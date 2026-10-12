@@ -1,11 +1,12 @@
 # TOOL-aHeardState-1 — format-guard: the turn end refuses a final message without the BUILD/SPEC pair or a committed line
 
-**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-2 · base 2f01150c · streams tooling · order 1
+**Status:** INPROGRESS · rev-2 · 2026-10-12 · node a · Tier-2 · base 2f01150c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-build-TOOL-aHeardState-1-1-live-witness.md](../build/2026-10-12-build-TOOL-aHeardState-1-1-live-witness.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md) | research | TOOL-aHeardState-2 |
 
 <!-- /gen:spec-records -->
@@ -55,9 +56,12 @@ to a live build omits the `BUILD`/`SPEC` pair, breaks rule r1, or leaves a new c
   other micro-format; field VALUES; where in the message the pair sits; sub-agent stops; every stop
   after a block in the same chain, whichever hook blocked; and whether it is wired. NOT OBSERVED —
   comment prose, which no arm reads.
-- **S9** — the end-to-end witness: once the wiring commit lands on this run's branch, one turn of this
-  run ends deliberately without the pair, and the transcript's `Stop hook feedback:` from this hook
-  is recorded in a `build/` record. AC11.
+- **S9** — the in-tree witness: the hook, run as the wired command runs it, against this run's own
+  orientation card, this tree's `memory/LIVE.md`, charter and HEAD, with only the Stop payload built
+  by hand, recorded in a `build/` record together with the turn this run ended without the pair. The
+  harness half — that a session started in a tree carrying the wiring delivers `last_assistant_message`
+  and surfaces the block — is handed to the owner, because this session's hooks load from the tree it
+  was launched in (F4). AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -183,10 +187,13 @@ the branch lands, which is the owner's act: this run closes into an owner-landin
   runs against `.claude/settings.json`, it reports the fragment wired, and
   `bash tools/check-hook-destinations.sh` exits 0. Red when: the fragment is unwired, or its
   `hook_path` names no shipped destination.
-- **AC11** — When this run ends one turn without the pair after the wiring commit, the session's
-  transcript shows `Stop hook feedback:` carrying this hook's reason, recorded in a
-  `memory/builds/aHeardState/build/` record. Red when: the turn ends with no feedback.
-  fixture: this run's own session; observable only after the wiring commit.
+- **AC11** — When the witness message this run's session ended a turn with is piped to
+  `format-guard.js` with this session's id and this tree as `cwd`, the hook reads the real card's
+  `- build: aHeardState` route and the real `memory/LIVE.md` row and blocks; the same message carrying
+  this build's pair allows; both recorded in a `memory/builds/aHeardState/build/` record. Red when:
+  the real inputs leave the hook unarmed, or the paired message blocks.
+  permission: the harness half needs a session launched in a tree carrying the wiring, which this
+  run's session is not; it is the owner's observation at the hand-off.
 
 ## 7. Gates
 
@@ -209,10 +216,21 @@ New arm: tools/hooks/format-guard.test.sh, the new held leg `format-guard self-t
   second instance. scratch-guard already exports `readCard`, `extractRouteUnits` and `readConfKey`;
   widening its export list by two names is the smallest seam.
   RESOLVED (agent, 2026-10-11, delegated): import through scratch-guard's `module.exports`.
+- **FACT-QUESTION · F4 — Can this run's own session observe the wired hook end to end?** Probe: end one
+  turn without the pair after the wiring commit, and look for `Stop hook feedback:`. Liveness: the
+  same session's stop-guard is wired and RUN.md binds the session, so a run-open block would appear
+  if this tree's hooks were the ones loaded. Observation, 2026-10-12: the turn ended with no feedback
+  from either hook, and the Bash environment carries no `CLAUDE_PROJECT_DIR`; the session was launched
+  in another worktree and moved here, so its hooks resolve there, where no aHeardState RUN.md exists.
+  RESOLVED (agent, 2026-10-12, delegated): no; AC11 is observed in-tree on the real inputs, and the
+  harness half goes to the owner.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · first draft, from the brief record and the kickoff's design defaults.
+- rev-2 · 2026-10-12 · S9 · AC11 · §8 · the end-to-end witness turn drew no feedback, because this
+  session's hooks load from its launch tree (F4); AC11 now observes the hook on the real card, LIVE.md,
+  charter and HEAD, and the harness half is the owner's at the hand-off.
 
 ## 10. Reuse audit
 

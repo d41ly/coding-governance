@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 6e8f8b1da4dc036b7fce23555b78fb4b5db0e60c · park · 13 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: dd96ba886
 phase: BUILDING
@@ -37,3 +38,7 @@ base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 2026-10-12T16:46:25Z dispatch · item 2d0dd234 TOOL-aHeardState-1 · reason tools/hooks/format-guard.js tools/hooks/format-guard.fragment.json tools/hooks/format-guard.test.sh tools/hooks/scratch-guard.js tools/hooks/kit.toml tools/hooks/README.md .claude/settings.json tools/gate-legs.json tools/govkit/registry.toml memory/map/features/agent-cap.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md
 
 2026-10-12T17:06:38Z dispatch · item 2d0dd234 TOOL-aHeardState-1 · reason tools/hooks/format-guard.js tools/hooks/format-guard.fragment.json tools/hooks/format-guard.test.sh tools/hooks/scratch-guard.js tools/hooks/kit.toml tools/hooks/README.md .claude/settings.json tools/gate-legs.json tools/govkit/registry.toml memory/map/features/agent-cap.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/guides/SESSION-KICKOFF.md
+
+2026-10-12T19:45:28Z dispatch · item 0a2162b9 TOOL-aHeardState-1 · reason memory/builds/aHeardState/spec/2026-10-11-spec-TOOL-aHeardState-1.md memory/builds/aHeardState/build/2026-10-12-build-TOOL-aHeardState-1-1-live-witness.md
+
+2026-10-12T19:47:28Z decision · item stop-guard is dark for a run whose session was launched in another worktree and moved to the run's tree: this run's session drew no run-open block at a BUILDING turn end · reason options: (a) the unattended kit's preflight refuses a session whose CLAUDE_PROJECT_DIR is not the run's tree; (b) the protocol tells the prompt path to relaunch the session in the new worktree; (c) record it as a gotcha only. Refused here: it changes the unattended kit, outside this build's mandate, and rests on an inference from two silent hooks (build record 2026-10-12-build-TOOL-aHeardState-1-1-live-witness.md)
