@@ -89,6 +89,21 @@ and the floor raised to 240; the pre-push suite's AC7 arm in the LIN scratch, th
 the predicate-9 arm, which now plants `reused_cache 1`, and the non-runner bar arm reading both
 knobs.
 
+## Found after the pass commit, and the records commit after it
+
+- `manifest-check.sh memory/guides/SESSION-KICKOFF.md` redded check 9 at `ba16f0f6d`: the merge
+  took origin's whole manifest, so `last-body-change` was origin's 31cf2f4c and counted this build's
+  17 watched commits. Taking the whole file also dropped this build's one surviving body line, the
+  bar command's `--calibrate-width` wording, which git had auto-merged; origin had deleted the
+  other line this build reworded, the ceiling line, which stays deleted. The records commit restores
+  the line, advances `last-body-change` and `last-audit` to `ba16f0f6d`, and the check exits 0.
+- The pre-push suite's H49 class arm, replayed read-only over the runner and the hook: it reds at the
+  build's parent `01ba3a815` on seven knobs this build's earlier units added to the runner
+  (`GATE_REUSE_PUSH`, `GATE_REUSE_SAMPLE`, `GATE_REUSE_DAY`, `GATE_CALIBRATION_RATES`,
+  `GATE_PUSH_BASE`, `GATE_SELFTESTS_MAX_LAG`, `GATE_SPAWN_NOW`) and is clean at origin 6e8f8b1da. The
+  composition adds `GATE_REUSE_LINEAGE`, in `GATE_REUSE_PUSH`'s class: cleared by the hook for every
+  bar, which none of the arm's three classes names. Owed with the seven, at VERIFYING.
+
 ## Announced gaps
 
 - `tools/run-gates/post-merge.sh` and the unattended driver's `_gknobs` scrub `GATE_REUSE` from the
