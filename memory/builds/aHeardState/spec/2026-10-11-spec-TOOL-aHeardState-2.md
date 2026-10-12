@@ -1,6 +1,6 @@
 # TOOL-aHeardState-2 — runlog prose: a transcript measure of narration, interjections and pair emission
 
-**Status:** INPROGRESS · rev-2 · 2026-10-13 · node a · Tier-2 · base 2f01150c · streams tooling · order 2
+**Status:** INPROGRESS · rev-3 · 2026-10-13 · node a · Tier-2 · base 2f01150c · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -134,7 +134,7 @@ can reach both kits, since both are gov-side.
 
 ## 7. Gates
 
-`runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `scratch-guard self-test` · `agent-cap self-test` · `hook destinations self-test` · `verifier fan-out self-test` · `review-join self-test`
+`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `scratch-guard self-test` · `agent-cap self-test` · `hook destinations self-test` · `verifier fan-out self-test` · `review-join self-test`
 
 New arm: tools/runlog/selftest.py · covers AC2 AC3 AC4 AC5 · a fixture transcript with known turns, interjections and pairs; a fence-less charter; an unknown session id · none
 New arm: tools/hooks/format-guard.test.sh · covers AC6 · the same fixture messages through both implementations · none
@@ -157,6 +157,7 @@ New arm: tools/hooks/format-guard.test.sh · covers AC6 · the same fixture mess
   because `_derive_owner_class` drops idle-wake ticks and task notifications, which open real turns;
   any typed user record now opens one. The same session has emitted pairs since the owner's grep, so
   AC1 no longer pins a zero.
+- rev-3 · 2026-10-13 · §7 · the closing review's guard narrowing (TOOL-aHeardState-4 and -5) put `tools/hooks/` back in the spec-tokens join and made the `format-guard self-test` guard joinable, so the leg line names them.
 
 ## 10. Reuse audit
 

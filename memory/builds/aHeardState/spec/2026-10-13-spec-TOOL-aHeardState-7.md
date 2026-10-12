@@ -1,6 +1,6 @@
 # TOOL-aHeardState-7 — the format-guard header states what happens to a continuation's commits, and an arm pins it
 
-**Status:** SPECCED · rev-1 · 2026-10-13 · node a · Tier-1 · base 2f9dfaf0 · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-10-13 · node a · Tier-1 · base 2f9dfaf0 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -49,7 +49,7 @@ A header correction and one arm of three stops over the existing fixture helpers
 
 ## 6. Gates
 
-`format-guard self-test`
+`format-guard self-test` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test`
 
 ## 7. Open questions
 
@@ -58,3 +58,4 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-10-13 · initial draft, promoted from closing review round 1 id 3; closes id 12.
+- rev-2 · 2026-10-13 · §7 · the closing review's guard narrowing (TOOL-aHeardState-4 and -5) put `tools/hooks/` back in the spec-tokens join and made the `format-guard self-test` guard joinable, so the leg line names them.

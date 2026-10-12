@@ -1,6 +1,6 @@
 # TOOL-aHeardState-8 — the closing review's mediums and lows: fixtures that can see the defects, and three small fixes
 
-**Status:** SPECCED · rev-1 · 2026-10-13 · node a · Tier-1 · base 2f9dfaf0 · streams tooling · order 8
+**Status:** SPECCED · rev-2 · 2026-10-13 · node a · Tier-1 · base 2f9dfaf0 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -86,7 +86,7 @@ microformats fence block only, so the pinned pair figures stop depending on the 
 
 ## 6. Gates
 
-`format-guard self-test` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line`
+`format-guard self-test` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line`
 
 ## 7. Open questions
 
@@ -95,3 +95,4 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-10-13 · initial draft, promoted from closing review round 1's 18 minors.
+- rev-2 · 2026-10-13 · §7 · the closing review's guard narrowing (TOOL-aHeardState-4 and -5) put `tools/hooks/` back in the spec-tokens join and made the `format-guard self-test` guard joinable, so the leg line names them.

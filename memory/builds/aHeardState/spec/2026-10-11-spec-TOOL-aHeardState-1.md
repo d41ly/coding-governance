@@ -1,6 +1,6 @@
 # TOOL-aHeardState-1 — format-guard: the turn end refuses a final message without the BUILD/SPEC pair or a committed line
 
-**Status:** INPROGRESS · rev-2 · 2026-10-12 · node a · Tier-2 · base 2f01150c · streams tooling · order 1
+**Status:** INPROGRESS · rev-3 · 2026-10-13 · node a · Tier-2 · base 2f01150c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -198,7 +198,7 @@ the branch lands, which is the owner's act: this run closes into an owner-landin
 
 ## 7. Gates
 
-`scratch-guard self-test` · `agent-cap self-test` · `hook destinations self-test` · `verifier fan-out self-test` · `review-join self-test` · `check-wiring self-test` · `lexicon naming predicates` · `run-gates canary` · `run-gates gov canary`
+`format-guard self-test` · `scratch-guard self-test` · `agent-cap self-test` · `hook destinations self-test` · `verifier fan-out self-test` · `review-join self-test` · `check-wiring self-test` · `lexicon naming predicates` · `run-gates canary` · `run-gates gov canary`
 
 New arm: tools/hooks/format-guard.test.sh, the new held leg `format-guard self-test` · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 · payloads piped over a fixture repository with a card, a LIVE.md, a charter fence and a moved HEAD · none
 
@@ -232,6 +232,7 @@ New arm: tools/hooks/format-guard.test.sh, the new held leg `format-guard self-t
 - rev-2 · 2026-10-12 · S9 · AC11 · §8 · the end-to-end witness turn drew no feedback, because this
   session's hooks load from its launch tree (F4); AC11 now observes the hook on the real card, LIVE.md,
   charter and HEAD, and the harness half is the owner's at the hand-off.
+- rev-3 · 2026-10-13 · §7 · the closing review's guard narrowing (TOOL-aHeardState-4 and -5) put `tools/hooks/` back in the spec-tokens join and made the `format-guard self-test` guard joinable, so the leg line names them.
 
 ## 10. Reuse audit
 
