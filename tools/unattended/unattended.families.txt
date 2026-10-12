@@ -1,0 +1,13 @@
+# unattended.families.txt - the driver's refusal FAMILIES, priced by check-arms.py (TOOL-aSparedSpawn-14 S5).
+# One row per family: <family><TAB><ceiling><TAB><date><TAB><decision id><TAB><ERE over each fail message>.
+# The count is the driver's sites whose message the ERE matches; over the ceiling is red with "a new
+# per-verb site: extend the family's shared table instead", and a pattern matching nothing is red.
+# Seeded AFTER the first retirement batch, at the census each pattern measured over the driver on
+# 2026-10-12, hits and near-misses read before seeding. missing-run-state is check_run_state's one
+# site; required-flag is check_verb_flag's plus the partner-flag and value-shape refusals left outside
+# VERB_REQUIRES; field-shape is the line-end, separator and bypass-flag refusals at the write boundary,
+# row 3 of the review, security-shaped (R4): consolidated by a later batch, never retired, and until
+# then a new site there is added only by raising this ceiling with a dated decision id.
+missing-run-state	1	2026-10-12	TOOL-aSparedSpawn-14	^no run-state file
+required-flag	11	2026-10-12	TOOL-aSparedSpawn-14	requires (--[a-z]|\$[a-z])
+field-shape	37	2026-10-12	TOOL-aSparedSpawn-14	newline|carriage return|field separator|own separator|bypass flag

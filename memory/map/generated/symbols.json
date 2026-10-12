@@ -3458,6 +3458,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "check_families",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
+    },
+    {
       "id": "check_family_view",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -3666,6 +3671,11 @@
       "id": "check_id",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "check_id_carried",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
     },
     {
       "id": "check_idle_invariant",
@@ -4158,6 +4168,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_retirements",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
+    },
+    {
       "id": "check_rev",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -4201,6 +4216,11 @@
       "id": "check_run_call",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "check_run_state",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_run_states",
@@ -4561,6 +4581,11 @@
       "id": "check_update_safety",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_verb_flag",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_view_line",
@@ -9883,6 +9908,11 @@
       "file": "tools/workflows/review_replay.py"
     },
     {
+      "id": "parse_ceilings",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
+    },
+    {
       "id": "parse_cell_key",
       "kind": "function",
       "file": "tools/lexicon/lexicon_conf.py"
@@ -10321,6 +10351,11 @@
       "id": "print_entries",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "print_env_failure",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "print_fail",
@@ -11316,6 +11351,11 @@
       "id": "read_debt_gloss",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_decision_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
     },
     {
       "id": "read_declared",

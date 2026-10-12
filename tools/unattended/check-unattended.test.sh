@@ -4373,15 +4373,9 @@ mutate .unattended.conf 's/^UNDECLARED_WRITE_BUDGET=.*/UNDECLARED_WRITE_BUDGET="
 hit "$(run)" "UNDECLARED_WRITE_BUDGET is not a single integer, so the per-build comparison below would be a string test wearing a numeric name"
 reset_tree
 
-# ---- THE RETIRED KEY IS REFUSED BY NAME (S8), off the leg's text scan of declared names, so an
-# ---- adopter who upgrades without moving it is told which key replaced it. Staged out, the old key
-# ---- is silently ignored and the leg passes.
-reset_tree
-printf '\nUNDECLARED_WRITE_CEILING="0"\n' >> .unattended.conf
-out=$(run)
-hit "$out" " is retired: check 23 grades each run record against a per-build budget now, so declare UNDECLARED_WRITE_BUDGET in .unattended.conf and delete the old key, which nothing reads any more"
-# AC3 (TOOL-aWindowedPass-5): a conf still setting the retired key passes check 22 and is reported as
-# retired there; check 23's refusal above is the one that names the replacement.
+# ---- AC3 (TOOL-aWindowedPass-5): a conf still setting the retired key passes check 22 and is reported
+# ---- as retired there. Check 23's by-name refusal of it was retired by TOOL-aSparedSpawn-14 (row 15,
+# ---- no tombstone), so that report is the key's one carrier.
 reset_tree
 printf '\nUNDECLARED_WRITE_CEILING="5"\n' >> .unattended.conf
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
@@ -6315,12 +6309,12 @@ hit "$_ss_whole" "the declared-scalar parser is missing from one of the two scri
 hit "$_ss_whole" "the allow-list names tNoSuchFn(), which no longer calls read_recorded_phase()"
 miss "$_ss_whole" "check-unattended: --only"
 _ss_union=""
-for _ss_s in core 28 30 31 32 33 39 40 15 41 42 43 47 48 49 50 51; do
+for _ss_s in core 28 30 31 32 33 39 40 15 41 42 43 48 49 50 51 52; do
   run_scoped "$_ss_s"
   _ss_union+=$(grep -v '^check-unattended: --only ' <<<"$out" || true)$'\n'
   if [ "$_ss_s" = core ]; then
     _ss_skip=$(grep '^check-unattended: --only core ran checks ' <<<"$out" || true); _ss_skip=" ${_ss_skip#*; skipped} "
-    for _ss_n in 28 30 31 32 33 39 40 15 41 42 43 47 48 49 50 51; do
+    for _ss_n in 28 30 31 32 33 39 40 15 41 42 43 48 49 50 51 52; do
       n=$((n+1)); case "$_ss_skip" in *" $_ss_n "*) ;; *) echo "FAIL --only core's liveness line does not name check $_ss_n as skipped"; st=1 ;; esac
       [ "$_ss_n" = 15 ] || miss "$out" "UNATTENDED check $_ss_n FAILED"
     done
@@ -6492,72 +6486,41 @@ mutate $KIT_REL/SKILL.template.md 's/then run `--hold` with the code/then run `-
 hit  "$(run)" "the Skill's hold paragraph routes a hold line to an override, which spends the one check between a run and its landing on a fault that is not the run's"
 reset_tree
 
-# ==== TOOL-dAlignedCarrier-1: CHECK 47, the retired commit premise in any shipped file of the kit
-# ---- The staged line is ASSEMBLED FROM FRAGMENTS split inside their words, so the staged sentence
-# ---- never exists contiguously in this suite's own bytes, and the real-tree leg, which reads this
-# ---- file too, stays clean. It is written to a file and appended by sed's `r`, as check 33's arm
-# ---- does, and the copy it lands in is the fixture's tracked lib, one of the population's plain
-# ---- shell files.
+# ==== TOOL-aSparedSpawn-14: CHECK 52, the three joins that replaced the driver's retired per-site
+# ---- refusals, on ONE fail line whose hits each name their join. Each staged break goes into the
+# ---- fixture's copy of the DRIVER, the one file the check reads, and each verdict is read off a run
+# ---- scoped to 52. A staged probe is written to a file and appended by sed's `r`, as check 48's arm
+# ---- does, so the real-tree leg never reads it. The first arm carries the line's whole literal.
+# ---- ROUTE (AC8): a scratch function naming its run-state file from `$_runmd` and refusing its absence
+# ---- by itself reds, naming the function...
 reset_tree
-_c47_no="n""o"; _c47_dv="dri""ver ve""rb"; _c47_cm="comm""its"
-printf '# the rows: %s %s %s them\n' "$_c47_no" "$_c47_dv" "$_c47_cm" > "$TMPBIN_PARENT/c47.line"
-mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
-out=$(run)
-hit  "$out" "a shipped file of this kit states the retired premise that the driver makes no commit of its own, but under LANDER_MODE=in-place --close commits its own records commit, so a reader who trusts the sentence expects staged rows to stay uncommitted after the close has committed them; reword it to name the step that commits them. matches: "
-hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: "
-# ...the NEAR-MISS, a control on the predicate rather than a second break: the same words ending in
-# a verb that makes no commit, the shape a sibling suite carries, stay silent. Without it the arm
-# above is equally consistent with a ban on every sentence that names the driver's verbs at all.
+printf 'c52probe() {\n  runmd_of "$1" >/dev/null; rel=$_runmd\n  [ -f "$rel" ] || { fail 99 "a scratch verb refusing a missing record by itself"; return 1; }\n}\n' > "$TMPBIN_PARENT/c52.fn"
+mutate $KIT_REL/unattended.sh "\$r $TMPBIN_PARENT/c52.fn"
+out=$(bash "$SCRIPT" --only 52 2>&1)
+hit  "$out" "the driver's shared refusals have a second spelling or a gap - a run-state test refusing outside check_run_state, a VERB_REQUIRES pair and its check_verb_flag call out of step, a claim mode or class its declarations lack, or a population with nothing to join - so the one arm each helper keeps no longer covers its condition: route c52probe() at line "
+# ...and the NEAR-MISS: the same test over a variable not named from `$_runmd` - a README, a brief, a
+# piece - stays silent, so the arm above is not a ban on every presence test that refuses.
 reset_tree
-printf '# the rows: %s %s does\n' "$_c47_no" "$_c47_dv" > "$TMPBIN_PARENT/c47.line"
-mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
-miss "$(run)" "UNATTENDED check 47 FAILED"
+printf 'c52probe() {\n  rel=$1\n  [ -f "$rel" ] || { fail 99 "a scratch verb refusing a missing file of its own"; return 1; }\n}\n' > "$TMPBIN_PARENT/c52.fn"
+mutate $KIT_REL/unattended.sh "\$r $TMPBIN_PARENT/c52.fn"
+miss "$(bash "$SCRIPT" --only 52 2>&1)" "UNATTENDED check 52 FAILED"
+# ---- FLAGS (AC9): a VERB_REQUIRES pair whose call is gone reds as unenforced.
 reset_tree
-
-# ==== TOOL-dAlignedCarrier-6: CHECK 47's SECOND ROW, the retired premise that the landing's close
-# ---- is where the owed flagged bar is told (closing review L2). Assembled from fragments split
-# ---- inside their words, as the first row's arm is, so this suite's own bytes form no instance.
-# ---- Both alternatives are staged, the mode token first and the announcing word first.
-_c47_ip="in-""place"; _c47_an="anno""unces"
-printf '# the %s close %s the owed bar\n' "$_c47_ip" "$_c47_an" > "$TMPBIN_PARENT/c47.line"
-mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
-out=$(run)
-hit  "$out" "a shipped file of this kit states the retired premise that the landing's close is where the owed flagged bar is told, but since TOOL-dAlignedCarrier-6 the move into VERIFYING announces it under every LANDER_MODE and the close says nothing, so a reader who trusts the sentence waits at the close for a notice that never comes; reword it to name the move into VERIFYING. matches: "
-hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: \"$_c47_ip close $_c47_an\""
+mutate $KIT_REL/unattended.sh '/check_verb_flag --park --reason/d'
+hit  "$(bash "$SCRIPT" --only 52 2>&1)" "flag --park --reason is listed and never enforced"
+# ---- CLAIMS (AC10): a case arm naming a mode CLAIM_MODES lacks, and separately a class CLAIM_READS
+# ---- lacks, each reds naming it.
 reset_tree
-printf '# it %s, on an %s close, that the bar is owed\n' "$_c47_an" "$_c47_ip" > "$TMPBIN_PARENT/c47.line"
-mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
-out=$(run)
-hit  "$out" "the retired premise that the landing's close is where the owed flagged bar is told"
-hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: \"$_c47_an, on an $_c47_ip close,\""
-# ...the NEAR-MISS: the same mode's close with no announcing word stays silent, so the arm above is
-# not equally consistent with a ban on naming that close at all.
+mutate $KIT_REL/unattended.sh 's/^  case "\$mode:\$cls" in$/&\n    scratch:mine) CW_ACT=renew ;;/'
+hit  "$(bash "$SCRIPT" --only 52 2>&1)" "claim mode scratch (an arm at line "
 reset_tree
-printf '# the %s close runs the bar\n' "$_c47_ip" > "$TMPBIN_PARENT/c47.line"
-mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
-miss "$(run)" "UNATTENDED check 47 FAILED"
+mutate $KIT_REL/unattended.sh 's/^  case "\$mode:\$cls" in$/&\n    holder:foreign-scratch) CW_ACT=take ;;/'
+hit  "$(bash "$SCRIPT" --only 52 2>&1)" "claim class foreign-scratch (an arm at line "
+# ---- LIVENESS: a driver with no VERB_REQUIRES row has nothing to join, and says so rather than
+# ---- passing over the empty set.
 reset_tree
-
-# ==== TOOL-dAlignedCarrier-6 rev-5: CHECK 47's WINDOW HOLDS EACH ROW'S WIDEST INSTANCE WRAPPED AT
-# ---- EVERY WORD, AND EACH EXCERPT IS WHOLE (closing review round 2, L1 and L4). Row 2's widest
-# ---- instance is eight words and row 1's seven. Each is staged once per position it can wrap at,
-# ---- every copy after a line of eight neutral words that flushes the window, and the ONE run must
-# ---- report the whole quoted excerpt once per copy: 7 for row 2, 6 for row 1. A window a word short
-# ---- drops a copy and a pattern ending on a bare stem truncates every excerpt, so either reds the
-# ---- count. Fragments as above, so this suite's own bytes form no instance.
-_c47_ip="in-""place"; _c47_an="anno""unces"; _c47_no="n""o"; _c47_vb="ve""rb"; _c47_cm="comm""its"
-for _c47_row in "$_c47_ip p q close r s t $_c47_an" "$_c47_no p q $_c47_vb r s $_c47_cm"; do
-  read -r -a _c47_w <<<"$_c47_row"
-  for ((_c47_i = 1; _c47_i < ${#_c47_w[@]}; _c47_i++)); do
-    printf '# f f f f f f f f\n# %s\n# %s\n' "${_c47_w[*]:0:_c47_i}" "${_c47_w[*]:_c47_i}"
-  done
-done > "$TMPBIN_PARENT/c47.line"
-mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
-out=$(run)
-same "check 47 row 2 wrapped at each of its 7 positions" \
-  "$(printf '%s\n' "$out" | grep -F "the landing's close is where the owed flagged bar is told" | grep -oF "\"$_c47_ip p q close r s t $_c47_an\"" | wc -l | tr -d ' ')" 7
-same "check 47 row 1 wrapped at each of its 6 positions" \
-  "$(printf '%s\n' "$out" | grep -F "the driver makes no commit of its own" | grep -oF "\"$_c47_no p q $_c47_vb r s $_c47_cm\"" | wc -l | tr -d ' ')" 6
+mutate $KIT_REL/unattended.sh '/^VERB_REQUIRES="/,/"$/d'
+hit  "$(bash "$SCRIPT" --only 52 2>&1)" "nothing to join: no VERB_REQUIRES row"
 reset_tree
 
 # ==== TOOL-dAlignedCarrier-6: CHECK 48, a run-state fact written after the function's last stage
@@ -6859,18 +6822,21 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- AC3's three and the partition's seventy (seventeen `run_scoped` calls at two each, the
 # ---- `--only core` skip loop's sixteen and fifteen, the staged reds' four and the final `same`).
 # ---- FLOOR_SHARD_7 carries the same +79 and the other seven are untouched. OWED: observed at VERIFYING.
-FLOOR_ASSERTIONS=1046
+# ---- LOWERED 1046 -> 1041 by TOOL-aSparedSpawn-14 (row 15 of the first retirement batch): check 47's
+# ---- sixteen assertions and check 23's tombstone arm left, check 52's twelve arrived, counted off the
+# ---- diff; region 3 carries -1 and region 7 -4. This pass runs no suite. OWED: observed at VERIFYING.
+FLOOR_ASSERTIONS=1041
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
 FLOOR_SHARD_1=159
 FLOOR_SHARD_2=67
-FLOOR_SHARD_3=128
+FLOOR_SHARD_3=127
 FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133
 FLOOR_SHARD_6=150
-FLOOR_SHARD_7=305
+FLOOR_SHARD_7=301
 FLOOR_SHARD_8=208
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;

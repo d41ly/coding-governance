@@ -1,0 +1,63 @@
+# memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-14-direct-checks.sh, run on node a 2026-10-12 over the pass's final tree
+== row 1 replay: a verb on a slug with no run-state file
+UNATTENDED check 10 FAILED — no run-state file, so there is no run to report on: memory/builds/aNoSuchRun/RUN.md
+rc=1
+== row 2 replay: --park with no --item, refused by the shared reader before any write
+UNATTENDED check 112 FAILED — --park requires --item, because the verb's row in VERB_REQUIRES lists it, and a record written without that value is one no reader can act on
+rc=1
+== row 2: usage renders VERB_REQUIRES row for row (diff of the render against the source text)
+identical
+== row 5 replay: a scratch call of print_env_failure from the sourced driver
+UNATTENDED check 99 FAILED — a scratch environment failure the helper prints
+rc=2
+== row 1 / AC8: a scratch verb tests its run-state file and refuses by itself
+unattended-report: check 52 joined the driver's VERB_REQUIRES, claim declarations and their readers: 24 pair(s), 24 call(s), 11 arm(s), 14 caller(s)
+FAILED, hits: route c52probe() at line 13900
+== AC8 near-miss: the same test on a variable not named from _runmd stays silent
+unattended-report: check 52 joined the driver's VERB_REQUIRES, claim declarations and their readers: 24 pair(s), 24 call(s), 11 arm(s), 14 caller(s)
+== AC8: a per-site message back under another number
+unattended-report: check 52 joined the driver's VERB_REQUIRES, claim declarations and their readers: 24 pair(s), 24 call(s), 11 arm(s), 14 caller(s)
+FAILED, hits: route c52probe() at line 13899
+== AC9: a listed flag whose call is gone
+unattended-report: check 52 joined the driver's VERB_REQUIRES, claim declarations and their readers: 24 pair(s), 23 call(s), 11 arm(s), 14 caller(s)
+FAILED, hits: flag --park --reason is listed and never enforced
+== AC9: a call the table does not list
+unattended-report: check 52 joined the driver's VERB_REQUIRES, claim declarations and their readers: 24 pair(s), 25 call(s), 11 arm(s), 14 caller(s)
+FAILED, hits: flag --park --step is enforced and not listed
+== row 4 / AC10: a claim mode in a case arm CLAIM_MODES lacks
+unattended-report: check 52 joined the driver's VERB_REQUIRES, claim declarations and their readers: 24 pair(s), 24 call(s), 12 arm(s), 14 caller(s)
+FAILED, hits: claim mode scratch (an arm at line 2136)
+== AC10: a read class in a case arm CLAIM_READS lacks
+unattended-report: check 52 joined the driver's VERB_REQUIRES, claim declarations and their readers: 24 pair(s), 24 call(s), 12 arm(s), 14 caller(s)
+FAILED, hits: claim class foreign-scratch (an arm at line 2136)
+== AC10: a caller passing an undeclared mode
+unattended-report: check 52 joined the driver's VERB_REQUIRES, claim declarations and their readers: 24 pair(s), 24 call(s), 11 arm(s), 15 caller(s)
+FAILED, hits: claim mode scratchmode (a caller at line 13898)
+== check 52 liveness: no VERB_REQUIRES row
+unattended-report: check 52 joined the driver's VERB_REQUIRES, claim declarations and their readers: 0 pair(s), 24 call(s), 11 arm(s), 14 caller(s)
+FAILED, hits: nothing to join: no VERB_REQUIRES row
+== control: the pristine driver
+unattended-report: check 52 joined the driver's VERB_REQUIRES, claim declarations and their readers: 24 pair(s), 24 call(s), 11 arm(s), 14 caller(s)
+
+# memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-14-arm-breaks.py tools/memory-tree/check-arms.py: each break staged into a copy, its --selftest run
+== ceiling compare: 1 arm(s) red
+   arm FAIL  AC3: a census one above its ceiling reds naming the gate and the review — expected 'tools/kit/budget.sh has 2 fail branch(es) and refusal site(s) agai
+== ceiling date: 1 arm(s) red
+   arm FAIL  AC4: a ceiling token that lacks its date reds naming the token — expected "REFUSAL_CEILINGS token 'tools/kit/budget.sh:2:TOOL-tBudget-1' is malformed 
+== ceiling id carried: 1 arm(s) red
+   arm FAIL  AC4: a ceiling naming an id the decision log does not carry reds naming the token's id — expected 'REFUSAL_CEILINGS token for tools/kit/budget.sh name
+== family over ceiling: 1 arm(s) red
+   arm FAIL  AC5: one more site matching a family at its ceiling reds with the shared-table remedy — expected "tools/kit/budget.sh carries 2 site(s) in family alph
+== family dead pattern: 1 arm(s) red
+   arm FAIL  AC7: a family pattern matching no refusal site reds naming the family — expected 'tools/kit/budget.families.txt:1 family dead matches no refusal site 
+== survivor signature: 1 arm(s) red
+   arm FAIL  AC1: a retirement row whose survivor lacks its signature reds naming the row's id — expected '(TOOL-tBudget-1) names the survivor tools/kit/budget.sh,
+== replay field: 1 arm(s) red
+   arm FAIL  AC2: a retirement row lacking its replay field reds naming the field — expected '(TOOL-tBudget-1) lacks its replay field', got: check-arms: ceiling to
+== survivor field: 1 arm(s) red
+   arm FAIL  AC2: a retirement row lacking its survivor field reds naming the field — expected '(TOOL-tBudget-1) lacks its survivor field', got: UNEXPECTED Attribu
+== retirement id carried: 1 arm(s) red
+   arm FAIL  S2: a retirement row naming an id the decision log does not carry reds — expected 'names TOOL-tBudget-7, which no DECISIONS.md row carries', got: chec
+== report unbudgeted: 1 arm(s) red
+   arm FAIL  ...and a tree with no ceiling lists its gate unbudgeted — expected 'unbudgeted gates (1, no REFUSAL_CEILINGS token): tools/kit/budget.sh', got: tools/
+# unbroken: PASS — check-arms: all arms held

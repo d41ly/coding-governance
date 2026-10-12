@@ -65,7 +65,7 @@ roughly doubled in six weeks while nothing retires one.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 15 unit(s) · node a · opened 2026-10-09 · streams tooling
+**Build status:** CLOSED · 15 unit(s) · node a · opened 2026-10-09 · streams tooling
 ids TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14
 ids TOOL-aSparedSpawn-15
 
@@ -86,10 +86,10 @@ ids TOOL-aSparedSpawn-15
 | [TOOL-aSparedSpawn-9 — fixture templates and environment git identity across the named suites](spec/2026-10-09-spec-TOOL-aSparedSpawn-9.md) | 2 | 1 | CLOSED | rev-1 | 2026-10-09 |
 | [TOOL-aSparedSpawn-12 — the held self-test tier, selected by the kit whose shipped bytes moved](spec/2026-10-09-spec-TOOL-aSparedSpawn-12.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-12 |
 | [TOOL-aSparedSpawn-13 — content-addressed reuse: declared read classes, a shared cache, a soundness sample](spec/2026-10-09-spec-TOOL-aSparedSpawn-13.md) | 3 | 2 | CLOSED | rev-5 | 2026-10-12 |
-| [TOOL-aSparedSpawn-14 — a refusal retirement review, and a growth budget beside the floors](spec/2026-10-09-spec-TOOL-aSparedSpawn-14.md) | 3 | 2 | INPROGRESS | rev-4 | 2026-10-12 |
+| [TOOL-aSparedSpawn-14 — a refusal retirement review, and a growth budget beside the floors](spec/2026-10-09-spec-TOOL-aSparedSpawn-14.md) | 3 | 2 | CLOSED | rev-4 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 41 bound to this build, across 3 record folder(s).
+Records: 42 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

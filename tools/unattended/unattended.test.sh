@@ -1582,10 +1582,21 @@ same "a probe answering no reads unregistered" "$(_tr "$ORIGIN_DIR/tick-no:$PATH
 hit "$(_tr "$ORIGIN_DIR/tick-none")" "is not on PATH"
 same "a missing probe command reads UNKNOWN, not no" "$(_tr "$ORIGIN_DIR/tick-none" | cut -c1)" "2"
 
-# ---- check 10, all three branches: no file for --status, no phase, no file for --close.
+# ---- check 10: the missing run-state refusal every verb shares, `check_run_state`, armed ONCE
+# ---- (TOOL-aSparedSpawn-14 S7: twenty-three per-verb arms retired, leg check 52 routes every verb
+# ---- through the helper), and the no-phase branch below.
 reset_tree; readme tNoRun; fixture
 out=$(run --status tNoRun);  hit "$out" "no run-state file, so there is no run to report on"
-out=$(run --close tNoRun);   hit "$out" "no run-state file, so there is no run to close"
+# ---- TOOL-aSparedSpawn-14 S8: `usage` renders VERB_REQUIRES row for row. The expected rows are read
+# ---- off the SOURCE text here, never off the variable the driver renders them from.
+same "AC9 usage renders every VERB_REQUIRES row byte for byte" \
+  "$(run_proc | sed -n '/^required flags, per verb:$/,$p' | sed '1d; s/^  //')" \
+  "$(sed -n '/^VERB_REQUIRES="/,/"$/p' "$SCRIPT" | sed 's/^VERB_REQUIRES="//; s/"$//')"
+# ---- TOOL-aSparedSpawn-14 S10: an environment failure exits 2 through `print_env_failure`, called
+# ---- here from the sourced driver inside a substitution, whose subshell is all its exit ends.
+out=$(print_env_failure 99 "a scratch environment failure the helper prints" 2>&1); rc=$?
+same "AC11 print_env_failure exits 2" "$rc" "2"
+hit "$out" "UNATTENDED check 99 FAILED — a scratch environment failure the helper prints"
 reset_tree
 out=$(run --status tRun)
 hit "$out" "the run-state file declares no phase, and a run with no phase is not resumable"
@@ -2426,7 +2437,6 @@ reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 hit "$(run --phase tRun NOSUCHPHASE --witness abc)" "the phase is not in the declared vocabulary, and a phase nothing recognises is not a position"
 hit "$(run --phase tRun BUILDING)" "a phase claim carries a WITNESS - a sha, a tag or a run id - and presence is its own refusal because an unwitnessed claim is the one an oracle skips"
 reset_tree
-hit "$(run --phase tBare BUILDING --witness abc)" "no run-state file, so there is no run to move"
 
 # ...and a TERMINAL phase is refused here whatever the vocabulary says. Membership is not permission:
 # a run that could set LANDED through this verb would skip the entire Definition-of-Done gate, and
@@ -3231,13 +3241,8 @@ n=$((n+1)); [ -z "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ] \
 
 # ---- S2: --attest, because the two AGENT-attested keys had no writer and --abort REQUIRES both. Its
 # ---- refusals first: no item, an undeclared item, and a MACHINE-checked item.
-# ...and with NO run-state file at all: --attest must not mint one, because a record created by an
-# attestation is a run that authorized its own existence.
-reset_tree; rm -f memory/builds/tRun/RUN.md
-hit "$(run --attest tRun --item keepalive-reaped)" "no run-state file, so there is no run to attest anything about"
 
 bcopen
-hit "$(run --attest tRun)" "--attest requires --item: an attestation with no item named is not an attestation"
 hit "$(run --attest tRun --item not-a-real-item)" "--attest names an item that is not in the declared DoD set, so nothing would ever read it"
 # The refusal reads the item's declared CHECKER rather than matching a pair of names, so a project
 # that renames a machine item still gets refused and one that declares its own agent item gets the verb.
@@ -3687,8 +3692,6 @@ miss "$out" "an UNCOMMITTED LANDING is sitting in:"
 git worktree remove --force "$OTHER" 2>/dev/null; git branch -q -D other-tree 2>/dev/null
 reset_tree
 
-hit "$(run --landed tBare)" "no run-state file, so there is no run to mark landed"
-
 # ---- 32: the OBSERVATION. The fixture's unit branch is one commit AHEAD of the anchor, which is
 # ---- exactly the state of a run that has built but not landed — so HEAD is not an ancestor of the
 # ---- advertised tip and the claim is refused. This is the branch that makes LANDED an observation
@@ -4056,12 +4059,6 @@ if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stoppe
 # ---- 33/34/35: --abort. It is deliberately NOT symmetric with --landed: an aborted run landed
 # ---- nothing, so the four machine items assert obligations it does not have — but it owes BOTH
 # ---- agent-attested items, and a first cut of this unit dropped the second.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
-before=$(sum)
-hit "$(run --abort tRun)" "--abort requires --reason, because an abort with no recorded reason is indistinguishable from a run that simply stopped, and the reason is the only thing the owner gets in place of the turn nobody took"
-same "the reasonless --abort wrote nothing" "$(sum)" "$before"
-hit "$(run --abort tBare --reason r)" "no run-state file, so there is no run to abort"
-
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
 hit "$(run --abort tRun --reason "second thoughts")" "the run is already finished and a finished record is not something to move, re-open or re-pin"
@@ -4909,9 +4906,6 @@ out=$(run --authorization tBr2); _az_rc=$?
 hit  "$out" "unattended: authorization-reachable — met · base $_az_tip · anchor refs/heads/main at "
 same "GH30 AC1 a met record exits 0" "$_az_rc" "0"
 same "GH30 AC1 a met record moved nothing" "$(read_authorization_witness tBr2)" "$_az_w0"
-out=$(run --authorization tAbsent); _az_rc=$?
-hit  "$out" "no run-state file, so there is no run whose authorization can be graded"
-same "GH30 AC1 an absent record exits 1" "$_az_rc" "1"
 # ---- AC2: the borrowed record is check 89's, and ONE line then names both exits and not owner-landing.
 _az_w0=$(read_authorization_witness tBr)
 _az_ref=$(run --authorization tBr); _az_rc=$?
@@ -5215,15 +5209,13 @@ same "a different item parks its own row" "$(grep -c 'decision · item ' memory/
 hit "$(run --status tRun)" "· parked 2"
 miss "$(run --status tNoPark)" "· parked"
 
-# refusal: no --item.
+# refusal: no --item, through the required-flag reader every verb shares (TOOL-aSparedSpawn-14 S8):
+# its ONE arm. Each verb's other required flags are listed in VERB_REQUIRES and joined to their
+# calls by leg check 52, not re-armed one by one.
 before=$(git hash-object memory/builds/tRun/RUN.md)
 out=$(run --park tRun --reason "r")
-hit "$out" "--park requires --item, because a parked entry with no question recorded is the bare 'parked' the protocol calls indistinguishable from 'forgotten'"
+hit "$out" "--park requires --item, because the verb's row in VERB_REQUIRES lists it, and a record written without that value is one no reader can act on"
 same "a refused park wrote nothing" "$(git hash-object memory/builds/tRun/RUN.md)" "$before"
-
-# refusal: no --reason.
-out=$(run --park tRun --item "q")
-hit "$out" "--park requires --reason, because an entry recording no reason is indistinguishable from one nobody meant - the same argument --waive already makes"
 
 # refusal: a reason spelling the declared bypass flag. park() writes it verbatim and leg check 11
 # greps the file WHOLE, so recording it would red the bar on a record no verb can rewrite.
@@ -5251,12 +5243,6 @@ run --phase tRun LANDING --witness "$(git rev-parse HEAD)" >/dev/null 2>&1 || tr
 sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
 hit "$(run --park tRun --item q --reason r)" "ABORTED via --park"
 
-# refusal: NO RECORD AT ALL. `refuse_if_terminal` returns 0 for a file that does not exist, so a
-# design leaning on it alone would let --park mint a parked entry for a run that never started.
-reset_tree; rm -f memory/builds/tRun/RUN.md
-out=$(run --park tRun --item q --reason r)
-hit "$out" "no run-state file, so there is no run to park a decision against"
-same "--park created no record" "$([ -f memory/builds/tRun/RUN.md ] && echo yes || echo no)" "no"
 reset_tree
 
 # ---- the proposal-kind unit: `--propose`, the FIFTH parked kind. A recipe-mode run follows its
@@ -5312,21 +5298,7 @@ same "a proposal changed nothing the close blocks on" "$blocked_after" "$blocked
 same "the close was actually evaluating something" \
   "$([ "$blocked_before" -gt 0 ] && echo yes || echo no)" "yes"
 
-# refusal: no --item.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
-before=$(git hash-object memory/builds/tRun/RUN.md)
-out=$(run --propose tRun --step F1 --reason r)
-hit "$out" "--propose requires --item, because a proposal naming no amendment is the bare 'noticed something' that a wrap-up cannot act on and the next run cannot find"
-same "a refused proposal wrote nothing" "$(git hash-object memory/builds/tRun/RUN.md)" "$before"
-
-# refusal: no --step. This is the field no other kind carries, and the reason it exists:
-# an amendment floating free of the step that provoked it is advice.
-out=$(run --propose tRun --item i --reason r)
-hit "$out" "--propose requires --step, because an amendment floating free of the playbook step that provoked it is advice, and the owner would have to re-derive where it applies"
-
-# refusal: no --reason.
-out=$(run --propose tRun --item i --step F1)
-hit "$out" "--propose requires --reason, because a proposal recording no reason is indistinguishable from one nobody meant - the same argument --park and --waive already make"
 
 # refusal: a NEWLINE, in any of the three fields. park() appends ONE line and the leg parses the
 # region line-wise, so one carried through forges a second row that no verb wrote.
@@ -5348,12 +5320,6 @@ same "the bypass-flag refusal wrote nothing" "$(git hash-object memory/builds/tR
 sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
 hit "$(run --propose tRun --item i --step F1 --reason r)" "ABORTED via --propose"
 
-# refusal: NO RECORD AT ALL. refuse_if_terminal returns 0 for a file that does not exist, so the
-# existence guard is separate here for the reason it is separate in --park.
-reset_tree; rm -f memory/builds/tRun/RUN.md
-out=$(run --propose tRun --item i --step F1 --reason r)
-hit "$out" "no run-state file, so there is no run to propose a playbook amendment against"
-same "--propose created no record" "$([ -f memory/builds/tRun/RUN.md ] && echo yes || echo no)" "no"
 reset_tree
 
 # ---- check 47: --record-piece. Every refusal, plus the two PASSING directions that tell a working
@@ -5362,9 +5328,6 @@ reset_tree
 reset_tree
 mkdir -p pc/one recs; printf 'a fixture piece
 ' > pc/one/piece.md; git add -A >/dev/null
-hit "$(run --record-piece tRun --records-root recs --leg L --verdict PASS)" "--record-piece requires --path, because a verdict with no piece to join to is a verdict about nothing"
-hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --verdict PASS)" "--record-piece requires --leg, because a verdict that names no check cannot be compared against the playbook's declared set"
-hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg L)" "--record-piece requires --verdict, because an absent one is indistinguishable from a check that never ran"
 hit "$(run --record-piece tRun --records-root recs --path pc/nope.md --leg L --verdict PASS)" "a piece record names a path that is not a file in this tree, so the hash it joins on does not exist and the record would describe nothing - path follows:"
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg L --verdict MAYBE)" "a piece verdict is outside the closed set, and a verdict nobody can compare is a record that reads as evidence while carrying an opinion - legal values are PASS FAIL NA, given:"
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'a · b' --verdict PASS)" "a piece record field spells the record's own field separator, which makes the row unparseable by the check that grades it - the four fields tested follow: leg ["
@@ -5385,18 +5348,12 @@ same "the record carries the piece it joins to" "$(sed -n 's/^piece: //p' recs/*
 same "the record carries the piece HASH, not a placeholder" "$(sed -n 's/^hash: //p' recs/*.md | head -1)" "$(git hash-object pc/one/piece.md)"
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg L --verdict PASS)" "piece verdict unchanged"
 
-# ---- and the SLUG caller refuses with no run-state file, which is what makes the attended path need
-# ---- a second CALLER rather than a second implementation.
-rm -f memory/builds/tRun/RUN.md
-hit "$(run --record-piece tRun --path pc/one/piece.md --leg L --verdict PASS)" "no run-state file, so there is no run to record a piece against - the attended path calls the records-root form of this writer instead, which is why there is one function and two callers:"
 reset_tree
 
 # ---- check 47, the SET writer. Same shape as the piece writer's arms: every refusal, then the
 # ---- passing direction, because refusal arms alone are satisfied by a writer that refuses all.
 reset_tree
 mkdir -p recs2; git add -A >/dev/null
-hit "$(run --record-set tRun --records-root recs2 --verdict PASS)" "--record-set requires --leg, because a set verdict that names no check cannot be compared against the playbook's declared set"
-hit "$(run --record-set tRun --records-root recs2 --leg S)" "--record-set requires --verdict, because an absent one is indistinguishable from a check that never ran"
 hit "$(run --record-set tRun --records-root recs2 --leg S --verdict MAYBE)" "a set verdict is outside the closed set, and a verdict nobody can compare is a record that reads as evidence while carrying an opinion - legal values are PASS FAIL NA, given:"
 out=$(run --record-set tRun --records-root recs2 --run R1 --leg S --verdict PASS)
 hit "$out" "set verdict recorded"
@@ -5526,10 +5483,6 @@ hit "$(run --record-set tDoD2 --records-root recs4 --run R9 --leg honest --verdi
 same "...and the second re-stamp is staged too" "$(git diff --name-only -- recs4)" ""
 reset_tree
 
-# ---- and the SLUG callers refuse without a run-state file, which is what makes the attended path a
-# ---- second CALLER rather than a second implementation.
-rm -f memory/builds/tRun/RUN.md
-hit "$(run --record-set tRun --leg S --verdict PASS)" "no run-state file, so there is no run to record a set against - the attended path calls the records-root form of this writer instead:"
 reset_tree
 
 # ---- the RECORDS ROOT comes from the playbook the run is bound to, at BASE. A run bound to a
@@ -6041,19 +5994,12 @@ rm -rf "$stubdir"
 
 
 
-# ---- THE THREE NEW REFUSALS, each armed by a POSITIVE assertion naming its own failure text. All
-# ---- three are REACHABLE, which is why none of them is pinned: the registry's contract is that a pin
+# ---- THE TWO REMOTE-OBSERVATION REFUSALS, each armed by a POSITIVE assertion naming its own failure
+# ---- text; the scratch-file third went to `print_env_failure` at TOOL-aSparedSpawn-14. Both are
+# ---- REACHABLE, which is why neither is pinned: the registry's contract is that a pin
 # ---- means no fixture CAN reach a branch, and "chose not to" is a different fact wearing the same
 # ---- row. Two of them are reached by a stub `git` ahead of the real one on PATH, which is the only
 # ---- fixture that can make a remote observation fail in a chosen WAY rather than merely fail.
-
-echo "MARK arm-mktemp" >&2
-# ---- the scratch file the bound needs. Without a file to capture into there is no bound, so the
-# ---- observation is refused rather than run unbounded — the one case where failing to allocate is
-# ---- safer than proceeding. Reached with a TMPDIR that does not exist, which is what mktemp reads.
-bcopen
-out=$(TMPDIR="$TMP/no-such-dir-for-mktemp" bash "$SCRIPT" --close tRun 2>&1)
-hit "$out" "cannot create a scratch file to capture the remote advertisement, so the observation cannot be bounded and an unbounded one is what this refuses"
 
 echo "MARK arm-timeout" >&2
 # ---- the TIMEOUT refusal, and it says timeout rather than failure on purpose: "the remote did not
@@ -6240,10 +6186,6 @@ mkdir -p memory/builds/tRun/prompts memory/builds/tRun/spec
 printf 'a brief
 ' > memory/builds/tRun/prompts/armbrief.md
 git add memory/builds/tRun/prompts/armbrief.md >/dev/null 2>&1
-o=$(run --brief tRun --path memory/builds/tRun/prompts/armbrief.md)
-n=$((n+1)); case "$o" in *"--brief requires --unit, because a brief naming no unit records what SOME agent was handed and joins to nothing"*) echo "ok   brief: --unit is required" ;; *) echo "FAIL brief: --unit is required -- $o"; st=1 ;; esac
-o=$(run --brief tRun --unit ARCH-tRun-1)
-n=$((n+1)); case "$o" in *"--brief requires --path, because the brief is the FILE and a row with no path records that one existed"*) echo "ok   brief: --path is required" ;; *) echo "FAIL brief: --path is required -- $o"; st=1 ;; esac
 o=$(run --brief tRun --unit ARCH-tRun-404 --path memory/builds/tRun/prompts/armbrief.md)
 n=$((n+1)); case "$o" in *"--brief names a unit the build README's generated units region does not carry, so the brief joins to no unit of this build"*) echo "ok   brief: a unit off the roster is refused" ;; *) echo "FAIL brief: a unit off the roster is refused -- $o"; st=1 ;; esac
 o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/gone.md)
@@ -6308,12 +6250,8 @@ o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 n=$((n+1)); case "$o" in *"a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: "*" spells ["*) echo "ok   order verb: a malformed value is REFUSED, not truncated to its prefix" ;; *) echo "FAIL order verb: a malformed value is REFUSED, not truncated to its prefix -- $o"; st=1 ;; esac
 rm -f memory/builds/tRun/spec/one.md
 
-# A slug with a README and NO run-state file, and one with neither: the two preconditions the
-# verb tests before it looks at anything the caller passed.
-mkdir -p memory/builds/tNoRun
-readme tNoRun
-o=$(run --brief tNoRun --unit ARCH-tNoRun-1 --path memory/builds/tRun/prompts/armbrief.md)
-n=$((n+1)); case "$o" in *"no run-state file, so there is no run to record a brief against"*) echo "ok   brief: a build with no run-state file has no run to record against" ;; *) echo "FAIL brief: a build with no run-state file has no run to record against -- $o"; st=1 ;; esac
+# A slug with a run-state file and NO README: the precondition the verb tests before it looks at
+# anything the caller passed. A missing run-state file is `check_run_state`'s (TOOL-aSparedSpawn-14).
 mkdir -p memory/builds/tNoRm
 runmd tNoRm "$MANDATE"
 o=$(run --brief tNoRm --unit ARCH-tNoRm-1 --path memory/builds/tRun/prompts/armbrief.md)
@@ -6563,12 +6501,10 @@ n=$((n+1)); [ -z "$(grep -n 'decision|abort|override|waiver' "$SCRIPT")" ]   || 
 echo "MARK halt-code" >&2
 # ---- THE HALT CODE ON --abort. A single ABORTED terminal said a run stopped and never said why: the
 # ---- reason was free prose in a parked entry, which the owner reads and no check does. The code is
-# ---- REQUIRED and VALIDATED, and both refusals name the legal set — a validated vocabulary whose
-# ---- refusal does not say what is legal costs the operator a source read.
+# ---- REQUIRED and VALIDATED: a missing code is the required-flag reader's refusal, and an unknown
+# ---- one's names the legal set — a validated vocabulary whose refusal does not say what is legal
+# ---- costs the operator a source read.
 bcopen
-out=$(run --abort tRun --reason "stopped for a stated reason")
-hit "$out" "--abort requires --code, because a single ABORTED terminal says a run stopped and never says why; the reason is prose for the owner and the code is the field every reader joins on"
-same "a refused abort wrote nothing" "$(grep -c '^halt-code: ' memory/builds/tRun/RUN.md)" "0"
 
 bcopen
 out=$(run --abort tRun --reason "stopped for a stated reason" --code not-a-real-code)
@@ -6944,10 +6880,8 @@ same "the ceiling fires before a bound equal to it"           "$(review_state '9
 
 # ---- the verb's refusals, on disk
 bcopen
-hit "$(run --review tNoSuchBuild --subject S1 --verdict BLOCKED --blockers 1)" "no run-state file, so there is no run to record a review round against"
 hit "$(run --review tRun --subject S1 --verdict MAYBE --blockers 1)" "--review names a verdict outside the closed set, and a verdict nothing can compare is prose in a field; legal verdicts"
 hit "$(run --review tRun --subject S1 --verdict BLOCKED)" "--review requires --blockers as a plain integer, because the predicate compares this round's count against the previous one and cannot compare prose"
-hit "$(run --review tRun --verdict BLOCKED --blockers 1)" "--review requires --subject, because the convergence predicate is per SUBJECT and a round with no subject cannot be sequenced against anything"
 crdrop
 same "a refused round wrote nothing" "$(grep -c 'review · item' memory/builds/tRun/RUN.md)" "0"
 # the SUBJECT is free text from the caller, and leg check 11 greps this file WHOLE for the declared
@@ -7804,7 +7738,6 @@ n=$((n+1)); [ "$_rc" = 2 ] || { echo "FAIL the missing-library refusal did not e
 rm -rf "$_nolib"
 
 hit "$(run --dispatch tRun --pass notanid --writes ${PFX}a.sh)" "--dispatch was given a --pass value that is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id:"
-hit "$(run --dispatch tRun --pass ARCH-tRun-1)" "--dispatch requires at least one --writes path, because a declaration naming nothing is not a disjointness proof:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes /etc/passwd)" "--dispatch was given an absolute --writes path, and a declaration is repo-relative or it names a file no comparison can find:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ../outside.sh)" "--dispatch was given a --writes path that escapes the repository, which no pass may declare and no comparison can bound:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes 'two words/x.sh')" "--dispatch was given a --writes path containing whitespace, which the declaration's own field separator cannot carry, so the leg would split it into paths nobody declared:"
@@ -7836,9 +7769,6 @@ run --attest tRun --item keepalive-reaped >/dev/null 2>&1
 run --attest tRun --item parked-decisions-surfaced >/dev/null 2>&1
 run --abort tRun --reason stop --code fork-unresolvable >/dev/null 2>&1
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)" "the run is already finished and a finished record is not something to move, re-open or re-pin"
-build_specced_tree; rm -f memory/builds/tRun/RUN.md
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)" "no run-state file, so there is no run to declare a dispatch against:"
-
 # ---- TOOL-aProbedUnit-3: `--audit`, the dispatched-unit stall probe. One line per unit whose LATEST
 # ---- dispatch row is still open, the tree's two clocks, and a verdict against UNIT_STALL_BOUND.
 # ---- Every arm below is the driver over the scratch repo; the fixture is the one the `--dispatch`
@@ -7890,11 +7820,6 @@ out=$(PATH="$TMP/stub:$PATH" bash "$SCRIPT" --audit tRun 2>&1); rc=$?
 same "AC5 a dead mtime probe exits 1" "$rc" "1"
 hit "$out" "the audit cannot measure idle time on this node, because a probe it needs answered nothing, so neither verdict is answerable and a zero from a dead probe would read as written-just-now:"
 miss "$out" "· PROGRESSING"
-# AC5, first branch — no run-state file.
-reset_tree
-out=$(run --audit tNoRun); rc=$?
-same "AC5 no run-state file exits 1" "$rc" "1"
-hit "$out" "no run-state file, so there is no dispatched unit to audit for idleness:"
 # AC5, second branch — a terminal record. Not `refuse_if_terminal`: its sentence says the verb would
 # REWRITE the record, and this verb rewrites nothing, so that sentence would be false here.
 build_audit_fixture
@@ -8007,10 +7932,6 @@ same "task AC8 a relative heartbeat exits 1" "$rc" "1"
 hit "$out" "--register-task was given a relative --heartbeat path, and the audit reads it from the run's own worktree while the task may beat in another, so only an absolute path names one file from both:"
 hit "$(run --register-task tRun --task "$(printf 'le\tg')" --heartbeat "$TK_BEAT")" "a task name or heartbeat path carries a tab or a newline, and the registry is one tab-separated row per act, so it would forge a field or a row nothing registered"
 same "task AC8 no row was appended" "$([ -e "$TK_REG" ] && echo row || echo none)" "none"
-hit "$(run --register-task tRun --heartbeat "$TK_BEAT")" "--register-task requires --task, because a task with no name is a STALLED line nobody can act on"
-hit "$(run --register-task tRun --task leg-a)" "--register-task requires --heartbeat, because a task with no heartbeat file is the silent background work this registry exists to end"
-hit "$(run --register-task tNoRun --task leg-a --heartbeat "$TK_BEAT")" "no run-state file, so there is no run to register a background task against:"
-hit "$(run --release-task tRun)" "--release-task requires --task, because a release naming nothing closes nothing"
 # AC1 — a heartbeat written one second earlier is PROGRESSING.
 echo beat > "$TK_BEAT"; touch -d "@$(( $(date -u +%s) - 1 ))" "$TK_BEAT"
 out=$(run --register-task tRun --task leg-a --heartbeat "$TK_BEAT"); rc=$?
@@ -8051,11 +7972,7 @@ same "task AC4 absent heartbeat PROGRESSING" "$(printf '%s\n' "$out" | grep -c '
 mutate "$TK_REG" "\$s/^[^\t]*\tregister/$(date -u -d "@$(( $(date -u +%s) - 3600 ))" +%Y-%m-%dT%H:%M:%SZ)\tregister/"
 out=$(run --audit tRun)
 same "task AC4 absent heartbeat STALLED" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: task leg-a · .* · last-beat none · STALLED$')" "1"
-# ...an append that fails is a refusal naming the registry, never a silent unrecorded act.
 run --release-task tRun --task leg-a >/dev/null
-mv "$TK_REG" "$TK_REG.held"; mkdir "$TK_REG"
-hit "$(run --register-task tRun --task leg-b --heartbeat "$TK_BEAT")" "cannot append to the task registry, so the act is not recorded and the audit would not see it:"
-rmdir "$TK_REG"; mv "$TK_REG.held" "$TK_REG"
 # AC7 — a zero bound exits 2 through `read_bound_key`; an absent key NOTEs the 5400s default.
 mkconf "true" "true" "" "3600" "" "1800" "7" "5400" "" "1800" "6" "0"
 out=$(run --audit tRun); rc=$?
@@ -8413,13 +8330,7 @@ hit "$out" "last-stall: 2026-09-16T00:00:00Z fixture-session rate_limit {}"
 rm -f "$SIDECAR/stall.tRun.log"
 out=$(run --liveness tRun)
 hit "$out" "last-stall: none"
-# AC1 — no run-state file is check 52's first sentence and no verdict; no slug is check_slug's.
-reset_tree
-out=$(run --liveness tNoRun); rc=$?
-same "AC1 no run-state file exits 1" "$rc" "1"
-hit "$out" "UNATTENDED check 52 FAILED"
-hit "$out" "no run-state file, so there is no run whose liveness can be graded:"
-miss "$out" "verdict:"
+# AC1 — no slug is check_slug's.
 out=$(run --liveness); rc=$?
 same "AC1 no slug exits 1" "$rc" "1"
 hit "$out" "UNATTENDED check 1 FAILED"
@@ -8528,9 +8439,6 @@ reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 out=$(run --rescope tRun --act sideways --item ARCH-tRun-1 --reason r)
 hit "$out" "--rescope --act takes one of retire, supersede, add or defer, and a value outside that closed set may not select one by default:"
 
-out=$(run --rescope tRun --act retire --item ARCH-tRun-1)
-hit "$out" "--rescope requires --reason, because an amendment recording no reason is indistinguishable from one nobody meant - the same argument --park and --waive already make:"
-
 out=$(run --rescope tRun --act retire --item notanid --reason r)
 hit "$out" "--rescope --unit is not id-shaped by the driver's own spelling, so the row would name something no roster can carry:"
 
@@ -8566,11 +8474,6 @@ run --attest tRun --item parked-decisions-surfaced >/dev/null 2>&1
 run --abort tRun --reason "stop" --code fork-unresolvable >/dev/null 2>&1
 out=$(run --rescope tRun --act retire --item ARCH-tRun-1 --reason r)
 hit "$out" "the run is already finished and a finished record is not something to move, re-open or re-pin"
-
-# ...with no run-state file at all there is no run to amend.
-reset_tree; rm -f memory/builds/tRun/RUN.md
-out=$(run --rescope tRun --act retire --item ARCH-tNone-1 --reason r)
-hit "$out" "no run-state file, so there is no run to record an amendment against:"
 
 # ---- TOOL-aBoundedCeiling-6: run_bounded is a bound on the CLOCK, not on the verdict -------------
 # The message was always the correct half of memory/gotchas/bounded-through-a-pipe-is-unbounded.md,
@@ -9875,14 +9778,6 @@ reset_tree
 # ---- literal run `check-arms.py` derives, not the clause a reader would stop at: an arm that stops
 # ---- at the last word of a sentence reads as unarmed and the meta-gate says so with no hint why.
 build_hold_fixture; before=$(sum)
-out=$(run --hold tNoSuchBuild --code platform-limit --until owner --reason "x" --reaped k1)
-hit "$out" "no run-state file, so there is no run to hold"
-out=$(run --hold tRun --until owner --reason "x" --reaped k1)
-hit "$out" "--hold requires --code, because a paused run that does not say why it paused is indistinguishable from one that stopped, and the code is the field the checkpoint and any resume scheduler both join on"
-out=$(run --hold tRun --code platform-limit --reason "x" --reaped k1)
-hit "$out" "--hold requires --until, because a pause with no release condition is a stop wearing a pause's name; the grammar is after <utc-instant>, probe host|gate|api, or owner"
-out=$(run --hold tRun --code platform-limit --until owner --reaped k1)
-hit "$out" "--hold requires --reason, because the code is what every machine reader joins on and the reason is the only sentence the owner gets in place of the turn nobody took"
 out=$(run --hold tRun --code platform-limit --until owner --reason "I would have reached for --no-verify" --reaped k1)
 hit "$out" "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar for as long as the hold lasts; say it without the literal flag"
 same "every --hold argument refusal wrote nothing" "$(sum)" "$before"
@@ -9910,8 +9805,6 @@ out=$(run --resume tRun --keepalive-id k1)
 hit "$out" "lease recorded · keepalive k1 · session none -> fixture-session"
 rm -f "$TMP/.git/unattended"
 
-out=$(run --resume tNoSuchBuild --keepalive-id kC)
-hit "$out" "no run-state file, so there is no run to resume"
 
 # ---- a LEFTOVER lease file, malformed or not, is never read (TOOL-dDerivedDocket-61 §4 Migration):
 # ---- the holder resumes on the run-state facts and writes nothing.
@@ -10040,8 +9933,6 @@ out=$(run --handoff tRun --reason r --reaped k1)
 hit  "$out" "--handoff takes --code owner-landing or --code owner-decision and no other"
 hit  "$out" "an --abort: none"
 same "AC3 a refused code wrote nothing" "$(sum)" "$before"
-out=$(run --handoff tNoSuchBuild --code owner-landing --reason r --reaped k1)
-hit  "$out" "no run-state file, so there is no run to hand off"
 
 # ---- AC4: the attribution guard. An OWN red is refused through fail 83 naming the leg; an
 # ---- all-INHERITED red is admitted; a record naming no bar is refused through fail 83's own branch.
@@ -10370,9 +10261,8 @@ same "AC10 the settle path is derived and repo-relative" \
   "$(printf '%s\n' "$su_row" | sed -n 's/.* && bash \(.*\)unattended\.sh --settle tRun$/\1/p')" "$KIT_REL/"
 hit  "$(cat "$su_out/handoff.out")" "unattended: once an owner has landed it, the record is settled by the recipe's last command - bash $KIT_REL/unattended.sh --settle tRun"
 
-# ---- The settle's own refusals: no record; a record differing from HEAD; a recorded LANDING; and a
-# ---- hand-off nobody has landed yet. Each writes nothing.
-hit "$(run_su --settle tNoSuchBuild)" "no run-state file, so there is no run to settle"
+# ---- The settle's own refusals: a record differing from HEAD; a recorded LANDING; and a hand-off
+# ---- nobody has landed yet. Each writes nothing. A missing record is `check_run_state`'s.
 write_su_handoff owner-landing
 add_facts "$su_dir/$SU_R" "note: an edit nobody committed"
 su_b=$(read_su_sum)
@@ -11553,17 +11443,6 @@ out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
 same "the red landing bar left the record RUNNING" "$(sed -n 's/^phase: //p' "$ip_dir/memory/builds/tRun/RUN.md")" "RUNNING"
 ipgit checkout -q --detach "$ip_base"; ipgit push -q -f origin HEAD:main; ipgit checkout -q unit
-
-# ---- S5's refusal: the close evaluated everything and then could not commit. Staged by a pre-commit
-# ---- hook that refuses, which spec §4 step 4 says the close commit runs "as for any commit". Unsetting
-# ---- the fixture's identity was the first cut, and git fell back to the node's GLOBAL identity and
-# ---- committed, so the arm graded the machine; `core.hooksPath` is local, so it outranks a global one.
-ipprep ""
-mkdir -p "$ip_out/hooks"; printf '#!/bin/sh\necho "fixture pre-commit: refused"\nexit 1\n' > "$ip_out/hooks/pre-commit"
-chmod +x "$ip_out/hooks/pre-commit"; ipgit config core.hooksPath "$ip_out/hooks"
-out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
-hit "$out" "the close evaluated the whole Definition of Done and then could not commit its own record, so the phase is written and staged but does not travel; the commit's own output follows"
-ipgit config --unset core.hooksPath
 
 # ---- S7: under `primary` every verb behaves as it did at BASE — no probe, no carry check, no
 # ---- commit, and no GATE_FULL in the bar's environment. This is the control the whole unit rests on.
@@ -14791,10 +14670,9 @@ hit  "$out" "phase LANDED (derived: "
 same "AC20 the in-place --landed writes landed too" "$(read_claim_field tRun status)" "landed"
 remove_claim_landing
 
-# ---- --beat: a missing record is its one refusal; off, it names the switch; on a LIVE run it skips a
-# ---- beat not yet due and renews one that is, one `beat —` line each.
+# ---- --beat: off, it names the switch; on a LIVE run it skips a beat not yet due and renews one that
+# ---- is, one `beat —` line each. Its missing-record refusal is `check_run_state`'s (TOOL-aSparedSpawn-14).
 reset_tree
-hit  "$(run --beat tFresh)" "no run-state file, so there is no run whose claim a beat could renew"
 run --preflight tRun --keepalive-id k1 >/dev/null
 hit  "$(run --beat tRun)" "unattended: beat — tRun · skipped: RUN_CLAIMS is off"
 build_claim_held
@@ -15099,50 +14977,6 @@ out=$(run --beat tRun)
 hit  "$out" "unattended: beat — tRun · skipped: the claim is not this run's: tRun · node other · session s-other"
 miss "$out" "skipped: verdict"
 same "GH12 AC2 --beat over another session's live claim moves no ref" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gc_sha"
-# ---- TOOL-aGraftedHelix-19 S5: a mode outside CLAIM_MODES is refused before any claim write. The
-# ---- scratch driver REMOVES the existing member `status`, so the value keeps its case branch and
-# ---- only the membership test stands between `--hold` and the write: red when that test is gone.
-build_claim_held
-gc_drv=$(mktemp -d)
-sed 's/^\(CLAIM_MODES=".*\) status\(.*"\)$/\1\2/' "$SCRIPT" >"$gc_drv/unattended.sh"
-cp "$HERE/lib-unattended.sh" "$gc_drv/lib-unattended.sh"
-gc_m0=$(sed -n 's/^CLAIM_MODES="\(.*\)"$/\1/p' "$SCRIPT")
-gc_m1=$(sed -n 's/^CLAIM_MODES="\(.*\)"$/\1/p' "$gc_drv/unattended.sh")
-hit  " $gc_m0 " " status "
-same "GH19 S5 the scratch driver's CLAIM_MODES is the kit's less status" " $gc_m1 " "$(printf ' %s ' "$gc_m0" | sed 's/ status / /')"
-gc_sha=$(read_claim_ref tRun)
-# ---- ...and `--beat`'s site, which never met a refusal before S2, maps it to one skip line and
-# ---- writes nothing: over NO claim, where a fall-through would create one. Red when that line goes.
-sed 's/^\(CLAIM_MODES=".*\) beat"$/\1"/' "$SCRIPT" >"$gc_drv/nobeat.sh"
-remove_claim_refs
-out=$(bash "$gc_drv/nobeat.sh" --beat tRun 2>&1)
-hit  "$out" "unattended: beat — tRun · skipped: the claim write table refused the call"
-same "GH19 S2 a refused --beat creates no claim" "$(read_claim_ref tRun)" ""
-git --git-dir="$ORIGIN" update-ref refs/gov/runs/tRun "$gc_sha"
-out=$(bash "$gc_drv/unattended.sh" --hold tRun --code platform-limit --until owner --reason "the mode axis" --reaped k1 2>&1)
-hit  "$out" "UNATTENDED check 110 FAILED — this call passed a claim mode the driver does not declare, so the claim write table has no column for it and nothing was written; declare the mode in CLAIM_MODES beside its case branch, or pass a declared one: mode status · CLAIM_MODES $gc_m1"
-same "GH19 S5 the refused status write moves no claim ref" "$(read_claim_ref tRun)" "$gc_sha"
-rm -rf "$gc_drv"
-remove_claim_refs; reset_tree
-# ---- TOOL-aGraftedHelix-22 S2: a claim-read class the decision derives outside CLAIM_READS is
-# ---- refused before any claim write. The scratch driver REMOVES the existing member `foreign-stale`,
-# ---- so the class keeps its case branch and only the read-axis membership test stands between a
-# ---- foreign stale claim and `--preflight`'s take, announced write: red when that test is gone.
-arm_claim_fixture
-gc_drv=$(mktemp -d)
-sed 's/^\(CLAIM_READS=".*\) foreign-stale\(.*"\)$/\1\2/' "$SCRIPT" >"$gc_drv/unattended.sh"
-cp "$HERE/lib-unattended.sh" "$gc_drv/lib-unattended.sh"
-gc_r0=$(sed -n 's/^CLAIM_READS="\(.*\)"$/\1/p' "$SCRIPT")
-gc_r1=$(sed -n 's/^CLAIM_READS="\(.*\)"$/\1/p' "$gc_drv/unattended.sh")
-hit  " $gc_r0 " " foreign-stale "
-same "GH22 S2 the scratch driver's CLAIM_READS is the kit's less foreign-stale" " $gc_r1 " "$(printf ' %s ' "$gc_r0" | sed 's/ foreign-stale / /')"
-seed_claim_row foreign-stale tFresh s-new k2
-gc_sha=$(read_claim_ref tFresh)
-out=$(CLAUDE_CODE_SESSION_ID=s-new bash "$gc_drv/unattended.sh" --preflight tFresh --keepalive-id k2 2>&1)
-hit  "$out" "UNATTENDED check 111 FAILED — this call derived a claim-read class the driver does not declare, so the claim write table has no row for it and nothing was written; declare the class in CLAIM_READS beside its case branch: class foreign-stale · CLAIM_READS $gc_r1"
-same "GH22 S2 the refused preflight moves no claim ref" "$(read_claim_ref tFresh)" "$gc_sha"
-same "GH22 S2 ...and writes no run-state file" "$([ -e memory/builds/tFresh/RUN.md ] && echo present || echo absent)" "absent"
-rm -rf "$gc_drv"
 remove_claim_refs; reset_tree
 
 # ==================================================================================================
@@ -17255,7 +17089,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 2768 -> 2808 by TOOL-aRoutedQuill-7: the skeleton-list arms in region three, AC1 to AC7 and F1's
 # subsequence arm, 40 assertions counted off the block's own lines and run as a slice of the prologue and
 # that block on node a, 2026-10-10; no suite ran.
-FLOOR_ASSERTIONS=2808
+# LOWERED 2808 -> 2742 by TOOL-aSparedSpawn-14, the first retirement batch: rows 1, 2, 4 and 5 retired
+# 69 per-site assertions - missing run-state 29, required flag 26, the claim-table refusals 11 and the
+# environment exits 3 - and added 3 for the shared helpers, counted off the diff by region; no suite
+# ran. Each shard floor below moves by its region's share.
+FLOOR_ASSERTIONS=2742
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -17391,7 +17229,8 @@ PROLOGUE_ARMS=20
 # RAISED 254 -> 265: TOOL-aMendedFleet-63's 11 region-one assertions, see FLOOR_ASSERTIONS.
 # RAISED 209 -> 211: the two closing-review guard-sentence arms, see FLOOR_ASSERTIONS.
 # MERGED at the reconcile of local main into origin/main: base 209 + aMendedFleet's 56 + aGraftedHelix's 2 = 267.
-FLOOR_SHARD_1=267
+# 267 -> 269 by TOOL-aSparedSpawn-14: one retired run-state arm, three helper arms.
+FLOOR_SHARD_1=269
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
@@ -17436,7 +17275,8 @@ FLOOR_SHARD_1=267
 # this derivation's own discount, because static sites stand in for executed counts. The next
 # measured executed count of a shard re-declares its floor at the suite's usual headroom. The RAISED
 # lines above are region two's history.
-FLOOR_SHARD_2=222
+# 222 -> 218 by TOOL-aSparedSpawn-14's retired arms, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=218
 # RAISED 255 -> 279 by TOOL-aQuotedBrief-1: the same 24 region-three prompt-record assertions, see FLOOR_ASSERTIONS.
 # RAISED 279 -> 295 by TOOL-aQuotedBrief-2: the same 16 region-three carried-branch assertions, see FLOOR_ASSERTIONS.
 # RAISED 295 -> 323 by TOOL-aQuotedBrief-3: the same 28 region-three brief-item assertions, see FLOOR_ASSERTIONS.
@@ -17445,12 +17285,14 @@ FLOOR_SHARD_2=222
 # RAISED 336 -> 346 by TOOL-aQuotedBrief-5: the same 10 region-three doubled-space heading assertions, see FLOOR_ASSERTIONS.
 # RAISED 346 -> 390 by TOOL-aQuotedBrief-6: the same 44 region-three assertions, see FLOOR_ASSERTIONS.
 # RAISED 390 -> 430 by TOOL-aRoutedQuill-7: the same 40 region-three skeleton-list assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_3=430
-FLOOR_SHARD_4=390
-FLOOR_SHARD_5=270
-FLOOR_SHARD_6=129
-FLOOR_SHARD_7=312
-FLOOR_SHARD_8=658
+# LOWERED by TOOL-aSparedSpawn-14's retired arms, each by its region's count, see FLOOR_ASSERTIONS:
+# 3 by 25, 4 by 17, 5 by 7, 6 by 2, 7 by 1 and 8 by 12.
+FLOOR_SHARD_3=405
+FLOOR_SHARD_4=373
+FLOOR_SHARD_5=263
+FLOOR_SHARD_6=127
+FLOOR_SHARD_7=311
+FLOOR_SHARD_8=646
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

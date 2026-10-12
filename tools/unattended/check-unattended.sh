@@ -4060,14 +4060,9 @@ ds_fleet_n=0; ds_graded=0; ds_unavail=0; ds_records=0; ds_fleet_over=""
 # ---- THE BUDGET IS READ BEFORE THE LOOP (TOOL-dUnstuckLanding-17 S7/S8), because the run this tree
 # ---- drives is judged against it as the loop leaves that record. MANDATORY, in the shape its sibling
 # ---- pins take: undeclared or not a single integer is a refusal, never a defaulted value. The RETIRED
-# ---- key is refused BY NAME off the leg's own text scan of declared names, so it is never imported and
-# ---- an adopter who upgrades without moving it is told which key replaced it. Check 22 tolerates the
-# ---- same key as retired (TOOL-aWindowedPass-5), so the key-table join does not red on it as well.
+# ---- key's by-name refusal was itself retired by TOOL-aSparedSpawn-14 (row 15, no tombstone): check 22
+# ---- reports a conf that still sets it, and a conf with it and without this key is refused just below.
 ds_budget_ok=0
-_c23_retired=UNDECLARED_WRITE_CEILING
-if printf '%s\n' "$_conf_names" | grep -qx -- "$_c23_retired"; then
-  fail 23 "$_c23_retired is retired: check 23 grades each run record against a per-build budget now, so declare UNDECLARED_WRITE_BUDGET in .unattended.conf and delete the old key, which nothing reads any more: $CONF"
-fi
 if [ -z "$UNDECLARED_WRITE_BUDGET" ]; then
   fail 23 "UNDECLARED_WRITE_BUDGET is undeclared in .unattended.conf, and with no budget a pass that wrote outside its declared set is reported and never graded - which is the state this check exists to end"
 elif ! printf '%s' "$UNDECLARED_WRITE_BUDGET" | grep -qE '^[0-9]+$'; then
@@ -6068,99 +6063,6 @@ else
 fi
 
 fi
-if check_selected 47; then
-# ---- check 47 - NO SHIPPED FILE OF THIS KIT STATES A RETIRED PREMISE, read off a table of two rows.
-# ---- ROW 1, TOOL-dAlignedCarrier-1 closing TOOL-dDerivedDocket-74: the premise said the driver's verbs
-# ---- never make a commit, and it stopped being true when `--close` began committing its own records
-# ---- commit under `LANDER_MODE=in-place`. It was taken out of three carriers once, by fixed-string
-# ---- greps that were case-sensitive and read three named files, and the next day it was back,
-# ---- lowercase, in a fourth place none of them read. ROW 2, TOOL-dAlignedCarrier-6 from its closing
-# ---- review's L2: the premise said the owed flagged bar is told by the close of a landing that
-# ---- prepares its merge in place, and it stopped being true when the move into VERIFYING took the
-# ---- notice under every LANDER_MODE; the check-45 header one file over still said it after every
-# ---- carrier was rewritten. Each row is the CLASS, so the next spelling reds in whichever file it
-# ---- lands, and each row has its own fail line, so a red names which premise came back.
-# ----
-# ---- POPULATION: every file the kit's own ls-files lists under KITREL, the kit directory this leg
-# ---- already derives, so an adopter's install prefix is honoured and no path is spelled. NOTHING IS
-# ---- EXCLUDED, this checker and its suite included, because the ask names the kit's shipped files and
-# ---- both ship. This header DESCRIBES the premise rather than spelling it, the pattern below is written
-# ---- with optional groups and bracketed spaces so its own source never forms an instance, and the
-# ---- suite assembles its staged line from fragments. A listed file the worktree lacks is skipped.
-# ----
-# ---- NORMALISATION, per file: CR bytes stripped; on each line the leading whitespace and ONE leading
-# ---- comment marker (`#`, `//`, `*` or `<!--`) stripped; the lines joined by one space, whitespace
-# ---- squeezed, the whole folded to lower case. A wrap inside a comment or a paragraph therefore reads
-# ---- as one sentence, which is the shape the retired greps could not see. The join is a window of the
-# ---- previous SEVEN words plus the current line, which holds the widest instance either row admits,
-# ---- row 2's eight words, and a match is reported only where it ends on the current line, so each is
-# ---- named once. Six words, the width row 1 needs, let row 2 through when a wrap fell before its last
-# ---- word (closing review round 2, L1).
-# ----
-# ---- EVERY ROW'S PATTERN ENDS BY CONSUMING ONE BOUNDARY CHARACTER after its last word, and the scanner
-# ---- strips that character, and the leading one, from the excerpt it reports and from the end offset
-# ---- it dedups on. Row 1 ends in a non-word byte; row 2 ends in the rest of its last word and the
-# ---- space after it, which the window always carries, so its matched set is what a bare word stem
-# ---- matched and its excerpt is whole (closing review round 2, L4: the stem lost a letter from every
-# ---- excerpt). A new row owes the same ending.
-# ----
-# ---- THE PREDICATE, word-bounded, one pattern per row. ROW 1, two alternatives: the word `no`, at
-# ---- most two words, the word `verb`, at most two words, then the third-person form of commit; or the
-# ---- three-word sentence that makes `nothing` the subject of that same form with `it` as its object.
-# ---- ROW 2, two alternatives: the hyphenated landing-mode token, at most two words, a word opening
-# ---- `close`, at most three words, then a word opening `announc`; or that word first, at most three
-# ---- words, then the mode token directly before a word opening `close`. Measured before it was
-# ---- wired: at BASE 87c245b3 it named four sentences in three files, the protocol row, two Skill
-# ---- sentences and the check-45 header, and on the tree it named that header alone. A near-miss
-# ---- sweep of `close` within four words of `announc` WITHOUT the mode token found only true sentences
-# ---- about other terms, which is why the token is required.
-# ----
-# ---- What this does NOT check: a spelling outside those alternatives passes, and a sentence that
-# ---- names the mode's close and NEGATES the announcement matches all the same, so name the move into
-# ---- VERIFYING rather than the close that says nothing. A file outside the
-# ---- kit directory is not read, the rendered carriers included, whose parity legs already hold each
-# ---- to its template. A match inside a string literal counts like one in prose, because the premise
-# ---- misleads a reader either way.
-_c47_re='[^a-z0-9_]no( [^ ]+)?( [^ ]+)?[ ]verb( [^ ]+)?( [^ ]+)?[ ]commits[^a-z0-9_]|[^a-z0-9_]nothing[ ]commits[ ]it[^a-z0-9_]'
-_c47_re2='[^a-z0-9_]in-place[^ ]*( [^ ]+)?( [^ ]+)?[ ]close[^ ]*( [^ ]+)?( [^ ]+)?( [^ ]+)?[ ]announc[^ ]*[ ]|[^a-z0-9_]announc[^ ]*( [^ ]+)?( [^ ]+)?( [^ ]+)?[ ]in-place[^ ]*[ ]close[^ ]*[ ]'
-_c47_files=()
-while IFS= read -r _c47_p; do
-  [ -f "$_c47_p" ] && _c47_files+=("$_c47_p")
-done < <(GIT ls-files -- "$KITREL" 2>/dev/null)
-if [ "${#_c47_files[@]}" -eq 0 ]; then
-  report "check 47 did not grade this kit's shipped files for the retired premises - ls-files listed none under $KITREL"
-else
-  report "check 47 graded ${#_c47_files[@]} shipped file(s) of this kit for the retired premises, two rows"
-  # ONE SCANNER, HELD ONCE AND RUN PER ROW, so the two rows cannot drift into two normalisations. Its
-  # excerpt and its end offset rely on the header's trailing-boundary contract, which every row keeps.
-  _c47_awk='
-      BEGIN { re = ENVIRON["RE"] }
-      FNR == 1 { if (hits != "") out = out (out == "" ? "" : "; ") cur ": " hits
-                 hits = ""; tail = ""; cur = FILENAME }
-      { ln = $0; gsub(/\r/, "", ln); sub(/^[ \t]+/, "", ln)
-        if (!sub(/^<!--/, "", ln)) if (!sub(/^\/\//, "", ln)) if (!sub(/^#/, "", ln)) sub(/^\*/, "", ln)
-        ln = tolower(ln); gsub(/[[:space:]]+/, " ", ln); sub(/^ /, "", ln); sub(/ $/, "", ln)
-        if (ln == "") next
-        p = (tail == "" ? 0 : length(tail) + 1)
-        w = " " (tail == "" ? ln : tail " " ln) " "
-        s = w; off = 0
-        while (match(s, re)) {
-          e = off + RSTART + RLENGTH - 2
-          if (e > p) hits = hits (hits == "" ? "" : ", ") "\"" substr(s, RSTART + 1, RLENGTH - 2) "\""
-          off = e; s = substr(s, RSTART + RLENGTH - 1)
-        }
-        k = split(w, tk, " "); tail = ""
-        for (i = (k > 7 ? k - 6 : 1); i <= k; i++) tail = tail (tail == "" ? "" : " ") tk[i]
-      }
-      END { if (hits != "") out = out (out == "" ? "" : "; ") cur ": " hits
-            printf "%s", out }'
-  _c47_hits=$(RE="$_c47_re" awk "$_c47_awk" "${_c47_files[@]}")
-  [ -z "$_c47_hits" ] || fail 47 "a shipped file of this kit states the retired premise that the driver makes no commit of its own, but under LANDER_MODE=in-place --close commits its own records commit, so a reader who trusts the sentence expects staged rows to stay uncommitted after the close has committed them; reword it to name the step that commits them. matches: $_c47_hits"
-  _c47_hits=$(RE="$_c47_re2" awk "$_c47_awk" "${_c47_files[@]}")
-  [ -z "$_c47_hits" ] || fail 47 "a shipped file of this kit states the retired premise that the landing's close is where the owed flagged bar is told, but since TOOL-dAlignedCarrier-6 the move into VERIFYING announces it under every LANDER_MODE and the close says nothing, so a reader who trusts the sentence waits at the close for a notice that never comes; reword it to name the move into VERIFYING. matches: $_c47_hits"
-fi
-
-fi
 # ---- check 48 - NO FUNCTION WRITES A RUN-STATE FACT AFTER ITS LAST STAGE OF THAT FILE.
 # ---- TOOL-dAlignedCarrier-6, from its closing review's M1. `--phase` staged the record between its
 # ---- phase write and its witness write, so the index paired the new phase with the previous witness
@@ -6384,6 +6286,80 @@ else
     || fail 51 "a function in a shipped shell file of this kit writes a terminal phase and no run claim, so the run it ends leaves its claim on the remote reading live or held, a held claim never ages, and the slug's next --preflight is refused at check 107 by a claim nobody releases; write the claim with write_claim after the record is staged, or name the function on TERMINAL_CLAIM_EXEMPT_FNS with its reason:$_c51_hits"
 fi
 
+fi
+if check_selected 52; then
+# ---- check 52 - THE DRIVER'S SHARED REFUSALS ARE THE ONLY SPELLING OF THEIR CONDITIONS. TOOL-aSparedSpawn-14,
+# ---- the first batch of the refusal-retirement review (its rows 1, 2 and 4): three joins over the
+# ---- driver's own source in one awk pass, every hit named by its join on ONE fail line.
+# ----   ROUTE (row 1): in a function that names its run-state file by assigning `$_runmd`, a line that
+# ----   tests that variable's presence and refuses on it - `[ -f "$<it>" ] || … fail <n>` - is a hit, as
+# ----   is any `fail` whose message opens `no run-state file` outside `check_run_state`: the per-verb
+# ----   refusal the batch retired, back under another number.
+# ----   FLAGS (row 2): every `<verb> <flag>` pair VERB_REQUIRES lists has a `check_verb_flag <verb>
+# ----   <flag>` call, and every call is a listed pair, so a listed flag is enforced and an enforced one
+# ----   is listed in the usage the table renders.
+# ----   CLAIMS (row 4): every mode a `check_claim_writable` caller passes as a literal or a
+# ----   `case "$mode:$cls"` arm of that function names is a CLAIM_MODES member, and every class an arm
+# ----   names or a `cls=<literal>` assigns is a CLAIM_READS member - statically, where the run-time
+# ----   refusals it replaces (driver checks 110 and 111) fired at nobody.
+# ---- LIVENESS, on the same line: an empty population is a hit - no table row, no flag call, no claim
+# ---- declaration, no case arm or no caller. Measured before it was wired, on the batch's own tree:
+# ---- every join empty of hits, and the route's near-misses are four presence tests on OTHER files
+# ---- (a README, a brief, a piece and a commit message), which keying on `$_runmd` leaves out.
+# ---- What this does NOT check: a presence test spelled any other way (`if [ ! -f …`), a refusal on a
+# ---- later line than its test, whether a flag call sits at the right point of its verb or is reached
+# ---- at all, a flag passed through a variable, or the verdict half of a `foreign-` class, which is
+# ---- read off the remote's row. It reads the driver beside this checker and no other file.
+_c52_out=$(awk '
+  function add(s, x) { return s (s == "" ? "" : ", ") x }
+  { ln = $0; sub(/\r$/, "", ln) }
+  ln ~ /^[A-Za-z_][A-Za-z0-9_]*\(\)[ \t]*\{/ { fn = ln; sub(/\(.*/, "", fn); delete rsv }
+  ln ~ /^}/ { fn = "" }
+  ln ~ /^VERB_REQUIRES="/ { intab = 1; ln = substr(ln, 16) }
+  intab { row = ln; if (row ~ /"[ \t]*$/) { intab = 0; sub(/"[ \t]*$/, "", row) }
+          k = split(row, w, /[ \t]+/)
+          for (i = 2; i <= k; i++) if (w[i] != "") { tab[w[1] " " w[i]] = 1; ntab++ }
+          next }
+  ln ~ /^CLAIM_MODES="/ { s = ln; sub(/^CLAIM_MODES="/, "", s); sub(/".*/, "", s); nm += split(s, w, " "); for (i in w) modes[w[i]] = 1; next }
+  ln ~ /^CLAIM_READS="/ { s = ln; sub(/^CLAIM_READS="/, "", s); sub(/".*/, "", s); nr += split(s, w, " "); for (i in w) reads[w[i]] = 1; next }
+  { c = ln; sub(/^[ \t]+/, "", c) }
+  c ~ /^#/ { next }
+  match(c, /(^|[ \t;])[A-Za-z_][A-Za-z0-9_]*=\$_runmd([ \t;]|$)/) {
+    s = substr(c, RSTART, RLENGTH); sub(/=.*/, "", s); sub(/^[ \t;]+/, "", s); rsv[s] = 1 }
+  fn != "check_run_state" && c ~ /(^|[^A-Za-z0-9_])fail [0-9]+ "no run-state file/ { route = add(route, fn "() at line " NR) }
+  fn != "check_run_state" && c ~ /\|\|.*(^|[^A-Za-z0-9_])fail [0-9]+ / {
+    for (v in rsv) if (index(c, "[ -f \"$" v "\" ]") > 0) { route = add(route, fn "() at line " NR); break } }
+  fn != "check_verb_flag" && match(c, /(^|[^A-Za-z0-9_])check_verb_flag[ \t]+--[a-z-]+[ \t]+--[a-z-]+/) {
+    s = substr(c, RSTART, RLENGTH); sub(/^.*check_verb_flag[ \t]+/, "", s); split(s, w, /[ \t]+/)
+    call[w[1] " " w[2]] = 1; ncall++ }
+  match(c, /check_claim_writable "[^"]*" [a-z-]+[ \t]/) {
+    s = substr(c, RSTART, RLENGTH); sub(/^check_claim_writable "[^"]*" /, "", s); sub(/[ \t]$/, "", s)
+    used["mode " s] = "a caller at line " NR; ncaller++ }
+  fn == "check_claim_writable" && c ~ /^case "\$mode:\$cls" in/ { incase = 1; next }
+  incase && c ~ /^esac/ { incase = 0 }
+  incase && match(c, /^[a-z*|:-]+\)/) {
+    s = substr(c, 1, RLENGTH - 1); k = split(s, w, "|"); narm++
+    for (i = 1; i <= k; i++) { split(w[i], mc, ":")   # a bare `*` arm is the catch-all, naming neither axis
+      if (mc[1] != "*" && mc[1] != "") used["mode " mc[1]] = "an arm at line " NR
+      if (mc[2] != "*" && mc[2] != "") used["class " mc[2]] = "an arm at line " NR } }
+  fn == "check_claim_writable" && match(c, /(^|[ \t;])cls=[a-z-]+([ \t;]|$)/) {
+    s = substr(c, RSTART, RLENGTH); sub(/^.*cls=/, "", s); sub(/[ \t;]+$/, "", s); used["class " s] = "an assignment at line " NR }
+  END {
+    if (!ntab) hits = add(hits, "nothing to join: no VERB_REQUIRES row"); if (!ncall) hits = add(hits, "nothing to join: no check_verb_flag call")
+    if (!nm || !nr) hits = add(hits, "nothing to join: no CLAIM_MODES or CLAIM_READS member")
+    if (!narm) hits = add(hits, "nothing to join: no claim case arm"); if (!ncaller) hits = add(hits, "nothing to join: no check_claim_writable caller")
+    if (route != "") hits = add(hits, "route " route)
+    for (p in tab) if (ncall && !(p in call)) hits = add(hits, "flag " p " is listed and never enforced")
+    for (p in call) if (ntab && !(p in tab)) hits = add(hits, "flag " p " is enforced and not listed")
+    for (u in used) { split(u, w, " ")
+      if (w[1] == "mode" && nm && !(w[2] in modes)) hits = add(hits, "claim mode " w[2] " (" used[u] ")")
+      if (w[1] == "class" && nr && !(w[2] in reads)) hits = add(hits, "claim class " w[2] " (" used[u] ")") }
+    printf "%d pair(s), %d call(s), %d arm(s), %d caller(s)\037%s", ntab, ncall, narm, ncaller, hits }' "$DRIVER")
+_c52_hits=${_c52_out#*$'\037'}; _c52_n=${_c52_out%%$'\037'*}
+report "check 52 joined the driver's VERB_REQUIRES, claim declarations and their readers: $_c52_n"
+# ONE BRANCH FOR THE THREE JOINS AND THEIR LIVENESS, each hit naming its join, because a check this
+# batch adds to retire refusals should not cost more refusal sites than it can help (TOOL-aSparedSpawn-14).
+[ -z "$_c52_hits" ] || fail 52 "the driver's shared refusals have a second spelling or a gap - a run-state test refusing outside check_run_state, a VERB_REQUIRES pair and its check_verb_flag call out of step, a claim mode or class its declarations lack, or a population with nothing to join - so the one arm each helper keeps no longer covers its condition: $_c52_hits"
 fi
 fi   # ---- end of the checks `--only 28` skips
 
