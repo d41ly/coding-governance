@@ -1,11 +1,12 @@
 # TOOL-aSparedSpawn-32 — reconcile the build with origin/main 37200355
 
-**Status:** INPROGRESS · rev-4 · 2026-10-12 · node a · Tier-2 · base fce4b707 · streams tooling · order 5 · ratified 2026-10-12
+**Status:** CLOSED · rev-4 · 2026-10-12 · node a · Tier-2 · base fce4b707 · streams tooling · order 5 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-build-TOOL-aSparedSpawn-32-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aSparedSpawn-32-acceptance-ledger.md) | journal | — |
 | [2026-10-12-prompt-TOOL-aSparedSpawn-32-build-brief.md](../prompts/2026-10-12-prompt-TOOL-aSparedSpawn-32-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

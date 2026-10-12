@@ -265,18 +265,50 @@ it.
 
 ## Reuse, and the baseline a guard diffs against
 
+Reuse skips a leg whose inputs are byte-identical to a recorded green. There are three modes, two
+over the CACHE and one over the LEDGER, each asked for by its own knob, and a run takes ONE of them by
+the table below (TOOL-aSparedSpawn-32, composing TOOL-aSparedSpawn-13's cache with
+TOOL-aFrugalTurnstile-4's lineage). The runner reads the three knobs once, records the mode as the run
+header's `reuse` key, `off`, `env`, `push` or `lineage`, and unsets all three before any leg starts,
+so a leg's nested runner never inherits a mode. Any missing term of a mode means execute — every
+failure mode is "did more work", never "checked less".
+
+| `GATE_FULL` | `GATE_REUSE_LINEAGE` | `GATE_REUSE_PUSH` names HEAD | `GATE_REUSE` | mode | named on stderr as not used |
+|---|---|---|---|---|---|
+| set | set | any | any | `lineage` | `GATE_REUSE` and `GATE_REUSE_PUSH`, when set |
+| set | empty | any | any | `off` | `GATE_REUSE` and `GATE_REUSE_PUSH`, when set |
+| empty | any | yes | any | `push` | `GATE_REUSE_LINEAGE`, when set |
+| empty | any | no | set | `env` | `GATE_REUSE_LINEAGE`, when set |
+| empty | any | no | empty | `off` | `GATE_REUSE_LINEAGE`, when set |
+
+`.githooks/pre-push` never sets two of them for one bar: it clears every inherited one first, then sets
+`GATE_REUSE_LINEAGE` only on a FULL decision and `GATE_REUSE_PUSH` only on a SCOPED one, so the table
+governs a direct caller. `GATE_FULL` keeps meaning "no cache reuse", and the boundary's lineage run is
+the one deliberate exception, because its reused verdicts were earned by full runs.
+
+**What the stamps record.** `gate-full-green` carries `reused`, the legs the run carried forward, and
+`reused_cache`, the legs it took from the cache. A run that reused anything from the cache stamps
+neither `gate-full-green` nor the inherited green, so `reused_cache` is always `0` there, and a full
+green carries `reused` above 0 only from lineage. The push boundary's predicate 9 forces the full bar
+over a non-zero `reused_cache`, and over a record with no `reused_cache` and a non-zero `reused`, which
+was written before the field existed and cannot say its kind. The inherited green records `reused 0`
+and `reused_cache 0`.
+
+### The cache, `env` mode — `GATE_REUSE=1`
+
 `GATE_REUSE=1` skips a leg whose inputs are byte-identical to a recorded green: it carries no legacy
 `impure`, a `remote` leg has an observed remote, its row is not quarantined, the cache in the git
 common dir holds an `ok` under the key computed this run, it has not been reused on 10 runs in a row,
-and the sample did not draw it. Any missing term means execute — every failure mode is "did more
-work", never "checked less". It is OPT-IN because an advisory input may cause less work only on a run
-that is not authoritative. An authoritative run reuses only a `remote` or `history` leg, at the exact
-pushed sha and observed tip, and is then scoped: `.githooks/pre-push` sets `GATE_REUSE_PUSH` to
-`<pushed sha> <tip> <advertisement digest>` on a SCOPED decision whose `ls-remote` probe agreed with
-the remote sha git handed it, and on no other, and it clears both `GATE_REUSE` and an inherited
-`GATE_REUSE_PUSH`. Under `GATE_FULL` nothing is reused at all, whatever is set. A run that reused
-anything cannot stamp `gate-full-green` or the inherited green, and every stamp carries a `reused`
-field the push boundary forces the full bar over when it is not `0`.
+and the sample did not draw it. It is OPT-IN because an advisory input may cause less work only on a
+run that is not authoritative, and a run you ask for by hand is not one.
+
+### The cache, `push` mode — `GATE_REUSE_PUSH`, at the boundary's SCOPED decision
+
+An authoritative run reuses only a `remote` or `history` leg, at the exact pushed sha and observed
+tip, and is then scoped: `.githooks/pre-push` sets `GATE_REUSE_PUSH` to `<pushed sha> <tip>
+<advertisement digest>` on a SCOPED decision whose `ls-remote` probe agreed with the remote sha git
+handed it, and on no other, and it clears `GATE_REUSE`. The terms are the env mode's, narrowed to those
+two classes, and the mode holds only while HEAD is the pushed sha.
 
 **What a leg reads beyond its inputs** is declared on its manifest row as `reads`, an object mapping
 a class to a one-line reason. The classes are closed, and each puts one thing into the key:
@@ -300,7 +332,8 @@ seconds, run id, `HEAD`, an epoch and its reuse count, so every worktree of a cl
 is written only by a leg that EXECUTED `ok` on its first attempt on a tree that was clean when the
 run started and did not move, with its count at 0; a reused leg rewrites only its count, so a wrong entry cannot carry itself
 forward. Every write and the prune of entries older than 30 days run in one python process at run
-end. `gate-ledger.tsv` stays the dispatch-duration hint and is no longer read for reuse.
+end. `gate-ledger.tsv` is the dispatch-duration hint and the lineage mode's store; neither cache
+mode reads it.
 
 **The soundness sample.** On a reusing run each reusable leg is drawn for execution at
 `GATE_REUSE_SAMPLE` (default `0.25`, uniform per leg, seeded from the run id so a draw replays). A
@@ -325,33 +358,26 @@ an unguarded leg the working-tree fingerprint. Every key also takes `REUSE_SCHEM
 bumped when what a reusable `ok` means changes, and one digest per run of bash, the MSYS or Cygwin
 runtime, python and its UTF-8 mode, `git version` and its `core.autocrlf`/`core.eol`, the resolved
 location of every tool a leg names, and the exported `GATE_* GOV_* *_PY GIT_* PYTHON* LC_* LANG TZ
-PATH` variables, less every `GATE_REUSE*` knob, `GATE_TURNSTILE_HELD`, `GATE_RUN_ID`, and `GATE_BASE`
+PATH` variables, less every `GATE_REUSE*` knob, `GATE_TURNSTILE_HELD`, `GATE_TURNSTILE_HOLDER`, `GATE_RUN_ID`, and `GATE_BASE`
 and `GATE_PUSH_BASE`, which enter only a `base` leg's key. It does NOT see a tool other than git
 upgraded in place at the same path, a variable outside that set, or a read no class names, which is
 what the sample exists to catch. A failed walk or digest makes the key a dash, which never matches,
 and a run that would have reused or cached says so once on stderr: `run-gates: reuse — the input
 keys could not be measured (<step>), so nothing is reused or cached this run`.
-The header's `reuse_schema`, `reuse` (`off`, `env` or `push`) and `reuse_sample` keys say how a run
-keyed and drew.
+The header's `reuse_schema` and `reuse_sample` keys say how a run keyed and drew.
 
-`GATE_REUSE` skips a leg whose inputs are byte-identical to a recorded green, in one of two modes.
-Either way the leg is not declared `impure`, its row in `<git-dir>/gate-ledger.tsv` says `ok`, and
-the row's input key equals the one computed this run. The key hashes the leg's argv, the run's base
-and the leg's guard paths (index entries plus their porcelain lines), or the whole-tree fingerprint
-for an unguarded leg. Any missing term means execute: every failure mode is "did more work", never
-"checked less". The runner reads the knob once, records it as the run header's `reuse` key, and
-unsets it before any leg starts, so a leg's nested runner never inherits a mode.
+### Lineage — `GATE_REUSE_LINEAGE`, at the boundary's FULL decision
 
-- **`GATE_REUSE=1`**, or any value but `lineage`, is the OPT-IN mode, for a run you ask for by hand.
-  A run that reused anything in it cannot stamp `gate-full-green`.
-- **`GATE_REUSE=lineage`** also wants the row's `full` field to read `1`, meaning the run that
-  earned it set `GATE_FULL` on a clean tree. Its `manifest_blob` must be this run's, and its `head`
-  must be an ancestor of `HEAD`. A run whose every reuse meets those terms may still stamp
-  `gate-full-green`, which records the count as `reused`. `.githooks/pre-push` exports this mode on
-  its own FULL decision for this runner, and on no other decision or bar. That FULL line ends
-  `— reuse: lineage`. So after a red push, the fix push re-runs the failed legs and the legs whose
-  key moved, and nothing else. The key's base term ties one chain of reuses to one remote base,
-  because a landing moves the base and voids every key.
+`GATE_REUSE_LINEAGE`, honoured only beside `GATE_FULL`, reuses a leg from `<git-dir>/gate-ledger.tsv`
+and never from the cache: the leg is not declared `impure`, a `remote` leg has an observed remote, its
+row says `ok`, the row's input key equals the one computed this run, its `full` field reads `1`,
+meaning the run that earned it set `GATE_FULL` on a clean tree, its `manifest_blob` is this run's, and
+its `head` is an ancestor of `HEAD`. A run whose every reuse meets those terms may still stamp
+`gate-full-green`, which records the count as `reused`. `.githooks/pre-push` exports this mode on its
+own FULL decision for this runner, and on no other decision or bar. That FULL line ends `— reuse:
+lineage`. So after a red push, the fix push re-runs the failed legs and the legs whose key moved, and
+nothing else. The key's base term ties one chain of reuses to one remote base, because a landing moves
+the base and voids every key.
 
 WHAT LINEAGE REUSE DOES NOT CHECK: that a reused leg's guard names every input the leg reads, or
 that its verdict depends on the tree alone. A reused verdict is only as good as its input key, so
@@ -361,7 +387,9 @@ run.
 
 The ledger is per git dir, so a bar run in one worktree feeds lineage only to pushes from that
 worktree. A row written before these fields existed has an empty `full` and is never
-lineage-reusable. The inherited-green stamp still asks that nothing was reused.
+lineage-reusable.
+
+### The baseline
 
 The baseline a guard diffs against is the MERGE-BASE with the default branch, so a branch is graded
 on what it changed rather than on everything that landed while it was open — used only where the

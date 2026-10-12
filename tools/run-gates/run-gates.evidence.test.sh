@@ -161,7 +161,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=234
+FLOOR_ASSERTIONS=240
+# RAISED 234 -> 240 by TOOL-aSparedSpawn-32: the composed reuse designs, AC9's one, AC10's one, AC12's
+# three and the lineage stamp's reused_cache one. Counted one per `ok … || nope` pair.
 # MERGED 208 / 141 -> 234 at the reconcile with origin/main fcba0600 (TOOL-aSparedSpawn-32): base 115,
 # plus this branch's 93, plus main's 26.
 # RAISED 163 -> 208 by TOOL-aSparedSpawn-13 and -16: unit 13's reuse-cache arms, forty-one assertions net
@@ -969,7 +971,7 @@ write_ru_legs() { # rows... -> the manifest, committed
     > "$RU_T/${PFX}gate-legs.json"
   ( cd "$RU_T" && git add -A && git commit -qm legs ) >/dev/null 2>&1
 }
-ru_run() { ( cd "$RU_T" && env -u GATE_FULL -u GATE_REUSE -u GATE_REUSE_PUSH -u GATE_REUSE_DAY -u GATE_LEGS \
+ru_run() { ( cd "$RU_T" && env -u GATE_FULL -u GATE_REUSE -u GATE_REUSE_PUSH -u GATE_REUSE_LINEAGE -u GATE_REUSE_DAY -u GATE_LEGS \
     -u FLIP GATE_BASE="$RU_E" GATE_REUSE_SAMPLE=0 "$@" bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1; echo $? ); }
 ru_done() { rm -rf "$RU_T" "$RU_T.origin.git"; }
 read_ru_rundir() { local c=""; IFS= read -r c < "$RU_GD/gate-run/current" 2>/dev/null; printf '%s' "$RU_GD/gate-run/$c"; }
@@ -1433,17 +1435,19 @@ else
 fi
 
 # =================================================================================================
-# LINEAGE REUSE (TOOL-aFrugalTurnstile-4). `GATE_REUSE=lineage` reuses only a row that a FULL run on a
-# CLEAN tree earned, on this manifest blob, at an ancestor of HEAD, and a run whose every reuse is of
-# that kind may still stamp. The scratch is ru_repo's plus an unguarded leg `pu`, which writes the
-# GATE_REUSE it sees into the git dir, and a `pb` that stays red until `gb/f` says fixed.
-# EVERY REFUSAL ARM CARRIES ITS CONTROL ON THE SAME LEDGER: it is saved before the lineage run and put
-# back before a GATE_REUSE=1 run, which must reuse `pa`. Without that, a key that never matched would
-# pass the refusal arm as well as the lineage term it names.
+# LINEAGE REUSE (TOOL-aFrugalTurnstile-4). `GATE_FULL=1 GATE_REUSE_LINEAGE=1` reuses only a row that a
+# FULL run on a CLEAN tree earned, on this manifest blob, at an ancestor of HEAD, and a run whose every
+# reuse is of that kind may still stamp. The scratch is ru_repo's plus an unguarded leg `pu`, which
+# writes the three reuse knobs it sees into the git dir, and a `pb` that stays red until `gb/f` says fixed.
+# RE-STAGED BY TOOL-aSparedSpawn-32 S10: the mode is asked for by `GATE_REUSE_LINEAGE`, and the opt-in
+# control below runs the cache's `env` mode, the opt-in store since TOOL-aSparedSpawn-13.
+# EVERY REFUSAL ARM CARRIES ITS CONTROL: a GATE_REUSE=1 run after the lineage run must reuse `pa` from
+# the cache under the same key. Without that, a key that never matched would pass the refusal arm as
+# well as the lineage term it names.
 build_lin_repo() {
   ru_repo || return 1
   printf '#!/usr/bin/env bash\ngrep -q fixed gb/f\n' > "$RU_T/fx/b.sh"
-  printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_REUSE-unset}" > .git/reuse-leak\n' > "$RU_T/fx/u.sh"
+  printf '#!/usr/bin/env bash\nprintf "%%s|%%s|%%s" "${GATE_REUSE-unset}" "${GATE_REUSE_PUSH-unset}" "${GATE_REUSE_LINEAGE-unset}" > .git/reuse-leak\n' > "$RU_T/fx/u.sh"
   echo broken > "$RU_T/gb/f"
   printf '%s\n' '[' \
     '  {"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
@@ -1455,9 +1459,9 @@ build_lin_repo() {
 write_lin_fix() { echo fixed > "$RU_T/gb/f"; ( cd "$RU_T" && git add -A && git commit -qm fix ) >/dev/null 2>&1; }
 read_lin_header() { awk -F'\t' -v k="$1" '$1 == k { print $2 }' "$RU_GD/gate-run/$(cat "$RU_GD/gate-run/current" 2>/dev/null)/header" 2>/dev/null; }
 read_lin_stamp() { awk -F'\t' '$1 == "reused" { print $2 }' "$RU_GD/gate-full-green" 2>/dev/null; }
-check_lin_control() { # <AC label> — restore the saved ledger and prove GATE_REUSE=1 reuses pa from it
-  cp "$tmp/ru.led" "$RU_GD/gate-ledger.tsv"; ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
-  grep -q '^GATE reuse pa  ' "$REC_OUT" && ok "$1 control: the same ledger under GATE_REUSE=1 reuses pa, so the key matched" \
+check_lin_control() { # <AC label> — prove the cache's env mode reuses pa under the key lineage refused
+  cp "$tmp/ru.led" "$RU_GD/gate-ledger.tsv"; ru_run GATE_REUSE=1 >/dev/null
+  grep -q '^GATE reuse pa  ' "$REC_OUT" && ok "$1 control: GATE_REUSE=1 reuses pa from the cache, so the key matched" \
                                         || nope "$1 control: GATE_REUSE=1 did not reuse pa either, so the refusal above proves nothing"
 }
 
@@ -1470,18 +1474,21 @@ ru_bad=$(awk -F'\t' -v r="$(read_lin_header run_id)" -v m="$(read_lin_header man
   && ok "AC1 a full run on a clean tree writes nine-field rows naming its run, full 1, its manifest_blob and its head" \
   || { nope "AC1 the ledger rows do not carry the run, full, manifest_blob and head fields"; cat -A "$RU_GD/gate-ledger.tsv" 2>/dev/null | sed 's/^/      /'; }
 write_lin_fix; rm -f "$RU_GD/gate-full-green"
-ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+ru_run GATE_FULL=1 GATE_REUSE_LINEAGE=1 >/dev/null
 grep -q '^GATE reuse pa  ' "$REC_OUT" && grep -q '^GATE ok    pb$' "$REC_OUT" && grep -q '^GATE ok    pu$' "$REC_OUT" \
   && [ "$(read_lin_stamp)" = 1 ] \
   && ok "AC2 after a red full run and a fix, a lineage run reuses pa, runs pb and pu, and stamps reused 1" \
   || { nope "AC2 the lineage run after a fix did not reuse pa alone and stamp reused 1 (stamp '$(read_lin_stamp)')"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
-[ "$(cat "$RU_GD/reuse-leak" 2>/dev/null)" = unset ] && [ "$(read_lin_header reuse)" = lineage ] \
-  && ok "AC8 a leg never inherits the reuse mode, and the header records reuse lineage" \
+[ "$(cat "$RU_GD/reuse-leak" 2>/dev/null)" = "unset|unset|unset" ] && [ "$(read_lin_header reuse)" = lineage ] \
+  && ok "AC8 a leg never inherits a reuse knob, and the header records reuse lineage" \
   || nope "AC8 the leg saw '$(cat "$RU_GD/reuse-leak" 2>/dev/null)' and the header reuse reads '$(read_lin_header reuse)'"
+grep -q $'^reused_cache\t0$' "$RU_GD/gate-full-green" 2>/dev/null \
+  && ok "TOOL-aSparedSpawn-32 S8 the lineage stamp records reused_cache 0 beside reused 1" \
+  || nope "TOOL-aSparedSpawn-32 S8 the lineage stamp carries no reused_cache 0"
 rm -f "$RU_GD/gate-full-green"
-ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+ru_run GATE_REUSE=1 >/dev/null
 grep -q '^GATE reuse pa  ' "$REC_OUT" && [ ! -f "$RU_GD/gate-full-green" ] \
-  && ok "AC6 over lineage-qualifying rows, GATE_REUSE=1 reuses and still writes no full green" \
+  && ok "AC6 the opt-in mode, the cache's env mode since TOOL-aSparedSpawn-13, reuses and still writes no full green" \
   || nope "AC6 the opt-in run did not reuse pa, or it stamped a full green"
 touch "$RU_T/untracked"; ru_run GATE_FULL=1 >/dev/null
 [ "$(grep -c . "$RU_GD/gate-ledger.tsv" 2>/dev/null)" = 3 ] && [ -z "$(awk -F'\t' '$7 != ""' "$RU_GD/gate-ledger.tsv" 2>/dev/null)" ] \
@@ -1494,7 +1501,7 @@ ru_done
 build_lin_repo
 echo x2 > "$RU_T/ga/f"; echo broken2 > "$RU_T/gb/f"; ( cd "$RU_T" && git add -A && git commit -qm touch ) >/dev/null 2>&1
 ru_run >/dev/null; write_lin_fix; cp "$RU_GD/gate-ledger.tsv" "$tmp/ru.led"
-ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+ru_run GATE_FULL=1 GATE_REUSE_LINEAGE=1 >/dev/null
 grep -q '^GATE reuse ' "$REC_OUT" && nope "AC3 lineage reused a row a run without the full flag earned" \
                                   || ok "AC3 lineage reuses nothing from rows with an empty full"
 check_lin_control AC3
@@ -1506,7 +1513,7 @@ ru_run GATE_FULL=1 >/dev/null; write_lin_fix
 sed 's#"guard": \["gb/"\]},#"guard": ["gb/"]}, {"name": "pd", "argv": ["bash", "fx/a.sh"], "guard": ["gd/"]},#' \
   "$RU_T/${PFX}gate-legs.json" > "$tmp/ru.legs" && cp "$tmp/ru.legs" "$RU_T/${PFX}gate-legs.json"
 ( cd "$RU_T" && git add -A && git commit -qm leg4 ) >/dev/null 2>&1; cp "$RU_GD/gate-ledger.tsv" "$tmp/ru.led"
-ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+ru_run GATE_FULL=1 GATE_REUSE_LINEAGE=1 >/dev/null
 grep -q '^GATE ok    pd$' "$REC_OUT" || nope "AC4 fixture: the fourth leg did not run, so the manifest did not move"
 grep -q '^GATE reuse ' "$REC_OUT" && nope "AC4 lineage reused a row earned on another manifest blob" \
                                   || ok "AC4 lineage reuses nothing once the manifest blob moved"
@@ -1519,7 +1526,7 @@ ru_first=$(cd "$RU_T" && git rev-parse HEAD)
 echo sib > "$RU_T/other"; ( cd "$RU_T" && git add -A && git commit -qm sibling ) >/dev/null 2>&1
 ru_run GATE_FULL=1 >/dev/null
 ( cd "$RU_T" && git reset -q --hard "$ru_first" ) >/dev/null 2>&1; write_lin_fix; cp "$RU_GD/gate-ledger.tsv" "$tmp/ru.led"
-ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+ru_run GATE_FULL=1 GATE_REUSE_LINEAGE=1 >/dev/null
 grep -q '^GATE reuse ' "$REC_OUT" && nope "AC5 lineage reused a row whose head is not an ancestor of HEAD" \
                                   || ok "AC5 lineage reuses nothing from a sibling's rows"
 check_lin_control AC5
@@ -1531,7 +1538,7 @@ sed 's#"guard": \["ga/"\]}#"guard": ["ga/"], "impure": "reads a remote"}#' "$RU_
   && cp "$tmp/ru.legs" "$RU_T/${PFX}gate-legs.json"
 ( cd "$RU_T" && git add -A && git commit -qm impure && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
 write_lin_fix; ru_run GATE_FULL=1 >/dev/null; rm -f "$RU_GD/gate-full-green"
-ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+ru_run GATE_FULL=1 GATE_REUSE_LINEAGE=1 >/dev/null
 grep -q '^GATE ok    pa$' "$REC_OUT" && grep -q '^GATE reuse pb  ' "$REC_OUT" && grep -q '^GATE reuse pu  ' "$REC_OUT" \
   && [ "$(read_lin_stamp)" = 2 ] \
   && ok "AC7 lineage runs the impure pa, reuses pb and pu, and stamps reused 2" \
@@ -1551,10 +1558,37 @@ touch "$RU_GD/move-once"; ru_run GATE_FULL=1 >/dev/null
   && ok "AC1 (TOOL-14) a full run whose tree moved mid-bar writes every row with an empty full" \
   || { nope "AC1 (TOOL-14) a full run whose tree moved wrote a row with full set"; cat -A "$RU_GD/gate-ledger.tsv" 2>/dev/null | sed 's/^/      /'; }
 ( cd "$RU_T" && git checkout -q -- m ) >/dev/null 2>&1; rm -f "$RU_GD/gate-full-green"
-ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+ru_run GATE_FULL=1 GATE_REUSE_LINEAGE=1 >/dev/null
 ! grep -q '^GATE reuse ' "$REC_OUT" && [ "$(read_lin_stamp)" != 1 ] && [ "$(read_lin_stamp)" != 2 ] && [ "$(read_lin_stamp)" != 3 ] \
   && ok "AC2 (TOOL-14) lineage on the restored tree reuses none of the moved run's rows and stamps no reuse" \
   || { nope "AC2 (TOOL-14) lineage reused a moved run's row (stamp '$(read_lin_stamp)')"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
+ru_done
+
+# THE TWO REUSE DESIGNS, COMPOSED (TOOL-aSparedSpawn-32 AC9 AC10 AC12). The reconcile kept origin's
+# lineage and this build's cache side by side, and the naive merge disabled one with the other: origin's
+# `unset GATE_REUSE` ran before the cache's mode block read it, so the env mode never fired. One read
+# site, one mode per run. The earning bar is ru_repo's plain run, which writes a cache entry per leg and
+# ledger rows with an empty `full`, so the cache has what a lineage run must NOT take.
+ru_repo
+ru_run >/dev/null
+ru_run GATE_REUSE=1 >/dev/null
+grep -q '^GATE reuse pa  ' "$REC_OUT" && [ "$(read_lin_header reuse)" = env ] \
+  && ok "AC9 GATE_REUSE=1 survives the lineage read site: pa is reused and the header records reuse env" \
+  || { nope "AC9 GATE_REUSE=1 did not reuse pa, or the header reuse reads '$(read_lin_header reuse)'"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
+ru_run GATE_FULL=1 GATE_REUSE_LINEAGE=1 >/dev/null
+grep -q '^GATE ok    pa$' "$REC_OUT" && ! grep -q '^GATE reuse ' "$REC_OUT" && [ "$(read_lin_header reuse)" = lineage ] \
+  && ok "AC10 a lineage run over a cached ok whose row is not lineage-qualified executes pa and records reuse lineage" \
+  || { nope "AC10 the lineage run took the cache's entry, or the header reuse reads '$(read_lin_header reuse)'"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
+ru_run GATE_FULL=1 GATE_REUSE=1 GATE_REUSE_LINEAGE=1 >/dev/null
+[ "$(read_lin_header reuse)" = lineage ] && grep -q 'not used: GATE_REUSE$' "$REC_OUT" \
+  && ok "AC12 under the full flag both knobs take lineage, and GATE_REUSE is named as not used" \
+  || { nope "AC12 the full run with both knobs took '$(read_lin_header reuse)' or named nothing"; grep 'reuse' "$REC_OUT" | sed 's/^/      /'; }
+ru_run GATE_REUSE=1 GATE_REUSE_LINEAGE=1 >/dev/null
+[ "$(read_lin_header reuse)" = env ] && grep -q 'GATE_REUSE_LINEAGE is not used without GATE_FULL' "$REC_OUT" \
+  && ok "AC12 without the full flag both knobs take env, and GATE_REUSE_LINEAGE is named as not used" \
+  || { nope "AC12 the plain run with both knobs took '$(read_lin_header reuse)' or named nothing"; grep 'reuse' "$REC_OUT" | sed 's/^/      /'; }
+[ "$(grep -c $'^reuse\t' "$RU_GD/gate-run/$(<"$RU_GD/gate-run/current")/header" 2>/dev/null)" = 1 ] \
+  && ok "AC12 the header carries one reuse key" || nope "AC12 the header carries the reuse key more than once"
 ru_done
 rm -f "$tmp/ru.led" "$tmp/ru.legs"
 

@@ -2331,11 +2331,13 @@ fi
 # uniqueness the paragraph above calls a correctness property. Read above, removed here, before any
 # leg starts.
 unset GATE_RUN_ID
-# THE REUSE MODE, read once and removed for the same reason (TOOL-aFrugalTurnstile-4 S4): the pre-push
-# hook exports `lineage` to THIS bar, and a leg's nested runner inheriting it would reuse inside a
-# scratch clone that asked for nothing. The header records the value as `reuse`.
-REUSE_MODE=${GATE_REUSE:-}
-unset GATE_REUSE
+# THE REUSE KNOBS, read once and removed for the same reason (TOOL-aFrugalTurnstile-4 S4, composed by
+# TOOL-aSparedSpawn-32 S6): the pre-push hook exports `GATE_REUSE_LINEAGE` or `GATE_REUSE_PUSH` to THIS
+# bar, and a leg's nested runner inheriting either, or a hand-set `GATE_REUSE`, would reuse inside a
+# scratch clone that asked for nothing. The mode block below reads these three variables and never
+# the environment; the header records the one mode it decides as `reuse`.
+REUSE_ASK_ENV=${GATE_REUSE:-}; REUSE_ASK_PUSH=${GATE_REUSE_PUSH:-}; REUSE_ASK_LINEAGE=${GATE_REUSE_LINEAGE:-}
+unset GATE_REUSE GATE_REUSE_PUSH GATE_REUSE_LINEAGE
 
 FPRINT="$KITREL/gate-fingerprint.sh"
 fingerprint() { [ -f "$FPRINT" ] || { printf ''; return; }; bash "$FPRINT" "$@" 2>/dev/null; }
@@ -3019,8 +3021,10 @@ REUSE_SCHEMA=3
 # THE TOOLCHAIN, ENVIRONMENT AND HOST DIGEST, one per run, the fourth section of EVERY key
 # (TOOL-aSparedSpawn-1 S4). Two runs over identical bytes under a different git, python, bash, MSYS
 # runtime or `PYTHONUTF8` are not the same question. Every `GATE_REUSE*` knob is left out so the
-# earning run (unset) and the reusing run (set) can agree, and `GATE_TURNSTILE_HELD` and `GATE_RUN_ID`
-# because each names this run and nothing a leg grades. `GATE_BASE` and `GATE_PUSH_BASE` are left out
+# earning run (unset) and the reusing run (set) can agree, and `GATE_TURNSTILE_HELD`,
+# `GATE_TURNSTILE_HOLDER` and `GATE_RUN_ID` because each names this run and nothing a leg grades: the
+# holder nonce, which origin's host turnstile exports above, moved every key on every run until the
+# reconcile of TOOL-aSparedSpawn-32 left it out. `GATE_BASE` and `GATE_PUSH_BASE` are left out
 # HERE because they enter the key of a leg declaring `base` and of no other (TOOL-aSparedSpawn-13 S2):
 # hashed here they would move every key on every landing. Every other knob stays in: over-sensitive
 # is a miss, never a false hit.
@@ -3049,29 +3053,42 @@ REUSE_DIGEST=$(
   # arm-signature: the input keys could not be measured (the toolchain digest), so nothing is reused or cached this run
   [ "${#evs[@]}" -gt 0 ] || exit 1
   for v in "${evs[@]}"; do
-    case $v in GATE_REUSE*|GATE_TURNSTILE_HELD|GATE_RUN_ID|GATE_BASE|GATE_PUSH_BASE) continue ;;
+    case $v in GATE_REUSE*|GATE_TURNSTILE_HELD|GATE_TURNSTILE_HOLDER|GATE_RUN_ID|GATE_BASE|GATE_PUSH_BASE) continue ;;
       GATE_*|GOV_*|*_PY|GIT_*|PYTHON*|LC_*|LANG|TZ|PATH) printf 'env %s=%s\n' "$v" "${!v}" ;; esac
   done
 ) && REUSE_DIGEST=$(git hash-object --stdin 2>/dev/null <<<"$REUSE_DIGEST") || REUSE_DIGEST=""
 
-# ---- REUSE: THE MODE, THE CACHE AND THE OBSERVED REMOTE (TOOL-aSparedSpawn-13) -----------------
-# THE MODE, one of three. `env`: `GATE_REUSE` is set, an ordinary non-authoritative run. `push`:
-# `GATE_REUSE_PUSH` is set, which only `.githooks/pre-push` sets, on a SCOPED decision, to
-# `<pushed sha> <tip> <advertisement digest>`; under it only a leg declaring `remote` or `history` is
-# reused, and only while HEAD is the pushed sha (S10). `off` otherwise, and ALWAYS under `GATE_FULL`:
-# the rule that a full run reuses nothing is the runner's own, not only the hook's scrub (S8).
+# ---- REUSE: THE MODE, THE CACHE AND THE OBSERVED REMOTE (TOOL-aSparedSpawn-13, -32) -------------
+# THE MODE, ONE PER RUN, by a fixed precedence (TOOL-aSparedSpawn-32 S7). Under `GATE_FULL` it is
+# `lineage` when `REUSE_ASK_LINEAGE` is set and `off` otherwise, and a set `GATE_REUSE` or
+# `GATE_REUSE_PUSH` is named as not used. Without it, `push` when `REUSE_ASK_PUSH` names HEAD, else
+# `env` when `REUSE_ASK_ENV` is set, else `off`, and a set `GATE_REUSE_LINEAGE` is named as not used.
+# `push` and `env` read the cache and `lineage` the ledger; what each mode reuses, and who sets its
+# knob, is the README's reuse section. `GATE_FULL` therefore still means "no cache reuse" (S8 of -13),
+# the boundary's lineage run being the one exception, because its verdicts were earned by full runs.
 REUSE_MODE=off; REUSE_WHY=""; REUSE_PUSH_SHA=""; REUSE_PUSH_TIP=""; REUSE_PUSH_DIGEST=""
 REUSE_CACHE=""; [ -n "$RG_COMMON_RAW" ] && REUSE_CACHE="$RG_COMMON_RAW/gate-cache"
 if [ -n "${GATE_FULL:-}" ]; then
-  { [ -n "${GATE_REUSE:-}" ] || [ -n "${GATE_REUSE_PUSH:-}" ]; } && REUSE_WHY="GATE_FULL is set, so nothing is reused"
-elif [ -n "${GATE_REUSE_PUSH:-}" ]; then
-  read -r REUSE_PUSH_SHA REUSE_PUSH_TIP REUSE_PUSH_DIGEST _ <<<"$GATE_REUSE_PUSH"
-  if [ -n "$REUSE_PUSH_DIGEST" ] && [ -n "$RG_HEAD" ] && [ "$REUSE_PUSH_SHA" = "$RG_HEAD" ]; then REUSE_MODE=push
-  else REUSE_WHY="GATE_REUSE_PUSH names ${REUSE_PUSH_SHA:-nothing} and HEAD is ${RG_HEAD:-unread}, so nothing is reused"; fi
-elif [ -n "${GATE_REUSE:-}" ]; then
-  REUSE_MODE=env
+  _unused="${REUSE_ASK_ENV:+ GATE_REUSE}${REUSE_ASK_PUSH:+ GATE_REUSE_PUSH}"
+  if [ -n "$REUSE_ASK_LINEAGE" ]; then
+    REUSE_MODE=lineage
+    [ -n "$_unused" ] && REUSE_WHY="GATE_FULL is set, so the lineage mode alone applies — not used:${_unused}"
+  else
+    [ -n "$_unused" ] && REUSE_WHY="GATE_FULL is set, so nothing is reused"
+  fi
+  unset _unused
+else
+  [ -n "$REUSE_ASK_LINEAGE" ] && printf 'run-gates: reuse — GATE_REUSE_LINEAGE is not used without GATE_FULL\n' >&2
+  if [ -n "$REUSE_ASK_PUSH" ]; then
+    read -r REUSE_PUSH_SHA REUSE_PUSH_TIP REUSE_PUSH_DIGEST _ <<<"$REUSE_ASK_PUSH"
+    if [ -n "$REUSE_PUSH_DIGEST" ] && [ -n "$RG_HEAD" ] && [ "$REUSE_PUSH_SHA" = "$RG_HEAD" ]; then REUSE_MODE=push
+    else REUSE_WHY="GATE_REUSE_PUSH names ${REUSE_PUSH_SHA:-nothing} and HEAD is ${RG_HEAD:-unread}, so nothing is reused"; fi
+  fi
+  [ "$REUSE_MODE" = off ] && [ -n "$REUSE_ASK_ENV" ] && { REUSE_MODE=env; REUSE_WHY=""; }
 fi
-if [ "$REUSE_MODE" != off ] && [ -z "$REUSE_CACHE" ]; then REUSE_MODE=off; REUSE_WHY="no git common dir holds a cache"; fi
+case $REUSE_MODE in env|push)
+  if [ -z "$REUSE_CACHE" ]; then REUSE_MODE=off; REUSE_WHY="no git common dir holds a cache"; fi ;;
+esac
 [ -n "$REUSE_WHY" ] && printf 'run-gates: reuse — %s\n' "$REUSE_WHY" >&2
 # THE SAMPLE RATE (S6, owner ruling F2: 0.25, uniform per leg), as parts in 10000. A value that is no
 # decimal from 0 to 1 is refused back to the default, loudly: a typo must not switch the sample off.
@@ -3166,9 +3183,6 @@ if [ -n "$RUNDIR" ]; then
     # additive key breaks none, and a bump could not be armed because nothing reads the field.
     printf 'queued\t%s\n'      "$QUEUED"
     printf 'queued_from\t%s\n' "$QUEUED_FROM"
-    # The reuse mode as given, `lineage`, another value, or empty (TOOL-aFrugalTurnstile-4 S4). Outside
-    # the run-envelope block for the reason the queue keys above give.
-    printf 'reuse\t%s\n' "$REUSE_MODE"
     # THE ACQUIRE PAIR (TOOL-dDerivedDocket-26 S4), from the variables the stdout line printed, so the
     # header and the line cannot disagree about one run. Outside the envelope block for the reason above.
     printf 'acquired\t%s\n'      "$ACQUIRED"
@@ -3183,8 +3197,9 @@ if [ -n "$RUNDIR" ]; then
     # The reuse key's schema (TOOL-aSparedSpawn-1 S5), so a reader can tell a schema miss from a
     # content miss. Outside the run-envelope block for the reason above.
     printf 'reuse_schema\t%s\n' "$REUSE_SCHEMA"
-    # The reuse mode, `off`, `env` or `push`, and the sample rate it drew at (TOOL-aSparedSpawn-13).
-    # Outside the run-envelope block for the reason above.
+    # The ONE reuse mode the run took, `off`, `env`, `push` or `lineage`, and the sample rate the cache
+    # modes draw at (TOOL-aSparedSpawn-13, TOOL-aFrugalTurnstile-4 S4, composed by TOOL-aSparedSpawn-32
+    # S7). Outside the run-envelope block for the reason above.
     printf 'reuse\t%s\n' "$REUSE_MODE"
     printf 'reuse_sample\t%s\n' "$REUSE_SAMPLE"
     # The memory pause's threshold this run held dispatch above, `off`, or `inert` where the host gave
@@ -3215,12 +3230,13 @@ if [ -n "$RUNDIR" ] || [ "$REUSE_MODE" != off ] || { [ -n "$REUSE_CACHE" ] && [ 
   fi
 fi
 
-# ---- reuse a proven green (the reuse unit, then TOOL-aSparedSpawn-13) -------------------------------
+# ---- reuse a proven green from the CACHE: the `env` and `push` modes (TOOL-aSparedSpawn-13) ---------
 # OPT-IN, and that is the boundary rule rather than caution: an advisory input may cause LESS work
 # only on a run that is not authoritative. An authoritative run reuses only a `remote` or `history`
 # leg, at the exact pushed sha and observed tip, and is then scoped: `.githooks/pre-push` sets
-# `GATE_REUSE_PUSH` on a SCOPED decision and on no other, and a run reusing anything stamps no green
-# the boundary trusts. Under `GATE_FULL` nothing is reused at all (`REUSE_MODE` above).
+# `GATE_REUSE_PUSH` on a SCOPED decision and on no other, and a run reusing anything from the cache
+# stamps no green the boundary trusts (`cache_reuses`). Under `GATE_FULL` the cache is never read; the
+# ledger block below is the `lineage` mode, the boundary's one exception (the mode block above).
 #
 # A leg is reused when ALL of: the mode allows its classes, it carries no legacy `impure`, a `remote`
 # leg has an observed remote, its key was measured, its row is not quarantined, the cache holds an
@@ -3229,8 +3245,8 @@ fi
 # "did more work", never "checked less". The cache entry is read by a builtin, so a lookup spawns
 # nothing. The age count moves here, in the entry itself, and an execution under the same key resets it
 # by writing a fresh entry (the cache block below).
-reuses=0
-if [ "$REUSE_MODE" != off ]; then
+reuses=0; cache_reuses=0; lineage_reuses=0
+if [ "$REUSE_MODE" = env ] || [ "$REUSE_MODE" = push ]; then
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
     [ -f "$WORK/$i.rc" ] && continue                 # already decided by the guard pass
@@ -3277,23 +3293,23 @@ if [ "$REUSE_MODE" != off ]; then
     printf 'ok\t%s\t%s\t%s\t%s\t%s\n' "$_es" "$_er" "$_eh" "$_ee" "$((10#$_age + 1))" \
       > "$REUSE_CACHE/${_key:0:2}/$_key" 2>/dev/null
     printf 'reuse' > "$WORK/$i.rc"
+    cache_reuses=$((cache_reuses+1))
   done
   unset _cls _key _q _st _es _er _eh _ee _age _h _s _c _o
 fi
 
-# ---- reuse a proven green (the reuse unit) -------------------------------------------------
-# TWO MODES OF ONE KNOB, read once into REUSE_MODE above. `lineage` is what `.githooks/pre-push`
-# exports on its own FULL decision for this runner (TOOL-aFrugalTurnstile-4, design D5, which
-# supersedes TOOL-aPacedTurnstile-6's rule that the boundary never reuses): it takes only a verdict a
-# FULL run on a CLEAN tree earned, on this same manifest blob, at an ancestor of HEAD, and a run whose
-# every reuse is of that kind may still stamp `gate-full-green`. Any other non-empty value is the
-# OPT-IN mode, which an advisory run asks for by hand and which can never stamp.
+# ---- reuse a proven green from the LEDGER: the `lineage` mode (TOOL-aFrugalTurnstile-4) ------------
+# `lineage` is what `.githooks/pre-push` asks for, by `GATE_REUSE_LINEAGE`, on its own FULL decision
+# for this runner (TOOL-aFrugalTurnstile-4, design D5, which supersedes TOOL-aPacedTurnstile-6's rule
+# that the boundary never reuses): it takes only a verdict a FULL run on a CLEAN tree earned, on this
+# same manifest blob, at an ancestor of HEAD, and a run whose every reuse is of that kind may still
+# stamp `gate-full-green`. It reads the ledger and never a cache entry (TOOL-aSparedSpawn-32 S6); the
+# ledger's opt-in mode is the cache's `env` mode above since TOOL-aSparedSpawn-13.
 #
-# A leg is reused when ALL of: reuse is asked for, the leg is not declared `impure`, its ledger row
-# says `ok`, that row carries a key, and the key equals the one computed THIS run; under `lineage`
-# also the row's `full` is `1`, its `manifest_blob` is this run's, and its `head` is an ancestor of
-# HEAD. Any missing term means execute — every failure mode of this block is "did more work", never
-# "checked less".
+# A leg is reused when ALL of: the leg is not declared `impure`, a `remote` leg has an observed remote,
+# its ledger row says `ok`, that row carries a key, the row's `full` is `1`, its `manifest_blob` is this
+# run's, its `head` is an ancestor of HEAD, and the key equals the one computed THIS run. Any missing
+# term means execute — every failure mode of this block is "did more work", never "checked less".
 #
 # WHAT LINEAGE REUSE DOES NOT CHECK: that a reused leg's guard names every input the leg reads, or
 # that its verdict depends on the tree alone. A reused verdict is only as good as its input key, so
@@ -3305,11 +3321,11 @@ fi
 # as the `grep -m1` this replaced did. Each row's tabs are folded to US (0x1f) before the split:
 # `full` is empty on most rows, and a tab IFS collapses an empty field and shifts every field after it.
 # The lineage terms run CHEAPEST FIRST (S6): string compares; then the earning run's header `base`,
-# a file read, because `input_key` hashes BASE and another base can never match; then ancestry, one
-# git spawn per distinct head, memoized; and `input_key` last. A row whose run names no readable
+# a file read, because the key hashes BASE and another base can never match; then ancestry, one
+# git spawn per distinct head, memoized; and the key last, compared with the run's precomputed
+# `INPUT_KEYS`, the one composition `input_key` also builds. A row whose run names no readable
 # header falls through to the key, so a swept record costs work and never a verdict.
-lineage_reuses=0
-if [ -n "$REUSE_MODE" ] && [ -n "$LEDGER" ] && [ -s "$LEDGER" ]; then
+if [ "$REUSE_MODE" = lineage ] && [ -n "$LEDGER" ] && [ -s "$LEDGER" ]; then
   declare -A _lrow=() _rbase=()
   while IFS= read -r _line || [ -n "$_line" ]; do
     _n=${_line%%$'\t'*}
@@ -3320,8 +3336,11 @@ if [ -n "$REUSE_MODE" ] && [ -n "$LEDGER" ] && [ -s "$LEDGER" ]; then
     [ -z "${names[$i]}" ] && continue
     [ -f "$WORK/$i.rc" ] && continue                 # already decided by the guard pass
     # An IMPURE leg is never reused, on any tree, however identical. Its verdict is a function of
-    # something outside the tree, so a byte-identical tree is not the same question twice.
-    [ -n "${impures[$i]}" ] && continue
+    # something outside the tree, so a byte-identical tree is not the same question twice. The
+    # declaration is the manifest's legacy `impure`, which the cache block above refuses the same way,
+    # and a `remote` leg with no observed remote is refused for the cache block's reason (S9 of -13).
+    _cls=",${legreads[$i]},"
+    case $_cls in *,impure,*) continue ;; *,remote,*) [ -n "$REMOTE_OBS" ] || continue ;; esac
     _row=${_lrow[${names[$i]}]-}
     [ -n "$_row" ] || continue
     _sec=; _st=; _key=; _end=; _run=; _full=; _blob=; _head=
@@ -3329,36 +3348,34 @@ if [ -n "$REUSE_MODE" ] && [ -n "$LEDGER" ] && [ -s "$LEDGER" ]; then
     IFS=$'\x1f' read -r _n _sec _st _key _end _run _full _blob _head _ <<<"${_row//$'\t'/$'\x1f'}"
     [ "$_st" = ok ] || continue                     # a RED row is never reusable
     [ -n "$_key" ] && [ "$_key" != "-" ] || continue # no key recorded is not a match, it is a gap
-    if [ "$REUSE_MODE" = lineage ]; then
-      [ "$_full" = 1 ] && [ -n "$_blob" ] && [ "$_blob" = "$MANIFEST_BLOB" ] || continue
-      # The run id names a path, so it is shape-checked first; one outside the shape is not refused,
-      # it only loses the shortcut. `?` memoizes "no header", `=<base>` the base it recorded.
-      case $_run in
-        ''|*[!A-Za-z0-9TZ-]*) ;;
-        *)
-          if [ -z "${_rbase[$_run]+x}" ]; then
-            _rbase[$_run]='?'
-            if [ -f "$RUNROOT/$_run/header" ]; then
-              while IFS=$'\t' read -r _hk _hv; do
-                [ "$_hk" = base ] && { _rbase[$_run]="=$_hv"; break; }
-              done < "$RUNROOT/$_run/header"
-            fi
+    [ "$_full" = 1 ] && [ -n "$_blob" ] && [ "$_blob" = "$MANIFEST_BLOB" ] || continue
+    # The run id names a path, so it is shape-checked first; one outside the shape is not refused,
+    # it only loses the shortcut. `?` memoizes "no header", `=<base>` the base it recorded.
+    case $_run in
+      ''|*[!A-Za-z0-9TZ-]*) ;;
+      *)
+        if [ -z "${_rbase[$_run]+x}" ]; then
+          _rbase[$_run]='?'
+          if [ -f "$RUNROOT/$_run/header" ]; then
+            while IFS=$'\t' read -r _hk _hv; do
+              [ "$_hk" = base ] && { _rbase[$_run]="=$_hv"; break; }
+            done < "$RUNROOT/$_run/header"
           fi
-          case ${_rbase[$_run]} in '?'|"=$BASE") ;; *) continue ;; esac ;;
-      esac
-      case $_head in ''|*[!0-9a-f]*) continue ;; esac
-      case $_anc_no in *" $_head "*) continue ;; esac
-      case $_anc_yes in
-        *" $_head "*) ;;
-        *) if git merge-base --is-ancestor "$_head" HEAD 2>/dev/null; then _anc_yes="$_anc_yes$_head "
-           else _anc_no="$_anc_no$_head "; continue; fi ;;
-      esac
-    fi
-    [ "$_key" = "$(input_key "$i")" ] || continue
+        fi
+        case ${_rbase[$_run]} in '?'|"=$BASE") ;; *) continue ;; esac ;;
+    esac
+    case $_head in ''|*[!0-9a-f]*) continue ;; esac
+    case $_anc_no in *" $_head "*) continue ;; esac
+    case $_anc_yes in
+      *" $_head "*) ;;
+      *) if git merge-base --is-ancestor "$_head" HEAD 2>/dev/null; then _anc_yes="$_anc_yes$_head "
+         else _anc_no="$_anc_no$_head "; continue; fi ;;
+    esac
+    [ "$_key" = "${INPUT_KEYS[$i]:--}" ] || continue
     printf 'reuse' > "$WORK/$i.rc"
-    [ "$REUSE_MODE" = lineage ] && lineage_reuses=$((lineage_reuses+1))
+    lineage_reuses=$((lineage_reuses+1))
   done
-  unset _lrow _rbase
+  unset _lrow _rbase _cls
 fi
 
 # ---- CALIBRATION: THE SPAWN FLOOR. TOOL-dDerivedDocket-26 S5 ---------------------------------------
@@ -4861,15 +4878,13 @@ remove_census_watcher
 # this record exists to remove. Field 2 is still the duration, which is what lets the manifest
 # parser above read it as a dispatch hint with no edit at all.
 #
-# Rows: name, seconds, status, input key, ended-at. Advisory for dispatch, and read for reuse no more:
-# the reuse cache in the common dir is that store (TOOL-aSparedSpawn-13 S4), so the key and status
-# here are a record for a reader — a failed write costs wall clock, never a verdict.
 # Rows, nine tab-separated fields: name, seconds, status, input key, ended-at, run, full,
 # manifest_blob, head. The last four are the run that wrote the row: its id, `1` when it ran with
 # GATE_FULL on a CLEAN tree that did NOT move while the bar ran, and empty otherwise, the leg
-# manifest blob it read, and the sha it graded (TOOL-aFrugalTurnstile-4 S1). They are what
-# `GATE_REUSE=lineage` tests, and a carried-forward row keeps the run that EXECUTED it. Advisory for
-# dispatch, DURABLE for the reuse unit that reads the key — a failed write costs wall clock, never a
+# manifest blob it read, and the sha it graded (TOOL-aFrugalTurnstile-4 S1). They are what the
+# `lineage` mode tests, and a carried-forward row keeps the run that EXECUTED it. Advisory for
+# dispatch, DURABLE for the lineage mode that reads the key; the `env` and `push` modes read the reuse
+# cache in the common dir instead (TOOL-aSparedSpawn-13 S4) — a failed write costs wall clock, never a
 # verdict. A moved tree blanks `full` (TOOL-aFrugalTurnstile-14 S1): its keys may describe content
 # other than what the leg graded, and a lineage reuse of them could stamp a full green.
 FPRINT_END=$(fingerprint)
@@ -5045,11 +5060,12 @@ fi
 
 # ---- the verdict, the full-green stamp, and the sweep --------------------------------------
 # `reuses` feeds the fourth full-green precondition, counted by the reuse verb above. A run that
-# reused a leg in the OPT-IN mode has not proven the whole bar, so it cannot stamp a full green. A
-# `lineage` reuse is different in kind (TOOL-aFrugalTurnstile-4 S3): its verdict was EARNED by a full
-# run on a clean tree, same manifest, an ancestor of HEAD, under an equal input key, so the stamp asks
-# that every reuse was one of those. The inherited-green stamp keeps "reused nothing".
-reuses=${reuses:-0}; lineage_reuses=${lineage_reuses:-0}
+# reused a leg from the CACHE, `cache_reuses`, has not proven the whole bar, so it cannot stamp a full
+# green. A `lineage` reuse is different in kind (TOOL-aFrugalTurnstile-4 S3): its verdict was EARNED
+# by a full run on a clean tree, same manifest, an ancestor of HEAD, under an equal input key, so the
+# stamp asks that every reuse was one of those AND that none came from the cache (TOOL-aSparedSpawn-32
+# S8). The inherited-green stamp keeps "reused nothing".
+reuses=${reuses:-0}; lineage_reuses=${lineage_reuses:-0}; cache_reuses=${cache_reuses:-0}
 # `tree_moved` is computed ABOVE the ledger block, which reads it (TOOL-aFrugalTurnstile-14 S1).
 
 # THE HELD-TIER LAST-RUN RECORDS (TOOL-aSparedSpawn-12 S4), which the `changed` selection reads. Per
@@ -5207,8 +5223,8 @@ fi
 # An implementation that forgets ONE of them still passes every arm written for the others, which
 # is why each has its own negative control in the evidence harness.
 #
-#   failed nothing  · skipped nothing  · reused nothing but lineage-qualified legs  · the tree did
-#   not move  · the tree was CLEAN when the run started
+#   failed nothing  · skipped nothing  · reused nothing but lineage-qualified legs, and nothing from
+#   the cache  · the tree did not move  · the tree was CLEAN when the run started
 #
 # The last one is the one a spec audit found missing. A developer's ordinary full run on a dirty
 # tree would otherwise stamp a green that the push boundary later treats as proof about a tree
@@ -5234,7 +5250,7 @@ case "$LEGS_REL" in
                 && git rev-parse --show-prefix 2>/dev/null) && LEGS_REL=$_lr${LEGS_REL##*/} ;;
 esac
 if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = "$lineage_reuses" ] \
-   && [ ! -f "$WORK/wall.breach" ] \
+   && [ "$cache_reuses" = 0 ] && [ ! -f "$WORK/wall.breach" ] \
    && [ "$tree_moved" = no ] && [ "$TREE_CLEAN" = yes ] && [ -n "$FPRINT_START" ] \
    && [ "$gate_verdict" = GREEN ] && [ -f "$RUNDIR/verdict" ]; then
   {
@@ -5242,18 +5258,18 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = "$linea
     printf 'fingerprint\t%s\n' "$FPRINT_START"
     printf 'manifest_blob\t%s\n' "$MANIFEST_BLOB"
     printf 'manifest\t%s\n' "$LEGS_REL"
-    # How many legs this green carried forward rather than ran, `0` when none (S3). Evidence: no
-    # reader in `.githooks/pre-push` reads it.
+    # THE TWO REUSE COUNTS (TOOL-aSparedSpawn-32 S8). `reused` is how many legs this green carried
+    # forward rather than ran, `0` when none (TOOL-aFrugalTurnstile-4 S3), every one of them a lineage
+    # reuse under the precondition above. `reused_cache` is how many it took from the cache, always 0
+    # here. The push boundary's predicate 9 reads the pair: a non-zero `reused_cache`, or a record with
+    # no `reused_cache` and a non-zero `reused`, which cannot say its kind, forces the full bar.
     printf 'reused\t%s\n' "$reuses"
+    printf 'reused_cache\t%s\n' "$cache_reuses"
     # WHAT THIS GREEN COVERED. Without it a record named `gate-full-green` cannot say
     # whether the kit-subject legs ran, and the push boundary would trust a partial bar as
     # a whole one. The READER of this field is TOOL-dUnstalledConvoy-27; written without
     # that reader it is an inert byte, which is what a spec audit caught rev-2 shipping.
     printf 'selftests\t%s\n' "$SELFTESTS_STAMP"
-    # HOW MANY LEGS THIS RUN REUSED, always 0 under the precondition above. Written so the push
-    # boundary's predicate 9 can refuse a record that says otherwise, however it was written
-    # (TOOL-aSparedSpawn-13 S8): a reused verdict never satisfies the full-green predicate.
-    printf 'reused\t%s\n' "$reuses"
     printf 'run_id\t%s\n' "$RUNID"
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   } > "$gd/gate-full-green.tmp" 2>/dev/null \
@@ -5300,7 +5316,8 @@ if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ "$ATTR_LANDABLE" = 1 ] \
     printf 'base\t%s\n' "$ATTR_RSHA"
     printf 'max_age\t%s\n' "$ATTR_MAX_AGE"
     printf 'legs\t%s\n' "$ATTR_LAND_LEGS"
-    printf 'reused\t%s\n' "$reuses"   # predicate 9's field, as on the full green (TOOL-aSparedSpawn-13 S8)
+    printf 'reused\t%s\n' "$reuses"   # predicate 9's pair, as on the full green (TOOL-aSparedSpawn-13 S8, -32 S8)
+    printf 'reused_cache\t%s\n' "$cache_reuses"
     printf 'run_id\t%s\n' "$RUNID"
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   } > "$gd/gate-inherited-green.tmp" 2>/dev/null \

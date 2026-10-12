@@ -1309,9 +1309,9 @@ read_policy_at() { # sha -> PP_POLICY (park|land), PP_MAX_AGE (the positive boun
 gd=$(git rev-parse --git-dir 2>/dev/null)
 kitfp=""; [ -n "$GATE_RUNNER" ] && kitfp="$top/${GATE_RUNNER%/*}/gate-fingerprint.sh"
 force=""; lag=0
-rec_sha=""; rec_fp=""; rec_blob=""; rec_man=""; rec_st=""; rec_reused=""
-read_green_file() { # path -> rec_sha rec_fp rec_blob rec_man rec_st rec_reused, each empty when the file is absent
-  rec_sha=""; rec_fp=""; rec_blob=""; rec_man=""; rec_st=""; rec_reused=""
+rec_sha=""; rec_fp=""; rec_blob=""; rec_man=""; rec_st=""; rec_reused=""; rec_reused_cache=""
+read_green_file() { # path -> rec_sha rec_fp rec_blob rec_man rec_st rec_reused rec_reused_cache, each empty when absent
+  rec_sha=""; rec_fp=""; rec_blob=""; rec_man=""; rec_st=""; rec_reused=""; rec_reused_cache=""
   [ -f "$1" ] || return 0
   rec_sha=$(awk -F'\t' '$1=="sha"{print $2}' "$1" 2>/dev/null)
   rec_fp=$(awk -F'\t' '$1=="fingerprint"{print $2}' "$1" 2>/dev/null)
@@ -1323,10 +1323,11 @@ read_green_file() { # path -> rec_sha rec_fp rec_blob rec_man rec_st rec_reused,
   # stamp written before TOOL-dUnstalledConvoy-26 lacks this key, and defaulting the missing case to
   # "covered everything" would make each of them certify legs it never ran.
   rec_st=$(awk -F'\t' '$1=="selftests"{print $2}' "$1" 2>/dev/null)
-  # HOW MANY LEGS THE RUN REUSED (TOOL-aSparedSpawn-13 S8), which predicate 9 reads. Absent reads as
-  # absent, never as a force: every stamp written before the field existed lacks it, and the runner
-  # never stamps a run that reused anything.
+  # HOW MANY LEGS THE RUN REUSED, and how many of them from the cache (TOOL-aSparedSpawn-13 S8, -32
+  # S8), the pair predicate 9 reads. Each is empty when absent; what an absent one means is
+  # predicate 9's to say.
   rec_reused=$(awk -F'\t' '$1=="reused"{print $2}' "$1" 2>/dev/null)
+  rec_reused_cache=$(awk -F'\t' '$1=="reused_cache"{print $2}' "$1" 2>/dev/null)
 }
 
 # THE CANDIDATE STAMPS (TOOL-dThriftyLanding-2). `--git-dir` is per WORKTREE, so a full green earned in
@@ -1400,7 +1401,8 @@ check_green_manifest() {
   force="the recorded $2 was earned on the leg manifest $1, and the bar this push runs reads ${KP}gate-legs.json"
 }
 
-# PREDICATES 2 TO 9, ONE FUNCTION, TWO RECORDS (TOOL-dDerivedDocket-24). They were inline and read
+# PREDICATES 2 TO 8, ONE FUNCTION, TWO RECORDS (TOOL-dDerivedDocket-24), and 9 in `check_green_reuse`
+# below, which only a runner stamp's two callers run. They were inline and read
 # the full green's fields; the inherited green below must pass exactly the same seven, so the seven
 # became one function over a record's five fields rather than a second copy of them. The label is the
 # only thing that differs, and it is spelled `full green` for the full green, so every message that
@@ -1496,16 +1498,23 @@ check_green_record() { # sha · fingerprint · manifest blob · manifest path ·
   return 0
 }
 
-# check_green_reuse <label> <reused> — predicate 9, read only from a runner stamp, after predicates 2
-# to 8 pass. Its own function since the reconcile of TOOL-aSparedSpawn-32: the record signature above
-# gained the manifest path and the bar pair on one side, and this field on the other.
-# 9. the record says its run REUSED a leg (TOOL-aSparedSpawn-13 S8). The runner never stamps one, so
-#    a record that says so was written some other way, and a reused verdict is copied rather than
-#    earned: it can never satisfy the full-green predicate. Present and not `0` forces.
+# check_green_reuse <label> <reused> <reused_cache> — predicate 9, read only from a runner stamp, after
+# predicates 2 to 8 pass. Its own function since the reconcile of TOOL-aSparedSpawn-32: the record
+# signature above gained the manifest path and the bar pair on one side, and this pair on the other.
+# 9. the record says its run reused a leg FROM THE CACHE (TOOL-aSparedSpawn-13 S8, composed by -32 S8).
+#    The runner never stamps one, so a record that says so was written some other way, and a cached
+#    verdict is copied rather than earned: it can never satisfy the full-green predicate. A non-zero
+#    `reused_cache` forces. A record with NO `reused_cache` and a non-zero `reused` forces too, because
+#    it was written before the field existed and cannot say which kind it reused, so it is read as the
+#    cache. A `reused` above 0 beside `reused_cache 0` is a lineage stamp, whose reuses full runs
+#    earned (TOOL-aFrugalTurnstile-4 S3), and it does not force.
 check_green_reuse() {
-  local label=$1 r_reused=${2:-}
+  local label=$1 r_reused=${2:-} r_cache=${3:-}
   force=""
-  if [ -n "$r_reused" ] && [ "$r_reused" != 0 ]; then
+  if [ -n "$r_cache" ] && [ "$r_cache" != 0 ]; then
+    force="the recorded $label says its run reused $r_cache leg(s) from the cache, and a reused verdict proves nothing whole"; return 0
+  fi
+  if [ -z "$r_cache" ] && [ -n "$r_reused" ] && [ "$r_reused" != 0 ]; then
     force="the recorded $label says its run reused $r_reused leg(s), and a reused verdict proves nothing whole"; return 0
   fi
   return 0
@@ -1622,7 +1631,7 @@ for _gi in "${!green_candidates[@]}"; do
   force=""
   [ -n "$rec_sha" ] || force="no recorded full green"
   [ -z "$force" ] && check_green_record "$rec_sha" "$rec_fp" "$rec_blob" "$rec_man" "$rec_st" "full green"
-  [ -z "$force" ] && check_green_reuse "full green" "$rec_reused"
+  [ -z "$force" ] && check_green_reuse "full green" "$rec_reused" "$rec_reused_cache"
   if [ -z "$force" ]; then
     [ "$_gi" -gt 0 ] && rec_from=$(green_label "$_gi")
     break
@@ -1655,6 +1664,7 @@ if [ -n "$force" ] && [ -f "$gd/gate-inherited-green" ]; then
   ig_base=$(awk -F'\t' '$1=="base"{print $2}' "$_ig" 2>/dev/null)
   ig_age=$(awk -F'\t' '$1=="max_age"{print $2}' "$_ig" 2>/dev/null)
   ig_reused=$(awk -F'\t' '$1=="reused"{print $2}' "$_ig" 2>/dev/null)
+  ig_reused_cache=$(awk -F'\t' '$1=="reused_cache"{print $2}' "$_ig" 2>/dev/null)
   full_force=$force
   if [ "$PP_POLICY" != land ]; then
     inh_why="an inherited green is not read while the policy at R reads $PP_POLICY"
@@ -1664,7 +1674,7 @@ if [ -n "$force" ] && [ -f "$gd/gate-inherited-green" ]; then
     inh_why="the inherited green was written under max_age ${ig_age:-none} and the bound at ${main_remote:0:8} is $PP_MAX_AGE"
   else
     check_green_record "$ig_sha" "$ig_fp" "$ig_blob" "$ig_man" "$ig_st" "inherited green"
-    [ -z "$force" ] && check_green_reuse "inherited green" "$ig_reused"
+    [ -z "$force" ] && check_green_reuse "inherited green" "$ig_reused" "$ig_reused_cache"
     if [ -z "$force" ]; then inh_sha=$ig_sha; else inh_why="the inherited green ${ig_sha:0:8} is refused too: $force"; fi
   fi
   [ -n "$inh_sha" ] || force=$full_force
@@ -1808,11 +1818,13 @@ fi
 # It is set again below, on a doc-only decision and nowhere else.
 [ -n "${GATE_DOCS_BASE+x}" ] && ENV_CLEARED+=" GATE_DOCS_BASE"
 unset GATE_DOCS_BASE
-# THE PUSH-TIME REUSE KNOB IS THIS HOOK'S ALONE TOO (TOOL-aSparedSpawn-13 S10), for every bar a STUB
-# included, for the docs knob's reason: an inherited value would let the environment decide which
-# legs a vetted runner spares. It is set again below, on a scoped decision whose tip probe agreed.
-[ -n "${GATE_REUSE_PUSH+x}" ] && ENV_CLEARED+=" GATE_REUSE_PUSH"
-unset GATE_REUSE_PUSH
+# THE TWO PUSH-TIME REUSE KNOBS ARE THIS HOOK'S ALONE TOO (TOOL-aSparedSpawn-13 S10, -32 S6), for every
+# bar a STUB included, for the docs knob's reason: an inherited value would let the environment decide
+# which legs a vetted runner spares. Each is set again below, on the one decision that asks for it.
+for _k in GATE_REUSE_PUSH GATE_REUSE_LINEAGE; do
+  [ -n "${!_k+x}" ] && ENV_CLEARED+=" $_k"
+  unset "$_k"
+done
 # ITS TWO SEAMS GO WITH IT (TOOL-aSparedSpawn-16 S6), for every bar a STUB included: `GATE_REUSE_SAMPLE`
 # sets how often a reused leg is re-executed and `GATE_REUSE_DAY` pins the day a `clock` leg is keyed
 # on, so either, inherited, decides what a push bar spares. The runner keeps reading both; they are
@@ -2077,10 +2089,11 @@ if [ -n "$inh_sha" ]; then
 elif [ -n "$force" ]; then
   # LINEAGE REUSE, on this decision and this bar only (TOOL-aFrugalTurnstile-4 S7, design D5): after
   # a red, the fix push re-runs the failed legs and the legs whose input key moved, and may still stamp.
-  # Exported AFTER the scrub above, so an inherited GATE_REUSE is still never honoured; a bar that is
-  # not this kit's runner gets nothing, and the runner unsets it before any leg starts.
+  # Asked for by its own knob, `GATE_REUSE_LINEAGE` (TOOL-aSparedSpawn-32 S6), exported AFTER the scrub
+  # above, so an inherited one is never honoured; a bar that is not this kit's runner gets nothing, and
+  # the runner unsets it before any leg starts. The cache modes are the README's reuse section.
   _reuse_clause=""
-  [ "$bar_record" = runner ] && { export GATE_REUSE=lineage; _reuse_clause=" — reuse: lineage"; }
+  [ "$bar_record" = runner ] && { export GATE_REUSE_LINEAGE=1; _reuse_clause=" — reuse: lineage"; }
   echo "pre-push: FULL gate on $def push (${main_local:0:8}) — ${DOCS_ONLY:+doc-only, but }$force${inh_why:+; $inh_why} — bar: $bar_label$_reuse_clause"
   export GATE_FULL=1
   RUNLOG_DECISION=full

@@ -920,7 +920,8 @@ esac
 # A direct green run writes the ledger row; the push then runs over the SAME tree and base, so on the
 # old hook the row's key matched and the red leg was never executed.
 # RE-STAGED BY TOOL-aFrugalTurnstile-4 S9: the row is earned WITHOUT GATE_FULL, so its `full` field is
-# empty. The hook now exports GATE_REUSE=lineage on its own FULL decision, and a row a full run earned
+# empty. The hook now exports GATE_REUSE_LINEAGE on its own FULL decision (the knob since
+# TOOL-aSparedSpawn-32 S6; the cache, which the earning run also feeds, is never read under GATE_FULL), and a row a full run earned
 # would be reused there, because this leg's verdict depends on H49_LEG_RC, which no input key sees:
 # the not-checked class of the runner's reuse block, staged on purpose. An empty `full` keeps this arm
 # testing what it names — `GATE_REUSE=1` semantics would reuse the row, lineage refuses it, and the
@@ -1020,22 +1021,37 @@ case "$_out|$rp_knob" in
   *) bad "RP AC15 expected a FULL decision with no knob, got knob '$rp_knob': $_out" ;;
 esac
 
-# AC14: predicate 9 — a planted full green whose `reused` field is not 0 forces the full bar, and the
-# same record reading 0 scopes, so the arm sees the field and not the record.
-_out=$(RP_GREEN_EXTRA=$'reused\t1\n' run_rp_push)
+# AC14: predicate 9 — a planted full green whose `reused_cache` field is not 0 forces the full bar, and
+# the same record reading 0 scopes, so the arm sees the field and not the record. RE-STAGED BY
+# TOOL-aSparedSpawn-32 S10: the field predicate 9 reads for a cache reuse is `reused_cache` since the
+# two reuse designs were composed; `reused` alone is lineage's count.
+_out=$(RP_GREEN_EXTRA=$'reused\t1\nreused_cache\t1\n' run_rp_push)
 case "$(read_rp_line "$_out")" in
-  *"FULL gate on main push"*"says its run reused 1 leg(s)"*) ok "RP AC14 a full green whose reused reads 1 forces the full bar" ;;
+  *"FULL gate on main push"*"says its run reused 1 leg(s) from the cache"*) ok "RP AC14 a full green whose reused_cache reads 1 forces the full bar" ;;
   *) bad "RP AC14 expected predicate 9 to force the full bar, got: $_out" ;;
 esac
-_out=$(RP_GREEN_EXTRA=$'reused\t0\n' run_rp_push)
+_out=$(RP_GREEN_EXTRA=$'reused\t0\nreused_cache\t0\n' run_rp_push)
 case "$_out" in
-  *"scoped gate on main push"*) ok "RP AC14 control: the same record reading reused 0 scopes" ;;
+  *"scoped gate on main push"*) ok "RP AC14 control: the same record reading reused_cache 0 scopes" ;;
   *) bad "RP AC14 control expected a scoped decision, got: $_out" ;;
+esac
+# TOOL-aSparedSpawn-32 AC8: a record written before `reused_cache` existed cannot say which kind it
+# reused, so `reused 2` with no `reused_cache` forces FULL; the same count beside `reused_cache 0` is a
+# lineage stamp and scopes, which is the control that the arm reads the missing field.
+_out=$(RP_GREEN_EXTRA=$'reused\t2\n' run_rp_push)
+case "$(read_rp_line "$_out")" in
+  *"FULL gate on main push"*"says its run reused 2 leg(s), and"*) ok "TOOL-aSparedSpawn-32 AC8 an unlabelled reused 2 forces the full bar" ;;
+  *) bad "TOOL-aSparedSpawn-32 AC8 expected an unlabelled reused 2 to force the full bar, got: $_out" ;;
+esac
+_out=$(RP_GREEN_EXTRA=$'reused\t2\nreused_cache\t0\n' run_rp_push)
+case "$(read_rp_line "$_out")" in
+  *"scoped gate on main push"*) ok "TOOL-aSparedSpawn-32 AC8 control: reused 2 beside reused_cache 0, a lineage stamp, scopes" ;;
+  *) bad "TOOL-aSparedSpawn-32 AC8 control expected a lineage stamp to scope, got: $_out" ;;
 esac
 cd "$tmp" || exit 2
 
 # --- TOOL-aFrugalTurnstile-4 S7: LINEAGE REUSE AT THE BOUNDARY. On a FULL decision for this kit's
-# --- runner the hook exports GATE_REUSE=lineage itself, after the scrub, so the push that fixes a red
+# --- runner the hook exports GATE_REUSE_LINEAGE itself (TOOL-aSparedSpawn-32 S6), after the scrub, so the push that fixes a red
 # --- re-runs the failed leg and the legs whose key moved, and lands on a stamp that says `reused 1`.
 # --- No other bar gets the mode. A COPY OF THE REAL RUNNER again, for H49's reason: three legs, `pa`
 # --- guarded on ga/, `pb` guarded on gb/ and red until gb/f says fixed, `pu` unguarded.
@@ -1086,6 +1102,17 @@ case "$_out" in
   *"GATE ok    pb"*"GATE ok    pu"*) ok "LIN AC11 control — the fixed leg and the unguarded leg executed on that push" ;;
   *) bad "LIN AC11 control expected pb and pu to execute on the fix push: $_out" ;;
 esac
+# TOOL-aSparedSpawn-32 AC7: the fix push's stamp is a LINEAGE stamp, `reused 1` beside `reused_cache 0`,
+# and predicate 9 reads it as one: the next push takes no FULL decision from the stamp's reused field.
+# The naive merge read `reused 1` as a cache reuse and forced every push after a lineage green FULL.
+# The commit moves the tree, so the cover pass cannot take the push before the decision line.
+echo after > lin-after.txt; git add lin-after.txt; git commit -q -m "lin after"
+_out=$(run_lin_push); _rc=$?
+case "$(awk -F'\t' '$1 == "reused_cache" { print $2 }' "$lin_gd/gate-full-green" 2>/dev/null)|$(printf '%s\n' "$_out" | grep -m1 'gate on main push')" in
+  "0|"*"FULL gate"*"reused"*) bad "TOOL-aSparedSpawn-32 AC7 the push after a lineage green was forced FULL by its reused field: $_out" ;;
+  "0|"*"scoped gate on main push"*) ok "TOOL-aSparedSpawn-32 AC7 a lineage stamp (reused 1, reused_cache 0) scopes the next push" ;;
+  *) bad "TOOL-aSparedSpawn-32 AC7 expected a reused_cache 0 stamp and a scoped next push, got rc=$_rc: $_out" ;;
+esac
 
 # AC12: the declared STUB gets no mode and no clause.
 git commit -q --allow-empty -m "lin stub"; rm -f "$lin_gd"/gate-*green*
@@ -1097,14 +1124,14 @@ case "$_rc|$_out" in
   *) bad "LIN AC12 expected a FULL STUB push with no reuse clause, got rc=$_rc: $_out" ;;
 esac
 # AC12: a declared GATE_CMD naming another tracked script never receives the mode.
-printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_REUSE-unset}" > "%s/other-saw"\nexit 0\n' "$lin" > other-bar.sh
+printf '#!/usr/bin/env bash\nprintf "%%s|%%s" "${GATE_REUSE-unset}" "${GATE_REUSE_LINEAGE-unset}" > "%s/other-saw"\nexit 0\n' "$lin" > other-bar.sh
 printf 'GATE_CMD="bash other-bar.sh"\n' > .unattended.conf
 git add -A; git commit -q -m "lin other"; rm -f "$lin_gd"/gate-*green*
 _out=$(run_lin_push GOV_GATE_CMD="bash other-bar.sh"); _rc=$?
 case "$_rc|$(cat "$lin/other-saw" 2>/dev/null)|$_out" in
   *"reuse: lineage"*) bad "LIN AC12 a non-runner bar's FULL line carries reuse: lineage: $_out" ;;
-  "0|unset|"*) ok "LIN AC12 a declared non-runner bar runs with GATE_REUSE unset" ;;
-  *) bad "LIN AC12 expected the declared bar to run with GATE_REUSE unset, got rc=$_rc saw '$(cat "$lin/other-saw" 2>/dev/null)': $_out" ;;
+  "0|unset|unset|"*) ok "LIN AC12 a declared non-runner bar runs with GATE_REUSE and GATE_REUSE_LINEAGE unset" ;;
+  *) bad "LIN AC12 expected the declared bar to run with both reuse knobs unset, got rc=$_rc saw '$(cat "$lin/other-saw" 2>/dev/null)': $_out" ;;
 esac
 cd "$pfx_home" || exit 2
 # ---- TOOL-dDerivedDocket-24: THE INHERITED-RED POLICY, READ AT R ---------------------------------
