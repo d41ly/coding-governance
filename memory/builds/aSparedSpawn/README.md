@@ -86,7 +86,7 @@ ids TOOL-aSparedSpawn-15
 | [TOOL-aSparedSpawn-9 — fixture templates and environment git identity across the named suites](spec/2026-10-09-spec-TOOL-aSparedSpawn-9.md) | 2 | 1 | CLOSED | rev-1 | 2026-10-09 |
 | [TOOL-aSparedSpawn-12 — the held self-test tier, selected by the kit whose shipped bytes moved](spec/2026-10-09-spec-TOOL-aSparedSpawn-12.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-12 |
 | [TOOL-aSparedSpawn-13 — content-addressed reuse: declared read classes, a shared cache, a soundness sample](spec/2026-10-09-spec-TOOL-aSparedSpawn-13.md) | 3 | 2 | CLOSED | rev-5 | 2026-10-12 |
-| [TOOL-aSparedSpawn-14 — a refusal retirement review, and a growth budget beside the floors](spec/2026-10-09-spec-TOOL-aSparedSpawn-14.md) | 3 | 2 | INPROGRESS | rev-2 | 2026-10-10 |
+| [TOOL-aSparedSpawn-14 — a refusal retirement review, and a growth budget beside the floors](spec/2026-10-09-spec-TOOL-aSparedSpawn-14.md) | 3 | 2 | INPROGRESS | rev-3 | 2026-10-12 |
 <!-- /gen:build-units -->
 
 Records: 41 bound to this build, across 3 record folder(s).
