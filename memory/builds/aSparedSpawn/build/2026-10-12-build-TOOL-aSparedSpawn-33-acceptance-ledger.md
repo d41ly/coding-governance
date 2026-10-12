@@ -20,8 +20,8 @@ no rule for them. No name outside the §4 table reaches the digest.
 
 **Evidences:** TOOL-aSparedSpawn-33
 - AC1 — the fixture's `dg` block, a direct bar then a scoped push through the hook — this tree: the
-  push printed `reuse offered to remote and history legs` and `GATE reuse pr  (proven green, inputs
-  unchanged)`; the base: the same push printed `GATE ok    pr`, red. The suite arm in
+  push printed `reuse offered to remote and history legs` and `GATE reuse pr`, proven green with
+  inputs unchanged; the base: the same push printed `GATE ok    pr`, red. The suite arm in
   `.githooks/pre-push.test.sh` is written, passes `bash -n`, and is owed at VERIFYING.
 - AC2 — the fixture's `sv` block, a stub bar copying the view — this tree: a `git -c` push left no
   `GIT_EXEC_PATH`, `GIT_PREFIX`, `GIT_CONFIG_PARAMETERS` or `LC_CTYPE` line, and the view's PATH
@@ -45,12 +45,13 @@ no rule for them. No name outside the §4 table reaches the digest.
 - AC7 — `grep -c 'restored' tools/run-gates/README.md` — 1 on this tree, 0 on the base.
 - AC8 — `GATE_REUSE_LINEAGE=1 bash tools/run-gates/post-merge.sh`, and the parity arm's sed over
   `_gknobs` — this tree printed `post-merge: not honoured from the environment: GATE_REUSE_LINEAGE`
-  and the sed reads `GATE_LEGS GATE_REUSE GATE_REUSE_LINEAGE GATE_DOCS_BASE GATE_SPAWN_CMD
-  GATE_SPAWN_FLOOR GATE_VERDICT_FAULT`; the base printed no line and its list lacks the knob, red.
+  and the sed's list holds `GATE_REUSE_LINEAGE` beside `GATE_REUSE`; the base printed no line and
+  its list lacks the knob, red.
 - AC9 — `check_knob_classes`, `read_hook_const` and `BAR_INERT_KNOBS` lifted verbatim from the suite
   file and run over the runner — 0 lines on this tree; 8 unclassified on the base:
-  `GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_LINEAGE GATE_REUSE_PUSH
-  GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW`. The H49 arm itself is owed at VERIFYING.
+  `GATE_CALIBRATION_RATES`, `GATE_PUSH_BASE`, `GATE_REUSE_DAY`, `GATE_REUSE_LINEAGE`,
+  `GATE_REUSE_PUSH`, `GATE_REUSE_SAMPLE`, `GATE_SELFTESTS_MAX_LAG` and `GATE_SPAWN_NOW`. The H49 arm
+  itself is owed at VERIFYING.
 
 ## Announced gaps
 
