@@ -9193,6 +9193,11 @@
       "file": "tools/process-monitor/census.py"
     },
     {
+      "id": "measure_ru_entries",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "measure_rule",
       "kind": "function",
       "file": "tools/unattended/check-arms-groups.test.sh"
@@ -12273,6 +12278,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "read_remote_heads",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "read_rev",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -12321,6 +12331,16 @@
       "id": "read_row_hold",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_ru_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "read_ru_rundir",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "read_run_commits",
@@ -16668,6 +16688,11 @@
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
+      "id": "run_rp_push",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "run_rq_preflight",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -17691,6 +17716,11 @@
       "id": "seed_c42",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "seed_cache_ok",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "seed_cf_fixture",
@@ -21026,6 +21056,11 @@
       "id": "write_rq_main",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_ru_legs",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "write_run_branch",

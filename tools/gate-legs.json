@@ -5,6 +5,7 @@
       "bash",
       "skills/session-kickoff/manifest-check.sh"
     ],
+    "reads": {"history": "it asks `rev-list` and `git log` whether a watched file moved since the last audit (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "records",
     "subject": "repo",
     "ceiling": 640
@@ -255,6 +256,7 @@
       "bash",
       "{prefix}/memory-tree/check-verdict-epoch.sh"
     ],
+    "reads": {"base": "it grades from GATE_PUSH_BASE, else the mainline merge-base (TOOL-aSparedSpawn-13 S3).", "history": "it walks `rev-list` and `git log` from that base to HEAD (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300
@@ -797,6 +799,7 @@
       "python3",
       "{prefix}/codebase-map/test_codebase_map.py"
     ],
+    "reads": {"base": "its baseline is the one carried at the merge-base with the remote default branch (TOOL-aSparedSpawn-13 S3).", "history": "it reads that baseline out of history (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300
@@ -992,6 +995,7 @@
       "{prefix}/drift-audit/drift_report.py",
       "--check"
     ],
+    "reads": {"base": "it compares records against its base ref (TOOL-aSparedSpawn-13 S3).", "history": "it walks `git log` and `rev-list` from its base to HEAD (TOOL-aSparedSpawn-13 S3)."},
     "signature": [
       "python",
       "{prefix}/drift-audit/drift_report.py",
@@ -1007,7 +1011,7 @@
       "bash",
       "{prefix}/unattended/check-unattended.sh"
     ],
-    "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint \u2014 the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`.",
+    "reads": {"remote": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint — the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`."},
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 16040,
@@ -1019,7 +1023,7 @@
       "bash",
       "{prefix}/unattended/check-pass-order.sh"
     ],
-    "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs one bounded `ls-remote` to learn the tip the remote advertises and grades only the commits HEAD carries past it (TOOL-dUnstuckLanding-17), so a verdict cached before the remote moved must not be reused.",
+    "reads": {"remote": "its verdict is a function of the REMOTE as well as of the tree: it runs one bounded `ls-remote` to learn the tip the remote advertises and grades only the commits HEAD carries past it (TOOL-dUnstuckLanding-17), so a verdict cached before the remote moved must not be reused."},
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],
@@ -1032,7 +1036,7 @@
       "python3",
       "{prefix}/memory-tree/routed_commits.py"
     ],
-    "impure": "its verdict is a function of the commit GRAPH and of the GATE_PUSH_BASE the pre-push hook exports, not of the tree alone: two commits with one tree and different messages grade differently, so a verdict cached on a tree must not be reused (TOOL-aRoutedQuill-3).",
+    "reads": {"base": "it grades the commits past the GATE_PUSH_BASE the pre-push hook exports, so a verdict cached against one base says nothing about another (TOOL-aRoutedQuill-3).", "history": "its verdict is a function of the commit GRAPH, not of the tree alone: two commits with one tree and different messages grade differently (TOOL-aRoutedQuill-3)."},
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],
@@ -1044,7 +1048,7 @@
       "bash",
       "{prefix}/unattended/check-brief-recorded.sh"
     ],
-    "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs one bounded `ls-remote` to learn the tip the remote advertises and grades only the commits HEAD carries past it (TOOL-dUnstuckLanding-17), so a verdict cached before the remote moved must not be reused.",
+    "reads": {"remote": "its verdict is a function of the REMOTE as well as of the tree: it runs one bounded `ls-remote` to learn the tip the remote advertises and grades only the commits HEAD carries past it (TOOL-dUnstuckLanding-17), so a verdict cached before the remote moved must not be reused."},
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],
@@ -1286,6 +1290,7 @@
       "bash",
       "{prefix}/check-dead-paths.sh"
     ],
+    "reads": {"history": "it reads every deletion and rename `git log` reaches (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 430
@@ -1345,6 +1350,7 @@
       "{prefix}/govkit/govkit.py",
       "epoch"
     ],
+    "reads": {"base": "it grades from GATE_PUSH_BASE, else the merge-base with the default branch (TOOL-aSparedSpawn-13 S3).", "history": "it asks `merge-base --is-ancestor` of the commits HEAD carries (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300
@@ -1368,6 +1374,7 @@
       "python",
       "{prefix}/lexicon/lexicon.py"
     ],
+    "reads": {"base": "it reads the merge-base of a range's parents (TOOL-aSparedSpawn-13 S3).", "history": "it walks the merges `rev-list` finds over a range (TOOL-aSparedSpawn-13 S3)."},
     "signature": [
       "python",
       "{prefix}/lexicon/lexicon.py",
@@ -1441,6 +1448,7 @@
       "bash",
       "{prefix}/memory-tree/check-memory-hygiene.sh"
     ],
+    "reads": {"base": "its later checks diff what was added since the mainline merge-base (TOOL-aSparedSpawn-13 S3).", "clock": "it compares the date against RECORD_SERVES_CUTOFF (TOOL-aSparedSpawn-13 S3).", "history": "it reads commits since that merge-base (TOOL-aSparedSpawn-13 S3)."},
     "signature": [
       "bash",
       "{prefix}/memory-tree/check-memory-hygiene.sh",
@@ -1603,6 +1611,7 @@
       "python",
       "{prefix}/check-spec-tokens.py"
     ],
+    "reads": {"history": "it dates a token by `git log -1 --pickaxe-regex` (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 180
@@ -1624,6 +1633,7 @@
       "{prefix}/run-gates/derive-ceilings.py",
       "--check"
     ],
+    "reads": {"history": "it reads the last commit's date through `git log -1` (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300

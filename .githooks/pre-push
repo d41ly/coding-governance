@@ -1137,9 +1137,9 @@ read_policy_at() { # sha -> PP_POLICY (park|land), PP_MAX_AGE (the positive boun
 gd=$(git rev-parse --git-dir 2>/dev/null)
 kitfp=""; [ -n "$GATE_RUNNER" ] && kitfp="$top/${GATE_RUNNER%/*}/gate-fingerprint.sh"
 force=""; lag=0
-rec_sha=""; rec_fp=""; rec_blob=""; rec_st=""
-read_green_file() { # path -> rec_sha rec_fp rec_blob rec_st, each empty when the file is absent
-  rec_sha=""; rec_fp=""; rec_blob=""; rec_st=""
+rec_sha=""; rec_fp=""; rec_blob=""; rec_st=""; rec_reused=""
+read_green_file() { # path -> rec_sha rec_fp rec_blob rec_st rec_reused, each empty when the file is absent
+  rec_sha=""; rec_fp=""; rec_blob=""; rec_st=""; rec_reused=""
   [ -f "$1" ] || return 0
   rec_sha=$(awk -F'\t' '$1=="sha"{print $2}' "$1" 2>/dev/null)
   rec_fp=$(awk -F'\t' '$1=="fingerprint"{print $2}' "$1" 2>/dev/null)
@@ -1148,11 +1148,15 @@ read_green_file() { # path -> rec_sha rec_fp rec_blob rec_st, each empty when th
   # stamp written before TOOL-dUnstalledConvoy-26 lacks this key, and defaulting the missing case to
   # "covered everything" would make each of them certify legs it never ran.
   rec_st=$(awk -F'\t' '$1=="selftests"{print $2}' "$1" 2>/dev/null)
+  # HOW MANY LEGS THE RUN REUSED (TOOL-aSparedSpawn-13 S8), which predicate 9 reads. Absent reads as
+  # absent, never as a force: every stamp written before the field existed lacks it, and the runner
+  # never stamps a run that reused anything.
+  rec_reused=$(awk -F'\t' '$1=="reused"{print $2}' "$1" 2>/dev/null)
 }
 
 # THE CANDIDATE STAMPS (TOOL-dThriftyLanding-2). `--git-dir` is per WORKTREE, so a full green earned in
 # a run's own worktree was invisible to the primary tree's push, which paid the whole bar again. The
-# stamp is self-validating — predicates 2 to 8 check that its sha is an ancestor of the pushed tip,
+# stamp is self-validating — predicates 2 to 9 check that its sha is an ancestor of the pushed tip,
 # that its tree fingerprint reproduces AT that sha, and that the manifest it names is this one — so
 # WHERE it was written does not change what it proves. Three candidates, in this order, each path once:
 # this git dir's own stamp; the common dir's own, which is the primary tree's; and the common dir's
@@ -1177,14 +1181,14 @@ green_label() { # candidate index -> how the decision line names it
 }
 rec_from=""
 
-# PREDICATES 2 TO 8, ONE FUNCTION, TWO RECORDS (TOOL-dDerivedDocket-24). They were inline and read
+# PREDICATES 2 TO 9, ONE FUNCTION, TWO RECORDS (TOOL-dDerivedDocket-24). They were inline and read
 # the full green's fields; the inherited green below must pass exactly the same seven, so the seven
 # became one function over a record's four fields rather than a second copy of them. The label is the
 # only thing that differs, and it is spelled `full green` for the full green, so every message that
 # record printed before is byte-identical. Sets `force` to the first predicate the record fails, or
 # empty, and `lag` to its distance behind the tip.
-check_green_record() { # sha · fingerprint · manifest blob · selftests · label
-  local r_sha=$1 r_fp=$2 r_blob=$3 r_st=$4 label=$5 p2 fresh now_blob
+check_green_record() { # sha · fingerprint · manifest blob · selftests · label · reused
+  local r_sha=$1 r_fp=$2 r_blob=$3 r_st=$4 label=$5 r_reused=${6:-} p2 fresh now_blob
   force=""; lag=0
   # 2. the recorded green is not an ancestor of what is being pushed, so it describes another line of
   #    history entirely.
@@ -1245,6 +1249,12 @@ check_green_record() { # sha · fingerprint · manifest blob · selftests · lab
   if [ -n "${GATE_SELFTESTS:-}" ] && [ "$r_st" != "1" ]; then
     force="this push runs the kit self-tests and the recorded $label was earned with them HELD"; return 0
   fi
+  # 9. the record says its run REUSED a leg (TOOL-aSparedSpawn-13 S8). The runner never stamps one, so
+  #    a record that says so was written some other way, and a reused verdict is copied rather than
+  #    earned: it can never satisfy the full-green predicate. Present and not `0` forces.
+  if [ -n "$r_reused" ] && [ "$r_reused" != 0 ]; then
+    force="the recorded $label says its run reused $r_reused leg(s), and a reused verdict proves nothing whole"; return 0
+  fi
   return 0
 }
 
@@ -1295,7 +1305,7 @@ classify_docs() {
 classify_docs
 [ -n "$DOCS_WHY" ] && echo "pre-push: $DOCS_WHY" >&2
 
-# 1. no record at all — nothing has ever proven this bar here. Then predicates 2 to 8, per candidate
+# 1. no record at all — nothing has ever proven this bar here. Then predicates 2 to 9, per candidate
 #    (TOOL-dThriftyLanding-2). The FIRST candidate's refusal keeps its exact wording, so a clone with
 #    one git dir prints every message it printed before; a later candidate that EXISTS and is refused
 #    appends its own, so no refusal is silent. A later candidate that is absent adds nothing.
@@ -1306,7 +1316,7 @@ for _gi in "${!green_candidates[@]}"; do
   read_green_file "$_gf"
   force=""
   [ -n "$rec_sha" ] || force="no recorded full green"
-  [ -z "$force" ] && check_green_record "$rec_sha" "$rec_fp" "$rec_blob" "$rec_st" "full green"
+  [ -z "$force" ] && check_green_record "$rec_sha" "$rec_fp" "$rec_blob" "$rec_st" "full green" "$rec_reused"
   if [ -z "$force" ]; then
     [ "$_gi" -gt 0 ] && rec_from=$(green_label "$_gi")
     break
@@ -1320,12 +1330,12 @@ done
 read_policy_at "$main_remote"
 echo "pre-push: inherited-red policy at ${main_remote:0:8} reads $PP_POLICY — $PP_WHY (read from $_gate_env_rel at that sha, never from the pushed tree)"
 
-# THE INHERITED GREEN (KF2), looked for WHENEVER predicates 1 to 8 would force FULL: the full green
-# absent, or present and refused by any of 2 to 8. Reading it only when the full green is ABSENT would
+# THE INHERITED GREEN (KF2), looked for WHENEVER predicates 1 to 9 would force FULL: the full green
+# absent, or present and refused by any of 2 to 9. Reading it only when the full green is ABSENT would
 # force a FULL bar on every push from a git dir that ever earned a full green, for as long as the
 # default branch holds an inherited red. It selects the scoped gate only when the policy at R is
 # `land`, its `base` IS the remote sha on this hook's stdin, its `max_age` IS the bound parsed at that
-# sha, and its `sha` passes predicates 2 to 8 exactly as a full green would. It never satisfies
+# sha, and its `sha` passes predicates 2 to 9 exactly as a full green would. It never satisfies
 # predicate 1 in the full green's place: it is a different file, read in a different branch, and a
 # FULL force it does not lift still names why it was not used.
 inh_sha=""; inh_why=""
@@ -1337,6 +1347,7 @@ if [ -n "$force" ] && [ -f "$gd/gate-inherited-green" ]; then
   ig_st=$(awk -F'\t' '$1=="selftests"{print $2}' "$_ig" 2>/dev/null)
   ig_base=$(awk -F'\t' '$1=="base"{print $2}' "$_ig" 2>/dev/null)
   ig_age=$(awk -F'\t' '$1=="max_age"{print $2}' "$_ig" 2>/dev/null)
+  ig_reused=$(awk -F'\t' '$1=="reused"{print $2}' "$_ig" 2>/dev/null)
   full_force=$force
   if [ "$PP_POLICY" != land ]; then
     inh_why="an inherited green is not read while the policy at R reads $PP_POLICY"
@@ -1345,7 +1356,7 @@ if [ -n "$force" ] && [ -f "$gd/gate-inherited-green" ]; then
   elif [ "$ig_age" != "$PP_MAX_AGE" ]; then
     inh_why="the inherited green was written under max_age ${ig_age:-none} and the bound at ${main_remote:0:8} is $PP_MAX_AGE"
   else
-    check_green_record "$ig_sha" "$ig_fp" "$ig_blob" "$ig_st" "inherited green"
+    check_green_record "$ig_sha" "$ig_fp" "$ig_blob" "$ig_st" "inherited green" "$ig_reused"
     if [ -z "$force" ]; then inh_sha=$ig_sha; else inh_why="the inherited green ${ig_sha:0:8} is refused too: $force"; fi
   fi
   [ -n "$inh_sha" ] || force=$full_force
@@ -1407,9 +1418,12 @@ if [ -z "${GOV_GATE_CMD:-}" ] && [ -z "$GATE_RUNNER" ]; then
 fi
 
 # ---- WHAT THE BAR READS, NOT ONLY WHICH BAR — closing review round 2 H1, TOOL-aRepatriatedFork-49 ----
-# The runner takes its leg manifest from `GATE_LEGS` and reuses a proven-green ledger row under
-# `GATE_REUSE`, so either knob, exported, decided what a vetted runner checked: a manifest of one green
-# leg outside the tree landed a RED tracked bar. They are cleared for every bar not labelled STUB. The
+# The runner takes its leg manifest from `GATE_LEGS` and reuses a cached green under `GATE_REUSE`, so
+# either knob, exported, decided what a vetted runner checked: a manifest of one green leg outside the
+# tree landed a RED tracked bar. They are cleared for every bar not labelled STUB. An authoritative run
+# reuses only a `remote` or `history` leg, at the exact pushed sha and observed tip, and is then scoped:
+# that is `GATE_REUSE_PUSH`, which this hook alone sets, below, on a scoped decision and on no other
+# (TOOL-aSparedSpawn-13 S10, owner ruling F1 (b)); the environment's `GATE_REUSE` stays cleared here. The
 # label is the key, never `GOV_GATE_CMD_TEST` itself, which does not mark the DEFAULT bar and would
 # leave a planted manifest under a `default` label that earns the lander marker. A STUB keeps them,
 # because the hook's own fixtures drive a runner copy over a fixture manifest.
@@ -1436,6 +1450,11 @@ fi
 # It is set again below, on a doc-only decision and nowhere else.
 [ -n "${GATE_DOCS_BASE+x}" ] && ENV_CLEARED+=" GATE_DOCS_BASE"
 unset GATE_DOCS_BASE
+# THE PUSH-TIME REUSE KNOB IS THIS HOOK'S ALONE TOO (TOOL-aSparedSpawn-13 S10), for every bar a STUB
+# included, for the docs knob's reason: an inherited value would let the environment decide which
+# legs a vetted runner spares. It is set again below, on a scoped decision whose tip probe agreed.
+[ -n "${GATE_REUSE_PUSH+x}" ] && ENV_CLEARED+=" GATE_REUSE_PUSH"
+unset GATE_REUSE_PUSH
 [ -n "$ENV_CLEARED" ] \
   && echo "pre-push: not honoured from the environment by this bar:$ENV_CLEARED" >&2
 
@@ -1448,6 +1467,37 @@ if [ -n "$_tree_dirty" ]; then
   write_refusal dirty-tree "$why"; RUNLOG_CLEAN=1; exit 1
 fi
 
+# THE TIP, PROBED FIRST (TOOL-aSparedSpawn-13 S9 S10), and only where the decision below is scoped: a
+# FULL decision exports GATE_FULL, under which the runner reuses nothing, so a probe there buys
+# nothing. One bounded `ls-remote --heads` against the URL git handed this hook, redirected to a file
+# and read back, never captured through a pipe, so the bound holds the clock as well as the verdict.
+# Reuse is OFFERED only when it answered and the default branch it advertises IS the remote sha git
+# fed this hook on stdin; the digest of the whole advertisement rides with it, because a remote leg
+# grades every advertised head, and the runner keys such a leg on exactly these bytes. A probe that
+# fails, times out or disagrees offers nothing, and the decision line says which.
+REUSE_OFFER=""; _reuse_clause=""
+if [ -z "$force" ] || [ -n "$inh_sha" ]; then
+  _rp="$gd/gate-reuse-probe.$$"; _rp_tip=""; _rp_dig=""
+  _rp_url=${RUNLOG_ARG2:-$RUNLOG_ARG1}
+  if [ -n "$_rp_url" ] && timeout -k 5s 20 env GIT_TERMINAL_PROMPT=0 \
+       "GIT_SSH_COMMAND=ssh -o ConnectTimeout=10 -o BatchMode=yes" \
+       git -c credential.interactive=never ls-remote --heads "$_rp_url" > "$_rp" 2>/dev/null; then
+    while IFS= read -r _l; do
+      [ "${_l#*$'\t'}" = "refs/heads/$def" ] && _rp_tip=${_l%%$'\t'*}
+    done < "$_rp"
+    _rp_dig=$(git hash-object --stdin < "$_rp" 2>/dev/null) || _rp_dig=""
+  fi
+  [ -e "$_rp" ] && rm -f "$_rp" 2>/dev/null
+  if [ -z "$_rp_tip" ] || [ -z "$_rp_dig" ]; then
+    _reuse_clause="; reuse not offered: the ls-remote probe did not answer with the $def tip"
+  elif [ "$_rp_tip" != "$main_remote" ]; then
+    _reuse_clause="; reuse not offered: the ls-remote probe reads $def at ${_rp_tip:0:8}, and git handed this hook ${main_remote:0:8}"
+  else
+    REUSE_OFFER="$main_local $_rp_tip $_rp_dig"
+    _reuse_clause="; reuse offered to remote and history legs at ${main_local:0:8}, tip ${_rp_tip:0:8}"
+  fi
+fi
+
 # THE DECISION AND ITS REASON, on one line, always. A boundary that silently chooses the cheap path
 # is indistinguishable from one that is broken, and this line is the only place the choice is
 # visible to the person whose push it is.
@@ -1455,8 +1505,9 @@ _docs_clause=""
 [ -n "$DOCS_ONLY" ] && _docs_clause=" docs-only: $DOCS_N path(s) in GATE_DOC_PATHS at ${main_remote:0:8};"
 if [ -n "$inh_sha" ]; then
   [ -n "$DOCS_ONLY" ] && export GATE_DOCS_BASE="$main_remote"
-  echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause inherited green ${inh_sha:0:8} at base ${main_remote:0:8} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG; the full green was not usable: $full_force — bar: $bar_label"
+  echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause inherited green ${inh_sha:0:8} at base ${main_remote:0:8} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG; the full green was not usable: $full_force$_reuse_clause — bar: $bar_label"
   export GATE_BASE="$inh_sha"
+  [ -n "$REUSE_OFFER" ] && export GATE_REUSE_PUSH="$REUSE_OFFER"
   RUNLOG_DECISION=scoped
 elif [ -n "$force" ]; then
   echo "pre-push: FULL gate on $def push (${main_local:0:8}) — ${DOCS_ONLY:+doc-only, but }$force${inh_why:+; $inh_why} — bar: $bar_label"
@@ -1464,8 +1515,9 @@ elif [ -n "$force" ]; then
   RUNLOG_DECISION=full
 else
   [ -n "$DOCS_ONLY" ] && export GATE_DOCS_BASE="$main_remote"
-  echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause full green ${rec_sha:0:8}${rec_from:+ from $rec_from} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG — bar: $bar_label"
+  echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause full green ${rec_sha:0:8}${rec_from:+ from $rec_from} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG$_reuse_clause — bar: $bar_label"
   export GATE_BASE="$rec_sha"
+  [ -n "$REUSE_OFFER" ] && export GATE_REUSE_PUSH="$REUSE_OFFER"
   RUNLOG_DECISION=scoped
 fi
 # THE BAR'S RUN ID, pinned so this push's END joins the bar's own run-log line by id. Set BEFORE the

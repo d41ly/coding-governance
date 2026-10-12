@@ -1,11 +1,12 @@
 # TOOL-aSparedSpawn-13 — content-addressed reuse: declared read classes, a shared cache, a soundness sample
 
-**Status:** INPROGRESS · rev-5 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
+**Status:** CLOSED · rev-5 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aSparedSpawn-13-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-13-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aSparedSpawn-13-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-13-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

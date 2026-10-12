@@ -120,10 +120,17 @@ empty manifest and an unwritten verdict file are REFUSED, and the pre-push hook 
 after every exit 0. Two whole-output readers filter the timestamped `gate queue: acquired` line.
 `TOOL-dDerivedDocket-26`.
 
-**Exactly one leg is impure, and it is the gate rather than a self-test.** `unattended kit gate`
-runs `ls-remote` against the real remote and fails closed, so its verdict is a function of the remote
-as well as of the tree; every other leg naming a network verb builds its origin under `mktemp -d`.
-That is the population the `impure` key declares, as `TOOL-aPacedTurnstile-5` measured.
+**A leg declares what it reads beyond its inputs, and the declaration is the reuse key.** The
+`reads` key maps a closed class, `history`, `base`, `clock` or `remote`, to a reason, and each
+class puts one thing into the leg's key: `HEAD`, the baseline, the UTC day, or the remote's
+advertisement. The `remote` legs are the bar's own gates that observe the real remote with
+`ls-remote`, never a self-test, which builds its origin under `mktemp -d`; the `history`, `base`
+and `clock` legs are the ones the reuse research found reading git history, a merge-base or the date.
+The manifest is the population, never this page. A legacy `impure` reads as `remote` and never
+reuses, so an adopter's row keeps its meaning. Verdicts live in the common dir's `gate-cache`,
+written only by a leg that executed `ok` on a clean tree, and a quarter-rate sample re-executes
+reusable legs and quarantines one that disagrees. The push boundary reuses only `remote` and
+`history` legs, at the exact pushed sha and probed tip, and that run is scoped. `TOOL-aSparedSpawn-13`.
 
 
 **One leg here grades the DEPLOYER's work rather than the runner's.** `receipt sync` reads

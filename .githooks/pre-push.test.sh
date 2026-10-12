@@ -901,6 +901,83 @@ case "$_rc|$(read_h49_token)|$(read_h49_mark ignored)|$_out" in
   *"|bar-refused||"*gate-legs.json*) ok "H49 an ignored leg manifest is refused as bar-refused before the bar reads it" ;;
   *) bad "H49 expected the ignored manifest to be refused as bar-refused, got rc=$_rc token '$(read_h49_token)': $_out" ;;
 esac
+# ---- TOOL-aSparedSpawn-13: PUSH-TIME REUSE IS THE HOOK'S OWN KNOB ---------------------------------
+# An authoritative run reuses only a `remote` or `history` leg, at the exact pushed sha and observed
+# tip, and is then scoped: `GATE_REUSE_PUSH`, set by this hook alone on a SCOPED decision whose
+# `ls-remote` probe answered with the remote sha git handed it. A stub bar records the knob it received,
+# so each arm grades what reached the runner; the runner's half, which legs it then reuses, is the
+# evidence suite's. Every push is scoped by a planted full green at the pushed tip's parent unless the
+# arm plants otherwise.
+rp="$tmp/rp"; mkdir -p "$rp/hooks"; cp "$SRC/.githooks/pre-push" "$rp/hooks/pre-push"
+git init -q --template= --bare "$rp/remote.git"; git init -q --template= "$rp/work"
+cd "$rp/work" || exit 2
+git config core.hooksPath "$rp/hooks"
+git commit -q --allow-empty -m init; git branch -M main
+git remote add origin "$rp/remote.git"
+rp_gd=$(cd "$(git rev-parse --git-dir)" && pwd)
+touch "$rp_gd/push-main-active"
+GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
+printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_REUSE_PUSH:-}" > "%s/knob"\nexit 0\n' "$rp" > "$rp/stub.sh"
+run_rp_push() { # [remote] [NAME=VALUE…] -> the push's merged output; the knob the bar saw is in $rp/knob
+  local remote=origin
+  case "${1:-}" in *=*|'') ;; *) remote=$1; shift ;; esac
+  printf 'sha\t%s\n%s' "$(git rev-parse HEAD)" "${RP_GREEN_EXTRA:-}" > "$rp_gd/gate-full-green"
+  git commit -q --allow-empty -m "rp $RANDOM" >/dev/null 2>&1
+  printf 'unset' > "$rp/knob"
+  env GOV_GATE_CMD="bash $rp/stub.sh" "$@" git push origin main 2>&1
+}
+
+_out=$(run_rp_push); rp_knob=$(cat "$rp/knob")
+rp_want="$(git rev-parse HEAD) $(git --git-dir="$rp/remote.git" rev-parse main~1)"
+case "$_out" in
+  *"scoped gate on main push"*"reuse offered to remote and history legs at"*) ok "RP AC13 a scoped decision whose probe agreed names the reuse it offers" ;;
+  *) bad "RP AC13 expected the scoped decision line to offer reuse, got: $_out" ;;
+esac
+case "$rp_knob" in
+  "$rp_want "?*) ok "RP S10 the bar receives GATE_REUSE_PUSH as the pushed sha, the remote's tip and a digest" ;;
+  *) bad "RP S10 the bar received '$rp_knob', wanted '$rp_want <digest>'" ;;
+esac
+
+# AC12: a probe that answers with no tip of the default branch offers nothing, and says so. A first push
+# to an empty remote stages it: a PATH shim cannot, since git runs the hook with its own dirs first.
+git init -q --template= --bare "$rp/empty.git"; git remote add second "$rp/empty.git"
+_out=$(run_rp_push second); rp_knob=$(cat "$rp/knob")
+case "$_out|$rp_knob" in
+  *"reuse not offered: the ls-remote probe did not answer with the main tip"*"|") ok "RP AC12 a probe with no tip to answer offers nothing, and the decision line names the probe" ;;
+  *) bad "RP AC12 expected no knob and the probe named, got knob '$rp_knob': $_out" ;;
+esac
+
+# AC15: an inherited knob is cleared, named, and never reaches the bar; the bar sees the hook's own.
+_out=$(run_rp_push GATE_REUSE_PUSH=planted); rp_knob=$(cat "$rp/knob")
+case "$_out" in
+  *"not honoured from the environment by this bar:"*GATE_REUSE_PUSH*) ok "RP AC15 an inherited GATE_REUSE_PUSH is named as not honoured" ;;
+  *) bad "RP AC15 expected the inherited knob to be named, got: $_out" ;;
+esac
+case "$rp_knob" in
+  planted|unset) bad "RP AC15 the bar received '$rp_knob' rather than the hook's own knob" ;;
+  *) ok "RP AC15 the planted knob never reaches the bar; the hook's own does" ;;
+esac
+rm -f "$rp_gd/gate-full-green"
+_out=$( git commit -q --allow-empty -m "rp full" >/dev/null 2>&1; printf 'unset' > "$rp/knob"
+        env GOV_GATE_CMD="bash $rp/stub.sh" GATE_REUSE_PUSH=planted git push origin main 2>&1 ); rp_knob=$(cat "$rp/knob")
+case "$_out|$rp_knob" in
+  *"FULL gate on main push"*"|") ok "RP AC15 a FULL decision hands the bar no knob, inherited or not" ;;
+  *) bad "RP AC15 expected a FULL decision with no knob, got knob '$rp_knob': $_out" ;;
+esac
+
+# AC14: predicate 9 — a planted full green whose `reused` field is not 0 forces the full bar, and the
+# same record reading 0 scopes, so the arm sees the field and not the record.
+_out=$(RP_GREEN_EXTRA=$'reused\t1\n' run_rp_push)
+case "$_out" in
+  *"FULL gate on main push"*"says its run reused 1 leg(s)"*) ok "RP AC14 a full green whose reused reads 1 forces the full bar" ;;
+  *) bad "RP AC14 expected predicate 9 to force the full bar, got: $_out" ;;
+esac
+_out=$(RP_GREEN_EXTRA=$'reused\t0\n' run_rp_push)
+case "$_out" in
+  *"scoped gate on main push"*) ok "RP AC14 control: the same record reading reused 0 scopes" ;;
+  *) bad "RP AC14 control expected a scoped decision, got: $_out" ;;
+esac
+cd "$tmp" || exit 2
 # ---- TOOL-dDerivedDocket-24: THE INHERITED-RED POLICY, READ AT R ---------------------------------
 # A scratch repo whose `.githooks/gate-env.sh` at the pushed remote tip R declares the policy under
 # test, and a stub gate that writes the run record a real runner would: a RED verdict and one

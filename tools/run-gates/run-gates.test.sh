@@ -212,8 +212,8 @@ if bad:
     print("canary: malformed leg(s) (empty name, argv len < 2, or argv[0] not in {bash,python,python3,node}): " + ", ".join(bad)); sys.exit(1)
 ' "$LEGS_FILE" || fail=1
 
-# 1a. THE MANIFEST KEY SET. Every row carries `name` and `argv`, may carry `guard` and `impure`,
-#     and carries nothing else. A mistyped `impure` — `impur`, `Impure`, `inpure` — is otherwise
+# 1a. THE MANIFEST KEY SET. Every row carries `name` and `argv`, may carry `guard`, `reads` or the
+#     legacy `impure` and the other pinned keys, and carries nothing else. A mistyped `impure` — `impur`, `Impure`, `inpure` — is otherwise
 #     silent: the reuse path reads the key it knows, finds nothing, and treats a leg whose verdict
 #     depends on a remote as reusable on a byte-identical tree. The typo is the whole failure
 #     mode, so the pin is on the SET rather than on any one key.
@@ -231,7 +231,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling", "signature", "doc_reads"}
+KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads"}
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -393,7 +393,7 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling", "signature", "doc_reads"}
+KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads"}
 legs = json.load(open(sys.argv[1]))
 sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
 ' "$1"; }
@@ -419,6 +419,16 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"],"doc_read":[]}]' > "$ctl/drtypo
 if keyset_probe "$ctl/dr.json" && ! keyset_probe "$ctl/drtypo.json"; then :
 else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`doc_reads\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
+# ...and `reads`, the tenth (TOOL-aSparedSpawn-13 S1), by the same two halves: a mistyped `reads` leaves
+# a leg that reads history, a base, the clock or a remote keyed on its tree alone.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"reads":{"remote":"probes the remote"}}]' > "$ctl/rd.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"read":{"remote":"probes the remote"}}]' > "$ctl/rdtypo.json"
+if keyset_probe "$ctl/rd.json" && ! keyset_probe "$ctl/rdtypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`reads\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
 rm -rf "$ctl"
@@ -2834,7 +2844,7 @@ run_hv_bar() { # dir · manifest · VAR=value… -> HV_OUT (stdout and stderr) a
   local d=$1 m=$2; shift 2
   HV_OUT=$( cd "$d" && env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_WALL= GATE_SELFTESTS= GATE_ATTRIBUTE= \
       GATE_INHERITED_RED= GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_PROFILES= GATE_JOBS=4 GATE_PROFILE=minimal \
-      GATE_TURNSTILE=0 GATE_LEGS="$m" "$@" bash $KIT_REL/run-gates.sh 2>&1 ); HV_RC=$?
+      GATE_TURNSTILE=0 GATE_REUSE_SAMPLE=0 GATE_REUSE_PUSH= GATE_LEGS="$m" "$@" bash $KIT_REL/run-gates.sh 2>&1 ); HV_RC=$?
 }
 check_hv_line() { # label · pattern -> one counted assertion that some line of HV_OUT matches the ERE
   n=$((n+1))
@@ -2902,8 +2912,10 @@ run_hv_bar "$H5" "$HV/fine.json" GATE_TURNSTILE=1 GATE_TURNSTILE_TICK=1
 check_hv_line "AC5 a dead holder's bar still prints its verdict line" '^gates GREEN — '
 check_hv_value "AC5 and writes its verdict file" "$(read_hv_record "$H5" verdict)" GREEN
 
-# 9d. AC6 — A LEDGER ROW READING `retried` IS NEVER REUSED. The control first: the same row reading
-#     `ok` IS reused, so the key the arm edits is the one the reuse predicate matched.
+# 9d. AC6 — A LEDGER ROW IS NO REUSE STORE, `retried` or `ok`. The control first: the cache entry the
+#     earning bar wrote IS reused. Since TOOL-aSparedSpawn-13 S4 reuse reads the common dir's cache and
+#     never the ledger, and a retried pass writes no entry because its first attempt was no `ok`; so
+#     with the cache gone, a ledger row reading `ok` still runs its leg.
 H6="$HV/r6"; build_hv_repo "$H6"
 printf '[{"name": "cached", "argv": ["bash", "fx/ok.sh"]}]\n' > "$HV/cached.json"
 run_hv_bar "$H6" "$HV/cached.json"
@@ -2913,10 +2925,9 @@ check_hv_line "AC6 control: an ok row with a matching key is reused" '^GATE reus
 # still carries the reused leg's row forward. Keyed on `NR == FNR` it swallowed every row as "seen".
 check_hv_value "aSS3 AC7 a bar that reused its only leg keeps that leg's ledger row" \
   "$(awk -F'\t' '$1 == "cached" { print "kept" }' "$H6/.git/gate-ledger.tsv" 2>/dev/null)" kept
-awk -F'\t' 'BEGIN { OFS = "\t" } $1 == "cached" { $3 = "retried" } { print }' "$H6/.git/gate-ledger.tsv" > "$HV/ledger.tmp" \
-  && cp "$HV/ledger.tmp" "$H6/.git/gate-ledger.tsv"
+rm -rf "$H6/.git/gate-cache"
 run_hv_bar "$H6" "$HV/cached.json" GATE_REUSE=1
-check_hv_line "AC6 a retried row runs its leg" '^GATE ok    cached$'
+check_hv_line "AC6 with the cache gone, a ledger row reading ok runs its leg" '^GATE ok    cached$'
 
 # 9e. AC11's second arm — THE WALK DIES ON A DEAD ROOT. `run_leg_reap`, sliced out of the runner, run
 #     against a root that has ALREADY exited leaves its orphan ALIVE; the same reap against a LIVE root

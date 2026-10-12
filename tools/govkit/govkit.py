@@ -2740,6 +2740,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         manifest_chunk = {leg.get("name"): leg.get("chunk") for leg in _legs_json}
         manifest_doc_reads = {leg.get("name"): leg.get("doc_reads") for leg in _legs_json}
         manifest_impure = {leg.get("name"): leg.get("impure") for leg in _legs_json}
+        manifest_reads = {leg.get("name"): leg.get("reads") for leg in _legs_json}
         manifest_ceiling = {leg.get("name"): leg.get("ceiling") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
@@ -2816,6 +2817,16 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                                f"{leg.get('impure')!r} while <prefix>/gate-legs.json says "
                                f"{manifest_impure.get(nm)!r} — the descriptor and the manifest "
                                f"disagree about whether a verdict cached on a tree may be reused")
+                    # AND ABOUT THE READ CLASSES, where the descriptor declares them, as with ceiling
+                    # (TOOL-aSparedSpawn-13 S1): the classes decide what enters a leg's reuse key, so a
+                    # descriptor and a manifest that disagree key one leg two ways. A descriptor that
+                    # declares none is not compared: the manifest may declare classes the emitter
+                    # never carries, since an adopter row takes the legacy `impure` below instead.
+                    if "reads" in leg and leg.get("reads") != manifest_reads.get(nm):
+                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with reads "
+                               f"{leg.get('reads')!r} while <prefix>/gate-legs.json says "
+                               f"{manifest_reads.get(nm)!r} — the descriptor and the manifest "
+                               f"disagree about what this leg reads beyond its inputs")
                     # AND ABOUT CEILING, where the descriptor declares one (DEPL-aBenchedProbe-2 S5):
                     # the emitter carries the descriptor's value verbatim into adopters, so it must
                     # be a positive int (a bool is an int to Python, and not a bound) equal to the
@@ -4164,8 +4175,14 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     # IMPURE TRAVELS under the same reader check (TOOL-aRoutedQuill-12 S5): the
                     # run-gates canary has carried the key since run-gates 1.0, so a runner that
                     # reads `subject` reads it too, and a leg graded on the commit graph is not cached.
+                    # A descriptor's `reads` TRAVELS AS THE LEGACY `impure` (TOOL-aSparedSpawn-13 S1),
+                    # its reasons joined: every runner reads `impure` as never-reuse, whatever its
+                    # version, so an adopter's verdict keeps its meaning and no canary meets a key
+                    # its pinned set predates.
                     if leg.get("impure"):
                         row["impure"] = leg["impure"]
+                    elif isinstance(leg.get("reads"), dict) and leg["reads"]:
+                        row["impure"] = "; ".join(f"{k}: {v}" for k, v in sorted(leg["reads"].items()))
                 if guards:
                     row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
                 # DOC READS TRAVEL, all or nothing, and only into a runner that reads them: below

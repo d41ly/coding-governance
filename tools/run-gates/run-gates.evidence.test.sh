@@ -906,14 +906,19 @@ rec_done
 rm -f "$REC_OUT"
 
 # =================================================================================================
-# REUSE A PROVEN GREEN (the reuse unit). Every arm drives the real runner in its own scratch repo,
-# for the reason the record arms above give: these have to make trees dirty and re-run over a ledger.
+# REUSE A PROVEN GREEN (the reuse unit, then TOOL-aSparedSpawn-13). Every arm drives the real runner in
+# its own scratch repo, for the reason the record arms above give: these have to make trees dirty and
+# re-run over a cache.
 #
-# EVERY POSITIVE ARM CARRIES ITS CONTROL. "Nothing was reused" is the state a cold ledger, a broken
+# EVERY POSITIVE ARM CARRIES ITS CONTROL. "Nothing was reused" is the state a cold cache, a broken
 # key and a correct refusal all produce, so an arm that only checks for the absence of the reuse verb
 # passes on all three. Each one below therefore also proves that reuse WOULD have fired.
+#
+# NO ARM HERE SETS GATE_FULL, because under GATE_FULL nothing is reused (S8). Every guarded leg still
+# runs: the base is an empty tree, which every guard reads as changed, and GATE_BASE is no input of an
+# undeclared leg's key. The sample is 0 unless an arm draws, so a count of reused legs is exact.
 
-ru_repo() {   # -> RU_T, RU_GD
+ru_repo() {   # -> RU_T, RU_GD, RU_E (an empty-tree base), RU_C2 (a second base with an empty tree)
   RU_T=$(mktemp -d)
   mkdir -p "$RU_T/${PFX}${KIT}" "$RU_T/${PFX}${LIB}" "$RU_T/fx" "$RU_T/ga" "$RU_T/gb"
   cp "$ROOT/${PFX}${KIT}/run-gates.sh" "$ROOT/${PFX}${KIT}/gate-fingerprint.sh" \
@@ -922,24 +927,45 @@ ru_repo() {   # -> RU_T, RU_GD
   ( cd "$RU_T" && git init -q --template= -b main . ) >/dev/null 2>&1 || return 1
   printf '#!/usr/bin/env bash\necho a\nexit 0\n' > "$RU_T/fx/a.sh"
   printf '#!/usr/bin/env bash\necho b\nexit 0\n' > "$RU_T/fx/b.sh"
-  echo x > "$RU_T/ga/f"; echo y > "$RU_T/gb/f"
+  echo x > "$RU_T/ga/f"; echo y > "$RU_T/gb/f"; echo o > "$RU_T/other"
   printf '%s\n' '[' \
     '  {"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
     '  {"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}' \
     ']' > "$RU_T/${PFX}gate-legs.json"
   ( cd "$RU_T" && git add -A && git commit -qm seed ) >/dev/null 2>&1 || return 1
-  ( cd "$RU_T" && git remote add origin ../origin.git && git update-ref refs/remotes/origin/main HEAD \
+  ( cd "$RU_T" && git remote add origin "$RU_T.origin.git" && git update-ref refs/remotes/origin/main HEAD \
       && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
   RU_GD="$RU_T/.git"
+  RU_E=$(git -C "$RU_T" hash-object -w -t tree /dev/null)
+  RU_C2=$(git -C "$RU_T" commit-tree "$RU_E" -m alt)
 }
-ru_run() { ( cd "$RU_T" && env "$@" bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1; echo $? ); }
-ru_done() { rm -rf "$RU_T"; }
+write_ru_legs() { # rows... -> the manifest, committed
+  { printf '[\n'; local first=1 r; for r in "$@"; do [ "$first" = 1 ] || printf ',\n'; printf '  %s' "$r"; first=0; done; printf '\n]\n'; } \
+    > "$RU_T/${PFX}gate-legs.json"
+  ( cd "$RU_T" && git add -A && git commit -qm legs ) >/dev/null 2>&1
+}
+ru_run() { ( cd "$RU_T" && env -u GATE_FULL -u GATE_REUSE -u GATE_REUSE_PUSH -u GATE_REUSE_DAY -u GATE_LEGS \
+    -u FLIP GATE_BASE="$RU_E" GATE_REUSE_SAMPLE=0 "$@" bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1; echo $? ); }
+ru_done() { rm -rf "$RU_T" "$RU_T.origin.git"; }
+read_ru_rundir() { local c=""; IFS= read -r c < "$RU_GD/gate-run/current" 2>/dev/null; printf '%s' "$RU_GD/gate-run/$c"; }
+read_ru_key() { awk -F'\t' -v n="$1" '$1 == n { print $7; exit }' "$(read_ru_rundir)"/[0-9]*.leg 2>/dev/null; }
+measure_ru_entries() { find "$RU_GD/gate-cache" -mindepth 2 -type f 2>/dev/null | grep -c .; }
+# seed_cache_ok <git dir> <run dir> — an `ok` entry under every executed leg's key in that record: a
+# DIRTY tree's run writes none (S4), so an arm about what a dirty tree's key holds plants its own.
+seed_cache_ok() {
+  local f k
+  for f in "$2"/[0-9]*.leg; do
+    [ -f "$f" ] || continue
+    k=$(cut -f7 "$f"); [ "${#k}" -ge 3 ] || continue
+    mkdir -p "$1/gate-cache/${k:0:2}" && printf 'ok\t0\tplanted\t-\t0\n' > "$1/gate-cache/${k:0:2}/$k"
+  done
+}
 
 REC_OUT=${REC_OUT:-$(mktemp)}
 
 ru_repo || { echo "evidence-test: cannot build a reuse scratch"; exit 2; }
-ru_run GATE_FULL=1 >/dev/null
-ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+ru_run >/dev/null
+ru_run GATE_REUSE=1 >/dev/null
 [ "$(grep -c '^GATE reuse ' "$REC_OUT")" = 2 ] \
   && ok "with GATE_REUSE set, an unchanged tree reuses every pure leg" \
   || { nope "reuse did not fire on an unchanged tree"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
@@ -948,85 +974,97 @@ grep -qE 'reused\)' "$REC_OUT" && ok "the verdict line reports a non-zero reused
 ru_done
 
 # THE OPT-IN DEFAULT, with the precondition that makes the arm mean something. An advisory input may
-# cause LESS work only on a run that is not authoritative, and this is the one criterion guarding
-# that boundary — so it first proves the rows WOULD have matched, then proves they were not used.
+# cause LESS work only on a run that is not authoritative. An authoritative run reuses only a `remote`
+# or `history` leg, at the exact pushed sha and observed tip, and is then scoped: that is the hook's own
+# GATE_REUSE_PUSH, never GATE_REUSE, so this arm first proves the entries WOULD have matched, then
+# proves an unset GATE_REUSE used none of them.
 ru_repo
-ru_run GATE_FULL=1 >/dev/null
-ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+ru_run >/dev/null
+ru_run GATE_REUSE=1 >/dev/null
 [ "$(grep -c '^GATE reuse ' "$REC_OUT")" = 2 ] \
-  && ok "precondition: those ledger rows WOULD match this run's keys" \
-  || nope "the rows do not match, so the opt-in arm below would pass by finding nothing"
-ru_run GATE_FULL=1 >/dev/null
+  && ok "precondition: those cache entries WOULD match this run's keys" \
+  || nope "the entries do not match, so the opt-in arm below would pass by finding nothing"
+ru_run >/dev/null
 ru_a=$(grep -E '^GATE ' "$REC_OUT")
 grep -q '^GATE reuse ' "$REC_OUT" && nope "a leg was reused with GATE_REUSE unset — the default leaked" \
                                   || ok "no leg is reused with GATE_REUSE unset"
-rm -f "$RU_GD/gate-ledger.tsv"; ru_run GATE_FULL=1 >/dev/null
+rm -rf "$RU_GD/gate-cache"; ru_run >/dev/null
 ru_b=$(grep -E '^GATE ' "$REC_OUT")
-[ "$ru_a" = "$ru_b" ] && ok "stdout with a matching ledger is byte-identical to the same tree with no ledger" \
-                      || nope "stdout differs from the ledger-removed control — something advisory reached the default path"
+[ "$ru_a" = "$ru_b" ] && ok "stdout with a matching cache is byte-identical to the same tree with no cache" \
+                      || nope "stdout differs from the cache-removed control — something advisory reached the default path"
 ru_done
 
 # A CHANGE INSIDE ONE GUARD, and its control: the arm has to show the OTHER leg still reusing, or a
 # runner that simply stopped reusing altogether passes it.
 ru_repo
-ru_run GATE_FULL=1 >/dev/null
+ru_run >/dev/null
 echo moved > "$RU_T/ga/f"; ( cd "$RU_T" && git add -A && git commit -qm move ) >/dev/null 2>&1
-ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+ru_run GATE_REUSE=1 >/dev/null
 grep -q '^GATE ok    pa' "$REC_OUT" && ok "a leg whose guarded input moved is NOT reused" \
                                     || nope "a leg was reused although a file inside its guard changed"
 grep -q '^GATE reuse pb' "$REC_OUT" && ok "control: the untouched leg on the same run WAS reused" \
                                     || nope "no leg reused on that run, so the arm above proves nothing"
 ru_done
 
-# AN IMPURE LEG IS NEVER REUSED. Fixture-declared: this tree's own corpus is not the subject, and a
-# harness that ships must not assert which of an adopter's legs are impure.
+# A LEGACY IMPURE LEG IS NEVER REUSED (AC10). Fixture-declared: this tree's own corpus is not the
+# subject, and a harness that ships must not assert which of an adopter's legs read a remote.
 ru_repo
-printf '%s\n' '[' \
-  '  {"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"], "impure": "reads a remote"},' \
-  '  {"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}' \
-  ']' > "$RU_T/${PFX}gate-legs.json"
-( cd "$RU_T" && git add -A && git commit -qm impure ) >/dev/null 2>&1
-ru_run GATE_FULL=1 >/dev/null
-ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
-grep -q '^GATE ok    pa' "$REC_OUT" && ok "a leg declared impure executes even on a byte-identical tree" \
-                                    || nope "an impure leg was reused"
-grep -q '^GATE reuse pb' "$REC_OUT" && ok "control: a pure sibling WAS reused on that same run" \
-                                    || nope "nothing was reused, so the impure arm proves nothing"
+write_ru_legs '{"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"], "impure": "reads a remote"}' \
+        '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}'
+ru_run >/dev/null
+ru_run GATE_REUSE=1 >/dev/null
+grep -q '^GATE ok    pa' "$REC_OUT" && ok "AC10 a leg declared impure executes even on a byte-identical tree" \
+                                    || nope "AC10 an impure leg was reused"
+grep -q '^GATE reuse pb' "$REC_OUT" && ok "AC10 control: a pure sibling WAS reused on that same run" \
+                                    || nope "AC10 nothing was reused, so the impure arm proves nothing"
 ru_done
 
-# A RED ROW IS NEVER REUSABLE, and the ledger says so in the field rather than leaving the rule to be
-# re-implemented by every reader.
+# A RED LEG IS NEVER REUSABLE, and writes no entry (AC5): the cache holds only verdicts a leg earned.
 ru_repo
 printf '#!/usr/bin/env bash\necho boom\nexit 3\n' > "$RU_T/fx/a.sh"
 ( cd "$RU_T" && git add -A && git commit -qm red ) >/dev/null 2>&1
-ru_run GATE_FULL=1 >/dev/null
-ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
-grep -q '^GATE FAIL  pa' "$REC_OUT" && ok "a leg whose recorded row is a failure runs again" \
+ru_run >/dev/null
+ru_k=$(read_ru_key pa)
+[ -n "$ru_k" ] && [ ! -e "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" ] && ok "AC5 a red leg writes no cache entry" \
+  || nope "AC5 the red leg's key '$ru_k' has an entry"
+ru_run GATE_REUSE=1 >/dev/null
+grep -q '^GATE FAIL  pa' "$REC_OUT" && ok "a leg whose last run was a failure runs again" \
                                     || nope "a red leg was reused"
 grep -q '^GATE reuse pb' "$REC_OUT" && ok "control: the green sibling WAS reused on that run" \
                                     || nope "nothing was reused, so the red arm proves nothing"
 ru_done
 
-# REUSE DEFEATS THE FULL-GREEN STAMP. This is the join the push boundary rests on: a stamp must never
-# be able to describe a run that copied a verdict instead of earning it.
+# REUSE DEFEATS THE FULL-GREEN STAMP (AC8). This is the join the push boundary rests on: a stamp must
+# never be able to describe a run that copied a verdict instead of earning it.
 ru_repo
-ru_run GATE_FULL=1 >/dev/null
+ru_run >/dev/null
 [ -f "$RU_GD/gate-full-green" ] && ok "control: the earning run stamped a full green" \
                                 || nope "the earning run did not stamp, so the arm below proves nothing"
+grep -q $'^reused\t0$' "$RU_GD/gate-full-green" 2>/dev/null && ok "S8 the full green carries reused 0" \
+                                                           || nope "S8 the full green carries no reused 0"
 rm -f "$RU_GD/gate-full-green"
-ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
-[ -f "$RU_GD/gate-full-green" ] && nope "a run that reused legs stamped a full green" \
-                               || ok "a run that reused ANY leg does not stamp a full green"
+ru_run GATE_REUSE=1 >/dev/null
+[ -f "$RU_GD/gate-full-green" ] && nope "AC8 a run that reused legs stamped a full green" \
+                               || ok "AC8 a run that reused ANY leg does not stamp a full green"
+# ...and under GATE_FULL nothing is reused at all, whatever else is set.
+ru_run GATE_REUSE=1 GATE_FULL=1 >/dev/null
+grep -q '^GATE reuse ' "$REC_OUT" && nope "AC8 GATE_FULL with GATE_REUSE reused a leg" \
+                                  || ok "AC8 GATE_FULL with GATE_REUSE reuses nothing"
+grep -q 'GATE_FULL is set, so nothing is reused' "$REC_OUT" && ok "AC8 the run says why" || nope "AC8 no line says GATE_FULL withheld reuse"
+ru_run GATE_REUSE=1 >/dev/null
+[ "$(grep -c '^GATE reuse ' "$REC_OUT")" = 2 ] && ok "AC8 control: without GATE_FULL the same entries are reused" \
+                                               || nope "AC8 control reused nothing, so the arm above proves nothing"
 ru_done
 
 # THE KEY TAKES WHAT A DIRTY GUARDED FILE HOLDS (TOOL-aSparedSpawn-1). A porcelain line reads ` M ga/f`
 # after the first unstaged edit and after the second, so a key built from it hands the second edit the
-# green the first one earned. Each arm keeps the reuse control on the untouched sibling.
+# green the first one earned. A dirty tree writes no entry (S4), so the first edit's keys are planted.
 ru_repo
 echo e1 > "$RU_T/ga/f"
-ru_run GATE_FULL=1 >/dev/null
+ru_run >/dev/null
+seed_cache_ok "$RU_GD" "$(read_ru_rundir)"
 echo e2 > "$RU_T/ga/f"
-ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+ru_run GATE_REUSE=1 >/dev/null
 grep -q '^GATE ok    pa' "$REC_OUT" && ok "AC1 a second unstaged edit to a guarded file is NOT reused" \
                                     || nope "AC1 a guarded leg was reused across two different unstaged edits — the key read the status line"
 grep -q '^GATE reuse pb' "$REC_OUT" && ok "AC1 control: the untouched leg on that dirty tree WAS reused" \
@@ -1036,13 +1074,14 @@ ru_done
 # A FILE INSIDE A NEW UNTRACKED DIRECTORY. The default status mode reports `?? ga/new/` before and after
 # its content changes, so only a walk with `--untracked-files=all` sees the edit.
 ru_repo
-ru_run GATE_FULL=1 >/dev/null
+ru_run >/dev/null
 mkdir -p "$RU_T/ga/new"; echo n1 > "$RU_T/ga/new/f"
-ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+ru_run GATE_REUSE=1 >/dev/null
 grep -q '^GATE ok    pa' "$REC_OUT" && ok "AC2 a new untracked file under a guard runs its leg" \
                                     || nope "AC2 a leg was reused although an untracked file appeared under its guard"
+seed_cache_ok "$RU_GD" "$(read_ru_rundir)"
 echo n2 > "$RU_T/ga/new/f"
-ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+ru_run GATE_REUSE=1 >/dev/null
 grep -q '^GATE ok    pa' "$REC_OUT" && ok "AC2 changing that untracked file's content runs the leg again" \
                                     || nope "AC2 a leg was reused after a file inside an untracked directory changed — the walk collapsed the directory"
 grep -q '^GATE reuse pb' "$REC_OUT" && ok "AC2 control: the sibling leg WAS reused on that run" \
@@ -1066,28 +1105,26 @@ ru_done
 
 # THE ENVIRONMENT IS IN THE KEY, and GATE_REUSE is not: the first reuse arm above is the second half.
 ru_repo
-ru_run GATE_FULL=1 PYTHONUTF8=1 >/dev/null
-ru_run GATE_FULL=1 GATE_REUSE=1 PYTHONUTF8=0 >/dev/null
+ru_run PYTHONUTF8=1 >/dev/null
+ru_run GATE_REUSE=1 PYTHONUTF8=0 >/dev/null
 grep -q '^GATE reuse ' "$REC_OUT" && nope "AC4 a leg was reused across a PYTHONUTF8 change — the digest omits the environment" \
                                   || ok "AC4 runs that differ only in PYTHONUTF8 reuse no leg"
-ru_run GATE_FULL=1 GATE_REUSE=1 PYTHONUTF8=0 >/dev/null
+ru_run GATE_REUSE=1 PYTHONUTF8=0 >/dev/null
 [ "$(grep -c '^GATE reuse ' "$REC_OUT")" = 2 ] && ok "AC4 control: the same environment again reuses every pure leg" \
                                                || nope "AC4 a repeat under one environment reused nothing, so the arm above proves nothing"
 ru_done
 
-# REUSE_SCHEMA IS IN THE KEY. The control runs AFTER the miss, never before it: a run that reused EVERY
-# leg leaves the ledger empty (its carry-forward `awk 'NR==FNR'` reads an empty first file), so a
-# reusing control placed first left the schema run nothing to match and the arm passed with the
-# constant out of the key. Observed so on node a, 2026-10-11.
+# REUSE_SCHEMA IS IN THE KEY. The control runs AFTER the miss, and the miss is what earns its entries:
+# the missing run executed on a clean tree, so it wrote them under the staged schema.
 ru_repo
-ru_run GATE_FULL=1 >/dev/null
+ru_run >/dev/null
 sed -i 's/^REUSE_SCHEMA=.*/REUSE_SCHEMA=staged/' "$RU_T/${PFX}${KIT}/run-gates.sh"
 grep -q '^REUSE_SCHEMA=staged$' "$RU_T/${PFX}${KIT}/run-gates.sh" && ok "AC5 the staged schema value is in the runner copy" \
                                                                   || nope "AC5 the runner copy carries no REUSE_SCHEMA line to change"
-ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+ru_run GATE_REUSE=1 >/dev/null
 grep -q '^GATE reuse ' "$REC_OUT" && nope "AC5 a leg was reused across a REUSE_SCHEMA change — the constant is not in the key" \
                                   || ok "AC5 a changed REUSE_SCHEMA reuses no leg"
-ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+ru_run GATE_REUSE=1 >/dev/null
 [ "$(grep -c '^GATE reuse ' "$REC_OUT")" = 2 ] && ok "AC5 control: the edited runner copy again reuses every pure leg" \
                                                || nope "AC5 a repeat under the edited runner reused nothing, so the arm above proves nothing"
 ru_done
@@ -1095,11 +1132,182 @@ ru_done
 # A RE-SAVE WITH IDENTICAL BYTES IS THE SAME INPUT: a content key fires on a dirty tree.
 ru_repo
 echo e1 > "$RU_T/ga/f"
-ru_run GATE_FULL=1 >/dev/null
+ru_run >/dev/null
+seed_cache_ok "$RU_GD" "$(read_ru_rundir)"
 sleep 1; touch "$RU_T/ga/f"
-ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+ru_run GATE_REUSE=1 >/dev/null
 [ "$(grep -c '^GATE reuse ' "$REC_OUT")" = 2 ] && ok "AC6 a dirty guarded file re-saved with identical bytes reuses both legs" \
                                                || { nope "AC6 a touch with identical bytes stopped reuse — the key reads mtime or status churn"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
+ru_done
+
+# ---- THE READ CLASSES (TOOL-aSparedSpawn-13 S2). Each arm moves ONE thing a class names and shows the
+# declaring leg executing while the undeclared sibling, on that same run, is reused.
+ru_repo
+write_ru_legs '{"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]}' \
+        '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"], "reads": {"base": "fixture"}}'
+ru_run >/dev/null
+ru_run GATE_REUSE=1 GATE_BASE="$RU_C2" >/dev/null
+grep -q '^GATE ok    pb' "$REC_OUT" && ok "AC1 a leg declaring base executes when only GATE_BASE moved" \
+                                    || nope "AC1 the base leg was reused across another base"
+grep -q '^GATE reuse pa' "$REC_OUT" && ok "AC1 a leg declaring no class is reused across that base" \
+                                    || nope "AC1 the undeclared leg executed: BASE still enters every key"
+ru_done
+
+ru_repo
+write_ru_legs '{"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]}' \
+        '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"], "reads": {"history": "fixture"}}'
+ru_run >/dev/null
+echo o2 > "$RU_T/other"; ( cd "$RU_T" && git commit -qam other ) >/dev/null 2>&1
+ru_run GATE_REUSE=1 >/dev/null
+grep -q '^GATE ok    pb' "$REC_OUT" && ok "AC2 a leg declaring history executes after a commit off every guard" \
+                                    || nope "AC2 the history leg was reused across a commit"
+grep -q '^GATE reuse pa' "$REC_OUT" && ok "AC2 the undeclared guarded leg is reused across that commit" \
+                                    || nope "AC2 the undeclared leg executed, so the arm above proves nothing"
+ru_run GATE_REUSE=1 >/dev/null
+grep -q '^GATE reuse pb' "$REC_OUT" && ok "AC2 at the same HEAD the history leg is reused" \
+                                    || nope "AC2 the history leg executed again at an unmoved HEAD"
+ru_done
+
+ru_repo
+write_ru_legs '{"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]}' \
+        '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"], "reads": {"clock": "fixture"}}'
+ru_run GATE_REUSE_DAY=5 >/dev/null
+ru_run GATE_REUSE=1 GATE_REUSE_DAY=6 >/dev/null
+grep -q '^GATE ok    pb' "$REC_OUT" && ok "AC3 a leg declaring clock executes on another pinned day" \
+                                    || nope "AC3 the clock leg was reused across days"
+grep -q '^GATE reuse pa' "$REC_OUT" && ok "AC3 control: the undeclared leg is reused on that day" \
+                                    || nope "AC3 the undeclared leg executed: the day enters every key"
+ru_done
+
+# AC4: THE CACHE IS THE CLONE'S, so a fresh worktree reuses what another worktree earned.
+ru_repo
+ru_run >/dev/null
+git -C "$RU_T" worktree add -q "$RU_T.wt" -b wtb >/dev/null 2>&1
+( cd "$RU_T.wt" && env -u GATE_FULL -u GATE_REUSE_PUSH -u GATE_REUSE_DAY -u GATE_LEGS GATE_BASE="$RU_E" GATE_REUSE=1 \
+    GATE_REUSE_SAMPLE=0 bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1 )
+[ "$(grep -c '^GATE reuse ' "$REC_OUT")" = 2 ] && ok "AC4 a fresh worktree of the clone reuses the first worktree's legs" \
+                                               || { nope "AC4 the fresh worktree executed them"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
+git -C "$RU_T" worktree remove --force "$RU_T.wt" >/dev/null 2>&1; rm -rf "$RU_T.wt"
+ru_done
+
+# AC5: a dirty tree writes no entry; a reused leg rewrites none.
+ru_repo
+ru_run >/dev/null
+ru_n=$(measure_ru_entries); ru_k=$(read_ru_key pa); ru_m=$(cat "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" 2>/dev/null)
+[ "$ru_n" = 2 ] && ok "AC5 control: the clean green run wrote one entry per leg" || nope "AC5 the clean run wrote $ru_n entries"
+echo dirt > "$RU_T/gb/new"
+ru_run GATE_BASE="$RU_C2" >/dev/null
+[ "$(measure_ru_entries)" = "$ru_n" ] && ok "AC5 a run on a dirty tree writes no entry" || nope "AC5 the dirty run wrote $(( $(measure_ru_entries) - ru_n )) entries"
+rm -f "$RU_T/gb/new"; sleep 1
+ru_run GATE_REUSE=1 >/dev/null
+grep -q '^GATE reuse pa' "$REC_OUT" && [ "$(cat "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" 2>/dev/null)" = "$ru_m" ] \
+  && ok "AC5 a reused leg rewrites nothing" || nope "AC5 the reused leg's entry changed, or it was not reused"
+ru_done
+
+# AC6: THE SAMPLE CATCHES A WRONG ENTRY. `pa` reads FLIP, which no key holds, so its cached `ok` is
+# wrong once FLIP is set; at rate 1 the sample draws it.
+ru_repo
+write_ru_legs '{"name": "pa", "argv": ["bash", "-c", "[ -z \"${FLIP:-}\" ]"], "guard": ["ga/"]}' \
+        '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}'
+ru_run >/dev/null
+ru_rc=$(ru_run GATE_REUSE=1 GATE_REUSE_SAMPLE=1 FLIP=1); ru_k=$(read_ru_key pa)
+[ "$ru_rc" != 0 ] && ok "AC6 a sampled leg that reds against its cached ok reds the run (rc=$ru_rc)" || nope "AC6 the run was green"
+grep -qxF "cache disagreement · pa · $ru_k" "$REC_OUT" && ok "AC6 it prints cache disagreement · pa · <key>" \
+  || nope "AC6 no disagreement line names pa and its key"
+[ ! -e "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" ] && ok "AC6 the disagreeing entry is erased" || nope "AC6 the entry survived"
+ru_run >/dev/null
+[ -e "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" ] && ok "AC6 precondition: a clean green run earns the same key again" \
+  || nope "AC6 the entry was not re-earned, so the arm below proves nothing"
+ru_run GATE_REUSE=1 >/dev/null
+grep -q '^GATE ok    pa' "$REC_OUT" && ok "AC6 the quarantined leg executes although its key matches" \
+                                    || nope "AC6 the quarantined leg was reused"
+grep -q '^GATE reuse pb' "$REC_OUT" && ok "AC6 control: its sibling is reused on that run" || nope "AC6 nothing was reused"
+ru_done
+
+# ...and RED THEN GREEN is `nondeterministic`, which quarantines too.
+ru_repo
+ru_nd="$RU_T.nd"
+write_ru_legs "{\"name\": \"pa\", \"argv\": [\"bash\", \"-c\", \"if [ -e '$ru_nd' ]; then rm -f '$ru_nd'; exit 0; fi; : > '$ru_nd'; exit 1\"], \"guard\": [\"ga/\"]}" \
+        '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}'
+: > "$ru_nd"; ru_run >/dev/null
+rm -f "$ru_nd"; ru_rc=$(ru_run GATE_REUSE=1 GATE_REUSE_SAMPLE=1)
+[ "$ru_rc" != 0 ] && grep -qxF "nondeterministic · pa" "$REC_OUT" && ok "AC6 red then green prints nondeterministic · pa and reds the run" \
+  || nope "AC6 no nondeterministic line, or the run was green (rc=$ru_rc)"
+ls "$RU_GD/gate-cache"/quarantine.* >/dev/null 2>&1 && ok "AC6 the nondeterministic leg is quarantined" || nope "AC6 no quarantine file"
+rm -f "$ru_nd"
+ru_done
+
+# AC7: A LEG REUSED ON 10 RUNS IN A ROW EXECUTES ON THE NEXT, whatever the sample drew (here: nothing).
+ru_repo
+ru_run >/dev/null
+ru_run GATE_REUSE=1 >/dev/null
+ls "$RU_GD/gate-cache"/age.* >/dev/null 2>&1 && ok "AC7 precondition: a reuse moves the age counter" || nope "AC7 no age counter was written"
+for ru_f in "$RU_GD/gate-cache"/age.*; do printf '10' > "$ru_f"; done
+ru_run GATE_REUSE=1 >/dev/null
+grep -q '^GATE reuse ' "$REC_OUT" && nope "AC7 a leg was reused an eleventh time" || ok "AC7 a leg reused on 10 runs executes on the next"
+grep -q 'pa was reused on 10 runs in a row, so it executes' "$REC_OUT" && ok "AC7 the run says why" || nope "AC7 no line names the age bound"
+ru_nz=""; for ru_f in "$RU_GD/gate-cache"/age.*; do [ "$(cat "$ru_f")" = 0 ] || ru_nz+=" ${ru_f##*/}"; done
+[ -z "$ru_nz" ] && ok "AC7 executing resets the counter" || nope "AC7 counters not reset:$ru_nz"
+ru_done
+
+# AC9: THE PRUNE at run end erases an entry older than 30 days and keeps a younger one.
+ru_repo
+ru_run >/dev/null
+mkdir -p "$RU_GD/gate-cache/zz"
+printf 'ok\t1\tx\ty\t1\n' > "$RU_GD/gate-cache/zz/zzold"; printf 'ok\t1\tx\ty\t1\n' > "$RU_GD/gate-cache/zz/zzyoung"
+touch -d '31 days ago' "$RU_GD/gate-cache/zz/zzold"; touch -d '29 days ago' "$RU_GD/gate-cache/zz/zzyoung"
+ru_run GATE_REUSE=1 >/dev/null
+[ ! -e "$RU_GD/gate-cache/zz/zzold" ] && ok "AC9 an entry dated 31 days back is erased" || nope "AC9 the 31-day entry survived"
+[ -e "$RU_GD/gate-cache/zz/zzyoung" ] && ok "AC9 an entry dated 29 days back remains" || nope "AC9 the 29-day entry was erased"
+ru_done
+
+# AC10 AND THE REMOTE CLASS. A `remote` leg is keyed on the advertisement, so a new head on the remote
+# moves its key, and a legacy `impure` leg's with it; an undeclared leg's key does not move.
+ru_repo
+git init -q --template= --bare "$RU_T.origin.git" >/dev/null 2>&1
+git -C "$RU_T" push -q origin main >/dev/null 2>&1
+write_ru_legs '{"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]}' \
+        '{"name": "pr", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"], "reads": {"remote": "fixture"}}' \
+        '{"name": "pi", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"], "impure": "fixture"}'
+git -C "$RU_T" push -q origin main >/dev/null 2>&1
+ru_run >/dev/null
+ru_ki=$(read_ru_key pi)
+ru_run GATE_REUSE=1 >/dev/null
+grep -q '^GATE reuse pr' "$REC_OUT" && ok "S9 a remote leg is reused while the remote advertises what it was keyed on" \
+                                    || nope "S9 the remote leg executed on an unmoved remote"
+git -C "$RU_T" push -q origin HEAD:refs/heads/elsewhere >/dev/null 2>&1
+ru_run GATE_REUSE=1 >/dev/null
+grep -q '^GATE ok    pr' "$REC_OUT" && ok "S2 a new remote head runs the remote leg again" || nope "S2 the remote leg was reused across a new head"
+[ "$(read_ru_key pi)" != "$ru_ki" ] && ok "AC10 a legacy impure leg's key moves with the remote, as a remote leg's" \
+                                || nope "AC10 the legacy impure leg's key did not move"
+grep -q '^GATE reuse pa' "$REC_OUT" && ok "AC10 control: the undeclared leg is reused across the new head, so its key did not move" \
+                                    || nope "AC10 the undeclared leg executed: the remote entered a key that declares no class"
+
+# S10, the runner's half: under GATE_REUSE_PUSH only a remote or history leg is reused, at the exact
+# pushed sha and tip, and the run's record says push and is never full.
+ru_head=$(git -C "$RU_T" rev-parse HEAD)
+git -C "$RU_T" ls-remote --heads origin > "$RU_T.adv" 2>/dev/null
+ru_tip=$(awk -F'\t' '$2 == "refs/heads/main" { print $1 }' "$RU_T.adv")
+ru_dig=$(git -C "$RU_T" hash-object --stdin < "$RU_T.adv")
+rm -f "$RU_GD/gate-full-green"
+ru_run GATE_REUSE_PUSH="$ru_head $ru_tip $ru_dig" >/dev/null
+grep -q '^GATE reuse pr' "$REC_OUT" && ok "AC12 at the exact sha and tip a remote leg is reused at the push" \
+                                    || nope "AC12 the remote leg executed at the exact sha and tip"
+grep -q '^GATE ok    pa' "$REC_OUT" && ok "AC12 a leg declaring neither class executes at the push" \
+                                    || nope "AC12 a leg declaring neither class was reused at the push"
+ru_hd=$(read_ru_rundir)
+[ "$(awk -F'\t' '$1 == "reuse" { print $2 }' "$ru_hd/header")|$(awk -F'\t' '$1 == "full" { print $2 }' "$ru_hd/header")" = "push|" ] \
+  && [ "$(awk -F'\t' '$1 == "reused" { print $2 }' "$ru_hd/verdict")" -gt 0 ] 2>/dev/null \
+  && ok "AC13 the run record reads reuse push, no full, and a reused count above 0" || nope "AC13 the run record does not say so"
+[ ! -f "$RU_GD/gate-full-green" ] && ok "AC14 the reusing push run stamps no gate-full-green" || nope "AC14 a full green was stamped"
+ru_run GATE_REUSE_PUSH="$ru_head 0000000000000000000000000000000000000000 $ru_dig" >/dev/null
+grep -q '^GATE ok    pr' "$REC_OUT" && ok "AC12 a moved tip runs the remote leg" || nope "AC12 a moved tip still reused"
+ru_run GATE_REUSE_PUSH="$RU_C2 $ru_tip $ru_dig" >/dev/null
+grep -q '^GATE reuse ' "$REC_OUT" && nope "AC12 a pushed sha that is not HEAD reused a leg" || ok "AC12 a pushed sha that is not HEAD reuses nothing"
+echo moved > "$RU_T/gb/f"; ( cd "$RU_T" && git commit -qam moved ) >/dev/null 2>&1
+ru_run GATE_REUSE_PUSH="$(git -C "$RU_T" rev-parse HEAD) $ru_tip $ru_dig" >/dev/null
+grep -q '^GATE ok    pr' "$REC_OUT" && ok "AC12 a changed guarded input runs the remote leg" || nope "AC12 a changed input still reused"
+rm -f "$RU_T.adv"
 ru_done
 
 # THE PROFILER STILL SEES A REUSED LEG. Without this the new verb is dropped by that tool's verdict
@@ -1108,7 +1316,7 @@ ru_done
 if [ -f "$ROOT/${PFX}${KIT}/profile_bar.py" ]; then
   ru_repo
   cp "$ROOT/${PFX}${KIT}/profile_bar.py" "$RU_T/${PFX}${KIT}/"
-  ru_run GATE_FULL=1 >/dev/null
+  ru_run >/dev/null
   ru_out=$( cd "$RU_T" && "$DC_PY" $KIT_REL/profile_bar.py --width 2 2>&1 )
   # Matched on the word the tool uses for a REFUSAL, not on 'executed leg' — which appears in its
   # ordinary success line ('across N executed leg(s)') and made this arm fail on a healthy run.
@@ -1733,9 +1941,16 @@ done
   || nope "AC6 only $sb_same of 13 ledger keys equal input_key's"
 [ "$sb_moved" -ge 1 ] && ok "AC6 a union listing sorted backwards moves $sb_moved key(s)" \
   || nope "AC6 a backwards union moved no key: the arm cannot see the slice order"
-sb_rc=$(run_sb_bar "$SB_T" cut "$SB_K/sb.json" GATE_FULL=1 GATE_JOBS=2 GATE_REUSE=1)
+# The reuse half reads the cache (TOOL-aSparedSpawn-13), which a run on this DIRTY tree never writes
+# and under GATE_FULL never reads, so an earning bar with GATE_FULL's place taken by an unresolvable
+# base (every guard runs, and GATE_BASE is no input of a key) has its keys planted as `ok` entries.
+sb_keep=$SB_RUN
+sb_rc=$(run_sb_bar "$SB_T" cut "$SB_K/sb.json" GATE_BASE=no-such-base GATE_JOBS=2); read_sb_run "$SB_T"
+seed_cache_ok "$SB_T/.git" "$SB_RUN"
+sb_rc=$(run_sb_bar "$SB_T" cut "$SB_K/sb.json" GATE_BASE=no-such-base GATE_JOBS=2 GATE_REUSE=1 GATE_REUSE_SAMPLE=0)
 [ "$(grep -c '^GATE reuse' "$SB_K/cut.out")" = 13 ] && ok "AC6 a GATE_REUSE bar reuses all 13 legs on the precomputed keys" \
   || nope "AC6 a GATE_REUSE bar reused $(grep -c '^GATE reuse' "$SB_K/cut.out") of 13 legs"
+SB_RUN=$sb_keep
 # AC7: the header's head and worktree, and the log dir, from a primary tree, a linked worktree and an
 # unborn branch, against what git answers there; an unborn HEAD reads empty, never the word HEAD.
 mk_legs "$tmp/sb1.json" '{"name":"one","argv":["bash","-c","exit 0"]}'

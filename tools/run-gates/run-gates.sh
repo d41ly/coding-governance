@@ -2352,12 +2352,23 @@ prior = [durs[data[i]["name"]] if data[i]["name"] in durs
 order = sorted(range(len(data)), key=lambda i: -prior[i])
 # Line 1 also carries, behind one RS, the python half of the reuse key digest (TOOL-aSparedSpawn-1
 # S4): this interpreter version and its utf8 mode, read here so the digest starts no python of its own.
+# The read classes per row, the fourth field below (TOOL-aSparedSpawn-13 S1).
+reads = {}
+for l in data:
+    r = l.get("reads")
+    if "reads" in l:
+        known = isinstance(r, dict) and all(k in ("history", "base", "clock", "remote") for k in r)
+        reads[id(l)] = ",".join(sorted(r)) if known else "impure,remote"
+    else:
+        reads[id(l)] = "impure,remote" if l.get("impure") else ""
 rows = [" ".join(str(i) for i in order) + "\x1e" + sys.version.replace("\n", " ")
         + " utf8_mode=" + str(sys.flags.utf8_mode)]
-# The fourth field is the `impure` declaration, carried through as a PRESENCE rather than as its
-# text: the reason string is for a human reading the manifest, and the runner only ever asks whether
-# there is one. Newlines and the field separators cannot appear in it because it is reduced to a flag
-# here, which is what keeps a prose reason from being able to corrupt the wire format.
+# The fourth field is the `reads` declaration (TOOL-aSparedSpawn-13 S1): the sorted, comma-joined
+# CLASSES, never the reasons, which are for a human reading the manifest. The classes are closed:
+# history, base, clock, remote. A legacy `impure` with no `reads` reads as `remote,impure`, and so
+# does a class outside the four or a `reads` that is no object: `impure` in this field means "key it
+# as remote and never reuse it", the meaning the key had before classes existed. Reduced to known
+# words here, so no prose reason can corrupt the wire format.
 # The SIXTH field is `subject`, appended AFTER chunk so the chunk position is unchanged — a field
 # inserted before it would be parsed as chunk by any reader that had not moved in the same commit.
 # Defaulted to `repo`: a leg that has not declared is on the bar, because the other default silently
@@ -2377,7 +2388,7 @@ rows = [" ".join(str(i) for i in order) + "\x1e" + sys.version.replace("\n", " "
 # to remember a variable. TOOL-dUnstalledConvoy-30.
 rows += [l["name"] + "\x1e" + ",".join(resolve_prefix_token(g, troot) for g in l.get("guard", []))
          + "\x1e" + "\x1f".join(resolve_prefix_token(a, troot) for a in l["argv"])
-         + "\x1e" + ("1" if l.get("impure") else "")
+         + "\x1e" + reads[id(l)]
          + "\x1e" + str(l.get("chunk", "") or "")
          + "\x1e" + (l.get("subject") or "repo")
          # THE SEVENTH FIELD, appended after `subject` for exactly the reason `subject` was appended
@@ -2427,12 +2438,12 @@ unset _pm_args
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
-names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); signatures=(); docreads=()
+names=(); guards=(); argvs=(); legreads=(); chunks=(); subjects=(); ceilings=(); signatures=(); docreads=()
 rowhashes=(); heldkeys=(); ORDER=""; first=1
 while IFS= read -r line; do
   if [ "$first" = 1 ]; then IFS=$'\x1e' read -r ORDER PY_ID <<<"$line"; first=0; continue; fi
   IFS=$'\x1e' read -r nm gd_ av im ch sj ce sg dr rwh_ hky_ <<<"$line"
-  names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}"); chunks+=("${ch:-default}")
+  names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); legreads+=("${im:-}"); chunks+=("${ch:-default}")
   subjects+=("${sj:-repo}"); ceilings+=("${ce:-}"); signatures+=("${sg:-}"); docreads+=("${dr:-}")
   rowhashes+=("${rwh_:-}"); heldkeys+=("${hky_:-}")
 done <<<"$legs"
@@ -2722,8 +2733,9 @@ done
 #
 # A guarded leg is keyed on its own guard pathspecs; an unguarded leg declares by its silence
 # that it reads everything, so it is keyed on the whole-tree fingerprint. Both also take the
-# argv and the resolved base, because the same paths run by a different command, or diffed
-# against a different baseline, are not the same question.
+# argv, the manifest row and what the row declares it reads beyond its inputs (`build_key_text`),
+# because the same paths run by a different command, or diffed against a different baseline by a
+# leg that reads one, are not the same question.
 #
 # INDEX-AND-WALK rather than a hash of every file: `ls-files -s` is one cheap git call per leg
 # and carries the committed and staged blobs, and the dirt slice below is taken from the ONE
@@ -2744,7 +2756,8 @@ input_key() { # leg index -> the key, or a dash
 }
 
 # build_key_text <leg index> <its sorted `ls-files -s` listing> -> KEY_TEXT, the bytes the key
-# hashes: the argv, the base, the leg's inputs and the toolchain digest. ONE composition for the
+# hashes: the argv, the row's classes and hash, the declared reads, the leg's inputs and the
+# toolchain digest. ONE composition for the
 # per-leg `input_key` above and the precompute below, so the two cannot disagree about what a key is.
 build_key_text() {
   local i=$1 comp=$2 gp dirt="" r p g
@@ -2767,7 +2780,17 @@ $dirt"
   else
     comp="$FPRINT_START"
   fi
-  printf -v KEY_TEXT '%s\n---\n%s\n---\n%s\n---\n%s\n' "${argvs[$i]}" "$BASE" "$comp" "$REUSE_DIGEST"
+  # THE DECLARED READS, and only those (TOOL-aSparedSpawn-13 S2): the base where the row says `base`,
+  # HEAD where it says `history` or `remote`, the UTC day where it says `clock`, the observed remote
+  # where it says `remote`. An undeclared leg's key moves with none of them, so a landing that moves
+  # BASE no longer misses every leg. The row hash always enters: a reworded row is another question.
+  local cls=",${legreads[$i]}," ext=""
+  case $cls in *,base,*) ext+="base $BASE ${GATE_PUSH_BASE:-}"$'\n' ;; esac
+  case $cls in *,history,*|*,remote,*) ext+="head $RG_HEAD"$'\n' ;; esac
+  case $cls in *,clock,*) ext+="day $REUSE_DAY"$'\n' ;; esac
+  case $cls in *,remote,*) ext+="remote $REMOTE_OBS"$'\n' ;; esac
+  printf -v KEY_TEXT '%s\n---\n%s %s\n%s---\n%s\n---\n%s\n' "${argvs[$i]}" "${legreads[$i]}" "${rowhashes[$i]}" \
+    "$ext" "$comp" "$REUSE_DIGEST"
 }
 
 # THE KEYS, COMPUTED ONCE BEFORE DISPATCH (TOOL-aSparedSpawn-4 S5) into `INPUT_KEYS`, which every
@@ -2852,13 +2875,17 @@ build_input_keys() {
 
 # WHAT A REUSABLE `ok` MEANS. Bump this when a runner change redefines it: every recorded ledger row
 # then misses at once, which is the "did more work" direction. A constant rather than the runner's
-# own blob, because the runner's comments move in most builds. TOOL-aSparedSpawn-1 S5.
-REUSE_SCHEMA=2
+# own blob, because the runner's comments move in most builds. TOOL-aSparedSpawn-1 S5. 3 since the key
+# carries declared reads and the cache replaced the ledger as the store (TOOL-aSparedSpawn-13).
+REUSE_SCHEMA=3
 # THE TOOLCHAIN, ENVIRONMENT AND HOST DIGEST, one per run, the fourth section of EVERY key
 # (TOOL-aSparedSpawn-1 S4). Two runs over identical bytes under a different git, python, bash, MSYS
-# runtime or `PYTHONUTF8` are not the same question. `GATE_REUSE` is left out so the earning run
-# (unset) and the reusing run (set) can agree, and `GATE_TURNSTILE_HELD` because the runner exports a
-# per-run nonce in it above. Every other knob stays in: over-sensitive is a miss, never a false hit.
+# runtime or `PYTHONUTF8` are not the same question. Every `GATE_REUSE*` knob is left out so the
+# earning run (unset) and the reusing run (set) can agree, and `GATE_TURNSTILE_HELD` and `GATE_RUN_ID`
+# because each names this run and nothing a leg grades. `GATE_BASE` and `GATE_PUSH_BASE` are left out
+# HERE because they enter the key of a leg declaring `base` and of no other (TOOL-aSparedSpawn-13 S2):
+# hashed here they would move every key on every landing. Every other knob stays in: over-sensitive
+# is a miss, never a false hit.
 # WHAT IT DOES NOT SEE: a tool upgraded IN PLACE at the same path, other than git, which pays
 # `git version`; and any variable outside the prefix set, which a leg may still read.
 REUSE_DIGEST=$(
@@ -2881,10 +2908,76 @@ REUSE_DIGEST=$(
   mapfile -t evs < <(compgen -e)
   [ "${#evs[@]}" -gt 0 ] || exit 1
   for v in "${evs[@]}"; do
-    case $v in GATE_REUSE|GATE_TURNSTILE_HELD) continue ;;
+    case $v in GATE_REUSE*|GATE_TURNSTILE_HELD|GATE_RUN_ID|GATE_BASE|GATE_PUSH_BASE) continue ;;
       GATE_*|GOV_*|*_PY|GIT_*|PYTHON*|LC_*|LANG|TZ|PATH) printf 'env %s=%s\n' "$v" "${!v}" ;; esac
   done
 ) && REUSE_DIGEST=$(git hash-object --stdin 2>/dev/null <<<"$REUSE_DIGEST") || REUSE_DIGEST=""
+
+# ---- REUSE: THE MODE, THE CACHE AND THE OBSERVED REMOTE (TOOL-aSparedSpawn-13) -----------------
+# THE MODE, one of three. `env`: `GATE_REUSE` is set, an ordinary non-authoritative run. `push`:
+# `GATE_REUSE_PUSH` is set, which only `.githooks/pre-push` sets, on a SCOPED decision, to
+# `<pushed sha> <tip> <advertisement digest>`; under it only a leg declaring `remote` or `history` is
+# reused, and only while HEAD is the pushed sha (S10). `off` otherwise, and ALWAYS under `GATE_FULL`:
+# the rule that a full run reuses nothing is the runner's own, not only the hook's scrub (S8).
+REUSE_MODE=off; REUSE_WHY=""; REUSE_PUSH_SHA=""; REUSE_PUSH_TIP=""; REUSE_PUSH_DIGEST=""
+REUSE_CACHE=""; [ -n "$RG_COMMON_RAW" ] && REUSE_CACHE="$RG_COMMON_RAW/gate-cache"
+if [ -n "${GATE_FULL:-}" ]; then
+  { [ -n "${GATE_REUSE:-}" ] || [ -n "${GATE_REUSE_PUSH:-}" ]; } && REUSE_WHY="GATE_FULL is set, so nothing is reused"
+elif [ -n "${GATE_REUSE_PUSH:-}" ]; then
+  read -r REUSE_PUSH_SHA REUSE_PUSH_TIP REUSE_PUSH_DIGEST _ <<<"$GATE_REUSE_PUSH"
+  if [ -n "$REUSE_PUSH_DIGEST" ] && [ -n "$RG_HEAD" ] && [ "$REUSE_PUSH_SHA" = "$RG_HEAD" ]; then REUSE_MODE=push
+  else REUSE_WHY="GATE_REUSE_PUSH names ${REUSE_PUSH_SHA:-nothing} and HEAD is ${RG_HEAD:-unread}, so nothing is reused"; fi
+elif [ -n "${GATE_REUSE:-}" ]; then
+  REUSE_MODE=env
+fi
+if [ "$REUSE_MODE" != off ] && [ -z "$REUSE_CACHE" ]; then REUSE_MODE=off; REUSE_WHY="no git common dir holds a cache"; fi
+[ -n "$REUSE_WHY" ] && printf 'run-gates: reuse — %s\n' "$REUSE_WHY" >&2
+# THE SAMPLE RATE (S6, owner ruling F2: 0.25, uniform per leg), as parts in 10000. A value that is no
+# decimal from 0 to 1 is refused back to the default, loudly: a typo must not switch the sample off.
+REUSE_SAMPLE=${GATE_REUSE_SAMPLE:-0.25}; SAMPLE_PM=2500
+if [[ $REUSE_SAMPLE =~ ^1(\.0*)?$ ]]; then SAMPLE_PM=10000
+elif [[ $REUSE_SAMPLE =~ ^0?(\.([0-9]*))?$ ]] && [ -n "$REUSE_SAMPLE" ]; then
+  _f="${BASH_REMATCH[2]:-}0000"; SAMPLE_PM=$((10#${_f:0:4}))
+else
+  printf 'run-gates: GATE_REUSE_SAMPLE=%s is no rate from 0 to 1; sampling at 0.25\n' "$REUSE_SAMPLE" >&2
+  REUSE_SAMPLE=0.25
+fi
+# THE DAY a `clock` leg is keyed on: whole UTC days since the epoch, from the clock bash already
+# holds. `GATE_REUSE_DAY` pins it, the seam a `clock` arm needs, as `GATE_RUN_ID` pins the run id.
+REUSE_DAY=${GATE_REUSE_DAY:-$((EPOCHSECONDS / 86400))}
+
+# read_remote_heads -> REMOTE_HEADS, `<default-branch tip> <digest of the whole advertisement>`, or
+# rc 1 and empty when the probe did not answer or advertised no default branch. One `ls-remote
+# --heads`, bounded and redirected to a file, never captured through a pipe: a substitution waits for
+# every holder of the pipe, so `timeout` would bound the verdict and not the clock. The digest is
+# `git hash-object --stdin` over those bytes, which is what the pre-push hook computes over its own
+# probe, so the two agree on one advertisement by construction.
+read_remote_heads() {
+  local f="$WORK/remote.heads" tip="" l d
+  local -a lines=()
+  REMOTE_HEADS=""
+  [ -n "$RR_REMOTE" ] || return 1
+  timeout -k 5s 20 env GIT_TERMINAL_PROMPT=0 "GIT_SSH_COMMAND=ssh -o ConnectTimeout=10 -o BatchMode=yes" \
+    git -c credential.interactive=never ls-remote --heads "$RR_REMOTE" > "$f" 2>/dev/null || return 1
+  { mapfile -t lines < "$f"; } 2>/dev/null
+  for l in "${lines[@]}"; do
+    [ "${l#*$'\t'}" = "refs/heads/${DEFBR:-main}" ] && tip=${l%%$'\t'*}
+  done
+  [ -n "$tip" ] || return 1
+  d=$(git hash-object --stdin < "$f" 2>/dev/null) && [ -n "$d" ] || return 1
+  REMOTE_HEADS="$tip $d"
+}
+# THE OBSERVED REMOTE a `remote` leg is keyed on (S9). Asked only when such a leg is still to run on a
+# CLEAN tree, the one tree whose verdict may be written; under `push` the hook's own probe, carried in
+# the knob, stands in for it. Empty means a `remote` leg neither reuses nor writes.
+REMOTE_OBS=""
+for ((i=0; i<total; i++)); do
+  [ -n "${names[$i]}" ] && [ ! -f "$WORK/$i.rc" ] || continue
+  case ",${legreads[$i]}," in *,remote,*) ;; *) continue ;; esac
+  if [ "$REUSE_MODE" = push ]; then REMOTE_OBS="$REUSE_PUSH_TIP $REUSE_PUSH_DIGEST"
+  elif [ "$TREE_CLEAN" = yes ] && read_remote_heads; then REMOTE_OBS=$REMOTE_HEADS; fi
+  break
+done
 
 # THE HEADER, written before the first leg dispatches, in a key-per-line grammar. It is what a
 # concurrent reader resolves through `gate-run/current` while the run is in flight, and what
@@ -2941,6 +3034,10 @@ if [ -n "$RUNDIR" ]; then
     # The reuse key's schema (TOOL-aSparedSpawn-1 S5), so a reader can tell a schema miss from a
     # content miss. Outside the run-envelope block for the reason above.
     printf 'reuse_schema\t%s\n' "$REUSE_SCHEMA"
+    # The reuse mode, `off`, `env` or `push`, and the sample rate it drew at (TOOL-aSparedSpawn-13).
+    # Outside the run-envelope block for the reason above.
+    printf 'reuse\t%s\n' "$REUSE_MODE"
+    printf 'reuse_sample\t%s\n' "$REUSE_SAMPLE"
     # The memory pause's threshold this run held dispatch above, `off`, or `inert` where the host gave
     # no reading (TOOL-aGraftedHelix-7). Outside the run-envelope block for the reason above.
     printf 'mempause\t%s\n' "$prof_mrec"
@@ -2956,37 +3053,69 @@ if [ -n "$RUNDIR" ]; then
   chmod 600 "$RUNDIR/header" 2>/dev/null || true
 fi
 
-# The keys are wanted by a ledger row, which needs the run directory, or by the reuse block below;
-# a bar with neither computes none, as a bar with neither asked git for none before.
-if [ -n "$RUNDIR" ] || { [ -n "${GATE_REUSE:-}" ] && [ -n "$LEDGER" ] && [ -s "$LEDGER" ]; }; then
+# The keys are wanted by a ledger row, which needs the run directory, or by the reuse block and the
+# cache write below; a bar with none of them computes none, as a bar with neither asked git for none.
+if [ -n "$RUNDIR" ] || [ "$REUSE_MODE" != off ] || { [ -n "$REUSE_CACHE" ] && [ "$TREE_CLEAN" = yes ]; }; then
   build_input_keys
 fi
 
-# ---- reuse a proven green (the reuse unit) -------------------------------------------------
+# ---- reuse a proven green (the reuse unit, then TOOL-aSparedSpawn-13) -------------------------------
 # OPT-IN, and that is the boundary rule rather than caution: an advisory input may cause LESS work
-# only on a run that is not authoritative. `.githooks/pre-push` never sets this, so the run that
-# decides a landing always executes every leg it did not guard away.
+# only on a run that is not authoritative. An authoritative run reuses only a `remote` or `history`
+# leg, at the exact pushed sha and observed tip, and is then scoped: `.githooks/pre-push` sets
+# `GATE_REUSE_PUSH` on a SCOPED decision and on no other, and a run reusing anything stamps no green
+# the boundary trusts. Under `GATE_FULL` nothing is reused at all (`REUSE_MODE` above).
 #
-# A leg is reused when ALL of: reuse is asked for, the leg is not declared `impure`, its ledger row
-# says `ok`, that row carries a key, and the key equals the one computed THIS run. Any missing term
-# means execute — every failure mode of this block is "did more work", never "checked less".
+# A leg is reused when ALL of: the mode allows its classes, it carries no legacy `impure`, a `remote`
+# leg has an observed remote, its key was measured, its row is not quarantined, the cache holds an
+# `ok` under that key in the git common dir, it has not been reused 10 runs in a row (S7), and the
+# sample did not draw it (S6). Any missing term means execute: every failure mode of this block is
+# "did more work", never "checked less". The cache entry is read by a builtin, so a lookup spawns
+# nothing. The age counter moves here and is reset when the leg executes (the cache block below).
 reuses=0
-if [ -n "${GATE_REUSE:-}" ] && [ -n "$LEDGER" ] && [ -s "$LEDGER" ]; then
+if [ "$REUSE_MODE" != off ]; then
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
     [ -f "$WORK/$i.rc" ] && continue                 # already decided by the guard pass
-    # An IMPURE leg is never reused, on any tree, however identical. Its verdict is a function of
-    # something outside the tree, so a byte-identical tree is not the same question twice.
-    [ -n "${impures[$i]}" ] && continue
-    _row=$(LC_ALL=C grep -m1 -F "${names[$i]}"$'\t' "$LEDGER" 2>/dev/null) || _row=
-    [ -n "$_row" ] || continue
-    IFS=$'\t' read -r _n _sec _st _key _end <<<"$_row"
-    [ "$_n" = "${names[$i]}" ] || continue
-    [ "$_st" = ok ] || continue                      # a RED row is never reusable
-    [ -n "$_key" ] && [ "$_key" != "-" ] || continue # no key recorded is not a match, it is a gap
-    [ "$_key" = "${INPUT_KEYS[$i]:--}" ] || continue
+    _cls=",${legreads[$i]},"
+    # A LEGACY `impure` is never reused, on any tree, however identical: it says the verdict is a
+    # function of something outside the tree and says nothing about what, so no key can carry it.
+    case $_cls in *,impure,*) continue ;; esac
+    if [ "$REUSE_MODE" = push ]; then
+      case $_cls in *,remote,*|*,history,*) ;; *) continue ;; esac
+    fi
+    case $_cls in *,remote,*) [ -n "$REMOTE_OBS" ] || continue ;; esac
+    _key=${INPUT_KEYS[$i]:--}
+    [ "$_key" != - ] && [ "${#_key}" -ge 3 ] || continue
+    _q=""; { IFS= read -r _q < "$REUSE_CACHE/quarantine.${heldkeys[$i]}"; } 2>/dev/null
+    if [ -n "$_q" ] && [ "$_q" = "${rowhashes[$i]}" ]; then
+      printf 'run-gates: reuse — %s is quarantined until its manifest row changes\n' "${names[$i]}" >&2
+      continue
+    fi
+    _st=""; { IFS=$'\t' read -r _st _ < "$REUSE_CACHE/${_key:0:2}/$_key"; } 2>/dev/null
+    [ "$_st" = ok ] || continue                      # missing, unreadable or malformed: execute
+    _age=0; { IFS= read -r _age < "$REUSE_CACHE/age.${heldkeys[$i]}"; } 2>/dev/null
+    [[ $_age =~ ^[0-9]+$ ]] || _age=0
+    if [ "$_age" -ge 10 ]; then
+      printf '%s' "$_key" > "$WORK/$i.aged"
+      printf 'run-gates: reuse — %s was reused on %s runs in a row, so it executes\n' "${names[$i]}" "$_age" >&2
+      continue
+    fi
+    # THE DRAW, seeded from the run id so a run's draw replays: a polynomial hash of `<run id>/<leg>`
+    # in shell arithmetic, which spawns nothing. ponytail: a 31-polynomial mod a prime, uniform enough
+    # for a quarter-rate sample; a keyed hash if anyone ever games the draw.
+    _h=7; _s="$RUNID/${names[$i]}"
+    for ((_c=0; _c<${#_s}; _c++)); do
+      printf -v _o '%d' "'${_s:_c:1}"; _h=$(( (_h * 31 + _o) % 1000000007 ))
+    done
+    if [ $((_h % 10000)) -lt "$SAMPLE_PM" ]; then
+      printf '%s' "$_key" > "$WORK/$i.sampled"
+      continue
+    fi
+    printf '%s' "$((_age + 1))" > "$REUSE_CACHE/age.${heldkeys[$i]}" 2>/dev/null
     printf 'reuse' > "$WORK/$i.rc"
   done
+  unset _cls _key _q _st _age _h _s _c _o
 fi
 
 # ---- CALIBRATION: THE SPAWN FLOOR. TOOL-dDerivedDocket-26 S5 ---------------------------------------
@@ -4423,6 +4552,36 @@ render_spawn_summary
 # THE SERIAL RETRY, after the pool drains and INSIDE the wall (TOOL-dDerivedDocket-26 S1), and before
 # the attribution below, which reads the red set the retry decides and each red leg's FIRST attempt.
 run_leg_retry
+# THE SAMPLE'S VERDICT (TOOL-aSparedSpawn-13 S6), after the serial retry and inside the wall. A drawn leg
+# executed as an ordinary one; its effective verdict is its retry's where it had one. Green agrees. Red
+# against the cached `ok` it was drawn from has ALREADY redded the run through its own `GATE FAIL`, and
+# runs once more, alone, only to say which it was: red again is a `cache disagreement`, and the entry
+# goes; green is `nondeterministic`. Either quarantines the leg against its current row hash, so it is
+# never reused again until its manifest row changes. Backgrounded and waited on, as the serial retry is,
+# because the wall's handle on a leg is the worker's own pid.
+for _sf in "$WORK"/*.sampled; do
+  [ -f "$_sf" ] || continue
+  i=${_sf##*/}; i=${i%.sampled}
+  _key=""; { IFS= read -r _key < "$_sf"; } 2>/dev/null
+  _src="$WORK/$i.rc"; [ -f "$WORK/$i.retry.rc" ] && _src="$WORK/$i.retry.rc"
+  _rc=""; { IFS= read -r _rc < "$_src"; } 2>/dev/null
+  if [ "$_rc" = 0 ]; then
+    printf 'run-gates: sampled %s — it executed against its cached ok and agreed\n' "${names[$i]}" >&2
+    continue
+  fi
+  runleg "$i" .sample &
+  wait "$!" 2>/dev/null
+  _rc2=""; { IFS= read -r _rc2 < "$WORK/$i.sample.rc"; } 2>/dev/null
+  if [ "$_rc2" = 0 ]; then
+    printf 'nondeterministic · %s\n' "${names[$i]}"
+  else
+    printf 'cache disagreement · %s · %s\n' "${names[$i]}" "$_key"
+    [ "${#_key}" -ge 3 ] && rm -f "$REUSE_CACHE/${_key:0:2}/$_key" 2>/dev/null
+  fi
+  printf '%s' "${rowhashes[$i]}" > "$REUSE_CACHE/quarantine.${heldkeys[$i]}" 2>/dev/null \
+    || printf 'run-gates: %s could not be quarantined\n' "${names[$i]}" >&2
+done
+unset _sf _key _src _rc _rc2
 # AFTER the pool drains and every leg has its verdict, and BEFORE the watcher goes: the wall bounds
 # the bar and its attribution together (TOOL-dDerivedDocket-23 F6). A no-op unless asked and red.
 run_attribution
@@ -4434,8 +4593,9 @@ remove_census_watcher
 # this record exists to remove. Field 2 is still the duration, which is what lets the manifest
 # parser above read it as a dispatch hint with no edit at all.
 #
-# Rows: name, seconds, status, input key, ended-at. Advisory for dispatch, DURABLE for the reuse
-# unit that reads the key — a failed write costs wall clock, never a verdict.
+# Rows: name, seconds, status, input key, ended-at. Advisory for dispatch, and read for reuse no more:
+# the reuse cache in the common dir is that store (TOOL-aSparedSpawn-13 S4), so the key and status
+# here are a record for a reader — a failed write costs wall clock, never a verdict.
 if [ -n "$LEDGER" ]; then
   new="$WORK/ledger.new"; merged="$WORK/ledger.merged"; : > "$new"
   for ((i=0; i<total; i++)); do
@@ -4449,16 +4609,15 @@ if [ -n "$LEDGER" ]; then
     fi
     # A RETRIED LEG takes its retry's seconds and the status `retried`, whatever the retry did
     # (TOOL-dDerivedDocket-26 S2). The seconds are the leg's cost ALONE, which is the better dispatch
-    # hint; the status is one the reuse predicate below never accepts, because it reads `ok` and nothing
-    # else, so a pass that needed a second attempt is never copied forward as a proven green.
+    # hint; the status says a pass needed a second attempt, and the reuse cache writes no entry for
+    # one (its first attempt was no `ok`), so it is never copied forward as a proven green.
     if [ -f "$WORK/$i.retry.sec" ]; then
       lsec="$WORK/$i.retry.sec"; lst=retried
       [ -n "$RUNDIR" ] && [ -f "$RUNDIR/$i.retry.leg" ] \
         && IFS=$'\t' read -r _ _ _ _ _ lend _ < "$RUNDIR/$i.retry.leg" 2>/dev/null
     fi
-    # A RED leg is never reusable, and the ledger says so in the field the reuse unit reads
-    # rather than leaving that rule to be re-implemented there. A key on a failed row would be a
-    # true statement about the inputs and a dangerous one about the verdict.
+    # A RED leg's row carries no key: a key on a failed row would be a true statement about the
+    # inputs and a dangerous one about the verdict, for any reader that took it for a reusable one.
     [ "$lst" = ok ] || lkey=-
     # The seconds by the builtin, a one-line file whose `$(cat …)` was a fork and an exec per leg
     # (TOOL-aSparedSpawn-4 S6).
@@ -4640,6 +4799,75 @@ if [ -n "${GATE_SELFTESTS:-}" ] && [ -n "$HELD_DIR" ] && [ -n "$RG_HEAD" ]; then
   done
   unset _hrc _hfile
 fi
+
+# THE REUSE CACHE (TOOL-aSparedSpawn-13 S4 S5 S7), in the git common dir so every worktree of the clone
+# shares it, and never in a ref, so nothing pushes it. Per leg that EXECUTED: its age counter, where it
+# has one, goes back to 0. Per leg that executed `ok` on its FIRST attempt, on a tree that was clean
+# when the run started and did not move, with a measured key and no legacy `impure`: one entry under
+# `<key[0:2]>/<key>`, `ok<TAB>secs<TAB>run id<TAB>HEAD<TAB>ended epoch`. A reused, held or skipped leg
+# did not execute and writes nothing, so a wrong entry cannot carry itself forward. A `remote` leg
+# writes only when the remote is probed again after the legs end and still advertises what it was
+# keyed on (S9). Every write, tmp then rename, and the 30-day prune by mtime run in ONE python
+# process, so a bar pays one spawn for them however many legs it records; any failure there costs a
+# saving, never a verdict.
+if [ -n "$REUSE_CACHE" ] && [ -n "$RG_HEAD" ]; then
+  _cw="$WORK/cache.writes"; : > "$_cw"; _cw_remote=0
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    _crc=""; { IFS= read -r _crc < "$WORK/$i.rc"; } 2>/dev/null
+    case "$_crc" in ''|ondemand|skip|docskip|reuse) continue ;; esac
+    [ -f "$REUSE_CACHE/age.${heldkeys[$i]}" ] && printf '0' > "$REUSE_CACHE/age.${heldkeys[$i]}" 2>/dev/null
+    [ "$_crc" = 0 ] && [ "$TREE_CLEAN" = yes ] && [ "$tree_moved" = no ] || continue
+    _ck=${INPUT_KEYS[$i]:--}
+    [ "$_ck" != - ] && [ "${#_ck}" -ge 3 ] || continue
+    _csec=""; { IFS= read -r _csec < "$WORK/$i.sec"; } 2>/dev/null
+    case ",${legreads[$i]}," in
+      *,impure,*) continue ;;
+      *,remote,*) [ -n "$REMOTE_OBS" ] || continue; _cr=1; _cw_remote=1 ;;
+      *) _cr=0 ;;
+    esac
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$_ck" "${_csec:-0}" "${RUNID:--}" "$RG_HEAD" "$EPOCHSECONDS" "$_cr" >> "$_cw"
+  done
+  # THE SECOND PROBE: the remote moved while its legs ran, so their verdicts answer a question no key
+  # names. Their rows are dropped; every other row stands.
+  if [ "$_cw_remote" = 1 ] && { ! read_remote_heads || [ "$REMOTE_HEADS" != "$REMOTE_OBS" ]; }; then
+    printf 'run-gates: reuse — the remote advertised something else after its legs ran, so no remote leg is cached\n' >&2
+    _cwl=(); { mapfile -t _cwl < "$_cw"; } 2>/dev/null
+    : > "$_cw"
+    for _l in ${_cwl[@]+"${_cwl[@]}"}; do [ "${_l##*$'\t'}" = 1 ] || printf '%s\n' "$_l" >> "$_cw"; done
+  fi
+  if [ -s "$_cw" ] || [ "$REUSE_MODE" != off ]; then
+    "$PYBIN" -c '
+import os, sys, time
+root = sys.argv[1]
+for line in sys.stdin.read().splitlines():
+    f = line.split("\t")
+    if len(f) < 5 or len(f[0]) < 3:
+        continue
+    try:
+        d = os.path.join(root, f[0][:2])
+        os.makedirs(d, exist_ok=True)
+        tmp = os.path.join(d, f[0] + ".tmp." + str(os.getpid()))
+        with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write("ok\t" + "\t".join(f[1:5]) + "\n")
+        os.replace(tmp, os.path.join(d, f[0]))
+    except OSError:
+        pass
+cut = time.time() - 30 * 86400
+for sub in (os.listdir(root) if os.path.isdir(root) else []):
+    p = os.path.join(root, sub)
+    if len(sub) != 2 or not os.path.isdir(p):
+        continue
+    for n in os.listdir(p):
+        try:
+            if os.path.getmtime(os.path.join(p, n)) < cut:
+                os.remove(os.path.join(p, n))
+        except OSError:
+            pass
+' "$REUSE_CACHE" < "$_cw" 2>/dev/null || printf 'run-gates: reuse — the cache at %s was not written\n' "$REUSE_CACHE" >&2
+  fi
+  unset _cw _cw_remote _crc _ck _csec _cr _cwl _l
+fi
 # THE BREACH IS READ HERE, from the marker and not from `fails`. A killed leg writes no `.rc`, so
 # whether `fails` moved at all is a RACE between the watcher's kill and the reader's report -- both
 # outcomes were reproduced. The marker is the only fact that is true on every path, so the durable
@@ -4722,6 +4950,10 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
     # a whole one. The READER of this field is TOOL-dUnstalledConvoy-27; written without
     # that reader it is an inert byte, which is what a spec audit caught rev-2 shipping.
     printf 'selftests\t%s\n' "$SELFTESTS_STAMP"
+    # HOW MANY LEGS THIS RUN REUSED, always 0 under the precondition above. Written so the push
+    # boundary's predicate 9 can refuse a record that says otherwise, however it was written
+    # (TOOL-aSparedSpawn-13 S8): a reused verdict never satisfies the full-green predicate.
+    printf 'reused\t%s\n' "$reuses"
     printf 'run_id\t%s\n' "$RUNID"
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   } > "$gd/gate-full-green.tmp" 2>/dev/null \
@@ -4767,6 +4999,7 @@ if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ "$ATTR_LANDABLE" = 1 ] \
     printf 'base\t%s\n' "$ATTR_RSHA"
     printf 'max_age\t%s\n' "$ATTR_MAX_AGE"
     printf 'legs\t%s\n' "$ATTR_LAND_LEGS"
+    printf 'reused\t%s\n' "$reuses"   # predicate 9's field, as on the full green (TOOL-aSparedSpawn-13 S8)
     printf 'run_id\t%s\n' "$RUNID"
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   } > "$gd/gate-inherited-green.tmp" 2>/dev/null \

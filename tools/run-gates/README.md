@@ -168,22 +168,64 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 
 ## Reuse, and the baseline a guard diffs against
 
-`GATE_REUSE=1` skips a leg whose inputs are byte-identical to a recorded green: not declared
-`impure`, its ledger row says `ok`, and the row's input key equals the one computed this run. Any
-missing term means execute — every failure mode is "did more work", never "checked less". It is
-OPT-IN because an advisory input may cause less work only on a run that is not authoritative, and
-`.githooks/pre-push` never sets it. A run that reused anything cannot stamp `gate-full-green`.
+`GATE_REUSE=1` skips a leg whose inputs are byte-identical to a recorded green: it carries no legacy
+`impure`, a `remote` leg has an observed remote, its row is not quarantined, the cache in the git
+common dir holds an `ok` under the key computed this run, it has not been reused on 10 runs in a row,
+and the sample did not draw it. Any missing term means execute — every failure mode is "did more
+work", never "checked less". It is OPT-IN because an advisory input may cause less work only on a run
+that is not authoritative. An authoritative run reuses only a `remote` or `history` leg, at the exact
+pushed sha and observed tip, and is then scoped: `.githooks/pre-push` sets `GATE_REUSE_PUSH` to
+`<pushed sha> <tip> <advertisement digest>` on a SCOPED decision whose `ls-remote` probe agreed with
+the remote sha git handed it, and on no other, and it clears both `GATE_REUSE` and an inherited
+`GATE_REUSE_PUSH`. Under `GATE_FULL` nothing is reused at all, whatever is set. A run that reused
+anything cannot stamp `gate-full-green` or the inherited green, and every stamp carries a `reused`
+field the push boundary forces the full bar over when it is not `0`.
 
-The key takes the leg's argv, the baseline, and its inputs: for a guarded leg the `git ls-files -s`
-of its guards plus the walk rows under them, each `<XY> <blob-or-dash> <path>`, the blob hashed at run
-start from one `--untracked-files=all` walk; for an unguarded leg the working-tree fingerprint. Every
-key also takes `REUSE_SCHEMA`, a runner constant bumped when what a reusable `ok` means changes, and
-one digest per run of bash, the MSYS or Cygwin runtime, python and its UTF-8 mode, `git version` and
-its `core.autocrlf`/`core.eol`, the resolved location of every tool a leg names, and the exported
-`GATE_* GOV_* *_PY GIT_* PYTHON* LC_* LANG TZ PATH` variables, less `GATE_REUSE` and
-`GATE_TURNSTILE_HELD`. It does NOT see a tool other than git upgraded in place at the same path, or a
-variable outside that set. A failed walk or digest makes the key a dash, which never matches. The
-header's `reuse_schema` key says which schema a run keyed under.
+**What a leg reads beyond its inputs** is declared on its manifest row as `reads`, an object mapping
+a class to a one-line reason. The classes are closed, and each puts one thing into the key:
+
+| class | the key takes | for a leg that |
+|---|---|---|
+| `base` | the resolved baseline and `GATE_PUSH_BASE` | diffs against a merge-base or the push base |
+| `history` | the `HEAD` sha | reads commits, so a commit moves it with the tree unchanged |
+| `clock` | the UTC day (`GATE_REUSE_DAY` pins it) | compares against today |
+| `remote` | `HEAD`, the default branch's advertised tip and the digest of the whole `ls-remote --heads` advertisement | observes the remote |
+
+A leg that declares none is keyed on its inputs alone, so a landing that moves the baseline no longer
+misses it. A legacy `impure`, a class outside the four, or a `reads` that is no object is read as
+`remote` and never reused, so an adopter's `impure` keeps its meaning; govkit writes a descriptor's
+`reads` into an adopter's row as that legacy `impure`. A `remote` leg is keyed only when the runner
+probes the remote (one bounded `ls-remote --heads`, on a clean tree, when such a leg is still to run)
+and caches its verdict only when a second probe after the legs end reads the same advertisement.
+
+**The cache** is one file per key under `<git-common-dir>/gate-cache/<key[0:2]>/<key>`, holding `ok`,
+seconds, run id, `HEAD` and an epoch, so every worktree of a clone shares it and nothing pushes it. It
+is written only by a leg that EXECUTED `ok` on its first attempt on a tree that was clean when the
+run started and did not move; a reused leg writes nothing, so a wrong entry cannot carry itself
+forward. Every write and the prune of entries older than 30 days run in one python process at run
+end. `gate-ledger.tsv` stays the dispatch-duration hint and is no longer read for reuse.
+
+**The soundness sample.** On a reusing run each reusable leg is drawn for execution at
+`GATE_REUSE_SAMPLE` (default `0.25`, uniform per leg, seeded from the run id so a draw replays). A
+drawn leg that executes green agrees. One that reds against its cached `ok` has redded the run and
+runs once more: red again prints `cache disagreement · <leg> · <key>` and erases the entry, red then
+green prints `nondeterministic · <leg>`, and either quarantines the leg (`quarantine.<name key>` in
+the cache dir) until its manifest row changes. A leg reused on 10 consecutive runs executes on the
+next whatever the draw (`age.<name key>`), so a wrong entry lives at most that long.
+
+The key takes the leg's argv, its manifest row (classes and row hash), the declared reads above, and
+its inputs: for a guarded leg the `git ls-files -s` of its guards plus the walk rows under them, each
+`<XY> <blob-or-dash> <path>`, the blob hashed at run start from one `--untracked-files=all` walk; for
+an unguarded leg the working-tree fingerprint. Every key also takes `REUSE_SCHEMA`, a runner constant
+bumped when what a reusable `ok` means changes, and one digest per run of bash, the MSYS or Cygwin
+runtime, python and its UTF-8 mode, `git version` and its `core.autocrlf`/`core.eol`, the resolved
+location of every tool a leg names, and the exported `GATE_* GOV_* *_PY GIT_* PYTHON* LC_* LANG TZ
+PATH` variables, less every `GATE_REUSE*` knob, `GATE_TURNSTILE_HELD`, `GATE_RUN_ID`, and `GATE_BASE`
+and `GATE_PUSH_BASE`, which enter only a `base` leg's key. It does NOT see a tool other than git
+upgraded in place at the same path, a variable outside that set, or a read no class names, which is
+what the sample exists to catch. A failed walk or digest makes the key a dash, which never matches.
+The header's `reuse_schema`, `reuse` (`off`, `env` or `push`) and `reuse_sample` keys say how a run
+keyed and drew.
 
 The baseline a guard diffs against is the MERGE-BASE with the default branch, so a branch is graded
 on what it changed rather than on everything that landed while it was open — used only where the
