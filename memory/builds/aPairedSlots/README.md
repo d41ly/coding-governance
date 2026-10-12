@@ -97,11 +97,11 @@ ids TOOL-aPairedSlots-15
 | [TOOL-aPairedSlots-12 — the A/B instrument reads the run record's verdict by key, and the rule check proves an arm from its bar rows](spec/2026-10-12-spec-TOOL-aPairedSlots-12.md) | 8 | 1 | CLOSED | rev-1 | 2026-10-12 |
 | [TOOL-aPairedSlots-13 — the two-bar check reads the verdict by key and grades its rows at their declared width](spec/2026-10-12-spec-TOOL-aPairedSlots-13.md) | 8 | 1 | CLOSED | rev-1 | 2026-10-12 |
 | [TOOL-aPairedSlots-11 — the drift history is created with its header already in it](spec/2026-10-12-spec-TOOL-aPairedSlots-11.md) | 9 | 2 | INPROGRESS | rev-1 | 2026-10-12 |
-| [TOOL-aPairedSlots-14 — the two-bar check's overlap guard reads the slots the bars were admitted to](spec/2026-10-12-spec-TOOL-aPairedSlots-14.md) | 9 | 1 | INPROGRESS | rev-1 | 2026-10-12 |
+| [TOOL-aPairedSlots-14 — the two-bar check's overlap guard reads the slots the bars were admitted to](spec/2026-10-12-spec-TOOL-aPairedSlots-14.md) | 9 | 1 | CLOSED | rev-1 | 2026-10-12 |
 | [TOOL-aPairedSlots-15 — the closing review's mediums and lows, batched](spec/2026-10-12-spec-TOOL-aPairedSlots-15.md) | 9 | 2 | INPROGRESS | rev-1 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 20 bound to this build, across 4 record folder(s).
+Records: 21 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

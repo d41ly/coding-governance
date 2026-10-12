@@ -84,6 +84,31 @@ cmd_run() { # root
   cmd_grade "$root"
 }
 
+read_record_key() { awk -F'\t' -v k="$2" '$1 == k {print $2; exit}' "$1" 2>/dev/null; } # file key
+read_newest_record() { local gd; gd=$(read_git_dir "$1") && ls -td "$gd/gate-run"/*/ 2>/dev/null | head -1; }
+
+# THE ADMITTED INTERVAL, NOT THE INVOCATION (TOOL-aPairedSlots-14). Timestamps taken around the runner
+# include its queue wait, and two bars started together overlap by those even when the turnstile ran
+# them one after the other. The run records say what the turnstile did: a serialized second bar
+# re-claims slot 1, and a bar at one slot writes no `slot` key, so slots 1 and 2 arise only from two
+# holders at once; each `acquired` before the other's `ended` adds the order. A queued second bar is
+# not refused: the head-only claim makes a genuinely concurrent one wait a tick.
+check_overlap() { # record-dir record-dir -> rc 0 when the two held slots 1 and 2 at once
+  local a=$1 b=$2 sa sb aa ab ea eb
+  sa=$(read_record_key "${a%/}/header" slot); sb=$(read_record_key "${b%/}/header" slot)
+  aa=$(read_record_key "${a%/}/header" acquired); ab=$(read_record_key "${b%/}/header" acquired)
+  ea=$(read_record_key "${a%/}/verdict" ended); eb=$(read_record_key "${b%/}/verdict" ended)
+  if [ "$(printf '%s\n%s\n' "$sa" "$sb" | LC_ALL=C sort | tr '\n' ' ')" != "1 2 " ]; then
+    echo "the concurrent pair held slots '${sa:--}' and '${sb:--}', not 1 and 2, so it shows nothing about two writers"
+    return 1
+  fi
+  if [ -z "$aa" ] || [ -z "$ab" ] || [ -z "$ea" ] || [ -z "$eb" ] || ! [[ "$aa" < "$eb" ]] || ! [[ "$ab" < "$ea" ]]; then
+    echo "the concurrent pair was not admitted at once (acquired ${aa:--} and ${ab:--}, ended ${ea:--} and ${eb:--})"
+    return 1
+  fi
+  echo "the concurrent pair held slots 1 and 2 at once (acquired $aa and $ab, ended $ea and $eb)"
+}
+
 # Every bar: one whole run-log line, a run record with a verdict, and ledger rows for its legs. A row
 # is ten fields. The earlier copy of this check wrote eleven, the verdict file's `ended` and its time
 # in two columns, and such a row is read with those two joined; any other width is named, never graded
@@ -110,9 +135,8 @@ cmd_grade() { # root
   done
   check_rows "$root/check.tsv" || bad=1
   # Both concurrent bars must actually have overlapped, or the pair proves nothing about two writers.
-  if [ "$(awk -F'\t' '$1=="concurrent" {print $3, $4}' "$root/check.tsv" | awk 'NR==1{s1=$1;e1=$2} NR==2{s2=$1;e2=$2} END{print (s1<e2 && s2<e1) ? "yes" : "no"}')" != yes ]; then
-    echo "the concurrent pair did not overlap, so it shows nothing about two writers"; bad=1
-  fi
+  # Each worktree's newest run record is its concurrent run's.
+  check_overlap "$(read_newest_record "$root/w1")" "$(read_newest_record "$root/w2")" || bad=1
   [ "$bad" = 0 ] && echo "TWO-BAR CHECK PASS" || echo "TWO-BAR CHECK FAIL"
   return "$bad"
 }

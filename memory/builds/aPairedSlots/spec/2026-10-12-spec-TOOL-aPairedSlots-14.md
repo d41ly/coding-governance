@@ -1,11 +1,12 @@
 # TOOL-aPairedSlots-14 — the two-bar check's overlap guard reads the slots the bars were admitted to
 
-**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-1 · base d3354597 · streams tooling · order 9
+**Status:** CLOSED · rev-1 · 2026-10-12 · node a · Tier-1 · base d3354597 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-build-TOOL-aPairedSlots-14-1-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aPairedSlots-14-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md) | journal | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 TOOL-aPairedSlots-11 TOOL-aPairedSlots-12 TOOL-aPairedSlots-13 TOOL-aPairedSlots-15 |
 
 <!-- /gen:spec-records -->
