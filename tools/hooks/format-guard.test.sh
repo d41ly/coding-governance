@@ -16,7 +16,7 @@
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 HOOK="$HERE/format-guard.js"
-ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "format-guard.test: not inside a git repository"; exit 2; }
+ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "format-guard.test: not inside a git repository"; exit 2; }
 command -v node >/dev/null 2>&1 || { echo "format-guard.test: node is not on PATH"; exit 2; }
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 pass=0; fail=0

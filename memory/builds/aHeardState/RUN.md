@@ -110,3 +110,5 @@ base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 2026-10-12T22:11:56Z dispatch · item 53d686b2 TOOL-aHeardState-8 · reason tools/hooks/agent-cap.js tools/hooks/scratch-guard.js tools/hooks/format-guard.js tools/runlog/runlog_lib.py tools/runlog/README.md tools/runlog/adopt-runlog.sh tools/runlog/extract.py tools/runlog/model.py tools/runlog/record.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/prose.py
 
 2026-10-12T22:14:46Z dispatch · item 5742dae9 TOOL-aHeardState-3 · reason tools/run-gates/selftest-budgets.txt
+
+2026-10-12T22:44:49Z dispatch · item 46b6e15a TOOL-aHeardState-8 · reason tools/hooks/format-guard.test.sh memory/builds/aHeardState/spec/2026-10-13-spec-TOOL-aHeardState-8.md
