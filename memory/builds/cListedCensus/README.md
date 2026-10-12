@@ -45,18 +45,18 @@ none
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-cListedCensus-1` | INPROGRESS | the scan's population is `git ls-files -z` filtered to a `.ps1` suffix in any case; a dead probe and an empty population refuse with exit 2 |
+| 1 | `TOOL-cListedCensus-1` | CLOSED | the scan's population is `git ls-files -z` filtered to a `.ps1` suffix in any case; a dead probe and an empty population refuse with exit 2 |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node c · opened 2026-10-12 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node c · opened 2026-10-12 · streams tooling
 ids TOOL-cListedCensus-1 TOOL-cListedCensus-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-cListedCensus-1 — ps-hygiene grades the tracked `.ps1` files, and refuses a population it could not derive](spec/2026-10-12-spec-TOOL-cListedCensus-1.md) | — | 2 | INPROGRESS | rev-2 | 2026-10-13 |
+| [TOOL-cListedCensus-1 — ps-hygiene grades the tracked `.ps1` files, and refuses a population it could not derive](spec/2026-10-12-spec-TOOL-cListedCensus-1.md) | — | 2 | CLOSED | rev-2 | 2026-10-13 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 4 record folder(s).

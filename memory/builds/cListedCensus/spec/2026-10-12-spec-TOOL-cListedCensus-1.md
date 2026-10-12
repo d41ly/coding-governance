@@ -1,6 +1,6 @@
 # TOOL-cListedCensus-1 — ps-hygiene grades the tracked `.ps1` files, and refuses a population it could not derive
 
-**Status:** INPROGRESS · rev-2 · 2026-10-13 · node c · Tier-2 · base 6e8f8b1d · streams tooling
+**Status:** CLOSED · rev-2 · 2026-10-13 · node c · Tier-2 · base 6e8f8b1d · streams tooling
 
 <!-- gen:spec-records -->
 
