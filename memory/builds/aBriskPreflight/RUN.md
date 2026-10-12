@@ -109,3 +109,7 @@ base: 271a90045723817f694de4d22c56f88dbcd0063e
 2026-10-12T16:35:24Z brief · item TOOL-aBriskPreflight-11 · reason 2326d74e6092 memory/builds/aBriskPreflight/prompts/2026-10-12-prompt-TOOL-aBriskPreflight-11-build-brief.md
 
 2026-10-12T16:55:48Z rescope · item add TOOL-aBriskPreflight-19 · reason after the owner's 'land': three legs red on other builds' offenders at origin/main read OWN or MIXED here (install-prefix and both lexicon legs by comparator, harness arms by printed waivers), so the push boundary refuses; draining them is a blocker between the run and its own landing, adopted under protocol section 11
+
+2026-10-12T17:19:48Z dispatch · item ef43b17f TOOL-aBriskPreflight-19 · reason .githooks/pre-push.test.sh tools/unattended/unattended.test.sh memory/project/unarmed-branches.txt memory/builds/aBriskPreflight/spec/2026-10-12-spec-TOOL-aBriskPreflight-19.md memory/builds/aBriskPreflight/build/2026-10-12-build-TOOL-aBriskPreflight-19-acceptance-ledger.md memory/builds/aBriskPreflight/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
+
+2026-10-12T17:20:18Z brief · item TOOL-aBriskPreflight-19 · reason 1e1294bf7ab4 memory/builds/aBriskPreflight/prompts/2026-10-12-prompt-TOOL-aBriskPreflight-19-build-brief.md

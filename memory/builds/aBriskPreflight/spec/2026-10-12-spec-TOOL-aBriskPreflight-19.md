@@ -1,11 +1,12 @@
 # TOOL-aBriskPreflight-19 — the three inherited reds that read as this build's own are drained, so its landing push can land
 
-**Status:** SPECCED · rev-1 · 2026-10-12 · node a · Tier-1 · base 37200355 · streams tooling · order 7
+**Status:** CLOSED · rev-1 · 2026-10-12 · node a · Tier-1 · base 37200355 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-build-TOOL-aBriskPreflight-19-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aBriskPreflight-19-acceptance-ledger.md) | journal | — |
 | [2026-10-12-prompt-TOOL-aBriskPreflight-19-build-brief.md](../prompts/2026-10-12-prompt-TOOL-aBriskPreflight-19-build-brief.md) | research | — |
 
 <!-- /gen:spec-records -->

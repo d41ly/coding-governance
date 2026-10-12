@@ -1988,6 +1988,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "build_pfx_fixture",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "build_placement_models",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -5249,11 +5254,6 @@
     },
     {
       "id": "decide",
-      "kind": "function",
-      "file": ".githooks/pre-push.test.sh"
-    },
-    {
-      "id": "decide_on",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
     },
@@ -10021,21 +10021,6 @@
       "id": "pedit",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
-    },
-    {
-      "id": "pfx_decide",
-      "kind": "function",
-      "file": ".githooks/pre-push.test.sh"
-    },
-    {
-      "id": "pfx_fixture",
-      "kind": "function",
-      "file": ".githooks/pre-push.test.sh"
-    },
-    {
-      "id": "pfx_stamp",
-      "kind": "function",
-      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "phase_of",
@@ -16463,6 +16448,11 @@
       "file": "tools/workflows/check_by_design_parity.py"
     },
     {
+      "id": "run_pfx_push",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "run_pk_gate",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -16536,6 +16526,11 @@
       "id": "run_push",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
+    },
+    {
+      "id": "run_push_selftests",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "run_raw",
@@ -20751,6 +20746,11 @@
       "id": "write_pause_row",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "write_pfx_stamp",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "write_pk_conf",
