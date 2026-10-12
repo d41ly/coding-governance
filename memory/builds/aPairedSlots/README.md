@@ -22,7 +22,7 @@ the mandate, recorded under [prompts/](prompts/2026-10-11-prompt-TOOL-aPairedSlo
 
 ## Expected improvements
 
-- A doc-only bar never waits behind a non-doc bar.
+- A doc-only bar never waits behind another worktree's bar.
 - Where the A/B shows it pays, two non-doc bars run at once and the queue halves.
 - The slot count is a declared knob with a recorded measurement behind its value.
 - Two concurrent bars on one repository lose no ledger row, run-log line or run record.
@@ -101,7 +101,7 @@ ids TOOL-aPairedSlots-15
 | [TOOL-aPairedSlots-15 — the closing review's mediums and lows, batched](spec/2026-10-12-spec-TOOL-aPairedSlots-15.md) | 9 | 2 | CLOSED | rev-2 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 23 bound to this build, across 4 record folder(s).
+Records: 25 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

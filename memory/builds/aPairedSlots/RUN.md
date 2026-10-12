@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: yes
+keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: b6cd9fa6bd8bc416729b6369740cb3e938e205ef
 phase: VERIFYING
@@ -115,3 +117,21 @@ base: 6dc23b58fe360c0e15168544cf4b03af6550a7ad
 2026-10-12T02:02:55Z dispatch · item 3a28efb3 TOOL-aPairedSlots-15 · reason memory/builds/aPairedSlots/README.md memory/builds/aPairedSlots/build/2026-10-11-build-TOOL-aPairedSlots-5-shared-path-audit.md memory/builds/aPairedSlots/build/2026-10-12-build-TOOL-aPairedSlots-15-1-acceptance-ledger.md memory/builds/aPairedSlots/spec/2026-10-11-spec-TOOL-aPairedSlots-7.md memory/builds/aPairedSlots/spec/2026-10-12-spec-TOOL-aPairedSlots-15.md memory/gotchas/INDEX.md memory/gotchas/allocation-knob-without-a-ceiling.md memory/gotchas/beacon-published-before-it-is-complete.md memory/gotchas/floor-left-below-the-arms-it-guards.md memory/gotchas/invariant-held-on-one-admission-path.md memory/gotchas/overlap-judged-from-the-invocation-interval.md memory/gotchas/predicate-bounded-by-its-own-count.md memory/gotchas/record-file-read-by-line-position.md memory/guides/SESSION-KICKOFF.md memory/map/features/run-gates-turnstile.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json tools/run-gates/README.md tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.turnstile.test.sh
 
 2026-10-12T02:09:45Z dispatch · item b4c4b2bb TOOL-aPairedSlots-11 · reason memory/LIVE.md memory/builds/aPairedSlots/README.md memory/builds/aPairedSlots/build/2026-10-12-build-TOOL-aPairedSlots-11-1-acceptance-ledger.md memory/builds/aPairedSlots/spec/2026-10-12-spec-TOOL-aPairedSlots-11.md memory/map/generated/symbols.json tools/drift-audit/drift_report.py tools/drift-audit/selftest.py tools/run-gates/run-gates.turnstile.test.sh
+
+2026-10-12T05:31:06Z brief · item TOOL-aPairedSlots-1 · reason 9d0368c759c7 memory/builds/aPairedSlots/prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md
+
+2026-10-12T05:31:09Z brief · item TOOL-aPairedSlots-2 · reason 9d0368c759c7 memory/builds/aPairedSlots/prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md
+
+2026-10-12T05:31:13Z brief · item TOOL-aPairedSlots-3 · reason 9d0368c759c7 memory/builds/aPairedSlots/prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md
+
+2026-10-12T05:31:17Z brief · item TOOL-aPairedSlots-4 · reason 9d0368c759c7 memory/builds/aPairedSlots/prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md
+
+2026-10-12T05:31:21Z brief · item TOOL-aPairedSlots-5 · reason 9d0368c759c7 memory/builds/aPairedSlots/prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md
+
+2026-10-12T05:31:25Z brief · item TOOL-aPairedSlots-6 · reason 9d0368c759c7 memory/builds/aPairedSlots/prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md
+
+2026-10-12T05:31:30Z brief · item TOOL-aPairedSlots-7 · reason 9d0368c759c7 memory/builds/aPairedSlots/prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md
+
+2026-10-12T05:31:34Z brief · item TOOL-aPairedSlots-8 · reason 9d0368c759c7 memory/builds/aPairedSlots/prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md
+
+2026-10-12T05:31:38Z brief · item TOOL-aPairedSlots-9 · reason 9d0368c759c7 memory/builds/aPairedSlots/prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md
