@@ -9,13 +9,23 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-aTrimmedHook-8=OPEN TOOL-aTrimmedHook-17=OPEN
+units-at-landing: KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-3 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-4 TOOL-aTrimmedHook-6 TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-7 TOOL-aTrimmedHook-16
+hold-run: 
+hold-streak: 1 · at a6cd3366
+resume-owed: none · owner
+held-at: 2026-10-12T21:02:05Z
+hold-reason: local main holds the merge with two other builds' unpushed hand-offs, so the push that settles this run is the owner's to order
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
 gates-run: unattended-179182660378324811621-2181682 8610698e
 parked-surfaced: yes, 1 surfaced
 keepalive-reaped: yes
-refreshed-at: 9a8777b8b502bce48249884e21e5830abadf3e26 · park · 56 touching
+refreshed-at: 6e8f8b1da4dc036b7fce23555b78fb4b5db0e60c · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: f492cf2655c0e607ab5705e8c863fd9d73e29008
-phase: VERIFYING
+witness: a6cd33665160b57b93fb27469c48434fa06e040d
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/angry-engelbart-f0995c
@@ -87,3 +97,9 @@ base: 2785323db4e72b8ae2f26660cc3947165a6258fc
 2026-10-12T16:47:50Z dispatch · item 59ae2687 TOOL-aTrimmedHook-16 · reason .claude/skills/unattended/SKILL.md .githooks/pre-push.test.sh memory/HYGIENE.md memory/TEMPLATE-SPEC.md memory/builds/aTrimmedHook/prompts/2026-10-12-prompt-TOOL-aTrimmedHook-16-1-build-brief.md memory/builds/aTrimmedHook/spec/2026-10-12-spec-TOOL-aTrimmedHook-16.md memory/guides/ANNOTATION-STYLE.md memory/guides/BUILD-METHOD.md memory/guides/PLAYBOOK-TEMPLATE.md memory/guides/SESSION-KICKOFF.md memory/guides/UNATTENDED-ASKS.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-VERBS.md memory/map/generated/symbols.json memory/project/unarmed-branches.txt skills/session-kickoff/manifest-check.sh tools/memory-tree/ANNOTATION-STYLE.template.md tools/memory-tree/BUILD-METHOD.template.md tools/memory-tree/HYGIENE.template.md tools/memory-tree/SPEC-TEMPLATE.template.md tools/memory-tree/check-memory-hygiene.sh tools/run-gates/run-gates.evidence.test.sh tools/unattended/ASKS.template.md tools/unattended/PLAYBOOK-TEMPLATE.template.md tools/unattended/PROTOCOL.template.md tools/unattended/README.md tools/unattended/SKILL.template.md tools/unattended/STOPS.template.md tools/unattended/VERBS.template.md tools/unattended/check-brief-recorded.sh tools/unattended/check-pass-order.sh tools/unattended/check-unattended.sh tools/unattended/fixture-record-one.template.md tools/unattended/fixture-record-two.template.md tools/unattended/fixture-records/tools~unattended~fixture-pieces~one~piece.md.md tools/unattended/fixture-records/tools~unattended~fixture-pieces~two~piece.md.md tools/unattended/gate-guard.js tools/unattended/playbook.fixture.md tools/unattended/playbook.fixture.template.md tools/unattended/run-lease.js tools/unattended/stall-recorder.js tools/unattended/stop-guard.js tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/aTrimmedHook/build/2026-10-12-build-TOOL-aTrimmedHook-16-1-acceptance-ledger.md
 
 2026-10-12T16:47:57Z brief · item TOOL-aTrimmedHook-16 · reason 097e8dbd97a7 memory/builds/aTrimmedHook/prompts/2026-10-12-prompt-TOOL-aTrimmedHook-16-1-build-brief.md
+
+2026-10-12T21:00:43Z decision · item settling aTrimmedHook needs local main pushed: it sits merged at 725b97638 with the unpushed aPairedSlots and aPrimedIndex hand-offs · reason options: push local main through push-main.sh (pre-push bar, lands all three builds) then --settle; or a gates-green bar on the branch first, then owner-landing, push and settle; refused here because the push lands two other builds the mandate does not cover
+
+2026-10-12T21:02:17Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aTrimmedHook && bash tools/push-main.sh --land --slug aTrimmedHook && bash tools/unattended/unattended.sh --settle aTrimmedHook
+
+2026-10-12T21:02:17Z hold · item owner-decision · reason until owner · reaped 60c7e304 · resume none(owner)
