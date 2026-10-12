@@ -23,7 +23,7 @@ KIT_ROLES_VERSION = "1.2"
 #: Split from one string, because a quoted `"tools"` beside a quoted segment reads to the
 #: install-prefix ban as a kit path (TOOL-aOrientedCast-8 S14).
 FRONT_MATTER_KEYS = tuple("name description tools model maxTurns "
-                          "workflow reads writes rules returns agent".split())
+                          "workflow reads writes rules returns agent mandatory output".split())
 
 #: The closed `reads` vocabulary: `<family>:<field>`, a trailing `?` marking one optional.
 READ_KEYS = frozenset(

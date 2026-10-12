@@ -11063,6 +11063,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_roster",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "print_route_body",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"

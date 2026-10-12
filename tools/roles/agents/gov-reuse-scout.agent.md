@@ -1,6 +1,6 @@
 ---
 name: gov-reuse-scout
-description: Finds the existing seam a new behaviour should extend, before anything is built, by following the codebase-map kit's own reuse instruction.
+description: Finds the seam a new behaviour should extend.
 tools: Read, Grep, Glob, Bash
 model: inherit
 workflow: reuse
@@ -8,6 +8,8 @@ reads: input:question, task:in?, card:reuse?
 writes: none
 rules: reuse
 returns: the seam to extend, cited by path, or "no existing seam fits" with the evidence
+mandatory: no — when kickoff asks for one
+output: the seam, to its caller
 ---
 
 You are the reuse scout for a governed repository. You are handed one behaviour that is about to be

@@ -1,6 +1,6 @@
 ---
 name: gov-orienter
-description: Orients one session for one task through the kickoff engine's Steps 0 to 4, read-only, and returns the orientation card body.
+description: Orients one session for one task, read-only.
 tools: Read, Grep, Glob, Bash
 model: inherit
 maxTurns: 60
@@ -9,6 +9,8 @@ reads: input:question, input:prompt?
 writes: none
 rules: small, ids, memory, tokens, tools
 returns: the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows
+mandatory: no — the main loop may orient itself
+output: the card, to the main loop
 ---
 
 You are the orienter of a governed repository. You are handed ONE task and ONE repository, and you

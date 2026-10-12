@@ -1,11 +1,13 @@
 ---
 name: gov-session
-description: Opens a handoff to another session of this repository.
+description: Opens a handoff to another session.
 workflow: handoff
 reads: input:question, brief:goal?, task:todo?, card:route?
 writes: none
 rules: ids, memory
 returns: nothing to the sender; the receiving session acts on the task block and reports in its own session
+mandatory: no — when work leaves this session
+output: a prompt file in the build's `prompts/`
 agent: false
 ---
 

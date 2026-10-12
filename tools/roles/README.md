@@ -5,8 +5,8 @@ A governed session runs its LLM work through ten declared WORKFLOWS — `orient`
 `handoff`, `spec-write`, `spec-review`, `build`, `closing-review`, `gate-bar` and `bookkeeping` —
 each driven by an agent ROLE, a harness, a program or the main loop. A role is an agent-definition
 file under `agents/`: a CONSTANT block its agent starts from, plus front matter saying which
-workflow it serves, which inputs it reads, which path class it may write and which sections of the
-governing doc it needs. The workflow table, `workflows.toml`, says which roles drive each workflow,
+workflow it serves, which inputs it reads, which path class it may write, which sections of the
+governing doc it needs, when it is mandatory and where its output goes. The workflow table, `workflows.toml`, says which roles drive each workflow,
 which harness stage spawns as which role, and what refuses a bypass. The library, `roles_lib.py`, is
 the one reader of all of it and the one composition of a role with its house overlay
 (`render_role`): every route that hands a role to an agent goes through it, so a role reaches an
@@ -19,6 +19,8 @@ block is the kit's and is overwritten on update; the overlay is yours and is kep
 overlay is appended to the base block under a `## House rules` heading when the role is rendered;
 an empty or absent one adds nothing. An overlay carries no `#` or `##` heading of its own and no
 render token but `{{MEMORY_ROOT}}`. Its size is printed on every check run and never graded.
+The `mandatory` and `output` keys ride the base file, as `writes` does, so an overlay cannot change
+them.
 
 A base block POINTS at the document that owns a rule — the spec format, the build method, the
 review protocol, all under `{{MEMORY_ROOT}}` — and never restates it. Stage protocol (return
@@ -62,6 +64,17 @@ union of the `stages` tables of every workflow whose harness is that script, as 
 workflow, as the next section states.
 Exit 0, 1 on a refusal, 2 on usage or an unarmed tree; the script's header states what it does not
 check.
+
+`python handoff.py roster` prints the charter's roles section, one line per role, every role
+included, `agent: false` too (TOOL-aOrientedCast-17):
+``- `<slot>`: <description> <when>. Output: <output>.``, where `<when>` is `Optional` for a
+`mandatory` of `no`, `Optional, <text>` for `no — <text>`, and `Mandatory <value>` otherwise, and
+`{{MEMORY_ROOT}}` is the conf's value. The order is the workflow table's: by the file position of
+the entry a role's `workflow` names, then by its place in that entry's `roles`, with a role naming
+no entry last. A line past 200 characters, the playbook's one-line rule limit, refuses naming the
+role and its length, as do a missing key and an empty catalogue, with nothing printed: exit 1. No
+repository or no `MEMORY_ROOT` exits 2. It reads no charter, since on a first install the playbook
+render writes the charter; the playbook kit's derived roster placeholder is its consumer.
 
 ## The effort policy
 
@@ -211,8 +224,10 @@ invoking `/build`.
 the role files, the overlays and the workflow table against each other in both directions, and every
 `rules` tag against the section 1 rule tags of the governing doc, which it locates through the
 memory-tree conf's `CHARTER` key; a body or an overlay spelling a protocol's file name reds as R5 or
-R10. It prints one line per defect naming the file and the rule (R0 to R12, listed in its header
-with what it does not check), then a summary of every count it graded, the charter's shape among
+R10. A role called mandatory under a workflow whose `enforced-by` names no hook script, without an
+`unenforced — <why>` clause, reds as R13, and a writer role whose `output` lacks its class's folder
+as R14. It prints one line per defect naming the file and the rule (the rules are listed in its
+header, with what it does not check), then a summary of every count it graded, the charter's shape among
 them. Exit 0 clean, 1 on a defect or an empty catalogue (DEAD PROBE), 2 when the conf or its
 `CHARTER` is missing, or the doc is no charter this kit reads. `--write` re-renders the region below from the table and the front matter, and nothing
 else; the check compares the two on every run.

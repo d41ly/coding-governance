@@ -13,7 +13,8 @@
 # The arms: a stage heading naming a workflow at the wrong stage; a catalogue workflow no heading
 # names; a token surviving the substitution; a byte appended to a rendered agent type; an unknown
 # argument; the renderer's task part sent to the hooks kit's spawn guard (arm 6, which SKIPs out loud
-# without that kit or node); an `export` conf line with a trailing comment (arm 7). Every arm is a
+# without that kit or node); an `export` conf line with a trailing comment (arm 7); the roster verb's
+# one line per role and its refusal of a line past 200 characters (arm 8). Every arm is a
 # self-contained block below the prologue, so a slice of the prologue and one
 # block runs that arm alone.
 #
@@ -47,7 +48,8 @@ TMP_ROOT=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP_ROOT"' EXIT
 # 10, then +3 for arm 7 (TOOL-aOrientedCast-15). Arm 6 is NOT in the floor: it SKIPs out loud on a
 # host with no hooks kit or no node, and a skip must not red the floor.
-FLOOR_ASSERTIONS=13
+# +3 for arm 8 (TOOL-aOrientedCast-17).
+FLOOR_ASSERTIONS=16
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""
@@ -149,6 +151,21 @@ check_arm "arm 7 ...the rendered Skill carries no comment" \
    "$([ -f "$FX/.claude/skills/build/SKILL.md" ] && ! grep -q '# note' "$FX/.claude/skills/build/SKILL.md" && echo 1 || echo 0)"
 check_arm "arm 7 ...and the Skill and every agent type name the root the plain conf rendered, byte for byte" \
    "$(diff -r -q "$TMP_ROOT/a7/skills" "$FX/.claude/skills" >/dev/null && diff -r -q "$TMP_ROOT/a7/agents" "$FX/.claude/agents" >/dev/null && echo 1 || echo 0)"
+
+# ---- arm 8: the roster verb prints one line per role, and refuses an over-long one --------------
+# TOOL-aOrientedCast-17 S8: `handoff.py roster` is what the playbook's derived placeholder reads, so
+# a line past the one-line region's 200 characters must refuse with nothing on stdout.
+build_fixture; check_arm "arm 8 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
+_nr=$(ls "$FX/$KREL/agents/"*.agent.md | wc -l | tr -d ' ')
+out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" roster 2>/dev/null); rc=$?
+_nl=$(printf '%s\n' "$out" | tr -d '\r' | grep -c '^- `[a-z-]*`: ')
+check_arm "arm 8 roster exits 0 with one backticked-slot line per role file" \
+   "$([ "$rc" = 0 ] && [ "$_nr" -gt 0 ] && [ "$_nl" = "$_nr" ] && [ "$(printf '%s\n' "$out" | wc -l | tr -d ' ')" = "$_nr" ] && echo 1 || echo 0)"
+_pad=$(printf '%200s' '' | tr ' ' 'x')
+sed -i "s/^description: \(.*\)\.\(\r\{0,1\}\)\$/description: \1$_pad.\2/" "$FX/$KREL/agents/gov-builder.agent.md"
+(cd "$FX" && "$PY" -B "$KREL/handoff.py" roster) > "$TMP_ROOT/a8.out" 2>"$TMP_ROOT/a8.err"; rc=$?
+check_arm "arm 8 a gov-builder line lengthened by 200 characters refuses, naming it, with stdout empty" \
+   "$([ "$rc" = 1 ] && grep -q 'gov-builder' "$TMP_ROOT/a8.err" && [ ! -s "$TMP_ROOT/a8.out" ] && echo 1 || echo 0)"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

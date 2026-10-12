@@ -14,7 +14,8 @@ touching nothing else, then grades as usual.
       carried section (`## Protocols`, `## Facts`), or a tag repeated in section 1 (exit 2)
   R1  zero role files or zero workflow entries, or a tagged charter no role's `rules` cites a tag
       of: a check that graded nothing is DEAD PROBE
-  R2  a front-matter defect: unknown, indented, repeated or missing key (`rules` may be empty);
+  R2  a front-matter defect: unknown, indented, repeated or missing key (`rules` may be empty;
+      `mandatory` and `output` may not, on any role);
       `name` not the file stem; `writes` outside its set; `agent` not true/false; `tools` or
       `model` absent on an agent role
   R3  a `reads` key outside the vocabulary, named twice, or `card:reuse` without `?`
@@ -44,13 +45,23 @@ touching nothing else, then grades as usual.
       and a `roles: note:` otherwise (TOOL-aOrientedCast-11); a name ending in `?` is optional, so
       a leg the manifest lacks is a `roles: note:` too, and a `?` alone names no leg
       (TOOL-aOrientedCast-13)
+  R13 a `mandatory` value carrying a token other than {{MEMORY_ROOT}}; or one calling its role
+      mandatory (anything but `no` or `no — <when>`) whose `workflow` entry's `enforced-by` holds no
+      hook entry, one whose first word is a `.js` file name, and that carries no
+      `unenforced — <why>` clause (TOOL-aOrientedCast-17)
+  R14 an `output` value carrying a token other than {{MEMORY_ROOT}}; or a `spec`, `review`,
+      `product` or `records` writer's `output` lacking its class's folder spelling from
+      WRITE_FOLDERS (TOOL-aOrientedCast-17)
 
 WHAT THIS DOES NOT CHECK, because a structural check reads as a semantic one to everybody who did not
 write it: the MEANING of a body; the truth of an `enforced-by` entry; a `tools:` name, which moves
 with the CLI; a command harness, which is graded for presence only; and whether the kit of a harness
 the tree does not hold should be installed, which is a `note` here and the wiring check's to report;
 whether a cited rule suits its role; and whether a bare tag exists in every v4.x seed an adopter may
-hold. An overlay's size is printed and never graded: it is the adopter's own text.
+hold. An overlay's size is printed and never graded: it is the adopter's own text. R13 reads a
+first word ending in `.js` as a hook by spelling convention alone, never asking whether that script
+exists, is wired or refuses an inline stand-in; R14 does not compare an `output` with where the role
+actually writes; and a `mandatory` value's when-clause is never tested for truth.
 """
 import pathlib
 import re
@@ -72,7 +83,19 @@ WORKFLOW_NAMES = ("orient", "research", "reuse", "handoff", "spec-write", "spec-
 WORKFLOW_KEYS = ("name", "stage", "driver", "harness", "roles", "stages", "enforced-by", "trigger")
 DRIVERS = ("agent", "workflow", "program", "main-loop")
 WRITES = ("none", "spec", "product", "review", "records")
-REQUIRED_ROLE_KEYS = ("name", "description", "workflow", "reads", "writes", "rules", "returns")
+REQUIRED_ROLE_KEYS = ("name", "description", "workflow", "reads", "writes", "rules", "returns",
+                      "mandatory", "output")
+#: Where each writer class's output lives, spelled as `output` must carry it (R14). The product
+#: class has no single folder, so its spelling is the conf key that declares its paths.
+WRITE_FOLDERS = {"spec": "{{MEMORY_ROOT}}/builds/<slug>/spec/",
+                 "review": "{{MEMORY_ROOT}}/builds/<slug>/reviews/",
+                 "product": "ROUTED_PATHS", "records": "{{MEMORY_ROOT}}/"}
+#: A `mandatory` value calling its role optional: exactly `no`, or `no — <when it is used>` (R13).
+NOT_MANDATORY_RE = re.compile(r"^no(?: — .+)?$")
+#: A mandatory value's own statement that no hook enforces it (R13).
+UNENFORCED_RE = re.compile(r"\bunenforced — \S")
+#: An `enforced-by` entry naming a hook: its first word is a `.js` script's file name (R13).
+HOOK_ENTRY_RE = re.compile(r"^[^\s/\\]+\.js(?=[\s,]|$)")
 #: A backticked path ending in `.md` in the carried Protocols body: a protocol's file.
 PROTOCOL_PATH_RE = re.compile(r"`([^`\s]*\.md)`")
 STAGE_KEY_RE = re.compile(r"^[a-z][A-Za-z]*$")
@@ -136,7 +159,7 @@ def check_roles(root, kit_dir, write=False):
     def add_defect(path, rule, what):
         defects.append("roles: %s: %s — %s" % (resolve_display_path(root, path), rule, what))
 
-    roles, n_reads, n_rules, cited = {}, 0, 0, set()
+    roles, n_reads, n_rules, n_outputs, n_mandatory, cited = {}, 0, 0, 0, 0, set()
     for p in sorted((kit_dir / "agents").glob("*.agent.md")):
         slot = p.name[:-len(".agent.md")]
         try:
@@ -191,6 +214,15 @@ def check_roles(root, kit_dir, write=False):
             add_defect(p, "R5", "body carries a '# ' or '## ' heading line")
         for token in sorted(set(lib.TOKEN_RE.findall(body)) - {lib.MEMORY_ROOT_TOKEN}):
             add_defect(p, "R5", "body carries the token %s; only %s renders" % (token, lib.MEMORY_ROOT_TOKEN))
+        output = keys.get("output", "")
+        for token in sorted(set(lib.TOKEN_RE.findall(output)) - {lib.MEMORY_ROOT_TOKEN}):
+            add_defect(p, "R14", "output carries the token %s; only %s renders" % (token, lib.MEMORY_ROOT_TOKEN))
+        folder = WRITE_FOLDERS.get(keys.get("writes"))
+        if folder:
+            n_outputs += 1
+            if folder not in output:
+                add_defect(p, "R14", "output '%s' does not name the %s class's folder, %s"
+                           % (output, keys["writes"], folder))
     files = {p.name[:-len(".agent.md")] for p in (kit_dir / "agents").glob("*.agent.md")}
     if not files:
         add_defect(kit_dir / "agents", "R1", "DEAD PROBE: no role file, so this check graded nothing")
@@ -274,6 +306,20 @@ def check_roles(root, kit_dir, write=False):
             add_defect(r["path"], "R7", "workflow '%s' names no entry in workflows.toml" % wf)
         elif wf and slot not in by_name[wf].get("roles", []):
             add_defect(r["path"], "R7", "the '%s' entry's roles does not list %s" % (wf, slot))
+        value = r["keys"].get("mandatory", "")
+        for token in sorted(set(lib.TOKEN_RE.findall(value)) - {lib.MEMORY_ROOT_TOKEN}):
+            add_defect(r["path"], "R13", "mandatory carries the token %s; only %s renders"
+                       % (token, lib.MEMORY_ROOT_TOKEN))
+        if not value or NOT_MANDATORY_RE.match(value) or wf not in by_name:
+            continue
+        n_mandatory += 1
+        enforced = by_name[wf].get("enforced-by")
+        hooked = isinstance(enforced, list) and any(
+            isinstance(e, str) and HOOK_ENTRY_RE.match(e) for e in enforced)
+        if not hooked and not UNENFORCED_RE.search(value):
+            add_defect(r["path"], "R13", "mandatory '%s' calls this role mandatory, and the '%s' entry's "
+                       "enforced-by names no hook; name the hook script there, or say 'unenforced — <why>' "
+                       "in the value" % (value, wf))
     for slot in sorted(files - listed_anywhere):
         add_defect(kit_dir / "agents" / (slot + ".agent.md"), "R8", "no workflow entry lists this role")
 
@@ -311,9 +357,11 @@ def check_roles(root, kit_dir, write=False):
     if problem:
         add_defect(readme, "R11", problem)
 
-    summary = ("roles: graded %d roles, %d overlays, %d workflows, %d reads keys, %d rule tags and %d "
-               "protocol file names against %s, a %s charter; overlay bytes %s; %d defect(s)" % (
-                   len(files), len(overlays), len(workflows), n_reads, n_rules, len(protocol_files), doc,
+    summary = ("roles: graded %d roles, %d overlays, %d workflows, %d reads keys, %d mandatory roles, "
+               "%d writer outputs, %d rule tags and %d protocol file names against %s, a %s charter; "
+               "overlay bytes %s; %d defect(s)" % (
+                   len(files), len(overlays), len(workflows), n_reads, n_mandatory, n_outputs, n_rules,
+                   len(protocol_files), doc,
                    "tagged" if charter["shape"] == "tagged" else "pre-tag",
                    ", ".join("%s=%d" % kv for kv in overlays.items()) or "none", len(defects)))
     return defects, notes, summary

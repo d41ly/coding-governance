@@ -1,6 +1,6 @@
 ---
 name: gov-synthesizer
-description: Merges the verified findings into one review report, one item per defect, with the verdict line the review protocol names.
+description: Merges verified findings into one report.
 tools: Read, Grep, Glob, Bash, Write
 model: inherit
 workflow: closing-review
@@ -8,6 +8,8 @@ reads: input:diff?, input:spec?
 writes: review
 rules: left-shift, risk, signal
 returns: the report's path and the items it adjudicated, each with its severity and the ids of the findings it covers
+mandatory: for every review's report
+output: a report in `{{MEMORY_ROOT}}/builds/<slug>/reviews/`
 ---
 
 You are the synthesizer of a review. You are handed the findings the skeptics confirmed, and you

@@ -6,6 +6,7 @@
     python handoff.py harness-args <harness>
     python handoff.py stage-efforts <workflow>
     python handoff.py check <file>
+    python handoff.py roster
 
 `render` composes the role as `roles_lib.render_role` renders it with a task block holding exactly
 the inputs the role's `reads` declares, in that order, then `roles_lib.render_charter_blocks` for
@@ -19,7 +20,12 @@ of the file. `check` re-derives both and compares the marker's `path` with the f
 `harness-args` prints, as one line of sorted JSON, the union of the `stages` tables of every
 workflow whose harness names that script. `stage-efforts` prints, the same way, the reasoning effort
 `house/policy.toml` resolves for every stage key of ONE workflow's `stages` table: a harness call
-passes it as its `efforts` argument (TOOL-aOrientedCast-10).
+passes it as its `efforts` argument (TOOL-aOrientedCast-10). `roster` prints the charter's roles
+section, one line per role, ``- `<slot>`: <description> <when>. Output: <output>.``, where `<when>`
+is `Optional` for a `mandatory` of `no`, `Optional, <text>` for `no — <text>`, else `Mandatory
+<value>`, `{{MEMORY_ROOT}}` is the conf's value, and the order is the workflow table's; a line past
+200 characters, a missing key or an empty catalogue refuses with nothing printed. It reads no
+charter (TOOL-aOrientedCast-17).
 
 Sources, by key family: `task:` the card's `## task` field, read by the kickoff checker's grammar
 (stated above its `check_card_task`, and ported here because that one is shell) under the labels
@@ -32,7 +38,7 @@ or a placeholder refuses and writes nothing; an optional one is named on the `No
 A relative path given to `--card`, `--out`, an `--input` or `check` is read from the repository root.
 
 Exit 0 on success, 1 on a refusal naming its key, file or role, 2 on usage or an unarmed
-environment: no repository, no MEMORY_ROOT, no CHARTER.
+environment: no repository, no MEMORY_ROOT, no CHARTER (`roster` needs no CHARTER).
 
 WHAT THIS DOES NOT CHECK: whether a card or brief value says anything true, since a value present,
 single and not a placeholder is copied verbatim; whether a rendered role is current against the
@@ -71,6 +77,9 @@ MARKER_RE = re.compile(r"^<!-- gov:handoff role=(\S+) build=(\S+) unit=(\S+) pat
 ROLE_HEAD_RE, TASK_HEAD_RE = re.compile(r"^## Role$", re.M), re.compile(r"^## Task$", re.M)
 PROMPT_HEAD_RE = re.compile(r"^## The prompt[ \t]*$", re.M)
 BRIEF_HEAD_RE = re.compile(r"^## The brief[ \t]*$", re.M)
+# ponytail: the playbook's one-line region refuses a rendered rule past 200 characters; spelled
+# again because a kit file may not import a sibling kit. A drift fails closed either way.
+ROSTER_LINE_MAX = 200
 
 
 def check_placeholder(value):
@@ -418,6 +427,52 @@ def print_stage_efforts(workflow):
                                         separators=(",", ":"), ensure_ascii=False) + "\n").encode("utf-8"))
 
 
+def print_roster(memory_root):
+    """Print one charter line per role, `- `<slot>`: <description> <when>. Output: <output>.`, in the
+    workflow table's order (TOOL-aOrientedCast-17); RolesError naming every role whose line is past
+    ROSTER_LINE_MAX or lacks a key, and on an empty catalogue, with nothing printed."""
+    from check_roles import NOT_MANDATORY_RE  # the checker's one reading of an optional role
+    roles = lib.load_roles(KIT_DIR)
+    if not roles:
+        raise lib.RolesError("%s holds no role file, so the roster is empty"
+                             % (KIT_DIR / "agents").as_posix())
+    index = {}
+    for i, w in enumerate(lib.load_workflows(KIT_DIR)):
+        index.setdefault(w.get("name"), (i, w.get("roles") if isinstance(w.get("roles"), list) else []))
+
+    def derive_rank(slot):
+        hit = index.get(roles[slot]["keys"].get("workflow"))
+        if hit is None:
+            return (1, 0, 0, slot)
+        listed = hit[1]
+        return (0, hit[0], listed.index(slot) if slot in listed else len(listed), slot)
+
+    lines, bad = [], []
+    for slot in sorted(roles, key=derive_rank):
+        keys = roles[slot]["keys"]
+        missing = [k for k in ("description", "mandatory", "output") if not keys.get(k)]
+        if missing:
+            bad.append("role %s has no %s, so its roster line cannot be composed"
+                       % (slot, " and no ".join(missing)))
+            continue
+        mandatory, output = keys["mandatory"].rstrip("."), keys["output"].rstrip(".")
+        if mandatory == "no":
+            when = "Optional"
+        elif NOT_MANDATORY_RE.match(mandatory):
+            when = "Optional, " + mandatory[len("no — "):]
+        else:
+            when = "Mandatory " + mandatory
+        line = ("- `%s`: %s %s. Output: %s." % (slot, keys["description"], when, output)).replace(
+            lib.MEMORY_ROOT_TOKEN, memory_root)
+        if len(line) > ROSTER_LINE_MAX:
+            bad.append("roster line for %s is %d characters, past the %d a one-line charter rule may "
+                       "take; shorten its description, mandatory or output" % (slot, len(line), ROSTER_LINE_MAX))
+        lines.append(line)
+    if bad:
+        raise lib.RolesError("\n".join(bad))
+    sys.stdout.buffer.write(("\n".join(lines) + "\n").encode("utf-8"))
+
+
 def main(argv):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(prog="handoff.py", description="Render, check and map role handoffs.")
@@ -435,6 +490,7 @@ def main(argv):
     sub.add_parser("harness-args").add_argument("harness")
     sub.add_parser("stage-efforts").add_argument("workflow")
     sub.add_parser("check").add_argument("file")
+    sub.add_parser("roster")
     a = ap.parse_args(argv)
     if a.verb in ("harness-args", "stage-efforts"):
         try:
@@ -478,11 +534,15 @@ def main(argv):
     try:
         if not memory_root:
             raise lib.RolesError("%s declares no MEMORY_ROOT, or is absent" % conf.as_posix())
-        charter_path = lib.resolve_charter_path(root)
+        # the roster reads no charter: on a first install the playbook render writes it
+        charter_path = None if a.verb == "roster" else lib.resolve_charter_path(root)
     except lib.RolesError as e:
         print("handoff: %s" % e, file=sys.stderr)
         return 2
     try:
+        if a.verb == "roster":
+            print_roster(memory_root)
+            return 0
         roles = lib.load_roles(KIT_DIR)
         if a.role not in roles:
             raise lib.RolesError("no role '%s' in the catalogue; its slots are %s" % (a.role, ", ".join(roles)))

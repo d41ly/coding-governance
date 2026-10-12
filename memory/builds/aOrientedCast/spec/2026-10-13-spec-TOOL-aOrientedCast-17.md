@@ -1,11 +1,12 @@
 # TOOL-aOrientedCast-17 — a role declares when it is mandatory and where its output goes, and the kit prints the charter's roster lines
 
-**Status:** INPROGRESS · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 17 · ratified 2026-10-13
+**Status:** CLOSED · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 17 · ratified 2026-10-13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-TOOL-aOrientedCast-17-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-aOrientedCast-17-1-acceptance-ledger.md) | journal | — |
 | [2026-10-13-prompt-TOOL-aOrientedCast-16-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-16-1-spec-brief.md) | journal | TOOL-aOrientedCast-16 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 PLAY-aOrientedCast-2 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-16-2-build-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-16-2-build-brief.md) | journal | TOOL-aOrientedCast-16 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 PLAY-aOrientedCast-2 |
 
