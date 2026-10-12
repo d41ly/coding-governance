@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.101 -->
+<!-- gov:kit unattended@1.102 -->
 # The unattended stop contract — HELD, the hold codes and the lease
 
 *Installed beside `UNATTENDED-PROTOCOL.md` from the unattended kit and byte-compared against the
