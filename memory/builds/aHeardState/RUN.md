@@ -12,17 +12,17 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 parked-surfaced: yes, 1 surfaced
 keepalive-reaped: yes
 hold-run: 
-hold-streak: 1 · at 12cb2e1b
+hold-streak: 1 · at 42d328b9
 resume-owed: none · owner
-held-at: 2026-10-12T19:59:59Z
-hold-reason: the owner paused the run to reboot node a: about 26 GB of leaked kernel pool after 7 days up made each spawn cost 260-740 ms and pushed the claim push past its bound; unit 1 is built and amended, unit 2 is SPECCED with its code drafted but not placed
+held-at: 2026-10-12T22:54:50Z
+hold-reason: the owner ordered the build merged to local main without the close's bar, unpushed: every unit CLOSED; the bar's last run redded three OWN legs, each fixed since and not re-run
 hold-until: owner
 hold-code: host-owner-action
-held-from: BUILDING
+held-from: VERIFYING
 refreshed-at: 6e8f8b1da4dc036b7fce23555b78fb4b5db0e60c · park · 13 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 9ea947136
-phase: VERIFYING
+witness: 42d328b9b25cf070c01d8c058f39f5123d95e6fd
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/aHeardState
@@ -112,3 +112,5 @@ base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 2026-10-12T22:14:46Z dispatch · item 5742dae9 TOOL-aHeardState-3 · reason tools/run-gates/selftest-budgets.txt
 
 2026-10-12T22:44:49Z dispatch · item 46b6e15a TOOL-aHeardState-8 · reason tools/hooks/format-guard.test.sh memory/builds/aHeardState/spec/2026-10-13-spec-TOOL-aHeardState-8.md
+
+2026-10-12T22:54:53Z hold · item host-owner-action · reason until owner · reaped 4fa4ef2e · resume none(owner)
