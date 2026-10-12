@@ -4,6 +4,9 @@
 #   rule 2  a verify stage that spawns one agent per item                    (verifier arity)
 # Run from the kit directory: bash ./agent-cap.test.sh   (exit 0 = all pass)
 set -u
+# A suite run from inside a session inherits the session's directory, which would arm rule 6 over a
+# fixture whose cwd lies in no checkout (TOOL-aOrientedCast-14 S7); an arm that needs one names it.
+unset CLAUDE_PROJECT_DIR
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
 derive_self_rel() {
@@ -2213,11 +2216,14 @@ printf 'const s = await agent("one")\n' > "$HOREPO/tools/workflows/h.js"
 printf 'const s = await agent("one")\n' > "$HOREPO/tools/workflows/other.js"
 HO_ROLES='{"roles":{"gov-researcher":{"agent":true,"workflow":"research","writes":"none"},"gov-builder":{"agent":true,"workflow":"build","writes":"product"},"gov-session":{"agent":false,"workflow":"handoff","writes":"none"}},"harnesses":["tools/workflows/h.js"]}'
 HO_FLAG=""
+HO_CWD=""
+HO_PROJECT=""
 write_roles() { # the index body, or `none` to remove it
   if [ "$1" = none ]; then rm -f "$HOREPO/.claude/roles.json"; else printf '%s' "$1" > "$HOREPO/.claude/roles.json"; fi
 }
 # The handoff files and one prompt file per variant under $TMP/ho.<variant>. The marker and digest are
-# computed here as the renderer defines them; AC6 holds the renderer itself against the hook.
+# computed here as the renderer defines them; arm 6 of the roles kit's adopt-roles.test.sh, the
+# agreement arm, holds the renderer itself against the hook (TOOL-aOrientedCast-15).
 write_handoff() {
   "$TESTPY" -c '
 import hashlib, os, sys
@@ -2256,14 +2262,15 @@ for k, v in prompts.items():
 ' "$HOREPO" "$TMP/ho"
 }
 run_spawn() { # name expected_exit subagent_type(- for none) prompt-variant needle(empty for an allow) [session prompt tool_use_id]
+  # HO_CWD moves the payload cwd off $HOJ/sub; HO_PROJECT, when set, is the hook's CLAUDE_PROJECT_DIR.
   local payload got
   payload=$("$TESTPY" -c 'import json,sys
 cwd,t,pf,s,p,u=sys.argv[1:7]
 ti={"prompt":open(pf,newline="").read()}
 if t!="-": ti["subagent_type"]=t
 print(json.dumps({"tool_name":"Agent","cwd":cwd,"session_id":s,"prompt_id":p,"tool_use_id":u,"tool_input":ti}))' \
-    "$HOJ/sub" "$3" "$TMP/ho.$4" "${6:-ho-s}" "${7:-ho-p-$RANDOM$RANDOM}" "${8:-ho-u-$RANDOM}")
-  printf '%s' "$payload" | (cd "$TMP" && node "$HOOK" $HO_FLAG) >/dev/null 2>"$TMP/err"; got=$?
+    "${HO_CWD:-$HOJ/sub}" "$3" "$TMP/ho.$4" "${6:-ho-s}" "${7:-ho-p-$RANDOM$RANDOM}" "${8:-ho-u-$RANDOM}")
+  printf '%s' "$payload" | (cd "$TMP" && { [ -z "$HO_PROJECT" ] || export CLAUDE_PROJECT_DIR="$HO_PROJECT"; } && node "$HOOK" $HO_FLAG) >/dev/null 2>"$TMP/err"; got=$?
   if [ "$got" = "$2" ] && { if [ -z "$5" ]; then [ ! -s "$TMP/err" ]; else grep -qF -- "$5" "$TMP/err"; fi; }; then
     echo "ok   $1 (exit $got)"; pass=$((pass+1))
   else
@@ -2353,6 +2360,18 @@ write_roles '{"roles":{"gov-session":{"agent":false,"workflow":"handoff","writes
 run_spawn "rule6 AC5: no agent-true role refuses the spawn as UNARMED" 2 gov-session ok 'UNARMED'
 write_roles "$("$TESTPY" -c 'import json,sys; d=json.loads(sys.argv[1]); d["harnesses"]=[]; print(json.dumps(d))' "$HO_ROLES")"
 run_harness "rule6 AC5: no harness refuses the harness call as UNARMED" 2 "{\"scriptPath\":\"$HO_H\",\"args\":{\"roles\":{\"builder\":\"gov-builder\"}}}" 'UNARMED'
+# TOOL-aOrientedCast-14 AC4 — the anchor: a cwd under no checkout falls back to CLAUDE_PROJECT_DIR, a
+# cwd in a checkout keeps it, and neither resolving says so. $TMP itself lies in no checkout. Against
+# a rule 6 reading the payload cwd alone, the first row exits 0 and the third says nothing.
+write_roles "$HO_ROLES"
+mkdir -p "$TMP/horepo2/.git" "$TMP/noco"
+HO_CWD="$NODEDIR" HO_PROJECT="$HOJ"
+run_spawn "rule6 OC14 AC4: cwd under no checkout, CLAUDE_PROJECT_DIR armed -> Explore refused" 2 Explore ok 'as the gov-researcher role'
+HO_CWD="$NODEDIR/horepo2"
+run_spawn "rule6 OC14 AC4: cwd in an index-less checkout keeps it over CLAUDE_PROJECT_DIR -> admitted" 0 Explore ok ""
+HO_CWD="$NODEDIR" HO_PROJECT="$NODEDIR/noco"
+run_spawn "rule6 OC14 AC4: cwd and CLAUDE_PROJECT_DIR under no checkout -> admitted, naming rule 6 unarmed" 0 Explore ok 'rule 6 unarmed'
+HO_CWD="" HO_PROJECT=""
 write_roles none
 
 echo "---- $pass passed, $fail failed ----"

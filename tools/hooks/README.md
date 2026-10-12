@@ -194,7 +194,10 @@ harness that satisfies every rule above ships at `<prefix>/workflows/tier2-revie
 ## Rule 6 — every agent prompt is a rendered handoff
 
 `TOOL-aOrientedCast-7`. Armed by `.claude/roles.json` at the checkout root of the payload `cwd`,
-read through scratch-guard's `loadRoleIndex`, so the two hooks read one index identically:
+else of `CLAUDE_PROJECT_DIR` when the cwd lies in no checkout (`TOOL-aOrientedCast-14`), read through
+scratch-guard's `resolveRoleRoot` and `loadRoleIndex`, so the two hooks read one index identically.
+When neither start lies in a checkout the rule adds nothing, and says so in one stderr line naming
+both when `CLAUDE_PROJECT_DIR` is set. Once read, the index is:
 
 - **absent** — no rule; every verdict is as before;
 - **broken** — every `Agent` and `Workflow` call is refused, naming the file;
@@ -409,7 +412,14 @@ and how many route lines were left out. It never blocks, and a throw prints noth
 Gates are the main session's, at the merge or push threshold (`TOOL-aOrientedCast-11`). On a Bash
 or PowerShell payload carrying an `agent_type`, after the scratch verdict and the orientation check,
 `checkRoleGate` splits the command into simple commands, finds each one's script past any
-`NAME=value`, `env`, `timeout` or launcher, and refuses one that is:
+`NAME=value`, prefix word (`env`, `exec`, `command`, `nice`, `nohup`, `export`, `time`), `timeout`
+or launcher, and refuses one that is listed below. A launcher's options and a prefix word's options
+are stepped past by the rule table `GATE_OPTION_RULES` (`TOOL-aOrientedCast-14`): `bash -o pipefail`
+or `python -X utf8` takes its argument; a shell's `-n`, a Python `-c` or `-m`, a Node `-e` or `-p`
+and `command -v` end the command, which runs no script; a shell's `-c` and `env -S` have their body
+scanned once. The role index is read at the checkout root of the payload `cwd`, else of
+`CLAUDE_PROJECT_DIR`; neither resolving adds no arm, with one witness line when
+`CLAUDE_PROJECT_DIR` is set. The rows:
 
 | Row | Matches | Admitted when |
 |---|---|---|
@@ -427,7 +437,8 @@ to return the need and verify with a fixture or a probe of your own code.
 
 **Its ceiling.** The match is textual: a gate reached through an interpreter, an alias, a function,
 an assembled path or a `$(…)` inside quotes passes it, and so does a scoped variant of a leg that
-adds an argument the leg does not carry. It stops forgetting, not evasion, and the push-boundary bar
+adds an argument the leg does not carry, or an option missing from the rule table that takes an
+argument, such as the `o` inside `bash -eo pipefail`. It stops forgetting, not evasion, and the push-boundary bar
 is still the guarantee. The main loop, which carries no `agent_type`, is never refused.
 
 ## The authoring rule for kit files

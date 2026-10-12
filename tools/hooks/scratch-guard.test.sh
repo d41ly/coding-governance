@@ -1055,17 +1055,24 @@ write_gate_manifest() {
   mkdir -p "$SGWT/.claude"
   printf '{"gates":{"manifest":"%s"},"harnesses":[],"roles":{"gov-builder":{"agent":true,"gates":["lexicon naming predicates"],"workflow":"build","writes":"product"},"gov-orienter":{"agent":true,"gates":[],"workflow":"orient","writes":"none"},"gov-skeptic":{"agent":true,"gates":[],"workflow":"closing-review","writes":"none"},"gov-spec-writer":{"agent":true,"gates":["memory hygiene","lexicon naming predicates"],"workflow":"spec-write","writes":"spec"}}}\n' "$1" > "$SG_ROLES"
 }
-# run_role_bash <name> <want_exit> <stderr-expect> <agent_type|-> <Bash|PowerShell> <command> — graded as run_card grades.
+# run_role_bash <name> <want_exit> <stderr-expect> <agent_type|-> <Bash|PowerShell> <command> [<cwd> [<CLAUDE_PROJECT_DIR>]]
+# — graded as run_card grades. The cwd defaults to the linked worktree; CLAUDE_PROJECT_DIR is UNSET
+# unless the arm names one, so a suite run inside a session never arms a role arm from the session's
+# directory (TOOL-aOrientedCast-14 S7).
 run_role_bash() {
-  local name=$1 want=$2 expect=$3 type=$4 tool=$5 cmd=$6
+  local name=$1 want=$2 expect=$3 type=$4 tool=$5 cmd=$6 cwd=${7:-$SG_CWD_WT} project=${8:-}
   local payload got
   payload=$("$TESTPY" -c 'import json,sys; d={"tool_name":sys.argv[2],"tool_input":{"command":sys.argv[3]},"cwd":sys.argv[4]}
 if sys.argv[1] != "-": d["agent_type"]=sys.argv[1]
-print(json.dumps(d))' "$type" "$tool" "$cmd" "$SG_CWD_WT")
+print(json.dumps(d))' "$type" "$tool" "$cmd" "$cwd")
   case "$payload" in *'"command"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
-  printf '%s' "$payload" \
-    | HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
+  if [ -n "$project" ]; then
+    printf '%s' "$payload" | env -u CLAUDE_PROJECT_DIR CLAUDE_PROJECT_DIR="$project" HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
       node "$HOOK" >/dev/null 2>"$TMP/err"
+  else
+    printf '%s' "$payload" | env -u CLAUDE_PROJECT_DIR HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
+      node "$HOOK" >/dev/null 2>"$TMP/err"
+  fi
   got=$?
   check_stderr "$name" "$want" "$got" "$expect"
 }
@@ -1100,6 +1107,29 @@ run_role_bash "G-AC2 git log naming a suite -> allow, stderr EMPTY" 0 empty gov-
 run_role_bash "G-AC2 grep for the runner's name -> allow, stderr EMPTY" 0 empty gov-builder Bash 'grep -n run-gates.sh AGENTS.md'
 run_role_bash "G-AC2 a commit message naming the bar -> allow, stderr EMPTY" 0 empty gov-builder Bash 'git commit -m "names bash kit/run-gates/run-gates.sh"'
 run_role_bash "G-AC2 gov-orienter's manifest-check --card (a leg's script, more words) -> allow, stderr EMPTY" 0 empty gov-orienter Bash 'bash skills/session-kickoff/manifest-check.sh --card --path'
+# ---- TOOL-aOrientedCast-14 AC1: every launcher option and prefix-word option is stepped past by ----
+# ---- the rule table. Against a walk of one option per launcher with no prefix-word options, each --
+# ---- exit-2 row below exits 0 except the node row: its `--selftest` refuses whichever word heads --
+run_role_bash "O-AC1 bash -o pipefail <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash -o pipefail kit/run-gates/run-gates.sh'
+run_role_bash "O-AC1 bash -O extglob <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash -O extglob kit/run-gates/run-gates.sh'
+run_role_bash "O-AC1 bash -e -x <suite> -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'bash -e -x kit/hooks/agent-cap.test.sh'
+run_role_bash "O-AC1 bash -e -c '<runner>' -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash -e -c 'bash kit/run-gates/run-gates.sh'"
+run_role_bash "O-AC1 python -X utf8 <selftest.py> -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'python -X utf8 kit/govkit/selftest.py'
+run_role_bash "O-AC1 env -u FOO bash <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'env -u FOO bash kit/run-gates/run-gates.sh'
+run_role_bash "O-AC1 exec bash <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'exec bash kit/run-gates/run-gates.sh'
+run_role_bash "O-AC1 nice -n 10 bash <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'nice -n 10 bash kit/run-gates/run-gates.sh'
+run_role_bash "O-AC1 node -r <preload> <script> --selftest -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'node -r kit/p.js kit/x.js --selftest'
+# ---- AC2: the near-misses — a syntax check, a lookup and an inline program run no script ----------
+run_role_bash "O-AC2 bash -n <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash -n kit/hooks/scratch-guard.test.sh'
+run_role_bash "O-AC2 bash -e -n <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash -e -n kit/hooks/agent-cap.test.sh'
+run_role_bash "O-AC2 command -v <runner> -> allow, stderr EMPTY" 0 empty gov-builder Bash 'command -v kit/run-gates/run-gates.sh'
+run_role_bash "O-AC2 python -c <program> <selftest.py> -> allow, stderr EMPTY" 0 empty gov-builder Bash 'python -c "print(1)" kit/govkit/selftest.py'
+run_role_bash "O-AC2 node -e <program> <script> --selftest -> allow, stderr EMPTY" 0 empty gov-builder Bash 'node -e "1" kit/x.js --selftest'
+# ---- AC3: the anchor — a cwd under no checkout falls back to CLAUDE_PROJECT_DIR; against a ---------
+# ---- checkRoleGate reading the payload cwd alone, the first row exits 0 and the third says nothing -
+run_role_bash "O-AC3 cwd under no checkout, CLAUDE_PROJECT_DIR the fixture -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash kit/run-gates/run-gates.sh' "$SG_NOREPO" "$SG_CWD_WT"
+run_role_bash "O-AC3 cwd under no checkout, no CLAUDE_PROJECT_DIR -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash kit/run-gates/run-gates.sh' "$SG_NOREPO"
+run_role_bash "O-AC3 cwd and CLAUDE_PROJECT_DIR under no checkout -> allow, one witness" 0 "one;;role-gate unarmed" gov-builder Bash 'bash kit/run-gates/run-gates.sh' "$SG_NOREPO" "$SG_NOREPO/$SGP"
 # ---- AC3: arming — no index, a broken index, a manifest that does not read ------------------------
 write_roles absent
 run_role_bash "G-AC3 no index: gov-builder runs the bar -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash kit/run-gates/run-gates.sh'
@@ -1276,8 +1306,10 @@ n=$((pass+fail))
 # 292 = 260 + the 32 run_role_bash arms the role-gate arm added (TOOL-aOrientedCast-11: 19 for AC1,
 # 8 for AC2 and 5 for AC3), counted by hand: the owner's rule runs no suite in a pass, so the main
 # loop confirms the executed count at the close.
+# 309 = 292 + the 17 run_role_bash rows TOOL-aOrientedCast-14 added (9 for AC1, 5 for AC2 and 3 for
+# AC3), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=292
+FLOOR_ASSERTIONS=309
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

@@ -111,12 +111,20 @@
  * or `*selftest.py` script, or a script carrying `--selftest`, unless it carries `--render`,
  * `--list` or `--help`. The allowlist is the index's `gates` list for that type, rendered from the
  * roles kit's policy; a type the index does not name, `workflow-subagent` among them, may run
- * nothing. `checkRoleGate` is the predicate and its comment is the ONE evaluation order. An absent
+ * nothing. `checkRoleGate` is the predicate and its comment is the ONE evaluation order. A
+ * launcher's options and a prefix word's options are stepped past by `GATE_OPTION_RULES`
+ * (TOOL-aOrientedCast-14): an option that takes an argument takes it, a shell's `-n`, a Python `-c`
+ * or `-m`, a Node `-e` or `-p` and `command -v` end the command, and a shell's `-c` and `env -S`
+ * scan their body once. The index is read at the checkout root of the payload `cwd`, else of
+ * `CLAUDE_PROJECT_DIR`; neither resolving adds no arm, with one witness line when
+ * `CLAUDE_PROJECT_DIR` is set. An absent
  * index adds no arm; a broken one refuses a candidate; a manifest that does not read leaves G1
  * unarmed with one witness line while G2 and G3 bind; a throw refuses a role agent. THE CEILING:
  * the match is textual, so a gate reached through an interpreter, an alias, a function, an
- * assembled path, a `$(…)` inside quotes, or a scoped variant of a leg with an extra argument
- * passes it. It stops forgetting, not evasion, and the push-boundary bar is still the guarantee.
+ * assembled path, a `$(…)` inside quotes, a scoped variant of a leg with an extra argument, or an
+ * option missing from the table that takes an argument (`bash -eo pipefail` among them, since only
+ * a bare `-o` is in the table) passes it. It stops forgetting, not evasion, and the push-boundary
+ * bar is still the guarantee.
  *
  * THE THIRD EVENT: SUBAGENTSTART (TOOL-aRoutedQuill-4). A subagent inherits the hooks but not the
  * parent's card, so it would meet the write gate blind. Wired by `scratch-guard-subagent.fragment.json`
@@ -133,7 +141,7 @@
  */
 'use strict'
 
-const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.33 — ships inside the hooks kit entry
+const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.34 — ships inside the hooks kit entry
 
 const TOOLS = ['Bash', 'PowerShell']
 const MAX_FINDINGS = 6
@@ -1197,7 +1205,23 @@ function checkRouted(data, env) {
 /** The launchers whose script is the head; `python3.<n>` is matched by shape. */
 const GATE_LAUNCHERS = ['bash', 'sh', 'python', 'python3', 'py', 'node']
 /** Leading words that change nothing about what runs; `timeout` is read apart for its duration. */
-const GATE_PREFIX_WORDS = ['env', 'export', 'nohup', 'time']
+const GATE_PREFIX_WORDS = ['env', 'export', 'nohup', 'time', 'exec', 'command', 'nice']
+/**
+ * The options of a launcher family or a prefix word (TOOL-aOrientedCast-14): `takes` consume the
+ * next word as their argument; an `ends` option ends the simple command, which runs no script; a
+ * `body` option's next word is a command of its own. Any other option is stepped past alone. A
+ * prefix word with no row (`export`, `nohup`, `time`) takes the empty rule. A shell's `n` cluster is
+ * tested before its `c` cluster, because `bash -nc '<x>'` only checks the syntax of `<x>`.
+ */
+const GATE_OPTION_RULES = {
+  shell: { plus: true, takes: ['-o', '+o', '-O', '+O', '--rcfile', '--init-file'], ends: /^-[A-Za-z]*n[A-Za-z]*$/, body: /^-[A-Za-z]*c[A-Za-z]*$/ },
+  python: { takes: ['-W', '-X', '-Q'], ends: /^-[A-Za-z]*[cm]$/ },
+  node: { takes: ['-r', '--require', '--import'], ends: /^(?:-e|--eval|-p|--print)$/ },
+  env: { takes: ['-u', '--unset', '-C', '--chdir'], body: /^(?:-S|--split-string)$/ },
+  nice: { takes: ['-n', '--adjustment'] },
+  exec: { takes: ['-a'] },
+  command: { takes: [], ends: /^-[vV]$/ },
+}
 /** G2, by basename and in any form: the bar runner, the self-test runner, the unattended gates runner. */
 const GATE_RUNNERS = ['run-gates.sh', 'run-selftests.sh', 'run-unattended-gates.sh']
 /** G3's admitting words: a render, a listing or a usage text runs no arm. */
@@ -1221,12 +1245,35 @@ function buildGateWord(w, base, topC) {
 }
 
 /**
+ * From word <k> of <a>, past every option of <rule>: a word opening `-`, or `+` for a shell. Returns
+ * the index of the next non-option word, or -1 when the simple command ends. A body option scans its
+ * next word ONCE through scanCommandHeads into <out>, at depth 0 only, then ends it. A `--` is stepped
+ * past and ends the options.
+ */
+function scanLauncherOptions(a, k, rule, depth, out) {
+  const r = rule || {}
+  for (; k < a.length; k++) {
+    const w = a[k]
+    if (w === '--') return k + 1
+    if (!w.startsWith('-') && !(r.plus && w.startsWith('+'))) return k
+    if (r.takes && r.takes.includes(w)) { k++; continue }
+    if (r.ends && r.ends.test(w)) return -1
+    if (r.body && r.body.test(w)) {
+      if (depth === 0 && a[k + 1] !== undefined) out.push(...scanCommandHeads(a[k + 1], depth + 1))
+      return -1
+    }
+  }
+  return k
+}
+
+/**
  * The simple commands of <cmd> and their heads. A simple command is a segment of the blanked view
  * between `;`, `|`, `&`, `(`, `)` and a newline, its words read from the original text with their
  * quotes dropped and its redirections removed. The HEAD is the first word after any `NAME=value`,
- * `env`, `export`, `nohup`, `time`, and `timeout` with its options and duration, then past a
- * launcher and one option of it: a shell's `-c` scans its body ONCE as a command of its own, a
- * shell's `-n` executes nothing, and a Python `-c` or `-m` names no script — each ends the segment.
+ * any prefix word with its options, and `timeout` with its options and duration, then past a
+ * launcher and its options, each stepped by GATE_OPTION_RULES through scanLauncherOptions: a shell's
+ * `-c` scans its body ONCE as a command of its own, a shell's `-n` executes nothing, and a Python
+ * `-c` or `-m` names no script — each ends the segment.
  * Returns `[{ text, head, argv, launched }]`, argv being the head and every word after it.
  */
 function scanCommandHeads(cmd, depth = 0) {
@@ -1251,7 +1298,11 @@ function scanCommandHeads(cmd, depth = 0) {
     let k = 0
     for (;;) {
       while (k < a.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(a[k])) k++
-      if (GATE_PREFIX_WORDS.includes(a[k])) { k++; continue }
+      if (GATE_PREFIX_WORDS.includes(a[k])) {
+        k = scanLauncherOptions(a, k + 1, GATE_OPTION_RULES[a[k]], depth, out)
+        if (k < 0) break
+        continue
+      }
       if (a[k] === 'timeout') {
         k++
         while (k < a.length && a[k].startsWith('-')) k += /^(?:-[sk]|--signal|--kill-after)$/.test(a[k]) ? 2 : 1
@@ -1260,23 +1311,13 @@ function scanCommandHeads(cmd, depth = 0) {
       }
       break
     }
-    if (k >= a.length) continue
+    if (k < 0 || k >= a.length) continue
     const lb = buildBaseName(a[k])
     let launched = false
     if (GATE_LAUNCHERS.includes(lb) || /^python3\.\d+$/.test(lb)) {
-      const shell = lb === 'bash' || lb === 'sh'
-      k++
-      const opt = a[k]
-      if (opt !== undefined && opt.startsWith('-')) {
-        if (shell && /^-[A-Za-z]*c[A-Za-z]*$/.test(opt)) {
-          if (depth === 0 && a[k + 1] !== undefined) out.push(...scanCommandHeads(a[k + 1], depth + 1))
-          continue
-        }
-        if (shell && opt === '-n') continue
-        if (!shell && /^-[A-Za-z]*[cm]$/.test(opt)) continue
-        k++
-      }
-      if (k >= a.length) continue
+      const family = lb === 'bash' || lb === 'sh' ? 'shell' : lb === 'node' ? 'node' : 'python'
+      k = scanLauncherOptions(a, k + 1, GATE_OPTION_RULES[family], depth, out)
+      if (k < 0 || k >= a.length) continue
       launched = true
     }
     out.push({ text: cmd.slice(m.index, m.index + m[0].length).trim(), head: a[k], argv: a.slice(k), launched })
@@ -1348,12 +1389,28 @@ function renderGateDeny(type, c, row, leg, allow, shown) {
 }
 
 /**
+ * The checkout root a role arm reads its index at (TOOL-aOrientedCast-14): the toplevel above the
+ * payload <cwd>, else above `env.CLAUDE_PROJECT_DIR`, each start resolved as checkRouted resolves its
+ * session start, else null. The cwd comes first because the command or spawn runs there.
+ */
+function resolveRoleRoot(cwd, env) {
+  const path = require('path')
+  for (const start of [cwd, env && env.CLAUDE_PROJECT_DIR]) {
+    if (typeof start !== 'string' || start === '') continue
+    const hit = resolveToplevel(path.resolve(buildNativePath(start)))
+    if (hit) return hit.toplevel
+  }
+  return null
+}
+
+/**
  * THE ONE EVALUATION ORDER of the role-gate arm. Returns null to admit, `{ witness }` to admit with
  * one stderr line, `{ deny }` to refuse.
  *  1. `agent_type` absent or empty → null (the main loop runs every gate)
  *  2. no simple command whose head is a launched script, a path-bearing word, or a G2 or G3 shape
  *     → null, with no file read
- *  3. no toplevel above the payload `cwd` → null
+ *  3. no root by resolveRoleRoot (the payload `cwd`, then `CLAUDE_PROJECT_DIR`) → null, or one
+ *     witness naming both starts when `CLAUDE_PROJECT_DIR` is set
  *  4. loadRoleIndex: absent → null; broken → deny naming the index
  *  5. the allowlist: the index's `gates` list for the type, else empty — `workflow-subagent` and
  *     every type the index does not name may run nothing
@@ -1361,26 +1418,31 @@ function renderGateDeny(type, c, row, leg, allow, shown) {
  *     returns a witness naming it; G2 and G3 still bind
  *  7. each simple command: an allowlisted G1 leg is admitted whole; else G2, G3, then G1 refuses
  */
-function checkRoleGate(cmd, data) {
+function checkRoleGate(cmd, data, env) {
   const path = require('path')
   const type = typeof data.agent_type === 'string' ? data.agent_type : ''
   if (!type) return null
   const cands = scanCommandHeads(cmd).filter((c) => c.launched || /[\\/]/.test(c.head) || checkGateRunner(c) || checkGateSuite(c))
   if (cands.length === 0) return null
-  if (typeof data.cwd !== 'string' || !data.cwd) return null
-  const cwd = path.resolve(data.cwd)
-  const hit = resolveToplevel(cwd)
-  if (!hit) return null
-  const index = loadRoleIndex(hit.toplevel)
+  const raw = typeof data.cwd === 'string' ? data.cwd : ''
+  const project = env && env.CLAUDE_PROJECT_DIR
+  const top = resolveRoleRoot(raw, env)
+  if (!top) {
+    if (!project) return null
+    return { witness: `role-gate unarmed — neither the payload cwd ${raw || '(none)'} nor CLAUDE_PROJECT_DIR ${project} lies in a checkout, so no role index was read` }
+  }
+  // G1 resolves the command's paths against the payload cwd, and against the root when it has none.
+  const cwd = raw ? path.resolve(raw) : top
+  const index = loadRoleIndex(top)
   if (index.state === 'absent') return null
   if (index.state === 'broken') {
     return { deny: `BLOCKED by scratch-guard: a role agent runs no gate, and the role index ${index.shown} ${index.why}, so the allowlist of ${type} cannot be read. Repair or re-render the index; gates run in the main session at the merge or push threshold.\n` }
   }
   const role = index.roles[type]
   const allow = role && Array.isArray(role.gates) ? role.gates : []
-  const g = readGateLegs(hit.toplevel, index)
+  const g = readGateLegs(top, index)
   for (const c of cands) {
-    const leg = checkGateLeg(c, g.legs, cwd, hit.toplevel)
+    const leg = checkGateLeg(c, g.legs, cwd, top)
     if (leg && allow.includes(leg.name)) continue
     const row = checkGateRunner(c) ? 'G2 runner' : checkGateSuite(c) ? 'G3 suite' : leg ? 'G1 leg' : null
     if (row) return { deny: renderGateDeny(type, c, row, leg, allow, index.shown) }
@@ -1537,7 +1599,7 @@ function main() {
   // fail-open catch a defect in it would be a silent off (§8 F5). The main loop is never refused.
   let gate = null
   try {
-    gate = checkRoleGate(cmd, data)
+    gate = checkRoleGate(cmd, data, process.env)
   } catch (e) {
     gate = data.agent_type ? { deny: `BLOCKED by scratch-guard: the role-gate arm threw (${(e && e.message) || e}) and refuses a role agent's ${data.tool_name} call.\n` } : null
   }
@@ -1550,4 +1612,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, scanCommandHeads }
+module.exports = { checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, scanCommandHeads, resolveRoleRoot }

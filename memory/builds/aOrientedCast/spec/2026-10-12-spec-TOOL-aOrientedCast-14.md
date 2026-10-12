@@ -1,11 +1,12 @@
 # TOOL-aOrientedCast-14 — the role gate reads past every launcher option, and both role arms find the session's checkout
 
-**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 14 · ratified 2026-10-12
+**Status:** CLOSED · rev-4 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 14 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-build-TOOL-aOrientedCast-14-1-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aOrientedCast-14-1-acceptance-ledger.md) | journal | — |
 | [2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md) | journal | TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-15 |
 | [2026-10-12-prompt-TOOL-aOrientedCast-12-2-fold-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-12-2-fold-brief.md) | journal | TOOL-aOrientedCast-12 |
 | [2026-10-12-prompt-TOOL-aOrientedCast-13-1-fold-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-13-1-fold-brief.md) | journal | TOOL-aOrientedCast-13 TOOL-aOrientedCast-15 |
@@ -72,7 +73,10 @@ launcher or a prefix word takes, and anchors both arms on the payload cwd, then 
   takes an argument is part of the ceiling, said in the header.
 - No edit of the roles kit. The renderer-against-hook arm is `TOOL-aOrientedCast-15`'s, in the roles
   adopter's self-test, so this unit's write set and that unit's do not meet.
-- No kit-version bump for hooks; it moves once at the close.
+- No second kit-version bump for hooks. This unit is the build's last to edit `tools/hooks/`, so it
+  moves the hooks kit once, 1.33 to 1.34, in every carrier `tools/check-kit-versions.sh` grades:
+  `KIT_AGENT_CAP_VERSION` and its `gov:kit agent-cap@` marker in `agent-cap.js`, and the marker in
+  `scratch-guard.js`.
 
 **What it is built on.** This unit extends `TOOL-aOrientedCast-11`'s `scanCommandHeads`,
 `checkRoleGate` and its evaluation order, and widens the anchor of `TOOL-aOrientedCast-7`'s rule 6
@@ -286,6 +290,10 @@ No pass runs a leg above.
   a "What it is built on" paragraph. The edge from `TOOL-aOrientedCast-15`, sequenced after this
   unit, is dropped: the comment takes a label that unit's spec already fixes, and neither unit needs
   the other's built output, so the shared reword is prose. Edges reads `none`.
+- rev-4 · 2026-10-12 · §3. The non-goal "no kit-version bump for hooks; it moves once at the close"
+  disagreed with the dispatch, which names this unit the build's last to edit `tools/hooks/` and the
+  owner of the hooks kit's one bump after `TOOL-aOrientedCast-11`'s 1.33. The bump moves here, 1.33
+  to 1.34, in the two files this unit already touches.
 
 ## 10. Reuse audit
 

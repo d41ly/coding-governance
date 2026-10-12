@@ -37,8 +37,10 @@
  * unattended driver reads both at BASE, so the two can disagree for exactly one uncommitted edit.
  *
  * RULE 6 IS NOT A FAN-OUT BOUND EITHER (TOOL-aOrientedCast-7): every agent prompt is a rendered
- * handoff. Armed by `.claude/roles.json` at the checkout root of the payload `cwd`, read through the
- * sibling hook's `loadRoleIndex`: absent adds no rule; broken refuses both tools; no `agent`-true role
+ * handoff. Armed by `.claude/roles.json` at the checkout root of the payload `cwd`, else of
+ * `CLAUDE_PROJECT_DIR` (TOOL-aOrientedCast-14; neither resolving adds no rule, with one stderr line
+ * when `CLAUDE_PROJECT_DIR` is set), read through the
+ * sibling hook's `resolveRoleRoot` and `loadRoleIndex`: absent adds no rule; broken refuses both tools; no `agent`-true role
  * refuses every `Agent` call, and an empty `harnesses` list every `Workflow` call, as UNARMED. An
  * `Agent` call is admitted only when its `subagent_type` is an `agent`-true role and its `prompt` is,
  * line endings folded and its ends trimmed, exactly one `gov:handoff` marker line naming that role,
@@ -96,7 +98,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.33' // gov:kit agent-cap@1.33 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.34' // gov:kit agent-cap@1.34 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -2247,18 +2249,22 @@ function main() {
 
   // RULE 6 (TOOL-aOrientedCast-7) — before rule 4, so a refused spawn claims no slot, and before rule
   // 0, so a call outside a declared harness is refused whatever its args. Skipped under any `--only=`
-  // selector, as rule 0 is. An absent `.claude/roles.json` at the checkout root adds no rule; a broken one, or a throw
+  // selector, as rule 0 is. An absent `.claude/roles.json` at the role root adds no rule; a broken one, or a throw
   // anywhere in the rule, refuses: a rule that cannot finish does not admit.
   if (ONLY === null) {
     let deny = null
     let index = null
     try {
-      const root = resolveCheckoutRoot(data.cwd || process.cwd())
+      // TOOL-aOrientedCast-14: the root of the payload cwd, else of CLAUDE_PROJECT_DIR.
+      const { loadRoleIndex, resolveRoleRoot } = require(require('path').join(__dirname, 'scratch-guard.js'))
+      const cwd = data.cwd || process.cwd()
+      const root = resolveRoleRoot(cwd, process.env)
       if (root) {
-        const { loadRoleIndex } = require(require('path').join(__dirname, 'scratch-guard.js'))
         index = loadRoleIndex(root)
         if (index.state === 'broken') deny = renderHandoffDeny(data.tool_name, `the role index ${index.shown} ${index.why}; fix or regenerate it.`, null)
         else if (index.state === 'ok') deny = data.tool_name === 'Agent' ? checkHandoffSpawn(data, index, root) : checkHarnessCall(data, index, root)
+      } else if (process.env.CLAUDE_PROJECT_DIR) {
+        process.stderr.write(`agent-cap: rule 6 unarmed — neither the payload cwd ${cwd} nor CLAUDE_PROJECT_DIR ${process.env.CLAUDE_PROJECT_DIR} lies in a checkout, so no role index was read\n`)
       }
     } catch (e) {
       deny = renderHandoffDeny(data.tool_name, `the rule threw (${(e && e.message) || e}), and a rule that cannot finish does not admit.`, index)

@@ -14163,6 +14163,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "resolveRoleRoot",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "resolveRoot",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
@@ -17091,6 +17096,11 @@
       "id": "scanJoinFindings",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "scanLauncherOptions",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "scanLeases",
