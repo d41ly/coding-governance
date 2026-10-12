@@ -24,6 +24,9 @@
 | [2026-10-11-build-TOOL-aScoutedSeam-1-6-rerun-effort.js](../build/2026-10-11-build-TOOL-aScoutedSeam-1-6-rerun-effort.js) | research | — |
 | [2026-10-11-build-TOOL-aScoutedSeam-1-6-rerun.js](../build/2026-10-11-build-TOOL-aScoutedSeam-1-6-rerun.js) | research | — |
 | [2026-10-11-build-TOOL-aScoutedSeam-1-7-m1c-trial.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-7-m1c-trial.md) | research | KICK-aScoutedSeam-1 |
+| [2026-10-13-build-TOOL-aScoutedSeam-1-8-precision-and-misses.md](../build/2026-10-13-build-TOOL-aScoutedSeam-1-8-precision-and-misses.md) | research | — |
+| [2026-10-13-build-TOOL-aScoutedSeam-1-8-precision.py](../build/2026-10-13-build-TOOL-aScoutedSeam-1-8-precision.py) | research | — |
+| [2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md) | research | KICK-aScoutedSeam-1 TOOL-aScoutedSeam-3 DEPL-aScoutedSeam-1 |
 
 <!-- /gen:spec-records -->
 

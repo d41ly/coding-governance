@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-11-build-TOOL-aScoutedSeam-1-1-failure-analysis.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-1-failure-analysis.md) | research | TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-2 KICK-aScoutedSeam-1 DEPL-aScoutedSeam-1 |
 | [2026-10-11-build-TOOL-aScoutedSeam-1-2-benchmark.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-2-benchmark.md) | research | TOOL-aScoutedSeam-1 |
+| [2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md) | research | TOOL-aScoutedSeam-1 KICK-aScoutedSeam-1 DEPL-aScoutedSeam-1 |
 
 <!-- /gen:spec-records -->
 
