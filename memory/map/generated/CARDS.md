@@ -227,12 +227,23 @@ The gate runner, its harnesses, and the adopter that keeps a target's verdict re
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/run-gates.md`
 - decisions 9: `TOOL-aPacedTurnstile-1`, `TOOL-aPacedTurnstile-2`, `TOOL-aPacedTurnstile-4`, `TOOL-aPacedTurnstile-5`, `TOOL-aPacedTurnstile-6`, `TOOL-aPacedTurnstile-3`, `TOOL-aPacedTurnstile-7`, `TOOL-aPacedTurnstile-16`, `TOOL-dLoggedFlight-3`
-- gate-legs 13: `run-gates gov canary`, `run-gates adopter e2e`, `run-gates wiring`, `profile-bar selftest`, `run-gates turnstile`, `every held leg is budgeted, every budget row resolves`, `run-selftests self-test`, `selftest harness self-test`, `extract-arms self-test`, `leg ceilings clear their evidenced maximum`, `run-gates run-log line`, `receipt sync (installed files match the receipt)`, `pre-push bar self-test`
+- gate-legs 12: `run-gates gov canary`, `run-gates adopter e2e`, `run-gates wiring`, `profile-bar selftest`, `every held leg is budgeted, every budget row resolves`, `run-selftests self-test`, `selftest harness self-test`, `extract-arms self-test`, `leg ceilings clear their evidenced maximum`, `run-gates run-log line`, `receipt sync (installed files match the receipt)`, `pre-push bar self-test`
 - kits 1: `run-gates`
-- gotcha-classes 14
-- guides 1: `MERGE-BAR.md`
-- globs 22
-- cut 36 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- gotcha-classes 14: `bounded-through-a-pipe-is-unbounded.md`
+- guides 1
+- globs 21
+- cut 35 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+
+## run-gates-turnstile
+
+The host turnstile: the slots that admit gate bars, the docs key beside them, and the files two concurrent bars share
+
+- status `shipped` · streams `tooling` · dossier `memory/map/features/run-gates-turnstile.md`
+- decisions 10: `TOOL-aFrugalTurnstile-5`, `TOOL-aPairedSlots-1`, `TOOL-aPairedSlots-2`, `TOOL-aPairedSlots-3`, `TOOL-aPairedSlots-4`, `TOOL-aPairedSlots-5`, `TOOL-aPairedSlots-6`, `TOOL-aPairedSlots-7`, `TOOL-aPairedSlots-9`, `TOOL-dDerivedDocket-64`
+- gate-legs 1: `run-gates turnstile`
+- gotcha-classes 7: `record-file-read-by-line-position.md`, `overlap-judged-from-the-invocation-interval.md`, `predicate-bounded-by-its-own-count.md`, `invariant-held-on-one-admission-path.md`, `floor-left-below-the-arms-it-guards.md`, `allocation-knob-without-a-ceiling.md`, `beacon-published-before-it-is-complete.md`
+- globs 3: `tools/run-gates/run-gates.sh`, `tools/run-gates/gate-profiles.txt`
+- cut 1 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## runlog
 

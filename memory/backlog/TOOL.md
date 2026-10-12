@@ -185,6 +185,12 @@ Cite ids, never line numbers.
 | [TOOL-aPacedTurnstile-12](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | govkit's selfcheck joins a descriptor's [[gate_leg]] rows to the repo's… |
 | [TOOL-aPacedTurnstile-13](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | the fingerprint helper TOOL-aPacedTurnstile-5 S5 specifies is… |
 | [TOOL-aPacedTurnstile-15](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | the unattended kit has no check that the PRIMARY tree is landable, and… |
+| [TOOL-aPairedSlots-10](../builds/aPairedSlots/BACKLOG.md) | OPEN | LOW | — | 2026-10-11 | the health log's trim is a tail-and-mv copy-and-replace in the… |
+| [TOOL-aPairedSlots-16](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite push-main self-test red at 9b743831 on the daily held… |
+| [TOOL-aPairedSlots-17](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite pre-push self-test red at 9b743831 on the daily held… |
+| [TOOL-aPairedSlots-18](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite memory-hygiene self-test red at 9b743831 on the daily… |
+| [TOOL-aPairedSlots-19](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite unattended driver selftest shard 5/8 red at 9b743831 on… |
+| [TOOL-aPairedSlots-20](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite unattended driver selftest shard 7/8 red at 9b743831 on… |
 | [TOOL-aPooledSweep-4](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THREE HELD SUITES ARE RED AT HEAD AND THIS BUILD DID NOT CAUSE ANY OF… |
 | [TOOL-aPooledSweep-5](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE WHOLE-POPULATION SWEEP IS UNMEASURED, and the 4.0x figure this… |
 | [TOOL-aPooledSweep-6](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE PEAK-CONCURRENCY ARM DOES NOT DISCRIMINATE THE COMPARISON IT EXISTS… |

@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-11T19:08:43+03:00 @ 75c3508403d985069110eb3c29a11dfd67de370c
+last-audit: 2026-10-12T05:19:35+03:00 @ 779ba03aad5d2662a92b6feb4eb874e80ea01a65
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 2f01150c67b563d0799eac4e5296e9000e9ba854
+last-body-change: 0b4954c9e4200b848e44982e8a4234fdb099f270
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -169,10 +169,10 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
 - A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
   and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
   `TOOL-aPromptedMandate-4`.
-- The turnstile serializes bars WITHIN one repository only; sessions on this node still contend
-  across repos. `both expired ... unproven either way` means contention, and now SKIPS that arm
-  loudly rather than redding — re-run quiet before believing a latency claim.
-  `TOOL-aPacedTurnstile-2`.
+- The turnstile is HOST-wide and admits a row's `slots` bars, one by default (`TOOL-aPairedSlots-1`);
+  a runner older than aFrugalTurnstile never sees it, so such checkouts still contend. `both expired
+  ... unproven either way` means contention and SKIPS that arm loudly: re-run quiet before believing
+  a latency claim. `TOOL-aPacedTurnstile-2`.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it: checks
   5, 9 and 21 all fired only once the folder was staged.

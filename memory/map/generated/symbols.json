@@ -415,6 +415,11 @@
     {
       "id": "add_health_event",
       "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
+      "id": "add_health_event",
+      "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
@@ -1496,6 +1501,11 @@
       "id": "build_docs_fixture",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "build_docs_repo",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
     },
     {
       "id": "build_edges",
@@ -4108,6 +4118,11 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "check_registered",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
       "id": "check_registry",
       "kind": "function",
       "file": "tools/gate-lint/encoding_posture.py"
@@ -4488,6 +4503,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_two_writers",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
       "id": "check_untouched_r3",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -4556,6 +4576,11 @@
       "id": "check_worksheets_signed",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "check_worktree_unheld",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "check_written_asks",
@@ -8903,6 +8928,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "measure_held_slots",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "measure_hook_entries",
       "kind": "function",
       "file": "tools/process-monitor/adopt-process-monitor.sh"
@@ -11933,6 +11963,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_pid_and_swap",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
       "id": "read_pid_image",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -12326,6 +12361,11 @@
       "id": "read_slot_table",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_slots_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "read_slug",
@@ -13623,6 +13663,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "render_prof_line",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "render_push_lines",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -13711,6 +13756,11 @@
       "id": "render_rx_literal",
       "kind": "function",
       "file": "tools/run-gates/lib-attribute.sh"
+    },
+    {
+      "id": "render_same_holder",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "render_scope_row",
@@ -14221,6 +14271,11 @@
       "id": "resolve_fragment_hook",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "resolve_free_slot",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "resolve_full_sha",
@@ -15938,6 +15993,11 @@
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
+      "id": "run_beside_holder",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
       "id": "run_bg_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -16051,6 +16111,11 @@
       "id": "run_dl_leg",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_docs_bar",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
     },
     {
       "id": "run_docs_push",
@@ -16201,11 +16266,6 @@
       "id": "run_hook",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
-    },
-    {
-      "id": "run_hook",
-      "kind": "function",
-      "file": "tools/process-monitor/adopt-process-monitor.test.sh"
     },
     {
       "id": "run_hook",
@@ -16618,6 +16678,11 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "run_slot_bar",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
       "id": "run_spec_commit_block",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -16996,6 +17061,11 @@
       "id": "scan_dead_anchors",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "scan_dead_docs_beacons",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "scan_dead_work",
@@ -17691,6 +17761,11 @@
       "id": "set_runstate_fact",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "set_share_rule",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
     },
     {
       "id": "set_tool_root",
@@ -18424,6 +18499,11 @@
     },
     {
       "id": "test_drift_history",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_drift_history_two_writers",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
     },
