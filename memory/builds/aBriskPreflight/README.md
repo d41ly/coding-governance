@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling
 roster: TOOL
-ids: TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-8 TOOL-aBriskPreflight-9 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-11 TOOL-aBriskPreflight-12 TOOL-aBriskPreflight-13 TOOL-aBriskPreflight-14 TOOL-aBriskPreflight-15 TOOL-aBriskPreflight-16 TOOL-aBriskPreflight-17 TOOL-aBriskPreflight-18
+ids: TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-8 TOOL-aBriskPreflight-9 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-11 TOOL-aBriskPreflight-12 TOOL-aBriskPreflight-13 TOOL-aBriskPreflight-14 TOOL-aBriskPreflight-15 TOOL-aBriskPreflight-16 TOOL-aBriskPreflight-17 TOOL-aBriskPreflight-18 TOOL-aBriskPreflight-19
 authorized-by: prompt
 ---
 
@@ -70,12 +70,13 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 8 | `TOOL-aBriskPreflight-10` | the tracked pre-commit hook is executable again (adopted discovery) |
 | 9 | `TOOL-aBriskPreflight-11` | the ceilings instrument prices every fork at the worst host reading on record (review H1) |
 | 10 | `TOOL-aBriskPreflight-12` | the closing review's mediums and lows: record bindings and ledgers, RB_TOOK at the child's end, the cache reset, four arms (review M1-M2, L1-L5) |
+| 11 | `TOOL-aBriskPreflight-19` | the three inherited reds that read as this build's own are drained, so its landing push can land (adopted blocker) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 10 unit(s) · node a · opened 2026-10-11 · streams tooling
+**Build status:** SPECCED · 11 unit(s) · node a · opened 2026-10-11 · streams tooling
 ids TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-8 TOOL-aBriskPreflight-9 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-11 TOOL-aBriskPreflight-12
-ids TOOL-aBriskPreflight-13 TOOL-aBriskPreflight-14 TOOL-aBriskPreflight-15 TOOL-aBriskPreflight-16 TOOL-aBriskPreflight-17 TOOL-aBriskPreflight-18
+ids TOOL-aBriskPreflight-13 TOOL-aBriskPreflight-14 TOOL-aBriskPreflight-15 TOOL-aBriskPreflight-16 TOOL-aBriskPreflight-17 TOOL-aBriskPreflight-18 TOOL-aBriskPreflight-19
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -90,13 +91,14 @@ ids TOOL-aBriskPreflight-13 TOOL-aBriskPreflight-14 TOOL-aBriskPreflight-15 TOOL
 | [TOOL-aBriskPreflight-7 — preflight and the wiring check each declare a wall-clock ceiling and name a breach](spec/2026-10-11-spec-TOOL-aBriskPreflight-7.md) | 4 | 2 | CLOSED | rev-4 | 2026-10-11 |
 | [TOOL-aBriskPreflight-11 — the ceilings instrument prices every fork at the worst host reading on record](spec/2026-10-12-spec-TOOL-aBriskPreflight-11.md) | 6 | 2 | CLOSED | rev-2 | 2026-10-12 |
 | [TOOL-aBriskPreflight-12 — the closing review's mediums and lows: record bindings and ledgers, RB_TOOK at the child's end, the cache reset, four arms](spec/2026-10-12-spec-TOOL-aBriskPreflight-12.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-12 |
+| [TOOL-aBriskPreflight-19 — the three inherited reds that read as this build's own are drained, so its landing push can land](spec/2026-10-12-spec-TOOL-aBriskPreflight-19.md) | 7 | 1 | SPECCED | rev-1 | 2026-10-12 |
 <!-- /gen:build-units -->
 
 Records: 50 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aBriskPreflight-19.
 
-Ids no `spec-audit` record has ever named: TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-11 TOOL-aBriskPreflight-12.
+Ids no `spec-audit` record has ever named: TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-11 TOOL-aBriskPreflight-12 TOOL-aBriskPreflight-19.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -108,6 +110,7 @@ Ids no `spec-audit` record has ever named: TOOL-aBriskPreflight-1 TOOL-aBriskPre
 | 3 | `TOOL-aBriskPreflight-3` | no |
 | 4 | `TOOL-aBriskPreflight-7` | no |
 | 6 | `TOOL-aBriskPreflight-11`, `TOOL-aBriskPreflight-12` | yes |
+| 7 | `TOOL-aBriskPreflight-19` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
