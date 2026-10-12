@@ -95,15 +95,15 @@ ids TOOL-aPairedSlots-15
 | [TOOL-aPairedSlots-7 — the common dir's shared files take a second concurrent writer safely](spec/2026-10-11-spec-TOOL-aPairedSlots-7.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-11 |
 | [TOOL-aPairedSlots-9 — node a's slot count and the shared-width rule, set by the two-bar A/B](spec/2026-10-11-spec-TOOL-aPairedSlots-9.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-12 |
 | [TOOL-aPairedSlots-11 — the drift history is created with its header already in it](spec/2026-10-12-spec-TOOL-aPairedSlots-11.md) | 8 | 2 | INPROGRESS | rev-1 | 2026-10-12 |
-| [TOOL-aPairedSlots-12 — the A/B instrument reads the run record's verdict by key, and the rule check proves an arm from its bar rows](spec/2026-10-12-spec-TOOL-aPairedSlots-12.md) | 8 | 1 | INPROGRESS | rev-1 | 2026-10-12 |
+| [TOOL-aPairedSlots-12 — the A/B instrument reads the run record's verdict by key, and the rule check proves an arm from its bar rows](spec/2026-10-12-spec-TOOL-aPairedSlots-12.md) | 8 | 1 | CLOSED | rev-1 | 2026-10-12 |
 | [TOOL-aPairedSlots-15 — the closing review's mediums and lows, batched](spec/2026-10-12-spec-TOOL-aPairedSlots-15.md) | 8 | 2 | INPROGRESS | rev-1 | 2026-10-12 |
 | [TOOL-aPairedSlots-13 — the two-bar check reads the verdict by key and grades its rows at their declared width](spec/2026-10-12-spec-TOOL-aPairedSlots-13.md) | 9 | 1 | INPROGRESS | rev-1 | 2026-10-12 |
 | [TOOL-aPairedSlots-14 — the two-bar check's overlap guard reads the slots the bars were admitted to](spec/2026-10-12-spec-TOOL-aPairedSlots-14.md) | 10 | 1 | INPROGRESS | rev-1 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 18 bound to this build, across 4 record folder(s).
+Records: 19 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aPairedSlots-11 TOOL-aPairedSlots-12 TOOL-aPairedSlots-13 TOOL-aPairedSlots-14 TOOL-aPairedSlots-15.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 TOOL-aPairedSlots-11 TOOL-aPairedSlots-12 TOOL-aPairedSlots-13
 TOOL-aPairedSlots-14 TOOL-aPairedSlots-15.

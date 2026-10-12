@@ -144,7 +144,9 @@ measure_bar() { # root arm rep bar -> appends a results row, stdout: the wall
   ok=$(grep -c '^GATE ok ' "$o.log"); fail=$(grep -c '^GATE FAIL ' "$o.log")
   exp=$(awk -F'\t' '$1=="expected_legs" {print $2}' "$root/init.tsv")
   rec=$(ls -td "$root/$bar/.git/gate-run"/*/ 2>/dev/null | head -1)
-  verdict=$(cat "${rec}verdict" 2>/dev/null | head -1); verdict=${verdict:--}
+  # BY KEY (TOOL-aPairedSlots-12): the verdict file opens with `ended<TAB><time>`, so a first-line read
+  # carried a TAB into the row, and every later column, the proof among them, sat one place right.
+  verdict=$(awk -F'\t' '$1=="verdict" {print $2}' "${rec}verdict" 2>/dev/null); verdict=${verdict:--}
   w=$(awk -F'\t' '$1=="width" {print $2}' "${rec}header" 2>/dev/null)
   qf=$(awk -F'\t' '$1=="queued_from" {print $2}' "${rec}header" 2>/dev/null)
   pz=$(grep -c . "${rec}pauses" 2>/dev/null); pz=${pz:-0}
