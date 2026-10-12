@@ -9,12 +9,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+hold-run: 
+hold-streak: 1 · at a1dc95b8
+resume-owed: unattended-resume-aprimedindex · fire 2026-10-12T04:44:38Z
+held-at: 2026-10-12T04:14:38Z
+hold-reason: the close's second bar was green on every leg but straggler-guard arms, which timed out twice, the second time alone, at a spawn cost 4.1x this clone's floor while two other sessions' bars ran on node a
+hold-until: probe host
+hold-code: host-degraded
+held-from: VERIFYING
 gates-run: unattended-179177077013434529691-597878 38e594a6
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 33a88d0e3d6b850736736d1594faf59729b7a22f
-phase: VERIFYING
+witness: a1dc95b8978b03626d691b773aabad0c3b010210
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/enforce-index-regen-before-bars-acdde6
@@ -106,3 +114,5 @@ base: 15bbfa4f867262f3c862e2473688fc69d0566b7d
 2026-10-12T01:52:09Z brief · item TOOL-aPrimedIndex-16 · reason cf04d072e179 memory/builds/aPrimedIndex/prompts/2026-10-12-prompt-TOOL-aPrimedIndex-16-1-build-brief.md
 
 2026-10-12T01:53:42Z dispatch · item 4606faa4 TOOL-aPrimedIndex-16 · reason tools/lexicon/selftest.py tools/unattended/unattended.test.sh .githooks/pre-push.test.sh .lexicon.conf .memory-tree.conf memory/project/unarmed-branches.txt memory/guides/SESSION-KICKOFF.md memory/builds/aPrimedIndex/spec/2026-10-12-spec-TOOL-aPrimedIndex-16.md memory/builds/aPrimedIndex/BACKLOG.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-1.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-2.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-3.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-4.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-6.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-8.md
+
+2026-10-12T04:14:46Z hold · item host-degraded · reason until probe host · reaped 5d684520 · resume unattended-resume-aprimedindex
