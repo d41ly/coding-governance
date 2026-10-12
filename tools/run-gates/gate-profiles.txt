@@ -64,6 +64,15 @@
 #                `memory:` line. Every row below declares 0, DARK: the width A/B that sets each
 #                row's value from loaded runs is owed (TOOL-aSparedSpawn-2 S1). TOOL-aSparedSpawn-2.
 #
+#   slots=<n>    how many bars the host turnstile admits at once; a row that omits it gets 1, the
+#                one-bar-per-host behaviour, and 0 is refused. It schedules bars and never legs: a
+#                bar admitted beside another runs every leg it would have run alone.
+#                `GATE_TURNSTILE_SLOTS=<n>` overrides the row's value alone, and a malformed one is
+#                ignored with a NOTE. A host admits the LARGEST count any of its repositories
+#                declares, because every runner claims among its own slots and all share slot 1.
+#                A row's value is a measurement on that hardware, argued beside the row; node
+#                `a`'s comes from the two-bar A/B of TOOL-aPairedSlots-9. TOOL-aPairedSlots-1.
+#
 # THE CALIBRATED WIDTH is not a knob: `bash <prefix>/run-gates/run-gates.sh --calibrate-width` times
 # concurrent spawn loops at 1, 2, 4, 6 and 8 and caches the smallest that comes within the runner's
 # CALIBRATE_THETA percent of the best rate in `<git-common-dir>/gate-host-calibration`. A bar reads

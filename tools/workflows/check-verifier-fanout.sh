@@ -198,13 +198,15 @@ while IFS= read -r f; do
   n=$((n+1))
   # The payload is built by node itself: a JSON encoder written in shell is one more place for a
   # backslash or a backtick in a workflow's prompt text to change the meaning of the thing being
-  # judged.
+  # judged. `--only=scripts` asks for the rules that read a SCRIPT (TOOL-aOrientedCast-7 S11): an
+  # inline-script payload is not a tool call, and the hook's call rule refuses every one of them
+  # wherever a role index exists.
   if ! out=$(node -e '
       const fs = require("fs")
       process.stdout.write(JSON.stringify({
         tool_name: "Workflow",
         tool_input: { script: fs.readFileSync(process.argv[1], "utf8") },
-      }))' "$f" | node "$HOOK" 2>&1); then
+      }))' "$f" | node "$HOOK" --only=scripts 2>&1); then
     echo "verifier-fanout: FAILED — $f"
     printf '%s\n' "$out" | sed 's/^/    /'
     st=1

@@ -127,6 +127,7 @@ DA_DIR=$(resolve_carrier_kit drift-audit drift_report.py)
 PG_DIR=$(resolve_carrier_kit pytest-parallel-guardrails crashprobe.py)
 GK_DIR=$(resolve_carrier_kit govkit govkit.py)
 LX_DIR=$(resolve_carrier_kit lexicon lexicon.py)
+RL_DIR=$(resolve_carrier_kit roles roles_lib.py)
 checked=0
 fails=0
 V='[0-9]+\.[0-9]+'   # two-part X.Y; only monotone comparability matters to the deployer
@@ -382,6 +383,16 @@ for kept in lexicon.py canon.py README.md LEXICON.md; do
     fails=$((fails+1))
   fi
 done
+
+# roles: the constant in the library, the marker in the README a deployer greps in an adopting tree.
+# Paired, not presence-checked, for the half-bumped-pair reason every block above records
+# (TOOL-aOrientedCast-8 S9).
+need "KIT_ROLES_VERSION"           ${RL_DIR}/roles_lib.py                   "^KIT_ROLES_VERSION = \"$V\""
+rl=$(grep -oE "^KIT_ROLES_VERSION = \"$V\"" ${RL_DIR}/roles_lib.py | head -1 | grep -oE "$V")
+if [ -z "$rl" ] || ! grep -qE "gov:kit roles@$rl([^0-9.]|\$)" ${RL_DIR}/README.md; then
+  echo "kit-versions: ${RL_DIR}/README.md gov:kit roles@ marker != KIT_ROLES_VERSION (${rl:-unreadable})"
+  fails=$((fails+1))
+fi
 
 # pytest-parallel-guardrails: the constant lives in crashprobe.py, but the probe is a
 # hunt-then-remove diagnostic — the DEPLOYER-side version signal is the gov:kit marker in each

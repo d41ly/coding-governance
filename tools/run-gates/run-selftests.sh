@@ -552,13 +552,20 @@ def resolve_prefix_token(spelled, troot):
 sys.stdout.reconfigure(newline="")
 budgets, legs_path, filt = sys.argv[1], sys.argv[2], sys.argv[3]
 legs = {l["name"]: l for l in json.load(open(legs_path, encoding="utf-8"))}
+# THE LAUNCHERS A ROW'S OWN ARGV MAY BEGIN WITH, DERIVED from the manifest rather than typed here:
+# whatever word some leg's argv starts with is a command this repo runs (TOOL-aOrientedCast-12).
+launchers = {l["argv"][0] for l in legs.values() if l.get("argv")}
 for line in open(budgets, encoding="utf-8"):
     if not line.strip() or line.lstrip().startswith("#"):
         continue
     f = line.rstrip("\r\n").split("\t")
-    if len(f) < 2:
+    # A ROW IS FOUR FIELDS, the four the declaration's header names. One tab short and the reading
+    # slid into the argv column, so the run loop `eval`'d prose as the suite's command; a one-field
+    # row used to be skipped without a word. Both are a named state now (TOOL-aOrientedCast-12).
+    if len(f) != 4:
+        print("\t".join(["BADROW", f[0], f[1] if len(f) > 1 else "", ""]))
         continue
-    name, budget, argv = f[0], f[1], (f[2] if len(f) > 2 else "")
+    name, budget, argv = f[0], f[1], f[2]
     # A BUDGET NOBODY CAN COMPARE IS NOT A BUDGET. An empty second column emitted `ok` for a row
     # whose argv then read back EMPTY -- the run loop `eval`'d nothing, got rc 0, and printed a
     # green line at 0s for a suite it never executed; and `[ "$took" -gt "$budget" ]` on a
@@ -567,6 +574,12 @@ for line in open(budgets, encoding="utf-8"):
     # the forward one matches names and the reverse one iterates an empty argv zero times.
     if not budget.isdigit():
         print("\t".join(["BADBUDGET", name, budget, argv]))
+        continue
+    # AN ARGV THAT READS AS PROSE IS NOT A COMMAND: its first word must be a launcher some leg uses,
+    # or name a path. Only the row's OWN argv is graded; one taken from the manifest already ran.
+    first = (argv.split() or [""])[0]
+    if argv and first not in launchers and "/" not in first and "\\" not in first:
+        print("\t".join(["BADARGV", name, budget, argv]))
         continue
     if not argv:
         leg = legs.get(name)
@@ -838,6 +851,14 @@ PY
     fi
     if [ "$state" = BADBUDGET ]; then
       echo "run-selftests: row '$name' declares a budget that is not a number ('$budget'), so its cost verdict could never fire" >&2
+      fails=1; continue
+    fi
+    if [ "$state" = BADROW ]; then
+      echo "run-selftests: row '$name' does not carry the four tab-separated fields the declaration's header names (name, budget, argv, reading), so its reading can run as its argv" >&2
+      fails=1; continue
+    fi
+    if [ "$state" = BADARGV ]; then
+      echo "run-selftests: row '$name' declares the argv '$argv', whose first word is no launcher a manifest leg uses and names no path, so it reads as prose rather than a command" >&2
       fails=1; continue
     fi
     for tok in $argv; do

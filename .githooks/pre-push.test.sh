@@ -269,7 +269,7 @@ stamp() {    # write a full-green record naming a sha, with a reproducible finge
   [ -n "$st" ] && printf 'selftests\t%s\n' "$st" >> "$gd/gate-full-green"
   return 0
 }
-decide_on() {   # the hook's decision line for a push made WITH the self-test switch on
+run_push_selftests() {   # the hook's decision line for a push made WITH the self-test switch on
   git commit -q --allow-empty -m "decide-on $RANDOM" >/dev/null 2>&1
   ( GATE_SELFTESTS=1 GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true
 }
@@ -367,7 +367,7 @@ cd "$tmp/work" || exit 2
 # 19 — a record earned switch-OFF does not satisfy a switch-ON push. This is the only direction
 #      that forces, and it is the one the whole unit is for.
 stamp "$(git rev-parse HEAD)" 0
-line=$(decide_on)
+line=$(run_push_selftests)
 case "$line" in
   *"FULL gate"*) ok "19 a switch-OFF record offered for a switch-ON push → FULL" ;;
   *) bad "19 a record that never ran the kit self-tests satisfied a push that does: ${line:-<no decision line>}" ;;
@@ -384,7 +384,7 @@ esac
 #      unit lacks the key, and reading its absence as 'covered everything' would make each of them
 #      certify legs it never ran.
 stamp "$(git rev-parse HEAD)"
-case "$(decide_on)" in
+case "$(run_push_selftests)" in
   *"FULL gate"*"kit self-tests"*) ok "21 a record with NO switch key reads as OFF" ;;
   *) bad "21 a record missing the switch key was treated as covering the kit self-tests" ;;
 esac
@@ -400,7 +400,7 @@ esac
 # 23 — its control: switch-ON record, switch-ON push. Without this, an implementation that forced
 #      on every switch-ON push would still pass 19 through 22.
 stamp "$(git rev-parse HEAD)" 1
-case "$(decide_on)" in
+case "$(run_push_selftests)" in
   *"scoped gate"*) ok "23 control — a switch-ON record satisfies a switch-ON push" ;;
   *) bad "23 a record that covered the kit self-tests did not satisfy a push that runs them" ;;
 esac
@@ -410,7 +410,7 @@ esac
 #       Predicate 8 is unedited and must read it as not covering a switch-ON push, and as covering a
 #       switch-OFF one, since the 2026-08-27 default holds every suite anyway.
 stamp "$(git rev-parse HEAD)" changed
-case "$(decide_on)" in
+case "$(run_push_selftests)" in
   *"FULL gate"*"kit self-tests"*) ok "23b a selftests-changed record offered for a switch-ON push → FULL" ;;
   *) bad "23b a selftests-changed record satisfied a push that runs every kit self-test" ;;
 esac
@@ -663,7 +663,7 @@ fi
 
 # Build a scratch repo whose kits live at $1, push once so a record can name a real sha, and leave
 # the caller standing in it.
-pfx_fixture() {
+build_pfx_fixture() {
   local pfx=$1 hook=$2 tag=$3
   # SPLIT deliberately: `local a=$1 d="...$a..."` reads $a as unset under `set -u` here, so the
   # fixture builder died before it built anything. One name per statement.
@@ -687,13 +687,13 @@ pfx_fixture() {
 }
 # A full-green record for a fixture at $1, naming sha $2. Deliberately NOT the `stamp` above: that
 # one spells `<prefix>/` itself, which is the very assumption under test here.
-pfx_stamp() {
+write_pfx_stamp() {
   local pfx=$1 sha=$2 blob=${3-} gd; gd=$(git rev-parse --git-dir)
   [ -n "$blob" ] || blob=$(git hash-object -- "$pfx/gate-legs.json" 2>/dev/null)
   printf 'sha\t%s\nfingerprint\t%s\nmanifest_blob\t%s\nrun_id\ttest\n' "$sha" "" "$blob" \
     > "$gd/gate-full-green"
 }
-pfx_decide() {
+run_pfx_push() {
   git commit -q --allow-empty -m "decide $RANDOM" >/dev/null 2>&1
   ( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 ) \
     | grep -m1 -E 'gate on main push' || true
@@ -703,9 +703,9 @@ pfx_decide() {
 for _h in new old; do
   case $_h in new) _hook="$SRC/.githooks/pre-push" ;; old) _hook="$tmp/hooks-old-pre-push" ;; esac
   [ -s "$_hook" ] || continue
-  pfx_fixture scripts "$_hook" "ac1$_h" || { bad "AC1 could not build the $_h fixture"; continue; }
-  pfx_stamp scripts "$(git rev-parse HEAD)"
-  case "$(pfx_decide)" in
+  build_pfx_fixture scripts "$_hook" "ac1$_h" || { bad "AC1 could not build the $_h fixture"; continue; }
+  write_pfx_stamp scripts "$(git rev-parse HEAD)"
+  case "$(run_pfx_push)" in
     *"scoped gate"*) [ "$_h" = new ] && ok "AC1 precondition — a scripts/ tree reaches a SCOPED decision" ;;
     *) [ "$_h" = new ] && bad "AC1 precondition — no scoped decision at a scripts/ prefix" ;;
   esac
@@ -713,8 +713,8 @@ for _h in new old; do
   printf '%s\n' '[{"name":"x","argv":["bash","b.sh"]},{"name":"y","argv":["bash","c.sh"]}]' \
     > scripts/gate-legs.json
   git add -A >/dev/null 2>&1; git commit -qm "move the manifest" >/dev/null 2>&1
-  pfx_stamp scripts "$_prev"
-  _dec=$(pfx_decide)
+  write_pfx_stamp scripts "$_prev"
+  _dec=$(run_pfx_push)
   case "$_h:$_dec" in
     new:*"FULL gate"*) ok "AC1 a manifest change at scripts/ FORCES a full run (predicate 6 fires)" ;;
     new:*) bad "AC1 predicate 6 did not fire at a scripts/ prefix: ${_dec:-<no decision>}" ;;
@@ -724,9 +724,9 @@ for _h in new old; do
 done
 
 # --- AC2: a recorded manifest blob that differs, at that same prefix ---------------------------
-pfx_fixture scripts "$SRC/.githooks/pre-push" ac2 || bad "AC2 could not build its fixture"
-pfx_stamp scripts "$(git rev-parse HEAD)" "0000000000000000000000000000000000000000"
-_dec=$(pfx_decide)
+build_pfx_fixture scripts "$SRC/.githooks/pre-push" ac2 || bad "AC2 could not build its fixture"
+write_pfx_stamp scripts "$(git rev-parse HEAD)" "0000000000000000000000000000000000000000"
+_dec=$(run_pfx_push)
 case "$_dec" in
   *"differs from the one the recorded green was earned on"*)
     ok "AC2 a differing recorded manifest blob at scripts/ FORCES (predicate 7 fires)" ;;
@@ -736,7 +736,7 @@ esac
 # --- AC3: a manifest the resolved root does NOT point at is a REFUSAL, not a non-match ---------
 # The distinction the whole unit turns on. A tree that tracks a manifest somewhere the hook does not
 # look must SAY SO; reading it as "no change here" is what let a manifest-wide change land scoped.
-pfx_fixture nowhere "$SRC/.githooks/pre-push" ac3 >/dev/null 2>&1
+build_pfx_fixture nowhere "$SRC/.githooks/pre-push" ac3 >/dev/null 2>&1
 git commit -q --allow-empty -m c >/dev/null 2>&1
 _out=$( GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 )
 case "$_out" in
@@ -746,7 +746,7 @@ case "$_out" in
 esac
 # ANTI-VACUITY: a repo with NO manifest anywhere is a legitimate case and must NOT refuse, or the
 # arm above is satisfied by a hook that refuses everything.
-pfx_fixture scripts "$SRC/.githooks/pre-push" ac3b >/dev/null 2>&1
+build_pfx_fixture scripts "$SRC/.githooks/pre-push" ac3b >/dev/null 2>&1
 rm -f scripts/gate-legs.json; git add -A >/dev/null 2>&1
 git commit -qm "no manifest at all" >/dev/null 2>&1
 if GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1; then
@@ -1574,6 +1574,7 @@ cd "$pfx_home" || exit 2
 #     nothing there even when it is read (TOOL-dLadderedRemote-5).
 #   GATE_TURNSTILE_DIR — where the host beacon and queue live; it decides contention only, as GATE_TURNSTILE=0 does (TOOL-aFrugalTurnstile-5 F1).
 #   GATE_TURNSTILE_HOLDER — a holder's nonce; scrubbing it would queue a pushing leg behind its own parent bar (TOOL-aFrugalTurnstile-5 F1).
+#   GATE_TURNSTILE_SLOTS — how many bars the host turnstile admits; it decides contention only, never a leg (TOOL-aPairedSlots-1).
 #   GATE_REUSE_PUSH GATE_REUSE_LINEAGE GATE_REUSE_DIGEST_ENV GATE_REUSE_SAMPLE GATE_REUSE_DAY — the hook
 #     clears each for every bar, a STUB included, and sets the first three only on the decision that
 #     asks for it, as it does GATE_DOCS_BASE (TOOL-aSparedSpawn-13 S10, -16 S6, -32 S6, -33 S2).
@@ -1585,7 +1586,7 @@ cd "$pfx_home" || exit 2
 #   GATE_SPAWN_NOW — the spawn pause's reading, GATE_MEMINFO's sibling: a pause narrows the pool and
 #     always ends (TOOL-aSparedSpawn-2). Width class.
 # Classified by TOOL-aSparedSpawn-33 S8.
-BAR_INERT_KNOBS="GOV_REMOTE GOV_DEFAULT_BRANCH GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_DIGEST_ENV GATE_REUSE_LINEAGE GATE_REUSE_PUSH GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+BAR_INERT_KNOBS="GOV_REMOTE GOV_DEFAULT_BRANCH GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_DIGEST_ENV GATE_REUSE_LINEAGE GATE_REUSE_PUSH GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_SLOTS GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
 read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
 check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
   local knobs cleared scrubbed k n
@@ -1708,11 +1709,20 @@ case "$msg|$(read_token)|$(read_tip feat8)" in
 esac
 printf 'GOV_BRANCH_GATE_CMD="bash %s"\n' "$red" > .githooks/gate-env.sh
 git add .githooks/gate-env.sh; git commit -q -m "declare an untracked branch bar"
+# TOOL-aBriskPreflight-6 S3: a runner where the kit-root ladder finds it, so the refusal names it and
+# not the placeholder. The hook resolves the runner only for a push that reads it, and a declared
+# branch bar is one; a resolution keyed to the default branch alone prints the placeholder here.
+mkdir -p "$RUN_GATES"; printf '#!/usr/bin/env bash\nexit 0\n' > "$RUN_GATES/run-gates.sh"
 msg=$( ( unset GOV_DEFAULT_BRANCH GOV_GATE_CMD_TEST; git push -q mirror feat8 2>&1 ) )
 case "$msg|$(read_token)" in
   *"does not track"*"|bar-refused") ok "AC10 an untracked branch bar is refused as bar-refused" ;;
   *) bad "AC10 expected an untracked branch bar to be refused, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
 esac
+case "$msg" in
+  *"Sanctioned use: GOV_BRANCH_GATE_CMD='bash $RUN_GATES/run-gates.sh'"*) ok "AC10 the branch bar's refusal names the runner the ladder found" ;;
+  *) bad "AC10 expected the refusal to name $RUN_GATES/run-gates.sh, so a feature push with a declared branch bar resolved no runner: ${msg:-<push SUCCEEDED>}" ;;
+esac
+rm -rf "$RUN_GATES"
 # H1 — the policy file itself, UNTRACKED: refused before it is sourced, whatever it declares.
 git rm -q .githooks/gate-env.sh; git commit -q -m "undeclare the branch bar"
 mkdir -p .githooks   # `git rm` took the emptied directory with it

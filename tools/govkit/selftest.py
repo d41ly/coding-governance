@@ -109,7 +109,7 @@ def resolve_kit_dir(home, anchor, here):
     raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
-KIT_DIRS = {home: resolve_kit_dir(home, anchor, HERE) for home, anchor in (("codebase-map", "map_lib.py"), ("drift-audit", "drift_report.py"), ("hooks", "agent-cap.js"), ("lexicon", "lexicon.py"), ("memory-recall", "extract.py"), ("memory-tree", "gotchas.py"), ("playbook", "render_playbook.py"), ("process-monitor", "procmon-hook.js"), ("pytest-parallel-guardrails", "crashprobe.py"), ("run-gates", "run-gates.sh"), ("runlog", "runlog.py"), ("unattended", "unattended.sh"), ("workflows", "tier2-review.js"))}
+KIT_DIRS = {home: resolve_kit_dir(home, anchor, HERE) for home, anchor in (("codebase-map", "map_lib.py"), ("drift-audit", "drift_report.py"), ("hooks", "agent-cap.js"), ("lexicon", "lexicon.py"), ("memory-recall", "extract.py"), ("memory-tree", "gotchas.py"), ("playbook", "render_playbook.py"), ("process-monitor", "procmon-hook.js"), ("pytest-parallel-guardrails", "crashprobe.py"), ("roles", "roles_lib.py"), ("run-gates", "run-gates.sh"), ("runlog", "runlog.py"), ("unattended", "unattended.sh"), ("workflows", "tier2-review.js"))}
 KIT_DIRS["govkit"] = HERE
 KIT_NAMES = {home: d.name for home, d in KIT_DIRS.items()}
 
@@ -2695,6 +2695,163 @@ def check_ceiling_emission(tmp: pathlib.Path) -> None:
     check("CE5: a ceiling the receipt recorded is gov's to replace",
           read_rows().get(leg, {}).get("ceiling") == 1780,
           str(read_rows().get(leg)) + (p.stdout + p.stderr)[-900:])
+
+
+def check_roles_default() -> None:
+    """TOOL-aOrientedCast-8 S10, AC2, over gov's OWN registry and descriptors: `roles` is a default
+    and the default closes over it; without its card writer it is an unsatisfied requirement; an aged
+    registry lacking it makes `update` gain it and an unmoved one gains nothing; and the descriptor
+    claims every house overlay as `seed`, the Skill as `rendered` with a re-render, and every test
+    file as `project-owned`. A module-level function, so a slice runs it without `main()`."""
+    gk = govkit_module()
+    rep = gk.Report()
+    reg = gk.load_registry(GOV_ROOT)
+    descs = gk.read_descriptors(GOV_ROOT, reg, rep)
+    dflt = list(gk.default_kits(reg))
+    check("OC8 AC2 the default set holds roles", "roles" in dflt, str(dflt))
+    check("OC8 AC2 ...and the default selection's requirements are all satisfied by it",
+          gk.derive_unsatisfied_requires(dflt, descs, None) == [],
+          str(gk.derive_unsatisfied_requires(dflt, descs, None)))
+    _alone = gk.derive_unsatisfied_requires(["roles", "memory-tree"], descs, {"kits": []})
+    check("OC8 AC2 roles selected without its card writer is an unsatisfied requirement",
+          ("roles", "kickoff-manifest") in _alone, str(_alone))
+    # The aged registry is the current default less `roles`, built from the registry's own answer
+    # rather than typed, and `blob_at` is stood in for as the TOOL-aRoutedQuill-5 arm does.
+    _was = [k for k in dflt if k != "roles"]
+    _regs = {"a" * 40: "[selection]\ndefault = [%s]\n" % ", ".join('"%s"' % k for k in _was),
+             "b" * 40: "[selection]\ndefault = [%s]\n" % ", ".join('"%s"' % k for k in dflt)}
+    _blob = gk.blob_at
+    gk.blob_at = lambda _r, c, _p: _regs[c].encode() if c in _regs else None
+    try:
+        _gained = gk.derive_default_gained(GOV_ROOT, "a" * 40, "b" * 40, {"kits": _was}, descs)
+        _same = gk.derive_default_gained(GOV_ROOT, "b" * 40, "b" * 40, {"kits": _was}, descs)
+    finally:
+        gk.blob_at = _blob
+    check("OC8 AC2 a registry aged before roles joined the default gains it", _gained == (["roles"], ""),
+          str(_gained))
+    check("OC8 AC2 LIVENESS ...and an unmoved default gains nothing", _same == ([], ""), str(_same))
+    d = descs.get("roles", ({}, ""))[0]
+    rules = d.get("files") or []
+
+    def derive_listed_role(rel):
+        """The role of the LIST rule naming rel, else the `**` rule's, else None."""
+        for rule in rules:
+            if isinstance(rule.get("include"), list) and rel in rule["include"]:
+                return rule.get("role")
+        return next((r.get("role") for r in rules if r.get("include") == "**"), None)
+
+    kit = KIT_DIRS["roles"]
+    house = sorted("house/" + p.name for p in (kit / "house").glob("*.md"))
+    check("OC8 AC2 every house overlay is a seed row", house and all(
+        derive_listed_role(h) == "seed" for h in house), str({h: derive_listed_role(h) for h in house}))
+    _skill = [r for r in rules if r.get("include") == ["SKILL.template.md"]]
+    check("OC8 AC2 the Skill row is rendered, and the descriptor declares a [[regenerate]]",
+          len(_skill) == 1 and _skill[0].get("role") == "rendered" and bool(d.get("regenerate")),
+          str(_skill) + " regenerate=" + str(d.get("regenerate")))
+    tests = sorted(p.name for p in kit.glob("*.test.sh"))
+    check("OC8 AC2 every test file the kit holds is a project-owned row", tests and all(
+        derive_listed_role(x) == "project-owned" for x in tests), str({x: derive_listed_role(x) for x in tests}))
+
+
+def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = False) -> None:
+    """TOOL-aOrientedCast-8 S10, AC4 and AC6: a DEFAULT apply into a scratch target renders the roles
+    kit — the role index, nine agent types, ten seeded house overlays and the `/build` Skill — its
+    `--check` reads fresh, and the target's own wiring checker reads `ok` for roles, then `UNWIRED`
+    once the index is gone. The target holds a governing doc at the path the memory-tree seed writes
+    as `CHARTER`, copied from gov's own `AGENTS.md`, because the shape lands the playbook elsewhere.
+    With `charter=False` it holds none, and this asserts AC13 instead: the apply still exits 0 through
+    the adopter's accepted exit 3, the Skill alone is rendered, and check-wiring names the doc.
+    With `runner=True` (TOOL-aOrientedCast-13 AC4) the deploy text also carries a `[gate_runner]`
+    built from the run-gates kit's `[gate_runner_seed]`, so the apply writes the target's own gate
+    manifest, which holds no lexicon leg; the seed policy's optional lexicon grant must then leave
+    the adopter's `--check` and the target's `check_roles.py` at exit 0, the latter with a note.
+    WHAT THIS DOES NOT CHECK: the rendered bytes, which the kit's own legs grade, or an update's
+    re-render, which the update-safety arms own."""
+    deploy = DEPLOY_REGISTRY_DEFAULT
+    manifest = None
+    if runner:
+        import tomllib  # noqa: PLC0415
+        seed = tomllib.loads((KIT_DIRS["run-gates"] / "kit.toml").read_text(encoding="utf-8"))["gate_runner_seed"]
+        # Resolved and written as govkit's intake writes it: a list is a TOML array, a scalar quoted.
+        lines = ["", "[gate_runner]"]
+        for k, v in seed.items():
+            vals = v if isinstance(v, list) else [v]
+            vals = [x.replace("{prefix}", PFX[:-1]).replace("{kit}", PFX + KIT_NAMES["run-gates"])
+                    for x in vals]
+            manifest = vals[0] if k == "file" else manifest
+            lines.append('%s = %s' % (k, "[" + ", ".join('"%s"' % x for x in vals) + "]"
+                                      if isinstance(v, list) else '"%s"' % vals[0]))
+        deploy = DEPLOY_REGISTRY_DEFAULT.rstrip("\n") + "\n" + "\n".join(lines) + "\n"
+    t = make_target(pathlib.Path(tmp) / ("roles-runner" if runner else "roles-default" if charter
+                                         else "roles-no-doc"), deploy)
+    # The seed's CHARTER, read from the memory-tree kit's own conf example rather than typed.
+    doc = _re.findall(r'^CHARTER="?([^"\n]*)"?', (KIT_DIRS["memory-tree"] / ".memory-tree.conf.example")
+                      .read_text(encoding="utf-8"), _re.M)[-1]
+    if charter:
+        (t / doc).write_bytes((GOV_ROOT / "AGENTS.md").read_bytes())
+        git(t, "add", "-A")
+        git(t, "commit", "-qm", "the governing doc")
+    ap = run("apply", "--target", str(t))
+    tag = "OC8 AC4" if charter else "OC8 AC13 (no doc at %s)" % doc
+    check(tag + " a default apply into a scratch target exits 0", ap.returncode == 0,
+          (ap.stdout + ap.stderr)[-2000:])
+    try:
+        kit = resolve_kit_dir("roles", "roles_lib.py", t / PFX)
+    except LookupError as e:
+        check(tag + " ...and installs the roles kit", False, str(e))
+        return
+    if not charter:
+        check(tag + " ...renders the /build Skill", (t / ".claude" / "skills" / "build" / "SKILL.md").is_file(),
+              "absent")
+        _agents = list((t / ".claude" / "agents").glob("*")) if (t / ".claude" / "agents").is_dir() else []
+        check(tag + " ...and writes no agent type and no role index",
+              not _agents and not (t / ".claude" / "roles.json").exists(), str(_agents))
+        p = subprocess.run([govkit_module().resolve_bash(), str(t / PFX / "check-wiring.sh"), "--check"], cwd=str(t),
+                           capture_output=True, text=True, encoding="utf-8", errors="replace")
+        _ln = [ln for ln in p.stdout.splitlines() if ln.startswith("UNWIRED  roles")]
+        check(tag + " ...and check-wiring reads UNWIRED roles naming the doc and the CHARTER key",
+              any(("names %s, which is not a file" % doc) in ln and "CHARTER" in ln for ln in _ln),
+              p.stdout[-2000:])
+        return
+    agents = sorted(p.name for p in (t / ".claude" / "agents").glob("gov-*.md"))
+    check("OC8 AC4 ...renders the role index", (t / ".claude" / "roles.json").is_file(), str(agents))
+    check("OC8 AC4 ...renders nine agent types, one per agent role", len(agents) == 9, str(agents))
+    check("OC8 AC4 ...seeds ten house overlays", len(list((kit / "house").glob("*.md"))) == 10,
+          str(sorted(p.name for p in (kit / "house").glob("*.md"))))
+    check("OC8 AC4 ...and renders the /build Skill", (t / ".claude" / "skills" / "build" / "SKILL.md").is_file(),
+          "absent")
+    ck = subprocess.run([govkit_module().resolve_bash(), str(kit / "adopt-roles.sh"), "--check"], cwd=str(t),
+                        capture_output=True, text=True, encoding="utf-8", errors="replace")
+    check("OC8 AC4 the target's adopter --check reads its render fresh", ck.returncode == 0,
+          ck.stdout + ck.stderr)
+    if runner:
+        mf = t / (manifest or "")
+        held = [x.get("name") for x in json.loads(mf.read_text(encoding="utf-8"))] if mf.is_file() else None
+        check("OC13 AC4 the runner apply writes the target's own gate manifest, holding no lexicon leg",
+              held is not None and "lexicon naming predicates" not in held, str(held))
+        check("OC13 AC4 ...and the adopter's --check exits 0 over the seed's optional lexicon grant",
+              ck.returncode == 0, ck.stdout + ck.stderr)
+        cr = subprocess.run([sys.executable, str(kit / "check_roles.py")], cwd=str(t), capture_output=True,
+                            text=True, encoding="utf-8", errors="replace")
+        check("OC13 AC4 ...and check_roles.py exits 0 with a note naming the lexicon leg",
+              cr.returncode == 0 and any(ln.startswith("roles: note:") and "lexicon naming predicates" in ln
+                                         for ln in cr.stdout.splitlines()), cr.stdout + cr.stderr)
+    cw = t / PFX / "check-wiring.sh"
+
+    def run_wiring():
+        p = subprocess.run([govkit_module().resolve_bash(), str(cw), "--check"], cwd=str(t), capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
+        return [ln for ln in p.stdout.splitlines() if ln[:9].strip() and ln[9:18].strip() == "roles"]
+
+    lines = run_wiring()
+    check("OC8 AC6 the target's check-wiring reads ok for roles, and no absent harness reads UNWIRED",
+          any(ln.startswith("ok       roles") for ln in lines)
+          and not any(ln.startswith("UNWIRED") for ln in lines), str(lines))
+    (t / ".claude" / "roles.json").unlink()
+    lines = run_wiring()
+    check("OC8 AC6 ...and UNWIRED naming the index and the scaffold once the index is absent",
+          any(ln.startswith("UNWIRED  roles") and "roles.json" in ln and "adopt-roles.sh --scaffold" in ln
+              for ln in lines), str(lines))
 
 
 def main() -> int:
@@ -6187,8 +6344,9 @@ user_skills = "/tmp/gk-fake-skills"
                   str(sorted(_declared_writes)))
 
             marks = measure_plan_marks(pl2.stdout)
-            check("the default selection previews exactly 5 SIDE|rendered rows",
-                  marks.get("SIDE|rendered") == 5, str(marks))
+            # 5 -> 6, TOOL-aOrientedCast-8 S1: the roles kit's `/build` Skill.
+            check("the default selection previews exactly 6 SIDE|rendered rows",
+                  marks.get("SIDE|rendered") == 6, str(marks))
             # `ORDER|project-owned` is 4, and the four are NAMED: memory-recall's
             # `recall-fixture.json`, `check-recall.py` and `test_recall_floor.py`, withheld from the
             # payload by a `project-owned` rule with no sibling producer (TOOL-aWalkedCorpus-3 S8);
@@ -6216,9 +6374,15 @@ user_skills = "/tmp/gk-fake-skills"
             # 29 -> 31, TOOL-aRoutedQuill-5 S1: `agent-cap` joined the default selection, and it
             # withholds `agent-cap.test.sh` and `scratch-guard.test.sh` by the same mechanism.
             # Measured by a default `plan` into a scratch target on 2026-10-10.
+            # 31 -> 32 and seed 3 -> 13, TOOL-aOrientedCast-8 S1: `roles` joined the default
+            # selection; it withholds `adopt-roles.test.sh` and seeds its ten house overlays.
+            # Measured by a default `plan` into a scratch target on 2026-10-11.
+            # seed 13 -> 14, TOOL-aOrientedCast-10 S9: `roles` seeds its effort policy
+            # `house/policy.toml` beside the overlays. Not measured in the pass (no suite runs there);
+            # the main loop observes it at the close.
             check("...and the playbook file previews as a seed WRITE, not as an order",
-                  marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 3
-                  and marks.get("ORDER|project-owned") == 31,
+                  marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 14
+                  and marks.get("ORDER|project-owned") == 32,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
@@ -6352,6 +6516,14 @@ user_skills = "/tmp/gk-fake-skills"
                 check("RQ5 AC4 ...and a descriptor declaring no `kits` is left alone",
                       _gk.add_deploy_kits(_rq_t, ["agent-cap"]) == ""
                       and _rq_dt.read_bytes() == b'prefix = "t"\n', _rq_dt.read_bytes().decode())
+
+            # ---- TOOL-aOrientedCast-8 AC2, AC4, AC6 and AC13: the roles kit is a default that arrives
+            # ---- rendered, or, with no governing doc, arrives with its Skill and names the doc.
+            # ---- Module-level functions, so a slice reaches each without this block.
+            check_roles_default()
+            check_roles_install(tmp3)
+            check_roles_install(tmp3, charter=False)
+            check_roles_install(tmp3, runner=True)
 
             # AN ACCEPTED STOP IS NOT A FAILURE. `memory-tree` seeds the conf and stops by design, so
             # every correct first install exits 1 there; calling that a failure made a default-selection

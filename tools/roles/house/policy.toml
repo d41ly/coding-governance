@@ -1,0 +1,28 @@
+# policy.toml — this repository's own settings for its role agents. Seeded: yours to edit.
+# A changed value reaches an agent after `render_agents.py --write` and a new session.
+# Read through roles_lib.py's `load_policy` only; levels are low, medium, high, xhigh and max.
+
+[effort]
+default = "medium"            # every role and stage this file does not name
+
+[effort.roles]                # one entry per role slot whose `agent` is true
+gov-orienter = "xhigh"
+gov-spec-writer = "xhigh"
+gov-spec-reviewer = "medium"
+gov-builder = "high"
+gov-diff-reviewer = "high"
+gov-skeptic = "high"
+gov-synthesizer = "high"
+
+[effort.stages.spec-review]   # one table per workflow; keys are that workflow's stage keys
+skeptic = "medium"
+synthesis = "medium"
+
+[effort.stages.spec-write]
+skeptic = "medium"
+synthesis = "medium"
+
+[gates]                       # the gate legs a role may run, by manifest name; every other role runs none
+# A trailing `?` marks a leg whose kit a target may not install: absent from the manifest, it is a note.
+gov-spec-writer = ["memory hygiene", "lexicon naming predicates?"]
+gov-builder = ["lexicon naming predicates?"]

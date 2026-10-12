@@ -40,6 +40,14 @@ Cite ids, never line numbers.
 | [TOOL-aBranchedMandate-8](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | --preflight OVERWRITES a live non-terminal run-state file, losing the… |
 | [TOOL-aBranchedMandate-10](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | map_extractors.template.py unions the two JS scans with a bare +,… |
 | [TOOL-aBranchedMandate-11](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | govkit.py's blocked skip reason is unreachable behind cmd_apply's early… |
+| [TOOL-aBriskPreflight-8](../builds/aBriskPreflight/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | owner call: a read-only selector on tools/check-wiring.sh that skips… |
+| [TOOL-aBriskPreflight-9](../builds/aBriskPreflight/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | owner call: preflight reads the unattended kit's own hook wiring before… |
+| [TOOL-aBriskPreflight-13](../builds/aBriskPreflight/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite push-main self-test red at 9b743831 on the daily held… |
+| [TOOL-aBriskPreflight-14](../builds/aBriskPreflight/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite pre-push self-test red at 9b743831 on the daily held… |
+| [TOOL-aBriskPreflight-15](../builds/aBriskPreflight/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite memory-hygiene self-test red at 9b743831 on the daily… |
+| [TOOL-aBriskPreflight-16](../builds/aBriskPreflight/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite unattended driver selftest shard 5/8 red at 9b743831 on… |
+| [TOOL-aBriskPreflight-17](../builds/aBriskPreflight/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite unattended driver selftest shard 7/8 red at 9b743831 on… |
+| [TOOL-aBriskPreflight-18](../builds/aBriskPreflight/BACKLOG.md) | OPEN | BLOCKER | — | 2026-10-12 | inherited red: leg playbook render wiring red at 37200355, older than… |
 | [TOOL-aCandidStub-1](../builds/aCandidStub/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | tools/hooks/agent-cap.js blesses an identifier bound from an EMPTY… |
 | [TOOL-aCandidStub-2](../builds/aCandidStub/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | tools/memory-tree/adopt-memory-tree.sh scaffolds no gotchas/, and… |
 | [TOOL-aCollapsedScan-5](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | THE ORIGINAL FACT IS NOW FALSE and the ASK SURVIVES. Re-measured… |
@@ -185,6 +193,12 @@ Cite ids, never line numbers.
 | [TOOL-aPacedTurnstile-12](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | govkit's selfcheck joins a descriptor's [[gate_leg]] rows to the repo's… |
 | [TOOL-aPacedTurnstile-13](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | the fingerprint helper TOOL-aPacedTurnstile-5 S5 specifies is… |
 | [TOOL-aPacedTurnstile-15](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | the unattended kit has no check that the PRIMARY tree is landable, and… |
+| [TOOL-aPairedSlots-10](../builds/aPairedSlots/BACKLOG.md) | OPEN | LOW | — | 2026-10-11 | the health log's trim is a tail-and-mv copy-and-replace in the… |
+| [TOOL-aPairedSlots-16](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite push-main self-test red at 9b743831 on the daily held… |
+| [TOOL-aPairedSlots-17](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite pre-push self-test red at 9b743831 on the daily held… |
+| [TOOL-aPairedSlots-18](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite memory-hygiene self-test red at 9b743831 on the daily… |
+| [TOOL-aPairedSlots-19](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite unattended driver selftest shard 5/8 red at 9b743831 on… |
+| [TOOL-aPairedSlots-20](../builds/aPairedSlots/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite unattended driver selftest shard 7/8 red at 9b743831 on… |
 | [TOOL-aPooledSweep-4](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THREE HELD SUITES ARE RED AT HEAD AND THIS BUILD DID NOT CAUSE ANY OF… |
 | [TOOL-aPooledSweep-5](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE WHOLE-POPULATION SWEEP IS UNMEASURED, and the 4.0x figure this… |
 | [TOOL-aPooledSweep-6](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE PEAK-CONCURRENCY ARM DOES NOT DISCRIMINATE THE COMPARISON IT EXISTS… |
@@ -320,6 +334,8 @@ Cite ids, never line numbers.
 | [TOOL-aTracedSpawn-1](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | tools/unattended/unattended.test.sh CANNOT BE RUN UNSHARDED AND DIES AT… |
 | [TOOL-aTracedSpawn-2](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE REMAINING 320 SPAWNS IN check-unattended.sh's FIXTURE FRAME, after… |
 | [TOOL-aTracedSpawn-3](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE SHARD-2 FAILURE COUNT AFTER THE FIXTURE-HEADING FIX IS UNMEASURED,… |
+| [TOOL-aTrimmedHook-8](../builds/aTrimmedHook/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | after this build a one-file RUN.md commit's .githooks/pre-commit still… |
+| [TOOL-aTrimmedHook-17](../builds/aTrimmedHook/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite process-monitor census selftest red at 37200355 on the… |
 | [TOOL-aUnblockedFleet-9](../builds/aUnblockedFleet/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-31 | FIVE ACCEPTANCE CRITERIA OF TOOL-aUnblockedFleet-2 ARE WRITTEN,… |
 | [TOOL-aUnmannedHelm-2](../builds/aUnmannedHelm/BACKLOG.md) | OPEN | — | — | 2026-08-10 | the ledger_dir in tools/drift-audit/drift_report.py points at an… |
 | [TOOL-aUnmannedHelm-10](../builds/aUnmannedHelm/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | three root docs (AGENTS.md, WIRE-INTO-PROJECT.md, .gitattributes) come… |

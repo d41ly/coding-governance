@@ -417,6 +417,77 @@ else
   _bd_py=$(resolve_python) || exit 2
   "$_bd_py" "$HERE/check_by_design_parity.py" "$MTD" || exit $?
 fi
+
+# THE AGENT-TYPE SHAPE ARM (TOOL-aOrientedCast-4). A workflow script cannot import, so every script of
+# this kit that tests an agent type name carries its own copy of the shape, and the build and unit
+# harnesses' `roles` guards joined the three that already existed. The OWNER is the review harness's
+# template; every other `/^…$/` literal on a line testing `a.workerType` or declaring
+# `const AGENT_TYPE_SHAPE =` must equal the owner's byte for byte. Population: every tracked `*.js`
+# directly in this kit, less a render whose template is tracked beside it, since the pair loop above
+# already holds a render to its template. A line of either form carrying no literal contributes nothing.
+# WHAT IT DOES NOT CHECK: a script that tests an agent type under another variable name, a render (the
+# pair loop's), and whether the expression is a good one.
+_at_owner="$KITREL/tier2-review.template.js"
+_at_tracked=$(git ls-files -- "$KITREL/*.js")
+_at_pop=()
+while IFS= read -r _f; do
+  [ -n "$_f" ] || continue
+  case "${_f#"$KITREL"/}" in */*) continue ;; esac
+  case "$_f" in
+    *.template.js) ;;
+    *) case "
+$_at_tracked
+" in *"
+${_f%.js}.template.js
+"*) continue ;; esac ;;
+  esac
+  _at_pop+=("$_f")
+done <<EOF
+$_at_tracked
+EOF
+_at_hits=""
+[ "${#_at_pop[@]}" -gt 0 ] && _at_hits=$(awk '
+  /a\.workerType|const AGENT_TYPE_SHAPE =/ {
+    if (match($0, /\/\^[^\/]*\$\//)) print FILENAME "\t" FNR "\t" substr($0, RSTART, RLENGTH)
+  }' "${_at_pop[@]}")
+_at_own=""; _at_nown=0; _at_copies=""
+while IFS=$'\t' read -r _f _l _lit; do
+  [ -n "$_f" ] || continue
+  if [ "$_f" = "$_at_owner" ]; then
+    case " $_at_own " in *" $_lit "*) ;; *) _at_own="${_at_own:+$_at_own }$_lit"; _at_nown=$((_at_nown+1)) ;; esac
+  else
+    _at_copies="$_at_copies$_f	$_l	$_lit
+"
+  fi
+done <<EOF
+$_at_hits
+EOF
+if [ "$_at_nown" = 0 ]; then
+  echo "protocol-parity: agent-type shape DEAD PROBE — the owner $_at_owner yields no literal on a line testing a.workerType or declaring const AGENT_TYPE_SHAPE =, so the copies have nothing to agree with"
+  exit 1
+fi
+if [ "$_at_nown" -gt 1 ]; then
+  echo "protocol-parity: agent-type shape is AMBIGUOUS — the owner $_at_owner yields $_at_nown distinct literals: $_at_own"
+  exit 1
+fi
+_at_n=0; _at_m=0; _at_files=" "; _at_bad=0
+while IFS=$'\t' read -r _f _l _lit; do
+  [ -n "$_f" ] || continue
+  _at_n=$((_at_n+1))
+  case "$_at_files" in *" $_f "*) ;; *) _at_files="$_at_files$_f "; _at_m=$((_at_m+1)) ;; esac
+  if [ "$_lit" != "$_at_own" ]; then
+    echo "protocol-parity: agent-type shape DRIFT — $_f:$_l carries $_lit where the owner $_at_owner carries $_at_own"
+    _at_bad=1
+  fi
+done <<EOF
+$_at_copies
+EOF
+[ "$_at_bad" = 0 ] || exit 1
+if [ "$_at_n" = 0 ]; then
+  echo "protocol-parity: agent-type shape — no copy of the owner's literal was found outside $_at_owner, so this arm compared nothing"
+  exit 1
+fi
+echo "protocol-parity: agent-type shape — $_at_n literal(s) in $_at_m file(s) agree with the owner"
 if [ "$nskip" -gt 0 ]; then
   echo "protocol-parity: in parity — $((i-nskip)) rendered pair(s) match their templates for '$KITREL'; $nskip pair(s) SKIPPED, each named above"
 else

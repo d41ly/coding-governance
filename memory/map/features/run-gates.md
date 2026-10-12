@@ -9,7 +9,7 @@ decisions = ["TOOL-aPacedTurnstile-1", "TOOL-aPacedTurnstile-2", "TOOL-aPacedTur
 
 [claims]
 gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring",
-  "profile-bar selftest", "run-gates turnstile",
+  "profile-bar selftest",
   "every held leg is budgeted, every budget row resolves", "run-selftests self-test",
   "selftest harness self-test", "extract-arms self-test",
   "leg ceilings clear their evidenced maximum", "run-gates run-log line",
@@ -58,7 +58,6 @@ globs = [
   "tools/run-gates/profile_bar.test.sh",
   "tools/run-gates/gate-profiles.txt",
   "tools/run-gates/gate-fingerprint.sh",
-  "tools/run-gates/run-gates.turnstile.test.sh",
   "tools/run-gates/run-gates.runlog.test.sh",
   "tools/run-gates/run-held-wsl.sh",
   "tools/run-gates/held_halves.py",
@@ -219,7 +218,8 @@ saving, never a verdict (`TOOL-dThriftyLanding-2`).
 **The remote is asked through the ladder, never spelled.** The runner inlines the gov lib's remote
 ladder byte-identically, so no probe reads a literal `origin` (`TOOL-dLadderedRemote-2`).
 
-**A waiting bar beats.** On every tick it waits, the turnstile rewrites `gate-queue-heartbeat` under its own worktree's git dir, beside `gate-logs/`, and never removes it, so an out-of-process liveness reader sees a queued bar move before its first leg lands; the unattended driver's clock reads its mtime. `TOOL-dDerivedDocket-64`.
+**The host turnstile has its own dossier,** `run-gates-turnstile.md`: how many bars a host admits,
+the docs key, and what two concurrent bars of one repository share. It moved out at this file's cap.
 
 **The held tier can split across hosts, and only the combiner stamps it.** `run-held-wsl.sh` runs the Windows-only held legs natively and the rest in WSL from an ext4 mirror, each half a plain runner over a partition. `held_halves.py --combine` refuses a missing, moved or mismatched half and alone writes `held-green`, which no boundary reads. `TOOL-aSparedSpawn-5`.
 

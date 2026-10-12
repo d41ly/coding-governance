@@ -22,6 +22,7 @@ kits = [
   "settings-merge", "check-wiring", "push-main", "check-kit-versions", "check-install-prefix",
   "runlog",
   "process-monitor",
+  "roles",
 ]
 
 # NO `drop_blocks`. `cross-os` applies: this fleet is multi-OS, four nodes on Windows and POSIX

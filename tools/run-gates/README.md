@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.38` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.40` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -428,7 +428,7 @@ worktree serves the primary tree's push. It is one slot per clone, last writer w
 worktree's green evicts the first, which costs that push its saving and never its verdict.
 TOOL-dThriftyLanding-1, -2, -3.
 
-## The turnstile — one bar per host
+## The turnstile — `slots` bars per host, one by default
 
 A run claims a beacon in a HOST directory before it dispatches: `GATE_TURNSTILE_DIR`, else
 `~/.gov/gate-turnstile`. Every repository on the machine shares it, because bars from different
@@ -437,6 +437,47 @@ the scratch sweep stay per git common dir. A host dir that cannot be created fal
 dir for the beacon and the queue, with a NOTE, which is per-repository queueing. A runner older than
 this keys on its common dir and does not see the host beacon, so serialization is complete only when
 every repository on the host carries this runner.
+
+**The turnstile admits `slots` holders at once** (`TOOL-aPairedSlots-2`), the selected profile row's
+`slots` knob, 1 where it declares none, `GATE_TURNSTILE_SLOTS` over it. Each holder owns its own
+beacon directory: slot 1 is `gate-bar-beacon`, slot k is `gate-bar-beacon.<k>`. The queue is still
+one FIFO: only the ticket that sorts first claims, it takes the first free slot, and it gives up its
+ticket at once, so a second free slot goes to the next ticket one tick later. A waiter reaps a dead
+or stalled holder slot by slot, each removal guarded by the nonce it judged, and a release frees only
+its own slot. Above one slot a queued bar's line reads
+`<k> of <n> bar slots on this host are held — <repo> run <id> pid <pid>[; …] — queued at position N (waited Ns)`
+and the run record's header gains `slots` and `slot`; at one slot nothing printed or written changes,
+except where a bar's own worktree holds it back, as the next paragraph says.
+A host whose repositories declare different counts admits the LARGEST, since every runner claims
+among its own slots and all share slot 1 and the queue: a runner older than this claims slot 1 alone.
+A count above 64 is refused in a row and ignored, with a NOTE, in the override.
+
+**A worktree holds one bar at a time** (`TOOL-aPairedSlots-5`, `TOOL-aPairedSlots-15`). Everything
+under a worktree's git dir — its ledger, run records, gate logs and summary — assumes one writer, so
+a bar does not claim while any holder present names its own top level: a slot at any count, or a
+docs beacon. A head held back that way waits, keeping later tickets behind it, and its line names
+that holder: `… this worktree's bar holds <slot k|the docs key> — <repo> run <id> pid <pid> — queued
+at position N (waited Ns)`. Two worktrees of one repository have two git dirs and run at once.
+
+**A bar that acquires while another slot is held takes the shared width** (`TOOL-aPairedSlots-3`):
+the held count is read once, right after the acquire, and the constant `TS_SHARE_RULE` decides —
+`half` divides the width by the held count, `full` leaves it. The rule is the two-bar A/B's
+(`TOOL-aPairedSlots-9`), which sets it. `GATE_JOBS` is the operator's width and is never divided. The
+bar prints `gate profile: width <w> at dispatch — <k> of <n> bar slots held (<rule>)`, and the
+summary file and header record that width; a bar that acquires alone prints nothing and keeps its
+profile's width, and is not narrowed later when a neighbour arrives. The memory pause needs no
+counterpart: it reads a host-wide source, so two bars already pause on one reading.
+
+**A doc-only bar never queues** (`TOOL-aPairedSlots-4`). A run whose docs mode resolved — a
+`GATE_DOCS_BASE` naming a commit, with `GATE_FULL` unset — takes no ticket and claims no slot: it
+writes its beacon to `gate-docs-beacon/<run id>` beside the slots, exports its nonce so its legs'
+runners nest, runs the ticker, prints `gate queue: docs-only — admitted on the docs key, not queued`,
+and records `queued_from` `docs`. Nothing caps how many run at once (owner, 2026-10-11). It waits
+only for a bar in its own worktree, printing `gate queue: docs-only — this worktree's bar holds <key>
+— … — waiting for it`, and never for another worktree's. The reap and the held count read the slots
+only, so a doc-only bar never narrows or is named by a non-doc bar, and delays one only in its own
+worktree. A doc-only run first sweeps the docs beacons of dead, stalled or unfinished holders: one
+with neither a pid nor a heartbeat is judged by its directory's age. `--hold` is never doc-only.
 
 The beacon holds `heartbeat`, `pid`, `nonce`, and the holder's name: `repo` (its top level), `run`
 (its run id) and `ttl`. A second run takes a time-sorted ticket and queues, announcing
@@ -451,13 +492,14 @@ That line is not durable, and the status file beside it is deleted the moment th
 wait also reaches the RUN RECORD as the paired keys `queued` and `queued_from`, and the summary
 file as its own line. `queued_from` reads `held` (queued, then acquired), `nested` (ran inside the
 bar that holds the host, below), `expired` (burned the bounded wait and ran unqueued), `unticketed`
-(could not write a ticket and ran unqueued at once), `off` (the turnstile was disabled) or
+(could not write a ticket and ran unqueued at once), `docs` (a doc-only bar on the docs key, above),
+`off` (the turnstile was disabled) or
 `unresolved` (neither the host dir nor the common dir resolved). `off` and `unresolved` record a
 DASH rather than a zero, because a zero for a probe that never ran is a reassuring number about
 nothing. `unresolved` is UNARMED and the runner's comment says why.
 
 A holder exports its nonce as `GATE_TURNSTILE_HOLDER` to its legs. A runner that inherits a value
-equal to the live beacon's `nonce` is NESTED inside that bar: it takes no ticket, prints
+equal to the `nonce` of any live slot beacon is NESTED inside that bar: it takes no ticket, prints
 `gate queue: nested under <run> — <repo> pid <pid>`, and runs. Without that, a suite's scratch-repo
 bar, or a wrapper bar's inner runner, would queue behind the very bar whose leg started it. Nesting
 trusts an inherited value any process on the host can read from the beacon, so it decides contention
@@ -550,6 +592,7 @@ it knows:
 | `name` · `width` · `timeout` | the selected row, the effective width and its per-leg timeout |
 | `wall` | the whole-run wall in seconds, `GATE_WALL` over the row's own; 0 is no wall |
 | `queue` | the turnstile's bounded wait in seconds, the declared multiple of the TTL, derived before the verb exits |
+| `slots` | how many bars the host turnstile admits at once: the row's `slots` knob, 1 where it declares none, `GATE_TURNSTILE_SLOTS` over it. The profile line carries `, slots <n>` only above 1 |
 | `ceiling_max` | the largest positive leg `ceiling` in the resolved manifest, or `-` when no leg declares one; ABSENT when the manifest does not parse |
 | `ceilings` · `line` | whether per-leg ceilings are live here, and the profile line a bar prints |
 | `mempause` | the memory pause's effective threshold, `GATE_MEMPAUSE` over the row's own; 0 is off. A host that gives no reading shows as `mempause INERT` on `line` |

@@ -698,8 +698,23 @@ elif (cd "$SGWT" && bash "$SG_WRITER" --card --write --session sgtest-w1 </dev/n
   # pinned at the worktree's HEAD — the append re-renders the `tree —` cell and replaces the sentinel
   # — and the hook reads that card. Every spelling both kits share is exercised end to end here.
   sg_w1_head=$(git -C "$SGWT" rev-parse HEAD)
-  if (cd "$SGWT" && bash "$SG_WRITER" --card --write --session sgtest-w1 </dev/null >"$TMP/writer.out" 2>&1) \
-     && printf '## task\n- `README.md:1`\nREADY — sgtest · node a · sg-wt · base %s · Tier-1 · gates none\n' "$sg_w1_head" \
+  # The body's `## task` is the kickoff suite's own, all eight fields filled (TOOL-aOrientedCast-6
+  # S9): the writer refuses an unfilled task since KICK-aOrientedCast-1. `render_task_section` is
+  # taken from the suite beside the writer, or from the same SG_WRITER_BASE blob, and never typed
+  # here; an empty extraction is a FAIL naming the helper and where it looked.
+  if [ -n "${SG_WRITER_BASE:-}" ]; then
+    sg_task_src="$SG_WRITER_BASE:skills/session-kickoff/manifest-check.test.sh"
+    sg_task_def=$(git -C "$HERE" show "$sg_task_src" 2>/dev/null | tr -d '\r' | sed -n '/^render_task_section() {$/,/^}$/p')
+  else
+    sg_task_src="$(dirname "$SG_WRITER")/manifest-check.test.sh"
+    sg_task_def=$(tr -d '\r' < "$sg_task_src" 2>/dev/null | sed -n '/^render_task_section() {$/,/^}$/p')
+  fi
+  sg_task_ok=0
+  [ -n "$sg_task_def" ] && eval "$sg_task_def" 2>/dev/null && [ -n "$(render_task_section 2>/dev/null)" ] && sg_task_ok=1
+  if [ "$sg_task_ok" != 1 ]; then
+    echo "FAIL AC10 render_task_section yielded no definition from $sg_task_src, so the READY body has no filled ## task to send"; fail=$((fail+1))
+  elif (cd "$SGWT" && bash "$SG_WRITER" --card --write --session sgtest-w1 </dev/null >"$TMP/writer.out" 2>&1) \
+     && { render_task_section; printf '## read\n- `README.md:1`\nREADY — sgtest · node a · sg-wt · base %s · Tier-1 · gates none\n' "$sg_w1_head"; } \
         | (cd "$SGWT" && bash "$SG_WRITER" --card --append --session sgtest-w1 >"$TMP/append.out" 2>&1); then
     echo "ok   AC10 the writer's --card --append landed a real READY body on sgtest-w1"; pass=$((pass+1))
   else
@@ -943,6 +958,192 @@ read_conf "W-AC10 a key is matched whole: KEY_X and NOTKEY are not KEY" '<null>'
 read_conf "W-AC10 the key is compared as a string, never a regex: K.Y does not read KXY" '<null>' 'KXY=1' 'K.Y'
 
 # ==================================================================================================
+# ---- the ROLE ARM (TOOL-aOrientedCast-6): a spec write only from a `writes = spec` role, a product
+# ---- write only from a `writes = product` role once the route admits it, and the status flip -----
+# Over the write gate's fixture. Every arm ABOVE ran with no role index, which is S5's absent case:
+# the gate exactly as aRoutedQuill left it. The base hook admits every spec write and admits a
+# product write from any writer once a routed unit is buildable, so every exit-2 arm below was
+# observed exiting 0 against it (2026-10-11, node a, a hand probe of the same payloads); the exit-0
+# arms are their near-misses. The index is removed at the end of the block.
+SG_ROLES="$SGWT/.claude/roles.json"
+SG_ROLES_SHOWN=$(build_comparable "$SG_CWD_WT")/.claude/roles.json
+# write_roles <ok|nospec|broken|absent> — the index in TOOL-aOrientedCast-3's shape, or not.
+write_roles() {
+  mkdir -p "$SGWT/.claude"
+  case "$1" in
+    ok)     printf '{"harnesses":["a.js"],"roles":{"gov-builder":{"agent":true,"workflow":"build","writes":"product"},"gov-session":{"agent":false,"workflow":"handoff","writes":"none"},"gov-spec-writer":{"agent":true,"workflow":"spec","writes":"spec"}}}\n' > "$SG_ROLES" ;;
+    nospec) printf '{"harnesses":[],"roles":{"gov-builder":{"agent":true,"workflow":"build","writes":"product"}}}\n' > "$SG_ROLES" ;;
+    broken) printf '{' > "$SG_ROLES" ;;
+    absent) rm -f "$SG_ROLES" ;;
+  esac
+}
+# A spec with a section line beside its status, routed by sgtest-o1; TOOL-x-2's spec is routed by no card here.
+SG_OSPEC="$SG_SPECS/2026-10-09-spec-TOOL-x-20.md"
+printf '# TOOL-x-20 — a role-arm fixture unit\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2 · base 0000000 · streams tooling · order 1\n\n## 2. Scope (IN)\n\n- **S1** — a line beside the status\n' > "$SGWT/$SG_OSPEC"
+write_route_card sgtest-o1 write "TOOL-x-20=$SG_OSPEC"
+SG_OS="$SG_CWD_WT/$SG_OSPEC"
+SG_O2="$SG_CWD_WT/$SG_SPECS/2026-10-09-spec-TOOL-x-2.md"
+# run_edit <name> <want_exit> <stderr-expect> <tool> <target> <edit> [<field>=<value> ...] — <edit> is
+# `old>>new` for an Edit, `old>>new;;old>>new` for a MultiEdit's edits, `@<file>` for a Write's
+# content and `-` for a Write of `x`; fields join the payload top level. Graded as run_write grades.
+run_edit() {
+  local name=$1 want=$2 expect=$3 tool=$4 target=$5 edit=$6; shift 6
+  local payload got
+  payload=$("$TESTPY" -c 'import json,sys
+t,p,s=sys.argv[1:4]; ti={"file_path":p}
+if t=="Write": ti["content"]="x" if s=="-" else open(s[1:],encoding="utf-8",newline="").read()
+else:
+    eds=[dict(zip(("old_string","new_string"),e.split(">>",1))) for e in s.split(";;")]
+    if t=="Edit": ti.update(eds[0])
+    else: ti["edits"]=eds
+d={"tool_name":t,"tool_input":ti}; d.update(kv.split("=",1) for kv in sys.argv[4:]); print(json.dumps(d))' "$tool" "$target" "$edit" "$@")
+  case "$payload" in *'"tool_name"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
+  printf '%s' "$payload" \
+    | HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= CLAUDE_PROJECT_DIR="$SG_PROJECT" \
+      node "$HOOK" >/dev/null 2>"$TMP/err"
+  got=$?
+  check_stderr "$name" "$want" "$got" "$expect"
+}
+write_roles ok
+# ---- AC1: a spec write from the spec-writer only ------------------------------------------------
+run_edit "R-AC1 gov-spec-writer writes a spec -> allow, stderr EMPTY" 0 empty Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-spec-writer
+run_edit "R-AC1 the main loop writes a spec -> deny naming gov-spec-writer, the index and handoff.py render" 2 "any;;gov-spec-writer;;$SG_ROLES_SHOWN;;handoff.py render;;--build bx" Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "R-AC1 workflow-subagent writes a spec -> deny naming gov-spec-writer, the index and handoff.py render" 2 "any;;gov-spec-writer;;$SG_ROLES_SHOWN;;handoff.py render" Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=workflow-subagent
+run_edit "R-AC1 gov-builder writes a spec -> deny naming gov-spec-writer, the index and handoff.py render" 2 "any;;gov-spec-writer;;$SG_ROLES_SHOWN;;handoff.py render" Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
+# ---- AC2: a product write needs the buildable route AND the builder ------------------------------
+run_edit "R-AC2 gov-builder, buildable route -> allow, stderr EMPTY" 0 empty Write "$SG_T" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
+run_edit "R-AC2 the main loop, buildable route -> deny naming gov-builder" 2 "any;;gov-builder;;$SG_ROLES_SHOWN" Write "$SG_T" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "R-AC2 gov-spec-writer, buildable route -> deny naming gov-builder" 2 "any;;gov-builder;;$SG_ROLES_SHOWN" Write "$SG_T" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-spec-writer
+run_edit "R-AC2 gov-builder, unrouted card -> deny with the ## route refusal" 2 "any;;## route;;/session-kickoff" Write "$SG_T" - session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
+# ---- AC3: the status flip, and every near-miss that moves more than the status and date ----------
+sed 's/^\*\*Status:\*\* INPROGRESS \(.*\) 2026-10-09 /**Status:** CLOSED \1 2026-10-11 /' "$SGWT/$SG_OSPEC" > "$TMP/flip.md"
+sed 's/^\*\*Status:\*\* INPROGRESS/**Status:** CLOSED/; s/a line beside the status/a line moved beside the status/' "$SGWT/$SG_OSPEC" > "$TMP/flip-moved.md"
+SG_TMP_N=$(cd "$TMP" && node -p 'process.cwd()')   # node's spelling, which the payload builder can open
+run_edit "R-AC3 the main loop's Edit of the status cell -> allow, stderr EMPTY" 0 empty Edit "$SG_OS" 'INPROGRESS>>CLOSED' session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "R-AC3 the main loop's Write changing only the status and date cells -> allow, stderr EMPTY" 0 empty Write "$SG_OS" "@$SG_TMP_N/flip.md" session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "R-AC3 the main loop's MultiEdit of the status and the date -> allow, stderr EMPTY" 0 empty MultiEdit "$SG_OS" 'INPROGRESS>>CLOSED;;2026-10-09>>2026-10-11' session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "R-AC3 gov-builder flips its routed unit's spec INPROGRESS to CLOSED -> allow, stderr EMPTY" 0 empty Edit "$SG_OS" 'INPROGRESS>>CLOSED' session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
+run_edit "R-AC3 gov-builder's same flip on a spec the card does not route -> deny" 2 "any;;gov-spec-writer;;status and date cells" Edit "$SG_O2" 'SPECCED>>CLOSED' session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
+run_edit "R-AC3 workflow-subagent's flip -> deny" 2 "any;;gov-spec-writer" Edit "$SG_OS" 'INPROGRESS>>CLOSED' session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=workflow-subagent
+run_edit "R-AC3 the main loop's Edit moving the rev- cell -> deny" 2 "any;;gov-spec-writer" Edit "$SG_OS" 'rev-1>>rev-2' session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "R-AC3 the main loop's Write moving a section 2 line beside the status -> deny" 2 "any;;gov-spec-writer" Write "$SG_OS" "@$SG_TMP_N/flip-moved.md" session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "R-AC3 the main loop's MultiEdit whose old_string the file does not hold -> deny" 2 "any;;gov-spec-writer" MultiEdit "$SG_OS" 'NOT-IN-THE-FILE>>CLOSED' session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+# ---- AC4: arming — absent, broken, and an index naming no writer for one class -------------------
+write_roles absent
+run_edit "R-AC4 no index: the main loop writes a spec -> allow, stderr EMPTY" 0 empty Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "R-AC4 no index: the main loop's product write over a buildable route -> allow, stderr EMPTY" 0 empty Write "$SG_T" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+write_roles broken
+run_edit "R-AC4 an index holding { : the main loop writes a spec -> deny naming the index" 2 "any;;$SG_ROLES_SHOWN;;is not JSON" Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "R-AC4 an index holding { : the main loop's product write -> deny naming the index" 2 "any;;$SG_ROLES_SHOWN;;is not JSON" Write "$SG_T" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+run_edit "R-AC4 an index holding { : a Write to the build's README.md -> allow, stderr EMPTY" 0 empty Write "$SG_CWD_WT/mem/builds/bx/README.md" - session_id=sgtest-o1 "cwd=$SG_CWD_WT"
+write_roles nospec
+run_edit "R-AC4 an index naming no spec role: gov-spec-writer writes a spec -> deny naming UNARMED and the class" 2 "any;;UNARMED;;spec class;;$SG_ROLES_SHOWN" Write "$SG_OS" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-spec-writer
+run_edit "R-AC4 an index naming no spec role: gov-builder's product write -> allow, stderr EMPTY" 0 empty Write "$SG_T" - session_id=sgtest-o1 "cwd=$SG_CWD_WT" agent_id=sub-1 agent_type=gov-builder
+write_roles absent
+
+# ==================================================================================================
+# ---- the ROLE-GATE ARM (TOOL-aOrientedCast-11): a role agent runs no gate its allowlist does not --
+# ---- name; the main loop is never refused -------------------------------------------------------
+# Over the linked worktree of the orientation fixture, with a role index carrying `gates` and a gate
+# manifest at `kit/gate-legs.json`, so `{prefix}` is `kit`. Every arm ABOVE ran with no index or one
+# without `gates`, so the arm was absent or its leg row unarmed there. Against the base hook every
+# exit-2 arm below exits 0 (2026-10-12, node a, a hand probe of the spec's payloads over the
+# repository's own index); the exit-0 arms are their near-misses and the main loop's controls.
+# write_gate_manifest — five legs in the manifest's shape, one of them repo-relative with no {prefix}.
+write_gate_manifest() {
+  mkdir -p "$SGWT/kit"
+  printf '[{"name":"memory hygiene","argv":["bash","{prefix}/memory-tree/check-memory-hygiene.sh"]},{"name":"lexicon naming predicates","argv":["python","{prefix}/lexicon/lexicon.py"]},{"name":"roles catalogue","argv":["python","{prefix}/roles/check_roles.py"]},{"name":"gotchas selftest","argv":["python3","{prefix}/memory-tree/gotchas.py","--selftest"]},{"name":"kickoff-manifest ratchet","argv":["bash","skills/session-kickoff/manifest-check.sh"]}]\n' > "$SGWT/kit/gate-legs.json"
+  mkdir -p "$SGWT/.claude"
+  printf '{"gates":{"manifest":"%s"},"harnesses":[],"roles":{"gov-builder":{"agent":true,"gates":["lexicon naming predicates"],"workflow":"build","writes":"product"},"gov-orienter":{"agent":true,"gates":[],"workflow":"orient","writes":"none"},"gov-skeptic":{"agent":true,"gates":[],"workflow":"closing-review","writes":"none"},"gov-spec-writer":{"agent":true,"gates":["memory hygiene","lexicon naming predicates"],"workflow":"spec-write","writes":"spec"}}}\n' "$1" > "$SG_ROLES"
+}
+# run_role_bash <name> <want_exit> <stderr-expect> <agent_type|-> <Bash|PowerShell> <command> [<cwd> [<CLAUDE_PROJECT_DIR>]]
+# — graded as run_card grades. The cwd defaults to the linked worktree; CLAUDE_PROJECT_DIR is UNSET
+# unless the arm names one, so a suite run inside a session never arms a role arm from the session's
+# directory (TOOL-aOrientedCast-14 S7).
+run_role_bash() {
+  local name=$1 want=$2 expect=$3 type=$4 tool=$5 cmd=$6 cwd=${7:-$SG_CWD_WT} project=${8:-}
+  local payload got
+  payload=$("$TESTPY" -c 'import json,sys; d={"tool_name":sys.argv[2],"tool_input":{"command":sys.argv[3]},"cwd":sys.argv[4]}
+if sys.argv[1] != "-": d["agent_type"]=sys.argv[1]
+print(json.dumps(d))' "$type" "$tool" "$cmd" "$cwd")
+  case "$payload" in *'"command"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
+  if [ -n "$project" ]; then
+    printf '%s' "$payload" | env -u CLAUDE_PROJECT_DIR CLAUDE_PROJECT_DIR="$project" HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
+      node "$HOOK" >/dev/null 2>"$TMP/err"
+  else
+    printf '%s' "$payload" | env -u CLAUDE_PROJECT_DIR HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
+      node "$HOOK" >/dev/null 2>"$TMP/err"
+  fi
+  got=$?
+  check_stderr "$name" "$want" "$got" "$expect"
+}
+write_gate_manifest kit/gate-legs.json
+# ---- AC1: the REFUSED payloads for gov-builder, each naming its row; the main loop's controls -----
+run_role_bash "G-AC1 the bar runner -> deny naming G2" 2 "any;;G2 runner;;gov-builder;;$SG_ROLES_SHOWN;;merge or push threshold" gov-builder Bash 'bash kit/run-gates/run-gates.sh'
+run_role_bash "G-AC1 the bar under a GATE_ prefix -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'GATE_SELFTESTS=1 bash kit/run-gates/run-gates.sh'
+run_role_bash "G-AC1 the self-test runner -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash kit/run-gates/run-selftests.sh --pooled'
+run_role_bash "G-AC1 the unattended gates runner -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash kit/unattended/run-unattended-gates.sh --checks'
+run_role_bash "G-AC1 a *.test.sh suite -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'bash kit/hooks/agent-cap.test.sh'
+run_role_bash "G-AC1 a selftest.py script -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'python kit/govkit/selftest.py'
+run_role_bash "G-AC1 a script carrying --selftest -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'python3 kit/memory-tree/gotchas.py --selftest'
+run_role_bash "G-AC1 a leg the allowlist does not name -> deny naming G1 and the leg" 2 "any;;G1 leg;;roles catalogue" gov-builder Bash 'python kit/roles/check_roles.py'
+run_role_bash "G-AC1 a suite inside bash -c -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash -c 'bash kit/hooks/agent-cap.test.sh'"
+run_role_bash "G-AC1 PowerShell: the bar after an env assignment -> deny naming G2" 2 "any;;G2 runner" gov-builder PowerShell '$env:GATE_FULL=1; bash kit/run-gates/run-gates.sh'
+run_role_bash "G-AC1 the main loop runs the bar -> allow, stderr EMPTY" 0 empty - Bash 'bash kit/run-gates/run-gates.sh'
+run_role_bash "G-AC1 the main loop runs a suite -> allow, stderr EMPTY" 0 empty - Bash 'bash kit/hooks/agent-cap.test.sh'
+run_role_bash "G-AC1 the main loop runs a leg -> allow, stderr EMPTY" 0 empty - Bash 'python kit/roles/check_roles.py'
+# ---- AC1: BY ROLE — the allowlist decides ---------------------------------------------------------
+run_role_bash "G-AC1 gov-spec-writer runs memory hygiene -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash 'bash kit/memory-tree/check-memory-hygiene.sh'
+run_role_bash "G-AC1 gov-builder runs memory hygiene -> deny naming the leg" 2 "any;;G1 leg;;memory hygiene" gov-builder Bash 'bash kit/memory-tree/check-memory-hygiene.sh'
+run_role_bash "G-AC1 workflow-subagent runs memory hygiene -> deny naming the leg" 2 "any;;G1 leg;;memory hygiene" workflow-subagent Bash 'bash kit/memory-tree/check-memory-hygiene.sh'
+run_role_bash "G-AC1 gov-builder runs the lexicon -> allow, stderr EMPTY" 0 empty gov-builder Bash 'python kit/lexicon/lexicon.py'
+run_role_bash "G-AC1 gov-spec-writer runs the lexicon -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash 'python kit/lexicon/lexicon.py'
+run_role_bash "G-AC1 gov-skeptic runs the lexicon -> deny naming the leg" 2 "any;;G1 leg;;lexicon naming predicates" gov-skeptic Bash 'python kit/lexicon/lexicon.py'
+# ---- AC2: the NEAR-MISSES — a mention, a scoped variant or a render is not a gate run --------------
+run_role_bash "G-AC2 gotchas.py --for-diff -> allow, stderr EMPTY" 0 empty gov-builder Bash 'python3 kit/memory-tree/gotchas.py --for-diff HEAD~1..HEAD'
+run_role_bash "G-AC2 lexicon.py --suggest -> allow, stderr EMPTY" 0 empty gov-builder Bash 'python3 kit/lexicon/lexicon.py --suggest checkRoleGate --as js.function'
+run_role_bash "G-AC2 a *.test.sh carrying --render -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash kit/workflows/check-protocol-parity.test.sh --render'
+run_role_bash "G-AC2 bash -n on a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash -n kit/hooks/agent-cap.test.sh'
+run_role_bash "G-AC2 git log naming a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash 'git log --oneline -- kit/hooks/agent-cap.test.sh'
+run_role_bash "G-AC2 grep for the runner's name -> allow, stderr EMPTY" 0 empty gov-builder Bash 'grep -n run-gates.sh AGENTS.md'
+run_role_bash "G-AC2 a commit message naming the bar -> allow, stderr EMPTY" 0 empty gov-builder Bash 'git commit -m "names bash kit/run-gates/run-gates.sh"'
+run_role_bash "G-AC2 gov-orienter's manifest-check --card (a leg's script, more words) -> allow, stderr EMPTY" 0 empty gov-orienter Bash 'bash skills/session-kickoff/manifest-check.sh --card --path'
+# ---- TOOL-aOrientedCast-14 AC1: every launcher option and prefix-word option is stepped past by ----
+# ---- the rule table. Against a walk of one option per launcher with no prefix-word options, each --
+# ---- exit-2 row below exits 0 except the node row: its `--selftest` refuses whichever word heads --
+run_role_bash "O-AC1 bash -o pipefail <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash -o pipefail kit/run-gates/run-gates.sh'
+run_role_bash "O-AC1 bash -O extglob <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash -O extglob kit/run-gates/run-gates.sh'
+run_role_bash "O-AC1 bash -e -x <suite> -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'bash -e -x kit/hooks/agent-cap.test.sh'
+run_role_bash "O-AC1 bash -e -c '<runner>' -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash -e -c 'bash kit/run-gates/run-gates.sh'"
+run_role_bash "O-AC1 python -X utf8 <selftest.py> -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'python -X utf8 kit/govkit/selftest.py'
+run_role_bash "O-AC1 env -u FOO bash <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'env -u FOO bash kit/run-gates/run-gates.sh'
+run_role_bash "O-AC1 exec bash <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'exec bash kit/run-gates/run-gates.sh'
+run_role_bash "O-AC1 nice -n 10 bash <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'nice -n 10 bash kit/run-gates/run-gates.sh'
+run_role_bash "O-AC1 node -r <preload> <script> --selftest -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'node -r kit/p.js kit/x.js --selftest'
+# ---- AC2: the near-misses — a syntax check, a lookup and an inline program run no script ----------
+run_role_bash "O-AC2 bash -n <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash -n kit/hooks/scratch-guard.test.sh'
+run_role_bash "O-AC2 bash -e -n <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash -e -n kit/hooks/agent-cap.test.sh'
+run_role_bash "O-AC2 command -v <runner> -> allow, stderr EMPTY" 0 empty gov-builder Bash 'command -v kit/run-gates/run-gates.sh'
+run_role_bash "O-AC2 python -c <program> <selftest.py> -> allow, stderr EMPTY" 0 empty gov-builder Bash 'python -c "print(1)" kit/govkit/selftest.py'
+run_role_bash "O-AC2 node -e <program> <script> --selftest -> allow, stderr EMPTY" 0 empty gov-builder Bash 'node -e "1" kit/x.js --selftest'
+# ---- AC3: the anchor — a cwd under no checkout falls back to CLAUDE_PROJECT_DIR; against a ---------
+# ---- checkRoleGate reading the payload cwd alone, the first row exits 0 and the third says nothing -
+run_role_bash "O-AC3 cwd under no checkout, CLAUDE_PROJECT_DIR the fixture -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash kit/run-gates/run-gates.sh' "$SG_NOREPO" "$SG_CWD_WT"
+run_role_bash "O-AC3 cwd under no checkout, no CLAUDE_PROJECT_DIR -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash kit/run-gates/run-gates.sh' "$SG_NOREPO"
+run_role_bash "O-AC3 cwd and CLAUDE_PROJECT_DIR under no checkout -> allow, one witness" 0 "one;;role-gate unarmed" gov-builder Bash 'bash kit/run-gates/run-gates.sh' "$SG_NOREPO" "$SG_NOREPO/$SGP"
+# ---- AC3: arming — no index, a broken index, a manifest that does not read ------------------------
+write_roles absent
+run_role_bash "G-AC3 no index: gov-builder runs the bar -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash kit/run-gates/run-gates.sh'
+write_roles broken
+run_role_bash "G-AC3 an index holding { : gov-builder runs the bar -> deny naming the index" 2 "any;;$SG_ROLES_SHOWN;;is not JSON" gov-builder Bash 'bash kit/run-gates/run-gates.sh'
+run_role_bash "G-AC3 an index holding { : gov-builder runs ls -> allow, stderr EMPTY (no candidate reads no index)" 0 empty gov-builder Bash 'ls'
+write_gate_manifest kit/missing.json
+run_role_bash "G-AC3 a manifest that does not read: a leg's exact argv -> allow, one witness naming the unarmed row" 0 "one;;G1 leg unarmed" gov-builder Bash 'python kit/roles/check_roles.py'
+run_role_bash "G-AC3 a manifest that does not read: the bar runner still -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash kit/run-gates/run-gates.sh'
+write_roles absent
+rm -rf "$SGWT/kit"
+
+# ==================================================================================================
 # ---- the SUBAGENT CONTEXT (TOOL-aRoutedQuill-4): a SubagentStart payload is answered with the -----
 # ---- card's route, each unit's verdict and what the write gate refuses, as facts -----------------
 # Over the write gate's fixture, conf and cards above. The base hook exits 0 with EMPTY stdout for
@@ -1101,8 +1302,15 @@ n=$((pass+fail))
 # and the foreign fixture's build line).
 # 236 = 212 + the 24 the subagent context added (TOOL-aRoutedQuill-4: 7 for AC1, 4 for AC2, 6 for
 # AC3, 2 for AC4, 4 for AC5 and 1 for AC7).
+# 260 = 236 + the 24 run_edit arms the role arm added (TOOL-aOrientedCast-6: 4 for AC1, 4 for AC2,
+# 9 for AC3 and 7 for AC4); its AC10 fold change keeps that arm's one ok-or-FAIL line.
+# 292 = 260 + the 32 run_role_bash arms the role-gate arm added (TOOL-aOrientedCast-11: 19 for AC1,
+# 8 for AC2 and 5 for AC3), counted by hand: the owner's rule runs no suite in a pass, so the main
+# loop confirms the executed count at the close.
+# 309 = 292 + the 17 run_role_bash rows TOOL-aOrientedCast-14 added (9 for AC1, 5 for AC2 and 3 for
+# AC3), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=236
+FLOOR_ASSERTIONS=309
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

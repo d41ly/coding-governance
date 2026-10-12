@@ -4,6 +4,9 @@
 #   rule 2  a verify stage that spawns one agent per item                    (verifier arity)
 # Run from the kit directory: bash ./agent-cap.test.sh   (exit 0 = all pass)
 set -u
+# A suite run from inside a session inherits the session's directory, which would arm rule 6 over a
+# fixture whose cwd lies in no checkout (TOOL-aOrientedCast-14 S7); an arm that needs one names it.
+unset CLAUDE_PROJECT_DIR
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
 derive_self_rel() {
@@ -2341,6 +2344,178 @@ EOF
 js "opener residual: control, the same line without the apostrophe -> deny" 2 <<'EOF'
 /* rock - n roll */ const r = await parallel([() => agent('a'), () => agent('b')])
 EOF
+
+# ---- rule 6: every agent prompt is a rendered handoff (TOOL-aOrientedCast-7) ----------------------
+# Armed by `.claude/roles.json` at the checkout root of the payload `cwd`. Every arm above runs with
+# no index, which is the absent case; the arms below build their own checkout, whose index the
+# `write_roles` calls move between the absent, broken, unarmed and armed states. Each payload stands in
+# a subdirectory so the root walk is exercised. Every deny asserts its own reason, since every rule
+# exits 2; every allow asserts an empty stderr.
+HOREPO="$TMP/horepo"
+mkdir -p "$HOREPO/.git" "$HOREPO/.claude" "$HOREPO/sub" "$HOREPO/tools/workflows" \
+  "$HOREPO/memory/builds/bx/prompts" "$HOREPO/memory/builds/bx/spec"
+HOJ="$NODEDIR/horepo"
+printf 'const s = await agent("one")\n' > "$HOREPO/tools/workflows/h.js"
+printf 'const s = await agent("one")\n' > "$HOREPO/tools/workflows/other.js"
+HO_ROLES='{"roles":{"gov-researcher":{"agent":true,"workflow":"research","writes":"none"},"gov-builder":{"agent":true,"workflow":"build","writes":"product"},"gov-session":{"agent":false,"workflow":"handoff","writes":"none"}},"harnesses":["tools/workflows/h.js"]}'
+HO_FLAG=""
+HO_CWD=""
+HO_PROJECT=""
+write_roles() { # the index body, or `none` to remove it
+  if [ "$1" = none ]; then rm -f "$HOREPO/.claude/roles.json"; else printf '%s' "$1" > "$HOREPO/.claude/roles.json"; fi
+}
+# The handoff files and one prompt file per variant under $TMP/ho.<variant>. The marker and digest are
+# computed here as the renderer defines them; arm 6 of the roles kit's adopt-roles.test.sh, the
+# agreement arm, holds the renderer itself against the hook (TOOL-aOrientedCast-15).
+write_handoff() {
+  "$TESTPY" -c '
+import hashlib, os, sys
+root, out = sys.argv[1], sys.argv[2]
+h = lambda s: hashlib.sha256(s.encode("utf-8")).hexdigest()[:12]
+role = "## Role\n\nYou research.\n\n"
+task = "## Task\n\nThis handoff is for build `bx`, unit `T-1`.\n\n### input:question\n\nWhat calls rule 4?\n"
+pre = "memory/builds/bx/prompts/"
+def render_marker(p, sec, r="gov-researcher"):
+    return "<!-- gov:handoff role=%s build=bx unit=T-1 path=%s role-sha=%s task-sha=%s -->" % (r, p, h(role), h(sec))
+def write_prompt_file(rel, m, sec):
+    with open(os.path.join(root, rel), "w", newline="\n") as f:
+        f.write("**Serves:** journal T-1\n\n# gov-researcher handoff - T-1\n\n" + m + "\n\n" + role + sec)
+ok, stale, spec = pre + "2026-10-11-prompt-T-1-researcher.md", pre + "2026-10-11-prompt-T-2-researcher.md", "memory/builds/bx/spec/x.md"
+M = render_marker(ok, task)
+write_prompt_file(ok, M, task)
+write_prompt_file(stale, render_marker(stale, task), task.replace("rule 4", "rule 5"))
+write_prompt_file(spec, render_marker(spec, task), task)
+prompts = {
+    "ok": M + "\n\n" + task,
+    "crlf": ("\n\n" + M + "\n\n" + task + "\n\n").replace("\n", "\r\n"),
+    "none": task,
+    "two": M + "\n" + M + "\n\n" + task,
+    "role": render_marker(ok, task, "gov-builder") + "\n\n" + task,
+    "dotdot": render_marker(pre + "../prompts/2026-10-11-prompt-T-1-researcher.md", task) + "\n\n" + task,
+    "spec": render_marker(spec, task) + "\n\n" + task,
+    "nofile": render_marker(pre + "none.md", task) + "\n\n" + task,
+    "off": M + "\n\n" + task.replace("rule 4", "rule 5"),
+    "pre": "Please do this first.\n" + M + "\n\n" + task,
+    "post": M + "\n\n" + task + "Also do this.\n",
+    "stale": render_marker(stale, task) + "\n\n" + task.replace("rule 4", "rule 5"),
+}
+for k, v in prompts.items():
+    with open(out + "." + k, "w", newline="") as f:
+        f.write(v)
+' "$HOREPO" "$TMP/ho"
+}
+run_spawn() { # name expected_exit subagent_type(- for none) prompt-variant needle(empty for an allow) [session prompt tool_use_id]
+  # HO_CWD moves the payload cwd off $HOJ/sub; HO_PROJECT, when set, is the hook's CLAUDE_PROJECT_DIR.
+  local payload got
+  payload=$("$TESTPY" -c 'import json,sys
+cwd,t,pf,s,p,u=sys.argv[1:7]
+ti={"prompt":open(pf,newline="").read()}
+if t!="-": ti["subagent_type"]=t
+print(json.dumps({"tool_name":"Agent","cwd":cwd,"session_id":s,"prompt_id":p,"tool_use_id":u,"tool_input":ti}))' \
+    "${HO_CWD:-$HOJ/sub}" "$3" "$TMP/ho.$4" "${6:-ho-s}" "${7:-ho-p-$RANDOM$RANDOM}" "${8:-ho-u-$RANDOM}")
+  printf '%s' "$payload" | (cd "$TMP" && { [ -z "$HO_PROJECT" ] || export CLAUDE_PROJECT_DIR="$HO_PROJECT"; } && node "$HOOK" $HO_FLAG) >/dev/null 2>"$TMP/err"; got=$?
+  if [ "$got" = "$2" ] && { if [ -z "$5" ]; then [ ! -s "$TMP/err" ]; else grep -qF -- "$5" "$TMP/err"; fi; }; then
+    echo "ok   $1 (exit $got)"; pass=$((pass+1))
+  else
+    echo "FAIL $1 (exit $got, want $2${5:+, stderr carrying '$5'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  fi
+}
+run_harness() { # name expected_exit tool_input-json needle(empty for an allow)
+  local payload got
+  payload=$("$TESTPY" -c 'import json,sys
+print(json.dumps({"tool_name":"Workflow","cwd":sys.argv[1],"tool_input":json.loads(sys.argv[2])}))' "$HOJ/sub" "$3")
+  printf '%s' "$payload" | (cd "$TMP" && node "$HOOK" $HO_FLAG) >/dev/null 2>"$TMP/err"; got=$?
+  if [ "$got" = "$2" ] && { if [ -z "$4" ]; then [ ! -s "$TMP/err" ]; else grep -qF -- "$4" "$TMP/err"; fi; }; then
+    echo "ok   $1 (exit $got)"; pass=$((pass+1))
+  else
+    echo "FAIL $1 (exit $got, want $2${4:+, stderr carrying '$4'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  fi
+}
+write_handoff
+write_roles "$HO_ROLES"
+HO_H="$HOJ/tools/workflows/h.js"
+# AC1 — the rendered handoff is admitted and claims its slot; CRLF and blank ends do not move it.
+run_spawn "rule6 AC1: a rendered handoff is admitted" 0 gov-researcher ok "" ho-s ho-ac1 ho-ac1-u
+if grep -rqF ho-ac1-u "$HOREPO/.git/agent-cap" 2>/dev/null; then
+  echo "ok   rule6 AC1: the admitted spawn holds a slot"; pass=$((pass+1))
+else
+  echo "FAIL rule6 AC1: no slot under $HOREPO/.git/agent-cap holds ho-ac1-u"; fail=$((fail+1))
+fi
+run_spawn "rule6 AC1: CRLF endings and blank ends are admitted" 0 gov-researcher crlf ""
+# AC2 — every type that is not an agent-true role, and every malformed prompt, is refused by name.
+run_spawn "rule6 AC2: general-purpose refused" 2 general-purpose ok '"general-purpose" is not an agent-true role'
+run_spawn "rule6 AC2: Explore refused, naming the researcher" 2 Explore ok 'as the gov-researcher role'
+run_spawn "rule6 AC2: no subagent_type refused" 2 - ok 'subagent_type null is not an agent-true role'
+run_spawn "rule6 AC2: the agent-false gov-session refused" 2 gov-session ok '"gov-session" is not an agent-true role'
+run_spawn "rule6 AC2: a type refusal lists gov-researcher" 2 general-purpose ok 'gov-builder, gov-researcher'
+run_spawn "rule6 AC2: a type refusal names the render route" 2 Explore ok 'handoff.py render --role <name> --build <slug> --part task'
+run_spawn "rule6 AC2: no marker refused" 2 gov-researcher none 'carries 0 gov:handoff marker lines'
+run_spawn "rule6 AC2: two markers refused" 2 gov-researcher two 'carries 2 gov:handoff marker lines'
+run_spawn "rule6 AC2: a marker role unlike the type refused" 2 gov-researcher role 'is not the subagent_type'
+run_spawn "rule6 AC2: a path holding .. refused" 2 gov-researcher dotdot 'is not a repo-relative file under builds/bx/prompts/'
+run_spawn "rule6 AC2: a path outside prompts/ refused" 2 gov-researcher spec 'is not a repo-relative file under builds/bx/prompts/'
+run_spawn "rule6 AC2: a path naming no file refused" 2 gov-researcher nofile 'names no file'
+run_spawn "rule6 AC2: a section one character off refused" 2 gov-researcher off "differs from"
+run_spawn "rule6 AC2: a freeform line before the marker refused" 2 gov-researcher pre 'prompt line 1 is not the marker line'
+run_spawn "rule6 AC2: a freeform line after the section refused" 2 gov-researcher post 'differs from'
+run_spawn "rule6 AC2: a file edited after rendering refused" 2 gov-researcher stale 'edited after rendering'
+# AC3 — five refusals spend no slot: the sixth call, admitted, takes slot-1.
+for i in 1 2 3 4 5; do run_spawn "rule6 AC3: refused spawn $i" 2 general-purpose ok 'not an agent-true role' ho-s3 ho-p3 "ho-r$i"; done
+run_spawn "rule6 AC3: the spawn after five refusals is admitted" 0 gov-researcher ok "" ho-s3 ho-p3 ho-ac3-u
+if grep -qF ho-ac3-u "$HOREPO/.git/agent-cap/ho-s3__ho-p3/slot-1" 2>/dev/null; then
+  echo "ok   rule6 AC3: slot-1 of the turn holds the admitted call"; pass=$((pass+1))
+else
+  echo "FAIL rule6 AC3: slot-1 of ho-s3__ho-p3 does not hold ho-ac3-u"; ls -R "$HOREPO/.git/agent-cap" 2>&1 | sed 's/^/     /'; fail=$((fail+1))
+fi
+# AC4 — a declared harness with known roles passes, as an object and as a JSON string; nothing else.
+run_harness "rule6 AC4: the harness with roles as an object" 0 "{\"scriptPath\":\"$HO_H\",\"args\":{\"roles\":{\"builder\":\"gov-builder\"}}}" ""
+run_harness "rule6 AC4: the harness with roles in a JSON string" 0 "{\"scriptPath\":\"$HO_H\",\"args\":\"{\\\"roles\\\":{\\\"builder\\\":\\\"gov-builder\\\"}}\"}" ""
+run_harness "rule6 AC4: an inline script refused" 2 '{"script":"const s = await agent(\"one\")\n","args":{"roles":{"builder":"gov-builder"}}}' 'an inline `script`'
+run_harness "rule6 AC4: a name-only call refused" 2 '{"name":"tier2-review"}' 'names no `scriptPath`'
+run_harness "rule6 AC4: a scriptPath not in harnesses refused" 2 "{\"scriptPath\":\"$HOJ/tools/workflows/other.js\",\"args\":{\"roles\":{\"builder\":\"gov-builder\"}}}" 'is not a declared harness'
+run_harness "rule6 AC4: args that do not parse refused" 2 "{\"scriptPath\":\"$HO_H\",\"args\":\"{nope\"}" '`args` is not a plain object'
+run_harness "rule6 AC4: the harness with no roles refused" 2 "{\"scriptPath\":\"$HO_H\",\"args\":{\"repo\":\".\"}}" 'handoff.py harness-args'
+run_harness "rule6 AC4: the harness with roles {} refused" 2 "{\"scriptPath\":\"$HO_H\",\"args\":{\"roles\":{}}}" 'handoff.py harness-args'
+run_harness "rule6 AC4: an unknown role refused" 2 "{\"scriptPath\":\"$HO_H\",\"args\":{\"roles\":{\"builder\":\"gov-nobody\"}}}" '"gov-nobody", not an agent-true role'
+run_harness "rule6 AC4: an agent-false role refused" 2 "{\"scriptPath\":\"$HO_H\",\"args\":{\"roles\":{\"builder\":\"gov-session\"}}}" '"gov-session", not an agent-true role'
+# AC5 — absent adds no rule; broken refuses both tools; unarmed refuses that tool; a selector skips it.
+HO_INLINE='{"script":"const s = await agent(\"one\")\n"}'
+write_roles none
+run_spawn "rule6 AC5: no index, a general-purpose spawn admitted as at base" 0 general-purpose none "" ho-s5 ho-p5 ho-ac5-u
+if grep -rqF ho-ac5-u "$HOREPO/.git/agent-cap" 2>/dev/null; then
+  echo "ok   rule6 AC5: with no index the spawn still claims its slot"; pass=$((pass+1))
+else
+  echo "FAIL rule6 AC5: with no index no slot holds ho-ac5-u"; fail=$((fail+1))
+fi
+run_harness "rule6 AC5: no index, an inline script admitted as at base" 0 "$HO_INLINE" ""
+write_roles '{'
+run_spawn "rule6 AC5: a broken index refuses the spawn" 2 general-purpose none 'roles.json is not JSON'
+run_harness "rule6 AC5: a broken index refuses the harness call" 2 "$HO_INLINE" 'roles.json is not JSON'
+HO_FLAG=--only=join
+run_spawn "rule6 AC5: --only=join never meets rule 6 (Agent)" 0 general-purpose none ""
+run_harness "rule6 AC5: --only=join never meets rule 6 (Workflow)" 0 "$HO_INLINE" ""
+# S11 — `scripts` is the fan-out gate's selector: the script rules run, the call rules do not.
+HO_FLAG=--only=scripts
+run_harness "rule6 AC5: --only=scripts never meets rule 6" 0 "$HO_INLINE" ""
+run_harness "rule6 AC5: --only=scripts still runs the fan-out rules" 2 '{"script":"const r = await parallel([() => agent(\"a\"), () => agent(\"b\")])\n"}' 'raw parallel()/pipeline()'
+HO_FLAG=""
+write_roles '{"roles":{"gov-session":{"agent":false,"workflow":"handoff","writes":"none"}},"harnesses":["tools/workflows/h.js"]}'
+run_spawn "rule6 AC5: no agent-true role refuses the spawn as UNARMED" 2 gov-session ok 'UNARMED'
+write_roles "$("$TESTPY" -c 'import json,sys; d=json.loads(sys.argv[1]); d["harnesses"]=[]; print(json.dumps(d))' "$HO_ROLES")"
+run_harness "rule6 AC5: no harness refuses the harness call as UNARMED" 2 "{\"scriptPath\":\"$HO_H\",\"args\":{\"roles\":{\"builder\":\"gov-builder\"}}}" 'UNARMED'
+# TOOL-aOrientedCast-14 AC4 — the anchor: a cwd under no checkout falls back to CLAUDE_PROJECT_DIR, a
+# cwd in a checkout keeps it, and neither resolving says so. $TMP itself lies in no checkout. Against
+# a rule 6 reading the payload cwd alone, the first row exits 0 and the third says nothing.
+write_roles "$HO_ROLES"
+mkdir -p "$TMP/horepo2/.git" "$TMP/noco"
+HO_CWD="$NODEDIR" HO_PROJECT="$HOJ"
+run_spawn "rule6 OC14 AC4: cwd under no checkout, CLAUDE_PROJECT_DIR armed -> Explore refused" 2 Explore ok 'as the gov-researcher role'
+HO_CWD="$NODEDIR/horepo2"
+run_spawn "rule6 OC14 AC4: cwd in an index-less checkout keeps it over CLAUDE_PROJECT_DIR -> admitted" 0 Explore ok ""
+HO_CWD="$NODEDIR" HO_PROJECT="$NODEDIR/noco"
+run_spawn "rule6 OC14 AC4: cwd and CLAUDE_PROJECT_DIR under no checkout -> admitted, naming rule 6 unarmed" 0 Explore ok 'rule 6 unarmed'
+HO_CWD="" HO_PROJECT=""
+write_roles none
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

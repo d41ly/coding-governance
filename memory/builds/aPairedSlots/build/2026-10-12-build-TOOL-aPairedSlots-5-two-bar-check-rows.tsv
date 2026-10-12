@@ -1,0 +1,6 @@
+# **Serves:** journal TOOL-aPairedSlots-5 TOOL-aPairedSlots-7
+mode	bar	start	end	rc	ok	fail	runlog_lines	record_verdict	ledger_rows_this_run
+serial	w1	1791761526	1791769387	1	55	10	1	ended	2026-10-12T01:43:06Z	65
+serial	w2	1791769387	1791777377	1	55	10	1	ended	2026-10-12T03:56:13Z	65
+concurrent	w1	1791777382	1791782822	1	55	10	1	ended	2026-10-12T05:27:00Z	65
+concurrent	w2	1791777382	1791782932	1	56	9	1	ended	2026-10-12T05:28:50Z	65

@@ -42,9 +42,20 @@ top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 tool_root=tools
 un_name=unattended
 un_ran=""
+# THE DRIVER'S OWN FIRST NARROWING, asked here before the driver starts (TOOL-aTrimmedHook-3). Its
+# top-level initialisation costs tens of seconds on a contended node before `check_commit_message`
+# reads anything, and that function's first act is this pair: the branch's full ref, then the tracked
+# run-state files naming it. No ref or no such file is its silent `return 0`, so skipping the driver
+# then changes no verdict and saves the process. The glob is a SUPERSET of the driver's
+# `$M/builds/*/RUN.md` because the hook cannot read MEMORY_ROOT without the driver: a file the driver
+# would not have listed only costs a driver run, which answers exactly as before.
+un_ref=$(git symbolic-ref -q HEAD 2>/dev/null) || un_ref=""
+un_named=""
+[ -z "$un_ref" ] || un_named=$(git ls-files -- ':(glob)**/builds/*/RUN.md' 2>/dev/null | xargs -r grep -lF -- ": $un_ref" 2>/dev/null)
 for base in "$top/$tool_root/$un_name" "$top/$un_name"; do
   if [ -f "$base/unattended.sh" ] && [ -f "$top/.unattended.conf" ]; then
     un_ran=1
+    [ -n "$un_named" ] || break
     bash "$base/unattended.sh" --check-commit "$1"; rc=$?
     [ "$rc" = 1 ] && exit 1
     [ "$rc" = 0 ] || echo "commit-msg: the unattended commit-time check could not run (exit $rc); check 23 still grades this commit at the close."

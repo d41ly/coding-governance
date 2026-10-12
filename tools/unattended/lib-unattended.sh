@@ -355,6 +355,13 @@ read_consumes_from() { # spec file -> the unit ids its §3 Edges block consumes 
 #
 # NORMALISED WITH `10#`, because a value that arrives as `08` is otherwise read as a broken octal
 # literal by the first arithmetic that touches it.
+#
+# THE SUM HOLDS AT ANY SLOT COUNT (TOOL-aPairedSlots-6). A bar's elapsed time is its queue wait plus
+# its own run. A waiter fails open at the runner's bounded wait, the `queue` key, however many holders
+# the turnstile admits, and the wall is armed after the acquire at every width; so wall + queue +
+# margin bounds a bar beside a second holder exactly as it bounds one alone, and a doc-only bar, which
+# never waits, sits inside it with room to spare. The runner's `slots` key is therefore one this parse
+# ignores, and an arm pins that it still pins the same backstop when the profile prints it.
 GPF_WALL=""; GPF_QUEUE=""; GPF_CEILING_MAX=""; GPF_MISSING=""
 parse_gate_profile() { # the profile command's stdout -> GPF_WALL, GPF_QUEUE, GPF_CEILING_MAX, GPF_MISSING; rc 1 when a key is missing
   local _gp_k _gp_v _gp_w="" _gp_q="" _gp_c=""

@@ -94,7 +94,7 @@ the run that found five of six same-named processes to be another repository's.
 
 ## Reuse affordance
 
-seam: `run_bounded` — reuse for any project-declared command a verb must bound and be able to reap after its session dies; extend by calling it, which records the process with no code of the caller's.
+seam: `run_bounded` — reuse for any project-declared command a verb must bound and be able to reap after its session dies; extend by calling it, which records the process with no code of the caller's; a verb that overlaps several bounded commands calls its two halves instead, `init_bounded` to start and record each and `read_bounded` to read each where its answer is read, as `--preflight`'s four probes do (`TOOL-aBriskPreflight-4`).
 
 ## Gaps
 

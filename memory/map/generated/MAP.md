@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 133 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 110 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 137 · kits: 18 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 6 · gotcha-classes: 118 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -100,6 +100,10 @@ Inventories: gate-legs: 133 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `review-join self-test` | review-harnesses |
 | `review-protocol parity (kit vs dogfood)` | agent-cap |
 | `review-replay selftest` | review-harnesses |
+| `roles adopter self-test` | roles |
+| `roles catalogue` | roles |
+| `roles render selftest` | roles |
+| `roles render wiring` | roles |
 | `routed commits name a specced unit` | memory-tree-hygiene |
 | `routed-commits selftest` | memory-tree-hygiene |
 | `row-driver view refusal` | memory-tree-merge-driver |
@@ -110,7 +114,7 @@ Inventories: gate-legs: 133 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `run-gates evidence` | foundation |
 | `run-gates gov canary` | run-gates |
 | `run-gates run-log line` | run-gates |
-| `run-gates turnstile` | run-gates |
+| `run-gates turnstile` | run-gates-turnstile |
 | `run-gates wiring` | run-gates |
 | `run-selftests self-test` | run-gates |
 | `runlog record schema` | runlog |
@@ -161,6 +165,7 @@ Inventories: gate-legs: 133 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `playbook` | playbook |
 | `process-monitor` | process-monitor |
 | `pytest-parallel-guardrails` | baseline |
+| `roles` | roles |
 | `run-gates` | run-gates |
 | `runlog` | runlog |
 | `unattended` | unattended |
@@ -218,6 +223,7 @@ Inventories: gate-legs: 133 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 
 | key | claimant |
 |---|---|
+| `build` | roles |
 | `drift-audit` | baseline |
 | `lexicon` | lexicon |
 | `memory-recall` | memory-recall |
@@ -240,6 +246,7 @@ Inventories: gate-legs: 133 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `a-view-fix-trades-one-blindness-for-another.md` | agent-cap |
 | `ab-arm-never-did-the-work.md` | run-gates |
 | `absence-assertion-over-whole-file-text.md` | baseline |
+| `allocation-knob-without-a-ceiling.md` | run-gates-turnstile |
 | `allowlist-narrower-than-the-root-it-guards.md` | agent-cap |
 | `amendment-leaves-its-other-half-standing.md` | build-method |
 | `anchor-literal-resolves-above-its-target.md` | memory-recall |
@@ -248,6 +255,7 @@ Inventories: gate-legs: 133 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `assertion-between-two-derived-values.md` | unattended |
 | `async-job-starts-with-sigint-ignored.md` | run-gates |
 | `bash-c-multiline-flattens-under-msys.md` | agent-cap |
+| `beacon-published-before-it-is-complete.md` | run-gates-turnstile |
 | `borrowed-seed-inherits-its-head-state.md` | unattended |
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
 | `canary-waits-on-a-rendezvous-not-a-clock.md` | run-gates |
@@ -267,6 +275,7 @@ Inventories: gate-legs: 133 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `fixture-lacks-a-gate-the-consumer-has.md` | govkit |
 | `fixture-passes-by-finding-nothing.md` | baseline |
 | `fixture-removes-the-path-under-test.md` | run-gates |
+| `floor-left-below-the-arms-it-guards.md` | run-gates-turnstile |
 | `fold-text-is-unreviewed-surface.md` | build-method |
 | `format-derived-from-arity.md` | run-gates |
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
@@ -284,6 +293,7 @@ Inventories: gate-legs: 133 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `inline-fence-swallows-the-rest-of-the-file.md` | memory-tree-hygiene |
 | `inline-marker-breaks-a-line-continuation.md` | install-prefix |
 | `inputs-inside-the-subjects-reach.md` | unattended |
+| `invariant-held-on-one-admission-path.md` | run-gates-turnstile |
 | `join-key-widened-by-a-shared-location.md` | runlog |
 | `ledger-token-wrapped-across-a-line-joins-nothing.md` | memory-tree-hygiene |
 | `line-claim-matched-over-the-whole-output.md` | memory-tree-hygiene |
@@ -300,11 +310,14 @@ Inventories: gate-legs: 133 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `observed-by-claim-no-arm-discharges.md` | review-harnesses |
 | `one-value-field-records-a-mixed-outcome.md` | build-method |
 | `orchestrator-hand-off-owed-a-disposition.md` | unattended-stops |
+| `overlap-judged-from-the-invocation-interval.md` | run-gates-turnstile |
 | `pin-copied-from-another-corpus.md` | baseline |
 | `pin-gated-checks-arm-nothing-without-a-pin.md` | memory-tree-hygiene |
 | `porcelain-diff-names-a-rename-by-its-destination.md` | unattended |
+| `predicate-bounded-by-its-own-count.md` | run-gates-turnstile |
 | `process-creation-is-the-suite-cost.md` | unattended |
 | `record-citing-a-foreign-id-defines-or-orphans-it.md` | memory-tree-hygiene |
+| `record-file-read-by-line-position.md` | run-gates-turnstile |
 | `record-without-serves-or-with-a-round-counter.md` | memory-tree-hygiene |
 | `reflowed-prompt-string-reads-as-a-deleted-stop.md` | unattended |
 | `retirement-inventory-misses-readers-by-value.md` | runlog |
@@ -325,6 +338,7 @@ Inventories: gate-legs: 133 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `suite-invalidated-by-a-commit-under-it.md` | run-gates |
 | `swallowed-delegate-reads-as-clean.md` | memory-tree-hygiene |
 | `sweep-issues-no-cost-verdict.md` | run-gates |
+| `test-oracle-read-from-a-historical-sha.md` | review-harnesses |
 | `text-mode-read-eats-a-bare-cr.md` | unattended |
 | `trace-profile-measures-itself.md` | unattended |
 | `trailing-comma-counted-as-an-element.md` | agent-cap |

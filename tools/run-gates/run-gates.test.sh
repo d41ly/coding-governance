@@ -136,7 +136,10 @@ fail=0
 # RAISED 381 -> 388 by TOOL-aSparedSpawn-16: arm 12a2's two calibrate refusals, arm 9d2's two reuse tails,
 # arm 9d3's unmeasured-key line, and arm 9f's two cache-entry assertions, those behind the `timeout` gate
 # counted on a host without one as well (38 -> 40). Counted off the arms; this pass runs no suite.
-FLOOR_ASSERTIONS=388
+# 326 -> 339, TOOL-aPairedSlots-15: section 11s's nine checks (TOOL-aPairedSlots-1), which left this
+# floor where it was, and its four ceiling checks, counted off the arm.
+# 388 + 339 -> 401, TOOL-aSparedSpawn-34, the merge of local main: base 326, plus 62 and 13.
+FLOOR_ASSERTIONS=401
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -1581,8 +1584,9 @@ printf '%s\n' "$o" | grep -q 'big' \
 # `mempause` joined at TOOL-aGraftedHelix-7: it holds a dispatch while used memory is high and every
 # hold ends, so it costs speed and never a leg — read against the invariant before it was pinned.
 # `spawnpause` joined at TOOL-aSparedSpawn-2: the same holds on a second reading, the same release
-# rules, so the same verdict against the invariant.
-PINNED_KNOBS="mempause spawnpause timeout wall width"
+# rules, so the same verdict against the invariant. `slots` joined at TOOL-aPairedSlots-1: it
+# schedules bars and never legs.
+PINNED_KNOBS="mempause slots spawnpause timeout wall width"
 # THE RUNNER'S OWN SET IS GRADED TOO, not only the table's: a knob added to KNOWN_KNOBS that no row
 # declares yet would otherwise pass this arm, which is the case TOOL-aSparedSpawn-2 AC7 names.
 n=$((n+1))
@@ -3439,6 +3443,44 @@ _mpo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/t80.txt" GATE_PROFILE= GATE_MEMPA
           GATE_CGROUP_ROOT="$MP/cg" bash $KIT_REL/run-gates.sh --print-profile 2>&1 )
 check_mp_value "AC1 GATE_MEMPAUSE=x prints one NOTE" "$(printf '%s\n' "$_mpo" | grep -c '^run-gates: NOTE - GATE_MEMPAUSE=')" 1
 check_mp_value "AC1 and leaves the pause off" "$(printf '%s\n' "$_mpo" | awk -F'\t' '$1 == "line" && /mempause off;/ { c++ } END { print c + 0 }')" 1
+
+# 11s. THE SLOTS KNOB (TOOL-aPairedSlots-1 AC1 to AC3), over this section's fixture. `slots` is how
+#      many bars the host turnstile admits; a row without it reads 1, `GATE_TURNSTILE_SLOTS` replaces
+#      the row's value, a malformed override is ignored with a NOTE, 0 refuses, and the profile line
+#      carries the field ONLY above 1, so a bar at the kit default prints the line it always printed.
+read_slots_key() { # VAR=value… -> the `slots` key and the profile line --print-profile prints, TAB-joined
+  ( cd "$MP/r" && env GATE_PROFILES= GATE_PROFILE= GATE_JOBS= GATE_TURNSTILE_SLOTS= GATE_MEMPAUSE= \
+      GATE_CGROUP_ROOT="$MP/cg" "$@" bash $KIT_REL/run-gates.sh --print-profile 2>/dev/null ) \
+    | awk -F'\t' '$1 == "slots" { k = $2 } $1 == "line" { l = $2 } END { printf "%s\t%s", k, l }'
+}
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,mempause=0,slots=3\n' > "$MP/x/ts3.txt"
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,mempause=0\n' > "$MP/x/ts0.txt"
+_slk=$(read_slots_key GATE_PROFILES="$MP/x/ts3.txt")
+check_mp_value "slots AC1 a row declaring slots=3 prints 3" "${_slk%%$'\t'*}" 3
+check_mp_value "slots AC3 and its line carries the field" "$(case "${_slk#*$'\t'}" in *'mempause off, slots 3;'*) echo yes ;; esac)" yes
+_slk=$(read_slots_key GATE_PROFILES="$MP/x/ts0.txt")
+check_mp_value "slots AC1 a row declaring none prints 1" "${_slk%%$'\t'*}" 1
+check_mp_value "slots AC3 and its line is the kit-default line, no slots field" "$(case "${_slk#*$'\t'}" in *slots*) echo field ;; *'mempause off; '*) echo plain ;; esac)" plain
+_slk=$(read_slots_key GATE_PROFILES="$MP/x/ts0.txt" GATE_TURNSTILE_SLOTS=2)
+check_mp_value "slots AC2 GATE_TURNSTILE_SLOTS=2 over a row declaring none prints 2" "${_slk%%$'\t'*}" 2
+_slo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/ts3.txt" GATE_PROFILE= GATE_TURNSTILE_SLOTS=abc GATE_CGROUP_ROOT="$MP/cg" \
+          bash $KIT_REL/run-gates.sh --print-profile 2>&1 )
+check_mp_value "slots AC2 GATE_TURNSTILE_SLOTS=abc prints one NOTE" "$(printf '%s\n' "$_slo" | grep -c "^run-gates: NOTE - GATE_TURNSTILE_SLOTS='abc'")" 1
+check_mp_value "slots AC2 and leaves the row's 3" "$(printf '%s\n' "$_slo" | awk -F'\t' '$1 == "slots" { print $2 }')" 3
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,slots=0\n' > "$MP/x/tsz.txt"
+_slo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/tsz.txt" GATE_PROFILE= GATE_TURNSTILE_SLOTS= bash $KIT_REL/run-gates.sh --print-profile 2>&1 ); _slrc=$?
+check_mp_value "slots S1 a row carrying slots=0 exits 2" "$_slrc" 2
+check_mp_value "slots S1 and its refusal names the knob" "$(printf '%s\n' "$_slo" | grep -c "knob 'slots'")" 1
+# AT MOST 64 (TOOL-aPairedSlots-15): one slot path is built per slot before the queue, so a row above
+# the ceiling refuses as 0 does, and an override above it is ignored with the NOTE.
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,slots=65\n' > "$MP/x/ts65.txt"
+_slo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/ts65.txt" GATE_PROFILE= GATE_TURNSTILE_SLOTS= bash $KIT_REL/run-gates.sh --print-profile 2>&1 ); _slrc=$?
+check_mp_value "slots S3 a row carrying slots=65 exits 2" "$_slrc" 2
+check_mp_value "slots S3 and its refusal names the ceiling" "$(printf '%s\n' "$_slo" | grep -c "knob 'slots'.*at most 64")" 1
+_slo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/ts3.txt" GATE_PROFILE= GATE_TURNSTILE_SLOTS=65 GATE_CGROUP_ROOT="$MP/cg" \
+          bash $KIT_REL/run-gates.sh --print-profile 2>&1 )
+check_mp_value "slots S3 GATE_TURNSTILE_SLOTS=65 prints one NOTE" "$(printf '%s\n' "$_slo" | grep -c "^run-gates: NOTE - GATE_TURNSTILE_SLOTS='65'")" 1
+check_mp_value "slots S3 and leaves the row's 3" "$(printf '%s\n' "$_slo" | awk -F'\t' '$1 == "slots" { print $2 }')" 3
 
 # 11b. AC5 — a held dispatch waits for the reading to FALL. A rewrites the meminfo to 10 % after 3 s.
 write_mp_meminfo "$MP/x/m5" 95
