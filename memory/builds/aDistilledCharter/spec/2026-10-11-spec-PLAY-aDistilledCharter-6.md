@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-build-PLAY-aDistilledCharter-6-landing.md](../build/2026-10-12-build-PLAY-aDistilledCharter-6-landing.md) | journal | — |
 | [2026-10-11-prompt-PLAY-aDistilledCharter-6-brief.md](../prompts/2026-10-11-prompt-PLAY-aDistilledCharter-6-brief.md) | research | — |
 
 <!-- /gen:spec-records -->

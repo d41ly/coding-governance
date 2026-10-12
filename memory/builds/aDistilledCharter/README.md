@@ -107,7 +107,7 @@ ids TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 T
 | [PLAY-aDistilledCharter-6 — the micro-formats are a section-1 rule that binds every final message](spec/2026-10-11-spec-PLAY-aDistilledCharter-6.md) | 18 | 1 | CLOSED | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 4 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
