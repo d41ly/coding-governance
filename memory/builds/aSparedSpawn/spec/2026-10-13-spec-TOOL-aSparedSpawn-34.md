@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-34 — reconcile the build with local main, so it lands there conflict-free
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node a · Tier-2 · base 249b4ab6 · streams tooling · order 7
+**Status:** INPROGRESS · rev-1 · 2026-10-13 · node a · Tier-2 · base 249b4ab6 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
