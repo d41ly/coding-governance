@@ -207,9 +207,18 @@ ticket at once, so a second free slot goes to the next ticket one tick later. A 
 or stalled holder slot by slot, each removal guarded by the nonce it judged, and a release frees only
 its own slot. Above one slot a queued bar's line reads
 `<k> of <n> bar slots on this host are held — <repo> run <id> pid <pid>[; …] — queued at position N (waited Ns)`
-and the run record's header gains `slots` and `slot`; at one slot nothing printed or written changes.
+and the run record's header gains `slots` and `slot`; at one slot nothing printed or written changes,
+except where a bar's own worktree holds it back, as the next paragraph says.
 A host whose repositories declare different counts admits the LARGEST, since every runner claims
 among its own slots and all share slot 1 and the queue: a runner older than this claims slot 1 alone.
+A count above 64 is refused in a row and ignored, with a NOTE, in the override.
+
+**A worktree holds one bar at a time** (`TOOL-aPairedSlots-5`, `TOOL-aPairedSlots-15`). Everything
+under a worktree's git dir — its ledger, run records, gate logs and summary — assumes one writer, so
+a bar does not claim while any holder present names its own top level: a slot at any count, or a
+docs beacon. A head held back that way waits, keeping later tickets behind it, and its line names
+that holder: `… this worktree's bar holds <slot k|the docs key> — <repo> run <id> pid <pid> — queued
+at position N (waited Ns)`. Two worktrees of one repository have two git dirs and run at once.
 
 **A bar that acquires while another slot is held takes the shared width** (`TOOL-aPairedSlots-3`):
 the held count is read once, right after the acquire, and the constant `TS_SHARE_RULE` decides —
@@ -224,10 +233,12 @@ counterpart: it reads a host-wide source, so two bars already pause on one readi
 `GATE_DOCS_BASE` naming a commit, with `GATE_FULL` unset — takes no ticket and claims no slot: it
 writes its beacon to `gate-docs-beacon/<run id>` beside the slots, exports its nonce so its legs'
 runners nest, runs the ticker, prints `gate queue: docs-only — admitted on the docs key, not queued`,
-and records `queued_from` `docs`. Nothing caps how many run at once (owner, 2026-10-11). Non-doc
-waiters, the reap and the held count read the slots only, so a doc-only bar never delays, narrows or
-is named by a non-doc bar. A doc-only run first sweeps the docs beacons of dead or stalled holders.
-`--hold` is never doc-only.
+and records `queued_from` `docs`. Nothing caps how many run at once (owner, 2026-10-11). It waits
+only for a bar in its own worktree, printing `gate queue: docs-only — this worktree's bar holds <key>
+— … — waiting for it`, and never for another worktree's. The reap and the held count read the slots
+only, so a doc-only bar never narrows or is named by a non-doc bar, and delays one only in its own
+worktree. A doc-only run first sweeps the docs beacons of dead, stalled or unfinished holders: one
+with neither a pid nor a heartbeat is judged by its directory's age. `--hold` is never doc-only.
 
 The beacon holds `heartbeat`, `pid`, `nonce`, and the holder's name: `repo` (its top level), `run`
 (its run id) and `ttl`. A second run takes a time-sorted ticket and queues, announcing

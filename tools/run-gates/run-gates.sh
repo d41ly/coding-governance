@@ -712,6 +712,11 @@ if [ -f "$PROFILES" ]; then
       # its fail-open bound. Refused like any malformed knob (TOOL-aPairedSlots-1).
       [ "${k%%=*}" = slots ] && [ "$((10#${k#*=}))" -lt 1 ] \
         && prof_die "$PROFILES:$ln: knob 'slots' is how many bars the host turnstile admits at once, 1 or more: '${k#*=}'"
+      # AND AT MOST 64 (TOOL-aPairedSlots-15): the runner builds one slot path per slot before the queue,
+      # so a mistyped count of many digits hangs every bar before its first leg. `GATE_JOBS` is
+      # clamped at 64 for the same reason.
+      [ "${k%%=*}" = slots ] && [ "$((10#${k#*=}))" -gt 64 ] \
+        && prof_die "$PROFILES:$ln: knob 'slots' is how many bars the host turnstile admits at once, at most 64: '${k#*=}'"
     done
     declared="$declared $pname"
     [ -n "$sel" ] && continue
@@ -988,10 +993,10 @@ prof_m=off; prof_mrec=off
 if [ -n "${GATE_TURNSTILE_SLOTS:-}" ]; then
   case "$GATE_TURNSTILE_SLOTS" in
     *[!0-9]*|????????????????*) _ps_ok=0 ;;
-    *) _ps_ok=1; [ "$((10#$GATE_TURNSTILE_SLOTS))" -ge 1 ] || _ps_ok=0 ;;
+    *) _ps_ok=1; [ "$((10#$GATE_TURNSTILE_SLOTS))" -ge 1 ] && [ "$((10#$GATE_TURNSTILE_SLOTS))" -le 64 ] || _ps_ok=0 ;;
   esac
   if [ "$_ps_ok" = 1 ]; then PROF_SLOTS=$((10#$GATE_TURNSTILE_SLOTS))
-  else echo "run-gates: NOTE - GATE_TURNSTILE_SLOTS='$GATE_TURNSTILE_SLOTS' is not a count of 1 or more, so the profile's $PROF_SLOTS slot(s) stand" >&2; fi
+  else echo "run-gates: NOTE - GATE_TURNSTILE_SLOTS='$GATE_TURNSTILE_SLOTS' is not a count from 1 to 64, so the profile's $PROF_SLOTS slot(s) stand" >&2; fi
   unset _ps_ok
 fi
 prof_s=""; [ "$PROF_SLOTS" -gt 1 ] && prof_s=", slots $PROF_SLOTS"
@@ -1221,12 +1226,27 @@ measure_held_slots() { # -> TS_HELD_N, how many of this runner's slot paths exis
 }
 TS_DOCS_ROOT=""; [ -n "$TS_DIR_C" ] && TS_DOCS_ROOT="${TS_DIR_C%/*}/gate-docs-beacon"
 scan_dead_docs_beacons() { # -> removes each docs beacon whose pid is dead or whose heartbeat outlived its ttl, nonce-guarded
-  local d hpid hb hn httl age
+  local d hpid hb hn httl age mt
   [ -n "$TS_DOCS_ROOT" ] && [ -d "$TS_DOCS_ROOT" ] || return 0
   for d in "$TS_DOCS_ROOT"/*; do
     [ -d "$d" ] || continue
-    hpid=$(cat "$d/pid" 2>/dev/null); hb=$(cat "$d/heartbeat" 2>/dev/null); hn=$(cat "$d/nonce" 2>/dev/null)
+    # THE NONCE FIRST (TOOL-aPairedSlots-15), as `ts_try_reap` reads it: every fact judged below then
+    # belongs to the holder whose nonce guards the removal.
+    hn=$(cat "$d/nonce" 2>/dev/null); hpid=$(cat "$d/pid" 2>/dev/null); hb=$(cat "$d/heartbeat" 2>/dev/null)
     httl=$(cat "$d/ttl" 2>/dev/null); num_ok "$httl" || httl=$TS_TTL
+    # AN UNFINISHED BEACON, interrupted between its `mkdir` and its first writes, has neither a pid nor
+    # a heartbeat, and nothing else would ever sweep it. Its directory's age is the only clock it has;
+    # one that cannot be read is left alone, since a beacon being written right now has none yet.
+    if [ -z "$hpid" ] && ! num_ok "$hb"; then
+      mt=$(date -r "$d" +%s 2>/dev/null) || mt=""
+      num_ok "$mt" || continue
+      age=$(( $(ts_now) - mt ))
+      if [ "$age" -gt "$httl" ] && [ "$(cat "$d/nonce" 2>/dev/null)" = "$hn" ]; then
+        printf 'run-gates: sweeping the docs beacon of an unfinished holder (no pid or heartbeat, %ss old)\n' "$age" >&2
+        rm -rf "$d" 2>/dev/null
+      fi
+      continue
+    fi
     if [ -n "$hpid" ] && ! ts_alive "$hpid"; then
       [ "$(cat "$d/nonce" 2>/dev/null)" = "$hn" ] || continue
       printf 'run-gates: sweeping the docs beacon of a dead holder (pid %s)\n' "$hpid" >&2
@@ -1245,21 +1265,34 @@ scan_dead_docs_beacons() { # -> removes each docs beacon whose pid is dead or wh
 # the ledger, the run records and `current`, the summary and failure files, the gate logs, the greens
 # and the queue files — assumes one writer, which the single-holder turnstile guaranteed. Two
 # worktrees have two git dirs, so admitting two bars keeps that true for them; two bars in ONE
-# worktree would break it. So above one slot the head does not claim while a slot's `repo` names this
-# run's top level, and waits as it waits for a full host. At one slot the head claims only an empty
-# slot 1, so the predicate is never reached. A slot with no readable `repo`, as an older runner's
-# beacon may be, does not block: it cannot be told apart from another worktree's.
+# worktree would break it. So the head does not claim while a holder's `repo` names this run's top
+# level, and waits as it waits for a full host. A holder with no readable `repo`, as an older
+# runner's beacon may be, does not block: it cannot be told apart from another worktree's.
+# EVERY HOLDER PRESENT, AT EVERY COUNT (TOOL-aPairedSlots-15): slot 1, each `.<k>` beside it whatever
+# this runner's own count, and each docs beacon. Read only up to its own count, a bar run at a lower
+# count than a neighbour in its worktree claimed beside it, and the docs key was never asked; the
+# nesting test reads every beacon for the same reason. At one slot with no such neighbour this finds
+# slot 1 alone, which the claim tests anyway, so a bar at the kit default waits and prints as before.
 TS_SAME=""
-check_worktree_unheld() { # -> rc 0 when no slot names this run's top level; rc 1 with that slot's path in TS_SAME
+check_worktree_unheld() { # -> rc 0 when no holder names this run's top level; rc 1 with that holder's path in TS_SAME
   local d r
   TS_SAME=""
-  [ "${TS_SLOTS:-1}" -gt 1 ] || return 0
-  for d in ${TS_SLOT_DIRS[@]+"${TS_SLOT_DIRS[@]}"}; do
+  for d in "$TS_DIR_C" "$TS_DIR_C".* ${TS_DOCS_ROOT:+"$TS_DOCS_ROOT"/*}; do
     [ -d "$d" ] || continue
     r=$(cat "$d/repo" 2>/dev/null)
     if [ -n "$r" ] && [ "$r" = "$ROOT" ]; then TS_SAME=$d; return 1; fi
   done
   return 0
+}
+render_same_holder() { # -> prints TS_SAME's key, repo, run and pid, for a line that says why a bar waits
+  local k
+  case "$TS_SAME" in
+    "$TS_DIR_C") k="slot 1" ;;
+    "$TS_DIR_C".*) k="slot ${TS_SAME##*.}" ;;
+    *) k="the docs key" ;;
+  esac
+  printf '%s — %s run %s pid %s' "$k" "$(cat "$TS_SAME/repo" 2>/dev/null)" \
+    "$(cat "$TS_SAME/run" 2>/dev/null || echo -)" "$(cat "$TS_SAME/pid" 2>/dev/null || echo -)"
 }
 resolve_free_slot() { # -> rc 0 with TS_DIR and TS_SLOT set by the first slot whose mkdir succeeds, in slot order
   local i=0 d
@@ -1363,14 +1396,16 @@ ts_try_reap() {
   local d hpid hb age httl hn reaped=1
   # SLOT BY SLOT (TOOL-aPairedSlots-2): each slot is judged by its own pid and its own ttl, every dead
   # or stalled one is reaped on this tick, and a live neighbour is never touched. THE REMOVAL IS
-  # NONCE-GUARDED: the nonce read when the slot was judged must still be there, so a slot a successor
-  # claimed between the judgement and the removal survives. That narrows TOOL-aReapedTicket-4's race
-  # to the instant between the re-read and the `rm`; it does not close it.
+  # NONCE-GUARDED, and the nonce is read FIRST (TOOL-aPairedSlots-15): every fact the slot is judged by
+  # then belongs to the holder that nonce names, and the nonce must still be there at the removal, so a
+  # slot a successor claimed after the judgement survives. Read last, a successor's nonce could vouch
+  # for a dead holder's pid. That narrows TOOL-aReapedTicket-4's race to the instant between the
+  # re-read and the `rm`; it does not close it.
   for d in ${TS_SLOT_DIRS[@]+"${TS_SLOT_DIRS[@]}"}; do
     [ -d "$d" ] || continue
+    hn=$(cat "$d/nonce" 2>/dev/null)
     hpid=$(cat "$d/pid" 2>/dev/null)
     hb=$(cat "$d/heartbeat" 2>/dev/null)
-    hn=$(cat "$d/nonce" 2>/dev/null)
     # THE HOLDER'S TTL is the bound (TOOL-aFrugalTurnstile-5 S3): on a host-wide beacon the holder may be
     # another repository running a longer one. Anything but a positive integer, as from an older
     # runner's beacon, falls back to this waiter's own.
@@ -1481,6 +1516,21 @@ elif [ -n "$TS_DIR_C" ] && [ -n "${DOCS_BASE:-}" ] && [ "${#TS_HOLD[@]}" = 0 ]; 
   TS_DOCS=1
   TS_NONCE="$$-$(ts_now)-$RANDOM"
   scan_dead_docs_beacons
+  # ITS OWN WORKTREE FIRST (TOOL-aPairedSlots-15 F1): a doc-only bar waits for a holder in its own
+  # worktree, whose git dir it would otherwise share, and never for another worktree's, so the host
+  # queue is still never joined. Bounded and failing open at the queue's own bound.
+  ts_start=$(ts_now)
+  if ! check_worktree_unheld; then
+    echo "gate queue: docs-only — this worktree's bar holds $(render_same_holder) — waiting for it"
+    while ! check_worktree_unheld; do
+      ts_try_reap; scan_dead_docs_beacons
+      if [ $(( $(ts_now) - ts_start )) -ge "$TS_MAXWAIT" ]; then
+        echo "run-gates: turnstile WAIT EXPIRED after $(( $(ts_now) - ts_start ))s (bound ${TS_MAXWAIT}s) — this doc-only bar runs beside its worktree's holder" >&2
+        break
+      fi
+      sleep "$TS_TICK"
+    done
+  fi
   if mkdir -p "$TS_DOCS_ROOT" 2>/dev/null && mkdir "$TS_DOCS_ROOT/$TS_RUN" 2>/dev/null; then
     TS_DIR="$TS_DOCS_ROOT/$TS_RUN"
     printf '%s' "$(ts_now)" > "$TS_DIR/heartbeat" 2>/dev/null || true
@@ -1631,6 +1681,9 @@ elif [ -n "$TS_DIR_C" ]; then
     # when there IS a dead holder the ticket sweep can wait a tick. The two are separate functions
     # rather than one because their preconditions differ — the reaper is guarded on a beacon
     # EXISTING, which is precisely the guard that made it unable to see the wedge.
+    # A DOCS BEACON in this worktree holds the claim back too (TOOL-aPairedSlots-15); its holder's
+    # death is noticed here, since only a doc-only bar's own path sweeps docs beacons.
+    case "$TS_SAME" in "$TS_DOCS_ROOT"/*) scan_dead_docs_beacons ;; esac
     { ts_try_reap || ts_sweep_queue; } && continue
     TS_WAITED=$(( $(ts_now) - ts_start ))
     # THE WAIT BEATS (TOOL-dDerivedDocket-64). Nothing else a waiter writes moves while it waits:
@@ -1678,13 +1731,15 @@ elif [ -n "$TS_DIR_C" ]; then
         if [ "$TS_HELD_N" -ge "$TS_SLOTS" ]; then
           echo "run-gates: $TS_HELD_N of $TS_SLOTS bar slots on this host are held — $ts_names — queued at position $pos (waited ${TS_WAITED}s)" >&2
         elif ! check_worktree_unheld; then
-          echo "run-gates: $TS_HELD_N of $TS_SLOTS bar slots on this host are held, one by this worktree — $ts_names — queued at position $pos (waited ${TS_WAITED}s)" >&2
+          echo "run-gates: $TS_HELD_N of $TS_SLOTS bar slots on this host are held, and this worktree's bar holds $(render_same_holder) — queued at position $pos (waited ${TS_WAITED}s)" >&2
         else
           echo "run-gates: $TS_HELD_N of $TS_SLOTS bar slots on this host are held, and a ticket sorts ahead of this one — queued at position $pos (waited ${TS_WAITED}s)" >&2
         fi
       elif [ -d "$TS_DIR_C" ]; then
         ts_hr=$(cat "$TS_DIR_C/run" 2>/dev/null); ts_hd=$(cat "$TS_DIR_C/repo" 2>/dev/null); ts_hp=$(cat "$TS_DIR_C/pid" 2>/dev/null)
         echo "run-gates: another bar holds this host — ${ts_hd:--} run ${ts_hr:--} pid ${ts_hp:--} — queued at position $pos (waited ${TS_WAITED}s)" >&2
+      elif ! check_worktree_unheld; then
+        echo "run-gates: no bar holds this host's first slot, but this worktree's bar holds $(render_same_holder) — queued at position $pos (waited ${TS_WAITED}s)" >&2
       else
         echo "run-gates: no bar holds this host, but a ticket sorts ahead of this one — queued at position $pos (waited ${TS_WAITED}s)" >&2
       fi

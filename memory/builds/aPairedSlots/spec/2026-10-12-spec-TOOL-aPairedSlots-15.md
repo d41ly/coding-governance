@@ -1,11 +1,12 @@
 # TOOL-aPairedSlots-15 — the closing review's mediums and lows, batched
 
-**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-2 · base d3354597 · streams tooling · order 9
+**Status:** CLOSED · rev-2 · 2026-10-12 · node a · Tier-2 · base d3354597 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-build-TOOL-aPairedSlots-15-1-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aPairedSlots-15-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md) | journal | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 TOOL-aPairedSlots-11 TOOL-aPairedSlots-12 TOOL-aPairedSlots-13 TOOL-aPairedSlots-14 |
 
 <!-- /gen:spec-records -->
@@ -95,7 +96,7 @@ omitted `check_worktree_unheld` and `TS_SAME`; both exist since TOOL-aPairedSlot
 | When | Line |
 |---|---|
 | a bar is held back by its own worktree's holder, at one slot | `run-gates: no bar holds this host's first slot, but this worktree's bar holds <key> — <repo> run <run> pid <pid> — queued at position <n> (waited <s>s)` |
-| the same, above one slot | `run-gates: <k> of <n> bar slots on this host are held, one by this worktree — <repo> run <run> pid <pid> — queued at position <n> (waited <s>s)` |
+| the same, above one slot | `run-gates: <k> of <n> bar slots on this host are held, and this worktree's bar holds <key> — <repo> run <run> pid <pid> — queued at position <n> (waited <s>s)` |
 | a doc-only bar waits for its worktree's holder | `gate queue: docs-only — this worktree's bar holds <key> — <repo> run <run> pid <pid> — waiting for it` |
 | an unfinished docs beacon is swept | `run-gates: sweeping the docs beacon of an unfinished holder (no pid or heartbeat, <s>s old)` |
 
@@ -150,7 +151,9 @@ omitted `check_worktree_unheld` and `TS_SAME`; both exist since TOOL-aPairedSlot
   two-slot holder, and the stalled docs holder arm sees `sweeping the docs beacon of a stalled holder`
   and the beacon gone.
   Red when: arm 32 is green against a runner whose nesting reads only its own slot paths.
-- **AC7** — When each suite runs whole, its assertion count equals its raised `FLOOR_ASSERTIONS`.
+- **AC7** — When the turnstile suite runs whole, its assertion count equals its raised
+  `FLOOR_ASSERTIONS`, and the canary's raised floor equals its old floor plus the checks of section 11s
+  counted off the arm.
   Red when: an arm this build added is removed and the suite stays green.
 - **AC8** — When the records are read, the audit's health log row names ask TOOL-aPairedSlots-10, the
   roster row for unit 7 names no health log trim, and each new class has a `memory/gotchas/` entry.
@@ -174,6 +177,9 @@ omitted `check_worktree_unheld` and `TS_SAME`; both exist since TOOL-aPairedSlot
 ## 9. Revision log
 
 - rev-1 · 2026-10-12 · initial draft, promoted from the closing review's round 1.
+- rev-2 · 2026-10-12 · Messages · AC7 · the above-one-slot line names the key its worktree's holder
+  holds, as the one-slot line does, since that holder may be a docs bar; the canary's floor is counted
+  off its arm, because the canary runs whole only at the close's bar.
 
 ## 10. Reuse audit
 

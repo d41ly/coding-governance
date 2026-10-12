@@ -67,7 +67,7 @@ Other parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 4 | `TOOL-aPairedSlots-4` | a doc-only bar takes its own key and never queues |
 | 5 | `TOOL-aPairedSlots-5` | a worktree holds at most one slot, so every path under its git dir stays one bar's; the shared-path audit and the two-real-bar check |
 | 6 | `TOOL-aPairedSlots-6` | the unattended driver's gate backstop stays correct with two holders |
-| 7 | `TOOL-aPairedSlots-7` | the common dir's run log, health log trim, shared full green and drift history header take a second concurrent writer safely |
+| 7 | `TOOL-aPairedSlots-7` | the common dir's run log, shared full green and drift history header take a second concurrent writer safely |
 | 8 | `TOOL-aPairedSlots-8` | the process-monitor adopter self-test stamps a fixture's common dir, not the real one |
 | 9 | `TOOL-aPairedSlots-9` | node a's slot count and the shared-width rule, set by the two-bar A/B at one repetition per arm (owner, 2026-10-11) |
 | 11 | `TOOL-aPairedSlots-11` | the drift history is created with its header already in it (closing review H1) |
@@ -92,16 +92,16 @@ ids TOOL-aPairedSlots-15
 | [TOOL-aPairedSlots-3 — a bar dispatched while another slot is held takes the shared width its rule names](spec/2026-10-11-spec-TOOL-aPairedSlots-3.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-11 |
 | [TOOL-aPairedSlots-4 — a doc-only bar takes its own key and never queues](spec/2026-10-11-spec-TOOL-aPairedSlots-4.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aPairedSlots-5 — a worktree holds at most one slot, so every path under its git dir stays one bar's](spec/2026-10-11-spec-TOOL-aPairedSlots-5.md) | 5 | 2 | CLOSED | rev-2 | 2026-10-11 |
-| [TOOL-aPairedSlots-7 — the common dir's shared files take a second concurrent writer safely](spec/2026-10-11-spec-TOOL-aPairedSlots-7.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-11 |
+| [TOOL-aPairedSlots-7 — the common dir's shared files take a second concurrent writer safely](spec/2026-10-11-spec-TOOL-aPairedSlots-7.md) | 6 | 2 | CLOSED | rev-4 | 2026-10-12 |
 | [TOOL-aPairedSlots-9 — node a's slot count and the shared-width rule, set by the two-bar A/B](spec/2026-10-11-spec-TOOL-aPairedSlots-9.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-12 |
 | [TOOL-aPairedSlots-12 — the A/B instrument reads the run record's verdict by key, and the rule check proves an arm from its bar rows](spec/2026-10-12-spec-TOOL-aPairedSlots-12.md) | 8 | 1 | CLOSED | rev-1 | 2026-10-12 |
 | [TOOL-aPairedSlots-13 — the two-bar check reads the verdict by key and grades its rows at their declared width](spec/2026-10-12-spec-TOOL-aPairedSlots-13.md) | 8 | 1 | CLOSED | rev-1 | 2026-10-12 |
 | [TOOL-aPairedSlots-11 — the drift history is created with its header already in it](spec/2026-10-12-spec-TOOL-aPairedSlots-11.md) | 9 | 2 | INPROGRESS | rev-1 | 2026-10-12 |
 | [TOOL-aPairedSlots-14 — the two-bar check's overlap guard reads the slots the bars were admitted to](spec/2026-10-12-spec-TOOL-aPairedSlots-14.md) | 9 | 1 | CLOSED | rev-1 | 2026-10-12 |
-| [TOOL-aPairedSlots-15 — the closing review's mediums and lows, batched](spec/2026-10-12-spec-TOOL-aPairedSlots-15.md) | 9 | 2 | INPROGRESS | rev-1 | 2026-10-12 |
+| [TOOL-aPairedSlots-15 — the closing review's mediums and lows, batched](spec/2026-10-12-spec-TOOL-aPairedSlots-15.md) | 9 | 2 | CLOSED | rev-2 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 21 bound to this build, across 4 record folder(s).
+Records: 22 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

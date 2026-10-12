@@ -241,7 +241,9 @@ The host turnstile: the slots that admit gate bars, the docs key beside them, an
 - status `shipped` · streams `tooling` · dossier `memory/map/features/run-gates-turnstile.md`
 - decisions 10: `TOOL-aFrugalTurnstile-5`, `TOOL-aPairedSlots-1`, `TOOL-aPairedSlots-2`, `TOOL-aPairedSlots-3`, `TOOL-aPairedSlots-4`, `TOOL-aPairedSlots-5`, `TOOL-aPairedSlots-6`, `TOOL-aPairedSlots-7`, `TOOL-aPairedSlots-9`, `TOOL-dDerivedDocket-64`
 - gate-legs 1: `run-gates turnstile`
-- globs 3: `tools/run-gates/run-gates.sh`, `tools/run-gates/gate-profiles.txt`, `tools/run-gates/run-gates.turnstile.test.sh`
+- gotcha-classes 7: `record-file-read-by-line-position.md`, `overlap-judged-from-the-invocation-interval.md`, `predicate-bounded-by-its-own-count.md`, `invariant-held-on-one-admission-path.md`, `floor-left-below-the-arms-it-guards.md`, `allocation-knob-without-a-ceiling.md`, `beacon-published-before-it-is-complete.md`
+- globs 3: `tools/run-gates/run-gates.sh`, `tools/run-gates/gate-profiles.txt`
+- cut 1 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## runlog
 

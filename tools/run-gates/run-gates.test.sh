@@ -122,7 +122,9 @@ fail=0
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
 # 324 -> 326, TOOL-dLadderedRemote-2: the two arms of the canary's ladder-refusal pass, counted off the arm.
-FLOOR_ASSERTIONS=326
+FLOOR_ASSERTIONS=339
+# 326 -> 339, TOOL-aPairedSlots-15: section 11s's nine checks (TOOL-aPairedSlots-1), which left this
+# floor where it was, and its four ceiling checks, counted off the arm.
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -3179,6 +3181,16 @@ printf 't\t0\t0\twidth=2,timeout=0,wall=0,slots=0\n' > "$MP/x/tsz.txt"
 _slo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/tsz.txt" GATE_PROFILE= GATE_TURNSTILE_SLOTS= bash $KIT_REL/run-gates.sh --print-profile 2>&1 ); _slrc=$?
 check_mp_value "slots S1 a row carrying slots=0 exits 2" "$_slrc" 2
 check_mp_value "slots S1 and its refusal names the knob" "$(printf '%s\n' "$_slo" | grep -c "knob 'slots'")" 1
+# AT MOST 64 (TOOL-aPairedSlots-15): one slot path is built per slot before the queue, so a row above
+# the ceiling refuses as 0 does, and an override above it is ignored with the NOTE.
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,slots=65\n' > "$MP/x/ts65.txt"
+_slo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/ts65.txt" GATE_PROFILE= GATE_TURNSTILE_SLOTS= bash $KIT_REL/run-gates.sh --print-profile 2>&1 ); _slrc=$?
+check_mp_value "slots S3 a row carrying slots=65 exits 2" "$_slrc" 2
+check_mp_value "slots S3 and its refusal names the ceiling" "$(printf '%s\n' "$_slo" | grep -c "knob 'slots'.*at most 64")" 1
+_slo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/ts3.txt" GATE_PROFILE= GATE_TURNSTILE_SLOTS=65 GATE_CGROUP_ROOT="$MP/cg" \
+          bash $KIT_REL/run-gates.sh --print-profile 2>&1 )
+check_mp_value "slots S3 GATE_TURNSTILE_SLOTS=65 prints one NOTE" "$(printf '%s\n' "$_slo" | grep -c "^run-gates: NOTE - GATE_TURNSTILE_SLOTS='65'")" 1
+check_mp_value "slots S3 and leaves the row's 3" "$(printf '%s\n' "$_slo" | awk -F'\t' '$1 == "slots" { print $2 }')" 3
 
 # 11b. AC5 — a held dispatch waits for the reading to FALL. A rewrites the meminfo to 10 % after 3 s.
 write_mp_meminfo "$MP/x/m5" 95

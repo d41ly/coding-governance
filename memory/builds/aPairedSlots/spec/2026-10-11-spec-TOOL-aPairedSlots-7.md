@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-7 — the common dir's shared files take a second concurrent writer safely
 
-**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 6
+**Status:** CLOSED · rev-4 · 2026-10-12 · node a · Tier-2 · base b6cd02bc · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -90,11 +90,10 @@ No function is minted. New path: `gate-full-green.shared.tmp.<pid>` (the staging
 ## 5. Production-readiness checklist
 
 - security — N/A — the same files, the same writers.
-- perf / scale — one `cat` spawn per bar for the run log; the health lock costs builtins only.
-- error / empty / loading states — a trim that cannot take its lock skips the trim this event; the
-  next event retries.
+- perf / scale — one `cat` spawn per bar for the run log.
+- error / empty / loading states — each writer fails as it did before, one stderr line or none.
 - observability — unchanged lines, whole.
-- risks — the stated trim residual.
+- risks — the health log's trim, deferred to ask TOOL-aPairedSlots-10.
 - testing — AC1 to AC4, each RED against the old writer.
 - migration — none.
 - user docs — N/A — internal files.
@@ -132,6 +131,8 @@ none
 - rev-3 · 2026-10-11 · AC1 · the criterion names the observation the arm makes: the runner's own
   append statement, extracted and run by three writers of 20000-byte lines, at the size the tear
   rate through `printf >>` stays observable on this host.
+- rev-4 · 2026-10-12 · §5 · the checklist stops describing the health lock rev-2 moved to ask
+  TOOL-aPairedSlots-10, which the closing review found it still did (its L7).
 
 ## 10. Reuse audit
 

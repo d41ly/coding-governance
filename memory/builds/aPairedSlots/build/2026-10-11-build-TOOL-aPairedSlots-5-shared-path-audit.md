@@ -30,7 +30,7 @@ The question per path: does a second concurrent writer lose, tear or corrupt any
 | `gate-full-green`, `gate-inherited-green` | worktree git dir | tmp then `mv` | per-worktree; S1 |
 | `gate-queue-status`, `gate-queue-heartbeat` | worktree git dir | each queued tick | per-worktree; S1. The prompt placed the heartbeat in the common dir; the code writes `$gd`, the worktree git dir |
 | `runlog/gates.log` | common dir | one `printf >>` line per bar | COLLIDES at long lines; fixed by TOOL-aPairedSlots-7 S1 (measurements below) |
-| `health.log` | common dir | one short `>>` line per event; a tail-and-`mv` trim at 500 lines | append safe as measured; the trim COLLIDES; TOOL-aPairedSlots-7 S2 |
+| `health.log` | common dir | one short `>>` line per event; a tail-and-`mv` trim at 500 lines | append safe as measured; the trim COLLIDES, deferred to ask TOOL-aPairedSlots-10 |
 | `gate-full-green.shared` | common dir | `cp` to a FIXED `.tmp` name, then `mv` | COLLIDES on the staging name; TOOL-aPairedSlots-7 S3 |
 | `gate-timings.tsv` | worktree and common dir | `rm -f` of a retired file | safe; removing an absent file twice is a no-op |
 | `gate-work.*` and its `owner` record | ambient temp root | `mktemp -d`, then owner tmp-and-`mv` | per-bar; the sweep removes only a dir whose owner names THIS common dir and whose pid fails `kill -0`, so a live sibling withholds it. Safe while both bars run under one MSYS runtime, which shares the pid table; a runtime that does not would read the sibling as dead |

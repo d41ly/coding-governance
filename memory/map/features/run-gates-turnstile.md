@@ -17,7 +17,10 @@ harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = []
+gotcha-classes = ["record-file-read-by-line-position.md", "overlap-judged-from-the-invocation-interval.md",
+  "predicate-bounded-by-its-own-count.md", "invariant-held-on-one-admission-path.md",
+  "floor-left-below-the-arms-it-guards.md", "allocation-knob-without-a-ceiling.md",
+  "beacon-published-before-it-is-complete.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -39,7 +42,7 @@ semaphore. Slot 1 is `gate-bar-beacon` under the host's turnstile directory and 
 `gate-bar-beacon.<k>`, each with its own pid, nonce, heartbeat and repo file. The stale reap and the
 nonce-guarded release act per slot, so neither can free another holder's beacon. The queue stays one
 FIFO, and only its head claims, taking the lowest free slot. The count is the profile row's
-`slots=<n>`, overridden by `GATE_TURNSTILE_SLOTS`. With one slot the runner prints exactly the lines it
+`slots=<n>`, 1 to 64, overridden by `GATE_TURNSTILE_SLOTS`. With one slot the runner prints exactly the lines it
 printed before the semaphore existed. `TOOL-aPairedSlots-1`, `TOOL-aPairedSlots-2`.
 
 **The kit ships one slot.** The two-bar measurement behind the `capable` row found no arm where two
@@ -55,10 +58,12 @@ host memory, so concurrent bars already share its pause. `TOOL-aPairedSlots-3`.
 **A docs-only bar never queues.** Under `GATE_DOCS_BASE` a bar takes its own key,
 `gate-docs-beacon/<run id>`, unbounded by the owner's ruling, and its run record reads
 `queued_from docs`. Nesting reads every slot beacon and every docs beacon, so a bar started inside
-any holder passes through. `TOOL-aPairedSlots-4`.
+any holder passes through. It waits only for a holder in its own worktree, never another's.
+`TOOL-aPairedSlots-4`, `TOOL-aPairedSlots-15`.
 
-**A worktree holds at most one slot.** Everything under one worktree's git dir then stays one bar's:
-its ledger, run records, gate logs and green stamps. Only the common dir is shared.
+**A worktree holds one bar at a time.** A bar does not claim while any holder present names its own
+top level, a slot at any count or a docs beacon, so everything under one worktree's git dir stays one
+bar's: its ledger, run records, gate logs and green stamps. Only the common dir is shared.
 `TOOL-aPairedSlots-5`, whose audit record lists every path two bars of one repository write.
 
 **The common dir takes a second writer.** The run-log line is appended through `cat`, one write per

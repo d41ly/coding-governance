@@ -415,6 +415,11 @@
     {
       "id": "add_health_event",
       "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
+      "id": "add_health_event",
+      "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
@@ -1496,6 +1501,11 @@
       "id": "build_docs_fixture",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "build_docs_repo",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
     },
     {
       "id": "build_edges",
@@ -2631,6 +2641,11 @@
       "id": "case_run",
       "kind": "function",
       "file": "tools/memory-tree/marker-contract.test.sh"
+    },
+    {
+      "id": "cat",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
     },
     {
       "id": "cblock",
@@ -4106,6 +4121,11 @@
       "id": "check_refusal_switch",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "check_registered",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
     },
     {
       "id": "check_registry",
@@ -9268,11 +9288,6 @@
       "file": "tools/memory-tree/marker-contract.test.sh"
     },
     {
-      "id": "mk_docs_repo",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.turnstile.test.sh"
-    },
-    {
       "id": "mk_legs",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
@@ -13741,6 +13756,11 @@
       "id": "render_rx_literal",
       "kind": "function",
       "file": "tools/run-gates/lib-attribute.sh"
+    },
+    {
+      "id": "render_same_holder",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "render_scope_row",
@@ -20063,6 +20083,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "ts_alive",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
       "id": "ts_drop_ticket",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -20076,6 +20101,11 @@
       "id": "ts_now",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "ts_now",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
     },
     {
       "id": "ts_release",
@@ -20266,11 +20296,6 @@
       "id": "vintage",
       "kind": "function",
       "file": "tools/govkit/census.py"
-    },
-    {
-      "id": "wait_registered",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.turnstile.test.sh"
     },
     {
       "id": "walk",
