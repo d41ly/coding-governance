@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-32 — reconcile the build with origin/main 37200355
 
-**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base fce4b707 · streams tooling · order 5 · ratified 2026-10-12
+**Status:** INPROGRESS · rev-4 · 2026-10-12 · node a · Tier-2 · base fce4b707 · streams tooling · order 5 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
@@ -207,6 +207,33 @@ both not-checked sentences, each beside the branch it describes. The hook's FULL
 states lineage's rule, its SCOPED branch states the push mode's, and predicate 9's comment states
 (b)'s reading. No comment restates another's rule.
 
+**(f) What the merged code forces (rev-4).** Origin moved to 6e8f8b1da before the merge; the merge
+takes that tip, and the conflict set is the same 16 files. Five points the merged code decides that
+(a) to (e) do not name, each the narrowest reading that keeps both sides:
+
+- Lineage's terms arrive as origin wrote them, read through this build's representations: origin's
+  `impures[]` no longer exists, so "not declared `impure`" reads the manifest's legacy `impure` from
+  `legreads`, as the cache block does; a `remote` leg with no observed remote is refused, the rule
+  this build's runner states for every reuse of such a leg; and the key compares with the run's
+  precomputed `INPUT_KEYS`, the one composition `input_key` also builds, rather than a spawn per leg.
+- Predicate 9 moves into its own function, `check_green_reuse`, because origin's `check_green_record`
+  signature gained a manifest path and a bar pair while this build's gained the reused field.
+- The hook's `ls-remote` probe runs after origin's cover pass and post-merge red, and not under
+  `--decide`, because a covered or decide-only push runs no bar and a post-merge red can turn the
+  decision FULL.
+- The reuse digest leaves out `GATE_TURNSTILE_HOLDER` beside `GATE_TURNSTILE_HELD`: origin's host
+  turnstile exports the holder nonce to every bar before the digest is taken, which moved every key
+  on every run and disabled the cache whenever the turnstile was on. This is a red the merge
+  produced, fixed here; it is not the digest's view of the hook's environment, which stays
+  `TOOL-aSparedSpawn-33`'s.
+- Row 4 of (d)'s table governs where S7's "exactly as today" and the table disagree: a set but
+  invalid `GATE_REUSE_PUSH` with `GATE_REUSE` set takes `env`, where today's block took `off`. The
+  hook never sets both, so only a direct caller can reach it.
+
+Not changed here, and recorded as owed: `tools/run-gates/post-merge.sh` and the unattended driver's
+`_gknobs` scrub `GATE_REUSE` from the bars they run and not `GATE_REUSE_LINEAGE`, so an exported
+lineage knob reaches a post-merge or close bar, which both run with the full flag.
+
 ### Files touched (estimate)
 
 - `tools/run-gates/run-gates.sh`
@@ -342,6 +369,10 @@ New arm: .githooks/pre-push.test.sh · covers AC7 AC8 · a lineage full stamp re
   mode per run by a precedence table, a `reused_cache` stamp field predicate 9 reads, `GATE_FULL`
   meaning no cache reuse with lineage the one exception, and each rule stated once. §3 names the
   digest's view of the hook environment as `TOOL-aSparedSpawn-33`.
+- rev-4 · 2026-10-12 · §4 · the merge takes origin's moved tip 6e8f8b1da, and §4 (f) records five
+  points the merged code decided that (a) to (e) did not name: lineage read through `legreads` and
+  `INPUT_KEYS`, predicate 9 in its own function, the probe after the cover pass, the holder nonce left
+  out of the digest, and (d)'s row 4 over S7; plus the post-merge and driver scrubs left owed.
 
 ## 10. Reuse audit
 

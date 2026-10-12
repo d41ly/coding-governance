@@ -92,7 +92,7 @@ ids TOOL-aSparedSpawn-29 TOOL-aSparedSpawn-30 TOOL-aSparedSpawn-31 TOOL-aSparedS
 | [TOOL-aSparedSpawn-17 — an executed red under a cached ok erases the entry and quarantines the leg](spec/2026-10-12-spec-TOOL-aSparedSpawn-17.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-12 |
 | [TOOL-aSparedSpawn-18 — the width A/B instrument counts only executed verdicts and fails on a red bar](spec/2026-10-12-spec-TOOL-aSparedSpawn-18.md) | 4 | 1 | CLOSED | rev-1 | 2026-10-12 |
 | [TOOL-aSparedSpawn-19 — the spawn-budget leg never passes a run that graded nothing it could have](spec/2026-10-12-spec-TOOL-aSparedSpawn-19.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-12 |
-| [TOOL-aSparedSpawn-32 — reconcile the build with origin/main 37200355](spec/2026-10-12-spec-TOOL-aSparedSpawn-32.md) | 5 | 2 | INPROGRESS | rev-3 | 2026-10-12 |
+| [TOOL-aSparedSpawn-32 — reconcile the build with origin/main 37200355](spec/2026-10-12-spec-TOOL-aSparedSpawn-32.md) | 5 | 2 | INPROGRESS | rev-4 | 2026-10-12 |
 | [TOOL-aSparedSpawn-33 — the pre-push hook restores the caller's environment for the reuse digest](spec/2026-10-12-spec-TOOL-aSparedSpawn-33.md) | 6 | 2 | OPEN | rev-1 | 2026-10-12 |
 <!-- /gen:build-units -->
 
