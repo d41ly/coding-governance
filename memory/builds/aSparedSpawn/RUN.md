@@ -19,19 +19,19 @@ hold-code: host-owner-action
 held-from: VERIFYING
 refreshed-at: 37200355d6033895cd156ec962928fd264084c2b · park · 107 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: ebee78269ef98a8c22524e4dc485b7616030a9fb
-phase: HELD
+witness: 3cbba3f17ccde5e6b21680c337856d06001a6fcf
+phase: VERIFYING
 may: none
 mode: slug
 run-branch: refs/heads/branch/gate-runner-profiling-optimization-5d1f1e
 anchor-kind: default-branch
 cli-version: 2.1.293
-lease-utc: 2026-10-10T21:40:09Z
+lease-utc: 2026-10-12T21:26:50Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 23708
+pid: 17536
 session: a847ea22-72ec-4e2b-ad82-5275ce268903
-keepalive: f1736cba
+keepalive: 850e8e9b
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: d22cca6cb2d550fa304d57dbc09771b0230d47e6
 anchor-ref: refs/heads/main
@@ -218,3 +218,5 @@ base: e6585db4e125bb0919c0c1f18687eb9825ffed80
 2026-10-12T19:36:09Z brief · item TOOL-aSparedSpawn-33 · reason a62e1325877a memory/builds/aSparedSpawn/prompts/2026-10-12-prompt-TOOL-aSparedSpawn-33-build-brief.md
 
 2026-10-12T20:49:11Z hold · item host-owner-action · reason until owner · reaped f1736cba · resume none(owner)
+
+2026-10-12T21:26:56Z resume · item aSparedSpawn · reason held · keepalive 850e8e9b · manual
