@@ -98,3 +98,7 @@ base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 2026-10-12T22:02:01Z dispatch · item b357641e TOOL-aHeardState-6 · reason memory/gotchas/held-suite-guard-misses-a-sibling-kit.md memory/map/features/agent-cap.md
 
 2026-10-12T22:02:20Z dispatch · item b357641e TOOL-aHeardState-6 · reason memory/gotchas/held-suite-guard-misses-a-sibling-kit.md memory/gotchas/INDEX.md memory/map/features/agent-cap.md
+
+2026-10-12T22:03:10Z dispatch · item f1d88c60 TOOL-aHeardState-7 · reason tools/hooks/format-guard.js tools/hooks/format-guard.test.sh
+
+2026-10-12T22:05:16Z dispatch · item f1d88c60 TOOL-aHeardState-7 · reason tools/hooks/format-guard.js tools/hooks/format-guard.test.sh memory/map/generated/inventories.json memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md

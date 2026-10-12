@@ -224,6 +224,12 @@ run_stop "AC6 a committed line naming another sha blocks" block "$TMP/wrong.md"
 sha=$(seed_fixture_commit "four")
 printf '%s\n\n- merged — --no-ff tBranch → main · %s\n' "$(cat "$TMP/good.md")" "${sha:0:8}" > "$TMP/merged.md"
 run_stop "AC6 a merged line naming the commit allows" allow "$TMP/merged.md"
+# TOOL-aHeardState-7 — a chained stop leaves the baseline alone, so its commit is owed at the next
+# unchained stop: the behaviour the header now states.
+sha=$(seed_fixture_commit "five")
+run_stop "TOOL-aHeardState-7 a chained stop after a commit allows" allow "$TMP/good.md" '{"stop_hook_active":true}'
+run_stop "TOOL-aHeardState-7 the next unchained stop demands the chained commit" block "$TMP/good.md"
+check_contains "TOOL-aHeardState-7 the reason names the chained commit" "$TMP/out" "commit ${sha:0:9}"
 
 # AC5 — unarmed: every case silent on both streams.
 seed_repo "$TMP/charter.md"
@@ -293,9 +299,9 @@ else echo "FAIL AC6 liveness: the verdicts never moved, so agreement proves noth
 
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count. 43 = the suite as TOOL-aHeardState-1 landed it; 54 = 43 + TOOL-aHeardState-2's AC6 arm (10
-# messages and its liveness).
+# messages and its liveness); 57 = 54 + TOOL-aHeardState-7's three chained-stop assertions.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=54
+FLOOR_ASSERTIONS=57
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

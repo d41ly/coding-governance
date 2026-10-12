@@ -47,8 +47,9 @@
  * highest-severity item (the [state] rule). Sub-agent stops (`Stop` is the main agent's event; a
  * payload carrying `agent_id` exits 0). EVERY STOP AFTER A BLOCK IN THE SAME CHAIN, whichever hook
  * blocked — so inside an unattended run, whose stop-guard blocks `run-open` turn ends, only the first
- * stop of each chain is graded, and commits made in the continuation are absorbed into the baseline
- * ungraded. Whether this hook is WIRED: check-wiring.sh and check-hook-destinations.sh own that. A
+ * stop of each chain is graded. A chained stop leaves the HEAD sidecar where it was, so a commit made
+ * in the continuation is not graded there and is demanded at the next unchained armed stop, even when
+ * a chained message already reported it. Whether this hook is WIRED: check-wiring.sh and check-hook-destinations.sh own that. A
  * broken hook never blocks a stop — every failure path is an allow, and an uncaught error exits 0.
  */
 'use strict'
