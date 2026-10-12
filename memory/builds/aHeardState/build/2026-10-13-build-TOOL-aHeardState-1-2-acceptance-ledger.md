@@ -18,7 +18,7 @@ runlog rows below rest on direct CLI observations.
 - AC8 — `left` — a BUILD line without its left field blocks quoting the charter shape (suite).
 - AC9 — `node format-guard.js` — non-JSON stdin exits 0 with empty stdout (suite).
 - AC10 — `python tools/settings-merge.py --fragment format-guard.fragment.json --check` — settings-merge reports the fragment already wired, and check-hook-destinations lists it ok and clean.
-- AC11 — amended rev-2 — the in-tree observation on the real card, LIVE.md, charter and HEAD replaces the end-to-end turn, which drew no feedback because this session's hooks load from its launch tree; `2026-10-12-build-TOOL-aHeardState-1-1-live-witness.md` records both, and the harness half is the owner's.
+- AC11 — amended rev-2 — the in-tree observation on the real card, `memory/LIVE.md`, charter and HEAD replaces the end-to-end turn, which drew no feedback because this session's hooks load from its launch tree; `2026-10-12-build-TOOL-aHeardState-1-1-live-witness.md` records both, and the harness half is the owner's.
 
 **Evidences:** TOOL-aHeardState-2
 - AC1 — `python tools/runlog/runlog.py prose --session 86a064cd-3532-4202-93cd-dd26651975d3` — 34 turns, narration 47.7% ALARM, pair 15/32, exit 0, on 2026-10-13.
