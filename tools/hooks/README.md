@@ -407,6 +407,44 @@ capped at `ROUTE_CONTEXT_CAP`, 10,000 characters, the harness's own cap: past it
 cut at a line boundary, a cut unit line takes its verdict with it, and a closing line names the card
 and how many route lines were left out. It never blocks, and a throw prints nothing and exits 0.
 
+## format-guard — the turn end refuses a final message without the BUILD/SPEC pair
+
+`format-guard.js` is the third hook in this home, wired on `Stop` through
+`format-guard.fragment.json` (`TOOL-aHeardState-1`). It reads the payload's `last_assistant_message`
+and refuses the turn end, `{"decision":"block","reason":…}` on exit 0, when a session routed to a
+live build ends without the charter's `BUILD`/`SPEC` pair, breaks rule r1, or leaves a commit made
+since its previous stop unreported. The reason reaches the model as `Stop hook feedback:`, names each
+defect and quotes the charter definition it breaks.
+
+**When it arms.** All three, or it exits 0 and prints nothing: the session's orientation card under
+`<git-common-dir>/orientation/<session_id>.md` exists; its `## route` carries a `- build: <slug>` line;
+and `<MEMORY_ROOT>/LIVE.md` at the payload cwd's toplevel lists `<slug>`, `MEMORY_ROOT` read from the
+toplevel's `.memory-tree.conf` with no default. LIVE.md is the generated non-terminal set, so a build
+leaves the hook's reach when its last unit reaches a terminal status. The card and route readers are
+`scratch-guard.js`'s, imported through its `module.exports`.
+
+**The grammar is the charter's.** The `BUILD`, `SPEC`, `committed` and `merged` shapes are derived
+from the `<!-- microformats -->` fence of the toplevel's `AGENTS.md`, the fence `check-microformats.sh`
+keys on: a placeholder `<…>` matches a run carrying no ` · `, `[ · …]` is an optional group, and the
+line is anchored at a column-0 `- `. Edit the charter and the hook follows. No fence, or no definition
+for one of those four heads, allows with one stderr witness line.
+
+**What blocks.** No bare `BUILD` line; no bare `SPEC` line while the route names a unit with a
+`· spec` path; a line after the last bare `BUILD` that is not a bare `SPEC` (the `[pair]` rule); either
+line backticked, bold, indented, a heading, fenced or missing its `- ` (rule r1); either line off its
+derived shape; and a first-parent commit since the previous armed stop that no bare `committed` or
+`merged` line names by a 7+ hex prefix. The last HEAD seen lives in
+`<git-dir>/format-guard/<session_id>.head`; the first armed stop records it and requires nothing.
+
+**The bound.** It never blocks when `stop_hook_active` is true, so it refuses at most once per turn
+end and keeps no count. Every failure path allows, and an uncaught error exits 0.
+
+**The ceiling.** It does not grade emission mid-turn, the ⏳ heartbeat, any other micro-format, any
+field value, or where in the message the pair sits. It never sees a sub-agent's stop. It grades no
+stop that follows a block in the same chain, whichever hook blocked, so under an unattended run only
+the first stop of each chain is graded. It does not prove it is wired. The transcript-level measure
+that covers what it cannot see is `runlog.py prose` (`TOOL-aHeardState-2`).
+
 ## scratch-guard's fourth check: a role agent runs no gate
 
 Gates are the main session's, at the merge or push threshold (`TOOL-aOrientedCast-11`). On a Bash

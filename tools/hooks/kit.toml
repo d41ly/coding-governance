@@ -81,6 +81,24 @@ include = ["scratch-guard-subagent.fragment.json"]
 role = "engine"
 to = "{prefix}/hooks/scratch-guard-subagent.fragment.json"
 
+# format-guard — the third hook in this home, on `Stop` (TOOL-aHeardState-1). One rule per file, for
+# check 7i's reason above. It requires scratch-guard.js beside it for the card and route readers,
+# and both ship to the same directory.
+[[files]]
+include = ["format-guard.js"]
+role = "engine"
+to = "{prefix}/hooks/format-guard.js"
+
+# WITHHELD, as scratch-guard.test.sh is: its subject is the hook beside it.
+[[files]]
+include = ["format-guard.test.sh"]
+role = "project-owned"
+
+[[files]]
+include = ["format-guard.fragment.json"]
+role = "engine"
+to = "{prefix}/hooks/format-guard.fragment.json"
+
 [adopt]
 # RESTORED. TOOL-aQuenchedHarness-3 removed two `[[gate_leg]]` rows from this file and took
 # the `[adopt]` table and the whole `[check]` block out with them -- the hunk boundaries ran

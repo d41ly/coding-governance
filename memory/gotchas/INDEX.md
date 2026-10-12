@@ -64,6 +64,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [guard-above-a-fold-makes-its-fallback-dead](guard-above-a-fold-makes-its-fallback-dead.md) | class | 2 | yes | a guard added above a fold settles the predicate the fold's own fallback re-tests, leaving a dead arm that reads as coverage |
 | [guard-fed-the-value-it-supersedes](guard-fed-the-value-it-supersedes.md) | class | 2 |  | a guard on a relaunch reads only the pid the launch it guards was meant to replace, so the process the launch itself created is invisible to the next launch and the guard never sees the duplicate it exists to stop |
 | [hand-named-gate-list-green-while-the-bar-reds](hand-named-gate-list-green-while-the-bar-reds.md) | class | 6 |  | a spec names the legs its author expects the change to move, the unit is green on exactly those, and the bar is red on an unguarded leg the list never named |
+| [held-suite-guard-misses-a-sibling-kit](held-suite-guard-misses-a-sibling-kit.md) | class | 7 |  | a held self-test reads another kit's file, but its leg's guard names only its own kit, so an edit to the sibling skips the leg or reuses its stale green |
 | [heredoc-escape-reaches-the-regex](heredoc-escape-reaches-the-regex.md) | class | 0 | yes | source written through a shell heredoc into a non-raw string turns an escape into a control byte, and the symptom never looks like a quoting problem |
 | [history-leg-graded-before-the-reconcile-commit](history-leg-graded-before-the-reconcile-commit.md) | class | 2 |  | a history-wide leg graded before the reconcile commit is graded on the wrong history, because the merge adds commits to the population without touching a file the fix touched |
 | [hookspath-resolves-into-another-checkout](hookspath-resolves-into-another-checkout.md) | class | 6 |  | an ABSOLUTE core.hooksPath makes every worktree it governs run the hook files of the one checkout it names, so a push is gated by whatever that checkout happens to have checked out |
@@ -118,6 +119,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [suite-invalidated-by-a-commit-under-it](suite-invalidated-by-a-commit-under-it.md) | class | 1 |  | a suite that pins gov's revision at import and stamps fixtures from live HEAD is silently invalidated by any commit made while it runs, and the failures name the product |
 | [swallowed-delegate-reads-as-clean](swallowed-delegate-reads-as-clean.md) | class | 2 |  | a gate that discards its delegate's exit status reads a delegate that never ran as a clean population |
 | [sweep-issues-no-cost-verdict](sweep-issues-no-cost-verdict.md) | invariant | 1 |  | the self-test sweep never grades a suite's wall clock against its budget, and that is the ruling, not a gap |
+| [test-oracle-read-from-a-historical-sha](test-oracle-read-from-a-historical-sha.md) | class | 2 |  | a test compares its subject with a copy read out of git at a literal sha, so every later legitimate edit of the subject reds it and the fix is always "move the sha" |
 | [text-mode-read-eats-a-bare-cr](text-mode-read-eats-a-bare-cr.md) | class | 2 |  | reading a CRLF worktree file in text mode turns a bare CR inside a regex into a newline |
 | [trace-profile-measures-itself](trace-profile-measures-itself.md) | class | 1 |  | a per-line set -x profile charges its own write overhead to the next line, so its seconds rank by call count and an optimisation aimed at them moves nothing |
 | [trailing-comma-counted-as-an-element](trailing-comma-counted-as-an-element.md) | class | 5 |  | a counter scoring one-plus-every-top-level-comma reads a trailing comma as a real item, so every multi-line literal measures one too many |
@@ -132,6 +134,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-117 record(s): 114 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+119 record(s): 116 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->
