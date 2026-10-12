@@ -93,9 +93,9 @@ ids TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedS
 | [TOOL-aSparedSpawn-19 — the spawn-budget leg never passes a run that graded nothing it could have](spec/2026-10-12-spec-TOOL-aSparedSpawn-19.md) | 4 | 2 | OPEN | rev-1 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 46 bound to this build, across 4 record folder(s).
+Records: 50 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedSpawn-18 TOOL-aSparedSpawn-19.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14 TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6
 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedSpawn-18 TOOL-aSparedSpawn-19.
