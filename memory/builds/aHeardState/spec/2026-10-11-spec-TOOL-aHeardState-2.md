@@ -1,6 +1,6 @@
 # TOOL-aHeardState-2 — runlog prose: a transcript measure of narration, interjections and pair emission
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-2 · base 2f01150c · streams tooling · order 2
+**Status:** INPROGRESS · rev-2 · 2026-10-13 · node a · Tier-2 · base 2f01150c · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -23,9 +23,10 @@ hook existed, can be measured for prose discipline and pair emission after the f
   transcript through `resolve_session_tree` and reads it through `read_records`; `--transcript <path>`
   reads one named file instead. Sub-agent files and records marked `isSidechain` are out. A
   transcript that does not resolve exits 2 naming what was looked for. AC1, AC5.
-- **S2** — turns. A turn opens at a main-file user record whose typed text `_read_text` returns and
-  whose `_derive_owner_class` is `human` or `candidate`; a `tool_result` record never opens one. In a
-  turn, the FINAL MESSAGE is the assistant text after the turn's last `tool_use` block, and each other
+- **S2** — turns. A turn opens at any main-file user record whose typed text `_read_text` returns,
+  whatever its origin — an owner prompt, an idle-wake tick the harness marks `isMeta`, a task
+  notification, a hook's feedback; a `tool_result` record never opens one, and an opener that follows
+  another with nothing from the assistant between them joins its turn. In a turn, the FINAL MESSAGE is the assistant text after the turn's last `tool_use` block, and each other
   assistant message carrying text, counted once per `message.id`, is one INTERJECTION. AC2.
 - **S3** — the figures, one line each: narration share, the interjection characters over all
   assistant prose characters, marked `ALARM` above 40%; interjections per final message as mean, max
@@ -108,9 +109,11 @@ can reach both kits, since both are gov-side.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python tools/runlog/runlog.py prose --session 86a064cd-3532-4202-93cd-dd26651975d3`
-  runs on node a, its `pair` line reads `0/<f>` with `<f>` above zero. Red when: the session does not
-  resolve, or the count is not zero.
-  fixture: that session's transcript, present on node a only.
+  runs on node a, it counts more than two turns, its `narration` line reads `ALARM`, and its `pair`
+  line reads `<p>/<f>` with `<p>` below `<f>`. Red when: the session does not resolve, the owner-class
+  turn rule's two turns come back, or every final message counts as carrying the pair.
+  fixture: that session's transcript, present on node a only; it is still live, and has emitted pairs
+  since the owner's zero-emission grep, so no count is pinned.
   figure: DERIVED at observation time.
 - **AC2** — When `runlog.py prose --transcript` reads the fixture transcript, `turns`, `final
   messages`, the narration percentage, the interjection mean, max and turns-above-3 equal the values
@@ -149,12 +152,16 @@ New arm: tools/hooks/format-guard.test.sh · covers AC6 · the same fixture mess
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · first draft, from the brief record and the kickoff's design defaults.
+- rev-2 · 2026-10-13 · S2 · AC1 · §10 · a measurement of session 86a064cd with the draft found two turns,
+  because `_derive_owner_class` drops idle-wake ticks and task notifications, which open real turns;
+  any typed user record now opens one. The same session has emitted pairs since the owner's grep, so
+  AC1 no longer pins a zero.
 
 ## 10. Reuse audit
 
 `tools/codebase-map/reuse_lookup.py "transcript prose measure per session"` names `extract_session`
 and `resolve_session_tree` in `tools/runlog/extract.py` as seams; this unit imports
-`resolve_session_tree`, `read_records`, `_read_text` and `_derive_owner_class` from there rather than
+`resolve_session_tree`, `build_session_tree`, `read_records` and `_read_text` from there rather than
 reading the JSONL again. The thresholds come from the v1 template at 817ce189, which named the audit
 `{{PROSE_AUDIT}}` and shipped none.
 

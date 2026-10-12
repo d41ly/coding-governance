@@ -57,7 +57,7 @@ ids TOOL-aHeardState-1 TOOL-aHeardState-2
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aHeardState-1 — format-guard: the turn end refuses a final message without the BUILD/SPEC pair or a committed line](spec/2026-10-11-spec-TOOL-aHeardState-1.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-10-12 |
-| [TOOL-aHeardState-2 — runlog prose: a transcript measure of narration, interjections and pair emission](spec/2026-10-11-spec-TOOL-aHeardState-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-10-11 |
+| [TOOL-aHeardState-2 — runlog prose: a transcript measure of narration, interjections and pair emission](spec/2026-10-11-spec-TOOL-aHeardState-2.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-10-13 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 3 record folder(s).

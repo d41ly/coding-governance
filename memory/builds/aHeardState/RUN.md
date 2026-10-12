@@ -54,3 +54,5 @@ base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 2026-10-12T20:00:34Z hold · item host-owner-action · reason until owner · reaped 81987d49 · resume none(owner)
 
 2026-10-12T21:27:39Z resume · item aHeardState · reason held · keepalive 4fa4ef2e · manual
+
+2026-10-12T21:28:24Z dispatch · item 4110a669 TOOL-aHeardState-2 · reason memory/builds/aHeardState/spec/2026-10-11-spec-TOOL-aHeardState-2.md

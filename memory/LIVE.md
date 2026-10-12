@@ -4,13 +4,13 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-10-12, the newest record date in this tree (aHeardState).
+Dormant: no record dated within 21 days of 2026-10-13, the newest record date in this tree (aHeardState).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
 | Build | Status | Node | Opened | Streams | Ids (n) | Last record | Activity | Landed-unclosed |
 |---|---|---|---|---|---|---|---|---|
-| [aHeardState](builds/aHeardState/README.md) | INPROGRESS | a | 2026-10-11 | tooling | 2 | 2026-10-12 | active | 2 |
+| [aHeardState](builds/aHeardState/README.md) | INPROGRESS | a | 2026-10-11 | tooling | 2 | 2026-10-13 | active | 2 |
 | [aRoutedQuill](builds/aRoutedQuill/README.md) | DEFERRED | a | 2026-10-09 | tooling+kickoff+playbook+deployer | 15 | 2026-10-10 | active | 0 |
 | [aSparedSpawn](builds/aSparedSpawn/README.md) | OPEN | a | 2026-10-09 | tooling | 15 | 2026-10-09 | active | 0 |
 | [dPinnedHandoff](builds/dPinnedHandoff/README.md) | SPECCED | d | 2026-09-22 | tooling | 3 | 2026-09-28 | active | 0 |
