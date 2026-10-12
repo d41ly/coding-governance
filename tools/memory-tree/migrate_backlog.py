@@ -2730,14 +2730,11 @@ def run_commit(tmp: str, message: str, files: dict) -> str:
 
 def init_repo(tmp: str) -> None:
     os.makedirs(tmp, exist_ok=True)
-    run("git", "init", "-q", "-b", "main", ".", cwd=tmp)
-    run("git", "config", "user.email", "t@t.test", cwd=tmp)
-    run("git", "config", "user.name", "t", cwd=tmp)
-    run("git", "config", "commit.gpgsign", "false", cwd=tmp)
+    run("git", "init", "-q", "--template=", "-b", "main", ".", cwd=tmp)
     # HERMETIC AGAINST THIS MACHINE'S GLOBAL CONFIG. `core.autocrlf` is a user-global setting on
     # every Windows node here, and it decides what the fixture's own shards look like on disk —
     # so an arm counting rows would be grading the checkout convention rather than the parser.
-    run("git", "config", "core.autocrlf", "false", cwd=tmp)
+    # It is pinned false, with the identity, in the environment `main` sets before the selftest.
 
 
 WAIVER = "# no waived header" + chr(10)
@@ -3657,7 +3654,7 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
 
             empty = os.path.join(base, "inv_empty")
             os.makedirs(empty, exist_ok=True)
-            run("git", "init", "-q", "-b", "main", ".", cwd=empty)
+            run("git", "init", "-q", "--template=", "-b", "main", ".", cwd=empty)
             rc_k, out_k = run_engine(empty, ["--stragglers"])
             arm("a repository holding no ref is a DEAD PROBE, not a clean inventory",
                 "DEAD PROBE", lambda: out_k)
@@ -4317,6 +4314,12 @@ def read_flag_value(rest: list, flag: str) -> str:
 def main(argv: list) -> int:
     args = read_args(argv[1:])
     if args["mode"] == "--selftest":
+        # TOOL-aSparedSpawn-9 S1: the fixtures' identity and line endings, once for every git the
+        # selftest runs, in place of two to four `git config` processes per fixture repository.
+        os.environ.update(GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t.test", GIT_COMMITTER_NAME="t",
+                          GIT_COMMITTER_EMAIL="t@t.test", GIT_CONFIG_COUNT="2",
+                          GIT_CONFIG_KEY_0="core.autocrlf", GIT_CONFIG_VALUE_0="false",
+                          GIT_CONFIG_KEY_1="commit.gpgsign", GIT_CONFIG_VALUE_1="false")
         return cmd_selftest()
     if args["mode"] == "--recipe":
         return cmd_recipe(resolve_root())

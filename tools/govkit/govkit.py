@@ -2740,6 +2740,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         manifest_chunk = {leg.get("name"): leg.get("chunk") for leg in _legs_json}
         manifest_doc_reads = {leg.get("name"): leg.get("doc_reads") for leg in _legs_json}
         manifest_impure = {leg.get("name"): leg.get("impure") for leg in _legs_json}
+        manifest_reads = {leg.get("name"): leg.get("reads") for leg in _legs_json}
         manifest_ceiling = {leg.get("name"): leg.get("ceiling") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
@@ -2816,6 +2817,16 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                                f"{leg.get('impure')!r} while <prefix>/gate-legs.json says "
                                f"{manifest_impure.get(nm)!r} — the descriptor and the manifest "
                                f"disagree about whether a verdict cached on a tree may be reused")
+                    # AND ABOUT THE READ CLASSES, where the descriptor declares them, as with ceiling
+                    # (TOOL-aSparedSpawn-13 S1): the classes decide what enters a leg's reuse key, so a
+                    # descriptor and a manifest that disagree key one leg two ways. A descriptor that
+                    # declares none is not compared: the manifest may declare classes the emitter
+                    # never carries, since an adopter row takes the legacy `impure` below instead.
+                    if "reads" in leg and leg.get("reads") != manifest_reads.get(nm):
+                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with reads "
+                               f"{leg.get('reads')!r} while <prefix>/gate-legs.json says "
+                               f"{manifest_reads.get(nm)!r} — the descriptor and the manifest "
+                               f"disagree about what this leg reads beyond its inputs")
                     # AND ABOUT CEILING, where the descriptor declares one (DEPL-aBenchedProbe-2 S5):
                     # the emitter carries the descriptor's value verbatim into adopters, so it must
                     # be a positive int (a bool is an int to Python, and not a bound) equal to the
@@ -4164,8 +4175,14 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     # IMPURE TRAVELS under the same reader check (TOOL-aRoutedQuill-12 S5): the
                     # run-gates canary has carried the key since run-gates 1.0, so a runner that
                     # reads `subject` reads it too, and a leg graded on the commit graph is not cached.
+                    # A descriptor's `reads` TRAVELS AS THE LEGACY `impure` (TOOL-aSparedSpawn-13 S1),
+                    # its reasons joined: every runner reads `impure` as never-reuse, whatever its
+                    # version, so an adopter's verdict keeps its meaning and no canary meets a key
+                    # its pinned set predates.
                     if leg.get("impure"):
                         row["impure"] = leg["impure"]
+                    elif isinstance(leg.get("reads"), dict) and leg["reads"]:
+                        row["impure"] = "; ".join(f"{k}: {v}" for k, v in sorted(leg["reads"].items()))
                 if guards:
                     row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
                 # DOC READS TRAVEL, all or nothing, and only into a runner that reads them: below
@@ -12887,13 +12904,17 @@ def resolve_descriptor_paths(desc: dict, tool_root: str) -> dict:
     return desc
 
 
-def cmd_shipped(root: pathlib.Path) -> int:
+def cmd_shipped(root: pathlib.Path, epoch: bool = False) -> int:
     """TOOL-aRepatriatedFork-16 S1 — what THIS repo ships, as ONE derivation.
 
     One `<entry>\\t<role>\\t<src>` row per descriptor survivor carrying a source, sorted. The
     install-prefix gate used to carry this as its own heredoc over the same calls, and two further
-    readers were about to paste it again. Read-only, no arguments. A registry naming a broken
-    descriptor exits 1 and prints NO row: a reader must not grade a narrowed set as the whole one.
+    readers were about to paste it again. Read-only. A registry naming a broken descriptor exits 1
+    and prints NO row: a reader must not grade a narrowed set as the whole one.
+
+    `epoch` (the `--epoch` flag, TOOL-aSparedSpawn-12 S6) keeps only the rows whose role is in
+    `EPOCH_ROLES`, the filter `derive_epoch_state` applies to these same survivors, so "this kit
+    moved" has one answer for the version-bump rule and for the run-gates held-tier selection.
     """
     r = Report()
     descs = read_descriptors(root, load_registry(root), r)
@@ -12903,7 +12924,8 @@ def cmd_shipped(root: pathlib.Path) -> int:
         return 1
     rows = {f"{eid}\t{row['role']}\t{row['src']}"
             for eid, (d, _p) in descs.items()
-            for row in resolve_entry(root, d, canonical_ctx(eid))["survivors"] if row.get("src")}
+            for row in resolve_entry(root, d, canonical_ctx(eid))["survivors"] if row.get("src")
+            and (not epoch or row["role"] in EPOCH_ROLES)}
     sys.stdout.write("".join(f"{x}\n" for x in sorted(rows)))
     return 0
 
@@ -13189,7 +13211,7 @@ def cmd_mint(root: pathlib.Path, base: str, head: str | None) -> int:
 # ------------------------------------------------------------------------------------------- main
 USAGE = """usage:
   govkit.py selfcheck [--write] [--fix]
-  govkit.py shipped
+  govkit.py shipped [--epoch]
   govkit.py epoch [--base <rev>]
   govkit.py mint --base <rev> [--head <rev>]
   govkit.py plan --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
@@ -13662,6 +13684,11 @@ def main(argv: list[str]) -> int:
             if len(flags) != len(set(flags)) or any(a not in ("--write", "--fix") for a in flags):
                 raise Refusal("selfcheck takes no arguments except --write and --fix")
             return selfcheck(repo_root(), write="--write" in flags, fix="--fix" in flags)
+        if argv[0] == "shipped":
+            # Parsed here and not in `parse_args`: `--epoch` is this verb's alone.
+            if argv[1:] not in ([], ["--epoch"]):
+                raise Refusal("shipped takes no arguments except --epoch")
+            return cmd_shipped(repo_root(), epoch=len(argv) == 2)
         if argv[0] == "epoch":
             # Parsed here and not in `parse_args`: `--base` is this verb's alone.
             if len(argv) not in (1, 3) or (len(argv) == 3 and argv[1] != "--base"):
@@ -13683,10 +13710,6 @@ def main(argv: list[str]) -> int:
          PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE, STAGED, ACCEPT_ROLE_MOVES,
          SUGGEST_PINS) = parse_args(argv)
         root = repo_root()
-        if verb == "shipped":
-            if len(argv) > 1:
-                raise Refusal("shipped takes no arguments")
-            return cmd_shipped(root)
         if verb == "contribute":
             if target is None:
                 raise Refusal("contribute needs an explicit --target: the adopter tree to "

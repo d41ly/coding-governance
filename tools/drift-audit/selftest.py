@@ -93,7 +93,11 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 482
+CHECK_FLOOR = 486
+# 482 + 482 -> 486, TOOL-aSparedSpawn-34, the merge of local main into aSparedSpawn: base 478, plus 4
+# from this branch (TOOL-aSparedSpawn-11) and 4 from local main (TOOL-aPairedSlots-7 and -11).
+# 478 -> 482, TOOL-aSparedSpawn-11: the four checks of `test_one_signal_matches_report`, COUNTED off
+# the arm rather than measured, because the unit pass runs no suite.
 # 480 -> 482, TOOL-aPairedSlots-11: the two-writers arm now asserts its interleaving, the header's
 # place, the reader's answer and an empty file's header, four checks where it had two; COUNTED.
 # 474 -> 478, TOOL-dLadderedRemote-2: the four remote-ladder checks in `test_base_is_remote_tracking`,
@@ -379,9 +383,7 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
         "DECLARED_EMPTY = {'handkept_inventories_disagreeing_with_source'}\n",
         encoding="utf-8", newline="\n")
 
-    run(["git", "init", "-q", "-b", "main"], r)
-    run(["git", "config", "user.email", "selftest@example.com"], r)
-    run(["git", "config", "user.name", "selftest"], r)
+    run(["git", "init", "-q", "--template=", "-b", "main"], r)
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "seed"], r)
 
@@ -418,6 +420,147 @@ def report(r: pathlib.Path, *extra: str) -> dict:
     if out.returncode != 0 or not out.stdout.strip():
         raise AssertionError(f"report failed rc={out.returncode}: {out.stderr.strip()[:300]}")
     return {s["signal"]: s for s in json.loads(out.stdout)}
+
+
+# THE NAME-TO-FUNCTION MAP (TOOL-aSparedSpawn-11 S3), DERIVED and never typed. `main` emits one record
+# per entry of `SIGNALS`, in that order, so the order of one full `report()` over a clean fixture IS
+# the index of each name's function. Filled by `test_one_signal_matches_report`, which runs before
+# every arm that reads it and refuses a map whose size is not the size of `SIGNALS`.
+SIGNAL_ORDER: dict[str, int] = {}
+
+
+def load_fixture_report(r: pathlib.Path):
+    """A FRESH module compiled from the fixture's own copy of the report, as its subprocess loads it.
+
+    Compiled from the source rather than imported, so no cached bytecode stands in for an edit, and
+    loaded from the FIXTURE's copy, because the report finds its project layer and its sibling kits
+    beside its own `__file__`."""
+    import types
+    path = r / REPORT_REL
+    mod = types.ModuleType("_drift_report_fixture")
+    mod.__file__ = str(path)
+    sys.modules[mod.__name__] = mod
+    exec(compile(path.read_bytes(), str(path), "exec"), mod.__dict__)
+    return mod
+
+
+def read_one_signal(r: pathlib.Path, name: str, *extra: str) -> dict:
+    """`report(r, *extra)[name]`, computed in THIS process by that one signal's function.
+
+    `report()` starts a Python and runs every signal to answer a question about one. This builds the
+    context `main` builds — the fixture's conf, project layer and base ref, `offline` off, the derived
+    name set for the signal that reads it — calls the one function, adds `pin` as `main` does and
+    round-trips the record through JSON, so it compares as the subprocess's does. `main`'s other
+    post-processing is not reproduced: a fixture whose project layer declares BASELINES, and any
+    `extra` but `--base-ref <ref>`, go to `report()`, as does every arm grading `main`'s own contract.
+
+    A subprocess starts with nothing imported, so every non-stdlib module is hidden while the fixture
+    runs and whatever it imported is dropped after: a cached `drift_signals`, lexicon or recall module
+    would carry one fixture into the next. The cwd, `GOV_DEFAULT_BRANCH`, `sys.path` and the hidden
+    modules are restored whatever happens, and a refusal raises as `report()` does."""
+    import contextlib
+    import json
+    if extra and (len(extra) != 2 or extra[0] != "--base-ref"):
+        return report(r, *extra)[name]
+    if not SIGNAL_ORDER:
+        raise AssertionError("read_one_signal: the signal map is not derived; "
+                             "test_one_signal_matches_report must run first")
+    if name not in SIGNAL_ORDER:
+        raise KeyError(name)
+    keep = set(sys.stdlib_module_names) | set(sys.builtin_module_names) | {"__main__"}
+    hidden = {k: sys.modules.pop(k) for k in [k for k in sys.modules if k.split(".")[0] not in keep]}
+    saved_path, saved_cwd = list(sys.path), os.getcwd()
+    saved_branch = os.environ.get("GOV_DEFAULT_BRANCH")
+    os.environ.setdefault("GOV_DEFAULT_BRANCH", "main")
+    rec, baselined = None, False
+    try:
+        os.chdir(r)
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            mod = load_fixture_report(r)
+            root = mod.repo_root()
+            conf = mod.load_conf(root)
+            proj = mod.load_project_layer(root)
+            mod._read_lookback(proj)
+            mod._read_dead_keys(proj)
+            baselined = bool(getattr(proj, "BASELINES", None))
+            if not baselined:
+                base_ref = mod.resolve_base_ref(root, extra[1] if extra else None)
+                if mod.Git(root, base_ref).run("rev-parse", "--verify", "--quiet",
+                                               base_ref + "^{commit}").returncode != 0:
+                    raise mod.DriftError(f"base ref '{base_ref}' does not resolve in this clone")
+                ctx = mod.Ctx(root, conf, proj, base_ref)
+                ctx.offline = False
+                ctx.signal_names = set(SIGNAL_ORDER)
+                rec = mod.SIGNALS[SIGNAL_ORDER[name]](ctx)
+                if rec["gateable"] and rec["tolerance"] is None:
+                    raise mod.DriftError(f"{rec['signal']}: gateable with no tolerance")
+                rec["pin"] = ctx.pins.get(rec["signal"], rec["tolerance"])
+    except Exception as exc:
+        raise AssertionError(f"report failed in process: {exc}") from exc
+    finally:
+        os.chdir(saved_cwd)
+        sys.path[:] = saved_path
+        if saved_branch is None:
+            os.environ.pop("GOV_DEFAULT_BRANCH", None)
+        else:
+            os.environ["GOV_DEFAULT_BRANCH"] = saved_branch
+        for k in [k for k in sys.modules if k.split(".")[0] not in keep]:
+            del sys.modules[k]
+        sys.modules.update(hidden)
+    if baselined:
+        return report(r, *extra)[name]
+    if rec.get("signal") != name:
+        raise AssertionError(f"read_one_signal: SIGNALS[{SIGNAL_ORDER[name]}] answered "
+                             f"{rec.get('signal')!r}, not {name!r}; the derived map is stale")
+    return json.loads(json.dumps(rec))
+
+
+def test_one_signal_matches_report(tmp: pathlib.Path) -> None:
+    """TOOL-aSparedSpawn-11 AC4: derives the name-to-function map, then holds every signal's
+    in-process record equal to its `report()` record over the fields the in-process one carries, on a
+    clean fixture and on one violating two signals. A context missing an attribute a signal reads
+    raises or answers differently, and either reds here."""
+    import json
+    print("one signal in process (every signal equals its report() record)")
+    r = make_repo(tmp, name="onesignal")
+    clean = report(r)
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+    SIGNAL_ORDER.clear()
+    SIGNAL_ORDER.update({n: i for i, n in enumerate(clean)})
+    check("one signal: the derived map names one signal per entry of SIGNALS",
+          bool(SIGNAL_ORDER) and len(SIGNAL_ORDER) == len(dr.SIGNALS),
+          f"{len(SIGNAL_ORDER)} name(s) for {len(dr.SIGNALS)} function(s)")
+    if len(SIGNAL_ORDER) != len(dr.SIGNALS):
+        SIGNAL_ORDER.clear()
+        return
+
+    def read_differences(rep: dict) -> list:
+        out = []
+        for n in SIGNAL_ORDER:
+            mine = read_one_signal(r, n)
+            theirs = json.loads(json.dumps({k: rep[n].get(k) for k in mine}))
+            if mine != theirs:
+                out.append(n)
+        return out
+
+    diff = read_differences(clean)
+    check("one signal: every in-process record equals report() on the clean fixture", not diff,
+          f"differ: {diff}")
+    sha = run(["git", "rev-parse", "--short", "HEAD"], r).stdout.strip()
+    led = r / "memory" / "project" / "in-flight" / "a.md"
+    led.write_text(re.sub(r"work at `[0-9a-f]+`", f"work at `{sha}`", led.read_text(encoding="utf-8")),
+                   encoding="utf-8", newline="\n")
+    (r / "src" / "app.py").write_text("# implements TOOL-aThing-1\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "cite the id in product source"], r)
+    violated = report(r)
+    diff = read_differences(violated)
+    check("one signal: every in-process record equals report() on the violating fixture", not diff,
+          f"differ: {diff}")
+    moved = [n for n in SIGNAL_ORDER if violated[n].get("value") != clean[n].get("value")]
+    check("one signal: the violating fixture moves a value, so the second comparison is not the first",
+          bool(moved), "no value moved between the two fixtures")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -515,10 +658,10 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
                     encoding="utf-8", newline="\n")
 
     # --- signal 3 is report-only but must still be able to observe a shrink ----------------
-    s3 = report(r)["shrink_only_lists_not_shrinking"]
+    s3 = read_one_signal(r, "shrink_only_lists_not_shrinking")
     check("shrink-only signal sees a list that has not shrunk", s3["value"] == 1, str(s3["detail"]))
     (r / "shrinkme.txt").write_text("# header\nentry-one\n", encoding="utf-8", newline="\n")
-    s3b = report(r)["shrink_only_lists_not_shrinking"]
+    s3b = read_one_signal(r, "shrink_only_lists_not_shrinking")
     check("shrink-only signal goes quiet once the list actually shrinks", s3b["value"] == 0,
           str(s3b["detail"]))
 
@@ -530,7 +673,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     # --- signal 6: a CLOSED spec must be backed by a commit that names it AND changed product ---
     print("closed-spec traceability (signal 6)")
     ghost = r / SPEC_DIR_FOR_FIXTURE / "2026-02-02-spec-aGhost-1.md"
-    base6 = report(r)["closed_specs_with_no_product_commit"]
+    base6 = read_one_signal(r, "closed_specs_with_no_product_commit")
     check("clean fixture: the traceability signal is silent", base6["value"] == 0,
           f"got {base6['value']} detail={base6['detail']}")
 
@@ -547,7 +690,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
                      encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "records: close it with nothing built", "--no-verify"], r)
-    v6 = report(r)["closed_specs_with_no_product_commit"]
+    v6 = read_one_signal(r, "closed_specs_with_no_product_commit")
     check("violated: an uncertified CLOSED spec fires the traceability signal", v6["value"] == 1,
           f"got {v6['value']} detail={v6['detail']}")
 
@@ -562,7 +705,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "records: a post-cutoff spec that is not built yet",
          "--no-verify"], r)
-    v6t = report(r)["closed_specs_with_no_product_commit"]
+    v6t = read_one_signal(r, "closed_specs_with_no_product_commit")
     check("a NON-TERMINAL post-cutoff spec with no commit does not fire", v6t["value"] == 1,
           f"got {v6t['value']} — a non-CLOSED status is being judged: {v6t['detail']}")
     live_spec.unlink()
@@ -577,7 +720,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "fix(aSlugOnly): the work, subject naming no unit id",
          "--no-verify"], r)
-    v6s = report(r)["closed_specs_with_no_product_commit"]
+    v6s = read_one_signal(r, "closed_specs_with_no_product_commit")
     check("a CLOSED spec certified by its SLUG alone does not fire", v6s["value"] == 1,
           f"got {v6s['value']} — the slug fallback is gone: {v6s['detail']}")
     slugonly.unlink()
@@ -616,7 +759,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     check("the merge fixture is VISIBLE to a path-restricted walk (else the arm below is vacuous)",
           "merge: aGhost" in merge_seen,
           "history simplification dropped it; the arm would pass without the guard")
-    v6m = report(r)["closed_specs_with_no_product_commit"]
+    v6m = read_one_signal(r, "closed_specs_with_no_product_commit")
     check("a MERGE subject naming the slug does not certify it", v6m["value"] == 1,
           f"got {v6m['value']} — merge subjects are being counted as evidence")
 
@@ -625,7 +768,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "reopen it", "--no-verify"], r)
     check("...and goes quiet once the uncertified spec is gone",
-          report(r)["closed_specs_with_no_product_commit"]["value"] == 0)
+          read_one_signal(r, "closed_specs_with_no_product_commit")["value"] == 0)
 
     # TRACE_GLOBS NARROWS PRODUCT_GLOBS, and that narrowing needs its own arm: with the pathspec
     # dropped from the walk entirely, every other signal-6 arm here stays green. This spec is named
@@ -638,7 +781,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     (r / "conf" / "settings.ini").write_text("k=v2\n", encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "chore(aOutside): bookkeeping only, no product", "--no-verify"], r)
-    v6g = report(r)["closed_specs_with_no_product_commit"]
+    v6g = read_one_signal(r, "closed_specs_with_no_product_commit")
     check("a commit inside PRODUCT_GLOBS but outside TRACE_GLOBS does not certify",
           [d["id"] for d in v6g["detail"]] == ["TOOL-aOutside-1"],
           f"got {v6g['detail']} -- the evidence pathspec is not being applied")
@@ -658,7 +801,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     run(["git", "add", SPEC_DIR_FOR_FIXTURE + "/2025-12-20-spec-aStale-1.md"], r)
     run(["git", "commit", "-q", "-m", "records: a spec whose two dates straddle the cutoff",
          "--no-verify"], r)
-    v6h = report(r)["closed_specs_with_no_product_commit"]
+    v6h = read_one_signal(r, "closed_specs_with_no_product_commit")
     check("the cutoff is judged on the HEADER date, not the filename date",
           [d["id"] for d in v6h["detail"]] == ["TOOL-aStale-1"],
           f"got {v6h['detail']} -- a filename-date key would grandfather this spec")
@@ -677,14 +820,14 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
                      encoding="utf-8", newline="\n")
     run(["git", "add", wspec_rel], r)
     run(["git", "commit", "-q", "-m", "records: a unit nothing certifies", "--no-verify"], r)
-    v6w0 = report(r)["closed_specs_with_no_product_commit"]
+    v6w0 = read_one_signal(r, "closed_specs_with_no_product_commit")
     check("the waiver fixture fires BEFORE it is waived",
           [d["id"] for d in v6w0["detail"]] == ["TOOL-aWaived-1"],
           f"got {v6w0['detail']} -- the arm below would pass vacuously")
 
     waiver.write_text("# fixture\n" + wspec_rel + "\tTOOL-aWaived-1\tno subject can name it\n",
                       encoding="utf-8", newline="\n")
-    v6w1 = report(r)["closed_specs_with_no_product_commit"]
+    v6w1 = read_one_signal(r, "closed_specs_with_no_product_commit")
     check("a waived spec is silent", v6w1["value"] == 0,
           f"got {v6w1['detail']} -- the waiver is not being read")
 
@@ -699,7 +842,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     moved.parent.mkdir(parents=True, exist_ok=True)
     moved.write_text(waiver.read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
     waiver.unlink()
-    v6m0 = report(r)["closed_specs_with_no_product_commit"]
+    v6m0 = read_one_signal(r, "closed_specs_with_no_product_commit")
     check("a relocated registry with no TRACE_WAIVER waives nothing",
           [d["id"] for d in v6m0["detail"]] == ["TOOL-aWaived-1"],
           f"got {v6m0['detail']} -- the TRACE_WAIVER arm below would pass vacuously")
@@ -711,7 +854,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
          "a declared TRACE_WAIVER outside the tree is a finding, not an empty waiver set"),
     ):
         sigp.write_text(sig_base + f'\nTRACE_WAIVER = "{decl}"\n', encoding="utf-8", newline="\n")
-        got = report(r)["closed_specs_with_no_product_commit"]
+        got = read_one_signal(r, "closed_specs_with_no_product_commit")
         check(why, sorted(d["id"] for d in got["detail"]) == want, f"got {got['detail']}")
     sigp.write_text(sig_base, encoding="utf-8", newline="\n")
     waiver.write_text(moved.read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
@@ -723,7 +866,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     wspec.unlink()
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "records: drop the waived fixture", "--no-verify"], r)
-    v6w2 = report(r)["closed_specs_with_no_product_commit"]
+    v6w2 = read_one_signal(r, "closed_specs_with_no_product_commit")
     check("a waiver row whose spec is gone becomes a finding of its own",
           [d["id"] for d in v6w2["detail"]] == ["(stale waiver)"],
           f"got {v6w2['detail']} -- a stale waiver is being swallowed")
@@ -755,7 +898,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
         ro.write_text(ro_h1 + ro_status + tail + "\n" + body, encoding="utf-8", newline="\n")
         if row:
             waiver.write_text(row, encoding="utf-8", newline="\n")
-        got = report(r)["closed_specs_with_no_product_commit"]
+        got = read_one_signal(r, "closed_specs_with_no_product_commit")
         if row:
             waiver.unlink()
         named = not row or bool(got["detail"]) and "records-only" in got["detail"][0].get("note", "")
@@ -812,7 +955,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     onmain = run(["git", "log", "main", "--format=%s", "--", "src"], r).stdout
     check("the branch fixture is INVISIBLE from the default branch (else the arm is vacuous)",
           "feat(aBranch)" not in onmain, "the commit is already on main")
-    v6b = report(r)["closed_specs_with_no_product_commit"]
+    v6b = read_one_signal(r, "closed_specs_with_no_product_commit")
     check("a spec CLOSED on its own branch is certified by that branch: both tips are walked",
           all(d["id"] != "TOOL-aBranch-1" for d in v6b["detail"]),
           f"base-only walk would red correct work: {v6b['detail']}")
@@ -830,7 +973,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     keep = sig.read_text(encoding="utf-8")
     sig.write_text(keep.replace("TRACE_CUTOFF = '2026-01-15'", "TRACE_CUTOFF = ''"),
                    encoding="utf-8", newline="\n")
-    unset = report(r)["closed_specs_with_no_product_commit"]
+    unset = read_one_signal(r, "closed_specs_with_no_product_commit")
     check("unset cutoff: the signal is not gateable", unset["gateable"] is False,
           f"gateable={unset['gateable']}")
     quiet6 = run([sys.executable, REPORT_REL, "--check"], r)
@@ -902,7 +1045,7 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], r)
 
-    clean = report(r)["lexicon_verbs_declared_but_unused"]
+    clean = read_one_signal(r, "lexicon_verbs_declared_but_unused")
     check("clean fixture: every declared verb is used, so the signal is silent",
           clean["value"] == 0 and clean["gateable"] is True, f"{clean}")
     check("clean fixture: ...and LIVE over a non-empty population", clean["live"] is True, f"{clean}")
@@ -914,7 +1057,7 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "declare an unused verb", "--no-verify"], r)
-    fired = report(r)["lexicon_verbs_declared_but_unused"]
+    fired = read_one_signal(r, "lexicon_verbs_declared_but_unused")
     check("violated: a declared-but-unused verb fires the signal", fired["value"] == 1, f"{fired}")
     check("violated: it names the verb", "vanish" in str(fired["detail"]), f"{fired['detail']}")
 
@@ -925,13 +1068,13 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
     # widening, so the lookup froze at the adoption commit forever while reporting a confident 0.
     # Asserting the COMMIT the lookup found is what makes the two implementations distinguishable;
     # a DATE cannot, because a same-day fixture gives both the same answer.
-    before = report(r)["lexicon_ratified_older_than_language_surface"].get("langs_commit")
+    before = read_one_signal(r, "lexicon_ratified_older_than_language_surface").get("langs_commit")
     conf.write_text(conf.read_text(encoding="utf-8").replace(
         'LANGS="py:python-ast:parser"', 'LANGS="py:python-ast:parser js:js-regex:probe"'),
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "widen the language surface IN PLACE", "--no-verify"], r)
-    after = report(r)["lexicon_ratified_older_than_language_surface"].get("langs_commit")
+    after = read_one_signal(r, "lexicon_ratified_older_than_language_surface").get("langs_commit")
     check("the LANGS lookup SEES an in-place widening (a -S pickaxe cannot)",
           bool(after) and after != before, f"before={before} after={after}")
 
@@ -941,7 +1084,7 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
                     encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "roll the stamp back", "--no-verify"], r)
-    stale = report(r)["lexicon_ratified_older_than_language_surface"]
+    stale = read_one_signal(r, "lexicon_ratified_older_than_language_surface")
     check("violated: a language surface widened after ratification fires the staleness signal",
           stale["value"] == 1, f"{stale}")
     check("...and the signal is LIVE by derivation, not a hardcoded True",
@@ -969,7 +1112,7 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "arm a language through PATTERNS alone", "--no-verify"], r)
-    armed = report(r)["lexicon_verbs_declared_but_unused"]
+    armed = read_one_signal(r, "lexicon_verbs_declared_but_unused")
     check("a language armed ONLY by a PATTERNS row is read: the verb it defines stops being unused",
           armed["value"] == 0, f"{armed}")
     check("...and the signal stays LIVE over that widened population", armed["live"] is True,
@@ -1020,7 +1163,7 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
     r = make_repo(tmp / "lexrate")
     name = "lexicon_marginal_offense_rate"
 
-    absent = report(r)[name]
+    absent = read_one_signal(r, name)
     check("no .lexicon.conf: the rate is NOT ASKED, not a clean zero",
           absent["gateable"] is False and absent["value"] == 0, f"{absent}")
     check("no .lexicon.conf: it says why", "not adopted" in str(absent["detail"]), f"{absent['detail']}")
@@ -1038,7 +1181,7 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
 
     # The adoption commit IS the derived base, so HEAD == base and the window is empty BY
     # CONSTRUCTION. This is the state a rate of 0 would misreport as clean.
-    empty = report(r)[name]
+    empty = read_one_signal(r, name)
     # ASSERTS `not_asked`, not `value == 0`. A rate of 0 ALSO has value 0 and gateable False, so the
     # obvious spelling of this arm stays green under exactly the break it exists to catch -- observed
     # 2026-08-25 by staging that break and watching this line pass. `not_asked` is the field the
@@ -1054,7 +1197,7 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "add two definitions, one off-table", "--no-verify"], r)
-    fired = report(r)[name]
+    fired = read_one_signal(r, name)
     check("a window with definitions added reports offenders over that population",
           fired["value"] == 1 and fired["of"] == 2, f"{fired}")
     check("...and is LIVE by derivation over a non-empty population",
@@ -1069,7 +1212,7 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
     # at both ends. Asserting BOTH operands is the point -- an arm reading only `value` would stay
     # green against a version that merely stopped counting it as an offender while leaving it in
     # `of`, which is the same rate wrong in the other direction. Closing review L4.
-    before = report(r)[name]
+    before = read_one_signal(r, name)
     # A GRADEABLE CONTROL LANDS IN THE SAME COMMIT. Round 1 asserted `before["of"] > 0` as its
     # non-vacuity guard, which is a property of the PREVIOUS window and says nothing about whether
     # this commit reached the signal at all -- the round-2 review patched the extractor to skip
@@ -1083,7 +1226,7 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
         encoding="utf-8", newline=chr(10))
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "one ungradeable name and one gradeable control", "--no-verify"], r)
-    after = report(r)[name]
+    after = read_one_signal(r, name)
     check("an ungradeable name is not counted as an offender",
           after["value"] == before["value"], f"before={before['value']} after={after['value']}")
     check("...and the population grew by the CONTROL alone, so the ungradeable name left both operands",
@@ -1113,7 +1256,7 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
         encoding="utf-8", newline=chr(10))
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "arm a second language through PATTERNS alone", "--no-verify"], r)
-    widened = report(r)[name]
+    widened = read_one_signal(r, name)
     check("the marginal rate READS a language armed only by a PATTERNS row: its population grows",
           widened["of"] == after["of"] + 1,
           f"of before={after['of']} after={widened['of']} -- a population that did not grow means "
@@ -1148,7 +1291,7 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
         "def __():" + chr(10) + "    pass" + chr(10), encoding="utf-8", newline=chr(10))
     run(["git", "add", "-A"], b)
     run(["git", "commit", "-q", "-m", "add only an ungradeable name", "--no-verify"], b)
-    _blind = report(b)[name]
+    _blind = read_one_signal(b, name)
     check("an all-ungradeable window is NOT ASKED, never a clean zero",
           _blind.get("not_asked") is True, f"{_blind}")
     check("...and it says WHY, so the zero is never mistaken for a clean window",
@@ -1162,7 +1305,7 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "admit the verb", "--no-verify"], r)
-    admitted = report(r)[name]
+    admitted = read_one_signal(r, name)
     check("admitting a verb lowers the rate, so the table is read at HEAD and not frozen",
           admitted["value"] == 0 and admitted["of"] >= 2, f"{admitted}")
 
@@ -1173,7 +1316,7 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
     if (shallow / ".git").exists():
         deep = run(["git", "rev-parse", "--is-shallow-repository"], shallow).stdout.strip()
         check("the fixture clone really is shallow (or this arm proves nothing)", deep == "true", deep)
-        got = report(shallow)[name]
+        got = read_one_signal(shallow, name)
         check("shallow clone: DEAD PROBE rather than a rate over a one-commit window",
               got["live"] is False and "shallow" in str(got["detail"]).lower(), f"{got}")
     else:
@@ -1197,7 +1340,7 @@ def test_backlog_stragglers(tmp: pathlib.Path) -> None:
     print("backlog stragglers (not asked without the relocation engine; falsifiable with it)")
     r = make_repo(tmp, name="stragglers")
 
-    s = report(r)["backlog_stragglers"]
+    s = read_one_signal(r, "backlog_stragglers")
     check("no memory-tree kit: backlog_stragglers is NOT ASKED, not a clean zero",
           s.get("not_asked") is True and s["value"] == 0, f"{s}")
     check("no memory-tree kit: and it says why",
@@ -1250,7 +1393,7 @@ def test_backlog_stragglers(tmp: pathlib.Path) -> None:
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "flip to builds", "--no-verify"], r)
 
-    s = report(r)["backlog_stragglers"]
+    s = read_one_signal(r, "backlog_stragglers")
     check("two stragglers: the signal counts both", s["value"] == 2, f"{s}")
     check("two stragglers: and reports how many refs it examined", s["of"] >= 3, f"of={s['of']}")
     check("two stragglers: the probe is live", s["live"] is True, f"{s}")
@@ -1267,7 +1410,7 @@ def test_backlog_stragglers(tmp: pathlib.Path) -> None:
     for branch in ("main", "strag", "sidework"):
         run(["git", "branch", "-q", "-D", branch], r)
     run(["git", "update-ref", "-d", "refs/remotes/origin/elsewhere"], r)
-    s = report(r, "--base-ref", tip)["backlog_stragglers"]
+    s = read_one_signal(r, "backlog_stragglers", "--base-ref", tip)
     check("no ref to examine: the signal reports NOT LIVE, never a clean zero",
           s["live"] is False and s["value"] == 0, f"{s}")
     check("no ref to examine: and it carries the reason",
@@ -1302,7 +1445,7 @@ def test_live_backlog_rows(tmp: pathlib.Path) -> None:
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "shards", "--no-verify"], r)
 
-    got = report(r)["live_backlog_rows_per_shard"]
+    got = read_one_signal(r, "live_backlog_rows_per_shard")
     check("counts LIVE rows, not entries: 3 of 5", got["value"] == 3, f"got {got['value']}")
     check("reports every shard, so a total cannot hide one", got["of"] == 2, f"got {got['of']}")
     check("probe is LIVE with shards present", got["live"] is True)
@@ -1327,19 +1470,19 @@ def test_live_backlog_rows(tmp: pathlib.Path) -> None:
     closed = (bl / "ARCH.md").read_text(encoding="utf-8").replace(
         "- ARCH-tLive-1 · OPEN · one", "- ARCH-tLive-1 · CLOSED · one")
     (bl / "ARCH.md").write_text(closed, encoding="utf-8", newline="\n")
-    check("closing a row lowers the count", report(r)["live_backlog_rows_per_shard"]["value"] == 2,
+    check("closing a row lowers the count", read_one_signal(r, "live_backlog_rows_per_shard")["value"] == 2,
           "the signal does not track the variable it exists for")
 
     # --- REPORT-ONLY, and F2 decided that deliberately: `drift-audit records` is an unguarded
     # --- merge-bar leg, so a gateable version turns a growing backlog into a scheduled refusal.
-    check("the signal is not gateable", report(r)["live_backlog_rows_per_shard"]["gateable"] is False)
+    check("the signal is not gateable", read_one_signal(r, "live_backlog_rows_per_shard")["gateable"] is False)
 
     # --- DEAD, not a reassuring 0, where there are no shards at all --------------------------
     r2 = make_repo(tmp, name="noshards")
     for f in sorted((r2 / "memory" / "backlog").glob("*.md")):
         run(["git", "rm", "-q", str(f.relative_to(r2))], r2)
     run(["git", "commit", "-q", "-m", "drop shards", "--no-verify"], r2)
-    dead = report(r2)["live_backlog_rows_per_shard"]
+    dead = read_one_signal(r2, "live_backlog_rows_per_shard")
     check("no shards at all reports DEAD rather than 0",
           dead["live"] is False, f"live={dead['live']} value={dead['value']}")
 
@@ -1423,7 +1566,7 @@ def test_backlog_ask_signals(tmp: pathlib.Path) -> None:
                         ("backlog_asks_unlabelled", "sev")):
         rows = [{k: v for k, v in row.items() if k != field} for row in full]
         (r / "projection.json").write_text(json.dumps(rows), encoding="utf-8", newline="\n")
-        dead = report(r)[name]
+        dead = read_one_signal(r, name)
         check(f"[dDD-34] a projection lacking `{field}` makes {name} a DEAD PROBE, not a 0",
               dead["live"] is False and not dead.get("not_asked"), f"{dead}")
 
@@ -1438,7 +1581,7 @@ def test_backlog_ask_signals(tmp: pathlib.Path) -> None:
     (r / "src" / "only.test.sh").write_text("# ARCH-aFoo-3\n", encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "asks cited from source and from a test", "--no-verify"], r)
-    got = report(r)[name]
+    got = read_one_signal(r, name)
     ids = [d["id"] for d in got.get("detail", [])]
     check("[aMF-55] cited asks: 1 of 3 live, report-only and pinless",
           (got["value"], got["of"], got["live"], got["gateable"], got["tolerance"])
@@ -1451,7 +1594,7 @@ def test_backlog_ask_signals(tmp: pathlib.Path) -> None:
     check("[aMF-55] a sibling id one digit longer does not count for the shorter id",
           "ARCH-aFoo-4" not in ids, f"{ids}")
     (r / "projection.json").write_text("not json", encoding="utf-8", newline="\n")
-    dead = report(r)[name]
+    dead = read_one_signal(r, name)
     check("[aMF-55] an unreadable projection reads not live, never not asked",
           dead["live"] is False and not dead.get("not_asked"), f"{dead}")
 
@@ -1519,7 +1662,7 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "spec", "--no-verify"], r)
 
-    got = report(r)["readme_mechanism_drift"]
+    got = read_one_signal(r, "readme_mechanism_drift")
     toks = sorted(d["mechanism"] for d in got["detail"])
     check("AC1: the README claim its own spec later revised is reported",
           toks == ["--counts"], f"got {toks}")
@@ -1550,7 +1693,7 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
                        encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "close every spec", "--no-verify"], r)
-    shut = report(r)["readme_mechanism_drift"]
+    shut = read_one_signal(r, "readme_mechanism_drift")
     check("S4: a build whose every spec is CLOSED is not graded, so it reads zero rows",
           shut["value"] == 0 and shut["detail"] == [] and shut["of"] == 0,
           f"got value={shut['value']} of={shut['of']} rows={shut['detail'][:1]}")
@@ -1574,7 +1717,7 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
     run(["git", "commit", "-q", "-m", "agree", "--no-verify"], r2,
         env={"GIT_AUTHOR_DATE": "2026-01-02T00:00:00 +0000",
              "GIT_COMMITTER_DATE": "2026-01-02T00:00:00 +0000"})
-    ok = report(r2)["readme_mechanism_drift"]
+    ok = read_one_signal(r2, "readme_mechanism_drift")
     check("AC2: an agreeing pair reports nothing", ok["value"] == 0, f"got {ok['value']}")
     check("AC2: and the probe is still LIVE, so silence is a verdict rather than a blind spot",
           ok["live"] is True)
@@ -1606,7 +1749,7 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
     run(["git", "commit", "-q", "-m", "tz", "--no-verify"], r4,
         env={"GIT_AUTHOR_DATE": "2026-01-02T01:00:00 +0300",
              "GIT_COMMITTER_DATE": "2026-01-02T01:00:00 +0300"})
-    tz = report(r4)["readme_mechanism_drift"]
+    tz = read_one_signal(r4, "readme_mechanism_drift")
     check("MEDIUM 1: a README line and a spec revision on the same LOCAL day are not a hit",
           tz["value"] == 0, f"got {tz['value']} rows: {tz['detail'][:1]}")
     check("MEDIUM 1: and the probe is LIVE, so the zero is a verdict", tz["live"] is True)
@@ -1633,7 +1776,7 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
     run(["git", "commit", "-q", "-m", "dup", "--no-verify"], r5,
         env={"GIT_AUTHOR_DATE": "2026-01-02T00:00:00 +0000",
              "GIT_COMMITTER_DATE": "2026-01-02T00:00:00 +0000"})
-    dup = report(r5)["readme_mechanism_drift"]
+    dup = read_one_signal(r5, "readme_mechanism_drift")
     check("LOW 1: a line naming one mechanism twice is ONE row",
           dup["value"] == 1, f"got {dup['value']}")
 
@@ -1676,7 +1819,7 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
     run(["git", "commit", "-q", "-m", "nested", "--no-verify"], r6,
         env={"GIT_AUTHOR_DATE": "2026-01-02T00:00:00 +0000",
              "GIT_COMMITTER_DATE": "2026-01-02T00:00:00 +0000"})
-    nest = report(r6)["readme_mechanism_drift"]
+    nest = read_one_signal(r6, "readme_mechanism_drift")
     slugs = sorted({d["build"] for d in nest["detail"]})
     check("LOW 3: a two-segment MEMORY_ROOT still names the BUILD, not the literal `builds`",
           slugs == ["one", "two"], f"got {slugs}")
@@ -1692,7 +1835,7 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r3)
     run(["git", "commit", "-q", "-m", "no tokens", "--no-verify"], r3)
-    dead = report(r3)["readme_mechanism_drift"]
+    dead = read_one_signal(r3, "readme_mechanism_drift")
     check("AC4: a corpus with no mechanism token reports DEAD rather than a reassuring 0",
           dead["live"] is False, f"live={dead['live']} value={dead['value']}")
 
@@ -1734,7 +1877,7 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "retire the ledger", "--no-verify"], r)
 
-    drained = report(r)["ledger_rows_contradicting_git"]
+    drained = read_one_signal(r, "ledger_rows_contradicting_git")
     check("drained: the ledger probe is no longer live", drained["live"] is False,
           f"live={drained['live']}")
     check("drained: it reports 0 rather than a stale count", drained["value"] == 0,
@@ -1775,7 +1918,7 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
     assert "'ledger_rows_contradicting_git'" in sig.read_text(encoding="utf-8"), \
         "direction two must run with the declaration STILL in place"
 
-    still = report(r)["ledger_rows_contradicting_git"]
+    still = read_one_signal(r, "ledger_rows_contradicting_git")
     check("still declared, a row returns: the probe is LIVE again",
           still["live"] is True, f"live={still['live']}")
     check("still declared, a row returns: and it scores the contradiction", still["value"] == 1,
@@ -1807,7 +1950,7 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "lift the declaration", "--no-verify"], r)
 
-    back = report(r)["ledger_rows_contradicting_git"]
+    back = read_one_signal(r, "ledger_rows_contradicting_git")
     check("declaration lifted: the probe is still LIVE", back["live"] is True, f"live={back['live']}")
     check("declaration lifted: and still scores the contradiction", back["value"] == 1,
           f"got {back['value']}")
@@ -1842,7 +1985,7 @@ def test_handkept_name_sets(tmp: pathlib.Path) -> None:
 
     def read_row(claimed: list[str]) -> tuple[dict, dict]:
         claims.write_text("\n".join(claimed) + "\n", encoding="utf-8", newline="\n")
-        rec = report(r)["handkept_inventories_disagreeing_with_source"]
+        rec = read_one_signal(r, "handkept_inventories_disagreeing_with_source")
         return rec, (rec["detail"][0] if rec["detail"] else {})
 
     rec, row = read_row(names)
@@ -2076,9 +2219,7 @@ def test_shrink_low_water(tmp: pathlib.Path) -> None:
 
     r = tmp / "low-water"
     r.mkdir()
-    run(["git", "init", "-q", "-b", "main"], r)
-    run(["git", "config", "user.email", "selftest@example.com"], r)
-    run(["git", "config", "user.name", "selftest"], r)
+    run(["git", "init", "-q", "--template=", "-b", "main"], r)
     lst = r / "list.txt"
     for n in (3, 1, 2):
         lst.write_text("# header\n\n" + "".join(f"row-{i}\n" for i in range(n)),
@@ -2128,7 +2269,7 @@ def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
     before = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
 
     bare = tmp / "remotebase.git"
-    run(["git", "init", "-q", "--bare", str(bare)], tmp)
+    run(["git", "init", "-q", "--template=", "--bare", str(bare)], tmp)
     run(["git", "remote", "add", "origin", str(bare)], r)
     # THE RAISE, UNJUSTIFIED, pushed — what a raise another node already landed looks like from here.
     conf.write_text(conf.read_text(encoding="utf-8").replace('ORPHAN_ID_PIN="5"', 'ORPHAN_ID_PIN="9"'),
@@ -2545,7 +2686,7 @@ def test_evidence_oracle(tmp: pathlib.Path) -> None:
         run(["git", "commit", "-q", "-m", msg, "--no-verify"], r)
 
     def read_signal(*extra: str) -> dict:
-        return report(r, *extra)["non_terminal_specs_cited_by_product_source"]
+        return read_one_signal(r, "non_terminal_specs_cited_by_product_source", *extra)
 
     # ---- ARM 1: the correction-form id. Its seq carries a trailing lowercase letter, which the
     # hand-typed digits-then-boundary pattern could not match at all -- so the spec scored UNKEYED
@@ -2679,7 +2820,7 @@ def test_source_cited_ids(tmp: pathlib.Path) -> None:
         run(["git", "commit", "-q", "-m", msg, "--no-verify"], r)
 
     def read_signal(*extra: str) -> dict:
-        return report(r, *extra)["source_cited_ids_resolving_to_no_record"]
+        return read_one_signal(r, "source_cited_ids_resolving_to_no_record", *extra)
 
     base = read_signal()
     check("citations: the signal is live on a fixture with records and source",
@@ -2794,7 +2935,7 @@ def test_report_only_signal_is_judged_against_its_pin(tmp: pathlib.Path) -> None
     run(["git", "commit", "-q", "-m", "chore: plant a dangling citation", "--no-verify"], r)
 
     name = "source_cited_ids_resolving_to_no_record"
-    value = report(r)[name]["value"]
+    value = read_one_signal(r, name)["value"]
     check("report-only: the fixture's report-only signal has a value to pin",
           value > 0, f"value {value} -- the arm below would pin at zero and prove nothing")
 
@@ -2831,7 +2972,7 @@ def test_evidence_globs_exclude_test_templates(tmp: pathlib.Path) -> None:
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "chore: cite a spec id from a test template", "--no-verify"], r)
 
-    sig = report(r)["non_terminal_specs_cited_by_product_source"]
+    sig = read_one_signal(r, "non_terminal_specs_cited_by_product_source")
     check("evidence: a `.test-template` citation is not evidence a unit shipped",
           all(row["id"] != "TOOL-aThing-1" for row in sig["detail"]),
           f"detail: {[row['id'] for row in sig['detail']]}")
@@ -2874,7 +3015,7 @@ def test_asks_disposed_overrides(tmp: pathlib.Path) -> None:
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "run-state records", "--no-verify"], r)
 
-    got = report(r)["asks_disposed_overrides"]
+    got = read_one_signal(r, "asks_disposed_overrides")
     # THE OTHER TWO ROWS ARE THE LOAD-BEARING HALF of this fixture. A count over every `override`
     # row reads 4, and a count over every row naming the item reads 4 as well — so a fixture with
     # only this item's overrides in it would pass under either mistake.
@@ -2894,12 +3035,12 @@ def test_asks_disposed_overrides(tmp: pathlib.Path) -> None:
                  + f"2026-09-05T00:00:00Z override {sep} item asks-disposed {sep} reason a third\n",
                  encoding="utf-8", newline="\n")
     check("a further override raises the count",
-          report(r)["asks_disposed_overrides"]["value"] == 3,
+          read_one_signal(r, "asks_disposed_overrides")["value"] == 3,
           "the signal does not track the variable it exists for")
 
     # --- DEAD, not a reassuring 0, where no run-state record exists at all ----------------------
     r2 = make_repo(tmp, name="norunstate")
-    dead = report(r2)["asks_disposed_overrides"]
+    dead = read_one_signal(r2, "asks_disposed_overrides")
     check("no run-state record at all reports DEAD rather than 0",
           dead["live"] is False, f"live={dead['live']} value={dead['value']}")
 
@@ -2931,21 +3072,21 @@ def test_legs_retried_after_timeout(tmp: pathlib.Path) -> None:
     r = make_repo(tmp, name="retried")
     _write_gate_verdict(r, "r1", "verdict\tGREEN\nretried\t1\n")
     _write_gate_verdict(r, "r2", "verdict\tRED\nretried\t1\n")
-    got = report(r)["legs_retried_after_timeout"]
+    got = read_one_signal(r, "legs_retried_after_timeout")
     check("two records with retried 1 report 2", got["value"] == 2, f"got {got['value']}")
     check("the probe is LIVE where a record carries the key", got["live"] is True)
     check("report-only: a retried leg is not a refusal", got["gateable"] is False)
     # --- a record from a runner that predates the retry is read but moves nothing ------------------
     _write_gate_verdict(r, "r0", "verdict\tGREEN\nran\t4\n")
-    got = report(r)["legs_retried_after_timeout"]
+    got = read_one_signal(r, "legs_retried_after_timeout")
     check("a record without the key is counted in `of` and adds nothing",
           got["value"] == 2 and got["of"] == 3, f"value {got['value']} of {got['of']}")
     # --- it MOVES when another bar retries ---------------------------------------------------------
     _write_gate_verdict(r, "r3", "verdict\tGREEN\nretried\t3\n")
     check("a further record raises the sum",
-          report(r)["legs_retried_after_timeout"]["value"] == 5, "the signal does not track its variable")
+          read_one_signal(r, "legs_retried_after_timeout")["value"] == 5, "the signal does not track its variable")
     # --- DEAD, not a reassuring 0, over a git dir holding no run record -------------------------------
-    dead = report(make_repo(tmp, name="noruns"))["legs_retried_after_timeout"]
+    dead = read_one_signal(make_repo(tmp, name="noruns"), "legs_retried_after_timeout")
     check("a git dir with no run record reports DEAD rather than 0",
           dead["live"] is False, f"live={dead['live']} value={dead['value']}")
     # --- TOOL-aMendedFleet-59: every git dir of the clone, grouped by leg ---------------------------
@@ -2954,7 +3095,7 @@ def test_legs_retried_after_timeout(tmp: pathlib.Path) -> None:
     _write_gate_verdict(w, "r1", "verdict\tGREEN\nretried\t1\n", retries=(("leg a", "ok"),))
     _write_gate_verdict(w, "r1", "verdict\tRED\nretried\t2\n", git_dir=".git/worktrees/w1",
                         retries=(("leg a", "ok"), ("leg b", "fail")))
-    got = report(w)["legs_retried_after_timeout"]
+    got = read_one_signal(w, "legs_retried_after_timeout")
     check("a linked worktree's run record is summed beside the common dir's",
           got["value"] == 3 and got["of"] == 2, f"value {got['value']} of {got['of']}")
     check("`git_dirs` counts the git dirs holding a record", got["git_dirs"] == 2, f"got {got['git_dirs']}")
@@ -3068,7 +3209,7 @@ def test_auto_memory_pointers(tmp: pathlib.Path) -> None:
     r = tmp / "automem-repo"
     (r / "src").mkdir(parents=True)
     (r / "src" / "a.py").write_text("x = 1\n", encoding="utf-8", newline="\n")
-    run(["git", "init", "-q", "-b", "main"], r)
+    run(["git", "init", "-q", "--template=", "-b", "main"], r)
     run(["git", "add", "-A"], r)
     run(["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "seed",
          "--no-verify"], r)
@@ -3217,16 +3358,16 @@ def test_fleet_over_budget(tmp: pathlib.Path) -> None:
     """
     print("builds over their undeclared-write budget, over the check 23 fleet line")
     r = make_repo(tmp, name="fleet")
-    got = report(r)[_FLEET_SIG]
+    got = read_one_signal(r, _FLEET_SIG)
     check("no .unattended.conf: the signal is NOT ASKED", got.get("not_asked") is True, f"got {got}")
     (r / ".unattended.conf").write_text("MEMORY_ROOT=memory\n", encoding="utf-8", newline="\n")
-    got = report(r)[_FLEET_SIG]
+    got = read_one_signal(r, _FLEET_SIG)
     check("a conf and no run record: DEAD, not a clean 0",
           got["live"] is False and not got.get("not_asked"), f"got {got}")
     head8 = run(["git", "rev-parse", "HEAD"], r).stdout.strip()[:8]
     out = _write_fleet_out(r, "fx", "unattended: check 23 fleet — 3 undeclared write(s) over 9 graded pass(es) "
                                     "in 4 record(s) · budget 0 per build · over aFixture=2 · range whole (x) · at 0badc0de")
-    got = report(r)[_FLEET_SIG]
+    got = read_one_signal(r, _FLEET_SIG)
     check("one build over budget reads value 1", got["value"] == 1, f"got {got['value']}")
     check("`of` is the record count the line states", got["of"] == 4, f"got {got['of']}")
     check("report-only: the fleet total is never a refusal", got["gateable"] is False)
@@ -3237,19 +3378,19 @@ def test_fleet_over_budget(tmp: pathlib.Path) -> None:
     out.write_text("unattended: check 23 fleet — 0 undeclared write(s) over 9 graded pass(es) in 4 record(s) "
                    "· budget 0 per build · over none · range whole (x) · at " + head8 + "\n",
                    encoding="utf-8", newline="\n")
-    got = report(r)[_FLEET_SIG]
+    got = read_one_signal(r, _FLEET_SIG)
     check("`over none` reads 0 and stays LIVE", got["value"] == 0 and got["live"] is True, f"got {got}")
     # Implementation review round 1, M10: check 23 prints `over unjudged` when no budget is declared,
     # and that is a fleet nobody judged, never zero builds over it.
     out.write_text("unattended: check 23 fleet — 3 undeclared write(s) over 9 graded pass(es) in 4 record(s) "
                    "· budget undeclared per build · over unjudged · range whole (x) · at " + head8 + "\n",
                    encoding="utf-8", newline="\n")
-    got = report(r)[_FLEET_SIG]
+    got = read_one_signal(r, _FLEET_SIG)
     check("`over unjudged` reads DEAD, never a live 0 (M10)",
           got["live"] is False and not got.get("not_asked") and "over unjudged" in str(got["detail"]),
           f"got {got}")
     out.unlink()
-    got = report(r)[_FLEET_SIG]
+    got = read_one_signal(r, _FLEET_SIG)
     check("deleting the record returns it to DEAD, not a live 0",
           got["live"] is False, f"live={got['live']} value={got['value']}")
 
@@ -3509,9 +3650,7 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
     # is over a population the arm sets rather than over whatever the fixture above accumulated.
     small = tmp / "runcalls"
     small.mkdir()
-    run(["git", "init", "-q", "-b", "main"], small)
-    run(["git", "config", "user.email", "selftest@example.com"], small)
-    run(["git", "config", "user.name", "selftest"], small)
+    run(["git", "init", "-q", "--template=", "-b", "main"], small)
     for name in ("base", "witness"):
         (small / f"{name}.txt").write_text(name + NL, encoding="utf-8", newline=NL)
         run(["git", "add", "-A"], small)
@@ -4152,9 +4291,7 @@ def test_aborted_work_landed(tmp: pathlib.Path) -> None:
     # ---- AC9, the call count: four shared calls and two per record, whatever the history's length.
     small = tmp / "abortedcalls"
     small.mkdir()
-    run(["git", "init", "-q", "-b", "main"], small)
-    run(["git", "config", "user.email", "selftest@example.com"], small)
-    run(["git", "config", "user.name", "selftest"], small)
+    run(["git", "init", "-q", "--template=", "-b", "main"], small)
     (small / "seed.txt").write_text("seed" + NL, encoding="utf-8", newline=NL)
     run(["git", "add", "-A"], small)
     run(["git", "commit", "-q", "-m", "seed", "--no-verify"], small)
@@ -4341,6 +4478,11 @@ def test_version_carriers_agree(tmp: pathlib.Path) -> None:
               f"found {found}")
 
 def main() -> int:
+    # TOOL-aSparedSpawn-9 S1: the fixtures' identity and line endings, once for every git the
+    # selftest runs, in place of two to four `git config` processes per fixture repository.
+    os.environ.update(GIT_AUTHOR_NAME="selftest", GIT_AUTHOR_EMAIL="selftest@example.com",
+                      GIT_COMMITTER_NAME="selftest", GIT_COMMITTER_EMAIL="selftest@example.com",
+                      GIT_CONFIG_COUNT="1", GIT_CONFIG_KEY_0="core.autocrlf", GIT_CONFIG_VALUE_0="false")
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
         test_conf_parser_matches_bash(tmp)
@@ -4349,6 +4491,8 @@ def main() -> int:
             print("foreign-prefix-probe: stopped after 1 arm")
             print("FAIL (1 assertions)" if (FAILS) else "PASS (1 assertions)")
             return 1 if (FAILS) else 0
+        # FIRST of the signal arms: it derives the map `read_one_signal` reads.
+        test_one_signal_matches_report(tmp)
         test_harness_liveness_note_is_derived(tmp)
         test_signals_can_move(tmp)
         test_lexicon_signals(tmp)

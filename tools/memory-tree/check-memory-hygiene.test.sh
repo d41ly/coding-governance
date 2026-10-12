@@ -87,7 +87,8 @@ KIT="${KIT_REL##*/}"
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -124,7 +125,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -135,8 +136,12 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 CODEBASE_MAP_DIR=$(resolve_kit_dir "$_PY" codebase-map reuse_lookup.py "$HERE") || exit 2
 CODEBASE_MAP="${CODEBASE_MAP_DIR##*/}"
+# Fixture identity and line endings for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true.
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t.test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t.test
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 cd "$TMP" || exit 2
-git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+git init -q --template= .
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
@@ -1046,6 +1051,24 @@ lineno()  { grep -nF "$1" <<<"$out" | head -1 | cut -d: -f1; }
 before()  { local a b; n=$((n+1)); a=$(lineno "$1"); b=$(lineno "$2")
             { [ -n "$a" ] && [ -n "$b" ] && [ "$a" -lt "$b" ]; } \
               || { echo "FAIL expected [$1] before [$2] (got '$a' vs '$b')"; st=1; }; }
+# ONE SCOPED RUN, its liveness asserted (TOOL-aSparedSpawn-7 S8). Leaves the output in `sout` and the
+# exit in `src`, never in `out`, which the main block's arms read. Counts one assertion per requested
+# id named among what RAN, plus one for the unreached-guard refusal being absent: a scoped arm reading
+# no liveness line would pass on silence, since a check that never ran prints what a clean one prints.
+run_scoped() { # comma selection
+  local _rs_l _rs_i
+  sout=$(bash "$SCRIPT" --only "$1" 2>/dev/null); src=$?
+  _rs_l=$(grep "^HYGIENE --only $1 ran checks " <<<"$sout" || true)
+  for _rs_i in ${1//,/ }; do
+    n=$((n+1))
+    case " ${_rs_l#*ran checks} " in
+      *" $_rs_i "*) ;;
+      *) echo "FAIL run_scoped $1: no liveness line naming check $_rs_i among the checks that ran"; st=1 ;;
+    esac
+  done
+  n=$((n+1)); grep -qF 'was requested and no guard for it ran' <<<"$sout" && { echo "FAIL run_scoped $1: a requested check's guard never ran"; st=1; }
+  return 0
+}
 
 hit  'tFixture-3.md (missing/invalid'
 # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
@@ -1074,6 +1097,43 @@ n=$((n+1)); printf '%s\n' "$offout" | awk -F'\t' 'NF != 2 || $1 !~ /^check [^ ]+
 n=$((n+1)); printf '%s\n' "$offout" | grep -qE ':[0-9]+(:|[[:space:]]|$)' && { echo "FAIL --offenders keyed an offender with its line locator"; st=1; }
 n=$((n+1)); printf '%s\n' "$offout" | grep -qF 'tFixture-3.md' || { echo "FAIL --offenders did not key the known check-12 offender tFixture-3.md"; st=1; }
 n=$((n+1)); printf '%s\n' "$offout" | grep -qF 'HYGIENE check' && { echo "FAIL --offenders let the default mode's prose through"; st=1; }
+# ---- TOOL-aSparedSpawn-7: `--only N[,M]`, over this same red tree. Every arm reads `sout`, never `out`.
+# ---- AC6: `--only 12` runs check 12's block, which grades check 25 too, and says so on one line.
+run_scoped 12
+n=$((n+1)); grep -qxF 'HYGIENE --only 12 ran checks 12 25' <<<"$sout" || { echo "FAIL --only 12 printed no exact liveness line naming 12 and 25"; st=1; }
+n=$((n+1)); grep -qF 'tFixture-3.md (missing/invalid' <<<"$sout" || { echo "FAIL --only 12 did not report the known check-12 offender tFixture-3.md"; st=1; }
+n=$((n+1)); grep -qE '^HYGIENE check (1|2|3|4|5|6|7|8|9|10|11|21|22|23) FAILED' <<<"$sout" && { echo "FAIL --only 12 printed a verdict of a check it did not select"; st=1; }
+# ...and with that block's guard staged two ways it exits 2 naming check 12: OUT of the file, so no
+# call carries 12 and the selector is refused before any check runs, and SHADOWED, so the call stays
+# and records nothing, which is the guard the selected path never registered.
+_hs_k=$(mktemp -d); cp -r "$HERE"/. "$_hs_k"/
+sed -i 's/^if check_selected 12 25; then$/if :; then/' "$_hs_k/check-memory-hygiene.sh"
+_hs_o=$(bash "$_hs_k/check-memory-hygiene.sh" --only 12 2>/dev/null); _hs_rc=$?
+n=$((n+1)); [ "$_hs_rc" = 2 ] || { echo "FAIL --only 12 with its guard staged out exited $_hs_rc, not 2"; st=1; }
+n=$((n+1)); grep -qF -- '--only names check 12, which no check_selected call in this script carries' <<<"$_hs_o" || { echo "FAIL --only 12 with its guard staged out did not name check 12"; st=1; }
+cp "$SCRIPT" "$_hs_k/check-memory-hygiene.sh"
+sed -i 's/^if check_selected 12 25; then$/check_selected() { return 1; }\nif check_selected 12 25; then/' "$_hs_k/check-memory-hygiene.sh"
+_hs_o=$(bash "$_hs_k/check-memory-hygiene.sh" --only 12 2>/dev/null); _hs_rc=$?
+n=$((n+1)); [ "$_hs_rc" = 2 ] || { echo "FAIL --only 12 with its guard shadowed exited $_hs_rc, not 2"; st=1; }
+n=$((n+1)); grep -qxF 'HYGIENE --only: check 12 was requested and no guard for it ran, so its verdict would be silence' <<<"$_hs_o" || { echo "FAIL --only 12 with its guard shadowed did not name check 12 as unreached"; st=1; }
+rm -rf "$_hs_k"
+# ---- AC7: `--only` beside any other argument, or naming an id no call carries, exits 2 and grades nothing.
+for _hs_a in "--only 12 --staged" "--staged --only 12" "--offenders --only 12" "--only 12 --print-index-set" "--only 99" "--only 12,x"; do
+  _hs_o=$(bash "$SCRIPT" $_hs_a 2>/dev/null); _hs_rc=$?
+  n=$((n+1)); [ "$_hs_rc" = 2 ] || { echo "FAIL [$_hs_a] exited $_hs_rc, not 2"; st=1; }
+  n=$((n+1)); grep -qF 'HYGIENE check' <<<"$_hs_o" && { echo "FAIL [$_hs_a] graded a check"; st=1; }
+done
+# ---- AC8: the PARTITION. Over this red tree the SET of lines the unscoped run printed (`out`, above)
+# ---- equals the union of the scoped runs' lines, liveness lines set aside, over one selection per
+# ---- `check_selected` call, named by its first id. The list is this suite's pin of the population.
+_hs_union=""
+for _hs_s in 1 2 3 4 5 6 9 10 11 12 13 17 20 21 22 23 24 26 27 28; do
+  run_scoped "$_hs_s"
+  _hs_union+=$(grep -v '^HYGIENE --only ' <<<"$sout" || true)$'\n'
+done
+n=$((n+1)); [ "$(printf '%s\n' "$_hs_union" | grep . | sort -u)" = "$(printf '%s\n' "$out" | grep . | sort -u)" ] \
+  || { echo "FAIL the scoped runs do not partition the unscoped run's lines:"; diff <(printf '%s\n' "$out" | grep . | sort -u) <(printf '%s\n' "$_hs_union" | grep . | sort -u) | head -20; st=1; }
+n=$((n+1)); grep -qF 'HYGIENE --only' <<<"$out" && { echo "FAIL the unscoped run printed a liveness line"; st=1; }
 # ---- check 22: the acceptance ledger (TOOL-dUnstalledConvoy-12).
 hit  'ARCH-tFixture-70/AC2'                    # numbered, unevidenced — the defect this exists for
 miss 'ARCH-tFixture-70/AC1'                    # ...and the evidenced sibling is silent
@@ -1843,7 +1903,7 @@ miss 'reader-inventory arm, is DISARMED'
 # were the liveness filter gone, so the notice is not the only thing this tree can show.
 RT=$TMP/readersclosed
 mkdir -p "$RT"
-( cd "$RT" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$RT" && git init -q --template= .
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
   mkdir -p memory/backlog memory/project memory/builds/tDone/spec
   printf '# r\n' > memory/README.md
@@ -1982,7 +2042,7 @@ git add -A >/dev/null 2>&1; git commit -q -m unstale --no-verify
 #     guard exists for, and the state a mis-segmented selector would produce on a correct tree.
 H=$TMP/halfmigrated
 mkdir -p "$H/memory/project" "$H/memory/architecture/project" "$H/memory/architecture/builds/2026-08-01-ARCH-tOld/spec"
-( cd "$H" && git init -q . && git config user.email t@t.test && git config user.name t
+( cd "$H" && git init -q --template= .
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# old\n' > memory/architecture/builds/2026-08-01-ARCH-tOld/spec/2026-08-01-spec-tOld-1.md
@@ -2013,7 +2073,7 @@ grep -qF 'the selector is mis-segmented' <<<"$outh" || { echo "FAIL the empty-po
 #      index-class file exists anywhere and silence is correct.
 S6=$TMP/missegmented6
 mkdir -p "$S6/memory/architecture/guides"
-( cd "$S6" && git init -q . && git config user.email t@t.test && git config user.name t
+( cd "$S6" && git init -q --template= .
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
   printf '# a guide, at the PRE-flatten path the flat selector does not reach\n' > memory/architecture/guides/METHOD.md
   git add -A && git commit -q -m missegmented6 --no-verify )
@@ -2031,7 +2091,7 @@ n=$((n+1))
 #     that — measured, not imagined.
 Y=$TMP/young
 mkdir -p "$Y/memory/project" "$Y/memory/backlog"
-( cd "$Y" && git init -q . && git config user.email t@t.test && git config user.name t
+( cd "$Y" && git init -q --template= .
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
@@ -2070,7 +2130,7 @@ grep -qF 'row-grammar: NOT MEASURED — memory/backlog/ARCH.md has no LIVE_ROW_P
 # announcement's wording, which gotchas.py's own self-test owns; only that the green run shows it.
 YI=$TMP/young-invariant
 mkdir -p "$YI/memory/project" "$YI/memory/backlog" "$YI/memory/gotchas" "$YI/bin"
-( cd "$YI" && git init -q . && git config user.email t@t.test && git config user.name t
+( cd "$YI" && git init -q --template= .
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
@@ -2096,7 +2156,7 @@ n=$((n+1))
 n=$((n+1))
 G=$TMP/mapped
 mkdir -p "$G/memory/project" "$G/memory/guides" "$G/memory/map/features" "$G/memory/backlog"
-( cd "$G" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$G" && git init -q --template= .
   # ---- The two cap keys are declared APART here, and that is PART OF THE ARMS rather than setup.
   # ---- Both SHIP at 20,480, so a fixture declaring neither makes the row and dossier bounds ONE
   # ---- number, the band between them empty, and the dossier arm satisfiable by an engine carrying no
@@ -2153,7 +2213,7 @@ cblock "$outm" 6 | grep -qF '; no line cap for this class' \
 n=$((n+1))
 NG=$TMP/nomap
 mkdir -p "$NG/memory/project" "$NG/memory/backlog"
-( cd "$NG" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$NG" && git init -q --template= .
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nINDEX_CAP_BYTES="61440"\nINDEX_CAP_LINES="0"\nDOSSIER_CAP_BYTES="20480"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# legacy\n' > memory/project/legacy-files.txt
@@ -2190,7 +2250,7 @@ cblock "$outn" 6 | grep -qF 'memory/backlog/ARCH.md' \
 # ----      isolates membership rather than the move.
 A=$TMP/rotarchive
 mkdir -p "$A/memory/builds/tRot/spec" "$A/memory/archive" "$A/memory/backlog" "$A/memory/project"
-( cd "$A" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$A" && git init -q --template= .
   # DEPL is declared and has NO live shard, deliberately: the archive below is named for it, so its
   # stem resolves to ZERO live indexes. That branch is the one whose `continue` made check 10 inert
   # for every backlog archive, and until this fixture existed it shipped unobserved.
@@ -2311,7 +2371,7 @@ grep -qF 'memory/backlog/DEPL.md' <<<"$c10hm" \
 R=$TMP/runanchor
 mkdir -p "$R/memory/builds/tOwner/spec" "$R/memory/builds/tRunBig" "$R/memory/builds/tRunOk" \
          "$R/memory/backlog" "$R/memory/project"
-( cd "$R" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$R" && git init -q --template= .
   # ORPHAN_ID_PIN is what ARMS the unit; 0 is legal because every id below is defined.
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
@@ -2350,7 +2410,7 @@ grep -F 'check 13: id ARCH-tOwner-1' <<<"$outr" | grep -qF 'tRunOk' \
 n=$((n+1))
 A=$TMP/scaffolded
 mkdir -p "$A"
-( cd "$A" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$A" && git init -q --template= .
   # READINESS_ROWS is a `required_keys_render` key (TOOL-aJoinedCanon-9), so this stand-in conf
   # declares it exactly as a real adopter's does — theirs is seeded from .memory-tree.conf.example,
   # which ships the key. Without it the scaffolder REFUSES rather than rendering a §5 holding one
@@ -2390,7 +2450,7 @@ n=$((n+1))
 B=$TMP/scaffolded-inside
 mkdir -p "$B/$(dirname -- "$KIT_REL")"
 cp -r "$HERE" "$B/$(dirname -- "$KIT_REL")/" 2>/dev/null
-( cd "$B" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$B" && git init -q --template= .
   # Declares READINESS_ROWS for the reason the sibling arm above states: it is a
   # `required_keys_render` key, and without it the scaffolder refuses before it reaches the ceiling
   # strip this arm exists to observe.
@@ -2415,7 +2475,7 @@ _src_valued=$(awk -F'\t' '/^## /{ if ($2 ~ /^[0-9]+$/) c++ } END{ print c+0 }' "
 n=$((n+1))
 R=$TMP/routed
 mkdir -p "$R/src" "$R/lib" "$R/.github" "$R/memory"
-( cd "$R" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$R" && git init -q --template= .
   for _f in src/a lib/b .github/c memory/d; do printf 'x\n' > "$_f"; done
   git add -A && git commit -q -m base --no-verify )
 _ro=$(cd "$R" && bash "$HERE/adopt-memory-tree.sh" --scaffold 2>&1); _rrc=$?
@@ -2449,7 +2509,7 @@ outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null); rca=$?
 # ---- SERVED id's slug must stay silent, or branch 5 would be a rule the corpus cannot satisfy.
 K=$TMP/c21
 mkdir -p "$K"
-( cd "$K" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$K" && git init -q --template= .
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nRECORD_UNBOUND_PIN="1"\n' > .memory-tree.conf
   mkdir -p memory/backlog memory/project memory/builds/tOne/spec memory/builds/tOne/reviews \
            memory/builds/tOne/build memory/builds/tTwo/spec memory/builds/tTwo/reviews
@@ -2522,7 +2582,7 @@ c6run() {  # $1 = extra conf lines (%b, so \n works); leaves $out set and assert
   n=$((n+1))
   [ "$c6rc" != 2 ] || { echo "FAIL check-6 caps '$1' aborted the gate (status 2); a silent run below would prove nothing"; st=1; }
 }
-( cd "$C6" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$C6" && git init -q --template= .
   mkdir -p memory/backlog memory/project memory/guides memory/builds/tBig memory/builds/tLong memory/builds/tWide
   printf '# r\n' > memory/README.md
   for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
@@ -2839,7 +2899,7 @@ s10conf() {
   [ -n "$1" ] && printf '%b' "$1" >> "$S10/.memory-tree.conf"
   return 0
 }
-( cd "$S10" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$S10" && git init -q --template= .
   mkdir -p memory/builds/tTen/spec memory/backlog memory/project
   printf '# r\n' > memory/README.md
   for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
@@ -2974,7 +3034,7 @@ write_pk_conf() {   # $1 = a conf line, or empty for the fixture's base conf
 }
 (
   cd "$_b1" || exit 1
-  git init -q .; git config user.email t@t.test; git config user.name t
+  git init -q --template= .
   mkdir -p memory/guides memory/builds/tOne/spec memory/project
   write_pk_conf ""
   printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
@@ -3245,7 +3305,7 @@ rm -rf "$TMP/kit32"
 _fl=$(mktemp -d)
 (
   cd "$_fl" || exit 1
-  git init -q .; git config user.email t@t.test; git config user.name t
+  git init -q --template= .
   mkdir -p scripts memory .governance
   cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
   # The second row RE-HOMES one sibling, as a `kit.codebase-map.prefix` override records it: only
@@ -3297,7 +3357,7 @@ else
 _ad=$(mktemp -d)
 (
   cd "$_ad" || exit 1
-  git init -q .; git config user.email t@t.test; git config user.name t
+  git init -q --template= .
   mkdir -p "scripts/$_PB" notes .governance
   cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
   cp "$_pbk/render_playbook.py" "scripts/$_PB/"
@@ -3354,7 +3414,7 @@ else
 build_fixture_r3() {
   local d; d=$(mktemp -d)
   ( cd "$d" || exit 1
-    git init -q .; git config user.email t@t.test; git config user.name t; git config core.autocrlf false
+    git init -q --template= .
     mkdir -p "scripts/$_PB" notes .governance
     cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
     cp "$_pbk/render_playbook.py" "scripts/$_PB/"
@@ -3519,7 +3579,7 @@ bm_set() {   # $1 = the BACKLOG_MODE line, or empty for a conf that never declar
   [ -n "${1:-}" ] && printf '%s\n' "$1" >> "$BM/.memory-tree.conf"
   return 0
 }
-( cd "$BM" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$BM" && git init -q --template= .
   bm_set ""
   mkdir -p memory/backlog memory/project memory/archive memory/builds/tAsk memory/builds/tHome
   printf '# r\n' > memory/README.md
@@ -3661,7 +3721,7 @@ write_fork_spec() { # filename date -> a live Tier-2 spec, the only one in the t
     > "$FI/memory/builds/tFork/spec/$1-spec-ARCH-tFork-1.md"
   ( cd "$FI" && git add -A ) >/dev/null 2>&1
 }
-( cd "$FI" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$FI" && git init -q --template= .
   mkdir -p memory && printf 'sentinel\n' > memory/HYGIENE.md
   git add -A && git commit -q -m fitem --no-verify ) >/dev/null 2>&1
 FI_CONF='MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n'
@@ -3699,7 +3759,7 @@ write_t1_spec() { # $1 filename date, stdin -> the only spec in the tree, staged
   ( cd "$T1" && git add -A ) >/dev/null 2>&1
 }
 mkdir -p "$T1"
-( cd "$T1" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$T1" && git init -q --template= .
   mkdir -p memory && printf 'sentinel\n' > memory/HYGIENE.md
   git add -A && git commit -q -m tier1 --no-verify ) >/dev/null 2>&1
 T1_CONF='MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n'
@@ -3779,8 +3839,7 @@ else
   fi
   (
     cd "$R27" || exit 1
-    git init -q . && git symbolic-ref HEAD refs/heads/main
-    git config user.email t@t.test; git config user.name t; git config core.autocrlf false
+    git init -q --template= . && git symbolic-ref HEAD refs/heads/main
     mkdir -p memory/builds/tOne/spec memory/project
     printf '/%s/\n/%s/\n/.governance/\n__pycache__/\n' "${KIT_REL%%/*}" "${R27_KIT%%/*}" > .gitignore
     printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\nNEAR_MATCH_GATE="red:0.125"\n' > .memory-tree.conf
@@ -3847,8 +3906,7 @@ mkdir -p "$C28/$KIT_REL"
 cp "$HERE"/*.sh "$HERE"/*.py "$C28/$KIT_REL"/
 (
   cd "$C28" || exit 1
-  git init -q . && git symbolic-ref HEAD refs/heads/main
-  git config user.email t@t.test; git config user.name t; git config core.autocrlf false
+  git init -q --template= . && git symbolic-ref HEAD refs/heads/main
   mkdir -p memory/builds/tOne/spec memory/project memory/gotchas
   printf '/%s/\n__pycache__/\n' "${KIT_REL%%/*}" > .gitignore
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n' > .memory-tree.conf
@@ -3910,8 +3968,7 @@ mkdir -p "$C24/$KIT_REL"
 cp "$HERE"/*.sh "$HERE"/*.py "$C24/$KIT_REL"/
 (
   cd "$C24" || exit 1
-  git init -q . && git symbolic-ref HEAD refs/heads/main
-  git config user.email t@t.test; git config user.name t; git config core.autocrlf false
+  git init -q --template= . && git symbolic-ref HEAD refs/heads/main
   mkdir -p memory/builds/tOne/spec memory/project memory/gotchas memory/archive
   printf '/%s/\n__pycache__/\n' "${KIT_REL%%/*}" > .gitignore
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\nROTATION_MODE="cut"\n' > .memory-tree.conf
@@ -4009,12 +4066,19 @@ esac
 # fixture's half-staged state, top-level and never skipped.
 # RAISED 542 -> 552 by TOOL-aRoutedQuill-1: its ten Tier-1 micro-spec arms, each top-level and
 # never skipped, because that fixture needs no sibling kit.
+# RAISED 552 -> 613 by TOOL-aSparedSpawn-7: 97 % of the 63 `--only` assertions its main-block arms add,
+# counted by reading since the pass runs no suite (AC6's nine, AC7's twelve, the partition's forty-two),
+# none skipped. OWED: observed at VERIFYING.
 # MERGED at the dHomedResolver x origin/main b726385f reconcile: base 542 + ours' 5 + theirs' 10
 # = 557, each side's raise counting only the arms that side added.
+# MERGED at the TOOL-aSparedSpawn-32 reconcile with origin/main 37200355: this build's 613 plus
+# origin's raise of 5 over the shared 552 = 618, each side's raise counting only its own arms.
 # RAISED 557 -> 573 at the aTrimmedHook x origin/main reconcile: TOOL-aTrimmedHook-2's ten
 # narrowed-staged-leg arms and TOOL-aTrimmedHook-6's six staged-minors arms, each top-level and
 # never skipped.
-FLOOR_ASSERTIONS=573
+# MERGED at the TOOL-aSparedSpawn-34 reconcile with local main: the shared 557, plus this build's
+# 61 (557 -> 618) and local main's 16 (557 -> 573) = 634, each side's raise counting only its own arms.
+FLOOR_ASSERTIONS=634
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

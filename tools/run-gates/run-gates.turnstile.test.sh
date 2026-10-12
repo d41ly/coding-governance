@@ -75,7 +75,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -112,7 +113,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -128,6 +129,10 @@ LIB="${LIB_DIR##*/}"
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "turnstile-test: not a git repo"; exit 2; }
 HERE=$(cd "$(dirname "$0")" && pwd)
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+# Fixture identity and line endings for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true.
+export GIT_AUTHOR_NAME=ts-test GIT_AUTHOR_EMAIL=ts@test.invalid GIT_COMMITTER_NAME=ts-test GIT_COMMITTER_EMAIL=ts@test.invalid
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 # THE HOST TURNSTILE IS THIS SUITE'S OWN (TOOL-aFrugalTurnstile-5 S7). The runner's beacon and queue
 # live in a host-wide directory, so a fixture bar left on the default would queue behind every real
 # bar on the machine, and one inside a real bar's leg would NEST and never claim at all. `mk_repo`
@@ -186,8 +191,7 @@ mk_repo() {
   cp "$HERE/run-gates.sh" "$HERE/gate-profiles.txt" "$d/${PFX}${KIT}/" || return 1
   cp "$HERE/gate-fingerprint.sh" "$d/${PFX}${KIT}/" 2>/dev/null || true
   cp "$ROOT/${LIB_DIR}/resolve-python.sh" "$d/${PFX}${LIB}/" 2>/dev/null || true
-  ( cd "$d" && git init -q -b main . && git config user.email ts@test.invalid \
-      && git config user.name ts-test ) >/dev/null 2>&1 || return 1
+  ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1 || return 1
   # The occupancy leg: register, count everyone registered, record the count, dwell, deregister.
   # `mkdir` for the marker so registration is atomic; the count is taken AFTER registering, so a
   # holder always sees at least itself.
@@ -360,16 +364,58 @@ fi
 # nothing. And the successor used to launch after a flat 5 s whether or not the holder had
 # claimed; launch-to-claim measured 6 to 11.5 s under load, and an unclaimed beacon makes the
 # property pass VACUOUSLY. The claim is now the control, polled the way 4b polls it.
+#
+# THE TTL IS MEASURED, NOT TYPED (TOOL-aSparedSpawn-15 S3). A TTL is a time by definition, so this is
+# the one arm where a clock stays; what it stops being is a guess. Before the runs, the SHIPPED
+# `ts_tick_start`, with the one helper it calls, is sourced from the runner and run for ten ticks
+# against a scratch beacon, with a `sleep` stub first on its PATH: one spawn in place of the real
+# sleep's one, returning at once, so the ten bodies cost the spawns a real tick pays and nothing
+# waits a second. The stub counts its calls in a file and, on the eleventh, stamps the end and
+# replaces the nonce, which ends the ticker by its own guard. A stub on PATH and not a function, as
+# TOOL-aSparedSpawn-11 found, because a definition here is a name the naming leg grades. One tick's
+# period is the tick plus the mean body; the TTL is three periods and never under 6 s, and the leg
+# is the TTL plus 8 s, so a ticker that does NOT refresh still leaves a heartbeat the successor
+# reaps. A tick body that grows a spawn (a `cat` or a `date` put back) raises the printed period,
+# and a period that cannot be read is a FAIL, never a typed fallback.
+tk6=$tmp/tick6; mkdir -p "$tk6/b" "$tk6/bin"; printf '%s' tick > "$tk6/b/nonce"
+sed -n '/^ts_alive()/p;/^ts_tick_start() {/,/^}$/p' "$HERE/run-gates.sh" > "$tk6/fn.sh"
+printf '%s\n' '#!/bin/bash' \
+  'd=${0%/bin/sleep}; k=0; { read -r k < "$d/count"; } 2>/dev/null; k=$((k + 1)); printf "%s\n" "$k" > "$d/count"' \
+  '[ "$k" -le 10 ] || { printf "%s\n" "${EPOCHREALTIME//[.,]/}" > "$d/end"; printf x > "$d/b/nonce"; }' > "$tk6/bin/sleep"
+chmod +x "$tk6/bin/sleep"
+# The shell's own spelling of the stub's directory: a TMPDIR spelled `C:/...` would split the PATH
+# entry at the drive colon, and the ticker would run the real `sleep` and never end.
+tk6bin=$(cd "$tk6/bin" && pwd)
+grep -q '^ts_tick_start() {' "$tk6/fn.sh" && [ -n "$tk6bin" ] && (
+  # shellcheck disable=SC1090
+  . "$tk6/fn.sh" || exit 1
+  TS_DIR=$tk6/b; TS_NONCE=tick; TS_TICK_EVERY=1; TS_TTL=6
+  printf '%s\n' "${EPOCHREALTIME//[.,]/}" > "$tk6/start"
+  PATH="$tk6bin:$PATH" ts_tick_start || exit 1
+  # A HANG BOUND the pass path never reaches: the poll ends on the stamp, or on the ticker's exit.
+  _w6=0; while [ ! -s "$tk6/end" ] && [ "$_w6" -lt 600 ] && kill -0 "${TS_TICK_PID:-none}" 2>/dev/null; do sleep 0.1; _w6=$((_w6 + 1)); done
+) >/dev/null 2>&1
+t6s=""; t6e=""
+{ read -r t6s < "$tk6/start"; read -r t6e < "$tk6/end"; } 2>/dev/null
+if grep -q '^ts_tick_start() {' "$tk6/fn.sh" && [ -n "$t6s" ] && [ -n "$t6e" ]; then
+  body6=$(( (10#$t6e - 10#$t6s) / 10000 )); period6=$(( 1000 + body6 ))
+  ttl6=$(( (3 * period6 + 999) / 1000 )); [ "$ttl6" -ge 6 ] || ttl6=6; long6=$(( ttl6 + 8 ))
+  ok "R6 measured: one tick is ${period6} ms (${body6} ms of it the body), so the TTL is ${ttl6} s and the leg ${long6} s"
+else
+  ttl6=6; long6=14
+  nope "R6 printed no measured period: the shipped ts_tick_start did not extract or did not tick ten times, so the TTL below is a typed guess"
+fi
+rm -rf "$tk6"
 R6=$tmp/ceiling; mk_repo "$R6"; B6=$(beacon "$R6")
 legs "$R6" '[ {"name": "long", "argv": ["bash", "fx/long.sh"]} ]'
-( cd "$R6" && env GATE_FULL=1 TS_LONG=14 GATE_TURNSTILE_TTL=6 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1 &
+( cd "$R6" && env GATE_FULL=1 TS_LONG=$long6 GATE_TURNSTILE_TTL=$ttl6 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1 &
 h6=$!; claimed6=0
 for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do
   sleep 1; kill -0 "$h6" 2>/dev/null || break; [ -d "$B6" ] && { claimed6=1; break; }
 done
 if [ "$claimed6" = 1 ]; then
   ok "control: the long-leg holder claimed the beacon (the ceiling arm has something to grade)"
-  out6=$( cd "$R6" && env GATE_FULL=1 GATE_TURNSTILE_TTL=6 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
+  out6=$( cd "$R6" && env GATE_FULL=1 GATE_TURNSTILE_TTL=$ttl6 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
   wait "$h6" 2>/dev/null
   printf '%s' "$out6" | grep -q 'stalled holder' \
     && nope "a LIVE holder inside a leg longer than the TTL was reaped — the ticker is not refreshing the beacon" \
@@ -535,7 +581,11 @@ legs "$R9b" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
 # `held`/`queued=0`, and the arm reds having graded nothing. A quarter second makes the invariant the
 # comment above already CLAIMS actually hold. Raising the TTL instead would drag `TS_MAXWAIT = TTL*4`
 # up with it and lengthen the window the refresher must survive, which is the wrong direction.
-( while [ -d "$B9b" ]; do printf '%s' "$(date +%s)" > "$B9b/heartbeat" 2>/dev/null || true; sleep 0.25; done ) &
+# AND NO FORK IN THE WRITE (TOOL-aSparedSpawn-15 S2). It wrote `$(date +%s)`, one spawn a tick, and
+# a spawn on a loaded node `a` costs 632 to 818 ms, so a quarter-second refresher became a
+# one-second one and the runner reaped the holder this arm needs alive. `$EPOCHSECONDS` is the same
+# integer from a builtin; the `sleep` is the one spawn left in the loop.
+( while [ -d "$B9b" ]; do printf '%s' "$EPOCHSECONDS" > "$B9b/heartbeat" 2>/dev/null || true; sleep 0.25; done ) &
 hb=$!
 out9b=$( cd "$R9b" && env GATE_FULL=1 GATE_TURNSTILE_TTL=2 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 ); rc9b=$?
 q9b=$(hdrkey "$R9b" queued); qf9b=$(hdrkey "$R9b" queued_from)

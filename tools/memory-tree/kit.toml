@@ -330,7 +330,7 @@ guard = ["{kit}/"]
 name = "routed commits name a specced unit"
 subject = "repo"
 argv = ["python3", "{kit}/routed_commits.py"]
-impure = "its verdict is a function of the commit GRAPH and of the GATE_PUSH_BASE the pre-push hook exports, not of the tree alone: two commits with one tree and different messages grade differently, so a verdict cached on a tree must not be reused (TOOL-aRoutedQuill-3)."
+reads = { base = "it grades the commits past the GATE_PUSH_BASE the pre-push hook exports, so a verdict cached against one base says nothing about another (TOOL-aRoutedQuill-3).", history = "its verdict is a function of the commit GRAPH, not of the tree alone: two commits with one tree and different messages grade differently (TOOL-aRoutedQuill-3)." }
 guard = []
 history_depth = "full"
 

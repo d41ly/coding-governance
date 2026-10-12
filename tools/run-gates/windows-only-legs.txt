@@ -1,0 +1,18 @@
+# windows-only-legs.txt — the held legs that run NATIVELY when the held tier is split. TOOL-aSparedSpawn-5.
+#
+#     <held leg name> TAB <why it must run on Windows>
+#
+# Read by `held_halves.py` beside this file; every held leg NOT named here runs in the WSL half.
+# A row must name a held leg of the manifest (kit subject, or the `selftests` chunk), or the
+# partition REFUSES naming the row, so a renamed leg cannot leave a row that sends nothing anywhere.
+#
+# THE BAR FOR A ROW: the suite's arms exercise its subject only on Windows, so a WSL run of it would
+# certify the POSIX branch of a check no registered node runs. A MIXED suite, with Windows and POSIX
+# arms both, stays in WSL: the paired runs compare it on both hosts before any record is written, and
+# the daily `held` CI job keeps covering its Windows arms (owner ruling F1, 2026-10-10). A leg that
+# reds in WSL for the host and not the tree is found by a paired run and earns a row here then.
+#
+# GOV'S DECLARATION over gov's legs, withheld from adopters by `kit.toml` as `selftest-budgets.txt` is.
+agent-cap self-test	its arms resolve MSYS /c/ spellings through node's win32 path.resolve, a translation only a Windows node performs
+scratch-guard self-test	it runs the hook inside node with a payload cwd spelled C:\..., which is the shape the hook receives only on Windows
+process-monitor census selftest	its arms join MSYS ps -W rows to Windows process ids, a census that exists only under MSYS

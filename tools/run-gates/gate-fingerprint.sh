@@ -54,7 +54,11 @@ else
   # moves with the git build is a digest that forces full for no reason. LC_ALL=C so the sort is over
   # bytes rather than over whatever collation the operator's locale supplies — the same reason every
   # other ordered comparison in this kit pins it.
-  porcelain=$(LC_ALL=C git status --porcelain 2>/dev/null | LC_ALL=C sort) || exit 0
+  # `--untracked-files=all` in BOTH walks (TOOL-aSparedSpawn-1 S3): the default mode reports a new
+  # directory as one `?? d/` line, which the `[ -f ]` test below skips, so the content of every file
+  # inside it never reached the digest. A clean tree lists nothing in either mode, so the at-a-rev
+  # equality above holds.
+  porcelain=$(LC_ALL=C git status --porcelain --untracked-files=all 2>/dev/null | LC_ALL=C sort) || exit 0
 
   # The blob hash of every dirty-or-untracked file THAT STILL EXISTS. The status lines above already
   # name what changed; these say what it changed TO, which is what makes an edit-and-revert-and-edit
@@ -65,7 +69,7 @@ else
   # hash a filename that does not exist. Deleted paths are skipped rather than failing the digest —
   # their absence is already recorded in the porcelain component.
   blobs=$(
-    LC_ALL=C git status --porcelain -z 2>/dev/null \
+    LC_ALL=C git status --porcelain -z --untracked-files=all 2>/dev/null \
       | while IFS= read -r -d '' entry; do
           p=${entry:3}
           [ -n "$p" ] || continue

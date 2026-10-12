@@ -28,6 +28,9 @@
 #        arm or a named exemption (EXITS, which runs last because it reads which arms ran)
 #   AC9  a linked worktree and the primary tree write one COMMON journal
 #   CAP  a line over the cap is fitted exactly as the runlog kit's `render_line` fits it, both steps
+#   SPAWNS  the runner's own spawns per leg hold `SPAWN_CEILING`, one added fork in a worker reds it
+#        naming its line, and an adopted process monitor costs no python before the first dispatch
+#        (TOOL-aSparedSpawn-4 S8, its AC8 to AC10)
 # AC10 is `gotchas.py --for-paths` over the runner, a command of its own, and is not repeated here.
 #
 # WHAT THIS DOES NOT CHECK. Whether a line MEANS anything past the fields named here: the run model is
@@ -46,9 +49,11 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 # AC5's check that both bars printed the acquire line its stdout comparison filters.
 # 210 -> 211, TOOL-aGraftedHelix-7: AC5's check that both bars printed the `memory: ` line its stdout
 # comparison now filters too.
+# 211 -> 220, TOOL-aSparedSpawn-4: the SPAWNS arm, nine checks.
 # 211 -> 217, TOOL-aPairedSlots-7: TWO's six checks, two concurrent writers of the run log and the
 # shared full green, COUNTED off the arm.
-FLOOR_ASSERTIONS=217
+# 220 + 217 -> 226, TOOL-aSparedSpawn-34, the merge of local main: base 211, plus 9 and 6.
+FLOOR_ASSERTIONS=226
 # Where the scratch clone installs the runner: a FIXTURE-INTERNAL path, bound once, never gov's prefix.
 KR=kit/run-gates
 n=0; st=0
@@ -123,7 +128,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -160,7 +166,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -582,6 +588,141 @@ check_ac4_spawns() {
   check_journal AC4
 }
 
+# ---------------------------------------------------------------------------------------- SPAWNS
+# THE RUNNER'S OWN SPAWNS PER LEG, against a ceiling with no clock (TOOL-aSparedSpawn-4 S8). A fork
+# costs 89 to 315 ms under MSYS and nothing in the source reads that way, so the bookkeeping a worker
+# pays per leg — its clock, its output read, its log name, its redaction, its key — crept to 45 to 65
+# events before anybody counted. Two bars traced on their own descriptor with a PS4 that carries
+# `${BASHPID}`, over a one-leg and a two-leg manifest at width 1; the per-leg figure is the
+# difference. A FORK is a pid that traces a command of its own, an EXEC a command word that is no
+# assignment, builtin, keyword or function the traced runner defines, and an EVENT either.
+# CALIBRATED FIRST: a specimen with five declared forks and one exec is counted, and a counter that
+# reads it otherwise REFUSES, so a trace whose descriptor closed early reads as a refusal, never as
+# a reassuring zero. The ceiling reds on growth, and reds as STALE when it sits more than max(3, 5 %)
+# above the figure: a saving lands as a lowered constant in the commit that makes it.
+# WHAT THIS DOES NOT CHECK: a subshell that traces no command of its own, and anything a leg or a
+# python child spawns; the count is a lower bound and per leg only. The per-bar startup is the
+# gate-lint kit's fork budget, which this kit does not name.
+#
+# PINNED 2026-10-12, node `a`, bash 5.3: 5 events per leg (2 forks, 3 execs: the worker's fork, the
+# `timeout` fork and exec, and the two `mv`), read twice alike by the pass's own trace of the cut
+# runner over these manifests, against 40 at its parent 4f1913b1. RAISE IT ONLY WITH A REASON LINE
+# HERE naming the spawn that is worth its cost.
+SPAWN_CEILING=5
+SPAWN_PS4='+${BASHPID}|${BASH_SOURCE##*/}:${LINENO}|'
+measure_spawns() { # trace · the runner it traced -> SP_FORKS SP_EXECS SP_SITES ("<site> <events>" lines); 2 when no line traced
+  local line pid site cmd w root="" known
+  local -A seen=() per=()
+  SP_FORKS=0; SP_EXECS=0; SP_SITES=""
+  [ -s "$1" ] || return 2
+  known=" $(compgen -b | tr '\n' ' ') $(compgen -k | tr '\n' ' ') "
+  known="$known$(sed -n 's/^[[:space:]]*\([A-Za-z_][A-Za-z0-9_]*\)[[:space:]]*()[[:space:]]*{.*/\1/p' "$2" | tr '\n' ' ') "
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in +*'|'*'|'*) ;; *) continue ;; esac
+    line=${line#"${line%%[!+]*}"}; pid=${line%%|*}; line=${line#*|}; site=${line%%|*}; cmd=${line#*|}
+    case "$pid" in ''|*[!0-9]*) continue ;; esac
+    [ -n "$root" ] || root=$pid
+    if [ "$pid" != "$root" ] && [ -z "${seen[$pid]+x}" ]; then
+      seen[$pid]=1; SP_FORKS=$((SP_FORKS + 1)); per[$site]=$(( ${per[$site]:-0} + 1 ))
+    fi
+    w=${cmd%% *}; w=${w#\'}; w=${w%\'}
+    case "$w" in ''|*=*|\(*) continue ;; esac
+    case "$known" in *" $w "*) continue ;; esac
+    SP_EXECS=$((SP_EXECS + 1)); per[$site]=$(( ${per[$site]:-0} + 1 ))
+  done < "$1"
+  [ -n "$root" ] || return 2
+  for site in "${!per[@]}"; do SP_SITES+="$site ${per[$site]}"$'\n'; done
+}
+check_spawn_calibration() { # specimen -> 0 when its trace counts the declared 5 forks and 1 exec, 2 otherwise
+  env PS4="$SPAWN_PS4" BASH_XTRACEFD=9 bash -x "$1" 9>"$1.trace" >/dev/null 2>&1
+  measure_spawns "$1.trace" "$1" || return 2
+  [ "$SP_FORKS|$SP_EXECS" = "5|1" ] || return 2
+}
+measure_python_execs() { # trace -> the python execs it holds before the first `runleg` dispatch
+  awk -F'|' -v py="$PY" '{ w = $3; sub(/ .*/, "", w); gsub(/\047/, "", w) } w == "runleg" { exit } w == py { n++ } END { print n + 0 }' "$1"
+}
+# One bar at width 1 traced on its own descriptor. The spawn floor is PINNED at one microsecond, so no
+# bar's start measurement ever beats it: a floor a bar rewrites is a per-bar spawn that lands in one
+# trace and not the other, which read as three phantom per-leg events in the pass that pinned the
+# ceiling.
+run_spawn_trace() { # trace file · runner · manifest [· output file]
+  printf '0.001\t2026-01-01T00:00:00Z\n' > "$WORK/spawn-floor"
+  env PS4="$SPAWN_PS4" BASH_XTRACEFD=9 GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 GATE_JOBS=1 \
+    GATE_RUN_KEEP=1000 GATE_SPAWN_FLOOR="$WORK/spawn-floor" GATE_LEGS="$3" bash -x "$2" 9>"$1" >"${4:-/dev/null}" 2>&1
+}
+# check_spawn_ceiling <runner> <tag> -> SPAWN_VERDICT, one line; 0 within the ceiling, 1 red
+check_spawn_ceiling() {
+  local rn=$1 tg=$2 f1 e1 f2 e2 per slack
+  SPAWN_VERDICT=""
+  run_spawn_trace "$WORK/sp.$tg.one" "$rn" "$WORK/sp1.json" || { SPAWN_VERDICT="the one-leg bar did not run green"; return 1; }
+  measure_spawns "$WORK/sp.$tg.one" "$rn" || { SPAWN_VERDICT="the one-leg trace is empty"; return 1; }
+  f1=$SP_FORKS; e1=$SP_EXECS; printf '%s' "$SP_SITES" | sort > "$WORK/sp.$tg.one.sites"
+  run_spawn_trace "$WORK/sp.$tg.two" "$rn" "$WORK/sp2.json" || { SPAWN_VERDICT="the two-leg bar did not run green"; return 1; }
+  measure_spawns "$WORK/sp.$tg.two" "$rn" || { SPAWN_VERDICT="the two-leg trace is empty"; return 1; }
+  f2=$SP_FORKS; e2=$SP_EXECS; printf '%s' "$SP_SITES" | sort > "$WORK/sp.$tg.two.sites"
+  per=$(( (f2 - f1) + (e2 - e1) ))
+  slack=$(( SPAWN_CEILING * 5 / 100 )); [ "$slack" -ge 3 ] || slack=3
+  # The PER-LEG CONTRIBUTORS: every site whose events grew from the one-leg bar to the two-leg bar.
+  SPAWN_SITES=$(join -a 2 -e 0 -o '0,1.2,2.2' "$WORK/sp.$tg.one.sites" "$WORK/sp.$tg.two.sites" \
+    | awk '$3 > $2 { print ($3 - $2), $1 }' | sort -rn | head -10 | tr '\n' ' ')
+  if [ "$per" -gt "$SPAWN_CEILING" ]; then
+    SPAWN_VERDICT="per-leg events $per ($((f2 - f1)) forks, $((e2 - e1)) execs) over the ceiling $SPAWN_CEILING; per-leg sites: $SPAWN_SITES"
+    return 1
+  fi
+  if [ $(( SPAWN_CEILING - per )) -gt "$slack" ]; then
+    SPAWN_VERDICT="per-leg events $per sit more than $slack under the ceiling $SPAWN_CEILING: STALE, lower it to $per"
+    return 1
+  fi
+  SPAWN_VERDICT="per-leg events $per ($((f2 - f1)) forks, $((e2 - e1)) execs) within the ceiling $SPAWN_CEILING"
+}
+check_spawns() {
+  local rn plus pre d ln n_py0 n_py1 want pdir
+  # AC8: the counter reads the specimen's declared figures, and refuses with its descriptor closed.
+  printf '%s\n' 'f() { printf %s x; }' 'a=$(f)' 'b=$(f)' '( : )' "printf 'x\\n' | while IFS= read -r l; do :; done" \
+    'cat </dev/null >/dev/null' > "$WORK/specimen.sh"
+  check_spawn_calibration "$WORK/specimen.sh"
+  check "SPAWNS the counter reads the specimen's declared 5 forks and 1 exec" "$?|$SP_FORKS|$SP_EXECS" "0|5|1" || return 1
+  { printf 'exec 9>&-\n'; cat "$WORK/specimen.sh"; } > "$WORK/specimen-closed.sh"
+  check_spawn_calibration "$WORK/specimen-closed.sh"
+  check "SPAWNS a trace whose descriptor closed early refuses rather than reading zero" "$?" 2
+  # The legs the ceiling was measured over: each declares a ceiling, as every gov leg does.
+  write_legs sp1 '[{"name": "one", "argv": ["bash", "-c", "exit 0"], "ceiling": 60}]'
+  write_legs sp2 '[{"name": "one", "argv": ["bash", "-c", "exit 0"], "ceiling": 60}, {"name": "two", "argv": ["bash", "-c", "exit 0"], "ceiling": 60}]'
+  # WARM, so the traced bars find a ledger and a journal, as every bar after a clone's first does.
+  run_bar GATE_LEGS="$WORK/sp2.json" GATE_RUN_KEEP=1000
+  rn=$(build_traced_runner spawns "$HERE/run-gates.sh")
+  check_spawn_ceiling "$rn" real
+  check "SPAWNS the runner's per-leg events hold the ceiling: $SPAWN_VERDICT" "$?" 0
+  echo "SPAWNS $SPAWN_VERDICT"
+  # AC9: one added `$(date +%s)` as runleg's seconds line opens reds the arm, naming the figure, the
+  # ceiling and that line. The substitution is spelled in pieces, so this file carries none of it.
+  d=date; pre='  : "$('"$d"' +%s)"; '
+  sed "s/^  local secs; printf -v secs/$pre&/" "$HERE/run-gates.sh" > "$WORK/plus-one.sh"
+  ln=$(grep -n "^$pre" "$WORK/plus-one.sh" | cut -d: -f1)
+  check "SPAWNS the staged copy carries one added substitution" "$(grep -c "^$pre" "$WORK/plus-one.sh")" 1
+  plus=$(build_traced_runner plus "$WORK/plus-one.sh")
+  check_spawn_ceiling "$plus" plus
+  check "SPAWNS one added fork in runleg reds the arm" "$?" 1
+  case "$SPAWN_VERDICT" in
+    *"over the ceiling $SPAWN_CEILING"*"run-gates.sh:$ln "*) check "SPAWNS the red names the figure, the ceiling and the added line" yes yes ;;
+    *) check "SPAWNS the red names the figure, the ceiling and the added line run-gates.sh:$ln" "$SPAWN_VERDICT" "over the ceiling, naming run-gates.sh:$ln" ;;
+  esac
+  # AC10: the process-monitor kit dir costs no python of its own. Python execs before the first
+  # dispatch are the same with the conf as without it, and the line names the refusal exactly as the
+  # resolver this suite carries, run as the runner's old wrapper ran it, words it.
+  # The one-leg trace the ceiling read is the bar without the conf.
+  n_py0=$(measure_python_execs "$WORK/sp.real.one")
+  : > "$REPO/.process-monitor.conf"
+  run_spawn_trace "$WORK/sp.pm1" "$rn" "$WORK/sp1.json" "$WORK/sp.pm1.out"
+  rm -f "$REPO/.process-monitor.conf"
+  n_py1=$(measure_python_execs "$WORK/sp.pm1")
+  check "SPAWNS the trace sees python before the first dispatch" "$([ "$n_py0" -gt 0 ] && echo yes)" yes
+  check "SPAWNS an adopted process monitor adds no python before the first dispatch" "$n_py1" "$n_py0"
+  pdir=$(cd "${rn%/*}" && pwd)
+  want="run-gates: process-monitor: adopted, but the kit is not found ($(resolve_kit_dir "$PY" process-monitor reap.py "$pdir" 2>&1)); tree kills use the runner's own depth-8 walk"
+  check "SPAWNS a missing kit's line carries the resolver's refusal byte for byte" "$(grep '^run-gates: process-monitor:' "$WORK/sp.pm1.out")" "$want"
+}
+
 # ------------------------------------------------------------------------------------------ AC5
 check_ac5_write_failure() {
   local out_off rc_off err_off l0
@@ -747,7 +888,7 @@ scan_exit_sites() { # file... -> one TAB-separated row per shell exit
 # as a count that moved rather than as a match.
 cat > "$WORK/exits.tsv" <<'EXITS'
 echo "run-gates: cannot create the run record at $RUNDIR" >&2; exit 2	1	AC8 run-dir
-' "$LEGS_FILE" "$TIMINGS" "$(dirname "$KITREL")") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }	1	AC8 manifest
+|| { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }	1	AC8 manifest
 kill -0 "$_me" 2>/dev/null || exit 0	2	exempt: the wall watcher's and the census sampler's ( … ) & subshells, which run no trap of the runner's
 [ -f "$_work/wall.disarm" ] && exit 0	1	exempt: the wall watcher's ( … ) & subshell, which runs no trap of the runner's
 [ -f "$_work/census.disarm" ] && exit 0	1	exempt: the census sampler's ( … ) & subshell, from TOOL-aGraftedHelix-5, which runs no trap of the runner's
@@ -944,6 +1085,7 @@ check_selected AC7 && check_ac7_many_fails
 check_selected AC8 && check_ac8_pre_header
 check_selected AC9 && check_ac9_worktree
 check_selected CAP && check_cap_fit
+check_selected SPAWNS && check_spawns
 check_selected AC8 && check_ac8_exits
 check_selected TWO && check_two_writers
 

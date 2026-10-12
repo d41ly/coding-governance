@@ -297,6 +297,17 @@ Cite ids, never line numbers.
 | [TOOL-aSiftedFork-7](../builds/aSiftedFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | THE RUN-GATES CANARY IS NON-DETERMINISTIC ON THIS HOST AND NAMES A… |
 | [TOOL-aSightedSkeptic-11](../builds/aSightedSkeptic/BACKLOG.md) | OPEN | HIGH | — | 2026-10-01 | inherited red: leg row-keyed merge driver replay red at ef1dcdb6,… |
 | [TOOL-aSignalledHook-2](../builds/aSignalledHook/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | the unattended kit does not handle push-main's exit 4 (landed UNGATED):… |
+| [TOOL-aSparedSpawn-20](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | the unit builder runs the govkit selfcheck and shell hygiene (a fork… |
+| [TOOL-aSparedSpawn-21](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | tools/memory-tree/check-arms.py compares each floored suite's declared… |
+| [TOOL-aSparedSpawn-22](../builds/aSparedSpawn/BACKLOG.md) | OPEN | LOW | — | 2026-10-12 | a lint over the *.test.sh suites flags a fixture sleep <N> whose arm… |
+| [TOOL-aSparedSpawn-23](../builds/aSparedSpawn/BACKLOG.md) | OPEN | LOW | — | 2026-10-12 | a dead-plumbing grep: every $WORK/$i.<suffix> marker… |
+| [TOOL-aSparedSpawn-24](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | an arm enumerates every GATE_REUSE* name tools/run-gates/run-gates.sh… |
+| [TOOL-aSparedSpawn-26](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | bash 5.2 rows in memory/project/fork-ceilings.txt, measured on CI's Git… |
+| [TOOL-aSparedSpawn-27](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | a documented check for every A/B instrument in this repository: it… |
+| [TOOL-aSparedSpawn-28](../builds/aSparedSpawn/BACKLOG.md) | OPEN | LOW | — | 2026-10-12 | migrate the existing unscoped arms of… |
+| [TOOL-aSparedSpawn-29](../builds/aSparedSpawn/BACKLOG.md) | OPEN | LOW | — | 2026-10-12 | the template size gate selftest leg gets a kit owner or a guard in… |
+| [TOOL-aSparedSpawn-30](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | run the six-bar width A/B with… |
+| [TOOL-aSparedSpawn-31](../builds/aSparedSpawn/BACKLOG.md) | OPEN | LOW | — | 2026-10-12 | owner action: set up a WSL2 mirror with bash… |
 | [TOOL-aStagedLane-5](../builds/aStagedLane/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | THE INDEX-VERSUS-COMMIT SHAPE SURVIVES ONE FILE OVER.… |
 | [TOOL-aStandingWrit-2](../builds/aStandingWrit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | SECURITY in landed code: the pinned BASE anchors on a remote-tracking… |
 | [TOOL-aStandingWrit-5](../builds/aStandingWrit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | .githooks/pre-commit's branch guard fails CLOSED on a bogus… |

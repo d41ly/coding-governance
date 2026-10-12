@@ -1,0 +1,70 @@
+ok   - seed: the earning bar is green
+ok   - S4: the clean green bar wrote 8 entries, every executed ok but the legacy impure leg's
+ok   - S4: the entry sits at <key[0:2]>/<key>
+ok   - S4: the entry reads ok, secs, run id, HEAD and an epoch
+ok   - S8: the full green carries reused 0
+ok   - reuse: pure reads reuse
+ok   - reuse: based reads reuse
+ok   - reuse: hist reads reuse
+ok   - reuse: clk reads reuse
+ok   - reuse: rem reads reuse
+ok   - reuse: flip reads reuse
+ok   - reuse: nd reads reuse
+ok   - reuse: red reads reuse
+ok   - AC10 a legacy impure leg is never reused: legacy reads ok
+ok   - header: reuse env
+ok   - AC8 a run that reused legs stamps no gate-full-green
+ok   - AC8 control: pure reads reuse
+ok   - AC1 another GATE_BASE: based reads ok
+ok   - AC1 another GATE_BASE: pure reads reuse
+ok   - AC1 another GATE_BASE: hist reads reuse
+ok   - AC3 another day: clk reads ok
+ok   - AC3 another day: pure reads reuse
+ok   - AC8 GATE_FULL with GATE_REUSE reuses nothing
+ok   - AC8 the run says why
+ok   - AC4 a fresh worktree: pure reads reuse
+ok   - AC4 a fresh worktree: clk reads reuse
+ok   - AC2 a commit off the guard: hist reads ok
+ok   - AC2 a commit off the guard: pure reads reuse
+ok   - AC2 the same HEAD again: hist reads reuse
+ok   - AC5 a red leg writes no entry, and its green sibling did
+ok   - AC5 a run on a dirty tree writes no entry (7 before and after)
+ok   - AC5 control: pure reads reuse
+ok   - AC5 a reused leg rewrote nothing
+ok   - AC6 the disagreeing run reds (rc=1)
+ok   - AC6 it prints cache disagreement · flip · <key>
+ok   - AC6 red then green prints nondeterministic · nd
+ok   - AC6 the disagreeing entry is gone
+ok   - AC6 both legs are quarantined
+ok   - AC6 precondition: flip's entry is earned again
+ok   - AC6 a quarantined leg executes although its key matches: flip reads ok
+ok   - AC6 control: pure reads reuse
+ok   - S7: reusing writes an age counter
+ok   - AC7 the eleventh reuse: pure reads ok
+ok   - AC7 the run says why
+ok   - AC7 execution resets every counter to 0
+ok   - AC9 a 31-day entry is erased and a 29-day one remains
+ok   - AC10 a new remote head moves the legacy leg's key, as it moves the remote leg's
+ok   - AC10 control: the pure leg's key does not move
+ok   - AC12 push, same sha and tip: rem reads reuse
+ok   - AC12 push, same sha and tip: hist reads reuse
+ok   - AC12 push: a leg declaring neither class: pure reads ok
+ok   - AC12 push: a base leg: based reads ok
+ok   - AC13 the run record: reused > 0, reuse push, full empty
+ok   - AC14 the reusing push run wrote no gate-full-green
+ok   - AC12 a moved tip: rem reads ok
+ok   - AC12 another advertisement: rem reads ok
+ok   - AC12 another pushed sha: rem reads ok
+ok   - AC12 another pushed sha: hist reads ok
+ok   - AC12 a guarded input changed: rem reads ok
+ok   - AC13 the scoped decision line offers reuse
+ok   - S10 the bar receives GATE_REUSE_PUSH as pushed sha, tip and digest
+ok   - S9 the tip in the knob is what the remote advertised before the push
+ok   - AC12 a probe with no tip to answer offers nothing and the decision line names the probe
+ok   - AC15 an inherited GATE_REUSE_PUSH is named as not honoured
+ok   - AC15 the planted knob never reaches the bar
+ok   - AC15 a FULL decision exports no knob, inherited or not
+ok   - AC14 a planted green whose reused reads 1 forces the full bar
+ok   - AC14 control: the same record with reused 0 scopes
+direct checks: 68 ok, 0 failed
+rc=0

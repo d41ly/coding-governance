@@ -1,10 +1,15 @@
 # TOOL-aSparedSpawn-15 — the remaining clock-bound arms on the flake list, ordered or calibrated
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-1 · base 22efab65 · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-1 · base 22efab65 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-11-build-TOOL-aSparedSpawn-15-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-15-acceptance-ledger.md) | journal | — |
+| [2026-10-11-build-TOOL-aSparedSpawn-15-direct-checks.sh](../build/2026-10-11-build-TOOL-aSparedSpawn-15-direct-checks.sh) | journal | — |
+| [2026-10-11-prompt-TOOL-aSparedSpawn-15-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-15-build-brief.md) | journal | — |
+| [2026-10-12-review-TOOL-aSparedSpawn-1-15-closing-diff-round1.md](../reviews/2026-10-12-review-TOOL-aSparedSpawn-1-15-closing-diff-round1.md) | diff-review | TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14 |
 
 <!-- /gen:spec-records -->
 
@@ -26,7 +31,9 @@ item names its class:
   asserts 8000 literals on one line finish in 10 s by `date +%s`. It times a CONTROL first in the same
   process, the same literals one per line, and asserts the one-line run takes at most four times the
   control plus 2 s, both read from `EPOCHREALTIME`. The absolute hook timeout is not this arm's
-  question and is stated as such in its comment. Observed by AC1.
+  question and is stated as such in its comment. Every literal follows `void`, since the walk runs
+  only for a quote glued to an identifier and the arm's `f(a1, 'lit1')` put a comma there; both runs
+  must exit 0. Observed by AC1.
 - **S2** — Spawns in a heartbeat, `tools/run-gates/run-gates.turnstile.test.sh:534`: the refresher
   writes `$(date +%s)` every 0.25 s against a 2 s TTL. It writes `$EPOCHSECONDS`, which forks
   nothing. Observed by AC2.
@@ -34,9 +41,13 @@ item names its class:
   in `ts_tick_start` in `tools/run-gates/run-gates.sh`: each tick reads the nonce through `$(cat ...)`
   and the time through `$(ts_now)`, which is `date +%s`. The tick reads both with builtins, keeping
   `${EPOCHSECONDS:-$(date +%s)}` as its fallback the way the runner's owner record already does. The
-  arm then measures the host before it runs: ten spawns timed as `measure_load_ratio` in
-  `tools/run-gates/foreign-prefix.gov.test.sh` does, giving one tick's period, and its TTL becomes
-  three periods and never under 6 s, with `TS_LONG` the TTL plus 8 s. Observed by AC3.
+  arm then measures the host before it runs: the shipped `ts_tick_start` and the two helpers it
+  calls, extracted and run for ten ticks with a `sleep` stub first on its PATH that returns at once
+  and ends the ticker on its eleventh call by replacing the nonce, timed over `EPOCHREALTIME` the
+  way `measure_load_ratio` in `tools/run-gates/foreign-prefix.gov.test.sh` times its spawns, giving
+  one tick's period as the tick plus the mean body; its TTL becomes three periods and never under
+  6 s, with `TS_LONG` the TTL plus 8 s. The tick body's one fewer `cat-file` site lowers its
+  registry count in `memory/project/spawn-idiom-sites.txt` by one. Observed by AC3.
 - **S4** — Clock as an ordering, `tools/run-gates/run-gates.evidence.test.sh:513-519`: the mover
   waits up to 20 polls of `cat` plus `sleep 1` for the run's header and then moves the tree ANYWAY.
   It moves only once the header exists; if the run ends first, it moves nothing and the arm reds
@@ -104,6 +115,7 @@ it, a floor kept) with the cheaper reading `measure_load_ratio` takes, ten spawn
 - `tools/unattended/resume-tick.test.sh`
 - `tools/govkit/selftest.py`
 - `skills/session-kickoff/manifest-check.test.sh`
+- `memory/project/spawn-idiom-sites.txt`
 
 ### Alternatives rejected
 
@@ -147,14 +159,15 @@ it, a floor kept) with the cheaper reading `measure_load_ratio` takes, ten spawn
   Red when: the unkilled pid reads 1, or a landed kill waits out the bound.
 - **AC7** — When govkit's contention case runs under twelve fork loops, the lock is observed held and
   `[-12] AC5` passes in its first attempt or a later one. Red when: three attempts expire without
-  observing the lock. cost: a slice of govkit's selftest, prologue plus that function.
+  observing the lock. cost: the whole govkit selftest at VERIFYING, since a pass runs no slice.
 - **AC8** — When `read_session_id` is staged to read stdin although `--session` answered, the S4 arm
   of the kickoff suite reds with exit 124 at its 120 s bound; unstaged, it passes. Red when: the
   staged break passes.
 
 ## 7. Gates
 
-`agent-cap self-test` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `hook destinations self-test` · `lexicon naming predicates` · `manifest-check self-test` · `recall floor arms` · `review-join self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `run-gates turnstile` · `run-gates evidence` · `kit epoch (shipped bytes move, the version moves)`
+`agent-cap self-test` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `hook destinations self-test` · `lexicon naming predicates` · `manifest-check self-test` · `recall floor arms` · `review-join self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `run-gates turnstile` · `run-gates evidence` · `kit epoch (shipped bytes move, the version moves)` ·
+`shell hygiene (a fork spent on builtin work)` · `recall floor`
 
 New arm: tools/hooks/agent-cap.test.sh · covers AC1 · the per-quote prefix copy restored · none
 New arm: tools/run-gates/run-gates.turnstile.test.sh · covers AC2 AC3 · a forking refresher and a forking tick, under fork loops · none
@@ -171,6 +184,19 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-11 · S1, S3, AC7, §4 files, §7 · the build pass. S1's payload could not fail: the
+  identifier walk runs only for a quote glued to an identifier, and `f(a1, 'lit1')` puts a comma
+  there, so with the per-quote copy restored the one-line run was no slower (3.3 s against 1.9 s one
+  per line, under the ratio). Every literal now follows `void`, and the restored copy took 19.9 s
+  against 0.7 s. S3 times the shipped tick body rather than ten bare spawns, because AC3's red case
+  is a period that rises with `cat` put back, which a bare spawn reading cannot show. The tick's
+  dropped `cat` moves `memory/project/spawn-idiom-sites.txt` from 20 to 19 `cat-file` sites in
+  `run-gates.sh`, so §7 names that leg and `recall floor`, whose guard the registry path trips. AC7's cost is the whole selftest at VERIFYING.
+- rev-3 · 2026-10-11 · S3 · the build pass. The tick measurement's `sleep` is a stub on PATH, and the
+  two helpers come from the runner by extraction, rather than three functions defined in the suite:
+  `lexicon naming predicates` grades every definition there, and `sleep`, `ts_alive` and `ts_now`
+  moved its verb pin by three, the class TOOL-aSparedSpawn-11 rev-3 met. The stub costs one spawn
+  where the real `sleep` costs one.
 
 ## 10. Reuse audit
 

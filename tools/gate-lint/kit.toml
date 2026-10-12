@@ -76,6 +76,20 @@ subject = "repo"
 argv = ["python3", "{kit}/sh_hygiene.py", "--location-probes"]
 guard = []
 
+# The spawn-idiom lint, the scanner's third mode (TOOL-aSparedSpawn-8). `subject = "repo"` and no guard
+# for the loop scan's reason: a fork spent on builtin work can arrive in any shell file. Its three
+# BANNED classes take no registry row at all; its six counted classes grade against an empty
+# declaration when no registry is passed, so an adopter's first run lists every site it carries — the
+# posture of the two legs above. The home repository's row passes its registry and excludes its
+# memory tree; its suites stay in, counted by the registry classes alone.
+# The fork COUNT beside it, `fork-count.sh`, ships with this kit and its leg does not: its ceilings name
+# this repository's own entrypoints and fixtures, so it is an `[[exempt_leg]]` in the deployer registry.
+[[gate_leg]]
+name = "shell hygiene (a fork spent on builtin work)"
+subject = "repo"
+argv = ["python3", "{kit}/sh_hygiene.py", "--spawn-idioms"]
+guard = []
+
 # The self-test arm. `subject = "kit"` puts it under the 2026-08-23 kit-self-test hold deliberately:
 # a suite that stages breaks into a copy of a scanner has a job only when that scanner's source
 # changes, and none at all in an adopter's repo that copy-installs the kit and never edits it. The

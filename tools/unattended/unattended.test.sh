@@ -529,7 +529,41 @@ run_main_at_head() { # command... -> its output and status
   [ -z "$_ma_rs" ] || git update-ref refs/heads/main "$_ma_rs" 2>/dev/null
   return "$_ma_rc"
 }
-run() { run_main_at_head bash "$SCRIPT" "$@" 2>&1; }
+# ---- THE IN-PROCESS HARNESS (TOOL-aSparedSpawn-6) -----------------------------------------------
+# The driver is SOURCED once, here in the prologue every shard runs: it defines its functions and
+# returns, and `( load_driver_conf && main "$@" )` then runs one call in a subshell of this shell,
+# paying a fork where `bash "$SCRIPT"` pays a process and a parse of the whole driver. Every call this
+# suite makes through `run`, or through a wrapper ending in `run_driver`, goes through ONE body that
+# `UNATTENDED_HARNESS` steers: `inproc` runs the subshell, and `process`, the DEFAULT until the
+# owner's equivalence run has taken each shard in both modes, runs the process exactly as before.
+# The `( … )` is never elided: `$(run …; run …)` forms exist, and a bare `main` would let the first
+# call's `exit` end the rest of them. `run_proc` is the process whatever the mode, for the classes a
+# subshell cannot model: the hook path, a copy of the driver, a probe the driver runs at source time.
+# Each call appends one byte to its mode's tally FILE, because `out=$(run …)` runs `run` in a
+# subshell and a counter variable incremented there is lost; the tail prints both counts.
+. "$SCRIPT" || { echo "FAIL the driver did not source, so no arm below can run in process"; exit 2; }
+UNATTENDED_HARNESS=${UNATTENDED_HARNESS:-process}
+case "$UNATTENDED_HARNESS" in
+  process|inproc) ;;
+  *) echo "FAIL UNATTENDED_HARNESS is '$UNATTENDED_HARNESS', and the harness modes are process and inproc"; exit 2 ;;
+esac
+DRV_INPROC_TALLY="$TMP/harness-inproc.tally"; DRV_PROC_TALLY="$TMP/harness-proc.tally"
+: > "$DRV_INPROC_TALLY"; : > "$DRV_PROC_TALLY"
+# The driver's and its library's function names, and their definitions as sourced: the namespace arm
+# in the tail compares this shell's definitions against these, so a double an arm left behind, or a
+# function it unset, is named before it can answer an in-process call in the driver's place.
+DRV_FNS=$(grep -ohE '^[A-Za-z_][A-Za-z0-9_]*\(\)' "$SCRIPT" "$HERE/lib-unattended.sh" | tr -d '()' | sort -u | tr '\n' ' ')
+declare -f $DRV_FNS > "$TMP/harness-fns.sourced"
+run_inproc() { ( load_driver_conf && main "$@" ); }   # argv... -> one in-process call, uncounted
+run_driver() { # argv... -> the driver's output and status, in process or as a process per UNATTENDED_HARNESS
+  if [ "$UNATTENDED_HARNESS" = inproc ]; then
+    printf . >>"$DRV_INPROC_TALLY"; run_inproc "$@"
+  else
+    printf . >>"$DRV_PROC_TALLY"; bash "$SCRIPT" "$@"
+  fi
+}
+run() { run_main_at_head run_driver "$@" 2>&1; }
+run_proc() { printf . >>"$DRV_PROC_TALLY"; run_main_at_head bash "$SCRIPT" "$@" 2>&1; }
 
 # ---- EVERY `--dispatch` ARM NEEDS A COMMITTED, READY SPEC for the unit it names. The driver refuses
 # ---- a pass for a unit no tracked spec under the build defines (M2's MISSING, check 49) and one
@@ -1551,10 +1585,21 @@ same "a probe answering no reads unregistered" "$(_tr "$ORIGIN_DIR/tick-no:$PATH
 hit "$(_tr "$ORIGIN_DIR/tick-none")" "is not on PATH"
 same "a missing probe command reads UNKNOWN, not no" "$(_tr "$ORIGIN_DIR/tick-none" | cut -c1)" "2"
 
-# ---- check 10, all three branches: no file for --status, no phase, no file for --close.
+# ---- check 10: the missing run-state refusal every verb shares, `check_run_state`, armed ONCE
+# ---- (TOOL-aSparedSpawn-14 S7: twenty-three per-verb arms retired, leg check 52 routes every verb
+# ---- through the helper), and the no-phase branch below.
 reset_tree; readme tNoRun; fixture
 out=$(run --status tNoRun);  hit "$out" "no run-state file, so there is no run to report on"
-out=$(run --close tNoRun);   hit "$out" "no run-state file, so there is no run to close"
+# ---- TOOL-aSparedSpawn-14 S8: `usage` renders VERB_REQUIRES row for row. The expected rows are read
+# ---- off the SOURCE text here, never off the variable the driver renders them from.
+same "AC9 usage renders every VERB_REQUIRES row byte for byte" \
+  "$(run_proc | sed -n '/^required flags, per verb:$/,$p' | sed '1d; s/^  //')" \
+  "$(sed -n '/^VERB_REQUIRES="/,/"$/p' "$SCRIPT" | sed 's/^VERB_REQUIRES="//; s/"$//')"
+# ---- TOOL-aSparedSpawn-14 S10: an environment failure exits 2 through `print_env_failure`, called
+# ---- here from the sourced driver inside a substitution, whose subshell is all its exit ends.
+out=$(print_env_failure 99 "a scratch environment failure the helper prints" 2>&1); rc=$?
+same "AC11 print_env_failure exits 2" "$rc" "2"
+hit "$out" "UNATTENDED check 99 FAILED — a scratch environment failure the helper prints"
 reset_tree
 out=$(run --status tRun)
 hit "$out" "the run-state file declares no phase, and a run with no phase is not resumable"
@@ -2247,6 +2292,120 @@ same "a no-handle re-preflight left the recorded set intact" \
 _blk_max=$(awk '/^if in_shard [0-9]+; then/ { s = NR; next } /^fi   # ---- (end REGION|region [0-9]+ continues)/ && s { if (NR - s > m) m = NR - s; s = 0 } END { print m + 0 }' "$HERE/unattended.test.sh")
 same "no in_shard block of this suite exceeds 2500 lines (longest: $_blk_max)" "$([ "$_blk_max" -gt 0 ] && [ "$_blk_max" -le 2500 ] && echo ok || echo "too long: $_blk_max")" "ok"
 
+fi   # ---- region 1 continues below: the parity table is a block of its own, at a top-level seam
+if in_shard 1; then
+
+# ---- TOOL-aSparedSpawn-6 S7, AC7: THE PARITY TABLE. Each row runs the driver twice from one reset
+# ---- tree, once as a process and once in process, and the two must agree on their output through
+# ---- `render_stable`, their exit status, and the tree they leave through `derive_tree_digest`. The
+# ---- in-process side is `run_inproc`, called DIRECTLY whatever UNATTENDED_HARNESS says, so the dark
+# ---- default still grades in-process parity, and neither side counts toward the harness tally the
+# ---- liveness arm reads. Commit dates are pinned for the whole table and every UTC stamp, long number
+# ---- and abbreviated sha is normalised, so a difference is the driver's and never the clock's.
+# ---- A row is `label | setup | argv`: the setup runs after each reset, in this shell, and the argv is
+# ---- split on spaces. The rc-2 rows hold the conf refusals load_driver_conf owns: with one bound
+# ---- read moved out of it onto the executed path alone, the GATE_BOUND row's two sides disagree,
+# ---- which is the staged break this table answers (observed on a slice of the prologue and this block).
+render_stable() { # driver output on stdin -> the same text, every per-call value normalised
+  sed -E 's/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z/<utc>/g; s/[0-9]{9,}/<n>/g; s/(^|[^0-9A-Za-z])[0-9a-f]{7,40}([^0-9A-Za-z]|$)/\1<sha>\2/g'
+}
+derive_tree_digest() { # -> one hash over the refs' names, the status, and every worktree file's name and normalised bytes
+  { git for-each-ref --format='%(refname)'; git status --porcelain=v1 -uall
+    git ls-files -co --exclude-standard -z | xargs -0 -r awk 'FNR == 1 { print "== " FILENAME } { print }'
+  } 2>/dev/null | render_stable | git hash-object --stdin
+}
+PARITY_ROWS="version | : | --version
+usage, no verb | : |
+argv refusal | : | --no-such-verb
+slug refusal | : | --status ../etc
+status with no run | : | --status tRun
+plan | : | --plan tRun
+plan framed over two slugs | : | --plan tRun tNone --framed
+preflight | : | --preflight tRun --keepalive-id k1
+phase | : | --phase tRun BUILDING --witness abc
+audit | : | --audit tRun
+register-task | : | --register-task tRun --task t --heartbeat /no/such/beat
+release-task | : | --release-task tRun --task t
+liveness | : | --liveness tRun
+resume | : | --resume tRun
+close | : | --close tRun
+authorization | : | --authorization tRun
+landed | : | --landed tRun
+abort | : | --abort tRun --reason r --code external-prerequisite
+hold | : | --hold tRun --code host-degraded --until owner --reason r --reaped k1
+handoff | : | --handoff tRun --code owner-landing --reason r --reaped k1
+settle | : | --settle tRun
+park | : | --park tRun --item i --reason r
+propose | : | --propose tRun --item i --step s --reason r
+rescope | : | --rescope tRun --act retire --item ARCH-tRun-1 --reason r
+dispatch | : | --dispatch tRun --pass ARCH-tRun-1 --writes a.sh
+brief | : | --brief tRun --unit ARCH-tRun-1 --path x.md
+review | : | --review tRun --subject s --verdict CLEAN --blockers 0
+attest | : | --attest tRun --item keepalive-reaped
+record-piece | : | --record-piece tRun --path p --leg 1 --verdict PASS
+record-set | : | --record-set tRun --leg 1 --verdict PASS
+check-commit | printf 'x\\n' > .git/u6-msg | --check-commit .git/u6-msg
+claims | : | --claims
+beat | : | --beat tRun
+overlaps | : | --overlaps
+no conf, rc 2 | rm -f .unattended.conf | --status tRun
+a conf holding declare, rc 2 | printf 'declare LANDER_MODE=\"bogus\"\\n' >> .unattended.conf | --status tRun
+a malformed GATE_BOUND, rc 2 | printf 'GATE_BOUND=\"soon\"\\n' >> .unattended.conf | --status tRun"
+export GIT_AUTHOR_DATE="2026-10-11T00:00:00Z" GIT_COMMITTER_DATE="2026-10-11T00:00:00Z"
+_pt_rows=0; _pt_rc0=0; _pt_rc1=0; _pt_rc2=0
+while IFS='|' read -r _pt_l _pt_s _pt_a; do
+  _pt_l=${_pt_l% }; _pt_s=${_pt_s# }; _pt_a=${_pt_a# }
+  reset_tree; eval "$_pt_s"
+  _pt_po=$(run_main_at_head bash "$SCRIPT" $_pt_a 2>&1); _pt_pr=$?; _pt_pd=$(derive_tree_digest)
+  reset_tree; eval "$_pt_s"
+  _pt_io=$(run_main_at_head run_inproc $_pt_a 2>&1); _pt_ir=$?; _pt_id=$(derive_tree_digest)
+  same "parity $_pt_l: output" "$(printf '%s\n' "$_pt_io" | render_stable)" "$(printf '%s\n' "$_pt_po" | render_stable)"
+  same "parity $_pt_l: exit status" "$_pt_ir" "$_pt_pr"
+  same "parity $_pt_l: tree left behind" "$_pt_id" "$_pt_pd"
+  _pt_rows=$((_pt_rows + 1)); case "$_pt_pr" in 0) _pt_rc0=1 ;; 1) _pt_rc1=1 ;; 2) _pt_rc2=1 ;; esac
+done <<< "$PARITY_ROWS"
+unset GIT_AUTHOR_DATE GIT_COMMITTER_DATE
+rm -f .git/u6-msg
+# ...and the table is what it says: every row ran, and among them a pass, a refusal and a misconfiguration.
+same "parity: every declared row ran" "$_pt_rows" "$(printf '%s\n' "$PARITY_ROWS" | grep -c '|')"
+same "parity: the rows reach exit 0, 1 and 2" "$_pt_rc0$_pt_rc1$_pt_rc2" "111"
+# ...and every verb the dispatch carries is a row, so a verb added later is a row or a red.
+for _pt_v in $(verbs_all) --overlaps; do
+  n=$((n+1)); grep -qE -- "\| *$_pt_v( |\$)" <<< "$PARITY_ROWS" || { echo "FAIL parity: the verb $_pt_v has no row in the parity table"; st=1; }
+done
+
+# ---- TOOL-aSparedSpawn-6 S8, AC8: THE TOP-LEVEL EXIT ARM. An `exit` the driver runs at top level,
+# ---- outside every function, runs when this suite SOURCES it and ends this shell instead of a call.
+# ---- Each one is DECLARED below by a fragment of the refusal it ends, and that fragment must be
+# ---- asserted by an arm of this suite that runs the driver as a PROCESS (the missing-library arm, a
+# ---- copy run as `bash ./unattended.sh`). An undeclared exit reds naming its line; a declared fragment
+# ---- no top-level exit carries reds as stale, because a stale row silently widens what it exempts.
+TOPLEVEL_EXITS='the kit library is missing beside this script'
+# The scan lands in a FILE and the loops below read it, never a here-string of a captured variable:
+# a loop fed that way is the `shell hygiene (a loop fed by a command substitution)` class
+# (TOOL-aSparedSpawn-10 S8).
+_tx_file="$TMP/u6-toplevel-exits.txt"
+awk '
+  /^[A-Za-z_][A-Za-z0-9_]*\(\) *\{.*\} *(#.*)?$/ && !f { next }
+  /^[A-Za-z_][A-Za-z0-9_]*\(\) *\{/ && !f { f = 1; next }
+  f && /^\}[[:space:]]*(#.*)?$/ { f = 0; next }
+  f { next }
+  /^[[:space:]]*#/ { next }
+  { c3 = c2; c2 = c1; c1 = $0 }
+  /(^|[;&|{( ])exit([ ;)}]|$)/ { gsub(/\t/, " ", c3); gsub(/\t/, " ", c2); printf "%d\t%s %s %s\n", NR, c3, c2, c1 }
+' "$SCRIPT" > "$_tx_file"
+n=$((n+1)); [ -s "$_tx_file" ] || { echo "FAIL the top-level exit scan found no exit at all, and the missing-library refusal is one, so the scan reads nothing"; st=1; }
+while IFS=$'\t' read -r _tx_n _tx_c; do
+  [ -n "$_tx_n" ] || continue
+  _tx_ok=""
+  while IFS= read -r _tx_f; do case "$_tx_c" in *"$_tx_f"*) _tx_ok=1 ;; esac; done <<< "$TOPLEVEL_EXITS"
+  n=$((n+1)); [ -n "$_tx_ok" ] || { echo "FAIL the driver exits at top level on line $_tx_n, outside load_driver_conf and main, and no TOPLEVEL_EXITS row names it, so sourcing the driver can end this suite there"; st=1; }
+done < "$_tx_file"
+while IFS= read -r _tx_f; do
+  n=$((n+1)); grep -qF -- "$_tx_f" "$_tx_file" || { echo "FAIL the TOPLEVEL_EXITS row '$_tx_f' names no top-level exit of the driver, so it is stale"; st=1; }
+  n=$((n+1)); [ "$(grep -cF -- "$_tx_f" "$HERE/unattended.test.sh")" -ge 2 ] || { echo "FAIL the TOPLEVEL_EXITS row '$_tx_f' is asserted by no arm of this suite"; st=1; }
+done <<< "$TOPLEVEL_EXITS"
+rm -f "$_tx_file"
 fi   # ---- end REGION ONE ----------------------------------------------------------------------
 
 # ---- REGIONS 2 TO `SHARD_ARITY` ------------------------------------------------------------------
@@ -2281,7 +2440,6 @@ reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 hit "$(run --phase tRun NOSUCHPHASE --witness abc)" "the phase is not in the declared vocabulary, and a phase nothing recognises is not a position"
 hit "$(run --phase tRun BUILDING)" "a phase claim carries a WITNESS - a sha, a tag or a run id - and presence is its own refusal because an unwitnessed claim is the one an oracle skips"
 reset_tree
-hit "$(run --phase tBare BUILDING --witness abc)" "no run-state file, so there is no run to move"
 
 # ...and a TERMINAL phase is refused here whatever the vocabulary says. Membership is not permission:
 # a run that could set LANDED through this verb would skip the entire Definition-of-Done gate, and
@@ -2984,7 +3142,7 @@ n=$((n+1)); grep -q 'check-playbook.sh" --counts "$_pb" "$slug" "$_at"' "$SCRIPT
 # ...and the pin is BOUND AND CHECKED before the call rather than passed straight through. `fact`
 # returns empty with exit 0 for an absent key, so an unvalidated pass-through is how an absent BASE
 # reached the leg as "no pin" — round 3, HIGH 2.
-n=$((n+1)); grep -q '_at=$(fact "$rel" base)' "$SCRIPT" \
+n=$((n+1)); grep -q 'fact "$rel" base >/dev/null; _at=$_fact' "$SCRIPT" \
   || { echo "FAIL the close does not bind the BASE before calling, so an absent fact reaches the leg as no pin at all"; st=1; }
 # POINTED AT THE FILE THAT HELD THEM. Round 3, HIGH 5: this grepped the DRIVER, where those names
 # never existed — 0 hits at the pre-fix base too, so it could not fail. They lived in the LEG, six
@@ -3088,13 +3246,8 @@ n=$((n+1)); [ -z "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ] \
 
 # ---- S2: --attest, because the two AGENT-attested keys had no writer and --abort REQUIRES both. Its
 # ---- refusals first: no item, an undeclared item, and a MACHINE-checked item.
-# ...and with NO run-state file at all: --attest must not mint one, because a record created by an
-# attestation is a run that authorized its own existence.
-reset_tree; rm -f memory/builds/tRun/RUN.md
-hit "$(run --attest tRun --item keepalive-reaped)" "no run-state file, so there is no run to attest anything about"
 
 bcopen
-hit "$(run --attest tRun)" "--attest requires --item: an attestation with no item named is not an attestation"
 hit "$(run --attest tRun --item not-a-real-item)" "--attest names an item that is not in the declared DoD set, so nothing would ever read it"
 # The refusal reads the item's declared CHECKER rather than matching a pair of names, so a project
 # that renames a machine item still gets refused and one that declares its own agent item gets the verb.
@@ -3544,8 +3697,6 @@ miss "$out" "an UNCOMMITTED LANDING is sitting in:"
 git worktree remove --force "$OTHER" 2>/dev/null; git branch -q -D other-tree 2>/dev/null
 reset_tree
 
-hit "$(run --landed tBare)" "no run-state file, so there is no run to mark landed"
-
 # ---- 32: the OBSERVATION. The fixture's unit branch is one commit AHEAD of the anchor, which is
 # ---- exactly the state of a run that has built but not landed — so HEAD is not an ancestor of the
 # ---- advertised tip and the claim is refused. This is the branch that makes LANDED an observation
@@ -3913,12 +4064,6 @@ if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stoppe
 # ---- 33/34/35: --abort. It is deliberately NOT symmetric with --landed: an aborted run landed
 # ---- nothing, so the four machine items assert obligations it does not have — but it owes BOTH
 # ---- agent-attested items, and a first cut of this unit dropped the second.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
-before=$(sum)
-hit "$(run --abort tRun)" "--abort requires --reason, because an abort with no recorded reason is indistinguishable from a run that simply stopped, and the reason is the only thing the owner gets in place of the turn nobody took"
-same "the reasonless --abort wrote nothing" "$(sum)" "$before"
-hit "$(run --abort tBare --reason r)" "no run-state file, so there is no run to abort"
-
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
 hit "$(run --abort tRun --reason "second thoughts")" "the run is already finished and a finished record is not something to move, re-open or re-pin"
@@ -4868,9 +5013,6 @@ out=$(run --authorization tBr2); _az_rc=$?
 hit  "$out" "unattended: authorization-reachable — met · base $_az_tip · anchor refs/heads/main at "
 same "GH30 AC1 a met record exits 0" "$_az_rc" "0"
 same "GH30 AC1 a met record moved nothing" "$(read_authorization_witness tBr2)" "$_az_w0"
-out=$(run --authorization tAbsent); _az_rc=$?
-hit  "$out" "no run-state file, so there is no run whose authorization can be graded"
-same "GH30 AC1 an absent record exits 1" "$_az_rc" "1"
 # ---- AC2: the borrowed record is check 89's, and ONE line then names both exits and not owner-landing.
 _az_w0=$(read_authorization_witness tBr)
 _az_ref=$(run --authorization tBr); _az_rc=$?
@@ -5174,15 +5316,13 @@ same "a different item parks its own row" "$(grep -c 'decision · item ' memory/
 hit "$(run --status tRun)" "· parked 2"
 miss "$(run --status tNoPark)" "· parked"
 
-# refusal: no --item.
+# refusal: no --item, through the required-flag reader every verb shares (TOOL-aSparedSpawn-14 S8):
+# its ONE arm. Each verb's other required flags are listed in VERB_REQUIRES and joined to their
+# calls by leg check 52, not re-armed one by one.
 before=$(git hash-object memory/builds/tRun/RUN.md)
 out=$(run --park tRun --reason "r")
-hit "$out" "--park requires --item, because a parked entry with no question recorded is the bare 'parked' the protocol calls indistinguishable from 'forgotten'"
+hit "$out" "--park requires --item, because the verb's row in VERB_REQUIRES lists it, and a record written without that value is one no reader can act on"
 same "a refused park wrote nothing" "$(git hash-object memory/builds/tRun/RUN.md)" "$before"
-
-# refusal: no --reason.
-out=$(run --park tRun --item "q")
-hit "$out" "--park requires --reason, because an entry recording no reason is indistinguishable from one nobody meant - the same argument --waive already makes"
 
 # refusal: a reason spelling the declared bypass flag. park() writes it verbatim and leg check 11
 # greps the file WHOLE, so recording it would red the bar on a record no verb can rewrite.
@@ -5210,12 +5350,6 @@ run --phase tRun LANDING --witness "$(git rev-parse HEAD)" >/dev/null 2>&1 || tr
 sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
 hit "$(run --park tRun --item q --reason r)" "ABORTED via --park"
 
-# refusal: NO RECORD AT ALL. `refuse_if_terminal` returns 0 for a file that does not exist, so a
-# design leaning on it alone would let --park mint a parked entry for a run that never started.
-reset_tree; rm -f memory/builds/tRun/RUN.md
-out=$(run --park tRun --item q --reason r)
-hit "$out" "no run-state file, so there is no run to park a decision against"
-same "--park created no record" "$([ -f memory/builds/tRun/RUN.md ] && echo yes || echo no)" "no"
 reset_tree
 
 # ---- the proposal-kind unit: `--propose`, the FIFTH parked kind. A recipe-mode run follows its
@@ -5271,21 +5405,7 @@ same "a proposal changed nothing the close blocks on" "$blocked_after" "$blocked
 same "the close was actually evaluating something" \
   "$([ "$blocked_before" -gt 0 ] && echo yes || echo no)" "yes"
 
-# refusal: no --item.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
-before=$(git hash-object memory/builds/tRun/RUN.md)
-out=$(run --propose tRun --step F1 --reason r)
-hit "$out" "--propose requires --item, because a proposal naming no amendment is the bare 'noticed something' that a wrap-up cannot act on and the next run cannot find"
-same "a refused proposal wrote nothing" "$(git hash-object memory/builds/tRun/RUN.md)" "$before"
-
-# refusal: no --step. This is the field no other kind carries, and the reason it exists:
-# an amendment floating free of the step that provoked it is advice.
-out=$(run --propose tRun --item i --reason r)
-hit "$out" "--propose requires --step, because an amendment floating free of the playbook step that provoked it is advice, and the owner would have to re-derive where it applies"
-
-# refusal: no --reason.
-out=$(run --propose tRun --item i --step F1)
-hit "$out" "--propose requires --reason, because a proposal recording no reason is indistinguishable from one nobody meant - the same argument --park and --waive already make"
 
 # refusal: a NEWLINE, in any of the three fields. park() appends ONE line and the leg parses the
 # region line-wise, so one carried through forges a second row that no verb wrote.
@@ -5307,12 +5427,6 @@ same "the bypass-flag refusal wrote nothing" "$(git hash-object memory/builds/tR
 sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
 hit "$(run --propose tRun --item i --step F1 --reason r)" "ABORTED via --propose"
 
-# refusal: NO RECORD AT ALL. refuse_if_terminal returns 0 for a file that does not exist, so the
-# existence guard is separate here for the reason it is separate in --park.
-reset_tree; rm -f memory/builds/tRun/RUN.md
-out=$(run --propose tRun --item i --step F1 --reason r)
-hit "$out" "no run-state file, so there is no run to propose a playbook amendment against"
-same "--propose created no record" "$([ -f memory/builds/tRun/RUN.md ] && echo yes || echo no)" "no"
 reset_tree
 
 # ---- check 47: --record-piece. Every refusal, plus the two PASSING directions that tell a working
@@ -5321,9 +5435,6 @@ reset_tree
 reset_tree
 mkdir -p pc/one recs; printf 'a fixture piece
 ' > pc/one/piece.md; git add -A >/dev/null
-hit "$(run --record-piece tRun --records-root recs --leg L --verdict PASS)" "--record-piece requires --path, because a verdict with no piece to join to is a verdict about nothing"
-hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --verdict PASS)" "--record-piece requires --leg, because a verdict that names no check cannot be compared against the playbook's declared set"
-hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg L)" "--record-piece requires --verdict, because an absent one is indistinguishable from a check that never ran"
 hit "$(run --record-piece tRun --records-root recs --path pc/nope.md --leg L --verdict PASS)" "a piece record names a path that is not a file in this tree, so the hash it joins on does not exist and the record would describe nothing - path follows:"
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg L --verdict MAYBE)" "a piece verdict is outside the closed set, and a verdict nobody can compare is a record that reads as evidence while carrying an opinion - legal values are PASS FAIL NA, given:"
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'a · b' --verdict PASS)" "a piece record field spells the record's own field separator, which makes the row unparseable by the check that grades it - the four fields tested follow: leg ["
@@ -5344,18 +5455,12 @@ same "the record carries the piece it joins to" "$(sed -n 's/^piece: //p' recs/*
 same "the record carries the piece HASH, not a placeholder" "$(sed -n 's/^hash: //p' recs/*.md | head -1)" "$(git hash-object pc/one/piece.md)"
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg L --verdict PASS)" "piece verdict unchanged"
 
-# ---- and the SLUG caller refuses with no run-state file, which is what makes the attended path need
-# ---- a second CALLER rather than a second implementation.
-rm -f memory/builds/tRun/RUN.md
-hit "$(run --record-piece tRun --path pc/one/piece.md --leg L --verdict PASS)" "no run-state file, so there is no run to record a piece against - the attended path calls the records-root form of this writer instead, which is why there is one function and two callers:"
 reset_tree
 
 # ---- check 47, the SET writer. Same shape as the piece writer's arms: every refusal, then the
 # ---- passing direction, because refusal arms alone are satisfied by a writer that refuses all.
 reset_tree
 mkdir -p recs2; git add -A >/dev/null
-hit "$(run --record-set tRun --records-root recs2 --verdict PASS)" "--record-set requires --leg, because a set verdict that names no check cannot be compared against the playbook's declared set"
-hit "$(run --record-set tRun --records-root recs2 --leg S)" "--record-set requires --verdict, because an absent one is indistinguishable from a check that never ran"
 hit "$(run --record-set tRun --records-root recs2 --leg S --verdict MAYBE)" "a set verdict is outside the closed set, and a verdict nobody can compare is a record that reads as evidence while carrying an opinion - legal values are PASS FAIL NA, given:"
 out=$(run --record-set tRun --records-root recs2 --run R1 --leg S --verdict PASS)
 hit "$out" "set verdict recorded"
@@ -5485,10 +5590,6 @@ hit "$(run --record-set tDoD2 --records-root recs4 --run R9 --leg honest --verdi
 same "...and the second re-stamp is staged too" "$(git diff --name-only -- recs4)" ""
 reset_tree
 
-# ---- and the SLUG callers refuse without a run-state file, which is what makes the attended path a
-# ---- second CALLER rather than a second implementation.
-rm -f memory/builds/tRun/RUN.md
-hit "$(run --record-set tRun --leg S --verdict PASS)" "no run-state file, so there is no run to record a set against - the attended path calls the records-root form of this writer instead:"
 reset_tree
 
 # ---- the RECORDS ROOT comes from the playbook the run is bound to, at BASE. A run bound to a
@@ -6000,19 +6101,12 @@ rm -rf "$stubdir"
 
 
 
-# ---- THE THREE NEW REFUSALS, each armed by a POSITIVE assertion naming its own failure text. All
-# ---- three are REACHABLE, which is why none of them is pinned: the registry's contract is that a pin
+# ---- THE TWO REMOTE-OBSERVATION REFUSALS, each armed by a POSITIVE assertion naming its own failure
+# ---- text; the scratch-file third went to `print_env_failure` at TOOL-aSparedSpawn-14. Both are
+# ---- REACHABLE, which is why neither is pinned: the registry's contract is that a pin
 # ---- means no fixture CAN reach a branch, and "chose not to" is a different fact wearing the same
 # ---- row. Two of them are reached by a stub `git` ahead of the real one on PATH, which is the only
 # ---- fixture that can make a remote observation fail in a chosen WAY rather than merely fail.
-
-echo "MARK arm-mktemp" >&2
-# ---- the scratch file the bound needs. Without a file to capture into there is no bound, so the
-# ---- observation is refused rather than run unbounded — the one case where failing to allocate is
-# ---- safer than proceeding. Reached with a TMPDIR that does not exist, which is what mktemp reads.
-bcopen
-out=$(TMPDIR="$TMP/no-such-dir-for-mktemp" bash "$SCRIPT" --close tRun 2>&1)
-hit "$out" "cannot create a scratch file to capture the remote advertisement, so the observation cannot be bounded and an unbounded one is what this refuses"
 
 echo "MARK arm-timeout" >&2
 # ---- the TIMEOUT refusal, and it says timeout rather than failure on purpose: "the remote did not
@@ -6199,10 +6293,6 @@ mkdir -p memory/builds/tRun/prompts memory/builds/tRun/spec
 printf 'a brief
 ' > memory/builds/tRun/prompts/armbrief.md
 git add memory/builds/tRun/prompts/armbrief.md >/dev/null 2>&1
-o=$(run --brief tRun --path memory/builds/tRun/prompts/armbrief.md)
-n=$((n+1)); case "$o" in *"--brief requires --unit, because a brief naming no unit records what SOME agent was handed and joins to nothing"*) echo "ok   brief: --unit is required" ;; *) echo "FAIL brief: --unit is required -- $o"; st=1 ;; esac
-o=$(run --brief tRun --unit ARCH-tRun-1)
-n=$((n+1)); case "$o" in *"--brief requires --path, because the brief is the FILE and a row with no path records that one existed"*) echo "ok   brief: --path is required" ;; *) echo "FAIL brief: --path is required -- $o"; st=1 ;; esac
 o=$(run --brief tRun --unit ARCH-tRun-404 --path memory/builds/tRun/prompts/armbrief.md)
 n=$((n+1)); case "$o" in *"--brief names a unit the build README's generated units region does not carry, so the brief joins to no unit of this build"*) echo "ok   brief: a unit off the roster is refused" ;; *) echo "FAIL brief: a unit off the roster is refused -- $o"; st=1 ;; esac
 o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/gone.md)
@@ -6267,12 +6357,8 @@ o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 n=$((n+1)); case "$o" in *"a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: "*" spells ["*) echo "ok   order verb: a malformed value is REFUSED, not truncated to its prefix" ;; *) echo "FAIL order verb: a malformed value is REFUSED, not truncated to its prefix -- $o"; st=1 ;; esac
 rm -f memory/builds/tRun/spec/one.md
 
-# A slug with a README and NO run-state file, and one with neither: the two preconditions the
-# verb tests before it looks at anything the caller passed.
-mkdir -p memory/builds/tNoRun
-readme tNoRun
-o=$(run --brief tNoRun --unit ARCH-tNoRun-1 --path memory/builds/tRun/prompts/armbrief.md)
-n=$((n+1)); case "$o" in *"no run-state file, so there is no run to record a brief against"*) echo "ok   brief: a build with no run-state file has no run to record against" ;; *) echo "FAIL brief: a build with no run-state file has no run to record against -- $o"; st=1 ;; esac
+# A slug with a run-state file and NO README: the precondition the verb tests before it looks at
+# anything the caller passed. A missing run-state file is `check_run_state`'s (TOOL-aSparedSpawn-14).
 mkdir -p memory/builds/tNoRm
 runmd tNoRm "$MANDATE"
 o=$(run --brief tNoRm --unit ARCH-tNoRm-1 --path memory/builds/tRun/prompts/armbrief.md)
@@ -6522,12 +6608,10 @@ n=$((n+1)); [ -z "$(grep -n 'decision|abort|override|waiver' "$SCRIPT")" ]   || 
 echo "MARK halt-code" >&2
 # ---- THE HALT CODE ON --abort. A single ABORTED terminal said a run stopped and never said why: the
 # ---- reason was free prose in a parked entry, which the owner reads and no check does. The code is
-# ---- REQUIRED and VALIDATED, and both refusals name the legal set — a validated vocabulary whose
-# ---- refusal does not say what is legal costs the operator a source read.
+# ---- REQUIRED and VALIDATED: a missing code is the required-flag reader's refusal, and an unknown
+# ---- one's names the legal set — a validated vocabulary whose refusal does not say what is legal
+# ---- costs the operator a source read.
 bcopen
-out=$(run --abort tRun --reason "stopped for a stated reason")
-hit "$out" "--abort requires --code, because a single ABORTED terminal says a run stopped and never says why; the reason is prose for the owner and the code is the field every reader joins on"
-same "a refused abort wrote nothing" "$(grep -c '^halt-code: ' memory/builds/tRun/RUN.md)" "0"
 
 bcopen
 out=$(run --abort tRun --reason "stopped for a stated reason" --code not-a-real-code)
@@ -6903,10 +6987,8 @@ same "the ceiling fires before a bound equal to it"           "$(review_state '9
 
 # ---- the verb's refusals, on disk
 bcopen
-hit "$(run --review tNoSuchBuild --subject S1 --verdict BLOCKED --blockers 1)" "no run-state file, so there is no run to record a review round against"
 hit "$(run --review tRun --subject S1 --verdict MAYBE --blockers 1)" "--review names a verdict outside the closed set, and a verdict nothing can compare is prose in a field; legal verdicts"
 hit "$(run --review tRun --subject S1 --verdict BLOCKED)" "--review requires --blockers as a plain integer, because the predicate compares this round's count against the previous one and cannot compare prose"
-hit "$(run --review tRun --verdict BLOCKED --blockers 1)" "--review requires --subject, because the convergence predicate is per SUBJECT and a round with no subject cannot be sequenced against anything"
 crdrop
 same "a refused round wrote nothing" "$(grep -c 'review · item' memory/builds/tRun/RUN.md)" "0"
 # the SUBJECT is free text from the caller, and leg check 11 greps this file WHOLE for the declared
@@ -7763,7 +7845,6 @@ n=$((n+1)); [ "$_rc" = 2 ] || { echo "FAIL the missing-library refusal did not e
 rm -rf "$_nolib"
 
 hit "$(run --dispatch tRun --pass notanid --writes ${PFX}a.sh)" "--dispatch was given a --pass value that is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id:"
-hit "$(run --dispatch tRun --pass ARCH-tRun-1)" "--dispatch requires at least one --writes path, because a declaration naming nothing is not a disjointness proof:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes /etc/passwd)" "--dispatch was given an absolute --writes path, and a declaration is repo-relative or it names a file no comparison can find:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ../outside.sh)" "--dispatch was given a --writes path that escapes the repository, which no pass may declare and no comparison can bound:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes 'two words/x.sh')" "--dispatch was given a --writes path containing whitespace, which the declaration's own field separator cannot carry, so the leg would split it into paths nobody declared:"
@@ -7795,9 +7876,6 @@ run --attest tRun --item keepalive-reaped >/dev/null 2>&1
 run --attest tRun --item parked-decisions-surfaced >/dev/null 2>&1
 run --abort tRun --reason stop --code fork-unresolvable >/dev/null 2>&1
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)" "the run is already finished and a finished record is not something to move, re-open or re-pin"
-build_specced_tree; rm -f memory/builds/tRun/RUN.md
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)" "no run-state file, so there is no run to declare a dispatch against:"
-
 # ---- TOOL-aProbedUnit-3: `--audit`, the dispatched-unit stall probe. One line per unit whose LATEST
 # ---- dispatch row is still open, the tree's two clocks, and a verdict against UNIT_STALL_BOUND.
 # ---- Every arm below is the driver over the scratch repo; the fixture is the one the `--dispatch`
@@ -7849,11 +7927,6 @@ out=$(PATH="$TMP/stub:$PATH" bash "$SCRIPT" --audit tRun 2>&1); rc=$?
 same "AC5 a dead mtime probe exits 1" "$rc" "1"
 hit "$out" "the audit cannot measure idle time on this node, because a probe it needs answered nothing, so neither verdict is answerable and a zero from a dead probe would read as written-just-now:"
 miss "$out" "· PROGRESSING"
-# AC5, first branch — no run-state file.
-reset_tree
-out=$(run --audit tNoRun); rc=$?
-same "AC5 no run-state file exits 1" "$rc" "1"
-hit "$out" "no run-state file, so there is no dispatched unit to audit for idleness:"
 # AC5, second branch — a terminal record. Not `refuse_if_terminal`: its sentence says the verb would
 # REWRITE the record, and this verb rewrites nothing, so that sentence would be false here.
 build_audit_fixture
@@ -7966,10 +8039,6 @@ same "task AC8 a relative heartbeat exits 1" "$rc" "1"
 hit "$out" "--register-task was given a relative --heartbeat path, and the audit reads it from the run's own worktree while the task may beat in another, so only an absolute path names one file from both:"
 hit "$(run --register-task tRun --task "$(printf 'le\tg')" --heartbeat "$TK_BEAT")" "a task name or heartbeat path carries a tab or a newline, and the registry is one tab-separated row per act, so it would forge a field or a row nothing registered"
 same "task AC8 no row was appended" "$([ -e "$TK_REG" ] && echo row || echo none)" "none"
-hit "$(run --register-task tRun --heartbeat "$TK_BEAT")" "--register-task requires --task, because a task with no name is a STALLED line nobody can act on"
-hit "$(run --register-task tRun --task leg-a)" "--register-task requires --heartbeat, because a task with no heartbeat file is the silent background work this registry exists to end"
-hit "$(run --register-task tNoRun --task leg-a --heartbeat "$TK_BEAT")" "no run-state file, so there is no run to register a background task against:"
-hit "$(run --release-task tRun)" "--release-task requires --task, because a release naming nothing closes nothing"
 # AC1 — a heartbeat written one second earlier is PROGRESSING.
 echo beat > "$TK_BEAT"; touch -d "@$(( $(date -u +%s) - 1 ))" "$TK_BEAT"
 out=$(run --register-task tRun --task leg-a --heartbeat "$TK_BEAT"); rc=$?
@@ -8010,11 +8079,7 @@ same "task AC4 absent heartbeat PROGRESSING" "$(printf '%s\n' "$out" | grep -c '
 mutate "$TK_REG" "\$s/^[^\t]*\tregister/$(date -u -d "@$(( $(date -u +%s) - 3600 ))" +%Y-%m-%dT%H:%M:%SZ)\tregister/"
 out=$(run --audit tRun)
 same "task AC4 absent heartbeat STALLED" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: task leg-a · .* · last-beat none · STALLED$')" "1"
-# ...an append that fails is a refusal naming the registry, never a silent unrecorded act.
 run --release-task tRun --task leg-a >/dev/null
-mv "$TK_REG" "$TK_REG.held"; mkdir "$TK_REG"
-hit "$(run --register-task tRun --task leg-b --heartbeat "$TK_BEAT")" "cannot append to the task registry, so the act is not recorded and the audit would not see it:"
-rmdir "$TK_REG"; mv "$TK_REG.held" "$TK_REG"
 # AC7 — a zero bound exits 2 through `read_bound_key`; an absent key NOTEs the 5400s default.
 mkconf "true" "true" "" "3600" "" "1800" "7" "5400" "" "1800" "6" "0"
 out=$(run --audit tRun); rc=$?
@@ -8372,13 +8437,7 @@ hit "$out" "last-stall: 2026-09-16T00:00:00Z fixture-session rate_limit {}"
 rm -f "$SIDECAR/stall.tRun.log"
 out=$(run --liveness tRun)
 hit "$out" "last-stall: none"
-# AC1 — no run-state file is check 52's first sentence and no verdict; no slug is check_slug's.
-reset_tree
-out=$(run --liveness tNoRun); rc=$?
-same "AC1 no run-state file exits 1" "$rc" "1"
-hit "$out" "UNATTENDED check 52 FAILED"
-hit "$out" "no run-state file, so there is no run whose liveness can be graded:"
-miss "$out" "verdict:"
+# AC1 — no slug is check_slug's.
 out=$(run --liveness); rc=$?
 same "AC1 no slug exits 1" "$rc" "1"
 hit "$out" "UNATTENDED check 1 FAILED"
@@ -8487,9 +8546,6 @@ reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 out=$(run --rescope tRun --act sideways --item ARCH-tRun-1 --reason r)
 hit "$out" "--rescope --act takes one of retire, supersede, add or defer, and a value outside that closed set may not select one by default:"
 
-out=$(run --rescope tRun --act retire --item ARCH-tRun-1)
-hit "$out" "--rescope requires --reason, because an amendment recording no reason is indistinguishable from one nobody meant - the same argument --park and --waive already make:"
-
 out=$(run --rescope tRun --act retire --item notanid --reason r)
 hit "$out" "--rescope --unit is not id-shaped by the driver's own spelling, so the row would name something no roster can carry:"
 
@@ -8525,11 +8581,6 @@ run --attest tRun --item parked-decisions-surfaced >/dev/null 2>&1
 run --abort tRun --reason "stop" --code fork-unresolvable >/dev/null 2>&1
 out=$(run --rescope tRun --act retire --item ARCH-tRun-1 --reason r)
 hit "$out" "the run is already finished and a finished record is not something to move, re-open or re-pin"
-
-# ...with no run-state file at all there is no run to amend.
-reset_tree; rm -f memory/builds/tRun/RUN.md
-out=$(run --rescope tRun --act retire --item ARCH-tNone-1 --reason r)
-hit "$out" "no run-state file, so there is no run to record an amendment against:"
 
 # ---- TOOL-aBoundedCeiling-6: run_bounded is a bound on the CLOCK, not on the verdict -------------
 # The message was always the correct half of memory/gotchas/bounded-through-a-pipe-is-unbounded.md,
@@ -8577,28 +8628,35 @@ write_proc_record() { :; }
 # shellcheck disable=SC1090
 . "$rb_fn"
 
-# ...a plain child that outlives the bound is KILLED, and the WALL CLOCK reflects it. Compared
-# against a 30 s sleeper with a 2 s bound. THE WINDOW IS DECIDED BY A MEASUREMENT, not by taste:
-# the CORRECT construct was measured on node `a` at 12 s under heavy ambient load against that same
-# 2 s bound -- kill-path and scheduling overhead, which does NOT shrink when the sleeper does. So the
-# valid window is (12, sleeper), and a 10 s sleeper made it empty. 30 s gives a real window at half
-# the cost of the 60 s original, which mattered: the control BLOCKS for its full sleep by
-# construction, and this suite's declared budget is 970 s against a measured 906 s.
-_t0=$(date +%s); run_bounded bash -c 'sleep 30' >/dev/null 2>&1; _rc=$?; _t1=$(date +%s)
+# ...a plain child that outlives the bound is KILLED before it can finish. ORDERED ON A MARKER, NOT
+# A WINDOW (TOOL-aSparedSpawn-15 S5): each sleeper writes a marker only when it finishes ON ITS OWN,
+# so "run_bounded returned before the sleeper finished" is the marker being ABSENT at the return,
+# and "the control waited for it" is the marker being PRESENT. The elapsed-time windows these arms
+# used (under 20 s, at least 20 s, against a 2 s bound) were sized from a measurement of 12 s under
+# load and redded on a heavier day. A subject's sleeper is 60 s at no cost, since nothing waits for
+# it, and it is killed through its recorded pid after the assertion; its `wait` then fails, so the
+# kill writes no marker. The control's stays at 30 s, because the control BLOCKS for it by
+# construction.
+_rbm=$TMP/rb-marks; rm -rf "$_rbm"; mkdir -p "$_rbm"
+run_bounded bash -c 'sleep 60 & echo $! > "$1"; wait $! && : > "$2"' _ "$_rbm/child.pid" "$_rbm/child.done" >/dev/null 2>&1; _rc=$?
 n=$((n+1))
-[ $(( _t1 - _t0 )) -lt 20 ] || { echo "FAIL run_bounded took $(( _t1 - _t0 ))s against a 2s bound — the bound is on the verdict, not the clock"; st=1; }
+[ ! -e "$_rbm/child.done" ] || { echo "FAIL run_bounded returned only after its 60 s child finished on its own against a 2s bound — the bound is on the verdict, not the clock"; st=1; }
 n=$((n+1))
 case "$_rc" in 124|137) ;; *) echo "FAIL run_bounded returned $_rc for a killed command; 124 or 137 expected"; st=1 ;; esac
+_rbp=""; { read -r _rbp < "$_rbm/child.pid"; } 2>/dev/null; [ -z "$_rbp" ] || kill "$_rbp" 2>/dev/null
 
 # ...and a backgrounded GRANDCHILD does not hold it, which is the actual defect. The CONTROL is the
-# same command through a command substitution: if the control also returns fast, this host does not
-# reproduce the class and the arm above proved nothing, so that is a FAIL and not a pass.
-_t0=$(date +%s); run_bounded bash -c 'sleep 30 & exit 0' >/dev/null 2>&1; _t1=$(date +%s)
-_t2=$(date +%s); _ctl=$(timeout -k 5s 2 bash -c 'sleep 30 & exit 0' 2>&1); _t3=$(date +%s)
+# same command through a command substitution: if its marker is ABSENT when the substitution
+# returns, this host does not reproduce the class and the arm above proved nothing, so that is a
+# FAIL and not a pass.
+run_bounded bash -c '( sleep 60 & echo $! > "$1"; wait $! && : > "$2" ) & exit 0' _ "$_rbm/grand.pid" "$_rbm/grand.done" >/dev/null 2>&1
 n=$((n+1))
-[ $(( _t1 - _t0 )) -lt 20 ] || { echo "FAIL run_bounded blocked $(( _t1 - _t0 ))s on a backgrounded grandchild — bounded-through-a-pipe-is-unbounded"; st=1; }
+[ ! -e "$_rbm/grand.done" ] || { echo "FAIL run_bounded blocked until its backgrounded grandchild finished on its own — bounded-through-a-pipe-is-unbounded"; st=1; }
+_rbp=""; { read -r _rbp < "$_rbm/grand.pid"; } 2>/dev/null; [ -z "$_rbp" ] || kill "$_rbp" 2>/dev/null
+_ctl=$(timeout -k 5s 2 bash -c '( sleep 30 & wait $! && : > "$1" ) & exit 0' _ "$_rbm/ctl.done" 2>&1)
 n=$((n+1))
-[ $(( _t3 - _t2 )) -ge 20 ] || { echo "FAIL the CONTROL returned in $(( _t3 - _t2 ))s, so this host does not reproduce the pipe defect and the grandchild arm graded nothing"; st=1; }
+[ -e "$_rbm/ctl.done" ] || { echo "FAIL the CONTROL returned before its grandchild finished, so this host does not reproduce the pipe defect and the grandchild arm graded nothing"; st=1; }
+rm -rf "$_rbm"
 
 # ...a command that finishes INSIDE the bound is not killed and its output survives.
 run_bounded bash -c 'echo alive; exit 0'; _rc=$?
@@ -8624,6 +8682,9 @@ n=$((n+1))
 [ "$_rc" = 3 ] || { echo "FAIL an INERT bound changed the command exit status to $_rc; 3 expected"; st=1; }
 hit "$RB_OUT" "ran-unbounded"
 rm -f "$rb_fn"
+# TOOL-aSparedSpawn-6: the block above left doubles of driver functions in this shell, or unset
+# them. Re-sourcing the driver restores every definition before an in-process call can meet one.
+. "$SCRIPT"
 
 # ...and the BOUND REACHES ITS VERBS, which the helper arms above cannot show. spec-6 AC1 and AC5.
 # Asserted as ELAPSED TIME against a 30 s sleeper with a 2 s bound: the message was always the
@@ -9058,6 +9119,9 @@ n=$((n+1))
 RB_ERR=""
 same "an empty notice stream yields no tail at all, not a bare header" "$(read_stderr_tail)" ""
 rm -f "$sp_fn"
+# TOOL-aSparedSpawn-6: the block above left doubles of driver functions in this shell, or unset
+# them. Re-sourcing the driver restores every definition before an in-process call can meet one.
+. "$SCRIPT"
 
 # ---- ...and the two-stream capture reaches the CALLERS that print it whole. TOOL-dDerivedDocket-48
 # ---- AC3. Each stub writes one known line to each stream and each refusal must quote BOTH: RB_OUT
@@ -10104,14 +10168,6 @@ reset_tree
 # ---- literal run `check-arms.py` derives, not the clause a reader would stop at: an arm that stops
 # ---- at the last word of a sentence reads as unarmed and the meta-gate says so with no hint why.
 build_hold_fixture; before=$(sum)
-out=$(run --hold tNoSuchBuild --code platform-limit --until owner --reason "x" --reaped k1)
-hit "$out" "no run-state file, so there is no run to hold"
-out=$(run --hold tRun --until owner --reason "x" --reaped k1)
-hit "$out" "--hold requires --code, because a paused run that does not say why it paused is indistinguishable from one that stopped, and the code is the field the checkpoint and any resume scheduler both join on"
-out=$(run --hold tRun --code platform-limit --reason "x" --reaped k1)
-hit "$out" "--hold requires --until, because a pause with no release condition is a stop wearing a pause's name; the grammar is after <utc-instant>, probe host|gate|api, or owner"
-out=$(run --hold tRun --code platform-limit --until owner --reaped k1)
-hit "$out" "--hold requires --reason, because the code is what every machine reader joins on and the reason is the only sentence the owner gets in place of the turn nobody took"
 out=$(run --hold tRun --code platform-limit --until owner --reason "I would have reached for --no-verify" --reaped k1)
 hit "$out" "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar for as long as the hold lasts; say it without the literal flag"
 same "every --hold argument refusal wrote nothing" "$(sum)" "$before"
@@ -10139,8 +10195,6 @@ out=$(run --resume tRun --keepalive-id k1)
 hit "$out" "lease recorded · keepalive k1 · session none -> fixture-session"
 rm -f "$TMP/.git/unattended"
 
-out=$(run --resume tNoSuchBuild --keepalive-id kC)
-hit "$out" "no run-state file, so there is no run to resume"
 
 # ---- a LEFTOVER lease file, malformed or not, is never read (TOOL-dDerivedDocket-61 §4 Migration):
 # ---- the holder resumes on the run-state facts and writes nothing.
@@ -10269,8 +10323,6 @@ out=$(run --handoff tRun --reason r --reaped k1)
 hit  "$out" "--handoff takes --code owner-landing or --code owner-decision and no other"
 hit  "$out" "an --abort: none"
 same "AC3 a refused code wrote nothing" "$(sum)" "$before"
-out=$(run --handoff tNoSuchBuild --code owner-landing --reason r --reaped k1)
-hit  "$out" "no run-state file, so there is no run to hand off"
 
 # ---- AC4: the attribution guard. An OWN red is refused through fail 83 naming the leg; an
 # ---- all-INHERITED red is admitted; a record naming no bar is refused through fail 83's own branch.
@@ -10424,7 +10476,7 @@ SUR
 su_unit=$(git -C "$su_dir" rev-parse unit)
 su_base=$(git -C "$su_dir" rev-parse main)
 SU_R=memory/builds/tRun/RUN.md
-run_su() { ( cd "$su_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main bash "$SCRIPT" "$@" 2>&1 ); }
+run_su() { ( cd "$su_dir" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main && run_main_at_head run_driver "$@" 2>&1 ); }
 run_su_git() { git -C "$su_dir" "$@"; }
 run_su_leg() { ( cd "$su_dir" && GOV_UNATTENDED_REPORT=1 bash "$HERE/check-unattended.sh" --skip 28 2>&1 ); }
 read_su_sum() { run_su_git hash-object "${1:-$SU_R}"; }
@@ -10599,9 +10651,8 @@ same "AC10 the settle path is derived and repo-relative" \
   "$(printf '%s\n' "$su_row" | sed -n 's/.* && bash \(.*\)unattended\.sh --settle tRun$/\1/p')" "$KIT_REL/"
 hit  "$(cat "$su_out/handoff.out")" "unattended: once an owner has landed it, the record is settled by the recipe's last command - bash $KIT_REL/unattended.sh --settle tRun"
 
-# ---- The settle's own refusals: no record; a record differing from HEAD; a recorded LANDING; and a
-# ---- hand-off nobody has landed yet. Each writes nothing.
-hit "$(run_su --settle tNoSuchBuild)" "no run-state file, so there is no run to settle"
+# ---- The settle's own refusals: a record differing from HEAD; a recorded LANDING; and a hand-off
+# ---- nobody has landed yet. Each writes nothing. A missing record is `check_run_state`'s.
 write_su_handoff owner-landing
 add_facts "$su_dir/$SU_R" "note: an edit nobody committed"
 su_b=$(read_su_sum)
@@ -11227,7 +11278,7 @@ G62_W="$ORIGIN_DIR/g62-wave"
 G62_LEDGER="$DD_CD/unattended/tRun.procs"
 add_wave_worktree() { rm -rf "$G62_W"; git worktree add -q -b wave "$G62_W" >/dev/null 2>&1 || { echo "FAIL fixture: git worktree add failed under $G62_W"; st=1; }; }
 remove_wave_worktree() { git worktree remove --force "$G62_W" >/dev/null 2>&1; git worktree prune; rm -rf "$G62_W"; git branch -q -D wave 2>/dev/null; }
-run_wave() { ( cd "$G62_W" && run_main_at_head bash "$SCRIPT" "$@" 2>&1 ); }
+run_wave() { ( cd "$G62_W" && run_main_at_head run_driver "$@" 2>&1 ); }
 G62_MAIN=$(git worktree list --porcelain | sed -n 's/^worktree //p' | head -n 1)
 
 # ---- AC4: from the sibling, the take-over and the no-id resume are refused at 58 naming the run's
@@ -11467,7 +11518,7 @@ ip_out=$(mktemp -d)
 # helper once carried was written through a heredoc that halved its backslash, and the literal
 # `\n` it left became an unquoted `n` - so `env` ran a command named `n` and every arm below it
 # graded the driver's absence.
-iprun() { ( cd "$ip_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" bash "$SCRIPT" "$@" 2>&1 ); }
+iprun() { ( cd "$ip_dir" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" && run_main_at_head run_driver "$@" 2>&1 ); }
 ipgit() { git -C "$ip_dir" "$@"; }
 ipreset() {
   # FORCED: a refused or `primary` close leaves its record staged, a plain checkout refuses over it,
@@ -11783,17 +11834,6 @@ out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
 same "the red landing bar left the record RUNNING" "$(sed -n 's/^phase: //p' "$ip_dir/memory/builds/tRun/RUN.md")" "RUNNING"
 ipgit checkout -q --detach "$ip_base"; ipgit push -q -f origin HEAD:main; ipgit checkout -q unit
-
-# ---- S5's refusal: the close evaluated everything and then could not commit. Staged by a pre-commit
-# ---- hook that refuses, which spec §4 step 4 says the close commit runs "as for any commit". Unsetting
-# ---- the fixture's identity was the first cut, and git fell back to the node's GLOBAL identity and
-# ---- committed, so the arm graded the machine; `core.hooksPath` is local, so it outranks a global one.
-ipprep ""
-mkdir -p "$ip_out/hooks"; printf '#!/bin/sh\necho "fixture pre-commit: refused"\nexit 1\n' > "$ip_out/hooks/pre-commit"
-chmod +x "$ip_out/hooks/pre-commit"; ipgit config core.hooksPath "$ip_out/hooks"
-out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
-hit "$out" "the close evaluated the whole Definition of Done and then could not commit its own record, so the phase is written and staged but does not travel; the commit's own output follows"
-ipgit config --unset core.hooksPath
 
 # ---- S7: under `primary` every verb behaves as it did at BASE — no probe, no carry check, no
 # ---- commit, and no GATE_FULL in the bar's environment. This is the control the whole unit rests on.
@@ -12673,6 +12713,9 @@ AC15IDL
   cd "$TMP" || exit 2
   rm -rf "$ac15_dir"
 fi
+# TOOL-aSparedSpawn-6: the block above left doubles of driver functions in this shell, or unset
+# them. Re-sourcing the driver restores every definition before an in-process call can meet one.
+. "$SCRIPT"
 askreset
 
 fi   # ---- region 7 continues below: one compound block past about 3000 commands segfaults
@@ -13312,7 +13355,7 @@ DL_R=memory/builds/tRun/RUN.md
 # The node's LANDED LOG, where in-place `--landed` keeps its observation (TOOL-dDerivedDocket-61 S10);
 # it replaced the retired per-slug lease file this fixture used to reset.
 DL_LOG="$dl_dir/.git/unattended/landed.tRun.log"
-run_dl() { ( cd "$dl_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main DLOUT="$dl_out" bash "$SCRIPT" "$@" 2>&1 ); }
+run_dl() { ( cd "$dl_dir" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main DLOUT="$dl_out" && run_main_at_head run_driver "$@" 2>&1 ); }
 run_dl_git() { git -C "$dl_dir" "$@"; }
 read_dl_sum() { run_dl_git hash-object "$DL_R"; }
 init_dl_fixture() {
@@ -13803,7 +13846,7 @@ IHS
   git add -A >/dev/null && git commit -q -m base --no-verify
   git push -q origin main
 ) >/dev/null 2>&1
-run_ih() { ( cd "$ih_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IHOUT="$ih_out" IHMAN="$TOOL_REL/gate-legs.json" bash "$SCRIPT" "$@" 2>&1 ); }
+run_ih() { ( cd "$ih_dir" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main IHOUT="$ih_out" IHMAN="$TOOL_REL/gate-legs.json" && run_main_at_head run_driver "$@" 2>&1 ); }
 run_ih_repo() { git -C "$ih_dir" "$@"; }
 IHOVR="--override closing-review-recorded --reason fixture-has-no-review --override build-complete --reason fixture-unit-is-open"
 # R's policy body on main, pushed; a fresh unit branch on top of it, preflighted and attested; sets
@@ -14150,6 +14193,9 @@ hit  "$(cat "$f4_dir/memory/builds/tRun/BACKLOG.md")" "- KEEP · ARCH-tRun-1 · 
 hit  "$(cat "$f4_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the default branch"
 unset -f write_inherited_asks write_backlog_rows write_ask_rows read_leg_argv derive_ask_seq read_ask_back write_ask_views run_f4_filer seed_f4_tree
 rm -rf "$f4_dir" "$TMP/f4-authored.md" "$TMP/f4-not-a-dir" "$TMP/f4-shim"
+# TOOL-aSparedSpawn-6: the block above left doubles of driver functions in this shell, or unset
+# them. Re-sourcing the driver restores every definition before an in-process call can meet one.
+. "$SCRIPT"
 
 # TOOL-aMendedFleet-9: THE DAILY HELD JOB'S REDS. SLICED, with the reader shadowed and ASKS_CMD blank,
 # so the writer only PRINTS what it would file. The key is read at R: blank is DARK and a bad shape is
@@ -14161,7 +14207,7 @@ h9_dir=$(mktemp -d)
     && printf -- '---\nslug: tRun\nroster: ARCH\n---\n' > memory/builds/tRun/README.md \
     && printf 'HELD_CI_WORKFLOW=""\n' > .unattended.conf && git add -A && git commit -q -m blank --no-verify ) >/dev/null 2>&1
 slice_fn write_held_asks; slice_fn read_policy_key; slice_fn read_roster_family
-readme_of() { printf '%s/builds/%s/README.md' "$M" "$1"; }
+readme_of() { _readme="$M/builds/$1/README.md"; printf '%s' "$_readme"; }
 read_leg_argv() { return 1; }
 derive_ask_seq() { printf '7'; }
 read_held_reds() { echo "$2" >> "$h9_dir/.git/h9-calls"; [ -z "$H9_ROWS" ] || printf '%s\n' "$H9_ROWS"; echo "held reader: run 9 at stub · 4 held job(s) read · 3 red"; }
@@ -14199,6 +14245,9 @@ n=$((n+1)); [ ! -e "$h9_dir/memory/builds/tRun/BACKLOG.md" ] || { echo "FAIL hel
 unset -f write_held_asks read_policy_key read_roster_family readme_of read_leg_argv derive_ask_seq read_held_reds run_h9
 unset H9_ROWS
 rm -rf "$h9_dir"
+# TOOL-aSparedSpawn-6: the block above left doubles of driver functions in this shell, or unset
+# them. Re-sourcing the driver restores every definition before an in-process call can meet one.
+. "$SCRIPT"
 
 # AC21 and AC23: under park with the witness set, the rows are staged beside the hold line; commit,
 # push, reap and hold as the line says, and the hold is accepted. Resumed and closed again over the
@@ -14656,14 +14705,18 @@ read_pl_token() { # pid -> its procfs start token, or `-`
 # THE TOKEN ONCE THE EXEC HAS HAPPENED (TOOL-aGraftedHelix-34 S5). On this platform an exec replaces
 # the Windows process behind a pid and the procfs start token moves with it, so a token read the
 # moment `&` returns is the forked shell's whenever the box is loaded: measured 3 of 30 under twelve
-# fork loops, 0 of 30 idle. Waits on the OBSERVED image, `(<comm>)` in the stat line, bounded at 100
-# polls of 0.1 s; `-` past the bound, which the caller asserts against.
+# fork loops, 0 of 30 idle. Waits on the OBSERVED image, `(<comm>)` in the stat line, up to the
+# 120 s hang bound; `-` past the bound, which the caller asserts against.
+# THIS POLL AND THE TWO IN `write_pl_orphan` EXIT ON THEIR FACT, so each bound is a HANG BOUND of
+# 120 s the pass path never reaches (TOOL-aSparedSpawn-15 S6). They were about 10 s, 30 s and 15 s,
+# counted in polls whose turns spawn, and a spawn on a loaded node `a` costs 632 to 818 ms.
+PL_HANG=120
 read_pl_exec_token() { # pid · comm -> its start token once it runs <comm>, or `-`
-  local l i=0
-  while [ "$i" -lt 100 ]; do
+  local l end=$(( EPOCHSECONDS + PL_HANG ))
+  while [ "$EPOCHSECONDS" -lt "$end" ]; do
     { IFS= read -r l < "/proc/$1/stat"; } 2>/dev/null || break
     case "$l" in *"($2)"*) read_pl_token "$1"; return 0 ;; esac
-    sleep 0.1; i=$((i + 1))
+    sleep 0.1
   done
   printf -- '-'
 }
@@ -14690,24 +14743,24 @@ init_pl_fixture() {
 # names it. Sets PL_ORPH, the recorded wrapper left running, and PL_KIDS, its descendants once the stub
 # sleeps — the wrapper, then `timeout`, then the stub, which exists a moment after the record does.
 write_pl_orphan() { # sleep seconds
-  local _d _i=0 _k
+  local _d _k _end=$(( EPOCHSECONDS + PL_HANG ))
   PL_ORPH=""; PL_KIDS=""
   ( cd "$pl_dir" && exec env -u GATE_SELFTESTS -u UNATTENDED_PROCFS GOV_DEFAULT_BRANCH=main PLOUT="$pl_out" PL_SLEEP="$1" \
       ${PL_PROCFS:+UNATTENDED_PROCFS="$PL_PROCFS"} bash "$SCRIPT" --preflight tRun --keepalive-id k1 ) >/dev/null 2>&1 &
   _d=$!
-  while [ -z "$PL_ORPH" ] && [ "$_i" -lt 300 ]; do
+  while [ -z "$PL_ORPH" ] && [ "$EPOCHSECONDS" -lt "$_end" ]; do
     PL_ORPH=$(awk -v d="$_d" '$3 == d { print $1; exit }' "$PL_LEDGER" 2>/dev/null)
-    [ -n "$PL_ORPH" ] || { sleep 0.1; _i=$((_i + 1)); }
+    [ -n "$PL_ORPH" ] || sleep 0.1
   done
   kill -9 "$_d" 2>/dev/null; wait "$_d" 2>/dev/null
-  n=$((n+1)); [ -n "$PL_ORPH" ] || { echo "FAIL the killed driver $_d left no record in $PL_LEDGER, so every arm on this orphan grades nothing"; st=1; return 1; }
-  _i=0
-  while [ "$_i" -lt 150 ]; do
+  n=$((n+1)); [ -n "$PL_ORPH" ] || { echo "FAIL the killed driver $_d left no record in $PL_LEDGER within the ${PL_HANG} s hang bound, so every arm on this orphan grades nothing"; st=1; return 1; }
+  _end=$(( EPOCHSECONDS + PL_HANG ))
+  while [ "$EPOCHSECONDS" -lt "$_end" ]; do
     PL_KIDS=$(read_pl_kids "$PL_ORPH")
     for _k in $PL_KIDS; do grep -q '(sleep)' "/proc/$_k/stat" 2>/dev/null && return 0; done
-    sleep 0.1; _i=$((_i + 1))
+    sleep 0.1
   done
-  echo "FAIL the orphan $PL_ORPH never grew its sleeping stub, so the arms on it grade a tree that is not the one a bar leaves"; st=1
+  echo "FAIL the orphan $PL_ORPH never grew its sleeping stub within the ${PL_HANG} s hang bound, so the arms on it grade a tree that is not the one a bar leaves"; st=1
   return 1
 }
 true & pl_dead=$!; wait "$pl_dead"
@@ -15108,10 +15161,9 @@ hit  "$out" "phase LANDED (derived: "
 same "AC20 the in-place --landed writes landed too" "$(read_claim_field tRun status)" "landed"
 remove_claim_landing
 
-# ---- --beat: a missing record is its one refusal; off, it names the switch; on a LIVE run it skips a
-# ---- beat not yet due and renews one that is, one `beat —` line each.
+# ---- --beat: off, it names the switch; on a LIVE run it skips a beat not yet due and renews one that
+# ---- is, one `beat —` line each. Its missing-record refusal is `check_run_state`'s (TOOL-aSparedSpawn-14).
 reset_tree
-hit  "$(run --beat tFresh)" "no run-state file, so there is no run whose claim a beat could renew"
 run --preflight tRun --keepalive-id k1 >/dev/null
 hit  "$(run --beat tRun)" "unattended: beat — tRun · skipped: RUN_CLAIMS is off"
 build_claim_held
@@ -15159,7 +15211,7 @@ GK_HOOKS=$(mktemp -d); GK_BIN=$(mktemp -d); GK_GIT=$(command -v git)
 GK_GD=$(git rev-parse --absolute-git-dir)
 GK_JOURNAL="$(cd "$(git rev-parse --git-common-dir)" && pwd)/runlog/pushes.log"
 cp "$GK_SRC" "$GK_HOOKS/pre-push"; chmod +x "$GK_HOOKS/pre-push"
-run_hooked() { run_main_at_head env -u GOV_DEFAULT_BRANCH -u GOV_RUNLOG -u GOV_BRANCH_GATE_CMD bash "$SCRIPT" "$@" 2>&1; }
+run_hooked() { ( unset GOV_DEFAULT_BRANCH GOV_RUNLOG GOV_BRANCH_GATE_CMD && run_proc "$@" ); }   # the hook path: a process in every mode
 build_hooked_fixture() { arm_claim_fixture; git config core.hooksPath "$GK_HOOKS"; git remote set-head origin -a >/dev/null 2>&1
           rm -f "$GK_BIN/git" "$GK_GD/pre-push-refusal" "$GK_JOURNAL"; }
 read_hooked_journal() { tail -n 1 "$GK_JOURNAL" 2>/dev/null; }
@@ -15416,50 +15468,6 @@ out=$(run --beat tRun)
 hit  "$out" "unattended: beat — tRun · skipped: the claim is not this run's: tRun · node other · session s-other"
 miss "$out" "skipped: verdict"
 same "GH12 AC2 --beat over another session's live claim moves no ref" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gc_sha"
-# ---- TOOL-aGraftedHelix-19 S5: a mode outside CLAIM_MODES is refused before any claim write. The
-# ---- scratch driver REMOVES the existing member `status`, so the value keeps its case branch and
-# ---- only the membership test stands between `--hold` and the write: red when that test is gone.
-build_claim_held
-gc_drv=$(mktemp -d)
-sed 's/^\(CLAIM_MODES=".*\) status\(.*"\)$/\1\2/' "$SCRIPT" >"$gc_drv/unattended.sh"
-cp "$HERE/lib-unattended.sh" "$gc_drv/lib-unattended.sh"
-gc_m0=$(sed -n 's/^CLAIM_MODES="\(.*\)"$/\1/p' "$SCRIPT")
-gc_m1=$(sed -n 's/^CLAIM_MODES="\(.*\)"$/\1/p' "$gc_drv/unattended.sh")
-hit  " $gc_m0 " " status "
-same "GH19 S5 the scratch driver's CLAIM_MODES is the kit's less status" " $gc_m1 " "$(printf ' %s ' "$gc_m0" | sed 's/ status / /')"
-gc_sha=$(read_claim_ref tRun)
-# ---- ...and `--beat`'s site, which never met a refusal before S2, maps it to one skip line and
-# ---- writes nothing: over NO claim, where a fall-through would create one. Red when that line goes.
-sed 's/^\(CLAIM_MODES=".*\) beat"$/\1"/' "$SCRIPT" >"$gc_drv/nobeat.sh"
-remove_claim_refs
-out=$(bash "$gc_drv/nobeat.sh" --beat tRun 2>&1)
-hit  "$out" "unattended: beat — tRun · skipped: the claim write table refused the call"
-same "GH19 S2 a refused --beat creates no claim" "$(read_claim_ref tRun)" ""
-git --git-dir="$ORIGIN" update-ref refs/gov/runs/tRun "$gc_sha"
-out=$(bash "$gc_drv/unattended.sh" --hold tRun --code platform-limit --until owner --reason "the mode axis" --reaped k1 2>&1)
-hit  "$out" "UNATTENDED check 110 FAILED — this call passed a claim mode the driver does not declare, so the claim write table has no column for it and nothing was written; declare the mode in CLAIM_MODES beside its case branch, or pass a declared one: mode status · CLAIM_MODES $gc_m1"
-same "GH19 S5 the refused status write moves no claim ref" "$(read_claim_ref tRun)" "$gc_sha"
-rm -rf "$gc_drv"
-remove_claim_refs; reset_tree
-# ---- TOOL-aGraftedHelix-22 S2: a claim-read class the decision derives outside CLAIM_READS is
-# ---- refused before any claim write. The scratch driver REMOVES the existing member `foreign-stale`,
-# ---- so the class keeps its case branch and only the read-axis membership test stands between a
-# ---- foreign stale claim and `--preflight`'s take, announced write: red when that test is gone.
-arm_claim_fixture
-gc_drv=$(mktemp -d)
-sed 's/^\(CLAIM_READS=".*\) foreign-stale\(.*"\)$/\1\2/' "$SCRIPT" >"$gc_drv/unattended.sh"
-cp "$HERE/lib-unattended.sh" "$gc_drv/lib-unattended.sh"
-gc_r0=$(sed -n 's/^CLAIM_READS="\(.*\)"$/\1/p' "$SCRIPT")
-gc_r1=$(sed -n 's/^CLAIM_READS="\(.*\)"$/\1/p' "$gc_drv/unattended.sh")
-hit  " $gc_r0 " " foreign-stale "
-same "GH22 S2 the scratch driver's CLAIM_READS is the kit's less foreign-stale" " $gc_r1 " "$(printf ' %s ' "$gc_r0" | sed 's/ foreign-stale / /')"
-seed_claim_row foreign-stale tFresh s-new k2
-gc_sha=$(read_claim_ref tFresh)
-out=$(CLAUDE_CODE_SESSION_ID=s-new bash "$gc_drv/unattended.sh" --preflight tFresh --keepalive-id k2 2>&1)
-hit  "$out" "UNATTENDED check 111 FAILED — this call derived a claim-read class the driver does not declare, so the claim write table has no row for it and nothing was written; declare the class in CLAIM_READS beside its case branch: class foreign-stale · CLAIM_READS $gc_r1"
-same "GH22 S2 the refused preflight moves no claim ref" "$(read_claim_ref tFresh)" "$gc_sha"
-same "GH22 S2 ...and writes no run-state file" "$([ -e memory/builds/tFresh/RUN.md ] && echo present || echo absent)" "absent"
-rm -rf "$gc_drv"
 remove_claim_refs; reset_tree
 
 # ==================================================================================================
@@ -16019,9 +16027,9 @@ remove_claim_refs; reset_tree
 # ---- TOOL-aGraftedHelix-37: breaking a stale `claim-push.lock` is a step ONE writer wins. The three
 # ---- lock functions are EXTRACTED from the shipped driver and driven over plain directories, never a
 # ---- copy typed here, and an empty extraction fails naming the function. The race runs two writers
-# ---- over a stale lock, the second's `date` waiting (bounded 10 s) for the first's verdict and the
+# ---- over a stale lock, the second's guard `mkdir` waiting (bounded 10 s) for the first's verdict and the
 # ---- first starting once the second waits: the order that let both in on unit 36's inline break.
-# ---- A writer's `date`, `find` and `rm` are SHIMS first on its own PATH, never shell functions: a
+# ---- A writer's `mkdir`, `find` and `rm` are SHIMS first on its own PATH, never shell functions: a
 # ---- function named for a command is a lexicon verb offender, and assigning PATH clears the hash.
 # ---- Every arm's staged break is a `mutate` of the extracted copy, sourced only inside a `$( )`, so
 # ---- the suite's own shell keeps the clean functions; the block unsets them and re-sources the
@@ -16038,26 +16046,31 @@ resolve_health_log() { echo "$gh_d/health"; }
 add_health_event() { echo "$3" >> "$1"; }
 # shellcheck disable=SC1090
 . "$gh_fn"
-GH37_DATE=$(command -v date); GH37_FIND=$(command -v find); GH37_RM=$(command -v rm)
-export GH37_DATE GH37_FIND GH37_RM
+GH37_FIND=$(command -v find); GH37_RM=$(command -v rm); GH37_MKDIR=$(command -v mkdir)
+export GH37_FIND GH37_RM GH37_MKDIR
 mkdir -p "$gh_d/bin-race2" "$gh_d/bin-inter1" "$gh_d/bin-inter2"
-# The race's second writer: its `date` marks `in2`, then waits for the first writer's verdict.
-cat > "$gh_d/bin-race2/date" <<'GH37'
+# THE CLOCK READ FORKS NOTHING NOW: the staleness rule reads `$EPOCHSECONDS`, so no `date` runs inside
+# it to hook (TOOL-aSparedSpawn-8). Each pause sits on the first command the writer runs AFTER the
+# verdict it used to pause inside, which is the same interleaving: the verdict is already taken.
+# The race's second writer: its `mkdir` of the GUARD, the step after its first staleness verdict,
+# marks `in2`, then waits for the first writer's verdict. Its `mkdir` of the lock passes through.
+cat > "$gh_d/bin-race2/mkdir" <<'GH37'
 #!/usr/bin/env bash
-: > "$GH37_X/in2"; i=0; while [ ! -e "$GH37_X/v1" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
-exec "$GH37_DATE" "$@"
+case "${!#}" in
+  *.break) : > "$GH37_X/in2"; i=0; while [ ! -e "$GH37_X/v1" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done ;;
+esac
+exec "$GH37_MKDIR" "$@"
 GH37
-# The interleaving's first writer: its SECOND `date`, the re-read under a guard it holds, marks `in1`
-# and waits for writer 2's verdict.
-cat > "$gh_d/bin-inter1/date" <<'GH37'
+# The interleaving's first writer: its `rm` of the LOCK, the step after the re-read under a guard it
+# holds, marks `in1` and waits for writer 2's verdict. Its `rm` of an aged guard passes through.
+cat > "$gh_d/bin-inter1/rm" <<'GH37'
 #!/usr/bin/env bash
-if [ -e "$GH37_X/d1" ]; then
-  : > "$GH37_X/in1"; i=0
-  while [ ! -e "$GH37_X/v2" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
-else
-  : > "$GH37_X/d1"
-fi
-exec "$GH37_DATE" "$@"
+case "${!#}" in
+  *.break) ;;
+  *) : > "$GH37_X/in1"; i=0
+     while [ ! -e "$GH37_X/v2" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done ;;
+esac
+exec "$GH37_RM" "$@"
 GH37
 # ...and its second writer: `find` marks the guard's age read, `rm` waits for writer 1 to act first.
 cat > "$gh_d/bin-inter2/find" <<'GH37'
@@ -16069,7 +16082,7 @@ cat > "$gh_d/bin-inter2/rm" <<'GH37'
 i=0; while [ ! -e "$GH37_X/in1" ] && [ ! -e "$GH37_X/v1" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
 exec "$GH37_RM" "$@"
 GH37
-chmod +x "$gh_d/bin-race2/date" "$gh_d/bin-inter1/date" "$gh_d/bin-inter2/find" "$gh_d/bin-inter2/rm"
+chmod +x "$gh_d/bin-race2/mkdir" "$gh_d/bin-inter1/rm" "$gh_d/bin-inter2/find" "$gh_d/bin-inter2/rm"
 measure_gh37_race() { # functions file -> `<trials two writers took the lock> <trials exactly one did>`, of five
   local t x lk p i two=0 one=0
   . "$1"
@@ -16152,10 +16165,13 @@ mutate "$gh_cp" 's/\[ "\$o" = "\$2" \] && //'
 same "GH37 AC5 a copy with the owner comparison cut removes another writer's lock" "$( . "$gh_cp"; mkdir -p "$gh_lk"; echo w-other > "$gh_lk/owner"
   remove_claim_push_lock "$gh_lk" w-me; [ -d "$gh_lk" ] && echo kept || echo gone )" "gone"
 unset -f check_claim_push_lock_stale write_claim_push_lock remove_claim_push_lock measure_gh37_race measure_gh37_interleave
-unset REMOTE_BOUND GH37_DATE GH37_FIND GH37_RM
+unset REMOTE_BOUND GH37_FIND GH37_RM GH37_MKDIR
 # shellcheck source=lib-unattended.sh
 . "$HERE/lib-unattended.sh"
 rm -rf "$gh_d"
+# TOOL-aSparedSpawn-6: the block above unset three driver functions and REMOTE_BOUND, which every
+# in-process remote observation reads. Re-sourcing the driver restores both before a call meets them.
+. "$SCRIPT"
 # ---- AC7: a finished record over a README missing its build-index close refuses at check 9 before the
 # ---- rotation; a live record missing its generated close refuses before the claim write.
 build_aborted_run() { run --preflight tRun --keepalive-id k1 >/dev/null; sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md; fixture; }
@@ -16389,7 +16405,7 @@ GWP
   git commit -q --allow-empty -m "unit work" --no-verify
 ) >/dev/null 2>&1
 gw_unit=$(git -C "$gw_dir" rev-parse unit)
-run_gw() { ( cd "$gw_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main GWOUT="$gw_out" bash "$SCRIPT" "$@" 2>&1 ); }
+run_gw() { ( cd "$gw_dir" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main GWOUT="$gw_out" && run_main_at_head run_driver "$@" 2>&1 ); }
 run_gw_git() { git -C "$gw_dir" "$@"; }
 read_gw_record() { cat "$gw_dir/memory/builds/tRun/RUN.md"; }
 # THE MARGIN IS READ OUT OF THE DRIVER, never retyped, so a moved constant moves every expected line.
@@ -16730,7 +16746,7 @@ reset_tree
 # ---- three commits unfetched, so the tip is advertised and absent here. The suffix keeps each arm's
 # ---- commits distinct from every earlier arm's, so an unfetched tip is never present by accident.
 rx_root=$(mktemp -d); rx_seq=0
-run_rx() { ( cd "$rx_root/repo" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main bash "$SCRIPT" "$@" 2>&1 ); }
+run_rx() { ( cd "$rx_root/repo" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main && run_main_at_head run_driver "$@" 2>&1 ); }
 run_rx_git() { git -C "$rx_root/repo" "$@"; }
 read_rx_fact() { sed -n "s/^$1: //p" "$rx_root/repo/memory/builds/tRx/RUN.md" | head -1; }
 build_rx_fixture() { # fetch: yes|no -> RX_TIP, the remote's main after the three commits
@@ -16865,7 +16881,7 @@ LN_VALUE='a=desk-a/daily-agent d=compeeto/d41ly'
 LN_NB="COMPUTERNAME=desktop-3j1o6cd USERNAME=agent5"
 LN_ND="COMPUTERNAME=compeeto USERNAME=d41ly"
 LN_R=memory/builds/tLn/RUN.md
-run_ln() { local _e=$1; shift; ( cd "$ln_root/repo" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main $_e bash "$SCRIPT" "$@" 2>&1 ); }
+run_ln() { local _e=$1; shift; ( cd "$ln_root/repo" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main && { [ -z "$_e" ] || export $_e; } && run_main_at_head run_driver "$@" 2>&1 ); }
 run_ln_git() { git -C "$ln_root/repo" "$@"; }
 read_ln_fact() { sed -n "s/^$1: //p" "$ln_root/repo/$LN_R" | head -1; }
 build_ln_fixture() { # LANDING_NODES at BASE, `-` for undeclared · the run's own committed value, `-` for BASE's · [older]
@@ -17282,6 +17298,27 @@ same "TOOL-dUnstuckLanding-27 L6 the record-alone fallback is announced once" \
 rm -rf "$ln_root"
 fi   # ---- end REGION 8 ------------------------------------------------------------------------
 
+# ---- THE HARNESS TAIL (TOOL-aSparedSpawn-6 S8, S9) - every shard, in every mode ---------------------
+# THE NAMESPACE ARM. Every driver and library function in this shell must still be the definition the
+# prologue sourced: an arm that doubles one and leaves it, or unsets one, has changed what every later
+# in-process call runs, in the driver's place and with no other signal. A static scan for a colliding
+# name cannot tell a double fenced in `( … )` or restored by re-sourcing from one that leaks, so this
+# compares the definitions themselves and names each that moved.
+declare -f $DRV_FNS > "$TMP/harness-fns.now" 2>/dev/null
+_hn=$(awk 'FNR == 1 { f++ }
+  /^[A-Za-z_][A-Za-z0-9_]* \(\) *$/ { fn = $1; seen[fn] = 1 }
+  fn != "" { b[f, fn] = b[f, fn] $0 "\n" }
+  END { for (k in seen) if (b[1, k] != b[2, k]) print k }' "$TMP/harness-fns.sourced" "$TMP/harness-fns.now" | sort | tr '\n' ' ')
+n=$((n+1)); [ -s "$TMP/harness-fns.sourced" ] || { echo "FAIL the namespace arm holds no sourced definitions, so it compares nothing"; st=1; }
+n=$((n+1)); [ -z "$_hn" ] || { echo "FAIL a driver or library function in this shell is no longer the definition the prologue sourced, so an in-process call after it runs a double or nothing: ${_hn% }"; st=1; }
+# THE LIVENESS LINE. One byte per call in each mode's tally; under UNATTENDED_HARNESS=inproc a run
+# that made NO in-process call claimed a harness it never exercised, and reds. Counted in both modes,
+# so a shard prints one assertion count whichever mode it ran in.
+_ha=$(wc -c < "$DRV_INPROC_TALLY"); _hb=$(wc -c < "$DRV_PROC_TALLY")
+echo "harness: $((_ha + 0)) in-process calls, $((_hb + 0)) process calls"
+n=$((n+1)); [ "$UNATTENDED_HARNESS" != inproc ] || [ "$((_ha + 0))" -gt 0 ] \
+  || { echo "FAIL UNATTENDED_HARNESS=inproc made 0 in-process calls, so this run graded the process and called it the harness"; st=1; }
+
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
@@ -17551,11 +17588,17 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 2768 -> 2808 by TOOL-aRoutedQuill-7: the skeleton-list arms in region three, AC1 to AC7 and F1's
 # subsequence arm, 40 assertions counted off the block's own lines and run as a slice of the prologue and
 # that block on node a, 2026-10-10; no suite ran.
+# LOWERED 2808 -> 2742 by TOOL-aSparedSpawn-14, the first retirement batch: rows 1, 2, 4 and 5 retired
+# 69 per-site assertions - missing run-state 29, required flag 26, the claim-table refusals 11 and the
+# environment exits 3 - and added 3 for the shared helpers, counted off the diff by region; no suite
+# ran. Each shard floor below moves by its region's share.
 # RAISED 2808 -> 2842 by TOOL-aBriskPreflight-4: the overlapped-probe arms in region five, AC1 to AC8
 # on in-place stub fixtures (30, AC6's four counted either way) and AC9's handle-identity arm beside
 # the capture helpers (4), counted off the block's own lines and run as a slice of the prologue and
 # region five's run_bounded span on node a, 2026-10-11; no suite ran.
-FLOOR_ASSERTIONS=2842
+# MERGED at TOOL-aSparedSpawn-34's reconcile with local main: the shared 2808, less this build's 66
+# and plus local main's 34 = 2776, each side's move counting only its own arms.
+FLOOR_ASSERTIONS=2776
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -17691,7 +17734,8 @@ PROLOGUE_ARMS=20
 # RAISED 254 -> 265: TOOL-aMendedFleet-63's 11 region-one assertions, see FLOOR_ASSERTIONS.
 # RAISED 209 -> 211: the two closing-review guard-sentence arms, see FLOOR_ASSERTIONS.
 # MERGED at the reconcile of local main into origin/main: base 209 + aMendedFleet's 56 + aGraftedHelix's 2 = 267.
-FLOOR_SHARD_1=267
+# 267 -> 269 by TOOL-aSparedSpawn-14: one retired run-state arm, three helper arms.
+FLOOR_SHARD_1=269
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
@@ -17736,7 +17780,8 @@ FLOOR_SHARD_1=267
 # this derivation's own discount, because static sites stand in for executed counts. The next
 # measured executed count of a shard re-declares its floor at the suite's usual headroom. The RAISED
 # lines above are region two's history.
-FLOOR_SHARD_2=222
+# 222 -> 218 by TOOL-aSparedSpawn-14's retired arms, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=218
 # RAISED 255 -> 279 by TOOL-aQuotedBrief-1: the same 24 region-three prompt-record assertions, see FLOOR_ASSERTIONS.
 # RAISED 279 -> 295 by TOOL-aQuotedBrief-2: the same 16 region-three carried-branch assertions, see FLOOR_ASSERTIONS.
 # RAISED 295 -> 323 by TOOL-aQuotedBrief-3: the same 28 region-three brief-item assertions, see FLOOR_ASSERTIONS.
@@ -17745,13 +17790,16 @@ FLOOR_SHARD_2=222
 # RAISED 336 -> 346 by TOOL-aQuotedBrief-5: the same 10 region-three doubled-space heading assertions, see FLOOR_ASSERTIONS.
 # RAISED 346 -> 390 by TOOL-aQuotedBrief-6: the same 44 region-three assertions, see FLOOR_ASSERTIONS.
 # RAISED 390 -> 430 by TOOL-aRoutedQuill-7: the same 40 region-three skeleton-list assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_3=430
-FLOOR_SHARD_4=390
+# LOWERED by TOOL-aSparedSpawn-14's retired arms, each by its region's count, see FLOOR_ASSERTIONS:
+# 3 by 25, 4 by 17, 5 by 7, 6 by 2, 7 by 1 and 8 by 12.
 # RAISED 270 -> 304 by TOOL-aBriskPreflight-4: the same 34 region-five overlapped-probe and handle assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_5=304
-FLOOR_SHARD_6=129
-FLOOR_SHARD_7=312
-FLOOR_SHARD_8=658
+# Region five MERGED at TOOL-aSparedSpawn-34's reconcile: the shared 270, less 7, plus 34 = 297.
+FLOOR_SHARD_3=405
+FLOOR_SHARD_4=373
+FLOOR_SHARD_5=297
+FLOOR_SHARD_6=127
+FLOOR_SHARD_7=311
+FLOOR_SHARD_8=646
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

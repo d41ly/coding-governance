@@ -49,7 +49,6 @@ tools/unattended/check-unattended.sh	<<<	2	surfaced by the one-hop widening, TOO
 tools/unattended/check-unattended.sh	DSROWS	1	surfaced by the one-hop widening, TOOL-cMendedVintage-12
 tools/unattended/check-unattended.sh	DSSIBS	1	predates the gate
 tools/unattended/check-unattended.sh	EOF	1	surfaced by the one-hop widening, TOOL-cMendedVintage-12
-tools/unattended/check-unattended.sh	EXEOF	1	surfaced by the one-hop widening, TOOL-cMendedVintage-12
 tools/unattended/check-unattended.sh	KBCEOF	1	surfaced by the one-hop widening, TOOL-cMendedVintage-12
 tools/unattended/check-unattended.sh	KBEOF	1	surfaced by the one-hop widening, TOOL-cMendedVintage-12
 tools/unattended/check-unattended.sh	KEYEOF	1	predates the gate

@@ -512,6 +512,48 @@ sidecar now carries.
 prints the call's source. A pin row of yours whose signature carried one now reads as stale:
 re-key it from the row `--emit-pin` prints.
 
+## Retiring a refusal, and the ceiling on adding one — TOOL-aSparedSpawn-14
+
+`ARMS_FLOORS` stops a gate shrinking without a reason; nothing stopped one growing, and a refusal
+that has never fired still costs every run of its suite. Three readers inside `--check` close that.
+
+**The review.** A refusal site is a retirement CANDIDATE only when all four hold. **R1**: it was never
+observed firing in a real run — run records, backlogs, gotchas, the decision log and every node's
+local runlog store, read by hand; a suite or an acceptance ledger does not count. **R2**: it cites no
+record whose Goal shows an observed occurrence. **R3**: its condition survives — in another refusal or
+leg cited by file, in a family's shared table or helper, or in one structural check. **R4**: it is not
+security-shaped: self-authorization, git object or config substitution, record forgery at a write
+boundary, or any charter §9 surface is never a candidate, whatever R1 to R3 say. An agent PROPOSES a
+batch with those columns filled; the owner decides each row. Cadence: each minor bump of the kit that
+owns the gate, or monthly, whichever comes first, and always when a ceiling reds.
+
+**The retirement commit**, one per batch: the site and its arm gone; any pin row gone; the floor in
+`ARMS_FLOORS` lowered with a comment naming the decision; one row per retired row in
+`<MEMORY_ROOT>/project/refusal-retirements.txt` (declare the name in `PROJECT_REGISTRY_EXTRA`); and NO
+tombstone — a new refusal policing the retired surface is the growth this review exists to stop. A row:
+
+    <decision id> · RETIRES <gate> check <n> "<signature head>" (x<sites>) · R1 <stores read> · R2 <ids> · R3 <how it survives> · R4 <why not security-shaped> · survivor <file> "<signature>" · replay "<refusal line>" · supersedes <id>
+
+`--check` reds a row missing any of R1 to R4, its survivor or its replay; a survivor file that no
+longer carries its signature; and a decision id no `<MEMORY_ROOT>/DECISIONS.md` row carries. The
+replay is the line the surviving refusal printed when the changed program was run once after the batch.
+
+**The ceiling.** `REFUSAL_CEILINGS="<gate>:<count>:<date>:<decision id> …"`, beside `ARMS_FLOORS`, counts
+the census the floor's first number counts. Above it is red, and the remedy is the review, not the
+number: raise a ceiling only with a dated decision id. A malformed token, or one naming an id the
+decision log does not carry, is red; every ceiling prints with its date and id on every run, and
+`--report` names the gates no token budgets. Blank budgets nothing.
+
+**Families.** A `<stem>.families.txt` beside a gate prices a family of variant refusals, one row each:
+`<family><TAB><ceiling><TAB><date><TAB><decision id><TAB><ERE>`, the ERE read over each fail branch's
+whole message and each refusal site's signature. Over its ceiling reds with "a new per-verb site:
+extend the family's shared table instead"; a pattern matching no site reds, because a pattern that
+cannot match cannot price anything.
+
+What none of these checks: that a decision row decided the number beside it, that a family pattern
+means what its name says, or that a survivor refuses the SAME condition — only that it still carries
+the signature it was recorded with. The replay line is prose; nothing re-runs it.
+
 ## Notes
 
 - Determinism: the scripts export `LC_ALL=C` and emit LF, and the build index normalises CR before it

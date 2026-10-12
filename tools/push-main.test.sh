@@ -23,6 +23,11 @@ lander="${KIT_REL}push-main.sh"   # the lander's path inside every fixture, the 
 
 tmp=$(mktemp -d) || exit 2
 trap 'rm -rf "$tmp"' EXIT
+# Fixture identity and line endings for every git below, the racers' included, through the
+# environment and not per repo (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a
+# node's global autocrlf=true, which used to reach a clone's first checkout before its config did.
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@e GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@e
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 fail=0
 ok()  { echo "  ok   — $1"; }
 bad() { echo "  FAIL — $1"; fail=1; }
@@ -48,8 +53,7 @@ export GOV_DEFAULT_BRANCH=main
 
 setup_repo() {  # $1 = repo dir · $2 = remote name (origin) · $3 = remote path ($tmp/remote.git)
   local r=$1 name=${2:-origin} url=${3:-$tmp/remote.git}
-  git init -q "$r"; cd "$r" || exit 2
-  git config user.email t@e; git config user.name t
+  git init -q --template= "$r"; cd "$r" || exit 2
   mkdir -p "./$KIT_REL" .githooks
   cp "$HERE/push-main.sh" "$lander"
   cp "$SRC/.githooks/pre-push"  .githooks/pre-push
@@ -58,13 +62,12 @@ setup_repo() {  # $1 = repo dir · $2 = remote name (origin) · $3 = remote path
   git remote add "$name" "$url"
 }
 
-git init -q --bare "$tmp/remote.git"
+git init -q --template= --bare "$tmp/remote.git"
 setup_repo "$tmp/work"
 git push -q --no-verify origin main
 git -C "$tmp/remote.git" symbolic-ref HEAD refs/heads/main
 git clone -q "$tmp/remote.git" "$tmp/racer"
 git -C "$tmp/racer" checkout -q -B main origin/main
-git -C "$tmp/racer" config user.email r@e; git -C "$tmp/racer" config user.name r
 cd "$tmp/work" || exit 2
 gitdir=$(git rev-parse --git-dir)
 read_refusal_token() { [ -s "$gitdir/pre-push-refusal" ] && cut -f1 < "$gitdir/pre-push-refusal" || echo ""; }
@@ -288,6 +291,7 @@ exit 0
 NOISE
 git commit -q --allow-empty -m c12
 before12=$(git -C "$tmp/remote.git" rev-parse main)
+mkdir -p "$tmp/remote.git/hooks"   # the remote is initialised with no template, so no hooks dir
 printf '#!/bin/sh\nexit 1\n' > "$tmp/remote.git/hooks/pre-receive"; chmod +x "$tmp/remote.git/hooks/pre-receive"
 out12=$(GOV_GATE_CMD="bash $tmp/noise.sh" bash "$lander" 2>&1); rc12=$?
 rm -f "$tmp/remote.git/hooks/pre-receive"
@@ -334,7 +338,7 @@ done
 # AC1 — a remote NOT named origin (adopter ic's node `d` names it after the project): the lander resolves the remote
 #       first and reads ITS HEAD, and the hook reads the remote git names in $1. With no
 #       GOV_DEFAULT_BRANCH exported, the pre-S1 lander exited 2 before its first fetch.
-git init -q --bare "$tmp/mirror.git"
+git init -q --template= --bare "$tmp/mirror.git"
 setup_repo "$tmp/wi" mirror "$tmp/mirror.git"
 git push -q --no-verify mirror main
 git -C "$tmp/mirror.git" symbolic-ref HEAD refs/heads/main
@@ -369,13 +373,12 @@ cd "$tmp" || exit 2
 # in case 18, `git merge origin/main` in case 19, `landed main on origin` in case 21b, and the whole
 # merge subject in case 9. Change one of those strings and change its case in the same commit. The
 # F7 arms pin a SHAPE as well: the carry line's `<sha8> · <build> ·` and its trailing `FOREIGN`.
-git init -q --bare "$tmp/remote2.git"
+git init -q --template= --bare "$tmp/remote2.git"
 setup_repo "$tmp/work2" origin "$tmp/remote2.git"
 echo seed > src-seed.txt; git add src-seed.txt; git commit -q -m seed
 git push -q --no-verify origin main
 git -C "$tmp/remote2.git" symbolic-ref HEAD refs/heads/main
 git clone -q "$tmp/remote2.git" "$tmp/racer2"
-git -C "$tmp/racer2" config user.email r@e; git -C "$tmp/racer2" config user.name r
 git worktree add -q "$tmp/wt" -b feat main
 
 build_main() {  # local main back onto the remote tip; the caller adds whatever it needs on top
@@ -671,9 +674,8 @@ rema=$(git ls-remote "$tmp/remote2.git" refs/heads/main | awk '{print $1}')
 #      base lander, which moved the branch to the prepared merge and exited 0.
 _ml_lex=$(cd "$HERE" && for d in */; do [ -f "$d/lexicon.py" ] && { printf '%s' "${d%/}"; break; }; done)
 if [ -n "$_ml_lex" ]; then
-  git init -q --bare "$tmp/remote3.git"
+  git init -q --template= --bare "$tmp/remote3.git"
   setup_repo "$tmp/work3" origin "$tmp/remote3.git"
-  git config core.autocrlf false
   cp -r "$HERE/$_ml_lex" "./$KIT_REL$_ml_lex"; rm -rf "./$KIT_REL$_ml_lex/__pycache__"
   printf 'LANGS="sh:shell-tokens:parser"\n' > .lexicon.conf
   printf '__pycache__/\n' > .gitignore
@@ -711,7 +713,6 @@ if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ]; then
   git clone -q "$tmp/remote4.git" "$tmp/work4"
   (
     cd "$tmp/work4" || exit 1
-    git config user.email t@e; git config user.name t; git config core.autocrlf false
     git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
     git push -q -f origin main
     git -C "$tmp/remote4.git" symbolic-ref HEAD refs/heads/main
@@ -740,7 +741,6 @@ if [ -n "$_mt_gk" ] && [ -n "$_ml_lex" ]; then
   git clone -q "$tmp/remote5.git" "$tmp/work5"
   out25=$(
     cd "$tmp/work5" || exit 1
-    git config user.email t@e; git config user.name t; git config core.autocrlf false
     git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
     git rm -q -- "${KIT_REL}$_ml_lex/lexicon.py" "${KIT_REL}$_mt_gk/govkit.py"
     # The regeneration goes too (TOOL-aPrimedIndex-8): with it present, `--prepare` regenerates after
@@ -876,7 +876,6 @@ if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ] && [ -n "$_mt_rc" ]; then
   git clone -q "$tmp/remote26.git" "$tmp/work26"
   out26=$(
     cd "$tmp/work26" || exit 1
-    git config user.email t@e; git config user.name t; git config core.autocrlf false
     git config core.hooksPath "$tmp/allow-hook"   # a clone wires no hook; the lander wants its allow record
     git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
     git push -q -f --no-verify origin main

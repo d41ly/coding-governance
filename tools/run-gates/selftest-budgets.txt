@@ -64,6 +64,7 @@ drift-audit selftest	1290		worst of 8 readings 855s, x1.5
 foreign-prefix parity (every self-test at three prefixes)	3750		one reading 2494s on node a 2026-10-01, the redesigned leg alone at 19ef4230, PASS at three prefixes with whole rows serial, x1.5; it was 60000, sized for the calibrate design
 gotchas selftest	90		worst of 10 readings 54s, x1.5
 govkit selftest	1600		worst of 7 readings 1065s, x1.5
+held-halves selftest	60		measured 1.3s on node a 2026-10-11 by direct invocation, x1.5 floored at this file 60s minimum
 hook destinations self-test	510		worst of 4 readings 335s, x1.5
 install-prefix self-test	1180		worst of 11 readings 783s, x1.5
 kit-placeholders self-test	60		worst of 7 readings 24s, x1.5

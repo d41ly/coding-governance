@@ -321,6 +321,10 @@ name = "hook destinations (every declared hook path ships)"
 why = "it resolves gov's own descriptors through `<prefix>/govkit`, the deployer, which is a registry exemption itself and never travels into a target. An adopter has fragments and adopter scripts but no deployer, so this gate cannot run there at all. The protection it buys is therefore gov-side only, and that limit is the reason for this row rather than an oversight: gov is where the fragments and the descriptors are AUTHORED, so it is where a fragment naming an unshipped destination is created. TOOL-dRetiredFork-21."
 
 [[exempt_leg]]
+name = "spawn budget (forks per hot entrypoint)"
+why = "its ceilings file declares THIS repository's hot entrypoints and the fixture each is counted in, by path, so the leg is gov-side only: an adopter has other entrypoints and no row for them. The counter itself, `fork-count.sh`, ships with the gate-lint kit and takes the ceilings file as an argument, so an adopter that wants a fork budget declares its own rows and wires its own leg. TOOL-aSparedSpawn-8."
+
+[[exempt_leg]]
 name = "hook destinations self-test"
 why = "the arms for that gate; no descriptor can claim a leg whose script no adopter receives."
 

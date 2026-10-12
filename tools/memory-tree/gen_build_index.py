@@ -3820,9 +3820,7 @@ def _build_backlog_fixture(tmp: str, files: dict, *, mode: str = "builds", cutof
     a node whose own memory note prices process creation as the dominant cost of a suite.
     """
     if not os.path.isdir(os.path.join(tmp, ".git")):
-        run("git", "init", "-q", ".", cwd=tmp)
-        run("git", "config", "user.email", "t@t.test", cwd=tmp)
-        run("git", "config", "user.name", "t", cwd=tmp)
+        run("git", "init", "-q", "--template=", ".", cwd=tmp)
     shutil.rmtree(os.path.join(tmp, "memory"), ignore_errors=True)
     write_text(os.path.join(tmp, ".memory-tree.conf"), _render_backlog_conf(mode, cutoff, excerpt))
     write_text(os.path.join(tmp, "memory", STALE_HEADER_WAIVER), "# empty\n")
@@ -3875,9 +3873,7 @@ def _render_fixture_conf(example_family: bool = False) -> str:
 
 def _fixture(tmp: str, *, marker=True, readme=True, status_key=None, spec_status="INPROGRESS",
              example_family=False):
-    run("git", "init", "-q", ".", cwd=tmp)
-    run("git", "config", "user.email", "t@t.test", cwd=tmp)
-    run("git", "config", "user.name", "t", cwd=tmp)
+    run("git", "init", "-q", "--template=", ".", cwd=tmp)
     write_text(os.path.join(tmp, ".memory-tree.conf"), _render_fixture_conf(example_family))
     # The stale-header waiver registry, EMPTY, because `collect()` refuses without it
     # (TOOL-dRetiredFork-3, AC4) and every fixture below goes through `collect()`. Written here
@@ -6172,9 +6168,7 @@ def cmd_selftest() -> int:
     with tempfile.TemporaryDirectory() as cbase:
         cx = os.path.join(cbase, "pinned")
         os.makedirs(cx)
-        run("git", "init", "-q", ".", cwd=cx)
-        run("git", "config", "user.email", "t@t.test", cwd=cx)
-        run("git", "config", "user.name", "t", cwd=cx)
+        run("git", "init", "-q", "--template=", ".", cwd=cx)
 
         def _build_conf_commit(label: str) -> str:
             run("git", "add", "-A", cwd=cx)
@@ -6264,15 +6258,12 @@ def cmd_selftest() -> int:
         _c_undeclared = ("DISCIPLINES", "FAMILIES")
         # S1's one-parser property, over the bytes that actually split two readers of one file. A
         # SECOND fixture, because this conf must be what the working tree holds AND what the blob
-        # holds, and the repository above pins `memory-new` at both. `core.autocrlf` is turned OFF
-        # in it: the global setting is on, and it would fold the CRLF out of the blob before the
-        # arm ever saw it.
+        # holds, and the repository above pins `memory-new` at both. `core.autocrlf` is OFF in it,
+        # through the environment `main` sets before the selftest: the global setting is on, and it
+        # would fold the CRLF out of the blob before the arm ever saw it.
         cy = os.path.join(cbase, "awkward")
         os.makedirs(cy)
-        run("git", "init", "-q", ".", cwd=cy)
-        run("git", "config", "user.email", "t@t.test", cwd=cy)
-        run("git", "config", "user.name", "t", cwd=cy)
-        run("git", "config", "core.autocrlf", "false", cwd=cy)
+        run("git", "init", "-q", "--template=", ".", cwd=cy)
         # WRITTEN AS BYTES, not through `write_text`, which would normalise the very thing under
         # test. CRLF endings, a LONE CR mid-file, and a utf-8 value outside ASCII: the first is the
         # control, the second is what universal newlines turns into a line break, and the third is
@@ -6870,6 +6861,11 @@ def cmd_new_spec(root: str, conf: dict, args: dict) -> int:
 def main(argv: list) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
+        # TOOL-aSparedSpawn-9 S1: the fixtures' identity and line endings, once for every git the
+        # selftest runs, in place of two to four `git config` processes per fixture repository.
+        os.environ.update(GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t.test", GIT_COMMITTER_NAME="t",
+                          GIT_COMMITTER_EMAIL="t@t.test", GIT_CONFIG_COUNT="1",
+                          GIT_CONFIG_KEY_0="core.autocrlf", GIT_CONFIG_VALUE_0="false")
         return cmd_selftest()
     if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey",
                     "--report", "--bump", "--asks", "--new-build", "--new-spec", "--doctor"):

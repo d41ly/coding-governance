@@ -39,6 +39,11 @@ def derive_install_prefix() -> str:
 
 
 PFX = derive_install_prefix()
+# TOOL-aSparedSpawn-9 S1: the fixtures' identity and line endings, once for every git this file
+# runs, in place of two to four `git config` processes per fixture repository.
+os.environ.update(GIT_AUTHOR_NAME="lexicon selftest", GIT_AUTHOR_EMAIL="selftest@example.invalid",
+                  GIT_COMMITTER_NAME="lexicon selftest", GIT_COMMITTER_EMAIL="selftest@example.invalid",
+                  GIT_CONFIG_COUNT="1", GIT_CONFIG_KEY_0="core.autocrlf", GIT_CONFIG_VALUE_0="false")
 
 
 def resolve_bash() -> str:
@@ -338,7 +343,7 @@ def run_case(files: dict, conf: str | None, waivers: dict | None = None, args: t
             p.write_text(body, encoding="utf-8")
         if conf is not None:
             (root / ".lexicon.conf").write_text(conf, encoding="utf-8")
-        subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+        subprocess.run(["git", "init", "-q", "--template="], cwd=root, check=True)
         # Stage ONLY the fixture files. The kit is copied in so that its waiver registries and its
         # imports resolve the way an installed kit's do, but it is left UNTRACKED on purpose: the
         # corpus is `git ls-files`, so a tracked kit would put its own sources into the population
@@ -498,7 +503,7 @@ with build_tempdir() as _td:
     (_r / "core").mkdir(parents=True, exist_ok=True)
     (_r / "core" / "a.py").write_text("def build_index():\n    pass\n", encoding="utf-8", newline="\n")
     (_r / ".lexicon.conf").write_text(BASE_CONF, encoding="utf-8", newline="\n")
-    subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
+    subprocess.run(["git", "init", "-q", "--template="], cwd=_r, check=True)
     subprocess.run(["git", "add", "--", "core/a.py", ".lexicon.conf"], cwd=_r, check=True,
                    capture_output=True)
     _both = {}
@@ -875,7 +880,7 @@ with build_tempdir() as td:
     (root / "src" / "a.tsx").write_text(
         "export function Card(): JSX.Element {\n  return <div />;\n}\n\n"
         "export interface CardProps {\n  id: string;\n}\n", encoding="utf-8")
-    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "init", "-q", "--template="], cwd=root, check=True)
     subprocess.run(["git", "add", "--", "src"], cwd=root, check=True, capture_output=True)
     r = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", str(root / ".lexicon.conf")],
                        cwd=root, capture_output=True, text=True)
@@ -1184,7 +1189,7 @@ with build_tempdir() as td:
     (root / "src" / "a.tsx").write_text(
         "export const buildProbe = () => mount(<Probe />);\nexport const loadCount = () => 1;\n",
         encoding="utf-8")
-    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "init", "-q", "--template="], cwd=root, check=True)
     subprocess.run(["git", "add", "--", "src"], cwd=root, check=True, capture_output=True)
     r = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", str(root / ".lexicon.conf")],
                        cwd=root, capture_output=True, text=True)
@@ -1233,7 +1238,7 @@ with build_tempdir() as td:
         'PATTERNS:\n'
         r'  ts-regex.functions  ^\s*(?:export\s+)?function\s+([A-Za-z_$][\w$]*)' '\n',
         encoding="utf-8", newline="\n")
-    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "init", "-q", "--template="], cwd=root, check=True)
     subprocess.run(["git", "add", "--", "src/a.py", "web/widget.ts", ".lexicon.conf"],
                    cwd=root, check=True, capture_output=True)
     r = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", str(root / "seed.conf")],
@@ -1344,7 +1349,7 @@ with build_tempdir() as _td:
         _p.parent.mkdir(parents=True, exist_ok=True)
         _p.write_text(_body, encoding="utf-8")
     (_r / ".lexicon.conf").write_text(BASE_CONF, encoding="utf-8")
-    subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
+    subprocess.run(["git", "init", "-q", "--template="], cwd=_r, check=True)
     subprocess.run(["git", "add", "--", *_U6, ".lexicon.conf"], cwd=_r, check=True, capture_output=True)
     _got = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/lexicon.py"], cwd=_r,
                           capture_output=True, text=True)
@@ -1446,7 +1451,7 @@ with build_tempdir() as _td:
         _p = _r / _rel
         _p.parent.mkdir(parents=True, exist_ok=True)
         _p.write_text(_b, encoding="utf-8")
-    subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
+    subprocess.run(["git", "init", "-q", "--template="], cwd=_r, check=True)
     subprocess.run(["git", "add", "--", *_many], cwd=_r, check=True, capture_output=True)
     subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", ".lexicon.conf"],
                    cwd=_r, capture_output=True, text=True)
@@ -1466,7 +1471,7 @@ with build_tempdir() as _td:
         _p = _r / _rel
         _p.parent.mkdir(parents=True, exist_ok=True)
         _p.write_text(_b, encoding="utf-8")
-    subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
+    subprocess.run(["git", "init", "-q", "--template="], cwd=_r, check=True)
     subprocess.run(["git", "add", "--", *_pol], cwd=_r, check=True, capture_output=True)
     subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", ".lexicon.conf"],
                    cwd=_r, capture_output=True, text=True)
@@ -1483,7 +1488,7 @@ with build_tempdir() as _td:
     shutil.copytree(KIT, _r / PFX / KIT_NAME, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (_r / "core").mkdir(parents=True, exist_ok=True)
     (_r / "core" / "a.py").write_text("def build_it():\n    pass\n", encoding="utf-8")
-    subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
+    subprocess.run(["git", "init", "-q", "--template="], cwd=_r, check=True)
     subprocess.run(["git", "add", "--", "core/a.py"], cwd=_r, check=True, capture_output=True)
     subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", ".lexicon.conf"],
                    cwd=_r, capture_output=True, text=True)
@@ -1513,7 +1518,7 @@ with build_tempdir() as _td:
     (_r / "docs").mkdir(parents=True, exist_ok=True)
     (_r / "docs" / "readme.md").write_text("# prose only\n\nNothing here defines anything.\n",
                                            encoding="utf-8")
-    subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
+    subprocess.run(["git", "init", "-q", "--template="], cwd=_r, check=True)
     subprocess.run(["git", "add", "--", "docs/readme.md"], cwd=_r, check=True, capture_output=True)
     _rr = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", ".lexicon.conf"],
                          cwd=_r, capture_output=True, text=True)
@@ -1766,7 +1771,7 @@ with tempfile.TemporaryDirectory(dir=str(KIT.parent.parent)) as _td:
     # wrong reason, which the sibling arm caught. The sandbox is shaped like an adopter: a git repo
     # with the kit under `<prefix>/lexicon/` and no declaration, which is exactly where the version is
     # read and one step before any conf check.
-    subprocess.run(["git", "init", "-q", "."], cwd=_td, capture_output=True)
+    subprocess.run(["git", "init", "-q", "--template=", "."], cwd=_td, capture_output=True)
     _kit = Path(_td) / PFX / KIT_NAME
     shutil.copytree(KIT, _kit, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     _lx = _kit / "lexicon.py"
@@ -2092,9 +2097,7 @@ with build_tempdir() as _td:
              "  py.file.conv  7\n\n  py.function.debt  9\n\n  py.type.conv  4\n")
     _cf = _r / ".lexicon.conf"
     _cf.write_text(_base, encoding="utf-8", newline="\n")
-    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=_r, check=True, capture_output=True)
-    for _k, _v in (("user.email", "s@e"), ("user.name", "s")):
-        subprocess.run(["git", "config", _k, _v], cwd=_r, check=True, capture_output=True)
+    subprocess.run(["git", "init", "-q", "--template=", "-b", "main"], cwd=_r, check=True, capture_output=True)
     subprocess.run(["git", "add", "-A"], cwd=_r, check=True, capture_output=True)
     subprocess.run(["git", "commit", "-qm", "base"], cwd=_r, check=True, capture_output=True)
     # ADJACENT CELLS -- the likeliest concurrent pair, because related cells sit together, and the
@@ -3410,7 +3413,7 @@ if _PREC_PATH.exists():
     elif _DISAGREE:
         with build_tempdir() as _ptd:
             _proot = Path(_ptd)
-            subprocess.run(["git", "init", "-q"], cwd=_proot, check=True, capture_output=True)
+            subprocess.run(["git", "init", "-q", "--template="], cwd=_proot, check=True, capture_output=True)
             (_proot / ".lexicon.conf").write_text(_prec_text, encoding="utf-8", newline="\n")
             _sr = subprocess.run([sys.executable, str(KIT / "lexicon.py"), "--suggest",
                                   f"{_tok}_thing", "--as", _vocab_cell],
@@ -3768,7 +3771,7 @@ for _label, _tail in (
         shutil.copytree(KIT, _sroot / PFX / KIT_NAME,
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
         (_sroot / ".lexicon.conf").write_text(BASE_CONF + _tail, encoding="utf-8", newline="\n")
-        subprocess.run(["git", "init", "-q"], cwd=_sroot, check=True)
+        subprocess.run(["git", "init", "-q", "--template="], cwd=_sroot, check=True)
         _sr = subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=_sroot,
                              capture_output=True, text=True)
         _STAMP[_label] = _sr.stdout + _sr.stderr
@@ -4204,7 +4207,7 @@ with build_tempdir() as _td:
                                           newline="\n")
     (_rr / ".lexicon.conf").write_text(_L4_CONF := _M2_BASE + "CELLS:\n  py.function  snake\n",
                                        encoding="utf-8", newline="\n")
-    subprocess.run(["git", "init", "-q"], cwd=_rr, check=True)
+    subprocess.run(["git", "init", "-q", "--template="], cwd=_rr, check=True)
     subprocess.run(["git", "add", "--", "core", ".lexicon.conf"], cwd=_rr, check=True,
                    capture_output=True)
     (_rr / "core" / "gone.py").unlink()          # TRACKED, and no longer on disk
@@ -4332,7 +4335,7 @@ with build_tempdir() as _td:
         "def build_other():\n    pass\n\n\ndef fetch_thing():\n    pass\n",
         encoding="utf-8", newline="\n")
     (_rr / ".lexicon.conf").write_text(_ROUTED_CONF, encoding="utf-8", newline="\n")
-    subprocess.run(["git", "init", "-q"], cwd=_rr, check=True)
+    subprocess.run(["git", "init", "-q", "--template="], cwd=_rr, check=True)
     subprocess.run(["git", "add", "--", "core", ".lexicon.conf"], cwd=_rr, check=True,
                    capture_output=True)
 
@@ -4605,17 +4608,16 @@ with build_tempdir() as td:
     (_root / "src").mkdir()
     (_root / "src" / "a.py").write_text(EXPAND_FILES["src/a.py"], encoding="utf-8", newline="\n")
     (_root / ".lexicon.conf").write_text(EXPAND_CONF, encoding="utf-8", newline="\n")
-    subprocess.run(["git", "init", "-q"], cwd=_root, check=True)
+    subprocess.run(["git", "init", "-q", "--template="], cwd=_root, check=True)
     # NOT `-A`. The kit is copied in UNTRACKED on purpose, and staging it would put its own
     # identifiers into the corpus these arms grade — and would also defeat the whole point of the
     # dirty-predicate arm below.
     subprocess.run(["git", "add", "--", "src/a.py", ".lexicon.conf"], cwd=_root, check=True,
                    capture_output=True)
-    # AN IDENTITY, EXPLICITLY. The commit is what gives `--stamp` a sha to write; a fixture relying
-    # on the machine's global git identity is green on this node and fails on any runner without
-    # one, which is a green that proves nothing about an adopter.
-    subprocess.run(["git", "config", "user.email", "selftest@example.invalid"], cwd=_root, check=True)
-    subprocess.run(["git", "config", "user.name", "lexicon selftest"], cwd=_root, check=True)
+    # AN IDENTITY, EXPLICITLY, from the environment set at this file's top. The commit is what gives
+    # `--stamp` a sha to write; a fixture relying on the machine's global git identity is green on
+    # this node and fails on any runner without one, which is a green that proves nothing about an
+    # adopter.
     subprocess.run(["git", "commit", "-q", "-m", "fixture"], cwd=_root, check=True, capture_output=True)
 
     # THE DIRTY REFUSAL, staged before the stamp because the once-guard would otherwise fire first.
@@ -4718,9 +4720,7 @@ with build_tempdir() as td:
     (_u / "src").mkdir()
     (_u / "src" / "a.py").write_text(EXPAND_FILES["src/a.py"], encoding="utf-8", newline="\n")
     (_u / ".lexicon.conf").write_text(EXPAND_CONF, encoding="utf-8", newline="\n")
-    subprocess.run(["git", "init", "-q"], cwd=_u, check=True)
-    subprocess.run(["git", "config", "user.email", "selftest@example.invalid"], cwd=_u, check=True)
-    subprocess.run(["git", "config", "user.name", "lexicon selftest"], cwd=_u, check=True)
+    subprocess.run(["git", "init", "-q", "--template="], cwd=_u, check=True)
     # THE CONF IS DELIBERATELY NOT STAGED. Everything else is, so the tree is clean by the tracked
     # two-sided diff and the old guard would have stamped.
     subprocess.run(["git", "add", "--", "src/a.py"], cwd=_u, check=True, capture_output=True)
@@ -5904,9 +5904,7 @@ check("AC6: ...and a refusal-blown reading earns `probe` too, so F2 reaches the 
 with build_tempdir() as _td:
     _r = Path(_td)
     _git = lambda *a: subprocess.run(["git", *a], cwd=_r, capture_output=True, text=True, encoding="utf-8")  # noqa: E731
-    _git("init", "-q", "-b", "main")
-    for _k, _v in (("user.email", "s@e"), ("user.name", "s"), ("core.autocrlf", "false")):
-        _git("config", _k, _v)
+    _git("init", "-q", "--template=", "-b", "main")
     _ml_conf = 'LANGS="sh:shell-tokens:parser conf::dark"\n'
     (_r / ".lexicon.conf").write_text(_ml_conf, encoding="utf-8", newline="\n")
     (_r / "a.sh").write_text("fa() { :; }\nfk() { :; }\nfz() { :; }\n", encoding="utf-8", newline="\n")

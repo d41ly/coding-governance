@@ -598,7 +598,7 @@ render_health_cell() {
   log=$(derive_health_log "${CARD_DIR%/orientation}")
   [ -e "$log" ] || { printf 'health — none recorded: no health.log in the git common dir\n'; return 0; }
   { [ -f "$log" ] && [ -r "$log" ]; } || { printf 'health — skipped: health.log exists and cannot be read\n'; return 0; }
-  now=${EPOCHSECONDS:-$(date -u +%s)}
+  now=$EPOCHSECONDS
   since=$(date -u -d "@$((now - HEALTH_WINDOW_S))" +%Y-%m-%dT%H:%M:%S+00:00 2>/dev/null) \
     || since=$(date -u -r "$((now - HEALTH_WINDOW_S))" +%Y-%m-%dT%H:%M:%S+00:00 2>/dev/null) || since=""
   [ -n "$since" ] || { printf 'health — skipped: date computes no UTC stamp for the window start on this host\n'; return 0; }
@@ -785,7 +785,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -822,7 +823,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
