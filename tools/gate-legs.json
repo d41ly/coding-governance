@@ -317,6 +317,20 @@
     "ceiling": 490
   },
   {
+    "name": "format-guard self-test",
+    "argv": [
+      "bash",
+      "{prefix}/hooks/format-guard.test.sh"
+    ],
+    "guard": [
+      "{prefix}/hooks/",
+      "AGENTS.md"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
     "name": "agent-instructions self-test",
     "argv": [
       "bash",

@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 109 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 131 · kits: 17 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 109 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -38,6 +38,7 @@ Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `every held leg is budgeted, every budget row resolves` | run-gates |
 | `extract-arms self-test` | run-gates |
 | `foreign-prefix parity (every self-test at three prefixes)` | install-prefix |
+| `format-guard self-test` | agent-cap |
 | `gotchas selftest` | baseline |
 | `govkit acceptance matrix` | govkit |
 | `govkit refusal join` | govkit |
@@ -184,6 +185,7 @@ Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `SessionStart skills/session-kickoff/manifest-check.sh` | session-kickoff |
 | `SessionStart tools/check-wiring.sh` | foundation |
 | `SessionStart tools/process-monitor/procmon-hook.js` | process-monitor |
+| `Stop tools/hooks/format-guard.js` | agent-cap |
 | `Stop tools/unattended/stop-guard.js` | unattended |
 | `StopFailure tools/unattended/stall-recorder.js` | unattended |
 | `SubagentStart tools/hooks/scratch-guard.js` | agent-cap |

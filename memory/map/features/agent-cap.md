@@ -11,6 +11,7 @@ decisions = []
 gate-legs = [
   "agent-cap self-test",
   "scratch-guard self-test",
+  "format-guard self-test",
   "verifier fan-out",
   "verifier fan-out self-test",
   "review-protocol parity (kit vs dogfood)",
@@ -21,7 +22,7 @@ gate-legs = [
 ]
 kits = ["hooks"]
 git-hooks = []
-harness-hooks = ["PreToolUse tools/hooks/agent-cap.js", "PreToolUse tools/hooks/scratch-guard.js", "SubagentStart tools/hooks/scratch-guard.js"]
+harness-hooks = ["PreToolUse tools/hooks/agent-cap.js", "PreToolUse tools/hooks/scratch-guard.js", "SubagentStart tools/hooks/scratch-guard.js", "Stop tools/hooks/format-guard.js"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []

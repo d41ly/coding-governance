@@ -33,3 +33,7 @@ base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 2026-10-12T16:33:00Z brief · item TOOL-aHeardState-1 · reason b9d32e7b75fa memory/builds/aHeardState/prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md
 
 2026-10-12T16:33:44Z brief · item TOOL-aHeardState-2 · reason b9d32e7b75fa memory/builds/aHeardState/prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md
+
+2026-10-12T16:46:25Z dispatch · item 2d0dd234 TOOL-aHeardState-1 · reason tools/hooks/format-guard.js tools/hooks/format-guard.fragment.json tools/hooks/format-guard.test.sh tools/hooks/scratch-guard.js tools/hooks/kit.toml tools/hooks/README.md .claude/settings.json tools/gate-legs.json tools/govkit/registry.toml memory/map/features/agent-cap.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md
+
+2026-10-12T17:06:38Z dispatch · item 2d0dd234 TOOL-aHeardState-1 · reason tools/hooks/format-guard.js tools/hooks/format-guard.fragment.json tools/hooks/format-guard.test.sh tools/hooks/scratch-guard.js tools/hooks/kit.toml tools/hooks/README.md .claude/settings.json tools/gate-legs.json tools/govkit/registry.toml memory/map/features/agent-cap.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/guides/SESSION-KICKOFF.md

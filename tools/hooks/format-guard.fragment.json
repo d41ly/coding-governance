@@ -1,0 +1,7 @@
+{
+  "name": "format-guard",
+  "event": "Stop",
+  "matcher": "*",
+  "marker": "format-guard.js",
+  "hook_path": "{kit}/hooks/format-guard.js"
+}
