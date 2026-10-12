@@ -9,9 +9,17 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+hold-run: 
+hold-streak: 1 · at ea8c8728
+resume-owed: unattended-resume-aorientedcast · fire 2026-10-12T20:17:05Z
+held-at: 2026-10-12T19:47:05Z
+hold-reason: all 18 units are CLOSED; the close owes about ten kit suites, red-then-green arm observations and the bar, which the main session must run under the owner's addendum; node a leaks about 26 GB of kernel pool (0.4 to 2 s per process spawn), so the owner chose to reboot before the close
+hold-until: probe host
+hold-code: host-degraded
+held-from: REVIEWING
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 06194e750d5f67ffbb99afeec0df25b40d2ce060
-phase: REVIEWING
+witness: ea8c87285f623599a8579c7f0bf9521da9928432
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/deterministic-attended-workflows-943570
@@ -135,3 +143,5 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-12T19:22:54Z dispatch · item fbf31ea8 TOOL-aOrientedCast-15 · reason memory/map/features/review-harnesses.md memory/map/generated/inventories.json memory/map/generated/MAP.md
 
 2026-10-12T19:24:56Z dispatch · item fbf31ea8 TOOL-aOrientedCast-15 · reason memory/map/generated/CARDS.md
+
+2026-10-12T19:47:52Z hold · item host-degraded · reason until probe host · reaped 0410f9d5 · resume unattended-resume-aorientedcast
