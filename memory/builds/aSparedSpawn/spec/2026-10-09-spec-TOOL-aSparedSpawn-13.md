@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-13 — content-addressed reuse: declared read classes, a shared cache, a soundness sample
 
-**Status:** INPROGRESS · rev-4 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-5 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -214,7 +214,6 @@ fa68a767), and a push right after a green bar at the same sha and tip reuses the
 - `.githooks/pre-push.test.sh` — the push-time reuse arms
 - `tools/govkit/govkit.py` — the descriptor parity on `reads`, and the legacy `impure` an adopter row gets
 - `tools/unattended/kit.toml`, `tools/memory-tree/kit.toml` — the four descriptors move to `reads`
-- `memory/project/fork-ceilings.txt` — the two run-gates rows rise by the cache's one python per bar
 
 ### Alternatives rejected
 
@@ -352,6 +351,10 @@ New arm: .githooks/pre-push.test.sh · covers AC12 AC13 AC14 AC15 · a moved tip
   compare against a base ref; §7 names the three govkit legs the files-touched list trips and the
   spawn budget, whose two run-gates rows rise by the cache's one python per bar, with
   `memory/project/fork-ceilings.txt` added to the files touched.
+- rev-5 · 2026-10-12 · §4 · the fork ceilings leave the files touched again: measured by
+  `fork-count.sh --only`, the one-leg and two-leg rows read 51 and 53 forks with this change and at its
+  parent alike, since the cache's python is an exec and no fork to that counter. Both rows already
+  read STALE against ceilings of 72 and 74 at the parent, a saving an earlier unit did not bank.
 
 ## 10. Reuse audit
 
