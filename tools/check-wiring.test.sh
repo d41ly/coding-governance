@@ -327,6 +327,27 @@ JSON
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       agent-cap'; } \
     && ck "AC7d the flag removed -> ok, exit 0" 1 || ck "AC7d the flag removed -> ok, exit 0" 0
+  # BP12 AC7 — AN INHERITED VIEW IS NOT A SETTINGS READ (TOOL-aBriskPreflight-12 S5). The view is
+  # captured from matchers_of's OWN flatten over this correctly wired file, lifted alone as
+  # settings-merge.py's arm 17 lifts it, so state (a) injects exactly what a real read would build.
+  _bpv=$(cd "$D" && bash -c 'settings_json() { printf "%s\n" "$PWD/.claude/settings.json"; }
+    eval "$(awk "/^matchers_of\\(\\) \\{/{on=1} on{print} on && /^}/{exit}" "$1")"; matchers_of; printf "%s" "$_SJ_VIEW"' _ "$SCRIPT")
+  [ -n "$_bpv" ] || ck "BP12 AC7 fixture: matchers_of's flatten built no view to inject" 0
+  # (a) the injected view over a STALE Workflow-only file: the checker must read the file, not the
+  # inheritance. Not over a missing file (spec rev-3): the arm re-reads the file for the shipped path,
+  # so a missing one reds there whether or not the view was inherited, and grades nothing.
+  sed -i 's/"matcher": "Workflow|Agent"/"matcher": "Workflow"/' .claude/settings.json
+  out=$(_SJ_RC=0 _SJ_VIEW=$_bpv chk --check); rc=$?
+  { [ "$rc" = 1 ] && ! printf '%s' "$out" | grep -q 'ok       agent-cap' \
+      && printf '%s' "$out" | grep -q "wired under matcher 'Workflow'"; } \
+    && ck "BP12 AC7 an inherited _SJ_RC=0 view over a stale settings file -> UNWIRED agent-cap, exit 1" 1 \
+    || ck "BP12 AC7 an inherited _SJ_RC=0 view over a stale settings file -> UNWIRED agent-cap, exit 1 [rc=$rc]" 0
+  # (b) an inherited EMPTY view over the correct file: the file's own wiring must still read ok.
+  sed -i 's/"matcher": "Workflow"/"matcher": "Workflow|Agent"/' .claude/settings.json
+  out=$(_SJ_RC=0 _SJ_VIEW= chk --check); rc=$?
+  printf '%s' "$out" | grep -q 'ok       agent-cap' \
+    && ck "BP12 AC7 an inherited empty view over a correct settings file -> ok agent-cap" 1 \
+    || ck "BP12 AC7 an inherited empty view over a correct settings file -> ok agent-cap [rc=$rc]" 0
   cleanup
 else
   echo "skip agent-cap cases — settings-merge.py not found next to script"
@@ -499,6 +520,22 @@ JSON
     out=$(HOME="$SGHOME" chk --check)
     ck "RQ5 AC8 the PreToolUse matcher wired under SubagentStart -> the PreToolUse entry is UNWIRED" \
        "$(printf '%s' "$out" | grep -q '^UNWIRED  scratch   — .*PreToolUse entry' && echo 1 || echo 0)"
+    # TOOL-aBriskPreflight-2 AC6 — a SHIPPED fragment with its matcher line taken out, beside a second
+    # fragment that declares one. The reader keeps four keys per path for the whole run, and the
+    # absent key must read as absent: never as the other fragment's value, and never as a pass.
+    rm -f .claude/settings.json
+    for _f in scratch-guard scratch-guard-subagent; do
+      "$py" ${KP}settings-merge.py --fragment $KIT_REL/${HOOKS}/$_f.fragment.json >/dev/null 2>&1
+    done
+    _sgf=$KIT_REL/${HOOKS}/scratch-guard.fragment.json
+    grep -v '"matcher"' "$SGFRAG" > "$_sgf"
+    out=$(HOME="$SGHOME" chk --check)
+    ck "BP2 AC6 a shipped fragment with no matcher -> UNWIRED scratch naming that fragment, never another's matcher" \
+       "$(printf '%s' "$out" | grep -qF "UNWIRED  scratch   — $_sgf declares no marker/matcher/event/hook_path" && echo 1 || echo 0)"
+    cp "$SGFRAG" "$_sgf"
+    out=$(HOME="$SGHOME" chk --check)
+    ck "BP2 AC6 LIVENESS ...and restored, the PreToolUse entry reads ok again" \
+       "$(printf '%s' "$out" | grep -q '^ok       scratch   — PreToolUse entry' && echo 1 || echo 0)"
   else
     echo "skip RQ5 AC8 — scratch-guard-subagent.fragment.json not found beside the gate's fragment"
   fi
@@ -976,6 +1013,30 @@ out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
   && ck "AC10 restoring the declared family goes green again" 1 || ck "AC10 restoring the declared family goes green again" 0
 
+# state 5d2 — THE CHUNK FLUSH (TOOL-aBriskPreflight-12 S6). The harvest closes a sed chunk before 8000
+# characters of paths, and no state above crosses it, so the in-loop flush never ran. Here the
+# declared list is pushed past 8000 with many ~50-character paths (MAX_PATH), the index `git ls-files`
+# lists FIRST leads a row with QFIRST and the one it lists LAST a row with QLAST, every other new
+# index empty. Past 8000 there are at least two chunks, so the first index is harvested ONLY by the
+# in-loop flush: QFIRST named is that branch's liveness, in every run. Uppercase sorts first in git's
+# byte order, so `AFIRST.md` precedes `TOOL.md` and the lowercase `zlast.md` follows every pad.
+printf -- '- QFIRST-001 | a row only the first chunk holds\n' > memory/backlog/AFIRST.md
+printf -- '- QLAST-001 | a row only the last chunk holds\n' > memory/backlog/zlast.md
+_bpi=0; while [ "$_bpi" -lt 180 ]; do : > "memory/backlog/pad-$_bpi-chunk-flush-padding-index.md"; _bpi=$((_bpi + 1)); done
+git add -A; git commit -q -m "chunk flush fixture"
+_bpl=$(git ls-files | git check-attr --stdin merge | sed -n 's/: merge: rows$//p')
+_bpn=$(printf '%s\n' "$_bpl" | awk '{ s += length($0) + 1 } END { print s + 0 }')
+[ "$_bpn" -gt 8000 ] && [ "$(printf '%s\n' "$_bpl" | head -n 1)" = memory/backlog/AFIRST.md ] \
+  && [ "$(printf '%s\n' "$_bpl" | tail -n 1)" = memory/backlog/zlast.md ] \
+  && ck "AC10 chunk-flush fixture: the declared list is $_bpn characters, past 8000, AFIRST first and zlast last" 1 \
+  || ck "AC10 chunk-flush fixture: the declared list is $_bpn characters, past 8000, AFIRST first and zlast last (fixture no-op)" 0
+out=$(chk --check); rc=$?
+_bpu=$(printf '%s\n' "$out" | grep '^UNWIRED  merge' | grep 'does not declare')
+{ [ "$rc" = 1 ] && printf '%s' "$_bpu" | grep -q 'QFIRST' && printf '%s' "$_bpu" | grep -q 'QLAST'; } \
+  && ck "AC10 a family only the first chunk holds and one only the last -> one UNWIRED merge line naming both" 1 \
+  || ck "AC10 a family only the first chunk holds and one only the last -> one UNWIRED merge line naming both [rc=$rc: ${_bpu:-no such line}]" 0
+git reset -q --hard HEAD~1
+
 # state 5e — THE INERTNESS CHANNEL THE TWO-PLANE DRIVER OPENS, and state 5d cannot reach it.
 #
 # 5d drifts FAMILIES, and the smoke fixture is built FROM the conf, so its rows rename with it and
@@ -1012,6 +1073,22 @@ fi
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
   && ck "AC10 restoring the real grammar goes green again" 1 || ck "AC10 restoring the real grammar goes green again" 0
+
+# state 5f — the driver EXITS 0 having written %O over %A, so the rc test passes and only the
+# missing-id list can red. No other state reaches that list with a driver that exits 0, so this is
+# the arm that holds the one-awk count (TOOL-aBriskPreflight-1 S5). TWO families, so the list's
+# family-then-id ORDER is graded too; state 6 below needs the real driver, and reds without it.
+cp $KIT_REL/${MT_KIT}/merge-rows.py $KIT_REL/${MT_KIT}/merge-rows.py.away
+printf 'import shutil, sys\nshutil.copyfile(sys.argv[1], sys.argv[2])\n' > ${KP}${MT_KIT}/merge-rows.py
+cp .memory-tree.conf .memory-tree.conf.away
+printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL playbook:PLAY"\n' > .memory-tree.conf
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'cannot merge' \
+  && printf '%s' "$out" | grep -qF 'missing or duplicated: TOOL-002 TOOL-003 PLAY-002 PLAY-003 ('; } \
+  && ck "AC10 a driver that exits 0 and drops the new rows -> UNWIRED naming every -002 and -003, exit 1" 1 \
+  || ck "AC10 a driver that exits 0 and drops the new rows -> UNWIRED naming every -002 and -003, exit 1" 0
+mv -f .memory-tree.conf.away .memory-tree.conf
+mv -f $KIT_REL/${MT_KIT}/merge-rows.py.away $KIT_REL/${MT_KIT}/merge-rows.py
 
 # state 6 — a value somebody else set is REPORTED and never clobbered (the check_hooks rule)
 git config merge.rows.driver 'bash vendor/other-driver.sh %O %A %B %P'
@@ -1523,6 +1600,44 @@ for spell in 'absent|' 'blank|BACKLOG_MODE=""' 'quoted|BACKLOG_MODE="builds"' \
 done
 rm -f "$D/.git/mode-kit.py"
 cleanup
+
+# ---- TOOL-aBriskPreflight-2 AC9: the launcher is resolved ONCE, and a run with none still probes ----
+# Every arm that needs python reads `PY_OK`, set beside `PY`, instead of RUNNING the candidates again.
+# Every launcher name is shadowed by a stub that exits 9 and GOV_PYTHON names a fourth, so a memo that
+# read a launcher as resolved hands a stub to the kit resolver and to the straggler inventory: the
+# agent-cap arm then skips a hook that is there, and the straggler line names an exit status. The
+# engine is a stub too, because a run with no python stops before it starts it.
+newrepo
+OOT=$(mktemp -d)
+for _n in python3 python py gov-py; do printf '#!/bin/sh\nexit 9\n' > "$OOT/$_n"; chmod +x "$OOT/$_n"; done
+mkdir -p "./${KP}$HOOKS" "./${KP}${MT_KIT}"; cp "$SCRIPT" "./${KP}check-wiring.sh"; printf '// stub\n' > "${KP}$HOOKS/agent-cap.js"
+printf '# a stub engine\n' > "${KP}${MT_KIT}/migrate_backlog.py"
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="tooling"\nFAMILIES="tooling:TOOL"\nROTATION_MODE="cut"\nBACKLOG_MODE="builds"\n' > .memory-tree.conf
+git add -A; git commit -q -m "no usable python, and a builds-mode memory tree"
+out=$(PATH="$OOT:$PATH" GOV_PYTHON="$OOT/gov-py" bash "./${KP}check-wiring.sh" --check 2>"$OOT/err")
+ck "BP2 AC9 no launcher runs -> stderr carries the resolver's bash-probe note" \
+   "$(grep -q '^note     resolver  — no usable python' "$OOT/err" && echo 1 || echo 0)"
+ck "BP2 AC9 ...stdout says the straggler inventory did not run" \
+   "$(printf '%s' "$out" | grep -q '^note     straggler — no usable python launcher resolved' && echo 1 || echo 0)"
+ck "BP2 AC9 ...and the bash probe rung still finds the shipped agent-cap.js" \
+   "$(printf '%s' "$out" | grep -q '^UNWIRED  agent-cap' && ! printf '%s' "$out" | grep -q '^skip     agent-cap' && echo 1 || echo 0)"
+cleanup
+
+# ---- TOOL-aBriskPreflight-2 AC12: KIT_FILE_PAIRS lists every pair a call site passes -----------------
+# A pair the list lacks still resolves, through a python start of its own, so a stale list is slower
+# and never wrong — which is why nothing but this comparison would ever see it go stale. The literal
+# pairs are the two words after each `resolve_kit_file` outside a comment.
+_kfp='FNR == NR { if (sub(/^KIT_FILE_PAIRS=\(/, "")) { sub(/\).*$/, ""); n = split($0, w, " "); for (i = 1; i < n; i += 2) have[w[i] " " w[i+1]] = 1 }; next }
+  /^[[:space:]]*#/ { next }
+  { s = $0; while (match(s, /resolve_kit_file [A-Za-z0-9_.-]+ [A-Za-z0-9_.-]+/)) { p = substr(s, RSTART + 17, RLENGTH - 17); print ((p in have) ? "listed " : "unlisted ") p; s = substr(s, RSTART + RLENGTH) } }'
+_pairs=$(awk "$_kfp" "$SCRIPT" "$SCRIPT")
+ck "BP2 AC12 every literal pair a resolve_kit_file call site passes is in KIT_FILE_PAIRS" \
+   "$([ -n "$_pairs" ] && ! printf '%s\n' "$_pairs" | grep -q '^unlisted ' && echo 1 || echo 0)"
+_kfd=$(mktemp -d)
+sed '/^KIT_FILE_PAIRS=(/s/ memory-tree merge-rows\.py//' "$SCRIPT" > "$_kfd/cw.sh"
+ck "BP2 AC12 LIVENESS ...and with one pair taken out of the list, the comparison names it" \
+   "$(awk "$_kfp" "$_kfd/cw.sh" "$_kfd/cw.sh" | grep -qx 'unlisted memory-tree merge-rows.py' && echo 1 || echo 0)"
+rm -rf "$_kfd"
 
 # ---- TOOL-aRepatriatedFork-19: the install RECEIPT is the first rung -----------------------------
 # An adopter that homes a kit somewhere no probe spells — the merge driver flat under `scripts/`, the

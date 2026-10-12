@@ -1998,6 +1998,16 @@
       "file": "tools/unattended/stop-guard.test.sh"
     },
     {
+      "id": "build_pf_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "build_pfx_fixture",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "build_placement_models",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -4568,6 +4578,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_wiring_runnable",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_work_landed",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -5274,11 +5289,6 @@
     },
     {
       "id": "decide",
-      "kind": "function",
-      "file": ".githooks/pre-push.test.sh"
-    },
-    {
-      "id": "decide_on",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
     },
@@ -6793,6 +6803,11 @@
       "file": "tools/unattended/resume-tick.test.sh"
     },
     {
+      "id": "derive_wiring_bound",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "derive_worktree_root",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -7843,6 +7858,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "init_bounded",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "init_declared_merge",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -7856,6 +7876,11 @@
       "id": "init_pl_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "init_preflight_probes",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "init_repo",
@@ -8031,11 +8056,6 @@
       "id": "json_artifact_inventory",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
-    },
-    {
-      "id": "json_str",
-      "kind": "function",
-      "file": "tools/check-wiring.sh"
     },
     {
       "id": "key",
@@ -9143,6 +9163,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "measure_spawn_cost",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "measure_timeline_events",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -10043,21 +10068,6 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
-      "id": "pfx_decide",
-      "kind": "function",
-      "file": ".githooks/pre-push.test.sh"
-    },
-    {
-      "id": "pfx_fixture",
-      "kind": "function",
-      "file": ".githooks/pre-push.test.sh"
-    },
-    {
-      "id": "pfx_stamp",
-      "kind": "function",
-      "file": ".githooks/pre-push.test.sh"
-    },
-    {
       "id": "phase_of",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -10356,6 +10366,11 @@
       "id": "print_populations",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "print_preflight_breach",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "print_probe_populations",
@@ -11013,6 +11028,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_bounded",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_brief_cutoff",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -11416,6 +11436,11 @@
       "id": "read_fork_cutoff",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "read_fragment_keys",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
     },
     {
       "id": "read_gate",
@@ -11998,6 +12023,21 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "read_pf_at",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_pf_pid",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_pf_rows",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "read_phase",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -12101,6 +12141,11 @@
       "id": "read_pp_key",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "read_preflight_probes",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "read_probe_allow",
@@ -14793,6 +14838,11 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "resolve_kit_files",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
       "id": "resolve_kit_homes",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
@@ -16508,6 +16558,11 @@
       "file": "tools/workflows/check_by_design_parity.py"
     },
     {
+      "id": "run_pfx_push",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "run_pk_gate",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -16581,6 +16636,11 @@
       "id": "run_push",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
+    },
+    {
+      "id": "run_push_selftests",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "run_raw",
@@ -20816,6 +20876,11 @@
       "id": "write_pause_row",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "write_pfx_stamp",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "write_pk_conf",

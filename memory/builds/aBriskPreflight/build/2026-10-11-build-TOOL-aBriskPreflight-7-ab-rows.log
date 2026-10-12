@@ -1,0 +1,14 @@
+# **Serves:** research TOOL-aBriskPreflight-7
+host label=ab-AO-1 at=17:01:48Z spawn5=6.31 fork=0.59 paged=19542MB nonpaged=6245MB committed=53951MB cpu=39%
+label=ab-AO-1 rc=1 start=1791738124.377381 wall=1820.0 spawn5=8.96
+proof label=ab-AO-1 preflight-ok=0 last=unattended: --preflight refused; the run-state file is unchanged
+host label=ab-AN-1 at=17:32:48Z spawn5=4.15 fork=0.07 paged=19585MB nonpaged=6283MB committed=53739MB cpu=26%
+label=ab-AN-1 rc=0 start=1791739978.614873 wall=1041.7 spawn5=7.36
+proof label=ab-AN-1 preflight-ok=1 last=unattended: preflight OK — base 167094533ac30999618508f122af116f2fce2869 · anchor refs/heads/main at 23c08f73e8f87c12
+host label=ab-AO-2 at=17:50:50Z spawn5=6.12 fork=2.53 paged=19632MB nonpaged=6285MB committed=54056MB cpu=21%
+label=ab-AO-2 rc=1 start=1791741062.629077 wall=2112.3 spawn5=7.74
+proof label=ab-AO-2 preflight-ok=0 last=unattended: --preflight refused; the run-state file is unchanged
+host label=ab-AN-2 at=18:26:42Z spawn5=6.40 fork=1.06 paged=19724MB nonpaged=6300MB committed=54326MB cpu=33%
+label=ab-AN-2 rc=0 start=1791743215.481733 wall=855.8 spawn5=8.71
+proof label=ab-AN-2 preflight-ok=1 last=unattended: preflight OK — base 167094533ac30999618508f122af116f2fce2869 · anchor refs/heads/main at 23c08f73e8f87c12
+done
