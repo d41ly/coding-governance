@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-15 — the closing review's minors: oracles that rot, readers that disagree, a verdict over a broken index
 
-**Status:** OPEN · rev-2 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 15 · ratified 2026-10-12
+**Status:** OPEN · rev-3 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 15 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md) | journal | TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 |
 | [2026-10-12-prompt-TOOL-aOrientedCast-13-1-fold-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-13-1-fold-brief.md) | journal | TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 |
+| [2026-10-12-prompt-TOOL-aOrientedCast-15-1-fold-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-15-1-fold-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -67,6 +68,20 @@ index every hook refuses. Its write set does not meet `TOOL-aOrientedCast-14`'s.
   (`:1584-1586`) reports `UNWIRED  roles     — .claude/roles.json does not parse as the role index;
   re-render it with bash <kit>/adopt-roles.sh --scaffold`, adds one to `unwired` and returns. The
   `note` stays only for a host with no usable python. Observed by AC6.
+- **S8** — Arm 13 of `render_agents.py --selftest` (`tools/roles/render_agents.py:459-461`), added
+  by `TOOL-aOrientedCast-13` at `8eccf905b`, matches its claim over the whole output: it asserts
+  `render_agents: note` appears and `'absent'` appears, each anywhere. It asserts instead that ONE
+  output line carries both, as the govkit OC13 arm does: `any(ln.startswith("render_agents: note")
+  and "'absent'" in ln for ln in out.getvalue().splitlines())`. The bug class is
+  line-claim-matched-over-the-whole-output. Observed by AC7.
+- **S9** — The roles kit's version moves 1.1 to 1.2. This is the build's last unit to edit
+  `tools/roles/`, and `TOOL-aOrientedCast-13` moved the kit's shipped bytes after 1.1. The carriers,
+  read from `tools/check-kit-versions.sh` (`:386-392`) and `tools/govkit/govkit.py`'s
+  `derive_marker_basis` and `write_version_carriers`, are: `KIT_ROLES_VERSION` in
+  `tools/roles/roles_lib.py`, the source `kit.toml`'s `version_from` names; the `gov:kit roles@`
+  marker in `tools/roles/README.md`; the same marker in `tools/roles/SKILL.template.md`, inside the
+  descriptor's `**` claim; and the rendered `.claude/skills/build/SKILL.md`, re-rendered by
+  `bash tools/roles/adopt-roles.sh --scaffold` and byte-compared by its `--check`. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -78,8 +93,9 @@ index every hook refuses. Its write set does not meet `TOOL-aOrientedCast-14`'s.
   unguarded, so a `handoff.py` or `agent-cap.js` edit already reaches it.
 - No change to the card grammar itself, to the kickoff refusal text, or to `--task-skeleton`.
 - No change to the typed OC4 arms or to the harnesses.
-- No kit-version bump for workflows, roles, kickoff-manifest or check-wiring; each moves once at the
-  close.
+- No kit-version bump for workflows, kickoff-manifest or check-wiring; each moves once at the
+  close. The roles kit is the exception, S9: this unit is the build's last to edit `tools/roles/`,
+  so its one move happens here, after the last change to its shipped bytes.
 
 **What it is built on.** S3 and S4 extend `TOOL-aOrientedCast-2`'s `handoff.py` render, check and
 kickoff-checker resolution; S1 rewrites `TOOL-aOrientedCast-4`'s OC4 arms of
@@ -167,6 +183,19 @@ The fixture in `adopt-roles.test.sh` gains arm 7: the conf is written as
 the rendered Skill carries no `# note`, and the Skill and every agent type name the same `<MR>/`
 root. Against the base adopter the scaffold exits 2, "MEMORY_ROOT is blank or absent".
 
+### The note arm (S8)
+
+The first `check_arm(state, 13, …)` call's predicate becomes `rc == 0 and any(…)` over
+`out.getvalue().splitlines()`, the line test S8 quotes; its failure text and the second arm 13 call
+stay as they are. The expression is inline, so no symbol is minted.
+
+### The roles bump (S9)
+
+`KIT_ROLES_VERSION = "1.2"` in `roles_lib.py`, `<!-- gov:kit roles@1.2 -->` in the README and the
+Skill template, and `bash tools/roles/adopt-roles.sh --scaffold` to carry the template's marker into
+`.claude/skills/build/SKILL.md`. The bump lands after S3, S4, S6 and S8 in the pass, so no later
+edit of this unit moves the kit's bytes past 1.2.
+
 ### The kickoff stamp
 
 `manifest-check.sh` is in the kickoff manifest's `watch:` list, so this unit re-stamps
@@ -185,6 +214,11 @@ gotchas checks.
 `tools/roles/handoff.py`
 `tools/roles/adopt-roles.sh`
 `tools/roles/adopt-roles.test.sh`
+`tools/roles/render_agents.py`
+`tools/roles/roles_lib.py`
+`tools/roles/README.md`
+`tools/roles/SKILL.template.md`
+`.claude/skills/build/SKILL.md`
 `skills/session-kickoff/manifest-check.sh`
 `skills/session-kickoff/manifest-check.test.sh`
 `tools/check-wiring.sh`
@@ -259,16 +293,29 @@ file. The suite arms are under `New arm:` in §7.
   `ok       roles` line.
   Red when: a broken index still reads ok.
   fixture: the scratch repository the `check-wiring` suite's roles block builds, made in the pass.
+- **AC7** — When the `roles render selftest` leg runs at the close, arm 13 passes, and it reds when a
+  `render_agents: note` line without `'absent'` and a separate line carrying `'absent'` are staged into
+  the optional-leg render's output.
+  Red when: the arm tests the two substrings over the whole output, which admits that staged pair,
+  as the arm at `8eccf905b` does.
+  permission: this run's builder may not execute the roles render selftest; the main loop observes it.
+- **AC8** — When `grep -c '^KIT_ROLES_VERSION = "1.2"' tools/roles/roles_lib.py` runs it prints 1;
+  when `grep -c 'gov:kit roles@1.2'` runs over each of `tools/roles/README.md`,
+  `tools/roles/SKILL.template.md` and `.claude/skills/build/SKILL.md` it prints 1; and
+  `grep -rn 'roles@1.1' tools/roles .claude/skills/build` prints nothing.
+  Red when: a carrier still reads 1.1, or the rendered Skill was not re-rendered after the template
+  moved.
 
 ## 7. Gates
 
-`unattended-build self-test` · `tier2-review self-test` · `review-join self-test` · `verifier fan-out self-test` · `roles adopter self-test` · `roles render wiring` · `roles catalogue` · `manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `kickoff-manifest ratchet` · `check-wiring self-test` · `straggler-guard arms` · `transition-audit arms` · `gotchas selftest` · `recall floor` · `recall floor arms` · `install-prefix (shipped surface)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`unattended-build self-test` · `tier2-review self-test` · `review-join self-test` · `verifier fan-out self-test` · `roles adopter self-test` · `roles render wiring` · `roles render selftest` · `roles catalogue` · `kit version markers` · `govkit selfcheck` · `kit epoch (shipped bytes move, the version moves)` · `manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `kickoff-manifest ratchet` · `check-wiring self-test` · `straggler-guard arms` · `transition-audit arms` · `gotchas selftest` · `recall floor` · `recall floor arms` · `install-prefix (shipped surface)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/workflows/unattended-build.test.sh · covers AC1 · the span and empty-roles arms of §4, against an untyped spec prompt staged to carry the role stamp · `FLOOR_ASSERTIONS` moved to the count the rewritten block executes
 New arm: tools/roles/adopt-roles.test.sh · covers AC3 · arm 6, against `handoff.py`'s task hash staged to skip the CRLF fold · none
 New arm: tools/roles/adopt-roles.test.sh · covers AC5 · arm 7, against the base adopter's bare `sed` read of `MEMORY_ROOT` · `FLOOR_ASSERTIONS` raised by arm 7's assertions
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC4 · a KC row whose OUT label is followed by a space before its colon, against the base `value()` · `FLOOR_ASSERTIONS` raised by the rows added
 New arm: tools/check-wiring.test.sh · covers AC6 · a truncated `.claude/roles.json` in the roles block, against the base `check_roles` that falls through to ok · none
+New arm: tools/roles/render_agents.py · covers AC7 · arm 13's one-line note test, against a staged note line without `'absent'` plus a separate `'absent'` line · none
 
 The main loop observes each arm RED on its staged break and GREEN once restored, at the close (M8).
 No pass runs a leg above.
@@ -299,6 +346,10 @@ No pass runs a leg above.
   sources and redded check 12's join; they move to a "What it is built on" paragraph. The
   `hands-off` to `TOOL-aOrientedCast-14`, sequenced before this unit, is dropped: neither unit needs
   the other's built output, so the shared reword is prose. Edges reads `none`.
+- rev-3 · 2026-10-12 · fold of the 15-1 brief. §2 gains S8, arm 13 of `render_agents.py` tested on
+  one output line, and S9, the roles kit 1.1 to 1.2 over its four carriers; §3's bump non-goal
+  excepts roles; §4 gains "The note arm" and "The roles bump"; files touched, AC7, AC8, four gates
+  and one `New arm:` row follow.
 
 ## 10. Reuse audit
 

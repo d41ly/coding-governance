@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-14 — the role gate reads past every launcher option, and both role arms find the session's checkout
 
-**Status:** OPEN · rev-3 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 14 · ratified 2026-10-12
+**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 14 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
