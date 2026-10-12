@@ -83,3 +83,15 @@ base: 6dc23b58fe360c0e15168544cf4b03af6550a7ad
 2026-10-11T22:58:44Z brief · item TOOL-aPairedSlots-9 · reason 79f3a3a61f81 memory/builds/aPairedSlots/prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md
 
 2026-10-11T23:19:07Z dispatch · item 91a71cac TOOL-aPairedSlots-9 · reason memory/LIVE.md memory/builds/aPairedSlots/README.md memory/builds/aPairedSlots/spec/2026-10-11-spec-TOOL-aPairedSlots-9.md memory/builds/aPairedSlots/build/2026-10-11-build-TOOL-aPairedSlots-9-1-acceptance-ledger.md memory/builds/aPairedSlots/build/2026-10-11-build-TOOL-aPairedSlots-9-ab-plan.txt memory/builds/aPairedSlots/build/2026-10-11-build-TOOL-aPairedSlots-9-ab-results.md memory/builds/aPairedSlots/build/2026-10-11-build-TOOL-aPairedSlots-9-ab-results.tsv memory/builds/aPairedSlots/build/2026-10-11-build-TOOL-aPairedSlots-9-ab-samples.tsv memory/builds/aPairedSlots/build/2026-10-11-build-TOOL-aPairedSlots-9-rule-check.py
+
+2026-10-12T00:25:03Z review · item aPairedSlots · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 4 · minors 26 · disposition promote
+
+2026-10-12T00:25:22Z rescope · item add TOOL-aPairedSlots-11 · reason closing review round 1 HIGH H1 (id 7, with M6 ids 15 and 32): two first writers leave the drift history with rows above its header, unreadable for good; promoted by the CONVERGED exit
+
+2026-10-12T00:25:31Z rescope · item add TOOL-aPairedSlots-12 · reason closing review round 1 HIGH H2 (id 12, with L8 id 38): the A/B instrument reads the run record's verdict by line, so its proof column shifts and the rule check proves an arm from the wrong field; promoted by the CONVERGED exit
+
+2026-10-12T00:25:39Z rescope · item add TOOL-aPairedSlots-13 · reason closing review round 1 HIGH H3 (id 13): the two-bar check reads the verdict by line, so its row predicate compares a timestamp with a leg count; promoted by the CONVERGED exit
+
+2026-10-12T00:25:47Z rescope · item add TOOL-aPairedSlots-14 · reason closing review round 1 HIGH H4 (id 30, with M7 id 14): the two-bar check's overlap guard times the invocation, not the admitted interval, so it cannot fail; promoted by the CONVERGED exit
+
+2026-10-12T00:25:55Z rescope · item add TOOL-aPairedSlots-15 · reason closing review round 1 MEDIUMs and LOWs, batched as one unit (M1 to M9, L1 to L7): reap nonce order, worktree rule across counts and the docs key, suite floors and pins, slot cap, docs beacon sweep, names, README and records; promoted by the CONVERGED exit

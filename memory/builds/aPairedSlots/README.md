@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling
 roster: TOOL
-ids: TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 TOOL-aPairedSlots-10
+ids: TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 TOOL-aPairedSlots-10 TOOL-aPairedSlots-11 TOOL-aPairedSlots-12 TOOL-aPairedSlots-13 TOOL-aPairedSlots-14 TOOL-aPairedSlots-15
 authorized-by: prompt
 ---
 
@@ -38,7 +38,8 @@ the mandate, recorded under [prompts/](prompts/2026-10-11-prompt-TOOL-aPairedSlo
 - **Classification (M2)**: six units at open; eight after the shared-path audit split unit 5, nine after the owner cut the A/B to one repetition (2026-10-11); all authored this run, one mechanism each.
 - Built on aFrugalTurnstile's host-wide turnstile (TOOL-aFrugalTurnstile-5), never on the one it
   replaced; this run's code passes start only once that build has landed on the default branch.
-- Units 1, 2, 3, 4, 5, 7 and 9 all write `tools/run-gates/run-gates.sh` and run in that order. Unit 6
+- Units 1, 2, 3, 4, 5 and 7 write `tools/run-gates/run-gates.sh` and run in that order; unit 9 runs
+  last, since it sets that file's share rule, and the A/B left the value it already had. Unit 6
   writes the unattended kit and unit 8 the process-monitor self-test; each is disjoint from the rest.
 - Out of scope, owned by aFrugalTurnstile: the scoped and full staleness rules, lineage reuse,
   `post-merge.sh` and the push boundary.
@@ -69,11 +70,17 @@ Other parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 7 | `TOOL-aPairedSlots-7` | the common dir's run log, health log trim, shared full green and drift history header take a second concurrent writer safely |
 | 8 | `TOOL-aPairedSlots-8` | the process-monitor adopter self-test stamps a fixture's common dir, not the real one |
 | 9 | `TOOL-aPairedSlots-9` | node a's slot count and the shared-width rule, set by the two-bar A/B at one repetition per arm (owner, 2026-10-11) |
+| 11 | `TOOL-aPairedSlots-11` | the drift history is created with its header already in it (closing review H1) |
+| 12 | `TOOL-aPairedSlots-12` | the A/B instrument reads the run record's verdict by key, and the rule check proves an arm from its bar rows (closing review H2) |
+| 13 | `TOOL-aPairedSlots-13` | the two-bar check reads the verdict by key and grades its rows at their declared width (closing review H3) |
+| 14 | `TOOL-aPairedSlots-14` | the two-bar check's overlap guard reads the slots the bars were admitted to (closing review H4) |
+| 15 | `TOOL-aPairedSlots-15` | the closing review's mediums and lows, batched |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 9 unit(s) · node a · opened 2026-10-11 · streams tooling
-ids TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 TOOL-aPairedSlots-10
+**Build status:** INPROGRESS · 14 unit(s) · node a · opened 2026-10-11 · streams tooling
+ids TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 TOOL-aPairedSlots-10 TOOL-aPairedSlots-11 TOOL-aPairedSlots-12 TOOL-aPairedSlots-13 TOOL-aPairedSlots-14
+ids TOOL-aPairedSlots-15
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -87,13 +94,19 @@ ids TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlot
 | [TOOL-aPairedSlots-5 — a worktree holds at most one slot, so every path under its git dir stays one bar's](spec/2026-10-11-spec-TOOL-aPairedSlots-5.md) | 5 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aPairedSlots-7 — the common dir's shared files take a second concurrent writer safely](spec/2026-10-11-spec-TOOL-aPairedSlots-7.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-11 |
 | [TOOL-aPairedSlots-9 — node a's slot count and the shared-width rule, set by the two-bar A/B](spec/2026-10-11-spec-TOOL-aPairedSlots-9.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-12 |
+| [TOOL-aPairedSlots-11 — the drift history is created with its header already in it](spec/2026-10-12-spec-TOOL-aPairedSlots-11.md) | 8 | 2 | INPROGRESS | rev-1 | 2026-10-12 |
+| [TOOL-aPairedSlots-12 — the A/B instrument reads the run record's verdict by key, and the rule check proves an arm from its bar rows](spec/2026-10-12-spec-TOOL-aPairedSlots-12.md) | 8 | 1 | INPROGRESS | rev-1 | 2026-10-12 |
+| [TOOL-aPairedSlots-15 — the closing review's mediums and lows, batched](spec/2026-10-12-spec-TOOL-aPairedSlots-15.md) | 8 | 2 | INPROGRESS | rev-1 | 2026-10-12 |
+| [TOOL-aPairedSlots-13 — the two-bar check reads the verdict by key and grades its rows at their declared width](spec/2026-10-12-spec-TOOL-aPairedSlots-13.md) | 9 | 1 | INPROGRESS | rev-1 | 2026-10-12 |
+| [TOOL-aPairedSlots-14 — the two-bar check's overlap guard reads the slots the bars were admitted to](spec/2026-10-12-spec-TOOL-aPairedSlots-14.md) | 10 | 1 | INPROGRESS | rev-1 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 17 bound to this build, across 3 record folder(s).
+Records: 18 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aPairedSlots-11 TOOL-aPairedSlots-12 TOOL-aPairedSlots-13 TOOL-aPairedSlots-14 TOOL-aPairedSlots-15.
 
-Ids no `spec-audit` record has ever named: TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9.
+Ids no `spec-audit` record has ever named: TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 TOOL-aPairedSlots-11 TOOL-aPairedSlots-12 TOOL-aPairedSlots-13
+TOOL-aPairedSlots-14 TOOL-aPairedSlots-15.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -107,6 +120,9 @@ Ids no `spec-audit` record has ever named: TOOL-aPairedSlots-1 TOOL-aPairedSlots
 | 5 | `TOOL-aPairedSlots-5` | no |
 | 6 | `TOOL-aPairedSlots-7` | no |
 | 7 | `TOOL-aPairedSlots-9` | no |
+| 8 | `TOOL-aPairedSlots-11`, `TOOL-aPairedSlots-12`, `TOOL-aPairedSlots-15` | yes |
+| 9 | `TOOL-aPairedSlots-13` | no |
+| 10 | `TOOL-aPairedSlots-14` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -11,6 +11,7 @@
 | [2026-10-11-build-TOOL-aPairedSlots-5-two-bar-check.sh](../build/2026-10-11-build-TOOL-aPairedSlots-5-two-bar-check.sh) | journal | TOOL-aPairedSlots-7 |
 | [2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md) | journal | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 |
 | [2026-10-11-prompt-TOOL-aPairedSlots-1.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1.md) | research | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-6 |
+| [2026-10-12-review-TOOL-aPairedSlots-1-9-diff-review-round1.md](../reviews/2026-10-12-review-TOOL-aPairedSlots-1-9-diff-review-round1.md) | diff-review | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 |
 
 <!-- /gen:spec-records -->
 
