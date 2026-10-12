@@ -35,19 +35,21 @@
 #
 # Exit 0 + no FAILED lines = clean (WARN:/NOTE: lines permitted). Exit 1 = a check failed — for
 #          the card verbs: a body or card with nothing to check (DEAD PROBE), a --check miss, a
-#          real READY line with no `## task` beneath it, or a body whose `## route` breaks a rule.
+#          real READY line with no `## task` beneath it, a READY body whose `## task` leaves a field
+#          --task-skeleton prints absent, repeated, empty or a placeholder, or a body whose
+#          `## route` breaks a rule.
 # Exit 2 = environment error (not a git repo / no manifest found / path outside the repo / a card
 #          verb with no session id, a path-shaped one, a card over its byte cap, an append whose
 #          READY line pins a BASE that is not HEAD, an id reader that could not answer, or a route
 #          the tree cannot check: no MEMORY_ROOT, or no defined-id set).
 set -u
-KIT_MANIFEST_VERSION="1.29"   # gov:kit kickoff-manifest@1.29 — the registry id
+KIT_MANIFEST_VERSION="1.30"   # gov:kit kickoff-manifest@1.30 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
 # marker and the shipped seed's marker are compared with. It was one number, so every vintage bump
 # told every adopter to upgrade a format that had not moved. Raise it only with an upgrade step.
-MANIFEST_FORMAT="1.4"
+MANIFEST_FORMAT="1.5"
 
 # THE ONE LIST of places a kickoff manifest may live, in precedence order. Every consumer reads it
 # from here — the discovery loop, the not-found message, and the `--locations` verb that the kickoff
@@ -74,7 +76,28 @@ MANIFEST_LOCATIONS="memory/guides/SESSION-KICKOFF.md .claude/SESSION-KICKOFF.md"
 # a region whose content is conditional cannot be byte-compared — it would be simultaneously required
 # by check 10 and banned by check 1. The tier enumeration already has a home in §B's tier rule, so
 # dropping it here is a deduplication that happens to be what makes the seal implementable.
+#
+# It is also the LABEL source: `check_card_task` reads the eight field labels out of it at run time, so
+# the append's refusal and this skeleton cannot name different fields (KICK-aOrientedCast-1).
 read -r -d '' TASK_SKELETON <<'KICKOFF_TASK_SKELETON' || true
+<!-- kickoff:task -->
+> - **Title:** …
+> - **Goal (1–2 sentences):** …
+> - **IN scope:** …
+> - **OUT / non-goals** (explicit cut-line): …
+> - **To-do:** (the steps in order, each naming what it changes) …
+> - **Reuse:** (each seam this extends, by path, or "no seam fits" with the probe's evidence) …
+> - **Acceptance check** (the observation that proves THIS change — a test it adds, a gate it
+>   moves, an observed behavior; *not* an unrelated green check): …
+> - **Gates it must pass:** …
+<!-- /kickoff:task -->
+KICKOFF_TASK_SKELETON
+
+# FORMAT 1.4's region, FROZEN — the six fields before To-do and Reuse. Check 10 is its only reader: it
+# passes this region, with a NOTE naming the re-paste, only in a manifest whose marker is older than
+# 1.5, so an adopter's ratchet stays green through the `govkit update` that brings the eight fields.
+# Never edit it; a format that moves the region again freezes ITS predecessor beside this one.
+read -r -d '' TASK_SKELETON_FORMAT_1_4 <<'KICKOFF_TASK_SKELETON_1_4' || true
 <!-- kickoff:task -->
 > - **Title:** …
 > - **Goal (1–2 sentences):** …
@@ -84,7 +107,7 @@ read -r -d '' TASK_SKELETON <<'KICKOFF_TASK_SKELETON' || true
 >   moves, an observed behavior; *not* an unrelated green check): …
 > - **Gates it must pass:** …
 <!-- /kickoff:task -->
-KICKOFF_TASK_SKELETON
+KICKOFF_TASK_SKELETON_1_4
 
 # THE ONE BRIEF SHAPE, and the card's route shape beneath it (KICK-aRoutedQuill-1). A kickoff whose
 # task writes product code drafts its brief from this, and the session pipes the filled route section
@@ -1030,10 +1053,82 @@ check_card_route() {
   exit 1
 }
 
+# The task fields (KICK-aOrientedCast-1): a real READY body's `## task` holds every field TASK_SKELETON
+# names, each once, none empty and none a placeholder. ONE awk, the skeleton on its first input and the
+# body on its second, so the labels graded are the skeleton's by construction. This is the one grammar
+# for a card's task fields, and TOOL-aOrientedCast-2's renderer reads `task:` keys by it:
+#   section — the lines after the LAST `## task` heading, to the next `## ` heading, READY line or end;
+#   line    — leading whitespace, then any run of `>` each with an optional space, then one `- ` or
+#             `* ` marker, stripped; a line then opening `<!--` or `UNVERIFIED — ` is not field text;
+#   field   — a line opening `**`: its label runs to the first `:**` when that comes no later than the
+#             first closing `**`, else to that `**`, trimmed; the rest of the line and each following
+#             line, up to the next field line, is its raw text;
+#   value   — trimmed, one leading balanced `(…)` group stripped, then one leading `:`, trimmed again;
+#   verdict — whitespace runs collapsed; EMPTY, or a PLACEHOLDER: one of … ... tbd todo n/a none - ?
+#             in any case, only `.` and `…`, or one `<slot>` holding no further angle bracket.
+# A field line whose label is not one of the eight ends the field above it and is otherwise ignored.
+# It spawns no git and no id reader. WHAT THIS DOES NOT CHECK: what a value says beyond present, single,
+# non-empty and not a placeholder; a stored card, since `--card --check` keeps its rules and a card
+# written before this landed still checks clean; or a body with no real READY line.
+check_card_task() {
+  local verdict
+  verdict=$(printf '%s\n' "$TASK_SKELETON" | LC_ALL=C awk -v q="'" '
+    function strip(s) { sub(/^[[:space:]]+/, "", s); sub(/^(> ?)+/, "", s); sub(/^[-*] /, "", s); return s }
+    function trim(s) { sub(/^[[:space:]]+/, "", s); sub(/[[:space:]]+$/, "", s); return s }
+    function field(s,   k, b) {
+      if (substr(s, 1, 2) != "**") return 0
+      s = substr(s, 3); k = index(s, ":**"); b = index(s, "**")
+      if (!b) return 0
+      if (k && k < b) { LBL = trim(substr(s, 1, k - 1)); REST = substr(s, k + 3) }
+      else { LBL = trim(substr(s, 1, b - 1)); REST = substr(s, b + 2) }
+      return 1
+    }
+    function value(r,   d, i, ch) {
+      r = trim(r)
+      if (substr(r, 1, 1) == "(")
+        for (i = 1; i <= length(r); i++) {
+          ch = substr(r, i, 1)
+          if (ch == "(") d++
+          else if (ch == ")" && --d == 0) { r = substr(r, i + 1); break }
+        }
+      r = trim(r)
+      if (substr(r, 1, 1) == ":") r = substr(r, 2)
+      r = trim(r); gsub(/[[:space:]]+/, " ", r)
+      return r
+    }
+    function placeholder(v,   t) {
+      t = tolower(v)
+      if (t == "…" || t == "..." || t == "tbd" || t == "todo" || t == "n/a" || t == "none" || t == "-" || t == "?") return 1
+      t = v; gsub(/\.|…/, "", t)
+      return t == "" || v ~ /^<[^<>]*>$/
+    }
+    NR == FNR { s = strip($0); if (substr(s, 1, 4) != "<!--" && field(s)) { nl++; L[nl] = LBL; W[LBL] = nl }; next }
+    { sub(/\r$/, "") }
+    /^## task[[:space:]]*$/ { insec = 1; cur = 0; split("", cnt); split("", raw); next }
+    insec && (/^## / || /^(- )?READY — /) { insec = 0 }
+    !insec { next }
+    { s = strip($0) }
+    substr(s, 1, 4) == "<!--" || index(s, "UNVERIFIED — ") == 1 { next }
+    field(s) { cur = (LBL in W) ? W[LBL] : 0; if (cur && ++cnt[cur] == 1) raw[cur] = REST; next }
+    cur && cnt[cur] == 1 { raw[cur] = raw[cur] "\n" s }
+    END {
+      for (i = 1; i <= nl; i++) {
+        if (!cnt[i]) c = "has no " L[i] " field"
+        else if (cnt[i] > 1) c = "carries " L[i] " twice"
+        else if ((v = value(raw[i])) == "") c = "leaves " L[i] " empty"
+        else if (placeholder(v)) c = "leaves " L[i] " a placeholder (" q v q ")"
+        else continue
+        out = out (out == "" ? "" : "; ") c
+      }
+      if (out != "") print out
+    }' - "$1")
+  [ -z "$verdict" ] || { echo "MANIFEST task REFUSED — the '## task' section $verdict; every field --task-skeleton prints is filled before a kickoff lands, and nothing was appended"; exit 1; }
+}
+
 # `--card --append`: the body on stdin, checked, annotated, and stored — or refused with the file
 # byte-identical. Order: the body's READY-line count, the citation check (its refusals come from a
-# reader that could not answer), DEAD PROBE on zero tokens, the `## task` refusal, the stale-BASE
-# refusal, the card's own shape, the route rules, the cap. A real-READY body replaces the whole TAIL and re-renders the `tree —` cell; a body
+# reader that could not answer), DEAD PROBE on zero tokens, the `## task` refusal, the task fields,
+# the stale-BASE refusal, the card's own shape, the route rules, the cap. A real-READY body replaces the whole TAIL and re-renders the `tree —` cell; a body
 # without one goes in before the TAIL's READY line, so the card always ends with its one READY line.
 add_card_body() {
   local body="$CARD_TMP/body" nready ready sha tree bytes l
@@ -1049,6 +1144,8 @@ add_card_body() {
   if [ "$nready" = 1 ] && ! grep -q '^## task' "$body"; then
     echo "MANIFEST env ERROR — the body carries a real READY line and no '## task' section: a kickoff that left no scope does not land on the card, and nothing was appended"; exit 1
   fi
+  # The fields under it, before the stale-BASE refusal; a body with no real READY line carries no task.
+  if [ "$nready" = 1 ]; then check_card_task "$body"; fi
   derive_head_state
   if [ "$nready" = 1 ]; then
     ready=$(grep -m1 "$CARD_READY_RE" "$body")
@@ -1239,7 +1336,7 @@ $c8"
 # string can interpolate it instead of re-typing it, and the playbook-parity gate compares
 # this expression against the one MANIFEST-TEMPLATE.md states, so the two cannot drift apart again.
 STAMP_SHA_RULE="sha = HEAD on any branch"
-RETROFIT="retrofit: (1) body deltas — rewrite the §B intro to 're-audited every kickoff; accretes', add the ratchet + dated-corrections (never delete the section) + traps-accrete text; (2) add the manifest-audit block: last-audit '<ISO datetime> @ <full sha>' (sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)), watch = gate-defining pathspecs, verify-paths = 2-3 anchors, last-body-change = the sha where the BODY was last revised; (2b) paste the sealed task region from --task-skeleton into §A; (3) copy manifest-check.sh in, add the .gitattributes LF rule + the gate-fence line, git add everything; (4) run this check to 0; (5) re-render the project's charter — since charter v4.0 it carries no manifest lines, and the ratchet leg's refusals name the write-back and the merge re-stamp; (5b) add registry = the file whose first table under '## Node registry' names this node, which the card verbs read; (6) bump the marker to v1.4 LAST. Full recipe: coding-governance/WIRE-INTO-PROJECT.md §4."
+RETROFIT="retrofit: (1) body deltas — rewrite the §B intro to 're-audited every kickoff; accretes', add the ratchet + dated-corrections (never delete the section) + traps-accrete text; (2) add the manifest-audit block: last-audit '<ISO datetime> @ <full sha>' (sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)), watch = gate-defining pathspecs, verify-paths = 2-3 anchors, last-body-change = the sha where the BODY was last revised; (2b) paste the sealed task region from --task-skeleton into §A; (3) copy manifest-check.sh in, add the .gitattributes LF rule + the gate-fence line, git add everything; (4) run this check to 0; (5) re-render the project's charter — since charter v4.0 it carries no manifest lines, and the ratchet leg's refusals name the write-back and the merge re-stamp; (5b) add registry = the file whose first table under '## Node registry' names this node, which the card verbs read; (6) bump the marker to v$MANIFEST_FORMAT LAST. Full recipe: coding-governance/WIRE-INTO-PROJECT.md §4."
 nblocks=$(grep -c '<!-- manifest-audit' "$MF" || true)
 BLOCK_OK=1
 if [ "$nblocks" -eq 0 ]; then
@@ -1404,7 +1501,16 @@ $files
       # until the closing review pointed at it, and a trailing blank line inside the region passed.
       c10have=$(region "$MF" '<!-- kickoff:task -->' '<!-- /kickoff:task -->' 2>/dev/null; printf X)
       c10want=$(printf '%s\n' "$TASK_SKELETON" | region /dev/stdin '<!-- kickoff:task -->' '<!-- /kickoff:task -->' 2>/dev/null; printf X)
-      if [ "$c10have" != "$c10want" ]; then
+      # Format 1.4's frozen region passes under a marker older than 1.5, the format that replaced it,
+      # and ONLY there: the WARN above already names the upgrade, the NOTE names its first step, and a
+      # 1.5 marker demands the region this script carries (KICK-aOrientedCast-1 §8 F2). The 1.5 is
+      # literal on purpose — it is when THAT region moved, not whatever MANIFEST_FORMAT says today.
+      c10old=$(printf '%s\n' "$TASK_SKELETON_FORMAT_1_4" | region /dev/stdin '<!-- kickoff:task -->' '<!-- /kickoff:task -->' 2>/dev/null; printf X)
+      if [ "$c10have" = "$c10want" ]; then
+        :
+      elif [ "$c10have" = "$c10old" ] && [ -n "$mver" ] && [ "$(ver_older "$mver" 1.5)" = y ]; then
+        echo "NOTE: the sealed task region is format 1.4's; re-paste it from --task-skeleton, then bump the marker to v$MANIFEST_FORMAT"
+      else
         fail 10 "the sealed task region differs from the task contract this script carries, and that region is not hand-authorable; restore it from the --task-skeleton verb rather than editing it in $MF"
       fi
     fi

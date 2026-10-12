@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.103 -->
+<!-- gov:kit unattended@1.104 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -727,7 +727,16 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   the fan-out hook compares the value with the run's pinned `spec-audit` fact and refuses any other.
   The unit harness then builds ONE unit per call from its brief and its spec. Every call is made by
   `scriptPath`, never by `name`: the fan-out guard's read-window narrowing is conditional on
-  `scriptPath`. Read the build method WHOLE before the first call. The child runs no gate, suite or
+  `scriptPath`. **Every harness call also carries `roles`**: the JSON the roles kit's
+  `handoff.py harness-args <harness>` prints, `<harness>` being `unattended-build`, `unattended-unit`
+  or, for the closing review M8 composes, `tier2-review`. **It also carries `efforts`**: the JSON
+  `handoff.py stage-efforts <workflow>` prints for the workflow that call runs — `spec-write` for
+  the build harness, `build` for the unit harness, `closing-review` for the closing review. With no
+  `.claude/roles.json` the roles kit is not installed: pass no `roles` and no `efforts`, and each
+  harness logs its per-stage fallback. A session started
+  before the rendered agent types existed cannot spawn them: it passes none too, and once the spawn
+  guard has landed it holds and a fresh session takes over. Read the build method WHOLE before the
+  first call. The child runs no gate, suite or
   bar, verifies with the one check that exercises its change, and bounds every command, skipping and
   naming a non-code command that does not return in its bound. The call carries `scratch: <your
   session scratchpad, absolute>` and refuses without it; the child refuses too, without the key or
@@ -735,8 +744,9 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   fact>`**, audit on or off: it pins the spec audit's checklist and the spec commit's checklist at
   the base the run was authorized at, and the harness refuses a declared `specAudit` without it.
   - **A review the platform killed DEFERS**: on `exit: 'deferred-platform'` nothing was recorded or
-    built and every returned agent's result is on disk, because the build harness runs its audit under
-    `workerType: 'none'`. Re-run the harness ONCE with identical args;
+    built. Every returned agent's result is on disk where the audit ran its judges untyped, under
+    `workerType: 'none'`; under `roles` none is, and the hand-back's `next` says the re-run
+    dispatches every judge again. Re-run the harness ONCE with identical args;
     on a second `deferred-platform`, hold — `--code platform-limit --until "after <reset UTC>"` when
     the Workflow result names a usage or session limit, `--code platform-unavailable --until "probe
     api"` otherwise — each with `--pending-run <runId>`.
@@ -745,8 +755,10 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
     do NOT; `(UNDECIDED - plan a unit that closes it, or dispose it)` is oriented, never dispatched
     (`UNATTENDED-ASKS.md` §3); `next: none - every tracked spec is terminal` ends the loop;
     `next: none - no tracked spec grades as a unit` does NOT — halt and read the NOT A UNIT rows, the
-    verb still exits 0. A child returning `committed:false` stops the loop. Nothing refuses the next
-    dispatch for you: the one refusal of an early stop is `build-complete` at `--close`, and its
+    verb still exits 0. A child returning `diverged: true` stopped before its code on the spec
+    section its `why` names: have that spec revised by the spec-writer role through a rendered
+    handoff, as the `/build` Skill's stage 5 does, then dispatch the unit again.
+    Any other `committed:false` stops the loop. Nothing refuses the next dispatch for you: the one refusal of an early stop is `build-complete` at `--close`, and its
     escapes are a unit carried forward against an open ask or a recorded `--override build-complete`.
 - **Run the bug-class checklist after every commit**, before the next pass: the memory-tree kit's
   `gotchas.py --for-diff HEAD~1..HEAD`. It takes a COMMITTED range, so before the commit it prints

@@ -1,8 +1,8 @@
 # Session kickoff manifest — coding-governance
 
-<!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
+<!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-12T23:57:50+03:00 @ 5e4b391ece19eb700712f3a70a5de68fc19b23a2
+last-audit: 2026-10-13T00:37:56+03:00 @ cfce31b6f20cdfa5fbf77d5ed1e4588175da1eaa
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 5e4b391ece19eb700712f3a70a5de68fc19b23a2
@@ -25,17 +25,17 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 
 ## §A — Task (the agent DERIVES this per kickoff — the user does NOT fill it)
 
-Derived from the `/session-kickoff` message plus the adjacent memory (`memory/DECISIONS.md`,
-`memory/backlog/`, `memory/builds/<slug>/`) and the code. The field set below is SEALED — check 10
-byte-compares it against the contract `manifest-check.sh` carries, so editing it here reds the bar.
-Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`. The tier lives in
-§B's tier rule, not here.
+Derived per kickoff from the `/session-kickoff` message, `memory/` and the code. The region below is
+SEALED: check 10 byte-compares it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`,
+which restores it. The tier is §B's.
 
 <!-- kickoff:task -->
 > - **Title:** …
 > - **Goal (1–2 sentences):** …
 > - **IN scope:** …
 > - **OUT / non-goals** (explicit cut-line): …
+> - **To-do:** (the steps in order, each naming what it changes) …
+> - **Reuse:** (each seam this extends, by path, or "no seam fits" with the probe's evidence) …
 > - **Acceptance check** (the observation that proves THIS change — a test it adds, a gate it
 >   moves, an observed behavior; *not* an unrelated green check): …
 > - **Gates it must pass:** …
@@ -51,6 +51,7 @@ lives where each bullet points.
 - Every session start writes an orientation card; a commit is refused until its READY line is appended, and only from a tree the card names (`tools/hooks/scratch-guard.js`).
 - A card's `## route` lands only when its build, unit specs and brief all resolve; a write under `ROUTED_PATHS` needs a route naming a buildable unit, and a pushed commit there names a specced one (`TOOL-aRoutedQuill-2`, `-3`).
 - The card's READY anchor accepts both the bare and the `- ` list-item spelling (`TOOL-cMendedVintage-16`).
+- An attended code build runs through `/build` after kickoff's go: the role catalogue's workflows in stage order (`KICK-aOrientedCast-2`).
 - Layout: `main` lives in `C:/projects/coding-governance`; every unit's branch rides its own worktree under `.claude/worktrees/<branch-slug>/`, and `git worktree list` is the inventory.
 - Remote `origin`, default branch `main`; a push needs an explicit ask or the authorization `memory/guides/UNATTENDED-PROTOCOL.md` section 1 defines.
 - Governing docs: `AGENTS.md`, the template it renders from, and `memory/DECISIONS.md`; binding guides are `memory/guides/REVIEW-PROTOCOL.md` and the unattended protocol and verbs.

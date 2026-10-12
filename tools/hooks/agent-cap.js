@@ -36,6 +36,25 @@
  * string that does not parse shows it no `kind`; and it reads the WORKTREE README and conf while the
  * unattended driver reads both at BASE, so the two can disagree for exactly one uncommitted edit.
  *
+ * RULE 6 IS NOT A FAN-OUT BOUND EITHER (TOOL-aOrientedCast-7): every agent prompt is a rendered
+ * handoff. Armed by `.claude/roles.json` at the checkout root of the payload `cwd`, else of
+ * `CLAUDE_PROJECT_DIR` (TOOL-aOrientedCast-14; neither resolving adds no rule, with one stderr line
+ * when `CLAUDE_PROJECT_DIR` is set), read through the
+ * sibling hook's `resolveRoleRoot` and `loadRoleIndex`: absent adds no rule; broken refuses both tools; no `agent`-true role
+ * refuses every `Agent` call, and an empty `harnesses` list every `Workflow` call, as UNARMED. An
+ * `Agent` call is admitted only when its `subagent_type` is an `agent`-true role and its `prompt` is,
+ * line endings folded and its ends trimmed, exactly one `gov:handoff` marker line naming that role,
+ * blank lines, and the `## Task` section of the file the marker's `path` names under
+ * `builds/<build>/prompts/`, that file holding the same single marker and a section whose SHA-256
+ * prefix is the marker's `task-sha`. A `Workflow` call is admitted only by a `scriptPath` listed in
+ * `harnesses`, with `args.roles` a non-empty object whose every value is an `agent`-true role. ORDER:
+ * after the AGENT_CAP refusal and the declared-cap read, before rule 4 (so a refused spawn claims no
+ * slot) and before rule 0; skipped under `--only=`. A throw inside it refuses. CEILING, said rather
+ * than implied: it stops forgetting, not evasion. A hook-less or `--bare` run, the agents a running
+ * harness spawns through its own `agent()`, a session-to-session message, a self-consistent
+ * hand-written prompt file and a hand-edited index all pass it, and it never compares `role-sha` with
+ * the role an agent type was rendered from.
+ *
  * CAP: 5, a FILE CONSTANT and the CEILING, never raisable. This guard RESOLVES the number
  * wherever a bound is written — the helper CALL SITE, the helper's own DEFAULT
  * PARAMETER, and the width a `gov:bounded-fanout` line claims — and denies one
@@ -79,7 +98,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.33' // gov:kit agent-cap@1.33 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.34' // gov:kit agent-cap@1.34 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -1882,11 +1901,8 @@ function checkSpecAuditDeclared(data) {
     `structured args only, never the script text.\n`
   let readme = '(unplaced)'
   try {
-    let a = data.tool_input && data.tool_input.args
-    if (typeof a === 'string') {
-      try { a = JSON.parse(a) } catch { return null }
-    }
-    if (!a || typeof a !== 'object' || Array.isArray(a)) return null
+    const a = extractWorkflowArgs(data)
+    if (!a) return null
     // TOOL-aWardedAudit-2 S4 — THE BUILD HARNESS'S `specAudit` IS THE SAME ACT ONE CALL EARLIER. The
     // harness runs its audit through a `workflow()` call inside its own script, a runtime call no
     // hook sees, so the only tool call there is to judge is the one carrying `specAudit`. It is placed
@@ -2007,6 +2023,151 @@ function checkSpecAuditDeclared(data) {
   }
 }
 
+// A Workflow call's structured `args`, parsed ONCE for rules 0 and 6: a JSON string is parsed, and
+// anything that is not then a plain object — a string that does not parse included — is null. Rule 0
+// admits on null, as it always has; rule 6 refuses on it.
+function extractWorkflowArgs(data) {
+  let a = data && data.tool_input && data.tool_input.args
+  if (typeof a === 'string') {
+    try { a = JSON.parse(a) } catch { return null }
+  }
+  return a && typeof a === 'object' && !Array.isArray(a) ? a : null
+}
+
+// RULE 6 (TOOL-aOrientedCast-7) — every agent prompt is a rendered handoff. The marker line is the
+// roles kit's interface, read here and never written; the renderer is named by its bare file name in
+// every message, because a kit file names no sibling kit by literal.
+const HANDOFF_MARK = 'gov:handoff'
+const HANDOFF_MARK_RE = /^<!-- gov:handoff role=(\S+) build=(\S+) unit=(\S+) path=(\S+) role-sha=([0-9a-f]{12}) task-sha=([0-9a-f]{12}) -->$/
+
+// Every line of `text`, carriage returns stripped, that is a whole marker line with its six fields in
+// order: `{ line, role, build, unit, path, taskSha }` each.
+function extractHandoffMarker(text) {
+  const out = []
+  for (const raw of String(text).split('\n')) {
+    const line = raw.replace(/\r/g, '')
+    const m = HANDOFF_MARK_RE.exec(line)
+    if (m) out.push({ line, role: m[1], build: m[2], unit: m[3], path: m[4], taskSha: m[6] })
+  }
+  return out
+}
+
+// The `## Task` section: from the first line that is exactly `## Task` to the end of the text, CRLF
+// folded to LF, or null. The renderer's span (`handoff.py`'s `check` hashes the same bytes). Walked
+// by line, not by a multiline `$`, which in JS also matches before a lone CR and in Python does not.
+function extractTaskSection(text) {
+  const t = String(text).replace(/\r\n/g, '\n')
+  let at = 0
+  for (const line of t.split('\n')) {
+    if (line === '## Task') return t.slice(at)
+    at += line.length + 1
+  }
+  return null
+}
+
+// The first twelve lowercase hex digits of the SHA-256 of a section's UTF-8 bytes.
+function buildTaskDigest(section) {
+  return require('crypto').createHash('sha256').update(String(section), 'utf8').digest('hex').slice(0, 12)
+}
+
+// The refusal: the rule, the tool, the reason, and the route that passes.
+function renderHandoffDeny(tool, why, index) {
+  const roles = index && index.roles ? Object.keys(index.roles).filter((n) => index.roles[n].agent === true).sort() : []
+  const route = tool === 'Agent'
+    ? `The agent-true roles are: ${roles.join(', ') || '(none)'}. Render the handoff with ` +
+      `\`handoff.py render --role <name> --build <slug> --part task\`, then pass its output unchanged as ` +
+      `\`prompt\` with \`subagent_type\` that role.`
+    : `The declared harnesses are: ${(index && index.harnesses ? index.harnesses : []).join(', ') || '(none)'}. ` +
+      `Run one by \`scriptPath\` and pass, in \`args\`, the \`roles\` object \`handoff.py harness-args <harness>\` prints.`
+  return `BLOCKED by agent-cap: rule 6 (TOOL-aOrientedCast-7) refused this ${tool} call — ${why}\n${route}\n`
+}
+
+// Rule 6 on an `Agent` call (§4 "The evaluation order", step 2): null to admit, else a deny string.
+function checkHandoffSpawn(data, index, root) {
+  const fs = require('fs')
+  const path = require('path')
+  const ti = data.tool_input || {}
+  const roles = Object.keys(index.roles).filter((n) => index.roles[n].agent === true)
+  if (!roles.length) return renderHandoffDeny('Agent', `UNARMED: ${index.shown} declares no agent-true role, so no spawn can be admitted.`, index)
+  const type = ti.subagent_type
+  if (typeof type !== 'string' || !Object.prototype.hasOwnProperty.call(index.roles, type) || index.roles[type].agent !== true) {
+    const research = roles.filter((n) => index.roles[n].workflow === 'research').sort()
+    return renderHandoffDeny('Agent', `subagent_type ${JSON.stringify(type === undefined ? null : type)} is not an agent-true role of ${index.shown}; ` +
+      `a built-in agent type is never admitted${research.length ? `, and research or mapping runs as the ${research.join(' or ')} role` : ''}.`, index)
+  }
+  if (typeof ti.prompt !== 'string') return renderHandoffDeny('Agent', 'the call carries no `prompt` string.', index)
+  const marks = extractHandoffMarker(ti.prompt)
+  if (marks.length !== 1) return renderHandoffDeny('Agent', `the prompt carries ${marks.length} ${HANDOFF_MARK} marker lines; exactly one is required.`, index)
+  const m = marks[0]
+  if (m.role !== type) return renderHandoffDeny('Agent', `the marker's role ${m.role} is not the subagent_type ${type}.`, index)
+  const parts = m.path.replace(/\\/g, '/').split('/')
+  const at = parts.indexOf('builds')
+  if (extractBuildSlug(m.path) !== m.build || parts[at + 2] !== 'prompts' || parts.length < at + 4 || parts.slice(at + 3).some((s) => s === '' || s === '.')) {
+    return renderHandoffDeny('Agent', `the marker's path ${m.path} is not a repo-relative file under builds/${m.build}/prompts/ with no \`..\` segment.`, index)
+  }
+  const file = path.join(root, ...parts)
+  let st = null
+  try { st = fs.statSync(file) } catch { st = null }
+  if (!st || !st.isFile()) return renderHandoffDeny('Agent', `the marker's path ${m.path} names no file under ${root.split(path.sep).join('/')}.`, index)
+  const text = fs.readFileSync(file, 'utf8')
+  const fileMarks = extractHandoffMarker(text)
+  if (fileMarks.length !== 1 || fileMarks[0].line !== m.line) {
+    return renderHandoffDeny('Agent', `${m.path} does not hold exactly one marker line byte-equal to the prompt's (it holds ${fileMarks.length}).`, index)
+  }
+  const section = extractTaskSection(text)
+  if (section === null) return renderHandoffDeny('Agent', `${m.path} holds no \`## Task\` line.`, index)
+  // F4 (a): the whole prompt is the marker, blank lines and the section — line endings folded, the two
+  // ends trimmed, and each line's trailing whitespace aside. Anything else is a freeform prompt.
+  const got = ti.prompt.replace(/\r\n/g, '\n').trim().split('\n').map((l) => l.trimEnd())
+  const want = section.replace(/\s+$/, '').split('\n').map((l) => l.trimEnd())
+  let k = 1
+  while (k < got.length && got[k] === '') k++
+  if (got[0] !== m.line) return renderHandoffDeny('Agent', `prompt line 1 is not the marker line; it reads ${JSON.stringify(got[0].slice(0, 120))}.`, index)
+  for (let j = 0; j <= want.length; j++) {
+    const g = got[k + j]
+    if (j === want.length ? g === undefined : g === want[j]) continue
+    return renderHandoffDeny('Agent', `prompt line ${k + j + 1} differs from ${m.path}'s \`## Task\` section: the prompt reads ` +
+      `${JSON.stringify(g === undefined ? '(end)' : g.slice(0, 120))}, the file ${JSON.stringify(j === want.length ? '(end)' : want[j].slice(0, 120))}. Resend the file's bytes.`, index)
+  }
+  const digest = buildTaskDigest(section)
+  if (digest !== m.taskSha) return renderHandoffDeny('Agent', `${m.path}'s \`## Task\` section hashes to ${digest}, and its marker says task-sha=${m.taskSha}: the file was edited after rendering.`, index)
+  return null
+}
+
+// Rule 6 on a `Workflow` call (§4 "The evaluation order", step 3): null to admit, else a deny string.
+function checkHarnessCall(data, index, root) {
+  const fs = require('fs')
+  const path = require('path')
+  const { buildComparablePath } = require(path.join(__dirname, 'scratch-guard.js'))
+  const ti = data.tool_input || {}
+  if (!index.harnesses.length) return renderHandoffDeny('Workflow', `UNARMED: ${index.shown} declares no harness, so no Workflow call can be admitted.`, index)
+  if (ti.script) return renderHandoffDeny('Workflow', 'an inline `script` is never a declared harness.', index)
+  const sp = ti.scriptPath
+  if (typeof sp !== 'string' || sp === '') return renderHandoffDeny('Workflow', 'the call names no `scriptPath` (a `name:` run is not a declared harness).', index)
+  const folded = process.platform === 'win32' ? sp.replace(/\\/g, '/').replace(/^\/([A-Za-z])\//, '$1:/') : sp
+  const abs = path.resolve(data.cwd || process.cwd(), folded)
+  let real = abs
+  try { real = fs.realpathSync(abs) } catch { real = abs }
+  let top = root
+  try { top = fs.realpathSync(root) } catch { top = root }
+  const rel = buildComparablePath(path.relative(top, real)).replace(/^\.\//, '')
+  if (!index.harnesses.some((h) => buildComparablePath(h).replace(/^\.\//, '') === rel)) {
+    return renderHandoffDeny('Workflow', `scriptPath ${sp} (${rel} from the checkout root) is not a declared harness.`, index)
+  }
+  const a = extractWorkflowArgs(data)
+  if (!a) return renderHandoffDeny('Workflow', '`args` is not a plain object, or a JSON string of one.', index)
+  const r = a.roles
+  if (!r || typeof r !== 'object' || Array.isArray(r) || !Object.keys(r).length) {
+    return renderHandoffDeny('Workflow', '`args.roles` is absent, not a plain object, or empty; take it from `handoff.py harness-args <harness>`.', index)
+  }
+  for (const [key, v] of Object.entries(r)) {
+    if (typeof v !== 'string' || !Object.prototype.hasOwnProperty.call(index.roles, v) || index.roles[v].agent !== true) {
+      return renderHandoffDeny('Workflow', `\`args.roles.${key}\` is ${JSON.stringify(v)}, not an agent-true role of ${index.shown}.`, index)
+    }
+  }
+  return null
+}
+
 function main() {
   // TOOL-aRepatriatedFork-7, closing review round 1 residual (b) — `--print-cap` ANSWERS the effective
   // cap for the checkout the caller stands in, and judges nothing. The shell readers that need the
@@ -2036,7 +2197,10 @@ function main() {
   // repo's vacuous-selector-empty-population class arriving in the file whose job is to refuse what
   // it cannot resolve. A WIRED command must never carry it: <prefix>/check-wiring.sh asserts that,
   // because `--only=join` in settings.json would turn the three cap rules off with no diff.
-  const ONLY_RULES = ["join"]
+  // TOOL-aOrientedCast-7 S11 - `scripts` is rules 1, 2, 3 and 5, the rules that read a SCRIPT, and
+  // never rules 0 and 6, which judge the CALL. A file gate feeding committed scripts as inline
+  // `script` payloads asks with it; rule 6 would refuse every such payload wherever an index exists.
+  const ONLY_RULES = ["join", "scripts"]
   const onlyArg = process.argv.slice(2).find((a) => a.startsWith("--only="))
   const ONLY = onlyArg === undefined ? null : onlyArg.slice("--only=".length)
   if (ONLY !== null && ONLY_RULES.indexOf(ONLY) === -1) {
@@ -2083,7 +2247,35 @@ function main() {
   EFFECTIVE_CAP = Math.min(declared.cap, MAX_VERIFIERS)
   CAP_SOURCE = declared.file
 
-  // RULE 4 first for an `Agent` payload, and it is the ONLY thing that path runs: the rules below
+  // RULE 6 (TOOL-aOrientedCast-7) — before rule 4, so a refused spawn claims no slot, and before rule
+  // 0, so a call outside a declared harness is refused whatever its args. Skipped under any `--only=`
+  // selector, as rule 0 is. An absent `.claude/roles.json` at the role root adds no rule; a broken one, or a throw
+  // anywhere in the rule, refuses: a rule that cannot finish does not admit.
+  if (ONLY === null) {
+    let deny = null
+    let index = null
+    try {
+      // TOOL-aOrientedCast-14: the root of the payload cwd, else of CLAUDE_PROJECT_DIR.
+      const { loadRoleIndex, resolveRoleRoot } = require(require('path').join(__dirname, 'scratch-guard.js'))
+      const cwd = data.cwd || process.cwd()
+      const root = resolveRoleRoot(cwd, process.env)
+      if (root) {
+        index = loadRoleIndex(root)
+        if (index.state === 'broken') deny = renderHandoffDeny(data.tool_name, `the role index ${index.shown} ${index.why}; fix or regenerate it.`, null)
+        else if (index.state === 'ok') deny = data.tool_name === 'Agent' ? checkHandoffSpawn(data, index, root) : checkHarnessCall(data, index, root)
+      } else if (process.env.CLAUDE_PROJECT_DIR) {
+        process.stderr.write(`agent-cap: rule 6 unarmed — neither the payload cwd ${cwd} nor CLAUDE_PROJECT_DIR ${process.env.CLAUDE_PROJECT_DIR} lies in a checkout, so no role index was read\n`)
+      }
+    } catch (e) {
+      deny = renderHandoffDeny(data.tool_name, `the rule threw (${(e && e.message) || e}), and a rule that cannot finish does not admit.`, index)
+    }
+    if (deny) {
+      process.stderr.write(deny)
+      process.exit(2)
+    }
+  }
+
+  // RULE 4 for an `Agent` payload, and after rule 6 the ONLY thing that path runs: the rules below
   // all read a script, and an Agent spawn carries none.
   if (data.tool_name === 'Agent') {
     const deny = guardAgentSpawn(data)
@@ -2124,7 +2316,7 @@ function main() {
   }
   if (!script) process.exit(0) // a `name:` run: no source reaches this hook (see the protocol)
 
-  const fan = ONLY === null ? runBothViews(fanoutFindings, script) : []
+  const fan = ONLY !== 'join' ? runBothViews(fanoutFindings, script) : []
   if (fan.length) {
     process.stderr.write(
       `BLOCKED by agent-cap: a verify/fan-out stage spawns one agent per item. The review protocol ` +
@@ -2144,7 +2336,7 @@ function main() {
   // RULE 3 runs AFTER the arity rule on purpose. A one-argument `boundedParallel(all.map(…))` breaks
   // both, and the arity message is the one that names the defect an operator has to fix; reversing
   // the order would retitle the rule-2 corpus without changing a verdict.
-  const caps = ONLY === null ? runBothViews(capFindings, script) : []
+  const caps = ONLY !== 'join' ? runBothViews(capFindings, script) : []
   if (caps.length) {
     process.stderr.write(
       `BLOCKED by agent-cap: a bound is written here that this file cannot resolve at or under ` +
@@ -2165,7 +2357,7 @@ function main() {
   // Order is unchanged and still decides which message an operator sees: the three rules above all
   // prevent a BURST, the expensive failure this hook exists for, while a ref-keyed join is a wrong
   // verdict, which is cheap to re-run.
-  const bad = ONLY === null ? runBothViews(offendingLines, script) : []
+  const bad = ONLY !== 'join' ? runBothViews(offendingLines, script) : []
   if (bad.length) {
   const shown = bad
     .slice(0, 6)

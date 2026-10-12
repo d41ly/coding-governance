@@ -68,8 +68,13 @@ stamp_line() {
   printf 'last-audit: 2026-07-12T12:%02d:%02d+00:00 @ %s' $((n/60)) $((n%60)) "$1"
 }
 
+# The sealed region every fixture manifest carries, taken from the checker's own verb so the fixture
+# cannot drift from the constant again (KICK-aOrientedCast-1 S7). An arm that needs another region
+# sets TASK_REGION for its write_manifest call and restores it after.
+TASK_SKELETON_OUT=$(bash "$CHECK" --task-skeleton)
+TASK_REGION=$TASK_SKELETON_OUT
 write_manifest() { # $1=repo $2=sha $3=watch $4=vpaths [$5=marker] [$6=extra-body] [$7=last-body-change] [$8=extra audit-block line]
-  local marker="${5:-kickoff-manifest: v1.4}"
+  local marker="${5:-kickoff-manifest: v1.5}"
   # The FIRST location `--locations` prints. The repo-root spelling this helper used to write is no
   # longer a discovery location, and most cases here call the checker with no path argument.
   mkdir -p "$1/memory/guides"
@@ -84,15 +89,7 @@ last-body-change: ${7:-$2}
 ${8:-}
 -->
 ## §A
-<!-- kickoff:task -->
-> - **Title:** …
-> - **Goal (1–2 sentences):** …
-> - **IN scope:** …
-> - **OUT / non-goals** (explicit cut-line): …
-> - **Acceptance check** (the observation that proves THIS change — a test it adds, a gate it
->   moves, an observed behavior; *not* an unrelated green check): …
-> - **Gates it must pass:** …
-<!-- /kickoff:task -->
+$TASK_REGION
 ## §B
 gate fence:
 \`\`\`bash
@@ -341,7 +338,7 @@ mkdir -p "$R/memory/guides"; cat > "$R/memory/guides/SESSION-KICKOFF.md" <<'EOF'
 old body
 EOF
 commit_all "$R" manifest
-run "v1.0 marker, no block → C2 retrofit" "$R" 1 "marker to v1.4 LAST"
+run "v1.0 marker, no block → C2 retrofit" "$R" 1 "marker to v1.5 LAST"
 
 # ---- 24 v1.0 marker WITH valid block → version WARN, 0 ------------------
 mkrepo v10block
@@ -650,6 +647,32 @@ run "C10 a transposed marker pair is named" "$R" 1 "the sealed task region's mar
 mkrepo c10d; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 sed -i 's/$/\r/' "$R/memory/guides/SESSION-KICKOFF.md"; commit_all "$R" manifest
 run "C10 a CRLF manifest is not reported as region drift" "$R" 0 -
+
+# FORMAT 1.4's region (KICK-aOrientedCast-1 AC8), typed here and NOT read from the checker: it is
+# frozen, and a guard reading the constant it guards would pass an edit to that constant. Under a
+# marker older than 1.5 it passes with the format WARN and the re-paste NOTE; under a 1.5 marker, or
+# edited by one character, it is the "differs" failure. RED against the base checker, whose format
+# was 1.4 and whose own region this was: no WARN, no NOTE, and a 1.5 marker passed it.
+TASK_REGION_1_4='<!-- kickoff:task -->
+> - **Title:** …
+> - **Goal (1–2 sentences):** …
+> - **IN scope:** …
+> - **OUT / non-goals** (explicit cut-line): …
+> - **Acceptance check** (the observation that proves THIS change — a test it adds, a gate it
+>   moves, an observed behavior; *not* an unrelated green check): …
+> - **Gates it must pass:** …
+<!-- /kickoff:task -->'
+TASK_REGION=$TASK_REGION_1_4
+mkrepo c10e; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "kickoff-manifest: v1.4"; commit_all "$R" manifest
+runm "C10 the 1.4 region under a 1.4 marker passes with the format WARN and the re-paste NOTE" "$R" 0 \
+  "WARN: manifest format v1.4 < kit format v1.5" \
+  "NOTE: the sealed task region is format 1.4's; re-paste it from --task-skeleton, then bump the marker to v1.5"
+mkrepo c10f; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "kickoff-manifest: v1.5"; commit_all "$R" manifest
+run "C10 the 1.4 region under a 1.5 marker differs" "$R" 1 "the sealed task region differs from the task contract this script carries, and that region is not hand-authorable; restore it from the --task-skeleton verb rather than editing it in"
+mkrepo c10g; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "kickoff-manifest: v1.4"
+sed -i 's/\*\*IN scope:\*\*/**IN SCOPE:**/' "$R/memory/guides/SESSION-KICKOFF.md"; commit_all "$R" manifest
+run "C10 an edited 1.4 region under a 1.4 marker differs" "$R" 1 "the sealed task region differs from the task contract this script carries, and that region is not hand-authorable; restore it from the --task-skeleton verb rather than editing it in"
+TASK_REGION=$TASK_SKELETON_OUT
 
 # THE SHIPPED SEED. gov-only: the template an adopter instantiates must carry the same region the
 # checker enforces, or the seed produces a manifest the gate rejects on arrival.
@@ -1067,6 +1090,13 @@ if [ -n "$cli_aa_set" ]; then export AI_AGENT="$cli_aa"; else unset AI_AGENT; fi
 K2A="$NONCE-k2a"; K2CARD="$CARD_HOME/$K2A.md"
 run_card "K2 setup: a card for the append arms" "$CWT" 0 - --card --write --session "$K2A"
 render_ready_line() { printf 'READY — aTest · node a · card-wt · base %s · Tier-2 · gates x' "$1"; }   # $1=base sha
+# render_task_section [title] — a `## task` section with all eight fields filled (KICK-aOrientedCast-1).
+# Every arm whose body carries a real READY line takes its task from here, so the field refusal never
+# answers for an arm that observes another refusal. No value holds a path- or id-shaped token, so an
+# arm's token and miss counts stay its own rows'.
+render_task_section() {
+  printf '## task\n- **Title:** %s\n- **Goal (1–2 sentences):** refuse a kickoff whose task is unfilled\n- **IN scope:** the append verb\n- **OUT / non-goals** (explicit cut-line): the stored card\n- **To-do:** grade the fields, then store the body\n- **Reuse:** the presence refusal beside it\n- **Acceptance check** (the observation that proves THIS change): an arm sees it\n- **Gates it must pass:** the checker self-test\n' "${1:-t}"
+}
 
 # AC1 — a clean body: appended, no annotation, ONE ls-files and ONE reader spawn from the checker.
 # The counters are SHIMS on PATH, logging their argv: the reader's own hygiene probe is a bash
@@ -1089,7 +1119,7 @@ chmod +x "$SHIM/git" "$SHIM/python"
 # The record row cites the ask's FILED home, never a line of `memory/backlog/TOOL.md`: that file is
 # a generated family view since TOOL-dDerivedDocket-7 and -34 ("Cite ids, never line numbers"), and
 # the `:455` it used to cite fell past its end at the switch-over.
-printf '## task\n- **Title:** t\n## read\n- `skills/session-kickoff/SKILL.md:47-60` — the skeleton\n## records\n- TOOL-cBriefedPilot-11 — one clause — memory/builds/cBriefedPilot/BACKLOG.md\n%s\n' "$(render_ready_line "$wt_head")" \
+{ render_task_section; printf '## read\n- `skills/session-kickoff/SKILL.md:47-60` — the skeleton\n## records\n- TOOL-cBriefedPilot-11 — one clause — memory/builds/cBriefedPilot/BACKLOG.md\n%s\n' "$(render_ready_line "$wt_head")"; } \
   | (cd "$CWT" && PATH="$SHIM:$PATH" GOV_PYTHON=python bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?   # gov:literal-python — names the SHIM on PATH, which exec's the resolved REAL_PY
 [ "$got" = 0 ] && grep -q '^- TOOL-cBriefedPilot-11 — one clause' "$K2CARD" && ! grep -q 'UNVERIFIED' "$K2CARD" \
   && { echo "ok   K2 AC1 a clean body is appended with no UNVERIFIED line"; pass=$((pass+1)); } \
@@ -1102,7 +1132,7 @@ run_card "K2 AC6 --card --check over a clean card exits 0" "$CWT" 0 - --card --c
 check_eq "K2 AC6 --card --check over a clean card prints nothing" "0" "$(grep -c . "$CARD_OUT")"
 
 # AC2 — four misses, each annotated beneath its own row; the defined id and the tracked range pass.
-printf '## task\n- **Title:** t\n## read\n- `nope/missing.md:1-2` — untracked\n- `skills/session-kickoff/SKILL.md:1-99999` — past the end\n- `skills/session-kickoff/SKILL.md:1-3` — inside\n## records\n- TOOL-zCardFixture-11 — cited by a record, defined by none\n- TOOL-zCardFixture-1 — a substring of the defined -10\n- TOOL-zCardFixture-10 — defined\n%s\n' "$(render_ready_line "$wt_head")" \
+{ render_task_section; printf '## read\n- `nope/missing.md:1-2` — untracked\n- `skills/session-kickoff/SKILL.md:1-99999` — past the end\n- `skills/session-kickoff/SKILL.md:1-3` — inside\n## records\n- TOOL-zCardFixture-11 — cited by a record, defined by none\n- TOOL-zCardFixture-1 — a substring of the defined -10\n- TOOL-zCardFixture-10 — defined\n%s\n' "$(render_ready_line "$wt_head")"; } \
   | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
 check_eq "K2 AC2 the append with misses exits 0" "0" "$got"
 read_next_line() { awk -v r="$1" 'f{print; exit} index($0,r)==1{f=1}' "$K2CARD"; }   # the line after the row that starts with $1
@@ -1137,13 +1167,13 @@ printf '## open\n- `AGENTS.md:1`\n' | (cd "$CWT" && CARD_CAP_BYTES=$k2cap bash "
 check_card_unchanged "K2 AC4 the card is byte-identical after the cap refusal"
 # AC8 — a READY line eight commits behind HEAD.
 stale=$(git -C "$CWT" rev-parse HEAD~8)
-printf '## task\n- `AGENTS.md:1`\n%s\n' "$(render_ready_line "$stale")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+{ render_task_section; printf '## read\n- `AGENTS.md:1`\n%s\n' "$(render_ready_line "$stale")"; } | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
 [ "$got" = 2 ] && grep -q "base $stale is not HEAD $wt_head" "$CARD_OUT" \
   && { echo "ok   K2 AC8 a stale base is refused with exit 2 naming both shas"; pass=$((pass+1))
  } || { echo "FAIL K2 AC8 a stale base is refused with exit 2 naming both shas (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 check_card_unchanged "K2 AC8 the card is byte-identical after the stale-base refusal"
 # S5 — two real READY lines in one body.
-printf '## task\n- `AGENTS.md:1`\n%s\n%s\n' "$(render_ready_line "$wt_head")" "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+{ render_task_section; printf '## read\n- `AGENTS.md:1`\n%s\n%s\n' "$(render_ready_line "$wt_head")" "$(render_ready_line "$wt_head")"; } | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
 [ "$got" = 2 ] && grep -q 'the body carries 2 READY lines' "$CARD_OUT" && { echo "ok   K2 S5 a body with two READY lines is refused"; pass=$((pass+1)); } \
   || { echo "FAIL K2 S5 a body with two READY lines is refused (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 # S1 — the reader could not answer: a launcher that exits non-zero, then one whose first line is
@@ -1191,7 +1221,7 @@ cp "$TMP/k2.before" "$K2CARD"
 
 # AC9 — a unique basename resolves; an ambiguous one is annotated with the tracked count.
 n_readme=$(git -C "$CWT" ls-files | awk -F/ '$NF=="README.md"' | wc -l | tr -d '[:space:]')
-printf '## task\n- `manifest-check.sh:60` — unique\n- `README.md:1` — many\n%s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+{ render_task_section; printf '## read\n- `manifest-check.sh:60` — unique\n- `README.md:1` — many\n%s\n' "$(render_ready_line "$wt_head")"; } | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
 check_eq "K2 AC9 the basename append exits 0" "0" "$got"
 check_eq "K2 AC9 a unique basename citation resolves and is not annotated" '- `README.md:1` — many' "$(read_next_line '- `manifest-check.sh:60`')"
 check_eq "K2 AC9 an ambiguous basename is annotated with the tracked count" "UNVERIFIED — README.md:1 (ambiguous: $n_readme matches)" "$(read_next_line '- `README.md:1`')"
@@ -1204,7 +1234,7 @@ printf '## open\n- `AGENTS.md:1`\nREADY — none yet\n' | (cd "$CWT" && bash "$C
 check_eq "K2 AC5 a body whose only READY line is the sentinel exits 0" "0" "$got"
 check_eq "K2 AC5 ...and the card holds exactly one READY line" "1" "$(grep -c '^READY — ' "$K2BCARD")"
 check_eq "K2 AC5 ...which is the sentinel, last" "READY — none yet" "$(tail -1 "$K2BCARD")"
-printf '## task\n- `AGENTS.md:1`\n%s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2B" > "$CARD_OUT" 2>&1); got=$?
+{ render_task_section; printf '## read\n- `AGENTS.md:1`\n%s\n' "$(render_ready_line "$wt_head")"; } | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2B" > "$CARD_OUT" 2>&1); got=$?
 check_eq "K2 AC5 a real READY line replaces the sentinel: one READY line" "1" "$(grep -c '^READY — ' "$K2BCARD")"
 check_eq "K2 AC5 ...and it is the body's" "$(render_ready_line "$wt_head")" "$(tail -1 "$K2BCARD")"
 check_eq "K2 AC5 ...and the earlier no-READY body went with the tail" "0" "$(grep -c '^## open' "$K2BCARD")"
@@ -1221,7 +1251,7 @@ check_eq "K2 AC5 ...and the card still holds one READY line and one task section
 # not a swap — the bare form the AC5 block above exercises is every card already on disk.
 K2R="$NONCE-k2r"; K2RCARD="$CARD_HOME/$K2R.md"
 run_card "K2 R1 setup: a fresh card with the sentinel" "$CWT" 0 - --card --write --session "$K2R"
-printf '## task\n- `AGENTS.md:1`\n- %s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2R" > "$CARD_OUT" 2>&1); got=$?
+{ render_task_section; printf '## read\n- `AGENTS.md:1`\n- %s\n' "$(render_ready_line "$wt_head")"; } | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2R" > "$CARD_OUT" 2>&1); got=$?
 check_eq "K2 R1 a list-item READY line appends" "0" "$got"
 check_eq "K2 R1 ...replaces the sentinel, which is gone" "0" "$(grep -c 'READY — none yet' "$K2RCARD")"
 check_eq "K2 R1 ...and is the card's last line" "- $(render_ready_line "$wt_head")" "$(tail -1 "$K2RCARD")"
@@ -1244,7 +1274,7 @@ run_card "K2 AC10 setup: a card written in worktree A" "$CWT" 0 - --card --write
 cp "$K2CCARD" "$TMP/k2c.before"
 k2c_startup=$(( $(wc -l < "$TMP/k2c.before" | tr -d '[:space:]') - 1 ))   # a fresh card is STARTUP + the sentinel
 b_head=$(git -C "$CWT2" rev-parse HEAD)
-render_big_body() { printf '## task\n- **Title:** %s\n## read\n' "$1"; awk 'BEGIN{for(i=0;i<60;i++) print "- `AGENTS.md:1` — padding row " i}'; printf 'READY — aTest · node a · card-wt2 · base %s · Tier-2 · gates x\n' "$b_head"; }
+render_big_body() { render_task_section "$1"; printf '## read\n'; awk 'BEGIN{for(i=0;i<60;i++) print "- `AGENTS.md:1` — padding row " i}'; printf 'READY — aTest · node a · card-wt2 · base %s · Tier-2 · gates x\n' "$b_head"; }
 k2c_cap=$(( $(wc -c < "$K2CCARD" | tr -d '[:space:]') + $(render_big_body one | wc -c | tr -d '[:space:]') * 3 / 2 ))
 render_big_body one | (cd "$CWT2" && CARD_CAP_BYTES=$k2c_cap bash "$CHECK" --card --append --session "$K2C" > "$CARD_OUT" 2>&1); got=$?
 check_eq "K2 AC10 the append from worktree B exits 0" "0" "$got"
@@ -1267,7 +1297,7 @@ check_eq "K2 AC10 ...and the card holds one READY line, one task section, the se
 K2E="$NONCE-k2e"; K2ECARD="$CARD_HOME/$K2E.md"
 run_card "F1 setup: a card for the no-grammar arm" "$CWT" 0 - --card --write --session "$K2E"
 mv "$CWT/$RECALL_REL/extract.py" "$CWT/$RECALL_REL/extract.py.hid"
-printf '## task\n- `AGENTS.md:1`\n%s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?
+{ render_task_section; printf '## read\n- `AGENTS.md:1`\n%s\n' "$(render_ready_line "$wt_head")"; } | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?
 mv "$CWT/$RECALL_REL/extract.py.hid" "$CWT/$RECALL_REL/extract.py"
 [ "$got" = 0 ] && grep -q '^NOTE: id citations unchecked — .*the id grammar lives in the memory-recall kit' "$CARD_OUT" && grep -q ' 1 tokens · 0 unverified ' "$CARD_OUT" \
   && { echo "ok   F1 a reader with no memory-recall kit degrades to the NOTE, the path is judged, the append lands (exit 0)"; pass=$((pass+1)); } \
@@ -1275,13 +1305,13 @@ mv "$CWT/$RECALL_REL/extract.py.hid" "$CWT/$RECALL_REL/extract.py"
 check_eq "F1 ...and the card ends with the body's READY line" "$(render_ready_line "$wt_head")" "$(tail -1 "$K2ECARD")"
 # F7 — a root-level tracked file cited by NAME is a path token (the spec-token lint's "exact tracked
 # path" half); a slashless dotted word that is not tracked (`e.g`) is nothing, never an UNVERIFIED.
-printf '## task\n- read AGENTS.md first, e.g. before TOOL-zCardFixture-10\n%s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?
+{ render_task_section; printf '## read\n- read AGENTS.md first, e.g. before TOOL-zCardFixture-10\n%s\n' "$(render_ready_line "$wt_head")"; } | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?
 [ "$got" = 0 ] && grep -q ' 2 tokens · 0 unverified ' "$CARD_OUT" \
   && { echo "ok   F7 a root-level tracked file cited by name and an id are 2 tokens, 0 unverified, and e.g is nothing (exit 0)"; pass=$((pass+1)); } \
   || { echo "FAIL F7 a root-level tracked file cited by name and an id are 2 tokens, 0 unverified, and e.g is nothing (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 # F8 — a `..` citation is a claim about some other tree: skipped, never handed to `git ls-files`,
 # whose `outside repository` fatal used to refuse the whole body.
-printf '## task\n- `skills/session-kickoff/SKILL.md` and ../../outside.md\n%s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?
+{ render_task_section; printf '## read\n- `skills/session-kickoff/SKILL.md` and ../../outside.md\n%s\n' "$(render_ready_line "$wt_head")"; } | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?
 [ "$got" = 0 ] && grep -q ' 1 tokens · 0 unverified ' "$CARD_OUT" \
   && { echo "ok   F8 a ..-segment citation beside a tracked path is skipped and the body lands (exit 0)"; pass=$((pass+1)); } \
   || { echo "FAIL F8 a ..-segment citation beside a tracked path is skipped and the body lands (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
@@ -1292,7 +1322,7 @@ git -C "$CWT2" commit -q --no-verify --allow-empty -m "drop vendor/gone.sh from 
   || { echo "FAIL F9 setup: the fixture commit in worktree B failed"; fail=$((fail+1)); }
 f9_head=$(git -C "$CWT2" rev-parse HEAD)
 run_card "F9 setup: a card whose recent block names vendor/gone.sh" "$CWT2" 0 "drop vendor/gone.sh from the bar" --card --write --session "$K2F"
-printf '## task\n- `AGENTS.md:1`\nREADY — aTest · node a · card-wt2 · base %s · Tier-2 · gates x\n' "$f9_head" | (cd "$CWT2" && bash "$CHECK" --card --append --session "$K2F" > "$CARD_OUT" 2>&1); got=$?
+{ render_task_section; printf '## read\n- `AGENTS.md:1`\nREADY — aTest · node a · card-wt2 · base %s · Tier-2 · gates x\n' "$f9_head"; } | (cd "$CWT2" && bash "$CHECK" --card --append --session "$K2F" > "$CARD_OUT" 2>&1); got=$?
 check_eq "F9 setup: the body over that card appends" "0" "$got"
 run_card "F9 --card --check over a card whose only miss is a commit subject exits 0" "$CWT2" 0 - --card --check --session "$K2F"
 check_eq "F9 ...and prints nothing" "0" "$(grep -c . "$CARD_OUT")"
@@ -1341,7 +1371,7 @@ check_route_refusal() {
 }
 KQ="$NONCE-kq"; KQCARD="$CARD_HOME/$KQ.md"
 run_card "KQ setup: a card in worktree B" "$CWT2" 0 - --card --write --session "$KQ"
-{ printf '## task\n- `AGENTS.md:1`\n'; print_route_ready; } | run_route_append "$KQ"; got=$?
+{ render_task_section; printf '## read\n- `AGENTS.md:1`\n'; print_route_ready; } | run_route_append "$KQ"; got=$?
 check_eq "KQ setup: a kickoff body lands on it" "0" "$got"
 
 # AC2 + AC10 — a conforming route with no READY line, under the K2 spawn shims.
@@ -1410,6 +1440,82 @@ KQ6="$NONCE-kq6"
 run_card "KQ AC6 setup: a fresh card with the sentinel" "$CWT2" 0 - --card --write --session "$KQ6"
 cp "$CARD_HOME/$KQ6.md" "$TMP/$KQ6.before"
 print_route_body TOOL-zCardFixture-10 "$QS10" > "$TMP/qb"; check_route_refusal "KQ AC6 R6 a route on a card still reading READY — none yet is refused" "$KQ6" 1 "route R6 REFUSED — the card still reads READY — none yet: no kickoff has appended to it" < "$TMP/qb"
+
+# ---- KICK-aOrientedCast-1: the eight task fields, graded at the append ---------------------------
+# Worktree B's HEAD is still q_head, so print_route_ready's line is real, and the KQ helpers append
+# and check byte identity. Each arm is RED against the base checker, whose skeleton printed six
+# fields and whose append landed a task section with any field missing, repeated or unfilled. The
+# task values carry no path- or id-shaped token; each body's one token is its `## read` row.
+# AC1 — the skeleton verb, outside any repository: eight field lines, in order, with To-do and Reuse
+# spelled as the build's interface 6 pins them.
+mkdir -p "$TMP/nogit"
+(cd "$TMP/nogit" && GIT_CEILING_DIRECTORIES="$TMP" bash "$CHECK" --task-skeleton > "$TMP/task.sk" 2>&1); got=$?
+check_eq "KC AC1 --task-skeleton exits 0 outside a repository" "0" "$got"
+check_eq "KC AC1 ...and prints eight field lines, in order" \
+  "Title|Goal (1–2 sentences)|IN scope|OUT / non-goals|To-do|Reuse|Acceptance check|Gates it must pass|" \
+  "$(sed -n 's/^> - \*\*\([^*:]*\).*/\1/p' "$TMP/task.sk" | tr '\n' '|')"
+check_eq "KC AC1 ...spelling **To-do:** and **Reuse:** as interface 6 does" "1 1" \
+  "$(grep -c '^> - \*\*To-do:\*\* ' "$TMP/task.sk") $(grep -c '^> - \*\*Reuse:\*\* ' "$TMP/task.sk")"
+KC="$NONCE-kc"; KCCARD="$CARD_HOME/$KC.md"
+run_card "KC setup: a card in worktree B" "$CWT2" 0 - --card --write --session "$KC"
+KC_TASK=$(render_task_section)
+KC_TAIL=$(printf '## read\n- `AGENTS.md:1`\n'; print_route_ready)
+# AC2 — all eight filled: it lands, and the card carries the eight.
+printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | run_route_append "$KC"; got=$?
+check_eq "KC AC2 a body filling all eight fields appends" "0" "$got"
+check_eq "KC AC2 ...and the card carries the eight field lines" "8" \
+  "$(grep -cE '^- \*\*(Title|Goal \(1–2 sentences\)|IN scope|OUT / non-goals|To-do|Reuse|Acceptance check|Gates it must pass)[:*]' "$KCCARD")"
+# AC6 — the grammar's admitted variants land: `> ` prefixes with every qualifier kept and the
+# Acceptance qualifier across two lines; then no prefix and the OUT label closed `:**`.
+printf '## task\n> - **Title:** t\n> - **Goal (1–2 sentences):** refuse a kickoff whose task is unfilled\n> - **IN scope:** the append verb\n> - **OUT / non-goals** (explicit cut-line): the stored card\n> - **To-do:** (the steps in order, each naming what it changes) grade the fields, then store the body\n> - **Reuse:** (each seam this extends, by path) the presence refusal beside it\n> - **Acceptance check** (the observation that proves THIS change — a test it adds, a gate it\n>   moves, an observed behavior; *not* an unrelated green check): an arm sees it\n> - **Gates it must pass:** the checker self-test\n%s\n' "$KC_TAIL" \
+  | run_route_append "$KC"; got=$?
+check_eq "KC AC6 > prefixes, every qualifier and a two-line Acceptance qualifier append" "0" "$got"
+printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | sed 's/^- \*\*OUT \/ non-goals\*\* (explicit cut-line):/- **OUT \/ non-goals:**/' | run_route_append "$KC"; got=$?
+check_eq "KC AC6 the OUT label written **OUT / non-goals:** appends" "0" "$got"
+# TOOL-aOrientedCast-15 S5 — a space between the qualifier and its colon: a filled value still lands
+# (green on the base too); its placeholder twin is refused below, RED against the base `value()`.
+printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | sed 's/^\(- \*\*OUT \/ non-goals\*\* (explicit cut-line)\):/\1 :/' | run_route_append "$KC"; got=$?
+check_eq "KC L1 an OUT label spaced before its colon appends a filled value" "0" "$got"
+# AC7 — a body with no READY line and no `## task`, on a card whose READY line is real, is not graded.
+printf '## open\n- parked: `AGENTS.md:2`\n' | run_route_append "$KC"; got=$?
+check_eq "KC AC7 a body with no READY line and no ## task still appends" "0" "$got"
+cp "$KCCARD" "$TMP/$KC.before"
+KC_END="every field --task-skeleton prints is filled before a kickoff lands, and nothing was appended"
+# AC3 — the six fields the base skeleton names: one refusal naming both new ones. Its text is spelled
+# WHOLE, never through KC_END: the harness-arms leg reads assertion lines as written, and this is the
+# arm that carries the refusal's signature.
+printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | grep -v -e '^- \*\*To-do:\*\*' -e '^- \*\*Reuse:\*\*' > "$TMP/qb"
+check_route_refusal "KC AC3 a six-field body is refused naming To-do and Reuse" "$KC" 1 \
+  "MANIFEST task REFUSED — the '## task' section has no To-do field; has no Reuse field; every field --task-skeleton prints is filled before a kickoff lands, and nothing was appended" < "$TMP/qb"
+# AC4 — each placeholder form, in its own append.
+printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | sed 's/^\(- \*\*Reuse:\*\*\) .*/\1 …/' > "$TMP/qb"
+check_route_refusal "KC AC4 a Reuse of … is a placeholder" "$KC" 1 "the '## task' section leaves Reuse a placeholder ('…'); $KC_END" < "$TMP/qb"
+printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | sed 's/^\(- \*\*To-do:\*\*\) .*/\1/' > "$TMP/qb"
+check_route_refusal "KC AC4 an empty To-do is empty" "$KC" 1 "the '## task' section leaves To-do empty; $KC_END" < "$TMP/qb"
+printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | sed 's/^\(- \*\*Gates it must pass:\*\*\) .*/\1 TBD/' > "$TMP/qb"
+check_route_refusal "KC AC4 Gates of TBD is a placeholder" "$KC" 1 "the '## task' section leaves Gates it must pass a placeholder ('TBD'); $KC_END" < "$TMP/qb"
+printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | sed 's/^\(- \*\*IN scope:\*\*\) .*/\1 <the scope>/' > "$TMP/qb"
+check_route_refusal "KC AC4 one angle-bracket slot is a placeholder" "$KC" 1 "the '## task' section leaves IN scope a placeholder ('<the scope>'); $KC_END" < "$TMP/qb"
+printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | sed 's/^\(- \*\*OUT \/ non-goals\*\* (explicit cut-line):\) .*/\1 none/' > "$TMP/qb"
+check_route_refusal "KC AC4 an OUT of none is a placeholder" "$KC" 1 "the '## task' section leaves OUT / non-goals a placeholder ('none'); $KC_END" < "$TMP/qb"
+printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | sed 's/^\(- \*\*OUT \/ non-goals\*\* (explicit cut-line)\):.*/\1 : …/' > "$TMP/qb"
+check_route_refusal "KC L1 an OUT of … spaced before its colon is a placeholder" "$KC" 1 "the '## task' section leaves OUT / non-goals a placeholder ('…'); $KC_END" < "$TMP/qb"
+# AC5 — the shipped skeleton fails its own rule, or the rule could never refuse.
+printf '## task\n%s\n%s\n' "$TASK_SKELETON_OUT" "$KC_TAIL" > "$TMP/qb"
+check_route_refusal "KC AC5 the skeleton itself is refused naming all eight" "$KC" 1 \
+  "the '## task' section leaves Title a placeholder ('…'); leaves Goal (1–2 sentences) a placeholder ('…'); leaves IN scope a placeholder ('…'); leaves OUT / non-goals a placeholder ('…'); leaves To-do a placeholder ('…'); leaves Reuse a placeholder ('…'); leaves Acceptance check a placeholder ('…'); leaves Gates it must pass a placeholder ('…'); $KC_END" < "$TMP/qb"
+# AC6 — plain labels are not the field grammar, and a repeated field is refused.
+printf '## task\n- Title: t\n- Goal: g\n- IN scope: i\n- OUT / non-goals: o\n- To-do: d\n- Reuse: r\n- Acceptance check: a\n- Gates it must pass: g\n%s\n' "$KC_TAIL" > "$TMP/qb"
+check_route_refusal "KC AC6 plain labels are refused naming every field absent" "$KC" 1 \
+  "the '## task' section has no Title field; has no Goal (1–2 sentences) field; has no IN scope field; has no OUT / non-goals field; has no To-do field; has no Reuse field; has no Acceptance check field; has no Gates it must pass field; $KC_END" < "$TMP/qb"
+printf '%s\n- **Reuse:** a second answer\n%s\n' "$KC_TASK" "$KC_TAIL" > "$TMP/qb"
+check_route_refusal "KC AC6 a Reuse field carried twice is refused" "$KC" 1 "the '## task' section carries Reuse twice; $KC_END" < "$TMP/qb"
+# AC7 — the verdict order: DEAD PROBE still answers a token-free body first, and the task fields
+# answer before the stale-BASE refusal (K2 AC8 holds the reverse: eight fields, then exit 2).
+{ printf '## task\n- **Title:** t\n'; print_route_ready; } > "$TMP/qb"
+check_route_refusal "KC AC7 a token-free READY body is still DEAD PROBE" "$KC" 1 "DEAD PROBE" < "$TMP/qb"
+{ printf '## task\n- **Title:** t\n## read\n- `AGENTS.md:1`\n'; render_ready_line "$wt_head"; printf '\n'; } > "$TMP/qb"
+check_route_refusal "KC AC7 the task fields answer before a stale BASE" "$KC" 1 "the '## task' section has no Goal (1–2 sentences) field; has no IN scope field; has no OUT / non-goals field; has no To-do field; has no Reuse field; has no Acceptance check field; has no Gates it must pass field; $KC_END" < "$TMP/qb"
 
 # S1 — a tree without the memory-tree kit: the id half announces its skip, and a startup card with
 # no path citation is DEAD PROBE on --check.
@@ -1746,7 +1852,12 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +4: KICK-aTrimmedHook-1's staged early exit and C6 one-listing arms, counted off the block; no
 # suite ran in the pass, the block was observed through a slice.
 # +1: TOOL-aTrimmedHook-7's non-ASCII breadth arm, observed through a slice; no suite ran in the pass.
-FLOOR_ASSERTIONS=284
+# +23: KICK-aOrientedCast-1 — C10's three format-1.4 arms and the KC block's twenty (the eight-line
+# skeleton, the field grammar's accepts and refusals, the verdict order), counted off the diff; no
+# suite ran in the pass.
+# +2: TOOL-aOrientedCast-15 S5 — the KC L1 pair, an OUT label spaced before its colon, filled and
+# placeholder, counted off the diff; no suite ran in the pass.
+FLOOR_ASSERTIONS=309
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

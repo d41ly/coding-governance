@@ -127,7 +127,11 @@ names a unit whose spec is buildable by `checkBuildable`. Unlike the two shell c
 CLOSED, has no `agent_id` exemption (a subagent's payload carries the parent's `session_id`), and
 refuses on an absent or replay-written card. An UNARMED conf refuses every write but the one to
 itself. A target outside the session's common dir is not gated, so a scratch clone never meets its
-own conf.
+own conf. Since `TOOL-aOrientedCast-6` the gate also reads WHO writes: a spec under
+`<MEMORY_ROOT>/builds/<build>/spec/` only from a `writes = spec` role, and a product write the route
+admits only from a `writes = product` role, both read from `.claude/roles.json` through the exported
+`loadRoleIndex`. An absent index adds no arm, and a status-and-date-only flip of a spec header stays
+admitted from the main loop and the routed builder.
 
 **And the same script on a SECOND event, `SubagentStart`** (`TOOL-aRoutedQuill-4`). A second
 fragment, `scratch-guard-subagent.fragment.json` with matcher `*`, is safe where a second PreToolUse
@@ -201,10 +205,11 @@ The FIFTH rule is the ref-keyed verdict join, lifted from `tools/workflows/check
 `TOOL-dTieredTribunal-14`. It is last because it is the cheapest failure to recover from: the four
 rules above it prevent a BURST, while a mis-keyed join is a wrong verdict that costs a re-run. The
 raw-primitive block is never an early exit-0, which would make every later rule unreachable for the
-scripts the join ban judges. A `--only=<rule>` selector
-over a closed set lets the file gate share this predicate instead of re-implementing it, and a WIRED
-command may never carry it — `tools/check-wiring.sh` asserts that, because narrowing a wired hook
-turns the cap rules off with no diff.
+scripts the join ban judges. A closed `--only=` set (`join`, `scripts`) lets file gates share this
+predicate; a WIRED command never carries it (`tools/check-wiring.sh`).
+
+Rule 6 (`TOOL-aOrientedCast-7`) admits an `Agent` call only as a rendered handoff and a `Workflow`
+call only as a declared harness, per `.claude/roles.json`.
 
 ## Gaps
 

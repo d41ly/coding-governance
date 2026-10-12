@@ -1,0 +1,105 @@
+# workflows.toml — the ten workflows a governed session runs its LLM work through, in stage order.
+# Read through roles_lib.py's `load_workflows` only, and graded by check_roles.py (rules R6 to R9).
+#
+#   name         one of the ten; each exactly once
+#   stage        an integer build order, 0 for an any-time workflow
+#   driver       agent | workflow | program | main-loop
+#   harness      a {prefix}-relative script path, a command, or "none"
+#   roles        the slot keys of the role files that drive it
+#   stages       optional, a workflow driver only: harness stage key -> the slot it spawns as
+#   enforced-by  what refuses a bypass, by description, or the one string "none — <why>"
+#   trigger      one line saying when it runs
+
+[[workflow]]
+name = "orient"
+stage = 1
+driver = "main-loop"
+harness = "/session-kickoff"
+roles = ["gov-orienter"]
+enforced-by = ["manifest-check.sh --card --append"]
+trigger = "once per session, at kickoff, before the first work-unit is opened"
+
+[[workflow]]
+name = "reuse"
+stage = 2
+driver = "agent"
+harness = "none"
+roles = ["gov-reuse-scout"]
+enforced-by = "none — the scout's trigger is the kickoff opt-in that aScoutedSeam owns"
+trigger = "before a new behaviour is designed, when kickoff asks for a scout"
+
+[[workflow]]
+name = "spec-write"
+stage = 3
+driver = "workflow"
+harness = "{prefix}/workflows/unattended-build.js"
+roles = ["gov-spec-writer", "gov-builder", "gov-spec-reviewer", "gov-skeptic", "gov-synthesizer"]
+stages = { specWriter = "gov-spec-writer", disposal = "gov-spec-writer", builder = "gov-builder", specFinder = "gov-spec-reviewer", skeptic = "gov-skeptic", synthesis = "gov-synthesizer" }
+enforced-by = ["scratch-guard.js role arm"]
+trigger = "once per build, after orientation, for every unit whose spec is missing or thin"
+
+[[workflow]]
+name = "spec-review"
+stage = 4
+driver = "workflow"
+harness = "{prefix}/workflows/tier2-review.js"
+roles = ["gov-spec-reviewer", "gov-skeptic", "gov-synthesizer"]
+stages = { specFinder = "gov-spec-reviewer", skeptic = "gov-skeptic", synthesis = "gov-synthesizer" }
+enforced-by = ["agent-cap.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys"]
+trigger = "after the spec set is written, where the build or its project declares a spec audit"
+
+[[workflow]]
+name = "build"
+stage = 5
+driver = "workflow"
+harness = "{prefix}/workflows/unattended-unit.js"
+roles = ["gov-builder"]
+stages = { builder = "gov-builder" }
+enforced-by = ["scratch-guard.js role arm", "routed commits name a specced unit"]
+trigger = "once per unit, in stage order, after its spec is READY"
+
+[[workflow]]
+name = "closing-review"
+stage = 6
+driver = "workflow"
+harness = "{prefix}/workflows/tier2-review.js"
+roles = ["gov-diff-reviewer", "gov-skeptic", "gov-synthesizer"]
+stages = { diffFinder = "gov-diff-reviewer", skeptic = "gov-skeptic", synthesis = "gov-synthesizer" }
+enforced-by = ["agent-cap.js spawn guard"]
+trigger = "once per build, after the last unit is terminal, over the cumulative diff"
+
+[[workflow]]
+name = "gate-bar"
+stage = 7
+driver = "program"
+harness = "bash {prefix}/run-gates/run-gates.sh"
+roles = []
+enforced-by = ["the pre-push hook"]
+trigger = "once, after the closing review, at the close or the push boundary"
+
+[[workflow]]
+name = "research"
+stage = 0
+driver = "agent"
+harness = "none"
+roles = ["gov-researcher"]
+enforced-by = ["agent-cap.js spawn guard"]
+trigger = "any time a design must choose between candidates that no existing seam decides"
+
+[[workflow]]
+name = "handoff"
+stage = 0
+driver = "program"
+harness = "python {prefix}/roles/handoff.py render"
+roles = ["gov-session"]
+enforced-by = "none — a session-to-session message is no tool call the spawn guard sees"
+trigger = "any time work passes to another session of this repository"
+
+[[workflow]]
+name = "bookkeeping"
+stage = 0
+driver = "main-loop"
+harness = "none"
+roles = []
+enforced-by = ["memory hygiene"]
+trigger = "any time a record, an index or the run state is updated"

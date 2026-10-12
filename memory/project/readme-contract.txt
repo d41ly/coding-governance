@@ -190,3 +190,4 @@ memory/builds/aFrugalTurnstile/README.md
 memory/builds/aPairedSlots/README.md
 memory/builds/dRemeasuredRender/README.md
 memory/builds/aTrimmedHook/README.md
+memory/builds/aOrientedCast/README.md

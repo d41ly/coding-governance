@@ -1579,6 +1579,48 @@
     "ceiling": 180
   },
   {
+    "name": "roles catalogue",
+    "argv": [
+      "python",
+      "{prefix}/roles/check_roles.py"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120
+  },
+  {
+    "name": "roles render wiring",
+    "argv": [
+      "bash",
+      "{prefix}/roles/adopt-roles.sh",
+      "--check"
+    ],
+    "chunk": "wiring",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
+    "name": "roles render selftest",
+    "argv": [
+      "python",
+      "{prefix}/roles/render_agents.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
+    "name": "roles adopter self-test",
+    "argv": [
+      "bash",
+      "{prefix}/roles/adopt-roles.test.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
     "name": "leg ceilings clear their evidenced maximum",
     "argv": [
       "python",

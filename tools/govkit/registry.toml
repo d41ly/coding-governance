@@ -48,6 +48,9 @@ default = [
   "agent-cap",
   "settings-merge",
   "check-wiring",
+  # TOOL-aOrientedCast-8 S1: the role catalogue, its agent types and the `/build` Skill bind only
+  # where they are installed and rendered, so the roles kit ships with every default install.
+  "roles",
 ]
 
 # ---------------------------------------------------------------- entries: kits with a directory
@@ -90,6 +93,10 @@ descriptor = "{prefix}/process-monitor/kit.toml"
 [[entry]]
 id = "runlog"
 descriptor = "{prefix}/runlog/kit.toml"
+
+[[entry]]
+id = "roles"
+descriptor = "{prefix}/roles/kit.toml"
 
 [[entry]]
 id = "agent-instructions"
@@ -643,6 +650,10 @@ why = "its subject is `<prefix>/lib/extract-arms.sh`, and `<prefix>/lib/` is gov
 [[exempt_leg]]
 name = "selftest harness self-test"
 why = "its subject is `<prefix>/lib/lib-selftest.sh`, and `<prefix>/lib/` is gov-internal by a standing registry exemption -- no kit carries it, so no descriptor can claim a leg over it. Held like every other self-test and run by `<prefix>/run-gates/run-selftests.sh`. TOOL-aQuenchedHarness-5."
+
+[[exempt_leg]]
+name = "roles adopter self-test"
+why = "it runs `adopt-roles.test.sh`, which `<prefix>/roles/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of the adopter in that directory, so its subject is the adopter and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-aOrientedCast-8 S6."
 
 [[exempt_leg]]
 name = "encoding posture (text IO names its encoding)"

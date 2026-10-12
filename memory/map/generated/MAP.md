@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 117 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 134 · kits: 18 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 6 · gotcha-classes: 118 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -99,6 +99,10 @@ Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `review-join self-test` | review-harnesses |
 | `review-protocol parity (kit vs dogfood)` | agent-cap |
 | `review-replay selftest` | review-harnesses |
+| `roles adopter self-test` | roles |
+| `roles catalogue` | roles |
+| `roles render selftest` | roles |
+| `roles render wiring` | roles |
 | `routed commits name a specced unit` | memory-tree-hygiene |
 | `routed-commits selftest` | memory-tree-hygiene |
 | `row-driver view refusal` | memory-tree-merge-driver |
@@ -158,6 +162,7 @@ Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `playbook` | playbook |
 | `process-monitor` | process-monitor |
 | `pytest-parallel-guardrails` | baseline |
+| `roles` | roles |
 | `run-gates` | run-gates |
 | `runlog` | runlog |
 | `unattended` | unattended |
@@ -215,6 +220,7 @@ Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 
 | key | claimant |
 |---|---|
+| `build` | roles |
 | `drift-audit` | baseline |
 | `lexicon` | lexicon |
 | `memory-recall` | memory-recall |
@@ -329,6 +335,7 @@ Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `suite-invalidated-by-a-commit-under-it.md` | run-gates |
 | `swallowed-delegate-reads-as-clean.md` | memory-tree-hygiene |
 | `sweep-issues-no-cost-verdict.md` | run-gates |
+| `test-oracle-read-from-a-historical-sha.md` | review-harnesses |
 | `text-mode-read-eats-a-bare-cr.md` | unattended |
 | `trace-profile-measures-itself.md` | unattended |
 | `trailing-comma-counted-as-an-element.md` | agent-cap |

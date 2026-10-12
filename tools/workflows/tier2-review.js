@@ -1,6 +1,6 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.48', // gov:kit tier2-review@1.48 // gov:kit review-harness@1.48 — BOTH ids: the
+  version: '1.49', // gov:kit tier2-review@1.49 // gov:kit review-harness@1.49 — BOTH ids: the
   // second is this entry's REGISTRY id, and without it a deployer grepping the id the
   // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
@@ -117,9 +117,19 @@ function readOutputTokens() {
 //                                         // after its items (`# by design — <n> invariant(s) this selection
 //                                         // touches`, then `- ` lines): it is cut out before the items are
 //                                         // parsed and joins `byDesign`. The array form carries no block.
-//   workerType: "<agent type>" | "none" } // the type every finder and skeptic spawns as; absent -> Plan,
+//   workerType: "<agent type>" | "none",  // the type every finder and skeptic spawns as; absent -> Plan,
 //                                         // "none" -> the platform default. Under a type no judge writes a lens file,
 //                                         // so a deferred return's `durable` is false and a re-run re-dispatches every judge
+//   roles: { diffFinder, specFinder, skeptic, synthesis }, // TOOL-aOrientedCast-5: each an agent type
+//                                         // name, never "none"; absent -> {}. A key names the type ITS stage spawns
+//                                         // as and wins over `workerType`, which keeps every judge stage no key
+//                                         // names; the synthesis takes its key or no type. Only this kind's finder
+//                                         // key is read. Any judge under a type makes the run not durable.
+//   efforts: { diffFinder, specFinder, skeptic, synthesis } } // TOOL-aOrientedCast-10: each a reasoning
+//                                         // effort level, lower-case letters; absent -> {}. A key sets ITS stage's
+//                                         // `effort` option, independent of `roles`; an unnamed stage runs at its
+//                                         // agent type's level, else the session's. The caller passes what
+//                                         // `handoff.py stage-efforts <workflow>` prints. Never the resume probe.
 // D9 - `kind` and `subjects` were added without extending this block, and BUILD-METHOD M4 sends a
 // reader HERE for the spec-audit spelling. An absent `kind` does not refuse - it defaults - so a
 // header missing the field buys exactly the failure M4 exists to prevent: a code-shaped review of a
@@ -204,21 +214,84 @@ if (isSpec && intensity === 'light')
 // so under one the judges get no DURABILITY instruction and the run says its results are not durable.
 // TOOL-aMendedFleet-93 S4 - absent reads as `Plan`, the default the charter A/B's reading set; the
 // reserved literal `none` spawns as before the default, durability instructions and review key included.
+// TOOL-aOrientedCast-5 S2 - the agent-type shape is ONE constant both refusals below test; the
+// protocol-parity leg's agent-type shape arm reads this declaration as the kit's one owner literal.
+const AGENT_TYPE_SHAPE = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/
 const workerType = a.workerType === undefined ? 'Plan' : a.workerType === 'none' ? '' : a.workerType
-if (a.workerType !== undefined && (typeof a.workerType !== 'string' || !/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(a.workerType)))
-  throw new Error('tier2-review: `workerType` must be an agent type name matching ^[A-Za-z][A-Za-z0-9_-]{0,63}$. Got ' + JSON.stringify(a.workerType) + '.')
-const judgeOpts = workerType ? { agentType: workerType } : {}
+if (a.workerType !== undefined && (typeof a.workerType !== 'string' || !AGENT_TYPE_SHAPE.test(a.workerType)))
+  throw new Error('tier2-review: `workerType` must be an agent type name matching ' + AGENT_TYPE_SHAPE.source + '. Got ' + JSON.stringify(a.workerType) + '.')
+// TOOL-aOrientedCast-5 S1/S3 - `roles`, the catalogue role each STAGE spawns as. Refused before any
+// agent when it is not a plain object, carries a key outside ROLE_KEYS, or a value that is not a type
+// name; `none` is refused too, since an untyped stage is spelled by leaving its key out. A key names
+// its own stage and wins over `workerType`, which keeps every judge stage no key names (spec section 8
+// F1); the synthesis, which `workerType` never governed, takes its key or no type; the resume probe
+// never takes one. Only this kind's finder key is read.
+const ROLE_KEYS = ['diffFinder', 'specFinder', 'skeptic', 'synthesis']
+const roles = a.roles === undefined ? {} : a.roles
+if (!roles || typeof roles !== 'object' || Array.isArray(roles) || Object.prototype.toString.call(roles) !== '[object Object]')
+  throw new Error('tier2-review: `roles` must be an object mapping a stage key to an agent type name; legal keys: ' + ROLE_KEYS.join(' | ') +
+    ', each value matching ' + AGENT_TYPE_SHAPE.source + ' and not none. Got ' + JSON.stringify(a.roles) + '.')
+for (const k of Object.keys(roles)) {
+  if (ROLE_KEYS.indexOf(k) === -1)
+    throw new Error('tier2-review: `roles` carries the key ' + JSON.stringify(k) + ', which names no stage; legal keys: ' + ROLE_KEYS.join(' | ') + '.')
+  if (typeof roles[k] !== 'string' || !AGENT_TYPE_SHAPE.test(roles[k]) || roles[k] === 'none')
+    throw new Error('tier2-review: `roles` key ' + k + ' must be an agent type name matching ' + AGENT_TYPE_SHAPE.source +
+      ', and not none (leave the key out for an untyped stage); legal keys: ' + ROLE_KEYS.join(' | ') + '. Got ' + JSON.stringify(roles[k]) + '.')
+}
+const finderKey = isSpec ? 'specFinder' : 'diffFinder'
+const otherFinderKey = isSpec ? 'diffFinder' : 'specFinder'
+const findType = roles[finderKey] || workerType
+const verifyType = roles.skeptic || workerType
+const synthType = roles.synthesis || ''
+const roledJudges = !!(roles[finderKey] || roles.skeptic)
+// TOOL-aOrientedCast-10 S7 - `efforts`, the reasoning effort each STAGE spawns at, keyed as `roles`
+// is. Refused before any agent when it is not a plain object, carries a key outside ROLE_KEYS, or a
+// value that is not lower-case letters. The level vocabulary is the roles library's, which the caller
+// read it from; this file grades the shape only, so no second copy of the vocabulary exists here.
+const EFFORT_SHAPE = /^[a-z]+$/
+const efforts = a.efforts === undefined ? {} : a.efforts
+if (!efforts || typeof efforts !== 'object' || Array.isArray(efforts) || Object.prototype.toString.call(efforts) !== '[object Object]')
+  throw new Error('tier2-review: `efforts` must be an object mapping a stage key to an effort level; legal keys: ' + ROLE_KEYS.join(' | ') +
+    ', each value matching ' + EFFORT_SHAPE.source + '. Got ' + JSON.stringify(a.efforts) + '.')
+for (const k of Object.keys(efforts)) {
+  if (ROLE_KEYS.indexOf(k) === -1)
+    throw new Error('tier2-review: `efforts` carries the key ' + JSON.stringify(k) + ', which names no stage; legal keys: ' + ROLE_KEYS.join(' | ') + '.')
+  if (typeof efforts[k] !== 'string' || !EFFORT_SHAPE.test(efforts[k]))
+    throw new Error('tier2-review: `efforts` key ' + k + ' must be an effort level matching ' + EFFORT_SHAPE.source +
+      ' (leave the key out to run at the agent type\'s own level); legal keys: ' + ROLE_KEYS.join(' | ') + '. Got ' + JSON.stringify(efforts[k]) + '.')
+}
+function renderStageOpts(type, key) {
+  return Object.assign(type ? { agentType: type } : {}, efforts[key] ? { effort: efforts[key] } : {})
+}
+const findOpts = renderStageOpts(findType, finderKey)
+const verifyOpts = renderStageOpts(verifyType, 'skeptic')
+const synthOpts = renderStageOpts(synthType, 'synthesis')
 // TOOL-aMendedFleet-111 S6 - whether the judges' results outlive this run. Under a named type no judge
 // writes its file, so every deferred note says a re-run dispatches every finder and skeptic again, and
 // every return carrying `pending` carries `durable` too, so a caller reads the fact, not the prose.
-const durable = !workerType
+// TOOL-aOrientedCast-5 S4 - it reads the judge stages' RESOLVED types, so a roled judge counts as a
+// named type, and a mixed run's untyped judge stage is told to write no file as well (spec section 8 F3).
+const durable = !findType && !verifyType
 function renderRerunTail(only, synthToo) {
   return durable
     ? `re-run with identical args to dispatch only ${only}`
     : `this run wrote no result file, so a re-run with identical args dispatches every finder and skeptic again${synthToo ? ', plus the synthesis' : ''}`
 }
-if (workerType)
+if (workerType && !roledJudges)
   log(`worker type ${workerType} — every finder and skeptic spawns as it and writes no find-*.json or verify-*.json, so this run's lens and batch results are NOT durable and a resume re-dispatches them`)
+if (!durable && roledJudges)
+  log(`judges under a named type — no finder or skeptic writes a find-*.json or verify-*.json, so this run's lens and batch results are NOT durable and a resume re-dispatches them`)
+// TOOL-aOrientedCast-5 S7 - one line per stage on every run, naming its type and where it came from.
+log(`role find: ${findType || 'the platform default'} — ${roles[finderKey] ? `roles.${finderKey}` : workerType ? 'workerType' : `no roles.${finderKey}, and workerType is none`}`)
+log(`role verify: ${verifyType || 'the platform default'} — ${roles.skeptic ? 'roles.skeptic' : workerType ? 'workerType' : 'no roles.skeptic, and workerType is none'}`)
+log(`role synthesis: ${synthType || 'the platform default'} — ${roles.synthesis ? 'roles.synthesis' : 'no roles.synthesis, as before roles'}`)
+if (roles[otherFinderKey] !== undefined)
+  log(`role find: roles.${otherFinderKey} is not read on a ${kind}`)
+// TOOL-aOrientedCast-10 S7 - one line per stage on every run, naming its effort and where it came from.
+for (const k of [finderKey, 'skeptic', 'synthesis'])
+  log(efforts[k] ? `effort ${k}: ${efforts[k]} — efforts.${k}` : `effort ${k}: the agent type's own, else the session's — no efforts.${k}`)
+if (efforts[otherFinderKey] !== undefined)
+  log(`effort ${otherFinderKey}: efforts.${otherFinderKey} is not read on a ${kind}`)
 // S7 - the context default is per-kind, and each is wrong if the other kind inherits it.
 const context = a.context || (isSpec ? 'the spec set under audit' : 'the cumulative diff landing on main')
 // `byDesign` is RESOLVED below, after the checklist's by-design block is cut out (TOOL-aGraftedHelix-3).
@@ -796,7 +869,9 @@ else log('WARNING: `checklist` was supplied with no item — no lens sweeps the 
 // purpose: the common dir is shared by every worktree on the node, and a take-over from another
 // worktree of the same commits is exactly the re-run this exists for. The reuse holds only for a
 // `workerType: 'none'` run: under a named type no judge wrote a file, so the key directory is empty
-// and a re-run dispatches every judge again (TOOL-aMendedFleet-111 S6). A spec audit's subject is every
+// and a re-run dispatches every judge again (TOOL-aMendedFleet-111 S6). A judge `roles` key is such a
+// type and joins the print; the synthesis role does not, since no keyed file is the synthesis's to
+// make stale (TOOL-aOrientedCast-5 S6). A spec audit's subject is every
 // `path@blob` in the order given; a diff review's is the RESOLVED base and head (F5), so a review
 // commissioned against `origin/main` is pinned to the sha that ref named, and a moved ref is a
 // different key rather than a stale answer.
@@ -820,8 +895,13 @@ const REVIEW_SHAPE = 'lenses5-r3'
 // unchanged. `scratch` is a location, not content, and stays out: a resumed run has a new scratchpad.
 // TOOL-aEvidencedLens-4 S7 - and `prevBlobs`, one per subject in order, null where absent, ONLY when some
 // subject carries one: a run carrying none, the diff kind included, keeps its print and so its key.
+// TOOL-aOrientedCast-5 S6 - and `roles` as `{ find, verify }`, the types this run's finders and skeptics
+// took from it, ONLY when one of the two is set, so a run whose judges took no role keeps its key. The
+// synthesis role and the other kind's finder key stay out: the synthesis writes no keyed file, so its
+// role cannot make one stale, and the other finder key is never read.
 const inputPrint = deriveFnv1a(renderCanonical(Object.assign({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}),
-  ...(prevBlobCount ? { prevBlobs: subjects.map((x) => (x && typeof x === 'object' && x.prevBlob !== undefined ? x.prevBlob : null)) } : {}) }, workerType ? { workerType: workerType } : {})))
+  ...(prevBlobCount ? { prevBlobs: subjects.map((x) => (x && typeof x === 'object' && x.prevBlob !== undefined ? x.prevBlob : null)) } : {}) }, workerType ? { workerType: workerType } : {},
+  roledJudges ? { roles: { find: roles[finderKey] || null, verify: roles.skeptic || null } } : {})))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -1022,13 +1102,15 @@ const finderResults = await boundedParallel(
         // not, so the BLOB COMPARISON happens here. Without it S5 is a string test any caller
         // satisfies. TOOL-aEvidencedLens-4 S5 - the move is no longer a fixed BLOCKER: the resume probe
         // reports it to RUN INTEGRITY, and a defect IN the moved text is graded by the rubric like any other.
-        ? `You are the ${L.key} reviewer of a SPEC SET. For EACH subject listed under SUBJECT above: first run ` +
+        // TOOL-aOrientedCast-5 S5 - under a role, the identity and posture sentences are the role's block.
+        ? (roles[finderKey] ? '' : `You are the ${L.key} reviewer of a SPEC SET. `) +
+          `For EACH subject listed under SUBJECT above: first run ` +
           `\`git -C ${repo} hash-object <path>\` and compare the result to the pinned blob. A mismatch ` +
           `means the spec MOVED since this review was commissioned: review the file as it now stands, and read ` +
           `the moved text with \`git -C ${repo} diff <blob> -- <path>\` as unreviewed fold text. Report a defect IN ` +
           `that text as a finding graded by the SEVERITY RUBRIC below; the move itself is not a finding. ` +
           `Then Read the file WHOLE.\n\n`
-        : `You are the ${L.key} reviewer. Review ONLY the diff named under SUBJECT above (run \`${diffCmd}\`, then Read/Grep the touched files + their immediate callers).\n\n`) +
+        : (roles[finderKey] ? '' : `You are the ${L.key} reviewer. `) + `Review ONLY the diff named under SUBJECT above (run \`${diffCmd}\`, then Read/Grep the touched files + their immediate callers).\n\n`) +
         `LENS: ${L.brief}\n` +
         // TOOL-aEvidencedLens-2 S2 - the probe policy directly under the brief; '' on the diff kind.
         probeBlock +
@@ -1038,20 +1120,23 @@ const finderResults = await boundedParallel(
         checklistBlock[L.key] +
         `\n` +
         (isSpec
-          ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, a proposed fix, and evidence: the command you ran and what it printed, or read: <path>:<line> for a finding that rests on reading alone. A spec finding is often the ABSENCE of a line, so address it by section. Every finding is ABOUT the spec set; its evidence may come from anywhere in ${repo} at HEAD. No speculation, no style nits. If nothing real, return findings: [].\n`
-          : `Emit CONCRETE findings only — each needs file, line, severity (blocker|high|medium|low), a one-line claim, the impact, and a proposed fix. No speculation, no style nits, nothing outside the diff. If nothing real, return findings: [].\n`) +
+          ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, a proposed fix, and evidence: the command you ran and what it printed, or read: <path>:<line> for a finding that rests on reading alone. A spec finding is often the ABSENCE of a line, so address it by section. Every finding is ABOUT the spec set; its evidence may come from anywhere in ${repo} at HEAD.` +
+            (roles[finderKey] ? '' : ` No speculation, no style nits.`) + ` If nothing real, return findings: [].\n`
+          : `Emit CONCRETE findings only — each needs file, line, severity (blocker|high|medium|low), a one-line claim, the impact, and a proposed fix. ` +
+            (roles[finderKey] ? `Nothing outside the diff.` : `No speculation, no style nits, nothing outside the diff.`) + ` If nothing real, return findings: [].\n`) +
         // TOOL-aSightedSkeptic-6 S2 - the rubric beside the instruction that asks for a severity.
         SEVERITY_RUBRIC + `\n` +
         // TOOL-dDerivedDocket-29 S1 - WRITE BEFORE RETURN. A fan that dies on a session limit loses
         // every structured return with it; a file on disk survives, and the next run's probe reuses it.
         // TOOL-aMendedFleet-67 S2 - a judge under `workerType` holds no Write tool, so it is told none.
-        (workerType
+        // TOOL-aOrientedCast-5 S4 - nor under a role, and a mixed run's untyped judges follow `durable`.
+        (!durable
           ? `\nWrite no file. Set path to an empty string.\n`
           : `\nDURABILITY — BEFORE you return, whatever you found, Write the exact JSON object you are about to return, plus one more field "key":"${reviewKey}", to ${keyDir}/find-${L.key}.json, creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.\n`) +
         (isSpec
           ? `Return JSON {lens:"${L.key}", path, findings:[{file,where,severity,claim,impact,fix,evidence}]}.`
           : `Return JSON {lens:"${L.key}", path, findings:[{file,line,severity,claim,impact,fix}]}.`),
-        Object.assign({ label: `find:${L.key}`, phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA }, judgeOpts),
+        Object.assign({ label: `find:${L.key}`, phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA }, findOpts),
       ),
   ),
 )
@@ -1214,7 +1299,9 @@ const verdictResults = await boundedParallel(
       // LOW unreachable beside a rubric that defines one. The diff kind is untouched (shared invariant 2).
       (isSpec
         ? probeBlock + `\n` +
-          `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it. Read the cited spec at the cited section and the siblings it names; ` +
+          // TOOL-aOrientedCast-5 S5 - under a role, the try-to-refute stance is the role's block.
+          (roles.skeptic ? `For EACH finding below, read` : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it. Read`) +
+          ` the cited spec at the cited section and the siblings it names; ` +
           `a claim about code or a record is checked against that code or record, never against the spec's account of it. ` +
           `Then re-run the finding's evidence under the PROBE POLICY above: run the command it names, or re-read the path and line it names, and say in \`reason\` what you observed.\n` +
           `"confirmed" when the claim is TRUE of the spec set, and of the tree where it makes a claim about the tree, AT ANY RUBRIC SEVERITY: the rubric grades it, confirmation does not.\n` +
@@ -1224,7 +1311,7 @@ const verdictResults = await boundedParallel(
           `or \`duplicate of prior <ref>\` for a prior round's original; (6) a PREFERENCE that names no defect the rubric grades, not even a low.\n` +
           `Evidence that reads \`-\` was not recorded: probe the claim yourself and never confirm on the finder's word. ` +
           `A probe you could not run inside its bound is a finding you cannot establish; apply the default by the finder's grade, and never call it evidence that does not reproduce.\n\n`
-        : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate).\n\n`) +
+        : (roles.skeptic ? `For EACH finding below, ` : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — `) + `read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate).\n\n`) +
         // TOOL-aSightedSkeptic-6 S4 - the default follows the FINDER's grade (spec section 8 F3). An
         // unsure skeptic refuting a real blocker loses the defect; one answering uncertain on every
         // low-precision nit floods disposal. So only a costly finding is left outstanding.
@@ -1252,7 +1339,7 @@ const verdictResults = await boundedParallel(
         `"none" when no fix was proposed. For "unsound", \`fixNote\` holds ONLY the corrected fix, and is empty when you have none; ` +
         `say why the fix is unsound in \`reason\`, never in \`fixNote\`. ` +
         `The fix verdict NEVER changes the finding's verdict: judge the claim on its own, then the fix on its own.` +
-        (workerType
+        (!durable
           ? `\n\nWrite no file. Set path to an empty string.`
           : `\n\nDURABILITY — BEFORE you return, Write the exact JSON object you are about to return, plus two more fields ` +
             `"key":"${reviewKey}" and "batch":"${batchPrints[gi]}", to ${keyDir}/verify-${group[0].id}-${group[group.length - 1].id}.json, ` +
@@ -1260,7 +1347,7 @@ const verdictResults = await boundedParallel(
         `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted"|"uncertain", reason, severity:"blocker"|"high"|"medium"|"low" (on a confirmed verdict), fixVerdict:"sound"|"unsound"|"none", fixNote}]}. ` +
         `Emit EXACTLY one verdict per finding above (${group.length} verdicts, ids ${group.map((f) => f.id).join(', ')}). ` +
         `Copy the integer id — do NOT re-type the file path, and do not renumber.`,
-        Object.assign({ label: batchLabels[gi], phase: 'Verify', schema: VERDICT_SCHEMA }, judgeOpts),
+        Object.assign({ label: batchLabels[gi], phase: 'Verify', schema: VERDICT_SCHEMA }, verifyOpts),
       ),
   ),
 )
@@ -1614,6 +1701,10 @@ const synth = await agent(
       ? `lens notes supplied for: ${readNotes.length ? readNotes.join(', ') : 'no lens that ran'}` +
         (unreadNotes.length ? `; lens notes for skipped lenses, unread: ${unreadNotes.join(', ')}` : '') + `.\n`
       : `lens notes: none supplied, so every lens ran on the kit's generic brief.\n`) +
+    // TOOL-aOrientedCast-5 S8 - a run where `roles` named a stage it reads says so; a classic run carries no clause.
+    (roles[finderKey] || roles.skeptic || roles.synthesis
+      ? `Roles: finders ${findType || 'the platform default'}, skeptic batches ${verifyType || 'the platform default'}, synthesis ${synthType || 'the platform default'}.\n`
+      : '') +
     // TOOL-aSightedSkeptic-7 S6 - a light run names every skipped lens; a full run carries no clause.
     (skippedLenses.length
       ? `Intensity: light - the ${skippedLenses.join(', ')} lens(es) were NOT run, so their classes were swept only ` +
@@ -1717,6 +1808,7 @@ const synth = await agent(
       : '') +
     `Return JSON {path, items, summary} with a FORWARD-SLASH path.`,
   {
+    ...synthOpts,
     label: 'synth',
     phase: 'Synthesize',
     schema: {
