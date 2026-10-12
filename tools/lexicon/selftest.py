@@ -1135,15 +1135,15 @@ with build_tempdir() as td:
     # grade, which is the state the mode must pass through.
     _skill = root / ".claude" / "skills" / "lexicon" / "SKILL.md"
     subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--render"], cwd=root,
-                   capture_output=True, text=True)
+                   capture_output=True, text=True, encoding="utf-8")
     _kept = _skill.read_bytes()
     _r = subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check-render"], cwd=root,
-                        capture_output=True, text=True)
+                        capture_output=True, text=True, encoding="utf-8")
     check("--check-render: a fresh Skill passes while the declaration's grade is red",
           _r.returncode == 0, _r.stdout + _r.stderr)
     _skill.write_bytes(_kept + b"x")
     _r = subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check-render"], cwd=root,
-                        capture_output=True, text=True)
+                        capture_output=True, text=True, encoding="utf-8")
     check("--check-render: a Skill one byte off a fresh render reds, naming the drift",
           _r.returncode == 1 and "lexicon: DRIFTED" in _r.stdout + _r.stderr, _r.stdout + _r.stderr)
     _skill.write_bytes(_kept)

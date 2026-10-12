@@ -1,6 +1,6 @@
 # TOOL-aPrimedIndex-16 — the close bar's reds, which this build's edit to the runner makes its own
 
-**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-1 · base 4606faa4 · streams tooling · order 7
+**Status:** CLOSED · rev-1 · 2026-10-12 · node a · Tier-1 · base 4606faa4 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 

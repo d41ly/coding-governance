@@ -59,6 +59,8 @@ whole set without a hand-kept list.
 
 - **hands-off** `TOOL-aPrimedIndex-2` — the reader that resolves these rows, runs them and refuses a
   malformed one.
+- **hands-off** `TOOL-aPrimedIndex-3` — the declared rows its preflight checks.
+- **hands-off** `TOOL-aPrimedIndex-9` — the lexicon row whose check it narrows.
 
 ## 4. Design
 

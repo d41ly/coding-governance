@@ -52,6 +52,7 @@ know which generator a red leg wanted.
 - **consumes-from** `TOOL-aPrimedIndex-1` — the declared rows; with none the verb reports an empty set.
 - **hands-off** `TOOL-aPrimedIndex-3` — calling `--check` before a bar and refusing on its exit.
 - **hands-off** `TOOL-aPrimedIndex-4` — calling `--write` over the lander's merged tree.
+- **hands-off** `TOOL-aPrimedIndex-7` — the verb whose review minors it batches.
 
 ## 4. Design
 

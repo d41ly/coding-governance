@@ -189,6 +189,11 @@ Cite ids, never line numbers.
 | [TOOL-aPooledSweep-5](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE WHOLE-POPULATION SWEEP IS UNMEASURED, and the 4.0x figure this… |
 | [TOOL-aPooledSweep-6](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE PEAK-CONCURRENCY ARM DOES NOT DISCRIMINATE THE COMPARISON IT EXISTS… |
 | [TOOL-aPooledSweep-7](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE PORT PROGRAMME TOOL-aQuenchedHarness-6 OPENED IS SUPERSEDED FOR… |
+| [TOOL-aPrimedIndex-11](../builds/aPrimedIndex/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite push-main self-test red at 9b743831 on the daily held… |
+| [TOOL-aPrimedIndex-12](../builds/aPrimedIndex/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite pre-push self-test red at 9b743831 on the daily held… |
+| [TOOL-aPrimedIndex-13](../builds/aPrimedIndex/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite memory-hygiene self-test red at 9b743831 on the daily… |
+| [TOOL-aPrimedIndex-14](../builds/aPrimedIndex/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite unattended driver selftest shard 5/8 red at 9b743831 on… |
+| [TOOL-aPrimedIndex-15](../builds/aPrimedIndex/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite unattended driver selftest shard 7/8 red at 9b743831 on… |
 | [TOOL-aProbedToolkit-2](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | A SKIP READS AS A PASS IN EVERY ADOPTER. check() at… |
 | [TOOL-aProbedToolkit-4](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE LEXICON RATCHET CAN ONLY LOOSEN, AND ITS REMEDY ANSWERS 1.5% OF… |
 | [TOOL-aProbedToolkit-5](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE LEXICON PREDICATE GRADES A POPULATION THE TABLE WAS NEVER WRITTEN… |

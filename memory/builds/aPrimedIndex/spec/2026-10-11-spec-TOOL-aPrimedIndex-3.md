@@ -55,6 +55,8 @@ regenerates them all. Every bar entry point reaches the runner, so this binds al
 - **consumes-from** `TOOL-aPrimedIndex-2` — the `--check` verb and its exit codes.
 - **consumes-from** `TOOL-aPrimedIndex-1` — the declared rows; with none, the preflight checks
   nothing and says so.
+- **hands-off** `DEPL-aPrimedIndex-1` — the preflight govkit's verdict reader skips.
+- **hands-off** `TOOL-aPrimedIndex-6` — the skip knob the push bar scrubs.
 
 ## 4. Design
 

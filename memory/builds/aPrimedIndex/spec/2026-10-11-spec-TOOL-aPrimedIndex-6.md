@@ -37,6 +37,7 @@ arm holds and a caller cannot skip the generated-output preflight on the push th
 ### Edges
 
 - **consumes-from** `TOOL-aPrimedIndex-3` — the knob being classified.
+- **hands-off** `TOOL-aPrimedIndex-7` — the scrubbed knob the runner's minors build on.
 
 ## 4. Design
 

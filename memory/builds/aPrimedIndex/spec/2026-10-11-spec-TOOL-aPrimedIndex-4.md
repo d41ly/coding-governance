@@ -50,6 +50,8 @@ stale pushes a fresh tree instead of meeting the bar's refusal.
 
 - **consumes-from** `TOOL-aPrimedIndex-2` — the `--write` verb, its exit codes and its moved-file
   report.
+- **hands-off** `TOOL-aPrimedIndex-8` — the lander paths whose review minors it batches.
+- **hands-off** `TOOL-aPrimedIndex-10` — the lander paths whose allow-record operand it corrects.
 
 ## 4. Design
 

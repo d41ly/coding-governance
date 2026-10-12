@@ -83,8 +83,7 @@ One new shell function in `tools/push-main.sh`, `remove_new_untracked` (verb `re
   `--prepare` refuses and `git status --porcelain` is empty afterwards. Red when: the file survives,
   as it does with the cleanup removed.
 - **AC2** — When arm 32 runs the attended landing over a `regen.py` that exits 1, the output carries
-  `push-main: the generated outputs this landing owes could not be regenerated (named above). Aborted
-  (no push).` and the remote's main does not move; `check-arms.py --check` then exits 0. Red when:
+  the lander's whole regeneration refusal, which ends `Aborted (no push).`, and the remote's main does not move; `check-arms.py --check` then exits 0. Red when:
   either refusal site is neither armed nor pinned.
 - **AC3** — When arm 25 runs as a slice, it prints its `ok` line with both skips named. Red when:
   the regeneration refuses before the merge-loss check's lexicon skip.
