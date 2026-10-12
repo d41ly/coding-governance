@@ -4458,6 +4458,11 @@
       "file": "tools/memory-tree/routed_commits.py"
     },
     {
+      "id": "check_rule_tags",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "check_run_call",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -7553,11 +7558,6 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
-      "id": "extract_charter_sections",
-      "kind": "function",
-      "file": "tools/roles/roles_lib.py"
-    },
-    {
       "id": "extract_chunks",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
@@ -10351,6 +10351,11 @@
       "id": "parse_cell_key",
       "kind": "function",
       "file": "tools/lexicon/lexicon_conf.py"
+    },
+    {
+      "id": "parse_charter",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "parse_cim",
@@ -14296,6 +14301,11 @@
       "id": "render_census",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "render_charter_blocks",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "render_check_report",

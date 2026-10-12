@@ -40,7 +40,8 @@ The checker grades that each entry names something, not that the thing exists.
 [--input <key>=<value>]... [--out <path> | --stdout] [--part full|task]` turns a role and one task
 into the prompt its agent is handed (TOOL-aOrientedCast-2). The file holds the role as `render_role`
 renders it under `## Role`, then `## Task`: one block per key of the role's `reads`, in declared
-order, then one block per `charter` id. A `task:` key is read from the session card's `## task`
+order, then, as its last block, the role's charter blocks (described under "The agent types"),
+whose library notes print on stderr as `handoff: note — `. A `task:` key is read from the session card's `## task`
 field by the kickoff checker's field grammar, a `card:` key from that card's section, a `brief:` key
 from the build's brief record, and an `input:` key from `--input`. A required key that resolves to
 nothing, an empty value or a placeholder refuses by name and writes nothing; an optional one is named
@@ -102,12 +103,17 @@ then every role's list is empty, the strict reading.
 `python render_agents.py --write | --check | --selftest` renders each role whose `agent` is true
 into a Claude Code agent type, `.claude/agents/<name>.md` (TOOL-aOrientedCast-3). Its front matter
 is the role's Claude keys, then `omitClaudeMd: true`, then the role's `workflow` and `writes` for
-the hooks to read. Its body is `render_role`'s output, then, under `## Charter`, one
-`### charter §<n>` block per id of the role's `charter` key, in the order the key names them, spelled
-as a handoff spells its blocks. An agent started with the charter omitted holds only its system
-prompt and its task, so a harness that hands it no handoff would otherwise give it no charter section
-at all; a typed spawn that IS handed a handoff carries those sections twice, which is the accepted
-cost. Beside the types sits `.claude/roles.json`, the generated index the hooks read: every role
+the hooks to read. Its body is `render_role`'s output, then `## Charter` and
+`render_charter_blocks` for the role (TOOL-aOrientedCast-16): a `### Charter rules` block holding the
+section 1 rule lines whose tag the role's `rules` key cites, in charter order, then the charter's
+`## Protocols` and `## Facts` sections whole, each under a `### ` heading — the same text a handoff
+appends to its task. `parse_charter` reads only the span between the `gov:playbook` region markers
+when the doc holds them, so an adopter's own sections around the region never reach an agent. An
+agent started with the charter omitted holds only its system prompt and its task, so a harness that
+hands it no handoff would otherwise give it no charter at all; a typed spawn that IS handed a
+handoff carries the blocks twice, which is the accepted cost. A pre-tag (v3.x) charter, with
+`## §<n> — ` headings and no rule tag, renders every type with no `## Charter` and prints one note
+asking for a reseed; a doc of neither shape refuses. Beside the types sits `.claude/roles.json`, the generated index the hooks read: every role
 with its `workflow`, `writes` and `agent`, `agent: false` roles included, and `harnesses`, the
 repo-relative scripts of every workflow whose `driver` is `workflow`. A harness the tree does not
 hold is listed where the resolver places it and printed on a `note` line; it refuses nothing.
@@ -118,8 +124,9 @@ longer renders and rewrites the index last; it never touches any other file unde
 `.claude/agents/`, where your own definitions may live. `--check` writes nothing, names every
 `missing`, `drift` or `stale` owned path and the remedy, and strips carriage returns from the
 on-disk side, so a CRLF checkout of a correct render reads fresh. The adopter's `--check` runs it
-beside the Skill's compare as the `roles render wiring` leg, so editing a role, an overlay or a
-cited charter section without a re-render reds the bar.
+beside the Skill's compare as the `roles render wiring` leg, so editing a role, an overlay, a
+cited rule line or a carried section without a re-render reds the bar: a rule edit stales exactly
+the types whose role cites its tag, and a carried-section edit stales every type.
 `--selftest` runs the renderer's arms over a catalogue it builds in a temporary directory and is the
 `roles render selftest` leg. Exit 0, 1 on drift or a failed arm, 2 on usage, a library refusal or a
 zero-role catalogue.
@@ -141,7 +148,14 @@ record in the build that shipped this renderer is the instrument to re-run.
 `govkit update --write` installs it where a receipt predates it, printing `default-gained`. It
 requires the kickoff kit, whose card writer every `task:` and `card:` input is read from, and the
 memory-tree kit, whose `.memory-tree.conf` names the memory root and, by `CHARTER`, the governing
-doc the roles' charter ids resolve against.
+doc the roles' rule tags resolve against.
+
+**A role's `rules` tags.** A tag every v4.x charter template carries outside any `when:` or `kit:`
+block is cited bare. A tag a target's charter may lack is cited with a trailing `?` — `cross-os`,
+fenced by `when:cross-os`, and `spec`, which v4.0 and the first v4.1 template lack — so a charter
+without it prints a note instead of refusing. Write the tags in charter order, and name a protocol
+in a body by its name ("the build method's M6"), never by its file: the checker refuses the file
+name of any protocol the charter's Protocols section lists.
 
 - The base role files, the workflow table, the library, the checker, the renderers, the adopter and
   this README are the kit's, overwritten on every update.
@@ -195,11 +209,12 @@ invoking `/build`.
 
 `python check_roles.py [--root <dir>] [--write]`, run as the `roles catalogue` gate leg. It grades
 the role files, the overlays and the workflow table against each other in both directions, and every
-`charter` id against a `## §<n> — ` heading of the governing doc, which it locates through the
-memory-tree conf's `CHARTER` key. It prints one line per defect naming the file and the rule (R0 to
-R11, listed in its header with what it does not check), then a summary of every count it graded.
-Exit 0 clean, 1 on a defect or an empty catalogue (DEAD PROBE), 2 when the conf or its `CHARTER`
-is missing. `--write` re-renders the region below from the table and the front matter, and nothing
+`rules` tag against the section 1 rule tags of the governing doc, which it locates through the
+memory-tree conf's `CHARTER` key; a body or an overlay spelling a protocol's file name reds as R5 or
+R10. It prints one line per defect naming the file and the rule (R0 to R12, listed in its header
+with what it does not check), then a summary of every count it graded, the charter's shape among
+them. Exit 0 clean, 1 on a defect or an empty catalogue (DEAD PROBE), 2 when the conf or its
+`CHARTER` is missing, or the doc is no charter this kit reads. `--write` re-renders the region below from the table and the front matter, and nothing
 else; the check compares the two on every run.
 
 <!-- gen:roles-catalogue -->
@@ -220,17 +235,17 @@ else; the check compares the two on every run.
 
 **Roles**, from `agents/*.agent.md`:
 
-| role | workflow | writes | reads | charter | agent | returns |
+| role | workflow | writes | reads | rules | agent | returns |
 |---|---|---|---|---|---|---|
-| `gov-builder` | build | product | input:spec, card:route?, brief:non-goals? | §3, §7, §9, §11, §12 | true | whether the unit was committed, the commit, why when it was not, and which check ran for which gate |
-| `gov-diff-reviewer` | closing-review | none | input:diff, input:spec? | §7, §8, §9, §10 | true | concrete findings, each with its file and line, the input that reaches it, the consequence and a proposed fix |
-| `gov-orienter` | orient | none | input:question, input:prompt? | §1, §2, §5 | true | the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows |
-| `gov-researcher` | research | none | input:question, brief:goal?, brief:non-goals? | §5, §12 | true | the candidates, each with its mechanism, the smallest test that would make it lose and that test's result, then the pick and its reason |
-| `gov-reuse-scout` | reuse | none | input:question, task:in?, card:reuse? | §12 | true | the seam to extend, cited by path, or "no existing seam fits" with the evidence |
-| `gov-session` | handoff | none | input:question, brief:goal?, task:todo?, card:route? | §2, §3 | false | nothing to the sender; the receiving session acts on the task block and reports in its own session |
-| `gov-skeptic` | closing-review | none | input:diff?, input:spec? | §8, §10 | true | a verdict per finding, confirmed or refuted, with the reason observed and, for a confirmed one, its severity |
-| `gov-spec-reviewer` | spec-review | none | input:spec, brief:goal?, brief:non-goals? | §7, §8, §9, §10 | true | concrete findings, each with the spec and section, the evidence probed, the consequence and a proposed fix |
-| `gov-spec-writer` | spec-write | spec | brief:goal, brief:items, brief:acceptance, brief:gates, brief:non-goals, input:spec?, task:reuse?, card:route? | §1, §7, §9, §12 | true | the units authored, already present and refused, each by its unit id, with the reason for every refusal |
-| `gov-synthesizer` | closing-review | review | input:diff?, input:spec? | §8, §16 | true | the report's path and the items it adjudicated, each with its severity and the ids of the findings it covers |
+| `gov-builder` | build | product | input:spec, card:route?, brief:non-goals? | yagni, reuse, core, derive, verify, gate, security, bytes, cross-os?, tools | true | whether the unit was committed, the commit, why when it was not, and which check ran for which gate |
+| `gov-diff-reviewer` | closing-review | none | input:diff, input:spec? | verify, gate, class, left-shift, security, risk, bytes, cross-os? | true | concrete findings, each with its file and line, the input that reaches it, the consequence and a proposed fix |
+| `gov-orienter` | orient | none | input:question, input:prompt? | small, ids, memory, tokens, tools | true | the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows |
+| `gov-researcher` | research | none | input:question, brief:goal?, brief:non-goals? | reuse, verify, class, memory | true | the candidates, each with its mechanism, the smallest test that would make it lose and that test's result, then the pick and its reason |
+| `gov-reuse-scout` | reuse | none | input:question, task:in?, card:reuse? | reuse | true | the seam to extend, cited by path, or "no existing seam fits" with the evidence |
+| `gov-session` | handoff | none | input:question, brief:goal?, task:todo?, card:route? | ids, memory | false | nothing to the sender; the receiving session acts on the task block and reports in its own session |
+| `gov-skeptic` | closing-review | none | input:diff?, input:spec? | verify, class, risk | true | a verdict per finding, confirmed or refuted, with the reason observed and, for a confirmed one, its severity |
+| `gov-spec-reviewer` | spec-review | none | input:spec, brief:goal?, brief:non-goals? | spec?, verify, gate, class, security, risk | true | concrete findings, each with the spec and section, the evidence probed, the consequence and a proposed fix |
+| `gov-spec-writer` | spec-write | spec | brief:goal, brief:items, brief:acceptance, brief:gates, brief:non-goals, input:spec?, task:reuse?, card:route? | yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security | true | the units authored, already present and refused, each by its unit id, with the reason for every refusal |
+| `gov-synthesizer` | closing-review | review | input:diff?, input:spec? | left-shift, risk, signal | true | the report's path and the items it adjudicated, each with its severity and the ids of the findings it covers |
 
 <!-- /gen:roles-catalogue -->

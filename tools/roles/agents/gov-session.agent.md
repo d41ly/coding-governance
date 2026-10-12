@@ -4,7 +4,7 @@ description: Opens a handoff to another session of this repository.
 workflow: handoff
 reads: input:question, brief:goal?, task:todo?, card:route?
 writes: none
-charter: §2, §3
+rules: ids, memory
 returns: nothing to the sender; the receiving session acts on the task block and reports in its own session
 agent: false
 ---

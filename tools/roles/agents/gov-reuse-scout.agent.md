@@ -6,7 +6,7 @@ model: inherit
 workflow: reuse
 reads: input:question, task:in?, card:reuse?
 writes: none
-charter: §12
+rules: reuse
 returns: the seam to extend, cited by path, or "no existing seam fits" with the evidence
 ---
 

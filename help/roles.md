@@ -14,7 +14,9 @@ reference; this page is the short version.
 1. **Kickoff writes the card.** Its `## task` block carries the goal, scope, cut-line, To-do, Reuse,
    acceptance check and gates.
 2. **A role supplies the constant part.** Each role is one file under `<prefix>/roles/agents/`: its
-   instructions, the inputs it reads, the file class it may write and the charter sections it needs.
+   instructions, the inputs it reads, the file class it may write and the charter's section 1 rule
+   tags it needs, under `rules`. Its agent carries those rule lines and the charter's Protocols and
+   Facts sections whole.
 3. **The handoff renderer joins them.** `handoff.py render` writes one prompt file under the build's
    `prompts/` folder, with `## Role` and then `## Task`, filled from the card, the build's brief and
    any `--input` values. A required input that is missing or still a placeholder refuses by name.

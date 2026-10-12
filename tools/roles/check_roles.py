@@ -9,14 +9,21 @@ then one summary line naming every count it graded and each overlay's bytes. Exi
 defect, 2 when the check is unarmed. `--write` renders the README's catalogue region and writes it,
 touching nothing else, then grades as usual.
 
-  R0  no `.memory-tree.conf`, no CHARTER key in it, or no file at that path (exit 2)
-  R1  zero role files or zero workflow entries: a check that graded nothing is DEAD PROBE
-  R2  a front-matter defect: unknown, indented, repeated or missing key; `name` not the file stem;
-      `writes` outside its set; `agent` not true/false; `tools` or `model` absent on an agent role
+  R0  no `.memory-tree.conf`, no CHARTER key in it, or no file at that path; a governing doc that
+      carries neither a section 1 rule tag nor a `## §<n> — ` heading, a tagged doc lacking a
+      carried section (`## Protocols`, `## Facts`), or a tag repeated in section 1 (exit 2)
+  R1  zero role files or zero workflow entries, or a tagged charter no role's `rules` cites a tag
+      of: a check that graded nothing is DEAD PROBE
+  R2  a front-matter defect: unknown, indented, repeated or missing key (`rules` may be empty);
+      `name` not the file stem; `writes` outside its set; `agent` not true/false; `tools` or
+      `model` absent on an agent role
   R3  a `reads` key outside the vocabulary, named twice, or `card:reuse` without `?`
-  R4  a `charter` id that is not `§` and digits, or names no heading in the governing doc
+  R4  a `rules` entry that is not a lowercase tag optionally ending in `?`, a tag named twice, or a
+      bare tag naming no section 1 rule of a tagged charter; an optional (`?`) tag section 1 lacks
+      prints one `roles: note:`. A pre-tag (v3.x) charter resolves no tag and prints one note
   R5  a body empty, over its slot's ceiling, carrying a `# `/`## ` line or a token other than
-      {{MEMORY_ROOT}}; a slot with no ceiling row
+      {{MEMORY_ROOT}}, or spelling the file name of a protocol the charter's Protocols section
+      names; a slot with no ceiling row
   R6  a workflow entry with an unknown, missing or repeated key or name, a missing name of the ten,
       a non-integer or negative `stage`, an unknown `driver`, or a `trigger` carrying a newline
   R7  a role whose `workflow` names no entry, or whose entry does not list it
@@ -25,7 +32,8 @@ touching nothing else, then grades as usual.
   R9  a workflow driver whose harness is not a `{prefix}/<home>/<file>.js` path; a `stages` table on
       another driver, a key outside its pattern, or a value outside the entry's roles or naming an
       `agent: false` role. A well-formed harness the tree does not hold prints one `roles: note:`
-  R10 a house overlay naming no role, or carrying a `# `/`## ` line or a token other than {{MEMORY_ROOT}}
+  R10 a house overlay naming no role, or carrying a `# `/`## ` line, a token other than
+      {{MEMORY_ROOT}}, or the file name of a protocol the charter's Protocols section names
   R11 the README's catalogue region absent, or different from a fresh render
   R12 a `house/policy.toml` defect, one line per line of `roles_lib.load_policy`'s refusal: the file
       absent or not TOML, an unknown key, no `default`, a level outside the five, a role entry
@@ -40,8 +48,9 @@ touching nothing else, then grades as usual.
 WHAT THIS DOES NOT CHECK, because a structural check reads as a semantic one to everybody who did not
 write it: the MEANING of a body; the truth of an `enforced-by` entry; a `tools:` name, which moves
 with the CLI; a command harness, which is graded for presence only; and whether the kit of a harness
-the tree does not hold should be installed, which is a `note` here and the wiring check's to report.
-An overlay's size is printed and never graded: it is the adopter's own text.
+the tree does not hold should be installed, which is a `note` here and the wiring check's to report;
+whether a cited rule suits its role; and whether a bare tag exists in every v4.x seed an adopter may
+hold. An overlay's size is printed and never graded: it is the adopter's own text.
 """
 import pathlib
 import re
@@ -63,7 +72,9 @@ WORKFLOW_NAMES = ("orient", "research", "reuse", "handoff", "spec-write", "spec-
 WORKFLOW_KEYS = ("name", "stage", "driver", "harness", "roles", "stages", "enforced-by", "trigger")
 DRIVERS = ("agent", "workflow", "program", "main-loop")
 WRITES = ("none", "spec", "product", "review", "records")
-REQUIRED_ROLE_KEYS = ("name", "description", "workflow", "reads", "writes", "charter", "returns")
+REQUIRED_ROLE_KEYS = ("name", "description", "workflow", "reads", "writes", "rules", "returns")
+#: A backticked path ending in `.md` in the carried Protocols body: a protocol's file.
+PROTOCOL_PATH_RE = re.compile(r"`([^`\s]*\.md)`")
 STAGE_KEY_RE = re.compile(r"^[a-z][A-Za-z]*$")
 JS_HARNESS_RE = re.compile(r"^\{prefix\}/[^/{}\s]+/[^/{}\s]+\.js$")
 REGION_OPEN, REGION_CLOSE = "<!-- gen:roles-catalogue -->", "<!-- /gen:roles-catalogue -->"
@@ -89,7 +100,7 @@ def render_catalogue_region(roles, workflows):
     out =["", "**Workflows**, from `workflows.toml`:", "",
            "| " + " | ".join(WORKFLOW_KEYS) + " |", "|" + "---|" * len(WORKFLOW_KEYS)]
     out += ["| " + " | ".join(render_cell(w.get(k)) for k in WORKFLOW_KEYS) + " |" for w in workflows]
-    cols = ("workflow", "writes", "reads", "charter", "agent", "returns")
+    cols = ("workflow", "writes", "reads", "rules", "agent", "returns")
     out += ["", "**Roles**, from `agents/*.agent.md`:", "",
             "| role | " + " | ".join(cols) + " |", "|" + "---|" * (len(cols) + 1)]
     for slot, r in roles.items():
@@ -114,13 +125,18 @@ def check_roles(root, kit_dir, write=False):
     root, kit_dir = pathlib.Path(root), pathlib.Path(kit_dir)
     tool_root = kit_dir.parent
     charter_path = lib.resolve_charter_path(root)
-    sections = lib.extract_charter_sections(lib.load_text(charter_path))
+    doc = resolve_display_path(root, charter_path)
+    charter = lib.parse_charter(lib.load_text(charter_path), doc)
     defects, notes = [], []
+    if charter["shape"] == "legacy":
+        notes.append("roles: note: " + lib.LEGACY_NOTE % doc)
+    protocols = dict(zip(lib.CARRIED_SECTIONS, charter["carried"])).get("Protocols", ("", ""))[1]
+    protocol_files = sorted({m.rsplit("/", 1)[-1] for m in PROTOCOL_PATH_RE.findall(protocols)})
 
     def add_defect(path, rule, what):
         defects.append("roles: %s: %s — %s" % (resolve_display_path(root, path), rule, what))
 
-    roles, n_reads, n_charter = {}, 0, 0
+    roles, n_reads, n_rules, cited = {}, 0, 0, set()
     for p in sorted((kit_dir / "agents").glob("*.agent.md")):
         slot = p.name[:-len(".agent.md")]
         try:
@@ -130,7 +146,7 @@ def check_roles(root, kit_dir, write=False):
             continue
         roles[slot] = {"path": p, "keys": keys, "body": body}
         for k in REQUIRED_ROLE_KEYS:
-            if k not in keys or (k != "charter" and not keys[k]):
+            if k not in keys or (k != "rules" and not keys[k]):
                 add_defect(p, "R2", "front-matter key '%s' is missing" % k)
         if keys.get("name") and keys["name"] != slot:
             add_defect(p, "R2", "name '%s' is not the file stem '%s'" % (keys["name"], slot))
@@ -153,12 +169,16 @@ def check_roles(root, kit_dir, write=False):
             if item == "card:reuse":
                 add_defect(p, "R3", "card:reuse must be optional, 'card:reuse?': that section is not on every card")
             seen.add(base)
-        for cid in [x.strip() for x in keys.get("charter", "").split(",") if x.strip()]:
-            n_charter += 1
-            if not re.fullmatch(r"§\d+", cid):
-                add_defect(p, "R4", "charter id '%s' is not § and digits" % cid)
-            elif cid not in sections:
-                add_defect(p, "R4", "charter %s names no heading in %s" % (cid, resolve_display_path(root, charter_path)))
+        entries = [x.strip() for x in keys.get("rules", "").split(",") if x.strip()]
+        n_rules += len(entries)
+        cited.update(e.rstrip("?") for e in entries)
+        tag_defects, tag_notes = lib.check_rule_tags(charter, keys.get("rules", ""))
+        for what in tag_defects:
+            add_defect(p, "R4", what)
+        notes.extend("roles: note: %s: %s" % (resolve_display_path(root, p), n) for n in tag_notes)
+        for name in protocol_files:
+            if name in body:
+                add_defect(p, "R5", "body spells the protocol file %s; name the protocol, never its file" % name)
         ceiling = BODY_CEILINGS.get(slot)
         size = len(body.encode("utf-8"))
         if ceiling is None:
@@ -174,6 +194,9 @@ def check_roles(root, kit_dir, write=False):
     files = {p.name[:-len(".agent.md")] for p in (kit_dir / "agents").glob("*.agent.md")}
     if not files:
         add_defect(kit_dir / "agents", "R1", "DEAD PROBE: no role file, so this check graded nothing")
+    elif charter["shape"] == "tagged" and not cited & set(charter["rules"]):
+        add_defect(charter_path, "R1", "DEAD PROBE: no role's rules cites a section 1 rule tag of "
+                   "this charter, so no rule reaches any agent")
 
     table = kit_dir / "workflows.toml"
     try:
@@ -264,6 +287,9 @@ def check_roles(root, kit_dir, write=False):
             add_defect(p, "R10", "overlay carries a '# ' or '## ' heading line")
         for token in sorted(set(lib.TOKEN_RE.findall(text)) - {lib.MEMORY_ROOT_TOKEN}):
             add_defect(p, "R10", "overlay carries the token %s; only %s renders" % (token, lib.MEMORY_ROOT_TOKEN))
+        for name in protocol_files:
+            if name in text:
+                add_defect(p, "R10", "overlay spells the protocol file %s; name the protocol, never its file" % name)
 
     try:
         policy_notes = []
@@ -285,9 +311,10 @@ def check_roles(root, kit_dir, write=False):
     if problem:
         add_defect(readme, "R11", problem)
 
-    summary = ("roles: graded %d roles, %d overlays, %d workflows, %d reads keys, %d charter ids "
-               "against %s; overlay bytes %s; %d defect(s)" % (
-                   len(files), len(overlays), len(workflows), n_reads, n_charter, resolve_display_path(root, charter_path),
+    summary = ("roles: graded %d roles, %d overlays, %d workflows, %d reads keys, %d rule tags and %d "
+               "protocol file names against %s, a %s charter; overlay bytes %s; %d defect(s)" % (
+                   len(files), len(overlays), len(workflows), n_reads, n_rules, len(protocol_files), doc,
+                   "tagged" if charter["shape"] == "tagged" else "pre-tag",
                    ", ".join("%s=%d" % kv for kv in overlays.items()) or "none", len(defects)))
     return defects, notes, summary
 

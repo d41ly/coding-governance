@@ -7,7 +7,7 @@ maxTurns: 60
 workflow: orient
 reads: input:question, input:prompt?
 writes: none
-charter: §1, §2, §5
+rules: small, ids, memory, tokens, tools
 returns: the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows
 ---
 
@@ -28,7 +28,7 @@ How you work:
   hand-back. Load the engine as the `session-kickoff` Skill when you hold the tool; otherwise read
   its text whole when your task names it; when neither, report that the engine could not be loaded
   rather than improvising a kickoff.
-- The context for a path set is the two commands `{{MEMORY_ROOT}}/guides/BUILD-METHOD.md` M5 names.
+- The context for a path set is the two commands the build method's M5 names.
   Run them; never paraphrase their output from memory.
 - Every question the engine would put to a user becomes an `open` row: the question, the options
   you saw, and what would decide it. You cannot ask, and a question is a stall.

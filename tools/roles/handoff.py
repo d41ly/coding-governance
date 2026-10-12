@@ -8,7 +8,9 @@
     python handoff.py check <file>
 
 `render` composes the role as `roles_lib.render_role` renders it with a task block holding exactly
-the inputs the role's `reads` declares, in that order, then one block per `charter` id, and writes
+the inputs the role's `reads` declares, in that order, then `roles_lib.render_charter_blocks` for
+the role as the last block: the section 1 rule lines its `rules` tags cite and the charter's carried
+sections (TOOL-aOrientedCast-16), each library note printed on stderr as `handoff: note — `. It writes
 the file under the build's `prompts/` folder, printing its repo-relative path. `--part task` prints
 the marker line, a blank line and the `## Task` section instead; `--stdout` writes nothing and prints.
 The marker carries two hashes, each the first 12 hex digits of the SHA-256 of one section's bytes
@@ -23,7 +25,7 @@ Sources, by key family: `task:` the card's `## task` field, read by the kickoff 
 (stated above its `check_card_task`, and ported here because that one is shell) under the labels
 that checker's `--task-skeleton` prints, so a skeleton that does not yield eight refuses; `card:` the lines
 under the card's last `## <heading>`; `brief:` the `### <sub-head>` under the brief record's
-`## The brief`; `input:` the `--input` argument; a charter id the governing doc's section. The card is
+`## The brief`; `input:` the `--input` argument; a rule tag the governing doc's section 1. The card is
 `--card`, else the file the kickoff checker's `--card --path` prints for CLAUDE_CODE_SESSION_ID, so
 the card's location stays that checker's rule. A required key resolving to nothing, an empty value
 or a placeholder refuses and writes nothing; an optional one is named on the `Not supplied` line.
@@ -35,7 +37,7 @@ environment: no repository, no MEMORY_ROOT, no CHARTER.
 WHAT THIS DOES NOT CHECK: whether a card or brief value says anything true, since a value present,
 single and not a placeholder is copied verbatim; whether a rendered role is current against the
 catalogue, since `check` hashes the file's own bytes and nothing more; and whether a secret sits in
-a card or a brief, which the charter's §5 rule guards and this script does not.
+a card or a brief, which the charter's `[security]` rule guards and this script does not.
 """
 import argparse
 import datetime
@@ -238,8 +240,10 @@ def derive_section_sha(section):
     return hashlib.sha256(section.replace("\r\n", "\n").encode("utf-8")).hexdigest()[:12]
 
 
-def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path):
-    """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused."""
+def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path,
+                   notes=None):
+    """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused.
+    The charter library's notes are appended to `notes` when a list is given."""
     build_dir = root / memory_root / "builds" / slug
     if not build_dir.is_dir():
         raise lib.RolesError("the build folder %s does not exist" % build_dir.as_posix())
@@ -320,12 +324,17 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         else:
             absent.append(key)
             reasons += [what] if why.get(src) and what not in reasons else []
-    sections = lib.extract_charter_sections(lib.load_text(charter_path))
-    for cid in [x.strip() for x in keys.get("charter", "").split(",") if x.strip()]:
-        if cid not in sections:
-            refusals.append("charter %s — names no section of %s" % (cid, charter_path.as_posix()))
-        else:
-            blocks.append("### charter %s\n\n%s" % (cid, sections[cid]))
+    doc = charter_path.relative_to(root).as_posix() if root in charter_path.parents else charter_path.as_posix()
+    charter = lib.parse_charter(lib.load_text(charter_path), doc)
+    if charter["shape"] == "legacy" and notes is not None:
+        notes.append(lib.LEGACY_NOTE % doc)
+    try:
+        charter_blocks = lib.render_charter_blocks(
+            charter, (KIT_DIR / "agents" / (role + ".agent.md")).as_posix(), keys.get("rules", ""), notes)
+    except lib.RolesError as e:
+        refusals += str(e).split("\n")
+    else:
+        blocks += [charter_blocks.rstrip("\n")] if charter_blocks else []
     if refusals:
         raise lib.RolesError("\n".join(refusals))
     opening = ("This handoff is for build `%s`, unit `%s`." % (slug, unit_id) if unit
@@ -487,8 +496,11 @@ def main(argv):
         if out and prompts not in out.parents:
             ap.error("--out %s is not under %s, the only folder the spawn guard admits a marker in"
                      % (a.out, prompts.relative_to(root).as_posix()))
+        notes = []
         path, text, task_part = render_handoff(root, memory_root, charter_path, a.role, keys, a.build,
-                                               a.unit, a.card, inputs, out)
+                                               a.unit, a.card, inputs, out, notes)
+        for line in notes:
+            print("handoff: note — %s" % line, file=sys.stderr)
     except lib.RolesError as e:
         print("\n".join("handoff: " + ln for ln in str(e).split("\n")), file=sys.stderr)
         return 1

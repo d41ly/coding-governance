@@ -5,7 +5,7 @@ feature = "roles"
 title = "The role catalogue: one owner-editable agent definition per role with an empty house overlay beside it, the table of the workflows a governed session runs its LLM work through, the library every consumer reads them by, and the leg that holds the three and the governing doc to one another"
 status = "building"
 streams = ["tooling"]
-decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2", "TOOL-aOrientedCast-8", "TOOL-aOrientedCast-10", "TOOL-aOrientedCast-11"]
+decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2", "TOOL-aOrientedCast-8", "TOOL-aOrientedCast-10", "TOOL-aOrientedCast-11", "TOOL-aOrientedCast-16"]
 
 [claims]
 gate-legs = ["roles adopter self-test", "roles catalogue", "roles render selftest", "roles render wiring"]
@@ -28,7 +28,7 @@ globs = [
 The prompts an agent starts from were either freeform or string literals inside a harness the owner
 could not adjust. This kit makes each role a FILE: a constant block in Claude Code's own agent
 format, front matter saying which workflow it serves, which inputs it reads, which path class it
-writes and which governing-doc sections it needs, and an overlay the owner edits instead of the base.
+writes and which section 1 rule tags of the governing doc it cites, and an overlay the owner edits instead of the base.
 It is inert until a consumer reads it: nothing spawns from a role file yet, and the leg is the only
 moving part (TOOL-aOrientedCast-1). The handoff renderer, `handoff.py`, is its first consumer: it
 composes a role with a task block read from the session card, the build's brief record, the
@@ -36,7 +36,7 @@ governing doc and the caller's arguments into one hashed prompt file under the b
 checks such a file's hashes, and prints the stage-to-role map a harness takes (TOOL-aOrientedCast-2).
 The agent-type renderer, `render_agents.py`, is its second: it renders each `agent`-true role into a
 Claude Code agent type under `.claude/agents/`, trimmed of the charter by `omitClaudeMd: true` and
-carrying the charter sections the role names instead, beside the generated index `.claude/roles.json`
+carrying the rule lines the role cites and the charter's Protocols and Facts sections instead, beside the generated index `.claude/roles.json`
 the hooks read; its `--check` is the `roles render wiring` leg (TOOL-aOrientedCast-3). The kit's
 adopter, `adopt-roles.sh`, renders the `/build` Skill from `SKILL.template.md`: the router an
 attended session follows after kickoff's go, whose `## Stage` headings the render binds to the
@@ -110,8 +110,10 @@ CRLF working copy hashes like its blob.
   conf grammar line for line from the hooks kit's `readConfKey`, rather than imported: a kit file
   names nothing outside itself.
 - `resolve_kit_dir` is carried inline under the lib dir's parity table, as every consumer carries it.
-- The governing doc's `## §<n> — ` headings are the only contract read from outside the kit; a
-  charter rewrite that renumbers sections reds this leg, which is the intended signal.
+- The governing doc's section 1 `- [<tag>] ` rule lines and its `## Protocols` and `## Facts`
+  sections, read inside its `gov:playbook` region, are the only contract read from outside the kit
+  (TOOL-aOrientedCast-16): a cited tag the charter drops reds this leg, and a pre-tag charter with
+  `## §<n> — ` headings is one reseed note.
 
 **The renderer owns the catalogue's names plus the on-disk index's, never the directory.** An
 adopter keeps agent definitions of its own under `.claude/agents/`; the index already records every

@@ -92,4 +92,4 @@ M9's derivation. Then ask before any merge or push.
 | closing-review | M8 | identical, roles included |
 | gate-bar | the merge bar | the main loop runs it; under a mandate the run's close does |
 | wrap-up | M9 | identical |
-| landing | template §1 | the owner's ask; a mandate lands by its protocol |
+| landing | the charter's `[land]` rule | the owner's ask; a mandate lands by its protocol |

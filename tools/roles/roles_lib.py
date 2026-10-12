@@ -1,9 +1,11 @@
 """roles_lib — the one reader of the role catalogue, and the one composition of a role (TOOL-aOrientedCast-1).
 
 Reads the role files under `agents/`, the workflow table `workflows.toml`, the memory-tree conf and
-the governing doc's `§<n>` sections. `render_role` is the one composition of a role with its house
-overlay: every consumer that hands a role to an agent calls it, so a role reaches an agent the same
-way by every route. Stdlib only; every text read folds CRLF to LF and names its encoding.
+the governing doc: its section 1 rule tags and its carried sections (TOOL-aOrientedCast-16).
+`render_role` is the one composition of a role with its house overlay, and `render_charter_blocks`
+the one composition of the charter text a role carries: every consumer that hands a role to an agent
+calls both, so a role reaches an agent the same way by every route. Stdlib only; every text read
+folds CRLF to LF and names its encoding.
 
 The front-matter grammar: a `---` block at line 1, one `key: value` per line at COLUMN 0, values kept
 RAW (a list is comma-separated on one line, the form Claude Code's own `tools:` takes). An indented,
@@ -21,7 +23,7 @@ KIT_ROLES_VERSION = "1.2"
 #: Split from one string, because a quoted `"tools"` beside a quoted segment reads to the
 #: install-prefix ban as a kit path (TOOL-aOrientedCast-8 S14).
 FRONT_MATTER_KEYS = tuple("name description tools model maxTurns "
-                          "workflow reads writes charter returns agent".split())
+                          "workflow reads writes rules returns agent".split())
 
 #: The closed `reads` vocabulary: `<family>:<field>`, a trailing `?` marking one optional.
 READ_KEYS = frozenset(
@@ -46,7 +48,21 @@ TOKEN_RE = re.compile(r"\{\{[^{}]*\}\}")
 FRONT_MATTER_RE = re.compile(r"---[ \t]*\n(.*?)\n---[ \t]*(?:\n|$)", re.S)
 CONF_LINE_RE = re.compile(
     r"^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(?:\"([^\"]*)\"|'([^']*)'|(\S*))(?:\s+#.*)?\s*$")
+#: The playbook render's region markers. A charter rendered into a larger file sits between them,
+#: and only that span is read, so an adopter's own sections around it never reach an agent.
+PLAYBOOK_OPEN, PLAYBOOK_CLOSE = "<!-- gov:playbook -->", "<!-- /gov:playbook -->"
+SECTION_ONE_RE = re.compile(r"^## 1\. ")
+#: A section 1 rule line, `- [<tag>] <text>`; the whole line is the rule.
+RULE_LINE_RE = re.compile(r"^- \[([a-z0-9][a-z0-9-]*)\] ")
+#: One entry of a role's `rules` value: a tag, a trailing `?` marking it optional.
+RULE_KEY_RE = re.compile(r"^[a-z0-9][a-z0-9-]*\??$")
+#: The section 3 headings every agent type and handoff carries whole, in this order (§8 F3).
+CARRIED_SECTIONS = ("Protocols", "Facts")
+#: A v3.x charter's numbered heading, kept only to tell a pre-tag charter from an unknown doc.
 SECTION_RE = re.compile(r"^## (§\d+) — ")
+LEGACY_NOTE = ("%s is a pre-tag charter: it carries `## §<n> — ` headings and no section 1 rule tag, "
+               "so no role's rules resolve and no agent type or handoff carries the charter; reseed "
+               "the charter template from gov, then re-render")
 HARNESS_RE = re.compile(r"^\{prefix\}/([^/{}\s]+)/([^/{}\s]+)$")
 
 
@@ -131,18 +147,104 @@ def resolve_charter_path(root):
     return charter
 
 
-def extract_charter_sections(text):
-    """`{"§<n>": body}` for every `## §<n> — ` heading; a body runs to the next `## ` line."""
-    sections, current, lines = {}, None, []
-    for line in text.replace("\r\n", "\n").split("\n") + ["## "]:
+def parse_charter(text, where):
+    """The governing doc as `{"shape", "rules", "carried"}`; RolesError (R0) on a doc this kit cannot read.
+
+    Only the playbook region is read when the text holds its two markers once each, in order. A
+    section is a `## ` line and the lines up to the next one. Section 1's `- [<tag>] ` lines are the
+    rules, kept whole in charter order; each CARRIED_SECTIONS name is the first section headed by it,
+    as `(heading, body)` with the body's blank edges trimmed. With a rule the shape is `tagged` and
+    every carried section is required; with none and a `## §<n> — ` heading it is `legacy`, carrying
+    nothing; otherwise the doc is refused. `where` is the path every message names.
+    """
+    text = text.replace("\r\n", "\n")
+    i = text.find(PLAYBOOK_OPEN)
+    j = text.find(PLAYBOOK_CLOSE, i + len(PLAYBOOK_OPEN)) if i >= 0 else -1
+    if j >= 0 and text.count(PLAYBOOK_OPEN) == 1 and text.count(PLAYBOOK_CLOSE) == 1:
+        text = text[i + len(PLAYBOOK_OPEN):j]
+    sections = []
+    for line in text.split("\n"):
         if line.startswith("## "):
-            if current is not None and current not in sections:
-                sections[current] = "\n".join(lines).strip("\n")
-            m = SECTION_RE.match(line)
-            current, lines = (m.group(1) if m else None), []
-        elif current is not None:
-            lines.append(line)
-    return sections
+            sections.append((line, []))
+        elif sections:
+            sections[-1][1].append(line)
+    rules = {}
+    one = next((body for head, body in sections if SECTION_ONE_RE.match(head)), [])
+    for line in one:
+        m = RULE_LINE_RE.match(line)
+        if m and m.group(1) in rules:
+            raise RolesError("%s: R0 — the governing doc repeats the rule tag [%s] in section 1"
+                             % (where, m.group(1)))
+        if m:
+            rules[m.group(1)] = line
+    if not rules:
+        if any(SECTION_RE.match(ln) for ln in text.split("\n")):
+            return {"shape": "legacy", "rules": {}, "carried": []}
+        raise RolesError("%s: R0 — the governing doc carries neither a section 1 rule tag nor a "
+                         "'## §<n> — ' heading, so it is no charter this kit reads" % where)
+    carried = []
+    for name in CARRIED_SECTIONS:
+        hit = next(((head, body) for head, body in sections
+                    if head == "## " + name or head.startswith("## %s " % name)), None)
+        if hit is None:
+            raise RolesError("%s: R0 — the governing doc carries section 1 rule tags and no '## %s' "
+                             "section, which every role agent carries" % (where, name))
+        body = list(hit[1])
+        while body and not body[0].strip():
+            body.pop(0)
+        while body and not body[-1].strip():
+            body.pop()
+        carried.append((hit[0][3:], "\n".join(body)))
+    return {"shape": "tagged", "rules": rules, "carried": carried}
+
+
+def check_rule_tags(charter, value):
+    """`(defects, notes)` for one role's raw `rules` value against `parse_charter`'s structure.
+
+    An entry that is not a lowercase tag (optionally ending in `?`) or repeats a tag is a defect on
+    either shape. On a tagged charter a bare tag section 1 lacks is a defect and an optional one a
+    note; on a legacy charter every well-formed entry is admitted and resolves to nothing.
+    """
+    defects, notes, seen = [], [], set()
+    for e in [x.strip() for x in value.split(",") if x.strip()]:
+        if not RULE_KEY_RE.match(e):
+            defects.append("rules entry '%s' is not a lowercase tag, optionally ending in ?" % e)
+            continue
+        tag = e.rstrip("?")
+        if tag in seen:
+            defects.append("rules tag '%s' is named twice" % tag)
+            continue
+        seen.add(tag)
+        if charter["shape"] != "tagged" or tag in charter["rules"]:
+            continue
+        if e == tag:
+            defects.append("rules tag '%s' names no section 1 rule of the governing doc" % tag)
+        else:
+            notes.append("rules tag '%s' names no section 1 rule of the governing doc, so this role "
+                         "carries no such rule here" % e)
+    return defects, notes
+
+
+def render_charter_blocks(charter, where, value, notes=None):
+    """The charter text a role agent carries: `### Charter rules` holding the section 1 lines the
+    `rules` value cites, in charter order, when it cites any, then each carried section under a
+    `### ` heading, joined by one blank line and ending in one newline; `""` on a legacy charter.
+
+    A defect raises RolesError, one `<where>: R4 — <defect>` line each; a note is appended to
+    `notes` as `<where>: <note>` when a list is given.
+    """
+    defects, found = check_rule_tags(charter, value)
+    if defects:
+        raise RolesError("\n".join("%s: R4 — %s" % (where, d) for d in defects))
+    if notes is not None:
+        notes.extend("%s: %s" % (where, n) for n in found)
+    if charter["shape"] != "tagged":
+        return ""
+    cited = {x.strip().rstrip("?") for x in value.split(",")}
+    lines = [line for tag, line in charter["rules"].items() if tag in cited]
+    blocks = ["### Charter rules\n\n" + "\n".join(lines)] if lines else []
+    blocks += ["### %s\n\n%s" % (head, body) for head, body in charter["carried"]]
+    return "\n\n".join(blocks) + "\n"
 
 
 def parse_front_matter(path, text):
