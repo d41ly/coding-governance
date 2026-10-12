@@ -17,6 +17,12 @@ main loop: the re-render pass this unit's brief names — `render_agents.py --wr
 lines of §7, each RED on its staged break and GREEN restored (render self-test arms 4, 14 and 15,
 the checker's R4 and R5 breaks, the wiring leg's staged rule-line edit), and every leg §7 lists.
 
+The re-render pass ran at the main loop, declared at `b61ec1c4`: `render_agents.py --write` wrote the
+nine types and left `.claude/roles.json` byte-identical, `adopt-roles.sh --scaffold` re-rendered
+`.claude/skills/build/SKILL.md`, `adopt-roles.sh --check` exited 0, `check_roles.py` exited 0 against
+`AGENTS.md` as a tagged charter, and AC7's grep over `.claude/skills/build .claude/agents` printed
+nothing. The `New arm:` observations remain owed at the close.
+
 **Evidences:** TOOL-aOrientedCast-16
 - AC1 — `parse_charter` — over `AGENTS.md` it returned shape `tagged` with the 44 tags the probe's own `^- \[([a-z0-9][a-z0-9-]*)\] ` match found in section 1, each mapped to its whole line in the same order, and carried `Protocols — read the one whose trigger holds` then `Facts`, each body a substring of the file ending on the line before the next `## ` heading or `<!-- /gov:playbook -->`.
 - AC2 — `render_charter_blocks` — `parse_charter` returned `legacy` with no rules and nothing carried for a `## §1 — One` / `## §2 — Two` text, and raised `RolesError` naming R0 for a doc of neither shape, a tagged doc without `## Facts` (naming `Facts`) and one repeating `[one]` (naming `one`); `yagni, nope` raised naming R4 and `nope`; `yagni, nope?` returned the yagni line and the carried blocks with one note naming `nope?`; the legacy structure returned an empty string.
