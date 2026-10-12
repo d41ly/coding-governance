@@ -149,3 +149,13 @@ base: e6585db4e125bb0919c0c1f18687eb9825ffed80
 2026-10-12T06:02:10Z dispatch · item e7b097d3 TOOL-aSparedSpawn-14 · reason memory/guides/SESSION-KICKOFF.md
 
 2026-10-12T06:03:25Z dispatch · item e7b097d3 TOOL-aSparedSpawn-14 · reason tools/memory-tree/check-arms.py tools/memory-tree/README.md tools/memory-tree/.memory-tree.conf.example .memory-tree.conf memory/project/refusal-retirements.txt tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/unarmed-branches.txt tools/unattended/unattended.families.txt tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-14-acceptance-ledger.md memory/builds/aSparedSpawn/spec/2026-10-09-spec-TOOL-aSparedSpawn-14.md memory/builds/aSparedSpawn/README.md memory/map/generated/symbols.json memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-14-direct-checks.sh memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-14-direct-checks.out memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-14-arm-breaks.py memory/guides/SESSION-KICKOFF.md
+
+2026-10-12T06:47:18Z rescope · item add TOOL-aSparedSpawn-16 · reason the round-1 closing review found the bar red on two drifted registries and two push-soundness holes the build's own security model forbids; one closing-fix unit takes those, the stale fork ceilings, the six unarmed exits and two cheap fixes, and every other finding carries to the exit
+
+2026-10-12T06:48:21Z review · item aSparedSpawn · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 3 · minors 18 · disposition promote
+
+2026-10-12T06:48:24Z rescope · item add TOOL-aSparedSpawn-17 · reason promoted by the converged round-1 closing diff review (owner rulings of 2026-10-04): one unit per HIGH, the MEDIUMs and LOWs batched into TOOL-aSparedSpawn-16
+
+2026-10-12T06:48:28Z rescope · item add TOOL-aSparedSpawn-18 · reason promoted by the converged round-1 closing diff review (owner rulings of 2026-10-04): one unit per HIGH, the MEDIUMs and LOWs batched into TOOL-aSparedSpawn-16
+
+2026-10-12T06:48:31Z rescope · item add TOOL-aSparedSpawn-19 · reason promoted by the converged round-1 closing diff review (owner rulings of 2026-10-04): one unit per HIGH, the MEDIUMs and LOWs batched into TOOL-aSparedSpawn-16

@@ -1,6 +1,6 @@
-# TOOL-aSparedSpawn-16 — the closing review's bar reds and push-soundness fixes
+# TOOL-aSparedSpawn-16 — the closing review's mediums and lows, and the bar reds this build's diff carries
 
-**Status:** OPEN · rev-1 · 2026-10-12 · node a · Tier-2 · base f479ba42 · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-10-12 · node a · Tier-2 · base f479ba42 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -10,19 +10,19 @@
 
 ## 1. Goal
 
-Make the build's own HEAD bar green and close the review's push-soundness holes before the close
-lands. The round-1 closing review
-(`memory/builds/aSparedSpawn/reviews/2026-10-12-review-TOOL-aSparedSpawn-1-15-closing-diff-round1.md`)
-found two drifted registries and two stale fork ceilings that red the default bar at f479ba42, six
-unarmed exit sites the harness arms leg reds on, a reuse path that keeps a stale `ok` after an
-executed red, a push bar that inherits two reuse knobs, a spawn-budget selector that passes on a
-typo, an A/B instrument that certifies runs which executed nothing, and an evidence floor that lags
-unit 13's arms. This unit fixes each, one scope item per finding.
+Make the build's own HEAD bar green, and fix every MEDIUM and LOW finding of the round-1 closing
+review (`memory/builds/aSparedSpawn/reviews/2026-10-12-review-TOOL-aSparedSpawn-1-15-closing-diff-round1.md`)
+that no HIGH unit owns. The review converged with three HIGHs, and the owner rulings of 2026-10-04
+promote one unit per HIGH and batch the rest here: ids 1, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18,
+19, 21, 22 and 23. Ids 4 and 15 duplicate HIGH id 20 and go with it to `TOOL-aSparedSpawn-19`. The
+bar reds this build's diff carries ride along: two drifted registries, two stale fork ceilings and
+six unarmed exit sites.
 
 ## 2. Scope (IN)
 
-Every site was re-read at f479ba42; line numbers are that tree's. Each item names the review
-finding id it closes.
+Every site was re-read at f479ba42; line numbers are that tree's. Each item names the review finding
+id it closes and, where the report gives one, follows the skeptic's corrected fix. Labels S5, S7 and
+S8 are unused since rev-2; §9 says where their work went.
 
 - **S1** — Finding 9. `tools/govkit/subject-pins.tsv` carries no row for the `held-halves selftest`
   leg that unit 5 added to `tools/gate-legs.json`, so `govkit selfcheck` reds. The row comes from
@@ -36,15 +36,14 @@ finding id it closes.
   measured). Each forking site this build added in its own files is rewritten first: a `$(cat f)`
   becomes `$(<f)` or a `read`, and a `printf … | grep -c` becomes a builtin test where one reads the
   same answer. Every row is then re-measured and set to exactly what the scan reports, the
-  `check-unattended.sh` row lowered to its measured 25. This item lands LAST in the pass, after S4 to
-  S6 add their arms, so the registry is measured over the final bytes. Observed by AC2.
+  `check-unattended.sh` row lowered to its measured 25. This item lands LAST in the pass, after every
+  other item adds its arms, so the registry is measured over the final bytes. Observed by AC2.
 - **S3** — `memory/project/fork-ceilings.txt` rows `run-gates-1leg` and `run-gates-2leg` declare
   ceilings 72 and 74 against measured counts of 51 and 53, which the `spawn budget (forks per hot
   entrypoint)` leg reds as STALE (the file's tolerance is max(3, 5 %) above the count). The one-leg
   row falls to its measured count. The two-leg row falls to its measured count plus two, because its
   reason already records a polled reading that varied, and the reason gains that margin and the date
-  measured. Both are re-measured after S5, which adds code to the runner's post-pool path. Observed
-  by AC3.
+  measured. Both are re-measured after every runner change in this unit. Observed by AC3.
 - **S4** — `python tools/memory-tree/check-arms.py --check` reds on six unarmed exit sites in
   `tools/run-gates/run-gates.sh` that units 1, 2 and 4 added. Each is armed or pinned:
   - `:1270` (no spawn command resolves) and `:1273` (a rate could not be measured) are reasoned
@@ -55,99 +54,140 @@ finding id it closes.
     effect is the `:1273` refusal. It gains a `# arm-signature:` marker naming that refusal's text,
     which the `:1273` arm then arms.
   - `:2896` (`git version … || exit 1`) and `:2909` (`[ "${#evs[@]}" -gt 0 ] || exit 1`) exit the
-    `REUSE_DIGEST` capture, which prints nothing and leaves the digest empty, so no text exists to
-    assert. Each is pinned with a five-field row in `memory/project/unarmed-branches.txt` whose
-    reason says so; the silent empty digest is review finding 19, a non-goal here.
+    `REUSE_DIGEST` capture. Each is pinned with a five-field row in
+    `memory/project/unarmed-branches.txt`, unless S18's line gives the capture's failure a text an
+    arm can assert, in which case each is marked and armed instead.
   - `:5088`, the bare `exit 1` closing a red run, gains a `# arm-signature:` marker naming the
-    `gates RED` summary text an existing canary arm already asserts, or a pin row with a reason if
-    no arm asserts a 12-character span of it.
+    `gates RED` summary text an existing canary arm already asserts.
 
-  The canary's `FLOOR_ASSERTIONS` rises by the assertions added, with a `RAISED` line. Observed by
-  AC4.
-- **S5** — Finding 3, HIGH. In `tools/run-gates/run-gates.sh`'s reuse path, a leg that executes
-  while its key holds a cached `ok`, and whose effective result is red, must erase that entry and
-  quarantine the leg, as the sampled-disagreement branch at `:4562` does. Today only `*.sampled`
-  legs reach that branch, so an age-forced execution (`:3097`-`:3102`) or any other execution under
-  a cached key that reds leaves the stale `ok` in place, and the cache block at `:4819` resets the
-  age counter to 0. The branch's population widens to every executed leg whose effective rc is
-  non-zero and whose key holds an `ok` entry. A sampled leg keeps its classifying re-run and its two
-  lines. A leg that was not sampled takes the effective rc as its verdict, which is already its serial
-  retry's where it had one, prints `cache disagreement · <leg> · <key>`, loses the entry and is
-  quarantined against its row hash. The `$WORK/$i.aged` marker is removed, since the widened branch
-  covers the case it was written for and nothing reads it; the age bound's stderr note stays.
-  `tools/run-gates/README.md`'s reuse section says an executed red against a cached `ok` erases and
-  quarantines whatever drew the execution. Observed by AC5 and AC9.
-  - **Readers:** by name: `tools/run-gates/run-gates.sh` writes `.aged` at `:3100`, and no other
-    tracked file spells it. by value: NO VALUE READERS — the review's finding 14 confirmed by
-    `git grep` that no glob or read of the marker exists, so nothing compares or derives from it.
+  The canary's `FLOOR_ASSERTIONS` rises by every assertion this unit adds to the canary, with a
+  `RAISED` line. Observed by AC4.
 - **S6** — Finding 1. `.githooks/pre-push` clears `GATE_REUSE_SAMPLE` and `GATE_REUSE_DAY` beside
   `GATE_REUSE_PUSH` (`:1456`-`:1457`), for every bar a STUB included, and appends each to
   `ENV_CLEARED` when it was set, so the `not honoured from the environment by this bar:` line names
   it. The runner keeps reading both, since they are its own suite's seams. An arm in
   `.githooks/pre-push.test.sh` beside the AC15 arm exports `GATE_REUSE_SAMPLE=0` and
   `GATE_REUSE_DAY=1` into a push and asserts the line names each. Observed by AC6.
-- **S7** — Finding 4. `tools/gate-lint/fork-count.sh` refuses with exit 2 an `--only` id that names
-  no declared row, printing the declared ids, after `read_budgets` and before any row is traced.
-  Today `--only no-such-id` prints `0 passed · 0 red · 0 skipped` and exits 0. A `--selftest` arm
-  stages that typo against a one-row file and expects the refusal; the selftest's PASS line counts
-  three assertions. Observed by AC7.
-- **S8** — Finding 6, HIGH.
-  `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-2-width-ab.sh` sets
-  `GATE_SELFTESTS=1` in each arm's environment, so its held legs execute. The positive artifact
-  counts only executed verdict lines, `^GATE (ok|FAIL) `, which leaves out `held`, `skip`, `reuse`
-  and the `retry` interim, and requires exactly one per manifest leg. An arm whose bar exits non-zero
-  records `artifact` as `no` and is never picked as a best wall. Observed by AC8.
 - **S9** — Finding 18. `FLOOR_ASSERTIONS` in `tools/run-gates/run-gates.evidence.test.sh` (151 at
-  `:156`) rises by the executed assertions unit 13 and this unit's S5 arms add, counted one per
+  `:156`) rises by the executed assertions unit 13 and this unit's evidence arms add, counted one per
   `ok … || nope` pair as units 1, 3 and 4 counted theirs, with a
-  `RAISED 151 -> <new> by TOOL-aSparedSpawn-13 and -16` line. The acceptance ledger marks the
+  `RAISED <old> -> <new> by TOOL-aSparedSpawn-13 and -16` line. The acceptance ledger marks the
   executed count OWED until the suite runs at VERIFYING. Observed by AC10.
+- **S10** — Findings 11 and 21 (M3), reconciled as the report says: id 21's fix, with id 11's rule
+  for the `tool` lines. `REUSE_DIGEST` in `tools/run-gates/run-gates.sh` (`:2891`-`:2913`) leaves
+  out of its env loop `GIT_EXEC_PATH` and the hook-only knobs `GATE_ATTRIBUTE`,
+  `GATE_INHERITED_RED`, `GATE_INHERITED_RED_MAX_AGE` and `GATE_DOCS_BASE`, which `.githooks/pre-push`
+  exports (`:1507`, `:1517`, `:1547`-`:1549`) and which decide red attribution or leg selection, not
+  a leg's own `ok`. PATH is hashed with a leading component stripped when it names git's exec path,
+  in its native or MSYS spelling, and each `tool` line resolves with `type -P` under that stripped
+  PATH. `REUSE_SCHEMA` moves from 3 to 4. An arm in `.githooks/pre-push.test.sh` earns an entry with
+  a direct bar, pushes through the real `.githooks/pre-push` with a scoped decision, and asserts
+  `GATE reuse` on a remote leg. Observed by AC11.
+- **S11** — Finding 12 (M5). The consecutive-reuse count is kept per cache KEY, as a sixth field of
+  the entry itself, and no longer per leg name in the shared `$REUSE_CACHE/age.<name key>` file. A
+  reuse rewrites its entry with the count plus one, in place by `printf`; a torn read is malformed
+  and executes, which costs a saving and never a verdict. An entry with five fields reads as count 0.
+  Only an execution under that key resets it, by writing a fresh entry; an execution under another
+  key touches nothing of it. The evidence suite's AC7 arm sets the entry's count field to 10 rather
+  than an `age.*` file, and `tools/run-gates/README.md`'s age rule says per key. Spec 13 is a landed
+  record, so its S7 text is superseded by this item rather than rewritten. Observed by AC12.
+  - **Readers:** by name: `tools/run-gates/run-gates.sh` reads, increments and resets the
+    `age.<name key>` file (`:3097`, `:3115`, `:4819`); `tools/run-gates/run-gates.evidence.test.sh`
+    globs `age.*` in its AC7 arm (`:1244`-`:1249`); `tools/run-gates/README.md` names
+    `age.<name key>` (`:214`). by value: `tools/run-gates/run-gates.sh`'s reuse block compares the
+    count to 10 at `:3099`, and the evidence AC7 arm compares it to 0 after an execution.
+- **S12** — Finding 16 (M6). Arms 9k and 9m in `tools/run-gates/run-gates.test.sh` stop placing
+  their signal with a fixed sleep. 9k's sleeper (`:3074`, `sleep 12`) polls every 0.1 s, up to a
+  120 s hang bound, until `$TMPDIR/../1.retry.pid` exists, then lists the directory into `HV_PEEK`
+  and exits 0. 9m's sleeper (`:3101`, `sleep 15`) polls the same way until `$TMPDIR/../1.retry.rc`
+  exists, which means the tail attempt started and timed out beside it. Observed by AC13.
+- **S13** — Finding 17 (M7). Arm 9f in `tools/run-gates/run-gates.test.sh` (`:2954`), before
+  `unset HV_FLAG` at `:2979`, takes the newest `$H1/.git/gate-run/*/` record, reads the contended
+  leg's key from field 7 of its `1.leg`, and asserts `$H1/.git/gate-cache/${k:0:2}/$k` does not
+  exist. As the control, the spinner's key from field 7 of `0.leg` has its entry. The fixture is not
+  rerun after `HV_FLAG` is unset. Observed by AC14.
+- **S14** — Finding 7 (L1). `load_half` in `tools/run-gates/held_halves.py` (`:150`) opens the
+  stdout file with `newline=""`, so `parse_verdicts` receives the runner's exact bytes and a bare CR
+  in a failing leg's echoed output cannot split off a `GATE <verb> <name>` row. A `--selftest` arm,
+  in Python, seeds a failing leg's output carrying `\rGATE ok    <other leg>` and asserts the per-leg
+  view is unchanged. Observed by AC15.
+- **S15** — Finding 8 (L2). One rule: the runner requires bash 5's `EPOCHSECONDS`, which every site
+  but one already reads bare. The ticker's `${EPOCHSECONDS:-$(ts_now)}` (`:1433`) becomes
+  `$EPOCHSECONDS`, the comment at `:1418`-`:1423` states the rule, and `ts_now` (`:1381`), whose last
+  caller that was, is deleted. The turnstile suite's R6 extraction (`run-gates.turnstile.test.sh:377`)
+  stops naming it, and `memory/map/generated/symbols.json` is re-rendered by `gen_map.py --write`.
+  Observed by AC16.
+  - **Readers:** by name: `tools/run-gates/run-gates.sh` defines and calls `ts_now`;
+    `tools/run-gates/run-gates.turnstile.test.sh` extracts it by its definition line at `:377`;
+    `.lexicon.conf` names it in a historical comment at `:117`, which is left as written;
+    `memory/map/generated/symbols.json` lists it. by value: `ts_tick_start` in
+    `tools/run-gates/run-gates.sh` writes its output into the heartbeat file on a shell without
+    `EPOCHSECONDS`, a path no supported bash takes.
+- **S16** — Finding 13 (L3). `runleg` in `tools/run-gates/run-gates.sh` (`:3326`-`:3331`) skips the
+  durable `gate-logs/<leg>.log` write when its suffix is `.sample`, so the `log:` pointer
+  `FAILED_LEGS` carries keeps naming the attempt that redded the run. An evidence arm on the
+  nondeterministic path asserts the `log:` file holds the failing attempt's exit code. Observed by
+  AC17.
+- **S17** — Findings 14 and 22 (L4). `report_one` in `tools/run-gates/run-gates.sh` (`:3420` on)
+  reads the two reuse markers and tails the leg's own line under the two-space tail contract: a leg
+  with `$WORK/$i.sampled` prints `(sampled against a cached ok)`, and a leg with `$WORK/$i.aged`
+  prints `(executed: reused on 10 runs in a row)`, on its `GATE ok` or `GATE FAIL` line. The `.aged`
+  marker gains its first reader here; `TOOL-aSparedSpawn-17` keeps the marker for it. Canary arms
+  assert both tails. Observed by AC18.
+- **S18** — Finding 19 (L5). When `build_input_keys` (`:2813`) returns early on a failed step, or
+  `REUSE_DIGEST` comes out empty, and the reuse mode is not off or a cache write was due, the runner
+  prints one stderr line, `run-gates: reuse — the input keys could not be measured (<which step>), so
+  nothing is reused or cached this run`. An evidence arm breaks the digest step with a fault seam
+  shadowing `hash-object` and asserts the line. Observed by AC19.
+- **S19** — Finding 23 (L6). `2026-10-09-spec-TOOL-aSparedSpawn-14.md`'s AC11 (`:295`) and its §7
+  arm line (`:332`) name five checks (27, 29, 56, 69 and 88), the nine sites and the helper
+  `print_env_failure` that shipped, so they agree with its S10. The spec takes rev-5 with a §9 line
+  citing finding 23. Observed by AC20.
 
 ## 3. Non-goals (OUT)
 
-- The review's M3 (findings 11 and 21, push-time reuse missing an entry earned outside a hook), M5
-  (finding 12, the age counter keyed by leg name), M6 (finding 16, arms 9k and 9m placing a signal
-  with a fixed sleep) and M7 (finding 17, no arm guarding a retried green out of the cache).
-- Every LOW item: L1 to L6, findings 7, 8, 13, 14, 19, 22 and 23. S5 removes the `.aged` write that
-  finding 14 names, as a side effect of widening the disagreement branch; it adds no `(aged)` tail.
-- H3's all-skipped case (finding 20, and finding 15 under M1): a run grading zero rows because every
-  row names another bash. It needs bash 5.2 rows measured on CI's Git Bash, which this node cannot
-  produce. S7 changes the `--only` typo alone.
-- Each non-goal above is carried to the build's exit as an ask.
-- Re-running the width A/B. S8 fixes the instrument; the owner runs it before any width knob moves.
-- A kit version bump. The main loop bumps every kit this unit touches once, after it.
+- The three HIGH findings: id 3 is `TOOL-aSparedSpawn-17`, id 6 is `TOOL-aSparedSpawn-18`, and id 20
+  with its duplicates 4 and 15 is `TOOL-aSparedSpawn-19`.
+- The review's left-shift gates beyond the arms named in §2: the unit builder's per-pass
+  `govkit selfcheck` and shell-hygiene check, check-arms comparing a floor against a diff's added
+  arms, the fixed-sleep lint over the suites, the dead-plumbing grep over `$WORK` suffixes, and the
+  `GATE_REUSE*` enumeration arm. Each is carried to the build's exit as an ask.
 - Running any suite or the bar inside the build pass. The suites and the bar run once, at VERIFYING.
+- A kit version bump. The main loop bumps every kit this unit touches once, after it.
 
 ### Edges
 
-none
+- **consumes-from** `TOOL-aSparedSpawn-17` — the `$WORK/$i.aged` marker stays written, so S17's
+  `report_one` tail has something to read.
 
 ## 4. Design
 
-Nine fixes, each where the review located its defect. Three are registry repairs measured from the
-tree (S1, S2, S3), and S2 and S3 are measured last because S4 to S6 move the bytes they count. Two
-are arms and marks for a meta-gate (S4, S9). Three are behaviour fixes with an arm each (S5, S6,
-S7), and one is a record instrument (S8).
+Fixes at the sites the review located. Three registry repairs are measured from the tree (S1, S2,
+S3), and S2 and S3 are measured last because every other item moves the bytes they count. S4 and S9
+are arms and marks for the floors and the arms meta-gate. S6, S10, S11, S15, S16, S17 and S18 change
+the runner or the hook and each carries an arm. S12, S13 and S14 change only suites. S19 is a record
+correction.
 
-### The disagreement branch, widened (S5)
+### Reuse key and age (S10, S11)
 
-The loop after `run_leg_retry` iterates `"$WORK"/*.sampled` today. It becomes one pass over every
-leg index whose `$WORK/$i.rc` names an execution, skipping `reuse`, `ondemand`, `skip` and
-`docskip` as the cache block does. For each, the effective rc is `$WORK/$i.retry.rc` where it exists,
-else `$WORK/$i.rc`. A leg with a `.sampled` marker runs the existing branch unchanged. Any other leg
-whose effective rc is non-zero, whose `INPUT_KEYS[$i]` is a measured key, and whose cache entry under
-that key reads `ok` runs the branch's red-again arm: the `cache disagreement` line, the entry erased,
-the quarantine file written. No extra run is spent on it, because its retry already gave a second
-observation where one was due. The loop spawns nothing per leg: every read is a builtin `read`, so
-the one-leg and two-leg fork counts S3 measures do not move.
+The digest's env loop gains the five names to its `continue` arm. PATH is read once into a local,
+its first `:`-separated component dropped when it equals `$GIT_EXEC_PATH`, its MSYS spelling
+(`/c/...`), or ends in `/libexec/git-core`, and the `tool` lines resolve under that local through
+`PATH=$stripped type -P`, which spawns nothing. With the schema at 4 every key changes, so no entry
+earned under 3 is trusted.
+
+The age count moves into the entry: `ok<TAB>secs<TAB>run id<TAB>HEAD<TAB>ended epoch<TAB>reuses`.
+The reuse block reads it with the `read` it already makes and writes the entry back with the count
+plus one. The cache block's reset at `:4819` goes, since an executed green writes a fresh entry with
+count 0 and an executed red writes nothing.
 
 ### Inventory
 
-No new function, variable family or file kind is minted. S5 removes the `.aged` marker file kind.
-S4 adds two `# arm-signature:` comments and two pin rows. New arms reuse the helpers their suites
-already define (`run_sp_verb` and `check_sp_value` in the canary, `ru_repo` and `ru_run` in the
-evidence suite, `run_rp_push` in the pre-push suite), so the lexicon leg and the map's
-`symbols.json` see no new definition.
+No new function or variable family is minted. S15 deletes `ts_now`; S11 retires the
+`age.<name key>` file kind. New arms reuse the helpers their suites already define
+(`run_sp_verb` and `check_sp_value` in the canary, `ru_repo` and `ru_run` in the evidence suite,
+`run_rp_push` in the pre-push suite, `arm_case` in `held_halves.py`'s selftest), so the lexicon leg
+sees no new definition.
 
 ### Files touched (estimate)
 
@@ -158,36 +198,37 @@ evidence suite, `run_rp_push` in the pre-push suite), so the lexicon leg and the
 - `tools/run-gates/run-gates.sh`
 - `tools/run-gates/run-gates.test.sh`
 - `tools/run-gates/run-gates.evidence.test.sh`
+- `tools/run-gates/run-gates.turnstile.test.sh`
+- `tools/run-gates/held_halves.py`
 - `tools/run-gates/README.md`
 - `.githooks/pre-push`
 - `.githooks/pre-push.test.sh`
-- `tools/gate-lint/fork-count.sh`
-- `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-2-width-ab.sh`
+- `memory/map/generated/symbols.json`
+- `memory/builds/aSparedSpawn/spec/2026-10-09-spec-TOOL-aSparedSpawn-14.md`
 
 ### Alternatives rejected
 
-- **Raise the spawn-idiom rows to their measured counts without removing any site.** The registry
+- **Raise the spawn-idiom rows to their measured counts without rewriting any site.** The registry
   is shrink-only by design, and the sites this build added are its own to drain.
-- **Read `.aged` in the existing loop and leave other executions alone.** A plain bar or a push-mode
-  bar can execute a leg whose key holds an `ok` too, so an age-only reader leaves the same stale
-  entry in place on those paths.
-- **Re-run every non-sampled red once more to classify it.** The serial retry already re-ran a red
-  leg, and a second classifying run doubles a red bar's tail for a label.
-- **Exit 2 when every row is skipped, in this unit.** Without bash 5.2 rows every CI bar would then
-  red; the review's own reconciliation orders the rows first.
-- **Arm the two `REUSE_DIGEST` exits by making them print.** That is finding 19's fix, which needs a
-  line on stderr and an arm of its own; pinning them now keeps this unit to the reds.
+- **Keep the age count in a per-key `age.<key>` file.** Per-key files grow with every key ever
+  reused and nothing prunes them; the entry already sits under the 30-day prune.
+- **Restore the `EPOCHSECONDS` fallback at every converted site (L2's other option).** A
+  `$(date +%s)` fallback is the BANNED `epoch-date` class, and no supported host lacks the variable.
+- **Write sample runs to `<leg>.sample.log` (L3's other option).** It adds a file kind for a run
+  whose output the run directory already keeps.
+- **Have pre-push restore the pre-git PATH for the digest (M3's other option).** The runner would
+  then trust a hook to shape its own key; stripping inside the digest serves every caller.
 
 ## 5. Production-readiness checklist
 
-- security: S5 and S6 close two paths by which a push could land green on a leg that just went red, or on knobs the environment chose; no new input or write path.
-- perf / scale: S5 adds one builtin pass over the leg indices after the pool drains and no spawn; S2 removes forks; S3 records savings already made.
-- error / empty / loading states: S7's refusal names the declared ids; S5's erase and quarantine print the existing named line; S8's arm records `no` on a non-zero bar exit rather than a figure.
-- observability: S5 reuses the `cache disagreement` line, so a reader counting disagreements sees the new population without a new verb; S6's cleared knobs ride the existing not-honoured line.
-- risks: S5 quarantines a leg that reds once on a plain bar under a cached `ok`, until its manifest row changes, the same cost the sampled branch already pays for a flaky leg.
-- testing: an evidence arm for S5's aged and plain-bar cases, a pre-push arm for S6, a selftest arm for S7, canary arms for S4, each observed red on a staged break first.
-- migration: none for data; an existing stale `ok` is erased the first time its leg executes red.
-- user docs: `tools/run-gates/README.md`'s reuse section states the widened erase and quarantine rule.
+- security: S6 and S10 bound what the environment and the hook decide about a push bar's reuse; S11 makes a wrong entry's life follow its own key; no new input or write path.
+- perf / scale: S10 and S11 add builtin work only; S2 removes forks; S3 records savings already made; S12 and S13 shorten no wait on the pass path and bound the red path at 120 s.
+- error / empty / loading states: S18 prints the one line a silent key failure lacked; a malformed or five-field entry executes or reads as count 0.
+- observability: S17 puts the sampled and aged facts on the leg's own line; S16 keeps the `log:` pointer on the failing attempt.
+- risks: S10's schema bump makes the first reuse bar on each node cold; S11's in-place rewrite can be read torn, which executes; S15 drops a fallback no supported bash needs.
+- testing: an arm per behavioural item, each observed red on a staged break first; the canary and evidence floors rise by what is added.
+- migration: entries under schema 3 are no longer matched and age out under the 30-day prune; the old `age.*` files are left to no reader and the prune does not walk them.
+- user docs: `tools/run-gates/README.md`'s reuse section states the per-key age, the digest's exclusions and the two tails.
 
 ## 6. Acceptance criteria
 
@@ -208,49 +249,63 @@ evidence suite, `run_rp_push` in the pre-push suite), so the lexicon leg and the
   `HYGIENE check-arms: tools/run-gates/run-gates.sh` line. Red when: one of the six sites stays
   unarmed and unpinned, or an arm asserts a shorter text than the site's signature.
   permission: the canary arms themselves execute at VERIFYING; this criterion reads their text.
-- **AC5** — When a scratch repository's one-leg bar earns an `ok`, its `age.*` counter is set to 10,
-  and the runner runs again with `GATE_REUSE=1` and `GATE_REUSE_SAMPLE=0` while the leg exits 1,
-  the run prints `cache disagreement` naming the leg, the entry under its key is gone, and a
-  quarantine file exists. Red when: the entry survives the aged red, which is f479ba42's behaviour.
-  fixture: the evidence suite's `ru_repo` shape, built in a scratch directory.
 - **AC6** — When a scratch clone with `.githooks/pre-push` installed pushes to a local bare remote
   with `GATE_REUSE_SAMPLE=0` and `GATE_REUSE_DAY=1` exported and `GOV_GATE_CMD` naming a stub, the
   hook's `not honoured from the environment by this bar:` line names both. Red when: either name is
   absent from the line, or the stub sees either knob set.
-- **AC7** — When `bash tools/gate-lint/fork-count.sh memory/project/fork-ceilings.txt . --only no-such-id`
-  runs, it exits 2 and lists every declared id; `bash tools/gate-lint/fork-count.sh --selftest`
-  prints `PASS (3 assertions)`. Red when: the typo exits 0, which is f479ba42's behaviour.
-- **AC8** — When `2026-10-11-build-TOOL-aSparedSpawn-2-width-ab.sh` runs with `AB_LOAD=0` on a frozen
-  clone of the tree and a one-leg manifest whose leg sits in the `selftests` chunk, every row's
-  `artifact` reads `yes` for a leg exiting 0 and `no` for a leg exiting 1. Red when: the exit-1 leg
-  reads `yes`, which it does at f479ba42 because the `GATE held` lines are counted.
-  cost: six one-leg bars and one calibration, about two minutes on node a.
-- **AC9** — When the scratch repository of AC5 runs a plain bar, with no `GATE_REUSE`, while its leg
-  exits 1 and its key holds an `ok`, the entry is erased and the leg quarantined, and the next
-  `GATE_REUSE=1` run prints `GATE ok` for it rather than `GATE reuse`. Red when: a plain bar's red
-  leaves the entry, or the next reuse run reuses the leg.
-- **AC10** — When `grep -n 'RAISED 151 -> ' tools/run-gates/run-gates.evidence.test.sh` runs, it
-  prints one line naming `TOOL-aSparedSpawn-13` and `-16`, and `FLOOR_ASSERTIONS` is that line's new
-  value. Red when: the floor is still 151, which is f479ba42's state.
+- **AC10** — When `grep -n 'by TOOL-aSparedSpawn-13 and -16' tools/run-gates/run-gates.evidence.test.sh`
+  runs, it prints one `RAISED` line, and `FLOOR_ASSERTIONS` is that line's new value. Red when: no
+  such line exists, which is f479ba42's state.
   permission: whether the floor sits at or below the executed count is observed when the suite runs
   at VERIFYING, and the ledger marks it OWED until then.
+- **AC11** — When a scratch repository's bar earns an `ok` from a plain shell, and the runner then
+  runs as a git alias child (`git -c alias.rg='!bash …' rg`), which receives the environment a hook
+  does, with `GATE_REUSE=1`, it prints `GATE reuse` for the leg. Red when: the child executes the
+  leg, which f479ba42 does because its digest hashes `GIT_EXEC_PATH` and the prefixed PATH.
+- **AC12** — When a scratch repository reuses one leg's entry under key K1 nine times, then runs
+  that leg under another key K2 on a dirty tree, then reuses K1 again, the runner's next K1 run after
+  that executes it with the age line. Red when: the K2 execution resets K1's count, which the
+  per-name `age.*` file does at f479ba42.
+- **AC13** — When arm 9k's and 9m's blocks are sliced with the canary's prologue into a scratch
+  script and run under twelve `true` fork loops, both pass, and `grep -n 'sleep 1[25]' tools/run-gates/run-gates.test.sh`
+  finds neither sleeper. Red when: either sleeper still sleeps a fixed time.
+  cost: the slice runs two tail-retry fixtures, about a minute on node a.
+- **AC14** — When the runner's cache writer is staged to read `$WORK/$i.retry.rc` in place of
+  `$WORK/$i.rc`, arm 9f's new assertion reds on a cache entry for the contended leg; unstaged, it
+  passes and the spinner's entry exists. Red when: the staged break passes.
+- **AC15** — When `python tools/run-gates/held_halves.py --selftest` runs, the new CR arm passes;
+  with `load_half`'s `newline=""` removed it reds. Red when: the text-mode read passes the arm.
+- **AC16** — When `git grep -n 'ts_now' -- tools/` runs, it prints nothing, and
+  `grep -c 'EPOCHSECONDS:-' tools/run-gates/run-gates.sh` prints 0. Red when: either finds a site.
+- **AC17** — When a scratch repository's leg reds then greens under `GATE_REUSE=1` and
+  `GATE_REUSE_SAMPLE=1`, the `log:` file the run names opens with `exit 1`. Red when: it opens with
+  `exit 0`, the sample run's, which is f479ba42's behaviour.
+- **AC18** — When a scratch repository's leg is drawn by `GATE_REUSE_SAMPLE=1`, its line reads
+  `GATE ok    <leg>  (sampled against a cached ok)`; with its age count at 10 the line carries the
+  `(executed: reused on 10 runs in a row)` tail. Red when: either line is the plain one.
+- **AC19** — When a scratch repository's bar runs with `GATE_REUSE=1` and a `git` wrapper first on
+  its PATH that fails `hash-object`, stderr carries `the input keys could not be measured`. Red when:
+  the run is silent, which f479ba42 is.
+- **AC20** — When `grep -n 'print_env_failure' memory/builds/aSparedSpawn/spec/2026-10-09-spec-TOOL-aSparedSpawn-14.md`
+  runs, it prints AC11's bullet and the §7 arm line, and AC11 names five checks. Red when: AC11
+  still says six checks or names `die_env` as the shipped helper.
 
 ## 7. Gates
 
 `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` ·
 `shell hygiene (a fork spent on builtin work)` · `spawn budget (forks per hot entrypoint)` ·
-`shell-hygiene selftest` · `harness arms (fail branches armed or pinned)` · `run-gates evidence` ·
-`run-gates canary` · `run-gates gov canary` · `run-gates turnstile` · `run-gates run-log line` ·
-`run-gates adopter e2e` · `profile-bar selftest` · `pre-push self-test` · `pre-push bar self-test` ·
+`harness arms (fail branches armed or pinned)` · `run-gates evidence` · `run-gates canary` ·
+`run-gates gov canary` · `run-gates turnstile` · `run-gates run-log line` · `run-gates adopter e2e` ·
+`profile-bar selftest` · `held-halves selftest` · `pre-push self-test` · `pre-push bar self-test` ·
 `pre-push run-log line` · `push-main self-test` · `branch-guard self-test` ·
 `python resolver (behaviour + inline parity + idiom ban)` · `lexicon naming predicates` ·
 `transition-audit arms` · `straggler-guard arms` · `recall floor arms` · `recall floor` ·
-`memory hygiene` · `kit epoch (shipped bytes move, the version moves)`
+`memory hygiene` · `codebase-map coverage + freshness` · `kit epoch (shipped bytes move, the version moves)`
 
-New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC5 AC9 · an aged leg and a plain bar's leg each exiting 1 against a cached ok · FLOOR_ASSERTIONS, by S9
-New arm: tools/run-gates/run-gates.test.sh · covers AC4 · the calibrate verb with a blank spawn command and with a spawn that fails · FLOOR_ASSERTIONS, by the arms added
-New arm: .githooks/pre-push.test.sh · covers AC6 · the two reuse knobs exported into a push · none
-New arm: tools/gate-lint/fork-count.sh · covers AC7 · an `--only` id naming no declared row · none
+New arm: tools/run-gates/run-gates.test.sh · covers AC4 AC13 AC14 AC18 · the calibrate verb with a blank spawn command and a failing spawn, fixed sleepers under load, the cache writer reading the retry, the plain leg line · FLOOR_ASSERTIONS, by S4
+New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC12 AC17 AC19 · a second key resetting the first's count, a sample run overwriting the log, a failing hash-object · FLOOR_ASSERTIONS, by S9
+New arm: .githooks/pre-push.test.sh · covers AC6 AC11 · the two reuse knobs exported into a push, and a direct bar's entry missed through the real hook · none
+New arm: tools/run-gates/held_halves.py · covers AC15 · a text-mode read of a CR-bearing stdout · none
 
 ## 8. Open questions
 
@@ -259,17 +314,23 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-12 · initial draft.
+- rev-2 · 2026-10-12 · §1 §2 §3 §4 §5 §6 §7 S5 S7 S8 S10 S11 S12 S13 S14 S15 S16 S17 S18 S19 AC5 AC7
+  AC8 AC9 AC11 to AC20 · the review converged and the owner rulings of 2026-10-04 promote one unit per
+  HIGH and batch the MEDIUMs and LOWs into this one. S5 (id 3) with AC5 and AC9 went to
+  TOOL-aSparedSpawn-17, S8 (id 6) with AC8 to TOOL-aSparedSpawn-18, and S7 (id 4) with AC7 to
+  TOOL-aSparedSpawn-19, which takes id 20's duplicates. S10 to S19 add ids 11 and 21, 12, 16, 17, 7,
+  8, 13, 14 and 22, 19 and 23, each with its own criterion. S4's two digest exits may be armed by
+  S18's line instead of pinned.
 
 ## 10. Reuse audit
 
 `tools/codebase-map/reuse_lookup.py "quarantine a leg whose cached ok disagrees with an executed red"`
 ranks generic `ok` and `leg` helpers and no reuse seam; no new seam is built. Each fix extends the
-existing branch that already owns its case: S5 widens the sampled-disagreement quarantine path after
-`run_leg_retry` in `tools/run-gates/run-gates.sh` (TOOL-aSparedSpawn-13 S6) rather than adding a
-second erase; S6 extends the hook's `ENV_CLEARED` scrub that already clears `GATE_REUSE_PUSH` and
-`GATE_DOCS_BASE`; S7 adds its refusal beside `check_budgets` and `read_budgets` in
-`tools/gate-lint/fork-count.sh`, whose empty-file refusal is the same shape; S1 uses govkit's own
-`selfcheck --write` generator.
+code that already owns its case: S6 the hook's `ENV_CLEARED` scrub that clears `GATE_REUSE_PUSH`
+and `GATE_DOCS_BASE`; S10 the `REUSE_DIGEST` env loop's own exclusion arm; S11 the cache entry
+`TOOL-aSparedSpawn-13` writes and the 30-day prune that already walks it; S17 `report_one`'s
+two-space tail contract; S1 govkit's own `selfcheck --write` generator; S4 check-arms' marker and
+pin grammar.
 
 Recall terms used: cache disagreement quarantine sampled age bound GATE_REUSE_PUSH ENV_CLEARED
-not honoured check_budgets fork ceilings spawn idiom registry subject pins FLOOR_ASSERTIONS
+REUSE_DIGEST GIT_EXEC_PATH subject pins spawn idiom registry fork ceilings FLOOR_ASSERTIONS

@@ -9,6 +9,7 @@
 | [2026-10-11-build-TOOL-aSparedSpawn-10-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-10-acceptance-ledger.md) | journal | — |
 | [2026-10-11-build-TOOL-aSparedSpawn-10-plan-fixture.sh](../build/2026-10-11-build-TOOL-aSparedSpawn-10-plan-fixture.sh) | journal | — |
 | [2026-10-11-prompt-TOOL-aSparedSpawn-10-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-10-build-brief.md) | journal | — |
+| [2026-10-12-review-TOOL-aSparedSpawn-1-15-closing-diff-round1.md](../reviews/2026-10-12-review-TOOL-aSparedSpawn-1-15-closing-diff-round1.md) | diff-review | TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14 TOOL-aSparedSpawn-15 |
 
 <!-- /gen:spec-records -->
 
