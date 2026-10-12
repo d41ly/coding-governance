@@ -1983,6 +1983,11 @@
       "file": "tools/unattended/stop-guard.test.sh"
     },
     {
+      "id": "build_pf_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "build_placement_models",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -10018,26 +10023,6 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
-      "id": "pf_at",
-      "kind": "function",
-      "file": "tools/unattended/unattended.test.sh"
-    },
-    {
-      "id": "pf_fixture",
-      "kind": "function",
-      "file": "tools/unattended/unattended.test.sh"
-    },
-    {
-      "id": "pf_pid",
-      "kind": "function",
-      "file": "tools/unattended/unattended.test.sh"
-    },
-    {
-      "id": "pf_rows",
-      "kind": "function",
-      "file": "tools/unattended/unattended.test.sh"
-    },
-    {
       "id": "pfx_decide",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -11976,6 +11961,21 @@
       "id": "read_pauses",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "read_pf_at",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_pf_pid",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_pf_rows",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "read_phase",

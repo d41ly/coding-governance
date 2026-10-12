@@ -8803,7 +8803,7 @@ rm -rf "$TMP/bp7-shim"
 # ---- three running, and a --prepared nobody reads is never started. NO HOST GATE except AC6's: only
 # ---- that arm grades a bound, and it is counted either way.
 export PF_MARK="$TMP/pf-mark"
-pf_fixture() { # wire body · lander body · profile body -> a committed in-place fixture, an empty ledger
+build_pf_fixture() { # wire body · lander body · profile body -> a committed in-place fixture, an empty ledger
   reset_tree
   rm -rf "$PF_MARK"; mkdir -p "$PF_MARK"; rm -f "$(git rev-parse --git-common-dir)/unattended/tRun.procs"
   printf '#!/usr/bin/env bash\n%s\n' "$1" > wire.sh
@@ -8813,12 +8813,12 @@ pf_fixture() { # wire body · lander body · profile body -> a committed in-plac
   printf 'GATE_PROFILE_CMD="bash profile.sh"\n' >> .unattended.conf
   fixture
 }
-pf_rows() { awk '{ s = $7 " " $8 " " $9; sub(/ +$/, "", s); print s }' "$(git rev-parse --git-common-dir)/unattended/tRun.procs" 2>/dev/null; }
-pf_pid() { awk -v a="$1" '$7 " " $8 " " $9 == a { print $1; exit }' "$(git rev-parse --git-common-dir)/unattended/tRun.procs" 2>/dev/null; }
-pf_at() { grep -nF -m1 -- "$2" <<<"$1" | cut -d: -f1; }
+read_pf_rows() { awk '{ s = $7 " " $8 " " $9; sub(/ +$/, "", s); print s }' "$(git rev-parse --git-common-dir)/unattended/tRun.procs" 2>/dev/null; }
+read_pf_pid() { awk -v a="$1" '$7 " " $8 " " $9 == a { print $1; exit }' "$(git rev-parse --git-common-dir)/unattended/tRun.procs" 2>/dev/null; }
+read_pf_at() { grep -nF -m1 -- "$2" <<<"$1" | cut -d: -f1; }
 
 # ---- AC1: every stub answers at once, the lander with its passing 1, and preflight passes as before.
-pf_fixture 'exit 0' 'exit 1' 'exit 0'
+build_pf_fixture 'exit 0' 'exit 1' 'exit 0'
 out=$(run --preflight tRun --keepalive-id k1); rc=$?
 same "BP4 AC1 a preflight whose four probes all answer exits 0" "$rc" "0"
 hit  "$out" "unattended: preflight OK"
@@ -8828,7 +8828,7 @@ miss "$out" "UNATTENDED check 61 FAILED"
 
 # ---- AC2: each refusal and each probe's captured output prints at its own check, in the block's
 # ---- order, and the --prepared that check_lander_mode never reads prints nothing at all.
-pf_fixture 'echo WIRE-OUT; exit 1' 'case "$1" in --carry) echo CARRY-OUT; exit 2 ;; --prepared) echo PREP-OUT; exit 1 ;; esac' 'exit 3'
+build_pf_fixture 'echo WIRE-OUT; exit 1' 'case "$1" in --carry) echo CARRY-OUT; exit 2 ;; --prepared) echo PREP-OUT; exit 1 ;; esac' 'exit 3'
 out=$(run --preflight tRun --keepalive-id k1)
 hit  "$out" "UNATTENDED check 4 FAILED"
 hit  "$out" "WIRE-OUT"
@@ -8836,13 +8836,13 @@ hit  "$out" "UNATTENDED check 60 FAILED"
 hit  "$out" "CARRY-OUT"
 hit  "$out" "the wall is not compared with the largest leg ceiling"
 miss "$out" "PREP-OUT"
-_pf1=$(pf_at "$out" "UNATTENDED check 4 FAILED"); _pf2=$(pf_at "$out" "WIRE-OUT"); _pf3=$(pf_at "$out" "UNATTENDED check 60 FAILED")
-_pf4=$(pf_at "$out" "CARRY-OUT"); _pf5=$(pf_at "$out" "the wall is not compared with the largest leg ceiling")
+_pf1=$(read_pf_at "$out" "UNATTENDED check 4 FAILED"); _pf2=$(read_pf_at "$out" "WIRE-OUT"); _pf3=$(read_pf_at "$out" "UNATTENDED check 60 FAILED")
+_pf4=$(read_pf_at "$out" "CARRY-OUT"); _pf5=$(read_pf_at "$out" "the wall is not compared with the largest leg ceiling")
 same "BP4 AC2 each refusal prints at its own check, in the block's order" \
   "$([ -n "$_pf5" ] && [ "${_pf1:-0}" -lt "${_pf2:-0}" ] && [ "${_pf2:-0}" -lt "${_pf3:-0}" ] && [ "${_pf3:-0}" -lt "${_pf4:-0}" ] && [ "${_pf4:-0}" -lt "$_pf5" ] && echo ok || echo "lines $_pf1 $_pf2 $_pf3 $_pf4 $_pf5")" "ok"
 # ---- AC4, on the same run: a refused preflight prunes nothing, so every started child has its row,
 # ---- and every row names the one driver that started it.
-same "BP4 AC4 the ledger holds one row per started probe, in start order" "$(pf_rows)" \
+same "BP4 AC4 the ledger holds one row per started probe, in start order" "$(read_pf_rows)" \
   "$(printf 'bash wire.sh --check\nbash lander.sh --carry\nbash lander.sh --prepared\nbash profile.sh')"
 # A PID ASSERTION THAT CAN FAIL (TOOL-aBriskPreflight-12 S7). The one it replaces counted distinct
 # field-3 values, which one driver writing every row makes 1 whenever any row exists. This grades
@@ -8859,7 +8859,7 @@ same "BP4 AC4 each row names its own child pid and the one driver pid" \
 # ---- its OWN wall. It is read only after check_wiring, so a figure taken at the read is the wiring
 # ---- stub's 12 s; the wrapper's end stamp makes it the profile's. The harness clock proves the wiring
 # ---- stub really ran its 12 s, so a fast figure is not a fixture that never waited.
-pf_fixture 'sleep 12; exit 0' 'exit 1' 'exit 3'
+build_pf_fixture 'sleep 12; exit 0' 'exit 1' 'exit 3'
 _t0=$(date +%s); out=$(run --preflight tRun --keepalive-id k1); _t1=$(date +%s)
 hit "$out" "the declared GATE_PROFILE_CMD exited 3 after"
 _bpt=$(printf '%s' "$out" | sed -n 's/.*the declared GATE_PROFILE_CMD exited 3 after \([0-9][0-9]*\)s.*/\1/p' | head -1)
@@ -8870,7 +8870,7 @@ n=$((n+1)); [ $(( _t1 - _t0 )) -ge 12 ] \
 
 # ---- AC3: the three others are RUNNING while the wiring stub waits for them. Under the sequential
 # ---- driver the stub polls its whole 60 s alone and leaves no OVERLAP.
-pf_fixture 'i=0; while [ "$i" -lt 300 ]; do [ -e "$PF_MARK/carry" ] && [ -e "$PF_MARK/prepared" ] && [ -e "$PF_MARK/profile" ] && { : > "$PF_MARK/OVERLAP"; exit 0; }; sleep 0.2; i=$((i + 1)); done; exit 0' \
+build_pf_fixture 'i=0; while [ "$i" -lt 300 ]; do [ -e "$PF_MARK/carry" ] && [ -e "$PF_MARK/prepared" ] && [ -e "$PF_MARK/profile" ] && { : > "$PF_MARK/OVERLAP"; exit 0; }; sleep 0.2; i=$((i + 1)); done; exit 0' \
   'case "$1" in --carry) : > "$PF_MARK/carry" ;; --prepared) : > "$PF_MARK/prepared" ;; esac; sleep 10; exit 1' \
   ': > "$PF_MARK/profile"; sleep 10; exit 0'
 run --preflight tRun --keepalive-id k1 >/dev/null
@@ -8881,11 +8881,11 @@ n=$((n+1)); [ -e "$PF_MARK/OVERLAP" ] || { echo "FAIL BP4 AC3 the wiring stub ne
 # ---- driver that starts it and never reads it, the verb returns while it sleeps, which this arm can
 # ---- see only when the verb's own remainder after --carry is shorter than the sleeper; on a host
 # ---- slow enough that it is not, the arm SAYS it could not tell the two apart (spec rev-3).
-pf_fixture 'exit 0' 'case "$1" in --carry) date +%s > "$PF_MARK/CARRY-AT"; exit 2 ;; --prepared) sleep 30; : > "$PF_MARK/PREP-DONE"; echo PREP-OUT; exit 1 ;; esac' 'exit 0'
+build_pf_fixture 'exit 0' 'case "$1" in --carry) date +%s > "$PF_MARK/CARRY-AT"; exit 2 ;; --prepared) sleep 30; : > "$PF_MARK/PREP-DONE"; echo PREP-OUT; exit 1 ;; esac' 'exit 0'
 out=$(run --preflight tRun --keepalive-id k1); _t1=$(date +%s)
 n=$((n+1)); [ -e "$PF_MARK/PREP-DONE" ] || { echo "FAIL BP4 AC5 the verb returned while the unread --prepared probe was still running, or never started it"; st=1; }
 miss "$out" "PREP-OUT"
-_pfp=$(pf_pid "bash lander.sh --prepared")
+_pfp=$(read_pf_pid "bash lander.sh --prepared")
 n=$((n+1)); { [ -n "$_pfp" ] && ! kill -0 "$_pfp" 2>/dev/null; } || { echo "FAIL BP4 AC5 the --prepared probe has no ledger row or outlived the verb: '${_pfp:-<no row>}'"; st=1; }
 _pfc=$(cat "$PF_MARK/CARRY-AT" 2>/dev/null)
 # A verb that ran more than 10 s past the sleeper after --carry answered was slow for its own reasons,
@@ -8898,7 +8898,7 @@ if [ "$RB_HAVE_TIMEOUT" != 1 ]; then
   n=$((n+4))
   echo "  (SKIP BP4 AC6 — this host has no runnable 'timeout -k', so the bound the arm grades cannot be exercised; its 4 assertions are counted, not run)"
 else
-  pf_fixture 'exit 0' 'case "$1" in --prepared) exec sleep 600 ;; esac; exit 0' 'exit 0'
+  build_pf_fixture 'exit 0' 'case "$1" in --prepared) exec sleep 600 ;; esac; exit 0' 'exit 0'
   sed -i 's/^GATE_BOUND=.*/GATE_BOUND="2"/' .unattended.conf; fixture
   _t0=$(date +%s); out=$(run --preflight tRun --keepalive-id k1); _t1=$(date +%s)
   hit  "$out" "UNATTENDED check 61 FAILED"
@@ -8907,31 +8907,31 @@ else
   # concurrent bar a whole fixture --preflight took 149 s to 516 s under either driver, so only a
   # sleeper far past any load tells a bound that fired from one that did not (spec rev-2).
   n=$((n+1)); [ $(( _t1 - _t0 )) -lt 300 ] || { echo "FAIL BP4 AC6 --preflight took $(( _t1 - _t0 ))s against a 2s bound on its --prepared probe"; st=1; }
-  _pfp=$(pf_pid "bash lander.sh --prepared")
+  _pfp=$(read_pf_pid "bash lander.sh --prepared")
   n=$((n+1)); { [ -n "$_pfp" ] && ! kill -0 "$_pfp" 2>/dev/null; } || { echo "FAIL BP4 AC6 the bounded --prepared probe has no ledger row or outlived the verb: '${_pfp:-<no row>}'"; st=1; }
 fi
 
 # ---- AC7: the guard is asked BEFORE the start. A repairing flag and an undeclared check are refused
 # ---- with check 4's two sentences, and nothing ran and nothing was recorded.
-pf_fixture ': > "$PF_MARK/WIRE-RAN"; exit 0' 'exit 1' 'exit 0'
+build_pf_fixture ': > "$PF_MARK/WIRE-RAN"; exit 0' 'exit 1' 'exit 0'
 sed -i 's/^WIRING_CHECK=.*/WIRING_CHECK="bash wire.sh --session"/' .unattended.conf; fixture
 out=$(run --preflight tRun --keepalive-id k1)
 hit  "$out" "UNATTENDED check 4 FAILED — WIRING_CHECK carries a flag this kit does not recognise as READ-ONLY"
 n=$((n+1)); [ ! -e "$PF_MARK/WIRE-RAN" ] || { echo "FAIL BP4 AC7 a repairing WIRING_CHECK ran before its guard refused it"; st=1; }
-miss "$(pf_rows)" "wire.sh"
-pf_fixture ': > "$PF_MARK/WIRE-RAN"; exit 0' 'exit 1' 'exit 0'
+miss "$(read_pf_rows)" "wire.sh"
+build_pf_fixture ': > "$PF_MARK/WIRE-RAN"; exit 0' 'exit 1' 'exit 0'
 sed -i 's/^WIRING_CHECK=.*/WIRING_CHECK=""/' .unattended.conf; fixture
 out=$(run --preflight tRun --keepalive-id k1)
 hit  "$out" "UNATTENDED check 4 FAILED — WIRING_CHECK is not declared in .unattended.conf"
 n=$((n+1)); [ ! -e "$PF_MARK/WIRE-RAN" ] || { echo "FAIL BP4 AC7 an undeclared WIRING_CHECK started a wiring child"; st=1; }
-miss "$(pf_rows)" "wire.sh"
+miss "$(read_pf_rows)" "wire.sh"
 
 # ---- AC8: primary mode starts no lander probe and a blank profile command no profile probe.
-pf_fixture 'exit 1' 'exit 1' 'exit 0'
+build_pf_fixture 'exit 1' 'exit 1' 'exit 0'
 sed -i 's/^LANDER_MODE=.*/LANDER_MODE="primary"/; /^GATE_PROFILE_CMD=/d' .unattended.conf; fixture
 out=$(run --preflight tRun --keepalive-id k1)
 hit  "$out" "UNATTENDED check 4 FAILED — the declared wiring check failed"
-same "BP4 AC8 primary mode with no profile records the wiring child alone" "$(pf_rows)" "bash wire.sh --check"
+same "BP4 AC8 primary mode with no profile records the wiring child alone" "$(read_pf_rows)" "bash wire.sh --check"
 rm -rf "$PF_MARK"; unset PF_MARK
 reset_tree
 
