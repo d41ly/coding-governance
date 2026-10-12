@@ -20,6 +20,11 @@ staged break and GREEN restored — the checker's R13 break (gov-orienter's `man
 staged without its folder), and adopt-roles.test.sh arm 8 against a `handoff.py` whose 200-character
 refusal is staged out — and every leg §7 lists.
 
+The re-render pass ran at the main loop, declared at `d799ef46`: `render_agents.py --write` wrote
+the nine types with the new descriptions, `render_agents.py --check` exited 0, `check_roles.py`
+exited 0 with six mandatory roles and three writer outputs, and no type under `.claude/agents`
+carries a `mandatory` or `output` key. The `New arm:` observations remain owed at the close.
+
 **Evidences:** TOOL-aOrientedCast-17
 - AC1 — `check_roles.py --root <fixture A>` — over fixture A's unmodified copy the copied checker returned no defect and no `R13` or `R14` line, and its summary read `... 32 reads keys, 6 mandatory roles, 3 writer outputs, 55 rule tags ...; 0 defect(s)`.
 - AC2 — `R13` — gov-orienter's `mandatory` set to `for every session` gave exit 1 and one R13 line naming `gov-orienter.agent.md` and `orient`; with `, unenforced — the card writer is no hook` appended, exit 0; gov-builder's `mandatory` line deleted gave exit 1 with an `R2` line naming `mandatory`; a `{{TOOL_ROOT}}` token in it gave exit 1 with an R13 line naming the token; the `build` entry's `enforced-by = ["routed commits name a specced unit"]` gave exit 1 with an R13 line naming `gov-builder.agent.md` (beside R11, since the README region renders that column).

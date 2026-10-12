@@ -1,6 +1,6 @@
 ---
 name: gov-builder
-description: Builds exactly one unit from its spec, verifies it with the spec's direct check, and commits it.
+description: Builds one unit from its spec and commits it.
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: inherit
 effort: high

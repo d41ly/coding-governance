@@ -1,6 +1,6 @@
 ---
 name: gov-spec-reviewer
-description: Hunts defects in a spec set before any code exists, establishing each claim with a read-only probe.
+description: Hunts defects in a spec set, read-only.
 tools: Read, Grep, Glob, Bash
 model: inherit
 effort: medium

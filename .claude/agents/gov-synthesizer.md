@@ -1,6 +1,6 @@
 ---
 name: gov-synthesizer
-description: Merges the verified findings into one review report, one item per defect, with the verdict line the review protocol names.
+description: Merges verified findings into one report.
 tools: Read, Grep, Glob, Bash, Write
 model: inherit
 effort: high

@@ -1,6 +1,6 @@
 ---
 name: gov-orienter
-description: Orients one session for one task through the kickoff engine's Steps 0 to 4, read-only, and returns the orientation card body.
+description: Orients one session for one task, read-only.
 tools: Read, Grep, Glob, Bash
 model: inherit
 maxTurns: 60

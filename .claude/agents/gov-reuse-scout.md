@@ -1,6 +1,6 @@
 ---
 name: gov-reuse-scout
-description: Finds the existing seam a new behaviour should extend, before anything is built, by following the codebase-map kit's own reuse instruction.
+description: Finds the seam a new behaviour should extend.
 tools: Read, Grep, Glob, Bash
 model: inherit
 effort: medium

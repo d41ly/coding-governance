@@ -1,6 +1,6 @@
 ---
 name: gov-diff-reviewer
-description: Reviews only the diff it is handed, through one lens, and reports concrete findings with a path and line, the impact and a fix.
+description: Reviews a diff through one lens.
 tools: Read, Grep, Glob, Bash
 model: inherit
 effort: high
