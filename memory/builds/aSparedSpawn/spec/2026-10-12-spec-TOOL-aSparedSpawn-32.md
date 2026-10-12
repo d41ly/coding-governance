@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-32 — reconcile the build with origin/main 37200355
 
-**Status:** OPEN · rev-1 · 2026-10-12 · node a · Tier-2 · base fce4b707 · streams tooling · order 5
+**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-2 · base fce4b707 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
