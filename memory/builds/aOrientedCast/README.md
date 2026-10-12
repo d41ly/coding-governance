@@ -85,7 +85,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 18 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
+**Build status:** OPEN · 23 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
 ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10
 ids TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19
 
@@ -110,6 +110,11 @@ ids TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrie
 | [TOOL-aOrientedCast-13 — a gate allowlist may name a leg the target lacks, marked optional](spec/2026-10-12-spec-TOOL-aOrientedCast-13.md) | 13 | 2 | CLOSED | rev-2 | 2026-10-12 |
 | [TOOL-aOrientedCast-14 — the role gate reads past every launcher option, and both role arms find the session's checkout](spec/2026-10-12-spec-TOOL-aOrientedCast-14.md) | 14 | 2 | CLOSED | rev-4 | 2026-10-12 |
 | [TOOL-aOrientedCast-15 — the closing review's minors: oracles that rot, readers that disagree, a verdict over a broken index](spec/2026-10-12-spec-TOOL-aOrientedCast-15.md) | 15 | 2 | CLOSED | rev-4 | 2026-10-12 |
+| [TOOL-aOrientedCast-16 — a role cites section 1 rule tags, and its agent carries those rules with the Protocols and Facts sections](spec/2026-10-13-spec-TOOL-aOrientedCast-16.md) | 16 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-17 — a role declares when it is mandatory and where its output goes, and the kit prints the charter's roster lines](spec/2026-10-13-spec-TOOL-aOrientedCast-17.md) | 17 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-18 — the role roster, derived into the charter by the roles kit's own verb](spec/2026-10-13-spec-TOOL-aOrientedCast-18.md) | 18 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-19 — an inline stand-in for a role declares itself through its handoff, and needs a dated owner waiver row](spec/2026-10-13-spec-TOOL-aOrientedCast-19.md) | 19 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [PLAY-aOrientedCast-2 — the charter's `[roles]` rule and its generated Agent roles section](spec/2026-10-13-spec-PLAY-aOrientedCast-2.md) | 20 | 2 | OPEN | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
 Records: 38 bound to this build, across 4 record folder(s).
@@ -117,7 +122,7 @@ Records: 38 bound to this build, across 4 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7
-TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15.
+TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 PLAY-aOrientedCast-2 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -139,6 +144,11 @@ TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-12 TOOL-aOrientedCa
 | 13 | `TOOL-aOrientedCast-13` | no |
 | 14 | `TOOL-aOrientedCast-14` | no |
 | 15 | `TOOL-aOrientedCast-15` | no |
+| 16 | `TOOL-aOrientedCast-16` | no |
+| 17 | `TOOL-aOrientedCast-17` | no |
+| 18 | `TOOL-aOrientedCast-18` | no |
+| 19 | `TOOL-aOrientedCast-19` | no |
+| 20 | `PLAY-aOrientedCast-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
