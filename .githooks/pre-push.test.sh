@@ -927,9 +927,11 @@ run_rp_push() { # [remote] [NAME=VALUE…] -> the push's merged output; the knob
   env GOV_GATE_CMD="bash $rp/stub.sh" "$@" git push origin main 2>&1
 }
 
+read_rp_line() { printf '%s' "$1" | grep -m1 'gate on main push'; }   # the decision line alone, never the whole output
+
 _out=$(run_rp_push); rp_knob=$(cat "$rp/knob")
 rp_want="$(git rev-parse HEAD) $(git --git-dir="$rp/remote.git" rev-parse main~1)"
-case "$_out" in
+case "$(read_rp_line "$_out")" in
   *"scoped gate on main push"*"reuse offered to remote and history legs at"*) ok "RP AC13 a scoped decision whose probe agreed names the reuse it offers" ;;
   *) bad "RP AC13 expected the scoped decision line to offer reuse, got: $_out" ;;
 esac
@@ -942,7 +944,7 @@ esac
 # to an empty remote stages it: a PATH shim cannot, since git runs the hook with its own dirs first.
 git init -q --template= --bare "$rp/empty.git"; git remote add second "$rp/empty.git"
 _out=$(run_rp_push second); rp_knob=$(cat "$rp/knob")
-case "$_out|$rp_knob" in
+case "$(read_rp_line "$_out")|$rp_knob" in
   *"reuse not offered: the ls-remote probe did not answer with the main tip"*"|") ok "RP AC12 a probe with no tip to answer offers nothing, and the decision line names the probe" ;;
   *) bad "RP AC12 expected no knob and the probe named, got knob '$rp_knob': $_out" ;;
 esac
@@ -968,7 +970,7 @@ esac
 # AC14: predicate 9 — a planted full green whose `reused` field is not 0 forces the full bar, and the
 # same record reading 0 scopes, so the arm sees the field and not the record.
 _out=$(RP_GREEN_EXTRA=$'reused\t1\n' run_rp_push)
-case "$_out" in
+case "$(read_rp_line "$_out")" in
   *"FULL gate on main push"*"says its run reused 1 leg(s)"*) ok "RP AC14 a full green whose reused reads 1 forces the full bar" ;;
   *) bad "RP AC14 expected predicate 9 to force the full bar, got: $_out" ;;
 esac

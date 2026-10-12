@@ -12333,6 +12333,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_rp_line",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "read_ru_key",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
