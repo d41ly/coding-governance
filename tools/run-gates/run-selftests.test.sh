@@ -4,7 +4,7 @@
 # IT LANDED WITHOUT ONE. `TOOL-aQuenchedHarness-4` shipped a runner whose whole job is refusing —
 # refusing a declaration that misses a held leg, refusing a row naming an untracked file, refusing a
 # filter that matched nothing — and nothing in this tree had ever seen any of those refusals fire.
-# Charter §7: a gate you have only ever watched pass is an assertion about nothing. This is that
+# Charter [gate]: a gate you have only ever watched pass is an assertion about nothing. This is that
 # arrears, paid by `TOOL-aQuenchedHarness-6`, which added `--rank` to the same file and would
 # otherwise have added a fourth unobserved refusal to three.
 #
@@ -128,7 +128,7 @@ LIB_DIR=$(resolve_kit_dir "$_rkd_py" lib lib-selftest.sh "$HERE") || exit 2
 LIB="${LIB_DIR##*/}"
 UNATTENDED_DIR=$(resolve_kit_dir "$_rkd_py" unattended check-unattended.test.sh "$HERE") || exit 2
 UNATTENDED="${UNATTENDED_DIR##*/}"
-ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
+ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
   echo "run-selftests.test: not a git work tree"; exit 2; }
 cd "$ROOT" || exit 2
 . "$ROOT/${LIB_DIR}/lib-selftest.sh"
@@ -165,7 +165,7 @@ U=$(git -C "$ROOT" ls-files --full-name -- '*run-unattended-gates.sh' | head -1)
 [ -n "$U" ] || { echo "run-selftests.test: no tracked run-unattended-gates.sh to derive from"; exit 2; }
 UDIR=$(dirname -- "$U")
 # This script's own repo-relative path, derived the same way the runner derives its own.
-RUNNER_REL="$(git -C "$(dirname -- "$RUNNER")" rev-parse --show-prefix 2>/dev/null)$(basename -- "$RUNNER")"
+RUNNER_REL="$(unset GIT_DIR GIT_WORK_TREE; git -C "$(dirname -- "$RUNNER")" rev-parse --show-prefix 2>/dev/null)$(basename -- "$RUNNER")"
 # Where the fixture parks the BASE runner for the byte-parity arm: beside the runner, derived from
 # RUNNER_REL rather than spelled, so it adds no carried literal. The build step says why it sits there.
 BASE_RUNNER="$(dirname -- "$RUNNER_REL")/base-runner.sh"
@@ -250,8 +250,8 @@ build_repo() {
   # ---- the host, the way the sibling runner's durable leg logs already do.
   printf '#!/usr/bin/env bash\necho "fatal: unable to access '"'"'https://u:p@example.com/x'"'"'"\nexit 1\n' > ${PFX}suite-secret.sh
 
-  # THE CHARTER STUB WITH ONE REGISTRY ROW. The runner keys pooled evidence by the charter's §2
-  # node TAG, resolved from USERNAME/USER against the registry table at the repo root; a bare
+  # THE CHARTER STUB WITH ONE REGISTRY ROW. The runner keys pooled evidence by the charter's
+  # node-registry TAG, resolved from USERNAME/USER against the registry table at the repo root; a bare
   # `git init` has no charter, so the fixture writes one mapping the current user to tag `t`.
   # AC2's no-row clause is staged by deleting this row.
   printf '# fixture charter\n\n| Tag | Machine/user | Primary tree |\n|-----|---|---|\n| `t` | `%s` | fixture |\n' \
@@ -968,7 +968,7 @@ arm "a failure present at R and GONE at L is FIXED, and the exit status is unaff
     "$ATTR_ROWS" \
     "$R --serial --attribute HEAD~1 --kit ${PFX}attr/fixed.sh"
 
-# F4/AC10. Charter §7 says a runner REDS on a cost breach, and the mode every self-test unit
+# F4/AC10. The charter's [cost] says a runner REDS on a cost breach, and the mode every self-test unit
 # verifies with is the last place to quietly suspend that.
 arm "an L-side budget breach still REDS under --attribute, and names the number it broke" 1 \
     "OVER BUDGET at L" \

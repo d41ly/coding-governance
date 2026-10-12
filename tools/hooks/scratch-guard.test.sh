@@ -396,7 +396,7 @@ esac
 # `.claude/**` is outside the govkit surface, outside the codebase-map inventories and outside both
 # <prefix>/-scoped JS gates, so nothing else in the bar notices the EXECUTED copy drifting from the
 # graded one. Absence must not satisfy it.
-ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null || echo "")
+ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null || echo "")
 # SELF-ARMING ON THE RESOLVED COPY COUNT — TOOL-dRetiredFork-14.
 # This arm asserted TWO copies and hard-FAILED when the second was absent. That became the CORRECT
 # state the moment the kit stopped shipping a second destination, so the arm failed on the shipped
@@ -517,8 +517,8 @@ else
 fi
 SG_CWD_FIX=$(cd "$SGFIX" && node -p 'process.cwd()')
 SG_CWD_WT=$(cd "$SGWT" && node -p 'process.cwd()')
-SG_TOP_FIX=$(git -C "$SGFIX" rev-parse --show-toplevel)     # git's spelling — what the writer's `tree —` cell carries
-SG_TOP_WT=$(git -C "$SGWT" rev-parse --show-toplevel)
+SG_TOP_FIX=$(unset GIT_DIR GIT_WORK_TREE; git -C "$SGFIX" rev-parse --show-toplevel)     # git's spelling — what the writer's `tree —` cell carries
+SG_TOP_WT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$SGWT" rev-parse --show-toplevel)
 SG_CARDS="$SGFIX/.git/orientation"
 SG_READY='READY — sgtest · node a · sg-wt · base 0000000 · Tier-1 · gates none'
 # The hook's one comparable form, read from the hook rather than re-spelled here — a second fold in
@@ -545,12 +545,12 @@ write_card sgtest-b1 "$SG_TOP_WT" write 'READY — none yet'
 run_card "AC2 --write card holding the sentinel only -> deny naming the card path, sentinel, /session-kickoff" 2 "any;;$SG_CARD_FIX/sgtest-b1.md;;sentinel;;/session-kickoff" 'git commit -m x' session_id=sgtest-b1 "cwd=$SG_CWD_WT"
 write_card sgtest-b1 "$SG_TOP_WT" write "$SG_READY"
 run_card "AC2 real READY line, matching tree cell -> allow, stderr EMPTY" 0 empty 'git commit -m x' session_id=sgtest-b1 "cwd=$SG_CWD_WT"
-# TOOL-cMendedVintage-16 — the same line in the charter's §16 R1 form, a markdown list item. This
+# TOOL-cMendedVintage-16 — the same line in the charter's [r1] form, a markdown list item. This
 # hook is the SECOND reader of the card, and a bare-only anchor here denies the commit of a session
 # that did kick off, whatever the writer accepts. Observed RED before the widening: a deny naming
 # the sentinel. The bare arm directly above is the other half — both forms, not one.
 write_card sgtest-b2 "$SG_TOP_WT" write "- $SG_READY"
-run_card "AC2 the READY line as a §16 R1 list item -> allow, stderr EMPTY" 0 empty 'git commit -m x' session_id=sgtest-b2 "cwd=$SG_CWD_WT"
+run_card "AC2 the READY line as an [r1] list item -> allow, stderr EMPTY" 0 empty 'git commit -m x' session_id=sgtest-b2 "cwd=$SG_CWD_WT"
 write_card sgtest-b3 "$SG_TOP_WT" write "- READY — none yet"
 run_card "AC2 the sentinel as a list item is still the sentinel -> deny naming it" 2 "any;;$SG_CARD_FIX/sgtest-b3.md;;sentinel" 'git commit -m x' session_id=sgtest-b3 "cwd=$SG_CWD_WT"
 

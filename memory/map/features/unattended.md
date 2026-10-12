@@ -40,6 +40,7 @@ globs = [
 
 ## Constraints & why
 
+- Its `[[regenerate]]` render row is staged, stage 1: run-gates' `regen.py` re-renders it on `--regen`, and every bar proves it fresh with this kit's `[check]` first (TOOL-aPrimedIndex-1).
 **The checkpoint is replaced, not removed.** Every other kit makes a rule enforceable. This one
 removes a rule — the explicit ask before a merge and a push — and its burden is to put
 something machine-checkable in the vacated slot. That is why the mandate is ASSERTED rather than
@@ -119,7 +120,7 @@ authored region holds only the facts nothing in the tree derives, enumerated in 
 section 2 and not counted here.
 
 **The template is byte-gated and this feature is kit-conditional.** The rules live in the charter's
-two `kit:unattended` conditional blocks in §1, dropped by the renderer for a target that did not
+two `kit:unattended` conditional blocks in section 3, dropped by the renderer for a target that did not
 select the kit; two amended clauses sit in the unconditional body, true for a non-adopting
 re-puller. The Skill's `## Resume` section invokes `/session-kickoff` after the reap and the
 re-schedule (`TOOL-aReplayedCard-3`), so a resumed session re-orients before its first commit;

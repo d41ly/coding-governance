@@ -3260,7 +3260,7 @@ reset_tree
 # H, the OWNER TURN after the push. This is the direction that destroys the provenance argument: the
 # one question the path may ask would be asked by a run already authorized, with nobody present.
 reset_tree
-mutate $KIT_REL/SKILL.template.md 's/One `AskUserQuestion`, every gap/One ask, every gap/'
+mutate $KIT_REL/SKILL.template.md 's/[Oo]ne `AskUserQuestion`, every gap/one ask, every gap/'
 mutate $KIT_REL/SKILL.template.md 's/^6\. \*\*The kickoff hand-back\*\*/6. **The kickoff hand-back** AskUserQuestion/'
 hit "$(run)" "the Skill's prompt path puts its owner turn AFTER the branch push, so the one question it is allowed to ask would be asked by a run that is already authorized and has nobody to answer it:"
 
@@ -5258,7 +5258,7 @@ cp "$TMP/$KIT_REL/ASKS.template.md" "$ak/memory/guides/UNATTENDED-ASKS.md"
 # the recall kit's extractor and its conf reader, into a directory the declared RECALL_CLI names
 # FOUND by the file only that kit holds, never by a typed kit directory (the carried-prefix ban).
 _rk_rel=$(git -C "$HERE" ls-files --full-name -- ':(top)*recall_conf.py' | head -n 1)
-_rk_src="$(git -C "$HERE" rev-parse --show-toplevel)/${_rk_rel%/*}"
+_rk_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/${_rk_rel%/*}"
 cp "$_rk_src/extract.py" "$_rk_src/recall_conf.py" "$ak/rk/"
 n=$((n+1)); [ -f "$ak/rk/extract.py" ] || { echo "FAIL the ask block could not copy the recall kit's extractor, so every S3 arm below would grade a missing grammar"; st=1; }
 printf 'MEMORY_ROOT=memory\nFAMILIES="example:EXMP tooling:TOOL"\n' > "$ak/.memory-tree.conf"

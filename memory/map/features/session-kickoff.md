@@ -27,6 +27,7 @@ globs = [
 
 ## Constraints & why
 
+- The manifest's gate commands name `run-gates.sh --regen`, and an edit to the watched runner re-stamps `last-audit` in the same commit (TOOL-aPrimedIndex-2, -3, -7).
 The engine is project-agnostic and the manifest is the project layer it reads. Everything specific to
 a repo — branch conventions, the id protocol, the gate fence, the pointer map — lives in the manifest,
 so the engine can ship unchanged to every adopter and the manifest can say something different in each
@@ -76,6 +77,27 @@ unmerged remote-tracking refs sharing a path with this tree's branch, read once 
 The `cli —` cell (`KICK-aMendedFleet-4`), directly after `node —`, compares PATH's `claude --version`,
 read once under a bounded `timeout`, with the running session's version from `AI_AGENT`, and prints a
 NOTE when PATH is the older, since every session started from PATH runs that CLI.
+The `health —` cell (`TOOL-aGraftedHelix-8`), after `claims —` and above `recent —`, counts the last
+24 hours of `<git-common-dir>/health.log`, one TAB-separated line per automatic self-heal any kit
+appended, by kind; the window is fixed, never "since the previous card", because cards are per
+session. The log's reader and writer are the inlined `health_log_sh` block, byte-identical to the
+gov lib copy and gated.
+
+Every location probe the checker asks from another directory — the file's toplevel and its prefix —
+runs with `GIT_DIR` and `GIT_WORK_TREE` unset, because a hook inherits them and they would answer for
+the caller's tree instead of the probed one (`TOOL-aGraftedHelix-45`, gated by the shell-hygiene
+location-probe leg).
+
+The engine's Step 0 finds the remote through the same ladder every kit inlines — `GOV_REMOTE`, else the
+current branch's configured remote unless it is `.`, else the repository's only remote; several and
+none chosen asks, naming `GOV_REMOTE` — and the default branch through `GOV_DEFAULT_BRANCH`, else the
+remote's `HEAD` symref, else `main` or `master`. No step spells a literal `origin`
+(`TOOL-dLadderedRemote-5`).
+
+The manifest audits its own freshness, not only its claims: check 7 caps its size (it must be trimmed,
+never the cap raised), and check 9 reds once ten or more watched commits land while `last-body-change`
+stays put, so a manifest nobody re-reads cannot pass by re-stamping `last-audit` alone. A stamp-only
+re-audit is therefore not enough after a long gap: the body has to be re-read and genuinely revised.
 
 The engine's kickoff lands on the card through `--card --append` (`KICK-aReplayedCard-2`), which
 checks every cited path, line range and record id for EXISTENCE in two spawns — one

@@ -39,7 +39,7 @@
 #          READY line pins a BASE that is not HEAD, an id reader that could not answer, or a route
 #          the tree cannot check: no MEMORY_ROOT, or no defined-id set).
 set -u
-KIT_MANIFEST_VERSION="1.24"   # gov:kit kickoff-manifest@1.24 — the registry id
+KIT_MANIFEST_VERSION="1.26"   # gov:kit kickoff-manifest@1.26 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -941,12 +941,12 @@ CARD_PARTS_AWK='{ ln=$0; sub(/\r$/, "", ln)
   if ((want=="tail") == (intail==1)) print ln }'
 
 # THE READY ANCHOR, and the one place it is spelled. The optional leading `- ` is not cosmetic: the
-# charter's §16 R1 requires an emitted micro-format to be a markdown list item — `- ` at column 0 —
+# charter's [r1] rule requires an emitted micro-format to be a markdown list item — `- ` at column 0 —
 # so a kickoff body that OBEYS the charter was read here as carrying NO READY line, and the append
 # then reported success while leaving the sentinel in place and skipping the `tree —` re-render.
 # Both forms are accepted, and that is a WIDENING rather than a swap: the sentinel this script
 # renders is bare, as is every card already on disk, and dropping the bare form would strand them.
-# The reader moves; §16 R1 does not (TOOL-cMendedVintage-16).
+# The reader moves; [r1] does not (TOOL-cMendedVintage-16).
 CARD_READY_RE='^\(- \)\{0,1\}READY — '
 
 # The route rules (KICK-aRoutedQuill-1 §4): a body's `## route` section names its build, each unit
@@ -1200,7 +1200,7 @@ $c8"
 # string can interpolate it instead of re-typing it, and the playbook-parity gate compares
 # this expression against the one MANIFEST-TEMPLATE.md states, so the two cannot drift apart again.
 STAMP_SHA_RULE="sha = HEAD on any branch"
-RETROFIT="retrofit: (1) body deltas — rewrite the §B intro to 're-audited every kickoff; accretes', add the ratchet + dated-corrections (never delete the section) + traps-accrete text; (2) add the manifest-audit block: last-audit '<ISO datetime> @ <full sha>' (sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)), watch = gate-defining pathspecs, verify-paths = 2-3 anchors, last-body-change = the sha where the BODY was last revised; (2b) paste the sealed task region from --task-skeleton into §A; (3) copy manifest-check.sh in, add the .gitattributes LF rule + the gate-fence line, git add everything; (4) run this check to 0; (5) pull the manifest DoD + reconcile lines into the project's playbook; (5b) add registry = the file whose first table under '## Node registry' names this node, which the card verbs read; (6) bump the marker to v1.4 LAST. Full recipe: coding-governance/WIRE-INTO-PROJECT.md §4."
+RETROFIT="retrofit: (1) body deltas — rewrite the §B intro to 're-audited every kickoff; accretes', add the ratchet + dated-corrections (never delete the section) + traps-accrete text; (2) add the manifest-audit block: last-audit '<ISO datetime> @ <full sha>' (sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)), watch = gate-defining pathspecs, verify-paths = 2-3 anchors, last-body-change = the sha where the BODY was last revised; (2b) paste the sealed task region from --task-skeleton into §A; (3) copy manifest-check.sh in, add the .gitattributes LF rule + the gate-fence line, git add everything; (4) run this check to 0; (5) re-render the project's charter — since charter v4.0 it carries no manifest lines, and the ratchet leg's refusals name the write-back and the merge re-stamp; (5b) add registry = the file whose first table under '## Node registry' names this node, which the card verbs read; (6) bump the marker to v1.4 LAST. Full recipe: coding-governance/WIRE-INTO-PROJECT.md §4."
 nblocks=$(grep -c '<!-- manifest-audit' "$MF" || true)
 BLOCK_OK=1
 if [ "$nblocks" -eq 0 ]; then

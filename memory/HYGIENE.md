@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.139 -->
+<!-- gov:kit memory-tree@2.144 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -165,6 +165,30 @@ MOST are scaffolded by `adopt-memory-tree.sh`, not all: a registry that arrives 
 that reads it is scaffolded by nothing. "Absent" and "present and empty" read identically
 to every consumer, so a registry a gate names and nothing creates is invisible until the first row.
 
+## Ids — how a session mints them
+
+Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` practice
+(PLAY-aDistilledCharter-3). Checks 5, 13 and 14 below grade what these rules produce.
+
+- Every new tracked id is `FAMILY-<slug>-<seq>`, owned by the session that mints it, so nothing it
+  numbers can be contested.
+- The slug is the node's tag from the charter's node registry plus a fresh CamelCase adjective-noun,
+  `[A-Za-z]` only, minted ONCE per session; the tag's letter makes two nodes' slugs disjoint.
+- `<seq>` is a plain 1-up per session and family, unpadded: a label, never a rank. The next one is the
+  numeric maximum of YOUR ids in that family plus one, carried in session state, because an
+  uncommitted id is invisible to grep.
+- Before using a slug, grep the whole memory tree for `[A-Z]+-<slug>-[0-9]` at all times, archives
+  included, and scan the live rows of the work-state index; re-roll on any hit.
+- No reserve-above-a-marker, no shared counter and no renumber-on-merge: the slug is the guarantee.
+- A session is one continuous effort under one slug, across work-units and families; a resumed or
+  summarized session keeps its slug.
+- A fan-out child never mints: its orchestrator does, or the child takes a slug of its own.
+- The residual tie-break: the later to merge re-mints its slug for every UNMERGED id, and an id
+  already merged wins.
+- Legacy id eras are frozen: cite them verbatim, never renumber, never mint in their format.
+- Shorthand with the slug elided is for session prose only, never where ids are the permanent record,
+  because it is shape-identical to a frozen legacy id.
+
 ## The check catalog (all in `tools/memory-tree/check-memory-hygiene.sh`; this file is the prose home)
 
 1. **prompt placement** — prompt-kind files only under `builds/*/prompts/` or `archive/`.
@@ -248,10 +272,14 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    DERIVED from each build's README front matter (`slug node opened streams roster ids [status]`, at
    column 0, opening at line 1) plus every `**Status:**` header under its `spec/`. A build with no
    README, an unpaired generated-region marker, or two answers to its own status is a NAMED error.
-   Pin the generated files `eol=lf` in `.gitattributes` — the gate byte-compares them.
-10. **rotation note** — every rotated `archive/<STEM>.<date><suffix?>.md` is referenced from its live index, which is resolved by BASENAME anywhere under the memory root rather than at
-    a fixed path; a stem resolving to zero or several live indexes is a NAMED finding, never a
-    skip. The reference is read from everything above the index's first row, and never fewer
+   Pin the generated files `eol=lf` in `.gitattributes` — the gate byte-compares them. While any
+   file under `archive/` is untracked, `--check` and `--write` both REFUSE and name it: the index
+   reads `git ls-files`, so a half-staged rotation's moved rows look deleted. Stage the archive
+   first (`TOOL-dHomedResolver-2`).
+10. **rotation note** — every rotated `archive/<STEM>.<date><suffix?>.md` is referenced from its live index, which is resolved at the stem's DECLARED HOME —
+    `DECISIONS.md` at the memory root, `backlog/<FAMILY>.md` for a family — and never by searching
+    for a file of that name, so a build file that shares a stem's name is not consulted
+    (`TOOL-dHomedResolver-1`). A home that is not tracked is a NAMED finding, never a skip. The reference is read from everything above the index's first row, and never fewer
     than its first three lines. It grades ANNOUNCEMENT, never the archive's CONTENTS.
     With `BACKLOG_MODE` set to `builds` an archive whose stem is a FAMILY is left to check 9's archive
     guard and COUNTED in one line, because the live file at that stem is a generated view that could

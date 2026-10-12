@@ -32,9 +32,12 @@
 #     the run's last move
 #   STALE, newest attempt's launched pid  -> skip · IN-FLIGHT · launched <pid> alive since <utc>
 #     alive AND the line newer than the run's last move AND the line inside the stale bound
+#   STALE, pid-alive yes, and no launch   -> skip · STALE OVER A LIVE PID · pid <pid> is alive and this tick did
+#     of this tick's alive                   not launch it ... — one stale-live-pid health line, nothing killed
 #   STALE, under the cap, not logged in   -> SKIP — the CLI is not logged in ... (kills nothing, writes nothing)
-#   STALE, under the cap, pid-alive yes   -> kill the tree — the recorded pid's, and a launched pid still
-#     alive after the run moved or past the stale bound (a resumed session that hung) — then the row below
+#   STALE, under the cap, a launched pid  -> kill the tree — the launched pid's, still alive after the run moved
+#     alive                                  or past the stale bound (a resumed session that hung), and the
+#                                            recorded pid's with it — then the row below
 #   STALE, under the cap, logged in       -> append the attempt line, launch detached, resumed · attempt <n> · out <path>
 #   ...and the launch reported no pid     -> launch failed: <the launcher's first line> (the line stays and counts)
 # The login row PRECEDES the kill row and the order is the point: a kill is useful only where a
@@ -42,6 +45,15 @@
 # a logged-out node kills nothing (TOOL-aWokenSentinel-12 owns that ordering's proof). `--dry-run`
 # prints the line it would act on with ` (dry-run)` appended and does nothing else — no kill, no
 # attempt line, no launch, no login probe.
+#
+# THE TICK KILLS ONLY WHAT IT LAUNCHED (TOOL-aSparedHolder-1). On 2026-10-10 a STALE verdict over
+# `pid-alive yes` killed the owner's interactive session of run aFrugalTurnstile: it was waiting on a
+# Workflow whose agent had sat in one Bash call for two hours, so nothing had moved, and the verdict
+# was true. Nothing this file can read tells idle-on-error from a wait on hung background work, and
+# the session belongs to whoever started it, so a live recorded pid with no live launch of this
+# tick's own is REPORTED: one `stale-live-pid` health line, which the orientation card counts, and no
+# login probe, kill, attempt line or launch. A live LAUNCHED pid is the tick's own resumer, and a
+# resumer re-records the lease's pid as its own child, so that pair is still killed and relaunched.
 #
 # THE MANDATE IS THE INDEX, NOT THE FILESYSTEM (the closing review's id 1). This script hands a
 # session id to `claude -p --dangerously-skip-permissions`, and the record it reads that id from
@@ -328,6 +340,15 @@ run_tick() { # worktree · slug · session · host
   if [ "$lalive" = yes ] && [ "$RT_SINCE" -gt 0 ] && [ "$lastutc" \> "$boundcut" ]; then
     print_decision "$slug" "$wt" "skip · IN-FLIGHT · launched $RT_LAUNCHED alive since $lastutc"; return 0
   fi
+  # A LIVE PID THIS TICK DID NOT LAUNCH IS REPORTED, never killed (TOOL-aSparedHolder-1, the header's
+  # rule). Logged on every tick it holds, so the card's count is how long the owner has left it.
+  if [ "$RL_ALIVE" = yes ] && [ "$lalive" != yes ]; then
+    if [ "$DRY_RUN" != 1 ]; then
+      TICK_HEALTH_LOG=${TICK_HEALTH_LOG:-$(resolve_health_log "$ROOT")}
+      add_health_event "$TICK_HEALTH_LOG" resume-tick stale-live-pid "$slug pid $RL_PID last-move ${RL_MOVE}s"
+    fi
+    print_decision "$slug" "$wt" "skip · STALE OVER A LIVE PID · pid $RL_PID is alive and this tick did not launch it, so nothing is killed or launched"; return 0
+  fi
   n=$((RT_TOTAL + 1))
   utc=$(date -u +%Y-%m-%dT%H:%M:%SZ); stamp=$(date -u +%Y%m%dT%H%M%SZ)
   out="$sidecar/resume.$slug.$stamp.out"; launcher="$sidecar/resume.$slug.$stamp.sh"
@@ -343,17 +364,23 @@ run_tick() { # worktree · slug · session · host
   # THE CONTINUE PAYLOAD, one string. The kit's repo-relative path is derived, never spelled; a kit
   # outside the root keeps its absolute path, which still runs.
   kitrel=${KIT_DIR#"$ROOT"/}
-  payload="You are the resumed session of unattended run \`$slug\`. First run \`bash $kitrel/unattended.sh --resume $slug --keepalive-id <the idle-wake id you schedule now, per the unattended Skill>\` so this session's lease replaces the dead one. Then continue from the phase the run-state file names. The owner is absent: never park a question the protocol lets you decide — take the option that makes no measured observable worse and record why. If the run is terminal, reap the idle-wake and stop."
+  payload="You are the resumed session of unattended run \`$slug\`. First delete every idle-wake job your scheduler lists, because a resumed session inherits the dead one's. Then run \`bash $kitrel/unattended.sh --resume $slug --keepalive-id <the idle-wake id you schedule now, per the unattended Skill>\` so this session's lease replaces the dead one. Then continue from the phase the run-state file names. The owner is absent: never park a question the protocol lets you decide — take the option that makes no measured observable worse and record why. If the run is terminal, reap the idle-wake and stop."
   # THE ATTEMPT LINE, appended BEFORE the launch, so a tick that dies mid-launch still counts; the
   # launched pid is written onto it AFTER, because it exists only then.
   printf '%s attempt %s session %s pid %s pid-alive %s out %s\n' "$utc" "$n" "$sid" "$RL_PID" "$RL_ALIVE" "$out" >> "$log"
-  # THE LAUNCHER: three statements, and the record of what was launched, argv included. The PATH
+  # THE LAUNCHER: four statements, and the record of what was launched, argv included. The PATH
   # export is what lets a suite's stub `claude` win — a login shell would re-read its profile and
   # put the real CLI back. `-p` warns after 3 s with no stdin, so stdin is /dev/null. `--max-turns`
   # is absent from `claude --help` on CLI 2.1.178 and ACCEPTED by it, measured 2026-09-16 on node
   # `a`; a withdrawn flag leaves `unknown option` in the .out, and the attempt still counts.
+  # THE BACKGROUND-WAIT CEILING OFF (TOOL-aSparedHolder-1). `-p` stops a background agent or Workflow
+  # ten minutes after the last turn and says so on its first output line, which is how every resumed
+  # aFrugalTurnstile session lost its unit builder. Measured on node `a` 2026-10-11, CLI 2.1.292: with
+  # `0` a background agent outlived the turn end and the CLI took the follow-up turn; at 5000 ms it
+  # was stopped. A resumer whose background work hangs never exits, and the hung-launch row ends it.
   {
     printf 'export PATH=%q\n' "$PATH"
+    printf 'export CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0\n'
     printf 'cd %q || exit 2\n' "$wt"
     printf 'claude -p --resume %q --dangerously-skip-permissions --max-turns %q %q </dev/null >%q 2>&1\n' "$sid" "$RESUME_TURNS" "$payload" "$out"
   } > "$launcher"

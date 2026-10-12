@@ -261,7 +261,7 @@ read_conf_scalar() {
 }
 
 MODE="${1:---check}"
-case "$MODE" in --scaffold|--check|--render|--expand) ;; *) echo "usage: $(basename "$0") [--scaffold|--check|--render|--expand [--stamp]]"; exit 2 ;; esac
+case "$MODE" in --scaffold|--check|--check-render|--render|--expand) ;; *) echo "usage: $(basename "$0") [--scaffold|--check|--check-render|--render|--expand [--stamp]]"; exit 2 ;; esac
 
 # --render exists because --scaffold REFUSES on an existing declaration, so without it the only
 # remedy for a DRIFTED Skill would be deleting the conf and re-deriving the table. A refusal whose
@@ -269,6 +269,15 @@ case "$MODE" in --scaffold|--check|--render|--expand) ;; *) echo "usage: $(basen
 if [ "$MODE" = "--render" ]; then
   [ -f "$CONF" ] || { echo "lexicon-adopt: no .lexicon.conf; nothing to render from"; exit 1; }
   write_skill || exit 1
+  exit 0
+fi
+
+# --check-render is the Skill byte-compare `--check` runs, alone. run-gates' regen preflight proves
+# the render fresh with it: the whole `--check` also grades naming, a red no re-render can cure, and
+# read there as a stale output it refused every bar. TOOL-aPrimedIndex-9.
+if [ "$MODE" = "--check-render" ]; then
+  [ -f "$CONF" ] || exit 0
+  check_skill || exit 1
   exit 0
 fi
 

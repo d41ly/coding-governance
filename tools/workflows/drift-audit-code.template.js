@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-code',
-  version: '1.26',
+  version: '1.28',
   description:
     'Drift audit Tier 2, wave 1: dead / inefficient / unwired / duplicated code + instrument integrity. Project-agnostic; all repo facts arrive via args.',
   whenToUse:
@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.26
+// gov:kit drift-audit@1.28
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // The cap is on CONCURRENCY *and*, for the verify stage, on TOTAL agents. Concurrency is not a
 // budget: N findings fanned one-skeptic-each still spawn N agents, five at a time.
@@ -125,7 +125,7 @@ EVIDENCE RULES (these decide whether your finding survives the skeptic):
 - Severity: blocker = breaks a merge-bar gate or ships a live defect; high = real user-visible or
   data-integrity impact; medium = real debt with a concrete cost; low = tidy-up.
 
-COST IS A VERDICT, AND THIS LENS HAS A BUDGET. Charter §7: every suite declares a wall-clock ceiling
+COST IS A VERDICT, AND THIS LENS HAS A BUDGET. Charter [cost]: every suite declares a wall-clock ceiling
 and one arriving without a ceiling reds by that fact. Yours is roughly 30 TOOL CALLS. If a question
 cannot be answered inside it, RECORD THE QUESTION AS UNANSWERED and move on — an unanswered question
 on disk is worth more than a perfect one nobody ever receives.

@@ -118,6 +118,12 @@ PLACEHOLDER_RE = re.compile(r'\{\{([A-Z][A-Z0-9_]*)\}\}')
 REGION_OPEN = '<!-- gov:playbook -->'
 REGION_CLOSE = '<!-- /gov:playbook -->'
 REGION_MARKER_RE = re.compile(r'<!--\s*/?gov:playbook\s*-->')
+# TOOL-aDistilledCharter-1. A ONE-LINE REGION holds rules a reader takes in at a glance: every line
+# a `- ` bullet, none past ONE_LINE_MAX characters, no continuation. Graded AFTER substitution, which
+# is the only moment an adopter's own section 2 exists. The markers survive into the charter.
+ONE_LINE_OPEN = '<!-- one-line -->'
+ONE_LINE_CLOSE = '<!-- /one-line -->'
+ONE_LINE_MAX = 200
 # govkit's TOKEN_RX, spelled again because this engine ships without govkit. `{relpath}` and the
 # seeded three are govkit-derived, so they are never an operator's key.
 ARGV_TOKEN_RE = re.compile(r'(?<!\$)\{([a-z_]+)\}')
@@ -130,9 +136,13 @@ class Refusal(Exception):
 
 # --------------------------------------------------------------------------- derivation probes
 def read_git(root: Path, *args: str) -> str:
-    """Run git in the target and return stdout, or the empty string when it cannot answer."""
+    """Run git in the target and return stdout, or the empty string when it cannot answer.
+
+    No inherited `GIT_*` variable reaches git (TOOL-aDistilledCharter-7, R6): a hook reached through a
+    `.git` file exports `GIT_DIR`, which outranks `-C` and would answer for the ambient repository."""
+    env = {k: v for k, v in os.environ.items() if not k.startswith('GIT_')}
     try:
-        r = subprocess.run(['git', '-C', root.as_posix(), *args],
+        r = subprocess.run(['git', '-C', root.as_posix(), *args], env=env,
                            capture_output=True, text=True, encoding="utf-8", timeout=30)
         return r.stdout.strip() if r.returncode == 0 else ''
     except (OSError, subprocess.SubprocessError):
@@ -161,7 +171,7 @@ def read_conf(root: Path, name: str, key: str) -> str:
     return ''
 
 
-def derive_project_name(root: Path, _a: dict) -> str:
+def derive_project_name(root: Path, _a: dict, _e: Path | None = None) -> str:
     # The PRIMARY tree's name, never the current directory's. `root.resolve().name` answers whatever
     # worktree the render ran in, so a render from a throwaway branch dir baked that dir's name into a
     # committed charter as the product's identity — and the next render from anywhere else produced a
@@ -227,7 +237,7 @@ def resolve_remote(root):
 # <<< remote_ladder_py
 
 
-def derive_default_branch(root: Path, _a: dict) -> str:
+def derive_default_branch(root: Path, _a: dict, _e: Path | None = None) -> str:
     # The OBSERVED branch, never GOV_DEFAULT_BRANCH: a render the bar byte-compares must not move
     # with an operator's environment. The remote is the ladder's, so a node whose remote is not
     # called `origin` renders its real default instead of a local name that happens to match
@@ -244,19 +254,19 @@ def derive_default_branch(root: Path, _a: dict) -> str:
     return ''
 
 
-def derive_memory_root(root: Path, _a: dict) -> str:
+def derive_memory_root(root: Path, _a: dict, _e: Path | None = None) -> str:
     return read_conf(root, '.memory-tree.conf', 'MEMORY_ROOT') or 'memory'
 
 
-def derive_memory_disciplines(root: Path, _a: dict) -> str:
+def derive_memory_disciplines(root: Path, _a: dict, _e: Path | None = None) -> str:
     return read_conf(root, '.memory-tree.conf', 'DISCIPLINES')
 
 
-def derive_id_families(root: Path, _a: dict) -> str:
+def derive_id_families(root: Path, _a: dict, _e: Path | None = None) -> str:
     return read_conf(root, '.memory-tree.conf', 'FAMILIES')
 
 
-def derive_ci_file(root: Path, _a: dict) -> str:
+def derive_ci_file(root: Path, _a: dict, _e: Path | None = None) -> str:
     d = root / '.github' / 'workflows'  # the target's CI dir, not the review-harness kit
     if d.is_dir():
         hits = sorted(p.name for p in d.iterdir() if p.suffix in ('.yml', '.yaml'))
@@ -265,7 +275,7 @@ def derive_ci_file(root: Path, _a: dict) -> str:
     return ''
 
 
-def derive_gate_runner(root: Path, _a: dict) -> str:
+def derive_gate_runner(root: Path, _a: dict, _e: Path | None = None) -> str:
     # The run-gates kit through the ONE sibling resolver (TOOL-aRepatriatedFork-2 S3), looked up
     # from this engine when it sits inside the target and from the target's root when it renders a
     # tree it is not installed in. A dir outside the target is no answer, and neither is a miss.
@@ -305,22 +315,202 @@ def derive_gate_runner(root: Path, _a: dict) -> str:
     return ''
 
 
-def derive_lexicon_conf(root: Path, _a: dict) -> str:
+def derive_lexicon_conf(root: Path, _a: dict, _e: Path | None = None) -> str:
     return '.lexicon.conf' if (root / '.lexicon.conf').is_file() else ''
 
 
-def derive_node_tag(_r: Path, _a: dict) -> str:
-    return 'a'
+# NO `derive_machine`, and no probe reading $USERNAME/$COMPUTERNAME at all. One did, and baked one
+# node's identity into a charter committed to a shared remote, so every other node's render differed
+# and the unguarded wiring leg red for them. The node registry is fleet data the operator states —
+# since TOOL-aDistilledCharter-2 in the fleet registry beside this engine, never in the environment.
+
+# --------------------------------------------------------------------------- the fleet registry
+# TOOL-aDistilledCharter-2. Gov is the ONE allocator of node tags: `fleet.toml` ships beside this
+# engine into every adopter, and every adopter's charter renders its node table from it, so a machine
+# carries one tag everywhere. A repository overrides a cell for one node under `[nodes.<tag>]`.
+FLEET_NAME = 'fleet.toml'
+NODE_KEYS = ('primary_tree', 'worktree_root', 'variances')
+# LEGACY v3.x blocks and placeholders are the descriptor's rows carrying `legacy`, read in `render`
+# (TOOL-aDistilledCharter-2 rev-2, -9). An adopter's template is a seed `govkit update` never
+# rewrites, so the regenerate it runs (unless GOVKIT_RERENDER=0) renders a v3.x template with this
+# engine and must not roll the kit back.
+#
+# The template major version this engine ships with. An older one renders as it always did, and the
+# render notes that a newer one is available to reseed.
+TEMPLATE_MAJOR = 4
+TEMPLATE_MARKER_RE = re.compile(r'<!--\s*governance-template:\s*v([0-9]+)\.([0-9]+)\s*-->')
 
 
-# NO `derive_machine`. It read $USERNAME/$COMPUTERNAME and baked one node's identity into a charter
-# committed to a shared remote, so every other node's render differed and the unguarded wiring leg
-# red for them — and the only in-band fix rewrites a file with no row-merge driver, hard-conflicting
-# on every cross-node merge. MACHINE_A is an ASKED placeholder now: the node registry is fleet data
-# the operator states, exactly like VARIANCES_A beside it. Ambient environment is not a derivation.
+def read_fleet(path: Path) -> list[dict]:
+    """The fleet registry's rows sorted by tag, every row graded. Refuses naming the row."""
+    try:
+        data = tomllib.loads(path.read_text(encoding='utf-8'))
+    except OSError as e:
+        raise Refusal(f'the fleet registry is not readable at {path.as_posix()} ({e.strerror}); '
+                      f'it ships beside the engine, so the playbook-render kit is incomplete here')
+    except tomllib.TOMLDecodeError as e:
+        raise Refusal(f'the fleet registry at {path.as_posix()} is not valid TOML: {e}')
+    rows = data.get('node') or []
+    if not rows:
+        raise Refusal(f'the fleet registry at {path.as_posix()} names no node, so no node could '
+                      f'identify itself from the charter')
+    tags, users = set(), []
+    for n, row in enumerate(rows, 1):
+        tag = row.get('tag')
+        if not (isinstance(tag, str) and re.fullmatch(r'[a-z]', tag)):
+            raise Refusal(f'fleet row {n}: tag {tag!r} is not one lowercase letter')
+        if tag in tags:
+            raise Refusal(f'fleet row {n}: tag `{tag}` is already taken by an earlier row')
+        for key in ('user', 'projects_root'):
+            if not (isinstance(row.get(key), str) and row[key].strip()):
+                raise Refusal(f'fleet row {n} (`{tag}`): `{key}` is empty')
+        for key in ('host', 'variances'):
+            if not isinstance(row.get(key, ''), str):
+                raise Refusal(f'fleet row {n} (`{tag}`): `{key}` must be a string')
+        clash = check_user_clash(row['user'], users)
+        if clash:
+            raise Refusal(f'fleet row {n} (`{tag}`): {clash}')
+        tags.add(tag)
+        users.append((row['user'], tag))
+    return sorted(rows, key=lambda r: r['tag'])
 
 
-def derive_primary_tree(root: Path, _a: dict) -> str:
+def check_user_clash(user: str, held: list[tuple[str, str]]) -> str:
+    """Why `user` cannot join a fleet holding `held` (user, tag) pairs, or '' when it can.
+
+    TOOL-aDistilledCharter-7, R3. Every reader of the rendered table matches the USER alone —
+    `manifest-check.sh` by equality or the `<user> @` prefix, `run-selftests.sh` by a substring of
+    `$USERNAME` — so a second row for one user, on any host, is a node no reader can tell apart, and
+    one user name inside another is the substring reader's wrong answer."""
+    u = user.strip().lower()
+    for other, tag in held:
+        o = other.strip().lower()
+        if u == o:
+            return f'user {user!r} already holds tag `{tag}`, and readers match the user alone'
+        if u in o or o in u:
+            return (f'user {user!r} and the user {other!r} of tag `{tag}` contain one another, and a '
+                    f'reader matching by substring would take the wrong row')
+    return ''
+
+
+def resolve_node_overrides(target: Path, tags: set[str]) -> dict[str, dict]:
+    """The target's `[nodes.<tag>]` tables, graded against the fleet's tags and NODE_KEYS."""
+    try:
+        cfg = tomllib.loads((target / '.governance' / 'deploy.toml').read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return {}
+    nodes = cfg.get('nodes') or {}
+    if not isinstance(nodes, dict):
+        raise Refusal('deploy.toml `nodes` must be a table of `[nodes.<tag>]` tables')
+    for tag, table in nodes.items():
+        if tag not in tags:
+            raise Refusal(f'deploy.toml [nodes.{tag}] names a tag the fleet registry does not hold; '
+                          f'claim the node in gov first')
+        if not isinstance(table, dict):
+            raise Refusal(f'deploy.toml [nodes.{tag}] must be a table')
+        bad = sorted(set(table) - set(NODE_KEYS))
+        if bad:
+            raise Refusal(f'deploy.toml [nodes.{tag}] carries {", ".join(bad)}; only '
+                          f'{", ".join(NODE_KEYS)} override a node row')
+        for key, val in table.items():
+            if not (isinstance(val, str) and val.strip()) or '\n' in val:
+                raise Refusal(f'deploy.toml [nodes.{tag}] {key} must be a non-empty single line')
+    return nodes
+
+
+def derive_node_table(root: Path, _a: dict, _e: Path | None = None) -> str:
+    """The section-3 node table, from the fleet registry beside the engine.
+
+    The SHAPE is every reader's contract: `manifest-check.sh` takes the first table under
+    `## Node registry` and matches the user against the Machine/user cell; `run-selftests.sh` and
+    the drift audit match a backticked tag and a backticked user token at the head of a row."""
+    fleet = read_fleet((_e or Path(__file__).resolve().parent) / FLEET_NAME)
+    over = resolve_node_overrides(root, {r['tag'] for r in fleet})
+    # TOOL-aDistilledCharter-5. The checkout name is the committed `project_name` answer, never the
+    # rendering clone's directory: two nodes with clones named apart would commit two charters and
+    # red each other's wiring leg, and a submodule's probe answers `vendor`. A node whose clone sits
+    # under another name takes `[nodes.<tag>] primary_tree`.
+    try:
+        cfg = tomllib.loads((root / '.governance' / 'deploy.toml').read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        cfg = {}
+    # TOOL-aDistilledCharter-8, N2: the `[answers]` key `checkout_dir` when stated — a product named
+    # apart from its clone (`App` cloned as `app/main`) states the clone once — else `project_name`,
+    # which `[charter]` may carry too. `[charter]` refuses `checkout_dir`: it names no placeholder (-9, T5).
+    def read_answer(name: str, tables: tuple[str, ...]) -> str:
+        return next((v.strip() for tbl in tables
+                     for k, v in (cfg.get(tbl) or {}).items()
+                     if str(k).lower() == name and isinstance(v, str) and v.strip()), '')
+    checkout = read_answer('checkout_dir', ('answers',)) or read_answer('project_name',
+                                                                        ('charter', 'answers'))
+    if not checkout:
+        raise Refusal('NODE_TABLE builds every node\'s primary tree from `checkout_dir`, else '
+                      '`project_name`, and deploy.toml answers neither. Answer one under [answers] '
+                      'rather than letting the rendering clone\'s directory stand in for every node')
+
+    def render_cell(text: str) -> str:
+        return text.replace('|', r'\|')
+    out = ['| Tag | Machine/user | Primary tree | Worktree root | Variances |',
+           '|-----|--------------|--------------|---------------|-----------|']
+    for r in fleet:
+        o = over.get(r['tag'], {})
+        host = r.get('host', '').strip()
+        ident = f'{r["user"]} @ {host}' if host else r['user']
+        primary = o.get('primary_tree') or f'{r["projects_root"].rstrip("/")}/{checkout}'
+        worktrees = o.get('worktree_root') or f'{primary}/.claude/worktrees'
+        variances = o.get('variances') or r.get('variances', '').strip() or 'none recorded'
+        out.append(f'| `{r["tag"]}` | `{render_cell(ident)}` | `{render_cell(primary)}` | `{render_cell(worktrees)}` '
+                   f'| {render_cell(variances)} |')
+    return '\n'.join(out)
+
+
+def write_fleet_claim(engine_dir: Path, user: str, host: str, projects_root: str,
+                      variances: str) -> str:
+    """Append a row with the lowest letter the fleet has not used, and return that letter.
+
+    Appends TEXT rather than re-serialising, so the registry's comments survive. Refused in an
+    installed copy — recognised, as `resolve_declaration_paths` recognises one, by the descriptor
+    sitting beside the engine — because the next update would overwrite a local claim."""
+    if (engine_dir / 'playbook.kit.toml').is_file():
+        raise Refusal('this engine is an INSTALLED copy, and its fleet registry is gov\'s: a claim '
+                      'here is overwritten by the next update. Claim the node in gov\'s checkout, '
+                      'then update this repository')
+    for key, val in (('--user', user), ('--projects-root', projects_root)):
+        if not val.strip():
+            raise Refusal(f'{key} is empty')
+    for val in (user, host, projects_root, variances):
+        if any(ord(c) < 32 or ord(c) == 127 for c in val):
+            raise Refusal('a claim value carries a control character')
+    path = engine_dir / FLEET_NAME
+    fleet = read_fleet(path)
+    clash = check_user_clash(user, [(r['user'], r['tag']) for r in fleet])
+    if clash:
+        raise Refusal(clash)
+    taken = {r['tag'] for r in fleet}
+    free = next((c for c in 'abcdefghijklmnopqrstuvwxyz' if c not in taken), None)
+    if free is None:
+        raise Refusal('the fleet holds all 26 tags; a 27th node needs a wider tag alphabet first')
+    raw = path.read_bytes()
+    eol = b'\r\n' if b'\r\n' in raw else b'\n'
+    row = [f'tag = "{free}"', f'user = {json.dumps(user.strip(), ensure_ascii=False)}',
+           f'host = {json.dumps(host.strip(), ensure_ascii=False)}',
+           f'projects_root = {json.dumps(projects_root.strip(), ensure_ascii=False)}',
+           f'variances = {json.dumps(variances.strip(), ensure_ascii=False)}']
+    block = eol + b'[[node]]' + eol + eol.join(s.encode('utf-8') for s in row) + eol
+    if not raw.endswith(eol):
+        raw += eol
+    # Parse the WHOLE new file before writing it (R5): a claim that fails here leaves gov's fleet
+    # registry untouched, where a write-then-check left every later render refusing.
+    try:
+        tomllib.loads((raw + block).decode('utf-8'))
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+        raise Refusal(f'the claimed row would leave the fleet registry unreadable ({e}); nothing '
+                      f'was written')
+    path.write_bytes(raw + block)
+    return free
+
+
+def derive_primary_tree(root: Path, _a: dict, _e: Path | None = None) -> str:
     # The PRIMARY tree, not whichever worktree this render runs from. `--show-toplevel` answers the
     # linked worktree, so a render performed inside one would register that worktree as the node's
     # primary tree — measured on gov's own first render. `--git-common-dir` points at the main
@@ -332,7 +522,7 @@ def derive_primary_tree(root: Path, _a: dict) -> str:
     return top or root.resolve().as_posix()
 
 
-def derive_worktree_root(root: Path, _a: dict) -> str:
+def derive_worktree_root(root: Path, _a: dict, _e: Path | None = None) -> str:
     primary = derive_primary_tree(root, _a)
     return f'{primary}/.claude/worktrees' if primary else ''
 
@@ -346,7 +536,7 @@ PROBES = {
     'ci_file': derive_ci_file,
     'gate_runner': derive_gate_runner,
     'lexicon_conf': derive_lexicon_conf,
-    'node_tag': derive_node_tag,
+    'node_table': derive_node_table,
     'primary_tree': derive_primary_tree,
     'worktree_root': derive_worktree_root,
 }
@@ -436,6 +626,39 @@ def build_substitution(text: str, key: str, val: str) -> str:
         else:
             out.append(line.replace(token, val))
     return '\n'.join(out)
+
+
+def check_one_line_regions(text: str) -> None:
+    """Refuse a one-line region holding anything but short single-line bullets.
+
+    Line numbers are the RENDERED body's; the refusal quotes the line so an operator can find it in
+    the source it came from — the template for section 1, `[charter] adopter_rules` for section 2.
+    What it does NOT grade: what a rule says, or any line outside a region."""
+    inside = 0
+    for n, line in enumerate(text.split('\n'), 1):
+        bare = line.strip()
+        if bare == ONE_LINE_OPEN:
+            if inside:
+                raise Refusal(f'line {n}: a one-line region opens inside another one, opened at '
+                              f'line {inside}')
+            inside = n
+            continue
+        if bare == ONE_LINE_CLOSE:
+            if not inside:
+                raise Refusal(f'line {n}: a one-line region closes with none open')
+            inside = 0
+            continue
+        if not inside or not bare:
+            continue
+        quoted = line.strip()[:60]
+        if not re.match(r'- \S', line):
+            raise Refusal(f'line {n}: a one-line region holds a line that is not a `- ` bullet, '
+                          f'so a rule spans two lines or is not a rule: {quoted!r}')
+        if len(line.rstrip()) > ONE_LINE_MAX:
+            raise Refusal(f'line {n}: a rule in a one-line region is {len(line.rstrip())} '
+                          f'characters, past the {ONE_LINE_MAX} a one-line rule may take: {quoted!r}')
+    if inside:
+        raise Refusal(f'line {inside}: a one-line region is never closed')
 
 
 # --------------------------------------------------------------------------- the region reader
@@ -586,9 +809,24 @@ def read_charter_table(cfg: dict, rows: list[dict], argv_tokens: set[str]) -> di
 
 
 def resolve_placeholder_value(row: dict, charter: dict, answers: dict,
-                              target: Path) -> tuple[str, str]:
-    """One placeholder's value and its note line. Precedence: `[charter]`, `[answers]`, then the
-    probe (derived) or the declared default (defaulted). The one site the three classes share."""
+                              target: Path, engine_dir: Path | None = None) -> tuple[str, str]:
+    """One placeholder's value and its note line, as the render AND `--answers` both use it.
+
+    TOOL-aDistilledCharter-7. The trailing newlines of a TOML multi-line string go here (R8), so a
+    sibling renderer asking `--answers` gets the value the charter carries; and a value carrying a
+    one-line marker is refused (R7), because it could close a region early and escape the grade."""
+    val, note = resolve_placeholder_raw(row, charter, answers, target, engine_dir)
+    val = str(val).rstrip('\n')
+    if ONE_LINE_OPEN in val or ONE_LINE_CLOSE in val:
+        raise Refusal(f'the value for {row["key"]} carries a one-line region marker, which would let '
+                      f'it close the region the render grades')
+    return val, note
+
+
+def resolve_placeholder_raw(row: dict, charter: dict, answers: dict,
+                            target: Path, engine_dir: Path | None = None) -> tuple[str, str]:
+    """One placeholder's value as stated. Precedence: `[charter]`, `[answers]`, then the probe
+    (derived) or the declared default (defaulted). The one site the three classes share."""
     key, cls = row['key'], row.get('class')
     given = charter.get(key.lower()) or answers.get(key.lower())
     if cls == 'derived':
@@ -596,7 +834,7 @@ def resolve_placeholder_value(row: dict, charter: dict, answers: dict,
         if probe is None:
             raise Refusal(f'{key} declares probe `{row.get("probe")}`, which this engine does '
                           f'not define')
-        seen = probe(target, answers)
+        seen = probe(target, answers, engine_dir)
         if given:
             # F2, RESOLVED: a redundant answer is a note, never a failure. The empty-probe case is
             # gov's own `ci_file`: no workflow exists yet, and the answer says so.
@@ -683,7 +921,8 @@ def resolve_answers(engine_dir: Path, gov_root: Path, target: Path,
     for key in keys:
         low = key.lower()
         if key.upper() in by_key:
-            out[key] = resolve_placeholder_value(by_key[key.upper()], charter, answers, target)[0]
+            out[key] = resolve_placeholder_value(by_key[key.upper()], charter, answers, target,
+                                                 engine_dir)[0]
             continue
         if low == 'kits':
             out[key] = sorted(read_kits(dep, cfg, entries))
@@ -725,6 +964,20 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
                       f'at the installed template, or pass a different --charter')
     text = read_input(template, 'the charter template')
     present = check_fences(text, entries, declared_blocks)
+    marker = TEMPLATE_MARKER_RE.search(text)
+    current = bool(marker) and int(marker.group(1)) >= TEMPLATE_MAJOR
+    # The LEGACY blocks are the descriptor's `[[block]]` rows carrying `legacy` (TOOL-aDistilledCharter-9,
+    # T6): one declaration, never a typed copy. A template at this engine's major carrying one's fence
+    # has regained a block v4.0 retired, which is a refusal.
+    legacy = {b['name']: b.get('why', '') for b in blocks if b.get('legacy')}
+    for ns, name in present:
+        if ns == 'when' and name in legacy and current:
+            raise Refusal(f'the template is v{marker.group(1)}.{marker.group(2)} and carries the '
+                          f'when:{name} fence, a legacy block kept only for older seeded templates')
+    # A legacy block whose fence this template does not carry is noted, never refused: it is a v4.0
+    # template under a deploy.toml written for v3.x. With the fence present it drops as it always did.
+    retired = [d for d in drop_names if d in legacy and ('when', d) not in present]
+    drop_names = [d for d in drop_names if d not in retired]
     for d in drop_names:
         if ('when', d) not in present:
             raise Refusal(f'drop_blocks names `{d}` but no when fence in the template carries it')
@@ -733,16 +986,29 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
     drop |= {('when', d) for d in drop_names}
     text = remove_fenced(text, drop)
 
-    notes = []
+    notes = [f'retired   drop_blocks {d} — {legacy[d]}; remove it from deploy.toml' for d in retired]
+    if marker and not current:
+        notes.append(f'legacy    template v{marker.group(1)}.{marker.group(2)} at '
+                     f'{template.as_posix()} — this engine ships v{TEMPLATE_MAJOR}.x; reseed the '
+                     f'template from gov, then re-render')
     by_key = {r['key']: r for r in rows}
     for key in sorted(set(PLACEHOLDER_RE.findall(text))):
         row = by_key.get(key)
         if row is None:
             raise Refusal(f'the template carries {{{{{key}}}}} and the descriptor declares no '
                           f'[[placeholder]] row for it, so nothing can supply a value')
-        val, note = resolve_placeholder_value(row, charter, answers, target)
+        # N6: a legacy row exists only so a SEEDED older template keeps rendering. A template at this
+        # engine's major naming one has regained a name v4.0 retired, which is a refusal, not a value.
+        if row.get('legacy') and marker and int(marker.group(1)) >= TEMPLATE_MAJOR:
+            raise Refusal(f'the template is v{marker.group(1)}.{marker.group(2)} and carries '
+                          f'{{{{{key}}}}}, a legacy {row["legacy"]} placeholder kept only for older '
+                          f'seeded templates')
+        val, note = resolve_placeholder_value(row, charter, answers, target, engine_dir)
         notes.append(note)
-        text = build_substitution(text, key, str(val))
+        # A TOML multi-line string ends in a newline, and the template line holding the token ends in
+        # one too; without the strip every multi-line answer adds a blank line after itself.
+        text = build_substitution(text, key, str(val).rstrip('\n'))
+    check_one_line_regions(text)
     for ns, name in sorted(set(present)):
         if (ns, name) in drop:
             notes.append(f'dropped   {ns}:{name}')
@@ -948,6 +1214,267 @@ def run_selftest() -> int:
          '{{COMMIT_TRAILER}}\n', '[charter]\ncomit_trailer = "x"' + ans,
          want='[charter] comit_trailer names no declared [[placeholder]]')
 
+    # TOOL-aDistilledCharter-1 — a one-line region admits short single-line bullets and nothing else.
+    rules_desc = ('[[placeholder]]\nkey = "ADOPTER_RULES"\nclass = "defaulted"\n'
+                  'default = "- none — this repository adds no rules of its own"\n')
+    region = f'{ONE_LINE_OPEN}\n%s\n{ONE_LINE_CLOSE}\nend\n'
+    arm_fixture('a continuation line in a one-line region is refused', rules_desc,
+                region % '- a rule\n  that wraps', ans.lstrip(), want='not a `- ` bullet')
+    arm_fixture('an over-length rule in a one-line region is refused', rules_desc,
+                region % ('- ' + 'x' * ONE_LINE_MAX), ans.lstrip(), want=f'past the {ONE_LINE_MAX}')
+    arm_fixture('an unclosed one-line region is refused', rules_desc,
+                f'{ONE_LINE_OPEN}\n- a rule\n', ans.lstrip(), want='never closed')
+    arm_fixture('a nested one-line region is refused', rules_desc,
+                region % f'{ONE_LINE_OPEN}\n- a rule', ans.lstrip(), want='opens inside another')
+    arm_fixture('an unanswered ADOPTER_RULES renders its declared default', rules_desc,
+                region % '{{ADOPTER_RULES}}', ans.lstrip(),
+                in_body=f'- none — this repository adds no rules of its own\n{ONE_LINE_CLOSE}',
+                in_notes='DEFAULTED ADOPTER_RULES')
+    arm_fixture('a multi-line adopter_rules answer renders with no blank line added', rules_desc,
+                region % '{{ADOPTER_RULES}}',
+                '[charter]\nadopter_rules = """\n- one\n- two\n"""' + ans,
+                in_body=f'- one\n- two\n{ONE_LINE_CLOSE}', in_notes='answered  ADOPTER_RULES')
+
+    # TOOL-aDistilledCharter-2 — the fleet registry, the node table it renders, and the claim.
+    fleet_rows = [('a', 'ann', 'HOSTA', 'C:/p', 'quirk | piped'),
+                  ('b', 'bob', '', '/home/bob/src', ''),
+                  ('d', 'dee', 'HOSTD', 'C:/p', '')]
+
+    def build_fleet_text(rows) -> str:
+        return ''.join(f'[[node]]\ntag = "{t}"\nuser = "{u}"\nhost = "{h}"\n'
+                       f'projects_root = "{r}"\nvariances = "{v}"\n\n' for t, u, h, r, v in rows)
+
+    def build_node_render(fleet: str, tail: str = '', checkout: str = 'repo-one',
+                          name: str = 'app'):
+        with tempfile.TemporaryDirectory() as td:
+            eng, tgt = Path(td) / 'engine', Path(td) / checkout
+            eng.mkdir()
+            (tgt / '.governance').mkdir(parents=True)
+            (eng / 'playbook.kit.toml').write_text(
+                '[[placeholder]]\nkey = "NODE_TABLE"\nclass = "derived"\nprobe = "node_table"\n',
+                encoding='utf-8')
+            (eng / 'registry.toml').write_text(REG_FIXTURE, encoding='utf-8')
+            (eng / FLEET_NAME).write_text(fleet, encoding='utf-8')
+            (tgt / 'CHARTER.md').write_text('## Node registry\n\n{{NODE_TABLE}}\n', encoding='utf-8')
+            (tgt / '.governance' / 'deploy.toml').write_text(
+                'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "CHARTER.md"\n'
+                + (f'project_name = "{name}"\n' if name else '') + tail, encoding='utf-8')
+            try:
+                return render(eng, Path(td), tgt)[0], None
+            except Refusal as e:
+                return '', str(e)
+
+    def read_pairs(body: str) -> list:
+        return re.findall(r'^\| `([a-z])` \| `([^`]*)`', body, re.M)
+
+    def check_arm(ok: bool, name: str, detail: str) -> None:
+        nonlocal passed, failed
+        if ok:
+            passed += 1
+        else:
+            failed += 1
+            print(f'  arm FAIL {name} — {detail}')
+
+    one, e1 = build_node_render(build_fleet_text(fleet_rows))
+    two, e2 = build_node_render(build_fleet_text(fleet_rows), checkout='other-repo')
+    three, e3 = build_node_render(build_fleet_text(fleet_rows[::-1]))
+    want_pairs = [('a', 'ann @ HOSTA'), ('b', 'bob'), ('d', 'dee @ HOSTD')]
+    check_arm(read_pairs(one) == read_pairs(two) == read_pairs(three) == want_pairs
+          and '`C:/p/app`' in one and '`C:/p/app`' in two and 'repo-one' not in one
+          and r'quirk \| piped' in one,
+          'one fleet renders the same (tag, identity) pairs in every repository and row order',
+          f'errors {e1, e2, e3}; pairs {read_pairs(one)} / {read_pairs(two)} / {read_pairs(three)}')
+    for name, rows, want in (
+            ('a repeated tag', fleet_rows + [('a', 'zed', 'Z', 'C:/p', '')], 'already taken'),
+            ('a repeated user and host', fleet_rows + [('e', 'ann', 'HOSTA', 'C:/p', '')],
+             'already holds tag'),
+            # R3: the readers match the user alone, so another host does not make a second row safe.
+            ('one user on a second host', fleet_rows + [('e', 'ANN', 'OTHER', 'C:/p', '')],
+             'already holds tag'),
+            ('one user name inside another', fleet_rows + [('e', 'bobby', 'B2', 'C:/p', '')],
+             'contain one another'),
+            ('a two-letter tag', fleet_rows + [('ab', 'zed', 'Z', 'C:/p', '')],
+             'not one lowercase letter')):
+        _b, err = build_node_render(build_fleet_text(rows))
+        check_arm(err is not None and want in err, f'the fleet refuses {name}', f'got {err!r}')
+    body, err = build_node_render(build_fleet_text(fleet_rows), '\n[nodes.b]\nvariances = "x"\n')
+    check_arm(err is None and '| `b` | `bob` | `/home/bob/src/app` | '
+          '`/home/bob/src/app/.claude/worktrees` | x |' in body and r'quirk \| piped' in body,
+          'a [nodes.<tag>] override moves its one cell and no other row', f'{err!r} {body!r}')
+    _b, err = build_node_render(build_fleet_text(fleet_rows), name='')
+    check_arm(err is not None and '`project_name`' in err,
+              'a node table with no project_name answer refuses rather than naming the clone',
+              f'got {err!r}')
+    _b, err = build_node_render(build_fleet_text(fleet_rows),
+                                '\n[nodes.b]\nprimary_tree = "E:/elsewhere"\n')
+    check_arm(err is None and '| `b` | `bob` | `E:/elsewhere` | `E:/elsewhere/.claude/worktrees` |' in _b,
+              'a [nodes.<tag>] primary_tree override still wins over project_name', f'{err!r} {_b!r}')
+    for name, tail, want in (('a tag the fleet lacks', '\n[nodes.q]\nvariances = "x"\n',
+                              'does not hold'),
+                             ('an unknown key', '\n[nodes.b]\ncolour = "x"\n', 'only primary_tree')):
+        _b, err = build_node_render(build_fleet_text(fleet_rows), tail)
+        check_arm(err is not None and want in err, f'[nodes] refuses {name}', f'got {err!r}')
+    with tempfile.TemporaryDirectory() as td:
+        eng = Path(td)
+        (eng / FLEET_NAME).write_text(build_fleet_text(fleet_rows), encoding='utf-8')
+        got = write_fleet_claim(eng, 'cy', 'HOSTC', 'D:/w', '')
+        rows_after = [r['tag'] for r in read_fleet(eng / FLEET_NAME)]
+        try:
+            write_fleet_claim(eng, 'CY', 'hostc', 'D:/w', '')
+            again = 'no refusal'
+        except Refusal as e:
+            again = str(e)
+        (eng / 'playbook.kit.toml').write_text('', encoding='utf-8')
+        try:
+            write_fleet_claim(eng, 'new', 'N', 'D:/w', '')
+            installed = 'no refusal'
+        except Refusal as e:
+            installed = str(e)
+    check_arm(got == 'c' and rows_after == ['a', 'b', 'c', 'd'] and 'already holds' in again
+          and 'INSTALLED' in installed,
+          'a claim takes the lowest free letter, once per identity, never in an installed copy',
+          f'got {got!r} rows {rows_after} again {again!r} installed {installed!r}')
+    arm_fixture('a legacy drop_blocks member with no fence is noted with the descriptor\'s why',
+                trailer_desc + '\n[[block]]\nname = "node-table"\nlegacy = "v3"\nwhy = "WHY-X"\n',
+                'plain\n', 'drop_blocks = ["node-table"]\n' + ans, in_body='plain',
+                in_notes='retired   drop_blocks node-table — WHY-X')
+    # TOOL-aDistilledCharter-9, T6: a template at this engine's major carrying a legacy fence is
+    # refused, against the SHIPPED descriptor, so the arm fails the day a block loses its legacy mark.
+    with tempfile.TemporaryDirectory() as td:
+        tgt = Path(td)
+        (tgt / '.governance').mkdir()
+        (tgt / 'TPL.md').write_text(f'<!-- governance-template: v{TEMPLATE_MAJOR}.0 -->\n'
+                                    '<!-- when:node-table -->\nrow\n<!-- /when:node-table -->\n',
+                                    encoding='utf-8')
+        (tgt / '.governance' / 'deploy.toml').write_text(
+            'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
+        here = Path(__file__).resolve().parent
+        try:
+            render(here, here.parent.parent, tgt)
+            got = 'no refusal'
+        except Refusal as e:
+            got = str(e)
+    check_arm('a legacy block kept only for older' in got,
+              'a current-major template carrying a legacy fence is refused', f'got {got!r}')
+    # TOOL-aDistilledCharter-2 rev-2 (closing review round 1, R1). A SEEDED v3.x template renders
+    # under THIS engine and its SHIPPED declarations, because `update` never rewrites a seed and a
+    # refusal here rolls the kit back. The declarations are the real ones beside this engine, so the
+    # arm fails the day a legacy name leaves the descriptor.
+    real_engine = Path(__file__).resolve().parent
+    v3 = ('<!-- governance-template: v1.27 -->\n<!-- when:node-table -->\n'
+          '| `{{TAG_A}}` | `{{MACHINE_A}}` | `{{PRIMARY_TREE_A}}` | `{{WORKTREE_ROOT_A}}` | '
+          '{{VARIANCES_A}} |\n<!-- /when:node-table -->\n<!-- when:security-outbound -->\nSSRF\n'
+          '<!-- /when:security-outbound -->\naudit {{PROSE_AUDIT}}\n')
+    for drops, want_row in (('', True), ('drop_blocks = ["node-table"]\n', False)):
+        with tempfile.TemporaryDirectory() as td:
+            tgt = Path(td)
+            (tgt / '.governance').mkdir()
+            (tgt / 'TPL.md').write_text(v3, encoding='utf-8')
+            (tgt / '.governance' / 'deploy.toml').write_text(
+                'kits = ["lexicon"]\n' + drops + '\n[answers]\nplaybook_path = "TPL.md"\n'
+                'machine_a = "u"\nprimary_tree_a = "C:/p/x"\nworktree_root_a = "C:/p/x/w"\n'
+                'variances_a = "none"\n', encoding='utf-8')
+            try:
+                body, notes = render(real_engine, real_engine.parent.parent, tgt)
+                err = None
+            except Refusal as e:
+                body, notes, err = '', [], str(e)
+        check_arm(err is None and ('`C:/p/x`' in body) == want_row and 'SSRF' in body
+                  and any('reseed' in n for n in notes),
+                  f'a v3.x template renders under the shipped declarations '
+                  f'({"node-table dropped" if drops else "every block kept"}) and notes a reseed',
+                  f'refused: {err}' if err else f'body {body!r} notes {notes!r}')
+    import contextlib
+    import io
+    for outside, want_note in (('## Node registry\n\n| `a` | `u` |\n\n', True), ('# head\n\n', False)):
+        with tempfile.TemporaryDirectory() as td:
+            tgt = Path(td)
+            (tgt / '.governance').mkdir()
+            (tgt / '.governance' / 'deploy.toml').write_text(
+                'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
+            (tgt / 'TPL.md').write_text('x\n', encoding='utf-8')
+            (tgt / 'AGENTS.md').write_text(f'{outside}{REGION_OPEN}\nx\n{REGION_CLOSE}\n',
+                                           encoding='utf-8')
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                rc = main(['--target', str(tgt), '--check'])
+        check_arm(rc == 0 and ('Node registry' in out.getvalue()) == want_note,
+              f'the stale-registry note prints {"when" if want_note else "only when"} a registry '
+              f'sits outside the region', f'rc {rc} out {out.getvalue()!r}')
+
+    # TOOL-aDistilledCharter-8 — N2: `checkout_dir` names the clone when the product is named apart;
+    # N5: `--check` prints the reseed note; N6: a v4 template naming a legacy placeholder is refused.
+    body, err = build_node_render(build_fleet_text(fleet_rows), 'checkout_dir = "app/main"\n',
+                                  name='App')
+    check_arm(err is None and '`C:/p/app/main`' in body and '`C:/p/App`' not in body,
+              'checkout_dir names the clone where the product name differs', f'{err!r} {body!r}')
+    for marker_v, want in (('v3.5', 'reseed'), ('v4.0', 'legacy v3 placeholder')):
+        with tempfile.TemporaryDirectory() as td:
+            tgt = Path(td)
+            (tgt / '.governance').mkdir()
+            (tgt / 'TPL.md').write_text(f'<!-- governance-template: {marker_v} -->\n'
+                                        f'tag {{{{TAG_A}}}}\n', encoding='utf-8')
+            (tgt / '.governance' / 'deploy.toml').write_text(
+                'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                main(['--target', str(tgt)])   # write mode first; its notes are not the observation
+            out, err_out = io.StringIO(), io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err_out):
+                rc = main(['--target', str(tgt), '--check'])
+        said = out.getvalue() + err_out.getvalue()
+        check_arm(want in said and (rc == 0) == (marker_v == 'v3.5'),
+                  f'a {marker_v} template naming a legacy placeholder: --check '
+                  f'{"prints the reseed note" if marker_v == "v3.5" else "refuses it"}',
+                  f'rc {rc}, said {said!r}')
+
+    # TOOL-aDistilledCharter-7 — R5: DEL is refused and the fleet is untouched; R7: a [charter] value
+    # carrying a one-line marker is refused; R8: `--answers` agrees with the render; R6: an inherited
+    # GIT_DIR does not steer a probe at the ambient repository.
+    with tempfile.TemporaryDirectory() as td:
+        eng = Path(td)
+        (eng / FLEET_NAME).write_text(build_fleet_text(fleet_rows), encoding='utf-8')
+        before = (eng / FLEET_NAME).read_bytes()
+        try:
+            write_fleet_claim(eng, 'eve', 'H3', 'C:/p', 'quirk' + chr(127))
+            got = 'no refusal'
+        except Refusal as e:
+            got = str(e)
+        after = (eng / FLEET_NAME).read_bytes()
+    check_arm('control character' in got and before == after,
+              'a claim carrying DEL is refused and leaves the fleet registry untouched',
+              f'got {got!r}, file changed {before != after}')
+    arm_fixture('a [charter] value carrying a one-line marker is refused', rules_desc,
+                region % '{{ADOPTER_RULES}}',
+                f'[charter]\nadopter_rules = """\n- ok\n{ONE_LINE_CLOSE}\nfree prose\n"""' + ans,
+                want='carries a one-line region marker')
+    with tempfile.TemporaryDirectory() as td:
+        eng, tgt = _write_fixture(Path(td), ok_kits, ok_var)
+        (eng / 'playbook.kit.toml').write_text(trailer_desc, encoding='utf-8')
+        dep = tgt / '.governance' / 'deploy.toml'
+        dep.write_text(dep.read_text(encoding='utf-8')
+                       + '\n[charter]\ncommit_trailer = """\nTRAILER\n"""\n', encoding='utf-8')
+        got = resolve_answers(eng, Path(td), tgt, ['commit_trailer'])
+    check_arm(got == {'commit_trailer': 'TRAILER'},
+              '--answers strips a multi-line value exactly as the render does', f'got {got!r}')
+    ambient = read_git(Path(__file__).resolve().parent, 'rev-parse', '--absolute-git-dir')
+    if not ambient:
+        print('  arm SKIP an inherited GIT_DIR does not steer a probe — this engine sits in no git '
+              'repository, so there is no ambient one to leak')
+    else:
+        saved = os.environ.get('GIT_DIR')
+        os.environ['GIT_DIR'] = ambient
+        try:
+            with tempfile.TemporaryDirectory() as td:
+                seen = derive_primary_tree(Path(td), {})
+                want = Path(td).resolve().as_posix()
+        finally:
+            if saved is None:
+                os.environ.pop('GIT_DIR', None)
+            else:
+                os.environ['GIT_DIR'] = saved
+        check_arm(seen == want, 'an inherited GIT_DIR does not steer a probe at the ambient repository',
+                  f'derived {seen!r}, wanted {want!r}')
+
     # S3 / AC5 — the template is never its own charter. Driven through `main`, so the exit code is
     # the one an operator sees, over gov's own declarations and a real registry entry.
     import contextlib
@@ -1089,10 +1616,27 @@ def main(argv: list[str]) -> int:
     ap.add_argument('--selftest', action='store_true')
     # TOOL-aRepatriatedFork-42: another kit's renderer asks for the answers this engine would use.
     ap.add_argument('--answers', nargs='+', metavar='KEY')
+    # TOOL-aDistilledCharter-2: a new node claims its tag once, in gov's own checkout.
+    ap.add_argument('--claim-node', action='store_true')
+    ap.add_argument('--user', default='')
+    ap.add_argument('--host', default='')
+    ap.add_argument('--projects-root', default='')
+    ap.add_argument('--variances', default='')
     a = ap.parse_args(argv)
 
     if a.selftest:
         return run_selftest()
+    if a.claim_node:
+        try:
+            tag = write_fleet_claim(Path(__file__).resolve().parent, a.user, a.host,
+                                    a.projects_root, a.variances)
+        except Refusal as e:
+            print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
+            return 1
+        print(f'render-playbook — claimed tag `{tag}` for {a.user} @ {a.host or "<no host>"}; '
+              f'commit the fleet registry with the governance charter rendered again beside it; every other '
+              f'repository receives it at its next govkit update')
+        return 0
     if not a.target:
         ap.error('--target is required')
 
@@ -1127,6 +1671,15 @@ def main(argv: list[str]) -> int:
 
     survived = PLACEHOLDER_RE.findall(body)
 
+    # TOOL-aDistilledCharter-2 S6. The kickoff card reads the FIRST `## Node registry` of the
+    # charter, so an authored one above the region keeps this repository's old tags in force.
+    if charter_path.is_file():
+        parts = REGION_MARKER_RE.split(charter_path.read_text(encoding='utf-8'))
+        if re.search(r'^## Node registry', parts[0] + (parts[2] if len(parts) > 2 else ''), re.M):
+            print('render-playbook: NOTE — the charter carries its own `## Node registry` outside '
+                  'the rendered region, and readers take the first one, so this repository still '
+                  'reads its old tags. Delete that section to adopt the fleet tags')
+
     if a.check:
         rc = 0
         # PARITY and PLACEHOLDER COMPLETENESS are two questions, and a render whose descriptor
@@ -1149,6 +1702,11 @@ def main(argv: list[str]) -> int:
             print(f'render-playbook: SURVIVING PLACEHOLDER in the render: '
                   f'{", ".join(sorted(set(survived)))}', file=sys.stderr)
             rc = 1
+        # N5: the two notes an adopter must act on print here too. `govkit update` runs the
+        # regenerate (unless GOVKIT_RERENDER=0) with its output captured, so `--check` is where they are seen.
+        for n in notes:
+            if n.startswith(('legacy', 'retired')):
+                print(f'  {n}')
         if rc == 0:
             print(f'render-playbook OK — region matches a fresh render, no placeholder survived')
         return rc
@@ -1167,4 +1725,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.25"  # gov:kit playbook-render@1.25
+KIT_PLAYBOOK_RENDER_VERSION = "1.27"  # gov:kit playbook-render@1.27

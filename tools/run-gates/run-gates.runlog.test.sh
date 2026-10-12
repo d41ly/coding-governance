@@ -176,7 +176,7 @@ PY=$(resolve_python 2>/dev/null) || PY=""
 KIT="${HERE##*/}"
 RUNLOG_KIT=""
 [ -n "$PY" ] && RUNLOG_KIT=$(resolve_kit_dir "$PY" runlog runlog_lib.py "$HERE" 2>/dev/null) \
-  && RUNLOG_KIT="$(git -C "$HERE" rev-parse --show-toplevel)/$RUNLOG_KIT"
+  && RUNLOG_KIT="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$RUNLOG_KIT"
 [ -n "$PY" ] && [ -f "$RUNLOG_KIT/runlog_lib.py" ] || {
   echo "FAIL no python, or no runlog kit beside this one: the journal cannot be graded, so nothing below can be"; exit 1; }
 # AC3 LAUNCHES THROUGH `timeout --foreground`, and INT is the reason. An `&` job of a shell with no job
@@ -962,7 +962,7 @@ check_ac9_worktree() {
   (cd "$wt" && env GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 GATE_LEGS="$WORK/ac9.json" \
     GATE_RUN_ID=from-worktree bash "$KR/run-gates.sh" >/dev/null 2>&1)
   l=$(measure_lines)
-  top=$(git -C "$wt" rev-parse --show-toplevel)
+  top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$wt" rev-parse --show-toplevel)
   gd=$(git -C "$wt" rev-parse --path-format=absolute --git-dir)
   check "AC9 the linked worktree's line lands in the COMMON journal" "$(read_field "$l" run)" from-worktree
   check "AC9 and names the worktree it ran in" "$(read_field "$l" wt)" "$top"

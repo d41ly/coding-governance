@@ -20,6 +20,7 @@ gotcha-classes = ["a-grep-for-a-word-is-a-presence-probe.md",
   "record-citing-a-foreign-id-defines-or-orphans-it.md", "swallowed-delegate-reads-as-clean.md",
   "waiver-row-that-hides-nothing-reds.md", "pin-gated-checks-arm-nothing-without-a-pin.md",
   "record-without-serves-or-with-a-round-counter.md", "sourced-conf-blank-overrides-the-default.md",
+  "name-search-resolves-a-namesake.md", "index-derivation-reads-a-half-staged-move-as-a-deletion.md",
   "history-leg-graded-before-the-reconcile-commit.md",
   "line-claim-matched-over-the-whole-output.md"]
 guides = []
@@ -274,10 +275,11 @@ The attended lander's mint names its unit through the leg's `--newest-unit` verb
   class whose ONLY bound is bytes is currently unarmed.
 - Checks 6 and 7 measure RAW working-tree bytes, so an adopter without the `eol=lf` pin gets a
   platform-dependent cap: a CRLF checkout adds one byte per line — `TOOL-aRootedPrefix-3`.
-- Check 10 resolves a rotated index's live counterpart by BASENAME anywhere under the memory root,
-  names a stem that resolves to zero or several rather than skipping it, admits a same-day
-  disambiguator after the date, and reads the reference from the index PREAMBLE
-  (`TOOL-cSpliceWarden-2`); a fixed path is blind to every `backlog/*.md` shard.
+- Check 10 resolves a rotated index's live counterpart at the stem's DECLARED HOME, `DECISIONS.md`
+  or `backlog/<FAMILY>.md`, and names a home that is not tracked rather than skipping it
+  (`TOOL-dHomedResolver-1`); it admits a same-day disambiguator after the date and reads the
+  reference from the index PREAMBLE (`TOOL-cSpliceWarden-2`). The basename search it replaced
+  counted every namesake, so a build file called `DECISIONS.md` red the rotation.
 - Check 10 grades ANNOUNCEMENT, never CONTENTS. Nothing in this engine asserts that an archive holds
   what the declared `ROTATION_MODE` says it should: the key is validated against its closed set and
   then read by no check — `TOOL-cSpliceWarden-6`.

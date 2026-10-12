@@ -871,7 +871,7 @@ check_spec_audit "rule0: kind [\"spec-audit\"] (an array) on the undeclared READ
 # of tier2-review.js that decides `isSpec` — asserting the two agree. An edit to either side reds
 # here until the other follows. The harness sits beside this kit in this repo; an adopter layout
 # without it gets an ANNOUNCED skip, never a silent green.
-T2R=""; _wf_dir=$(resolve_kit_dir "$TESTPY" workflows tier2-review.js "$HERE" 2>/dev/null) && T2R="$(git -C "$HERE" rev-parse --show-toplevel)/$_wf_dir/tier2-review.js"
+T2R=""; _wf_dir=$(resolve_kit_dir "$TESTPY" workflows tier2-review.js "$HERE" 2>/dev/null) && T2R="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_wf_dir/tier2-review.js"
 if [ -f "$T2R" ]; then
   kind_line=$(grep -m1 '^const kind = ' "$T2R")
   for k in '"spec-audit"' '["spec-audit"]' '"diff-review"' '"SPEC-AUDIT"' '{"k":"spec-audit"}' '7'; do
@@ -2250,7 +2250,7 @@ try {
   process.exitCode = 1
 }
 JSEOF
-  node "$TMP/nr.js" property "$TMP/base-hook.js" "$HOOK" "$(git -C "$HERE" rev-parse --show-toplevel)" "$TMP/nrfix" > "$TMP/nr.out" 2>&1
+  node "$TMP/nr.js" property "$TMP/base-hook.js" "$HOOK" "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" "$TMP/nrfix" > "$TMP/nr.out" 2>&1
   if [ $? = 0 ]; then
     echo "ok   no-regress: no denial lost against BASE ($(tail -1 "$TMP/nr.out"))"; pass=$((pass+1))
   else
@@ -2260,7 +2260,7 @@ JSEOF
   # through a real `node` per hook. Any disagreement reds naming the payload, and so does a sample in
   # which real node denied nothing, since a parity over admissions alone cannot see an exit stub that
   # drops its code.
-  node "$TMP/nr.js" parity "$TMP/base-hook.js" "$HOOK" "$(git -C "$HERE" rev-parse --show-toplevel)" "$TMP/nrfix" 400 > "$TMP/nrp.out" 2>&1
+  node "$TMP/nr.js" parity "$TMP/base-hook.js" "$HOOK" "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" "$TMP/nrfix" 400 > "$TMP/nrp.out" 2>&1
   if [ $? = 0 ]; then
     echo "ok   no-regress parity: the in-process runner agrees with real node ($(tail -1 "$TMP/nrp.out"))"; pass=$((pass+1))
   else

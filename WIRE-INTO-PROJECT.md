@@ -6,19 +6,20 @@ derive-vs-ask calls.
 
 **The chain is three composing layers:**
 
-1. **Governance playbook** (`coding-governance-agents.template.md`) — the multi-node ruleset (IDs,
-   streams, work state, gates, reviews, memory, output discipline). Lives in the project as one doc.
+1. **Governance charter** (`coding-governance-agents.template.md`) — one-line governing practices,
+   the project's own one-line rules, and a generated block: node registry, tools, protocols, facts and
+   micro-formats. Rendered into the project's `AGENTS.md` as one region.
 2. **`/session-kickoff` skill** (`skills/session-kickoff/`) — the project-agnostic kickoff *engine*,
    installed ONCE per machine; it reads a per-project **kickoff manifest** to learn project specifics.
 3. **memory-tree kit** (`<prefix>/memory-tree/`) — the gated `memory/` structure that operationalizes the
-   playbook's §5/§6. Optional but recommended.
+   charter's `[memory]`, `[derive]` and `[records]` practices. Required; §0 says why.
 
 **Precedence (never violate):** project `CLAUDE.md` > kickoff manifest > the skill. The playbook is the
 ruleset the manifest points at, not a duplicate of it.
 
 **Posture:** DERIVE everything the repo reveals (gate commands, layout, remote, default branch, id
-families); use `AskUserQuestion` ONLY for what it genuinely can't (node registry, stream ownership, tier
-policy, whether to adopt memory-tree). Keep it tight — this is wiring, not a meeting.
+families); use `AskUserQuestion` ONLY for what it genuinely can't (this repository's own rules, stream
+ownership, tier policy, which optional kits to adopt). Keep it tight — this is wiring, not a meeting.
 
 **Definitions:** `<gov>` = the `coding-governance` checkout (the repo this file lives in); `<project>` =
 the target repo root. `<prefix>` = the one directory a tree keeps its kits in: under `<project>` it
@@ -33,25 +34,34 @@ is the one you choose, once, for every kit (empty for a root install), and the `
 - Confirm `<project>` is a git repo, on its default branch, clean:
   `git -C <project> status --short` (empty) · `git -C <project> symbolic-ref --short HEAD`.
 - **Ask the user** (not derivable):
-  - **Fleet** — one node-registry row per machine/agent: tag · machine · primary-tree path · worktree
-    root · variances. (Solo/single machine → one row.)
+  - **Fleet** — every machine that works here must hold a tag in gov's fleet registry,
+    `<gov>/<prefix>/playbook/fleet.toml`, which renders the charter's node table in EVERY adopter, so
+    one machine carries one tag everywhere. A machine with no row claims one in gov's own checkout:
+    `python <gov>/<prefix>/playbook/render_playbook.py --claim-node --user <u> --host <h> --projects-root <dir>`,
+    then re-renders gov's own charter in the same commit, because `govkit update` never reaches gov.
+    A user holds one tag: the table's readers match the user alone, so one user on two machines
+    cannot be told apart.
+    Ask only for a per-repository override of one node's `primary_tree`, `worktree_root` or
+    `variances`, which goes under `[nodes.<tag>]` in this repository's `deploy.toml`.
+  - **This repository's own rules** — mobile-first, design in Figma first, a changed workflow: one
+    line each, under `[charter] adopter_rules` (§2). Optional; unanswered, the charter says `none`.
   - **Stream ownership** — which node owns which stream (keeps merges disjoint).
   - **Tier policy** — single-tier, or Tier-1/Tier-2 and what forces Tier-2 (new write path · migration ·
     auth/sanitization/egress surface · shared-contract change · cross-stream merge).
-  - **memory-tree is REQUIRED** — not a question. Playbook v2.5 made it so
-    (`coding-governance-agents.template.md` §5): §5's work-state
-    rules and §6's record protocol both assume the tree. There is no drop path and no
+  - **memory-tree is REQUIRED** — not a question. The charter's `[derive]`, `[ids]` and `[records]`
+    practices and three of its protocol lines assume the tree. There is no drop path and no
     `{{MEMORY_*}}`-deletion branch; §3 is mandatory.
   - **Adopt codebase-map?** yes (recommended for any repo past ~20 modules) / no. If yes, lock:
     MAP_ROOT (under the memory tree when memory-tree is adopted, e.g. `memory/map`; else `docs/map`),
     GATE_FILE (a path the project's EXISTING test suite collects), and which surfaces to inventory
-    (walk `<prefix>/codebase-map/INVENTORY-DERIVATION.md` §1 with the user). If no: skip §3b and delete the
-    FOUR codebase-map lines from the playbook (§1 DoR + §1 DoD + §5 kit bullet + §7 gates line).
+    (walk `<prefix>/codebase-map/INVENTORY-DERIVATION.md` §1 with the user). If no: skip §3b and leave
+    `codebase-map` out of `kits`; the render drops its tools line.
   - **Adopt memory-recall?** yes / no — retrieval over the memory tree (ask the decision corpus a
     question in English, get the records that answer it, ranked). **Requires memory-tree**: the kit
     reads `.memory-tree.conf` and refuses without it, so a "no" above forces a "no" here. Also lock
     whether to take the optional `recall-opened` PostToolUse hook (§3c step 4 — declining is a
-    supported end state). If no: skip §3c and delete the ONE memory-recall §5 kit bullet.
+    supported end state). If no: skip §3c and leave `memory-recall` out of `kits`; the render drops
+    its tools line.
 - **Derive, don't ask:** gate commands (`package.json` / `Makefile` / CI config), repo layout (the tree),
   remote + default branch, id families.
 
@@ -101,15 +111,15 @@ fallback and the upstream re-pull both read it.
 Everything below is a judgement call about YOUR project. The renderer refuses rather than guessing,
 so these are the answers `intake` will ask for, and the kits whose blocks the charter carries.
 
-- **The memory tree is not droppable.** `§5`'s derived work-state index and `§6`'s record protocol
-  are both written against it, so a charter without it states rules nothing can make true. Adopt it
-  at §3 below.
+- **The memory tree is not droppable.** The charter's `[derive]` and `[records]` practices and its
+  memory-tree protocol lines are written against it, so a charter without it states rules nothing can
+  make true. Adopt it at §3 below.
 - **A self-verifying codebase map** (`codebase-map/` kit): per-feature dossiers claim EXACT KEYS from
   machine-enumerated inventories, and a ratchet fails on any unclaimed new key AND any claim naming a
   dead key, so its claimed keys cannot rot into fiction; path globs and dossier prose are not gated.
   `map_diff` renders any git range as a feature-level
-  changelog. Zero CI changes — the gate rides the existing suite. Keeping it selected keeps three
-  `kit:codebase-map` blocks in the charter.
+  changelog. Zero CI changes — the gate rides the existing suite. Keeping it selected keeps its
+  tools line in the charter's section 3.
 - **A records-vs-reality audit** (`drift-audit/` kit): asks whether this repo's RECORD of its own
   state still matches the tree — stale claims, closed specs with no product commit, hand-kept
   inventories disagreeing with what they describe. Stdlib and git, seconds, no agents. Drop it if the
@@ -121,7 +131,8 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
   filename, and Claude Code does not read `AGENTS.md` natively. Drop it only if exactly one agent
   tool reads this repo; with two, this kit is what stops the second reading a stale copy.
 - **Parallel-test guardrails** (`pytest-parallel-guardrails/` kit): drop it if the project is not
-  Python or does not run `pytest -n auto`. The bug classes it fixes stay in the charter either way.
+  Python or does not run `pytest -n auto`. The charter's one line on the bug classes it fixes is
+  that kit's tools line, so a selection without the kit carries no line on them.
 - **A source-hygiene scan for PowerShell** (`gate-lint/` kit): drop it if the project has no `.ps1`
   files. A repo with none gets a clean report that proves nothing, which is honest and is why it is
   adopted only where the language exists.
@@ -129,26 +140,50 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
   other repos. An adopter that only consumes them has no population to declare.
 - **A naming lexicon** (`lexicon/` kit): a closed verb table every definition leads with, banned type
   suffixes, and forbidden import directions between layers. Opt-in — with no conf it reports NOT
-  ADOPTED and exits 0. Keeping it selected keeps the `kit:lexicon` block in `§12`; dropping it
-  removes five bullets and `{{LEXICON_CONF}}` with them.
+  ADOPTED and exits 0. Keeping it selected keeps its tools line, which names `{{LEXICON_CONF}}`;
+  dropping it removes both.
+- **The review protocol** (`review-harness` kit): the fan-out caps, the Tier-2 pattern and its
+  harness. Optional. The security checklist and the tier definitions the charter's `[security]` and
+  `[risk]` practices point at ship with the memory tree, in its spec template, so every adoption
+  that keeps the required memory tree carries them, whatever else it selects.
 - **A kickoff manifest** (`kickoff-manifest` kit): the per-project manifest `/session-kickoff` reads.
-  Keeping it selected keeps the `kit:kickoff-manifest` block in `§1`, the manifest's merge exception;
-  dropping it removes that exception with the manifest it governs.
-- **Unattended runs** (`unattended/` kit): keeping it selected keeps `§1`'s `kit:unattended` blocks —
-  the ONE substitute for the explicit ask before a merge and a push, the pointer to the protocol's
-  landing rule, and the protocol contract. A repo that keeps them without the kit is carrying rules
-  nothing can make true.
+  Keeping it selected keeps the `/session-kickoff` tools line. The manifest's merge exception left
+  the charter at v4.0: the `kickoff-manifest ratchet` leg refuses a merge that moved watched files
+  without a re-stamp, and its refusal names the re-stamp owed.
+- **Unattended runs** (`unattended/` kit): keeping it selected keeps its tools line and its protocol
+  line, the pointer to the ONE substitute for the explicit ask that the charter's `[land]` practice
+  names. A repo that keeps the pointer without the kit is carrying a rule nothing can make true.
 
-### The two blocks that are not about a kit
+### The one block that is not about a kit
 
-`drop_blocks` in the target's `deploy.toml` names blocks to remove that no kit governs. Two exist:
+`drop_blocks` in the target's `deploy.toml` names blocks to remove that no kit governs. One exists:
 
-- `when:security-outbound` — the outbound-call and stored-content rules in `§9`. Drop them if the
-  project has no such surface.
-- `when:cross-os` — `§11` whole. Drop it for a single-OS team.
+- `when:cross-os` — the `[cross-os]` practice and the toolchain fact. Drop it for a single-OS team.
 
-`§15`'s persona is adjustable per project and is NOT a droppable block: editing the persona is the
-sanctioned change, and its facts-over-wit rules are not adjustable at all.
+v4.0 retired `node-table` and `security-outbound`: the node registry is generated from the fleet,
+and the outbound rules moved to the spec template's security checklist. A `drop_blocks` member
+naming either is printed as `retired` and ignored; delete it.
+
+Section 1, `[voice]` included, binds every adopter and is not droppable. A project that wants a
+different persona says so in a section-2 line; the facts-over-wit half binds regardless.
+
+### Section 2 — this repository's own rules
+
+`[charter] adopter_rules` in `deploy.toml` is a multi-line string of `- ` bullets, one rule per
+physical line. The render grades it: a continuation line, a rule past the renderer's `ONE_LINE_MAX`
+or a non-bullet line is a refusal naming the line. Write a rule as a practice, never a procedure; a
+procedure belongs in a guide the rule points at.
+
+### Nodes — taking the fleet's tags in an existing adopter
+
+An adopter that kept its own registry above the rendered region still reads its OLD tags, because
+readers take the first `## Node registry` in the charter, and the render prints a note saying so. To
+take the fleet's: make sure every node working here holds a fleet row — claim one in gov if not,
+and this repository receives it at its next `govkit update`, which refreshes the fleet registry
+beside the engine — then delete the authored `## Node registry` section, remove `node-table` from
+`drop_blocks`, and re-render.
+Ids minted under an old tag stay valid: the all-time slug collision grep protects them, and frozen
+records keep the letter they were written with.
 
 ### Where each value comes from
 
@@ -473,8 +508,8 @@ its first run of the new gate. Skip this whole section if you are scaffolding fr
    carrying front matter. For that repo the migration is a flatten plus a front-matter backfill across
    every build folder, then step 1 — its own work unit in its own repo, not a step in this runbook.
 
-Then re-pull §3, §5 and this kit's handling per the playbook's v2.4 banner, and drop any ledger row,
-pointer stub or self-prune rule from your kickoff manifest (§4) and your instantiated playbook (§2).
+Then re-pull §3, §5 and this kit's handling per the v2.4 banner, and drop any ledger row, pointer stub
+or self-prune rule from your kickoff manifest (§4) and from the charter you rendered in §2.
 
 <!-- govkit:entry codebase-map -->
 ## 3b — Adopt the codebase-map kit (if chosen in §0)
@@ -530,7 +565,8 @@ pointer stub or self-prune rule from your kickoff manifest (§4) and your instan
    leg instead — add `python <GATE_FILE>` (the gate's `__main__` runner; `${MAP_PY:-python}` if the
    launcher differs) to BOTH your CI config and your local gate runner, grep-guarded so a re-run
    doesn't duplicate the leg. Without this the freshness/coverage ratchet silently never runs.
-6. Fill the manifest's "Codebase map" section (§4) and keep the playbook's map DoR/DoD lines (§2).
+6. Fill the manifest's "Codebase map" section (§4) and keep `codebase-map` in `kits`, so the
+   charter keeps its tools line.
 7. Commit `<kit>/ .codebase-map.conf <GATE_FILE> <MAP_ROOT>/` as one landing.
 
 <!-- govkit:entry memory-recall -->
@@ -668,15 +704,15 @@ from §2). Write the manifest to one of those paths so it resolves.
    cp <gov>/skills/session-kickoff/MANIFEST-TEMPLATE.md <project>/memory/guides/SESSION-KICKOFF.md
    ```
 2. Fill **§B (orientation)** from the repo: repo layout · remote + default branch · branch conventions ·
-   governing docs · the **path to the playbook from §2** · the pointer map (area → doc → entrypoints) ·
+   governing docs · the **path to the charter from §2** · the pointer map (area → doc → entrypoints) ·
    the gate commands · the tier rule · the **ID protocol** (id format + slug rules + collision grep +
    where work state is READ from, e.g. the generated `memory/LIVE.md`) · the environment traps. Fill the
    **`manifest-audit` block** per the template's Customize notes: `watch` = the pathspecs the gate/layout
    claims derive FROM (never lockfiles; ≤~8); `verify-paths` = the 2–3 tracked anchors; stamp
    `last-audit` = ISO-8601 datetime with offset (e.g. `date -Iseconds`) `@` full sha per the stamp
    rule those notes state; `registry` = the repo-relative file whose first table
-   under `## Node registry` names the project's nodes (the charter from §2 when the playbook is
-   adopted) — the checker's `--card` verbs resolve the session's node from its Machine/user
+   under `## Node registry` names the project's nodes (the charter from §2, whose generated table
+   comes from the fleet registry) — the checker's `--card` verbs resolve the session's node from its Machine/user
    column; tag claims whose truth lives in another repo
    `(cross-repo — verify at use)`. Keep it SHORT — only what the engine can't derive from
    git/`CLAUDE.md`; reference the playbook, never duplicate it. (§A is derived by the agent per
@@ -716,11 +752,11 @@ the INVOKING directory, not from its own location — run it with the cwd inside
    claims; stamp only AFTER actually re-verifying §B).
 3. Copy the checker + `.gitattributes` line + gate-fence line; `git add` everything (step 4 above).
 4. `bash <prefix>/manifest-check.sh` → 0.
-5. Re-pull the playbook's §1 manifest lines (DoD write-back + Landing reconcile exception) into the
-   project's instantiated playbook, and bump its `governance-template:` marker to the version you
-   actually pulled FROM — read it out of `<gov>/coding-governance-agents.template.md`, never from
-   this line. Stamping an older number on a newer copy makes the marker lie, and the marker is what
-   both the kickoff engine's Step-2 fallback and the re-pull mechanism read.
+5. Re-render the charter the way §2 does, rather than re-pulling lines into it: since v4.0 it carries no
+   manifest lines, and the DoD write-back and the merge exception are the `kickoff-manifest ratchet`
+   leg's refusals. The render writes the `governance-template:` marker of the template it read, so
+   the marker cannot lie about the version; both the kickoff engine's Step-2 fallback and the
+   re-pull mechanism read it.
 5b. Add `registry: <path>` to the audit block (v1.4) — the file whose first table under
    `## Node registry` names the project's nodes, read by the checker's `--card` verbs for the
    session card's `node —` cell. Without it every card the project writes reads `node — UNKNOWN:
@@ -737,7 +773,7 @@ Optional for any pytest project: adopt `<prefix>/pytest-parallel-guardrails/` (b
 `pytest-xdist` runs; aiosqlite suites also get the closed-loop seam patch + its regression gate) —
 adoption steps in that kit's README; no wiring beyond the adopter's own `pyproject.toml`/conftest.
 
-Only if the project runs multiple nodes/worktrees (playbook §3):
+Only if the project runs multiple nodes/worktrees (the charter's `[isolate]` practice):
 - A `new-stream` script (sibling worktree on a fresh branch off fast-forwarded `main` + dependency
   install) → fill `{{WORKTREE_SCRIPT}}`.
 - **The remote ladder.** Every kit that asks which ref "landed" means resolves the remote the same
@@ -795,11 +831,27 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   origin BEFORE the pre-push gate so the ~min gate never runs on a stale tree, and bounds a during-gate
   remote race at `GOV_PUSH_MAIN_MAX_RETRIES` (default 3). The `pre-push` hook refuses a raw default-branch
   push that bypasses it (a local marker; `--no-verify` bypasses). Add `bash <prefix>/push-main.test.sh` as a
-  gate-runner leg (the lander self-test).
+  gate-runner leg (the lander self-test) declared `"subject": "kit"`, so your bar holds it unless
+  `GATE_SELFTESTS=1`; do the same for `.githooks/pre-push.test.sh` and `.githooks/pre_push_bar_selftest.py`
+  if you add them. They test gov's engine files, which you never edit, and `govkit` emits them that way.
 - **Optional, to stop a doc push paying the whole bar**: declare `GATE_DOC_PATHS` in
   `.githooks/gate-env.sh` — your non-code paths, e.g. your memory tree and root markdown. A push that
   changes only those runs just the legs whose `doc_reads` moved; kit legs arrive declared, and a leg of
   your own runs every time until you give it a `doc_reads` list in your manifest.
+- **Optional, to land on the scoped bar and run the full bar after the merge**: declare
+  `GATE_POST_MERGE=local` or `GATE_POST_MERGE=ci` in `.githooks/gate-env.sh` and commit it. A push
+  then lands on the bar the boundary decides, and the full bar runs on the landed sha afterwards. Its
+  red is published as `refs/gov/bar-red` on your remote and forces the full bar on every later landing
+  until a full green descends from it. What each part asks of you:
+
+  | To get | Declare | Where |
+  |---|---|---|
+  | the lag counted in first-parent landings, a push whose tree already carries a recorded green running no bar, and a full bar after a red re-running only what failed or moved | nothing: `govkit update` | — |
+  | the green of your own wrapper bar recorded, at the push boundary and at the unattended close | nothing: both record it | — |
+  | one bar per machine, for a bar that is not the runner | enter it through `<prefix>/run-gates/run-gates.sh --hold -- <your bar>`, or have the bar script re-exec itself through that | your bar script |
+  | the post-merge full bar, its binding red, and the unattended close landing on the scoped bar | `GATE_POST_MERGE=local`, where the lander starts it on the landing machine, or `GATE_POST_MERGE=ci`, where remote CI runs it; committed | `.githooks/gate-env.sh` |
+  | remote CI running it | a job that runs `<prefix>/run-gates/post-merge.sh <sha>` on every push to the default branch, with a token that can push `refs/gov/*` | your CI workflow |
+  | the unattended close landing without a full bar | relaxing any rule of your own that demands a full bar per unattended landing; this kit does not change it for you | your charter |
 
 **Also copy, if you want the gates this repo runs on itself** (each is a leg, none is wired for you):
 
@@ -833,7 +885,7 @@ adopter who unwires one keeps it unwired, and `check-wiring.sh` reports it. A de
 An opt-in hook the target declined, as memory-recall's `recall-opened.js`, lands its fragment and
 is reported `not wired`, never refused. The manual steps below are for a project wiring by hand.
 
-**Concurrency guard (recommended for ANY project that fans out `Workflow` agents — playbook §8):**
+**Concurrency guard (recommended for ANY project that fans out `Workflow` agents — the charter's `[bound]`):**
 - Copy `<prefix>/hooks/agent-cap.js` (+ its `.test.sh` sibling) into the project **under the same kit
   prefix as your other kits** — `<project>/<prefix>/hooks/`. **NOT `<project>/.claude/hooks/`**, which this runbook prescribed until
   TOOL-dRetiredFork-14/21 withdrew that destination: the wiring check now expects the hook beside
@@ -1343,7 +1395,15 @@ row's commit, and on `--write` that is a finding. `check` grades a file that dif
 recorded hash through your own clean filter, so a `core.autocrlf=true` checkout counts `eol-only`
 rather than reporting a mismatch. A rollback also restores what the kit's `[[regenerate]]` argv
 re-rendered (its `rendered` and `generated` rows, and any path that block's optional `writes` list
-names), and names any path it wrote that no snapshot covered. The per-kit version delta reads the
+names), and names any path it wrote that no snapshot covered. When the render stands, `update
+--write` re-measures each `rendered` row from the bytes it landed, so the row's `sha256`, `oid`,
+`commit` and `version`, and its `install.sums` line, name the file you hold. A rendered row whose
+render did not run, refused, stopped at an accepted outcome without rendering, or was rolled back
+keeps its record and prints a `KEPT` line saying why, and
+`rendered receipts: <n> re-measured · <m> kept` counts both. A `[[hole]]` whose probe fails
+before the render prints `probes undischarged before the render` and is probed again after it; only
+a hole still failing then prints `is undischarged`, and one the render discharged says so. The
+per-kit version delta reads the
 constant from your own copy of the kit's version file. A gate leg your runner already carries with
 gov's own resolved argv is `claimed` rather than refused.
 
@@ -2013,12 +2073,20 @@ a `{kit}` token and both the writer and the checker expand it against the fragme
   re-run `--scaffold`; the cache invalidates itself on the resolved conf, so no manual purge is needed.
 
 - **Precedence on any conflict:** `CLAUDE.md` > manifest > skill — follow the winner, fix the loser.
-- **Pull upstream improvements:** the playbook carries `governance-template: vN.N`; re-pull by diffing your
-  filled copy against `<gov>/coding-governance-agents.template.md` per §-body (ignore filled
-  placeholders + the deleted Customize block) — a re-pull carries the v2.2 §1 manifest lines (DoD
-  write-back + Landing reconcile exception) into instantiated playbooks. The manifest carries its own
-  `kickoff-manifest: vN.N`. The `memory-tree/` scripts are identical across repos — copy the newer
-  versions in wholesale.
+- **Pull upstream improvements:** the charter carries `governance-template: vN.N`. `govkit update`
+  refreshes the engine and its declarations and re-renders the region from the template you HAVE
+  (unless GOVKIT_RERENDER=0): the template is a seed it never rewrites, and it reports
+  `reseed-available` when gov's has moved. To take a new template version, copy
+  `<gov>/coding-governance-agents.template.md` over the file `playbook_path` names, then re-render;
+  until you do, an older template still renders and the render notes its marker. The manifest
+  carries its own `kickoff-manifest: vN.N`. The `memory-tree/` scripts are identical across repos —
+  copy the newer versions in wholesale.
+  **v4.1 (2026-10-09), the first v4 release, REPLACES the charter's shape:** sections §0 to §16 are gone. Section 1 is
+  one-line practices, each with a handle such as `[gate]`; section 2 is the adopter's
+  `[charter] adopter_rules`; section 3 is generated. Every v3.5 rule's destination is the ledger in
+  `memory/builds/aDistilledCharter/` in gov. Cite a rule by its handle or by the guide or gate that
+  owns it, never by a section number. Take the fleet's node tags per §2 "Nodes". Snapshot of the
+  prior release: `memory/archive/coding-governance-agents.template-v-3-5.md`.
   **v2.7 (2026-08-11) DELETES text you may already hold:** companion §1's unattended block is now a
   single pointer at `<MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md`, and §8's restatement of the §1
   landing rule is a pointer too. Both were paraphrases of documents the kits install; re-pull §8 and

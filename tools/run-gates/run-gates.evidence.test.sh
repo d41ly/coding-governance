@@ -12,6 +12,10 @@
 # greps the runner) and never executes run-gates.sh. Executing the real runner in place would re-run
 # the whole bar recursively and clobber the live gate-last-summary.txt mid-run, so every case here
 # drives it through GATE_LEGS with its own scratch GIT_DIR.
+#
+# It also carries the post-merge bar's arms (TOOL-aFrugalTurnstile-6 AC1-AC10, between the
+# `post-merge arms` markers near the end): a bare remote and a clone, the kit's `post-merge.sh` run on
+# landed red and green commits, and the remote ref, the two records and the refusals read back.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
@@ -144,6 +148,10 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 LIB_DIR=$(resolve_kit_dir "$DC_PY" lib resolve-python.sh "$HERE") || exit 2
 LIB="${LIB_DIR##*/}"
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+# THE HOST TURNSTILE IS THIS SUITE'S OWN (TOOL-aFrugalTurnstile-5 S7): on the host default a fixture bar
+# queues behind every real bar, and inside a real bar's leg it nests and never holds, which AC14's
+# `queued_from held` control would read as the turnstile not running.
+export GATE_TURNSTILE_DIR="$tmp/gate-turnstile"
 # THE MEMORY PAUSE IS OFF for every bar here (TOOL-aGraftedHelix-7): the shipped table turns it on and
 # it reads the HOST's memory, so a box above its threshold would narrow these bars' pools and move the
 # census and timing arms for a reason that is the box's. The canary drives the pause over fixtures.
@@ -153,7 +161,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=208
+FLOOR_ASSERTIONS=234
+# MERGED 208 / 141 -> 234 at the reconcile with origin/main fcba0600 (TOOL-aSparedSpawn-32): base 115,
+# plus this branch's 93, plus main's 26.
 # RAISED 163 -> 208 by TOOL-aSparedSpawn-13 and -16: unit 13's reuse-cache arms, forty-one assertions net
 # of the six they replaced, never counted when they landed; and unit 16's three AC12 assertions and
 # AC17's one. Counted one per `ok … || nope` pair; the executed total is owed at VERIFYING.
@@ -161,6 +171,10 @@ FLOOR_ASSERTIONS=208
 # RAISED 131 -> 151 by TOOL-aSparedSpawn-4: the worker-builtin arms, AC1 to AC4, AC6 and AC7, twenty assertions.
 # RAISED 129 -> 131 by TOOL-aSparedSpawn-3: the dispatch-prior arms, AC5 and AC6, one assertion each.
 # RAISED 115 -> 129 by TOOL-aSparedSpawn-1: the content-keyed reuse arms, AC1 to AC6, fourteen assertions.
+# RAISED 138 -> 141 by TOOL-aFrugalTurnstile-17: a dirty-tree wrapper, a RED-verdict runner, a HEAD-moving bar.
+# RAISED 136 -> 138 by TOOL-aFrugalTurnstile-14: a moved tree writes no full row, and lineage reuses none.
+# RAISED 116 -> 136 by TOOL-aFrugalTurnstile-6: the post-merge bar's twenty assertions.
+# RAISED 115 -> 116 by TOOL-aFrugalTurnstile-1: the control stamp's `manifest` key.
 # MERGED 112 / 87 -> 115 at the reconcile with origin/main 290d0d2d5: base 84, plus this branch's 28, plus main's 3.
 # RAISED 110 -> 112 by TOOL-aGraftedHelix-7: AC10's two assertions over a reading taken during a memory pause.
 # RAISED 84 -> 87 by TOOL-dThriftyLanding-2: the shared-stamp control and its two assertions.
@@ -453,6 +467,11 @@ if [ -f "$REC_GD/gate-full-green" ]; then
   grep -q "^manifest_blob	$blob$" "$REC_GD/gate-full-green" \
     && ok "the stamp's manifest_blob is the hash of the manifest THAT RUN READ" \
     || { nope "the stamp's manifest_blob does not match the manifest the run read"; sed 's/^/      /' "$REC_GD/gate-full-green"; }
+  # WHICH manifest, repo-relative (TOOL-aFrugalTurnstile-1 AC6): the pre-push hook refuses a record
+  # whose `manifest` is not the kit sibling, so an absolute or `./`-prefixed spelling costs a full bar.
+  [ "$(awk -F'\t' '$1=="manifest"{print $2}' "$REC_GD/gate-full-green")" = "${PFX}gate-legs.json" ] \
+    && ok "the stamp's manifest names the kit sibling ${PFX}gate-legs.json, repo-relative" \
+    || { nope "the stamp's manifest is not ${PFX}gate-legs.json"; sed 's/^/      /' "$REC_GD/gate-full-green"; }
   stamp_before=$(cat "$REC_GD/gate-full-green")
   # a RED run must neither write nor UPDATE it — the arm that distinguishes the two
   printf '#!/usr/bin/env bash\necho boom\nexit 3\n' > "$REC_T/fx/a.sh"
@@ -725,9 +744,10 @@ rec_legs '[ {"name": "one", "argv": ["bash", "fx/a.sh"]}, {"name": "two", "argv"
 rc=$(rec_run GATE_FULL=1)
 cn_v0=$(grep '^gates ' "$REC_OUT")
 # AC6 rides this control run: the ledger block's read of a `.leg` row takes field 7 alone.
-[ "$(grep -c . "$REC_GD/gate-ledger.tsv" 2>/dev/null)" = 2 ] && [ -z "$(awk -F'\t' 'NF != 5' "$REC_GD/gate-ledger.tsv" 2>/dev/null)" ] \
-  && ok "AC6 every gate-ledger row stays five fields, so no key absorbed the eighth" \
-  || { nope "AC6 the ledger lost its five-field shape"; cat -A "$REC_GD/gate-ledger.tsv" 2>/dev/null | sed 's/^/      /'; }
+# Nine fields since TOOL-aFrugalTurnstile-4 S1 added run, full, manifest_blob and head after ended-at.
+[ "$(grep -c . "$REC_GD/gate-ledger.tsv" 2>/dev/null)" = 2 ] && [ -z "$(awk -F'\t' 'NF != 9' "$REC_GD/gate-ledger.tsv" 2>/dev/null)" ] \
+  && ok "AC6 every gate-ledger row stays nine fields, so no key absorbed the eighth" \
+  || { nope "AC6 the ledger lost its nine-field shape"; cat -A "$REC_GD/gate-ledger.tsv" 2>/dev/null | sed 's/^/      /'; }
 mkdir -p "$tmp/ps-fail" "$tmp/ps-nocol" "$tmp/ps-noself"
 printf '#!/bin/sh\nexit 1\n' > "$tmp/ps-fail/ps"
 printf '#!/bin/sh\necho "  UID  TTY  STIME COMMAND"\necho "  u    ?    10:00 bash fx/a.sh"\n' > "$tmp/ps-nocol/ps"
@@ -1039,8 +1059,9 @@ grep -q '^GATE reuse pb' "$REC_OUT" && ok "control: the green sibling WAS reused
                                     || nope "nothing was reused, so the red arm proves nothing"
 ru_done
 
-# REUSE DEFEATS THE FULL-GREEN STAMP (AC8). This is the join the push boundary rests on: a stamp must
-# never be able to describe a run that copied a verdict instead of earning it.
+# OPT-IN REUSE DEFEATS THE FULL-GREEN STAMP (AC8). This is the join the push boundary rests on: a stamp
+# must never describe a run that copied a verdict no full run earned. The `lineage` mode, whose reuses
+# a full run on a clean tree did earn, is the one exception, and its arms follow the profiler's below.
 ru_repo
 ru_run >/dev/null
 [ -f "$RU_GD/gate-full-green" ] && ok "control: the earning run stamped a full green" \
@@ -1410,6 +1431,132 @@ if [ -f "$ROOT/${PFX}${KIT}/profile_bar.py" ]; then
 else
   ok "no profiler ships beside the runner here, so its reuse grammar is not gradeable (stated)"
 fi
+
+# =================================================================================================
+# LINEAGE REUSE (TOOL-aFrugalTurnstile-4). `GATE_REUSE=lineage` reuses only a row that a FULL run on a
+# CLEAN tree earned, on this manifest blob, at an ancestor of HEAD, and a run whose every reuse is of
+# that kind may still stamp. The scratch is ru_repo's plus an unguarded leg `pu`, which writes the
+# GATE_REUSE it sees into the git dir, and a `pb` that stays red until `gb/f` says fixed.
+# EVERY REFUSAL ARM CARRIES ITS CONTROL ON THE SAME LEDGER: it is saved before the lineage run and put
+# back before a GATE_REUSE=1 run, which must reuse `pa`. Without that, a key that never matched would
+# pass the refusal arm as well as the lineage term it names.
+build_lin_repo() {
+  ru_repo || return 1
+  printf '#!/usr/bin/env bash\ngrep -q fixed gb/f\n' > "$RU_T/fx/b.sh"
+  printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_REUSE-unset}" > .git/reuse-leak\n' > "$RU_T/fx/u.sh"
+  echo broken > "$RU_T/gb/f"
+  printf '%s\n' '[' \
+    '  {"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
+    '  {"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]},' \
+    '  {"name": "pu", "argv": ["bash", "fx/u.sh"]}' \
+    ']' > "$RU_T/${PFX}gate-legs.json"
+  ( cd "$RU_T" && git add -A && git commit -qm lineage && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+}
+write_lin_fix() { echo fixed > "$RU_T/gb/f"; ( cd "$RU_T" && git add -A && git commit -qm fix ) >/dev/null 2>&1; }
+read_lin_header() { awk -F'\t' -v k="$1" '$1 == k { print $2 }' "$RU_GD/gate-run/$(cat "$RU_GD/gate-run/current" 2>/dev/null)/header" 2>/dev/null; }
+read_lin_stamp() { awk -F'\t' '$1 == "reused" { print $2 }' "$RU_GD/gate-full-green" 2>/dev/null; }
+check_lin_control() { # <AC label> — restore the saved ledger and prove GATE_REUSE=1 reuses pa from it
+  cp "$tmp/ru.led" "$RU_GD/gate-ledger.tsv"; ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+  grep -q '^GATE reuse pa  ' "$REC_OUT" && ok "$1 control: the same ledger under GATE_REUSE=1 reuses pa, so the key matched" \
+                                        || nope "$1 control: GATE_REUSE=1 did not reuse pa either, so the refusal above proves nothing"
+}
+
+# AC1, AC2, AC8 and AC6 share one scratch: the red full run, the fix, the lineage run, the opt-in run.
+build_lin_repo || { echo "evidence-test: cannot build the lineage scratch"; exit 2; }
+ru_run GATE_FULL=1 >/dev/null
+ru_bad=$(awk -F'\t' -v r="$(read_lin_header run_id)" -v m="$(read_lin_header manifest_blob)" -v h="$(cd "$RU_T" && git rev-parse HEAD)" \
+  'NF != 9 || $6 != r || $7 != "1" || $8 != m || $9 != h' "$RU_GD/gate-ledger.tsv" 2>/dev/null)
+[ "$(grep -c . "$RU_GD/gate-ledger.tsv" 2>/dev/null)" = 3 ] && [ -n "$(read_lin_header run_id)" ] && [ -z "$ru_bad" ] \
+  && ok "AC1 a full run on a clean tree writes nine-field rows naming its run, full 1, its manifest_blob and its head" \
+  || { nope "AC1 the ledger rows do not carry the run, full, manifest_blob and head fields"; cat -A "$RU_GD/gate-ledger.tsv" 2>/dev/null | sed 's/^/      /'; }
+write_lin_fix; rm -f "$RU_GD/gate-full-green"
+ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+grep -q '^GATE reuse pa  ' "$REC_OUT" && grep -q '^GATE ok    pb$' "$REC_OUT" && grep -q '^GATE ok    pu$' "$REC_OUT" \
+  && [ "$(read_lin_stamp)" = 1 ] \
+  && ok "AC2 after a red full run and a fix, a lineage run reuses pa, runs pb and pu, and stamps reused 1" \
+  || { nope "AC2 the lineage run after a fix did not reuse pa alone and stamp reused 1 (stamp '$(read_lin_stamp)')"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
+[ "$(cat "$RU_GD/reuse-leak" 2>/dev/null)" = unset ] && [ "$(read_lin_header reuse)" = lineage ] \
+  && ok "AC8 a leg never inherits the reuse mode, and the header records reuse lineage" \
+  || nope "AC8 the leg saw '$(cat "$RU_GD/reuse-leak" 2>/dev/null)' and the header reuse reads '$(read_lin_header reuse)'"
+rm -f "$RU_GD/gate-full-green"
+ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+grep -q '^GATE reuse pa  ' "$REC_OUT" && [ ! -f "$RU_GD/gate-full-green" ] \
+  && ok "AC6 over lineage-qualifying rows, GATE_REUSE=1 reuses and still writes no full green" \
+  || nope "AC6 the opt-in run did not reuse pa, or it stamped a full green"
+touch "$RU_T/untracked"; ru_run GATE_FULL=1 >/dev/null
+[ "$(grep -c . "$RU_GD/gate-ledger.tsv" 2>/dev/null)" = 3 ] && [ -z "$(awk -F'\t' '$7 != ""' "$RU_GD/gate-ledger.tsv" 2>/dev/null)" ] \
+  && ok "AC1 a full run over an untracked file writes every row with an empty full" \
+  || nope "AC1 a dirty full run wrote a row with full set"
+ru_done
+
+# AC3: rows earned WITHOUT the full flag are not lineage-qualifying. The touch commit makes every leg
+# execute on the earning run, so each one has a row.
+build_lin_repo
+echo x2 > "$RU_T/ga/f"; echo broken2 > "$RU_T/gb/f"; ( cd "$RU_T" && git add -A && git commit -qm touch ) >/dev/null 2>&1
+ru_run >/dev/null; write_lin_fix; cp "$RU_GD/gate-ledger.tsv" "$tmp/ru.led"
+ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+grep -q '^GATE reuse ' "$REC_OUT" && nope "AC3 lineage reused a row a run without the full flag earned" \
+                                  || ok "AC3 lineage reuses nothing from rows with an empty full"
+check_lin_control AC3
+ru_done
+
+# AC4: a row earned on another manifest blob.
+build_lin_repo
+ru_run GATE_FULL=1 >/dev/null; write_lin_fix
+sed 's#"guard": \["gb/"\]},#"guard": ["gb/"]}, {"name": "pd", "argv": ["bash", "fx/a.sh"], "guard": ["gd/"]},#' \
+  "$RU_T/${PFX}gate-legs.json" > "$tmp/ru.legs" && cp "$tmp/ru.legs" "$RU_T/${PFX}gate-legs.json"
+( cd "$RU_T" && git add -A && git commit -qm leg4 ) >/dev/null 2>&1; cp "$RU_GD/gate-ledger.tsv" "$tmp/ru.led"
+ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+grep -q '^GATE ok    pd$' "$REC_OUT" || nope "AC4 fixture: the fourth leg did not run, so the manifest did not move"
+grep -q '^GATE reuse ' "$REC_OUT" && nope "AC4 lineage reused a row earned on another manifest blob" \
+                                  || ok "AC4 lineage reuses nothing once the manifest blob moved"
+check_lin_control AC4
+ru_done
+
+# AC5: a row whose head is a SIBLING of HEAD, with the same ga/ bytes and the same base.
+build_lin_repo
+ru_first=$(cd "$RU_T" && git rev-parse HEAD)
+echo sib > "$RU_T/other"; ( cd "$RU_T" && git add -A && git commit -qm sibling ) >/dev/null 2>&1
+ru_run GATE_FULL=1 >/dev/null
+( cd "$RU_T" && git reset -q --hard "$ru_first" ) >/dev/null 2>&1; write_lin_fix; cp "$RU_GD/gate-ledger.tsv" "$tmp/ru.led"
+ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+grep -q '^GATE reuse ' "$REC_OUT" && nope "AC5 lineage reused a row whose head is not an ancestor of HEAD" \
+                                  || ok "AC5 lineage reuses nothing from a sibling's rows"
+check_lin_control AC5
+ru_done
+
+# AC7: an impure leg runs under lineage, and the run still stamps over the two legs it reused.
+build_lin_repo
+sed 's#"guard": \["ga/"\]}#"guard": ["ga/"], "impure": "reads a remote"}#' "$RU_T/${PFX}gate-legs.json" > "$tmp/ru.legs" \
+  && cp "$tmp/ru.legs" "$RU_T/${PFX}gate-legs.json"
+( cd "$RU_T" && git add -A && git commit -qm impure && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+write_lin_fix; ru_run GATE_FULL=1 >/dev/null; rm -f "$RU_GD/gate-full-green"
+ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+grep -q '^GATE ok    pa$' "$REC_OUT" && grep -q '^GATE reuse pb  ' "$REC_OUT" && grep -q '^GATE reuse pu  ' "$REC_OUT" \
+  && [ "$(read_lin_stamp)" = 2 ] \
+  && ok "AC7 lineage runs the impure pa, reuses pb and pu, and stamps reused 2" \
+  || { nope "AC7 lineage over an impure leg did not run it and stamp reused 2 (stamp '$(read_lin_stamp)')"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
+ru_done
+
+# TOOL-aFrugalTurnstile-14: a FULL run on a clean tree whose leg `pu` edits tracked `m` mid-bar (once,
+# while the git-dir flag exists) writes no `full` 1 row, and a lineage run on the restored tree reuses
+# none of its rows and so stamps no full green from reuse.
+build_lin_repo
+echo m > "$RU_T/m"; echo fixed > "$RU_T/gb/f"
+printf '#!/usr/bin/env bash\nif [ -f .git/move-once ]; then rm -f .git/move-once; echo moved >> m; fi\n' > "$RU_T/fx/u.sh"
+( cd "$RU_T" && git add -A && git commit -qm moving && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+touch "$RU_GD/move-once"; ru_run GATE_FULL=1 >/dev/null
+[ -n "$(cd "$RU_T" && git status --porcelain -- m)" ] || nope "AC1 fixture: pu did not edit m, so the tree never moved"
+[ "$(grep -c . "$RU_GD/gate-ledger.tsv" 2>/dev/null)" = 3 ] && [ -z "$(awk -F'\t' '$7 != ""' "$RU_GD/gate-ledger.tsv" 2>/dev/null)" ] \
+  && ok "AC1 (TOOL-14) a full run whose tree moved mid-bar writes every row with an empty full" \
+  || { nope "AC1 (TOOL-14) a full run whose tree moved wrote a row with full set"; cat -A "$RU_GD/gate-ledger.tsv" 2>/dev/null | sed 's/^/      /'; }
+( cd "$RU_T" && git checkout -q -- m ) >/dev/null 2>&1; rm -f "$RU_GD/gate-full-green"
+ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+! grep -q '^GATE reuse ' "$REC_OUT" && [ "$(read_lin_stamp)" != 1 ] && [ "$(read_lin_stamp)" != 2 ] && [ "$(read_lin_stamp)" != 3 ] \
+  && ok "AC2 (TOOL-14) lineage on the restored tree reuses none of the moved run's rows and stamps no reuse" \
+  || { nope "AC2 (TOOL-14) lineage reused a moved run's row (stamp '$(read_lin_stamp)')"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
+ru_done
+rm -f "$tmp/ru.led" "$tmp/ru.legs"
 
 # =================================================================================================
 # THE ADMISSION RULE (TOOL-aLeakedHandle-2). `derive-ceilings.py` built its evidence from `ok` rows
@@ -2053,6 +2200,177 @@ sb_c=""; IFS= read -r sb_c < "$SB_U/.git/gate-run/current"
   || nope "AC7 the bare-rev-parse variant did not read HEAD: the unborn arm proves nothing"
 git -C "$SB_T" worktree remove --force "$SB_K/wt" >/dev/null 2>&1
 rm -rf "$SB_T" "$SB_K" "$SB_U"
+
+# --- THE POST-MERGE BAR (TOOL-aFrugalTurnstile-6 AC1-AC10) -----------------------------------------
+# A bare remote and a clone carrying this kit's runner, its post-merge script and a one-leg manifest
+# whose leg reads `verdict.txt`. c1 is green, c2 red, c3 green, each a child of the one before, all
+# landed. Remotes are named through variables; the turnstile is this suite's own, exported above.
+# >>> post-merge arms
+PM_T=$(mktemp -d); PM_B="$PM_T/b.git"; PM_B2="$PM_T/b2.git"; PM_C="$PM_T/c"; PM_K="${PFX}${KIT}"
+PM_R=up; PM_R2=second; PM_OUT="$PM_T/out"; PM_PROBE="$PM_T/probe"; PM_REF=refs/gov/bar-red
+mkdir -p "$PM_C/$PM_K"
+cp "$ROOT/$PM_K/run-gates.sh" "$ROOT/$PM_K/gate-fingerprint.sh" "$ROOT/$PM_K/gate-profiles.txt" \
+   "$ROOT/$PM_K/lib-attribute.sh" "$ROOT/$PM_K/post-merge.sh" "$PM_C/$PM_K/" \
+  || { echo "evidence-test: cannot copy the kit for the post-merge arms"; exit 2; }
+git init -q --bare -b main "$PM_B" && git init -q --bare -b main "$PM_B2" \
+  || { echo "evidence-test: cannot make the post-merge remotes"; exit 2; }
+# `core.autocrlf false`: the scratch worktree is a fresh CHECKOUT, and a host-wide autocrlf would hand
+# the bar CRLF scripts the fixture never wrote (measured on node a: every bar red on a `\r`).
+( cd "$PM_C" && git init -q -b main . && git config user.email pm@test.invalid && git config user.name pm-test \
+    && git config core.autocrlf false && git remote add "$PM_R" "$PM_B" ) >/dev/null 2>&1 \
+  || { echo "evidence-test: cannot make the post-merge clone"; exit 2; }
+printf '%s\n' '[' '  {"name": "verdict", "argv": ["bash", "-c", "cat verdict.txt; grep -qx green verdict.txt"]}' ']' \
+  > "$PM_C/${PFX}gate-legs.json"
+printf '#!/usr/bin/env bash\n{ env; git rev-parse HEAD; pwd; } > "$PM_PROBE"\n' > "$PM_C/bar.sh"
+pm_commit() { # verdict word · [gate-env text, printf-interpreted] -> prints the new sha, landed on main
+  printf '%s\n' "$1" > "$PM_C/verdict.txt"
+  mkdir -p "$PM_C/.githooks"
+  if [ -n "${2:-}" ]; then printf "$2" > "$PM_C/.githooks/gate-env.sh"; else rm -f "$PM_C/.githooks/gate-env.sh"; fi
+  ( cd "$PM_C" && git add -A && git commit -qm "$1" && git push -q "$PM_R" HEAD:main \
+      && git symbolic-ref "refs/remotes/$PM_R/HEAD" "refs/remotes/$PM_R/main" && git rev-parse HEAD ) 2>/dev/null
+}
+pm_run() { ( cd "$PM_C" && env -u GATE_FULL -u GATE_JOBS -u GATE_PROFILES -u GOV_REMOTE PM_PROBE="$PM_PROBE" ${PM_X:-} \
+               bash "$PM_K/post-merge.sh" "$@" >"$PM_OUT" 2>&1; echo $? ); }
+pm_key() { awk -F'\t' -v k="$2" '$1 == k { print $2; exit }' "$1" 2>/dev/null; }
+pm_red() { git ls-remote "${1:-$PM_B}" "$PM_REF" 2>/dev/null | cut -f1; }
+pm_show() { sed 's/^/      /' "$PM_OUT"; }
+PM_GD="$PM_C/.git"; PM_REC="$PM_GD/gate-post-merge"
+pm_c1=$(pm_commit green); pm_c2=$(pm_commit red); pm_c3=$(pm_commit green)
+[ -n "$pm_c1" ] && [ -n "$pm_c2" ] && [ -n "$pm_c3" ] || { echo "evidence-test: cannot land the post-merge commits"; exit 2; }
+
+# AC1 — a red landing publishes the ref, records RED pushed, and its run record survives the worktree.
+pm_rc=$(pm_run "$pm_c2"); pm_id=$(pm_key "$PM_REC" run_id)
+[ "$pm_rc" = 1 ] && [ "$(pm_red)" = "$pm_c2" ] && [ "$(pm_key "$PM_REC" verdict)" = RED ] && [ "$(pm_key "$PM_REC" published)" = pushed ] \
+  && ok "AC1 a red post-merge exits 1, refs/gov/bar-red names c2, and gate-post-merge reads verdict RED, published pushed" \
+  || { nope "AC1 a red post-merge did not publish (rc=$pm_rc, ref=$(pm_red))"; pm_show; }
+[ -n "$pm_id" ] && grep -rqx red "$PM_GD/gate-run/$pm_id" 2>/dev/null && ! git -C "$PM_C" worktree list | grep -q 'gate-pm\.' \
+  && ok "AC1 gate-run/<run_id>/ in the common dir holds the failing leg's output after the scratch worktree is gone" \
+  || { nope "AC1 the run record went with the worktree, or the worktree survived (id=$pm_id)"; git -C "$PM_C" worktree list | sed 's/^/      /'; }
+
+# AC2 — a green descendant clears it and writes D3's record, by post-merge.
+pm_rc=$(pm_run "$pm_c3"); git ls-remote --exit-code "$PM_B" "$PM_REF" >/dev/null 2>&1; pm_lr=$?
+[ "$pm_rc" = 0 ] && [ "$pm_lr" = 2 ] \
+  && ok "AC2 a green descendant exits 0 and git ls-remote --exit-code of refs/gov/bar-red exits 2" \
+  || { nope "AC2 the green did not clear the ref (rc=$pm_rc, ls-remote rc=$pm_lr)"; pm_show; }
+PM_BG="$PM_GD/gate-bar-green.shared"
+[ "$(cut -f1 "$PM_BG" 2>/dev/null | tr '\n' ' ')" = "sha tree bar bar_paths kind base selftests run_id by stamped " ] \
+  && [ "$(pm_key "$PM_BG" kind)" = full ] && [ "$(pm_key "$PM_BG" by)" = post-merge ] && [ "$(pm_key "$PM_BG" sha)" = "$pm_c3" ] \
+  && [ "$(pm_key "$PM_BG" bar)" = "bash $PM_K/run-gates.sh" ] \
+  && ok "AC2 gate-bar-green.shared carries exactly D3's keys, kind full, by post-merge, and the default bar string" \
+  || { nope "AC2 gate-bar-green.shared differs from D3's grammar"; sed 's/^/      /' "$PM_BG" 2>/dev/null; }
+[ -f "$PM_GD/gate-full-green.shared" ] && ! git -C "$PM_C" worktree list | grep -q 'gate-pm\.' \
+  && ok "AC2 the runner's gate-full-green.shared is present and no gate-pm. worktree is left" \
+  || nope "AC2 gate-full-green.shared is absent, or a gate-pm. worktree survived"
+
+# AC3 — a green that does not descend from the red keeps it.
+git -C "$PM_C" push -q "$PM_R" "$pm_c2:$PM_REF" 2>/dev/null
+pm_rc=$(pm_run "$pm_c1")
+[ "$pm_rc" = 0 ] && [ "$(pm_red)" = "$pm_c2" ] && [ "$(pm_key "$PM_REC" published)" = kept ] \
+  && ok "AC3 a green on c2's parent exits 0, the ref still names c2, and the record reads published kept" \
+  || { nope "AC3 a non-descendant green moved the ref (rc=$pm_rc, ref=$(pm_red))"; pm_show; }
+
+# AC4 — a red never moves the ref backwards.
+git -C "$PM_C" push -q -f "$PM_R" "$pm_c3:$PM_REF" 2>/dev/null
+pm_rc=$(pm_run "$pm_c2")
+[ "$pm_rc" = 1 ] && [ "$(pm_red)" = "$pm_c3" ] && [ "$(pm_key "$PM_REC" published)" = kept ] \
+  && ok "AC4 a red on c2 with the ref at c3 exits 1, keeps c3, and reads published kept" \
+  || { nope "AC4 the ref moved backwards (rc=$pm_rc, ref=$(pm_red))"; pm_show; }
+git -C "$PM_C" push -q "$PM_R" ":$PM_REF" 2>/dev/null
+
+# AC5 — a declared bar runs inside the hold verb, full, in the scratch worktree, with no reuse.
+pm_c4=$(pm_commit green 'GOV_GATE_CMD="bash bar.sh"\n'); rm -f "$PM_PROBE"
+pm_rc=$(PM_X="GATE_REUSE=lineage" pm_run "$pm_c4")
+[ "$pm_rc" = 0 ] && grep -qx 'GATE_FULL=1' "$PM_PROBE" 2>/dev/null && grep -q '^GATE_TURNSTILE_HOLDER=.' "$PM_PROBE" \
+  && ! grep -q '^GATE_REUSE=' "$PM_PROBE" && grep -qx "$pm_c4" "$PM_PROBE" && grep -q 'gate-pm\.[0-9]*$' "$PM_PROBE" \
+  && ok "AC5 the declared bar saw GATE_FULL=1, a holder, no GATE_REUSE, HEAD at the sha and a gate-pm. cwd" \
+  || { nope "AC5 the declared bar ran outside the hold verb, unfull, with reuse, or elsewhere (rc=$pm_rc)"; pm_show; }
+[ "$(pm_key "$PM_BG" bar)" = "bash bar.sh" ] \
+  && ok "AC5 the green record's bar reads bash bar.sh" || nope "AC5 the green record's bar reads '$(pm_key "$PM_BG" bar)'"
+
+# AC6 — a remote that rejects the ref fails the publication, loudly, and the record still lands.
+printf '#!/bin/sh\nwhile read o n r; do case "$r" in refs/gov/*) echo "no gov refs here"; exit 1 ;; esac; done\nexit 0\n' \
+  > "$PM_B/hooks/pre-receive"; chmod +x "$PM_B/hooks/pre-receive"; rm -f "$PM_REC"
+git -C "$PM_B" update-ref -d "$PM_REF" 2>/dev/null
+pm_rc=$(pm_run "$pm_c2")
+[ "$pm_rc" = 1 ] && grep -q 'post-merge: publish FAILED — .*rejected' "$PM_OUT" && [ "$(pm_key "$PM_REC" published)" = failed ] \
+  && [ -n "$(pm_key "$PM_REC" why)" ] \
+  && ok "AC6 a rejected publication exits 1, prints publish FAILED naming the rejection, and records published failed with a why" \
+  || { nope "AC6 a rejected publication was not reported or not recorded (rc=$pm_rc)"; pm_show; }
+rm -f "$PM_B/hooks/pre-receive"
+
+# AC7 — a commit that never landed is refused before any bar.
+( cd "$PM_C" && git checkout -q -b feat && printf 'x\n' > feat.txt && git add feat.txt && git commit -qm feat ) >/dev/null 2>&1
+pm_c5=$(git -C "$PM_C" rev-parse HEAD); git -C "$PM_C" checkout -q main 2>/dev/null; rm -f "$PM_PROBE"
+git -C "$PM_B" update-ref -d "$PM_REF" 2>/dev/null
+pm_rc=$(pm_run "$pm_c5")
+[ "$pm_rc" = 2 ] && grep -q 'post-merge: REFUSING' "$PM_OUT" && [ ! -f "$PM_PROBE" ] && [ -z "$(pm_red)" ] \
+  && ok "AC7 an unlanded commit exits 2 with REFUSING, no bar ran and no ref was pushed" \
+  || { nope "AC7 an unlanded commit was not refused before the bar (rc=$pm_rc)"; pm_show; }
+
+# AC8 — the export form is refused; the hook's accepted forms all read bash bar.sh.
+pm_c6=$(pm_commit green 'export GOV_GATE_CMD="bash bar.sh"\n'); rm -f "$PM_PROBE"
+pm_rc=$(pm_run "$pm_c6")
+[ "$pm_rc" = 2 ] && grep -q 'export GOV_GATE_CMD' "$PM_OUT" && [ ! -f "$PM_PROBE" ] \
+  && ok "AC8 export GOV_GATE_CMD= exits 2 naming the line, and no bar ran" \
+  || { nope "AC8 the export form was not refused (rc=$pm_rc)"; pm_show; }
+for pm_form in "GOV_GATE_CMD='bash bar.sh'\\n" 'GOV_GATE_CMD="bash bar.sh" # the bar\n' 'GOV_GATE_CMD="bash bar.sh"\r\n' \
+               'GOV_GATE_CMD=bash nothing.sh\nGOV_GATE_CMD="bash bar.sh"\n'; do
+  pm_c=$(pm_commit green "$pm_form"); rm -f "$PM_BG"
+  pm_rc=$(pm_run "$pm_c")
+  [ "$pm_rc" = 0 ] && [ "$(pm_key "$PM_BG" bar)" = "bash bar.sh" ] \
+    && ok "AC8 the accepted form $(printf '%q' "$pm_form") resolves to bash bar.sh" \
+    || { nope "AC8 the accepted form $(printf '%q' "$pm_form") resolved to '$(pm_key "$PM_BG" bar)' (rc=$pm_rc)"; pm_show; }
+done
+
+# TOOL-aFrugalTurnstile-17 AC1-AC3 — a wrapper bar that dirties the tree earns no green record, a
+# runner's exit 0 without verdict GREEN is RED, and a bar that moves the worktree's HEAD is refused.
+git -C "$PM_B" update-ref -d "$PM_REF" 2>/dev/null
+printf '#!/usr/bin/env bash\necho dirtied >> verdict.txt\n' > "$PM_C/dirty.sh"
+pm_c=$(pm_commit green 'GOV_GATE_CMD="bash dirty.sh"\n'); rm -f "$PM_BG"
+pm_rc=$(pm_run "$pm_c")
+[ "$pm_rc" = 0 ] && [ ! -f "$PM_BG" ] && grep -q 'no gate-bar-green.shared written .* not clean' "$PM_OUT" \
+  && ok "TOOL-17 AC1 a wrapper bar that edits a tracked file and exits 0 writes no gate-bar-green.shared and names the dirty tree" \
+  || { nope "TOOL-17 AC1 a dirty tree's green was recorded, or the decline is silent (rc=$pm_rc)"; pm_show; }
+git -C "$PM_C" push -q -f "$PM_R" "$pm_c1:$PM_REF" 2>/dev/null
+cp "$PM_C/$PM_K/run-gates.sh" "$PM_T/run-gates.real"
+printf '#!/usr/bin/env bash\nd=$(git rev-parse --absolute-git-dir)/gate-run/$GATE_RUN_ID; mkdir -p "$d"; printf "verdict\\tRED\\n" > "$d/verdict"\nexit 0\n' \
+  > "$PM_C/$PM_K/run-gates.sh"
+pm_c=$(pm_commit green); cp "$PM_T/run-gates.real" "$PM_C/$PM_K/run-gates.sh"; rm -f "$PM_BG"
+pm_rc=$(pm_run "$pm_c")
+[ "$pm_rc" = 1 ] && [ -n "$(pm_red)" ] && [ ! -f "$PM_BG" ] && grep -q 'does not read verdict GREEN — treating it as RED' "$PM_OUT" \
+  && ok "TOOL-17 AC2 a runner exiting 0 with verdict RED exits 1, refs/gov/bar-red stays, and no green record is written" \
+  || { nope "TOOL-17 AC2 a runner's exit 0 without verdict GREEN read as green (rc=$pm_rc, ref=$(pm_red))"; pm_show; }
+git -C "$PM_C" push -q "$PM_R" ":$PM_REF" 2>/dev/null
+printf '#!/usr/bin/env bash\ngit checkout -q --detach HEAD~1\n' > "$PM_C/mover.sh"
+pm_c=$(pm_commit green 'GOV_GATE_CMD="bash mover.sh"\n'); rm -f "$PM_BG"
+pm_rc=$(pm_run "$pm_c")
+[ "$pm_rc" = 2 ] && grep -q 'post-merge: REFUSING' "$PM_OUT" && [ "$(pm_key "$PM_REC" verdict)" = REFUSED ] && [ ! -f "$PM_BG" ] \
+  && ok "TOOL-17 AC3 a bar that moves the worktree's HEAD exits 2 with REFUSED and writes no green record" \
+  || { nope "TOOL-17 AC3 a bar that moved HEAD was not refused (rc=$pm_rc)"; pm_show; }
+
+# AC9 — two remotes and a detached HEAD: refused unless named, and --remote publishes there alone.
+git -C "$PM_B" update-ref -d "$PM_REF" 2>/dev/null
+( cd "$PM_C" && git remote add "$PM_R2" "$PM_B2" && git push -q "$PM_R2" main \
+    && git symbolic-ref "refs/remotes/$PM_R2/HEAD" "refs/remotes/$PM_R2/main" && git checkout -q --detach ) >/dev/null 2>&1
+pm_rc=$(pm_run "$pm_c2")
+[ "$pm_rc" = 2 ] && grep -q GOV_REMOTE "$PM_OUT" \
+  && ok "AC9 two remotes, a detached HEAD and no GOV_REMOTE exit 2 naming GOV_REMOTE" \
+  || { nope "AC9 the script chose a remote nobody named (rc=$pm_rc)"; pm_show; }
+pm_rc=$(pm_run "$pm_c2" --remote "$PM_R2")
+[ "$pm_rc" = 1 ] && [ "$(pm_red "$PM_B2")" = "$pm_c2" ] && [ -z "$(pm_red)" ] \
+  && ok "AC9 --remote second publishes the red on the second remote and the first shows none" \
+  || { nope "AC9 --remote did not publish on the named remote alone (rc=$pm_rc)"; pm_show; }
+git -C "$PM_C" checkout -q main 2>/dev/null
+
+# AC10 — no argument, or a sha that names nothing, is a usage refusal and runs no bar.
+pm_rc=$(pm_run)
+[ "$pm_rc" = 2 ] && grep -q 'post-merge: usage:' "$PM_OUT" && ! grep -q 'gate queue' "$PM_OUT" \
+  && ok "AC10 no argument exits 2 with a usage line and no bar" || { nope "AC10 no argument did not refuse (rc=$pm_rc)"; pm_show; }
+pm_rc=$(pm_run 0123456789abcdef0123456789abcdef01234567)
+[ "$pm_rc" = 2 ] && grep -q 'post-merge: usage:' "$PM_OUT" && ! grep -q 'gate queue' "$PM_OUT" \
+  && ok "AC10 a sha naming no commit exits 2 with a usage line and no bar" || { nope "AC10 an unknown sha did not refuse (rc=$pm_rc)"; pm_show; }
+rm -rf "$PM_T"
+# <<< post-merge arms
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "run-gates evidence: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }

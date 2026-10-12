@@ -999,7 +999,7 @@ arm "a family-less, tailed target in a units sub-folder is joined by its H1, not
 #      in a scratch repo: AC6's staged breaks, AC8's report line and --list rows, and AC1's hit as the
 #      report prints it. Each arm was observed RED on the checker before this join, which printed no
 #      claims line, carried no `scan_claims` and exited 0 over every fixture here.
-MAPKIT="$(git -C "$HERE" rev-parse --show-toplevel)/$CODEBASE_MAP_DIR"
+MAPKIT="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$CODEBASE_MAP_DIR"
 cat > "$base/claims-direct.py" <<'PYEOF'
 import importlib.util, os, sys
 P = sys.argv[3]   # the install prefix with its slash, handed in by the suite

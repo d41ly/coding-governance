@@ -177,7 +177,6 @@
       "--location-probes",
       "memory/project/location-probe-waivers.txt",
       ".",
-      ":!*.test.sh",
       ":!memory/"
     ],
     "chunk": "product",

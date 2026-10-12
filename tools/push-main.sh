@@ -32,6 +32,20 @@
 # this lander, which is every adopter, both paths say so in one line and land as before. What a mint
 # does NOT do: re-stamp the kickoff manifest, so a minted carrier on its watch line still reds C5.
 #
+# GENERATED OUTPUTS ARE REGENERATED HERE TOO (TOOL-aPrimedIndex-4). After the mint, both paths run
+# the run-gates kit's `regen.py --write` over the tree about to be pushed: a reconcile merge leaves
+# the `merge=ours` indexes stale, and the push bar refuses a stale declared output before its first
+# leg. `--prepare` folds what it moved into the prepared merge beside the mint; the attended landing
+# commits it as `regen: generated outputs onto <remote>/<branch> at <sha8> for <unit>`, `Pass: none`.
+# A failed write refuses the landing as a refused mint does. No regen.py beside this lander says so
+# in one line and lands as before. What it does NOT do: prove the result fresh -- the push bar's
+# preflight is that check, and a regeneration cannot fix a check red for another reason.
+# AFTER A LANDING (TOOL-aFrugalTurnstile-8). Both landing paths read `GATE_POST_MERGE` from the
+# gate-env file committed at the landed tip; `local` starts the run-gates kit's post-merge bar on that
+# tip, detached, and returns at once, logging to `<common-dir>/gate-post-merge-<sha8>.log` and
+# recording the start in `<common-dir>/gate-post-merge.start`; `ci` says remote CI owns it. What
+# this does NOT check: whether that bar ever finished, or what it published.
+#
 # WHY THE FLAGS EXIST — TOOL-dDerivedDocket-2. The attended path lands only from the primary tree
 # with the default branch checked out, and it pushes that branch, which every build on the node
 # shares. A run that is never on it therefore had to leave its own tree to land, and its landing
@@ -43,6 +57,9 @@
 # 3 an OBSERVATION failure: not a repository, an undeterminable default branch, an `ls-remote` or a
 # fetch that did not answer. Two codes and not one, because a driver reads them differently: a 2
 # says its own invocation is wrong and no retry will help, a 3 says the clone or the network is.
+# 4 the push LANDED UNGATED: git reported success and the hook left no allow record for the pushed
+# commit, so no bar certified what is now on the remote (TOOL-aSignalledHook-1). Retrying cannot
+# help, because the push already happened; the landing needs a bar and a decision.
 # The no-argument invocation keeps BASE's codes, its own exit 2 included.
 set -u
 
@@ -178,6 +195,11 @@ refusal="$gd/pre-push-refusal"
 # hook once it has vetted the bar and before it runs it, cleared by it on every run and by this script
 # before every push. The lander marker is written only when it reads `default` or `tracked`.
 barfile="$gd/pre-push-bar"
+# THE HOOK'S ALLOW RECORD (TOOL-aSignalledHook-1): `<pushed sha><TAB><gate run id>`, written by the
+# hook only at its one success exit on a default-branch push, cleared by it on every run and by this
+# script before every push. git's exit 0 is not a verdict: on Git for Windows a hook that dies by a
+# signal, KILL included, is read as success, and the push lands with no bar. Read by check_push_allow.
+allowfile="$gd/pre-push-allow"
 
 # The marker is a SOFT advisory guard: a SIGKILL/OOM/power-loss during the gate can leak it (this
 # trap can't catch those). Worst case a later raw push skips reconcile-before-gate and wastes ONE
@@ -248,6 +270,11 @@ derive_push_failure() {  # -> refused | unreachable | unchanged | race on stdout
     head-moved)
       echo "push-main: the bar ran GREEN but HEAD moved while it ran, so the green does not describe the pushed tree — re-run push-main. ($msg)" >&2
       echo refused; return 0 ;;
+    signalled)
+      # TOOL-aSignalledHook-1: the hook was sent a signal, so a bar may have run and been stopped
+      # part-way. Nothing was pushed; whatever sent the signal decides whether to try again.
+      echo "push-main: the pre-push hook was sent a signal and refused, stopping any bar it had started, so nothing was pushed — re-run push-main when whatever stopped it is done. ($msg)" >&2
+      echo refused; return 0 ;;
     ?*)
       echo "push-main: pre-push refused the push ($tok) — a precondition; no leg ran: $msg" >&2
       echo refused; return 0 ;;
@@ -300,6 +327,30 @@ check_claim_push_clear() {  # -> 0 always, once no live lock holds this git dir 
 # only matches a double-quoted value read a DIFFERENT value than the reader did for any unquoted
 # or single-quoted declaration - one half honouring a key the other could not see. A subshell
 # source is the driver's exact semantics without polluting this script's namespace.
+# check_push_allow — after git reports a push successful, require the hook's allow record to name
+# the pushed commit (TOOL-aSignalledHook-1). Without it the push is on the remote and no bar
+# certified it: the hook was killed, and on Git for Windows a hook that dies by a signal reads as
+# success. The trap in the hook turns every catchable signal into a refusal, so what reaches this
+# line is a KILL or a TerminateProcess. It cannot be undone here, only refused the name `landed`:
+# no lander marker, a line saying what happened, and exit 4 from the caller. The lander's own EXIT
+# trap still clears its marker file.
+# THE PUSHED SHA AND THE REMOTE'S TIP ARE CAPTURED BEFORE THE PUSH and passed in, never re-read after
+# it: a commit landing in this tree during the upload would otherwise read as a push no hook allowed.
+# NOTHING PUSHED IS NOT UNGATED. When the remote already held the commit, git runs the hook with no ref
+# lines, the hook exits as `skip-nondefault` and writes no record, and git still exits 0; that
+# re-run of a landing that already happened is reported as such (closing review round 1).
+check_push_allow() {  # pushed sha · the remote's tip before the push -> 0 when the hook allowed it; else the UNGATED report and 1
+  local pushed=$1 was=$2 sha="" run=""
+  if [ "$pushed" = "$was" ]; then
+    echo "push-main: $remote/$def already held ${pushed:0:8} before this push, so nothing was pushed and no hook verdict is owed." >&2
+    return 0
+  fi
+  [ -f "$allowfile" ] && IFS=$'\t' read -r sha run < "$allowfile"
+  [ -n "$sha" ] && [ "$sha" = "$pushed" ] && return 0
+  echo "push-main: landed UNGATED — git reports ${pushed:0:8} pushed to $remote/$def, but the pre-push hook left no allow record for it${sha:+ (its record names ${sha:0:8})} in $allowfile. The hook was killed before it decided: on Git for Windows a hook that dies by a signal reads as success. The commit is on $remote and NO bar certified it; NOT writing the lander marker. Run the bar on $remote/$def and decide whether to keep it." >&2
+  return 1
+}
+
 write_lander_marker() {  # -> 1 when the push landed but the record could not be written
   local lm _gcd bar barpath barblob
   [ -f .unattended.conf ] || return 0
@@ -341,6 +392,74 @@ write_lander_marker() {  # -> 1 when the push landed but the record could not be
   if ! printf 'landed %s at %s by push-main bar %s %s %s\n' "$def" "$(git rev-parse HEAD)" "$bar" "$barpath" "$barblob" > "$_gcd/$lm"; then
     echo "push-main: pushed $def, but could not write the lander marker at $_gcd/$lm. The push SUCCEEDED and is not recorded." >&2
     return 1
+  fi
+  return 0
+}
+
+# THE POST-MERGE BAR, where the landed tip declares one (TOOL-aFrugalTurnstile-8, design D10). The
+# declaration is `GATE_POST_MERGE` in the gate-env file AS COMMITTED AT THE LANDED TIP, read by
+# `git show` and parsed by `read_policy_key`, a byte-identical copy of the pre-push hook's (the hook
+# ships verbatim and sources no kit; push-main.test.sh holds the pair). Never the working tree, never
+# R, never this environment: the bar that runs is the one the landed commit asks for.
+read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleaned; nothing when none assigns it
+  local line v="" hit=""
+  while IFS= read -r line || [ -n "$line" ]; do
+    line=${line%$'\r'}
+    case "$line" in "$2="*) v=${line#"$2="}; hit=1 ;; esac
+  done <<< "$1"
+  [ -n "$hit" ] || return 0
+  v=${v%%[[:space:]]#*}
+  while [ "${v% }" != "$v" ] || [ "${v%$'\t'}" != "$v" ]; do v=${v%?}; done
+  while [ "${v# }" != "$v" ]; do v=${v# }; done
+  case "$v" in
+    \"*\") v=${v#\"}; v=${v%\"} ;;
+    \'*\') v=${v#\'}; v=${v%\'} ;;
+  esac
+  printf '%s' "$v"
+}
+# `local` starts the run-gates kit's post-merge script on the landed tip, DETACHED: all three streams
+# redirected and under nohup, because a background job that keeps the lander's stdout makes every
+# `$(...)` capture of push-main wait for the whole bar. The start goes to stderr and to a key-per-line
+# record, `<common-dir>/gate-post-merge.start`; the log is per sha so a second landing cannot truncate
+# a bar still writing. `ci` and a value outside the set print one line and start nothing; undeclared
+# prints nothing. Always 0: the landing already happened, so a failure to start is a line, not a code.
+# WHAT THIS DOES NOT CHECK: whether the bar it started ever finished or published a verdict.
+run_post_merge() {  # -> 0 always; one stderr line whenever the landed tip declares anything
+  local tip blob pm py dir gcd log pid winpid
+  tip=$(git rev-parse HEAD 2>/dev/null) || return 0
+  blob=$(git show "$tip:.githooks/gate-env.sh" 2>/dev/null) || return 0
+  pm=$(read_policy_key "$blob" GATE_POST_MERGE)
+  case "$pm" in
+    '')    return 0 ;;
+    ci)    echo "push-main: post-merge bar — GATE_POST_MERGE=ci at ${tip:0:8}, so remote CI runs it; nothing started here." >&2
+           return 0 ;;
+    local) ;;
+    *)     echo "push-main: post-merge bar NOT started — GATE_POST_MERGE at ${tip:0:8} is '$pm', outside 'local ci'." >&2
+           return 0 ;;
+  esac
+  if ! py=$(resolve_python 2>/dev/null); then
+    echo "push-main: post-merge bar NOT started — no usable python launcher, so the run-gates kit could not be located. The landing stands." >&2
+    return 0
+  fi
+  # The FILE test, for check_merge_losses's reason: the resolver answers beside THIS script, `$top` is the cwd's.
+  if ! dir=$(resolve_kit_dir "$py" run-gates post-merge.sh "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/post-merge.sh" ]; then
+    echo "push-main: post-merge bar NOT started — no run-gates kit holding post-merge.sh beside this lander. The landing stands." >&2
+    return 0
+  fi
+  gcd=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || gcd=""
+  if [ -z "$gcd" ]; then
+    echo "push-main: post-merge bar NOT started — the git common dir could not be resolved. The landing stands." >&2
+    return 0
+  fi
+  log="$gcd/gate-post-merge-${tip:0:8}.log"
+  nohup "${BASH:-bash}" "$top/$dir/post-merge.sh" "$tip" --remote "$remote" </dev/null >"$log" 2>&1 &
+  pid=$!
+  winpid=$(cat "/proc/$pid/winpid" 2>/dev/null || true)
+  if printf 'sha\t%s\npid\t%s\nwinpid\t%s\nlog\t%s\nstarted\t%s\nby\tpush-main\n' \
+      "$tip" "$pid" "$winpid" "$log" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$gcd/gate-post-merge.start" 2>/dev/null; then
+    echo "push-main: post-merge bar started on ${tip:0:8} — pid $pid, log $log" >&2
+  else
+    echo "push-main: post-merge bar started on ${tip:0:8} — pid $pid, log $log; the start record could not be written." >&2
   fi
   return 0
 }
@@ -624,6 +743,52 @@ check_merge_losses() {  # R · T -> 1 when a merge in R..T loses a definition; 0
   return 0
 }
 
+# ---- GENERATED OUTPUTS, regenerated at the landing — TOOL-aPrimedIndex-4 -------------------------
+# `run_regen` runs the run-gates kit's `regen.py --write` over the WORKING TREE; the caller commits
+# what it wrote. Found the way the minter finds the deployer, from this script's own directory, and
+# the file test under the toplevel for the merge-loss check's reason: the kit can resolve beside
+# this lander while the tree being landed lacks the file. No python or no regen.py prints one line
+# and returns 0, and the push bar's preflight then grades the outputs. A stage that moved nothing is
+# not echoed. On a failed write or a refused declaration the verb's output goes to stderr and this
+# returns 1.
+run_regen() {  # -> 0 regenerated or announced-skipped · 1 a write failed or the declaration was refused
+  local py dir out rc
+  if ! py=$(resolve_python 2>/dev/null); then
+    echo "push-main: generated outputs were NOT regenerated — no usable python launcher; the push bar's preflight grades them."
+    return 0
+  fi
+  if ! dir=$(resolve_kit_dir "$py" run-gates regen.py "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/regen.py" ]; then
+    echo "push-main: generated outputs were NOT regenerated — no regen.py beside this lander; the push bar's preflight grades them."
+    return 0
+  fi
+  out=$("$py" "$top/$dir/regen.py" --write 2>&1); rc=$?
+  if [ "$rc" -eq 0 ]; then
+    printf '%s\n' "$out" | grep -v -e ' · moved: none$' || true
+    return 0
+  fi
+  echo "push-main: the generated outputs could NOT be regenerated (regen.py exit $rc):" >&2
+  printf '%s\n' "$out" | sed 's/^/  /' >&2
+  return 1
+}
+
+# `remove_new_untracked <snapshot>` cleans every untracked file the snapshot does not hold, the snapshot
+# being a sorted NUL-separated `git ls-files --others --exclude-standard -z` taken before `run_regen`.
+# The reset after a failed regeneration restores tracked files only, and a regeneration also CREATES
+# files (a new ledger shard, a render's temporary), which then dirtied the tree the next landing
+# requires clean (TOOL-aPrimedIndex-8). Both callers take the snapshot on a tree they required clean,
+# so every path cleaned is one the regeneration made. NUL-safe end to end; an unreadable state cleans
+# nothing.
+remove_new_untracked() {  # snapshot file -> nothing on stdout
+  local now
+  [ -f "${1:-}" ] || return 0
+  now=$(mktemp) || return 0
+  if git ls-files --others --exclude-standard -z > "$now" 2>/dev/null; then
+    LC_ALL=C sort -z -o "$now" "$now"
+    LC_ALL=C comm -z -13 "$1" "$now" | xargs -0 -r git clean -f -q -- >/dev/null 2>&1 || true
+  fi
+  rm -f "$now"
+}
+
 # ---- KIT VERSIONS, minted at the landing — TOOL-aMendedFleet-65 ----------------------------------
 # `run_minter <base> [<head>]` runs the deployer's `mint` verb, which writes the next version of every
 # kit whose shipped bytes moved in <base>..<head> with no bump dating the move, into the WORKING TREE;
@@ -737,6 +902,17 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     echo "push-main: the kit versions this landing owes could not be minted (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
     return 1
   fi
+  # REGENERATE INTO THE MERGE (TOOL-aPrimedIndex-4): after the mint, because a minted version can
+  # itself stale an output that stamps it; folded by the same rewrite, same parents and subject.
+  rgsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$rgsnap"
+  if ! run_regen; then
+    git reset -q --hard "$t" >/dev/null 2>&1 || true
+    remove_new_untracked "$rgsnap"; rm -f "$rgsnap"
+    git checkout "$branch" >/dev/null 2>&1 || true
+    echo "push-main: the generated outputs this landing owes could not be regenerated (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+    return 1
+  fi
+  rm -f "$rgsnap"
   if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
     git add -A
     if ! t=$(git commit-tree "$(git write-tree)" -p "$R" -p "$oldb" -m "$msg") || ! git update-ref --no-deref HEAD "$t"; then
@@ -771,7 +947,7 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
 
 # `--land`: push the prepared merge, and only it, as the default branch.
 cmd_land() {
-  local attempt R t rc cls
+  local attempt R t rc cls pushed
   attempt=1
   while [ "$attempt" -le "$max" ]; do
     R=$(resolve_tip) || exit 3
@@ -789,14 +965,19 @@ cmd_land() {
     check_claim_push_clear
     # The hook's verdict and the bar it vetted are cleared before every push, as the attended path
     # clears them, so a file an earlier push's hook wrote cannot be read as this one's answer.
-    rm -f "$refusal" "$barfile"
+    rm -f "$refusal" "$barfile" "$allowfile"
     echo "push-main: gating + pushing ${t:0:8} to $def (attempt $attempt/$max)..." >&2
     # HEAD, never refs/heads/<def>: the local default branch is shared by every build on this node,
     # and publishing it is the defect these flags close. Its output is SHOWN and never read (S2).
+    # THE SHA PUSHED, NOT THE PREPARED ONE (TOOL-aPrimedIndex-10): under in-place the close commits its
+    # records on the prepared merge, so HEAD is what the hook vets and names in its allow record.
+    pushed=$(git rev-parse --verify HEAD)
     git push "$remote" "HEAD:refs/heads/$def" >&2
     rc=$?
     if [ "$rc" -eq 0 ]; then
+      check_push_allow "$pushed" "$R" || exit 4
       write_lander_marker || exit 1
+      run_post_merge
       cls=landed
     else
       cls=$(derive_push_failure)
@@ -911,19 +1092,42 @@ while [ "$attempt" -le "$max" ]; do
     fi
   fi
 
+  # REGENERATE, on every attempt, after the mint (TOOL-aPrimedIndex-4): its own commit, named and
+  # trailered as the mint commit is, so the routed-commits leg and the pass reader read it alike.
+  rgsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$rgsnap"
+  if ! run_regen; then
+    git reset -q --hard HEAD >/dev/null 2>&1 || true
+    remove_new_untracked "$rgsnap"; rm -f "$rgsnap"
+    echo "push-main: the generated outputs this landing owes could not be regenerated (named above). Aborted (no push)." >&2
+    exit 1
+  fi
+  rm -f "$rgsnap"
+  if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
+    git add -A
+    regen_unit=$(read_mint_unit "$mt..HEAD")
+    if ! git commit -q --no-verify -m "regen: generated outputs onto $remote/$def at ${mt:0:8}${regen_unit:+ for $regen_unit}" -m "Pass: none"; then
+      echo "push-main: could not commit the regenerated outputs. Aborted (no push)." >&2
+      exit 1
+    fi
+  fi
+
   # The marker first, then the wait for a claim push in flight, then the clear (TOOL-aGraftedHelix-36
   # S10); the marker stays until the verdict files have been read.
   touch "$marker"
   check_claim_push_clear
-  rm -f "$refusal" "$barfile"
+  rm -f "$refusal" "$barfile" "$allowfile"
   echo "push-main: gating + pushing $def (attempt $attempt/$max)..." >&2
   # THE PUSH'S OUTPUT IS SHOWN, NEVER READ (S2). It carries the bar's own output, so classifying on
   # its words let any leg that printed `connection` report a red bar as an unreachable remote
   # (TOOL-aHonedRuleset-10), and any leg that printed `rejected` fake a race and re-run the bar.
+  pushed=$(git rev-parse --verify "refs/heads/$def")
+  was=$(git rev-parse -q --verify "refs/remotes/$remote/$def") || was=""
   git push "$remote" "$def" >&2
   rc=$?
   if [ "$rc" -eq 0 ]; then
+    check_push_allow "$pushed" "$was" || exit 4
     write_lander_marker || exit 1
+    run_post_merge
     cls=landed
   else
     # The hook's verdict first, then a probe, then ancestry: derive_push_failure, shared with --land.

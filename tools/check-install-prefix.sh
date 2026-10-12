@@ -200,7 +200,7 @@ if _gk_dir=$(resolve_kit_dir "$PY_GATE" govkit govkit.py "$_self_dir" 2>/dev/nul
   REGISTRY="$_gk_dir/registry.toml"
 fi
 if [ -z "$REGISTRY" ]; then
-  # A SKIP ANNOUNCES ITSELF (§7), and exits 0 (TOOL-aRepatriatedFork-16 §8 F1, owner): a consumer's
+  # A SKIP ANNOUNCES ITSELF (charter [gate]), and exits 0 (TOOL-aRepatriatedFork-16 §8 F1, owner): a consumer's
   # bar stays green when it has nothing to police, and a printed skip cannot be misread as a graded run.
   echo "install-prefix: SKIPPED — this repo is not a kit SOURCE (no govkit engine and registry resolve"
   echo "install-prefix: from this gate's directory), so it ships nothing and its files under"

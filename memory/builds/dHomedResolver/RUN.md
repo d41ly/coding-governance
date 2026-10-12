@@ -1,0 +1,81 @@
+# dHomedResolver - run state
+
+Created by `unattended.sh --preflight`. The unit list is NOT copied here — it is DERIVED
+from the build README on every read, so it cannot go stale between them. This file holds
+only what nothing else does: the phase and its witness, the keepalive id and the lease — the
+session and pid holding the run — the pinned BASE with its anchor evidence, and the parked decisions.
+
+<!-- run:generated -->
+<!-- /run:generated -->
+
+## Run facts
+landed-by: attended
+landed-derived: 62e5f4c4c01c668832fe3485697dd39991b01725 62e5f4c4c01c668832fe3485697dd39991b01725
+asks-at-landing: TOOL-dHomedResolver-6=OPEN TOOL-dHomedResolver-7=OPEN TOOL-dHomedResolver-9=CLOSED
+units-at-landing: TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-5 TOOL-dHomedResolver-8
+hold-run: 
+hold-streak: 1 · at 69005bc7
+resume-owed: none · owner
+held-at: 2026-10-11T08:45:05Z
+hold-reason: landed by the owner's order in chat on 2026-10-11 at bd8e05f2, pushed with the hook bypassed; a full bar on main and the kit self-tests stay owed
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
+parked-surfaced: yes
+keepalive-reaped: yes
+refreshed-at: bd8e05f2270aa92335e74e577f8c229098bccad5 · handoff · 0 touching
+gates-run: unattended-17916787078768482032-5067 1f0fcca0
+gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
+witness: 62e5f4c4c01c668832fe3485697dd39991b01725
+phase: LANDED
+branch-sha: b39dff78aae970c8428289aa781cf21f79c6fbff
+branch-ref: refs/heads/branch/check-10-declare-resolution-05a19e
+may: none
+mode: prompt
+run-branch: refs/heads/branch/check-10-declare-resolution-05a19e
+anchor-kind: run-branch
+cli-version: 2.1.293
+lease-utc: 2026-10-09T15:09:31Z
+pid-image: claude.exe
+host: compeeto
+pid: 47108
+session: ffd5c89b-5632-4294-9489-10549c6c8185
+keepalive: c9b21169
+anchor-url: https://github.com/d41ly/coding-governance
+anchor-sha: 5a836bf0fc940029136b4b3fd57a87f35ff40f26
+anchor-ref: refs/heads/main
+base: b39dff78aae970c8428289aa781cf21f79c6fbff
+
+## Parked
+
+2026-10-09T15:11:02Z brief · item TOOL-dHomedResolver-1 · reason df82dbf5fd8e memory/builds/dHomedResolver/prompts/2026-10-09-prompt-TOOL-dHomedResolver-1-1-build-brief.md
+
+2026-10-09T15:27:42Z dispatch · item ada7047d TOOL-dHomedResolver-1 · reason memory/HYGIENE.md memory/builds/dHomedResolver/README.md memory/builds/dHomedResolver/build/2026-10-09-build-TOOL-dHomedResolver-1-1-acceptance-ledger.md memory/builds/dHomedResolver/prompts/2026-10-09-prompt-TOOL-dHomedResolver-1-1-build-brief.md memory/builds/dHomedResolver/spec/2026-10-09-spec-TOOL-dHomedResolver-1.md memory/guides/SESSION-KICKOFF.md memory/map/features/memory-tree-hygiene.md memory/map/generated/symbols.json tools/memory-tree/HYGIENE.template.md tools/memory-tree/README.md tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/row_grammar.py
+
+2026-10-09T15:28:36Z brief · item TOOL-dHomedResolver-2 · reason 0e5a9cf464f3 memory/builds/dHomedResolver/prompts/2026-10-09-prompt-TOOL-dHomedResolver-2-1-build-brief.md
+
+2026-10-09T15:33:54Z dispatch · item 5e5c2692 TOOL-dHomedResolver-2 · reason memory/HYGIENE.md memory/builds/dHomedResolver/README.md memory/builds/dHomedResolver/build/2026-10-09-build-TOOL-dHomedResolver-2-1-acceptance-ledger.md memory/builds/dHomedResolver/prompts/2026-10-09-prompt-TOOL-dHomedResolver-2-1-build-brief.md memory/builds/dHomedResolver/spec/2026-10-09-spec-TOOL-dHomedResolver-2.md memory/map/generated/symbols.json tools/memory-tree/HYGIENE.template.md tools/memory-tree/README.md tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/gen_build_index.py
+
+2026-10-09T15:34:38Z brief · item TOOL-dHomedResolver-3 · reason 4ff2973c99ac memory/builds/dHomedResolver/prompts/2026-10-09-prompt-TOOL-dHomedResolver-3-1-build-brief.md
+
+2026-10-09T15:39:13Z dispatch · item 88437f6c TOOL-dHomedResolver-3 · reason memory/LIVE.md memory/builds/dHomedResolver/README.md memory/builds/dHomedResolver/build/2026-10-09-build-TOOL-dHomedResolver-3-1-acceptance-ledger.md memory/builds/dHomedResolver/prompts/2026-10-09-prompt-TOOL-dHomedResolver-3-1-build-brief.md memory/builds/dHomedResolver/spec/2026-10-09-spec-TOOL-dHomedResolver-3.md memory/gotchas/INDEX.md memory/gotchas/index-derivation-reads-a-half-staged-move-as-a-deletion.md memory/gotchas/name-search-resolves-a-namesake.md memory/map/features/memory-tree-hygiene.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json
+
+2026-10-09T15:53:15Z review · item dHomedResolver · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 7 · disposition promote
+
+2026-10-09T15:53:22Z rescope · item add TOOL-dHomedResolver-5 · reason promoted from the closing diff review round 1: its five mediums and two lows (items M1, M2, L1, L2), batched into one unit by the severity rule
+
+2026-10-09T15:58:33Z brief · item TOOL-dHomedResolver-5 · reason af820f14ce85 memory/builds/dHomedResolver/prompts/2026-10-09-prompt-TOOL-dHomedResolver-5-1-build-brief.md
+
+2026-10-09T16:09:13Z dispatch · item 996609b2 TOOL-dHomedResolver-5 · reason memory/builds/dHomedResolver/README.md memory/builds/dHomedResolver/build/2026-10-09-build-TOOL-dHomedResolver-5-1-acceptance-ledger.md memory/builds/dHomedResolver/prompts/2026-10-09-prompt-TOOL-dHomedResolver-5-1-build-brief.md memory/builds/dHomedResolver/spec/2026-10-09-spec-TOOL-dHomedResolver-1.md memory/builds/dHomedResolver/spec/2026-10-09-spec-TOOL-dHomedResolver-5.md tools/memory-tree/gen_build_index.py tools/memory-tree/row_grammar.py
+
+2026-10-11T06:23:44Z rescope · item add TOOL-dHomedResolver-8 · reason the close's flagged bar reads three reds OWN that origin/main b726385f brought in: the hygiene suite's python-key parity arm (KF3, this build edits that suite), push-main.test.sh arm 26 and the routed-commits leg (their graders' directories this build or its mint touch); all three red identically at b726385f, and none can land without being fixed here
+
+2026-10-11T06:26:07Z brief · item TOOL-dHomedResolver-8 · reason c6f3ad719622 memory/builds/dHomedResolver/prompts/2026-10-11-prompt-TOOL-dHomedResolver-8-1-build-brief.md
+
+2026-10-11T06:36:16Z dispatch · item 5c8d7625 TOOL-dHomedResolver-8 · reason .memory-tree.conf memory/LIVE.md memory/builds/dHomedResolver/README.md memory/builds/dHomedResolver/build/2026-10-11-build-TOOL-dHomedResolver-8-1-acceptance-ledger.md memory/builds/dHomedResolver/prompts/2026-10-11-prompt-TOOL-dHomedResolver-8-1-build-brief.md memory/builds/dHomedResolver/spec/2026-10-11-spec-TOOL-dHomedResolver-8.md memory/guides/SESSION-KICKOFF.md tools/memory-tree/check-memory-hygiene.test.sh tools/push-main.test.sh
+
+2026-10-11T08:42:03Z decision · item land the build with the hook bypassed, no full bar · reason decided by the owner in chat on 2026-10-11, while the third close's flagged bar was running; that bar was stopped unfinished. A full bar on main and the kit self-tests stay owed
+
+2026-10-11T08:45:07Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dHomedResolver && bash tools/push-main.sh --land --slug dHomedResolver && bash tools/unattended/unattended.sh --settle dHomedResolver
+
+2026-10-11T08:45:07Z hold · item owner-decision · reason until owner · reaped c9b21169 · resume none(owner)

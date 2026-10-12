@@ -11,6 +11,7 @@
 #
 #   S1 kit coverage      — every kit govkit's registry declares is named in a playbook file or waived.
 #   S2 value parity      — a value the playbook STATES equals the source that OWNS it.
+#   S4 section citations — no live file cites a charter section by number, which v4.0 has none of.
 #
 # THERE IS NO S3. It asserted the placeholder arithmetic a deploy-time catalogue stated, and v3.0
 # deleted that catalogue along with the companion carrying it — the counts have no author left to
@@ -135,9 +136,12 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 HK_DIR="<no hooks kit>"
+PB_DIR="<no playbook-render kit>"
 REGISTRY=""
 if _pp_py=$(resolve_python 2>/dev/null); then
   HK_DIR=$(resolve_kit_dir "$_pp_py" hooks agent-cap.js "$_self_dir" 2>/dev/null) || HK_DIR="<no hooks kit>"
+  # TOOL-aDistilledCharter-8: the renderer's TEMPLATE_MAJOR is a pair whose owner is the template.
+  PB_DIR=$(resolve_kit_dir "$_pp_py" playbook render_playbook.py "$_self_dir" 2>/dev/null) || PB_DIR="<no playbook-render kit>"
   # The S1 population's source, through the same resolver (TOOL-aRepatriatedFork-54).
   REGISTRY=$(resolve_kit_dir "$_pp_py" govkit registry.toml "$_self_dir" 2>/dev/null) && REGISTRY="$REGISTRY/registry.toml"
 fi
@@ -213,8 +217,10 @@ waived=$(grep -vE '^[[:space:]]*(#|$)' "$WAIVERS" | awk '{print $1}' | sort -u)
 # The first form is THIS install's own root, derived, never gov's literal one: spelled `tools/` it
 # graded every other install against a root it does not have (TOOL-aRepatriatedFork-26, VERIFYING
 # repair). At a root install there is no root head, and a bare `<kit>/` is the substring above.
+# A `kit:<id>` fence NAMES its kit too (TOOL-aDistilledCharter-7, C7): since v4.0 the charter's
+# per-kit tools and protocol lines sit inside one, and spell no install path at all.
 named_in_playbook() { # <kit>
-  grep -qE "${SELF_PRE:+$SELF_PRE$1/|}<prefix>/$1/|\`$1/\`" "$TEMPLATE" "$RUNBOOK" 2>/dev/null
+  grep -qE "${SELF_PRE:+$SELF_PRE$1/|}<prefix>/$1/|\`$1/\`|<!-- kit:$1 -->" "$TEMPLATE" "$RUNBOOK" 2>/dev/null
 }
 
 for k in $kits; do
@@ -240,11 +246,15 @@ done
 #
 #   <label>~<stated-file>~<stated-extraction>~<owning-file>~<owning-extraction>
 #
-# The field separator is `~` and NOT `|`, because one of the values being compared is the hook
-# matcher `Workflow|Agent` and its extraction regex therefore contains a pipe. With `|` as the
-# delimiter that row silently reparsed into the wrong fields and the gate reported "the owning
-# source does not exist: ]*)`.*/\1/p" — a real failure for a fake reason, which is worse than
-# either a pass or an honest red. `~` appears in none of these patterns.
+# The field separator is `~` and NOT `|`: a hook-matcher pair once compared `Workflow|Agent`, and
+# with `|` as the delimiter that row silently reparsed into the wrong fields — a real failure for a
+# fake reason, which is worse than either a pass or an honest red. `~` appears in none of these.
+#
+# THE STATED SIDE MOVED at v4.0. The charter keeps one digit, the verify-agent total in its `[bound]`
+# line. The lens-array bound, the bounded-helper width and the resolved-K ceiling are stated by the
+# hook's own README now, so those three pairs read it (TOOL-aDistilledCharter-6, closing review
+# round 1, G1: retired outright, their digits would drift with no gate watching). The hook-matcher
+# pair is retired: no prose states the matcher, and `check-wiring.sh` grades the settings file.
 #
 # The pair list is no longer playbook-only. TOOL-aHonedRuleset-5 added a row whose stated side is
 # the kickoff MANIFEST TEMPLATE, because the value it pins -- the stamp rule's sha expression --
@@ -253,11 +263,11 @@ done
 # the stamp. The datetime half, whether a stamp is FRESH, and whether the sha it names is reachable
 # are manifest-check.sh's checks 3 and 5, not this gate's.
 PAIRS="
-lens-array bound~$TEMPLATE~sed -n 's/.*array LITERAL of ≤\([0-9]\+\) elements.*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_LENSES = \([0-9]\+\).*/\1/p'
-agent-cap hook matcher~$TEMPLATE~sed -n 's/.*matcher \`\([A-Za-z|]*\)\`.*/\1/p'~.claude/settings.json~sed -n 's/.*\"matcher\": \"\(Workflow[^\"]*\)\".*/\1/p'
+lens-array bound~${HK_DIR}/README.md~sed -n 's/.*array LITERAL of ≤\([0-9]\+\) elements.*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_LENSES = \([0-9]\+\).*/\1/p'
 verify-agent total~$TEMPLATE~sed -n 's/.*at most \([0-9]\+\) verify agents TOTAL.*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
-bounded-helper width~$TEMPLATE~sed -n 's/.*boundedParallel(thunks, \([0-9]\+\)).*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
-resolved-K ceiling~$TEMPLATE~sed -n 's/.*cannot resolve to an integer ≤\([0-9]\+\).*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+bounded-helper width~${HK_DIR}/README.md~sed -n 's/.*boundedParallel(thunks, \([0-9]\+\)).*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+resolved-K ceiling~${HK_DIR}/README.md~sed -n 's/.*cannot resolve to an integer ≤\([0-9]\+\).*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+template major~${PB_DIR}/render_playbook.py~sed -n 's/^TEMPLATE_MAJOR = \([0-9]\+\).*/\1/p'~$TEMPLATE~sed -n 's/.*governance-template: v\([0-9]\+\)\..*/\1/p'
 stamp rule sha expression~skills/session-kickoff/MANIFEST-TEMPLATE.md~sed -n 's/.*Stamp rule: sha = \`\([A-Z]*\)\` on any branch.*/\1/p'~skills/session-kickoff/manifest-check.sh~sed -n 's/^STAMP_SHA_RULE=\"sha = \([A-Z]*\) on any branch\".*/\1/p'
 "
 
@@ -299,6 +309,48 @@ while IFS='~' read -r tag label msg; do
   fail 7 "a declared value pair disagrees with the source that owns it. Pair $label, detail: $msg"
 done < "$PPTMP"
 rm -f "$PPTMP"
+
+# ============================================================== S4 — section citations ==========
+# TOOL-aDistilledCharter-3. The charter has no numbered sections since v4.0: a rule is cited by its
+# handle (`charter [gate]`) or by the guide or gate that owns it. A live file citing a charter section
+# BY NUMBER points at nothing, and the next restructure would leave it pointing at the wrong thing —
+# which is how the runbook's per-section kit-block counts went stale without a word.
+#
+# WHAT IT DOES NOT CATCH, said here so a green run is not misread. A bare `§<n>` with no charter word
+# beside it cannot be told from a citation of the citing document's own sections, so it is counted
+# and printed as a near-miss, never failed. A line citing the SPEC template's own sections
+# (`spec template's §8`) is excluded, because TEMPLATE-SPEC.md's numbered sections are real; a line
+# carrying both forms is excluded whole. Frozen records under the memory tree are outside the surface.
+# This gate's own file and its self-test are excluded too: both spell the predicate on purpose.
+#
+# TOOL-aDistilledCharter-7 widened it after the closing review: every derived kit directory joins the
+# surface, so a ROOT install (empty SELF_PRE) still grades its kits (G2); so do CLAUDE.md and the
+# memory root's own live guides, DECISIONS.md excepted (G8); the pathspec-mode variables are unset,
+# or a `:!` exclusion reads as a file name (G6). The predicate reads git grep's BYTES, so every
+# multibyte separator is an alternative rather than a bracket member (G5).
+unset GIT_LITERAL_PATHSPECS GIT_GLOB_PATHSPECS GIT_NOGLOB_PATHSPECS GIT_ICASE_PATHSPECS
+s4_kitpaths=()
+for k in $kits; do s4_kitpaths+=("${SELF_PRE}$k"); done
+s4_paths=("${s4_kitpaths[@]}")
+[ -n "${SELF_PRE%/}" ] && s4_paths+=("${SELF_PRE%/}")
+s4_paths+=(skills .githooks .claude/rules .claude/skills memory/guides WIRE-INTO-PROJECT.md README.md
+  AGENTS.md CLAUDE.md "$TEMPLATE" ':(glob)memory/*.md' ':!memory/DECISIONS.md'
+  ":!${SELF_PRE}check-playbook-parity.sh" ":!${SELF_PRE}check-playbook-parity.test.sh")
+s4_pop=$(git ls-files -- "${s4_paths[@]}" | grep -c . || true)
+s4_kitpop=$(git ls-files -- "${s4_kitpaths[@]}" | grep -c . || true)
+if [ "$s4_pop" -eq 0 ] || [ "$s4_kitpop" -eq 0 ] || [ -z "$(git ls-files -- "$TEMPLATE")" ]; then
+  fail 17 "the section-citation surface is empty, lacks the tracked template or holds no kit file, so no citation could be found and this stage must not report clean"
+else
+  s4_nb=$(printf '\302\240'); s4_nd=$(printf '\342\200\223'); s4_ap=$(printf '\342\200\231')
+  s4_pred='(^|[^a-z])(charter|template|playbook|governance|agents\.md)s?(\.md)?('"'"'s|'"$s4_ap"'s)?([[:space:],:(`-]|'"$s4_nd"'|'"$s4_nb"'){0,3}(§)+ ?[0-9]|§1 Landing|§16 R1|§[0-9]+ (of|in) (the )?(charter|agents\.md)'
+  s4_hits=$(git grep -n -I -i -E "$s4_pred" -- "${s4_paths[@]}" 2>/dev/null | grep -v -i -E '(spec|protocol)[- ]template' || true)
+  s4_near=$(git grep -n -I -E '§[0-9]' -- "${s4_paths[@]}" 2>/dev/null | grep -c . || true)
+  while IFS= read -r h; do
+    [ -n "$h" ] || continue
+    fail 16 "a live file cites a charter section by number, and v4.0 has no numbered sections; cite the handle or the owning guide: $h"
+  done < <(printf '%s\n' "$s4_hits")
+  printf 'playbook-parity: S4 graded %s file(s); %s line(s) carry a section sign, any charter citation among them failed above\n' "$s4_pop" "$s4_near"
+fi
 
 # The success line reads ONLY what the surviving stages assign. The catalogue stage above
 # assigned three counters this line used to print, and the script runs under `set -u` — so

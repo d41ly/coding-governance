@@ -3,7 +3,7 @@
  * stop-guard — a `Stop` hook that refuses the turn end of a session bound to a non-terminal
  * unattended run, and continues the conversation with the absent-owner instruction instead.
  *
- * gov:kit unattended@1.95 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.101 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for TOOL-aWokenSentinel-3 under the build folder of that slug.
@@ -101,7 +101,7 @@ const REASONS = ['terminal', 'held', 'elsewhere', 'liveness-unreadable', 'backgr
 /**
  * `bash <kitDir>/unattended.sh --liveness <slug>` with cwd at the root, because the driver sources
  * the conf of the tree it runs in; the driver path is forward-slashed because MSYS mangles a
- * backslash path handed to a shell (charter §11). Returns `{stdout, ok}` where `ok` is a zero exit
+ * backslash path handed to a shell (charter [cross-os]). Returns `{stdout, ok}` where `ok` is a zero exit
  * within the bound; a spawn error, a non-zero exit or the bound is `ok: false`.
  */
 function runLiveness(kitDir, root, slug) {

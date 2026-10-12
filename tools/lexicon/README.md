@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.20 -->
+<!-- gov:kit lexicon@1.23 -->
 # lexicon — a declared naming vocabulary, gated
 
 An OPT-IN kit that gates two naming predicates against a per-repo DECLARATION, and refuses an import
@@ -465,6 +465,7 @@ owns it rots between changes. Read it from the signal.
 ```bash
 python <prefix>/lexicon/lexicon.py --suggest <identifier> --as <ext>.<surface>   # one line, no corpus pass
 bash <prefix>/lexicon/adopt-lexicon.sh --render             # re-render the Skill after a declaration edit
+bash <prefix>/lexicon/adopt-lexicon.sh --check-render       # the Skill byte-compare alone; run-gates' regen preflight runs it
 ```
 
 `--suggest` answers from the declaration FIRST and the shipped canon second, in that fixed

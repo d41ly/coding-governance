@@ -82,7 +82,7 @@ MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gen_build_index.py "$HERE") 
 MT_KIT="${MT_KIT_DIR##*/}"
 GOVKIT_DIR=""   # a kit SOURCE only: absent at an adopter, where the dispatch arms announce their skip
 _gk_rel=$(resolve_kit_dir "$_rkd_py" govkit govkit.py "$HERE" 2>/dev/null) \
-  && GOVKIT_DIR="$(git -C "$HERE" rev-parse --show-toplevel)/$_gk_rel"
+  && GOVKIT_DIR="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_gk_rel"
 
 # ---- THE SHARD CONTRACT (TOOL-aShardedFloor-2) ---------------------------------------------------
 # This suite IS the merge bar's floor: one leg exceeding leg-seconds / width sets the whole bar's
@@ -129,6 +129,9 @@ in_shard() { [ "$SH_I" = 0 ] || [ "$SH_I" = "$1" ]; }
 
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP" "${ORIGIN_DIR:-}"' EXIT
+# A take-over reads the runner's HOST turnstile queue (TOOL-aFrugalTurnstile-5), so on the default every
+# arm would name the dead tickets of whatever bars died on this machine. This suite's own, and empty.
+export GATE_TURNSTILE_DIR="$TMP/gate-turnstile"
 st=0
 n=0
 
@@ -1845,7 +1848,7 @@ hit "$out" "write the RECORD KEY, which is not always the item name: parked-surf
 # The kit is reached through the resolver, REPO-RELATIVE, never a spelled sibling path, and laid
 # into the fixture at that same relative path, which is where the driver's file test looks.
 _rl_rel=$(resolve_kit_dir "$_rkd_py" runlog runlog.py "$HERE") || exit 2
-_rl_src="$(git -C "$HERE" rev-parse --show-toplevel)/$_rl_rel"
+_rl_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_rl_rel"
 for _rk in present absent; do
   bcopen
   # A READY spec, because bcopen's is THIN and `--dispatch` refuses a THIN unit (check 49).
@@ -3210,8 +3213,10 @@ done <<<"$ug"
 # ---- `_` joins the excluded neighbours since TOOL-dDerivedDocket-24 S10, whose `read_leg_argv` is the
 # ---- first CALL of the resolver with a word after it (`resolve_python 2>/dev/null`): the name ends
 # ---- in `python `, and a launcher word preceded by an identifier character is never a bare launcher.
+# ---- A `local` declaration, a double-quoted string and a `.py` extension are not invocations either: the
+# ---- held job redded on `local base py d`, on prose saying "no python launcher", and on `drift_report.py `.
 n=$((n+1)); [ "$(grep -c '^# >>> resolve_python' "$SCRIPT")" = 1 ] || { echo "FAIL the driver carries no inline resolve_python block, so any launcher it runs is unresolved"; st=1; }
-np=$(awk '/^# >>> resolve_python/{b=1} b{if(/^# <<< resolve_python/)b=0; next} /^[[:space:]]*#/{next} {print NR": "$0}' "$SCRIPT" | grep -E '(^|[^-_[:alnum:]])(python3?|py) ' || true)
+np=$(awk '/^# >>> resolve_python/{b=1} b{if(/^# <<< resolve_python/)b=0; next} /^[[:space:]]*#/{next} /^[[:space:]]*local[[:space:]]/{next} {l=$0; gsub(/"[^"]*"/, """", l); print NR": "l}' "$SCRIPT" | grep -E '(^|[^-_.[:alnum:]])(python3?|py) ' || true)
 n=$((n+1)); [ -z "$np" ] || { echo "FAIL the driver invokes a python launcher without the resolver: $np"; st=1; }
 n=$((n+1)); grep -q 'run_bounded "\$_stpy" "\$SPEC_TOKENS_CLI"' "$SCRIPT" || { echo "FAIL the declared spec-token checker is not run through the resolved launcher"; st=1; }
 
@@ -4237,6 +4242,108 @@ mkconf "true" "bash probe-gate.sh"
 fixture
 run --preflight tRun --keepalive-id k1 >/dev/null
 miss "$(run --close tRun)" "GATEPROBE-should-not-appear"
+
+# ---- TOOL-aFrugalTurnstile-3 AC6/AC7: A GREEN CLOSE LEAVES THE BOUNDARY'S `gate-bar-green`, naming
+# ---- the declared GATE_CMD, only when its bar ran full; a bar run without GATE_FULL under `primary`
+# ---- and a red bar write none. RED against the driver at bef97330, which has no writer. The probe is
+# ---- TRACKED and the run-state file `--preflight` writes is committed, so the tree the writer reads
+# ---- is clean. GATE_FULL is spelled on every call: the bar that runs this suite exports it.
+fg_gd=$(git rev-parse --absolute-git-dir)
+reset_tree; readme tRun; rm -f "$fg_gd/gate-bar-green"
+printf '#!/usr/bin/env bash\nexit 0\n' > probe-gate.sh
+mkconf "true" "bash probe-gate.sh"
+fixture
+run --preflight tRun --keepalive-id k1 >/dev/null; fixture
+out=$(GATE_FULL=1 run --close tRun)
+hit  "$out" "unattended: gates-green — recorded gate-bar-green for $(git rev-parse HEAD | cut -c1-8) (kind full)"
+same "TOOL-aFrugalTurnstile-3 AC6 the close's record names the declared GATE_CMD" \
+  "$(awk -F'\t' '$1=="bar"{print $2}' "$fg_gd/gate-bar-green" 2>/dev/null)" "bash probe-gate.sh"
+same "TOOL-aFrugalTurnstile-3 AC6 the close's record is written by unattended" \
+  "$(awk -F'\t' '$1=="by"{print $2}' "$fg_gd/gate-bar-green" 2>/dev/null)" "unattended"
+reset_tree; readme tRun; rm -f "$fg_gd/gate-bar-green"
+printf '#!/usr/bin/env bash\nexit 0\n' > probe-gate.sh
+mkconf "true" "bash probe-gate.sh"
+fixture
+run --preflight tRun --keepalive-id k1 >/dev/null; fixture
+out=$(GATE_FULL= run --close tRun)
+hit  "$out" "unattended: gates-green — no gate-bar-green written: the bar did not run full"
+same "TOOL-aFrugalTurnstile-3 AC7 a bar run without GATE_FULL under primary writes no record" \
+  "$([ -e "$fg_gd/gate-bar-green" ] && echo present || echo absent)" "absent"
+reset_tree; readme tRun; rm -f "$fg_gd/gate-bar-green"
+printf '#!/usr/bin/env bash\nexit 1\n' > probe-gate.sh
+mkconf "true" "bash probe-gate.sh"
+fixture
+run --preflight tRun --keepalive-id k1 >/dev/null; fixture
+out=$(GATE_FULL=1 run --close tRun)
+hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+miss "$out" "gate-bar-green"
+same "TOOL-aFrugalTurnstile-3 AC7 a red bar writes no record" \
+  "$([ -e "$fg_gd/gate-bar-green" ] && echo present || echo absent)" "absent"
+
+# ---- TOOL-aFrugalTurnstile-3 AC8: THE RECORD'S GRAMMAR IS SPELLED TWICE, in the pre-push hook and in
+# ---- this driver, because the hook ships verbatim and sources no kit; this arm holds the two together
+# ---- as `read_policy_key`'s copies are held. Both functions are cut out of their shipped files by
+# ---- `slice_fn`'s awk and sed, called alike in one clean scratch repo, and their key columns compared
+# ---- with each other and with the ten keys in order. A copy of the driver's with `by` dropped must
+# ---- FAIL that comparison, or the comparison is one that cannot fail.
+fg_hook="${HERE%/"$KIT_REL"}/.githooks/pre-push"
+fg_s=$(grep -n '^write_bar_green()' "$fg_hook" 2>/dev/null | cut -d: -f1)
+if [ -z "$fg_s" ]; then
+  echo "SKIP TOOL-aFrugalTurnstile-3 AC8 parity arm: no write_bar_green() in the pre-push hook at $fg_hook, so there is no second spelling to hold the driver's against"
+else
+  fg_keys=$(printf '%s\n' sha tree bar bar_paths kind base selftests run_id by stamped)
+  fg_e=$(awk -v s="$fg_s" 'NR>s && /^}/ {print NR; exit}' "$fg_hook")
+  eval "$(sed -n "${fg_s},${fg_e}p" "$fg_hook" | sed '1s/^write_bar_green()/write_hook_bar_green()/')"
+  slice_fn write_bar_green
+  fg_w=$(mktemp -d)
+  ( cd "$fg_w" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
+      && git config core.autocrlf false && echo a > a && git add a && git commit -q -m one --no-verify ) >/dev/null 2>&1
+  fg_pp=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green" \
+             && write_hook_bar_green "$g" "$(git rev-parse HEAD)" 0 full "" "bash probe-gate.sh" fg-run >/dev/null \
+             && cut -f1 "$g/gate-bar-green" )
+  fg_ud=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green" \
+             && write_bar_green "$g" "$(git rev-parse HEAD)" 0 full "" "bash probe-gate.sh" fg-run >/dev/null \
+             && cut -f1 "$g/gate-bar-green" )
+  same "TOOL-aFrugalTurnstile-3 AC8 the hook's record carries the ten keys in order" "$fg_pp" "$fg_keys"
+  same "TOOL-aFrugalTurnstile-3 AC8 the driver's record carries the hook's keys in order" "$fg_ud" "$fg_pp"
+  # TOOL-aFrugalTurnstile-16 AC2: the key column alone let the two writers disagree on `base`, so a
+  # kind scoped record with a base is compared WHOLE, every line but `by` and `stamped`, which differ
+  # by design. Both write the scoped slot.
+  fg_sp=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green.scoped" \
+             && write_hook_bar_green "$g" "$(git rev-parse HEAD)" 0 scoped "$(git rev-parse HEAD)" "bash probe-gate.sh" fg-run >/dev/null \
+             && grep -v -e '^by	' -e '^stamped	' "$g/gate-bar-green.scoped" )
+  fg_su=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green.scoped" \
+             && write_bar_green "$g" "$(git rev-parse HEAD)" 0 scoped "$(git rev-parse HEAD)" "bash probe-gate.sh" fg-run >/dev/null \
+             && grep -v -e '^by	' -e '^stamped	' "$g/gate-bar-green.scoped" )
+  n=$((n+1)); [ -n "$fg_sp" ] && [ "$fg_sp" = "$fg_su" ] \
+    || { echo "FAIL TOOL-aFrugalTurnstile-16 AC2 the hook's and the driver's kind scoped records differ beyond by and stamped: [$fg_sp] vs [$fg_su]"; st=1; }
+  eval "$(declare -f write_bar_green | sed 's/by\\tunattended\\n//')"
+  fg_dk=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green" \
+             && write_bar_green "$g" "$(git rev-parse HEAD)" 0 full "" "bash probe-gate.sh" fg-run >/dev/null \
+             && cut -f1 "$g/gate-bar-green" )
+  n=$((n+1)); [ -n "$fg_dk" ] && [ "$fg_dk" != "$fg_pp" ] \
+    || { echo "FAIL TOOL-aFrugalTurnstile-3 AC8 a driver copy with the by key dropped still compared equal to the hook's keys, so the parity comparison cannot fail: [$fg_dk]"; st=1; }
+  unset -f write_bar_green write_hook_bar_green
+  rm -rf "$fg_w"
+fi
+reset_tree
+
+# ---- TOOL-aFrugalTurnstile-12 AC3: THE CLOSE'S BAR SCRUBS EVERY KNOB THE HOOK SCRUBS. The hook's
+# ---- BAR_SCRUBBED_KNOBS is read off its shipped file and every name in it must appear in the driver's
+# ---- `_gknobs`; a staged driver copy with GATE_REUSE dropped must be named, or the check cannot fail.
+fk_hook="${HERE%/"$KIT_REL"}/.githooks/pre-push"
+fk_hk=$(sed -n 's/^BAR_SCRUBBED_KNOBS="\([^"]*\)"$/\1/p' "$fk_hook" 2>/dev/null)
+if [ -z "$fk_hk" ]; then
+  echo "SKIP TOOL-aFrugalTurnstile-12 AC3 parity arm: no BAR_SCRUBBED_KNOBS line in the pre-push hook at $fk_hook, so there is no list to hold the driver's against"
+else
+  fk_cut='s/^ *local _gk _gknobs="\([^"]*\)".*/\1/p'
+  fk_drv=$(sed -n "$fk_cut" "$SCRIPT")
+  fk_miss=""; for fk_k in $fk_hk; do case " $fk_drv " in *" $fk_k "*) ;; *) fk_miss+=" $fk_k" ;; esac; done
+  same "TOOL-aFrugalTurnstile-12 AC3 every BAR_SCRUBBED_KNOBS name is in the driver's scrub" "${fk_drv:+found}$fk_miss" "found"
+  fk_drv=$(sed 's/\(_gknobs="[^"]*\)GATE_REUSE /\1/' "$SCRIPT" | sed -n "$fk_cut")
+  fk_miss=""; for fk_k in $fk_hk; do case " $fk_drv " in *" $fk_k "*) ;; *) fk_miss+=" $fk_k" ;; esac; done
+  same "TOOL-aFrugalTurnstile-12 AC3 a driver copy with GATE_REUSE dropped is named" "$fk_miss" " GATE_REUSE"
+fi
 
 # ---- TOOL-aBranchedMandate-3, S9: the SECOND ANCHOR. Every arm here drives the real bare origin the
 # ---- fixture already builds, because the whole mechanism is an observation of a remote and a
@@ -7136,7 +7243,7 @@ hit "$out" "dispatch declared"
 # ---- sourcing either conf, so one spelling table is fed to it and to each owner's own parser. Absent
 # ---- and blank are compared as the consumer sees them: an absent `MAP_ROOT` is the kit default, and
 # ---- `BACKLOG_MODE` matters only as equal to `builds` or not.
-_rcv_root=$(git -C "$HERE" rev-parse --show-toplevel)
+_rcv_root=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)
 _rcv_cm="$_rcv_root/$(resolve_kit_dir "$_rkd_py" codebase-map map_lib.py "$HERE")"
 _rcv_mt="$_rcv_root/$MT_KIT_DIR"
 _rcv_d=$(mktemp -d)
@@ -9529,6 +9636,16 @@ hit "$out" "INTERRUPTED — a non-empty index is staged"
 hit "$out" "staged.txt"
 n=$((n+1)); grep -q '^keepalive: kC$' memory/builds/tRun/RUN.md || { echo "FAIL AC7 the take-over did not record the new keepalive"; st=1; }
 n=$((n+1)); grep -q '^session: sOther$' memory/builds/tRun/RUN.md || { echo "FAIL AC7 the take-over did not record its session in the lease facts"; st=1; }
+# ---- TOOL-aFrugalTurnstile-5 AC9: the take-over reads the HOST queue the runner writes. A dead-pid
+# ---- ticket planted there is named; the driver at that unit's base probed only the common dir's
+# ---- queue, which no bar writes any more, and printed "no interrupted act" over it.
+build_hold_fixture
+write_aged_commit
+mkdir -p "$GATE_TURNSTILE_DIR/gate-bar-queue"; : > "$GATE_TURNSTILE_DIR/gate-bar-queue/20000101T000000-999999-1"
+out=$(CLAUDE_CODE_SESSION_ID=sOther run --resume tRun --keepalive-id kC)
+hit "$out" "INTERRUPTED — a turnstile ticket names a pid that is not running"
+miss "$out" "no interrupted act was found"
+rm -rf "$GATE_TURNSTILE_DIR/gate-bar-queue"
 
 # ---- AC19: a LEASELESS working record is surfaced by the age of the newest commit touching its
 # ---- build folder — the population TOOL-aReapedTicket-5 records, which nothing surfaced at all.
@@ -11043,7 +11160,8 @@ IPL
   cat > bin/bar.sh <<'IPB'
 #!/usr/bin/env bash
 { printf 'GATE_FULL=%s\n' "${GATE_FULL-<unset>}"
-  printf 'GATE_SELFTESTS=%s\n' "${GATE_SELFTESTS-<unset>}"; } > "$IPOUT/barenv.txt"
+  printf 'GATE_SELFTESTS=%s\n' "${GATE_SELFTESTS-<unset>}"
+  printf 'KNOBS=%s %s %s\n' "${GATE_LEGS-<unset>}" "${GATE_REUSE-<unset>}" "${GATE_DOCS_BASE-<unset>}"; } > "$IPOUT/barenv.txt"
 echo "bar-stub ran"
 [ -f poison.txt ] && { echo "bar-stub: leg no-poison FAILED"; exit 1; }
 exit 0
@@ -11525,6 +11643,83 @@ same "the re-close's gates-run names the merge its bar graded" \
 same "the re-close left a clean tree"                  "$(ipgit status --porcelain)" ""
 ipgit checkout -q --detach "$ip_base"; ipgit push -q -f origin HEAD:main; ipgit checkout -q unit
 
+# ---- TOOL-aFrugalTurnstile-9 AC1-AC5 AC7: WHERE R DECLARES GATE_POST_MERGE, THE IN-PLACE CLOSE ASKS
+# ---- `pre-push --decide <HEAD> <R>` and runs the bar it answers. The hook git runs is a STUB reached
+# ---- through core.hooksPath, outside the repo so the tree stays clean, which writes its argv and
+# ---- prints $FT9_DECISION. The declaration is committed on R, origin's main, per case. RED against the
+# ---- driver at bef97330: the argv file is never written and the bar always sees GATE_FULL=1.
+ft9_base0=$ip_base; ft9_hk="$ip_out/ft9hooks"; mkdir -p "$ft9_hk"
+printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$@" > "$IPOUT/argv.txt"\n[ "${1-}" = --decide ] || exit 0\n[ "${FT9_RC:-0}" = 0 ] || exit "$FT9_RC"\n[ -z "$FT9_DECISION" ] || printf "%%s\\n" "$FT9_DECISION"\n' > "$ft9_hk/pre-push"
+ipgit config core.hooksPath "$ft9_hk"
+ft9_b=$'\t'"bash bin/bar.sh"   # TOOL-aFrugalTurnstile-13: every answer names the bar it decided for
+init_declared_merge() { # $1 = the gate-env line committed at R
+  ipreset; ipgit checkout -q --detach "$ft9_base0"; mkdir -p "$ip_dir/.githooks"
+  printf '%s\n' "$1" > "$ip_dir/.githooks/gate-env.sh"
+  ipgit add -A >/dev/null && ipgit commit -q -m "declaration" --no-verify
+  ip_base=$(ipgit rev-parse HEAD); ipgit checkout -q unit
+  ipprep ""; rm -f "$ip_out/argv.txt" "$ip_out/barenv.txt" "$ft9_gd/gate-bar-green" "$ft9_gd/gate-bar-green.scoped"
+}
+ft9_gd=$(ipgit rev-parse --absolute-git-dir)
+init_declared_merge "GATE_POST_MERGE=local"; ft9_h=$(ipgit rev-parse HEAD)
+out=$(FT9_DECISION="full stale$ft9_b"STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+same "TOOL-aFrugalTurnstile-9 AC1 the hook is asked --decide <HEAD> <R>" "$(tr '\n' ' ' < "$ip_out/argv.txt" 2>/dev/null)" "--decide $ft9_h $ip_base "
+same "TOOL-aFrugalTurnstile-9 AC1 a full answer runs the bar with GATE_FULL=1" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+same "TOOL-aFrugalTurnstile-9 AC1 the record reads kind full" "$(awk -F'\t' '$1=="kind"{print $2}' "$ft9_gd/gate-bar-green" 2>/dev/null)" "full"
+hit "$out" "pre-push --decide answered 'full stale'"
+# ---- TOOL-aFrugalTurnstile-12 AC1/AC2: THE BAR'S KNOBS EXPORTED BY THE DRIVER'S CALLER NEVER REACH
+# ---- THE BAR whose green is recorded as the whole bar's. RED against the driver at d4e5927f: the stub
+# ---- sees all three.
+init_declared_merge "GATE_POST_MERGE=local"
+out=$(GATE_LEGS=one-leg.json GATE_REUSE=1 GATE_DOCS_BASE=deadbeef FT9_DECISION="full stale$ft9_b"STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+same "TOOL-aFrugalTurnstile-12 AC1 AC2 the bar sees GATE_LEGS, GATE_REUSE and GATE_DOCS_BASE unset" \
+  "$(sed -n 's/^KNOBS=//p' "$ip_out/barenv.txt" 2>/dev/null)" "<unset> <unset> <unset>"
+hit "$out" "not honoured from the environment by this bar: GATE_LEGS GATE_REUSE GATE_DOCS_BASE"
+init_declared_merge "GATE_POST_MERGE=local"
+out=$(FT9_DECISION="scoped $ip_base$ft9_b"STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+same "TOOL-aFrugalTurnstile-9 AC2 a scoped answer runs the bar with GATE_FULL unset" "$(grep -c '^GATE_FULL=<unset>$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+same "TOOL-aFrugalTurnstile-9 AC2 the scoped slot reads kind scoped and the decision's base" \
+  "$(awk -F'\t' '$1=="kind"||$1=="base"{print $2}' "$ft9_gd/gate-bar-green.scoped" 2>/dev/null | tr '\n' ' ')" "scoped $ip_base "
+init_declared_merge "GATE_POST_MERGE=local"; ft9_gr=$(grep '^gates-run:' "$ip_dir/memory/builds/tRun/RUN.md")
+out=$(FT9_DECISION="covered gate-bar-green@1234abcd$ft9_b"STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+same "TOOL-aFrugalTurnstile-9 AC3 a covered answer runs no bar" "$([ -e "$ip_out/barenv.txt" ] && echo ran || echo absent)" "absent"
+same "TOOL-aFrugalTurnstile-9 AC3 a covered close writes no gates-run fact" "$(grep '^gates-run:' "$ip_dir/memory/builds/tRun/RUN.md")" "$ft9_gr"
+hit "$out" "met without a bar: the boundary reads this tree as covered by gate-bar-green@1234abcd"
+for ft9_d in "maybe$ft9_b" "" "scoped deadbeef$ft9_b" $'full a\nfull b' "rc1"; do
+  init_declared_merge "GATE_POST_MERGE=local"; ft9_rc=0; [ "$ft9_d" = rc1 ] && ft9_rc=1
+  out=$(FT9_RC=$ft9_rc FT9_DECISION="$ft9_d" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+  same "TOOL-aFrugalTurnstile-9 AC4 a malformed answer [$ft9_d] runs the full bar" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+  hit "$out" "pre-push --decide did not answer with one decision line"
+done
+# ---- TOOL-aFrugalTurnstile-13 AC2/AC3: THE ANSWER IS HONOURED ONLY FOR THIS CLOSE'S BAR. A covered
+# ---- answer naming another bar, or naming none, runs GATE_CMD with GATE_FULL=1; one naming GATE_CMD
+# ---- is met without a bar. RED against the driver at 69426afd: both refused cases are met without a bar.
+for ft9_d in $'covered gate-bar-green@1234abcd\tbash other/bar.sh' "covered gate-bar-green@1234abcd"; do
+  init_declared_merge "GATE_POST_MERGE=local"
+  out=$(FT9_DECISION="$ft9_d" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+  same "TOOL-aFrugalTurnstile-13 AC2 an answer for another bar [$ft9_d] runs the full bar" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+  hit "$out" "not this close's bar 'bash bin/bar.sh'; running the full bar"
+  miss "$out" "met without a bar"
+done
+init_declared_merge "GATE_POST_MERGE=local"
+out=$(FT9_DECISION="covered gate-bar-green@1234abcd$ft9_b" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+same "TOOL-aFrugalTurnstile-13 AC3 an answer for this close's bar is honoured" "$([ -e "$ip_out/barenv.txt" ] && echo ran || echo absent)" "absent"
+hit "$out" "met without a bar: the boundary reads this tree as covered by gate-bar-green@1234abcd"
+init_declared_merge "GATE_POST_MERGE=local"; mv "$ft9_hk/pre-push" "$ft9_hk/pre-push.off"
+out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+mv "$ft9_hk/pre-push.off" "$ft9_hk/pre-push"
+same "TOOL-aFrugalTurnstile-9 AC4 no hook runs the full bar" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+hit "$out" "no pre-push hook at"
+init_declared_merge "# nothing declared"
+out=$(FT9_DECISION="covered x" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+same "TOOL-aFrugalTurnstile-9 AC5 undeclared, the hook is never asked" "$([ -e "$ip_out/argv.txt" ] && echo asked || echo absent)" "absent"
+same "TOOL-aFrugalTurnstile-9 AC5 undeclared, the bar runs with GATE_FULL=1" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+miss "$out" "GATE_POST_MERGE"
+init_declared_merge "GATE_POST_MERGE=yes"
+out=$(FT9_DECISION="covered x" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+same "TOOL-aFrugalTurnstile-9 AC7 a value outside the set never asks the hook" "$([ -e "$ip_out/argv.txt" ] && echo asked || echo absent)" "absent"
+hit "$out" "GATE_POST_MERGE at ${ip_base:0:8} is 'yes', outside 'local ci'"
+ipgit config --unset core.hooksPath; ip_base=$ft9_base0; ipreset
+
 cd "$TMP" || exit 2
 rm -rf "$ip_dir" "$ip_out" "$ip_oroot"
 
@@ -11757,7 +11952,7 @@ else
   build_hold_fixture
   mkdir -p dk/u "dk/$_da_home"
   cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "$HERE/check-playbook.sh" dk/u/
-  cp "$(git -C "$HERE" rev-parse --show-toplevel)/$_da_rel/drift_report.py" "dk/$_da_home/"
+  cp "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_da_rel/drift_report.py" "dk/$_da_home/"
   git add -A >/dev/null && git commit -q -m dk --no-verify
   _dh="$(git rev-parse --git-common-dir)/drift-history.tsv"
   { printf '#utc\tsha\tbase_ref\tbase_sha\tsignal\tstate\tvalue\tof\tkey_hash\n'
@@ -12126,7 +12321,7 @@ hit "$(run --rescope tUnitAsk --act retire --item EXMP-tUnitAsk-77 --reason gone
 # ---- what this arm grades, and one that fired would red as unanswered, which is another fault.
 # ---- COUNTED EITHER WAY, like the backstop kill arms, so the floor grades this suite and not the conf
 # ---- beside it; the SKIP line says the arms went unexercised.
-ASKS_ROOT=$(cd "$HERE" && git rev-parse --show-toplevel 2>/dev/null)
+ASKS_ROOT=$(unset GIT_DIR GIT_WORK_TREE; cd "$HERE" && git rev-parse --show-toplevel 2>/dev/null)
 ASKS_REAL=$(sed -n 's/^ASKS_CMD="\(.*\)"$/\1/p' "$ASKS_ROOT/.unattended.conf" 2>/dev/null | head -1)
 if [ -z "$ASKS_REAL" ]; then
   n=$((n+36))
@@ -13655,7 +13850,9 @@ read_ask_back() { AB_WHY="the double reads nothing back"; [ "${F4_READBACK:-no}"
 # refused leg would render views for rows that are not there.
 write_ask_views() { echo "f4-views-double: $1 filed"; }
 run_f4_filer() { # temp store -> the sliced filer's output over the arm's repository; F4_CP_FAILS=backup|restore fails that copy
-  local M=memory ASKS_CMD="bash asks.sh" RB_OUT=""
+  # WI_STAGED and AV_STAGED are the driver's globals the filer appends to (TOOL-dUnstuckLanding-27
+  # S3); unset here, `set -u` killed the filer after the row write and before the views call.
+  local M=memory ASKS_CMD="bash asks.sh" RB_OUT="" WI_STAGED="" AV_STAGED=""
   local -x TMPDIR="$1" F4_BL="memory/builds/tRun/BACKLOG.md" F4_CP_FAILS="${F4_CP_FAILS:-}" F4_REAL_CP
   F4_REAL_CP=$(command -v cp)
   ( cd "$f4_dir" || exit 2
@@ -13806,7 +14003,7 @@ hit  "$out" "gates-green: filed ask ARCH-tRun-3 for leg x leg red at ${IH_R:0:8}
 # owner columns before the reason. The runner's path is DERIVED from this repository's own declared
 # GATE_CMD and installed at the same relative path in the fixture, so no kit path is spelled here;
 # it is committed at R too, because a diff against R that touches the runner reads every red OWN.
-ih_top=$(git -C "$HERE" rev-parse --show-toplevel)
+ih_top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)
 ih_rg=$(sed -n 's/^GATE_CMD="bash \(.*\)"$/\1/p' "$ih_top/.unattended.conf" | head -1)
 if [ -n "$ih_rg" ] && [ -f "$ih_top/$ih_rg" ]; then
   run_ih_repo reset -q --hard; run_ih_repo clean -qfd; run_ih_repo checkout -q main
@@ -13836,7 +14033,7 @@ fi
 # AC11, the driver's half: its own reader, sliced out of the SHIPPED driver and run over the
 # repository this suite lives in at HEAD, resolves land with an age bound of 10.
 slice_fn read_policy_key; slice_fn read_gate_policy
-_o=$( cd "$(git -C "$HERE" rev-parse --show-toplevel)" && CONF=".unattended.conf" \
+_o=$( cd "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" && CONF=".unattended.conf" \
       && read_gate_policy "$(git rev-parse HEAD)" && printf '%s %s' "$GP_POLICY" "$GP_MAX_AGE" )
 same "AC11 this repository at HEAD reads land with a bound of 10" "$_o" "land 10"
 
@@ -13860,7 +14057,7 @@ rm -rf "$ih_dir" "$ih_oroot" "$ih_out"
 # ---- value runs verbatim. A repository declaring none prints a named SKIP and counts the arms.
 # ---- AC4's dirty tree is read under `primary`: under `in-place` refusal 62 stops a porcelain-dirty
 # ---- close before its bar, so a dirty in-place arm would pass over a render that never ran.
-rv_top=$(git -C "$HERE" rev-parse --show-toplevel)
+rv_top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)
 rv_asks=$(sed -n 's/^ASKS_CMD="\(.*\)"$/\1/p' "$rv_top/.unattended.conf" 2>/dev/null | head -1)
 rv_gen=""
 for _w in $rv_asks; do [ -f "$rv_top/$_w" ] && { rv_gen=$_w; break; }; done

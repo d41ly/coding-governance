@@ -21,7 +21,7 @@ harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md",
+gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md", "a-runner-knob-owes-a-push-class.md",
   "hookspath-resolves-into-another-checkout.md",
   "ab-arm-never-did-the-work.md",
   "empty-field-collapses-unless-it-is-last.md",
@@ -63,11 +63,13 @@ globs = [
   "tools/run-gates/run-held-wsl.sh",
   "tools/run-gates/held_halves.py",
   "tools/run-gates/windows-only-legs.txt",
+  "tools/run-gates/post-merge.sh",
 ]
 ```
 
 ## Constraints & why
 
+- A bar refuses stale outputs first (TOOL-aPrimedIndex-3).
 **The run record, and why the completion file is NOT in it.** Every run writes
 `<git-dir>/gate-run/<run-id>/` — a header before dispatch, one TSV row and one redacted output copy
 per leg, a verdict last — and the verdict's ABSENCE is the crash signal. The `.rc` completion file
@@ -120,25 +122,19 @@ empty manifest and an unwritten verdict file are REFUSED, and the pre-push hook 
 after every exit 0. Two whole-output readers filter the timestamped `gate queue: acquired` line.
 `TOOL-dDerivedDocket-26`.
 
-**A leg declares what it reads beyond its inputs, and the declaration is the reuse key.** The
-`reads` key maps a closed class, `history`, `base`, `clock` or `remote`, to a reason, and each
-class puts one thing into the leg's key: `HEAD`, the baseline, the UTC day, or the remote's
-advertisement. The `remote` legs are the bar's own gates that observe the real remote with
-`ls-remote`, never a self-test, which builds its origin under `mktemp -d`; the `history`, `base`
-and `clock` legs are the ones the reuse research found reading git history, a merge-base or the date.
-The manifest is the population, never this page. A legacy `impure` reads as `remote` and never
-reuses, so an adopter's row keeps its meaning. Verdicts live in the common dir's `gate-cache`,
-written only by a leg that executed `ok` on a clean tree, and a quarter-rate sample re-executes
-reusable legs and quarantines one that disagrees. The push boundary reuses only `remote` and
-`history` legs, at the exact pushed sha and probed tip, and that run is scoped. `TOOL-aSparedSpawn-13`.
-
+**A leg declares what it reads beyond its inputs, and the declaration is the reuse key.** Each
+`reads` class, `history`, `base`, `clock` or `remote`, puts one fact into the key, and a legacy
+`impure` reads as `remote` and never reuses. The manifest is the population and the README's reuse
+section the rule, never this page. `TOOL-aSparedSpawn-13`.
 
 **One leg here grades the DEPLOYER's work rather than the runner's.** `receipt sync` reads
 `.governance/install.json` and reds when an engine row's file is missing or no longer hashes to its
-recorded sha256. It lives here because every adopter installs this kit; the reader that already
-answers the question needs a gov checkout beside the target, so it never runs on an adopter's bar. It is the INTEGRITY arm alone — no `source`, `commit` or
-`gov_oid`, which resolve only against gov's blobs, and no `seed`, `merged`, `attributes` or `forked`
-row. In THIS repository it always takes its announced-skip path, because there is no receipt here, so
+recorded sha256, unless the mismatch is EOL-ONLY: `git hash-object` over the working file
+yields the row's `oid` while the raw bytes do not, the
+rule `govkit check` applies, so a CRLF copy under an `eol=lf` pin is clean and a real edit still reds
+(`TOOL-aLevelledCopy-1`). It lives here because every adopter installs this kit; the reader that already
+answers the question needs a gov checkout beside the target, so it never runs on an adopter's bar.
+It is the INTEGRITY arm alone, and the README names the fields and rows it does not grade. In THIS repository it always takes its announced-skip path, because there is no receipt here, so
 its four built-in fixture arms are the only part of it any gov bar grades. TOOL-cMendedVintage-6.
 
 **The manifest does NOT travel, and the canary that grades it splits in two.** A target's leg list is
@@ -166,11 +162,8 @@ maps detected cores and RAM to a named row; the FIRST row satisfying both thresh
 last row is a zero-threshold catch-all, so unknown hardware is matched rather than special-cased.
 Cores alone are the wrong question: each heavy leg builds its own scratch repo, so a many-core box
 with little RAM thrashes at full width. A knob may cost SPEED or convert a hang into a bounded RED,
-never turn a leg into a pass or a skip — and the BOUND is on the clock as well as on the verdict: a
-leg captured through a command substitution keeps
-the worker blocked until the last inherited write end closes, so an orphan defeats the timeout while
-`timeout` still reports 124. Capture through a file, and grade the elapsed time against an untimed
-control rather than against the message; the runner declares the implemented set
+never turn a leg into a pass or a skip, and the bound holds the clock as well as the verdict
+(`bounded-through-a-pipe-is-unbounded`). The runner declares the implemented set
 and the shipped canary PINS the same set separately, so a new knob reds until an author edits the pin
 and reads the rule. An ABSENT table falls back to the built-in formula and is the documented
 rollback; a MALFORMED one refuses, because a silently ignored knob is a knob the operator believes
@@ -182,16 +175,13 @@ calls. When the runner's output moves and the declaration does not, the deployer
 ran nothing — silently, because "no lines matched" and "no legs ran" are one observation to a reader.
 
 **A held suite's verdict is ATTRIBUTED, not absolute.** `run-selftests.sh --attribute <R>` runs each
-selected suite at the working tree AND at R's own copy of it, in a detached worktree under the git
-common dir, and reports NEW, INHERITED and FIXED sets of normalised FAIL lines, because a suite can
-be red at any base for causes filed against other units, so a bare GREEN names a state nobody can
-reach. Exit 1 is a NEW FAIL, a DEAD
-PROBE at L or an L-side OVER BUDGET, and never an inherited one; consumers read the `verdict clean`
-token on the summary line and never the NEW count alone. SETS AND NOT COUNTS, because a failure this
-tree fixed plus one it introduced nets to zero. A dead side has no members, so everything at L over
-it reads NEW — the direction that fails toward noise rather than toward a false pass. The R-side set
-is cached per (R, suite, suite blob at R) and written only after a run that COMPLETED, which is what
-bounds a cache miss's doubled cost to once per pair. `TOOL-dDerivedDocket-1`.
+selected suite at the working tree AND at R's copy in a detached worktree, and reports NEW,
+INHERITED and FIXED sets of normalised FAIL lines, because a suite can be red at any base for causes
+filed elsewhere. Exit 1 is a NEW FAIL, a DEAD PROBE at L or an L-side OVER BUDGET, never an inherited
+one; consumers read the `verdict clean` token. SETS, NOT COUNTS: a fix plus a new failure nets to
+zero, and a dead side reads everything at L as NEW, failing toward noise. The R-side set is cached
+per (R, suite, suite blob at R) after a COMPLETED run, so a miss costs double once per pair.
+`TOOL-dDerivedDocket-1`.
 
 **A red BAR leg is attributed too, and it is REPORT-ONLY.** `GATE_ATTRIBUTE=<R>` re-runs each red
 leg alone at R from a detached worktree and prints a `GATE attr` line per red leg — OWN, INHERITED,
@@ -211,9 +201,27 @@ world moved past is indistinguishable from one nobody measured. `TOOL-dDerivedDo
 
 **A dispatch waits out memory pressure, and every wait ends.** `mempause` holds the next leg while used memory is above its row's threshold and a leg runs; the `mempause_sh` block both dispatchers carry releases it `fell`, `drained`, `unread`, `bound` or `wall`, so a pool narrows and never deadlocks. Each episode is a `pauses` row, and `derive-ceilings.py` sets its legs' readings aside as `paused`. `TOOL-aGraftedHelix-7`.
 
+**A leg is HELD by `subject == kit` OR `chunk == selftests`, and the summary names that rule.** It
+runs only under `GATE_SELFTESTS=1`; `GATE_FULL` lifts guards, never the hold. An adopter's manifest
+carries no `chunk`, so there only `subject = kit` holds, hence `N held: subject kit or chunk
+selftests` rather than "every self-test" (`TOOL-aBenchedProbe-2`).
+
+**A doc-only push runs only the legs whose doc reads moved.** `GATE_DOCS_BASE=<rev>` (not under
+`GATE_FULL`) skips a leg whose declared `doc_reads` did not move; an undeclared leg falls through to
+its guard. The deployer carries a kit leg's `doc_reads` at run-gates 1.25+ and its `ceiling` at 1.2+
+(`TOOL-dThriftyLanding-1`, `DEPL-aBenchedProbe-2`).
+
+**A full green earned in any worktree serves every push.** A linked worktree's green also lands in a
+separate `.shared` slot in the common dir, never over the primary's own stamp; the push boundary reads
+it last and validates it with its own predicates. One slot per clone: last writer wins, costing a
+saving, never a verdict (`TOOL-dThriftyLanding-2`).
+
+**The remote is asked through the ladder, never spelled.** The runner inlines the gov lib's remote
+ladder byte-identically, so no probe reads a literal `origin` (`TOOL-dLadderedRemote-2`).
+
 **A waiting bar beats.** On every tick it waits, the turnstile rewrites `gate-queue-heartbeat` under its own worktree's git dir, beside `gate-logs/`, and never removes it, so an out-of-process liveness reader sees a queued bar move before its first leg lands; the unattended driver's clock reads its mtime. `TOOL-dDerivedDocket-64`.
 
-**The held tier can split across hosts, and only the combiner stamps it.** `run-held-wsl.sh` runs the declared Windows-only held legs in a scratch clone and the rest in a WSL worktree of an ext4 mirror, each half a plain runner over a partition, so neither half's git dir is one a boundary reads. `held_halves.py --combine` refuses any half that is missing, moved, at another sha, fingerprint or manifest blob, or that left a held leg unreported or reported twice, and writes `held-green` only after the declared agreeing paired runs. No boundary reads it. `TOOL-aSparedSpawn-5`.
+**The held tier can split across hosts, and only the combiner stamps it.** `run-held-wsl.sh` runs the Windows-only held legs natively and the rest in WSL from an ext4 mirror, each half a plain runner over a partition. `held_halves.py --combine` refuses a missing, moved or mismatched half and alone writes `held-green`, which no boundary reads. `TOOL-aSparedSpawn-5`.
 
 ## Shared seams
 
@@ -248,16 +256,15 @@ time; extend by adding keys the deployer resolves, leaving runner-side placehold
 
 ## Affordances
 
+- **Regenerate every declared output** — `bash tools/run-gates/run-gates.sh --regen`; `--regen-check` writes nothing.
 - **Check a target's declaration** — `bash tools/run-gates/adopt-run-gates.sh --check`, which reports
   NOT ADOPTED and exits 0 where no target declares one.
 
 ## Gaps
 
 - The shipped canary's selection arms drive a FIXTURE table they write, not `gate-profiles.txt`,
-  because that file is data an adopter is expected to tune and an arm keyed on its figures would red
-  on their tree while saying nothing about it. Exactly one arm reads the shipped table — the pinned
-  knob set, whose subject is that file's own content. So nothing observes a gov threshold
-  drifting from gov's hardware, but a malformed shipped table reds one arm instead of cascading.
+  which an adopter tunes; only the pinned-knob-set arm reads the shipped table. So nothing observes
+  a gov threshold drifting from gov's hardware, and a malformed shipped table reds one arm only.
 
 - `adopt-run-gates.sh` has no WRITE path today: the `[gate_runner]` declaration is emitted by
   `govkit intake` from this kit's `[gate_runner_seed]`, because a declaration written at configure

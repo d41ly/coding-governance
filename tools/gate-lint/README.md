@@ -210,7 +210,7 @@ step, or a pre-commit hook:
 python3 <prefix>/gate-lint/ps-hygiene.py . || exit 1
 ```
 
-Run `--selftest` in the same place. Per `coding-governance-agents.template.md` §7, a gate
+Run `--selftest` in the same place. Per the charter's `[gate]` practice, a gate
 whose failing case has never been observed is not a gate — `--selftest` is how these prove they
 can still fail after a refactor.
 

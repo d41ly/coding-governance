@@ -208,7 +208,7 @@ ARM_GPB=$BASE_G arm '...and a bump minted INTO the merge onto the base dates it'
 # that option alone prints the merge's patch, which a `tail -1` or a sha loop then reads as a commit.
 # Over the tracked scripts of the repository this suite runs in. LIVE: zero hits is a dead probe,
 # since this kit's own gate carries one. Staged red by deleting `--no-patch` from the gate's search.
-pk=$(cd "$(git -C "$HERE" rev-parse --show-toplevel)" && git grep -nE 'log.* -[SG].*KIT_[A-Z_]*_VERSION' -- '*.sh' '*.py' '*.js' 2>/dev/null)
+pk=$(cd "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" && git grep -nE 'log.* -[SG].*KIT_[A-Z_]*_VERSION' -- '*.sh' '*.py' '*.js' 2>/dev/null)
 pk_bad=$(printf '%s\n' "$pk" | grep -v -e '^$' | grep -v -e '--no-patch.*--diff-merges=first-parent' -e '--diff-merges=first-parent.*--no-patch')
 if [ -z "$pk" ]; then
   fails=$((fails+1)); printf 'arm FAIL  %s\n' 'the kit-version pickaxe scan matched nothing, so it graded nothing (DEAD PROBE)'
@@ -262,7 +262,7 @@ ARM_GPB=$BASE_V2 arm '...and a receipt naming another version than the constant 
 # OFF THE PUSH BOUNDARY a branch carrying an undated engine move is `owed at the lander`, exit 0
 # (TOOL-aMendedFleet-65 S7), which is the third correct answer here; `clean —` or that phrase, and
 # never a FAILED, is what this arm accepts.
-live=$(cd "$(git -C "$HERE" rev-parse --show-toplevel)" && unset GATE_PUSH_BASE && bash "$GATE" 2>&1); lrc=$?
+live=$(cd "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" && unset GATE_PUSH_BASE && bash "$GATE" 2>&1); lrc=$?
 case "$lrc:$live" in
   0:*"clean —"*|0:*"owed at the lander"*) printf 'arm ok    %s\n' 'the live tree passes, and says so as a clean or owed verdict' ;;
   *) fails=$((fails+1)); printf 'arm FAIL  %s — got rc=%s\n' 'the live tree passes' "$lrc"

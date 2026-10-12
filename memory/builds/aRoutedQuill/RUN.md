@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+landed-by: attended
+landed-derived: 9d7e2966a2806a73ca8aaa0f1057642324516ca6 69e0ff0f52b31b66ecf9efb901e8e4a0a6174683
 asks-at-landing: TOOL-aRoutedQuill-8=DEFERRED TOOL-aRoutedQuill-13=OPEN
 units-at-landing: TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-9
 hold-run: 
@@ -23,8 +25,8 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: db08af1b20360b826a73528c1f3b6c1596eb480b · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 7955316e1c249d092f1711c183412a6237fa29f3
-phase: HELD
+witness: 9d7e2966a2806a73ca8aaa0f1057642324516ca6
+phase: LANDED
 may: none
 mode: slug
 run-branch: refs/heads/branch/unattended-arouted-quill-71b76b

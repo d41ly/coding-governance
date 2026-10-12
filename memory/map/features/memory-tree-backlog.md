@@ -38,6 +38,7 @@ says.
 
 ## Constraints & why
 
+- A build's `BACKLOG.md` keeps one status row per ask: a disposition that changes is edited in place, as a KEEP replaced by its CLOSED row (V4, met by TOOL-aPrimedIndex-5).
 **The mode is one conf key, and absent means `shards`.** `BACKLOG_MODE` blank or absent reads
 `shards`: the family files under `memory/backlog/` are the authored backlog, one status slot per row.
 `builds` makes each ask a row of `builds/<slug>/BACKLOG.md` in the folder of its own id's slug, derives
@@ -62,6 +63,17 @@ ids prove nothing; the legacy pairs were adjudicated once, by rule, in the recor
 **A grant is a proposal until an owner commits it** (`TOOL-dDerivedDocket-19`). An ask row's `may`
 names what a run could do; only a build README an owner committed honours it, and a `SCOPE` row
 carrying one is a verdict, because its writer is a triager adding clauses to somebody else's ask.
+
+**A closed build keeps no silent open ask, and a new ask carries its severity.** V10 is retroactive
+over every finished build: an OPEN ask in a CLOSED build's `BACKLOG.md` with no disposition row reds,
+so a run that files an ask it may not fix also writes the `KEEP` that leaves it to an owner (a
+`REOPEN` counts as one). V12 is forward-only: an ask filed on or after the conf's cutoff with no `SEV`
+row anywhere reds. Both are rows in the build's own `## Dispositions`, folded like every other row.
+
+**An OPEN BLOCKER ask surfaces in the work-state index.** The generator renders `## Open BLOCKER
+asks` in `memory/LIVE.md` from the fold alone, one line per OPEN ask whose SEV is BLOCKER with its id,
+home and leg, and no heading when there is none (`TOOL-dUnstuckLanding-16`), which is where an
+escalated inherited-red ask from the unattended close becomes visible to every session.
 
 **The switch retired a counted-never-refused rule** (`TOOL-dDerivedDocket-34`). A signed `unit` ask
 derives its spec's status, so the drift signal that counted backlog rows outliving closed specs, and

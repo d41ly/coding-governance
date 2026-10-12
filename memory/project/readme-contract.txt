@@ -177,6 +177,13 @@ memory/builds/aSparedSpawn/README.md
 memory/builds/aLevelledCopy/README.md
 memory/builds/aHomedAnchor/README.md
 memory/builds/aQuotedBrief/README.md
+memory/builds/aDistilledCharter/README.md
 memory/builds/aRoutedQuill/README.md
 memory/builds/dLadderedRemote/README.md
+memory/builds/dHomedResolver/README.md
 memory/builds/aBenchedProbe/README.md
+memory/builds/aPrimedIndex/README.md
+memory/builds/aSparedHolder/README.md
+memory/builds/aSignalledHook/README.md
+memory/builds/aFrugalTurnstile/README.md
+memory/builds/dRemeasuredRender/README.md

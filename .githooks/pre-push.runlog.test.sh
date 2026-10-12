@@ -22,7 +22,8 @@
 #         pairs with their decisions, rc, lander and refs; a refusal before the loop writes one line
 #   AC2   a credentialed URL through a named remote, bare, typed and rewritten by `insteadOf`, and
 #         refused before the loop: the remote fields S3 names, and no password on any line
-#   AC3   TERM while the bar runs ends the hook with exit=unclean while the bar is still running
+#   AC3   TERM while the bar runs ends the hook at once, clean, as refuse-signal at rc 143, and stops
+#         the bar (TOOL-aSignalledHook-1; it read exit=unclean with the bar running before)
 #   AC4   a stub bar sees GATE_RUN_ID equal to END's gate_run; a real runner copy writes run= that id,
 #         and a leg of that bar sees no GATE_RUN_ID at all
 #   AC5   a failed append leaves rc and stdout alone and says so once; GOV_RUNLOG=0 writes nothing
@@ -30,7 +31,7 @@
 #   AC7   the writer adds no external exec, from a linked worktree and from a primary clone, both
 #         write the COMMON journal, and a clone's first push pays one mkdir
 #   AC8   this suite's own declarations: withheld, budgeted, a held leg with a ceiling, an exempt row
-#   DEC   the decisions AC1 does not reach: skip-delete, refuse-manifest, refuse-head, refuse-dirty,
+#   DEC   the decisions AC1 does not reach: skip-delete, refuse-manifest, refuse-head, refuse-dirty, covered,
 #         scoped, branch-gated, and the other two refusals before the loop
 #   CAP   a line over the cap is fitted exactly as the runlog kit's `render_line` fits it, both steps
 #   EXITS every `exit` in the hook maps to a decision or a named exemption, every one after the trap
@@ -38,8 +39,8 @@
 #
 # WHAT THIS DOES NOT CHECK. Whether a line MEANS anything past the fields named here: the run model is
 # a later unit. The hook's gating decisions as such, which `pre-push.test.sh` grades. A KILL, which
-# runs no trap. Wall time, except in AC3, whose verdict is "the bar was still running when the hook
-# ended" and not a threshold. The lexer is a COPY of the one in the gate runner's run-log suite,
+# runs no trap. Wall time, except in AC3, which applies a 15 s threshold against a 20 s stub bar:
+# a hook that waited the bar out reds it. The lexer is a COPY of the one in the gate runner's run-log suite,
 # changed to key a site on its CODE and not its comment, because kits do not source each other's
 # tests; each copy is graded by its own staged arms.
 set -u
@@ -49,7 +50,7 @@ SRC="$(cd "$HERE/.." && pwd)"
 # (TOOL-aRepatriatedFork-28), never a literal prefix typed here.
 KIT_REL=$( . "$SRC/.githooks/gate-env.sh" >/dev/null 2>&1; printf '%s' "${GOV_KITROOT:-}" )
 [ -n "$KIT_REL" ] || { echo "pre-push.runlog.test: .githooks/gate-env.sh declares no GOV_KITROOT"; exit 2; }
-FLOOR_ASSERTIONS=246
+FLOOR_ASSERTIONS=249
 n=0; st=0
 SEEN=" "; WRITER_FNS=""
 
@@ -481,10 +482,13 @@ EOF
 # ------------------------------------------------------------------------------------------ AC3
 # THE SIGNAL IS SENT ONLY ONCE THE BAR IS PROVABLY RUNNING. The stub bar writes its pid as its FIRST
 # act and then becomes the sleep, so the poll proves the hook is waiting on it before TERM is sent, and
-# the pid read is the process that must still be alive afterwards. A fixed sleep would place the
-# signal wherever the scheduler happened to be.
+# the pid read is the process the hook must stop. A fixed sleep would place the signal wherever the
+# scheduler happened to be.
+# THE VERDICT INVERTED AT TOOL-aSignalledHook-1. This arm used to require the hook to END UNCLEAN while
+# its bar still ran, which is exactly how a TERM landed 69e0ff0f on Git for Windows: there a hook
+# killed by a signal reads to git as success. The hook now traps TERM, stops the bar and refuses.
 check_ac3_term() {
-  local ready="$WORK/ready" hp spid i l0 l
+  local ready="$WORK/ready" hp spid i l0 l t0 secs
   printf '#!/usr/bin/env bash\necho $$ > "%s.tmp" && mv "%s.tmp" "%s"\nexec sleep 20\n' \
     "$ready" "$ready" "$ready" > "$WORK/slow.sh"
   git checkout -q main && git commit -q --allow-empty -m t3
@@ -498,16 +502,21 @@ check_ac3_term() {
   spid=$(cat "$ready" 2>/dev/null); BG_PIDS="$BG_PIDS $spid"
   check "AC3 the stub bar reported ready" "$([ -n "$spid" ] && echo yes)" yes
   check "AC3 the stub bar is running when TERM is sent" "$(kill -0 "$spid" 2>/dev/null && echo alive)" alive
+  t0=$SECONDS
   kill -TERM "$hp" 2>/dev/null
   wait "$hp" 2>/dev/null
-  # The hook is gone and the bar it was waiting on is NOT: it did not wait out the stub's 20 s.
-  check "AC3 the hook ended while its bar still ran" "$(kill -0 "$spid" 2>/dev/null && echo alive)" alive
+  secs=$((SECONDS - t0))
+  # The hook did not wait out the stub's 20 s, and it took the bar down with it.
+  check "AC3 the hook ended before its bar could have" "$([ "$secs" -lt 15 ] && echo prompt || echo "after ${secs}s")" prompt
+  i=0; while kill -0 "$spid" 2>/dev/null && [ "$i" -lt 50 ]; do sleep 0.1; i=$((i + 1)); done
+  check "AC3 the hook stopped the bar it was waiting on" "$(kill -0 "$spid" 2>/dev/null && echo alive || echo stopped)" stopped
   kill "$spid" 2>/dev/null
   l=$(measure_lines)
   check "AC3 START and END" "$((l - l0))" 2
-  check "AC3 END reads unclean" "$(read_field $l exit)" unclean
-  check "AC3 END keeps the decision set before the bar" "$(read_field $l decision)" full
+  check "AC3 END reads clean" "$(read_field $l exit)" clean
+  check "AC3 END reads the signal refusal" "$(read_field $l decision)|$(read_field $l rc)" "refuse-signal|143"
   check "AC3 END names the bar it was waiting on" "$(check_shape_run "$(read_field $l gate_run)")" shaped
+  [ "$(read_field $l decision)" = refuse-signal ] && add_seen refuse-signal
   rm -f "$REPO/.git/push-main-active"
   check_journal AC3
 }
@@ -698,6 +707,16 @@ check_dec_rest() {
   run_hook "$WORK/refs.bar" origin "$WORK/remote.git" GOV_GATE_CMD_TEST= GOV_GATE_CMD="bash tracked-bar.sh"
   l=$(measure_lines)
   check "DEC bar: a tracked bar is recorded as tracked" "$RC|$(read_field $l bar)" "0|tracked"
+  # COVERED (TOOL-aFrugalTurnstile-2 AC11): that green wrote gate-bar-green for this tree and bar, so
+  # the same push again runs no bar, still names the vetted bar for the lander, and ends clean.
+  run_hook "$WORK/refs.bar" origin "$WORK/remote.git" GOV_GATE_CMD_TEST= GOV_GATE_CMD="bash tracked-bar.sh"
+  l=$(measure_lines)
+  check "DEC covered: the push lands with no bar" "$RC|$(printf '%s\n' "$OUT" | grep -c 'pre-push: covered on main push')" "0|1"
+  check "DEC covered: decision" "$(read_field $l decision)|$(read_field $l exit)" "covered|clean"
+  check "DEC covered: pre-push-bar holds the vetted bar's three fields" \
+    "$(awk -F'\t' '{ print NF "|" $1 }' "$REPO/.git/pre-push-bar" 2>/dev/null)" "3|tracked"
+  [ "$(read_field $l decision)" = covered ] && add_seen covered
+  rm -f "$REPO/.git/gate-bar-green"
   run_hook "$WORK/refs.bar" origin "$WORK/remote.git" GOV_GATE_CMD_TEST= GOV_GATE_CMD=
   l=$(measure_lines)
   check "DEC bar: no override is recorded as the default bar" "$(read_field $l bar)" default
@@ -970,6 +989,8 @@ scan_exit_sites() { # file -> one TAB-separated row per shell exit
 # third column is the decision a site writes, which the join below requires this run to have SEEN.
 {
   printf '%s\t%s\t%s\n' 'exit 1' 2 'exempt: the two refusals before any journal root, which S1 names as unloggable'
+  printf '%s\t%s\t%s\n' 'exit 2' 1 'exempt: the --decide argument refusals (a wrong count, a tip naming no commit, a bad sha, a ladder refusal), above the journal root and so unloggable by construction (TOOL-aFrugalTurnstile-7 S4)'
+  printf '%s\t%s\t%s\n' 'RUNLOG_CLEAN=1; exit 0' 1 'exempt: the --decide decision exit in print_decision, which runs with the run log switched off and no EXIT trap, so it writes no END (TOOL-aFrugalTurnstile-7 S6)'
   printf '%s\t%s\t%s\n' 'write_refusal default-branch "$why"; exit 1' 3 refuse-default-branch
   printf '%s\t%s\t%s\n' '[ -z "$main_local" ] && { RUNLOG_DECISION=skip-nondefault; RUNLOG_CLEAN=1; exit 0; }' 1 skip-nondefault
   printf '%s\t%s\t%s\n' '[ -z "${main_local//0/}" ] && { RUNLOG_DECISION=skip-delete; RUNLOG_CLEAN=1; exit 0; }' 1 skip-delete
@@ -980,7 +1001,9 @@ scan_exit_sites() { # file -> one TAB-separated row per shell exit
   printf '%s\t%s\t%s\n' 'write_refusal merge-loss "$why"; RUNLOG_CLEAN=1; exit 1' 1 'exempt: the merge-loss refusal, reachable only with a merge losing a definition under an armed .lexicon.conf, which this suite does not build; armed by pre-push.test.sh (TOOL-aMendedFleet-3)'
   printf '%s\t%s\t%s\n' 'write_refusal dirty-tree "$why"; RUNLOG_CLEAN=1; exit 1' 1 refuse-dirty
   printf '%s\t%s\t%s\n' 'write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1' 5 refuse-bar
+  printf '%s\t%s\t%s\n' 'RUNLOG_DECISION=covered; RUNLOG_CLEAN=1; exit 0' 1 covered
   printf '%s\t%s\t%s\n' 'write_refusal head-moved "$why"; RUNLOG_CLEAN=1; exit 1' 1 'full|scoped'
+  printf '%s\t%s\t%s\n' 'RUNLOG_CLEAN=1; exit "$2"' 1 refuse-signal
   printf '%s\t%s\t%s\n' 'RUNLOG_CLEAN=1; exit "$rc"' 2 'full|scoped|branch-gated'
 } > "$WORK/exits.tsv"
 
