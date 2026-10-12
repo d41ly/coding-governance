@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-19 — an inline stand-in for a role declares itself through its handoff, and needs a dated owner waiver row
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 19 · ratified 2026-10-13
+**Status:** DEFERRED · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 19 · ratified 2026-10-13
 
 <!-- gen:spec-records -->
 

@@ -157,3 +157,5 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-12T22:30:32Z rescope · item add PLAY-aOrientedCast-2 · reason the owner's second addendum (prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-4-owner-addendum.md): the roles join the v4.3 charter as a rendered section
 
 2026-10-12T22:30:34Z rescope · item add TOOL-aOrientedCast-19 · reason the owner's second addendum (prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-4-owner-addendum.md): the roles join the v4.3 charter as a rendered section
+
+2026-10-12T23:07:29Z rescope · item defer TOOL-aOrientedCast-19 · reason temporary: its spec reds the spec-token checker (§4 touches .claude/skills/build/SKILL.md, which the check-wiring self-test leg guards, and §7 does not name it), --dispatch refuses every pass while that checker is red, and the fold needs a gov-spec-writer spawn whose handoff render refuses until TOOL-aOrientedCast-16 lands; the spec returns to OPEN once folded

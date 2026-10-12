@@ -113,11 +113,11 @@ ids TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrie
 | [TOOL-aOrientedCast-16 — a role cites section 1 rule tags, and its agent carries those rules with the Protocols and Facts sections](spec/2026-10-13-spec-TOOL-aOrientedCast-16.md) | 16 | 2 | OPEN | rev-1 | 2026-10-13 |
 | [TOOL-aOrientedCast-17 — a role declares when it is mandatory and where its output goes, and the kit prints the charter's roster lines](spec/2026-10-13-spec-TOOL-aOrientedCast-17.md) | 17 | 2 | OPEN | rev-1 | 2026-10-13 |
 | [TOOL-aOrientedCast-18 — the role roster, derived into the charter by the roles kit's own verb](spec/2026-10-13-spec-TOOL-aOrientedCast-18.md) | 18 | 2 | OPEN | rev-1 | 2026-10-13 |
-| [TOOL-aOrientedCast-19 — an inline stand-in for a role declares itself through its handoff, and needs a dated owner waiver row](spec/2026-10-13-spec-TOOL-aOrientedCast-19.md) | 19 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-19 — an inline stand-in for a role declares itself through its handoff, and needs a dated owner waiver row](spec/2026-10-13-spec-TOOL-aOrientedCast-19.md) | 19 | 2 | DEFERRED | rev-1 | 2026-10-13 |
 | [PLAY-aOrientedCast-2 — the charter's `[roles]` rule and its generated Agent roles section](spec/2026-10-13-spec-PLAY-aOrientedCast-2.md) | 20 | 2 | OPEN | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 38 bound to this build, across 4 record folder(s).
+Records: 39 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
