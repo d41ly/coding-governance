@@ -11,6 +11,7 @@ decisions = []
 gate-legs = [
   "agent-cap self-test",
   "scratch-guard self-test",
+  "format-guard self-test",
   "verifier fan-out",
   "verifier fan-out self-test",
   "review-protocol parity (kit vs dogfood)",
@@ -21,11 +22,11 @@ gate-legs = [
 ]
 kits = ["hooks"]
 git-hooks = []
-harness-hooks = ["PreToolUse tools/hooks/agent-cap.js", "PreToolUse tools/hooks/scratch-guard.js", "SubagentStart tools/hooks/scratch-guard.js"]
+harness-hooks = ["PreToolUse tools/hooks/agent-cap.js", "PreToolUse tools/hooks/scratch-guard.js", "SubagentStart tools/hooks/scratch-guard.js", "Stop tools/hooks/format-guard.js"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["bash-c-multiline-flattens-under-msys.md", "git-rm-cached-refuses-a-diverged-index-blob.md",
+gotcha-classes = ["bash-c-multiline-flattens-under-msys.md", "held-suite-guard-misses-a-sibling-kit.md", "git-rm-cached-refuses-a-diverged-index-blob.md",
   "trailing-comma-counted-as-an-element.md",
   "allowlist-narrower-than-the-root-it-guards.md",
   "a-pair-exists-and-it-is-the-wrong-one.md",
@@ -57,7 +58,7 @@ globs = [
 **The rule is the charter's, not this kit's.** `memory/guides/REVIEW-PROTOCOL.md` is BINDING and states
 two bounds: a review's verify stage spawns at most a stated TOTAL, and all fan-out runs at most a
 stated number at once. Both are resolved by `tools/hooks/agent-cap.js` rather than written in the
-document, so neither goes stale when a repo declares its own. This feature is the machinery that makes those numbers true rather than aspirational.
+document, so neither goes stale when a repo declares its own.
 The document and the predicate are one feature for that reason — a rule enforced by a predicate that
 disagrees with it is worse than no predicate.
 
@@ -161,7 +162,7 @@ in a linked worktree is the primary tree's `.git`.
 hooks.** It returns the single-token value of a key between the opening `---` and the next `---`, or null;
 `checkAuthorizedReadme` reads `authorized-by:` through it and the spec-audit rule reads
 `spec-audit:`, required lazily inside the rule's try so a withdrawn sibling is a deny, not a crash.
-It takes bytes, not a path: the staged-blob caller has no file to name. One reader keeps "a fenced example in the body is not front matter" one answer (F10) for both keys.
+It takes bytes, not a path: the staged-blob caller has no file to name. One reader keeps F10 one answer for both keys.
 
 **`readConfKey` in the same file is the ONE shell-grammar conf reader.** The write gate reads
 `MEMORY_ROOT`, `ROUTED_PATHS` and `SPEC_TIER1_CUTOFF` through it, and `agent-cap.js`'s

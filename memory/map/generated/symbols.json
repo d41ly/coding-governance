@@ -1223,6 +1223,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "buildShapeRegex",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "buildTaskDigest",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -2423,6 +2428,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "build_shape_regex",
+      "kind": "function",
+      "file": "tools/runlog/prose.py"
+    },
+    {
       "id": "build_simulation",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -2853,6 +2863,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkBare",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "checkBuildable",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -2866,6 +2881,11 @@
       "id": "checkCommand",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "checkCommitLines",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "checkDriveRootLitter",
@@ -2908,9 +2928,19 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "checkNamed",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "checkOriented",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkPair",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "checkPosixRootLitter",
@@ -2951,6 +2981,11 @@
       "id": "checkStatusOnlyEdit",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkStop",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "checkStop",
@@ -3475,6 +3510,11 @@
     {
       "id": "check_contains",
       "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
+    },
+    {
+      "id": "check_contains",
+      "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
@@ -3571,6 +3611,11 @@
       "id": "check_emitted",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "check_empty",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
     },
     {
       "id": "check_encoding",
@@ -4106,6 +4151,11 @@
       "id": "check_packing",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "check_pair",
+      "kind": "function",
+      "file": "tools/runlog/prose.py"
     },
     {
       "id": "check_pairs",
@@ -5321,6 +5371,11 @@
       "id": "cmd_probe",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "cmd_prose",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
     },
     {
       "id": "cmd_ready",
@@ -7503,6 +7558,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "extractNewCommits",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "extractRouteUnits",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -9060,6 +9120,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
     {
@@ -9591,6 +9656,11 @@
       "id": "measure_predictors",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
+    },
+    {
+      "id": "measure_prose",
+      "kind": "function",
+      "file": "tools/runlog/prose.py"
     },
     {
       "id": "measure_python_execs",
@@ -11253,6 +11323,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "readCharterShapes",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "readConfKey",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -11288,6 +11363,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "readHeadSha",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "readHeredocs",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -11296,6 +11376,11 @@
       "id": "readInput",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
+    },
+    {
+      "id": "readLiveSlugs",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "readMemoryRoot",
@@ -11366,6 +11451,11 @@
       "id": "readStdin",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "readStdin",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "readStdin",
@@ -11676,6 +11766,11 @@
       "id": "read_cell",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "read_charter_shapes",
+      "kind": "function",
+      "file": "tools/runlog/prose.py"
     },
     {
       "id": "read_charter_table",
@@ -12206,6 +12301,11 @@
       "id": "read_hook_oids",
       "kind": "function",
       "file": "tools/check-wiring.test.sh"
+    },
+    {
+      "id": "read_hook_verdict",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
     },
     {
       "id": "read_hooked_journal",
@@ -13865,6 +13965,11 @@
     {
       "id": "render",
       "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "render",
+      "kind": "function",
       "file": "tools/memory-recall/adopt-memory-recall.sh"
     },
     {
@@ -13921,6 +14026,11 @@
       "id": "renderBlock",
       "kind": "function",
       "file": "tools/unattended/stop-guard.js"
+    },
+    {
+      "id": "renderBlockReason",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "renderBrief",
@@ -14046,6 +14156,11 @@
       "id": "renderLexedView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderLiteral",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "renderLivenessNote",
@@ -14488,6 +14603,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_mark",
+      "kind": "function",
+      "file": "tools/runlog/prose.py"
+    },
+    {
       "id": "render_markdown",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -14561,6 +14681,11 @@
       "id": "render_prof_line",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "render_prose_report",
+      "kind": "function",
+      "file": "tools/runlog/prose.py"
     },
     {
       "id": "render_push_lines",
@@ -14938,6 +15063,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "resolveGitDir",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "resolveHarnessName",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -15121,6 +15251,16 @@
       "id": "resolve_cell",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "resolve_charter",
+      "kind": "function",
+      "file": "tools/runlog/prose.py"
+    },
+    {
+      "id": "resolve_charter_file",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "resolve_charter_path",
@@ -15510,6 +15650,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
@@ -15815,6 +15960,11 @@
     {
       "id": "resolve_native",
       "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
+    },
+    {
+      "id": "resolve_native",
+      "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
     },
     {
@@ -16046,6 +16196,11 @@
       "id": "resolve_python",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
     },
     {
       "id": "resolve_python",
@@ -17848,6 +18003,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "run_stop",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
+    },
+    {
       "id": "run_su",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -18158,6 +18318,11 @@
       "file": "tools/unattended/run-lease.js"
     },
     {
+      "id": "scanMessageLines",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "scanSegments",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -18391,6 +18556,11 @@
       "id": "scan_leaks",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_message_lines",
+      "kind": "function",
+      "file": "tools/runlog/prose.py"
     },
     {
       "id": "scan_missing_citations",
@@ -18638,6 +18808,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "scan_turns",
+      "kind": "function",
+      "file": "tools/runlog/prose.py"
+    },
+    {
       "id": "scan_type_names",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -18803,6 +18978,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "seed_fixture_commit",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
+    },
+    {
       "id": "seed_gates_run",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -18856,6 +19036,11 @@
       "id": "seed_relocation_kit",
       "kind": "function",
       "file": "tools/check-wiring.test.sh"
+    },
+    {
+      "id": "seed_repo",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
     },
     {
       "id": "seed_ros",
@@ -20543,6 +20728,16 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_prose_ac2_ac3_figures",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_prose_ac4_ac5_refusals",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_python3_only",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -21973,6 +22168,11 @@
       "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
+      "id": "write_message",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
+    },
+    {
       "id": "write_model_copy",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -22066,6 +22266,11 @@
       "id": "write_proc_record",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_prose_scenario",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "write_published_conf",

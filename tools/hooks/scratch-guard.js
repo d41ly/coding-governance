@@ -141,7 +141,7 @@
  */
 'use strict'
 
-const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.34 — ships inside the hooks kit entry
+const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.35 — ships inside the hooks kit entry
 
 const TOOLS = ['Bash', 'PowerShell']
 const MAX_FINDINGS = 6
@@ -1612,4 +1612,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, scanCommandHeads, resolveRoleRoot }
+module.exports = { resolveToplevel, resolveCommonDir, checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, scanCommandHeads, resolveRoleRoot }

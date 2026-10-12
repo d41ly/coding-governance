@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-13T01:05:26+03:00 @ f5a63b77ee338bc5885f2c6194dcaf7ab721eeeb
+last-audit: 2026-10-13T01:59:11+03:00 @ 7350eff3975a7047ff01b30ad2be7b275921f433
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: f5a63b77ee338bc5885f2c6194dcaf7ab721eeeb
