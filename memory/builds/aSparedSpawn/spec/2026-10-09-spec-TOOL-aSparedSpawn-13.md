@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-13 — content-addressed reuse: declared read classes, a shared cache, a soundness sample
 
-**Status:** INPROGRESS · rev-2 · 2026-10-10 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -33,18 +33,37 @@ pushed sha and the observed tip only.
     parses the field and skips reuse on it; `tools/run-gates/run-gates.test.sh` lists it in its
     manifest key set; `tools/run-gates/run-gates.evidence.test.sh` declares it on a fixture row;
     `tools/run-gates/README.md` documents it; `memory/map/features/run-gates.md` describes its
-    population in prose, and states one such leg where the manifest carries three.
+    population in prose, and states one such leg where the manifest carries four;
+    `tools/govkit/govkit.py` compares a kit descriptor's row against the manifest's and emits the
+    row into an adopter; `tools/unattended/kit.toml` and `tools/memory-tree/kit.toml` carry the
+    four descriptors, which move from `impure` to `reads` with the manifest rows.
     by value: `tools/run-gates/run-gates.sh` reads the field's PRESENCE to decide reuse, and nothing
-    reads the reason text.
+    reads the reason text; `tools/govkit/govkit.py` compares a descriptor's `reads` with the
+    manifest's where the descriptor declares one, as it compares `ceiling`, and writes an adopter
+    row's legacy `impure` from the descriptor's reasons, so an adopter's runner keeps never reusing
+    those legs whatever runner version it holds.
 - **S2** — The key. Per leg, one hash over what `TOOL-aSparedSpawn-1` already folds in (its content
   key for dirty guarded files, its toolchain, environment and host digest, and `REUSE_SCHEMA`), plus
-  the manifest row's own bytes and only the read classes the row declares: `BASE` for `base`, the
-  `HEAD` sha for `history`, the UTC day for `clock`, and the `HEAD` sha plus the observed tip of the
-  default branch for `remote`. `BASE` enters no other leg's key. A `remote` leg with no observed tip
-  writes no entry and reuses nothing. Observed by AC1, AC2, AC3 and AC12.
+  the manifest row's own bytes and only the read classes the row declares: `BASE` and
+  `GATE_PUSH_BASE` for `base`, the `HEAD` sha for `history`, the UTC day for `clock`, and the `HEAD`
+  sha plus the observed tip of the default branch and the digest of the whole `ls-remote --heads`
+  advertisement for `remote`, because `unattended kit gate` grades against every advertised head and
+  not only the default's. `BASE` enters no other leg's key, so the environment digest leaves out
+  `GATE_BASE`, `GATE_PUSH_BASE`, `GATE_RUN_ID` and every `GATE_REUSE*` knob, and `REUSE_SCHEMA`
+  moves to 3. A `remote` leg with no observed tip writes no entry and reuses nothing. A class
+  outside the four, or a `reads` that is no object, reads as a legacy `impure`. Observed by AC1, AC2,
+  AC3 and AC12.
 - **S3** — Declarations. Every leg the research's §1.4 found reading history, a base or the clock
   carries its class, each re-read against its script at build time. The research's list is a floor
-  and not the population; a missed reader is what S6 exists to catch. Observed by AC2.
+  and not the population; a missed reader is what S6 exists to catch. Observed by AC2. Re-read at
+  build: `history` for the dead-path carriers, the spec tokens, the leg ceilings and the drift-audit
+  records; `history` and `base` for the lexicon naming predicates, the verdict epoch, the kit epoch,
+  the codebase-map coverage and the routed commits, which grades the graph from `GATE_PUSH_BASE`;
+  `clock`, `history` and `base` for memory hygiene, whose later checks diff since the mainline
+  merge-base;
+  `history` for the kickoff-manifest ratchet, whose `health.log` window the research flagged is read
+  by the `--card` writer and not by the leg's argv; `remote` for the other three rows that carried
+  `impure`.
 - **S4** — The cache, in the git common dir and never in a pushable ref: one file per key under a
   two-character fan-out, holding `ok`, seconds, run id, `HEAD` and end time, written tmp-then-rename.
   Only a leg that EXECUTED `ok` on a tree whose `TREE_CLEAN` reads `yes` writes an entry; a reused
@@ -86,7 +105,9 @@ pushed sha and the observed tip only.
   `.githooks/pre-push` in the comment above `BAR_SCRUBBED_KNOBS` (`:1408-1420`);
   `tools/run-gates/run-gates.evidence.test.sh` in the opt-in arm's comment (`:905-907`). Each is
   rewritten in this unit. by value: `.githooks/pre-push` acts on it by scrubbing `GATE_REUSE`
-  (`:1421`), which stays, and gains `GATE_REUSE_PUSH` in the same list so only the hook sets it;
+  (`:1421`), which stays, and clears `GATE_REUSE_PUSH` beside `GATE_DOCS_BASE`, for every bar a STUB
+  included, so only the hook sets it: the scrubbed list is kept for a STUB, and this knob, like the
+  docs knob, is the hook's alone;
   the opt-in arm of `tools/run-gates/run-gates.evidence.test.sh` and the H49 arm of
   `.githooks/pre-push.test.sh` (`:868-875`) assert it, and both keep passing, since a FULL run and
   an environment-set `GATE_REUSE` still reuse nothing.
@@ -124,8 +145,20 @@ per-git-dir `gate-ledger.tsv`. This unit changes three things around it and keep
    process. The write happens where the ledger row is written today, under the S4 preconditions.
 
 The sample and the age counter live beside the cache: a per-leg counter file of consecutive reuses,
-and a quarantine file per leg holding the row hash that quarantined it. A drawn leg is dispatched as
-an ordinary leg and its line says it was sampled.
+and a quarantine file per leg holding the row hash that quarantined it, `age.<name key>` and
+`quarantine.<name key>` in `gate-cache`, the name key being `TOOL-aSparedSpawn-12`'s. A drawn leg is
+dispatched as an ordinary leg and its line says it was sampled. The draw is a polynomial hash of the
+run id and the leg name in shell arithmetic, so it spawns nothing and replays from the run id. A
+sampled leg whose first attempt reds runs once more after the serial retry pass; the first attempt's
+`GATE FAIL` already reds the run, and the second attempt picks the line, `cache disagreement` or
+`nondeterministic`. Every cache write and the 30-day prune, by file mtime, run in ONE python process
+at run end, so a bar pays one spawn for them however many legs it records.
+
+The tip probe is `ls-remote --heads` under `timeout -k`, redirected to a file and read back, the
+idiom of `check-unattended.sh`, against the remote the runner's ladder resolves; the hook probes the
+URL git hands it. Both hash the advertisement with `git hash-object --stdin`, so the two sides agree
+on the digest by construction. The hook probes only on a scoped decision: a FULL one exports
+`GATE_FULL`, under which nothing is reused, so a probe there would buy nothing.
 
 ### Push-time reuse (S9 to S11)
 
@@ -147,7 +180,9 @@ fa68a767), and a push right after a green bar at the same sha and tip reuses the
 
 ### Data model
 
-- Cache entry: `ok<TAB>secs<TAB>run_id<TAB>head<TAB>ended`, one per key, about 100 bytes.
+- Cache entry: `ok<TAB>secs<TAB>run_id<TAB>head<TAB>ended`, one per key, about 100 bytes; `ended`
+  is epoch seconds.
+- The knob: `GATE_REUSE_PUSH=<pushed sha> <tip> <advertisement digest>`.
 - Age counter: the count of consecutive reuses, reset to 0 by any execution.
 - Quarantine: the manifest row hash at the time of the disagreement.
 
@@ -155,8 +190,10 @@ fa68a767), and a push right after a green bar at the same sha and tip reuses the
 
 - The manifest key `reads` and its four class values; the directory
   `gate-cache` under the git common dir; the knob `GATE_REUSE_SAMPLE` for the rate, and a pinned-day
-  seam for the `clock` arm, pinned the way the run id already is (TOOL-aGraftedHelix-7). New function
-  names come from `lexicon.py --suggest` at build.
+  seam for the `clock` arm, pinned the way the run id already is (TOOL-aGraftedHelix-7):
+  `GATE_REUSE_DAY`, defaulting to the UTC days since the epoch. New function names come from
+  `lexicon.py --suggest` at build: `read_remote_heads`, the runner's probe.
+- The header keys `reuse` (`off`, `env` or `push`) and `reuse_sample`.
 - The hook-owned knob `GATE_REUSE_PUSH`; the stamp field `reused`; predicate 9 of
   `check_green_record`.
 
@@ -176,6 +213,8 @@ fa68a767), and a push right after a green bar at the same sha and tip reuses the
 - `memory/map/features/run-gates.md`
 - `.githooks/pre-push` — the tip probe, the knob and its scrub, predicate 9, the rewritten comment
 - `.githooks/pre-push.test.sh` — the push-time reuse arms
+- `tools/govkit/govkit.py` — the descriptor parity on `reads`, and the legacy `impure` an adopter row gets
+- `tools/unattended/kit.toml`, `tools/memory-tree/kit.toml` — the four descriptors move to `reads`
 
 ### Alternatives rejected
 
@@ -300,6 +339,14 @@ New arm: .githooks/pre-push.test.sh · covers AC12 AC13 AC14 AC15 · a moved tip
   the tip probed with `ls-remote` first, the run stamped scoped, a `reused` field and predicate 9 so a
   reused verdict never satisfies the full green, and the never-reuses rule changed in all four places
   it is stated, with Readers.
+- rev-3 · 2026-10-12 · S1 S2 S3 S11 §4 · build-time divergences: govkit and the two kit descriptors
+  join S1's Readers, since govkit compares and emits the key and the manifest holds four `impure`
+  rows; the `remote` key adds the digest of the whole `ls-remote --heads` advertisement, because the
+  unattended kit gate grades every head; the environment digest drops `GATE_BASE`, `GATE_PUSH_BASE`,
+  `GATE_RUN_ID` and `GATE_REUSE*`, without which AC1 cannot hold, and `REUSE_SCHEMA` moves to 3; S3's
+  population is stated as re-read; `GATE_REUSE_PUSH` is cleared beside `GATE_DOCS_BASE` so a STUB
+  bar cannot inherit it either; the day seam, the age and quarantine files, the draw, the re-run, the
+  one-process cache write and prune, and the probe idiom are pinned.
 
 ## 10. Reuse audit
 
