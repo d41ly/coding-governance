@@ -1759,9 +1759,7 @@ def scan_engine_imports(kit_dir):
 def _tree(tmp, decisions, *, families="arch:ARCH", pin="0", archives=None, shards=None):
     """`shards` is {basename: text} written under <memory>/backlog/ and TRACKED, so the census arms
     below exercise `scan_backlog_shards`'s `git ls-files` walk rather than a directory listing."""
-    run("git", "init", "-q", ".", cwd=tmp)
-    run("git", "config", "user.email", "t@t.test", cwd=tmp)
-    run("git", "config", "user.name", "t", cwd=tmp)
+    run("git", "init", "-q", "--template=", ".", cwd=tmp)
     with open(os.path.join(tmp, ".memory-tree.conf"), "w", encoding="utf-8") as fh:
         fh.write(f'MEMORY_ROOT=memory\nFAMILIES="{families}"\n{PIN_KEY}="{pin}"\n')
     os.makedirs(os.path.join(tmp, "memory", "backlog"), exist_ok=True)
@@ -2496,10 +2494,8 @@ def cmd_selftest():
             if os.path.isfile(os.path.join(kroot, receipt)):
                 os.makedirs(os.path.join(t, os.path.dirname(receipt)))
                 shutil.copyfile(os.path.join(kroot, receipt), os.path.join(t, receipt))
-            run("git", "init", "-q", ".", cwd=t)
+            run("git", "init", "-q", "--template=", ".", cwd=t)
             run("git", "symbolic-ref", "HEAD", "refs/heads/main", cwd=t)
-            run("git", "config", "user.email", "t@t.test", cwd=t)
-            run("git", "config", "user.name", "t", cwd=t)
             _write_commit(t, "2026-01-01", dict(rel_base), msg="base")
             return t, run("git", "rev-parse", "HEAD", cwd=t).strip()
 
@@ -2817,6 +2813,11 @@ def cmd_selftest():
 def main(argv):
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
+        # TOOL-aSparedSpawn-9 S1: the fixtures' identity and line endings, once for every git the
+        # selftest runs, in place of two to four `git config` processes per fixture repository.
+        os.environ.update(GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t.test", GIT_COMMITTER_NAME="t",
+                          GIT_COMMITTER_EMAIL="t@t.test", GIT_CONFIG_COUNT="1",
+                          GIT_CONFIG_KEY_0="core.autocrlf", GIT_CONFIG_VALUE_0="false")
         return cmd_selftest()
     try:
         root = tree_root()

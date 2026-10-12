@@ -136,8 +136,12 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 CODEBASE_MAP_DIR=$(resolve_kit_dir "$_PY" codebase-map reuse_lookup.py "$HERE") || exit 2
 CODEBASE_MAP="${CODEBASE_MAP_DIR##*/}"
+# Fixture identity and line endings for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true.
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t.test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t.test
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 cd "$TMP" || exit 2
-git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+git init -q --template= .
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
@@ -1772,7 +1776,7 @@ miss 'reader-inventory arm, is DISARMED'
 # were the liveness filter gone, so the notice is not the only thing this tree can show.
 RT=$TMP/readersclosed
 mkdir -p "$RT"
-( cd "$RT" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$RT" && git init -q --template= .
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
   mkdir -p memory/backlog memory/project memory/builds/tDone/spec
   printf '# r\n' > memory/README.md
@@ -1911,7 +1915,7 @@ git add -A >/dev/null 2>&1; git commit -q -m unstale --no-verify
 #     guard exists for, and the state a mis-segmented selector would produce on a correct tree.
 H=$TMP/halfmigrated
 mkdir -p "$H/memory/project" "$H/memory/architecture/project" "$H/memory/architecture/builds/2026-08-01-ARCH-tOld/spec"
-( cd "$H" && git init -q . && git config user.email t@t.test && git config user.name t
+( cd "$H" && git init -q --template= .
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# old\n' > memory/architecture/builds/2026-08-01-ARCH-tOld/spec/2026-08-01-spec-tOld-1.md
@@ -1942,7 +1946,7 @@ grep -qF 'the selector is mis-segmented' <<<"$outh" || { echo "FAIL the empty-po
 #      index-class file exists anywhere and silence is correct.
 S6=$TMP/missegmented6
 mkdir -p "$S6/memory/architecture/guides"
-( cd "$S6" && git init -q . && git config user.email t@t.test && git config user.name t
+( cd "$S6" && git init -q --template= .
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
   printf '# a guide, at the PRE-flatten path the flat selector does not reach\n' > memory/architecture/guides/METHOD.md
   git add -A && git commit -q -m missegmented6 --no-verify )
@@ -1960,7 +1964,7 @@ n=$((n+1))
 #     that — measured, not imagined.
 Y=$TMP/young
 mkdir -p "$Y/memory/project" "$Y/memory/backlog"
-( cd "$Y" && git init -q . && git config user.email t@t.test && git config user.name t
+( cd "$Y" && git init -q --template= .
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
@@ -1999,7 +2003,7 @@ grep -qF 'row-grammar: NOT MEASURED — memory/backlog/ARCH.md has no LIVE_ROW_P
 # announcement's wording, which gotchas.py's own self-test owns; only that the green run shows it.
 YI=$TMP/young-invariant
 mkdir -p "$YI/memory/project" "$YI/memory/backlog" "$YI/memory/gotchas" "$YI/bin"
-( cd "$YI" && git init -q . && git config user.email t@t.test && git config user.name t
+( cd "$YI" && git init -q --template= .
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
@@ -2025,7 +2029,7 @@ n=$((n+1))
 n=$((n+1))
 G=$TMP/mapped
 mkdir -p "$G/memory/project" "$G/memory/guides" "$G/memory/map/features" "$G/memory/backlog"
-( cd "$G" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$G" && git init -q --template= .
   # ---- The two cap keys are declared APART here, and that is PART OF THE ARMS rather than setup.
   # ---- Both SHIP at 20,480, so a fixture declaring neither makes the row and dossier bounds ONE
   # ---- number, the band between them empty, and the dossier arm satisfiable by an engine carrying no
@@ -2082,7 +2086,7 @@ cblock "$outm" 6 | grep -qF '; no line cap for this class' \
 n=$((n+1))
 NG=$TMP/nomap
 mkdir -p "$NG/memory/project" "$NG/memory/backlog"
-( cd "$NG" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$NG" && git init -q --template= .
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nINDEX_CAP_BYTES="61440"\nINDEX_CAP_LINES="0"\nDOSSIER_CAP_BYTES="20480"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# legacy\n' > memory/project/legacy-files.txt
@@ -2119,7 +2123,7 @@ cblock "$outn" 6 | grep -qF 'memory/backlog/ARCH.md' \
 # ----      isolates membership rather than the move.
 A=$TMP/rotarchive
 mkdir -p "$A/memory/builds/tRot/spec" "$A/memory/archive" "$A/memory/backlog" "$A/memory/project"
-( cd "$A" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$A" && git init -q --template= .
   # DEPL is declared and has NO live shard, deliberately: the archive below is named for it, so its
   # stem resolves to ZERO live indexes. That branch is the one whose `continue` made check 10 inert
   # for every backlog archive, and until this fixture existed it shipped unobserved.
@@ -2187,7 +2191,7 @@ grep -qF 'ARCH-tMoved-1' <<<"$outb" \
 R=$TMP/runanchor
 mkdir -p "$R/memory/builds/tOwner/spec" "$R/memory/builds/tRunBig" "$R/memory/builds/tRunOk" \
          "$R/memory/backlog" "$R/memory/project"
-( cd "$R" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$R" && git init -q --template= .
   # ORPHAN_ID_PIN is what ARMS the unit; 0 is legal because every id below is defined.
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
@@ -2226,7 +2230,7 @@ grep -F 'check 13: id ARCH-tOwner-1' <<<"$outr" | grep -qF 'tRunOk' \
 n=$((n+1))
 A=$TMP/scaffolded
 mkdir -p "$A"
-( cd "$A" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$A" && git init -q --template= .
   # READINESS_ROWS is a `required_keys_render` key (TOOL-aJoinedCanon-9), so this stand-in conf
   # declares it exactly as a real adopter's does — theirs is seeded from .memory-tree.conf.example,
   # which ships the key. Without it the scaffolder REFUSES rather than rendering a §5 holding one
@@ -2266,7 +2270,7 @@ n=$((n+1))
 B=$TMP/scaffolded-inside
 mkdir -p "$B/$(dirname -- "$KIT_REL")"
 cp -r "$HERE" "$B/$(dirname -- "$KIT_REL")/" 2>/dev/null
-( cd "$B" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$B" && git init -q --template= .
   # Declares READINESS_ROWS for the reason the sibling arm above states: it is a
   # `required_keys_render` key, and without it the scaffolder refuses before it reaches the ceiling
   # strip this arm exists to observe.
@@ -2291,7 +2295,7 @@ _src_valued=$(awk -F'\t' '/^## /{ if ($2 ~ /^[0-9]+$/) c++ } END{ print c+0 }' "
 n=$((n+1))
 R=$TMP/routed
 mkdir -p "$R/src" "$R/lib" "$R/.github" "$R/memory"
-( cd "$R" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$R" && git init -q --template= .
   for _f in src/a lib/b .github/c memory/d; do printf 'x\n' > "$_f"; done
   git add -A && git commit -q -m base --no-verify )
 _ro=$(cd "$R" && bash "$HERE/adopt-memory-tree.sh" --scaffold 2>&1); _rrc=$?
@@ -2325,7 +2329,7 @@ outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null); rca=$?
 # ---- SERVED id's slug must stay silent, or branch 5 would be a rule the corpus cannot satisfy.
 K=$TMP/c21
 mkdir -p "$K"
-( cd "$K" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$K" && git init -q --template= .
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nRECORD_UNBOUND_PIN="1"\n' > .memory-tree.conf
   mkdir -p memory/backlog memory/project memory/builds/tOne/spec memory/builds/tOne/reviews \
            memory/builds/tOne/build memory/builds/tTwo/spec memory/builds/tTwo/reviews
@@ -2398,7 +2402,7 @@ c6run() {  # $1 = extra conf lines (%b, so \n works); leaves $out set and assert
   n=$((n+1))
   [ "$c6rc" != 2 ] || { echo "FAIL check-6 caps '$1' aborted the gate (status 2); a silent run below would prove nothing"; st=1; }
 }
-( cd "$C6" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$C6" && git init -q --template= .
   mkdir -p memory/backlog memory/project memory/guides memory/builds/tBig memory/builds/tLong memory/builds/tWide
   printf '# r\n' > memory/README.md
   for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
@@ -2709,7 +2713,7 @@ s10conf() {
   [ -n "$1" ] && printf '%b' "$1" >> "$S10/.memory-tree.conf"
   return 0
 }
-( cd "$S10" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$S10" && git init -q --template= .
   mkdir -p memory/builds/tTen/spec memory/backlog memory/project
   printf '# r\n' > memory/README.md
   for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
@@ -2844,7 +2848,7 @@ write_pk_conf() {   # $1 = a conf line, or empty for the fixture's base conf
 }
 (
   cd "$_b1" || exit 1
-  git init -q .; git config user.email t@t.test; git config user.name t
+  git init -q --template= .
   mkdir -p memory/guides memory/builds/tOne/spec memory/project
   write_pk_conf ""
   printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
@@ -3115,7 +3119,7 @@ rm -rf "$TMP/kit32"
 _fl=$(mktemp -d)
 (
   cd "$_fl" || exit 1
-  git init -q .; git config user.email t@t.test; git config user.name t
+  git init -q --template= .
   mkdir -p scripts memory .governance
   cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
   # The second row RE-HOMES one sibling, as a `kit.codebase-map.prefix` override records it: only
@@ -3167,7 +3171,7 @@ else
 _ad=$(mktemp -d)
 (
   cd "$_ad" || exit 1
-  git init -q .; git config user.email t@t.test; git config user.name t
+  git init -q --template= .
   mkdir -p "scripts/$_PB" notes .governance
   cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
   cp "$_pbk/render_playbook.py" "scripts/$_PB/"
@@ -3224,7 +3228,7 @@ else
 build_fixture_r3() {
   local d; d=$(mktemp -d)
   ( cd "$d" || exit 1
-    git init -q .; git config user.email t@t.test; git config user.name t; git config core.autocrlf false
+    git init -q --template= .
     mkdir -p "scripts/$_PB" notes .governance
     cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
     cp "$_pbk/render_playbook.py" "scripts/$_PB/"
@@ -3389,7 +3393,7 @@ bm_set() {   # $1 = the BACKLOG_MODE line, or empty for a conf that never declar
   [ -n "${1:-}" ] && printf '%s\n' "$1" >> "$BM/.memory-tree.conf"
   return 0
 }
-( cd "$BM" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$BM" && git init -q --template= .
   bm_set ""
   mkdir -p memory/backlog memory/project memory/archive memory/builds/tAsk memory/builds/tHome
   printf '# r\n' > memory/README.md
@@ -3531,7 +3535,7 @@ write_fork_spec() { # filename date -> a live Tier-2 spec, the only one in the t
     > "$FI/memory/builds/tFork/spec/$1-spec-ARCH-tFork-1.md"
   ( cd "$FI" && git add -A ) >/dev/null 2>&1
 }
-( cd "$FI" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$FI" && git init -q --template= .
   mkdir -p memory && printf 'sentinel\n' > memory/HYGIENE.md
   git add -A && git commit -q -m fitem --no-verify ) >/dev/null 2>&1
 FI_CONF='MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n'
@@ -3569,7 +3573,7 @@ write_t1_spec() { # $1 filename date, stdin -> the only spec in the tree, staged
   ( cd "$T1" && git add -A ) >/dev/null 2>&1
 }
 mkdir -p "$T1"
-( cd "$T1" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+( cd "$T1" && git init -q --template= .
   mkdir -p memory && printf 'sentinel\n' > memory/HYGIENE.md
   git add -A && git commit -q -m tier1 --no-verify ) >/dev/null 2>&1
 T1_CONF='MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n'
@@ -3649,8 +3653,7 @@ else
   fi
   (
     cd "$R27" || exit 1
-    git init -q . && git symbolic-ref HEAD refs/heads/main
-    git config user.email t@t.test; git config user.name t; git config core.autocrlf false
+    git init -q --template= . && git symbolic-ref HEAD refs/heads/main
     mkdir -p memory/builds/tOne/spec memory/project
     printf '/%s/\n/%s/\n/.governance/\n__pycache__/\n' "${KIT_REL%%/*}" "${R27_KIT%%/*}" > .gitignore
     printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\nNEAR_MATCH_GATE="red:0.125"\n' > .memory-tree.conf
@@ -3717,8 +3720,7 @@ mkdir -p "$C28/$KIT_REL"
 cp "$HERE"/*.sh "$HERE"/*.py "$C28/$KIT_REL"/
 (
   cd "$C28" || exit 1
-  git init -q . && git symbolic-ref HEAD refs/heads/main
-  git config user.email t@t.test; git config user.name t; git config core.autocrlf false
+  git init -q --template= . && git symbolic-ref HEAD refs/heads/main
   mkdir -p memory/builds/tOne/spec memory/project memory/gotchas
   printf '/%s/\n__pycache__/\n' "${KIT_REL%%/*}" > .gitignore
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n' > .memory-tree.conf
@@ -3780,8 +3782,7 @@ mkdir -p "$C24/$KIT_REL"
 cp "$HERE"/*.sh "$HERE"/*.py "$C24/$KIT_REL"/
 (
   cd "$C24" || exit 1
-  git init -q . && git symbolic-ref HEAD refs/heads/main
-  git config user.email t@t.test; git config user.name t; git config core.autocrlf false
+  git init -q --template= . && git symbolic-ref HEAD refs/heads/main
   mkdir -p memory/builds/tOne/spec memory/project memory/gotchas memory/archive
   printf '/%s/\n__pycache__/\n' "${KIT_REL%%/*}" > .gitignore
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\nROTATION_MODE="cut"\n' > .memory-tree.conf

@@ -22,6 +22,11 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "canary: not inside a git repositor
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "canary: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
+# Fixture identity and line endings for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true. No
+# arm runs status, diff or add on this tree, which is what makes the environment safe here (S5).
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@e GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@e
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 # The resolver, INLINED byte-identically from <prefix>/lib/resolve-python.sh -- this harness SHIPS
 # with the kit and <prefix>/lib/ never travels. Enrols itself in the parity population, which is
 # grep-derived from the marker below (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/` S2).
@@ -348,7 +353,7 @@ io.open(d + "/unbounded.json", "w", encoding="utf-8", newline="\n").write(json.d
 CEILPY
 # A SCRATCH REPO, cwd and all. $KITDIR/run-gates.sh is absolute and GATE_LEGS is explicit, so
 # nothing else moves; the runner's git dir and the turnstile beacon both follow cwd.
-_cr=$(mktemp -d); ( cd "$_cr" && git init -q . && git commit -q --allow-empty -m base ) >/dev/null 2>&1
+_cr=$(mktemp -d); ( cd "$_cr" && git init -q --template= . && git commit -q --allow-empty -m base ) >/dev/null 2>&1
 _bout=$(cd "$_cr" && GATE_LEGS="$_cd/bounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
 case "$_bout" in
   *"GATE FAIL  slow bounded"*"timed out after 2s"*) ;;
@@ -557,7 +562,7 @@ cat > "$SCRATCH/${PFX}gate-legs.json" <<'JSON'
   {"name": "delta fast", "argv": ["bash", "fx/mid.sh", "delta"]}
 ]
 JSON
-( cd "$SCRATCH" && git init -q . && git config user.email t@e && git config user.name t ) >/dev/null 2>&1
+( cd "$SCRATCH" && git init -q --template= . ) >/dev/null 2>&1
 
 # CLEARS fx/ts FIRST. Without it the width-1 run reads the width-4 run's records and the negative
 # control passes on stale evidence -- this repo's fixture-passes-by-finding-nothing class exactly.
@@ -844,7 +849,7 @@ import json, sys
 json.dump([{"name": "l%02d" % i, "argv": ["bash", "fx/a.sh"]} for i in range(30)],
           open(sys.argv[1], "w", newline="\n"), indent=1)
 ' "$SCRATCH/many/${PFX}gate-legs.json"
-( cd "$SCRATCH/many" && git init -q . && git config user.email t@e && git config user.name t ) >/dev/null 2>&1
+( cd "$SCRATCH/many" && git init -q --template= . ) >/dev/null 2>&1
 #     The ABSENCE of "(no result)" is not on its own an assertion: a fixture that never ran has none
 #     either. Two breakages were reproduced passing this arm silently — a missing manifest, and an
 #     omitted `git init`, which is worse, because `git rev-parse --show-toplevel` then walks UP to the
@@ -881,7 +886,7 @@ cat > "$G/${PFX}gate-legs.json" <<'JSON'
   {"name": "plain two", "argv": ["bash", "fx/a.sh"]}
 ]
 JSON
-( cd "$G" && git init -q -b main . && git config user.email t@e && git config user.name t \
+( cd "$G" && git init -q --template= -b main . \
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 # Pass 1 with no origin ref: BASE is unresolvable, changed() fails SAFE to "run", so all three legs
 # execute and all three land a timing row. This is also the arm for that fail-safe.
@@ -945,7 +950,7 @@ cat > "$S/${PFX}gate-legs.json" <<'JSON'
   {"name": "an undeclared leg", "argv": ["bash", "fx/a.sh"]}
 ]
 JSON
-( cd "$S" && git init -q -b main . && git config user.email t@e && git config user.name t \
+( cd "$S" && git init -q --template= -b main . \
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 
 # OFF: the kit leg is held, and it is held with its OWN verb. Not `skip`, whose tail says
@@ -1020,7 +1025,7 @@ cat > "$S2/${PFX}gate-legs.json" <<'JSON'
   {"name": "h kit two",  "argv": ["bash", "fx/a.sh"], "subject": "kit",  "chunk": "held"}
 ]
 JSON
-( cd "$S2" && git init -q -b main . && git config user.email t@e && git config user.name t \
+( cd "$S2" && git init -q --template= -b main . \
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 
 o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
@@ -1079,7 +1084,7 @@ cat > "$S3/${PFX}gate-legs.json" <<'JSON'
   {"name": "k two", "argv": ["bash", "fx/a.sh"], "subject": "kit"}
 ]
 JSON
-( cd "$S3" && git init -q -b main . && git config user.email t@e && git config user.name t \
+( cd "$S3" && git init -q --template= -b main . \
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 
 o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 ); rc=$?
@@ -1202,7 +1207,7 @@ cat > "$D/${PFX}gate-legs.json" <<'JSON'
   {"name": "undeclared",   "argv": ["bash", "fx/a.sh"]}
 ]
 JSON
-( cd "$D" && git init -q -b main . && git config user.email t@e && git config user.name t \
+( cd "$D" && git init -q --template= -b main . \
   && git add -A && git commit -qm fx && printf 'a2\n' > notes/a.md && git commit -qam a ) >/dev/null 2>&1
 _db=$( cd "$D" && git rev-parse HEAD~1 )
 o=$( cd "$D" && GATE_FULL= GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=$_db GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
@@ -1290,11 +1295,11 @@ n=$((n+1))
 #    no skip when the shipped table is edited or removed, and lets the arms name exact readings.
 #    Exactly ONE arm reads the shipped table (4e), because its subject IS that file's own content.
 P="$SCRATCH/prof"
-# EVERY WRITE BELOW LANDS IN $P, INCLUDING A `<prefix>/gate-legs.json` and a `git config user.email`.
+# EVERY WRITE BELOW LANDS IN $P, INCLUDING A `<prefix>/gate-legs.json` and a `git init`.
 # Assert first that $P is not inside the repo under test — by GIT IDENTITY, never by comparing path
 # strings, because under MSYS one directory has two spellings and mount points are not symlinks. A
 # scratch resolving into the real tree would overwrite the bar's own leg manifest with a two-leg
-# fixture and rewrite this repo's commit identity.
+# fixture and re-initialise this repo's git dir.
 #
 # IT EXITS, and it runs BEFORE the mkdir. The first spelling printed REFUSING, set `fail=1`, and then
 # performed every write it had just refused — there is no `set -e` here, so a message is not a stop.
@@ -1328,7 +1333,7 @@ cat > "$P/${PFX}gate-legs.json" <<'JSON'
   {"name": "two", "argv": ["bash", "fx/a.sh"]}
 ]
 JSON
-( cd "$P" && git init -q . && git config user.email t@e && git config user.name t ) >/dev/null 2>&1
+( cd "$P" && git init -q --template= . ) >/dev/null 2>&1
 runp() { ( cd "$P" && env GATE_FULL= GATE_BASE= "$@" bash $KIT_REL/run-gates.sh 2>&1 ); }
 profline() { printf '%s\n' "$1" | grep '^gate profile: ' | head -1; }
 # A LEG's own measured seconds, from the timing cache the runner writes for the next run's dispatch
@@ -1834,7 +1839,7 @@ printf '%s\n' '[' \
   '  {"name": "ga leg", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
   '  {"name": "gb leg", "argv": ["bash", "fx/a.sh"], "guard": ["gb/"]}' \
   ']' > "$BB/${PFX}gate-legs.json"
-( cd "$BB" && git init -q -b main . && git config user.email c@t && git config user.name c \
+( cd "$BB" && git init -q --template= -b main . \
    && git add -A && git commit -qm seed \
    && git remote add origin ../origin.git \
    && git update-ref refs/remotes/origin/main HEAD \
@@ -1882,7 +1887,7 @@ printf '%s\n' '[' \
   '  {"name": "gamma", "argv": ["bash", "fx/a.sh"], "chunk": "one"},' \
   '  {"name": "delta", "argv": ["bash", "fx/a.sh"]}' \
   ']' > "$CK/${PFX}gate-legs.json"
-( cd "$CK" && git init -q -b main . && git config user.email c@t && git config user.name c \
+( cd "$CK" && git init -q --template= -b main . \
    && git add -A && git commit -qm seed ) >/dev/null 2>&1
 cout=$( cd "$CK" && env GATE_FULL=1 bash $KIT_REL/run-gates.sh 2>&1 )
 # SNAPSHOT THE SUMMARY NOW. Every run overwrites it, and the all-skipped fixture below runs a
@@ -1948,7 +1953,7 @@ mkdir -p "$_wd/${PFX}${KIT}" "$_wd/${PFX}${LIB}"
 cp "$ROOT/$KITREL/run-gates.sh" "$ROOT/$KITREL/gate-profiles.txt" "$_wd/${PFX}${KIT}/" 2>/dev/null
 cp "$ROOT/$KITREL/gate-fingerprint.sh" "$_wd/${PFX}${KIT}/" 2>/dev/null || true
 cp "$ROOT/${LIB_DIR}/resolve-python.sh" "$_wd/${PFX}${LIB}/" 2>/dev/null || true
-( cd "$_wd" && git init -q -b main . && git config user.email w@t.invalid && git config user.name w ) >/dev/null 2>&1
+( cd "$_wd" && git init -q --template= -b main . ) >/dev/null 2>&1
 printf 'x\n' > "$_wd/file.txt"
 printf '#!/bin/sh\n( sleep 120 ) &\nsleep 120\n' > "$_wd/slow.sh"
 printf '[\n { "name": "slow leg", "argv": ["bash", "slow.sh"], "chunk": "product", "subject": "repo", "ceiling": 600 }\n]\n' > "$_wd/legs.json"
@@ -2096,8 +2101,7 @@ build_attr_fixture() { # dir — R committed, L in the working tree
   for k in 2 3 5 6 8 9 10 11 12 13 14 15 16; do mkdir -p "$d/fx$k"; done
   cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
-  ( cd "$d" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
-      && git config core.autocrlf false ) >/dev/null 2>&1
+  ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   # THREE SIGNATURE LEGS, each in a directory of its own with its data OUTSIDE it: a checker's
   # directory is its comparator, so a data file beside it would read every change to it as OWN.
   for k in off c f; do
@@ -2280,8 +2284,7 @@ git -C "$A1" checkout -q -- "$KIT_REL/run-gates.sh" 2>/dev/null
 # AC3's summary over ONE red leg, driven through a second TRACKED manifest.
 A3="$AT/a3"; mkdir -p "$A3/$KIT_REL"
 cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$A3/$KIT_REL/" 2>/dev/null
-( cd "$A3" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
-    && git config core.autocrlf false ) >/dev/null 2>&1
+( cd "$A3" && git init -q --template= -b main . ) >/dev/null 2>&1
 printf '[\n  {"name": "absent", "argv": ["bash", "fx4/new.sh"]}\n]\n' > "$A3/$ATL"
 ( cd "$A3" && git add -A && git commit -qm R ) >/dev/null 2>&1
 mkdir -p "$A3/fx4"; printf '#!/usr/bin/env bash\necho "FAIL new"\nexit 1\n' > "$A3/fx4/new.sh"
@@ -2297,8 +2300,7 @@ build_replay_fixture() { # dir · R's line · L's line
   local d=$1
   mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
   cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
-  ( cd "$d" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
-      && git config core.autocrlf false ) >/dev/null 2>&1
+  ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   printf '#!/usr/bin/env bash\nread c g p < data/lane.txt\necho "verb offenders $c over pin $p ($g graded)"\n[ "$c" -le "$p" ]\n' > "$d/fx/pin.sh"
   printf '[\n  {"name": "lexicon naming predicates", "argv": ["bash", "fx/pin.sh"]}\n]\n' > "$d/$ATL"
   printf '%s\n' "$2" > "$d/data/lane.txt"
@@ -2330,8 +2332,7 @@ check_attr_line "$(run_attr_bar "$AT/rc" GATE_ATTRIBUTE=HEAD)" "lexicon naming p
 # set after the measurement without moving R's tree.
 AW="$AT/aw"; mkdir -p "$AW/$KIT_REL" "$AW/fx" "$AW/data"
 cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$AW/$KIT_REL/" 2>/dev/null
-( cd "$AW" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
-    && git config core.autocrlf false ) >/dev/null 2>&1
+( cd "$AW" && git init -q --template= -b main . ) >/dev/null 2>&1
 printf '#!/usr/bin/env bash\ncase "$(cat data/m.txt)" in slow) sleep "$(cat '"'%s'"')";; esac\necho "FAIL w"\nexit 1\n' "$AT/aw.sleep" > "$AW/fx/w.sh"
 printf 'slow\n' > "$AW/data/m.txt"
 printf '[\n  {"name": "walled", "argv": ["bash", "fx/w.sh"]}\n]\n' > "$AW/$ATL"
@@ -2363,8 +2364,7 @@ build_age_fixture() { # dir · the landing (1..12) the red arrives in · [own] -
   mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
   cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
-  ( cd "$d" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
-      && git config core.autocrlf false ) >/dev/null 2>&1
+  ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   printf '#!/usr/bin/env bash\nif [ -s data/red.txt ]; then cat data/red.txt; exit 1; fi\nexit 0\n' > "$d/fx/r.sh"
   if [ -n "$own" ]; then
     printf '#!/usr/bin/env bash\nif [ -s data/own.txt ]; then cat data/own.txt; exit 1; fi\nexit 0\n' > "$d/fx/o.sh"
@@ -2456,8 +2456,7 @@ build_moved_age_fixture() { # dir -> sets AGE_R
   mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
   cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
-  ( cd "$d" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
-      && git config core.autocrlf false ) >/dev/null 2>&1
+  ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   for k in sup cnt ins; do
     printf '#!/usr/bin/env bash\nif [ -s data/%s.txt ]; then cat data/%s.txt; exit 1; fi\nexit 0\n' "$k" "$k" > "$d/fx/$k.sh"
     : > "$d/data/$k.txt"
@@ -2506,8 +2505,7 @@ n=$((n+1))
 AX="$AT/ax"; mkdir -p "$AX/$KIT_REL" "$AX/fx" "$AX/data"
 cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$AX/$KIT_REL/" 2>/dev/null
 cp "$KITDIR/gate-fingerprint.sh" "$AX/$KIT_REL/" 2>/dev/null || true
-( cd "$AX" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
-    && git config core.autocrlf false ) >/dev/null 2>&1
+( cd "$AX" && git init -q --template= -b main . ) >/dev/null 2>&1
 { printf '#!/usr/bin/env bash\n'
   printf 'if [ -n "${ATTR_TERM_READY:-}" ] && [ "$(cat data/side.txt)" = r ]; then\n'
   printf '  printf "%%s\\n" "$$" > "$ATTR_TERM_READY"\n'
@@ -2663,8 +2661,8 @@ if [ -n "${RG_READY:-}" ]; then
 fi
 exit 0
 HOLD
-  ( cd "$d" && git init -q -b main . && git config user.email o@t.invalid && git config user.name o \
-      && git config core.autocrlf false && git add -A && git commit -qm seed ) >/dev/null 2>&1
+  ( cd "$d" && git init -q --template= -b main . \
+      && git add -A && git commit -qm seed ) >/dev/null 2>&1
 }
 # One bar, in the foreground, its merged output to a file OUTSIDE the repo (a file inside would make
 # the tree untracked-dirty before the runner starts). The ambient scoping environment is cleared for
@@ -2828,8 +2826,8 @@ build_hv_repo() { # dir — a scratch repository carrying this runner and its si
   printf '#!/usr/bin/env bash\nsleep 60\n' > "$d/fx/hang.sh"
   printf 'seed\n' > "$d/fx/target.txt"
   printf '#!/usr/bin/env bash\necho moved >> fx/target.txt\nexit 0\n' > "$d/fx/move.sh"
-  ( cd "$d" && git init -q -b main . && git config user.email h@t.invalid && git config user.name h \
-      && git config core.autocrlf false && git add -A && git commit -qm base ) >/dev/null 2>&1
+  ( cd "$d" && git init -q --template= -b main . \
+      && git add -A && git commit -qm base ) >/dev/null 2>&1
 }
 run_hv_bar() { # dir · manifest · VAR=value… -> HV_OUT (stdout and stderr) and HV_RC
   local d=$1 m=$2; shift 2

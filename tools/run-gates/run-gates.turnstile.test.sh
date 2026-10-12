@@ -129,6 +129,10 @@ LIB="${LIB_DIR##*/}"
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "turnstile-test: not a git repo"; exit 2; }
 HERE=$(cd "$(dirname "$0")" && pwd)
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+# Fixture identity and line endings for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true.
+export GIT_AUTHOR_NAME=ts-test GIT_AUTHOR_EMAIL=ts@test.invalid GIT_COMMITTER_NAME=ts-test GIT_COMMITTER_EMAIL=ts@test.invalid
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 bad=0
 # An EXECUTED assertion count with a floor, carried at birth: a suite that prints a hardcoded total
 # is a suite whose count stops tracking its arms the first time somebody deletes one.
@@ -174,8 +178,7 @@ mk_repo() {
   cp "$HERE/run-gates.sh" "$HERE/gate-profiles.txt" "$d/${PFX}${KIT}/" || return 1
   cp "$HERE/gate-fingerprint.sh" "$d/${PFX}${KIT}/" 2>/dev/null || true
   cp "$ROOT/${LIB_DIR}/resolve-python.sh" "$d/${PFX}${LIB}/" 2>/dev/null || true
-  ( cd "$d" && git init -q -b main . && git config user.email ts@test.invalid \
-      && git config user.name ts-test ) >/dev/null 2>&1 || return 1
+  ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1 || return 1
   # The occupancy leg: register, count everyone registered, record the count, dwell, deregister.
   # `mkdir` for the marker so registration is atomic; the count is taken AFTER registering, so a
   # holder always sees at least itself.

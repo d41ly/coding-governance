@@ -11,6 +11,10 @@ set -u
 HOOK="$(cd "$(dirname "$0")" && pwd)/pre-commit"
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
+# Fixture identity and line endings for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true.
+export GIT_AUTHOR_NAME=test GIT_AUTHOR_EMAIL=t@example.com GIT_COMMITTER_NAME=test GIT_COMMITTER_EMAIL=t@example.com
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 pass=0; fail=0
 ck() { # name  actual_exit  expected_pass(0)/fail(1)
   local ok; if [ "$3" = 0 ]; then [ "$2" = 0 ] && ok=1 || ok=0; else [ "$2" != 0 ] && ok=1 || ok=0; fi
@@ -19,9 +23,7 @@ ck() { # name  actual_exit  expected_pass(0)/fail(1)
 }
 
 cd "$tmp" || exit 2
-git init -q -b main
-git config user.email t@example.com; git config user.name test
-git config core.autocrlf false   # hermetic: a global autocrlf=true otherwise reaches this repo
+git init -q --template= -b main
 mkdir hk; cp "$HOOK" hk/pre-commit; chmod +x hk/pre-commit
 git config core.hooksPath hk
 export GOV_DEFAULT_BRANCH=main   # throwaway has no origin/HEAD — pin the default explicitly
@@ -128,8 +130,7 @@ run_prefix_commit() { # <prefix, "" for the root> <rung: env|receipt|root|none> 
   local pfx=$1 rung=$2 hook=$3 d="$tmp/pfx-$2" kd
   rm -rf "$d"; mkdir -p "$d"
   ( cd "$d" || exit 2
-    git init -q -b main; git config user.email t@example.com; git config user.name test
-    git config core.autocrlf false
+    git init -q --template= -b main
     mkdir hk; cp "$hook" hk/pre-commit; chmod +x hk/pre-commit; git config core.hooksPath hk
     kd=${pfx:+$pfx/}$mt; mkdir -p "$kd" memory
     printf '#!/usr/bin/env bash\necho "HYGIENE RAN from %s $*"\n' "$kd" > "$kd/$hy"
@@ -173,8 +174,7 @@ fi
 ua=unattended; ad=adopt-unattended.sh
 d="$tmp/wiring"; rm -rf "$d"; mkdir -p "$d"
 out=$( cd "$d" || exit 2
-  git init -q -b main; git config user.email t@example.com; git config user.name test
-  git config core.autocrlf false
+  git init -q --template= -b main
   mkdir hk; cp "$HOOK" hk/pre-commit; chmod +x hk/pre-commit; git config core.hooksPath hk
   mkdir -p "$ua"; printf '#!/usr/bin/env bash
 echo "WIRING RAN $*"

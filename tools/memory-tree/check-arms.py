@@ -975,9 +975,7 @@ def cmd_selftest() -> int:
     with tempfile.TemporaryDirectory() as base:
         root = os.path.join(base, "repo")
         os.makedirs(root)
-        run("git", "init", "-q", ".", cwd=root)
-        run("git", "config", "user.email", "t@t.test", cwd=root)
-        run("git", "config", "user.name", "t", cwd=root)
+        run("git", "init", "-q", "--template=", ".", cwd=root)
         _w(os.path.join(root, ".memory-tree.conf"),
            f'MEMORY_ROOT=memory\nARMS_FLOORS="{PFX}gate-a.sh:3:1"\n')
         _w(os.path.join(root, PFX, "gate-a.sh"), GATE_A)
@@ -996,9 +994,7 @@ def cmd_selftest() -> int:
         # there, because an empty population has nothing to floor.
         empty = os.path.join(base, "empty")
         os.makedirs(empty)
-        run("git", "init", "-q", ".", cwd=empty)
-        run("git", "config", "user.email", "t@t.test", cwd=empty)
-        run("git", "config", "user.name", "t", cwd=empty)
+        run("git", "init", "-q", "--template=", ".", cwd=empty)
         _w(os.path.join(empty, "README.md"), "no gates here yet\n")
         run("git", "add", "-A", cwd=empty)
         run("git", "commit", "-q", "-m", "e", "--no-verify", cwd=empty)
@@ -1189,9 +1185,7 @@ def cmd_selftest() -> int:
         # observed red against the a7c78ad2 reader, which read neither file.
         side = os.path.join(base, "side")
         os.makedirs(side)
-        run("git", "init", "-q", ".", cwd=side)
-        run("git", "config", "user.email", "t@t.test", cwd=side)
-        run("git", "config", "user.name", "t", cwd=side)
+        run("git", "init", "-q", "--template=", ".", cwd=side)
         _w(os.path.join(side, ".memory-tree.conf"),
            f'MEMORY_ROOT=memory\nARMS_FLOORS="{PFX}kit/g.sh:2:1"\n')
         _w(os.path.join(side, PFX, "kit", "g.sh"),
@@ -1244,9 +1238,7 @@ def cmd_selftest() -> int:
         def build_refusal_tree(name, files, refusals="graded", floors=""):
             t = os.path.join(base, name)
             os.makedirs(t)
-            run("git", "init", "-q", ".", cwd=t)
-            run("git", "config", "user.email", "t@t.test", cwd=t)
-            run("git", "config", "user.name", "t", cwd=t)
+            run("git", "init", "-q", "--template=", ".", cwd=t)
             _w(os.path.join(t, ".memory-tree.conf"), f'MEMORY_ROOT=memory\nARMS_REFUSALS="{refusals}"\n'
                f'ARMS_FLOORS="{floors}"\n')
             _w(os.path.join(t, "memory", "project", ".keep"), "")
@@ -1388,6 +1380,11 @@ def _capture(fn, root, conf, sink):
 def main(argv):
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
+        # TOOL-aSparedSpawn-9 S1: the fixtures' identity and line endings, once for every git the
+        # selftest runs, in place of two to four `git config` processes per fixture repository.
+        os.environ.update(GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t.test", GIT_COMMITTER_NAME="t",
+                          GIT_COMMITTER_EMAIL="t@t.test", GIT_CONFIG_COUNT="1",
+                          GIT_CONFIG_KEY_0="core.autocrlf", GIT_CONFIG_VALUE_0="false")
         return cmd_selftest()
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()

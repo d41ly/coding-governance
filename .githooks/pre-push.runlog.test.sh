@@ -62,6 +62,12 @@ unset GATE_BASE GATE_FULL GATE_REUSE GATE_JOBS GATE_PROFILES GATE_PROFILE GATE_R
   GOV_DEFAULT_BRANCH GIT_SSH_COMMAND PPRL_SEEN GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR \
   GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE GIT_PREFIX
 export GOV_DEFAULT_BRANCH=main
+# Fixture identity and config for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1). autocrlf OFF because the global conf on a Windows node would check files
+# out with CRLF in the linked worktree AC7 makes; the hook itself is a copy, never a checkout.
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t
+export GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false \
+  GIT_CONFIG_KEY_1=commit.gpgsign GIT_CONFIG_VALUE_1=false
 # THE DECLARED TEST ESCAPE (TOOL-aRepatriatedFork-5). Every bar below is an mktemp stub or a copy of
 # the runner outside the scratch tree, untracked by construction, and the hook refuses an untracked
 # bar. The DEC arm's `bar` checks empty it per push to reach the tracked, default and refused cases.
@@ -245,13 +251,10 @@ PYEOF
 build_scratch() {
   mkdir -p "$WORK/hooks" || return 1
   cp "$HERE/pre-push" "$HOOK" || return 1
-  git init -q --bare "$WORK/remote.git" || return 1
-  git init -q -b main "$REPO" || return 1
+  git init -q --template= --bare "$WORK/remote.git" || return 1
+  git init -q --template= -b main "$REPO" || return 1
   cd "$REPO" || return 1
-  # autocrlf OFF: the global conf on a Windows node would check files out with CRLF in the linked
-  # worktree AC7 makes. The hook itself is a copy, never a checkout.
-  git config user.email t@t; git config user.name t; git config commit.gpgsign false
-  git config core.autocrlf false; git config core.hooksPath "$WORK/hooks"
+  git config core.hooksPath "$WORK/hooks"
   git commit -q --allow-empty -m base || return 1
   git remote add origin "$WORK/remote.git" || return 1
   printf '#!/usr/bin/env bash\nexit 0\n' > "$WORK/green.sh"

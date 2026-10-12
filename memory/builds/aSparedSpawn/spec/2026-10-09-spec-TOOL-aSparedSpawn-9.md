@@ -1,11 +1,13 @@
 # TOOL-aSparedSpawn-9 — fixture templates and environment git identity across the named suites
 
-**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-1 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-1 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aSparedSpawn-9-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-9-acceptance-ledger.md) | journal | — |
+| [2026-10-12-build-TOOL-aSparedSpawn-9-direct-checks.sh](../build/2026-10-12-build-TOOL-aSparedSpawn-9-direct-checks.sh) | journal | — |
 | [2026-10-11-prompt-TOOL-aSparedSpawn-9-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-9-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

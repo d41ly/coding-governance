@@ -107,6 +107,10 @@ bad() { echo "  FAIL — $1"; fail=1; }
 # The scratch repo is `git init`+`remote add` (origin/HEAD unset); pin the default so the hook's
 # fail-CLOSED resolution doesn't refuse the gate cases (case 6 unsets it to test that path).
 export GOV_DEFAULT_BRANCH=main
+# Fixture identity and line endings for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true.
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@example.com GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@example.com
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 # THE DECLARED TEST ESCAPE (TOOL-aRepatriatedFork-5, from adopter nc's PKG-dCandidLodestar-5). Every
 # stub below is an mktemp script, which is untracked by construction, and the hook refuses an
 # untracked merge bar. Without this the whole file would test a refusal path and nothing else.
@@ -118,10 +122,9 @@ export GOV_GATE_CMD_TEST=1
 mkdir -p "$tmp/hooks"
 cp "$SRC/.githooks/pre-push" "$tmp/hooks/pre-push"
 
-git init -q --bare "$tmp/remote.git"
-git init -q "$tmp/work"
+git init -q --template= --bare "$tmp/remote.git"
+git init -q --template= "$tmp/work"
 cd "$tmp/work" || exit 2
-git config user.email t@example.com; git config user.name t
 git config core.hooksPath "$tmp/hooks"
 git commit -q --allow-empty -m init
 git branch -M main
@@ -531,7 +534,7 @@ fi
 # does not. Both directions, because a one-sided arm cannot tell a working scrub from a fixture that
 # never reproduced the bug.
 wt=$(mktemp -d)
-( git init -q "$wt/w" && cd "$wt/w" && git config user.email t@t && git config user.name t \
+( git init -q --template= "$wt/w" && cd "$wt/w" \
     && echo x > a && git add -A && git commit -qm init && git worktree add -q "$wt/lw" -b lw ) >/dev/null 2>&1
 wtcfg="$wt/w/.git/config"
 wtgd="$wt/w/.git/worktrees/lw"
@@ -612,9 +615,8 @@ pfx_fixture() {
   # fixture builder died before it built anything. One name per statement.
   local d="$tmp/pfx-$pfx-$tag"
   mkdir -p "$d/hooks"; cp "$hook" "$d/hooks/pre-push"
-  git init -q --bare "$d/remote.git"; git init -q "$d/work"
+  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
   cd "$d/work" || return 1
-  git config user.email t@example.com; git config user.name t
   git config core.hooksPath "$d/hooks"
   mkdir -p "$pfx"
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$pfx/gate-legs.json"
@@ -702,9 +704,8 @@ else bad "AC3 the hook refused a tree that simply has no leg manifest"; fi
 # --- does not exist. The kit and its runner are joined at run time, as the hook joins them.
 vg=vendor/gov; rgk=run-gates
 vgd="$tmp/vg"; mkdir -p "$vgd/hooks"; cp "$SRC/.githooks/pre-push" "$vgd/hooks/pre-push"
-git init -q --bare "$vgd/remote.git"; git init -q "$vgd/work"
+git init -q --template= --bare "$vgd/remote.git"; git init -q --template= "$vgd/work"
 cd "$vgd/work" || exit 2
-git config user.email t@example.com; git config user.name t; git config core.autocrlf false
 git config core.hooksPath "$vgd/hooks"
 mkdir -p "${vg}/$rgk" .githooks
 # The stub writes the GREEN run record a real runner would: an exit 0 with no verdict is RED since
@@ -754,9 +755,8 @@ esac
 # --- manifest, ran that runner over a RED tracked bar and landed, with `git status` empty. Each arm
 # --- stages that shape; the control proves a clean, tracked receipt still reaches its bar.
 b1="$tmp/b1"; mkdir -p "$b1/hooks"; cp "$SRC/.githooks/pre-push" "$b1/hooks/pre-push"
-git init -q --bare "$b1/remote.git"; git init -q "$b1/work"
+git init -q --template= --bare "$b1/remote.git"; git init -q --template= "$b1/work"
 cd "$b1/work" || exit 2
-git config user.email t@example.com; git config user.name t; git config core.autocrlf false
 git config core.hooksPath "$b1/hooks"
 mkdir -p "$RUN_GATES"
 printf '#!/usr/bin/env bash\necho "TRACKED BAR RAN - RED"; exit 1\n' > "$RUN_GATES/$RUN_GATES.sh"
@@ -768,7 +768,7 @@ b1_gd=$(git rev-parse --git-dir)
 mkdir -p "$b1_gd/x/$RUN_GATES" .governance
 printf '#!/usr/bin/env bash\necho "PLANTED BAR RAN"; exit 0\n' > "$b1_gd/x/$RUN_GATES/$RUN_GATES.sh"
 printf '%s\n' '[]' > "$b1_gd/x/gate-legs.json"
-printf '.governance/\n' >> "$b1_gd/info/exclude"
+mkdir -p "$b1_gd/info"; printf '.governance/\n' >> "$b1_gd/info/exclude"
 write_b1_receipt() { # <path the runner row records> -> the receipt, one key per line as the hook's reader expects
   printf '{\n  "files": [\n    {\n      "path": "%s",\n      "source": "%s/%s.sh"\n    }\n  ]\n}\n' \
     "$1" "$RUN_GATES" "$RUN_GATES" > .governance/install.json
@@ -816,9 +816,8 @@ cd "$pfx_home" || exit 2
 # --- every arm by never being asked. Each planted route writes a marker when it runs.
 h49="$tmp/h49"; h49_mark="$h49/mark"; mkdir -p "$h49/hooks" "$h49_mark"
 cp "$SRC/.githooks/pre-push" "$h49/hooks/pre-push"
-git init -q --bare "$h49/remote.git"; git init -q "$h49/work"
+git init -q --template= --bare "$h49/remote.git"; git init -q --template= "$h49/work"
 cd "$h49/work" || exit 2
-git config user.email t@example.com; git config user.name t; git config core.autocrlf false
 git config core.hooksPath "$h49/hooks"
 mkdir -p "$RUN_GATES" fx
 cp "$SRC/$RUN_GATES_DIR/run-gates.sh" "$SRC/$RUN_GATES_DIR/gate-fingerprint.sh" \
@@ -877,7 +876,7 @@ case "$_rc|$(read_h49_token)" in
 esac
 
 # The IGNORED manifest: the repository tracks the runner and no manifest, and `git status` is empty.
-git rm -q --cached gate-legs.json; printf 'gate-legs.json\n' >> "$h49_gd/info/exclude"
+git rm -q --cached gate-legs.json; mkdir -p "$h49_gd/info"; printf 'gate-legs.json\n' >> "$h49_gd/info/exclude"
 printf '[{"name": "planted", "argv": ["bash", "-c", "touch %s/ignored"]}]\n' "$h49_mark" > gate-legs.json
 git commit -q -m "h49 an ignored manifest"
 [ -z "$(git status --porcelain)" ] || bad "H49 fixture — the ignored manifest is visible to git status, so the arm below tests nothing hidden"
@@ -906,9 +905,8 @@ build_ir_fixture() { # tag · gate-env body (printf %b) -> a pushed main whose R
   local tag=$1 body=$2
   local d="$tmp/ir-$tag"
   mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
-  git init -q --bare "$d/remote.git"; git init -q "$d/work"
+  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
   cd "$d/work" || return 1
-  git config user.email t@example.com; git config user.name t
   git config core.hooksPath "$d/hooks"
   mkdir -p .githooks "$KIT_REL"
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
@@ -1104,7 +1102,7 @@ fi
 # AC11, the reader's failing case: two fixture commits gov's own values cannot satisfy, one declaring
 # park with a bound of 7 and one with no gate-env.sh at all, which reads the kit default land, unbounded.
 _d="$tmp/ir-ac11-reader"; mkdir -p "$_d/.githooks"
-( cd "$_d" && git init -q && git config user.email t@example.com && git config user.name t \
+( cd "$_d" && git init -q --template= \
   && printf 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=7\n' > .githooks/gate-env.sh \
   && git add .githooks/gate-env.sh && git commit -q -m park7 \
   && git rm -q .githooks/gate-env.sh && git commit -q -m absent ) >/dev/null 2>&1
@@ -1127,9 +1125,8 @@ cd "$pfx_home" || exit 2
 build_vr_fixture() { # tag -> a pushed main whose tree carries the stub runner; cwd moves into its work tree
   local d="$tmp/vr-$1"
   mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
-  git init -q --bare "$d/remote.git"; git init -q "$d/work"
+  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
   cd "$d/work" || return 1
-  git config user.email t@example.com; git config user.name t
   git config core.hooksPath "$d/hooks"
   mkdir -p "$KIT_REL/$RUN_GATES" .githooks
   # The rung the hook reads the kit root from when no receipt and no root install name it.
@@ -1280,10 +1277,9 @@ esac
 # pushes with "can't determine the default branch" before any of them reached what it grades.
 fx8="$tmp/fx8"
 mkdir -p "$fx8"
-git init -q --bare "$fx8/mirror.git"
-git init -q "$fx8/work"
+git init -q --template= --bare "$fx8/mirror.git"
+git init -q --template= "$fx8/work"
 cd "$fx8/work" || exit 2
-git config user.email t@example.com; git config user.name t
 git config core.hooksPath "$tmp/hooks"
 git commit -q --allow-empty -m init; git branch -M main
 git remote add mirror "$fx8/mirror.git"
@@ -1397,10 +1393,9 @@ cd "$pfx_home" || exit 2
 # and reaches the later raw-push refusal.
 if _ml_lex=$(resolve_kit_dir "$_rkd_py" lexicon lexicon.py "$SRC/$KIT_REL" 2>/dev/null); then
   _ml_home=${_ml_lex##*/}
-  git init -q --bare "$tmp/ml.git"
-  git init -q "$tmp/ml"
+  git init -q --template= --bare "$tmp/ml.git"
+  git init -q --template= "$tmp/ml"
   cd "$tmp/ml" || exit 2
-  git config user.email t@example.com; git config user.name t; git config core.autocrlf false
   git config core.hooksPath "$tmp/hooks"
   cp -r "$SRC/$_ml_lex" "$_ml_home"; rm -rf "$_ml_home/__pycache__"
   printf 'LANGS="sh:shell-tokens:parser"\n' > .lexicon.conf
@@ -1445,9 +1440,8 @@ printf '#!/usr/bin/env bash\nprintf "docs=%%s\\n" "${GATE_DOCS_BASE:-}" > "$DOCS
 build_docs_fixture() { # tag · gate-env body (printf %b) -> a pushed main at R carrying that body
   local d="$tmp/docs-$1"
   mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
-  git init -q --bare "$d/remote.git"; git init -q "$d/work"
+  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
   cd "$d/work" || return 1
-  git config user.email t@example.com; git config user.name t; git config core.autocrlf false
   git config core.hooksPath "$d/hooks"
   mkdir -p .githooks "$KIT_REL" notes src
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"

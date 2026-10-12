@@ -35,6 +35,12 @@ KIT="${KIT_REL##*/}"   # this kit's own directory NAME (TOOL-aRepatriatedFork-46
 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "evidence-test: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
+# Fixture identity and line endings for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true. The
+# runner arms over this tree run under a scratch GIT_DIR, so this repository's own index and config
+# are never read with the environment's value (S5).
+export GIT_AUTHOR_NAME=rec-test GIT_AUTHOR_EMAIL=rec@test.invalid GIT_COMMITTER_NAME=rec-test GIT_COMMITTER_EMAIL=rec@test.invalid
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 RUNNER="$ROOT/${PFX}${KIT}/run-gates.sh"
 # The launcher is RESOLVED, not assumed, ONCE, for every python arm below: on Windows the bare name
 # `python` can be the Store stub that answers `command -v` and exits 9009, and an arm that dies on
@@ -169,7 +175,7 @@ mk_legs() { printf '[%s]\n' "$2" > "$1"; }
 # fresh_gitdir <n> — a scratch GIT_DIR per case, so cases cannot read each other's logs and the real
 # gate-last-summary.txt is never touched
 fresh_gitdir() {
-  local d="$tmp/gd$1"; rm -rf "$d"; git init -q --bare "$d" 2>/dev/null || mkdir -p "$d"
+  local d="$tmp/gd$1"; rm -rf "$d"; git init -q --template= --bare "$d" 2>/dev/null || mkdir -p "$d"
   printf '%s' "$d"
 }
 # GIT_WORK_TREE is required, not decoration: the runner resolves ROOT with `--show-toplevel`,
@@ -311,8 +317,7 @@ rec_repo() {  # -> sets REC_T (worktree) and REC_GD (git dir)
   cp "$ROOT/${PFX}${KIT}/run-gates.sh" "$ROOT/${PFX}${KIT}/gate-fingerprint.sh" \
      "$ROOT/${PFX}${KIT}/gate-profiles.txt" "$REC_T/${PFX}${KIT}/" || return 1
   cp "$ROOT/${LIB_DIR}/resolve-python.sh" "$REC_T/${PFX}${LIB}/" 2>/dev/null || true
-  ( cd "$REC_T" && git init -q -b main . && git config user.email rec@test.invalid \
-      && git config user.name rec-test ) >/dev/null 2>&1 || return 1
+  ( cd "$REC_T" && git init -q --template= -b main . ) >/dev/null 2>&1 || return 1
   printf '#!/usr/bin/env bash\necho hello\nexit 0\n' > "$REC_T/fx/a.sh"
   printf '#!/usr/bin/env bash\necho boom\nexit 3\n'  > "$REC_T/fx/red.sh"
   printf '#!/usr/bin/env bash\nsleep 60\nexit 0\n'    > "$REC_T/fx/slow.sh"
@@ -462,9 +467,10 @@ rec_done
 # Its own git dir keeps its stamp, the common dir gains `gate-full-green.shared` carrying the same sha,
 # and the common dir's OWN stamp, which is the primary tree's, is never written from a worktree.
 rec_repo
-# autocrlf OFF before the checkout: on a host that converts, the worktree's copy of the profile table
-# reads CRLF and the runner refuses it, so the control would fail for a reason outside this unit.
-( cd "$REC_T" && git config core.autocrlf false && git worktree add -q "$REC_T.wt" -b side ) >/dev/null 2>&1
+# autocrlf OFF before the checkout, through the prologue's environment: on a host that converts, the
+# worktree's copy of the profile table reads CRLF and the runner refuses it, so the control would
+# fail for a reason outside this unit.
+( cd "$REC_T" && git worktree add -q "$REC_T.wt" -b side ) >/dev/null 2>&1
 ( cd "$REC_T.wt" && env -u GATE_BASE -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES -u GATE_DOCS_BASE GATE_FULL=1 \
     bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1 )
 _wgd=$( cd "$REC_T.wt" && git rev-parse --git-dir 2>/dev/null )
@@ -913,8 +919,7 @@ ru_repo() {   # -> RU_T, RU_GD
   cp "$ROOT/${PFX}${KIT}/run-gates.sh" "$ROOT/${PFX}${KIT}/gate-fingerprint.sh" \
      "$ROOT/${PFX}${KIT}/gate-profiles.txt" "$RU_T/${PFX}${KIT}/" || return 1
   cp "$ROOT/${LIB_DIR}/resolve-python.sh" "$RU_T/${PFX}${LIB}/" 2>/dev/null || true
-  ( cd "$RU_T" && git init -q -b main . && git config user.email ru@test.invalid \
-      && git config user.name ru-test ) >/dev/null 2>&1 || return 1
+  ( cd "$RU_T" && git init -q --template= -b main . ) >/dev/null 2>&1 || return 1
   printf '#!/usr/bin/env bash\necho a\nexit 0\n' > "$RU_T/fx/a.sh"
   printf '#!/usr/bin/env bash\necho b\nexit 0\n' > "$RU_T/fx/b.sh"
   echo x > "$RU_T/ga/f"; echo y > "$RU_T/gb/f"
@@ -1133,7 +1138,7 @@ DC_T=$(mktemp -d)
 mkdir -p "$DC_T/${PFX}${KIT}"
 cp "$ROOT/${PFX}${KIT}/derive-ceilings.py" "$ROOT/${PFX}${KIT}/ceiling-margin.txt" \
    "$DC_T/${PFX}${KIT}/" || { echo "evidence-test: cannot copy the ceiling kit"; exit 2; }
-( cd "$DC_T" && git init -q -b main . ) >/dev/null 2>&1 \
+( cd "$DC_T" && git init -q --template= -b main . ) >/dev/null 2>&1 \
   || { echo "evidence-test: cannot init the ceiling fixture repo"; exit 2; }
 DC_SCRIPT="$DC_T/${PFX}${KIT}/derive-ceilings.py"
 DC_EV="$DC_T/${PFX}${KIT}/ceiling-evidence.txt"
@@ -1527,7 +1532,7 @@ CN_T=$(mktemp -d)
 mkdir -p "$CN_T/${PFX}${KIT}" "$CN_T/.git/gate-run/r1"
 cp "$ROOT/${PFX}${KIT}/derive-ceilings.py" "$ROOT/${PFX}${KIT}/ceiling-margin.txt" "$CN_T/${PFX}${KIT}/" \
   || { echo "evidence-test: cannot copy the ceiling kit for the census arms"; exit 2; }
-( cd "$CN_T" && git init -q -b main . ) >/dev/null 2>&1
+( cd "$CN_T" && git init -q --template= -b main . ) >/dev/null 2>&1
 CN_SCRIPT="$CN_T/${PFX}${KIT}/derive-ceilings.py"; CN_EV="$CN_T/${PFX}${KIT}/ceiling-evidence.txt"
 printf '%s\n' '[' '  {"name": "L", "argv": ["true"], "ceiling": 100},' '  {"name": "M", "argv": ["true"], "ceiling": 100}' ']' \
   > "$CN_T/${PFX}gate-legs.json"
@@ -1593,7 +1598,7 @@ PZ_T=$(mktemp -d)
 mkdir -p "$PZ_T/${PFX}${KIT}" "$PZ_T/.git/gate-run/r1"
 cp "$ROOT/${PFX}${KIT}/derive-ceilings.py" "$ROOT/${PFX}${KIT}/ceiling-margin.txt" "$PZ_T/${PFX}${KIT}/" \
   || { echo "evidence-test: cannot copy the ceiling kit for the pause arms"; exit 2; }
-( cd "$PZ_T" && git init -q -b main . ) >/dev/null 2>&1
+( cd "$PZ_T" && git init -q --template= -b main . ) >/dev/null 2>&1
 printf '%s\n' '[' '  {"name": "L", "argv": ["true"], "ceiling": 300}' ']' > "$PZ_T/${PFX}gate-legs.json"
 # The row is the runner's seven-field shape, held by `spawn` (TOOL-aSparedSpawn-2): a reader that takes
 # exactly six fields sets nothing aside, and a spawn-held episode is contention like a memory-held one.
@@ -1628,8 +1633,8 @@ run_sb_bar() { # tree · kit name · manifest · VAR=value… -> its rc, its out
       GATE_TURNSTILE=0 GATE_WALL=0 GATE_LEGS="$m" LC_ALL=C.UTF-8 "$@" bash "$SB_K/$k/run-gates.sh" > "$SB_K/$k.out" 2>&1; echo $? )
 }
 read_sb_run() { local c=""; IFS= read -r c < "$1/.git/gate-run/current" 2>/dev/null; SB_RUN="$1/.git/gate-run/$c"; }   # -> SB_RUN
-( cd "$SB_T" && git init -q -b main . && git config user.email sb@test.invalid && git config user.name sb \
-    && git config core.autocrlf false && mkdir -p ga/sub gb && printf 'one\n' > ga/one.txt && printf 'two\n' > ga/sub/two.txt \
+( cd "$SB_T" && git init -q --template= -b main . \
+    && mkdir -p ga/sub gb && printf 'one\n' > ga/one.txt && printf 'two\n' > ga/sub/two.txt \
     && printf 'f\n' > gb/f.txt && printf 'g\n' > gb/g.txt && git add -A && git commit -qm seed \
     && git remote add origin ../origin.git && git update-ref refs/remotes/origin/main HEAD \
     && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
@@ -1735,7 +1740,7 @@ sb_rc=$(run_sb_bar "$SB_T" cut "$SB_K/sb.json" GATE_FULL=1 GATE_JOBS=2 GATE_REUS
 # unborn branch, against what git answers there; an unborn HEAD reads empty, never the word HEAD.
 mk_legs "$tmp/sb1.json" '{"name":"one","argv":["bash","-c","exit 0"]}'
 git -C "$SB_T" worktree add -q "$SB_K/wt" >/dev/null 2>&1
-SB_U=$(mktemp -d); ( cd "$SB_U" && git init -q -b main . && printf 'x\n' > x.txt ) >/dev/null 2>&1
+SB_U=$(mktemp -d); ( cd "$SB_U" && git init -q --template= -b main . && printf 'x\n' > x.txt ) >/dev/null 2>&1
 sed 's/^    printf '"'"'head\\t%s\\n'"'"' "\$RG_HEAD"$/    printf '"'"'head\\t%s\\n'"'"' "$(git rev-parse HEAD 2>\/dev\/null)"/' "$RUNNER" > "$SB_K/oldhead.sh"
 build_sb_kit oldhead "$SB_K/oldhead.sh"
 for sb_t in "$SB_T" "$SB_K/wt" "$SB_U"; do

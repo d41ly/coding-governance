@@ -378,9 +378,7 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
         "DECLARED_EMPTY = {'handkept_inventories_disagreeing_with_source'}\n",
         encoding="utf-8", newline="\n")
 
-    run(["git", "init", "-q", "-b", "main"], r)
-    run(["git", "config", "user.email", "selftest@example.com"], r)
-    run(["git", "config", "user.name", "selftest"], r)
+    run(["git", "init", "-q", "--template=", "-b", "main"], r)
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "seed"], r)
 
@@ -2216,9 +2214,7 @@ def test_shrink_low_water(tmp: pathlib.Path) -> None:
 
     r = tmp / "low-water"
     r.mkdir()
-    run(["git", "init", "-q", "-b", "main"], r)
-    run(["git", "config", "user.email", "selftest@example.com"], r)
-    run(["git", "config", "user.name", "selftest"], r)
+    run(["git", "init", "-q", "--template=", "-b", "main"], r)
     lst = r / "list.txt"
     for n in (3, 1, 2):
         lst.write_text("# header\n\n" + "".join(f"row-{i}\n" for i in range(n)),
@@ -2268,7 +2264,7 @@ def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
     before = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
 
     bare = tmp / "remotebase.git"
-    run(["git", "init", "-q", "--bare", str(bare)], tmp)
+    run(["git", "init", "-q", "--template=", "--bare", str(bare)], tmp)
     run(["git", "remote", "add", "origin", str(bare)], r)
     # THE RAISE, UNJUSTIFIED, pushed — what a raise another node already landed looks like from here.
     conf.write_text(conf.read_text(encoding="utf-8").replace('ORPHAN_ID_PIN="5"', 'ORPHAN_ID_PIN="9"'),
@@ -3208,7 +3204,7 @@ def test_auto_memory_pointers(tmp: pathlib.Path) -> None:
     r = tmp / "automem-repo"
     (r / "src").mkdir(parents=True)
     (r / "src" / "a.py").write_text("x = 1\n", encoding="utf-8", newline="\n")
-    run(["git", "init", "-q", "-b", "main"], r)
+    run(["git", "init", "-q", "--template=", "-b", "main"], r)
     run(["git", "add", "-A"], r)
     run(["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "seed",
          "--no-verify"], r)
@@ -3649,9 +3645,7 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
     # is over a population the arm sets rather than over whatever the fixture above accumulated.
     small = tmp / "runcalls"
     small.mkdir()
-    run(["git", "init", "-q", "-b", "main"], small)
-    run(["git", "config", "user.email", "selftest@example.com"], small)
-    run(["git", "config", "user.name", "selftest"], small)
+    run(["git", "init", "-q", "--template=", "-b", "main"], small)
     for name in ("base", "witness"):
         (small / f"{name}.txt").write_text(name + NL, encoding="utf-8", newline=NL)
         run(["git", "add", "-A"], small)
@@ -4240,9 +4234,7 @@ def test_aborted_work_landed(tmp: pathlib.Path) -> None:
     # ---- AC9, the call count: four shared calls and two per record, whatever the history's length.
     small = tmp / "abortedcalls"
     small.mkdir()
-    run(["git", "init", "-q", "-b", "main"], small)
-    run(["git", "config", "user.email", "selftest@example.com"], small)
-    run(["git", "config", "user.name", "selftest"], small)
+    run(["git", "init", "-q", "--template=", "-b", "main"], small)
     (small / "seed.txt").write_text("seed" + NL, encoding="utf-8", newline=NL)
     run(["git", "add", "-A"], small)
     run(["git", "commit", "-q", "-m", "seed", "--no-verify"], small)
@@ -4429,6 +4421,11 @@ def test_version_carriers_agree(tmp: pathlib.Path) -> None:
               f"found {found}")
 
 def main() -> int:
+    # TOOL-aSparedSpawn-9 S1: the fixtures' identity and line endings, once for every git the
+    # selftest runs, in place of two to four `git config` processes per fixture repository.
+    os.environ.update(GIT_AUTHOR_NAME="selftest", GIT_AUTHOR_EMAIL="selftest@example.com",
+                      GIT_COMMITTER_NAME="selftest", GIT_COMMITTER_EMAIL="selftest@example.com",
+                      GIT_CONFIG_COUNT="1", GIT_CONFIG_KEY_0="core.autocrlf", GIT_CONFIG_VALUE_0="false")
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
         test_conf_parser_matches_bash(tmp)

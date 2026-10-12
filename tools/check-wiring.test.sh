@@ -31,14 +31,24 @@ SMERGE="$HERE/settings-merge.py"
 pass=0; fail=0
 ck() { if [ "$2" = 1 ]; then echo "ok   $1"; pass=$((pass+1)); else echo "FAIL $1"; fail=$((fail+1)); fi; }
 
+# Fixture identity and line endings for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true. The
+# arms that read this tree run ls-files and check-attr, neither of which hashes a file (S5).
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@e GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@e
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 D=""; OOT=""
+# newrepo's repository is BUILT once per run, here, and COPIED per call (TOOL-aSparedSpawn-9 S3), so
+# every arm still starts from its own unshared tree at one HEAD, and a failed copy exits like a
+# failed init. `--chmod=+x`, not the filesystem bit: on a core.fileMode=false host `git add` stages
+# 100644 from an executable file, and the hook-mode arm would then grade every fixture here
+# (TOOL-aLevelledCopy-3 S7).
+NEWREPO_SEED=$(mktemp -d) || exit 2
+trap 'rm -rf "$NEWREPO_SEED"' EXIT
+( cd "$NEWREPO_SEED" && git init -q --template= -b main && mkdir .githooks \
+  && printf '#!/bin/sh\nexit 0\n' > .githooks/pre-commit && chmod +x .githooks/pre-commit \
+  && git add --chmod=+x .githooks/pre-commit && git commit -q -m init ) || exit 2
 newrepo() {   # cd (in THIS shell) into a fresh repo with a tracked .githooks/pre-commit
-  D=$(mktemp -d); cd "$D" || exit 2
-  git init -q -b main; git config core.autocrlf false; git config user.email t@e; git config user.name t
-  mkdir .githooks; printf '#!/bin/sh\nexit 0\n' > .githooks/pre-commit; chmod +x .githooks/pre-commit
-  # `--chmod=+x`, not the filesystem bit: on a core.fileMode=false host `git add` stages 100644 from
-  # an executable file, and the hook-mode arm would then grade every fixture here (TOOL-aLevelledCopy-3 S7).
-  git add --chmod=+x .githooks/pre-commit; git commit -q -m init
+  D=$(mktemp -d); cp -a "$NEWREPO_SEED/." "$D/" || exit 2; cd "$D" || exit 2
 }
 cleanup() { cd "$REPO"; [ -n "$D" ] && rm -rf "$D"; [ -n "$OOT" ] && rm -rf "$OOT"; D=""; OOT=""; }
 chk() { bash "$SCRIPT" "$@" 2>/dev/null; }   # run the checker, drop stderr noise
@@ -241,7 +251,7 @@ cleanup
 D=$(mktemp -d); cd "$D" || exit 2; chk --check >/dev/null; [ "$?" = 0 ] && ck "AC5 non-git -> exit 0" 1 || ck "AC5 non-git -> exit 0" 0
 cleanup
 # AC5c — repo without .githooks -> skip, exit 0
-D=$(mktemp -d); cd "$D" || exit 2; git init -q -b main; git config user.email t@e; git config user.name t; git commit -q --allow-empty -m init
+D=$(mktemp -d); cd "$D" || exit 2; git init -q --template= -b main; git commit -q --allow-empty -m init
 chk --check >/dev/null; [ "$?" = 0 ] && ck "AC5 no .githooks -> skip, exit 0" 1 || ck "AC5 no .githooks -> skip, exit 0" 0
 cleanup
 
@@ -1201,7 +1211,7 @@ ck "a shipped file absent from the install -> UNWIRED naming it" "$r"; rm -rf "$
 newrepo; skill_fixture 1; install_engine 'engine
 '
 # A bare origin with its HEAD set, so the note's merge base resolves (TOOL-aGraftedHelix-36 S6).
-SKOR=$(mktemp -d); git init -q --bare "$SKOR"; git -C "$SKOR" symbolic-ref HEAD refs/heads/main
+SKOR=$(mktemp -d); git init -q --template= --bare "$SKOR"; git -C "$SKOR" symbolic-ref HEAD refs/heads/main
 git remote add origin "$SKOR"; git push -q origin main >/dev/null 2>&1
 git fetch -q origin >/dev/null 2>&1; git remote set-head origin main >/dev/null 2>&1
 SKWT=$(mktemp -d); rmdir "$SKWT"; git worktree add -q -b skbr "$SKWT" >/dev/null 2>&1
@@ -1228,7 +1238,7 @@ git remote set-head origin main >/dev/null 2>&1
 # engine edit of its own, while the install matches the lagging primary: UNWIRED, naming the
 # fast-forward. RED with the branch-change condition cut: the lagging worktree read the note.
 SKCL=$(mktemp -d); rmdir "$SKCL"; git clone -q "$SKOR" "$SKCL" >/dev/null 2>&1
-( cd "$SKCL" && git config user.email t@e && git config user.name t \
+( cd "$SKCL" \
     && printf 'upstream\n' > skills/session-kickoff/SKILL.md && git commit -q -am upstream && git push -q origin main ) >/dev/null 2>&1
 git fetch -q origin >/dev/null 2>&1
 SKLG=$(mktemp -d); rmdir "$SKLG"; git worktree add -q -b sklag "$SKLG" origin/main >/dev/null 2>&1
@@ -1476,7 +1486,7 @@ printf 'MEMORY_ROOT=memory\nDISCIPLINES="tooling"\nFAMILIES="tooling:TOOL"\nROTA
 mkdir -p memory/builds/aFlip
 printf '# aFlip\n\n## Asks\n\n## Dispositions\n' > memory/builds/aFlip/BACKLOG.md
 git add -A; git commit -q -m "flip to builds"
-OOT=$(mktemp -d); git init -q --bare -b main "$OOT/origin.git"
+OOT=$(mktemp -d); git init -q --template= --bare -b main "$OOT/origin.git"
 git remote add origin "$OOT/origin.git"; git push -q origin main
 git remote set-head origin -a >/dev/null 2>&1
 out=$(chke --session); rc=$?
