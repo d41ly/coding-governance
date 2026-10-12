@@ -2324,10 +2324,10 @@ cd "$pfx_home" || exit 2
 build_bg_fixture t16stamp || bad "T16 could not build its fixture"
 git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
 git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1
-for _alt in "control:" "manifest:leg manifest tools/other-legs.json" "blob:leg manifest blob 01234567" "fingerprint:graded tree fingerprint 01234567"; do
+for _alt in "control:" "manifest:leg manifest elsewhere/other-legs.json" "blob:leg manifest blob 01234567" "fingerprint:graded tree fingerprint 01234567"; do
   rm -f "$bg_gd"/gate-bar-green*; write_bg_stamp "$_x"
   case "${_alt%%:*}" in
-    manifest) set_bg_key "$bg_gd/gate-full-green" manifest tools/other-legs.json ;;
+    manifest) set_bg_key "$bg_gd/gate-full-green" manifest elsewhere/other-legs.json ;;
     blob) set_bg_key "$bg_gd/gate-full-green" manifest_blob 0123456789abcdef0123456789abcdef01234567 ;;
     fingerprint) set_bg_key "$bg_gd/gate-full-green" fingerprint 0123456789abcdef ;;
   esac

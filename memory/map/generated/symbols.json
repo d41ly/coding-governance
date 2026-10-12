@@ -2018,6 +2018,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_pm_commit",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "build_pm_shim",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -10073,31 +10078,6 @@
       "file": "tools/govkit/govkit.py"
     },
     {
-      "id": "pm_commit",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
-    },
-    {
-      "id": "pm_key",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
-    },
-    {
-      "id": "pm_red",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
-    },
-    {
-      "id": "pm_run",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
-    },
-    {
-      "id": "pm_show",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
-    },
-    {
       "id": "pop_guard",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.sh"
@@ -10321,6 +10301,11 @@
       "id": "print_plan_lines",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "print_pm_out",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "print_populations",
@@ -11993,9 +11978,19 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_pm_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "read_pm_mark",
       "kind": "function",
       "file": "tools/push-main.test.sh"
+    },
+    {
+      "id": "read_pm_red",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "read_pm_remote",
@@ -16441,6 +16436,11 @@
       "id": "run_plan_in",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "run_pm",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "run_pm_case",

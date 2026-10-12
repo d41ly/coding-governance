@@ -1,10 +1,13 @@
 # TOOL-aTrimmedHook-16 — the closing bar's reds, this build's own and the inherited ones absorbed
 
-**Status:** SPECCED · rev-1 · 2026-10-12 · node a · Tier-1 · base ad0f5649 · streams tooling+kickoff · order 6
+**Status:** CLOSED · rev-1 · 2026-10-12 · node a · Tier-1 · base ad0f5649 · streams tooling+kickoff · order 6
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-12-build-TOOL-aTrimmedHook-16-1-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aTrimmedHook-16-1-acceptance-ledger.md) | journal | — |
+| [2026-10-12-prompt-TOOL-aTrimmedHook-16-1-build-brief.md](../prompts/2026-10-12-prompt-TOOL-aTrimmedHook-16-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

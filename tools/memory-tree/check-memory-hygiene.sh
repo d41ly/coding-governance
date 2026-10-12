@@ -31,7 +31,7 @@ set -u
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.143   # gov:kit memory-tree@2.143 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.144   # gov:kit memory-tree@2.144 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -898,7 +898,7 @@ if [ "$STAGED" = 1 ]; then
   _IDX_STAGED=0
   while IFS= read -r _l; do
     case "$_l" in
-      "$M"/README.md|"$M"/LIVE.md|"$M"/DECISIONS.md|"$M"/ledger/*|"$M"/backlog/*|"$M"/guides/*|"$M"/builds/*/BACKLOG.md|"$M"/builds/*/STATUS.md|"$M"/builds/*/README.md|"$M"/builds/*/RUN.[A-Z]*.md) _IDX_STAGED=1; break ;;
+      "$M"/README.md|"$M"/LIVE.md|"$M"/DECISIONS.md|"$M"/ledger/*|"$M"/backlog/*|"$M"/guides/*|"$M"/builds/*/BACKLOG.md|"$M"/builds/*/README.md|"$M"/builds/*/RUN.[A-Z]*.md) _IDX_STAGED=1; break ;;
     esac
     if [ -n "$MAP_SUB" ]; then case "$_l" in "$M/$MAP_SUB"/*) _IDX_STAGED=1; break ;; esac; fi
   done <<<"$STAGED_MD"

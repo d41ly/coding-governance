@@ -41,7 +41,7 @@
 #          READY line pins a BASE that is not HEAD, an id reader that could not answer, or a route
 #          the tree cannot check: no MEMORY_ROOT, or no defined-id set).
 set -u
-KIT_MANIFEST_VERSION="1.27"   # gov:kit kickoff-manifest@1.27 — the registry id
+KIT_MANIFEST_VERSION="1.28"   # gov:kit kickoff-manifest@1.28 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -1299,9 +1299,13 @@ if [ "$BLOCK_OK" = 1 ]; then
     n=0
     case "$w" in
       *'*'*|*'?'*|*'['*|:*) ;;
-      *) while IFS= read -r _c6f; do
+      # Split on newlines with globbing off, not a loop fed by a here-string of a substitution's value,
+      # which the shell-hygiene leg refuses; no line of a git listing is empty.
+      *) _c6ifs=$IFS; IFS=$'\n'; set -f
+         for _c6f in $_c6all; do
            case "$_c6f" in "$w"|"${w%/}"/*) n=$((n+1)) ;; esac
-         done <<<"$_c6all" ;;
+         done
+         set +f; IFS=$_c6ifs ;;
     esac
     { [ "$n" -gt 0 ] && [ -z "$_c6q" ]; } || n=$(git ls-files -- "$w" 2>/dev/null | wc -l | tr -d '[:space:]')
     if [ "$n" -eq 0 ]; then
