@@ -1747,9 +1747,14 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     check("[aRF-17 AC1] LIVENESS the install rendered v1 and tracks the rendered row",
           read_bytes17(t / "docs" / "out.md") == b"v1\n"
           and read_row17(t, "docs/out.md").get("role") == "rendered", str(read_row17(t, "docs/out.md")))
+    _rb_before = dict(read_row17(t, "docs/out.md"))
     write_gov17(g, kit_rb, {"eng.txt": "v2\n"}, "B")
     p = run_gov17(g, "update", "--target", str(t), "--write")
     order = read_bytes17(t / ".governance" / "outbox" / "update-rollback-demo.md").decode("utf-8")
+    check("[dRR-4 AC3] a rolled-back kit's rendered row keeps its record, and the run says why",
+          read_row17(t, "docs/out.md") == _rb_before
+          and "receipt: KEPT [rendered] docs/out.md — its kit was rolled back" in p.stdout,
+          p.stdout[-1500:] + str(read_row17(t, "docs/out.md")) + str(_rb_before))
     check("[aRF-17 AC1] LIVENESS the run really rolled the kit back",
           "ROLLED BACK" in p.stdout and read_bytes17(t / PFX / "demo" / "eng.txt") == b"v1\n",
           p.stdout[-1500:])
@@ -1806,9 +1811,12 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     _cg_ran = _cg_out.find("ran demo:")
     check("[aHI-1 AC4] update names an absent render key BEFORE the regenerate it would refuse",
           0 <= _cg_gap < _cg_ran, _cg_out[-1500:])
+    # DEPL-dRemeasuredRender-4 S6. The EARLY line, by its own spelling and BEFORE the `ran` line:
+    # since DEPL-dRemeasuredRender-2 the `is undischarged` spelling is printed only by the re-probe.
+    _cg_hole = _cg_out.find("govkit update — HOLE demo: 'demo-hole' probes undischarged before the "
+                            "render (probe exit 3); probed again after it — the fixture hole")
     check("[aHI-1 S3] ...and names the undischarged hole there too, with its reason",
-          "govkit update — HOLE demo: 'demo-hole' is undischarged (probe exit 3) — the fixture hole"
-          in _cg_out, _cg_out[-1500:])
+          0 <= _cg_hole < _cg_ran, _cg_out[-1500:])
     check("[aHI-1 S3] ...and the regenerate still ran: the lines change no disposition",
           read_bytes17(t / "docs" / "out.md") == b"v2\n", repr(read_bytes17(t / "docs" / "out.md")))
     for _cg_val, _cg_want in ((None, "is ABSENT"), ('"<your-tool>"', "still the example's <...>"),
@@ -1843,6 +1851,178 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     check("[aHI-1 AC3] a defaulted key is never absent; both lists are read, once each",
           _gm.read_conf_key_gaps(_cg_t, _cg_d) == [("A", "absent"), ("B", "placeholder")],
           str(_gm.read_conf_key_gaps(_cg_t, _cg_d)))
+
+    # ---- DEPL-dRemeasuredRender-1 AC1-AC3. A kit whose regenerate renders one `rendered` row from
+    # ---- its engine and its template. After `update --write` moves both, the row's receipt and its
+    # ---- `install.sums` line name the rendered bytes, and `check` agrees. The `oid` is graded against
+    # ---- the target's own index entry once the render is staged, never against a second
+    # ---- `hash-object` call, so the arm is not the code under test asking itself.
+    kit_rm = (SAFE_HEAD + 'version_from = { file = "ver.sh", pattern = "^DEMO_VERSION=" }\n\n'
+              '[check]\nnone = "fixture"\n\n'
+              '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+              '[[files]]\ninclude = ["tpl.md"]\nrole = "rendered"\nto = "docs/out.md"\n\n'
+              '[[regenerate]]\nargv = ["bash", "{kit}/gen.sh"]\n\n'
+              '[adopt]\nargv = ["bash", "{kit}/gen.sh"]\nmutates_index = false\n')
+    gen_rm = 'd="$(dirname "$0")"\nmkdir -p docs\ncat "$d/eng.txt" "$d/tpl.md" > docs/out.md\n'
+    g, _a = build_gov17("mr", kit_rm, {"eng.txt": "v1\n", "gen.sh": gen_rm, "tpl.md": "tpl\n",
+                                       "ver.sh": "DEMO_VERSION=1.0\n"})
+    t = build_target17(g, "mr")
+    _rm_before = dict(read_row17(t, "docs/out.md"))
+    _rm_b = write_gov17(g, kit_rm, {"eng.txt": "v2\n", "tpl.md": "tpl2\n",
+                                    "ver.sh": "DEMO_VERSION=1.1\n"}, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    _rm_bytes = read_bytes17(t / "docs" / "out.md")
+    _rm_row = read_row17(t, "docs/out.md")
+    _rm_sha = hashlib.sha256(_rm_bytes).hexdigest()
+    check("[dRR-1 AC1] LIVENESS the render ran and rewrote the rendered row's file",
+          _rm_bytes == b"v2\ntpl2\n" and _rm_before.get("sha256") != _rm_sha,
+          repr(_rm_bytes) + str(_rm_before))
+    git(t, "add", "--", "docs/out.md")
+    _rm_idx = run_gov_git(t, "ls-files", "-s", "--", "docs/out.md").split()
+    _rm_sums = read_bytes17(t / ".governance" / "install.sums").decode("utf-8")
+    check("[dRR-1 AC1] the rendered row's sha256, oid and install.sums line name the rendered bytes",
+          _rm_row.get("sha256") == _rm_sha and len(_rm_idx) > 1 and _rm_row.get("oid") == _rm_idx[1]
+          and f"{_rm_sha}  docs/out.md\n" in _rm_sums,
+          str(_rm_row) + " idx " + str(_rm_idx) + "\n" + _rm_sums)
+    check("[dRR-1 S1] ...and its commit is the vintage that rendered it, gov_oid gov's template blob",
+          _rm_row.get("commit") == _rm_b
+          and _rm_row.get("gov_oid") == govkit_module().blob_oid(b"tpl2\n"), str(_rm_row))
+    check("[dRR-4 AC4] ...and its version is the new vintage's, moved from the install's",
+          "1.1" in str(_rm_row.get("version")) and _rm_row.get("version") != _rm_before.get("version"),
+          str(_rm_row.get("version")) + " vs " + str(_rm_before.get("version")))
+    check("[dRR-1 S3] the run says it re-measured the row, and counts it",
+          "receipt: re-measured [rendered] docs/out.md" in p.stdout
+          and "rendered receipts: 1 re-measured · 0 kept" in p.stdout, p.stdout[-1500:])
+    settle(t, "the update")
+    p = run_gov17(g, "check", "--target", str(t))
+    check("[dRR-1 AC2] check agrees with the re-measured receipt", p.returncode == 0,
+          p.stdout[-1500:] + p.stderr[-600:])
+    # AC3: the same kit with a regenerate that writes and then REFUSES. The row keeps its record.
+    gen_rr = ('d="$(dirname "$0")"\nmkdir -p docs\ncat "$d/eng.txt" "$d/tpl.md" > docs/out.md\n'
+              'if grep -q v2 "$d/eng.txt"; then echo "gen: REFUSED" >&2; exit 5; fi\n')
+    g, _a = build_gov17("rr", kit_rm, {"eng.txt": "v1\n", "gen.sh": gen_rr, "tpl.md": "tpl\n",
+                                       "ver.sh": "DEMO_VERSION=1.0\n"})
+    t = build_target17(g, "rr")
+    _rr_before = dict(read_row17(t, "docs/out.md"))
+    write_gov17(g, kit_rm, {"eng.txt": "v2\n", "tpl.md": "tpl2\n"}, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    check("[dRR-1 AC3] LIVENESS the regenerate really refused",
+          "re-render/regenerate argv exited 5" in p.stdout + p.stderr, (p.stdout + p.stderr)[-1500:])
+    check("[dRR-1 AC3] a refused render's row keeps its record, and the run says KEPT and why",
+          read_row17(t, "docs/out.md") == _rr_before
+          and "receipt: KEPT [rendered] docs/out.md — its render was refused" in p.stdout,
+          p.stdout[-1500:] + str(read_row17(t, "docs/out.md")) + str(_rr_before))
+    # DEPL-dRemeasuredRender-3 AC1. A regenerate that exits 3 through a declared `ok = true` outcome
+    # and renders nothing, the shape of memory-tree's `not-rendered-here`: the row keeps its record.
+    kit_ns = kit_rm + '\n[[outcome]]\ncode = 3\nmeans = "not-rendered-here"\nok = true\n'
+    gen_ns = ('d="$(dirname "$0")"\nif grep -q v2 "$d/eng.txt"; then exit 3; fi\nmkdir -p docs\n'
+              'cat "$d/eng.txt" "$d/tpl.md" > docs/out.md\n')
+    g, _a = build_gov17("ns", kit_ns, {"eng.txt": "v1\n", "gen.sh": gen_ns, "tpl.md": "tpl\n",
+                                       "ver.sh": "DEMO_VERSION=1.0\n"})
+    t = build_target17(g, "ns")
+    _ns_before = dict(read_row17(t, "docs/out.md"))
+    write_gov17(g, kit_ns, {"eng.txt": "v2\n", "tpl.md": "tpl2\n"}, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    check("[dRR-3 AC1] LIVENESS the regenerate stopped at its accepted outcome and rendered nothing",
+          "(not-rendered-here)" in p.stdout and read_bytes17(t / "docs" / "out.md") == b"v1\ntpl\n",
+          p.stdout[-1500:])
+    check("[dRR-3 AC1] an accepted stop's row keeps its record, and the run names the outcome",
+          read_row17(t, "docs/out.md") == _ns_before
+          and "receipt: KEPT [rendered] docs/out.md — its render stopped at accepted outcome "
+              "'not-rendered-here' without rendering" in p.stdout,
+          p.stdout[-1500:] + str(read_row17(t, "docs/out.md")) + str(_ns_before))
+
+    # DEPL-dRemeasuredRender-4 AC3. The two KEPT reasons no arm drove: a render this run did not
+    # run (`GOVKIT_RERENDER=0`), and one that ran and left no file. Each row keeps its record.
+    _ka = {"eng.txt": "v1\n", "gen.sh": gen_rm, "tpl.md": "tpl\n", "ver.sh": "DEMO_VERSION=1.0\n"}
+    _kb = {"eng.txt": "v2\n", "tpl.md": "tpl2\n", "ver.sh": "DEMO_VERSION=1.1\n"}
+    g, _a = build_gov17("nr", kit_rm, _ka)
+    t = build_target17(g, "nr")
+    _nr_before = dict(read_row17(t, "docs/out.md"))
+    write_gov17(g, kit_rm, _kb, "B")
+    p = subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), "update",
+                        "--target", str(t), "--write"], capture_output=True, text=True,
+                       encoding="utf-8", env=dict(env, GOVKIT_RERENDER="0"))
+    check("[dRR-4 AC3] a render this run did not run keeps its row, and the run says why",
+          read_row17(t, "docs/out.md") == _nr_before
+          and "receipt: KEPT [rendered] docs/out.md — its render did not run this time" in p.stdout,
+          p.stdout[-1500:] + str(read_row17(t, "docs/out.md")))
+    gen_ab = ('d="$(dirname "$0")"\nmkdir -p docs\nif grep -q v2 "$d/eng.txt"; then rm -f docs/out.md; '
+              'else cat "$d/eng.txt" "$d/tpl.md" > docs/out.md; fi\n')
+    g, _a = build_gov17("ab", kit_rm, dict(_ka, **{"gen.sh": gen_ab}))
+    t = build_target17(g, "ab")
+    _ab_before = dict(read_row17(t, "docs/out.md"))
+    write_gov17(g, kit_rm, _kb, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    check("[dRR-4 AC3] a render that left no file keeps its row, and the run says why and counts it",
+          not (t / "docs" / "out.md").exists() and read_row17(t, "docs/out.md") == _ab_before
+          and "receipt: KEPT [rendered] docs/out.md — its file is absent after the render" in p.stdout
+          and "rendered receipts: 0 re-measured · 1 kept" in p.stdout,
+          p.stdout[-1500:] + str(read_row17(t, "docs/out.md")))
+    # DEPL-dRemeasuredRender-4 AC2. The line for each verdict kind, in-process: no fixture can make a
+    # probe fail to launch on demand, and the line is the whole behaviour.
+    _rhv = govkit_module().render_hole_verdict
+    _rhv_lines = {v: _rhv("demo", "h", v, "d", "why", False)
+                  for v in ("undischarged", "discharged", "no-launch")}
+    check("[dRR-4 AC2] each re-probe verdict maps to its own line",
+          _rhv_lines["undischarged"] == "govkit update — HOLE demo: 'h' is undischarged (probe exit d) — why"
+          and _rhv_lines["discharged"].endswith("is discharged after the render; the early verdict "
+                                                "does not stand")
+          and "reads no-launch (d), so neither verdict is confirmed — why" in _rhv_lines["no-launch"]
+          and "after the rollback restored" in _rhv("demo", "h", "undischarged", "1", "w", True),
+          str(_rhv_lines))
+
+    # ---- DEPL-dRemeasuredRender-2 AC1-AC2. A hole whose probe reads the RENDERED file is probed
+    # ---- before the regenerate, where it fails, and again after it. Only the verdict after the
+    # ---- render is called undischarged: `hp` passes once rendered, `hf` fails throughout.
+    for _hpt, _hpcmd in (("hp", '["bash", "-c", "grep -q v2 docs/out.md"]'),
+                         ("hf", '["bash", "-c", "exit 3"]'),
+                         ("hb", '["bash", "-c", "grep -q v2 docs/out.md"]'),
+                         ("hr", '["bash", "-c", "exit 3"]')):
+        # `hb` adds a check that passes before the update and fails on the render, so the verify
+        # pass rolls the render that discharged the hole back; `hr` refuses after rendering.
+        _hpchk = ('[check]\nargv = ["bash", "{kit}/check.sh"]\n\n' if _hpt == "hb" else
+                  '[check]\nnone = "fixture"\n\n')
+        kit_hp = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n' + _hpchk +
+                  '[[hole]]\nid = "demo-hole"\nkind = "authoring"\nblocks_adopt = false\n'
+                  'blocks_gate = false\nwhy = "the fixture hole"\n'
+                  f'discharge = {{ command = {_hpcmd} }}\n\n'
+                  '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                  '[[files]]\ninclude = ["tpl.md"]\nrole = "rendered"\nto = "docs/out.md"\n\n'
+                  '[[regenerate]]\nargv = ["bash", "{kit}/gen.sh"]\n\n'
+                  '[adopt]\nargv = ["bash", "{kit}/gen.sh"]\nmutates_index = false\n')
+        _hpgen = (gen_cg + 'if grep -q v2 "$d/eng.txt"; then exit 5; fi\n') if _hpt == "hr" else gen_cg
+        g, _a = build_gov17(_hpt, kit_hp, {"eng.txt": "v1\n", "gen.sh": _hpgen, "tpl.md": "tpl\n",
+                                           "check.sh": "grep -q v1 docs/out.md\n"})
+        t = build_target17(g, _hpt)
+        write_gov17(g, kit_hp, {"eng.txt": "v2\n"}, "B")
+        p = run_gov17(g, "update", "--target", str(t), "--write")
+        _hp_early = p.stdout.find("HOLE demo: 'demo-hole' probes undischarged before the render")
+        _hp_final = p.stdout.find("HOLE demo: 'demo-hole' is undischarged (probe exit")
+        check(f"[dRR-2 {_hpt}] LIVENESS the early probe named the hole, and the render landed "
+              f"or was rolled back as the fixture means",
+              _hp_early >= 0 and read_bytes17(t / "docs" / "out.md")
+              == (b"v1\n" if _hpt == "hb" else b"v2\n"), p.stdout[-1500:])
+        if _hpt == "hb":
+            check("[dRR-4 AC1] a hole whose discharging render is rolled back is reported "
+                  "undischarged over the restored bytes, never discharged",
+                  "ROLLED BACK" in p.stdout and _hp_final > _hp_early
+                  and "after the rollback restored the pre-render bytes" in p.stdout
+                  and "is discharged after the render" not in p.stdout, p.stdout[-1800:])
+        elif _hpt == "hr":
+            check("[dRR-4 AC5] a refused render's hole is still re-probed and reported",
+                  "re-render/regenerate argv exited 5" in p.stdout + p.stderr
+                  and _hp_final > _hp_early, (p.stdout + p.stderr)[-1800:])
+        elif _hpt == "hp":
+            check("[dRR-2 AC1] a hole the render discharges is not reported undischarged, and the "
+                  "run says the early verdict does not stand",
+                  _hp_final < 0 and "HOLE demo: 'demo-hole' is discharged after the render; the "
+                  "early verdict does not stand" in p.stdout, p.stdout[-1500:])
+        else:
+            check("[dRR-2 AC2] a hole still failing after the render is reported undischarged, "
+                  "after the early line",
+                  _hp_final > _hp_early >= 0 and "is discharged after the render" not in p.stdout,
+                  p.stdout[-1500:])
 
     # ---- DEPL-aHalvedInstall-4 AC1-AC5. One update moves a kit's conf.sh (which the target edited,
     # ---- so it conflicts), its plain.txt (clean) and its engine (re-rendered). The refused row holds
@@ -15729,6 +15909,20 @@ user_skills = "/tmp/gk-fake-skills"
         # v14-reap targets, two orders between them. The main scratch is swept where it still
         # exists, at the end of its own block; a single sweep here graded 2 of the suite's ~6.
         check_rollback_orders(tmp, "the late scratch (m13, v14-reap)", 2)
+
+    # ---- DEPL-aPrimedIndex-1. THE VERDICT READER SKIPS THE RUNNER'S GENERATED-OUTPUT PREFLIGHT. The
+    # ---- preflight exits 2 before any leg line when a declared output is stale, and an empty map let
+    # ---- apply certify an install it never compared. The fixture runner prints its leg line only when
+    # ---- GATE_REGEN_CHECK=0 reaches it, and otherwise refuses in the preflight's shape.
+    with tempfile.TemporaryDirectory() as _rv:
+        _rvt = pathlib.Path(_rv)
+        (_rvt / "runner.sh").write_text(
+            '[ "${GATE_REGEN_CHECK:-1}" = 0 ] || { echo "run-gates: REFUSED"; exit 2; }\n'
+            'echo "GATE ok    fixture leg"\n', encoding="utf-8", newline="\n")
+        _rvm = govkit_module().read_gate_verdicts(_rvt, {"command": ["bash", "runner.sh"],
+                                                         "observed_ran": ["GATE ok    {name}"]})
+        check("[aPrimedIndex-1] the verdict reader skips the runner's preflight, so a leg still reads",
+              _rvm.get("fixture leg") == "green", repr(_rvm))
 
     print()
     if FAILURES:

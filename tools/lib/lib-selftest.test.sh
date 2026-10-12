@@ -7,7 +7,7 @@
 # exit status from outside — the same shape every other suite in this repo uses on its own subject.
 set -u
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "lib-selftest-test: not a git tree"; exit 2; }
+ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "lib-selftest-test: not a git tree"; exit 2; }
 cd "$ROOT" || exit 2
 LIB="$HERE/lib-selftest.sh"
 [ -f "$LIB" ] || { echo "lib-selftest-test: no harness at $LIB"; exit 2; }

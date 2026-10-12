@@ -189,6 +189,11 @@ Cite ids, never line numbers.
 | [TOOL-aPooledSweep-5](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE WHOLE-POPULATION SWEEP IS UNMEASURED, and the 4.0x figure this… |
 | [TOOL-aPooledSweep-6](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE PEAK-CONCURRENCY ARM DOES NOT DISCRIMINATE THE COMPARISON IT EXISTS… |
 | [TOOL-aPooledSweep-7](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE PORT PROGRAMME TOOL-aQuenchedHarness-6 OPENED IS SUPERSEDED FOR… |
+| [TOOL-aPrimedIndex-11](../builds/aPrimedIndex/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite push-main self-test red at 9b743831 on the daily held… |
+| [TOOL-aPrimedIndex-12](../builds/aPrimedIndex/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite pre-push self-test red at 9b743831 on the daily held… |
+| [TOOL-aPrimedIndex-13](../builds/aPrimedIndex/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite memory-hygiene self-test red at 9b743831 on the daily… |
+| [TOOL-aPrimedIndex-14](../builds/aPrimedIndex/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite unattended driver selftest shard 5/8 red at 9b743831 on… |
+| [TOOL-aPrimedIndex-15](../builds/aPrimedIndex/BACKLOG.md) | OPEN | HIGH | — | 2026-10-12 | held red: suite unattended driver selftest shard 7/8 red at 9b743831 on… |
 | [TOOL-aProbedToolkit-2](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | A SKIP READS AS A PASS IN EVERY ADOPTER. check() at… |
 | [TOOL-aProbedToolkit-4](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE LEXICON RATCHET CAN ONLY LOOSEN, AND ITS REMEDY ANSWERS 1.5% OF… |
 | [TOOL-aProbedToolkit-5](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE LEXICON PREDICATE GRADES A POPULATION THE TABLE WAS NEVER WRITTEN… |
@@ -416,6 +421,9 @@ Cite ids, never line numbers.
 | [TOOL-dPolishedVitrine-11](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | THE UNATTENDED ADOPTER DELETES FIXTURE RECORDS GOVKIT SHIPS AS ENGINE… |
 | [TOOL-dPolishedVitrine-15](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-13 | A FINISHED CLAIM THAT STANDS AT HEAD IS TRUSTED, AND THE KIT GATE WOULD… |
 | [TOOL-dPolishedVitrine-16](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE TWO CONSUMERS HOLD AN unattended@1.20 THAT GOV NUMBERS TWICE. inCMS… |
+| [TOOL-dRemeasuredRender-2](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | LOW | — | 2026-10-11 | the location-probe scanner does not see a probe whose cd <dir> carries… |
+| [TOOL-dRemeasuredRender-3](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | inherited red: leg lexicon naming predicates red at 9b743831,… |
+| [TOOL-dRemeasuredRender-4](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | inherited red: leg playbook render wiring red at 9b743831, introduced… |
 | [TOOL-dRetiredFork-22](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-02 | THE BUILD HARNESS'S AUDIT STAGE CANNOT EVER COMPLETE, so BUILD is… |
 | [TOOL-dRetiredFork-23](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE GIT-ENV LEAK LIST NOW EXISTS IN THREE COPIES AND NOTHING COMPARES… |
 | [TOOL-dRetiredFork-25](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | check-memory-hygiene.test.sh fails two arms on a freshly scaffolded… |

@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.37` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.38` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -17,7 +17,7 @@ its own, and the canary asserts that.
 |---|---|---|
 | 0 | GREEN: every leg that ran passed, over a tree that did not move, with at least one leg line reported and the run record's verdict file written | `gates GREEN — …` |
 | 1 | RED: one or more legs failed and at least one of them is not HOST, or the whole-run wall fired | `gates RED — …` |
-| 2 | REFUSED: not run from a repository, no usable python, a manifest or profile table it cannot read, a scratch dir or run record it cannot create, a manifest whose every leg is held, a run that reported no leg line (an empty manifest), or a green whose verdict file was not written | a `run-gates:` line, or `gates REFUSED — …` |
+| 2 | REFUSED: not run from a repository, no usable python, a manifest or profile table it cannot read, a scratch dir or run record it cannot create, a manifest whose every leg is held, a run that reported no leg line (an empty manifest), a green whose verdict file was not written, or a declared generated output that is stale or unproven (see "Generated outputs") | a `run-gates:` line, or `gates REFUSED — …` |
 | 3 | TREE MOVED: no leg failed, but the tree changed while the bar ran, so no verdict describes it | `gates TREE MOVED — …` |
 | 4 | HOST: every failed leg timed out twice, the second time alone, while one spawn cost more than `GATE_HOST_RATIO` times this clone's recorded floor, so the verdict is about the host and not the subject | `gates HOST — …` |
 
@@ -129,7 +129,103 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `adopt-run-gates.sh` | `--check` asserts a target's `[gate_runner]` declaration still matches this runner's output strings |
 | `adopt-run-gates.test.sh` | the adopter e2e, gated on EFFECTS rather than exit codes |
 | `check-receipt.py` | the leg `receipt sync (installed files match the receipt)`: every engine row of `.governance/install.json` still on disk and still hashing to its recorded sha256, or, where the raw bytes miss, hashing through the target's own clean filter to the row's `oid` while the raw bytes' blob does not: that row is graded clean and counted `eol-only` on the summary and `ok` lines, the rule `govkit check` applies, in one `git hash-object --stdin-paths` spawn for every such row. A row with no `oid`, a real edit, a CRLF copy no filter normalizes, a tampered `sha256` over bytes that are the blob, a tree with no `.git` and a git refusal all still red, the last two with a `GIT` line naming why. The INTEGRITY half only — it reads no `source`, `commit` or `gov_oid`, because those resolve against a gov checkout an adopter does not have, and it grades no `seed`, `merged`, `attributes` or `forked` row. A tree with no receipt is an announced `SKIP`, and the built-in fixture arms, the eol-only ones over real git repositories, run on every invocation so the leg has a verdict there too; its `fixtures:` line prints their count |
+| `regen.py` | the generated-output verb behind `--regen`, `--regen-check` and `--regen-list`: it reads the staged `[[generated]]` and `[[regenerate]]` rows of every tracked kit descriptor and regenerates them in stage order, or proves each fresh without writing; see "Generated outputs" below |
 | `kit.toml` | this entry, declared as data |
+
+## Generated outputs — declared by the kit that writes them
+
+A merge bar grades generated outputs for freshness: the build index, the bug-class index, the
+codebase map, and the Skills and guides the kits render from templates. Each one is declared in the
+descriptor of the kit that generates it, so the set is read from the kits and never kept as a list
+here (TOOL-aPrimedIndex-1).
+
+| table | keys that make a row an item | the item's check |
+|---|---|---|
+| `[[generated]]` | `write` and `check`, argv arrays, and `stage`, an integer; all three or none | the row's `check` |
+| `[[regenerate]]` | `stage`, plus an optional `check` argv | the row's `check`, else the kit's `[check]` argv |
+
+The argv tokens are the four the descriptors already spell: `{kit}`, `{prefix}`, `{memory_root}`
+and `{map_root}`. An argv beginning `python` or `python3` runs under the reader's own interpreter.
+Rows sharing one write and one check are one item.
+
+**Stages run in order, the items of one stage concurrently**, because one stage's outputs are
+disjoint and a later stage reads an earlier one's:
+
+| stage | what it holds |
+|---|---|
+| 1 | renders from kit templates: the Skills, the rendered guides and documents, the charter region |
+| 2 | indexes over the records: the build index and its views, the bug-class index |
+| 3 | the codebase map, which reads the output of both earlier stages |
+
+A row with none of the keys keeps exactly its old meaning: the unattended kit reads `[[generated]]`
+for its write-set rules and govkit runs `[[regenerate]]` argvs, and neither reads these keys.
+
+### `--regen`, `--regen-check`, `--regen-list` — one command for every declared output
+
+`regen.py`, beside the runner, reads the declarations above and is reached through the runner's
+first argument, so it needs no python launcher of the reader's own (TOOL-aPrimedIndex-2):
+
+```bash
+bash <prefix>/run-gates/run-gates.sh --regen         # run every write, stage by stage; prints what each stage moved
+bash <prefix>/run-gates/run-gates.sh --regen-check   # run every check; writes nothing
+bash <prefix>/run-gates/run-gates.sh --regen-list    # the resolved items, in run order
+```
+
+The tree is the current directory's git toplevel; the descriptors are the tracked `kit.toml` files
+one directory below the tool root, where this kit sits in its own repository. `--regen` names any
+untracked file first, because the build-index generator enumerates tracked files and does not see a
+record until it is added. A write that exits non-zero is followed by its own check: a fresh check
+makes it `declined`, which a kit's adopter is when it renders nothing in a state its kit declares
+legal, and the stage goes on. A write whose check is not fresh FAILS, and a failed write stops
+before the next stage. `--list` names every `[[regenerate]]` row it skips for carrying no stage.
+
+| exit | `--regen` | `--regen-check` |
+|---|---|---|
+| 0 | every write ran | every item fresh |
+| 1 | a write failed, or timed out, and its check is not fresh | an item stale, its check failed, or it timed out |
+| 2 | REFUSED: a descriptor that does not parse, a malformed row, an unresolved token, a script an argv names that is not in the tree, no repository | the same |
+
+`GATE_REGEN_JOBS` bounds concurrency (default 4) and `GATE_REGEN_BOUND` bounds each command in
+seconds (default 900). A command's output goes to a file and never through a pipe, so the bound
+holds whatever its children do; a command outliving it is killed with its process tree (`taskkill
+/T` on Windows, its process group on POSIX), and an MSYS fork can still escape Windows parentage. A
+`bash` argv runs under the bash `profile_bar.resolve_bash` finds by running each candidate, never by
+`PATH` order, which reaches WSL's first on a default Windows `PATH`. **What it does not check:** that
+a write writes what its row names, or that a check grades it; a check red for a reason a regeneration cannot fix reads as stale, and its output
+tail is printed so a reader can tell.
+
+### Every bar proves them fresh before it queues
+
+After its profile and process-monitor lines and before the host turnstile, the runner runs
+`regen.py --check`. A stale, failed or timed-out item, or a declaration the verb refuses, ends the
+run with exit 2, REFUSED, before any leg, naming `--regen` and saying to commit what it moves
+(TOOL-aPrimedIndex-3); a refused declaration gets its own line, because `--regen` cannot cure it. Before the queue, because a refusal after an hour in another bar's queue is
+the cost the check exists to remove. Every bar entry point reaches the runner — a hand-run bar, the
+pre-push hook, the lander's push, the unattended close and remote CI — so this binds all of them.
+govkit's `apply` reads the runner too, for its baseline and after verdicts, and runs it with the
+check skipped, because it compares legs and a stale output reads there as its own leg's red
+(DEPL-aPrimedIndex-1).
+
+The runner never regenerates the tree it grades: at the push boundary the hook refuses a dirty tree,
+and a green earned over an uncommitted regeneration could never be reused. A tree with no kit
+descriptor at the tool root prints one line and spawns nothing. `GATE_REGEN_CHECK=0` skips the
+check with a line naming the knob. A stale output then reds only where its own leg runs in that bar,
+and a guard can skip that leg, so a skip can turn a refusal into a green. The pre-push hook therefore
+scrubs the knob from the bar that lands (TOOL-aPrimedIndex-6).
+
+### The lander regenerates over its merged tree
+
+`<prefix>/push-main.sh` is the verb's second caller (TOOL-aPrimedIndex-4). `--prepare` runs
+`regen.py --write` over the merged tree after the version mint, and what it moved enters the
+prepared merge the way the mint's output does, same parents and same subject. The attended landing
+runs it on every attempt after its mint commit and commits what moved as its own commit, subject
+`regen: generated outputs onto <remote>/<default> at <sha8>`, with a `Pass: none` trailer. That is
+what keeps a reconcile merge, which leaves the `merge=ours` indexes stale, from meeting the push
+bar's refusal. A failed write refuses the landing: `--prepare` leaves the branch where it was, and
+the attended landing keeps the reconcile merge and the mint commit it already made on the local
+default branch, as a refused mint does. Either way the files the regeneration created are cleaned
+(TOOL-aPrimedIndex-8). A lander with no `regen.py` beside it says so in one line and lands without
+it.
 
 ## Reuse, and the baseline a guard diffs against
 

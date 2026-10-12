@@ -127,7 +127,7 @@ LIB_DIR=$(resolve_kit_dir "$_rkd_py" lib lib-selftest.sh "$HERE") || exit 2
 LIB="${LIB_DIR##*/}"
 UNATTENDED_DIR=$(resolve_kit_dir "$_rkd_py" unattended check-unattended.test.sh "$HERE") || exit 2
 UNATTENDED="${UNATTENDED_DIR##*/}"
-ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
+ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
   echo "run-selftests.test: not a git work tree"; exit 2; }
 cd "$ROOT" || exit 2
 . "$ROOT/${LIB_DIR}/lib-selftest.sh"
@@ -164,7 +164,7 @@ U=$(git -C "$ROOT" ls-files --full-name -- '*run-unattended-gates.sh' | head -1)
 [ -n "$U" ] || { echo "run-selftests.test: no tracked run-unattended-gates.sh to derive from"; exit 2; }
 UDIR=$(dirname -- "$U")
 # This script's own repo-relative path, derived the same way the runner derives its own.
-RUNNER_REL="$(git -C "$(dirname -- "$RUNNER")" rev-parse --show-prefix 2>/dev/null)$(basename -- "$RUNNER")"
+RUNNER_REL="$(unset GIT_DIR GIT_WORK_TREE; git -C "$(dirname -- "$RUNNER")" rev-parse --show-prefix 2>/dev/null)$(basename -- "$RUNNER")"
 # Where the fixture parks the BASE runner for the byte-parity arm: beside the runner, derived from
 # RUNNER_REL rather than spelled, so it adds no carried literal. The build step says why it sits there.
 BASE_RUNNER="$(dirname -- "$RUNNER_REL")/base-runner.sh"

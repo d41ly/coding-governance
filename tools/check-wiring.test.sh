@@ -4,7 +4,7 @@
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # The repository, asked of git: `$HERE/..` is the root only at a one-segment prefix (VERIFYING repair).
-REPO="$(git -C "$HERE" rev-parse --show-toplevel)" || exit 2   # safe dir to return to before any rm -rf
+REPO="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" || exit 2   # safe dir to return to before any rm -rf
 # THIS SUITE'S OWN DIRECTORY, DERIVED (TOOL-aRepatriatedFork-19 S4, on the canonical block
 # TOOL-aRepatriatedFork-18 S2 ships). It was a spelled gov-prefix default that nothing ever set, so at
 # any prefix but gov's every fixture below laid its kit files where the checker under test does not
@@ -147,7 +147,7 @@ MEMORY_RECALL_DIR=$(resolve_kit_dir "$_rkd_py" memory-recall extract.py "$HERE")
 MEMORY_RECALL="${MEMORY_RECALL_DIR##*/}"
 LIB_DIR=$(resolve_kit_dir "$_rkd_py" lib pyrun.sh "$HERE") || exit 2
 LIB="${LIB_DIR##*/}"
-ROOT_ABS="$(git -C "$HERE" rev-parse --show-toplevel)" || exit 2
+ROOT_ABS="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" || exit 2
 py=$(resolve_python "${PYBIN:-}") || { echo "check-wiring.test: no usable python"; exit 2; }
 
 # A kit file in THIS repo, resolved across both install layouts the way every arm resolves them:

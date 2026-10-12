@@ -374,6 +374,180 @@ esac
 rm -rf "$_cd" "$_cr"
 fi   # ---- end the HAVE_TIMEOUT gate on arms 1c/1d/1e ----------------------------------------------
 
+# ---- 1r. THE REGEN VERB READS THE DECLARED OUTPUTS. TOOL-aPrimedIndex-2 ----------------------------
+#     A scratch repo holding one fixture kit at THIS kit's tool root, whose tracked descriptor declares
+#     one staged output; its check exits the code written in its `rc` file and its write writes 0
+#     there. The verb, from inside the scratch repo: --check exits 1 with a STALE line on rc 1 and
+#     writes nothing, --write makes it fresh and names the moved file, and a row carrying `write`
+#     alone is refused with exit 2 naming its descriptor. The kit sits at the tool root inside the
+#     scratch repo, because the verb reads the descriptors there.
+#     Staged red by making `build_items` skip a partial row instead of refusing it: 1r-c fails.
+_rr=$(mktemp -d)
+mkdir -p "$_rr/${PFX}fake"
+printf '%s\n' '#!/usr/bin/env bash' 'here=$(cd "$(dirname "$0")" && pwd)' \
+  '[ "${1:-}" = --write ] && { printf 0 > "$here/rc"; exit 0; }' 'exit "$(cat "$here/rc")"' > "$_rr/${PFX}fake/gen.sh"
+printf '%s\n' 'id = "fake"' '' '[[generated]]' 'path = "out.txt"' 'generator = "gen.sh"' 'why = "a fixture output"' \
+  'write = ["bash", "{kit}/gen.sh", "--write"]' 'check = ["bash", "{kit}/gen.sh", "--check"]' 'stage = 1' > "$_rr/${PFX}fake/kit.toml"
+printf 1 > "$_rr/${PFX}fake/rc"
+( cd "$_rr" && git init -q . && git add "${PFX}fake/kit.toml" "${PFX}fake/gen.sh" "${PFX}fake/rc" && git commit -q -m base ) >/dev/null 2>&1
+_rv_out=$(cd "$_rr" && "$PYBIN" "$KITDIR/regen.py" --check 2>&1); _rv_rc=$?
+n=$((n+1))
+case "$_rv_rc:$_rv_out" in
+  1:*"regen: STALE · stage 1 · fake"*"regen: 1 declared · 0 fresh · 1 stale"*) ;;
+  *) echo "canary: 1r-a a staged output whose check exits 1 did not read STALE with exit 1 (rc $_rv_rc)"; fail=1 ;;
+esac
+n=$((n+1))
+[ -z "$(cd "$_rr" && git status --porcelain)" ] || { echo "canary: 1r-a --check wrote into the tree it checked"; fail=1; }
+_rw_out=$(cd "$_rr" && "$PYBIN" "$KITDIR/regen.py" --write 2>&1); _rw_rc=$?
+_rc_out=$(cd "$_rr" && "$PYBIN" "$KITDIR/regen.py" --check 2>&1); _rc_rc=$?
+n=$((n+1))
+case "$_rw_rc:$_rc_rc:$_rw_out" in
+  0:0:*"moved: ${PFX}fake/rc"*) ;;
+  *) echo "canary: 1r-b --write did not make the output fresh and name the file it moved (write rc $_rw_rc, check rc $_rc_rc)"; fail=1 ;;
+esac
+printf '%s\n' 'id = "fake"' '' '[[generated]]' 'path = "out.txt"' 'generator = "gen.sh"' 'why = "a fixture output"' \
+  'write = ["bash", "{kit}/gen.sh", "--write"]' > "$_rr/${PFX}fake/kit.toml"
+( cd "$_rr" && git commit -q -am partial ) >/dev/null 2>&1
+_rl_out=$(cd "$_rr" && "$PYBIN" "$KITDIR/regen.py" --list 2>&1); _rl_rc=$?
+n=$((n+1))
+case "$_rl_rc:$_rl_out" in
+  2:*"REFUSED"*"${PFX}fake/kit.toml"*"all three or none"*) ;;
+  *) echo "canary: 1r-c a [[generated]] row carrying write alone was not refused with exit 2 naming its descriptor (rc $_rl_rc)"; fail=1 ;;
+esac
+rm -rf "$_rr"
+
+# ---- 1s. EVERY BAR PROVES THE DECLARED OUTPUTS FRESH BEFORE IT QUEUES. TOOL-aPrimedIndex-3 --------
+#     The REAL runner over a one-leg manifest, in a scratch repo holding 1r's fixture kit: a stale check
+#     refuses with exit 2 before any queue or leg line, a fresh one prints the verb's count line and
+#     runs the leg, GATE_REGEN_CHECK=0 skips with a line naming the knob, --print-profile pays for no
+#     check, and a tree with no descriptor at the tool root says so and runs.
+#     Staged red by deleting the preflight block from the runner: 1s-a and 1s-c fail.
+_rr=$(mktemp -d)
+mkdir -p "$_rr/${PFX}fake"
+printf '%s\n' '[{"name": "quick", "argv": ["bash", "-c", "true"], "subject": "repo", "ceiling": 60}]' > "$_rr/legs.json"
+printf '%s\n' '#!/usr/bin/env bash' 'here=$(cd "$(dirname "$0")" && pwd)' \
+  '[ "${1:-}" = --write ] && { printf 0 > "$here/rc"; exit 0; }' 'exit "$(cat "$here/rc")"' > "$_rr/${PFX}fake/gen.sh"
+printf '%s\n' 'id = "fake"' '' '[[generated]]' 'path = "out.txt"' 'generator = "gen.sh"' 'why = "a fixture output"' \
+  'write = ["bash", "{kit}/gen.sh", "--write"]' 'check = ["bash", "{kit}/gen.sh", "--check"]' 'stage = 1' > "$_rr/${PFX}fake/kit.toml"
+printf 1 > "$_rr/${PFX}fake/rc"
+( cd "$_rr" && git init -q . && git add "${PFX}fake/kit.toml" "${PFX}fake/gen.sh" && git commit -q -m base ) >/dev/null 2>&1
+run_regen_bar() { ( cd "$_rr" && env GATE_FULL=1 GATE_BASE= GATE_REUSE= GATE_LEGS="$_rr/legs.json" "$@" bash "$KITDIR/run-gates.sh" 2>&1 ); }
+_rs_out=$(run_regen_bar); _rs_rc=$?
+n=$((n+1))
+case "$_rs_rc:$_rs_out" in
+  2:*"regen: STALE"*"run-gates: REFUSED"*"run-gates.sh --regen"*) ;;
+  *) echo "canary: 1s-a a staged output whose check exits 1 did not refuse the bar with exit 2 and the --regen remedy (rc $_rs_rc)"; fail=1 ;;
+esac
+n=$((n+1))
+case "$_rs_out" in
+  *"gate queue:"*|*"GATE ok"*|*"GATE FAIL"*) echo "canary: 1s-a the refused bar reached the queue or a leg, so the preflight is not ahead of them"; fail=1 ;;
+esac
+printf 0 > "$_rr/${PFX}fake/rc"
+_rf_out=$(run_regen_bar); _rf_rc=$?
+n=$((n+1))
+case "$_rf_rc:$_rf_out" in
+  0:*"regen: 1 declared · 1 fresh · 0 stale"*"GATE ok    quick"*) ;;
+  *) echo "canary: 1s-b a fresh staged output did not print its count line and run the leg (rc $_rf_rc)"; fail=1 ;;
+esac
+printf 1 > "$_rr/${PFX}fake/rc"
+_rk_out=$(run_regen_bar GATE_REGEN_CHECK=0); _rk_rc=$?
+n=$((n+1))
+case "$_rk_rc:$_rk_out" in
+  0:*"NOT checked"*"GATE_REGEN_CHECK=0"*"GATE ok    quick"*) ;;
+  *) echo "canary: 1s-c GATE_REGEN_CHECK=0 over a stale output did not skip with a line naming the knob and run the leg (rc $_rk_rc)"; fail=1 ;;
+esac
+_rp_out=$(cd "$_rr" && bash "$KITDIR/run-gates.sh" --print-profile 2>&1)
+n=$((n+1))
+case "$_rp_out" in
+  *"regen:"*) echo "canary: 1s-d --print-profile ran the generated-output check, which it must not pay for"; fail=1 ;;
+esac
+( cd "$_rr" && git rm -q -r --cached "${PFX}fake" && rm -rf "${PFX}fake" ) >/dev/null 2>&1
+_re_out=$(run_regen_bar); _re_rc=$?
+n=$((n+1))
+case "$_re_rc:$_re_out" in
+  0:*"generated outputs — no kit descriptor under"*"GATE ok    quick"*) ;;
+  *) echo "canary: 1s-e a tree with no kit descriptor did not announce the empty set and run the leg (rc $_re_rc)"; fail=1 ;;
+esac
+rm -rf "$_rr"
+
+# ---- 1t. THE VERB'S REVIEW REPAIRS. TOOL-aPrimedIndex-7 --------------------------------------------
+#     A scratch repo of fixture kits at THIS kit's tool root, each declaring one staged output whose
+#     write and check are inline `bash -c` bodies. 1t-a: a check whose child outlives the bound returns
+#     at the bound, because no pipe waits on it. 1t-b: a stage-1 write that exits 1 while its check is
+#     fresh is `declined` and stage 2 runs. 1t-c: with its check failing too, `--write` stops after
+#     stage 1. 1t-d: the runner hands `--regen-list`, `--regen` and `--regen-check` to the verb before
+#     any bar machinery. 1t-e: a check naming a script that is not in the tree is a refused
+#     declaration, and the runner says so rather than naming `--regen`.
+#     Staged red one break per arm in the verb: the pipe restored, the declined branch dropped, the stop
+#     dropped, the hand-over moved below the bar setup, the operand check dropped.
+_rt=$(mktemp -d)
+mkdir -p "$_rt/${PFX}slow" "$_rt/${PFX}one" "$_rt/${PFX}two"
+printf '%s\n' '[{"name": "quick", "argv": ["bash", "-c", "true"], "subject": "repo", "ceiling": 60}]' > "$_rt/legs.json"
+printf '%s\n' 'id = "slow"' '[[generated]]' 'path = "s"' 'generator = "g"' 'why = "a check that outlives its bound"' \
+  'write = ["bash", "-c", "exit 0"]' 'check = ["bash", "-c", "sleep 8 & wait"]' 'stage = 1' > "$_rt/${PFX}slow/kit.toml"
+( cd "$_rt" && git init -q . && git add "${PFX}slow/kit.toml" && git commit -q -m slow ) >/dev/null 2>&1
+# The verdict's OWN seconds are read, not the verb's wall clock: an interpreter start costs seconds on
+# a loaded Windows node, and the pipe version measured 8 s here, the length of the sleep.
+_ra_out=$(cd "$_rt" && GATE_REGEN_BOUND=2 "$PYBIN" "$KITDIR/regen.py" --check 2>&1); _ra_rc=$?
+_ra_sec=$(printf '%s\n' "$_ra_out" | sed -n 's/.*(timed out, \([0-9][0-9]*\)s).*/\1/p' | head -n 1)
+n=$((n+1))
+case "$_ra_rc:$_ra_out" in
+  1:*"timed out"*) [ -n "$_ra_sec" ] && [ "$_ra_sec" -le 5 ] || { echo "canary: 1t-a a check outliving GATE_REGEN_BOUND=2 took ${_ra_sec:-an unread number of }s to time out, so the bound does not hold the wall clock"; fail=1; } ;;
+  *) echo "canary: 1t-a a check outliving its bound did not read timed out (rc $_ra_rc)"; fail=1 ;;
+esac
+( cd "$_rt" && git rm -q -r "${PFX}slow" && git commit -q -m "no slow" ) >/dev/null 2>&1
+printf '%s\n' 'id = "one"' '[[generated]]' 'path = "o"' 'generator = "g"' 'why = "a stage-1 write that declines"' \
+  'write = ["bash", "-c", "exit 1"]' 'check = ["bash", "-c", "exit 0"]' 'stage = 1' > "$_rt/${PFX}one/kit.toml"
+printf '%s\n' 'id = "two"' '[[generated]]' 'path = "t"' 'generator = "g"' 'why = "a stage-2 write leaving a marker"' \
+  'write = ["bash", "-c", "touch marker"]' 'check = ["bash", "-c", "exit 0"]' 'stage = 2' > "$_rt/${PFX}two/kit.toml"
+( cd "$_rt" && git add "${PFX}one/kit.toml" "${PFX}two/kit.toml" && git commit -q -m stages ) >/dev/null 2>&1
+_rb_out=$(cd "$_rt" && "$PYBIN" "$KITDIR/regen.py" --write 2>&1); _rb_rc=$?
+n=$((n+1))
+case "$_rb_rc:$_rb_out" in
+  0:*"regen: declined · stage 1 · one"*) [ -f "$_rt/marker" ] || { echo "canary: 1t-b a declined stage-1 write stopped stage 2"; fail=1; } ;;
+  *) echo "canary: 1t-b a stage-1 write exiting 1 over a fresh check was not declined, or the verb failed (rc $_rb_rc)"; fail=1 ;;
+esac
+rm -f "$_rt/marker"
+sed -i 's/^check = \["bash", "-c", "exit 0"\]$/check = ["bash", "-c", "exit 1"]/' "$_rt/${PFX}one/kit.toml"
+( cd "$_rt" && git commit -q -am "one fails" ) >/dev/null 2>&1
+_rc_out=$(cd "$_rt" && "$PYBIN" "$KITDIR/regen.py" --write 2>&1); _rc_rc=$?
+n=$((n+1))
+case "$_rc_rc:$_rc_out" in
+  1:*"regen: FAILED · stage 1 · one"*"stopped after stage 1"*) [ ! -f "$_rt/marker" ] || { echo "canary: 1t-c a stage ran after a failed write"; fail=1; } ;;
+  *) echo "canary: 1t-c a failed stage-1 write did not stop the verb with exit 1 (rc $_rc_rc)"; fail=1 ;;
+esac
+sed -i 's/^check = \["bash", "-c", "exit 1"\]$/check = ["bash", "-c", "exit 0"]/' "$_rt/${PFX}one/kit.toml"
+( cd "$_rt" && git commit -q -am "one fresh" ) >/dev/null 2>&1
+_rd_list=$(cd "$_rt" && bash "$KITDIR/run-gates.sh" --regen-list 2>&1)
+_rd_want=$(cd "$_rt" && "$PYBIN" "$KITDIR/regen.py" --list 2>&1)
+_rd_w=$(cd "$_rt" && bash "$KITDIR/run-gates.sh" --regen 2>&1); _rd_wrc=$?
+_rd_c=$(cd "$_rt" && bash "$KITDIR/run-gates.sh" --regen-check 2>&1); _rd_crc=$?
+n=$((n+1))
+if [ "$_rd_list" != "$_rd_want" ] || [ "$_rd_wrc" != 0 ] || [ "$_rd_crc" != 0 ]; then
+  echo "canary: 1t-d the runner's --regen-list, --regen or --regen-check did not hand over to the verb (write rc $_rd_wrc, check rc $_rd_crc)"; fail=1
+fi
+n=$((n+1))
+case "$_rd_w$_rd_c" in
+  *"gate queue:"*|*"gate profile:"*) echo "canary: 1t-d a --regen verb reached the bar's setup"; fail=1 ;;
+esac
+mkdir -p "$_rt/${PFX}three"
+printf '%s\n' 'id = "three"' '[[generated]]' 'path = "h"' 'generator = "g"' 'why = "a check naming a missing script"' \
+  'write = ["bash", "-c", "exit 0"]' 'check = ["bash", "{kit}/gone.sh"]' 'stage = 1' > "$_rt/${PFX}three/kit.toml"
+( cd "$_rt" && git add "${PFX}three/kit.toml" && git commit -q -m three ) >/dev/null 2>&1
+_re_out=$(cd "$_rt" && "$PYBIN" "$KITDIR/regen.py" --list 2>&1); _re_rc=$?
+_re_bar=$(cd "$_rt" && env GATE_FULL=1 GATE_BASE= GATE_REUSE= GATE_LEGS="$_rt/legs.json" bash "$KITDIR/run-gates.sh" 2>&1); _re_brc=$?
+n=$((n+1))
+case "$_re_rc:$_re_out" in
+  2:*"${PFX}three/gone.sh"*"not in this tree"*) ;;
+  *) echo "canary: 1t-e a check naming a missing script was not refused with exit 2 naming it (rc $_re_rc)"; fail=1 ;;
+esac
+n=$((n+1))
+case "$_re_brc:$_re_bar" in
+  2:*"declaration refused"*) case "$_re_bar" in *"regenerate every one"*) echo "canary: 1t-e the runner named --regen for a refused declaration"; fail=1 ;; esac ;;
+  *) echo "canary: 1t-e the runner did not refuse a refused declaration with its own line (rc $_re_brc)"; fail=1 ;;
+esac
+rm -rf "$_rt" 2>/dev/null || true
+
 # 1a-control: the same predicate over a manifest with NO `impure` key must PASS, and over one with
 #     a near-miss spelling must FAIL. Both halves, because the arm above is a negative search and a
 #     negative search passes just as happily over a population it never selected.
@@ -1295,7 +1469,7 @@ P="$SCRATCH/prof"
 # performed every write it had just refused — there is no `set -e` here, so a message is not a stop.
 # A guard that detects the corruption and then commits it is worse than none, because it also files a
 # report saying it held.
-if [ "$( cd "$P" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null )" = "$( cd "$ROOT" && git rev-parse --show-toplevel 2>/dev/null )" ]; then
+if [ "$( cd "$P" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null )" = "$(unset GIT_DIR GIT_WORK_TREE;  cd "$ROOT" && git rev-parse --show-toplevel 2>/dev/null )" ]; then
   echo "canary: REFUSING — the section-4 scratch $P resolves to the repo under test, so its fixture writes would clobber the real gate-legs.json and rewrite this repo's commit identity. Nothing was written."
   exit 2
 fi

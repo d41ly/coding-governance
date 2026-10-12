@@ -29,6 +29,7 @@ globs = [
 
 ## Constraints & why
 
+- Its `[[generated]]` row carries `write`, `check` and `stage = 3`: run-gates' `regen.py` regenerates the map last, after the renders and indexes it reads (TOOL-aPrimedIndex-1).
 The map is adopted at a NON-CANONICAL install prefix — every kit here lives under `tools/`, not at
 the repo root the kit's convention assumed. That USED to be this feature's defining constraint: the
 engine resolved the root as the kit dir's grandparent, so at this prefix every derived path was one
