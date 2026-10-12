@@ -90,3 +90,5 @@ base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 2026-10-12T21:54:30Z dispatch · item 7267f93e TOOL-aHeardState-3 · reason tools/govkit/subject-pins.tsv tools/run-gates/selftest-budgets.txt
 
 2026-10-12T21:56:37Z dispatch · item 42a3992d TOOL-aHeardState-4 · reason memory/builds/aHeardState/spec/2026-10-13-spec-TOOL-aHeardState-4.md tools/gate-legs.json memory/guides/SESSION-KICKOFF.md
+
+2026-10-12T21:58:04Z dispatch · item bb3654ac TOOL-aHeardState-4 · reason tools/gate-legs.json memory/guides/SESSION-KICKOFF.md

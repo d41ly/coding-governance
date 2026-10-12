@@ -323,8 +323,9 @@
       "{prefix}/hooks/format-guard.test.sh"
     ],
     "guard": [
-      "{prefix}/hooks/",
-      "AGENTS.md"
+      "{prefix}/hooks/format-guard.js",
+      "{prefix}/hooks/format-guard.test.sh",
+      "{prefix}/hooks/scratch-guard.js"
     ],
     "chunk": "selftests",
     "subject": "kit",
