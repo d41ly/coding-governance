@@ -1,12 +1,13 @@
 # TOOL-aOrientedCast-13 — a gate allowlist may name a leg the target lacks, marked optional
 
-**Status:** OPEN · rev-1 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 13 · ratified 2026-10-12
+**Status:** OPEN · rev-2 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 13 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md) | journal | TOOL-aOrientedCast-12 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 |
+| [2026-10-12-prompt-TOOL-aOrientedCast-13-1-fold-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-13-1-fold-brief.md) | journal | TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 |
 
 <!-- /gen:spec-records -->
 
@@ -59,12 +60,15 @@ rather than a defect, and the seed marks the lexicon grant that way.
   author's statement, read as written.
 - No kit-version bump for roles or govkit; each touched kit moves once at the close.
 
+**What it is built on.** This unit extends `TOOL-aOrientedCast-11`'s `[gates]` table, its R12
+grading in `load_policy` and the index's `gates` lists, without moving their shape. Its govkit arm
+installs the case `TOOL-aOrientedCast-8` built: `check_roles_install` and the default selection that
+ships roles without lexicon. Both specs are CLOSED and declare no edge to this unit, and a one-sided
+edge reds the hygiene gate's join, so the dependency is stated here rather than as an edge.
+
 ### Edges
 
-- **consumes-from** `TOOL-aOrientedCast-11` — the `[gates]` table, its R12 grading in `load_policy`
-  and the index's `gates` lists, which this unit extends without moving their shape.
-- **consumes-from** `TOOL-aOrientedCast-8` — `check_roles_install` and the default selection that
-  ships roles without lexicon, which is the case this unit's new govkit arm installs.
+none
 
 ## 4. Design
 
@@ -217,6 +221,9 @@ No pass runs a leg above.
 ## 9. Revision log
 
 - rev-1 · 2026-10-12 · initial draft.
+- rev-2 · 2026-10-12 · §3. The two `consumes-from` edges to `TOOL-aOrientedCast-11` and
+  `TOOL-aOrientedCast-8` had no `hands-off` at their CLOSED sources and redded check 12's join; they
+  move to a "What it is built on" paragraph, as `TOOL-aOrientedCast-11` did, and Edges reads `none`.
 
 ## 10. Reuse audit
 

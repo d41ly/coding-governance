@@ -1,12 +1,14 @@
 # TOOL-aOrientedCast-14 — the role gate reads past every launcher option, and both role arms find the session's checkout
 
-**Status:** OPEN · rev-1 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 14 · ratified 2026-10-12
+**Status:** OPEN · rev-3 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 14 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md) | journal | TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-15 |
+| [2026-10-12-prompt-TOOL-aOrientedCast-12-2-fold-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-12-2-fold-brief.md) | journal | TOOL-aOrientedCast-12 |
+| [2026-10-12-prompt-TOOL-aOrientedCast-13-1-fold-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-13-1-fold-brief.md) | journal | TOOL-aOrientedCast-13 TOOL-aOrientedCast-15 |
 
 <!-- /gen:spec-records -->
 
@@ -72,15 +74,22 @@ launcher or a prefix word takes, and anchors both arms on the payload cwd, then 
   adopter's self-test, so this unit's write set and that unit's do not meet.
 - No kit-version bump for hooks; it moves once at the close.
 
+**What it is built on.** This unit extends `TOOL-aOrientedCast-11`'s `scanCommandHeads`,
+`checkRoleGate` and its evaluation order, and widens the anchor of `TOOL-aOrientedCast-7`'s rule 6
+and its arming from `.claude/roles.json`. Both specs are CLOSED and declare no edge to this unit, and
+a one-sided edge reds the hygiene gate's join, so the dependency is stated here rather than as an
+edge.
+
+**It shares one reword with `TOOL-aOrientedCast-15`, and no output.** The reworded `agent-cap.test.sh`
+comment names arm 6 of the roles adopter's self-test by the label `TOOL-aOrientedCast-15`'s §4 "The
+agreement arm" already fixes, so this unit reads a ratified spec and needs nothing that unit builds.
+That arm in turn pipes a payload carrying the fixture's `cwd` to rule 6 under
+`env -u CLAUDE_PROJECT_DIR`, which reads the same root before and after this unit's anchor, so it
+needs nothing this unit builds either. Neither consumes the other's output, so no edge joins them.
+
 ### Edges
 
-- **consumes-from** `TOOL-aOrientedCast-11` — `scanCommandHeads`, `checkRoleGate` and its evaluation
-  order, which this unit extends.
-- **consumes-from** `TOOL-aOrientedCast-7` — rule 6 and its arming from `.claude/roles.json`, whose
-  anchor this unit widens.
-- **consumes-from** `TOOL-aOrientedCast-15` — the label of the arm the reworded `agent-cap.test.sh`
-  comment names; without it the comment would name an arm that does not exist, which is the defect
-  it replaces.
+none
 
 ## 4. Design
 
@@ -198,8 +207,8 @@ index with `gates` and a manifest, built in the pass, as `TOOL-aOrientedCast-11`
 - **AC1** — When `node tools/hooks/scratch-guard.js` reads a `gov-builder` Bash payload for each of
   `bash -o pipefail <runner>`, `bash -O extglob <runner>`, `bash -e -x <suite>`,
   `bash -e -c '<runner>'`, `python -X utf8 <selftest.py>`, `env -u FOO bash <runner>`,
-  `exec bash <runner>`, `nice -n 10 bash <runner>` and `node -r ./p.js <script> --selftest`, each
-  exits 2 naming G2 or G3.
+  `exec bash <runner>`, `nice -n 10 bash <runner>` and `node -r <preload.js> <script> --selftest`,
+  each exits 2 naming G2 or G3.
   Red when: the walk stops at an option's argument, a second option, a `-c` body or a prefix word's
   option, which is the base hook's reading of every line.
 - **AC2** — When the same hook reads `bash -n <suite>`, `bash -e -n <suite>`, `command -v <runner>`,
@@ -269,6 +278,14 @@ No pass runs a leg above.
 ## 9. Revision log
 
 - rev-1 · 2026-10-12 · initial draft.
+- rev-2 · 2026-10-12 · AC1's preload payload is spelled `<preload.js>`, a placeholder like its
+  siblings, because `./p.js` read to the spec-tokens paths join as an untracked path and redded
+  `--dispatch` check 49 for every pass.
+- rev-3 · 2026-10-12 · §3. The `consumes-from` edges to the CLOSED `TOOL-aOrientedCast-11` and
+  `TOOL-aOrientedCast-7` had no `hands-off` at their sources and redded check 12's join; they move to
+  a "What it is built on" paragraph. The edge from `TOOL-aOrientedCast-15`, sequenced after this
+  unit, is dropped: the comment takes a label that unit's spec already fixes, and neither unit needs
+  the other's built output, so the shared reword is prose. Edges reads `none`.
 
 ## 10. Reuse audit
 

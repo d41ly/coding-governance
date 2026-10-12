@@ -1,12 +1,13 @@
 # TOOL-aOrientedCast-15 — the closing review's minors: oracles that rot, readers that disagree, a verdict over a broken index
 
-**Status:** OPEN · rev-1 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 15 · ratified 2026-10-12
+**Status:** OPEN · rev-2 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 15 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md) | journal | TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 |
+| [2026-10-12-prompt-TOOL-aOrientedCast-13-1-fold-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-13-1-fold-brief.md) | journal | TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 |
 
 <!-- /gen:spec-records -->
 
@@ -80,18 +81,22 @@ index every hook refuses. Its write set does not meet `TOOL-aOrientedCast-14`'s.
 - No kit-version bump for workflows, roles, kickoff-manifest or check-wiring; each moves once at the
   close.
 
+**What it is built on.** S3 and S4 extend `TOOL-aOrientedCast-2`'s `handoff.py` render, check and
+kickoff-checker resolution; S1 rewrites `TOOL-aOrientedCast-4`'s OC4 arms of
+`unattended-build.test.sh`; S4, S6 and S7 extend `TOOL-aOrientedCast-8`'s adopter, its self-test's
+fixture and `check_roles` in `check-wiring.sh`; and S5 corrects `KICK-aOrientedCast-1`'s card task
+grammar in `manifest-check.sh`. Those specs are CLOSED and declare no edge to this unit, and a
+one-sided edge reds the hygiene gate's join, so the dependency is stated here rather than as an edge.
+
+**It shares one reword with `TOOL-aOrientedCast-14`, and no output.** That unit rewords the
+`agent-cap.test.sh` comment at `:2220` to name arm 6 by the label §4 "The agreement arm" fixes, which
+it reads from this spec rather than from anything this unit builds. Arm 6 pipes a payload carrying
+the fixture's `cwd` to rule 6 under `env -u CLAUDE_PROJECT_DIR`, which reads the same root before
+and after that unit's anchor, so it needs nothing that unit builds. No edge joins the two.
+
 ### Edges
 
-- **consumes-from** `TOOL-aOrientedCast-2` — `handoff.py`'s render, check and kickoff-checker
-  resolution, which S3 and S4 extend.
-- **consumes-from** `TOOL-aOrientedCast-4` — the OC4 arms of `unattended-build.test.sh`, which S1
-  rewrites.
-- **consumes-from** `TOOL-aOrientedCast-8` — the adopter, its self-test's fixture and `check_roles`
-  in `check-wiring.sh`.
-- **consumes-from** `KICK-aOrientedCast-1` — the card's task grammar in `manifest-check.sh`, which
-  S5 corrects.
-- **hands-off** `TOOL-aOrientedCast-14` — rewording the `agent-cap.test.sh` comment at `:2220` to
-  name arm 6 of the roles adopter's self-test, whose label §4 fixes.
+none
 
 ## 4. Design
 
@@ -290,6 +295,10 @@ No pass runs a leg above.
 ## 9. Revision log
 
 - rev-1 · 2026-10-12 · initial draft.
+- rev-2 · 2026-10-12 · §3. The four `consumes-from` edges to CLOSED units had no `hands-off` at their
+  sources and redded check 12's join; they move to a "What it is built on" paragraph. The
+  `hands-off` to `TOOL-aOrientedCast-14`, sequenced before this unit, is dropped: neither unit needs
+  the other's built output, so the shared reword is prose. Edges reads `none`.
 
 ## 10. Reuse audit
 

@@ -1,12 +1,13 @@
 # TOOL-aOrientedCast-12 — a budget row is four fields, and an argv column that reads as prose is refused
 
-**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-1 · base 646d4a73 · streams tooling · order 12 · ratified 2026-10-12
+**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-1 · base 646d4a73 · streams tooling · order 12 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md) | journal | TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 |
+| [2026-10-12-prompt-TOOL-aOrientedCast-12-2-fold-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-12-2-fold-brief.md) | journal | TOOL-aOrientedCast-14 |
 
 <!-- /gen:spec-records -->
 
@@ -42,7 +43,10 @@ declaration's one reader refuse that class of row, so the next missing tab reds 
 - No second parser of the declaration. `--rank` (`run-selftests.sh:417`) reads the reading column on
   its own and reports a three-field row as unbacked, which is loud; it is left as it is.
 - No change to the budget figures, to any other row, or to `tools/gate-legs.json`.
-- No kit-version bump for run-gates; each touched kit moves once at the close.
+- A run-gates kit-version bump beyond one. `run-selftests.sh` ships as a run-gates engine file, and
+  this unit is the build's last to edit `tools/run-gates/`, so it bumps the kit once, 1.35 to 1.36,
+  on both carriers: `KIT_RUN_GATES_VERSION` and its marker in `run-gates.sh`, and the marker in the
+  kit README (rev-2).
 
 ## 4. Design
 
@@ -91,6 +95,8 @@ PYBIN=python TROOT=tools bash -c 'eval "$(sed -n "/^read_population() {/,/^}/p" 
 `tools/run-gates/run-selftests.sh`
 `tools/run-gates/run-selftests.test.sh`
 `memory/guides/SESSION-KICKOFF.md`
+`tools/run-gates/run-gates.sh` (the version bump, rev-2)
+`tools/run-gates/README.md` (the version bump, rev-2)
 
 `run-selftests.sh` is in the kickoff manifest's `watch:` list, so this unit re-stamps the
 manifest's `last-audit` with a delta line in its commit message. It mints no function.
@@ -113,6 +119,12 @@ manifest's `last-audit` with a delta line in its commit message. It mints no fun
   Red when: `--check` passes either row, or the run loop runs the prose.
   permission: this run's builder may not execute the self-test runner or its suite; the main loop
   observes the arms at the close.
+- **AC4** — When `grep -n 'run-gates@1.36' tools/run-gates/run-gates.sh tools/run-gates/README.md`
+  runs, it prints one line from each file, the runner's line also setting
+  `KIT_RUN_GATES_VERSION=1.36`, and `grep -c 'run-gates@1.35'` over the same two files prints 0 for
+  each. The main loop observes `bash tools/check-kit-versions.sh` and the kit epoch check at the
+  close.
+  Red when: either carrier keeps 1.35, or the constant and its marker disagree.
 
 ## 6. Gates
 
@@ -138,6 +150,12 @@ No pass runs a leg above.
 ## 8. Revision log
 
 - rev-1 · 2026-10-12 · initial draft.
+- rev-2 · 2026-10-12 · the change moves `run-selftests.sh`, a run-gates engine file, and this is the
+  build's last unit editing `tools/run-gates/`, so the run-gates kit is owed its one bump here. §3's
+  non-goal now names the bump, 1.35 to 1.36; the files touched gain its two carriers; AC4 observes it.
+- rev-3 · 2026-10-12 · AC4 named the runner's carrier by its bare basename, which the spec-token
+  checker's bar pattern reads as running the bar. AC4 now names it as the runner's line, beside the
+  `KIT_RUN_GATES_VERSION=1.36` constant it holds; the observation is unchanged.
 
 ## 9. Reuse audit
 
