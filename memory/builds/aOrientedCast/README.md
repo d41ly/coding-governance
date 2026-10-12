@@ -103,7 +103,7 @@ ids TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrie
 | [TOOL-aOrientedCast-15 — the closing review's minors: oracles that rot, readers that disagree, a verdict over a broken index](spec/2026-10-12-spec-TOOL-aOrientedCast-15.md) | 15 | 2 | CLOSED | rev-4 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 36 bound to this build, across 4 record folder(s).
+Records: 37 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
