@@ -24,19 +24,19 @@ parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 37200355d6033895cd156ec962928fd264084c2b · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 973dc13e8dfe2567e2995f7bf20441daf35fab35
-phase: HELD
+witness: 2b0cd160a2b0cc771abd2aad6ebcd0bf1e55ada3
+phase: VERIFYING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/sleepy-kapitsa-1f69c8
 anchor-kind: local
 cli-version: 2.1.293
-lease-utc: 2026-10-11T01:22:33Z
+lease-utc: 2026-10-12T16:10:58Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 11836
 session: 653ff713-97af-487f-8f4e-2f4c9c73a605
-keepalive: 0fe01023
+keepalive: 50da7a17
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: b726385f2b5b8fd16802925c02104377253a9045
 anchor-ref: refs/heads/main
@@ -101,3 +101,5 @@ base: 271a90045723817f694de4d22c56f88dbcd0063e
 2026-10-12T05:30:07Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aBriskPreflight && bash tools/push-main.sh --land --slug aBriskPreflight && bash tools/unattended/unattended.sh --settle aBriskPreflight
 
 2026-10-12T05:30:08Z hold · item owner-decision · reason until owner · reaped 0fe01023 · resume none(owner)
+
+2026-10-12T16:12:22Z resume · item aBriskPreflight · reason held · keepalive 50da7a17 · manual

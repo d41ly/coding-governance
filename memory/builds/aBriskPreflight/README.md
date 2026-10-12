@@ -49,6 +49,8 @@ prose is the mandate, recorded under [prompts/](prompts/2026-10-11-prompt-TOOL-a
 - aSparedSpawn-8 plans the driver's fork-free readers and a fork-count arm; this build converts
   none of those readers and adds no fork-count arm.
 - One kit-version bump per touched kit, after that kit's last move.
+- **Owner ruling, 2026-10-12, at the hand-off**: unit 11's F2 takes option (i) — the ceilings
+  instrument's below-`GATE_BOUND` refusal applies to the wiring ceiling only — and the build lands.
 
 ## Parked decisions
 
@@ -86,11 +88,11 @@ ids TOOL-aBriskPreflight-13 TOOL-aBriskPreflight-14 TOOL-aBriskPreflight-15 TOOL
 | [TOOL-aBriskPreflight-4 — preflight starts its bounded probes together and collects each at its own check](spec/2026-10-11-spec-TOOL-aBriskPreflight-4.md) | 2 | 2 | CLOSED | rev-4 | 2026-10-11 |
 | [TOOL-aBriskPreflight-3 — preflight's wiring scope, measured: the whole check stays, every candidate recorded](spec/2026-10-11-spec-TOOL-aBriskPreflight-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aBriskPreflight-7 — preflight and the wiring check each declare a wall-clock ceiling and name a breach](spec/2026-10-11-spec-TOOL-aBriskPreflight-7.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-11 |
-| [TOOL-aBriskPreflight-11 — the ceilings instrument prices every fork at the worst host reading on record](spec/2026-10-12-spec-TOOL-aBriskPreflight-11.md) | 6 | 2 | SPECCED | rev-1 | 2026-10-12 |
+| [TOOL-aBriskPreflight-11 — the ceilings instrument prices every fork at the worst host reading on record](spec/2026-10-12-spec-TOOL-aBriskPreflight-11.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-12 |
 | [TOOL-aBriskPreflight-12 — the closing review's mediums and lows: record bindings and ledgers, RB_TOOK at the child's end, the cache reset, four arms](spec/2026-10-12-spec-TOOL-aBriskPreflight-12.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 48 bound to this build, across 4 record folder(s).
+Records: 49 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

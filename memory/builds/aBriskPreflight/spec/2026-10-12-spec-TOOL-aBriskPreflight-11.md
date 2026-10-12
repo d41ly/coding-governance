@@ -1,11 +1,12 @@
 # TOOL-aBriskPreflight-11 — the ceilings instrument prices every fork at the worst host reading on record
 
-**Status:** SPECCED · rev-1 · 2026-10-12 · node a · Tier-2 · base bb388384 · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-10-12 · node a · Tier-2 · base bb388384 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-prompt-TOOL-aBriskPreflight-11-build-brief.md](../prompts/2026-10-12-prompt-TOOL-aBriskPreflight-11-build-brief.md) | research | — |
 | [2026-10-12-prompt-TOOL-aBriskPreflight-11-spec-brief.md](../prompts/2026-10-12-prompt-TOOL-aBriskPreflight-11-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -35,6 +36,12 @@ fork at the worst host reading it reads, says which figure it priced at, and pro
   the repository, so a copy of the file outside the tree runs it. It asserts the pricing line names
   `K_w=9.00` and `S_w=4.00`, prints `ceilings selftest: ok — K_w=9.00 S_w=4.00 from the old-arm host
   row` and exits 0, or prints the pricing line it read and exits 1. Observed by AC1.
+- **S6** — The instrument's refusal at or above `GATE_BOUND` grades the WIRING subject only, by the
+  owner's ruling on §8 F2: `WIRING_CEILING` races `GATE_BOUND` on one child, while
+  `PREFLIGHT_CEILING` kills nothing and compares preflight's whole wall, which no bound covers. The
+  preflight subject is derived and printed whatever its relation to `GATE_BOUND`, and the instrument
+  says so on stderr when it sits at or above it. Spec 7's AC8 takes the same rule in its rev line.
+  Observed by AC6.
 - **S4** — Once §8 F2 is resolved, the three constant lines of `tools/unattended/unattended.sh` take
   the instrument's stdout byte for byte, and `2026-10-11-spec-TOOL-aBriskPreflight-7.md` takes a
   rev line naming this unit, since its §4 says a later change to either value is a rev bump of that
@@ -50,8 +57,8 @@ fork at the worst host reading it reads, says which figure it priced at, and pro
   K_m, E, K, U, the floors of 2.5 s and 0.91 s and the round-up to 30 s keep their definitions.
 - No change to `GATE_BOUND`, its default or `.unattended.conf`, and no conf key or environment read
   for any ceiling. The brief says so, and spec 7 §3 says so.
-- No change to the instrument's refusal at or above `GATE_BOUND`. Whether the preflight subject may
-  sit there is §8 F2, the owner's turn, and a second mechanism by BUILD-METHOD M2.
+- No change to the instrument's refusal at or above `GATE_BOUND` for the wiring subject; S6 narrows
+  it to that subject by the owner's ruling on §8 F2.
 - No typed value. A constant that the instrument does not print is never written into the driver.
 - No new row and no re-measurement. The worst reading on record stays on record: a new row can only
   raise a maximum.
@@ -64,9 +71,7 @@ fork at the worst host reading it reads, says which figure it priced at, and pro
 
 ### Edges
 
-- **hands-off** external — §8 F2, whether `PREFLIGHT_CEILING` may sit at or above `GATE_BOUND` once
-  every host row prices the forks. No option survives the vetoes inside this unit, so the question
-  goes to the owner, and S4 waits on the answer.
+none
 
 ## 4. Design
 
@@ -225,6 +230,12 @@ BUILD-METHOD M12 asks.
   runs, it prints at least one line from each of the three files.
   Red when: one of the three still says S_w and K_w come from after-arm rows, so two answers to one
   question ship.
+- **AC6** — When the instrument runs over the committed rows, it exits 0 and prints a
+  `PREFLIGHT_CEILING` line whatever its relation to `GATE_BOUND`, with one stderr line naming that
+  relation when the value sits at or above it; a copy whose rows push the WIRING subject to
+  `GATE_BOUND` or above still exits 1 naming that subject.
+  Red when: the instrument refuses the preflight subject at the bound, or stops refusing the
+  wiring one.
 - **AC5** — When `git diff bb388384 -- .unattended.conf` runs, it prints nothing, and
   `grep -n 'TOOL-aBriskPreflight-11' memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-7.md`
   prints a §9 rev line.
@@ -269,12 +280,17 @@ New arm: memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflig
   this is not the run's to choose: it is parked for the owner, and S4 and AC3 wait on it.
   Recommendation to the owner: (i), built as its own unit that this one consumes, because it keeps
   the worst-on-record rule, lifts `WIRING_CEILING` to 840 s and closes H1's impact, and changes no
-  bound and no conf. Not resolved.
+  bound and no conf.
+  RESOLVED (owner, 2026-10-12, at the hand-off): (i) — "go with 'apply the below GATE_BOUND rule to
+  the wiring ceiling only' and land". Built in THIS unit as S6, since the owner's answer is the
+  one change the instrument needs and it touches no file outside this unit's write set.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-12 · initial draft, from the spec brief
   `2026-10-12-prompt-TOOL-aBriskPreflight-11-spec-brief.md` and the closing review's H1.
+- rev-2 · 2026-10-12 · §8 F2 RESOLVED by the owner as (i); S6 and AC6 added, the §3 non-goal on the
+  bound refusal and the hands-off edge rewritten to match; S4 and AC3 no longer wait.
 
 ## 10. Reuse audit
 
