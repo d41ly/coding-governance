@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-33 — the pre-push hook restores the caller's environment for the reuse digest
 
-**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-2 · base 950dc27f · streams tooling · order 6 · closes TOOL-aSparedSpawn-25 · ratified 2026-10-12
+**Status:** INPROGRESS · rev-2 · 2026-10-12 · node a · Tier-2 · base 950dc27f · streams tooling · order 6 · closes TOOL-aSparedSpawn-25 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
@@ -53,6 +53,14 @@ read site and schema it extends, so its line numbers are re-read then.
 - **S6** — `tools/run-gates/README.md`'s cache push subsection and the hook's SCOPED branch comment
   state the rule once each: the digest reads the caller's restored environment, and the legs read the
   hook's. Observed by AC7.
+- **S7** (rev-2, adopted from the brief) — `tools/run-gates/post-merge.sh`'s scrub and the
+  unattended driver's `_gknobs` clear `GATE_REUSE_LINEAGE` beside `GATE_REUSE`. Both bars run with
+  `GATE_FULL`, under which an inherited lineage knob turns the runner's `lineage` mode on, so a
+  post-merge or close bar would reuse. Observed by AC8.
+- **S8** (rev-2, adopted from the brief) — the H49 knob-class table in `.githooks/pre-push.test.sh`
+  (`BAR_INERT_KNOBS`) classifies every `GATE_*` knob this build added to the runner, this unit's
+  `GATE_REUSE_DIGEST_ENV` included, each with its reason in the table's comment, so the arm's
+  predicate reports nothing unclassified. Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -82,8 +90,33 @@ absent: an entry earned with the name set then misses, which costs a saving and 
 | `GIT_EXEC_PATH` | exported for every hook | absent |
 | PATH | git's exec path prepended, and on Git for Windows any further components node a's measurement shows | the leading run of exactly those components stripped, matched in native and MSYS spelling; anything after the first non-match kept |
 | `GIT_PREFIX` | exported; the hook already unsets it at `:38` | absent |
-| `LC_CTYPE` | Git for Windows sets `C.UTF-8` when the caller set none | absent when `git version` names `windows`, the value is `C.UTF-8`, and `LC_ALL` and `LANG` are unset; otherwise the caller's value, kept |
+| `LC_CTYPE` | Git for Windows sets `C.UTF-8` when the caller set none | absent when `GIT_EXEC_PATH` is a drive-letter path (rev-2), the value is `C.UTF-8`, and `LC_ALL` and `LANG` are unset; otherwise the caller's value, kept |
 | `GIT_DIR`, `GIT_CONFIG_PARAMETERS` | present under an alias child or a `git -c` push | absent; `GIT_DIR` is already unset for execution at `:38` |
+
+**Rev-2, what node a's measurement forced.** `env` in a plain Git-Bash shell against `env` inside a
+real pre-push hook (git 2.54.0.windows.1) differs in seven digest-relevant ways: `GIT_EXEC_PATH`
+(native spelling `C:/Program Files/Git/mingw64/libexec/git-core`), `GIT_PREFIX=` (empty),
+`LC_CTYPE=C.UTF-8`, PATH's head `/mingw64/libexec/git-core:`, and every `/bin` component of the
+caller's PATH reading `/usr/bin`, since a native git round-trips PATH through Windows spelling and
+both mounts map to one directory. Three rules change by it:
+
+- **PATH's head**: a leading component is git's when it ends in `/git-core` and `GIT_EXEC_PATH`
+  ends with it, which matches the native spelling verbatim and the MSYS mount spelling as its tail.
+  A drive-letter MSYS spelling (`/c/...`) is not matched and stays, which costs a miss.
+- **`/bin` against `/usr/bin`**: the hook cannot tell which `/usr/bin` was a `/bin`, so the RUNNER
+  reads each `/bin` component of PATH as `/usr/bin` when `[ /bin -ef /usr/bin ]`, in every mode, both
+  for the PATH line and for the PATH its `tool` lines resolve under. Sound, because the test proves the
+  two are one directory; elsewhere nothing is rewritten.
+- **`LC_CTYPE`'s Windows test**: `GIT_EXEC_PATH` is a drive-letter path, which only a native Windows
+  git exports, in place of a `git version` spawn on every push.
+
+The view is written at ONE site, after the decision block, wherever `GATE_REUSE_PUSH` was exported:
+the hook's own later exports (`GATE_RUN_ID`, `GATE_ATTRIBUTE`, the inherited-red pair) are not in it,
+and the runner unsets or excludes each of them before its digest anyway. The hook lists exported names
+with `compgen -e` redirected into the view file and read back by `mapfile`, then rewrites that file
+with the view lines, so no fork is spent and no value but an admitted one reaches the disk. The
+hook's admitted-name patterns are a copy of the runner's digest patterns, kept in step by an arm of
+the S5 suite that compares the two pattern texts.
 
 ### The handoff
 
@@ -105,6 +138,8 @@ New knob `GATE_REUSE_DIGEST_ENV`, read by the runner and set by the hook. New ru
 - `tools/run-gates/run-gates.sh`
 - `tools/run-gates/README.md`
 - `tools/run-gates/run-gates.evidence.test.sh`
+- `tools/run-gates/post-merge.sh` (rev-2, S7)
+- `tools/unattended/unattended.sh` (rev-2, S7)
 
 ### Alternatives rejected
 
@@ -142,7 +177,7 @@ hook and a two-leg manifest with one `remote` leg, and a local bare remote as `o
   hook's `GIT_EXEC_PATH`, PATH prefix and, on Git for Windows, `LC_CTYPE`.
 - **AC2** — When a fixture push runs with a stub bar that copies the file `GATE_REUSE_DIGEST_ENV`
   names, the copy carries no `GIT_EXEC_PATH`, `GIT_PREFIX` or `GIT_CONFIG_PARAMETERS` line, its PATH
-  line equals the caller's PATH, and with the caller's `LC_CTYPE` unset on node a it carries no
+  line equals the caller's PATH once each `/bin` component of both is read as `/usr/bin` (rev-2), and with the caller's `LC_CTYPE` unset on node a it carries no
   `LC_CTYPE` line; with the caller's `LC_CTYPE=en_US.UTF-8` that line is present. Red when: any
   addition survives, or the caller's own locale is dropped.
 - **AC3** — When a fixture leg prints `$GIT_EXEC_PATH` during a push, its output shows the value
@@ -156,6 +191,13 @@ hook and a two-leg manifest with one `remote` leg, and a local bare remote as `o
   above the one `TOOL-aSparedSpawn-32`'s merge commit holds. Red when: the value is unchanged.
 - **AC7** — When `grep -c 'restored' tools/run-gates/README.md` runs, it counts the cache push
   subsection's one statement of the rule. Red when: the README is silent on it.
+- **AC8** (rev-2) — When `post-merge.sh` runs with `GATE_REUSE_LINEAGE=1` exported, its
+  `not honoured from the environment:` line names `GATE_REUSE_LINEAGE`; and the driver's `_gknobs`
+  list, read by the sed the unattended suite's parity arm uses, holds it. Red when: the exported knob
+  is not named, which is today's code.
+- **AC9** (rev-2) — When the H49 class arm's own predicate, `check_knob_classes`, runs over
+  `tools/run-gates/run-gates.sh` with the table and hook constants it reads, it prints nothing.
+  Red when: it names an unclassified knob, as it names eight at this unit's base.
 
 ## 7. Gates
 
@@ -167,7 +209,7 @@ hook and a two-leg manifest with one `remote` leg, and a local bare remote as `o
 `shell hygiene (a fork spent on builtin work)` · `spawn budget (forks per hot entrypoint)` ·
 `harness arms (fail branches armed or pinned)`
 
-New arm: .githooks/pre-push.test.sh · covers AC1 AC2 AC3 AC4 · a direct bar's entry pushed through the real hook, a stub copying the view, a leg printing git's exec path, an inherited view knob · none
+New arm: .githooks/pre-push.test.sh · covers AC1 AC2 AC3 AC4 AC9 · a direct bar's entry pushed through the real hook, a stub copying the view, a leg printing git's exec path, an inherited view knob, the hook's and the runner's digest patterns compared, the class table's new rows · none
 New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC5 · the env mode handed a view file · none
 
 ## 8. Open questions
@@ -182,6 +224,11 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC5 · the env mod
 
 - rev-1 · 2026-10-12 · initial draft, adopting the owner's ruling on `TOOL-aSparedSpawn-25` (option
   (c)); options (a) and (b) are recorded in §4 Alternatives rejected.
+- rev-2 · 2026-10-12 · node a's measured difference (§4, Rev-2) adds the `/bin` reading in the
+  runner, matches git's PATH head by `GIT_EXEC_PATH`'s tail, tests Windows by that path's drive letter
+  rather than a `git version` spawn, and fixes the view's one write site; AC2 reads PATH under the
+  `/bin` rule. S7, S8, AC8 and AC9 adopt the brief's two knob-scrub discoveries left by
+  `TOOL-aSparedSpawn-32`'s reconcile.
 
 ## 10. Reuse audit
 
