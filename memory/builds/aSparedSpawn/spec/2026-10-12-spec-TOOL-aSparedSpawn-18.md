@@ -1,11 +1,13 @@
 # TOOL-aSparedSpawn-18 — the width A/B instrument counts only executed verdicts and fails on a red bar
 
-**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-1 · base 8444f597 · streams tooling · order 4
+**Status:** CLOSED · rev-1 · 2026-10-12 · node a · Tier-1 · base 8444f597 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-build-TOOL-aSparedSpawn-18-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aSparedSpawn-18-acceptance-ledger.md) | journal | — |
+| [2026-10-12-build-TOOL-aSparedSpawn-18-direct-checks.sh](../build/2026-10-12-build-TOOL-aSparedSpawn-18-direct-checks.sh) | journal | — |
 | [2026-10-12-prompt-TOOL-aSparedSpawn-18-build-brief.md](../prompts/2026-10-12-prompt-TOOL-aSparedSpawn-18-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

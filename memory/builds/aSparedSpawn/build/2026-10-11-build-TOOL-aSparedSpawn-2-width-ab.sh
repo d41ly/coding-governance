@@ -8,11 +8,15 @@
 #   bash <this> <frozen-clone> <legs-subset.json> <rows.tsv>
 #
 # <legs-subset.json> is the owner's F2 pick: a GATE_LEGS manifest of the spawn-heaviest held
-# self-test legs. Each arm's row carries wall, leg-seconds, effective concurrency, ceiling fires,
-# pause holds, the largest foreign count and the bash count beside the seconds, and the POSITIVE
-# ARTIFACT that the arm ran its subject: every leg of the manifest printed a `GATE` verb line. A row
-# whose artifact reads `no` measured an arm that exited early and is not a figure. The last row
-# records the calibrated pick beside each load's best-wall width.
+# self-test legs, so each arm sets GATE_SELFTESTS=1 beside GATE_FULL=1: GATE_FULL alone holds them,
+# and a held leg runs nothing. Each arm's row carries wall, leg-seconds, effective concurrency,
+# ceiling fires, pause holds, the largest foreign count and the bash count beside the seconds, the
+# bar's exit (`rc`), and the POSITIVE ARTIFACT that the arm ran its subject. THE RULE: an arm is a
+# figure only when it executed one verdict per leg and its bar exited 0. An executed verdict is a
+# `GATE ok` or `GATE FAIL` line; `held`, `skip`, `reuse` and the `retry` interim execute nothing and
+# are not counted (TOOL-aSparedSpawn-18). A row whose artifact reads `no` measured an arm that ran
+# short or went red and is never picked as a best wall. The last row records the calibrated pick
+# beside each load's best-wall width.
 #
 # THE LOAD is AB_LOAD concurrent loops of `true` spawns, armed before the arm's bar and killed by
 # pid after it: repeatable, unlike a neighbouring bar.
@@ -39,7 +43,7 @@ remove_loader() {
 }
 trap remove_loader EXIT
 
-printf 'utc\tnode\tload\twidth\twall_s\tleg_s\teff_conc\tceiling_fires\tpause_holds\tforeign_max\tbash_count\tgate_lines\tlegs\tartifact\n' > "$rows"
+printf 'utc\tnode\tload\twidth\twall_s\tleg_s\teff_conc\tceiling_fires\tpause_holds\tforeign_max\tbash_count\tgate_lines\tlegs\trc\tartifact\n' > "$rows"
 declare -A best_w=() best_s=()
 for load in quiet loaded; do
   for w in 4 6 8; do
@@ -47,8 +51,9 @@ for load in quiet loaded; do
     [ "$load" = loaded ] && arm_loader "$AB_LOAD"
     bashes=$(ps -ef | grep -c '[b]ash')
     t0=$(date +%s)
-    ( cd "$clone" && env GATE_TURNSTILE=0 GATE_REUSE= GATE_BASE= GATE_FULL=1 GATE_JOBS="$w" GATE_LEGS="$legs" \
-        GATE_RUN_ID="$id" bash tools/run-gates/run-gates.sh ) > "$rows.$id.out" 2>&1
+    ( cd "$clone" && env GATE_TURNSTILE=0 GATE_REUSE= GATE_BASE= GATE_FULL=1 GATE_SELFTESTS=1 GATE_JOBS="$w" \
+        GATE_LEGS="$legs" GATE_RUN_ID="$id" bash tools/run-gates/run-gates.sh ) > "$rows.$id.out" 2>&1
+    rc=$?
     t1=$(date +%s)
     remove_loader
     rec="$common/gate-run/$id"
@@ -56,12 +61,12 @@ for load in quiet loaded; do
       { s += $4; if ($2 == "timeout") f++; if ($8 ~ /^[0-9]+$/ && $8 + 0 > m) m = $8 + 0 }
       END { printf "%d %d %d\n", s, f + 0, m + 0 }')
     holds=$(cat "$rec/pauses" 2>/dev/null | wc -l | tr -d ' ')
-    gl=$(grep -cE '^GATE [a-z]+ ' "$rows.$id.out")
+    gl=$(grep -cE '^GATE (ok|FAIL) ' "$rows.$id.out")
     wall=$(( t1 - t0 )); [ "$wall" -gt 0 ] || wall=1
-    art=no; [ "$gl" -ge "$nlegs" ] && art=yes
-    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$node" \
+    art=no; [ "$gl" -eq "$nlegs" ] && [ "$rc" -eq 0 ] && art=yes
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$node" \
       "$load" "$w" "$wall" "$leg_s" "$(awk -v a="$leg_s" -v b="$wall" 'BEGIN { printf "%.2f", a / b }')" \
-      "$fires" "$holds" "$foreign" "$bashes" "$gl" "$nlegs" "$art" >> "$rows"
+      "$fires" "$holds" "$foreign" "$bashes" "$gl" "$nlegs" "$rc" "$art" >> "$rows"
     if [ "$art" = yes ] && { [ -z "${best_s[$load]:-}" ] || [ "$wall" -lt "${best_s[$load]}" ]; }; then
       best_s[$load]=$wall; best_w[$load]=$w
     fi
