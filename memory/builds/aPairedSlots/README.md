@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling
 roster: TOOL
-ids: TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 TOOL-aPairedSlots-10 TOOL-aPairedSlots-11 TOOL-aPairedSlots-12 TOOL-aPairedSlots-13 TOOL-aPairedSlots-14 TOOL-aPairedSlots-15
+ids: TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 TOOL-aPairedSlots-10 TOOL-aPairedSlots-11 TOOL-aPairedSlots-12 TOOL-aPairedSlots-13 TOOL-aPairedSlots-14 TOOL-aPairedSlots-15 TOOL-aPairedSlots-16 TOOL-aPairedSlots-17 TOOL-aPairedSlots-18 TOOL-aPairedSlots-19 TOOL-aPairedSlots-20
 authorized-by: prompt
 ---
 
@@ -80,7 +80,7 @@ Other parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- gen:build-index -->
 **Build status:** CLOSED · 14 unit(s) · node a · opened 2026-10-11 · streams tooling
 ids TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 TOOL-aPairedSlots-10 TOOL-aPairedSlots-11 TOOL-aPairedSlots-12 TOOL-aPairedSlots-13 TOOL-aPairedSlots-14
-ids TOOL-aPairedSlots-15
+ids TOOL-aPairedSlots-15 TOOL-aPairedSlots-16 TOOL-aPairedSlots-17 TOOL-aPairedSlots-18 TOOL-aPairedSlots-19 TOOL-aPairedSlots-20
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -88,7 +88,7 @@ ids TOOL-aPairedSlots-15
 | [TOOL-aPairedSlots-1 — a `slots=<n>` key on each profile row, kit default 1, overridable by `GATE_TURNSTILE_SLOTS`](spec/2026-10-11-spec-TOOL-aPairedSlots-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aPairedSlots-6 — the unattended driver's gate backstop stays correct with two holders](spec/2026-10-11-spec-TOOL-aPairedSlots-6.md) | 1 | 1 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aPairedSlots-8 — the process-monitor adopter self-test stamps a fixture's common dir, not the real one](spec/2026-10-11-spec-TOOL-aPairedSlots-8.md) | 1 | 1 | CLOSED | rev-2 | 2026-10-11 |
-| [TOOL-aPairedSlots-2 — the turnstile is a counting semaphore of `slots` beacons, each reaped and released on its own](spec/2026-10-11-spec-TOOL-aPairedSlots-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-11 |
+| [TOOL-aPairedSlots-2 — the turnstile is a counting semaphore of `slots` beacons, each reaped and released on its own](spec/2026-10-11-spec-TOOL-aPairedSlots-2.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-12 |
 | [TOOL-aPairedSlots-3 — a bar dispatched while another slot is held takes the shared width its rule names](spec/2026-10-11-spec-TOOL-aPairedSlots-3.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-11 |
 | [TOOL-aPairedSlots-4 — a doc-only bar takes its own key and never queues](spec/2026-10-11-spec-TOOL-aPairedSlots-4.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aPairedSlots-5 — a worktree holds at most one slot, so every path under its git dir stays one bar's](spec/2026-10-11-spec-TOOL-aPairedSlots-5.md) | 5 | 2 | CLOSED | rev-2 | 2026-10-11 |

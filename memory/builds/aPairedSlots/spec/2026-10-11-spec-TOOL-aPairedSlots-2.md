@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-2 — the turnstile is a counting semaphore of `slots` beacons, each reaped and released on its own
 
-**Status:** CLOSED · rev-2 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-10-12 · node a · Tier-2 · base b6cd02bc · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -73,6 +73,8 @@ runner prints and writes.
 - **hands-off** `TOOL-aPairedSlots-3` — the number of slots held at dispatch, which this unit
   makes countable as the slot paths that exist.
 - **hands-off** `TOOL-aPairedSlots-4` — the doc-only key, which sits beside the slots, not in them.
+- **hands-off** `TOOL-aPairedSlots-5` — the slot paths and their `repo` files, which the
+  one-slot-per-worktree rule reads.
 - **consumes-from** external — TOOL-aFrugalTurnstile-5's host turnstile, which this unit widens.
 
 ## 4. Design
@@ -187,6 +189,8 @@ none
 - rev-2 · 2026-10-11 · S5 · §4 · nesting reads every slot beacon present rather than 1 to the count;
   the claim helper is `resolve_free_slot` over a once-built `TS_SLOT_DIRS`, replacing a per-slot
   path function that would fork on every call.
+- rev-3 · 2026-10-12 · §3 · the hands-off edge to TOOL-aPairedSlots-5 that its consumes-from
+  edge names, which the close's memory hygiene found missing.
 
 ## 10. Reuse audit
 

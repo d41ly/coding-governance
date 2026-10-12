@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 37200355d6033895cd156ec962928fd264084c2b · park · 0 touching
+gates-run: unattended-179178331712264625013-1128143 867228bb
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
@@ -135,3 +137,5 @@ base: 6dc23b58fe360c0e15168544cf4b03af6550a7ad
 2026-10-12T05:31:34Z brief · item TOOL-aPairedSlots-8 · reason 9d0368c759c7 memory/builds/aPairedSlots/prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md
 
 2026-10-12T05:31:38Z brief · item TOOL-aPairedSlots-9 · reason 9d0368c759c7 memory/builds/aPairedSlots/prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md
+
+2026-10-12T06:22:26Z decision · item Land aPairedSlots over six bar reds that are red at origin/main 37200355 with the same offenders, which the close attributes to this run because its diff edits run-gates.sh (KF3)? · reason Options: land attended over the six inherited reds, as the last three builds landed; or wait for their fixes on main and re-run the close. Refused here: with KF3 every red reads OWN, so neither --override gates-green nor an owner-landing hand-off is admitted, and absorbing six reds owned by other builds, one in post-merge.sh which the prompt puts out of scope, is outside this mandate.

@@ -21,6 +21,10 @@ position reads the expected-leg count as a proof and the end time as a leg count
 `verdict` file with `head -1`, and `tools/run-gates/run-gates.sh` writes `ended` first on every
 path. The closing review of aPairedSlots found both (its H2 and H3).
 
+It coexists-with `empty-field-collapses-unless-it-is-last`: there a field-splitting read drops an
+EMPTY value and the columns close up; here a populated value carries an extra separator and they
+open up. Both shift a row, from opposite causes.
+
 ## The remedy
 
 Read a key-value file by key, with an awk that prints the second field of the line whose first is
