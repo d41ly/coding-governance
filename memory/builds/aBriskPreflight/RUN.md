@@ -9,10 +9,12 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: yes
+keepalive-reaped: yes
 refreshed-at: 37200355d6033895cd156ec962928fd264084c2b · park · 47 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: bb38838401eb288e311f39de5802de1ff9e1b3da
-phase: SPECCING
+witness: 7d98741e3baa4512160c252da3eb99e3e6969ecc
+phase: VERIFYING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/sleepy-kapitsa-1f69c8
