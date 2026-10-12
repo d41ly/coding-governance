@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling+kickoff+playbook
 roster: TOOL+KICK+PLAY
-ids: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15
+ids: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19
 authorized-by: prompt
 ---
 
@@ -46,6 +46,10 @@ JavaScript the owner cannot adjust. The owner's prose is the mandate, recorded u
 - The two enforcement units build last, so no pass of this run meets a gate it has not finished.
 - The catalogue does not exist yet, so this run's own spec and build briefs are written by hand.
 - One kit-version bump per touched kit, after that kit's last unit.
+- Owner rulings of 2026-10-13, the second addendum under `prompts/`: roles cite section 1 rule tags,
+  agents carry the rendered Protocols section whole, and an inline stand-in needs a run that cannot
+  spawn agents and an owner waiver. Its five units are MISSING at the resume, and their briefs are
+  written by hand because the handoff renderer refuses until the first of them lands.
 
 ## Parked decisions
 
@@ -73,12 +77,17 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 16 | `TOOL-aOrientedCast-13` | a gate allowlist may name a leg a target lacks without redding the catalogue (review H2) |
 | 17 | `TOOL-aOrientedCast-14` | the hooks scan every launcher option and anchor on the project dir (review M2, M3) |
 | 18 | `TOOL-aOrientedCast-15` | the remaining review minors, batched (review M4, M5, L1, L2, L3) |
+| 19 | `TOOL-aOrientedCast-16` | a role cites section 1 rule tags, and its agent type carries those rules and the rendered Protocols section (addendum 2) |
+| 20 | `TOOL-aOrientedCast-17` | a role declares when it is mandatory and where its output goes, and the kit prints the charter's roster lines (addendum 2) |
+| 21 | `TOOL-aOrientedCast-18` | the playbook renders a derived role-roster placeholder from the roles kit's roster (addendum 2) |
+| 22 | `PLAY-aOrientedCast-2` | the charter's `[roles]` rule and its generated Agent roles section (addendum 2) |
+| 23 | `TOOL-aOrientedCast-19` | an inline stand-in for a role needs a dated owner waiver row (addendum 2) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 18 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
-ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11
-ids TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15
+ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10
+ids TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |

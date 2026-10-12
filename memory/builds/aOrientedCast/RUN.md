@@ -18,19 +18,19 @@ hold-until: probe host
 hold-code: host-degraded
 held-from: REVIEWING
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: ea8c87285f623599a8579c7f0bf9521da9928432
-phase: HELD
+witness: b69f13633cd1ef9e345dccc0a04398e18bc71ffe
+phase: SPECCING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/deterministic-attended-workflows-943570
 anchor-kind: local
 cli-version: 2.1.293
-lease-utc: 2026-10-11T01:52:59Z
+lease-utc: 2026-10-12T22:29:18Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 28560
+pid: 6728
 session: e131d82c-aaf3-45ad-abb9-258d7ab9ad1b
-keepalive: 0410f9d5
+keepalive: 2edced79
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: b726385f2b5b8fd16802925c02104377253a9045
 anchor-ref: refs/heads/main
@@ -145,3 +145,15 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-12T19:24:56Z dispatch · item fbf31ea8 TOOL-aOrientedCast-15 · reason memory/map/generated/CARDS.md
 
 2026-10-12T19:47:52Z hold · item host-degraded · reason until probe host · reaped 0410f9d5 · resume unattended-resume-aorientedcast
+
+2026-10-12T22:29:23Z resume · item aOrientedCast · reason held · keepalive 2edced79 · manual
+
+2026-10-12T22:30:25Z rescope · item add TOOL-aOrientedCast-16 · reason the owner's second addendum (prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-4-owner-addendum.md): the roles join the v4.3 charter as a rendered section
+
+2026-10-12T22:30:27Z rescope · item add TOOL-aOrientedCast-17 · reason the owner's second addendum (prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-4-owner-addendum.md): the roles join the v4.3 charter as a rendered section
+
+2026-10-12T22:30:29Z rescope · item add TOOL-aOrientedCast-18 · reason the owner's second addendum (prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-4-owner-addendum.md): the roles join the v4.3 charter as a rendered section
+
+2026-10-12T22:30:32Z rescope · item add PLAY-aOrientedCast-2 · reason the owner's second addendum (prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-4-owner-addendum.md): the roles join the v4.3 charter as a rendered section
+
+2026-10-12T22:30:34Z rescope · item add TOOL-aOrientedCast-19 · reason the owner's second addendum (prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-4-owner-addendum.md): the roles join the v4.3 charter as a rendered section
