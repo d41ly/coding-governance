@@ -288,7 +288,7 @@ Cite ids, never line numbers.
 | [TOOL-aSparedSpawn-22](../builds/aSparedSpawn/BACKLOG.md) | OPEN | LOW | — | 2026-10-12 | a lint over the *.test.sh suites flags a fixture sleep <N> whose arm… |
 | [TOOL-aSparedSpawn-23](../builds/aSparedSpawn/BACKLOG.md) | OPEN | LOW | — | 2026-10-12 | a dead-plumbing grep: every $WORK/$i.<suffix> marker… |
 | [TOOL-aSparedSpawn-24](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | an arm enumerates every GATE_REUSE* name tools/run-gates/run-gates.sh… |
-| [TOOL-aSparedSpawn-25](../builds/aSparedSpawn/BACKLOG.md) | SPECCED | MED | TOOL-aSparedSpawn-33 | 2026-10-12 | owner call: the reuse digest's view of a pre-push hook's environment… |
+| [TOOL-aSparedSpawn-25](../builds/aSparedSpawn/BACKLOG.md) | INPROGRESS | MED | TOOL-aSparedSpawn-33 | 2026-10-12 | owner call: the reuse digest's view of a pre-push hook's environment… |
 | [TOOL-aSparedSpawn-26](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | bash 5.2 rows in memory/project/fork-ceilings.txt, measured on CI's Git… |
 | [TOOL-aSparedSpawn-27](../builds/aSparedSpawn/BACKLOG.md) | OPEN | MED | — | 2026-10-12 | a documented check for every A/B instrument in this repository: it… |
 | [TOOL-aSparedSpawn-28](../builds/aSparedSpawn/BACKLOG.md) | OPEN | LOW | — | 2026-10-12 | migrate the existing unscoped arms of… |

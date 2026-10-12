@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-33 — the pre-push hook restores the caller's environment for the reuse digest
 
-**Status:** OPEN · rev-1 · 2026-10-12 · node a · Tier-2 · base 950dc27f · streams tooling · order 6 · closes TOOL-aSparedSpawn-25 · ratified 2026-10-12
+**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-2 · base 950dc27f · streams tooling · order 6 · closes TOOL-aSparedSpawn-25 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
