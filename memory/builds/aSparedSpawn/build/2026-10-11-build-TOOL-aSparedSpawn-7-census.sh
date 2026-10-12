@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** journal TOOL-aSparedSpawn-7
 # TOOL-aSparedSpawn-7 S1 / AC1 - the traced census of check-unattended.sh, and the AC2 / AC5 readings
 # on the same conforming tree.
 #

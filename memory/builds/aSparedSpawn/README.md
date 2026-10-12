@@ -89,7 +89,7 @@ ids TOOL-aSparedSpawn-15
 | [TOOL-aSparedSpawn-14 — a refusal retirement review, and a growth budget beside the floors](spec/2026-10-09-spec-TOOL-aSparedSpawn-14.md) | 3 | 2 | OPEN | rev-2 | 2026-10-10 |
 <!-- /gen:build-units -->
 
-Records: 32 bound to this build, across 3 record folder(s).
+Records: 34 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** journal TOOL-aSparedSpawn-7
 # TOOL-aSparedSpawn-7 - the pass's direct checks of the two `--only` selectors, over HAND-BUILT fixture
 # repositories in a scratch root, never over this tree. No suite and no slice of one.
 #

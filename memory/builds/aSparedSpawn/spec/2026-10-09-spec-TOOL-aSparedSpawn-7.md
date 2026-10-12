@@ -7,6 +7,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-11-build-TOOL-aSparedSpawn-7-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-7-acceptance-ledger.md) | journal | — |
+| [2026-10-11-build-TOOL-aSparedSpawn-7-census.sh](../build/2026-10-11-build-TOOL-aSparedSpawn-7-census.sh) | journal | — |
+| [2026-10-11-build-TOOL-aSparedSpawn-7-direct-checks.sh](../build/2026-10-11-build-TOOL-aSparedSpawn-7-direct-checks.sh) | journal | — |
 | [2026-10-11-prompt-TOOL-aSparedSpawn-7-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-7-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
