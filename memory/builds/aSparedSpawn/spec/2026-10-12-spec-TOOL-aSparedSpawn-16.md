@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-16 — the closing review's mediums and lows, and the bar reds this build's diff carries
 
-**Status:** INPROGRESS · rev-2 · 2026-10-12 · node a · Tier-2 · base f479ba42 · streams tooling · order 4
+**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base f479ba42 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -39,7 +39,11 @@ S8 are unused since rev-2; §9 says where their work went.
   becomes `$(<f)` or a `read`, and a `printf … | grep -c` becomes a builtin test where one reads the
   same answer. Every row is then re-measured and set to exactly what the scan reports, the
   `check-unattended.sh` row lowered to its measured 25. This item lands LAST in the pass, after every
-  other item adds its arms, so the registry is measured over the final bytes. Observed by AC2.
+  other item adds its arms, so the registry is measured over the final bytes. Rev-3: the
+  `printf … | grep -c` and `grep -q` sites this build added in `run-gates.test.sh` read a count or a
+  match over multi-line output, which no one builtin test reads, so that file's `var-pipe` row is set
+  to its measured count, above its old one, while every `cat-file` and `printf-subst` site the build
+  added is rewritten. Observed by AC2.
 - **S3** — `memory/project/fork-ceilings.txt` rows `run-gates-1leg` and `run-gates-2leg` declare
   ceilings 72 and 74 against measured counts of 51 and 53, which the `spawn budget (forks per hot
   entrypoint)` leg reds as STALE (the file's tolerance is max(3, 5 %) above the count). The one-leg
@@ -56,9 +60,9 @@ S8 are unused since rev-2; §9 says where their work went.
     effect is the `:1273` refusal. It gains a `# arm-signature:` marker naming that refusal's text,
     which the `:1273` arm then arms.
   - `:2896` (`git version … || exit 1`) and `:2909` (`[ "${#evs[@]}" -gt 0 ] || exit 1`) exit the
-    `REUSE_DIGEST` capture. Each is pinned with a five-field row in
-    `memory/project/unarmed-branches.txt`, unless S18's line gives the capture's failure a text an
-    arm can assert, in which case each is marked and armed instead.
+    `REUSE_DIGEST` capture. S18's line gives that failure a text, so each is marked with
+    `# arm-signature:` naming it, and canary arm 9d3 (S18) asserts it whole (rev-3): check-arms reads
+    this gate's arms from `run-gates.test.sh` alone, so the arm is the canary's, and nothing is pinned.
   - `:5088`, the bare `exit 1` closing a red run, gains a `# arm-signature:` marker naming the
     `gates RED` summary text an existing canary arm already asserts.
 
@@ -71,11 +75,20 @@ S8 are unused since rev-2; §9 says where their work went.
   `.githooks/pre-push.test.sh` beside the AC15 arm exports `GATE_REUSE_SAMPLE=0` and
   `GATE_REUSE_DAY=1` into a push and asserts the line names each. Observed by AC6.
 - **S9** — Finding 18. `FLOOR_ASSERTIONS` in `tools/run-gates/run-gates.evidence.test.sh` (151 at
-  `:156`) rises by the executed assertions unit 13 and this unit's evidence arms add, counted one per
-  `ok … || nope` pair as units 1, 3 and 4 counted theirs, with a
+  `:156`, 163 since `TOOL-aSparedSpawn-17` counted its own twelve) rises by the executed assertions
+  unit 13 and this unit's evidence arms add, counted one per `ok … || nope` pair as units 1, 3 and 4
+  counted theirs: unit 13's forty-one beyond the six it rewrote in place, and this unit's four, to 208, with a
   `RAISED <old> -> <new> by TOOL-aSparedSpawn-13 and -16` line. The acceptance ledger marks the
   executed count OWED until the suite runs at VERIFYING. Observed by AC10.
-- **S10** — Findings 11 and 21 (M3), reconciled as the report says: id 21's fix, with id 11's rule
+- **S10** — MOVED TO THE BUILD'S EXIT AS A NAMED ASK (rev-3); the text below is the ask's design and
+  nothing of it is built here. A pre-push hook's environment, observed 2026-10-12 on node a, differs
+  from a plain shell by more than `GIT_EXEC_PATH` and the PATH prefix: git also exports `GIT_PREFIX`,
+  and Git for Windows exports `LC_CTYPE=C.UTF-8` where the caller set none, while a `git -c alias`
+  child, AC11's instrument, adds `GIT_DIR` and `GIT_CONFIG_PARAMETERS` too. `LC_CTYPE` is a locale a
+  leg can read, so leaving it out of the digest trades a miss for a possible false hit, which is the
+  owner's call this spec did not make, and without it no direct bar's entry is reused through the
+  hook on this node. `REUSE_SCHEMA` stays 3, since S11's entry reads compatibly.
+  Findings 11 and 21 (M3), reconciled as the report says: id 21's fix, with id 11's rule
   for the `tool` lines. `REUSE_DIGEST` in `tools/run-gates/run-gates.sh` (`:2891`-`:2913`) leaves
   out of its env loop `GIT_EXEC_PATH` and the hook-only knobs `GATE_ATTRIBUTE`,
   `GATE_INHERITED_RED`, `GATE_INHERITED_RED_MAX_AGE` and `GATE_DOCS_BASE`, which `.githooks/pre-push`
@@ -93,16 +106,23 @@ S8 are unused since rev-2; §9 says where their work went.
   key touches nothing of it. The evidence suite's AC7 arm sets the entry's count field to 10 rather
   than an `age.*` file, and `tools/run-gates/README.md`'s age rule says per key. Spec 13 is a landed
   record, so its S7 text is superseded by this item rather than rewritten. Observed by AC12.
-  - **Readers:** by name: `tools/run-gates/run-gates.sh` reads, increments and resets the
+  - **Readers:** by name: READER NOT IN TREE once this item is built, since it rewrites every reader
+    that spelled the file kind (rev-3); at f479ba42 `tools/run-gates/run-gates.sh` read,
+    incremented and reset the
     `age.<name key>` file (`:3097`, `:3115`, `:4819`); `tools/run-gates/run-gates.evidence.test.sh`
     globs `age.*` in its AC7 arm (`:1244`-`:1249`); `tools/run-gates/README.md` names
-    `age.<name key>` (`:214`). by value: `tools/run-gates/run-gates.sh`'s reuse block compares the
-    count to 10 at `:3099`, and the evidence AC7 arm compares it to 0 after an execution.
+    `age.<name key>` (`:214`); `TOOL-aSparedSpawn-17`'s AC1 arm, landed after this spec, globs
+    `age.*` too, and reads its key after a reuse run, whose record holds no row for a reused leg, so
+    it reads the key from the earning run instead (rev-3). by value: `tools/run-gates/run-gates.sh`'s
+    reuse block compares the count to 10 at `:3099`, the evidence AC7 arm compares it to 0 after an
+    execution, and the evidence AC5 arm asserts a reused leg's entry is byte-identical, which now
+    holds for every field but the count, 0 to 1 (rev-3).
 - **S12** — Finding 16 (M6). Arms 9k and 9m in `tools/run-gates/run-gates.test.sh` stop placing
   their signal with a fixed sleep. 9k's sleeper (`:3074`, `sleep 12`) polls every 0.1 s, up to a
   120 s hang bound, until `$TMPDIR/../1.retry.pid` exists, then lists the directory into `HV_PEEK`
   and exits 0. 9m's sleeper (`:3101`, `sleep 15`) polls the same way until `$TMPDIR/../1.retry.rc`
-  exists, which means the tail attempt started and timed out beside it. Observed by AC13.
+  exists, which means the tail attempt started and timed out beside it; 9m's sleeper becomes a
+  committed fixture file, as 9k's is. Observed by AC13.
 - **S13** — Finding 17 (M7). Arm 9f in `tools/run-gates/run-gates.test.sh` (`:2954`), before
   `unset HV_FLAG` at `:2979`, takes the newest `$H1/.git/gate-run/*/` record, reads the contended
   leg's key from field 7 of its `1.leg`, and asserts `$H1/.git/gate-cache/${k:0:2}/$k` does not
@@ -115,7 +135,8 @@ S8 are unused since rev-2; §9 says where their work went.
   view is unchanged. Observed by AC15.
 - **S15** — Finding 8 (L2). One rule: the runner requires bash 5's `EPOCHSECONDS`, which every site
   but one already reads bare. The ticker's `${EPOCHSECONDS:-$(ts_now)}` (`:1433`) becomes
-  `$EPOCHSECONDS`, the comment at `:1418`-`:1423` states the rule, and `ts_now` (`:1381`), whose last
+  `$EPOCHSECONDS`, as does `measure_foreign`'s `${EPOCHSECONDS:-0}` (`:3632`, the site AC16's count
+  also finds, rev-3), the comment at `:1418`-`:1423` states the rule, and `ts_now` (`:1381`), whose last
   caller that was, is deleted. The turnstile suite's R6 extraction (`run-gates.turnstile.test.sh:377`)
   stops naming it, and `memory/map/generated/symbols.json` is re-rendered by `gen_map.py --write`.
   Observed by AC16.
@@ -139,8 +160,9 @@ S8 are unused since rev-2; §9 says where their work went.
 - **S18** — Finding 19 (L5). When `build_input_keys` (`:2813`) returns early on a failed step, or
   `REUSE_DIGEST` comes out empty, and the reuse mode is not off or a cache write was due, the runner
   prints one stderr line, `run-gates: reuse — the input keys could not be measured (<which step>), so
-  nothing is reused or cached this run`. An evidence arm breaks the digest step with a fault seam
-  shadowing `hash-object` and asserts the line. Observed by AC19.
+  nothing is reused or cached this run`. A canary arm (rev-3: the canary, not the evidence suite,
+  because it also arms S4's two digest sites) breaks the digest step with a `git` shadowing
+  `hash-object` and asserts the line. Observed by AC19.
 - **S19** — Finding 23 (L6). `2026-10-09-spec-TOOL-aSparedSpawn-14.md`'s AC11 (`:295`) and its §7
   arm line (`:332`) name five checks (27, 29, 56, 69 and 88), the nine sites and the helper
   `print_env_failure` that shipped, so they agree with its S10. The spec takes rev-5 with a §9 line
@@ -154,6 +176,9 @@ S8 are unused since rev-2; §9 says where their work went.
   `govkit selfcheck` and shell-hygiene check, check-arms comparing a floor against a diff's added
   arms, the fixed-sleep lint over the suites, the dead-plumbing grep over `$WORK` suffixes, and the
   `GATE_REUSE*` enumeration arm. Each is carried to the build's exit as an ask.
+- S10 and its AC11, the reuse digest's view of a hook's environment, carried to the build's exit as
+  a named ask (rev-3): the hook's `GIT_PREFIX` and Git for Windows' `LC_CTYPE` differ from a plain
+  shell as well, and whether a locale may leave the key is the owner's ruling.
 - Running any suite or the bar inside the build pass. The suites and the bar run once, at VERIFYING.
 - A kit version bump. The main loop bumps every kit this unit touches once, after it.
 
@@ -172,7 +197,7 @@ correction.
 
 ### Reuse key and age (S10, S11)
 
-The digest's env loop gains the five names to its `continue` arm. PATH is read once into a local,
+S10's half is the exit ask's design since rev-3 and is not built here. The digest's env loop gains the five names to its `continue` arm. PATH is read once into a local,
 its first `:`-separated component dropped when it equals `$GIT_EXEC_PATH`, its MSYS spelling
 (`/c/...`), or ends in `/libexec/git-core`, and the `tool` lines resolve under that local through
 `PATH=$stripped type -P`, which spawns nothing. With the schema at 4 every key changes, so no entry
@@ -196,7 +221,6 @@ sees no new definition.
 - `tools/govkit/subject-pins.tsv`
 - `memory/project/spawn-idiom-sites.txt`
 - `memory/project/fork-ceilings.txt`
-- `memory/project/unarmed-branches.txt`
 - `tools/run-gates/run-gates.sh`
 - `tools/run-gates/run-gates.test.sh`
 - `tools/run-gates/run-gates.evidence.test.sh`
@@ -260,7 +284,8 @@ sees no new definition.
   such line exists, which is f479ba42's state.
   permission: whether the floor sits at or below the executed count is observed when the suite runs
   at VERIFYING, and the ledger marks it OWED until then.
-- **AC11** — When a scratch repository's bar earns an `ok` from a plain shell, and the runner then
+- **AC11** — MOVED TO THE BUILD'S EXIT WITH S10 (rev-3); not observed in this unit. When a scratch
+  repository's bar earns an `ok` from a plain shell, and the runner then
   runs as a git alias child (`git -c alias.rg='!bash …' rg`), which receives the environment a hook
   does, with `GATE_REUSE=1`, it prints `GATE reuse` for the leg. Red when: the child executes the
   leg, which f479ba42 does because its digest hashes `GIT_EXEC_PATH` and the prefixed PATH.
@@ -304,9 +329,9 @@ sees no new definition.
 `transition-audit arms` · `straggler-guard arms` · `recall floor arms` · `recall floor` ·
 `memory hygiene` · `codebase-map coverage + freshness` · `kit epoch (shipped bytes move, the version moves)`
 
-New arm: tools/run-gates/run-gates.test.sh · covers AC4 AC13 AC14 AC18 · the calibrate verb with a blank spawn command and a failing spawn, fixed sleepers under load, the cache writer reading the retry, the plain leg line · FLOOR_ASSERTIONS, by S4
-New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC12 AC17 AC19 · a second key resetting the first's count, a sample run overwriting the log, a failing hash-object · FLOOR_ASSERTIONS, by S9
-New arm: .githooks/pre-push.test.sh · covers AC6 AC11 · the two reuse knobs exported into a push, and a direct bar's entry missed through the real hook · none
+New arm: tools/run-gates/run-gates.test.sh · covers AC4 AC13 AC14 AC18 AC19 · the calibrate verb with a blank spawn command and a failing spawn, fixed sleepers under load, the cache writer reading the retry, the plain leg line, a failing hash-object · FLOOR_ASSERTIONS, by S4
+New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC12 AC17 · a second key resetting the first's count, a sample run overwriting the log · FLOOR_ASSERTIONS, by S9
+New arm: .githooks/pre-push.test.sh · covers AC6 · the two reuse knobs exported into a push · none
 New arm: tools/run-gates/held_halves.py · covers AC15 · a text-mode read of a CR-bearing stdout · none
 
 ## 8. Open questions
@@ -323,6 +348,15 @@ none
   TOOL-aSparedSpawn-19, which takes id 20's duplicates. S10 to S19 add ids 11 and 21, 12, 16, 17, 7,
   8, 13, 14 and 22, 19 and 23, each with its own criterion. S4's two digest exits may be armed by
   S18's line instead of pinned.
+- rev-3 · 2026-10-12 · §2 §3 §4 §6 §7 S2 S4 S9 S10 S11 S12 S15 S18 AC11 · the build pass forced these.
+  S10 with AC11 moves to the build's exit as a named ask: a hook's environment on node a also differs
+  by `GIT_PREFIX` and Git for Windows' `LC_CTYPE`, and dropping a locale from the key is the owner's
+  call. S4's digest exits are marked and armed by S18's canary arm, which is the canary's because
+  check-arms reads this gate's arms there alone, so `unarmed-branches.txt` leaves the files touched.
+  S11's Readers gain the evidence AC5 arm and unit 17's AC1 arm, whose key is read from the earning
+  run because a reused leg writes no record row. S15 makes `measure_foreign`'s fallback bare too,
+  which AC16's count finds. S9 counts unit 13's forty-one and this unit's four, 163 to 208. S2 sets
+  the canary's `var-pipe` row to its measured count. S12's 9m sleeper is a committed fixture file.
 
 ## 10. Reuse audit
 

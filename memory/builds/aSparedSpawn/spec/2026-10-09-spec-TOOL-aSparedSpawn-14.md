@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-14 — a refusal retirement review, and a growth budget beside the floors
 
-**Status:** CLOSED · rev-4 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
+**Status:** CLOSED · rev-5 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -109,8 +109,8 @@ the owner's.
   `ARMS_FLOORS` token for `tools/unattended/unattended.sh` in `.memory-tree.conf`, and
   `tools/drift-audit/drift_signals.py` reports that floor's distance; S11 lowers the token.
 - **S10** — Row 5, class F: the driver's environment and internal-failure exits at checks 27, 29,
-  56, 69 and 88 route through one exit-2 helper, `die_env`, which `check-arms.py` exempts by class as
-  it does other environment refusals: an exit code other than 1 is outside its population. On this
+  56, 69 and 88 route through one exit-2 helper, `print_env_failure`, which `check-arms.py` exempts by
+  class as it does other environment refusals: an exit code other than 1 is outside its population. On this
   tree check 48 holds no such exit; the research's two check-48 lines were check 27's archive-name
   refusal and a site since moved, so the row is the other five checks' nine sites (rev-3). The shim arms are dropped, and the pins for checks 27 and 29
   are removed from `tools/unattended/unarmed-branches.txt` (`:33-34`). Observed by AC11.
@@ -293,9 +293,9 @@ there rather than added to the table.
   and separately a read class `CLAIM_READS` lacks, the leg's static join reds naming it, and
   `grep -c 'check 110\|check 111'` over the driver suite prints 0. Red when: the undeclared mode or
   class passes, or an arm for either check remains.
-- **AC11** — Row 5: when `check-arms.py --check` runs after the batch, the six checks' environment
-  exits route through `die_env`, exempt by class, and `tools/unattended/unarmed-branches.txt` carries
-  no row for checks 27 or 29; a scratch call of the helper exits 2. Red when: a listed exit remains
+- **AC11** — Row 5: when `check-arms.py --check` runs after the batch, the nine environment exits of
+  the five checks 27, 29, 56, 69 and 88 route through `print_env_failure`, exempt by class, and
+  `tools/unattended/unarmed-branches.txt` carries no row for checks 27 or 29; a scratch call of the helper exits 2. Red when: a listed exit remains
   outside the helper, a pin row survives, or the helper exits anything but 2.
 - **AC12** — Row 15: when `grep -n 'is retired\|retired premise'` runs over the leg after the batch, it
   finds none of the three tombstone sites, and no new refusal names the retired key or premise.
@@ -330,7 +330,7 @@ there rather than added to the table.
 
 New arm: tools/memory-tree/check-arms.py · covers AC1 AC2 AC3 AC4 AC5 AC7 · a survivor signature absent, a ceiling exceeded, a malformed token, a family over its ceiling, a dead family pattern · none
 New arm: tools/unattended/check-unattended.sh, check 52's route check, flag-table join and claim-table join · covers AC8 AC9 AC10 · a scratch verb reading its run state directly, a listed flag with no call, and a scratch claim mode left undeclared · its floor in `ARMS_FLOORS` moves with the batch
-New arm: tools/unattended/unattended.test.sh, one arm each for `require_run_state`, `VERB_REQUIRES` and `die_env` · covers AC8 AC9 AC11 · the helper bypassed, a listed flag unenforced, the helper exiting 1 · its `FLOOR_ASSERTIONS` falls by the arms the batch drops
+New arm: tools/unattended/unattended.test.sh, one arm each for `check_run_state`, `VERB_REQUIRES` and `print_env_failure`, whose nine sites are the five checks 27, 29, 56, 69 and 88 · covers AC8 AC9 AC11 · the helper bypassed, a listed flag unenforced, the helper exiting 1 · its `FLOOR_ASSERTIONS` falls by the arms the batch drops
 
 ## 8. Open questions
 
@@ -375,6 +375,11 @@ New arm: tools/unattended/unattended.test.sh, one arm each for `require_run_stat
   the lexicon's spellings, `check_run_state`, `check_verb_flag` and `print_env_failure`, as §4's
   inventory provides. Row 15's replay is owed at VERIFYING: the leg's core run it needs passed the
   pass's 600 s bound and was stopped.
+- rev-5 · 2026-10-12 · S10 AC11 §7 · the closing review's finding 23 (TOOL-aSparedSpawn-16 S19): AC11
+  said six checks and named `die_env`, and the §7 arm line named `require_run_state` and `die_env`,
+  against S10's five checks and nine sites and the helpers that shipped. AC11, S10 and the arm line
+  now name the five checks 27, 29, 56, 69 and 88, the nine sites, `check_run_state` and
+  `print_env_failure`. A record correction; nothing built moves.
 
 ## 10. Reuse audit
 
