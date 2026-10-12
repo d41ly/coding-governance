@@ -9,13 +9,23 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 37200355d6033895cd156ec962928fd264084c2b · park · 0 touching
+asks-at-landing: TOOL-aPairedSlots-10=OPEN TOOL-aPairedSlots-16=OPEN TOOL-aPairedSlots-17=OPEN TOOL-aPairedSlots-18=OPEN TOOL-aPairedSlots-19=OPEN TOOL-aPairedSlots-20=OPEN
+units-at-landing: TOOL-aPairedSlots-1 TOOL-aPairedSlots-6 TOOL-aPairedSlots-8 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-7 TOOL-aPairedSlots-9 TOOL-aPairedSlots-12 TOOL-aPairedSlots-13 TOOL-aPairedSlots-11 TOOL-aPairedSlots-14 TOOL-aPairedSlots-15
+hold-run: 
+hold-streak: 1 · at 61bed236
+resume-owed: none · owner
+held-at: 2026-10-12T06:25:10Z
+hold-reason: Every unit is closed and the work is sound; the close's bar is red only on six legs red at origin/main 37200355 with the same offenders, and KF3 attributes them to this run because its diff edits run-gates.sh, so the run cannot land itself. The owner decides whether to land over them (parked decision).
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
+refreshed-at: 37200355d6033895cd156ec962928fd264084c2b · handoff · 0 touching
 gates-run: unattended-179178331712264625013-1128143 867228bb
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: b6cd9fa6bd8bc416729b6369740cb3e938e205ef
-phase: VERIFYING
+witness: 61bed2368b436ef4e0d1bb0ac07605af1508275a
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/concurrent-gate-bars-ac9858
@@ -139,3 +149,7 @@ base: 6dc23b58fe360c0e15168544cf4b03af6550a7ad
 2026-10-12T05:31:38Z brief · item TOOL-aPairedSlots-9 · reason 9d0368c759c7 memory/builds/aPairedSlots/prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md
 
 2026-10-12T06:22:26Z decision · item Land aPairedSlots over six bar reds that are red at origin/main 37200355 with the same offenders, which the close attributes to this run because its diff edits run-gates.sh (KF3)? · reason Options: land attended over the six inherited reds, as the last three builds landed; or wait for their fixes on main and re-run the close. Refused here: with KF3 every red reads OWN, so neither --override gates-green nor an owner-landing hand-off is admitted, and absorbing six reds owned by other builds, one in post-merge.sh which the prompt puts out of scope, is outside this mandate.
+
+2026-10-12T06:25:21Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aPairedSlots && bash tools/push-main.sh --land --slug aPairedSlots && bash tools/unattended/unattended.sh --settle aPairedSlots
+
+2026-10-12T06:25:21Z hold · item owner-decision · reason until owner · reaped 925b9d54 · resume none(owner)

@@ -101,7 +101,7 @@ ids TOOL-aPairedSlots-15 TOOL-aPairedSlots-16 TOOL-aPairedSlots-17 TOOL-aPairedS
 | [TOOL-aPairedSlots-15 — the closing review's mediums and lows, batched](spec/2026-10-12-spec-TOOL-aPairedSlots-15.md) | 9 | 2 | CLOSED | rev-2 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 25 bound to this build, across 4 record folder(s).
+Records: 26 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
