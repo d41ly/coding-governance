@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling
 roster: TOOL
-ids: TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-8 TOOL-aBriskPreflight-9 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-11 TOOL-aBriskPreflight-12
+ids: TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-8 TOOL-aBriskPreflight-9 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-11 TOOL-aBriskPreflight-12 TOOL-aBriskPreflight-13 TOOL-aBriskPreflight-14 TOOL-aBriskPreflight-15 TOOL-aBriskPreflight-16 TOOL-aBriskPreflight-17 TOOL-aBriskPreflight-18
 authorized-by: prompt
 ---
 
@@ -73,6 +73,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- gen:build-index -->
 **Build status:** SPECCED · 10 unit(s) · node a · opened 2026-10-11 · streams tooling
 ids TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-8 TOOL-aBriskPreflight-9 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-11 TOOL-aBriskPreflight-12
+ids TOOL-aBriskPreflight-13 TOOL-aBriskPreflight-14 TOOL-aBriskPreflight-15 TOOL-aBriskPreflight-16 TOOL-aBriskPreflight-17 TOOL-aBriskPreflight-18
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |

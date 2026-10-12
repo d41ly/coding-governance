@@ -10,7 +10,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 
 | Build | Status | Node | Opened | Streams | Ids (n) | Last record | Activity | Landed-unclosed |
 |---|---|---|---|---|---|---|---|---|
-| [aBriskPreflight](builds/aBriskPreflight/README.md) | SPECCED | a | 2026-10-11 | tooling | 12 | 2026-10-12 | active | 0 |
+| [aBriskPreflight](builds/aBriskPreflight/README.md) | SPECCED | a | 2026-10-11 | tooling | 18 | 2026-10-12 | active | 0 |
 | [aRoutedQuill](builds/aRoutedQuill/README.md) | DEFERRED | a | 2026-10-09 | tooling+kickoff+playbook+deployer | 15 | 2026-10-10 | active | 0 |
 | [aSparedSpawn](builds/aSparedSpawn/README.md) | OPEN | a | 2026-10-09 | tooling | 15 | 2026-10-09 | active | 0 |
 | [dPinnedHandoff](builds/dPinnedHandoff/README.md) | SPECCED | d | 2026-09-22 | tooling | 3 | 2026-09-28 | active | 0 |
@@ -35,3 +35,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dRetiredFork](builds/dRetiredFork/README.md) | DEFERRED | d | 2026-09-02 | tooling+deployer | 56 | 2026-09-03 | dormant | 0 |
 | [dScaffoldedMirror](builds/dScaffoldedMirror/README.md) | DEFERRED | d | 2026-08-24 | tooling | 22 | 2026-08-25 | dormant | 0 |
 | [dScriptedRepeat](builds/dScriptedRepeat/README.md) | SPECCED | d | 2026-08-20 | tooling | 15 | 2026-08-24 | dormant | 0 |
+
+## Open BLOCKER asks
+
+- [TOOL-aBriskPreflight-18](builds/aBriskPreflight/BACKLOG.md) · aBriskPreflight · inherited red: leg playbook render wiring red at 37200355, older than…
