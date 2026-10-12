@@ -47,6 +47,12 @@ is the mandate, recorded under [prompts/](prompts/2026-10-11-prompt-TOOL-aHeardS
 |---|---|---|
 | 1 | `TOOL-aHeardState-1` | `format-guard`, a Stop hook that refuses a final message missing the pair or a `committed` line |
 | 2 | `TOOL-aHeardState-2` | `runlog.py prose`, a report-only measure of a session's prose and pair emission |
+| 3 | `TOOL-aHeardState-3` | the format-guard self-test leg's subject pin and budget row (review id 8) |
+| 4 | `TOOL-aHeardState-4` | the leg's guard narrowed to the hook files (review id 9) |
+| 5 | `TOOL-aHeardState-5` | the leg's guard covers the runlog files its parity arm reads (review id 10) |
+| 6 | `TOOL-aHeardState-6` | a bug-class record for a held suite whose guard misses a sibling kit (review id 14) |
+| 7 | `TOOL-aHeardState-7` | the hook header states the continuation-commit behaviour, and an arm pins it (review id 3) |
+| 8 | `TOOL-aHeardState-8` | the closing review's eighteen minors, batched |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->

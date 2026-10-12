@@ -74,3 +74,15 @@ base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 2026-10-12T21:49:56Z rescope · item add TOOL-aHeardState-7 · reason closing review round 1 id 3 (HIGH): the format-guard header says continuation commits are absorbed, and the code demands them
 
 2026-10-12T21:49:57Z rescope · item add TOOL-aHeardState-8 · reason closing review round 1: the 18 MEDIUM and LOW findings, batched into one unit
+
+2026-10-12T21:53:05Z brief · item TOOL-aHeardState-3 · reason b9d32e7b75fa memory/builds/aHeardState/prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md
+
+2026-10-12T21:53:07Z brief · item TOOL-aHeardState-4 · reason b9d32e7b75fa memory/builds/aHeardState/prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md
+
+2026-10-12T21:53:09Z brief · item TOOL-aHeardState-5 · reason b9d32e7b75fa memory/builds/aHeardState/prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md
+
+2026-10-12T21:53:11Z brief · item TOOL-aHeardState-6 · reason b9d32e7b75fa memory/builds/aHeardState/prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md
+
+2026-10-12T21:53:12Z brief · item TOOL-aHeardState-7 · reason b9d32e7b75fa memory/builds/aHeardState/prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md
+
+2026-10-12T21:53:13Z brief · item TOOL-aHeardState-8 · reason b9d32e7b75fa memory/builds/aHeardState/prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md
