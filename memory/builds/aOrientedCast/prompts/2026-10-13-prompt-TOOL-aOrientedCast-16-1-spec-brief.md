@@ -11,7 +11,10 @@ and the playbook kit already hold. Verify every claim about current code by read
 and line. A choice you cannot derive is a fork, resolved by M3 of the build method and marked
 `RESOLVED (agent, 2026-10-13, delegated)`; the owner's four answers below are not forks and are not
 re-opened. You run no gate and no self-test; the only checks you may run are memory hygiene and the
-lexicon. You write only the five spec files. You do not commit, and you do not regenerate any index.
+lexicon. You write only the spec files of the units your roster names; the table below shows all
+five so you see the interfaces between them, and a sibling writer may hold the rest. Spell every
+name, path and key another unit defines exactly as that unit's row does. You do not commit, and you
+do not regenerate any index.
 
 ## Task
 
@@ -76,7 +79,7 @@ because builders run no gate. Each §6 command is one a builder may run: a fixtu
 checker on its own scratch copy.
 
 **Return:**
-- `authored`: the five paths;
+- `authored`: the paths you wrote;
 - `forks`: each fork with the option taken;
 - `refused`: anything you could not specify, with why;
-- the memory hygiene exit status over your five files, if you ran it.
+- the memory hygiene exit status over your files, if you ran it.
