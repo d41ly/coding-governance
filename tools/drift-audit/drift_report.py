@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.28
+gov:kit drift-audit@1.29
 
     python <prefix>/drift-audit/drift_report.py            # human table, always exits 0
     python <prefix>/drift-audit/drift_report.py --json     # machine-readable, always exits 0
@@ -89,7 +89,7 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
-KIT_DRIFT_AUDIT_VERSION = "1.28"
+KIT_DRIFT_AUDIT_VERSION = "1.29"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -3789,15 +3789,36 @@ def resolve_history_path(root: pathlib.Path) -> pathlib.Path | None:
 
 
 def write_drift_history(path: pathlib.Path | None, rows: list[str]) -> None:
-    """Append `rows` in ONE binary write, the header first into an absent or empty file, so two bars
-    on one node interleave whole groups at worst. A failure is one stderr line and never touches the
-    exit status; a success is one stdout line, so a missing line is a visible miss."""
+    """Append `rows` in ONE binary write below a header that is already in place, so two bars on one
+    node interleave whole groups at worst and write one header. A failure is one stderr line and never
+    touches the exit status; a success is one stdout line, so a missing line is a visible miss."""
     try:
         if path is None:
             raise OSError("git rev-parse --git-common-dir named no directory")
+        head = "\t".join(HISTORY_COLUMNS) + "\n"
+        # THE FILE APPEARS WITH ITS HEADER (TOOL-aPairedSlots-11). A writer that finds no history
+        # writes the header to a temporary file of its own and publishes it with a hard link, which
+        # fails when the path exists, so no writer can open the history and find it headless. The
+        # create-then-write it replaces let a second writer's rows land above the header, and the
+        # reader then refused the history for good. A link refused for any other reason, as on a file
+        # system with no hard links, falls through to the append below, which heads an empty file.
+        created = False
+        if not path.exists():
+            tmp = path.with_name(f"{path.name}.tmp.{os.getpid()}")
+            try:
+                tmp.write_bytes(head.encode("utf-8"))
+                os.link(tmp, path)
+                created = True
+            except OSError:
+                pass
+            finally:
+                try:
+                    tmp.unlink()
+                except OSError:
+                    pass
         with open(path, "ab") as fh:
-            head = "" if fh.tell() else "\t".join(HISTORY_COLUMNS) + "\n"
-            fh.write((head + "".join(r + "\n" for r in rows)).encode("utf-8"))
+            lead = "" if created or fh.tell() else head
+            fh.write((lead + "".join(r + "\n" for r in rows)).encode("utf-8"))
     except OSError as exc:
         print(f"drift-report: history NOT written to {path}: {exc}", file=sys.stderr)
         return

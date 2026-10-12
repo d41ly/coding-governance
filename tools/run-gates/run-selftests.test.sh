@@ -76,7 +76,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -113,7 +114,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -185,9 +186,10 @@ ATTR_BASE=fb07ca25
 # closing-fix ledger carries both counts.
 # MERGED with TOOL-dDerivedDocket-1/-23's floor: base 43, +26 from that build (69), +69 from
 # TOOL-aBatchedArm (112), so 43 + 26 + 69.
-SELFTEST_FLOOR=141
+SELFTEST_FLOOR=144
 # RAISED 138 -> 139 by the dDerivedDocket closing diff review's F5: the signalled --attribute arm.
 # RAISED 139 -> 141 by TOOL-aGraftedHelix-7: the sweep's memory pause at 95 % and at 10 % used.
+# RAISED 141 -> 144 by TOOL-aOrientedCast-12: the three row-shape arms, a hand count, not a run.
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -666,6 +668,26 @@ arm "an EMPTY budget column is caught too, rather than collapsing into the argv"
 
 arm "the RUN loop refuses a row it cannot resolve instead of printing ok for a suite it never ran" 1     "this row could not be resolved into a runnable suite"     "printf 'hollow		bash ${PFX}suite-ok.sh	worst of 3 readings 5s, x1.5
 ' >> $B && git add -A"     "$R --serial"
+
+# ---------------------------------------------------------------- the row's shape, TOOL-aOrientedCast-12
+# A row ONE TAB SHORT slid its reading into the argv column, and every reader took that prose as the
+# suite's command: --check found no slash in it to look up, and the run loop `eval`'d it to exit 127.
+# The live instance was the `roles render selftest` row. A row whose own argv begins with no launcher
+# the manifest uses and names no path is the same class written with all four fields.
+arm "a row one tab short is a named refusal in --check, because its reading would run as its argv" 1 \
+    "does not carry the four tab-separated fields" \
+    "printf 'short\t60\tmeasured 2s on node t 2026-09-07, x1.5\n' >> $B && git add -A" \
+    "$R --check"
+
+arm "a four-field row whose argv is prose reds --check, because no launcher and no path begins it" 1 \
+    "reads as prose rather than a command" \
+    "printf 'prosaic\t60\tmeasured 1s\tworst of 3 readings 5s, x1.5\n' >> $B && git add -A" \
+    "$R --check"
+
+arm "the RUN loop refuses a row one tab short as BADROW instead of running its reading" 1 \
+    "BADROW: this row could not be resolved into a runnable suite" \
+    "printf 'short\t60\tmeasured 2s on node t 2026-09-07, x1.5\n' >> $B && git add -A" \
+    "$R --serial"
 
 # ---------------------------------------------------------------- --sweep, TOOL-aPooledSweep-1
 # The pool answers ONE question and issues no cost verdict, so every arm here reads the sweep

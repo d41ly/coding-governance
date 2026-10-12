@@ -167,9 +167,12 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
 
 ## Running ONE rule
 
-`--only=<rule>` narrows the hook to a single rule, over a closed set whose only member today is
-`join`. Anything outside the set is REFUSED with the set named, rather than silently matching
-nothing. It exists so a file gate can share this predicate instead of re-implementing it.
+`--only=<rule>` narrows the hook over a closed set: `join` is rule 5 alone, and `scripts` is rules 1,
+2, 3 and 5, the rules that read a script, without rules 0 and 6, which judge the call. Anything
+outside the set is REFUSED with the set named, rather than silently matching nothing. It exists so a
+file gate can share this predicate instead of re-implementing it: the review-join gate asks for
+`join`, and the verifier fan-out gate for `scripts`, because it feeds committed scripts as inline
+`script` payloads that rule 6 refuses wherever a role index exists.
 
 **A WIRED command must never carry it.** `--only=join` in `.claude/settings.json` would turn the cap
 rules off with no diff and a hook that still looks wired. `<prefix>/check-wiring.sh` asserts its absence.
@@ -187,6 +190,39 @@ reaching a fan-out made outside a workflow script, which is why the matcher must
 
 `AGENT_CAP` in the environment is REFUSED, not honoured — the ceiling is a file constant. A ready-made
 harness that satisfies every rule above ships at `<prefix>/workflows/tier2-review.js`.
+
+## Rule 6 — every agent prompt is a rendered handoff
+
+`TOOL-aOrientedCast-7`. Armed by `.claude/roles.json` at the checkout root of the payload `cwd`,
+else of `CLAUDE_PROJECT_DIR` when the cwd lies in no checkout (`TOOL-aOrientedCast-14`), read through
+scratch-guard's `resolveRoleRoot` and `loadRoleIndex`, so the two hooks read one index identically.
+When neither start lies in a checkout the rule adds nothing, and says so in one stderr line naming
+both when `CLAUDE_PROJECT_DIR` is set. Once read, the index is:
+
+- **absent** — no rule; every verdict is as before;
+- **broken** — every `Agent` and `Workflow` call is refused, naming the file;
+- **no `agent`-true role** — every `Agent` call is refused as UNARMED; **an empty `harnesses`
+  list** — every `Workflow` call is refused as UNARMED.
+
+An `Agent` call passes only when `subagent_type` is an `agent`-true role (a built-in type such as
+`Explore` or `general-purpose` never is), and `prompt`, line endings folded and its ends trimmed, is
+exactly the output of `handoff.py render --role <name> --build <slug> --part task`: ONE
+`gov:handoff` marker line naming that role, blank lines, then the `## Task` section of the file the
+marker's `path` names. That path is repo-relative under `builds/<build>/prompts/`; the file must hold
+the same single marker, and its section must hash to the marker's `task-sha`, so a file edited after
+rendering is refused too. A refusal names the first prompt line that differs; resend the file's bytes.
+
+A `Workflow` call passes only by a `scriptPath` listed in `harnesses` (never an inline `script` or a
+`name:` run), with `args.roles` a non-empty object whose every value is an `agent`-true role: pass
+what `handoff.py harness-args <harness>` prints.
+
+ORDER: after the `AGENT_CAP` refusal and the declared-cap read; before rule 4, so a refused spawn
+claims no slot; before rule 0. Skipped under any `--only=`. A throw inside the rule refuses.
+
+**What it does not stop**, said rather than implied: a hook-less or `--bare` run; the agents a running
+harness spawns through its own `agent()`, which is a runtime call and not a tool call; a
+session-to-session message; a hand-written prompt file that agrees with itself; and a hand-edited
+index. It never compares `role-sha` with the role an agent type was rendered from.
 
 ## Lowering the cap — `.agent-cap.conf`
 
@@ -323,6 +359,39 @@ the agent writes: approval is recorded, not proven. The gate stops forgetting, n
 `readConfKey(bytes, key)` is this home's one shell-grammar conf reader; `agent-cap.js`'s
 `readSpecAuditDefault` delegates to it.
 
+**The role arm: WHO writes a spec or a product file** (`TOOL-aOrientedCast-6`). The same gate reads
+the payload's `agent_type` against the role index `.claude/roles.json` at the target's toplevel,
+which the roles kit generates; `loadRoleIndex(top)` is the one reader, exported for `agent-cap.js`.
+Two write classes are graded, and nothing else reads the index:
+
+- **spec** — a target under `<MEMORY_ROOT>/builds/<build>/spec/`, at any depth. Admitted only from
+  a role with `agent: true` and `writes = spec`.
+- **product** — a target under `ROUTED_PATHS`. The route arm above runs first and unchanged; once it
+  finds a buildable unit, the write is admitted only from a role with `agent: true` and
+  `writes = product`. A builder with no buildable route meets the route refusal word for word.
+
+The main loop (its payload carries no `agent_type`) and an untyped harness agent
+(`workflow-subagent`) are refused both, with ONE exception: an `Edit`, `MultiEdit` or `Write` on a
+spec whose result differs from the file in exactly one line, its `**Status:**` line, and there only
+in the status and date cells. That flip is admitted from the main loop on any spec, and from a
+`product` role on a spec its card's `## route` names; rev, tier, base, the tail and every section
+stay the spec-writer's.
+
+**Arming.** No index adds no arm, so a repository without the roles kit sees the route gate exactly
+as before. An index that cannot be read, is not JSON, or is not the shape
+`{ roles: { <name>: { writes, agent } }, harnesses: [...] }` refuses every spec and product write,
+naming the file. An index naming no `agent`-true role for a class refuses that class as UNARMED.
+Each refusal names the target, its class, the writer, the roles the index admits, the index, and the
+route to such a role: render its handoff with `handoff.py render --role <name> --build <slug> --part
+task` and pass the output as the prompt of an `Agent` call whose `subagent_type` is that role, or
+name the role in its harness's `roles` argument. A spec refusal also names the status flip.
+
+**Its ceiling**, beside the gate's: a Bash or PowerShell write is never seen; a hand-edited index is
+read like a generated one; a session launched AS a role carries that role's type. The `none`,
+`review` and `records` write classes are declared in the index and graded by nothing here. A hook
+script is read afresh on every call, so the arm binds a session from its next write once the tree
+its hooks run from holds it.
+
 **The third event: `SubagentStart`** (`TOOL-aRoutedQuill-4`). A subagent inherits the hooks but not
 the parent's card, so `scratch-guard-subagent.fragment.json` wires the same script on `SubagentStart`
 with matcher `*`. A second fragment is safe here where a second PreToolUse one is not, because the
@@ -375,6 +444,40 @@ field value, or where in the message the pair sits. It never sees a sub-agent's 
 stop that follows a block in the same chain, whichever hook blocked, so under an unattended run only
 the first stop of each chain is graded. It does not prove it is wired. The transcript-level measure
 that covers what it cannot see is `runlog.py prose` (`TOOL-aHeardState-2`).
+
+## scratch-guard's fourth check: a role agent runs no gate
+
+Gates are the main session's, at the merge or push threshold (`TOOL-aOrientedCast-11`). On a Bash
+or PowerShell payload carrying an `agent_type`, after the scratch verdict and the orientation check,
+`checkRoleGate` splits the command into simple commands, finds each one's script past any
+`NAME=value`, prefix word (`env`, `exec`, `command`, `nice`, `nohup`, `export`, `time`), `timeout`
+or launcher, and refuses one that is listed below. A launcher's options and a prefix word's options
+are stepped past by the rule table `GATE_OPTION_RULES` (`TOOL-aOrientedCast-14`): `bash -o pipefail`
+or `python -X utf8` takes its argument; a shell's `-n`, a Python `-c` or `-m`, a Node `-e` or `-p`
+and `command -v` end the command, which runs no script; a shell's `-c` and `env -S` have their body
+scanned once. The role index is read at the checkout root of the payload `cwd`, else of
+`CLAUDE_PROJECT_DIR`; neither resolving adds no arm, with one witness line when
+`CLAUDE_PROJECT_DIR` is set. The rows:
+
+| Row | Matches | Admitted when |
+|---|---|---|
+| G1 leg | its argv equals a leg's of the gate manifest the role index names, from the leg's script on | the role's allowlist names that leg |
+| G2 runner | the bar runner, the self-test runner or the unattended gates runner, by basename, any form | never |
+| G3 suite | a `*.test.sh` or `*selftest.py` script, or a script carrying `--selftest` | it carries `--render`, `--list` or `--help`, or it is an allowlisted G1 leg |
+
+The allowlist is the role index's `gates` list for that type, which the roles kit renders from the
+`[gates]` table of its policy file; a type the index does not name, `workflow-subagent` and every
+built-in among them, may run nothing. `checkRoleGate`'s comment is the ONE evaluation order. An absent
+index adds no arm; a broken one refuses a candidate; a manifest that does not read leaves G1 unarmed
+with one witness line, and G2 and G3 still bind; a throw inside the arm refuses a role agent. The
+refusal names the type, the simple command, the row, the leg, the allowlist and the index, and says
+to return the need and verify with a fixture or a probe of your own code.
+
+**Its ceiling.** The match is textual: a gate reached through an interpreter, an alias, a function,
+an assembled path or a `$(…)` inside quotes passes it, and so does a scoped variant of a leg that
+adds an argument the leg does not carry, or an option missing from the rule table that takes an
+argument, such as the `o` inside `bash -eo pipefail`. It stops forgetting, not evasion, and the push-boundary bar
+is still the guarantee. The main loop, which carries no `agent_type`, is never refused.
 
 ## The authoring rule for kit files
 

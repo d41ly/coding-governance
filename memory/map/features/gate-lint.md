@@ -13,6 +13,8 @@ gate-legs = [
   "shell-hygiene selftest",
   "encoding posture (text IO names its encoding)",
   "shell hygiene (a location probe asked from a moved directory)",
+  "shell hygiene (a fork spent on builtin work)",
+  "spawn budget (forks per hot entrypoint)",
 ]
 kits = ["gate-lint"]
 git-hooks = []
@@ -30,6 +32,8 @@ globs = [
   "memory/project/substitution-fed-loops.txt",
   "memory/project/encoding-posture-sites.txt",
   "memory/project/location-probe-waivers.txt",
+  "memory/project/spawn-idiom-sites.txt",
+  "memory/project/fork-ceilings.txt",
 ]
 ```
 
@@ -126,6 +130,16 @@ Its population reaches extensionless files by their shell shebang, so the git ho
 without the kit naming where a repository keeps them. The class record is
 `memory/gotchas/inherited-git-dir-pins-the-work-tree-to-the-cwd.md`.
 
+**The spawn-idiom lint is the THIRD mode, and a fork COUNT stands beside it.** `TOOL-aSparedSpawn-8`
+grades forks spent on work bash does in-process — under MSYS each costs 89 to 315 ms. Three idioms
+have no false positive and are BANNED with no registry escape: `$(date +%s)`, `$(cat <<…` and a
+`$(<f)` carrying a second redirection. Six more are counted per (path, class) in a shrink-only
+registry, suites included, so regrowth reds while the drain proceeds. A lint reads source and cannot
+see how often a site runs, so `fork-count.sh` counts forks per invocation of each declared hot
+entrypoint under a PS4 trace, calibrates on a specimen first, and reds on growth above a ceiling and
+on a ceiling left above a saving. Its leg is gov's alone: the ceilings name this repository's
+entrypoints, so it is an `[[exempt_leg]]` while the script ships with the kit.
+
 ## Shared seams
 
 - `memory/project/*.txt` — the shrink-only registry convention, shared with
@@ -171,6 +185,14 @@ that must land green over a non-compliant population without keying on a line nu
   written. It landed holding no row.
 - `memory/project/encoding-posture-sites.txt` — gov's gov-internal carried sites, one row per
   file and arm. Lower a count or delete a row in the commit that drains the site.
+- `python tools/gate-lint/sh_hygiene.py --spawn-idioms [registry] [root] [pathspec ...]` — the
+  spawn-idiom lint. It prints each class's scanned, gated and near-miss counts and every registered
+  row's reason; a BANNED site prints its path, line and remedy.
+- `memory/project/spawn-idiom-sites.txt` — the carried spawn-idiom sites, per (path, class). Lower a
+  count in the commit that converts a site.
+- `bash tools/gate-lint/fork-count.sh memory/project/fork-ceilings.txt . [--only <id>]` — forks per
+  hot entrypoint against its ceiling; `--selftest` proves the calibration holds and that a moved
+  declaration refuses. A red prints the delta and the top ten `file:line` contributors.
 
 ## Gaps
 

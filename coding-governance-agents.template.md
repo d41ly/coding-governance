@@ -126,6 +126,9 @@ gate or protocol named in section 3 carries the detail.*
 - The agent-cap hook refuses an unbounded fan-out at the tool call; consolidate the fan-out rather than routing around it.
 - The write gate refuses a product-code write that no specced unit owns; route the unit through `/session-kickoff` first.
 <!-- /kit:agent-cap -->
+<!-- kit:roles -->
+- Every agent is handed a rendered role from `<prefix>/roles/`; spec, review and build work runs only in role agents. An attended code build runs through `/build`.
+<!-- /kit:roles -->
 <!-- kit:unattended -->
 - `/unattended` starts, resumes or closes a run that merges and pushes with no owner turn.
 <!-- /kit:unattended -->

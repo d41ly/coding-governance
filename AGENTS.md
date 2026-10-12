@@ -122,6 +122,7 @@ gate or protocol named in section 3 carries the detail.*
 - `<prefix>/workflows/tier2-review.js` runs a Tier-2 review as one bounded `Workflow`.
 - The agent-cap hook refuses an unbounded fan-out at the tool call; consolidate the fan-out rather than routing around it.
 - The write gate refuses a product-code write that no specced unit owns; route the unit through `/session-kickoff` first.
+- Every agent is handed a rendered role from `<prefix>/roles/`; spec, review and build work runs only in role agents. An attended code build runs through `/build`.
 - `/unattended` starts, resumes or closes a run that merges and pushes with no owner turn.
 - `/runlog` answers what an unattended run did, decided or cost, and why it stopped.
 - `<prefix>/push-main.sh` lands and pushes the default branch, and nothing bypasses it.

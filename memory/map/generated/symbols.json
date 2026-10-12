@@ -233,6 +233,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "RolesError",
+      "kind": "class",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "RowLoss",
       "kind": "class",
       "file": "tools/memory-tree/merge-rows.py"
@@ -420,6 +425,11 @@
     {
       "id": "add_health_event",
       "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
+      "id": "add_health_event",
+      "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
@@ -466,6 +476,11 @@
       "id": "add_overlap_commit",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "add_parity_rows",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "add_pass",
@@ -1133,6 +1148,11 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "buildBaseName",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "buildBlankedRun",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -1154,6 +1174,16 @@
     },
     {
       "id": "buildComparablePath",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "buildEditResult",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "buildGateWord",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -1196,6 +1226,11 @@
       "id": "buildShapeRegex",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "buildTaskDigest",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "build_aborted_run",
@@ -1336,6 +1371,11 @@
       "id": "build_big_model",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_blob_request",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "build_brief_run",
@@ -1513,6 +1553,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "build_docs_repo",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
       "id": "build_edges",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -1556,6 +1601,16 @@
       "id": "build_fixture",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "build_fixture",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
+      "id": "build_fixture",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "build_fixture",
@@ -1773,6 +1828,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "build_input_keys",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "build_invocations",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
@@ -1791,6 +1851,11 @@
       "id": "build_items",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "build_key_text",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "build_killed_close_fixture",
@@ -1988,6 +2053,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "build_partition",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "build_path_probe",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2001,6 +2071,16 @@
       "id": "build_payload",
       "kind": "function",
       "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
+      "id": "build_pf_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "build_pfx_fixture",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "build_placement_models",
@@ -2031,6 +2111,11 @@
       "id": "build_planted",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_pm_commit",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "build_pm_shim",
@@ -2193,6 +2278,11 @@
       "file": "tools/govkit/matrix.py"
     },
     {
+      "id": "build_roster_id_re",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "build_rotated_archive_re",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -2256,6 +2346,11 @@
       "id": "build_sandbox",
       "kind": "function",
       "file": "tools/unattended/runlog-writer.test.sh"
+    },
+    {
+      "id": "build_sb_kit",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "build_scan_text",
@@ -2376,6 +2471,11 @@
       "id": "build_source_store",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_spawn_measured",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "build_spec_commit_repo",
@@ -2541,6 +2641,11 @@
       "id": "build_unnamed_why",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "build_unquoted",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "build_usage",
@@ -2793,6 +2898,31 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkGateLeg",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkGateRunner",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkGateSuite",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkHandoffSpawn",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "checkHarnessCall",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkLiteralOpen",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -2818,6 +2948,16 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkRoleGate",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkRoleWrite",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkRouted",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -2836,6 +2976,11 @@
       "id": "checkSpecAuditDeclared",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "checkStatusOnlyEdit",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "checkStop",
@@ -3078,6 +3223,16 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "check_arm",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
+      "id": "check_arm",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "check_ask_mandate",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -3168,6 +3323,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_budgets",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
       "id": "check_build_backlog",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -3176,6 +3336,11 @@
       "id": "check_built_from_history",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "check_calibration",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
     },
     {
       "id": "check_calls_invariant",
@@ -3223,6 +3388,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "check_card_task",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "check_card_unchanged",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
@@ -3236,6 +3406,11 @@
       "id": "check_carry_set",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "check_catalogue_region",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
     },
     {
       "id": "check_ceiling_emission",
@@ -3398,6 +3573,11 @@
       "file": "tools/lexicon/lexicon_conf.py"
     },
     {
+      "id": "check_declarations",
+      "kind": "function",
+      "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
       "id": "check_derived_landed",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -3503,6 +3683,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "check_families",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
+    },
+    {
       "id": "check_family_view",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -3586,6 +3771,16 @@
       "id": "check_halved_install_arms",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_halves",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "check_handoff",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "check_handoff_bar",
@@ -3708,6 +3903,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "check_id_carried",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
+    },
+    {
       "id": "check_idle_invariant",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -3731,6 +3931,11 @@
       "id": "check_in_window",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "check_index_input",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "check_inherited_override",
@@ -4008,6 +4213,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "check_placeholder",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "check_playbook_hole_modes",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -4086,6 +4296,11 @@
       "id": "check_provenance_chain",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "check_pure_body",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "check_push_allow",
@@ -4183,6 +4398,11 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "check_registered",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
       "id": "check_registry",
       "kind": "function",
       "file": "tools/gate-lint/encoding_posture.py"
@@ -4203,6 +4423,11 @@
       "file": "tools/runlog/adopt-runlog.sh"
     },
     {
+      "id": "check_rendered",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "check_residue_gone",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -4218,6 +4443,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_retirements",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
+    },
+    {
       "id": "check_rev",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -4226,6 +4456,26 @@
       "id": "check_role_move",
       "kind": "function",
       "file": "tools/govkit/matrix.py"
+    },
+    {
+      "id": "check_roles",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_roles",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
+    },
+    {
+      "id": "check_roles_default",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_roles_install",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "check_rollback_orders",
@@ -4261,6 +4511,11 @@
       "id": "check_run_call",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "check_run_state",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_run_states",
@@ -4303,6 +4558,21 @@
       "file": "tools/memory-tree/merge-rows.test.sh"
     },
     {
+      "id": "check_sb_secs",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "check_sc_line",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "check_sc_value",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "check_scratch_guard",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -4315,7 +4585,17 @@
     {
       "id": "check_selected",
       "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.sh"
+    },
+    {
+      "id": "check_selected",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "check_selected",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.sh"
     },
     {
       "id": "check_self_containment",
@@ -4403,9 +4683,34 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_sp_value",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "check_spawn",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "check_spawn_calibration",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "check_spawn_ceiling",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "check_spawn_substitution",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "check_spawns",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
       "id": "check_spec_audit",
@@ -4426,6 +4731,11 @@
       "id": "check_staged_backlog",
       "kind": "function",
       "file": ".githooks/straggler-guard.sh"
+    },
+    {
+      "id": "check_staged_render",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "check_stamp_line",
@@ -4568,6 +4878,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_two_writers",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
       "id": "check_untouched_r3",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -4581,6 +4896,11 @@
       "id": "check_user_clash",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "check_verb_flag",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_view_line",
@@ -4618,6 +4938,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_wiring_runnable",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_work_landed",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -4641,6 +4966,11 @@
       "id": "check_worksheets_signed",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "check_worktree_unheld",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "check_written_asks",
@@ -5333,11 +5663,6 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
-      "id": "decide_on",
-      "kind": "function",
-      "file": ".githooks/pre-push.test.sh"
-    },
-    {
       "id": "declared_in_kits_json",
       "kind": "function",
       "file": "tools/govkit/census.py"
@@ -5653,6 +5978,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "derive_calibrated_width",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "derive_candidates",
       "kind": "function",
       "file": "tools/lexicon/scaffold_lexicon.py"
@@ -5771,6 +6101,11 @@
       "id": "derive_dir_segments",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "derive_dispatch_order",
+      "kind": "function",
+      "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
       "id": "derive_dispositions",
@@ -5906,6 +6241,11 @@
       "id": "derive_guarded_legs",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "derive_harness_paths",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "derive_head_state",
@@ -6268,6 +6608,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_prompt_name",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "derive_push_failure",
       "kind": "function",
       "file": "tools/push-main.sh"
@@ -6383,6 +6728,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "derive_row_kinds",
+      "kind": "function",
+      "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
       "id": "derive_row_re",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -6421,6 +6771,11 @@
       "id": "derive_scope",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
+    },
+    {
+      "id": "derive_section_sha",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "derive_self_rel",
@@ -6763,9 +7118,19 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_tool_root",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "derive_transition",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "derive_tree_digest",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "derive_tree_holds",
@@ -6791,6 +7156,11 @@
       "id": "derive_verdict",
       "kind": "function",
       "file": "tools/process-monitor/classify.py"
+    },
+    {
+      "id": "derive_verdict",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "derive_verdicts",
@@ -6846,6 +7216,11 @@
       "id": "derive_winpid",
       "kind": "function",
       "file": "tools/unattended/resume-tick.test.sh"
+    },
+    {
+      "id": "derive_wiring_bound",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "derive_worktree_root",
@@ -7173,6 +7548,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "extractHandoffMarker",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "extractNewCommits",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
@@ -7181,6 +7561,16 @@
       "id": "extractRouteUnits",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "extractTaskSection",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "extractWorkflowArgs",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "extract_acceptance",
@@ -7198,6 +7588,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "extract_brief_section",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "extract_build_readmes",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -7208,9 +7603,19 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "extract_card_section",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "extract_card_tokens",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "extract_charter_sections",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "extract_chunks",
@@ -7348,6 +7753,11 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
+      "id": "extract_roster_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "extract_row",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -7391,6 +7801,11 @@
       "id": "extract_supersessions",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "extract_task_fields",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "extract_text",
@@ -7903,6 +8318,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "init_bounded",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "init_declared_merge",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -7916,6 +8336,11 @@
       "id": "init_pl_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "init_preflight_probes",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "init_repo",
@@ -8093,11 +8518,6 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
-      "id": "json_str",
-      "kind": "function",
-      "file": "tools/check-wiring.sh"
-    },
-    {
       "id": "key",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -8243,6 +8663,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "loadRoleIndex",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "load_affordance_exempt",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -8261,6 +8686,11 @@
       "id": "load_baseline",
       "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
+      "id": "load_catalogue",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "load_checker",
@@ -8328,6 +8758,11 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "load_declaration",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "load_declarations",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -8353,6 +8788,16 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "load_driver_conf",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "load_fixture_report",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "load_fork_cutoff",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -8361,6 +8806,11 @@
       "id": "load_fragment",
       "kind": "function",
       "file": "tools/settings-merge.py"
+    },
+    {
+      "id": "load_gate_leg_names",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "load_generator",
@@ -8378,6 +8828,11 @@
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
     },
     {
+      "id": "load_half",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "load_kit_conf",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -8393,14 +8848,34 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "load_manifest",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "load_map_tree",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "load_owned_names",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "load_parse_spec_h1",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "load_policy",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "load_population",
+      "kind": "function",
+      "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
       "id": "load_project_layer",
@@ -8423,6 +8898,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "load_roles",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "load_rules",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
@@ -8443,6 +8923,11 @@
       "file": "tools/memory-tree/routed_commits.py"
     },
     {
+      "id": "load_text",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "load_toml",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -8451,6 +8936,11 @@
       "id": "load_waivers",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "load_workflows",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "log_event",
@@ -8780,12 +9270,32 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/roles/check_roles.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
     },
     {
       "id": "main",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "main",
@@ -8826,6 +9336,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/unattended/stop-guard.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "main",
@@ -8998,6 +9513,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "measure_forks",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
       "id": "measure_gh37_interleave",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -9011,6 +9531,11 @@
       "id": "measure_git_calls",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "measure_held_slots",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "measure_hook_entries",
@@ -9103,6 +9628,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "measure_parity",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "measure_pass",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -9131,6 +9661,11 @@
       "id": "measure_prose",
       "kind": "function",
       "file": "tools/runlog/prose.py"
+    },
+    {
+      "id": "measure_python_execs",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
       "id": "measure_ranks",
@@ -9183,6 +9718,11 @@
       "file": "tools/process-monitor/census.py"
     },
     {
+      "id": "measure_ru_entries",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "measure_rule",
       "kind": "function",
       "file": "tools/unattended/check-arms-groups.test.sh"
@@ -9211,6 +9751,21 @@
       "id": "measure_spawn_cost",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "measure_spawn_cost",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "measure_spawn_rate",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "measure_spawns",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
       "id": "measure_timeline_events",
@@ -9858,6 +10413,11 @@
       "file": "tools/workflows/review_replay.py"
     },
     {
+      "id": "parse_ceilings",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
+    },
+    {
       "id": "parse_cell_key",
       "kind": "function",
       "file": "tools/lexicon/lexicon_conf.py"
@@ -9871,6 +10431,11 @@
       "id": "parse_conf",
       "kind": "function",
       "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
+      "id": "parse_conf",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "parse_conf_assignment",
@@ -9928,6 +10493,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "parse_front_matter",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "parse_gate_backstop",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -9946,6 +10516,11 @@
       "id": "parse_iso",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "parse_iso_epoch",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "parse_json_pairs",
@@ -10113,21 +10688,6 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
-      "id": "pfx_decide",
-      "kind": "function",
-      "file": ".githooks/pre-push.test.sh"
-    },
-    {
-      "id": "pfx_fixture",
-      "kind": "function",
-      "file": ".githooks/pre-push.test.sh"
-    },
-    {
-      "id": "pfx_stamp",
-      "kind": "function",
-      "file": ".githooks/pre-push.test.sh"
-    },
-    {
       "id": "phase_of",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -10166,31 +10726,6 @@
       "id": "planned_writes",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "pm_commit",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
-    },
-    {
-      "id": "pm_key",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
-    },
-    {
-      "id": "pm_red",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
-    },
-    {
-      "id": "pm_run",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
-    },
-    {
-      "id": "pm_show",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "pop_guard",
@@ -10273,6 +10808,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_contributors",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
       "id": "print_corpus",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
@@ -10298,6 +10838,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "print_drift",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "print_drift_delta",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -10306,6 +10851,11 @@
       "id": "print_entries",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "print_env_failure",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "print_fail",
@@ -10321,6 +10871,16 @@
       "id": "print_gate_backstop",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "print_harness_args",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "print_host",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "print_interrupted_acts",
@@ -10418,14 +10978,29 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "print_plan",
+      "kind": "function",
+      "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
       "id": "print_plan_lines",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "print_pm_out",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "print_populations",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "print_preflight_breach",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "print_probe_populations",
@@ -10451,6 +11026,16 @@
       "id": "print_recomputed",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "print_refusal",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "print_refusal",
+      "kind": "function",
+      "file": "tools/run-gates/run-held-wsl.sh"
     },
     {
       "id": "print_registry",
@@ -10503,6 +11088,11 @@
       "file": "tools/agent-instructions/adopt-agent-instructions.sh"
     },
     {
+      "id": "print_spawn_populations",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "print_spec_audit_line",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -10511,6 +11101,11 @@
       "id": "print_spec_probes",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "print_stage_efforts",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "print_stale_dossiers",
@@ -10749,6 +11344,11 @@
     },
     {
       "id": "readFrontMatterKey",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "readGateLegs",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -11098,9 +11698,19 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "read_boot_epoch",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "read_bound_key",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "read_bounded",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "read_brief_cutoff",
@@ -11121,6 +11731,11 @@
       "id": "read_brief_subheads",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_budgets",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
     },
     {
       "id": "read_build_slug",
@@ -11208,6 +11823,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_code_lines",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "read_commit_paths",
       "kind": "function",
       "file": "tools/codebase-map/map_diff.py"
@@ -11241,6 +11861,11 @@
       "id": "read_conf_key",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "read_conf_key",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "read_conf_key_gaps",
@@ -11311,6 +11936,11 @@
       "id": "read_debt_gloss",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_decision_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
     },
     {
       "id": "read_declared",
@@ -11513,6 +12143,16 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_fragment_keys",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "read_function_bodies",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "read_gate",
       "kind": "function",
       "file": "tools/check-install-prefix.test.sh"
@@ -11536,6 +12176,11 @@
       "id": "read_git",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_git",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "read_git_dirs",
@@ -11663,6 +12308,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_host_calibration",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "read_host_name",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -11761,6 +12411,11 @@
       "id": "read_kit_conf",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "read_kit_marker",
+      "kind": "function",
+      "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
       "id": "read_kit_rel",
@@ -12063,6 +12718,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "read_one_signal",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "read_oracle_answer",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -12083,6 +12743,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "read_parity",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "read_parser_slice",
       "kind": "function",
       "file": "tools/push-main.test.sh"
@@ -12098,6 +12763,21 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "read_pf_at",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_pf_pid",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_pf_rows",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "read_phase",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -12106,6 +12786,11 @@
       "id": "read_phase_into",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_pid_and_swap",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
     },
     {
       "id": "read_pid_image",
@@ -12148,9 +12833,19 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_pm_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "read_pm_mark",
       "kind": "function",
       "file": "tools/push-main.test.sh"
+    },
+    {
+      "id": "read_pm_red",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "read_pm_remote",
@@ -12203,6 +12898,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "read_preflight_probes",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_probe_allow",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -12236,6 +12936,11 @@
       "id": "read_recipe",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_record",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "read_record_cells",
@@ -12313,6 +13018,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "read_remote_heads",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "read_remote_red",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
@@ -12368,6 +13078,21 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_rp_line",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_ru_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "read_ru_rundir",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "read_run_commits",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -12396,6 +13121,16 @@
       "id": "read_rx_fact",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_sb_run",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "read_sc_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "read_scan_overlaps",
@@ -12446,6 +13181,11 @@
       "id": "read_shell_function",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_shell_sources",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "read_signal_table_names",
@@ -12503,6 +13243,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_slots_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "read_slug",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -12513,9 +13258,29 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_sp_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "read_sp_why",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "read_spawn_floor",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "read_spawn_now",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "read_spawn_now",
+      "kind": "function",
+      "file": "tools/run-gates/run-selftests.sh"
     },
     {
       "id": "read_spec_marks",
@@ -12586,6 +13351,11 @@
       "id": "read_su_sum",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_substitution",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "read_suggestion",
@@ -13145,6 +13915,11 @@
     {
       "id": "remove_scratch",
       "kind": "function",
+      "file": "tools/run-gates/run-held-wsl.sh"
+    },
+    {
+      "id": "remove_scratch",
+      "kind": "function",
       "file": "tools/unattended/runlog-writer.test.sh"
     },
     {
@@ -13343,6 +14118,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderGateDeny",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "renderHandoffDeny",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "renderIntent",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -13428,6 +14213,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderRoleDeny",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "renderRoster",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
@@ -13473,6 +14263,26 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "renderStageOpts",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderStageOpts",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderStageOpts",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "renderStageOpts",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "renderStageShape",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -13506,6 +14316,11 @@
       "id": "render_affordance_exempt",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "render_agent_file",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "render_all",
@@ -13576,6 +14391,16 @@
       "id": "render_cards_md",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "render_catalogue_region",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
+    },
+    {
+      "id": "render_cell",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
     },
     {
       "id": "render_cell",
@@ -13686,6 +14511,11 @@
       "id": "render_grade_tsv",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_handoff",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "render_handoff_recipe",
@@ -13808,6 +14638,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "render_path",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "render_path_spellings",
       "kind": "function",
       "file": "tools/run-gates/lib-attribute.sh"
@@ -13831,6 +14666,11 @@
       "id": "render_pointer",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "render_prof_line",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "render_prose_report",
@@ -13918,6 +14758,16 @@
       "file": "tools/process-monitor/classify.py"
     },
     {
+      "id": "render_role",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "render_roles_index",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "render_rows",
       "kind": "function",
       "file": "tools/process-monitor/census.py"
@@ -13926,6 +14776,11 @@
       "id": "render_rx_literal",
       "kind": "function",
       "file": "tools/run-gates/lib-attribute.sh"
+    },
+    {
+      "id": "render_same_holder",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "render_scope_row",
@@ -13970,12 +14825,22 @@
     {
       "id": "render_skill",
       "kind": "function",
+      "file": "tools/roles/adopt-roles.sh"
+    },
+    {
+      "id": "render_skill",
+      "kind": "function",
       "file": "tools/runlog/adopt-runlog.sh"
     },
     {
       "id": "render_skill_copy",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "render_spawn_summary",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "render_spec",
@@ -13991,6 +14856,11 @@
       "id": "render_spec_skeleton",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_stable",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "render_staged",
@@ -14031,6 +14901,11 @@
       "id": "render_symbols_json",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "render_task_section",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
       "id": "render_template",
@@ -14218,6 +15093,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "resolveRoleRoot",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "resolveRoot",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
@@ -14315,6 +15195,11 @@
     {
       "id": "resolve_bash",
       "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "resolve_bash",
+      "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
     },
     {
@@ -14333,9 +15218,19 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "resolve_brief_record",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "resolve_cache_dir",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "resolve_card_path",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "resolve_carrier_kit",
@@ -14356,6 +15251,11 @@
       "id": "resolve_charter_file",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "resolve_charter_path",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "resolve_claim_remote",
@@ -14438,9 +15338,19 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "resolve_display_path",
+      "kind": "function",
+      "file": "tools/roles/check_roles.py"
+    },
+    {
       "id": "resolve_drift_at",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "resolve_effort",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "resolve_entry",
@@ -14463,9 +15373,19 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "resolve_free_slot",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "resolve_full_sha",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "resolve_gate_manifest",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "resolve_gate_path",
@@ -14491,6 +15411,11 @@
       "id": "resolve_gov_pin",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "resolve_harness_path",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "resolve_health_log",
@@ -14591,6 +15516,11 @@
       "id": "resolve_journal_root",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
+    },
+    {
+      "id": "resolve_kickoff_checker",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "resolve_kickoff_checker",
@@ -14800,17 +15730,17 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/run-gates/run-gates.runlog.test.sh"
-    },
-    {
-      "id": "resolve_kit_dir",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "resolve_kit_dir",
@@ -14934,6 +15864,11 @@
     },
     {
       "id": "resolve_kit_file",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "resolve_kit_files",
       "kind": "function",
       "file": "tools/check-wiring.sh"
     },
@@ -15345,6 +16280,11 @@
     {
       "id": "resolve_python",
       "kind": "function",
+      "file": "tools/roles/adopt-roles.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
@@ -15376,6 +16316,11 @@
       "id": "resolve_python",
       "kind": "function",
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
+      "file": "tools/run-gates/run-held-wsl.sh"
     },
     {
       "id": "resolve_python",
@@ -15728,6 +16673,11 @@
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
     },
     {
+      "id": "resolve_stage_efforts",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "resolve_stand_down",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -15776,6 +16726,11 @@
       "id": "resolve_worktree_reflog",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "resolve_wsl_host",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "restamp",
@@ -16120,6 +17075,11 @@
     {
       "id": "run_adopter",
       "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
+      "id": "run_adopter",
+      "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
     {
@@ -16193,6 +17153,11 @@
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
+      "id": "run_beside_holder",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
       "id": "run_bg_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -16263,6 +17228,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "run_combine",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "run_command",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
@@ -16318,6 +17288,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_docs_bar",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
       "id": "run_docs_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -16326,6 +17301,16 @@
       "id": "run_driver",
       "kind": "function",
       "file": "tools/unattended/runlog-writer.test.sh"
+    },
+    {
+      "id": "run_driver",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_edit",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "run_engine",
@@ -16443,9 +17428,19 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_half",
+      "kind": "function",
+      "file": "tools/run-gates/run-held-wsl.sh"
+    },
+    {
       "id": "run_handoff",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "run_harness",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
     },
     {
       "id": "run_harness",
@@ -16466,11 +17461,6 @@
       "id": "run_hook",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
-    },
-    {
-      "id": "run_hook",
-      "kind": "function",
-      "file": "tools/process-monitor/adopt-process-monitor.test.sh"
     },
     {
       "id": "run_hook",
@@ -16521,6 +17511,11 @@
       "id": "run_in_gov",
       "kind": "function",
       "file": "tools/govkit/matrix.py"
+    },
+    {
+      "id": "run_inproc",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "run_ir_push",
@@ -16623,6 +17618,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "run_mode",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "run_mp_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -16663,6 +17663,11 @@
       "file": "tools/workflows/check_by_design_parity.py"
     },
     {
+      "id": "run_pfx_push",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "run_pk_gate",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -16691,6 +17696,11 @@
       "id": "run_plan_in",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "run_pm",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "run_pm_case",
@@ -16733,9 +17743,19 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "run_proc",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_push",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
+    },
+    {
+      "id": "run_push_selftests",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "run_raw",
@@ -16778,6 +17798,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "run_role_bash",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
       "id": "run_rollup",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -16801,6 +17826,11 @@
       "id": "run_row",
       "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
+      "id": "run_rp_push",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "run_rq_preflight",
@@ -16833,6 +17863,26 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_sb_bar",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "run_sc_bar",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "run_scoped",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "run_scoped",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
       "id": "run_scratch",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -16841,6 +17891,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/gate-lint/encoding_posture.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
     },
     {
       "id": "run_selftest",
@@ -16856,6 +17911,16 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "run_selftest",
@@ -16891,6 +17956,36 @@
       "id": "run_skip_leg",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "run_slot_bar",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
+      "id": "run_sp_bar",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "run_sp_verb",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "run_spawn",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "run_spawn_scan",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "run_spawn_trace",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
       "id": "run_spec_commit_block",
@@ -16943,6 +18038,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "run_tail_retry",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "run_takeover",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -16966,6 +18066,11 @@
       "id": "run_traced",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
+    },
+    {
+      "id": "run_traced",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
     },
     {
       "id": "run_traced",
@@ -17021,6 +18126,11 @@
       "id": "run_writes",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "run_wsl",
+      "kind": "function",
+      "file": "tools/run-gates/run-held-wsl.sh"
     },
     {
       "id": "run_wt",
@@ -17173,6 +18283,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "scanCommandHeads",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "scanDenyHits",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -17181,6 +18296,11 @@
       "id": "scanJoinFindings",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "scanLauncherOptions",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "scanLeases",
@@ -17291,6 +18411,11 @@
       "id": "scan_dead_anchors",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "scan_dead_docs_beacons",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "scan_dead_work",
@@ -17523,6 +18648,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "scan_rkd_capture",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
       "id": "scan_round_writes",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -17596,6 +18726,16 @@
       "id": "scan_slot_budget",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "scan_spawn_file",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "scan_spawn_tree",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "scan_spec_adds",
@@ -17783,6 +18923,11 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "seed_cache_ok",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "seed_cf_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -17831,6 +18976,11 @@
       "id": "seed_gates_run",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "seed_half",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "seed_handoff_bar",
@@ -18006,6 +19156,11 @@
       "id": "set_runstate_fact",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "set_share_rule",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
     },
     {
       "id": "set_tool_root",
@@ -18743,6 +19898,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_drift_history_two_writers",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "test_dry_run_walks_the_same_set_and_kills_nothing",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -19076,6 +20236,11 @@
       "id": "test_health_appender_failures_return_none_with_one_note",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_held",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "test_hits_disagreement_reds",
@@ -19461,6 +20626,11 @@
       "id": "test_one_retirement_is_free",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_one_signal_matches_report",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_one_walk_two_callers",
@@ -20073,6 +21243,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_staged_render",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "test_stale_declaration_is_reported_not_honoured",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -20334,11 +21509,6 @@
     },
     {
       "id": "ts_hb",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.sh"
-    },
-    {
-      "id": "ts_now",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
     },
@@ -20853,6 +22023,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "write_gate_manifest",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
       "id": "write_gates_staged",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -20863,6 +22038,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "write_handoff",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
       "id": "write_handoff_spec",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
@@ -20871,6 +22051,11 @@
       "id": "write_held_asks",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_held_stamp",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "write_hooks",
@@ -21018,6 +22203,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "write_pfx_stamp",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "write_pk_conf",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -21118,6 +22308,11 @@
       "file": "tools/run-gates/post-merge.sh"
     },
     {
+      "id": "write_redacted",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "write_refs",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -21148,9 +22343,24 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "write_rendered",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "write_rev_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_roles",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "write_roles",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "write_rounds_line",
@@ -21181,6 +22391,11 @@
       "id": "write_rq_main",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_ru_legs",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "write_run_branch",
@@ -21216,6 +22431,16 @@
       "id": "write_runlog_verdict",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "write_sc_commit",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "write_sc_legs",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "write_session",
@@ -21256,6 +22481,11 @@
       "id": "write_spec",
       "kind": "function",
       "file": "tools/unattended/check-pass-order.test.sh"
+    },
+    {
+      "id": "write_specimen",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
     },
     {
       "id": "write_staged",

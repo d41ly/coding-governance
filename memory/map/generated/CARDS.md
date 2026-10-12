@@ -64,9 +64,9 @@ Three scanners for the failure modes a reader cannot see: PowerShell's decoding 
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/gate-lint.md`
 - decisions 1: `TOOL-aLeakedHandle-1`
-- gate-legs 4: `shell hygiene (a loop fed by a command substitution)`, `shell-hygiene selftest`, `encoding posture (text IO names its encoding)`, `shell hygiene (a location probe asked from a moved directory)`
+- gate-legs 6: `shell hygiene (a loop fed by a command substitution)`, `shell-hygiene selftest`, `encoding posture (text IO names its encoding)`, `shell hygiene (a location probe asked from a moved directory)`, `shell hygiene (a fork spent on builtin work)`, `spawn budget (forks per hot entrypoint)`
 - kits 1: `gate-lint`
-- globs 4: `tools/gate-lint/*`, `memory/project/substitution-fed-loops.txt`, `memory/project/encoding-posture-sites.txt`, `memory/project/location-probe-waivers.txt`
+- globs 6: `tools/gate-lint/*`, `memory/project/substitution-fed-loops.txt`, `memory/project/encoding-posture-sites.txt`, `memory/project/location-probe-waivers.txt`, `memory/project/spawn-idiom-sites.txt`, `memory/project/fork-ceilings.txt`
 
 ## govkit
 
@@ -209,8 +209,19 @@ Workflow review harnesses — one pipeline, three implementations, one hardened
 - decisions 0
 - gate-legs 6: `workflow script syntax`, `review-join ban (no ref-keyed join)`, `review-join self-test`, `review-replay selftest`, `tier2-review self-test`, `unattended-build self-test`
 - workflow-scripts 9: `check-workflow-syntax.js`, `drift-audit-code.js`, `drift-audit-code.template.js`, `drift-audit-state.js`, `drift-audit-state.template.js`, `orient-counterfactual.js`, `tier2-review.js`, `tier2-review.template.js`, `unattended-build.template.js`
-- gotcha-classes 3: `degradation-known-but-unreported.md`, `node-check-is-not-a-syntax-gate.md`, `observed-by-claim-no-arm-discharges.md`
+- gotcha-classes 4: `degradation-known-but-unreported.md`, `node-check-is-not-a-syntax-gate.md`, `observed-by-claim-no-arm-discharges.md`, `test-oracle-read-from-a-historical-sha.md`
 - globs 1: `tools/workflows/*`
+
+## roles
+
+The role catalogue: one owner-editable agent definition per role with an empty house overlay beside it, the table of the workflows a governed session runs it...
+
+- status `building` · streams `tooling` · dossier `memory/map/features/roles.md`
+- decisions 7: `TOOL-aOrientedCast-1`, `TOOL-aOrientedCast-2`, `TOOL-aOrientedCast-3`, `KICK-aOrientedCast-2`, `TOOL-aOrientedCast-8`, `TOOL-aOrientedCast-10`, `TOOL-aOrientedCast-11`
+- gate-legs 4: `roles adopter self-test`, `roles catalogue`, `roles render selftest`, `roles render wiring`
+- kits 1: `roles`
+- rendered-skills 1: `build`
+- globs 1: `tools/roles/**`
 
 ## row-grammar
 
@@ -227,12 +238,23 @@ The gate runner, its harnesses, and the adopter that keeps a target's verdict re
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/run-gates.md`
 - decisions 9: `TOOL-aPacedTurnstile-1`, `TOOL-aPacedTurnstile-2`, `TOOL-aPacedTurnstile-4`, `TOOL-aPacedTurnstile-5`, `TOOL-aPacedTurnstile-6`, `TOOL-aPacedTurnstile-3`, `TOOL-aPacedTurnstile-7`, `TOOL-aPacedTurnstile-16`, `TOOL-dLoggedFlight-3`
-- gate-legs 13: `run-gates gov canary`, `run-gates adopter e2e`, `run-gates wiring`, `profile-bar selftest`, `run-gates turnstile`, `every held leg is budgeted, every budget row resolves`, `run-selftests self-test`, `selftest harness self-test`, `extract-arms self-test`, `leg ceilings clear their evidenced maximum`, `run-gates run-log line`, `receipt sync (installed files match the receipt)`, `pre-push bar self-test`
+- gate-legs 13: `run-gates gov canary`, `run-gates adopter e2e`, `run-gates wiring`, `profile-bar selftest`, `every held leg is budgeted, every budget row resolves`, `run-selftests self-test`, `selftest harness self-test`, `extract-arms self-test`, `leg ceilings clear their evidenced maximum`, `run-gates run-log line`, `receipt sync (installed files match the receipt)`, `pre-push bar self-test`, `held-halves selftest`
 - kits 1: `run-gates`
 - gotcha-classes 15
 - guides 1: `MERGE-BAR.md`
-- globs 22
-- cut 37 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- globs 24
+- cut 39 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+
+## run-gates-turnstile
+
+The host turnstile: the slots that admit gate bars, the docs key beside them, and the files two concurrent bars share
+
+- status `shipped` · streams `tooling` · dossier `memory/map/features/run-gates-turnstile.md`
+- decisions 10: `TOOL-aFrugalTurnstile-5`, `TOOL-aPairedSlots-1`, `TOOL-aPairedSlots-2`, `TOOL-aPairedSlots-3`, `TOOL-aPairedSlots-4`, `TOOL-aPairedSlots-5`, `TOOL-aPairedSlots-6`, `TOOL-aPairedSlots-7`, `TOOL-aPairedSlots-9`, `TOOL-dDerivedDocket-64`
+- gate-legs 1: `run-gates turnstile`
+- gotcha-classes 7: `record-file-read-by-line-position.md`, `overlap-judged-from-the-invocation-interval.md`, `predicate-bounded-by-its-own-count.md`, `invariant-held-on-one-admission-path.md`, `floor-left-below-the-arms-it-guards.md`, `allocation-knob-without-a-ceiling.md`, `beacon-published-before-it-is-complete.md`
+- globs 3: `tools/run-gates/run-gates.sh`, `tools/run-gates/gate-profiles.txt`
+- cut 1 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## runlog
 

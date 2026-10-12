@@ -58,7 +58,7 @@ globs = [
 **The rule is the charter's, not this kit's.** `memory/guides/REVIEW-PROTOCOL.md` is BINDING and states
 two bounds: a review's verify stage spawns at most a stated TOTAL, and all fan-out runs at most a
 stated number at once. Both are resolved by `tools/hooks/agent-cap.js` rather than written in the
-document, so neither goes stale when a repo declares its own. This feature is the machinery that makes those numbers true rather than aspirational.
+document, so neither goes stale when a repo declares its own.
 The document and the predicate are one feature for that reason — a rule enforced by a predicate that
 disagrees with it is worse than no predicate.
 
@@ -128,7 +128,11 @@ names a unit whose spec is buildable by `checkBuildable`. Unlike the two shell c
 CLOSED, has no `agent_id` exemption (a subagent's payload carries the parent's `session_id`), and
 refuses on an absent or replay-written card. An UNARMED conf refuses every write but the one to
 itself. A target outside the session's common dir is not gated, so a scratch clone never meets its
-own conf.
+own conf. Since `TOOL-aOrientedCast-6` the gate also reads WHO writes: a spec under
+`<MEMORY_ROOT>/builds/<build>/spec/` only from a `writes = spec` role, and a product write the route
+admits only from a `writes = product` role, both read from `.claude/roles.json` through the exported
+`loadRoleIndex`. An absent index adds no arm, and a status-and-date-only flip of a spec header stays
+admitted from the main loop and the routed builder.
 
 **And the same script on a SECOND event, `SubagentStart`** (`TOOL-aRoutedQuill-4`). A second
 fragment, `scratch-guard-subagent.fragment.json` with matcher `*`, is safe where a second PreToolUse
@@ -158,7 +162,7 @@ in a linked worktree is the primary tree's `.git`.
 hooks.** It returns the single-token value of a key between the opening `---` and the next `---`, or null;
 `checkAuthorizedReadme` reads `authorized-by:` through it and the spec-audit rule reads
 `spec-audit:`, required lazily inside the rule's try so a withdrawn sibling is a deny, not a crash.
-It takes bytes, not a path: the staged-blob caller has no file to name. One reader keeps "a fenced example in the body is not front matter" one answer (F10) for both keys.
+It takes bytes, not a path: the staged-blob caller has no file to name. One reader keeps F10 one answer for both keys.
 
 **`readConfKey` in the same file is the ONE shell-grammar conf reader.** The write gate reads
 `MEMORY_ROOT`, `ROUTED_PATHS` and `SPEC_TIER1_CUTOFF` through it, and `agent-cap.js`'s
@@ -202,10 +206,11 @@ The FIFTH rule is the ref-keyed verdict join, lifted from `tools/workflows/check
 `TOOL-dTieredTribunal-14`. It is last because it is the cheapest failure to recover from: the four
 rules above it prevent a BURST, while a mis-keyed join is a wrong verdict that costs a re-run. The
 raw-primitive block is never an early exit-0, which would make every later rule unreachable for the
-scripts the join ban judges. A `--only=<rule>` selector
-over a closed set lets the file gate share this predicate instead of re-implementing it, and a WIRED
-command may never carry it — `tools/check-wiring.sh` asserts that, because narrowing a wired hook
-turns the cap rules off with no diff.
+scripts the join ban judges. A closed `--only=` set (`join`, `scripts`) lets file gates share this
+predicate; a WIRED command never carries it (`tools/check-wiring.sh`).
+
+Rule 6 (`TOOL-aOrientedCast-7`) admits an `Agent` call only as a rendered handoff and a `Workflow`
+call only as a declared harness, per `.claude/roles.json`.
 
 ## Gaps
 

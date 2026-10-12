@@ -131,13 +131,19 @@ flip_to_builds() { # $1 = repo dir — the commit that switches the default bran
   git -C "$1" commit -qm "flip to builds"
 }
 
+# NEITHER IS LEAF-PURE: each runs the checker in a subshell, so each call still forks once. What they
+# no longer pay is the caller's own substitution around them. `audit` captures inside its body, where
+# the `cd` stays in that capture's subshell, and leaves the output in `_audit`; `audit_rc` sets
+# `_audit_rc` from its subshell's status with no capture at all. Both still print (TOOL-aSparedSpawn-8).
 audit() { # $1 = repo dir, rest = argv — the real checker, inside the fixture
   local d="$1"; shift
-  ( cd "$d" && "$PY" "$MOD" "$@" 2>&1 )
+  _audit=$(cd "$d" && "$PY" "$MOD" "$@" 2>&1)
+  printf '%s\n' "$_audit"
 }
 audit_rc() { # same, but the exit status
   local d="$1"; shift
-  ( cd "$d" && "$PY" "$MOD" "$@" >/dev/null 2>&1 ); echo $?
+  ( cd "$d" && "$PY" "$MOD" "$@" >/dev/null 2>&1 ); _audit_rc=$?
+  echo "$_audit_rc"
 }
 engine() { # $1 = repo dir — the hygiene engine, inside the fixture
   ( cd "$1" && bash "$ENGINE" 2>&1 )
@@ -158,8 +164,8 @@ flip_to_builds "$F1"
 git -C "$F1" merge -q --no-ff -m "merge the straggler" strag
 F1_MERGE=$(git -C "$F1" rev-parse HEAD)
 
-out=$(audit "$F1" --expect-builds)
-rc=$(audit_rc "$F1" --expect-builds)
+audit "$F1" --expect-builds >/dev/null; out=$_audit
+audit_rc "$F1" --expect-builds >/dev/null; rc=$_audit_rc
 [ "$rc" = 1 ] || bad "AC1: an unaccounted transition did not exit 1 (rc=$rc)"; ok
 has "$out" "$F1_MERGE" || bad "AC1: the refusal does not name the merge sha"; ok
 has "$out" "TOOL-aSeed-1" || bad "AC1: the refusal does not name the lost id"; ok
@@ -177,32 +183,32 @@ has "$eout" "$F1_MERGE" || bad "AC1: the engine's check 26 line does not name th
 write_relocated "$F1" aFlip TOOL-aSeed-1 "$F1_STRAG"
 git -C "$F1" add -A >/dev/null 2>&1; git -C "$F1" commit -qm "account for the relocation"
 F1_OK=$(git -C "$F1" rev-parse HEAD)
-[ "$(audit_rc "$F1" --expect-builds)" = 0 ] || bad "AC1: one RELOCATED row per entry did not account for it"; ok
+audit_rc "$F1" --expect-builds >/dev/null; [ "$_audit_rc" = 0 ] || bad "AC1: one RELOCATED row per entry did not account for it"; ok
 
 write_relocated "$F1" aSecond TOOL-aSeed-1 "$F1_STRAG"
 git -C "$F1" add -A >/dev/null 2>&1; git -C "$F1" commit -qm "a second provenance row for one entry"
-dout=$(audit "$F1" --expect-builds)
-[ "$(audit_rc "$F1" --expect-builds)" = 1 ] || bad "AC2: two RELOCATED rows for one entry did not refuse"; ok
+audit "$F1" --expect-builds >/dev/null; dout=$_audit
+audit_rc "$F1" --expect-builds >/dev/null; [ "$_audit_rc" = 1 ] || bad "AC2: two RELOCATED rows for one entry did not refuse"; ok
 { has "$dout" "aFlip/BACKLOG.md" && has "$dout" "aSecond/BACKLOG.md"; } \
   || bad "AC2: the duplicate verdict does not name both files"; ok
 git -C "$F1" rm -rq memory/builds/aSecond; git -C "$F1" commit -qm "drop the duplicate"
 
 write_relocated "$F1" aFlip TOOL-aSeed-1 "0000000"
 git -C "$F1" add -A >/dev/null 2>&1; git -C "$F1" commit -qm "a provenance row naming another commit"
-[ "$(audit_rc "$F1" --expect-builds)" = 1 ] || bad "AC2: a RELOCATED row whose sha names another commit still accounted"; ok
+audit_rc "$F1" --expect-builds >/dev/null; [ "$_audit_rc" = 1 ] || bad "AC2: a RELOCATED row whose sha names another commit still accounted"; ok
 git -C "$F1" revert --no-edit HEAD >/dev/null 2>&1
-[ "$(audit_rc "$F1" --expect-builds)" = 0 ] || bad "AC2: reverting the mis-keyed provenance row did not restore the accounting"; ok
+audit_rc "$F1" --expect-builds >/dev/null; [ "$_audit_rc" = 0 ] || bad "AC2: reverting the mis-keyed provenance row did not restore the accounting"; ok
 
 # --- AC9 — the cache holds the delta, and a foreign epoch is DETECTED ----------------------------
 rm -rf "$F1/.git/transition-audit-cache"
 audit "$F1" --report --expect-builds >/dev/null
-c2=$(audit "$F1" --report --expect-builds)
+audit "$F1" --report --expect-builds >/dev/null; c2=$_audit
 has "$c2" "cache hits 1" || bad "AC9: the second run did not read the cached delta"; ok
 cf=$(ls "$F1/.git/transition-audit-cache"/*.json 2>/dev/null | head -1)
 [ -n "$cf" ] || bad "AC9: no cache file was written under the git dir"; ok
 if [ -n "$cf" ]; then
   "$PY" -c "import json,sys; p=sys.argv[1]; d=json.load(open(p)); d['epoch']='foreign'; json.dump(d,open(p,'w'))" "$cf"
-  c3=$(audit "$F1" --report --expect-builds)
+  audit "$F1" --report --expect-builds >/dev/null; c3=$_audit
   has "$c3" "cache recomputed 1 (foreign epoch)" || bad "AC9: a foreign-epoch cache entry was not reported as recomputed"; ok
   has "$c3" "cache hits 0" || bad "AC9: a foreign-epoch cache entry was still counted as a hit"; ok
 fi
@@ -226,32 +232,32 @@ printf '# aFlip\n\n## Asks\n\n## Dispositions\n' > "$FK/memory/builds/aFlip/BACK
 git -C "$FK" add -A >/dev/null 2>&1; git -C "$FK" commit -qm "flip to builds"
 git -C "$FK" merge -q --no-ff -m "merge the straggler" strag
 rm -rf "$FK/.git/transition-audit-cache"
-kcold=$(audit "$FK" --expect-builds)
+audit "$FK" --expect-builds >/dev/null; kcold=$_audit
 has "$kcold" "PLAY-aSeed-1" \
   || bad "AC9b: the fixture's delta does not carry the playbook row, so retiring its family below moves nothing"; ok
 # RETIRE THE FAMILY in the working tree's conf, which every reader of the delta resolves. The
 # committed conf blobs still read builds, so the mode walk the audit rests on does not move.
 write_conf "$FK" builds "tooling:TOOL" "tooling"
-kwarm=$(audit "$FK" --expect-builds); kwarm_rc=$(audit_rc "$FK" --expect-builds)
+audit "$FK" --expect-builds >/dev/null; audit_rc "$FK" --expect-builds >/dev/null; kwarm=$_audit; kwarm_rc=$_audit_rc
 has "$kwarm" "cache recomputed 1 (foreign inputs)" \
   || bad "AC9b: a cache entry computed under another FAMILIES was not reported as recomputed"; ok
 has "$kwarm" "PLAY-aSeed-1" \
   && bad "AC9b: a warm run graded a retired family's cached entry, which a cold run never produces"; ok
 rm -rf "$FK/.git/transition-audit-cache"
-kcold_rc=$(audit_rc "$FK" --expect-builds)
+audit_rc "$FK" --expect-builds >/dev/null; kcold_rc=$_audit_rc
 [ "$kwarm_rc" = "$kcold_rc" ] \
   || bad "AC9b: the warm verdict ($kwarm_rc) differs from a cold run's ($kcold_rc) over one tree"; ok
 
 # --- AC7 — the pinned registry -------------------------------------------------------------------
-pinout=$(audit "$F1" --pin --expect-builds)
+audit "$F1" --pin --expect-builds >/dev/null; pinout=$_audit
 has "$pinout" "$F1_MERGE accounted" || bad "AC7: --pin does not print a row for the unpinned transition"; ok
 [ -f "$F1/memory/project/transition-audit.txt" ] && bad "AC7: --pin wrote the registry instead of printing it"; ok
 printf '# pins\n0123456789abcdef0123456789abcdef01234567 accounted\n' > "$F1/memory/project/transition-audit.txt"
-sout=$(audit "$F1" --expect-builds)
-{ [ "$(audit_rc "$F1" --expect-builds)" = 1 ] && has "$sout" "STALE PIN"; } \
+audit "$F1" --expect-builds >/dev/null; sout=$_audit
+{ audit_rc "$F1" --expect-builds >/dev/null; [ "$_audit_rc" = 1 ] && has "$sout" "STALE PIN"; } \
   || bad "AC7: a registry row naming a sha this history does not hold was not refused"; ok
 printf '# pins\n%s accounted\n' "$F1_MERGE" > "$F1/memory/project/transition-audit.txt"
-[ "$(audit_rc "$F1" --expect-builds)" = 0 ] || bad "AC7: a live pinned transition was refused"; ok
+audit_rc "$F1" --expect-builds >/dev/null; [ "$_audit_rc" = 0 ] || bad "AC7: a live pinned transition was refused"; ok
 rm -f "$F1/memory/project/transition-audit.txt"
 
 # --- AC13 — the dereference pin: a replace ref and a graft file cannot hide the merge -------------
@@ -259,7 +265,7 @@ git -C "$F1" replace --graft "$F1_MERGE" "$(git -C "$F1" rev-parse "$F1_MERGE^1"
 [ -n "$(git -C "$F1" replace -l)" ] || bad "AC13: the replace ref fixture was not created, so the pin went unexercised"; ok
 rm -f "$F1/memory/builds/aFlip/BACKLOG.md"; rmdir "$F1/memory/builds/aFlip" 2>/dev/null
 git -C "$F1" add -A >/dev/null 2>&1; git -C "$F1" commit -qm "drop the accounting again"
-rout=$(audit "$F1" --expect-builds)
+audit "$F1" --expect-builds >/dev/null; rout=$_audit
 has "$rout" "$F1_MERGE" || bad "AC13: a replace ref re-parenting the merge hid it from the audit"; ok
 printf '%s %s\n' "$F1_MERGE" "$(git -C "$F1" rev-parse "$F1_MERGE^1")" > "$TMP/grafts"
 gout=$( cd "$F1" && GIT_GRAFT_FILE="$TMP/grafts" "$PY" "$MOD" --expect-builds 2>&1 )
@@ -275,15 +281,15 @@ git -C "$F1" replace -d "$F1_MERGE" >/dev/null 2>&1
 # Two commits whose trees differ in exactly their RELOCATED rows. Only that pair can tell an
 # implementation bound to HEAD from one bound to the named tip, in either direction.
 F1_BAD=$(git -C "$F1" rev-parse HEAD)
-[ "$(audit_rc "$F1" --expect-builds)" = 1 ] \
+audit_rc "$F1" --expect-builds >/dev/null; [ "$_audit_rc" = 1 ] \
   || bad "AC12: the fixture checked out at the unaccounted tip passed with no --at"; ok
-[ "$(audit_rc "$F1" --at "$F1_OK" --expect-builds)" = 0 ] \
+audit_rc "$F1" --at "$F1_OK" --expect-builds >/dev/null; [ "$_audit_rc" = 0 ] \
   || bad "AC12: --at over a tip whose tree carries the provenance rows still refused"; ok
 git -C "$F1" checkout -q "$F1_OK"
-[ "$(audit_rc "$F1" --at "$F1_BAD" --expect-builds)" = 1 ] \
+audit_rc "$F1" --at "$F1_BAD" --expect-builds >/dev/null; [ "$_audit_rc" = 1 ] \
   || bad "AC12: --at over an unaccounted tip passed because HEAD's tree accounted for it"; ok
 git -C "$F1" checkout -q main
-noflag=$(audit "$F1" --at "$F1_OK")
+audit "$F1" --at "$F1_OK" >/dev/null; noflag=$_audit
 has "$noflag" "reader cross-check not run" || bad "AC12: --at without --expect-builds does not announce the skipped cross-check"; ok
 
 # --- AC6 — the three DEAD PROBE refusals, each staged ---------------------------------------------
@@ -296,8 +302,8 @@ old = "        return backlog.read_conf(conf).mode"
 assert s.count(old) == 1
 io.open(p, "w", encoding="utf-8", newline="").write(s.replace(old, '        return "shards"', 1))
 PYEOF
-cout=$(audit "$B" --expect-builds)
-{ [ "$(audit_rc "$B" --expect-builds)" = 2 ] && has "$cout" "DEAD PROBE"; } \
+audit "$B" --expect-builds >/dev/null; cout=$_audit
+{ audit_rc "$B" --expect-builds >/dev/null; [ "$_audit_rc" = 2 ] && has "$cout" "DEAD PROBE"; } \
   || bad "AC6: a conf reader that calls every blob shards did not refuse as a DEAD PROBE"; ok
 
 D="$TMP/f1noboundary"; cp -r "$F1" "$D"
@@ -309,15 +315,15 @@ old = "    return boundaries, reaches"
 assert s.count(old) == 1
 io.open(p, "w", encoding="utf-8", newline="").write(s.replace(old, "    return set(), {}", 1))
 PYEOF
-bout=$(audit "$D" --expect-builds)
-{ [ "$(audit_rc "$D" --expect-builds)" = 2 ] && has "$bout" "no mode boundary"; } \
+audit "$D" --expect-builds >/dev/null; bout=$_audit
+{ audit_rc "$D" --expect-builds >/dev/null; [ "$_audit_rc" = 2 ] && has "$bout" "no mode boundary"; } \
   || bad "AC6: a boundary detector that answers nothing did not refuse as a DEAD PROBE"; ok
 
 SH="$TMP/f1shallow"
 git clone -q --depth 1 "file://$F1" "$SH" 2>/dev/null
 if [ -d "$SH" ]; then
-  shout=$(audit "$SH" --expect-builds)
-  { [ "$(audit_rc "$SH" --expect-builds)" = 2 ] && has "$shout" "SHALLOW"; } \
+  audit "$SH" --expect-builds >/dev/null; shout=$_audit
+  { audit_rc "$SH" --expect-builds >/dev/null; [ "$_audit_rc" = 2 ] && has "$shout" "SHALLOW"; } \
     || bad "AC6: a shallow clone did not refuse as a DEAD PROBE"; ok
 else
   bad "AC6: the shallow clone fixture could not be built, so the refusal went unexercised"; ok
@@ -325,8 +331,8 @@ fi
 
 # --- AC15 — the memory-recall kit is a NAMED prerequisite, never a degraded mode -------------------
 NR="$TMP/f1norecall"; cp -r "$F1" "$NR"; rm -rf "$NR/$KIT_MR"
-nout=$(audit "$NR" --expect-builds)
-{ [ "$(audit_rc "$NR" --expect-builds)" = 1 ] && has "$nout" "memory-recall" \
+audit "$NR" --expect-builds >/dev/null; nout=$_audit
+{ audit_rc "$NR" --expect-builds >/dev/null; [ "$_audit_rc" = 1 ] && has "$nout" "memory-recall" \
   && has "$nout" "install the memory-recall kit" && has "$nout" "${KIT_MR##*/}"; } \
   || bad "AC15: an absent memory-recall kit did not refuse by name with the path and the remedy"; ok
 
@@ -337,7 +343,7 @@ has "$e5" "memory-hygiene: check 26 is DORMANT" || bad "AC5: a shards-mode tree 
 printf '%s\n' "$e5" | grep -F 'memory-hygiene: check 26 ' | grep -qv 'is DORMANT' \
   && bad "AC5: a shards-mode tree printed a check 26 line other than the dormant announcement"; ok
 rm -rf "$F5/$KIT_MR"
-[ "$(audit_rc "$F5")" = 0 ] || bad "AC15: a shards-mode tree with no memory-recall kit did not stay dormant at exit 0"; ok
+audit_rc "$F5" >/dev/null; [ "$_audit_rc" = 0 ] || bad "AC15: a shards-mode tree with no memory-recall kit did not stay dormant at exit 0"; ok
 
 # ============================================================ F2/F3/F4 — what IS and IS NOT a merge
 F2="$TMP/f2"; new_repo "$F2"
@@ -348,7 +354,7 @@ git -C "$F2" checkout -q main
 flip_to_builds "$F2"
 git -C "$F2" checkout -q strag
 git -C "$F2" merge -q --no-ff -m "merge the default INTO the straggler" main
-r2=$(audit "$F2" --report --expect-builds)
+audit "$F2" --report --expect-builds >/dev/null; r2=$_audit
 has "$r2" "transitions examined 1" || bad "AC3: merging the default into the straggler was not classified as a transition"; ok
 
 F3="$TMP/f3"; new_repo "$F3"
@@ -359,7 +365,7 @@ git -C "$F3" checkout -q main
 flip_to_builds "$F3"
 git -C "$F3" merge -q --squash strag >/dev/null 2>&1 || true
 git -C "$F3" commit -qam "squash the straggler" >/dev/null 2>&1 || true
-r3=$(audit "$F3" --report --expect-builds)
+audit "$F3" --report --expect-builds >/dev/null; r3=$_audit
 has "$r3" "transitions examined 0" || bad "AC3: a squashed straggler was classified as a transition"; ok
 
 F4="$TMP/f4"; new_repo "$F4"
@@ -372,14 +378,14 @@ git -C "$F4" checkout -q strag
 git -C "$F4" rebase -q main >/dev/null 2>&1 || true
 git -C "$F4" checkout -q main
 git -C "$F4" merge -q --ff-only strag >/dev/null 2>&1 || true
-r4=$(audit "$F4" --report --expect-builds)
+audit "$F4" --report --expect-builds >/dev/null; r4=$_audit
 has "$r4" "transitions examined 0" || bad "AC3: a rebased straggler was classified as a transition"; ok
 
 # ====================================================== F6 — a LINEAR flip is not a DEAD PROBE
 F6="$TMP/f6"; new_repo "$F6"
 flip_to_builds "$F6"
-l6=$(audit "$F6" --expect-builds)
-{ [ "$(audit_rc "$F6" --expect-builds)" = 0 ] && has "$l6" "transitions examined 0"; } \
+audit "$F6" --expect-builds >/dev/null; l6=$_audit
+{ audit_rc "$F6" --expect-builds >/dev/null; [ "$_audit_rc" = 0 ] && has "$l6" "transitions examined 0"; } \
   || bad "AC6: a linear flip with no transition merge did not pass with a zero count"; ok
 
 # =========================================== F7 — the criss-cross: EVERY merge base, never the first
@@ -427,7 +433,7 @@ git -C "$F8" commit -qm "the straggler rotates its decision log and its shard"
 git -C "$F8" checkout -q main
 flip_to_builds "$F8"
 git -C "$F8" merge -q --no-ff -m "merge the rotating straggler" strag
-r8=$(audit "$F8" --report --expect-builds)
+audit "$F8" --report --expect-builds >/dev/null; r8=$_audit
 has "$r8" "TOOL-aSeed-9" && bad "AC4: an id anchored in a ROTATED DECISION LOG was reported as a lost backlog row"; ok
 has "$r8" "TOOL-aSeed-2" || bad "AC4: a row rotated into a FAMILY-named archive with its text changed was not reported"; ok
 
@@ -440,7 +446,7 @@ git -C "$F8B" commit -qam "the straggler deletes a row outright"
 git -C "$F8B" checkout -q main
 flip_to_builds "$F8B"
 git -C "$F8B" merge -q --no-ff -m "merge the deleting straggler" strag
-r8b=$(audit "$F8B" --report --expect-builds)
+audit "$F8B" --report --expect-builds >/dev/null; r8b=$_audit
 has "$r8b" "TOOL-aSeed-2 \xc2\xb7 removed" || has "$r8b" "TOOL-aSeed-2" \
   || bad "AC4: a row removed from the shard and absent from any archive was not reported"; ok
 printf '%s' "$r8b" | grep -q "removed" || bad "AC4: the removal was not reported with the REMOVED kind"; ok
@@ -466,7 +472,7 @@ flip_to_builds "$F9"
 git -C "$F9" merge -q --no-ff -m "merge the straggler" strag 2>/dev/null || {
   git -C "$F9" checkout -q --theirs memory/backlog/TOOL.md 2>/dev/null
   git -C "$F9" add -A >/dev/null 2>&1; git -C "$F9" commit -qm "merge the straggler" >/dev/null 2>&1; }
-r9=$(audit "$F9" --report --expect-builds)
+audit "$F9" --report --expect-builds >/dev/null; r9=$_audit
 has "$r9" "TOOL-aSeed-2" || bad "AC14: the straggler's OWN row change was not reported"; ok
 has "$r9" "TOOL-aSeed-1" && bad "AC14: a row whose version the default side already held was reported as the straggler's change"; ok
 
@@ -494,7 +500,7 @@ PYEOF
 )
 [ -n "$before" ] || bad "AC11: delta() over two tips with no merge between them returned nothing"; ok
 git -C "$F11" merge -q --no-ff -m "merge the straggler" strag
-after=$(audit "$F11" --report --expect-builds | sed -n 's/^entry [0-9a-f]* \xc2\xb7 \([^ ]*\) \xc2\xb7 \([^ ]*\) \xc2\xb7 \([0-9a-f]*\) .*/\1|\2|\3/p' | LC_ALL=C sort)
+audit "$F11" --report --expect-builds >/dev/null; after=$(printf '%s\n' "$_audit" | sed -n's/^entry [0-9a-f]* \xc2\xb7 \([^ ]*\) \xc2\xb7 \([^ ]*\) \xc2\xb7 \([0-9a-f]*\) .*/\1|\2|\3/p' | LC_ALL=C sort)
 [ "$before" = "$after" ] \
   || bad "AC11: delta() before the merge and --report after it disagree (before='$before' after='$after')"; ok
 

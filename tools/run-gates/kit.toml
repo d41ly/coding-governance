@@ -88,6 +88,14 @@ role = "project-owned"
 include = ["selftest-pooled-evidence.txt"]
 role = "project-owned"
 
+# AND SO IS THE WINDOWS-ONLY DECLARATION. `windows-only-legs.txt` names THIS repo's held legs that
+# must run natively when `run-held-wsl.sh` splits the tier, so an adopter receiving it gets a
+# population they do not have. `held_halves.py` ships and refuses by name where the declaration is
+# absent — the announced-unarmed state. TOOL-aSparedSpawn-5 S3.
+[[files]]
+include = ["windows-only-legs.txt"]
+role = "project-owned"
+
 [adopt]
 argv = ["bash", "{kit}/adopt-run-gates.sh"]
 mutates_index = false
@@ -129,6 +137,18 @@ guard = []
 name = "receipt sync (installed files match the receipt)"
 subject = "repo"
 argv = ["python", "{kit}/check-receipt.py"]
+guard = []
+
+# THE SPLIT-TIER COMBINER'S SELF-TEST. TOOL-aSparedSpawn-5, mirroring `review-replay selftest` in the
+# workflows kit. It SHIPS: `held_halves.py` is an engine file under `**`, and `--selftest` builds its
+# own synthetic manifests, halves and git dirs, so a target holding the tool can run it; its one arm
+# over the real manifest announces a skip where the declaration is withheld. `subject = "kit"` puts it
+# under the 2026-08-23 hold. UNGUARDED for the reason `review-replay selftest` gives: a guard naming
+# this kit would make every live spec touching it name the leg, and the self-test costs about a second.
+[[gate_leg]]
+name = "held-halves selftest"
+subject = "kit"
+argv = ["python3", "{kit}/held_halves.py", "--selftest"]
 guard = []
 
 # The seed for a target's own [gate_runner] declaration. `cmd_intake` emits this block when this

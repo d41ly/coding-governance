@@ -46,6 +46,7 @@ govkit runbook parity	repo	declarations
 govkit selfcheck	repo	declarations
 govkit selftest	kit	selftests
 harness arms (fail branches armed or pinned)	repo	declarations
+held-halves selftest	kit	selftests
 hook destinations (every declared hook path ships)	repo	product
 hook destinations self-test	kit	selftests
 install-prefix (shipped surface)	repo	product
@@ -100,6 +101,10 @@ review-join ban (no ref-keyed join)	repo	declarations
 review-join self-test	kit	selftests
 review-protocol parity (kit vs dogfood)	repo	declarations
 review-replay selftest	kit	selftests
+roles adopter self-test	kit	selftests
+roles catalogue	repo	declarations
+roles render selftest	kit	selftests
+roles render wiring	repo	wiring
 routed commits name a specced unit	repo	declarations
 routed-commits selftest	kit	selftests
 row-driver view refusal	repo	declarations
@@ -119,9 +124,11 @@ runlog skill wiring	repo	wiring
 scratch-guard self-test	kit	selftests
 selftest harness self-test	kit	selftests
 settings-merge selftest	kit	selftests
+shell hygiene (a fork spent on builtin work)	repo	product
 shell hygiene (a location probe asked from a moved directory)	repo	product
 shell hygiene (a loop fed by a command substitution)	repo	product
 shell-hygiene selftest	kit	selftests
+spawn budget (forks per hot entrypoint)	repo	product
 spec tokens (a spec's own names resolve)	repo	declarations
 spec-tokens self-test	kit	selftests
 straggler-guard arms	repo	declarations

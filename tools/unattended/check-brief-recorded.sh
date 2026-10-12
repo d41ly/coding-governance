@@ -110,7 +110,7 @@
 # post-run subset joined it rather than moving the increment, which would change what the sibling's
 # identically named count means.
 set -u
-KIT_UNATTENDED_VERSION=1.101  # gov:kit unattended@1.101 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.104 # gov:kit unattended@1.104 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and
@@ -310,6 +310,11 @@ if [ "${#_SUBJ[@]}" -ne "$_n_hist" ]; then
   echo "brief-recorded: the subject cache holds ${#_SUBJ[@]} commit(s) where history has $_n_hist, so the build-commit walk below would miss commits and report every unit unbuilt-in-range - which is a clean bill this leg has not earned"
   exit 2
 fi
+# THE WALK MEMO (TOOL-aSparedSpawn-11 S5), the sibling leg's declaration. Every unit id of a build
+# walks one range, and HEAD does not move during this check, so `build_commit` answers a repeated
+# range from here instead of a fresh `rev-list`. The two calls that share a range run in THIS shell
+# and read `_BC_OUT`, because a memo written inside a `$(...)` dies with the subshell.
+declare -A _BC_MEMO=()
 
 graded=0; skipped_cutoff=0; nobase=0; unbuilt=0; postrun=0; unborne=0; regraded=0; prebuilt=0
 violations=""; announced=""; inrange_ids=""; not_judged=0
@@ -396,7 +401,8 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
     # own selection rather than a second copy of it. A copy would be two answers to one question, and
     # this half is the one that has already been wrong twice: its exclusion set made a CONFORMING run
     # unlandable, twice over. The default window is the in-range `--reverse` walk.
-    build_c=$(build_commit "$base..HEAD $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS")
+    build_commit "$base..HEAD $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" >/dev/null
+    build_c=$_BC_OUT
     if [ -z "$build_c" ]; then unbuilt=$((unbuilt+1)); continue; fi
     inrange_ids="$inrange_ids $id"
 
@@ -480,7 +486,8 @@ brief-recorded: GRADED ANYWAY — $id was BUILT at $(GIT rev-parse --short "$bui
       # by construction, so `^<tip>` emptied it in RANGE mode and redded every repair of a unit an
       # earlier landed run built. Narrowing an exemption widens what fails. The in-range walk above
       # keeps the token; pass-order's pre-anchor probe keeps it too, because that one detects.
-      _pre=$(build_commit "$base" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "")
+      build_commit "$base" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "" >/dev/null
+      _pre=$_BC_OUT
       if [ -n "$_pre" ] && [ "$_pre" != TRUNCATED ]; then
         prebuilt=$((prebuilt+1))
         announced="$announced

@@ -1,0 +1,77 @@
+{
+  "gates": {
+    "manifest": "tools/gate-legs.json"
+  },
+  "harnesses": [
+    "tools/workflows/tier2-review.js",
+    "tools/workflows/unattended-build.js",
+    "tools/workflows/unattended-unit.js"
+  ],
+  "roles": {
+    "gov-builder": {
+      "agent": true,
+      "gates": [
+        "lexicon naming predicates"
+      ],
+      "workflow": "build",
+      "writes": "product"
+    },
+    "gov-diff-reviewer": {
+      "agent": true,
+      "gates": [],
+      "workflow": "closing-review",
+      "writes": "none"
+    },
+    "gov-orienter": {
+      "agent": true,
+      "gates": [],
+      "workflow": "orient",
+      "writes": "none"
+    },
+    "gov-researcher": {
+      "agent": true,
+      "gates": [],
+      "workflow": "research",
+      "writes": "none"
+    },
+    "gov-reuse-scout": {
+      "agent": true,
+      "gates": [],
+      "workflow": "reuse",
+      "writes": "none"
+    },
+    "gov-session": {
+      "agent": false,
+      "gates": [],
+      "workflow": "handoff",
+      "writes": "none"
+    },
+    "gov-skeptic": {
+      "agent": true,
+      "gates": [],
+      "workflow": "closing-review",
+      "writes": "none"
+    },
+    "gov-spec-reviewer": {
+      "agent": true,
+      "gates": [],
+      "workflow": "spec-review",
+      "writes": "none"
+    },
+    "gov-spec-writer": {
+      "agent": true,
+      "gates": [
+        "memory hygiene",
+        "lexicon naming predicates"
+      ],
+      "workflow": "spec-write",
+      "writes": "spec"
+    },
+    "gov-synthesizer": {
+      "agent": true,
+      "gates": [],
+      "workflow": "closing-review",
+      "writes": "review"
+    }
+  }
+}

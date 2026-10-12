@@ -229,7 +229,7 @@ derive_attempts() { # log · last-move-seconds
   local cutoff rest
   RT_TOTAL=0; RT_SINCE=0; RT_LAST=""; RT_LAUNCHED=""; RT_LUTC=""; RT_LIMG=""
   [ -s "$1" ] || return 0
-  cutoff=$(date -u -d "@$(( $(date -u +%s) - $2 ))" +%Y-%m-%dT%H:%M:%SZ)
+  cutoff=$(date -u -d "@$(( $EPOCHSECONDS - $2 ))" +%Y-%m-%dT%H:%M:%SZ)
   RT_TOTAL=$(grep -c '' "$1")
   RT_SINCE=$(awk -v t="$cutoff" '$1 > t { c++ } END { print c + 0 }' "$1")
   RT_LAST=$(tail -n 1 -- "$1"); RT_LAST=${RT_LAST%$'\r'}
@@ -336,7 +336,7 @@ run_tick() { # worktree · slug · session · host
   # below and count against the cap. The bound is `--liveness`'s own number, read off its line.
   lalive=no
   [ -z "$RT_LAUNCHED" ] || lalive=$(check_pid_alive "$RT_LAUNCHED" "$RT_LIMG" "$RT_LUTC")
-  boundcut=$(date -u -d "@$(( $(date -u +%s) - RL_BOUND ))" +%Y-%m-%dT%H:%M:%SZ)
+  boundcut=$(date -u -d "@$(( $EPOCHSECONDS - RL_BOUND ))" +%Y-%m-%dT%H:%M:%SZ)
   if [ "$lalive" = yes ] && [ "$RT_SINCE" -gt 0 ] && [ "$lastutc" \> "$boundcut" ]; then
     print_decision "$slug" "$wt" "skip · IN-FLIGHT · launched $RT_LAUNCHED alive since $lastutc"; return 0
   fi

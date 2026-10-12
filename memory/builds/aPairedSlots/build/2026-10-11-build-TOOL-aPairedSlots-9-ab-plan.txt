@@ -1,0 +1,67 @@
+# **Serves:** journal TOOL-aPairedSlots-9
+1791690846	A	1	HOLD
+gate profile: capable  (cores 16 via nproc, ram 32692 MB via getconf; width 8, timeout off, ceilings live, wall 21600s, mempause 90%; detected)
+run-gates: process-monitor: installed, but its declared roots do not admit this runner; tree kills fall back
+run-gates: another bar holds this host — C:/projects/coding-governance/.claude/worktrees/lucid-almeida-7de027 run push-179168947763236924382-2869996 pid 2872319 — queued at position 1 (waited 11s)
+gate queue: waited 5444s
+gate queue: acquired 2026-10-11T05:25:20Z from held
+ab: quiet: 5 foreign bar(s) still running after 3600s; running anyway, recorded
+1791699969	A	1	QUIET	noisy
+1791700203	B	1	HOLD
+gate profile: capable  (cores 16 via nproc, ram 32692 MB via getconf; width 8, timeout off, ceilings live, wall 21600s, mempause 90%; detected)
+run-gates: process-monitor: installed, but its declared roots do not admit this runner; tree kills fall back
+run-gates: another bar holds this host — C:/Users/daily-agent/AppData/Local/Temp/pab/c1 run 20261011T035431Z-2931759 pid 2931759 — queued at position 1 (waited 5s)
+run-gates: turnstile WAIT EXPIRED after 7210s (bound 7200s) — running UNQUEUED alongside whatever holds the beacon
+gate queue: waited 7210s
+gate queue: acquired 2026-10-11T08:30:35Z from expired
+arm A rep 1 makespan 8440s proof 65
+1791708580	B	1	QUIET	quiet
+arm B rep 1 makespan 5544s proof 65 NO
+1791714611	B	1	HOLD	try 1
+gate profile: capable  (cores 16 via nproc, ram 32692 MB via getconf; width 8, timeout off, ceilings live, wall 21600s, mempause 90%; detected)
+run-gates: process-monitor: installed, but its declared roots do not admit this runner; tree kills fall back
+run-gates: another bar holds this host — C:/projects/coding-governance run push-179171074733193110234-3509768 pid 3512601 — queued at position 1 (waited 15s)
+run-gates: turnstile WAIT EXPIRED after 7204s (bound 7200s) — running UNQUEUED alongside whatever holds the beacon
+gate queue: waited 7204s
+gate queue: acquired 2026-10-11T12:31:23Z from expired
+1791721887	B	1	NOT-HELD
+1791721889	B	1	DONE	rc 3
+1791721890	B	1	HOLD	try 2
+gate profile: capable  (cores 16 via nproc, ram 32692 MB via getconf; width 8, timeout off, ceilings live, wall 21600s, mempause 90%; detected)
+run-gates: process-monitor: installed, but its declared roots do not admit this runner; tree kills fall back
+run-gates: another bar holds this host — C:/projects/coding-governance run push-179171074733193110234-3509768 pid 3512601 — queued at position 2 (waited 14s)
+1791723692	C	1	HOLD	try 1
+gate profile: capable  (cores 16 via nproc, ram 32692 MB via getconf; width 8, timeout off, ceilings live, wall 21600s, mempause 90%; detected)
+run-gates: process-monitor: installed, but its declared roots do not admit this runner; tree kills fall back
+run-gates: another bar holds this host — C:/projects/coding-governance run push-179171074733193110234-3509768 pid 3512601 — queued at position 3 (waited 15s)
+1791723904	B	1	HOLD	try 1
+gate profile: capable  (cores 16 via nproc, ram 32692 MB via getconf; width 8, timeout off, ceilings live, wall 21600s, mempause 90%; detected)
+run-gates: process-monitor: installed, but its declared roots do not admit this runner; tree kills fall back
+run-gates: another bar holds this host — C:/projects/coding-governance run push-179171074733193110234-3509768 pid 3512601 — queued at position 2 (waited 9s)
+run-gates: sweeping a queue ticket past the bounded wait (stamp 20261011T113159, cutoff 20261011T113208)
+run-gates: another bar holds this host — C:/projects/coding-governance run push-179171074733193110234-3509768 pid 3512601 — queued at position 1 (waited 1582s)
+run-gates: turnstile WAIT EXPIRED after 7205s (bound 7200s) — running UNQUEUED alongside whatever holds the beacon
+gate queue: waited 7205s
+gate queue: acquired 2026-10-11T15:06:23Z from expired
+1791731188	B	1	NOT-HELD
+1791731189	B	1	DONE	rc 3
+1791731192	B	1	HOLD	try 2
+gate profile: capable  (cores 16 via nproc, ram 32692 MB via getconf; width 8, timeout off, ceilings live, wall 21600s, mempause 90%; detected)
+run-gates: process-monitor: installed, but its declared roots do not admit this runner; tree kills fall back
+run-gates: another bar holds this host — C:/projects/coding-governance run push-179171074733193110234-3509768 pid 3512601 — queued at position 1 (waited 13s)
+gate queue: waited 1609s
+gate queue: acquired 2026-10-11T15:34:23Z from held
+ab: quiet: 14 foreign bar(s) still running after 3600s; running anyway, recorded
+1791736517	B	1	QUIET	noisy
+arm B rep 1 makespan 11162s proof 65 NO
+1791747731	B	1	DONE	rc 0
+1791747732	C	1	HOLD	try 1
+gate profile: capable  (cores 16 via nproc, ram 32692 MB via getconf; width 8, timeout off, ceilings live, wall 21600s, mempause 90%; detected)
+run-gates: process-monitor: installed, but its declared roots do not admit this runner; tree kills fall back
+gate queue: waited 0s
+gate queue: acquired 2026-10-11T19:42:58Z from held
+ab: quiet: 12 foreign bar(s) still running after 3600s; running anyway, recorded
+1791751412	C	1	QUIET	noisy
+arm C rep 1 makespan 9011s proof NO
+1791760454	C	1	DONE	rc 0
+1791760454	PLAN	DONE

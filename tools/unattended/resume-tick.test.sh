@@ -195,12 +195,20 @@ run_tick_over() {
   local t="$1"; shift
   OUT=$(bash "$t" --repo "$FX" "$@" 2>"$TMP/err"); RC=$?; ERR=$(cat "$TMP/err")
 }
-# read_stub_log — the log once the launched stub has started its sleeper, polled up to ten seconds
-# because the launch is detached and the child starts after the tick returned; the `sleeper` line
-# is written after the `argv` line, so both are in. Empty when it never came.
+# THE THREE POLLS BELOW EXIT ON THEIR FACT, so their bounds are HANG BOUNDS of 120 s that the pass
+# path never reaches (TOOL-aSparedSpawn-15 S6). They were 10 s, 5 s and 5 s, sized for a quiet host,
+# and a spawn on a loaded node `a` costs 632 to 818 ms, so a poll whose every turn spawns ran out of
+# turns before the fact it waited for arrived. Only the red path pays the bound, and each one names
+# it on stderr when it is hit.
+RT_HANG=120
+# read_stub_log — the log once the launched stub has started its sleeper, polled up to the hang
+# bound because the launch is detached and the child starts after the tick returned; the `sleeper`
+# line is written after the `argv` line, so both are in. Empty when it never came.
 read_stub_log() {
-  local i; for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
-    [ -s "$STUB_LOG" ] && grep -q '^sleeper ' "$STUB_LOG" && break; sleep 0.5
+  local end=$(( EPOCHSECONDS + RT_HANG ))
+  until [ -s "$STUB_LOG" ] && grep -q '^sleeper ' "$STUB_LOG"; do
+    [ "$EPOCHSECONDS" -lt "$end" ] || { echo "read_stub_log: the stub never wrote its sleeper line within the ${RT_HANG} s hang bound" >&2; break; }
+    sleep 0.5
   done
   cat "$STUB_LOG" 2>/dev/null || true
 }
@@ -230,27 +238,31 @@ seed_log() {
 # MSYS its WINDOWS pid (ps's WINPID column, polled until the forked child has exec'd into `sleep`),
 # the bash pid elsewhere; empty when it never came, which every arm refuses to probe with.
 derive_winpid() {
-  local w="" i
+  local w="" end=$(( EPOCHSECONDS + RT_HANG ))
   case "$(uname -s)" in
     MINGW*|MSYS*|CYGWIN*)
-      for i in 1 2 3 4 5 6 7 8 9 10; do
-        w=$(ps -p "$1" | awk -v p="$1" 'NR>1 && $1==p && $NF ~ /sleep/ {print $4}'); [ -n "$w" ] && break; sleep 0.5
+      while :; do
+        w=$(ps -p "$1" | awk -v p="$1" 'NR>1 && $1==p && $NF ~ /sleep/ {print $4}'); [ -n "$w" ] && break
+        [ "$EPOCHSECONDS" -lt "$end" ] || { echo "derive_winpid: $1 never showed an exec'd sleep within the ${RT_HANG} s hang bound" >&2; break; }
+        sleep 0.5
       done ;;
     *) w=$1 ;;
   esac
   printf '%s' "$w"
 }
 # read_task_gone <winpid> — the count of `No tasks are running` lines `tasklist` prints for that pid,
-# polled until it reads 1 or 25 polls of 0.2 s pass (TOOL-aGraftedHelix-34 S6). `taskkill //F`
+# polled until it reads 1 or the hang bound passes (TOOL-aGraftedHelix-34 S6). `taskkill //F`
 # returns while the process may still be terminating, and an eight-wide pool widens that window: the
 # AC4 and AC13 arms read `tasklist` at once and redded there while green alone and in order. A tick
-# that never killed still reads 0, after the bound, so the arms keep their failing case.
+# that never killed still reads 0, after the bound, so the arms keep their failing case; a landed
+# kill reads 1 at the first poll that sees it.
 read_task_gone() {
-  local c=0 i=0
-  while [ "$i" -lt 25 ]; do
+  local c=0 end=$(( EPOCHSECONDS + RT_HANG ))
+  while :; do
     c=$(tasklist //FI "PID eq $1" 2>/dev/null | grep -c 'No tasks are running')
     [ "$c" = 1 ] && break
-    sleep 0.2; i=$((i + 1))
+    [ "$EPOCHSECONDS" -lt "$end" ] || { echo "read_task_gone: $1 was still listed at the ${RT_HANG} s hang bound" >&2; break; }
+    sleep 0.2
   done
   printf '%s' "$c"
 }

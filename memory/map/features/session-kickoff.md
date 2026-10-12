@@ -123,7 +123,11 @@ defined, every spec tracked under the build's `spec/` with an H1 defining its id
 under the build's `prompts/` or its `README.md`. A miss is refused, never annotated, and a route
 lands only on a card a kickoff has appended to; a later route takes the stored one's place. A tree
 whose conf declares no `MEMORY_ROOT`, read through `read_memory_root`, or whose reader yields no id
-set, refuses a route with exit 2. The append also refuses a real READY body with no `## task`.
+set, refuses a route with exit 2. The append also refuses a real READY body with no `## task`, and
+one whose `## task` leaves any field `--task-skeleton` prints absent, repeated, empty or a
+placeholder (`check_card_task`, `KICK-aOrientedCast-1`): the labels are read out of the skeleton at
+run time, the eight fields gained To-do and Reuse at manifest format 1.5, and check 10 still passes a
+format-1.4 region under an older marker with a NOTE naming the re-paste. A stored card is not graded.
 
 The engine also puts the spec-audit question to the owner, once, at Step 3 (`KICK-aBlindedTrial-1`):
 only when the DoR is a design pass and the build method the manifest names makes `spec-audit:` opt-in,

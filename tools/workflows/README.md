@@ -350,6 +350,66 @@ Which types omit the charter — verified 2026-10-04, node a, Claude Code 2.1.17
 - UNVERIFIED: whether a custom definition added mid-session is spawnable without restarting the
   session. Name a built-in type unless that has been measured.
 
+## roles — stage agents spawned as catalogue roles
+
+The build harness, the unit harness and the review harness take an optional `roles` object mapping a
+stage key to an agent type: the catalogue's harness arguments for that harness, which a caller passes
+as printed. A stage it names spawns as that type and the craft its role now carries is left out of the
+prompt; in the build and unit harnesses its prompt also carries one sentence after the grounding text
+naming the type. A stage it does not name spawns as it did before roles, untyped in those two and
+under `workerType` in the review harness, and each harness logs one line per stage saying which.
+`{}` and an absent `roles` mean the same thing.
+
+```js
+// unattended-build.js: specWriter, committer and disposal spawn here; builder travels in
+// dispatch.args to each unit; specFinder, skeptic and synthesis are forwarded to the audit's review call
+args: { repo, slug, scratch, units, roles: { specWriter: 'gov-spec-writer', disposal: 'gov-spec-writer',
+        builder: 'gov-builder', specFinder: 'gov-spec-reviewer', skeptic: 'gov-skeptic', synthesis: 'gov-synthesizer' } }
+// unattended-unit.js: its one key
+args: { ..., roles: { builder: 'gov-builder' } }
+// tier2-review.js: its four keys, only the running kind's finder key read
+args: { repo, base, head, reviewDir, roles: { diffFinder: 'gov-diff-reviewer', specFinder: 'gov-spec-reviewer',
+        skeptic: 'gov-skeptic', synthesis: 'gov-synthesizer' } }
+```
+
+Each harness refuses, before any agent spawns: a `roles` that is not a plain object, a key outside its
+own set, a value not matching `^[A-Za-z][A-Za-z0-9_-]{0,63}$`, and the value `none`, which is the review
+harness's reserved untyped literal; an untyped stage is spelled by leaving its key out.
+
+- **The builder's hand-back.** With `roles.builder` the unit agent does not edit its spec. It sets the
+  status header to CLOSED with today's date, an edit changing nothing else, and on a divergence it
+  commits nothing and returns `why` opening `DIVERGENCE:`. The unit harness returns `diverged: true`
+  exactly then, so the caller branches on a field: it has the spec-writer role revise the spec and
+  dispatches the unit again. Untyped, the builder keeps today's order to change the spec first.
+- **The audit's roles.** The review keys reach the review harness's `roles` beside `workerType: 'none'`,
+  which then governs only a judge stage no role names. A judge run under a role writes no lens or verify
+  file, so a deferred-platform return whose review says `durable: false` tells the caller the re-run
+  dispatches every judge again, instead of promising a reuse.
+- **The review harness's roles.** `tier2-review.js` takes four keys: `diffFinder` and `specFinder` name
+  the finders of a diff review and of a spec audit, only the running kind's key being read; `skeptic`
+  names every skeptic batch; `synthesis` names the synthesis. A key wins over `workerType` for its own
+  stage, `workerType` keeps every judge stage no key names, and the synthesis takes its key or no type;
+  the resume probe never takes one. A roled finder or skeptic is told none of the posture its role
+  carries, and keeps every stage protocol sentence: the acquire step, the rubric, the probe policy, the
+  schemas. Any judge under a type, a role or `workerType`, makes the whole run not durable, so every
+  judge writes no file and a re-run dispatches every finder and skeptic again; a synthesis role alone
+  keeps a `none` run durable and its key. A judge role joins the review key; the synthesis role does not.
+  Compose the object with `<prefix>/roles/handoff.py harness-args tier2-review` rather than by hand.
+- **The harnesses' efforts** (TOOL-aOrientedCast-10). Each harness takes `efforts` beside `roles`, keyed
+  by the same stage keys: a level of lower-case letters, set as that stage's `agent()` `effort` option.
+  It is independent of `roles`, so an untyped stage still takes its level; a stage it does not name
+  passes no `effort` and runs at its agent type's level, else the session's, and each harness logs one
+  `effort <key>:` line per stage saying which. The review harness never sets it on the resume probe;
+  the build harness spawns its spec writer, spec commit and disposal at theirs, forwards the audit's three
+  review keys as the review call's `efforts` and `builder` in `dispatch.args`. A malformed object, an
+  unknown key or a value off the shape refuses before any spawn. The vocabulary is the roles kit's, so
+  a harness grades the shape only. Compose it with `<prefix>/roles/handoff.py stage-efforts
+  <workflow>`, keyed by WORKFLOW: the review harness serves spec review and closing review, which run
+  one role at two levels.
+- **The parity arm.** A workflow script cannot import, so each harness that tests an agent type keeps its
+  own copy of the shape. The protocol-parity leg's agent-type shape arm compares every copy in this kit
+  with the one `tier2-review.template.js` owns, and reds on a difference or on an owner yielding none.
+
 ## `review_replay.py` — a review scored for recall against a past round
 
 Stdlib Python, run under the repo's python launcher. It answers one question nothing else here can:

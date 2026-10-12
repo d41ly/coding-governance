@@ -1,0 +1,35 @@
+# **Serves:** journal TOOL-aSparedSpawn-12
+# The select-sim.py replay beside this file over the last 30 first-parent commits of main at 76c924e7, node a, 2026-10-12, costs from the aMeteredSweep legs table.
+held legs 66, held leg-seconds 36221; legs selecting by their guard: playbook parity selftest, template size gate selftest, python resolver (behaviour + inline parity + idiom ban), branch-guard self-test, hook destinations self-test, dead-path carriers self-test, remote literals self-test, govkit selftest, spec-tokens self-test, kit-placeholders self-test, selftest harness self-test, extract-arms self-test
+unowned and unguarded, so selected by every commit: template size gate selftest
+76c924e72 files    1 |  7 legs   2306 s | fix: track .githooks/pre-commit as 100755, so check-wiring s
+37200355d files    1 |  1 legs    194 s | records(aSparedHolder): re-stamp the kickoff manifest after 
+75c350840 files   27 |  5 legs    885 s | mint: unattended 1.100 for TOOL-aSparedHolder-1 over the rec
+2f01150c6 files  131 | 41 legs  28948 s | merge: origin/main 23c08f73 into main — reconcile aSparedHol
+eeb2b465b files    3 |  1 legs    194 s | records(aSparedHolder): close TOOL-aSparedHolder-1 — landed 
+75a1a52e3 files   36 |  5 legs    885 s | merge: aSparedHolder — the resume tick kills only what it la
+9a8777b8b files    1 |  1 legs    194 s | records(dHomedResolver): settle the run record — LANDED by t
+62e5f4c4c files    1 |  1 legs    194 s | records(dHomedResolver): HELD owner-decision — the owner's l
+69005bc78 files    1 |  1 legs    194 s | records(dHomedResolver): the two attestations, keepalive rea
+bd8e05f22 files    1 |  1 legs    194 s | records(dHomedResolver): re-stamp the kickoff manifest after
+6fbac31c7 files   55 | 20 legs   6629 s | merge: dHomedResolver — land onto origin/main at fad16fd3
+fad16fd3d files   23 | 10 legs   2690 s | merge: aSignalledHook — land onto origin/main at d19938f3
+d19938f35 files    1 |  1 legs    194 s | records(aFrugalTurnstile): settle the run record — LANDED by
+5764df795 files    1 |  1 legs    194 s | records(aFrugalTurnstile): HELD owner-decision — the owner's
+c9fa75f26 files    1 |  1 legs    194 s | records(aFrugalTurnstile): park the owner's decision to land
+63a43402c files  103 | 21 legs  17191 s | merge: aFrugalTurnstile — land onto origin/main at b6cd02bc
+b6cd02bc5 files    4 |  1 legs    194 s | records(aDistilledCharter): settle the build — LANDED by the
+f75cffbed files  147 | 50 legs  34310 s | merge: aDistilledCharter — land onto origin/main at b726385f
+b726385f2 files    2 |  1 legs    194 s | Merge origin/main into main (reconcile before landing the aB
+3ae316678 files  142 | 27 legs  16328 s | Merge origin/main into main (push-main reconcile)
+de383a311 files    7 |  1 legs    194 s | merge: aBenchedProbe follow-up — the runbook declares the ho
+d22cca6cb files  132 | 30 legs  26316 s | merge: origin/main d006cfc5 into local main — reconcile the 
+eb013481d files    1 |  1 legs    194 s | merge: aQuotedBrief — the settle record onto origin/main at 
+76b9c4518 files    2 |  1 legs    194 s | merge: aRoutedQuill — the trial spec's rollout names order 6
+ea1032745 files    1 |  1 legs    194 s | records(aHomedAnchor): settle the run record
+17e8ccb7e files   66 | 10 legs   2690 s | merge: aHomedAnchor — land onto origin/main at 3d05f1ea
+3d05f1ead files    1 |  5 legs    885 s | records(aQuotedBrief): owner raises the armed-cutoff pin 30 
+08f152544 files    1 |  1 legs    194 s | records(aQuotedBrief): HELD owner-decision — handed off
+26da990ac files    1 |  1 legs    194 s | records(aQuotedBrief): the close's bar reds on the armed-cut
+fa3d3e0a4 files   55 |  5 legs    885 s | merge: aQuotedBrief — land onto origin/main at 5a836bf0
+selected: mean 4808 s per commit, 13.3% of 36221 held leg-seconds; commits selecting nothing: 0 of 30; selecting nothing beyond the every-commit legs: 17 of 30

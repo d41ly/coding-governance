@@ -69,7 +69,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -106,7 +107,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -163,6 +164,12 @@ run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RES
     const agent = async (prompt, opts) => {
       const label = (opts && opts.label) || "(unlabelled)"
       trace.push("agent:" + label)
+      // TOOL-aOrientedCast-4 S11 - the agent type each spawn asked for, `-` for none: a stage named in
+      // `roles` spawns typed and every other one exactly as before, and only the options can tell.
+      trace.push("type:" + label + ":" + ((opts && opts.agentType) || "-"))
+      // TOOL-aOrientedCast-10 - the effort a spawn asked for, traced ONLY when its options carry the
+      // key, so every trace written before `efforts` existed stays byte for byte what it was.
+      if (opts && Object.prototype.hasOwnProperty.call(opts, "effort")) trace.push("effort:" + label + ":" + opts.effort)
       // TOOL-aStagedLane-2 - THE PROMPT IS TRACED, not just the label. The whole defect this unit
       // closes is what the agent is TOLD to run: the unattended BUILD prompt names three driver verbs
       // that refuse without a run-state file, and no gate downstream of here reads a prompt. A double
@@ -210,6 +217,10 @@ run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RES
     const workflow = async (ref, wargs) => {
       trace.push("workflow:" + ((ref && ref.scriptPath) || String(ref)))
       trace.push("wargs:" + JSON.stringify(wargs))
+      // TOOL-aOrientedCast-4 S11 - the review roles the call forwards, keys sorted, `-` for none.
+      trace.push("wfroles:" + (wargs && wargs.roles ? JSON.stringify(wargs.roles, Object.keys(wargs.roles).sort()) : "-"))
+      // TOOL-aOrientedCast-10 - the review levels the call forwards, traced only when it forwards any.
+      if (wargs && wargs.efforts) trace.push("wfefforts:" + JSON.stringify(wargs.efforts, Object.keys(wargs.efforts).sort()))
       return returns["workflow"] || {}
     }
     const budget = { total: null, spent: () => 0, remaining: () => Infinity }
@@ -248,10 +259,10 @@ DISPOSE_OK='{"disposed":true,"standing":[],"promoted":0,"folded":0,"promotedIds"
 # defaulting to the blocker count and `highs` and `unverified` to 0, so every existing call site
 # keeps a return that reconciles. `unverified` joined at the closing review's cluster F, because the
 # harness now refuses a synthesis return without it and disposes it beside `confirmed`.
-review_out() { printf '{"blockers":%s,"confirmed":%s,"highs":%s,"unverified":%s,"report":"r.md","precision":1,"note":"n"}' "$1" "${2:-$1}" "${3:-0}" "${4:-0}"; }
+review_out() { printf -v _review_out '{"blockers":%s,"confirmed":%s,"highs":%s,"unverified":%s,"report":"r.md","precision":1,"note":"n"}' "$1" "${2:-$1}" "${3:-0}" "${4:-0}"; printf '%s' "$_review_out"; }
 # The CONVERGENCE token is the driver's, recorded by an agent, so it is a separate fixture. Keeping
 # them separate is the point: a run can produce a clean review and still not converge.
-rec() { printf '{"token":"%s","exitCode":0}' "$1"; }
+rec() { printf -v _rec '{"token":"%s","exitCode":0}' "$1"; printf '%s' "$_rec"; }
 # `audit <token> <blockers>` still reads as one thing at the call sites, but it now feeds the two
 # halves their own shapes. The DEFAULT disposal double is built from the count it is paired with —
 # `promoted` equal to the blockers, `folded` 0, and one `promotedIds` entry whenever it promoted —
@@ -269,9 +280,12 @@ returns() { local dflt ids='[]' places='[]'
       ids="$ids${ids:+,}\"$u\""; places="$places${places:+,}{\"unit\":\"$u\",\"repairs\":\"A-tB-3\",\"order\":3}"
     done; ids="[$ids]"; places="[$places]"; fi
   dflt=$(printf '{"disposed":true,"standing":[],"promoted":%s,"folded":0,"promotedIds":%s,"edges":[],"placements":%s,"summary":"ok"}' "${2:-0}" "$ids" "$places")
-  printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-  "$SPEC_C" "$(review_out "${2:-0}")" "$(rec "$1")" "${3:-$dflt}"; }
-audit() { printf '%s' "$1"; }
+  review_out "${2:-0}" >/dev/null; rec "$1" >/dev/null; printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+  "$SPEC_C" "$_review_out" "$_rec" "${3:-$dflt}"; }
+audit() { _audit=$1; printf '%s' "$_audit"; }
+# `review_out`, `rec` and `audit` each leave their answer in a fixed global, `_review_out`, `_rec` or
+# `_audit`, and still print it: a call site reads the global and forks no subshell for a printf
+# (TOOL-aSparedSpawn-8 S10). Two calls of one helper in one statement keep the first in its own name.
 
 # ---- AC2: THE ARGS GUARD, BOTH DIRECTIONS. The first cut of the guard this ports from tested
 # ---- `typeof a !== "object"` and refused every legitimate caller, so the PASSING case is armed.
@@ -391,8 +405,8 @@ esac
 # S2 — A NON-INTEGER BLOCKER COUNT IS A DEGRADED RUN AND IS REPORTED AS ONE. tier2-review yields
 # `null` there BY DESIGN, never 0, so reading it as 0 would make every degraded audit look clean:
 # unattended.sh emits CONVERGED only on a count of 0.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"blockers":null,"report":"r.md"},"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(rec CONVERGED)" "$DISPOSE_OK")")
+rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"blockers":null,"report":"r.md"},"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_rec" "$DISPOSE_OK")")
 has "S2 a null blocker count THROWS rather than rounding to zero" "$o" "non-integer blocker count"
 n=$((n+1)); case "$o" in
   *"phase:Disposal"*) echo "FAIL S2 a degraded audit reached DISPOSAL"; st=1 ;;
@@ -410,7 +424,7 @@ has "an unpinned subject blob is REFUSED before the sub-workflow runs" "$o" "7-4
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"dispose:":%s}' "$SPEC_OK" "$DISPOSE_OK")")
 has "a dead AUDIT stage THROWS" "$o" "THROW"
 has "the throw says an absent verdict is not a convergence" "$o" "must never read as CONVERGED"
-o=$(run_wf "$UNITS" "$(printf '{"workflow":%s,"audit:record":%s,"dispose:":%s}' "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"workflow":%s,"audit:record":%s,"dispose:":%s}' "$_review_out" "$_rec" "$DISPOSE_OK")")
 # The message moved with TOOL-aStagedLane-3: the stage is a FAN now, so the refusal is keyed on
 # the live WRITER COUNT rather than on a falsy return. The arm follows the message rather than
 # the message being frozen for the arm — `arm-literal-strands-on-message-edit`, met head on.
@@ -418,9 +432,9 @@ has "a dead SPEC stage THROWS rather than auditing nothing" "$o" "EVERY spec wri
 
 # ---- AC6: A DEGRADED RUN SAYS SO. `degradation-known-but-unreported` is the class where a pipeline
 # ---- computes how badly it degraded and does not report it.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
     '{"authored":[],"alreadyPresent":["A-tB-1"],"refused":["A-tB-2","A-tB-3"],"summary":"s"}' \
-    "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+    "$_review_out" "$_rec" "$DISPOSE_OK")")
 has "a degraded run reports DEGRADED, not complete" "$o" "DEGRADED"
 has "the refused units are NAMED, not merely counted" "$o" "A-tB-2"
 
@@ -451,7 +465,9 @@ else
   echo "FAIL the file no longer declares per-unit dispatch sequential"; st=1
 fi
 if [ -f "$ROOT/${HOOKS_DIR}/agent-cap.js" ]; then
-  o=$(printf '{"tool_name":"Workflow","tool_input":{"scriptPath":"'"${PFX}${KIT}/unattended-build.js"'"}}' \
+  # `roles` in `args` (TOOL-aOrientedCast-7 S11): where a role index exists, the hook admits a harness
+  # call only when it hands the harness a known role.
+  o=$(printf '{"tool_name":"Workflow","tool_input":{"scriptPath":"'"${PFX}${KIT}/unattended-build.js"'","args":{"roles":{"specWriter":"gov-spec-writer"}}}}' \
       | (cd "$ROOT" && node ${HOOKS_DIR}/agent-cap.js 2>&1); echo "rc=$?")
   n=$((n+1)); case "$o" in *"rc=0"*) echo "ok   agent-cap ADMITS the harness" ;; *) echo "FAIL agent-cap denied the harness -- $o"; st=1 ;; esac
 else
@@ -734,8 +750,8 @@ build_dispose_units() { local i ids='' pl=''
   for i in $(seq 4 $(( $2 + 3 ))); do ids="$ids${ids:+,}\"A-tB-$i\""; pl="$pl${pl:+,}{\"unit\":\"A-tB-$i\",\"repairs\":\"none\",\"order\":3}"; done
   printf '{"disposed":true,"standing":[],"promoted":%s,"folded":%s,"promotedIds":[%s],"edges":[],"placements":[%s],"summary":"d"}' "$1" "${3:-0}" "$ids" "$pl"; }
 DISPOSE_HIGH_BATCH='{"disposed":true,"standing":[],"promoted":4,"folded":0,"promotedIds":["A-tB-4","A-tB-5"],"edges":[],"placements":[{"unit":"A-tB-4","repairs":"A-tB-3","order":3},{"unit":"A-tB-5","repairs":"none","order":3}],"summary":"d"}'
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 4 1)" "$(rec CONVERGED)" "$DISPOSE_HIGH_BATCH")")
+review_out 0 4 1 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" "$DISPOSE_HIGH_BATCH")")
 has "V1 CONVERGED with confirmed findings: the disposal agent RUNS" "$o" "agent:dispose:tB"
 has "V1 ...and the log says the rule, on CONVERGED too" "$o" "disposing by severity, on CONVERGED too"
 has "V1 ...and the prompt names the one high" "$o" "1 at HIGH"
@@ -746,8 +762,8 @@ has "V1 ...and the roster is handed out" "$o" '"roster":[{'
 # ---- V3: counts that do NOT reconcile — 2 + 0 + 0 standing over 3 confirmed — hand out NO roster,
 # ---- carry the counts, and are never logged done. The `{disposed:true, standing:['b1']}` defect
 # ---- with the contradiction moved into two integers.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 3 0)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":2,"folded":0,"summary":"x"}')")
+review_out 0 3 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" '{"disposed":true,"standing":[],"promoted":2,"folded":0,"summary":"x"}')")
 has    "V3 unreconciled counts: the roster is EMPTY" "$o" '"roster":[]'
 has    "V3 unreconciled counts: the note says the counts do not reconcile" "$o" "do not reconcile"
 has    "V3 unreconciled counts: the counts still travel out" "$o" '"promoted":2,"folded":0'
@@ -827,8 +843,8 @@ MT_MERGED='[{"severity":"BLOCKER","ids":[14,26,40]},{"severity":"HIGH","ids":[1]
 MT_DISPOSE='{"disposed":true,"standing":[],"promoted":13,"folded":0,"refuted":0,"promotedIds":["A-tB-16","A-tB-17","A-tB-18","A-tB-19","A-tB-20","A-tB-21","A-tB-22","A-tB-23","A-tB-24","A-tB-25"],"edges":[],"placements":[{"unit":"A-tB-16","repairs":"A-tB-3","order":3},{"unit":"A-tB-17","repairs":"A-tB-3","order":3},{"unit":"A-tB-18","repairs":"A-tB-3","order":3},{"unit":"A-tB-19","repairs":"A-tB-3","order":3},{"unit":"A-tB-20","repairs":"A-tB-3","order":3},{"unit":"A-tB-21","repairs":"A-tB-3","order":3},{"unit":"A-tB-22","repairs":"A-tB-3","order":3},{"unit":"A-tB-23","repairs":"A-tB-3","order":3},{"unit":"A-tB-24","repairs":"A-tB-3","order":3},{"unit":"A-tB-25","repairs":"none","order":3}],"summary":"13 promoted into 10 units: 3 blockers, 6 highs, 1 minors batch"}'
 run_merged_review() { RUN_WF_SCHEMA=strict run_wf "$MT_ARGS" "$1" "$MT_T2"; }
 run_merged_build() { # callee RESULT json · [driver token] · [disposal double] -> the build harness run over it
-  run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "${1:-null}" "$(rec "${2:-BOUNDED}")" "${3:-$MT_DISPOSE}")"
+  rec "${2:-BOUNDED}" >/dev/null; run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "${1:-null}" "$_rec" "${3:-$MT_DISPOSE}")"
 }
 t2=$(run_merged_review "$(build_merged_returns "$MT_MERGED")")
 au=$(printf '%s\n' "$t2" | sed -n 's/^RESULT //p')
@@ -1129,7 +1145,7 @@ NOSUBJ=$(printf '%s' "$UNITS" | sed 's#"subjects":\[[^]]*\],##' | sed 's#"slug":
 # The supplied-subject fixtures in `$UNITS` keep their 7-hex blobs: they never enter that branch.
 B40=0123456789abcdef0123456789abcdef01234567
 T40=fedcba9876543210fedcba9876543210fedcba98
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$_review_out" "$_rec" "$DISPOSE_OK")")
 has    "B round 2 over the promoted id does not throw" "$o" "RESULT"
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:record:r2:')
 has    "B round 2 records under its own generation key" "$p" "--subject tB-spec-set-r2 --verdict"
@@ -1149,7 +1165,7 @@ has    "B a subjectRound above round is REFUSED" "$o" "is above \`round\`"
 o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":2,"auditIds":["A-tB-9"],#')" "$(returns CONVERGED 0)")
 has    "B an auditIds entry outside units is REFUSED by name" "$o" 'names A-tB-9, which `units` does not carry'
 # The terminal-subject refusal is its own outcome, and the throw names the remedy.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":{"terminalSubject":true,"exitCode":1,"stderr":"fail 37"},"dispose:":%s}' "$SPEC_OK" "$(review_out 0)" "$DISPOSE_OK")")
+review_out 0 >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":{"terminalSubject":true,"exitCode":1,"stderr":"fail 37"},"dispose:":%s}' "$SPEC_OK" "$_review_out" "$DISPOSE_OK")")
 has    "B a terminal-subject refusal THROWS by name" "$o" "the subject is terminal, re-key it"
 has    "B ...naming the subject it refused" "$o" '`tB-spec-set-r1` already carries a terminal review round'
 hasnt_ "B ...and not as an unrecorded round" "$o" "the round was not recorded"
@@ -1164,14 +1180,14 @@ has    "B ...and asks for promotedIds" "$p" 'name every promoted unit id in `pro
 # ---- highs, so the merge bar demands the units the highs became.
 # ---- TOOL-aEvidencedLens-8 S4/S5: at zero blockers the exit is CONVERGED, so the record carries
 # ---- `--highs` and `--minors` from the start, and needs no retry.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 4 1)" "$(rec CONVERGED)" "$DISPOSE_HIGH_BATCH")")
+review_out 0 4 1 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" "$DISPOSE_HIGH_BATCH")")
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:record:r1:')
 has    "C zero blockers with a high: the record command carries the counts and --disposition promote" "$p" "--blockers 0 --highs 1 --minors 3 --disposition promote"
 # Nothing stands once the stage refuted both UNVERIFIED findings, so the record carries zero counts
 # and no disposition — never `promote` beside zero standing.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 0 0 2)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":0,"folded":0,"refuted":2,"promotedIds":[],"edges":[],"placements":[],"summary":"d"}')")
+review_out 0 0 0 2 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" '{"disposed":true,"standing":[],"promoted":0,"folded":0,"refuted":2,"promotedIds":[],"edges":[],"placements":[],"summary":"d"}')")
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:record:r1:')
 has    "C zero blockers, nothing standing: the record carries zero counts" "$p" "--blockers 0 --highs 0 --minors 0  Return"
 hasnt_ "C ...and no disposition" "$p" "--disposition"
@@ -1181,8 +1197,8 @@ o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
 has    "C a clean zero-blocker record carries --highs 0 --minors 0" "$(printf '%s\n' "$o" | grep '^prompt:audit:record:r1:')" "--blockers 0 --highs 0 --minors 0"
 # At a POSITIVE count the first command carries NO counts, which a CONVERGING round would refuse, and
 # the retry names all three flags as its trigger and appends every one of them.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 2 5 1)" "$(rec BOUNDED)" "$(build_dispose_units 5 4)")")
+review_out 2 5 1 >/dev/null; rec BOUNDED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" "$(build_dispose_units 5 4)")")
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:record:r1:')
 has    "C two blockers: the first command ends at --blockers 2" "$p" "--blockers 2  Return"
 has    "C ...and the retry appends --highs, --minors and --disposition" "$p" "run the SAME command once more with --highs 1 --minors 2 --disposition promote appended"
@@ -1192,30 +1208,30 @@ has    "C ...triggered by a refusal naming any of the three" "$p" "REFUSES namin
 # ---- confirmed 5 with two blockers and three highs reconciled, and two blockers went out as prose.
 # TOOL-aEvidencedLens-8 S3: the split is now on UNITS, one per blocker and high, and the counts all
 # promote. Five findings promoted into ONE unit over 2 blockers + 3 highs is refused at the floor.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 2 5 3)" "$(rec BOUNDED)" "$(build_dispose_units 5 1)")")
+review_out 2 5 3 >/dev/null; rec BOUNDED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" "$(build_dispose_units 5 1)")")
 has    "D one unit beside 2 blockers + 3 highs: the roster is EMPTY" "$o" '"roster":[]'
 has    "D ...and the note names the floor" "$o" "1 unit(s) for 2 blocker(s), 3 high(s) and 0 minor(s), below the floor of 5"
 has    "D ...and the disposal is NOT done" "$o" "disposal: NOT done"
 # ---- TOOL-aEvidencedLens-8 S2: a non-zero `folded` is refused BY NAME, even where the sum reconciles.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 3 1)" "$(rec CONVERGED)" "$(build_dispose_units 2 2 1)")")
+review_out 0 3 1 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" "$(build_dispose_units 2 2 1)")")
 has    "D8 folded 1 over a reconciling sum: REFUSED by name" "$o" "folded 1 — a spec audit's MEDIUM and LOW are PROMOTED, batched, never folded"
 has    "D8 ...with an empty roster" "$o" '"roster":[]'
 # ---- S3's floor: one unit for one high and two minors is refused; two are accepted.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 3 1)" "$(rec CONVERGED)" "$(build_dispose_units 3 1)")")
+review_out 0 3 1 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" "$(build_dispose_units 3 1)")")
 has    "D8 one unit for one high and two minors: REFUSED at the floor" "$o" "1 unit(s) for 0 blocker(s), 1 high(s) and 2 minor(s), below the floor of 2"
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 3 1)" "$(rec CONVERGED)" "$(build_dispose_units 3 2)")")
+review_out 0 3 1 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" "$(build_dispose_units 3 2)")")
 has    "D8 ...two units are ACCEPTED" "$o" "disposal: done — promoted 3 · folded 0"
 has    "D8 ...and the roster is handed out" "$o" '"roster":[{'
 # ---- S3's ceiling: five minors promoted into five units is the measured shape it exists to refuse.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 5 0)" "$(rec CONVERGED)" "$(build_dispose_units 5 5)")")
+review_out 0 5 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" "$(build_dispose_units 5 5)")")
 has    "D8 five units for five minors: REFUSED at the ceiling" "$o" "5 unit(s) where at most 2 fit — the minors are batched into one unit or two, never one per minor"
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 5 0)" "$(rec CONVERGED)" "$(build_dispose_units 5 2)")")
+review_out 0 5 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" "$(build_dispose_units 5 2)")")
 has    "D8 ...two disjoint batches are ACCEPTED" "$o" "disposal: done — promoted 5 · folded 0"
 # ---- S1: the disposal prompt PROMOTES the minors, batched, and carries its four pinned sentences.
 p=$(printf '%s\n' "$o" | grep '^prompt:dispose:tB:')
@@ -1226,26 +1242,26 @@ for d8 in 'PROMOTE every MEDIUM and every LOW' 'never one unit per minor' 'disjo
 done
 hasnt_ "D8 ...and no longer orders a fold" "$p" "FOLD every MEDIUM"
 # ---- S6: the hand-record note names both counts and the UNVERIFIED rule.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 3 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":["m1"],"promoted":2,"folded":0,"promotedIds":["A-tB-4"],"edges":[],"placements":[],"summary":"x"}')")
+review_out 0 3 1 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" '{"disposed":true,"standing":["m1"],"promoted":2,"folded":0,"promotedIds":["A-tB-4"],"edges":[],"placements":[],"summary":"x"}')")
 has    "D8 the DEGRADED note's hand-record command carries the counts" "$o" '--blockers 0 --highs 1 --minors 2`'
 has    "D8 ...and adds every promoted UNVERIFIED finding to --minors" "$o" 'adding to `--minors` every promoted UNVERIFIED finding'
 # THREE since closing review round 2, cluster F: `refuted` joined `promoted` and `folded`.
 n=$((n+1)); if [ "$(grep -c "type: 'integer', minimum: 0" "$F")" = 3 ]; then echo "ok   D promoted, folded and refuted carry minimum 0 in DISPOSAL_SCHEMA"; else echo "FAIL D DISPOSAL_SCHEMA does not pin minimum 0 on all three counts"; st=1; fi
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 1 1 0)" "$(rec BOUNDED)" '{"disposed":true,"standing":[],"promoted":1,"folded":0,"promotedIds":[],"summary":"x"}')")
+review_out 1 1 0 >/dev/null; rec BOUNDED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" '{"disposed":true,"standing":[],"promoted":1,"folded":0,"promotedIds":[],"summary":"x"}')")
 has    "D a promotion naming no unit is REFUSED, at the unit floor since TOOL-aEvidencedLens-8" "$o" '0 unit(s) for 1 blocker(s), 0 high(s) and 0 minor(s), below the floor of 1'
 has    "D ...with an empty roster" "$o" '"roster":[]'
 # ---- TOOL-aEvidencedLens-21 AC3 (closing review M2): two raw HIGH ids the report merged into one item.
 # The prompt and the floor agree on RAW ids, and no count changes basis.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 2 2)" "$(rec CONVERGED)" "$(build_dispose_units 2 1)")")
+review_out 0 2 2 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" "$(build_dispose_units 2 1)")")
 has    "D21 the disposal prompt makes each merged raw id its own unit" "$(printf '%s\n' "$o" | grep '^prompt:dispose:tB:')" "even where the report merged several ids into one item"
 has    "D21 one unit for two raw HIGH ids in one item: REFUSED at the floor" "$o" "1 unit(s) for 0 blocker(s), 2 high(s) and 0 minor(s), below the floor of 2"
 has    "D21 ...naming raw ids, merged items included" "$o" "one unit per RAW blocker and high id, merged items included"
 has    "D21 ...with an empty roster" "$o" '"roster":[]'
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 2 2)" "$(rec CONVERGED)" "$(build_dispose_units 2 2)")")
+review_out 0 2 2 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" "$(build_dispose_units 2 2)")")
 has    "D21 ...two units are ACCEPTED" "$o" "disposal: done — promoted 2 · folded 0"
 has    "D21 ...and the record counts stay raw" "$(printf '%s\n' "$o" | grep '^prompt:audit:record')" "--highs 2 --minors 0"
 
@@ -1266,8 +1282,8 @@ PAIRED='[{"from":"A-tB-4","verb":"consumes-from","to":"A-tB-1"},{"from":"A-tB-1"
 ONEWAY='[{"from":"A-tB-4","verb":"consumes-from","to":"A-tB-1"}]'
 BESIDE='[{"unit":"A-tB-4","repairs":"A-tB-1","order":2}]'
 run_dispose() { # dispose-json -> the trace and the RESULT
-  run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 1 1)" "$(rec CONVERGED)" "$1")"
+  review_out 0 1 1 >/dev/null; rec CONVERGED >/dev/null; run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" "$1")"
 }
 
 # THE PASSING CASE FIRST, so every refusal below is known to differ from it by one field.
@@ -1334,7 +1350,7 @@ has    "E ...and so does NON-CONVERGENT" "$nt" "DEGRADED — 0 spec(s) refused, 
 
 # ---- F (ids 14, 15): the callee's two null-blocker RESULTS are read as clean rounds, its unverified
 # ---- population is disposed, and the dead-lens shape keeps the throw.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":null,"blockers":null,"highs":null,"lensesRun":4,"lensesDead":0,"skepticsDead":0,"unverified":0,"note":"all findings adjudicated and refuted"},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(rec CONVERGED)" "$DISPOSE_OK")")
+rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":null,"blockers":null,"highs":null,"lensesRun":4,"lensesDead":0,"skepticsDead":0,"unverified":0,"note":"all findings adjudicated and refuted"},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$_rec" "$DISPOSE_OK")")
 has    "F all-refuted: a RESULT, not a throw" "$o" "RESULT"
 has    "F all-refuted: read as a clean round at 0" "$o" "a clean round at 0"
 has    "F all-refuted: the round is recorded CLEAN at 0" "$o" '--verdict "CLEAN" --blockers 0'
@@ -1362,24 +1378,24 @@ has    "D ...and the resume route" "$o" 'dispatch every unit `bash '"${PFX}${UNA
 has    "D ...and the note opens HELD" "$o" '"note":"HELD AT HAND-OUT — a clean round with no tracked spec-audit record'
 has    "D ...and dispatch still travels, for the resume route" "$o" '"dispatch":{"scriptPath":"'"${PFX}${KIT}/unattended-unit.js"'"'
 has    "D ...and the withholding is logged" "$o" "hand-out: WITHHELD"
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":null,"root":"/tmp/r","blockers":null,"highs":null,"lensesRun":4,"lensesDead":0,"note":"clean: 0 findings"},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(rec CONVERGED)" "$DISPOSE_OK")")
+rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":null,"root":"/tmp/r","blockers":null,"highs":null,"lensesRun":4,"lensesDead":0,"note":"clean: 0 findings"},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$_rec" "$DISPOSE_OK")")
 has    "F zero findings, no unverified key: a RESULT too" "$o" "RESULT"
 has    "D zero findings, unattended: the roster is WITHHELD too" "$o" '"roster":[]'
 has    "D ...and the callee's note is quoted into the demand" "$o" "the callee said: clean: 0 findings"
 o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"confirmed":[],"report":null,"blockers":null,"highs":null,"lensesRun":4,"lensesDead":0,"skepticsDead":0,"unverified":0,"note":"all findings adjudicated and refuted"}}')
 has    "D attended clean round: the roster is still handed out — an owner is in the loop" "$o" '"roster":[{'
 hasnt_ "D ...and nothing is withheld" "$o" "hand-out: WITHHELD"
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":null,"blockers":null,"highs":null,"lensesRun":0,"lensesDead":4,"note":"UNVERIFIED: no lens completed"},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(rec CONVERGED)" "$DISPOSE_OK")")
+rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":null,"blockers":null,"highs":null,"lensesRun":0,"lensesDead":4,"note":"UNVERIFIED: no lens completed"},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$_rec" "$DISPOSE_OK")")
 has    "F every lens dead: still THROWS" "$o" "non-integer blocker count"
 has    "F ...naming the lens deaths" "$o" "lensesDead 4"
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":null,"blockers":null,"highs":null,"lensesRun":3,"lensesDead":1,"skepticsDead":0,"unverified":0,"note":"all findings refuted, but 1/4 lenses died"},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(rec CONVERGED)" "$DISPOSE_OK")")
+rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":null,"blockers":null,"highs":null,"lensesRun":3,"lensesDead":1,"skepticsDead":0,"unverified":0,"note":"all findings refuted, but 1/4 lenses died"},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$_rec" "$DISPOSE_OK")")
 has    "F all-refuted beside a dead lens: THROWS" "$o" "non-integer blocker count"
 # ---- TOOL-dDerivedDocket-29 AC8: a DEFERRED callee return is recognised BEFORE the clean-round test
 # ---- and the non-integer refusal. The two arms above keep a return that carries NO `exit` field on
 # ---- the throw, which is still how a callee predating the field reads. A deferral records no round,
 # ---- builds nothing, and tells the caller to re-run once and then hold with the Workflow runId.
 DEF='{"exit":"deferred-platform","key":"spec-audit-r1-x-y","pending":["find:security","find:seams"],"confirmed":[],"report":null,"blockers":null,"highs":null,"lensesRun":2,"lensesDead":2,"note":"DEFERRED: 2/4 lenses died"}'
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$DEF" "$(rec CONVERGED)" "$DISPOSE_OK")")
+rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$DEF" "$_rec" "$DISPOSE_OK")")
 has    "DP a deferred audit is a RESULT, not a throw" "$o" "RESULT"
 hasnt_ "DP ...and the non-integer refusal does not fire first" "$o" "non-integer blocker count"
 has    "DP ...returning exit deferred-platform" "$o" '"exit":"deferred-platform"'
@@ -1392,18 +1408,18 @@ has    "DP ...and the next step re-runs once, then holds naming the runId" "$o" 
 o=$(run_wf "$A_UNITS" "$(printf '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":%s}' "$DEF")")
 has    "DP attended: deferred too, and told to stop rather than hold" "$o" "an attended run has no driver to hold"
 # id 14: unverified findings are OUTSTANDING and run the stage.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 0 0 2)" "$(rec CONVERGED)" "$(build_dispose_units 2 1)")")
+review_out 0 0 0 2 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" "$(build_dispose_units 2 1)")")
 has    "F 0 confirmed + 2 unverified: the disposal agent RUNS" "$o" "agent:dispose:tB"
 has    "F ...and the prompt hands it the unverified population" "$o" "and 2 unverified. Open the report"
 has    "F ...and says an unverified finding is OUTSTANDING, not cleared" "$o" "OUTSTANDING, not cleared"
 has    "F ...and the hand-out carries unverified 2" "$o" '"unverified":2'
 has    "F ...and the roster is handed out" "$o" '"roster":[{'
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 1 1 1)" "$(rec CONVERGED)" "$(build_dispose_units 2 2)")")
+review_out 0 1 1 1 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" "$(build_dispose_units 2 2)")")
 has    "F confirmed 1 + unverified 1: reconciles against their sum" "$o" '"roster":[{'
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 1 1 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":0,"promotedIds":["A-tB-4"],"summary":"d"}')")
+review_out 0 1 1 1 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" '{"disposed":true,"standing":[],"promoted":1,"folded":0,"promotedIds":["A-tB-4"],"summary":"d"}')")
 has    "F ...and one short of the sum is refused naming both populations" "$o" "is not confirmed 1 + unverified 1"
 o=$(run_wf "$UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has    "F a synthesis return with no unverified key is REFUSED" "$o" "THROW"
@@ -1420,8 +1436,8 @@ hasnt_ "F ...and the stage is never reached" "$o" "phase:Disposal"
 # ---- one of the unverified findings used to record a bare CONVERGED row the merge bar reads as
 # ---- demanding nothing. At zero blockers with something outstanding the DISPOSAL stage now runs
 # ---- FIRST and the record carries `promote` iff `promotedIds` is non-empty.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 0 0 2)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":0,"refuted":1,"promotedIds":["A-tB-9"],"edges":[],"placements":[{"unit":"A-tB-9","repairs":"A-tB-3","order":3}],"summary":"d"}')")
+review_out 0 0 0 2 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" '{"disposed":true,"standing":[],"promoted":1,"folded":0,"refuted":1,"promotedIds":["A-tB-9"],"edges":[],"placements":[{"unit":"A-tB-9","repairs":"A-tB-3","order":3}],"summary":"d"}')")
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:record:r1:')
 has    "R2-B zero blockers, zero highs, a promoted UNVERIFIED finding: the record carries --disposition promote" "$p" "--blockers 0 --highs 0 --minors 1 --disposition promote"
 ag=$(printf '%s\n' "$o" | grep '^agent:' | tr '\n' ' ')
@@ -1439,8 +1455,8 @@ has    "R2-B CONVERGED paired with 3 blockers THROWS" "$o" "returned CONVERGED p
 hasnt_ "R2-B ...and DISPOSAL is not reached" "$o" "phase:Disposal"
 # A disposal that does not finish at zero blockers has nothing to record yet, and says so rather than
 # writing a bare CONVERGED row over findings nobody disposed.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 3 0)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":2,"folded":0,"summary":"x"}')")
+review_out 0 3 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" '{"disposed":true,"standing":[],"promoted":2,"folded":0,"summary":"x"}')")
 hasnt_ "R2-B a DEGRADED disposal at zero blockers records NO round" "$o" "agent:audit:record"
 has    "R2-B ...and the note says so, with the hand-record command" "$o" 'The round was NOT recorded: at zero blockers the driver'
 # The needle carries the RESULT line's JSON-escaped quotes, one backslash each.
@@ -1461,7 +1477,7 @@ has    "R2-C the post-disposal nextAction names subjects among what NOT to pass"
 # ---- E (id 14): the callee is handed the SUBJECT's round, not the invocation's. Under the kit
 # ---- default every promoted-spec audit lands at invocation round 2, and `tier2-review.js` primed
 # ---- it as a FOLD review of a spec nobody had reviewed.
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$_review_out" "$_rec" "$DISPOSE_OK")")
 w=$(printf '%s\n' "$o" | grep '^wargs:')
 has    "R2-E a post-disposal re-invoke at round 2 hands the callee round 1" "$w" '"round":1'
 has    "R2-E ...as a spec-audit" "$w" '"kind":"spec-audit"'
@@ -1475,17 +1491,17 @@ has    "R2-E ...while the harness keeps its own round for the record" "$o" "prom
 # ---- subject. INSIDE the resolver branch only: the supplied-subject fixtures above carry no
 # ---- `tree` and never enter it. Each arm read RED first against the render at 12513c25, where
 # ---- the first and third proceed to the sub-workflow and the second finds no `tree` to strip.
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$T40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$T40" "$_review_out" "$_rec" "$DISPOSE_OK")")
 has    "WS15 a resolved subject whose tree differs from its blob THROWS" "$o" "THROW"
 has    "WS15 ...naming the path and both hashes" "$o" "s3 HEAD $B40 tree $T40"
 has    "WS15 ...and the remedy" "$o" "Commit the fold"
 same   "WS15 ...and no lens was dispatched" "$(printf '%s\n' "$o" | grep -c '^workflow:')" "0"
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$_review_out" "$_rec" "$DISPOSE_OK")")
 same   "WS15 an agreeing pair reaches the sub-workflow" "$(printf '%s\n' "$o" | grep -c '^workflow:')" "1"
 w=$(printf '%s\n' "$o" | grep '^wargs:')
 has    "WS15 ...handed {path, blob}" "$w" "\"subjects\":[{\"path\":\"s3\",\"blob\":\"$B40\"}]"
 same   "WS15 ...with tree stripped" "$(printf '%s' "$w" | grep -c '"tree"')" "0"
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$_review_out" "$_rec" "$DISPOSE_OK")")
 has    "WS15 a resolved subject with no tree THROWS naming the field" "$o" "40-hex tree"
 hasnt_ "WS15 ...and not as a dirty tree" "$o" "Commit the fold"
 
@@ -1498,15 +1514,15 @@ hasnt_ "WS15 ...and not as a dirty tree" "$o" "Commit the fold"
 # ---- WARNING is that unit's text; its prompt spells `--for-paths <paths>`. The caller's precedence and
 # ---- the `checklist from` line are this unit's and survive it.
 GH3_RES='"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}],"checklist":"- [ ] RESOLVERCLX","checklistPaths":["a.sh","b.sh"]}'
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$_review_out" "$_rec" "$DISPOSE_OK")")
 w=$(printf '%s\n' "$o" | grep '^wargs:')
 has    "GH3 the resolver's checklist reaches the spec audit as checklist" "$w" '"checklist":"- [ ] RESOLVERCLX"'
 has    "GH3 ...and the stage says where it came from" "$o" "log:audit round 2: checklist from --for-paths over 2 path(s)"
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$_review_out" "$_rec" "$DISPOSE_OK")")
 has    "GH3 a resolver returning no checklist is a WARNING naming the gap" "$o" 'log:WARNING: no `checklist` for the audit: the resolver returned neither `checklist` nor `checklistError`'
 hasnt_ "GH3 ...and no checklist key is passed" "$(printf '%s\n' "$o" | grep '^wargs:')" '"checklist"'
-o=$(run_wf "$(printf '%s' "$NOSUBJ" | sed 's#"slug":"tB",#"slug":"tB","checklist":"- [ ] CALLERCLX",#')" \
-    "$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$(printf '%s' "$NOSUBJ" | sed 's#"slug":"tB",#"slug":"tB","checklist":"- [ ] CALLERCLX",#')" \
+    "$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$_review_out" "$_rec" "$DISPOSE_OK")")
 w=$(printf '%s\n' "$o" | grep '^wargs:')
 has    "GH3 a caller checklist beside the resolver's is the one the audit receives" "$w" '"checklist":"- [ ] CALLERCLX"'
 hasnt_ "GH3 ...and the resolver's is not passed" "$w" "RESOLVERCLX"
@@ -1516,8 +1532,8 @@ has    "GH3 the rendered resolver prompt runs --for-paths through the rendered m
 has    "GH3 ...over the paths under the specs' Files touched sub-heads" "$p" '### Files touched'
 # A caller checklist with no `- ` item is no checklist: the callee's parser refuses one, so it never
 # reaches the audit, and the resolver's stands in for it.
-o=$(run_wf "$(printf '%s' "$NOSUBJ" | sed 's#"slug":"tB",#"slug":"tB","checklist":"CALLERCLX",#')" \
-    "$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$(printf '%s' "$NOSUBJ" | sed 's#"slug":"tB",#"slug":"tB","checklist":"CALLERCLX",#')" \
+    "$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$_review_out" "$_rec" "$DISPOSE_OK")")
 w=$(printf '%s\n' "$o" | grep '^wargs:')
 hasnt_ "GH3 a caller checklist with no - item never reaches the audit" "$w" "CALLERCLX"
 has    "GH3 ...and the resolver's reaches it instead" "$w" '"checklist":"- [ ] RESOLVERCLX"'
@@ -1532,7 +1548,7 @@ has    "GH3 ...and the resolver's reaches it instead" "$w" '"checklist":"- [ ] R
 GH29_B=a1b2c3d4e5f60718293a4b5c6d7e8f9012345678
 GH29_WT="log:WARNING: the audit's checklist reads invariants from the working tree — no pinned \`base\` was passed"
 build_gh29_args() { printf '%s' "$NOSUBJ" | sed 's#,"base":"'"$FIX_B"'"##; s#"slug":"tB",#"slug":"tB","base":"'"$1"'",#'; }
-GH29_RET=$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; GH29_RET=$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$_review_out" "$_rec" "$DISPOSE_OK")
 o=$(run_wf "$(build_gh29_args "$GH29_B")" "$GH29_RET")
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:subjects:r2:')
 has    "GH29 a pinned base reaches the resolver's checker as --for-paths --base" "$p" \
@@ -1567,8 +1583,8 @@ P_SUBJ='"audit:subjects":{"subjects":[{"path":"'$CPATH'","blob":"'$B40'","tree":
 P_CCL='# c-head\n# invariants are read at c-point\n- [ ] alpha (universal)\n      a\n- [ ] gamma\n      g\n# by design — 1 invariant(s) this selection touches\n- inv-two — x → y (D-2)'
 P_COMMIT='{"committed":true,"sha":"'$CSHA'","why":"","specs":[{"id":"A-tB-1","path":"'$CPATH'"}],"summary":"ok","checklist":"'$P_CCL'"}'
 run_pathless() { # args · spec double · commit double · resolver map entry, or '' -> the run, audit and disposal doubled clean
-  run_wf "$1" "$(printf '{"spec:":%s,"commit:":%s%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$2" "$3" "${4:+,$4}" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")"
+  review_out 0 >/dev/null; rec CONVERGED >/dev/null; run_wf "$1" "$(printf '{"spec:":%s,"commit:":%s%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$2" "$3" "${4:+,$4}" "$_review_out" "$_rec" "$DISPOSE_OK")"
 }
 # AC1 - placement, prompt, log, and the checklist merged after the resolver's under ONE by-design head.
 o=$(run_pathless "$P_UNITS" "$P_SPEC" "$P_COMMIT" "$P_SUBJ")
@@ -1617,7 +1633,7 @@ has    "GH15 a differing caller path loses to the committed one" "$p" "A-tB-1 | 
 hasnt_ "GH15 ...and is gone from the resolver's roster" "$p" "| spec s1 |"
 has    "GH15 ...and one log line names both" "$o" "log:spec stage: A-tB-1 specPath s1 -> $CPATH"
 # AC3 - the two skips, each logged, neither spawning the stage.
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' '{"authored":[],"alreadyPresent":["A-tB-1","A-tB-2","A-tB-3"],"refused":[],"summary":"s"}' "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' '{"authored":[],"alreadyPresent":["A-tB-1","A-tB-2","A-tB-3"],"refused":[],"summary":"s"}' "$B40" "$B40" "$_review_out" "$_rec" "$DISPOSE_OK")")
 hasnt_ "GH15 nothing authored: no commit stage" "$o" "agent:commit:"
 has    "GH15 ...and the skip says why" "$o" "log:spec stage: no commit — the writers authored no unit of this roster"
 o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
@@ -1647,7 +1663,7 @@ has    "GH15 notAtHead: ...or a resume with pinned subjects" "$o" "git ls-tree H
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:subjects:r1:')
 has    "GH15 the resolver prompt names notAtHead" "$p" '`notAtHead`'
 has    "GH15 ...for a path in the working tree that does not resolve at HEAD" "$p" "EXISTS in the working tree and does NOT resolve at HEAD"
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[],"notAtHead":[{"path":"s3"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[],"notAtHead":[{"path":"s3"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$_review_out" "$_rec" "$DISPOSE_OK")")
 has    "GH15 notAtHead under auditIds: THROWS" "$o" "not at HEAD, so no blob pins them: s3"
 has    "GH15 ...saying subjects cannot stand beside auditIds" "$o" '`subjects` cannot stand beside `auditIds`'
 hasnt_ "GH15 ...and offering no git ls-tree" "$o" "git ls-tree"
@@ -1667,19 +1683,19 @@ o=$(run_pathless "$P_UNITS" "$P_SPEC" "$COMMIT_OK" '"audit:subjects":{"subjects"
 has    "GH15 empty: keeps the refusal operators grep" "$o" "no spec subjects could be pinned at round 1"
 has    "GH15 empty: ...states the cause" "$o" "none resolved at HEAD or exists on disk"
 has    "GH15 empty: ...and ends in the remedy" "$o" 'WITHOUT `resumeFromRunId`'
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$T40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+review_out 0 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$T40" "$_review_out" "$_rec" "$DISPOSE_OK")")
 has    "GH15 dirty: keeps Commit the fold" "$o" "Commit the fold"
 has    "GH15 dirty: ...and names a fresh re-invoke" "$o" 'WITHOUT `resumeFromRunId`'
 hasnt_ "GH15 dirty: ...and never the same arguments again" "$o" "re-invoke with the same arguments"
 CLEAN='{"blockers":null,"confirmed":[],"lensesDead":0,"unverified":0,"report":null,"note":"clean"}'
-o=$(run_wf "$P_UNITS" "$(printf '{"spec:":%s,"commit:":%s,"audit:subjects":{"subjects":[{"path":"zz.md","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s}' "$P_SPEC" "$COMMIT_OK" "$B40" "$B40" "$CLEAN" "$(rec CONVERGED)")")
+rec CONVERGED >/dev/null; o=$(run_wf "$P_UNITS" "$(printf '{"spec:":%s,"commit:":%s,"audit:subjects":{"subjects":[{"path":"zz.md","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s}' "$P_SPEC" "$COMMIT_OK" "$B40" "$B40" "$CLEAN" "$_rec")")
 has    "GH15 clean round over no unit: THROWS" "$o" "covered NO unit"
 has    "GH15 ...with the --plan rebuild and a fresh re-invoke" "$o" 'WITHOUT `resumeFromRunId`'
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"zz.md","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s}' "$SPEC_C" "$B40" "$B40" "$CLEAN" "$(rec CONVERGED)")")
+rec CONVERGED >/dev/null; o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"zz.md","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s}' "$SPEC_C" "$B40" "$B40" "$CLEAN" "$_rec")")
 has    "GH15 clean round under auditIds: THROWS" "$o" "covered NO unit"
 hasnt_ "GH15 ...offering no git ls-tree" "$o" "git ls-tree"
-o=$(run_wf '{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","base":"5eed5eed5eed5eed5eed5eed5eed5eed5eed5eed","subjects":[{"path":"s9","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1}]}' \
-    "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s}' '{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"}' "$CLEAN" "$(rec CONVERGED)")")
+rec CONVERGED >/dev/null; o=$(run_wf '{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","base":"5eed5eed5eed5eed5eed5eed5eed5eed5eed5eed","subjects":[{"path":"s9","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1}]}' \
+    "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s}' '{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"}' "$CLEAN" "$_rec")")
 has    "GH15 caller subjects over pathless units reach the same clean-round THROW" "$o" "covered NO unit"
 has    "GH15 ...with the remedy" "$o" "--plan tB --paths"
 
@@ -1698,7 +1714,7 @@ has    "EL5-AC3 ...and announces that no resolver ran" "$o" 'log:WARNING: no `ch
 EL5_NOSUBJ=$(printf '%s' "$UNITS" | sed 's#"subjects":\[[^]]*\],##')
 # `$SPEC_C`, not `$SPEC_OK`, since the merge with aGraftedHelix: with no caller `subjects` the spec commit
 # stage runs for the authored unit, and with no double for it the call refuses before the resolver.
-build_el5_res() { printf '{"spec:":%s,"audit:subjects":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$1" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK"; }
+build_el5_res() { review_out 0 >/dev/null; rec CONVERGED >/dev/null; printf '{"spec:":%s,"audit:subjects":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$1" "$_review_out" "$_rec" "$DISPOSE_OK"; }
 o=$(run_wf "$EL5_NOSUBJ" "$(build_el5_res '{"subjects":[{"path":"s1","blob":"'"$B40"'","tree":"'"$B40"'"}],"checklist":"# h\n- [ ] a\n- [ ] b\n","checklistPaths":["x"]}')")
 has    "EL5-AC2 the resolver's checklist reaches the callee verbatim" "$(printf '%s\n' "$o" | grep '^wargs:')" '"checklist":"# h\n- [ ] a\n- [ ] b\n"'
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:subjects:')
@@ -1738,7 +1754,7 @@ for el5 in \
   same   "EL5-AC6 ...before the sub-workflow: ${el5#*|}" "$(printf '%s\n' "$o" | grep -c '^workflow:')" "0"
   hasnt_ "EL5-AC6 ...and before any agent: ${el5#*|}" "$o" 'agent:'
 done
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"blockers":3,"confirmed":3,"highs":0,"unverified":0,"report":"r.md","precision":1,"note":"n","confirmedFindings":[{"ref":"f1","claim":"c"}]},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(rec CONVERGING)" "$DISPOSE_OK")")
+rec CONVERGING >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"blockers":3,"confirmed":3,"highs":0,"unverified":0,"report":"r.md","precision":1,"note":"n","confirmedFindings":[{"ref":"f1","claim":"c"}]},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$_rec" "$DISPOSE_OK")")
 has    "EL5-AC7 the CONVERGING return hands back the pinned {path, blob} set" "$o" '"prevSubjects":[{"path":"s1","blob":"abc1234"},{"path":"s2","blob":"def5678"}]'
 has    "EL5-AC7 ...and the callee's confirmedFindings as priorFindings" "$o" '"priorFindings":[{"ref":"f1","claim":"c"}]'
 has    "EL5-AC7 ...and nextAction names both as the args to copy back" "$o" "copy this return's prevSubjects and priorFindings as those args"
@@ -1770,16 +1786,16 @@ hasnt_ "EL5-AC8 ...with no render token left on its line" "$cl" '{{'
 
 # ---- F (id 16): an UNVERIFIED finding the stage judges not a defect has a route. `refuted` is
 # ---- optional, bounded by `unverified`, in the sum, and the severity floors stand.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 2 0 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":2,"folded":0,"refuted":1,"promotedIds":["A-tB-4"],"edges":[],"placements":[{"unit":"A-tB-4","repairs":"none","order":3}],"summary":"r1 refuted: not reachable"}')")
+review_out 0 2 0 1 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" '{"disposed":true,"standing":[],"promoted":2,"folded":0,"refuted":1,"promotedIds":["A-tB-4"],"edges":[],"placements":[{"unit":"A-tB-4","repairs":"none","order":3}],"summary":"r1 refuted: not reachable"}')")
 has    "R2-F promoted 2 + folded 0 + refuted 1 over confirmed 2 + unverified 1: the roster is handed out" "$o" '"roster":[{'
 has    "R2-F ...and refuted travels out" "$o" '"folded":0,"refuted":1'
 has    "R2-F ...and the log counts it" "$o" "promoted 2 · folded 0 · refuted 1"
 p=$(printf '%s\n' "$o" | grep '^prompt:dispose:tB:')
 has    "R2-F the prompt permits refuting an UNVERIFIED finding" "$p" "You may REFUTE an UNVERIFIED finding — never a CONFIRMED one"
 has    "R2-F ...with a one-line reason in summary" "$p" "with a one-line reason per refuted finding in \`summary\`, and count it in \`refuted\`"
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 2 0 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":0,"refuted":2,"promotedIds":[],"summary":"x"}')")
+review_out 0 2 0 1 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$_review_out" "$_rec" '{"disposed":true,"standing":[],"promoted":1,"folded":0,"refuted":2,"promotedIds":[],"summary":"x"}')")
 has    "R2-F refuted 2 above unverified 1 is REFUSED by name" "$o" "refuted 2 is above the 1 unverified"
 has    "R2-F ...with an empty roster" "$o" '"roster":[]'
 o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
@@ -2413,8 +2429,8 @@ build_gh33_writer() { # group · authored-json -> one writer double
   printf '"spec:tB:g%s":{"authored":%s,"alreadyPresent":[],"refused":[],"summary":"s"}' "$1" "$2"
 }
 run_gh33() { # args · writer doubles · commit specs-json -> the run, its commit double and disposal clean
-  run_wf "$1" "$(printf '{%s,"commit:":{"committed":true,"sha":"%s","why":"","specs":%s,"summary":"ok"},"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$2" "$CSHA" "$3" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")"
+  review_out 0 >/dev/null; rec CONVERGED >/dev/null; run_wf "$1" "$(printf '{%s,"commit:":{"committed":true,"sha":"%s","why":"","specs":%s,"summary":"ok"},"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$2" "$CSHA" "$3" "$_review_out" "$_rec" "$DISPOSE_OK")"
 }
 # AC1 - an id, an absolute path and two relative paths reach ONE commit naming all four, and four roster paths.
 GH33_U4='[{"id":"A-tB-1","order":1},{"id":"A-tB-2","order":2},{"id":"A-tB-3","order":3},{"id":"A-tB-4","order":4}]'
@@ -2566,6 +2582,167 @@ o=$(run_pathless "$(build_gh35_args "$GH35_P" "$P_OFF")" "$P_SPEC" "$P_COMMIT" '
 has    "GH35 audit off, a pinned base: the spec commit's checker is pinned" "$(printf '%s\n' "$o" | grep '^prompt:commit:specs:tB:')" "$GH35_PIN"
 hasnt_ "GH35 ...and no WARNING prints" "$o" "$GH35_WARN"
 
+# ---- TOOL-aOrientedCast-4: A STAGE `roles` NAMES SPAWNS AS THAT CATALOGUE ROLE, its prompt stamped and
+# ---- the craft its role carries left out; a stage it does not name is today's call byte for byte and
+# ---- says so in the log. Three runs per side: an audited CONVERGED round, the same with no caller
+# ---- `subjects` so the spec commit and the resolver spawn, and a NON-CONVERGENT round that disposes.
+# ---- The untyped side is held to the CURRENT harness, never to one read out of a historical commit
+# ---- (TOOL-aOrientedCast-15 S1: that oracle redded on every later legitimate prompt edit): a run with
+# ---- no `roles` key prints the same prompts and result as one with `"roles":{}`, each untyped-only
+# ---- span stands in the untyped output and each typed-only span is absent from it, so a typed `hasnt_`
+# ---- and its untyped `has` twin cannot both pass by the text going missing. Every typed, refusal and
+# ---- hand-back arm read RED against the harnesses before roles, which spawn every stage untyped and
+# ---- tell the builder to edit its spec.
+OC_ROLES='{"specWriter":"gov-spec-writer","committer":"gov-x","disposal":"gov-spec-writer","builder":"gov-builder","specFinder":"gov-spec-reviewer","skeptic":"gov-skeptic","synthesis":"gov-synthesizer"}'
+OC_NOB='{"specWriter":"gov-spec-writer","committer":"gov-x","disposal":"gov-spec-writer","specFinder":"gov-spec-reviewer","skeptic":"gov-skeptic","synthesis":"gov-synthesizer"}'
+OC_NOSUB=$(printf '%s' "$UNITS" | sed 's#"subjects":\[[^]]*\],##')
+OC_A=("$UNITS" "$OC_NOSUB" "$UNITS")
+OC_R=("$(returns CONVERGED 0)"
+  "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"%s","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$CPATH" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")"
+  "$(returns NON-CONVERGENT 2)")
+OC_EMPTY='s#"slug":"tB",#"slug":"tB","roles":{},#'
+OC_TYPED='' OC_UNTYPED=''
+for i in 0 1 2; do
+  o=$(run_wf "${OC_A[$i]}" "${OC_R[$i]}")
+  t=$(run_wf "$(printf '%s' "${OC_A[$i]}" | sed 's#"slug":"tB",#"slug":"tB","roles":'"$OC_ROLES"',#')" "${OC_R[$i]}")
+  has    "OC4 AC1 run $i untyped: the harness returns" "$o" "RESULT "
+  has    "OC4 AC2 run $i typed: the harness returns" "$t" "RESULT "
+  hasnt_ "OC4 AC1 run $i untyped: no spawn carries a type nobody passed" "$(printf '%s\n' "$o" | grep '^type:')" "gov-"
+  same "OC4 AC1 run $i untyped: every prompt equals the empty-roles run's, byte for byte" \
+    "$(printf '%s\n' "$o" | grep '^promptjson:')" "$(run_wf "$(printf '%s' "${OC_A[$i]}" | sed "$OC_EMPTY")" "${OC_R[$i]}" | grep '^promptjson:')"
+  [ "$i" = 0 ] && OC_T0="$t"
+  OC_UNTYPED="$OC_UNTYPED$o
+"; OC_TYPED="$OC_TYPED$t
+"
+done
+same   "OC4 AC1 untyped: one log line per stage key says it is untyped" "$(printf '%s\n' "$o" | grep -c '^log:roles: [A-Za-z]* is untyped: no role was passed')" "7"
+same   "OC4 AC1 untyped: no workflow call forwards roles" "$(printf '%s' "$OC_UNTYPED" | grep '^wfroles:' | sort -u)" "wfroles:-"
+same   "OC4 AC2 typed: no spec: agent spawns under another type" "$(printf '%s' "$OC_TYPED" | grep '^type:spec:' | grep -vc ':gov-spec-writer$')" "0"
+has    "OC4 AC2 typed: ...and the spec writers are typed" "$OC_TYPED" "type:spec:tB:g0:gov-spec-writer"
+has    "OC4 AC2 typed: the spec commit spawns as its type" "$OC_TYPED" "type:commit:specs:tB:gov-x"
+has    "OC4 AC2 typed: the disposal spawns as its type" "$OC_TYPED" "type:dispose:tB:gov-spec-writer"
+has    "OC4 AC2 typed: the resolver keeps today's spawn" "$OC_TYPED" "type:audit:subjects:r1:-"
+has    "OC4 AC2 typed: the round recorder keeps today's spawn" "$OC_TYPED" "type:audit:record:r1:-"
+OC_P=$(printf '%s' "$OC_TYPED" | grep '^prompt:spec:')
+has    "OC4 AC2 typed: the spec prompt carries the stamp" "$OC_P" "This stage runs as the gov-spec-writer agent type: your role is your system prompt"
+hasnt_ "OC4 AC2 typed: the spec prompt leaves out the criterion craft" "$OC_P" "stalls for hours"
+hasnt_ "OC4 AC2 typed: ...and the no-code order" "$OC_P" "DO NOT WRITE PRODUCT CODE"
+hasnt_ "OC4 AC2 typed: ...and the reuse craft" "$OC_P" "real probe rather than a claim"
+has    "OC4 AC2 typed: the spec prompt keeps the order sentence, rejoined" "$OC_P" "Otherwise author it, and give its status header the \`order\` verb this roster names."
+has    "OC4 AC2 typed: ...and the id sentence" "$OC_P" "Name every unit in"
+has    "OC4 AC2 typed: the commit prompt carries its stamp" "$(printf '%s' "$OC_TYPED" | grep '^prompt:commit:')" "This stage runs as the gov-x agent type"
+OC_P=$(printf '%s' "$OC_TYPED" | grep '^prompt:dispose:')
+has    "OC4 AC2 typed: the disposal prompt carries its stamp" "$OC_P" "This stage runs as the gov-spec-writer agent type"
+hasnt_ "OC4 AC2 typed: ...and leaves out the edge join's rationale" "$OC_P" "the whole reason that join exists"
+has    "OC4 AC2 typed: ...and still asks for edges" "$OC_P" "Return in \`edges\` EVERY §3 edge bullet"
+OC_P=$(printf '%s' "$OC_UNTYPED" | grep '^prompt:spec:')
+has    "OC4 AC2 untyped: the spans stand in an untyped prompt" "$OC_P" "real probe rather than a claim"
+has    "OC4 AC1 untyped: the spec prompt keeps the criterion craft" "$OC_P" "stalls for hours"
+has    "OC4 AC1 untyped: ...and the no-code order" "$OC_P" "DO NOT WRITE PRODUCT CODE"
+has    "OC4 AC1 untyped: the disposal prompt keeps the edge join's rationale" "$(printf '%s' "$OC_UNTYPED" | grep '^prompt:dispose:')" "the whole reason that join exists"
+hasnt_ "OC4 AC1 untyped: no prompt carries a role stamp" "$(printf '%s' "$OC_UNTYPED" | grep '^prompt:')" "This stage runs as the"
+same   "OC4 AC2 typed: the audit forwards its three review roles" "$(printf '%s' "$OC_TYPED" | grep '^wfroles:' | sort -u)" 'wfroles:{"skeptic":"gov-skeptic","specFinder":"gov-spec-reviewer","synthesis":"gov-synthesizer"}'
+has    "OC4 AC2 typed: ...beside workerType none" "$(printf '%s' "$OC_TYPED" | grep '^wargs:' | head -1)" '"workerType":"none"'
+has    "OC4 AC2 typed: the builder type travels to the child" "$(printf '%s\n' "$OC_T0" | grep '^RESULT')" '"roles":{"builder":"gov-builder"}'
+has    "OC4 AC2 typed: the log names each typed stage" "$OC_T0" "log:roles: specWriter spawns as the gov-spec-writer agent type"
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","roles":'"$OC_NOB"',#')" "$(returns CONVERGED 0)")
+hasnt_ "OC4 AC2 no builder role: dispatch.args carries no roles key" "$(printf '%s\n' "$o" | grep '^RESULT')" '"roles"'
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","roles":{"specWriter":"gov-spec-writer"},#')" "$(returns CONVERGED 0)")
+same   "OC4 AC2 no audit role: the audit forwards no roles" "$(printf '%s\n' "$o" | grep '^wfroles:')" "wfroles:-"
+# AC3 - a malformed or misspelt role refuses by name in either harness, before any spawn.
+for v in '[]' '"gov-x"' '{"specwriter":"gov-x"}' '{"disposal":"bad name"}' '{"committer":"none"}' 'null'; do
+  o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","roles":'"$v"',#')" '{}')
+  has    "OC4 AC3 the build harness REFUSES roles $v" "$o" "THROW unattended-build: \`roles"
+  hasnt_ "OC4 AC3 ...before any spawn for $v" "$o" "agent:"
+done
+OC_CHILD=$(printf "$CHILD_ARGS" unattended)
+for v in '{"specWriter":"gov-x"}' '{"builder":"x y"}' '{"builder":"none"}'; do
+  o=$(run_wf "$(printf '%s' "$OC_CHILD" | sed 's#"slug":"tB",#"slug":"tB","roles":'"$v"',#')" '{}' "$C")
+  has    "OC4 AC3 the unit harness REFUSES roles $v" "$o" "THROW unattended-unit: \`roles"
+  hasnt_ "OC4 AC3 ...before any spawn for $v" "$o" "agent:"
+done
+has    "OC4 AC3 the unit harness names the misspelt key" "$(run_wf "$(printf '%s' "$OC_CHILD" | sed 's#"slug":"tB",#"slug":"tB","roles":{"specWriter":"gov-x"},#')" '{}' "$C")" "specWriter"
+# AC1/AC4 - the child: untyped is base byte for byte and says so; typed is stamped and hands back.
+for m in unattended attended; do
+  o=$(run_wf "$(printf "$CHILD_ARGS" $m)" '{}' "$C")
+  has  "OC4 AC1 child $m untyped: the log says its builder is untyped" "$o" "log:unit A-tB-1: builder is untyped"
+  same "OC4 AC1 child $m untyped: its spawn carries no type" "$(printf '%s\n' "$o" | grep '^type:')" "type:unit:A-tB-1:-"
+  same "OC4 AC1 child $m untyped: its prompt equals the empty-roles run's, byte for byte" \
+    "$(printf '%s\n' "$o" | grep '^promptjson:')" "$(run_wf "$(printf "$CHILD_ARGS" $m | sed "$OC_EMPTY")" '{}' "$C" | grep '^promptjson:')"
+  has    "OC4 AC1 child $m untyped: it is told to change its spec first" "$o" "CHANGE THE SPEC FIRST"
+  hasnt_ "OC4 AC1 child $m untyped: ...and not to hand a divergence back" "$o" "a why that opens DIVERGENCE:"
+  hasnt_ "OC4 AC1 child $m untyped: ...nor the status-only flip" "$o" "changes nothing else in the spec"
+  hasnt_ "OC4 AC1 child $m untyped: ...nor a role stamp" "$(printf '%s\n' "$o" | grep '^prompt:')" "This stage runs as the"
+done
+OC_CT=$(printf '%s' "$OC_CHILD" | sed 's#"slug":"tB",#"slug":"tB","roles":{"builder":"gov-builder"},#')
+o=$(run_wf "$OC_CT" '{}' "$C")
+same   "OC4 AC4 the typed child spawns as gov-builder" "$(printf '%s\n' "$o" | grep '^type:')" "type:unit:A-tB-1:gov-builder"
+has    "OC4 AC4 ...stamped" "$o" "This stage runs as the gov-builder agent type"
+has    "OC4 AC4 ...handing a divergence back" "$o" "a why that opens DIVERGENCE:"
+has    "OC4 AC4 ...with the status-only flip" "$o" "changes nothing else in the spec"
+hasnt_ "OC4 AC4 ...and never told to edit its spec" "$o" "CHANGE THE SPEC FIRST"
+hasnt_ "OC4 AC4 ...nor to close as WONTDO" "$o" "or to WONTDO with a reason"
+o=$(run_wf "$OC_CT" '{"unit:":{"committed":false,"sha":"","why":"DIVERGENCE: §4 names a verb the code lacks","summary":"s"}}' "$C")
+has    "OC4 AC4 a DIVERGENCE: why returns diverged true" "$o" '"diverged":true'
+o=$(run_wf "$OC_CT" '{"unit:":{"committed":false,"sha":"","why":"tests red","summary":"s"}}' "$C")
+has    "OC4 AC4 any other why returns diverged false" "$o" '"diverged":false'
+# AC7 - a roled audit's deferral promises no reuse its judges never wrote; an untyped one's is unchanged.
+# The double carries `blockers: null` as the review harness's every deferred return does (the DP arms'
+# fixture above): without it the harness's returned-nothing refusal reads it as a dead sub-workflow.
+OC_DEF=$(printf '{"spec:":%s,"workflow":{"exit":"deferred-platform","pending":["find:a"],"blockers":null,"durable":%%s,"key":"k"}}' "$SPEC_C")
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","roles":'"$OC_ROLES"',#')" "$(printf "$OC_DEF" false)")
+has    "OC4 AC7 a roled deferral exits deferred-platform" "$o" '"exit":"deferred-platform"'
+has    "OC4 AC7 ...and says every judge is dispatched again" "$o" "dispatches every judge again"
+hasnt_ "OC4 AC7 ...and promises no reuse" "$o" "reuses every lens"
+o=$(run_wf "$UNITS" "$(printf "$OC_DEF" true)" | grep '^RESULT')
+has    "OC4 AC7 an untyped durable deferral promises the reuse" "$o" "reuses every lens"
+same   "OC4 AC7 ...and returns what the empty-roles run returns, byte for byte" \
+  "$o" "$(run_wf "$(printf '%s' "$UNITS" | sed "$OC_EMPTY")" "$(printf "$OC_DEF" true)" | grep '^RESULT')"
+
+# ---- TOOL-aOrientedCast-10: A STAGE `efforts` NAMES SPAWNS AT THAT REASONING EFFORT, independent of
+# ---- `roles`; the audit's three review keys travel to the review call and `builder` in dispatch.args.
+# ---- Every arm reads RED against the parent harnesses, which read no `efforts`: no refusal fires, no
+# ---- spawn carries an `effort` option, nothing is forwarded and no `effort ` line is logged. The same
+# ---- three runs as the roles block above, so every stage this harness spawns is reached.
+OC10_EFF='{"specWriter":"xhigh","committer":"low","disposal":"xhigh","builder":"high","skeptic":"medium","specFinder":"medium","synthesis":"medium"}'
+OC10_ALL=''
+for i in 0 1 2; do
+  t=$(run_wf "$(printf '%s' "${OC_A[$i]}" | sed 's#"slug":"tB",#"slug":"tB","efforts":'"$OC10_EFF"',#')" "${OC_R[$i]}")
+  has    "OC10 AC6 run $i: the harness returns under efforts" "$t" "RESULT "
+  [ "$i" = 0 ] && OC10_T0="$t"
+  OC10_ALL="$OC10_ALL$t
+"
+done
+has    "OC10 AC6 the spec writers spawn at their level" "$OC10_ALL" "effort:spec:tB:g0:xhigh"
+has    "OC10 AC6 the spec commit spawns at its level" "$OC10_ALL" "effort:commit:specs:tB:low"
+has    "OC10 AC6 the disposal spawns at its level" "$OC10_ALL" "effort:dispose:tB:xhigh"
+hasnt_ "OC10 AC6 the resolver and the round recorder carry no level" "$(printf '%s' "$OC10_ALL" | grep '^effort:audit:')" "effort:"
+has    "OC10 AC6 the audit forwards its three review levels" "$OC10_T0" 'wfefforts:{"skeptic":"medium","specFinder":"medium","synthesis":"medium"}'
+has    "OC10 AC6 the builder level travels to the child, alone" "$(printf '%s\n' "$OC10_T0" | grep '^RESULT')" '"efforts":{"builder":"high"}'
+has    "OC10 AC6 the log names each stage's level and source" "$OC10_T0" "log:effort specWriter: xhigh — efforts.specWriter"
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","efforts":{"skeptic":"medium"},#')" "$(returns CONVERGED 0)")
+has    "OC10 AC6 a skeptic level alone reaches the review call" "$o" 'wfefforts:{"skeptic":"medium"}'
+hasnt_ "OC10 AC6 ...and dispatch.args carries no efforts" "$(printf '%s\n' "$o" | grep '^RESULT')" '"efforts"'
+has    "OC10 AC6 ...and the log says the builder runs at its type's level" "$o" "log:effort builder: the agent type's own, else the session's — no efforts.builder"
+o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
+hasnt_ "OC10 AC6 absent: no spawn carries a level and nothing is forwarded" "$(printf '%s\n' "$o" | grep -E '^(effort|wfefforts):')" ":"
+for v in '[]' '{"finder":"high"}' '{"skeptic":"High"}' 'null'; do
+  o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","efforts":'"$v"',#')" '{}')
+  has    "OC10 AC6 the build harness REFUSES efforts $v" "$o" "THROW unattended-build: \`efforts\`"
+  hasnt_ "OC10 AC6 ...before any spawn for $v" "$o" "agent:"
+done
+o=$(run_wf "$(printf '%s' "$OC_CHILD" | sed 's#"slug":"tB",#"slug":"tB","efforts":{"builder":"max"},#')" '{}' "$C")
+same   "OC10 AC6 the unit harness spawns its builder at its level" "$(printf '%s\n' "$o" | grep '^effort:')" "effort:unit:A-tB-1:max"
+has    "OC10 AC6 ...and logs it" "$o" "log:effort builder: max — efforts.builder"
+o=$(run_wf "$(printf '%s' "$OC_CHILD" | sed 's#"slug":"tB",#"slug":"tB","roles":{"builder":"gov-builder"},"efforts":{"builder":"high"},#')" '{}' "$C")
+same   "OC10 AC6 a typed builder takes its level too" "$(printf '%s\n' "$o" | grep -E '^(type|effort):')" "type:unit:A-tB-1:gov-builder
+effort:unit:A-tB-1:high"
+for v in '[]' '{"finder":"high"}' '{"builder":"High"}'; do
+  o=$(run_wf "$(printf '%s' "$OC_CHILD" | sed 's#"slug":"tB",#"slug":"tB","efforts":'"$v"',#')" '{}' "$C")
+  has    "OC10 AC6 the unit harness REFUSES efforts $v" "$o" "THROW unattended-unit: \`efforts\`"
+  hasnt_ "OC10 AC6 ...before any spawn for $v" "$o" "agent:"
+done
+
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
 # over it, 326 at 1d8530e7 (TOOL-aWokenSentinel-21) — at ~10 % headroom, rounded down, because the
@@ -2627,7 +2804,20 @@ hasnt_ "GH35 ...and no WARNING prints" "$o" "$GH35_WARN"
 # node a, 2026-10-06. All of them sit on the path a green run takes.
 # MERGED 379 -> 566 at the reconcile of local main into origin/main: base 379, plus aMendedFleet's 1
 # (380) and aGraftedHelix's 186 (565).
-FLOOR_ASSERTIONS=566
+# RAISED 566 -> 612 by TOOL-aOrientedCast-4: 46 of its 49 static sites, counted with the grep above as
+# 692 at the unit's parent and 741 after. The three left out compare against the harnesses at the
+# unit's base and skip out loud where that commit is absent. Its loops run them 74 times on a slice of
+# the block behind this prologue on node a, 2026-10-11, and 47 of those read RED on the base harnesses.
+# RAISED 612 -> 631 by TOOL-aOrientedCast-10: its 19 static sites, counted by hand off the OC10 block —
+# the three-run loop (1), the spawned levels and forwarding (7), the skeptic-only run (3), the absent
+# run (1), the build refusal loop (2), the unit's level, log and typed level (3) and its refusal loop
+# (2). Its loops run them 31 times. Not measured by a run: the pass that wrote it runs no suite.
+# RAISED 631 -> 643 by TOOL-aOrientedCast-15: the three OC4 byte comparisons no longer skip, since
+# they compare with an empty-roles run of the current harness rather than a historical commit (3),
+# and nine new static sites, counted by hand off the OC4 block — the untyped spec and disposal spans
+# and the stamp's absence (4), the child loop's four spans (4) and the deferral's reuse span (1). Its
+# loops run the twelve 19 times. Not measured by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=643
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

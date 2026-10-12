@@ -52,6 +52,35 @@
 #                limit, the HIGHER of the two; a host with neither reads INERT and says so.
 #                `GATE_MEMPAUSE=<pct>` overrides the row's value alone. TOOL-aGraftedHelix-7.
 #
+#   spawnpause=<n>  hold the NEXT dispatch while one process creation costs over <n> times this
+#                clone's recorded spawn floor (`<git-common-dir>/gate-spawn-floor`, the lowest the
+#                bar has measured) and a leg is still running; 0 = off, which is what a row that
+#                omits it gets, and above 1000 is refused. A whole multiple, because the floor
+#                differs tenfold between nodes with the same core count, so an absolute figure would
+#                call one node permanently loaded. The reading is three timed spawns on each census
+#                tick, so it lags by up to a period. It shares the memory pause's episodes and every
+#                one of its release rules, so it too costs speed and never a leg. With no floor
+#                recorded it is INERT and says so. A run with it on prints a `spawn:` line after the
+#                `memory:` line. Every row below declares 0, DARK: the width A/B that sets each
+#                row's value from loaded runs is owed (TOOL-aSparedSpawn-2 S1). TOOL-aSparedSpawn-2.
+#
+#   slots=<n>    how many bars the host turnstile admits at once; a row that omits it gets 1, the
+#                one-bar-per-host behaviour, and 0 is refused. It schedules bars and never legs: a
+#                bar admitted beside another runs every leg it would have run alone.
+#                `GATE_TURNSTILE_SLOTS=<n>` overrides the row's value alone, and a malformed one is
+#                ignored with a NOTE. A host admits the LARGEST count any of its repositories
+#                declares, because every runner claims among its own slots and all share slot 1.
+#                A row's value is a measurement on that hardware, argued beside the row; node
+#                `a`'s comes from the two-bar A/B of TOOL-aPairedSlots-9. TOOL-aPairedSlots-1.
+#
+# THE CALIBRATED WIDTH is not a knob: `bash <prefix>/run-gates/run-gates.sh --calibrate-width` times
+# concurrent spawn loops at 1, 2, 4, 6 and 8 and caches the smallest that comes within the runner's
+# CALIBRATE_THETA percent of the best rate in `<git-common-dir>/gate-host-calibration`. A bar reads
+# that cache and, when it is well formed, under seven days old and from this boot, runs at the LOWER
+# of the row's width and the pick: the row's `width` is a cap a measurement may narrow and never
+# widen. `GATE_JOBS` outranks both. A host never calibrated runs at the row's width, and the profile
+# line says `uncalibrated` and why. TOOL-aSparedSpawn-2.
+#
 # OVERRIDES: `GATE_PROFILE=<name>` selects a row by name and skips detection. `GATE_PROFILES=<path>`
 # points at a different table; a path that does not exist falls back to the built-in formula, which
 # is the documented rollback for this whole mechanism. `GATE_JOBS=<n>` overrides the WIDTH alone and
@@ -87,7 +116,7 @@
 # `minimal` row below already declares, and it clears the largest ceiling with the pool term to
 # spare. The wedged-bar bound this buys is six hours rather than three; that is the price of a
 # verdict that means something.
-capable	8	24000	width=8,timeout=0,wall=21600,mempause=90
+capable	8	24000	width=8,timeout=0,wall=21600,mempause=90,spawnpause=0
 
 # --- the 4-core class ------------------------------------------------------------------------------
 # Deliberately BEHAVIOUR-NEUTRAL: the built-in formula already yields width 4 there. Moving the
@@ -95,11 +124,11 @@ capable	8	24000	width=8,timeout=0,wall=21600,mempause=90
 # matters, and a knob whose first landing is also its first behaviour change has no control. This
 # row's PURPOSE is its RAM threshold of zero paired with the row above: it is what a high-core,
 # low-RAM box falls to.
-modest	4	0	width=4,timeout=0,wall=21600,mempause=90
+modest	4	0	width=4,timeout=0,wall=21600,mempause=90,spawnpause=0
 
 # --- the catch-all, and the detection-failure row --------------------------------------------------
 # Zero thresholds, so it can never fail to match. Width 2 rather than 1 because unknown hardware is
 # slow, not serial-only. Removing this row is an operator error and the runner refuses rather than
 # silently falling through to the built-in formula: absent and unmatchable are different states and
 # only one of them is a mistake.
-minimal	0	0	width=2,timeout=0,wall=21600,mempause=90
+minimal	0	0	width=2,timeout=0,wall=21600,mempause=90,spawnpause=0

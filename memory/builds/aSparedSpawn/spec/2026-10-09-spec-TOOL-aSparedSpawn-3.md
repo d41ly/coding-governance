@@ -1,10 +1,14 @@
 # TOOL-aSparedSpawn-3 — a ceiling-killed leg retries in the pool's drain tail, and a bar with no ledger dispatches longest-first
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-11-build-TOOL-aSparedSpawn-3-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-3-acceptance-ledger.md) | journal | — |
+| [2026-10-11-prompt-TOOL-aSparedSpawn-3-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-3-build-brief.md) | journal | — |
+| [2026-10-12-review-TOOL-aSparedSpawn-1-15-closing-diff-round1.md](../reviews/2026-10-12-review-TOOL-aSparedSpawn-1-15-closing-diff-round1.md) | diff-review | TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14 TOOL-aSparedSpawn-15 |
 
 <!-- /gen:spec-records -->
 
@@ -25,8 +29,10 @@ much of that holds.
   rather than when the manifest-order reader reaches the leg. Observed by AC1.
 - **S2** — The dispatch pass, once every first attempt is dispatched, starts `runleg <i> .retry` as a
   pool job for a marked leg with no retry yet, whenever the running count is at most one. Markers are
-  found with a glob, so the decision forks nothing. The job writes the pid file the wall reads, and the
-  memory pause applies to it as to any dispatch. Observed by AC1 and AC3.
+  found with a glob and a released leg is remembered in a shell list, never by the retry's pid file,
+  which the job writes asynchronously; so the decision forks nothing until a marker is unreleased, and
+  only then counts the running jobs. The job writes the pid file the wall reads, and the memory pause
+  applies to it as to any dispatch. Observed by AC1 and AC3.
 - **S3** — `report_one` keeps its deferral rule and its `GATE retry` line, wording per F2.
   `run_leg_retry`, after the drain, reads a tail attempt's result where one exists. A pass prints
   `GATE ok    <leg>  (retried after timeout)`, counts in `retried` and appends the `retry-passed`
@@ -35,14 +41,24 @@ much of that holds.
 - **S4** — A tail attempt that does not pass is handled as F1 rules. Under the recommended (a), its
   files are set aside under a suffix of their own and the leg runs today's serial retry, alone, so every
   red retry verdict and every HOST reading still comes from an attempt that ran alone after the drain.
-  Observed by AC4.
+  The suffix is `.tail`: `<i>.retry.*` in the work dir and the run dir become `<i>.tail.*`, so the
+  set-aside row stays a `.leg` reading with its foreign count, and the drift report's `*.retry.leg`
+  glob does not count it as a second retry. The tail attempt's processes are verified gone before the
+  serial retry exactly as the first attempt's are, and a survivor blocks HOST the same way; that HOST
+  note now reads `an earlier attempt left processes running`, since it can name either. Observed by AC4.
 - **S5** — Dispatch priority in the legs-parse python (`run-gates.sh:2005`), per leg, in this order:
   the ledger's seconds; else the largest `ceiling-evidence.txt` reading for that leg, the file resolved
   beside the runner's own kit dir; else its declared `ceiling` divided by the median ceiling-to-evidence
-  ratio over the legs carrying both, computed in the same pass; else 0. The hint stays advisory and the
-  reporting walk stays manifest order. Observed by AC5 and AC6.
+  ratio over the legs carrying both, computed in the same pass, or divided by 1 when no leg carries
+  both, so ceiling-only legs still rank among themselves; else 0. The evidence file is read by the
+  path the manifest is, relative to the root the runner runs from, and an unreadable one is a missing
+  prior. The hint stays advisory and the reporting walk stays manifest order. Observed by AC5 and AC6.
 - **S6** — `tools/run-gates/README.md`'s retry section and dispatch-hint text describe the tail
   release and the priors. NOT OBSERVED: prose.
+- **S7** — The ledger merge carries forward every row this run did not measure, including when it
+  measured none. Its awk keys the first file by `FILENAME == ARGV[1]` instead of `NR == FNR`, which
+  holds for every line of the old ledger when the run wrote no row (every leg reused or guard-skipped)
+  and so dropped them all. Adopted from TOOL-aSparedSpawn-1's pass, which found it. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -96,8 +112,10 @@ moves, plus the `GATE retry` wording if F2 picks (a).
 - `tools/run-gates/run-gates.test.sh` — the tail-release and fallback arms beside the retry arms.
 - `tools/run-gates/run-gates.evidence.test.sh` — the record-row arms and the dispatch-order arms.
 - `tools/run-gates/profile_bar.test.sh` — its `GATE retry` fixture lines, if F2 rewords.
+- `tools/run-gates/foreign-prefix.gov.test.sh` — its baseline walk reads every `.leg` but a
+  `.retry.leg` as a first attempt, so it skips a `.tail.leg` too (rev-2).
 - `tools/run-gates/README.md` — the retry section and the dispatch hint.
-- `tools/run-gates/kit.toml` — the kit version, moved once for the build.
+- `tools/run-gates/kit.toml` — the kit version, moved once for the build by the main loop, not here.
 
 ### Alternatives rejected
 
@@ -140,6 +158,8 @@ moves, plus the `GATE retry` wording if F2 picks (a).
 - **AC6** — When a ledger row exists for one leg and evidence rows for all three, the ledger's seconds
   place that leg; a leg with neither is placed by its scaled `ceiling`. Red when: the evidence outranks
   the ledger, or a ceiling-only leg sorts as zero.
+- **AC7** — When a bar whose every leg is reused runs over a ledger holding that leg's row, the ledger
+  still holds the row afterwards. Red when: the ledger is left empty, which the `NR == FNR` merge does.
   cost: each arm drives the real runner over a fixture with sleeps of a few seconds; the tail arms need
   a second leg that outlasts a ceiling and a retry.
 
@@ -157,6 +177,7 @@ moves, plus the `GATE retry` wording if F2 picks (a).
 `spec tokens (a spec's own names resolve)`
 
 New arm: tools/run-gates/run-gates.test.sh · covers AC1 AC2 AC3 AC4 · a release after `wait`, a tail pass printed twice, a tail job with no pid file, and a tail timeout issuing FAIL · its `FLOOR_ASSERTIONS` rises by the assertions added
+New arm: tools/run-gates/run-gates.test.sh · covers AC7 · the ledger merge keyed on `NR == FNR` · its `FLOOR_ASSERTIONS` rises by the assertion added
 New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC5 AC6 · the sort key reading only the ledger, then the evidence ahead of the ledger · its `FLOOR_ASSERTIONS` rises by the assertions added
 
 ## 8. Open questions
@@ -169,16 +190,26 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC5 AC6 · the sor
     `not alone, HOST not measured` when it had a neighbour. Fewer runs, but a contended second timeout
     becomes a FAIL that today's alone retry would have passed.
   - Recommendation: (a).
+  - RESOLVED (owner, 2026-10-10): (a) nothing; only a pass is final from the tail.
 - **F2 — Does the `GATE retry` line keep its bytes?** Its tail says `one serial retry after the pool
   drains`, which a tail release makes inexact.
   - (a) Reword it to name both, moving the README line, the canary's AC1 pattern and the
     `profile_bar.test.sh` fixture lines in the same commit.
   - (b) Keep the bytes; no reader moves, and the line stays true only of the fallback.
   - Recommendation: (a); every reader is in this kit and the split is on the head and the leg name.
+  - RESOLVED (owner, 2026-10-10): (a) reword the line and move its three readers. The tail reads
+    `retried in the pool's tail, and alone after it drains unless that passes` (rev-2).
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-12 · S7 and AC7 adopt the ledger carry-forward defect TOOL-aSparedSpawn-1's pass
+  found; S2 remembers a released leg in a shell list, since the retry's pid file is written
+  asynchronously and a second pass could release it twice; S4 names the `.tail` suffix, verifies the
+  tail attempt clear before the serial retry, and moves the uncleared HOST note to `an earlier
+  attempt`; the foreign-prefix baseline walk joins the files touched, since it would read a
+  `.tail.leg` as a first attempt; S5 divides by 1 when no leg carries both a ceiling and a reading;
+  F2 records the chosen wording.
 
 ## 10. Reuse audit
 

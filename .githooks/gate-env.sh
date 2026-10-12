@@ -78,6 +78,10 @@
 #                             red's ask is escalated BLOCKER. It decides no landing.
 #                             PARSED at the remote's tip by the hook and the unattended driver, never
 #                             read from the sourced value; see the policy block below.
+#   GATE_WSL_MIRROR_DEFAULT=<path> the WSL mirror a node uses when its own `gate-wsl.conf` names none.
+#   GATE_WSL_PARITY_RUNS=<n>  the consecutive agreeing paired runs before `held-green` is written.
+#                             Both PARSED by `held_halves.py`, never sourced; a node's distro and
+#                             mirror are its own, in `<git-common-dir>/gate-wsl.conf` (TOOL-aSparedSpawn-5).
 # THIS FILE IS VETTED BEFORE IT IS SOURCED (TOOL-aRepatriatedFork-5, closing review round 1 H1): the
 # hook sources it only when it is tracked at the pushed sha and its working copy matches, and refuses
 # the push otherwise, so an ignored or excluded copy cannot set the test escape or `exit 0`.
@@ -102,3 +106,9 @@ INHERITED_RED_MAX_AGE=10
 # that changes nothing outside them is doc-only, and its bar skips each leg that DECLARES `doc_reads`
 # and none of whose paths moved. Read by .githooks/pre-push AT R, never from the tree being pushed.
 GATE_DOC_PATHS="memory/ README.md AGENTS.md CLAUDE.md WIRE-INTO-PROJECT.md coding-governance-agents.template.md"
+# THE SPLIT HELD TIER (TOOL-aSparedSpawn-5, owner rulings F1 and F2 of 2026-10-10). What every node
+# shares: the default WSL mirror and the trust threshold. A node's distro and its own mirror path are
+# one machine's facts and live in that clone's `<git-common-dir>/gate-wsl.conf`, never here, so no
+# node can lower the threshold for itself. Read by `held_halves.py`, which parses and never sources.
+GATE_WSL_MIRROR_DEFAULT=/c/projects/coding-governance
+GATE_WSL_PARITY_RUNS=3

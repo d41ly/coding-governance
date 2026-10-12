@@ -22,6 +22,11 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "canary: not inside a git repositor
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "canary: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
+# Fixture identity and line endings for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true. No
+# arm runs status, diff or add on this tree, which is what makes the environment safe here (S5).
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@e GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@e
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 # The resolver, INLINED byte-identically from <prefix>/lib/resolve-python.sh -- this harness SHIPS
 # with the kit and <prefix>/lib/ never travels. Enrols itself in the parity population, which is
 # grep-derived from the marker below (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/` S2).
@@ -66,7 +71,8 @@ KIT="${KIT_REL##*/}"
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -103,7 +109,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -122,7 +128,18 @@ fail=0
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
 # 324 -> 326, TOOL-dLadderedRemote-2: the two arms of the canary's ladder-refusal pass, counted off the arm.
-FLOOR_ASSERTIONS=326
+# 326 -> 347, TOOL-aSparedSpawn-2: the pin arm's runner-set half and section 12's 20. Not 348: arm
+# 12c's other-boot half SKIPS on a host with no readable /proc/uptime, so the floor is that count.
+# 347 -> 356, TOOL-aSparedSpawn-3: arm 9d's AC7 ledger-row assertion and the eight tail-release
+# assertions of 9k to 9m, those behind the `timeout` gate counted on a host without one as well (30 -> 38).
+# 356 -> 381, TOOL-aSparedSpawn-12: section 13's 25 held-tier selection assertions, none of them gated.
+# RAISED 381 -> 388 by TOOL-aSparedSpawn-16: arm 12a2's two calibrate refusals, arm 9d2's two reuse tails,
+# arm 9d3's unmeasured-key line, and arm 9f's two cache-entry assertions, those behind the `timeout` gate
+# counted on a host without one as well (38 -> 40). Counted off the arms; this pass runs no suite.
+# 326 -> 339, TOOL-aPairedSlots-15: section 11s's nine checks (TOOL-aPairedSlots-1), which left this
+# floor where it was, and its four ceiling checks, counted off the arm.
+# 388 + 339 -> 401, TOOL-aSparedSpawn-34, the merge of local main: base 326, plus 62 and 13.
+FLOOR_ASSERTIONS=401
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -201,8 +218,8 @@ if bad:
     print("canary: malformed leg(s) (empty name, argv len < 2, or argv[0] not in {bash,python,python3,node}): " + ", ".join(bad)); sys.exit(1)
 ' "$LEGS_FILE" || fail=1
 
-# 1a. THE MANIFEST KEY SET. Every row carries `name` and `argv`, may carry `guard` and `impure`,
-#     and carries nothing else. A mistyped `impure` — `impur`, `Impure`, `inpure` — is otherwise
+# 1a. THE MANIFEST KEY SET. Every row carries `name` and `argv`, may carry `guard`, `reads` or the
+#     legacy `impure` and the other pinned keys, and carries nothing else. A mistyped `impure` — `impur`, `Impure`, `inpure` — is otherwise
 #     silent: the reuse path reads the key it knows, finds nothing, and treats a leg whose verdict
 #     depends on a remote as reusable on a byte-identical tree. The typo is the whole failure
 #     mode, so the pin is on the SET rather than on any one key.
@@ -220,7 +237,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling", "signature", "doc_reads"}
+KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads"}
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -343,7 +360,7 @@ io.open(d + "/unbounded.json", "w", encoding="utf-8", newline="\n").write(json.d
 CEILPY
 # A SCRATCH REPO, cwd and all. $KITDIR/run-gates.sh is absolute and GATE_LEGS is explicit, so
 # nothing else moves; the runner's git dir and the turnstile beacon both follow cwd.
-_cr=$(mktemp -d); ( cd "$_cr" && git init -q . && git commit -q --allow-empty -m base ) >/dev/null 2>&1
+_cr=$(mktemp -d); ( cd "$_cr" && git init -q --template= . && git commit -q --allow-empty -m base ) >/dev/null 2>&1
 _bout=$(cd "$_cr" && GATE_LEGS="$_cd/bounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
 case "$_bout" in
   *"GATE FAIL  slow bounded"*"timed out after 2s"*) ;;
@@ -556,7 +573,7 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling", "signature", "doc_reads"}
+KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads"}
 legs = json.load(open(sys.argv[1]))
 sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
 ' "$1"; }
@@ -582,6 +599,16 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"],"doc_read":[]}]' > "$ctl/drtypo
 if keyset_probe "$ctl/dr.json" && ! keyset_probe "$ctl/drtypo.json"; then :
 else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`doc_reads\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
+# ...and `reads`, the tenth (TOOL-aSparedSpawn-13 S1), by the same two halves: a mistyped `reads` leaves
+# a leg that reads history, a base, the clock or a remote keyed on its tree alone.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"reads":{"remote":"probes the remote"}}]' > "$ctl/rd.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"read":{"remote":"probes the remote"}}]' > "$ctl/rdtypo.json"
+if keyset_probe "$ctl/rd.json" && ! keyset_probe "$ctl/rdtypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`reads\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
 rm -rf "$ctl"
@@ -726,7 +753,7 @@ cat > "$SCRATCH/${PFX}gate-legs.json" <<'JSON'
   {"name": "delta fast", "argv": ["bash", "fx/mid.sh", "delta"]}
 ]
 JSON
-( cd "$SCRATCH" && git init -q . && git config user.email t@e && git config user.name t ) >/dev/null 2>&1
+( cd "$SCRATCH" && git init -q --template= . ) >/dev/null 2>&1
 
 # CLEARS fx/ts FIRST. Without it the width-1 run reads the width-4 run's records and the negative
 # control passes on stale evidence -- this repo's fixture-passes-by-finding-nothing class exactly.
@@ -1013,7 +1040,7 @@ import json, sys
 json.dump([{"name": "l%02d" % i, "argv": ["bash", "fx/a.sh"]} for i in range(30)],
           open(sys.argv[1], "w", newline="\n"), indent=1)
 ' "$SCRATCH/many/${PFX}gate-legs.json"
-( cd "$SCRATCH/many" && git init -q . && git config user.email t@e && git config user.name t ) >/dev/null 2>&1
+( cd "$SCRATCH/many" && git init -q --template= . ) >/dev/null 2>&1
 #     The ABSENCE of "(no result)" is not on its own an assertion: a fixture that never ran has none
 #     either. Two breakages were reproduced passing this arm silently — a missing manifest, and an
 #     omitted `git init`, which is worse, because `git rev-parse --show-toplevel` then walks UP to the
@@ -1050,7 +1077,7 @@ cat > "$G/${PFX}gate-legs.json" <<'JSON'
   {"name": "plain two", "argv": ["bash", "fx/a.sh"]}
 ]
 JSON
-( cd "$G" && git init -q -b main . && git config user.email t@e && git config user.name t \
+( cd "$G" && git init -q --template= -b main . \
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 # Pass 1 with no origin ref: BASE is unresolvable, changed() fails SAFE to "run", so all three legs
 # execute and all three land a timing row. This is also the arm for that fail-safe.
@@ -1114,7 +1141,7 @@ cat > "$S/${PFX}gate-legs.json" <<'JSON'
   {"name": "an undeclared leg", "argv": ["bash", "fx/a.sh"]}
 ]
 JSON
-( cd "$S" && git init -q -b main . && git config user.email t@e && git config user.name t \
+( cd "$S" && git init -q --template= -b main . \
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 
 # OFF: the kit leg is held, and it is held with its OWN verb. Not `skip`, whose tail says
@@ -1189,7 +1216,7 @@ cat > "$S2/${PFX}gate-legs.json" <<'JSON'
   {"name": "h kit two",  "argv": ["bash", "fx/a.sh"], "subject": "kit",  "chunk": "held"}
 ]
 JSON
-( cd "$S2" && git init -q -b main . && git config user.email t@e && git config user.name t \
+( cd "$S2" && git init -q --template= -b main . \
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 
 o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
@@ -1248,7 +1275,7 @@ cat > "$S3/${PFX}gate-legs.json" <<'JSON'
   {"name": "k two", "argv": ["bash", "fx/a.sh"], "subject": "kit"}
 ]
 JSON
-( cd "$S3" && git init -q -b main . && git config user.email t@e && git config user.name t \
+( cd "$S3" && git init -q --template= -b main . \
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 
 o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 ); rc=$?
@@ -1371,7 +1398,7 @@ cat > "$D/${PFX}gate-legs.json" <<'JSON'
   {"name": "undeclared",   "argv": ["bash", "fx/a.sh"]}
 ]
 JSON
-( cd "$D" && git init -q -b main . && git config user.email t@e && git config user.name t \
+( cd "$D" && git init -q --template= -b main . \
   && git add -A && git commit -qm fx && printf 'a2\n' > notes/a.md && git commit -qam a ) >/dev/null 2>&1
 _db=$( cd "$D" && git rev-parse HEAD~1 )
 o=$( cd "$D" && GATE_FULL= GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=$_db GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
@@ -1459,11 +1486,11 @@ n=$((n+1))
 #    no skip when the shipped table is edited or removed, and lets the arms name exact readings.
 #    Exactly ONE arm reads the shipped table (4e), because its subject IS that file's own content.
 P="$SCRATCH/prof"
-# EVERY WRITE BELOW LANDS IN $P, INCLUDING A `<prefix>/gate-legs.json` and a `git config user.email`.
+# EVERY WRITE BELOW LANDS IN $P, INCLUDING A `<prefix>/gate-legs.json` and a `git init`.
 # Assert first that $P is not inside the repo under test — by GIT IDENTITY, never by comparing path
 # strings, because under MSYS one directory has two spellings and mount points are not symlinks. A
 # scratch resolving into the real tree would overwrite the bar's own leg manifest with a two-leg
-# fixture and rewrite this repo's commit identity.
+# fixture and re-initialise this repo's git dir.
 #
 # IT EXITS, and it runs BEFORE the mkdir. The first spelling printed REFUSING, set `fail=1`, and then
 # performed every write it had just refused — there is no `set -e` here, so a message is not a stop.
@@ -1497,7 +1524,7 @@ cat > "$P/${PFX}gate-legs.json" <<'JSON'
   {"name": "two", "argv": ["bash", "fx/a.sh"]}
 ]
 JSON
-( cd "$P" && git init -q . && git config user.email t@e && git config user.name t ) >/dev/null 2>&1
+( cd "$P" && git init -q --template= . ) >/dev/null 2>&1
 runp() { ( cd "$P" && env GATE_FULL= GATE_BASE= "$@" bash $KIT_REL/run-gates.sh 2>&1 ); }
 profline() { printf '%s\n' "$1" | grep '^gate profile: ' | head -1; }
 # A LEG's own measured seconds, from the timing cache the runner writes for the next run's dispatch
@@ -1556,7 +1583,18 @@ printf '%s\n' "$o" | grep -q 'big' \
 #     the only forcing function a coverage knob would ever meet.
 # `mempause` joined at TOOL-aGraftedHelix-7: it holds a dispatch while used memory is high and every
 # hold ends, so it costs speed and never a leg — read against the invariant before it was pinned.
-PINNED_KNOBS="mempause timeout wall width"
+# `spawnpause` joined at TOOL-aSparedSpawn-2: the same holds on a second reading, the same release
+# rules, so the same verdict against the invariant. `slots` joined at TOOL-aPairedSlots-1: it
+# schedules bars and never legs.
+PINNED_KNOBS="mempause slots spawnpause timeout wall width"
+# THE RUNNER'S OWN SET IS GRADED TOO, not only the table's: a knob added to KNOWN_KNOBS that no row
+# declares yet would otherwise pass this arm, which is the case TOOL-aSparedSpawn-2 AC7 names.
+n=$((n+1))
+_rkn=$(sed -n 's/^KNOWN_KNOBS="\([^"]*\)".*/\1/p' "$KITDIR/run-gates.sh" | head -1)
+[ -n "${_rkn// /}" ] || { echo "canary: no KNOWN_KNOBS=\"…\" line read from $KITDIR/run-gates.sh, so the runner's set is compared against nothing"; fail=1; }
+for k in $_rkn; do
+  case " $PINNED_KNOBS " in *" $k "*) ;; *) echo "canary: run-gates.sh implements knob key '$k', which is not in this suite's pinned set ($PINNED_KNOBS). Read the governing invariant in the table's header before adding it: no knob may ever turn a leg into a PASS or a SKIP."; fail=1 ;; esac
+done
 PTBL="$KITREL/gate-profiles.txt"
 n=$((n+1))
 if [ ! -f "$PTBL" ]; then
@@ -1993,7 +2031,7 @@ printf '%s\n' '[' \
   '  {"name": "ga leg", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
   '  {"name": "gb leg", "argv": ["bash", "fx/a.sh"], "guard": ["gb/"]}' \
   ']' > "$BB/${PFX}gate-legs.json"
-( cd "$BB" && git init -q -b main . && git config user.email c@t && git config user.name c \
+( cd "$BB" && git init -q --template= -b main . \
    && git add -A && git commit -qm seed \
    && git remote add origin ../origin.git \
    && git update-ref refs/remotes/origin/main HEAD \
@@ -2041,7 +2079,7 @@ printf '%s\n' '[' \
   '  {"name": "gamma", "argv": ["bash", "fx/a.sh"], "chunk": "one"},' \
   '  {"name": "delta", "argv": ["bash", "fx/a.sh"]}' \
   ']' > "$CK/${PFX}gate-legs.json"
-( cd "$CK" && git init -q -b main . && git config user.email c@t && git config user.name c \
+( cd "$CK" && git init -q --template= -b main . \
    && git add -A && git commit -qm seed ) >/dev/null 2>&1
 cout=$( cd "$CK" && env GATE_FULL=1 bash $KIT_REL/run-gates.sh 2>&1 )
 # SNAPSHOT THE SUMMARY NOW. Every run overwrites it, and the all-skipped fixture below runs a
@@ -2107,7 +2145,7 @@ mkdir -p "$_wd/${PFX}${KIT}" "$_wd/${PFX}${LIB}"
 cp "$ROOT/$KITREL/run-gates.sh" "$ROOT/$KITREL/gate-profiles.txt" "$_wd/${PFX}${KIT}/" 2>/dev/null
 cp "$ROOT/$KITREL/gate-fingerprint.sh" "$_wd/${PFX}${KIT}/" 2>/dev/null || true
 cp "$ROOT/${LIB_DIR}/resolve-python.sh" "$_wd/${PFX}${LIB}/" 2>/dev/null || true
-( cd "$_wd" && git init -q -b main . && git config user.email w@t.invalid && git config user.name w ) >/dev/null 2>&1
+( cd "$_wd" && git init -q --template= -b main . ) >/dev/null 2>&1
 printf 'x\n' > "$_wd/file.txt"
 printf '#!/bin/sh\n( sleep 120 ) &\nsleep 120\n' > "$_wd/slow.sh"
 printf '[\n { "name": "slow leg", "argv": ["bash", "slow.sh"], "chunk": "product", "subject": "repo", "ceiling": 600 }\n]\n' > "$_wd/legs.json"
@@ -2255,8 +2293,7 @@ build_attr_fixture() { # dir — R committed, L in the working tree
   for k in 2 3 5 6 8 9 10 11 12 13 14 15 16; do mkdir -p "$d/fx$k"; done
   cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
-  ( cd "$d" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
-      && git config core.autocrlf false ) >/dev/null 2>&1
+  ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   # THREE SIGNATURE LEGS, each in a directory of its own with its data OUTSIDE it: a checker's
   # directory is its comparator, so a data file beside it would read every change to it as OWN.
   for k in off c f; do
@@ -2439,8 +2476,7 @@ git -C "$A1" checkout -q -- "$KIT_REL/run-gates.sh" 2>/dev/null
 # AC3's summary over ONE red leg, driven through a second TRACKED manifest.
 A3="$AT/a3"; mkdir -p "$A3/$KIT_REL"
 cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$A3/$KIT_REL/" 2>/dev/null
-( cd "$A3" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
-    && git config core.autocrlf false ) >/dev/null 2>&1
+( cd "$A3" && git init -q --template= -b main . ) >/dev/null 2>&1
 printf '[\n  {"name": "absent", "argv": ["bash", "fx4/new.sh"]}\n]\n' > "$A3/$ATL"
 ( cd "$A3" && git add -A && git commit -qm R ) >/dev/null 2>&1
 mkdir -p "$A3/fx4"; printf '#!/usr/bin/env bash\necho "FAIL new"\nexit 1\n' > "$A3/fx4/new.sh"
@@ -2456,8 +2492,7 @@ build_replay_fixture() { # dir · R's line · L's line
   local d=$1
   mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
   cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
-  ( cd "$d" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
-      && git config core.autocrlf false ) >/dev/null 2>&1
+  ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   printf '#!/usr/bin/env bash\nread c g p < data/lane.txt\necho "verb offenders $c over pin $p ($g graded)"\n[ "$c" -le "$p" ]\n' > "$d/fx/pin.sh"
   printf '[\n  {"name": "lexicon naming predicates", "argv": ["bash", "fx/pin.sh"]}\n]\n' > "$d/$ATL"
   printf '%s\n' "$2" > "$d/data/lane.txt"
@@ -2489,8 +2524,7 @@ check_attr_line "$(run_attr_bar "$AT/rc" GATE_ATTRIBUTE=HEAD)" "lexicon naming p
 # set after the measurement without moving R's tree.
 AW="$AT/aw"; mkdir -p "$AW/$KIT_REL" "$AW/fx" "$AW/data"
 cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$AW/$KIT_REL/" 2>/dev/null
-( cd "$AW" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
-    && git config core.autocrlf false ) >/dev/null 2>&1
+( cd "$AW" && git init -q --template= -b main . ) >/dev/null 2>&1
 printf '#!/usr/bin/env bash\ncase "$(cat data/m.txt)" in slow) sleep "$(cat '"'%s'"')";; esac\necho "FAIL w"\nexit 1\n' "$AT/aw.sleep" > "$AW/fx/w.sh"
 printf 'slow\n' > "$AW/data/m.txt"
 printf '[\n  {"name": "walled", "argv": ["bash", "fx/w.sh"]}\n]\n' > "$AW/$ATL"
@@ -2522,8 +2556,7 @@ build_age_fixture() { # dir · the landing (1..12) the red arrives in · [own] -
   mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
   cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
-  ( cd "$d" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
-      && git config core.autocrlf false ) >/dev/null 2>&1
+  ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   printf '#!/usr/bin/env bash\nif [ -s data/red.txt ]; then cat data/red.txt; exit 1; fi\nexit 0\n' > "$d/fx/r.sh"
   if [ -n "$own" ]; then
     printf '#!/usr/bin/env bash\nif [ -s data/own.txt ]; then cat data/own.txt; exit 1; fi\nexit 0\n' > "$d/fx/o.sh"
@@ -2615,8 +2648,7 @@ build_moved_age_fixture() { # dir -> sets AGE_R
   mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
   cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
-  ( cd "$d" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
-      && git config core.autocrlf false ) >/dev/null 2>&1
+  ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   for k in sup cnt ins; do
     printf '#!/usr/bin/env bash\nif [ -s data/%s.txt ]; then cat data/%s.txt; exit 1; fi\nexit 0\n' "$k" "$k" > "$d/fx/$k.sh"
     : > "$d/data/$k.txt"
@@ -2665,8 +2697,7 @@ n=$((n+1))
 AX="$AT/ax"; mkdir -p "$AX/$KIT_REL" "$AX/fx" "$AX/data"
 cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$AX/$KIT_REL/" 2>/dev/null
 cp "$KITDIR/gate-fingerprint.sh" "$AX/$KIT_REL/" 2>/dev/null || true
-( cd "$AX" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
-    && git config core.autocrlf false ) >/dev/null 2>&1
+( cd "$AX" && git init -q --template= -b main . ) >/dev/null 2>&1
 { printf '#!/usr/bin/env bash\n'
   printf 'if [ -n "${ATTR_TERM_READY:-}" ] && [ "$(cat data/side.txt)" = r ]; then\n'
   printf '  printf "%%s\\n" "$$" > "$ATTR_TERM_READY"\n'
@@ -2822,8 +2853,8 @@ if [ -n "${RG_READY:-}" ]; then
 fi
 exit 0
 HOLD
-  ( cd "$d" && git init -q -b main . && git config user.email o@t.invalid && git config user.name o \
-      && git config core.autocrlf false && git add -A && git commit -qm seed ) >/dev/null 2>&1
+  ( cd "$d" && git init -q --template= -b main . \
+      && git add -A && git commit -qm seed ) >/dev/null 2>&1
 }
 # One bar, in the foreground, its merged output to a file OUTSIDE the repo (a file inside would make
 # the tree untracked-dirty before the runner starts). The ambient scoping environment is cleared for
@@ -2988,14 +3019,14 @@ build_hv_repo() { # dir — a scratch repository carrying this runner and its si
   printf '#!/usr/bin/env bash\nsleep 60\n' > "$d/fx/hang.sh"
   printf 'seed\n' > "$d/fx/target.txt"
   printf '#!/usr/bin/env bash\necho moved >> fx/target.txt\nexit 0\n' > "$d/fx/move.sh"
-  ( cd "$d" && git init -q -b main . && git config user.email h@t.invalid && git config user.name h \
-      && git config core.autocrlf false && git add -A && git commit -qm base ) >/dev/null 2>&1
+  ( cd "$d" && git init -q --template= -b main . \
+      && git add -A && git commit -qm base ) >/dev/null 2>&1
 }
 run_hv_bar() { # dir · manifest · VAR=value… -> HV_OUT (stdout and stderr) and HV_RC
   local d=$1 m=$2; shift 2
   HV_OUT=$( cd "$d" && env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_WALL= GATE_SELFTESTS= GATE_ATTRIBUTE= \
       GATE_INHERITED_RED= GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_PROFILES= GATE_JOBS=4 GATE_PROFILE=minimal \
-      GATE_TURNSTILE=0 GATE_LEGS="$m" "$@" bash $KIT_REL/run-gates.sh 2>&1 ); HV_RC=$?
+      GATE_TURNSTILE=0 GATE_REUSE_SAMPLE=0 GATE_REUSE_PUSH= GATE_LEGS="$m" "$@" bash $KIT_REL/run-gates.sh 2>&1 ); HV_RC=$?
 }
 check_hv_line() { # label · pattern -> one counted assertion that some line of HV_OUT matches the ERE
   n=$((n+1))
@@ -3065,17 +3096,39 @@ run_hv_bar "$H5" "$HV/fine.json" GATE_TURNSTILE=1 GATE_TURNSTILE_TICK=1 GATE_TUR
 check_hv_line "AC5 a dead holder's bar still prints its verdict line" '^gates GREEN — '
 check_hv_value "AC5 and writes its verdict file" "$(read_hv_record "$H5" verdict)" GREEN
 
-# 9d. AC6 — A LEDGER ROW READING `retried` IS NEVER REUSED. The control first: the same row reading
-#     `ok` IS reused, so the key the arm edits is the one the reuse predicate matched.
+# 9d. AC6 — A LEDGER ROW IS NO REUSE STORE, `retried` or `ok`. The control first: the cache entry the
+#     earning bar wrote IS reused. Since TOOL-aSparedSpawn-13 S4 reuse reads the common dir's cache and
+#     never the ledger, and a retried pass writes no entry because its first attempt was no `ok`; so
+#     with the cache gone, a ledger row reading `ok` still runs its leg.
 H6="$HV/r6"; build_hv_repo "$H6"
 printf '[{"name": "cached", "argv": ["bash", "fx/ok.sh"]}]\n' > "$HV/cached.json"
 run_hv_bar "$H6" "$HV/cached.json"
 run_hv_bar "$H6" "$HV/cached.json" GATE_REUSE=1
 check_hv_line "AC6 control: an ok row with a matching key is reused" '^GATE reuse cached  '
-awk -F'\t' 'BEGIN { OFS = "\t" } $1 == "cached" { $3 = "retried" } { print }' "$H6/.git/gate-ledger.tsv" > "$HV/ledger.tmp" \
-  && cp "$HV/ledger.tmp" "$H6/.git/gate-ledger.tsv"
+# TOOL-aSparedSpawn-3 AC7: that bar measured NO leg, so its own ledger rows are empty, and the merge
+# still carries the reused leg's row forward. Keyed on `NR == FNR` it swallowed every row as "seen".
+check_hv_value "aSS3 AC7 a bar that reused its only leg keeps that leg's ledger row" \
+  "$(awk -F'\t' '$1 == "cached" { print "kept" }' "$H6/.git/gate-ledger.tsv" 2>/dev/null)" kept
+rm -rf "$H6/.git/gate-cache"
 run_hv_bar "$H6" "$HV/cached.json" GATE_REUSE=1
-check_hv_line "AC6 a retried row runs its leg" '^GATE ok    cached$'
+check_hv_line "AC6 with the cache gone, a ledger row reading ok runs its leg" '^GATE ok    cached$'
+# 9d2. TOOL-aSparedSpawn-16 S17 (AC18) — THE TWO REUSE FACTS ON THE LEG'S OWN LINE. The bar above executed
+#      on a clean tree, so its entry stands at count 0: at rate 1 the sample draws it, and with the
+#      entry's count, its sixth field, set to 10 the age bound forces it. Each tail is pinned whole.
+run_hv_bar "$H6" "$HV/cached.json" GATE_REUSE=1 GATE_REUSE_SAMPLE=1
+check_hv_line "S17 a leg the sample drew says so on its ok line" '^GATE ok    cached  \(sampled against a cached ok\)$'
+for _hvf in "$H6"/.git/gate-cache/??/*; do awk -F'\t' -v OFS='\t' '{ $6 = 10; print }' "$_hvf" > "$_hvf.n" && mv -f "$_hvf.n" "$_hvf"; done
+run_hv_bar "$H6" "$HV/cached.json" GATE_REUSE=1
+check_hv_line "S17 a leg the age bound forced says so on its ok line" '^GATE ok    cached  \(executed: reused on 10 runs in a row\)$'
+# 9d3. TOOL-aSparedSpawn-16 S18 (AC19) — KEYS THAT CANNOT BE MEASURED SAY SO. A `git` first on PATH that
+#      fails every `hash-object` empties the toolchain digest, so every key is a dash; a reusing bar
+#      names that once, in the whole text the digest's two exit sites carry as their signature.
+mkdir -p "$HV/nohash"
+printf '#!/usr/bin/env bash\ncase " $* " in *" hash-object "*) exit 1 ;; esac\nexec "%s" "$@"\n' "$(type -P git)" > "$HV/nohash/git"
+chmod +x "$HV/nohash/git"
+run_hv_bar "$H6" "$HV/cached.json" GATE_REUSE=1 PATH="$HV/nohash:$PATH"
+check_hv_value "S18 an unmeasurable key is named once on a reusing bar" \
+  "$(grep -cF 'run-gates: reuse — the input keys could not be measured (the toolchain digest), so nothing is reused or cached this run' <<<"$HV_OUT")" 1
 
 # 9e. AC11's second arm — THE WALK DIES ON A DEAD ROOT. `run_leg_reap`, sliced out of the runner, run
 #     against a root that has ALREADY exited leaves its orphan ALIVE; the same reap against a LIVE root
@@ -3113,7 +3166,7 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   rm -f "$HV_FLAG" "$HV_FLAG.done" "$HV_FLAG.hung"
   run_hv_bar "$H1" "$HV/contended.json"
   check_hv_value "AC1 the contended bar exits 0" "$HV_RC" 0
-  check_hv_line "AC1 its first timeout is deferred beside ONE neighbour" '^GATE retry  contended  \(timed out after 2s beside 1 neighbours; one serial retry after the pool drains\)$'
+  check_hv_line "AC1 its first timeout is deferred beside ONE neighbour" "^GATE retry  contended  \(timed out after 2s beside 1 neighbours; retried in the pool's tail, and alone after it drains unless that passes\)$"
   check_hv_line "AC1 its serial retry passes" '^GATE ok    contended  \(retried after timeout\)$'
   check_hv_value "AC1 the run record counts it" "$(read_hv_record "$H1" retried)" 1
   check_hv_line "AC2 its chunk closes pending, never green" '^---- chunk default: pending  '
@@ -3124,6 +3177,16 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   # line naming the leg and its first attempt's ceiling; the lone hang below FAILS its retry and adds none.
   check_hv_value "AGH8 the passing retry appends one retry-passed line naming the leg and its first timeout" \
     "$(awk -F'\t' '$2 == "run-gates" && $3 == "retry-passed" { print $4 }' "$H1/.git/health.log" 2>/dev/null)" "contended after a 2s timeout"
+  # TOOL-aSparedSpawn-16 S13: the cache takes only a FIRST attempt's ok, so the contended leg, green only
+  # on its retry, has no entry under its key; the spinner, green on its first attempt on the same clean
+  # tree, has one, so the absence is the retry's and not a cache this bar never wrote. Read before the
+  # flag goes, from this bar's own record; the fixture is not run again.
+  _hvrec=$(ls -1td "$H1"/.git/gate-run/*/ 2>/dev/null | head -1)
+  _hvk=$(cut -f7 "${_hvrec}1.leg" 2>/dev/null); _hvsk=$(cut -f7 "${_hvrec}0.leg" 2>/dev/null)
+  check_hv_value "S13 the contended leg's retried pass writes no cache entry under its key" \
+    "$(case "$_hvk" in ???*) [ -e "$H1/.git/gate-cache/${_hvk:0:2}/$_hvk" ] && echo written || echo absent ;; *) echo unread ;; esac)" absent
+  check_hv_value "S13 control: the spinner's first-attempt ok has its entry" \
+    "$(case "$_hvsk" in ???*) [ -e "$H1/.git/gate-cache/${_hvsk:0:2}/$_hvsk" ] && echo written || echo absent ;; *) echo unread ;; esac)" written
   unset HV_FLAG
   # ...and a leg that hangs ALONE, with no floor for this clone: zero neighbours, FAIL on its retry.
   printf '[{"name": "lone", "argv": ["bash", "fx/hang.sh"], "ceiling": 1}]\n' > "$HV/lone.json"
@@ -3211,8 +3274,63 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   check_hv_value "AC11 the worker survived to write the first attempt's row, seconds and all" \
     "$(awk -F'\t' '$2 == "timeout" && $4 ~ /^[0-9]+\.[0-9]+$/ { print "written" }' "${_hvrec}0.leg" 2>/dev/null)" written
   unset HV_GC
+
+  # 9k. TOOL-aSparedSpawn-3 AC1 and AC2 — THE TAIL RELEASE. At width 2, a leg that hangs on its first
+  #     attempt and passes on any later one, beside a sleeper. Its retry starts while the sleeper still
+  #     runs, ordered by the two run-record rows and never by a clock, and the sleeper, as it ends,
+  #     lists the work dir and finds the worker's marker. The report is the serial bar's, line for line.
+  H13="$HV/r13"; build_hv_repo "$H13"
+  export HV_ONCE="$HV/once.flag" HV_PEEK="$HV/tail.peek"; rm -f "$HV_ONCE" "$HV_PEEK"
+  printf '#!/usr/bin/env bash\n[ -f "$HV_ONCE" ] && exit 0\n: > "$HV_ONCE"\nsleep 60\n' > "$H13/fx/once.sh"
+  # The sleeper ends on a SIGNAL, never a clock (TOOL-aSparedSpawn-16 S12): it polls until the tail
+  # retry's pid file exists, up to a 120 s hang bound, so a retry that never starts in the tail reads
+  # after-drain rather than passing on a lucky load.
+  printf '#!/usr/bin/env bash\ni=0; while [ ! -f "$TMPDIR/../1.retry.pid" ] && [ "$i" -lt 1200 ]; do sleep 0.1; i=$((i + 1)); done\nls "$TMPDIR/.." > "$HV_PEEK" 2>/dev/null\nexit 0\n' > "$H13/fx/sleeper.sh"
+  ( cd "$H13" && git add -A && git commit -qm legs ) >/dev/null 2>&1
+  printf '[{"name": "sleeper", "argv": ["bash", "fx/sleeper.sh"]},\n {"name": "once", "argv": ["bash", "fx/once.sh"], "ceiling": 2}]\n' > "$HV/tail.json"
+  run_hv_bar "$H13" "$HV/tail.json" GATE_JOBS=2
+  _hvrec=$(ls -1td "$H13"/.git/gate-run/*/ 2>/dev/null | head -1)
+  _hvrs=$(awk -F'\t' '{ print $5 }' "${_hvrec}1.retry.leg" 2>/dev/null); _hvse=$(awk -F'\t' '{ print $6 }' "${_hvrec}0.leg" 2>/dev/null)
+  check_hv_value "aSS3 AC1 the tail retry's row starts before the sleeper's row ends ($_hvrs, $_hvse)" \
+    "$(case "$_hvrs$_hvse" in ''|*[!0-9]*) echo unread ;; *) [ "$_hvrs" -lt "$_hvse" ] && echo in-tail || echo after-drain ;; esac)" in-tail
+  check_hv_value "aSS3 AC1 the work dir held the worker's marker for the leg" "$(grep -cx '1.defer' "$HV_PEEK" 2>/dev/null)" 1
+  check_hv_value "aSS3 AC2 the report is the serial bar's: the deferral, one pass, then the retry line" \
+    "$(grep -E '^(GATE|----)' <<<"$HV_OUT" | tr '\n' '|')" \
+    "GATE ok    sleeper|GATE retry  once  (timed out after 2s beside 1 neighbours; retried in the pool's tail, and alone after it drains unless that passes)|---- chunk default: pending  (2 ran, 0 failed, 0 skipped, 0 reused, 0 held)|GATE ok    once  (retried after timeout)|---- retry: green  (1 retried, 0 failed)|----|"
+  unset HV_ONCE HV_PEEK
+
+  # 9l. TOOL-aSparedSpawn-3 AC3 — THE WALL REACHES A TAIL RETRY. A 30 s ceiling and a 50 s wall, which
+  #     fires by 55 s at its 5 s poll: the tail retry starts after the first attempt's 30 s and runs 30 s
+  #     more, so it is alive at 55 s, and it starts before 50 s whenever the release takes under about
+  #     18 s (10 to 14 s measured on node a, the worker's own post-processing included).
+  H14="$HV/r14"; build_hv_repo "$H14"
+  printf '[{"name": "sleeper", "argv": ["bash", "-c", "sleep 150"]},\n {"name": "stall", "argv": ["bash", "fx/hang.sh"], "ceiling": 30}]\n' > "$HV/tail-wall.json"
+  run_hv_bar "$H14" "$HV/tail-wall.json" GATE_JOBS=2 GATE_WALL=50
+  check_hv_line "aSS3 AC3 the breach names the leg whose tail retry it stopped" '^  still running at the wall: stall \(its serial retry\)$'
+  check_hv_value "aSS3 AC3 and no line claims a verdict for it" "$(grep -cE '^GATE (ok|FAIL) +stall ' <<<"$HV_OUT")" 0
+
+  # 9m. TOOL-aSparedSpawn-3 AC4 — A TAIL ATTEMPT THAT DOES NOT PASS DECIDES NOTHING. It is set aside as
+  #     `.tail`, and the serial retry after the drain issues today's FAIL and its HOST note.
+  H15="$HV/r15"; build_hv_repo "$H15"
+  # The sleeper polls until the tail attempt's `.rc` exists, so that attempt has started and timed out
+  # beside it, up to the 120 s hang bound 9k's uses (TOOL-aSparedSpawn-16 S12); never a fixed sleep.
+  printf '#!/usr/bin/env bash\ni=0; while [ ! -f "$TMPDIR/../1.retry.rc" ] && [ "$i" -lt 1200 ]; do sleep 0.1; i=$((i + 1)); done\nexit 0\n' > "$H15/fx/sleeper.sh"
+  ( cd "$H15" && git add -A && git commit -qm legs ) >/dev/null 2>&1
+  printf '[{"name": "sleeper", "argv": ["bash", "fx/sleeper.sh"]},\n {"name": "stubborn", "argv": ["bash", "fx/hang.sh"], "ceiling": 2}]\n' > "$HV/tail-fail.json"
+  rm -f "$HV/nofloor"   # an earlier bar wrote its floor there, and HOST must stay unread here
+  run_hv_bar "$H15" "$HV/tail-fail.json" GATE_JOBS=2 GATE_SPAWN_FLOOR="$HV/nofloor"
+  check_hv_value "aSS3 AC4 one FAIL line, the serial wording and the serial attempt's HOST note" \
+    "$(grep -cxF <<<"$HV_OUT" 'GATE FAIL  stubborn  (timed out after 2s, again on its serial retry; no spawn floor is recorded for this clone, so HOST was not measured)')" 1
+  _hvrec=$(ls -1td "$H15"/.git/gate-run/*/ 2>/dev/null | head -1)
+  _hvse=$(awk -F'\t' '{ print $6 }' "${_hvrec}0.leg" 2>/dev/null)
+  _hvts=$(awk -F'\t' '$2 == "timeout" { print $5 }' "${_hvrec}1.tail.leg" 2>/dev/null)
+  _hvrs=$(awk -F'\t' '{ print $5 }' "${_hvrec}1.retry.leg" 2>/dev/null)
+  check_hv_value "aSS3 AC4 the set-aside tail attempt timed out beside the sleeper ($_hvts, $_hvse)" \
+    "$(case "$_hvts$_hvse" in ''|*[!0-9]*) echo unread ;; *) [ "$_hvts" -lt "$_hvse" ] && echo in-tail || echo after-drain ;; esac)" in-tail
+  check_hv_value "aSS3 AC4 the deciding attempt started after the drain ($_hvrs, $_hvse)" \
+    "$(case "$_hvrs$_hvse" in ''|*[!0-9]*) echo unread ;; *) [ "$_hvrs" -ge "$_hvse" ] && echo after-drain || echo in-tail ;; esac)" after-drain
 else
-  n=$((n+30))
+  n=$((n+40))
   echo "canary: SKIP the ceiling arms of section 9 — this host has no runnable 'timeout -k', so no ceiling can fire and nothing can be deferred, retried or read HOST here"
 fi
 rm -rf "$HV" 2>/dev/null || true
@@ -3325,6 +3443,44 @@ _mpo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/t80.txt" GATE_PROFILE= GATE_MEMPA
           GATE_CGROUP_ROOT="$MP/cg" bash $KIT_REL/run-gates.sh --print-profile 2>&1 )
 check_mp_value "AC1 GATE_MEMPAUSE=x prints one NOTE" "$(printf '%s\n' "$_mpo" | grep -c '^run-gates: NOTE - GATE_MEMPAUSE=')" 1
 check_mp_value "AC1 and leaves the pause off" "$(printf '%s\n' "$_mpo" | awk -F'\t' '$1 == "line" && /mempause off;/ { c++ } END { print c + 0 }')" 1
+
+# 11s. THE SLOTS KNOB (TOOL-aPairedSlots-1 AC1 to AC3), over this section's fixture. `slots` is how
+#      many bars the host turnstile admits; a row without it reads 1, `GATE_TURNSTILE_SLOTS` replaces
+#      the row's value, a malformed override is ignored with a NOTE, 0 refuses, and the profile line
+#      carries the field ONLY above 1, so a bar at the kit default prints the line it always printed.
+read_slots_key() { # VAR=value… -> the `slots` key and the profile line --print-profile prints, TAB-joined
+  ( cd "$MP/r" && env GATE_PROFILES= GATE_PROFILE= GATE_JOBS= GATE_TURNSTILE_SLOTS= GATE_MEMPAUSE= \
+      GATE_CGROUP_ROOT="$MP/cg" "$@" bash $KIT_REL/run-gates.sh --print-profile 2>/dev/null ) \
+    | awk -F'\t' '$1 == "slots" { k = $2 } $1 == "line" { l = $2 } END { printf "%s\t%s", k, l }'
+}
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,mempause=0,slots=3\n' > "$MP/x/ts3.txt"
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,mempause=0\n' > "$MP/x/ts0.txt"
+_slk=$(read_slots_key GATE_PROFILES="$MP/x/ts3.txt")
+check_mp_value "slots AC1 a row declaring slots=3 prints 3" "${_slk%%$'\t'*}" 3
+check_mp_value "slots AC3 and its line carries the field" "$(case "${_slk#*$'\t'}" in *'mempause off, slots 3;'*) echo yes ;; esac)" yes
+_slk=$(read_slots_key GATE_PROFILES="$MP/x/ts0.txt")
+check_mp_value "slots AC1 a row declaring none prints 1" "${_slk%%$'\t'*}" 1
+check_mp_value "slots AC3 and its line is the kit-default line, no slots field" "$(case "${_slk#*$'\t'}" in *slots*) echo field ;; *'mempause off; '*) echo plain ;; esac)" plain
+_slk=$(read_slots_key GATE_PROFILES="$MP/x/ts0.txt" GATE_TURNSTILE_SLOTS=2)
+check_mp_value "slots AC2 GATE_TURNSTILE_SLOTS=2 over a row declaring none prints 2" "${_slk%%$'\t'*}" 2
+_slo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/ts3.txt" GATE_PROFILE= GATE_TURNSTILE_SLOTS=abc GATE_CGROUP_ROOT="$MP/cg" \
+          bash $KIT_REL/run-gates.sh --print-profile 2>&1 )
+check_mp_value "slots AC2 GATE_TURNSTILE_SLOTS=abc prints one NOTE" "$(printf '%s\n' "$_slo" | grep -c "^run-gates: NOTE - GATE_TURNSTILE_SLOTS='abc'")" 1
+check_mp_value "slots AC2 and leaves the row's 3" "$(printf '%s\n' "$_slo" | awk -F'\t' '$1 == "slots" { print $2 }')" 3
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,slots=0\n' > "$MP/x/tsz.txt"
+_slo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/tsz.txt" GATE_PROFILE= GATE_TURNSTILE_SLOTS= bash $KIT_REL/run-gates.sh --print-profile 2>&1 ); _slrc=$?
+check_mp_value "slots S1 a row carrying slots=0 exits 2" "$_slrc" 2
+check_mp_value "slots S1 and its refusal names the knob" "$(printf '%s\n' "$_slo" | grep -c "knob 'slots'")" 1
+# AT MOST 64 (TOOL-aPairedSlots-15): one slot path is built per slot before the queue, so a row above
+# the ceiling refuses as 0 does, and an override above it is ignored with the NOTE.
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,slots=65\n' > "$MP/x/ts65.txt"
+_slo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/ts65.txt" GATE_PROFILE= GATE_TURNSTILE_SLOTS= bash $KIT_REL/run-gates.sh --print-profile 2>&1 ); _slrc=$?
+check_mp_value "slots S3 a row carrying slots=65 exits 2" "$_slrc" 2
+check_mp_value "slots S3 and its refusal names the ceiling" "$(printf '%s\n' "$_slo" | grep -c "knob 'slots'.*at most 64")" 1
+_slo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/ts3.txt" GATE_PROFILE= GATE_TURNSTILE_SLOTS=65 GATE_CGROUP_ROOT="$MP/cg" \
+          bash $KIT_REL/run-gates.sh --print-profile 2>&1 )
+check_mp_value "slots S3 GATE_TURNSTILE_SLOTS=65 prints one NOTE" "$(printf '%s\n' "$_slo" | grep -c "^run-gates: NOTE - GATE_TURNSTILE_SLOTS='65'")" 1
+check_mp_value "slots S3 and leaves the row's 3" "$(printf '%s\n' "$_slo" | awk -F'\t' '$1 == "slots" { print $2 }')" 3
 
 # 11b. AC5 — a held dispatch waits for the reading to FALL. A rewrites the meminfo to 10 % after 3 s.
 write_mp_meminfo "$MP/x/m5" 95
@@ -3470,6 +3626,239 @@ else
   fi
 fi
 rm -rf "$MP" 2>/dev/null || true
+
+# 12. THE SPAWN CALIBRATION AND THE SPAWN PAUSE. TOOL-aSparedSpawn-2. `--calibrate-width` caches the
+#     knee of K concurrent spawn loops' rates, a bar narrows its row's width to that pick, and
+#     `spawnpause=<n>` holds dispatch while one spawn costs over n times the floor. Clock-free through
+#     the seams: `GATE_CALIBRATION_RATES` stands in for the timed loops and `GATE_SPAWN_NOW` for the
+#     sampler's reading. Each arm's fixture is its own repository, so no cache crosses arms.
+SP=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the spawn-calibration arms"; exit 2; }
+mkdir -p "$SP/x"
+build_hv_repo "$SP/r"
+printf 't\t0\t0\twidth=8,timeout=0,wall=0\n' > "$SP/r/$KIT_REL/gate-profiles.txt"
+( cd "$SP/r" && git add -A && git commit -qm spawn ) >/dev/null 2>&1
+SP_CACHE="$SP/r/.git/gate-host-calibration"
+run_sp_verb() { # VAR=value… -> SP_OUT (stdout), SP_RC; the calibrate verb in the fixture
+  SP_OUT=$( cd "$SP/r" && env GATE_PROFILES= GATE_PROFILE= GATE_JOBS= "$@" \
+      bash $KIT_REL/run-gates.sh --calibrate-width 2>"$SP/x/err" ); SP_RC=$?
+}
+read_sp_key() { # key · VAR=value… -> that key of --print-profile in the fixture
+  local k=$1; shift
+  ( cd "$SP/r" && env GATE_PROFILES= GATE_PROFILE= GATE_JOBS= "$@" bash $KIT_REL/run-gates.sh --print-profile 2>/dev/null ) \
+    | awk -F'\t' -v k="$k" '$1 == k { print $2 }'
+}
+check_sp_value() { # label · got · want -> one counted assertion
+  n=$((n+1))
+  [ "$2" = "$3" ] || { echo "canary: spawn calibration — $1: got [$2], wanted [$3]"; fail=1; }
+}
+
+# 12a. AC2 — the KNEE, not the maximum, and no clock under the seam: `false` as the spawn command
+#      fails every timed loop, so a verb that timed anything exits 1 instead of picking.
+run_sp_verb GATE_CALIBRATION_RATES=100,190,350,360,355 GATE_SPAWN_CMD=false
+check_sp_value "AC2 rates flat after K=4 pick 4" "$(printf '%s\n' "$SP_OUT" | awk -F'\t' '$1 == "pick" { print $2 }')|$SP_RC" "4|0"
+run_sp_verb GATE_CALIBRATION_RATES=100,190,350,500,700 GATE_SPAWN_CMD=false
+check_sp_value "AC2 rates still rising at K=8 pick 8" "$(printf '%s\n' "$SP_OUT" | awk -F'\t' '$1 == "pick" { print $2 }')|$SP_RC" "8|0"
+run_sp_verb GATE_CALIBRATION_RATES=100,190
+check_sp_value "AC2 a seam naming two rates for five K exits 2" "$SP_RC" 2
+# 12a2. TOOL-aSparedSpawn-16 S4 — the verb's two timed refusals, from the verb run WITHOUT the rates
+#       seam. A blank spawn command (whitespace only) resolves no argv, and `false` fails the first timed
+#       loop; each exits 1 with its whole text, and neither writes a pick.
+run_sp_verb GATE_CALIBRATION_RATES= GATE_SPAWN_CMD=' '
+check_sp_value "S4 a blank spawn command exits 1 naming that nothing resolves" \
+  "$(grep -cF "run-gates: --calibrate-width: no spawn command resolves (no 'true' on PATH), so nothing can be timed" "$SP/x/err")|$SP_RC" "1|1"
+run_sp_verb GATE_CALIBRATION_RATES= GATE_SPAWN_CMD=false
+check_sp_value "S4 a failing spawn exits 1 naming the rate it could not measure" \
+  "$(grep -cF "could not be measured (a spawn failed, or bash has no EPOCHREALTIME), so no pick is written" "$SP/x/err")|$SP_RC" "1|1"
+
+# 12b. AC3 — the verb's cache is one line of four TAB fields, and the bar READS it: the row's 8 narrows
+#      to the pick, on the --print-profile keys, its profile line, and a real bar's header.
+run_sp_verb GATE_CALIBRATION_RATES=100,190,350,360,355
+check_sp_value "AC3 the cache holds one line of four fields" \
+  "$(awk -F'\t' 'NF == 4 { c++ } END { print NR "|" c + 0 }' "$SP_CACHE" 2>/dev/null)" "1|1"
+check_sp_value "AC3 --print-profile reads the cached width" "$(read_sp_key width)|$(read_sp_key width_from)" "4|calibrated"
+check_sp_value "AC3 its profile line says calibrated" \
+  "$(case "$(read_sp_key line)" in *'width 4 calibrated,'*) echo yes ;; esac)" yes
+printf '[{"name": "S1", "argv": ["bash", "fx/ok.sh"]}]\n' > "$SP/x/one.json"
+( cd "$SP/r" && env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_PROFILES= GATE_PROFILE= GATE_JOBS= GATE_TURNSTILE=0 \
+    GATE_RUN_ID=sp3 GATE_LEGS="$SP/x/one.json" bash $KIT_REL/run-gates.sh >/dev/null 2>&1 )
+check_sp_value "AC3 a bar's header records width 4 from calibrated" \
+  "$(awk -F'\t' '$1 == "width" || $1 == "width_from" { printf "%s|", $2 }' "$SP/r/.git/gate-run/sp3/header" 2>/dev/null)" "4|calibrated|"
+
+# 12c. AC4 — every failed test leaves the row's 8 and NAMES the test; GATE_JOBS outranks a valid cache.
+check_sp_value "AC4 GATE_JOBS=3 outranks the valid cache" "$(read_sp_key width GATE_JOBS=3)|$(read_sp_key width_from GATE_JOBS=3)" "3|GATE_JOBS"
+read_sp_why() { read_sp_key line | sed -n 's/.*width \([0-9]*\) uncalibrated: \([a-z ]*\),.*/\1 \2/p'; }
+rm -f "$SP_CACHE"
+check_sp_value "AC4 an absent cache leaves width 8, uncalibrated: absent" "$(read_sp_why)" "8 absent"
+printf 'garbage\n' > "$SP_CACHE"
+check_sp_value "AC4 a malformed cache leaves width 8, uncalibrated: malformed" "$(read_sp_why)" "8 malformed"
+#      Stamped with THIS boot where the host reads one, so the age test alone can refuse it: with a `-`
+#      there, a runner that skipped the age test was refused by the boot test instead, for another cause.
+_spboot=-
+{ read -r _spup _ < /proc/uptime; } 2>/dev/null && _spboot=$(( $(date +%s) - ${_spup%%.*} ))
+printf '4\t1=100,2=190,4=350,6=360,8=355\t2020-01-01T00:00:00Z\t%s\n' "$_spboot" > "$SP_CACHE"
+check_sp_value "AC4 a cache written in 2020 leaves width 8, uncalibrated: stale" "$(read_sp_why)" "8 stale"
+if ! { read -r _spup _ < /proc/uptime; } 2>/dev/null; then
+  echo "canary: SKIP arm 12c's other-boot half — this host has no readable /proc/uptime, so the runner skips the boot test and no other boot can be staged"
+else
+  n=$((n+1))
+  _spup=${_spup%%.*}
+  printf '4\t1=100,2=190,4=350,6=360,8=355\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    "$(( $(date +%s) - _spup - 100000 ))" > "$SP_CACHE"
+  [ "$(read_sp_why)" = "8 another boot" ] \
+    || { echo "canary: spawn calibration — AC4 a cache from a boot 100000 s earlier: got [$(read_sp_why)], wanted [8 another boot]"; fail=1; }
+fi
+rm -f "$SP_CACHE"
+
+# 12d. AC5 — the spawn pause HOLDS on a reading over the ratio, every hold ends `drained` or `bound`, and
+#      every leg still reports. The floor is 1 ms through `GATE_SPAWN_FLOOR`, the reading 5 ms through
+#      `GATE_SPAWN_NOW`, the ratio 2: B and C are held while a leg runs and released as it ends.
+printf '1.000\t2026-01-01T00:00:00Z\n' > "$SP/x/floor"
+printf '5000\n' > "$SP/x/now"
+printf 't\t0\t0\twidth=3,timeout=0,wall=0,spawnpause=2\n' > "$SP/x/t2.txt"
+printf '#!/usr/bin/env bash\nsleep 2\n' > "$SP/r/fx/two.sh"
+printf '[{"name": "A5s", "argv": ["bash", "fx/two.sh"]},\n {"name": "B5s", "argv": ["bash", "fx/ok.sh"]},\n {"name": "C5s", "argv": ["bash", "fx/ok.sh"]}]\n' > "$SP/x/ac5.json"
+run_sp_bar() { # run id · manifest · VAR=value… -> SP_OUT (stdout and stderr), SP_RC
+  SP_OUT=$( cd "$SP/r" && env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_WALL= GATE_PROFILE= GATE_JOBS= GATE_TURNSTILE=0 \
+      GATE_PROFILES="$SP/x/t2.txt" GATE_RUN_ID="$1" GATE_LEGS="$2" "${@:3}" bash $KIT_REL/run-gates.sh 2>&1 ); SP_RC=$?
+}
+run_sp_bar ac5s "$SP/x/ac5.json" GATE_SPAWN_FLOOR="$SP/x/floor" GATE_SPAWN_NOW="$SP/x/now"
+_spr="$SP/r/.git/gate-run/ac5s/pauses"
+check_sp_value "AC5 the bar is green" "$SP_RC" 0
+check_sp_value "AC5 every leg prints its verdict" "$(printf '%s\n' "$SP_OUT" | grep -c '^GATE ok ')" 3
+check_sp_value "AC5 at least one hold, each ending drained or bound and held by spawn" \
+  "$(awk -F'\t' '{ c++ } ($6 != "drained" && $6 != "bound") || $7 != "spawn" { b++ } END { print (c > 0 && b + 0 == 0) ? "yes" : "no:" c "/" b }' "$_spr" 2>/dev/null)" yes
+check_sp_value "AC5 one spawn: line counts the holds, and the memory: line counts none" \
+  "$(printf '%s\n' "$SP_OUT" | grep -c '^spawn: [1-9][0-9]* pause(s)')|$(printf '%s\n' "$SP_OUT" | grep -c '^memory: pause off$')" "1|1"
+#      The control: the same reading UNDER the ratio holds nothing.
+printf '1500\n' > "$SP/x/now"
+run_sp_bar ac5c "$SP/x/ac5.json" GATE_SPAWN_FLOOR="$SP/x/floor" GATE_SPAWN_NOW="$SP/x/now"
+check_sp_value "AC5 a reading under the ratio writes no pauses row" \
+  "$(cat "$SP/r/.git/gate-run/ac5c/pauses" 2>/dev/null | wc -l | tr -d ' ')|$(printf '%s\n' "$SP_OUT" | grep -c '^spawn: no pause ')" "0|1"
+
+# 12e. AC6 — no floor recorded: INERT, announced, never a threshold of zero. The reading is far over any
+#      ratio, so a pause that read the absent floor as 0 would hold.
+printf '5000\n' > "$SP/x/now"
+run_sp_bar ac6s "$SP/x/ac5.json" GATE_SPAWN_FLOOR="$SP/x/no-such-floor" GATE_SPAWN_NOW="$SP/x/now"
+check_sp_value "AC6 one NOTE names the spawn pause INERT" "$(printf '%s\n' "$SP_OUT" | grep -c '^run-gates: NOTE .*spawn pause is INERT')" 1
+check_sp_value "AC6 the summary line says INERT" "$(printf '%s\n' "$SP_OUT" | grep -c '^spawn: no spawn floor recorded, so the 2x pause was INERT$')" 1
+check_sp_value "AC6 no pauses row is written and every leg reports" \
+  "$(cat "$SP/r/.git/gate-run/ac6s/pauses" 2>/dev/null | wc -l | tr -d ' ')|$(printf '%s\n' "$SP_OUT" | grep -c '^GATE ok ')" "0|3"
+
+# 12f. S5's SAMPLER, the reading no seam stands in for: a census tick every second times three spawns
+#      against a 1 us floor, which any real spawn exceeds, so C's decision, taken when B ends at 6 s
+#      with A still running, reads the sampler's file and holds until A ends. Without the sampler's
+#      write there is no reading, and C dispatches with nothing held.
+printf '0.001\t2026-01-01T00:00:00Z\n' > "$SP/x/floor1"
+printf '#!/usr/bin/env bash\nsleep "$1"\n' > "$SP/r/fx/nap.sh"
+printf '[{"name": "A6f", "argv": ["bash", "fx/nap.sh", "10"]},\n {"name": "B6f", "argv": ["bash", "fx/nap.sh", "6"]},\n {"name": "C6f", "argv": ["bash", "fx/ok.sh"]}]\n' > "$SP/x/ac6f.json"
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,spawnpause=2\n' > "$SP/x/t2.txt"
+run_sp_bar s5f "$SP/x/ac6f.json" GATE_SPAWN_FLOOR="$SP/x/floor1" GATE_CENSUS_EVERY=1
+check_sp_value "S5 the sampler's own reading holds C, ending drained, held by spawn, and every leg reports" \
+  "$(cut -f6,7 "$SP/r/.git/gate-run/s5f/pauses" 2>/dev/null | tr '\t\n' ': ')|$(printf '%s\n' "$SP_OUT" | grep -c '^GATE ok ')" "drained:spawn |3"
+rm -rf "$SP" 2>/dev/null || true
+
+# ---- 13. GATE_SELFTESTS=changed, TOOL-aSparedSpawn-12 AC1 to AC6 ---------------------------------
+#    A scratch repository carrying this runner and a STUB govkit, laid out at govkit's resolved name,
+#    that prints two kits' shipped rows from a file (`--epoch` keeps the epoch roles; GOVKIT_STUB_OFF
+#    makes it exit 1). Kit kx ships its engine and suite, kit ky likewise, and uz is a selftests-chunk
+#    suite no kit ships, guarded on one file. Seeded once by a GATE_SELFTESTS=1 run, then moved one
+#    path at a time. Each arm reads the leg's OWN line, never a substring over the whole output.
+SC=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the held-tier selection arms"; exit 2; }
+GK_DIR=$(resolve_kit_dir "$_rkd_py" govkit govkit.py "$HERE") || exit 2
+GK="${GK_DIR##*/}"
+SCR="$SC/r"; mkdir -p "$SCR/$KIT_REL" "$SCR/${KIT_REL%/*}/$GK" "$SCR/kx" "$SCR/ky" "$SCR/uz" "$SCR/fx"
+cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$KITDIR/gate-fingerprint.sh" "$SCR/$KIT_REL/" 2>/dev/null
+printf '%s\n' 'import os, sys' 'if os.environ.get("GOVKIT_STUB_OFF"):' '    sys.exit(1)' \
+  'rows = [r.split(chr(9)) for r in open(os.path.join("fx", "shipped.tsv")).read().splitlines() if r]' \
+  'keep = ("engine", "seed", "rendered", "merged") if sys.argv[2:] == ["--epoch"] else None' \
+  'sys.stdout.write("".join(chr(9).join(r) + chr(10) for r in rows if keep is None or r[1] in keep))' \
+  > "$SCR/${KIT_REL%/*}/$GK/govkit.py"
+printf 'kx\tengine\tkx/engine.sh\nkx\tengine\tkx/x.test.sh\nkx\tproject-owned\tkx/notes.txt\nky\tengine\tky/engine.sh\nky\tengine\tky/y.test.sh\n' > "$SCR/fx/shipped.tsv"
+for f in kx/engine.sh ky/engine.sh ky/y.test.sh uz/z.test.sh fx/ok.sh; do printf '#!/usr/bin/env bash\nexit 0\n' > "$SCR/$f"; done
+printf '#!/usr/bin/env bash\n[ -n "${KX_RED:-}" ] && { echo "FAIL kx asked to red"; exit 1; }\nexit 0\n' > "$SCR/kx/x.test.sh"
+printf 'n\n' > "$SCR/kx/notes.txt"; printf 'g\n' > "$SCR/uz/guarded.txt"; printf 'o\n' > "$SCR/uz/other.txt"
+write_sc_legs() { # extra JSON fields for the uz row
+  printf '[{"name": "repo ok", "argv": ["bash", "fx/ok.sh"]},\n {"name": "kx suite", "argv": ["bash", "kx/x.test.sh"], "subject": "kit", "guard": ["kx/"]},\n {"name": "ky suite", "argv": ["bash", "ky/y.test.sh"], "subject": "kit", "guard": ["ky/"]},\n {"name": "uz suite", "argv": ["bash", "uz/z.test.sh"], "chunk": "selftests", "guard": ["uz/guarded.txt"]%s}]\n' "$1" > "$SC/legs.json"
+}
+write_sc_legs ""
+( cd "$SCR" && git init -q --template= -b main . && git add -A && git commit -qm base ) >/dev/null 2>&1
+run_sc_bar() { # VAR=value… -> SC_OUT
+  SC_OUT=$( cd "$SCR" && env GATE_FULL=1 GATE_BASE= GATE_REUSE= GATE_WALL= GATE_ATTRIBUTE= GATE_INHERITED_RED= \
+      GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_PROFILES= GATE_JOBS=4 GATE_PROFILE=minimal GATE_TURNSTILE=0 \
+      GATE_SELFTESTS_MAX_LAG= GATE_LEGS="$SC/legs.json" "$@" bash $KIT_REL/run-gates.sh 2>&1 )
+}
+write_sc_commit() { ( cd "$SCR" && git add -A && git commit -q --allow-empty -m "$1" ) >/dev/null 2>&1; }
+check_sc_line() { # label · ERE one whole line of SC_OUT must match
+  n=$((n+1))
+  printf '%s\n' "$SC_OUT" | grep -qE -- "$2" \
+    || { echo "canary: held-tier selection — $1: no line matched /$2/ in:"; printf '%s\n' "$SC_OUT" | sed 's/^/    /'; fail=1; }
+}
+check_sc_value() { # label · got · want
+  n=$((n+1))
+  [ "$2" = "$3" ] || { echo "canary: held-tier selection — $1: got [$2], wanted [$3]"; fail=1; }
+}
+SCREC="$SCR/.git/gate-selftest-last"
+read_sc_key() { printf '%s' "$1" | "$PYBIN" -c 'import hashlib, sys; print(hashlib.sha1(sys.stdin.buffer.read()).hexdigest()[:16])'; }
+SCKX=$(read_sc_key 'kx suite'); SCKY=$(read_sc_key 'ky suite')
+
+# 13a. S4 — a GATE_SELFTESTS=1 run on a clean tree seeds one record per executed held leg.
+run_sc_bar GATE_SELFTESTS=1
+check_sc_value "S4 a full run writes a record per held leg" "$(ls "$SCREC" 2>/dev/null | wc -l | tr -d ' ')" 3
+# 13b. AC1 — only kx's engine moved: kx executes, ky is held naming its sha, and the fallback names uz.
+printf '#!/usr/bin/env bash\n# moved\nexit 0\n' > "$SCR/kx/engine.sh"; write_sc_commit "kx engine moves"
+run_sc_bar GATE_SELFTESTS=changed
+check_sc_line "AC1 kx executes when its engine moved" '^run-gates: selftests changed: kx suite runs \(kx/engine.sh moved since [0-9a-f]{8}\)$'
+check_sc_line "AC1 ...and reports ok" '^GATE ok    kx suite$'
+check_sc_line "AC1 ky is held unchanged" '^GATE held  ky suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_value "AC1 ky does not execute" "$(printf '%s\n' "$SC_OUT" | grep -c '^GATE ok    ky suite$')" 0
+check_sc_line "AC2 the fallback line names the unowned leg" '^run-gates: selftests changed: no kit ships the suite of 1 held leg\(s\), so each selects by its guard plus its suite file: uz suite$'
+SC_OUT=""; [ -f "$SCR/.git/gate-full-green" ] && SC_OUT=$(<"$SCR/.git/gate-full-green")
+check_sc_line "S7 the gate-full-green stamp of a changed run reads changed" $'^selftests\tchanged$'
+# 13c. AC2 — only ky's suite file moved, and only uz's guard moved: both execute, kx is held.
+printf '#!/usr/bin/env bash\n# moved\nexit 0\n' > "$SCR/ky/y.test.sh"; printf 'g2\n' > "$SCR/uz/guarded.txt"; write_sc_commit "ky suite and uz guard move"
+run_sc_bar GATE_SELFTESTS=changed
+check_sc_line "AC2 ky executes when only its suite file moved" '^run-gates: selftests changed: ky suite runs \(ky/y.test.sh moved since [0-9a-f]{8}\)$'
+check_sc_line "AC2 uz executes when only its guard moved" '^run-gates: selftests changed: uz suite runs \(uz/guarded.txt moved since [0-9a-f]{8}\)$'
+check_sc_line "AC2 kx is held" '^GATE held  kx suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_value "AC2 the fallback line prints once" "$(printf '%s\n' "$SC_OUT" | grep -c '^run-gates: selftests changed: no kit ships')" 1
+# 13d. AC3 — a deleted record, a non-ancestor sha, a manifest row that changed: each executes.
+rm -f "$SCREC/$SCKX"
+_scd=$(cd "$SCR" && git commit-tree "HEAD^{tree}" -m dangling)
+printf 'sha\t%s\nrow\t%s\n' "$_scd" "$(sed -n 's/^row\t//p' "$SCREC/$SCKY")" > "$SCREC/$SCKY"
+write_sc_legs ', "ceiling": 600'
+run_sc_bar GATE_SELFTESTS=changed
+check_sc_line "AC3 a deleted record executes" '^run-gates: selftests changed: kx suite runs \(no last-run record\)$'
+check_sc_line "AC3 a non-ancestor sha executes" '^run-gates: selftests changed: ky suite runs \(recorded [0-9a-f]{8} is not an ancestor of HEAD\)$'
+check_sc_line "AC3 a changed manifest row executes" '^run-gates: selftests changed: uz suite runs \(its manifest row changed since its record\)$'
+# 13e. AC4 — eleven first-parent commits with nothing moved: held under a bound of 20, executed under 10.
+for _sck in 1 2 3 4 5 6 7 8 9 10 11; do write_sc_commit "empty $_sck"; done
+run_sc_bar GATE_SELFTESTS=changed GATE_SELFTESTS_MAX_LAG=20
+check_sc_line "AC4 control: an 11-behind record holds under a bound of 20" '^GATE held  ky suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+run_sc_bar GATE_SELFTESTS=changed
+check_sc_line "AC4 an 11-behind record executes under the default bound and names the lag" '^run-gates: selftests changed: ky suite runs \(recorded [0-9a-f]{8} is 11 first-parent commits behind HEAD, beyond the bound 10\)$'
+# 13f. AC5 — a selected leg that reds loses its record; a green on a dirty tree writes none.
+printf '#!/usr/bin/env bash\n# moved again\nexit 0\n' > "$SCR/kx/engine.sh"; write_sc_commit "kx engine moves again"
+check_sc_value "AC5 setup: kx holds a record before the red run" "$([ -f "$SCREC/$SCKX" ] && echo yes)" yes
+run_sc_bar GATE_SELFTESTS=changed KX_RED=1
+check_sc_line "AC5 kx executes and reds" '^GATE FAIL  kx suite  \(exit 1\)$'
+check_sc_value "AC5 the red leg's record is gone" "$([ -f "$SCREC/$SCKX" ] && echo yes)" ""
+rm -f "$SCREC/$SCKY"; printf 'dirt\n' >> "$SCR/uz/other.txt"
+run_sc_bar GATE_SELFTESTS=changed
+check_sc_line "AC5 on a dirty tree ky executes green" '^GATE ok    ky suite$'
+check_sc_value "AC5 a dirty-tree green writes no record" "$([ -f "$SCREC/$SCKY" ] && echo yes)" ""
+( cd "$SCR" && git checkout -q -- uz/other.txt )
+# 13g. AC6 — govkit unreachable: every held leg selects by its guard, and the bar says so once. ky
+#      moves a file its kit does not ship, which holds ky while govkit answers and selects it by its
+#      guard when govkit does not.
+run_sc_bar GATE_SELFTESTS=1
+printf '#!/usr/bin/env bash\nexit 0\n' > "$SCR/ky/extra.sh"; write_sc_commit "a ky file no kit ships"
+run_sc_bar GATE_SELFTESTS=changed
+check_sc_line "AC6 control: with govkit reachable an unshipped ky file holds ky" '^GATE held  ky suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+run_sc_bar GATE_SELFTESTS=changed GOVKIT_STUB_OFF=1
+check_sc_value "AC6 the unreachable line prints once" "$(printf '%s\n' "$SC_OUT" | grep -c '^run-gates: selftests changed: govkit is not reachable .*, so every held leg selects by its guard plus its suite file$')" 1
+check_sc_line "AC6 ky selects by its guard" '^run-gates: selftests changed: ky suite runs \(ky/extra.sh moved since [0-9a-f]{8}\)$'
+check_sc_line "AC6 kx is held on diff evidence" '^GATE held  kx suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+rm -rf "$SC" 2>/dev/null || true
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

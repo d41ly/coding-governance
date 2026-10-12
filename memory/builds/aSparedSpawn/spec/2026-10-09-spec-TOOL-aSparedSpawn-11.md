@@ -1,10 +1,15 @@
 # TOOL-aSparedSpawn-11 — per-suite levers: five suites stop paying a process for a question they ask once
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-11-build-TOOL-aSparedSpawn-11-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-11-acceptance-ledger.md) | journal | — |
+| [2026-10-11-build-TOOL-aSparedSpawn-11-direct-checks.sh](../build/2026-10-11-build-TOOL-aSparedSpawn-11-direct-checks.sh) | journal | — |
+| [2026-10-11-prompt-TOOL-aSparedSpawn-11-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-11-build-brief.md) | journal | — |
+| [2026-10-12-review-TOOL-aSparedSpawn-1-15-closing-diff-round1.md](../reviews/2026-10-12-review-TOOL-aSparedSpawn-1-15-closing-diff-round1.md) | diff-review | TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14 TOOL-aSparedSpawn-15 |
 
 <!-- /gen:spec-records -->
 
@@ -29,8 +34,9 @@ is one scope item with its own criterion, so any one can land or be cut alone.
   `node` spawns: every `nrfix` fixture, plus population files picked by a fixed stride over the sorted
   path list. Any disagreement reds naming the payload. Observed by AC2.
 - **S3** — In `tools/drift-audit/selftest.py`, an arm that reads one signal calls that signal's
-  function in-process over a context built by the suite's own `_build_run_ctx` (`:3284`), widened to
-  what that signal reads. The name-to-function map is derived once from one full `report()` over a
+  function in-process, through `read_one_signal`, over the context `main` builds: the report's own
+  `Ctx`, from a fresh module compiled from the FIXTURE's copy of the report, with that fixture's conf,
+  project layer and base ref. The name-to-function map is derived once from one full `report()` over a
   clean fixture, never typed. A handful of `report()` arms grading `main`'s own contract (pins,
   baselines, offline mode, refusals) stay out of process. Observed by AC4 and AC5.
 - **S4** — `tools/check-hook-destinations.test.sh` builds `scratch()` once per run, records its
@@ -79,9 +85,20 @@ one arm, about 88 % of the leg, 717 s serial (other-legs report, "agent-cap self
 `report()` (`:411`) starts `drift_report.py --json`, which computes every entry of `SIGNALS`
 (`tools/drift-audit/drift_report.py:3518`) in `main` (`:4294-4296`). Round one found 51 call sites
 subscripting one signal, 16 of them one signal alone. `main` adds `pin`, and for baselined signals
-`baseline`, `new` and `stale`, after the signal returns, so the in-process comparison in AC4 covers the
-fields the function returns and an arm reading the post-processed fields stays on `report()`. A
-signal reading `ctx.signal_names` is handed the derived name set.
+`baseline`, `new` and `stale`, after the signal returns. `pin` is a pure read of `PINS` and the
+record's tolerance, so the in-process path adds it as `main` does; a fixture whose project layer
+declares `BASELINES`, and any extra argument but `--base-ref <ref>`, go to `report()` instead. The
+in-process comparison in AC4 covers the fields the in-process record carries, and an arm reading any
+other post-processed field stays on `report()`. A signal reading `ctx.signal_names` is handed the
+derived name set.
+
+The context is `main`'s and not `_build_run_ctx` widened per signal. A per-signal attribute list is a
+second answer to what `Ctx` already answers, and the report resolves its project layer and its
+sibling kits beside its own `__file__`, so only a module loaded from the fixture's copy reads the
+fixture's lexicon and recall kits. A subprocess also starts with nothing imported, so every
+non-stdlib module is hidden while the fixture's code runs and dropped after; the cwd,
+`GOV_DEFAULT_BRANCH` and `sys.path` are restored, and the record is round-tripped through JSON so it
+compares as the subprocess's does.
 
 ### S4 — one scratch
 
@@ -102,7 +119,8 @@ whole argument tuple that reaches `rev-list`.
 | identifier | kind | cell that grades it |
 |---|---|---|
 | the S1 runner file written by the suite | node script, heredoc | `lexicon naming predicates` if tracked; it is not |
-| `one_signal` or the name `--suggest` returns | Python function in a suite | `lexicon naming predicates`, python cell |
+| `read_one_signal`, `load_fixture_report`, `test_one_signal_matches_report` and its nested `read_differences` | Python functions in a suite | `lexicon naming predicates`, python cell |
+| `SIGNAL_ORDER` | Python module global, the derived map | none |
 | `_BC_OUT`, `_BC_MEMO` | shell globals, the second an associative array | none |
 
 ### Files touched (estimate)
@@ -150,9 +168,9 @@ whole argument tuple that reaches `rev-list`.
   no-regress arm reds on zero ratifications, as TOOL-dFoldedVerdict-4's AC14 observed for the Python
   loop.
   Red when: the arm passes with the strip disabled.
-- **AC4** — When every signal in the derived map is called through `_build_run_ctx` on a violating
+- **AC4** — When every signal in the derived map is called through `read_one_signal` on a violating
   and a clean fixture, each record equals that signal's `report()` record on the same fixture, over
-  the fields the signal function returns.
+  the fields the in-process record carries: the signal function's own and `pin`.
   Red when: any signal differs, or the derived map is empty.
 - **AC5** — When `git grep -nE` for a literal list of signal names runs over
   the drift-audit selftest source, it finds none outside arms that assert one signal by name, and
@@ -163,8 +181,8 @@ whole argument tuple that reaches `rev-list`.
   Red when: the staged break passes, which means no arm depends on a clean start and the reset is
   unobserved; or `FLOOR_ASSERTIONS` is not met.
 - **AC7** — When `build_commit` is called twice for one range in one shell with `_BC_MEMO` declared and
-  `GIT` shadowed by a counting function, `rev-list` runs once and both calls answer what an
-  undeclared call answers; with no memo declared it runs twice.
+  the `git` that `GIT` runs shadowed on PATH by a counting stub, `rev-list` runs once and both calls
+  answer what an undeclared call answers; with no memo declared it runs twice.
   Red when: the second declared call re-runs `rev-list`, or any answer differs.
 - **AC8** — When `bash tools/unattended/check-pass-order.sh` and
   `bash tools/unattended/check-brief-recorded.sh` run at base and after the pass on the same tree,
@@ -203,10 +221,22 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC9 · the unse
   - (b) `worker_threads`, one worker per payload with `fs.readFileSync` patched in the worker; keeps
     real `process.exit` semantics, about 20-40 ms per payload, round one's ~110 s.
   - Recommendation: (a), with S2's parity sample as the guard against the divergence (a) risks.
+  - RESOLVED (owner, 2026-10-10): (a) `vm.Script` with the parity sample.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-11 · S3, §4 S3, AC4, inventory · the build pass. The in-process context is the
+  report's own `Ctx`, built as `main` builds it from a fresh module compiled from the fixture's copy,
+  not `_build_run_ctx` widened per signal: the widening is a hand-kept attribute list per signal, and
+  the report finds its project layer and sibling kits beside its own `__file__`, which only the
+  fixture's copy points at the fixture. `pin` is added as `main` adds it, `BASELINES` fixtures and
+  extras other than `--base-ref` stay on `report()`, and AC4 compares over the in-process record's
+  fields. The helper is `read_one_signal`, the name the lexicon's `--suggest` admits.
+- rev-3 · 2026-10-11 · AC7 · the build pass. AC7's counter shadows the `git` that `GIT` runs with a
+  stub first on PATH rather than redefining `GIT`: a second `GIT` definition is a second spelling of a
+  name `lexicon naming predicates` grades, and it moved both of that leg's pins by one. The stub
+  counts the same `rev-list` calls and passes every call through to the real git.
 
 ## 10. Reuse audit
 

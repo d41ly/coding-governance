@@ -6,7 +6,18 @@ Project-agnostic. Run over any repo:
 
     python <this file> [registry-path] [root]     # scan; exit 0 clean, 1 on an undeclared site
     python <this file> --location-probes [registry-path] [root] [pathspec ...]   # the second class
-    python <this file> --selftest                 # prove both predicates in BOTH directions
+    python <this file> --spawn-idioms [registry-path] [root] [pathspec ...]      # the third class
+    python <this file> --selftest                 # prove every predicate in BOTH directions
+
+THE THIRD CLASS, `--spawn-idioms` (TOOL-aSparedSpawn-8). A command substitution forks a subshell, 89 to
+315 ms under MSYS, and the idioms below fork for work bash does in-process. Three have no false positive
+and are BANNED on the product population with no registry escape: `$(date [-u] +%s)` and its `%N`
+form, `$(cat <<…`, and `$(<f …)` carrying a second redirection, which reads EMPTY and still forks.
+Six are counted per (path, class) in a shrink-only registry, the tracked `*.test.sh` included:
+`$(f …)` of a function whose body runs only builtins, `$(printf …)`, `$(cat <one word>)`,
+`$(basename`/`$(dirname`, `$(date +FMT)` that `printf %(…)T` spells, and a `printf`/`echo` of one
+expansion piped into a one-shot filter. A QUOTED heredoc's body is data and never graded. What it
+does not check is listed on `run_spawn_scan`, beside the mode it bounds.
 
 THE SECOND CLASS, `--location-probes`. With `GIT_DIR` set and no `GIT_WORK_TREE`, git takes the
 CURRENT directory for the top of the work tree. So `git -C <dir> rev-parse --show-prefix`, and the
@@ -198,7 +209,8 @@ PROBE_CLASSES = [
 #: A printed count nothing reads is the same nothing as no count: this repository has shipped
 #: nine arms stranded past an unconditional exit while the suite printed a total and every
 #: other gate held. Raise it with the arms; it may never be lowered to fit a regression.
-FLOOR_ASSERTIONS = 55
+#: RAISED 55 -> 81 by TOOL-aSparedSpawn-8: the spawn-idiom arms, 26 executed, every one unconditional.
+FLOOR_ASSERTIONS = 81
 
 
 def check_substitution(text: str) -> bool:
@@ -509,27 +521,12 @@ def scan_probe_tree(root: pathlib.Path, pathspecs: list[str]
     A shell source is a `*.sh`, or an extensionless file whose first line is a shell shebang — which
     reaches a repository's git hooks without this kit naming where it keeps them.
     """
-    listing = subprocess.run(
-        ["git", "ls-files", "-z", "--", *(pathspecs or ["."])],
-        cwd=str(root), capture_output=True, text=True, encoding="utf-8",
-    )
-    if listing.returncode != 0:
-        raise OSError("git ls-files failed, so the population could not be derived at all: "
-                      + (listing.stderr or "").strip())
     total: dict[str, list[tuple[str, int, str, str]]] = {key: [] for key, _m, _l in PROBE_CLASSES}
-    scanned = 0
-    for rel in sorted(p for p in listing.stdout.split("\0") if p):
-        full = root / rel
-        name = rel.rsplit("/", 1)[-1]
-        if not full.is_file() or not (name.endswith(".sh") or "." not in name):
-            continue
-        data = full.read_bytes()
-        if not name.endswith(".sh") and not SHELL_SHEBANG.match(data.split(b"\n", 1)[0]):
-            continue
-        scanned += 1
+    sources = read_shell_sources(root, pathspecs)
+    for rel, data in sources:
         for key, sites in scan_probe_file(data.decode("utf-8", "replace")).items():
             total[key].extend((rel, line, probe, remedy) for line, probe, remedy in sites)
-    return total, scanned
+    return total, len(sources)
 
 
 def build_probe_measured(found: dict[str, list[tuple[str, int, str, str]]]) -> dict[tuple[str, str], int]:
@@ -586,6 +583,361 @@ def run_probe_scan(args: list[str]) -> int:
           f"exports into a linked worktree's hooks and merge drivers, git takes the current directory "
           f"for the top of the work tree, so a probe asked from a moved directory answers about that "
           f"directory as if it were the root.")
+    for problem in problems:
+        print(f"  {problem}")
+    return 1
+
+
+# ---- the SPAWN-IDIOM classes, `--spawn-idioms` --------------------------------------------------
+# Under MSYS a fork costs 89 to 315 ms, and each class below forks for work bash does in-process. The
+# taxonomy, in report order: (key, BANNED, label). A BANNED class takes no registry row at all.
+SPAWN_CLASSES = [
+    ("epoch-date", True, "`$(date [-u] +%s)` or `+%s%N)` — `$EPOCHSECONDS`, or `${EPOCHREALTIME/[.,]/}` scaled, "
+                         "is the same answer with no fork"),
+    ("cat-heredoc", True, "`$(cat <<…` — read the heredoc with `IFS= read -r -d '' v <<'TAG' || :` instead"),
+    ("redirected-read", True, "`$(<f …)` with another redirection inside — bash's no-fork read is defeated, "
+                              "so it reads EMPTY and still forks"),
+    ("pure-fn-subst", False, "`$(f …)`, `f` defined in the file or a library it sources, its body spawning nothing"),
+    ("printf-subst", False, "`$(printf FMT ARGS)` with no pipe or redirect, FMT not ending `\\n` — `printf -v`"),
+    ("cat-file", False, "`$(cat <one word> [2>/dev/null])` — `$(<file)`"),
+    ("path-subst", False, "`$(basename …)` or `$(dirname …)` — parameter expansion"),
+    ("date-fmt", False, "`$(date [-u] +FMT)` with no `-d`/`-r` and a FMT `printf %(…)T` spells"),
+    ("var-pipe", False, "`printf`/`echo` of one expansion piped into `grep -q/-c`, `wc -l`, `tr`, `sed s///`, "
+                        "`head -1` or `cut` — a parameter expansion or a `[[ =~ ]]`"),
+]
+SPAWN_BANNED = [key for key, banned, _l in SPAWN_CLASSES if banned]
+SPAWN_REGISTERED = [key for key, banned, _l in SPAWN_CLASSES if not banned]
+# The remedy each BANNED site prints beside it.
+SPAWN_REMEDY = {
+    "epoch-date": "use $EPOCHSECONDS, or ${EPOCHREALTIME/[.,]/} scaled for %s%N",
+    "cat-heredoc": "read the heredoc first: IFS= read -r -d '' v <<'TAG' || :",
+    "redirected-read": "redirect the enclosing command, or test the file first and keep $(<f) bare",
+}
+# A registry key is one of the registry classes; a BANNED class name is refused as a row by name.
+SPAWN_KEY = re.compile(r"\A(?:" + "|".join(re.escape(key) for key, _b, _l in SPAWN_CLASSES) + r")\Z")
+SPAWN_KEY_SHAPE = (SPAWN_KEY, "a spawn-idiom class name", "CLASS")
+EPOCH_DATE = re.compile(r"date(?:[ \t]+-u)?[ \t]+['\"]?\+%s(?:%N)?['\"]?")
+DATE_FMT = re.compile(r"date(?:[ \t]+-u)?[ \t]+(\+[^\s'\"]+|'\+[^']*'|\"\+[^\"$`]*\")")
+CAT_FILE = re.compile(r"cat[ \t]+(?:\"[^\"]*\"|'[^']*'|[^\s\"'|<>;&()]+)(?:[ \t]+2>[ \t]*/dev/null)?")
+VAR_PIPE = re.compile(
+    r"(?<![\w-])(?:printf[ \t]+(?:'%s(?:\\n)?'|\"%s(?:\\n)?\")|echo(?:[ \t]+-[neE]+)?)[ \t]+"
+    r"(?:\"\$\{?[A-Za-z_][A-Za-z0-9_]*(?:\[[^\]\"]*\])?(?:[#%/:][^}\"]*)?\}?\"|\$\{?[A-Za-z_][A-Za-z0-9_]*\}?)"
+    r"[ \t]*\|[ \t]*(?:grep[ \t]+-[A-Za-z]*[qc]|wc[ \t]+-l(?![\w-])|tr(?![\w-])|sed[ \t]+(?:-e[ \t]+)?['\"]?s"
+    r"|head[ \t]+-(?:n[ \t]*)?1(?!\d)|cut(?![\w-]))")
+# `name() {`, `function name {` — a function definition. Group 1 the indent, 2 the name, 3 the rest.
+FUNCTION_DEF = re.compile(r"\A([ \t]*)(?:function[ \t]+)?([A-Za-z_][A-Za-z0-9_]*)[ \t]*\(\)[ \t]*\{(.*)\Z")
+# `. <path>.sh` or `source <path>.sh` — a library sourced by a literal file name.
+SOURCED = re.compile(r"(?:^|[;&|{ \t])(?:\.|source)[ \t]+\"?[^\"\s;]*?([A-Za-z0-9_.-]+\.sh)\"?", re.M)
+# The commands a pure body may run: every one is a builtin or a keyword, so none of them forks.
+PURE_COMMANDS = frozenset(
+    ": true false printf echo local declare typeset export readonly unset return read shift break continue "
+    "test [ [[ let case esac for in do done if then elif else fi while until set cd trap exit getopts "
+    "mapfile readarray pushd popd shopt".split())
+
+
+def read_substitution(code: str, start: int) -> str:
+    """The text inside the `$(` at `start`, balanced over quotes and nested substitutions.
+
+    An unbalanced one — a substitution that continues on the next line — returns the rest of the line,
+    which is enough for every predicate here: each reads only the command's first words.
+    """
+    depth, i, quote = 1, start + 2, ""
+    while i < len(code):
+        ch = code[i]
+        if ch == "\\" and quote != "'":
+            i += 2
+            continue
+        if quote:
+            if ch == quote:
+                quote = ""
+        elif ch in "'\"":
+            quote = ch
+        elif ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+            if depth == 0:
+                return code[start + 2:i]
+        i += 1
+    return code[start + 2:]
+
+
+def build_unquoted(text: str) -> str:
+    """The text with every quoted string, `${…}`, `$(…)` and `$((…))` replaced by `Q`."""
+    out, i = [], 0
+    while i < len(text):
+        ch = text[i]
+        if ch == "\\":
+            out.append("Q")
+            i += 2
+        elif ch in "'\"":
+            end = text.find(ch, i + 1)
+            end = len(text) if end < 0 else end + 1
+            out.append("Q")
+            i = end
+        elif text.startswith("${", i):
+            depth, j = 0, i + 1
+            while j < len(text):
+                depth += {"{": 1, "}": -1}.get(text[j], 0)
+                if depth == 0:
+                    break
+                j += 1
+            out.append("Q")
+            i = j + 1
+        elif text.startswith("$(", i):
+            inner = read_substitution(text, i)
+            out.append("Q")
+            i += len(inner) + 3
+        else:
+            out.append(ch)
+            i += 1
+    return "".join(out)
+
+
+def check_pure_body(body: str) -> bool:
+    """True when a function body runs only builtins and keywords, so a `$(f …)` call buys only a fork.
+
+    A body that calls another function is graded impure: that is a MISS, never a false red. So are a
+    pipeline, a substitution, a process substitution and any external command.
+    """
+    if check_substitution(body) or "<(" in body or ">(" in body:
+        return False
+    text = build_unquoted(body)
+    text = re.sub(r"\(\([^()]*\)\)", ":", text)
+    text = re.sub(r"\[\[.*?\]\]", "[[", text)
+    # A case pattern, after `in` or `;;` or at a line's start, is not a command and its `|` no pipe.
+    text = re.sub(r"(?m)(?:\bin\b|;;|^)[ \t]*\(?[^\s;()|]*(?:\|[^\s;()|]*)*\)", ";", text)
+    if re.search(r"(?<!\|)\|(?![|&])", text) or re.search(r"(?<![&>])&(?![&>])", text):
+        return False
+    for segment in re.split(r"\n|;;|;|&&|\|\||[{}()]", text):
+        words = segment.split()
+        while words and words[0] in ("!", "if", "elif", "while", "until", "then", "do", "else", "time"):
+            words.pop(0)
+        while words and re.match(r"\A[A-Za-z_][A-Za-z0-9_]*(?:\[[^\]]*\])?\+?=", words[0]):
+            words.pop(0)
+        if words and words[0] not in PURE_COMMANDS and not re.match(r"\A[0-9]*[<>]", words[0]):
+            return False
+    return True
+
+
+def read_code_lines(text: str) -> list[tuple[int, str, str]]:
+    """Each line as (1-based number, code half, comment half), a QUOTED heredoc's body dropped.
+
+    A quoted delimiter expands nothing, so its body is data — embedded Python, a written specimen —
+    and never a site. An unquoted body expands, so it is read as code.
+    """
+    lines = text.split("\n")
+    out: list[tuple[int, str, str]] = []
+    i = 0
+    while i < len(lines):
+        raw = lines[i].rstrip("\r")
+        code = extract_code(raw)
+        out.append((i + 1, code, raw[len(code):]))
+        match = None if HERESTRING in code else HEREDOC.search(code)
+        if match and match.group(2):
+            _body, end = extract_heredoc_body(lines, i, match.group(1), match.group(3))
+            i = end + 1 if end > i else len(lines)
+            continue
+        i += 1
+    return out
+
+
+def read_function_bodies(code_lines: list[tuple[int, str, str]]) -> dict[str, str]:
+    """Every function defined in one source, `{name: body code}`; a later definition wins."""
+    bodies: dict[str, str] = {}
+    i = 0
+    while i < len(code_lines):
+        match = FUNCTION_DEF.match(code_lines[i][1])
+        if not match:
+            i += 1
+            continue
+        indent, name, rest = match.groups()
+        if rest.rstrip().endswith("}"):
+            bodies[name] = rest.rstrip()[:-1]
+            i += 1
+            continue
+        body = [rest]
+        j = i + 1
+        while j < len(code_lines) and not re.match(re.escape(indent) + r"\}", code_lines[j][1]):
+            body.append(code_lines[j][1])
+            j += 1
+        bodies[name] = "\n".join(body)
+        i = j + 1
+    return bodies
+
+
+def check_spawn_substitution(inner: str, pure: set[str], impure: set[str]) -> tuple[str, bool]:
+    """Classify the text inside one `$( )`: (class key, is-site). A near miss is (class, False)."""
+    text = inner.strip()
+    word = text.split()[0] if text.split() else ""
+    flat = build_unquoted(text)
+    redirected = bool(re.search(r"[<>|]", flat))
+    if word == "date":
+        if EPOCH_DATE.fullmatch(text):
+            return "epoch-date", True
+        fmt = DATE_FMT.fullmatch(text)
+        return "date-fmt", bool(fmt and not re.search(r"%N|%:z|%-|%_|%s", fmt.group(1)))
+    if re.match(r"cat[ \t]*<<", text):
+        return "cat-heredoc", True
+    if text.startswith("<"):
+        return "redirected-read", bool(re.search(r"[0-9]*[<>]", flat[1:]))
+    if word == "cat":
+        return "cat-file", bool(CAT_FILE.fullmatch(text))
+    if word in ("basename", "dirname"):
+        return "path-subst", True
+    if word == "printf":
+        fmt = text.split()[1] if len(text.split()) > 1 else ""
+        return "printf-subst", not redirected and not re.search(r"\\n['\"]?\Z", fmt)
+    if word in pure:
+        return "pure-fn-subst", True
+    if word in impure:
+        return "pure-fn-subst", False
+    return "", False
+
+
+def scan_spawn_file(text: str, library: dict[str, str] | None = None) -> dict[str, list[tuple[int, bool, str]]]:
+    """Classify every spawn idiom in one shell source: `{class: [(line, is-site, code), ...]}`.
+
+    `library` is the functions of the libraries this file sources; the file's own definitions win.
+    A spelling in a comment is a near miss of its class and never a site.
+    """
+    code_lines = read_code_lines(text)
+    bodies = dict(library or {})
+    bodies.update(read_function_bodies(code_lines))
+    pure = {name for name, body in bodies.items() if check_pure_body(body)}
+    impure = set(bodies) - pure
+    found: dict[str, list[tuple[int, bool, str]]] = {key: [] for key, _b, _l in SPAWN_CLASSES}
+    for number, code, comment in code_lines:
+        for half, live in ((code, True), (comment, False)):
+            for match in re.finditer(r"\$\((?!\()", half):
+                key, site = check_spawn_substitution(read_substitution(half, match.start()), pure, impure)
+                if key:
+                    found[key].append((number, site and live, code.strip()))
+            for _match in VAR_PIPE.finditer(half):
+                found["var-pipe"].append((number, live, code.strip()))
+    return found
+
+
+def read_shell_sources(root: pathlib.Path, pathspecs: list[str]) -> list[tuple[str, bytes]]:
+    """Every tracked shell source under the pathspecs: a `*.sh`, or an extensionless shebang file."""
+    listing = subprocess.run(
+        ["git", "ls-files", "-z", "--", *(pathspecs or ["."])],
+        cwd=str(root), capture_output=True, text=True, encoding="utf-8",
+    )
+    if listing.returncode != 0:
+        raise OSError("git ls-files failed, so the population could not be derived at all: "
+                      + (listing.stderr or "").strip())
+    sources = []
+    for rel in sorted(p for p in listing.stdout.split("\0") if p):
+        full = root / rel
+        name = rel.rsplit("/", 1)[-1]
+        if not full.is_file() or not (name.endswith(".sh") or "." not in name):
+            continue
+        data = full.read_bytes()
+        if not name.endswith(".sh") and not SHELL_SHEBANG.match(data.split(b"\n", 1)[0]):
+            continue
+        sources.append((rel, data))
+    return sources
+
+
+def scan_spawn_tree(root: pathlib.Path, pathspecs: list[str]
+                    ) -> tuple[dict[str, list[tuple[str, int, bool, str]]], int, int]:
+    """The product population under the pathspecs, plus every tracked `*.test.sh` for the registry
+    classes only. Returns (found, product files, suite files). A BANNED class is graded on product.
+    """
+    product = read_shell_sources(root, pathspecs)
+    names = {rel for rel, _d in product}
+    suites = [(rel, data) for rel, data in read_shell_sources(root, ["*.test.sh"]) if rel not in names]
+    texts = {rel: data.decode("utf-8", "replace") for rel, data in product + suites}
+    by_name: dict[str, list[str]] = {}
+    for rel in texts:
+        by_name.setdefault(rel.rsplit("/", 1)[-1], []).append(rel)
+    found: dict[str, list[tuple[str, int, bool, str]]] = {key: [] for key, _b, _l in SPAWN_CLASSES}
+    for rel, text in sorted(texts.items()):
+        library: dict[str, str] = {}
+        folder = rel.rsplit("/", 1)[0] + "/" if "/" in rel else ""
+        for lib in sorted(set(SOURCED.findall(text))):
+            here = folder + lib
+            target = here if here in texts else (by_name.get(lib, [""])[0] if len(by_name.get(lib, [])) == 1 else "")
+            if target and target != rel:
+                library.update(read_function_bodies(read_code_lines(texts[target])))
+        suite = rel not in names
+        for key, sites in scan_spawn_file(text, library).items():
+            if suite and key in SPAWN_BANNED:
+                continue
+            found[key].extend((rel, line, site, code) for line, site, code in sites)
+    return found, len(product), len(suites)
+
+
+def build_spawn_measured(found: dict[str, list[tuple[str, int, bool, str]]]) -> dict[tuple[str, str], int]:
+    """The registry classes' sites as `{(path, class): count}` — the registry's own key."""
+    measured: dict[tuple[str, str], int] = {}
+    for key in SPAWN_REGISTERED:
+        for rel, _line, site, _code in found[key]:
+            if site:
+                measured[(rel, key)] = measured.get((rel, key), 0) + 1
+    return measured
+
+
+def print_spawn_populations(found: dict[str, list[tuple[str, int, bool, str]]], product: int, suites: int) -> None:
+    print(f"sh-hygiene: spawn idioms — {product} product shell source(s) and {suites} suite(s) scanned; "
+          f"a BANNED class grades the {product} product source(s) only")
+    for key, banned, label in SPAWN_CLASSES:
+        sites = [s for s in found[key] if s[2]]
+        near = len(found[key]) - len(sites)
+        files = len({s[0] for s in sites})
+        scanned = product if banned else product + suites
+        print(f"sh-hygiene:   [{'BANNED' if banned else 'registry'}] {key}: {scanned} scanned · "
+              f"{len(sites)} site(s) in {files} file(s) · {near} near miss(es) — {label}")
+
+
+def run_spawn_scan(args: list[str]) -> int:
+    """`--spawn-idioms [registry] [root] [pathspec ...]`: 0 clean, 1 findings, 2 refusal.
+
+    WHAT THIS DOES NOT CHECK, each a MISS and never a false red: how often a site executes; `eval` and
+    code built in variables; a substitution split across a line continuation; transitive purity — a
+    callee calling another function grades impure; repeated identical `git` queries; cross-process
+    probes; and the cost of fork-free work, such as a bash `read` loop over a 13k-line file. Those last
+    three are why a fork COUNT per entrypoint exists beside this lint.
+    """
+    root = pathlib.Path(args[1] if len(args) > 1 else ".").resolve()
+    if not root.is_dir():
+        print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
+        return 2
+    reasons: dict[tuple[str, str], str] = {}
+    try:
+        declared, malformed = resolve_declaration(args[0] if args else None, SPAWN_KEY_SHAPE, reasons)
+        found, product, suites = scan_spawn_tree(root, args[2:])
+    except OSError as exc:
+        print(f"sh-hygiene: {exc}", file=sys.stderr)
+        return 2
+    if product == 0:
+        print("sh-hygiene: no tracked shell source under the root and pathspecs, so this run graded "
+              "NOTHING — that is a refusal and not a pass", file=sys.stderr)
+        return 2
+    if not args:
+        print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
+    print_spawn_populations(found, product, suites)
+    for key in [k for k in declared if k[1] in SPAWN_BANNED]:
+        malformed.append(f"{key[0]}: the registry declares `{key[1]}`, a BANNED class no row can waive "
+                         f"— drain the site: {SPAWN_REMEDY[key[1]]}")
+        del declared[key]
+    measured = build_spawn_measured(found)
+    for key in sorted(set(measured) & set(declared)):
+        print(f"sh-hygiene: registered — {key[0]}: `{key[1]}` × {declared[key]} — {reasons[key]}")
+    explained = {key: f"{key[0]}: {count} `{key[1]}` site(s) and no registry row declares them — convert "
+                      f"each to the no-fork form, or declare the row with its reason"
+                 for key, count in measured.items()}
+    problems = malformed + check_registry(measured, declared, explained)
+    for key in SPAWN_BANNED:
+        problems.extend(f"{rel}:{line}: [{key}] {code} — {SPAWN_REMEDY[key]}"
+                        for rel, line, site, code in found[key] if site)
+    if not problems:
+        print(f"sh-hygiene: OK — no BANNED spawn idiom, and {sum(declared.values())} registered site(s) "
+              f"in {len(declared)} row(s) match the scan")
+        return 0
+    print(f"sh-hygiene: {len(problems)} finding(s). Each idiom below forks a process for work bash does "
+          f"in-process, at 89 to 315 ms a fork under MSYS.")
     for problem in problems:
         print(f"  {problem}")
     return 1
@@ -852,6 +1204,92 @@ def run_selftest() -> int:
     finally:
         os.environ.update(held)
 
+    # ---- the SPAWN-IDIOM classes: each fires on its specimen and stays silent on its near miss ----
+    # One file holds every specimen and every near miss, so an arm cannot pass by grading nothing:
+    # the same run must name each class's site and refuse each class's neighbour.
+    spawn_cases = [
+        ("x=$(date +%s)", "epoch-date", True),
+        ("x=$(date -u +%s%N)", "epoch-date", True),
+        ("x=$(date -d @5 +%s)", "date-fmt", False),
+        ('x="$(cat <<\'EOF\'', "cat-heredoc", True),
+        ("x=$(<f 2>/dev/null)", "redirected-read", True),
+        ("x=$(<f)", "redirected-read", False),
+        ('x=$(pure "$a")', "pure-fn-subst", True),
+        ('x=$(forks "$a")', "pure-fn-subst", False),
+        ("x=$(printf '%s-%s' \"$a\" \"$b\")", "printf-subst", True),
+        ("x=$(printf '%s\\n' \"$a\")", "printf-subst", False),
+        ('x=$(cat "$f" 2>/dev/null)', "cat-file", True),
+        ('x=$(cat "$f" | wc -l)', "cat-file", False),
+        ('x=$(basename -- "$f")', "path-subst", True),
+        ("x=$(date -u +%Y-%m-%dT%H:%M:%SZ)", "date-fmt", True),
+        ("x=$(date +%s.%N)", "date-fmt", False),
+        ("printf '%s' \"$x\" | grep -q y", "var-pipe", True),
+    ]
+    head = "pure() { local v=$1; printf '%s' \"${v#x}\"; }\nforks() { git rev-parse \"$1\"; }\n"
+    for case, key, site in spawn_cases:
+        seen_spawn = scan_spawn_file(head + case + "\nEOF\n")
+        test(f"spawn [{key} {'site' if site else 'near miss'}] {case}",
+             [s[1] for s in seen_spawn[key] if s[0] == 3], [site], say=True)
+    test("a specimen inside a QUOTED heredoc is data, so no class fires on it",
+         sum(len(v) for v in scan_spawn_file("cat <<'DATA'\nx=$(date +%s)\ny=$(cat <<EOF\nDATA\n").values()), 0,
+         say=True)
+    test("a specimen in a comment is a near miss of its class, never a site",
+         [s[1] for s in scan_spawn_file("# x=$(date +%s)\n")["epoch-date"]], [False], say=True)
+    test("a callee that calls another function grades impure — a miss, never a false red",
+         [s[1] for s in scan_spawn_file(head + "two() { pure \"$1\"; }\nx=$(two a)\n")["pure-fn-subst"]],
+         [False], say=True)
+    test("a function a library defines grades through the library the file sources",
+         [s[1] for s in scan_spawn_file("x=$(pure a)\n", {"pure": "printf '%s' \"$1\""})["pure-fn-subst"]],
+         [True], say=True)
+    held = {name: os.environ.pop(name) for name in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE")
+            if name in os.environ}
+    try:
+        with tempfile.TemporaryDirectory() as scratch:
+            tree = pathlib.Path(scratch)
+            (tree / "lib.sh").write_bytes(b"pure() { printf '%s' \"$1\"; }\n")
+            (tree / "a.sh").write_bytes(b". \"$HERE/lib.sh\"\nx=$(pure a); y=$(basename \"$x\")\n")
+            (tree / "b.test.sh").write_bytes(b"x=$(basename \"$0\")\nt=$(date +%s)\n")
+            for argv in (["git", "init", "-q", "."], ["git", "add", "-A"]):
+                subprocess.run(argv, cwd=str(tree), capture_output=True, check=True)
+            reg = tree / "reg.txt"
+            outcomes = []
+            for rows in ("a.sh\tpure-fn-subst\t1\tpredates\na.sh\tpath-subst\t1\tpredates\n"
+                         "b.test.sh\tpath-subst\t1\ta suite\n",
+                         "a.sh\tpure-fn-subst\t1\tpredates\na.sh\tpath-subst\t1\tpredates\n",
+                         "a.sh\tpure-fn-subst\t2\tpredates\na.sh\tpath-subst\t1\tpredates\n"
+                         "b.test.sh\tpath-subst\t1\ta suite\n",
+                         "a.sh\tpure-fn-subst\t1\tpredates\na.sh\tpath-subst\t1\tpredates\n"
+                         "b.test.sh\tpath-subst\t1\ta suite\na.sh\tepoch-date\t1\twaived\n"):
+                reg.write_text(rows, encoding="utf-8")
+                said = io.StringIO()
+                with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
+                    code = run_spawn_scan([str(reg), str(tree), ":!*.test.sh"])
+                outcomes.append((code, said.getvalue()))
+            test("a registry row per (path, class) is green, and a suite's epoch-date is not BANNED",
+                 outcomes[0][0], 0, say=True)
+            test("a suite's registry-class site is counted, so a row missing for it is a finding",
+                 (outcomes[1][0], "b.test.sh: 1 `path-subst` site(s) and no registry row" in outcomes[1][1]),
+                 (1, True), say=True)
+            test("a count that disagrees is a finding", (outcomes[2][0], "the scan measures" in outcomes[2][1]),
+                 (1, True), say=True)
+            test("a row naming a BANNED class is refused rather than honoured",
+                 (outcomes[3][0], "a BANNED class no row can waive" in outcomes[3][1]), (1, True), say=True)
+            (tree / "c.sh").write_bytes(b"t=$(date +%s)\n")
+            subprocess.run(["git", "add", "-A"], cwd=str(tree), capture_output=True, check=True)
+            said = io.StringIO()
+            reg.write_text("a.sh\tpure-fn-subst\t1\tpredates\na.sh\tpath-subst\t1\tpredates\n"
+                           "b.test.sh\tpath-subst\t1\ta suite\n", encoding="utf-8")
+            with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
+                code = run_spawn_scan([str(reg), str(tree), ":!*.test.sh"])
+            test("a product epoch-date site reds naming the file, line, class and the remedy",
+                 (code, "c.sh:1: [epoch-date] t=$(date +%s) — use $EPOCHSECONDS" in said.getvalue()),
+                 (1, True), say=True)
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                code = run_spawn_scan([str(reg), str(tree), "nosuch/"])
+            test("an empty product population refuses with 2", code, 2, say=True)
+    finally:
+        os.environ.update(held)
+
     if n < FLOOR_ASSERTIONS:
         print(f"SELFTEST FAIL: {n} assertion(s) executed, under the floor of {FLOOR_ASSERTIONS} — an arm is stranded past an early exit, which is the one defect a printed count can see and a per-arm check cannot")
         ok = False
@@ -864,6 +1302,8 @@ def main(argv: list[str]) -> int:
         return run_selftest()
     if "--location-probes" in argv:
         return run_probe_scan([arg for arg in argv[1:] if arg != "--location-probes"])
+    if "--spawn-idioms" in argv:
+        return run_spawn_scan([arg for arg in argv[1:] if arg != "--spawn-idioms"])
     args = argv[1:]
     root = pathlib.Path(args[1] if len(args) > 1 else ".").resolve()
     if not root.is_dir():
