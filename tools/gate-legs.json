@@ -325,7 +325,10 @@
     "guard": [
       "{prefix}/hooks/format-guard.js",
       "{prefix}/hooks/format-guard.test.sh",
-      "{prefix}/hooks/scratch-guard.js"
+      "{prefix}/hooks/scratch-guard.js",
+      "{prefix}/runlog/prose.py",
+      "{prefix}/runlog/extract.py",
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "kit",
