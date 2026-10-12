@@ -1,4 +1,4 @@
-"""prose.py — a transcript measure of narration, interjections and BUILD/SPEC pair emission.
+"""prose.py — a transcript measure of narration, interjections and BUILD/SPEC pair emission. gov:kit runlog@1.12
 
 Contract: the spec for TOOL-aHeardState-2 under the build folder of that slug.
 

@@ -58,3 +58,5 @@ base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 2026-10-12T21:28:24Z dispatch · item 4110a669 TOOL-aHeardState-2 · reason memory/builds/aHeardState/spec/2026-10-11-spec-TOOL-aHeardState-2.md
 
 2026-10-12T21:30:08Z dispatch · item b8c9b136 TOOL-aHeardState-2 · reason tools/runlog/prose.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/kit.toml tools/runlog/fixtures/prose.json tools/runlog/README.md tools/hooks/format-guard.test.sh memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
+
+2026-10-12T21:34:52Z dispatch · item 50e2420f TOOL-aHeardState-2 · reason tools/hooks/agent-cap.js tools/hooks/scratch-guard.js tools/hooks/format-guard.js tools/runlog/runlog_lib.py tools/runlog/README.md tools/runlog/adopt-runlog.sh tools/runlog/extract.py tools/runlog/model.py tools/runlog/record.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/prose.py tools/playbook/render_playbook.py
