@@ -1,11 +1,12 @@
 # TOOL-aSparedSpawn-34 — reconcile the build with local main, so it lands there conflict-free
 
-**Status:** INPROGRESS · rev-1 · 2026-10-13 · node a · Tier-2 · base 249b4ab6 · streams tooling · order 7
+**Status:** CLOSED · rev-1 · 2026-10-13 · node a · Tier-2 · base 249b4ab6 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-TOOL-aSparedSpawn-34-acceptance-ledger.md](../build/2026-10-13-build-TOOL-aSparedSpawn-34-acceptance-ledger.md) | journal | — |
 | [2026-10-13-prompt-TOOL-aSparedSpawn-34-build-brief.md](../prompts/2026-10-13-prompt-TOOL-aSparedSpawn-34-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
