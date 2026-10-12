@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling+kickoff+playbook
 roster: TOOL+KICK+PLAY
-ids: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19
+ids: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21
 authorized-by: prompt
 ---
 
@@ -50,6 +50,9 @@ JavaScript the owner cannot adjust. The owner's prose is the mandate, recorded u
   agents carry the rendered Protocols section whole, and an inline stand-in needs a run that cannot
   spawn agents and an owner waiver. Its five units are MISSING at the resume, and their briefs are
   written by hand because the handoff renderer refuses until the first of them lands.
+- The owner's third addendum, the same day: every agent a turn dispatches or receives is shown with
+  its effort, model, unit, prompt, ids, outcome and authority, kept in a per-build ledger, and
+  enforced by extending format-guard. The build reconciles from local main, never waiting on origin.
 
 ## Parked decisions
 
@@ -82,12 +85,15 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 21 | `TOOL-aOrientedCast-18` | the playbook renders a derived role-roster placeholder from the roles kit's roster (addendum 2) |
 | 22 | `PLAY-aOrientedCast-2` | the charter's `[roles]` rule and its generated Agent roles section (addendum 2) |
 | 23 | `TOOL-aOrientedCast-19` | an inline stand-in for a role needs a dated owner waiver row (addendum 2) |
+| 24 | `TOOL-aOrientedCast-20` | the roles kit derives each agent's dispatch and return lines, and appends them to a generated per-build agent ledger (addendum 3) |
+| 25 | `PLAY-aOrientedCast-3` | the charter's `agent` and `returned` micro-formats, mandatory for every agent a turn dispatches or receives (addendum 3) |
+| 26 | `TOOL-aOrientedCast-21` | format-guard refuses a final message that omits an agent line for an agent its turn dispatched or received (addendum 3) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 23 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
-ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10
-ids TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19
+ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9
+ids TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |

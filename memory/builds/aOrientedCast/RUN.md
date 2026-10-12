@@ -171,3 +171,9 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-12T23:31:48Z dispatch · item b61ec1c4 TOOL-aOrientedCast-16 · reason .claude/skills/build/SKILL.md .claude/agents/gov-builder.md .claude/agents/gov-diff-reviewer.md .claude/agents/gov-orienter.md .claude/agents/gov-researcher.md .claude/agents/gov-reuse-scout.md .claude/agents/gov-skeptic.md .claude/agents/gov-spec-reviewer.md .claude/agents/gov-spec-writer.md .claude/agents/gov-synthesizer.md .claude/roles.json memory/builds/aOrientedCast/build/2026-10-13-build-TOOL-aOrientedCast-16-1-acceptance-ledger.md
 
 2026-10-12T23:32:58Z resume · item aOrientedCast · reason working · keepalive d98cca1e · manual
+
+2026-10-12T23:35:53Z rescope · item add TOOL-aOrientedCast-20 · reason the owner's third addendum (prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-6-owner-addendum.md): every agent shown with its effort and references, kept in a ledger, enforced by format-guard
+
+2026-10-12T23:35:55Z rescope · item add PLAY-aOrientedCast-3 · reason the owner's third addendum (prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-6-owner-addendum.md): every agent shown with its effort and references, kept in a ledger, enforced by format-guard
+
+2026-10-12T23:35:56Z rescope · item add TOOL-aOrientedCast-21 · reason the owner's third addendum (prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-6-owner-addendum.md): every agent shown with its effort and references, kept in a ledger, enforced by format-guard
