@@ -60,3 +60,17 @@ base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 2026-10-12T21:30:08Z dispatch · item b8c9b136 TOOL-aHeardState-2 · reason tools/runlog/prose.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/kit.toml tools/runlog/fixtures/prose.json tools/runlog/README.md tools/hooks/format-guard.test.sh memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
 
 2026-10-12T21:34:52Z dispatch · item 50e2420f TOOL-aHeardState-2 · reason tools/hooks/agent-cap.js tools/hooks/scratch-guard.js tools/hooks/format-guard.js tools/runlog/runlog_lib.py tools/runlog/README.md tools/runlog/adopt-runlog.sh tools/runlog/extract.py tools/runlog/model.py tools/runlog/record.py tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/prose.py tools/playbook/render_playbook.py
+
+2026-10-12T21:49:01Z review · item aHeardState · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 5 · minors 18 · disposition promote
+
+2026-10-12T21:49:43Z rescope · item add TOOL-aHeardState-3 · reason closing review round 1 id 8 (HIGH): the format-guard self-test leg has no subject pin and no budget row
+
+2026-10-12T21:49:52Z rescope · item add TOOL-aHeardState-4 · reason closing review round 1 id 9 (HIGH): the new {prefix}/hooks/ guard tips hooks/ past BROAD_LEG_FLOOR and out of the spec-tokens join
+
+2026-10-12T21:49:53Z rescope · item add TOOL-aHeardState-5 · reason closing review round 1 id 10 (HIGH): the format-guard self-test guard omits the runlog files its parity arm reads
+
+2026-10-12T21:49:55Z rescope · item add TOOL-aHeardState-6 · reason closing review round 1 id 14 (HIGH): the same narrow-guard defect from the intent lens; its unit records the class in the bug-class checklist
+
+2026-10-12T21:49:56Z rescope · item add TOOL-aHeardState-7 · reason closing review round 1 id 3 (HIGH): the format-guard header says continuation commits are absorbed, and the code demands them
+
+2026-10-12T21:49:57Z rescope · item add TOOL-aHeardState-8 · reason closing review round 1: the 18 MEDIUM and LOW findings, batched into one unit

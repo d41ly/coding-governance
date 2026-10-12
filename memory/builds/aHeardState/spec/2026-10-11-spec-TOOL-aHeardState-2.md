@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md) | research | TOOL-aHeardState-1 |
+| [2026-10-13-review-TOOL-aHeardState-1-2-closing-diff-review-round1.md](../reviews/2026-10-13-review-TOOL-aHeardState-1-2-closing-diff-review-round1.md) | diff-review | TOOL-aHeardState-1 |
 
 <!-- /gen:spec-records -->
 

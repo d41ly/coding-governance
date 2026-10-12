@@ -5,7 +5,7 @@ opened: 2026-10-11
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aHeardState-1 TOOL-aHeardState-2
+ids: TOOL-aHeardState-1 TOOL-aHeardState-2 TOOL-aHeardState-3 TOOL-aHeardState-4 TOOL-aHeardState-5 TOOL-aHeardState-6 TOOL-aHeardState-7 TOOL-aHeardState-8
 ---
 
 # aHeardState — the turn end refuses a final message without the BUILD/SPEC pair, and a transcript measure counts the prose
@@ -50,21 +50,27 @@ is the mandate, recorded under [prompts/](prompts/2026-10-11-prompt-TOOL-aHeardS
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-10-11 · streams tooling
-ids TOOL-aHeardState-1 TOOL-aHeardState-2
+**Build status:** INPROGRESS · 8 unit(s) · node a · opened 2026-10-11 · streams tooling
+ids TOOL-aHeardState-1 TOOL-aHeardState-2 TOOL-aHeardState-3 TOOL-aHeardState-4 TOOL-aHeardState-5 TOOL-aHeardState-6 TOOL-aHeardState-7 TOOL-aHeardState-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aHeardState-1 — format-guard: the turn end refuses a final message without the BUILD/SPEC pair or a committed line](spec/2026-10-11-spec-TOOL-aHeardState-1.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-10-12 |
 | [TOOL-aHeardState-2 — runlog prose: a transcript measure of narration, interjections and pair emission](spec/2026-10-11-spec-TOOL-aHeardState-2.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-10-13 |
+| [TOOL-aHeardState-3 — the format-guard self-test leg gets its subject pin and its budget row](spec/2026-10-13-spec-TOOL-aHeardState-3.md) | 3 | 1 | SPECCED | rev-1 | 2026-10-13 |
+| [TOOL-aHeardState-4 — the format-guard self-test guard names the hook files, not the whole hooks directory](spec/2026-10-13-spec-TOOL-aHeardState-4.md) | 4 | 1 | SPECCED | rev-1 | 2026-10-13 |
+| [TOOL-aHeardState-5 — the format-guard self-test guard covers the runlog files its parity arm reads](spec/2026-10-13-spec-TOOL-aHeardState-5.md) | 5 | 1 | SPECCED | rev-1 | 2026-10-13 |
+| [TOOL-aHeardState-6 — the bug-class checklist names a held suite whose guard misses a sibling kit it reads](spec/2026-10-13-spec-TOOL-aHeardState-6.md) | 6 | 1 | SPECCED | rev-1 | 2026-10-13 |
+| [TOOL-aHeardState-7 — the format-guard header states what happens to a continuation's commits, and an arm pins it](spec/2026-10-13-spec-TOOL-aHeardState-7.md) | 7 | 1 | SPECCED | rev-1 | 2026-10-13 |
+| [TOOL-aHeardState-8 — the closing review's mediums and lows: fixtures that can see the defects, and three small fixes](spec/2026-10-13-spec-TOOL-aHeardState-8.md) | 8 | 1 | SPECCED | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aHeardState-3 TOOL-aHeardState-4 TOOL-aHeardState-5 TOOL-aHeardState-6 TOOL-aHeardState-7 TOOL-aHeardState-8.
 
-Ids no `spec-audit` record has ever named: TOOL-aHeardState-1 TOOL-aHeardState-2.
+Ids no `spec-audit` record has ever named: TOOL-aHeardState-1 TOOL-aHeardState-2 TOOL-aHeardState-3 TOOL-aHeardState-4 TOOL-aHeardState-5 TOOL-aHeardState-6 TOOL-aHeardState-7 TOOL-aHeardState-8.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -73,6 +79,12 @@ Ids no `spec-audit` record has ever named: TOOL-aHeardState-1 TOOL-aHeardState-2
 |---|---|---|
 | 1 | `TOOL-aHeardState-1` | no |
 | 2 | `TOOL-aHeardState-2` | no |
+| 3 | `TOOL-aHeardState-3` | no |
+| 4 | `TOOL-aHeardState-4` | no |
+| 5 | `TOOL-aHeardState-5` | no |
+| 6 | `TOOL-aHeardState-6` | no |
+| 7 | `TOOL-aHeardState-7` | no |
+| 8 | `TOOL-aHeardState-8` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
