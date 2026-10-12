@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+gates-run: unattended-17917550758759849974-134991 4606faa4
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
@@ -99,3 +100,9 @@ base: 15bbfa4f867262f3c862e2473688fc69d0566b7d
 2026-10-11T14:58:39Z brief · item TOOL-aPrimedIndex-10 · reason 2607f636a7fb memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-10-1-build-brief.md
 
 2026-10-11T15:04:53Z dispatch · item c7604c36 TOOL-aPrimedIndex-10 · reason tools/push-main.sh tools/push-main.test.sh memory/map/features/push-main.md memory/map/generated/symbols.json memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-10.md
+
+2026-10-12T01:51:49Z rescope · item add TOOL-aPrimedIndex-16 · reason the close's bar over 4606faa4 red 9 legs and KF3 attributed all OWN because this build edits run-gates.sh, so the push bar would refuse them too
+
+2026-10-12T01:52:09Z brief · item TOOL-aPrimedIndex-16 · reason cf04d072e179 memory/builds/aPrimedIndex/prompts/2026-10-12-prompt-TOOL-aPrimedIndex-16-1-build-brief.md
+
+2026-10-12T01:53:42Z dispatch · item 4606faa4 TOOL-aPrimedIndex-16 · reason tools/lexicon/selftest.py tools/unattended/unattended.test.sh .githooks/pre-push.test.sh .lexicon.conf .memory-tree.conf memory/project/unarmed-branches.txt memory/guides/SESSION-KICKOFF.md memory/builds/aPrimedIndex/spec/2026-10-12-spec-TOOL-aPrimedIndex-16.md memory/builds/aPrimedIndex/BACKLOG.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-1.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-2.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-3.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-4.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-6.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-8.md
