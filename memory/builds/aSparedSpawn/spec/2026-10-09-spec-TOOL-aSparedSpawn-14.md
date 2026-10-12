@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-14 — a refusal retirement review, and a growth budget beside the floors
 
-**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-4 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -119,9 +119,9 @@ the owner's.
   (`:6063`, `:6065`) are retired with no tombstone in their place, per S2. Those two sites are the
   whole of check 47, so its block goes; the retired key stays reported by check 22, and the protocol's
   key row stops saying check 23 refuses it. The batch's single commit carries S2's proof for all five
-  rows: one registry row each with R1 to R4, survivor and replay filled, both unattended gates' floors
-  and seeded ceilings lowered with comment lines naming the decision id, and no refusal site outside
-  the five rows removed. Observed by AC12 and AC13.
+  rows: one registry row each with R1 to R4, survivor and replay filled, both unattended gates'
+  censuses lower, the floors and seeded ceilings at the post-batch census with comment lines naming
+  the decision id, and no refusal site outside the five rows removed. Observed by AC12 and AC13.
   **Readers:** by name: the arms of `tools/unattended/check-unattended.test.sh` that pin checks 23 and
   47 spell their messages. by value: `tools/memory-tree/check-arms.py` counts the sites against the
   `ARMS_FLOORS` token for `tools/unattended/check-unattended.sh`, and
@@ -297,11 +297,13 @@ there rather than added to the table.
   Red when: a tombstone remains, or one is re-added in another form.
 - **AC13** — The proof: when `check-arms.py --check` runs on the post-batch tree, its retirement pass
   reads one registry row per approved row, 1, 2, 4, 5 and 15, each with R1 to R4, a survivor carrying
-  its signature, a replay line and a decision id a `memory/DECISIONS.md` row carries; both unattended gates' `ARMS_FLOORS` and
-  `REFUSAL_CEILINGS` tokens sit below the batch parent's, each lowered beside a comment naming a row
-  id; and `check-arms.py --report` at parent and child differ only in the five rows' sites.
-  Red when: a row or field is missing, a survivor lacks its signature, a floor or ceiling did not
-  move, or a site outside the five rows left the census.
+  its signature, a replay line and a decision id a `memory/DECISIONS.md` row carries; both unattended
+  gates' censuses sit below the batch parent's, the driver's `ARMS_FLOORS` token is lowered and the
+  leg's re-stamped where its census landed, each beside a comment naming the decision id, and both
+  `REFUSAL_CEILINGS` tokens sit at the post-batch census; and `check-arms.py --report` at parent and
+  child differ only in the five rows' sites and check 52's one new branch.
+  Red when: a row or field is missing, a survivor lacks its signature, a census or the driver's floor
+  did not move, or a site outside the five rows left the census.
   fixture: R1 cites the stores actually read; node `a` has none, and other nodes' stores are read
   only if the owner supplies them before the commit.
   cost: one direct invocation of the changed program per row for its replay line, seconds each.
@@ -361,6 +363,13 @@ New arm: tools/unattended/unattended.test.sh, one arm each for `require_run_stat
   check 48 holding no such exit here; the ceilings and the batch share the one pass commit, so the
   tokens carry the post-batch census. Check 52 is the leg's new number for the three joins. The kit
   version bumps stay with the run's main loop, after its last unit.
+- rev-4 · 2026-10-12 · S11 AC13 · check 52 reports its three joins and their liveness on ONE fail
+  branch, so the check that replaces refusals adds one site rather than four; the leg's census then
+  falls 266 -> 264, onto the floor token it already had, so that token is re-stamped and not lowered,
+  and AC13 grades the two censuses, the driver's floor and both seeded ceilings. The helpers carry
+  the lexicon's spellings, `check_run_state`, `check_verb_flag` and `print_env_failure`, as §4's
+  inventory provides. Row 15's replay is owed at VERIFYING: the leg's core run it needs passed the
+  pass's 600 s bound and was stopped.
 
 ## 10. Reuse audit
 
