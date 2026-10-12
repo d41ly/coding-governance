@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-33 — the pre-push hook restores the caller's environment for the reuse digest
 
-**Status:** INPROGRESS · rev-2 · 2026-10-12 · node a · Tier-2 · base 950dc27f · streams tooling · order 6 · closes TOOL-aSparedSpawn-25 · ratified 2026-10-12
+**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base 950dc27f · streams tooling · order 6 · closes TOOL-aSparedSpawn-25 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
@@ -33,8 +33,8 @@ read site and schema it extends, so its line numbers are re-read then.
   inside a real hook, and records it in the ledger; a name the table lacks is added to it with its
   rule, or the pass stops naming it. Observed by AC2.
 - **S2** — The hook hands the runner the restored view for the DIGEST ONLY. On a SCOPED decision
-  where it exports `GATE_REUSE_PUSH`, it writes the restored view's digest lines to a file in its own
-  scratch directory and exports `GATE_REUSE_DIGEST_ENV` naming that file. It clears an inherited
+  where it exports `GATE_REUSE_PUSH`, it writes the restored view's digest lines to a file in its git
+  dir (rev-3) and exports `GATE_REUSE_DIGEST_ENV` naming that file. It clears an inherited
   `GATE_REUSE_DIGEST_ENV` for every bar, a STUB included, beside `GATE_REUSE_PUSH`, and names it on
   the `not honoured from the environment by this bar:` line. The legs' own environment is not
   touched: they run under the hook's environment exactly as today. Observed by AC3 and AC4.
@@ -121,10 +121,13 @@ the S5 suite that compares the two pattern texts.
 ### The handoff
 
 The view file holds one `env NAME=value` line per variable the digest's name patterns admit, in
-the digest's own format, written with `printf` from the hook's scratch directory and removed by the
-hook's existing exit trap. The runner reads it with `mapfile` and spawns nothing more than today.
-Values carrying a newline are written with `printf %q` and read back the same way, so a line is
-always one variable.
+the digest's own format, written with `printf` to `<git dir>/gate-reuse-view.<hook pid>`, an absolute
+path, since the hook has no scratch directory of its own. It is removed once the bar returns, and by
+the signal handler (rev-3): not by the EXIT trap, whose exact line `.githooks/pre-push.runlog.test.sh`
+pins, and whose run-log writer an exec on that line would be charged to. The runner reads it with
+`mapfile` and spawns nothing more than today. Values carrying a newline are written with `printf %q`,
+and the runner's own listing writes them the same way in every mode, so a line is always one variable
+and the two listings agree.
 
 ### Inventory
 
@@ -229,6 +232,9 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC5 · the env mod
   rather than a `git version` spawn, and fixes the view's one write site; AC2 reads PATH under the
   `/bin` rule. S7, S8, AC8 and AC9 adopt the brief's two knob-scrub discoveries left by
   `TOOL-aSparedSpawn-32`'s reconcile.
+- rev-3 · 2026-10-12 · the view file lives in the git dir and is removed after the bar and by the
+  signal handler, not by the EXIT trap the run-log suite pins (§4, The handoff); the runner's mode
+  block moves, unchanged, above the digest, which now reads the mode it decides.
 
 ## 10. Reuse audit
 
