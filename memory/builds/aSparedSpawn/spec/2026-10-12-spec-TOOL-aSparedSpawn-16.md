@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-16 — the closing review's mediums and lows, and the bar reds this build's diff carries
 
-**Status:** CLOSED · rev-3 · 2026-10-12 · node a · Tier-2 · base f479ba42 · streams tooling · order 4
+**Status:** CLOSED · rev-4 · 2026-10-12 · node a · Tier-2 · base f479ba42 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -17,8 +17,9 @@
 Make the build's own HEAD bar green, and fix every MEDIUM and LOW finding of the round-1 closing
 review (`memory/builds/aSparedSpawn/reviews/2026-10-12-review-TOOL-aSparedSpawn-1-15-closing-diff-round1.md`)
 that no HIGH unit owns. The review converged with three HIGHs, and the owner rulings of 2026-10-04
-promote one unit per HIGH and batch the rest here: ids 1, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18,
-19, 21, 22 and 23. Ids 4 and 15 duplicate HIGH id 20 and go with it to `TOOL-aSparedSpawn-19`. The
+promote one unit per HIGH and batch the rest here: ids 1, 7, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19,
+22 and 23. Ids 11 and 21 (M3) left at rev-3 with S10 and are the owner-call ask
+`TOOL-aSparedSpawn-25`. Ids 4 and 15 duplicate HIGH id 20 and go with it to `TOOL-aSparedSpawn-19`. The
 bar reds this build's diff carries ride along: two drifted registries, two stale fork ceilings and
 six unarmed exit sites.
 
@@ -82,8 +83,8 @@ S8 are unused since rev-2; §9 says where their work went.
   counted theirs: unit 13's forty-one beyond the six it rewrote in place, and this unit's four, to 208, with a
   `RAISED <old> -> <new> by TOOL-aSparedSpawn-13 and -16` line. The acceptance ledger marks the
   executed count OWED until the suite runs at VERIFYING. Observed by AC10.
-- **S10** — MOVED TO THE BUILD'S EXIT AS A NAMED ASK (rev-3); the text below is the ask's design and
-  nothing of it is built here. A pre-push hook's environment, observed 2026-10-12 on node a, differs
+- **S10** — MOVED TO THE BUILD'S EXIT AS A NAMED ASK (rev-3), `TOOL-aSparedSpawn-25`; the text below
+  is the ask's design and nothing of it is built here. A pre-push hook's environment, observed 2026-10-12 on node a, differs
   from a plain shell by more than `GIT_EXEC_PATH` and the PATH prefix: git also exports `GIT_PREFIX`,
   and Git for Windows exports `LC_CTYPE=C.UTF-8` where the caller set none, while a `git -c alias`
   child, AC11's instrument, adds `GIT_DIR` and `GIT_CONFIG_PARAMETERS` too. `LC_CTYPE` is a locale a
@@ -179,7 +180,7 @@ S8 are unused since rev-2; §9 says where their work went.
   arms, the fixed-sleep lint over the suites, the dead-plumbing grep over `$WORK` suffixes, and the
   `GATE_REUSE*` enumeration arm. Each is carried to the build's exit as an ask.
 - S10 and its AC11, the reuse digest's view of a hook's environment, carried to the build's exit as
-  a named ask (rev-3): the hook's `GIT_PREFIX` and Git for Windows' `LC_CTYPE` differ from a plain
+  the named ask `TOOL-aSparedSpawn-25` (rev-3): the hook's `GIT_PREFIX` and Git for Windows' `LC_CTYPE` differ from a plain
   shell as well, and whether a locale may leave the key is the owner's ruling.
 - Running any suite or the bar inside the build pass. The suites and the bar run once, at VERIFYING.
 - A kit version bump. The main loop bumps every kit this unit touches once, after it.
@@ -199,7 +200,8 @@ correction.
 
 ### Reuse key and age (S10, S11)
 
-S10's half is the exit ask's design since rev-3 and is not built here. The digest's env loop gains the five names to its `continue` arm. PATH is read once into a local,
+S10's half is the design of the exit ask `TOOL-aSparedSpawn-25` since rev-3 and is not built here.
+The digest's env loop gains the five names to its `continue` arm. PATH is read once into a local,
 its first `:`-separated component dropped when it equals `$GIT_EXEC_PATH`, its MSYS spelling
 (`/c/...`), or ends in `/libexec/git-core`, and the `tool` lines resolve under that local through
 `PATH=$stripped type -P`, which spawns nothing. With the schema at 4 every key changes, so no entry
@@ -249,14 +251,14 @@ sees no new definition.
 
 ## 5. Production-readiness checklist
 
-- security: S6 and S10 bound what the environment and the hook decide about a push bar's reuse; S11 makes a wrong entry's life follow its own key; no new input or write path.
-- perf / scale: S10 and S11 add builtin work only; S2 removes forks; S3 records savings already made; S12 and S13 shorten no wait on the pass path and bound the red path at 120 s.
+- security: S6 bounds what the environment decides about a push bar's reuse; S11 makes a wrong entry's life follow its own key; no new input or write path. What the hook's environment decides about the digest is S10's, which is `TOOL-aSparedSpawn-25` since rev-3.
+- perf / scale: S11 adds builtin work only; S2 removes forks; S3 records savings already made; S12 and S13 shorten no wait on the pass path and bound the red path at 120 s.
 - error / empty / loading states: S18 prints the one line a silent key failure lacked; a malformed or five-field entry executes or reads as count 0.
 - observability: S17 puts the sampled and aged facts on the leg's own line; S16 keeps the `log:` pointer on the failing attempt.
-- risks: S10's schema bump makes the first reuse bar on each node cold; S11's in-place rewrite can be read torn, which executes; S15 drops a fallback no supported bash needs.
+- risks: S11's in-place rewrite can be read torn, which executes; S15 drops a fallback no supported bash needs.
 - testing: an arm per behavioural item, each observed red on a staged break first; the canary and evidence floors rise by what is added.
-- migration: entries under schema 3 are no longer matched and age out under the 30-day prune; the old `age.*` files are left to no reader and the prune does not walk them.
-- user docs: `tools/run-gates/README.md`'s reuse section states the per-key age, the digest's exclusions and the two tails.
+- migration: `REUSE_SCHEMA` stays 3 and a five-field entry reads as count 0; the old `age.*` files are left to no reader and the prune does not walk them. The schema bump and the digest exclusions are S10's, which is `TOOL-aSparedSpawn-25` since rev-3.
+- user docs: `tools/run-gates/README.md`'s reuse section states the per-key age and the two tails.
 
 ## 6. Acceptance criteria
 
@@ -286,8 +288,8 @@ sees no new definition.
   such line exists, which is f479ba42's state.
   permission: whether the floor sits at or below the executed count is observed when the suite runs
   at VERIFYING, and the ledger marks it OWED until then.
-- **AC11** — MOVED TO THE BUILD'S EXIT WITH S10 (rev-3); not observed in this unit. When a scratch
-  repository's bar earns an `ok` from a plain shell, and the runner then
+- **AC11** — MOVED TO THE BUILD'S EXIT WITH S10 (rev-3), `TOOL-aSparedSpawn-25`; not observed in
+  this unit. When a scratch repository's bar earns an `ok` from a plain shell, and the runner then
   runs as a git alias child (`git -c alias.rg='!bash …' rg`), which receives the environment a hook
   does, with `GATE_REUSE=1`, it prints `GATE reuse` for the leg. Red when: the child executes the
   leg, which f479ba42 does because its digest hashes `GIT_EXEC_PATH` and the prefixed PATH.
@@ -359,6 +361,9 @@ none
   run because a reused leg writes no record row. S15 makes `measure_foreign`'s fallback bare too,
   which AC16's count finds. S9 counts unit 13's forty-one and this unit's four, 163 to 208. S2 sets
   the canary's `var-pipe` row to its measured count. S12's 9m sleeper is a committed fixture file.
+- rev-4 · 2026-10-12 · §1 §2 §3 §4 §5 S10 AC11 · records: §1 and §5 brought in line with rev-3's S10
+  move; no behaviour change. Findings 11 and 21 leave §1's list, §5 drops S10's schema bump and digest
+  exclusions, and every S10 sentence names its exit ask, `TOOL-aSparedSpawn-25`.
 
 ## 10. Reuse audit
 
