@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-7 — `--only` selectors for the unattended gate and the hygiene gate, each naming what ran
 
-**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 2
+**Status:** INPROGRESS · rev-2 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -24,38 +24,65 @@ conditional on S1's measurement, and about 270 s quiet and 1500 s pool in the hy
 - **S1** — The traced census, before code. One conforming-fixture run of `check-unattended.sh` under
   `PS4='+$EPOCHREALTIME $LINENO '`, its spawns and seconds attributed to check headers, giving `f`, the
   share of the 28 region plus the post-28 checks. Recorded with its instrument under the build folder.
-  Observed by AC1.
+  The conforming fixture is a clone of this repository at the pass commit, which the merge bar holds
+  green. The instrument, `2026-10-11-build-TOOL-aSparedSpawn-7-census.sh`, lands in the pass; its one
+  run is owed at VERIFYING, because a whole-leg run is barred inside a pass, and S2 does not land
+  before `f` is recorded. The same run observes AC2 and AC5 on that clone. Observed by AC1.
 - **S2** — `check-unattended.sh` parser. Inside the existing argv sentinel pair
   (`check-unattended.sh:141-149`), `--only` accepts `28` as today, `core`, and any `N` among the
   post-28 check headers, read from the running file by the `_o28_nums` awk (`:5372-5377`) and never
-  typed. `--skip 28` is unchanged. Anything else exits 2. Observed by AC2, AC4.
+  typed. `--skip 28` is unchanged. Anything else exits 2: a value that is neither `core` nor digits
+  inside the sentinel pair, and a number naming no post-28 header right after it. The comment line
+  inside check 39 that opened `# ---- check 1 refuses` read as a check 1 header to that awk and is
+  reworded, so `1` is not selectable and `--only 28` no longer announces a check 1 skip.
+  Observed by AC2, AC4.
 - **S3** — `check-unattended.sh` guards. `--only core` runs the prologue and the region guarded at
   `:325`, and skips the 28 region (`:4792`) and the post-28 branch, announcing each skip as `--only 28`
   does today (`:5360-5383`). `--only <N>` skips the core and 28 regions; each `# ---- check N` block
   after the 28 region opens with `check_selected N`, called once per header and never inside a loop.
   Producers stay unguarded: the conf import, the warm-ups, `core_of` and the per-record facts.
-  Observed by AC2, AC3.
+  The audit (every name assigned in the core region and read after the 28 region, and every name one
+  post-28 block assigns and another reads) found four producers. Three move above the core guard:
+  the driver-constant parse with `core_of` and the four core sets read beside it, `KITREL` with
+  `PREFIX`, and the directive splitter that builds `core`, `corescope` and `coresec`. The fourth is
+  check 48's list of the kit's shell files, which check 51 reads, so it runs ahead of check 48's
+  guard. The warm-ups and the per-record facts stay inside the core region: no check after the 28
+  region reads them. The post-28 branch opens on `if [ "$SCOPE" = only28 ] || [ "$SCOPE" = core ]`,
+  and `--only core` announces its skips there in `--only 28`'s words. A number naming a core check
+  and a post-28 header both (15) selects the post-28 block alone. Observed by AC2, AC3.
 - **S4** — The liveness line, on stdout, under ANY `--only` including `28`:
   `check-unattended: --only <sel> ran checks <sorted ran set>; skipped <the rest of the header set>`.
   A requested check that never reached its guard exits 2 with the line
   `check N was requested and no guard for it ran, so its verdict would be silence`. The header's contract (`check-unattended.sh:12`) names the
-  line as a third exit-0 exception; an unscoped run prints nothing new. Observed by AC2, AC3, AC5.
+  line as a FOURTH exit-0 exception, since three are named there already; an unscoped run prints
+  nothing new. Observed by AC2, AC3, AC5.
 - **S5** — `check-memory-hygiene.sh --only N[,M]`. Each check block opens with
   `check_selected <ids>`, where a delegated block names every id it grades at once, such as the
   13-16 classifier block (`check-memory-hygiene.sh:2486`) and check 25 inside check 12's block
   (`:2419`). The selectable set is derived from the running file's own `check_selected` calls. A
   requested id no call names exits 2 before any check runs; one that never reached its call exits 2
   after. `--only` with `--staged`, `--offenders` or a print mode exits 2. Producers stay unguarded:
-  checks 1-5 remain the prefix `--print-index-set` returns after (`:812`). Observed by AC6, AC7.
+  checks 1-5 remain the prefix `--print-index-set` returns after (`:812`). Checks 6, 7 and 8 share
+  the `derive_waived` state the curation-debt stale-entry guard reads, so their three blocks and
+  that guard each call `check_selected 6 7 8` and run as one unit. The grandfather stale-line guard
+  builds its tracked set unguarded, grades its legacy half under `check_selected 5` and its debt
+  half under `check_selected 6 7 8`. The index set and the view set stay producers.
+  Observed by AC6, AC7.
 - **S6** — The hygiene liveness line on stdout, `HYGIENE --only <sel> ran checks <sorted ran set>`,
   named in the header (`check-memory-hygiene.sh:20-21`) as a third exit-0 channel. Observed by AC6.
-- **S7** — Projection parity arms in both suites. For `core`, every post-28 `N`, and every hygiene
-  selectable id, on the conforming fixture and on one red fixture of that check, the unscoped run's
-  lines for it equal the `--only` run's lines. Observed by AC8.
-- **S8** — Arm migration. In both suites, an arm that asks about one check or region and carries no
-  negative assertion on a check outside that selection calls a `run_scoped <sel>` helper, which also
-  asserts the liveness line. An arm with such a negative stays unscoped or widens its selection.
-  The existing `--only 28` arms assert the new line. Observed by AC9.
+- **S7** — Projection parity arms in both suites, in PARTITION form: the set of lines the unscoped
+  run prints equals the union of the lines the scoped runs print, over every selectable id, with the
+  liveness lines set aside. One comparison reads every check's lines at once, so a scoped run that
+  drops or adds a verdict reds it whichever check it was. The gate suite compares on its pristine
+  fixture and on that fixture with one staged red in the 28 region and one after it; the hygiene
+  suite compares on its main fixture, which is red across most checks. A red fixture per check is
+  dropped: the partition grades every check's lines on every fixture it runs. Observed by AC8.
+- **S8** — Scoped arms. Both suites gain a `run_scoped <sel>` helper that runs one selection and
+  asserts its liveness line and the absence of the unreached-guard refusal; every scoped arm this
+  unit adds calls it, and the existing `--only 28` arms assert the new line. The migration of the
+  existing unscoped arms moves OUT of this unit: each migrated arm's equivalence is observable only
+  by a suite run, which a pass may not make, and several hundred arms rewritten unobserved is the
+  hand-patch shape the build's gotchas record. The main loop files it. Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -120,10 +147,10 @@ never register its check.
 1. S1's trace, recorded.
 2. The `check-unattended.sh` parser, guards and line (S2-S4), with its parity arms.
 3. The hygiene selector and line (S5, S6), with its parity arms.
-4. Arm migration (S8), one suite region per step, the inventory compared before and after each:
-   `check-arms.py --report` rows for both gates with the line column dropped, the `--emit-floors`
-   tokens, the sorted assertion multiset with the `--only` argument stripped, and each suite's PASS
-   count read from its log.
+4. The scoped arms (S8). The migration of the existing arms, with its inventory comparison
+   (`check-arms.py --report` rows with the line column dropped, the `--emit-floors` tokens, the sorted
+   assertion multiset with the `--only` argument stripped, and each suite's PASS count), is the
+   follow-on unit's procedure and is not run here.
 
 `check-memory-hygiene.sh` is in `check-verdict-epoch.sh`'s scan set, so the memory-tree kit owes its
 version bump in every carrier `check-kit-versions.sh` derives. The unattended kit bump is shared with
@@ -140,9 +167,12 @@ New identifiers: `check_selected` (verb `check`) and `run_scoped` (verb `run`); 
 - `tools/unattended/check-unattended.sh` — parser values, guards, the line, the contract header.
 - `tools/unattended/check-unattended.test.sh` — parity arms, `run_scoped`, migrated arms.
 - `tools/memory-tree/check-memory-hygiene.sh` — the selector, guards, the line, the header.
-- `tools/memory-tree/check-memory-hygiene.test.sh` — parity arms, `run_scoped`, migrated arms.
-- `memory/HYGIENE.md` — the kit version carrier and the `--only` usage line.
-- `tools/memory-tree/HYGIENE.template.md` — the same, in the kit's template.
+- `tools/memory-tree/check-memory-hygiene.test.sh` — parity arms, `run_scoped`, the new arms.
+- `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-7-census.sh` — S1's instrument.
+
+`memory/HYGIENE.md` and its template are NOT touched: the usage line lives in the gate's header,
+which HYGIENE.md already names as the single enforcement, and the kit version carriers are bumped by
+the main loop once after the last unit.
 
 ### Alternatives rejected
 
@@ -190,15 +220,15 @@ New identifiers: `check_selected` (verb `check`) and `run_scoped` (verb `run`); 
 - **AC7** — When `--only 12` is combined with `--staged` or `--offenders`, or names an id no
   `check_selected` call carries, `tools/memory-tree/check-memory-hygiene.sh` exits 2.
   Red when: any of those combinations runs a check.
-- **AC8** — When the projection parity arms run, for `core`, each post-28 `N` and each hygiene id,
-  the unscoped run's lines for that check equal the `--only` run's lines, on the conforming fixture
-  and on one red fixture of that check. Red when: a staged guard placed around a producer makes a
-  scoped run drop or add a verdict and the arm stays green.
-  permission: the two suites are held; the owner runs them on demand, and a pass observes this by slice.
-- **AC9** — When `python tools/memory-tree/check-arms.py --report` runs before and after the arm
-  migration, both gates' normalised rows are identical and `--emit-floors` reproduces their
-  `ARMS_FLOORS` tokens, and every `run_scoped` arm asserts the liveness line.
-  Red when: a row disappears, a token moves, or a scoped arm carries a negative on an unselected check.
+- **AC8** — When the projection parity arms run, the set of lines the unscoped run prints equals the
+  union of the lines the `--only` runs print over `core`, `28` and each post-28 `N`, on the gate
+  suite's pristine fixture and on it with a staged 28-region red and a staged check 39 red, and over
+  every hygiene selectable id on the hygiene suite's main fixture. Red when: a staged guard placed
+  around a producer makes a scoped run drop or add a verdict and the arm stays green.
+  permission: the two suites are held; the owner runs them on demand, and VERIFYING observes this.
+- **AC9** — When the suites run, every `run_scoped` call asserts its liveness line and the absence
+  of the unreached-guard refusal, and the existing `--only 28` arms assert the liveness line.
+  Red when: a scoped arm reads no liveness line, or carries a negative on an unselected check.
 
 ## 7. Gates
 
@@ -214,6 +244,12 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-12 · §2 §4 §6 S1 S2 S3 S4 S5 S7 S8 AC8 AC9 · the pass's reading of the code: S1's run is
+  owed at VERIFYING on a clone of the tree, S2 refuses a non-numeric value in the sentinel and drops
+  a comment line that read as a check 1 header, S3 names the four producers its audit found and the
+  anchor `--only core` shares, S4's exception is the FOURTH, S5 makes 6, 7 and 8 one unit over their
+  shared waiver state, S7 takes the partition form, S8 moves the migration of existing arms out, and
+  the HYGIENE.md pair leaves the file list.
 
 ## 10. Reuse audit
 
