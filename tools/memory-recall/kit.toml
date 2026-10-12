@@ -90,6 +90,9 @@ mutates_index = false
 # GOVKIT_RERENDER is set to, because the flag runs a block and there was none.
 [[regenerate]]
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--scaffold"]
+# Staged for the bar (TOOL-aPrimedIndex-1): run-gates' regen.py re-renders this before a bar
+# and proves it fresh with this kit's [check] argv; stage 1 is a render from a kit template.
+stage = 1
 
 [check]
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--check"]
