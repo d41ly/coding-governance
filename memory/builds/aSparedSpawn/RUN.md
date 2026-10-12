@@ -9,10 +9,18 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+hold-run: 
+hold-streak: 1 · at ebee7826
+resume-owed: none · owner
+held-at: 2026-10-12T20:49:03Z
+hold-reason: the owner asked to pause for a node reboot (2026-10-12); TOOL-aSparedSpawn-33's unfinished pass is set aside in stash 21eb9abc50b4cd0d8366064531d6a674ac31ccfc (tag aSparedSpawn-u33-wip-before-reboot-hold), to be applied on resume and the unit re-dispatched as a continuation
+hold-until: owner
+hold-code: host-owner-action
+held-from: VERIFYING
 refreshed-at: 37200355d6033895cd156ec962928fd264084c2b · park · 107 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 336e151ac873e4b6096e1398f29dcbe0e12af50e
-phase: VERIFYING
+witness: ebee78269ef98a8c22524e4dc485b7616030a9fb
+phase: HELD
 may: none
 mode: slug
 run-branch: refs/heads/branch/gate-runner-profiling-optimization-5d1f1e
@@ -208,3 +216,5 @@ base: e6585db4e125bb0919c0c1f18687eb9825ffed80
 2026-10-12T19:35:48Z dispatch · item 93b53471 TOOL-aSparedSpawn-33 · reason .githooks/pre-push .githooks/pre-push.test.sh tools/run-gates/run-gates.sh tools/run-gates/README.md tools/run-gates/run-gates.evidence.test.sh tools/run-gates/post-merge.sh tools/unattended/unattended.sh memory/builds/aSparedSpawn/spec/2026-10-12-spec-TOOL-aSparedSpawn-33.md memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-33-acceptance-ledger.md memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-33-fixtures.sh memory/builds/aSparedSpawn/README.md
 
 2026-10-12T19:36:09Z brief · item TOOL-aSparedSpawn-33 · reason a62e1325877a memory/builds/aSparedSpawn/prompts/2026-10-12-prompt-TOOL-aSparedSpawn-33-build-brief.md
+
+2026-10-12T20:49:11Z hold · item host-owner-action · reason until owner · reaped f1736cba · resume none(owner)
