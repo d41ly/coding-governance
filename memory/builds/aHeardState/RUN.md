@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 6b32af422bc2c02d067c2fc0887627f95404de0f
-phase: RUNNING
+witness: dd96ba886
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/aHeardState
@@ -29,3 +29,7 @@ anchor-ref: refs/heads/main
 base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 
 ## Parked
+
+2026-10-12T16:33:00Z brief · item TOOL-aHeardState-1 · reason b9d32e7b75fa memory/builds/aHeardState/prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md
+
+2026-10-12T16:33:44Z brief · item TOOL-aHeardState-2 · reason b9d32e7b75fa memory/builds/aHeardState/prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md

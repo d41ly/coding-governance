@@ -1,6 +1,6 @@
 # TOOL-aHeardState-1 — format-guard: the turn end refuses a final message without the BUILD/SPEC pair or a committed line
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-2 · base 2f01150c · streams tooling · order 1
+**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-2 · base 2f01150c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

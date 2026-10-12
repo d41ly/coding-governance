@@ -50,13 +50,13 @@ is the mandate, recorded under [prompts/](prompts/2026-10-11-prompt-TOOL-aHeardS
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-10-11 · streams tooling
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-10-11 · streams tooling
 ids TOOL-aHeardState-1 TOOL-aHeardState-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aHeardState-1 — format-guard: the turn end refuses a final message without the BUILD/SPEC pair or a committed line](spec/2026-10-11-spec-TOOL-aHeardState-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-11 |
+| [TOOL-aHeardState-1 — format-guard: the turn end refuses a final message without the BUILD/SPEC pair or a committed line](spec/2026-10-11-spec-TOOL-aHeardState-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-10-12 |
 | [TOOL-aHeardState-2 — runlog prose: a transcript measure of narration, interjections and pair emission](spec/2026-10-11-spec-TOOL-aHeardState-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
