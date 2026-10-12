@@ -9,10 +9,18 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+hold-run: 
+hold-streak: 1 · at 12cb2e1b
+resume-owed: none · owner
+held-at: 2026-10-12T19:59:59Z
+hold-reason: the owner paused the run to reboot node a: about 26 GB of leaked kernel pool after 7 days up made each spawn cost 260-740 ms and pushed the claim push past its bound; unit 1 is built and amended, unit 2 is SPECCED with its code drafted but not placed
+hold-until: owner
+hold-code: host-owner-action
+held-from: BUILDING
 refreshed-at: 6e8f8b1da4dc036b7fce23555b78fb4b5db0e60c · park · 13 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: dd96ba886
-phase: BUILDING
+witness: 12cb2e1b8d9683b0de301122eab6cec1e323d016
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/aHeardState
@@ -42,3 +50,5 @@ base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 2026-10-12T19:45:28Z dispatch · item 0a2162b9 TOOL-aHeardState-1 · reason memory/builds/aHeardState/spec/2026-10-11-spec-TOOL-aHeardState-1.md memory/builds/aHeardState/build/2026-10-12-build-TOOL-aHeardState-1-1-live-witness.md
 
 2026-10-12T19:47:28Z decision · item stop-guard is dark for a run whose session was launched in another worktree and moved to the run's tree: this run's session drew no run-open block at a BUILDING turn end · reason options: (a) the unattended kit's preflight refuses a session whose CLAUDE_PROJECT_DIR is not the run's tree; (b) the protocol tells the prompt path to relaunch the session in the new worktree; (c) record it as a gotcha only. Refused here: it changes the unattended kit, outside this build's mandate, and rests on an inference from two silent hooks (build record 2026-10-12-build-TOOL-aHeardState-1-1-live-witness.md)
+
+2026-10-12T20:00:34Z hold · item host-owner-action · reason until owner · reaped 81987d49 · resume none(owner)
