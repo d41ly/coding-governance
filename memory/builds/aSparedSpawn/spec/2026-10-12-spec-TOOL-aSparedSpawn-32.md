@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-32 — reconcile the build with origin/main 37200355
 
-**Status:** INPROGRESS · rev-2 · 2026-10-12 · node a · Tier-2 · base fce4b707 · streams tooling · order 5
+**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base fce4b707 · streams tooling · order 5 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
@@ -62,17 +62,65 @@ records any difference in the ledger. Conflicted files, with hunk counts:
   origin's changes to the runner or the hook moved its count, and the ledger records both readings.
   Observed by AC6.
 
+S6 to S10 compose the two reuse designs, per the owner's ruling in §8 F1: origin's LINEAGE reuse
+(`TOOL-aFrugalTurnstile-4`) and this build's content-addressed CACHE reuse
+(`TOOL-aSparedSpawn-13`, `-16`, `-17`). §4 "Composing the two reuse designs" is the contract; these
+items are what it builds.
+
+- **S6** — Disjoint knobs, one read site. Lineage reuse is asked for by a new knob,
+  `GATE_REUSE_LINEAGE`, which `.githooks/pre-push` exports on a FULL decision for a runner bar where
+  origin exported `GATE_REUSE=lineage`. Cache reuse keeps `GATE_REUSE` (the env mode) and
+  `GATE_REUSE_PUSH` (the push mode). The runner reads the three knobs once, at the site of origin's
+  `REUSE_MODE=${GATE_REUSE:-}; unset GATE_REUSE`, into `REUSE_ASK_ENV`, `REUSE_ASK_PUSH` and
+  `REUSE_ASK_LINEAGE`, and unsets all three there; the mode block reads those variables and never the
+  environment. The hook clears an inherited `GATE_REUSE_LINEAGE` for every bar, a STUB included,
+  beside `GATE_REUSE_PUSH`, and names it on the `not honoured from the environment` line. Observed by
+  AC9 and AC10.
+  - **Readers:** by name: READER NOT IN TREE — the `lineage` value of `GATE_REUSE` is spelled only
+    on origin/main 37200355d, by its hook's FULL branch, its runner's reuse block, its README and its
+    two suites' lineage arms, which this merge brings in and S6 and S10 re-stage. by value: the
+    runner's reuse block branches on the mode, and its header writes the mode as `reuse`.
+- **S7** — One mode per run, by a fixed precedence. Under `GATE_FULL` the mode is `lineage` when
+  `REUSE_ASK_LINEAGE` is set and `off` otherwise, and a set `GATE_REUSE` or `GATE_REUSE_PUSH` is
+  named as not used. Without `GATE_FULL` the mode is `push`, then `env`, then `off`, exactly as this
+  build's mode block decides today, and a set `GATE_REUSE_LINEAGE` is named as not used. The header's
+  `reuse` key records the one mode: `off`, `env`, `push` or `lineage`. Observed by AC10 and AC12.
+- **S8** — The stamp says which kind of reuse it carries. `gate-full-green` keeps origin's
+  `reused <n>`, the legs the run carried forward, and gains `reused_cache <n>`, the legs it took from
+  the cache, always 0 on a full green. Predicate 9 in `.githooks/pre-push` forces FULL when
+  `reused_cache` is non-zero, or when it is absent and `reused` is non-zero, because a record written
+  before the composition cannot say which kind it reused. A full stamp with `reused` above 0 and
+  `reused_cache` 0 is a lineage stamp, keeps origin's meaning, and does not force the next push FULL.
+  The inherited-green stamp keeps "reused nothing" on both sides. Observed by AC7 and AC8.
+- **S9** — The texts. `tools/run-gates/README.md` states each rule once: the cache's env and push
+  modes, lineage at the boundary's FULL decision, the precedence, the two stamp fields and
+  predicate 9's reading. The runner's mode block and the hook's scrub, FULL branch and predicate 9
+  comments each state the rule they implement once and point at the README for the other. Origin's
+  not-checked sentence for lineage and this build's for the cache both survive verbatim. Observed by
+  AC11.
+- **S10** — The arms of both sides re-staged to the composed names. Origin's lineage arms set
+  `GATE_REUSE_LINEAGE` and read `reuse lineage` from the header; origin's opt-in arms over the
+  ledger are re-staged on the cache env mode, which has been the opt-in store since this build's
+  `TOOL-aSparedSpawn-13`; this build's predicate-9 arm plants `reused_cache 1`.
+  NOT OBSERVED by a criterion of its own: each re-staged arm executes when its suite runs at the
+  close, and AC1 and AC2 account for every line either side added.
+
 ## 3. Non-goals (OUT)
 
 - A kit version mint. The lander mints every carrier at `--prepare`.
 - Running any suite or the bar inside the pass. The close's bar runs once, after this unit.
-- Any behaviour change beyond reconciling the two sides. A defect found in either side's code is
-  recorded as an ask, not fixed here.
+- Any behaviour change beyond reconciling the two sides, which for reuse is the composition §4
+  states. A defect found in either side's code is recorded as an ask, not fixed here.
 - Re-deriving origin's own records, decisions or backlog rows. They arrive as origin wrote them.
+- The reuse digest's view of the hook's environment is `TOOL-aSparedSpawn-33`, not this unit.
+- Any change to either reuse design's own terms: lineage's four row terms and its base filter, and
+  the cache's key, sample and age bound, arrive as each side wrote them. The composition decides
+  only which knob asks for which design, which mode a run takes, and what the stamp records.
 
 ### Edges
 
-none
+- **hands-off** `TOOL-aSparedSpawn-33` — the digest's view of the hook's environment, read beside
+  `REUSE_ASK_PUSH` at the one knob read site this unit builds.
 
 ## 4. Design
 
@@ -98,6 +146,66 @@ The two-parent diff reads, per conflicted file F, every line `git diff 69e0ff0f5
 adds and every line `git diff 69e0ff0f5 fce4b707 -- F` adds, and checks each is present in the
 result or is justified by a ledger line. The justification is either a line the other side rewrote
 on purpose or a line both sides moved.
+
+### Composing the two reuse designs
+
+Kept side by side, the two designs disable each other. Origin's `unset GATE_REUSE` sits about 900
+lines above this build's mode block, which reads `GATE_REUSE`, so the env mode never fires. And a
+lineage FULL run stamps `reused <n>` with n above 0, which this build's predicate 9 reads as a reused
+verdict, so every push after a lineage green is forced FULL and runs lineage again. The owner ruled
+to compose both (§8 F1). The composition, in five parts:
+
+**(a) Disjoint triggers and names.**
+
+| Design | Asked for by | Set by | Store it reads | Mode |
+|---|---|---|---|---|
+| cache, env | `GATE_REUSE` | a person or a script, by hand | the common-dir cache | `env` |
+| cache, push | `GATE_REUSE_PUSH` | `.githooks/pre-push`, on a SCOPED decision | the common-dir cache | `push` |
+| lineage | `GATE_REUSE_LINEAGE` | `.githooks/pre-push`, on a FULL decision for a runner bar | the per-git-dir `gate-ledger.tsv` | `lineage` |
+
+The runner reads all three at ONE site, origin's, right after `unset GATE_RUN_ID`:
+`REUSE_ASK_ENV=${GATE_REUSE:-}`, `REUSE_ASK_PUSH=${GATE_REUSE_PUSH:-}` and
+`REUSE_ASK_LINEAGE=${GATE_REUSE_LINEAGE:-}`, then `unset GATE_REUSE GATE_REUSE_PUSH GATE_REUSE_LINEAGE`,
+so a leg's nested runner inherits no mode, which is origin's S4 intent extended to all three. The
+mode block, later, reads only the `REUSE_ASK_*` variables. `GATE_REUSE_SAMPLE` and `GATE_REUSE_DAY`
+stay read where they are, as the cache's seams. The digest's env loop already leaves out every
+`GATE_REUSE*` name, so the new knob changes no key. A lineage run reuses only from ledger rows; it
+never reads a cache entry to decide a reuse. The cache's upkeep after the legs, the entry writes and
+`TOOL-aSparedSpawn-17`'s erase on an executed red, runs on every run whatever its mode, because it
+keeps the cache honest rather than sparing a leg.
+
+**(b) The stamp distinguishes the two kinds.** Three counters: `reuses`, every reused leg;
+`lineage_reuses`, origin's; and `cache_reuses`, this build's. The full-green preconditions are
+`[ "$reuses" = "$lineage_reuses" ]` (origin's) AND `[ "$cache_reuses" = 0 ]`. The stamp writes
+`reused` from `reuses`, as origin does, and `reused_cache` from `cache_reuses`. Predicate 9 reads
+`reused_cache`; a stamp without that field and with `reused` above 0 forces FULL, the fail-safe
+reading of a record that cannot say its kind. `read_green_file` gains `rec_reused_cache`, and the
+inherited-green path reads the same pair.
+
+**(c) `GATE_FULL` keeps meaning "no cache reuse".** Under it the cache modes never apply, exactly as
+`TOOL-aSparedSpawn-13` S8 made it, and the boundary's lineage path is the one deliberate exception,
+as `TOOL-aFrugalTurnstile-4` §4 records: its reused verdicts were earned by full runs on a clean
+tree under an equal input key, which is why they may stamp.
+
+**(d) When more than one could apply, one mode wins, by this table.**
+
+| `GATE_FULL` | `REUSE_ASK_LINEAGE` | `REUSE_ASK_PUSH` valid | `REUSE_ASK_ENV` | Mode | Named as not used |
+|---|---|---|---|---|---|
+| set | set | any | any | `lineage` | `GATE_REUSE`, `GATE_REUSE_PUSH` when set |
+| set | empty | any | any | `off` | `GATE_REUSE`, `GATE_REUSE_PUSH` when set (today's line) |
+| empty | any | yes | any | `push` | `GATE_REUSE_LINEAGE` when set |
+| empty | any | no | set | `env` | `GATE_REUSE_LINEAGE` when set |
+| empty | any | no | empty | `off` | `GATE_REUSE_LINEAGE` when set |
+
+The hook never sets two of them for one bar: `GATE_REUSE_LINEAGE` only on FULL, `GATE_REUSE_PUSH`
+only on SCOPED, and it clears every inherited one first. The table governs a direct caller.
+
+**(e) Each rule stated once.** The README section origin rewrote for its two ledger modes becomes one
+section with three subsections, cache env, cache push and lineage, and one table, (d)'s. The
+runner's mode block comment states (d) and points at the README for the rest; the reuse block keeps
+both not-checked sentences, each beside the branch it describes. The hook's FULL branch comment
+states lineage's rule, its SCOPED branch states the push mode's, and predicate 9's comment states
+(b)'s reading. No comment restates another's rule.
 
 ### Files touched (estimate)
 
@@ -131,14 +239,14 @@ on purpose or a line both sides moved.
 
 ## 5. Production-readiness checklist
 
-- security: the merged hook and runner keep both sides' scrubs and refusals; S1's two-parent diff is what shows none was dropped.
+- security: the merged hook and runner keep both sides' scrubs and refusals; S1's two-parent diff is what shows none was dropped. S6 clears the new lineage knob for every bar, and S8 keeps predicate 9 refusing every cache-reused full stamp, reading an unlabelled one as cache.
 - perf / scale: N/A — no new code path; a re-measured fork row records origin's cost, not a change of this unit's.
 - error / empty / loading states: N/A — no behaviour change beyond reconciling.
 - observability: the ledger records each conflicted file's resolution and its two-parent diff result.
-- risks: a conflict resolved by picking a side drops a behaviour silently; S1's diff is the check, and a hunk both sides rewrote is the case to read twice.
+- risks: a conflict resolved by picking a side drops a behaviour silently; S1's diff is the check, and a hunk both sides rewrote is the case to read twice. A full stamp written before the composition with `reused` above 0 forces one FULL push, which costs a bar and never a verdict.
 - testing: the direct checks in AC6 at the merge; the suites and the bar run at the close.
 - migration: N/A — no data or schema moves.
-- user docs: `tools/run-gates/README.md` keeps both sides' sections.
+- user docs: `tools/run-gates/README.md` keeps both sides' sections, and its reuse section states the composed rules once each (S9).
 
 ## 6. Acceptance criteria
 
@@ -170,6 +278,35 @@ on purpose or a line both sides moved.
   Red when: any exits non-zero.
   figure: each fork count is DERIVED at observation; a row re-measured here records both readings.
 
+Each of the six criteria below runs on a hand-built fixture: a scratch repository holding a copy of the merged
+runner, hook and a two-leg manifest, with a local bare remote as `origin`, built as the evidence
+suite's `ru_repo` and the pre-push suite's `run_rp_push` build theirs. Each is observed red against
+the naive merge, both sides' bytes kept side by side, before the composition is written.
+
+- **AC7** — When a fixture push reds on one leg, the leg is fixed, and the fix push runs FULL with
+  `GATE_REUSE_LINEAGE` exported by the hook and stamps `gate-full-green` with `reused` above 0 and
+  `reused_cache 0`, the next push of that sha takes no FULL decision from predicate 9: its decision
+  line does not carry `reused`. Red when: the next push is forced FULL by the stamp's `reused`
+  field, which the naive merge does.
+- **AC8** — When a fixture's `gate-full-green` is planted with `reused_cache 1`, the push is forced
+  FULL and its decision line names `reused`; with a planted stamp carrying `reused 2` and no
+  `reused_cache` field, it is forced FULL too. Red when: either planted stamp is trusted.
+- **AC9** — When a fixture bar earns an `ok` and a second bar runs with `GATE_REUSE=1`, the second
+  prints `GATE reuse` for the leg and its run header records `reuse` as `env`. Red when: it executes
+  the leg, which the naive merge does because origin's unset clears `GATE_REUSE` before this build's
+  mode block reads it.
+- **AC10** — When a fixture's cache holds an `ok` for a leg whose ledger row is not
+  lineage-qualified, a bar with the full flag and `GATE_REUSE_LINEAGE=1` prints `GATE ok` for that
+  leg, not `GATE reuse`, and its header records `reuse` as `lineage`. Red when: the lineage run
+  reuses the cache's entry.
+- **AC11** — When `grep -c 'WHAT LINEAGE REUSE DOES NOT CHECK' tools/run-gates/README.md` runs it
+  prints 1, and the README's reuse section carries (d)'s precedence table once. Red when: a rule is
+  stated twice or not at all.
+- **AC12** — When a fixture bar runs with the full flag, `GATE_REUSE=1` and `GATE_REUSE_LINEAGE=1`,
+  its header records `reuse` as `lineage` and stderr names `GATE_REUSE` as not used; without the full
+  flag and with both set, the header records `env` and stderr names `GATE_REUSE_LINEAGE`. Red when:
+  either run takes another mode, or names nothing.
+
 ## 7. Gates
 
 `run-gates evidence` · `run-gates canary` · `run-gates gov canary` · `run-gates turnstile` ·
@@ -183,14 +320,28 @@ on purpose or a line both sides moved.
 `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` ·
 `hook destinations self-test` · `kit/dogfood doc parity`
 
+New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC9 AC10 AC12 · the naive merge's unset before the mode block, a lineage run reading the cache, two knobs set at once · none
+New arm: .githooks/pre-push.test.sh · covers AC7 AC8 · a lineage full stamp read by predicate 9, a planted cache-reused stamp · none
+
 ## 8. Open questions
 
-none
+- **F1 — How do origin's lineage reuse and this build's cache reuse coexist in the merged tree?**
+  Kept side by side, origin's `unset GATE_REUSE` disables the cache's env mode, and predicate 9
+  forces every push after a lineage green FULL. The options were to keep origin's lineage and retire
+  the cache's env mode, to keep the cache and retire lineage, or to compose both.
+  RESOLVED (owner, 2026-10-12): compose both reuse designs.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-12 · initial draft.
 - rev-2 · 2026-10-12 · §4: the merge commit carries `Pass: none` and a pass commit after it carries the CLOSED header and the ledger, because `--check-commit` refused a trailered merge for staging `memory/DECISIONS.md`, a shared record no dispatch may declare, and `diff-tree` lists no paths for a merge commit.
+- rev-3 · 2026-10-12 · §2 §3 §4 §5 §6 §7 §8 S6 S7 S8 S9 S10 AC7 AC8 AC9 AC10 AC11 AC12 · the merge pass
+  aborted on the two reuse designs: origin's `unset GATE_REUSE` merged without a conflict above this
+  build's mode block, and predicate 9 read a lineage stamp's `reused` as a cache reuse. The owner
+  ruled to compose both (§8 F1). §4 states the composition: disjoint knobs read at one site, one
+  mode per run by a precedence table, a `reused_cache` stamp field predicate 9 reads, `GATE_FULL`
+  meaning no cache reuse with lineage the one exception, and each rule stated once. §3 names the
+  digest's view of the hook environment as `TOOL-aSparedSpawn-33`.
 
 ## 10. Reuse audit
 

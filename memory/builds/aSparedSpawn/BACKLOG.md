@@ -26,7 +26,8 @@
 - SEV · TOOL-aSparedSpawn-24 · MED · an inherited reuse knob decides what a push bar spares
 - KEEP · TOOL-aSparedSpawn-24 · the two known knobs are cleared; the generalised arm is declined under the unattended protocol's section 11
 - SEV · TOOL-aSparedSpawn-25 · MED · owner call
-- KEEP · TOOL-aSparedSpawn-25 · awaiting the owner
+- KEEP · TOOL-aSparedSpawn-25 · adopted by TOOL-aSparedSpawn-33 on the owner's ruling of 2026-10-12; that unit's spec closes it
+- SCOPE · TOOL-aSparedSpawn-25 · accept the owner ruled on 2026-10-12 that the pre-push hook restores the caller's pre-git environment for the reuse digest, and TOOL-aSparedSpawn-33's end-to-end arm earns an ok from a plain-shell bar, pushes through the real .githooks/pre-push and prints GATE reuse for that leg
 - SEV · TOOL-aSparedSpawn-26 · MED · CI's spawn-budget leg grades nothing until the rows exist
 - KEEP · TOOL-aSparedSpawn-26 · needs a measurement on CI's bash, which no node runs
 - SEV · TOOL-aSparedSpawn-27 · MED · an A/B arm that executed nothing was certified as a figure
