@@ -1,0 +1,569 @@
+{
+ "about": "Synthetic transcripts for runlog.py prose (TOOL-aHeardState-2). Each scenario is a list of transcript records, written to a .jsonl by the selftest. Figures are pinned in the selftest arm that reads each scenario.",
+ "scenarios": {
+  "mixed": [
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": "build the thing"
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "m1",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Starting."
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "m1",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "tool_use",
+       "id": "t1",
+       "name": "Bash",
+       "input": {
+        "command": "true"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "t1",
+       "content": "ok"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "m2",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Reading."
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "m2",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "tool_use",
+       "id": "t2",
+       "name": "Bash",
+       "input": {
+        "command": "true"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "t2",
+       "content": "ok"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "m3",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Still reading."
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "m3",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "tool_use",
+       "id": "t3",
+       "name": "Bash",
+       "input": {
+        "command": "true"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "t3",
+       "content": "ok"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "m4",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Nearly there."
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "m4",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "tool_use",
+       "id": "t4",
+       "name": "Bash",
+       "input": {
+        "command": "true"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "t4",
+       "content": "ok"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "m5",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Done.\n\n- BUILD — tBuild · Tier-2 · 1/2 build · left TOOL-tBuild-2\n- SPEC — [TOOL-tBuild-1](memory/builds/tBuild/spec/x.md) · review none"
+      }
+     ]
+    }
+   },
+   {
+    "type": "user",
+    "isMeta": true,
+    "message": {
+     "role": "user",
+     "content": "an idle-wake tick, marked isMeta: it opens a turn, and the next prompt joins it"
+    }
+   },
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": "and the next"
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "m6",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Nothing to do; no tools used."
+      }
+     ]
+    }
+   },
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": "one more"
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "m7",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Checking."
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "m7",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "tool_use",
+       "id": "t5",
+       "name": "Bash",
+       "input": {
+        "command": "true"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "t5",
+       "content": "ok"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "m8",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Done.\n\n- `BUILD — tBuild · Tier-2 · 1/2 build · left TOOL-tBuild-2`\n- `SPEC — [TOOL-tBuild-1](memory/builds/tBuild/spec/x.md) · review none`"
+      }
+     ]
+    }
+   }
+  ],
+  "alarm": [
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": "go"
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "a0",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "a0",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "tool_use",
+       "id": "ta0",
+       "name": "Bash",
+       "input": {
+        "command": "true"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "ta0",
+       "content": "ok"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "a1",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "a1",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "tool_use",
+       "id": "ta1",
+       "name": "Bash",
+       "input": {
+        "command": "true"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "ta1",
+       "content": "ok"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "a2",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "a2",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "tool_use",
+       "id": "ta2",
+       "name": "Bash",
+       "input": {
+        "command": "true"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "ta2",
+       "content": "ok"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "a3",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "a3",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "tool_use",
+       "id": "ta3",
+       "name": "Bash",
+       "input": {
+        "command": "true"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "ta3",
+       "content": "ok"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "a9",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Done.\n\n- BUILD — tBuild · Tier-2 · 1/2 build · left TOOL-tBuild-2\n- SPEC — [TOOL-tBuild-1](memory/builds/tBuild/spec/x.md) · review none"
+      }
+     ]
+    }
+   }
+  ],
+  "calm": [
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": "go"
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "c1",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "xxxxxxxxxx"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "c1",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "tool_use",
+       "id": "tc1",
+       "name": "Bash",
+       "input": {
+        "command": "true"
+       }
+      }
+     ]
+    }
+   },
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "tc1",
+       "content": "ok"
+      }
+     ]
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "c2",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+      }
+     ]
+    }
+   },
+   {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": "again"
+    }
+   },
+   {
+    "type": "assistant",
+    "message": {
+     "id": "c3",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

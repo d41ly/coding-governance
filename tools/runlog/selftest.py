@@ -323,7 +323,12 @@ from collections import Counter  # noqa: E402
 # line as witness when no card is appended, and the liveness that the placeholder alone reads 0.
 # Its decoy checks move it by 3. Landed unpriced; TOOL-aMendedFleet-112 priced it, no suite run.
 # 4 + 3 = 7
-ASSERTION_FLOOR = 1561
+# RAISED 1561 -> 1578 by TOOL-aHeardState-2, runlog prose: TWO new arms. `test_prose_ac2_ac3_figures`
+# carries 7 checks — the charter fence present, and per scenario (mixed, alarm, calm) the exit and
+# the four pinned lines; `test_prose_ac4_ac5_refusals` carries 4 — the fence-less charter's exit and
+# `unknown` pair line, and an unknown session's exit 2 naming the root. Decoy checks move each by 3.
+# 7 + 4 + 3 + 3 = 17
+ASSERTION_FLOOR = 1578
 
 PASS = []
 FAIL = []
@@ -8647,6 +8652,73 @@ def read_shell_function(text, name):
     """A shell function's body, from its `name() {` line to the first `}` alone at column 0."""
     m = re.search(rf"^{re.escape(name)}\(\) \{{.*?^\}}$", text, re.M | re.S)
     return m.group(0) if m else ""
+
+
+
+# ---------------------------------------------------------------------------------- prose (TOOL-aHeardState-2)
+
+PROSE = json.loads((FIXTURES / "prose.json").read_bytes())["scenarios"]
+
+
+def resolve_charter_file():
+    """The repository's own `AGENTS.md`, whose microformats fence the prose arms derive the pair from."""
+    for d in (HERE, *HERE.parents):
+        if (d / ".git").exists():
+            return d / "AGENTS.md"
+    return HERE / "AGENTS.md"
+
+
+def write_prose_scenario(base, name):
+    """One fixture scenario as a `.jsonl` transcript named for the scenario; its stem is the sid printed."""
+    path = pathlib.Path(base) / f"{name}.jsonl"
+    path.write_bytes(("\n".join(json.dumps(r, ensure_ascii=False) for r in PROSE[name]) + "\n")
+                     .encode("utf-8"))
+    return path
+
+
+def test_prose_ac2_ac3_figures():
+    base, _projects = build_projects("runlog-prose-")
+    charter = resolve_charter_file()
+    check_true("prose liveness: the repository charter carries the microformats fence",
+               "<!-- microformats -->" in charter.read_text(encoding="utf-8"), str(charter))
+    want = {
+        "mixed": ["prose — mixed · turns 3 · final messages 3",
+                  "narration — 14.8% of 358 assistant prose characters · ok above 40%",
+                  "interjections — mean 1.7 · max 4 · turns above 3 1 · ok above a mean of 3",
+                  "pair — 1/3 final messages carry the BUILD/SPEC pair"],
+        "alarm": ["prose — alarm · turns 1 · final messages 1",
+                  "narration — 74.6% of 536 assistant prose characters · ALARM above 40%",
+                  "interjections — mean 4.0 · max 4 · turns above 3 1 · ALARM above a mean of 3",
+                  "pair — 1/1 final messages carry the BUILD/SPEC pair"],
+        "calm": ["prose — calm · turns 2 · final messages 2",
+                 "narration — 1.6% of 610 assistant prose characters · ok above 40%",
+                 "interjections — mean 0.5 · max 1 · turns above 3 0 · ok above a mean of 3",
+                 "pair — 0/2 final messages carry the BUILD/SPEC pair"],
+    }
+    for name, lines in want.items():
+        path = write_prose_scenario(base, name)
+        r = run_runlog(["prose", "--transcript", str(path), "--charter", str(charter)], base,
+                       build_arm_env(base))
+        check(f"prose AC2/AC3: the {name} scenario exits 0", r.returncode, 0)
+        check(f"prose AC2/AC3: the {name} scenario prints its pinned figures", r.stdout.splitlines(), lines)
+
+
+def test_prose_ac4_ac5_refusals():
+    base, projects = build_projects("runlog-prose-ref-")
+    path = write_prose_scenario(base, "mixed")
+    fenceless = pathlib.Path(base) / "AGENTS.md"
+    fenceless.write_bytes(b"# a charter with no microformats fence\n")
+    r = run_runlog(["prose", "--transcript", str(path), "--charter", str(fenceless)], base,
+                   build_arm_env(base))
+    check("prose AC4: a fence-less charter exits 0", r.returncode, 0)
+    check_true("prose AC4: ...and the pair line reads unknown, never a fabricated zero",
+               any(ln.startswith("pair — unknown · no microformats fence in ") for ln in r.stdout.splitlines()),
+               r.stdout)
+    sid = "00000000-0000-4000-8000-000000000000"
+    r = run_runlog(["prose", "--session", sid, "--transcripts", str(projects)], base, build_arm_env(base))
+    check("prose AC5: a session with no transcript exits 2", r.returncode, 2)
+    check_true("prose AC5: ...naming the projects root it searched", pathlib.Path(projects).name in r.stderr,
+               r.stderr)
 
 
 def main():

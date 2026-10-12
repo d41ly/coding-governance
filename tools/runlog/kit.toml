@@ -35,7 +35,8 @@ role = "project-owned"
 # reds there instead of shipping.
 [[files]]
 include = ["fixtures/driver-torn.txt", "fixtures/golden-lines.txt", "fixtures/invocations.txt",
-           "fixtures/journal-mixed.txt", "fixtures/tool-classes.json", "fixtures/transcripts.json"]
+           "fixtures/journal-mixed.txt", "fixtures/prose.json", "fixtures/tool-classes.json",
+           "fixtures/transcripts.json"]
 role = "project-owned"
 
 # THE SKILL IS RENDERED (TOOL-dLoggedFlight-12). It names the CLI by where this kit is installed and

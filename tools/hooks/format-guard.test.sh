@@ -20,6 +20,93 @@ command -v node >/dev/null 2>&1 || { echo "format-guard.test: node is not on PAT
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 pass=0; fail=0
 
+# The runlog kit's prose reader, for the AC6 parity arm: resolved, never spelled.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+TESTPY=$(resolve_python) || { echo "format-guard.test: no usable python"; exit 2; }
+RUNLOG_DIR=$(resolve_kit_dir "$TESTPY" runlog prose.py "$HERE") || exit 2
+
 # The native spelling of a directory: node reads the payload's cwd as a Windows path on Windows, and
 # an MSYS `/tmp/x` names nothing there (memory/gotchas, the node-a /tmp mount).
 resolve_native() { (cd "$1" && { pwd -W 2>/dev/null || pwd; }); }
@@ -170,10 +257,45 @@ printf 'not json' | node "$HOOK" > "$TMP/out" 2> "$TMP/err"; rc=$?
 if [ "$rc" = 0 ] && [ ! -s "$TMP/out" ]; then echo "ok   AC9 non-JSON stdin exits 0 with empty stdout"; pass=$((pass+1))
 else echo "FAIL AC9 non-JSON stdin (exit $rc)"; fail=$((fail+1)); fi
 
+# AC6 (TOOL-aHeardState-2) — runlog prose re-implements this hook's pair predicate in Python; both
+# readers grade the same messages against the same charter and must agree on every one.
+seed_repo "$TMP/charter.md"
+read_hook_verdict() { # message-file -> block|allow, counting nothing
+  node -e '
+    const fs = require("fs")
+    process.stdout.write(JSON.stringify({ hook_event_name: "Stop", session_id: process.argv[2], cwd: process.argv[3],
+      stop_hook_active: false, last_assistant_message: fs.readFileSync(process.argv[1], "utf8") }))' "$1" "$SID" "$(resolve_native "$REPO")" \
+    | node "$HOOK" 2>/dev/null | grep -q . && echo block || echo allow
+}
+names="good none tick indent bold head fenced first gap noleft"
+files=""; for f in $names; do files="$files $TMP/$f.md"; done
+# shellcheck disable=SC2086
+"$TESTPY" -c '
+import pathlib, sys
+sys.path.insert(0, sys.argv[1])
+import prose as pr
+shapes, err = pr.read_charter_shapes(pathlib.Path(sys.argv[2]))
+if shapes is None:
+    sys.exit("prose could not derive the pair grammar: " + err)
+for f in sys.argv[3:]:
+    text = pathlib.Path(f).read_text(encoding="utf-8")
+    print(pathlib.Path(f).stem, "block" if pr.check_pair(pr.scan_message_lines(text), shapes) else "allow")
+' "$ROOT/$RUNLOG_DIR" "$TMP/charter.md" $files > "$TMP/prose-verdicts" 2> "$TMP/err"
+for f in $names; do
+  hook=$(read_hook_verdict "$TMP/$f.md")
+  py=$(awk -v n="$f" '$1 == n { print $2 }' "$TMP/prose-verdicts")
+  if [ -n "$py" ] && [ "$hook" = "$py" ]; then echo "ok   AC6 the $f message reads $hook in both readers"; pass=$((pass+1))
+  else echo "FAIL AC6 the $f message reads ${hook} in format-guard and ${py:-nothing} in runlog prose"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+done
+if grep -q ' allow$' "$TMP/prose-verdicts" && grep -q ' block$' "$TMP/prose-verdicts"; then
+  echo "ok   AC6 liveness: the verdict set holds both an allow and a block"; pass=$((pass+1))
+else echo "FAIL AC6 liveness: the verdicts never moved, so agreement proves nothing"; fail=$((fail+1)); fi
+
 n=$((pass+fail))
-# FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count. 43 = the suite as TOOL-aHeardState-1 landed it.
+# FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count. 43 = the suite as TOOL-aHeardState-1 landed it; 54 = 43 + TOOL-aHeardState-2's AC6 arm (10
+# messages and its liveness).
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=43
+FLOOR_ASSERTIONS=54
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
