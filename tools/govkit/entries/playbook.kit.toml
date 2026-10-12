@@ -131,6 +131,13 @@ class = "derived"
 probe = "node_table"
 why = "the section-3 node registry, one row per node of the fleet registry beside the engine (`fleet.toml`), with the repository's `[nodes.<tag>]` overrides. Gov is the one allocator, so a machine carries one tag in every adopter (TOOL-aDistilledCharter-2). It replaced TAG_A, MACHINE_A, PRIMARY_TREE_A, WORKTREE_ROOT_A and VARIANCES_A, which rendered one row from whichever node ran the render"
 
+[[placeholder]]
+key = "ROLE_ROSTER"
+class = "derived"
+probe = "role_roster"
+kit = "roles"
+why = "section 3's Agent roles subsection: one `- ` line per role, printed by the roles kit's own `roster` verb so that kit stays the one reader of role files; only reachable when the roles block survives (TOOL-aOrientedCast-18)"
+
 # --- LEGACY: names a v3.x template uses and v4.0 does not. KEPT DECLARED (TOOL-aDistilledCharter-2
 # rev-2, closing review round 1, R1): an adopter's template is a SEED that `govkit update` never
 # rewrites, so after an update the v4.0 engine renders the adopter's v3.x template, and a refusal on

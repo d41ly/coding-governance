@@ -6718,6 +6718,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_role_roster",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "derive_root_confs",
       "kind": "function",
       "file": "tools/govkit/govkit.py"

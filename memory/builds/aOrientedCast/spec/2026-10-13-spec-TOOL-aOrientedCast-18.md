@@ -1,11 +1,12 @@
 # TOOL-aOrientedCast-18 — the role roster, derived into the charter by the roles kit's own verb
 
-**Status:** INPROGRESS · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 18
+**Status:** CLOSED · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-TOOL-aOrientedCast-18-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-aOrientedCast-18-1-acceptance-ledger.md) | journal | — |
 | [2026-10-13-prompt-TOOL-aOrientedCast-16-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-16-1-spec-brief.md) | journal | TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-19 PLAY-aOrientedCast-2 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-16-2-build-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-16-2-build-brief.md) | journal | TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-19 PLAY-aOrientedCast-2 |
 
