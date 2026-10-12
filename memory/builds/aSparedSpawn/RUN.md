@@ -220,3 +220,5 @@ base: e6585db4e125bb0919c0c1f18687eb9825ffed80
 2026-10-12T20:49:11Z hold · item host-owner-action · reason until owner · reaped f1736cba · resume none(owner)
 
 2026-10-12T21:26:56Z resume · item aSparedSpawn · reason held · keepalive 850e8e9b · manual
+
+2026-10-12T21:37:36Z dispatch · item 5ffc921b TOOL-aSparedSpawn-33 · reason .githooks/pre-push .githooks/pre-push.test.sh tools/run-gates/run-gates.sh tools/run-gates/README.md tools/run-gates/run-gates.evidence.test.sh tools/run-gates/post-merge.sh tools/unattended/unattended.sh memory/builds/aSparedSpawn/spec/2026-10-12-spec-TOOL-aSparedSpawn-33.md memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-33-acceptance-ledger.md memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-33-fixtures.sh memory/builds/aSparedSpawn/README.md memory/guides/SESSION-KICKOFF.md memory/backlog/TOOL.md

@@ -1409,6 +1409,28 @@ grep -q '^GATE reuse ' "$REC_OUT" && nope "AC12 a pushed sha that is not HEAD re
 echo moved > "$RU_T/gb/f"; ( cd "$RU_T" && git commit -qam moved ) >/dev/null 2>&1
 ru_run GATE_REUSE_PUSH="$(git -C "$RU_T" rev-parse HEAD) $ru_tip $ru_dig" >/dev/null
 grep -q '^GATE ok    pr' "$REC_OUT" && ok "AC12 a changed guarded input runs the remote leg" || nope "AC12 a changed input still reused"
+# TOOL-aSparedSpawn-33 AC5 and S3: the file `GATE_REUSE_DIGEST_ENV` names, the caller's environment the
+# hook restores, is read by the `push` mode's digest alone. The env mode runs FIRST, while the cache
+# holds entries under this shell's digest only: a runner that read the altered lines there would find
+# no entry and execute, so a reuse here is the file ignored.
+ru_vhead=$(git -C "$RU_T" rev-parse HEAD)
+printf 'env PATH=/nowhere\nenv GATE_ALTERED=1\n' > "$RU_T.view"
+ru_run GATE_REUSE_PUSH="$ru_vhead $ru_tip $ru_dig" >/dev/null
+grep -q '^GATE reuse pr' "$REC_OUT" && ok "TOOL-aSparedSpawn-33 control: with no view file the push mode reuses pr on this shell's digest" \
+                                    || nope "TOOL-aSparedSpawn-33 control: the push mode with no view file executed pr"
+ru_run GATE_REUSE=1 GATE_REUSE_DIGEST_ENV="$RU_T.view" >/dev/null
+grep -q '^GATE reuse pa' "$REC_OUT" && ok "TOOL-aSparedSpawn-33 AC5 the env mode ignores a view file of altered lines and reuses the plain entry" \
+                                    || nope "TOOL-aSparedSpawn-33 AC5 the env mode read the view file"
+ru_run GATE_REUSE_PUSH="$ru_vhead $ru_tip $ru_dig" GATE_REUSE_DIGEST_ENV="$RU_T.view" >/dev/null
+grep -q '^GATE ok    pr' "$REC_OUT" && ! grep -q '^GATE reuse' "$REC_OUT" \
+  && ok "TOOL-aSparedSpawn-33 S3 the push mode keys on the view file: its altered lines execute pr" \
+  || nope "TOOL-aSparedSpawn-33 S3 the push mode ignored the view file"
+ru_run GATE_REUSE_PUSH="$ru_vhead $ru_tip $ru_dig" GATE_REUSE_DIGEST_ENV="$RU_T.missing" >/dev/null
+grep -q 'could not be measured (the toolchain digest), so nothing is reused or cached this run' "$REC_OUT" \
+  && ! grep -q '^GATE reuse' "$REC_OUT" \
+  && ok "TOOL-aSparedSpawn-33 S3 a view file that cannot be read fails the digest, says so, and reuses nothing" \
+  || nope "TOOL-aSparedSpawn-33 S3 a missing view file did not fail the digest"
+rm -f "$RU_T.view"
 rm -f "$RU_T.adv"
 ru_done
 

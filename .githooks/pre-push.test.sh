@@ -1048,6 +1048,45 @@ case "$(read_rp_line "$_out")" in
   *"scoped gate on main push"*) ok "TOOL-aSparedSpawn-32 AC8 control: reused 2 beside reused_cache 0, a lineage stamp, scopes" ;;
   *) bad "TOOL-aSparedSpawn-32 AC8 control expected a lineage stamp to scope, got: $_out" ;;
 esac
+# ---- TOOL-aSparedSpawn-33: THE PUSH DIGEST READS THE CALLER'S RESTORED ENVIRONMENT -----------------
+# Beside `GATE_REUSE_PUSH` the hook writes the caller's environment as it was before git started the
+# hook, and names the file in `GATE_REUSE_DIGEST_ENV`. A stub copies that file, so each arm grades the
+# view the runner would read. AC2: git's additions are gone, `GIT_CONFIG_PARAMETERS` included (set
+# here as a `git -c` push sets it), and PATH is the caller's under the runner's `/bin` reading.
+printf '#!/usr/bin/env bash\nrm -f "%s/view"\n[ -n "${GATE_REUSE_DIGEST_ENV:-}" ] && cp "$GATE_REUSE_DIGEST_ENV" "%s/view"\nexit 0\n' "$rp" "$rp" > "$rp/viewstub.sh"
+rm -f "$rp/view"
+_out=$( unset LC_CTYPE; run_rp_push GOV_GATE_CMD="bash $rp/viewstub.sh" GIT_CONFIG_PARAMETERS="'fx.knob'='1'" )
+rp_cp=":$PATH:"; rp_vp=":$(sed -n 's/^env PATH=//p' "$rp/view" 2>/dev/null):"
+if [ /bin -ef /usr/bin ]; then
+  while [[ $rp_cp == *":/bin:"* ]]; do rp_cp=${rp_cp//":/bin:"/":/usr/bin:"}; done
+  while [[ $rp_vp == *":/bin:"* ]]; do rp_vp=${rp_vp//":/bin:"/":/usr/bin:"}; done
+fi
+case "$([ -s "$rp/view" ] && echo found)|$(grep -cE '^env (GIT_EXEC_PATH|GIT_PREFIX|GIT_CONFIG_PARAMETERS|GIT_DIR|LC_CTYPE)=' "$rp/view" 2>/dev/null)|$([ "$rp_vp" = "$rp_cp" ] && echo same)" in
+  "found|0|same") ok "TOOL-aSparedSpawn-33 AC2 the view carries none of git's additions, no LC_CTYPE the caller left unset, and the caller's PATH" ;;
+  *) bad "TOOL-aSparedSpawn-33 AC2 expected a view without git's additions and with the caller's PATH, got: $(cut -c1-60 "$rp/view" 2>/dev/null | tr '\n' ';') $_out" ;;
+esac
+_out=$(run_rp_push GOV_GATE_CMD="bash $rp/viewstub.sh" LC_CTYPE=en_US.UTF-8)
+grep -qx 'env LC_CTYPE=en_US.UTF-8' "$rp/view" 2>/dev/null \
+  && ok "TOOL-aSparedSpawn-33 AC2 the caller's own LC_CTYPE stays in the view" \
+  || bad "TOOL-aSparedSpawn-33 AC2 the caller's LC_CTYPE=en_US.UTF-8 was dropped from the view: $_out"
+# AC4: an inherited view knob is cleared and named, for a STUB bar too, and the bar reads the hook's own.
+_out=$(run_rp_push GOV_GATE_CMD="bash $rp/viewstub.sh" GATE_REUSE_DIGEST_ENV="$rp/planted.view")
+case "$(printf '%s\n' "$_out" | grep -m1 'not honoured from the environment by this bar:')|$([ -s "$rp/view" ] && echo found)" in
+  *GATE_REUSE_DIGEST_ENV*"|found") ok "TOOL-aSparedSpawn-33 AC4 an inherited GATE_REUSE_DIGEST_ENV is named as not honoured, and the bar reads the hook's own view" ;;
+  *) bad "TOOL-aSparedSpawn-33 AC4 expected the inherited view knob named and the hook's view handed on, got: $_out" ;;
+esac
+# THE TWO PATTERN TEXTS: the hook's view writer copies the runner's digest name patterns to bound what
+# reaches its file, so the two lines marked `# digest-env-names` must agree; a runner copy with one
+# name dropped must not, or the comparison cannot fail.
+rp_pat_hook=$(sed -n 's/^ *\(GATE_\*[^)]*\)) .*# digest-env-names$/\1/p' "$SRC/.githooks/pre-push")
+rp_pat_run=$(sed -n 's/^ *\(GATE_\*[^)]*\)) .*# digest-env-names$/\1/p' "$SRC/$RUN_GATES_DIR/run-gates.sh")
+[ -n "$rp_pat_hook" ] && [ "$rp_pat_hook" = "$rp_pat_run" ] \
+  && ok "TOOL-aSparedSpawn-33 the hook's view writer admits exactly the runner's digest name patterns: $rp_pat_run" \
+  || bad "TOOL-aSparedSpawn-33 the hook's view patterns '$rp_pat_hook' differ from the runner's '$rp_pat_run'"
+rp_pat_cut=$(sed 's/|TZ) printf/) printf/' "$SRC/$RUN_GATES_DIR/run-gates.sh" | sed -n 's/^ *\(GATE_\*[^)]*\)) .*# digest-env-names$/\1/p')
+[ -n "$rp_pat_cut" ] && [ "$rp_pat_cut" != "$rp_pat_hook" ] \
+  && ok "TOOL-aSparedSpawn-33 a runner copy with TZ dropped from its patterns is told apart" \
+  || bad "TOOL-aSparedSpawn-33 a runner copy with TZ dropped still compared equal: '$rp_pat_cut'"
 cd "$tmp" || exit 2
 
 # --- TOOL-aFrugalTurnstile-4 S7: LINEAGE REUSE AT THE BOUNDARY. On a FULL decision for this kit's
@@ -1132,6 +1171,52 @@ case "$_rc|$(cat "$lin/other-saw" 2>/dev/null)|$_out" in
   *"reuse: lineage"*) bad "LIN AC12 a non-runner bar's FULL line carries reuse: lineage: $_out" ;;
   "0|unset|unset|"*) ok "LIN AC12 a declared non-runner bar runs with GATE_REUSE and GATE_REUSE_LINEAGE unset" ;;
   *) bad "LIN AC12 expected the declared bar to run with both reuse knobs unset, got rc=$_rc saw '$(cat "$lin/other-saw" 2>/dev/null)': $_out" ;;
+esac
+
+# --- TOOL-aSparedSpawn-33 AC1 AC3: A DIRECT BAR'S ENTRY MEETS THE PUSH. A copy of the real runner, a
+# --- leg `pa` that records the GIT_EXEC_PATH it ran under, and a `remote` leg `pr`. A direct bar from
+# --- this shell earns pr's entry at the very commit the push then sends, since a remote leg is keyed on
+# --- HEAD; its own full green is put back to the first push's, or it would cover the push and no bar
+# --- would run. The push is scoped, offers reuse, and must meet that entry: before the hook restored
+# --- the caller's environment, git's GIT_EXEC_PATH, PATH head and (on Git for Windows) LC_CTYPE moved
+# --- the key. The sample, which the hook does not let a push choose, may draw pr; a draw happens only
+# --- after a cached ok matched, so a sampled pr is the entry met too.
+dg="$tmp/dg"; mkdir -p "$dg/hooks"
+cp "$SRC/.githooks/pre-push" "$dg/hooks/pre-push"
+git init -q --bare "$dg/remote.git"; git init -q "$dg/work"
+cd "$dg/work" || exit 2
+git config user.email t@example.com; git config user.name t; git config core.autocrlf false
+git config core.hooksPath "$dg/hooks"
+mkdir -p "$RUN_GATES" fx ga gb
+cp "$SRC/$RUN_GATES_DIR/run-gates.sh" "$SRC/$RUN_GATES_DIR/gate-fingerprint.sh" \
+   "$SRC/$RUN_GATES_DIR/gate-profiles.txt" "$RUN_GATES/"
+printf '#!/usr/bin/env bash\nprintf "%%s" "${GIT_EXEC_PATH-unset}" > "%s/gep"\n' "$dg" > fx/a.sh
+printf '#!/usr/bin/env bash\necho r\n' > fx/r.sh
+echo x > ga/f; echo y > gb/f
+printf '%s\n' '[' \
+  '  {"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
+  '  {"name": "pr", "argv": ["bash", "fx/r.sh"], "guard": ["gb/"], "reads": {"remote": "fixture"}}' \
+  ']' > gate-legs.json
+git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+git remote add origin "$dg/remote.git"
+dg_gd=$(cd "$(git rev-parse --git-dir)" && pwd)
+touch "$dg_gd/push-main-active"
+( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 git push -q origin main ) >/dev/null 2>&1
+echo x2 > ga/f; echo y2 > gb/f; git add -A; git commit -q -m "dg earn"
+cp "$dg_gd/gate-full-green" "$dg/green1" 2>/dev/null
+( unset GOV_GATE_CMD GOV_GATE_CMD_TEST
+  GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 GATE_BASE=$(git hash-object -t tree /dev/null) bash "$RUN_GATES/run-gates.sh" ) >/dev/null 2>&1
+cp "$dg/green1" "$dg_gd/gate-full-green" 2>/dev/null
+rm -f "$dg/gep"
+_out=$( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 git push origin main 2>&1 ); _rc=$?
+case "$_rc|$_out" in
+  "0|"*"scoped gate on main push"*"reuse offered to remote and history legs"*"GATE reuse pr"*|"0|"*"scoped gate on main push"*"reuse offered to remote and history legs"*"pr  (sampled against a cached ok)"*)
+    ok "TOOL-aSparedSpawn-33 AC1 a push through the real hook meets the remote leg's entry a direct bar earned" ;;
+  *) bad "TOOL-aSparedSpawn-33 AC1 expected the scoped push to reuse pr from the direct bar's entry, got rc=$_rc: $_out" ;;
+esac
+case "$(cat "$dg/gep" 2>/dev/null)" in
+  ""|unset) bad "TOOL-aSparedSpawn-33 AC3 leg pa did not see GIT_EXEC_PATH during the push: '$(cat "$dg/gep" 2>/dev/null)'" ;;
+  *) ok "TOOL-aSparedSpawn-33 AC3 the legs keep the hook's environment: pa saw GIT_EXEC_PATH during the push" ;;
 esac
 cd "$pfx_home" || exit 2
 # ---- TOOL-dDerivedDocket-24: THE INHERITED-RED POLICY, READ AT R ---------------------------------
@@ -1489,7 +1574,18 @@ cd "$pfx_home" || exit 2
 #     nothing there even when it is read (TOOL-dLadderedRemote-5).
 #   GATE_TURNSTILE_DIR — where the host beacon and queue live; it decides contention only, as GATE_TURNSTILE=0 does (TOOL-aFrugalTurnstile-5 F1).
 #   GATE_TURNSTILE_HOLDER — a holder's nonce; scrubbing it would queue a pushing leg behind its own parent bar (TOOL-aFrugalTurnstile-5 F1).
-BAR_INERT_KNOBS="GOV_REMOTE GOV_DEFAULT_BRANCH GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+#   GATE_REUSE_PUSH GATE_REUSE_LINEAGE GATE_REUSE_DIGEST_ENV GATE_REUSE_SAMPLE GATE_REUSE_DAY — the hook
+#     clears each for every bar, a STUB included, and sets the first three only on the decision that
+#     asks for it, as it does GATE_DOCS_BASE (TOOL-aSparedSpawn-13 S10, -16 S6, -32 S6, -33 S2).
+#   GATE_PUSH_BASE — the hook overwrites it from git's own ref line on every gated push (S5).
+#   GATE_CALIBRATION_RATES — read only under --calibrate-width, which no push bar passes, and unset
+#     before any leg (TOOL-aSparedSpawn-2).
+#   GATE_SELFTESTS_MAX_LAG — read only under GATE_SELFTESTS=changed, which predicate 8 forces FULL, and
+#     it can hold only a held-tier leg that GATE_SELFTESTS added, never a leg of the default bar.
+#   GATE_SPAWN_NOW — the spawn pause's reading, GATE_MEMINFO's sibling: a pause narrows the pool and
+#     always ends (TOOL-aSparedSpawn-2). Width class.
+# Classified by TOOL-aSparedSpawn-33 S8.
+BAR_INERT_KNOBS="GOV_REMOTE GOV_DEFAULT_BRANCH GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_DIGEST_ENV GATE_REUSE_LINEAGE GATE_REUSE_PUSH GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
 read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
 check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
   local knobs cleared scrubbed k n

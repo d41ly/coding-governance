@@ -10721,8 +10721,9 @@ dod_met() { # slug · run-state file · item · checker
       # result is recorded as a trusted gate-bar-green that stores neither the manifest nor the reuse
       # mode, so a GATE_LEGS subset or a GATE_REUSE run inherited from the driver would certify the
       # whole bar for this tree. The hook's BAR_SCRUBBED_KNOBS plus its docs knob; the parity arm in
-      # unattended.test.sh reds when the hook names one this list lacks.
-      local _gk _gknobs="GATE_LEGS GATE_REUSE GATE_DOCS_BASE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT" _gset=""
+      # unattended.test.sh reds when the hook names one this list lacks. `GATE_REUSE_LINEAGE` too, which
+      # this bar's GATE_FULL would turn into the runner's lineage reuse (TOOL-aSparedSpawn-33 S7).
+      local _gk _gknobs="GATE_LEGS GATE_REUSE GATE_REUSE_LINEAGE GATE_DOCS_BASE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT" _gset=""
       local -a _gscrub=(-u GATE_WALL)
       for _gk in $_gknobs; do
         _gscrub+=(-u "$_gk")

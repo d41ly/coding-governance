@@ -310,6 +310,15 @@ tip, and is then scoped: `.githooks/pre-push` sets `GATE_REUSE_PUSH` to `<pushed
 handed it, and on no other, and it clears `GATE_REUSE`. The terms are the env mode's, narrowed to those
 two classes, and the mode holds only while HEAD is the pushed sha.
 
+The push key's environment is the caller's, restored: git starts the hook with `GIT_EXEC_PATH`, its
+exec path at PATH's head and, on Git for Windows, `LC_CTYPE=C.UTF-8`, none of which a direct bar from
+your shell had. So beside `GATE_REUSE_PUSH` the hook writes the environment as it was before git, with
+those additions taken back out, to a file in the git dir, and names it in `GATE_REUSE_DIGEST_ENV`; in
+this mode alone the digest reads that file in place of the runner's own environment, and a file that
+cannot be read fails the digest. The legs still run under the hook's environment: only the key reads
+the caller's. A value the hook cannot tell from git's own is left out, which costs a saving and never
+a verdict.
+
 **What a leg reads beyond its inputs** is declared on its manifest row as `reads`, an object mapping
 a class to a one-line reason. The classes are closed, and each puts one thing into the key:
 
@@ -359,7 +368,8 @@ bumped when what a reusable `ok` means changes, and one digest per run of bash, 
 runtime, python and its UTF-8 mode, `git version` and its `core.autocrlf`/`core.eol`, the resolved
 location of every tool a leg names, and the exported `GATE_* GOV_* *_PY GIT_* PYTHON* LC_* LANG TZ
 PATH` variables, less every `GATE_REUSE*` knob, `GATE_TURNSTILE_HELD`, `GATE_TURNSTILE_HOLDER`, `GATE_RUN_ID`, and `GATE_BASE`
-and `GATE_PUSH_BASE`, which enter only a `base` leg's key. It does NOT see a tool other than git
+and `GATE_PUSH_BASE`, which enter only a `base` leg's key. Each `/bin` in PATH is read as `/usr/bin`
+where the two are one directory, for the PATH line and the tool locations alike. It does NOT see a tool other than git
 upgraded in place at the same path, a variable outside that set, or a read no class names, which is
 what the sample exists to catch. A failed walk or digest makes the key a dash, which never matches,
 and a run that would have reused or cached says so once on stderr: `run-gates: reuse — the input

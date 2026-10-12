@@ -72,6 +72,7 @@ PP_BAR_PID=""
 write_signal_refusal() { # signal name · exit status -> the refusal line and file, then exit
   trap '' HUP INT QUIT PIPE TERM
   [ -n "$PP_BAR_PID" ] && kill -TERM "$PP_BAR_PID" 2>/dev/null
+  [ -z "${PP_VIEW:-}" ] || rm -f "$PP_VIEW" 2>/dev/null
   local why="pre-push: REFUSING — this hook was sent SIG$1${PP_BAR_PID:+ while its bar ran, and the bar was stopped}, so no verdict exists for this push. Push again."
   echo "$why" >&2
   if declare -F write_refusal >/dev/null; then write_refusal signalled "$why"; fi
@@ -1821,7 +1822,9 @@ unset GATE_DOCS_BASE
 # THE TWO PUSH-TIME REUSE KNOBS ARE THIS HOOK'S ALONE TOO (TOOL-aSparedSpawn-13 S10, -32 S6), for every
 # bar a STUB included, for the docs knob's reason: an inherited value would let the environment decide
 # which legs a vetted runner spares. Each is set again below, on the one decision that asks for it.
-for _k in GATE_REUSE_PUSH GATE_REUSE_LINEAGE; do
+# `GATE_REUSE_DIGEST_ENV` (TOOL-aSparedSpawn-33) goes with them: it names the environment the push
+# digest reads, so an inherited one would let the caller hand the runner a key.
+for _k in GATE_REUSE_PUSH GATE_REUSE_LINEAGE GATE_REUSE_DIGEST_ENV; do
   [ -n "${!_k+x}" ] && ENV_CLEARED+=" $_k"
   unset "$_k"
 done
@@ -2104,6 +2107,47 @@ else
   [ -n "$REUSE_OFFER" ] && export GATE_REUSE_PUSH="$REUSE_OFFER"
   RUNLOG_DECISION=scoped
 fi
+# THE CALLER'S ENVIRONMENT, FOR THE PUSH DIGEST ONLY (TOOL-aSparedSpawn-33, the owner's ruling on
+# TOOL-aSparedSpawn-25). Where a scoped decision exported `GATE_REUSE_PUSH`, the runner keys every leg
+# on an environment digest, and git started this hook with additions a direct bar never had, so a
+# push never met an entry a direct bar earned. The rule: the DIGEST reads the caller's environment as
+# it was before git, restored here, and the LEGS read this hook's, untouched. Restored from what is
+# observable: `GIT_EXEC_PATH`, `GIT_PREFIX`, `GIT_DIR` and `GIT_CONFIG_PARAMETERS` absent; PATH's
+# leading run of git's exec path stripped, matched verbatim or as its MSYS mount tail; and `LC_CTYPE`
+# absent where it is Git for Windows' injection: `C.UTF-8` under a drive-letter exec path, with
+# `LC_ALL` and `LANG` unset. A caller value indistinguishable from git's own is marked absent, which
+# costs a saving and never a verdict. `compgen -e` lists the names into the view file and `mapfile`
+# reads them back before the file is rewritten as the view, so no fork is spent and only an admitted
+# name's value reaches the disk. It is removed once the bar returns, and by the signal handler: not by
+# the EXIT trap, whose line the run-log suite pins. The name patterns copy the runner's digest.
+PP_VIEW=""
+if [ -n "${GATE_REUSE_PUSH:-}" ] && [ -n "$gd" ]; then
+  PP_VIEW="$gd/gate-reuse-view.$$"
+  case $PP_VIEW in /*|[A-Za-z]:*) ;; *) PP_VIEW="$top/$PP_VIEW" ;; esac
+  _vrest=$PATH
+  while [ -n "${GIT_EXEC_PATH:-}" ]; do
+    _vc=${_vrest%%:*}
+    case $_vc in */git-core) ;; *) break ;; esac
+    case $GIT_EXEC_PATH in *"$_vc") ;; *) break ;; esac
+    [ "$_vrest" = "$_vc" ] && { _vrest=""; break; }
+    _vrest=${_vrest#*:}
+  done
+  _vctype=""
+  case ${GIT_EXEC_PATH:-} in [A-Za-z]:[/\\]*)
+    [ "${LC_CTYPE:-}" = C.UTF-8 ] && [ -z "${LC_ALL+x}" ] && [ -z "${LANG+x}" ] && _vctype=drop ;;
+  esac
+  if { compgen -e > "$PP_VIEW" && mapfile -t _vks < "$PP_VIEW"; } 2>/dev/null; then
+    for _k in "${_vks[@]}"; do
+      case $_k in GIT_EXEC_PATH|GIT_PREFIX|GIT_DIR|GIT_CONFIG_PARAMETERS) continue ;;
+        LC_CTYPE) [ -n "$_vctype" ] && continue; _vv=$LC_CTYPE ;;
+        PATH) _vv=$_vrest ;;
+        GATE_*|GOV_*|*_PY|GIT_*|PYTHON*|LC_*|LANG|TZ) _vv=${!_k} ;; # digest-env-names
+        *) continue ;;
+      esac
+      if [[ $_vv == *$'\n'* ]]; then printf 'env %s=%q\n' "$_k" "$_vv"; else printf 'env %s=%s\n' "$_k" "$_vv"; fi
+    done > "$PP_VIEW" 2>/dev/null && export GATE_REUSE_DIGEST_ENV="$PP_VIEW"
+  fi
+fi
 # --decide stops here, with the decision just announced: a doc-only one prints plain scoped (S6).
 if [ -n "$DECIDE" ]; then
   if [ "$RUNLOG_DECISION" = full ]; then print_decision full "$force${inh_why:+; $inh_why}"; fi
@@ -2255,6 +2299,8 @@ $gate </dev/null &
 PP_BAR_PID=$!
 wait "$PP_BAR_PID"
 rc=$?
+# The digest's view file, once the bar that read it has returned; the signal handler removes it too.
+[ -z "$PP_VIEW" ] || rm -f "$PP_VIEW" 2>/dev/null
 PP_BAR_PID=""
 # AN EXIT 0 IS NOT A VERDICT UNTIL THE RECORD SAYS SO (TOOL-dDerivedDocket-26 S6). One push to the
 # default branch proceeded with no bar run while this hook said it was forcing one

@@ -2335,9 +2335,12 @@ unset GATE_RUN_ID
 # TOOL-aSparedSpawn-32 S6): the pre-push hook exports `GATE_REUSE_LINEAGE` or `GATE_REUSE_PUSH` to THIS
 # bar, and a leg's nested runner inheriting either, or a hand-set `GATE_REUSE`, would reuse inside a
 # scratch clone that asked for nothing. The mode block below reads these three variables and never
-# the environment; the header records the one mode it decides as `reuse`.
+# the environment; the header records the one mode it decides as `reuse`. `GATE_REUSE_DIGEST_ENV`,
+# the file the hook writes the caller's restored environment to beside `GATE_REUSE_PUSH`
+# (TOOL-aSparedSpawn-33), is read here too, and only the `push` mode's digest reads it.
 REUSE_ASK_ENV=${GATE_REUSE:-}; REUSE_ASK_PUSH=${GATE_REUSE_PUSH:-}; REUSE_ASK_LINEAGE=${GATE_REUSE_LINEAGE:-}
-unset GATE_REUSE GATE_REUSE_PUSH GATE_REUSE_LINEAGE
+REUSE_ASK_DIGEST_ENV=${GATE_REUSE_DIGEST_ENV:-}
+unset GATE_REUSE GATE_REUSE_PUSH GATE_REUSE_LINEAGE GATE_REUSE_DIGEST_ENV
 
 FPRINT="$KITREL/gate-fingerprint.sh"
 fingerprint() { [ -f "$FPRINT" ] || { printf ''; return; }; bash "$FPRINT" "$@" 2>/dev/null; }
@@ -3013,51 +3016,6 @@ build_input_keys() {
   for i in $bulk; do INPUT_KEYS[$i]=${shas[$k]%$'\r'}; k=$((k + 1)); done
 }
 
-# WHAT A REUSABLE `ok` MEANS. Bump this when a runner change redefines it: every recorded ledger row
-# then misses at once, which is the "did more work" direction. A constant rather than the runner's
-# own blob, because the runner's comments move in most builds. TOOL-aSparedSpawn-1 S5. 3 since the key
-# carries declared reads and the cache replaced the ledger as the store (TOOL-aSparedSpawn-13).
-REUSE_SCHEMA=3
-# THE TOOLCHAIN, ENVIRONMENT AND HOST DIGEST, one per run, the fourth section of EVERY key
-# (TOOL-aSparedSpawn-1 S4). Two runs over identical bytes under a different git, python, bash, MSYS
-# runtime or `PYTHONUTF8` are not the same question. Every `GATE_REUSE*` knob is left out so the
-# earning run (unset) and the reusing run (set) can agree, and `GATE_TURNSTILE_HELD`,
-# `GATE_TURNSTILE_HOLDER` and `GATE_RUN_ID` because each names this run and nothing a leg grades: the
-# holder nonce, which origin's host turnstile exports above, moved every key on every run until the
-# reconcile of TOOL-aSparedSpawn-32 left it out. `GATE_BASE` and `GATE_PUSH_BASE` are left out
-# HERE because they enter the key of a leg declaring `base` and of no other (TOOL-aSparedSpawn-13 S2):
-# hashed here they would move every key on every landing. Every other knob stays in: over-sensitive
-# is a miss, never a false hit.
-# WHAT IT DOES NOT SEE: a tool upgraded IN PLACE at the same path, other than git, which pays
-# `git version`; and any variable outside the prefix set, which a leg may still read.
-REUSE_DIGEST=$(
-  printf 'schema %s\n' "$REUSE_SCHEMA"
-  printf 'bash %s %s\n' "$BASH_VERSION" "$MACHTYPE"
-  if [ -r /proc/version ]; then IFS= read -r r < /proc/version; printf 'runtime %s\n' "$r"; fi
-  printf 'python %s %s\n' "$PYBIN" "$PY_ID"
-  # An empty digest is reported after `build_input_keys` below (TOOL-aSparedSpawn-16 S18), not here.
-  # arm-signature: the input keys could not be measured (the toolchain digest), so nothing is reused or cached this run
-  git version 2>/dev/null || exit 1
-  git config --get-regexp '^core\.(autocrlf|eol)$' 2>/dev/null
-  # Every other tool a leg names, by the location it resolves to: argv[0], each once.
-  declare -A seen=()
-  for ((i=0; i<total; i++)); do
-    [ -n "${names[$i]}" ] || continue
-    IFS=$'\x1f' read -r t _ <<<"${argvs[$i]}"
-    [ -n "$t" ] && [ -z "${seen[$t]:-}" ] || continue
-    seen[$t]=1; printf 'tool %s ' "$t"; type -P "$t" || echo
-  done
-  # The environment the legs inherit; `compgen -e` lists the exported names, sorted. PATH is always
-  # exported, so an empty listing is a failed read and fails the digest rather than dropping the env.
-  mapfile -t evs < <(compgen -e)
-  # arm-signature: the input keys could not be measured (the toolchain digest), so nothing is reused or cached this run
-  [ "${#evs[@]}" -gt 0 ] || exit 1
-  for v in "${evs[@]}"; do
-    case $v in GATE_REUSE*|GATE_TURNSTILE_HELD|GATE_TURNSTILE_HOLDER|GATE_RUN_ID|GATE_BASE|GATE_PUSH_BASE) continue ;;
-      GATE_*|GOV_*|*_PY|GIT_*|PYTHON*|LC_*|LANG|TZ|PATH) printf 'env %s=%s\n' "$v" "${!v}" ;; esac
-  done
-) && REUSE_DIGEST=$(git hash-object --stdin 2>/dev/null <<<"$REUSE_DIGEST") || REUSE_DIGEST=""
-
 # ---- REUSE: THE MODE, THE CACHE AND THE OBSERVED REMOTE (TOOL-aSparedSpawn-13, -32) -------------
 # THE MODE, ONE PER RUN, by a fixed precedence (TOOL-aSparedSpawn-32 S7). Under `GATE_FULL` it is
 # `lineage` when `REUSE_ASK_LINEAGE` is set and `off` otherwise, and a set `GATE_REUSE` or
@@ -3090,6 +3048,85 @@ case $REUSE_MODE in env|push)
   if [ -z "$REUSE_CACHE" ]; then REUSE_MODE=off; REUSE_WHY="no git common dir holds a cache"; fi ;;
 esac
 [ -n "$REUSE_WHY" ] && printf 'run-gates: reuse — %s\n' "$REUSE_WHY" >&2
+
+# WHAT A REUSABLE `ok` MEANS. Bump this when a runner change redefines it: every recorded ledger row
+# then misses at once, which is the "did more work" direction. A constant rather than the runner's
+# own blob, because the runner's comments move in most builds. TOOL-aSparedSpawn-1 S5. 3 since the key
+# carries declared reads and the cache replaced the ledger as the store (TOOL-aSparedSpawn-13). 4 since
+# a push's key reads the caller's restored environment and PATH reads `/bin` as `/usr/bin`
+# (TOOL-aSparedSpawn-33).
+REUSE_SCHEMA=4
+# THE TOOLCHAIN, ENVIRONMENT AND HOST DIGEST, one per run, the fourth section of EVERY key
+# (TOOL-aSparedSpawn-1 S4). Two runs over identical bytes under a different git, python, bash, MSYS
+# runtime or `PYTHONUTF8` are not the same question. Every `GATE_REUSE*` knob is left out so the
+# earning run (unset) and the reusing run (set) can agree, and `GATE_TURNSTILE_HELD`,
+# `GATE_TURNSTILE_HOLDER` and `GATE_RUN_ID` because each names this run and nothing a leg grades: the
+# holder nonce, which origin's host turnstile exports above, moved every key on every run until the
+# reconcile of TOOL-aSparedSpawn-32 left it out. `GATE_BASE` and `GATE_PUSH_BASE` are left out
+# HERE because they enter the key of a leg declaring `base` and of no other (TOOL-aSparedSpawn-13 S2):
+# hashed here they would move every key on every landing. Every other knob stays in: over-sensitive
+# is a miss, never a false hit.
+# THE CALLER'S ENVIRONMENT UNDER `push` (TOOL-aSparedSpawn-33, the owner's ruling on -25). A pre-push
+# hook runs under git's additions, `GIT_EXEC_PATH`, a PATH head and on Git for Windows `LC_CTYPE`, so
+# a key taken over this shell never met the one a direct bar earned. The hook restores the caller's
+# environment as it was before git and names the file it wrote in `GATE_REUSE_DIGEST_ENV`; in the
+# `push` mode that file's lines stand in for this shell's, and its PATH is the one the `tool` lines
+# resolve under. The legs still run under the hook's environment: only the key reads the caller's. A
+# named file that cannot be read fails the digest. Every mode reads each `/bin` in PATH as `/usr/bin`
+# where `-ef` proves them one directory, since a native git round-trips PATH and the hook cannot tell
+# which `/usr/bin` was a `/bin`. A value holding a newline is a `%q` line, as the hook writes it.
+# WHAT IT DOES NOT SEE: a tool upgraded IN PLACE at the same path, other than git, which pays
+# `git version`; and any variable outside the prefix set, which a leg may still read.
+REUSE_DIGEST=$(
+  printf 'schema %s\n' "$REUSE_SCHEMA"
+  printf 'bash %s %s\n' "$BASH_VERSION" "$MACHTYPE"
+  if [ -r /proc/version ]; then IFS= read -r r < /proc/version; printf 'runtime %s\n' "$r"; fi
+  printf 'python %s %s\n' "$PYBIN" "$PY_ID"
+  # An empty digest is reported after `build_input_keys` below (TOOL-aSparedSpawn-16 S18), not here.
+  # arm-signature: the input keys could not be measured (the toolchain digest), so nothing is reused or cached this run
+  git version 2>/dev/null || exit 1
+  git config --get-regexp '^core\.(autocrlf|eol)$' 2>/dev/null
+  # The environment, as `env NAME=value` lines: this shell's, from `compgen -e`, sorted, or under
+  # `push` the caller's, from the hook's file. PATH is always exported, so a listing without it is a
+  # failed read and fails the digest rather than dropping the env.
+  evl=(); vp=""
+  if [ "$REUSE_MODE" = push ] && [ -n "$REUSE_ASK_DIGEST_ENV" ]; then
+    # arm-signature: the input keys could not be measured (the toolchain digest), so nothing is reused or cached this run
+    { mapfile -t evl < "$REUSE_ASK_DIGEST_ENV"; } 2>/dev/null || exit 1
+  else
+    mapfile -t evs < <(compgen -e)
+    for v in "${evs[@]}"; do
+      if [[ ${!v} == *$'\n'* ]]; then printf -v l 'env %s=%q' "$v" "${!v}"; else l="env $v=${!v}"; fi
+      evl+=("$l")
+    done
+  fi
+  for l in "${evl[@]}"; do case $l in "env PATH="*) vp=${l#env PATH=} ;; esac; done
+  # arm-signature: the input keys could not be measured (the toolchain digest), so nothing is reused or cached this run
+  [ -n "$vp" ] || exit 1
+  if [ /bin -ef /usr/bin ]; then
+    vp=":$vp:"; b=:/bin: u=:/usr/bin:
+    while [[ $vp == *"$b"* ]]; do vp=${vp//"$b"/"$u"}; done
+    vp=${vp#:}; vp=${vp%:}
+  fi
+  PATH=$vp
+  # Every other tool a leg names, by the location it resolves to under that PATH: argv[0], each once.
+  declare -A seen=()
+  for ((i=0; i<total; i++)); do
+    [ -n "${names[$i]}" ] || continue
+    IFS=$'\x1f' read -r t _ <<<"${argvs[$i]}"
+    [ -n "$t" ] && [ -z "${seen[$t]:-}" ] || continue
+    seen[$t]=1; printf 'tool %s ' "$t"; type -P "$t" || echo
+  done
+  # The name patterns below are copied into `.githooks/pre-push`'s view writer, which bounds what
+  # reaches its file; the pre-push suite compares the two pattern texts.
+  for l in "${evl[@]}"; do
+    v=${l#env }; v=${v%%=*}
+    case $v in GATE_REUSE*|GATE_TURNSTILE_HELD|GATE_TURNSTILE_HOLDER|GATE_RUN_ID|GATE_BASE|GATE_PUSH_BASE) continue ;;
+      PATH) printf 'env PATH=%s\n' "$vp" ;;
+      GATE_*|GOV_*|*_PY|GIT_*|PYTHON*|LC_*|LANG|TZ) printf '%s\n' "$l" ;; # digest-env-names
+    esac
+  done
+) && REUSE_DIGEST=$(git hash-object --stdin 2>/dev/null <<<"$REUSE_DIGEST") || REUSE_DIGEST=""
 # THE SAMPLE RATE (S6, owner ruling F2: 0.25, uniform per leg), as parts in 10000. A value that is no
 # decimal from 0 to 1 is refused back to the default, loudly: a typo must not switch the sample off.
 REUSE_SAMPLE=${GATE_REUSE_SAMPLE:-0.25}; SAMPLE_PM=2500
