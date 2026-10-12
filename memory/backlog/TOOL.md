@@ -345,6 +345,7 @@ Cite ids, never line numbers.
 | [TOOL-cFinalBerth-4](../builds/cFinalBerth/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-13 | the three named refusals aMooredAnchor S4 scoped for check 9's silent… |
 | [TOOL-cFinalBerth-5](../builds/cFinalBerth/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-13 | the run-gates canary's par*2 < ser ratio FLIPS run to run on one tree:… |
 | [TOOL-cGradedDebt-3](../builds/cGradedDebt/BACKLOG.md) | OPEN | — | — | 2026-09-13 | ARMS_FLOORS FOR THE HYGIENE GATE TRAILS ITS POPULATION BY FOUR.… |
+| [TOOL-cListedCensus-2](../builds/cListedCensus/BACKLOG.md) | OPEN | LOW | — | 2026-10-13 | the two sibling scanners list their population case-sensitively, the… |
 | [TOOL-cMendedVintage-20](../builds/cMendedVintage/BACKLOG.md) | OPEN | — | — | 2026-09-20 | the unattended driver gains a rotation the verbs understand, so a long… |
 | [TOOL-cSettledDocket-7](../builds/cSettledDocket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | tools/memory-recall/recall-opened.test.sh is tracked and NO gate leg… |
 | [TOOL-cSettledDocket-8](../builds/cSettledDocket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | DIRECTIVES_EXTRA_TABLE has one reader, check 16. Unit 2's 'shown to the… |

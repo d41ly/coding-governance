@@ -2,8 +2,8 @@
 """PowerShell source-hygiene scans — two classes that make a script misbehave SILENTLY.
 
 Project-agnostic. Run over any repo: `python <prefix>/gate-lint/ps-hygiene.py [root]`.
-Exit 0 clean, 1 on findings, 2 on usage error or a population that could not be derived.
-`--selftest` proves both scans, and the tracked population, can FAIL.
+Exit 0 clean, 1 on findings, 2 on a refusal: a usage error, a `git ls-files` that failed, or no
+tracked .ps1 at all. `--selftest` proves both scans, and the tracked population, can FAIL.
 
 CLASS 1 — case-only identifier collisions. PowerShell variable names are case-INSENSITIVE, so
 `$LEGS` and `$legs` are ONE variable. Upstream this bit the same file three times: `$LEGS =
@@ -33,6 +33,10 @@ class is itself the could-not-fail shape these scans exist to catch. TRACKED, no
 question is about the commit, and a walk from the root also reads every untracked checkout parked
 inside the tree, which is where some adopters keep their linked worktrees. No tracked .ps1 at all
 is a refusal, because a dead `git ls-files` and an empty tree both yield zero files.
+
+The listing takes no pathspec and filters the suffix case-insensitively. A pathspec glob is
+case-sensitive even under `core.ignorecase`, so `*.ps1` dropped a tracked `Deploy.PS1` that the walk
+it replaced had graded on Windows — a population narrower than the walk, certified clean.
 """
 from __future__ import annotations
 
@@ -135,16 +139,18 @@ def scan(root: pathlib.Path) -> tuple[list[str], int]:
     """Every tracked .ps1 under root, graded. Returns (findings, files scanned).
 
     A failed `git ls-files` raises rather than returning nothing: it is a dead probe, and spelling it
-    the same way as an empty tree would grade nothing and pass.
+    the same way as an empty tree would grade nothing and pass. The set drops the repeat entries an
+    unmerged path gets, one per stage. A listed path absent from disk (an unstaged deletion, a
+    skip-worktree entry) is skipped and not counted.
     """
-    listing = subprocess.run(["git", "ls-files", "-z", "--", "*.ps1"], cwd=str(root),
+    listing = subprocess.run(["git", "ls-files", "-z"], cwd=str(root),
                              capture_output=True, text=True, encoding="utf-8")
     if listing.returncode != 0:
         raise OSError("git ls-files failed, so the population could not be derived at all: "
                       + (listing.stderr or "").strip())
     findings: list[str] = []
     scanned = 0
-    for rel in sorted(p for p in listing.stdout.split("\0") if p):
+    for rel in sorted({p for p in listing.stdout.split("\0") if p.lower().endswith(".ps1")}):
         path = root / rel
         if not path.is_file():
             continue
@@ -217,18 +223,24 @@ def _selftest() -> int:
                 scan(tree)
                 print("SELFTEST FAIL: a directory that is no repository did not raise"); ok = False
             except OSError:
-                if run_quiet()[0] != 2:
-                    print("SELFTEST FAIL: a directory that is no repository did not refuse with 2"); ok = False
+                code, said = run_quiet()
+                if code != 2 or "git ls-files failed" not in said or "graded NOTHING" in said:
+                    print("SELFTEST FAIL: a directory that is no repository did not refuse with 2, "
+                          "naming the dead listing"); ok = False
             subprocess.run(git + ["init", "-q", "."], cwd=str(tree), capture_output=True, check=True)
+            # The one tracked .ps1 is then deleted from disk: listed, absent, and so not counted.
+            (tree / "b.ps1").write_bytes(b"Write-Host 'plain ascii'\n")
+            subprocess.run(git + ["add", "--", "b.ps1"], cwd=str(tree), capture_output=True, check=True)
+            (tree / "b.ps1").unlink()
             code, said = run_quiet()
             if scan(tree)[1] != 0 or code != 2 or "graded NOTHING" not in said:
-                print("SELFTEST FAIL: a repository tracking no .ps1, beside an untracked one, did not "
-                      "refuse as empty"); ok = False
+                print("SELFTEST FAIL: a repository whose one tracked .ps1 is gone from disk, beside an "
+                      "untracked one, did not refuse as empty"); ok = False
             (tree / "a.ps1").write_bytes(b"Write-Host 'plain ascii'\n")
             (nested / "a.ps1").write_bytes(bad)
             subprocess.run(git + ["add", "--", "a.ps1"], cwd=str(tree), capture_output=True, check=True)
             code, said = run_quiet()
-            if (code, scan(tree)[1]) != (0, 1):
+            if (code, scan(tree)[1]) != (0, 1) or "OK — 1 tracked .ps1 file(s)" not in said:
                 print("SELFTEST FAIL: an untracked copy under .claude/worktrees/ was graded"); ok = False
             # The CONTROL: the same bytes, staged, red. Without it the arm above could pass on a
             # fixture that no scan would ever flag.
@@ -237,6 +249,15 @@ def _selftest() -> int:
             code, said = run_quiet()
             if code != 1 or ".claude/worktrees/x/a.ps1: non-ASCII with no UTF-8 BOM" not in said:
                 print("SELFTEST FAIL: the same copy, once tracked, did not red"); ok = False
+            # An upper-case suffix under a non-ASCII name: a case-sensitive `*.ps1` pathspec drops it,
+            # and a listing without -z quotes the name so it is no file. The walk graded it.
+            (tree / "sub").mkdir()
+            (tree / "sub" / "ü.PS1").write_bytes(bad)
+            subprocess.run(git + ["add", "-f", "--", "sub/ü.PS1"], cwd=str(tree), capture_output=True,
+                           check=True)
+            code, said = run_quiet()
+            if code != 1 or "sub/ü.PS1: non-ASCII with no UTF-8 BOM" not in said:
+                print("SELFTEST FAIL: a tracked sub/ü.PS1 was not graded"); ok = False
     finally:
         os.environ.pop("GIT_CEILING_DIRECTORIES", None)
         os.environ.update(held)
@@ -254,7 +275,7 @@ def main(argv: list[str]) -> int:
         return 2
     try:
         findings, scanned = scan(root)
-    except OSError as exc:
+    except (OSError, ValueError) as exc:  # ValueError: a listing git wrote in no UTF-8 is a dead probe too
         print(f"ps-hygiene: {exc}", file=sys.stderr)
         return 2
     if scanned == 0:

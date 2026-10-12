@@ -17,7 +17,8 @@ python3 <prefix>/gate-lint/ps-hygiene.py --selftest
 ```
 
 Scans **every tracked** `.ps1` under `root`, listed by `git ls-files` and never by a walk of the
-disk, so a worktree parked untracked inside the tree is not graded. A failed listing and a root that
+disk, so a worktree parked untracked inside the tree is not graded. The suffix matches in any case,
+because a git pathspec glob would not, and the walk it replaced graded `Deploy.PS1` on Windows. A failed listing and a root that
 tracks no `.ps1` each refuse with exit 2: both yield zero files, and only one of them means there is
 nothing to grade. A repository that wired the scanner with no tracked `.ps1` therefore reds; drop the
 line until PowerShell exists. It looks for two classes:

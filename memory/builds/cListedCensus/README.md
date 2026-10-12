@@ -4,7 +4,7 @@ node: c
 opened: 2026-10-12
 streams: tooling
 roster: TOOL
-ids: TOOL-cListedCensus-1
+ids: TOOL-cListedCensus-1 TOOL-cListedCensus-2
 ---
 
 # cListedCensus — ps-hygiene grades the tracked `.ps1` files, not a walk of the disk
@@ -34,6 +34,8 @@ that, `PKG-bStitchedFerry-3`, was erased by a govkit pull because it never reach
 - One unit, Tier 2, at the owner's call at kickoff; no spec audit is declared.
 - The reference is nc `bcc6f8a4:scripts/gate-lint/ps-hygiene.py`, taken without its carve-out comment.
 - No leg is wired: gov tracks no `.ps1`, so a leg here would refuse on every run.
+- Closing review round 1 (light) converged: 0 blockers, 1 HIGH, 1 MEDIUM, 8 LOW items. All ten fold
+  into rev-2; H1's two sibling instances in the other scanners are filed as `TOOL-cListedCensus-2`.
 
 ## Parked decisions
 
@@ -43,21 +45,21 @@ none
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-cListedCensus-1` | INPROGRESS | the scan's population is `git ls-files -z -- '*.ps1'`; a dead probe and an empty population refuse with exit 2 |
+| 1 | `TOOL-cListedCensus-1` | INPROGRESS | the scan's population is `git ls-files -z` filtered to a `.ps1` suffix in any case; a dead probe and an empty population refuse with exit 2 |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 1 unit(s) · node c · opened 2026-10-12 · streams tooling
-ids TOOL-cListedCensus-1
+ids TOOL-cListedCensus-1 TOOL-cListedCensus-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-cListedCensus-1 — ps-hygiene grades the tracked `.ps1` files, and refuses a population it could not derive](spec/2026-10-12-spec-TOOL-cListedCensus-1.md) | — | 2 | INPROGRESS | rev-1 | 2026-10-12 |
+| [TOOL-cListedCensus-1 — ps-hygiene grades the tracked `.ps1` files, and refuses a population it could not derive](spec/2026-10-12-spec-TOOL-cListedCensus-1.md) | — | 2 | INPROGRESS | rev-2 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

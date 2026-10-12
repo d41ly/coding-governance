@@ -29,21 +29,31 @@ nc's second fix, `PKG-bIndexedHarrow-1`, is the one gov took as `TOOL-cListedCen
 
 ## The fix
 
-When the question is about the COMMIT, take the population from the index: `git ls-files -z --
-'<glob>'` with `cwd` at the root, as `tools/gate-lint/sh_hygiene.py`, `encoding_posture.py` and now
-`ps-hygiene.py` do. Pruning one directory name from the walk fixes one adopter's layout and still
-grades every other untracked file. Converting a walk brings two new failure modes, and both need a
-refusal rather than a green: a dead `git ls-files` and an empty listing each yield zero files.
-Observe three cases: a tracked violation reds, the same bytes untracked do not, and an empty tracked
-set refuses.
+When the question is about the COMMIT, take the population from the index: `git ls-files -z` with
+`cwd` at the root, as `tools/gate-lint/sh_hygiene.py`, `encoding_posture.py` and now `ps-hygiene.py`
+do. Pruning one directory name from the walk fixes one adopter's layout and still grades every other
+untracked file.
+
+The listing must be at least as wide as the walk it replaces. A git pathspec glob is case-sensitive
+even under `core.ignorecase`, so `-- '*.ps1'` dropped a tracked `Deploy.PS1` that `rglob` graded on
+Windows, and the scanner certified the narrower population clean. List with no pathspec and match
+the suffix case-insensitively. `sh_hygiene.py` (`*.sh`) and `encoding_posture.py` (`.endswith(".py")`)
+still match case-sensitively; that is `TOOL-cListedCensus-2`.
+
+Converting a walk brings new failure modes, and each needs a refusal rather than a green: a dead
+`git ls-files`, a listing that does not decode, and an empty listing each yield zero files. Observe
+four cases: a tracked violation reds, the same bytes untracked do not, an upper-case suffix reds,
+and an empty tracked set refuses.
 
 A walk is still right when the question is about the disk, such as a generated artifact that is
 never committed. Say which question the gate asks.
 
 ## Gated by
 
-The instance: `ps-hygiene.py --selftest` stages a BOM-less copy untracked under a nested worktree path
-and asserts it is not graded, with the same bytes staged as the red control.
+The instance has a check and no gate. `ps-hygiene.py --selftest` stages a BOM-less copy untracked
+under a nested worktree path and asserts it is not graded, with the same bytes staged as the red
+control, and tracks a sub/ü.PS1 that must red. No leg runs it, held or otherwise, because the kit
+declares no ps-hygiene leg and wiring one is a later unit. Run it by hand after editing the scanner.
 
 The class: no machine gate, because a walk is legitimate wherever the question is about the disk. The
 documented check is a survey: grep the tracked tools for `rglob(`, `os.walk(` and a `find` over a
