@@ -78,7 +78,7 @@ Other parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 14 unit(s) · node a · opened 2026-10-11 · streams tooling
+**Build status:** CLOSED · 14 unit(s) · node a · opened 2026-10-11 · streams tooling
 ids TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 TOOL-aPairedSlots-10 TOOL-aPairedSlots-11 TOOL-aPairedSlots-12 TOOL-aPairedSlots-13 TOOL-aPairedSlots-14
 ids TOOL-aPairedSlots-15
 
@@ -96,12 +96,12 @@ ids TOOL-aPairedSlots-15
 | [TOOL-aPairedSlots-9 — node a's slot count and the shared-width rule, set by the two-bar A/B](spec/2026-10-11-spec-TOOL-aPairedSlots-9.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-12 |
 | [TOOL-aPairedSlots-12 — the A/B instrument reads the run record's verdict by key, and the rule check proves an arm from its bar rows](spec/2026-10-12-spec-TOOL-aPairedSlots-12.md) | 8 | 1 | CLOSED | rev-1 | 2026-10-12 |
 | [TOOL-aPairedSlots-13 — the two-bar check reads the verdict by key and grades its rows at their declared width](spec/2026-10-12-spec-TOOL-aPairedSlots-13.md) | 8 | 1 | CLOSED | rev-1 | 2026-10-12 |
-| [TOOL-aPairedSlots-11 — the drift history is created with its header already in it](spec/2026-10-12-spec-TOOL-aPairedSlots-11.md) | 9 | 2 | INPROGRESS | rev-1 | 2026-10-12 |
+| [TOOL-aPairedSlots-11 — the drift history is created with its header already in it](spec/2026-10-12-spec-TOOL-aPairedSlots-11.md) | 9 | 2 | CLOSED | rev-1 | 2026-10-12 |
 | [TOOL-aPairedSlots-14 — the two-bar check's overlap guard reads the slots the bars were admitted to](spec/2026-10-12-spec-TOOL-aPairedSlots-14.md) | 9 | 1 | CLOSED | rev-1 | 2026-10-12 |
 | [TOOL-aPairedSlots-15 — the closing review's mediums and lows, batched](spec/2026-10-12-spec-TOOL-aPairedSlots-15.md) | 9 | 2 | CLOSED | rev-2 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 22 bound to this build, across 4 record folder(s).
+Records: 23 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

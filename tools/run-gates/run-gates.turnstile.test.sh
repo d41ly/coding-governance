@@ -1435,25 +1435,26 @@ fi
 # ================= TOOL-aPairedSlots-15: the closing review's mediums and lows ======================
 
 # ---- 44: a reap judges the holder whose nonce guards the removal (AC1) -------------------------------
-# Sourced, not run: `ts_try_reap` and `scan_dead_docs_beacons` with every pid reported dead and `cat`
-# shimmed so that READING A BEACON'S PID swaps its nonce, as a successor claiming the slot between the
-# judgement and the removal would. A reap that read the nonce first spares the successor; one that read
-# it after the pid, or that does not re-read it, deletes it.
+# Sourced, not run: the runner's `ts_try_reap` and `scan_dead_docs_beacons`, each pid read routed
+# through a reader that swaps the beacon's nonce as it reads, as a successor claiming the slot between
+# the judgement and the removal would. Pid 999999 is dead to the runner's own `ts_alive`. A reap that
+# read the nonce first spares the successor; one that read it after the pid, or that does not re-read
+# it, deletes it. The routed count is asserted, so a runner whose pid read changed spelling reds here.
 F44=$tmp/reap44; mkdir -p "$F44/slot" "$F44/docs/b"
 for d44 in "$F44/slot" "$F44/docs/b"; do
   printf '999999' > "$d44/pid"; printf '%s' "$(date +%s)" > "$d44/heartbeat"; printf 'judged' > "$d44/nonce"
 done
 (
-  eval "$(sed -n '/^num_ok() {/p;/^ts_try_reap() {/,/^}/p;/^scan_dead_docs_beacons() {/,/^}/p' "$HERE/run-gates.sh")"
-  ts_now() { date +%s; }
-  ts_alive() { return 1; }
+  eval "$(sed -n '/^num_ok() {/p;/^ts_now()/p;/^ts_alive()/p;/^ts_try_reap() {/,/^}/p;/^scan_dead_docs_beacons() {/,/^}/p' \
+    "$HERE/run-gates.sh" | sed 's|cat "\$d/pid"|read_pid_and_swap "$d"|')"
+  read_pid_and_swap() { cat "$1/pid"; printf 'successor' > "$1/nonce"; }
   add_health_event() { :; }
-  cat() { command cat "$@"; case "$1" in */pid) printf 'successor' > "${1%/pid}/nonce" ;; esac; }
   TS_TTL=600; TS_SLOT_DIRS=("$F44/slot"); TS_DOCS_ROOT="$F44/docs"; RG_HEALTH_LOG=/dev/null
+  declare -f ts_try_reap scan_dead_docs_beacons | grep -c read_pid_and_swap > "$F44/routed"
   ts_try_reap 2>/dev/null; scan_dead_docs_beacons 2>/dev/null
   exit 0
 )
-[ -d "$F44/slot" ] && [ "$(cat "$F44/slot/nonce" 2>/dev/null)" = successor ] \
+[ "$(cat "$F44/routed" 2>/dev/null)" = 2 ] && [ -d "$F44/slot" ] && [ "$(cat "$F44/slot/nonce" 2>/dev/null)" = successor ] \
   && ok "a slot whose nonce changed after its pid was read survived the reap" \
   || nope "a slot whose nonce changed after its pid was read was reaped"
 [ -d "$F44/docs/b" ] && [ "$(cat "$F44/docs/b/nonce" 2>/dev/null)" = successor ] \
