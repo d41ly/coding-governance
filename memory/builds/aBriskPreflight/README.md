@@ -90,7 +90,7 @@ ids TOOL-aBriskPreflight-13 TOOL-aBriskPreflight-14 TOOL-aBriskPreflight-15 TOOL
 | [TOOL-aBriskPreflight-12 — the closing review's mediums and lows: record bindings and ledgers, RB_TOOK at the child's end, the cache reset, four arms](spec/2026-10-12-spec-TOOL-aBriskPreflight-12.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 47 bound to this build, across 4 record folder(s).
+Records: 48 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -10,6 +10,7 @@
 | [2026-10-11-build-TOOL-aBriskPreflight-6-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aBriskPreflight-6-acceptance-ledger.md) | journal | — |
 | [2026-10-11-build-TOOL-aBriskPreflight-6-claim-push-ab.md](../build/2026-10-11-build-TOOL-aBriskPreflight-6-claim-push-ab.md) | research | — |
 | [2026-10-11-build-TOOL-aBriskPreflight-6-claim-push.sh](../build/2026-10-11-build-TOOL-aBriskPreflight-6-claim-push.sh) | research | — |
+| [2026-10-12-build-TOOL-aBriskPreflight-1-runlog-748ca395.md](../build/2026-10-12-build-TOOL-aBriskPreflight-1-runlog-748ca395.md) | journal | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-12 |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-7 |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-6-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-6-build-brief.md) | research | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-6-spec-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-6-spec-brief.md) | research | — |

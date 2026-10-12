@@ -9,13 +9,23 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-aBriskPreflight-8=OPEN TOOL-aBriskPreflight-9=OPEN TOOL-aBriskPreflight-13=OPEN TOOL-aBriskPreflight-14=OPEN TOOL-aBriskPreflight-15=OPEN TOOL-aBriskPreflight-16=OPEN TOOL-aBriskPreflight-17=OPEN TOOL-aBriskPreflight-18=OPEN
+units-at-landing: TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-11 TOOL-aBriskPreflight-12
+hold-run: 
+hold-streak: 1 · at 973dc13e
+resume-owed: none · owner
+held-at: 2026-10-12T05:29:58Z
+hold-reason: TOOL-aBriskPreflight-11 (promoted from the closing review's HIGH H1) is parked on spec fork F2: priced at the worst host reading on record, PREFLIGHT_CEILING derives to about 4200 s, above GATE_BOUND 3600 s, and every option the run could take trips spec 7's AC8, raises a bound, or picks the selector by its outcome. The other eleven units are CLOSED and the work is sound; the bar's remaining reds are other builds' offenders on origin/main, read OWN only through the comparator rule. Decide F2, then build unit 11 (or retire it with a reason) and land.
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
 gates-run: unattended-179177613053776420063-779951 4bb77a0d
 parked-surfaced: yes
 keepalive-reaped: yes
-refreshed-at: 37200355d6033895cd156ec962928fd264084c2b · park · 47 touching
+refreshed-at: 37200355d6033895cd156ec962928fd264084c2b · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 7d98741e3baa4512160c252da3eb99e3e6969ecc
-phase: VERIFYING
+witness: 973dc13e8dfe2567e2995f7bf20441daf35fab35
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/sleepy-kapitsa-1f69c8
@@ -87,3 +97,7 @@ base: 271a90045723817f694de4d22c56f88dbcd0063e
 2026-10-11T23:26:47Z decision · item TOOL-aBriskPreflight-7 AC10 lexicon half: is python tools/lexicon/lexicon.py --check exit 0 observed for unit 7? · reason Options seen: (i) write AC10 observed on gen_map alone; (ii) re-run lexicon now; (iii) amend spec 7 AC10. Neither feb305b0b nor any record holds the lexicon run. Re-run 2026-10-12 by TOOL-aBriskPreflight-12: rc 1, 1071 verb offenders over pin 1063, none in a file unit 7 touched, so the red is inherited and not unit 7's. Refused (iii): amending another unit's criterion is not this unit's scope. The ledger line names gen_map as its token and states the lexicon half as not observed at exit 0; the close's bar grades the lexicon leg
 
 2026-10-11T23:41:34Z dispatch · item 89d72ea1 TOOL-aBriskPreflight-12 · reason tools/check-wiring.sh tools/check-wiring.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh .githooks/straggler-guard.test.sh memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-1.md memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-3.md memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-4.md memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-5.md memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-6.md memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-7.md memory/builds/aBriskPreflight/spec/2026-10-12-spec-TOOL-aBriskPreflight-12.md memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-1-host-state.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-1-run-timed.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-1-run-traced.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-1-runs.log memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-1-trace-gaps.py memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-1-trace-spawns.py memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-3-arm-windows.py memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-4-probes-ab.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-5-walk-probe.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-6-claim-push.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-7-ab-prep.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-7-ab-rows.log memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-7-ab-run.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-7-ceiling-rows.log memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-7-ceilings.sh memory/builds/aBriskPreflight/build/2026-10-12-build-TOOL-aBriskPreflight-4-acceptance-ledger.md memory/builds/aBriskPreflight/build/2026-10-12-build-TOOL-aBriskPreflight-7-acceptance-ledger.md memory/builds/aBriskPreflight/build/2026-10-12-build-TOOL-aBriskPreflight-12-acceptance-ledger.md memory/builds/aBriskPreflight/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json memory/backlog/TOOL.md
+
+2026-10-12T05:30:07Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aBriskPreflight && bash tools/push-main.sh --land --slug aBriskPreflight && bash tools/unattended/unattended.sh --settle aBriskPreflight
+
+2026-10-12T05:30:08Z hold · item owner-decision · reason until owner · reaped 0fe01023 · resume none(owner)

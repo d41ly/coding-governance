@@ -9,6 +9,7 @@
 | [2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md](../build/2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 |
 | [2026-10-11-build-TOOL-aBriskPreflight-3-arm-windows.py](../build/2026-10-11-build-TOOL-aBriskPreflight-3-arm-windows.py) | research | — |
 | [2026-10-11-build-TOOL-aBriskPreflight-3-wiring-scope.md](../build/2026-10-11-build-TOOL-aBriskPreflight-3-wiring-scope.md) | research | — |
+| [2026-10-12-build-TOOL-aBriskPreflight-1-runlog-748ca395.md](../build/2026-10-12-build-TOOL-aBriskPreflight-1-runlog-748ca395.md) | journal | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-12 |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-3-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-3-build-brief.md) | research | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-3-spec-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-3-spec-brief.md) | research | — |
