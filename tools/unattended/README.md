@@ -306,10 +306,14 @@ file constants of the driver, `WIRING_CEILING` and `PREFLIGHT_CEILING` in second
 - **The values are derived, never typed.** Per subject, from after-arm rows: the slowest untraced
   wall `W`, plus every traced exec `E` and fork `K` re-priced from that run's own per-spawn `S_m` and
   per-fork `K_m` to the worst on record, `S_w` (at least 2.5 s) and `K_w` (at least 0.91 s), plus `U`,
-  each timed wait's bound less its traced window. The sum rounds up to a multiple of 30 s:
-  `W + E*max(0, S_w - S_m) + K*max(0, K_w - K_m) + U`. `CEILING_SPAWN_MS` is `S_w`. The rows and the
-  instrument that prints the three constant lines sit in that unit's build record, and a changed
-  value is a re-derivation there.
+  each timed wait's bound less its traced window. `W`, `S_m` and `K_m` come from after-arm rows;
+  `S_w` and `K_w` from every host row on record, any arm and any exit status
+  (`TOOL-aBriskPreflight-11`). The sum rounds up to a multiple of 30 s:
+  `W + E*max(0, S_w - S_m) + K*max(0, K_w - K_m) + U`. `CEILING_SPAWN_MS` is `S_w`. Only
+  `WIRING_CEILING` must sit below `GATE_BOUND`, since it races that bound on one child;
+  `PREFLIGHT_CEILING` kills nothing and may sit above it. The rows and the instrument that prints
+  the three constant lines sit in that unit's build record, and a changed value is a re-derivation
+  there.
 - **Why no conf key.** A key owes a row in the protocol's key table, a governance carrier, and an
   environment read is a new public surface; a ceiling raisable from either leaves no diff behind.
   An adopter whose wiring check legitimately runs past `WIRING_CEILING` has no override until one is

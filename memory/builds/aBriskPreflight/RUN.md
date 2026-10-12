@@ -103,3 +103,7 @@ base: 271a90045723817f694de4d22c56f88dbcd0063e
 2026-10-12T05:30:08Z hold · item owner-decision · reason until owner · reaped 0fe01023 · resume none(owner)
 
 2026-10-12T16:12:22Z resume · item aBriskPreflight · reason held · keepalive 50da7a17 · manual
+
+2026-10-12T16:34:49Z dispatch · item 2c038d0d TOOL-aBriskPreflight-11 · reason memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-7-ceilings.sh tools/unattended/unattended.sh tools/unattended/README.md memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-7.md memory/builds/aBriskPreflight/spec/2026-10-12-spec-TOOL-aBriskPreflight-11.md memory/builds/aBriskPreflight/build/2026-10-12-build-TOOL-aBriskPreflight-11-acceptance-ledger.md memory/builds/aBriskPreflight/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
+
+2026-10-12T16:35:24Z brief · item TOOL-aBriskPreflight-11 · reason 2326d74e6092 memory/builds/aBriskPreflight/prompts/2026-10-12-prompt-TOOL-aBriskPreflight-11-build-brief.md

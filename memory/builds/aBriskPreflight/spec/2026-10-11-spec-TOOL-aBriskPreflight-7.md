@@ -1,6 +1,6 @@
 # TOOL-aBriskPreflight-7 — preflight and the wiring check each declare a wall-clock ceiling and name a breach
 
-**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 4 · ratified 2026-10-11
+**Status:** CLOSED · rev-4 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 4 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -259,9 +259,10 @@ files.
 grammar for this unit, with no function definitions so the lexicon leg has nothing to grade. It
 reads the rows, applies the formula, and prints exactly three lines: `WIRING_CEILING="<n>"`,
 `PREFLIGHT_CEILING="<n>"` and `CEILING_SPAWN_MS="<n>"`. It exits 1 naming the subject when rows are
-missing, or when a value is at or above the `GATE_BOUND` that `.unattended.conf` declares (3600 at
-writing). Then the unit parks: a wiring ceiling at or above that bound can never fire first, and a
-preflight ceiling there names nothing sooner than the bound the owner called silent.
+missing, or when the WIRING value is at or above the `GATE_BOUND` that `.unattended.conf` declares
+(3600 at writing). Then the unit parks: a wiring ceiling at or above that bound can never fire
+first. A preflight ceiling there kills nothing and compares the whole wall, which no bound covers,
+so the instrument prints it and names the relation on stderr (rev-4).
 
 A later change to either value is a rev bump of this spec with new rows. The instrument's diff
 against the driver refuses a retyped constant.
@@ -375,9 +376,10 @@ their tests as BUILD-METHOD M12 asks.
   `grep -E '^(WIRING_CEILING|PREFLIGHT_CEILING|CEILING_SPAWN_MS)=' tools/unattended/unattended.sh`.
   The wiring subject has at least three untraced rows and the preflight subject at least two (§4
   "The rows this pass read"), each after its own host row, and each subject one traced count row
-  and at least one row per U wait. Both ceilings are below the declared `GATE_BOUND`.
+  and at least one row per U wait. `WIRING_CEILING` is below the declared `GATE_BOUND`;
+  `PREFLIGHT_CEILING` kills nothing and may sit at or above it, which the instrument names on stderr.
   Red when: a constant was typed rather than derived, a timed row has no host row, a U wait has no
-  window row, or a value reaches the bound, which the instrument refuses with exit 1.
+  window row, or the wiring value reaches the bound, which the instrument refuses with exit 1.
   figure: every value is DERIVED at the pass from the rows the instrument names. S_w and K_w carry
   the PINNED floors of 2.5 s and 0.91 s, measured on node a, 2026-10-11.
   fixture: no after-arm row exists today; the A/B or this pass writes them (§4 "The values").
@@ -485,6 +487,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC7 · a PATH directory w
 - rev-3 · 2026-10-11 · AC1 grades the fixture's `tRun/RUN.md` as byte-identical rather than absent:
   the suite's pristine tree carries one, so "no `RUN.md` exists" was false of the fixture before any
   run, and the sliced arm read it present on the built driver.
+- rev-4 · 2026-10-12 · by TOOL-aBriskPreflight-11, as §4 asks of a changed value: §4 "The
+  instrument" and §6 AC8's bound rule are narrowed to `WIRING_CEILING` by the owner's ruling
+  on that unit's §8 F2, since `PREFLIGHT_CEILING` kills nothing; and the instrument now prices
+  S_w and K_w at every host row on record, any arm, as §4's table says, so the re-derived
+  constants are 840, 4200 and 2500.
 
 ## 10. Reuse audit
 

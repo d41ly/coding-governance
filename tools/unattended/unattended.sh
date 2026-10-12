@@ -660,13 +660,14 @@ read_bound_key GATE_BOUND "$GATE_BOUND_DEFAULT" seconds "a declared command is b
 # no diff behind, and a conf key owes a protocol key-table row. Assigned AFTER the conf is sourced, so
 # a conf naming any of the three is overwritten. WIRING_CEILING kills the wiring child at the smaller
 # of it and GATE_BOUND and check 4 refuses naming it; PREFLIGHT_CEILING kills nothing, and a
-# --preflight over it prints a named breach line. Every input is DERIVED from after-arm rows by the
-# formula in this unit's spec — the measured wall plus every counted spawn and fork re-priced at the
-# worst per-process cost on record — except CEILING_SPAWN_MS's 2.5 s and the 0.91 s per-fork floor,
+# --preflight over it prints a named breach line, so it may sit above GATE_BOUND (TOOL-aBriskPreflight-11).
+# DERIVED by the formula in this unit's spec — the measured wall plus every counted spawn and fork
+# re-priced at the worst per-process cost on record: W, S_m and K_m from after-arm rows, S_w and K_w
+# from every host row on record, any arm — except CEILING_SPAWN_MS's 2.5 s and the 0.91 s per-fork floor,
 # which are PINNED readings of node a, 2026-10-11. The rows and the instrument that prints these three
 # lines sit in this unit's build record; a changed value is a re-derivation there, never a retype here.
-WIRING_CEILING="570"
-PREFLIGHT_CEILING="3060"
+WIRING_CEILING="840"
+PREFLIGHT_CEILING="4200"
 CEILING_SPAWN_MS="2500"
 # ...and SAID inert where the bound is, beside the NOTE above that names GATE_BOUND: that one prints
 # before this constant exists, and an inert ceiling that reads as a live one is a skip that looks

@@ -73,7 +73,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 10 unit(s) · node a · opened 2026-10-11 · streams tooling
+**Build status:** CLOSED · 10 unit(s) · node a · opened 2026-10-11 · streams tooling
 ids TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-8 TOOL-aBriskPreflight-9 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-11 TOOL-aBriskPreflight-12
 ids TOOL-aBriskPreflight-13 TOOL-aBriskPreflight-14 TOOL-aBriskPreflight-15 TOOL-aBriskPreflight-16 TOOL-aBriskPreflight-17 TOOL-aBriskPreflight-18
 
@@ -87,12 +87,12 @@ ids TOOL-aBriskPreflight-13 TOOL-aBriskPreflight-14 TOOL-aBriskPreflight-15 TOOL
 | [TOOL-aBriskPreflight-2 — check-wiring reads the settings file and each fragment once, and resolves python once](spec/2026-10-11-spec-TOOL-aBriskPreflight-2.md) | 2 | 1 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aBriskPreflight-4 — preflight starts its bounded probes together and collects each at its own check](spec/2026-10-11-spec-TOOL-aBriskPreflight-4.md) | 2 | 2 | CLOSED | rev-4 | 2026-10-11 |
 | [TOOL-aBriskPreflight-3 — preflight's wiring scope, measured: the whole check stays, every candidate recorded](spec/2026-10-11-spec-TOOL-aBriskPreflight-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-11 |
-| [TOOL-aBriskPreflight-7 — preflight and the wiring check each declare a wall-clock ceiling and name a breach](spec/2026-10-11-spec-TOOL-aBriskPreflight-7.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-11 |
-| [TOOL-aBriskPreflight-11 — the ceilings instrument prices every fork at the worst host reading on record](spec/2026-10-12-spec-TOOL-aBriskPreflight-11.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-12 |
+| [TOOL-aBriskPreflight-7 — preflight and the wiring check each declare a wall-clock ceiling and name a breach](spec/2026-10-11-spec-TOOL-aBriskPreflight-7.md) | 4 | 2 | CLOSED | rev-4 | 2026-10-11 |
+| [TOOL-aBriskPreflight-11 — the ceilings instrument prices every fork at the worst host reading on record](spec/2026-10-12-spec-TOOL-aBriskPreflight-11.md) | 6 | 2 | CLOSED | rev-2 | 2026-10-12 |
 | [TOOL-aBriskPreflight-12 — the closing review's mediums and lows: record bindings and ledgers, RB_TOOK at the child's end, the cache reset, four arms](spec/2026-10-12-spec-TOOL-aBriskPreflight-12.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 49 bound to this build, across 4 record folder(s).
+Records: 50 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

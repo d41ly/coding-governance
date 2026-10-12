@@ -1,11 +1,12 @@
 # TOOL-aBriskPreflight-11 — the ceilings instrument prices every fork at the worst host reading on record
 
-**Status:** SPECCED · rev-2 · 2026-10-12 · node a · Tier-2 · base bb388384 · streams tooling · order 6
+**Status:** CLOSED · rev-2 · 2026-10-12 · node a · Tier-2 · base bb388384 · streams tooling · order 6 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-build-TOOL-aBriskPreflight-11-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aBriskPreflight-11-acceptance-ledger.md) | journal | — |
 | [2026-10-12-prompt-TOOL-aBriskPreflight-11-build-brief.md](../prompts/2026-10-12-prompt-TOOL-aBriskPreflight-11-build-brief.md) | research | — |
 | [2026-10-12-prompt-TOOL-aBriskPreflight-11-spec-brief.md](../prompts/2026-10-12-prompt-TOOL-aBriskPreflight-11-spec-brief.md) | research | — |
 
@@ -281,7 +282,7 @@ New arm: memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflig
   Recommendation to the owner: (i), built as its own unit that this one consumes, because it keeps
   the worst-on-record rule, lifts `WIRING_CEILING` to 840 s and closes H1's impact, and changes no
   bound and no conf.
-  RESOLVED (owner, 2026-10-12, at the hand-off): (i) — "go with 'apply the below GATE_BOUND rule to
+  RESOLVED (owner, 2026-10-12): (i), at the hand-off — "go with 'apply the below GATE_BOUND rule to
   the wiring ceiling only' and land". Built in THIS unit as S6, since the owner's answer is the
   one change the instrument needs and it touches no file outside this unit's write set.
 
