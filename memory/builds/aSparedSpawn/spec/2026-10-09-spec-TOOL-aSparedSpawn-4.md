@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-4 — the runner's own spawns: a handful per leg, two git calls per bar, and a fork count with a ceiling
 
-**Status:** INPROGRESS · rev-2 · 2026-10-10 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -21,34 +21,54 @@ bar, and adds a fork-count arm with a declared ceiling and no clock, so the coun
 ## 2. Scope (IN)
 
 - **S1** — `runleg` timing from `EPOCHREALTIME` with `printf -v` for the seconds, in place of two
-  `date +%s%N` captures and a `printf` capture; a `date` fallback where `EPOCHREALTIME` is unset, as
-  `measure_spawn_cost` already tolerates. Observed by AC1 and AC5.
+  `date +%s%N` captures and a `printf` capture; the date builtin `printf '%(%s)T'` as the fallback where
+  `EPOCHREALTIME` is unset, since the spawn-idiom lint of `TOOL-aSparedSpawn-8` bans the `$(date +%s%N)`
+  spelling on product files with no registry escape. Observed by AC1 and AC5.
 - **S2** — The leg's raw output read with `mapfile -d ''` joined by `printf -v`, then stripped of
-  trailing newlines, so it is byte-identical to today's `$(cat …)` capture, NUL bytes included.
+  trailing newlines, so it is byte-identical to today's `$(cat …)` capture, NUL bytes included. Output
+  that then ends in a CR is read by the substitution itself: the MSYS substitution strips a trailing
+  CRLF as one newline and Linux keeps the CR, so only the substitution gives each host its own bytes.
   Observed by AC2.
 - **S3** — `leg_log` maps the name with `${1//[!A-Za-z0-9._-]/_}` under a C locale in place of its
   `printf | tr` capture, byte-identical for a multibyte name. Observed by AC3.
-- **S4** — `redact` runs only when the output matches `*://*@*`; otherwise both copies are written by
-  `printf`. The two `chmod 600` calls give way to `umask 077` set once inside the leg's worker
-  subshell. Observed by AC4.
+- **S4** — `redact` runs only when the output matches `*://*@*` or holds a CRLF; otherwise both copies
+  are written by `printf`. The CRLF case goes through `sed` because the MSYS `sed` reads its pipe in
+  text mode, so every CRLF leaves it as a bare LF, while the Linux one writes the CR back out. The
+  two `chmod 600` calls give way to `umask 077` set once inside the leg's worker subshell, after the
+  leg exits so the leg never inherits it. A log file that already exists keeps its mode, since a
+  truncating write moves none. Observed by AC4.
 - **S5** — Every input key computed ONCE, before dispatch, into an array the forked workers inherit:
-  one `git ls-files -s` over the union of guard pathspecs, one `awk` pass emitting each leg's key
-  input to a file, one `git hash-object --stdin-paths` over those files. The reuse block and the ledger
-  row read the array. The definition is the reuse-key unit's, reproduced byte for byte. Observed by AC6.
+  one `git ls-files -s` over the union of guard pathspecs, sorted once, one `awk` pass emitting each
+  leg's slice to a file, one `git hash-object --no-filters --stdin-paths` over the key texts, run as
+  `git --git-dir=<common dir> -C <scratch dir>` so a native git reads the scratch files and the
+  repository's object format picks the hash. The reuse block and the ledger row read the array. The
+  definition is the reuse-key unit's, reproduced byte for byte: one `build_key_text` composes the key
+  text for both paths. The slice is the dirt rule, which equals git's pathspec only for a PLAIN guard,
+  so a guard holding a glob character, pathspec magic, `..`, an absolute or empty path, `.` or any byte
+  `ls-files` quotes keys its leg through the per-leg `input_key` unchanged, and a guard ending in `/`
+  matches no file of that exact name, as git's pathspec does. The index is read at dispatch, where the
+  per-leg call read it at the leg's end. Observed by AC6.
 - **S6** — `report_one` and `ts_hb` read with `read` and `$EPOCHSECONDS` in place of `$(cat …)` and
-  `$(date)`; `ts_now` becomes `$EPOCHSECONDS` at every use. `live()` writes `jobs -rp` to a work-dir
-  file and counts it with `mapfile`, keeping `jobs -rp`'s meaning, so the drain re-check's race
-  reasoning is untouched. Observed by AC5.
+  `$(date)`; every `$(ts_now)` becomes `$EPOCHSECONDS`, and `ts_now` stays only as the ticker's
+  fallback `TOOL-aSparedSpawn-15` left. `live` writes `jobs -rp` to a work-dir file and counts it with
+  `mapfile` into `LIVE_N`, keeping `jobs -rp`'s meaning, so the drain re-check's race reasoning is
+  untouched. The ledger merge reads each leg's seconds with `read` too, the one per-leg `$(cat …)` the
+  pass's own trace found beyond the sites above. Observed by AC5.
 - **S7** — Per bar, `git rev-parse --git-dir --git-common-dir --verify -q HEAD` once, after
-  `cd "$ROOT"`, feeding the git-dir, common-dir and header-HEAD sites; the header's `worktree` reads
-  `ROOT`, which the same command already answered at start. Each consumer keeps its own normalisation.
-  The two receipt writers keep their end-of-run reads. Observed by AC7.
+  `cd "$ROOT"`, feeding the git-dir, common-dir and header-HEAD sites and the base ladder's
+  `--verify -q HEAD`, which asks the same question; the header's `worktree` reads `ROOT`, which the
+  same command already answered at start. Each consumer keeps its own normalisation. The two receipt
+  writers keep their end-of-run reads. Observed by AC7.
 - **S8** — The fork-count arm in `run-gates.runlog.test.sh`, beside `measure_execs` and `run_traced`:
   a `PS4` carrying `${BASHPID}`, two traced bars over a one-leg and a two-leg manifest, forks as
   distinct pids and execs as non-builtin command words, the per-leg figure as the difference. It
   first counts a specimen with known forks and REFUSES when the counter disagrees. The ceiling is a
   constant in the suite with its reason, red on growth and red when stale by more than max(3, 5 %).
-  It prints the top `file:line` contributors when red. Observed by AC8 and AC9.
+  It prints the top `file:line` contributors when red. The per-leg figure is EVENTS, forks plus
+  execs, over legs that declare a ceiling, at width 1 with the spawn floor pinned, since a bar that
+  rewrites its floor spends spawns one trace has and the other lacks. The ceiling is pinned from the
+  pass's direct trace by a counter written to the same definition; the arm's own first run is owed at
+  VERIFYING. Observed by AC8 and AC9.
 - **S9** — `tools/run-gates/README.md` names the arm, its ceiling and how to move it. NOT OBSERVED: prose.
 - **S10** — The process-monitor kit dir is resolved inside the legs-parse python. `run-gates.sh` reads
   the marked `resolve_kit_dir` block once, at top level, into one variable with a builtin
@@ -63,7 +83,9 @@ bar, and adds a fork-count arm with a declared ceiling and no clock, so the coun
 - **S11** — Every remaining copy of the canonical function reads its heredoc with the builtin `read`
   in place of `"$(cat <<'RKD'`: the suite copies listed under §4, which the spawn-idiom scan of
   `TOOL-aSparedSpawn-8` does not reach. The region between the `resolve_kit_dir` markers moves no byte
-  in any copy. Observed by AC11.
+  in any copy. One copy, in `tools/memory-tree/kit-dogfood-parity.test.sh`, sits inside a
+  `derive_kit_paths` block whose canonical `tools/lib/render-doc.sh` already took the builtin read, so
+  that block is re-rendered whole from its canonical. Observed by AC11.
 - **S12** — The parity suite behind the `python resolver (behaviour + inline parity + idiom ban)` leg
   gains a ban arm: a `$(cat <<'RKD'` wrapper in any file of its `resolve_kit_dir` population reds,
   comments stripped first, with a planted specimen proving the predicate fires. Observed by AC12.
@@ -155,7 +177,12 @@ since no byte of it moves; the existing parity arm proves that.
 - `tools/run-gates/run-gates.runlog.test.sh` — the fork-count arm and its ceiling.
 - `tools/run-gates/run-gates.evidence.test.sh` — the key-parity, output-capture and log-name arms.
 - `tools/run-gates/README.md` — the arm and its ceiling.
-- `tools/run-gates/kit.toml` — the kit version, moved once for the build.
+- `tools/run-gates/kit.toml` — the kit version, moved once for the build, by the main loop after the
+  last unit and not in this pass.
+- `memory/project/spawn-idiom-sites.txt` and `memory/project/fork-ceilings.txt` — the runner's rows,
+  lowered in the commit that drains their sites, as both registries require.
+- the pass's instrument, `…-TOOL-aSparedSpawn-4-direct-checks.sh` in this build's `build/` folder,
+  committed beside its ledger.
 - `tools/lib/resolve-python.test.sh` — S12's ban arm, besides its own wrapper.
 - `memory/map/generated/symbols.json` — regenerated, since S10 deletes a shell function.
 - `tools/hooks/kit.toml`, `tools/memory-tree/kit.toml`, `tools/unattended/kit.toml`,
@@ -243,6 +270,8 @@ since no byte of it moves; the existing parity arm proves that.
   at base traces, and `PROCMON_WHY` matches base's bytes for a found kit, a missing kit and a refusing
   scope. Red when: the python count is unchanged, or a refusal's text differs or aborts the parse.
   figure: both python counts DERIVED from the two traces at observation.
+  The suite arm, which holds no runner at base, observes it as the same python count with the conf as
+  without it, and a missing kit's line equal to the refusal its own copy of the resolver prints.
 - **AC11** — When the parity arm of `python resolver (behaviour + inline parity + idiom ban)` grades the
   `resolve_kit_dir` row after the pass, every copy's marked region equals `tools/lib/resolve_kit_dir.py`
   byte for byte, and its population covers every file `git grep -l '>>> resolve_kit_dir'` lists outside
@@ -275,7 +304,8 @@ since no byte of it moves; the existing parity arm proves that.
 `testsuite counts (every bar self-test prints one)` · `line length` · `kit version markers` ·
 `kit epoch (shipped bytes move, the version moves)` ·
 `verdict epoch (kit version dates the engine)` · `memory hygiene` ·
-`spec tokens (a spec's own names resolve)`
+`spec tokens (a spec's own names resolve)` · `shell hygiene (a fork spent on builtin work)` ·
+`spawn budget (forks per hot entrypoint)`
 
 New arm: tools/run-gates/run-gates.runlog.test.sh · covers AC8 AC9 AC10 · a closed trace descriptor, then one added `$(date +%s)` in a fixture copy of `runleg` · its `FLOOR_ASSERTIONS` rises by the assertions added
 New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC1 AC2 AC3 AC4 AC6 AC7 · each builtin swapped back for a variant that loses the byte the arm pins · its `FLOOR_ASSERTIONS` rises by the assertions added
@@ -301,6 +331,15 @@ New arm: tools/lib/resolve-python.test.sh, the S12 ban beside its section 3 ban 
   the process-monitor kit dir moves into the legs-parse python, every suite copy's `resolve_kit_dir`
   wrapper takes the builtin read, the parity suite gains a ban arm, and the edge to
   `TOOL-aSparedSpawn-8` names who converts the product copies.
+- rev-3 · 2026-10-12 · §2 §4 §6 §7 S1 S2 S4 S5 S6 S7 S8 S11 AC10 · the pass's direct checks against the
+  parent runner forced six divergences: the clock fallback is the date builtin, since the spawn-idiom
+  ban refuses the `date` substitution; the output read and the redaction guard hand a CR-ending output
+  and a CRLF-bearing one to the substitution and to `sed`, the only spellings that give an MSYS host and
+  a Linux one each their own bytes; the key precompute hashes with `--no-filters` through the common
+  dir and sends a non-plain guard to the per-leg definition; the ledger merge's seconds and the base
+  ladder's HEAD join S6 and S7; the arm counts events over ceiling-declaring legs with the floor pinned;
+  the one `derive_kit_paths` copy is re-rendered from its canonical; and the two registries and the
+  two legs that read them are named.
 
 ## 10. Reuse audit
 
