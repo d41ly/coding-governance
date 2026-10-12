@@ -8556,6 +8556,10 @@ if [ "$RB_HAVE_TIMEOUT" != 1 ]; then
 else
 rb_fn=$(mktemp)
 sed -n '/^run_bounded() {/,/^}$/p' "$SCRIPT" > "$rb_fn"
+# ...and its two halves (TOOL-aBriskPreflight-4 S1): `run_bounded` is `init_bounded` then
+# `read_bounded`, so a site that extracts it alone sources a runner that calls two missing names.
+sed -n '/^init_bounded() {/,/^}$/p' "$SCRIPT" >> "$rb_fn"
+sed -n '/^read_bounded() {/,/^}$/p' "$SCRIPT" >> "$rb_fn"
 [ -s "$rb_fn" ] || { echo "FAIL could not extract run_bounded from $SCRIPT — the arms below would grade nothing"; st=1; }
 # PLAIN ASSIGNMENTS, ON THEIR OWN LINE. A prefix assignment on the `.` builtin does not persist in
 # bash outside POSIX mode, so the sourced function saw GATE_BOUND_LIVE UNSET, `set -u` killed the
@@ -8642,6 +8646,10 @@ fixture
 # ---- mechanism was never wrong: the breach message fired on every one of those runs.
 _t0=$(date +%s); out=$(run --preflight tRun --keepalive-id k1); _t1=$(date +%s)
 hit "$out" "the declared wiring check did not answer within the declared"
+# ...and a GATE_BOUND BELOW the wiring ceiling keeps its own refusal byte for byte: the bound is the
+# smaller of the two, so the ceiling never stands in for it (TOOL-aBriskPreflight-7 AC3).
+hit "$out" "the declared wiring check did not answer within the declared 2s bound"
+miss "$out" "wall-clock ceiling"
 # The DRIVER's number, extracted from its own message. `killed after <n>s` is what the bound saw.
 n=$((n+1))
 _rbt=$(printf '%s' "$out" | sed -n 's/.*killed after \([0-9][0-9]*\)s.*/\1/p' | head -1)
@@ -8676,6 +8684,257 @@ fi   # ---- end the run_bounded host gate: the VERB arm needs it too, because wi
      # ---- the wiring sleeper runs to completion, the check PASSES, and both assertions above red
      # ---- for a property of the box rather than a defect in the code.
 
+# ---- TOOL-aBriskPreflight-7: THE TWO DECLARED CEILINGS. The driver runs from a COPY inside the
+# ---- fixture, its constant rewritten through `mutate` and committed, so no arm waits out a real
+# ---- ceiling and no environment seam exists to lower one (spec §8 F2). Against a driver that
+# ---- declares no such constant the rewrite is a fixture no-op, and `mutate` reds. The instrument is
+# ---- the driver's own `killed after` and `it took` figures, never this harness's clock.
+_cl_kit="$HERE/unattended.sh $HERE/lib-unattended.sh $HERE/check-playbook.sh"
+# AC1 AC2 AC3: the wiring child killed at its own ceiling under a 600 s GATE_BOUND. HOST-GATED on the
+# run_bounded probe above: with no runnable `timeout -k` nothing can fire, and the sleeper passes.
+if [ "$RB_HAVE_TIMEOUT" != 1 ]; then
+  n=$((n+16))
+  echo "  SKIP the wiring-ceiling arms: this host has no runnable 'timeout -k', so the ceiling cannot fire; their 16 assertions are counted, not run"
+else
+  reset_tree
+  printf '#!/usr/bin/env bash\nsleep 30\n' > slowwire.sh
+  mkconf "bash slowwire.sh --check" "true" "" "600"     # WIRING_CHECK sleeps 30 s; GATE_BOUND=600
+  mkdir -p dk/u
+  # shellcheck disable=SC2086
+  cp $_cl_kit dk/u/
+  mutate dk/u/unattended.sh 's/^WIRING_CEILING="[0-9]*"$/WIRING_CEILING="2"/'
+  fixture
+  before=$(sum)
+  out=$(run_main_at_head bash dk/u/unattended.sh --preflight tRun --keepalive-id k1 2>&1)
+  hit "$out" "the declared wiring check ran past its own 2s wall-clock ceiling and was killed after"
+  hit "$out" "the 600s GATE_BOUND is no longer this check's only kill"
+  hit "$out" "at the kill against the"
+  hit "$out" "ms the ceiling allows, so a figure far above that is this host's load and one near it is the check's own cost: bash slowwire.sh --check"
+  hit "$out" "--preflight refused; the run-state file is unchanged"
+  same "BP7 AC1 a wiring check killed at its ceiling leaves the run-state file byte-identical" "$(sum)" "$before"
+  n=$((n+1))
+  _rbt=$(printf '%s' "$out" | sed -n 's/.*killed after \([0-9][0-9]*\)s.*/\1/p' | head -1)
+  { [ -n "$_rbt" ] && [ "$_rbt" -lt 25 ]; } \
+    || { echo "FAIL BP7 AC1 the driver reported killed after '${_rbt:-<no figure>}'s against a 2s WIRING_CEILING under a 600s GATE_BOUND — the ceiling does not reach the wiring child"; st=1; }
+  # AC2: a conf naming the constant is overwritten, because the constants are assigned after it.
+  printf 'WIRING_CEILING="9999"\n' >> .unattended.conf
+  fixture
+  out=$(run_main_at_head bash dk/u/unattended.sh --preflight tRun --keepalive-id k1 2>&1)
+  hit "$out" "the declared wiring check ran past its own 2s wall-clock ceiling"
+  # AC3: a wiring check inside its ceiling passes check 4.
+  mutate dk/u/unattended.sh 's/^WIRING_CEILING="2"$/WIRING_CEILING="20"/'
+  printf '#!/usr/bin/env bash\nsleep 1\n' > slowwire.sh
+  fixture
+  out=$(run_main_at_head bash dk/u/unattended.sh --preflight tRun --keepalive-id k1 2>&1)
+  hit "$out" "unattended: preflight OK"
+  miss "$out" "check 4 FAILED"
+  # THE EQUAL PAIR (TOOL-aBriskPreflight-12 S9): a WIRING_CEILING equal to GATE_BOUND gives the kill
+  # to GATE_BOUND, so check 4 keeps the bound's own refusal byte for byte. Red at `-le`.
+  printf '#!/usr/bin/env bash\nsleep 30\n' > slowwire.sh
+  mutate dk/u/unattended.sh 's/^WIRING_CEILING="20"$/WIRING_CEILING="2"/'
+  mutate .unattended.conf 's/^GATE_BOUND=.*/GATE_BOUND="2"/'
+  fixture
+  out=$(run_main_at_head bash dk/u/unattended.sh --preflight tRun --keepalive-id k1 2>&1)
+  hit "$out" "the declared wiring check did not answer within the declared 2s bound"
+  miss "$out" "wall-clock ceiling"
+  reset_tree
+fi
+
+# AC4 AC5 AC6: preflight over its own ceiling NAMES the breach after the verdict and moves nothing.
+# Three copies: `u` with PREFLIGHT_CEILING at 1 s, `v` unmodified, `w` with an unreadable stamp. The
+# 3 s wiring sleeper puts every run past 1 s, refusals included: check 2 refuses and the wiring check
+# still runs. No host gate, since nothing here is killed.
+reset_tree
+printf '#!/usr/bin/env bash\nsleep 3\n' > slowwire.sh
+mkconf "bash slowwire.sh --check"
+mkdir -p dk/u dk/v dk/w
+# shellcheck disable=SC2086
+{ cp $_cl_kit dk/u/; cp $_cl_kit dk/v/; cp $_cl_kit dk/w/; }
+mutate dk/u/unattended.sh 's/^PREFLIGHT_CEILING="[0-9]*"$/PREFLIGHT_CEILING="1"/'
+mutate dk/w/unattended.sh 's/^readonly DRIVER_T0_US$/DRIVER_T0_US=notanumber; readonly DRIVER_T0_US/'
+fixture
+_bp7=$(git rev-parse HEAD)
+out=$(run_main_at_head bash dk/u/unattended.sh --preflight tRun --keepalive-id k1 2>&1); _rc=$?
+hit "$out" "unattended: preflight over its ceiling — it took"
+hit "$out" "its own 1s wall-clock ceiling"
+hit "$out" "here against the"
+same "BP7 AC4 the breach line follows the verdict" "$(printf '%s\n' "$out" | grep -E '^unattended: preflight (OK|over its ceiling)' | sed 's/ —.*//' | tr '\n' '|')" "unattended: preflight OK|unattended: preflight over its ceiling|"
+same "BP7 AC4 a breach leaves the exit status to the checks" "$_rc" "0"
+same "BP7 AC4 a breach still writes and stages the run-state file" "$(git diff --cached --name-only -- memory/builds/tRun/RUN.md)" "memory/builds/tRun/RUN.md"
+n=$((n+1))
+_bpw=$(printf '%s' "$out" | sed -n 's/.*over its ceiling — it took \([0-9][0-9]*\)\.[0-9]s.*/\1/p' | head -1)
+{ [ -n "$_bpw" ] && [ "$_bpw" -ge 3 ]; } \
+  || { echo "FAIL BP7 AC4 the breach line reported a wall of '${_bpw:-<no figure>}' s, below the 3 s wiring sleeper it ran through"; st=1; }
+git reset -q --hard "$_bp7"; git clean -qfd
+out=$(run_main_at_head bash dk/v/unattended.sh --preflight tRun --keepalive-id k1 2>&1)
+hit "$out" "unattended: preflight OK"
+miss "$out" "preflight over its ceiling"
+# AC5: a REFUSED preflight reaches the compare too, and the line does not move its status.
+git reset -q --hard "$_bp7"; git clean -qfd
+: > bp7-untracked.txt
+out=$(run_main_at_head bash dk/u/unattended.sh --preflight tRun --keepalive-id k1 2>&1); _rcu=$?
+hit "$out" "the working tree is dirty, so the pinned BASE would name a state that is not what runs"
+hit "$out" "--preflight refused; the run-state file is unchanged"
+hit "$out" "unattended: preflight over its ceiling — it took"
+out=$(run_main_at_head bash dk/v/unattended.sh --preflight tRun --keepalive-id k1 2>&1); _rcv=$?
+miss "$out" "preflight over its ceiling"
+same "BP7 AC5 a breach on a refusal leaves the exit status the checks decided" "$_rcu" "$_rcv"
+# AC6: a stamp that is not a whole number says the compare could not run.
+git reset -q --hard "$_bp7"; git clean -qfd
+out=$(run_main_at_head bash dk/w/unattended.sh --preflight tRun --keepalive-id k1 2>&1); _rc=$?
+hit "$out" "unattended: preflight ceiling not compared — the driver's start stamp is not a whole number"
+same "BP7 AC6 an unreadable stamp leaves the exit status to the checks" "$_rc" "0"
+reset_tree
+
+# AC7: a host with no working `timeout -k` is told the wiring ceiling is inert too, beside the
+# GATE_BOUND NOTE, whose bytes do not move. The value is read off the driver, never retyped.
+mkdir -p "$TMP/bp7-shim"; printf '#!/bin/sh\nexit 1\n' > "$TMP/bp7-shim/timeout"; chmod +x "$TMP/bp7-shim/timeout"
+_bp7c=$(sed -n 's/^WIRING_CEILING="\([0-9][0-9]*\)"$/\1/p' "$SCRIPT")
+out=$(PATH="$TMP/bp7-shim:$PATH" bash "$SCRIPT" --version 2>&1 >/dev/null)
+hit "$out" "unattended: NOTE - this node has no working 'timeout -k', so the GATE_BOUND wall-clock bound on GATE_CMD and WIRING_CHECK is INERT; both run unbounded this session"
+hit "$out" "so the ${_bp7c:-<no WIRING_CEILING>}s wall-clock ceiling on WIRING_CHECK is INERT too"
+rm -rf "$TMP/bp7-shim"
+
+# ---- TOOL-aBriskPreflight-4: --preflight STARTS its four bounded probes together and READS each where
+# ---- it was read before. The wiring check, the lander's --carry and --prepared and the profile
+# ---- command are stubs here whose exits, sleeps and markers stage each case. The markers go to a
+# ---- directory OUTSIDE the tree, because a marker in it would be the dirtiness check 2 refuses. AC3
+# ---- and AC5 are red against the sequential driver: under it the wiring stub never sees the other
+# ---- three running, and a --prepared nobody reads is never started. NO HOST GATE except AC6's: only
+# ---- that arm grades a bound, and it is counted either way.
+export PF_MARK="$TMP/pf-mark"
+build_pf_fixture() { # wire body · lander body · profile body -> a committed in-place fixture, an empty ledger
+  reset_tree
+  rm -rf "$PF_MARK"; mkdir -p "$PF_MARK"; rm -f "$(git rev-parse --git-common-dir)/unattended/tRun.procs"
+  printf '#!/usr/bin/env bash\n%s\n' "$1" > wire.sh
+  printf '#!/usr/bin/env bash\n%s\n' "$2" > lander.sh
+  printf '#!/usr/bin/env bash\n%s\n' "$3" > profile.sh
+  sed -i 's/^LANDER_MODE=.*/LANDER_MODE="in-place"/; s/^LANDER=.*/LANDER="bash lander.sh"/; s/^WIRING_CHECK=.*/WIRING_CHECK="bash wire.sh --check"/' .unattended.conf
+  printf 'GATE_PROFILE_CMD="bash profile.sh"\n' >> .unattended.conf
+  fixture
+}
+read_pf_rows() { awk '{ s = $7 " " $8 " " $9; sub(/ +$/, "", s); print s }' "$(git rev-parse --git-common-dir)/unattended/tRun.procs" 2>/dev/null; }
+read_pf_pid() { awk -v a="$1" '$7 " " $8 " " $9 == a { print $1; exit }' "$(git rev-parse --git-common-dir)/unattended/tRun.procs" 2>/dev/null; }
+read_pf_at() { grep -nF -m1 -- "$2" <<<"$1" | cut -d: -f1; }
+
+# ---- AC1: every stub answers at once, the lander with its passing 1, and preflight passes as before.
+build_pf_fixture 'exit 0' 'exit 1' 'exit 0'
+out=$(run --preflight tRun --keepalive-id k1); rc=$?
+same "BP4 AC1 a preflight whose four probes all answer exits 0" "$rc" "0"
+hit  "$out" "unattended: preflight OK"
+miss "$out" "UNATTENDED check 4 FAILED"
+miss "$out" "UNATTENDED check 60 FAILED"
+miss "$out" "UNATTENDED check 61 FAILED"
+
+# ---- AC2: each refusal and each probe's captured output prints at its own check, in the block's
+# ---- order, and the --prepared that check_lander_mode never reads prints nothing at all.
+build_pf_fixture 'echo WIRE-OUT; exit 1' 'case "$1" in --carry) echo CARRY-OUT; exit 2 ;; --prepared) echo PREP-OUT; exit 1 ;; esac' 'exit 3'
+out=$(run --preflight tRun --keepalive-id k1)
+hit  "$out" "UNATTENDED check 4 FAILED"
+hit  "$out" "WIRE-OUT"
+hit  "$out" "UNATTENDED check 60 FAILED"
+hit  "$out" "CARRY-OUT"
+hit  "$out" "the wall is not compared with the largest leg ceiling"
+miss "$out" "PREP-OUT"
+_pf1=$(read_pf_at "$out" "UNATTENDED check 4 FAILED"); _pf2=$(read_pf_at "$out" "WIRE-OUT"); _pf3=$(read_pf_at "$out" "UNATTENDED check 60 FAILED")
+_pf4=$(read_pf_at "$out" "CARRY-OUT"); _pf5=$(read_pf_at "$out" "the wall is not compared with the largest leg ceiling")
+same "BP4 AC2 each refusal prints at its own check, in the block's order" \
+  "$([ -n "$_pf5" ] && [ "${_pf1:-0}" -lt "${_pf2:-0}" ] && [ "${_pf2:-0}" -lt "${_pf3:-0}" ] && [ "${_pf3:-0}" -lt "${_pf4:-0}" ] && [ "${_pf4:-0}" -lt "$_pf5" ] && echo ok || echo "lines $_pf1 $_pf2 $_pf3 $_pf4 $_pf5")" "ok"
+# ---- AC4, on the same run: a refused preflight prunes nothing, so every started child has its row,
+# ---- and every row names the one driver that started it.
+same "BP4 AC4 the ledger holds one row per started probe, in start order" "$(read_pf_rows)" \
+  "$(printf 'bash wire.sh --check\nbash lander.sh --carry\nbash lander.sh --prepared\nbash profile.sh')"
+# A PID ASSERTION THAT CAN FAIL (TOOL-aBriskPreflight-12 S7). The one it replaces counted distinct
+# field-3 values, which one driver writing every row makes 1 whenever any row exists. This grades
+# both pid fields: four distinct all-digit child pids, and one all-digit driver pid that is none of them.
+same "BP4 AC4 each row names its own child pid and the one driver pid" \
+  "$(awk '{ if ($1 !~ /^[0-9]+$/ || $3 !~ /^[0-9]+$/) bad = "a non-numeric pid on row " NR
+            if (seen[$1]++) bad = "child pid " $1 " on two rows"
+            if (NR > 1 && $3 != d) bad = "two driver pids"
+            d = $3 }
+       END { if (NR != 4) bad = NR " rows"; else if (d in seen) bad = "driver pid " d " is also a child pid"
+             print (bad == "" ? "ok" : bad) }' "$(git rev-parse --git-common-dir)/unattended/tRun.procs" 2>/dev/null)" "ok"
+
+# ---- TOOL-aBriskPreflight-12 S3, AC4: a profile that fails at once behind a slow wiring check reports
+# ---- its OWN wall. It is read only after check_wiring, so a figure taken at the read is the wiring
+# ---- stub's 12 s; the wrapper's end stamp makes it the profile's. The harness clock proves the wiring
+# ---- stub really ran its 12 s, so a fast figure is not a fixture that never waited.
+build_pf_fixture 'sleep 12; exit 0' 'exit 1' 'exit 3'
+_t0=$(date +%s); out=$(run --preflight tRun --keepalive-id k1); _t1=$(date +%s)
+hit "$out" "the declared GATE_PROFILE_CMD exited 3 after"
+_bpt=$(printf '%s' "$out" | sed -n 's/.*the declared GATE_PROFILE_CMD exited 3 after \([0-9][0-9]*\)s.*/\1/p' | head -1)
+n=$((n+1)); { [ -n "$_bpt" ] && [ "$_bpt" -lt 12 ]; } \
+  || { echo "FAIL BP12 AC4 the profile that exited at once was reported after '${_bpt:-<no figure>}'s, the wiring stub's 12 s wall, so RB_TOOK still runs to the read"; st=1; }
+n=$((n+1)); [ $(( _t1 - _t0 )) -ge 12 ] \
+  || { echo "FAIL BP12 AC4 fixture: --preflight returned in $(( _t1 - _t0 ))s, so the 12 s wiring stub never ran and the figure above grades nothing"; st=1; }
+
+# ---- AC3: the three others are RUNNING while the wiring stub waits for them. Under the sequential
+# ---- driver the stub polls its whole 60 s alone and leaves no OVERLAP.
+build_pf_fixture 'i=0; while [ "$i" -lt 300 ]; do [ -e "$PF_MARK/carry" ] && [ -e "$PF_MARK/prepared" ] && [ -e "$PF_MARK/profile" ] && { : > "$PF_MARK/OVERLAP"; exit 0; }; sleep 0.2; i=$((i + 1)); done; exit 0' \
+  'case "$1" in --carry) : > "$PF_MARK/carry" ;; --prepared) : > "$PF_MARK/prepared" ;; esac; sleep 10; exit 1' \
+  ': > "$PF_MARK/profile"; sleep 10; exit 0'
+run --preflight tRun --keepalive-id k1 >/dev/null
+n=$((n+1)); [ -e "$PF_MARK/OVERLAP" ] || { echo "FAIL BP4 AC3 the wiring stub never saw the lander and profile probes running, so preflight still runs its probes one after another"; st=1; }
+
+# ---- AC5: a --prepared left unread after check 60 refused on --carry is READ before the verb returns,
+# ---- never left running and never printed. Under the sequential driver it never starts. Under a
+# ---- driver that starts it and never reads it, the verb returns while it sleeps, which this arm can
+# ---- see only when the verb's own remainder after --carry is shorter than the sleeper; on a host
+# ---- slow enough that it is not, the arm SAYS it could not tell the two apart (spec rev-3).
+build_pf_fixture 'exit 0' 'case "$1" in --carry) date +%s > "$PF_MARK/CARRY-AT"; exit 2 ;; --prepared) sleep 30; : > "$PF_MARK/PREP-DONE"; echo PREP-OUT; exit 1 ;; esac' 'exit 0'
+out=$(run --preflight tRun --keepalive-id k1); _t1=$(date +%s)
+n=$((n+1)); [ -e "$PF_MARK/PREP-DONE" ] || { echo "FAIL BP4 AC5 the verb returned while the unread --prepared probe was still running, or never started it"; st=1; }
+miss "$out" "PREP-OUT"
+_pfp=$(read_pf_pid "bash lander.sh --prepared")
+n=$((n+1)); { [ -n "$_pfp" ] && ! kill -0 "$_pfp" 2>/dev/null; } || { echo "FAIL BP4 AC5 the --prepared probe has no ledger row or outlived the verb: '${_pfp:-<no row>}'"; st=1; }
+_pfc=$(cat "$PF_MARK/CARRY-AT" 2>/dev/null)
+# A verb that ran more than 10 s past the sleeper after --carry answered was slow for its own reasons,
+# and would have outlasted the sleeper whether or not it read the probe.
+[ -n "$_pfc" ] && [ $(( _t1 - _pfc )) -gt 40 ]   && echo "  (NOTE BP4 AC5 — the verb ran $(( _t1 - _pfc ))s after --carry answered, past the 30 s sleeper, so this run could not tell a probe read before the verb returned from one left to finish alone)"
+
+# ---- AC6: a probe killed at its bound is refused at its own check and outlives neither its bound nor
+# ---- the verb. The one arm that grades a bound, so it rides the host gate and is counted either way.
+if [ "$RB_HAVE_TIMEOUT" != 1 ]; then
+  n=$((n+4))
+  echo "  (SKIP BP4 AC6 — this host has no runnable 'timeout -k', so the bound the arm grades cannot be exercised; its 4 assertions are counted, not run)"
+else
+  build_pf_fixture 'exit 0' 'case "$1" in --prepared) exec sleep 600 ;; esac; exit 0' 'exit 0'
+  sed -i 's/^GATE_BOUND=.*/GATE_BOUND="2"/' .unattended.conf; fixture
+  _t0=$(date +%s); out=$(run --preflight tRun --keepalive-id k1); _t1=$(date +%s)
+  hit  "$out" "UNATTENDED check 61 FAILED"
+  hit  "$out" "bash lander.sh --prepared"
+  # THE SLEEPER IS 600 s AND THE WALL 300 s, a hang backstop and not a timing: on node `a` under a
+  # concurrent bar a whole fixture --preflight took 149 s to 516 s under either driver, so only a
+  # sleeper far past any load tells a bound that fired from one that did not (spec rev-2).
+  n=$((n+1)); [ $(( _t1 - _t0 )) -lt 300 ] || { echo "FAIL BP4 AC6 --preflight took $(( _t1 - _t0 ))s against a 2s bound on its --prepared probe"; st=1; }
+  _pfp=$(read_pf_pid "bash lander.sh --prepared")
+  n=$((n+1)); { [ -n "$_pfp" ] && ! kill -0 "$_pfp" 2>/dev/null; } || { echo "FAIL BP4 AC6 the bounded --prepared probe has no ledger row or outlived the verb: '${_pfp:-<no row>}'"; st=1; }
+fi
+
+# ---- AC7: the guard is asked BEFORE the start. A repairing flag and an undeclared check are refused
+# ---- with check 4's two sentences, and nothing ran and nothing was recorded.
+build_pf_fixture ': > "$PF_MARK/WIRE-RAN"; exit 0' 'exit 1' 'exit 0'
+sed -i 's/^WIRING_CHECK=.*/WIRING_CHECK="bash wire.sh --session"/' .unattended.conf; fixture
+out=$(run --preflight tRun --keepalive-id k1)
+hit  "$out" "UNATTENDED check 4 FAILED — WIRING_CHECK carries a flag this kit does not recognise as READ-ONLY"
+n=$((n+1)); [ ! -e "$PF_MARK/WIRE-RAN" ] || { echo "FAIL BP4 AC7 a repairing WIRING_CHECK ran before its guard refused it"; st=1; }
+miss "$(read_pf_rows)" "wire.sh"
+build_pf_fixture ': > "$PF_MARK/WIRE-RAN"; exit 0' 'exit 1' 'exit 0'
+sed -i 's/^WIRING_CHECK=.*/WIRING_CHECK=""/' .unattended.conf; fixture
+out=$(run --preflight tRun --keepalive-id k1)
+hit  "$out" "UNATTENDED check 4 FAILED — WIRING_CHECK is not declared in .unattended.conf"
+n=$((n+1)); [ ! -e "$PF_MARK/WIRE-RAN" ] || { echo "FAIL BP4 AC7 an undeclared WIRING_CHECK started a wiring child"; st=1; }
+miss "$(read_pf_rows)" "wire.sh"
+
+# ---- AC8: primary mode starts no lander probe and a blank profile command no profile probe.
+build_pf_fixture 'exit 1' 'exit 1' 'exit 0'
+sed -i 's/^LANDER_MODE=.*/LANDER_MODE="primary"/; /^GATE_PROFILE_CMD=/d' .unattended.conf; fixture
+out=$(run --preflight tRun --keepalive-id k1)
+hit  "$out" "UNATTENDED check 4 FAILED — the declared wiring check failed"
+same "BP4 AC8 primary mode with no profile records the wiring child alone" "$(read_pf_rows)" "bash wire.sh --check"
+rm -rf "$PF_MARK"; unset PF_MARK
+reset_tree
+
 # ---- TOOL-dDerivedDocket-48: the capture is TWO streams, and three helpers read them -------------
 # NO HOST GATE HERE, deliberately. These arms grade string handling and never a bound, so they run
 # on a box with no runnable `timeout` too -- and a bound the arm never reaches cannot skip them.
@@ -8693,12 +8952,14 @@ fi   # ---- end the run_bounded host gate: the VERB arm needs it too, because wi
 # and they red when the driver's figure moves without anybody saying so.
 sp_fn=$(mktemp)
 sed -n '/^run_bounded() {/,/^}$/p'           "$SCRIPT" >  "$sp_fn"
+sed -n '/^init_bounded() {/,/^}$/p'          "$SCRIPT" >> "$sp_fn"
+sed -n '/^read_bounded() {/,/^}$/p'          "$SCRIPT" >> "$sp_fn"
 sed -n '/^read_stderr_tail() {/,/^}$/p'      "$SCRIPT" >> "$sp_fn"
 sed -n '/^derive_stream_verdict() {/,/^}$/p' "$SCRIPT" >> "$sp_fn"
 sed -n '/^RB_TAIL_LINES=/p;/^RB_TAIL_BYTES=/p;/^RB_TAIL_NOTE_ROOM=/p' "$SCRIPT" >> "$sp_fn"
 n=$((n+1))
-[ "$(grep -c '^}$' "$sp_fn")" = 3 ] \
-  || { echo "FAIL could not extract all three capture helpers from $SCRIPT — the arms below would grade nothing"; st=1; }
+[ "$(grep -c '^}$' "$sp_fn")" = 5 ] \
+  || { echo "FAIL could not extract the runner, its two halves and both capture helpers from $SCRIPT — the arms below would grade nothing"; st=1; }
 n=$((n+1))
 [ "$(grep -c '^RB_TAIL_' "$sp_fn")" = 3 ] \
   || { echo "FAIL could not extract the three RB_TAIL_ pins from $SCRIPT — the tail arms would grade this file's own copy of them"; st=1; }
@@ -8736,6 +8997,18 @@ same "and KEEPS RB_OUT's sentence, which is that branch's only diagnostic" \
 same "and empties the row stream"    "$RB_STDOUT" ""
 same "and empties the notice stream" "$RB_ERR"    ""
 same "and zeroes the seeded RB_TOOK rather than reporting a time it never measured" "$RB_TOOK" "0"
+
+# ...and the two HALVES keep each child's identity (TOOL-aBriskPreflight-4 S1, AC9): two children
+# started through `init_bounded` and read back in the REVERSE order each return their own status and
+# their own output, which is what lets --preflight read its probes in the block's order.
+init_bounded bash -c 'echo FIRST-CHILD; exit 4'; _bph1=$RB_HANDLE
+init_bounded bash -c 'echo SECOND-CHILD; exit 5'; _bph2=$RB_HANDLE
+read_bounded "$_bph2"; _bprc=$?
+same "BP4 AC9 the later handle read first returns its own status" "$_bprc" "5"
+same "BP4 AC9 and its own output" "$RB_OUT" "SECOND-CHILD"
+read_bounded "$_bph1"; _bprc=$?
+same "BP4 AC9 the earlier handle read second returns its own status" "$_bprc" "4"
+same "BP4 AC9 and its own output" "$RB_OUT" "FIRST-CHILD"
 
 # ...the three verdicts a stdout-empty call can carry, each returned by a DIRECT call. Both helpers
 # are dark at this order -- the witness that consumes them is a later unit's -- so no caller's
@@ -12288,7 +12561,7 @@ if [ -z "$ASKS_REAL" ]; then
   echo "  SKIP AC15 — this repository's .unattended.conf declares no ASKS_CMD, so the two call shapes and closing review F2's IDLIST parity table have no declared producer to run against; the stubbed arms above are the only coverage until it is armed, and the arm's 36 assertions are counted, not run"
 else
   echo "  AC15 runs the declared producer: $ASKS_REAL"
-  slice_fn run_bounded; slice_fn read_stderr_tail; slice_fn derive_stream_verdict
+  slice_fn run_bounded; slice_fn init_bounded; slice_fn read_bounded; slice_fn read_stderr_tail; slice_fn derive_stream_verdict
   slice_fn run_ask_witness; slice_fn ask_field
   eval "$(sed -n '/^ASK_TSV_HEAD=/p;/^ASK_TSV_FIELDS=/p;/^ASK_TSV_EXAMINED=/p;/^RB_TAIL_LINES=/p;/^RB_TAIL_BYTES=/p;/^RB_TAIL_NOTE_ROOM=/p' "$SCRIPT")"
   # The process ledger's recorder, a no-op for the capture-helper arms' reason: it is graded by its
@@ -13204,6 +13477,27 @@ run_dl_git push -q origin HEAD:main
 out=$(run_dl --preflight tOther --keepalive-id k9)
 hit  "$out" "EXCLUDED memory/builds/tRun/RUN.md from the live-run count — derived LANDED: its landing commit"
 miss "$out" "concurrent unattended run(s)"
+
+# ---- TOOL-aBriskPreflight-5 S5: the PRIMED walk keeps the lease-only gate. A record committed at
+# ---- RUNNING and pushed, whose WORKING COPY alone reads LANDING, is live: its last commit is on the
+# ---- tip, and only the `git diff --name-only` listing hands it to the lease-only check that refuses
+# ---- it a landing commit. A LANDING record staged and never committed is live too: no commit at all.
+# ---- The dirty tree refuses this preflight; the count is announced before that refusal lands.
+init_dl_fixture
+run_dl --preflight tRun --keepalive-id k1 >/dev/null
+run_dl_git add -A >/dev/null && run_dl_git commit -q -m "run state" --no-verify
+run_dl_git push -q origin HEAD:main
+sed -i 's/^phase: .*/phase: LANDING/' "$dl_dir/$DL_R"
+mkdir -p "$dl_dir/memory/builds/tStaged"
+printf '# tStaged — run state\n\n## Run facts\n\nphase: LANDING\n\n## Parked\n' > "$dl_dir/memory/builds/tStaged/RUN.md"
+run_dl_git add memory/builds/tStaged/RUN.md
+out=$(run_dl --preflight tOther --keepalive-id k9)
+hit  "$out" "2 concurrent unattended run(s) — this run is NOT blocked by them"
+hit  "$out" "memory/builds/tRun/RUN.md · phase LANDING"
+hit  "$out" "memory/builds/tStaged/RUN.md · phase LANDING"
+miss "$out" "EXCLUDED memory/builds/tRun/RUN.md"
+miss "$out" "EXCLUDED memory/builds/tStaged/RUN.md"
+run_dl_git reset -q --hard HEAD; run_dl_git clean -qfd
 
 # ---- AC6: a derived-LANDED record. `--resume` has nothing to resume and never calls the lander;
 # ---- `--preflight` then WRITES it LANDED, stages it and retires it, over a default branch that took
@@ -17257,7 +17551,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 2768 -> 2808 by TOOL-aRoutedQuill-7: the skeleton-list arms in region three, AC1 to AC7 and F1's
 # subsequence arm, 40 assertions counted off the block's own lines and run as a slice of the prologue and
 # that block on node a, 2026-10-10; no suite ran.
-FLOOR_ASSERTIONS=2808
+# RAISED 2808 -> 2842 by TOOL-aBriskPreflight-4: the overlapped-probe arms in region five, AC1 to AC8
+# on in-place stub fixtures (30, AC6's four counted either way) and AC9's handle-identity arm beside
+# the capture helpers (4), counted off the block's own lines and run as a slice of the prologue and
+# region five's run_bounded span on node a, 2026-10-11; no suite ran.
+FLOOR_ASSERTIONS=2842
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -17449,7 +17747,8 @@ FLOOR_SHARD_2=222
 # RAISED 390 -> 430 by TOOL-aRoutedQuill-7: the same 40 region-three skeleton-list assertions, see FLOOR_ASSERTIONS.
 FLOOR_SHARD_3=430
 FLOOR_SHARD_4=390
-FLOOR_SHARD_5=270
+# RAISED 270 -> 304 by TOOL-aBriskPreflight-4: the same 34 region-five overlapped-probe and handle assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_5=304
 FLOOR_SHARD_6=129
 FLOOR_SHARD_7=312
 FLOOR_SHARD_8=658

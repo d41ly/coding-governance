@@ -4,7 +4,7 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-10-12, the newest record date in this tree (aDistilledCharter).
+Dormant: no record dated within 21 days of 2026-10-12, the newest record date in this tree (aBriskPreflight).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
@@ -34,3 +34,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dRetiredFork](builds/dRetiredFork/README.md) | DEFERRED | d | 2026-09-02 | tooling+deployer | 56 | 2026-09-03 | dormant | 0 |
 | [dScaffoldedMirror](builds/dScaffoldedMirror/README.md) | DEFERRED | d | 2026-08-24 | tooling | 22 | 2026-08-25 | dormant | 0 |
 | [dScriptedRepeat](builds/dScriptedRepeat/README.md) | SPECCED | d | 2026-08-20 | tooling | 15 | 2026-08-24 | dormant | 0 |
+
+## Open BLOCKER asks
+
+- [TOOL-aBriskPreflight-18](builds/aBriskPreflight/BACKLOG.md) · aBriskPreflight · inherited red: leg playbook render wiring red at 37200355, older than…

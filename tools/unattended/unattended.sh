@@ -52,7 +52,15 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.102  # gov:kit unattended@1.102 — kit identity; set HERE, never from .unattended.conf
+# THE DRIVER'S START STAMP, in microseconds, read by `print_preflight_breach` (TOOL-aBriskPreflight-7
+# S3). Taken HERE, the first statement, so the wall it measures includes the library, the conf and
+# the `timeout` liveness spawn, which an external clock around the verb counts too. Fork-free, in
+# `write_runlog_start`'s spelling, and readonly so the conf sourced below cannot move it. `SECONDS`
+# is not used: bash imports it from the environment, so an inherited value would shift the figure.
+if [ -n "${EPOCHREALTIME:-}" ]; then DRIVER_T0_US=${EPOCHREALTIME//[!0-9]/}
+else printf -v DRIVER_T0_US '%(%s)T' -1; DRIVER_T0_US="${DRIVER_T0_US}000000"; fi
+readonly DRIVER_T0_US
+KIT_UNATTENDED_VERSION=1.103  # gov:kit unattended@1.103 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -231,17 +239,31 @@ RB_BOUND=""
 # already moved the command into its own process group, where a terminal's Ctrl-C never reached it.
 # On the UNBOUNDED path, a host with no runnable `timeout`, the command now ignores INT, so a Ctrl-C
 # ends the driver alone and leaves the command running — as a recorded orphan the next reap finds.
+#
+# TWO HALVES, ONE WRAPPER LINE (TOOL-aBriskPreflight-4 S1). `init_bounded` starts and records the
+# child and leaves its handle in RB_HANDLE; `read_bounded` waits for that child and sets the four
+# values. `run_bounded` is the two back to back, so every caller sees what it always saw. A verb that
+# overlaps several bounded commands starts each through `init_bounded`, keeps each handle in its own
+# variable, and reads each through `read_bounded` where its answer is read; `--preflight`'s probes
+# are the one such verb. The handle is a plain string -- pid, start second, capture directory, the
+# directory last because a path may carry a space -- because the suite sources these alone under
+# `set -u`, where an associative array declared only at file scope would be an indexed one.
+RB_HANDLE=""
 run_bounded() { # argv...
-  local _s _e _rc _d _p _i _b=${RB_BOUND:-${GATE_BOUND:-0}}
+  init_bounded "$@" || return 1
+  read_bounded "$RB_HANDLE"
+}
+init_bounded() { # argv... -> 0 with RB_HANDLE naming the started child, or 1 with RB_OUT's sentence
+  local _s _d _p _i _b=${RB_BOUND:-${GATE_BOUND:-0}}
   # THE REFUSAL BRANCH KEEPS RB_OUT'S SENTENCE and empties only the two NEW values. That sentence
   # is this branch's ONLY diagnostic -- it is SET here and the function returns before RB_TOOK is
   # computed below, so it is the freshest thing a caller gets -- and check_wiring, the gates-green
   # item and --dispatch all print it. Emptying it would make a failed capture refuse with no reason
   # at all. RB_TOOK is the value that genuinely carries over from a previous call and --dispatch
   # prints it beside the sentence, so it is zeroed rather than left reading a time this call never
-  # measured.
+  # measured. RB_HANDLE is emptied so no caller can read a previous child's handle as this one's.
   _d=$(mktemp -d) \
-    || { RB_OUT="run_bounded: cannot create a capture file"; RB_STDOUT=""; RB_ERR=""; RB_TOOK=0; return 1; }
+    || { RB_OUT="run_bounded: cannot create a capture file"; RB_STDOUT=""; RB_ERR=""; RB_TOOK=0; RB_HANDLE=""; return 1; }
   _s=$(date +%s)
   # GATE_BOUND_LIVE is REMOTE_BOUND_LIVE's sibling and is probed the same way: by RUNNING timeout,
   # never by testing for the binary. With no runnable timeout the command still RUNS, unbounded --
@@ -254,17 +276,34 @@ run_bounded() { # argv...
   # exec; the wait is on that observed condition, bounded at 100 polls of 0.05 s and ended early when
   # the wrapper is gone, and the variable is unset before the command so its environment is as it
   # was. A LITERAL bound, because the suite sources this function alone under `set -u`.
+  # THE WRAPPER STAMPS THE CHILD'S OWN END (TOOL-aBriskPreflight-12 S3) into `up.end`, with the
+  # `printf '%(%s)T'` builtin so no process is added. The stamp path is taken into `_rbe`, a shell
+  # variable that is never exported, before RB_UP is unset, so the command's environment is still as
+  # it was. A bounded kill returns to the wrapper through `timeout`, so it stamps there too.
   if [ "$GATE_BOUND_LIVE" = 1 ] && [ "$_b" -gt 0 ]; then
-    RB_UP="$_d/up" "${BASH:-bash}" -c ': >"$RB_UP"; unset RB_UP; "$@"; exit $?' "$ROOT" timeout -k 5s "$_b" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
+    RB_UP="$_d/up" "${BASH:-bash}" -c ': >"$RB_UP"; _rbe=$RB_UP.end; unset RB_UP; "$@"; _rbr=$?; printf "%(%s)T\n" -1 >"$_rbe"; exit $_rbr' "$ROOT" timeout -k 5s "$_b" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
   else
-    RB_UP="$_d/up" "${BASH:-bash}" -c ': >"$RB_UP"; unset RB_UP; "$@"; exit $?' "$ROOT" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
+    RB_UP="$_d/up" "${BASH:-bash}" -c ': >"$RB_UP"; _rbe=$RB_UP.end; unset RB_UP; "$@"; _rbr=$?; printf "%(%s)T\n" -1 >"$_rbe"; exit $_rbr' "$ROOT" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
   fi
   _p=$!
   _i=0
   while [ ! -e "$_d/up" ] && [ "$_i" -lt 100 ] && kill -0 "$_p" 2>/dev/null; do sleep 0.05; _i=$((_i + 1)); done
   write_proc_record "$_p" "$@"
+  RB_HANDLE="$_p $_s $_d"
+  return 0
+}
+# THE OTHER HALF. Split by parameter expansion, so reading a handle starts no process. RB_TOOK runs
+# from the child's own start to the child's own end when the wrapper stamped one in `up.end`, so a
+# probe read late reports its own wall and not the wait before its read (TOOL-aBriskPreflight-12 S3).
+# With no all-digit stamp, as when the wrapper itself was killed before writing, it runs to this
+# read's return instead. The stamp is read with the `read` builtin, so no process is added.
+read_bounded() { # handle -> the child's status; RB_OUT, RB_STDOUT, RB_ERR and RB_TOOK as run_bounded sets them
+  local _p=${1%% *} _r=${1#* } _s _d _e="" _rc
+  _s=${_r%% *}; _d=${_r#* }
   wait "$_p"; _rc=$?
-  _e=$(date +%s); RB_TOOK=$(( _e - _s ))
+  [ -f "$_d/up.end" ] && read -r _e <"$_d/up.end" 2>/dev/null
+  case "$_e" in ''|*[!0-9]*) _e=$(date +%s) ;; esac
+  RB_TOOK=$(( _e - _s ))
   RB_STDOUT=$(cat "$_d/out" 2>/dev/null)
   RB_ERR=$(cat "$_d/err" 2>/dev/null)
   RB_OUT=$(cat "$_d/out" "$_d/err" 2>/dev/null)
@@ -616,6 +655,24 @@ esac
 read_bound_key RESUME_SCHEDULE_DELAY "$RESUME_SCHEDULE_DELAY_DEFAULT" seconds "a probe hold fires its restart at the kit default of ${RESUME_SCHEDULE_DELAY_DEFAULT}s after it was taken"
 read_bound_key RESUME_SCHEDULE_LIMIT "$RESUME_SCHEDULE_LIMIT_DEFAULT" holds "a run that cannot move stops owing restarts after the kit default of $RESUME_SCHEDULE_LIMIT_DEFAULT consecutive holds"
 read_bound_key GATE_BOUND "$GATE_BOUND_DEFAULT" seconds "a declared command is bounded at the kit default of ${GATE_BOUND_DEFAULT}s"
+# TOOL-aBriskPreflight-7 - THE TWO WALL-CLOCK CEILINGS, and the per-spawn cost both were derived to
+# tolerate. FILE CONSTANTS on REMOTE_BOUND's argument: a ceiling raisable from the environment leaves
+# no diff behind, and a conf key owes a protocol key-table row. Assigned AFTER the conf is sourced, so
+# a conf naming any of the three is overwritten. WIRING_CEILING kills the wiring child at the smaller
+# of it and GATE_BOUND and check 4 refuses naming it; PREFLIGHT_CEILING kills nothing, and a
+# --preflight over it prints a named breach line, so it may sit above GATE_BOUND (TOOL-aBriskPreflight-11).
+# DERIVED by the formula in this unit's spec — the measured wall plus every counted spawn and fork
+# re-priced at the worst per-process cost on record: W, S_m and K_m from after-arm rows, S_w and K_w
+# from every host row on record, any arm — except CEILING_SPAWN_MS's 2.5 s and the 0.91 s per-fork floor,
+# which are PINNED readings of node a, 2026-10-11. The rows and the instrument that prints these three
+# lines sit in this unit's build record; a changed value is a re-derivation there, never a retype here.
+WIRING_CEILING="840"
+PREFLIGHT_CEILING="4200"
+CEILING_SPAWN_MS="2500"
+# ...and SAID inert where the bound is, beside the NOTE above that names GATE_BOUND: that one prints
+# before this constant exists, and an inert ceiling that reads as a live one is a skip that looks
+# like a pass.
+[ "$GATE_BOUND_LIVE" = 1 ] || echo "unattended: NOTE - this node has no working 'timeout -k', so the ${WIRING_CEILING}s wall-clock ceiling on WIRING_CHECK is INERT too; a wiring check past it is not killed this session" >&2
 # TOOL-dDerivedDocket-27 S1 - THE UNATTENDED BAR'S WALL, the one number owner ruling D12-i7 lets a
 # project declare for it: a call, never a new `case`, and an EMPTY default, so a malformed value
 # refuses here and a blank one stays blank with the reader's NOTE. UNEXPORTED on the next line, so
@@ -1268,18 +1325,105 @@ fact() { # run-state file · key
 # HELD record under any other code is never derived and never observes the remote: a paused run
 # whose branch somebody merged has not been handed off, and a terminal derived under a live lease
 # would end it through fail 26 (review item M13).
+#
+# TOOL-aBriskPreflight-5 - THE PRIMED FORM, `read_derived_phase --prime <file>...`, for a caller that
+# derives a whole population: the live-run count walked 88 records with one derivation each, and a
+# LANDING one started about eight programs. The prime answers the three sub-questions below once for
+# the population and keeps them in the DPC_ cache; the per-record form takes an answer from the cache
+# when it holds one and computes it exactly as before when it does not, so the derivation is still
+# this one block and a batched call that fails leaves its records to the old reading. Called with no
+# path it empties the cache, which its one caller does before anything in this process writes a
+# record. It prints nothing, never calls `fail`, never touches `status` and returns 0, as the
+# per-record form does. Presence is `${X[$k]+x}`, so a cached empty answer is an answer.
+#   DPC_PHASE / DPC_HOLD - the `phase` and `hold-code` facts, by ONE awk applying `fact`'s rules: one
+#     trailing CR stripped, the section from `## Run facts` to the next `## ` heading, the first line
+#     `<key>:` wins, leading spaces only stripped. A path `[ -f ]` refuses is never cached.
+#   DPC_LANDING - `read_landing_commit`'s answer, empty for its status 1. A record `git diff
+#     --name-only HEAD` does not list has an empty `git diff -U0 HEAD`, so it passes the lease-only
+#     check trivially; a listed one is handed to `check_lease_only_diff` itself. Once that passes, the
+#     phase and hold-code lines are the same bytes in HEAD's copy, so HEAD's phase is the cached one;
+#     the commit is the library's own `git log -1` per record, all in one subshell. The listing is
+#     not `-z`: a NUL stream cannot ride a variable, and without it git quotes a path exactly as the
+#     caller's `ls-files` did, so the two spell every path alike.
+#   DPC_ANC - per landing commit, 1 when it is an ancestor of ADVQ_SHA: one `git rev-list` over all
+#     of them excluding the tip, a commit absent from its output being one the tip reaches. It runs
+#     only where the per-record form would have observed the remote at all.
 DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""; DP_BY=""
-read_derived_phase() { # run-state file -> sets DP_PHASE (the effective phase) and DP_REASON
-  local _dp_hl=""
+declare -A DPC_PHASE=() DPC_HOLD=() DPC_LANDING=() DPC_ANC=()
+read_derived_phase() { # run-state file -> sets DP_PHASE (the effective phase) and DP_REASON; or --prime <file>...
+  local _dp_hl="" _dp_hc _dp_ph _dp_anc _dp_f _dp_c _dp_o _dp_r
+  local -a _dp_fs=() _dp_ls=() _dp_go=() _dp_cs=() _dp_rows=()
+  local -A _dp_seen=()
+  if [ "${1:-}" = --prime ]; then
+    shift
+    DPC_PHASE=(); DPC_HOLD=(); DPC_LANDING=(); DPC_ANC=()
+    # A path awk would read as an option or an assignment is left to the per-record form.
+    for _dp_f in "$@"; do
+      case "$_dp_f" in -*|*=*) continue ;; esac
+      [ -f "$_dp_f" ] && _dp_fs+=("$_dp_f")
+    done
+    [ "${#_dp_fs[@]}" -gt 0 ] || return 0
+    _dp_o=$(LC_ALL=C awk '
+      FNR == 1 { n++; f[n] = FILENAME; sec = 0 }
+      { sub(/\r$/, "") }
+      index($0, "## Run facts") == 1 { sec = 1; next }
+      index($0, "## ") == 1 { sec = 0; next }
+      !sec { next }
+      !(n in ph) && index($0, "phase:") == 1 { v = substr($0, 7); sub(/^ +/, "", v); ph[n] = v }
+      !(n in hc) && index($0, "hold-code:") == 1 { v = substr($0, 11); sub(/^ +/, "", v); hc[n] = v }
+      END { for (i = 1; i <= n; i++) if (index(f[i] ph[i] hc[i], "\037") == 0) printf "%s\037%s\037%s\n", f[i], ph[i], hc[i] }
+    ' "${_dp_fs[@]}" 2>/dev/null) || return 0
+    mapfile -t _dp_rows <<< "$_dp_o"
+    for _dp_r in "${_dp_rows[@]}"; do
+      [ -n "$_dp_r" ] || continue
+      IFS=$'\037' read -r _dp_f _dp_ph _dp_hc <<< "$_dp_r"
+      DPC_PHASE[$_dp_f]=$_dp_ph; DPC_HOLD[$_dp_f]=$_dp_hc
+      case "$_dp_ph" in
+        LANDING) _dp_ls+=("$_dp_f") ;;
+        HELD) check_handoff_code "$_dp_hc" && _dp_ls+=("$_dp_f") ;;
+      esac
+    done
+    [ "${#_dp_ls[@]}" -gt 0 ] || return 0
+    _dp_o=$(GIT diff --name-only HEAD -- "${_dp_ls[@]}" 2>/dev/null) || return 0
+    for _dp_f in "${_dp_ls[@]}"; do
+      case $'\n'"$_dp_o"$'\n' in
+        *$'\n'"$_dp_f"$'\n'*) check_lease_only_diff "$_dp_f" || { DPC_LANDING[$_dp_f]=""; continue; } ;;
+      esac
+      _dp_go+=("$_dp_f")
+    done
+    [ "${#_dp_go[@]}" -gt 0 ] || return 0
+    _dp_o=$(for _dp_f in "${_dp_go[@]}"; do
+              printf '%s\037' "$_dp_f"; GIT log -1 --format=%H HEAD -- "$_dp_f" 2>/dev/null; echo
+            done)
+    mapfile -t _dp_rows <<< "$_dp_o"
+    for _dp_r in "${_dp_rows[@]}"; do
+      case "$_dp_r" in *$'\037'*) ;; *) continue ;; esac
+      _dp_f=${_dp_r%%$'\037'*}; _dp_c=${_dp_r#*$'\037'}
+      DPC_LANDING[$_dp_f]=$_dp_c
+      [ -n "$_dp_c" ] && [ -z "${_dp_seen[$_dp_c]+x}" ] && { _dp_seen[$_dp_c]=1; _dp_cs+=("$_dp_c"); }
+    done
+    [ "${#_dp_cs[@]}" -gt 0 ] && read_advertised_tip || return 0
+    _dp_o=$(GIT rev-list "${_dp_cs[@]}" "^$ADVQ_SHA" 2>/dev/null) || return 0
+    for _dp_c in "${_dp_cs[@]}"; do
+      case $'\n'"$_dp_o"$'\n' in *$'\n'"$_dp_c"$'\n'*) DPC_ANC[$_dp_c]=0 ;; *) DPC_ANC[$_dp_c]=1 ;; esac
+    done
+    return 0
+  fi
   DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""; DP_BY=""
   [ -n "${1:-}" ] || return 0
-  DP_PHASE=$(fact "$1" phase)
+  if [ -n "${DPC_PHASE[$1]+x}" ]; then DP_PHASE=${DPC_PHASE[$1]}; else DP_PHASE=$(fact "$1" phase); fi
   case "$DP_PHASE" in
     LANDING) ;;
-    HELD) check_handoff_code "$(fact "$1" hold-code)" || return 0; _dp_hl="$HOLD_CODES_HANDOFF" ;;
+    HELD)
+      if [ -n "${DPC_HOLD[$1]+x}" ]; then _dp_hc=${DPC_HOLD[$1]}; else _dp_hc=$(fact "$1" hold-code); fi
+      check_handoff_code "$_dp_hc" || return 0; _dp_hl="$HOLD_CODES_HANDOFF" ;;
     *) return 0 ;;
   esac
-  DP_LANDING=$(read_landing_commit "$1" "$_dp_hl") || DP_LANDING=""
+  if [ -n "${DPC_LANDING[$1]+x}" ]; then
+    DP_LANDING=${DPC_LANDING[$1]}
+  else
+    DP_LANDING=$(read_landing_commit "$1" "$_dp_hl") || DP_LANDING=""
+  fi
   if [ -z "$DP_LANDING" ]; then
     DP_REASON="the $DP_PHASE record is not committed as it stands, so no commit carries it to any remote"
     return 0
@@ -1288,7 +1432,12 @@ read_derived_phase() { # run-state file -> sets DP_PHASE (the effective phase) a
     DP_REASON="$ADVQ_WHY"
     return 0
   fi
-  if GIT merge-base --is-ancestor "$DP_LANDING" "$ADVQ_SHA" 2>/dev/null; then
+  if [ -n "${DPC_ANC[$DP_LANDING]+x}" ]; then
+    _dp_anc=${DPC_ANC[$DP_LANDING]}
+  else
+    _dp_anc=0; GIT merge-base --is-ancestor "$DP_LANDING" "$ADVQ_SHA" 2>/dev/null && _dp_anc=1
+  fi
+  if [ "$_dp_anc" = 1 ]; then
     [ "$DP_PHASE" = HELD ] && DP_BY=attended
     DP_PHASE=LANDED; DP_AREF="$ADVQ_REF"; DP_TIP="$ADVQ_SHA"
   else
@@ -2708,33 +2857,115 @@ check_branch() {
   return 1
 }
 
-check_wiring() {
-  [ -n "$WIRING_CHECK" ] || { fail 4 "WIRING_CHECK is not declared in .unattended.conf — an undeclared wiring probe is not a passing one"; return 1; }
-  # The NON-repairing mode, by declaration — expressed as an ALLOW-LIST, because the blacklist form
-  # was one substring wide. `*--fix*` is walked through by every other repairing spelling a project
-  # might declare, `--session` among them, and that mode repairs too. Naming what IS permitted makes
-  # the unknown case a refusal instead of a pass.
-  # Every DASH-LED token must be one this kit recognises as read-only. Word-split rather than
-  # substring-matched, so `--session` (which repairs) is refused instead of walking through a
-  # `*--fix*` blacklist, and a bare command with no flags is still legal.
+# THE GUARD, ONE PREDICATE FOR TWO READERS (TOOL-aBriskPreflight-4 S2): `check_wiring` prints its
+# refusals from it, and `init_preflight_probes` asks it before it starts the wiring child, so a
+# repairing command is refused before anything runs rather than after it has. It prints nothing.
+# The NON-repairing mode, by declaration — expressed as an ALLOW-LIST, because the blacklist form
+# was one substring wide. `*--fix*` is walked through by every other repairing spelling a project
+# might declare, `--session` among them, and that mode repairs too. Naming what IS permitted makes
+# the unknown case a refusal instead of a pass.
+# Every DASH-LED token must be one this kit recognises as read-only. Word-split rather than
+# substring-matched, so `--session` (which repairs) is refused instead of walking through a
+# `*--fix*` blacklist, and a bare command with no flags is still legal.
+WR_TOKEN=""
+check_wiring_runnable() { # -> 0 when the declared WIRING_CHECK may run; 1 with WR_TOKEN the first refused flag, empty when none is declared
   local tok
+  WR_TOKEN=""
+  [ -n "$WIRING_CHECK" ] || return 1
   for tok in $WIRING_CHECK; do
     case "$tok" in
       -*) case "$tok" in
             --check|--dry-run|--verify|-n) ;;
-            *) fail 4 "WIRING_CHECK carries a flag this kit does not recognise as READ-ONLY, and preflight delegates to a check rather than a fix; permitted: --check, --dry-run, --verify, -n: $tok" ; return 1 ;;
+            *) WR_TOKEN=$tok; return 1 ;;
           esac ;;
     esac
   done
-  local wout
+  return 0
+}
+
+# ---- THE WIRING CHILD'S BOUND, ONE ANSWER FOR TWO READERS (TOOL-aBriskPreflight-7 S2). The bound is
+# read where the child STARTS -- init_preflight_probes, or check_wiring's synchronous form -- and the
+# kill is read in check_wiring, so the comparison is spelled once here rather than twice. The smaller
+# of WIRING_CEILING and GATE_BOUND; an EQUAL pair is GATE_BOUND's, so its refusal keeps its bytes. A
+# GATE_BOUND of 0, which the conf reader refuses and only a hermetic test sets, is no bound at all,
+# so the ceiling alone applies. Fork-free: it runs on every preflight.
+WIRING_BOUND=0; WIRING_BOUND_BY=""
+derive_wiring_bound() { # -> WIRING_BOUND the effective bound in seconds, WIRING_BOUND_BY `ceiling` or `gate`
+  local _g=${GATE_BOUND:-0} _c=${WIRING_CEILING:-0}
+  if [ "$_c" -gt 0 ] && { [ "$_g" -le 0 ] || [ "$_c" -lt "$_g" ]; }; then
+    WIRING_BOUND=$_c; WIRING_BOUND_BY=ceiling
+  else
+    WIRING_BOUND=$_g; WIRING_BOUND_BY=gate
+  fi
+}
+
+# ---- ONE SPAWN'S COST, MEASURED AT A BREACH (TOOL-aBriskPreflight-7 S4). A wall-clock verdict on
+# this fleet must say whether it read load or regression (TOOL-aGradedMandate-12), so both breach
+# lines print this beside CEILING_SPAWN_MS. Five spawns of the external `true`, resolved on PATH
+# OUTSIDE the timed window -- the shape of the build's host-state instrument, so the figure compares
+# with its `spawn5` over five. Called on the two breach paths only and cached for the process, so a
+# run that does not breach pays nothing.
+SPAWN_COST=""
+measure_spawn_cost() { # -> SPAWN_COST: whole milliseconds per spawn, or an unmeasured phrase naming why
+  [ -z "$SPAWN_COST" ] || return 0
+  local _t _a _b _i
+  if [ -z "${EPOCHREALTIME:-}" ]; then SPAWN_COST="an unmeasured amount (this bash has no EPOCHREALTIME)"; return 0; fi
+  _t=$(type -P true 2>/dev/null)
+  if [ -z "$_t" ]; then SPAWN_COST="an unmeasured amount (no external true on PATH)"; return 0; fi
+  _a=${EPOCHREALTIME//[!0-9]/}
+  for _i in 1 2 3 4 5; do "$_t"; done
+  _b=${EPOCHREALTIME//[!0-9]/}
+  SPAWN_COST="$(( (10#$_b - 10#$_a) / 5000 ))ms"
+}
+
+# ---- PREFLIGHT'S OWN WALL AGAINST ITS CEILING (TOOL-aBriskPreflight-7 S3). Called after
+# verb_preflight on EVERY return path, refusals included, and it judges COST ONLY: it never calls
+# `fail`, never sets `status`, adds nothing to the run log's checks and writes no file -- the owner's
+# ruling "Name it, refuse only wiring", because a refused preflight costs a whole re-run. The clock is
+# read in DRIVER_T0_US's own spelling, so the stamp and the compare cannot disagree about units. Under
+# the ceiling it prints nothing: the run log's END line already carries every preflight's duration.
+print_preflight_breach() { # -> the breach line on stdout when the wall passed PREFLIGHT_CEILING; nothing under it
+  local _now _us _w
+  case "${DRIVER_T0_US:-}" in
+    ""|*[!0-9]*) printf '%s\n' "unattended: preflight ceiling not compared — the driver's start stamp is not a whole number, so this run's wall is unknown rather than within its ${PREFLIGHT_CEILING}s ceiling"
+                 return 0 ;;
+  esac
+  if [ -n "${EPOCHREALTIME:-}" ]; then _now=${EPOCHREALTIME//[!0-9]/}
+  else printf -v _now '%(%s)T' -1; _now="${_now}000000"; fi
+  _us=$(( 10#$_now - 10#$DRIVER_T0_US ))
+  [ "$_us" -gt $(( PREFLIGHT_CEILING * 1000000 )) ] || return 0
+  measure_spawn_cost
+  _w="$(( _us / 1000000 )).$(( _us % 1000000 / 100000 ))"
+  printf '%s\n' "unattended: preflight over its ceiling — it took ${_w}s against its own ${PREFLIGHT_CEILING}s wall-clock ceiling. One spawn cost ${SPAWN_COST} here against the ${CEILING_SPAWN_MS}ms the ceiling allows, so a figure far above that is this host's load and one near it is preflight's own cost. This line judges cost only: the exit status and the run-state file are what the checks above decided."
+}
+
+check_wiring() {
+  if ! check_wiring_runnable; then
+    [ -n "$WIRING_CHECK" ] || { fail 4 "WIRING_CHECK is not declared in .unattended.conf — an undeclared wiring probe is not a passing one"; return 1; }
+    fail 4 "WIRING_CHECK carries a flag this kit does not recognise as READ-ONLY, and preflight delegates to a check rather than a fix; permitted: --check, --dry-run, --verify, -n: $WR_TOKEN"
+    return 1
+  fi
+  local wout _wh=${PF_PROBE_WIRING:-}
+  PF_PROBE_WIRING=""
   # BOUNDED, same helper. TOOL-aBoundedCeiling-6 and TOOL-aPromptedMandate-9: nothing in the
-  # precondition chain had a timeout, and this seam was measured at 1m22s under load.
+  # precondition chain had a timeout, and this seam was measured at 1m22s under load. Under
+  # --preflight the child was STARTED by init_preflight_probes and is only read here; everywhere
+  # else, and when that start could not make its capture, it runs here as it always did. Either
+  # start ran under the bound `derive_wiring_bound` names, asked again here for the refusal's choice.
+  derive_wiring_bound
   # shellcheck disable=SC2086
-  run_bounded $WIRING_CHECK && return 0
+  if [ -n "$_wh" ]; then read_bounded "$_wh"; else RB_BOUND=$WIRING_BOUND; run_bounded $WIRING_CHECK; fi
   local _wrc=$?
+  RB_BOUND=""
+  [ "$_wrc" = 0 ] && return 0
   wout=$RB_OUT
-  if { [ "$_wrc" = 124 ] || [ "$_wrc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
-    fail 4 "the declared wiring check did not answer within the declared ${GATE_BOUND}s bound and was killed after ${RB_TOOK}s, so preflight cannot tell a dormant hook from a slow one: $WIRING_CHECK"
+  if { [ "$_wrc" = 124 ] || [ "$_wrc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ] && [ "${WIRING_BOUND:-0}" -gt 0 ]; then
+    if [ "$WIRING_BOUND_BY" = ceiling ]; then
+      measure_spawn_cost
+      fail 4 "the declared wiring check ran past its own ${WIRING_CEILING}s wall-clock ceiling and was killed after ${RB_TOOK}s, so preflight refuses its cost rather than waiting it out; the ${GATE_BOUND}s GATE_BOUND is no longer this check's only kill. One spawn cost ${SPAWN_COST} at the kill against the ${CEILING_SPAWN_MS}ms the ceiling allows, so a figure far above that is this host's load and one near it is the check's own cost: $WIRING_CHECK"
+    else
+      fail 4 "the declared wiring check did not answer within the declared ${GATE_BOUND}s bound and was killed after ${RB_TOOK}s, so preflight cannot tell a dormant hook from a slow one: $WIRING_CHECK"
+    fi
     # WHATEVER IT MANAGED TO SAY BEFORE IT WAS KILLED, indented under the refusal. This branch
     # returns before the shared printer below, whose comment promises the declared check's output is
     # never discarded -- true of the ordinary-failure path and, until this line, false of this one.
@@ -2763,6 +2994,14 @@ check_wiring() {
 # the whole reason the probes exist - a 2 says the declaration names a lander that cannot land this
 # way and no retry helps, a 3 says the clone or the network is what failed and the run holds.
 run_lander() { # flag · slug -> the lander's own exit; its output in RB_OUT
+  # A PROBE --preflight ALREADY STARTED is read rather than run again (TOOL-aBriskPreflight-4 S4).
+  # The handle is taken by emptying its variable first, so it is read at most once.
+  local _lh=""
+  case "$1" in
+    --carry)    _lh=${PF_PROBE_CARRY:-};    PF_PROBE_CARRY="" ;;
+    --prepared) _lh=${PF_PROBE_PREPARED:-}; PF_PROBE_PREPARED="" ;;
+  esac
+  if [ -n "$_lh" ]; then read_bounded "$_lh"; return; fi
   # shellcheck disable=SC2086
   run_bounded $LANDER "$1" --slug "$2"
 }
@@ -2790,6 +3029,50 @@ check_lander_mode() { # slug
          return 1 ;;
     esac
   done
+  return 0
+}
+
+# ---- PREFLIGHT'S PROBES, STARTED TOGETHER AND READ WHERE THEY ARE READ. TOOL-aBriskPreflight-4 S3, S5.
+# The wiring check, the lander's `--carry` and `--prepared`, and the profile command read nothing
+# of one another, and waited one after another they were 754 s of a 1561 s preflight on node a. They
+# start here, after check_branch, in the order they are read: the wiring check first because it is
+# the longest child and the first read. Nothing is printed here. Each reader -- check_wiring,
+# run_lander, derive_gate_backstop -- takes its handle where it read its answer before, so every
+# refusal prints at the position and in the order it always did. Starting AFTER check_clean is
+# deliberate: a declared lander or profile command is a project's, and nothing it writes may reach a
+# verdict check_clean has already given. A start that cannot make its capture leaves its handle
+# empty, and its reader then runs the synchronous form and prints that sentence where it always did.
+PF_PROBE_WIRING=""; PF_PROBE_CARRY=""; PF_PROBE_PREPARED=""; PF_PROBE_PROFILE=""
+init_preflight_probes() { # slug -> each declared probe started, its handle in its own PF_PROBE_ variable
+  PF_PROBE_WIRING=""; PF_PROBE_CARRY=""; PF_PROBE_PREPARED=""; PF_PROBE_PROFILE=""
+  # The guard is asked BEFORE the start, so a repairing flag never runs (memory/gotchas/destructive-step-before-its-precondition.md).
+  derive_wiring_bound
+  RB_BOUND=$WIRING_BOUND
+  # shellcheck disable=SC2086
+  if check_wiring_runnable && init_bounded $WIRING_CHECK; then PF_PROBE_WIRING=$RB_HANDLE; fi
+  RB_BOUND=""
+  if [ "$LANDER_MODE" = in-place ]; then
+    # shellcheck disable=SC2086
+    init_bounded $LANDER --carry --slug "$1" && PF_PROBE_CARRY=$RB_HANDLE
+    # shellcheck disable=SC2086
+    init_bounded $LANDER --prepared --slug "$1" && PF_PROBE_PREPARED=$RB_HANDLE
+  fi
+  # shellcheck disable=SC2086
+  if [ -n "$GATE_PROFILE_CMD" ] && init_bounded $GATE_PROFILE_CMD; then PF_PROBE_PROFILE=$RB_HANDLE; fi
+  return 0
+}
+# NO PROBE OUTLIVES THE VERB UNREAD. The one this can meet is `--prepared`'s, when check_lander_mode
+# refused on `--carry` and returned before reading it. It is waited for and its answer discarded --
+# never killed, because a kill is the least reversible act this driver takes and it is the lease
+# holder's reap that owns one. The capture values are put back, so a caller reading them after the
+# block reads what the block's last reader left.
+read_preflight_probes() { # -> every pending probe read and discarded; prints nothing
+  local _h _o=$RB_OUT _so=$RB_STDOUT _e=$RB_ERR _t=$RB_TOOK
+  for _h in "${PF_PROBE_WIRING:-}" "${PF_PROBE_CARRY:-}" "${PF_PROBE_PREPARED:-}" "${PF_PROBE_PROFILE:-}"; do
+    [ -z "$_h" ] || read_bounded "$_h" || true
+  done
+  PF_PROBE_WIRING=""; PF_PROBE_CARRY=""; PF_PROBE_PREPARED=""; PF_PROBE_PROFILE=""
+  RB_OUT=$_o; RB_STDOUT=$_so; RB_ERR=$_e; RB_TOOK=$_t
   return 0
 }
 
@@ -2944,7 +3227,7 @@ check_single_live() {
   #
   # FAILS CLOSED. No observation, an uncommitted record, or a landing commit off the tip leaves the
   # record LANDING, and a LANDING record counts as it always did.
-  local anc="${ASHA:-}"
+  local anc="${ASHA:-}" recs=()
   [ -n "$anc" ] && { GIT rev-parse --verify --quiet "$anc^{commit}" >/dev/null 2>&1 || anc=""; }
   for f in $(GIT ls-files ":(glob)$M/builds/*/RUN.md" ":(glob)$M/builds/*/RUN.*.md" 2>/dev/null); do
     # THIS RUN'S OWN RECORD IS NOT A CONCURRENT RUN. It is absent at a first preflight — the file
@@ -2953,6 +3236,12 @@ check_single_live() {
     # this skip the announcement reports the run to itself as its own competitor, which is worse than
     # saying nothing: it is a true-looking count of the wrong population.
     case "$f" in "$M/builds/${SLUG:-}/RUN.md"|"$M/builds/${SLUG:-}/RUN."*".md") continue ;; esac
+    recs+=("$f")
+  done
+  # PRIMED ONCE for the population, so each record is derived once and the announcement below reads
+  # the same answers (TOOL-aBriskPreflight-5); emptied before the claims block.
+  read_derived_phase --prime "${recs[@]}"
+  for f in "${recs[@]}"; do
     read_derived_phase "$f"; p="$DP_PHASE"; [ -n "$p" ] || continue
     if [ "$p" = LANDED ] && [ -n "$DP_LANDING" ]; then
       printf 'unattended: EXCLUDED %s from the live-run count — derived LANDED: its landing commit %s is on %s at %s, so it is a finished run and the next --preflight of its slug retires it\n' "$f" "${DP_LANDING:0:8}" "$DP_AREF" "${DP_TIP:0:8}"
@@ -2987,6 +3276,7 @@ check_single_live() {
       printf '  %s · phase %s · witness %s\n' "$f" "$DP_PHASE" "$(fact "$f" witness)"
     done
   fi
+  read_derived_phase --prime
   [ "$RUN_CLAIMS" = on ] && [ -n "$CLAIM_ROWS" ] || return 0
   printf '%s\n' "$CLAIM_ROWS" | awk -F'\t' -v me="${SLUG:-}" '
     $1 != me && $5 != "terminal" { r[++n] = sprintf("  %s · node %s · status %s · beat %s · verdict %s", $1, $2, $3, ($4 == "-" ? "unknown" : $4 "s"), $5) }
@@ -6993,6 +7283,9 @@ verb_preflight() { # slug · keepalive-id
   fi
   check_clean || true
   check_branch || true
+  # TOOL-aBriskPreflight-4 - the four bounded probes start together here and are read below, each by
+  # the check that reads it; read_preflight_probes after the GB_CMP case reads whatever is left.
+  init_preflight_probes "$slug"
   check_wiring || true
   check_method || true
   check_waivers "$rel" || true
@@ -7011,6 +7304,7 @@ verb_preflight() { # slug · keepalive-id
     1) fail 85 "the unattended bar's wall is below the largest declared leg ceiling, so a healthy bar that dispatches that leg is killed by its own wall and every close reads red over a bound nobody chose: $GW_WHY. Raise GATE_WALL in $CONF to at least that ceiling" ;;
     2) echo "unattended: preflight — the wall is not compared with the largest leg ceiling: $GW_WHY" ;;
   esac
+  read_preflight_probes
   # ONE entry point for the base, shared with --close, so the two verbs cannot disagree about which
   # commit they are measuring against. `trusted_base` names its own refusals.
   #
@@ -9171,15 +9465,17 @@ read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS and GR_AGED (comm
 # `--preflight` compares the wall with the largest leg ceiling without running the profile twice.
 GB_SUM=""; GB_WALL=""; GB_QUEUE=""; GB_MARGIN=""; GB_WHY=""; GB_CMP=2
 derive_gate_backstop() { # -> 0 with GB_SUM and its three terms, or 1 with GB_WHY; GB_CMP and GW_WHY either way
-  local _db_rc _db_miss=""
+  local _db_rc _db_miss="" _db_h=${PF_PROBE_PROFILE:-}
+  PF_PROBE_PROFILE=""
   GB_SUM=""; GB_WALL=""; GB_QUEUE=""; GB_MARGIN=""; GB_WHY=""; GB_CMP=2; GW_WHY=""
   if [ -z "$GATE_PROFILE_CMD" ]; then
     GB_WHY="this project declares no GATE_PROFILE_CMD, so the bar has no profile to size a backstop from"
     GW_WHY="this project declares no GATE_PROFILE_CMD, so the wall cannot be compared with the largest leg ceiling"
     return 1
   fi
+  # A profile --preflight already started is read here, where its answer is read (TOOL-aBriskPreflight-4 S4).
   # shellcheck disable=SC2086
-  run_bounded $GATE_PROFILE_CMD; _db_rc=$?
+  if [ -n "$_db_h" ]; then read_bounded "$_db_h"; else run_bounded $GATE_PROFILE_CMD; fi; _db_rc=$?
   if [ "$_db_rc" != 0 ]; then
     GB_WHY="the declared GATE_PROFILE_CMD exited $_db_rc after ${RB_TOOK}s, so it gave no profile to size a backstop from: $GATE_PROFILE_CMD"
     GW_WHY="the declared GATE_PROFILE_CMD exited $_db_rc, so the wall cannot be compared with the largest leg ceiling"
@@ -13936,7 +14232,7 @@ case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)
 [ -n "$VERB" ] || { usage; RUNLOG_CLEAN=1; exit 2; }
 
 case "$VERB" in
-  --preflight) verb_preflight "$SLUG" "$KID" ;;
+  --preflight) verb_preflight "$SLUG" "$KID"; print_preflight_breach ;;
   --status)    verb_status "$SLUG" ;;
   --audit)     print_audit "$SLUG" ;;
   --register-task) write_task_register "$SLUG" "$TK_NAME" "$TK_BEAT" ;;
