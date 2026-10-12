@@ -76,7 +76,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 18 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
+**Build status:** INPROGRESS · 18 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
 ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11
 ids TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15
 
@@ -98,7 +98,7 @@ ids TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrie
 | [TOOL-aOrientedCast-7 — the spawn guard refuses an Agent or Workflow call that carries no rendered handoff](spec/2026-10-11-spec-TOOL-aOrientedCast-7.md) | 10 | 2 | CLOSED | rev-4 | 2026-10-12 |
 | [TOOL-aOrientedCast-11 — a role agent runs no gate, and the write gate's hook refuses one](spec/2026-10-11-spec-TOOL-aOrientedCast-11.md) | 11 | 2 | CLOSED | rev-2 | 2026-10-12 |
 | [TOOL-aOrientedCast-12 — a budget row is four fields, and an argv column that reads as prose is refused](spec/2026-10-12-spec-TOOL-aOrientedCast-12.md) | 12 | 1 | CLOSED | rev-3 | 2026-10-12 |
-| [TOOL-aOrientedCast-13 — a gate allowlist may name a leg the target lacks, marked optional](spec/2026-10-12-spec-TOOL-aOrientedCast-13.md) | 13 | 2 | OPEN | rev-2 | 2026-10-12 |
+| [TOOL-aOrientedCast-13 — a gate allowlist may name a leg the target lacks, marked optional](spec/2026-10-12-spec-TOOL-aOrientedCast-13.md) | 13 | 2 | INPROGRESS | rev-2 | 2026-10-12 |
 | [TOOL-aOrientedCast-14 — the role gate reads past every launcher option, and both role arms find the session's checkout](spec/2026-10-12-spec-TOOL-aOrientedCast-14.md) | 14 | 2 | OPEN | rev-3 | 2026-10-12 |
 | [TOOL-aOrientedCast-15 — the closing review's minors: oracles that rot, readers that disagree, a verdict over a broken index](spec/2026-10-12-spec-TOOL-aOrientedCast-15.md) | 15 | 2 | OPEN | rev-2 | 2026-10-12 |
 <!-- /gen:build-units -->

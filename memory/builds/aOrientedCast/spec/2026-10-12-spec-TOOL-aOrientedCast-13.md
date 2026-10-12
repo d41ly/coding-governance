@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-13 — a gate allowlist may name a leg the target lacks, marked optional
 
-**Status:** OPEN · rev-2 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 13 · ratified 2026-10-12
+**Status:** INPROGRESS · rev-2 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 13 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
