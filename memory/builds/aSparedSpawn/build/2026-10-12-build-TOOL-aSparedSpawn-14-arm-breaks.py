@@ -1,3 +1,4 @@
+# **Serves:** journal TOOL-aSparedSpawn-14
 """Stage one break at a time into a copy of check-arms.py beside it, run its --selftest, report which arms red."""
 import os
 import subprocess

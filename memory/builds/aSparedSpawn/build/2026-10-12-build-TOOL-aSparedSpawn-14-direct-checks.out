@@ -1,3 +1,4 @@
+# **Serves:** journal TOOL-aSparedSpawn-14
 # memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-14-direct-checks.sh, run on node a 2026-10-12 over the pass's final tree
 == row 1 replay: a verb on a slug with no run-state file
 UNATTENDED check 10 FAILED — no run-state file, so there is no run to report on: memory/builds/aNoSuchRun/RUN.md

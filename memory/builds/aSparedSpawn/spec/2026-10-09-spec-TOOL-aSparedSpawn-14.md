@@ -7,6 +7,9 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-11-build-TOOL-aSparedSpawn-14-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-14-acceptance-ledger.md) | journal | — |
+| [2026-10-12-build-TOOL-aSparedSpawn-14-arm-breaks.py](../build/2026-10-12-build-TOOL-aSparedSpawn-14-arm-breaks.py) | journal | — |
+| [2026-10-12-build-TOOL-aSparedSpawn-14-direct-checks.out](../build/2026-10-12-build-TOOL-aSparedSpawn-14-direct-checks.out) | journal | — |
+| [2026-10-12-build-TOOL-aSparedSpawn-14-direct-checks.sh](../build/2026-10-12-build-TOOL-aSparedSpawn-14-direct-checks.sh) | journal | — |
 | [2026-10-11-prompt-TOOL-aSparedSpawn-14-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-14-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

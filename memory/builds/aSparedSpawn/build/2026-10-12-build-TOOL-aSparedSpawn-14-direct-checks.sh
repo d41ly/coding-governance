@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** journal TOOL-aSparedSpawn-14
 # The direct checks TOOL-aSparedSpawn-14's pass ran: the changed driver and leg invoked directly, each
 # once, over the tree or over a staged break. No suite, no bar, no slice of a suite.
 #   bash memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-14-direct-checks.sh <scratch dir>
