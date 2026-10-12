@@ -117,3 +117,5 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-12T00:10:41Z review · item aOrientedCast · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 2 · minors 8 · disposition promote
 
 2026-10-12T16:35:45Z brief · item TOOL-aOrientedCast-12 · reason 8fe392978328 memory/builds/aOrientedCast/prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md
+
+2026-10-12T17:16:02Z dispatch · item 63c41b71 TOOL-aOrientedCast-12 · reason tools/run-gates/selftest-budgets.txt tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/run-gates/run-gates.sh tools/run-gates/README.md memory/guides/SESSION-KICKOFF.md memory/builds/aOrientedCast/spec/2026-10-12-spec-TOOL-aOrientedCast-12.md memory/builds/aOrientedCast/build/2026-10-12-build-TOOL-aOrientedCast-12-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md

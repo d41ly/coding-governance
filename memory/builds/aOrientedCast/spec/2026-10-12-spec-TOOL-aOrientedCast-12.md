@@ -1,11 +1,12 @@
 # TOOL-aOrientedCast-12 — a budget row is four fields, and an argv column that reads as prose is refused
 
-**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-1 · base 646d4a73 · streams tooling · order 12 · ratified 2026-10-12
+**Status:** CLOSED · rev-3 · 2026-10-12 · node a · Tier-1 · base 646d4a73 · streams tooling · order 12 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-build-TOOL-aOrientedCast-12-1-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aOrientedCast-12-1-acceptance-ledger.md) | journal | — |
 | [2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md) | journal | TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 |
 | [2026-10-12-prompt-TOOL-aOrientedCast-12-2-fold-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-12-2-fold-brief.md) | journal | TOOL-aOrientedCast-14 |
 
