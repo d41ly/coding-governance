@@ -30,6 +30,6 @@ imports, what that module imports, and `{prefix}/lib/` when the suite inlines a 
 files to the sibling's directory, which can tip a shared guard past `BROAD_LEG_FLOOR` in
 `tools/check-spec-tokens.py` and drop it out of the spec-tokens join.
 
-Not gated: a lint that reads each held suite for the sibling kits it resolves reds scratch-guard's leg
+No machine gate yet: a lint that reads each held suite for the sibling kits it resolves reds scratch-guard's leg
 on arrival, so it is a build of its own. Until then this record is the checklist entry, selected by
 `gotchas.py --for-paths` for a diff touching `tools/gate-legs.json`.
