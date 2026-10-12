@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-9 — fixture templates and environment git identity across the named suites
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-1 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-1 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
