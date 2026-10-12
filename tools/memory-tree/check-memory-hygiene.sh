@@ -8,6 +8,13 @@
 #   <prefix>/memory-tree/check-memory-hygiene.sh            # full check
 #   <prefix>/memory-tree/check-memory-hygiene.sh --staged   # pre-commit fast leg (file-checks on staged paths)
 #   <this script> --offenders                            # one `check <n><TAB><key>` per offender, nothing else
+#   <this script> --only N[,M]                           # only the check blocks naming N or M (TOOL-aSparedSpawn-7)
+#
+# `--only` runs every producer and only the check blocks whose `check_selected` call names a requested
+# id. A block grading several ids runs whole and records them all, so `--only 12` reads `ran checks 12
+# 25`, and 6, 7 and 8 are one unit over the waiver state they share. The selectable set is READ from
+# this file's own `check_selected` calls, never typed. It takes no other argument: `--staged`,
+# `--offenders` and the print modes each grade or print something `--only` does not select.
 #
 # `--staged` is NOT the full check with a narrower file list. Several checks whose population is the
 # CORPUS rather than the diff are HELD: 13-16, 17-19, 21, the row-grammar arm, 23 and 26 (whose
@@ -17,9 +24,32 @@
 # already false of 13-19 — one rule returning two verdicts, the
 # `amendment-leaves-its-other-half-standing` class this repo catalogues.
 #
-# Exit 0 = clean. Two channels print at exit 0 and are NOT regressions: the corpus classifier's
-# check-16 notices, and any line opening `HYGIENE advisory `. Anything else printed is a regression.
+# Exit 0 = clean. Three channels print at exit 0 and are NOT regressions: the corpus classifier's
+# check-16 notices, any line opening `HYGIENE advisory `, and under `--only` the one liveness line
+# `HYGIENE --only <sel> ran checks <ids>`. Anything else printed is a regression. Under `--only`, a
+# requested id whose `check_selected` call never ran exits 2: its verdict would be silence.
 set -u
+# --only N[,M]: parsed BEFORE the `cd` below, because the selectable set is read from "$0" and a
+# relative "$0" names this file only from the caller's directory. Refused whole, before any check runs,
+# when it shares the argv with anything else or names an id no `check_selected` call carries.
+ONLY=""; ONLY_SEL=""; RAN=""
+case " $* " in
+  *" --only "*)
+    [ "${1:-}" = --only ] && [ "$#" = 2 ] \
+      || { echo "HYGIENE — cannot run: --only takes one comma list and no other argument; --staged, --offenders and the print modes each grade or print something --only does not select"; exit 2; }
+    ONLY_SEL=$2
+    case "$ONLY_SEL" in
+      ""|,*|*,|*,,*|*[!0-9,]*) echo "HYGIENE — cannot run: --only takes check numbers joined by commas, got '$ONLY_SEL'"; exit 2 ;;
+    esac
+    ONLY=${ONLY_SEL//,/ }
+    _only_known=" $(awk '{ sub(/\r$/, "") } /^[ \t]*if check_selected [0-9][0-9 ]*; then$/ { sub(/^[ \t]*if check_selected /, ""); sub(/; then$/, ""); printf "%s ", $0 }' "$0")"
+    for _o in $ONLY; do
+      case "$_only_known" in
+        *" $_o "*) ;;
+        *) echo "HYGIENE — cannot run: --only names check $_o, which no check_selected call in this script carries; the selectable ids are: $(printf '%s\n' $_only_known | sort -un | tr '\n' ' ')"; exit 2 ;;
+      esac
+    done ;;
+esac
 # --offenders: THE SIGNATURE THE MERGE BAR GRADES THIS LEG WITH (TOOL-dDerivedDocket-23 S3). The full
 # check runs exactly as it does with no flag and exits as it does; what changes is stdout, which
 # carries one `check <n><TAB><key>` line per offender each failing check lists and NOTHING ELSE — so
@@ -348,6 +378,11 @@ while IFS= read -r _l; do [ -n "$_l" ] && DEBT_SET["$_l"]=1; done <<<"$DEBT"
 in_legacy() { [ -n "${LEGACY_SET[$1]+x}" ]; }
 in_debt()   { [ -n "${DEBT_SET[$1]+x}" ]; }
 fail() { if [ "$OFFENDERS" = 1 ]; then add_offender_keys "$1" "$2"; else echo "HYGIENE check $1 FAILED — $2"; fi; status=1; }
+# <ids…> -> 0 when the run is unscoped or any id is selected, and then EVERY id is recorded as ran,
+# because the block runs whole. Unscoped it is one builtin test. Called once per guarded block and
+# never in a loop, and the exit-2 refusal at the end of this file reads `RAN`. TOOL-aSparedSpawn-7.
+check_selected() { [ -z "$ONLY" ] && return 0; local _cs
+  for _cs in "$@"; do case " $ONLY " in *" $_cs "*) RAN="$RAN $*"; return 0 ;; esac; done; return 1; }
 # add_offender_keys <check> <message> — one key per offender line the message LISTS. A message's first
 # line is its header and is dropped when a list follows it; a one-line message is its own key. Lines
 # ending in a colon are sub-headers, and a `… and N more` line is a count rather than an offender.
@@ -504,6 +539,7 @@ if [ "$STAGED" = 1 ]; then
 fi
 in_scope() { [ "$STAGED" = 0 ] && return 0; [ -n "${STAGED_SET[$1]+x}" ]; }   # zero-fork (see LEGACY_SET)
 
+if check_selected 1; then
 # 1 — prompt placement: prompt-kind files only under builds/*/prompts/ or archive/.
 c1=$(printf '%s\n' "$FILES" \
   | grep -E '(\.prompt\.md|\.build-prompt\.md|-prompt\.md|/[0-9]{4}-[0-9]{2}-[0-9]{2}-prompt-[A-Za-z0-9-]+-[0-9]+\.md)$' \
@@ -511,6 +547,9 @@ c1=$(printf '%s\n' "$FILES" \
 [ -n "$c1" ] && fail 1 "prompt-kind files outside builds/*/prompts/ or archive/:
 $c1"
 
+fi
+
+if check_selected 2; then
 # 2 — link integrity (exempt DECISIONS.md / decisions/ / archive/ and legacy-listed recording files).
 # LIVE.md and the ledger shards are NOT exempt: their rows link to build READMEs, and a link that
 # stops resolving is precisely the drift the generated index exists to prevent.
@@ -556,6 +595,9 @@ broken=$(awk '
 [ -n "$broken" ] && fail 2 "broken relative .md links:
 $broken"
 
+fi
+
+if check_selected 3; then
 # 3 — structure lint (depth-2; decisions/ guides/ archive/ contents opaque).
 # FLAT (1.5): the root holds the four index files, one append-only DECISIONS.md, and the fixed
 # directory set. There is no discipline directory to descend into; `builds/` holds one folder per
@@ -646,6 +688,9 @@ bad3=$(printf '%s\n%s\n%s\n' "$bad3" "$bp" "$bm" | grep . || true)
 [ -n "$bad3" ] && fail 3 "unexpected entries (structure):
 $bad3"
 
+fi
+
+if check_selected 4; then
 # 4 — build-folder naming + internal shape.
 # FLAT (1.5): ONE population, `<M>/builds/<slug>/`. The date prefix and the FAMILY prefix are gone
 # with the discipline directory — a folder is named for its slug and nothing else, so there is no
@@ -730,6 +775,9 @@ bad4=$(printf '%s\n' "$bad4" | grep . || true)
 $bad4"
 
 
+fi
+
+if check_selected 5; then
 # 5 — recording-file naming (grandfather: legacy-files.txt).
 # The optional `-<FAMILY>-` qualifier is the CLOSED alternation from FAMILIES. A generic `[A-Z]+`
 # would admit a family that does not exist and make the rejection arm vacuous.
@@ -753,6 +801,8 @@ done)
 [ -n "$bad5" ] && fail 5 "recording-file names not matching YYYY-MM-DD-<kind>[-<FAMILY>]-<slug>-<seq>.md (and not grandfathered):
   (nesting is fine — a sub-folder under spec/ groups a multi-unit build; the NAME is what is wrong)
 $bad5"
+
+fi
 
 # index set for checks 6/7
 index_set() {
@@ -813,6 +863,7 @@ VIEW_SET=""
   | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done)
 case "${1:-}" in --print-index-set) printf '%s\n' "$INDEX_SET"; exit 0 ;; esac   # see the PRINT MODES note above
 
+if check_selected 6 7 8; then
 # 6 — index size caps (grandfather: curation-debt.txt).
 # Batched wc: one `wc -c` + one `wc -l` over the whole selected set (was 2 forks PER index file).
 # Findings emit in index_set order (the -l stream's arg order); multi-file wc `total` lines are
@@ -921,6 +972,9 @@ $bad6b"
 pop_guard 6 "no index file under $M/ (guides, ledger, backlog, build READMEs, map dossiers)" \
   "$(printf '%s\n' "$sel6" | grep -c . || true)" "$PRE_INDEXY"
 
+fi
+
+if check_selected 6 7 8; then
 # 7 — entry budget, ENTRY_CAP_CHARS per class (grandfather: curation-debt.txt; exempt guides/*.md — a guide is prose,
 #     not index rows — a RETIRED builds/*/RUN.<PHASE>.<blob8>.md, whose standing-mandate block is
 #     quoted prose reproduced verbatim and must not be reflowed to fit an index budget (the LIVE
@@ -1003,6 +1057,9 @@ derive_waived 7 "$bad7"; bad7="$_UNWAIVED"
 [ -n "$bad7" ] && fail 7 "index entry lines over their declared cap:
 $bad7"
 
+fi
+
+if check_selected 6 7 8; then
 # 8 — status vocabulary on the backlog shards (grandfather: curation-debt.txt).
 #     STATUS.md was RETIRED by TOOL-aRuledFrontispiece-7: one existed across the whole corpus, it
 #     contradicted its own build README, nothing ever wrote one, and no decision record created
@@ -1071,6 +1128,9 @@ $bad8"
   [ "$STAGED" = 1 ] || printf 'memory-hygiene: check 8 graded %s backlog row(s) across %s shard(s)\n' "$rows8" "$shards8"
 fi
 
+fi
+
+if check_selected 9; then
 # 9 — build-index drift (delegates to the sibling generator). The retired directory listing carried
 # PATHS, which git already prints better; this carries STATUS, which git does not — and the status is
 # DERIVED from each build's front matter plus its specs' status headers, so nothing is authored here
@@ -1080,6 +1140,9 @@ if [ "$STAGED" = 0 ] || printf '%s\n' "$STAGED_MD" | grep -q .; then
 $drift"; fi
 fi
 
+fi
+
+if check_selected 22; then
 # 22 — THE REVIEW VERDICT VOCABULARY. A review record has to say what it concluded, in a token
 # something can read, and until this check existed it did not have to say anything at all.
 #
@@ -1136,6 +1199,9 @@ if [ -n "$REVIEW_VERDICT_CUTOFF" ]; then
 $bad22"
 fi
 
+fi
+
+if check_selected 21; then
 # 21 — every record names the spec it is evidence about. Delegates the
 # PARSE to the sibling generator, which already reads every record's bytes; the shell owns the four
 # fail branches, because `check-arms.py` discovers its population from tracked shell and cannot see a
@@ -1290,6 +1356,9 @@ $over21"
 $proj21"
 fi
 
+fi
+
+if check_selected 10; then
 # 10 — rotation note (always; cheap). FLAT (1.5): one archive directory at the memory root.
 #
 # WHAT THIS CHECKS: that a rotated archive is ANNOUNCED by the index it was cut from. WHAT IT DOES
@@ -1362,6 +1431,9 @@ if [ "$BMODE" = builds ] && [ "$STAGED" = 0 ]; then
   printf "memory-hygiene: check 10: %s family archive(s) left to check 9's archive guard (backlog layout builds)\\n" "$left10"
 fi
 
+fi
+
+if check_selected 24; then
 # 24 — the declared ROTATION_MODE is HONOURED. Delegated to row_grammar.py for the reason 13-20 are:
 # the assertion is a corpus walk over ROW DOCUMENTS, and this file must not spell a second row
 # grammar. The first cut of this check did exactly that and five of six evasions passed silently —
@@ -1381,6 +1453,9 @@ if [ "$STAGED" = 0 ]; then
   fi
 fi
 
+fi
+
+if check_selected 26; then
 # 26 — the TRANSITION-MERGE audit. Delegated to transition_audit.py for the reason 24 is: the
 # assertion is a walk over the commit GRAPH keyed by the anchor grammar, and this file must not
 # spell a second row grammar or a second ancestry rule.
@@ -1412,6 +1487,9 @@ if [ "$STAGED" = 0 ]; then
   [ "$_tarc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 26 $'\n'"$tam"
 fi
 
+fi
+
+if check_selected 11; then
 # 11 — old-tree tombstone (only if TOMBSTONE_ROOTS is configured; never grandfathered).
 for old in $TOMBSTONE_ROOTS; do
   if git ls-files "$old/" | grep -q .; then
@@ -1420,6 +1498,9 @@ $(git ls-files "$old/" | head)"
   fi
 done
 
+fi
+
+if check_selected 12 25; then
 # 12 — spec format ($M/TEMPLATE-SPEC.md; runs only when SPEC_FORMAT_CUTOFF is set in the conf).
 # Status header (first 5 unfenced lines) for every spec incl. nested spec/<sub>/ files. Tier-2 adds:
 # the canonical nine ## sections (exact, in order) · no empty section bodies (write "N/A — <why>") ·
@@ -2534,6 +2615,9 @@ if [ "$STAGED" = 0 ] && [ -z "$SPEC_FORMAT_CUTOFF" ]; then
   echo "memory-hygiene: check 25, the §2 reader-inventory arm, is DISARMED — SPEC_FORMAT_CUTOFF is blank, and check 25 grades check 12's selection, so it graded nothing. Declare SPEC_FORMAT_CUTOFF in .memory-tree.conf to arm it."
 fi
 
+fi
+
+if check_selected 13 14 15 16; then
 # 13-15 (pinned) + 16 (structural) — id + path corpus classification (delegates to the sibling classifier). ONE grammar and ONE
 # walk: this script owns the append-only and index sets and PRINTS them on demand; the classifier
 # owns the id grammar it imports from the recall kit. Neither transcribes the other. Every pin the
@@ -2553,6 +2637,9 @@ if [ "$STAGED" = 0 ]; then
   [ "$_idsrc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 13-16 $'\n'"$ids"
 fi
 
+fi
+
+if check_selected 17 18 19; then
 # 17-19 — the bug-class catalogue (delegates to the sibling module). The catalogue's INDEX is
 # generated, every class record declares a gate or says it has none, and a record whose anchors reach
 # only the append-only tree is reachable on paper and dead in practice.
@@ -2568,6 +2655,9 @@ if [ "$STAGED" = 0 ]; then
   [ "$_gotrc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 17-19 $'\n'"$got"
 fi
 
+fi
+
+if check_selected 20; then
 # 20 — the row documents' grammar, and id collisions INSIDE one file. Delegated for the same reason
 # 13-19 are: the assertion is a corpus walk with a pin, which is a Python job, and check-arms.py's
 # population is `*.sh` only, so the branches are armed by the module's own selftest.
@@ -2585,6 +2675,9 @@ if [ "$STAGED" = 0 ]; then
   fi
 fi
 
+fi
+
+if check_selected 27; then
 # 27 — a decision row or gotcha ADDED since the mainline merge-base that ranks as a near match of an
 # older record must name it, or carry a relation token. Delegated to row_grammar.py, the row
 # grammar's owner, for the reason 20 and 24 are (TOOL-cSpliceWarden-6), and ranked with the
@@ -2601,6 +2694,9 @@ if [ "$STAGED" = 0 ]; then
   fi
 fi
 
+fi
+
+if check_selected 28; then
 # 28 — a decision row or gotcha whose NORMALIZED text a record of another identity holds, one of the
 # holders added since the mainline merge-base: check 27's exact half (TOOL-aGraftedHelix-6).
 # Delegated to row_grammar.py for the reason 27 is, and full runs only for the same reason. The
@@ -2615,6 +2711,8 @@ if [ "$STAGED" = 0 ]; then
   fi
 fi
 
+fi
+
 # grandfather stale-line guards (a listed path that no longer exists fails).
 # One `git ls-files` + set lookups, NOT `git ls-files --error-unmatch` per path — git is a heavyweight
 # fork, so a long grandfather list was one spawn per line (~80s at adopter ic's 522 lines). Entries are
@@ -2622,14 +2720,19 @@ fi
 if [ -n "$LEGACY$DEBT" ]; then
   declare -A TRACKED_SET
   while IFS= read -r _l; do [ -n "$_l" ] && TRACKED_SET["$_l"]=1; done < <(git ls-files)
-  badL=$(printf '%s\n' "$LEGACY" | grep . | while IFS= read -r p; do [ -n "${TRACKED_SET[$p]+x}" ] || echo "$p"; done)
-  [ -n "$badL" ] && fail 5 "legacy-files.txt lists paths that no longer exist (stale-line guard):
+  if check_selected 5; then
+    badL=$(printf '%s\n' "$LEGACY" | grep . | while IFS= read -r p; do [ -n "${TRACKED_SET[$p]+x}" ] || echo "$p"; done)
+    [ -n "$badL" ] && fail 5 "legacy-files.txt lists paths that no longer exist (stale-line guard):
 $badL"
-  badD=$(printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do [ -n "${TRACKED_SET[$p]+x}" ] || echo "$p"; done)
-  [ -n "$badD" ] && fail 6 "curation-debt.txt lists paths that no longer exist (stale-line guard):
+  fi
+  if check_selected 6 7 8; then
+    badD=$(printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do [ -n "${TRACKED_SET[$p]+x}" ] || echo "$p"; done)
+    [ -n "$badD" ] && fail 6 "curation-debt.txt lists paths that no longer exist (stale-line guard):
 $badD"
+  fi
 fi
 
+if check_selected 6 7 8; then
 # curation-debt STALE-ENTRY guard, and the per-row report. Its sibling above grades whether a listed
 # path still EXISTS; this one grades whether it still HIDES anything, which is the question the
 # registry is actually about. Populated by `derive_waived` during checks 6, 7 and 8.
@@ -2676,6 +2779,9 @@ else
   [ "$STAGED" = 1 ] && printf 'memory-hygiene: the curation-debt stale-ENTRY guard and its per-row report are HELD under --staged — the selection is the staged set, so a listed file nobody staged would record nothing and read as stale\n'
 fi
 
+fi
+
+if check_selected 23; then
 # ---- 23: every acceptance criterion of a CLOSED Tier-2 unit is EVIDENCED or AMENDED.
 # ---- NUMBERED 22 IN THIS COMMENT UNTIL 2026-08-27, AND IT WAS NEVER 22. Every fail arm below
 # ---- says 23 and so does the pop_guard; 22 is the review-verdict vocabulary at `:610`, and
@@ -2948,6 +3054,8 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   fi
 fi
 
+fi
+
 # --- empty-population report (see pop_guard). Reported ONCE, after every check has run, so the
 # --- message names every disarmed selector instead of the first one. A tree that genuinely has no
 # --- builds yet is a real case: scaffold it, or set MEMORY_ROOT to the tree that has one.
@@ -2963,5 +3071,17 @@ fi
 # THE KEYS, numbered where one repeats, on the fd `--offenders` kept for them. Nothing else reaches it.
 if [ "$OFFENDERS" = 1 ]; then
   printf '%s' "$OFFENDER_KEYS" | awk 'NF { n[$0]++; print (n[$0] > 1 ? $0 "#" n[$0] : $0) }' >&3
+fi
+# THE LIVENESS LINE (TOOL-aSparedSpawn-7 S6), the third exit-0 channel the header names: what the
+# scoped run graded, sorted. A requested id no guard recorded exits 2, since its verdict would be silence.
+if [ -n "$ONLY" ]; then
+  _ran_sorted=$(printf '%s\n' $RAN | sort -un | tr '\n' ' '); _ran_sorted=${_ran_sorted% }
+  echo "HYGIENE --only $ONLY_SEL ran checks ${_ran_sorted:-none}"
+  for _o in $ONLY; do
+    case " $RAN " in
+      *" $_o "*) ;;
+      *) echo "HYGIENE --only: check $_o was requested and no guard for it ran, so its verdict would be silence"; exit 2 ;;
+    esac
+  done
 fi
 exit "$status"

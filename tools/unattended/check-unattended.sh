@@ -44,6 +44,11 @@
 # is entitled to both without setting an environment variable, and routing them through REPORT would
 # make them invisible on every bar run. TOOL-dDerivedDocket-3.
 #
+# FOUR: under ANY `--only`, one LIVENESS line on the default channel,
+# `check-unattended: --only <sel> ran checks <ran>; skipped <the rest>`, naming what the scoped run
+# graded and what it did not, so a scoped arm can never pass on silence. An unscoped run never
+# prints it. A requested check whose guard was never reached exits 2 after it. TOOL-aSparedSpawn-7.
+#
 # READ-ONLY, which is what lets it run on the bar. It writes nothing, renders nothing and derives
 # nothing: the run-state file's generated region is asserted EMPTY, because the unit list is derived
 # from the build README at read time and lives in no second place. The README's own freshness is the
@@ -136,23 +141,65 @@ CONF="$ROOT/.unattended.conf"
 # ---- freely - a later one reads a count an earlier one computed - so they are one unit until that
 # ---- is untangled, and pretending otherwise would hand back wrong verdicts rather than slow ones.
 # ----
+# ---- TOOL-aSparedSpawn-7: `--only core` runs that unit alone, and `--only <N>` runs one check
+# ---- numbered after the 28 region, the selectable N read off this file's own headers below and
+# ---- never typed. Each guarded block calls `check_selected`, which records what ran, and every
+# ---- `--only` prints the liveness line the header's FOURTH exception names. A number naming a core
+# ---- check and a post-28 header both (15) selects the post-28 block alone.
+# ----
 # ---- WHAT `--only 28` DOES AFTER THE REGION: every numbered check below it prints one announced
 # ---- skip naming itself, on the report channel, off the check headers themselves (see the guard
 # ---- that follows the 28 region). The parser below sits between a bare argv sentinel pair so that
 # ---- check 26 can join every flag it accepts to an arm in this leg's own suite. TOOL-dDerivedDocket-30.
-SCOPE=""
+SCOPE=""; ONLY=""; RAN=""
 # gov:argv-begin
 case "${1:-}" in
   "")            ;;
-  --only)        [ "${2:-}" = 28 ] || { echo "check-unattended: --only takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=only28 ;;
+  --only)        ONLY=${2:-}
+                 case "$ONLY" in
+                   28)   SCOPE=only28 ;;
+                   core) SCOPE=core ;;
+                   ""|*[!0-9]*) echo "check-unattended: --only takes core, 28 or one check numbered after the 28 region; checks 1-27 share state and are one unit, so '$ONLY' is refused"; exit 2 ;;
+                   *)    SCOPE=post ;;
+                 esac ;;
   --skip)        [ "${2:-}" = 28 ] || { echo "check-unattended: --skip takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=skip28 ;;
   --emit-ceiling) echo "check-unattended: --emit-ceiling is retired with UNDECLARED_WRITE_CEILING (TOOL-aWindowedPass-5) and refused (TOOL-dUnstuckLanding-17): check 23 grades the run this branch drives against a declared per-build budget, which is a policy and not a measurement, so there is no pin left to measure, and the fleet's count now appears on the 'check 23 fleet' line every run prints"; exit 2 ;;
-  *)             echo "check-unattended: unknown argument '${1}'; this leg takes [--only 28] or [--skip 28]"; exit 2 ;;
+  *)             echo "check-unattended: unknown argument '${1}'; this leg takes [--only core|28|<N>] or [--skip 28]"; exit 2 ;;
 esac
 # gov:argv-end
+# ---- THE CHECK HEADERS AFTER THE 28 REGION, read from the copy that is RUNNING, under `--only`
+# ---- only, so an unscoped run pays nothing for it (TOOL-dDerivedDocket-30 S2, F3; moved up here by
+# ---- TOOL-aSparedSpawn-7 so a `--only <N>` is refused before any check runs). A typed list goes
+# ---- quiet on the first check added after it. The anchor is the guard line that opens the
+# ---- post-28 branch, matched as a whole line, which is why the extractor's own source line -
+# ---- holding that text inside a longer one - cannot start the population early. A header spelled
+# ---- any other way is neither announced nor selectable, which is why every check after the region
+# ---- carries the one spelling this reads.
+_o28_self="$_LIB_DIR/${0##*/}"; _o28_nums=""
+if [ -n "$ONLY" ]; then
+  _o28_nums=$(awk -v a='if [ "$SCOPE" = only28 ] || [ "$SCOPE" = core ]; then' '
+      { ln = $0; sub(/\r$/, "", ln) }
+      ln == a { f = 1; next }
+      f && ln ~ /^# ---- check [0-9]+ / {
+        n = ln; sub(/^# ---- check /, "", n); sub(/[^0-9].*$/, "", n)
+        if (!(n in seen)) { seen[n] = 1; print n } }' "$_o28_self")
+  if [ "$SCOPE" = post ]; then
+    case " ${_o28_nums//$'\n'/ } " in
+      *" $ONLY "*) ;;
+      *) echo "check-unattended: --only $ONLY names no check header after the 28 region, and checks 1-27 share state and are one unit; this leg selects core, 28 or one of: ${_o28_nums//$'\n'/ }"; exit 2 ;;
+    esac
+  fi
+fi
 
 status=0
 fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
+# <ids…> -> 0 when the run is unscoped or any id is selected, and then EVERY id is recorded as ran,
+# because the block runs whole. Unscoped it is one builtin test, so the merge-bar run's spawn count
+# does not move. Called once per guarded block and never in a loop: a loop over an empty population
+# would never register its check, and the exit-2 refusal at the end of this file reads `RAN`.
+# TOOL-aSparedSpawn-7.
+check_selected() { [ -z "$ONLY" ] && return 0; local _cs
+  for _cs in "$@"; do case " $ONLY " in *" $_cs "*) RAN="$RAN $*"; return 0 ;; esac; done; return 1; }
 
 # DEFINED HERE, ABOVE ITS FIRST CALLER, and that placement is the whole point. It used to sit 200
 # lines below the review-loop check that calls it, so at call time it was not a function yet: bash
@@ -325,7 +372,77 @@ report() { [ "$REPORT" = 1 ] && printf 'unattended-report: %s\n' "$1"; return 0;
 # descriptor, so the one place a reader can see which outputs checks 23 and 38 forgive is this line.
 report "GENERATED_INDEXES resolved to: ${GENERATED_INDEXES:-nothing} - the kits' [[generated]] rows first, then the conf's additions"
 
-if [ "$SCOPE" != only28 ]; then
+# ---- THE PRODUCERS A SCOPED RUN STILL NEEDS, above the core guard (TOOL-aSparedSpawn-7 S3). Each
+# ---- was audited as a name assigned in the core region and read after the 28 region, where a
+# ---- `--only <N>` run would read it unset (`set -u` ends the leg) or initialised empty (a silent
+# ---- skip of that check's walk). Pure computation, no verdict: the refusals that grade these
+# ---- values stay in the core region, and the unscoped run computes each exactly once, as before.
+# ---- The bulk-git warm-ups and the per-record facts stay inside the guard: nothing after it reads them.
+# The kit's CORE sets, read from the driver — the single source. Parsed rather than sourced, because
+# sourcing a script whose tail runs a verb would run the verb.
+# Pure bash for the same reason as the accessors below: this runs three times per leg invocation and
+# cost two processes each. Semantics preserved exactly — the line must be `KEY="…"` with only
+# whitespace after the closing quote, the first such line wins, and anything else (no quotes, a
+# truncated line) yields the empty string, which is the state check 1 refuses by name.
+# ONE PASS, NOT ONE PER KEY (TOOL-aSparedSpawn-8 S2). A per-call `read` loop over the 13k-line driver
+# cost about a third of a second a key, and twenty-odd keys are read per leg run. One `awk` reads
+# every constant into two arrays instead: `_CORE` holds each `KEY="value"` line and `_BARE` each
+# `KEY=<digits>` line, after the same CR and trailing-whitespace strip, the FIRST match winning in
+# both, so `core_of` and `read_bare_const` below are lookups. An absent key reads empty, as before.
+# Each reader prints its answer and leaves it in a fixed global, `_core_of` or `_bare_const`, the
+# convention `normpath` set in the kit library, so a caller reads it without forking a subshell.
+declare -gA _CORE=() _BARE=()
+mapfile -t _consts < <(awk '
+  { sub(/\r$/, ""); sub(/[ \t]+$/, "") }
+  /^[A-Za-z_][A-Za-z0-9_]*="/ {
+    k = $0; sub(/=.*/, "", k); v = substr($0, length(k) + 3)
+    if (v != "" && substr(v, length(v)) == "\"") print "Q" k "=" substr(v, 1, length(v) - 1)
+    next
+  }
+  /^[A-Za-z_][A-Za-z0-9_]*=[0-9]+$/ { k = $0; sub(/=.*/, "", k); print "B" k "=" substr($0, length(k) + 2) }
+' "$DRIVER")
+for _cr in "${_consts[@]}"; do
+  _ck=${_cr#?}; _ck=${_ck%%=*}; _cv=${_cr#*=}
+  case "$_cr" in
+    Q*) [ -n "${_CORE[$_ck]+x}" ] || _CORE[$_ck]=$_cv ;;
+    B*) [ -n "${_BARE[$_ck]+x}" ] || _BARE[$_ck]=$_cv ;;
+  esac
+done
+unset _consts _cr _ck _cv
+core_of() { # KEY  ->  the quoted value from $DRIVER, printed and left in `_core_of`
+  _core_of=${_CORE[$1]-}
+  [ -z "${_CORE[$1]+x}" ] || printf '%s\n' "$_core_of"
+  return 0
+}
+core_of PHASES_CORE >/dev/null; PHASES_CORE=$_core_of
+core_of DOD_CORE >/dev/null; DOD_CORE=$_core_of
+core_of DIRECTIVES_CORE >/dev/null; DIRECTIVES_CORE=$_core_of
+core_of PHASES_TERMINAL >/dev/null; PHASES_TERMINAL=$_core_of
+# The kit-relative install dir, read by checks 47 and 48 to list this kit's tracked files.
+KITREL=${HERE#"$(cd "$ROOT" && pwd)"/}
+PREFIX=${KITREL%/*}; [ "$PREFIX" = "$KITREL" ] && PREFIX="" || PREFIX="$PREFIX/"
+# The directive registry, split once into `core`, `corescope` and `coresec`; check 16's region
+# below says why there are three lists. Check 31 reads `core` under `--only 31`.
+core=""; corescope=""; coresec=""
+for _de in $DIRECTIVES_CORE $DIRECTIVES_EXTRA; do
+  _dh=${_de%%:*}; _dr=${_de#*:}; _ds=${_dr%%:*}; _dc=${_dr#*:}
+  [ "$_dc" = "$_dr" ] && _dc=all
+  core="$core$_dh:$_ds
+"
+done
+for _de in $DIRECTIVES_CORE; do
+  _dh=${_de%%:*}; _dr=${_de#*:}; _ds=${_dr%%:*}; _dc=${_dr#*:}
+  [ "$_dc" = "$_dr" ] && _dc=all
+  corescope="$corescope$_dh:$_dc
+"
+  coresec="$coresec$_dh:$_ds
+"
+done
+core=$(printf '%s' "$core" | grep . | sort -u)
+corescope=$(printf '%s' "$corescope" | grep . | sort -u)
+coresec=$(printf '%s' "$coresec" | grep . | sort -u)
+
+if check_selected core; then
 
 
 # ====================================================================== bulk git, warmed once
@@ -465,46 +582,7 @@ for k in LANDER BYPASS_BAN GATE_CMD WIRING_CHECK KEEPALIVE_CREATE KEEPALIVE_DELE
   [ -n "$v" ] || fail 1 "a required key is undeclared in .unattended.conf, and an undeclared value is not a defaulted one: $k"
 done
 
-# The kit's CORE sets, read from the driver — the single source. Parsed rather than sourced, because
-# sourcing a script whose tail runs a verb would run the verb.
-# Pure bash for the same reason as the accessors below: this runs three times per leg invocation and
-# cost two processes each. Semantics preserved exactly — the line must be `KEY="…"` with only
-# whitespace after the closing quote, the first such line wins, and anything else (no quotes, a
-# truncated line) yields the empty string, which is the state check 1 refuses by name.
-# ONE PASS, NOT ONE PER KEY (TOOL-aSparedSpawn-8 S2). A per-call `read` loop over the 13k-line driver
-# cost about a third of a second a key, and twenty-odd keys are read per leg run. One `awk` reads
-# every constant into two arrays instead: `_CORE` holds each `KEY="value"` line and `_BARE` each
-# `KEY=<digits>` line, after the same CR and trailing-whitespace strip, the FIRST match winning in
-# both, so `core_of` and `read_bare_const` below are lookups. An absent key reads empty, as before.
-# Each reader prints its answer and leaves it in a fixed global, `_core_of` or `_bare_const`, the
-# convention `normpath` set in the kit library, so a caller reads it without forking a subshell.
-declare -gA _CORE=() _BARE=()
-mapfile -t _consts < <(awk '
-  { sub(/\r$/, ""); sub(/[ \t]+$/, "") }
-  /^[A-Za-z_][A-Za-z0-9_]*="/ {
-    k = $0; sub(/=.*/, "", k); v = substr($0, length(k) + 3)
-    if (v != "" && substr(v, length(v)) == "\"") print "Q" k "=" substr(v, 1, length(v) - 1)
-    next
-  }
-  /^[A-Za-z_][A-Za-z0-9_]*=[0-9]+$/ { k = $0; sub(/=.*/, "", k); print "B" k "=" substr($0, length(k) + 2) }
-' "$DRIVER")
-for _cr in "${_consts[@]}"; do
-  _ck=${_cr#?}; _ck=${_ck%%=*}; _cv=${_cr#*=}
-  case "$_cr" in
-    Q*) [ -n "${_CORE[$_ck]+x}" ] || _CORE[$_ck]=$_cv ;;
-    B*) [ -n "${_BARE[$_ck]+x}" ] || _BARE[$_ck]=$_cv ;;
-  esac
-done
-unset _consts _cr _ck _cv
-core_of() { # KEY  ->  the quoted value from $DRIVER, printed and left in `_core_of`
-  _core_of=${_CORE[$1]-}
-  [ -z "${_CORE[$1]+x}" ] || printf '%s\n' "$_core_of"
-  return 0
-}
-core_of PHASES_CORE >/dev/null; PHASES_CORE=$_core_of
-core_of DOD_CORE >/dev/null; DOD_CORE=$_core_of
-core_of DIRECTIVES_CORE >/dev/null; DIRECTIVES_CORE=$_core_of
-core_of PHASES_TERMINAL >/dev/null; PHASES_TERMINAL=$_core_of
+# The driver-constant parse and the core sets it fills run ABOVE the core guard now (TOOL-aSparedSpawn-7).
 # TOOL-aPromptedMandate-2 - the pass-kind subset, read the SAME way as every other core set, so
 # the leg never carries a second spelling of a driver declaration.
 core_of PHASES_PASSKIND >/dev/null; PHASES_PASSKIND=$_core_of
@@ -3073,8 +3151,7 @@ SHIP="$HERE/PROTOCOL.template.md"
 LIVEDOC="$M/guides/UNATTENDED-PROTOCOL.md"
 VERBSHIP="$HERE/VERBS.template.md"
 VERBDOC="$M/guides/UNATTENDED-VERBS.md"
-KITREL=${HERE#"$(cd "$ROOT" && pwd)"/}
-PREFIX=${KITREL%/*}; [ "$PREFIX" = "$KITREL" ] && PREFIX="" || PREFIX="$PREFIX/"
+# KITREL and PREFIX are computed ABOVE the core guard now (TOOL-aSparedSpawn-7): checks 47 and 48 read KITREL.
 # ---- TWO PAIRS as of TOOL-dFoldedVerdict-5, iterated rather than copied. The second exists because
 # ---- the protocol had reached its byte cap EXACTLY and section 7 moved out to make the contract
 # ---- amendable again. A ROW here and not a new check number: this check already carries the
@@ -3410,24 +3487,7 @@ tmpl="$HERE/SKILL.template.md"
 # knob then got a permanent `fail 16` on a rendered carrier they cannot edit, because the
 # memory-tree kit ships BUILD-METHOD.md with `role = "rendered"` and the doc-parity leg
 # byte-compares it. No route to green, on an unguarded merge-bar leg. Closing-review F3.
-core=""; corescope=""; coresec=""
-for _de in $DIRECTIVES_CORE $DIRECTIVES_EXTRA; do
-  _dh=${_de%%:*}; _dr=${_de#*:}; _ds=${_dr%%:*}; _dc=${_dr#*:}
-  [ "$_dc" = "$_dr" ] && _dc=all
-  core="$core$_dh:$_ds
-"
-done
-for _de in $DIRECTIVES_CORE; do
-  _dh=${_de%%:*}; _dr=${_de#*:}; _ds=${_dr%%:*}; _dc=${_dr#*:}
-  [ "$_dc" = "$_dr" ] && _dc=all
-  corescope="$corescope$_dh:$_dc
-"
-  coresec="$coresec$_dh:$_ds
-"
-done
-core=$(printf '%s' "$core" | grep . | sort -u)
-corescope=$(printf '%s' "$corescope" | grep . | sort -u)
-coresec=$(printf '%s' "$coresec" | grep . | sort -u)
+# The three lists are split ABOVE the core guard now (TOOL-aSparedSpawn-7): check 31 reads `core`.
 if [ ! -f "$tmpl" ]; then
   fail 16 "the kit ships no SKILL.template.md, so the directive table an agent reads cannot be joined to the registry it is supposed to mirror; a shipped kit always has one, so this is a broken install rather than a project choice"
 else
@@ -4849,7 +4909,7 @@ case " $_fr_keys " in *" phase "*) ;; *) fail 36 "the run-state key derivation f
 # ---- The template arm below is what checks the answer.
 fi
 
-if [ "$SCOPE" != skip28 ]; then
+if [ "$SCOPE" != skip28 ] && check_selected 28; then
 dl_a=$(awk '/^declared_list\(\) \{/{f=1} f{print} f&&/^\}/{exit}' "$DRIVER")
 dl_b=$(awk '/^declared_list\(\) \{/{f=1} f{print} f&&/^\}/{exit}' "$HERE/check-playbook.sh" 2>/dev/null)
 # THE SCALAR SIBLING, on the same terms. Round 3, HIGH 6: `declared_list` was consolidated and
@@ -5426,22 +5486,18 @@ fi
 # ---- leg is announced off its own headers. The anchor is the guard line itself, matched as a whole
 # ---- line, which is why the extractor's own source line - holding that text inside a longer one -
 # ---- cannot start the population early. A header spelled any other way is not announced, which is
-# ---- why every check after the region carries the one spelling this reads.
-if [ "$SCOPE" = only28 ]; then
-  _o28_self="$_LIB_DIR/${0##*/}"
-  _o28_nums=$(awk -v a='if [ "$SCOPE" = only28 ]; then' '
-      { ln = $0; sub(/\r$/, "", ln) }
-      ln == a { f = 1; next }
-      f && ln ~ /^# ---- check [0-9]+ / {
-        n = ln; sub(/^# ---- check /, "", n); sub(/[^0-9].*$/, "", n)
-        if (!(n in seen)) { seen[n] = 1; print n } }' "$_o28_self")
+# ---- why every check after the region carries the one spelling this reads. The extractor runs in the
+# ---- argv block at the top now, so a `--only <N>` is refused before any check (TOOL-aSparedSpawn-7),
+# ---- and `--only core` announces its skips here in the same words.
+if [ "$SCOPE" = only28 ] || [ "$SCOPE" = core ]; then
   [ -n "$_o28_nums" ] \
-    || report "--only 28 read no check header after the 28 region, so no skip was announced and a check after it may be skipped in silence: $_o28_self"
+    || report "--only $ONLY read no check header after the 28 region, so no skip was announced and a check after it may be skipped in silence: $_o28_self"
   for _o28_n in $_o28_nums; do
-    report "check $_o28_n skipped under --only 28 — this run asked for the 28 region alone"
+    report "check $_o28_n skipped under --only $ONLY — this run asked for the $ONLY region alone"
   done
 else
 
+if check_selected 30; then
 # ---- check 30 - a --plan run may never claim terminality over a build it graded nothing on.
 # TOOL-dHonouredPark, closing review round 3. A CORPUS check rather than a fixture one, and
 # deliberately: the blocker it gates was live on FIVE tracked builds while every fixture arm in
@@ -5579,6 +5635,8 @@ $_pv_l" ;;
 fi
 
 
+fi
+if check_selected 31; then
 # ---- check 31 - the adopter whose ROUTE does not resolve is TOLD, on every bar. TOOL-aHoistedPass-9,
 # the gate-time half of ruling D4: `govkit apply` refuses the same gap at the act that CREATES it and
 # only for installs made after it lands, while this runs on every bar of every adopter forever -
@@ -5680,6 +5738,8 @@ else
 fi
 
 
+fi
+if check_selected 32; then
 # ---- check 32 - the kit holds ONE derivation of the sidecar root. TOOL-aWokenSentinel-11, the
 # left-shift of a spec-audit finding: two specs in one build were about to spell
 # `<git-dir>/unattended` twice, once as `resolve_sidecar_dir` and once inline, and a per-unit
@@ -5722,6 +5782,8 @@ _sd_calls=$(grep -cE '^[^#]*\$\(resolve_sidecar_dir\)' "$DRIVER" || true)
   || fail 32 "the kit must hold ONE derivation of the sidecar root — resolve_sidecar_dir, in lib-unattended.sh — and the driver must read every sidecar through it; a second 'rev-parse --git-dir' on a code line of the driver, the lib or the tick is a second spelling that drifts from the first, and zero is a reader with no derivation. code-line count: $_sd_n (lib: $_sd_in_lib), driver callers: $_sd_calls"
 
 
+fi
+if check_selected 33; then
 # ---- check 33 - no shell file in this kit counts a captured variable's lines by adding a newline
 # first. TOOL-aWokenSentinel-23, the left-shift of a spec-audit finding: a suite helper counted a
 # verb's stdout with `printf '%s\n' "$_o" | wc -l`, and `printf '%s\n'` on an EMPTY capture prints
@@ -5769,6 +5831,8 @@ _lc_hits=${_lc_hits%$'\n'}
 # ---- 39 AND 40 ARE THE TWO CHECKS TOOL-dDerivedDocket-4's spec and ledger call 32 and 33. main
 # ---- numbered aWokenSentinel's sidecar-root and line-count checks 32 and 33 first, and the
 # ---- reconcile merge of origin/main into this build kept main's numbers and moved this pair.
+fi
+if check_selected 39; then
 # ---- check 39 - EVERY READ OF THE `phase` FACT GOES THROUGH ONE OF THE TWO READERS (S8). Two readers, a
 # ---- call-site classification, and a structural arm that grades it — because a classification
 # ---- nothing enforces is a comment. The rules, stated once here and nowhere else:
@@ -5797,7 +5861,7 @@ PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_livenes
 # ---- matches, or the driver reads the fact in a spelling this check no longer sees and the routing
 # ---- is graded over no read at all. The awk prints its marker only after seeing both, so a driver
 # ---- it cannot open lands here too. This REPLACES a driver-is-absent guard that could never fire:
-# ---- check 1 refuses and EXITS on an unreadable driver before any check below it runs, so that
+# ---- the leg's first check refuses and EXITS on an unreadable driver before any check below it runs, so that
 # ---- branch was unreachable and the arm written for it never passed.
 _c39=$(PRF="$PHASE_RECORDED_FNS" awk '
     BEGIN { n = split(ENVIRON["PRF"], a, /[ \t]+/); for (i = 1; i <= n; i++) if (a[i] != "") allow[a[i]] = 1 }
@@ -5831,6 +5895,8 @@ case "$_c39" in
     fail 39 "a phase reader holds no read the classifier recognises, so its predicate no longer matches how the driver reads the fact and the routing below would be graded over no lines at all and would pass by finding nothing: $DRIVER" ;;
 esac
 
+fi
+if check_selected 40; then
 # ---- check 40 - A PHASE ANOTHER VERB PRODUCES IS NOT REACHABLE THROUGH `--phase`. Vocabulary membership is
 # ---- not permission: every literal phase a `set_fact … phase` site writes is a PRODUCER's, written
 # ---- with the facts that make it mean something, and a phase move into it would be that record with
@@ -5851,6 +5917,8 @@ if [ -f "$DRIVER" ]; then
     || fail 40 "a phase another verb PRODUCES is reachable through --phase, so one phase move would write that phase with none of the facts its producer writes beside it, and the verb that releases it would have nothing to read:$_c40"
 fi
 
+fi
+if check_selected 15; then
 # ---- check 15 - THE DATING SELF-SCAN, TOOL-dDerivedDocket-22 section 7. A FIRST-COMMIT DATE read with
 # ---- `--diff-filter=A` and no `--follow` anywhere in this kit's own shell. That spelling dates an
 # ---- archived record to the rotation that added its name, which moves a grandfathered record into a
@@ -5871,6 +5939,8 @@ _c15s=$(for _c15f in "$HERE"/*.sh; do
 [ -z "${_c15s//[[:space:]]/}" ] \
   || fail 15 "a first-commit DATE is read with --diff-filter=A and no --follow in this kit's own shell, so a rotation re-dates an archived record to the commit that added its name and a cutoff grades a record it was written to grandfather:$_c15s"
 
+fi
+if check_selected 41; then
 # ---- check 41 - A PROCESS NOT IN THE LEDGER IS NEVER KILLED, and both carriers an agent acts from SAY
 # ---- so. TOOL-dDerivedDocket-28 S8. One run found six abandoned processes whose command lines matched
 # ---- this kit's, five of them another repository's, and had to be parked because nothing told it
@@ -5894,6 +5964,8 @@ for _c41_f in "$HERE/STOPS.template.md" "$HERE/SKILL.template.md"; do
 done
 report "check 41 graded $_c41_n of 2 carriers of the process-ledger rule"
 
+fi
+if check_selected 42; then
 # ---- check 42 - THE UNATTENDED BAR'S WALL CLEARS THE LARGEST LEG CEILING. TOOL-dDerivedDocket-27 S6.
 # ---- The wall is hand-set by owner ruling D12-i7, and this is the check that keeps a hand-set wall
 # ---- honest: a wall below the largest declared leg ceiling fires on a healthy bar that dispatches
@@ -5945,6 +6017,8 @@ else
   fi
 fi
 
+fi
+if check_selected 43; then
 # ---- check 43 - THE SKILL ROUTES A `hold ·` LINE TO A HOLD, in the order `--hold` accepts it.
 # ---- TOOL-dDerivedDocket-27 S7. `gates-green` NAMES a hold and never takes one, because `--hold` needs a
 # ---- committed tree and a reaped keepalive that a close which has just failed an item cannot have. So
@@ -5993,6 +6067,8 @@ else
   fi
 fi
 
+fi
+if check_selected 47; then
 # ---- check 47 - NO SHIPPED FILE OF THIS KIT STATES A RETIRED PREMISE, read off a table of two rows.
 # ---- ROW 1, TOOL-dAlignedCarrier-1 closing TOOL-dDerivedDocket-74: the premise said the driver's verbs
 # ---- never make a commit, and it stopped being true when `--close` began committing its own records
@@ -6084,6 +6160,7 @@ else
   [ -z "$_c47_hits" ] || fail 47 "a shipped file of this kit states the retired premise that the landing's close is where the owed flagged bar is told, but since TOOL-dAlignedCarrier-6 the move into VERIFYING announces it under every LANDER_MODE and the close says nothing, so a reader who trusts the sentence waits at the close for a notice that never comes; reword it to name the move into VERIFYING. matches: $_c47_hits"
 fi
 
+fi
 # ---- check 48 - NO FUNCTION WRITES A RUN-STATE FACT AFTER ITS LAST STAGE OF THAT FILE.
 # ---- TOOL-dAlignedCarrier-6, from its closing review's M1. `--phase` staged the record between its
 # ---- phase write and its witness write, so the index paired the new phase with the previous witness
@@ -6114,6 +6191,7 @@ _c48_files=()
 while IFS= read -r _c48_p; do
   case "$_c48_p" in *.sh) [ -f "$_c48_p" ] && _c48_files+=("$_c48_p") ;; esac
 done < <(GIT ls-files -- "$KITREL" 2>/dev/null)
+if check_selected 48; then
 if [ "${#_c48_files[@]}" -eq 0 ]; then
   report "check 48 did not grade this kit's shell files for a fact written after its last stage - ls-files listed none under $KITREL"
 else
@@ -6161,6 +6239,8 @@ else
   [ -z "$_c48_hits" ] || fail 48 "a function in a shipped shell file of this kit writes a run-state fact after its last staging of that same file, so the index holds the file as it was before that write and the write stays unstaged: a commit of what the verb staged records half of it and leaves the tree dirty; stage after the last write. matches: $_c48_hits"
 fi
 
+fi
+if check_selected 49; then
 # ---- check 49 - EVERY LANDING_NODES TOKEN IS A PAIR, AND NO TAG OR NODE IS DECLARED TWICE.
 # ---- TOOL-dUnstuckLanding-20 S6 (F4). The driver resolves the node holding a run against this key at
 # ---- the pinned BASE, and a malformed token never matches, so a typo makes that node hand off on every
@@ -6181,6 +6261,8 @@ else
   fi
 fi
 
+fi
+if check_selected 50; then
 # ---- check 50 - THE DRIVER READS THE POLICY FILE THE PRE-PUSH HOOK READS. Implementation review
 # ---- round 2, hunt item 3, on TOOL-dUnstuckLanding-16's fold: a conf naming no policy file makes the
 # ---- driver read the hook's own file at R, and the driver spells that path beside the hook's
@@ -6202,6 +6284,8 @@ else
   fi
 fi
 
+fi
+if check_selected 51; then
 # ---- check 51 - A FUNCTION THAT WRITES A TERMINAL PHASE WRITES THE RUN CLAIM TOO. TOOL-aGraftedHelix-31,
 # ---- from the closing review's H3: `--settle` arrived by a merge, wrote LANDED and never the claim,
 # ---- so a settled hand-off stayed `held` on the remote, which never ages, and the slug's next run was
@@ -6300,7 +6384,23 @@ else
     || fail 51 "a function in a shipped shell file of this kit writes a terminal phase and no run claim, so the run it ends leaves its claim on the remote reading live or held, a held claim never ages, and the slug's next --preflight is refused at check 107 by a claim nobody releases; write the claim with write_claim after the record is staged, or name the function on TERMINAL_CLAIM_EXEMPT_FNS with its reason:$_c51_hits"
 fi
 
+fi
 fi   # ---- end of the checks `--only 28` skips
 
 
+# ---- THE LIVENESS LINE (TOOL-aSparedSpawn-7 S4, the header's FOURTH exception). Under any `--only`,
+# ---- the selectable set in order - core, 28, then the post-28 headers numerically - split into what
+# ---- a guard recorded as ran and what it did not. A requested check no guard recorded exits 2: its
+# ---- verdict would otherwise be silence, which reads exactly like a pass.
+if [ -n "$ONLY" ]; then
+  _lv_ran=""; _lv_skip=""
+  for _lv in core 28 $(printf '%s\n' $_o28_nums | sort -n); do
+    case " $RAN " in *" $_lv "*) _lv_ran="$_lv_ran $_lv" ;; *) _lv_skip="$_lv_skip $_lv" ;; esac
+  done
+  echo "check-unattended: --only $ONLY ran checks${_lv_ran:- none}; skipped${_lv_skip:- none}"
+  case " $RAN " in
+    *" $ONLY "*) ;;
+    *) echo "check-unattended: check $ONLY was requested and no guard for it ran, so its verdict would be silence"; exit 2 ;;
+  esac
+fi
 exit "$status"

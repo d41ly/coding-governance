@@ -1047,6 +1047,24 @@ lineno()  { grep -nF "$1" <<<"$out" | head -1 | cut -d: -f1; }
 before()  { local a b; n=$((n+1)); a=$(lineno "$1"); b=$(lineno "$2")
             { [ -n "$a" ] && [ -n "$b" ] && [ "$a" -lt "$b" ]; } \
               || { echo "FAIL expected [$1] before [$2] (got '$a' vs '$b')"; st=1; }; }
+# ONE SCOPED RUN, its liveness asserted (TOOL-aSparedSpawn-7 S8). Leaves the output in `sout` and the
+# exit in `src`, never in `out`, which the main block's arms read. Counts one assertion per requested
+# id named among what RAN, plus one for the unreached-guard refusal being absent: a scoped arm reading
+# no liveness line would pass on silence, since a check that never ran prints what a clean one prints.
+run_scoped() { # comma selection
+  local _rs_l _rs_i
+  sout=$(bash "$SCRIPT" --only "$1" 2>/dev/null); src=$?
+  _rs_l=$(grep "^HYGIENE --only $1 ran checks " <<<"$sout" || true)
+  for _rs_i in ${1//,/ }; do
+    n=$((n+1))
+    case " ${_rs_l#*ran checks} " in
+      *" $_rs_i "*) ;;
+      *) echo "FAIL run_scoped $1: no liveness line naming check $_rs_i among the checks that ran"; st=1 ;;
+    esac
+  done
+  n=$((n+1)); grep -qF 'was requested and no guard for it ran' <<<"$sout" && { echo "FAIL run_scoped $1: a requested check's guard never ran"; st=1; }
+  return 0
+}
 
 hit  'tFixture-3.md (missing/invalid'
 # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
@@ -1075,6 +1093,43 @@ n=$((n+1)); printf '%s\n' "$offout" | awk -F'\t' 'NF != 2 || $1 !~ /^check [^ ]+
 n=$((n+1)); printf '%s\n' "$offout" | grep -qE ':[0-9]+(:|[[:space:]]|$)' && { echo "FAIL --offenders keyed an offender with its line locator"; st=1; }
 n=$((n+1)); printf '%s\n' "$offout" | grep -qF 'tFixture-3.md' || { echo "FAIL --offenders did not key the known check-12 offender tFixture-3.md"; st=1; }
 n=$((n+1)); printf '%s\n' "$offout" | grep -qF 'HYGIENE check' && { echo "FAIL --offenders let the default mode's prose through"; st=1; }
+# ---- TOOL-aSparedSpawn-7: `--only N[,M]`, over this same red tree. Every arm reads `sout`, never `out`.
+# ---- AC6: `--only 12` runs check 12's block, which grades check 25 too, and says so on one line.
+run_scoped 12
+n=$((n+1)); grep -qxF 'HYGIENE --only 12 ran checks 12 25' <<<"$sout" || { echo "FAIL --only 12 printed no exact liveness line naming 12 and 25"; st=1; }
+n=$((n+1)); grep -qF 'tFixture-3.md (missing/invalid' <<<"$sout" || { echo "FAIL --only 12 did not report the known check-12 offender tFixture-3.md"; st=1; }
+n=$((n+1)); grep -qE '^HYGIENE check (1|2|3|4|5|6|7|8|9|10|11|21|22|23) FAILED' <<<"$sout" && { echo "FAIL --only 12 printed a verdict of a check it did not select"; st=1; }
+# ...and with that block's guard staged two ways it exits 2 naming check 12: OUT of the file, so no
+# call carries 12 and the selector is refused before any check runs, and SHADOWED, so the call stays
+# and records nothing, which is the guard the selected path never registered.
+_hs_k=$(mktemp -d); cp -r "$HERE"/. "$_hs_k"/
+sed -i 's/^if check_selected 12 25; then$/if :; then/' "$_hs_k/check-memory-hygiene.sh"
+_hs_o=$(bash "$_hs_k/check-memory-hygiene.sh" --only 12 2>/dev/null); _hs_rc=$?
+n=$((n+1)); [ "$_hs_rc" = 2 ] || { echo "FAIL --only 12 with its guard staged out exited $_hs_rc, not 2"; st=1; }
+n=$((n+1)); grep -qF -- '--only names check 12, which no check_selected call in this script carries' <<<"$_hs_o" || { echo "FAIL --only 12 with its guard staged out did not name check 12"; st=1; }
+cp "$SCRIPT" "$_hs_k/check-memory-hygiene.sh"
+sed -i 's/^if check_selected 12 25; then$/check_selected() { return 1; }\nif check_selected 12 25; then/' "$_hs_k/check-memory-hygiene.sh"
+_hs_o=$(bash "$_hs_k/check-memory-hygiene.sh" --only 12 2>/dev/null); _hs_rc=$?
+n=$((n+1)); [ "$_hs_rc" = 2 ] || { echo "FAIL --only 12 with its guard shadowed exited $_hs_rc, not 2"; st=1; }
+n=$((n+1)); grep -qxF 'HYGIENE --only: check 12 was requested and no guard for it ran, so its verdict would be silence' <<<"$_hs_o" || { echo "FAIL --only 12 with its guard shadowed did not name check 12 as unreached"; st=1; }
+rm -rf "$_hs_k"
+# ---- AC7: `--only` beside any other argument, or naming an id no call carries, exits 2 and grades nothing.
+for _hs_a in "--only 12 --staged" "--staged --only 12" "--offenders --only 12" "--only 12 --print-index-set" "--only 99" "--only 12,x"; do
+  _hs_o=$(bash "$SCRIPT" $_hs_a 2>/dev/null); _hs_rc=$?
+  n=$((n+1)); [ "$_hs_rc" = 2 ] || { echo "FAIL [$_hs_a] exited $_hs_rc, not 2"; st=1; }
+  n=$((n+1)); grep -qF 'HYGIENE check' <<<"$_hs_o" && { echo "FAIL [$_hs_a] graded a check"; st=1; }
+done
+# ---- AC8: the PARTITION. Over this red tree the SET of lines the unscoped run printed (`out`, above)
+# ---- equals the union of the scoped runs' lines, liveness lines set aside, over one selection per
+# ---- `check_selected` call, named by its first id. The list is this suite's pin of the population.
+_hs_union=""
+for _hs_s in 1 2 3 4 5 6 9 10 11 12 13 17 20 21 22 23 24 26 27 28; do
+  run_scoped "$_hs_s"
+  _hs_union+=$(grep -v '^HYGIENE --only ' <<<"$sout" || true)$'\n'
+done
+n=$((n+1)); [ "$(printf '%s\n' "$_hs_union" | grep . | sort -u)" = "$(printf '%s\n' "$out" | grep . | sort -u)" ] \
+  || { echo "FAIL the scoped runs do not partition the unscoped run's lines:"; diff <(printf '%s\n' "$out" | grep . | sort -u) <(printf '%s\n' "$_hs_union" | grep . | sort -u) | head -20; st=1; }
+n=$((n+1)); grep -qF 'HYGIENE --only' <<<"$out" && { echo "FAIL the unscoped run printed a liveness line"; st=1; }
 # ---- check 22: the acceptance ledger (TOOL-dUnstalledConvoy-12).
 hit  'ARCH-tFixture-70/AC2'                    # numbered, unevidenced — the defect this exists for
 miss 'ARCH-tFixture-70/AC1'                    # ...and the evidenced sibling is silent
@@ -3820,7 +3875,10 @@ esac
 # never skipped, because that fixture needs no sibling kit.
 # RAISED 542 -> 552 by TOOL-aRoutedQuill-1: its ten Tier-1 micro-spec arms, each top-level and
 # never skipped, because that fixture needs no sibling kit.
-FLOOR_ASSERTIONS=552
+# RAISED 552 -> 613 by TOOL-aSparedSpawn-7: 97 % of the 63 `--only` assertions its main-block arms add,
+# counted by reading since the pass runs no suite (AC6's nine, AC7's twelve, the partition's forty-two),
+# none skipped. OWED: observed at VERIFYING.
+FLOOR_ASSERTIONS=613
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

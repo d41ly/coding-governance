@@ -1,11 +1,12 @@
 # TOOL-aSparedSpawn-7 — `--only` selectors for the unattended gate and the hygiene gate, each naming what ran
 
-**Status:** INPROGRESS · rev-2 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aSparedSpawn-7-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-7-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aSparedSpawn-7-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-7-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

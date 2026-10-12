@@ -391,6 +391,22 @@ reset_tree() {
   printf 'delete refs/heads/ahead\ndelete refs/heads/trunk\n' | git --git-dir="$ORIGIN" update-ref --stdin
 }
 run() { bash "$SCRIPT" 2>&1; }
+# ---- ONE SCOPED RUN, its liveness asserted (TOOL-aSparedSpawn-7 S8). Leaves `out` and `rc` set and
+# ---- counts two assertions: the liveness line names the selection among what RAN, and the
+# ---- unreached-guard refusal is absent. A scoped arm reading no liveness line would pass on silence,
+# ---- since a check that never ran prints exactly what a clean one prints.
+run_scoped() { # selection
+  local _rs_l _rs_r
+  out=$(bash "$SCRIPT" --only "$1" 2>&1); rc=$?
+  _rs_l=$(grep "^check-unattended: --only $1 ran checks " <<<"$out" || true)
+  _rs_r=${_rs_l#*ran checks}; _rs_r=${_rs_r%%;*}
+  n=$((n+1))
+  case " $_rs_r " in
+    *" $1 "*) ;;
+    *) echo "FAIL run_scoped $1: no liveness line naming it among the checks that ran"; st=1 ;;
+  esac
+  miss "$out" "was requested and no guard for it ran"
+}
 # THE WHOLE-OUTPUT GREEN CONTROLS GRADE "NOTHING ELSE PRINTED", NOT "NOTHING PRINTED". Checks 45 and
 # 46 announce the effective LANDER_MODE, RESUME_SCHEDULE and SELFTESTS_OWED_PATHS on the DEFAULT
 # channel by design (the checker's header, THREE), so a control comparing the whole output to empty
@@ -6259,11 +6275,59 @@ for o28 in 30 31 32 33 39 40 15 41 42 43; do
 done
 out=$(bash "$SCRIPT" --only 28 2>&1); rc=$?
 same "--only 28 without the report channel exits 0" "$rc" "0"
-same "--only 28 without the report channel prints nothing" "$out" ""
+# TOOL-aSparedSpawn-7 S4: without the report channel it prints ONE line, the liveness line.
+hit "$out" "check-unattended: --only 28 ran checks 28; skipped core "
+same "--only 28 without the report channel prints the liveness line alone" "${out%%$'\n'*}" "$out"
 # ...and the population is DERIVED: a header staged after the region is announced with no list edited.
 # 97 is a number no check of the leg uses.
-mutate $KIT_REL/check-unattended.sh '/^if \[ "\$SCOPE" = only28 \]; then$/a # ---- check 97 - a fixture header, staged after the 28 region'
+mutate $KIT_REL/check-unattended.sh '/^if \[ "\$SCOPE" = only28 \] || \[ "\$SCOPE" = core \]; then$/a # ---- check 97 - a fixture header, staged after the 28 region'
 hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" --only 28 2>&1)" "check 97 skipped under --only 28 — this run asked for the 28 region alone"
+# ==== TOOL-aSparedSpawn-7: `--only core` and `--only <N>`, each naming what ran ======================
+# ---- AC4: a selector naming no post-28 header, or no number at all, exits 2 before any check runs.
+reset_tree
+for _ss_v in 5 99 abc; do
+  out=$(bash "$SCRIPT" --only "$_ss_v" 2>&1); rc=$?
+  same "--only $_ss_v exits 2" "$rc" "2"
+  miss "$out" "UNATTENDED check"
+done
+hit "$out" "check-unattended: --only takes core, 28 or one check numbered after the 28 region; checks 1-27 share state and are one unit, so 'abc' is refused"
+hit "$(bash "$SCRIPT" --only 5 2>&1)" "check-unattended: --only 5 names no check header after the 28 region, and checks 1-27 share state and are one unit; this leg selects core, 28 or one of:"
+# ---- AC3: with check 30's guard staged out, `--only 30` reaches no `check_selected 30` and exits 2
+# ---- naming it, rather than reporting the silence of a check that never registered as clean.
+reset_tree
+mutate $KIT_REL/check-unattended.sh 's/^if check_selected 30; then$/if :; then/'
+out=$(bash "$SCRIPT" --only 30 2>&1); rc=$?
+same "--only 30 with its guard staged out exits 2" "$rc" "2"
+hit "$out" "check-unattended: check 30 was requested and no guard for it ran, so its verdict would be silence"
+# ---- AC8, AC2 and AC5: the PARTITION. Over the pristine fixture with one staged red in the 28 region
+# ---- (check 28's own scalar-parser arm) and one after it (check 39's allow-list), the SET of lines the
+# ---- unscoped run prints equals the union of the scoped runs' lines over every selection, liveness
+# ---- lines set aside. One comparison reads every check's lines, so a scoped run that drops or adds a
+# ---- verdict reds it whichever check it was. The selection list is this suite's pin of the population.
+# ---- `--only core` must name every post-28 check as skipped and print none of their failures (AC2),
+# ---- and the unscoped run prints no liveness line (AC5). Check 15 has a core half, so its failure
+# ---- line is not a negative here.
+reset_tree
+rm -f $KIT_REL/check-playbook.sh
+mutate $KIT_REL/check-unattended.sh 's/^PHASE_RECORDED_FNS="/PHASE_RECORDED_FNS="tNoSuchFn /'
+_ss_whole=$(bash "$SCRIPT" 2>&1)
+hit "$_ss_whole" "the declared-scalar parser is missing from one of the two scripts that inline it, so the comparison that keeps the copies one answer would pass over an empty pair - driver and leg follow:"
+hit "$_ss_whole" "the allow-list names tNoSuchFn(), which no longer calls read_recorded_phase()"
+miss "$_ss_whole" "check-unattended: --only"
+_ss_union=""
+for _ss_s in core 28 30 31 32 33 39 40 15 41 42 43 47 48 49 50 51; do
+  run_scoped "$_ss_s"
+  _ss_union+=$(grep -v '^check-unattended: --only ' <<<"$out" || true)$'\n'
+  if [ "$_ss_s" = core ]; then
+    _ss_skip=$(grep '^check-unattended: --only core ran checks ' <<<"$out" || true); _ss_skip=" ${_ss_skip#*; skipped} "
+    for _ss_n in 28 30 31 32 33 39 40 15 41 42 43 47 48 49 50 51; do
+      n=$((n+1)); case "$_ss_skip" in *" $_ss_n "*) ;; *) echo "FAIL --only core's liveness line does not name check $_ss_n as skipped"; st=1 ;; esac
+      [ "$_ss_n" = 15 ] || miss "$out" "UNATTENDED check $_ss_n FAILED"
+    done
+  fi
+done
+same "the scoped runs partition the unscoped run's lines" "$(printf '%s\n' "$_ss_union" | grep . | sort -u)" "$(printf '%s\n' "$_ss_whole" | grep . | sort -u)"
+reset_tree
 # ---- S6: the `--skip 28` smoke arm, the leg's other scope over the pristine fixture. It is also the
 # ---- GREEN CONTROL for every fixture below: the flag arm and the allow-list join read the pristine
 # ---- driver and leg without a finding, which is AC12's restored-verb half. Graded by what checks 22
@@ -6790,7 +6854,12 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- widening-repair block of region 8, so FLOOR_SHARD_8 carries the same +2 and the other seven
 # ---- are untouched. The block's old arm F, both ids in one group, is relabelled G. MEASURED on a
 # ---- slice of the prologue and arms A to G on node a, 2026-10-06; this pass runs no suite.
-FLOOR_ASSERTIONS=967
+# ---- RAISED 967 -> 1046 by TOOL-aSparedSpawn-7, 97 % of the 82 assertions its arms add in region 7,
+# ---- counted by reading, since the pass runs no suite: the `--only 28` arm's net one, AC4's eight,
+# ---- AC3's three and the partition's seventy (seventeen `run_scoped` calls at two each, the
+# ---- `--only core` skip loop's sixteen and fifteen, the staged reds' four and the final `same`).
+# ---- FLOOR_SHARD_7 carries the same +79 and the other seven are untouched. OWED: observed at VERIFYING.
+FLOOR_ASSERTIONS=1046
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
@@ -6801,7 +6870,7 @@ FLOOR_SHARD_3=128
 FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133
 FLOOR_SHARD_6=150
-FLOOR_SHARD_7=226
+FLOOR_SHARD_7=305
 FLOOR_SHARD_8=208
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
