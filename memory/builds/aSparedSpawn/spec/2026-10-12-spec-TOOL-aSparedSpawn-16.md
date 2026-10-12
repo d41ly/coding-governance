@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-16 — the closing review's mediums and lows, and the bar reds this build's diff carries
 
-**Status:** OPEN · rev-2 · 2026-10-12 · node a · Tier-2 · base f479ba42 · streams tooling · order 4
+**Status:** INPROGRESS · rev-2 · 2026-10-12 · node a · Tier-2 · base f479ba42 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
