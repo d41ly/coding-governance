@@ -2560,7 +2560,7 @@ def check_roles_default() -> None:
         derive_listed_role(x) == "project-owned" for x in tests), str({x: derive_listed_role(x) for x in tests}))
 
 
-def check_roles_install(tmp: pathlib.Path, charter: bool = True) -> None:
+def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = False) -> None:
     """TOOL-aOrientedCast-8 S10, AC4 and AC6: a DEFAULT apply into a scratch target renders the roles
     kit — the role index, nine agent types, ten seeded house overlays and the `/build` Skill — its
     `--check` reads fresh, and the target's own wiring checker reads `ok` for roles, then `UNWIRED`
@@ -2568,10 +2568,29 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True) -> None:
     as `CHARTER`, copied from gov's own `AGENTS.md`, because the shape lands the playbook elsewhere.
     With `charter=False` it holds none, and this asserts AC13 instead: the apply still exits 0 through
     the adopter's accepted exit 3, the Skill alone is rendered, and check-wiring names the doc.
+    With `runner=True` (TOOL-aOrientedCast-13 AC4) the deploy text also carries a `[gate_runner]`
+    built from the run-gates kit's `[gate_runner_seed]`, so the apply writes the target's own gate
+    manifest, which holds no lexicon leg; the seed policy's optional lexicon grant must then leave
+    the adopter's `--check` and the target's `check_roles.py` at exit 0, the latter with a note.
     WHAT THIS DOES NOT CHECK: the rendered bytes, which the kit's own legs grade, or an update's
     re-render, which the update-safety arms own."""
-    t = make_target(pathlib.Path(tmp) / ("roles-default" if charter else "roles-no-doc"),
-                    DEPLOY_REGISTRY_DEFAULT)
+    deploy = DEPLOY_REGISTRY_DEFAULT
+    manifest = None
+    if runner:
+        import tomllib  # noqa: PLC0415
+        seed = tomllib.loads((KIT_DIRS["run-gates"] / "kit.toml").read_text(encoding="utf-8"))["gate_runner_seed"]
+        # Resolved and written as govkit's intake writes it: a list is a TOML array, a scalar quoted.
+        lines = ["", "[gate_runner]"]
+        for k, v in seed.items():
+            vals = v if isinstance(v, list) else [v]
+            vals = [x.replace("{prefix}", PFX[:-1]).replace("{kit}", PFX + KIT_NAMES["run-gates"])
+                    for x in vals]
+            manifest = vals[0] if k == "file" else manifest
+            lines.append('%s = %s' % (k, "[" + ", ".join('"%s"' % x for x in vals) + "]"
+                                      if isinstance(v, list) else '"%s"' % vals[0]))
+        deploy = DEPLOY_REGISTRY_DEFAULT.rstrip("\n") + "\n" + "\n".join(lines) + "\n"
+    t = make_target(pathlib.Path(tmp) / ("roles-runner" if runner else "roles-default" if charter
+                                         else "roles-no-doc"), deploy)
     # The seed's CHARTER, read from the memory-tree kit's own conf example rather than typed.
     doc = _re.findall(r'^CHARTER="?([^"\n]*)"?', (KIT_DIRS["memory-tree"] / ".memory-tree.conf.example")
                       .read_text(encoding="utf-8"), _re.M)[-1]
@@ -2612,6 +2631,18 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True) -> None:
                         capture_output=True, text=True, encoding="utf-8", errors="replace")
     check("OC8 AC4 the target's adopter --check reads its render fresh", ck.returncode == 0,
           ck.stdout + ck.stderr)
+    if runner:
+        mf = t / (manifest or "")
+        held = [x.get("name") for x in json.loads(mf.read_text(encoding="utf-8"))] if mf.is_file() else None
+        check("OC13 AC4 the runner apply writes the target's own gate manifest, holding no lexicon leg",
+              held is not None and "lexicon naming predicates" not in held, str(held))
+        check("OC13 AC4 ...and the adopter's --check exits 0 over the seed's optional lexicon grant",
+              ck.returncode == 0, ck.stdout + ck.stderr)
+        cr = subprocess.run([sys.executable, str(kit / "check_roles.py")], cwd=str(t), capture_output=True,
+                            text=True, encoding="utf-8", errors="replace")
+        check("OC13 AC4 ...and check_roles.py exits 0 with a note naming the lexicon leg",
+              cr.returncode == 0 and any(ln.startswith("roles: note:") and "lexicon naming predicates" in ln
+                                         for ln in cr.stdout.splitlines()), cr.stdout + cr.stderr)
     cw = t / PFX / "check-wiring.sh"
 
     def run_wiring():
@@ -6299,6 +6330,7 @@ user_skills = "/tmp/gk-fake-skills"
             check_roles_default()
             check_roles_install(tmp3)
             check_roles_install(tmp3, charter=False)
+            check_roles_install(tmp3, runner=True)
 
             # AN ACCEPTED STOP IS NOT A FAILURE. `memory-tree` seeds the conf and stops by design, so
             # every correct first install exits 1 there; calling that a failure made a default-selection

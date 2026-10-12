@@ -33,7 +33,9 @@ touching nothing else, then grades as usual.
       workflow with no stages, or a stage key that workflow does not hold; under `[gates]`, a key
       naming no role file or an `agent: false` role, a value that is not a list of strings, or a
       leg name the tool root's gate manifest does not hold, checked only when that manifest reads
-      and a `roles: note:` otherwise (TOOL-aOrientedCast-11)
+      and a `roles: note:` otherwise (TOOL-aOrientedCast-11); a name ending in `?` is optional, so
+      a leg the manifest lacks is a `roles: note:` too, and a `?` alone names no leg
+      (TOOL-aOrientedCast-13)
 
 WHAT THIS DOES NOT CHECK, because a structural check reads as a semantic one to everybody who did not
 write it: the MEANING of a body; the truth of an `enforced-by` entry; a `tools:` name, which moves

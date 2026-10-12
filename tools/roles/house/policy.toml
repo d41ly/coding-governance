@@ -23,5 +23,6 @@ skeptic = "medium"
 synthesis = "medium"
 
 [gates]                       # the gate legs a role may run, by manifest name; every other role runs none
-gov-spec-writer = ["memory hygiene", "lexicon naming predicates"]
-gov-builder = ["lexicon naming predicates"]
+# A trailing `?` marks a leg whose kit a target may not install: absent from the manifest, it is a note.
+gov-spec-writer = ["memory hygiene", "lexicon naming predicates?"]
+gov-builder = ["lexicon naming predicates?"]

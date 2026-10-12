@@ -88,7 +88,10 @@ effort is the owner's setting, which no file here reaches.
 may run, by their name in the tool root's `gate-legs.json`; every other role runs none, because gates
 are the main session's at the merge or push threshold. `load_policy` refuses a key naming no role
 file or an `agent: false` role, a value that is not a list of strings, and a name the manifest holds
-no leg for, which it checks only when the manifest reads. `render_agents.py` writes each role's list
+no leg for, which it checks only when the manifest reads. A name ending in `?` is optional
+(TOOL-aOrientedCast-13): a leg the manifest lacks is then a note rather than a refusal, for a leg
+whose kit a target may not install, and the `?` is taken off before anything reads the name; a bare
+name still refuses, so a misspelt required leg is caught. `render_agents.py` writes each role's list
 into the index as `gates`, empty where this table names none, and the manifest's path as
 `gates.manifest`; the hooks kit's scratch guard reads both and refuses a role agent any other gate.
 An adopter that received this file before the table existed gains it only by its own edit, and until

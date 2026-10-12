@@ -217,6 +217,8 @@ def load_policy(kit_dir, roles, workflows, notes=None):
     `[gates]` (TOOL-aOrientedCast-11) maps a role slot whose `agent` is true to the gate legs it may
     run, by name. A name is checked against the tool root's gate manifest only when that manifest
     reads; when it does not, one line is appended to `notes` (when given) instead of a defect.
+    A name ending in `?` is OPTIONAL (TOOL-aOrientedCast-13): a leg the manifest lacks is a note
+    rather than a defect, and the returned policy carries every name with its `?` taken off.
     """
     path = pathlib.Path(kit_dir) / "house" / "policy.toml"
     where = path.as_posix()
@@ -301,13 +303,22 @@ def load_policy(kit_dir, roles, workflows, notes=None):
             bad.append("%s: R12 — %s — is not a list of strings" % (where, key))
             continue
         for n in names:
-            if legs is not None and n not in legs:
-                bad.append("%s: R12 — %s — %r names no leg of %s" % (where, key, n, manifest))
+            leg = n[:-1] if n.endswith("?") else n
+            if not leg:
+                bad.append("%s: R12 — %s — %r names no leg" % (where, key, n))
+            elif legs is not None and leg not in legs:
+                if leg == n:
+                    bad.append("%s: R12 — %s — %r names no leg of %s" % (where, key, n, manifest))
+                elif notes is not None:
+                    notes.append("%s holds no leg '%s', which gates.%s marks optional, so %s is "
+                                 "granted no such leg here" % (manifest, leg, slot, slot))
     if gates and legs is None and notes is not None:
         notes.append("%s cannot be read, so the leg names under [gates] in %s are not checked"
                      % (manifest, where))
     if bad:
         raise RolesError("\n".join(bad))
+    for slot in gates:
+        gates[slot] = [n[:-1] if n.endswith("?") else n for n in gates[slot]]
     return data
 
 

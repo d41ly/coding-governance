@@ -449,6 +449,18 @@ def run_selftest():
         check_arm(state, 12, rc == 2 and "gates.r-one" in err.getvalue() and "'nope'" in err.getvalue(),
                   "a leg name the manifest does not hold exited %d without naming it" % rc)
         check_arm(state, 12, index_path.read_bytes() == good, "a refused leg name wrote the index")
+        (kit / "house" / "policy.toml").write_text(
+            FIXTURE_POLICY + '\n[gates]\nr-one = ["leg a", "absent?"]\n', encoding="utf-8")
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            rc = run_mode("write", kit, tool_root, root)
+        index = json.loads(index_path.read_bytes()) if index_path.is_file() else {}
+        held = index.get("roles", {}).get("r-one", {}).get("gates")
+        check_arm(state, 13, rc == 0 and "render_agents: note" in out.getvalue()
+                  and "'absent'" in out.getvalue(),
+                  "an optional leg the manifest lacks exited %d without a note naming it" % rc)
+        check_arm(state, 13, held == ["leg a", "absent"],
+                  "r-one's index gates are %r, not the two leg names with the ? taken off" % held)
     for line in state["fail"]:
         print("render_agents selftest: FAIL %s" % line)
     print("%s (%d assertions)" % ("FAIL" if state["fail"] else "PASS", state["n"]))

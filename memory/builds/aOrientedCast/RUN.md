@@ -119,3 +119,7 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-12T16:35:45Z brief · item TOOL-aOrientedCast-12 · reason 8fe392978328 memory/builds/aOrientedCast/prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md
 
 2026-10-12T17:16:02Z dispatch · item 63c41b71 TOOL-aOrientedCast-12 · reason tools/run-gates/selftest-budgets.txt tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/run-gates/run-gates.sh tools/run-gates/README.md memory/guides/SESSION-KICKOFF.md memory/builds/aOrientedCast/spec/2026-10-12-spec-TOOL-aOrientedCast-12.md memory/builds/aOrientedCast/build/2026-10-12-build-TOOL-aOrientedCast-12-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-12T17:41:02Z dispatch · item f289b2be TOOL-aOrientedCast-13 · reason tools/roles/roles_lib.py tools/roles/house/policy.toml tools/roles/render_agents.py tools/roles/check_roles.py tools/roles/README.md tools/govkit/selftest.py memory/builds/aOrientedCast/spec/2026-10-12-spec-TOOL-aOrientedCast-13.md memory/builds/aOrientedCast/build/2026-10-12-build-TOOL-aOrientedCast-13-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-12T17:41:20Z brief · item TOOL-aOrientedCast-13 · reason 8fe392978328 memory/builds/aOrientedCast/prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md
