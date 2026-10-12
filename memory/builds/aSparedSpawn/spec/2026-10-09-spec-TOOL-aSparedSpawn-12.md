@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-12 — the held self-test tier, selected by the kit whose shipped bytes moved
 
-**Status:** INPROGRESS · rev-2 · 2026-10-10 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -39,11 +39,19 @@ Definition-of-Done runs; the owner ruled it stays off the push boundary (§8 F1)
   `EPOCH_ROLES` names, plus the suite file itself. The owner is the govkit entry whose `shipped`
   rows carry the suite file. A leg with no such entry, or a tree where govkit cannot be reached,
   selects by its `guard` plus the suite file, and the bar says so once per run, naming those legs.
-  Observed by AC2, AC6.
+  A leg's suite files are the words of its `argv` that carry a `/` and end `.sh`, `.py` or `.js`,
+  the rule the foreign-load census already reads; every entry shipping one of them is an owner, and
+  the set is their union. A fallback leg with no `guard` selects on any moved path, which is what an
+  absent guard already means to the runner. Observed by AC2, AC6.
 - **S4** — The last-run record. One small file per held leg under the git common dir, holding the
   `HEAD` sha and the manifest row hash, written tmp-then-rename. It is written only when the leg
   EXECUTED with verdict `ok` on a tree whose `TREE_CLEAN` reads `yes`; a red, a retried pass or a
-  timeout clears it. Observed by AC5.
+  timeout clears it. A green on a dirty or moved tree neither writes nor clears, and a leg that did
+  not execute (held, skipped, reused) leaves its record as it was. The row hash is the SHA-1 of the
+  row's JSON with sorted keys and the file is named by the first 16 hex of the SHA-1 of the leg
+  name, both computed by the legs-parse program as its tenth and eleventh fields, so they cost no
+  spawn. Records are written under any non-empty `GATE_SELFTESTS`, so a `1` run seeds them.
+  Observed by AC5.
 - **S5** — The safety net: a recorded sha more than `GATE_SELFTESTS_MAX_LAG` first-parent commits
   behind `HEAD` executes the leg, so no `changed` run holds a suite on a record that old. It bounds
   staleness per run and promises no cadence, since no boundary runs the mode. Default 10 by owner
@@ -88,12 +96,19 @@ The held-tier branch in `tools/run-gates/run-gates.sh` (the `subjects`/`chunks` 
 
 1. Read every held leg's last-run record from `<git-common-dir>/gate-selftest-last/`. A missing,
    unreadable, non-ancestor or row-hash-mismatched record decides "execute" without a diff.
-2. Group the remaining legs by recorded sha and run ONE `git diff --name-only <sha>` per distinct
-   sha (working tree included), plus one `rev-list --count --first-parent <sha>..HEAD` per distinct
-   sha for the lag. After a full run every record shares one sha, so the common case is two spawns.
+2. Group the remaining legs by recorded sha and run ONE `git merge-base --is-ancestor <sha> HEAD`,
+   one `rev-list --count --first-parent <sha>..HEAD` for the lag and, only when both pass, one
+   `git diff --name-only --no-renames <sha>` (working tree included) per distinct sha. After a full
+   run every record shares one sha, so the common case is three spawns. The ancestry call is the
+   third: no count or diff reads "not an ancestor", and a non-ancestor must execute.
 3. Resolve the selection sets from `govkit.py shipped --epoch` and `govkit.py shipped`, one call each
    per bar, and join the changed paths against them.
-4. A leg selected executes as a normal leg. A leg not selected writes the held rc with its reason.
+4. A leg selected executes as a normal leg, and the bar prints `run-gates: selftests changed:
+   <name> runs (<reason>)` for it before dispatch; that is the line AC4 reads the lag on. A leg not
+   selected writes the held rc with its reason.
+
+The run header gains a `selftests` key carrying the stamp value, and the run-log line's `selftests`
+field reads the same value, so no record of a `changed` run says `1`.
 
 Who sets the mode: a developer, or a Definition-of-Done run, in its own environment. No boundary does,
 and the push boundary reads a `changed` record through the predicate it already has, so this unit
@@ -108,9 +123,13 @@ Why "since the last recorded run" and not "since `BASE`": a record moves only wh
 green on a clean tree, so a red suite keeps executing until it is fixed, and a branch whose `BASE`
 predates a kit move still runs that kit's suite once rather than on every bar.
 
-govkit is a sibling kit, so the runner reaches it through the sibling-kit render token the hooks kit
-README names (§12 of the charter), never by literal. UNVERIFIED: the token's spelling and how it
-resolves in the dogfood tree; the builder reads it from that README first.
+govkit is a sibling kit, and the runner is an ENGINE, which the hooks kit README says is not
+rendered and reaches a sibling through `resolve_kit_dir` (§12 of the charter), never by literal. So
+the selection is ONE inline Python program, opened by the `RKD_PROGRAM` copy the runner already
+carries, that resolves `resolve_kit_dir("govkit", "govkit.py", <kit dir>)`, runs `govkit.py
+shipped` and `shipped --epoch` as two subprocesses and asks git the step 2 questions; a refusal or
+a nonzero exit from either is "cannot be reached". It prints one decision per held leg, which the
+guard pass and the report read, so the decision is made once. A leg it names nothing for executes.
 
 ### Inventory
 
@@ -132,7 +151,9 @@ resolves in the dogfood tree; the builder reads it from that README first.
 - `tools/govkit/govkit.py`
 - `tools/govkit/selftest.py`
 - `.githooks/pre-push.test.sh` — the pin on predicate 8 only; `.githooks/pre-push` is not edited
-- the selection instrument, committed under this build's own build folder (S8)
+- the selection instrument, committed under this build's own build folder (S8) as
+  `2026-10-12-build-TOOL-aSparedSpawn-12-select-sim.py` with its output beside it, and the pass's
+  direct checks as `2026-10-12-build-TOOL-aSparedSpawn-12-direct-checks.sh`
 
 ### Alternatives rejected
 
@@ -149,7 +170,7 @@ resolves in the dogfood tree; the builder reads it from that README first.
 ## 5. Production-readiness checklist
 
 - security: no new trust surface; a forged record can only HOLD a suite, so records are written by the runner alone and a reader refuses a malformed one by executing.
-- perf / scale: two `git` spawns per distinct recorded sha plus two `govkit.py` calls per bar, only in `changed` mode; nothing in the default mode.
+- perf / scale: three `git` spawns per distinct recorded sha, one Python program and the two `govkit.py` calls it makes per bar, only in `changed` mode; nothing in the default mode.
 - error / empty / loading states: no record, a bad record, an absent govkit and a non-ancestor sha all execute the leg; each held line names its reason.
 - observability: every held leg prints its reason and recorded sha; the run header records the mode; the guard fallback prints the legs it applied to.
 - risks: an under-declared selection set holds a suite that should have run; S5's lag bound caps how long, and a full run that reds an unselected suite is a declaration miss to file.
@@ -229,6 +250,14 @@ New arm: .githooks/pre-push.test.sh · covers AC7 · a `changed` record accepted
 - rev-2 · 2026-10-10 · §1 §2 §3 §4 §5 §6 §7 S5 S7 AC7 · folded the owner's F1 ruling (b): no push-boundary
   use, so S7 no longer edits `check_green_record` and moves no line of `.githooks/`; the stamp writes
   `selftests changed` and the unedited predicate 8 is pinned in both directions; F2's N=10 is kept.
+- rev-3 · 2026-10-12 · §2 §4 §5 S3 S4 S8 AC4 · the build read the code before writing it: the
+  ancestry question is a third git spawn per distinct sha, since neither the count nor the diff can
+  say "not an ancestor"; govkit is reached by `resolve_kit_dir` inside one inline selection program,
+  which settles the rev-2 UNVERIFIED line (an engine is not rendered); a leg's suite files, its
+  owners and the unguarded fallback are stated; the record's row hash, file name, and the cases
+  that neither write nor clear it are stated; the lag is named on a per-selected-leg line before
+  dispatch; the run header and run-log line carry the stamp value; the instrument file names are
+  pinned.
 
 ## 10. Reuse audit
 
