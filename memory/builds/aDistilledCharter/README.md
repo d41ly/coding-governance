@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: playbook+tooling+deployer+kickoff
 roster: PLAY+TOOL+DEPL+KICK
-ids: DEPL-aDistilledCharter-1 DEPL-aDistilledCharter-2 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 PLAY-aDistilledCharter-5 PLAY-aDistilledCharter-6 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 TOOL-aDistilledCharter-8 TOOL-aDistilledCharter-9 TOOL-aDistilledCharter-10
+ids: DEPL-aDistilledCharter-1 DEPL-aDistilledCharter-2 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 PLAY-aDistilledCharter-5 PLAY-aDistilledCharter-6 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 TOOL-aDistilledCharter-8 TOOL-aDistilledCharter-9
 ---
 
 # aDistilledCharter — the charter becomes governing practices, adopter rules and a generated block
@@ -82,7 +82,7 @@ DEPL-2 for PLAY-5, and its five others became TOOL-8. Round 3 converged; its six
 <!-- gen:build-index -->
 **Build status:** CLOSED · 18 unit(s) · node a · opened 2026-10-09 · streams playbook+tooling+deployer+kickoff
 ids DEPL-aDistilledCharter-1 DEPL-aDistilledCharter-2 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 PLAY-aDistilledCharter-5 PLAY-aDistilledCharter-6 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2
-ids TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 TOOL-aDistilledCharter-8 TOOL-aDistilledCharter-9 TOOL-aDistilledCharter-10
+ids TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 TOOL-aDistilledCharter-8 TOOL-aDistilledCharter-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |

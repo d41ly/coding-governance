@@ -28,7 +28,7 @@ Let's also bring another small addition to the build: when you emit an agent rol
   spawned, derived from its journal.
 - **Record:** the same lines append to a generated per-build agent ledger.
 - **Enforcement:** a verb derives the lines so nobody types them, the pre-send self-check names
-  them, and the Stop hook `format-guard` (built by `TOOL-aHeardState-1`, from the session in the
+  them, and the Stop hook `format-guard` (aHeardState's first tooling unit, from the session in the
   `blissful-khayyam-69a7df` worktree) is EXTENDED to refuse a final message that omits them.
 
 ## The draft shapes
@@ -42,6 +42,6 @@ The spec writer settles the field order and names against the charter's micro-fo
 
 `format-guard` is not on local main: `branch/aHeardState` was landing onto `origin/main` when this
 addendum arrived. The unit extending it is specced only once the run branch carries that landing.
-A second Stop hook for the same emission, `TOOL-aDistilledCharter-10`, sits unlanded on
+A second Stop hook for the same emission, aDistilledCharter's tenth tooling unit, sits unlanded on
 `branch/governance-template-restructure-b84b3d`; two guards on one emission are two answers to one
 question, and that overlap is the owner's to settle, not this run's.
