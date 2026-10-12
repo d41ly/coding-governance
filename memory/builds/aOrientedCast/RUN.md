@@ -18,19 +18,19 @@ hold-until: probe host
 hold-code: host-degraded
 held-from: REVIEWING
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: b69f13633cd1ef9e345dccc0a04398e18bc71ffe
-phase: SPECCING
+witness: 99dfe6d7bc7433794373f3aff9b3461c33abc108
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/deterministic-attended-workflows-943570
 anchor-kind: local
 cli-version: 2.1.293
-lease-utc: 2026-10-12T22:29:18Z
+lease-utc: 2026-10-12T23:32:53Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 6728
+pid: 10828
 session: e131d82c-aaf3-45ad-abb9-258d7ab9ad1b
-keepalive: 2edced79
+keepalive: d98cca1e
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: b726385f2b5b8fd16802925c02104377253a9045
 anchor-ref: refs/heads/main
@@ -169,3 +169,5 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-12T23:17:12Z dispatch · item 9df98d1e TOOL-aOrientedCast-16 · reason tools/roles/roles_lib.py tools/roles/check_roles.py tools/roles/render_agents.py tools/roles/handoff.py tools/roles/agents/gov-builder.agent.md tools/roles/agents/gov-diff-reviewer.agent.md tools/roles/agents/gov-orienter.agent.md tools/roles/agents/gov-researcher.agent.md tools/roles/agents/gov-reuse-scout.agent.md tools/roles/agents/gov-session.agent.md tools/roles/agents/gov-skeptic.agent.md tools/roles/agents/gov-spec-reviewer.agent.md tools/roles/agents/gov-spec-writer.agent.md tools/roles/agents/gov-synthesizer.agent.md tools/roles/README.md tools/roles/SKILL.template.md tools/roles/adopt-roles.sh tools/roles/adopt-roles.test.sh help/roles.md WIRE-INTO-PROJECT.md memory/map/features/roles.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/aOrientedCast/spec/2026-10-13-spec-TOOL-aOrientedCast-16.md memory/builds/aOrientedCast/build/2026-10-13-build-TOOL-aOrientedCast-16-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
 
 2026-10-12T23:31:48Z dispatch · item b61ec1c4 TOOL-aOrientedCast-16 · reason .claude/skills/build/SKILL.md .claude/agents/gov-builder.md .claude/agents/gov-diff-reviewer.md .claude/agents/gov-orienter.md .claude/agents/gov-researcher.md .claude/agents/gov-reuse-scout.md .claude/agents/gov-skeptic.md .claude/agents/gov-spec-reviewer.md .claude/agents/gov-spec-writer.md .claude/agents/gov-synthesizer.md .claude/roles.json memory/builds/aOrientedCast/build/2026-10-13-build-TOOL-aOrientedCast-16-1-acceptance-ledger.md
+
+2026-10-12T23:32:58Z resume · item aOrientedCast · reason working · keepalive d98cca1e · manual
