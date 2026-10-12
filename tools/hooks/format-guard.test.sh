@@ -5,8 +5,9 @@
 #
 # WHAT THIS FILE DOES NOT CHECK, stated up front: it does not prove the hook is WIRED (check-wiring.sh
 # and check-hook-destinations.sh own that), and it does not prove the harness delivers
-# `last_assistant_message` on the running CLI — a payload here is built by hand. The live witness of
-# both is the build record TOOL-aHeardState-1 S9 names.
+# `last_assistant_message` on the running CLI — a payload here is built by hand. The build record
+# TOOL-aHeardState-1 S9 names holds an in-tree observation on the real card, LIVE.md, charter and HEAD
+# with a hand-built payload; harness delivery and the surfaced block are still the owner's to observe.
 #
 # EVERY ARM RUNS AGAINST A FIXTURE REPOSITORY under the suite's own temp dir: a charter carrying the
 # real fence, a LIVE.md naming the routed build, an orientation card under the fixture's common dir,
@@ -174,6 +175,7 @@ write_message fenced "$FENCE" "- $B" "- $S" "$FENCE"
 write_message first  "- $S" "- $B"
 write_message gap    "- $B" "" "- $S"
 write_message noleft "- BUILD — tBuild · Tier-2 · 1/2 build" "- $S"
+write_message inline "${FENCE}npm test${FENCE} passed." "" "- $B" "- $S"
 
 # The real charter, CR-stripped: a worktree checkout can land CRLF, and the fence edits below compare
 # whole lines (memory/gotchas, worktree CRLF outside the gated population).
@@ -215,6 +217,8 @@ else echo "FAIL AC6 no sidecar at .git/format-guard/$SID.head"; fail=$((fail+1))
 sha=$(seed_fixture_commit "one")
 run_stop "AC6 an unreported commit blocks" block "$TMP/good.md"
 check_contains "AC6 the reason names the new commit" "$TMP/out" "commit ${sha:0:9}"
+check_contains "TOOL-aHeardState-8 the commit defect names both line shapes" "$TMP/out" "committed or merged line"
+check_contains "TOOL-aHeardState-8 the reason says not yet terminal" "$TMP/out" "not yet terminal"
 sha=$(seed_fixture_commit "two")
 printf '%s\n\n- committed — %s · main · two\n' "$(cat "$TMP/good.md")" "${sha:0:7}" > "$TMP/reported.md"
 run_stop "AC6 a commit named by a committed line allows" allow "$TMP/reported.md"
@@ -258,6 +262,39 @@ seed_repo "$TMP/fourth.md"
 run_stop "AC7 a BUILD definition with a fourth field blocks a message the real charter passes" block "$TMP/good.md"
 check_contains "AC7 the edited shape is the one quoted" "$TMP/out" '· x <y>'
 
+# TOOL-aHeardState-8 — the closing review's fixtures, each a branch no arm ran before.
+# M3: an inline triple-backtick span is not a fence, so the pair after it stays bare.
+seed_repo "$TMP/charter.md"
+run_stop "TOOL-aHeardState-8 an inline backtick span leaves the pair bare" allow "$TMP/inline.md"
+# M6: a payload without last_assistant_message allows, with a witness.
+run_stop "TOOL-aHeardState-8 a payload with no message allows" allow "$TMP/none.md" '{"last_assistant_message":null}'
+check_contains "TOOL-aHeardState-8 the witness names the missing message" "$TMP/err" "no last_assistant_message"
+# M7: a routed unit with no spec owes the BUILD line alone; the spec'd route owes SPEC too.
+write_message buildonly "Done." "" "- $B"
+printf '## route\n- build: tBuild\n- unit: TOOL-tBuild-1\n' > "$REPO/.git/orientation/$SID.md"
+run_stop "TOOL-aHeardState-8 a spec-less route allows a lone BUILD line" allow "$TMP/buildonly.md"
+seed_repo "$TMP/charter.md"
+run_stop "TOOL-aHeardState-8 the spec'd route blocks the same lone BUILD line" block "$TMP/buildonly.md"
+check_contains "TOOL-aHeardState-8 the reason names the missing SPEC line" "$TMP/out" "no SPEC line"
+# L5: a sidecar sha that is not an ancestor of HEAD writes a witness and blocks nothing.
+seed_repo "$TMP/charter.md"
+seed_fixture_commit "six" >/dev/null
+run_stop "TOOL-aHeardState-8 a baseline stop before the reset allows" allow "$TMP/good.md"
+git -C "$REPO" reset -q --hard HEAD~1
+run_stop "TOOL-aHeardState-8 a HEAD reset behind the baseline allows" allow "$TMP/good.md"
+check_contains "TOOL-aHeardState-8 the reset writes the no-first-parent witness" "$TMP/err" "along no first-parent path"
+# M5: a linked worktree as the payload cwd keeps its sidecar under the worktree's own git dir.
+seed_repo "$TMP/charter.md"
+git -C "$REPO" worktree add -q "$TMP/wt" -b tWorktree 2>/dev/null
+REPO="$TMP/wt" run_stop "TOOL-aHeardState-8 a linked worktree's first stop allows" allow "$TMP/good.md"
+if [ -s "$TMP/repo/.git/worktrees/wt/format-guard/$SID.head" ]; then echo "ok   TOOL-aHeardState-8 the worktree's sidecar lands under .git/worktrees/wt"; pass=$((pass+1))
+else echo "FAIL TOOL-aHeardState-8 no sidecar under .git/worktrees/wt/format-guard"; fail=$((fail+1)); fi
+# M4: an unreadable HEAD skips the commit check with a witness, never silently.
+seed_repo "$TMP/charter.md"
+printf 'ref: refs/heads/tNowhere\n' > "$REPO/.git/HEAD"
+run_stop "TOOL-aHeardState-8 an unreadable HEAD allows" allow "$TMP/good.md"
+check_contains "TOOL-aHeardState-8 the witness names the unreadable HEAD" "$TMP/err" "HEAD is unreadable"
+
 # AC9 — a payload that is not JSON allows.
 printf 'not json' | node "$HOOK" > "$TMP/out" 2> "$TMP/err"; rc=$?
 if [ "$rc" = 0 ] && [ ! -s "$TMP/out" ]; then echo "ok   AC9 non-JSON stdin exits 0 with empty stdout"; pass=$((pass+1))
@@ -273,7 +310,7 @@ read_hook_verdict() { # message-file -> block|allow, counting nothing
       stop_hook_active: false, last_assistant_message: fs.readFileSync(process.argv[1], "utf8") }))' "$1" "$SID" "$(resolve_native "$REPO")" \
     | node "$HOOK" 2>/dev/null | grep -q . && echo block || echo allow
 }
-names="good none tick indent bold head fenced first gap noleft"
+names="good none tick indent bold head fenced first gap noleft inline"
 files=""; for f in $names; do files="$files $TMP/$f.md"; done
 # shellcheck disable=SC2086
 "$TESTPY" -c '
@@ -299,9 +336,10 @@ else echo "FAIL AC6 liveness: the verdicts never moved, so agreement proves noth
 
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count. 43 = the suite as TOOL-aHeardState-1 landed it; 54 = 43 + TOOL-aHeardState-2's AC6 arm (10
-# messages and its liveness); 57 = 54 + TOOL-aHeardState-7's three chained-stop assertions.
+# messages and its liveness); 57 = 54 + TOOL-aHeardState-7's three chained-stop assertions; 73 =
+# 57 + TOOL-aHeardState-8's 16: 2 wording, 13 in its fixture block, 1 inline parity message.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=57
+FLOOR_ASSERTIONS=73
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

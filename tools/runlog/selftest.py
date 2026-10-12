@@ -328,7 +328,10 @@ from collections import Counter  # noqa: E402
 # the four pinned lines; `test_prose_ac4_ac5_refusals` carries 4 — the fence-less charter's exit and
 # `unknown` pair line, and an unknown session's exit 2 naming the root. Decoy checks move each by 3.
 # 7 + 4 + 3 + 3 = 17
-ASSERTION_FLOOR = 1578
+# RAISED 1578 -> 1580 by TOOL-aHeardState-8: the refusal arm's UTF-16 charter, its exit and its
+# `unknown` pair line. The figures arm's mixed scenario now carries a two-block message and a
+# sidechain record, which move its pinned narration line and add no check.
+ASSERTION_FLOOR = 1580
 
 PASS = []
 FAIL = []
@@ -8661,11 +8664,9 @@ PROSE = json.loads((FIXTURES / "prose.json").read_bytes())["scenarios"]
 
 
 def resolve_charter_file():
-    """The repository's own `AGENTS.md`, whose microformats fence the prose arms derive the pair from."""
-    for d in (HERE, *HERE.parents):
-        if (d / ".git").exists():
-            return d / "AGENTS.md"
-    return HERE / "AGENTS.md"
+    """The withheld fixture charter: the microformats block of AGENTS.md, copied, so the pinned pair
+    figures move only when this kit's fixtures do (TOOL-aHeardState-8, review ids 11 and 26)."""
+    return FIXTURES / "prose-charter.md"
 
 
 def write_prose_scenario(base, name):
@@ -8683,7 +8684,7 @@ def test_prose_ac2_ac3_figures():
                "<!-- microformats -->" in charter.read_text(encoding="utf-8"), str(charter))
     want = {
         "mixed": ["prose — mixed · turns 3 · final messages 3",
-                  "narration — 14.8% of 358 assistant prose characters · ok above 40%",
+                  "narration — 16.9% of 367 assistant prose characters · ok above 40%",
                   "interjections — mean 1.7 · max 4 · turns above 3 1 · ok above a mean of 3",
                   "pair — 1/3 final messages carry the BUILD/SPEC pair"],
         "alarm": ["prose — alarm · turns 1 · final messages 1",
@@ -8711,13 +8712,19 @@ def test_prose_ac4_ac5_refusals():
     r = run_runlog(["prose", "--transcript", str(path), "--charter", str(fenceless)], base,
                    build_arm_env(base))
     check("prose AC4: a fence-less charter exits 0", r.returncode, 0)
+    utf16 = pathlib.Path(base) / "AGENTS-utf16.md"
+    utf16.write_bytes(resolve_charter_file().read_text(encoding="utf-8").encode("utf-16"))
+    r16 = run_runlog(["prose", "--transcript", str(path), "--charter", str(utf16)], base, build_arm_env(base))
+    check("prose AC4: a UTF-16 charter exits 0, never a traceback", r16.returncode, 0)
+    check_true("prose AC4: ...and its pair line reads unknown",
+               any(ln.startswith("pair — unknown · ") for ln in r16.stdout.splitlines()), r16.stdout + r16.stderr)
     check_true("prose AC4: ...and the pair line reads unknown, never a fabricated zero",
                any(ln.startswith("pair — unknown · no microformats fence in ") for ln in r.stdout.splitlines()),
                r.stdout)
     sid = "00000000-0000-4000-8000-000000000000"
     r = run_runlog(["prose", "--session", sid, "--transcripts", str(projects)], base, build_arm_env(base))
     check("prose AC5: a session with no transcript exits 2", r.returncode, 2)
-    check_true("prose AC5: ...naming the projects root it searched", pathlib.Path(projects).name in r.stderr,
+    check_true("prose AC5: ...naming the projects root it searched", pathlib.Path(projects).as_posix() in r.stderr,
                r.stderr)
 
 

@@ -165,11 +165,16 @@ function readCharterShapes(top) {
   return { shapes, error: '' }
 }
 
-/** Each line of the message with whether it sits inside a fenced block. */
+/**
+ * Each line of the message with whether it sits inside a fenced block. A backtick run whose line
+ * closes it again (an inline span such as three backticks around a command) is not a fence: in
+ * CommonMark a backtick fence's info string carries no backtick.
+ */
 function scanMessageLines(message) {
   let fenced = false
   return String(message).split(/\r?\n/).map((text) => {
-    const fence = /^ {0,3}(```|~~~)/.test(text)
+    const m = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(text)
+    const fence = !!m && !(m[1][0] === '`' && m[2].includes('`'))
     const row = { text, fenced: fenced || fence }
     if (fence) fenced = !fenced
     return row
@@ -225,18 +230,18 @@ function checkCommitLines(rows, shapes, shas) {
     }
   }
   const checkNamed = (sha) => named.some((n) => /^[0-9a-f]+$/.test(n) && n.length >= SHA_MIN && sha.startsWith(n))
-  return shas.filter((s) => !checkNamed(s)).map((s) => `commit ${s.slice(0, 9)} is new since this session's previous stop and no bare committed line names it`)
+  return shas.filter((s) => !checkNamed(s)).map((s) => `commit ${s.slice(0, 9)} is new since this session's previous stop and no bare committed or merged line names it`)
 }
 
 function renderBlockReason(slug, defects, shapes) {
   return [
-    `format-guard: this session routes build ${slug}, which LIVE.md lists as in progress, and this final message breaks the charter's micro-format rules:`,
+    `format-guard: this session routes build ${slug}, which LIVE.md lists as not yet terminal, and this final message breaks the charter's micro-format rules:`,
     ...defects.map((d) => `- ${d}`),
     '',
     `The definitions, from the ${FENCE_OPEN} fence of ${CHARTER_FILE}:`,
     ...['BUILD', 'SPEC', 'committed'].map((h) => `- \`${shapes[h].def}\``),
     '',
-    'Re-send the final message so it ends with its state block: one bare `- committed — …` line per new commit, then the BUILD line with the SPEC line directly under it, each a bare `- ` list item at column 0, outside any fence. This hook refuses once per turn end.',
+    'Re-send the final message so it ends with its state block: one bare `- committed — …` or `- merged — …` line per new commit, then the BUILD line with the SPEC line directly under it, each a bare `- ` list item at column 0, outside any fence. This hook refuses once per turn end.',
   ].join('\n')
 }
 
@@ -264,25 +269,30 @@ function checkStop(data) {
   }
   const rows = scanMessageLines(data.last_assistant_message)
   const defects = checkPair(rows, shapes, route.units.some((u) => u.spec))
-  let witness = ''
+  // One line per degraded outcome: two can happen in one stop, and a scalar would keep only the last.
+  const witnesses = []
   const gitDir = resolveGitDir(hit)
   const head = gitDir ? readHeadSha(gitDir, common) : ''
-  if (head && /^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(sid)) {
+  if (!head) {
+    witnesses.push(`format-guard: HEAD is unreadable under ${gitDir || hit.gitPath}, so no commit is required to be named`)
+  } else {
+    // readCard already refused a non-id-shaped session id, so this join is safe.
     const sidecar = path.join(gitDir, SIDECAR_DIR, sid + '.head')
     let prev = ''
     try { prev = fs.readFileSync(sidecar, 'utf8').trim() } catch { /* first armed stop */ }
     if (prev && prev !== head) {
       const shas = extractNewCommits(hit.toplevel, prev, head)
       if (shas) defects.push(...checkCommitLines(rows, shapes, shas))
-      else witness = `format-guard: HEAD moved from ${prev.slice(0, 9)} to ${head.slice(0, 9)} along no first-parent path, or git could not answer, so no commit is required to be named`
+      else witnesses.push(`format-guard: HEAD moved from ${prev.slice(0, 9)} to ${head.slice(0, 9)} along no first-parent path, or git could not answer, so no commit is required to be named`)
     }
     try {
       fs.mkdirSync(path.dirname(sidecar), { recursive: true })
       fs.writeFileSync(sidecar, head + '\n')
     } catch (e) {
-      witness = `format-guard: the HEAD sidecar ${sidecar} is unwritable (${(e && e.code) || e}), so the next stop cannot name new commits`
+      witnesses.push(`format-guard: the HEAD sidecar ${sidecar} is unwritable (${(e && e.code) || e}), so the next stop cannot name new commits`)
     }
   }
+  const witness = witnesses.join('\n')
   return defects.length ? { block: renderBlockReason(route.build, defects, shapes), witness } : { witness }
 }
 

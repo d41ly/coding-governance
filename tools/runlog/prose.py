@@ -28,7 +28,7 @@ CHARTER_FILE = "AGENTS.md"
 NARRATION_ALARM = 0.40
 INTERJECTION_ALARM = 3
 FIELD = r"(?:(?! · ).)+?"
-FENCE_LINE = re.compile(r"^ {0,3}(```|~~~)")
+FENCE_LINE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
 
 
 def build_shape_regex(definition: str):
@@ -58,6 +58,8 @@ def read_charter_shapes(charter: pathlib.Path):
         lines = charter.read_text(encoding="utf-8").splitlines()
     except OSError:
         return None, f"no {charter.name} at {charter.parent.as_posix()}"
+    except UnicodeDecodeError:
+        return None, f"{charter.as_posix()} is not readable as UTF-8"
     if FENCE_OPEN not in lines or FENCE_CLOSE not in lines:
         return None, f"no microformats fence in {charter.as_posix()}"
     a, b = lines.index(FENCE_OPEN), lines.index(FENCE_CLOSE)
@@ -77,7 +79,9 @@ def scan_message_lines(message: str) -> list:
     rows, fenced = [], False
     for text in message.split("\n"):
         text = text.rstrip("\r")
-        fence = bool(FENCE_LINE.match(text))
+        m = FENCE_LINE.match(text)
+        # An inline backtick span closed on the same line is not a fence, as in scanMessageLines.
+        fence = bool(m) and not (m.group(1)[0] == "`" and "`" in m.group(2))
         rows.append((text, fenced or fence))
         if fence:
             fenced = not fenced

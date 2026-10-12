@@ -102,3 +102,5 @@ base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 2026-10-12T22:03:10Z dispatch · item f1d88c60 TOOL-aHeardState-7 · reason tools/hooks/format-guard.js tools/hooks/format-guard.test.sh
 
 2026-10-12T22:05:16Z dispatch · item f1d88c60 TOOL-aHeardState-7 · reason tools/hooks/format-guard.js tools/hooks/format-guard.test.sh memory/map/generated/inventories.json memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md
+
+2026-10-12T22:06:35Z dispatch · item 0604ee9f TOOL-aHeardState-8 · reason tools/hooks/format-guard.js tools/hooks/format-guard.test.sh tools/runlog/prose.py tools/runlog/selftest.py tools/runlog/kit.toml tools/runlog/fixtures/prose.json tools/runlog/fixtures/prose-charter.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md
