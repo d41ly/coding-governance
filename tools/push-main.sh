@@ -32,6 +32,14 @@
 # this lander, which is every adopter, both paths say so in one line and land as before. What a mint
 # does NOT do: re-stamp the kickoff manifest, so a minted carrier on its watch line still reds C5.
 #
+# GENERATED OUTPUTS ARE REGENERATED HERE TOO (TOOL-aPrimedIndex-4). After the mint, both paths run
+# the run-gates kit's `regen.py --write` over the tree about to be pushed: a reconcile merge leaves
+# the `merge=ours` indexes stale, and the push bar refuses a stale declared output before its first
+# leg. `--prepare` folds what it moved into the prepared merge beside the mint; the attended landing
+# commits it as `regen: generated outputs onto <remote>/<branch> at <sha8> for <unit>`, `Pass: none`.
+# A failed write refuses the landing as a refused mint does. No regen.py beside this lander says so
+# in one line and lands as before. What it does NOT do: prove the result fresh -- the push bar's
+# preflight is that check, and a regeneration cannot fix a check red for another reason.
 # AFTER A LANDING (TOOL-aFrugalTurnstile-8). Both landing paths read `GATE_POST_MERGE` from the
 # gate-env file committed at the landed tip; `local` starts the run-gates kit's post-merge bar on that
 # tip, detached, and returns at once, logging to `<common-dir>/gate-post-merge-<sha8>.log` and
@@ -734,6 +742,52 @@ check_merge_losses() {  # R · T -> 1 when a merge in R..T loses a definition; 0
   return 0
 }
 
+# ---- GENERATED OUTPUTS, regenerated at the landing — TOOL-aPrimedIndex-4 -------------------------
+# `run_regen` runs the run-gates kit's `regen.py --write` over the WORKING TREE; the caller commits
+# what it wrote. Found the way the minter finds the deployer, from this script's own directory, and
+# the file test under the toplevel for the merge-loss check's reason: the kit can resolve beside
+# this lander while the tree being landed lacks the file. No python or no regen.py prints one line
+# and returns 0, and the push bar's preflight then grades the outputs. A stage that moved nothing is
+# not echoed. On a failed write or a refused declaration the verb's output goes to stderr and this
+# returns 1.
+run_regen() {  # -> 0 regenerated or announced-skipped · 1 a write failed or the declaration was refused
+  local py dir out rc
+  if ! py=$(resolve_python 2>/dev/null); then
+    echo "push-main: generated outputs were NOT regenerated — no usable python launcher; the push bar's preflight grades them."
+    return 0
+  fi
+  if ! dir=$(resolve_kit_dir "$py" run-gates regen.py "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/regen.py" ]; then
+    echo "push-main: generated outputs were NOT regenerated — no regen.py beside this lander; the push bar's preflight grades them."
+    return 0
+  fi
+  out=$("$py" "$top/$dir/regen.py" --write 2>&1); rc=$?
+  if [ "$rc" -eq 0 ]; then
+    printf '%s\n' "$out" | grep -v -e ' · moved: none$' || true
+    return 0
+  fi
+  echo "push-main: the generated outputs could NOT be regenerated (regen.py exit $rc):" >&2
+  printf '%s\n' "$out" | sed 's/^/  /' >&2
+  return 1
+}
+
+# `remove_new_untracked <snapshot>` cleans every untracked file the snapshot does not hold, the snapshot
+# being a sorted NUL-separated `git ls-files --others --exclude-standard -z` taken before `run_regen`.
+# The reset after a failed regeneration restores tracked files only, and a regeneration also CREATES
+# files (a new ledger shard, a render's temporary), which then dirtied the tree the next landing
+# requires clean (TOOL-aPrimedIndex-8). Both callers take the snapshot on a tree they required clean,
+# so every path cleaned is one the regeneration made. NUL-safe end to end; an unreadable state cleans
+# nothing.
+remove_new_untracked() {  # snapshot file -> nothing on stdout
+  local now
+  [ -f "${1:-}" ] || return 0
+  now=$(mktemp) || return 0
+  if git ls-files --others --exclude-standard -z > "$now" 2>/dev/null; then
+    LC_ALL=C sort -z -o "$now" "$now"
+    LC_ALL=C comm -z -13 "$1" "$now" | xargs -0 -r git clean -f -q -- >/dev/null 2>&1 || true
+  fi
+  rm -f "$now"
+}
+
 # ---- KIT VERSIONS, minted at the landing — TOOL-aMendedFleet-65 ----------------------------------
 # `run_minter <base> [<head>]` runs the deployer's `mint` verb, which writes the next version of every
 # kit whose shipped bytes moved in <base>..<head> with no bump dating the move, into the WORKING TREE;
@@ -847,6 +901,17 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     echo "push-main: the kit versions this landing owes could not be minted (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
     return 1
   fi
+  # REGENERATE INTO THE MERGE (TOOL-aPrimedIndex-4): after the mint, because a minted version can
+  # itself stale an output that stamps it; folded by the same rewrite, same parents and subject.
+  rgsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$rgsnap"
+  if ! run_regen; then
+    git reset -q --hard "$t" >/dev/null 2>&1 || true
+    remove_new_untracked "$rgsnap"; rm -f "$rgsnap"
+    git checkout "$branch" >/dev/null 2>&1 || true
+    echo "push-main: the generated outputs this landing owes could not be regenerated (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+    return 1
+  fi
+  rm -f "$rgsnap"
   if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
     git add -A
     if ! t=$(git commit-tree "$(git write-tree)" -p "$R" -p "$oldb" -m "$msg") || ! git update-ref --no-deref HEAD "$t"; then
@@ -881,7 +946,7 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
 
 # `--land`: push the prepared merge, and only it, as the default branch.
 cmd_land() {
-  local attempt R t rc cls
+  local attempt R t rc cls pushed
   attempt=1
   while [ "$attempt" -le "$max" ]; do
     R=$(resolve_tip) || exit 3
@@ -903,10 +968,13 @@ cmd_land() {
     echo "push-main: gating + pushing ${t:0:8} to $def (attempt $attempt/$max)..." >&2
     # HEAD, never refs/heads/<def>: the local default branch is shared by every build on this node,
     # and publishing it is the defect these flags close. Its output is SHOWN and never read (S2).
+    # THE SHA PUSHED, NOT THE PREPARED ONE (TOOL-aPrimedIndex-10): under in-place the close commits its
+    # records on the prepared merge, so HEAD is what the hook vets and names in its allow record.
+    pushed=$(git rev-parse --verify HEAD)
     git push "$remote" "HEAD:refs/heads/$def" >&2
     rc=$?
     if [ "$rc" -eq 0 ]; then
-      check_push_allow "$t" "$R" || exit 4
+      check_push_allow "$pushed" "$R" || exit 4
       write_lander_marker || exit 1
       run_post_merge
       cls=landed
@@ -1019,6 +1087,25 @@ while [ "$attempt" -le "$max" ]; do
     mint_unit=$(read_mint_unit "$mt..HEAD")
     if ! git commit -q --no-verify -m "mint: kit versions onto $remote/$def at ${mt:0:8}${mint_unit:+ for $mint_unit}" -m "Pass: none"; then
       echo "push-main: could not commit the minted versions. Aborted (no push)." >&2
+      exit 1
+    fi
+  fi
+
+  # REGENERATE, on every attempt, after the mint (TOOL-aPrimedIndex-4): its own commit, named and
+  # trailered as the mint commit is, so the routed-commits leg and the pass reader read it alike.
+  rgsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$rgsnap"
+  if ! run_regen; then
+    git reset -q --hard HEAD >/dev/null 2>&1 || true
+    remove_new_untracked "$rgsnap"; rm -f "$rgsnap"
+    echo "push-main: the generated outputs this landing owes could not be regenerated (named above). Aborted (no push)." >&2
+    exit 1
+  fi
+  rm -f "$rgsnap"
+  if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
+    git add -A
+    regen_unit=$(read_mint_unit "$mt..HEAD")
+    if ! git commit -q --no-verify -m "regen: generated outputs onto $remote/$def at ${mt:0:8}${regen_unit:+ for $regen_unit}" -m "Pass: none"; then
+      echo "push-main: could not commit the regenerated outputs. Aborted (no push)." >&2
       exit 1
     fi
   fi

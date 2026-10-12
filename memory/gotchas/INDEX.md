@@ -21,6 +21,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [a-new-leg-trips-a-growing-set-of-meta-gates](a-new-leg-trips-a-growing-set-of-meta-gates.md) | class | 6 |  | adding one gate leg trips a set of meta-gates that grows as new ones land, and a check inside an existing gate is far cheaper — but not free |
 | [a-new-local-collides-in-a-long-function](a-new-local-collides-in-a-long-function.md) | class | 2 |  | a local added to a function thousands of lines long can share its name with one a distant block already binds, and the later binding silently replaces the new value only on the inputs that reach that block |
 | [a-pair-exists-and-it-is-the-wrong-one](a-pair-exists-and-it-is-the-wrong-one.md) | class | 6 |  | a scanner that pairs a delimiter with the next one of its kind finds a pair for a delimiter that opens nothing, and the span it then blanks is where the defect hides |
+| [a-runner-knob-owes-a-push-class](a-runner-knob-owes-a-push-class.md) | class | 4 |  | a new GATE_ or GOV_ knob the gate runner reads has no push-boundary class until it joins one, and the arm that says so is guarded away from the unit that adds it |
 | [a-spelling-change-strands-its-readers](a-spelling-change-strands-its-readers.md) | class | 11 |  | a shared file changes how it SPELLS its values, the readers someone migrated resolve the new spelling, and every reader nobody listed compares the raw one and matches nothing |
 | [a-view-fix-trades-one-blindness-for-another](a-view-fix-trades-one-blindness-for-another.md) | class | 3 |  | a scanner that grades source through a rendered view has a blind spot, and building a better view moves it rather than closing it, each move a new fail-open or false-deny |
 | [ab-arm-never-did-the-work](ab-arm-never-did-the-work.md) | class | 3 |  | a timing A/B whose arms are not each asserted to have DONE the work measures a refusal against a run, and the fast arm looks like the good one |
@@ -131,6 +132,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-116 record(s): 113 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+117 record(s): 114 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

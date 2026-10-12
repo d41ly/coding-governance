@@ -41,6 +41,7 @@ pre-push hook. This kit is the part they share: the grammar, the reader, and whe
 
 ## Constraints & why
 
+- Its `[[regenerate]]` render row is staged, stage 1: run-gates' `regen.py` re-renders it on `--regen`, and every bar proves it fresh with this kit's `[check]` first (TOOL-aPrimedIndex-1).
 **One act, one line, TAB-separated `key=value`, and nothing but four escapes.** The producers are
 shell scripts, and hand-built JSON is the top breaker this repo's shell-hygiene record names; a
 tracked `.jsonl` fixture is also an undeclared lexicon extension. A line of fields can be written

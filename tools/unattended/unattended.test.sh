@@ -11653,7 +11653,7 @@ done
 # ---- TOOL-aFrugalTurnstile-13 AC2/AC3: THE ANSWER IS HONOURED ONLY FOR THIS CLOSE'S BAR. A covered
 # ---- answer naming another bar, or naming none, runs GATE_CMD with GATE_FULL=1; one naming GATE_CMD
 # ---- is met without a bar. RED against the driver at 69426afd: both refused cases are met without a bar.
-for ft9_d in $'covered gate-bar-green@1234abcd\tbash tools/run-gates/run-gates.sh' "covered gate-bar-green@1234abcd"; do
+for ft9_d in $'covered gate-bar-green@1234abcd\tbash other/bar.sh' "covered gate-bar-green@1234abcd"; do
   init_declared_merge "GATE_POST_MERGE=local"
   out=$(FT9_DECISION="$ft9_d" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
   same "TOOL-aFrugalTurnstile-13 AC2 an answer for another bar [$ft9_d] runs the full bar" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"

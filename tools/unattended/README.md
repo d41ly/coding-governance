@@ -26,9 +26,12 @@ rendered ones do carry placeholders, and for them a render is the only correct i
 `[[generated]]` table in the kit's `kit.toml`, every key at column 0 as a double-quoted string:
 `path` (tokens `{memory_root}`, `{map_root}` and `{kit}` only), `generator` (a file beside the
 descriptor), `why`, and an optional `when = "<conf>:<KEY>=<value>"` that applies the row only when
-that repo-root conf assigns exactly that value. govkit selfcheck refuses any other shape, because
-the shell reader would mangle or drop it. `GENERATED_INDEXES` in `.unattended.conf` only ADDS pairs
-to these (`TOOL-aWindowedPass-4`).
+that repo-root conf assigns exactly that value. govkit selfcheck refuses any other shape for those
+four keys, because the shell reader would mangle or drop it. A row may also carry `write` and
+`check`, argv arrays, and `stage`, an integer, all three or none, at column 0: the shell reader
+ignores them, and the run-gates kit's `regen.py` reads them to regenerate the output or prove it
+fresh before a bar (that kit's README, "Generated outputs"; TOOL-aPrimedIndex-1).
+`GENERATED_INDEXES` in `.unattended.conf` only ADDS pairs to these (`TOOL-aWindowedPass-4`).
 
 **One hook line is yours to wire, and no kit ships it.** Add
 `bash <kit>/unattended.sh --check-commit "$1"` to your own `commit-msg` hook, ahead of anything that

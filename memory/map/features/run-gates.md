@@ -20,7 +20,7 @@ harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md",
+gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md", "a-runner-knob-owes-a-push-class.md",
   "hookspath-resolves-into-another-checkout.md",
   "ab-arm-never-did-the-work.md",
   "empty-field-collapses-unless-it-is-last.md",
@@ -64,6 +64,7 @@ globs = [
 
 ## Constraints & why
 
+- A bar refuses stale outputs first (TOOL-aPrimedIndex-3).
 **The run record, and why the completion file is NOT in it.** Every run writes
 `<git-dir>/gate-run/<run-id>/` — a header before dispatch, one TSV row and one redacted output copy
 per leg, a verdict last — and the verdict's ABSENCE is the crash signal. The `.rc` completion file
@@ -254,6 +255,7 @@ time; extend by adding keys the deployer resolves, leaving runner-side placehold
 
 ## Affordances
 
+- **Regenerate every declared output** — `bash tools/run-gates/run-gates.sh --regen`; `--regen-check` writes nothing.
 - **Check a target's declaration** — `bash tools/run-gates/adopt-run-gates.sh --check`, which reports
   NOT ADOPTED and exits 0 where no target declares one.
 

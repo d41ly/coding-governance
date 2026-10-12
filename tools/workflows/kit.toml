@@ -114,6 +114,10 @@ why_no_adopter = "every rendered artifact, the review protocol and the four harn
 # `missing shipped copy`.
 [[regenerate]]
 argv = ["bash", "{kit}/check-protocol-parity.test.sh", "--render", "--tracked-only"]
+# Staged for the bar (TOOL-aPrimedIndex-1): run-gates' regen.py re-renders this before a bar.
+# This kit's [check] declares none, so the row names the parity gate's compare mode.
+check = ["bash", "{kit}/check-protocol-parity.test.sh"]
+stage = 1
 
 [[gate_leg]]
 name = "verifier fan-out"
