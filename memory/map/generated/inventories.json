@@ -198,6 +198,7 @@
     ],
     "gotcha-classes": [
       "a-folded-field-leaves-its-row-shape-docs-behind.md",
+      "a-gate-that-walks-the-repo-root-reads-other-worktrees.md",
       "a-grep-for-a-word-is-a-presence-probe.md",
       "a-helper-extraction-blinds-a-per-function-rule.md",
       "a-merged-in-check-can-refuse-a-pinned-record.md",

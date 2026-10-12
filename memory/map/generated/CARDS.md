@@ -63,9 +63,10 @@ Codebase map — CI-verified inventory claims + the reuse recall index
 Three scanners for the failure modes a reader cannot see: PowerShell's decoding traps, a shell loop that blocks forever, and Python text IO that decodes with...
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/gate-lint.md`
-- decisions 1: `TOOL-aLeakedHandle-1`
+- decisions 2: `TOOL-aLeakedHandle-1`, `TOOL-cListedCensus-1`
 - gate-legs 4: `shell hygiene (a loop fed by a command substitution)`, `shell-hygiene selftest`, `encoding posture (text IO names its encoding)`, `shell hygiene (a location probe asked from a moved directory)`
 - kits 1: `gate-lint`
+- gotcha-classes 1: `a-gate-that-walks-the-repo-root-reads-other-worktrees.md`
 - globs 4: `tools/gate-lint/*`, `memory/project/substitution-fed-loops.txt`, `memory/project/encoding-posture-sites.txt`, `memory/project/location-probe-waivers.txt`
 
 ## govkit

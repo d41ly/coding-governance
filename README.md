@@ -61,9 +61,9 @@ machines/sessions on the same repo.
 - **`tools/lib/`** — gov-internal, ships nothing: the one python-launcher resolver, carried INLINE and
   byte-identical by every copy-installed kit (a gate holds the copies together).
 - **`tools/gate-lint/`** — drop-in source-hygiene scans, not gate-logic linting. `ps-hygiene.py`
-  reads every `.ps1` under a root at BYTE level for two silent-failure classes: case-only
+  reads every tracked `.ps1` under a root at BYTE level for two silent-failure classes: case-only
   identifier collisions, and BOM-less scripts containing non-ASCII that PowerShell 5.1 decodes as
-  CP1252. Two lines to adopt, no gate legs of its own, `--selftest` included. See
+  CP1252. Two lines to adopt, on no gate leg of the kit's own, `--selftest` included. See
   `tools/gate-lint/README.md`.
 - **`tools/hooks/agent-cap.js`** — a `PreToolUse` guard on `Workflow|Agent` that caps fan-out in both
   modalities. A direct `Agent` spawn carries no script, so it is COUNTED at runtime — each claims a
