@@ -1233,6 +1233,8 @@ measure_spawn_rate() {
   t0=${EPOCHREALTIME:-}; t0=${t0//[.,]/}
   [ -n "$t0" ] || return 0
   for ((j=0; j<k; j++)); do
+    # A failed spawn's only effect is the caller's refusal (TOOL-aSparedSpawn-16 S4), which the canary arms.
+    # arm-signature: could not be measured (a spawn failed, or bash has no EPOCHREALTIME), so no pick is written
     ( for ((r=0; r<CALIBRATE_REPS; r++)); do "${CAL_CMD[@]}" </dev/null >/dev/null 2>&1 || exit 1; done ) &
     pids+=("$!")
   done
@@ -1378,8 +1380,7 @@ TS_TICK_EVERY=$(( TS_TTL / 6 )); [ "$TS_TICK_EVERY" -ge 1 ] || TS_TICK_EVERY=1
 TS_TICK_PID=""
 TS_TICK_LIVE=0
 
-ts_now()  { date +%s; }
-ts_hb()   { [ -n "$TS_DIR" ] && printf '%s' "$EPOCHSECONDS" > "$TS_DIR/heartbeat.tmp" 2>/dev/null && mv -f "$TS_DIR/heartbeat.tmp" "$TS_DIR/heartbeat" 2>/dev/null || true; }
+ts_hb()  { [ -n "$TS_DIR" ] && printf '%s' "$EPOCHSECONDS" > "$TS_DIR/heartbeat.tmp" 2>/dev/null && mv -f "$TS_DIR/heartbeat.tmp" "$TS_DIR/heartbeat" 2>/dev/null || true; }
 ts_alive(){ kill -0 "$1" 2>/dev/null; }
 
 # RELEASE IS NONCE-GUARDED. A run whose beacon was reaped for being stale must never delete its
@@ -1417,10 +1418,11 @@ ts_drop_ticket() { [ -n "$TS_TICKET" ] && rm -f "$TS_TICKET" 2>/dev/null; TS_TIC
 # before checking anything is a ticker that can refresh a beacon it never owned.
 #
 # NO FORK BUT THE SLEEP AND THE MOVE (TOOL-aSparedSpawn-15 S3). The nonce was `$(cat ...)` and the
-# time `$(ts_now)`, two spawns a tick, and a spawn on a loaded node `a` costs 632 to 818 ms, so a
-# tick ran late by over a second and a live holder read as stalled. Both are builtins now: `read`
-# for the nonce, `$EPOCHSECONDS` for the time, with `ts_now` kept as the fallback where the shell
-# has no `EPOCHSECONDS`.
+# time a `date +%s` subshell, two spawns a tick, and a spawn on a loaded node `a` costs 632 to 818 ms,
+# so a tick ran late by over a second and a live holder read as stalled. Both are builtins now: `read`
+# for the nonce, `$EPOCHSECONDS` for the time. ONE RULE, TOOL-aSparedSpawn-16 S15: the runner
+# requires bash 5's `EPOCHSECONDS` and reads it bare at every site, with no fallback, because a
+# `$(date +%s)` fallback is the banned `epoch-date` fork and no supported bash lacks the variable.
 ts_tick_start() {
   [ -n "$TS_DIR" ] || return 0
   local _hp=$$ _d=$TS_DIR _n=$TS_NONCE _every=$TS_TICK_EVERY _cur
@@ -1430,7 +1432,7 @@ ts_tick_start() {
       _cur=""; { IFS= read -r _cur < "$_d/nonce"; } 2>/dev/null
       [ "$_cur" = "$_n" ] || exit 0
       kill -0 "$_hp" 2>/dev/null || exit 0
-      printf '%s' "${EPOCHSECONDS:-$(ts_now)}" > "$_d/heartbeat.tmp" 2>/dev/null \
+      printf '%s' "$EPOCHSECONDS" > "$_d/heartbeat.tmp" 2>/dev/null \
         && mv -f "$_d/heartbeat.tmp" "$_d/heartbeat" 2>/dev/null || true
     done
   # STDIO GOES NOWHERE, and that is the whole point. Backgrounded and disowned, this
@@ -2808,8 +2810,10 @@ $dirt"
 # or empty path, `.`, or any byte `ls-files` would quote, sends its leg to `input_key`, the per-leg
 # definition, unchanged. A quoted listing line is matched by its escaped text, which agrees with the raw
 # path on every plain prefix. Any failure in the bulk half reads as the dash `input_key` gives a
-# failed hash, never as a key: an unmeasurable input is not a reusable one.
+# failed hash, never as a key: an unmeasurable input is not a reusable one. `KEYS_FAIL` names the step
+# that failed, which the caller prints (TOOL-aSparedSpawn-16 S18): a silent dash is a saving lost unseen.
 INPUT_KEYS=()
+KEYS_FAIL=""
 build_input_keys() {
   local i g gp n_bulk=0 bulk="" union=() plain shas=() k=0 comp
   local -a lines=()
@@ -2853,23 +2857,23 @@ build_input_keys() {
           if ((p == g && !dn[l, j]) || substr(p, 1, length(g) + 1) == g "/") { print line > (dir "/keys.slice." leg[l]); break }
         } }
       END { for (l = 1; l <= nl; l++) close(dir "/keys.slice." leg[l]) }
-    ' "$WORK/keys.guards" "$WORK/keys.listing" 2>/dev/null || return 0
+    ' "$WORK/keys.guards" "$WORK/keys.listing" 2>/dev/null || { KEYS_FAIL="the guard slices"; return 0; }
   fi
   for i in $bulk; do
     lines=(); comp=""
     if [ -n "${guards[$i]}" ]; then
-      { mapfile -t lines < "$WORK/keys.slice.$i"; } 2>/dev/null || return 0
+      { mapfile -t lines < "$WORK/keys.slice.$i"; } 2>/dev/null || { KEYS_FAIL="the guard slices"; return 0; }
       [ "${#lines[@]}" -gt 0 ] && printf -v comp '%s\n' "${lines[@]}"
       comp=${comp%$'\n'}
     fi
     build_key_text "$i" "$comp"
-    printf '%s' "$KEY_TEXT" > "$WORK/key.$i" || return 0
+    printf '%s' "$KEY_TEXT" > "$WORK/key.$i" || { KEYS_FAIL="a key text"; return 0; }
     printf 'key.%s\n' "$i" >> "$WORK/keys.slices"
   done
   git --git-dir="$RG_COMMON" -C "$WORK" hash-object --no-filters --stdin-paths \
-    < "$WORK/keys.slices" > "$WORK/keys.shas" 2>/dev/null || return 0
+    < "$WORK/keys.slices" > "$WORK/keys.shas" 2>/dev/null || { KEYS_FAIL="the key hashes"; return 0; }
   { mapfile -t shas < "$WORK/keys.shas"; } 2>/dev/null
-  [ "${#shas[@]}" = "$n_bulk" ] || return 0
+  [ "${#shas[@]}" = "$n_bulk" ] || { KEYS_FAIL="the key hashes"; return 0; }
   for i in $bulk; do INPUT_KEYS[$i]=${shas[$k]%$'\r'}; k=$((k + 1)); done
 }
 
@@ -2893,6 +2897,8 @@ REUSE_DIGEST=$(
   printf 'bash %s %s\n' "$BASH_VERSION" "$MACHTYPE"
   if [ -r /proc/version ]; then IFS= read -r r < /proc/version; printf 'runtime %s\n' "$r"; fi
   printf 'python %s %s\n' "$PYBIN" "$PY_ID"
+  # An empty digest is reported after `build_input_keys` below (TOOL-aSparedSpawn-16 S18), not here.
+  # arm-signature: the input keys could not be measured (the toolchain digest), so nothing is reused or cached this run
   git version 2>/dev/null || exit 1
   git config --get-regexp '^core\.(autocrlf|eol)$' 2>/dev/null
   # Every other tool a leg names, by the location it resolves to: argv[0], each once.
@@ -2906,6 +2912,7 @@ REUSE_DIGEST=$(
   # The environment the legs inherit; `compgen -e` lists the exported names, sorted. PATH is always
   # exported, so an empty listing is a failed read and fails the digest rather than dropping the env.
   mapfile -t evs < <(compgen -e)
+  # arm-signature: the input keys could not be measured (the toolchain digest), so nothing is reused or cached this run
   [ "${#evs[@]}" -gt 0 ] || exit 1
   for v in "${evs[@]}"; do
     case $v in GATE_REUSE*|GATE_TURNSTILE_HELD|GATE_RUN_ID|GATE_BASE|GATE_PUSH_BASE) continue ;;
@@ -3057,6 +3064,13 @@ fi
 # cache write below; a bar with none of them computes none, as a bar with neither asked git for none.
 if [ -n "$RUNDIR" ] || [ "$REUSE_MODE" != off ] || { [ -n "$REUSE_CACHE" ] && [ "$TREE_CLEAN" = yes ]; }; then
   build_input_keys
+  # SAID ONCE, ON STDERR (TOOL-aSparedSpawn-16 S18), where the keys were wanted for a saving: an empty
+  # toolchain digest or a failed bulk step leaves every key a dash, which executes everything and caches
+  # nothing, and until now did so in silence. A ledger-only bar loses no saving, so it says nothing.
+  [ -z "$REUSE_DIGEST" ] && KEYS_FAIL="the toolchain digest"
+  if [ -n "$KEYS_FAIL" ] && { [ "$REUSE_MODE" != off ] || { [ -n "$REUSE_CACHE" ] && [ "$TREE_CLEAN" = yes ]; }; }; then
+    printf 'run-gates: reuse — the input keys could not be measured (%s), so nothing is reused or cached this run\n' "$KEYS_FAIL" >&2
+  fi
 fi
 
 # ---- reuse a proven green (the reuse unit, then TOOL-aSparedSpawn-13) -------------------------------
@@ -3071,7 +3085,8 @@ fi
 # `ok` under that key in the git common dir, it has not been reused 10 runs in a row (S7), and the
 # sample did not draw it (S6). Any missing term means execute: every failure mode of this block is
 # "did more work", never "checked less". The cache entry is read by a builtin, so a lookup spawns
-# nothing. The age counter moves here and is reset when the leg executes (the cache block below).
+# nothing. The age count moves here, in the entry itself, and an execution under the same key resets it
+# by writing a fresh entry (the cache block below).
 reuses=0
 if [ "$REUSE_MODE" != off ]; then
   for ((i=0; i<total; i++)); do
@@ -3092,9 +3107,12 @@ if [ "$REUSE_MODE" != off ]; then
       printf 'run-gates: reuse — %s is quarantined until its manifest row changes\n' "${names[$i]}" >&2
       continue
     fi
-    _st=""; { IFS=$'\t' read -r _st _ < "$REUSE_CACHE/${_key:0:2}/$_key"; } 2>/dev/null
+    # THE AGE IS THE ENTRY'S SIXTH FIELD (TOOL-aSparedSpawn-16 S11), kept per KEY: an execution under
+    # another key, a dirty tree's, no longer resets this one's count. Every field before it is written
+    # non-empty, so a TAB-split read cannot shift it; a five-field entry, as an older runner wrote, reads 0.
+    _st=""; _es=""; _er=""; _eh=""; _ee=""; _age=""
+    { IFS=$'\t' read -r _st _es _er _eh _ee _age _ < "$REUSE_CACHE/${_key:0:2}/$_key"; } 2>/dev/null
     [ "$_st" = ok ] || continue                      # missing, unreadable or malformed: execute
-    _age=0; { IFS= read -r _age < "$REUSE_CACHE/age.${heldkeys[$i]}"; } 2>/dev/null
     [[ $_age =~ ^[0-9]+$ ]] || _age=0
     if [ "$_age" -ge 10 ]; then
       printf '%s' "$_key" > "$WORK/$i.aged"
@@ -3112,10 +3130,13 @@ if [ "$REUSE_MODE" != off ]; then
       printf '%s' "$_key" > "$WORK/$i.sampled"
       continue
     fi
-    printf '%s' "$((_age + 1))" > "$REUSE_CACHE/age.${heldkeys[$i]}" 2>/dev/null
+    # The reuse rewrites its own entry with the count plus one, in place by `printf`. A reader that meets
+    # it torn reads it malformed and executes, which costs a saving and never a verdict.
+    printf 'ok\t%s\t%s\t%s\t%s\t%s\n' "$_es" "$_er" "$_eh" "$_ee" "$((10#$_age + 1))" \
+      > "$REUSE_CACHE/${_key:0:2}/$_key" 2>/dev/null
     printf 'reuse' > "$WORK/$i.rc"
   done
-  unset _cls _key _q _st _age _h _s _c _o
+  unset _cls _key _q _st _es _er _eh _ee _age _h _s _c _o
 fi
 
 # ---- CALIBRATION: THE SPAWN FLOOR. TOOL-dDerivedDocket-26 S5 ---------------------------------------
@@ -3303,7 +3324,7 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
   { mapfile -d '' chunks_out < "$WORK/$i$sfx.raw"; } 2>/dev/null
   printf -v out '%s' ${chunks_out[@]+"${chunks_out[@]}"}
   while [[ $out == *$'\n' ]]; do out=${out%$'\n'}; done
-  [[ $out == *$'\r' ]] && out=$(cat "$WORK/$i$sfx.raw" 2>/dev/null)
+  [[ $out == *$'\r' ]] && out=$(< "$WORK/$i$sfx.raw")   # there to read: mapfile just read it
   # THE MASK IS SET HERE, ONCE, in this worker and only after the leg has exited, so the leg never
   # inherits it: every file below is created owner-only, which is what the two `chmod 600` gave.
   umask 077
@@ -3326,7 +3347,10 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
   local lf="" logged
   leg_log "${names[$i]}" && lf=$LEG_LOG
   printf -v logged '# run-gates | leg %s | exit %s\n%s\n' "${names[$i]}" "$rc" "$out"
-  if [ -n "$lf" ]; then
+  # NOT FOR THE SAMPLE'S SECOND LOOK (TOOL-aSparedSpawn-16 S16): the `log:` pointer `FAILED_LEGS` already
+  # carries names this file, and it must keep naming the attempt that redded the run. The look's own
+  # output stays in the run directory below.
+  if [ -n "$lf" ] && [ "$sfx" != .sample ]; then
     { write_redacted "$lf" "$logged"; } 2>/dev/null || true
   fi
   printf '%s\n' "$out" > "$WORK/$i$sfx.out"
@@ -3418,8 +3442,13 @@ derive_fail_tail() {
 }
 
 report_one() { # leg index — emits exactly the line the serial bar has always emitted
-  local i=$1 rc ftail
+  local i=$1 rc ftail rtail=""
   n=$((n+1))
+  # THE REUSE MARKERS ON THE LEG'S OWN LINE (TOOL-aSparedSpawn-16 S17), under the two-space tail
+  # contract: a leg the sample drew, or one the age bound forced, executed for a reason the line used to
+  # leave to a stderr note. `-f` is a builtin test, so the read spawns nothing.
+  if [ -f "$WORK/$i.sampled" ]; then rtail="  (sampled against a cached ok)"
+  elif [ -f "$WORK/$i.aged" ]; then rtail="  (executed: reused on 10 runs in a row)"; fi
   if [ ! -f "$WORK/$i.rc" ]; then
     RED_LEGS="$RED_LEGS $i"
     fails=$((fails+1)); c_ran=$((c_ran+1)); c_fail=$((c_fail+1)); printf 'GATE FAIL  %s  (no result)\n' "${names[$i]}"
@@ -3449,7 +3478,7 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     # THE FOURTH VERB, padded to the same column as the other three and following the two-space tail
     # contract: a reader splits the remainder on a double space and gets the bare leg name back.
     reuses=$((reuses+1)); c_reuse=$((c_reuse+1)); printf 'GATE reuse %s  (proven green, inputs unchanged)\n' "${names[$i]}"
-  elif [ "$rc" = 0 ]; then c_ran=$((c_ran+1)); printf 'GATE ok    %s\n' "${names[$i]}"
+  elif [ "$rc" = 0 ]; then c_ran=$((c_ran+1)); printf 'GATE ok    %s%s\n' "${names[$i]}" "$rtail"
   else c_ran=$((c_ran+1))
        local fired=0 secs=""
        { IFS= read -r fired < "$WORK/$i.bound"; } 2>/dev/null
@@ -3472,7 +3501,7 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
        fi
        fails=$((fails+1)); c_fail=$((c_fail+1)); RED_LEGS="$RED_LEGS $i"
        ftail="($(derive_fail_tail "$rc" "$fired" "$secs"))"
-       printf 'GATE FAIL  %s  %s\n' "${names[$i]}" "$ftail"; sed 's/^/    /' "$WORK/$i.out"
+       printf 'GATE FAIL  %s  %s%s\n' "${names[$i]}" "$ftail" "${rtail# }"; sed 's/^/    /' "$WORK/$i.out"
        FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  $ftail"$'\n'   # TOOL-aLeasedGauntlet-1 S3: keep for the durable summary
        # TOOL-dNomadicAtlas-1: a POINTER at the leg's own output, so the durable summary answers WHY
        # and not only WHICH. A pointer, never the bytes — this file is what an operator quotes.
@@ -3629,7 +3658,7 @@ remove_wall_watcher() {
 # both parse, and the WHOLE row is matched, because a start time printed with a space shifts every
 # later column. `$$` is the RUNNER's pid in the detached sampler too, which is the point. Two spawns.
 measure_foreign() {
-  local snap ts=${EPOCHSECONDS:-0}
+  local snap ts=$EPOCHSECONDS
   if [ -z "${CENSUS_TOKENS:-}" ] || ! snap=$(ps -ef 2>/dev/null); then
     printf '%s\tunknown\t\n' "$ts"; return 0
   fi
@@ -4818,11 +4847,13 @@ if [ -n "${GATE_SELFTESTS:-}" ] && [ -n "$HELD_DIR" ] && [ -n "$RG_HEAD" ]; then
 fi
 
 # THE REUSE CACHE (TOOL-aSparedSpawn-13 S4 S5 S7), in the git common dir so every worktree of the clone
-# shares it, and never in a ref, so nothing pushes it. Per leg that EXECUTED: its age counter, where it
-# has one, goes back to 0. Per leg that executed `ok` on its FIRST attempt, on a tree that was clean
-# when the run started and did not move, with a measured key and no legacy `impure`: one entry under
-# `<key[0:2]>/<key>`, `ok<TAB>secs<TAB>run id<TAB>HEAD<TAB>ended epoch`. A reused, held or skipped leg
-# did not execute and writes nothing, so a wrong entry cannot carry itself forward. A `remote` leg
+# shares it, and never in a ref, so nothing pushes it. Per leg that executed `ok` on its FIRST attempt,
+# on a tree that was clean when the run started and did not move, with a measured key and no legacy
+# `impure`: one entry under `<key[0:2]>/<key>`, `ok<TAB>secs<TAB>run id<TAB>HEAD<TAB>ended epoch<TAB>reuses`,
+# the reuse count 0, which is the only reset the count has (TOOL-aSparedSpawn-16 S11): an execution
+# under another key touches nothing of this one, and an executed red writes nothing. A held or skipped
+# leg did not execute and writes nothing, and a reused one rewrites only its count, so a wrong entry
+# cannot carry itself forward past the age bound. A `remote` leg
 # writes only when the remote is probed again after the legs end and still advertises what it was
 # keyed on (S9). Every write, tmp then rename, and the 30-day prune by mtime run in ONE python
 # process, so a bar pays one spawn for them however many legs it records; any failure there costs a
@@ -4833,7 +4864,6 @@ if [ -n "$REUSE_CACHE" ] && [ -n "$RG_HEAD" ]; then
     [ -z "${names[$i]}" ] && continue
     _crc=""; { IFS= read -r _crc < "$WORK/$i.rc"; } 2>/dev/null
     case "$_crc" in ''|ondemand|skip|docskip|reuse) continue ;; esac
-    [ -f "$REUSE_CACHE/age.${heldkeys[$i]}" ] && printf '0' > "$REUSE_CACHE/age.${heldkeys[$i]}" 2>/dev/null
     [ "$_crc" = 0 ] && [ "$TREE_CLEAN" = yes ] && [ "$tree_moved" = no ] || continue
     _ck=${INPUT_KEYS[$i]:--}
     [ "$_ck" != - ] && [ "${#_ck}" -ge 3 ] || continue
@@ -4866,7 +4896,7 @@ for line in sys.stdin.read().splitlines():
         os.makedirs(d, exist_ok=True)
         tmp = os.path.join(d, f[0] + ".tmp." + str(os.getpid()))
         with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
-            fh.write("ok\t" + "\t".join(f[1:5]) + "\n")
+            fh.write("ok\t" + "\t".join(f[1:5]) + "\t0\n")
         os.replace(tmp, os.path.join(d, f[0]))
     except OSError:
         pass
@@ -5102,5 +5132,6 @@ else
   echo "gates RED — $fails/$ran legs failed$skipnote$movenote$hostnote"
   [ -n "$sfile" ] && echo "gate summary saved to $sfile"
   [ -n "$gd" ] && [ -f "$gd/gate-last-failure.txt" ] && echo "gate failure record saved to $gd/gate-last-failure.txt"
+  # arm-signature: gates RED — 1/2 legs failed
   exit 1
 fi

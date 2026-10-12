@@ -1,11 +1,13 @@
 # TOOL-aSparedSpawn-16 — the closing review's mediums and lows, and the bar reds this build's diff carries
 
-**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base f479ba42 · streams tooling · order 4
+**Status:** CLOSED · rev-3 · 2026-10-12 · node a · Tier-2 · base f479ba42 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-build-TOOL-aSparedSpawn-16-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aSparedSpawn-16-acceptance-ledger.md) | journal | — |
+| [2026-10-12-build-TOOL-aSparedSpawn-16-direct-checks.sh](../build/2026-10-12-build-TOOL-aSparedSpawn-16-direct-checks.sh) | journal | — |
 | [2026-10-12-prompt-TOOL-aSparedSpawn-16-build-brief.md](../prompts/2026-10-12-prompt-TOOL-aSparedSpawn-16-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

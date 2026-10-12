@@ -147,7 +147,10 @@ def load_half(path, host, causes):
             why = " (a `wsl --shutdown` or a reboot ends a half without one)" if part == "verdict" else ""
             causes.append(f"the {host} half left no {part} file at {path}{why}")
     try:
-        with open(os.path.join(path, "stdout"), encoding="utf-8", errors="replace") as fh:
+        # newline="" hands parse_verdicts the runner's exact bytes: text mode turns a bare CR in a failing
+        # leg's echoed output into a line break, and a `GATE <verb> <name>` after it becomes a row
+        # (TOOL-aSparedSpawn-16 S14). The parser splits on LF alone and strips a CR ending a line.
+        with open(os.path.join(path, "stdout"), encoding="utf-8", errors="replace", newline="") as fh:
             half["legs"] = parse_verdicts(fh.read())
     except OSError:
         half["legs"] = []
@@ -438,7 +441,7 @@ def main(argv=None):
 # Synthetic manifests, declarations, halves and git dirs, all under one temp dir. It spawns nothing,
 # so it grades this file and no host. ARMS_DECLARED is the liveness assertion: an arm stranded past an
 # early return lowers the count and reds the run.
-ARMS_DECLARED = 33
+ARMS_DECLARED = 34
 
 
 def seed_half(root, host, legs, verdict="GREEN", sha="s" * 40, fp="f" * 40, blob="b" * 40,
@@ -638,6 +641,14 @@ def run_selftest():
                  len(rows) == 6 and not stamped and code == 1 and "disagreeing: E" in out)
         code, out, stamped, _ = run_case("paired-gap", win=[("C", "ok"), ("A", "ok")], extra=("--paired",))
         arm_case("AC5 a paired Windows half missing a WSL leg is refused", code == 2 and "leg 'B' ran on wsl" in out)
+
+        # S14 (TOOL-aSparedSpawn-16) — a bare CR inside a failing leg's echoed output is a byte of that
+        # output, so no verdict row splits off it: the per-leg view is the two legs the runner reported.
+        cr = seed_half(os.path.join(tmp, "cr"), "wsl", [("A", "ok")])
+        with open(os.path.join(cr, "stdout"), "w", encoding="utf-8", newline="") as fh:
+            fh.write("GATE FAIL  A  (exit 1)\n    boom\rGATE ok    B\nGATE ok    E\n")
+        arm_case("S14 a CR in a failing leg's output splits off no verdict row",
+                 load_half(cr, "wsl", [])["legs"] == [("A", "FAIL"), ("E", "ok")])
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     for f in fails:

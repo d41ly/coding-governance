@@ -363,7 +363,7 @@ fi
 #
 # THE TTL IS MEASURED, NOT TYPED (TOOL-aSparedSpawn-15 S3). A TTL is a time by definition, so this is
 # the one arm where a clock stays; what it stops being is a guess. Before the runs, the SHIPPED
-# `ts_tick_start`, with the two helpers it calls, is sourced from the runner and run for ten ticks
+# `ts_tick_start`, with the one helper it calls, is sourced from the runner and run for ten ticks
 # against a scratch beacon, with a `sleep` stub first on its PATH: one spawn in place of the real
 # sleep's one, returning at once, so the ten bodies cost the spawns a real tick pays and nothing
 # waits a second. The stub counts its calls in a file and, on the eleventh, stamps the end and
@@ -374,7 +374,7 @@ fi
 # reaps. A tick body that grows a spawn (a `cat` or a `date` put back) raises the printed period,
 # and a period that cannot be read is a FAIL, never a typed fallback.
 tk6=$tmp/tick6; mkdir -p "$tk6/b" "$tk6/bin"; printf '%s' tick > "$tk6/b/nonce"
-sed -n '/^ts_now()/p;/^ts_alive()/p;/^ts_tick_start() {/,/^}$/p' "$HERE/run-gates.sh" > "$tk6/fn.sh"
+sed -n '/^ts_alive()/p;/^ts_tick_start() {/,/^}$/p' "$HERE/run-gates.sh" > "$tk6/fn.sh"
 printf '%s\n' '#!/bin/bash' \
   'd=${0%/bin/sleep}; k=0; { read -r k < "$d/count"; } 2>/dev/null; k=$((k + 1)); printf "%s\n" "$k" > "$d/count"' \
   '[ "$k" -le 10 ] || { printf "%s\n" "${EPOCHREALTIME//[.,]/}" > "$d/end"; printf x > "$d/b/nonce"; }' > "$tk6/bin/sleep"

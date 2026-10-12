@@ -199,9 +199,9 @@ probes the remote (one bounded `ls-remote --heads`, on a clean tree, when such a
 and caches its verdict only when a second probe after the legs end reads the same advertisement.
 
 **The cache** is one file per key under `<git-common-dir>/gate-cache/<key[0:2]>/<key>`, holding `ok`,
-seconds, run id, `HEAD` and an epoch, so every worktree of a clone shares it and nothing pushes it. It
+seconds, run id, `HEAD`, an epoch and its reuse count, so every worktree of a clone shares it and nothing pushes it. It
 is written only by a leg that EXECUTED `ok` on its first attempt on a tree that was clean when the
-run started and did not move; a reused leg writes nothing, so a wrong entry cannot carry itself
+run started and did not move, with its count at 0; a reused leg rewrites only its count, so a wrong entry cannot carry itself
 forward. Every write and the prune of entries older than 30 days run in one python process at run
 end. `gate-ledger.tsv` stays the dispatch-duration hint and is no longer read for reuse.
 
@@ -211,7 +211,11 @@ drawn leg that executes green agrees. One that reds against its cached `ok` has 
 runs once more: red again prints `cache disagreement · <leg> · <key>` and erases the entry, red then
 green prints `nondeterministic · <leg>`, and either quarantines the leg (`quarantine.<name key>` in
 the cache dir) until its manifest row changes. A leg reused on 10 consecutive runs executes on the
-next whatever the draw (`age.<name key>`), so a wrong entry lives at most that long.
+next whatever the draw, so a wrong entry lives at most that long. The count is kept per KEY, in the
+entry itself: only an execution under that key resets it, by writing a fresh entry, and an execution
+under another key, a dirty tree's for one, leaves it alone. Each fact is on the leg's own line, under
+the two-space tail: `GATE ok    <leg>  (sampled against a cached ok)` for a drawn leg, and
+`(executed: reused on 10 runs in a row)` for one the bound forced, on its `GATE ok` or `GATE FAIL` line.
 An executed red against a cached `ok` erases the entry and quarantines the leg,
 whatever drew the execution: the age bound, a plain bar, or a push-mode bar that may not reuse
 that leg. Only a drawn leg runs once more to classify; any other takes its effective verdict, its
@@ -227,7 +231,9 @@ location of every tool a leg names, and the exported `GATE_* GOV_* *_PY GIT_* PY
 PATH` variables, less every `GATE_REUSE*` knob, `GATE_TURNSTILE_HELD`, `GATE_RUN_ID`, and `GATE_BASE`
 and `GATE_PUSH_BASE`, which enter only a `base` leg's key. It does NOT see a tool other than git
 upgraded in place at the same path, a variable outside that set, or a read no class names, which is
-what the sample exists to catch. A failed walk or digest makes the key a dash, which never matches.
+what the sample exists to catch. A failed walk or digest makes the key a dash, which never matches,
+and a run that would have reused or cached says so once on stderr: `run-gates: reuse — the input
+keys could not be measured (<step>), so nothing is reused or cached this run`.
 The header's `reuse_schema`, `reuse` (`off`, `env` or `push`) and `reuse_sample` keys say how a run
 keyed and drew.
 

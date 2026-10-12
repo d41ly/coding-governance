@@ -1455,6 +1455,14 @@ unset GATE_DOCS_BASE
 # legs a vetted runner spares. It is set again below, on a scoped decision whose tip probe agreed.
 [ -n "${GATE_REUSE_PUSH+x}" ] && ENV_CLEARED+=" GATE_REUSE_PUSH"
 unset GATE_REUSE_PUSH
+# ITS TWO SEAMS GO WITH IT (TOOL-aSparedSpawn-16 S6), for every bar a STUB included: `GATE_REUSE_SAMPLE`
+# sets how often a reused leg is re-executed and `GATE_REUSE_DAY` pins the day a `clock` leg is keyed
+# on, so either, inherited, decides what a push bar spares. The runner keeps reading both; they are
+# its own suite's seams, and that suite drives the runner directly.
+for _k in GATE_REUSE_SAMPLE GATE_REUSE_DAY; do
+  [ -n "${!_k+x}" ] && ENV_CLEARED+=" $_k"
+  unset "$_k"
+done
 [ -n "$ENV_CLEARED" ] \
   && echo "pre-push: not honoured from the environment by this bar:$ENV_CLEARED" >&2
 

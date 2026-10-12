@@ -20308,11 +20308,6 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
-      "id": "ts_now",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.sh"
-    },
-    {
       "id": "ts_release",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"

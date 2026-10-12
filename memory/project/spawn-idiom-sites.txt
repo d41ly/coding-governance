@@ -188,7 +188,7 @@ tools/run-gates/foreign-prefix.gov.test.sh	var-pipe	3	predates the lint; a param
 tools/run-gates/lib-attribute.sh	var-pipe	2	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/run-gates/profile_bar.test.sh	cat-file	2	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/run-gates/profile_bar.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
-tools/run-gates/run-gates.evidence.test.sh	cat-file	11	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.evidence.test.sh	cat-file	10	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.evidence.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/run-gates/run-gates.evidence.test.sh	var-pipe	43	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.gov.test.sh	path-subst	6	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
@@ -206,7 +206,7 @@ tools/run-gates/run-gates.test.sh	date-fmt	1	predates the lint; `printf -v v '%(
 tools/run-gates/run-gates.test.sh	path-subst	10	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/run-gates/run-gates.test.sh	printf-subst	2	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.test.sh	pure-fn-subst	11	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: resolve_mp_record×11
-tools/run-gates/run-gates.test.sh	var-pipe	136	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.test.sh	var-pipe	141	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.turnstile.test.sh	cat-file	11	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.turnstile.test.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.turnstile.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
@@ -245,7 +245,7 @@ tools/unattended/check-unattended.sh	cat-file	5	predates the lint; `$(<file)` is
 tools/unattended/check-unattended.sh	path-subst	8	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/unattended/check-unattended.sh	printf-subst	2	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
 tools/unattended/check-unattended.sh	pure-fn-subst	1	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: resolve_shared_records×1
-tools/unattended/check-unattended.sh	var-pipe	26	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/check-unattended.sh	var-pipe	25	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/unattended/check-unattended.test.sh	cat-file	16	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/unattended/check-unattended.test.sh	path-subst	10	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/unattended/check-unattended.test.sh	printf-subst	8	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit

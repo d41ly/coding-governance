@@ -45,6 +45,7 @@ govkit runbook parity	repo	declarations
 govkit selfcheck	repo	declarations
 govkit selftest	kit	selftests
 harness arms (fail branches armed or pinned)	repo	declarations
+held-halves selftest	kit	selftests
 hook destinations (every declared hook path ships)	repo	product
 hook destinations self-test	kit	selftests
 install-prefix (shipped surface)	repo	product

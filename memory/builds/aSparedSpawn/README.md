@@ -65,7 +65,7 @@ roughly doubled in six weeks while nothing retires one.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 19 unit(s) · node a · opened 2026-10-09 · streams tooling
+**Build status:** CLOSED · 19 unit(s) · node a · opened 2026-10-09 · streams tooling
 ids TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14
 ids TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedSpawn-18 TOOL-aSparedSpawn-19
 
@@ -87,13 +87,13 @@ ids TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedS
 | [TOOL-aSparedSpawn-12 — the held self-test tier, selected by the kit whose shipped bytes moved](spec/2026-10-09-spec-TOOL-aSparedSpawn-12.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-12 |
 | [TOOL-aSparedSpawn-13 — content-addressed reuse: declared read classes, a shared cache, a soundness sample](spec/2026-10-09-spec-TOOL-aSparedSpawn-13.md) | 3 | 2 | CLOSED | rev-5 | 2026-10-12 |
 | [TOOL-aSparedSpawn-14 — a refusal retirement review, and a growth budget beside the floors](spec/2026-10-09-spec-TOOL-aSparedSpawn-14.md) | 3 | 2 | CLOSED | rev-5 | 2026-10-12 |
-| [TOOL-aSparedSpawn-16 — the closing review's mediums and lows, and the bar reds this build's diff carries](spec/2026-10-12-spec-TOOL-aSparedSpawn-16.md) | 4 | 2 | INPROGRESS | rev-3 | 2026-10-12 |
+| [TOOL-aSparedSpawn-16 — the closing review's mediums and lows, and the bar reds this build's diff carries](spec/2026-10-12-spec-TOOL-aSparedSpawn-16.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-12 |
 | [TOOL-aSparedSpawn-17 — an executed red under a cached ok erases the entry and quarantines the leg](spec/2026-10-12-spec-TOOL-aSparedSpawn-17.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-12 |
 | [TOOL-aSparedSpawn-18 — the width A/B instrument counts only executed verdicts and fails on a red bar](spec/2026-10-12-spec-TOOL-aSparedSpawn-18.md) | 4 | 1 | CLOSED | rev-1 | 2026-10-12 |
 | [TOOL-aSparedSpawn-19 — the spawn-budget leg never passes a run that graded nothing it could have](spec/2026-10-12-spec-TOOL-aSparedSpawn-19.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 55 bound to this build, across 4 record folder(s).
+Records: 57 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

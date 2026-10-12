@@ -153,7 +153,10 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=163
+FLOOR_ASSERTIONS=208
+# RAISED 163 -> 208 by TOOL-aSparedSpawn-13 and -16: unit 13's reuse-cache arms, forty-one assertions net
+# of the six they replaced, never counted when they landed; and unit 16's three AC12 assertions and
+# AC17's one. Counted one per `ok … || nope` pair; the executed total is owed at VERIFYING.
 # RAISED 151 -> 163 by TOOL-aSparedSpawn-17: the executed-red-under-a-cached-ok arms, AC1's five assertions and AC2's seven.
 # RAISED 131 -> 151 by TOOL-aSparedSpawn-4: the worker-builtin arms, AC1 to AC4, AC6 and AC7, twenty assertions.
 # RAISED 129 -> 131 by TOOL-aSparedSpawn-3: the dispatch-prior arms, AC5 and AC6, one assertion each.
@@ -529,7 +532,8 @@ rec_legs '[ {"name": "slow", "argv": ["bash", "fx/slow.sh"]} ]'
 mv_mark=$REC_T.mover; mv_end=$REC_T.ended; rm -f "$mv_mark" "$mv_end"
 ( while :; do
     c="$REC_GD/gate-run/current"
-    if [ -f "$c" ] && [ -f "$REC_GD/gate-run/$(cat "$c")/header" ]; then
+    cur=""; [ -f "$c" ] && { IFS= read -r cur < "$c"; } 2>/dev/null
+    if [ -n "$cur" ] && [ -f "$REC_GD/gate-run/$cur/header" ]; then
       echo moved >> "$REC_T/fx/a.sh"; echo yes > "$mv_mark"; exit 0
     fi
     [ -f "$mv_end" ] && { echo no > "$mv_mark"; exit 0; }
@@ -1191,18 +1195,20 @@ git -C "$RU_T" worktree add -q "$RU_T.wt" -b wtb >/dev/null 2>&1
 git -C "$RU_T" worktree remove --force "$RU_T.wt" >/dev/null 2>&1; rm -rf "$RU_T.wt"
 ru_done
 
-# AC5: a dirty tree writes no entry; a reused leg rewrites none.
+# AC5: a dirty tree writes no entry; a reused leg rewrites only its reuse count, the sixth field, from 0
+# to 1 (TOOL-aSparedSpawn-16 S11), so the verdict, seconds, run id, HEAD and epoch stay the earner's.
 ru_repo
 ru_run >/dev/null
-ru_n=$(measure_ru_entries); ru_k=$(read_ru_key pa); ru_m=$(cat "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" 2>/dev/null)
+ru_n=$(measure_ru_entries); ru_k=$(read_ru_key pa); ru_m=""; { IFS= read -r ru_m < "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k"; } 2>/dev/null
 [ "$ru_n" = 2 ] && ok "AC5 control: the clean green run wrote one entry per leg" || nope "AC5 the clean run wrote $ru_n entries"
 echo dirt > "$RU_T/gb/new"
 ru_run GATE_BASE="$RU_C2" >/dev/null
 [ "$(measure_ru_entries)" = "$ru_n" ] && ok "AC5 a run on a dirty tree writes no entry" || nope "AC5 the dirty run wrote $(( $(measure_ru_entries) - ru_n )) entries"
 rm -f "$RU_T/gb/new"; sleep 1
 ru_run GATE_REUSE=1 >/dev/null
-grep -q '^GATE reuse pa' "$REC_OUT" && [ "$(cat "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" 2>/dev/null)" = "$ru_m" ] \
-  && ok "AC5 a reused leg rewrites nothing" || nope "AC5 the reused leg's entry changed, or it was not reused"
+ru_m2=""; { IFS= read -r ru_m2 < "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k"; } 2>/dev/null
+grep -q '^GATE reuse pa' "$REC_OUT" && [ "$ru_m2" = "${ru_m%$'\t'*}"$'\t'1 ] \
+  && ok "AC5 a reused leg rewrites only its count, 0 to 1" || nope "AC5 the reused leg's entry changed beyond its count, or it was not reused"
 ru_done
 
 # AC6: THE SAMPLE CATCHES A WRONG ENTRY. `pa` reads FLIP, which no key holds, so its cached `ok` is
@@ -1235,20 +1241,49 @@ rm -f "$ru_nd"; ru_rc=$(ru_run GATE_REUSE=1 GATE_REUSE_SAMPLE=1)
 [ "$ru_rc" != 0 ] && grep -qxF "nondeterministic · pa" "$REC_OUT" && ok "AC6 red then green prints nondeterministic · pa and reds the run" \
   || nope "AC6 no nondeterministic line, or the run was green (rc=$ru_rc)"
 ls "$RU_GD/gate-cache"/quarantine.* >/dev/null 2>&1 && ok "AC6 the nondeterministic leg is quarantined" || nope "AC6 no quarantine file"
+# TOOL-aSparedSpawn-16 AC17: the `log:` pointer the red run records keeps naming the attempt that redded
+# it; the sample's green second look, which ran after the pointer was taken, does not overwrite it.
+ru_lf=$(sed -n 's/^    log: //p' "$RU_GD/gate-last-failure.txt" 2>/dev/null | head -1); ru_l1=""
+case "$ru_lf" in ''|/*|?:/*) ;; *) ru_lf="$RU_T/$ru_lf" ;; esac   # the runner names it from the repository root
+[ -n "$ru_lf" ] && { IFS= read -r ru_l1 < "$ru_lf"; } 2>/dev/null
+[ "$ru_l1" = "# run-gates | leg pa | exit 1" ] && ok "16-AC17 the log: file the red run names opens with the failing attempt's exit 1" \
+  || nope "16-AC17 the log: file '$ru_lf' opens with '$ru_l1', not the failing attempt"
 rm -f "$ru_nd"
 ru_done
 
 # AC7: A LEG REUSED ON 10 RUNS IN A ROW EXECUTES ON THE NEXT, whatever the sample drew (here: nothing).
+# The count is the entry's sixth field (TOOL-aSparedSpawn-16 S11), so the arm sets that field to 10. The
+# key is read from the earning run's record: a reused leg writes no row there.
 ru_repo
-ru_run >/dev/null
+ru_run >/dev/null; ru_k=$(read_ru_key pa)
 ru_run GATE_REUSE=1 >/dev/null
-ls "$RU_GD/gate-cache"/age.* >/dev/null 2>&1 && ok "AC7 precondition: a reuse moves the age counter" || nope "AC7 no age counter was written"
-for ru_f in "$RU_GD/gate-cache"/age.*; do printf '10' > "$ru_f"; done
+[ "$(cut -f6 "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" 2>/dev/null)" = 1 ] && ok "AC7 precondition: a reuse moves pa's entry count to 1" \
+  || nope "AC7 pa's entry carries no count of 1 after one reuse"
+for ru_f in "$RU_GD"/gate-cache/??/*; do awk -F'\t' -v OFS='\t' '{ $6 = 10; print }' "$ru_f" > "$ru_f.n" && mv -f "$ru_f.n" "$ru_f"; done
 ru_run GATE_REUSE=1 >/dev/null
 grep -q '^GATE reuse ' "$REC_OUT" && nope "AC7 a leg was reused an eleventh time" || ok "AC7 a leg reused on 10 runs executes on the next"
 grep -q 'pa was reused on 10 runs in a row, so it executes' "$REC_OUT" && ok "AC7 the run says why" || nope "AC7 no line names the age bound"
-ru_nz=""; for ru_f in "$RU_GD/gate-cache"/age.*; do [ "$(cat "$ru_f")" = 0 ] || ru_nz+=" ${ru_f##*/}"; done
-[ -z "$ru_nz" ] && ok "AC7 executing resets the counter" || nope "AC7 counters not reset:$ru_nz"
+ru_nz=""; for ru_f in "$RU_GD"/gate-cache/??/*; do [ "$(cut -f6 "$ru_f")" = 0 ] || ru_nz+=" ${ru_f##*/}"; done
+[ -z "$ru_nz" ] && ok "AC7 executing resets the count in a fresh entry" || nope "AC7 counts not reset:$ru_nz"
+ru_done
+
+# TOOL-aSparedSpawn-16 AC12: THE COUNT IS PER KEY. pa's entry under K1 stands at 9; pa then executes under
+# K2, a dirty tree's key, which writes no entry; back on K1 it is reused a tenth time, and the next K1 run
+# executes it. The per-name `age.*` file this replaced was reset by the K2 execution, so K1 kept reusing.
+ru_repo
+ru_run >/dev/null; ru_k=$(read_ru_key pa); ru_e="$RU_GD/gate-cache/${ru_k:0:2}/$ru_k"
+[ -e "$ru_e" ] && awk -F'\t' -v OFS='\t' '{ $6 = 9; print }' "$ru_e" > "$ru_e.n" && mv -f "$ru_e.n" "$ru_e"
+echo k2 > "$RU_T/ga/k2"
+ru_run GATE_REUSE=1 >/dev/null
+grep -q '^GATE ok    pa' "$REC_OUT" && ok "16-AC12 precondition: pa executes under the dirty tree's key K2" \
+  || nope "16-AC12 pa did not execute under K2, so the arm below proves nothing"
+rm -f "$RU_T/ga/k2"
+ru_run GATE_REUSE=1 >/dev/null
+grep -q '^GATE reuse pa' "$REC_OUT" && ok "16-AC12 back on K1, pa is reused a tenth time" || nope "16-AC12 pa was not reused on K1 after the K2 execution"
+ru_run GATE_REUSE=1 >/dev/null
+grep -q 'pa was reused on 10 runs in a row, so it executes' "$REC_OUT" \
+  && ok "16-AC12 the K2 execution left K1's count alone, so the next K1 run executes pa with the age line" \
+  || nope "16-AC12 pa was not aged on K1: an execution under another key reset its count"
 ru_done
 
 # TOOL-aSparedSpawn-17 AC1: AN AGED EXECUTION THAT REDS against its cached `ok` erases the entry and
@@ -1257,11 +1292,13 @@ ru_done
 ru_repo
 write_ru_legs '{"name": "pa", "argv": ["bash", "-c", "[ -z \"${FLIP:-}\" ]"], "guard": ["ga/"]}' \
         '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}'
-ru_run >/dev/null
-ru_run GATE_REUSE=1 >/dev/null; ru_k=$(read_ru_key pa)
-[ -e "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" ] && ok "17-AC1 precondition: pa's key holds an entry before the aged run" \
+# The key comes from the earning run's record, since a reused leg writes no row (TOOL-aSparedSpawn-16),
+# and the age is the entry's sixth field (its S11), set to 10.
+ru_run >/dev/null; ru_k=$(read_ru_key pa)
+ru_run GATE_REUSE=1 >/dev/null
+[ "${#ru_k}" -ge 3 ] && [ -f "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" ] && ok "17-AC1 precondition: pa's key holds an entry before the aged run" \
   || nope "17-AC1 pa's key '$ru_k' holds no entry, so the arm below proves nothing"
-for ru_f in "$RU_GD/gate-cache"/age.*; do printf '10' > "$ru_f"; done
+for ru_f in "$RU_GD"/gate-cache/??/*; do awk -F'\t' -v OFS='\t' '{ $6 = 10; print }' "$ru_f" > "$ru_f.n" && mv -f "$ru_f.n" "$ru_f"; done
 ru_rc=$(ru_run GATE_REUSE=1 FLIP=1)
 [ "$ru_rc" != 0 ] && grep -q 'pa was reused on 10 runs in a row, so it executes' "$REC_OUT" \
   && ok "17-AC1 the age bound executed pa and its red reds the run (rc=$ru_rc)" || nope "17-AC1 pa was not aged into a red run (rc=$ru_rc)"

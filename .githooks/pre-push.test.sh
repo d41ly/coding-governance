@@ -917,7 +917,7 @@ git remote add origin "$rp/remote.git"
 rp_gd=$(cd "$(git rev-parse --git-dir)" && pwd)
 touch "$rp_gd/push-main-active"
 GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
-printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_REUSE_PUSH:-}" > "%s/knob"\nexit 0\n' "$rp" > "$rp/stub.sh"
+printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_REUSE_PUSH:-}" > "%s/knob"\nprintf "%%s|%%s" "${GATE_REUSE_SAMPLE-unset}" "${GATE_REUSE_DAY-unset}" > "%s/seams"\nexit 0\n' "$rp" "$rp" > "$rp/stub.sh"
 run_rp_push() { # [remote] [NAME=VALUE…] -> the push's merged output; the knob the bar saw is in $rp/knob
   local remote=origin
   case "${1:-}" in *=*|'') ;; *) remote=$1; shift ;; esac
@@ -929,7 +929,7 @@ run_rp_push() { # [remote] [NAME=VALUE…] -> the push's merged output; the knob
 
 read_rp_line() { printf '%s' "$1" | grep -m1 'gate on main push'; }   # the decision line alone, never the whole output
 
-_out=$(run_rp_push); rp_knob=$(cat "$rp/knob")
+_out=$(run_rp_push); rp_knob=$(<"$rp/knob")
 rp_want="$(git rev-parse HEAD) $(git --git-dir="$rp/remote.git" rev-parse main~1)"
 case "$(read_rp_line "$_out")" in
   *"scoped gate on main push"*"reuse offered to remote and history legs at"*) ok "RP AC13 a scoped decision whose probe agreed names the reuse it offers" ;;
@@ -943,14 +943,14 @@ esac
 # AC12: a probe that answers with no tip of the default branch offers nothing, and says so. A first push
 # to an empty remote stages it: a PATH shim cannot, since git runs the hook with its own dirs first.
 git init -q --template= --bare "$rp/empty.git"; git remote add second "$rp/empty.git"
-_out=$(run_rp_push second); rp_knob=$(cat "$rp/knob")
+_out=$(run_rp_push second); rp_knob=$(<"$rp/knob")
 case "$(read_rp_line "$_out")|$rp_knob" in
   *"reuse not offered: the ls-remote probe did not answer with the main tip"*"|") ok "RP AC12 a probe with no tip to answer offers nothing, and the decision line names the probe" ;;
   *) bad "RP AC12 expected no knob and the probe named, got knob '$rp_knob': $_out" ;;
 esac
 
 # AC15: an inherited knob is cleared, named, and never reaches the bar; the bar sees the hook's own.
-_out=$(run_rp_push GATE_REUSE_PUSH=planted); rp_knob=$(cat "$rp/knob")
+_out=$(run_rp_push GATE_REUSE_PUSH=planted); rp_knob=$(<"$rp/knob")
 case "$_out" in
   *"not honoured from the environment by this bar:"*GATE_REUSE_PUSH*) ok "RP AC15 an inherited GATE_REUSE_PUSH is named as not honoured" ;;
   *) bad "RP AC15 expected the inherited knob to be named, got: $_out" ;;
@@ -959,9 +959,17 @@ case "$rp_knob" in
   planted|unset) bad "RP AC15 the bar received '$rp_knob' rather than the hook's own knob" ;;
   *) ok "RP AC15 the planted knob never reaches the bar; the hook's own does" ;;
 esac
+# TOOL-aSparedSpawn-16 S6 (AC6): the push knob's two seams go with it, for a STUB bar too. Each, exported,
+# is named on the hook's not-honoured line, read alone, and the stub bar sees neither.
+printf 'none' > "$rp/seams"
+_out=$(run_rp_push GATE_REUSE_SAMPLE=0 GATE_REUSE_DAY=1); rp_seams=$(<"$rp/seams")
+case "$(printf '%s\n' "$_out" | grep -m1 'not honoured from the environment by this bar:')|$rp_seams" in
+  *" GATE_REUSE_SAMPLE"*" GATE_REUSE_DAY"*"|unset|unset") ok "RP S6 an exported GATE_REUSE_SAMPLE and GATE_REUSE_DAY are named as not honoured and never reach the bar" ;;
+  *) bad "RP S6 expected both seams named and the bar to see neither, got seams '$rp_seams': $_out" ;;
+esac
 rm -f "$rp_gd/gate-full-green"
 _out=$( git commit -q --allow-empty -m "rp full" >/dev/null 2>&1; printf 'unset' > "$rp/knob"
-        env GOV_GATE_CMD="bash $rp/stub.sh" GATE_REUSE_PUSH=planted git push origin main 2>&1 ); rp_knob=$(cat "$rp/knob")
+        env GOV_GATE_CMD="bash $rp/stub.sh" GATE_REUSE_PUSH=planted git push origin main 2>&1 ); rp_knob=$(<"$rp/knob")
 case "$_out|$rp_knob" in
   *"FULL gate on main push"*"|") ok "RP AC15 a FULL decision hands the bar no knob, inherited or not" ;;
   *) bad "RP AC15 expected a FULL decision with no knob, got knob '$rp_knob': $_out" ;;

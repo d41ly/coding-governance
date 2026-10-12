@@ -133,7 +133,10 @@ fail=0
 # 347 -> 356, TOOL-aSparedSpawn-3: arm 9d's AC7 ledger-row assertion and the eight tail-release
 # assertions of 9k to 9m, those behind the `timeout` gate counted on a host without one as well (30 -> 38).
 # 356 -> 381, TOOL-aSparedSpawn-12: section 13's 25 held-tier selection assertions, none of them gated.
-FLOOR_ASSERTIONS=381
+# RAISED 381 -> 388 by TOOL-aSparedSpawn-16: arm 12a2's two calibrate refusals, arm 9d2's two reuse tails,
+# arm 9d3's unmeasured-key line, and arm 9f's two cache-entry assertions, those behind the `timeout` gate
+# counted on a host without one as well (38 -> 40). Counted off the arms; this pass runs no suite.
+FLOOR_ASSERTIONS=388
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -2928,6 +2931,23 @@ check_hv_value "aSS3 AC7 a bar that reused its only leg keeps that leg's ledger 
 rm -rf "$H6/.git/gate-cache"
 run_hv_bar "$H6" "$HV/cached.json" GATE_REUSE=1
 check_hv_line "AC6 with the cache gone, a ledger row reading ok runs its leg" '^GATE ok    cached$'
+# 9d2. TOOL-aSparedSpawn-16 S17 (AC18) — THE TWO REUSE FACTS ON THE LEG'S OWN LINE. The bar above executed
+#      on a clean tree, so its entry stands at count 0: at rate 1 the sample draws it, and with the
+#      entry's count, its sixth field, set to 10 the age bound forces it. Each tail is pinned whole.
+run_hv_bar "$H6" "$HV/cached.json" GATE_REUSE=1 GATE_REUSE_SAMPLE=1
+check_hv_line "S17 a leg the sample drew says so on its ok line" '^GATE ok    cached  \(sampled against a cached ok\)$'
+for _hvf in "$H6"/.git/gate-cache/??/*; do awk -F'\t' -v OFS='\t' '{ $6 = 10; print }' "$_hvf" > "$_hvf.n" && mv -f "$_hvf.n" "$_hvf"; done
+run_hv_bar "$H6" "$HV/cached.json" GATE_REUSE=1
+check_hv_line "S17 a leg the age bound forced says so on its ok line" '^GATE ok    cached  \(executed: reused on 10 runs in a row\)$'
+# 9d3. TOOL-aSparedSpawn-16 S18 (AC19) — KEYS THAT CANNOT BE MEASURED SAY SO. A `git` first on PATH that
+#      fails every `hash-object` empties the toolchain digest, so every key is a dash; a reusing bar
+#      names that once, in the whole text the digest's two exit sites carry as their signature.
+mkdir -p "$HV/nohash"
+printf '#!/usr/bin/env bash\ncase " $* " in *" hash-object "*) exit 1 ;; esac\nexec "%s" "$@"\n' "$(type -P git)" > "$HV/nohash/git"
+chmod +x "$HV/nohash/git"
+run_hv_bar "$H6" "$HV/cached.json" GATE_REUSE=1 PATH="$HV/nohash:$PATH"
+check_hv_value "S18 an unmeasurable key is named once on a reusing bar" \
+  "$(grep -cF 'run-gates: reuse — the input keys could not be measured (the toolchain digest), so nothing is reused or cached this run' <<<"$HV_OUT")" 1
 
 # 9e. AC11's second arm — THE WALK DIES ON A DEAD ROOT. `run_leg_reap`, sliced out of the runner, run
 #     against a root that has ALREADY exited leaves its orphan ALIVE; the same reap against a LIVE root
@@ -2976,6 +2996,16 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   # line naming the leg and its first attempt's ceiling; the lone hang below FAILS its retry and adds none.
   check_hv_value "AGH8 the passing retry appends one retry-passed line naming the leg and its first timeout" \
     "$(awk -F'\t' '$2 == "run-gates" && $3 == "retry-passed" { print $4 }' "$H1/.git/health.log" 2>/dev/null)" "contended after a 2s timeout"
+  # TOOL-aSparedSpawn-16 S13: the cache takes only a FIRST attempt's ok, so the contended leg, green only
+  # on its retry, has no entry under its key; the spinner, green on its first attempt on the same clean
+  # tree, has one, so the absence is the retry's and not a cache this bar never wrote. Read before the
+  # flag goes, from this bar's own record; the fixture is not run again.
+  _hvrec=$(ls -1td "$H1"/.git/gate-run/*/ 2>/dev/null | head -1)
+  _hvk=$(cut -f7 "${_hvrec}1.leg" 2>/dev/null); _hvsk=$(cut -f7 "${_hvrec}0.leg" 2>/dev/null)
+  check_hv_value "S13 the contended leg's retried pass writes no cache entry under its key" \
+    "$(case "$_hvk" in ???*) [ -e "$H1/.git/gate-cache/${_hvk:0:2}/$_hvk" ] && echo written || echo absent ;; *) echo unread ;; esac)" absent
+  check_hv_value "S13 control: the spinner's first-attempt ok has its entry" \
+    "$(case "$_hvsk" in ???*) [ -e "$H1/.git/gate-cache/${_hvsk:0:2}/$_hvsk" ] && echo written || echo absent ;; *) echo unread ;; esac)" written
   unset HV_FLAG
   # ...and a leg that hangs ALONE, with no floor for this clone: zero neighbours, FAIL on its retry.
   printf '[{"name": "lone", "argv": ["bash", "fx/hang.sh"], "ceiling": 1}]\n' > "$HV/lone.json"
@@ -3071,7 +3101,10 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   H13="$HV/r13"; build_hv_repo "$H13"
   export HV_ONCE="$HV/once.flag" HV_PEEK="$HV/tail.peek"; rm -f "$HV_ONCE" "$HV_PEEK"
   printf '#!/usr/bin/env bash\n[ -f "$HV_ONCE" ] && exit 0\n: > "$HV_ONCE"\nsleep 60\n' > "$H13/fx/once.sh"
-  printf '#!/usr/bin/env bash\nsleep 12\nls "$TMPDIR/.." > "$HV_PEEK" 2>/dev/null\nexit 0\n' > "$H13/fx/sleeper.sh"
+  # The sleeper ends on a SIGNAL, never a clock (TOOL-aSparedSpawn-16 S12): it polls until the tail
+  # retry's pid file exists, up to a 120 s hang bound, so a retry that never starts in the tail reads
+  # after-drain rather than passing on a lucky load.
+  printf '#!/usr/bin/env bash\ni=0; while [ ! -f "$TMPDIR/../1.retry.pid" ] && [ "$i" -lt 1200 ]; do sleep 0.1; i=$((i + 1)); done\nls "$TMPDIR/.." > "$HV_PEEK" 2>/dev/null\nexit 0\n' > "$H13/fx/sleeper.sh"
   ( cd "$H13" && git add -A && git commit -qm legs ) >/dev/null 2>&1
   printf '[{"name": "sleeper", "argv": ["bash", "fx/sleeper.sh"]},\n {"name": "once", "argv": ["bash", "fx/once.sh"], "ceiling": 2}]\n' > "$HV/tail.json"
   run_hv_bar "$H13" "$HV/tail.json" GATE_JOBS=2
@@ -3098,7 +3131,11 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   # 9m. TOOL-aSparedSpawn-3 AC4 — A TAIL ATTEMPT THAT DOES NOT PASS DECIDES NOTHING. It is set aside as
   #     `.tail`, and the serial retry after the drain issues today's FAIL and its HOST note.
   H15="$HV/r15"; build_hv_repo "$H15"
-  printf '[{"name": "sleeper", "argv": ["bash", "-c", "sleep 15"]},\n {"name": "stubborn", "argv": ["bash", "fx/hang.sh"], "ceiling": 2}]\n' > "$HV/tail-fail.json"
+  # The sleeper polls until the tail attempt's `.rc` exists, so that attempt has started and timed out
+  # beside it, up to the 120 s hang bound 9k's uses (TOOL-aSparedSpawn-16 S12); never a fixed sleep.
+  printf '#!/usr/bin/env bash\ni=0; while [ ! -f "$TMPDIR/../1.retry.rc" ] && [ "$i" -lt 1200 ]; do sleep 0.1; i=$((i + 1)); done\nexit 0\n' > "$H15/fx/sleeper.sh"
+  ( cd "$H15" && git add -A && git commit -qm legs ) >/dev/null 2>&1
+  printf '[{"name": "sleeper", "argv": ["bash", "fx/sleeper.sh"]},\n {"name": "stubborn", "argv": ["bash", "fx/hang.sh"], "ceiling": 2}]\n' > "$HV/tail-fail.json"
   rm -f "$HV/nofloor"   # an earlier bar wrote its floor there, and HOST must stay unread here
   run_hv_bar "$H15" "$HV/tail-fail.json" GATE_JOBS=2 GATE_SPAWN_FLOOR="$HV/nofloor"
   check_hv_value "aSS3 AC4 one FAIL line, the serial wording and the serial attempt's HOST note" \
@@ -3112,7 +3149,7 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   check_hv_value "aSS3 AC4 the deciding attempt started after the drain ($_hvrs, $_hvse)" \
     "$(case "$_hvrs$_hvse" in ''|*[!0-9]*) echo unread ;; *) [ "$_hvrs" -ge "$_hvse" ] && echo after-drain || echo in-tail ;; esac)" after-drain
 else
-  n=$((n+38))
+  n=$((n+40))
   echo "canary: SKIP the ceiling arms of section 9 — this host has no runnable 'timeout -k', so no ceiling can fire and nothing can be deferred, retried or read HOST here"
 fi
 rm -rf "$HV" 2>/dev/null || true
@@ -3404,6 +3441,15 @@ run_sp_verb GATE_CALIBRATION_RATES=100,190,350,500,700 GATE_SPAWN_CMD=false
 check_sp_value "AC2 rates still rising at K=8 pick 8" "$(printf '%s\n' "$SP_OUT" | awk -F'\t' '$1 == "pick" { print $2 }')|$SP_RC" "8|0"
 run_sp_verb GATE_CALIBRATION_RATES=100,190
 check_sp_value "AC2 a seam naming two rates for five K exits 2" "$SP_RC" 2
+# 12a2. TOOL-aSparedSpawn-16 S4 — the verb's two timed refusals, from the verb run WITHOUT the rates
+#       seam. A blank spawn command (whitespace only) resolves no argv, and `false` fails the first timed
+#       loop; each exits 1 with its whole text, and neither writes a pick.
+run_sp_verb GATE_CALIBRATION_RATES= GATE_SPAWN_CMD=' '
+check_sp_value "S4 a blank spawn command exits 1 naming that nothing resolves" \
+  "$(grep -cF "run-gates: --calibrate-width: no spawn command resolves (no 'true' on PATH), so nothing can be timed" "$SP/x/err")|$SP_RC" "1|1"
+run_sp_verb GATE_CALIBRATION_RATES= GATE_SPAWN_CMD=false
+check_sp_value "S4 a failing spawn exits 1 naming the rate it could not measure" \
+  "$(grep -cF "could not be measured (a spawn failed, or bash has no EPOCHREALTIME), so no pick is written" "$SP/x/err")|$SP_RC" "1|1"
 
 # 12b. AC3 — the verb's cache is one line of four TAB fields, and the bar READS it: the row's 8 narrows
 #      to the pick, on the --print-profile keys, its profile line, and a real bar's header.
@@ -3547,8 +3593,8 @@ check_sc_line "AC1 ...and reports ok" '^GATE ok    kx suite$'
 check_sc_line "AC1 ky is held unchanged" '^GATE held  ky suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
 check_sc_value "AC1 ky does not execute" "$(printf '%s\n' "$SC_OUT" | grep -c '^GATE ok    ky suite$')" 0
 check_sc_line "AC2 the fallback line names the unowned leg" '^run-gates: selftests changed: no kit ships the suite of 1 held leg\(s\), so each selects by its guard plus its suite file: uz suite$'
-SC_OUT=$(cat "$SCR/.git/gate-full-green" 2>/dev/null)
-check_sc_line "S7 the gate-full-green stamp of a changed run reads changed" "$(printf '^selftests\tchanged$')"
+SC_OUT=""; [ -f "$SCR/.git/gate-full-green" ] && SC_OUT=$(<"$SCR/.git/gate-full-green")
+check_sc_line "S7 the gate-full-green stamp of a changed run reads changed" $'^selftests\tchanged$'
 # 13c. AC2 — only ky's suite file moved, and only uz's guard moved: both execute, kx is held.
 printf '#!/usr/bin/env bash\n# moved\nexit 0\n' > "$SCR/ky/y.test.sh"; printf 'g2\n' > "$SCR/uz/guarded.txt"; write_sc_commit "ky suite and uz guard move"
 run_sc_bar GATE_SELFTESTS=changed
