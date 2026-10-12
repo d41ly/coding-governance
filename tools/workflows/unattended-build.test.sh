@@ -2582,10 +2582,13 @@ hasnt_ "GH35 ...and no WARNING prints" "$o" "$GH35_WARN"
 # ---- the craft its role carries left out; a stage it does not name is today's call byte for byte and
 # ---- says so in the log. Three runs per side: an audited CONVERGED round, the same with no caller
 # ---- `subjects` so the spec commit and the resolver spawn, and a NON-CONVERGENT round that disposes.
-# ---- The untyped side is compared against the base harnesses read out of git at the unit's base, and
-# ---- skips out loud where that commit is absent. Every typed, refusal and hand-back arm read RED
-# ---- against the base harnesses, which read no roles, spawn every stage untyped and tell the builder
-# ---- to edit its spec; the byte-identity and untyped-spawn arms hold on both sides by design.
+# ---- The untyped side is held to the CURRENT harness, never to one read out of a historical commit
+# ---- (TOOL-aOrientedCast-15 S1: that oracle redded on every later legitimate prompt edit): a run with
+# ---- no `roles` key prints the same prompts and result as one with `"roles":{}`, each untyped-only
+# ---- span stands in the untyped output and each typed-only span is absent from it, so a typed `hasnt_`
+# ---- and its untyped `has` twin cannot both pass by the text going missing. Every typed, refusal and
+# ---- hand-back arm read RED against the harnesses before roles, which spawn every stage untyped and
+# ---- tell the builder to edit its spec.
 OC_ROLES='{"specWriter":"gov-spec-writer","committer":"gov-x","disposal":"gov-spec-writer","builder":"gov-builder","specFinder":"gov-spec-reviewer","skeptic":"gov-skeptic","synthesis":"gov-synthesizer"}'
 OC_NOB='{"specWriter":"gov-spec-writer","committer":"gov-x","disposal":"gov-spec-writer","specFinder":"gov-spec-reviewer","skeptic":"gov-skeptic","synthesis":"gov-synthesizer"}'
 OC_NOSUB=$(printf '%s' "$UNITS" | sed 's#"subjects":\[[^]]*\],##')
@@ -2593,12 +2596,7 @@ OC_A=("$UNITS" "$OC_NOSUB" "$UNITS")
 OC_R=("$(returns CONVERGED 0)"
   "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"%s","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$CPATH" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")"
   "$(returns NON-CONVERGENT 2)")
-OC_BF="$LAY/oc4-base-build.js"; OC_BC="$LAY/oc4-base-unit.js"
-OC_PFX=$(git -C "$HERE" rev-parse --show-prefix 2>/dev/null)
-OC_BASE=0
-git -C "$HERE" show "646d4a73:${OC_PFX}unattended-build.js" > "$OC_BF" 2>/dev/null &&
-  git -C "$HERE" show "646d4a73:${OC_PFX}unattended-unit.js" > "$OC_BC" 2>/dev/null && OC_BASE=1
-[ "$OC_BASE" = 1 ] || echo "SKIP OC4 AC1/AC7 base comparisons: commit 646d4a73 is not in this repository, so the untyped prompts were not compared byte for byte with the harnesses before roles"
+OC_EMPTY='s#"slug":"tB",#"slug":"tB","roles":{},#'
 OC_TYPED='' OC_UNTYPED=''
 for i in 0 1 2; do
   o=$(run_wf "${OC_A[$i]}" "${OC_R[$i]}")
@@ -2606,10 +2604,8 @@ for i in 0 1 2; do
   has    "OC4 AC1 run $i untyped: the harness returns" "$o" "RESULT "
   has    "OC4 AC2 run $i typed: the harness returns" "$t" "RESULT "
   hasnt_ "OC4 AC1 run $i untyped: no spawn carries a type nobody passed" "$(printf '%s\n' "$o" | grep '^type:')" "gov-"
-  if [ "$OC_BASE" = 1 ]; then
-    same "OC4 AC1 run $i untyped: every prompt equals the base harness's, byte for byte" \
-      "$(printf '%s\n' "$o" | grep '^promptjson:')" "$(run_wf "${OC_A[$i]}" "${OC_R[$i]}" "$OC_BF" | grep '^promptjson:')"
-  fi
+  same "OC4 AC1 run $i untyped: every prompt equals the empty-roles run's, byte for byte" \
+    "$(printf '%s\n' "$o" | grep '^promptjson:')" "$(run_wf "$(printf '%s' "${OC_A[$i]}" | sed "$OC_EMPTY")" "${OC_R[$i]}" | grep '^promptjson:')"
   [ "$i" = 0 ] && OC_T0="$t"
   OC_UNTYPED="$OC_UNTYPED$o
 "; OC_TYPED="$OC_TYPED$t
@@ -2635,7 +2631,12 @@ OC_P=$(printf '%s' "$OC_TYPED" | grep '^prompt:dispose:')
 has    "OC4 AC2 typed: the disposal prompt carries its stamp" "$OC_P" "This stage runs as the gov-spec-writer agent type"
 hasnt_ "OC4 AC2 typed: ...and leaves out the edge join's rationale" "$OC_P" "the whole reason that join exists"
 has    "OC4 AC2 typed: ...and still asks for edges" "$OC_P" "Return in \`edges\` EVERY §3 edge bullet"
-has    "OC4 AC2 untyped: the spans stand in an untyped prompt" "$(printf '%s' "$OC_UNTYPED" | grep '^prompt:spec:')" "real probe rather than a claim"
+OC_P=$(printf '%s' "$OC_UNTYPED" | grep '^prompt:spec:')
+has    "OC4 AC2 untyped: the spans stand in an untyped prompt" "$OC_P" "real probe rather than a claim"
+has    "OC4 AC1 untyped: the spec prompt keeps the criterion craft" "$OC_P" "stalls for hours"
+has    "OC4 AC1 untyped: ...and the no-code order" "$OC_P" "DO NOT WRITE PRODUCT CODE"
+has    "OC4 AC1 untyped: the disposal prompt keeps the edge join's rationale" "$(printf '%s' "$OC_UNTYPED" | grep '^prompt:dispose:')" "the whole reason that join exists"
+hasnt_ "OC4 AC1 untyped: no prompt carries a role stamp" "$(printf '%s' "$OC_UNTYPED" | grep '^prompt:')" "This stage runs as the"
 same   "OC4 AC2 typed: the audit forwards its three review roles" "$(printf '%s' "$OC_TYPED" | grep '^wfroles:' | sort -u)" 'wfroles:{"skeptic":"gov-skeptic","specFinder":"gov-spec-reviewer","synthesis":"gov-synthesizer"}'
 has    "OC4 AC2 typed: ...beside workerType none" "$(printf '%s' "$OC_TYPED" | grep '^wargs:' | head -1)" '"workerType":"none"'
 has    "OC4 AC2 typed: the builder type travels to the child" "$(printf '%s\n' "$OC_T0" | grep '^RESULT')" '"roles":{"builder":"gov-builder"}'
@@ -2662,10 +2663,12 @@ for m in unattended attended; do
   o=$(run_wf "$(printf "$CHILD_ARGS" $m)" '{}' "$C")
   has  "OC4 AC1 child $m untyped: the log says its builder is untyped" "$o" "log:unit A-tB-1: builder is untyped"
   same "OC4 AC1 child $m untyped: its spawn carries no type" "$(printf '%s\n' "$o" | grep '^type:')" "type:unit:A-tB-1:-"
-  if [ "$OC_BASE" = 1 ]; then
-    same "OC4 AC1 child $m untyped: its prompt equals the base harness's, byte for byte" \
-      "$(printf '%s\n' "$o" | grep '^promptjson:')" "$(run_wf "$(printf "$CHILD_ARGS" $m)" '{}' "$OC_BC" | grep '^promptjson:')"
-  fi
+  same "OC4 AC1 child $m untyped: its prompt equals the empty-roles run's, byte for byte" \
+    "$(printf '%s\n' "$o" | grep '^promptjson:')" "$(run_wf "$(printf "$CHILD_ARGS" $m | sed "$OC_EMPTY")" '{}' "$C" | grep '^promptjson:')"
+  has    "OC4 AC1 child $m untyped: it is told to change its spec first" "$o" "CHANGE THE SPEC FIRST"
+  hasnt_ "OC4 AC1 child $m untyped: ...and not to hand a divergence back" "$o" "a why that opens DIVERGENCE:"
+  hasnt_ "OC4 AC1 child $m untyped: ...nor the status-only flip" "$o" "changes nothing else in the spec"
+  hasnt_ "OC4 AC1 child $m untyped: ...nor a role stamp" "$(printf '%s\n' "$o" | grep '^prompt:')" "This stage runs as the"
 done
 OC_CT=$(printf '%s' "$OC_CHILD" | sed 's#"slug":"tB",#"slug":"tB","roles":{"builder":"gov-builder"},#')
 o=$(run_wf "$OC_CT" '{}' "$C")
@@ -2687,10 +2690,10 @@ o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","roles":'"$
 has    "OC4 AC7 a roled deferral exits deferred-platform" "$o" '"exit":"deferred-platform"'
 has    "OC4 AC7 ...and says every judge is dispatched again" "$o" "dispatches every judge again"
 hasnt_ "OC4 AC7 ...and promises no reuse" "$o" "reuses every lens"
-if [ "$OC_BASE" = 1 ]; then
-  same "OC4 AC7 an untyped durable deferral returns what the base harness returned, byte for byte" \
-    "$(run_wf "$UNITS" "$(printf "$OC_DEF" true)" | grep '^RESULT')" "$(run_wf "$UNITS" "$(printf "$OC_DEF" true)" "$OC_BF" | grep '^RESULT')"
-fi
+o=$(run_wf "$UNITS" "$(printf "$OC_DEF" true)" | grep '^RESULT')
+has    "OC4 AC7 an untyped durable deferral promises the reuse" "$o" "reuses every lens"
+same   "OC4 AC7 ...and returns what the empty-roles run returns, byte for byte" \
+  "$o" "$(run_wf "$(printf '%s' "$UNITS" | sed "$OC_EMPTY")" "$(printf "$OC_DEF" true)" | grep '^RESULT')"
 
 # ---- TOOL-aOrientedCast-10: A STAGE `efforts` NAMES SPAWNS AT THAT REASONING EFFORT, independent of
 # ---- `roles`; the audit's three review keys travel to the review call and `builder` in dispatch.args.
@@ -2805,7 +2808,12 @@ done
 # the three-run loop (1), the spawned levels and forwarding (7), the skeptic-only run (3), the absent
 # run (1), the build refusal loop (2), the unit's level, log and typed level (3) and its refusal loop
 # (2). Its loops run them 31 times. Not measured by a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=631
+# RAISED 631 -> 643 by TOOL-aOrientedCast-15: the three OC4 byte comparisons no longer skip, since
+# they compare with an empty-roles run of the current harness rather than a historical commit (3),
+# and nine new static sites, counted by hand off the OC4 block — the untyped spec and disposal spans
+# and the stamp's absence (4), the child loop's four spans (4) and the deferral's reuse span (1). Its
+# loops run the twelve 19 times. Not measured by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=643
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

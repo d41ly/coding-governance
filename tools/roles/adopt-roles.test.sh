@@ -12,7 +12,9 @@
 #
 # The arms: a stage heading naming a workflow at the wrong stage; a catalogue workflow no heading
 # names; a token surviving the substitution; a byte appended to a rendered agent type; an unknown
-# argument. Every arm is a self-contained block below the prologue, so a slice of the prologue and one
+# argument; the renderer's task part sent to the hooks kit's spawn guard (arm 6, which SKIPs out loud
+# without that kit or node); an `export` conf line with a trailing comment (arm 7). Every arm is a
+# self-contained block below the prologue, so a slice of the prologue and one
 # block runs that arm alone.
 #
 # WHAT THIS DOES NOT CHECK: what the rendered Skill or an agent type SAYS, which the catalogue checker
@@ -28,13 +30,24 @@ REPO=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "adopt-ro
 KREL=$(git -C "$HERE" rev-parse --show-prefix 2>/dev/null) || exit 2
 KREL=${KREL%/}
 [ -n "$KREL" ] || { echo "adopt-roles.test: the kit's directory derived empty"; exit 2; }
-MR=$(sed -n 's/^MEMORY_ROOT=//p' "$REPO/.memory-tree.conf" | tail -1 | tr -d '\r"'"'")
-CH=$(sed -n 's/^CHARTER=//p' "$REPO/.memory-tree.conf" | tail -1 | tr -d '\r"'"'")
+# The python launcher, by an inline candidate loop RUN per candidate: this suite defines no helper
+# for it (TOOL-aOrientedCast-15 S4), and being on PATH is not evidence of a launcher that runs.
+PY=""; for _c in "${GOV_PYTHON:-}" python3 python py; do [ -n "$_c" ] && "$_c" -c 'import sys' >/dev/null 2>&1 && { PY=$_c; break; }; done
+[ -n "$PY" ] || { echo "adopt-roles.test: no python launcher ran (GOV_PYTHON, python3, python, py)"; exit 2; }
+# MR and CH through the library's one conf grammar, as the adopter reads them (S6), never a `sed`.
+CONF_READ='import pathlib, sys
+sys.path.insert(0, sys.argv[1])
+import roles_lib
+print(roles_lib.read_conf_key(pathlib.Path(sys.argv[2]), sys.argv[3]) or "")'
+MR=$("$PY" -B -c "$CONF_READ" "$HERE" "$REPO/.memory-tree.conf" MEMORY_ROOT); MR=${MR%$'\r'}
+CH=$("$PY" -B -c "$CONF_READ" "$HERE" "$REPO/.memory-tree.conf" CHARTER); CH=${CH%$'\r'}
 [ -n "$MR" ] && [ -n "$CH" ] && [ -f "$REPO/$CH" ] || { echo "adopt-roles.test: $REPO/.memory-tree.conf names no MEMORY_ROOT or no CHARTER file"; exit 2; }
 [ -f "$ADOPTER" ] || { echo "adopt-roles.test: no adopter at $ADOPTER"; exit 2; }
 TMP_ROOT=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP_ROOT"' EXIT
-FLOOR_ASSERTIONS=10
+# 10, then +3 for arm 7 (TOOL-aOrientedCast-15). Arm 6 is NOT in the floor: it SKIPs out loud on a
+# host with no hooks kit or no node, and a skip must not red the floor.
+FLOOR_ASSERTIONS=13
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""
@@ -85,6 +98,57 @@ build_fixture; check_arm "arm 5 the fixture scaffolds and checks clean" "$([ $? 
 out=$(run_adopter --render); rc=$?
 check_arm "arm 5 an unknown argument is the usage refusal, exit 2" \
    "$([ "$rc" = 2 ] && printf '%s' "$out" | grep -q '^usage: ' && echo 1 || echo 0)"
+
+# ---- arm 6: the renderer's task part, sent as an Agent prompt, is admitted by the spawn guard ----
+# TOOL-aOrientedCast-15 S4: the renderer and the hooks kit's rule 6 hash the same `## Task` bytes, and
+# nothing but this arm runs the one against the other. The hooks kit is found the derived way the
+# renderer finds the kickoff kit; with no hooks kit or no node the arm SKIPs, naming what is absent.
+HK=$("$PY" -B -c 'import sys
+sys.path.insert(0, sys.argv[1])
+import roles_lib
+try:
+    print(roles_lib.resolve_kit_dir("hooks", "agent-cap.js", sys.argv[1]).as_posix())
+except LookupError:
+    pass' "$HERE"); HK=${HK%$'\r'}
+if [ -z "$HK" ]; then
+  echo "SKIP arm 6 — no hooks kit holding agent-cap.js was found from $KREL"
+elif ! command -v node >/dev/null 2>&1; then
+  echo "SKIP arm 6 — no node on PATH to run $HK/agent-cap.js"
+else
+  build_fixture
+  A6P="$MR/builds/bx/prompts/$(date +%F)-prompt-TOOL-bx-1-1-researcher.md"
+  mkdir -p "$FX/$MR/builds/bx/prompts"
+  (cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build bx --unit TOOL-bx-1 \
+     --input "question=which mechanism fits" --out "$A6P" --part task) > "$TMP_ROOT/a6.task" 2>"$TMP_ROOT/a6.err"; rc=$?
+  FXN=$(cd "$FX" && { pwd -W 2>/dev/null || pwd; })
+  "$PY" -c 'import json, sys
+print(json.dumps({"tool_name": "Agent", "cwd": sys.argv[1], "session_id": "a6-s", "prompt_id": "a6-p-" + sys.argv[3],
+                  "tool_use_id": "a6-u", "tool_input": {"subagent_type": "gov-researcher",
+                  "prompt": open(sys.argv[2], newline="", encoding="utf-8").read()}}))' \
+    "$FXN" "$TMP_ROOT/a6.task" "$$" > "$TMP_ROOT/a6.json"
+  (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR node "$HK/agent-cap.js" < "$TMP_ROOT/a6.json" >/dev/null 2>"$TMP_ROOT/a6.hook"); hrc=$?
+  check_arm "arm 6 the renderer's task part is admitted by the spawn guard" \
+     "$([ "$rc" = 0 ] && [ "$hrc" = 0 ] && [ ! -s "$TMP_ROOT/a6.hook" ] && echo 1 || echo 0)"
+  [ "$rc" = 0 ] && [ "$hrc" = 0 ] && [ ! -s "$TMP_ROOT/a6.hook" ] || sed 's/^/    /' "$TMP_ROOT/a6.err" "$TMP_ROOT/a6.hook"
+  msha=$(tr -d '\r' < "$TMP_ROOT/a6.task" | sed -n '1s/.* task-sha=\([0-9a-f]\{12\}\) -->$/\1/p')
+  out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" check "$A6P" 2>&1); rc=$?
+  check_arm "arm 6 check re-derives the marker's task-sha" \
+     "$([ "$rc" = 0 ] && [ -n "$msha" ] && printf '%s' "$out" | tr -d '\r' | grep -q " task-sha=$msha\$" && echo 1 || echo 0)"
+fi
+
+# ---- arm 7: an `export` conf line with a trailing comment ---------------------------------------
+# TOOL-aOrientedCast-15 S6: the adopter reads MEMORY_ROOT with the library's conf grammar. The base
+# adopter's bare `sed` read the `export` form as absent and exited 2.
+build_fixture; mkdir -p "$TMP_ROOT/a7" && cp -R "$FX/.claude/skills" "$FX/.claude/agents" "$TMP_ROOT/a7"/
+printf 'export MEMORY_ROOT=%s  # note\nCHARTER=%s\n' "$MR" "$CH" > "$FX/.memory-tree.conf"
+out=$(run_adopter --scaffold); rc=$?
+out2=$(run_adopter --check); rc2=$?
+check_arm "arm 7 an export conf line with a trailing comment scaffolds and checks clean" \
+   "$([ "$rc" = 0 ] && [ "$rc2" = 0 ] && echo 1 || echo 0)"
+check_arm "arm 7 ...the rendered Skill carries no comment" \
+   "$([ -f "$FX/.claude/skills/build/SKILL.md" ] && ! grep -q '# note' "$FX/.claude/skills/build/SKILL.md" && echo 1 || echo 0)"
+check_arm "arm 7 ...and the Skill and every agent type name the root the plain conf rendered, byte for byte" \
+   "$(diff -r -q "$TMP_ROOT/a7/skills" "$FX/.claude/skills" >/dev/null && diff -r -q "$TMP_ROOT/a7/agents" "$FX/.claude/agents" >/dev/null && echo 1 || echo 0)"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

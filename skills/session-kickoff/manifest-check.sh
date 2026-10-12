@@ -1076,6 +1076,7 @@ check_card_task() {
           if (ch == "(") d++
           else if (ch == ")" && --d == 0) { r = substr(r, i + 1); break }
         }
+      r = trim(r)
       if (substr(r, 1, 1) == ":") r = substr(r, 2)
       r = trim(r); gsub(/[[:space:]]+/, " ", r)
       return r

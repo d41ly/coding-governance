@@ -127,3 +127,11 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-12T18:27:19Z dispatch · item bfcadb2a TOOL-aOrientedCast-14 · reason tools/hooks/scratch-guard.js tools/hooks/agent-cap.js tools/hooks/scratch-guard.test.sh tools/hooks/agent-cap.test.sh tools/hooks/README.md memory/map/generated/symbols.json memory/builds/aOrientedCast/spec/2026-10-12-spec-TOOL-aOrientedCast-14.md memory/builds/aOrientedCast/build/2026-10-12-build-TOOL-aOrientedCast-14-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
 
 2026-10-12T18:27:41Z brief · item TOOL-aOrientedCast-14 · reason 8fe392978328 memory/builds/aOrientedCast/prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md
+
+2026-10-12T18:52:28Z brief · item TOOL-aOrientedCast-15 · reason 8fe392978328 memory/builds/aOrientedCast/prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md
+
+2026-10-12T18:57:39Z dispatch · item fbf31ea8 TOOL-aOrientedCast-15 · reason tools/workflows/unattended-build.test.sh tools/roles/handoff.py tools/roles/adopt-roles.sh tools/roles/adopt-roles.test.sh tools/roles/render_agents.py tools/roles/roles_lib.py tools/roles/README.md tools/roles/SKILL.template.md .claude/skills/build/SKILL.md skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh tools/check-wiring.sh tools/check-wiring.test.sh memory/gotchas/test-oracle-read-from-a-historical-sha.md memory/gotchas/INDEX.md memory/guides/SESSION-KICKOFF.md memory/builds/aOrientedCast/spec/2026-10-12-spec-TOOL-aOrientedCast-15.md memory/builds/aOrientedCast/build/2026-10-12-build-TOOL-aOrientedCast-15-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-12T19:22:54Z dispatch · item fbf31ea8 TOOL-aOrientedCast-15 · reason memory/map/features/review-harnesses.md memory/map/generated/inventories.json memory/map/generated/MAP.md
+
+2026-10-12T19:24:56Z dispatch · item fbf31ea8 TOOL-aOrientedCast-15 · reason memory/map/generated/CARDS.md

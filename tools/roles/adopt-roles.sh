@@ -62,7 +62,51 @@ TOOL_ROOT=${KIT_REL%/*}; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""
 cd "$ROOT" || exit 2
 CONF=".memory-tree.conf"
 [ -f "$CONF" ] || { echo "roles: no $CONF at the repo root, so MEMORY_ROOT cannot be read"; exit 2; }
-MEMORY_ROOT=$(sed -n 's/^MEMORY_ROOT=//p' "$CONF" | tail -1 | tr -d '\r"'"'")
+
+# The resolver, INLINE: this kit is copy-installed as a standalone directory, so the shared lib does
+# not exist in an adopting repo. Byte-identical to the canonical copy its marker line names.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+PY=$(resolve_python) || exit 2
+
+# MEMORY_ROOT and CHARTER are read with the library's ONE conf grammar — `export`, quotes and a
+# trailing `# comment` included — never a second parser here (TOOL-aOrientedCast-15 S6: a bare `sed`
+# exited 2 on the `export` form and rendered a trailing comment into the Skill).
+MEMORY_ROOT=$("$PY" -B -c 'import pathlib, sys
+sys.path.insert(0, sys.argv[1])
+import roles_lib
+print(roles_lib.read_conf_key(pathlib.Path(sys.argv[2]), "MEMORY_ROOT") or "")' "$KIT_DIR" "$CONF") \
+  || { echo "roles: MEMORY_ROOT could not be read from $CONF"; exit 2; }
+MEMORY_ROOT=${MEMORY_ROOT%$'\r'}
 [ -n "$MEMORY_ROOT" ] || { echo "roles: MEMORY_ROOT is blank or absent in $CONF"; exit 2; }
 
 TEMPLATE="$KIT_DIR/SKILL.template.md"
@@ -126,40 +170,6 @@ render_skill() { # -> the render on stdout; 1 a stage disagreement or a survivin
 body=$(render_skill && printf X) || exit $?
 body=${body%X}
 
-# The resolver, INLINE: this kit is copy-installed as a standalone directory, so the shared lib does
-# not exist in an adopting repo. Byte-identical to the canonical copy its marker line names.
-# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
-resolve_python() {
-  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
-  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
-  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
-  _rp_tried=""
-  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
-    [ -n "$_rp_c" ] || continue
-    _rp_tried="$_rp_tried $_rp_c"
-    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
-      printf '%s\n' "$_rp_c"
-      return 0
-    fi
-  done
-  {
-    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
-    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
-    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
-    echo "resolve_python: tried:$_rp_tried"
-    if [ -n "${1:-}" ]; then
-      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
-    fi
-    if [ -n "${GOV_PYTHON:-}" ]; then
-      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
-      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
-      echo "resolve_python: operator believes they chose, and would not have."
-    fi
-  } >&2
-  return 1
-}
-# <<< resolve_python
-PY=$(resolve_python) || exit 2
 AGENTS="$KIT_DIR/render_agents.py"
 [ -f "$AGENTS" ] || { echo "roles: $KIT_REL lacks render_agents.py, so no agent type can be rendered"; exit 2; }
 

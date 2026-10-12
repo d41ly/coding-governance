@@ -20,7 +20,8 @@ workflow whose harness names that script. `stage-efforts` prints, the same way, 
 passes it as its `efforts` argument (TOOL-aOrientedCast-10).
 
 Sources, by key family: `task:` the card's `## task` field, read by the kickoff checker's grammar
-(stated above its `check_card_task`, and ported here because that one is shell); `card:` the lines
+(stated above its `check_card_task`, and ported here because that one is shell) under the labels
+that checker's `--task-skeleton` prints, so a skeleton that does not yield eight refuses; `card:` the lines
 under the card's last `## <heading>`; `brief:` the `### <sub-head>` under the brief record's
 `## The brief`; `input:` the `--input` argument; a charter id the governing doc's section. The card is
 `--card`, else the file the kickoff checker's `--card --path` prints for CLAUDE_CODE_SESSION_ID, so
@@ -50,10 +51,10 @@ KIT_DIR = pathlib.Path(__file__).absolute().parent
 sys.path.insert(0, str(KIT_DIR))
 import roles_lib as lib  # noqa: E402  (the kit's own library, beside this file)
 
-#: The build's interface 6: a `task:` field and its card label, as the kickoff grammar extracts it.
-TASK_LABELS = {"title": "Title", "goal": "Goal (1–2 sentences)", "in": "IN scope",
-               "out": "OUT / non-goals", "todo": "To-do", "reuse": "Reuse",
-               "acceptance": "Acceptance check", "gates": "Gates it must pass"}
+#: The build's interface 6: the `task:` field keys, in order. Their card labels are NOT typed here:
+#: each render reads them off the kickoff checker's `--task-skeleton` and zips them with these
+#: (TOOL-aOrientedCast-15 S3), so the checker that grades a card is the one source of its labels.
+TASK_FIELDS = ("title", "goal", "in", "out", "todo", "reuse", "acceptance", "gates")
 INPUT_NAMES = ("spec", "diff", "question", "prompt")
 PATH_INPUTS = ("spec", "prompt")
 PLACEHOLDERS = ("…", "...", "tbd", "todo", "n/a", "none", "-", "?")
@@ -92,8 +93,10 @@ def extract_card_section(text, heading):
     return None if found is None else BLANK_EDGES_RE.sub("", "\n".join(found))
 
 
-def extract_task_fields(text):
-    """`{field: value}` for each interface-6 field the card's `## task` carries exactly once.
+def extract_task_fields(text, labels):
+    """`{field: value}` for each field of `labels`, a `{card label: field}` map, that the card's
+    `## task` carries exactly once. `labels` None keys each field by its own label, in the order the
+    section first names it: how `render_handoff` reads the label set off `--task-skeleton`.
 
     The kickoff checker's grammar: a line loses its leading whitespace, its `>` run and one `- ` or
     `* `; a line then opening `<!--` or `UNVERIFIED — ` is skipped; a line opening `**` is a field
@@ -103,7 +106,6 @@ def extract_task_fields(text):
     A field absent or repeated is left out; emptiness and placeholders are the caller's verdict.
     """
     section = extract_card_section(text, "task")
-    by_label = {label: field for field, label in TASK_LABELS.items()}
     raw, count, cur = {}, {}, None
     for line in (section or "").split("\n"):
         s = re.sub(r"^[-*] ", "", re.sub(r"^(> ?)+", "", line.lstrip()))
@@ -113,7 +115,7 @@ def extract_task_fields(text):
         if s.startswith("**") and b >= 0:
             k = rest.find(":**")
             label, tail = (rest[:k], rest[k + 3:]) if 0 <= k < b else (rest[:b], rest[b + 2:])
-            cur = by_label.get(label.strip())
+            cur = label.strip() if labels is None else labels.get(label.strip())
             if cur:
                 count[cur] = count.get(cur, 0) + 1
                 raw.setdefault(cur, tail)
@@ -260,11 +262,30 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
         values["input:" + name] = v.replace("\r\n", "\n")
     reads = [x.strip() for x in keys.get("reads", "").split(",") if x.strip()]
     card = brief = None
-    why = {}
+    why, labels = {}, {}
+    if any(k.startswith("task:") for k in reads):
+        # The card labels, read off the checker that grades a card rather than typed beside it
+        # (TOOL-aOrientedCast-15 S3): the same bounded, stdin-closed run `resolve_card_path` makes.
+        checker, bash = resolve_kickoff_checker(root), resolve_bash()
+        if checker is None or bash is None:
+            raise lib.RolesError("task: — no %s resolved to read the card labels from --task-skeleton"
+                                 % ("kickoff checker" if checker is None else "bash"))
+        try:
+            r = subprocess.run([bash, str(checker), "--task-skeleton"], cwd=root, stdin=subprocess.DEVNULL,
+                               capture_output=True, encoding="utf-8", errors="replace", timeout=CHECKER_BOUND_S)
+        except (OSError, subprocess.TimeoutExpired) as e:
+            raise lib.RolesError("task: — the kickoff checker %s --task-skeleton did not answer: %s"
+                                 % (checker.as_posix(), e))
+        derived = list(extract_task_fields("## task\n" + r.stdout, None)) if r.returncode == 0 else []
+        if len(derived) != len(TASK_FIELDS):
+            raise lib.RolesError("task: — the kickoff checker %s --task-skeleton exited %d with %d field "
+                                 "labels, and the task fields are %d" % (checker.as_posix(), r.returncode,
+                                                                          len(derived), len(TASK_FIELDS)))
+        labels = dict(zip(derived, TASK_FIELDS))
     if any(k.startswith(("task:", "card:")) for k in reads):
         card, why["card"] = resolve_card_path(root, card_arg)
         card_text = lib.load_text(card) if card else ""
-        values.update(("task:" + f, v) for f, v in extract_task_fields(card_text).items())
+        values.update(("task:" + f, v) for f, v in extract_task_fields(card_text, labels).items())
         for k in reads:
             if k.startswith("card:") and card:
                 section = extract_card_section(card_text, k.rstrip("?")[5:])

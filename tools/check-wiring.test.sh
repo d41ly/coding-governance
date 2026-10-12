@@ -2044,6 +2044,15 @@ if [ -n "$ROLES_DIR" ]; then
      "$([ "$(printf '%s\n' "$out" | grep -c '^note     roles     — nowhere/absent-harness.js is named by the role index')" = 1 ] && echo 1 || echo 0)"
   ck "OC8 AC6 ...and an absent harness never reads UNWIRED" \
      "$(printf '%s' "$out" | grep -q '^UNWIRED  roles' && echo 0 || echo 1)"
+  # TOOL-aOrientedCast-15 S7 — an index every hook refuses is UNWIRED, never ok with a note. RED
+  # against the base check_roles, which noted the parse failure and fell through to its ok line.
+  cp .claude/roles.json .claude/roles.json.good; printf '{' > .claude/roles.json
+  out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null); rc=$?
+  ck "OC15 AC6 a truncated role index -> one UNWIRED roles line naming it and the scaffold, exit 1" \
+     "$([ "$rc" = 1 ] && [ "$(printf '%s\n' "$out" | grep '^UNWIRED  roles ' | grep -F '.claude/roles.json' \
+        | grep -cF "${KP}$RL/adopt-roles.sh --scaffold")" = 1 ] && echo 1 || echo 0)"
+  ck "OC15 AC6 ...and no ok roles line" "$(printf '%s' "$out" | grep -q '^ok       roles' && echo 0 || echo 1)"
+  mv .claude/roles.json.good .claude/roles.json
   printf '.claude/agents/*.md eol=lf\n.claude/roles.json eol=lf\n' > .gitattributes
   git add -A; git commit -q -m rendered
   for _a in .claude/agents/*.md; do break; done

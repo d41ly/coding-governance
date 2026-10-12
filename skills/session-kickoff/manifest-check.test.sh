@@ -1436,6 +1436,10 @@ printf '## task\n> - **Title:** t\n> - **Goal (1–2 sentences):** refuse a kick
 check_eq "KC AC6 > prefixes, every qualifier and a two-line Acceptance qualifier append" "0" "$got"
 printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | sed 's/^- \*\*OUT \/ non-goals\*\* (explicit cut-line):/- **OUT \/ non-goals:**/' | run_route_append "$KC"; got=$?
 check_eq "KC AC6 the OUT label written **OUT / non-goals:** appends" "0" "$got"
+# TOOL-aOrientedCast-15 S5 — a space between the qualifier and its colon: a filled value still lands
+# (green on the base too); its placeholder twin is refused below, RED against the base `value()`.
+printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | sed 's/^\(- \*\*OUT \/ non-goals\*\* (explicit cut-line)\):/\1 :/' | run_route_append "$KC"; got=$?
+check_eq "KC L1 an OUT label spaced before its colon appends a filled value" "0" "$got"
 # AC7 — a body with no READY line and no `## task`, on a card whose READY line is real, is not graded.
 printf '## open\n- parked: `AGENTS.md:2`\n' | run_route_append "$KC"; got=$?
 check_eq "KC AC7 a body with no READY line and no ## task still appends" "0" "$got"
@@ -1458,6 +1462,8 @@ printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | sed 's/^\(- \*\*IN scope:\*\*\) .*/\1 
 check_route_refusal "KC AC4 one angle-bracket slot is a placeholder" "$KC" 1 "the '## task' section leaves IN scope a placeholder ('<the scope>'); $KC_END" < "$TMP/qb"
 printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | sed 's/^\(- \*\*OUT \/ non-goals\*\* (explicit cut-line):\) .*/\1 none/' > "$TMP/qb"
 check_route_refusal "KC AC4 an OUT of none is a placeholder" "$KC" 1 "the '## task' section leaves OUT / non-goals a placeholder ('none'); $KC_END" < "$TMP/qb"
+printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | sed 's/^\(- \*\*OUT \/ non-goals\*\* (explicit cut-line)\):.*/\1 : …/' > "$TMP/qb"
+check_route_refusal "KC L1 an OUT of … spaced before its colon is a placeholder" "$KC" 1 "the '## task' section leaves OUT / non-goals a placeholder ('…'); $KC_END" < "$TMP/qb"
 # AC5 — the shipped skeleton fails its own rule, or the rule could never refuse.
 printf '## task\n%s\n%s\n' "$TASK_SKELETON_OUT" "$KC_TAIL" > "$TMP/qb"
 check_route_refusal "KC AC5 the skeleton itself is refused naming all eight" "$KC" 1 \
@@ -1810,7 +1816,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +23: KICK-aOrientedCast-1 — C10's three format-1.4 arms and the KC block's twenty (the eight-line
 # skeleton, the field grammar's accepts and refusals, the verdict order), counted off the diff; no
 # suite ran in the pass.
-FLOOR_ASSERTIONS=302
+# +2: TOOL-aOrientedCast-15 S5 — the KC L1 pair, an OUT label spaced before its colon, filled and
+# placeholder, counted off the diff; no suite ran in the pass.
+FLOOR_ASSERTIONS=304
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

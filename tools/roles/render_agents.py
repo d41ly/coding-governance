@@ -456,8 +456,10 @@ def run_selftest():
             rc = run_mode("write", kit, tool_root, root)
         index = json.loads(index_path.read_bytes()) if index_path.is_file() else {}
         held = index.get("roles", {}).get("r-one", {}).get("gates")
-        check_arm(state, 13, rc == 0 and "render_agents: note" in out.getvalue()
-                  and "'absent'" in out.getvalue(),
+        # ONE line carries both (TOOL-aOrientedCast-15 S8): two substrings anywhere in the output
+        # would pass a note about something else beside an unrelated line naming the leg.
+        check_arm(state, 13, rc == 0 and any(ln.startswith("render_agents: note") and "'absent'" in ln
+                                             for ln in out.getvalue().splitlines()),
                   "an optional leg the manifest lacks exited %d without a note naming it" % rc)
         check_arm(state, 13, held == ["leg a", "absent"],
                   "r-one's index gates are %r, not the two leg names with the ? taken off" % held)

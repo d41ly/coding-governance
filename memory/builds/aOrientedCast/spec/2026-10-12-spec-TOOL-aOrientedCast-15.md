@@ -1,11 +1,12 @@
 # TOOL-aOrientedCast-15 — the closing review's minors: oracles that rot, readers that disagree, a verdict over a broken index
 
-**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 15 · ratified 2026-10-12
+**Status:** CLOSED · rev-4 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 15 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-build-TOOL-aOrientedCast-15-1-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aOrientedCast-15-1-acceptance-ledger.md) | journal | — |
 | [2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-12-1-spec-brief.md) | journal | TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 |
 | [2026-10-12-prompt-TOOL-aOrientedCast-13-1-fold-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-13-1-fold-brief.md) | journal | TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 |
 | [2026-10-12-prompt-TOOL-aOrientedCast-15-1-fold-brief.md](../prompts/2026-10-12-prompt-TOOL-aOrientedCast-15-1-fold-brief.md) | journal | — |
@@ -181,7 +182,10 @@ assertions only, so a host that SKIPs arm 6 does not red the floor.
 The fixture in `adopt-roles.test.sh` gains arm 7: the conf is written as
 `export MEMORY_ROOT=<MR>  # note` beside `CHARTER=<CH>`, then `--scaffold` and `--check` each exit 0,
 the rendered Skill carries no `# note`, and the Skill and every agent type name the same `<MR>/`
-root. Against the base adopter the scaffold exits 2, "MEMORY_ROOT is blank or absent".
+root, observed as the `.claude/skills` and `.claude/agents` trees byte-identical to the fixture's
+plain-conf render: one agent type, `gov-reuse-scout`, names no root at all, so a per-file grep for
+`<MR>/` would red on it. Against the base adopter the scaffold exits 2, "MEMORY_ROOT is blank or
+absent".
 
 ### The note arm (S8)
 
@@ -350,6 +354,9 @@ No pass runs a leg above.
   one output line, and S9, the roles kit 1.1 to 1.2 over its four carriers; §3's bump non-goal
   excepts roles; §4 gains "The note arm" and "The roles bump"; files touched, AC7, AC8, four gates
   and one `New arm:` row follow.
+- rev-4 · 2026-10-12 · §4 "The conf read". The builder found `gov-reuse-scout` names no memory root,
+  so "every agent type names the same root" is observed as a byte-identical render against the
+  fixture's plain conf rather than a per-file grep. The unit is built; status CLOSED.
 
 ## 10. Reuse audit
 

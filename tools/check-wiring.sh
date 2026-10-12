@@ -1583,7 +1583,11 @@ check_roles() {
   elif ! harn=$("$py" -c 'import json, sys
 for h in json.load(open(sys.argv[1], encoding="utf-8")).get("harnesses") or []:
     print(h)' .claude/roles.json 2>/dev/null); then
-    echo "note     roles     — .claude/roles.json does not parse as the role index, so the harnesses it names were not read"
+    # UNWIRED, not a note (TOOL-aOrientedCast-15 S7): every hook refuses an index it cannot parse, so
+    # an ok over it would be a wiring verdict that nothing downstream agrees with.
+    echo "UNWIRED  roles     — .claude/roles.json does not parse as the role index; re-render it with bash $kit/adopt-roles.sh --scaffold"
+    unwired=$((unwired+1))
+    return
   else
     while IFS= read -r h; do
       h=${h%$'\r'}   # a Windows python writes CRLF to a pipe, and a CR kept here names no file
