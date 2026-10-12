@@ -102,6 +102,7 @@ run-gates turnstile	3630		worst of 9 readings 2419s, x1.5
 run-selftests self-test	1217		measured 811s on node a 2026-09-14, direct timed run of the suite alone on a frozen git clone --local at f23b71e0 (108 arms, inner width 1, 15 bash processes on the box before it started, PASS), x1.5 rounded up; the 300s ceiling it replaces was killed at 300.333s exit 124 and had observed no wall
 runlog selftest	93		measured 62s on node d 2026-09-16, the worst of the direct runs (58 to 62 s) after the closing review's round-1 fold and the second origin/main reconcile raised the suite to 1291 assertions, x1.5
 scratch-guard self-test	220		worst of 8 readings 145s, x1.5
+format-guard self-test	120		ESTIMATE, not a reading: sized by TOOL-aHeardState-3 on node a 2026-10-13 from 54 assertions over about 70 node and git spawns at a post-reboot ~20 ms each, x1.5 headroom on a guessed 80 s; the build's VERIFYING run re-declares it from its reading
 selftest harness self-test	60		measured 37s on node a 2026-09-07, x1.5
 settings-merge selftest	60		worst of 11 readings 4s, x1.5
 shell-hygiene selftest	60		measured 0.3s on node a 2026-09-10 by direct invocation, x1.5 floored at this file 60s minimum

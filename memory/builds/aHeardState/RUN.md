@@ -86,3 +86,5 @@ base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 2026-10-12T21:53:12Z brief · item TOOL-aHeardState-7 · reason b9d32e7b75fa memory/builds/aHeardState/prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md
 
 2026-10-12T21:53:13Z brief · item TOOL-aHeardState-8 · reason b9d32e7b75fa memory/builds/aHeardState/prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md
+
+2026-10-12T21:54:30Z dispatch · item 7267f93e TOOL-aHeardState-3 · reason tools/govkit/subject-pins.tsv tools/run-gates/selftest-budgets.txt
