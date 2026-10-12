@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-32 — reconcile the build with origin/main 37200355
 
-**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-2 · base fce4b707 · streams tooling · order 5
+**Status:** INPROGRESS · rev-2 · 2026-10-12 · node a · Tier-2 · base fce4b707 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -78,8 +78,14 @@ none
 
 The merge follows the build's earlier reconcile, b9b24646f, and aMeteredSweep's two, 345900823 and
 2da5ad1d6: a `--no-ff` merge commit named `merge: origin/main 37200355 into aSparedSpawn`, then a
-stamps commit. The order inside the merge is fixed so that generated output is rendered from the
-resolved sources:
+pass commit, then a stamps commit. The merge commit carries `Pass: none`, as those three did: the
+commit-msg hook's `--check-commit` grades a trailered commit's whole index against the pass's
+declaration, a merge's index holds every path origin's 183 commits moved, and two of them,
+`memory/DECISIONS.md` and `memory/project/readme-contract.txt`, are shared records `--dispatch`
+refuses to declare. A merge commit also lists no paths to `diff-tree`, so check 23 could not
+attribute the pass to it. The pass commit after it, `Pass: TOOL-aSparedSpawn-32`, carries this
+spec's CLOSED header and the acceptance ledger, which is a write check 23 can grade. The order
+inside the merge is fixed so that generated output is rendered from the resolved sources:
 
 1. Resolve the product, suite and doc conflicts by hand, both sides kept, and stage them.
 2. Resolve `.memory-tree.conf` and the run-gates dossier additively, and stage them.
@@ -184,6 +190,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-12 · initial draft.
+- rev-2 · 2026-10-12 · §4: the merge commit carries `Pass: none` and a pass commit after it carries the CLOSED header and the ledger, because `--check-commit` refused a trailered merge for staging `memory/DECISIONS.md`, a shared record no dispatch may declare, and `diff-tree` lists no paths for a merge commit.
 
 ## 10. Reuse audit
 
