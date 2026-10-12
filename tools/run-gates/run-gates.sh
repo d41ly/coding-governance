@@ -4559,29 +4559,46 @@ run_leg_retry
 # goes; green is `nondeterministic`. Either quarantines the leg against its current row hash, so it is
 # never reused again until its manifest row changes. Backgrounded and waited on, as the serial retry is,
 # because the wall's handle on a leg is the worker's own pid.
-for _sf in "$WORK"/*.sampled; do
-  [ -f "$_sf" ] || continue
-  i=${_sf##*/}; i=${i%.sampled}
-  _key=""; { IFS= read -r _key < "$_sf"; } 2>/dev/null
-  _src="$WORK/$i.rc"; [ -f "$WORK/$i.retry.rc" ] && _src="$WORK/$i.retry.rc"
-  _rc=""; { IFS= read -r _rc < "$_src"; } 2>/dev/null
-  if [ "$_rc" = 0 ]; then
-    printf 'run-gates: sampled %s — it executed against its cached ok and agreed\n' "${names[$i]}" >&2
-    continue
-  fi
-  runleg "$i" .sample &
-  wait "$!" 2>/dev/null
-  _rc2=""; { IFS= read -r _rc2 < "$WORK/$i.sample.rc"; } 2>/dev/null
-  if [ "$_rc2" = 0 ]; then
-    printf 'nondeterministic · %s\n' "${names[$i]}"
-  else
-    printf 'cache disagreement · %s · %s\n' "${names[$i]}" "$_key"
-    [ "${#_key}" -ge 3 ] && rm -f "$REUSE_CACHE/${_key:0:2}/$_key" 2>/dev/null
-  fi
-  printf '%s' "${rowhashes[$i]}" > "$REUSE_CACHE/quarantine.${heldkeys[$i]}" 2>/dev/null \
-    || printf 'run-gates: %s could not be quarantined\n' "${names[$i]}" >&2
-done
-unset _sf _key _src _rc _rc2
+#
+# EVERY OTHER EXECUTION TOO (TOOL-aSparedSpawn-17): a leg the age bound forced, or one a plain or push
+# bar executed, whose effective verdict is red while its key holds an `ok`, is a disagreement as well.
+# It runs nothing more, since its retry already gave a second look where one was due: the line, the
+# entry erased, the quarantine. Otherwise the stale `ok` outlives the red and its age resets below, so a
+# retried push of the same sha could reuse it. The skip set is the cache block's; every read is a builtin.
+if [ -n "$REUSE_CACHE" ]; then
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    _src="$WORK/$i.rc"; [ -f "$WORK/$i.retry.rc" ] && _src="$WORK/$i.retry.rc"
+    _rc=""; { IFS= read -r _rc < "$_src"; } 2>/dev/null
+    if [ -f "$WORK/$i.sampled" ]; then
+      _key=""; { IFS= read -r _key < "$WORK/$i.sampled"; } 2>/dev/null
+      if [ "$_rc" = 0 ]; then
+        printf 'run-gates: sampled %s — it executed against its cached ok and agreed\n' "${names[$i]}" >&2
+        continue
+      fi
+      runleg "$i" .sample &
+      wait "$!" 2>/dev/null
+      _rc2=""; { IFS= read -r _rc2 < "$WORK/$i.sample.rc"; } 2>/dev/null
+      if [ "$_rc2" = 0 ]; then
+        printf 'nondeterministic · %s\n' "${names[$i]}"
+      else
+        printf 'cache disagreement · %s · %s\n' "${names[$i]}" "$_key"
+        [ "${#_key}" -ge 3 ] && rm -f "$REUSE_CACHE/${_key:0:2}/$_key" 2>/dev/null
+      fi
+    else
+      case "$_rc" in ''|0|ondemand|skip|docskip|reuse) continue ;; esac
+      _key=${INPUT_KEYS[$i]:--}
+      [ "$_key" != - ] && [ "${#_key}" -ge 3 ] || continue
+      _st=""; { IFS=$'\t' read -r _st _ < "$REUSE_CACHE/${_key:0:2}/$_key"; } 2>/dev/null
+      [ "$_st" = ok ] || continue
+      printf 'cache disagreement · %s · %s\n' "${names[$i]}" "$_key"
+      rm -f "$REUSE_CACHE/${_key:0:2}/$_key" 2>/dev/null
+    fi
+    printf '%s' "${rowhashes[$i]}" > "$REUSE_CACHE/quarantine.${heldkeys[$i]}" 2>/dev/null \
+      || printf 'run-gates: %s could not be quarantined\n' "${names[$i]}" >&2
+  done
+fi
+unset _key _src _rc _rc2 _st
 # AFTER the pool drains and every leg has its verdict, and BEFORE the watcher goes: the wall bounds
 # the bar and its attribution together (TOOL-dDerivedDocket-23 F6). A no-op unless asked and red.
 run_attribution

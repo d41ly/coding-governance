@@ -159,3 +159,11 @@ base: e6585db4e125bb0919c0c1f18687eb9825ffed80
 2026-10-12T06:48:28Z rescope · item add TOOL-aSparedSpawn-18 · reason promoted by the converged round-1 closing diff review (owner rulings of 2026-10-04): one unit per HIGH, the MEDIUMs and LOWs batched into TOOL-aSparedSpawn-16
 
 2026-10-12T06:48:31Z rescope · item add TOOL-aSparedSpawn-19 · reason promoted by the converged round-1 closing diff review (owner rulings of 2026-10-04): one unit per HIGH, the MEDIUMs and LOWs batched into TOOL-aSparedSpawn-16
+
+2026-10-12T07:05:21Z dispatch · item 3f100e9e TOOL-aSparedSpawn-17 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.evidence.test.sh tools/run-gates/README.md memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-17-acceptance-ledger.md memory/builds/aSparedSpawn/spec/2026-10-12-spec-TOOL-aSparedSpawn-17.md memory/builds/aSparedSpawn/README.md
+
+2026-10-12T07:05:30Z brief · item TOOL-aSparedSpawn-17 · reason b491cf232b3a memory/builds/aSparedSpawn/prompts/2026-10-12-prompt-TOOL-aSparedSpawn-17-build-brief.md
+
+2026-10-12T07:18:14Z dispatch · item 3f100e9e TOOL-aSparedSpawn-17 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.evidence.test.sh tools/run-gates/README.md memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-17-acceptance-ledger.md memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-17-direct-checks.sh memory/builds/aSparedSpawn/spec/2026-10-12-spec-TOOL-aSparedSpawn-17.md memory/builds/aSparedSpawn/README.md
+
+2026-10-12T07:27:47Z dispatch · item 3f100e9e TOOL-aSparedSpawn-17 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.evidence.test.sh tools/run-gates/README.md memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-17-acceptance-ledger.md memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-17-direct-checks.sh memory/builds/aSparedSpawn/spec/2026-10-12-spec-TOOL-aSparedSpawn-17.md memory/builds/aSparedSpawn/README.md memory/guides/SESSION-KICKOFF.md

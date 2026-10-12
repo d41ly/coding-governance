@@ -153,7 +153,8 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=151
+FLOOR_ASSERTIONS=163
+# RAISED 151 -> 163 by TOOL-aSparedSpawn-17: the executed-red-under-a-cached-ok arms, AC1's five assertions and AC2's seven.
 # RAISED 131 -> 151 by TOOL-aSparedSpawn-4: the worker-builtin arms, AC1 to AC4, AC6 and AC7, twenty assertions.
 # RAISED 129 -> 131 by TOOL-aSparedSpawn-3: the dispatch-prior arms, AC5 and AC6, one assertion each.
 # RAISED 115 -> 129 by TOOL-aSparedSpawn-1: the content-keyed reuse arms, AC1 to AC6, fourteen assertions.
@@ -1248,6 +1249,47 @@ grep -q '^GATE reuse ' "$REC_OUT" && nope "AC7 a leg was reused an eleventh time
 grep -q 'pa was reused on 10 runs in a row, so it executes' "$REC_OUT" && ok "AC7 the run says why" || nope "AC7 no line names the age bound"
 ru_nz=""; for ru_f in "$RU_GD/gate-cache"/age.*; do [ "$(cat "$ru_f")" = 0 ] || ru_nz+=" ${ru_f##*/}"; done
 [ -z "$ru_nz" ] && ok "AC7 executing resets the counter" || nope "AC7 counters not reset:$ru_nz"
+ru_done
+
+# TOOL-aSparedSpawn-17 AC1: AN AGED EXECUTION THAT REDS against its cached `ok` erases the entry and
+# quarantines the leg, as a sampled one does. `pa` reads FLIP, which no key holds; the sample is 0, so
+# only the age bound draws it. Before the fix the stale `ok` survived with its age reset.
+ru_repo
+write_ru_legs '{"name": "pa", "argv": ["bash", "-c", "[ -z \"${FLIP:-}\" ]"], "guard": ["ga/"]}' \
+        '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}'
+ru_run >/dev/null
+ru_run GATE_REUSE=1 >/dev/null; ru_k=$(read_ru_key pa)
+[ -e "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" ] && ok "17-AC1 precondition: pa's key holds an entry before the aged run" \
+  || nope "17-AC1 pa's key '$ru_k' holds no entry, so the arm below proves nothing"
+for ru_f in "$RU_GD/gate-cache"/age.*; do printf '10' > "$ru_f"; done
+ru_rc=$(ru_run GATE_REUSE=1 FLIP=1)
+[ "$ru_rc" != 0 ] && grep -q 'pa was reused on 10 runs in a row, so it executes' "$REC_OUT" \
+  && ok "17-AC1 the age bound executed pa and its red reds the run (rc=$ru_rc)" || nope "17-AC1 pa was not aged into a red run (rc=$ru_rc)"
+grep -qxF "cache disagreement · pa · $ru_k" "$REC_OUT" && ok "17-AC1 the aged red prints cache disagreement · pa · <key>" \
+  || nope "17-AC1 no disagreement line names pa and its key after an aged red"
+[ ! -e "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" ] && ok "17-AC1 the stale entry is erased" || nope "17-AC1 the stale ok survived an aged red"
+ls "$RU_GD/gate-cache"/quarantine.* >/dev/null 2>&1 && ok "17-AC1 the aged leg is quarantined" || nope "17-AC1 no quarantine file"
+ru_done
+
+# TOOL-aSparedSpawn-17 AC2: A PLAIN BAR'S RED does the same, with no GATE_REUSE at all. The clean green
+# run after it earns the key again, so the reuse run's `GATE ok` is the quarantine's, not a cold cache's.
+ru_repo
+write_ru_legs '{"name": "pa", "argv": ["bash", "-c", "[ -z \"${FLIP:-}\" ]"], "guard": ["ga/"]}' \
+        '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}'
+ru_run >/dev/null; ru_k=$(read_ru_key pa)
+[ -e "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" ] && ok "17-AC2 precondition: pa's key holds an ok before the plain red" \
+  || nope "17-AC2 pa's key '$ru_k' holds no entry, so the arm below proves nothing"
+ru_rc=$(ru_run FLIP=1)
+grep -qxF "cache disagreement · pa · $ru_k" "$REC_OUT" && ok "17-AC2 a plain bar's red prints cache disagreement · pa · <key> (rc=$ru_rc)" \
+  || nope "17-AC2 no disagreement line after a plain bar's red (rc=$ru_rc)"
+[ ! -e "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" ] && ok "17-AC2 the stale entry is erased" || nope "17-AC2 the stale ok survived a plain bar's red"
+ls "$RU_GD/gate-cache"/quarantine.* >/dev/null 2>&1 && ok "17-AC2 the leg is quarantined" || nope "17-AC2 no quarantine file"
+ru_run >/dev/null
+[ -e "$RU_GD/gate-cache/${ru_k:0:2}/$ru_k" ] && ok "17-AC2 precondition: a clean green run earns the same key again" \
+  || nope "17-AC2 the entry was not re-earned, so the arm below proves nothing"
+ru_run GATE_REUSE=1 >/dev/null
+grep -q '^GATE ok    pa' "$REC_OUT" && ok "17-AC2 the next reuse run executes pa" || nope "17-AC2 the quarantined leg was reused"
+grep -q '^GATE reuse pb' "$REC_OUT" && ok "17-AC2 control: its sibling is reused on that run" || nope "17-AC2 nothing was reused"
 ru_done
 
 # AC9: THE PRUNE at run end erases an entry older than 30 days and keeps a younger one.

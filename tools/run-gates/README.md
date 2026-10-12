@@ -212,6 +212,10 @@ runs once more: red again prints `cache disagreement · <leg> · <key>` and eras
 green prints `nondeterministic · <leg>`, and either quarantines the leg (`quarantine.<name key>` in
 the cache dir) until its manifest row changes. A leg reused on 10 consecutive runs executes on the
 next whatever the draw (`age.<name key>`), so a wrong entry lives at most that long.
+An executed red against a cached `ok` erases the entry and quarantines the leg,
+whatever drew the execution: the age bound, a plain bar, or a push-mode bar that may not reuse
+that leg. Only a drawn leg runs once more to classify; any other takes its effective verdict, its
+serial retry's where it had one, and prints `cache disagreement · <leg> · <key>`.
 
 The key takes the leg's argv, its manifest row (classes and row hash), the declared reads above, and
 its inputs: for a guarded leg the `git ls-files -s` of its guards plus the walk rows under them, each
