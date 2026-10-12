@@ -80,3 +80,5 @@ base: 2785323db4e72b8ae2f26660cc3947165a6258fc
 2026-10-11T08:04:27Z brief · item TOOL-aTrimmedHook-7 · reason fa508cf344d2 memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-7-1-build-brief.md
 
 2026-10-11T08:53:28Z decision · item brief item 5: the prompt's partial render, gen_build_index.py --check --builds <slugs> · reason options: build it here, or leave it; refused here because the exact classifier already skips the render for the commit the owner measured, and a partial render is a second mechanism in the renderer's cross-build views that no criterion of this build needs
+
+2026-10-12T16:13:17Z rescope · item add TOOL-aTrimmedHook-16 · reason the closing bar's reds: two of this build's own (a here-string loop in manifest-check.sh, a retired path in the hygiene staged pattern) and the inherited reds the owner chose to absorb (lexicon pin, install-prefix literals, an unarmed post-merge exit, the routed-commit waiver)

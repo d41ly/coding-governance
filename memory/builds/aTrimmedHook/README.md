@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling+kickoff
 roster: TOOL+KICK
-ids: KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3 TOOL-aTrimmedHook-4 TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-6 TOOL-aTrimmedHook-7 TOOL-aTrimmedHook-8
+ids: KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3 TOOL-aTrimmedHook-4 TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-6 TOOL-aTrimmedHook-7 TOOL-aTrimmedHook-8 TOOL-aTrimmedHook-16
 authorized-by: prompt
 ---
 
@@ -61,11 +61,12 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 6 | `TOOL-aTrimmedHook-5` | under `LIVE_LANDED_UNCLOSED` the classifier renders when anything outside its pathspec is staged (H2, M4) |
 | 7 | `TOOL-aTrimmedHook-6` | the hygiene-side minors, batched (M1, M2, L3, L4) |
 | 8 | `TOOL-aTrimmedHook-7` | the generator and manifest-check minors, batched (M3, L1, L5, L2) |
+| 9 | `TOOL-aTrimmedHook-16` | the closing bar's reds: two of this build's own, and the inherited ones the owner chose to absorb |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 8 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff
-ids KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3 TOOL-aTrimmedHook-4 TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-6 TOOL-aTrimmedHook-7 TOOL-aTrimmedHook-8
+**Build status:** SPECCED · 9 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff
+ids KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3 TOOL-aTrimmedHook-4 TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-6 TOOL-aTrimmedHook-7 TOOL-aTrimmedHook-8 TOOL-aTrimmedHook-16
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -78,13 +79,14 @@ ids KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHoo
 | [TOOL-aTrimmedHook-6 — the hygiene-side minors of the closing review, batched](spec/2026-10-11-spec-TOOL-aTrimmedHook-6.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aTrimmedHook-5 — under LIVE_LANDED_UNCLOSED the classifier renders when anything outside its pathspec is staged](spec/2026-10-11-spec-TOOL-aTrimmedHook-5.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aTrimmedHook-7 — the generator and manifest-check minors of the closing review, batched](spec/2026-10-11-spec-TOOL-aTrimmedHook-7.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-11 |
+| [TOOL-aTrimmedHook-16 — the closing bar's reds, this build's own and the inherited ones absorbed](spec/2026-10-12-spec-TOOL-aTrimmedHook-16.md) | 6 | 1 | SPECCED | rev-1 | 2026-10-12 |
 <!-- /gen:build-units -->
 
 Records: 19 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aTrimmedHook-16.
 
-Ids no `spec-audit` record has ever named: KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3 TOOL-aTrimmedHook-4 TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-6 TOOL-aTrimmedHook-7.
+Ids no `spec-audit` record has ever named: KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3 TOOL-aTrimmedHook-4 TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-6 TOOL-aTrimmedHook-7 TOOL-aTrimmedHook-16.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -96,6 +98,7 @@ Ids no `spec-audit` record has ever named: KICK-aTrimmedHook-1 TOOL-aTrimmedHook
 | 3 | `TOOL-aTrimmedHook-4`, `TOOL-aTrimmedHook-6` | yes |
 | 4 | `TOOL-aTrimmedHook-5` | no |
 | 5 | `TOOL-aTrimmedHook-7` | no |
+| 6 | `TOOL-aTrimmedHook-16` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
