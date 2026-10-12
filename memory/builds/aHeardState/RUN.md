@@ -94,3 +94,7 @@ base: 6b32af422bc2c02d067c2fc0887627f95404de0f
 2026-10-12T21:58:04Z dispatch · item bb3654ac TOOL-aHeardState-4 · reason tools/gate-legs.json memory/guides/SESSION-KICKOFF.md
 
 2026-10-12T22:01:08Z dispatch · item 588fb282 TOOL-aHeardState-5 · reason tools/gate-legs.json memory/guides/SESSION-KICKOFF.md
+
+2026-10-12T22:02:01Z dispatch · item b357641e TOOL-aHeardState-6 · reason memory/gotchas/held-suite-guard-misses-a-sibling-kit.md memory/map/features/agent-cap.md
+
+2026-10-12T22:02:20Z dispatch · item b357641e TOOL-aHeardState-6 · reason memory/gotchas/held-suite-guard-misses-a-sibling-kit.md memory/gotchas/INDEX.md memory/map/features/agent-cap.md

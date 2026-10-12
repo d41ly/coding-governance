@@ -60,6 +60,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [guard-above-a-fold-makes-its-fallback-dead](guard-above-a-fold-makes-its-fallback-dead.md) | class | 2 | yes | a guard added above a fold settles the predicate the fold's own fallback re-tests, leaving a dead arm that reads as coverage |
 | [guard-fed-the-value-it-supersedes](guard-fed-the-value-it-supersedes.md) | class | 2 |  | a guard on a relaunch reads only the pid the launch it guards was meant to replace, so the process the launch itself created is invisible to the next launch and the guard never sees the duplicate it exists to stop |
 | [hand-named-gate-list-green-while-the-bar-reds](hand-named-gate-list-green-while-the-bar-reds.md) | class | 6 |  | a spec names the legs its author expects the change to move, the unit is green on exactly those, and the bar is red on an unguarded leg the list never named |
+| [held-suite-guard-misses-a-sibling-kit](held-suite-guard-misses-a-sibling-kit.md) | class | 7 |  | a held self-test reads another kit's file, but its leg's guard names only its own kit, so an edit to the sibling skips the leg or reuses its stale green |
 | [heredoc-escape-reaches-the-regex](heredoc-escape-reaches-the-regex.md) | class | 0 | yes | source written through a shell heredoc into a non-raw string turns an escape into a control byte, and the symptom never looks like a quoting problem |
 | [history-leg-graded-before-the-reconcile-commit](history-leg-graded-before-the-reconcile-commit.md) | class | 2 |  | a history-wide leg graded before the reconcile commit is graded on the wrong history, because the merge adds commits to the population without touching a file the fix touched |
 | [hookspath-resolves-into-another-checkout](hookspath-resolves-into-another-checkout.md) | class | 6 |  | an ABSOLUTE core.hooksPath makes every worktree it governs run the hook files of the one checkout it names, so a push is gated by whatever that checkout happens to have checked out |
@@ -124,6 +125,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-109 record(s): 106 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+110 record(s): 107 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

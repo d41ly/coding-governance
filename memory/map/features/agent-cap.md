@@ -26,7 +26,7 @@ harness-hooks = ["PreToolUse tools/hooks/agent-cap.js", "PreToolUse tools/hooks/
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["bash-c-multiline-flattens-under-msys.md", "git-rm-cached-refuses-a-diverged-index-blob.md",
+gotcha-classes = ["bash-c-multiline-flattens-under-msys.md", "held-suite-guard-misses-a-sibling-kit.md", "git-rm-cached-refuses-a-diverged-index-blob.md",
   "trailing-comma-counted-as-an-element.md",
   "allowlist-narrower-than-the-root-it-guards.md",
   "a-pair-exists-and-it-is-the-wrong-one.md",
