@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-19 — the spawn-budget leg never passes a run that graded nothing it could have
 
-**Status:** OPEN · rev-1 · 2026-10-12 · node a · Tier-2 · base 8444f597 · streams tooling · order 4
+**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-2 · base 8444f597 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
