@@ -96,9 +96,9 @@ ids TOOL-aSparedSpawn-29 TOOL-aSparedSpawn-30 TOOL-aSparedSpawn-31 TOOL-aSparedS
 | [TOOL-aSparedSpawn-33 — the pre-push hook restores the caller's environment for the reuse digest](spec/2026-10-12-spec-TOOL-aSparedSpawn-33.md) | 6 | 2 | OPEN | rev-1 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 59 bound to this build, across 4 record folder(s).
+Records: 60 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aSparedSpawn-33.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14 TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6
 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedSpawn-18 TOOL-aSparedSpawn-19 TOOL-aSparedSpawn-32 TOOL-aSparedSpawn-33.
