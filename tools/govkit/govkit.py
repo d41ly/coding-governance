@@ -5935,7 +5935,11 @@ def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
     # this call to the WSL launcher on a Windows python, which is a different filesystem and a
     # different interpreter. Two sessions fixed this class independently and this was the one site
     # neither pass wired on its own: main resolved four, the merged branch found the fifth.
-    out = subprocess.run(resolve_shell_argv(list(cmd)), cwd=str(target), capture_output=True, text=True)
+    # THE RUNNER'S GENERATED-OUTPUT PREFLIGHT IS SKIPPED (DEPL-aPrimedIndex-1). It exits 2 before any
+    # leg line when a declared output is stale, and both reads then parsed an empty map, with which apply
+    # could certify an install it never compared. Skipped, a stale output reads as its own leg's red.
+    out = subprocess.run(resolve_shell_argv(list(cmd)), cwd=str(target), capture_output=True, text=True,
+                         env=dict(os.environ, GATE_REGEN_CHECK="0"))
     verdicts: dict[str, str] = {}
     for state, key in OBSERVED_STATES:
         for tmpl in (gr.get(key) or []):

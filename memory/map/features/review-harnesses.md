@@ -44,6 +44,7 @@ globs = [
 
 ## Constraints & why
 
+- Its `[[regenerate]]` render row is staged, stage 1, with a row-level `check`, the parity script's compare mode, since `[check]` declares none (TOOL-aPrimedIndex-1).
 **A workflow script has no filesystem and cannot import.** Everything it branches on arrives through
 `args`, which is delivered as a STRING even when the caller hands it JSON. The consequence that
 surprises every new author is that a lens catalogue cannot be read from a declaration file by the

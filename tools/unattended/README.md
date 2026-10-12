@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.99 -->
+<!-- gov:kit unattended@1.101 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -26,9 +26,12 @@ rendered ones do carry placeholders, and for them a render is the only correct i
 `[[generated]]` table in the kit's `kit.toml`, every key at column 0 as a double-quoted string:
 `path` (tokens `{memory_root}`, `{map_root}` and `{kit}` only), `generator` (a file beside the
 descriptor), `why`, and an optional `when = "<conf>:<KEY>=<value>"` that applies the row only when
-that repo-root conf assigns exactly that value. govkit selfcheck refuses any other shape, because
-the shell reader would mangle or drop it. `GENERATED_INDEXES` in `.unattended.conf` only ADDS pairs
-to these (`TOOL-aWindowedPass-4`).
+that repo-root conf assigns exactly that value. govkit selfcheck refuses any other shape for those
+four keys, because the shell reader would mangle or drop it. A row may also carry `write` and
+`check`, argv arrays, and `stage`, an integer, all three or none, at column 0: the shell reader
+ignores them, and the run-gates kit's `regen.py` reads them to regenerate the output or prove it
+fresh before a bar (that kit's README, "Generated outputs"; TOOL-aPrimedIndex-1).
+`GENERATED_INDEXES` in `.unattended.conf` only ADDS pairs to these (`TOOL-aWindowedPass-4`).
 
 **One hook line is yours to wire, and no kit ships it.** Add
 `bash <kit>/unattended.sh --check-commit "$1"` to your own `commit-msg` hook, ahead of anything that
@@ -169,9 +172,12 @@ nowhere in the product.
 
 `resume-tick.sh` is the one keepalive actor that does not share the session's process: an
 OS-scheduled task that walks every worktree, asks the driver `--liveness` about every run whose
-lease names a session, and on a verdict the protocol's section 5 names as acting kills the recorded
-pid's tree, appends an attempt line under `<git-dir>/unattended/resume.<slug>.log` and launches
-`claude -p --resume <session>` detached. It reads the lease from the INDEX, never the working copy
+lease names a session, and on a verdict the protocol's section 5 names as acting appends an attempt
+line under `<git-dir>/unattended/resume.<slug>.log` and launches `claude -p --resume <session>`
+detached, with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0` so the resumed session's background
+Workflows outlive its turn ends. It kills only what it launched: a recorded pid that is alive with
+no live launch of the tick's own is reported as `STALE OVER A LIVE PID`, and nothing is killed or
+launched (`TOOL-aSparedHolder-1`). It reads the lease from the INDEX, never the working copy
 — an untracked run-state file is announced and skipped, and so is a tracked one whose working copy
 differs from its index blob, because a file write must buy neither a skip-permissions session nor
 a kill aimed by hand — stands off a lease another node took, kills only a pid whose recorded image
@@ -208,7 +214,8 @@ compares the running session's version against it as integers and prints one lin
 `WARNING` when this CLI is older, a `NOTE` when it is newer, or `UNKNOWN` naming the missing side.
 It is a warning and never a refusal, and so is the tick line beside it.
 
-A relaunch appends one `run-resumed` line, and a launch that failed one `resume-failed` line, to the
+A relaunch appends one `run-resumed` line, a launch that failed one `resume-failed` line, and a
+live pid the tick spared one `stale-live-pid` line per tick, to the
 health log under the git common dir that the orientation card counts; the driver appends
 `claim-taken-over` when it takes over a stale claim (`TOOL-aGraftedHelix-8`), and
 `claim-push-lock-broken` when it breaks a stale `claim-push.lock` under that lock's guard, or

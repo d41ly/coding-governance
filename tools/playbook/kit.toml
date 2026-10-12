@@ -53,6 +53,9 @@ mutates_index = false
 [[regenerate]]
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", "."]
 writes = ["AGENTS.md"]
+# Staged for the bar (TOOL-aPrimedIndex-1): run-gates' regen.py re-renders this before a bar
+# and proves it fresh with this kit's [check] argv; stage 1 is a render from a kit template.
+stage = 1
 
 [check]
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]
