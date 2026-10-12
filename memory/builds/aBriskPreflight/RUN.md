@@ -12,20 +12,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 asks-at-landing: TOOL-aBriskPreflight-8=OPEN TOOL-aBriskPreflight-9=OPEN TOOL-aBriskPreflight-13=OPEN TOOL-aBriskPreflight-14=OPEN TOOL-aBriskPreflight-15=OPEN TOOL-aBriskPreflight-16=OPEN TOOL-aBriskPreflight-17=OPEN TOOL-aBriskPreflight-18=OPEN
 units-at-landing: TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-11 TOOL-aBriskPreflight-12
 hold-run: 
-hold-streak: 1 · at 973dc13e
-resume-owed: none · owner
-held-at: 2026-10-12T05:29:58Z
-hold-reason: TOOL-aBriskPreflight-11 (promoted from the closing review's HIGH H1) is parked on spec fork F2: priced at the worst host reading on record, PREFLIGHT_CEILING derives to about 4200 s, above GATE_BOUND 3600 s, and every option the run could take trips spec 7's AC8, raises a bound, or picks the selector by its outcome. The other eleven units are CLOSED and the work is sound; the bar's remaining reds are other builds' offenders on origin/main, read OWN only through the comparator rule. Decide F2, then build unit 11 (or retire it with a reason) and land.
-hold-until: owner
-hold-code: owner-decision
+hold-streak: 1 · at adcf766f
+resume-owed: unattended-resume-abriskpreflight · fire 2026-10-12T20:22:44Z
+held-at: 2026-10-12T19:52:44Z
+hold-reason: the owner stopped the final close's merge bar to reboot node a (kernel pool leak: Pool Paged ~19 GB, one spawn 0.8-1.8 s). Every unit is terminal, the landing merge is prepared at adcf766f onto origin/main 6e8f8b1d, and --authorization is met; resume re-runs --close, then lands
+hold-until: probe host
+hold-code: host-degraded
 held-from: VERIFYING
 gates-run: unattended-179177613053776420063-779951 4bb77a0d
 parked-surfaced: yes
 keepalive-reaped: yes
 refreshed-at: 37200355d6033895cd156ec962928fd264084c2b · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: dd0d1cece0adaec5e86930baab65235a4295a09c
-phase: VERIFYING
+witness: adcf766faa3d8c0adcb10b93b4eeef217a294eb9
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/sleepy-kapitsa-1f69c8
@@ -113,3 +113,5 @@ base: 271a90045723817f694de4d22c56f88dbcd0063e
 2026-10-12T17:19:48Z dispatch · item ef43b17f TOOL-aBriskPreflight-19 · reason .githooks/pre-push.test.sh tools/unattended/unattended.test.sh memory/project/unarmed-branches.txt memory/builds/aBriskPreflight/spec/2026-10-12-spec-TOOL-aBriskPreflight-19.md memory/builds/aBriskPreflight/build/2026-10-12-build-TOOL-aBriskPreflight-19-acceptance-ledger.md memory/builds/aBriskPreflight/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
 
 2026-10-12T17:20:18Z brief · item TOOL-aBriskPreflight-19 · reason 1e1294bf7ab4 memory/builds/aBriskPreflight/prompts/2026-10-12-prompt-TOOL-aBriskPreflight-19-build-brief.md
+
+2026-10-12T19:53:24Z hold · item host-degraded · reason until probe host · reaped 50da7a17 · resume unattended-resume-abriskpreflight
