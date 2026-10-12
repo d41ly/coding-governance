@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 6e8f8b1da4dc036b7fce23555b78fb4b5db0e60c · park · 1 touching
 hold-run: 
 hold-streak: 1 · at a1dc95b8
 resume-owed: unattended-resume-aprimedindex · fire 2026-10-12T04:44:38Z
@@ -21,19 +22,19 @@ gates-run: unattended-179177077013434529691-597878 38e594a6
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: a1dc95b8978b03626d691b773aabad0c3b010210
-phase: HELD
+witness: 13fe6a04dfac854847b87419641b5c546a0385e9
+phase: VERIFYING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/enforce-index-regen-before-bars-acdde6
 anchor-kind: local
 cli-version: 2.1.293
-lease-utc: 2026-10-11T01:23:28Z
+lease-utc: 2026-10-12T16:41:22Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 31536
 session: 86a064cd-3532-4202-93cd-dd26651975d3
-keepalive: 5d684520
+keepalive: 046fa035
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: b726385f2b5b8fd16802925c02104377253a9045
 anchor-ref: refs/heads/main
@@ -116,3 +117,7 @@ base: 15bbfa4f867262f3c862e2473688fc69d0566b7d
 2026-10-12T01:53:42Z dispatch · item 4606faa4 TOOL-aPrimedIndex-16 · reason tools/lexicon/selftest.py tools/unattended/unattended.test.sh .githooks/pre-push.test.sh .lexicon.conf .memory-tree.conf memory/project/unarmed-branches.txt memory/guides/SESSION-KICKOFF.md memory/builds/aPrimedIndex/spec/2026-10-12-spec-TOOL-aPrimedIndex-16.md memory/builds/aPrimedIndex/BACKLOG.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-1.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-2.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-3.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-4.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-6.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-8.md
 
 2026-10-12T04:14:46Z hold · item host-degraded · reason until probe host · reaped 5d684520 · resume unattended-resume-aprimedindex
+
+2026-10-12T16:42:45Z resume · item aPrimedIndex · reason held · keepalive 046fa035 · manual
+
+2026-10-12T16:44:00Z decision · item land aPrimedIndex while its run is HELD host-degraded, with the pre-push hook bypassed? · reason the close's second bar was green on every leg but straggler-guard arms, a HOST timeout under two other sessions' bars; the mandate does not delegate a hook bypass. The owner decided to land it with the hook skipped; it was pushed 37200355..13fe6a04
