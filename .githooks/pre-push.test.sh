@@ -48,7 +48,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -85,7 +86,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -106,6 +107,10 @@ bad() { echo "  FAIL — $1"; fail=1; }
 # The scratch repo is `git init`+`remote add` (origin/HEAD unset); pin the default so the hook's
 # fail-CLOSED resolution doesn't refuse the gate cases (case 6 unsets it to test that path).
 export GOV_DEFAULT_BRANCH=main
+# Fixture identity and line endings for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true.
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@example.com GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@example.com
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 # THE DECLARED TEST ESCAPE (TOOL-aRepatriatedFork-5, from adopter nc's PKG-dCandidLodestar-5). Every
 # stub below is an mktemp script, which is untracked by construction, and the hook refuses an
 # untracked merge bar. Without this the whole file would test a refusal path and nothing else.
@@ -117,10 +122,9 @@ export GOV_GATE_CMD_TEST=1
 mkdir -p "$tmp/hooks"
 cp "$SRC/.githooks/pre-push" "$tmp/hooks/pre-push"
 
-git init -q --bare "$tmp/remote.git"
-git init -q "$tmp/work"
+git init -q --template= --bare "$tmp/remote.git"
+git init -q --template= "$tmp/work"
 cd "$tmp/work" || exit 2
-git config user.email t@example.com; git config user.name t
 git config core.hooksPath "$tmp/hooks"
 git commit -q --allow-empty -m init
 git branch -M main
@@ -265,7 +269,7 @@ stamp() {    # write a full-green record naming a sha, with a reproducible finge
   [ -n "$st" ] && printf 'selftests\t%s\n' "$st" >> "$gd/gate-full-green"
   return 0
 }
-decide_on() {   # the hook's decision line for a push made WITH the self-test switch on
+run_push_selftests() {   # the hook's decision line for a push made WITH the self-test switch on
   git commit -q --allow-empty -m "decide-on $RANDOM" >/dev/null 2>&1
   ( GATE_SELFTESTS=1 GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true
 }
@@ -363,7 +367,7 @@ cd "$tmp/work" || exit 2
 # 19 — a record earned switch-OFF does not satisfy a switch-ON push. This is the only direction
 #      that forces, and it is the one the whole unit is for.
 stamp "$(git rev-parse HEAD)" 0
-line=$(decide_on)
+line=$(run_push_selftests)
 case "$line" in
   *"FULL gate"*) ok "19 a switch-OFF record offered for a switch-ON push → FULL" ;;
   *) bad "19 a record that never ran the kit self-tests satisfied a push that does: ${line:-<no decision line>}" ;;
@@ -380,7 +384,7 @@ esac
 #      unit lacks the key, and reading its absence as 'covered everything' would make each of them
 #      certify legs it never ran.
 stamp "$(git rev-parse HEAD)"
-case "$(decide_on)" in
+case "$(run_push_selftests)" in
   *"FULL gate"*"kit self-tests"*) ok "21 a record with NO switch key reads as OFF" ;;
   *) bad "21 a record missing the switch key was treated as covering the kit self-tests" ;;
 esac
@@ -396,9 +400,24 @@ esac
 # 23 — its control: switch-ON record, switch-ON push. Without this, an implementation that forced
 #      on every switch-ON push would still pass 19 through 22.
 stamp "$(git rev-parse HEAD)" 1
-case "$(decide_on)" in
+case "$(run_push_selftests)" in
   *"scoped gate"*) ok "23 control — a switch-ON record satisfies a switch-ON push" ;;
   *) bad "23 a record that covered the kit self-tests did not satisfy a push that runs them" ;;
+esac
+
+# 23b — TOOL-aSparedSpawn-12 AC7: a `selftests changed` record, which run-gates writes for a
+#       `GATE_SELFTESTS=changed` run that held every suite whose kit did not move, is a PARTIAL tier.
+#       Predicate 8 is unedited and must read it as not covering a switch-ON push, and as covering a
+#       switch-OFF one, since the 2026-08-27 default holds every suite anyway.
+stamp "$(git rev-parse HEAD)" changed
+case "$(run_push_selftests)" in
+  *"FULL gate"*"kit self-tests"*) ok "23b a selftests-changed record offered for a switch-ON push → FULL" ;;
+  *) bad "23b a selftests-changed record satisfied a push that runs every kit self-test" ;;
+esac
+stamp "$(git rev-parse HEAD)" changed
+case "$(decide)" in
+  *"scoped gate"*) ok "23c a selftests-changed record satisfies a switch-OFF push" ;;
+  *) bad "23c a selftests-changed record forced a switch-OFF push, which no held record does" ;;
 esac
 
 # 24 — THE HOOK SOURCES THE REPOSITORY'S OWN GATE POLICY. TOOL-dUnstalledConvoy-28 moved gov's
@@ -569,7 +588,7 @@ fi
 # does not. Both directions, because a one-sided arm cannot tell a working scrub from a fixture that
 # never reproduced the bug.
 wt=$(mktemp -d)
-( git init -q "$wt/w" && cd "$wt/w" && git config user.email t@t && git config user.name t \
+( git init -q --template= "$wt/w" && cd "$wt/w" \
     && echo x > a && git add -A && git commit -qm init && git worktree add -q "$wt/lw" -b lw ) >/dev/null 2>&1
 wtcfg="$wt/w/.git/config"
 wtgd="$wt/w/.git/worktrees/lw"
@@ -644,15 +663,14 @@ fi
 
 # Build a scratch repo whose kits live at $1, push once so a record can name a real sha, and leave
 # the caller standing in it.
-pfx_fixture() {
+build_pfx_fixture() {
   local pfx=$1 hook=$2 tag=$3
   # SPLIT deliberately: `local a=$1 d="...$a..."` reads $a as unset under `set -u` here, so the
   # fixture builder died before it built anything. One name per statement.
   local d="$tmp/pfx-$pfx-$tag"
   mkdir -p "$d/hooks"; cp "$hook" "$d/hooks/pre-push"
-  git init -q --bare "$d/remote.git"; git init -q "$d/work"
+  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
   cd "$d/work" || return 1
-  git config user.email t@example.com; git config user.name t
   git config core.hooksPath "$d/hooks"
   mkdir -p "$pfx"
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$pfx/gate-legs.json"
@@ -669,13 +687,13 @@ pfx_fixture() {
 }
 # A full-green record for a fixture at $1, naming sha $2. Deliberately NOT the `stamp` above: that
 # one spells `<prefix>/` itself, which is the very assumption under test here.
-pfx_stamp() {
+write_pfx_stamp() {
   local pfx=$1 sha=$2 blob=${3-} gd; gd=$(git rev-parse --git-dir)
   [ -n "$blob" ] || blob=$(git hash-object -- "$pfx/gate-legs.json" 2>/dev/null)
   printf 'sha\t%s\nfingerprint\t%s\nmanifest_blob\t%s\nrun_id\ttest\n' "$sha" "" "$blob" \
     > "$gd/gate-full-green"
 }
-pfx_decide() {
+run_pfx_push() {
   git commit -q --allow-empty -m "decide $RANDOM" >/dev/null 2>&1
   ( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 ) \
     | grep -m1 -E 'gate on main push' || true
@@ -685,9 +703,9 @@ pfx_decide() {
 for _h in new old; do
   case $_h in new) _hook="$SRC/.githooks/pre-push" ;; old) _hook="$tmp/hooks-old-pre-push" ;; esac
   [ -s "$_hook" ] || continue
-  pfx_fixture scripts "$_hook" "ac1$_h" || { bad "AC1 could not build the $_h fixture"; continue; }
-  pfx_stamp scripts "$(git rev-parse HEAD)"
-  case "$(pfx_decide)" in
+  build_pfx_fixture scripts "$_hook" "ac1$_h" || { bad "AC1 could not build the $_h fixture"; continue; }
+  write_pfx_stamp scripts "$(git rev-parse HEAD)"
+  case "$(run_pfx_push)" in
     *"scoped gate"*) [ "$_h" = new ] && ok "AC1 precondition — a scripts/ tree reaches a SCOPED decision" ;;
     *) [ "$_h" = new ] && bad "AC1 precondition — no scoped decision at a scripts/ prefix" ;;
   esac
@@ -695,8 +713,8 @@ for _h in new old; do
   printf '%s\n' '[{"name":"x","argv":["bash","b.sh"]},{"name":"y","argv":["bash","c.sh"]}]' \
     > scripts/gate-legs.json
   git add -A >/dev/null 2>&1; git commit -qm "move the manifest" >/dev/null 2>&1
-  pfx_stamp scripts "$_prev"
-  _dec=$(pfx_decide)
+  write_pfx_stamp scripts "$_prev"
+  _dec=$(run_pfx_push)
   case "$_h:$_dec" in
     new:*"FULL gate"*) ok "AC1 a manifest change at scripts/ FORCES a full run (predicate 6 fires)" ;;
     new:*) bad "AC1 predicate 6 did not fire at a scripts/ prefix: ${_dec:-<no decision>}" ;;
@@ -706,9 +724,9 @@ for _h in new old; do
 done
 
 # --- AC2: a recorded manifest blob that differs, at that same prefix ---------------------------
-pfx_fixture scripts "$SRC/.githooks/pre-push" ac2 || bad "AC2 could not build its fixture"
-pfx_stamp scripts "$(git rev-parse HEAD)" "0000000000000000000000000000000000000000"
-_dec=$(pfx_decide)
+build_pfx_fixture scripts "$SRC/.githooks/pre-push" ac2 || bad "AC2 could not build its fixture"
+write_pfx_stamp scripts "$(git rev-parse HEAD)" "0000000000000000000000000000000000000000"
+_dec=$(run_pfx_push)
 case "$_dec" in
   *"differs from the one the recorded green was earned on"*)
     ok "AC2 a differing recorded manifest blob at scripts/ FORCES (predicate 7 fires)" ;;
@@ -718,7 +736,7 @@ esac
 # --- AC3: a manifest the resolved root does NOT point at is a REFUSAL, not a non-match ---------
 # The distinction the whole unit turns on. A tree that tracks a manifest somewhere the hook does not
 # look must SAY SO; reading it as "no change here" is what let a manifest-wide change land scoped.
-pfx_fixture nowhere "$SRC/.githooks/pre-push" ac3 >/dev/null 2>&1
+build_pfx_fixture nowhere "$SRC/.githooks/pre-push" ac3 >/dev/null 2>&1
 git commit -q --allow-empty -m c >/dev/null 2>&1
 _out=$( GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 )
 case "$_out" in
@@ -728,7 +746,7 @@ case "$_out" in
 esac
 # ANTI-VACUITY: a repo with NO manifest anywhere is a legitimate case and must NOT refuse, or the
 # arm above is satisfied by a hook that refuses everything.
-pfx_fixture scripts "$SRC/.githooks/pre-push" ac3b >/dev/null 2>&1
+build_pfx_fixture scripts "$SRC/.githooks/pre-push" ac3b >/dev/null 2>&1
 rm -f scripts/gate-legs.json; git add -A >/dev/null 2>&1
 git commit -qm "no manifest at all" >/dev/null 2>&1
 if GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1; then
@@ -740,9 +758,8 @@ else bad "AC3 the hook refused a tree that simply has no leg manifest"; fi
 # --- does not exist. The kit and its runner are joined at run time, as the hook joins them.
 vg=vendor/gov; rgk=run-gates
 vgd="$tmp/vg"; mkdir -p "$vgd/hooks"; cp "$SRC/.githooks/pre-push" "$vgd/hooks/pre-push"
-git init -q --bare "$vgd/remote.git"; git init -q "$vgd/work"
+git init -q --template= --bare "$vgd/remote.git"; git init -q --template= "$vgd/work"
 cd "$vgd/work" || exit 2
-git config user.email t@example.com; git config user.name t; git config core.autocrlf false
 git config core.hooksPath "$vgd/hooks"
 mkdir -p "${vg}/$rgk" .githooks
 # The stub writes the GREEN run record a real runner would: an exit 0 with no verdict is RED since
@@ -792,9 +809,8 @@ esac
 # --- manifest, ran that runner over a RED tracked bar and landed, with `git status` empty. Each arm
 # --- stages that shape; the control proves a clean, tracked receipt still reaches its bar.
 b1="$tmp/b1"; mkdir -p "$b1/hooks"; cp "$SRC/.githooks/pre-push" "$b1/hooks/pre-push"
-git init -q --bare "$b1/remote.git"; git init -q "$b1/work"
+git init -q --template= --bare "$b1/remote.git"; git init -q --template= "$b1/work"
 cd "$b1/work" || exit 2
-git config user.email t@example.com; git config user.name t; git config core.autocrlf false
 git config core.hooksPath "$b1/hooks"
 mkdir -p "$RUN_GATES"
 printf '#!/usr/bin/env bash\necho "TRACKED BAR RAN - RED"; exit 1\n' > "$RUN_GATES/$RUN_GATES.sh"
@@ -806,7 +822,7 @@ b1_gd=$(git rev-parse --git-dir)
 mkdir -p "$b1_gd/x/$RUN_GATES" .governance
 printf '#!/usr/bin/env bash\necho "PLANTED BAR RAN"; exit 0\n' > "$b1_gd/x/$RUN_GATES/$RUN_GATES.sh"
 printf '%s\n' '[]' > "$b1_gd/x/gate-legs.json"
-printf '.governance/\n' >> "$b1_gd/info/exclude"
+mkdir -p "$b1_gd/info"; printf '.governance/\n' >> "$b1_gd/info/exclude"
 write_b1_receipt() { # <path the runner row records> -> the receipt, one key per line as the hook's reader expects
   printf '{\n  "files": [\n    {\n      "path": "%s",\n      "source": "%s/%s.sh"\n    }\n  ]\n}\n' \
     "$1" "$RUN_GATES" "$RUN_GATES" > .governance/install.json
@@ -854,9 +870,8 @@ cd "$pfx_home" || exit 2
 # --- every arm by never being asked. Each planted route writes a marker when it runs.
 h49="$tmp/h49"; h49_mark="$h49/mark"; mkdir -p "$h49/hooks" "$h49_mark"
 cp "$SRC/.githooks/pre-push" "$h49/hooks/pre-push"
-git init -q --bare "$h49/remote.git"; git init -q "$h49/work"
+git init -q --template= --bare "$h49/remote.git"; git init -q --template= "$h49/work"
 cd "$h49/work" || exit 2
-git config user.email t@example.com; git config user.name t; git config core.autocrlf false
 git config core.hooksPath "$h49/hooks"
 mkdir -p "$RUN_GATES" fx
 cp "$SRC/$RUN_GATES_DIR/run-gates.sh" "$SRC/$RUN_GATES_DIR/gate-fingerprint.sh" \
@@ -905,7 +920,8 @@ esac
 # A direct green run writes the ledger row; the push then runs over the SAME tree and base, so on the
 # old hook the row's key matched and the red leg was never executed.
 # RE-STAGED BY TOOL-aFrugalTurnstile-4 S9: the row is earned WITHOUT GATE_FULL, so its `full` field is
-# empty. The hook now exports GATE_REUSE=lineage on its own FULL decision, and a row a full run earned
+# empty. The hook now exports GATE_REUSE_LINEAGE on its own FULL decision (the knob since
+# TOOL-aSparedSpawn-32 S6; the cache, which the earning run also feeds, is never read under GATE_FULL), and a row a full run earned
 # would be reused there, because this leg's verdict depends on H49_LEG_RC, which no input key sees:
 # the not-checked class of the runner's reuse block, staged on purpose. An empty `full` keeps this arm
 # testing what it names — `GATE_REUSE=1` semantics would reuse the row, lineage refuses it, and the
@@ -921,7 +937,7 @@ case "$_rc|$(read_h49_token)" in
 esac
 
 # The IGNORED manifest: the repository tracks the runner and no manifest, and `git status` is empty.
-git rm -q --cached gate-legs.json; printf 'gate-legs.json\n' >> "$h49_gd/info/exclude"
+git rm -q --cached gate-legs.json; mkdir -p "$h49_gd/info"; printf 'gate-legs.json\n' >> "$h49_gd/info/exclude"
 printf '[{"name": "planted", "argv": ["bash", "-c", "touch %s/ignored"]}]\n' "$h49_mark" > gate-legs.json
 git commit -q -m "h49 an ignored manifest"
 [ -z "$(git status --porcelain)" ] || bad "H49 fixture — the ignored manifest is visible to git status, so the arm below tests nothing hidden"
@@ -931,9 +947,150 @@ case "$_rc|$(read_h49_token)|$(read_h49_mark ignored)|$_out" in
   *"|bar-refused||"*gate-legs.json*) ok "H49 an ignored leg manifest is refused as bar-refused before the bar reads it" ;;
   *) bad "H49 expected the ignored manifest to be refused as bar-refused, got rc=$_rc token '$(read_h49_token)': $_out" ;;
 esac
+# ---- TOOL-aSparedSpawn-13: PUSH-TIME REUSE IS THE HOOK'S OWN KNOB ---------------------------------
+# An authoritative run reuses only a `remote` or `history` leg, at the exact pushed sha and observed
+# tip, and is then scoped: `GATE_REUSE_PUSH`, set by this hook alone on a SCOPED decision whose
+# `ls-remote` probe answered with the remote sha git handed it. A stub bar records the knob it received,
+# so each arm grades what reached the runner; the runner's half, which legs it then reuses, is the
+# evidence suite's. Every push is scoped by a planted full green at the pushed tip's parent unless the
+# arm plants otherwise.
+rp="$tmp/rp"; mkdir -p "$rp/hooks"; cp "$SRC/.githooks/pre-push" "$rp/hooks/pre-push"
+git init -q --template= --bare "$rp/remote.git"; git init -q --template= "$rp/work"
+cd "$rp/work" || exit 2
+git config core.hooksPath "$rp/hooks"
+git commit -q --allow-empty -m init; git branch -M main
+git remote add origin "$rp/remote.git"
+rp_gd=$(cd "$(git rev-parse --git-dir)" && pwd)
+touch "$rp_gd/push-main-active"
+GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
+printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_REUSE_PUSH:-}" > "%s/knob"\nprintf "%%s|%%s" "${GATE_REUSE_SAMPLE-unset}" "${GATE_REUSE_DAY-unset}" > "%s/seams"\nexit 0\n' "$rp" "$rp" > "$rp/stub.sh"
+run_rp_push() { # [remote] [NAME=VALUE…] -> the push's merged output; the knob the bar saw is in $rp/knob
+  local remote=origin
+  case "${1:-}" in *=*|'') ;; *) remote=$1; shift ;; esac
+  printf 'sha\t%s\n%s' "$(git rev-parse HEAD)" "${RP_GREEN_EXTRA:-}" > "$rp_gd/gate-full-green"
+  git commit -q --allow-empty -m "rp $RANDOM" >/dev/null 2>&1
+  printf 'unset' > "$rp/knob"
+  env GOV_GATE_CMD="bash $rp/stub.sh" "$@" git push origin main 2>&1
+}
+
+read_rp_line() { printf '%s' "$1" | grep -m1 'gate on main push'; }   # the decision line alone, never the whole output
+
+_out=$(run_rp_push); rp_knob=$(<"$rp/knob")
+rp_want="$(git rev-parse HEAD) $(git --git-dir="$rp/remote.git" rev-parse main~1)"
+case "$(read_rp_line "$_out")" in
+  *"scoped gate on main push"*"reuse offered to remote and history legs at"*) ok "RP AC13 a scoped decision whose probe agreed names the reuse it offers" ;;
+  *) bad "RP AC13 expected the scoped decision line to offer reuse, got: $_out" ;;
+esac
+case "$rp_knob" in
+  "$rp_want "?*) ok "RP S10 the bar receives GATE_REUSE_PUSH as the pushed sha, the remote's tip and a digest" ;;
+  *) bad "RP S10 the bar received '$rp_knob', wanted '$rp_want <digest>'" ;;
+esac
+
+# AC12: a probe that answers with no tip of the default branch offers nothing, and says so. A first push
+# to an empty remote stages it: a PATH shim cannot, since git runs the hook with its own dirs first.
+git init -q --template= --bare "$rp/empty.git"; git remote add second "$rp/empty.git"
+_out=$(run_rp_push second); rp_knob=$(<"$rp/knob")
+case "$(read_rp_line "$_out")|$rp_knob" in
+  *"reuse not offered: the ls-remote probe did not answer with the main tip"*"|") ok "RP AC12 a probe with no tip to answer offers nothing, and the decision line names the probe" ;;
+  *) bad "RP AC12 expected no knob and the probe named, got knob '$rp_knob': $_out" ;;
+esac
+
+# AC15: an inherited knob is cleared, named, and never reaches the bar; the bar sees the hook's own.
+_out=$(run_rp_push GATE_REUSE_PUSH=planted); rp_knob=$(<"$rp/knob")
+case "$_out" in
+  *"not honoured from the environment by this bar:"*GATE_REUSE_PUSH*) ok "RP AC15 an inherited GATE_REUSE_PUSH is named as not honoured" ;;
+  *) bad "RP AC15 expected the inherited knob to be named, got: $_out" ;;
+esac
+case "$rp_knob" in
+  planted|unset) bad "RP AC15 the bar received '$rp_knob' rather than the hook's own knob" ;;
+  *) ok "RP AC15 the planted knob never reaches the bar; the hook's own does" ;;
+esac
+# TOOL-aSparedSpawn-16 S6 (AC6): the push knob's two seams go with it, for a STUB bar too. Each, exported,
+# is named on the hook's not-honoured line, read alone, and the stub bar sees neither.
+printf 'none' > "$rp/seams"
+_out=$(run_rp_push GATE_REUSE_SAMPLE=0 GATE_REUSE_DAY=1); rp_seams=$(<"$rp/seams")
+case "$(printf '%s\n' "$_out" | grep -m1 'not honoured from the environment by this bar:')|$rp_seams" in
+  *" GATE_REUSE_SAMPLE"*" GATE_REUSE_DAY"*"|unset|unset") ok "RP S6 an exported GATE_REUSE_SAMPLE and GATE_REUSE_DAY are named as not honoured and never reach the bar" ;;
+  *) bad "RP S6 expected both seams named and the bar to see neither, got seams '$rp_seams': $_out" ;;
+esac
+rm -f "$rp_gd/gate-full-green"
+_out=$( git commit -q --allow-empty -m "rp full" >/dev/null 2>&1; printf 'unset' > "$rp/knob"
+        env GOV_GATE_CMD="bash $rp/stub.sh" GATE_REUSE_PUSH=planted git push origin main 2>&1 ); rp_knob=$(<"$rp/knob")
+case "$_out|$rp_knob" in
+  *"FULL gate on main push"*"|") ok "RP AC15 a FULL decision hands the bar no knob, inherited or not" ;;
+  *) bad "RP AC15 expected a FULL decision with no knob, got knob '$rp_knob': $_out" ;;
+esac
+
+# AC14: predicate 9 — a planted full green whose `reused_cache` field is not 0 forces the full bar, and
+# the same record reading 0 scopes, so the arm sees the field and not the record. RE-STAGED BY
+# TOOL-aSparedSpawn-32 S10: the field predicate 9 reads for a cache reuse is `reused_cache` since the
+# two reuse designs were composed; `reused` alone is lineage's count.
+_out=$(RP_GREEN_EXTRA=$'reused\t1\nreused_cache\t1\n' run_rp_push)
+case "$(read_rp_line "$_out")" in
+  *"FULL gate on main push"*"says its run reused 1 leg(s) from the cache"*) ok "RP AC14 a full green whose reused_cache reads 1 forces the full bar" ;;
+  *) bad "RP AC14 expected predicate 9 to force the full bar, got: $_out" ;;
+esac
+_out=$(RP_GREEN_EXTRA=$'reused\t0\nreused_cache\t0\n' run_rp_push)
+case "$_out" in
+  *"scoped gate on main push"*) ok "RP AC14 control: the same record reading reused_cache 0 scopes" ;;
+  *) bad "RP AC14 control expected a scoped decision, got: $_out" ;;
+esac
+# TOOL-aSparedSpawn-32 AC8: a record written before `reused_cache` existed cannot say which kind it
+# reused, so `reused 2` with no `reused_cache` forces FULL; the same count beside `reused_cache 0` is a
+# lineage stamp and scopes, which is the control that the arm reads the missing field.
+_out=$(RP_GREEN_EXTRA=$'reused\t2\n' run_rp_push)
+case "$(read_rp_line "$_out")" in
+  *"FULL gate on main push"*"says its run reused 2 leg(s), and"*) ok "TOOL-aSparedSpawn-32 AC8 an unlabelled reused 2 forces the full bar" ;;
+  *) bad "TOOL-aSparedSpawn-32 AC8 expected an unlabelled reused 2 to force the full bar, got: $_out" ;;
+esac
+_out=$(RP_GREEN_EXTRA=$'reused\t2\nreused_cache\t0\n' run_rp_push)
+case "$(read_rp_line "$_out")" in
+  *"scoped gate on main push"*) ok "TOOL-aSparedSpawn-32 AC8 control: reused 2 beside reused_cache 0, a lineage stamp, scopes" ;;
+  *) bad "TOOL-aSparedSpawn-32 AC8 control expected a lineage stamp to scope, got: $_out" ;;
+esac
+# ---- TOOL-aSparedSpawn-33: THE PUSH DIGEST READS THE CALLER'S RESTORED ENVIRONMENT -----------------
+# Beside `GATE_REUSE_PUSH` the hook writes the caller's environment as it was before git started the
+# hook, and names the file in `GATE_REUSE_DIGEST_ENV`. A stub copies that file, so each arm grades the
+# view the runner would read. AC2: git's additions are gone, `GIT_CONFIG_PARAMETERS` included (set
+# here as a `git -c` push sets it), and PATH is the caller's under the runner's `/bin` reading.
+printf '#!/usr/bin/env bash\nrm -f "%s/view"\n[ -n "${GATE_REUSE_DIGEST_ENV:-}" ] && cp "$GATE_REUSE_DIGEST_ENV" "%s/view"\nexit 0\n' "$rp" "$rp" > "$rp/viewstub.sh"
+rm -f "$rp/view"
+_out=$( unset LC_CTYPE; run_rp_push GOV_GATE_CMD="bash $rp/viewstub.sh" GIT_CONFIG_PARAMETERS="'fx.knob'='1'" )
+rp_cp=":$PATH:"; rp_vp=":$(sed -n 's/^env PATH=//p' "$rp/view" 2>/dev/null):"
+if [ /bin -ef /usr/bin ]; then
+  while [[ $rp_cp == *":/bin:"* ]]; do rp_cp=${rp_cp//":/bin:"/":/usr/bin:"}; done
+  while [[ $rp_vp == *":/bin:"* ]]; do rp_vp=${rp_vp//":/bin:"/":/usr/bin:"}; done
+fi
+case "$([ -s "$rp/view" ] && echo found)|$(grep -cE '^env (GIT_EXEC_PATH|GIT_PREFIX|GIT_CONFIG_PARAMETERS|GIT_DIR|LC_CTYPE)=' "$rp/view" 2>/dev/null)|$([ "$rp_vp" = "$rp_cp" ] && echo same)" in
+  "found|0|same") ok "TOOL-aSparedSpawn-33 AC2 the view carries none of git's additions, no LC_CTYPE the caller left unset, and the caller's PATH" ;;
+  *) bad "TOOL-aSparedSpawn-33 AC2 expected a view without git's additions and with the caller's PATH, got: $(cut -c1-60 "$rp/view" 2>/dev/null | tr '\n' ';') $_out" ;;
+esac
+_out=$(run_rp_push GOV_GATE_CMD="bash $rp/viewstub.sh" LC_CTYPE=en_US.UTF-8)
+grep -qx 'env LC_CTYPE=en_US.UTF-8' "$rp/view" 2>/dev/null \
+  && ok "TOOL-aSparedSpawn-33 AC2 the caller's own LC_CTYPE stays in the view" \
+  || bad "TOOL-aSparedSpawn-33 AC2 the caller's LC_CTYPE=en_US.UTF-8 was dropped from the view: $_out"
+# AC4: an inherited view knob is cleared and named, for a STUB bar too, and the bar reads the hook's own.
+_out=$(run_rp_push GOV_GATE_CMD="bash $rp/viewstub.sh" GATE_REUSE_DIGEST_ENV="$rp/planted.view")
+case "$(printf '%s\n' "$_out" | grep -m1 'not honoured from the environment by this bar:')|$([ -s "$rp/view" ] && echo found)" in
+  *GATE_REUSE_DIGEST_ENV*"|found") ok "TOOL-aSparedSpawn-33 AC4 an inherited GATE_REUSE_DIGEST_ENV is named as not honoured, and the bar reads the hook's own view" ;;
+  *) bad "TOOL-aSparedSpawn-33 AC4 expected the inherited view knob named and the hook's view handed on, got: $_out" ;;
+esac
+# THE TWO PATTERN TEXTS: the hook's view writer copies the runner's digest name patterns to bound what
+# reaches its file, so the two lines marked `# digest-env-names` must agree; a runner copy with one
+# name dropped must not, or the comparison cannot fail.
+rp_pat_hook=$(sed -n 's/^ *\(GATE_\*[^)]*\)) .*# digest-env-names$/\1/p' "$SRC/.githooks/pre-push")
+rp_pat_run=$(sed -n 's/^ *\(GATE_\*[^)]*\)) .*# digest-env-names$/\1/p' "$SRC/$RUN_GATES_DIR/run-gates.sh")
+[ -n "$rp_pat_hook" ] && [ "$rp_pat_hook" = "$rp_pat_run" ] \
+  && ok "TOOL-aSparedSpawn-33 the hook's view writer admits exactly the runner's digest name patterns: $rp_pat_run" \
+  || bad "TOOL-aSparedSpawn-33 the hook's view patterns '$rp_pat_hook' differ from the runner's '$rp_pat_run'"
+rp_pat_cut=$(sed 's/|TZ) printf/) printf/' "$SRC/$RUN_GATES_DIR/run-gates.sh" | sed -n 's/^ *\(GATE_\*[^)]*\)) .*# digest-env-names$/\1/p')
+[ -n "$rp_pat_cut" ] && [ "$rp_pat_cut" != "$rp_pat_hook" ] \
+  && ok "TOOL-aSparedSpawn-33 a runner copy with TZ dropped from its patterns is told apart" \
+  || bad "TOOL-aSparedSpawn-33 a runner copy with TZ dropped still compared equal: '$rp_pat_cut'"
+cd "$tmp" || exit 2
 
 # --- TOOL-aFrugalTurnstile-4 S7: LINEAGE REUSE AT THE BOUNDARY. On a FULL decision for this kit's
-# --- runner the hook exports GATE_REUSE=lineage itself, after the scrub, so the push that fixes a red
+# --- runner the hook exports GATE_REUSE_LINEAGE itself (TOOL-aSparedSpawn-32 S6), after the scrub, so the push that fixes a red
 # --- re-runs the failed leg and the legs whose key moved, and lands on a stamp that says `reused 1`.
 # --- No other bar gets the mode. A COPY OF THE REAL RUNNER again, for H49's reason: three legs, `pa`
 # --- guarded on ga/, `pb` guarded on gb/ and red until gb/f says fixed, `pu` unguarded.
@@ -984,6 +1141,17 @@ case "$_out" in
   *"GATE ok    pb"*"GATE ok    pu"*) ok "LIN AC11 control — the fixed leg and the unguarded leg executed on that push" ;;
   *) bad "LIN AC11 control expected pb and pu to execute on the fix push: $_out" ;;
 esac
+# TOOL-aSparedSpawn-32 AC7: the fix push's stamp is a LINEAGE stamp, `reused 1` beside `reused_cache 0`,
+# and predicate 9 reads it as one: the next push takes no FULL decision from the stamp's reused field.
+# The naive merge read `reused 1` as a cache reuse and forced every push after a lineage green FULL.
+# The commit moves the tree, so the cover pass cannot take the push before the decision line.
+echo after > lin-after.txt; git add lin-after.txt; git commit -q -m "lin after"
+_out=$(run_lin_push); _rc=$?
+case "$(awk -F'\t' '$1 == "reused_cache" { print $2 }' "$lin_gd/gate-full-green" 2>/dev/null)|$(printf '%s\n' "$_out" | grep -m1 'gate on main push')" in
+  "0|"*"FULL gate"*"reused"*) bad "TOOL-aSparedSpawn-32 AC7 the push after a lineage green was forced FULL by its reused field: $_out" ;;
+  "0|"*"scoped gate on main push"*) ok "TOOL-aSparedSpawn-32 AC7 a lineage stamp (reused 1, reused_cache 0) scopes the next push" ;;
+  *) bad "TOOL-aSparedSpawn-32 AC7 expected a reused_cache 0 stamp and a scoped next push, got rc=$_rc: $_out" ;;
+esac
 
 # AC12: the declared STUB gets no mode and no clause.
 git commit -q --allow-empty -m "lin stub"; rm -f "$lin_gd"/gate-*green*
@@ -995,14 +1163,60 @@ case "$_rc|$_out" in
   *) bad "LIN AC12 expected a FULL STUB push with no reuse clause, got rc=$_rc: $_out" ;;
 esac
 # AC12: a declared GATE_CMD naming another tracked script never receives the mode.
-printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_REUSE-unset}" > "%s/other-saw"\nexit 0\n' "$lin" > other-bar.sh
+printf '#!/usr/bin/env bash\nprintf "%%s|%%s" "${GATE_REUSE-unset}" "${GATE_REUSE_LINEAGE-unset}" > "%s/other-saw"\nexit 0\n' "$lin" > other-bar.sh
 printf 'GATE_CMD="bash other-bar.sh"\n' > .unattended.conf
 git add -A; git commit -q -m "lin other"; rm -f "$lin_gd"/gate-*green*
 _out=$(run_lin_push GOV_GATE_CMD="bash other-bar.sh"); _rc=$?
 case "$_rc|$(cat "$lin/other-saw" 2>/dev/null)|$_out" in
   *"reuse: lineage"*) bad "LIN AC12 a non-runner bar's FULL line carries reuse: lineage: $_out" ;;
-  "0|unset|"*) ok "LIN AC12 a declared non-runner bar runs with GATE_REUSE unset" ;;
-  *) bad "LIN AC12 expected the declared bar to run with GATE_REUSE unset, got rc=$_rc saw '$(cat "$lin/other-saw" 2>/dev/null)': $_out" ;;
+  "0|unset|unset|"*) ok "LIN AC12 a declared non-runner bar runs with GATE_REUSE and GATE_REUSE_LINEAGE unset" ;;
+  *) bad "LIN AC12 expected the declared bar to run with both reuse knobs unset, got rc=$_rc saw '$(cat "$lin/other-saw" 2>/dev/null)': $_out" ;;
+esac
+
+# --- TOOL-aSparedSpawn-33 AC1 AC3: A DIRECT BAR'S ENTRY MEETS THE PUSH. A copy of the real runner, a
+# --- leg `pa` that records the GIT_EXEC_PATH it ran under, and a `remote` leg `pr`. A direct bar from
+# --- this shell earns pr's entry at the very commit the push then sends, since a remote leg is keyed on
+# --- HEAD; its own full green is put back to the first push's, or it would cover the push and no bar
+# --- would run. The push is scoped, offers reuse, and must meet that entry: before the hook restored
+# --- the caller's environment, git's GIT_EXEC_PATH, PATH head and (on Git for Windows) LC_CTYPE moved
+# --- the key. The sample, which the hook does not let a push choose, may draw pr; a draw happens only
+# --- after a cached ok matched, so a sampled pr is the entry met too.
+dg="$tmp/dg"; mkdir -p "$dg/hooks"
+cp "$SRC/.githooks/pre-push" "$dg/hooks/pre-push"
+git init -q --bare "$dg/remote.git"; git init -q "$dg/work"
+cd "$dg/work" || exit 2
+git config user.email t@example.com; git config user.name t; git config core.autocrlf false
+git config core.hooksPath "$dg/hooks"
+mkdir -p "$RUN_GATES" fx ga gb
+cp "$SRC/$RUN_GATES_DIR/run-gates.sh" "$SRC/$RUN_GATES_DIR/gate-fingerprint.sh" \
+   "$SRC/$RUN_GATES_DIR/gate-profiles.txt" "$RUN_GATES/"
+printf '#!/usr/bin/env bash\nprintf "%%s" "${GIT_EXEC_PATH-unset}" > "%s/gep"\n' "$dg" > fx/a.sh
+printf '#!/usr/bin/env bash\necho r\n' > fx/r.sh
+echo x > ga/f; echo y > gb/f
+printf '%s\n' '[' \
+  '  {"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
+  '  {"name": "pr", "argv": ["bash", "fx/r.sh"], "guard": ["gb/"], "reads": {"remote": "fixture"}}' \
+  ']' > gate-legs.json
+git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+git remote add origin "$dg/remote.git"
+dg_gd=$(cd "$(git rev-parse --git-dir)" && pwd)
+touch "$dg_gd/push-main-active"
+( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 git push -q origin main ) >/dev/null 2>&1
+echo x2 > ga/f; echo y2 > gb/f; git add -A; git commit -q -m "dg earn"
+cp "$dg_gd/gate-full-green" "$dg/green1" 2>/dev/null
+( unset GOV_GATE_CMD GOV_GATE_CMD_TEST
+  GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 GATE_BASE=$(git hash-object -t tree /dev/null) bash "$RUN_GATES/run-gates.sh" ) >/dev/null 2>&1
+cp "$dg/green1" "$dg_gd/gate-full-green" 2>/dev/null
+rm -f "$dg/gep"
+_out=$( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 git push origin main 2>&1 ); _rc=$?
+case "$_rc|$_out" in
+  "0|"*"scoped gate on main push"*"reuse offered to remote and history legs"*"GATE reuse pr"*|"0|"*"scoped gate on main push"*"reuse offered to remote and history legs"*"pr  (sampled against a cached ok)"*)
+    ok "TOOL-aSparedSpawn-33 AC1 a push through the real hook meets the remote leg's entry a direct bar earned" ;;
+  *) bad "TOOL-aSparedSpawn-33 AC1 expected the scoped push to reuse pr from the direct bar's entry, got rc=$_rc: $_out" ;;
+esac
+case "$(cat "$dg/gep" 2>/dev/null)" in
+  ""|unset) bad "TOOL-aSparedSpawn-33 AC3 leg pa did not see GIT_EXEC_PATH during the push: '$(cat "$dg/gep" 2>/dev/null)'" ;;
+  *) ok "TOOL-aSparedSpawn-33 AC3 the legs keep the hook's environment: pa saw GIT_EXEC_PATH during the push" ;;
 esac
 cd "$pfx_home" || exit 2
 # ---- TOOL-dDerivedDocket-24: THE INHERITED-RED POLICY, READ AT R ---------------------------------
@@ -1024,9 +1238,8 @@ build_ir_fixture() { # tag · gate-env body (printf %b) -> a pushed main whose R
   local tag=$1 body=$2
   local d="$tmp/ir-$tag"
   mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
-  git init -q --bare "$d/remote.git"; git init -q "$d/work"
+  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
   cd "$d/work" || return 1
-  git config user.email t@example.com; git config user.name t
   git config core.hooksPath "$d/hooks"
   mkdir -p .githooks "$KIT_REL"
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
@@ -1222,7 +1435,7 @@ fi
 # AC11, the reader's failing case: two fixture commits gov's own values cannot satisfy, one declaring
 # park with a bound of 7 and one with no gate-env.sh at all, which reads the kit default land, unbounded.
 _d="$tmp/ir-ac11-reader"; mkdir -p "$_d/.githooks"
-( cd "$_d" && git init -q && git config user.email t@example.com && git config user.name t \
+( cd "$_d" && git init -q --template= \
   && printf 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=7\n' > .githooks/gate-env.sh \
   && git add .githooks/gate-env.sh && git commit -q -m park7 \
   && git rm -q .githooks/gate-env.sh && git commit -q -m absent ) >/dev/null 2>&1
@@ -1245,9 +1458,8 @@ cd "$pfx_home" || exit 2
 build_vr_fixture() { # tag -> a pushed main whose tree carries the stub runner; cwd moves into its work tree
   local d="$tmp/vr-$1"
   mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
-  git init -q --bare "$d/remote.git"; git init -q "$d/work"
+  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
   cd "$d/work" || return 1
-  git config user.email t@example.com; git config user.name t
   git config core.hooksPath "$d/hooks"
   mkdir -p "$KIT_REL/$RUN_GATES" .githooks
   # The rung the hook reads the kit root from when no receipt and no root install name it.
@@ -1362,7 +1574,19 @@ cd "$pfx_home" || exit 2
 #     nothing there even when it is read (TOOL-dLadderedRemote-5).
 #   GATE_TURNSTILE_DIR — where the host beacon and queue live; it decides contention only, as GATE_TURNSTILE=0 does (TOOL-aFrugalTurnstile-5 F1).
 #   GATE_TURNSTILE_HOLDER — a holder's nonce; scrubbing it would queue a pushing leg behind its own parent bar (TOOL-aFrugalTurnstile-5 F1).
-BAR_INERT_KNOBS="GOV_REMOTE GOV_DEFAULT_BRANCH GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+#   GATE_TURNSTILE_SLOTS — how many bars the host turnstile admits; it decides contention only, never a leg (TOOL-aPairedSlots-1).
+#   GATE_REUSE_PUSH GATE_REUSE_LINEAGE GATE_REUSE_DIGEST_ENV GATE_REUSE_SAMPLE GATE_REUSE_DAY — the hook
+#     clears each for every bar, a STUB included, and sets the first three only on the decision that
+#     asks for it, as it does GATE_DOCS_BASE (TOOL-aSparedSpawn-13 S10, -16 S6, -32 S6, -33 S2).
+#   GATE_PUSH_BASE — the hook overwrites it from git's own ref line on every gated push (S5).
+#   GATE_CALIBRATION_RATES — read only under --calibrate-width, which no push bar passes, and unset
+#     before any leg (TOOL-aSparedSpawn-2).
+#   GATE_SELFTESTS_MAX_LAG — read only under GATE_SELFTESTS=changed, which predicate 8 forces FULL, and
+#     it can hold only a held-tier leg that GATE_SELFTESTS added, never a leg of the default bar.
+#   GATE_SPAWN_NOW — the spawn pause's reading, GATE_MEMINFO's sibling: a pause narrows the pool and
+#     always ends (TOOL-aSparedSpawn-2). Width class.
+# Classified by TOOL-aSparedSpawn-33 S8.
+BAR_INERT_KNOBS="GOV_REMOTE GOV_DEFAULT_BRANCH GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_DIGEST_ENV GATE_REUSE_LINEAGE GATE_REUSE_PUSH GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_SLOTS GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
 read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
 check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
   local knobs cleared scrubbed k n
@@ -1400,10 +1624,9 @@ esac
 # pushes with "can't determine the default branch" before any of them reached what it grades.
 fx8="$tmp/fx8"
 mkdir -p "$fx8"
-git init -q --bare "$fx8/mirror.git"
-git init -q "$fx8/work"
+git init -q --template= --bare "$fx8/mirror.git"
+git init -q --template= "$fx8/work"
 cd "$fx8/work" || exit 2
-git config user.email t@example.com; git config user.name t
 git config core.hooksPath "$tmp/hooks"
 git commit -q --allow-empty -m init; git branch -M main
 git remote add mirror "$fx8/mirror.git"
@@ -1486,11 +1709,20 @@ case "$msg|$(read_token)|$(read_tip feat8)" in
 esac
 printf 'GOV_BRANCH_GATE_CMD="bash %s"\n' "$red" > .githooks/gate-env.sh
 git add .githooks/gate-env.sh; git commit -q -m "declare an untracked branch bar"
+# TOOL-aBriskPreflight-6 S3: a runner where the kit-root ladder finds it, so the refusal names it and
+# not the placeholder. The hook resolves the runner only for a push that reads it, and a declared
+# branch bar is one; a resolution keyed to the default branch alone prints the placeholder here.
+mkdir -p "$RUN_GATES"; printf '#!/usr/bin/env bash\nexit 0\n' > "$RUN_GATES/run-gates.sh"
 msg=$( ( unset GOV_DEFAULT_BRANCH GOV_GATE_CMD_TEST; git push -q mirror feat8 2>&1 ) )
 case "$msg|$(read_token)" in
   *"does not track"*"|bar-refused") ok "AC10 an untracked branch bar is refused as bar-refused" ;;
   *) bad "AC10 expected an untracked branch bar to be refused, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
 esac
+case "$msg" in
+  *"Sanctioned use: GOV_BRANCH_GATE_CMD='bash $RUN_GATES/run-gates.sh'"*) ok "AC10 the branch bar's refusal names the runner the ladder found" ;;
+  *) bad "AC10 expected the refusal to name $RUN_GATES/run-gates.sh, so a feature push with a declared branch bar resolved no runner: ${msg:-<push SUCCEEDED>}" ;;
+esac
+rm -rf "$RUN_GATES"
 # H1 — the policy file itself, UNTRACKED: refused before it is sourced, whatever it declares.
 git rm -q .githooks/gate-env.sh; git commit -q -m "undeclare the branch bar"
 mkdir -p .githooks   # `git rm` took the emptied directory with it
@@ -1517,10 +1749,9 @@ cd "$pfx_home" || exit 2
 # and reaches the later raw-push refusal.
 if _ml_lex=$(resolve_kit_dir "$_rkd_py" lexicon lexicon.py "$SRC/$KIT_REL" 2>/dev/null); then
   _ml_home=${_ml_lex##*/}
-  git init -q --bare "$tmp/ml.git"
-  git init -q "$tmp/ml"
+  git init -q --template= --bare "$tmp/ml.git"
+  git init -q --template= "$tmp/ml"
   cd "$tmp/ml" || exit 2
-  git config user.email t@example.com; git config user.name t; git config core.autocrlf false
   git config core.hooksPath "$tmp/hooks"
   cp -r "$SRC/$_ml_lex" "$_ml_home"; rm -rf "$_ml_home/__pycache__"
   printf 'LANGS="sh:shell-tokens:parser"\n' > .lexicon.conf
@@ -1565,9 +1796,8 @@ printf '#!/usr/bin/env bash\nprintf "docs=%%s\\n" "${GATE_DOCS_BASE:-}" > "$DOCS
 build_docs_fixture() { # tag · gate-env body (printf %b) -> a pushed main at R carrying that body
   local d="$tmp/docs-$1"
   mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
-  git init -q --bare "$d/remote.git"; git init -q "$d/work"
+  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
   cd "$d/work" || return 1
-  git config user.email t@example.com; git config user.name t; git config core.autocrlf false
   git config core.hooksPath "$d/hooks"
   mkdir -p .githooks "$KIT_REL" notes src
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
@@ -2324,10 +2554,10 @@ cd "$pfx_home" || exit 2
 build_bg_fixture t16stamp || bad "T16 could not build its fixture"
 git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
 git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1
-for _alt in "control:" "manifest:leg manifest tools/other-legs.json" "blob:leg manifest blob 01234567" "fingerprint:graded tree fingerprint 01234567"; do
+for _alt in "control:" "manifest:leg manifest elsewhere/other-legs.json" "blob:leg manifest blob 01234567" "fingerprint:graded tree fingerprint 01234567"; do
   rm -f "$bg_gd"/gate-bar-green*; write_bg_stamp "$_x"
   case "${_alt%%:*}" in
-    manifest) set_bg_key "$bg_gd/gate-full-green" manifest tools/other-legs.json ;;
+    manifest) set_bg_key "$bg_gd/gate-full-green" manifest elsewhere/other-legs.json ;;
     blob) set_bg_key "$bg_gd/gate-full-green" manifest_blob 0123456789abcdef0123456789abcdef01234567 ;;
     fingerprint) set_bg_key "$bg_gd/gate-full-green" fingerprint 0123456789abcdef ;;
   esac

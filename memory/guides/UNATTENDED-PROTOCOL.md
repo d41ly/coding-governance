@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.97 -->
+<!-- gov:kit unattended@1.104 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -385,9 +385,9 @@ scheduled job shares all three, so it is demoted, not fixed.
 **The IDLE-WAKE** is that job. The AGENT schedules it as the run's first act, before orienting, on
 every start path, and reaps it last — a run that never starts still owns it. It is recorded under
 the `keepalive` fact and attested as `keepalive-reaped`; that fact, that DoD item, `--keepalive-id`
-and the `KEEPALIVE_*` keys keep their names: each has readers. Its limits, 2026-09-13: it fires only
-while the session is idle (documented) and, owner-reported, unmeasured, stays silent while a
-background task is pending. Its prompt is `--resume --keepalive-id` with its own id, then `--audit`.
+and the `KEEPALIVE_*` keys keep their names: each has readers. It fires only while the session
+is idle (documented); nine jobs never fired in 30 h of pending background work (2026-10-10). Its
+prompt is `--resume --keepalive-id` with its own id, then `--audit`.
 A background task's starter registers it (`--register-task`); `--audit` grades its heartbeat until
 `--release-task`.
 Presume a job you did not schedule ALIVE until a delete says so (`TOOL-aPromptedMandate-11`: two
@@ -400,7 +400,7 @@ writing `stop`; the stall-recorder writes an API-error end to `stall`; the resum
 OS-scheduled task, resumes from another process a run `--liveness` reads `STALE`, or
 `FINISHED-UNSTAMPED` with `stale: yes`, writing `resume` — three sidecar kinds under
 `<git-dir>/unattended/`. The tick acts only on a lease the INDEX holds, on the node that took it,
-in the worktree on the run's branch.
+in the worktree on the run's branch, and kills only what it launched.
 
 **The actors.** The AGENT schedules and reaps the idle-wake and, on resume, runs
 `--resume <slug> --keepalive-id <id>`, re-recording the lease. The DRIVER records the lease (§2,
@@ -502,7 +502,7 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `HOLD_CODES_EXTRA` | project hold codes, appended to the core set |
 | `HOLD_FLOOR` | the shrink-only SIZE of the kit's core hold-code set. MANDATORY, for the reason `CORE_FLOOR` is |
 | `UNDECLARED_WRITE_BUDGET` | the per-build BUDGET on COUNTED writes, by a dispatched pass that overlapped a sibling's window, outside the set it declared: check 23 fails the run this branch drives over it. MANDATORY: undeclared or malformed is a refusal, for the reason `CORE_FLOOR` is. A pass whose commit is on the advertised tip, while the run has commits that tip lacks, is not graded again. Other runs, and the fleet total on a `check 23 fleet` line, are printed and fail nothing |
-| `UNDECLARED_WRITE_CEILING` | RETIRED (`TOOL-aWindowedPass-5`), replaced by `UNDECLARED_WRITE_BUDGET`: check 22 reports a conf that still sets it, check 23 refuses it by name, and `--emit-ceiling` exits 2 |
+| `UNDECLARED_WRITE_CEILING` | RETIRED (`TOOL-aWindowedPass-5`), replaced by `UNDECLARED_WRITE_BUDGET`: check 22 reports a conf that still sets it, check 23 needs the new key, and `--emit-ceiling` exits 2 |
 | `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
 | `DIRECTIVES_EXTRA_TABLE` | a repo-relative file carrying Skill-shaped rows for whatever `DIRECTIVES_EXTRA` declares. Undeclared is the empty set |
 | `PASS_ORDER_CUTOFF` | the date from which a CLOSED unit whose BUILD COMMIT predates a conforming spec reds the `pass-order history` leg. Graded on the README's `opened:` date. BLANK turns the term OFF and the leg announces it |

@@ -11,27 +11,10 @@
 # The check-9 stage row left on 2026-10-05: a git shim failing only the run-state file's add arms it
 # (TOOL-aGraftedHelix-32 AC9), so the branch `--preflight`'s restore rides is now asserted.
 #
-# THE TWO ROTATION ROWS (kit 1.6) carry their reason, per the rule above. Both sit BELOW two
-# pre-write refusals that a fixture CAN reach — a derived name occupied by a non-file, and one
-# occupied by a file with different bytes — and both were left as branches rather than deleted
-# because the alternative is a silent misfiling:
-#   27  `archive_name_of` returns non-zero only when the record's phase is empty or `git hash-object`
-#       fails over a file that exists and was just read. The phase cannot be empty here — `is_terminal`
-#       has already matched it against the closed PHASES_TERMINAL set — so reaching this needs a git
-#       or filesystem fault, which no fixture in this suite can produce.
-#   The 27 row's ORDINAL moved 2 -> 4 on 2026-08-20, and the branch it pins did not change. Two
-#   `fail 27` branches were inserted ABOVE it inside `observe_anchor` when the remote observation
-#   became bounded, and ordinals are assigned by line order within a check — so every pinned row
-#   below an insertion point goes stale at once, with a message that reads like a rewording. Both new
-#   branches are ARMED rather than pinned, because both are reachable: a dead TMPDIR makes the
-#   scratch-file guard fire, and a stub `git` exiting 124 drives the timeout refusal without spending
-#   the declared bound.
-#   29  `GIT mv -f` after both pre-write tests cleared the destination. MEASURED: the two reachable
-#       failure modes were the ones now refused above it (a directory destination exits 0 and files
-#       the record INSIDE it; a differing file is refused by name), so what is left is an index or
-#       filesystem fault. Trying to arm this is what FOUND the directory case.
-unattended.sh	27	4	cannot derive an archive name for the finished record, so there is nothing safe to retire it to and the run does not start
-unattended.sh	29	2	cannot retire the finished record, and a half-rotated build is worse than an unrotated one — the run does not start and nothing was moved
+# THE TWO ROTATION ROWS (kit 1.6) and the three `--hold` HEAD and clock rows left on 2026-10-12:
+# TOOL-aSparedSpawn-14 routed every environment or internal failure of the driver through
+# `print_env_failure`, which exits 2 and is outside check-arms' population by class, so there is no
+# branch left to pin. Their reasons are in git and in that unit's retirement row.
 #
 # CHECK 30's SECOND BRANCH (TOOL-dHonouredPark). This check drives the REAL driver over the
 # real corpus, so its bad shape - a NOT A UNIT row beside a terminal verdict - exists only
@@ -64,16 +47,16 @@ check-unattended.sh	16	18	the Skill's non-overridable paragraph names an item th
 # `git hash-object` on a path this verb has already proven is a tracked file cannot fail without
 # git itself failing, so there is no constructible fixture. Pinned rather than armed with a
 # synthetic break, which proves the mechanism for the synthetic value and not the real one.
-unattended.sh	49	11	cannot hash the brief, so the row would carry no join
+unattended.sh	49	8	cannot hash the brief, so the row would carry no join
 # The order-gate blocker message needs TWO rostered units carrying `order` verbs, and the tRun
 # fixture's units region emits one row. A second rostered unit changes a fixture shared by this
 # whole suite, which the standing instruction on this node forbids running. TOOL-dBriefedPass-6
 # carries the separate fixture; TOOL-dBriefedPass-3 rev-5 DECLARES the branch unexercised.
-unattended.sh	49	27	and an earlier step still holds a unit that is neither terminal nor dispatched
+unattended.sh	49	22	and an earlier step still holds a unit that is neither terminal nor dispatched
 # The SIBLING malformed-order refusal sits inside the same sibling loop, so it needs the same two
 # rostered units the blocker message does and is unarmable from the shared fixture for the same
 # reason. TOOL-dBriefedPass-6 arms both together.
-unattended.sh	49	26	a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it
+unattended.sh	49	21	a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it
 # THEY MOVED AGAIN, 22 -> 27, 21 -> 26 and 18 -> 23, at aWindowedPass: `--check-commit`'s five `fail 49`
 # refusals landed above verb_dispatch, the same insertion-point class; re-keyed, never re-waived.
 # THE ORDINALS ABOVE MOVED 19 -> 22 and 18 -> 21 at aDeferredBar's closing round 2 (R1): three
@@ -82,24 +65,7 @@ unattended.sh	49	26	a sibling spec status header carries something shaped like t
 # armed; the third is the resolver refusal below, pinned rather than armed because
 # `resolve_python` RUNS each candidate and cannot be made to fail from the suite's fixture
 # without hiding every python launcher from PATH, which the suite's own arms need on it.
-unattended.sh	49	23	--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run
-# `--hold` reaches HEAD only after `check_clean` has passed, and `check_clean` counts UNTRACKED
-# paths - so a repository whose HEAD cannot resolve, which is one carrying no commit at all, has
-# already been refused for a dirty tree before this line runs. The guard stays because the
-# alternative is a HELD record carrying an empty witness, which `--status` then refuses with a
-# message about the wrong thing. Pinned rather than armed with a synthetic break, which proves the
-# mechanism for the synthetic value and not the real one. TOOL-dDerivedDocket-4.
-unattended.sh	56	4	HEAD does not resolve on this node, so the hold has no witness to record and a witnessless pause is the claim an oracle skips
-#
-# TOOL-dDerivedDocket-5 pins two CLOCK branches in `--hold`, and they are one hazard read twice.
-# Both fire only when `date -u` answers nothing on a host where the same binary answered a moment
-# earlier - `read_utc_now` for the first, and `date -u -d` over a `held-at` the driver itself just
-# wrote for the second. A fixture cannot stage that without hiding `date` from PATH, which would
-# take the rest of the suite down with it. They are branches rather than silent fallbacks for the
-# reason the sibling condition reader states: a hold recorded as owing a restart nobody can name
-# is worse than one that owes none, and a zero from a dead clock reads as an instant.
-# MOVED HERE from the central file at the reconcile of dDerivedDocket onto the sidecar layout, and
-# both signatures re-copied WHOLE: the rows carried a prefix of each message, which a later unit
-# extended, so they read as reworded against the branch they pin.
-unattended.sh	56	5	the clock answered nothing, so this hold has no held-at to record and every later reader — the release condition, the scheduled restart's own refusal and the fire instant — joins on exactly that field
-unattended.sh	56	6	the fire instant of this hold's restart cannot be computed on this node, because a clock probe it needs answered nothing, and a hold recorded as owing a schedule nobody can name is worse than one that owes none
+# RE-KEYED 11 -> 8, 27 -> 22, 26 -> 21 and 23 -> 18 at TOOL-aSparedSpawn-14: five `fail 49` refusals
+# above them left check 49 for the shared run-state and required-flag readers; re-keyed, never
+# re-waived.
+unattended.sh	49	18	--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run

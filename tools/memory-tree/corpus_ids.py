@@ -992,9 +992,7 @@ def print_defined_ids(root: str, conf: dict) -> int:
 
 # ----------------------------------------------------------------------------------------- selftest
 def _scratch(tmp: str, *, pins=True, extra=None):
-    run("git", "init", "-q", ".", cwd=tmp)
-    run("git", "config", "user.email", "t@t.test", cwd=tmp)
-    run("git", "config", "user.name", "t", cwd=tmp)
+    run("git", "init", "-q", "--template=", ".", cwd=tmp)
     conf = ['MEMORY_ROOT=memory', 'DISCIPLINES="arch"', 'FAMILIES="arch:ARCH"', 'CHARTER="AGENTS.md"']
     if pins:
         conf += ['ORPHAN_ID_PIN="0"', 'DEAD_PATH_PIN="0"']
@@ -1776,6 +1774,11 @@ def cmd_selftest() -> int:
 def main(argv: list) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
+        # TOOL-aSparedSpawn-9 S1: the fixtures' identity and line endings, once for every git the
+        # selftest runs, in place of two to four `git config` processes per fixture repository.
+        os.environ.update(GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t.test", GIT_COMMITTER_NAME="t",
+                          GIT_COMMITTER_EMAIL="t@t.test", GIT_CONFIG_COUNT="1",
+                          GIT_CONFIG_KEY_0="core.autocrlf", GIT_CONFIG_VALUE_0="false")
         return cmd_selftest()
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
@@ -1811,4 +1814,6 @@ def main(argv: list) -> int:
 
 
 if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8", errors="backslashreplace")
     sys.exit(main(sys.argv))

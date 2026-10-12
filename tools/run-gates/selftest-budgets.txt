@@ -64,6 +64,7 @@ drift-audit selftest	1290		worst of 8 readings 855s, x1.5
 foreign-prefix parity (every self-test at three prefixes)	3750		one reading 2494s on node a 2026-10-01, the redesigned leg alone at 19ef4230, PASS at three prefixes with whole rows serial, x1.5; it was 60000, sized for the calibrate design
 gotchas selftest	90		worst of 10 readings 54s, x1.5
 govkit selftest	1600		worst of 7 readings 1065s, x1.5
+held-halves selftest	60		measured 1.3s on node a 2026-10-11 by direct invocation, x1.5 floored at this file 60s minimum
 hook destinations self-test	510		worst of 4 readings 335s, x1.5
 install-prefix self-test	1180		worst of 11 readings 783s, x1.5
 kit-placeholders self-test	60		worst of 7 readings 24s, x1.5
@@ -90,6 +91,8 @@ recall floor arms	120		worst of 11 readings 79s, x1.5
 remote literals self-test	60		measured 17s on node d 2026-10-08, one direct run, x1.5 floored at this file's 60s minimum
 review-join self-test	460		worst of 8 readings 301s, x1.5
 review-replay selftest	60		measured 0.2s on node a 2026-10-01 by direct invocation, x1.5 floored at this file 60s minimum
+roles adopter self-test	60		PINNED by declaration at this file's 60s floor, not measured; re-priced from the first measured run. TOOL-aOrientedCast-8
+roles render selftest	60		measured 1.3s on node a 2026-10-11, one direct run of the argv in the pass that wrote it, x1.5 floored at this file 60s minimum. TOOL-aOrientedCast-3
 routed-commits selftest	80		measured 50s on node a 2026-10-09, one direct run of the scratch copy while other sessions held the box, x1.5. TOOL-aRoutedQuill-3
 row-grammar selftest	60		worst of 10 readings 36s, x1.5
 row-keyed merge driver replay	1620		worst of 10 readings 1077s, x1.5
@@ -102,6 +105,7 @@ run-gates turnstile	3630		worst of 9 readings 2419s, x1.5
 run-selftests self-test	1217		measured 811s on node a 2026-09-14, direct timed run of the suite alone on a frozen git clone --local at f23b71e0 (108 arms, inner width 1, 15 bash processes on the box before it started, PASS), x1.5 rounded up; the 300s ceiling it replaces was killed at 300.333s exit 124 and had observed no wall
 runlog selftest	93		measured 62s on node d 2026-09-16, the worst of the direct runs (58 to 62 s) after the closing review's round-1 fold and the second origin/main reconcile raised the suite to 1291 assertions, x1.5
 scratch-guard self-test	220		worst of 8 readings 145s, x1.5
+format-guard self-test	30		worst of 2 readings 16s on node a 2026-10-13 (73 assertions, post-reboot), x1.5 rounded up; re-declared at aHeardState's VERIFYING from the ESTIMATE of 120
 selftest harness self-test	60		measured 37s on node a 2026-09-07, x1.5
 settings-merge selftest	60		worst of 11 readings 4s, x1.5
 shell-hygiene selftest	60		measured 0.3s on node a 2026-09-10 by direct invocation, x1.5 floored at this file 60s minimum
@@ -135,7 +139,7 @@ unattended stop-guard selftest	60	bash {prefix}/unattended/stop-guard.test.sh	me
 unattended resume-tick selftest	200	bash {prefix}/unattended/resume-tick.test.sh	measured 131s on node d 2026-09-29, the worse of two direct serial runs of the argv (130s, 131s) on a frozen clone at 8331469c with no other suite on the box (145 process probes across the window, every one 0), x1.5; it was 60, sized from arm blocks run alone before the suite had ever run whole and already under the R side's 87s at 869209ed, and TOOL-dDerivedDocket-61 and TOOL-dDerivedDocket-62 added seven fixtures and thirteen ticks (L 128s under run-selftests.sh --attribute, 207s here beside four to six other suites)
 unattended pass-order selftest	170	bash {prefix}/unattended/check-pass-order.test.sh	measured 111s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
 unattended playbook selftest	630	bash {prefix}/unattended/check-playbook.test.sh	measured 418s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
-unattended-build self-test	60		sized from one run_wf invocation measured alone on node a 2026-09-21 from the suite's sourced preamble: 186 ms worst of three, times the 103 run_wf sites the suite carried at 1d8530e7 by grep -c, 19 s, x1.5 floored at 60 — the pass that wrote this row may not run the suite, so the main loop's first VERIFYING reading is the one it is re-derived from
+unattended-build self-test	500		re-declared 2026-10-11 by TOOL-aHomedAnchor-28: 332 s, the quiet node-a reading in ceiling-evidence.txt, x1.5. The held job ran 742 assertions in 180 s before its bound killed it (run 38045767386), and the suite now carries 853; a node-a run beside four others took 1853 s. Was 60, sized from an estimate of 103 run_wf sites
 unattended runlog-writer selftest	110	bash {prefix}/unattended/runlog-writer.test.sh	measured 71s on node d 2026-09-13, the worst of four readings (a cold first run; then 31s and 32s direct and 51s under run-selftests.sh --kit), x1.5. TOOL-dLoggedFlight-2, owner-approved, withheld and never a leg
 verdict-epoch self-test	390		worst of 9 readings 257s, x1.5
 verifier fan-out self-test	230		worst of 8 readings 151s, x1.5

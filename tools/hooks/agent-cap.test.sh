@@ -4,6 +4,9 @@
 #   rule 2  a verify stage that spawns one agent per item                    (verifier arity)
 # Run from the kit directory: bash ./agent-cap.test.sh   (exit 0 = all pass)
 set -u
+# A suite run from inside a session inherits the session's directory, which would arm rule 6 over a
+# fixture whose cwd lies in no checkout (TOOL-aOrientedCast-14 S7); an arm that needs one names it.
+unset CLAUDE_PROJECT_DIR
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
 derive_self_rel() {
@@ -69,7 +72,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -106,7 +110,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -870,7 +874,7 @@ check_spec_audit "rule0: kind [\"spec-audit\"] (an array) on the undeclared READ
 # of tier2-review.js that decides `isSpec` — asserting the two agree. An edit to either side reds
 # here until the other follows. The harness sits beside this kit in this repo; an adopter layout
 # without it gets an ANNOUNCED skip, never a silent green.
-T2R=""; _wf_dir=$(resolve_kit_dir "$TESTPY" workflows tier2-review.js "$HERE" 2>/dev/null) && T2R="$(git -C "$HERE" rev-parse --show-toplevel)/$_wf_dir/tier2-review.js"
+T2R=""; _wf_dir=$(resolve_kit_dir "$TESTPY" workflows tier2-review.js "$HERE" 2>/dev/null) && T2R="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_wf_dir/tier2-review.js"
 if [ -f "$T2R" ]; then
   kind_line=$(grep -m1 '^const kind = ' "$T2R")
   for k in '"spec-audit"' '["spec-audit"]' '"diff-review"' '"SPEC-AUDIT"' '{"k":"spec-audit"}' '7'; do
@@ -2093,56 +2097,177 @@ EOF
   # TOOL-aRepatriatedFork-7 F3: the nesting matrix joins the population, so no fixture of it that BASE
   # denied -- every flat control, and `depth-two` -- may be admitted now.
   cp "$TMP"/nest/*.js "$TMP/nrfix/" 2>/dev/null || true
-  cat > "$TMP/nr.py" <<'PYEOF'
-import json, subprocess, sys, pathlib
-base_hook, cur_hook, root, fixdir = sys.argv[1:5]
-root = pathlib.Path(root).resolve()
-files = subprocess.run(["git", "-C", str(root), "ls-files"], capture_output=True, text=True).stdout.split()
-pop = [root / f for f in files] + sorted(pathlib.Path(fixdir).glob("*.js"))
-lost, ratified, denied, n = [], [], 0, 0
-for p in pop:
-    try:
-        body = p.read_text(encoding="utf-8", errors="replace")
-    except Exception:
-        continue
-    payload = json.dumps({"tool_name": "Workflow", "tool_input": {"script": body}})
-    a = subprocess.run(["node", base_hook], input=payload, capture_output=True, text=True, timeout=120).returncode
-    n += 1
-    if a != 2:
-        continue
-    denied += 1
-    b = subprocess.run(["node", cur_hook], input=payload, capture_output=True, text=True, timeout=120).returncode
-    # ADMISSION IS `exit != 2`, not `exit == 0`. The hook BLOCKS only on 2, so a crash (1) or a
-    # timeout is an admission too — and scoring it as 0 made this arm blind to exactly the two
-    # defects the closing review found in the code it guards.
-    if b != 2:
-        # CLASS-SCOPED RATIFICATION (TOOL-dFoldedVerdict-4). A denial this hook no longer makes is
-        # ratified ONLY when the marker is what bought it: strip every `gov:sequential-agents` token
-        # from the bytes and re-run. Denial restored means the marker did it, and the loss is this
-        # unit's declared affordance. Denial NOT restored means something else changed, and that is a
-        # regression whatever it looks like. No path list and no BASE-sha bump: the ratification is
-        # keyed on the CLASS, so a file nobody thought to enumerate is graded the same way.
-        stripped = body.replace("gov:sequential-agents", "")
-        rp = json.dumps({"tool_name": "Workflow", "tool_input": {"script": stripped}})
-        r = subprocess.run(["node", cur_hook], input=rp, capture_output=True, text=True, timeout=120).returncode
-        if r == 2:
-            ratified.append("%s (exit %d, denial restored by removing the marker)" % (p, b))
-        else:
-            lost.append("%s (exit %d)" % (p, b))
-for f in lost:
-    print("LOST a denial: %s" % f)
-for f in ratified:
-    print("RATIFIED a marker-attributed loss: %s" % f)
-# REDS ON ZERO RATIFICATIONS, so the ratification branch cannot go unexercised and pass by never
-# running — which is the same could-not-fail shape as the empty-population guard beside it.
-print("population %d scanned, %d denied at BASE, %d denial(s) lost, %d ratified" % (n, denied, len(lost), len(ratified)))
-sys.exit(1 if lost or denied == 0 or not ratified else 0)
-PYEOF
-  "$TESTPY" "$TMP/nr.py" "$TMP/base-hook.js" "$HOOK" "$(git -C "$HERE" rev-parse --show-toplevel)" "$TMP/nrfix" > "$TMP/nr.out" 2>&1
+  # ONE NODE FOR THE WHOLE PROPERTY (TOOL-aSparedSpawn-11 S1, owner ruling F1 (a)). The loop below
+  # used to be Python starting `node` per population file and per hook, about 3700 processes and
+  # most of this suite's wall clock. The runner compiles each hook ONCE as a `vm.Script` and runs every
+  # payload in a FRESH context with the hook's own CommonJS arguments: the real `require`, except that
+  # `fs.readFileSync(0)` returns the payload; a `process` whose `exit` records the FIRST code and
+  # throws a sentinel; and an `argv` naming the hook as `node <hook>` would. An uncaught throw is 1,
+  # as real node exits, and a return with no exit is 0. The cwd and environment are this shell's, as
+  # the Python loop's were. What it reads is unchanged: every `git ls-files` path split on
+  # whitespace, plus the fixtures; each body decoded as UTF-8 with universal newlines, as Python's
+  # `read_text` did; admission is `exit != 2`; the ratification re-run strips every marker token;
+  # zero denials or zero ratifications red. The parity arm after it is the guard against the one
+  # risk this buys: an in-process verdict that real node would not give.
+  cat > "$TMP/nr.js" <<'JSEOF'
+'use strict'
+const fs = require('fs')
+const path = require('path')
+const vm = require('vm')
+const Module = require('module')
+const cp = require('child_process')
+const [mode, baseHook, curHook, root, fixdir, strideArg] = process.argv.slice(2)
+const BOUND_MS = 120000
+const STOP = { stop: 'process.exit' }
+
+function loadHook(file) {
+  const abs = path.resolve(file)
+  // A hashbang is legal only at the very start of a script, and the wrapper below is not the start.
+  // Blanking the line keeps every line number the hook's own.
+  const src = fs.readFileSync(abs, 'utf8').replace(/^#!.*/, '')
+  const wrapped = '(function (exports, require, module, __filename, __dirname, process, console) {' + src +
+    '\n}).apply(__nrArgs[0], __nrArgs)'
+  return { abs, script: new vm.Script(wrapped, { filename: abs }), req: Module.createRequire(abs) }
+}
+
+function runInProcess(hook, payload) {
+  let code = null
+  // Both views proxy an EMPTY target and read the real object inside the trap, so no proxy invariant
+  // ties a returned value to a non-configurable property of the real `fs` or `process`.
+  const fsView = new Proxy({}, {
+    get: (_t, k) => (k === 'readFileSync'
+      ? (fd, ...rest) => (fd === 0 ? payload : fs.readFileSync(fd, ...rest))
+      : fs[k]),
+    has: (_t, k) => k in fs,
+  })
+  const req = (id) => (id === 'fs' || id === 'node:fs' ? fsView : hook.req(id))
+  const sink = { write: () => true }
+  const proc = new Proxy({}, {
+    get: (_t, k) => {
+      if (k === 'exit') return (c) => { if (code === null) code = c === undefined ? 0 : c; throw STOP }
+      if (k === 'argv') return [process.execPath, hook.abs]
+      if (k === 'stdout' || k === 'stderr') return sink
+      const v = process[k]
+      return typeof v === 'function' ? v.bind(process) : v
+    },
+    has: (_t, k) => k in process,
+  })
+  const quiet = { log() {}, error() {}, warn() {}, info() {}, debug() {} }
+  const mod = { exports: {} }
+  const ctx = vm.createContext({ __nrArgs: [mod.exports, req, mod, hook.abs, path.dirname(hook.abs), proc, quiet] })
+  try {
+    hook.script.runInContext(ctx, { timeout: BOUND_MS })
+  } catch (e) {
+    if (e !== STOP && code === null) {
+      if (e && e.code === 'ERR_SCRIPT_EXECUTION_TIMEOUT') throw new Error('TIMEOUT after ' + BOUND_MS + ' ms')
+      code = 1
+    }
+  }
+  return code === null ? 0 : code
+}
+
+function runSpawned(hook, payload) {
+  const r = cp.spawnSync(process.execPath, [hook.abs], { input: payload, timeout: BOUND_MS, stdio: ['pipe', 'ignore', 'ignore'] })
+  return r.status === null ? 'killed' : r.status
+}
+
+function readBody(p) {
+  try {
+    return fs.readFileSync(p, 'utf8').replace(/\r\n?/g, '\n')
+  } catch {
+    return null
+  }
+}
+
+function buildPayload(body) {
+  return JSON.stringify({ tool_name: 'Workflow', tool_input: { script: body } })
+}
+
+const tracked = cp.execFileSync('git', ['-C', root, 'ls-files'], { encoding: 'utf8', maxBuffer: 1 << 28 })
+  .split(/\s+/).filter(Boolean).map((f) => path.join(path.resolve(root), f))
+const fixtures = fs.readdirSync(fixdir).filter((f) => f.endsWith('.js')).sort().map((f) => path.join(fixdir, f))
+const base = loadHook(baseHook)
+const cur = loadHook(curHook)
+
+try {
+  if (mode === 'property') {
+    const lost = []
+    const ratified = []
+    let denied = 0
+    let n = 0
+    for (const p of tracked.concat(fixtures)) {
+      const body = readBody(p)
+      if (body === null) continue
+      const payload = buildPayload(body)
+      const a = runInProcess(base, payload)
+      n += 1
+      if (a !== 2) continue
+      denied += 1
+      const b = runInProcess(cur, payload)
+      // ADMISSION IS `exit != 2`, not `exit == 0`: the hook BLOCKS only on 2, so a crash is an admission too.
+      if (b !== 2) {
+        // CLASS-SCOPED RATIFICATION (TOOL-dFoldedVerdict-4): denial restored by stripping every marker
+        // token means the marker bought the loss; anything else is a regression.
+        const r = runInProcess(cur, buildPayload(body.split('gov:sequential-agents').join('')))
+        if (r === 2) ratified.push(p + ' (exit ' + b + ', denial restored by removing the marker)')
+        else lost.push(p + ' (exit ' + b + ')')
+      }
+    }
+    for (const f of lost) console.log('LOST a denial: ' + f)
+    for (const f of ratified) console.log('RATIFIED a marker-attributed loss: ' + f)
+    console.log('population ' + n + ' scanned, ' + denied + ' denied at BASE, ' + lost.length +
+      ' denial(s) lost, ' + ratified.length + ' ratified')
+    process.exitCode = lost.length || denied === 0 || ratified.length === 0 ? 1 : 0
+  } else if (mode === 'parity') {
+    // ponytail: a fixed stride over the sorted tracked list keeps the sample a handful of spawns; a
+    // narrower stride buys coverage at about a second per spawn on a Windows node.
+    const stride = Number(strideArg)
+    const sample = fixtures.slice()
+    const sorted = tracked.slice().sort()
+    for (let i = 0; i < sorted.length; i += stride) sample.push(sorted[i])
+    const bad = []
+    let compared = 0
+    let denies = 0
+    for (const p of sample) {
+      const body = readBody(p)
+      if (body === null) continue
+      const payload = buildPayload(body)
+      for (const [name, hook] of [['BASE', base], ['current', cur]]) {
+        const inProc = runInProcess(hook, payload)
+        const real = runSpawned(hook, payload)
+        compared += 1
+        if (real === 2) denies += 1
+        if (inProc !== real) bad.push(name + ' hook on ' + p + ': in-process exit ' + inProc + ', node exit ' + real)
+      }
+    }
+    for (const b of bad) console.log('DISAGREE ' + b)
+    console.log('parity ' + compared + ' verdict(s) compared over ' + sample.length + ' payload(s), ' +
+      denies + ' deny verdict(s) from real node, ' + bad.length + ' disagreement(s)')
+    process.exitCode = bad.length || denies === 0 ? 1 : 0
+  } else {
+    console.log('nr.js: unknown mode ' + mode)
+    process.exitCode = 2
+  }
+} catch (e) {
+  console.log('nr.js: ' + (e && e.message ? e.message : String(e)))
+  process.exitCode = 1
+}
+JSEOF
+  node "$TMP/nr.js" property "$TMP/base-hook.js" "$HOOK" "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" "$TMP/nrfix" > "$TMP/nr.out" 2>&1
   if [ $? = 0 ]; then
     echo "ok   no-regress: no denial lost against BASE ($(tail -1 "$TMP/nr.out"))"; pass=$((pass+1))
   else
     echo "FAIL no-regress: a denial the BASE hook made is gone"; sed 's/^/     /' "$TMP/nr.out"; fail=$((fail+1))
+  fi
+  # S2 — PARITY: every fixture above plus every 400th tracked path, through the in-process runner AND
+  # through a real `node` per hook. Any disagreement reds naming the payload, and so does a sample in
+  # which real node denied nothing, since a parity over admissions alone cannot see an exit stub that
+  # drops its code.
+  node "$TMP/nr.js" parity "$TMP/base-hook.js" "$HOOK" "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" "$TMP/nrfix" 400 > "$TMP/nrp.out" 2>&1
+  if [ $? = 0 ]; then
+    echo "ok   no-regress parity: the in-process runner agrees with real node ($(tail -1 "$TMP/nrp.out"))"; pass=$((pass+1))
+  else
+    echo "FAIL no-regress parity: the in-process runner and real node disagree"; sed 's/^/     /' "$TMP/nrp.out"; fail=$((fail+1))
   fi
 else
   echo "skip no-regress property arm — the BASE blob does not resolve in this tree, so there is no shipped hook to compare verdicts against"
@@ -2154,21 +2279,42 @@ fi
 
 # F1. `checkLiteralOpen` copied the whole line prefix per quote, so cost was quadratic in LINE
 # length and every ordinary `return 'x'` paid it. Measured before the fix: 253 KB on one line took
-# 33.8 s against 62 ms at BASE. This arm is a BUDGET, not a verdict: it fails if the hook takes
-# longer on one long line than a generous multiple of the same script split across lines.
+# 33.8 s against 62 ms at BASE. This arm is a RATIO against a CONTROL, never a typed ceiling
+# (TOOL-aSparedSpawn-15 S1): the same 8000 literals ONE PER LINE are timed first, in this process,
+# and the one-line run may take at most four times that plus 2 s, both read from EPOCHREALTIME. A
+# loaded host slows both runs alike, so the verdict stops being a function of the box, while a walk
+# that is quadratic in LINE length grows the one-line run only. The typed 10 s it replaced redded on
+# a loaded node `a`, where one spawn costs 632 to 818 ms. The absolute hook timeout is NOT this arm's
+# question: a slowdown linear in both runs is not the defect it guards. Both runs must ADMIT (exit
+# 0), so a hook that crashed fast on either cannot pass the ratio by doing no work. EVERY LITERAL
+# FOLLOWS `void`: the walk runs only for a quote glued to an identifier, and the `f(a1, 'lit1')`
+# this arm used to time put a comma there, so the restored per-quote copy never ran and the arm
+# could not fail on the regression it names. Measured on node `a`: with the copy restored the
+# one-line run took 19 to 23 s against 0.9 to 1.3 s one per line; shipped, 0.3 to 0.9 s both ways.
 long_one=$("$TESTPY" -c "
 import json
 n = 8000
-line = 'const x = [' + ','.join(\"f(a%d, 'lit%d')\" % (i, i) for i in range(n)) + ']'
+line = 'const x = [' + ','.join(\"f(a%d, void 'lit%d')\" % (i, i) for i in range(n)) + ']'
 print(json.dumps({'tool_name':'Workflow','tool_input':{'script': line}}))
 ")
-t0=$(date +%s)
-printf '%s' "$long_one" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1
-t1=$(date +%s)
-if [ $((t1 - t0)) -le 10 ]; then
-  echo "ok   quadratic budget: 8000 literals on ONE line in $((t1 - t0))s (<= 10s)"; pass=$((pass+1))
+long_ctl=$("$TESTPY" -c "
+import json
+n = 8000
+body = 'const x = [' + chr(10) + (',' + chr(10)).join(\"f(a%d, void 'lit%d')\" % (i, i) for i in range(n)) + chr(10) + ']'
+print(json.dumps({'tool_name':'Workflow','tool_input':{'script': body}}))
+")
+c0=${EPOCHREALTIME//[.,]/}
+printf '%s' "$long_ctl" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; ctl_rc=$?
+c1=${EPOCHREALTIME//[.,]/}
+printf '%s' "$long_one" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; one_rc=$?
+c2=${EPOCHREALTIME//[.,]/}
+ctl_ms=$(( (10#$c1 - 10#$c0) / 1000 )); one_ms=$(( (10#$c2 - 10#$c1) / 1000 )); lim_ms=$(( 4 * ctl_ms + 2000 ))
+if [ "$ctl_rc" != 0 ] || [ "$one_rc" != 0 ]; then
+  echo "FAIL quadratic ratio: the hook exited $one_rc on ONE line and $ctl_rc one per line, not 0 for both, so the timing compares runs that did not do the work"; fail=$((fail+1))
+elif [ "$one_ms" -le "$lim_ms" ]; then
+  echo "ok   quadratic ratio: 8000 literals on ONE line in ${one_ms} ms against ${ctl_ms} ms one per line (<= 4x + 2000 = ${lim_ms} ms)"; pass=$((pass+1))
 else
-  echo "FAIL quadratic budget: 8000 literals on ONE line took $((t1 - t0))s — a hook that times out is NON-BLOCKING"; fail=$((fail+1))
+  echo "FAIL quadratic ratio: 8000 literals on ONE line took ${one_ms} ms against ${ctl_ms} ms one per line (> 4x + 2000 = ${lim_ms} ms) — a walk quadratic in line length is back, and a hook that times out is NON-BLOCKING"; fail=$((fail+1))
 fi
 
 # F2. A throw in the corrected views must not become an admission. This script drives
@@ -2198,6 +2344,178 @@ EOF
 js "opener residual: control, the same line without the apostrophe -> deny" 2 <<'EOF'
 /* rock - n roll */ const r = await parallel([() => agent('a'), () => agent('b')])
 EOF
+
+# ---- rule 6: every agent prompt is a rendered handoff (TOOL-aOrientedCast-7) ----------------------
+# Armed by `.claude/roles.json` at the checkout root of the payload `cwd`. Every arm above runs with
+# no index, which is the absent case; the arms below build their own checkout, whose index the
+# `write_roles` calls move between the absent, broken, unarmed and armed states. Each payload stands in
+# a subdirectory so the root walk is exercised. Every deny asserts its own reason, since every rule
+# exits 2; every allow asserts an empty stderr.
+HOREPO="$TMP/horepo"
+mkdir -p "$HOREPO/.git" "$HOREPO/.claude" "$HOREPO/sub" "$HOREPO/tools/workflows" \
+  "$HOREPO/memory/builds/bx/prompts" "$HOREPO/memory/builds/bx/spec"
+HOJ="$NODEDIR/horepo"
+printf 'const s = await agent("one")\n' > "$HOREPO/tools/workflows/h.js"
+printf 'const s = await agent("one")\n' > "$HOREPO/tools/workflows/other.js"
+HO_ROLES='{"roles":{"gov-researcher":{"agent":true,"workflow":"research","writes":"none"},"gov-builder":{"agent":true,"workflow":"build","writes":"product"},"gov-session":{"agent":false,"workflow":"handoff","writes":"none"}},"harnesses":["tools/workflows/h.js"]}'
+HO_FLAG=""
+HO_CWD=""
+HO_PROJECT=""
+write_roles() { # the index body, or `none` to remove it
+  if [ "$1" = none ]; then rm -f "$HOREPO/.claude/roles.json"; else printf '%s' "$1" > "$HOREPO/.claude/roles.json"; fi
+}
+# The handoff files and one prompt file per variant under $TMP/ho.<variant>. The marker and digest are
+# computed here as the renderer defines them; arm 6 of the roles kit's adopt-roles.test.sh, the
+# agreement arm, holds the renderer itself against the hook (TOOL-aOrientedCast-15).
+write_handoff() {
+  "$TESTPY" -c '
+import hashlib, os, sys
+root, out = sys.argv[1], sys.argv[2]
+h = lambda s: hashlib.sha256(s.encode("utf-8")).hexdigest()[:12]
+role = "## Role\n\nYou research.\n\n"
+task = "## Task\n\nThis handoff is for build `bx`, unit `T-1`.\n\n### input:question\n\nWhat calls rule 4?\n"
+pre = "memory/builds/bx/prompts/"
+def render_marker(p, sec, r="gov-researcher"):
+    return "<!-- gov:handoff role=%s build=bx unit=T-1 path=%s role-sha=%s task-sha=%s -->" % (r, p, h(role), h(sec))
+def write_prompt_file(rel, m, sec):
+    with open(os.path.join(root, rel), "w", newline="\n") as f:
+        f.write("**Serves:** journal T-1\n\n# gov-researcher handoff - T-1\n\n" + m + "\n\n" + role + sec)
+ok, stale, spec = pre + "2026-10-11-prompt-T-1-researcher.md", pre + "2026-10-11-prompt-T-2-researcher.md", "memory/builds/bx/spec/x.md"
+M = render_marker(ok, task)
+write_prompt_file(ok, M, task)
+write_prompt_file(stale, render_marker(stale, task), task.replace("rule 4", "rule 5"))
+write_prompt_file(spec, render_marker(spec, task), task)
+prompts = {
+    "ok": M + "\n\n" + task,
+    "crlf": ("\n\n" + M + "\n\n" + task + "\n\n").replace("\n", "\r\n"),
+    "none": task,
+    "two": M + "\n" + M + "\n\n" + task,
+    "role": render_marker(ok, task, "gov-builder") + "\n\n" + task,
+    "dotdot": render_marker(pre + "../prompts/2026-10-11-prompt-T-1-researcher.md", task) + "\n\n" + task,
+    "spec": render_marker(spec, task) + "\n\n" + task,
+    "nofile": render_marker(pre + "none.md", task) + "\n\n" + task,
+    "off": M + "\n\n" + task.replace("rule 4", "rule 5"),
+    "pre": "Please do this first.\n" + M + "\n\n" + task,
+    "post": M + "\n\n" + task + "Also do this.\n",
+    "stale": render_marker(stale, task) + "\n\n" + task.replace("rule 4", "rule 5"),
+}
+for k, v in prompts.items():
+    with open(out + "." + k, "w", newline="") as f:
+        f.write(v)
+' "$HOREPO" "$TMP/ho"
+}
+run_spawn() { # name expected_exit subagent_type(- for none) prompt-variant needle(empty for an allow) [session prompt tool_use_id]
+  # HO_CWD moves the payload cwd off $HOJ/sub; HO_PROJECT, when set, is the hook's CLAUDE_PROJECT_DIR.
+  local payload got
+  payload=$("$TESTPY" -c 'import json,sys
+cwd,t,pf,s,p,u=sys.argv[1:7]
+ti={"prompt":open(pf,newline="").read()}
+if t!="-": ti["subagent_type"]=t
+print(json.dumps({"tool_name":"Agent","cwd":cwd,"session_id":s,"prompt_id":p,"tool_use_id":u,"tool_input":ti}))' \
+    "${HO_CWD:-$HOJ/sub}" "$3" "$TMP/ho.$4" "${6:-ho-s}" "${7:-ho-p-$RANDOM$RANDOM}" "${8:-ho-u-$RANDOM}")
+  printf '%s' "$payload" | (cd "$TMP" && { [ -z "$HO_PROJECT" ] || export CLAUDE_PROJECT_DIR="$HO_PROJECT"; } && node "$HOOK" $HO_FLAG) >/dev/null 2>"$TMP/err"; got=$?
+  if [ "$got" = "$2" ] && { if [ -z "$5" ]; then [ ! -s "$TMP/err" ]; else grep -qF -- "$5" "$TMP/err"; fi; }; then
+    echo "ok   $1 (exit $got)"; pass=$((pass+1))
+  else
+    echo "FAIL $1 (exit $got, want $2${5:+, stderr carrying '$5'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  fi
+}
+run_harness() { # name expected_exit tool_input-json needle(empty for an allow)
+  local payload got
+  payload=$("$TESTPY" -c 'import json,sys
+print(json.dumps({"tool_name":"Workflow","cwd":sys.argv[1],"tool_input":json.loads(sys.argv[2])}))' "$HOJ/sub" "$3")
+  printf '%s' "$payload" | (cd "$TMP" && node "$HOOK" $HO_FLAG) >/dev/null 2>"$TMP/err"; got=$?
+  if [ "$got" = "$2" ] && { if [ -z "$4" ]; then [ ! -s "$TMP/err" ]; else grep -qF -- "$4" "$TMP/err"; fi; }; then
+    echo "ok   $1 (exit $got)"; pass=$((pass+1))
+  else
+    echo "FAIL $1 (exit $got, want $2${4:+, stderr carrying '$4'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+  fi
+}
+write_handoff
+write_roles "$HO_ROLES"
+HO_H="$HOJ/tools/workflows/h.js"
+# AC1 — the rendered handoff is admitted and claims its slot; CRLF and blank ends do not move it.
+run_spawn "rule6 AC1: a rendered handoff is admitted" 0 gov-researcher ok "" ho-s ho-ac1 ho-ac1-u
+if grep -rqF ho-ac1-u "$HOREPO/.git/agent-cap" 2>/dev/null; then
+  echo "ok   rule6 AC1: the admitted spawn holds a slot"; pass=$((pass+1))
+else
+  echo "FAIL rule6 AC1: no slot under $HOREPO/.git/agent-cap holds ho-ac1-u"; fail=$((fail+1))
+fi
+run_spawn "rule6 AC1: CRLF endings and blank ends are admitted" 0 gov-researcher crlf ""
+# AC2 — every type that is not an agent-true role, and every malformed prompt, is refused by name.
+run_spawn "rule6 AC2: general-purpose refused" 2 general-purpose ok '"general-purpose" is not an agent-true role'
+run_spawn "rule6 AC2: Explore refused, naming the researcher" 2 Explore ok 'as the gov-researcher role'
+run_spawn "rule6 AC2: no subagent_type refused" 2 - ok 'subagent_type null is not an agent-true role'
+run_spawn "rule6 AC2: the agent-false gov-session refused" 2 gov-session ok '"gov-session" is not an agent-true role'
+run_spawn "rule6 AC2: a type refusal lists gov-researcher" 2 general-purpose ok 'gov-builder, gov-researcher'
+run_spawn "rule6 AC2: a type refusal names the render route" 2 Explore ok 'handoff.py render --role <name> --build <slug> --part task'
+run_spawn "rule6 AC2: no marker refused" 2 gov-researcher none 'carries 0 gov:handoff marker lines'
+run_spawn "rule6 AC2: two markers refused" 2 gov-researcher two 'carries 2 gov:handoff marker lines'
+run_spawn "rule6 AC2: a marker role unlike the type refused" 2 gov-researcher role 'is not the subagent_type'
+run_spawn "rule6 AC2: a path holding .. refused" 2 gov-researcher dotdot 'is not a repo-relative file under builds/bx/prompts/'
+run_spawn "rule6 AC2: a path outside prompts/ refused" 2 gov-researcher spec 'is not a repo-relative file under builds/bx/prompts/'
+run_spawn "rule6 AC2: a path naming no file refused" 2 gov-researcher nofile 'names no file'
+run_spawn "rule6 AC2: a section one character off refused" 2 gov-researcher off "differs from"
+run_spawn "rule6 AC2: a freeform line before the marker refused" 2 gov-researcher pre 'prompt line 1 is not the marker line'
+run_spawn "rule6 AC2: a freeform line after the section refused" 2 gov-researcher post 'differs from'
+run_spawn "rule6 AC2: a file edited after rendering refused" 2 gov-researcher stale 'edited after rendering'
+# AC3 — five refusals spend no slot: the sixth call, admitted, takes slot-1.
+for i in 1 2 3 4 5; do run_spawn "rule6 AC3: refused spawn $i" 2 general-purpose ok 'not an agent-true role' ho-s3 ho-p3 "ho-r$i"; done
+run_spawn "rule6 AC3: the spawn after five refusals is admitted" 0 gov-researcher ok "" ho-s3 ho-p3 ho-ac3-u
+if grep -qF ho-ac3-u "$HOREPO/.git/agent-cap/ho-s3__ho-p3/slot-1" 2>/dev/null; then
+  echo "ok   rule6 AC3: slot-1 of the turn holds the admitted call"; pass=$((pass+1))
+else
+  echo "FAIL rule6 AC3: slot-1 of ho-s3__ho-p3 does not hold ho-ac3-u"; ls -R "$HOREPO/.git/agent-cap" 2>&1 | sed 's/^/     /'; fail=$((fail+1))
+fi
+# AC4 — a declared harness with known roles passes, as an object and as a JSON string; nothing else.
+run_harness "rule6 AC4: the harness with roles as an object" 0 "{\"scriptPath\":\"$HO_H\",\"args\":{\"roles\":{\"builder\":\"gov-builder\"}}}" ""
+run_harness "rule6 AC4: the harness with roles in a JSON string" 0 "{\"scriptPath\":\"$HO_H\",\"args\":\"{\\\"roles\\\":{\\\"builder\\\":\\\"gov-builder\\\"}}\"}" ""
+run_harness "rule6 AC4: an inline script refused" 2 '{"script":"const s = await agent(\"one\")\n","args":{"roles":{"builder":"gov-builder"}}}' 'an inline `script`'
+run_harness "rule6 AC4: a name-only call refused" 2 '{"name":"tier2-review"}' 'names no `scriptPath`'
+run_harness "rule6 AC4: a scriptPath not in harnesses refused" 2 "{\"scriptPath\":\"$HOJ/tools/workflows/other.js\",\"args\":{\"roles\":{\"builder\":\"gov-builder\"}}}" 'is not a declared harness'
+run_harness "rule6 AC4: args that do not parse refused" 2 "{\"scriptPath\":\"$HO_H\",\"args\":\"{nope\"}" '`args` is not a plain object'
+run_harness "rule6 AC4: the harness with no roles refused" 2 "{\"scriptPath\":\"$HO_H\",\"args\":{\"repo\":\".\"}}" 'handoff.py harness-args'
+run_harness "rule6 AC4: the harness with roles {} refused" 2 "{\"scriptPath\":\"$HO_H\",\"args\":{\"roles\":{}}}" 'handoff.py harness-args'
+run_harness "rule6 AC4: an unknown role refused" 2 "{\"scriptPath\":\"$HO_H\",\"args\":{\"roles\":{\"builder\":\"gov-nobody\"}}}" '"gov-nobody", not an agent-true role'
+run_harness "rule6 AC4: an agent-false role refused" 2 "{\"scriptPath\":\"$HO_H\",\"args\":{\"roles\":{\"builder\":\"gov-session\"}}}" '"gov-session", not an agent-true role'
+# AC5 — absent adds no rule; broken refuses both tools; unarmed refuses that tool; a selector skips it.
+HO_INLINE='{"script":"const s = await agent(\"one\")\n"}'
+write_roles none
+run_spawn "rule6 AC5: no index, a general-purpose spawn admitted as at base" 0 general-purpose none "" ho-s5 ho-p5 ho-ac5-u
+if grep -rqF ho-ac5-u "$HOREPO/.git/agent-cap" 2>/dev/null; then
+  echo "ok   rule6 AC5: with no index the spawn still claims its slot"; pass=$((pass+1))
+else
+  echo "FAIL rule6 AC5: with no index no slot holds ho-ac5-u"; fail=$((fail+1))
+fi
+run_harness "rule6 AC5: no index, an inline script admitted as at base" 0 "$HO_INLINE" ""
+write_roles '{'
+run_spawn "rule6 AC5: a broken index refuses the spawn" 2 general-purpose none 'roles.json is not JSON'
+run_harness "rule6 AC5: a broken index refuses the harness call" 2 "$HO_INLINE" 'roles.json is not JSON'
+HO_FLAG=--only=join
+run_spawn "rule6 AC5: --only=join never meets rule 6 (Agent)" 0 general-purpose none ""
+run_harness "rule6 AC5: --only=join never meets rule 6 (Workflow)" 0 "$HO_INLINE" ""
+# S11 — `scripts` is the fan-out gate's selector: the script rules run, the call rules do not.
+HO_FLAG=--only=scripts
+run_harness "rule6 AC5: --only=scripts never meets rule 6" 0 "$HO_INLINE" ""
+run_harness "rule6 AC5: --only=scripts still runs the fan-out rules" 2 '{"script":"const r = await parallel([() => agent(\"a\"), () => agent(\"b\")])\n"}' 'raw parallel()/pipeline()'
+HO_FLAG=""
+write_roles '{"roles":{"gov-session":{"agent":false,"workflow":"handoff","writes":"none"}},"harnesses":["tools/workflows/h.js"]}'
+run_spawn "rule6 AC5: no agent-true role refuses the spawn as UNARMED" 2 gov-session ok 'UNARMED'
+write_roles "$("$TESTPY" -c 'import json,sys; d=json.loads(sys.argv[1]); d["harnesses"]=[]; print(json.dumps(d))' "$HO_ROLES")"
+run_harness "rule6 AC5: no harness refuses the harness call as UNARMED" 2 "{\"scriptPath\":\"$HO_H\",\"args\":{\"roles\":{\"builder\":\"gov-builder\"}}}" 'UNARMED'
+# TOOL-aOrientedCast-14 AC4 — the anchor: a cwd under no checkout falls back to CLAUDE_PROJECT_DIR, a
+# cwd in a checkout keeps it, and neither resolving says so. $TMP itself lies in no checkout. Against
+# a rule 6 reading the payload cwd alone, the first row exits 0 and the third says nothing.
+write_roles "$HO_ROLES"
+mkdir -p "$TMP/horepo2/.git" "$TMP/noco"
+HO_CWD="$NODEDIR" HO_PROJECT="$HOJ"
+run_spawn "rule6 OC14 AC4: cwd under no checkout, CLAUDE_PROJECT_DIR armed -> Explore refused" 2 Explore ok 'as the gov-researcher role'
+HO_CWD="$NODEDIR/horepo2"
+run_spawn "rule6 OC14 AC4: cwd in an index-less checkout keeps it over CLAUDE_PROJECT_DIR -> admitted" 0 Explore ok ""
+HO_CWD="$NODEDIR" HO_PROJECT="$NODEDIR/noco"
+run_spawn "rule6 OC14 AC4: cwd and CLAUDE_PROJECT_DIR under no checkout -> admitted, naming rule 6 unarmed" 0 Explore ok 'rule 6 unarmed'
+HO_CWD="" HO_PROJECT=""
+write_roles none
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

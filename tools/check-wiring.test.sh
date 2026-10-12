@@ -4,7 +4,7 @@
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # The repository, asked of git: `$HERE/..` is the root only at a one-segment prefix (VERIFYING repair).
-REPO="$(git -C "$HERE" rev-parse --show-toplevel)" || exit 2   # safe dir to return to before any rm -rf
+REPO="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" || exit 2   # safe dir to return to before any rm -rf
 # THIS SUITE'S OWN DIRECTORY, DERIVED (TOOL-aRepatriatedFork-19 S4, on the canonical block
 # TOOL-aRepatriatedFork-18 S2 ships). It was a spelled gov-prefix default that nothing ever set, so at
 # any prefix but gov's every fixture below laid its kit files where the checker under test does not
@@ -31,14 +31,24 @@ SMERGE="$HERE/settings-merge.py"
 pass=0; fail=0
 ck() { if [ "$2" = 1 ]; then echo "ok   $1"; pass=$((pass+1)); else echo "FAIL $1"; fail=$((fail+1)); fi; }
 
+# Fixture identity and line endings for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true. The
+# arms that read this tree run ls-files and check-attr, neither of which hashes a file (S5).
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@e GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@e
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 D=""; OOT=""
+# newrepo's repository is BUILT once per run, here, and COPIED per call (TOOL-aSparedSpawn-9 S3), so
+# every arm still starts from its own unshared tree at one HEAD, and a failed copy exits like a
+# failed init. `--chmod=+x`, not the filesystem bit: on a core.fileMode=false host `git add` stages
+# 100644 from an executable file, and the hook-mode arm would then grade every fixture here
+# (TOOL-aLevelledCopy-3 S7).
+NEWREPO_SEED=$(mktemp -d) || exit 2
+trap 'rm -rf "$NEWREPO_SEED"' EXIT
+( cd "$NEWREPO_SEED" && git init -q --template= -b main && mkdir .githooks \
+  && printf '#!/bin/sh\nexit 0\n' > .githooks/pre-commit && chmod +x .githooks/pre-commit \
+  && git add --chmod=+x .githooks/pre-commit && git commit -q -m init ) || exit 2
 newrepo() {   # cd (in THIS shell) into a fresh repo with a tracked .githooks/pre-commit
-  D=$(mktemp -d); cd "$D" || exit 2
-  git init -q -b main; git config core.autocrlf false; git config user.email t@e; git config user.name t
-  mkdir .githooks; printf '#!/bin/sh\nexit 0\n' > .githooks/pre-commit; chmod +x .githooks/pre-commit
-  # `--chmod=+x`, not the filesystem bit: on a core.fileMode=false host `git add` stages 100644 from
-  # an executable file, and the hook-mode arm would then grade every fixture here (TOOL-aLevelledCopy-3 S7).
-  git add --chmod=+x .githooks/pre-commit; git commit -q -m init
+  D=$(mktemp -d); cp -a "$NEWREPO_SEED/." "$D/" || exit 2; cd "$D" || exit 2
 }
 cleanup() { cd "$REPO"; [ -n "$D" ] && rm -rf "$D"; [ -n "$OOT" ] && rm -rf "$OOT"; D=""; OOT=""; }
 chk() { bash "$SCRIPT" "$@" 2>/dev/null; }   # run the checker, drop stderr noise
@@ -92,7 +102,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -129,7 +140,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -147,7 +158,7 @@ MEMORY_RECALL_DIR=$(resolve_kit_dir "$_rkd_py" memory-recall extract.py "$HERE")
 MEMORY_RECALL="${MEMORY_RECALL_DIR##*/}"
 LIB_DIR=$(resolve_kit_dir "$_rkd_py" lib pyrun.sh "$HERE") || exit 2
 LIB="${LIB_DIR##*/}"
-ROOT_ABS="$(git -C "$HERE" rev-parse --show-toplevel)" || exit 2
+ROOT_ABS="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" || exit 2
 py=$(resolve_python "${PYBIN:-}") || { echo "check-wiring.test: no usable python"; exit 2; }
 
 # A kit file in THIS repo, resolved across both install layouts the way every arm resolves them:
@@ -240,7 +251,7 @@ cleanup
 D=$(mktemp -d); cd "$D" || exit 2; chk --check >/dev/null; [ "$?" = 0 ] && ck "AC5 non-git -> exit 0" 1 || ck "AC5 non-git -> exit 0" 0
 cleanup
 # AC5c — repo without .githooks -> skip, exit 0
-D=$(mktemp -d); cd "$D" || exit 2; git init -q -b main; git config user.email t@e; git config user.name t; git commit -q --allow-empty -m init
+D=$(mktemp -d); cd "$D" || exit 2; git init -q --template= -b main; git commit -q --allow-empty -m init
 chk --check >/dev/null; [ "$?" = 0 ] && ck "AC5 no .githooks -> skip, exit 0" 1 || ck "AC5 no .githooks -> skip, exit 0" 0
 cleanup
 
@@ -327,6 +338,27 @@ JSON
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       agent-cap'; } \
     && ck "AC7d the flag removed -> ok, exit 0" 1 || ck "AC7d the flag removed -> ok, exit 0" 0
+  # BP12 AC7 — AN INHERITED VIEW IS NOT A SETTINGS READ (TOOL-aBriskPreflight-12 S5). The view is
+  # captured from matchers_of's OWN flatten over this correctly wired file, lifted alone as
+  # settings-merge.py's arm 17 lifts it, so state (a) injects exactly what a real read would build.
+  _bpv=$(cd "$D" && bash -c 'settings_json() { printf "%s\n" "$PWD/.claude/settings.json"; }
+    eval "$(awk "/^matchers_of\\(\\) \\{/{on=1} on{print} on && /^}/{exit}" "$1")"; matchers_of; printf "%s" "$_SJ_VIEW"' _ "$SCRIPT")
+  [ -n "$_bpv" ] || ck "BP12 AC7 fixture: matchers_of's flatten built no view to inject" 0
+  # (a) the injected view over a STALE Workflow-only file: the checker must read the file, not the
+  # inheritance. Not over a missing file (spec rev-3): the arm re-reads the file for the shipped path,
+  # so a missing one reds there whether or not the view was inherited, and grades nothing.
+  sed -i 's/"matcher": "Workflow|Agent"/"matcher": "Workflow"/' .claude/settings.json
+  out=$(_SJ_RC=0 _SJ_VIEW=$_bpv chk --check); rc=$?
+  { [ "$rc" = 1 ] && ! printf '%s' "$out" | grep -q 'ok       agent-cap' \
+      && printf '%s' "$out" | grep -q "wired under matcher 'Workflow'"; } \
+    && ck "BP12 AC7 an inherited _SJ_RC=0 view over a stale settings file -> UNWIRED agent-cap, exit 1" 1 \
+    || ck "BP12 AC7 an inherited _SJ_RC=0 view over a stale settings file -> UNWIRED agent-cap, exit 1 [rc=$rc]" 0
+  # (b) an inherited EMPTY view over the correct file: the file's own wiring must still read ok.
+  sed -i 's/"matcher": "Workflow"/"matcher": "Workflow|Agent"/' .claude/settings.json
+  out=$(_SJ_RC=0 _SJ_VIEW= chk --check); rc=$?
+  printf '%s' "$out" | grep -q 'ok       agent-cap' \
+    && ck "BP12 AC7 an inherited empty view over a correct settings file -> ok agent-cap" 1 \
+    || ck "BP12 AC7 an inherited empty view over a correct settings file -> ok agent-cap [rc=$rc]" 0
   cleanup
 else
   echo "skip agent-cap cases — settings-merge.py not found next to script"
@@ -499,6 +531,22 @@ JSON
     out=$(HOME="$SGHOME" chk --check)
     ck "RQ5 AC8 the PreToolUse matcher wired under SubagentStart -> the PreToolUse entry is UNWIRED" \
        "$(printf '%s' "$out" | grep -q '^UNWIRED  scratch   — .*PreToolUse entry' && echo 1 || echo 0)"
+    # TOOL-aBriskPreflight-2 AC6 — a SHIPPED fragment with its matcher line taken out, beside a second
+    # fragment that declares one. The reader keeps four keys per path for the whole run, and the
+    # absent key must read as absent: never as the other fragment's value, and never as a pass.
+    rm -f .claude/settings.json
+    for _f in scratch-guard scratch-guard-subagent; do
+      "$py" ${KP}settings-merge.py --fragment $KIT_REL/${HOOKS}/$_f.fragment.json >/dev/null 2>&1
+    done
+    _sgf=$KIT_REL/${HOOKS}/scratch-guard.fragment.json
+    grep -v '"matcher"' "$SGFRAG" > "$_sgf"
+    out=$(HOME="$SGHOME" chk --check)
+    ck "BP2 AC6 a shipped fragment with no matcher -> UNWIRED scratch naming that fragment, never another's matcher" \
+       "$(printf '%s' "$out" | grep -qF "UNWIRED  scratch   — $_sgf declares no marker/matcher/event/hook_path" && echo 1 || echo 0)"
+    cp "$SGFRAG" "$_sgf"
+    out=$(HOME="$SGHOME" chk --check)
+    ck "BP2 AC6 LIVENESS ...and restored, the PreToolUse entry reads ok again" \
+       "$(printf '%s' "$out" | grep -q '^ok       scratch   — PreToolUse entry' && echo 1 || echo 0)"
   else
     echo "skip RQ5 AC8 — scratch-guard-subagent.fragment.json not found beside the gate's fragment"
   fi
@@ -976,6 +1024,30 @@ out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
   && ck "AC10 restoring the declared family goes green again" 1 || ck "AC10 restoring the declared family goes green again" 0
 
+# state 5d2 — THE CHUNK FLUSH (TOOL-aBriskPreflight-12 S6). The harvest closes a sed chunk before 8000
+# characters of paths, and no state above crosses it, so the in-loop flush never ran. Here the
+# declared list is pushed past 8000 with many ~50-character paths (MAX_PATH), the index `git ls-files`
+# lists FIRST leads a row with QFIRST and the one it lists LAST a row with QLAST, every other new
+# index empty. Past 8000 there are at least two chunks, so the first index is harvested ONLY by the
+# in-loop flush: QFIRST named is that branch's liveness, in every run. Uppercase sorts first in git's
+# byte order, so `AFIRST.md` precedes `TOOL.md` and the lowercase `zlast.md` follows every pad.
+printf -- '- QFIRST-001 | a row only the first chunk holds\n' > memory/backlog/AFIRST.md
+printf -- '- QLAST-001 | a row only the last chunk holds\n' > memory/backlog/zlast.md
+_bpi=0; while [ "$_bpi" -lt 180 ]; do : > "memory/backlog/pad-$_bpi-chunk-flush-padding-index.md"; _bpi=$((_bpi + 1)); done
+git add -A; git commit -q -m "chunk flush fixture"
+_bpl=$(git ls-files | git check-attr --stdin merge | sed -n 's/: merge: rows$//p')
+_bpn=$(printf '%s\n' "$_bpl" | awk '{ s += length($0) + 1 } END { print s + 0 }')
+[ "$_bpn" -gt 8000 ] && [ "$(printf '%s\n' "$_bpl" | head -n 1)" = memory/backlog/AFIRST.md ] \
+  && [ "$(printf '%s\n' "$_bpl" | tail -n 1)" = memory/backlog/zlast.md ] \
+  && ck "AC10 chunk-flush fixture: the declared list is $_bpn characters, past 8000, AFIRST first and zlast last" 1 \
+  || ck "AC10 chunk-flush fixture: the declared list is $_bpn characters, past 8000, AFIRST first and zlast last (fixture no-op)" 0
+out=$(chk --check); rc=$?
+_bpu=$(printf '%s\n' "$out" | grep '^UNWIRED  merge' | grep 'does not declare')
+{ [ "$rc" = 1 ] && printf '%s' "$_bpu" | grep -q 'QFIRST' && printf '%s' "$_bpu" | grep -q 'QLAST'; } \
+  && ck "AC10 a family only the first chunk holds and one only the last -> one UNWIRED merge line naming both" 1 \
+  || ck "AC10 a family only the first chunk holds and one only the last -> one UNWIRED merge line naming both [rc=$rc: ${_bpu:-no such line}]" 0
+git reset -q --hard HEAD~1
+
 # state 5e — THE INERTNESS CHANNEL THE TWO-PLANE DRIVER OPENS, and state 5d cannot reach it.
 #
 # 5d drifts FAMILIES, and the smoke fixture is built FROM the conf, so its rows rename with it and
@@ -1012,6 +1084,22 @@ fi
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
   && ck "AC10 restoring the real grammar goes green again" 1 || ck "AC10 restoring the real grammar goes green again" 0
+
+# state 5f — the driver EXITS 0 having written %O over %A, so the rc test passes and only the
+# missing-id list can red. No other state reaches that list with a driver that exits 0, so this is
+# the arm that holds the one-awk count (TOOL-aBriskPreflight-1 S5). TWO families, so the list's
+# family-then-id ORDER is graded too; state 6 below needs the real driver, and reds without it.
+cp $KIT_REL/${MT_KIT}/merge-rows.py $KIT_REL/${MT_KIT}/merge-rows.py.away
+printf 'import shutil, sys\nshutil.copyfile(sys.argv[1], sys.argv[2])\n' > ${KP}${MT_KIT}/merge-rows.py
+cp .memory-tree.conf .memory-tree.conf.away
+printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL playbook:PLAY"\n' > .memory-tree.conf
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'cannot merge' \
+  && printf '%s' "$out" | grep -qF 'missing or duplicated: TOOL-002 TOOL-003 PLAY-002 PLAY-003 ('; } \
+  && ck "AC10 a driver that exits 0 and drops the new rows -> UNWIRED naming every -002 and -003, exit 1" 1 \
+  || ck "AC10 a driver that exits 0 and drops the new rows -> UNWIRED naming every -002 and -003, exit 1" 0
+mv -f .memory-tree.conf.away .memory-tree.conf
+mv -f $KIT_REL/${MT_KIT}/merge-rows.py.away $KIT_REL/${MT_KIT}/merge-rows.py
 
 # state 6 — a value somebody else set is REPORTED and never clobbered (the check_hooks rule)
 git config merge.rows.driver 'bash vendor/other-driver.sh %O %A %B %P'
@@ -1200,7 +1288,7 @@ ck "a shipped file absent from the install -> UNWIRED naming it" "$r"; rm -rf "$
 newrepo; skill_fixture 1; install_engine 'engine
 '
 # A bare origin with its HEAD set, so the note's merge base resolves (TOOL-aGraftedHelix-36 S6).
-SKOR=$(mktemp -d); git init -q --bare "$SKOR"; git -C "$SKOR" symbolic-ref HEAD refs/heads/main
+SKOR=$(mktemp -d); git init -q --template= --bare "$SKOR"; git -C "$SKOR" symbolic-ref HEAD refs/heads/main
 git remote add origin "$SKOR"; git push -q origin main >/dev/null 2>&1
 git fetch -q origin >/dev/null 2>&1; git remote set-head origin main >/dev/null 2>&1
 SKWT=$(mktemp -d); rmdir "$SKWT"; git worktree add -q -b skbr "$SKWT" >/dev/null 2>&1
@@ -1227,7 +1315,7 @@ git remote set-head origin main >/dev/null 2>&1
 # engine edit of its own, while the install matches the lagging primary: UNWIRED, naming the
 # fast-forward. RED with the branch-change condition cut: the lagging worktree read the note.
 SKCL=$(mktemp -d); rmdir "$SKCL"; git clone -q "$SKOR" "$SKCL" >/dev/null 2>&1
-( cd "$SKCL" && git config user.email t@e && git config user.name t \
+( cd "$SKCL" \
     && printf 'upstream\n' > skills/session-kickoff/SKILL.md && git commit -q -am upstream && git push -q origin main ) >/dev/null 2>&1
 git fetch -q origin >/dev/null 2>&1
 SKLG=$(mktemp -d); rmdir "$SKLG"; git worktree add -q -b sklag "$SKLG" origin/main >/dev/null 2>&1
@@ -1475,7 +1563,7 @@ printf 'MEMORY_ROOT=memory\nDISCIPLINES="tooling"\nFAMILIES="tooling:TOOL"\nROTA
 mkdir -p memory/builds/aFlip
 printf '# aFlip\n\n## Asks\n\n## Dispositions\n' > memory/builds/aFlip/BACKLOG.md
 git add -A; git commit -q -m "flip to builds"
-OOT=$(mktemp -d); git init -q --bare -b main "$OOT/origin.git"
+OOT=$(mktemp -d); git init -q --template= --bare -b main "$OOT/origin.git"
 git remote add origin "$OOT/origin.git"; git push -q origin main
 git remote set-head origin -a >/dev/null 2>&1
 out=$(chke --session); rc=$?
@@ -1523,6 +1611,44 @@ for spell in 'absent|' 'blank|BACKLOG_MODE=""' 'quoted|BACKLOG_MODE="builds"' \
 done
 rm -f "$D/.git/mode-kit.py"
 cleanup
+
+# ---- TOOL-aBriskPreflight-2 AC9: the launcher is resolved ONCE, and a run with none still probes ----
+# Every arm that needs python reads `PY_OK`, set beside `PY`, instead of RUNNING the candidates again.
+# Every launcher name is shadowed by a stub that exits 9 and GOV_PYTHON names a fourth, so a memo that
+# read a launcher as resolved hands a stub to the kit resolver and to the straggler inventory: the
+# agent-cap arm then skips a hook that is there, and the straggler line names an exit status. The
+# engine is a stub too, because a run with no python stops before it starts it.
+newrepo
+OOT=$(mktemp -d)
+for _n in python3 python py gov-py; do printf '#!/bin/sh\nexit 9\n' > "$OOT/$_n"; chmod +x "$OOT/$_n"; done
+mkdir -p "./${KP}$HOOKS" "./${KP}${MT_KIT}"; cp "$SCRIPT" "./${KP}check-wiring.sh"; printf '// stub\n' > "${KP}$HOOKS/agent-cap.js"
+printf '# a stub engine\n' > "${KP}${MT_KIT}/migrate_backlog.py"
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="tooling"\nFAMILIES="tooling:TOOL"\nROTATION_MODE="cut"\nBACKLOG_MODE="builds"\n' > .memory-tree.conf
+git add -A; git commit -q -m "no usable python, and a builds-mode memory tree"
+out=$(PATH="$OOT:$PATH" GOV_PYTHON="$OOT/gov-py" bash "./${KP}check-wiring.sh" --check 2>"$OOT/err")
+ck "BP2 AC9 no launcher runs -> stderr carries the resolver's bash-probe note" \
+   "$(grep -q '^note     resolver  — no usable python' "$OOT/err" && echo 1 || echo 0)"
+ck "BP2 AC9 ...stdout says the straggler inventory did not run" \
+   "$(printf '%s' "$out" | grep -q '^note     straggler — no usable python launcher resolved' && echo 1 || echo 0)"
+ck "BP2 AC9 ...and the bash probe rung still finds the shipped agent-cap.js" \
+   "$(printf '%s' "$out" | grep -q '^UNWIRED  agent-cap' && ! printf '%s' "$out" | grep -q '^skip     agent-cap' && echo 1 || echo 0)"
+cleanup
+
+# ---- TOOL-aBriskPreflight-2 AC12: KIT_FILE_PAIRS lists every pair a call site passes -----------------
+# A pair the list lacks still resolves, through a python start of its own, so a stale list is slower
+# and never wrong — which is why nothing but this comparison would ever see it go stale. The literal
+# pairs are the two words after each `resolve_kit_file` outside a comment.
+_kfp='FNR == NR { if (sub(/^KIT_FILE_PAIRS=\(/, "")) { sub(/\).*$/, ""); n = split($0, w, " "); for (i = 1; i < n; i += 2) have[w[i] " " w[i+1]] = 1 }; next }
+  /^[[:space:]]*#/ { next }
+  { s = $0; while (match(s, /resolve_kit_file [A-Za-z0-9_.-]+ [A-Za-z0-9_.-]+/)) { p = substr(s, RSTART + 17, RLENGTH - 17); print ((p in have) ? "listed " : "unlisted ") p; s = substr(s, RSTART + RLENGTH) } }'
+_pairs=$(awk "$_kfp" "$SCRIPT" "$SCRIPT")
+ck "BP2 AC12 every literal pair a resolve_kit_file call site passes is in KIT_FILE_PAIRS" \
+   "$([ -n "$_pairs" ] && ! printf '%s\n' "$_pairs" | grep -q '^unlisted ' && echo 1 || echo 0)"
+_kfd=$(mktemp -d)
+sed '/^KIT_FILE_PAIRS=(/s/ memory-tree merge-rows\.py//' "$SCRIPT" > "$_kfd/cw.sh"
+ck "BP2 AC12 LIVENESS ...and with one pair taken out of the list, the comparison names it" \
+   "$(awk "$_kfp" "$_kfd/cw.sh" "$_kfd/cw.sh" | grep -qx 'unlisted memory-tree merge-rows.py' && echo 1 || echo 0)"
+rm -rf "$_kfd"
 
 # ---- TOOL-aRepatriatedFork-19: the install RECEIPT is the first rung -----------------------------
 # An adopter that homes a kit somewhere no probe spells — the merge driver flat under `scripts/`, the
@@ -1996,6 +2122,79 @@ ck "LC3 AC7 a hooks dir no checkout tracks is an announced skip, never an ok abo
    "$(printf '%s' "$out" | grep -q '^skip     hooks     — .*tracked by no checkout' \
       && ! printf '%s' "$out" | grep -q '^ok .*executable' && echo 1 || echo 0)"
 cleanup
+
+# ---- TOOL-aOrientedCast-8 AC6 — the roles arm. An installed kit left unrendered is UNWIRED under
+# ---- --check and printed the same under --session; a rendered one reads ok with one note per harness
+# ---- the role index names and the tree lacks; a CR-carrying pinned agent type is named by the eol
+# ---- arm's third glob; and a tree without the kit skips. The checker is COPIED into each fixture, so
+# ---- the probe rung resolves the fixture's own kit, never this repository's. The arm grades
+# ---- presence, so the fixture writes each artifact itself rather than running the adopter.
+ROLES_DIR=$(resolve_kit_dir "$_rkd_py" roles workflows.toml "$HERE" 2>/dev/null) || ROLES_DIR=""
+if [ -n "$ROLES_DIR" ]; then
+  RL="${ROLES_DIR##*/}"
+  newrepo; git config core.hooksPath .githooks
+  mkdir -p "./${KP}$RL/agents"
+  cp "$SCRIPT" "./${KP}check-wiring.sh"
+  cp "$REPO/$ROLES_DIR/workflows.toml" "./${KP}$RL/"
+  cp "$REPO/$ROLES_DIR"/agents/*.agent.md "./${KP}$RL/agents/"
+  # A conf whose CHARTER names no file, with a trailing comment the shell read must strip (AC13).
+  printf 'MEMORY_ROOT=memory\nCHARTER="DOC.md"  # the governing doc\n' > .memory-tree.conf
+  git add -A; git commit -q -m "the roles kit, unrendered"
+  out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null); rc=$?
+  ck "OC8 AC13 no doc at CHARTER -> UNWIRED roles naming the doc, the key and the scaffold, exit 1" \
+     "$([ "$rc" = 1 ] && printf '%s\n' "$out" | grep '^UNWIRED  roles ' \
+        | grep -F 'CHARTER in .memory-tree.conf names DOC.md, which is not a file' \
+        | grep -qF "${KP}$RL/adopt-roles.sh --scaffold" && echo 1 || echo 0)"
+  ck "OC8 AC13 ...read first, so the line names the cause and not the artifacts it left unrendered" \
+     "$(printf '%s\n' "$out" | grep '^UNWIRED  roles ' | grep -qF 'roles.json' && echo 0 || echo 1)"
+  printf 'doc\n' > DOC.md; git add -A; git commit -q -m "the governing doc"
+  out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null); rc=$?
+  ck "OC8 AC6 an installed, unrendered roles kit -> UNWIRED roles naming the index and the scaffold, exit 1" \
+     "$([ "$rc" = 1 ] && printf '%s\n' "$out" | grep '^UNWIRED  roles ' | grep -F '.claude/roles.json' \
+        | grep -qF "${KP}$RL/adopt-roles.sh --scaffold" && echo 1 || echo 0)"
+  out=$(bash "./${KP}check-wiring.sh" --session 2>/dev/null); rc=$?
+  ck "OC8 AC6 ...and --session prints the same line and exits 0" \
+     "$([ "$rc" = 0 ] && printf '%s' "$out" | grep -q '^UNWIRED  roles     — .*\.claude/roles\.json' && echo 1 || echo 0)"
+  mkdir -p .claude/agents .claude/skills/build
+  _n=0
+  for _f in "./${KP}$RL"/agents/*.agent.md; do
+    tr -d '\r' < "$_f" | sed -n '2,/^---$/p' | grep -qE '^agent:[[:space:]]*false' && continue
+    _b=${_f##*/}; printf 'x\n' > ".claude/agents/${_b%.agent.md}.md"; _n=$((_n+1))
+  done
+  printf '{"harnesses": ["nowhere/absent-harness.js"], "roles": {}}\n' > .claude/roles.json
+  printf 'x\n' > .claude/skills/build/SKILL.md
+  out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null); rc=$?
+  ck "OC8 AC6 LIVENESS a rendered install reads ok roles, counting its agent types" \
+     "$([ "$rc" = 0 ] && [ "$_n" -gt 0 ] && printf '%s' "$out" | grep -q "^ok       roles     — $_n agent types" && echo 1 || echo 0)"
+  ck "OC8 AC6 ...with one note for the harness the role index names and the tree lacks" \
+     "$([ "$(printf '%s\n' "$out" | grep -c '^note     roles     — nowhere/absent-harness.js is named by the role index')" = 1 ] && echo 1 || echo 0)"
+  ck "OC8 AC6 ...and an absent harness never reads UNWIRED" \
+     "$(printf '%s' "$out" | grep -q '^UNWIRED  roles' && echo 0 || echo 1)"
+  # TOOL-aOrientedCast-15 S7 — an index every hook refuses is UNWIRED, never ok with a note. RED
+  # against the base check_roles, which noted the parse failure and fell through to its ok line.
+  cp .claude/roles.json .claude/roles.json.good; printf '{' > .claude/roles.json
+  out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null); rc=$?
+  ck "OC15 AC6 a truncated role index -> one UNWIRED roles line naming it and the scaffold, exit 1" \
+     "$([ "$rc" = 1 ] && [ "$(printf '%s\n' "$out" | grep '^UNWIRED  roles ' | grep -F '.claude/roles.json' \
+        | grep -cF "${KP}$RL/adopt-roles.sh --scaffold")" = 1 ] && echo 1 || echo 0)"
+  ck "OC15 AC6 ...and no ok roles line" "$(printf '%s' "$out" | grep -q '^ok       roles' && echo 0 || echo 1)"
+  mv .claude/roles.json.good .claude/roles.json
+  printf '.claude/agents/*.md eol=lf\n.claude/roles.json eol=lf\n' > .gitattributes
+  git add -A; git commit -q -m rendered
+  for _a in .claude/agents/*.md; do break; done
+  printf 'x\r\n' > "$_a"
+  out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null)
+  ck "OC8 AC6 a CR-carrying pinned agent type is named by the eol arm" \
+     "$(printf '%s' "$out" | grep -qF "note     eol       — $_a" && echo 1 || echo 0)"
+  cleanup
+  newrepo; git config core.hooksPath .githooks; mkdir -p "./${KP}"; cp "$SCRIPT" "./${KP}check-wiring.sh"
+  out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null)
+  ck "OC8 AC6 a tree without the roles kit skips the arm" \
+     "$(printf '%s' "$out" | grep -q '^skip     roles     — the roles kit is not installed here' && echo 1 || echo 0)"
+  cleanup
+else
+  echo "skip OC8 AC6 roles cases — no roles kit resolves beside this suite; no pass counted"
+fi
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

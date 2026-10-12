@@ -84,7 +84,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -121,7 +122,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -197,13 +198,15 @@ while IFS= read -r f; do
   n=$((n+1))
   # The payload is built by node itself: a JSON encoder written in shell is one more place for a
   # backslash or a backtick in a workflow's prompt text to change the meaning of the thing being
-  # judged.
+  # judged. `--only=scripts` asks for the rules that read a SCRIPT (TOOL-aOrientedCast-7 S11): an
+  # inline-script payload is not a tool call, and the hook's call rule refuses every one of them
+  # wherever a role index exists.
   if ! out=$(node -e '
       const fs = require("fs")
       process.stdout.write(JSON.stringify({
         tool_name: "Workflow",
         tool_input: { script: fs.readFileSync(process.argv[1], "utf8") },
-      }))' "$f" | node "$HOOK" 2>&1); then
+      }))' "$f" | node "$HOOK" --only=scripts 2>&1); then
     echo "verifier-fanout: FAILED — $f"
     printf '%s\n' "$out" | sed 's/^/    /'
     st=1

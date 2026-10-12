@@ -1,6 +1,6 @@
 # runlog — one line grammar for run logs, and one reader for them
 
-<!-- gov:kit runlog@1.10 -->
+<!-- gov:kit runlog@1.13 -->
 
 Three producers append one line per act to a machine-local journal: the unattended driver, the gate
 runner and the pre-push hook. Several consumers read those lines. This kit gives all of them ONE
@@ -206,6 +206,25 @@ it counts as the witness.
 `LOCALAPPDATA`, `XDG_STATE_HOME` and `CLAUDE_CONFIG_DIR` at a decoy tree holding a canary transcript
 before any arm runs, and after EVERY arm compares the decoy's listing and searches the arm's output
 and scratch for the canary's id. Each extractor arm then aims the roots it uses at its own scratch.
+
+## The prose measure
+
+```bash
+python <this kit>/runlog.py prose --session <sid> | --transcript <file> [--transcripts <dir>] [--charter <file>]
+```
+
+Four lines over one session's main transcript, and nothing written (`TOOL-aHeardState-2`): the turn
+and final-message counts; the narration share, interjection characters over all assistant prose,
+marked `ALARM` above 40%; interjections per final message as mean, max and turns above 3, marked
+`ALARM` when the mean exceeds 3; and how many final messages carry the charter's adjacent bare
+`BUILD`/`SPEC` pair. A turn opens at any typed user record, an idle-wake tick or a task notification
+included, and back-to-back openers are one turn; the final message is the assistant text after the
+turn's last tool call, and every other text-carrying assistant message is one interjection. The pair
+is derived from the `<!-- microformats -->` fence of `--charter`, default the toplevel's `AGENTS.md`,
+by `prose.py`, which re-implements the hooks kit's `format-guard.js` predicate; a parity arm in that
+hook's suite holds the two to one verdict. A charter with no fence prints `pair — unknown`, never a
+zero. A session with no transcript exits 2. It cannot know whether a turn ran under a routed build,
+so the pair count covers every final message.
 
 ## The run model
 

@@ -25,6 +25,11 @@ case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 KIT_NAME="${KIT_REL##*/}"
 GATE="$HERE/check-verdict-epoch.sh"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
+# Fixture identity and config for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global config.
+export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t.test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t.test
+export GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false \
+  GIT_CONFIG_KEY_1=commit.gpgsign GIT_CONFIG_VALUE_1=false
 fails=0
 # THE EXIT CODE IS PART OF THE ASSERTION. The first cut captured `rc` and only printed it, so the
 # message and the verdict were never checked together: mutating the gate's FAILED branch from
@@ -65,8 +70,7 @@ commit_engine() { # $1=dir $2=version $3=extra-body-line $4=message
 newrepo() { # $1=name -> echoes the dir
   local d="$TMP/$1"
   mkdir -p "$d"
-  ( cd "$d" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
-    && git config commit.gpgsign false ) >/dev/null 2>&1
+  ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   printf '%s' "$d"
 }
 
@@ -172,7 +176,7 @@ arm 'a missing engine is a named failure' 2 'is missing' "$E"
 # The skip must SAY it skipped: silence here is indistinguishable from "the constant is fine", which
 # is the exact failure this gate exists for.
 F="$TMP/nomain"; mkdir -p "$F"
-( cd "$F" && git init -q -b work . && git config user.email t@t.test && git config user.name t   && git config commit.gpgsign false ) >/dev/null 2>&1
+( cd "$F" && git init -q --template= -b work . ) >/dev/null 2>&1
 engine "$F" 1.5 ""
 ( cd "$F" && git add -A && git commit -qm base --no-verify ) >/dev/null
 arm 'an unresolvable base is a REFUSAL, not a pass' 1 'verdict-epoch: FAILED — no mainline base to compare against, so this gate cannot judge' "$F"
@@ -204,7 +208,7 @@ ARM_GPB=$BASE_G arm '...and a bump minted INTO the merge onto the base dates it'
 # that option alone prints the merge's patch, which a `tail -1` or a sha loop then reads as a commit.
 # Over the tracked scripts of the repository this suite runs in. LIVE: zero hits is a dead probe,
 # since this kit's own gate carries one. Staged red by deleting `--no-patch` from the gate's search.
-pk=$(cd "$(git -C "$HERE" rev-parse --show-toplevel)" && git grep -nE 'log.* -[SG].*KIT_[A-Z_]*_VERSION' -- '*.sh' '*.py' '*.js' 2>/dev/null)
+pk=$(cd "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" && git grep -nE 'log.* -[SG].*KIT_[A-Z_]*_VERSION' -- '*.sh' '*.py' '*.js' 2>/dev/null)
 pk_bad=$(printf '%s\n' "$pk" | grep -v -e '^$' | grep -v -e '--no-patch.*--diff-merges=first-parent' -e '--diff-merges=first-parent.*--no-patch')
 if [ -z "$pk" ]; then
   fails=$((fails+1)); printf 'arm FAIL  %s\n' 'the kit-version pickaxe scan matched nothing, so it graded nothing (DEAD PROBE)'
@@ -258,7 +262,7 @@ ARM_GPB=$BASE_V2 arm '...and a receipt naming another version than the constant 
 # OFF THE PUSH BOUNDARY a branch carrying an undated engine move is `owed at the lander`, exit 0
 # (TOOL-aMendedFleet-65 S7), which is the third correct answer here; `clean —` or that phrase, and
 # never a FAILED, is what this arm accepts.
-live=$(cd "$(git -C "$HERE" rev-parse --show-toplevel)" && unset GATE_PUSH_BASE && bash "$GATE" 2>&1); lrc=$?
+live=$(cd "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" && unset GATE_PUSH_BASE && bash "$GATE" 2>&1); lrc=$?
 case "$lrc:$live" in
   0:*"clean —"*|0:*"owed at the lander"*) printf 'arm ok    %s\n' 'the live tree passes, and says so as a clean or owed verdict' ;;
   *) fails=$((fails+1)); printf 'arm FAIL  %s — got rc=%s\n' 'the live tree passes' "$lrc"

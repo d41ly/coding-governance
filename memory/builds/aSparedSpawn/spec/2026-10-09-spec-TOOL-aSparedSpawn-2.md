@@ -1,10 +1,15 @@
 # TOOL-aSparedSpawn-2 — the pool width comes from a measured spawn calibration, and dispatch pauses on spawn pressure
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 1 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-11-build-TOOL-aSparedSpawn-2-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-2-acceptance-ledger.md) | journal | — |
+| [2026-10-11-build-TOOL-aSparedSpawn-2-width-ab.sh](../build/2026-10-11-build-TOOL-aSparedSpawn-2-width-ab.sh) | journal | — |
+| [2026-10-11-prompt-TOOL-aSparedSpawn-2-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-2-build-brief.md) | journal | — |
+| [2026-10-12-review-TOOL-aSparedSpawn-1-15-closing-diff-round1.md](../reviews/2026-10-12-review-TOOL-aSparedSpawn-1-15-closing-diff-round1.md) | diff-review | TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14 TOOL-aSparedSpawn-15 |
 
 <!-- /gen:spec-records -->
 
@@ -24,14 +29,19 @@ already does for memory.
   4, 6 and 8 by `GATE_JOBS`, each quiet and under a declared synthetic spawn load, each from a frozen
   clone. Every row carries wall, leg-seconds, effective concurrency, ceiling fires, pause holds and the
   foreign and bash counts beside the seconds, and a positive artifact that the arm ran every leg of its
-  subject. The subject is the owner's pick (F2). Observed by AC1.
+  subject. The subject is the owner's pick (F2). Observed by AC1. **rev-2:** the builder pass writes
+  the instrument and does NOT run it, because a pass may run no bar; the six arms are owed at
+  VERIFYING under the owner's authorisation, and AC1 is recorded owed until then.
 - **S2** — A calibration verb, `--calibrate-width`, on the runner. It times K concurrent loops of the
   spawn `measure_spawn_cost` already times (the `GATE_SPAWN_CMD` seam's command, `true` by default) for
   K in 1, 2, 4, 6 and 8, computes each aggregate rate T(K), and selects the smallest K with
   T(K) >= THETA x max T. THETA is a source constant set from S1's rows. The verb prints the rates and
   the pick, and writes `<git-common-dir>/gate-host-calibration` tmp-then-rename, beside the
   `gate-spawn-floor` the runner already keeps there: `<width> TAB <rates> TAB <iso-utc> TAB <boot>`.
-  Observed by AC2 and AC3.
+  Observed by AC2 and AC3. **rev-2:** a rate is whole spawns a minute and `<rates>` is
+  `K=rate` comma-joined; the verb prints TAB key/value lines (`rates`, `theta`, `pick`, `cache`), as
+  `--print-profile` does; `<boot>` is the boot's epoch second, or `-` where `/proc/uptime` does not
+  read. THETA ships PROVISIONAL at 90 percent, because S1 has not run; S1's rows move it.
 - **S3** — An arm seam, `GATE_CALIBRATION_RATES`, read once and unset as `GATE_SPAWN_CMD` is: a list
   of T(K) values that stands in for the timed loops, so the selection is graded with no clock.
   Observed by AC2.
@@ -40,13 +50,31 @@ already does for memory.
   it exists). A valid cache sets the width by the rule F1 picks, below `GATE_JOBS` in precedence.
   Otherwise the row's width stands and the profile line says `uncalibrated` and which test failed.
   The header gains `width_from`, outside the four-key run envelope. Observed by AC3 and AC4.
+  **rev-2:** the git common dir is resolved ONCE, above the width, and the turnstile and the
+  scratch-dir owner take it from there, so a bar spawns no extra git; `--print-profile` gains one.
+  The age is parsed from `<iso-utc>` by civil-date arithmetic, so the read spawns nothing; a
+  future-dated line is stale. The boot test allows 60 seconds of clock jitter, and is skipped where
+  this host's `/proc/uptime` does not read. `width_from` is `row`, `calibrated` (the pick narrowed
+  the row) or `GATE_JOBS`, and `--print-profile` prints it as a key. **rev-3:** under `GATE_JOBS`
+  the profile line carries no calibration note, because the override names the width and a cache
+  that was not consulted has nothing to report; the line reads `width <n>,` exactly as before.
 - **S5** — The spawn-pressure pause, a fifth knob `spawnpause=<ratio>` in `KNOWN_KNOBS` and the
   table, 0 or absent meaning off. The census sampler (`arm_census`) also times three spawns on each
   tick and writes the reading to a file in the run's work dir. `check_dispatch_pause` holds the next
   dispatch while that reading exceeds `spawnpause` times the recorded floor, read with a builtin as
   the memory reading is. The memory pause's release rules apply unchanged: fell, drained, bound,
   unread, wall. With no floor recorded the knob is INERT and says so. A `spawn:` summary line follows
-  the `memory:` line. Observed by AC5 and AC6.
+  the `memory:` line. Observed by AC5 and AC6. **rev-2:** the knob grammar is digits, so the ratio is
+  a whole multiple of the floor, 0 to 1000, and a larger value is refused as `mempause` above 100 is.
+  The `spawn:` line prints only when the knob is on, so no whole-output reader in a suite sees a new
+  line on a row that leaves it off. The decision lives in the shared pause block, whose byte-identical
+  copy in the self-test runner moves with it and never sets the knob; each `pauses` row gains a
+  seventh field naming which reading held it (`memory`, `spawn` or `memory+spawn`), appended so no
+  positional reader moves. The `memory:` line and the verdict's `paused` keys count the episodes the
+  memory reading held; a spawn-held episode is counted on the `spawn:` line and recorded in the rows.
+  **rev-3:** `derive-ceilings.py` reads a `pauses` row only when it has exactly six fields, so the
+  seventh would silently empty its census set-aside. Its reader takes six fields or more, and every
+  episode, memory- or spawn-held, sets aside the readings it overlapped, both being contention.
 - **S6** — An arm seam, `GATE_SPAWN_NOW`, naming a file read in place of the sampler's reading, as
   `GATE_MEMINFO` stands in for `/proc/meminfo`. Observed by AC5.
 - **S7** — `PINNED_KNOBS` in the canary (`run-gates.test.sh:1385`) gains `spawnpause` in the same
@@ -54,6 +82,8 @@ already does for memory.
 - **S8** — `gate-profiles.txt` documents the calibration, its cache, the precedence and the new knob in
   its KNOBS block, and every row declares `spawnpause` from S1's loaded rows; `tools/run-gates/README.md`
   gains the verb. NOT OBSERVED: prose and declared values, which no checker grades for truth.
+  **rev-2:** with S1 unrun every row declares `spawnpause=0`, so the pause lands DARK; S1's loaded
+  rows set each row's value.
 
 ## 3. Non-goals (OUT)
 
@@ -107,9 +137,16 @@ tenfold between nodes with identical core counts.
 - `tools/run-gates/run-gates.sh` — the verb, the cache read, the precedence, the sampler reading, the pause.
 - `tools/run-gates/gate-profiles.txt` — the KNOBS block and each row's `spawnpause`.
 - `tools/run-gates/run-gates.test.sh` — `PINNED_KNOBS`, and the calibration and pause arms.
-- `tools/run-gates/run-gates.evidence.test.sh` — the header `width_from` key arm.
+- `tools/run-gates/run-selftests.sh` — the shared pause block's byte-identical copy (rev-2).
 - `tools/run-gates/README.md` — the verb and its cache.
-- `tools/run-gates/kit.toml` — the kit version, moved once for the build.
+- `tools/run-gates/kit.toml` — the kit version, moved once for the build, by the main loop.
+
+- `tools/run-gates/derive-ceilings.py` — its `pauses` reader takes the seventh field (rev-3).
+- `tools/run-gates/run-gates.evidence.test.sh` — the census arm's `pauses` fixture row gains the
+  seventh field the runner now writes, so that arm reds on a length-exact reader (rev-3).
+
+rev-2: the header `width_from` key is read by the calibration arm in the canary rather than by an
+evidence-suite arm. rev-3: the evidence suite is touched for the `pauses` fixture row alone.
 - `memory/builds/aSparedSpawn/build/` — the A/B instrument and its rows (S1).
 
 ### Alternatives rejected
@@ -166,7 +203,7 @@ tenfold between nodes with identical core counts.
 
 `run-gates canary` · `run-gates evidence` · `run-gates turnstile` · `run-gates run-log line` ·
 `run-gates gov canary` · `run-gates adopter e2e` · `profile-bar selftest` · `pre-push run-log line` ·
-`push-main self-test` · `check-wiring self-test` · `settings-merge selftest` ·
+`push-main self-test` · `run-selftests self-test` · `check-wiring self-test` · `settings-merge selftest` ·
 `foreign-prefix parity (every self-test at three prefixes)` ·
 `python resolver (behaviour + inline parity + idiom ban)` · `install-prefix self-test` ·
 `dead-path carriers self-test` · `lexicon naming predicates` · `spec-tokens self-test` ·
@@ -188,6 +225,7 @@ New arm: tools/run-gates/run-gates.test.sh · covers AC7 · `spawnpause` added t
   - (b) Replace: rows lose `width`, and a host with no cache uses a built-in default. One source of the
     number, but every node's first bar after landing changes width before anyone has calibrated it.
   - Recommendation: (a).
+  - RESOLVED (owner, 2026-10-10): (a) override only.
 - **F2 — What does the A/B run, and under what load?**
   - (a) The default `GATE_FULL` bar. Cheapest, but the reuse report finds that bar floored by its
     impure `unattended kit gate` leg, so width may read flat for a reason unrelated to spawns.
@@ -197,10 +235,20 @@ New arm: tools/run-gates/run-gates.test.sh · covers AC7 · `spawnpause` added t
     hours per arm, six arms.
   - Load: a declared synthetic spawn loader (repeatable) or a neighbouring bar (realistic, not repeatable).
   - Recommendation: (b), with the synthetic loader, and the bash and foreign counts beside every figure.
+  - RESOLVED (owner, 2026-10-10): (b) a GATE_LEGS subset of the spawn-heaviest held legs, with the synthetic loader.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-11 · the builder pass. S1's arms are owed at VERIFYING, so THETA ships provisional
+  at 90 and every row's `spawnpause` at 0 (dark); the common dir is resolved once above the width;
+  the cache age is parsed without a spawn and the boot test allows 60 s; the ratio is whole, 0 to
+  1000; the `spawn:` line prints only with the knob on; the shared pause block moves in both runners
+  and its rows gain a seventh `by` field; `width_from` is graded in the canary, not the evidence suite.
+- rev-3 · 2026-10-11 · the continuation pass. §7 names `run-selftests self-test`, whose guard the
+  moved pause block trips; `derive-ceilings.py`'s length-exact `pauses` reader takes the seventh
+  field, and the evidence suite's fixture row carries it; under `GATE_JOBS` the profile line drops
+  the calibration note, which canary arm 4g's `width 3,` match would otherwise red.
 
 ## 10. Reuse audit
 

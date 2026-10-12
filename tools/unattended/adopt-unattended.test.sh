@@ -80,7 +80,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -117,7 +118,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -518,15 +519,15 @@ F="$TMP/spell"; seed "$F"
 # mount-point flavor (/tmp/...) while git reports the Windows one (C:/Users/.../Temp/...), for one
 # directory. Prefer that; fall back to a symlink; skip loudly if neither yields a divergence.
 F_ALT=""
-if [ "$(cd "$F" && pwd)" != "$(cd "$F" && git rev-parse --show-toplevel)" ]; then
+if [ "$(cd "$F" && pwd)" != "$(unset GIT_DIR GIT_WORK_TREE; cd "$F" && git rev-parse --show-toplevel)" ]; then
   F_ALT="$F"
-elif ln -s "$F" "$TMP/spell-alt" 2>/dev/null && [ -L "$TMP/spell-alt" ]      && [ "$(cd "$TMP/spell-alt" && pwd)" != "$(cd "$TMP/spell-alt" && git rev-parse --show-toplevel)" ]; then
+elif ln -s "$F" "$TMP/spell-alt" 2>/dev/null && [ -L "$TMP/spell-alt" ]      && [ "$(cd "$TMP/spell-alt" && pwd)" != "$(unset GIT_DIR GIT_WORK_TREE; cd "$TMP/spell-alt" && git rev-parse --show-toplevel)" ]; then
   F_ALT="$TMP/spell-alt"
 fi
 if [ -n "$F_ALT" ]; then
   # LIVENESS, asserted rather than assumed: the arm is only meaningful while the two spellings differ.
   n=$((n+1))
-  [ "$(cd "$F_ALT" && pwd)" != "$(cd "$F_ALT" && git rev-parse --show-toplevel)" ]     || { echo "FAIL arm 3b fixture is inert: the two spellings agree, so it would pass with the fix reverted"; st=1; }
+  [ "$(cd "$F_ALT" && pwd)" != "$(unset GIT_DIR GIT_WORK_TREE; cd "$F_ALT" && git rev-parse --show-toplevel)" ]     || { echo "FAIL arm 3b fixture is inert: the two spellings agree, so it would pass with the fix reverted"; st=1; }
   out=$( cd "$F_ALT" && bash "$F_ALT/$KIT_REL/adopt-unattended.sh" 2>&1 ); rc=$?
   same "arm 3b adopts despite two spellings" "$rc" "0"
   present "$F/.claude/skills/unattended/SKILL.md" "arm 3b wrote into the adopting repo"

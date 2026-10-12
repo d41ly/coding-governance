@@ -28,7 +28,7 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "resolve-python.test: not inside a 
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
-ROOT=$(git -C "$HERE" rev-parse --show-toplevel)
+ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)
 CANON="$HERE/resolve-python.sh"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 st=0; n=0
@@ -104,7 +104,8 @@ out=$(PATH="$C:$PATH" bash -c 'set -u; . "$1"; PY=$(resolve_python) || { echo HA
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -141,7 +142,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -342,6 +343,44 @@ grep -qE 'command -v (python3|python|py)\b' "$plant" || bad "the ban predicate d
 printf '#!/usr/bin/env bash\n# command -v python3 is the retired idiom\n' > "$plant"
 awk '$0 !~ /^[[:space:]]*#/' "$plant" | grep -qE 'command -v (python3|python|py)\b' \
   && bad "the ban fires on a COMMENT explaining the idiom"; ok
+
+# ---- 3a. THE KIT-DIR WRAPPER BAN (TOOL-aSparedSpawn-4 S12) ----------------------------------------
+# Every copy of `resolve_kit_dir` reads its heredoc with the builtin `read`, because the `cat` capture
+# it replaced forked a subshell and exec'd `cat` at every call of every copy. §2 grades the bytes
+# BETWEEN the markers, and the wrapper sits outside them, so without this the old capture could come
+# back in any copy with parity still green. The population is §2's own for the `resolve_kit_dir` row,
+# suites, product files and the extensionless hooks alike, derived by the same grep. Comments are
+# stripped first, for §3's reason. The idiom is spelled in pieces so this file carries none of it, and
+# no shell reader takes the line for a heredoc opener.
+# WHAT THIS DOES NOT CHECK: a capture of any other heredoc tag, or one split across lines; the
+# spawn-idiom lint of the gate-lint kit owns the general class on product files.
+RKD_IDIOM="\$(c""at <""<'RKD'"
+scan_rkd_capture() {  # file paths on stdin -> "file:line" per non-comment line holding the idiom
+  awk -v idiom="$RKD_IDIOM" '
+    { f = $0; n = 0
+      while ((getline line < f) > 0) {
+        n++; sub(/\r$/, "", line)
+        if (line ~ /^[[:space:]]*#/) continue
+        if (index(line, idiom)) printf "%s:%d\n", f, n
+      }
+      close(f) }'
+}
+rkd_pop=$(cd "$ROOT" && git grep -l "^# >>> resolve_kit_dir" -- '*.sh' '*.py' '.githooks/*' WIRE-INTO-PROJECT.md \
+  | grep -v "^$KIT_REL/resolve_kit_dir" || true)
+rkd_hits=$(cd "$ROOT" && printf '%s\n' "$rkd_pop" | scan_rkd_capture)
+[ -z "$rkd_hits" ] || { echo "FAIL a resolve_kit_dir copy captures its heredoc with cat again; read it with IFS= read -r -d '' instead:"; printf '    %s\n' "${rkd_hits//$'\n'/$'\n'    }"; st=1; }
+ok
+# ...the population is real, and holds a suite, a product file and a hook, or it is a gate over less.
+mapfile -t rkd_rows <<<"$rkd_pop"
+[ "${#rkd_rows[@]}" -gt 10 ] || bad "the kit-dir wrapper ban scanned a collapsed population"; ok
+{ [[ $rkd_pop$'\n' == *.test.sh$'\n'* ]] && [[ $'\n'$rkd_pop == *$'\n'.githooks/* ]]; } \
+  || bad "the kit-dir wrapper ban population lost its suites or its hooks"; ok
+# ...and it FIRES on a planted wrapper, and stays SILENT on a comment spelling the same idiom.
+plant="$TMP/rkd.test.sh"
+printf 'resolve_kit_dir() {\n  "$1" -c "%s\n' "$RKD_IDIOM" > "$plant"
+[ "$(printf '%s\n' "$plant" | scan_rkd_capture | wc -l)" = 1 ] || bad "the kit-dir wrapper ban does not fire on a planted cat capture"; ok
+printf '#!/usr/bin/env bash\n  # the old wrapper read %s, which forked\n' "$RKD_IDIOM" > "$plant"
+[ -z "$(printf '%s\n' "$plant" | scan_rkd_capture)" ] || bad "the kit-dir wrapper ban fires on a COMMENT spelling the idiom"; ok
 
 # ---- 3b. THE INVOCATION-SHAPE BAN ---------------------------------------------------------------
 # The §3 ban above matches the retired IDIOM (`command -v python3 …`). A launcher invoked BARE —

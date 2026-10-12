@@ -391,6 +391,22 @@ reset_tree() {
   printf 'delete refs/heads/ahead\ndelete refs/heads/trunk\n' | git --git-dir="$ORIGIN" update-ref --stdin
 }
 run() { bash "$SCRIPT" 2>&1; }
+# ---- ONE SCOPED RUN, its liveness asserted (TOOL-aSparedSpawn-7 S8). Leaves `out` and `rc` set and
+# ---- counts two assertions: the liveness line names the selection among what RAN, and the
+# ---- unreached-guard refusal is absent. A scoped arm reading no liveness line would pass on silence,
+# ---- since a check that never ran prints exactly what a clean one prints.
+run_scoped() { # selection
+  local _rs_l _rs_r
+  out=$(bash "$SCRIPT" --only "$1" 2>&1); rc=$?
+  _rs_l=$(grep "^check-unattended: --only $1 ran checks " <<<"$out" || true)
+  _rs_r=${_rs_l#*ran checks}; _rs_r=${_rs_r%%;*}
+  n=$((n+1))
+  case " $_rs_r " in
+    *" $1 "*) ;;
+    *) echo "FAIL run_scoped $1: no liveness line naming it among the checks that ran"; st=1 ;;
+  esac
+  miss "$out" "was requested and no guard for it ran"
+}
 # THE WHOLE-OUTPUT GREEN CONTROLS GRADE "NOTHING ELSE PRINTED", NOT "NOTHING PRINTED". Checks 45 and
 # 46 announce the effective LANDER_MODE, RESUME_SCHEDULE and SELFTESTS_OWED_PATHS on the DEFAULT
 # channel by design (the checker's header, THREE), so a control comparing the whole output to empty
@@ -3244,7 +3260,7 @@ reset_tree
 # H, the OWNER TURN after the push. This is the direction that destroys the provenance argument: the
 # one question the path may ask would be asked by a run already authorized, with nobody present.
 reset_tree
-mutate $KIT_REL/SKILL.template.md 's/One `AskUserQuestion`, every gap/One ask, every gap/'
+mutate $KIT_REL/SKILL.template.md 's/[Oo]ne `AskUserQuestion`, every gap/one ask, every gap/'
 mutate $KIT_REL/SKILL.template.md 's/^6\. \*\*The kickoff hand-back\*\*/6. **The kickoff hand-back** AskUserQuestion/'
 hit "$(run)" "the Skill's prompt path puts its owner turn AFTER the branch push, so the one question it is allowed to ask would be asked by a run that is already authorized and has nobody to answer it:"
 
@@ -4118,6 +4134,38 @@ git add -A && git commit -q -m "lane" -m "Pass: ARCH-tRun-1" --no-verify
 _bc_want=$(git rev-parse HEAD)
 _bc_got=$(cd "$TMP" && . "$TMP/$KIT_REL/lib-unattended.sh" && build_commit "$_bc_base..HEAD" ARCH-tRun-1 memory/builds/tRun "" "")
 same "build_commit passes over a commit whose trailer pairs none with the unit" "$_bc_got" "$_bc_want"
+# ...and the WALK MEMO (TOOL-aSparedSpawn-11 S5, AC7). With `_BC_MEMO` declared, a second call over one
+# range answers from the memo and starts no second `rev-list`; a third call over ANOTHER range starts
+# its own and answers for that range, which is what reds a key staged to omit the range. With nothing
+# declared every call walks. The `git` that `GIT` runs is shadowed on PATH by a counting stub that
+# appends one line per `rev-list` to a file and execs the real git: the walk runs inside the
+# function's own `$(…)`, where a counter variable would die, and a second `GIT` definition would be a
+# second spelling of a name the naming leg grades. Every answer is compared against an undeclared
+# call's, through `_BC_OUT` as the checkers read it.
+reset_tree
+_bc_base=$(git rev-parse HEAD)
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "lane" -m "Pass: ARCH-tRun-1" --no-verify
+_bc_want=$(git rev-parse HEAD)
+rm -f "$TMP/bc-revlist.log"; mkdir -p "$TMP/bc-bin"
+printf '#!/usr/bin/env bash\ncase " $* " in *" rev-list "*) echo r >> "%s" ;; esac\nexec "%s" "$@"\n' \
+  "$TMP/bc-revlist.log" "$(command -v git)" > "$TMP/bc-bin/git"
+chmod +x "$TMP/bc-bin/git"
+_bc_got=$(cd "$TMP" && . "$TMP/$KIT_REL/lib-unattended.sh" && {
+  PATH="$TMP/bc-bin:$PATH"
+  build_commit "$_bc_base..HEAD" ARCH-tRun-1 memory/builds/tRun "" "" >/dev/null; _u1=$_BC_OUT
+  build_commit "$_bc_base..HEAD" ARCH-tRun-1 memory/builds/tRun "" "" >/dev/null; _u2=$_BC_OUT
+  _un=0; [ -f "$TMP/bc-revlist.log" ] && while IFS= read -r _l; do _un=$((_un+1)); done < "$TMP/bc-revlist.log"
+  rm -f "$TMP/bc-revlist.log"
+  declare -A _BC_MEMO=()
+  build_commit "$_bc_base..HEAD" ARCH-tRun-1 memory/builds/tRun "" "" >/dev/null; _m1=$_BC_OUT
+  build_commit "$_bc_base..HEAD" ARCH-tRun-1 memory/builds/tRun "" "" >/dev/null; _m2=$_BC_OUT
+  build_commit "$_bc_want..HEAD" ARCH-tRun-1 memory/builds/tRun "" "" >/dev/null; _m3=$_BC_OUT
+  _mn=0; [ -f "$TMP/bc-revlist.log" ] && while IFS= read -r _l; do _mn=$((_mn+1)); done < "$TMP/bc-revlist.log"
+  printf 'u=%s,%s m=%s,%s other=%s walks undeclared=%s declared=%s' "$_u1" "$_u2" "$_m1" "$_m2" "$_m3" "$_un" "$_mn"; })
+same "build_commit memoises its walk per range only where the caller declares _BC_MEMO" "$_bc_got" \
+  "u=$_bc_want,$_bc_want m=$_bc_want,$_bc_want other= walks undeclared=2 declared=2"
+rm -rf "$TMP/bc-revlist.log" "$TMP/bc-bin"
 
 # ---- THE SKIPS ANNOUNCE. A run with no declaration would otherwise be green over nothing, and the
 # ---- default run must still print nothing.
@@ -4325,15 +4373,9 @@ mutate .unattended.conf 's/^UNDECLARED_WRITE_BUDGET=.*/UNDECLARED_WRITE_BUDGET="
 hit "$(run)" "UNDECLARED_WRITE_BUDGET is not a single integer, so the per-build comparison below would be a string test wearing a numeric name"
 reset_tree
 
-# ---- THE RETIRED KEY IS REFUSED BY NAME (S8), off the leg's text scan of declared names, so an
-# ---- adopter who upgrades without moving it is told which key replaced it. Staged out, the old key
-# ---- is silently ignored and the leg passes.
-reset_tree
-printf '\nUNDECLARED_WRITE_CEILING="0"\n' >> .unattended.conf
-out=$(run)
-hit "$out" " is retired: check 23 grades each run record against a per-build budget now, so declare UNDECLARED_WRITE_BUDGET in .unattended.conf and delete the old key, which nothing reads any more"
-# AC3 (TOOL-aWindowedPass-5): a conf still setting the retired key passes check 22 and is reported as
-# retired there; check 23's refusal above is the one that names the replacement.
+# ---- AC3 (TOOL-aWindowedPass-5): a conf still setting the retired key passes check 22 and is reported
+# ---- as retired there. Check 23's by-name refusal of it was retired by TOOL-aSparedSpawn-14 (row 15,
+# ---- no tombstone), so that report is the key's one carrier.
 reset_tree
 printf '\nUNDECLARED_WRITE_CEILING="5"\n' >> .unattended.conf
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
@@ -4653,7 +4695,7 @@ cd "$TMP" || exit 2; anchor_restore; read_topo s2   # every section after a re-c
 # ---- CHECK 39, arm one: a direct read of the phase fact in a function that is neither reader.
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
-mutate $KIT_REL/unattended.sh 's|^  read_derived_phase "$rel"; p="$DP_PHASE"; w=$(fact "$rel" witness)$|  p=$(fact "$rel" phase); w=$(fact "$rel" witness)|'
+mutate $KIT_REL/unattended.sh 's|^  read_derived_phase "$rel"; p="$DP_PHASE"; fact "$rel" witness >/dev/null; w=$_fact$|  fact "$rel" phase >/dev/null; p=$_fact; fact "$rel" witness >/dev/null; w=$_fact|'
 out=$(run)
 hit "$out" "the phase fact is read outside the two readers, or the recorded-phase allow-list disagrees with the source, so the effective phase and the recorded one can differ at a call site nobody classified"
 hit "$out" "reads the phase fact directly inside verb_status()"
@@ -5216,7 +5258,7 @@ cp "$TMP/$KIT_REL/ASKS.template.md" "$ak/memory/guides/UNATTENDED-ASKS.md"
 # the recall kit's extractor and its conf reader, into a directory the declared RECALL_CLI names
 # FOUND by the file only that kit holds, never by a typed kit directory (the carried-prefix ban).
 _rk_rel=$(git -C "$HERE" ls-files --full-name -- ':(top)*recall_conf.py' | head -n 1)
-_rk_src="$(git -C "$HERE" rev-parse --show-toplevel)/${_rk_rel%/*}"
+_rk_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/${_rk_rel%/*}"
 cp "$_rk_src/extract.py" "$_rk_src/recall_conf.py" "$ak/rk/"
 n=$((n+1)); [ -f "$ak/rk/extract.py" ] || { echo "FAIL the ask block could not copy the recall kit's extractor, so every S3 arm below would grade a missing grammar"; st=1; }
 printf 'MEMORY_ROOT=memory\nFAMILIES="example:EXMP tooling:TOOL"\n' > "$ak/.memory-tree.conf"
@@ -6227,11 +6269,59 @@ for o28 in 30 31 32 33 39 40 15 41 42 43; do
 done
 out=$(bash "$SCRIPT" --only 28 2>&1); rc=$?
 same "--only 28 without the report channel exits 0" "$rc" "0"
-same "--only 28 without the report channel prints nothing" "$out" ""
+# TOOL-aSparedSpawn-7 S4: without the report channel it prints ONE line, the liveness line.
+hit "$out" "check-unattended: --only 28 ran checks 28; skipped core "
+same "--only 28 without the report channel prints the liveness line alone" "${out%%$'\n'*}" "$out"
 # ...and the population is DERIVED: a header staged after the region is announced with no list edited.
 # 97 is a number no check of the leg uses.
-mutate $KIT_REL/check-unattended.sh '/^if \[ "\$SCOPE" = only28 \]; then$/a # ---- check 97 - a fixture header, staged after the 28 region'
+mutate $KIT_REL/check-unattended.sh '/^if \[ "\$SCOPE" = only28 \] || \[ "\$SCOPE" = core \]; then$/a # ---- check 97 - a fixture header, staged after the 28 region'
 hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" --only 28 2>&1)" "check 97 skipped under --only 28 — this run asked for the 28 region alone"
+# ==== TOOL-aSparedSpawn-7: `--only core` and `--only <N>`, each naming what ran ======================
+# ---- AC4: a selector naming no post-28 header, or no number at all, exits 2 before any check runs.
+reset_tree
+for _ss_v in 5 99 abc; do
+  out=$(bash "$SCRIPT" --only "$_ss_v" 2>&1); rc=$?
+  same "--only $_ss_v exits 2" "$rc" "2"
+  miss "$out" "UNATTENDED check"
+done
+hit "$out" "check-unattended: --only takes core, 28 or one check numbered after the 28 region; checks 1-27 share state and are one unit, so 'abc' is refused"
+hit "$(bash "$SCRIPT" --only 5 2>&1)" "check-unattended: --only 5 names no check header after the 28 region, and checks 1-27 share state and are one unit; this leg selects core, 28 or one of:"
+# ---- AC3: with check 30's guard staged out, `--only 30` reaches no `check_selected 30` and exits 2
+# ---- naming it, rather than reporting the silence of a check that never registered as clean.
+reset_tree
+mutate $KIT_REL/check-unattended.sh 's/^if check_selected 30; then$/if :; then/'
+out=$(bash "$SCRIPT" --only 30 2>&1); rc=$?
+same "--only 30 with its guard staged out exits 2" "$rc" "2"
+hit "$out" "check-unattended: check 30 was requested and no guard for it ran, so its verdict would be silence"
+# ---- AC8, AC2 and AC5: the PARTITION. Over the pristine fixture with one staged red in the 28 region
+# ---- (check 28's own scalar-parser arm) and one after it (check 39's allow-list), the SET of lines the
+# ---- unscoped run prints equals the union of the scoped runs' lines over every selection, liveness
+# ---- lines set aside. One comparison reads every check's lines, so a scoped run that drops or adds a
+# ---- verdict reds it whichever check it was. The selection list is this suite's pin of the population.
+# ---- `--only core` must name every post-28 check as skipped and print none of their failures (AC2),
+# ---- and the unscoped run prints no liveness line (AC5). Check 15 has a core half, so its failure
+# ---- line is not a negative here.
+reset_tree
+rm -f $KIT_REL/check-playbook.sh
+mutate $KIT_REL/check-unattended.sh 's/^PHASE_RECORDED_FNS="/PHASE_RECORDED_FNS="tNoSuchFn /'
+_ss_whole=$(bash "$SCRIPT" 2>&1)
+hit "$_ss_whole" "the declared-scalar parser is missing from one of the two scripts that inline it, so the comparison that keeps the copies one answer would pass over an empty pair - driver and leg follow:"
+hit "$_ss_whole" "the allow-list names tNoSuchFn(), which no longer calls read_recorded_phase()"
+miss "$_ss_whole" "check-unattended: --only"
+_ss_union=""
+for _ss_s in core 28 30 31 32 33 39 40 15 41 42 43 48 49 50 51 52; do
+  run_scoped "$_ss_s"
+  _ss_union+=$(grep -v '^check-unattended: --only ' <<<"$out" || true)$'\n'
+  if [ "$_ss_s" = core ]; then
+    _ss_skip=$(grep '^check-unattended: --only core ran checks ' <<<"$out" || true); _ss_skip=" ${_ss_skip#*; skipped} "
+    for _ss_n in 28 30 31 32 33 39 40 15 41 42 43 48 49 50 51 52; do
+      n=$((n+1)); case "$_ss_skip" in *" $_ss_n "*) ;; *) echo "FAIL --only core's liveness line does not name check $_ss_n as skipped"; st=1 ;; esac
+      [ "$_ss_n" = 15 ] || miss "$out" "UNATTENDED check $_ss_n FAILED"
+    done
+  fi
+done
+same "the scoped runs partition the unscoped run's lines" "$(printf '%s\n' "$_ss_union" | grep . | sort -u)" "$(printf '%s\n' "$_ss_whole" | grep . | sort -u)"
+reset_tree
 # ---- S6: the `--skip 28` smoke arm, the leg's other scope over the pristine fixture. It is also the
 # ---- GREEN CONTROL for every fixture below: the flag arm and the allow-list join read the pristine
 # ---- driver and leg without a finding, which is AC12's restored-verb half. Graded by what checks 22
@@ -6396,72 +6486,41 @@ mutate $KIT_REL/SKILL.template.md 's/then run `--hold` with the code/then run `-
 hit  "$(run)" "the Skill's hold paragraph routes a hold line to an override, which spends the one check between a run and its landing on a fault that is not the run's"
 reset_tree
 
-# ==== TOOL-dAlignedCarrier-1: CHECK 47, the retired commit premise in any shipped file of the kit
-# ---- The staged line is ASSEMBLED FROM FRAGMENTS split inside their words, so the staged sentence
-# ---- never exists contiguously in this suite's own bytes, and the real-tree leg, which reads this
-# ---- file too, stays clean. It is written to a file and appended by sed's `r`, as check 33's arm
-# ---- does, and the copy it lands in is the fixture's tracked lib, one of the population's plain
-# ---- shell files.
+# ==== TOOL-aSparedSpawn-14: CHECK 52, the three joins that replaced the driver's retired per-site
+# ---- refusals, on ONE fail line whose hits each name their join. Each staged break goes into the
+# ---- fixture's copy of the DRIVER, the one file the check reads, and each verdict is read off a run
+# ---- scoped to 52. A staged probe is written to a file and appended by sed's `r`, as check 48's arm
+# ---- does, so the real-tree leg never reads it. The first arm carries the line's whole literal.
+# ---- ROUTE (AC8): a scratch function naming its run-state file from `$_runmd` and refusing its absence
+# ---- by itself reds, naming the function...
 reset_tree
-_c47_no="n""o"; _c47_dv="dri""ver ve""rb"; _c47_cm="comm""its"
-printf '# the rows: %s %s %s them\n' "$_c47_no" "$_c47_dv" "$_c47_cm" > "$TMPBIN_PARENT/c47.line"
-mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
-out=$(run)
-hit  "$out" "a shipped file of this kit states the retired premise that the driver makes no commit of its own, but under LANDER_MODE=in-place --close commits its own records commit, so a reader who trusts the sentence expects staged rows to stay uncommitted after the close has committed them; reword it to name the step that commits them. matches: "
-hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: "
-# ...the NEAR-MISS, a control on the predicate rather than a second break: the same words ending in
-# a verb that makes no commit, the shape a sibling suite carries, stay silent. Without it the arm
-# above is equally consistent with a ban on every sentence that names the driver's verbs at all.
+printf 'c52probe() {\n  runmd_of "$1" >/dev/null; rel=$_runmd\n  [ -f "$rel" ] || { fail 99 "a scratch verb refusing a missing record by itself"; return 1; }\n}\n' > "$TMPBIN_PARENT/c52.fn"
+mutate $KIT_REL/unattended.sh "\$r $TMPBIN_PARENT/c52.fn"
+out=$(bash "$SCRIPT" --only 52 2>&1)
+hit  "$out" "the driver's shared refusals have a second spelling or a gap - a run-state test refusing outside check_run_state, a VERB_REQUIRES pair and its check_verb_flag call out of step, a claim mode or class its declarations lack, or a population with nothing to join - so the one arm each helper keeps no longer covers its condition: route c52probe() at line "
+# ...and the NEAR-MISS: the same test over a variable not named from `$_runmd` - a README, a brief, a
+# piece - stays silent, so the arm above is not a ban on every presence test that refuses.
 reset_tree
-printf '# the rows: %s %s does\n' "$_c47_no" "$_c47_dv" > "$TMPBIN_PARENT/c47.line"
-mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
-miss "$(run)" "UNATTENDED check 47 FAILED"
+printf 'c52probe() {\n  rel=$1\n  [ -f "$rel" ] || { fail 99 "a scratch verb refusing a missing file of its own"; return 1; }\n}\n' > "$TMPBIN_PARENT/c52.fn"
+mutate $KIT_REL/unattended.sh "\$r $TMPBIN_PARENT/c52.fn"
+miss "$(bash "$SCRIPT" --only 52 2>&1)" "UNATTENDED check 52 FAILED"
+# ---- FLAGS (AC9): a VERB_REQUIRES pair whose call is gone reds as unenforced.
 reset_tree
-
-# ==== TOOL-dAlignedCarrier-6: CHECK 47's SECOND ROW, the retired premise that the landing's close
-# ---- is where the owed flagged bar is told (closing review L2). Assembled from fragments split
-# ---- inside their words, as the first row's arm is, so this suite's own bytes form no instance.
-# ---- Both alternatives are staged, the mode token first and the announcing word first.
-_c47_ip="in-""place"; _c47_an="anno""unces"
-printf '# the %s close %s the owed bar\n' "$_c47_ip" "$_c47_an" > "$TMPBIN_PARENT/c47.line"
-mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
-out=$(run)
-hit  "$out" "a shipped file of this kit states the retired premise that the landing's close is where the owed flagged bar is told, but since TOOL-dAlignedCarrier-6 the move into VERIFYING announces it under every LANDER_MODE and the close says nothing, so a reader who trusts the sentence waits at the close for a notice that never comes; reword it to name the move into VERIFYING. matches: "
-hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: \"$_c47_ip close $_c47_an\""
+mutate $KIT_REL/unattended.sh '/check_verb_flag --park --reason/d'
+hit  "$(bash "$SCRIPT" --only 52 2>&1)" "flag --park --reason is listed and never enforced"
+# ---- CLAIMS (AC10): a case arm naming a mode CLAIM_MODES lacks, and separately a class CLAIM_READS
+# ---- lacks, each reds naming it.
 reset_tree
-printf '# it %s, on an %s close, that the bar is owed\n' "$_c47_an" "$_c47_ip" > "$TMPBIN_PARENT/c47.line"
-mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
-out=$(run)
-hit  "$out" "the retired premise that the landing's close is where the owed flagged bar is told"
-hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: \"$_c47_an, on an $_c47_ip close,\""
-# ...the NEAR-MISS: the same mode's close with no announcing word stays silent, so the arm above is
-# not equally consistent with a ban on naming that close at all.
+mutate $KIT_REL/unattended.sh 's/^  case "\$mode:\$cls" in$/&\n    scratch:mine) CW_ACT=renew ;;/'
+hit  "$(bash "$SCRIPT" --only 52 2>&1)" "claim mode scratch (an arm at line "
 reset_tree
-printf '# the %s close runs the bar\n' "$_c47_ip" > "$TMPBIN_PARENT/c47.line"
-mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
-miss "$(run)" "UNATTENDED check 47 FAILED"
+mutate $KIT_REL/unattended.sh 's/^  case "\$mode:\$cls" in$/&\n    holder:foreign-scratch) CW_ACT=take ;;/'
+hit  "$(bash "$SCRIPT" --only 52 2>&1)" "claim class foreign-scratch (an arm at line "
+# ---- LIVENESS: a driver with no VERB_REQUIRES row has nothing to join, and says so rather than
+# ---- passing over the empty set.
 reset_tree
-
-# ==== TOOL-dAlignedCarrier-6 rev-5: CHECK 47's WINDOW HOLDS EACH ROW'S WIDEST INSTANCE WRAPPED AT
-# ---- EVERY WORD, AND EACH EXCERPT IS WHOLE (closing review round 2, L1 and L4). Row 2's widest
-# ---- instance is eight words and row 1's seven. Each is staged once per position it can wrap at,
-# ---- every copy after a line of eight neutral words that flushes the window, and the ONE run must
-# ---- report the whole quoted excerpt once per copy: 7 for row 2, 6 for row 1. A window a word short
-# ---- drops a copy and a pattern ending on a bare stem truncates every excerpt, so either reds the
-# ---- count. Fragments as above, so this suite's own bytes form no instance.
-_c47_ip="in-""place"; _c47_an="anno""unces"; _c47_no="n""o"; _c47_vb="ve""rb"; _c47_cm="comm""its"
-for _c47_row in "$_c47_ip p q close r s t $_c47_an" "$_c47_no p q $_c47_vb r s $_c47_cm"; do
-  read -r -a _c47_w <<<"$_c47_row"
-  for ((_c47_i = 1; _c47_i < ${#_c47_w[@]}; _c47_i++)); do
-    printf '# f f f f f f f f\n# %s\n# %s\n' "${_c47_w[*]:0:_c47_i}" "${_c47_w[*]:_c47_i}"
-  done
-done > "$TMPBIN_PARENT/c47.line"
-mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
-out=$(run)
-same "check 47 row 2 wrapped at each of its 7 positions" \
-  "$(printf '%s\n' "$out" | grep -F "the landing's close is where the owed flagged bar is told" | grep -oF "\"$_c47_ip p q close r s t $_c47_an\"" | wc -l | tr -d ' ')" 7
-same "check 47 row 1 wrapped at each of its 6 positions" \
-  "$(printf '%s\n' "$out" | grep -F "the driver makes no commit of its own" | grep -oF "\"$_c47_no p q $_c47_vb r s $_c47_cm\"" | wc -l | tr -d ' ')" 6
+mutate $KIT_REL/unattended.sh '/^VERB_REQUIRES="/,/"$/d'
+hit  "$(bash "$SCRIPT" --only 52 2>&1)" "nothing to join: no VERB_REQUIRES row"
 reset_tree
 
 # ==== TOOL-dAlignedCarrier-6: CHECK 48, a run-state fact written after the function's last stage
@@ -6758,18 +6817,26 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- widening-repair block of region 8, so FLOOR_SHARD_8 carries the same +2 and the other seven
 # ---- are untouched. The block's old arm F, both ids in one group, is relabelled G. MEASURED on a
 # ---- slice of the prologue and arms A to G on node a, 2026-10-06; this pass runs no suite.
-FLOOR_ASSERTIONS=967
+# ---- RAISED 967 -> 1046 by TOOL-aSparedSpawn-7, 97 % of the 82 assertions its arms add in region 7,
+# ---- counted by reading, since the pass runs no suite: the `--only 28` arm's net one, AC4's eight,
+# ---- AC3's three and the partition's seventy (seventeen `run_scoped` calls at two each, the
+# ---- `--only core` skip loop's sixteen and fifteen, the staged reds' four and the final `same`).
+# ---- FLOOR_SHARD_7 carries the same +79 and the other seven are untouched. OWED: observed at VERIFYING.
+# ---- LOWERED 1046 -> 1041 by TOOL-aSparedSpawn-14 (row 15 of the first retirement batch): check 47's
+# ---- sixteen assertions and check 23's tombstone arm left, check 52's twelve arrived, counted off the
+# ---- diff; region 3 carries -1 and region 7 -4. This pass runs no suite. OWED: observed at VERIFYING.
+FLOOR_ASSERTIONS=1041
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
 FLOOR_SHARD_1=159
 FLOOR_SHARD_2=67
-FLOOR_SHARD_3=128
+FLOOR_SHARD_3=127
 FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133
 FLOOR_SHARD_6=150
-FLOOR_SHARD_7=226
+FLOOR_SHARD_7=301
 FLOOR_SHARD_8=208
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;

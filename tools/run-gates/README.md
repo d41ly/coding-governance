@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.37` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.40` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -17,7 +17,7 @@ its own, and the canary asserts that.
 |---|---|---|
 | 0 | GREEN: every leg that ran passed, over a tree that did not move, with at least one leg line reported and the run record's verdict file written | `gates GREEN — …` |
 | 1 | RED: one or more legs failed and at least one of them is not HOST, or the whole-run wall fired | `gates RED — …` |
-| 2 | REFUSED: not run from a repository, no usable python, a manifest or profile table it cannot read, a scratch dir or run record it cannot create, a manifest whose every leg is held, a run that reported no leg line (an empty manifest), or a green whose verdict file was not written | a `run-gates:` line, or `gates REFUSED — …` |
+| 2 | REFUSED: not run from a repository, no usable python, a manifest or profile table it cannot read, a scratch dir or run record it cannot create, a manifest whose every leg is held, a run that reported no leg line (an empty manifest), a green whose verdict file was not written, or a declared generated output that is stale or unproven (see "Generated outputs") | a `run-gates:` line, or `gates REFUSED — …` |
 | 3 | TREE MOVED: no leg failed, but the tree changed while the bar ran, so no verdict describes it | `gates TREE MOVED — …` |
 | 4 | HOST: every failed leg timed out twice, the second time alone, while one spawn cost more than `GATE_HOST_RATIO` times this clone's recorded floor, so the verdict is about the host and not the subject | `gates HOST — …` |
 
@@ -43,16 +43,22 @@ the TERM — is not failed on the spot, because a bar under its own concurrency 
 a fraction of the time alone. It is printed in its manifest position as
 
 ```
-GATE retry  <leg>  (timed out after <n>s beside <k> neighbours; one serial retry after the pool drains)
+GATE retry  <leg>  (timed out after <n>s beside <k> neighbours; retried in the pool's tail, and alone after it drains unless that passes)
 ```
 
 where `<k>` counts the legs that were running when it timed out. Its chunk closes `pending`, never
-`green`. After the pool drains, and inside the run's wall, each such leg runs once more ALONE under its
-own ceiling and prints its final line: `GATE ok    <leg>  (retried after timeout)`, which counts green,
-or `GATE FAIL  <leg>  (timed out after <n>s, again on its serial retry; …)`, whose note says whether
-HOST was read and why not. One `---- retry: <green|RED|HOST|killed>  (<n> retried, <m> failed)` line
-follows. Any other 137 — a self-kill, an OOM kill, an operator's or a CI cancel, under a bound or with
-none — is an ordinary failure and is never retried; nor is an assertion failure.
+`green`. The worker that saw the ceiling fire leaves a `<i>.defer` marker in the work dir, and once
+every first attempt is dispatched the pool starts that leg's retry as soon as at most one other job
+runs: the pool's TAIL, where the floor leg runs alone and the other slots sit idle. A tail retry that
+passes is final. One that does not decides nothing: its files are set aside as `<i>.tail.*` and,
+after the pool drains and inside the run's wall, the leg runs once more ALONE under its own ceiling,
+as does a deferred leg the tail never reached. Each retried leg prints its final line after the drain,
+in the order it was deferred: `GATE ok    <leg>  (retried after timeout)`, which counts green, or
+`GATE FAIL  <leg>  (timed out after <n>s, again on its serial retry; …)`, whose note says whether
+HOST was read and why not, so a red verdict and a HOST reading always come from an attempt that ran
+alone. One `---- retry: <green|RED|HOST|killed>  (<n> retried, <m> failed)` line follows. Any other
+137 — a self-kill, an OOM kill, an operator's or a CI cancel, under a bound or with none — is an
+ordinary failure and is never retried; nor is an assertion failure.
 
 **HOST is a ratio, never a wall clock.** Each bar with a bounded leg to run times ten spawns of one
 external binary and keeps the lowest figure this clone has ever measured in `gate-spawn-floor` under
@@ -67,8 +73,9 @@ calling it another tenant. A descendant that left that group on its own is invis
 (make the verdict write fail) are arm seams for the suites, not conf keys: the runner unsets each
 once read, and the pre-push hook clears all three before the bar it runs.
 
-The records keep both attempts: the first attempt's `<i>.leg` row reads `timeout` and a
-`<i>.retry.leg` row sits beside it, the verdict file gains `retried <n>`, and the ledger row takes the
+The records keep every attempt: the first attempt's `<i>.leg` row reads `timeout` and a
+`<i>.retry.leg` row sits beside it, with a set-aside tail attempt's `<i>.tail.leg` between them when
+there was one, the verdict file gains `retried <n>`, and the ledger row takes the
 retry's seconds with the status `retried`, which reuse never accepts. The drift report sums `retried`
 across the run records as `legs_retried_after_timeout`.
 
@@ -98,6 +105,32 @@ The state reaches two other readers: the deployer, which reads a held leg as `he
 leg that vanished, and the `gate-full-green` stamp, which records whether the run covered them so a
 push boundary cannot mistake a partial bar for a whole one.
 
+### `GATE_SELFTESTS=changed` — only the held legs whose kit moved
+
+A developer tool, and a Definition-of-Done one: no push boundary sets it (TOOL-aSparedSpawn-12, owner
+ruling F1). A held leg executes when any of these holds, and is otherwise held with
+`GATE held  <name>  (self-test, unchanged since <sha8>)`:
+
+- it has no last-run record, an unreadable one, one whose sha is not an ancestor of `HEAD`, or one
+  earned under a different manifest row;
+- the record sits more than `GATE_SELFTESTS_MAX_LAG` first-parent commits behind `HEAD` (default
+  10, the value of the push boundary's `GATE_FULL_MAX_LAG`), so no `changed` run holds a suite on a
+  record that old;
+- a path in its selection set differs between the recorded sha and the working tree.
+
+The selection set is the owning kit's shipped sources in govkit's epoch roles
+(`govkit.py shipped --epoch`, the same rows the version-bump rule reads) plus the suite file; the
+owner is every govkit entry whose `shipped` rows carry one of the leg's suite files. A leg no kit
+owns, and every leg when govkit cannot be reached, selects by its `guard` plus its suite file, and the
+bar says so once. Each executing leg gets a `run-gates: selftests changed: <name> runs (<reason>)`
+line before dispatch.
+
+The record is one file per held leg under `<git-common-dir>/gate-selftest-last/`, shared by every
+worktree of the clone. It is written only by a leg that executed green on a tree that was clean when
+the run started and did not move, under any non-empty `GATE_SELFTESTS`, so a `GATE_SELFTESTS=1` run
+seeds every record; a red or a retried pass removes it. The `gate-full-green` stamp of such a run
+says `selftests changed`, never `1`, and a push that runs the self-tests forces over it.
+
 ## Why it became a kit
 
 It was a registry EXEMPTION, with two stated reasons that were both exact. It sourced `<prefix>/lib/`,
@@ -118,39 +151,243 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `gate-profiles.txt` | the DECLARED knob table: rows of name, minimum cores, minimum RAM MB, knobs, most-capable-first with a zero-threshold catch-all last. `GATE_PROFILE=<row>` selects one by name and skips detection; `GATE_PROFILES=<path>` reads a different table, and an absent path falls back to the built-in formula — which is the rollback. `GATE_CORES` / `GATE_RAM_MB` replace the detected readings and bypass detection, and `GATE_CGROUP_ROOT` relocates the cgroup files the RAM chain reads |
 | `lib-attribute.sh` | the attribution's two shared halves, SOURCED and never run: the normaliser (`write_normaliser`) and the detached scratch worktree at a base (`add_scratch_worktree` / `remove_scratch_worktree`). The runner sources it only when `GATE_ATTRIBUTE` is set and a leg is red, and `run-selftests.sh` only under `--attribute`, so a copy of either runner without it still runs every other mode |
 | `post-merge.sh` | the post-merge bar: the full bar on a landed sha, run through `--hold` in a scratch worktree, its verdict published as the remote ref `refs/gov/bar-red`; see "The post-merge bar" |
-| `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
+| `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file, both walked with `--untracked-files=all` so a file inside a new directory is hashed rather than collapsed into its `?? dir/` line; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
 | `profile_bar.py` | the profiling verb: runs the bar, records it as a RUN, and names the regime — floor-bound or packing-bound — so the next fix is chosen from a measurement |
 | `profile_bar.test.sh` | the profiler's own arms |
 | `run-gates.test.sh` | the SHIPPED canary — every assertion here is true in any tree |
 | `run-gates.gov.test.sh` | the GOV-ONLY arms, withheld from the payload; see below |
 | `run-gates.evidence.test.sh` | the durability arm: a red leg's output survives on disk |
 | `run-gates.turnstile.test.sh` | the turnstile arms: peak occupancy, reaping, FIFO order, release on every signal |
-| `run-gates.runlog.test.sh` | the run-log arms: one line per bar on every exit path after the trap and on every caught signal, withheld from the payload |
+| `run-gates.runlog.test.sh` | the run-log arms: one line per bar on every exit path after the trap and on every caught signal, and the `SPAWNS` arm's per-leg spawn ceiling, withheld from the payload |
 | `adopt-run-gates.sh` | `--check` asserts a target's `[gate_runner]` declaration still matches this runner's output strings |
 | `adopt-run-gates.test.sh` | the adopter e2e, gated on EFFECTS rather than exit codes |
 | `check-receipt.py` | the leg `receipt sync (installed files match the receipt)`: every engine row of `.governance/install.json` still on disk and still hashing to its recorded sha256, or, where the raw bytes miss, hashing through the target's own clean filter to the row's `oid` while the raw bytes' blob does not: that row is graded clean and counted `eol-only` on the summary and `ok` lines, the rule `govkit check` applies, in one `git hash-object --stdin-paths` spawn for every such row. A row with no `oid`, a real edit, a CRLF copy no filter normalizes, a tampered `sha256` over bytes that are the blob, a tree with no `.git` and a git refusal all still red, the last two with a `GIT` line naming why. The INTEGRITY half only — it reads no `source`, `commit` or `gov_oid`, because those resolve against a gov checkout an adopter does not have, and it grades no `seed`, `merged`, `attributes` or `forked` row. A tree with no receipt is an announced `SKIP`, and the built-in fixture arms, the eol-only ones over real git repositories, run on every invocation so the leg has a verdict there too; its `fixtures:` line prints their count |
+| `run-held-wsl.sh` | the held tier split in two: its Linux-safe legs in WSL2 from an ext4 mirror, the declared Windows-only legs natively, one combined verdict; see below |
+| `held_halves.py` | the split's partition, host resolution, combiner and parity record, with a `--selftest` that builds its own synthetic halves |
+| `windows-only-legs.txt` | gov's declaration of the held legs that run natively, one `<leg> TAB <reason>` row each; withheld from the payload |
+| `regen.py` | the generated-output verb behind `--regen`, `--regen-check` and `--regen-list`: it reads the staged `[[generated]]` and `[[regenerate]]` rows of every tracked kit descriptor and regenerates them in stage order, or proves each fresh without writing; see "Generated outputs" below |
 | `kit.toml` | this entry, declared as data |
+
+## Generated outputs — declared by the kit that writes them
+
+A merge bar grades generated outputs for freshness: the build index, the bug-class index, the
+codebase map, and the Skills and guides the kits render from templates. Each one is declared in the
+descriptor of the kit that generates it, so the set is read from the kits and never kept as a list
+here (TOOL-aPrimedIndex-1).
+
+| table | keys that make a row an item | the item's check |
+|---|---|---|
+| `[[generated]]` | `write` and `check`, argv arrays, and `stage`, an integer; all three or none | the row's `check` |
+| `[[regenerate]]` | `stage`, plus an optional `check` argv | the row's `check`, else the kit's `[check]` argv |
+
+The argv tokens are the four the descriptors already spell: `{kit}`, `{prefix}`, `{memory_root}`
+and `{map_root}`. An argv beginning `python` or `python3` runs under the reader's own interpreter.
+Rows sharing one write and one check are one item.
+
+**Stages run in order, the items of one stage concurrently**, because one stage's outputs are
+disjoint and a later stage reads an earlier one's:
+
+| stage | what it holds |
+|---|---|
+| 1 | renders from kit templates: the Skills, the rendered guides and documents, the charter region |
+| 2 | indexes over the records: the build index and its views, the bug-class index |
+| 3 | the codebase map, which reads the output of both earlier stages |
+
+A row with none of the keys keeps exactly its old meaning: the unattended kit reads `[[generated]]`
+for its write-set rules and govkit runs `[[regenerate]]` argvs, and neither reads these keys.
+
+### `--regen`, `--regen-check`, `--regen-list` — one command for every declared output
+
+`regen.py`, beside the runner, reads the declarations above and is reached through the runner's
+first argument, so it needs no python launcher of the reader's own (TOOL-aPrimedIndex-2):
+
+```bash
+bash <prefix>/run-gates/run-gates.sh --regen         # run every write, stage by stage; prints what each stage moved
+bash <prefix>/run-gates/run-gates.sh --regen-check   # run every check; writes nothing
+bash <prefix>/run-gates/run-gates.sh --regen-list    # the resolved items, in run order
+```
+
+The tree is the current directory's git toplevel; the descriptors are the tracked `kit.toml` files
+one directory below the tool root, where this kit sits in its own repository. `--regen` names any
+untracked file first, because the build-index generator enumerates tracked files and does not see a
+record until it is added. A write that exits non-zero is followed by its own check: a fresh check
+makes it `declined`, which a kit's adopter is when it renders nothing in a state its kit declares
+legal, and the stage goes on. A write whose check is not fresh FAILS, and a failed write stops
+before the next stage. `--list` names every `[[regenerate]]` row it skips for carrying no stage.
+
+| exit | `--regen` | `--regen-check` |
+|---|---|---|
+| 0 | every write ran | every item fresh |
+| 1 | a write failed, or timed out, and its check is not fresh | an item stale, its check failed, or it timed out |
+| 2 | REFUSED: a descriptor that does not parse, a malformed row, an unresolved token, a script an argv names that is not in the tree, no repository | the same |
+
+`GATE_REGEN_JOBS` bounds concurrency (default 4) and `GATE_REGEN_BOUND` bounds each command in
+seconds (default 900). A command's output goes to a file and never through a pipe, so the bound
+holds whatever its children do; a command outliving it is killed with its process tree (`taskkill
+/T` on Windows, its process group on POSIX), and an MSYS fork can still escape Windows parentage. A
+`bash` argv runs under the bash `profile_bar.resolve_bash` finds by running each candidate, never by
+`PATH` order, which reaches WSL's first on a default Windows `PATH`. **What it does not check:** that
+a write writes what its row names, or that a check grades it; a check red for a reason a regeneration cannot fix reads as stale, and its output
+tail is printed so a reader can tell.
+
+### Every bar proves them fresh before it queues
+
+After its profile and process-monitor lines and before the host turnstile, the runner runs
+`regen.py --check`. A stale, failed or timed-out item, or a declaration the verb refuses, ends the
+run with exit 2, REFUSED, before any leg, naming `--regen` and saying to commit what it moves
+(TOOL-aPrimedIndex-3); a refused declaration gets its own line, because `--regen` cannot cure it. Before the queue, because a refusal after an hour in another bar's queue is
+the cost the check exists to remove. Every bar entry point reaches the runner — a hand-run bar, the
+pre-push hook, the lander's push, the unattended close and remote CI — so this binds all of them.
+govkit's `apply` reads the runner too, for its baseline and after verdicts, and runs it with the
+check skipped, because it compares legs and a stale output reads there as its own leg's red
+(DEPL-aPrimedIndex-1).
+
+The runner never regenerates the tree it grades: at the push boundary the hook refuses a dirty tree,
+and a green earned over an uncommitted regeneration could never be reused. A tree with no kit
+descriptor at the tool root prints one line and spawns nothing. `GATE_REGEN_CHECK=0` skips the
+check with a line naming the knob. A stale output then reds only where its own leg runs in that bar,
+and a guard can skip that leg, so a skip can turn a refusal into a green. The pre-push hook therefore
+scrubs the knob from the bar that lands (TOOL-aPrimedIndex-6).
+
+### The lander regenerates over its merged tree
+
+`<prefix>/push-main.sh` is the verb's second caller (TOOL-aPrimedIndex-4). `--prepare` runs
+`regen.py --write` over the merged tree after the version mint, and what it moved enters the
+prepared merge the way the mint's output does, same parents and same subject. The attended landing
+runs it on every attempt after its mint commit and commits what moved as its own commit, subject
+`regen: generated outputs onto <remote>/<default> at <sha8>`, with a `Pass: none` trailer. That is
+what keeps a reconcile merge, which leaves the `merge=ours` indexes stale, from meeting the push
+bar's refusal. A failed write refuses the landing: `--prepare` leaves the branch where it was, and
+the attended landing keeps the reconcile merge and the mint commit it already made on the local
+default branch, as a refused mint does. Either way the files the regeneration created are cleaned
+(TOOL-aPrimedIndex-8). A lander with no `regen.py` beside it says so in one line and lands without
+it.
 
 ## Reuse, and the baseline a guard diffs against
 
-`GATE_REUSE` skips a leg whose inputs are byte-identical to a recorded green, in one of two modes.
-Either way the leg is not declared `impure`, its row in `<git-dir>/gate-ledger.tsv` says `ok`, and
-the row's input key equals the one computed this run. The key hashes the leg's argv, the run's base
-and the leg's guard paths (index entries plus their porcelain lines), or the whole-tree fingerprint
-for an unguarded leg. Any missing term means execute: every failure mode is "did more work", never
-"checked less". The runner reads the knob once, records it as the run header's `reuse` key, and
-unsets it before any leg starts, so a leg's nested runner never inherits a mode.
+Reuse skips a leg whose inputs are byte-identical to a recorded green. There are three modes, two
+over the CACHE and one over the LEDGER, each asked for by its own knob, and a run takes ONE of them by
+the table below (TOOL-aSparedSpawn-32, composing TOOL-aSparedSpawn-13's cache with
+TOOL-aFrugalTurnstile-4's lineage). The runner reads the three knobs once, records the mode as the run
+header's `reuse` key, `off`, `env`, `push` or `lineage`, and unsets all three before any leg starts,
+so a leg's nested runner never inherits a mode. Any missing term of a mode means execute — every
+failure mode is "did more work", never "checked less".
 
-- **`GATE_REUSE=1`**, or any value but `lineage`, is the OPT-IN mode, for a run you ask for by hand.
-  A run that reused anything in it cannot stamp `gate-full-green`.
-- **`GATE_REUSE=lineage`** also wants the row's `full` field to read `1`, meaning the run that
-  earned it set `GATE_FULL` on a clean tree. Its `manifest_blob` must be this run's, and its `head`
-  must be an ancestor of `HEAD`. A run whose every reuse meets those terms may still stamp
-  `gate-full-green`, which records the count as `reused`. `.githooks/pre-push` exports this mode on
-  its own FULL decision for this runner, and on no other decision or bar. That FULL line ends
-  `— reuse: lineage`. So after a red push, the fix push re-runs the failed legs and the legs whose
-  key moved, and nothing else. The key's base term ties one chain of reuses to one remote base,
-  because a landing moves the base and voids every key.
+| `GATE_FULL` | `GATE_REUSE_LINEAGE` | `GATE_REUSE_PUSH` names HEAD | `GATE_REUSE` | mode | named on stderr as not used |
+|---|---|---|---|---|---|
+| set | set | any | any | `lineage` | `GATE_REUSE` and `GATE_REUSE_PUSH`, when set |
+| set | empty | any | any | `off` | `GATE_REUSE` and `GATE_REUSE_PUSH`, when set |
+| empty | any | yes | any | `push` | `GATE_REUSE_LINEAGE`, when set |
+| empty | any | no | set | `env` | `GATE_REUSE_LINEAGE`, when set |
+| empty | any | no | empty | `off` | `GATE_REUSE_LINEAGE`, when set |
+
+`.githooks/pre-push` never sets two of them for one bar: it clears every inherited one first, then sets
+`GATE_REUSE_LINEAGE` only on a FULL decision and `GATE_REUSE_PUSH` only on a SCOPED one, so the table
+governs a direct caller. `GATE_FULL` keeps meaning "no cache reuse", and the boundary's lineage run is
+the one deliberate exception, because its reused verdicts were earned by full runs.
+
+**What the stamps record.** `gate-full-green` carries `reused`, the legs the run carried forward, and
+`reused_cache`, the legs it took from the cache. A run that reused anything from the cache stamps
+neither `gate-full-green` nor the inherited green, so `reused_cache` is always `0` there, and a full
+green carries `reused` above 0 only from lineage. The push boundary's predicate 9 forces the full bar
+over a non-zero `reused_cache`, and over a record with no `reused_cache` and a non-zero `reused`, which
+was written before the field existed and cannot say its kind. The inherited green records `reused 0`
+and `reused_cache 0`.
+
+### The cache, `env` mode — `GATE_REUSE=1`
+
+`GATE_REUSE=1` skips a leg whose inputs are byte-identical to a recorded green: it carries no legacy
+`impure`, a `remote` leg has an observed remote, its row is not quarantined, the cache in the git
+common dir holds an `ok` under the key computed this run, it has not been reused on 10 runs in a row,
+and the sample did not draw it. It is OPT-IN because an advisory input may cause less work only on a
+run that is not authoritative, and a run you ask for by hand is not one.
+
+### The cache, `push` mode — `GATE_REUSE_PUSH`, at the boundary's SCOPED decision
+
+An authoritative run reuses only a `remote` or `history` leg, at the exact pushed sha and observed
+tip, and is then scoped: `.githooks/pre-push` sets `GATE_REUSE_PUSH` to `<pushed sha> <tip>
+<advertisement digest>` on a SCOPED decision whose `ls-remote` probe agreed with the remote sha git
+handed it, and on no other, and it clears `GATE_REUSE`. The terms are the env mode's, narrowed to those
+two classes, and the mode holds only while HEAD is the pushed sha.
+
+The push key's environment is the caller's, restored: git starts the hook with `GIT_EXEC_PATH`, its
+exec path at PATH's head and, on Git for Windows, `LC_CTYPE=C.UTF-8`, none of which a direct bar from
+your shell had. So beside `GATE_REUSE_PUSH` the hook writes the environment as it was before git, with
+those additions taken back out, to a file in the git dir, and names it in `GATE_REUSE_DIGEST_ENV`; in
+this mode alone the digest reads that file in place of the runner's own environment, and a file that
+cannot be read fails the digest. The legs still run under the hook's environment: only the key reads
+the caller's. A value the hook cannot tell from git's own is left out, which costs a saving and never
+a verdict.
+
+**What a leg reads beyond its inputs** is declared on its manifest row as `reads`, an object mapping
+a class to a one-line reason. The classes are closed, and each puts one thing into the key:
+
+| class | the key takes | for a leg that |
+|---|---|---|
+| `base` | the resolved baseline and `GATE_PUSH_BASE` | diffs against a merge-base or the push base |
+| `history` | the `HEAD` sha | reads commits, so a commit moves it with the tree unchanged |
+| `clock` | the UTC day (`GATE_REUSE_DAY` pins it) | compares against today |
+| `remote` | `HEAD`, the default branch's advertised tip and the digest of the whole `ls-remote --heads` advertisement | observes the remote |
+
+A leg that declares none is keyed on its inputs alone, so a landing that moves the baseline no longer
+misses it. A legacy `impure`, a class outside the four, or a `reads` that is no object is read as
+`remote` and never reused, so an adopter's `impure` keeps its meaning; govkit writes a descriptor's
+`reads` into an adopter's row as that legacy `impure`. A `remote` leg is keyed only when the runner
+probes the remote (one bounded `ls-remote --heads`, on a clean tree, when such a leg is still to run)
+and caches its verdict only when a second probe after the legs end reads the same advertisement.
+
+**The cache** is one file per key under `<git-common-dir>/gate-cache/<key[0:2]>/<key>`, holding `ok`,
+seconds, run id, `HEAD`, an epoch and its reuse count, so every worktree of a clone shares it and nothing pushes it. It
+is written only by a leg that EXECUTED `ok` on its first attempt on a tree that was clean when the
+run started and did not move, with its count at 0; a reused leg rewrites only its count, so a wrong entry cannot carry itself
+forward. Every write and the prune of entries older than 30 days run in one python process at run
+end. `gate-ledger.tsv` is the dispatch-duration hint and the lineage mode's store; neither cache
+mode reads it.
+
+**The soundness sample.** On a reusing run each reusable leg is drawn for execution at
+`GATE_REUSE_SAMPLE` (default `0.25`, uniform per leg, seeded from the run id so a draw replays). A
+drawn leg that executes green agrees. One that reds against its cached `ok` has redded the run and
+runs once more: red again prints `cache disagreement · <leg> · <key>` and erases the entry, red then
+green prints `nondeterministic · <leg>`, and either quarantines the leg (`quarantine.<name key>` in
+the cache dir) until its manifest row changes. A leg reused on 10 consecutive runs executes on the
+next whatever the draw, so a wrong entry lives at most that long. The count is kept per KEY, in the
+entry itself: only an execution under that key resets it, by writing a fresh entry, and an execution
+under another key, a dirty tree's for one, leaves it alone. Each fact is on the leg's own line, under
+the two-space tail: `GATE ok    <leg>  (sampled against a cached ok)` for a drawn leg, and
+`(executed: reused on 10 runs in a row)` for one the bound forced, on its `GATE ok` or `GATE FAIL` line.
+An executed red against a cached `ok` erases the entry and quarantines the leg,
+whatever drew the execution: the age bound, a plain bar, or a push-mode bar that may not reuse
+that leg. Only a drawn leg runs once more to classify; any other takes its effective verdict, its
+serial retry's where it had one, and prints `cache disagreement · <leg> · <key>`.
+
+The key takes the leg's argv, its manifest row (classes and row hash), the declared reads above, and
+its inputs: for a guarded leg the `git ls-files -s` of its guards plus the walk rows under them, each
+`<XY> <blob-or-dash> <path>`, the blob hashed at run start from one `--untracked-files=all` walk; for
+an unguarded leg the working-tree fingerprint. Every key also takes `REUSE_SCHEMA`, a runner constant
+bumped when what a reusable `ok` means changes, and one digest per run of bash, the MSYS or Cygwin
+runtime, python and its UTF-8 mode, `git version` and its `core.autocrlf`/`core.eol`, the resolved
+location of every tool a leg names, and the exported `GATE_* GOV_* *_PY GIT_* PYTHON* LC_* LANG TZ
+PATH` variables, less every `GATE_REUSE*` knob, `GATE_TURNSTILE_HELD`, `GATE_TURNSTILE_HOLDER`, `GATE_RUN_ID`, and `GATE_BASE`
+and `GATE_PUSH_BASE`, which enter only a `base` leg's key. Each `/bin` in PATH is read as `/usr/bin`
+where the two are one directory, for the PATH line and the tool locations alike. It does NOT see a tool other than git
+upgraded in place at the same path, a variable outside that set, or a read no class names, which is
+what the sample exists to catch. A failed walk or digest makes the key a dash, which never matches,
+and a run that would have reused or cached says so once on stderr: `run-gates: reuse — the input
+keys could not be measured (<step>), so nothing is reused or cached this run`.
+The header's `reuse_schema` and `reuse_sample` keys say how a run keyed and drew.
+
+### Lineage — `GATE_REUSE_LINEAGE`, at the boundary's FULL decision
+
+`GATE_REUSE_LINEAGE`, honoured only beside `GATE_FULL`, reuses a leg from `<git-dir>/gate-ledger.tsv`
+and never from the cache: the leg is not declared `impure`, a `remote` leg has an observed remote, its
+row says `ok`, the row's input key equals the one computed this run, its `full` field reads `1`,
+meaning the run that earned it set `GATE_FULL` on a clean tree, its `manifest_blob` is this run's, and
+its `head` is an ancestor of `HEAD`. A run whose every reuse meets those terms may still stamp
+`gate-full-green`, which records the count as `reused`. `.githooks/pre-push` exports this mode on its
+own FULL decision for this runner, and on no other decision or bar. That FULL line ends `— reuse:
+lineage`. So after a red push, the fix push re-runs the failed legs and the legs whose key moved, and
+nothing else. The key's base term ties one chain of reuses to one remote base, because a landing moves
+the base and voids every key.
 
 WHAT LINEAGE REUSE DOES NOT CHECK: that a reused leg's guard names every input the leg reads, or
 that its verdict depends on the tree alone. A reused verdict is only as good as its input key, so
@@ -160,7 +397,9 @@ run.
 
 The ledger is per git dir, so a bar run in one worktree feeds lineage only to pushes from that
 worktree. A row written before these fields existed has an empty `full` and is never
-lineage-reusable. The inherited-green stamp still asks that nothing was reused.
+lineage-reusable.
+
+### The baseline
 
 The baseline a guard diffs against is the MERGE-BASE with the default branch, so a branch is graded
 on what it changed rather than on everything that landed while it was open — used only where the
@@ -189,7 +428,7 @@ worktree serves the primary tree's push. It is one slot per clone, last writer w
 worktree's green evicts the first, which costs that push its saving and never its verdict.
 TOOL-dThriftyLanding-1, -2, -3.
 
-## The turnstile — one bar per host
+## The turnstile — `slots` bars per host, one by default
 
 A run claims a beacon in a HOST directory before it dispatches: `GATE_TURNSTILE_DIR`, else
 `~/.gov/gate-turnstile`. Every repository on the machine shares it, because bars from different
@@ -198,6 +437,47 @@ the scratch sweep stay per git common dir. A host dir that cannot be created fal
 dir for the beacon and the queue, with a NOTE, which is per-repository queueing. A runner older than
 this keys on its common dir and does not see the host beacon, so serialization is complete only when
 every repository on the host carries this runner.
+
+**The turnstile admits `slots` holders at once** (`TOOL-aPairedSlots-2`), the selected profile row's
+`slots` knob, 1 where it declares none, `GATE_TURNSTILE_SLOTS` over it. Each holder owns its own
+beacon directory: slot 1 is `gate-bar-beacon`, slot k is `gate-bar-beacon.<k>`. The queue is still
+one FIFO: only the ticket that sorts first claims, it takes the first free slot, and it gives up its
+ticket at once, so a second free slot goes to the next ticket one tick later. A waiter reaps a dead
+or stalled holder slot by slot, each removal guarded by the nonce it judged, and a release frees only
+its own slot. Above one slot a queued bar's line reads
+`<k> of <n> bar slots on this host are held — <repo> run <id> pid <pid>[; …] — queued at position N (waited Ns)`
+and the run record's header gains `slots` and `slot`; at one slot nothing printed or written changes,
+except where a bar's own worktree holds it back, as the next paragraph says.
+A host whose repositories declare different counts admits the LARGEST, since every runner claims
+among its own slots and all share slot 1 and the queue: a runner older than this claims slot 1 alone.
+A count above 64 is refused in a row and ignored, with a NOTE, in the override.
+
+**A worktree holds one bar at a time** (`TOOL-aPairedSlots-5`, `TOOL-aPairedSlots-15`). Everything
+under a worktree's git dir — its ledger, run records, gate logs and summary — assumes one writer, so
+a bar does not claim while any holder present names its own top level: a slot at any count, or a
+docs beacon. A head held back that way waits, keeping later tickets behind it, and its line names
+that holder: `… this worktree's bar holds <slot k|the docs key> — <repo> run <id> pid <pid> — queued
+at position N (waited Ns)`. Two worktrees of one repository have two git dirs and run at once.
+
+**A bar that acquires while another slot is held takes the shared width** (`TOOL-aPairedSlots-3`):
+the held count is read once, right after the acquire, and the constant `TS_SHARE_RULE` decides —
+`half` divides the width by the held count, `full` leaves it. The rule is the two-bar A/B's
+(`TOOL-aPairedSlots-9`), which sets it. `GATE_JOBS` is the operator's width and is never divided. The
+bar prints `gate profile: width <w> at dispatch — <k> of <n> bar slots held (<rule>)`, and the
+summary file and header record that width; a bar that acquires alone prints nothing and keeps its
+profile's width, and is not narrowed later when a neighbour arrives. The memory pause needs no
+counterpart: it reads a host-wide source, so two bars already pause on one reading.
+
+**A doc-only bar never queues** (`TOOL-aPairedSlots-4`). A run whose docs mode resolved — a
+`GATE_DOCS_BASE` naming a commit, with `GATE_FULL` unset — takes no ticket and claims no slot: it
+writes its beacon to `gate-docs-beacon/<run id>` beside the slots, exports its nonce so its legs'
+runners nest, runs the ticker, prints `gate queue: docs-only — admitted on the docs key, not queued`,
+and records `queued_from` `docs`. Nothing caps how many run at once (owner, 2026-10-11). It waits
+only for a bar in its own worktree, printing `gate queue: docs-only — this worktree's bar holds <key>
+— … — waiting for it`, and never for another worktree's. The reap and the held count read the slots
+only, so a doc-only bar never narrows or is named by a non-doc bar, and delays one only in its own
+worktree. A doc-only run first sweeps the docs beacons of dead, stalled or unfinished holders: one
+with neither a pid nor a heartbeat is judged by its directory's age. `--hold` is never doc-only.
 
 The beacon holds `heartbeat`, `pid`, `nonce`, and the holder's name: `repo` (its top level), `run`
 (its run id) and `ttl`. A second run takes a time-sorted ticket and queues, announcing
@@ -212,13 +492,14 @@ That line is not durable, and the status file beside it is deleted the moment th
 wait also reaches the RUN RECORD as the paired keys `queued` and `queued_from`, and the summary
 file as its own line. `queued_from` reads `held` (queued, then acquired), `nested` (ran inside the
 bar that holds the host, below), `expired` (burned the bounded wait and ran unqueued), `unticketed`
-(could not write a ticket and ran unqueued at once), `off` (the turnstile was disabled) or
+(could not write a ticket and ran unqueued at once), `docs` (a doc-only bar on the docs key, above),
+`off` (the turnstile was disabled) or
 `unresolved` (neither the host dir nor the common dir resolved). `off` and `unresolved` record a
 DASH rather than a zero, because a zero for a probe that never ran is a reassuring number about
 nothing. `unresolved` is UNARMED and the runner's comment says why.
 
 A holder exports its nonce as `GATE_TURNSTILE_HOLDER` to its legs. A runner that inherits a value
-equal to the live beacon's `nonce` is NESTED inside that bar: it takes no ticket, prints
+equal to the `nonce` of any live slot beacon is NESTED inside that bar: it takes no ticket, prints
 `gate queue: nested under <run> — <repo> pid <pid>`, and runs. Without that, a suite's scratch-repo
 bar, or a wrapper bar's inner runner, would queue behind the very bar whose leg started it. Nesting
 trusts an inherited value any process on the host can read from the beacon, so it decides contention
@@ -311,9 +592,11 @@ it knows:
 | `name` · `width` · `timeout` | the selected row, the effective width and its per-leg timeout |
 | `wall` | the whole-run wall in seconds, `GATE_WALL` over the row's own; 0 is no wall |
 | `queue` | the turnstile's bounded wait in seconds, the declared multiple of the TTL, derived before the verb exits |
+| `slots` | how many bars the host turnstile admits at once: the row's `slots` knob, 1 where it declares none, `GATE_TURNSTILE_SLOTS` over it. The profile line carries `, slots <n>` only above 1 |
 | `ceiling_max` | the largest positive leg `ceiling` in the resolved manifest, or `-` when no leg declares one; ABSENT when the manifest does not parse |
 | `ceilings` · `line` | whether per-leg ceilings are live here, and the profile line a bar prints |
 | `mempause` | the memory pause's effective threshold, `GATE_MEMPAUSE` over the row's own; 0 is off. A host that gives no reading shows as `mempause INERT` on `line` |
+| `spawnpause` · `width_from` | the spawn pause's ratio, 0 for off; and where `width` came from: `row`, `calibrated` or `GATE_JOBS` |
 
 The unattended kit's driver reads `wall`, `queue` and `ceiling_max` to size the backstop of its
 own bar (`TOOL-dDerivedDocket-27`): the wall is armed only after the queue, so the longest a
@@ -347,10 +630,92 @@ has none, which on MSYS is Windows' own available figure; and the cgroup's usage
 `paused` and `paused_s`, the header `mempause`, and every bar prints one line after its pool drains:
 `memory: pause off`, `memory: no reading on this host, …`, `memory: no pause  (peak <p>% used, …)` or
 `memory: <k> pause(s), <s>s held  (…; fell <a>, bound <b>, drained <c>, unread <d>, wall <e>)`. Its
-peak varies with the host, so a reader comparing two bars' whole output filters it by name.
+peak varies with the host, so a reader comparing two bars' whole output filters it by name. A
+seventh field, `<held-by>`, names the reading that held the episode: `memory`, `spawn` or
+`memory+spawn` (next section). The `memory:` line and `paused` count what memory held.
+
+## The spawn calibration and the spawn pause — `--calibrate-width`, `spawnpause=<n>`
+
+The cost that binds a bar on a loaded Windows host is process creation, and a width past the point
+where more concurrent spawns stop raising the spawn rate only dilates every leg. Two levers, both
+TOOL-aSparedSpawn-2:
+
+**`run-gates.sh --calibrate-width`** times K concurrent loops of the spawn `GATE_SPAWN_CMD` names
+(`true` by default) for K in 1, 2, 4, 6 and 8, prints `rates`, `theta`, `pick` and `cache` as TAB
+key/value lines, and writes `<git-common-dir>/gate-host-calibration`: `<pick> TAB <K=rate,…> TAB
+<iso-utc> TAB <boot-epoch>`. The pick is the smallest K whose rate is within the runner's
+`CALIBRATE_THETA` percent of the best. It exits before the turnstile and runs no leg; on a loaded host
+it takes minutes. `GATE_CALIBRATION_RATES=<r1>,…,<r5>` replaces the timed loops with given rates.
+
+**Every bar reads that cache** and never calibrates. A cache that is well formed, under seven days
+old and written in this boot narrows the row's width to the pick, never widens it; `GATE_JOBS`
+outranks both. Otherwise the row stands and the profile line says why: `width 8 uncalibrated:
+absent`, `malformed`, `stale` or `another boot`. The header records `width_from`.
+
+**`spawnpause=<n>`** holds the next dispatch while one spawn costs over `<n>` times this clone's
+`gate-spawn-floor` and a leg runs, on the memory pause's episodes and every one of its release
+rules. The census sampler times three spawns a tick for the reading; `GATE_SPAWN_NOW=<path>` replaces
+it. With no floor recorded the knob is INERT: one `run-gates: NOTE` and a `spawn: no spawn floor
+recorded, …` line. A run with the knob on prints a `spawn:` line after `memory:`; a run with it off
+prints nothing new. Every shipped row declares 0 until the width A/B sets each row's value.
 `derive-ceilings.py` sets aside, as `paused`, any reading whose leg ran while one of its own run's
 episodes was open. `run-selftests.sh --pooled` carries the same block, byte-identical and
 parity-graded, holds its next suite the same way, and prints the same line; it keeps no `pauses` row.
+
+## The runner's own spawns — a ceiling per leg, and no clock
+
+A fork costs a large fraction of a second on a loaded Windows host, so the bookkeeping a worker pays
+around each leg is held to a count rather than left to a timing (TOOL-aSparedSpawn-4). The worker reads
+its clock from `EPOCHREALTIME`, the leg's output with `mapfile`, and its log name with a parameter
+expansion; it runs `redact` only on output that holds `://` and then `@`, and sets `umask 077` once,
+after the leg exits, in place of two `chmod 600`. Every leg's input key is computed once before
+dispatch, the bar asks `git rev-parse` once for its git dir, common dir and HEAD, and the
+process-monitor kit dir is resolved inside the legs-parse python, so its
+`run-gates: process-monitor:` line now prints after the turnstile lines rather than before them.
+
+**The `SPAWNS` arm of `run-gates.runlog.test.sh`** holds that cost. It traces a one-leg and a two-leg
+bar at width 1 with a `PS4` that carries `${BASHPID}`, counts FORKS as the pids that trace a command of
+their own and EXECS as the command words that are no builtin, keyword or runner function, and reads
+the per-leg figure as the difference. It counts a specimen with known forks first and refuses when
+the counter disagrees, so a trace that cannot move reads as a refusal, never as zero. The ceiling is
+the `SPAWN_CEILING` constant in that file, pinned with its date and node. The arm reds on growth,
+printing the figure, the ceiling and the `file:line` sites the extra events came from, and reds as
+STALE when the ceiling sits more than max(3, 5 %) above the figure.
+
+**To move it:** lower the constant in the commit that saves a spawn, to the figure the arm printed.
+Raise it only with a reason line beside the constant naming the spawn that is worth its cost.
+`RGRL_ARMS=SPAWNS bash run-gates.runlog.test.sh` runs the arm alone.
+
+## The held tier in WSL2 — `run-held-wsl.sh`
+
+A spawn costs about a millisecond in WSL2 and tens to hundreds under MSYS, so the held self-test tier
+can run its Linux-safe legs in WSL and only the declared Windows-only legs natively
+(TOOL-aSparedSpawn-5). Dark: nothing invokes it but the owner, and no boundary reads its record.
+
+**Setup, once per node.** Declare the node's host in `<git-common-dir>/gate-wsl.conf`, untracked and
+never committed: `GATE_WSL_DISTRO=<distro>` and `GATE_WSL_MIRROR=<absolute ext4 path>`, the only two
+keys it admits. Without it the run asks WSL's default distro and uses the shared default mirror,
+`GATE_WSL_MIRROR_DEFAULT` in `.githooks/gate-env.sh`, and every run prints each value with its source.
+Then `bash tools/run-gates/run-held-wsl.sh --setup` clones the mirror from this clone, with remote
+`win` as the fetch source and `origin` the hosted URL. The mirror's parent must be writable inside
+WSL; the clone is the only write `--setup` makes.
+
+**A run.** `bash tools/run-gates/run-held-wsl.sh` refuses a dirty tree, pins `HEAD` and its
+fingerprint, and runs two halves at once: the runner under `GATE_FULL=1 GATE_SELFTESTS=1` over the
+Windows-only partition in a scratch `git clone --local`, and over the rest in a detached worktree of
+the mirror after `git fetch win`, with `/mnt/*` off `PATH` and `TMPDIR` on ext4. Each partition row
+runs its leg through the `--leg` shim, which unsets `GATE_LEGS` so no leg grades the partition as its
+subject. `held_halves.py --combine` then refuses, exit 2, on a missing verdict, a fingerprint or
+`HEAD` other than the pinned one, a moved tree, two manifest blobs, or a held leg not reported exactly
+once on its declared host. Otherwise it exits by the runner's precedence, 1, then 4, then 3, then 0.
+
+**Paired runs and `held-green`.** `--paired` runs every Linux-safe held leg on both hosts and appends
+one row per host per leg to `<git-common-dir>/held-parity`; it writes no record. A plain run that
+combines GREEN writes `<git-common-dir>/held-green` only while the last `GATE_WSL_PARITY_RUNS` paired
+runs at this manifest blob agree on every compared leg, and otherwise prints `parity <n>/<k>` and
+the legs that disagreed. `held-green` certifies the held tier at one sha and fingerprint across both
+hosts, and nothing more: it is never `gate-full-green`, the push bar never reads it, and a WSL green
+covers only the POSIX branch of a mixed suite, whose Windows arms the daily `held` CI job keeps.
 
 ## The scratch directory — owned, redirected and swept
 
@@ -441,7 +806,14 @@ it costs no process beyond the one `mkdir` a clone's first bar pays for the jour
 which is what lets the runner read it as a dispatch hint and `profile_bar.py` read it as a
 measurement, with no second copy of the same fact. A row is nine tab-separated fields: name,
 seconds, status, input key, ended-at, run, full, manifest_blob, head. The reuse section above says
-what reads the last four.
+what reads the last four. A run carries forward every row it did not
+measure, so a bar that reused or skipped every leg leaves the store as it found it.
+
+Dispatch is longest-first, and a leg the ledger holds no row for is placed by a PRIOR: the largest
+reading `ceiling-evidence.txt` beside the runner records for it, else its declared `ceiling` divided
+by the median ceiling-to-reading ratio over the legs carrying both (re-derived every bar), else 0. So
+a new worktree, which has no ledger, still starts its heaviest legs first. The order is advisory and
+never moves a verdict; the run header's `dispatch` key records the one a bar used.
 
 `<git-dir>/gate-full-green` is stamped only when the run failed nothing, skipped nothing, reused
 nothing but lineage-qualified legs, the tree did not move, AND the tree was CLEAN when the run

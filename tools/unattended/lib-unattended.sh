@@ -130,7 +130,8 @@ resolve_sidecar_dir() { # -> <git-dir>/unattended, or nothing when the git dir c
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -167,7 +168,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -354,6 +355,13 @@ read_consumes_from() { # spec file -> the unit ids its §3 Edges block consumes 
 #
 # NORMALISED WITH `10#`, because a value that arrives as `08` is otherwise read as a broken octal
 # literal by the first arithmetic that touches it.
+#
+# THE SUM HOLDS AT ANY SLOT COUNT (TOOL-aPairedSlots-6). A bar's elapsed time is its queue wait plus
+# its own run. A waiter fails open at the runner's bounded wait, the `queue` key, however many holders
+# the turnstile admits, and the wall is armed after the acquire at every width; so wall + queue +
+# margin bounds a bar beside a second holder exactly as it bounds one alone, and a doc-only bar, which
+# never waits, sits inside it with room to spare. The runner's `slots` key is therefore one this parse
+# ignores, and an arm pins that it still pins the same backstop when the profile prints it.
 GPF_WALL=""; GPF_QUEUE=""; GPF_CEILING_MAX=""; GPF_MISSING=""
 parse_gate_profile() { # the profile command's stdout -> GPF_WALL, GPF_QUEUE, GPF_CEILING_MAX, GPF_MISSING; rc 1 when a key is missing
   local _gp_k _gp_v _gp_w="" _gp_q="" _gp_c=""
@@ -881,7 +889,7 @@ read_brief_paths() {  # commit · unit · run-state-path
   _rb_f=$(mktemp) || { printf 'lib-unattended: read_brief_paths cannot create a scratch file, so it cannot say which paths a brief row declared\n' >&2; return 2; }
   _rb_b=$(mktemp) || { rm -f "$_rb_f"; printf 'lib-unattended: read_brief_paths cannot create a scratch file, so it cannot say which paths a brief row declared\n' >&2; return 2; }
   GIT show "$1:$3" >"$_rb_f" 2>/dev/null || :
-  _rb_d=$(normpath "$3"); _rb_d=${_rb_d%/*}/prompts/
+  normpath "$3" >/dev/null; _rb_d=$_np; _rb_d=${_rb_d%/*}/prompts/
   # THE `|| [ -n … ]` REPLACES A GUARANTEE THE HEREDOC GAVE FREE. Command substitution stripped the
   # trailing newlines and the heredoc put exactly one back, so every line was terminated; a FILE may
   # end without one, and a bare `read` drops that last line. Without this the repair would silently
@@ -890,7 +898,7 @@ read_brief_paths() {  # commit · unit · run-state-path
   while IFS= read -r _rb_r || [ -n "$_rb_r" ]; do
     case "$_rb_r" in *" brief · item $2 · reason "*) ;; *) continue ;; esac
     _rb_r=${_rb_r#* · reason }
-    _rb_h=${_rb_r%% *}; _rb_p=$(normpath "${_rb_r#* }")
+    _rb_h=${_rb_r%% *}; normpath "${_rb_r#* }" >/dev/null; _rb_p=$_np
     case "$_rb_h" in [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;; *) continue ;; esac
     case "$_rb_p" in "$_rb_d"?*) ;; *) continue ;; esac
     GIT rev-parse --verify --quiet "$1:$_rb_p" </dev/null >"$_rb_b" 2>/dev/null || continue
@@ -1122,12 +1130,33 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
   # know there was more.
   # Does the caller carry a subject cache? Asked ONCE, outside the walk.
   if declare -p _SUBJ >/dev/null 2>&1; then _bc_cache=1; else _bc_cache=0; fi
+  # THE ANSWER IS ALSO LEFT IN `_BC_OUT` (TOOL-aSparedSpawn-11 S5), so a caller can call this in its
+  # own shell and read the answer without a `$(…)`. It must, to keep a memo: a memo written inside a
+  # command substitution dies with the subshell.
+  _BC_OUT=""
   _bc_n=0; _bc_mc=""
   [ -n "$_bc_cap" ] && _bc_mc="--max-count=$((_bc_cap+1))"
-  for _bc_c in $(GIT rev-list $_bc_ord $_bc_mc $_bc_range 2>/dev/null); do
+  # THE WALK IS MEMOISED ONLY WHERE THE CALLER DECLARED `_BC_MEMO`, opt-in exactly as `_SUBJ` is. The
+  # two history checkers ask one range once per unit id, and HEAD does not move during a check, so
+  # every id after the first re-ran the same `rev-list`. The driver declares nothing, because it can
+  # commit between two calls, and a range naming symbolic HEAD would then answer from before the
+  # commit. The key is the WHOLE argument tuple that reaches `rev-list`, order and count included:
+  # the two windows walk in opposite directions over the same range string.
+  _bc_key="$_bc_ord|$_bc_mc|$_bc_range"
+  if declare -p _BC_MEMO >/dev/null 2>&1; then
+    if [ -n "${_BC_MEMO[$_bc_key]+set}" ]; then
+      _bc_list=${_BC_MEMO[$_bc_key]}
+    else
+      _bc_list=$(GIT rev-list $_bc_ord $_bc_mc $_bc_range 2>/dev/null)
+      _BC_MEMO[$_bc_key]=$_bc_list
+    fi
+  else
+    _bc_list=$(GIT rev-list $_bc_ord $_bc_mc $_bc_range 2>/dev/null)
+  fi
+  for _bc_c in $_bc_list; do
     _bc_n=$((_bc_n+1))
     # the (cap+1)-th commit is the SENTINEL: proof that more exists, never graded.
-    if [ -n "$_bc_cap" ] && [ "$_bc_n" -gt "$_bc_cap" ]; then printf 'TRUNCATED'; return 0; fi
+    if [ -n "$_bc_cap" ] && [ "$_bc_n" -gt "$_bc_cap" ]; then _BC_OUT=TRUNCATED; printf 'TRUNCATED'; return 0; fi
     # FROM THE CALLER'S SUBJECT CACHE WHEN THERE IS ONE, and this is not an optimisation you may drop.
     # `check-pass-order.sh` builds `_SUBJ` in one `git log` over all of HEAD and asserts its size
     # against `rev-list --count`, then walks 10,811 commits through here. Reading a subject per commit
@@ -1155,7 +1184,7 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
     # Did it touch anything outside this build's own record surface?
     if GIT show --pretty=format: --name-only "$_bc_c" 2>/dev/null \
        | grep -v '^$' | grep -qv -e "^$_bc_dir/" $_bc_ex; then
-      printf '%s' "$_bc_c"; return 0
+      _BC_OUT=$_bc_c; printf '%s' "$_bc_c"; return 0
     fi
   done
   return 1
@@ -2134,6 +2163,6 @@ read_id_list_refusals() { # IDLIST value -> every refused token and why, on ONE 
 # names its home this way, which is what lets the P5 refusal say WHERE to go and look. MOVED HERE
 # from the driver with the expander above, and for the same reason: the leg reads the same blob per
 # home and a second spelling of "which folder" would send the two readers at different files.
-ask_home_of() { # ask id -> the slug segment
-  local _t="${1#*-}"; printf '%s' "${_t%-*}"
+ask_home_of() { # ask id -> the slug segment, printed and left in `_ask_home` (TOOL-aSparedSpawn-8)
+  local _t="${1#*-}"; _ask_home=${_t%-*}; printf '%s' "$_ask_home"
 }

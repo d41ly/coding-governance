@@ -691,6 +691,40 @@ exits 0, so an installed-but-undeclared kit is a legal state rather than a red.
    `.claude/skills/lexicon/SKILL.md` as one landing. Pin the Skill to LF — it is a rendered artifact
    its own gate byte-compares.
 
+<!-- govkit:entry roles -->
+## 3g — The roles kit (default)
+
+The role catalogue: one agent definition per governed role, the workflow table that says which role
+drives which workflow, and the `/build` Skill an attended session follows after kickoff's go. It is
+in the default selection, so `govkit apply` installs it, and `govkit update --write` installs it into
+a tree whose receipt predates it, printing `default-gained`.
+
+1. **What the default install renders.** The kit's adopter, `bash <prefix>/roles/adopt-roles.sh
+   --scaffold`, runs at install and at every update unless `GOVKIT_RERENDER=0` declines it. It
+   writes `.claude/skills/build/SKILL.md`, one agent type per agent role under `.claude/agents/`,
+   and `.claude/roles.json`, the role index the hooks kit's write gate and spawn guard arm on. Your
+   own definitions under `.claude/agents/` are never touched. `--check` grades all three and runs
+   as the `roles render wiring` leg.
+2. **The house overlays are yours.** The ten files under `<prefix>/roles/house/` are seeded once and
+   never rewritten by an update. Put your project's rules for a role there; the base files under
+   `agents/` are the kit's and are overwritten. Re-run `--scaffold` after editing one, or the leg
+   reds.
+3. **Restart before spawning.** A Claude Code session reads its agent registry when it starts, so
+   a session that ran the install or the update cannot spawn a newly rendered agent type. Start a
+   new session first.
+4. **`/build` needs the review harness.** The Skill drives the three harnesses the workflow table
+   names, and they ship in the `review-harness` kit, which is not a default. Without it the role
+   agents, the handoffs and the gates still work, and `check-wiring.sh` prints one `note` per absent
+   harness. Add `review-harness` to `kits` in `.governance/deploy.toml` to use `/build`.
+
+The roles need the governing doc `.memory-tree.conf` names by `CHARTER` to carry every `## §<n>`
+section a role's `charter` key cites; `roles catalogue` reds naming the missing one. With no file at
+`CHARTER` the install still succeeds: the adopter renders the Skill alone, renders no agent type and
+no role index, and exits 3, which the kit declares as its `no-governing-doc` outcome. Write that doc,
+or point `CHARTER` at the one you have, then re-run `--scaffold`.
+`check-wiring.sh` reports an install left unrendered as `UNWIRED  roles`, with `--scaffold` as the
+remedy, and names the doc and the `CHARTER` key first when that is the cause.
+
 ## 4 — Write the kickoff manifest (the engine's project layer)
 
 The engine (§1) discovers the manifest by searching `<project>`, **first hit wins**:
@@ -761,7 +795,10 @@ the INVOKING directory, not from its own location — run it with the cwd inside
    `## Node registry` names the project's nodes, read by the checker's `--card` verbs for the
    session card's `node —` cell. Without it every card the project writes reads `node — UNKNOWN:
    no registry`, and nothing else fails: the key is what the version WARN is now for.
-6. Bump the manifest marker to `kickoff-manifest: v1.4` **LAST** — the bump silences the kit's
+5c. Re-paste the sealed region from `--task-skeleton` into §A (v1.5) — it gained `**To-do:**` and
+   `**Reuse:**`, and the append refuses a kickoff body without all eight fields filled. Until the
+   marker moves, check 10 still passes the format-1.4 region and prints a NOTE naming this step.
+6. Bump the manifest marker to `kickoff-manifest: v1.5` **LAST** — the bump silences the kit's
    format WARN, the only standing signal that the body still predates the ratchet. The WARN compares
    the marker with the checker's `MANIFEST_FORMAT`, never with `KIT_MANIFEST_VERSION`: that one is
    the kit's vintage and moves whenever its bytes do, with no upgrade step owed.
@@ -1256,13 +1293,17 @@ it.
 <project>/
 ├── AGENTS.md / CLAUDE.md        # (optional) project charter / agent-instruction file (agent-instructions kit)
 ├── docs/PARALLEL.md             # governance playbook, filled (governance-template marker kept) — ONE file; §2 ships no companion
-├── memory/guides/SESSION-KICKOFF.md  # kickoff manifest (v1.4: audit block + sealed §A region + registry key) — the engine reads this
+├── memory/guides/SESSION-KICKOFF.md  # kickoff manifest (v1.5: audit block + sealed eight-field §A region + registry key) — the engine reads this
 ├── <prefix>/manifest-check.sh # ratchet gate — engine-identical copy (overwrite wholesale on kit updates)
 ├── .gitattributes               # EOL rules — the checker (+ the memory tree if §3 adopted)
 ├── .claude/settings.json        # the hooks a default install wires (§5's table), by settings-merge
 ├── <prefix>/hooks/              # agent-cap.js, scratch-guard.js + their two fragments (hooks kit, default)
 ├── <prefix>/settings-merge.py   # the one writer of .claude/settings.json (default)
 ├── <prefix>/check-wiring.sh     # reports an unwired hook or an UNARMED ROUTED_PATHS (default)
+├── <prefix>/roles/              # the role catalogue + its adopter; house/ overlays are yours (default)
+├── .claude/agents/<role>.md     # one rendered agent type per agent role (roles kit, §3g)
+├── .claude/roles.json           # the role index the write gate and spawn guard arm on (roles kit)
+├── .claude/skills/build/SKILL.md  # the rendered /build Skill (roles kit)
 ├── .memory-tree.conf            # memory-tree config           ┐ (+ ROUTED_PATHS, ROUTED_COMMIT_CUTOFF)
 ├── <prefix>/memory-tree/        # the hygiene kit (copied in)  │ only if §3 adopted
 └── memory/                      # scaffolded tree; LIVE.md = GENERATED work-state index      ┘
@@ -1395,7 +1436,15 @@ row's commit, and on `--write` that is a finding. `check` grades a file that dif
 recorded hash through your own clean filter, so a `core.autocrlf=true` checkout counts `eol-only`
 rather than reporting a mismatch. A rollback also restores what the kit's `[[regenerate]]` argv
 re-rendered (its `rendered` and `generated` rows, and any path that block's optional `writes` list
-names), and names any path it wrote that no snapshot covered. The per-kit version delta reads the
+names), and names any path it wrote that no snapshot covered. When the render stands, `update
+--write` re-measures each `rendered` row from the bytes it landed, so the row's `sha256`, `oid`,
+`commit` and `version`, and its `install.sums` line, name the file you hold. A rendered row whose
+render did not run, refused, stopped at an accepted outcome without rendering, or was rolled back
+keeps its record and prints a `KEPT` line saying why, and
+`rendered receipts: <n> re-measured · <m> kept` counts both. A `[[hole]]` whose probe fails
+before the render prints `probes undischarged before the render` and is probed again after it; only
+a hole still failing then prints `is undischarged`, and one the render discharged says so. The
+per-kit version delta reads the
 constant from your own copy of the kit's version file. A gate leg your runner already carries with
 gov's own resolved argv is `claimed` rather than refused.
 

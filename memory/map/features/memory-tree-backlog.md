@@ -38,6 +38,7 @@ says.
 
 ## Constraints & why
 
+- A build's `BACKLOG.md` keeps one status row per ask: a disposition that changes is edited in place, as a KEEP replaced by its CLOSED row (V4, met by TOOL-aPrimedIndex-5).
 **The mode is one conf key, and absent means `shards`.** `BACKLOG_MODE` blank or absent reads
 `shards`: the family files under `memory/backlog/` are the authored backlog, one status slot per row.
 `builds` makes each ask a row of `builds/<slug>/BACKLOG.md` in the folder of its own id's slug, derives

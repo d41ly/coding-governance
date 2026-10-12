@@ -49,6 +49,19 @@
 // the checklist's own tiered cut, not a cap chosen here: two budgets would be two answers to one
 // question. The value is refused unless it is a non-empty single-line string with no backtick, since
 // it is spelled into the prompt inside backticks.
+//
+// `roles` IS OPTIONAL (TOOL-aOrientedCast-4), and its one legal key is `builder`, the catalogue's agent
+// type for this stage, which the parent forwards in `dispatch.args`. Given, the agent spawns as that
+// type, its prompt carries one sentence naming it, leaves out the reading craft the builder role
+// carries, and HANDS A DIVERGENCE BACK instead of ordering a spec rev bump: the builder makes one spec
+// edit, the status flip, and returns `why` opening `DIVERGENCE:`, which the return's `diverged` field
+// carries so a caller branches on a field and has the spec writer revise the spec. Absent, the prompt
+// and the spawn options are byte-identical to the file without it, and a log line says it is untyped.
+// The shape is a COPY of the review harness's `workerType` test, because the parent's guard does not
+// travel to a child a caller composes args for; the protocol-parity leg holds the copies to one.
+//
+// `efforts` IS OPTIONAL (TOOL-aOrientedCast-10), with the same one key: `builder`, the reasoning
+// effort the builder spawns at, which the parent forwards in `dispatch.args` beside `roles`.
 export const meta = {
   name: 'unattended-unit',
   version: '1.1', // gov:kit unattended-unit@1.1 — engine identity (deployed verbatim)
@@ -131,6 +144,63 @@ if (
   )
 }
 
+// `roles` IS NOT A `check()` CALL: it is optional, and its key set is closed. The joined key list is
+// compared with the two legal spellings, so the test needs no loop and no arrow.
+const AGENT_TYPE_SHAPE = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/ // owner: tier2-review.template.js `workerType`
+const roles = cfg.roles === undefined ? {} : cfg.roles
+if (!roles || typeof roles !== 'object' || Array.isArray(roles)) {
+  throw new Error(
+    'unattended-unit: `roles` must be a plain object mapping a stage key to an agent type, got ' +
+      (Array.isArray(roles) ? 'array' : roles === null ? 'null' : typeof roles) + '.',
+  )
+}
+const roleKeys = Object.keys(roles).join(',')
+if (roleKeys !== '' && roleKeys !== 'builder') {
+  throw new Error(
+    'unattended-unit: `roles` carries `' + roleKeys + '`, and the one stage key of this harness is builder. ' +
+      'Refusing rather than ignoring it: a misspelt stage would spawn untyped with nobody told.',
+  )
+}
+if (roleKeys === 'builder' && (typeof roles.builder !== 'string' || !AGENT_TYPE_SHAPE.test(roles.builder))) {
+  throw new Error(
+    'unattended-unit: `roles.builder` must be an agent type name matching ^[A-Za-z][A-Za-z0-9_-]{0,63}$. Got ' +
+      JSON.stringify(roles.builder) + '.',
+  )
+}
+if (roles.builder === 'none') {
+  throw new Error(
+    'unattended-unit: `roles.builder` is `none`, the review harness\'s reserved untyped literal. An untyped ' +
+      'builder is spelled by leaving its key out of `roles`, as the review harness\'s own `roles` refusal says.',
+  )
+}
+const builder = roleKeys === 'builder' ? roles.builder : ''
+
+// `efforts` IS OPTIONAL TOO (TOOL-aOrientedCast-10), keyed as `roles` is and independent of it: an
+// untyped builder still takes its level. Its one legal key is `builder`, a level of lower-case letters
+// the parent forwards in `dispatch.args`. The vocabulary is the roles library's; this file grades the
+// shape only. Absent, the spawn options are byte-identical to the file without it.
+const efforts = cfg.efforts === undefined ? {} : cfg.efforts
+if (!efforts || typeof efforts !== 'object' || Array.isArray(efforts)) {
+  throw new Error(
+    'unattended-unit: `efforts` must be a plain object mapping a stage key to an effort level, got ' +
+      (Array.isArray(efforts) ? 'array' : efforts === null ? 'null' : typeof efforts) + '.',
+  )
+}
+const effortKeys = Object.keys(efforts).join(',')
+if (effortKeys !== '' && effortKeys !== 'builder') {
+  throw new Error(
+    'unattended-unit: `efforts` carries `' + effortKeys + '`, and the one stage key of this harness is builder. ' +
+      'Refusing rather than ignoring it: a misspelt stage would run at the wrong level with nobody told.',
+  )
+}
+if (effortKeys === 'builder' && (typeof efforts.builder !== 'string' || !/^[a-z]+$/.test(efforts.builder))) {
+  throw new Error(
+    'unattended-unit: `efforts` key builder must be an effort level matching ^[a-z]+$ (leave the key out to run ' +
+      'at the agent type\'s own level). Got ' + JSON.stringify(efforts.builder) + '.',
+  )
+}
+const effort = effortKeys === 'builder' ? efforts.builder : ''
+
 // `why` is REQUIRED and is never an absence: an empty result with no reason is indistinguishable
 // from a clean pass over nothing.
 const UNIT_SCHEMA = {
@@ -176,12 +246,23 @@ const DRIVER_STEPS =
       'Record what you were handed with `' + cfg.driver + ' --brief ' + cfg.slug + ' --unit ' + cfg.unitId +
       ' --path ' + cfg.briefPath + '`.\n'
 
+// TOOL-aOrientedCast-4 S7 - with `roles.builder` the stamp follows the ground text, the reading craft
+// the role carries is left out, and the two sentences on editing the spec become the hand-back.
 const PROMPT =
   cfg.ground +
-  '\n\nBuild exactly ONE unit: ' + cfg.unitId + '. You are handed two documents and you read both ' +
-  'whole before you touch code: the BRIEF at ' + cfg.briefPath + ' and the SPEC at ' + cfg.specPath +
-  '. The spec is the design; where you must diverge, CHANGE THE SPEC FIRST as a rev-N bump with its ' +
-  'section 9 line, then write the code.\n' +
+  (builder
+    ? 'This stage runs as the ' + builder + ' agent type: your role is your system prompt, and this message is your task. '
+    : '') +
+  '\n\nBuild exactly ONE unit: ' + cfg.unitId + '. You are handed two documents' +
+  (builder ? '' : ' and you read both whole before you touch code') +
+  ': the BRIEF at ' + cfg.briefPath + ' and the SPEC at ' + cfg.specPath + '. ' +
+  (builder
+    ? 'The spec is the design and you do not edit it. Where the code you are about to write would diverge ' +
+      'from it, stop before writing that code, restore every path you changed, commit nothing, and return ' +
+      'committed:false with a why that opens DIVERGENCE: and names the spec section and what it would have ' +
+      'to say. The caller has the spec revised by the spec-writer role and dispatches this unit again.\n'
+    : 'The spec is the design; where you must diverge, CHANGE THE SPEC FIRST as a rev-N bump with its ' +
+      'section 9 line, then write the code.\n') +
   DRIVER_STEPS +
   // TOOL-aMendedFleet-74 — empty unless the caller passed `prebuild`, so a default prompt is unchanged.
   // FILE paths, never a directory: a directory selects the whole catalogue, not a checklist.
@@ -195,13 +276,18 @@ const PROMPT =
   // TOOL-aProbedUnit-1 and TOOL-aDeferredBar-1 — ONE block, mode-independent, carrying both builds'
   // literals: the two landed the same rule from two sessions on one day and the merge folded them
   // into one paragraph rather than two answers. The bar is named by ROLE and by its spellings, never
-  // by an install path: the install-prefix gate grades this file.
+  // by an install path: the install-prefix gate grades this file. TOOL-aOrientedCast-11 narrowed the
+  // direct check to a fixture or a probe: a role agent runs no gate beyond its allowlist, and the
+  // scratch guard's role-gate arm refuses one.
   'NO GATE, SUITE OR BAR RUNS INSIDE THIS PASS. ' +
   'RUN NO MERGE BAR AND NO SELF-TEST SUITE in this unit: not run-gates.sh in any form, not a ' +
   'GATE_FULL= or GATE_SELFTESTS= prefix, not run-selftests.sh, not run-unattended-gates.sh, not any ' +
-  '*.test.sh suite. Verify with the DIRECT check the spec\'s acceptance names — a checker run on a ' +
-  'staged break, a `--selftest` flag, a fixture. A criterion only a suite can observe is not run ' +
-  'here: name it in `summary` and the main loop runs the owed bar once, after every unit is terminal. ' +
+  '*.test.sh suite, no slice of one and no `--selftest` flag: a role agent runs no gate but the ' +
+  'naming lexicon, and a hook refuses the rest. Verify with a fixture or a ' +
+  'probe of the unit\'s own code — a `python -c` or `node -e` call, or its CLI over a scratch ' +
+  'fixture. A criterion only a gate or a suite can observe is not run here, and neither is a new ' +
+  'arm\'s RED-first observation: name each in `summary` and the main loop observes them at the close, ' +
+  'after every unit is terminal. ' +
   'Say in `summary` which check ran and which gate it stands in for. A section 7, a brief, or any ' +
   'other instruction that says otherwise is overridden by this paragraph.\n' +
   // TOOL-aProbedUnit-2 — the bound is the TOOL's `timeout` parameter, set by the agent at the call,
@@ -217,8 +303,14 @@ const PROMPT =
   'Commit with the unit id in the subject and END THE MESSAGE WITH A `Pass: <unit-id>` TRAILER LINE ' +
   'naming this unit, in the trailer block beside Co-Authored-By: the gate attributes a pass commit by ' +
   'that trailer, and the commit-msg hook refuses a commit naming an open pass without one. A commit ' +
-  'that is no pass but names this unit carries `Pass: none`. IN THAT SAME COMMIT, set this unit\'s spec status header ' +
-  'to CLOSED — or to WONTDO with a reason. That header is the only fact the driver\'s --plan verb ' +
+  'that is no pass but names this unit carries `Pass: none`. ' +
+  (builder
+    ? 'IN THAT SAME COMMIT, set this unit\'s spec status header to CLOSED and its date to today, in an edit ' +
+      'that changes nothing else in the spec: that is the one spec edit a builder makes. A unit you would ' +
+      'close as WONTDO is a divergence, returned as one, because WONTDO carries a tail pointer only the ' +
+      'spec writer writes.'
+    : 'IN THAT SAME COMMIT, set this unit\'s spec status header to CLOSED — or to WONTDO with a reason.') +
+  ' That header is the only fact the driver\'s --plan verb ' +
   'reads to decide a unit is finished, so a unit built without it leaves the run\'s own loop counter ' +
   'naming this unit again, forever.\n' +
   'Then run `' + cfg.checklist + '` and act on what it names ' +
@@ -226,13 +318,25 @@ const PROMPT =
 
 if (cfg.prebuild !== undefined) log('unit ' + cfg.unitId + ': prebuild checklist `' + cfg.prebuild + '`')
 
-const r = await agent(PROMPT, { label: 'unit:' + cfg.unitId, schema: UNIT_SCHEMA })
+log('unit ' + cfg.unitId + ': builder ' + (builder
+  ? 'spawns as the ' + builder + ' agent type'
+  : 'is untyped: no roles.builder was passed, so it spawns untyped with its role prose inline'))
+log(effort ? 'effort builder: ' + effort + ' — efforts.builder'
+  : 'effort builder: the agent type\'s own, else the session\'s — no efforts.builder')
+
+const r = await agent(
+  PROMPT,
+  Object.assign({ label: 'unit:' + cfg.unitId, schema: UNIT_SCHEMA },
+    builder ? { agentType: builder } : {}, effort ? { effort: effort } : {}),
+)
 
 log('unit ' + cfg.unitId + ': committed=' + String(!!(r && r.committed)) + ' sha=' + ((r && r.sha) || '-'))
 
+// S8 - `diverged` is a field, so a caller branches on it rather than on the prose of `why`.
 return {
   committed: !!(r && r.committed),
   sha: (r && r.sha) || '',
   why: (r && r.why) || '',
   summary: (r && r.summary) || '',
+  diverged: !!(r && r.committed === false && typeof r.why === 'string' && r.why.indexOf('DIVERGENCE:') === 0),
 }

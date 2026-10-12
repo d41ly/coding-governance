@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""runlog.py — the runlog kit's command line. gov:kit runlog@1.10
+"""runlog.py — the runlog kit's command line. gov:kit runlog@1.13
 
     python <this kit>/runlog.py journal --producer driver|gates|pushes
     python <this kit>/runlog.py journal --producer gates --by-leg [--legs <gate-leg manifest>]
@@ -8,6 +8,7 @@
     python <this kit>/runlog.py extract --measure <projects dir>
     python <this kit>/runlog.py extract --ready <projects dir>
     python <this kit>/runlog.py narration --session <sid> --from <t> --to <t> [--transcripts <dir>]
+    python <this kit>/runlog.py prose --session <sid> | --transcript <file> [--transcripts <dir>] [--charter <file>]
     python <this kit>/runlog.py model <slug> [--run <n>] [--json] [--journals <dir>] [--transcripts <dir>]
     python <this kit>/runlog.py record <slug> [--run <n>] [--write] [--journals <dir>] [--transcripts <dir>]
     python <this kit>/runlog.py verify <record> [--journals <dir>]
@@ -65,6 +66,7 @@ sys.path.insert(0, HERE)
 
 import extract as ex  # noqa: E402
 import model as mdl  # noqa: E402
+import prose as pr  # noqa: E402
 import record as rec  # noqa: E402
 import runlog_lib as rl  # noqa: E402
 
@@ -287,6 +289,32 @@ def cmd_extract(args) -> int:
     return 2 if failed else 0
 
 
+def cmd_prose(args) -> int:
+    if args.transcript:
+        path = pathlib.Path(args.transcript)
+        if not path.is_file():
+            print(f"runlog: prose --transcript {path.as_posix()} names no file", file=sys.stderr)
+            return 2
+        tree = ex.build_session_tree(path)
+    else:
+        root = ex.resolve_projects_root(override=args.transcripts)
+        try:
+            tree = ex.resolve_session_tree(args.session, root)
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+        if tree.main is None:
+            print(f"runlog: prose found no transcript for session {tree.sid} under {root.as_posix()}",
+                  file=sys.stderr)
+            return 2
+    charter = pathlib.Path(args.charter) if args.charter else pr.resolve_charter(pathlib.Path.cwd())
+    shapes, error = pr.read_charter_shapes(charter)
+    fig = pr.measure_prose(pr.scan_turns(tree), shapes)
+    sys.stdout.write("\n".join(pr.render_prose_report(tree.sid, fig, error)) + "\n")
+    sys.stdout.flush()
+    return 0
+
+
 def cmd_narration(args) -> int:
     t_from, t_to = ex.parse_time(args.t_from), ex.parse_time(args.t_to)
     if t_from is None or t_to is None:
@@ -489,6 +517,14 @@ def main(argv=None) -> int:
     pn.add_argument("--from", dest="t_from", required=True)
     pn.add_argument("--to", dest="t_to", required=True)
     pn.add_argument("--transcripts", help="the projects dir to read instead of Claude Code's own")
+    pp = sub.add_parser("prose", help="measure one session's narration, interjections and BUILD/SPEC "
+                        "pair emission; writes nothing")
+    src = pp.add_mutually_exclusive_group(required=True)
+    src.add_argument("--session", help="one session id, resolved under the transcripts root")
+    src.add_argument("--transcript", help="one transcript .jsonl to read instead")
+    pp.add_argument("--transcripts", help="the projects dir to read instead of Claude Code's own")
+    pp.add_argument("--charter", help="the charter whose microformats fence defines the pair; default "
+                    "AGENTS.md at the toplevel of the current directory")
     pm = sub.add_parser("model", help="join one run's sources into the run model and print it")
     pm.add_argument("slug")
     pm.add_argument("--run", type=int, help="the 1-up run of the build, oldest first; default the last")
@@ -525,6 +561,8 @@ def main(argv=None) -> int:
         return cmd_extract(args)
     if args.cmd == "narration":
         return cmd_narration(args)
+    if args.cmd == "prose":
+        return cmd_prose(args)
     if args.legs and not args.by_leg:
         ap.error("journal --legs is read only by --by-leg")
     if args.by_leg and args.producer != "gates":
@@ -534,4 +572,6 @@ def main(argv=None) -> int:
 
 
 if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8", errors="backslashreplace")
     sys.exit(main())

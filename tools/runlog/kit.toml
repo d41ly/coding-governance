@@ -35,7 +35,9 @@ role = "project-owned"
 # reds there instead of shipping.
 [[files]]
 include = ["fixtures/driver-torn.txt", "fixtures/golden-lines.txt", "fixtures/invocations.txt",
-           "fixtures/journal-mixed.txt", "fixtures/tool-classes.json", "fixtures/transcripts.json"]
+           "fixtures/journal-mixed.txt", "fixtures/prose-charter.md", "fixtures/prose.json",
+           "fixtures/tool-classes.json",
+           "fixtures/transcripts.json"]
 role = "project-owned"
 
 # THE SKILL IS RENDERED (TOOL-dLoggedFlight-12). It names the CLI by where this kit is installed and
@@ -71,6 +73,9 @@ mutates_index = false
 # `--check` came back 0. `memory-recall` declares the same pair for the same reason.
 [[regenerate]]
 argv = ["bash", "{kit}/adopt-runlog.sh", "--scaffold"]
+# Staged for the bar (TOOL-aPrimedIndex-1): run-gates' regen.py re-renders this before a bar
+# and proves it fresh with this kit's [check] argv; stage 1 is a render from a kit template.
+stage = 1
 
 [check]
 argv = ["bash", "{kit}/adopt-runlog.sh", "--check"]

@@ -38,7 +38,7 @@
 # below. `--preview` grades the live tree and prints violations without setting exit status, which is
 # how a candidate predicate gets run over the real tree before it is wired.
 set -u
-KIT_UNATTENDED_VERSION=1.97   # gov:kit unattended@1.97 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.104 # gov:kit unattended@1.104 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other two readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and wrong
@@ -282,6 +282,11 @@ if [ "${#_SUBJ[@]}" -ne "$_n_hist" ]; then
   echo "pass-order: the subject cache holds ${#_SUBJ[@]} commit(s) where history has $_n_hist, so the build-commit walk below would miss commits and report every unit unbuilt-in-range — which is a clean bill this leg has not earned"
   exit 2
 fi
+# THE WALK MEMO (TOOL-aSparedSpawn-11 S5). Every unit id of a build walks one range, and HEAD does not
+# move during this check, so `build_commit` answers each repeated range from here instead of a fresh
+# `rev-list`. It is filled by calls made in THIS shell, which is why they read `_BC_OUT` rather than
+# a `$(…)`: a memo written inside a command substitution dies with the subshell.
+declare -A _BC_MEMO=()
 
 graded=0; skipped_cutoff=0; norun_graded=0; unbuilt=0; preanchor_hits=0; waived_n=0; truncated=0
 violations=""; waived_seen=""; previews=""; inrange_ids=""; not_judged=0
@@ -395,7 +400,8 @@ $1" ;;
     }
     # THE IN-RANGE WINDOW, which is `build_commit`'s default: unbounded, `--reverse`, so the
     # EARLIEST qualifying commit wins.
-    build_c=$(build_commit "${base:+$base..}HEAD $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS")
+    build_commit "${base:+$base..}HEAD $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" >/dev/null
+    build_c=$_BC_OUT
     if [ -z "$build_c" ]; then
       # S2c - THE PRE-ANCHOR PROBE, and it runs ONLY for the derived-range population. A commit that
       # writes product code for a unit touches nothing under the build folder, so it sits STRICTLY
@@ -412,7 +418,8 @@ $1" ;;
       # S2d - BOUNDED BY CONSTRUCTION, because the miss rate over the widened population could not be
       # measured before this landed. A probe that gives up is COUNTED, never reported as a miss.
       if [ "$norun" = 1 ] && [ -n "$base" ]; then
-        pre_c=$(build_commit "$base $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "")
+        build_commit "$base $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "" >/dev/null
+        pre_c=$_BC_OUT
         if [ "$pre_c" = TRUNCATED ]; then
           truncated=$((truncated+1))
         elif [ -n "$pre_c" ]; then

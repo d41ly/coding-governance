@@ -59,6 +59,14 @@ adopter of this kit, whatever the port's source said: installing the kit install
 refused on day one — owner-resolved (section 8 F2 of the unit), and `adopt-memory-tree.sh --scaffold`
 prints the `--emit-floors` command in its next steps for that reason.
 
+CEILINGS, FAMILIES AND RETIREMENTS (TOOL-aSparedSpawn-14). `REFUSAL_CEILINGS` puts a dated,
+attributed upper bound on the floor's own census, per gate; a `<stem>.families.txt` sidecar beside a
+gate prices a FAMILY of variant refusals by a pattern over their messages; and the registry
+`<MEMORY_ROOT>/project/refusal-retirements.txt` records each retired refusal with the survivor that
+still refuses its condition. All three read the walk `--check` already makes, every ceiling and family
+prints with its date and decision id on every run, and every decision id must be one the decision
+log carries. The review that lowers a floor and the rules each row obeys are the memory-tree README's.
+
 SIGNATURE 2 — A REFUSAL THAT IS NOT A FAIL CALL (TOOL-aGraftedHelix-47, closing TOOL-aDeferredBar-8).
 An adopter's `--check` that prints a reason and exits 1, and a gate's delegated block that prints a
 module's capture and sets `status=1`, were invisible to the predicate above. With
@@ -168,7 +176,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import kit_rel, parse_conf  # noqa: E402  the kit's shared helpers
 
 def load_conf(root):
-    conf = {"MEMORY_ROOT": "memory", "ARMS_FLOORS": "", "ARMS_REFUSALS": ""}
+    conf = {"MEMORY_ROOT": "memory", "ARMS_FLOORS": "", "ARMS_REFUSALS": "", "REFUSAL_CEILINGS": ""}
     p = os.path.join(root, ".memory-tree.conf")
     if os.path.isfile(p):
         parse_conf(read(p), conf)
@@ -254,7 +262,8 @@ def branches(root: str, gate_rel: str) -> list:
             raise Problem(f"{gate_rel}:{lineno}: check {num} branch {seen[num]} has no literal run "
                           f"long enough to assert on ({sig!r}) — reword the message or the arm cannot "
                           f"name it")
-        out.append({"gate": gate_rel, "num": num, "ord": seen[num], "line": lineno, "sig": sig})
+        out.append({"gate": gate_rel, "num": num, "ord": seen[num], "line": lineno, "sig": sig,
+                    "msg": message_of(m.group(2))})
     return out
 
 
@@ -617,6 +626,145 @@ def parse_floors(conf: dict) -> dict:
     return out
 
 
+# ------------------------------------------------------------------- the growth budget (TOOL-aSparedSpawn-14)
+# A floor stops a gate SHRINKING without a reason; nothing stopped one GROWING, and the unattended
+# driver went from 168 refusal sites to 359 in seven weeks with about 8% of them ever seen firing.
+# A ceiling is the floor's other half: per gate, for the floors' reason, counted on the same census
+# the floor's first number counts, and raised only by a dated decision. A site joining a declared
+# FAMILY is priced harder still: the family has a shared table, and a new per-verb site is the
+# repetition the table exists to end.
+# WHAT THESE DO NOT CHECK: that a decision id's row actually decided the number beside it (it only
+# has to exist), that a family pattern means what its name says, or that a retired refusal's
+# survivor refuses the same condition (it only has to still carry the signature it was recorded with).
+ID_SHAPE_RE = re.compile(r"[A-Z]+-[A-Za-z]+-[0-9]+")
+DATE_SHAPE_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
+RETIREMENTS = "project/refusal-retirements.txt"
+FAMILIES_SUFFIX = ".families.txt"
+
+
+def read_decision_ids(root: str, m: str) -> str:
+    """The decision log's text, or '' when the tree keeps none — every join below reads it once."""
+    p = os.path.join(root, m, "DECISIONS.md")
+    return read(p) if os.path.isfile(p) else ""
+
+
+def check_id_carried(ident: str, log: str) -> bool:
+    """True when the decision log carries `ident` as a WHOLE id, never as a prefix of a longer one."""
+    return re.search(r"(?<![A-Za-z0-9-])" + re.escape(ident) + r"(?![0-9])", log) is not None
+
+
+def parse_ceilings(conf: dict) -> tuple:
+    """`REFUSAL_CEILINGS="<gate>:<count>:<date>:<decision id> …"` -> ({gate: (count, date, id)}, [errors])."""
+    out, bad = {}, []
+    for tok in conf.get("REFUSAL_CEILINGS", "").split():
+        parts = tok.split(":")
+        gate, rest = parts[0], parts[1:]
+        count = rest[0] if rest and rest[0].isdigit() else None
+        date = next((p for p in rest if DATE_SHAPE_RE.fullmatch(p)), None)
+        ident = next((p for p in rest if ID_SHAPE_RE.fullmatch(p)), None)
+        why = ("its count is not an integer" if count is None else "it lacks its date (YYYY-MM-DD)"
+               if date is None else "it lacks its decision id" if ident is None
+               else "it carries more than four fields" if len(parts) != 4 else "")
+        if why:
+            bad.append(f"check-arms: REFUSAL_CEILINGS token {tok!r} is malformed — {why}; a token is "
+                       f"<gate>:<count>:<date>:<decision id>, and a ceiling nobody dated or attributed "
+                       f"is a number with no reason behind it")
+            continue
+        out[gate] = (int(count), date, ident)
+    return out, bad
+
+
+def check_families(root: str, census: dict, log: str) -> tuple:
+    """-> (problems, report lines) for every tracked `<stem>.families.txt` sidecar.
+
+    A row is `<family><TAB><ceiling><TAB><date><TAB><decision id><TAB><ERE>`; the family's count is
+    the gate's sites whose MESSAGE the ERE matches (a fail branch's whole message, a refusal site's
+    signature). Over its ceiling is a red naming the family; a pattern matching nothing is a red too,
+    because a pattern that cannot match cannot price anything.
+    """
+    bad, lines = [], []
+    sidecars = sorted(p for p in run("git", "ls-files", cwd=root).split("\n") if p.endswith(FAMILIES_SUFFIX))
+    for rel in sidecars:
+        gate = rel[:-len(FAMILIES_SUFFIX)] + ".sh"
+        if gate not in census:
+            bad.append(f"check-arms: {rel} prices the families of {gate}, which is NOT in the discovered "
+                       f"population — the gate moved or left, and its families price nothing now")
+            continue
+        for i, row in enumerate(read(os.path.join(root, rel)).split("\n"), 1):
+            if not row.strip() or row.lstrip().startswith("#"):
+                continue
+            f = row.split("\t")
+            if (len(f) != 5 or not f[1].isdigit() or not DATE_SHAPE_RE.fullmatch(f[2])
+                    or not ID_SHAPE_RE.fullmatch(f[3]) or not f[4]):
+                bad.append(f"check-arms: {rel}:{i} is not <family><TAB><ceiling><TAB><date><TAB><decision "
+                           f"id><TAB><ERE>, so the family it meant to price is priced by nothing")
+                continue
+            name, ceil, date, ident, ere = f[0], int(f[1]), f[2], f[3], f[4]
+            try:
+                pat = re.compile(ere)
+            except re.error as exc:
+                bad.append(f"check-arms: {rel}:{i} family {name} carries a pattern that does not compile ({exc})")
+                continue
+            if not check_id_carried(ident, log):
+                bad.append(f"check-arms: {rel}:{i} family {name} names {ident}, which no DECISIONS.md row "
+                           f"carries — a family ceiling is raised by a recorded decision or not at all")
+            got = sum(1 for msg in census[gate] if pat.search(msg))
+            lines.append(f"check-arms: family {gate} {name} {got}/{ceil} · {date} · {ident}")
+            if got == 0:
+                bad.append(f"check-arms: {rel}:{i} family {name} matches no refusal site in {gate}, and a "
+                           f"pattern that cannot match cannot refuse anything — re-measure it or delete the row")
+            elif got > ceil:
+                bad.append(f"check-arms: {gate} carries {got} site(s) in family {name} against its ceiling "
+                           f"of {ceil} ({rel}:{i}) — a new per-verb site: extend the family's shared table "
+                           f"instead")
+    return bad, lines
+
+
+def check_retirements(root: str, m: str, log: str) -> tuple:
+    """-> (problems, report lines) for the retirement registry, one row per retired refusal.
+
+    The row grammar is the README's: `<decision id> · RETIRES … · R1 … · R2 … · R3 … · R4 … ·
+    survivor <file> "<signature>" · replay "<refusal line>" · supersedes <id>`. A row is graded on its
+    FIELDS and on one join: its survivor file still carries the signature recorded for it.
+    """
+    rel = f"{m}/{RETIREMENTS}"
+    p = os.path.join(root, rel)
+    if not os.path.isfile(p):
+        return [], [f"check-arms: retirements — no registry at {rel}, so no retired refusal is joined to a survivor"]
+    bad, rows = [], 0
+    for i, row in enumerate(read(p).split("\n"), 1):
+        if not row.strip() or row.lstrip().startswith("#"):
+            continue
+        rows += 1
+        hm = re.match(r"(" + ID_SHAPE_RE.pattern + r") · RETIRES ", row)
+        if not hm:
+            bad.append(f"check-arms: {rel}:{i} does not open `<decision id> · RETIRES`, so nothing says "
+                       f"which decision retired what")
+            continue
+        ident = hm.group(1)
+        if not check_id_carried(ident, log):
+            bad.append(f"check-arms: {rel}:{i} names {ident}, which no DECISIONS.md row carries — a "
+                       f"retirement is the owner's decision, and one with no row is nobody's")
+        for k in ("R1", "R2", "R3", "R4"):
+            if f" · {k} " not in row:
+                bad.append(f"check-arms: {rel}:{i} ({ident}) lacks its {k} field, and the review admits a "
+                           f"retirement only with all four criteria filled")
+        sv = re.search(r' · survivor (\S+) "(.+?)"(?= · |$)', row)
+        rp = re.search(r' · replay "(.+?)"(?= · |$)', row)
+        if not sv:
+            bad.append(f"check-arms: {rel}:{i} ({ident}) lacks its survivor field, so nothing names where "
+                       f"the retired condition still refuses")
+        elif sv.group(2) not in (read(os.path.join(root, sv.group(1)))
+                                 if os.path.isfile(os.path.join(root, sv.group(1))) else ""):
+            bad.append(f"check-arms: {rel}:{i} ({ident}) names the survivor {sv.group(1)}, which no longer "
+                       f"carries its signature {sv.group(2)!r} — the condition this retirement relied on "
+                       f"surviving may be gone; restore it, or record a new survivor")
+        if not rp:
+            bad.append(f"check-arms: {rel}:{i} ({ident}) lacks its replay field, so nothing shows the "
+                       f"retired condition was observed refusing after the retirement")
+    return bad, [f"check-arms: retirements — {rows} row(s) read from {rel}"]
+
+
 def classify(root: str, conf: dict, pairs=None) -> dict:
     m = conf["MEMORY_ROOT"]
     graded = check_refusal_switch(conf)
@@ -763,16 +911,17 @@ def cmd_check(root: str, conf: dict) -> int:
     scanned = {g for g, _ in st["pairs"]}
     graded = st["graded"]
     sites = st["sites"] if graded else []
+    # The signature-2 line prints LAST of the report lines, after the budget's, so it stays the line
+    # directly above the verdict that every caller has always read it as.
     if graded:
-        rbad, waived, census = check_refusal_sites(st)
+        rbad, waived, sig2_line = check_refusal_sites(st)
         bad.extend(rbad)
         for line in waived:
             print(line)
-        print(census)
     else:
-        print(f"check-arms: refusal signature OFF — ARMS_REFUSALS is not `graded`, so "
-              f"{len(st['sites'])} refusal site(s) outside fail() go ungraded and {st['unread']} pin "
-              f"row(s) of kind exit or status were not read")
+        sig2_line = (f"check-arms: refusal signature OFF — ARMS_REFUSALS is not `graded`, so "
+                     f"{len(st['sites'])} refusal site(s) outside fail() go ungraded and {st['unread']} pin "
+                     f"row(s) of kind exit or status were not read")
     for r in pin_keys.values():
         if (r[0], r[1], r[2]) not in live:
             why = ("the gate is no longer in the population" if r[0] not in scanned
@@ -807,8 +956,10 @@ def cmd_check(root: str, conf: dict) -> int:
                        f"`fail() {{` + call-site predicate. Its branches and arms are no longer "
                        f"counted by anything; fix the gate or remove the floor in a commit that "
                        f"says why")
+    census = {}
     for gate_rel in sorted({b["gate"] for b in brs} | {s["gate"] for s in sites}):
         gb = [b for b in brs if b["gate"] == gate_rel] + [s for s in sites if s["gate"] == gate_rel]
+        census[gate_rel] = [b.get("msg") or b.get("sig") or b.get("key_sig") or "" for b in gb]
         want = floors.get(gate_rel)
         if not want:
             continue
@@ -819,6 +970,32 @@ def cmd_check(root: str, conf: dict) -> int:
                 bad.append(f"check-arms: {gate_rel} has {got[i]} {label} against a floor of "
                            f"{want[i]} (ARMS_FLOORS) — a guard or an assertion was removed; lower "
                            f"the floor in a commit that says why")
+    # THE CEILINGS, the floors' upper half, on the same census and printed on every run with the
+    # date and decision that set each one, so a reader sees what the budget is without the conf.
+    log = read_decision_ids(root, m)
+    ceilings, cbad = parse_ceilings(conf)
+    bad.extend(cbad)
+    for gate_rel in sorted(ceilings):
+        ceil, date, ident = ceilings[gate_rel]
+        if gate_rel not in census:
+            bad.append(f"check-arms: REFUSAL_CEILINGS names {gate_rel}, which is NOT in the discovered "
+                       f"population, so its ceiling prices nothing — fix the gate or remove the token")
+            continue
+        got = len(census[gate_rel])
+        print(f"check-arms: ceiling {gate_rel} {got}/{ceil} · {date} · {ident}")
+        if not check_id_carried(ident, log):
+            bad.append(f"check-arms: REFUSAL_CEILINGS token for {gate_rel} names {ident}, which no "
+                       f"{m}/DECISIONS.md row carries — a ceiling is raised by a recorded decision or not at all")
+        if got > ceil:
+            bad.append(f"check-arms: {gate_rel} has {got} fail branch(es) and refusal site(s) against a "
+                       f"ceiling of {ceil} (REFUSAL_CEILINGS, {date}, {ident}) — growth past the budget "
+                       f"is raised only through the retirement review in the memory-tree README, with a "
+                       f"dated decision id; retire or consolidate a site first")
+    fbad, flines = check_families(root, census, log)
+    rbad, rlines = check_retirements(root, m, log)
+    for line in flines + rlines + [sig2_line]:
+        print(line)
+    bad.extend(fbad + rbad)
     for line in bad:
         print("HYGIENE " + line)
     return 1 if bad else 0
@@ -861,7 +1038,21 @@ def cmd_report(root: str, conf: dict) -> int:
     for gate_rel, ln in st["unreasoned"]:
         print(f"UNREASONED {gate_rel}:{ln}")
     print(f"refusal pin rows : {len(st['rpinned'])} read, {st['unread']} not read")
-    for e in st["errors"] + ([] if st["graded"] else st["rerrors"]):
+    # THE BUDGET (TOOL-aSparedSpawn-14 S4): each gate's census against its ceiling, and the gates no
+    # token budgets, named, so an omission reads as one rather than as a gate with room.
+    ceilings, cbad = parse_ceilings(conf)
+    sites = st["sites"] if st["graded"] else []
+    unbudgeted = []
+    for gate_rel in st["gates"]:
+        got = (sum(1 for b in st["branches"] if b["gate"] == gate_rel)
+               + sum(1 for s in sites if s["gate"] == gate_rel))
+        if gate_rel in ceilings:
+            ceil, date, ident = ceilings[gate_rel]
+            print(f"ceiling {gate_rel}  {got}/{ceil} · {date} · {ident}")
+        else:
+            unbudgeted.append(gate_rel)
+    print(f"unbudgeted gates ({len(unbudgeted)}, no REFUSAL_CEILINGS token): {' '.join(unbudgeted) or 'none'}")
+    for e in st["errors"] + ([] if st["graded"] else st["rerrors"]) + cbad:
         print("ERROR " + e)
     return 0
 
@@ -975,9 +1166,7 @@ def cmd_selftest() -> int:
     with tempfile.TemporaryDirectory() as base:
         root = os.path.join(base, "repo")
         os.makedirs(root)
-        run("git", "init", "-q", ".", cwd=root)
-        run("git", "config", "user.email", "t@t.test", cwd=root)
-        run("git", "config", "user.name", "t", cwd=root)
+        run("git", "init", "-q", "--template=", ".", cwd=root)
         _w(os.path.join(root, ".memory-tree.conf"),
            f'MEMORY_ROOT=memory\nARMS_FLOORS="{PFX}gate-a.sh:3:1"\n')
         _w(os.path.join(root, PFX, "gate-a.sh"), GATE_A)
@@ -996,9 +1185,7 @@ def cmd_selftest() -> int:
         # there, because an empty population has nothing to floor.
         empty = os.path.join(base, "empty")
         os.makedirs(empty)
-        run("git", "init", "-q", ".", cwd=empty)
-        run("git", "config", "user.email", "t@t.test", cwd=empty)
-        run("git", "config", "user.name", "t", cwd=empty)
+        run("git", "init", "-q", "--template=", ".", cwd=empty)
         _w(os.path.join(empty, "README.md"), "no gates here yet\n")
         run("git", "add", "-A", cwd=empty)
         run("git", "commit", "-q", "-m", "e", "--no-verify", cwd=empty)
@@ -1189,9 +1376,7 @@ def cmd_selftest() -> int:
         # observed red against the a7c78ad2 reader, which read neither file.
         side = os.path.join(base, "side")
         os.makedirs(side)
-        run("git", "init", "-q", ".", cwd=side)
-        run("git", "config", "user.email", "t@t.test", cwd=side)
-        run("git", "config", "user.name", "t", cwd=side)
+        run("git", "init", "-q", "--template=", ".", cwd=side)
         _w(os.path.join(side, ".memory-tree.conf"),
            f'MEMORY_ROOT=memory\nARMS_FLOORS="{PFX}kit/g.sh:2:1"\n')
         _w(os.path.join(side, PFX, "kit", "g.sh"),
@@ -1244,9 +1429,7 @@ def cmd_selftest() -> int:
         def build_refusal_tree(name, files, refusals="graded", floors=""):
             t = os.path.join(base, name)
             os.makedirs(t)
-            run("git", "init", "-q", ".", cwd=t)
-            run("git", "config", "user.email", "t@t.test", cwd=t)
-            run("git", "config", "user.name", "t", cwd=t)
+            run("git", "init", "-q", "--template=", ".", cwd=t)
             _w(os.path.join(t, ".memory-tree.conf"), f'MEMORY_ROOT=memory\nARMS_REFUSALS="{refusals}"\n'
                f'ARMS_FLOORS="{floors}"\n')
             _w(os.path.join(t, "memory", "project", ".keep"), "")
@@ -1364,6 +1547,98 @@ def cmd_selftest() -> int:
         arm("S7: a switch value other than blank or graded is refused by name",
             "ARMS_REFUSALS is 'yes'", lambda: cmd_check(t16, c16))
 
+        # TOOL-aSparedSpawn-14 — the ceiling, the family sidecar and the retirement registry, each over
+        # a tree of its own whose gate holds two armed branches and whose decision log carries one id.
+        BG, BT = f"{PFX}kit/budget.sh", f"{PFX}kit/budget.test.sh"
+        BF, BR = f"{PFX}kit/budget.families.txt", os.path.join("memory", "project", "refusal-retirements.txt")
+        bgate = HELPER + ('[ -n "$a" ] && fail 1 "alpha refusal message here: $x"\n'
+                          '[ -n "$b" ] && fail 2 "beta refusal message here"\n')
+        barms = "hit 'alpha refusal message here'\nhit 'beta refusal message here'\nhit 'alpha refusal second site'\n"
+        dlog = "# decisions\n\n- TOOL-tBudget-1 · a dated ceiling\n- TOOL-tBudget-12 · a longer id\n"
+        rrow = ('TOOL-tBudget-1 · RETIRES {g} check 3 "gamma" (x1) · R1 records · R2 none · R3 survives · '
+                'R4 not security-shaped · survivor {g} "{s}" · replay "check 2 FAILED" · supersedes TOOL-tOld-1\n')
+
+        def build_budget_tree(name, ceilings, families="", rows="", extra=""):
+            t = os.path.join(base, name)
+            os.makedirs(t)
+            run("git", "init", "-q", "--template=", ".", cwd=t)
+            _w(os.path.join(t, ".memory-tree.conf"), f'MEMORY_ROOT=memory\nARMS_FLOORS="{BG}:2:2"\n'
+               f'REFUSAL_CEILINGS="{ceilings}"\n')
+            _w(os.path.join(t, "memory", "DECISIONS.md"), dlog)
+            _w(os.path.join(t, BG), bgate + extra)
+            _w(os.path.join(t, BT), barms)
+            if families:
+                _w(os.path.join(t, BF), families)
+            if rows:
+                _w(os.path.join(t, BR), rows)
+            run("git", "add", "-A", cwd=t)
+            run("git", "commit", "-q", "-m", "b", "--no-verify", cwd=t)
+            return t, load_conf(t)
+
+        tb1, cb1 = build_budget_tree("b1", f"{BG}:2:2026-10-12:TOOL-tBudget-1")
+        arm("AC3+AC4: a gate at its ceiling passes and prints the ceiling with its date and id",
+            f"check-arms: ceiling {BG} 2/2 · 2026-10-12 · TOOL-tBudget-1", lambda: cmd_check(tb1, cb1))
+        arm("...and the same tree is green", "[rc=0]", lambda: cmd_check(tb1, cb1))
+        tb2, cb2 = build_budget_tree("b2", f"{BG}:1:2026-10-12:TOOL-tBudget-1")
+        arm("AC3: a census one above its ceiling reds naming the gate and the review",
+            f"{BG} has 2 fail branch(es) and refusal site(s) against a ceiling of 1 (REFUSAL_CEILINGS, "
+            "2026-10-12, TOOL-tBudget-1) — growth past the budget is raised only through the retirement "
+            "review", lambda: cmd_check(tb2, cb2))
+        for label, tok, want in (("lacks its date", f"{BG}:2:TOOL-tBudget-1", "it lacks its date"),
+                                 ("lacks its id", f"{BG}:2:2026-10-12", "it lacks its decision id")):
+            tb, cb = build_budget_tree("b3" + label[-2:], tok)
+            arm(f"AC4: a ceiling token that {label} reds naming the token",
+                f"REFUSAL_CEILINGS token {tok!r} is malformed — {want}", lambda tb=tb, cb=cb: cmd_check(tb, cb))
+        tb4, cb4 = build_budget_tree("b4", f"{BG}:2:2026-10-12:TOOL-tBudget-9")
+        arm("AC4: a ceiling naming an id the decision log does not carry reds naming the token's id",
+            f"REFUSAL_CEILINGS token for {BG} names TOOL-tBudget-9, which no memory/DECISIONS.md row "
+            "carries", lambda: cmd_check(tb4, cb4))
+        tb4b, cb4b = build_budget_tree("b4b", f"{BG}:2:2026-10-12:TOOL-tBudget-12")
+        arm("...and an id carried only as a prefix of a longer one is not carried", "[rc=0]",
+            lambda: 0 if "names TOOL-tBudget-12" not in run_check_text(tb4b, cb4b)
+            and check_id_carried("TOOL-tBudget-1", "- TOOL-tBudget-12 · x") is False else 1)
+
+        fam = "alpha\t1\t2026-10-12\tTOOL-tBudget-1\t^alpha refusal\n"
+        tb5, cb5 = build_budget_tree("b5", f"{BG}:3:2026-10-12:TOOL-tBudget-1", families=fam)
+        arm("AC5 control: a family at its ceiling passes and prints with its date and id",
+            f"check-arms: family {BG} alpha 1/1 · 2026-10-12 · TOOL-tBudget-1\n", lambda: cmd_check(tb5, cb5))
+        tb6, cb6 = build_budget_tree("b6", f"{BG}:3:2026-10-12:TOOL-tBudget-1", families=fam,
+                                     extra='[ -n "$c" ] && fail 3 "alpha refusal second site"\n')
+        arm("AC5: one more site matching a family at its ceiling reds with the shared-table remedy",
+            f"{BG} carries 2 site(s) in family alpha against its ceiling of 1 ({BF}:1) — a new per-verb "
+            "site: extend the family's shared table instead", lambda: cmd_check(tb6, cb6))
+        tb7, cb7 = build_budget_tree("b7", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
+                                     families="dead\t1\t2026-10-12\tTOOL-tBudget-1\t^no such refusal\n")
+        arm("AC7: a family pattern matching no refusal site reds naming the family",
+            f"{BF}:1 family dead matches no refusal site in {BG}", lambda: cmd_check(tb7, cb7))
+
+        tb8, cb8 = build_budget_tree("b8", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
+                                     rows=rrow.format(g=BG, s="beta refusal message here"))
+        arm("AC1 control: a retirement row whose survivor carries its signature passes", "[rc=0]",
+            lambda: cmd_check(tb8, cb8))
+        tb9, cb9 = build_budget_tree("b9", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
+                                     rows=rrow.format(g=BG, s="gamma refusal never written"))
+        arm("AC1: a retirement row whose survivor lacks its signature reds naming the row's id",
+            f"(TOOL-tBudget-1) names the survivor {BG}, which no longer carries its signature",
+            lambda: cmd_check(tb9, cb9))
+        for field, cut in (("survivor", f' · survivor {BG} "beta refusal message here"'),
+                           ("replay", ' · replay "check 2 FAILED"')):
+            tb, cb = build_budget_tree("b10" + field, f"{BG}:2:2026-10-12:TOOL-tBudget-1",
+                                       rows=rrow.format(g=BG, s="beta refusal message here").replace(cut, ""))
+            arm(f"AC2: a retirement row lacking its {field} field reds naming the field",
+                f"(TOOL-tBudget-1) lacks its {field} field", lambda tb=tb, cb=cb: cmd_check(tb, cb))
+        tb11, cb11 = build_budget_tree("b11", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
+                                       rows=rrow.format(g=BG, s="beta refusal message here")
+                                       .replace("TOOL-tBudget-1 · RETIRES", "TOOL-tBudget-7 · RETIRES"))
+        arm("S2: a retirement row naming an id the decision log does not carry reds",
+            "names TOOL-tBudget-7, which no DECISIONS.md row carries", lambda: cmd_check(tb11, cb11))
+        arm("S4: --report names a ceiling and lists the gates no token budgets",
+            f"ceiling {BG}  2/2 · 2026-10-12 · TOOL-tBudget-1\nunbudgeted gates (0, no REFUSAL_CEILINGS "
+            "token): none", lambda: cmd_report(tb1, cb1))
+        arm("...and a tree with no ceiling lists its gate unbudgeted",
+            f"unbudgeted gates (1, no REFUSAL_CEILINGS token): {BG}",
+            lambda: cmd_report(tb1, dict(cb1, REFUSAL_CEILINGS="")))
+
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
         return 1
@@ -1388,6 +1663,11 @@ def _capture(fn, root, conf, sink):
 def main(argv):
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
+        # TOOL-aSparedSpawn-9 S1: the fixtures' identity and line endings, once for every git the
+        # selftest runs, in place of two to four `git config` processes per fixture repository.
+        os.environ.update(GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t.test", GIT_COMMITTER_NAME="t",
+                          GIT_COMMITTER_EMAIL="t@t.test", GIT_CONFIG_COUNT="1",
+                          GIT_CONFIG_KEY_0="core.autocrlf", GIT_CONFIG_VALUE_0="false")
         return cmd_selftest()
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()

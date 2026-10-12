@@ -61,7 +61,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -98,7 +99,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -260,7 +261,7 @@ read_conf_scalar() {
 }
 
 MODE="${1:---check}"
-case "$MODE" in --scaffold|--check|--render|--expand) ;; *) echo "usage: $(basename "$0") [--scaffold|--check|--render|--expand [--stamp]]"; exit 2 ;; esac
+case "$MODE" in --scaffold|--check|--check-render|--render|--expand) ;; *) echo "usage: $(basename "$0") [--scaffold|--check|--check-render|--render|--expand [--stamp]]"; exit 2 ;; esac
 
 # --render exists because --scaffold REFUSES on an existing declaration, so without it the only
 # remedy for a DRIFTED Skill would be deleting the conf and re-deriving the table. A refusal whose
@@ -268,6 +269,15 @@ case "$MODE" in --scaffold|--check|--render|--expand) ;; *) echo "usage: $(basen
 if [ "$MODE" = "--render" ]; then
   [ -f "$CONF" ] || { echo "lexicon-adopt: no .lexicon.conf; nothing to render from"; exit 1; }
   write_skill || exit 1
+  exit 0
+fi
+
+# --check-render is the Skill byte-compare `--check` runs, alone. run-gates' regen preflight proves
+# the render fresh with it: the whole `--check` also grades naming, a red no re-render can cure, and
+# read there as a stale output it refused every bar. TOOL-aPrimedIndex-9.
+if [ "$MODE" = "--check-render" ]; then
+  [ -f "$CONF" ] || exit 0
+  check_skill || exit 1
   exit 0
 fi
 

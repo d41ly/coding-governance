@@ -1,11 +1,11 @@
 # Session kickoff manifest — coding-governance
 
-<!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
+<!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-11T11:44:17+03:00 @ 6fbac31c7dcb2903cdf85a725f261424f8e24981
+last-audit: 2026-10-13T01:59:11+03:00 @ 7350eff3975a7047ff01b30ad2be7b275921f433
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 78110101c6c3e494cd10648a8bfb4cedea9470e3
+last-body-change: f5a63b77ee338bc5885f2c6194dcaf7ab721eeeb
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -25,17 +25,17 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 
 ## §A — Task (the agent DERIVES this per kickoff — the user does NOT fill it)
 
-Derived from the `/session-kickoff` message plus the adjacent memory (`memory/DECISIONS.md`,
-`memory/backlog/`, `memory/builds/<slug>/`) and the code. The field set below is SEALED — check 10
-byte-compares it against the contract `manifest-check.sh` carries, so editing it here reds the bar.
-Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`. The tier lives in
-§B's tier rule, not here.
+Derived per kickoff from the `/session-kickoff` message, `memory/` and the code. The region below is
+SEALED: check 10 byte-compares it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`,
+which restores it. The tier is §B's.
 
 <!-- kickoff:task -->
 > - **Title:** …
 > - **Goal (1–2 sentences):** …
 > - **IN scope:** …
 > - **OUT / non-goals** (explicit cut-line): …
+> - **To-do:** (the steps in order, each naming what it changes) …
+> - **Reuse:** (each seam this extends, by path, or "no seam fits" with the probe's evidence) …
 > - **Acceptance check** (the observation that proves THIS change — a test it adds, a gate it
 >   moves, an observed behavior; *not* an unrelated green check): …
 > - **Gates it must pass:** …
@@ -51,12 +51,13 @@ lives where each bullet points.
 - Every session start writes an orientation card; a commit is refused until its READY line is appended, and only from a tree the card names (`tools/hooks/scratch-guard.js`).
 - A card's `## route` lands only when its build, unit specs and brief all resolve; a write under `ROUTED_PATHS` needs a route naming a buildable unit, and a pushed commit there names a specced one (`TOOL-aRoutedQuill-2`, `-3`).
 - The card's READY anchor accepts both the bare and the `- ` list-item spelling (`TOOL-cMendedVintage-16`).
+- An attended code build runs through `/build` after kickoff's go: the role catalogue's workflows in stage order (`KICK-aOrientedCast-2`).
 - Layout: `main` lives in `C:/projects/coding-governance`; every unit's branch rides its own worktree under `.claude/worktrees/<branch-slug>/`, and `git worktree list` is the inventory.
 - Remote `origin`, default branch `main`; a push needs an explicit ask or the authorization `memory/guides/UNATTENDED-PROTOCOL.md` section 1 defines.
 - Governing docs: `AGENTS.md`, the template it renders from, and `memory/DECISIONS.md`; binding guides are `memory/guides/REVIEW-PROTOCOL.md` and the unattended protocol and verbs.
 - An unattended run is bound by directives the unattended Skill lists, waivable only by the owner at preflight; a discovery is adopted, not parked.
 - An unattended run declares a mode, which decides its authorization, its anchor and the directives that bind; the Skill's routing table is the list.
-- The idle-wake only wakes an idle session; resuming a stalled run is the stop-guard's, the stall-recorder's and the resume tick's, from the lease (protocol §5).
+- The idle-wake at most wakes an idle session (nine never fired in 30 h of pending background work, 2026-10-10); resuming a stalled run is the stop-guard's, the stall-recorder's and the resume tick's, from the lease, and the tick kills only what it launched, so a live STALE session is a `stale-live-pid` health line (protocol §5, `aSparedHolder`).
 - `GATE_BOUND` bounds every declared command and kills it on breach; nothing bounds an agent-launched process except `tools/process-monitor/`.
 - An adopter's bar holds a leg by `subject = "kit"` alone: govkit never emits `chunk`, so a shipped self-test declares it in its descriptor (`aBenchedProbe`).
 - A CLOSED Tier-2 unit owes an acceptance ledger in a `journal` record; the grammar is `memory/HYGIENE.md` "Acceptance ledger".
@@ -81,12 +82,12 @@ lives where each bullet points.
 ### Gate commands (the merge bar)
 
 ```bash
-bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY, at the width gate-profiles.txt declares for this hardware; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
+bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY at the gate-profiles.txt width or a lower `--calibrate-width` pick; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
 # Legs report in CHUNKS, each closing with a verdict line, so a red is readable before the run ends. A chunk whose every leg skipped reports skipped, never green.
+bash tools/run-gates/run-gates.sh --regen   # regenerate every declared generated output; a bar refuses while one is stale. TOOL-aPrimedIndex-2, -3
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD and the docs mode (GATE_DOCS_BASE). .githooks/pre-push decides, and prints which it chose and why
 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
-# Every leg declares a `ceiling` in tools/gate-legs.json; one outliving it gets ONE serial retry (a pass is green); all-HOST exits 4. TOOL-aBoundedCeiling-1
 # Per profile row: a whole-RUN wall (GATE_WALL; a breach kills the legs, TOOL-aQuenchedHarness-1), and mempause holding dispatch while used memory is above it (TOOL-aGraftedHelix-7)
 GATE_ATTRIBUTE=<rev> bash tools/run-gates/run-gates.sh   # re-run each RED leg at <rev> and print whose red it is: OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE. Report-only, the exit never moves; .githooks/pre-push exports the remote sha. TOOL-dDerivedDocket-23
 bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts and REFUSES an uncalibrated row until --pooled --calibrate; bare REFUSES; GOV_NODE must be a registry tag; a pooled red keeps each row's output under <git-dir>/gate-logs/selftests/. TOOL-aBatchedArm-4, -5

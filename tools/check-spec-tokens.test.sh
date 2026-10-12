@@ -124,7 +124,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -161,7 +162,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -998,7 +999,7 @@ arm "a family-less, tailed target in a units sub-folder is joined by its H1, not
 #      in a scratch repo: AC6's staged breaks, AC8's report line and --list rows, and AC1's hit as the
 #      report prints it. Each arm was observed RED on the checker before this join, which printed no
 #      claims line, carried no `scan_claims` and exited 0 over every fixture here.
-MAPKIT="$(git -C "$HERE" rev-parse --show-toplevel)/$CODEBASE_MAP_DIR"
+MAPKIT="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$CODEBASE_MAP_DIR"
 cat > "$base/claims-direct.py" <<'PYEOF'
 import importlib.util, os, sys
 P = sys.argv[3]   # the install prefix with its slash, handed in by the suite

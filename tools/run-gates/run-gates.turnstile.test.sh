@@ -75,7 +75,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -112,7 +113,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -128,11 +129,18 @@ LIB="${LIB_DIR##*/}"
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "turnstile-test: not a git repo"; exit 2; }
 HERE=$(cd "$(dirname "$0")" && pwd)
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+# Fixture identity and line endings for every git below, through the environment and not per repo
+# (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true.
+export GIT_AUTHOR_NAME=ts-test GIT_AUTHOR_EMAIL=ts@test.invalid GIT_COMMITTER_NAME=ts-test GIT_COMMITTER_EMAIL=ts@test.invalid
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 # THE HOST TURNSTILE IS THIS SUITE'S OWN (TOOL-aFrugalTurnstile-5 S7). The runner's beacon and queue
 # live in a host-wide directory, so a fixture bar left on the default would queue behind every real
 # bar on the machine, and one inside a real bar's leg would NEST and never claim at all. `mk_repo`
 # clears it, so every arm starts on an empty turnstile exactly as a fresh common dir gave it before.
 export GATE_TURNSTILE_DIR="$tmp/gate-turnstile"
+# THE SLOT COUNT IS THIS SUITE'S OWN TOO (TOOL-aPairedSlots-15): one, whatever the caller exported, so
+# an arm that names no count runs at the kit default and an operator's two-slot shell reds nothing.
+export GATE_TURNSTILE_SLOTS=1
 bad=0
 # An EXECUTED assertion count with a floor, carried at birth: a suite that prints a hardcoded total
 # is a suite whose count stops tracking its arms the first time somebody deletes one.
@@ -151,7 +159,9 @@ bad=0
 # arm 22's counted on its never-established branch too, as a SKIP.
 # Raised from 78 to 101 by TOOL-aFrugalTurnstile-5, which adds arms 23-28: 5, 4, 4, 6, 2 and 2
 # assertions, every one unconditional or counted on both branches, counted off the blocks.
-FLOOR_ASSERTIONS=101
+# Raised from 101 to 144 by TOOL-aPairedSlots-15: the 33 of arms 29-43 (TOOL-aPairedSlots-2 to -5),
+# which left this floor where it was, and the 10 of arms 44-48, counted off the blocks.
+FLOOR_ASSERTIONS=144
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -176,13 +186,12 @@ hdrkey() {
 # mk_repo <dir> — a scratch repository carrying the runner and its table.
 mk_repo() {
   local d=$1
-  rm -rf "$GATE_TURNSTILE_DIR/gate-bar-beacon" "$GATE_TURNSTILE_DIR/gate-bar-queue" 2>/dev/null
+  rm -rf "$GATE_TURNSTILE_DIR"/gate-bar-beacon "$GATE_TURNSTILE_DIR"/gate-bar-beacon.* "$GATE_TURNSTILE_DIR/gate-bar-queue" 2>/dev/null
   mkdir -p "$d/${PFX}${KIT}" "$d/${PFX}${LIB}" "$d/fx"
   cp "$HERE/run-gates.sh" "$HERE/gate-profiles.txt" "$d/${PFX}${KIT}/" || return 1
   cp "$HERE/gate-fingerprint.sh" "$d/${PFX}${KIT}/" 2>/dev/null || true
   cp "$ROOT/${LIB_DIR}/resolve-python.sh" "$d/${PFX}${LIB}/" 2>/dev/null || true
-  ( cd "$d" && git init -q -b main . && git config user.email ts@test.invalid \
-      && git config user.name ts-test ) >/dev/null 2>&1 || return 1
+  ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1 || return 1
   # The occupancy leg: register, count everyone registered, record the count, dwell, deregister.
   # `mkdir` for the marker so registration is atomic; the count is taken AFTER registering, so a
   # holder always sees at least itself.
@@ -355,16 +364,58 @@ fi
 # nothing. And the successor used to launch after a flat 5 s whether or not the holder had
 # claimed; launch-to-claim measured 6 to 11.5 s under load, and an unclaimed beacon makes the
 # property pass VACUOUSLY. The claim is now the control, polled the way 4b polls it.
+#
+# THE TTL IS MEASURED, NOT TYPED (TOOL-aSparedSpawn-15 S3). A TTL is a time by definition, so this is
+# the one arm where a clock stays; what it stops being is a guess. Before the runs, the SHIPPED
+# `ts_tick_start`, with the one helper it calls, is sourced from the runner and run for ten ticks
+# against a scratch beacon, with a `sleep` stub first on its PATH: one spawn in place of the real
+# sleep's one, returning at once, so the ten bodies cost the spawns a real tick pays and nothing
+# waits a second. The stub counts its calls in a file and, on the eleventh, stamps the end and
+# replaces the nonce, which ends the ticker by its own guard. A stub on PATH and not a function, as
+# TOOL-aSparedSpawn-11 found, because a definition here is a name the naming leg grades. One tick's
+# period is the tick plus the mean body; the TTL is three periods and never under 6 s, and the leg
+# is the TTL plus 8 s, so a ticker that does NOT refresh still leaves a heartbeat the successor
+# reaps. A tick body that grows a spawn (a `cat` or a `date` put back) raises the printed period,
+# and a period that cannot be read is a FAIL, never a typed fallback.
+tk6=$tmp/tick6; mkdir -p "$tk6/b" "$tk6/bin"; printf '%s' tick > "$tk6/b/nonce"
+sed -n '/^ts_alive()/p;/^ts_tick_start() {/,/^}$/p' "$HERE/run-gates.sh" > "$tk6/fn.sh"
+printf '%s\n' '#!/bin/bash' \
+  'd=${0%/bin/sleep}; k=0; { read -r k < "$d/count"; } 2>/dev/null; k=$((k + 1)); printf "%s\n" "$k" > "$d/count"' \
+  '[ "$k" -le 10 ] || { printf "%s\n" "${EPOCHREALTIME//[.,]/}" > "$d/end"; printf x > "$d/b/nonce"; }' > "$tk6/bin/sleep"
+chmod +x "$tk6/bin/sleep"
+# The shell's own spelling of the stub's directory: a TMPDIR spelled `C:/...` would split the PATH
+# entry at the drive colon, and the ticker would run the real `sleep` and never end.
+tk6bin=$(cd "$tk6/bin" && pwd)
+grep -q '^ts_tick_start() {' "$tk6/fn.sh" && [ -n "$tk6bin" ] && (
+  # shellcheck disable=SC1090
+  . "$tk6/fn.sh" || exit 1
+  TS_DIR=$tk6/b; TS_NONCE=tick; TS_TICK_EVERY=1; TS_TTL=6
+  printf '%s\n' "${EPOCHREALTIME//[.,]/}" > "$tk6/start"
+  PATH="$tk6bin:$PATH" ts_tick_start || exit 1
+  # A HANG BOUND the pass path never reaches: the poll ends on the stamp, or on the ticker's exit.
+  _w6=0; while [ ! -s "$tk6/end" ] && [ "$_w6" -lt 600 ] && kill -0 "${TS_TICK_PID:-none}" 2>/dev/null; do sleep 0.1; _w6=$((_w6 + 1)); done
+) >/dev/null 2>&1
+t6s=""; t6e=""
+{ read -r t6s < "$tk6/start"; read -r t6e < "$tk6/end"; } 2>/dev/null
+if grep -q '^ts_tick_start() {' "$tk6/fn.sh" && [ -n "$t6s" ] && [ -n "$t6e" ]; then
+  body6=$(( (10#$t6e - 10#$t6s) / 10000 )); period6=$(( 1000 + body6 ))
+  ttl6=$(( (3 * period6 + 999) / 1000 )); [ "$ttl6" -ge 6 ] || ttl6=6; long6=$(( ttl6 + 8 ))
+  ok "R6 measured: one tick is ${period6} ms (${body6} ms of it the body), so the TTL is ${ttl6} s and the leg ${long6} s"
+else
+  ttl6=6; long6=14
+  nope "R6 printed no measured period: the shipped ts_tick_start did not extract or did not tick ten times, so the TTL below is a typed guess"
+fi
+rm -rf "$tk6"
 R6=$tmp/ceiling; mk_repo "$R6"; B6=$(beacon "$R6")
 legs "$R6" '[ {"name": "long", "argv": ["bash", "fx/long.sh"]} ]'
-( cd "$R6" && env GATE_FULL=1 TS_LONG=14 GATE_TURNSTILE_TTL=6 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1 &
+( cd "$R6" && env GATE_FULL=1 TS_LONG=$long6 GATE_TURNSTILE_TTL=$ttl6 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1 &
 h6=$!; claimed6=0
 for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do
   sleep 1; kill -0 "$h6" 2>/dev/null || break; [ -d "$B6" ] && { claimed6=1; break; }
 done
 if [ "$claimed6" = 1 ]; then
   ok "control: the long-leg holder claimed the beacon (the ceiling arm has something to grade)"
-  out6=$( cd "$R6" && env GATE_FULL=1 GATE_TURNSTILE_TTL=6 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
+  out6=$( cd "$R6" && env GATE_FULL=1 GATE_TURNSTILE_TTL=$ttl6 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
   wait "$h6" 2>/dev/null
   printf '%s' "$out6" | grep -q 'stalled holder' \
     && nope "a LIVE holder inside a leg longer than the TTL was reaped — the ticker is not refreshing the beacon" \
@@ -530,7 +581,11 @@ legs "$R9b" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
 # `held`/`queued=0`, and the arm reds having graded nothing. A quarter second makes the invariant the
 # comment above already CLAIMS actually hold. Raising the TTL instead would drag `TS_MAXWAIT = TTL*4`
 # up with it and lengthen the window the refresher must survive, which is the wrong direction.
-( while [ -d "$B9b" ]; do printf '%s' "$(date +%s)" > "$B9b/heartbeat" 2>/dev/null || true; sleep 0.25; done ) &
+# AND NO FORK IN THE WRITE (TOOL-aSparedSpawn-15 S2). It wrote `$(date +%s)`, one spawn a tick, and
+# a spawn on a loaded node `a` costs 632 to 818 ms, so a quarter-second refresher became a
+# one-second one and the runner reaped the holder this arm needs alive. `$EPOCHSECONDS` is the same
+# integer from a builtin; the `sleep` is the one spawn left in the loop.
+( while [ -d "$B9b" ]; do printf '%s' "$EPOCHSECONDS" > "$B9b/heartbeat" 2>/dev/null || true; sleep 0.25; done ) &
 hb=$!
 out9b=$( cd "$R9b" && env GATE_FULL=1 GATE_TURNSTILE_TTL=2 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 ); rc9b=$?
 q9b=$(hdrkey "$R9b" queued); qf9b=$(hdrkey "$R9b" queued_from)
@@ -1023,7 +1078,7 @@ i23=0
 while ! grep -q 'queued at position' "$tmp/out23b" 2>/dev/null && ! grep -q '^ *2' "$S23/peaks" 2>/dev/null \
       && kill -0 "$w23" 2>/dev/null && [ "$i23" -lt 2400 ]; do sleep 0.1; i23=$((i23 + 1)); done
 : > "$S23/go"; wait "$w23" 2>/dev/null; wait "$h23" 2>/dev/null
-top23=$(cd "$R23a" && git rev-parse --show-toplevel); run23=$(hdrkey "$R23a" run_id)
+top23=$(unset GIT_DIR GIT_WORK_TREE; cd "$R23a" && git rev-parse --show-toplevel); run23=$(hdrkey "$R23a" run_id)
 [ -n "$f23_repo" ] && [ "$f23_repo" = "$top23" ] && ok "the host beacon's repo names the holder's top level" \
   || nope "the host beacon's repo read '$f23_repo', not the holder's top level '$top23'"
 [ -n "$f23_run" ] && [ "$f23_run" = "$run23" ] && ok "the host beacon's run is the holder's run id" \
@@ -1134,6 +1189,394 @@ else
   skipped "the unattended driver's spelling: that kit is not installed in this tree"
 fi
 
+# ================= TOOL-aPairedSlots-2: the turnstile as a COUNTING SEMAPHORE ===================
+# Every arm below runs its bars at GATE_TURNSTILE_SLOTS=2 under the suite's own host dir, each bar in
+# a repository of its own, so the arms stay true once a worktree may hold only one slot
+# (TOOL-aPairedSlots-5). A hold leg registers, then waits on its own go-file, so no verdict rests on
+# a clock: an arm releases its holders only after it has read what it asserts.
+printf '#!/usr/bin/env bash\nS=${TS_SHARED:?}\nmkdir -p "$S/live"; mkdir "$S/live/$$"\nls -1 "$S/live" | wc -l >> "$S/peaks"\ni=0; while [ ! -e "$S/go" ] && [ "$i" -lt 1500 ]; do sleep 0.2; i=$((i + 1)); done\nrmdir "$S/live/$$"\nexit 0\n' > "$tmp/holdS.sh"
+printf '[ {"name": "hold", "argv": ["bash", "%s"]} ]\n' "$tmp/holdS.sh" > "$tmp/holdS.json"
+# run_slot_bar <repo> <shared dir> <out file> [VAR=value…] — a backgrounded two-slot bar running the hold leg; its pid in SLOT_PID
+run_slot_bar() {
+  local r=$1 s=$2 o=$3; shift 3
+  ( cd "$r" && env TS_SHARED="$s" GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 GATE_TURNSTILE_TTL=600 GATE_TURNSTILE_TICK=1 \
+      GATE_LEGS="$tmp/holdS.json" "$@" bash $KIT_REL/run-gates.sh ) >"$o" 2>&1 &
+  SLOT_PID=$!
+}
+# check_registered <shared dir> <count> <pid> — until <count> holders have registered there, or <pid> exits
+check_registered() {
+  # THE COUNT DEFAULTS TO 0. `grep -c` over a file not yet written prints nothing, and an empty
+  # operand makes the comparison an error, which ended this loop at once and let an arm read the
+  # beacons before any holder had registered: observed on the first slice of these arms.
+  local i=0 c
+  while :; do
+    c=$(grep -c . "$1/peaks" 2>/dev/null); c=${c:-0}
+    [ "$c" -lt "$2" ] && kill -0 "$3" 2>/dev/null && [ "$i" -lt 2400 ] || break
+    sleep 0.1; i=$((i + 1))
+  done
+}
+BS=$(beacon x)
+
+# ---- 29: with slots=2 two bars hold at once and a third queues (AC1); its line names both (AC2) -------
+R29a=$tmp/slotA; R29b=$tmp/slotB; R29c=$tmp/slotC; mk_repo "$R29a"; mk_repo "$R29b"; mk_repo "$R29c"
+S29=$tmp/shared29; mkdir -p "$S29"
+run_slot_bar "$R29a" "$S29" "$tmp/out29a"; p29a=$SLOT_PID; check_registered "$S29" 1 "$p29a"
+run_slot_bar "$R29b" "$S29" "$tmp/out29b"; p29b=$SLOT_PID; check_registered "$S29" 2 "$p29b"
+h29a=$(cat "$BS/pid" 2>/dev/null); h29b=$(cat "$BS.2/pid" 2>/dev/null)
+run_slot_bar "$R29c" "$tmp/shared29c" "$tmp/out29c"; p29c=$SLOT_PID; mkdir -p "$tmp/shared29c"; : > "$tmp/shared29c/go"
+i29=0; while ! grep -q 'queued at position' "$tmp/out29c" 2>/dev/null && kill -0 "$p29c" 2>/dev/null && [ "$i29" -lt 2400 ]; do sleep 0.1; i29=$((i29 + 1)); done
+peak29=$(peak "$S29")
+: > "$S29/go"; wait "$p29a" "$p29b" "$p29c" 2>/dev/null
+[ "$peak29" = 2 ] && ok "slots=2: two bars held at once (peak 2)" || nope "slots=2: the occupancy peak was $peak29, not 2"
+grep -q 'queued at position' "$tmp/out29c" && ok "slots=2: the third bar queued" \
+  || { nope "slots=2: the third bar did not queue behind two holders"; tail -4 "$tmp/out29c" | sed 's/^/      /'; }
+grep -q "2 of 2 bar slots on this host are held — .*pid $h29a.*pid $h29b\|2 of 2 bar slots on this host are held — .*pid $h29b.*pid $h29a" "$tmp/out29c" \
+  && ok "the third bar's queue line counts two of two slots held and names both holders' pids" \
+  || { nope "the third bar's queue line did not name both holders ($h29a, $h29b)"; grep -E 'held|queued' "$tmp/out29c" | sed 's/^/      /'; }
+[ "$(hdrkey "$R29c" slots)" = 2 ] && ok "the third bar's header records slots 2" || nope "the third bar's header records slots '$(hdrkey "$R29c" slots)'"
+s29a=$(hdrkey "$R29a" slot); s29b=$(hdrkey "$R29b" slot)
+{ [ "$s29a" = 1 ] && [ "$s29b" = 2 ]; } || { [ "$s29a" = 2 ] && [ "$s29b" = 1 ]; } \
+  && ok "the two holders' headers record slots 1 and 2" || nope "the two holders' headers record slot '$s29a' and '$s29b'"
+
+# ---- 30: a dead slot is reaped while the other holder keeps running (AC3) ---------------------------
+R30a=$tmp/reapA; R30b=$tmp/reapB; mk_repo "$R30a"; mk_repo "$R30b"; S30=$tmp/shared30; mkdir -p "$S30"
+legs "$R30b" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+run_slot_bar "$R30a" "$S30" "$tmp/out30a"; p30a=$SLOT_PID; check_registered "$S30" 1 "$p30a"
+n30a=$(cat "$BS/nonce" 2>/dev/null)
+sh -c 'exit 0' & dead30=$!; wait "$dead30" 2>/dev/null
+mkdir -p "$BS.2"; printf '%s' "$dead30" > "$BS.2/pid"; printf '%s' "$(date +%s)" > "$BS.2/heartbeat"; printf 'planted30' > "$BS.2/nonce"
+out30=$( cd "$R30b" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 ); rc30=$?
+alive30=0; kill -0 "$p30a" 2>/dev/null && alive30=1
+n30after=$(cat "$BS/nonce" 2>/dev/null)
+: > "$S30/go"; wait "$p30a" 2>/dev/null
+[ "$(printf '%s\n' "$out30" | grep -c 'reaping the beacon of a dead holder')" = 1 ] && ok "the dead slot was reaped once" \
+  || nope "the dead slot was not reaped exactly once"
+[ "$rc30" = 0 ] && printf '%s\n' "$out30" | grep -q '^gate queue: acquired' && ok "the bar behind it claimed and ran" \
+  || nope "the bar behind the dead slot did not claim and run (rc $rc30)"
+[ "$alive30" = 1 ] && [ -n "$n30a" ] && [ "$n30after" = "$n30a" ] && ok "the live holder of slot 1 ran on, its nonce untouched" \
+  || nope "the live holder of slot 1 was disturbed (alive $alive30, nonce '$n30a' then '$n30after')"
+
+# ---- 31: a release frees only its own slot, never a sibling's or a successor's (AC4) ------------------
+R31w=$tmp/relW; R31x=$tmp/relX; mk_repo "$R31w"; mk_repo "$R31x"; S31w=$tmp/shared31w; S31x=$tmp/shared31x; mkdir -p "$S31w" "$S31x"
+run_slot_bar "$R31w" "$S31w" "$tmp/out31w"; p31w=$SLOT_PID; check_registered "$S31w" 1 "$p31w"
+run_slot_bar "$R31x" "$S31x" "$tmp/out31x"; p31x=$SLOT_PID; check_registered "$S31x" 1 "$p31x"
+n31w=$(cat "$BS/nonce" 2>/dev/null)
+# X holds slot 2. Its nonce is replaced, as a successor's claim after a reap would replace it.
+printf 'successor31' > "$BS.2/nonce"
+: > "$S31x/go"; wait "$p31x" 2>/dev/null
+[ -d "$BS.2" ] && [ "$(cat "$BS.2/nonce" 2>/dev/null)" = successor31 ] && ok "a run whose slot was re-claimed left the successor's beacon" \
+  || nope "a run whose slot was re-claimed removed the successor's beacon"
+[ -d "$BS" ] && [ "$(cat "$BS/nonce" 2>/dev/null)" = "$n31w" ] && ok "a release left the other slot's holder in place" \
+  || nope "a release freed another slot's beacon"
+rm -rf "$BS.2"; : > "$S31w/go"; wait "$p31w" 2>/dev/null
+
+# ---- 32: a runner started by the slot-2 holder's leg NESTS (AC5) -------------------------------------
+R32w=$tmp/nestW; R32o=$tmp/nestO; R32i=$tmp/nestI; mk_repo "$R32w"; mk_repo "$R32o"; mk_repo "$R32i"; S32=$tmp/shared32; mkdir -p "$S32"
+legs "$R32i" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+# The inner runner's TTL of 5 bounds a run that FAILS to nest at a 20 s fail-open, as arm 24's control
+# is bounded; a nested run never waits, so the bound costs a passing run nothing.
+# AT ONE SLOT (TOOL-aPairedSlots-15): the inner runner's own count holds no slot 2, so only a nesting
+# test that reads every beacon present finds its parent, which is the case the glob exists for.
+printf '#!/usr/bin/env bash\ncd "%s" && env -u GATE_LEGS GATE_TURNSTILE_SLOTS=1 GATE_TURNSTILE_TTL=5 bash %s/run-gates.sh > "%s" 2>&1\nexit 0\n' "$R32i" "$KIT_REL" "$tmp/out32in" > "$tmp/nest32.sh"
+printf '[ {"name": "nest", "argv": ["bash", "%s"]} ]\n' "$tmp/nest32.sh" > "$tmp/nest32.json"
+run_slot_bar "$R32w" "$S32" "$tmp/out32w"; p32w=$SLOT_PID; check_registered "$S32" 1 "$p32w"
+( cd "$R32o" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 GATE_TURNSTILE_TTL=600 GATE_TURNSTILE_TICK=1 GATE_LEGS="$tmp/nest32.json" bash $KIT_REL/run-gates.sh ) >"$tmp/out32o" 2>&1
+s32o=$(hdrkey "$R32o" slot)
+: > "$S32/go"; wait "$p32w" 2>/dev/null
+[ "$s32o" = 2 ] && ok "the outer bar held slot 2 beside slot 1's holder" || nope "the outer bar held slot '$s32o', not 2"
+grep -q '^gate queue: nested under ' "$tmp/out32in" 2>/dev/null && ok "a runner started by the slot-2 holder's leg nests" \
+  || { nope "a runner started by the slot-2 holder's leg did not nest"; tail -4 "$tmp/out32in" 2>/dev/null | sed 's/^/      /'; }
+
+# ---- 33: at the default count a bar writes no slot key (AC6) --------------------------------------
+# A FIXTURE TABLE WITH NO `slots` KEY (TOOL-aPairedSlots-15): the copied real table is tuned data, and
+# the day it gains a key this arm would stop testing the default.
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,mempause=0\n' > "$tmp/noslots.txt"
+R33=$tmp/slots1; mk_repo "$R33"; legs "$R33" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+( cd "$R33" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS= GATE_PROFILES="$tmp/noslots.txt" GATE_PROFILE= bash $KIT_REL/run-gates.sh ) >"$tmp/out33" 2>&1
+[ -z "$(hdrkey "$R33" slots)" ] && [ -z "$(hdrkey "$R33" slot)" ] && ok "a bar at the default count writes neither slots nor slot" \
+  || nope "a bar at the default count wrote a slot key"
+grep -q 'bar slots' "$tmp/out33" && nope "a bar at the default count printed a slots clause" || ok "a bar at the default count printed no slots clause"
+
+
+# ================= TOOL-aPairedSlots-3: the shared dispatch width =================================
+# A bar that acquires slot 2 while slot 1 is held reads the held count once and takes the width its
+# rule names. The rule is a constant in the runner, `TS_SHARE_RULE`, so each arm sets it in the
+# fixture repository's own runner copy; the profile is a fixture row of width 4.
+printf 't\t0\t0\twidth=4,timeout=0,wall=0,mempause=0\n' > "$tmp/w4.txt"
+# set_share_rule <repo> <rule> — the fixture runner's TS_SHARE_RULE, asserted to have moved
+set_share_rule() {
+  sed -i "s/^TS_SHARE_RULE=.*/TS_SHARE_RULE=$2/" "$1/$KIT_REL/run-gates.sh"
+  grep -q "^TS_SHARE_RULE=$2\$" "$1/$KIT_REL/run-gates.sh"
+}
+# run_beside_holder <repo> <out> [VAR=value…] — a quick-leg bar run while a slot-1 holder waits
+run_beside_holder() {
+  local r=$1 o=$2 s; shift 2
+  s=$tmp/sharedW.$RANDOM; mkdir -p "$s"
+  run_slot_bar "$WIDTH_W" "$s" "$o.w"; local pw=$SLOT_PID; check_registered "$s" 1 "$pw"
+  ( cd "$r" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 GATE_PROFILES="$tmp/w4.txt" GATE_PROFILE= GATE_JOBS= "$@" \
+      bash $KIT_REL/run-gates.sh ) >"$o" 2>&1
+  : > "$s/go"; wait "$pw" 2>/dev/null
+}
+WIDTH_W=$tmp/widthW; mk_repo "$WIDTH_W"
+
+# ---- 34: under `half` the bar beside a holder dispatches at half width; under `full` at full (AC1) ---
+R34h=$tmp/widthHalf; R34f=$tmp/widthFull; mk_repo "$R34h"; mk_repo "$R34f"
+legs "$R34h" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'; legs "$R34f" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+if set_share_rule "$R34h" half && set_share_rule "$R34f" full; then
+  run_beside_holder "$R34h" "$tmp/out34h"; run_beside_holder "$R34f" "$tmp/out34f"
+  grep -q '^gate profile: width 2 at dispatch — 2 of 2 bar slots held (half)$' "$tmp/out34h" && [ "$(hdrkey "$R34h" width)" = 2 ] \
+    && ok "half: the bar beside a holder dispatched at width 2 and its header records 2" \
+    || { nope "half: no width-2 dispatch line, or the header width reads '$(hdrkey "$R34h" width)'"; grep 'gate profile' "$tmp/out34h" | sed 's/^/      /'; }
+  grep -q '^gate profile: width 4 at dispatch — 2 of 2 bar slots held (full)$' "$tmp/out34f" && [ "$(hdrkey "$R34f" width)" = 4 ] \
+    && ok "full: the bar beside a holder dispatched at width 4 and its header records 4" \
+    || { nope "full: no width-4 dispatch line, or the header width reads '$(hdrkey "$R34f" width)'"; grep 'gate profile' "$tmp/out34f" | sed 's/^/      /'; }
+else
+  nope "the fixture runner carries no TS_SHARE_RULE line to set, so the width arms grade nothing"
+fi
+
+# ---- 35: the operator's GATE_JOBS is never divided (AC2) -----------------------------------------
+R35=$tmp/widthJobs; mk_repo "$R35"; legs "$R35" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+if set_share_rule "$R35" half; then
+  run_beside_holder "$R35" "$tmp/out35" GATE_JOBS=3
+  [ "$(hdrkey "$R35" width)" = 3 ] && ok "half beside a holder: GATE_JOBS=3 dispatched at 3" \
+    || nope "half beside a holder: GATE_JOBS=3 dispatched at '$(hdrkey "$R35" width)'"
+else
+  nope "the fixture runner carries no TS_SHARE_RULE line to set"
+fi
+
+# ---- 36: a bar alone prints no dispatch line and keeps the profile's width (AC3) -----------------
+R36=$tmp/widthAlone; mk_repo "$R36"; legs "$R36" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+if set_share_rule "$R36" half; then
+  ( cd "$R36" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 GATE_PROFILES="$tmp/w4.txt" GATE_PROFILE= GATE_JOBS= bash $KIT_REL/run-gates.sh ) >"$tmp/out36" 2>&1
+  grep -q 'at dispatch' "$tmp/out36" && nope "a bar holding the only held slot printed a dispatch line" \
+    || ok "a bar holding the only held slot printed no dispatch line"
+  [ "$(hdrkey "$R36" width)" = 4 ] && ok "and its header records the profile's width 4" || nope "and its header records width '$(hdrkey "$R36" width)'"
+else
+  nope "the fixture runner carries no TS_SHARE_RULE line to set"
+fi
+
+# ---- 37: two concurrent bars pause on ONE host reading (AC4) -------------------------------------
+# The memory pause reads a host-wide source, so two bars share it with no second mechanism. One
+# GATE_MEMINFO file at 95 % used under a 90 % threshold, two bars of two legs each: the second leg's
+# dispatch waits while the first runs, in BOTH bars.
+printf 'MemTotal: 1000 kB\nMemAvailable: 50 kB\n' > "$tmp/mem95"
+printf '#!/usr/bin/env bash\nsleep 2\nexit 0\n' > "$tmp/slow37.sh"
+printf '[ {"name": "slow", "argv": ["bash", "%s"]}, {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]\n' "$tmp/slow37.sh" > "$tmp/legs37.json"
+R37a=$tmp/memA; R37b=$tmp/memB; mk_repo "$R37a"; mk_repo "$R37b"
+for r37 in "$R37a" "$R37b"; do
+  ( cd "$r37" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 GATE_JOBS=2 GATE_MEMPAUSE=90 GATE_MEMINFO="$tmp/mem95" GATE_LEGS="$tmp/legs37.json" \
+      bash $KIT_REL/run-gates.sh ) >"$tmp/out37.${r37##*/}" 2>&1 &
+done
+wait
+for r37 in "$R37a" "$R37b"; do
+  id37=$(cat "$r37/.git/gate-run/current" 2>/dev/null)
+  [ -s "$r37/.git/gate-run/$id37/pauses" ] && ok "bar ${r37##*/} paused on the shared host reading" \
+    || nope "bar ${r37##*/} did not pause on the shared host reading"
+done
+
+# ================= TOOL-aPairedSlots-4: the docs key ===============================================
+# A doc-only bar is one whose GATE_DOCS_BASE resolves, with GATE_FULL unset. Each fixture repository
+# gets a second commit touching a doc path, so `GATE_DOCS_BASE=HEAD~1` names a real base. The non-doc
+# holder below runs at the kit default of one slot, so a doc-only bar that queued would wait behind it.
+build_docs_repo() { # <dir> — mk_repo plus a second commit, so HEAD~1 resolves
+  mk_repo "$1" || return 1
+  printf 'doc\n' > "$1/NOTES.md"; ( cd "$1" && git add -A && git commit -qm doc ) >/dev/null 2>&1
+}
+# run_docs_bar <repo> <out> [VAR=value…] — a doc-only bar in the foreground
+run_docs_bar() {
+  local r=$1 o=$2; shift 2
+  ( cd "$r" && env GATE_FULL= GATE_DOCS_BASE=HEAD~1 GATE_TURNSTILE_TICK=1 "$@" bash $KIT_REL/run-gates.sh ) >"$o" 2>&1
+}
+DK=$GATE_TURNSTILE_DIR/gate-docs-beacon
+
+# ---- 38: a doc-only bar is admitted at once while a non-doc bar holds the only slot (AC1) ----------
+R38w=$tmp/docsW; R38d=$tmp/docsD; mk_repo "$R38w"; build_docs_repo "$R38d"; S38=$tmp/shared38; mkdir -p "$S38"
+legs "$R38d" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+( cd "$R38w" && env TS_SHARED="$S38" GATE_FULL=1 GATE_TURNSTILE_SLOTS= GATE_PROFILES="$tmp/noslots.txt" GATE_PROFILE= GATE_TURNSTILE_TTL=600 GATE_TURNSTILE_TICK=1 \
+    GATE_LEGS="$tmp/holdS.json" bash $KIT_REL/run-gates.sh ) >"$tmp/out38w" 2>&1 &
+p38w=$!; check_registered "$S38" 1 "$p38w"
+run_docs_bar "$R38d" "$tmp/out38d"
+held38=0; kill -0 "$p38w" 2>/dev/null && held38=1
+: > "$S38/go"; wait "$p38w" 2>/dev/null
+grep -q '^gate queue: docs-only — admitted on the docs key, not queued$' "$tmp/out38d" && [ "$held38" = 1 ] \
+  && ok "a doc-only bar was admitted on the docs key and finished while the non-doc holder still ran" \
+  || { nope "a doc-only bar was not admitted at once beside the non-doc holder (holder alive: $held38)"; grep -E 'gate queue|queued' "$tmp/out38d" | sed 's/^/      /'; }
+grep -q 'queued at position' "$tmp/out38d" && nope "the doc-only bar took a ticket and queued" || ok "the doc-only bar took no place in the queue"
+[ "$(hdrkey "$R38d" queued_from)" = docs ] && ok "its header records queued_from docs" \
+  || nope "its header records queued_from '$(hdrkey "$R38d" queued_from)'"
+
+# ---- 39: a doc-only bar's release frees its own run id and no other (AC2) --------------------------
+R39a=$tmp/docsA; R39b=$tmp/docsB; build_docs_repo "$R39a"; build_docs_repo "$R39b"; S39=$tmp/shared39; mkdir -p "$S39"
+legs "$R39b" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+( cd "$R39a" && env TS_SHARED="$S39" GATE_FULL= GATE_DOCS_BASE=HEAD~1 GATE_TURNSTILE_TICK=1 \
+    GATE_LEGS="$tmp/holdS.json" bash $KIT_REL/run-gates.sh ) >"$tmp/out39a" 2>&1 &
+p39a=$!; check_registered "$S39" 1 "$p39a"
+run_docs_bar "$R39b" "$tmp/out39b"
+run39a=$(hdrkey "$R39a" run_id); run39b=$(hdrkey "$R39b" run_id)
+[ -n "$run39a" ] && [ -d "$DK/$run39a" ] && ok "the live doc-only bar's beacon stood while its neighbour released" \
+  || nope "the live doc-only bar's beacon was gone after its neighbour released"
+[ -n "$run39b" ] && [ ! -e "$DK/$run39b" ] && ok "the finished doc-only bar's own beacon is gone" \
+  || nope "the finished doc-only bar left its beacon behind"
+: > "$S39/go"; wait "$p39a" 2>/dev/null
+
+# ---- 40: a runner started by a doc-only bar's leg nests (AC3) --------------------------------------
+R40o=$tmp/docsO; R40i=$tmp/docsI; build_docs_repo "$R40o"; mk_repo "$R40i"
+legs "$R40i" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+printf '#!/usr/bin/env bash\ncd "%s" && env -u GATE_LEGS GATE_TURNSTILE_TTL=5 bash %s/run-gates.sh > "%s" 2>&1\nexit 0\n' "$R40i" "$KIT_REL" "$tmp/out40in" > "$tmp/nest40.sh"
+printf '[ {"name": "nest", "argv": ["bash", "%s"]} ]\n' "$tmp/nest40.sh" > "$tmp/nest40.json"
+run_docs_bar "$R40o" "$tmp/out40o" GATE_LEGS="$tmp/nest40.json"
+grep -q '^gate queue: nested under ' "$tmp/out40in" 2>/dev/null && ok "a runner started by a doc-only bar's leg nests" \
+  || { nope "a runner started by a doc-only bar's leg did not nest"; tail -3 "$tmp/out40in" 2>/dev/null | sed 's/^/      /'; }
+
+# ---- 41: the docs key is not a slot, and a full bar is never doc-only (AC4) ------------------------
+R41d=$tmp/docsHold; R41n=$tmp/docsNon; R41f=$tmp/docsFull; build_docs_repo "$R41d"; mk_repo "$R41n"; build_docs_repo "$R41f"
+S41=$tmp/shared41; mkdir -p "$S41"
+legs "$R41n" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'; legs "$R41f" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+( cd "$R41d" && env TS_SHARED="$S41" GATE_FULL= GATE_DOCS_BASE=HEAD~1 GATE_TURNSTILE_TICK=1 \
+    GATE_LEGS="$tmp/holdS.json" bash $KIT_REL/run-gates.sh ) >"$tmp/out41d" 2>&1 &
+p41d=$!; check_registered "$S41" 1 "$p41d"
+( cd "$R41n" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 bash $KIT_REL/run-gates.sh ) >"$tmp/out41n" 2>&1
+( cd "$R41f" && env GATE_FULL=1 GATE_DOCS_BASE=HEAD~1 GATE_TURNSTILE_SLOTS= GATE_PROFILES="$tmp/noslots.txt" GATE_PROFILE= bash $KIT_REL/run-gates.sh ) >"$tmp/out41f" 2>&1
+: > "$S41/go"; wait "$p41d" 2>/dev/null
+grep -q '^gate queue: waited 0s$' "$tmp/out41n" && ! grep -q 'at dispatch' "$tmp/out41n" \
+  && ok "a non-doc bar beside a doc-only holder waited 0s and took no shared width" \
+  || nope "a non-doc bar beside a doc-only holder waited or was narrowed"
+[ "$(hdrkey "$R41f" queued_from)" = held ] && ! grep -q 'docs-only' "$tmp/out41f" \
+  && ok "a full bar with GATE_DOCS_BASE set took a slot as a non-doc bar" \
+  || nope "a full bar with GATE_DOCS_BASE set took the docs key (queued_from '$(hdrkey "$R41f" queued_from)')"
+
+# ---- 42: a dead docs beacon is swept by the next doc-only bar (AC5) --------------------------------
+R42=$tmp/docsSweep; build_docs_repo "$R42"; legs "$R42" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+sh -c 'exit 0' & dead42=$!; wait "$dead42" 2>/dev/null
+mkdir -p "$DK/planted42"; printf '%s' "$dead42" > "$DK/planted42/pid"; printf '%s' "$(date +%s)" > "$DK/planted42/heartbeat"; printf 'p42' > "$DK/planted42/nonce"
+run_docs_bar "$R42" "$tmp/out42"
+grep -q 'sweeping the docs beacon of a dead holder' "$tmp/out42" && [ ! -e "$DK/planted42" ] \
+  && ok "a dead docs beacon was swept by the next doc-only bar" || nope "a dead docs beacon was left standing"
+
+# ================= TOOL-aPairedSlots-5: one slot per worktree =====================================
+# Two bars in ONE worktree would share every file under its git dir, so the claim refuses a second
+# slot to a worktree that holds one; two worktrees of one repository are two git dirs and run at once.
+
+# ---- 43: one worktree holds one slot, two worktrees of one repository hold two (AC1) ---------------
+R43=$tmp/wtOne; mk_repo "$R43"; S43=$tmp/shared43; mkdir -p "$S43"
+# AUTOCRLF OFF BEFORE THE CHECKOUT: a host whose global config converts line endings checks the
+# second worktree out with CRLF, and its runner then refuses the table on a carriage return after its 90 (observed on node a).
+( cd "$R43" && git config core.autocrlf false && git worktree add -q -b w2 "$tmp/wtTwo" ) >/dev/null 2>&1
+run_slot_bar "$R43" "$S43" "$tmp/out43a"; p43a=$SLOT_PID; check_registered "$S43" 1 "$p43a"
+h43a=$(cat "$BS/pid" 2>/dev/null)
+run_slot_bar "$R43" "$S43" "$tmp/out43b"; p43b=$SLOT_PID
+i43=0; while ! grep -q 'queued at position' "$tmp/out43b" 2>/dev/null && kill -0 "$p43b" 2>/dev/null && [ "$i43" -lt 2400 ]; do sleep 0.1; i43=$((i43 + 1)); done
+peak43=$(peak "$S43")
+: > "$S43/go"; wait "$p43a" "$p43b" 2>/dev/null
+[ "$peak43" = 1 ] && ok "two bars in one worktree never held at once (peak 1)" || nope "two bars in one worktree held at once (peak $peak43)"
+grep -q "held, and this worktree's bar holds slot 1 — .*pid $h43a" "$tmp/out43b" && ok "the second bar's queue line names this worktree's holder" \
+  || { nope "the second bar's queue line did not name this worktree's holder"; grep -E 'held|queued' "$tmp/out43b" | sed 's/^/      /'; }
+S43w=$tmp/shared43w; mkdir -p "$S43w"
+if [ -d "$tmp/wtTwo/$KIT_REL" ]; then
+  run_slot_bar "$R43" "$S43w" "$tmp/out43c"; p43c=$SLOT_PID; check_registered "$S43w" 1 "$p43c"
+  run_slot_bar "$tmp/wtTwo" "$S43w" "$tmp/out43d"; p43d=$SLOT_PID; check_registered "$S43w" 2 "$p43d"
+  peak43w=$(peak "$S43w")
+  : > "$S43w/go"; wait "$p43c" "$p43d" 2>/dev/null
+  [ "$peak43w" = 2 ] && ok "two worktrees of one repository held at once (peak 2)" || nope "two worktrees of one repository did not hold at once (peak $peak43w)"
+else
+  nope "the second worktree was not created, so the two-worktree half grades nothing"
+fi
+
+# ================= TOOL-aPairedSlots-15: the closing review's mediums and lows ======================
+
+# ---- 44: a reap judges the holder whose nonce guards the removal (AC1) -------------------------------
+# Sourced, not run: the runner's `ts_try_reap` and `scan_dead_docs_beacons`, each pid read routed
+# through a reader that swaps the beacon's nonce as it reads, as a successor claiming the slot between
+# the judgement and the removal would. Pid 999999 is dead to the runner's own `ts_alive`. A reap that
+# read the nonce first spares the successor; one that read it after the pid, or that does not re-read
+# it, deletes it. The routed count is asserted, so a runner whose pid read changed spelling reds here.
+F44=$tmp/reap44; mkdir -p "$F44/slot" "$F44/docs/b"
+for d44 in "$F44/slot" "$F44/docs/b"; do
+  printf '999999' > "$d44/pid"; printf '%s' "$(date +%s)" > "$d44/heartbeat"; printf 'judged' > "$d44/nonce"
+done
+(
+  eval "$(sed -n '/^num_ok() {/p;/^ts_now()/p;/^ts_alive()/p;/^ts_try_reap() {/,/^}/p;/^scan_dead_docs_beacons() {/,/^}/p' \
+    "$HERE/run-gates.sh" | sed 's|cat "\$d/pid"|read_pid_and_swap "$d"|')"
+  read_pid_and_swap() { cat "$1/pid"; printf 'successor' > "$1/nonce"; }
+  add_health_event() { :; }
+  TS_TTL=600; TS_SLOT_DIRS=("$F44/slot"); TS_DOCS_ROOT="$F44/docs"; RG_HEALTH_LOG=/dev/null
+  declare -f ts_try_reap scan_dead_docs_beacons | grep -c read_pid_and_swap > "$F44/routed"
+  ts_try_reap 2>/dev/null; scan_dead_docs_beacons 2>/dev/null
+  exit 0
+)
+[ "$(cat "$F44/routed" 2>/dev/null)" = 2 ] && [ -d "$F44/slot" ] && [ "$(cat "$F44/slot/nonce" 2>/dev/null)" = successor ] \
+  && ok "a slot whose nonce changed after its pid was read survived the reap" \
+  || nope "a slot whose nonce changed after its pid was read was reaped"
+[ -d "$F44/docs/b" ] && [ "$(cat "$F44/docs/b/nonce" 2>/dev/null)" = successor ] \
+  && ok "a docs beacon whose nonce changed after its pid was read survived the sweep" \
+  || nope "a docs beacon whose nonce changed after its pid was read was swept"
+
+# ---- 45: a bar at one slot does not claim beside its worktree's slot-2 holder (AC2) ------------------
+# A two-slot bar elsewhere holds slot 1 and a two-slot bar in this worktree holds slot 2; slot 1 frees,
+# and a one-slot bar from this worktree reaches the head. It must wait for its own worktree's holder.
+R45=$tmp/lowW; R45o=$tmp/lowO; mk_repo "$R45"; mk_repo "$R45o"; S45=$tmp/shared45; S45o=$tmp/shared45o; mkdir -p "$S45" "$S45o"
+run_slot_bar "$R45o" "$S45o" "$tmp/out45o"; p45o=$SLOT_PID; check_registered "$S45o" 1 "$p45o"
+run_slot_bar "$R45" "$S45" "$tmp/out45b"; p45b=$SLOT_PID; check_registered "$S45" 1 "$p45b"
+h45b=$(cat "$BS.2/pid" 2>/dev/null)
+: > "$S45o/go"; wait "$p45o" 2>/dev/null
+( cd "$R45" && env TS_SHARED="$S45" TS_DWELL=1 GATE_FULL=1 GATE_TURNSTILE_SLOTS=1 GATE_TURNSTILE_TTL=600 \
+    GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >"$tmp/out45c" 2>&1 &
+p45c=$!
+i45=0; while ! grep -q 'queued at position' "$tmp/out45c" 2>/dev/null && kill -0 "$p45c" 2>/dev/null && [ "$i45" -lt 2400 ]; do sleep 0.1; i45=$((i45 + 1)); done
+: > "$S45/go"; wait "$p45b" "$p45c" 2>/dev/null
+peak45=$(peak "$S45")
+[ "$peak45" = 1 ] && [ "$(grep -c . "$S45/peaks")" = 2 ] && ok "a one-slot bar never ran beside its worktree's slot-2 holder (peak 1)" \
+  || nope "a one-slot bar ran beside its worktree's slot-2 holder (peak $peak45, $(grep -c . "$S45/peaks") registrations)"
+grep -q "no bar holds this host's first slot, but this worktree's bar holds slot 2 — .*pid $h45b" "$tmp/out45c" \
+  && ok "its queue line names the slot-2 holder in its own worktree" \
+  || { nope "its queue line did not name the slot-2 holder ($h45b)"; grep -E 'held|queued' "$tmp/out45c" | sed 's/^/      /'; }
+
+# ---- 46: a doc-only bar waits for its own worktree's holder, and a bar waits for its docs beacon (AC3)
+R46=$tmp/docsSame; build_docs_repo "$R46"; S46=$tmp/shared46; mkdir -p "$S46"
+( cd "$R46" && env TS_SHARED="$S46" GATE_FULL=1 GATE_TURNSTILE_TTL=600 GATE_TURNSTILE_TICK=1 \
+    GATE_LEGS="$tmp/holdS.json" bash $KIT_REL/run-gates.sh ) >"$tmp/out46h" 2>&1 &
+p46h=$!; check_registered "$S46" 1 "$p46h"
+h46=$(cat "$BS/pid" 2>/dev/null)
+( cd "$R46" && env TS_SHARED="$S46" TS_DWELL=1 GATE_FULL= GATE_DOCS_BASE=HEAD~1 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >"$tmp/out46d" 2>&1 &
+p46d=$!
+i46=0; while ! grep -q "this worktree's bar holds" "$tmp/out46d" 2>/dev/null && kill -0 "$p46d" 2>/dev/null && [ "$i46" -lt 2400 ]; do sleep 0.1; i46=$((i46 + 1)); done
+: > "$S46/go"; wait "$p46h" "$p46d" 2>/dev/null
+peak46=$(peak "$S46")
+[ "$peak46" = 1 ] && [ "$(grep -c . "$S46/peaks")" = 2 ] && ok "a doc-only bar never ran beside its worktree's holder (peak 1)" \
+  || nope "a doc-only bar ran beside its worktree's holder (peak $peak46, $(grep -c . "$S46/peaks") registrations)"
+grep -q "^gate queue: docs-only — this worktree's bar holds slot 1 — .*pid $h46 — waiting for it$" "$tmp/out46d" \
+  && ok "the doc-only bar said it waits for its worktree's holder, naming it" \
+  || { nope "the doc-only bar did not name its worktree's holder ($h46)"; grep -E 'gate queue' "$tmp/out46d" | sed 's/^/      /'; }
+R46b=$tmp/docsSameB; build_docs_repo "$R46b"; S46b=$tmp/shared46b; mkdir -p "$S46b"
+( cd "$R46b" && env TS_SHARED="$S46b" GATE_FULL= GATE_DOCS_BASE=HEAD~1 GATE_TURNSTILE_TICK=1 \
+    GATE_LEGS="$tmp/holdS.json" bash $KIT_REL/run-gates.sh ) >"$tmp/out46e" 2>&1 &
+p46e=$!; check_registered "$S46b" 1 "$p46e"
+( cd "$R46b" && env TS_SHARED="$S46b" TS_DWELL=1 GATE_FULL=1 GATE_TURNSTILE_TTL=600 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >"$tmp/out46f" 2>&1 &
+p46f=$!
+i46=0; while ! grep -q 'queued at position' "$tmp/out46f" 2>/dev/null && kill -0 "$p46f" 2>/dev/null && [ "$i46" -lt 2400 ]; do sleep 0.1; i46=$((i46 + 1)); done
+: > "$S46b/go"; wait "$p46e" "$p46f" 2>/dev/null
+peak46b=$(peak "$S46b")
+[ "$peak46b" = 1 ] && [ "$(grep -c . "$S46b/peaks")" = 2 ] && ok "a non-doc bar never ran beside its worktree's doc-only bar (peak 1)" \
+  || nope "a non-doc bar ran beside its worktree's doc-only bar (peak $peak46b, $(grep -c . "$S46b/peaks") registrations)"
+grep -q "this worktree's bar holds the docs key — " "$tmp/out46f" && ok "its queue line names the docs key its worktree holds" \
+  || { nope "its queue line did not name the docs key"; grep -E 'held|queued' "$tmp/out46f" | sed 's/^/      /'; }
+
+# ---- 47: a docs beacon left unfinished is swept by its age (AC5) -------------------------------------
+R47=$tmp/docsUnfinished; build_docs_repo "$R47"; legs "$R47" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+mkdir -p "$DK/planted47"; printf 'p47' > "$DK/planted47/nonce"; touch -d "@$(( $(date +%s) - 100 ))" "$DK/planted47"
+run_docs_bar "$R47" "$tmp/out47" GATE_TURNSTILE_TTL=5
+grep -q 'sweeping the docs beacon of an unfinished holder' "$tmp/out47" && [ ! -e "$DK/planted47" ] \
+  && ok "a docs beacon with no pid and no heartbeat, older than the ttl, was swept" || nope "an unfinished docs beacon was left standing"
+
+# ---- 48: a stalled docs holder is swept by its heartbeat (AC6) ---------------------------------------
+R48=$tmp/docsStalled; build_docs_repo "$R48"; legs "$R48" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+sleep 300 & live48=$!
+mkdir -p "$DK/planted48"; printf '%s' "$live48" > "$DK/planted48/pid"; printf '%s' "$(( $(date +%s) - 100 ))" > "$DK/planted48/heartbeat"
+printf '5' > "$DK/planted48/ttl"; printf 'p48' > "$DK/planted48/nonce"
+run_docs_bar "$R48" "$tmp/out48"
+kill "$live48" 2>/dev/null; wait "$live48" 2>/dev/null
+grep -q 'sweeping the docs beacon of a stalled holder' "$tmp/out48" && [ ! -e "$DK/planted48" ] \
+  && ok "a docs beacon whose live holder's heartbeat outlived its ttl was swept" || nope "a stalled docs beacon was left standing"
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "turnstile: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }
 [ "$bad" = 0 ] && echo "PASS ($n assertions)"

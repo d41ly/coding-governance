@@ -2740,6 +2740,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         manifest_chunk = {leg.get("name"): leg.get("chunk") for leg in _legs_json}
         manifest_doc_reads = {leg.get("name"): leg.get("doc_reads") for leg in _legs_json}
         manifest_impure = {leg.get("name"): leg.get("impure") for leg in _legs_json}
+        manifest_reads = {leg.get("name"): leg.get("reads") for leg in _legs_json}
         manifest_ceiling = {leg.get("name"): leg.get("ceiling") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
@@ -2816,6 +2817,16 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                                f"{leg.get('impure')!r} while <prefix>/gate-legs.json says "
                                f"{manifest_impure.get(nm)!r} — the descriptor and the manifest "
                                f"disagree about whether a verdict cached on a tree may be reused")
+                    # AND ABOUT THE READ CLASSES, where the descriptor declares them, as with ceiling
+                    # (TOOL-aSparedSpawn-13 S1): the classes decide what enters a leg's reuse key, so a
+                    # descriptor and a manifest that disagree key one leg two ways. A descriptor that
+                    # declares none is not compared: the manifest may declare classes the emitter
+                    # never carries, since an adopter row takes the legacy `impure` below instead.
+                    if "reads" in leg and leg.get("reads") != manifest_reads.get(nm):
+                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with reads "
+                               f"{leg.get('reads')!r} while <prefix>/gate-legs.json says "
+                               f"{manifest_reads.get(nm)!r} — the descriptor and the manifest "
+                               f"disagree about what this leg reads beyond its inputs")
                     # AND ABOUT CEILING, where the descriptor declares one (DEPL-aBenchedProbe-2 S5):
                     # the emitter carries the descriptor's value verbatim into adopters, so it must
                     # be a positive int (a bool is an int to Python, and not a bound) equal to the
@@ -4164,8 +4175,14 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     # IMPURE TRAVELS under the same reader check (TOOL-aRoutedQuill-12 S5): the
                     # run-gates canary has carried the key since run-gates 1.0, so a runner that
                     # reads `subject` reads it too, and a leg graded on the commit graph is not cached.
+                    # A descriptor's `reads` TRAVELS AS THE LEGACY `impure` (TOOL-aSparedSpawn-13 S1),
+                    # its reasons joined: every runner reads `impure` as never-reuse, whatever its
+                    # version, so an adopter's verdict keeps its meaning and no canary meets a key
+                    # its pinned set predates.
                     if leg.get("impure"):
                         row["impure"] = leg["impure"]
+                    elif isinstance(leg.get("reads"), dict) and leg["reads"]:
+                        row["impure"] = "; ".join(f"{k}: {v}" for k, v in sorted(leg["reads"].items()))
                 if guards:
                     row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
                 # DOC READS TRAVEL, all or nothing, and only into a runner that reads them: below
@@ -5596,12 +5613,12 @@ def eol_population(target: pathlib.Path) -> dict[str, str]:
     literal paths it returns are what the renormalize touches and what the post-condition re-reads.
     """
     files = subprocess.run(["git", "-C", str(target), "ls-files", "-z"],
-                           capture_output=True, text=True).stdout.split("\0")
+                           capture_output=True, text=True, encoding="utf-8").stdout.split("\0")
     files = [f for f in files if f]
     if not files:
         return {}
     out = subprocess.run(["git", "-C", str(target), "check-attr", "--stdin", "-z", "eol"],
-                         input="\0".join(files), capture_output=True, text=True)
+                         input="\0".join(files), capture_output=True, text=True, encoding="utf-8")
     fields, res = out.stdout.split("\0"), {}
     for i in range(0, len(fields) - 2, 3):
         path, _attr, value = fields[i], fields[i + 1], fields[i + 2]
@@ -5935,7 +5952,11 @@ def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
     # this call to the WSL launcher on a Windows python, which is a different filesystem and a
     # different interpreter. Two sessions fixed this class independently and this was the one site
     # neither pass wired on its own: main resolved four, the merged branch found the fifth.
-    out = subprocess.run(resolve_shell_argv(list(cmd)), cwd=str(target), capture_output=True, text=True)
+    # THE RUNNER'S GENERATED-OUTPUT PREFLIGHT IS SKIPPED (DEPL-aPrimedIndex-1). It exits 2 before any
+    # leg line when a declared output is stale, and both reads then parsed an empty map, with which apply
+    # could certify an install it never compared. Skipped, a stale output reads as its own leg's red.
+    out = subprocess.run(resolve_shell_argv(list(cmd)), cwd=str(target), capture_output=True, text=True,
+                         env=dict(os.environ, GATE_REGEN_CHECK="0"))
     verdicts: dict[str, str] = {}
     for state, key in OBSERVED_STATES:
         for tmpl in (gr.get(key) or []):
@@ -7824,7 +7845,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             # Measured on git 2.55: `-z` disables the quoting as well as the terminator, so
             # `core.quotepath=false` beside it would be inert and is deliberately not here.
             _alldiff = subprocess.run(["git", "-C", str(target), "diff", "--name-only", "-z",
-                                       "HEAD"], capture_output=True, text=True)
+                                       "HEAD"], capture_output=True, text=True, encoding="utf-8")
             dirty = [p for p in _alldiff.stdout.split("\0") if p and p in _lfset and p not in ours]
             missing_wt = [p for p in lf_paths if not (target / p).exists()]
             if dirty or missing_wt:
@@ -8678,6 +8699,69 @@ def write_conflict_candidate(outbox: pathlib.Path, row: dict, base: bytes, ours:
         (d / name).write_bytes(data or b"")
     return rel, (f"cd {rel} && git merge-file -p {' '.join(MERGE_FILE_ARGS)} "
                  f"ours base theirs > candidate")
+
+
+def measure_rendered_rows(root: pathlib.Path, target: pathlib.Path, rows: list[dict],
+                          to_commit: str, resolve_version) -> list[tuple[dict, str | None]]:
+    """Re-measure each `rendered` receipt row from the bytes its render left on disk, in place.
+
+    DEPL-dRemeasuredRender-1 S1. `update` caps a rendered row at `re-rendered` and lets the kit's
+    `[[regenerate]]` argv rewrite the file, so without this the row's `sha256`, `oid`, `commit` and
+    `version` — and the `install.sums` line derived from it — keep naming the bytes from before the
+    run. Measured at an adopter: a lexicon Skill whose row named one blob while git stored another.
+
+    The stamping rule is the written rows' own: `sha256` hashes the raw bytes that landed, and
+    `commit` and `version` name the vintage this run rendered from. `oid` is the blob the TARGET's
+    clean filter makes of those bytes (`git hash-object --path`), NOT the index entry, because the
+    regenerate may leave its output unstaged and the entry would then name the pre-render blob.
+    `gov_oid` stays gov's: its blob of the row's `source` at that vintage. A source that does not
+    resolve there moves neither `commit`, `version` nor `gov_oid`, because they are one stamp.
+
+    The caller decides WHICH rows reach here — only a kit whose render ran, was accepted and was not
+    rolled back. Returns `(row, None)` per re-measured row and `(row, why)` per row it KEPT, whose
+    record it leaves untouched: an absent file, or a hash git would not compute."""
+    out: list[tuple[dict, str | None]] = []
+    for row in rows:
+        path = str(row.get("path"))
+        dp = target / path
+        if not dp.is_file():
+            out.append((row, "its file is absent after the render"))
+            continue
+        cl = subprocess.run(["git", "-C", str(target), "hash-object", f"--path={path}", "--",
+                             str(dp)], capture_output=True, text=True, encoding="utf-8",
+                            check=False)
+        oid = cl.stdout.strip()
+        if cl.returncode != 0 or not oid:
+            out.append((row, f"`git hash-object` would not hash it ({cl.stderr.strip()[:120]})"))
+            continue
+        row["sha256"] = _sha(dp.read_bytes())
+        row["oid"] = oid
+        tmpl = blob_at(root, to_commit, str(row["source"])) if row.get("source") else None
+        if tmpl is not None:
+            row["gov_oid"] = blob_oid(tmpl)
+            row["commit"] = to_commit
+            row["version"] = resolve_version(row)
+        out.append((row, None))
+    return out
+
+
+def render_hole_verdict(eid: str, hid: str, verdict: str, detail: str, why: str,
+                        rolled: bool) -> str:
+    """The one line `update` prints for a hole re-probed after its kit's render.
+
+    DEPL-dRemeasuredRender-4 S2. Pure, so every verdict kind has an arm without a fixture run. The
+    still-failing line keeps the spelling the early probe printed before DEPL-dRemeasuredRender-2,
+    because that is the line operators already read as undischarged; `rolled` says the probe read
+    the bytes a rollback restored, not the render's."""
+    head = f"govkit update — HOLE {eid}: '{hid}'"
+    after = "after the rollback restored the pre-render bytes" if rolled else "after the render"
+    if verdict == "undischarged":
+        return (f"{head} is undischarged (probe exit {detail}) — {why}" if not rolled else
+                f"{head} is undischarged (probe exit {detail}) {after} — {why}")
+    if verdict == "discharged":
+        return f"{head} is discharged {after}; the early verdict does not stand"
+    return (f"{head} re-probed {after} reads {verdict} ({detail}), so neither verdict is "
+            f"confirmed — {why}")
 
 
 def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
@@ -10782,6 +10866,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # DEPL-aRepatriatedFork-17 S1. Per kit whose declared argv ran: the pre-argv index entry and
     # worktree bytes of every path it is declared to write, and the status it left behind.
     _rg_snap: dict[str, dict] = {}
+    # DEPL-dRemeasuredRender-1 S2. The kits whose declared argv was REFUSED, so their rendered rows
+    # keep the record from before this run rather than being re-measured over a render nobody accepted.
+    _rr_refused: set[str] = set()
+    # DEPL-dRemeasuredRender-3. The kits whose argv exited NON-ZERO through an accepted outcome, to
+    # that outcome's `means`. Every shipped `ok` outcome with a non-zero exit is a stop that renders
+    # nothing (memory-tree `not-rendered-here`, lexicon `no-project-layer`), so acceptance is not a
+    # render, and re-measuring those rows would certify untouched bytes at this vintage.
+    _rr_norender: dict[str, str] = {}
+    # DEPL-dRemeasuredRender-4 S1. Per kit, the holes its early probe called undischarged and what
+    # their re-probe needs, kept for the step after the verify pass.
+    _hu_late: dict[str, tuple] = {}
     if write:
         for _eid in touched_kits:
             _d, _ = descs[_eid]
@@ -10848,10 +10943,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _own_rr = {f.get("source") for f in receipt.get("files") or []
                        if f.get("role") == "adopter-owned"}
             _hw_rr = {h.get("id"): h.get("why", "") for h in _d.get("hole", [])}
+            # DEPL-dRemeasuredRender-2 S1. THE EARLY PROBE STATES NO VERDICT. A probe that
+            # byte-checks the rendered artifact — lexicon's `lexicon-ratified` runs its adopter's
+            # `--check` — fails here and passes once the render below has run, so "is undischarged"
+            # printed here was a false red the same run's verify contradicted. The probe stays HERE,
+            # because naming a hole before a render that refuses on it is its purpose; its verdict
+            # is the re-probe's below.
+            _hu_rr: list[str] = []
             for _hid, _hv, _hd in run_hole_probes(_eid, _d, _ctx_rr, target, list(claimed), _own_rr):
                 if _hv == "undischarged":
-                    print(f"govkit update — HOLE {_eid}: '{_hid}' is undischarged (probe exit {_hd})"
-                          f" — {(_hw_rr.get(_hid) or 'no reason declared').splitlines()[0]}")
+                    _hu_rr.append(_hid)
+                    print(f"govkit update — HOLE {_eid}: '{_hid}' probes undischarged before the "
+                          f"render (probe exit {_hd}); probed again after it — "
+                          f"{(_hw_rr.get(_hid) or 'no reason declared').splitlines()[0]}")
             # DEPL-aRepatriatedFork-17 S1. A ROLLBACK COVERS WHAT THE RE-RENDER WROTE. The argv
             # below writes outside `written_paths`, so a kit rolled back after it kept its renders.
             # Snapshotted HERE, before the first argv, from the kit's own `rendered`/`generated`
@@ -10898,7 +11002,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 _rr_ran.append(f"{_eid}: {' '.join(_res)} -> exit {_out.returncode}"
                                + (f" ({_oc_rr.get('means')})" if _oc_rr else "")
                                + ("  REFUSED" if _bad else ""))
+                if _out.returncode != 0 and not _bad:
+                    _rr_norender.setdefault(_eid, str((_oc_rr or {}).get("means") or "(unnamed)"))
                 if _bad:
+                    _rr_refused.add(_eid)
                     # WHAT HAPPENS NEXT IS SAID, NOT PROMISED. This sentence used to promise that
                     # the verification below "rolls this run back", and for a kit declaring
                     # `[check] none` nothing can: its verify is `landed-unmeasured` and restores
@@ -10922,6 +11029,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                               "This kit declares no [check] argv, so nothing below can roll its "
                               "writes back: they stay staged, and the render has to be repaired "
                               "by hand before the next update"))
+            # DEPL-dRemeasuredRender-2 S2 + S3. Only the holes the early probe called undischarged
+            # are probed again, accepted argv or refused. The re-probe itself waits for the verify
+            # pass (DEPL-dRemeasuredRender-4 S1), which can still roll this render back.
+            if _hu_rr:
+                _hu_late[_eid] = (dict(_d, hole=[h for h in _d.get("hole", [])
+                                                 if h.get("id") in _hu_rr]),
+                                  _ctx_rr, _own_rr, _hw_rr)
             # S1. What THIS kit's argv changed, by status entry, so an undeclared write has a name.
             _rg_after = read_worktree_status(target)
             _rg_before = _rg_snap[_eid]["status"]
@@ -11672,6 +11786,52 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             else:
                 print("govkit update — renormalize: the pin block governs no tracked path in this "
                       "target, so there is nothing to re-stage")
+
+    # ======================= DEPL-dRemeasuredRender-1 — A RENDERED ROW NAMES WHAT ITS RENDER LANDED =
+    # HERE, after the verify pass and the renormalize, and not inside the regenerate loop: the verify
+    # pass can roll a kit's renders back, and a row stamped before that names bytes the target no
+    # longer holds. Both receipt writers below derive `install.sums` from the rows, so the sidecar
+    # follows without a write of its own. A row this does not re-measure is KEPT and says why, per row,
+    # because a receipt that silently stays stale is the defect this closes. The count prints its zeros.
+    # DEPL-dRemeasuredRender-4 S1. THE HOLE VERDICT THAT STANDS, read here for the reason above: a
+    # verdict printed inside the regenerate loop described bytes a rollback could then take away.
+    # A rolled-back kit is re-probed too, over the bytes the rollback restored, and its line says so.
+    for _eid, (_d_hu, _ctx_hu, _own_hu, _hw_hu) in _hu_late.items():
+        for _hid, _hv, _hd in run_hole_probes(_eid, _d_hu, _ctx_hu, target, list(claimed), _own_hu):
+            print(render_hole_verdict(_eid, _hid, _hv, _hd,
+                                      (_hw_hu.get(_hid) or "no reason declared").splitlines()[0],
+                                      _eid in _rolled_kits))
+
+    if write and touched_kits:
+        _rm_done = _rm_kept = 0
+        for _eid in touched_kits:
+            _rm_rows = [f for f in receipt.get("files") or []
+                        if f.get("kit") == _eid and f.get("role") == "rendered"]
+            if not _rm_rows:
+                continue
+            if _eid in _rolled_kits:
+                _rm_why = "its kit was rolled back, and the render with it"
+            elif _eid in _rr_refused:
+                _rm_why = "its render was refused"
+            elif _eid in _rr_norender:
+                _rm_why = (f"its render stopped at accepted outcome '{_rr_norender[_eid]}' "
+                           f"without rendering")
+            elif _eid not in _rg_snap:
+                _rm_why = "its render did not run this time (the DECLINED line above says why)"
+            else:
+                _rm_why = None
+            _rm_out = ([(_rm_row, _rm_why) for _rm_row in _rm_rows] if _rm_why else
+                       measure_rendered_rows(root, target, _rm_rows, to_commit, _resolve_ver_at))
+            for _rm_row, _rm_w in _rm_out:
+                if _rm_w:
+                    _rm_kept += 1
+                    print(f"govkit update — receipt: KEPT [rendered] {_rm_row.get('path')} — {_rm_w}; "
+                          f"its record still names the bytes from before this run")
+                else:
+                    _rm_done += 1
+                    print(f"govkit update — receipt: re-measured [rendered] {_rm_row.get('path')} "
+                          f"from the bytes its render landed")
+        print(f"govkit update — rendered receipts: {_rm_done} re-measured · {_rm_kept} kept")
 
     # ---- DEPL-cMendedVintage-13 S2 + S3. THE GATE LEGS, emitted by this verb for the first time.
     # ---- Until this landed they arrived on `apply` and on `adopt` and nowhere else, so every
@@ -12744,13 +12904,17 @@ def resolve_descriptor_paths(desc: dict, tool_root: str) -> dict:
     return desc
 
 
-def cmd_shipped(root: pathlib.Path) -> int:
+def cmd_shipped(root: pathlib.Path, epoch: bool = False) -> int:
     """TOOL-aRepatriatedFork-16 S1 — what THIS repo ships, as ONE derivation.
 
     One `<entry>\\t<role>\\t<src>` row per descriptor survivor carrying a source, sorted. The
     install-prefix gate used to carry this as its own heredoc over the same calls, and two further
-    readers were about to paste it again. Read-only, no arguments. A registry naming a broken
-    descriptor exits 1 and prints NO row: a reader must not grade a narrowed set as the whole one.
+    readers were about to paste it again. Read-only. A registry naming a broken descriptor exits 1
+    and prints NO row: a reader must not grade a narrowed set as the whole one.
+
+    `epoch` (the `--epoch` flag, TOOL-aSparedSpawn-12 S6) keeps only the rows whose role is in
+    `EPOCH_ROLES`, the filter `derive_epoch_state` applies to these same survivors, so "this kit
+    moved" has one answer for the version-bump rule and for the run-gates held-tier selection.
     """
     r = Report()
     descs = read_descriptors(root, load_registry(root), r)
@@ -12760,7 +12924,8 @@ def cmd_shipped(root: pathlib.Path) -> int:
         return 1
     rows = {f"{eid}\t{row['role']}\t{row['src']}"
             for eid, (d, _p) in descs.items()
-            for row in resolve_entry(root, d, canonical_ctx(eid))["survivors"] if row.get("src")}
+            for row in resolve_entry(root, d, canonical_ctx(eid))["survivors"] if row.get("src")
+            and (not epoch or row["role"] in EPOCH_ROLES)}
     sys.stdout.write("".join(f"{x}\n" for x in sorted(rows)))
     return 0
 
@@ -13046,7 +13211,7 @@ def cmd_mint(root: pathlib.Path, base: str, head: str | None) -> int:
 # ------------------------------------------------------------------------------------------- main
 USAGE = """usage:
   govkit.py selfcheck [--write] [--fix]
-  govkit.py shipped
+  govkit.py shipped [--epoch]
   govkit.py epoch [--base <rev>]
   govkit.py mint --base <rev> [--head <rev>]
   govkit.py plan --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
@@ -13519,6 +13684,11 @@ def main(argv: list[str]) -> int:
             if len(flags) != len(set(flags)) or any(a not in ("--write", "--fix") for a in flags):
                 raise Refusal("selfcheck takes no arguments except --write and --fix")
             return selfcheck(repo_root(), write="--write" in flags, fix="--fix" in flags)
+        if argv[0] == "shipped":
+            # Parsed here and not in `parse_args`: `--epoch` is this verb's alone.
+            if argv[1:] not in ([], ["--epoch"]):
+                raise Refusal("shipped takes no arguments except --epoch")
+            return cmd_shipped(repo_root(), epoch=len(argv) == 2)
         if argv[0] == "epoch":
             # Parsed here and not in `parse_args`: `--base` is this verb's alone.
             if len(argv) not in (1, 3) or (len(argv) == 3 and argv[1] != "--base"):
@@ -13540,10 +13710,6 @@ def main(argv: list[str]) -> int:
          PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE, STAGED, ACCEPT_ROLE_MOVES,
          SUGGEST_PINS) = parse_args(argv)
         root = repo_root()
-        if verb == "shipped":
-            if len(argv) > 1:
-                raise Refusal("shipped takes no arguments")
-            return cmd_shipped(root)
         if verb == "contribute":
             if target is None:
                 raise Refusal("contribute needs an explicit --target: the adopter tree to "

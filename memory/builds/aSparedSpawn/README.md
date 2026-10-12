@@ -5,7 +5,7 @@ opened: 2026-10-09
 streams: tooling
 roster: TOOL
 parents: aMeteredSweep
-ids: TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14 TOOL-aSparedSpawn-15
+ids: TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14 TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedSpawn-18 TOOL-aSparedSpawn-19 TOOL-aSparedSpawn-20 TOOL-aSparedSpawn-21 TOOL-aSparedSpawn-22 TOOL-aSparedSpawn-23 TOOL-aSparedSpawn-24 TOOL-aSparedSpawn-25 TOOL-aSparedSpawn-26 TOOL-aSparedSpawn-27 TOOL-aSparedSpawn-28 TOOL-aSparedSpawn-29 TOOL-aSparedSpawn-30 TOOL-aSparedSpawn-31 TOOL-aSparedSpawn-32 TOOL-aSparedSpawn-33 TOOL-aSparedSpawn-34
 ---
 
 # aSparedSpawn — the bar and its self-tests, rebuilt around the cost of a process
@@ -65,37 +65,44 @@ roughly doubled in six weeks while nothing retires one.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 15 unit(s) · node a · opened 2026-10-09 · streams tooling
+**Build status:** CLOSED · 22 unit(s) · node a · opened 2026-10-09 · streams tooling
 ids TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14
-ids TOOL-aSparedSpawn-15
+ids TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedSpawn-18 TOOL-aSparedSpawn-19 TOOL-aSparedSpawn-20 TOOL-aSparedSpawn-21 TOOL-aSparedSpawn-22 TOOL-aSparedSpawn-23 TOOL-aSparedSpawn-24 TOOL-aSparedSpawn-25 TOOL-aSparedSpawn-26 TOOL-aSparedSpawn-27 TOOL-aSparedSpawn-28
+ids TOOL-aSparedSpawn-29 TOOL-aSparedSpawn-30 TOOL-aSparedSpawn-31 TOOL-aSparedSpawn-32 TOOL-aSparedSpawn-33 TOOL-aSparedSpawn-34
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aSparedSpawn-1 — the reuse key hashes what a dirty guarded file holds, and the toolchain it ran under](spec/2026-10-09-spec-TOOL-aSparedSpawn-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-2 — the pool width comes from a measured spawn calibration, and dispatch pauses on spawn pressure](spec/2026-10-09-spec-TOOL-aSparedSpawn-2.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-5 — the held self-test tier in WSL2, from an ext4 mirror, with combined verdicts](spec/2026-10-09-spec-TOOL-aSparedSpawn-5.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-6 — the unattended driver as a library, called in process by its suite](spec/2026-10-09-spec-TOOL-aSparedSpawn-6.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-8 — fork-free readers, a spawn-idiom lint that stops regrowth, and a fork-count arm](spec/2026-10-09-spec-TOOL-aSparedSpawn-8.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-10 — foreign-prefix parity probes one shard per sharded suite and pools its whole runs](spec/2026-10-09-spec-TOOL-aSparedSpawn-10.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-11 — per-suite levers: five suites stop paying a process for a question they ask once](spec/2026-10-09-spec-TOOL-aSparedSpawn-11.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-15 — the remaining clock-bound arms on the flake list, ordered or calibrated](spec/2026-10-09-spec-TOOL-aSparedSpawn-15.md) | 2 | 1 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-3 — a ceiling-killed leg retries in the pool's drain tail, and a bar with no ledger dispatches longest-first](spec/2026-10-09-spec-TOOL-aSparedSpawn-3.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-4 — the runner's own spawns: a handful per leg, two git calls per bar, and a fork count with a ceiling](spec/2026-10-09-spec-TOOL-aSparedSpawn-4.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-7 — `--only` selectors for the unattended gate and the hygiene gate, each naming what ran](spec/2026-10-09-spec-TOOL-aSparedSpawn-7.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-9 — fixture templates and environment git identity across the named suites](spec/2026-10-09-spec-TOOL-aSparedSpawn-9.md) | 2 | 1 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-12 — the held self-test tier, selected by the kit whose shipped bytes moved](spec/2026-10-09-spec-TOOL-aSparedSpawn-12.md) | 3 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-13 — content-addressed reuse: declared read classes, a shared cache, a soundness sample](spec/2026-10-09-spec-TOOL-aSparedSpawn-13.md) | 3 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-14 — a refusal retirement review, and a growth budget beside the floors](spec/2026-10-09-spec-TOOL-aSparedSpawn-14.md) | 3 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aSparedSpawn-1 — the reuse key hashes what a dirty guarded file holds, and the toolchain it ran under](spec/2026-10-09-spec-TOOL-aSparedSpawn-1.md) | 1 | 2 | CLOSED | rev-3 | 2026-10-09 |
+| [TOOL-aSparedSpawn-2 — the pool width comes from a measured spawn calibration, and dispatch pauses on spawn pressure](spec/2026-10-09-spec-TOOL-aSparedSpawn-2.md) | 1 | 2 | CLOSED | rev-3 | 2026-10-11 |
+| [TOOL-aSparedSpawn-5 — the held self-test tier in WSL2, from an ext4 mirror, with combined verdicts](spec/2026-10-09-spec-TOOL-aSparedSpawn-5.md) | 1 | 2 | CLOSED | rev-4 | 2026-10-11 |
+| [TOOL-aSparedSpawn-6 — the unattended driver as a library, called in process by its suite](spec/2026-10-09-spec-TOOL-aSparedSpawn-6.md) | 1 | 2 | CLOSED | rev-3 | 2026-10-11 |
+| [TOOL-aSparedSpawn-8 — fork-free readers, a spawn-idiom lint that stops regrowth, and a fork-count arm](spec/2026-10-09-spec-TOOL-aSparedSpawn-8.md) | 1 | 2 | CLOSED | rev-4 | 2026-10-11 |
+| [TOOL-aSparedSpawn-10 — foreign-prefix parity probes one shard per sharded suite and pools its whole runs](spec/2026-10-09-spec-TOOL-aSparedSpawn-10.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-11 |
+| [TOOL-aSparedSpawn-11 — per-suite levers: five suites stop paying a process for a question they ask once](spec/2026-10-09-spec-TOOL-aSparedSpawn-11.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-11 |
+| [TOOL-aSparedSpawn-15 — the remaining clock-bound arms on the flake list, ordered or calibrated](spec/2026-10-09-spec-TOOL-aSparedSpawn-15.md) | 2 | 1 | CLOSED | rev-3 | 2026-10-11 |
+| [TOOL-aSparedSpawn-3 — a ceiling-killed leg retries in the pool's drain tail, and a bar with no ledger dispatches longest-first](spec/2026-10-09-spec-TOOL-aSparedSpawn-3.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-12 |
+| [TOOL-aSparedSpawn-4 — the runner's own spawns: a handful per leg, two git calls per bar, and a fork count with a ceiling](spec/2026-10-09-spec-TOOL-aSparedSpawn-4.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-12 |
+| [TOOL-aSparedSpawn-7 — `--only` selectors for the unattended gate and the hygiene gate, each naming what ran](spec/2026-10-09-spec-TOOL-aSparedSpawn-7.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-12 |
+| [TOOL-aSparedSpawn-9 — fixture templates and environment git identity across the named suites](spec/2026-10-09-spec-TOOL-aSparedSpawn-9.md) | 2 | 1 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-aSparedSpawn-12 — the held self-test tier, selected by the kit whose shipped bytes moved](spec/2026-10-09-spec-TOOL-aSparedSpawn-12.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-12 |
+| [TOOL-aSparedSpawn-13 — content-addressed reuse: declared read classes, a shared cache, a soundness sample](spec/2026-10-09-spec-TOOL-aSparedSpawn-13.md) | 3 | 2 | CLOSED | rev-5 | 2026-10-12 |
+| [TOOL-aSparedSpawn-14 — a refusal retirement review, and a growth budget beside the floors](spec/2026-10-09-spec-TOOL-aSparedSpawn-14.md) | 3 | 2 | CLOSED | rev-5 | 2026-10-12 |
+| [TOOL-aSparedSpawn-16 — the closing review's mediums and lows, and the bar reds this build's diff carries](spec/2026-10-12-spec-TOOL-aSparedSpawn-16.md) | 4 | 2 | CLOSED | rev-4 | 2026-10-12 |
+| [TOOL-aSparedSpawn-17 — an executed red under a cached ok erases the entry and quarantines the leg](spec/2026-10-12-spec-TOOL-aSparedSpawn-17.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-12 |
+| [TOOL-aSparedSpawn-18 — the width A/B instrument counts only executed verdicts and fails on a red bar](spec/2026-10-12-spec-TOOL-aSparedSpawn-18.md) | 4 | 1 | CLOSED | rev-1 | 2026-10-12 |
+| [TOOL-aSparedSpawn-19 — the spawn-budget leg never passes a run that graded nothing it could have](spec/2026-10-12-spec-TOOL-aSparedSpawn-19.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-12 |
+| [TOOL-aSparedSpawn-32 — reconcile the build with origin/main 37200355](spec/2026-10-12-spec-TOOL-aSparedSpawn-32.md) | 5 | 2 | CLOSED | rev-4 | 2026-10-12 |
+| [TOOL-aSparedSpawn-33 — the pre-push hook restores the caller's environment for the reuse digest](spec/2026-10-12-spec-TOOL-aSparedSpawn-33.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-12 |
+| [TOOL-aSparedSpawn-34 — reconcile the build with local main, so it lands there conflict-free](spec/2026-10-13-spec-TOOL-aSparedSpawn-34.md) | 7 | 2 | CLOSED | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 63 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14 TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7
-TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14 TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6
-TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9.
+TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedSpawn-18 TOOL-aSparedSpawn-19 TOOL-aSparedSpawn-32 TOOL-aSparedSpawn-33 TOOL-aSparedSpawn-34.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -105,6 +112,10 @@ TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9.
 | 1 | `TOOL-aSparedSpawn-1`, `TOOL-aSparedSpawn-2`, `TOOL-aSparedSpawn-5`, `TOOL-aSparedSpawn-6`, `TOOL-aSparedSpawn-8` | yes |
 | 2 | `TOOL-aSparedSpawn-10`, `TOOL-aSparedSpawn-11`, `TOOL-aSparedSpawn-15`, `TOOL-aSparedSpawn-3`, `TOOL-aSparedSpawn-4`, `TOOL-aSparedSpawn-7`, `TOOL-aSparedSpawn-9` | yes |
 | 3 | `TOOL-aSparedSpawn-12`, `TOOL-aSparedSpawn-13`, `TOOL-aSparedSpawn-14` | yes |
+| 4 | `TOOL-aSparedSpawn-16`, `TOOL-aSparedSpawn-17`, `TOOL-aSparedSpawn-18`, `TOOL-aSparedSpawn-19` | yes |
+| 5 | `TOOL-aSparedSpawn-32` | no |
+| 6 | `TOOL-aSparedSpawn-33` | no |
+| 7 | `TOOL-aSparedSpawn-34` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

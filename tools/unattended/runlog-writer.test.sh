@@ -112,7 +112,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -149,7 +150,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -161,7 +162,7 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 PY=$(resolve_python 2>/dev/null) || PY=""
 RUNLOG_KIT=""; RUN_GATES_DIR=""
 if [ -n "$PY" ]; then
-  _rw_root=$(git -C "$HERE" rev-parse --show-toplevel)
+  _rw_root=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)
   RUNLOG_KIT=$(resolve_kit_dir "$PY" runlog runlog_lib.py "$HERE" 2>/dev/null) && RUNLOG_KIT="$_rw_root/$RUNLOG_KIT"
   RUN_GATES_DIR=$(resolve_kit_dir "$PY" run-gates selftest-budgets.txt "$HERE" 2>/dev/null) && RUN_GATES_DIR="$_rw_root/$RUN_GATES_DIR"
 fi
@@ -684,7 +685,7 @@ check_ac11_worktree() {
   git worktree add -q "$wt" -b side >/dev/null 2>&1
   (cd "$wt" && bash "$KR/unattended.sh" --status "$SLUG" >/dev/null 2>&1)
   l=$(measure_lines)
-  top=$(git -C "$wt" rev-parse --show-toplevel)
+  top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$wt" rev-parse --show-toplevel)
   gd=$(git -C "$wt" rev-parse --path-format=absolute --git-dir)
   check "AC11 the linked worktree's line lands in the COMMON journal" "$(read_field $((l - 1)) wt)" "$top"
   check "AC11 its own git dir is under worktrees" "$(case "$gd" in */.git/worktrees/*) echo yes ;; esac)" yes

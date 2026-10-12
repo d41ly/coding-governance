@@ -103,7 +103,7 @@ build_stub() {
     printf 'printf "pid %%s argv %%s\\n" "$$" "$*" >> %q\n' "$STUB_LOG"
     printf 'case "$1" in\n'
     printf '  auth) if [ "${STUB_LOGGED_IN:-true}" = false ]; then printf "{\\n  \\"loggedIn\\": false\\n}\\n"; else printf "{\\n  \\"loggedIn\\": true\\n}\\n"; fi ;;\n'
-    printf '  -p) sleep %s & s=$!; printf "sleeper %%s\\n" "$s" >> %q; wait "$s"; printf "done\\n" >> %q ;;\n' "$STUB_HOLD_S" "$STUB_LOG" "$STUB_LOG"
+    printf '  -p) printf "bgwait %%s\\n" "${CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS-unset}" >> %q; sleep %s & s=$!; printf "sleeper %%s\\n" "$s" >> %q; wait "$s"; printf "done\\n" >> %q ;;\n' "$STUB_LOG" "$STUB_HOLD_S" "$STUB_LOG" "$STUB_LOG"
     printf 'esac\nexit 0\n'
   } > "$TMP/stub/claude"
   chmod +x "$TMP/stub/claude"
@@ -154,7 +154,7 @@ build_fixture() {
       && git config core.autocrlf false ) || { echo "FAIL fixture: git init failed under $FX"; exit 2; }
   # RE-SPELLED BY GIT: the tick prints worktree paths as `git worktree list` spells them, and on
   # Windows that is the long name of a directory this file may have reached by its 8.3 short one.
-  FX=$( cd "$FX" && git rev-parse --show-toplevel )
+  FX=$(unset GIT_DIR GIT_WORK_TREE;  cd "$FX" && git rev-parse --show-toplevel )
   cat > "$FX/.unattended.conf" <<'EOF'
 MEMORY_ROOT=memory
 UNITS_REGION_CUTOFF="2026-08-19"
@@ -188,19 +188,27 @@ EOF
 add_sibling_worktree() {
   SIB="$GITTMP/rt-sib"; rm -rf "$SIB"
   ( cd "$FX" && git worktree add -q -b "${1:-wave}" "$SIB" ) >/dev/null 2>&1 || { print_bad "fixture: git worktree add failed under $SIB"; return 1; }
-  SIB=$( cd "$SIB" && git rev-parse --show-toplevel )
+  SIB=$(unset GIT_DIR GIT_WORK_TREE;  cd "$SIB" && git rev-parse --show-toplevel )
 }
 # run_tick_over <tick> [args] — OUT, ERR and RC are what the tick did.
 run_tick_over() {
   local t="$1"; shift
   OUT=$(bash "$t" --repo "$FX" "$@" 2>"$TMP/err"); RC=$?; ERR=$(cat "$TMP/err")
 }
-# read_stub_log — the log once the launched stub has started its sleeper, polled up to ten seconds
-# because the launch is detached and the child starts after the tick returned; the `sleeper` line
-# is written after the `argv` line, so both are in. Empty when it never came.
+# THE THREE POLLS BELOW EXIT ON THEIR FACT, so their bounds are HANG BOUNDS of 120 s that the pass
+# path never reaches (TOOL-aSparedSpawn-15 S6). They were 10 s, 5 s and 5 s, sized for a quiet host,
+# and a spawn on a loaded node `a` costs 632 to 818 ms, so a poll whose every turn spawns ran out of
+# turns before the fact it waited for arrived. Only the red path pays the bound, and each one names
+# it on stderr when it is hit.
+RT_HANG=120
+# read_stub_log — the log once the launched stub has started its sleeper, polled up to the hang
+# bound because the launch is detached and the child starts after the tick returned; the `sleeper`
+# line is written after the `argv` line, so both are in. Empty when it never came.
 read_stub_log() {
-  local i; for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
-    [ -s "$STUB_LOG" ] && grep -q '^sleeper ' "$STUB_LOG" && break; sleep 0.5
+  local end=$(( EPOCHSECONDS + RT_HANG ))
+  until [ -s "$STUB_LOG" ] && grep -q '^sleeper ' "$STUB_LOG"; do
+    [ "$EPOCHSECONDS" -lt "$end" ] || { echo "read_stub_log: the stub never wrote its sleeper line within the ${RT_HANG} s hang bound" >&2; break; }
+    sleep 0.5
   done
   cat "$STUB_LOG" 2>/dev/null || true
 }
@@ -230,27 +238,31 @@ seed_log() {
 # MSYS its WINDOWS pid (ps's WINPID column, polled until the forked child has exec'd into `sleep`),
 # the bash pid elsewhere; empty when it never came, which every arm refuses to probe with.
 derive_winpid() {
-  local w="" i
+  local w="" end=$(( EPOCHSECONDS + RT_HANG ))
   case "$(uname -s)" in
     MINGW*|MSYS*|CYGWIN*)
-      for i in 1 2 3 4 5 6 7 8 9 10; do
-        w=$(ps -p "$1" | awk -v p="$1" 'NR>1 && $1==p && $NF ~ /sleep/ {print $4}'); [ -n "$w" ] && break; sleep 0.5
+      while :; do
+        w=$(ps -p "$1" | awk -v p="$1" 'NR>1 && $1==p && $NF ~ /sleep/ {print $4}'); [ -n "$w" ] && break
+        [ "$EPOCHSECONDS" -lt "$end" ] || { echo "derive_winpid: $1 never showed an exec'd sleep within the ${RT_HANG} s hang bound" >&2; break; }
+        sleep 0.5
       done ;;
     *) w=$1 ;;
   esac
   printf '%s' "$w"
 }
 # read_task_gone <winpid> — the count of `No tasks are running` lines `tasklist` prints for that pid,
-# polled until it reads 1 or 25 polls of 0.2 s pass (TOOL-aGraftedHelix-34 S6). `taskkill //F`
+# polled until it reads 1 or the hang bound passes (TOOL-aGraftedHelix-34 S6). `taskkill //F`
 # returns while the process may still be terminating, and an eight-wide pool widens that window: the
 # AC4 and AC13 arms read `tasklist` at once and redded there while green alone and in order. A tick
-# that never killed still reads 0, after the bound, so the arms keep their failing case.
+# that never killed still reads 0, after the bound, so the arms keep their failing case; a landed
+# kill reads 1 at the first poll that sees it.
 read_task_gone() {
-  local c=0 i=0
-  while [ "$i" -lt 25 ]; do
+  local c=0 end=$(( EPOCHSECONDS + RT_HANG ))
+  while :; do
     c=$(tasklist //FI "PID eq $1" 2>/dev/null | grep -c 'No tasks are running')
     [ "$c" = 1 ] && break
-    sleep 0.2; i=$((i + 1))
+    [ "$EPOCHSECONDS" -lt "$end" ] || { echo "read_task_gone: $1 was still listed at the ${RT_HANG} s hang bound" >&2; break; }
+    sleep 0.2
   done
   printf '%s' "$c"
 }
@@ -357,6 +369,14 @@ check_hit "$LOG" "argv -p --resume $SID --dangerously-skip-permissions --max-tur
 check_miss "$LOG" "done" "AC1 the stub is still running when the tick has returned"
 check_hit "$LOG" "--keepalive-id" "AC1 the payload carries its first instruction"
 check_hit "$LOG" "/unattended.sh --resume tRun --keepalive-id" "AC1 the payload names the driver beside the tick — absolute here, because the scratch kit is outside the fixture root"
+# TOOL-aSparedHolder-1: the resumed CLI sees the background-wait ceiling OFF. `-p` stops a background
+# agent or Workflow ten minutes after its last turn (measured 2026-10-11 on node a, CLI 2.1.292: a
+# 5 s ceiling stopped a background agent, 0 waited and took the follow-up turn), and every resumed
+# aFrugalTurnstile session died that way. The stub logs the value it inherited, so this grades the
+# environment the CLI gets, not the launcher's text. And the payload reaps the idle-wakes the dead
+# session's store carried in, where nine piled up across nine resumes on 2026-10-10.
+check_same "AC1 the resumed CLI inherits the background-wait ceiling 0" "$(printf '%s\n' "$LOG" | sed -n 's/^bgwait //p' | head -n 1)" "0"
+check_hit "$LOG" "delete every idle-wake job your scheduler lists" "AC1 the payload reaps the idle-wakes a resumed session carries"
 check_same "AC1 the stub saw auth status first" "$(head -n 1 "$STUB_LOG" | grep -c 'argv auth status')" "1"
 check_same "AC1 one sidecar line" "$(grep -c '' "$SIDECAR/resume.tRun.log")" "1"
 check_same "AC1 the sidecar line starts with a UTC stamp" "$(grep -cE "$UTC_RE" "$SIDECAR/resume.tRun.log")" "1"
@@ -405,36 +425,49 @@ build_fixture 999999999; seed_log 5 "$NOW_UTC"
 run_tick_over "$TICK"
 check_hit "$OUT" "· resumed · attempt 6 · out " "AC3 five newer lines launch attempt 6"
 
-# ---- AC4: a LIVE recorded pid is killed with its tree before the launch. The arm's own background
-# ---- sleep, recorded by the pid `derive_winpid` reads; gone from tasklist / kill -0 afterwards.
+# ---- AC4 (TOOL-aSparedHolder-1): a LIVE recorded pid the tick did NOT launch is REPORTED, never
+# ---- killed. On 2026-10-10 the tick killed aFrugalTurnstile's interactive session, alive and waiting
+# ---- on a Workflow whose agent sat in one Bash call for two hours, and relaunched it headless. The
+# ---- sleep outlives the tick, the stub saw nothing (no login probe, no -p), no attempt line is
+# ---- written, and the health log holds one stale-live-pid line naming the pid. RED against the
+# ---- tick before this unit: the sleep is gone and attempt 1 launches.
 sleep 300 & SLEEP_PID=$!
 WPID=$(derive_winpid "$SLEEP_PID")
 if [ -n "$WPID" ]; then
   build_fixture "$WPID"
   run_tick_over "$TICK"
-  check_hit "$OUT" "· resumed · attempt 1 · out " "AC4 a live pid is still resumed"
-  check_same "AC4 the stub was invoked" "$(read_stub_log | grep -c 'argv -p')" "1"
-  check_hit "$(cat "$SIDECAR/resume.tRun.log")" " pid $WPID pid-alive yes out " "AC4 the sidecar line records pid-alive yes"
+  check_same "AC4 a live unlaunched pid exits 0" "$RC" "0"
+  check_hit "$OUT" "resume-tick: tRun · $FX · skip · STALE OVER A LIVE PID · pid $WPID is alive and this tick did not launch it, so nothing is killed or launched" "AC4 a live pid the tick did not launch is reported by name"
   case "$(uname -s)" in
-    MINGW*|MSYS*|CYGWIN*) check_same "AC4 the sleep is gone from tasklist" "$(read_task_gone "$WPID")" "1" ;;
-    *) check_same "AC4 the sleep is gone" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "gone" ;;
+    MINGW*|MSYS*|CYGWIN*) check_same "AC4 the sleep is still listed by tasklist" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'sleep.exe')" "1" ;;
+    *) check_same "AC4 the sleep is still alive" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "alive" ;;
   esac
+  check_same "AC4 the report invokes nothing" "$([ -f "$STUB_LOG" ] && echo invoked || echo nothing)" "nothing"
+  check_same "AC4 the report writes no attempt line" "$([ -e "$SIDECAR/resume.tRun.log" ] && echo written || echo none)" "none"
+  check_same "AC4 the report appends one stale-live-pid health line naming the pid" \
+    "$(awk -F'\t' '$2 == "resume-tick" && $3 == "stale-live-pid" { print $4 }' "$FX_GITDIR/health.log" 2>/dev/null | cut -d' ' -f1-3)" "tRun pid $WPID"
+  run_tick_over "$TICK" --dry-run
+  check_hit "$OUT" "STALE OVER A LIVE PID · pid $WPID is alive and this tick did not launch it, so nothing is killed or launched (dry-run)" "AC4 dry-run names the report"
+  check_same "AC4 dry-run appends no health line" "$(grep -c 'stale-live-pid' "$FX_GITDIR/health.log" 2>/dev/null)" "1"
 else
-  print_bad "AC4 fixture: no pid for the background sleep, so the kill arm would probe an empty value and prove nothing"
+  print_bad "AC4 fixture: no pid for the background sleep, so the report arm would probe an empty value and prove nothing"
 fi
 kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null; SLEEP_PID=""
 
 # ---- U12 (TOOL-aWokenSentinel-12 AC1): a LOGGED-OUT node KILLS NOTHING. The login probe precedes
-# ---- the kill, so a STALE run with a LIVE recorded pid on a logged-out CLI is the announced skip:
-# ---- the sleep is still listed afterwards, the stub saw `auth status` and no `-p`, and no sidecar
-# ---- log exists. RED against a tick copy with the two calls swapped — the sleep is gone, which is
-# ---- a killed session with no resumer (`memory/gotchas/destructive-step-before-its-precondition`).
+# ---- the kill, so a STALE run whose LAUNCHED pid is alive and hung on a logged-out CLI is the
+# ---- announced skip: the sleep is still listed afterwards, the stub saw `auth status` and no `-p`,
+# ---- and no attempt line was added. Seeded on the launched pid since TOOL-aSparedHolder-1, because
+# ---- a live RECORDED pid the tick did not launch is never a kill target at all (AC4). RED against a
+# ---- tick copy with the two calls swapped — the sleep is gone, which is a killed session with no
+# ---- resumer (`memory/gotchas/destructive-step-before-its-precondition`).
 sleep 300 & SLEEP_PID=$!
 WPID=$(derive_winpid "$SLEEP_PID")
 if [ -n "$WPID" ]; then
-  build_fixture "$WPID"
+  build_fixture 999999999; seed_log 1 "$OLD_UTC"
+  sed -i "\$ s/\$/ launched $WPID/" "$SIDECAR/resume.tRun.log"
   STUB_LOGGED_IN=false run_tick_over "$TICK"
-  check_same "U12 logged-out with a live pid exits 0" "$RC" "0"
+  check_same "U12 logged-out with a live launched pid exits 0" "$RC" "0"
   check_hit "$OUT" "resume-tick: tRun · $FX · SKIP — the CLI is not logged in on this node; nothing can resume tRun" "U12 the logged-out skip is announced"
   case "$(uname -s)" in
     MINGW*|MSYS*|CYGWIN*) check_same "U12 the sleep is still listed by tasklist" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'sleep.exe')" "1" ;;
@@ -442,7 +475,7 @@ if [ -n "$WPID" ]; then
   esac
   check_same "U12 the stub saw auth status" "$(grep -c 'argv auth status' "$STUB_LOG")" "1"
   check_same "U12 the stub saw no -p" "$(grep -c 'argv -p' "$STUB_LOG")" "0"
-  check_same "U12 no sidecar log exists" "$([ -e "$SIDECAR/resume.tRun.log" ] && echo written || echo none)" "none"
+  check_same "U12 no attempt line was added" "$(grep -c '' "$SIDECAR/resume.tRun.log")" "1"
 else
   print_bad "U12 fixture: no pid for the background sleep, so the logged-out arm would probe an empty value and prove nothing"
 fi
@@ -646,7 +679,7 @@ if [ -n "$WPID" ]; then
   ( cd "$FX" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
       && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q -m host2 )
   run_tick_over "$TICK" --dry-run
-  check_hit "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1" "AC15 this node's own name is walked"
+  check_hit "$OUT" "resume-tick: tRun · $FX · skip · STALE OVER A LIVE PID · pid $WPID" "AC15 this node's own name is walked, to the live-pid report"
 else
   print_bad "AC15 fixture: no pid for the background sleep, so the foreign-host arm would probe an empty value and prove nothing"
 fi
@@ -702,7 +735,7 @@ sed -i "s/^phase: .*/phase: LANDING/; s/^witness: .*/witness: $FIRST/" "$FX/memo
     && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q -m landing )
 LC61=$( cd "$FX" && git rev-parse HEAD ); W61="$GITTMP/rt-w61"; rm -rf "$W61"
 ( cd "$FX" && git worktree add -q --detach "$W61" "$LC61" ) >/dev/null 2>&1
-W61=$( cd "$W61" && git rev-parse --show-toplevel )
+W61=$(unset GIT_DIR GIT_WORK_TREE;  cd "$W61" && git rev-parse --show-toplevel )
 mkdir -p "$FX_GITDIR/unattended"
 printf '2026-09-27T00:00:00Z landed %s on refs/heads/main at %s\n' "$LC61" "$LC61" > "$FX_GITDIR/unattended/landed.tRun.log"
 check_same "U61 the driver reads the observed landing TERMINAL in W2" "$( cd "$W61" && GOV_DEFAULT_BRANCH=main bash "$KIT/unattended.sh" --liveness tRun 2>/dev/null | sed -n 's/^verdict: //p')" "TERMINAL"

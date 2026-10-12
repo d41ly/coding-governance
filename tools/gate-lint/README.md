@@ -123,6 +123,62 @@ as the source spells it — and never on a line number. The argument is optional
 states: absent grades an empty declaration and says so, supplied-and-unresolvable refuses, and an
 empty population or a failed `git ls-files` refuses with exit 2.
 
+### `--spawn-idioms` — a fork spent on builtin work
+
+```bash
+python3 <tool-root>/gate-lint/sh_hygiene.py --spawn-idioms [registry-path] [root] [pathspec ...]
+```
+
+A third class. A command substitution forks a subshell — 89 to 315 ms each under MSYS — and some
+idioms fork for work bash does in the shell that asked. Three have no false positive and are BANNED
+on the population the pathspecs select, with no registry escape: `$(date +%s)` and its `%s%N` form
+(`$EPOCHSECONDS`, or `${EPOCHREALTIME/[.,]/}` scaled), `$(cat <<…` (read the heredoc first with
+`IFS= read -r -d '' v <<'TAG' || :`), and `$(<f …)` carrying a second redirection, which defeats
+bash's no-fork read so it reads EMPTY and still forks. Six more are counted per (path, class) in the
+registry: `pure-fn-subst` (a function defined in the file or in a library it sources, whose body runs
+only builtins), `printf-subst`, `cat-file`, `path-subst`, `date-fmt` and `var-pipe`. The registry
+classes also count every tracked `*.test.sh`, so a suite site is a row rather than unseen; a BANNED
+class grades the selected population alone.
+
+A quoted heredoc's body is data and never graded, a spelling in a comment is a near miss, and a
+callee that calls another function grades impure — a miss, never a false red. Every run prints each
+class's scanned, gated and near-miss counts and every registered row's reason. The registry is the
+loop registry's four fields keyed on the CLASS, `<path>\t<class>\t<count>\t<reason>`; a row naming a
+BANNED class is refused rather than honoured. A converted reader takes the out-variable convention:
+it sets a fixed global, clears it first so a miss never leaves the previous answer, and still
+prints, so a caller writes `f x >/dev/null; v=$_f`. The scanner's header lists what it does NOT
+check — how often a site runs above all, which is what the counter below is for.
+
+## fork-count.sh
+
+```bash
+bash <tool-root>/gate-lint/fork-count.sh <ceilings-file> [root] [--only <id>]   # 0 within ceilings, 1 red, 2 refusal
+bash <tool-root>/gate-lint/fork-count.sh --selftest
+```
+
+Counts the forks per invocation of each declared entrypoint, with no clock read anywhere. Each runs
+under `env SHELLOPTS=xtrace BASH_XTRACEFD=<fd>` with a PS4 carrying `${BASHPID}` and the source
+line; the forks are the distinct BASHPID values less the root's — a deterministic LOWER bound, since
+a subshell that traces nothing is unseen. Every run first counts a specimen written from a quoted
+heredoc and refuses with 2 when the count disagrees with its declaration, because a counter that
+cannot move reports the same zero a clean tree does.
+
+The ceilings file is the caller's, one row per entrypoint and bash `major.minor`:
+`<id>\t<bash>\t<ceiling>\t<base>\t<setup>\t<command>\t<reason>`. `setup` builds the fixture untraced
+in a fresh scratch directory and `command` is the one traced invocation; both see `ROOT` (the graded
+tree) and `SCRATCH`. A row whose setup fails, and an entrypoint with no row for the running bash,
+print `skipped — <id> · <why>` and are never counted as passed. A count above its ceiling reds with
+the delta and the top ten `file:line` sites the forked subshells first traced at; a ceiling more
+than max(3, 5 %) above its count reds as a saving nobody banked.
+
+A run that grades no row never reads as a measured pass. An `--only <id>` naming no declared row
+refuses with 2 and lists the declared ids. A selection holding a row for the running bash whose
+every row was skipped, by a failed setup or a missing trace, refuses with 2 naming that bash. A
+selection with NO row for the running bash keeps the `skipped` shape and exits 0, and prints
+`fork-count: NOT MEASURED — no row declares bash <major.minor>, so the spawn budget was not measured
+on this bash`, so the log shows the gap until that bash's rows are declared. The counter ships with this kit;
+the home repository's leg is its own, because its ceilings name that repository's entrypoints.
+
 ## encoding_posture.py
 
 ```bash

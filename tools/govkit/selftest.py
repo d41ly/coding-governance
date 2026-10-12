@@ -109,7 +109,7 @@ def resolve_kit_dir(home, anchor, here):
     raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
-KIT_DIRS = {home: resolve_kit_dir(home, anchor, HERE) for home, anchor in (("codebase-map", "map_lib.py"), ("drift-audit", "drift_report.py"), ("hooks", "agent-cap.js"), ("lexicon", "lexicon.py"), ("memory-recall", "extract.py"), ("memory-tree", "gotchas.py"), ("playbook", "render_playbook.py"), ("process-monitor", "procmon-hook.js"), ("pytest-parallel-guardrails", "crashprobe.py"), ("run-gates", "run-gates.sh"), ("runlog", "runlog.py"), ("unattended", "unattended.sh"), ("workflows", "tier2-review.js"))}
+KIT_DIRS = {home: resolve_kit_dir(home, anchor, HERE) for home, anchor in (("codebase-map", "map_lib.py"), ("drift-audit", "drift_report.py"), ("hooks", "agent-cap.js"), ("lexicon", "lexicon.py"), ("memory-recall", "extract.py"), ("memory-tree", "gotchas.py"), ("playbook", "render_playbook.py"), ("process-monitor", "procmon-hook.js"), ("pytest-parallel-guardrails", "crashprobe.py"), ("roles", "roles_lib.py"), ("run-gates", "run-gates.sh"), ("runlog", "runlog.py"), ("unattended", "unattended.sh"), ("workflows", "tier2-review.js"))}
 KIT_DIRS["govkit"] = HERE
 KIT_NAMES = {home: d.name for home, d in KIT_DIRS.items()}
 
@@ -932,6 +932,19 @@ def check_shipped_verb(tmp: pathlib.Path) -> None:
                          "shipped", "--all"], capture_output=True, text=True, encoding="utf-8")
     check("[aRF-16 S1] `shipped` refuses an argument", pr.returncode == 2
           and "shipped takes no arguments" in pr.stderr, pr.stderr)
+    # TOOL-aSparedSpawn-12 AC8: `--epoch` keeps the rows in EPOCH_ROLES and drops the rest. The
+    # predicate is observed REJECTING the unfiltered output, which carries the `generated` row an
+    # `--epoch` that ignored its flag would print.
+    pe = subprocess.run([sys.executable, str(fx / PFX / KIT_NAMES["govkit"] / "govkit.py"),
+                         "shipped", "--epoch"], capture_output=True, text=True, encoding="utf-8")
+
+    def check_epoch_rows(lines: list[str]) -> bool:
+        roles = govkit_module().EPOCH_ROLES   # the engine's own set, never a typed copy
+        return lines == [want[0]] and all(ln.split("\t")[1] in roles for ln in lines)
+    check("[aSS-12 AC8] `shipped --epoch` prints exactly the rows whose role is in EPOCH_ROLES",
+          pe.returncode == 0 and check_epoch_rows(pe.stdout.splitlines()), pe.stdout + pe.stderr)
+    check("[aSS-12 AC8] ...and the same predicate REJECTS the unfiltered rows, generated one included",
+          not check_epoch_rows(p.stdout.splitlines()), p.stdout)
 
 
 def check_epoch_verb(tmp: pathlib.Path) -> None:
@@ -1747,9 +1760,14 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     check("[aRF-17 AC1] LIVENESS the install rendered v1 and tracks the rendered row",
           read_bytes17(t / "docs" / "out.md") == b"v1\n"
           and read_row17(t, "docs/out.md").get("role") == "rendered", str(read_row17(t, "docs/out.md")))
+    _rb_before = dict(read_row17(t, "docs/out.md"))
     write_gov17(g, kit_rb, {"eng.txt": "v2\n"}, "B")
     p = run_gov17(g, "update", "--target", str(t), "--write")
     order = read_bytes17(t / ".governance" / "outbox" / "update-rollback-demo.md").decode("utf-8")
+    check("[dRR-4 AC3] a rolled-back kit's rendered row keeps its record, and the run says why",
+          read_row17(t, "docs/out.md") == _rb_before
+          and "receipt: KEPT [rendered] docs/out.md — its kit was rolled back" in p.stdout,
+          p.stdout[-1500:] + str(read_row17(t, "docs/out.md")) + str(_rb_before))
     check("[aRF-17 AC1] LIVENESS the run really rolled the kit back",
           "ROLLED BACK" in p.stdout and read_bytes17(t / PFX / "demo" / "eng.txt") == b"v1\n",
           p.stdout[-1500:])
@@ -1806,9 +1824,12 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     _cg_ran = _cg_out.find("ran demo:")
     check("[aHI-1 AC4] update names an absent render key BEFORE the regenerate it would refuse",
           0 <= _cg_gap < _cg_ran, _cg_out[-1500:])
+    # DEPL-dRemeasuredRender-4 S6. The EARLY line, by its own spelling and BEFORE the `ran` line:
+    # since DEPL-dRemeasuredRender-2 the `is undischarged` spelling is printed only by the re-probe.
+    _cg_hole = _cg_out.find("govkit update — HOLE demo: 'demo-hole' probes undischarged before the "
+                            "render (probe exit 3); probed again after it — the fixture hole")
     check("[aHI-1 S3] ...and names the undischarged hole there too, with its reason",
-          "govkit update — HOLE demo: 'demo-hole' is undischarged (probe exit 3) — the fixture hole"
-          in _cg_out, _cg_out[-1500:])
+          0 <= _cg_hole < _cg_ran, _cg_out[-1500:])
     check("[aHI-1 S3] ...and the regenerate still ran: the lines change no disposition",
           read_bytes17(t / "docs" / "out.md") == b"v2\n", repr(read_bytes17(t / "docs" / "out.md")))
     for _cg_val, _cg_want in ((None, "is ABSENT"), ('"<your-tool>"', "still the example's <...>"),
@@ -1843,6 +1864,178 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     check("[aHI-1 AC3] a defaulted key is never absent; both lists are read, once each",
           _gm.read_conf_key_gaps(_cg_t, _cg_d) == [("A", "absent"), ("B", "placeholder")],
           str(_gm.read_conf_key_gaps(_cg_t, _cg_d)))
+
+    # ---- DEPL-dRemeasuredRender-1 AC1-AC3. A kit whose regenerate renders one `rendered` row from
+    # ---- its engine and its template. After `update --write` moves both, the row's receipt and its
+    # ---- `install.sums` line name the rendered bytes, and `check` agrees. The `oid` is graded against
+    # ---- the target's own index entry once the render is staged, never against a second
+    # ---- `hash-object` call, so the arm is not the code under test asking itself.
+    kit_rm = (SAFE_HEAD + 'version_from = { file = "ver.sh", pattern = "^DEMO_VERSION=" }\n\n'
+              '[check]\nnone = "fixture"\n\n'
+              '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+              '[[files]]\ninclude = ["tpl.md"]\nrole = "rendered"\nto = "docs/out.md"\n\n'
+              '[[regenerate]]\nargv = ["bash", "{kit}/gen.sh"]\n\n'
+              '[adopt]\nargv = ["bash", "{kit}/gen.sh"]\nmutates_index = false\n')
+    gen_rm = 'd="$(dirname "$0")"\nmkdir -p docs\ncat "$d/eng.txt" "$d/tpl.md" > docs/out.md\n'
+    g, _a = build_gov17("mr", kit_rm, {"eng.txt": "v1\n", "gen.sh": gen_rm, "tpl.md": "tpl\n",
+                                       "ver.sh": "DEMO_VERSION=1.0\n"})
+    t = build_target17(g, "mr")
+    _rm_before = dict(read_row17(t, "docs/out.md"))
+    _rm_b = write_gov17(g, kit_rm, {"eng.txt": "v2\n", "tpl.md": "tpl2\n",
+                                    "ver.sh": "DEMO_VERSION=1.1\n"}, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    _rm_bytes = read_bytes17(t / "docs" / "out.md")
+    _rm_row = read_row17(t, "docs/out.md")
+    _rm_sha = hashlib.sha256(_rm_bytes).hexdigest()
+    check("[dRR-1 AC1] LIVENESS the render ran and rewrote the rendered row's file",
+          _rm_bytes == b"v2\ntpl2\n" and _rm_before.get("sha256") != _rm_sha,
+          repr(_rm_bytes) + str(_rm_before))
+    git(t, "add", "--", "docs/out.md")
+    _rm_idx = run_gov_git(t, "ls-files", "-s", "--", "docs/out.md").split()
+    _rm_sums = read_bytes17(t / ".governance" / "install.sums").decode("utf-8")
+    check("[dRR-1 AC1] the rendered row's sha256, oid and install.sums line name the rendered bytes",
+          _rm_row.get("sha256") == _rm_sha and len(_rm_idx) > 1 and _rm_row.get("oid") == _rm_idx[1]
+          and f"{_rm_sha}  docs/out.md\n" in _rm_sums,
+          str(_rm_row) + " idx " + str(_rm_idx) + "\n" + _rm_sums)
+    check("[dRR-1 S1] ...and its commit is the vintage that rendered it, gov_oid gov's template blob",
+          _rm_row.get("commit") == _rm_b
+          and _rm_row.get("gov_oid") == govkit_module().blob_oid(b"tpl2\n"), str(_rm_row))
+    check("[dRR-4 AC4] ...and its version is the new vintage's, moved from the install's",
+          "1.1" in str(_rm_row.get("version")) and _rm_row.get("version") != _rm_before.get("version"),
+          str(_rm_row.get("version")) + " vs " + str(_rm_before.get("version")))
+    check("[dRR-1 S3] the run says it re-measured the row, and counts it",
+          "receipt: re-measured [rendered] docs/out.md" in p.stdout
+          and "rendered receipts: 1 re-measured · 0 kept" in p.stdout, p.stdout[-1500:])
+    settle(t, "the update")
+    p = run_gov17(g, "check", "--target", str(t))
+    check("[dRR-1 AC2] check agrees with the re-measured receipt", p.returncode == 0,
+          p.stdout[-1500:] + p.stderr[-600:])
+    # AC3: the same kit with a regenerate that writes and then REFUSES. The row keeps its record.
+    gen_rr = ('d="$(dirname "$0")"\nmkdir -p docs\ncat "$d/eng.txt" "$d/tpl.md" > docs/out.md\n'
+              'if grep -q v2 "$d/eng.txt"; then echo "gen: REFUSED" >&2; exit 5; fi\n')
+    g, _a = build_gov17("rr", kit_rm, {"eng.txt": "v1\n", "gen.sh": gen_rr, "tpl.md": "tpl\n",
+                                       "ver.sh": "DEMO_VERSION=1.0\n"})
+    t = build_target17(g, "rr")
+    _rr_before = dict(read_row17(t, "docs/out.md"))
+    write_gov17(g, kit_rm, {"eng.txt": "v2\n", "tpl.md": "tpl2\n"}, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    check("[dRR-1 AC3] LIVENESS the regenerate really refused",
+          "re-render/regenerate argv exited 5" in p.stdout + p.stderr, (p.stdout + p.stderr)[-1500:])
+    check("[dRR-1 AC3] a refused render's row keeps its record, and the run says KEPT and why",
+          read_row17(t, "docs/out.md") == _rr_before
+          and "receipt: KEPT [rendered] docs/out.md — its render was refused" in p.stdout,
+          p.stdout[-1500:] + str(read_row17(t, "docs/out.md")) + str(_rr_before))
+    # DEPL-dRemeasuredRender-3 AC1. A regenerate that exits 3 through a declared `ok = true` outcome
+    # and renders nothing, the shape of memory-tree's `not-rendered-here`: the row keeps its record.
+    kit_ns = kit_rm + '\n[[outcome]]\ncode = 3\nmeans = "not-rendered-here"\nok = true\n'
+    gen_ns = ('d="$(dirname "$0")"\nif grep -q v2 "$d/eng.txt"; then exit 3; fi\nmkdir -p docs\n'
+              'cat "$d/eng.txt" "$d/tpl.md" > docs/out.md\n')
+    g, _a = build_gov17("ns", kit_ns, {"eng.txt": "v1\n", "gen.sh": gen_ns, "tpl.md": "tpl\n",
+                                       "ver.sh": "DEMO_VERSION=1.0\n"})
+    t = build_target17(g, "ns")
+    _ns_before = dict(read_row17(t, "docs/out.md"))
+    write_gov17(g, kit_ns, {"eng.txt": "v2\n", "tpl.md": "tpl2\n"}, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    check("[dRR-3 AC1] LIVENESS the regenerate stopped at its accepted outcome and rendered nothing",
+          "(not-rendered-here)" in p.stdout and read_bytes17(t / "docs" / "out.md") == b"v1\ntpl\n",
+          p.stdout[-1500:])
+    check("[dRR-3 AC1] an accepted stop's row keeps its record, and the run names the outcome",
+          read_row17(t, "docs/out.md") == _ns_before
+          and "receipt: KEPT [rendered] docs/out.md — its render stopped at accepted outcome "
+              "'not-rendered-here' without rendering" in p.stdout,
+          p.stdout[-1500:] + str(read_row17(t, "docs/out.md")) + str(_ns_before))
+
+    # DEPL-dRemeasuredRender-4 AC3. The two KEPT reasons no arm drove: a render this run did not
+    # run (`GOVKIT_RERENDER=0`), and one that ran and left no file. Each row keeps its record.
+    _ka = {"eng.txt": "v1\n", "gen.sh": gen_rm, "tpl.md": "tpl\n", "ver.sh": "DEMO_VERSION=1.0\n"}
+    _kb = {"eng.txt": "v2\n", "tpl.md": "tpl2\n", "ver.sh": "DEMO_VERSION=1.1\n"}
+    g, _a = build_gov17("nr", kit_rm, _ka)
+    t = build_target17(g, "nr")
+    _nr_before = dict(read_row17(t, "docs/out.md"))
+    write_gov17(g, kit_rm, _kb, "B")
+    p = subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), "update",
+                        "--target", str(t), "--write"], capture_output=True, text=True,
+                       encoding="utf-8", env=dict(env, GOVKIT_RERENDER="0"))
+    check("[dRR-4 AC3] a render this run did not run keeps its row, and the run says why",
+          read_row17(t, "docs/out.md") == _nr_before
+          and "receipt: KEPT [rendered] docs/out.md — its render did not run this time" in p.stdout,
+          p.stdout[-1500:] + str(read_row17(t, "docs/out.md")))
+    gen_ab = ('d="$(dirname "$0")"\nmkdir -p docs\nif grep -q v2 "$d/eng.txt"; then rm -f docs/out.md; '
+              'else cat "$d/eng.txt" "$d/tpl.md" > docs/out.md; fi\n')
+    g, _a = build_gov17("ab", kit_rm, dict(_ka, **{"gen.sh": gen_ab}))
+    t = build_target17(g, "ab")
+    _ab_before = dict(read_row17(t, "docs/out.md"))
+    write_gov17(g, kit_rm, _kb, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    check("[dRR-4 AC3] a render that left no file keeps its row, and the run says why and counts it",
+          not (t / "docs" / "out.md").exists() and read_row17(t, "docs/out.md") == _ab_before
+          and "receipt: KEPT [rendered] docs/out.md — its file is absent after the render" in p.stdout
+          and "rendered receipts: 0 re-measured · 1 kept" in p.stdout,
+          p.stdout[-1500:] + str(read_row17(t, "docs/out.md")))
+    # DEPL-dRemeasuredRender-4 AC2. The line for each verdict kind, in-process: no fixture can make a
+    # probe fail to launch on demand, and the line is the whole behaviour.
+    _rhv = govkit_module().render_hole_verdict
+    _rhv_lines = {v: _rhv("demo", "h", v, "d", "why", False)
+                  for v in ("undischarged", "discharged", "no-launch")}
+    check("[dRR-4 AC2] each re-probe verdict maps to its own line",
+          _rhv_lines["undischarged"] == "govkit update — HOLE demo: 'h' is undischarged (probe exit d) — why"
+          and _rhv_lines["discharged"].endswith("is discharged after the render; the early verdict "
+                                                "does not stand")
+          and "reads no-launch (d), so neither verdict is confirmed — why" in _rhv_lines["no-launch"]
+          and "after the rollback restored" in _rhv("demo", "h", "undischarged", "1", "w", True),
+          str(_rhv_lines))
+
+    # ---- DEPL-dRemeasuredRender-2 AC1-AC2. A hole whose probe reads the RENDERED file is probed
+    # ---- before the regenerate, where it fails, and again after it. Only the verdict after the
+    # ---- render is called undischarged: `hp` passes once rendered, `hf` fails throughout.
+    for _hpt, _hpcmd in (("hp", '["bash", "-c", "grep -q v2 docs/out.md"]'),
+                         ("hf", '["bash", "-c", "exit 3"]'),
+                         ("hb", '["bash", "-c", "grep -q v2 docs/out.md"]'),
+                         ("hr", '["bash", "-c", "exit 3"]')):
+        # `hb` adds a check that passes before the update and fails on the render, so the verify
+        # pass rolls the render that discharged the hole back; `hr` refuses after rendering.
+        _hpchk = ('[check]\nargv = ["bash", "{kit}/check.sh"]\n\n' if _hpt == "hb" else
+                  '[check]\nnone = "fixture"\n\n')
+        kit_hp = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n' + _hpchk +
+                  '[[hole]]\nid = "demo-hole"\nkind = "authoring"\nblocks_adopt = false\n'
+                  'blocks_gate = false\nwhy = "the fixture hole"\n'
+                  f'discharge = {{ command = {_hpcmd} }}\n\n'
+                  '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                  '[[files]]\ninclude = ["tpl.md"]\nrole = "rendered"\nto = "docs/out.md"\n\n'
+                  '[[regenerate]]\nargv = ["bash", "{kit}/gen.sh"]\n\n'
+                  '[adopt]\nargv = ["bash", "{kit}/gen.sh"]\nmutates_index = false\n')
+        _hpgen = (gen_cg + 'if grep -q v2 "$d/eng.txt"; then exit 5; fi\n') if _hpt == "hr" else gen_cg
+        g, _a = build_gov17(_hpt, kit_hp, {"eng.txt": "v1\n", "gen.sh": _hpgen, "tpl.md": "tpl\n",
+                                           "check.sh": "grep -q v1 docs/out.md\n"})
+        t = build_target17(g, _hpt)
+        write_gov17(g, kit_hp, {"eng.txt": "v2\n"}, "B")
+        p = run_gov17(g, "update", "--target", str(t), "--write")
+        _hp_early = p.stdout.find("HOLE demo: 'demo-hole' probes undischarged before the render")
+        _hp_final = p.stdout.find("HOLE demo: 'demo-hole' is undischarged (probe exit")
+        check(f"[dRR-2 {_hpt}] LIVENESS the early probe named the hole, and the render landed "
+              f"or was rolled back as the fixture means",
+              _hp_early >= 0 and read_bytes17(t / "docs" / "out.md")
+              == (b"v1\n" if _hpt == "hb" else b"v2\n"), p.stdout[-1500:])
+        if _hpt == "hb":
+            check("[dRR-4 AC1] a hole whose discharging render is rolled back is reported "
+                  "undischarged over the restored bytes, never discharged",
+                  "ROLLED BACK" in p.stdout and _hp_final > _hp_early
+                  and "after the rollback restored the pre-render bytes" in p.stdout
+                  and "is discharged after the render" not in p.stdout, p.stdout[-1800:])
+        elif _hpt == "hr":
+            check("[dRR-4 AC5] a refused render's hole is still re-probed and reported",
+                  "re-render/regenerate argv exited 5" in p.stdout + p.stderr
+                  and _hp_final > _hp_early, (p.stdout + p.stderr)[-1800:])
+        elif _hpt == "hp":
+            check("[dRR-2 AC1] a hole the render discharges is not reported undischarged, and the "
+                  "run says the early verdict does not stand",
+                  _hp_final < 0 and "HOLE demo: 'demo-hole' is discharged after the render; the "
+                  "early verdict does not stand" in p.stdout, p.stdout[-1500:])
+        else:
+            check("[dRR-2 AC2] a hole still failing after the render is reported undischarged, "
+                  "after the early line",
+                  _hp_final > _hp_early >= 0 and "is discharged after the render" not in p.stdout,
+                  p.stdout[-1500:])
 
     # ---- DEPL-aHalvedInstall-4 AC1-AC5. One update moves a kit's conf.sh (which the target edited,
     # ---- so it conflicts), its plain.txt (clean) and its engine (re-rendered). The refused row holds
@@ -2502,6 +2695,163 @@ def check_ceiling_emission(tmp: pathlib.Path) -> None:
     check("CE5: a ceiling the receipt recorded is gov's to replace",
           read_rows().get(leg, {}).get("ceiling") == 1780,
           str(read_rows().get(leg)) + (p.stdout + p.stderr)[-900:])
+
+
+def check_roles_default() -> None:
+    """TOOL-aOrientedCast-8 S10, AC2, over gov's OWN registry and descriptors: `roles` is a default
+    and the default closes over it; without its card writer it is an unsatisfied requirement; an aged
+    registry lacking it makes `update` gain it and an unmoved one gains nothing; and the descriptor
+    claims every house overlay as `seed`, the Skill as `rendered` with a re-render, and every test
+    file as `project-owned`. A module-level function, so a slice runs it without `main()`."""
+    gk = govkit_module()
+    rep = gk.Report()
+    reg = gk.load_registry(GOV_ROOT)
+    descs = gk.read_descriptors(GOV_ROOT, reg, rep)
+    dflt = list(gk.default_kits(reg))
+    check("OC8 AC2 the default set holds roles", "roles" in dflt, str(dflt))
+    check("OC8 AC2 ...and the default selection's requirements are all satisfied by it",
+          gk.derive_unsatisfied_requires(dflt, descs, None) == [],
+          str(gk.derive_unsatisfied_requires(dflt, descs, None)))
+    _alone = gk.derive_unsatisfied_requires(["roles", "memory-tree"], descs, {"kits": []})
+    check("OC8 AC2 roles selected without its card writer is an unsatisfied requirement",
+          ("roles", "kickoff-manifest") in _alone, str(_alone))
+    # The aged registry is the current default less `roles`, built from the registry's own answer
+    # rather than typed, and `blob_at` is stood in for as the TOOL-aRoutedQuill-5 arm does.
+    _was = [k for k in dflt if k != "roles"]
+    _regs = {"a" * 40: "[selection]\ndefault = [%s]\n" % ", ".join('"%s"' % k for k in _was),
+             "b" * 40: "[selection]\ndefault = [%s]\n" % ", ".join('"%s"' % k for k in dflt)}
+    _blob = gk.blob_at
+    gk.blob_at = lambda _r, c, _p: _regs[c].encode() if c in _regs else None
+    try:
+        _gained = gk.derive_default_gained(GOV_ROOT, "a" * 40, "b" * 40, {"kits": _was}, descs)
+        _same = gk.derive_default_gained(GOV_ROOT, "b" * 40, "b" * 40, {"kits": _was}, descs)
+    finally:
+        gk.blob_at = _blob
+    check("OC8 AC2 a registry aged before roles joined the default gains it", _gained == (["roles"], ""),
+          str(_gained))
+    check("OC8 AC2 LIVENESS ...and an unmoved default gains nothing", _same == ([], ""), str(_same))
+    d = descs.get("roles", ({}, ""))[0]
+    rules = d.get("files") or []
+
+    def derive_listed_role(rel):
+        """The role of the LIST rule naming rel, else the `**` rule's, else None."""
+        for rule in rules:
+            if isinstance(rule.get("include"), list) and rel in rule["include"]:
+                return rule.get("role")
+        return next((r.get("role") for r in rules if r.get("include") == "**"), None)
+
+    kit = KIT_DIRS["roles"]
+    house = sorted("house/" + p.name for p in (kit / "house").glob("*.md"))
+    check("OC8 AC2 every house overlay is a seed row", house and all(
+        derive_listed_role(h) == "seed" for h in house), str({h: derive_listed_role(h) for h in house}))
+    _skill = [r for r in rules if r.get("include") == ["SKILL.template.md"]]
+    check("OC8 AC2 the Skill row is rendered, and the descriptor declares a [[regenerate]]",
+          len(_skill) == 1 and _skill[0].get("role") == "rendered" and bool(d.get("regenerate")),
+          str(_skill) + " regenerate=" + str(d.get("regenerate")))
+    tests = sorted(p.name for p in kit.glob("*.test.sh"))
+    check("OC8 AC2 every test file the kit holds is a project-owned row", tests and all(
+        derive_listed_role(x) == "project-owned" for x in tests), str({x: derive_listed_role(x) for x in tests}))
+
+
+def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = False) -> None:
+    """TOOL-aOrientedCast-8 S10, AC4 and AC6: a DEFAULT apply into a scratch target renders the roles
+    kit — the role index, nine agent types, ten seeded house overlays and the `/build` Skill — its
+    `--check` reads fresh, and the target's own wiring checker reads `ok` for roles, then `UNWIRED`
+    once the index is gone. The target holds a governing doc at the path the memory-tree seed writes
+    as `CHARTER`, copied from gov's own `AGENTS.md`, because the shape lands the playbook elsewhere.
+    With `charter=False` it holds none, and this asserts AC13 instead: the apply still exits 0 through
+    the adopter's accepted exit 3, the Skill alone is rendered, and check-wiring names the doc.
+    With `runner=True` (TOOL-aOrientedCast-13 AC4) the deploy text also carries a `[gate_runner]`
+    built from the run-gates kit's `[gate_runner_seed]`, so the apply writes the target's own gate
+    manifest, which holds no lexicon leg; the seed policy's optional lexicon grant must then leave
+    the adopter's `--check` and the target's `check_roles.py` at exit 0, the latter with a note.
+    WHAT THIS DOES NOT CHECK: the rendered bytes, which the kit's own legs grade, or an update's
+    re-render, which the update-safety arms own."""
+    deploy = DEPLOY_REGISTRY_DEFAULT
+    manifest = None
+    if runner:
+        import tomllib  # noqa: PLC0415
+        seed = tomllib.loads((KIT_DIRS["run-gates"] / "kit.toml").read_text(encoding="utf-8"))["gate_runner_seed"]
+        # Resolved and written as govkit's intake writes it: a list is a TOML array, a scalar quoted.
+        lines = ["", "[gate_runner]"]
+        for k, v in seed.items():
+            vals = v if isinstance(v, list) else [v]
+            vals = [x.replace("{prefix}", PFX[:-1]).replace("{kit}", PFX + KIT_NAMES["run-gates"])
+                    for x in vals]
+            manifest = vals[0] if k == "file" else manifest
+            lines.append('%s = %s' % (k, "[" + ", ".join('"%s"' % x for x in vals) + "]"
+                                      if isinstance(v, list) else '"%s"' % vals[0]))
+        deploy = DEPLOY_REGISTRY_DEFAULT.rstrip("\n") + "\n" + "\n".join(lines) + "\n"
+    t = make_target(pathlib.Path(tmp) / ("roles-runner" if runner else "roles-default" if charter
+                                         else "roles-no-doc"), deploy)
+    # The seed's CHARTER, read from the memory-tree kit's own conf example rather than typed.
+    doc = _re.findall(r'^CHARTER="?([^"\n]*)"?', (KIT_DIRS["memory-tree"] / ".memory-tree.conf.example")
+                      .read_text(encoding="utf-8"), _re.M)[-1]
+    if charter:
+        (t / doc).write_bytes((GOV_ROOT / "AGENTS.md").read_bytes())
+        git(t, "add", "-A")
+        git(t, "commit", "-qm", "the governing doc")
+    ap = run("apply", "--target", str(t))
+    tag = "OC8 AC4" if charter else "OC8 AC13 (no doc at %s)" % doc
+    check(tag + " a default apply into a scratch target exits 0", ap.returncode == 0,
+          (ap.stdout + ap.stderr)[-2000:])
+    try:
+        kit = resolve_kit_dir("roles", "roles_lib.py", t / PFX)
+    except LookupError as e:
+        check(tag + " ...and installs the roles kit", False, str(e))
+        return
+    if not charter:
+        check(tag + " ...renders the /build Skill", (t / ".claude" / "skills" / "build" / "SKILL.md").is_file(),
+              "absent")
+        _agents = list((t / ".claude" / "agents").glob("*")) if (t / ".claude" / "agents").is_dir() else []
+        check(tag + " ...and writes no agent type and no role index",
+              not _agents and not (t / ".claude" / "roles.json").exists(), str(_agents))
+        p = subprocess.run([govkit_module().resolve_bash(), str(t / PFX / "check-wiring.sh"), "--check"], cwd=str(t),
+                           capture_output=True, text=True, encoding="utf-8", errors="replace")
+        _ln = [ln for ln in p.stdout.splitlines() if ln.startswith("UNWIRED  roles")]
+        check(tag + " ...and check-wiring reads UNWIRED roles naming the doc and the CHARTER key",
+              any(("names %s, which is not a file" % doc) in ln and "CHARTER" in ln for ln in _ln),
+              p.stdout[-2000:])
+        return
+    agents = sorted(p.name for p in (t / ".claude" / "agents").glob("gov-*.md"))
+    check("OC8 AC4 ...renders the role index", (t / ".claude" / "roles.json").is_file(), str(agents))
+    check("OC8 AC4 ...renders nine agent types, one per agent role", len(agents) == 9, str(agents))
+    check("OC8 AC4 ...seeds ten house overlays", len(list((kit / "house").glob("*.md"))) == 10,
+          str(sorted(p.name for p in (kit / "house").glob("*.md"))))
+    check("OC8 AC4 ...and renders the /build Skill", (t / ".claude" / "skills" / "build" / "SKILL.md").is_file(),
+          "absent")
+    ck = subprocess.run([govkit_module().resolve_bash(), str(kit / "adopt-roles.sh"), "--check"], cwd=str(t),
+                        capture_output=True, text=True, encoding="utf-8", errors="replace")
+    check("OC8 AC4 the target's adopter --check reads its render fresh", ck.returncode == 0,
+          ck.stdout + ck.stderr)
+    if runner:
+        mf = t / (manifest or "")
+        held = [x.get("name") for x in json.loads(mf.read_text(encoding="utf-8"))] if mf.is_file() else None
+        check("OC13 AC4 the runner apply writes the target's own gate manifest, holding no lexicon leg",
+              held is not None and "lexicon naming predicates" not in held, str(held))
+        check("OC13 AC4 ...and the adopter's --check exits 0 over the seed's optional lexicon grant",
+              ck.returncode == 0, ck.stdout + ck.stderr)
+        cr = subprocess.run([sys.executable, str(kit / "check_roles.py")], cwd=str(t), capture_output=True,
+                            text=True, encoding="utf-8", errors="replace")
+        check("OC13 AC4 ...and check_roles.py exits 0 with a note naming the lexicon leg",
+              cr.returncode == 0 and any(ln.startswith("roles: note:") and "lexicon naming predicates" in ln
+                                         for ln in cr.stdout.splitlines()), cr.stdout + cr.stderr)
+    cw = t / PFX / "check-wiring.sh"
+
+    def run_wiring():
+        p = subprocess.run([govkit_module().resolve_bash(), str(cw), "--check"], cwd=str(t), capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
+        return [ln for ln in p.stdout.splitlines() if ln[:9].strip() and ln[9:18].strip() == "roles"]
+
+    lines = run_wiring()
+    check("OC8 AC6 the target's check-wiring reads ok for roles, and no absent harness reads UNWIRED",
+          any(ln.startswith("ok       roles") for ln in lines)
+          and not any(ln.startswith("UNWIRED") for ln in lines), str(lines))
+    (t / ".claude" / "roles.json").unlink()
+    lines = run_wiring()
+    check("OC8 AC6 ...and UNWIRED naming the index and the scaffold once the index is absent",
+          any(ln.startswith("UNWIRED  roles") and "roles.json" in ln and "adopt-roles.sh --scaffold" in ln
+              for ln in lines), str(lines))
 
 
 def main() -> int:
@@ -5994,8 +6344,9 @@ user_skills = "/tmp/gk-fake-skills"
                   str(sorted(_declared_writes)))
 
             marks = measure_plan_marks(pl2.stdout)
-            check("the default selection previews exactly 5 SIDE|rendered rows",
-                  marks.get("SIDE|rendered") == 5, str(marks))
+            # 5 -> 6, TOOL-aOrientedCast-8 S1: the roles kit's `/build` Skill.
+            check("the default selection previews exactly 6 SIDE|rendered rows",
+                  marks.get("SIDE|rendered") == 6, str(marks))
             # `ORDER|project-owned` is 4, and the four are NAMED: memory-recall's
             # `recall-fixture.json`, `check-recall.py` and `test_recall_floor.py`, withheld from the
             # payload by a `project-owned` rule with no sibling producer (TOOL-aWalkedCorpus-3 S8);
@@ -6023,9 +6374,15 @@ user_skills = "/tmp/gk-fake-skills"
             # 29 -> 31, TOOL-aRoutedQuill-5 S1: `agent-cap` joined the default selection, and it
             # withholds `agent-cap.test.sh` and `scratch-guard.test.sh` by the same mechanism.
             # Measured by a default `plan` into a scratch target on 2026-10-10.
+            # 31 -> 32 and seed 3 -> 13, TOOL-aOrientedCast-8 S1: `roles` joined the default
+            # selection; it withholds `adopt-roles.test.sh` and seeds its ten house overlays.
+            # Measured by a default `plan` into a scratch target on 2026-10-11.
+            # seed 13 -> 14, TOOL-aOrientedCast-10 S9: `roles` seeds its effort policy
+            # `house/policy.toml` beside the overlays. Not measured in the pass (no suite runs there);
+            # the main loop observes it at the close.
             check("...and the playbook file previews as a seed WRITE, not as an order",
-                  marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 3
-                  and marks.get("ORDER|project-owned") == 31,
+                  marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 14
+                  and marks.get("ORDER|project-owned") == 32,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
@@ -6159,6 +6516,14 @@ user_skills = "/tmp/gk-fake-skills"
                 check("RQ5 AC4 ...and a descriptor declaring no `kits` is left alone",
                       _gk.add_deploy_kits(_rq_t, ["agent-cap"]) == ""
                       and _rq_dt.read_bytes() == b'prefix = "t"\n', _rq_dt.read_bytes().decode())
+
+            # ---- TOOL-aOrientedCast-8 AC2, AC4, AC6 and AC13: the roles kit is a default that arrives
+            # ---- rendered, or, with no governing doc, arrives with its Skill and names the doc.
+            # ---- Module-level functions, so a slice reaches each without this block.
+            check_roles_default()
+            check_roles_install(tmp3)
+            check_roles_install(tmp3, charter=False)
+            check_roles_install(tmp3, runner=True)
 
             # AN ACCEPTED STOP IS NOT A FAILURE. `memory-tree` seeds the conf and stops by design, so
             # every correct first install exits 1 there; calling that a failure made a default-selection
@@ -6552,7 +6917,9 @@ user_skills = "/tmp/gk-fake-skills"
                 [sys.executable, str(GOVKIT), "update", "--target", str(cc), "--write",
                  "--to", GOV_PIN],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8", errors="replace")
-            _deadline = time.time() + 30
+            # A HANG BOUND, never reached on the pass path (TOOL-aSparedSpawn-15 S6): the loop ends
+            # when the lock appears or the first run exits, and 30 s ran out on a loaded host.
+            _deadline = time.time() + 120
             while time.time() < _deadline and not _lk.exists() and _first.poll() is None:
                 time.sleep(0.002)
             if not _lk.exists():
@@ -15730,6 +16097,20 @@ user_skills = "/tmp/gk-fake-skills"
         # exists, at the end of its own block; a single sweep here graded 2 of the suite's ~6.
         check_rollback_orders(tmp, "the late scratch (m13, v14-reap)", 2)
 
+    # ---- DEPL-aPrimedIndex-1. THE VERDICT READER SKIPS THE RUNNER'S GENERATED-OUTPUT PREFLIGHT. The
+    # ---- preflight exits 2 before any leg line when a declared output is stale, and an empty map let
+    # ---- apply certify an install it never compared. The fixture runner prints its leg line only when
+    # ---- GATE_REGEN_CHECK=0 reaches it, and otherwise refuses in the preflight's shape.
+    with tempfile.TemporaryDirectory() as _rv:
+        _rvt = pathlib.Path(_rv)
+        (_rvt / "runner.sh").write_text(
+            '[ "${GATE_REGEN_CHECK:-1}" = 0 ] || { echo "run-gates: REFUSED"; exit 2; }\n'
+            'echo "GATE ok    fixture leg"\n', encoding="utf-8", newline="\n")
+        _rvm = govkit_module().read_gate_verdicts(_rvt, {"command": ["bash", "runner.sh"],
+                                                         "observed_ran": ["GATE ok    {name}"]})
+        check("[aPrimedIndex-1] the verdict reader skips the runner's preflight, so a leg still reads",
+              _rvm.get("fixture leg") == "green", repr(_rvm))
+
     print()
     if FAILURES:
         print(f"govkit-selftest: {len(FAILURES)} FAILED — {', '.join(FAILURES)}")
@@ -15739,4 +16120,6 @@ user_skills = "/tmp/gk-fake-skills"
 
 
 if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8", errors="backslashreplace")
     raise SystemExit(main())

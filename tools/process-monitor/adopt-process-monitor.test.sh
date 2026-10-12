@@ -14,10 +14,10 @@ set -u
 
 KIT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ADOPT="$KIT_DIR/adopt-process-monitor.sh"
-ROOT="$(cd "$KIT_DIR" && git rev-parse --show-toplevel)"
+ROOT="$(unset GIT_DIR GIT_WORK_TREE; cd "$KIT_DIR" && git rev-parse --show-toplevel)"
 # The kit's own prefix, DERIVED — a scratch adopter tree is built at it, and spelling it out
 # is exactly the literal the install-prefix ban refuses.
-KIT_REL="$(cd "$KIT_DIR" && git rev-parse --show-prefix)"; KIT_REL="${KIT_REL%/}"
+KIT_REL="$(unset GIT_DIR GIT_WORK_TREE; cd "$KIT_DIR" && git rev-parse --show-prefix)"; KIT_REL="${KIT_REL%/}"
 # PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).
@@ -205,8 +205,6 @@ fi
 # flagged is a short list, and a broken monitor is ONE named line. Collapsing the first and third is
 # how "nothing to report" becomes indistinguishable from "the probe could not run".
 HOOK="$KIT_DIR/procmon-hook.js"
-GD=$(git -C "$ROOT" rev-parse --git-common-dir 2>/dev/null)
-run_hook() { printf '%s' "$1" | CLAUDE_PROJECT_DIR="$ROOT" PROCMON_PYTHON="${2:-$TESTPY}" node "$HOOK" 2>&1; }
 # THE CLEAN ARM RUNS AGAINST A FIXTURE ROOT, never the real one (TOOL-dUnstuckLanding, the close's
 # bar). Over the real root the census reads the HOST: a Claude Code session running in this repo for
 # longer than the shipped 4h ceiling is a live process carrying the repo path, so "clean is silent"
@@ -236,7 +234,12 @@ if [ -f "$HOOK" ] && command -v node >/dev/null 2>&1; then
 
   # SessionStart ignores the window: a fresh session inherits another session's stamp, and that is
   # precisely how a two-day-old orphan goes unseen.
-  _out=$(run_hook '{"hook_event_name":"SessionStart"}' nonesuch-python-shim)
+  # EVERY STAMP ARM RUNS AGAINST THE FIXTURE ROOT (TOOL-aPairedSlots-8). Over the real root these arms
+  # cleared and wrote `procmon-stamp` in the repository's REAL common dir, which a live session's own
+  # hook stamps too and a second bar running this suite clears: a stamp landing between an arm's
+  # clear and its run throttled the hook silent, and a clear landing between a stamp and the second
+  # run let the census run. The fixture's git dir is this suite's alone.
+  _out=$(run_clean_hook '{"hook_event_name":"SessionStart"}' nonesuch-python-shim)
   case "$_out" in
     *"could NOT run"*) add_pass "test_session_start_ignores_the_throttle" ;;
     *) add_fail "test_session_start_ignores_the_throttle (got: $_out)" ;;
@@ -244,14 +247,14 @@ if [ -f "$HOOK" ] && command -v node >/dev/null 2>&1; then
 
   # A broken monitor names the failure and STILL exits 0 — a monitoring fault may not block a tool
   # call, and a silent failure is the one outcome this unit exists to prevent.
-  rm -f "$GD/procmon-stamp" 2>/dev/null
-  _out=$(run_hook '{"hook_event_name":"PostToolUse"}' nonesuch-python-shim); _rc=$?
+  rm -f "$CLEAN_GD/procmon-stamp" 2>/dev/null
+  _out=$(run_clean_hook '{"hook_event_name":"PostToolUse"}' nonesuch-python-shim); _rc=$?
   case "$_out" in
     *"could NOT run"*) add_pass "test_broken_monitor_names_the_failure" ;;
     *) add_fail "test_broken_monitor_names_the_failure (got: $_out)" ;;
   esac
   if [ "$_rc" = 0 ]; then add_pass "test_broken_monitor_fails_open"; else add_fail "test_broken_monitor_fails_open (rc=$_rc)"; fi
-  rm -f "$GD/procmon-stamp" 2>/dev/null
+  rm -f "$CLEAN_GD/procmon-stamp" 2>/dev/null
 
   if grep -q 'procmon-hook.js' "$KIT_DIR/kit.toml"; then
     add_pass "test_hook_destination_is_declared_by_the_unit_that_ships_it"
@@ -284,7 +287,6 @@ _root0=$(sed -n 's/^PROCMON_ROOTS="\{0,1\}\([^" ]*\).*/\1/p' "$ROOT/.process-mon
 "$TESTPY" -c 'import time; time.sleep(300)' "${_root0%/}/procmon-witness" >/dev/null 2>&1 &
 _witness=$!
 sleep 2
-rm -f "$GD/procmon-stamp" 2>/dev/null
 _out=$(printf '%s' '{"hook_event_name":"SessionStart"}' | CLAUDE_PROJECT_DIR="$_pmdir" node "$HOOK" 2>&1)
 kill "$_witness" 2>/dev/null; wait "$_witness" 2>/dev/null
 case "$_out" in
@@ -294,13 +296,12 @@ esac
 
 # The second run inside the window must be silent AND must not spawn a census. Shimming python to a
 # name that cannot exist proves the second half: had it run one, the failure would print.
-rm -f "$GD/procmon-stamp" 2>/dev/null
-run_hook '{"hook_event_name":"PostToolUse"}' >/dev/null 2>&1
-_out=$(run_hook '{"hook_event_name":"PostToolUse"}' nonesuch-python-shim)
+rm -f "$CLEAN_GD/procmon-stamp" 2>/dev/null
+run_clean_hook '{"hook_event_name":"PostToolUse"}' >/dev/null 2>&1
+_out=$(run_clean_hook '{"hook_event_name":"PostToolUse"}' nonesuch-python-shim)
 if [ -z "$_out" ]; then add_pass "test_throttle_suppresses_the_second_run"; else add_fail "test_throttle_suppresses_the_second_run (got: $_out)"; fi
 
 # A census that never answers must not block the tool call: the hook bounds it and exits 0.
-rm -f "$GD/procmon-stamp" 2>/dev/null
 # THE HOOK'S CENSUS BOUND, exercised through the real path. A shim on PROCMON_PYTHON cannot do
 # it: node's execFileSync refuses a .cmd without shell:true (CVE-2024-27980), so the shim never
 # ran and the arm passed in 0s over a bound it had not touched. What the hook actually bounds is
@@ -312,7 +313,6 @@ git -C "$_slowdir" init -q 2>/dev/null
 cp "$ROOT/.process-monitor.conf" "$_slowdir/.process-monitor.conf"
 printf 'import time\ntime.sleep(600)\n' > "$_slowdir/$KIT_REL/reap.py"
 cp "$HOOK" "$_slowdir/$KIT_REL/procmon-hook.js"
-rm -f "$GD/procmon-stamp" 2>/dev/null
 _t0=$(date +%s)
 _out=$(printf '%s' '{"hook_event_name":"PostToolUse"}' | CLAUDE_PROJECT_DIR="$_slowdir" timeout 200 node "$_slowdir/$KIT_REL/procmon-hook.js" 2>&1); _rc=$?
 _t1=$(date +%s)
@@ -326,7 +326,6 @@ elif [ "$_rc" = 0 ] && [ "$_el" -lt 180 ]; then
 else
   add_fail "test_hung_census_does_not_block_the_hook (rc=$_rc after ${_el}s)"
 fi
-rm -f "$GD/procmon-stamp" 2>/dev/null
 
 # The declared hole's DISCHARGE PROBE is the adopter's own --check, and a probe nobody staged a
 # failure for is a probe that cannot fail.

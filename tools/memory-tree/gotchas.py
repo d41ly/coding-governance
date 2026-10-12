@@ -816,9 +816,7 @@ def _rec(name, desc, body, kind=None, universal=None, indent=False):
 
 def _scratch(tmp: str, recs: dict, extra=None):
     PFX = derive_install_prefix()   # TOOL-aRepatriatedFork-28
-    run("git", "init", "-q", ".", cwd=tmp)
-    run("git", "config", "user.email", "t@t.test", cwd=tmp)
-    run("git", "config", "user.name", "t", cwd=tmp)
+    run("git", "init", "-q", "--template=", ".", cwd=tmp)
     write(os.path.join(tmp, ".memory-tree.conf"),
           'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nUNIVERSAL_BUDGET="1"\n')
     write(os.path.join(tmp, "memory", "HYGIENE.md"), "sentinel\n")
@@ -1302,6 +1300,11 @@ def main(argv: list) -> int:
         sys.stdout.reconfigure(encoding="utf-8")
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
+        # TOOL-aSparedSpawn-9 S1: the fixtures' identity and line endings, once for every git the
+        # selftest runs, in place of two to four `git config` processes per fixture repository.
+        os.environ.update(GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t.test", GIT_COMMITTER_NAME="t",
+                          GIT_COMMITTER_EMAIL="t@t.test", GIT_CONFIG_COUNT="1",
+                          GIT_CONFIG_KEY_0="core.autocrlf", GIT_CONFIG_VALUE_0="false")
         return cmd_selftest()
     if mode == "--declares":
         # rc ALONE cannot carry the verdict: an uncaught exception also exits 1 and would read as

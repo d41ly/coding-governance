@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.97 -->
+<!-- gov:kit unattended@1.104 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -26,9 +26,12 @@ rendered ones do carry placeholders, and for them a render is the only correct i
 `[[generated]]` table in the kit's `kit.toml`, every key at column 0 as a double-quoted string:
 `path` (tokens `{memory_root}`, `{map_root}` and `{kit}` only), `generator` (a file beside the
 descriptor), `why`, and an optional `when = "<conf>:<KEY>=<value>"` that applies the row only when
-that repo-root conf assigns exactly that value. govkit selfcheck refuses any other shape, because
-the shell reader would mangle or drop it. `GENERATED_INDEXES` in `.unattended.conf` only ADDS pairs
-to these (`TOOL-aWindowedPass-4`).
+that repo-root conf assigns exactly that value. govkit selfcheck refuses any other shape for those
+four keys, because the shell reader would mangle or drop it. A row may also carry `write` and
+`check`, argv arrays, and `stage`, an integer, all three or none, at column 0: the shell reader
+ignores them, and the run-gates kit's `regen.py` reads them to regenerate the output or prove it
+fresh before a bar (that kit's README, "Generated outputs"; TOOL-aPrimedIndex-1).
+`GENERATED_INDEXES` in `.unattended.conf` only ADDS pairs to these (`TOOL-aWindowedPass-4`).
 
 **One hook line is yours to wire, and no kit ships it.** Add
 `bash <kit>/unattended.sh --check-commit "$1"` to your own `commit-msg` hook, ahead of anything that
@@ -169,9 +172,12 @@ nowhere in the product.
 
 `resume-tick.sh` is the one keepalive actor that does not share the session's process: an
 OS-scheduled task that walks every worktree, asks the driver `--liveness` about every run whose
-lease names a session, and on a verdict the protocol's section 5 names as acting kills the recorded
-pid's tree, appends an attempt line under `<git-dir>/unattended/resume.<slug>.log` and launches
-`claude -p --resume <session>` detached. It reads the lease from the INDEX, never the working copy
+lease names a session, and on a verdict the protocol's section 5 names as acting appends an attempt
+line under `<git-dir>/unattended/resume.<slug>.log` and launches `claude -p --resume <session>`
+detached, with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0` so the resumed session's background
+Workflows outlive its turn ends. It kills only what it launched: a recorded pid that is alive with
+no live launch of the tick's own is reported as `STALE OVER A LIVE PID`, and nothing is killed or
+launched (`TOOL-aSparedHolder-1`). It reads the lease from the INDEX, never the working copy
 — an untracked run-state file is announced and skipped, and so is a tracked one whose working copy
 differs from its index blob, because a file write must buy neither a skip-permissions session nor
 a kill aimed by hand — stands off a lease another node took, kills only a pid whose recorded image
@@ -208,7 +214,8 @@ compares the running session's version against it as integers and prints one lin
 `WARNING` when this CLI is older, a `NOTE` when it is newer, or `UNKNOWN` naming the missing side.
 It is a warning and never a refusal, and so is the tick line beside it.
 
-A relaunch appends one `run-resumed` line, and a launch that failed one `resume-failed` line, to the
+A relaunch appends one `run-resumed` line, a launch that failed one `resume-failed` line, and a
+live pid the tick spared one `stale-live-pid` line per tick, to the
 health log under the git common dir that the orientation card counts; the driver appends
 `claim-taken-over` when it takes over a stale claim (`TOOL-aGraftedHelix-8`), and
 `claim-push-lock-broken` when it breaks a stale `claim-push.lock` under that lock's guard, or
@@ -277,6 +284,44 @@ charged the queue to `GATE_BOUND` killed a close for contention with its bar nev
 HOST, prints a `host-degraded` hold released by `probe host`. A kill at the backstop before the bar
 printed `gate queue: acquired` prints a `host-degraded` hold released by `probe gate`. A kill after
 that line is the bar never returning, which no hold fits.
+
+## Two declared ceilings — the wiring check and preflight
+
+`TOOL-aBriskPreflight-7`, under the owner's ruling "Name it, refuse only wiring": cost is a verdict,
+but a refused preflight costs a whole re-run, so only the wiring check is killed. Both ceilings are
+file constants of the driver, `WIRING_CEILING` and `PREFLIGHT_CEILING` in seconds, beside
+`CEILING_SPAWN_MS`, the per-spawn cost both were derived to tolerate.
+
+- **`WIRING_CEILING` kills.** The wiring child runs under the smaller of it and `GATE_BOUND`. When
+  the ceiling is the smaller and fires, check 4 refuses naming it, the time the child was killed
+  after, and one spawn's cost measured at the kill beside `CEILING_SPAWN_MS`, and prints whatever
+  the check said before it died, indented. When `GATE_BOUND` is the smaller or equal, its own
+  refusal fires unchanged; `GATE_BOUND` still bounds the wiring check, and the ceiling is a second,
+  smaller kill beside it.
+- **`PREFLIGHT_CEILING` names.** A `--preflight` whose wall from the driver's first statement passes
+  it prints `unattended: preflight over its ceiling` with the wall, the ceiling and the same spawn
+  figure, after the verb's own verdict, on every return path. It kills nothing, refuses nothing,
+  leaves the exit status and the run-state file as the checks decided them, and under the ceiling
+  prints nothing.
+- **The spawn figure says load or regression.** One spawn far above `CEILING_SPAWN_MS` reads as this
+  host's load; one near it reads as the check's own cost. It is measured only on a breach, five
+  spawns of the external `true`, so a run that does not breach pays nothing.
+- **The values are derived, never typed.** Per subject, from after-arm rows: the slowest untraced
+  wall `W`, plus every traced exec `E` and fork `K` re-priced from that run's own per-spawn `S_m` and
+  per-fork `K_m` to the worst on record, `S_w` (at least 2.5 s) and `K_w` (at least 0.91 s), plus `U`,
+  each timed wait's bound less its traced window. `W`, `S_m` and `K_m` come from after-arm rows;
+  `S_w` and `K_w` from every host row on record, any arm and any exit status
+  (`TOOL-aBriskPreflight-11`). The sum rounds up to a multiple of 30 s:
+  `W + E*max(0, S_w - S_m) + K*max(0, K_w - K_m) + U`. `CEILING_SPAWN_MS` is `S_w`. Only
+  `WIRING_CEILING` must sit below `GATE_BOUND`, since it races that bound on one child;
+  `PREFLIGHT_CEILING` kills nothing and may sit above it. The rows and the instrument that prints
+  the three constant lines sit in that unit's build record, and a changed value is a re-derivation
+  there.
+- **Why no conf key.** A key owes a row in the protocol's key table, a governance carrier, and an
+  environment read is a new public surface; a ceiling raisable from either leaves no diff behind.
+  An adopter whose wiring check legitimately runs past `WIRING_CEILING` has no override until one is
+  added there. On a node with no working `timeout -k` the ceiling is inert, and a second NOTE says so
+  beside the one naming `GATE_BOUND`.
 
 ## Two restatements moved out of the protocol's key table
 

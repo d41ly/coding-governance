@@ -49,6 +49,7 @@ map had no playbook dossier until now.
 
 ## Constraints & why
 
+- Its `[[regenerate]]` render row is staged, stage 1: run-gates' `regen.py` re-renders it on `--regen`, and every bar proves it fresh with this kit's `[check]` first (TOOL-aPrimedIndex-1).
 - **The size ceiling is 49152 bytes, and that is a REVERSAL.** It read 32 KiB and "never raise the
   limit" in four carriers until 2026-08-16, when the owner ordered the raise
   (`memory/DECISIONS.md`, `TOOL-aSiftedPlaybook-1`). Three prior units cite the old ceiling as a

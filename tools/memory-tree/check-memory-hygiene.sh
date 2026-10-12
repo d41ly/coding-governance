@@ -8,6 +8,13 @@
 #   <prefix>/memory-tree/check-memory-hygiene.sh            # full check
 #   <prefix>/memory-tree/check-memory-hygiene.sh --staged   # pre-commit fast leg (file-checks on staged paths)
 #   <this script> --offenders                            # one `check <n><TAB><key>` per offender, nothing else
+#   <this script> --only N[,M]                           # only the check blocks naming N or M (TOOL-aSparedSpawn-7)
+#
+# `--only` runs every producer and only the check blocks whose `check_selected` call names a requested
+# id. A block grading several ids runs whole and records them all, so `--only 12` reads `ran checks 12
+# 25`, and 6, 7 and 8 are one unit over the waiver state they share. The selectable set is READ from
+# this file's own `check_selected` calls, never typed. It takes no other argument: `--staged`,
+# `--offenders` and the print modes each grade or print something `--only` does not select.
 #
 # `--staged` is NOT the full check with a narrower file list. Several checks whose population is the
 # CORPUS rather than the diff are HELD: 13-16, 17-19, 21, the row-grammar arm, 23 and 26 (whose
@@ -17,9 +24,32 @@
 # already false of 13-19 — one rule returning two verdicts, the
 # `amendment-leaves-its-other-half-standing` class this repo catalogues.
 #
-# Exit 0 = clean. Two channels print at exit 0 and are NOT regressions: the corpus classifier's
-# check-16 notices, and any line opening `HYGIENE advisory `. Anything else printed is a regression.
+# Exit 0 = clean. Three channels print at exit 0 and are NOT regressions: the corpus classifier's
+# check-16 notices, any line opening `HYGIENE advisory `, and under `--only` the one liveness line
+# `HYGIENE --only <sel> ran checks <ids>`. Anything else printed is a regression. Under `--only`, a
+# requested id whose `check_selected` call never ran exits 2: its verdict would be silence.
 set -u
+# --only N[,M]: parsed BEFORE the `cd` below, because the selectable set is read from "$0" and a
+# relative "$0" names this file only from the caller's directory. Refused whole, before any check runs,
+# when it shares the argv with anything else or names an id no `check_selected` call carries.
+ONLY=""; ONLY_SEL=""; RAN=""
+case " $* " in
+  *" --only "*)
+    [ "${1:-}" = --only ] && [ "$#" = 2 ] \
+      || { echo "HYGIENE — cannot run: --only takes one comma list and no other argument; --staged, --offenders and the print modes each grade or print something --only does not select"; exit 2; }
+    ONLY_SEL=$2
+    case "$ONLY_SEL" in
+      ""|,*|*,|*,,*|*[!0-9,]*) echo "HYGIENE — cannot run: --only takes check numbers joined by commas, got '$ONLY_SEL'"; exit 2 ;;
+    esac
+    ONLY=${ONLY_SEL//,/ }
+    _only_known=" $(awk '{ sub(/\r$/, "") } /^[ \t]*if check_selected [0-9][0-9 ]*; then$/ { sub(/^[ \t]*if check_selected /, ""); sub(/; then$/, ""); printf "%s ", $0 }' "$0")"
+    for _o in $ONLY; do
+      case "$_only_known" in
+        *" $_o "*) ;;
+        *) echo "HYGIENE — cannot run: --only names check $_o, which no check_selected call in this script carries; the selectable ids are: $(printf '%s\n' $_only_known | sort -un | tr '\n' ' ')"; exit 2 ;;
+      esac
+    done ;;
+esac
 # --offenders: THE SIGNATURE THE MERGE BAR GRADES THIS LEG WITH (TOOL-dDerivedDocket-23 S3). The full
 # check runs exactly as it does with no flag and exits as it does; what changes is stdout, which
 # carries one `check <n><TAB><key>` line per offender each failing check lists and NOTHING ELSE — so
@@ -31,7 +61,7 @@ set -u
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.141   # gov:kit memory-tree@2.141 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.146   # gov:kit memory-tree@2.146 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -276,6 +306,8 @@ STAGED=0; [ "${1:-}" = "--staged" ] && STAGED=1
 
 status=0
 FILES=$(git ls-files "$M/")
+# FILES_ALL keeps the whole listing; under --staged FILES is narrowed below (TOOL-aTrimmedHook-2).
+FILES_ALL=$FILES
 
 # --- PRINT MODES: this script OWNS three sets that a sibling gate needs, and a transcription of
 # --- any of them is the drift class the kit exists to remove. Siblings ASK instead of copying.
@@ -311,7 +343,8 @@ for _p in $FAMILIES; do
     *) echo "HYGIENE — cannot run: FAMILIES token '$_p' is not <discipline>:<FAMILY> with a non-empty family. Dropping it silently is not an option: this shell and row_grammar.py derive the family set by different expressions, and a malformed token makes them select DIFFERENT archives — a colon-less token is dropped by both, but a token with an empty family is dropped here and kept as an empty alternation branch there."; exit 2 ;;
   esac
 done
-FAM_ALT=$(for p in $FAMILIES; do echo "${p#*:}"; done | paste -sd'|' -)
+# Joined in the shell, not through `paste`: the same string, one process fewer (TOOL-aTrimmedHook-2).
+FAM_ALT=""; for _fa in $FAMILIES; do FAM_ALT+="${FAM_ALT:+|}${_fa#*:}"; done
 # REFUSED, not defaulted, and for the same two reasons `derive_families()` refuses on the Python
 # side — one reader that raises and one that shrugs is the divergence this pair is built to avoid.
 # An EMPTY alternation renders `(DECISIONS|)`, whose empty branch widens the ERE; a token carrying an
@@ -363,6 +396,11 @@ while IFS= read -r _l; do [ -n "$_l" ] && DEBT_SET["$_l"]=1; done <<<"$DEBT"
 in_legacy() { [ -n "${LEGACY_SET[$1]+x}" ]; }
 in_debt()   { [ -n "${DEBT_SET[$1]+x}" ]; }
 fail() { if [ "$OFFENDERS" = 1 ]; then add_offender_keys "$1" "$2"; else echo "HYGIENE check $1 FAILED — $2"; fi; status=1; }
+# <ids…> -> 0 when the run is unscoped or any id is selected, and then EVERY id is recorded as ran,
+# because the block runs whole. Unscoped it is one builtin test. Called once per guarded block and
+# never in a loop, and the exit-2 refusal at the end of this file reads `RAN`. TOOL-aSparedSpawn-7.
+check_selected() { [ -z "$ONLY" ] && return 0; local _cs
+  for _cs in "$@"; do case " $ONLY " in *" $_cs "*) RAN="$RAN $*"; return 0 ;; esac; done; return 1; }
 # add_offender_keys <check> <message> — one key per offender line the message LISTS. A message's first
 # line is its header and is dropped when a list follows it; a one-line message is its own key. Lines
 # ending in a colon are sub-headers, and a `… and N more` line is a count rather than an offender.
@@ -448,7 +486,7 @@ resolve_python() {
 # <<< resolve_python
 _PY=$(resolve_python) || { echo "HYGIENE — no usable python; checks 9 and 13-19 delegate to sibling modules"; exit 2; }
 FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}"; return;; esac; done; }
-DISC_ALT=$(printf '%s\n' $DISCIPLINES | paste -sd'|' -)                   # the streams enum, for check 12
+DISC_ALT=""; for _da in $DISCIPLINES; do DISC_ALT+="${DISC_ALT:+|}$_da"; done                   # the streams enum, for check 12
 # THE recording-name tail, in ONE place. A multi-unit build names its sub-specs
 # `<date>-spec-<slug>-<seq>-u6-indexed-join.md`, and both check 5's name grammar and check 12's
 # selector have to admit that suffix. They were two hand-copied EREs for one grammar and they had
@@ -475,16 +513,20 @@ pop_guard() { # check-number · label · population-count · precondition-count
   POP_MISSING="${POP_MISSING}    check $1: $2 (but $4 file(s) of that kind exist elsewhere under $M/ — the selector is mis-segmented)"$'\n'
 }
 # Preconditions, deliberately un-segmented: they ask what KIND of file exists, never where.
-PRE_ANYBUILD=$(printf '%s\n' "$FILES" | grep -cE "/builds/" || true)
-PRE_RECORD=$(printf '%s\n' "$FILES" | grep -cE "/builds/.+/.+\.md$" || true)
-PRE_SPEC=$(printf '%s\n' "$FILES" | grep -cE "/[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-[^/]*\.md$" || true)
-PRE_STATUSY=$(printf '%s\n' "$FILES" | grep -cE "(/BACKLOG\.md$|^$M/backlog/)" || true)
+# UNDER --staged NONE OF THESE IS READ: pop_guard returns before its fourth argument, so they stay 0
+# and no process runs for them (TOOL-aTrimmedHook-2). Every pop_guard call below is skipped there too,
+# so its own argument substitutions never start.
+PRE_ANYBUILD=0; PRE_RECORD=0; PRE_SPEC=0; PRE_STATUSY=0; PRE_BINDABLE=0; PRE_INDEXY=0; PRE_REGISTRY=0
+[ "$STAGED" = 1 ] || PRE_ANYBUILD=$(printf '%s\n' "$FILES" | grep -cE "/builds/" || true)
+[ "$STAGED" = 1 ] || PRE_RECORD=$(printf '%s\n' "$FILES" | grep -cE "/builds/.+/.+\.md$" || true)
+[ "$STAGED" = 1 ] || PRE_SPEC=$(printf '%s\n' "$FILES" | grep -cE "/[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-[^/]*\.md$" || true)
+[ "$STAGED" = 1 ] || PRE_STATUSY=$(printf '%s\n' "$FILES" | grep -cE "(/BACKLOG\.md$|^$M/backlog/)" || true)
 # Check 21's precondition. Deliberately NOT anchored to `$M/builds/<slug>/`: a precondition that
 # restates its check's own population can never differ from it, so pop_guard would be unreachable
 # and the vacuity guard decoration. Un-anchored, a record left at a pre-flatten path counts here and
 # not there — which is exactly the mis-segmentation the guard exists to name. Extension-agnostic,
 # because one record in the corpus is a shell script.
-PRE_BINDABLE=$(printf '%s\n' "$FILES" | grep -cE "/(build|prompts|reviews)/" || true)
+[ "$STAGED" = 1 ] || PRE_BINDABLE=$(printf '%s\n' "$FILES" | grep -cE "/(build|prompts|reviews)/" || true)
 # Check 6's precondition, and until TOOL-dRetiredFork-1 it had NONE — which is why arming that check
 # needed a scope item of its own rather than a one-line paste. `pop_guard` returns silently unless
 # its FOURTH argument is greater than zero, so an arming with no precondition is decoration.
@@ -499,7 +541,7 @@ PRE_BINDABLE=$(printf '%s\n' "$FILES" | grep -cE "/(build|prompts|reviews)/" || 
 # The retired form ALONE, tracking the membership split above — a live run-state file is in no
 # check's population now, so counting it here would float the floor on a kind nothing grades and
 # make `pop_guard` fire at a selector that is behaving exactly as designed.
-PRE_INDEXY=$(printf '%s\n' "$FILES" | grep -cE "/(LIVE|DECISIONS|FOUNDATION|STATUS|README)\.md$|/(ledger|backlog|guides|features)/[^/]+\.md$|/RUN\.[A-Z]+\.[0-9a-f]{8}\.md$" || true)
+[ "$STAGED" = 1 ] || PRE_INDEXY=$(printf '%s\n' "$FILES" | grep -cE "/(LIVE|DECISIONS|FOUNDATION|STATUS|README)\.md$|/(ledger|backlog|guides|features)/[^/]+\.md$|/RUN\.[A-Z]+\.[0-9a-f]{8}\.md$" || true)
 # CR-stripped + marker-matched fences: only the marker that OPENED a fence closes it (a ~~~ line
 # inside a ``` fence is content, not a toggle), and \r is dropped so CRLF worktrees (autocrlf
 # smudge read by WSL/Linux bash) compare equal to LF sources.
@@ -513,24 +555,86 @@ _unfenced() { awk '
   f == ""' "$1"; }
 
 declare -A STAGED_SET
+# THE NARROWED LISTING (TOOL-aTrimmedHook-2). Under --staged the cost of this file is PROCESSES, not
+# bytes: a grep over ten lines costs what one over four thousand does. So the staged set is read ONCE,
+# with its status, and FILES becomes the staged paths plus every tracked file in their own build
+# folders. STAGED_MD is the tracked listing filtered to the staged set, which keeps git's order, the
+# order the old `| LC_ALL=C sort` produced. STAGED_NEW holds the paths whose NAME is new to the tree —
+# added, copied or renamed — which is all the name-grammar checks can find wrong in a commit. A staged
+# DELETION is graded by nothing here, as before (`--diff-filter=ACMR`). FILES_ALL keeps the whole
+# listing for check 10, which resolves an archive's live index across the tree.
+STAGED_MD=""; STAGED_NEW=""
+# TOOL-aTrimmedHook-6. THE CONF rides the same call and stays out of STAGED_MD: it and the grandfather
+# list decide which NAMES pass, so a commit staging either is graded over the whole listing, as before
+# the narrowing. `-M` keeps a rename an `R` row for an adopter whose diff.renames is off, and a renamed
+# SOURCE that a registry lists arms the stale-line guard below, as a staged list does.
+_NAMES_WHOLE=""; _RENAMED_LISTED=""
 if [ "$STAGED" = 1 ]; then
-  STAGED_MD=$(git diff --cached --name-only --diff-filter=ACMR -- "$M/**" | LC_ALL=C sort)
-  while IFS= read -r _l; do [ -n "$_l" ] && STAGED_SET["$_l"]=1; done <<<"$STAGED_MD"
+  declare -A _SBUILD
+  while IFS=$'\t' read -r _st _p1 _p2; do
+    [ -n "$_st" ] || continue
+    _l=${_p2:-$_p1}
+    if [ "$_l" = .memory-tree.conf ]; then _NAMES_WHOLE=1; continue; fi
+    case "$_st" in R*) [ -z "${LEGACY_SET[$_p1]+x}${DEBT_SET[$_p1]+x}" ] || _RENAMED_LISTED=1 ;; esac
+    STAGED_SET["$_l"]=1
+    case "$_st" in A*|C*|R*) STAGED_NEW+="$_l"$'\n' ;; esac
+    case "$_l" in "$M"/builds/*/*) _b=${_l#"$M"/builds/}; _SBUILD["${_b%%/*}"]=1 ;; esac
+  done <<<"$(git diff --cached --name-status --diff-filter=ACMR -M -- "$M/**" .memory-tree.conf)"
+  [ -z "${STAGED_SET[$M/project/legacy-files.txt]+x}" ] || _NAMES_WHOLE=1
+  FILES=""
+  while IFS= read -r _l; do
+    [ -n "$_l" ] || continue
+    if [ -n "${STAGED_SET[$_l]+x}" ]; then STAGED_MD+="$_l"$'\n'; FILES+="$_l"$'\n'; continue; fi
+    case "$_l" in "$M"/builds/*/*) _b=${_l#"$M"/builds/}; [ -n "${_SBUILD[${_b%%/*}]+x}" ] && FILES+="$_l"$'\n' ;; esac
+  done <<<"$FILES_ALL"
+  FILES=${FILES%$'\n'}; STAGED_MD=${STAGED_MD%$'\n'}; STAGED_NEW=${STAGED_NEW%$'\n'}
+  if [ -n "$_NAMES_WHOLE" ]; then
+    FILES=$FILES_ALL
+    echo "memory-hygiene: --staged grades the whole tree on this commit — it stages the grandfather list or the conf, which decide which names pass"
+  else
+    echo "memory-hygiene: --staged grades the staged files and their own build folders, not the whole tree; the push-boundary run grades the whole tree"
+  fi
 fi
 in_scope() { [ "$STAGED" = 0 ] && return 0; [ -n "${STAGED_SET[$1]+x}" ]; }   # zero-fork (see LEGACY_SET)
 
+# CHECKS 1, 3, 4 AND 5 GRADE PATH NAMES (TOOL-aTrimmedHook-2). A commit makes one wrong by staging a NEW
+# name, or by staging what decides which names pass: the grandfather list or the conf, which grade the
+# whole listing instead (TOOL-aTrimmedHook-6). Otherwise they are skipped under --staged, and say so.
+NAMES_GRADED=1
+if [ "$STAGED" = 1 ] && [ -z "$STAGED_NEW" ] && [ -z "$_NAMES_WHOLE" ]; then
+  NAMES_GRADED=0
+  echo "memory-hygiene: checks 1, 3, 4 and 5 grade path names, and this commit stages no new name; the push-boundary run grades them"
+fi
+
+if check_selected 1; then
 # 1 — prompt placement: prompt-kind files only under builds/*/prompts/ or archive/.
+if [ "$NAMES_GRADED" = 1 ]; then
 c1=$(printf '%s\n' "$FILES" \
   | grep -E '(\.prompt\.md|\.build-prompt\.md|-prompt\.md|/[0-9]{4}-[0-9]{2}-[0-9]{2}-prompt-[A-Za-z0-9-]+-[0-9]+\.md)$' \
   | grep -vE '/(builds/[^/]+/prompts/|archive/)' || true)
 [ -n "$c1" ] && fail 1 "prompt-kind files outside builds/*/prompts/ or archive/:
 $c1"
+fi
 
+fi
+
+if check_selected 2; then
 # 2 — link integrity (exempt DECISIONS.md / decisions/ / archive/ and legacy-listed recording files).
 # LIVE.md and the ledger shards are NOT exempt: their rows link to build READMEs, and a link that
 # stops resolving is precisely the drift the generated index exists to prevent.
-scan2=$(printf '%s\n' "$FILES" | grep -E '\.md$' | grep -vE '/(DECISIONS\.md$|decisions/|archive/)')
-[ "$STAGED" = 1 ] && scan2=$(printf '%s\n' "$scan2" | { grep -xF -f <(printf '%s\n' "$STAGED_MD") || true; })
+# Under --staged the same filter is applied to STAGED_MD in the shell: the selection the two greps
+# produced, with no process (TOOL-aTrimmedHook-2).
+if [ "$STAGED" = 1 ]; then
+  scan2=""
+  while IFS= read -r _l; do
+    case "$_l" in *.md) ;; *) continue ;; esac
+    case "$_l" in */DECISIONS.md|*/decisions/*|*/archive/*) continue ;; esac
+    scan2+="$_l"$'\n'
+  done <<<"$STAGED_MD"
+  scan2=${scan2%$'\n'}
+else
+  scan2=$(printf '%s\n' "$FILES" | grep -E '\.md$' | grep -vE '/(DECISIONS\.md$|decisions/|archive/)')
+fi
 # Drop grandfathered files first (fork-free), then extract every candidate link in ONE awk pass over
 # all remaining files — was `_unfenced | grep -oE | sed -E` PER FILE (3 forks × N files; the single
 # biggest cost on a large adopter tree — upstream adopter ic ARCH-aFencedNamespace-3). The awk inlines
@@ -571,10 +675,14 @@ broken=$(awk '
 [ -n "$broken" ] && fail 2 "broken relative .md links:
 $broken"
 
+fi
+
+if check_selected 3; then
 # 3 — structure lint (depth-2; decisions/ guides/ archive/ contents opaque).
 # FLAT (1.5): the root holds the four index files, one append-only DECISIONS.md, and the fixed
 # directory set. There is no discipline directory to descend into; `builds/` holds one folder per
 # slug and `backlog/` holds one shard per FAMILY.
+if [ "$NAMES_GRADED" = 1 ]; then
 root1=$(printf '%s\n' "$FILES" | awk -F/ '{ if (NF==2) print "F:"$2; else print "D:"$2 }' | LC_ALL=C sort -u)
 bad3=$(printf '%s\n' "$root1" | grep . | while IFS= read -r e; do case "$e" in
   F:README.md|F:HYGIENE.md|F:TEMPLATE-SPEC.md|F:DECISIONS.md|F:LIVE.md) ;;
@@ -600,8 +708,8 @@ p1=$(printf '%s\n' "$FILES" | grep "^$M/project/" | awk -F/ '{ if (NF==3) print 
 # machinery, not emptied — the registries stay — so the population is non-zero on a real tree and 0
 # only when the path expression is mis-segmented, which is the one shape that silently disarms this
 # sub-lint. A tree with no `.txt` anywhere is a young tree and stays silent.
-PRE_REGISTRY=$(printf '%s\n' "$FILES" | grep -cE '\.txt$')
-pop_guard 3 "no registry under $M/project/" \
+[ "$STAGED" = 1 ] || PRE_REGISTRY=$(printf '%s\n' "$FILES" | grep -cE '\.txt$')
+[ "$STAGED" = 1 ] || pop_guard 3 "no registry under $M/project/" \
   "$(printf '%s\n' "$FILES" | grep -cE "^$M/project/[^/]+\.txt$")" "$PRE_REGISTRY"
 bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   F:legacy-files.txt|F:curation-debt.txt) ;;
@@ -660,7 +768,11 @@ fi
 bad3=$(printf '%s\n%s\n%s\n' "$bad3" "$bp" "$bm" | grep . || true)
 [ -n "$bad3" ] && fail 3 "unexpected entries (structure):
 $bad3"
+fi
 
+fi
+
+if check_selected 4; then
 # 4 — build-folder naming + internal shape.
 # FLAT (1.5): ONE population, `<M>/builds/<slug>/`. The date prefix and the FAMILY prefix are gone
 # with the discipline directory — a folder is named for its slug and nothing else, so there is no
@@ -682,8 +794,9 @@ $bad3"
 # CLASS rather than by filename (TOOL-cMendedVintage-13). It is therefore in NO size check, and it
 # deliberately does not join check 8 either, whose seven-token status vocabulary cannot express the
 # run phases — the unattended leg owns validating those.
+if [ "$NAMES_GRADED" = 1 ]; then
 BUILD_N=$(printf '%s\n' "$FILES" | awk -F/ -v m="$M" '$0 ~ "^" m "/builds/" && NF > 3 { print $3 }' | LC_ALL=C sort -u | grep -c .)
-pop_guard 4 "no build folder under $M/builds/" "$BUILD_N" "$PRE_ANYBUILD"
+[ "$STAGED" = 1 ] || pop_guard 4 "no build folder under $M/builds/" "$BUILD_N" "$PRE_ANYBUILD"
 # S4 — CHECK 4 CONSULTS THE GRANDFATHER REGISTRY, which check 5 has read at its `in_legacy`
 # line all along. A build root listed in legacy-files.txt was grandfathered by one check and
 # graded by the other, so a project with a pre-governance folder name had to carve out this
@@ -743,16 +856,21 @@ bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
 bad4=$(printf '%s\n' "$bad4" | grep . || true)
 [ -n "$bad4" ] && fail 4 "build-folder naming/shape:
 $bad4"
+fi
 
 
+fi
+
+if check_selected 5; then
 # 5 — recording-file naming (grandfather: legacy-files.txt).
 # The optional `-<FAMILY>-` qualifier is the CLOSED alternation from FAMILIES. A generic `[A-Z]+`
 # would admit a family that does not exist and make the rejection arm vacuous.
 # ANY DEPTH under the four subfolders. A file one level deeper used to be governed by nothing: check
 # 5 saw only direct children, and check 12's population is files that already match the dated name,
 # so a free-named nested file was outside both by construction.
+if [ "$NAMES_GRADED" = 1 ]; then
 c5_sel=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/(prompts|spec|build|reviews)/(.+/)?[^/]+\.md$" || true)
-pop_guard 5 "no recording file under $M/builds/*/{prompts,spec,build,reviews}/" \
+[ "$STAGED" = 1 ] || pop_guard 5 "no recording file under $M/builds/*/{prompts,spec,build,reviews}/" \
   "$(printf '%s\n' "$c5_sel" | grep -c . || true)" "$PRE_RECORD"
 bad5=$(printf '%s\n' "$c5_sel" | grep . | while IFS= read -r f; do
   in_legacy "$f" && continue
@@ -768,6 +886,9 @@ done)
 [ -n "$bad5" ] && fail 5 "recording-file names not matching YYYY-MM-DD-<kind>[-<FAMILY>]-<slug>-<seq>.md (and not grandfathered):
   (nesting is fine — a sub-folder under spec/ groups a multi-unit build; the NAME is what is wrong)
 $bad5"
+fi
+
+fi
 
 # index set for checks 6/7
 index_set() {
@@ -818,21 +939,39 @@ index_set() {
     printf '%s\n' "$FILES" | grep -E "^$M/guides/[^/]+\.md$"
   } | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done
 }
-INDEX_SET=$(index_set)   # compute ONCE; checks 6 and 7 both read it (was recomputed per check)
+# UNDER --staged checks 6 and 7 read only the staged members of these sets, so when no staged path is
+# of an index KIND the selection is empty and neither set is built (TOOL-aTrimmedHook-2). The kinds are
+# index_set's own, widened rather than narrowed: a near miss only costs the build. A LIVE `RUN.md` is
+# not one of them, exactly as index_set exempts it by class; a RETIRED `RUN.<PHASE>.<hex>.md` is.
+_IDX_STAGED=1
+if [ "$STAGED" = 1 ]; then
+  _IDX_STAGED=0
+  while IFS= read -r _l; do
+    case "$_l" in
+      "$M"/README.md|"$M"/LIVE.md|"$M"/DECISIONS.md|"$M"/ledger/*|"$M"/backlog/*|"$M"/guides/*|"$M"/builds/*/BACKLOG.md|"$M"/builds/*/README.md|"$M"/builds/*/RUN.[A-Z]*.md) _IDX_STAGED=1; break ;;
+    esac
+    if [ -n "$MAP_SUB" ]; then case "$_l" in "$M/$MAP_SUB"/*) _IDX_STAGED=1; break ;; esac; fi
+  done <<<"$STAGED_MD"
+fi
+INDEX_SET=""
+[ "$_IDX_STAGED" = 1 ] && INDEX_SET=$(index_set)   # compute ONCE; checks 6 and 7 both read it (was recomputed per check)
 # THE FAMILY VIEWS, and they exist only under `builds`. Check 7's population used to be DERIVED from
 # check 6's by subtracting the exemptions; under `builds` the two sets differ by these files, so the
 # derivation becomes check 6's set PLUS this one, minus the exemptions. One expression per mode and
 # no second spelling of the base selector — the `ex7` rule recorded below.
 VIEW_SET=""
-[ "$BMODE" = builds ] && VIEW_SET=$(printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$" \
+[ "$_IDX_STAGED" = 1 ] && [ "$BMODE" = builds ] && VIEW_SET=$(printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$" \
   | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done)
 case "${1:-}" in --print-index-set) printf '%s\n' "$INDEX_SET"; exit 0 ;; esac   # see the PRINT MODES note above
 
+if check_selected 6 7 8; then
 # 6 — index size caps (grandfather: curation-debt.txt).
 # Batched wc: one `wc -c` + one `wc -l` over the whole selected set (was 2 forks PER index file).
 # Findings emit in index_set order (the -l stream's arg order); multi-file wc `total` lines are
 # skipped by name; `+0` coerces the counts.
-sel6=$(printf '%s\n' "$INDEX_SET" | while IFS= read -r f; do in_scope "$f" || continue; printf '%s\n' "$f"; done)
+# An empty set selects nothing, so the pipeline starts only on input (TOOL-aTrimmedHook-2).
+sel6=""
+[ -z "$INDEX_SET" ] || sel6=$(printf '%s\n' "$INDEX_SET" | while IFS= read -r f; do in_scope "$f" || continue; printf '%s\n' "$f"; done)
 bad6=""
 if [ -n "$sel6" ]; then
   cbytes=$(printf '%s\n' "$sel6" | xargs -r wc -c)
@@ -933,9 +1072,12 @@ $bad6"
 $bad6b"
 # TOOL-dRetiredFork-1, absorbed from adopter nc `nc carve-out 5/20`. Eight sibling checks already
 # carry this; check 6 reported a clean zero over an empty population instead of refusing.
-pop_guard 6 "no index file under $M/ (guides, ledger, backlog, build READMEs, map dossiers)" \
+[ "$STAGED" = 1 ] || pop_guard 6 "no index file under $M/ (guides, ledger, backlog, build READMEs, map dossiers)" \
   "$(printf '%s\n' "$sel6" | grep -c . || true)" "$PRE_INDEXY"
 
+fi
+
+if check_selected 6 7 8; then
 # 7 — entry budget, ENTRY_CAP_CHARS per class (grandfather: curation-debt.txt; exempt guides/*.md — a guide is prose,
 #     not index rows — a RETIRED builds/*/RUN.<PHASE>.<blob8>.md, whose standing-mandate block is
 #     quoted prose reproduced verbatim and must not be reflowed to fit an index budget (the LIVE
@@ -965,7 +1107,8 @@ ex7='/guides/[^/]+\.md$|/builds/[^/]+/RUN\.[A-Z]+\.[0-9a-f]{8}\.md$'
 _sel7src="$INDEX_SET"
 [ -n "$VIEW_SET" ] && _sel7src="$INDEX_SET
 $VIEW_SET"
-sel7=$(printf '%s\n' "$_sel7src" | grep -vE "$ex7" | while IFS= read -r f; do
+sel7=""
+[ -z "$_sel7src" ] || sel7=$(printf '%s\n' "$_sel7src" | grep -vE "$ex7" | while IFS= read -r f; do
   in_scope "$f" || continue; printf '%s\n' "$f"
 done)
 bad7=""
@@ -1018,6 +1161,9 @@ derive_waived 7 "$bad7"; bad7="$_UNWAIVED"
 [ -n "$bad7" ] && fail 7 "index entry lines over their declared cap:
 $bad7"
 
+fi
+
+if check_selected 6 7 8; then
 # 8 — status vocabulary on the backlog shards (grandfather: curation-debt.txt).
 #     STATUS.md was RETIRED by TOOL-aRuledFrontispiece-7: one existed across the whole corpus, it
 #     contradicted its own build README, nothing ever wrote one, and no decision record created
@@ -1044,7 +1190,7 @@ if [ "$BMODE" = builds ]; then
   [ "$STAGED" = 1 ] || printf 'memory-hygiene: check 8: backlog layout builds — graded by check 9\n'
 else
   pop8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | grep -c . || true)
-  pop_guard 8 "no backlog shard under $M/backlog/" "$pop8" "$PRE_STATUSY"
+  [ "$STAGED" = 1 ] || pop_guard 8 "no backlog shard under $M/backlog/" "$pop8" "$PRE_STATUSY"
   files8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | while IFS= read -r f; do
     [ -f "$f" ] || continue; in_scope "$f" || continue; printf '%s\n' "$f"; done)
   bad8=""; rows8=0; shards8=0
@@ -1086,15 +1232,34 @@ $bad8"
   [ "$STAGED" = 1 ] || printf 'memory-hygiene: check 8 graded %s backlog row(s) across %s shard(s)\n' "$rows8" "$shards8"
 fi
 
+fi
+
+if check_selected 9; then
 # 9 — build-index drift (delegates to the sibling generator). The retired directory listing carried
 # PATHS, which git already prints better; this carries STATUS, which git does not — and the status is
 # DERIVED from each build's front matter plus its specs' status headers, so nothing is authored here
 # and nothing rots.
-if [ "$STAGED" = 0 ] || printf '%s\n' "$STAGED_MD" | grep -q .; then
-  if ! drift=$("$_PY" "$HERE/gen_build_index.py" --check 2>&1); then fail 9 "generated build index differs from a fresh render:
-$drift"; fi
+#
+# UNDER --staged THE GENERATOR DECIDES WHETHER TO RENDER (TOOL-aTrimmedHook-1). `--check --staged` asks
+# whether anything the index stages can move the render — a structural path, an added or deleted
+# file, or a file whose cited ids change, because the roster reads ids out of EVERY memory file's
+# prose — and prints one SKIPPED line when nothing can. That line is printed here: a skip announces
+# itself. A render owed is the full `--check`, so its verdict and this fail branch are unchanged.
+if [ "$STAGED" = 0 ] || [ -n "$STAGED_MD" ]; then
+  _c9=(--check); [ "$STAGED" = 1 ] && _c9+=(--staged)
+  if ! drift=$("$_PY" "$HERE/gen_build_index.py" "${_c9[@]}" 2>&1); then fail 9 "generated build index differs from a fresh render:
+$drift"
+  else
+    # Per LINE (TOOL-aTrimmedHook-6): a warning printed first on the merged stream must not hide the skip.
+    while IFS= read -r _c9l; do
+      case "$_c9l" in "build-index: render SKIPPED"*) printf 'memory-hygiene: check 9: %s\n' "${_c9l#build-index: }"; break ;; esac
+    done <<<"$drift"
+  fi
 fi
 
+fi
+
+if check_selected 22; then
 # 22 — THE REVIEW VERDICT VOCABULARY. A review record has to say what it concluded, in a token
 # something can read, and until this check existed it did not have to say anything at all.
 #
@@ -1117,7 +1282,7 @@ fi
 if [ -n "$REVIEW_VERDICT_CUTOFF" ]; then
   c22_sel=$(printf '%s
 ' "$FILES" | grep -E "^$M/builds/[^/]+/reviews/" || true)
-  pop_guard 22 "no review record under $M/builds/*/reviews/" \
+  [ "$STAGED" = 1 ] || pop_guard 22 "no review record under $M/builds/*/reviews/" \
     "$(printf '%s
 ' "$c22_sel" | grep -c . || true)" "$PRE_BINDABLE"
   bad22=$(printf '%s
@@ -1151,12 +1316,17 @@ if [ -n "$REVIEW_VERDICT_CUTOFF" ]; then
 $bad22"
 fi
 
+fi
+
+if check_selected 21; then
 # 21 — every record names the spec it is evidence about. Delegates the
 # PARSE to the sibling generator, which already reads every record's bytes; the shell owns the four
 # fail branches, because `check-arms.py` discovers its population from tracked shell and cannot see a
 # Python raise. ONE invocation of the read-only mode, split here into four branch populations.
-c21_sel=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/(build|prompts|reviews)/" || true)
-pop_guard 21 "no record under $M/builds/*/{build,prompts,reviews}/" \
+# Read only under STAGED=0, the one condition its consumer runs in (TOOL-aTrimmedHook-2).
+c21_sel=""
+[ "$STAGED" = 1 ] || c21_sel=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/(build|prompts|reviews)/" || true)
+[ "$STAGED" = 1 ] || pop_guard 21 "no record under $M/builds/*/{build,prompts,reviews}/" \
   "$(printf '%s\n' "$c21_sel" | grep -c . || true)" "$PRE_BINDABLE"
 if [ "$STAGED" = 0 ] && printf '%s\n' "$c21_sel" | grep -q .; then
   # THE PARSE'S EXIT STATUS AND ITS N ROW ARE PART OF ITS ANSWER (TOOL-dMuffledSentinel-1). This
@@ -1305,6 +1475,9 @@ $over21"
 $proj21"
 fi
 
+fi
+
+if check_selected 10; then
 # 10 — rotation note (always; cheap). FLAT (1.5): one archive directory at the memory root.
 #
 # WHAT THIS CHECKS: that a rotated archive is ANNOUNCED by the index it was cut from. WHAT IT DOES
@@ -1349,7 +1522,22 @@ fi
 # The enumeration here and `ROTATED`/`row_docs` in row_grammar.py are two readers of ONE rule, and
 # so are the two `resolve_live_index_home` functions. Both pairs are joined by the cross-reader arm
 # in the row-grammar self-test, not by this comment.
-bad10=$(printf '%s\n' "$FILES" | grep -E "$ROTATED_ARCHIVE_ERE" | while IFS= read -r a; do
+# UNDER --staged CHECK 10 RUNS ONLY WHEN A ROTATED ARCHIVE OR A LIVE INDEX IT RESOLVES TO IS STAGED,
+# and then over the WHOLE listing: it asks whether each archive's declared live index is tracked, which
+# a narrowed listing would miss (TOOL-aTrimmedHook-2). Otherwise it is HELD, and says so.
+_C10=1; _F10=$FILES_ALL
+if [ "$STAGED" = 1 ]; then
+  _C10=0
+  while IFS= read -r _l; do
+    [ -n "$_l" ] || continue
+    if [[ $_l =~ $ROTATED_ARCHIVE_ERE ]]; then _C10=1; break; fi
+    _b=${_l##*/}
+    case "|DECISIONS|$FAM_ALT|" in *"|${_b%.md}|"*) [ "${_b%.md}.md" = "$_b" ] && { _C10=1; break; } ;; esac
+  done <<<"$STAGED_MD"
+  [ "$_C10" = 1 ] || echo "memory-hygiene: check 10 HELD under --staged — no rotated archive and no live index it resolves to is staged; the push-boundary run grades every archive"
+fi
+bad10=""
+[ "$_C10" = 1 ] && bad10=$(printf '%s\n' "$_F10" | grep -E "$ROTATED_ARCHIVE_ERE" | while IFS= read -r a; do
     base=${a##*/}; stem=${base%%.*}
     # UNDER `builds` A FAMILY-STEM ARCHIVE IS NOT THIS CHECK'S. The file at $M/backlog/<FAMILY>.md is
     # then a GENERATED view, which could never reference an archive from a preamble it does not
@@ -1362,16 +1550,19 @@ bad10=$(printf '%s\n' "$FILES" | grep -E "$ROTATED_ARCHIVE_ERE" | while IFS= rea
     # second spelling of a set two lines of this file already agree on.
     if [ "$BMODE" = builds ] && [ "$stem" != DECISIONS ]; then printf '#left\n'; continue; fi
     idx=$(resolve_live_index_home "$stem")
-    if ! printf '%s\n' "$FILES" | grep -qxF -- "$idx"; then
+    if ! printf '%s\n' "$_F10" | grep -qxF -- "$idx"; then
       echo "$a (stem '$stem' declares its live index at $idx, which is not tracked)"
       continue
     fi
     awk 'NR <= 3 { print; next } /^[[:space:]]*[-*][[:space:]]/ { exit } { print }' "$idx" |
       grep -qF "$base" || echo "$a (not referenced in the preamble of $idx)"
   done)
-left10=$(printf '%s\n' "$bad10" | grep -cx '#left' || true)
-bad10=$(printf '%s\n' "$bad10" | grep -vx '#left' || true)
-bad10=$(printf '%s\n' "$bad10" | grep . || true)
+left10=0
+if [ -n "$bad10" ]; then
+  left10=$(printf '%s\n' "$bad10" | grep -cx '#left' || true)
+  bad10=$(printf '%s\n' "$bad10" | grep -vx '#left' || true)
+  bad10=$(printf '%s\n' "$bad10" | grep . || true)
+fi
 [ -n "$bad10" ] && fail 10 "rotated archives not referenced from their live index preamble:
 $bad10"
 # THE DEFERRAL, SAID OUT LOUD. Printed on every `builds` run, zero included: a count of nothing is
@@ -1381,6 +1572,9 @@ if [ "$BMODE" = builds ] && [ "$STAGED" = 0 ]; then
   printf "memory-hygiene: check 10: %s family archive(s) left to check 9's archive guard (backlog layout builds)\\n" "$left10"
 fi
 
+fi
+
+if check_selected 24; then
 # 24 — the declared ROTATION_MODE is HONOURED. Delegated to row_grammar.py for the reason 13-20 are:
 # the assertion is a corpus walk over ROW DOCUMENTS, and this file must not spell a second row
 # grammar. The first cut of this check did exactly that and five of six evasions passed silently —
@@ -1400,6 +1594,9 @@ if [ "$STAGED" = 0 ]; then
   fi
 fi
 
+fi
+
+if check_selected 26; then
 # 26 — the TRANSITION-MERGE audit. Delegated to transition_audit.py for the reason 24 is: the
 # assertion is a walk over the commit GRAPH keyed by the anchor grammar, and this file must not
 # spell a second row grammar or a second ancestry rule.
@@ -1431,6 +1628,9 @@ if [ "$STAGED" = 0 ]; then
   [ "$_tarc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 26 $'\n'"$tam"
 fi
 
+fi
+
+if check_selected 11; then
 # 11 — old-tree tombstone (only if TOMBSTONE_ROOTS is configured; never grandfathered).
 for old in $TOMBSTONE_ROOTS; do
   if git ls-files "$old/" | grep -q .; then
@@ -1439,6 +1639,9 @@ $(git ls-files "$old/" | head)"
   fi
 done
 
+fi
+
+if check_selected 12 25; then
 # 12 — spec format ($M/TEMPLATE-SPEC.md; runs only when SPEC_FORMAT_CUTOFF is set in the conf).
 # Status header (first 5 unfenced lines) for every spec incl. nested spec/<sub>/ files. Tier-2 adds:
 # the canonical nine ## sections (exact, in order) · no empty section bodies (write "N/A — <why>") ·
@@ -1489,7 +1692,7 @@ SPEC_CANON10="$SPEC_CANON
 # stream. The canon rides in on `-v canon=`: this kit has ONE nine-line canon and one equality, so it
 # needs no canon records in the driver and therefore has no TAB-truncation hazard to guard against.
 c12_all=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/spec/(.+/)?[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-(($FAM_ALT)-)?[A-Za-z0-9]+-[0-9]+$REC_TAIL\.md$" || true)
-pop_guard 12 "no spec file under $M/builds/*/spec/" "$(printf '%s\n' "$c12_all" | grep -c . || true)" "$PRE_SPEC"
+[ "$STAGED" = 1 ] || pop_guard 12 "no spec file under $M/builds/*/spec/" "$(printf '%s\n' "$c12_all" | grep -c . || true)" "$PRE_SPEC"
 c12_sel=$(printf '%s\n' "$c12_all" | grep . | while IFS= read -r f; do
   base=${f##*/}; d=${base:0:10}      # spawn-free date extract — this loop sees every spec file
   [ "$d" \< "$SPEC_FORMAT_CUTOFF" ] && continue
@@ -2314,8 +2517,9 @@ esac
 # ---- spec would be one fork per live spec forever, which is the shape this batched awk exists to
 # ---- delete. `^{commit}` is the peel that stops an eight-hex prefix naming a tree or a blob from
 # ---- passing, and an ambiguous abbreviation answers on its own line rather than on stderr.
-base12=$(printf '%s\n' "$bad12_raw" | grep $'^\002\t' || true)
-bad12=$(printf '%s\n' "$bad12" | grep -v $'^\002\t' || true)
+# Each split below starts a process only when it has input: empty in, empty out (TOOL-aTrimmedHook-2).
+base12=""; [ -z "$bad12_raw" ] || base12=$(printf '%s\n' "$bad12_raw" | grep $'^\002\t' || true)
+[ -z "$bad12" ] || bad12=$(printf '%s\n' "$bad12" | grep -v $'^\002\t' || true)
 if [ -n "$base12" ]; then
   # THE PROBE THAT CANNOT MOVE. In a shallow clone every commit outside the fetch depth answers
   # `missing`, so this arm would either red honestly-written specs or, written to ignore `missing`,
@@ -2334,13 +2538,13 @@ if [ -n "$base12" ]; then
     fi
   fi
 fi
-edge12=$(printf '%s\n' "$bad12_raw" | grep $'^\003\t' || true)
-bad12=$(printf '%s\n' "$bad12" | grep -v $'^\003\t' || true)
+edge12=""; [ -z "$bad12_raw" ] || edge12=$(printf '%s\n' "$bad12_raw" | grep $'^\003\t' || true)
+[ -z "$bad12" ] || bad12=$(printf '%s\n' "$bad12" | grep -v $'^\003\t' || true)
 # ---- TOOL-dGatedProse-1: CHECK 25 rides the same pass under its own tag, \004, split out here so no
 # ---- check-25 record reaches check 12. \001 is the canon-diff excerpt request, \002 the base-sha
 # ---- sentinel and \003 the edge records; \004 is the first tag that feeds a different check NUMBER.
-rd25=$(printf '%s\n' "$bad12_raw" | grep $'^\004\t' || true)
-bad12=$(printf '%s\n' "$bad12" | grep -v $'^\004\t' || true)
+rd25=""; [ -z "$bad12_raw" ] || rd25=$(printf '%s\n' "$bad12_raw" | grep $'^\004\t' || true)
+[ -z "$bad12" ] || bad12=$(printf '%s\n' "$bad12" | grep -v $'^\004\t' || true)
 if [ "$STAGED" = 1 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
   echo "memory-hygiene: the §3 edge JOINS are held under --staged — the selection is the staged set, so one end of a correctly declared pair would report the other as missing. The shape arm still ran; the push-boundary run is where the joins bind."
 elif [ -n "$edge12" ]; then
@@ -2423,9 +2627,9 @@ $bad12"
 # ---- for one. Resolution shows a name is SPELLED where something reads, never that it is live.
 # ---- An empty batch runs no grep at all: an empty pattern file lists every file on one git and dies
 # ---- on another, so nothing here rests on it matching nothing.
-bad25=$(printf '%s\n' "$rd25" | sed -n $'s/^\004\tS\t//p')
+bad25=""; [ -z "$rd25" ] || bad25=$(printf '%s\n' "$rd25" | sed -n $'s/^\004\tS\t//p')
 _rdn=""
-_rdtok=$(printf '%s\n' "$rd25" | grep $'^\004\tT\t' || true)
+_rdtok=""; [ -z "$rd25" ] || _rdtok=$(printf '%s\n' "$rd25" | grep $'^\004\tT\t' || true)
 if [ -n "$_rdtok" ]; then
   _rdpat=$(mktemp) || { echo "HYGIENE — cannot run: mktemp failed, and check 25 resolves its by-name tokens from a pattern file"; exit 2; }
   printf '%s\n' "$_rdtok" | cut -f6- | LC_ALL=C sort -u > "$_rdpat"
@@ -2553,6 +2757,9 @@ if [ "$STAGED" = 0 ] && [ -z "$SPEC_FORMAT_CUTOFF" ]; then
   echo "memory-hygiene: check 25, the §2 reader-inventory arm, is DISARMED — SPEC_FORMAT_CUTOFF is blank, and check 25 grades check 12's selection, so it graded nothing. Declare SPEC_FORMAT_CUTOFF in .memory-tree.conf to arm it."
 fi
 
+fi
+
+if check_selected 13 14 15 16; then
 # 13-15 (pinned) + 16 (structural) — id + path corpus classification (delegates to the sibling classifier). ONE grammar and ONE
 # walk: this script owns the append-only and index sets and PRINTS them on demand; the classifier
 # owns the id grammar it imports from the recall kit. Neither transcribes the other. Every pin the
@@ -2572,6 +2779,9 @@ if [ "$STAGED" = 0 ]; then
   [ "$_idsrc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 13-16 $'\n'"$ids"
 fi
 
+fi
+
+if check_selected 17 18 19; then
 # 17-19 — the bug-class catalogue (delegates to the sibling module). The catalogue's INDEX is
 # generated, every class record declares a gate or says it has none, and a record whose anchors reach
 # only the append-only tree is reachable on paper and dead in practice.
@@ -2587,6 +2797,9 @@ if [ "$STAGED" = 0 ]; then
   [ "$_gotrc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 17-19 $'\n'"$got"
 fi
 
+fi
+
+if check_selected 20; then
 # 20 — the row documents' grammar, and id collisions INSIDE one file. Delegated for the same reason
 # 13-19 are: the assertion is a corpus walk with a pin, which is a Python job, and check-arms.py's
 # population is `*.sh` only, so the branches are armed by the module's own selftest.
@@ -2604,6 +2817,9 @@ if [ "$STAGED" = 0 ]; then
   fi
 fi
 
+fi
+
+if check_selected 27; then
 # 27 — a decision row or gotcha ADDED since the mainline merge-base that ranks as a near match of an
 # older record must name it, or carry a relation token. Delegated to row_grammar.py, the row
 # grammar's owner, for the reason 20 and 24 are (TOOL-cSpliceWarden-6), and ranked with the
@@ -2620,6 +2836,9 @@ if [ "$STAGED" = 0 ]; then
   fi
 fi
 
+fi
+
+if check_selected 28; then
 # 28 — a decision row or gotcha whose NORMALIZED text a record of another identity holds, one of the
 # holders added since the mainline merge-base: check 27's exact half (TOOL-aGraftedHelix-6).
 # Delegated to row_grammar.py for the reason 27 is, and full runs only for the same reason. The
@@ -2634,21 +2853,36 @@ if [ "$STAGED" = 0 ]; then
   fi
 fi
 
+fi
+
 # grandfather stale-line guards (a listed path that no longer exists fails).
 # One `git ls-files` + set lookups, NOT `git ls-files --error-unmatch` per path — git is a heavyweight
 # fork, so a long grandfather list was one spawn per line (~80s at adopter ic's 522 lines). Entries are
 # literal paths, never globs, so exact membership in the tracked set is equivalent.
-if [ -n "$LEGACY$DEBT" ]; then
+# UNDER --staged IT RUNS ONLY WHEN ONE OF ITS TWO LISTS IS STAGED, OR A STAGED RENAME'S SOURCE IS LISTED
+# (TOOL-aTrimmedHook-2, -6): a commit doing neither can make a listed path stale only by DELETING it, and
+# --staged grades no deletion. The whole-repo listing it builds reads beyond the memory tree.
+_C5L=1
+if [ "$STAGED" = 1 ] && [ -z "$_RENAMED_LISTED" ] && [ -z "${STAGED_SET[$M/project/legacy-files.txt]+x}${STAGED_SET[$M/project/curation-debt.txt]+x}" ]; then
+  _C5L=0
+  [ -z "$LEGACY$DEBT" ] || echo "memory-hygiene: the legacy/debt stale-line guard is HELD under --staged — neither list file is staged; the push-boundary run grades both"
+fi
+if [ "$_C5L" = 1 ] && [ -n "$LEGACY$DEBT" ]; then
   declare -A TRACKED_SET
   while IFS= read -r _l; do [ -n "$_l" ] && TRACKED_SET["$_l"]=1; done < <(git ls-files)
-  badL=$(printf '%s\n' "$LEGACY" | grep . | while IFS= read -r p; do [ -n "${TRACKED_SET[$p]+x}" ] || echo "$p"; done)
-  [ -n "$badL" ] && fail 5 "legacy-files.txt lists paths that no longer exist (stale-line guard):
+  if check_selected 5; then
+    badL=$(printf '%s\n' "$LEGACY" | grep . | while IFS= read -r p; do [ -n "${TRACKED_SET[$p]+x}" ] || echo "$p"; done)
+    [ -n "$badL" ] && fail 5 "legacy-files.txt lists paths that no longer exist (stale-line guard):
 $badL"
-  badD=$(printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do [ -n "${TRACKED_SET[$p]+x}" ] || echo "$p"; done)
-  [ -n "$badD" ] && fail 6 "curation-debt.txt lists paths that no longer exist (stale-line guard):
+  fi
+  if check_selected 6 7 8; then
+    badD=$(printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do [ -n "${TRACKED_SET[$p]+x}" ] || echo "$p"; done)
+    [ -n "$badD" ] && fail 6 "curation-debt.txt lists paths that no longer exist (stale-line guard):
 $badD"
+  fi
 fi
 
+if check_selected 6 7 8; then
 # curation-debt STALE-ENTRY guard, and the per-row report. Its sibling above grades whether a listed
 # path still EXISTS; this one grades whether it still HIDES anything, which is the question the
 # registry is actually about. Populated by `derive_waived` during checks 6, 7 and 8.
@@ -2695,6 +2929,9 @@ else
   [ "$STAGED" = 1 ] && printf 'memory-hygiene: the curation-debt stale-ENTRY guard and its per-row report are HELD under --staged — the selection is the staged set, so a listed file nobody staged would record nothing and read as stale\n'
 fi
 
+fi
+
+if check_selected 23; then
 # ---- 23: every acceptance criterion of a CLOSED Tier-2 unit is EVIDENCED or AMENDED.
 # ---- NUMBERED 22 IN THIS COMMENT UNTIL 2026-08-27, AND IT WAS NEVER 22. Every fail arm below
 # ---- says 23 and so does the pop_guard; 22 is the review-verdict vocabulary at `:610`, and
@@ -2801,7 +3038,7 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   # predate the cutoff is a real empty and says so below, but a listing that comes back empty
   # while spec files exist is a broken selector, and it reds. That distinction is the whole
   # difference between an announced skip and a check that is dark and looks identical to green.
-  pop_guard 23 "no spec file selected under $M/builds/*/spec/" "$(printf '%s
+  [ "$STAGED" = 1 ] || pop_guard 23 "no spec file selected under $M/builds/*/spec/" "$(printf '%s
 ' "$alspecs" | grep -c . || true)" "$PRE_SPEC"
   # THE PROLOGUE, in ONE awk over the same kind of stream. Every filter the retired per-spec loop
   # applied, IN ITS ORDER, and then the labels — which that loop paid a separate awk and a sort for.
@@ -2967,6 +3204,8 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   fi
 fi
 
+fi
+
 # --- empty-population report (see pop_guard). Reported ONCE, after every check has run, so the
 # --- message names every disarmed selector instead of the first one. A tree that genuinely has no
 # --- builds yet is a real case: scaffold it, or set MEMORY_ROOT to the tree that has one.
@@ -2982,5 +3221,17 @@ fi
 # THE KEYS, numbered where one repeats, on the fd `--offenders` kept for them. Nothing else reaches it.
 if [ "$OFFENDERS" = 1 ]; then
   printf '%s' "$OFFENDER_KEYS" | awk 'NF { n[$0]++; print (n[$0] > 1 ? $0 "#" n[$0] : $0) }' >&3
+fi
+# THE LIVENESS LINE (TOOL-aSparedSpawn-7 S6), the third exit-0 channel the header names: what the
+# scoped run graded, sorted. A requested id no guard recorded exits 2, since its verdict would be silence.
+if [ -n "$ONLY" ]; then
+  _ran_sorted=$(printf '%s\n' $RAN | sort -un | tr '\n' ' '); _ran_sorted=${_ran_sorted% }
+  echo "HYGIENE --only $ONLY_SEL ran checks ${_ran_sorted:-none}"
+  for _o in $ONLY; do
+    case " $RAN " in
+      *" $_o "*) ;;
+      *) echo "HYGIENE --only: check $_o was requested and no guard for it ran, so its verdict would be silence"; exit 2 ;;
+    esac
+  done
 fi
 exit "$status"
