@@ -1,10 +1,12 @@
 # TOOL-aHeardState-6 — the bug-class checklist names a held suite whose guard misses a sibling kit it reads
 
-**Status:** SPECCED · rev-1 · 2026-10-13 · node a · Tier-1 · base 2f9dfaf0 · streams tooling · order 6
+**Status:** CLOSED · rev-1 · 2026-10-13 · node a · Tier-1 · base 2f9dfaf0 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-13-build-TOOL-aHeardState-1-2-acceptance-ledger.md](../build/2026-10-13-build-TOOL-aHeardState-1-2-acceptance-ledger.md) | journal | TOOL-aHeardState-1 TOOL-aHeardState-2 TOOL-aHeardState-3 TOOL-aHeardState-4 TOOL-aHeardState-5 TOOL-aHeardState-7 TOOL-aHeardState-8 |
 
 <!-- /gen:spec-records -->
 

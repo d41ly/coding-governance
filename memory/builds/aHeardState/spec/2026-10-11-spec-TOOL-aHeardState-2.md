@@ -1,11 +1,12 @@
 # TOOL-aHeardState-2 — runlog prose: a transcript measure of narration, interjections and pair emission
 
-**Status:** INPROGRESS · rev-3 · 2026-10-13 · node a · Tier-2 · base 2f01150c · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-10-13 · node a · Tier-2 · base 2f01150c · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-TOOL-aHeardState-1-2-acceptance-ledger.md](../build/2026-10-13-build-TOOL-aHeardState-1-2-acceptance-ledger.md) | journal | TOOL-aHeardState-1 TOOL-aHeardState-3 TOOL-aHeardState-4 TOOL-aHeardState-5 TOOL-aHeardState-6 TOOL-aHeardState-7 TOOL-aHeardState-8 |
 | [2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aHeardState-1-1-brief.md) | research | TOOL-aHeardState-1 |
 | [2026-10-13-review-TOOL-aHeardState-1-2-closing-diff-review-round1.md](../reviews/2026-10-13-review-TOOL-aHeardState-1-2-closing-diff-review-round1.md) | diff-review | TOOL-aHeardState-1 |
 
