@@ -1796,7 +1796,10 @@ fi
 # reconcile with aRepatriatedFork: `GATE_SPAWN_CMD` names what the host probe times, `GATE_SPAWN_FLOOR`
 # its floor file, `GATE_VERDICT_FAULT` a verdict write that fails. Each exists for the runner's own
 # suite, which drives it directly, so no bar this hook runs has any use for one.
-BAR_SCRUBBED_KNOBS="GATE_LEGS GATE_REUSE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT"
+# `GATE_REGEN_CHECK` joins them (TOOL-aPrimedIndex-6): set to 0 it skips the runner's generated-output
+# preflight, and a skip can let a stale output through a bar whose freshness leg a guard scoped out,
+# so the push that lands may not choose it. memory/gotchas/a-runner-knob-owes-a-push-class.md.
+BAR_SCRUBBED_KNOBS="GATE_LEGS GATE_REUSE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT GATE_REGEN_CHECK"
 if [ "$bar_class" != stub ]; then
   for _k in $BAR_SCRUBBED_KNOBS; do
     [ -n "${!_k+x}" ] && ENV_CLEARED+=" $_k"

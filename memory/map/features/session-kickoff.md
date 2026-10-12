@@ -27,6 +27,7 @@ globs = [
 
 ## Constraints & why
 
+- The manifest's gate commands name `run-gates.sh --regen`, and an edit to the watched runner re-stamps `last-audit` in the same commit (TOOL-aPrimedIndex-2, -3, -7).
 The engine is project-agnostic and the manifest is the project layer it reads. Everything specific to
 a repo — branch conventions, the id protocol, the gate fence, the pointer map — lives in the manifest,
 so the engine can ship unchanged to every adopter and the manifest can say something different in each

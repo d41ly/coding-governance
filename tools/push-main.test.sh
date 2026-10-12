@@ -743,6 +743,11 @@ if [ -n "$_mt_gk" ] && [ -n "$_ml_lex" ]; then
     git config user.email t@e; git config user.name t; git config core.autocrlf false
     git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
     git rm -q -- "${KIT_REL}$_ml_lex/lexicon.py" "${KIT_REL}$_mt_gk/govkit.py"
+    # The regeneration goes too (TOOL-aPrimedIndex-8): with it present, `--prepare` regenerates after
+    # the mint, the lexicon render cannot read its deleted version, and the landing is refused before
+    # the merge-loss check prints the skip this arm asserts. Absent, the lander names that skip too.
+    _rg25=$(cd "$HERE" && for d in */; do [ -f "$d/regen.py" ] && { printf '%s' "${d%/}"; break; }; done)
+    [ -z "$_rg25" ] || git rm -q -- "${KIT_REL}$_rg25/regen.py"
     git commit -q --no-verify -m "drop the lexicon and govkit files"
     git push -q -f --no-verify origin main
     git -C "$tmp/remote5.git" symbolic-ref HEAD refs/heads/main
@@ -761,13 +766,19 @@ else
 fi
 
 # ---- THE POST-MERGE BAR AFTER A LANDING — TOOL-aFrugalTurnstile-8 ---------------------------------
-# A sixth fixture with NO pre-push hook wired, so a landing costs seconds: a stub post-merge script in
+# A sixth fixture behind a stub pre-push hook that allows, so a landing costs seconds: a stub post-merge script in
 # a run-gates dir beside the fixture lander sleeps 8 s, then writes its argv to $MARK. Each case
 # commits its own gate-env declaration and lands; the markers are read once, after one wait. Observed
 # RED against the lander at bef97330 (no marker, no line in any case) and GREEN against the change.
 git init -q --bare "$tmp/remote6.git"
 setup_repo "$tmp/work6" origin "$tmp/remote6.git"
-git config --unset core.hooksPath
+# An ALLOWING stub hook, not none: the lander requires the hook's allow record (TOOL-aSignalledHook-1),
+# so a hookless push reads landed UNGATED and exits 4 (TOOL-aPrimedIndex-10).
+mkdir -p "$tmp/allow-hook"
+printf '#!/usr/bin/env bash\nwhile read -r _ sha _ _; do printf "%%s\\tstub\\n" "$sha" > "$(git rev-parse --git-dir)/pre-push-allow"; done\nexit 0\n' \
+  > "$tmp/allow-hook/pre-push"
+chmod +x "$tmp/allow-hook/pre-push"
+git config core.hooksPath "$tmp/allow-hook"
 pmk="./${KIT_REL}run-gates"   # the stub kit dir beside the fixture lander; spelled bare for the install-prefix ban
 mkdir -p "$pmk"
 printf '#!/usr/bin/env bash\nsleep 8\necho "$*" > "$MARK"\n' > "$pmk/post-merge.sh"
@@ -792,6 +803,7 @@ run_pm_case p6 ''; o6=$pm_out                       # R declares local, the land
 GATE_POST_MERGE=local run_pm_case p6e ''; o6e=$pm_out  # the environment says local, the tip says nothing
 git rm -q "$pmk/post-merge.sh"
 run_pm_case p7 $'GATE_POST_MERGE=local\n'; o7=$pm_out; r7=$pm_rc; h7=$pm_sha
+t7=$(git ls-remote "$tmp/remote6.git" refs/heads/main | cut -f1)   # now: pm8 lands on this remote before the reads
 git checkout -q HEAD~1 -- "$pmk/post-merge.sh"
 git add -A; git commit -q -m "stub back"; git push -q --no-verify origin main
 git worktree add -q "$tmp/wt6" -b feat6 main
@@ -827,7 +839,7 @@ case "$o5" in *"is 'yes', outside 'local ci'"*) l5=1 ;; *) l5=0 ;; esac
   || bad "pm6 markers='$(read_pm_mark p6)' '$(read_pm_mark p6e)' $o6 $o6e"
 # AC7 — no kit: a line, exit 0, the landing stands
 [ "$r7" = 0 ] && case "$o7" in *"no run-gates kit holding post-merge.sh"*) true ;; *) false ;; esac \
-  && [ "$(git ls-remote "$tmp/remote6.git" refs/heads/main | cut -f1)" = "$h7" ] \
+  && [ "$t7" = "$h7" ] \
   && ok "pm7 a missing post-merge script is one line and exit 0; the landing stands" || bad "pm7 rc=$r7 $o7"
 # AC8 — the in-place path starts it too, on the prepared merge
 [ "$(read_pm_mark p8)" = "$h8 --remote origin" ] && grep -q "^sha	$h8$" "$gcd6/gate-post-merge.start" \
@@ -846,6 +858,18 @@ d9=$(diff <(read_parser_slice "$HERE/push-main.sh") <(read_parser_slice "$SRC/.g
 #      routed-commits leg reds a routed commit naming no unit. A clone of this repository at its
 #      committed HEAD is the remote; one commit naming a unit moves the runlog kit, and the lander
 #      runs from main. Observed RED against the base lander, whose mint subject named no unit.
+#      THE FIXTURE DEFINES ITS UNIT (TOOL-aPrimedIndex-8): the newest-unit reader names only an id a spec
+#      at HEAD defines (TOOL-aRoutedQuill-12), so without one the mint named nothing and this arm redded
+#      against every lander. The spec lands in the clone's first build folder that holds one, because
+#      the index generator refuses a build folder with no README.
+write_unit_spec() { # unit id -> a one-line spec defining it, committed into the fixture's first spec folder
+  local mr d
+  mr=$(sed -n 's/^MEMORY_ROOT=//p' .memory-tree.conf 2>/dev/null | tr -d "\"'" | tail -n 1)
+  for d in "${mr:-memory}"/builds/*/spec; do [ -d "$d" ] && break; done
+  [ -d "$d" ] || return 1
+  printf '# %s — a fixture unit\n' "$1" > "$d/2026-01-01-spec-$1.md"
+  git add "$d/2026-01-01-spec-$1.md" && git commit -q --no-verify -m "a fixture spec defining $1"
+}
 _mt_rc=$(cd "$HERE" && for d in */; do [ -f "$d/routed_commits.py" ] && { printf '%s' "${d%/}"; break; }; done)
 if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ] && [ -n "$_mt_rc" ]; then
   git clone -q --bare "$SRC" "$tmp/remote26.git"
@@ -853,24 +877,25 @@ if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ] && [ -n "$_mt_rc" ]; then
   out26=$(
     cd "$tmp/work26" || exit 1
     git config user.email t@e; git config user.name t; git config core.autocrlf false
+    git config core.hooksPath "$tmp/allow-hook"   # a clone wires no hook; the lander wants its allow record
     git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
     git push -q -f --no-verify origin main
     git -C "$tmp/remote26.git" symbolic-ref HEAD refs/heads/main
     R6=$(git rev-parse HEAD)
+    write_unit_spec TOOL-tFix-26 || exit 1
     printf '# a comment line, push-main.test case 26\n' >> "${KIT_REL}$_mt_rl/extract.py"
-    # The unit needs a SPEC: the lander's mint names only an id a spec at HEAD defines
-    # (TOOL-aRoutedQuill-12 S2), so an unspecced id named no unit and this arm red at b726385f
-    # (TOOL-dHomedResolver-8).
-    mkdir -p memory/builds/tFix/spec
-    printf '# TOOL-tFix-26 — the unit push-main.test case 26 lands\n' \
-      > memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-26.md
+    # The unit's SPEC is write_unit_spec's, above (TOOL-dHomedResolver-8 found the same need): a new
+    # README-less build folder for it would make the lander's index regeneration refuse the landing.
     git add -A
     git commit -q --no-verify -m "TOOL-tFix-26: move runlog"
     unset GATE_PUSH_BASE; bash "$lander" >/dev/null 2>&1 || echo "rc=$?"
     printf 'tip=%s\n' "$(git rev-parse origin/main)"
     printf 'head=%s\n' "$(git rev-parse HEAD)"
-    printf 'subject=%s\n' "$(git log -1 --format=%s)"
-    printf 'pass=%s\n' "$(git log -1 --format='%(trailers:key=Pass,valueonly)' | tr -d '\n')"
+    # The mint commit is FOUND BY ITS SUBJECT, not read as the newest: the regeneration
+    # TOOL-aPrimedIndex-4 adds commits after it whenever a generated output moved.
+    m26=$(git log -1 --format=%H --grep='^mint: kit versions onto' HEAD)
+    printf 'subject=%s\n' "$(git log -1 --format=%s "${m26:-HEAD}")"
+    printf 'pass=%s\n' "$(git log -1 --format='%(trailers:key=Pass,valueonly)' "${m26:-HEAD}" | tr -d '\n')"
     printf 'want=mint: kit versions onto origin/main at %s for TOOL-tFix-26\n' "${R6:0:8}"
   )
   _w26=$(printf '%s\n' "$out26" | sed -n 's/^want=//p')
@@ -899,5 +924,127 @@ out27=$(
 printf '%s\n' "$out27" | grep -qx 'refused=\[\]' && printf '%s\n' "$out27" | grep -qx 'named=\[TOOL-x-1\]' \
   && ok "27 a refusing --newest-unit mints no unit, and an answering one mints its id" \
   || bad "27 read_mint_unit kept a refusal or lost an answer: $out27"
+
+# 28-32 — TOOL-aPrimedIndex-4 and -8: the lander REGENERATES the declared generated outputs over the tree it
+#      is about to push. Each arm is a clone of this repository at its committed HEAD, pushed to a bare
+#      remote as main, whose memory root's bug-class index loses one row in a commit; the stale row is
+#      what a reconcile merge leaves behind when the index resolves `merge=ours`. The memory root is
+#      read from the clone's conf. Needs the run-gates kit's regen.py beside the lander; an install
+#      without one says so. Observed RED against the base lander, which pushed the stale row.
+_rg_k=$(cd "$HERE" && for d in */; do [ -f "$d/regen.py" ] && { printf '%s' "${d%/}"; break; }; done)
+build_regen_fixture() { # remote dir · work dir -> a clone at SRC's HEAD on main, pushed, with origin/HEAD at main
+  git clone -q --bare "$SRC" "$1"
+  git clone -q "$1" "$2"
+  cd "$2" || return 1
+  git config user.email t@e; git config user.name t; git config core.autocrlf false
+  git config core.hooksPath "$tmp/allow-hook"   # a clone wires no hook; the lander wants its allow record
+  git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
+  git push -q -f --no-verify origin main
+  git -C "$1" symbolic-ref HEAD refs/heads/main
+  git remote set-head origin main >/dev/null 2>&1
+  _mr=$(sed -n 's/^MEMORY_ROOT=//p' .memory-tree.conf 2>/dev/null | tr -d "\"'" | tail -n 1)
+  _gi="${_mr:-memory}/gotchas/INDEX.md"
+}
+write_stale_index() { # -> one table row of the bug-class index removed and committed, naming a unit
+  local n
+  n=$(grep -n '^| \[' "$_gi" | sed -n 3p | cut -d: -f1)
+  [ -n "$n" ] || return 1
+  sed -i "${n}d" "$_gi"
+  git commit -q --no-verify -am "TOOL-tFix-$1: a stale bug-class index"
+}
+if [ -n "$_rg_k" ]; then
+  # 28 (AC1) — --prepare folds the regenerated index into the prepared merge, and the tree is clean.
+  out28=$(
+    build_regen_fixture "$tmp/remote8.git" "$tmp/work8" || exit 1
+    R8=$(git rev-parse HEAD)
+    git checkout -q -b feat
+    write_stale_index 28 || exit 1
+    unset GATE_PUSH_BASE; bash "$lander" --prepare --slug tRegen >/dev/null 2>&1 || echo "rc=$?"
+    [ "$(git rev-parse HEAD^1)" = "$R8" ] && echo parent=ok
+    git diff --quiet "$R8" HEAD -- "$_gi" && echo index=restored
+    [ -z "$(git status --porcelain)" ] && echo tree=clean
+  )
+  case "$out28" in
+    *rc=*) bad "28 --prepare refused over a stale bug-class index: $out28" ;;
+    *parent=ok*index=restored*tree=clean*) ok "28 --prepare regenerates the stale bug-class index into the prepared merge and leaves a clean tree" ;;
+    *) bad "28 the prepared merge carries the stale bug-class index, or the tree was left dirty: $out28" ;;
+  esac
+
+  # 29 (AC2) — the attended landing commits the regeneration as `regen: …` with `Pass: none`, and lands it.
+  out29=$(
+    build_regen_fixture "$tmp/remote9.git" "$tmp/work9" || exit 1
+    R9=$(git rev-parse HEAD)
+    write_unit_spec TOOL-tFix-29 || exit 1
+    write_stale_index 29 || exit 1
+    unset GATE_PUSH_BASE; bash "$lander" >/dev/null 2>&1 || echo "rc=$?"
+    printf 'subject=%s\n' "$(git log -1 --format=%s)"
+    printf 'pass=%s\n' "$(git log -1 --format='%(trailers:key=Pass,valueonly)' | tr -d '\n')"
+    printf 'want=regen: generated outputs onto origin/main at %s for TOOL-tFix-29\n' "${R9:0:8}"
+    [ "$(git rev-parse origin/main)" = "$(git rev-parse HEAD)" ] && echo landed=1
+    git diff --quiet "$R9" origin/main -- "$_gi" && echo index=restored
+  )
+  _w29=$(printf '%s\n' "$out29" | sed -n 's/^want=//p')
+  case "$out29" in *rc=*) l29=0 ;; *) l29=1 ;; esac
+  [ "$l29" = 1 ] && [ -n "$_w29" ] && printf '%s\n' "$out29" | grep -qxF "subject=$_w29" \
+    && printf '%s\n' "$out29" | grep -qx 'pass=none' && printf '%s\n' "$out29" | grep -qx 'landed=1' \
+    && printf '%s\n' "$out29" | grep -qx 'index=restored' \
+    && ok "29 the attended landing commits the regeneration as its own regen: commit with Pass: none, and lands it" \
+    || bad "29 the attended regen commit is missing, misnamed or untrailered, or the landing failed: $out29"
+
+  # 30 (AC3) — a regen.py that exits 1 refuses --prepare and leaves the branch where it was. It writes
+  #      an untracked file first, as a new ledger shard or a render's temporary would, and the refused
+  #      landing leaves the tree clean (TOOL-aPrimedIndex-8).
+  out30=$(
+    build_regen_fixture "$tmp/remote10.git" "$tmp/work10" || exit 1
+    git checkout -q -b feat
+    printf 'import pathlib, sys\npathlib.Path("regen-litter.txt").write_text("x", encoding="utf-8")\nsys.exit(1)\n' > "${KIT_REL}$_rg_k/regen.py"
+    git commit -q --no-verify -am "TOOL-tFix-30: a failing regeneration"
+    B30=$(git rev-parse HEAD)
+    unset GATE_PUSH_BASE; bash "$lander" --prepare --slug tRegenFail 2>&1 >/dev/null; echo "rc=$?"
+    printf 'branch=%s\n' "$(git rev-parse --abbrev-ref HEAD)"
+    [ "$(git rev-parse feat)" = "$B30" ] && echo unmoved=1
+    [ -z "$(git status --porcelain)" ] && echo clean=1
+  )
+  case "$out30" in
+    *"could NOT be regenerated"*"rc=1"*"branch=feat"*"unmoved=1"*"clean=1"*) ok "30 a failing regeneration refuses --prepare, leaves the branch unmoved and checked out, and cleans what it created" ;;
+    *) bad "30 a failing regeneration was not refused with the branch left where it was: $out30" ;;
+  esac
+
+  # 31 (AC4) — no regen.py beside the lander: one line says so, and --prepare still prepares. The
+  #      removal is on the remote's tip as well as the branch, because a branch that deleted it alone
+  #      would publish a merge losing its definitions, which the merge-loss check refuses first.
+  out31=$(
+    build_regen_fixture "$tmp/remote11.git" "$tmp/work11" || exit 1
+    git rm -q -- "${KIT_REL}$_rg_k/regen.py"
+    git commit -q --no-verify -m "TOOL-tFix-31: no regeneration"
+    git push -q --no-verify origin main
+    R11=$(git rev-parse HEAD)
+    git checkout -q -b feat
+    git commit -q --no-verify --allow-empty -m "TOOL-tFix-31: a unit"
+    unset GATE_PUSH_BASE; bash "$lander" --prepare --slug tRegenAbsent 2>&1; echo "rc=$?"
+    [ "$(git rev-parse HEAD^1)" = "$R11" ] && echo parent=ok
+  )
+  case "$out31" in
+    *"no regen.py beside this lander"*"rc=0"*"parent=ok"*) ok "31 a lander with no regen.py beside it says so in one line and still prepares" ;;
+    *) bad "31 a missing regen.py was silent, or refused the landing: $out31" ;;
+  esac
+  # 32 (AC3, the attended path) — a regen.py that exits 1 refuses the attended landing with its own
+  #      line, and the remote's main does not move.
+  out32=$(
+    build_regen_fixture "$tmp/remote12.git" "$tmp/work12" || exit 1
+    R12=$(git rev-parse HEAD)
+    printf 'import sys\nsys.exit(1)\n' > "${KIT_REL}$_rg_k/regen.py"
+    git commit -q --no-verify -am "TOOL-tFix-32: a failing regeneration"
+    unset GATE_PUSH_BASE; bash "$lander" 2>&1; echo "rc=$?"
+    [ "$(git ls-remote origin refs/heads/main | cut -f1)" = "$R12" ] && echo unpushed=1
+  )
+  case "$out32" in
+    *"push-main: the generated outputs this landing owes could not be regenerated (named above). Aborted (no push)."*"rc=1"*"unpushed=1"*)
+      ok "32 a failing regeneration refuses the attended landing with its own line, and nothing is pushed" ;;
+    *) bad "32 a failing regeneration did not refuse the attended landing, or something was pushed: $out32" ;;
+  esac
+else
+  echo "  skip — 28-32 no run-gates kit holding regen.py beside this lander, so the regeneration arms did not run"
+fi
 
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }
