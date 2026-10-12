@@ -9,6 +9,7 @@
 | [2026-10-11-build-TOOL-aOrientedCast-10-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aOrientedCast-10-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aOrientedCast-10-0-owner-addendum.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-10-0-owner-addendum.md) | research | TOOL-aOrientedCast-11 |
 | [2026-10-11-prompt-TOOL-aOrientedCast-10-1-spec-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-10-1-spec-brief.md) | journal | TOOL-aOrientedCast-11 |
+| [2026-10-12-review-TOOL-aOrientedCast-1-closing-diff-round1.md](../reviews/2026-10-12-review-TOOL-aOrientedCast-1-closing-diff-round1.md) | diff-review | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-11 |
 
 <!-- /gen:spec-records -->
 

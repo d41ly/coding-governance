@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling+kickoff+playbook
 roster: TOOL+KICK+PLAY
-ids: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11
+ids: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15
 authorized-by: prompt
 ---
 
@@ -69,11 +69,16 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 12 | `TOOL-aOrientedCast-9` | the unattended Skill and verbs pass the renderer's `roles` to every harness call (M2 cross-read) |
 | 13 | `TOOL-aOrientedCast-10` | every role runs at a declared effort level, read from one owner-editable config (owner addendum) |
 | 14 | `TOOL-aOrientedCast-11` | a role agent runs no gate or self-test beyond its allowlist, and the hooks enforce it (owner addendum) |
+| 15 | `TOOL-aOrientedCast-12` | the roles render selftest budget row carries an empty argv column, and a prose argv is refused (review H1, M1) |
+| 16 | `TOOL-aOrientedCast-13` | a gate allowlist may name a leg a target lacks without redding the catalogue (review H2) |
+| 17 | `TOOL-aOrientedCast-14` | the hooks scan every launcher option and anchor on the project dir (review M2, M3) |
+| 18 | `TOOL-aOrientedCast-15` | the remaining review minors, batched (review M4, M5, L1, L2, L3) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 14 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
 ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11
+ids TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -94,7 +99,7 @@ ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOriente
 | [TOOL-aOrientedCast-11 — a role agent runs no gate, and the write gate's hook refuses one](spec/2026-10-11-spec-TOOL-aOrientedCast-11.md) | 11 | 2 | CLOSED | rev-2 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 26 bound to this build, across 3 record folder(s).
+Records: 28 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

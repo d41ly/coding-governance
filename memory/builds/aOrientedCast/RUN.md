@@ -105,3 +105,11 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-11T23:19:29Z dispatch · item 7bd7ab2e TOOL-aOrientedCast-11 · reason tools/roles/SKILL.template.md .claude/skills/build/SKILL.md
 
 2026-10-11T23:30:45Z dispatch · item 3a40e7da TOOL-aOrientedCast-11 · reason .claude/agents/gov-builder.md .claude/agents/gov-spec-writer.md .claude/agents/gov-spec-reviewer.md .claude/agents/gov-diff-reviewer.md .claude/agents/gov-skeptic.md .claude/agents/gov-synthesizer.md .claude/roles.json memory/builds/aOrientedCast/spec/2026-10-11-spec-TOOL-aOrientedCast-11.md memory/builds/aOrientedCast/build/2026-10-11-build-TOOL-aOrientedCast-11-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-12T00:04:43Z rescope · item add TOOL-aOrientedCast-12 · reason H1 and M1 of the closing review round 1: the roles render selftest budget row has no argv column, so the self-test runner evals its prose
+
+2026-10-12T00:05:05Z rescope · item add TOOL-aOrientedCast-13 · reason H2 of the closing review round 1: the seeded roles policy names the lexicon leg, which a default adopter install lacks, so the roles catalogue and render red there
+
+2026-10-12T00:05:25Z rescope · item add TOOL-aOrientedCast-14 · reason the closing review round 1 mediums on the hooks, M2 and M3, batched by M4 into one unit: checkRoleGate admits a launcher with more than one option, and rule 6 and checkRoleGate arm from the payload cwd only
+
+2026-10-12T00:05:42Z rescope · item add TOOL-aOrientedCast-15 · reason the closing review round 1 remaining minors, M4, M5, L1, L2 and L3, batched by M4 into one unit with a write set disjoint from TOOL-aOrientedCast-14
