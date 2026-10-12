@@ -5,7 +5,7 @@ opened: 2026-10-09
 streams: tooling
 roster: TOOL
 parents: aMeteredSweep
-ids: TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14 TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedSpawn-18 TOOL-aSparedSpawn-19 TOOL-aSparedSpawn-20 TOOL-aSparedSpawn-21 TOOL-aSparedSpawn-22 TOOL-aSparedSpawn-23 TOOL-aSparedSpawn-24 TOOL-aSparedSpawn-25 TOOL-aSparedSpawn-26 TOOL-aSparedSpawn-27 TOOL-aSparedSpawn-28 TOOL-aSparedSpawn-29 TOOL-aSparedSpawn-30 TOOL-aSparedSpawn-31 TOOL-aSparedSpawn-32 TOOL-aSparedSpawn-33
+ids: TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14 TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedSpawn-18 TOOL-aSparedSpawn-19 TOOL-aSparedSpawn-20 TOOL-aSparedSpawn-21 TOOL-aSparedSpawn-22 TOOL-aSparedSpawn-23 TOOL-aSparedSpawn-24 TOOL-aSparedSpawn-25 TOOL-aSparedSpawn-26 TOOL-aSparedSpawn-27 TOOL-aSparedSpawn-28 TOOL-aSparedSpawn-29 TOOL-aSparedSpawn-30 TOOL-aSparedSpawn-31 TOOL-aSparedSpawn-32 TOOL-aSparedSpawn-33 TOOL-aSparedSpawn-34
 ---
 
 # aSparedSpawn — the bar and its self-tests, rebuilt around the cost of a process
@@ -65,10 +65,10 @@ roughly doubled in six weeks while nothing retires one.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 21 unit(s) · node a · opened 2026-10-09 · streams tooling
+**Build status:** OPEN · 22 unit(s) · node a · opened 2026-10-09 · streams tooling
 ids TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14
 ids TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedSpawn-18 TOOL-aSparedSpawn-19 TOOL-aSparedSpawn-20 TOOL-aSparedSpawn-21 TOOL-aSparedSpawn-22 TOOL-aSparedSpawn-23 TOOL-aSparedSpawn-24 TOOL-aSparedSpawn-25 TOOL-aSparedSpawn-26 TOOL-aSparedSpawn-27 TOOL-aSparedSpawn-28
-ids TOOL-aSparedSpawn-29 TOOL-aSparedSpawn-30 TOOL-aSparedSpawn-31 TOOL-aSparedSpawn-32 TOOL-aSparedSpawn-33
+ids TOOL-aSparedSpawn-29 TOOL-aSparedSpawn-30 TOOL-aSparedSpawn-31 TOOL-aSparedSpawn-32 TOOL-aSparedSpawn-33 TOOL-aSparedSpawn-34
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -94,14 +94,15 @@ ids TOOL-aSparedSpawn-29 TOOL-aSparedSpawn-30 TOOL-aSparedSpawn-31 TOOL-aSparedS
 | [TOOL-aSparedSpawn-19 — the spawn-budget leg never passes a run that graded nothing it could have](spec/2026-10-12-spec-TOOL-aSparedSpawn-19.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-12 |
 | [TOOL-aSparedSpawn-32 — reconcile the build with origin/main 37200355](spec/2026-10-12-spec-TOOL-aSparedSpawn-32.md) | 5 | 2 | CLOSED | rev-4 | 2026-10-12 |
 | [TOOL-aSparedSpawn-33 — the pre-push hook restores the caller's environment for the reuse digest](spec/2026-10-12-spec-TOOL-aSparedSpawn-33.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-12 |
+| [TOOL-aSparedSpawn-34 — reconcile the build with local main, so it lands there conflict-free](spec/2026-10-13-spec-TOOL-aSparedSpawn-34.md) | 7 | 2 | OPEN | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
 Records: 61 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aSparedSpawn-34.
 
 Ids no `spec-audit` record has ever named: TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14 TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6
-TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedSpawn-18 TOOL-aSparedSpawn-19 TOOL-aSparedSpawn-32 TOOL-aSparedSpawn-33.
+TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedSpawn-18 TOOL-aSparedSpawn-19 TOOL-aSparedSpawn-32 TOOL-aSparedSpawn-33 TOOL-aSparedSpawn-34.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -114,6 +115,7 @@ TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-16
 | 4 | `TOOL-aSparedSpawn-16`, `TOOL-aSparedSpawn-17`, `TOOL-aSparedSpawn-18`, `TOOL-aSparedSpawn-19` | yes |
 | 5 | `TOOL-aSparedSpawn-32` | no |
 | 6 | `TOOL-aSparedSpawn-33` | no |
+| 7 | `TOOL-aSparedSpawn-34` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
