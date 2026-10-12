@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.97 -->
+<!-- gov:kit unattended@1.100 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -385,9 +385,9 @@ scheduled job shares all three, so it is demoted, not fixed.
 **The IDLE-WAKE** is that job. The AGENT schedules it as the run's first act, before orienting, on
 every start path, and reaps it last — a run that never starts still owns it. It is recorded under
 the `keepalive` fact and attested as `keepalive-reaped`; that fact, that DoD item, `--keepalive-id`
-and the `KEEPALIVE_*` keys keep their names: each has readers. Its limits, 2026-09-13: it fires only
-while the session is idle (documented) and, owner-reported, unmeasured, stays silent while a
-background task is pending. Its prompt is `--resume --keepalive-id` with its own id, then `--audit`.
+and the `KEEPALIVE_*` keys keep their names: each has readers. It fires only while the session
+is idle (documented); nine jobs never fired in 30 h of pending background work (2026-10-10). Its
+prompt is `--resume --keepalive-id` with its own id, then `--audit`.
 A background task's starter registers it (`--register-task`); `--audit` grades its heartbeat until
 `--release-task`.
 Presume a job you did not schedule ALIVE until a delete says so (`TOOL-aPromptedMandate-11`: two
@@ -400,7 +400,7 @@ writing `stop`; the stall-recorder writes an API-error end to `stall`; the resum
 OS-scheduled task, resumes from another process a run `--liveness` reads `STALE`, or
 `FINISHED-UNSTAMPED` with `stale: yes`, writing `resume` — three sidecar kinds under
 `<git-dir>/unattended/`. The tick acts only on a lease the INDEX holds, on the node that took it,
-in the worktree on the run's branch.
+in the worktree on the run's branch, and kills only what it launched.
 
 **The actors.** The AGENT schedules and reaps the idle-wake and, on resume, runs
 `--resume <slug> --keepalive-id <id>`, re-recording the lease. The DRIVER records the lease (§2,

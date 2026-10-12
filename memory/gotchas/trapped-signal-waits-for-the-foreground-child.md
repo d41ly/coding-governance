@@ -36,6 +36,12 @@ chosen exit, absent is a signal. KILL runs no trap at all, so a start record wit
 that case's signature. The price is that under a signal the EXIT trap's `$?` is whatever the last
 command left, often 0, so the record's `exit=` field says how the process ended and `rc` does not.
 
+**NOT FOR A GIT HOOK, OR ANYTHING ELSE GIT RUNS ON WINDOWS** (2026-10-11, `TOOL-aSignalledHook-1`).
+There a process that dies by an untrapped signal is read as exit 0, so following this fix in
+`.githooks/pre-push` let a TERM land a push with no bar. Trap the signal there, and run the long
+child in the background and `wait` on it so the trap is not delayed:
+`signal-killed-hook-reads-as-success.md`.
+
 ## Gate
 
 Gated by `tools/unattended/runlog-writer.test.sh`, arm AC3: TERM sent while `--close` waits on a 20 s

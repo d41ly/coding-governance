@@ -121,20 +121,6 @@ Cite ids, never line numbers.
 | [TOOL-aHoistedPass-40](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-06 | THE KIT GATE'S IMPORT ALLOW-LIST IS A FOURTH HAND-TYPED SPELLING OF ITS… |
 | [TOOL-aHoistedPass-41](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-06 | THE ONE NAMEABLE VERB DEBT THIS BUILD ADDED IS DEFERRED, NOT TAKEN. Of… |
 | [TOOL-aHoistedPass-42](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-06 | TWO FILES THIS BUILD LANDED HAVE NO RUNNER ANYWHERE, which is… |
-| [TOOL-aHomedAnchor-8](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite codebase-map kit selftest red at 40a8b8c3 on the daily… |
-| [TOOL-aHomedAnchor-9](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite foreign-prefix parity (every self-test at three… |
-| [TOOL-aHomedAnchor-10](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite corpus-ids selftest red at 40a8b8c3 on the daily held… |
-| [TOOL-aHomedAnchor-11](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite lexicon selftest red at 40a8b8c3 on the daily held job,… |
-| [TOOL-aHomedAnchor-12](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite govkit selftest red at 40a8b8c3 on the daily held job,… |
-| [TOOL-aHomedAnchor-13](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite python resolver (behaviour + inline parity + idiom ban)… |
-| [TOOL-aHomedAnchor-14](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite runlog selftest red at 40a8b8c3 on the daily held job,… |
-| [TOOL-aHomedAnchor-15](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite run-gates gov canary red at 40a8b8c3 on the daily held… |
-| [TOOL-aHomedAnchor-16](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite run-gates canary red at 40a8b8c3 on the daily held job,… |
-| [TOOL-aHomedAnchor-17](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite run-gates run-log line red at 40a8b8c3 on the daily… |
-| [TOOL-aHomedAnchor-18](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended driver selftest shard 2/8 red at 40a8b8c3 on… |
-| [TOOL-aHomedAnchor-19](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended driver selftest shard 8/8 red at 40a8b8c3 on… |
-| [TOOL-aHomedAnchor-20](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended gate selftest shard 1/8 red at 40a8b8c3 on… |
-| [TOOL-aHomedAnchor-21](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended-build self-test red at 40a8b8c3 on the daily… |
 | [TOOL-aHonedRuleset-7](../builds/aHonedRuleset/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | tools/memory-tree/HYGIENE.template.md STATES ITS WHOLE CAP TABLE TWICE,… |
 | [TOOL-aHonedRuleset-9](../builds/aHonedRuleset/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | tools/govkit/check_runbook_parity.py IS ON NO BAR — **AND THIS IS THE… |
 | [TOOL-aHonedRuleset-11](../builds/aHonedRuleset/BACKLOG.md) | OPEN | — | — | 2026-09-06 | tools/check-playbook-parity.sh HAS NO WAY TO EXERCISE A CANDIDATE ROW… |
@@ -293,6 +279,7 @@ Cite ids, never line numbers.
 | [TOOL-aSiftedFork-6](../builds/aSiftedFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | THE CANARY'S CLAMP ARMS USE timeout UNGUARDED, so a host that has none… |
 | [TOOL-aSiftedFork-7](../builds/aSiftedFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | THE RUN-GATES CANARY IS NON-DETERMINISTIC ON THIS HOST AND NAMES A… |
 | [TOOL-aSightedSkeptic-11](../builds/aSightedSkeptic/BACKLOG.md) | OPEN | HIGH | — | 2026-10-01 | inherited red: leg row-keyed merge driver replay red at ef1dcdb6,… |
+| [TOOL-aSignalledHook-2](../builds/aSignalledHook/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | the unattended kit does not handle push-main's exit 4 (landed UNGATED):… |
 | [TOOL-aStagedLane-5](../builds/aStagedLane/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | THE INDEX-VERSUS-COMMIT SHAPE SURVIVES ONE FILE OVER.… |
 | [TOOL-aStandingWrit-2](../builds/aStandingWrit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | SECURITY in landed code: the pinned BASE anchors on a remote-tracking… |
 | [TOOL-aStandingWrit-5](../builds/aStandingWrit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | .githooks/pre-commit's branch guard fails CLOSED on a bogus… |
@@ -408,6 +395,8 @@ Cite ids, never line numbers.
 | [TOOL-dGatedProse-10](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | memory/map/features/memory-tree-hygiene.md line 54 names… |
 | [TOOL-dGatedProse-11](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | tools/check-spec-tokens.py grades a LIVE spec by a whitelist, OPEN,… |
 | [TOOL-dGatedProse-12](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | FIVE KIT SELF-TESTS ARE RED ON MAIN and no row records them: measured… |
+| [TOOL-dHomedResolver-6](../builds/dHomedResolver/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | held red: suite unattended gate selftest shard 6/8 red at d006cfc5 on… |
+| [TOOL-dHomedResolver-7](../builds/dHomedResolver/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | held red: suite unattended cross-component red at d006cfc5 on the daily… |
 | [TOOL-dHonouredPark-5](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | A bespoke review fan-out must assign finding ids in the ORCHESTRATOR,… |
 | [TOOL-dHonouredPark-6](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | The engine tolerates a build folder whose specs carry another build's… |
 | [TOOL-dHonouredPark-7](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | plan_state cannot tell a spec that DISCUSSES a resolution mark from one… |
@@ -428,6 +417,9 @@ Cite ids, never line numbers.
 | [TOOL-dPolishedVitrine-11](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | THE UNATTENDED ADOPTER DELETES FIXTURE RECORDS GOVKIT SHIPS AS ENGINE… |
 | [TOOL-dPolishedVitrine-15](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-13 | A FINISHED CLAIM THAT STANDS AT HEAD IS TRUSTED, AND THE KIT GATE WOULD… |
 | [TOOL-dPolishedVitrine-16](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE TWO CONSUMERS HOLD AN unattended@1.20 THAT GOV NUMBERS TWICE. inCMS… |
+| [TOOL-dRemeasuredRender-2](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | LOW | — | 2026-10-11 | the location-probe scanner does not see a probe whose cd <dir> carries… |
+| [TOOL-dRemeasuredRender-3](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | inherited red: leg lexicon naming predicates red at 9b743831,… |
+| [TOOL-dRemeasuredRender-4](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | inherited red: leg playbook render wiring red at 9b743831, introduced… |
 | [TOOL-dRetiredFork-22](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-02 | THE BUILD HARNESS'S AUDIT STAGE CANNOT EVER COMPLETE, so BUILD is… |
 | [TOOL-dRetiredFork-23](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE GIT-ENV LEAK LIST NOW EXISTS IN THREE COPIES AND NOTHING COMPARES… |
 | [TOOL-dRetiredFork-25](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | check-memory-hygiene.test.sh fails two arms on a freshly scaffolded… |

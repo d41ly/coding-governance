@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-11T04:55:40+03:00 @ 02755258f138ecd3b4a3e9e74788506160525caa
+last-audit: 2026-10-11T19:08:43+03:00 @ 75c3508403d985069110eb3c29a11dfd67de370c
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 02755258f138ecd3b4a3e9e74788506160525caa
+last-body-change: 2f01150c67b563d0799eac4e5296e9000e9ba854
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -56,7 +56,7 @@ lives where each bullet points.
 - Governing docs: `AGENTS.md`, the template it renders from, and `memory/DECISIONS.md`; binding guides are `memory/guides/REVIEW-PROTOCOL.md` and the unattended protocol and verbs.
 - An unattended run is bound by directives the unattended Skill lists, waivable only by the owner at preflight; a discovery is adopted, not parked.
 - An unattended run declares a mode, which decides its authorization, its anchor and the directives that bind; the Skill's routing table is the list.
-- The idle-wake only wakes an idle session; resuming a stalled run is the stop-guard's, the stall-recorder's and the resume tick's, from the lease (protocol §5).
+- The idle-wake at most wakes an idle session (nine never fired in 30 h of pending background work, 2026-10-10); resuming a stalled run is the stop-guard's, the stall-recorder's and the resume tick's, from the lease, and the tick kills only what it launched, so a live STALE session is a `stale-live-pid` health line (protocol §5, `aSparedHolder`).
 - `GATE_BOUND` bounds every declared command and kills it on breach; nothing bounds an agent-launched process except `tools/process-monitor/`.
 - An adopter's bar holds a leg by `subject = "kit"` alone: govkit never emits `chunk`, so a shipped self-test declares it in its descriptor (`aBenchedProbe`).
 - A CLOSED Tier-2 unit owes an acceptance ledger in a `journal` record; the grammar is `memory/HYGIENE.md` "Acceptance ledger".
@@ -64,6 +64,7 @@ lives where each bullet points.
 - A live spec's leg line names every leg its files-touched trips: `python tools/check-spec-tokens.py --list` prints them before the spec is dated.
 - A spec audit is owed only where the owner declares `spec-audit:` or `SPEC_AUDIT_DEFAULT`; a run never declares either, and kickoff asks.
 - Before working inside a kit, `git log origin/main --oneline -20 -- tools/<kit>/` shows whether another node is rewriting it.
+- A landing that edits a grader owns every red that grader prints at the tip (KF3): reproduce at R in a detached worktree, then fix or ABSORB it (`memory/guides/UNATTENDED-STOPS.md` §13; `dHomedResolver`).
 - `tools/unattended/check-unattended.sh` carries raw CR bytes in its awk regexes: edit it in binary mode (`memory/gotchas/text-mode-read-eats-a-bare-cr.md`).
 - The read-path byte budget is retired (`TOOL-dSpentCeiling-1`): check 6's per-class caps are the bound, and a sum is not re-added.
 - A live `RUN.md` is outside check 6 by class (`TOOL-cMendedVintage-13`); a retired one is capped.

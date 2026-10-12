@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""runlog.py — the runlog kit's command line. gov:kit runlog@1.10
+"""runlog.py — the runlog kit's command line. gov:kit runlog@1.11
 
     python <this kit>/runlog.py journal --producer driver|gates|pushes
     python <this kit>/runlog.py journal --producer gates --by-leg [--legs <gate-leg manifest>]
@@ -534,4 +534,6 @@ def main(argv=None) -> int:
 
 
 if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8", errors="backslashreplace")
     sys.exit(main())

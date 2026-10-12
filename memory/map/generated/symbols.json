@@ -2303,6 +2303,11 @@
       "file": "tools/runlog/extract.py"
     },
     {
+      "id": "build_sg_fixture",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "build_simulation",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -3006,6 +3011,11 @@
       "id": "check_apply_owned",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_archives_tracked",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "check_argv_of",
@@ -4001,6 +4011,11 @@
       "id": "check_provenance_chain",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "check_push_allow",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "check_pytest_ini_probe",
@@ -9043,6 +9058,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "measure_rendered_rows",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "measure_replay",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
@@ -12293,6 +12313,16 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_sg_tip",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_sg_token",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "read_sheet_row",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -13528,6 +13558,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "render_hole_verdict",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "render_id_run",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -14756,6 +14791,16 @@
       "id": "resolve_launcher",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "resolve_live_index_home",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.sh"
+    },
+    {
+      "id": "resolve_live_index_home",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "resolve_ln_staged",
@@ -16621,6 +16666,11 @@
       "id": "run_settled_with_stub",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "run_sg_signal",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "run_shuffle_control",

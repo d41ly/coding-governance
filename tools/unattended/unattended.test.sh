@@ -82,7 +82,7 @@ MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gen_build_index.py "$HERE") 
 MT_KIT="${MT_KIT_DIR##*/}"
 GOVKIT_DIR=""   # a kit SOURCE only: absent at an adopter, where the dispatch arms announce their skip
 _gk_rel=$(resolve_kit_dir "$_rkd_py" govkit govkit.py "$HERE" 2>/dev/null) \
-  && GOVKIT_DIR="$(git -C "$HERE" rev-parse --show-toplevel)/$_gk_rel"
+  && GOVKIT_DIR="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_gk_rel"
 
 # ---- THE SHARD CONTRACT (TOOL-aShardedFloor-2) ---------------------------------------------------
 # This suite IS the merge bar's floor: one leg exceeding leg-seconds / width sets the whole bar's
@@ -1803,7 +1803,7 @@ hit "$out" "write the RECORD KEY, which is not always the item name: parked-surf
 # The kit is reached through the resolver, REPO-RELATIVE, never a spelled sibling path, and laid
 # into the fixture at that same relative path, which is where the driver's file test looks.
 _rl_rel=$(resolve_kit_dir "$_rkd_py" runlog runlog.py "$HERE") || exit 2
-_rl_src="$(git -C "$HERE" rev-parse --show-toplevel)/$_rl_rel"
+_rl_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_rl_rel"
 for _rk in present absent; do
   bcopen
   # A READY spec, because bcopen's is THIN and `--dispatch` refuses a THIN unit (check 49).
@@ -3055,8 +3055,10 @@ done <<<"$ug"
 # ---- `_` joins the excluded neighbours since TOOL-dDerivedDocket-24 S10, whose `read_leg_argv` is the
 # ---- first CALL of the resolver with a word after it (`resolve_python 2>/dev/null`): the name ends
 # ---- in `python `, and a launcher word preceded by an identifier character is never a bare launcher.
+# ---- A `local` declaration, a double-quoted string and a `.py` extension are not invocations either: the
+# ---- held job redded on `local base py d`, on prose saying "no python launcher", and on `drift_report.py `.
 n=$((n+1)); [ "$(grep -c '^# >>> resolve_python' "$SCRIPT")" = 1 ] || { echo "FAIL the driver carries no inline resolve_python block, so any launcher it runs is unresolved"; st=1; }
-np=$(awk '/^# >>> resolve_python/{b=1} b{if(/^# <<< resolve_python/)b=0; next} /^[[:space:]]*#/{next} {print NR": "$0}' "$SCRIPT" | grep -E '(^|[^-_[:alnum:]])(python3?|py) ' || true)
+np=$(awk '/^# >>> resolve_python/{b=1} b{if(/^# <<< resolve_python/)b=0; next} /^[[:space:]]*#/{next} /^[[:space:]]*local[[:space:]]/{next} {l=$0; gsub(/"[^"]*"/, """", l); print NR": "l}' "$SCRIPT" | grep -E '(^|[^-_.[:alnum:]])(python3?|py) ' || true)
 n=$((n+1)); [ -z "$np" ] || { echo "FAIL the driver invokes a python launcher without the resolver: $np"; st=1; }
 n=$((n+1)); grep -q 'run_bounded "\$_stpy" "\$SPEC_TOKENS_CLI"' "$SCRIPT" || { echo "FAIL the declared spec-token checker is not run through the resolved launcher"; st=1; }
 
@@ -7159,7 +7161,7 @@ hit "$out" "dispatch declared"
 # ---- sourcing either conf, so one spelling table is fed to it and to each owner's own parser. Absent
 # ---- and blank are compared as the consumer sees them: an absent `MAP_ROOT` is the kit default, and
 # ---- `BACKLOG_MODE` matters only as equal to `builds` or not.
-_rcv_root=$(git -C "$HERE" rev-parse --show-toplevel)
+_rcv_root=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)
 _rcv_cm="$_rcv_root/$(resolve_kit_dir "$_rkd_py" codebase-map map_lib.py "$HERE")"
 _rcv_mt="$_rcv_root/$MT_KIT_DIR"
 _rcv_d=$(mktemp -d)
@@ -12183,7 +12185,7 @@ else
   build_hold_fixture
   mkdir -p dk/u "dk/$_da_home"
   cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "$HERE/check-playbook.sh" dk/u/
-  cp "$(git -C "$HERE" rev-parse --show-toplevel)/$_da_rel/drift_report.py" "dk/$_da_home/"
+  cp "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_da_rel/drift_report.py" "dk/$_da_home/"
   git add -A >/dev/null && git commit -q -m dk --no-verify
   _dh="$(git rev-parse --git-common-dir)/drift-history.tsv"
   { printf '#utc\tsha\tbase_ref\tbase_sha\tsignal\tstate\tvalue\tof\tkey_hash\n'
@@ -12552,7 +12554,7 @@ hit "$(run --rescope tUnitAsk --act retire --item EXMP-tUnitAsk-77 --reason gone
 # ---- what this arm grades, and one that fired would red as unanswered, which is another fault.
 # ---- COUNTED EITHER WAY, like the backstop kill arms, so the floor grades this suite and not the conf
 # ---- beside it; the SKIP line says the arms went unexercised.
-ASKS_ROOT=$(cd "$HERE" && git rev-parse --show-toplevel 2>/dev/null)
+ASKS_ROOT=$(unset GIT_DIR GIT_WORK_TREE; cd "$HERE" && git rev-parse --show-toplevel 2>/dev/null)
 ASKS_REAL=$(sed -n 's/^ASKS_CMD="\(.*\)"$/\1/p' "$ASKS_ROOT/.unattended.conf" 2>/dev/null | head -1)
 if [ -z "$ASKS_REAL" ]; then
   n=$((n+36))
@@ -14099,7 +14101,9 @@ read_ask_back() { AB_WHY="the double reads nothing back"; [ "${F4_READBACK:-no}"
 # refused leg would render views for rows that are not there.
 write_ask_views() { echo "f4-views-double: $1 filed"; }
 run_f4_filer() { # temp store -> the sliced filer's output over the arm's repository; F4_CP_FAILS=backup|restore fails that copy
-  local M=memory ASKS_CMD="bash asks.sh" RB_OUT=""
+  # WI_STAGED and AV_STAGED are the driver's globals the filer appends to (TOOL-dUnstuckLanding-27
+  # S3); unset here, `set -u` killed the filer after the row write and before the views call.
+  local M=memory ASKS_CMD="bash asks.sh" RB_OUT="" WI_STAGED="" AV_STAGED=""
   local -x TMPDIR="$1" F4_BL="memory/builds/tRun/BACKLOG.md" F4_CP_FAILS="${F4_CP_FAILS:-}" F4_REAL_CP
   F4_REAL_CP=$(command -v cp)
   ( cd "$f4_dir" || exit 2
@@ -14244,7 +14248,7 @@ hit  "$out" "gates-green: filed ask ARCH-tRun-3 for leg x leg red at ${IH_R:0:8}
 # owner columns before the reason. The runner's path is DERIVED from this repository's own declared
 # GATE_CMD and installed at the same relative path in the fixture, so no kit path is spelled here;
 # it is committed at R too, because a diff against R that touches the runner reads every red OWN.
-ih_top=$(git -C "$HERE" rev-parse --show-toplevel)
+ih_top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)
 ih_rg=$(sed -n 's/^GATE_CMD="bash \(.*\)"$/\1/p' "$ih_top/.unattended.conf" | head -1)
 if [ -n "$ih_rg" ] && [ -f "$ih_top/$ih_rg" ]; then
   run_ih_repo reset -q --hard; run_ih_repo clean -qfd; run_ih_repo checkout -q main
@@ -14274,7 +14278,7 @@ fi
 # AC11, the driver's half: its own reader, sliced out of the SHIPPED driver and run over the
 # repository this suite lives in at HEAD, resolves land with an age bound of 10.
 slice_fn read_policy_key; slice_fn read_gate_policy
-_o=$( cd "$(git -C "$HERE" rev-parse --show-toplevel)" && CONF=".unattended.conf" \
+_o=$( cd "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" && CONF=".unattended.conf" \
       && read_gate_policy "$(git rev-parse HEAD)" && printf '%s %s' "$GP_POLICY" "$GP_MAX_AGE" )
 same "AC11 this repository at HEAD reads land with a bound of 10" "$_o" "land 10"
 
@@ -14298,7 +14302,7 @@ rm -rf "$ih_dir" "$ih_oroot" "$ih_out"
 # ---- value runs verbatim. A repository declaring none prints a named SKIP and counts the arms.
 # ---- AC4's dirty tree is read under `primary`: under `in-place` refusal 62 stops a porcelain-dirty
 # ---- close before its bar, so a dirty in-place arm would pass over a render that never ran.
-rv_top=$(git -C "$HERE" rev-parse --show-toplevel)
+rv_top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)
 rv_asks=$(sed -n 's/^ASKS_CMD="\(.*\)"$/\1/p' "$rv_top/.unattended.conf" 2>/dev/null | head -1)
 rv_gen=""
 for _w in $rv_asks; do [ -f "$rv_top/$_w" ] && { rv_gen=$_w; break; }; done

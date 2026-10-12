@@ -86,7 +86,7 @@ ids TOOL-aFrugalTurnstile-11 TOOL-aFrugalTurnstile-12 TOOL-aFrugalTurnstile-13 T
 | [PLAY-aFrugalTurnstile-1 — the charter's §1 Landing states the scoped-then-full path](spec/2026-10-09-spec-PLAY-aFrugalTurnstile-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-1 — staleness counts first-parent landings, and a runner stamp is trusted only for the runner's own manifest](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-10 — the unattended protocol's landing rule states the scoped-then-full path](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-10.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-09 |
-| [TOOL-aFrugalTurnstile-2 — pre-push records the green of the bar it ran, and a push whose tree carries one runs nothing](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-2.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-2 — pre-push records the green of the bar it ran, and a push whose tree carries one runs nothing](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-2.md) | 2 | 2 | CLOSED | rev-4 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-3 — the unattended close records the green of the bar it ran](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-3.md) | 2 | 2 | CLOSED | rev-1 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-5 — the gate turnstile is host-wide, names its holder, lets nested bars through, and `--hold` admits a foreign bar](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-5.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-11 — a scoped green takes its own slot, and the nearest adoptable green wins](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-11.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-10 |
@@ -94,7 +94,7 @@ ids TOOL-aFrugalTurnstile-11 TOOL-aFrugalTurnstile-12 TOOL-aFrugalTurnstile-13 T
 | [TOOL-aFrugalTurnstile-6 — `post-merge.sh` runs the full bar on a landed sha and publishes its verdict as a remote ref](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-6.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-7 — pre-push binds a post-merge red, and `--decide` prints the boundary's decision](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-7.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-8 — push-main starts the post-merge bar after a landing where it is declared](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-8.md) | 5 | 2 | CLOSED | rev-2 | 2026-10-09 |
-| [TOOL-aFrugalTurnstile-9 — the unattended close runs the boundary's decision where a post-merge bar is declared](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-9.md) | 5 | 2 | CLOSED | rev-4 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-9 — the unattended close runs the boundary's decision where a post-merge bar is declared](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-9.md) | 5 | 2 | CLOSED | rev-5 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-12 — the close's bar runs with the bar knobs scrubbed, so its green certifies the whole bar](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-12.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-10 |
 | [TOOL-aFrugalTurnstile-14 — a run whose tree moved writes no lineage-qualified ledger row](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-14.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-10 |
 | [TOOL-aFrugalTurnstile-17 — the post-merge minors: a clean-tree precondition, two guards armed, the protocol row corrected](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-17.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-10 |

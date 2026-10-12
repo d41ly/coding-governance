@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.97 -->
+<!-- gov:kit unattended@1.100 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -278,6 +278,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   and reads nothing, since no verb writes or reads a claim then; `git ls-remote <remote>
   'refs/gov/runs/*'` still shows a leftover one. It takes no slug and decides nothing about who
   drives: `UNATTENDED-STOPS.md` §7 is what the verdicts mean.
+- `--overlaps` — the overlap probe for a session that never preflights, which the orientation
+  card calls: it joins the specs this branch's diff changed against the unmerged remote refs as of
+  the last fetch, read from the LOCAL `refs/remotes/<remote>/HEAD`, so no network. It takes no slug,
+  writes nothing and always exits 0; other than one remote, or no symref, is one UNAVAILABLE line.
 - `--beat` — `--beat <slug>`, the resume tick's heartbeat for a run `--liveness` reads `LIVE` on this
   host: it renews that run's own claim when due and prints exactly one `beat —` line, `renewed` or
   `skipped: <why>`. It writes only a claim that is absent or the run's own, and refuses nothing but a

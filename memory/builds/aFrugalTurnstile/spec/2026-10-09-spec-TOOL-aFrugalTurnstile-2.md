@@ -1,6 +1,6 @@
 # TOOL-aFrugalTurnstile-2 — pre-push records the green of the bar it ran, and a push whose tree carries one runs nothing
 
-**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 2 · ratified 2026-10-09
+**Status:** CLOSED · rev-4 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 2 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -111,6 +111,8 @@ pays a second full bar because nothing records a green by tree and by bar.
   inside a wrapper bar could cover that wrapper's push.
 - **hands-off** `TOOL-aFrugalTurnstile-3` — the record grammar and the function shape the
   unattended close writes and its parity arm compares.
+- **hands-off** `TOOL-aFrugalTurnstile-11` — the record grammar, its writer, `check_bar_record`
+  and `check_bar_base`, which unit 11 consumes.
 - **hands-off** `TOOL-aFrugalTurnstile-7` — the inline comparison of a scoped record's base moves onto
   the callable decision, and a post-merge red that forces FULL must refuse a covered decision too
   unless the covering record's sha descends from the red.
@@ -317,6 +319,7 @@ S1 splits with `read -ra`.
   re-spelling it, and S3b's reader and search are three named functions (Inventory). The writer also
   declines, each with its own line, a kind that is neither `full` nor `scoped`, a bar holding a tab
   or newline (it would forge record keys), an unreadable tree and an unwritable record.
+- rev-4 · 2026-10-11 · §3 Edges: the reciprocal hands-off to TOOL-aFrugalTurnstile-11, whose consumes-from had no match back (hygiene check 12; absorbed by dHomedResolver at d19938f3).
 
 ## 10. Reuse audit
 
