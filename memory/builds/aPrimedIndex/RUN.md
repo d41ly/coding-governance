@@ -9,21 +9,23 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 6e8f8b1da4dc036b7fce23555b78fb4b5db0e60c · park · 1 touching
+asks-at-landing: TOOL-aPrimedIndex-5=CLOSED TOOL-aPrimedIndex-11=OPEN TOOL-aPrimedIndex-12=OPEN TOOL-aPrimedIndex-13=OPEN TOOL-aPrimedIndex-14=OPEN TOOL-aPrimedIndex-15=OPEN
+units-at-landing: TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-7 TOOL-aPrimedIndex-8 TOOL-aPrimedIndex-9 TOOL-aPrimedIndex-10 TOOL-aPrimedIndex-16
+refreshed-at: 6e8f8b1da4dc036b7fce23555b78fb4b5db0e60c · handoff · 7 touching
 hold-run: 
-hold-streak: 1 · at a1dc95b8
-resume-owed: unattended-resume-aprimedindex · fire 2026-10-12T04:44:38Z
-held-at: 2026-10-12T04:14:38Z
-hold-reason: the close's second bar was green on every leg but straggler-guard arms, which timed out twice, the second time alone, at a spawn cost 4.1x this clone's floor while two other sessions' bars ran on node a
-hold-until: probe host
-hold-code: host-degraded
+hold-streak: 2 · at 1de3bca3
+resume-owed: none · owner
+held-at: 2026-10-12T16:48:16Z
+hold-reason: the owner decided to land with the pre-push hook skipped while the run was held for the host; the work is on origin/main at 13fe6a04
+hold-until: owner
+hold-code: owner-decision
 held-from: VERIFYING
 gates-run: unattended-179177077013434529691-597878 38e594a6
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 13fe6a04dfac854847b87419641b5c546a0385e9
-phase: VERIFYING
+witness: 1de3bca37fe0a6b70e377e47b4d83c6d35a1b02a
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/enforce-index-regen-before-bars-acdde6
@@ -121,3 +123,7 @@ base: 15bbfa4f867262f3c862e2473688fc69d0566b7d
 2026-10-12T16:42:45Z resume · item aPrimedIndex · reason held · keepalive 046fa035 · manual
 
 2026-10-12T16:44:00Z decision · item land aPrimedIndex while its run is HELD host-degraded, with the pre-push hook bypassed? · reason the close's second bar was green on every leg but straggler-guard arms, a HOST timeout under two other sessions' bars; the mandate does not delegate a hook bypass. The owner decided to land it with the hook skipped; it was pushed 37200355..13fe6a04
+
+2026-10-12T16:48:38Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aPrimedIndex && bash tools/push-main.sh --land --slug aPrimedIndex && bash tools/unattended/unattended.sh --settle aPrimedIndex
+
+2026-10-12T16:48:39Z hold · item owner-decision · reason until owner · reaped 046fa035 · resume none(owner)
