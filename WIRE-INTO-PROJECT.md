@@ -133,9 +133,9 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
 - **Parallel-test guardrails** (`pytest-parallel-guardrails/` kit): drop it if the project is not
   Python or does not run `pytest -n auto`. The charter's one line on the bug classes it fixes is
   that kit's tools line, so a selection without the kit carries no line on them.
-- **A source-hygiene scan for PowerShell** (`gate-lint/` kit): drop it if the project has no `.ps1`
-  files. A repo with none gets a clean report that proves nothing, which is honest and is why it is
-  adopted only where the language exists.
+- **A source-hygiene scan for PowerShell** (`gate-lint/` kit): drop it if the project tracks no
+  `.ps1` files. A repo with none gets a refusal, exit 2, because a scan that graded nothing is not a
+  pass, and that is why it is adopted only where the language exists.
 - **A deployer for your own tooling** (`govkit/` kit): drop it unless this repo DEPLOYS kits into
   other repos. An adopter that only consumes them has no population to declare.
 - **A naming lexicon** (`lexicon/` kit): a closed verb table every definition leads with, banned type
