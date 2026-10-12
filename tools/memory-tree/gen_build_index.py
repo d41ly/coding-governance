@@ -779,11 +779,7 @@ def rosters(root: str, tracked: list, m: str, families: set,
     republishes it forever, and every gate agrees, because a fresh render reproduces it exactly. That
     is the defect this change exists to remove, so it must not be reintroduced by the fix.
     """
-    fam = "|".join(sorted(re.escape(f) for f in families))
-    if not fam:
-        raise Problem("build-index: FAMILIES is empty, so no id can be recognised and every roster "
-                      "would render empty — which is also what a clean corpus looks like")
-    id_re = re.compile(r"\b(?:" + fam + r")-([A-Za-z0-9]+)-\d+\b")
+    id_re = build_roster_id_re(families)
     out: dict = {}
     for p in tracked:
         if p == f"{m}/LIVE.md" or p.startswith(f"{m}/ledger/"):
@@ -800,14 +796,173 @@ def rosters(root: str, tracked: list, m: str, families: set,
             # A roster is built from ids in PROSE, so a file that is not text cannot contribute one
             # and skipping it changes no output. Verified by artifact equality, not by assertion.
             continue
-        # A `missing:` id declares that it has no record (TOOL-aMendedFleet-26), so it joins no roster.
-        _marked, text = scan_missing_citations(text, id_re)
-        for mm in id_re.finditer(text):
-            slug = mm.group(1)
+        for i, slug in extract_roster_ids(text, id_re):
             if p == f"{m}/builds/{slug}/README.md":
                 continue
-            out.setdefault(slug, set()).add(mm.group(0))
+            out.setdefault(slug, set()).add(i)
     return {s: sorted(v, key=_roster_sort_key) for s, v in out.items()}
+
+
+def build_roster_id_re(families: set):
+    """The id pattern a roster is scanned with: `<FAMILY>-<slug>-<digits>` over the declared families.
+
+    ONE builder for `rosters()` and `check_staged_render()` (TOOL-aTrimmedHook-1), so the classifier
+    that decides whether a staged edit can move a roster and the renderer that builds one cannot read
+    two grammars. The sequence must be all DIGITS, for the reason `rosters()` gives.
+    """
+    fam = "|".join(sorted(re.escape(f) for f in families))
+    if not fam:
+        raise Problem("build-index: FAMILIES is empty, so no id can be recognised and every roster "
+                      "would render empty — which is also what a clean corpus looks like")
+    return re.compile(r"\b(?:" + fam + r")-([A-Za-z0-9]+)-\d+\b")
+
+
+def extract_roster_ids(text: str, id_re) -> list:
+    """`[(id, slug), ...]`: the ids one file's prose contributes to rosters, in text order.
+
+    A `missing:` id declares that it has no record (TOOL-aMendedFleet-26), so it is blanked first and
+    joins no roster. The per-file half of `rosters()`, factored out so `check_staged_render()` compares
+    exactly what the renderer would read (TOOL-aTrimmedHook-1).
+    """
+    _marked, text = scan_missing_citations(text, id_re)
+    return [(mm.group(0), mm.group(1)) for mm in id_re.finditer(text)]
+
+
+def check_index_input(rel: str, m: str, kit: str | None) -> bool:
+    """True when the renderer reads `rel` other than through its prose ids, or writes it.
+
+    TOOL-aTrimmedHook-1. The STRUCTURAL half of the staged classifier: a staged edit to any of these
+    renders, whatever it says. A build's README and BACKLOG.md; anything under a build's spec, build,
+    prompts or reviews folder, whose headers, bindings and FILENAMES are read; LIVE.md, ledger/ and
+    backlog/, which are outputs or, under `shards`, inputs; project/, which holds the stale-header
+    waiver; the conf; and this kit's own directory, whose grammar files the views read. Every other
+    memory file reaches the render only through the ids its prose cites, which the id comparison in
+    `check_staged_render()` decides. The selftest's parity arm asserts every artifact `plan()` writes
+    is in this set, so an output added later cannot land outside it unnoticed.
+    """
+    if rel == ".memory-tree.conf":
+        return True
+    if kit and (rel == kit or rel.startswith(kit + "/")):
+        return True
+    if rel == f"{m}/LIVE.md":
+        return True
+    if any(rel.startswith(f"{m}/{d}/") for d in ("ledger", "backlog", "project")):
+        return True
+    pre = f"{m}/builds/"
+    if not rel.startswith(pre):
+        return False
+    parts = rel[len(pre):].split("/")
+    if len(parts) == 2:
+        return parts[1] in ("README.md", "BACKLOG.md")
+    return len(parts) >= 3 and parts[1] in RECORD_KINDS
+
+
+def build_blob_request(paths: list) -> bytes:
+    """The `git cat-file --batch` request for each path's HEAD and index blobs.
+
+    Encoded with `surrogateescape`, the error handler the name-status output was DECODED with, so a
+    path holding a byte that is not UTF-8 round-trips instead of raising (TOOL-aTrimmedHook-7).
+    """
+    return "".join(f"HEAD:{p}\n:{p}\n" for p in paths).encode("utf-8", "surrogateescape")
+
+
+def check_staged_render(root: str, conf: dict, here: str | None = None) -> tuple:
+    """`(render, reason)` for `--check --staged`: can anything the INDEX stages move the render?
+
+    TOOL-aTrimmedHook-1. The roster reads ids out of the prose of EVERY tracked memory file, so a path
+    list cannot answer this: a staged RUN.md that cites a new id moves a README's `ids:` line. Two git
+    spawns decide it. The staged set, with renames split into an add and a delete; then ONE
+    `cat-file --batch` for each modified non-structural file's HEAD and index blobs. A render is owed
+    when a path is added or deleted (the record set and its filename dates move), when a path is
+    structural by `check_index_input()`, or when a file's roster id SET differs between the blobs. A
+    roster is a union over files keyed by each id's own slug, so if no file's contribution changes, no
+    roster does. Any git or decode failure answers "render": a wrong skip is the costly direction.
+
+    WHAT IT DOES NOT CHECK. The renderer reads the WORKTREE and this reads the index, so an unstaged
+    edit can still move a render either way, as it could before. A HEAD already drifted by a
+    `--no-verify` commit is invisible to a skip. Both are the push boundary's, where the render is full.
+    """
+    m = conf["MEMORY_ROOT"]
+    # `here` is the kit's directory; a caller passes it only to place a fixture's kit under its root.
+    here = here or os.path.dirname(os.path.abspath(__file__))
+    try:
+        kit = os.path.relpath(here, root).replace(os.sep, "/")
+    except ValueError:
+        # Another Windows drive: the kit is outside this repository, the answer the branch below gives
+        # (TOOL-aTrimmedHook-7). It must never become a traceback the leg reports as drift.
+        kit = None
+    if kit is not None and (kit == ".." or kit.startswith("../") or os.path.isabs(kit)):
+        kit = None
+    specs = [m + "/", ".memory-tree.conf"] + ([kit + "/"] if kit else [])
+    # THE INDEX THE HOOK WAS HANDED (TOOL-aTrimmedHook-4). `_build_git_env()` drops GIT_INDEX_FILE for
+    # every other caller, because an inherited pointer names a different tree. Here the staged set IS
+    # that index: under `git commit -a`, `commit <paths>` or `commit -i` git hands the hook a temporary
+    # one, and the hygiene shell that decides this function runs at all reads it through its own
+    # `git diff --cached`. Carrying it keeps the two readers on one index.
+    env = _build_git_env()
+    if os.environ.get("GIT_INDEX_FILE"):
+        env["GIT_INDEX_FILE"] = os.environ["GIT_INDEX_FILE"]
+    # UNDER LIVE_LANDED_UNCLOSED THE RENDER READS PRODUCT SOURCE (TOOL-aTrimmedHook-5): LIVE.md's
+    # Landed-unclosed column comes from the drift-audit kit's grep over tracked source, its conf and its
+    # kit. So with the key on, the staged set is read WHOLE and any path outside this function's own
+    # pathspec answers "render". Read as `read_landed_unclosed` reads it, except that a value outside
+    # blank and `1` counts as on: a render is the safe answer, and the render refuses that value.
+    llu = (conf.get("LIVE_LANDED_UNCLOSED") or "").strip()
+    cmd = ["git", "diff", "--cached", "--name-status", "--no-renames", "-z"]
+    if not llu:
+        cmd += ["--", *specs]
+    try:
+        out = subprocess.run(cmd, cwd=root, capture_output=True, check=True, env=env).stdout
+    except (OSError, subprocess.CalledProcessError) as exc:
+        return True, f"git could not list the staged set ({exc})"
+    fields = out.decode("utf-8", "surrogateescape").split("\0")
+    modified = []
+    for k in range(0, len(fields) - 1, 2):
+        st, rel = fields[k], fields[k + 1]
+        if llu and not (rel.startswith(m + "/") or rel == ".memory-tree.conf"
+                        or (kit and rel.startswith(kit + "/"))):
+            return True, (f"{rel} is staged outside the memory root while LIVE_LANDED_UNCLOSED is on, "
+                          f"and the Landed-unclosed column reads tracked product source")
+        if not st.startswith("M"):
+            return True, f"{rel} is staged as {st}, and an added or deleted path moves the record set"
+        if check_index_input(rel, m, kit):
+            return True, f"{rel} is a build-index input or output"
+        modified.append(rel)
+    if not modified:
+        return False, "nothing is staged under the memory root, the conf or the kit"
+    families = {pair.split(":")[1] for pair in conf["FAMILIES"].split() if ":" in pair}
+    id_re = build_roster_id_re(families)
+    req = build_blob_request(modified)
+    try:
+        cat = subprocess.run(["git", "cat-file", "--batch"], cwd=root, input=req,
+                             capture_output=True, check=True, env=env).stdout
+        blobs, pos = [], 0
+        for _n in range(2 * len(modified)):
+            nl = cat.index(b"\n", pos)
+            head = cat[pos:nl].split()
+            pos = nl + 1
+            if len(head) != 3 or head[1] != b"blob":
+                blobs.append(None)
+                continue
+            size = int(head[2])
+            blobs.append(cat[pos:pos + size])
+            pos += size + 1
+    except (OSError, subprocess.CalledProcessError, ValueError) as exc:
+        return True, f"git could not read the staged blobs ({exc})"
+    for k, rel in enumerate(modified):
+        old, new = blobs[2 * k], blobs[2 * k + 1]
+        if old is None or new is None:
+            return True, f"{rel} has no readable blob at HEAD or in the index"
+        try:
+            was = {i for i, _s in extract_roster_ids(old.decode("utf-8").replace("\r\n", "\n"), id_re)}
+            now = {i for i, _s in extract_roster_ids(new.decode("utf-8").replace("\r\n", "\n"), id_re)}
+        except UnicodeDecodeError:
+            return True, f"{rel} does not decode as text, so the ids it cites cannot be compared"
+        if was != now:
+            return True, (f"{rel} changes the ids it cites ({len(now - was)} added, "
+                          f"{len(was - now)} removed), which moves a roster")
+    return False, (f"{len(modified)} modified file(s), none a build-index input and none changing "
+                   f"the ids it cites")
 
 
 # --------------------------------------------------------------------------------------- collecting
@@ -3755,6 +3910,130 @@ def _fixture(tmp: str, *, marker=True, readme=True, status_key=None, spec_status
     return load_conf(tmp)
 
 
+def test_staged_render(arm) -> None:
+    """TOOL-aTrimmedHook-1's arms: `--check --staged` renders exactly when the staged set can move it.
+
+    MODULE-LEVEL so a pass can run it alone, with any `arm(label, want, fn)` callable. Each arm stages
+    one edit in a fresh `_fixture` and reads the verdict, so a classifier that ignores ids fails the
+    id arm, and a structural set missing a rendered folder fails the parity arm.
+    """
+    with tempfile.TemporaryDirectory() as base:
+        t = os.path.join(base, "staged"); os.makedirs(t)
+        conf = _fixture(t)
+        notes = os.path.join(t, "memory", "notes.md")
+        write_text(notes, "# notes\n\ncites ARCH-tOne-1 and `missing:ARCH-tOne-9`.\n")
+        run("git", "add", "-A", cwd=t)
+        run("git", "commit", "-q", "-m", "notes", "--no-verify", cwd=t)
+
+        def write_staged(rel, text=None, remove=False):
+            run("git", "reset", "-q", "--hard", cwd=t)
+            path = os.path.join(t, rel)
+            if remove:
+                run("git", "rm", "-q", rel, cwd=t)
+                return check_staged_render(t, conf)
+            write_text(path, (read_text(path) if os.path.isfile(path) else "") + text)
+            run("git", "add", "-A", cwd=t)
+            return check_staged_render(t, conf)
+
+        arm("TOOL-aTrimmedHook-1 AC1 — a staged edit citing no new id skips the render", "False",
+            lambda: str(write_staged("memory/notes.md", "a plain line\n")[0]))
+        arm("TOOL-aTrimmedHook-1 AC1 — --check --staged prints the SKIPPED line and exits 0",
+            "render SKIPPED under --staged",
+            lambda: run(sys.executable, os.path.abspath(__file__), "--check", "--staged", cwd=t))
+        arm("TOOL-aTrimmedHook-1 AC2 — a staged line citing a NEW id renders", "True",
+            lambda: str(write_staged("memory/notes.md", "now ARCH-tOne-7\n")[0]))
+        arm("TOOL-aTrimmedHook-1 AC2 — a new id under the missing: form joins no roster, so it skips",
+            "False", lambda: str(write_staged("memory/notes.md", "and `missing:ARCH-tOne-8`\n")[0]))
+        arm("TOOL-aTrimmedHook-1 AC3 — a staged ADDED memory file renders", "True",
+            lambda: str(write_staged("memory/other.md", "# other\n")[0]))
+        arm("TOOL-aTrimmedHook-1 AC3 — a staged DELETED memory file renders", "True",
+            lambda: str(write_staged("memory/notes.md", remove=True)[0]))
+        arm("TOOL-aTrimmedHook-1 AC4 — a staged build README edit renders", "True",
+            lambda: str(write_staged("memory/builds/tOne/README.md", "\n")[0]))
+        arm("TOOL-aTrimmedHook-1 AC4 — a staged spec edit renders", "True",
+            lambda: str(write_staged("memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md", "\n")[0]))
+        arm("TOOL-aTrimmedHook-1 AC4 — a staged conf edit renders", "True",
+            lambda: str(write_staged(".memory-tree.conf", "\n")[0]))
+        arm("TOOL-aTrimmedHook-1 AC4 — a file under the kit's own directory is structural", "True False",
+            lambda: "%s %s" % (check_index_input("pfx/kit/backlog.py", "memory", "pfx/kit"),
+                               check_index_input("pfx/kitX/x.py", "memory", "pfx/kit")))
+        run("git", "reset", "-q", "--hard", cwd=t)
+        # TOOL-aTrimmedHook-4 AC1 — a structural edit staged ONLY into a temporary index, which is what
+        # git hands a hook under `commit -a`; `.git/index` itself holds nothing staged.
+        _alt = os.path.join(base, "alt-index")
+        shutil.copyfile(os.path.join(t, ".git", "index"), _alt)
+        _rd = os.path.join(t, "memory", "builds", "tOne", "README.md")
+        write_text(_rd, read_text(_rd) + "\n")
+        subprocess.run(["git", "add", "memory/builds/tOne/README.md"], cwd=t, check=True,
+                       capture_output=True, env=dict(_build_git_env(), GIT_INDEX_FILE=_alt))
+        _prev_idx = os.environ.get("GIT_INDEX_FILE")
+        os.environ["GIT_INDEX_FILE"] = _alt
+        try:
+            _alt_verdict = check_staged_render(t, conf)
+        finally:
+            if _prev_idx is None:
+                os.environ.pop("GIT_INDEX_FILE", None)
+            else:
+                os.environ["GIT_INDEX_FILE"] = _prev_idx
+        arm("TOOL-aTrimmedHook-4 AC1 — an edit staged only into the hook's GIT_INDEX_FILE renders", "True",
+            lambda: str(_alt_verdict[0]))
+        arm("TOOL-aTrimmedHook-4 AC1 — with no GIT_INDEX_FILE the default index holds nothing staged",
+            "False", lambda: str(check_staged_render(t, conf)[0]))
+        run("git", "reset", "-q", "--hard", cwd=t)
+        # TOOL-aTrimmedHook-5 AC1/AC2 — a product-source file staged beside a no-id memory edit.
+        os.makedirs(os.path.join(t, "src"), exist_ok=True)
+        write_text(os.path.join(t, "src", "x.sh"), "echo cites ARCH-tOne-1\n")
+        write_text(notes, read_text(notes) + "a plain line\n")
+        run("git", "add", "-A", cwd=t)
+        arm("TOOL-aTrimmedHook-5 AC1 — under LIVE_LANDED_UNCLOSED=1 a staged source file renders", "True",
+            lambda: str(check_staged_render(t, dict(conf, LIVE_LANDED_UNCLOSED="1"))[0]))
+        arm("TOOL-aTrimmedHook-5 AC2 — with the key blank the same pair skips", "False",
+            lambda: str(check_staged_render(t, dict(conf, LIVE_LANDED_UNCLOSED=""))[0]))
+        run("git", "reset", "-q", "--hard", cwd=t)
+        run("git", "clean", "-q", "-fd", "--", "src", cwd=t)
+        # TOOL-aTrimmedHook-7 AC1 — a kit on another drive makes os.path.relpath raise; the classifier
+        # must answer, never raise. Nothing is staged here, so the answer is a skip.
+        _real_relpath = os.path.relpath
+        os.path.relpath = lambda *_a, **_k: (_ for _ in ()).throw(ValueError("path is on mount 'D:'"))
+        try:
+            _m3 = check_staged_render(t, conf)
+        except ValueError as exc:
+            _m3 = (f"raised {exc}", "")
+        finally:
+            os.path.relpath = _real_relpath
+        arm("TOOL-aTrimmedHook-7 AC1 — a kit on another drive answers instead of raising", "False",
+            lambda: str(_m3[0]))
+        # AC2 — a path holding a byte that is not UTF-8 reaches the request as a lone surrogate.
+        arm("TOOL-aTrimmedHook-7 AC2 — the blob request round-trips a non-UTF-8 path", "True",
+            lambda: str(build_blob_request(["memory/n\udcff.md"]).endswith(b":memory/n\xff.md\n")))
+        # AC3 — a kit directory UNDER the fixture root, reached through the derivation, not a spelled
+        # prefix: a file staged there renders.
+        os.makedirs(os.path.join(t, "kitdir"), exist_ok=True)
+        write_text(os.path.join(t, "kitdir", "x.py"), "x = 1\n")
+        run("git", "add", "-A", cwd=t)
+        run("git", "commit", "-q", "-m", "kit", "--no-verify", cwd=t)
+        write_text(os.path.join(t, "kitdir", "x.py"), "x = 2\n")
+        run("git", "add", "-A", cwd=t)
+        arm("TOOL-aTrimmedHook-7 AC3 — a file under the derived kit directory renders", "True",
+            lambda: str(check_staged_render(t, conf, here=os.path.join(t, "kitdir"))[0]))
+        run("git", "reset", "-q", "--hard", "HEAD~1", cwd=t)
+        fam = {pair.split(":")[1] for pair in conf["FAMILIES"].split() if ":" in pair}
+        tracked = [p for p in run("git", "ls-files", "--", "memory/", cwd=t).split("\n") if p]
+        _union: dict = {}
+        _rre = build_roster_id_re(fam)
+        for p in tracked:
+            if p in ("memory/LIVE.md",) or p.startswith("memory/ledger/"):
+                continue
+            for i, s in extract_roster_ids(read_text(os.path.join(t, p)), _rre):
+                if p != f"memory/builds/{s}/README.md":
+                    _union.setdefault(s, set()).add(i)
+        arm("TOOL-aTrimmedHook-1 AC5 — rosters() is the per-file union of extract_roster_ids", "True",
+            lambda: str(rosters(t, tracked, "memory", fam)
+                        == {s: sorted(v, key=_roster_sort_key) for s, v in _union.items()}))
+        arm("TOOL-aTrimmedHook-1 AC6 — every artifact plan() renders is a build-index input", "[]",
+            lambda: str([p for p in plan(t, conf)[0] if not check_index_input(p, "memory", None)]))
+
+
 def cmd_selftest() -> int:
     fails = []
 
@@ -6262,6 +6541,8 @@ def cmd_selftest() -> int:
         "carries no Tier-1 skeleton fence",
         lambda: render_spec_skeleton("# T\n\n" + _q_t2, *_q_args, "", []))
 
+    test_staged_render(arm)
+
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it
     # would be one more row in the manifest for a file this one already imports. Its arms print
@@ -6593,7 +6874,7 @@ def main(argv: list) -> int:
     if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey",
                     "--report", "--bump", "--asks", "--new-build", "--new-spec", "--doctor"):
         print("usage: gen_build_index.py "
-              "[--check|--write|--check-format|--survey|--report|--bump|"
+              "[--check [--staged]|--write|--check-format|--survey|--report|--bump|"
               "--print-bindings|--asks|--new-build|--new-spec|--doctor|--selftest]")
         return 2
     try:
@@ -6636,6 +6917,14 @@ def main(argv: list) -> int:
             return cmd_report(root, conf)
         if mode == "--bump":
             return cmd_bump(root, conf)
+        # `--check --staged` (TOOL-aTrimmedHook-1): the pre-commit leg's form. A skip ANNOUNCES itself
+        # and exits 0; a render owed runs the full check unchanged, so its verdict is `--check`'s.
+        if mode == "--check" and "--staged" in argv[2:]:
+            render, why = check_staged_render(root, conf)
+            if not render:
+                print(f"build-index: render SKIPPED under --staged — {why}; the push boundary renders in full")
+                return 0
+            print(f"build-index: render owed under --staged — {why}")
         return cmd_check(root, conf) if mode == "--check" else cmd_write(root, conf)
     except Problem as exc:
         print(f"build-index: {exc}")

@@ -1338,6 +1338,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_blob_request",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "build_brief_run",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -2038,6 +2043,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_pm_commit",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "build_pm_shim",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -2196,6 +2206,11 @@
       "id": "build_role_pair",
       "kind": "function",
       "file": "tools/govkit/matrix.py"
+    },
+    {
+      "id": "build_roster_id_re",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "build_rotated_archive_re",
@@ -3698,6 +3713,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "check_index_input",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "check_inherited_override",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -4391,6 +4411,11 @@
       "id": "check_staged_backlog",
       "kind": "function",
       "file": ".githooks/straggler-guard.sh"
+    },
+    {
+      "id": "check_staged_render",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "check_stamp_line",
@@ -7313,6 +7338,11 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
+      "id": "extract_roster_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "extract_row",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -10128,31 +10158,6 @@
       "file": "tools/govkit/govkit.py"
     },
     {
-      "id": "pm_commit",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
-    },
-    {
-      "id": "pm_key",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
-    },
-    {
-      "id": "pm_red",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
-    },
-    {
-      "id": "pm_run",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
-    },
-    {
-      "id": "pm_show",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.evidence.test.sh"
-    },
-    {
       "id": "pop_guard",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.sh"
@@ -10381,6 +10386,11 @@
       "id": "print_plan_lines",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "print_pm_out",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "print_populations",
@@ -12083,9 +12093,19 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_pm_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "read_pm_mark",
       "kind": "function",
       "file": "tools/push-main.test.sh"
+    },
+    {
+      "id": "read_pm_red",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "read_pm_remote",
@@ -16598,6 +16618,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "run_pm",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "run_pm_case",
       "kind": "function",
       "file": "tools/push-main.test.sh"
@@ -19956,6 +19981,11 @@
       "id": "test_spine_nested_layout",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_staged_render",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "test_stale_declaration_is_reported_not_honoured",

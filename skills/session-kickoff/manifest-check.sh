@@ -10,7 +10,9 @@
 #   manifest-check.sh [<manifest-path>]   # full check (discovers the manifest when no path given;
 #                                         # a relative path resolves from the repo root, then from
 #                                         # the invoking directory)
-#   manifest-check.sh --staged [<path>]   # pre-commit fast leg: C1 C2 C4 C6 C7 C8 + C5s.
+#   manifest-check.sh --staged [<path>]   # pre-commit fast leg: C1 C2 C4 C6 C7 C8 + C5s, or ONE
+#                                         # NOTE and exit 0 when nothing staged touches the
+#                                         # manifest, its watch list or its verify-paths.
 #                                         # C9/C10/C11 are FULL-RUN only: they judge the working
 #                                         # tree, not what this commit stages, and the hook that
 #                                         # runs this leg fires on every commit.
@@ -39,7 +41,7 @@
 #          READY line pins a BASE that is not HEAD, an id reader that could not answer, or a route
 #          the tree cannot check: no MEMORY_ROOT, or no defined-id set).
 set -u
-KIT_MANIFEST_VERSION="1.26"   # gov:kit kickoff-manifest@1.26 — the registry id
+KIT_MANIFEST_VERSION="1.29"   # gov:kit kickoff-manifest@1.29 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -328,8 +330,21 @@ fi
 
 # The audit block's text, CR-stripped; `getval` reads one key from it. Defined here because the card
 # reads the block's `registry:` key before the checks below ever run, and one reader is one reader.
-read_block() { awk '/<!-- manifest-audit/{f=1;next} f&&/-->/{exit} f' "$1" | tr -d '\r'; }
-getval() { printf '%s\n' "$BLOCK" | sed -n "s/^[[:space:]]*$1:[[:space:]]*\(.*\)$/\1/p" | head -1 | sed 's/[[:space:]]*$//'; }
+# Both are read on every commit by the staged leg, so neither pipes (KICK-aTrimmedHook-1): the CR goes
+# inside the one awk, and the key is matched in the shell. `getval` answers what the retired
+# `sed | head | sed` did: the FIRST matching line, the value after the colon with leading and
+# trailing whitespace removed, and nothing at all when no line matches.
+read_block() { awk '{ gsub(/\r/, "") } /<!-- manifest-audit/{f=1;next} f&&/-->/{exit} f' "$1"; }
+getval() {
+  local _gl _gre="^[[:space:]]*$1:[[:space:]]*(.*)$"
+  while IFS= read -r _gl; do
+    if [[ $_gl =~ $_gre ]]; then
+      _gl=${BASH_REMATCH[1]}
+      printf '%s\n' "${_gl%"${_gl##*[![:space:]]}"}"
+      return 0
+    fi
+  done <<<"$BLOCK"
+}
 
 # The `node —` cell: the FIRST table under a `## Node registry` heading of the file the manifest's
 # `registry:` key names, backticks stripped, `$USERNAME` (else `$USER`) matched against the
@@ -1123,6 +1138,31 @@ case $? in
   *) echo "MANIFEST env ERROR — cannot read $MF"; exit 2 ;;
 esac
 
+# THE STAGED LEG'S EARLY EXIT (KICK-aTrimmedHook-1). Every check the staged leg runs reads the manifest
+# itself, a watched path or a verify-path, so a commit that stages none of the three cannot move one
+# of them; the pre-commit hook runs this leg on EVERY commit, and it used to pay the whole leg for
+# that answer. `git diff --cached` lists deletions too, so a staged deletion of a watched file or a
+# verify-path still runs the leg. A block that does not parse, an empty list, or a git that cannot
+# answer falls through to the leg below, which reports it. The push boundary runs the full leg.
+# WHAT IT DOES NOT CHECK: a manifest already broken at HEAD no longer reds a commit staging none of
+# the three — that is the full leg's finding, at the push boundary.
+if [ "$STAGED" = 1 ]; then
+  BLOCK=$(read_block "$MF")
+  _ew=$(getval 'watch'); _ev=$(getval 'verify-paths')
+  _el=()
+  if [ -n "$_ew" ] && [ -n "$_ev" ]; then
+    IFS=';' read -ra _ep <<<"$_ew;$_ev"
+    for _es in "${_ep[@]}"; do
+      _es=${_es#"${_es%%[![:space:]]*}"}; _es=${_es%"${_es##*[![:space:]]}"}
+      [ -n "$_es" ] && _el+=("$_es")
+    done
+  fi
+  if [ "${#_el[@]}" -gt 0 ] && _ed=$(git diff --cached --name-only -- "$MF" "${_el[@]}" 2>/dev/null) && [ -z "$_ed" ]; then
+    echo "NOTE: staged leg skipped — nothing staged touches the manifest, its watch list or its verify-paths; the full leg runs at the push boundary."
+    exit 0
+  fi
+fi
+
 # Forward-drift signal: manifest format older than this kit copy (no sort -V — BSD/busybox safe).
 ver_older() { awk -v a="$1" -v b="$2" 'BEGIN{na=split(a,x,".");nb=split(b,y,".");n=(na>nb?na:nb);for(i=1;i<=n;i++){d=(x[i]+0)-(y[i]+0);if(d<0){print "y";exit}if(d>0)exit}}'; }
 mver=$(sed -n 's/.*kickoff-manifest: v\([0-9][0-9.]*\).*/\1/p' "$MF" | head -1); mver=${mver%.}
@@ -1246,8 +1286,28 @@ fi
 
 if [ "$BLOCK_OK" = 1 ]; then
   # C6 — watch list is alive (a dead pathspec is a silent permanent false-green on the drift check).
+  # ONE listing for the whole watch list (KICK-aTrimmedHook-1), each LITERAL pathspec counted from it:
+  # git matches a literal as the path itself or anything under `<spec>/`, which is the case below. A
+  # spec carrying glob magic, and any literal counted zero, is asked of git on its own, so a dead
+  # verdict is always git's — a case-folding filesystem cannot turn a byte compare into a red.
+  # `core.quotePath=false` prints a non-ASCII name as itself, so it compares as itself; a name git still
+  # quotes (a quote, a backslash, a control byte) sends every count back to git (TOOL-aTrimmedHook-7).
+  _c6all=$(git -c core.quotePath=false ls-files -- "${WATCH[@]}" 2>/dev/null)
+  _c6q=""
+  case "$_c6all" in \"*|*$'\n'\"*) _c6q=1 ;; esac
   for w in "${WATCH[@]}"; do
-    n=$(git ls-files -- "$w" 2>/dev/null | wc -l | tr -d '[:space:]')
+    n=0
+    case "$w" in
+      *'*'*|*'?'*|*'['*|:*) ;;
+      # Split on newlines with globbing off, not a loop fed by a here-string of a substitution's value,
+      # which the shell-hygiene leg refuses; no line of a git listing is empty.
+      *) _c6ifs=$IFS; IFS=$'\n'; set -f
+         for _c6f in $_c6all; do
+           case "$_c6f" in "$w"|"${w%/}"/*) n=$((n+1)) ;; esac
+         done
+         set +f; IFS=$_c6ifs ;;
+    esac
+    { [ "$n" -gt 0 ] && [ -z "$_c6q" ]; } || n=$(git ls-files -- "$w" 2>/dev/null | wc -l | tr -d '[:space:]')
     if [ "$n" -eq 0 ]; then
       fail 6 "watch pathspec '$w' matches no tracked file — update the watch list to the restructured paths."
     elif [ "$n" -gt 100 ]; then

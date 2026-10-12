@@ -520,7 +520,12 @@ re-key it from the row `--emit-pin` prints.
   BYTE-COMPARES the generated index against an LF render, so an unpinned generated file on a Windows
   checkout is CRLF in the tracked copy — the normalisation keeps the gate honest, the pin keeps the
   committed bytes right, and you want both.
-- The gate is Bash (git-bash on Windows works). The `--staged` leg scopes the file-checks to staged paths.
+- The gate is Bash (git-bash on Windows works). The `--staged` leg grades the staged files and their
+  own build folders, not the whole tree: the name checks (1, 3, 4, 5) run only when a commit stages a
+  NEW name, check 10 and the legacy/debt stale-line guard are held unless their inputs are staged, and
+  each says so; a check whose staged selection is empty starts no process. Its check 9 runs
+  `gen_build_index.py --check --staged`, which renders only when a staged path can move the index (a structural path, an added or absent file, or a file whose cited ids change) and
+  otherwise prints one `render SKIPPED` line; the push boundary renders in full.
 - **`memory/project/stale-header-waiver.txt` — a build README header that is PRESENT and unparseable
   is not one that is ABSENT.** The generator raises on the first and would otherwise treat it as the
   second, regenerating the index around a corrupted header. A row here (one build README path, then
