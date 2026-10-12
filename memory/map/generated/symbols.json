@@ -1983,6 +1983,11 @@
       "file": "tools/unattended/stop-guard.test.sh"
     },
     {
+      "id": "build_pf_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "build_placement_models",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -4533,6 +4538,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_wiring_runnable",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_work_landed",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -6753,6 +6763,11 @@
       "file": "tools/unattended/resume-tick.test.sh"
     },
     {
+      "id": "derive_wiring_bound",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "derive_worktree_root",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -7803,6 +7818,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "init_bounded",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "init_declared_merge",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -7816,6 +7836,11 @@
       "id": "init_pl_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "init_preflight_probes",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "init_repo",
@@ -7991,11 +8016,6 @@
       "id": "json_artifact_inventory",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
-    },
-    {
-      "id": "json_str",
-      "kind": "function",
-      "file": "tools/check-wiring.sh"
     },
     {
       "id": "key",
@@ -9096,6 +9116,11 @@
       "id": "measure_spawn_cost",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "measure_spawn_cost",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "measure_timeline_events",
@@ -10308,6 +10333,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "print_preflight_breach",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "print_probe_populations",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
@@ -10958,6 +10988,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_bounded",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_brief_cutoff",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -11346,6 +11381,11 @@
       "id": "read_fork_cutoff",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "read_fragment_keys",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
     },
     {
       "id": "read_gate",
@@ -11923,6 +11963,21 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "read_pf_at",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_pf_pid",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_pf_rows",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "read_phase",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -12026,6 +12081,11 @@
       "id": "read_pp_key",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "read_preflight_probes",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "read_probe_allow",
@@ -14689,6 +14749,11 @@
     },
     {
       "id": "resolve_kit_file",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "resolve_kit_files",
       "kind": "function",
       "file": "tools/check-wiring.sh"
     },

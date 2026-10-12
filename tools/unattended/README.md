@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.100 -->
+<!-- gov:kit unattended@1.101 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -281,6 +281,40 @@ charged the queue to `GATE_BOUND` killed a close for contention with its bar nev
 HOST, prints a `host-degraded` hold released by `probe host`. A kill at the backstop before the bar
 printed `gate queue: acquired` prints a `host-degraded` hold released by `probe gate`. A kill after
 that line is the bar never returning, which no hold fits.
+
+## Two declared ceilings — the wiring check and preflight
+
+`TOOL-aBriskPreflight-7`, under the owner's ruling "Name it, refuse only wiring": cost is a verdict,
+but a refused preflight costs a whole re-run, so only the wiring check is killed. Both ceilings are
+file constants of the driver, `WIRING_CEILING` and `PREFLIGHT_CEILING` in seconds, beside
+`CEILING_SPAWN_MS`, the per-spawn cost both were derived to tolerate.
+
+- **`WIRING_CEILING` kills.** The wiring child runs under the smaller of it and `GATE_BOUND`. When
+  the ceiling is the smaller and fires, check 4 refuses naming it, the time the child was killed
+  after, and one spawn's cost measured at the kill beside `CEILING_SPAWN_MS`, and prints whatever
+  the check said before it died, indented. When `GATE_BOUND` is the smaller or equal, its own
+  refusal fires unchanged; `GATE_BOUND` still bounds the wiring check, and the ceiling is a second,
+  smaller kill beside it.
+- **`PREFLIGHT_CEILING` names.** A `--preflight` whose wall from the driver's first statement passes
+  it prints `unattended: preflight over its ceiling` with the wall, the ceiling and the same spawn
+  figure, after the verb's own verdict, on every return path. It kills nothing, refuses nothing,
+  leaves the exit status and the run-state file as the checks decided them, and under the ceiling
+  prints nothing.
+- **The spawn figure says load or regression.** One spawn far above `CEILING_SPAWN_MS` reads as this
+  host's load; one near it reads as the check's own cost. It is measured only on a breach, five
+  spawns of the external `true`, so a run that does not breach pays nothing.
+- **The values are derived, never typed.** Per subject, from after-arm rows: the slowest untraced
+  wall `W`, plus every traced exec `E` and fork `K` re-priced from that run's own per-spawn `S_m` and
+  per-fork `K_m` to the worst on record, `S_w` (at least 2.5 s) and `K_w` (at least 0.91 s), plus `U`,
+  each timed wait's bound less its traced window. The sum rounds up to a multiple of 30 s:
+  `W + E*max(0, S_w - S_m) + K*max(0, K_w - K_m) + U`. `CEILING_SPAWN_MS` is `S_w`. The rows and the
+  instrument that prints the three constant lines sit in that unit's build record, and a changed
+  value is a re-derivation there.
+- **Why no conf key.** A key owes a row in the protocol's key table, a governance carrier, and an
+  environment read is a new public surface; a ceiling raisable from either leaves no diff behind.
+  An adopter whose wiring check legitimately runs past `WIRING_CEILING` has no override until one is
+  added there. On a node with no working `timeout -k` the ceiling is inert, and a second NOTE says so
+  beside the one naming `GATE_BOUND`.
 
 ## Two restatements moved out of the protocol's key table
 

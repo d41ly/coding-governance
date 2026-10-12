@@ -1,0 +1,6 @@
+# **Serves:** research TOOL-aBriskPreflight-1
+label=cw-base-traced rc=0 start=1791679483.599318 end=1791680051.911689 wall=568.3
+host label=pf-real-base at=01:05:07Z spawn5=3.97 fork=0.08 paged=17319MB nonpaged=6280MB committed=48986MB cpu=31%
+host label=hook-base at=01:13:13Z spawn5=3.73 fork=0.91 paged=17357MB nonpaged=6165MB committed=49682MB cpu=32%
+hook-base rc=0 wall=53.0
+label=pf-real-base rc=0 start=1791680738.220824 wall=1218.6 spawn5=5.33

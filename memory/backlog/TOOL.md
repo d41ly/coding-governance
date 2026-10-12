@@ -40,6 +40,8 @@ Cite ids, never line numbers.
 | [TOOL-aBranchedMandate-8](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | --preflight OVERWRITES a live non-terminal run-state file, losing the… |
 | [TOOL-aBranchedMandate-10](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | map_extractors.template.py unions the two JS scans with a bare +,… |
 | [TOOL-aBranchedMandate-11](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | govkit.py's blocked skip reason is unreachable behind cmd_apply's early… |
+| [TOOL-aBriskPreflight-8](../builds/aBriskPreflight/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | owner call: a read-only selector on tools/check-wiring.sh that skips… |
+| [TOOL-aBriskPreflight-9](../builds/aBriskPreflight/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | owner call: preflight reads the unattended kit's own hook wiring before… |
 | [TOOL-aCandidStub-1](../builds/aCandidStub/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | tools/hooks/agent-cap.js blesses an identifier bound from an EMPTY… |
 | [TOOL-aCandidStub-2](../builds/aCandidStub/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | tools/memory-tree/adopt-memory-tree.sh scaffolds no gotchas/, and… |
 | [TOOL-aCollapsedScan-5](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | THE ORIGINAL FACT IS NOW FALSE and the ASK SURVIVES. Re-measured… |

@@ -1486,11 +1486,20 @@ case "$msg|$(read_token)|$(read_tip feat8)" in
 esac
 printf 'GOV_BRANCH_GATE_CMD="bash %s"\n' "$red" > .githooks/gate-env.sh
 git add .githooks/gate-env.sh; git commit -q -m "declare an untracked branch bar"
+# TOOL-aBriskPreflight-6 S3: a runner where the kit-root ladder finds it, so the refusal names it and
+# not the placeholder. The hook resolves the runner only for a push that reads it, and a declared
+# branch bar is one; a resolution keyed to the default branch alone prints the placeholder here.
+mkdir -p "$RUN_GATES"; printf '#!/usr/bin/env bash\nexit 0\n' > "$RUN_GATES/run-gates.sh"
 msg=$( ( unset GOV_DEFAULT_BRANCH GOV_GATE_CMD_TEST; git push -q mirror feat8 2>&1 ) )
 case "$msg|$(read_token)" in
   *"does not track"*"|bar-refused") ok "AC10 an untracked branch bar is refused as bar-refused" ;;
   *) bad "AC10 expected an untracked branch bar to be refused, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
 esac
+case "$msg" in
+  *"Sanctioned use: GOV_BRANCH_GATE_CMD='bash $RUN_GATES/run-gates.sh'"*) ok "AC10 the branch bar's refusal names the runner the ladder found" ;;
+  *) bad "AC10 expected the refusal to name $RUN_GATES/run-gates.sh, so a feature push with a declared branch bar resolved no runner: ${msg:-<push SUCCEEDED>}" ;;
+esac
+rm -rf "$RUN_GATES"
 # H1 — the policy file itself, UNTRACKED: refused before it is sourced, whatever it declares.
 git rm -q .githooks/gate-env.sh; git commit -q -m "undeclare the branch bar"
 mkdir -p .githooks   # `git rm` took the emptied directory with it
