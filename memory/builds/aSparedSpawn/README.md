@@ -65,7 +65,7 @@ roughly doubled in six weeks while nothing retires one.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 19 unit(s) · node a · opened 2026-10-09 · streams tooling
+**Build status:** INPROGRESS · 19 unit(s) · node a · opened 2026-10-09 · streams tooling
 ids TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14
 ids TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedSpawn-18 TOOL-aSparedSpawn-19
 
@@ -89,7 +89,7 @@ ids TOOL-aSparedSpawn-15 TOOL-aSparedSpawn-16 TOOL-aSparedSpawn-17 TOOL-aSparedS
 | [TOOL-aSparedSpawn-14 — a refusal retirement review, and a growth budget beside the floors](spec/2026-10-09-spec-TOOL-aSparedSpawn-14.md) | 3 | 2 | CLOSED | rev-4 | 2026-10-12 |
 | [TOOL-aSparedSpawn-16 — the closing review's mediums and lows, and the bar reds this build's diff carries](spec/2026-10-12-spec-TOOL-aSparedSpawn-16.md) | 4 | 2 | OPEN | rev-2 | 2026-10-12 |
 | [TOOL-aSparedSpawn-17 — an executed red under a cached ok erases the entry and quarantines the leg](spec/2026-10-12-spec-TOOL-aSparedSpawn-17.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-12 |
-| [TOOL-aSparedSpawn-18 — the width A/B instrument counts only executed verdicts and fails on a red bar](spec/2026-10-12-spec-TOOL-aSparedSpawn-18.md) | 4 | 1 | OPEN | rev-1 | 2026-10-12 |
+| [TOOL-aSparedSpawn-18 — the width A/B instrument counts only executed verdicts and fails on a red bar](spec/2026-10-12-spec-TOOL-aSparedSpawn-18.md) | 4 | 1 | INPROGRESS | rev-1 | 2026-10-12 |
 | [TOOL-aSparedSpawn-19 — the spawn-budget leg never passes a run that graded nothing it could have](spec/2026-10-12-spec-TOOL-aSparedSpawn-19.md) | 4 | 2 | OPEN | rev-1 | 2026-10-12 |
 <!-- /gen:build-units -->
 

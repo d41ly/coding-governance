@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-18 — the width A/B instrument counts only executed verdicts and fails on a red bar
 
-**Status:** OPEN · rev-1 · 2026-10-12 · node a · Tier-1 · base 8444f597 · streams tooling · order 4
+**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-1 · base 8444f597 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
