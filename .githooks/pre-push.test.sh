@@ -378,6 +378,21 @@ case "$(decide_on)" in
   *) bad "23 a record that covered the kit self-tests did not satisfy a push that runs them" ;;
 esac
 
+# 23b — TOOL-aSparedSpawn-12 AC7: a `selftests changed` record, which run-gates writes for a
+#       `GATE_SELFTESTS=changed` run that held every suite whose kit did not move, is a PARTIAL tier.
+#       Predicate 8 is unedited and must read it as not covering a switch-ON push, and as covering a
+#       switch-OFF one, since the 2026-08-27 default holds every suite anyway.
+stamp "$(git rev-parse HEAD)" changed
+case "$(decide_on)" in
+  *"FULL gate"*"kit self-tests"*) ok "23b a selftests-changed record offered for a switch-ON push → FULL" ;;
+  *) bad "23b a selftests-changed record satisfied a push that runs every kit self-test" ;;
+esac
+stamp "$(git rev-parse HEAD)" changed
+case "$(decide)" in
+  *"scoped gate"*) ok "23c a selftests-changed record satisfies a switch-OFF push" ;;
+  *) bad "23c a selftests-changed record forced a switch-OFF push, which no held record does" ;;
+esac
+
 # 24 — THE HOOK SOURCES THE REPOSITORY'S OWN GATE POLICY. TOOL-dUnstalledConvoy-28 moved gov's
 #      GATE_SELFTESTS out of this hook — which ships verbatim to every push-main adopter — and into
 #      `.githooks/gate-env.sh`, which no kit claims. The MECHANISM travels and the CHOICE does not,

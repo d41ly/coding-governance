@@ -132,7 +132,8 @@ fail=0
 # 12c's other-boot half SKIPS on a host with no readable /proc/uptime, so the floor is that count.
 # 347 -> 356, TOOL-aSparedSpawn-3: arm 9d's AC7 ledger-row assertion and the eight tail-release
 # assertions of 9k to 9m, those behind the `timeout` gate counted on a host without one as well (30 -> 38).
-FLOOR_ASSERTIONS=356
+# 356 -> 381, TOOL-aSparedSpawn-12: section 13's 25 held-tier selection assertions, none of them gated.
+FLOOR_ASSERTIONS=381
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -3479,6 +3480,109 @@ run_sp_bar s5f "$SP/x/ac6f.json" GATE_SPAWN_FLOOR="$SP/x/floor1" GATE_CENSUS_EVE
 check_sp_value "S5 the sampler's own reading holds C, ending drained, held by spawn, and every leg reports" \
   "$(cut -f6,7 "$SP/r/.git/gate-run/s5f/pauses" 2>/dev/null | tr '\t\n' ': ')|$(printf '%s\n' "$SP_OUT" | grep -c '^GATE ok ')" "drained:spawn |3"
 rm -rf "$SP" 2>/dev/null || true
+
+# ---- 13. GATE_SELFTESTS=changed, TOOL-aSparedSpawn-12 AC1 to AC6 ---------------------------------
+#    A scratch repository carrying this runner and a STUB govkit, laid out at govkit's resolved name,
+#    that prints two kits' shipped rows from a file (`--epoch` keeps the epoch roles; GOVKIT_STUB_OFF
+#    makes it exit 1). Kit kx ships its engine and suite, kit ky likewise, and uz is a selftests-chunk
+#    suite no kit ships, guarded on one file. Seeded once by a GATE_SELFTESTS=1 run, then moved one
+#    path at a time. Each arm reads the leg's OWN line, never a substring over the whole output.
+SC=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the held-tier selection arms"; exit 2; }
+GK_DIR=$(resolve_kit_dir "$_rkd_py" govkit govkit.py "$HERE") || exit 2
+GK="${GK_DIR##*/}"
+SCR="$SC/r"; mkdir -p "$SCR/$KIT_REL" "$SCR/${KIT_REL%/*}/$GK" "$SCR/kx" "$SCR/ky" "$SCR/uz" "$SCR/fx"
+cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$KITDIR/gate-fingerprint.sh" "$SCR/$KIT_REL/" 2>/dev/null
+printf '%s\n' 'import os, sys' 'if os.environ.get("GOVKIT_STUB_OFF"):' '    sys.exit(1)' \
+  'rows = [r.split(chr(9)) for r in open(os.path.join("fx", "shipped.tsv")).read().splitlines() if r]' \
+  'keep = ("engine", "seed", "rendered", "merged") if sys.argv[2:] == ["--epoch"] else None' \
+  'sys.stdout.write("".join(chr(9).join(r) + chr(10) for r in rows if keep is None or r[1] in keep))' \
+  > "$SCR/${KIT_REL%/*}/$GK/govkit.py"
+printf 'kx\tengine\tkx/engine.sh\nkx\tengine\tkx/x.test.sh\nkx\tproject-owned\tkx/notes.txt\nky\tengine\tky/engine.sh\nky\tengine\tky/y.test.sh\n' > "$SCR/fx/shipped.tsv"
+for f in kx/engine.sh ky/engine.sh ky/y.test.sh uz/z.test.sh fx/ok.sh; do printf '#!/usr/bin/env bash\nexit 0\n' > "$SCR/$f"; done
+printf '#!/usr/bin/env bash\n[ -n "${KX_RED:-}" ] && { echo "FAIL kx asked to red"; exit 1; }\nexit 0\n' > "$SCR/kx/x.test.sh"
+printf 'n\n' > "$SCR/kx/notes.txt"; printf 'g\n' > "$SCR/uz/guarded.txt"; printf 'o\n' > "$SCR/uz/other.txt"
+write_sc_legs() { # extra JSON fields for the uz row
+  printf '[{"name": "repo ok", "argv": ["bash", "fx/ok.sh"]},\n {"name": "kx suite", "argv": ["bash", "kx/x.test.sh"], "subject": "kit", "guard": ["kx/"]},\n {"name": "ky suite", "argv": ["bash", "ky/y.test.sh"], "subject": "kit", "guard": ["ky/"]},\n {"name": "uz suite", "argv": ["bash", "uz/z.test.sh"], "chunk": "selftests", "guard": ["uz/guarded.txt"]%s}]\n' "$1" > "$SC/legs.json"
+}
+write_sc_legs ""
+( cd "$SCR" && git init -q --template= -b main . && git add -A && git commit -qm base ) >/dev/null 2>&1
+run_sc_bar() { # VAR=value… -> SC_OUT
+  SC_OUT=$( cd "$SCR" && env GATE_FULL=1 GATE_BASE= GATE_REUSE= GATE_WALL= GATE_ATTRIBUTE= GATE_INHERITED_RED= \
+      GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_PROFILES= GATE_JOBS=4 GATE_PROFILE=minimal GATE_TURNSTILE=0 \
+      GATE_SELFTESTS_MAX_LAG= GATE_LEGS="$SC/legs.json" "$@" bash $KIT_REL/run-gates.sh 2>&1 )
+}
+write_sc_commit() { ( cd "$SCR" && git add -A && git commit -q --allow-empty -m "$1" ) >/dev/null 2>&1; }
+check_sc_line() { # label · ERE one whole line of SC_OUT must match
+  n=$((n+1))
+  printf '%s\n' "$SC_OUT" | grep -qE -- "$2" \
+    || { echo "canary: held-tier selection — $1: no line matched /$2/ in:"; printf '%s\n' "$SC_OUT" | sed 's/^/    /'; fail=1; }
+}
+check_sc_value() { # label · got · want
+  n=$((n+1))
+  [ "$2" = "$3" ] || { echo "canary: held-tier selection — $1: got [$2], wanted [$3]"; fail=1; }
+}
+SCREC="$SCR/.git/gate-selftest-last"
+read_sc_key() { printf '%s' "$1" | "$PYBIN" -c 'import hashlib, sys; print(hashlib.sha1(sys.stdin.buffer.read()).hexdigest()[:16])'; }
+SCKX=$(read_sc_key 'kx suite'); SCKY=$(read_sc_key 'ky suite')
+
+# 13a. S4 — a GATE_SELFTESTS=1 run on a clean tree seeds one record per executed held leg.
+run_sc_bar GATE_SELFTESTS=1
+check_sc_value "S4 a full run writes a record per held leg" "$(ls "$SCREC" 2>/dev/null | wc -l | tr -d ' ')" 3
+# 13b. AC1 — only kx's engine moved: kx executes, ky is held naming its sha, and the fallback names uz.
+printf '#!/usr/bin/env bash\n# moved\nexit 0\n' > "$SCR/kx/engine.sh"; write_sc_commit "kx engine moves"
+run_sc_bar GATE_SELFTESTS=changed
+check_sc_line "AC1 kx executes when its engine moved" '^run-gates: selftests changed: kx suite runs \(kx/engine.sh moved since [0-9a-f]{8}\)$'
+check_sc_line "AC1 ...and reports ok" '^GATE ok    kx suite$'
+check_sc_line "AC1 ky is held unchanged" '^GATE held  ky suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_value "AC1 ky does not execute" "$(printf '%s\n' "$SC_OUT" | grep -c '^GATE ok    ky suite$')" 0
+check_sc_line "AC2 the fallback line names the unowned leg" '^run-gates: selftests changed: no kit ships the suite of 1 held leg\(s\), so each selects by its guard plus its suite file: uz suite$'
+SC_OUT=$(cat "$SCR/.git/gate-full-green" 2>/dev/null)
+check_sc_line "S7 the gate-full-green stamp of a changed run reads changed" "$(printf '^selftests\tchanged$')"
+# 13c. AC2 — only ky's suite file moved, and only uz's guard moved: both execute, kx is held.
+printf '#!/usr/bin/env bash\n# moved\nexit 0\n' > "$SCR/ky/y.test.sh"; printf 'g2\n' > "$SCR/uz/guarded.txt"; write_sc_commit "ky suite and uz guard move"
+run_sc_bar GATE_SELFTESTS=changed
+check_sc_line "AC2 ky executes when only its suite file moved" '^run-gates: selftests changed: ky suite runs \(ky/y.test.sh moved since [0-9a-f]{8}\)$'
+check_sc_line "AC2 uz executes when only its guard moved" '^run-gates: selftests changed: uz suite runs \(uz/guarded.txt moved since [0-9a-f]{8}\)$'
+check_sc_line "AC2 kx is held" '^GATE held  kx suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_value "AC2 the fallback line prints once" "$(printf '%s\n' "$SC_OUT" | grep -c '^run-gates: selftests changed: no kit ships')" 1
+# 13d. AC3 — a deleted record, a non-ancestor sha, a manifest row that changed: each executes.
+rm -f "$SCREC/$SCKX"
+_scd=$(cd "$SCR" && git commit-tree "HEAD^{tree}" -m dangling)
+printf 'sha\t%s\nrow\t%s\n' "$_scd" "$(sed -n 's/^row\t//p' "$SCREC/$SCKY")" > "$SCREC/$SCKY"
+write_sc_legs ', "ceiling": 600'
+run_sc_bar GATE_SELFTESTS=changed
+check_sc_line "AC3 a deleted record executes" '^run-gates: selftests changed: kx suite runs \(no last-run record\)$'
+check_sc_line "AC3 a non-ancestor sha executes" '^run-gates: selftests changed: ky suite runs \(recorded [0-9a-f]{8} is not an ancestor of HEAD\)$'
+check_sc_line "AC3 a changed manifest row executes" '^run-gates: selftests changed: uz suite runs \(its manifest row changed since its record\)$'
+# 13e. AC4 — eleven first-parent commits with nothing moved: held under a bound of 20, executed under 10.
+for _sck in 1 2 3 4 5 6 7 8 9 10 11; do write_sc_commit "empty $_sck"; done
+run_sc_bar GATE_SELFTESTS=changed GATE_SELFTESTS_MAX_LAG=20
+check_sc_line "AC4 control: an 11-behind record holds under a bound of 20" '^GATE held  ky suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+run_sc_bar GATE_SELFTESTS=changed
+check_sc_line "AC4 an 11-behind record executes under the default bound and names the lag" '^run-gates: selftests changed: ky suite runs \(recorded [0-9a-f]{8} is 11 first-parent commits behind HEAD, beyond the bound 10\)$'
+# 13f. AC5 — a selected leg that reds loses its record; a green on a dirty tree writes none.
+printf '#!/usr/bin/env bash\n# moved again\nexit 0\n' > "$SCR/kx/engine.sh"; write_sc_commit "kx engine moves again"
+check_sc_value "AC5 setup: kx holds a record before the red run" "$([ -f "$SCREC/$SCKX" ] && echo yes)" yes
+run_sc_bar GATE_SELFTESTS=changed KX_RED=1
+check_sc_line "AC5 kx executes and reds" '^GATE FAIL  kx suite  \(exit 1\)$'
+check_sc_value "AC5 the red leg's record is gone" "$([ -f "$SCREC/$SCKX" ] && echo yes)" ""
+rm -f "$SCREC/$SCKY"; printf 'dirt\n' >> "$SCR/uz/other.txt"
+run_sc_bar GATE_SELFTESTS=changed
+check_sc_line "AC5 on a dirty tree ky executes green" '^GATE ok    ky suite$'
+check_sc_value "AC5 a dirty-tree green writes no record" "$([ -f "$SCREC/$SCKY" ] && echo yes)" ""
+( cd "$SCR" && git checkout -q -- uz/other.txt )
+# 13g. AC6 — govkit unreachable: every held leg selects by its guard, and the bar says so once. ky
+#      moves a file its kit does not ship, which holds ky while govkit answers and selects it by its
+#      guard when govkit does not.
+run_sc_bar GATE_SELFTESTS=1
+printf '#!/usr/bin/env bash\nexit 0\n' > "$SCR/ky/extra.sh"; write_sc_commit "a ky file no kit ships"
+run_sc_bar GATE_SELFTESTS=changed
+check_sc_line "AC6 control: with govkit reachable an unshipped ky file holds ky" '^GATE held  ky suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+run_sc_bar GATE_SELFTESTS=changed GOVKIT_STUB_OFF=1
+check_sc_value "AC6 the unreachable line prints once" "$(printf '%s\n' "$SC_OUT" | grep -c '^run-gates: selftests changed: govkit is not reachable .*, so every held leg selects by its guard plus its suite file$')" 1
+check_sc_line "AC6 ky selects by its guard" '^run-gates: selftests changed: ky suite runs \(ky/extra.sh moved since [0-9a-f]{8}\)$'
+check_sc_line "AC6 kx is held on diff evidence" '^GATE held  kx suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+rm -rf "$SC" 2>/dev/null || true
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

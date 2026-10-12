@@ -4248,6 +4248,16 @@
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
+      "id": "check_sc_line",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "check_sc_value",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "check_scratch_guard",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -12348,6 +12358,11 @@
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
+      "id": "read_sc_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "read_scan_overlaps",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -16686,6 +16701,11 @@
       "id": "run_sb_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "run_sc_bar",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "run_scoped",
@@ -21036,6 +21056,16 @@
       "id": "write_runlog_verdict",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "write_sc_commit",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "write_sc_legs",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "write_session",

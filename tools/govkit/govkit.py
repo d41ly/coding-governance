@@ -12744,13 +12744,17 @@ def resolve_descriptor_paths(desc: dict, tool_root: str) -> dict:
     return desc
 
 
-def cmd_shipped(root: pathlib.Path) -> int:
+def cmd_shipped(root: pathlib.Path, epoch: bool = False) -> int:
     """TOOL-aRepatriatedFork-16 S1 — what THIS repo ships, as ONE derivation.
 
     One `<entry>\\t<role>\\t<src>` row per descriptor survivor carrying a source, sorted. The
     install-prefix gate used to carry this as its own heredoc over the same calls, and two further
-    readers were about to paste it again. Read-only, no arguments. A registry naming a broken
-    descriptor exits 1 and prints NO row: a reader must not grade a narrowed set as the whole one.
+    readers were about to paste it again. Read-only. A registry naming a broken descriptor exits 1
+    and prints NO row: a reader must not grade a narrowed set as the whole one.
+
+    `epoch` (the `--epoch` flag, TOOL-aSparedSpawn-12 S6) keeps only the rows whose role is in
+    `EPOCH_ROLES`, the filter `derive_epoch_state` applies to these same survivors, so "this kit
+    moved" has one answer for the version-bump rule and for the run-gates held-tier selection.
     """
     r = Report()
     descs = read_descriptors(root, load_registry(root), r)
@@ -12760,7 +12764,8 @@ def cmd_shipped(root: pathlib.Path) -> int:
         return 1
     rows = {f"{eid}\t{row['role']}\t{row['src']}"
             for eid, (d, _p) in descs.items()
-            for row in resolve_entry(root, d, canonical_ctx(eid))["survivors"] if row.get("src")}
+            for row in resolve_entry(root, d, canonical_ctx(eid))["survivors"] if row.get("src")
+            and (not epoch or row["role"] in EPOCH_ROLES)}
     sys.stdout.write("".join(f"{x}\n" for x in sorted(rows)))
     return 0
 
@@ -13046,7 +13051,7 @@ def cmd_mint(root: pathlib.Path, base: str, head: str | None) -> int:
 # ------------------------------------------------------------------------------------------- main
 USAGE = """usage:
   govkit.py selfcheck [--write] [--fix]
-  govkit.py shipped
+  govkit.py shipped [--epoch]
   govkit.py epoch [--base <rev>]
   govkit.py mint --base <rev> [--head <rev>]
   govkit.py plan --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
@@ -13519,6 +13524,11 @@ def main(argv: list[str]) -> int:
             if len(flags) != len(set(flags)) or any(a not in ("--write", "--fix") for a in flags):
                 raise Refusal("selfcheck takes no arguments except --write and --fix")
             return selfcheck(repo_root(), write="--write" in flags, fix="--fix" in flags)
+        if argv[0] == "shipped":
+            # Parsed here and not in `parse_args`: `--epoch` is this verb's alone.
+            if argv[1:] not in ([], ["--epoch"]):
+                raise Refusal("shipped takes no arguments except --epoch")
+            return cmd_shipped(repo_root(), epoch=len(argv) == 2)
         if argv[0] == "epoch":
             # Parsed here and not in `parse_args`: `--base` is this verb's alone.
             if len(argv) not in (1, 3) or (len(argv) == 3 and argv[1] != "--base"):
@@ -13540,10 +13550,6 @@ def main(argv: list[str]) -> int:
          PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE, STAGED, ACCEPT_ROLE_MOVES,
          SUGGEST_PINS) = parse_args(argv)
         root = repo_root()
-        if verb == "shipped":
-            if len(argv) > 1:
-                raise Refusal("shipped takes no arguments")
-            return cmd_shipped(root)
         if verb == "contribute":
             if target is None:
                 raise Refusal("contribute needs an explicit --target: the adopter tree to "

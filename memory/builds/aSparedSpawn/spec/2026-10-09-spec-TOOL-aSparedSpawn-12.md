@@ -1,11 +1,15 @@
 # TOOL-aSparedSpawn-12 — the held self-test tier, selected by the kit whose shipped bytes moved
 
-**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
+**Status:** CLOSED · rev-3 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aSparedSpawn-12-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-12-acceptance-ledger.md) | journal | — |
+| [2026-10-12-build-TOOL-aSparedSpawn-12-direct-checks.sh](../build/2026-10-12-build-TOOL-aSparedSpawn-12-direct-checks.sh) | journal | — |
+| [2026-10-12-build-TOOL-aSparedSpawn-12-select-sim.out](../build/2026-10-12-build-TOOL-aSparedSpawn-12-select-sim.out) | journal | — |
+| [2026-10-12-build-TOOL-aSparedSpawn-12-select-sim.py](../build/2026-10-12-build-TOOL-aSparedSpawn-12-select-sim.py) | journal | — |
 | [2026-10-11-prompt-TOOL-aSparedSpawn-12-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-12-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

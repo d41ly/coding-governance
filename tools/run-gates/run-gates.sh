@@ -236,6 +236,12 @@ ATTR_POLICY=${GATE_INHERITED_RED:-}
 ATTR_MAX_AGE=${GATE_INHERITED_RED_MAX_AGE:-}
 unset GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE
 case "$ATTR_MAX_AGE" in ''|0*|*[!0-9]*) ATTR_MAX_AGE="" ;; esac
+# WHAT THE HELD TIER WAS ASKED FOR, as every record of this run states it (TOOL-aSparedSpawn-12 S7):
+# empty when held, `changed` when only the legs whose kit moved run, `1` for any other non-empty
+# value. A `changed` run is never written as `1`, so a partial tier is never recorded as the whole one,
+# and `.githooks/pre-push` predicate 8 forces a self-tests-on push over such a record unedited.
+SELFTESTS_STAMP=${GATE_SELFTESTS:+1}
+[ "${GATE_SELFTESTS:-}" = changed ] && SELFTESTS_STAMP=changed
 
 # ---- durable per-leg evidence (TOOL-dNomadicAtlas-1) --------------------------------------------
 # leg() already holds every leg's merged output in $out and PRINTS it on failure, then keeps only the
@@ -2042,7 +2048,7 @@ write_runlog_verdict() { # the status the EXIT trap saw -> one ev=once line appe
   key=(v t p ev run wt head started full selftests verdict stage ran failed skipped held reused
        wall_breach rc)
   val=(1 "$t" gates once "${RUNID:-}" "$rh_worktree" "$rh_head" "$rh_started" "$rh_full"
-       "${GATE_SELFTESTS:+1}" "$rv_verdict" "$stage" "$rv_ran" "$rv_failed" "$rv_skipped" "$rv_held"
+       "$SELFTESTS_STAMP" "$rv_verdict" "$stage" "$rv_ran" "$rv_failed" "$rv_skipped" "$rv_held"
        "$rv_reused" "$rv_wall_breach" "$rc")
   for i in ${fails[@]+"${!fails[@]}"}; do
     if [ "$n" -lt "$RUNLOG_FAIL_CAP" ]; then n=$((n + 1)); key+=("fail.$n"); val+=("${fails[i]}")
@@ -2272,7 +2278,7 @@ TREE_CLEAN=no
 _pm_args=()
 [ "$PROCMON_CONF" = 1 ] && _pm_args=(process-monitor reap.py "$KITDIR")
 legs=$("$PYBIN" -c "$RKD_PROGRAM"'
-import json, os, statistics, sys
+import hashlib, json, os, statistics, sys
 # THE PROCESS-MONITOR KIT DIR (TOOL-aSparedSpawn-4 S10), asked by argv[5] to argv[7] and answered as the
 # runner wrapper of the resolver answered it: the dir relative to the nearest directory holding .git,
 # or the refusal text. A refusal never ends this program, because the manifest still has to be read.
@@ -2397,6 +2403,12 @@ rows += [l["name"] + "\x1e" + ",".join(resolve_prefix_token(g, troot) for g in l
          # reads as absent, which is the direction that runs the leg (TOOL-dThriftyLanding-1).
          + "\x1e" + ("=" + ",".join(resolve_prefix_token(g, troot) for g in l["doc_reads"])
                             if isinstance(l.get("doc_reads"), list) else "")
+         # THE TENTH AND ELEVENTH FIELDS, appended for the same reason, read only by the held-tier
+         # selection (TOOL-aSparedSpawn-12 S4): the row hash, the SHA-1 of this row as JSON with
+         # sorted keys, so a record earned under another row reads as stale; and the record name,
+         # the first 16 hex of the SHA-1 of the leg name, which stays put when the row changes.
+         + "\x1e" + hashlib.sha1(json.dumps(l, sort_keys=True).encode()).hexdigest()
+         + "\x1e" + hashlib.sha1(str(l["name"]).encode()).hexdigest()[:16]
          for l in data]
 if pm is not None:
     rows = [pm] + rows
@@ -2415,12 +2427,14 @@ unset _pm_args
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
-names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); signatures=(); docreads=(); ORDER=""; first=1
+names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); signatures=(); docreads=()
+rowhashes=(); heldkeys=(); ORDER=""; first=1
 while IFS= read -r line; do
   if [ "$first" = 1 ]; then IFS=$'\x1e' read -r ORDER PY_ID <<<"$line"; first=0; continue; fi
-  IFS=$'\x1e' read -r nm gd_ av im ch sj ce sg dr <<<"$line"
+  IFS=$'\x1e' read -r nm gd_ av im ch sj ce sg dr rwh_ hky_ <<<"$line"
   names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}"); chunks+=("${ch:-default}")
   subjects+=("${sj:-repo}"); ceilings+=("${ce:-}"); signatures+=("${sg:-}"); docreads+=("${dr:-}")
+  rowhashes+=("${rwh_:-}"); heldkeys+=("${hky_:-}")
 done <<<"$legs"
 total=${#names[@]}
 
@@ -2491,6 +2505,148 @@ CENSUS_TOKENS="$WORK/census.tokens"
 } > "$CENSUS_TOKENS" 2>/dev/null || CENSUS_TOKENS=""
 unset _ct_av _ct_w
 
+# ---- THE HELD TIER, SELECTED BY THE KIT WHOSE SHIPPED BYTES MOVED (TOOL-aSparedSpawn-12) -----------
+# `GATE_SELFTESTS=changed` runs a held leg only when one of these holds, and holds it otherwise with a
+# line naming the sha it is unchanged since: it has no last-run record, an unreadable one, one whose
+# sha is not an ancestor of HEAD, or one earned under another manifest row; its record sits more than
+# `GATE_SELFTESTS_MAX_LAG` (default 10, owner ruling F2) first-parent commits behind HEAD; or a path in
+# its SELECTION SET differs between the recorded sha and the working tree. The set is the owning
+# kit's shipped sources in govkit's EPOCH_ROLES (`govkit.py shipped --epoch`, the derivation the
+# version-bump rule reads) plus the suite file; the owner is every govkit entry whose `shipped` rows
+# carry one of the leg's suite files, which are the argv words the census above reads. A leg no entry
+# owns, and every leg when govkit cannot be reached, selects by its guard plus its suite file instead,
+# and the bar says so once. A record is written only by a leg that EXECUTED green on a clean, unmoved
+# tree, under any non-empty `GATE_SELFTESTS` (the writer is beside the full-green stamp).
+#
+# THE DECISION IS MADE ONCE, here, by one program, and read twice: the hold pass below reads the
+# `<i>.unchanged` file it leaves and `report_one` prints from the same file. A leg it says nothing
+# about executes, so a crashed selection costs time and never a held suite. govkit is a sibling kit and
+# this runner is an engine, so it is reached through `resolve_kit_dir`, never by literal.
+#
+# WHAT THIS DOES NOT CHECK: that a selection set is complete. A suite reading a file its kit does not
+# ship is held while that file moves, until the lag bound executes it. Untracked files are not in
+# `git diff`, so a new file nobody added selects nothing. Nothing at any push boundary sets this mode,
+# by owner ruling F1; it serves developer and Definition-of-Done runs.
+HELD_DIR=""; [ -n "$RG_COMMON_RAW" ] && HELD_DIR="$RG_COMMON_RAW/gate-selftest-last"
+if [ "${GATE_SELFTESTS:-}" = changed ]; then
+  SELFTESTS_MAX_LAG=10
+  if [ -n "${GATE_SELFTESTS_MAX_LAG:-}" ]; then
+    if num_ok "$GATE_SELFTESTS_MAX_LAG"; then SELFTESTS_MAX_LAG=$((10#$GATE_SELFTESTS_MAX_LAG))
+    else echo "run-gates: NOTE - GATE_SELFTESTS_MAX_LAG='$GATE_SELFTESTS_MAX_LAG' is not a positive integer, so the held-tier lag bound is $SELFTESTS_MAX_LAG" >&2; fi
+  fi
+  _sel_in=""
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    { [ "${subjects[$i]}" = kit ] || [ "${chunks[$i]}" = selftests ]; } || continue
+    _sel_in+="$i"$'\x1e'"${names[$i]}"$'\x1e'"${heldkeys[$i]}"$'\x1e'"${rowhashes[$i]}"$'\x1e'"${guards[$i]}"$'\x1e'"${argvs[$i]}"$'\n'
+  done
+  # Output rows, RS-separated: `F` and a note printed once; `R`, a leg index and why it runs; `H`, a
+  # leg index and the short sha it is unchanged since. NOTE: single-quoted, so no apostrophe below.
+  _sel_out=$(printf '%s' "$_sel_in" | "$PYBIN" -c "$RKD_PROGRAM"'
+import subprocess, sys
+here, rdir, head, bound = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4])
+legs = [r.split("\x1e") for r in sys.stdin.buffer.read().decode("utf-8").split("\n") if r]
+out = []
+
+def run_git(*args):
+    p = subprocess.run(["git", *args], capture_output=True, text=True, encoding="utf-8", errors="replace")
+    return p.returncode, p.stdout
+
+def check_hit(path, specs):
+    for g in specs:
+        if g == "" or path == g.rstrip("/") or path.startswith(g.rstrip("/") + "/"):
+            return True
+    return False
+
+# The two govkit questions, asked once each. Any refusal or nonzero exit is "cannot be reached".
+owners, epoch, why = None, {}, ""
+try:
+    gk = str(resolve_kit_dir("govkit", "govkit.py", here) / "govkit.py")
+    rows = []
+    for extra in ([], ["--epoch"]):
+        p = subprocess.run([sys.executable, gk, "shipped", *extra], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
+        if p.returncode != 0:
+            raise LookupError("govkit.py shipped %s exited %d" % (" ".join(extra), p.returncode))
+        rows.append([r.split("\t") for r in p.stdout.splitlines() if r.count("\t") == 2])
+    owners = {}
+    for e, _role, src in rows[0]:
+        owners.setdefault(src, set()).add(e)
+    for e, _role, src in rows[1]:
+        epoch.setdefault(e, set()).add(src)
+except Exception as ex:
+    why = " ".join(str(ex).split())
+
+fallback, todo = [], {}
+for i, name, key, rowhash, guard, argv in legs:
+    suites = [w for w in argv.split("\x1f") if "/" in w and not any(c.isspace() for c in w)
+              and w.endswith((".sh", ".py", ".js"))]
+    ents = set().union(*(owners.get(s, set()) for s in suites)) if owners is not None else set()
+    if ents:
+        specs = set(suites).union(*(epoch.get(e, set()) for e in ents))
+    else:
+        specs = set(suites) | set(g for g in guard.split(",") if g) if guard else {""}
+        if owners is not None:
+            fallback.append(name)
+    sha = rowseen = ""
+    try:
+        with open(rdir + "/" + key, encoding="utf-8") as fh:
+            for ln in fh.read().splitlines():
+                k, _, v = ln.partition("\t")
+                if k == "sha":
+                    sha = v
+                elif k == "row":
+                    rowseen = v
+    except OSError:
+        out.append("R\x1e%s\x1eno last-run record" % i); continue
+    if len(sha) < 40 or any(c not in "0123456789abcdef" for c in sha) or not rowseen:
+        out.append("R\x1e%s\x1eits last-run record is unreadable" % i); continue
+    if rowseen != rowhash:
+        out.append("R\x1e%s\x1eits manifest row changed since its record" % i); continue
+    if not head:
+        out.append("R\x1e%s\x1eHEAD is unborn" % i); continue
+    todo.setdefault(sha, []).append((i, specs))
+
+for sha, members in todo.items():
+    s8 = sha[:8]
+    why_run = ""
+    if run_git("merge-base", "--is-ancestor", sha, head)[0] != 0:
+        why_run = "recorded %s is not an ancestor of HEAD" % s8
+    else:
+        rc, n = run_git("rev-list", "--count", "--first-parent", sha + ".." + head)
+        if rc != 0 or not n.strip().isdigit():
+            why_run = "the lag behind recorded %s could not be read" % s8
+        elif int(n) > bound:
+            why_run = "recorded %s is %d first-parent commits behind HEAD, beyond the bound %d" % (s8, int(n), bound)
+    if why_run:
+        out += ["R\x1e%s\x1e%s" % (i, why_run) for i, _s in members]; continue
+    rc, moved = run_git("-c", "core.quotePath=false", "diff", "--name-only", "--no-renames", sha)
+    if rc != 0:
+        out += ["R\x1e%s\x1ethe diff since recorded %s could not be read" % (i, s8) for i, _s in members]
+        continue
+    moved = [m for m in moved.splitlines() if m]
+    for i, specs in members:
+        hit = next((m for m in moved if check_hit(m, specs)), "")
+        out.append("R\x1e%s\x1e%s moved since %s" % (i, hit, s8) if hit else "H\x1e%s\x1e%s" % (i, s8))
+
+if why:
+    out.insert(0, "F\x1egovkit is not reachable (%s), so every held leg selects by its guard plus its suite file" % why)
+elif fallback:
+    out.insert(0, "F\x1eno kit ships the suite of %d held leg(s), so each selects by its guard plus its suite file: %s"
+               % (len(fallback), ", ".join(fallback)))
+sys.stdout.buffer.write("".join(r + "\n" for r in out).encode("utf-8"))
+' "$KITDIR" "$HELD_DIR" "$RG_HEAD" "$SELFTESTS_MAX_LAG") \
+    || echo "run-gates: selftests changed: the selection program failed, so every held leg it did not decide executes" >&2
+  while IFS=$'\x1e' read -r _sel_k _sel_i _sel_v; do
+    case "$_sel_k" in
+      F) printf 'run-gates: selftests changed: %s\n' "$_sel_i" ;;
+      R) printf 'run-gates: selftests changed: %s runs (%s)\n' "${names[$_sel_i]}" "$_sel_v" ;;
+      H) printf '%s' "$_sel_v" > "$WORK/$_sel_i.unchanged" ;;
+    esac
+  done <<<"$_sel_out"
+  unset _sel_in _sel_out _sel_k _sel_i _sel_v
+fi
+
 # UNBOUNDED LEGS ARE REPORTED, NEVER REFUSED. TOOL-aBoundedCeiling-1 S6. The runner cannot know
 # whether a row with no ceiling is a gov leg somebody forgot or an adopter leg the deployer has no
 # business bounding, and a refusal it cannot justify is a refusal that reds a tree for a field it
@@ -2524,8 +2680,10 @@ for ((i=0; i<total; i++)); do
   # `GATE_SELFTESTS=1` remains the way to ask for it. The push boundary is where it matters, and
   # `.githooks/pre-push` decides there against a recorded green whose `selftests` key says whether
   # the recorded run had them held.
+  # Under `GATE_SELFTESTS=changed` a held leg the selection above found unchanged is held the same
+  # way, and its `.unchanged` file is what `report_one` names the sha from (TOOL-aSparedSpawn-12).
   if { [ "${subjects[$i]}" = kit ] || [ "${chunks[$i]}" = selftests ]; } \
-     && [ -z "${GATE_SELFTESTS:-}" ]; then
+     && { [ -z "${GATE_SELFTESTS:-}" ] || [ -f "$WORK/$i.unchanged" ]; }; then
     printf 'ondemand' > "$WORK/$i.rc"; continue
   fi
   # THE DOCS MODE DECIDES A DECLARING LEG BY ITS DOC READS ALONE. Its guard is a statement about
@@ -2746,6 +2904,7 @@ if [ -n "$RUNDIR" ]; then
     printf 'full\t%s\n' "${GATE_FULL:+1}"
     printf 'docs_base\t%s\n' "$DOCS_BASE"
     printf 'full_from\t%s\n' "${GATE_FULL:+GATE_FULL}"
+    printf 'selftests\t%s\n' "$SELFTESTS_STAMP"   # the held-tier mode, TOOL-aSparedSpawn-12
     # THE RUN ENVELOPE IS FOUR KEYS, NOT ONE. The width alone was what an earlier draft recorded,
     # written when the width was a number this script computed. It is now a DECLARED row, so a
     # later reader comparing two runs needs the row NAME, the resolved width, the per-leg timeout
@@ -3146,7 +3305,10 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     # and `skips` is conjoined into the `gate-full-green` stamp, so counting an on-demand skip there
     # would silence the stamp and pin `.githooks/pre-push` into forcing a full run forever.
     ondemands=$((ondemands+1)); c_ondemand=$((c_ondemand+1))
-    printf 'GATE held  %s  (self-test, set GATE_SELFTESTS=1 to run)\n' "${names[$i]}"
+    local since=""
+    { IFS= read -r since < "$WORK/$i.unchanged"; } 2>/dev/null
+    if [ -n "$since" ]; then printf 'GATE held  %s  (self-test, unchanged since %s)\n' "${names[$i]}" "$since"
+    else printf 'GATE held  %s  (self-test, set GATE_SELFTESTS=1 to run)\n' "${names[$i]}"; fi
   elif [ "$rc" = skip ]; then
     skips=$((skips+1)); c_skip=$((c_skip+1)); printf 'GATE skip  %s  (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
   elif [ "$rc" = docskip ]; then
@@ -4449,6 +4611,35 @@ reuses=${reuses:-0}
 FPRINT_END=$(fingerprint)
 tree_moved=no
 [ -n "$FPRINT_START" ] && [ -n "$FPRINT_END" ] && [ "$FPRINT_START" != "$FPRINT_END" ] && tree_moved=yes
+
+# THE HELD-TIER LAST-RUN RECORDS (TOOL-aSparedSpawn-12 S4), which the `changed` selection reads. Per
+# held leg that EXECUTED under any non-empty `GATE_SELFTESTS`: a first-attempt green on a tree that was
+# clean when the run started and did not move writes `<common dir>/gate-selftest-last/<name key>`
+# (HEAD and the manifest row hash, tmp then rename); any other ending, a red, a timeout whose retry
+# passed or no result, removes it, so a red suite keeps executing until it is fixed. A green on a
+# dirty or moved tree leaves the record as it was, and a held, skipped or reused leg did not execute
+# and leaves it too. One file per leg, so two bars finishing together lose no row. A wall breach
+# exits above this block, so its legs keep the records an earlier green earned on inputs that the
+# next selection still diffs against.
+if [ -n "${GATE_SELFTESTS:-}" ] && [ -n "$HELD_DIR" ] && [ -n "$RG_HEAD" ]; then
+  mkdir -p "$HELD_DIR" 2>/dev/null || true
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    { [ "${subjects[$i]}" = kit ] || [ "${chunks[$i]}" = selftests ]; } || continue
+    [ -n "${heldkeys[$i]}" ] || continue
+    _hrc=""; { IFS= read -r _hrc < "$WORK/$i.rc"; } 2>/dev/null
+    case "$_hrc" in ondemand|skip|docskip|reuse) continue ;; esac
+    _hfile="$HELD_DIR/${heldkeys[$i]}"
+    if [ "$_hrc" = 0 ]; then
+      [ "$TREE_CLEAN" = yes ] && [ "$tree_moved" = no ] || continue
+      printf 'sha\t%s\nrow\t%s\n' "$RG_HEAD" "${rowhashes[$i]}" > "$_hfile.tmp.$$" 2>/dev/null \
+        && mv -f "$_hfile.tmp.$$" "$_hfile" 2>/dev/null || true
+    else
+      rm -f "$_hfile" 2>/dev/null || true
+    fi
+  done
+  unset _hrc _hfile
+fi
 # THE BREACH IS READ HERE, from the marker and not from `fails`. A killed leg writes no `.rc`, so
 # whether `fails` moved at all is a RACE between the watcher's kill and the reader's report -- both
 # outcomes were reproduced. The marker is the only fact that is true on every path, so the durable
@@ -4530,7 +4721,7 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
     # whether the kit-subject legs ran, and the push boundary would trust a partial bar as
     # a whole one. The READER of this field is TOOL-dUnstalledConvoy-27; written without
     # that reader it is an inert byte, which is what a spec audit caught rev-2 shipping.
-    printf 'selftests\t%s\n' "${GATE_SELFTESTS:+1}"
+    printf 'selftests\t%s\n' "$SELFTESTS_STAMP"
     printf 'run_id\t%s\n' "$RUNID"
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   } > "$gd/gate-full-green.tmp" 2>/dev/null \
@@ -4572,7 +4763,7 @@ if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ "$ATTR_LANDABLE" = 1 ] \
     printf 'sha\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"
     printf 'fingerprint\t%s\n' "$FPRINT_START"
     printf 'manifest_blob\t%s\n' "$(git hash-object -- "$LEGS_FILE" 2>/dev/null)"
-    printf 'selftests\t%s\n' "${GATE_SELFTESTS:+1}"
+    printf 'selftests\t%s\n' "$SELFTESTS_STAMP"
     printf 'base\t%s\n' "$ATTR_RSHA"
     printf 'max_age\t%s\n' "$ATTR_MAX_AGE"
     printf 'legs\t%s\n' "$ATTR_LAND_LEGS"

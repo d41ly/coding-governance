@@ -105,6 +105,32 @@ The state reaches two other readers: the deployer, which reads a held leg as `he
 leg that vanished, and the `gate-full-green` stamp, which records whether the run covered them so a
 push boundary cannot mistake a partial bar for a whole one.
 
+### `GATE_SELFTESTS=changed` — only the held legs whose kit moved
+
+A developer tool, and a Definition-of-Done one: no push boundary sets it (TOOL-aSparedSpawn-12, owner
+ruling F1). A held leg executes when any of these holds, and is otherwise held with
+`GATE held  <name>  (self-test, unchanged since <sha8>)`:
+
+- it has no last-run record, an unreadable one, one whose sha is not an ancestor of `HEAD`, or one
+  earned under a different manifest row;
+- the record sits more than `GATE_SELFTESTS_MAX_LAG` first-parent commits behind `HEAD` (default
+  10, the value of the push boundary's `GATE_FULL_MAX_LAG`), so no `changed` run holds a suite on a
+  record that old;
+- a path in its selection set differs between the recorded sha and the working tree.
+
+The selection set is the owning kit's shipped sources in govkit's epoch roles
+(`govkit.py shipped --epoch`, the same rows the version-bump rule reads) plus the suite file; the
+owner is every govkit entry whose `shipped` rows carry one of the leg's suite files. A leg no kit
+owns, and every leg when govkit cannot be reached, selects by its `guard` plus its suite file, and the
+bar says so once. Each executing leg gets a `run-gates: selftests changed: <name> runs (<reason>)`
+line before dispatch.
+
+The record is one file per held leg under `<git-common-dir>/gate-selftest-last/`, shared by every
+worktree of the clone. It is written only by a leg that executed green on a tree that was clean when
+the run started and did not move, under any non-empty `GATE_SELFTESTS`, so a `GATE_SELFTESTS=1` run
+seeds every record; a red or a retried pass removes it. The `gate-full-green` stamp of such a run
+says `selftests changed`, never `1`, and a push that runs the self-tests forces over it.
+
 ## Why it became a kit
 
 It was a registry EXEMPTION, with two stated reasons that were both exact. It sourced `<prefix>/lib/`,

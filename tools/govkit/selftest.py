@@ -932,6 +932,19 @@ def check_shipped_verb(tmp: pathlib.Path) -> None:
                          "shipped", "--all"], capture_output=True, text=True, encoding="utf-8")
     check("[aRF-16 S1] `shipped` refuses an argument", pr.returncode == 2
           and "shipped takes no arguments" in pr.stderr, pr.stderr)
+    # TOOL-aSparedSpawn-12 AC8: `--epoch` keeps the rows in EPOCH_ROLES and drops the rest. The
+    # predicate is observed REJECTING the unfiltered output, which carries the `generated` row an
+    # `--epoch` that ignored its flag would print.
+    pe = subprocess.run([sys.executable, str(fx / PFX / KIT_NAMES["govkit"] / "govkit.py"),
+                         "shipped", "--epoch"], capture_output=True, text=True, encoding="utf-8")
+
+    def check_epoch_rows(lines: list[str]) -> bool:
+        roles = govkit_module().EPOCH_ROLES   # the engine's own set, never a typed copy
+        return lines == [want[0]] and all(ln.split("\t")[1] in roles for ln in lines)
+    check("[aSS-12 AC8] `shipped --epoch` prints exactly the rows whose role is in EPOCH_ROLES",
+          pe.returncode == 0 and check_epoch_rows(pe.stdout.splitlines()), pe.stdout + pe.stderr)
+    check("[aSS-12 AC8] ...and the same predicate REJECTS the unfiltered rows, generated one included",
+          not check_epoch_rows(p.stdout.splitlines()), p.stdout)
 
 
 def check_epoch_verb(tmp: pathlib.Path) -> None:
