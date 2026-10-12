@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-18 — the role roster, derived into the charter by the roles kit's own verb
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 18
+**Status:** INPROGRESS · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
