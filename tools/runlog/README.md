@@ -1,6 +1,6 @@
 # runlog — one line grammar for run logs, and one reader for them
 
-<!-- gov:kit runlog@1.12 -->
+<!-- gov:kit runlog@1.13 -->
 
 Three producers append one line per act to a machine-local journal: the unattended driver, the gate
 runner and the pre-push hook. Several consumers read those lines. This kit gives all of them ONE

@@ -3,7 +3,7 @@
  * format-guard — a `Stop` hook that refuses the turn end of a session routed to a live build when the
  * final message lacks the charter's BUILD/SPEC pair, breaks rule r1, or leaves a new commit unreported.
  *
- * gov:kit agent-cap@1.34 — ships inside the hooks kit entry; the kit version is agent-cap.js's.
+ * gov:kit agent-cap@1.35 — ships inside the hooks kit entry; the kit version is agent-cap.js's.
  *
  * Contract: the spec for TOOL-aHeardState-1 under the build folder of that slug.
  *
