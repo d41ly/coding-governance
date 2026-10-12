@@ -1,6 +1,6 @@
 # TOOL-aHeardState-4 — the format-guard self-test guard names the hook files, not the whole hooks directory
 
-**Status:** SPECCED · rev-1 · 2026-10-13 · node a · Tier-1 · base 2f9dfaf0 · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-10-13 · node a · Tier-1 · base 2f9dfaf0 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -18,7 +18,8 @@ spec-tokens join for every spec. Narrow the guard to the hook files the suite re
 
 - **S1** — the `format-guard self-test` row's guard in `tools/gate-legs.json` names
   `{prefix}/hooks/format-guard.js`, `{prefix}/hooks/format-guard.test.sh`,
-  `{prefix}/hooks/scratch-guard.js` and `AGENTS.md` instead of `{prefix}/hooks/`. Observed by AC1.
+  and `{prefix}/hooks/scratch-guard.js`, exactly those three, since govkit's check 7c refuses a guard
+  on the root charter file as a pathspec in no declared class. Observed by AC1.
 
 ## 3. Non-goals (OUT)
 
@@ -39,7 +40,9 @@ One guard list in one row, edited to exact paths.
 ## 5. Acceptance criteria
 
 - **AC1** — When `python tools/check-spec-tokens.py --list` runs, its broad-guard line no longer names
-  `tools/hooks/`. Red when: the list still counts six legs on that guard and excludes it.
+  `tools/hooks/`, and `python tools/govkit/govkit.py selfcheck` names no guard pathspec in zero
+  classes. Red when: the list still counts six legs on that guard and excludes it, or `AGENTS.md` is
+  still a guard.
 
 ## 6. Gates
 
@@ -52,3 +55,6 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-10-13 · initial draft, promoted from closing review round 1 id 9.
+- rev-2 · 2026-10-13 · S1 · AC1 · govkit selfcheck refuses `AGENTS.md` as a guard pathspec (check 7c,
+  a root file no kit declares as its conf), so the narrowed guard drops it; a charter edit no longer
+  re-runs this leg, and `micro-format definitions` grades the fence itself.

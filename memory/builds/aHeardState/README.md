@@ -65,7 +65,7 @@ ids TOOL-aHeardState-1 TOOL-aHeardState-2 TOOL-aHeardState-3 TOOL-aHeardState-4 
 | [TOOL-aHeardState-1 — format-guard: the turn end refuses a final message without the BUILD/SPEC pair or a committed line](spec/2026-10-11-spec-TOOL-aHeardState-1.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-10-12 |
 | [TOOL-aHeardState-2 — runlog prose: a transcript measure of narration, interjections and pair emission](spec/2026-10-11-spec-TOOL-aHeardState-2.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-10-13 |
 | [TOOL-aHeardState-3 — the format-guard self-test leg gets its subject pin and its budget row](spec/2026-10-13-spec-TOOL-aHeardState-3.md) | 3 | 1 | SPECCED | rev-1 | 2026-10-13 |
-| [TOOL-aHeardState-4 — the format-guard self-test guard names the hook files, not the whole hooks directory](spec/2026-10-13-spec-TOOL-aHeardState-4.md) | 4 | 1 | SPECCED | rev-1 | 2026-10-13 |
+| [TOOL-aHeardState-4 — the format-guard self-test guard names the hook files, not the whole hooks directory](spec/2026-10-13-spec-TOOL-aHeardState-4.md) | 4 | 1 | SPECCED | rev-2 | 2026-10-13 |
 | [TOOL-aHeardState-5 — the format-guard self-test guard covers the runlog files its parity arm reads](spec/2026-10-13-spec-TOOL-aHeardState-5.md) | 5 | 1 | SPECCED | rev-1 | 2026-10-13 |
 | [TOOL-aHeardState-6 — the bug-class checklist names a held suite whose guard misses a sibling kit it reads](spec/2026-10-13-spec-TOOL-aHeardState-6.md) | 6 | 1 | SPECCED | rev-1 | 2026-10-13 |
 | [TOOL-aHeardState-7 — the format-guard header states what happens to a continuation's commits, and an arm pins it](spec/2026-10-13-spec-TOOL-aHeardState-7.md) | 7 | 1 | SPECCED | rev-1 | 2026-10-13 |
