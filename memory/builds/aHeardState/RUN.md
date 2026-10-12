@@ -19,8 +19,8 @@ hold-code: host-owner-action
 held-from: BUILDING
 refreshed-at: 6e8f8b1da4dc036b7fce23555b78fb4b5db0e60c · park · 13 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: b1ff2069a18fde2c3675a22a2412198be81f7854
-phase: BUILDING
+witness: 9ea947136
+phase: VERIFYING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/aHeardState
