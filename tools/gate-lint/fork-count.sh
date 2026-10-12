@@ -2,7 +2,7 @@
 # fork-count.sh — forks per invocation of each declared hot entrypoint, against a shrink-only ceiling.
 #
 #   bash <this> <ceilings-file> [root] [--only <id>] [--sites]   # 0 every row within its ceiling, 1 a red, 2 a refusal
-#   bash <this> --selftest                             # the calibration twice, and the declaration staged wrong
+#   bash <this> --selftest                             # the calibration twice, the declaration staged wrong, and the three graded-nothing outcomes
 #
 # WHY A COUNT AND NOT A CLOCK. A fork costs 89 to 315 ms under MSYS and nothing in the source reads that
 # way, so a saving or a regrowth is invisible until a suite runs an hour slower. A timing arm flakes on a
@@ -29,6 +29,15 @@
 # count the row was first measured at, kept beside the ceiling so the saving reads off one line.
 # Two directions red: a count above its ceiling, and a ceiling more than max(3, 5 %) above its count,
 # which is a saving nobody banked.
+#
+# A RUN THAT GRADES NOTHING has three outcomes, and none of them reads as a measured pass:
+#   - an `--only <id>` naming no declared row refuses with 2 and lists the declared ids — a typo;
+#   - a selection with a row declared for the running bash, every such row skipped because its setup
+#     failed or it wrote no trace, refuses with 2 naming that bash — it could have graded and did not;
+#   - a selection with NO row for the running bash keeps the `skipped` shape and exits 0, by owner
+#     ruling F1(a), and prints `fork-count: NOT MEASURED — no row declares bash <major.minor>, ...`,
+#     so the leg's log shows the gap. Declaring that bash's rows turns the line into a graded run.
+# (TOOL-aSparedSpawn-19)
 #
 # WHAT THIS DOES NOT CHECK. The count is a deterministic LOWER bound: a subshell that traces no command
 # of its own is unseen, and so is every process a non-bash child starts — a python or node child is
@@ -123,18 +132,22 @@ read_budgets() { # ceilings file -> FC_ROWS, one row per line; refuses a malform
   return 0
 }
 
-check_budgets() { # scratch root · [only id] -> one verdict line per entrypoint, then the summary; rc 1 on a red
-  local work="$1" only="${2:-}" row id want ceil base setup cmd margin dir rc ok=0 red=0 skip=0
+check_budgets() { # scratch root · [only id] -> one verdict line per entrypoint, then the summary; rc 1 on a red, 2 on a run that graded nothing it could have
+  local work="$1" only="${2:-}" row id want ceil base setup cmd margin dir rc ok=0 red=0 skip=0 declared=0
   local -A ids=() have=()
   want="${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}"
   for row in "${FC_ROWS[@]}"; do
     IFS=$'\t' read -r id _ _ _ _ _ _ <<<"$row"; ids[$id]=1
   done
+  if [ -n "$only" ] && [ -z "${ids[$only]+x}" ]; then
+    echo "fork-count: REFUSING — --only $only names no declared row, so this run would grade NOTHING; the declared ids are: ${!ids[*]}" >&2
+    return 2
+  fi
   for row in "${FC_ROWS[@]}"; do
     IFS=$'\t' read -r id ver ceil base setup cmd _ <<<"$row"
     [ -z "$only" ] || [ "$id" = "$only" ] || continue
     [ "$ver" = "$want" ] || continue
-    have[$id]=1
+    have[$id]=1; declared=$((declared + 1))
     dir="$work/$id"; mkdir -p "$dir"
     ( cd "$dir" && ROOT="$FC_ROOT_DIR" SCRATCH="$dir" bash -c "$setup" ) >"$dir/.setup.log" 2>&1; rc=$?
     if [ "$rc" != 0 ]; then
@@ -165,24 +178,46 @@ check_budgets() { # scratch root · [only id] -> one verdict line per entrypoint
     [ -n "${have[$id]+x}" ] || { echo "skipped — $id · no ceiling is declared for bash $want"; skip=$((skip + 1)); }
   done
   echo "fork-count: $ok passed · $red red · $skip skipped — a skipped row is not a pass"
+  if [ $((ok + red)) = 0 ]; then
+    if [ "$declared" -gt 0 ]; then
+      echo "fork-count: REFUSING — $declared row(s) in this selection are declared for bash $want and every one was skipped, so this run graded NOTHING it could have — a refusal and not a pass; fix the setup the skipped line names" >&2
+      return 2
+    fi
+    echo "fork-count: NOT MEASURED — no row declares bash $want, so the spawn budget was not measured on this bash"
+  fi
   [ "$red" = 0 ]
 }
 
-run_selftest() { # -> the calibration twice, and a copy with the declaration moved by one refusing
-  local work rc rc1 rc2 got1 got2 out
+run_selftest() { # -> the calibration twice, a copy with the declaration moved by one refusing, and the three graded-nothing outcomes
+  local work rc rc1 rc2 rc3 rc4 rc5 got1 got2 out out3 out4 out5 want other
   work=$(mktemp -d) || return 2
   FC_ROOT_DIR=$work
   check_calibration "$work" >/dev/null 2>&1; rc1=$?; got1=$FC_COUNT
   check_calibration "$work" >/dev/null 2>&1; rc2=$?; got2=$FC_COUNT
   sed 's/^SPECIMEN_FORKS=.*/SPECIMEN_FORKS='"$((SPECIMEN_FORKS + 1))"'/' "${BASH_SOURCE[0]}" > "$work/moved.sh"
   out=$(bash "$work/moved.sh" "$work/none.txt" "$work" 2>&1); rc=$?
+  # The graded-nothing outcomes run THIS script over scratch ceilings files: one row for a bash that
+  # cannot be the running one, and one row for the running bash whose setup fails. (TOOL-aSparedSpawn-19)
+  want="${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}"; other="$((BASH_VERSINFO[0] + 1)).0"
+  printf 'alpha\t%s\t1\t1\ttrue\ttrue\tanother bash only\n' "$other" > "$work/other.txt"
+  printf 'beta\t%s\t1\t1\texit 1\ttrue\ta setup that fails\n' "$want" > "$work/failed.txt"
+  out3=$("$BASH" "${BASH_SOURCE[0]}" "$work/other.txt" "$work" --only no-such-id 2>&1); rc3=$?
+  out4=$("$BASH" "${BASH_SOURCE[0]}" "$work/failed.txt" "$work" 2>&1); rc4=$?
+  out5=$("$BASH" "${BASH_SOURCE[0]}" "$work/other.txt" "$work" 2>&1); rc5=$?
   rm -rf "$work"
   local st=0
   [ "$rc1" = 0 ] && [ "$rc2" = 0 ] && [ "$got1" = "$got2" ] \
     || { echo "SELFTEST FAIL: the calibration did not hold on two runs: rc $rc1/$rc2, counts $got1/$got2 against $SPECIMEN_FORKS"; st=1; }
   [ "$rc" = 2 ] && [[ $out == *"the counter cannot move"* ]] \
     || { echo "SELFTEST FAIL: a declaration moved by one did not refuse with 2 naming the counter (rc $rc): $out"; st=1; }
-  [ "$st" = 0 ] && echo "PASS (2 assertions) — the specimen counted $got1 twice, and a declaration of $((SPECIMEN_FORKS + 1)) refused"
+  [ "$rc3" = 2 ] && [[ $out3 == *"fork-count: REFUSING — --only no-such-id names no declared row, so this run would grade NOTHING; the declared ids are: alpha"* ]] \
+    || { echo "SELFTEST FAIL: an --only id naming no row did not refuse with 2 listing the declared ids (rc $rc3): $out3"; st=1; }
+  [ "$rc4" = 2 ] && [[ $out4 == *"fork-count: REFUSING — 1 row(s) in this selection are declared for bash $want and every one was skipped"* ]] \
+    || { echo "SELFTEST FAIL: a declared row whose setup fails did not refuse with 2 naming bash $want (rc $rc4): $out4"; st=1; }
+  [ "$rc5" = 0 ] && [[ $out5 == *"fork-count: NOT MEASURED — no row declares bash $want, so the spawn budget was not measured on this bash"* ]] \
+    && [[ $out5 == *"skipped — alpha · no ceiling is declared for bash $want"* ]] \
+    || { echo "SELFTEST FAIL: a file declaring only bash $other did not exit 0 with the skipped shape and the NOT MEASURED line (rc $rc5): $out5"; st=1; }
+  [ "$st" = 0 ] && echo "PASS (5 assertions) — the specimen counted $got1 twice, a declaration of $((SPECIMEN_FORKS + 1)) refused, an --only typo and a declared row graded nothing refused, and an undeclared bash $want passed as NOT MEASURED"
   return "$st"
 }
 

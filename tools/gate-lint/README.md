@@ -169,7 +169,14 @@ in a fresh scratch directory and `command` is the one traced invocation; both se
 tree) and `SCRATCH`. A row whose setup fails, and an entrypoint with no row for the running bash,
 print `skipped — <id> · <why>` and are never counted as passed. A count above its ceiling reds with
 the delta and the top ten `file:line` sites the forked subshells first traced at; a ceiling more
-than max(3, 5 %) above its count reds as a saving nobody banked. The counter ships with this kit;
+than max(3, 5 %) above its count reds as a saving nobody banked.
+
+A run that grades no row never reads as a measured pass. An `--only <id>` naming no declared row
+refuses with 2 and lists the declared ids. A selection holding a row for the running bash whose
+every row was skipped, by a failed setup or a missing trace, refuses with 2 naming that bash. A
+selection with NO row for the running bash keeps the `skipped` shape and exits 0, and prints
+`fork-count: NOT MEASURED — no row declares bash <major.minor>, so the spawn budget was not measured
+on this bash`, so the log shows the gap until that bash's rows are declared. The counter ships with this kit;
 the home repository's leg is its own, because its ceilings name that repository's entrypoints.
 
 ## encoding_posture.py
