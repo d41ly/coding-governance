@@ -94,9 +94,9 @@ ids TOOL-aBriskPreflight-13 TOOL-aBriskPreflight-14 TOOL-aBriskPreflight-15 TOOL
 | [TOOL-aBriskPreflight-19 — the three inherited reds that read as this build's own are drained, so its landing push can land](spec/2026-10-12-spec-TOOL-aBriskPreflight-19.md) | 7 | 1 | SPECCED | rev-1 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 50 bound to this build, across 4 record folder(s).
+Records: 51 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aBriskPreflight-19.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-11 TOOL-aBriskPreflight-12 TOOL-aBriskPreflight-19.
 <!-- /gen:build-index -->
