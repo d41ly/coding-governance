@@ -72,7 +72,7 @@ ids TOOL-aHeardState-1 TOOL-aHeardState-2 TOOL-aHeardState-3 TOOL-aHeardState-4 
 | [TOOL-aHeardState-8 — the closing review's mediums and lows: fixtures that can see the defects, and three small fixes](spec/2026-10-13-spec-TOOL-aHeardState-8.md) | 8 | 1 | CLOSED | rev-2 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 4 record folder(s).
+Records: 5 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
