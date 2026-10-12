@@ -59,7 +59,7 @@ ids TOOL-cListedCensus-1 TOOL-cListedCensus-2
 | [TOOL-cListedCensus-1 — ps-hygiene grades the tracked `.ps1` files, and refuses a population it could not derive](spec/2026-10-12-spec-TOOL-cListedCensus-1.md) | — | 2 | INPROGRESS | rev-2 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

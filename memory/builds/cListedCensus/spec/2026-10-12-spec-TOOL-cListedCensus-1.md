@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-TOOL-cListedCensus-1-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-cListedCensus-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-12-prompt-TOOL-cListedCensus-1-brief.md](../prompts/2026-10-12-prompt-TOOL-cListedCensus-1-brief.md) | research | — |
 | [2026-10-13-review-TOOL-cListedCensus-1-implementation-diff-round1.md](../reviews/2026-10-13-review-TOOL-cListedCensus-1-implementation-diff-round1.md) | diff-review | — |
 
@@ -145,10 +146,9 @@ The untracked arm's fixture is proven live by its control: the same bytes, stage
   runs, its checklist names `a-gate-that-walks-the-repo-root-reads-other-worktrees`, and the bar's
   codebase-map and memory-hygiene legs are green over the edited dossier, README and record.
   Red when: the record names no anchor path, or the dossier does not claim it.
-- **AC5** — When `git grep -nE 'ps-hygiene|gate-lint/|\.ps1' -- README.md WIRE-INTO-PROJECT.md
-  tools/gate-lint/README.md memory/map/features/gate-lint.md` runs, every hit that states the
-  scanner's population says tracked files, and every hit that states its verdict on a repository
-  with no `.ps1` says exit 2.
+- **AC5** — When `git grep -nE 'ps-hygiene|gate-lint/|\.ps1'` runs over the four docs S4 names,
+  every hit that states the scanner's population says tracked files, and every hit that states its
+  verdict on a repository with no `.ps1` says exit 2.
   Red when: a hit still promises a clean report or `0 files clean` for an empty population.
 
 ## 7. Gates
