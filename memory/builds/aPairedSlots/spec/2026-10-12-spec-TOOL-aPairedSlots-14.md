@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-14 — the two-bar check's overlap guard reads the slots the bars were admitted to
 
-**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-1 · base d3354597 · streams tooling · order 10
+**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-1 · base d3354597 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 

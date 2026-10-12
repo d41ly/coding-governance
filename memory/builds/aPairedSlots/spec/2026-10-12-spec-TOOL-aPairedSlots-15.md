@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-15 — the closing review's mediums and lows, batched
 
-**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-2 · base d3354597 · streams tooling · order 8
+**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-2 · base d3354597 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
