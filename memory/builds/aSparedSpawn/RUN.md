@@ -10,17 +10,17 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 hold-run: 
-hold-streak: 1 · at ebee7826
+hold-streak: 1 · at 65a29cea
 resume-owed: none · owner
-held-at: 2026-10-12T20:49:03Z
-hold-reason: the owner asked to pause for a node reboot (2026-10-12); TOOL-aSparedSpawn-33's unfinished pass is set aside in stash 21eb9abc50b4cd0d8366064531d6a674ac31ccfc (tag aSparedSpawn-u33-wip-before-reboot-hold), to be applied on resume and the unit re-dispatched as a continuation
+held-at: 2026-10-12T22:07:04Z
+hold-reason: the owner asked (2026-10-13) to merge the completed build onto local main and stop; the gates run later, by the owner, on the fully reconciled tree. All 22 units CLOSED; owed: the bar, the kit suites the units' ledgers name, the six-bar width A/B, the WSL paired runs, and the four direct checks the scratch-guard refused TOOL-aSparedSpawn-34's builder (govkit selfcheck, check-arms, check-spec-tokens, the spawn-idiom registry re-measure)
 hold-until: owner
 hold-code: host-owner-action
 held-from: VERIFYING
 refreshed-at: 37200355d6033895cd156ec962928fd264084c2b · park · 107 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 3cbba3f17ccde5e6b21680c337856d06001a6fcf
-phase: VERIFYING
+witness: 65a29ceab1b258ed501b02d4ed264470f3559f95
+phase: HELD
 may: none
 mode: slug
 run-branch: refs/heads/branch/gate-runner-profiling-optimization-5d1f1e
@@ -228,3 +228,5 @@ base: e6585db4e125bb0919c0c1f18687eb9825ffed80
 2026-10-12T21:48:51Z dispatch · item 3227e789 TOOL-aSparedSpawn-34 · reason tools/run-gates/run-gates.sh tools/run-gates/gate-profiles.txt tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.runlog.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/drift-audit/selftest.py skills/session-kickoff/manifest-check.test.sh .githooks/pre-push.test.sh memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/project/fork-ceilings.txt memory/project/spawn-idiom-sites.txt memory/builds/aSparedSpawn/spec/2026-10-13-spec-TOOL-aSparedSpawn-34.md memory/builds/aSparedSpawn/build/2026-10-13-build-TOOL-aSparedSpawn-34-acceptance-ledger.md memory/builds/aSparedSpawn/README.md
 
 2026-10-12T21:48:57Z brief · item TOOL-aSparedSpawn-34 · reason f1bc59719c6a memory/builds/aSparedSpawn/prompts/2026-10-13-prompt-TOOL-aSparedSpawn-34-build-brief.md
+
+2026-10-12T22:07:06Z hold · item host-owner-action · reason until owner · reaped 850e8e9b · resume none(owner)
