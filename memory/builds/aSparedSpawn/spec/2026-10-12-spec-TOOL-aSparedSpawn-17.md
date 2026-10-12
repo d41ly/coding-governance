@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-17 — an executed red under a cached ok erases the entry and quarantines the leg
 
-**Status:** OPEN · rev-1 · 2026-10-12 · node a · Tier-2 · base 8444f597 · streams tooling · order 4
+**Status:** INPROGRESS · rev-1 · 2026-10-12 · node a · Tier-2 · base 8444f597 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
