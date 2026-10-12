@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-13 — content-addressed reuse: declared read classes, a shared cache, a soundness sample
 
-**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-4 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -56,12 +56,11 @@ pushed sha and the observed tip only.
 - **S3** — Declarations. Every leg the research's §1.4 found reading history, a base or the clock
   carries its class, each re-read against its script at build time. The research's list is a floor
   and not the population; a missed reader is what S6 exists to catch. Observed by AC2. Re-read at
-  build: `history` for the dead-path carriers, the spec tokens, the leg ceilings and the drift-audit
-  records; `history` and `base` for the lexicon naming predicates, the verdict epoch, the kit epoch,
-  the codebase-map coverage and the routed commits, which grades the graph from `GATE_PUSH_BASE`;
-  `clock`, `history` and `base` for memory hygiene, whose later checks diff since the mainline
-  merge-base;
-  `history` for the kickoff-manifest ratchet, whose `health.log` window the research flagged is read
+  build: `history` for the dead-path carriers, the spec tokens and the leg ceilings; `history` and
+  `base` for the drift-audit records, which compare against a base ref, the lexicon naming
+  predicates, the verdict epoch, the kit epoch, the codebase-map coverage and the routed commits,
+  which grades the graph from `GATE_PUSH_BASE`; `clock`, `history` and `base` for memory hygiene,
+  whose later checks diff since the mainline merge-base; `history` for the kickoff-manifest ratchet, whose `health.log` window the research flagged is read
   by the `--card` writer and not by the leg's argv; `remote` for the other three rows that carried
   `impure`.
 - **S4** — The cache, in the git common dir and never in a pushable ref: one file per key under a
@@ -215,6 +214,7 @@ fa68a767), and a push right after a green bar at the same sha and tip reuses the
 - `.githooks/pre-push.test.sh` — the push-time reuse arms
 - `tools/govkit/govkit.py` — the descriptor parity on `reads`, and the legacy `impure` an adopter row gets
 - `tools/unattended/kit.toml`, `tools/memory-tree/kit.toml` — the four descriptors move to `reads`
+- `memory/project/fork-ceilings.txt` — the two run-gates rows rise by the cache's one python per bar
 
 ### Alternatives rejected
 
@@ -305,7 +305,8 @@ fa68a767), and a push right after a green bar at the same sha and tip reuses the
 `run-gates run-log line` · `run-gates turnstile` · `settings-merge selftest` ·
 `spec-tokens self-test` · `straggler-guard arms` · `transition-audit arms` ·
 `codebase-map coverage + freshness` · `kit epoch (shipped bytes move, the version moves)` ·
-`memory hygiene` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `govkit selftest` ·
+`govkit refusal join` · `govkit acceptance matrix` · `spawn budget (forks per hot entrypoint)`
 
 New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 · a key that ignores the declared class, a reused verdict writing an entry, a sample that never reds · none
 New arm: tools/run-gates/run-gates.test.sh · covers none · the manifest key set refusing a near-miss of `reads` · none
@@ -347,6 +348,10 @@ New arm: .githooks/pre-push.test.sh · covers AC12 AC13 AC14 AC15 · a moved tip
   population is stated as re-read; `GATE_REUSE_PUSH` is cleared beside `GATE_DOCS_BASE` so a STUB
   bar cannot inherit it either; the day seam, the age and quarantine files, the draw, the re-run, the
   one-process cache write and prune, and the probe idiom are pinned.
+- rev-4 · 2026-10-12 · S3 §4 §7 · the drift-audit records declare `base` beside `history`, since they
+  compare against a base ref; §7 names the three govkit legs the files-touched list trips and the
+  spawn budget, whose two run-gates rows rise by the cache's one python per bar, with
+  `memory/project/fork-ceilings.txt` added to the files touched.
 
 ## 10. Reuse audit
 
