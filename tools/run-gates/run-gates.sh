@@ -97,6 +97,20 @@ case "$0" in
 esac
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "run-gates: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
+# THE BAR'S GIT FACTS, ASKED ONCE (TOOL-aSparedSpawn-4 S7). The git dir, the common dir and HEAD were
+# five separate `rev-parse` spawns, every one made from this directory after the `cd` above, and no
+# later `cd` runs in this shell, so one call here answers each with the value it read. Each consumer
+# keeps its own normalisation. An UNBORN branch prints both dirs and exits 1 with no HEAD line, so a
+# nonzero status reads as an empty HEAD rather than as the literal word a bare `rev-parse HEAD` echoes.
+# The header's `worktree` is `ROOT`, which `--show-toplevel` above already answered from here.
+RG_GIT_DIR=""; RG_COMMON_RAW=""; RG_HEAD=""
+_rg_facts=$(git rev-parse --git-dir --git-common-dir --verify -q HEAD 2>/dev/null); _rg_rc=$?
+if [ -n "$_rg_facts" ]; then
+  RG_GIT_DIR=${_rg_facts%%$'\n'*}
+  case "$_rg_facts" in *$'\n'*) _rg_facts=${_rg_facts#*$'\n'}; RG_COMMON_RAW=${_rg_facts%%$'\n'*} ;; esac
+  case "$_rg_facts" in *$'\n'*) [ "$_rg_rc" = 0 ] && RG_HEAD=${_rg_facts#*$'\n'} ;; esac
+fi
+unset _rg_facts _rg_rc
 # The python-launcher resolver, INLINED byte-identically from resolve-python.sh in gov's lib dir. This
 # kit is deployable (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`), and gov's lib dir is gov-internal and never travels:
 # sourcing it made this runner exit 2 with zero legs run in any tree that did not have it.
@@ -138,12 +152,12 @@ resolve_python() {
 
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
-# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
-# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
-# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
-resolve_kit_dir() {
-  local _rkd
-  IFS= read -r -d '' _rkd <<'RKD' || :
+# table. It is read here ONCE, by a builtin, into `RKD_PROGRAM`, and never run by a python of its
+# own: the legs-parse program below runs it ahead of the manifest, so the process-monitor kit dir
+# costs a bar no python spawn (TOOL-aSparedSpawn-4 S10). The `|| :` is owed because `read -d ''`
+# returns 1 at the end of its input.
+RKD_PROGRAM=""
+IFS= read -r -d '' RKD_PROGRAM <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -180,15 +194,6 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-  "$1" -c "${_rkd%$'\n'}"'
-import sys
-try:
-    d = resolve_kit_dir(*sys.argv[1:4])
-except LookupError as e:
-    sys.exit(str(e))
-r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
-print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
-}
 PYBIN=$(resolve_python) || { echo "run-gates: no usable python — required to parse the leg manifest"; exit 2; }
 fails=0; n=0; skips=0; ondemands=0
 
@@ -241,7 +246,8 @@ case "$ATTR_MAX_AGE" in ''|0*|*[!0-9]*) ATTR_MAX_AGE="" ;; esac
 #
 # Resolved ONCE, and a path is never composed from an empty root: `git rev-parse --git-dir` yields
 # nothing outside a repo, and composing "/gate-logs/<leg>.log" from that would write outside the tree.
-GD="$(git rev-parse --git-dir 2>/dev/null)" || GD=""
+# Read from the bar's one `rev-parse` above (TOOL-aSparedSpawn-4 S7).
+GD=$RG_GIT_DIR
 LOGDIR=""
 if [ -n "$GD" ] && mkdir -p "$GD/gate-logs" 2>/dev/null; then
   LOGDIR="$GD/gate-logs"
@@ -250,13 +256,31 @@ else
   echo "run-gates: evidence capture OFF (no usable git dir) — leg output is stdout-only this run" >&2
 fi
 
-leg_log() {   # NAME -> the log path, or rc 1 when capture is off
+# NAME -> LEG_LOG, the log path, or rc 1 when capture is off. The name maps byte by byte, so a
+# multibyte character becomes one underscore PER BYTE, as the `tr -c` it replaced mapped it; the C
+# locale is what makes the expansion see bytes, and it is local, so the caller's locale returns with
+# the function. It leaves its answer in a global because a `$(leg_log …)` was a fork per call, and the
+# `printf | tr` inside it two more (TOOL-aSparedSpawn-4 S3).
+leg_log() {
+  local LC_ALL=C
   [ -n "$LOGDIR" ] || return 1
-  printf '%s/%s.log' "$LOGDIR" "$(printf '%s' "$1" | tr -c 'A-Za-z0-9._-' '_')"
+  LEG_LOG="$LOGDIR/${1//[!A-Za-z0-9._-]/_}.log"
 }
 # A leg's output can carry an operator-exported credential; mask URL userinfo before it becomes
 # durable. Terminal output was ephemeral, a file is not.
 redact() { sed -E 's#://[^/@[:space:]]+:[^/@[:space:]]+@#://***:***@#g'; }
+# write_redacted <file> <text> — <text> into <file> as `printf '%s' <text> | redact` writes it
+# (TOOL-aSparedSpawn-4 S4): through `sed` when it holds `://` and then `@`, the shape of every
+# credential `redact` masks, and by a builtin otherwise. The guard is a SUPERSET test, so it can only
+# send more text through `sed` than needs it, never less. Text holding a CRLF goes through `sed` too,
+# because what `sed` does to one is the host's: under MSYS it reads its pipe in text mode and drops the
+# CR of every CRLF, on Linux it keeps it, and only `sed` itself gives either host its own bytes.
+write_redacted() {
+  case "$2" in
+    *://*@*|*$'\r\n'*) printf '%s' "$2" | redact > "$1" ;;
+    *) printf '%s' "$2" > "$1" ;;
+  esac
+}
 
 # The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
 # named on its marker line and gated by the resolve-python self-test.
@@ -341,7 +365,7 @@ else
   [ -z "$RR_REMOTE" ] || _tip=$(git rev-parse --verify -q "refs/remotes/$RR_REMOTE/${DEFBR:-main}" 2>/dev/null) || _tip=
   if [ -n "$_tip" ]; then
     _mb=$(git merge-base HEAD "$_tip" 2>/dev/null) || _mb=
-    _head=$(git rev-parse --verify -q HEAD 2>/dev/null) || _head=
+    _head=$RG_HEAD            # the bar's one `rev-parse`, the same `--verify -q HEAD` (TOOL-aSparedSpawn-4 S7)
     if [ -n "$_mb" ] && [ "$_mb" != "$_head" ]; then BASE=$_mb; else BASE=$_tip; fi
   fi
 fi
@@ -855,7 +879,7 @@ CAL_RATES_SEAM=${GATE_CALIBRATION_RATES:-}
 unset GATE_CALIBRATION_RATES
 # THE COMMON DIR, resolved ONCE here and reused by the turnstile and the scratch-dir owner below, so
 # the cache read costs a bar no git spawn of its own.
-RG_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || RG_COMMON=""
+RG_COMMON=$RG_COMMON_RAW
 [ -n "$RG_COMMON" ] && RG_COMMON=$(cd "$RG_COMMON" 2>/dev/null && pwd) || RG_COMMON=""
 CALIB_FILE=""; [ -n "$RG_COMMON" ] && CALIB_FILE="$RG_COMMON/gate-host-calibration"
 
@@ -1309,29 +1333,16 @@ echo "$PROF_LINE"
 # runner's descendant, so asking whether THIS process is in scope answers it for all of them.
 # The kit is found by the sibling resolver (TOOL-aRepatriatedFork-2 S3), and only once its conf says
 # it is adopted, so a repo without the monitor pays no python spawn for the question.
+#
+# THE RESOLUTION RUNS INSIDE THE LEGS-PARSE PYTHON, below the turnstile (TOOL-aSparedSpawn-4 S10),
+# which every bar starts anyway, so the question costs no python of its own. Only these DEFAULTS stay
+# here, so a trap that fires during the turnstile wait reaches `run_leg_reap` with the runner's own
+# walk; every other reader of these variables is on the tree-kill path, which runs after dispatch.
 PROCMON_OK=0
 PROCMON_WHY="not installed; tree kills use the runner's own depth-8 walk"
 PROCMON_REAP=""; PROCMON_SCOPE=""
-if [ -f "$ROOT/.process-monitor.conf" ]; then
-  if _pm_dir=$(resolve_kit_dir "$PYBIN" process-monitor reap.py "$KITDIR" 2>&1); then
-    PROCMON_REAP="$ROOT/$_pm_dir/reap.py"; PROCMON_SCOPE="$ROOT/$_pm_dir/scope.py"
-  else
-    PROCMON_WHY="adopted, but the kit is not found ($_pm_dir); tree kills use the runner's own depth-8 walk"
-  fi
-fi
-if [ -f "$PROCMON_REAP" ] && [ -f "$PROCMON_SCOPE" ]; then
-  _pm_win=$(ps -W 2>/dev/null | awk -v p="$$" '$1==p {print $4}')
-  if [ -z "$_pm_win" ]; then
-    PROCMON_WHY="installed, but this runner has no resolvable winpid; tree kills fall back"
-  elif PROCMON_ROOT="$ROOT" "$PYBIN" "$PROCMON_SCOPE" --explain "$_pm_win" 2>/dev/null \
-       | grep -q "IN SCOPE"; then
-    PROCMON_OK=1
-    PROCMON_WHY="delegating tree kills to process-monitor"
-  else
-    PROCMON_WHY="installed, but its declared roots do not admit this runner; tree kills fall back"
-  fi
-fi
-echo "run-gates: process-monitor: $PROCMON_WHY"
+PROCMON_CONF=0
+[ -f "$ROOT/.process-monitor.conf" ] && PROCMON_CONF=1
 
 
 # ---- the turnstile: one bar per repository at a time (the turnstile unit) -------------------------
@@ -1362,7 +1373,7 @@ TS_TICK_PID=""
 TS_TICK_LIVE=0
 
 ts_now()  { date +%s; }
-ts_hb()   { [ -n "$TS_DIR" ] && printf '%s' "$(ts_now)" > "$TS_DIR/heartbeat.tmp" 2>/dev/null && mv -f "$TS_DIR/heartbeat.tmp" "$TS_DIR/heartbeat" 2>/dev/null || true; }
+ts_hb()   { [ -n "$TS_DIR" ] && printf '%s' "$EPOCHSECONDS" > "$TS_DIR/heartbeat.tmp" 2>/dev/null && mv -f "$TS_DIR/heartbeat.tmp" "$TS_DIR/heartbeat" 2>/dev/null || true; }
 ts_alive(){ kill -0 "$1" 2>/dev/null; }
 
 # RELEASE IS NONCE-GUARDED. A run whose beacon was reaped for being stale must never delete its
@@ -1456,7 +1467,7 @@ ts_try_reap() {
     add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "dead holder pid $hpid"; return 0
   fi
   case "$hb" in ''|*[!0-9]*) hb=0 ;; esac
-  age=$(( $(ts_now) - hb ))
+  age=$(( EPOCHSECONDS - hb ))
   if [ "$hb" != 0 ] && [ "$age" -gt "$TS_TTL" ]; then
     printf 'run-gates: reaping the beacon of a stalled holder (heartbeat %ss old, ttl %ss)\n' "$age" "$TS_TTL" >&2
     rm -rf "$TS_DIR_C" 2>/dev/null
@@ -1501,7 +1512,7 @@ ts_sweep_queue() {
   [ -n "$TS_Q" ] && [ -d "$TS_Q" ] || return 1
   # If `date` cannot produce the cutoff the AGE SIGNAL IS UNARMED, and it says so rather than leaving
   # a reaper silently down to one signal — which is indistinguishable from one that is working.
-  cutoff=$(date -u -d "@$(( $(ts_now) - TS_MAXWAIT ))" +%Y%m%dT%H%M%S 2>/dev/null) || cutoff=""
+  cutoff=$(date -u -d "@$(( EPOCHSECONDS - TS_MAXWAIT ))" +%Y%m%dT%H%M%S 2>/dev/null) || cutoff=""
   if [ -z "$cutoff" ]; then
     printf 'run-gates: NOTE - this host cannot compute a queue staleness cutoff, so a leaked ticket whose pid has been RECYCLED will not be swept this run\n' >&2
   fi
@@ -1533,7 +1544,7 @@ ts_sweep_queue() {
 if [ -n "$TS_COMMON" ]; then
   TS_DIR_C="$TS_COMMON/gate-bar-beacon"
   TS_Q="$TS_COMMON/gate-bar-queue"
-  TS_NONCE="$$-$(ts_now)-$RANDOM"
+  TS_NONCE="$$-$EPOCHSECONDS-$RANDOM"
   mkdir -p "$TS_Q" 2>/dev/null || true
   # EVERY RUN TAKES A TICKET, including an uncontended one. A ticket whose name sorts by time is all
   # the ordering there is: every waiter reads the same listing and derives the same total order
@@ -1568,7 +1579,7 @@ if [ -n "$TS_COMMON" ]; then
   trap 'ts_drop_ticket; exit 130' INT
   trap 'ts_drop_ticket; exit 143' TERM
   trap 'ts_drop_ticket; exit 129' HUP
-  ts_start=$(ts_now); ts_lastpos=""; ts_announced=0
+  ts_start=$EPOCHSECONDS; ts_lastpos=""; ts_announced=0
   # A RUN WITH NO TICKET CANNOT EVER ACQUIRE, so it must not wait to find that out. Every iteration
   # of the loop below opens with `[ -n "$TS_TICKET" ]`, which is false forever once the write above
   # failed — so the run burned the ENTIRE TS_MAXWAIT (7200s at the shipped fallback) to reach a
@@ -1597,7 +1608,7 @@ if [ -n "$TS_COMMON" ]; then
     if [ -n "$TS_TICKET" ] && [ "$(ls -1 "$TS_Q" 2>/dev/null | LC_ALL=C sort | head -1)" = "$(basename "$TS_TICKET")" ] \
        && mkdir "$TS_DIR_C" 2>/dev/null; then
       TS_DIR="$TS_DIR_C"
-      printf '%s' "$(ts_now)" > "$TS_DIR/heartbeat" 2>/dev/null || true
+      printf '%s' "$EPOCHSECONDS" > "$TS_DIR/heartbeat" 2>/dev/null || true
       printf '%s' "$$"        > "$TS_DIR/pid" 2>/dev/null || true
       printf '%s' "$TS_NONCE" > "$TS_DIR/nonce" 2>/dev/null || true
       TS_HELD=1
@@ -1636,7 +1647,7 @@ if [ -n "$TS_COMMON" ]; then
       # previous tick's value and understates the wait by up to one `TS_TICK`.
       #
       # Refreshing unconditionally — which is the obvious fix and the one first specced — breaks
-      # the UNCONTENDED case instead: `ts_now` is `date +%s` and truncates, the five processes
+      # the UNCONTENDED case instead: the clock reads whole seconds and truncates, the five processes
       # above (`ls`, `sort`, `head`, `basename`, `mkdir`) sometimes straddle a second boundary,
       # and the line below then prints `waited 1s` where `run-gates.turnstile.test.sh` asserts
       # `^gate queue: waited 0s$`. Measured on node a: 4 of 60 first-iteration acquires crossed,
@@ -1648,7 +1659,7 @@ if [ -n "$TS_COMMON" ]; then
       # skips both this refresh AND the announce, so a run that reaps a stale holder on its first
       # iteration still records the stale value. Closing that needs a second predicate and is
       # deliberately not in this unit.
-      [ "$ts_announced" = 1 ] && TS_WAITED=$(( $(ts_now) - ts_start ))
+      [ "$ts_announced" = 1 ] && TS_WAITED=$(( EPOCHSECONDS - ts_start ))
       break
     fi
     # BOTH probes, on the same tick, and either one making progress re-tries the claim at once.
@@ -1657,7 +1668,7 @@ if [ -n "$TS_COMMON" ]; then
     # rather than one because their preconditions differ — the reaper is guarded on a beacon
     # EXISTING, which is precisely the guard that made it unable to see the wedge.
     { ts_try_reap || ts_sweep_queue; } && continue
-    TS_WAITED=$(( $(ts_now) - ts_start ))
+    TS_WAITED=$(( EPOCHSECONDS - ts_start ))
     # THE WAIT BEATS (TOOL-dDerivedDocket-64). Nothing else a waiter writes moves while it waits:
     # the ticket is created once, the status file below is rewritten only when the position changes,
     # and a gate log lands only when a leg finishes, which no waiter reaches. An out-of-process
@@ -2254,8 +2265,25 @@ TREE_CLEAN=no
 # evidenced maximum, else its scaled ceiling, else 0, and 0 sorts last), so an absent or unreadable
 # cache no longer yields manifest order. It is a scheduling hint only — it can never change a verdict.
 # Command-substitution surfaces a parse failure (a `< <()` process-sub would swallow it).
-legs=$("$PYBIN" -c '
+# THE PROGRAM OPENS WITH `RKD_PROGRAM`, the sibling-kit resolver, and where the process-monitor conf
+# exists it takes three more arguments and prints ONE LEADING LINE before line 1: `0`, RS and the kit
+# dir, or `1`, RS and the resolver refusal. The reader strips that line before anything below reads
+# line 1, so the dispatch order and every row keep their bytes (TOOL-aSparedSpawn-4 S10).
+_pm_args=()
+[ "$PROCMON_CONF" = 1 ] && _pm_args=(process-monitor reap.py "$KITDIR")
+legs=$("$PYBIN" -c "$RKD_PROGRAM"'
 import json, os, statistics, sys
+# THE PROCESS-MONITOR KIT DIR (TOOL-aSparedSpawn-4 S10), asked by argv[5] to argv[7] and answered as the
+# runner wrapper of the resolver answered it: the dir relative to the nearest directory holding .git,
+# or the refusal text. A refusal never ends this program, because the manifest still has to be read.
+pm = None
+if len(sys.argv) > 7:
+    try:
+        pm_d = resolve_kit_dir(*sys.argv[5:8])
+        pm_r = next((p for p in (pm_d, *pm_d.parents) if (p / ".git").exists()), pm_d.anchor)
+        pm = "0\x1e" + pm_d.relative_to(pm_r).as_posix()
+    except Exception as e:
+        pm = "1\x1e" + " ".join(str(e).splitlines())
 try:
     data = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -2370,8 +2398,20 @@ rows += [l["name"] + "\x1e" + ",".join(resolve_prefix_token(g, troot) for g in l
          + "\x1e" + ("=" + ",".join(resolve_prefix_token(g, troot) for g in l["doc_reads"])
                             if isinstance(l.get("doc_reads"), list) else "")
          for l in data]
+if pm is not None:
+    rows = [pm] + rows
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
-' "$LEGS_FILE" "$TIMINGS" "$(dirname "$KITREL")" "$KITREL/ceiling-evidence.txt") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
+' "$LEGS_FILE" "$TIMINGS" "$(dirname "$KITREL")" "$KITREL/ceiling-evidence.txt" ${_pm_args[@]+"${_pm_args[@]}"}) \
+  || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
+# The leading process-monitor line, stripped before line 1 is read. A conf that exists always gets
+# one, so its absence is a program that did not run the question, which reads as the resolver's
+# refusal would rather than as a found kit.
+PROCMON_LINE=""
+if [ "$PROCMON_CONF" = 1 ]; then
+  PROCMON_LINE=${legs%%$'\n'*}
+  case "$legs" in *$'\n'*) legs=${legs#*$'\n'} ;; *) legs="" ;; esac
+fi
+unset _pm_args
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
@@ -2383,6 +2423,31 @@ while IFS= read -r line; do
   subjects+=("${sj:-repo}"); ceilings+=("${ce:-}"); signatures+=("${sg:-}"); docreads+=("${dr:-}")
 done <<<"$legs"
 total=${#names[@]}
+
+# ---- PROCESS-MONITOR DELEGATION, RESOLVED (TOOL-aSparedSpawn-4 S10) ------------------------------
+# The detection the defaults above the turnstile describe, read from the leading line the legs parse
+# printed: `0` and the kit dir, or the refusal, which names the places looked. Its scope probe follows
+# unchanged, and the line prints here, after the turnstile lines, which is the one ORDER change.
+if [ -n "$PROCMON_LINE" ] || [ "$PROCMON_CONF" = 1 ]; then
+  _pm_dir=${PROCMON_LINE#*$'\x1e'}
+  case "$PROCMON_LINE" in
+    0$'\x1e'?*) PROCMON_REAP="$ROOT/$_pm_dir/reap.py"; PROCMON_SCOPE="$ROOT/$_pm_dir/scope.py" ;;
+    *) PROCMON_WHY="adopted, but the kit is not found ($_pm_dir); tree kills use the runner's own depth-8 walk" ;;
+  esac
+fi
+if [ -f "$PROCMON_REAP" ] && [ -f "$PROCMON_SCOPE" ]; then
+  _pm_win=$(ps -W 2>/dev/null | awk -v p="$$" '$1==p {print $4}')
+  if [ -z "$_pm_win" ]; then
+    PROCMON_WHY="installed, but this runner has no resolvable winpid; tree kills fall back"
+  elif PROCMON_ROOT="$ROOT" "$PYBIN" "$PROCMON_SCOPE" --explain "$_pm_win" 2>/dev/null \
+       | grep -q "IN SCOPE"; then
+    PROCMON_OK=1
+    PROCMON_WHY="delegating tree kills to process-monitor"
+  else
+    PROCMON_WHY="installed, but its declared roots do not admit this runner; tree kills fall back"
+  fi
+fi
+echo "run-gates: process-monitor: $PROCMON_WHY"
 
 # ---- THE FOREIGN-LOAD CENSUS. TOOL-aGraftedHelix-5 ------------------------------------------------
 # `derive-ceilings.py` argues every ceiling from the `.leg` readings this runner records, and a reading
@@ -2510,11 +2575,23 @@ done
 # unmeasurable input is NOT a reusable one: the key is a dash, which the reuse unit must treat as
 # "never matches".
 input_key() { # leg index -> the key, or a dash
-  local i=$1 gp comp dirt="" r p g
+  local i=$1 gp comp=""
   [ -n "$FPRINT_START" ] && [ "$WALK_OK" = yes ] && [ -n "$REUSE_DIGEST" ] || { printf '%s' -; return; }
   if [ -n "${guards[$i]}" ]; then
     IFS=, read -ra gp <<<"${guards[$i]}"
     comp=$(git ls-files -s -- "${gp[@]}" 2>/dev/null | LC_ALL=C sort) || comp=""
+  fi
+  build_key_text "$i" "$comp"
+  printf '%s' "$KEY_TEXT" | git hash-object --stdin 2>/dev/null || printf '%s' -
+}
+
+# build_key_text <leg index> <its sorted `ls-files -s` listing> -> KEY_TEXT, the bytes the key
+# hashes: the argv, the base, the leg's inputs and the toolchain digest. ONE composition for the
+# per-leg `input_key` above and the precompute below, so the two cannot disagree about what a key is.
+build_key_text() {
+  local i=$1 comp=$2 gp dirt="" r p g
+  if [ -n "${guards[$i]}" ]; then
+    IFS=, read -ra gp <<<"${guards[$i]}"
     # The guard's share of the dirt, matched the way the `ls-files` pathspec above matches: the path
     # IS the guard, or sits under the directory it names, with or without its slash. A substring
     # match also took `xga/f` for guard `ga/`. Without this share a guarded leg's key would not move
@@ -2532,8 +2609,87 @@ $dirt"
   else
     comp="$FPRINT_START"
   fi
-  printf '%s\n---\n%s\n---\n%s\n---\n%s\n' "${argvs[$i]}" "$BASE" "$comp" "$REUSE_DIGEST" \
-    | git hash-object --stdin 2>/dev/null || printf '%s' -
+  printf -v KEY_TEXT '%s\n---\n%s\n---\n%s\n---\n%s\n' "${argvs[$i]}" "$BASE" "$comp" "$REUSE_DIGEST"
+}
+
+# THE KEYS, COMPUTED ONCE BEFORE DISPATCH (TOOL-aSparedSpawn-4 S5) into `INPUT_KEYS`, which every
+# forked worker inherits, so neither the reuse block nor a ledger row asks git anything per leg. The
+# per-leg question was an `ls-files -s | sort` and a `hash-object`, asked twice for a reused leg. Here
+# it is one `ls-files -s` over the UNION of the guards, sorted once, so each leg's slice, taken in that
+# order, is already the sorted listing its own call printed; one `awk` pass writes each slice; and
+# one `hash-object --stdin-paths` hashes every key text. `--no-filters` because a path is hashed
+# through the attributes a `--stdin` never sees, and `--git-dir` with `-C` because the texts live in
+# the scratch dir, which a native git on an MSYS host cannot read by its POSIX name from stdin, while
+# the repository's object format must still pick the hash.
+#
+# THE SLICE IS THE DIRT RULE: the path IS the guard, or sits under it. That is what git's pathspec
+# does only for a PLAIN guard, so a guard holding a glob character, pathspec magic, a `..`, an absolute
+# or empty path, `.`, or any byte `ls-files` would quote, sends its leg to `input_key`, the per-leg
+# definition, unchanged. A quoted listing line is matched by its escaped text, which agrees with the raw
+# path on every plain prefix. Any failure in the bulk half reads as the dash `input_key` gives a
+# failed hash, never as a key: an unmeasurable input is not a reusable one.
+INPUT_KEYS=()
+build_input_keys() {
+  local i g gp n_bulk=0 bulk="" union=() plain shas=() k=0 comp
+  local -a lines=()
+  for ((i=0; i<total; i++)); do
+    [ -n "${names[$i]}" ] || continue
+    [ -f "$WORK/$i.rc" ] && continue          # held, skipped or docskipped: it never needs a key
+    if ! { [ -n "$FPRINT_START" ] && [ "$WALK_OK" = yes ] && [ -n "$REUSE_DIGEST" ]; }; then
+      INPUT_KEYS[$i]=-; continue
+    fi
+    plain=1
+    if [ -n "${guards[$i]}" ]; then
+      IFS=, read -ra gp <<<"${guards[$i]}"
+      for g in "${gp[@]}"; do
+        case "$g" in
+          ''|.|./|/*|:*|*[!A-Za-z0-9._/@+=-]*|*..*|*//*) plain=0 ;;
+        esac
+      done
+      if [ "$plain" = 1 ]; then union+=("${gp[@]}"); fi
+    fi
+    if [ "$plain" = 1 ]; then bulk+=" $i"; n_bulk=$((n_bulk + 1))
+    else INPUT_KEYS[$i]=$(input_key "$i"); fi
+  done
+  [ "$n_bulk" -gt 0 ] || return 0
+  : > "$WORK/keys.slices"
+  if [ "${#union[@]}" -gt 0 ]; then
+    git ls-files -s -- "${union[@]}" 2>/dev/null | LC_ALL=C sort > "$WORK/keys.listing" 2>/dev/null
+    for i in $bulk; do
+      [ -n "${guards[$i]}" ] && printf '%s\t%s\n' "$i" "${guards[$i]}"
+    done > "$WORK/keys.guards"
+    # One file per guarded leg, `keys.slice.<i>`, holding its lines of the listing in listing order. A
+    # guard ending in `/` names a directory, so, as in git's pathspec, it never matches a file of that
+    # exact name; without the slash it matches the file or everything under the directory.
+    awk -F'\t' -v dir="$WORK" '
+      FNR == NR { leg[++nl] = $1; ng[nl] = split($2, gl, ",")
+                  for (j = 1; j <= ng[nl]; j++) { g = gl[j]; dn[nl, j] = sub(/\/$/, "", g); gd[nl, j] = g }
+                  printf "" > (dir "/keys.slice." $1); next }
+      { line = $0; p = substr(line, index(line, "\t") + 1)
+        if (substr(p, 1, 1) == "\"" && substr(p, length(p), 1) == "\"") p = substr(p, 2, length(p) - 2)
+        for (l = 1; l <= nl; l++) for (j = 1; j <= ng[l]; j++) {
+          g = gd[l, j]
+          if ((p == g && !dn[l, j]) || substr(p, 1, length(g) + 1) == g "/") { print line > (dir "/keys.slice." leg[l]); break }
+        } }
+      END { for (l = 1; l <= nl; l++) close(dir "/keys.slice." leg[l]) }
+    ' "$WORK/keys.guards" "$WORK/keys.listing" 2>/dev/null || return 0
+  fi
+  for i in $bulk; do
+    lines=(); comp=""
+    if [ -n "${guards[$i]}" ]; then
+      { mapfile -t lines < "$WORK/keys.slice.$i"; } 2>/dev/null || return 0
+      [ "${#lines[@]}" -gt 0 ] && printf -v comp '%s\n' "${lines[@]}"
+      comp=${comp%$'\n'}
+    fi
+    build_key_text "$i" "$comp"
+    printf '%s' "$KEY_TEXT" > "$WORK/key.$i" || return 0
+    printf 'key.%s\n' "$i" >> "$WORK/keys.slices"
+  done
+  git --git-dir="$RG_COMMON" -C "$WORK" hash-object --no-filters --stdin-paths \
+    < "$WORK/keys.slices" > "$WORK/keys.shas" 2>/dev/null || return 0
+  { mapfile -t shas < "$WORK/keys.shas"; } 2>/dev/null
+  [ "${#shas[@]}" = "$n_bulk" ] || return 0
+  for i in $bulk; do INPUT_KEYS[$i]=${shas[$k]%$'\r'}; k=$((k + 1)); done
 }
 
 # WHAT A REUSABLE `ok` MEANS. Bump this when a runner change redefines it: every recorded ledger row
@@ -2580,7 +2736,7 @@ if [ -n "$RUNDIR" ]; then
     printf 'schema\t1\n'
     printf 'run_id\t%s\n' "$RUNID"
     printf 'started\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-    printf 'head\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"
+    printf 'head\t%s\n' "$RG_HEAD"
     printf 'base\t%s\n' "$BASE"
     printf 'base_from\t%s\n' "${GATE_BASE:+GATE_BASE}${GATE_BASE:-$BASE_FROM_LADDER}"
     printf 'fingerprint\t%s\n' "$FPRINT_START"
@@ -2603,7 +2759,7 @@ if [ -n "$RUNDIR" ]; then
     printf 'leg_ceilings\t%s\n' "$([ "$CEILINGS_LIVE" = 1 ] && echo live || echo inert)"
     printf 'profile_from\t%s\n' "$PROF_TAG"
     printf 'legs\t%s\n' "$total"
-    printf 'worktree\t%s\n' "$(git rev-parse --show-toplevel 2>/dev/null)"
+    printf 'worktree\t%s\n' "$ROOT"
     # THE QUEUE WAIT, paired value and source, in the header's own `value`/`_from` grammar —
     # `base`/`base_from`, `full`/`full_from`, `profile_row`/`profile_from`. Fourth instance.
     # DELIBERATELY OUTSIDE the run-envelope block above: `run-gates.evidence.test.sh` asserts that
@@ -2641,6 +2797,12 @@ if [ -n "$RUNDIR" ]; then
   chmod 600 "$RUNDIR/header" 2>/dev/null || true
 fi
 
+# The keys are wanted by a ledger row, which needs the run directory, or by the reuse block below;
+# a bar with neither computes none, as a bar with neither asked git for none before.
+if [ -n "$RUNDIR" ] || { [ -n "${GATE_REUSE:-}" ] && [ -n "$LEDGER" ] && [ -s "$LEDGER" ]; }; then
+  build_input_keys
+fi
+
 # ---- reuse a proven green (the reuse unit) -------------------------------------------------
 # OPT-IN, and that is the boundary rule rather than caution: an advisory input may cause LESS work
 # only on a run that is not authoritative. `.githooks/pre-push` never sets this, so the run that
@@ -2663,7 +2825,7 @@ if [ -n "${GATE_REUSE:-}" ] && [ -n "$LEDGER" ] && [ -s "$LEDGER" ]; then
     [ "$_n" = "${names[$i]}" ] || continue
     [ "$_st" = ok ] || continue                      # a RED row is never reusable
     [ -n "$_key" ] && [ "$_key" != "-" ] || continue # no key recorded is not a match, it is a gap
-    [ "$_key" = "$(input_key "$i")" ] || continue
+    [ "$_key" = "${INPUT_KEYS[$i]:--}" ] || continue
     printf 'reuse' > "$WORK/$i.rc"
   done
 fi
@@ -2796,13 +2958,17 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
   # S2), so every file a retry writes sits BESIDE the first attempt's and the red attribution still
   # reads that first attempt exactly as it was written.
   local i=$1 sfx=${2:-} s e out rc tpid="" FOREIGN=unknown
+  local -a chunks_out=()
   # THE WALL'S HANDLE ON THIS LEG. `$BASHPID`, never `$$`: inside a backgrounded function `$$` is
   # still the RUNNER's pid, and a wall that killed that would kill the shell that has to print the
   # verdict. Written before anything else so a leg that wedges on its first line is still reachable.
   printf '%s' "$BASHPID" > "$WORK/$i$sfx.pid" 2>/dev/null || true
   local argv; IFS=$'\x1f' read -ra argv <<<"${argvs[$i]}"
   case "${argv[0]}" in python|python3) argv[0]=$PYBIN ;; esac   # the manifest stores the canonical python3; run under the resolved PYBIN
-  s=${EPOCHREALTIME/[.,]/}000
+  # THE CLOCK IS A BUILTIN (TOOL-aSparedSpawn-4 S1): `EPOCHREALTIME` in nanoseconds, its separator
+  # stripped, and the date builtin's whole seconds only where the shell has none, so a leg's seconds
+  # field degrades to whole seconds there rather than to zero.
+  if [ -n "${EPOCHREALTIME:-}" ]; then s=${EPOCHREALTIME/[.,]/}000; else printf -v s '%(%s)T000000000' -1; fi
   # legs never read stdin — deny it so a stray reader can't hang the bar. The profile's per-leg
   # timeout wraps the exec when the selected row asks for one: a leg that outlives it exits 124 and
   # is reported RED naming itself, never skipped and never green. That is a COVERAGE improvement, not
@@ -2840,9 +3006,21 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
     printf '%s' "$tpid" > "$WORK/$i$sfx.tpid" 2>/dev/null || true
     wait "$tpid" 2>/dev/null; rc=$?
   else "${argv[@]}" </dev/null >"$WORK/$i$sfx.raw" 2>&1; rc=$?; fi
-  out=$(cat "$WORK/$i$sfx.raw" 2>/dev/null)
-  e=${EPOCHREALTIME/[.,]/}000
-  local secs; secs=$(printf '%s.%03d' "$(( (e-s)/1000000000 ))" "$(( ((e-s)/1000000)%1000 ))")
+  # THE OUTPUT, READ BY BUILTINS (TOOL-aSparedSpawn-4 S2), byte for byte what `$(cat …)` captured:
+  # `mapfile -d ''` splits at each NUL, which a bash string cannot hold and the capture dropped too,
+  # the chunks are joined, and the trailing newlines the capture stripped are stripped. An absent file
+  # reads empty, as `cat` did. Output that then ENDS in a CR is the one case the hosts disagree on: the
+  # MSYS substitution strips a trailing CRLF as one newline, Linux keeps the CR. So that output, and
+  # only that, is read by the substitution itself, which gives each host its own bytes.
+  { mapfile -d '' chunks_out < "$WORK/$i$sfx.raw"; } 2>/dev/null
+  printf -v out '%s' ${chunks_out[@]+"${chunks_out[@]}"}
+  while [[ $out == *$'\n' ]]; do out=${out%$'\n'}; done
+  [[ $out == *$'\r' ]] && out=$(cat "$WORK/$i$sfx.raw" 2>/dev/null)
+  # THE MASK IS SET HERE, ONCE, in this worker and only after the leg has exited, so the leg never
+  # inherits it: every file below is created owner-only, which is what the two `chmod 600` gave.
+  umask 077
+  if [ -n "${EPOCHREALTIME:-}" ]; then e=${EPOCHREALTIME/[.,]/}000; else printf -v e '%(%s)T000000000' -1; fi
+  local secs; printf -v secs '%s.%03d' "$(( (e-s)/1000000000 ))" "$(( ((e-s)/1000000)%1000 ))"
   # THE REAP, IN THE WORKER AND BEFORE ITS COMPLETION SIGNAL (TOOL-dDerivedDocket-26 F5). Whatever the
   # timed-out leg left in its group is killed here, so by the time `.rc` exists the attempt's residue
   # is gone and the serial retry and its spawn measurement run beside nothing of this attempt's. It is
@@ -2857,10 +3035,11 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
   # TOOL-dNomadicAtlas-1, ported into the worker: persist EVERY leg, not only the failing one — a
   # passing leg's output is what a later bisect reads, and the bytes are already in memory. Redacted,
   # because a terminal line is ephemeral and a file is not.
-  local lf; lf="$(leg_log "${names[$i]}")" || lf=""
+  local lf="" logged
+  leg_log "${names[$i]}" && lf=$LEG_LOG
+  printf -v logged '# run-gates | leg %s | exit %s\n%s\n' "${names[$i]}" "$rc" "$out"
   if [ -n "$lf" ]; then
-    { printf '# run-gates | leg %s | exit %s\n' "${names[$i]}" "$rc"; printf '%s\n' "$out"; } | redact >"$lf" 2>/dev/null || true
-    chmod 600 "$lf" 2>/dev/null || true
+    { write_redacted "$lf" "$logged"; } 2>/dev/null || true
   fi
   printf '%s\n' "$out" > "$WORK/$i$sfx.out"
   printf '%s\n' "$secs" > "$WORK/$i$sfx.sec"
@@ -2872,9 +3051,7 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
     # sibling already has. It is the same bytes with a longer life, and a durable copy that skips
     # the masking its sibling applies is a credential leak the old scratch-dir lifetime was
     # merely hiding.
-    { printf '# run-gates | leg %s | exit %s\n' "${names[$i]}" "$rc"; printf '%s\n' "$out"; } \
-      | redact >"$RUNDIR/$i$sfx.out" 2>/dev/null || true
-    chmod 600 "$RUNDIR/$i$sfx.out" 2>/dev/null || true
+    { write_redacted "$RUNDIR/$i$sfx.out" "$logged"; } 2>/dev/null || true
     local st; case "$rc" in 0) st=ok ;; *) st=fail ;; esac
     # `timeout` WHEN THE CEILING FIRED (TOOL-dDerivedDocket-26 S2), so a first attempt that is about to
     # be retried is never recorded as a failure, and a retry that timed out again says which kind it was.
@@ -2885,7 +3062,7 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
     # attempt's window (TOOL-aGraftedHelix-5), appended so no positional reader moves.
     derive_foreign "$s" "$e"
     printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-      "${names[$i]}" "$st" "$rc" "$secs" "$s" "$e" "$(input_key "$i")" "$FOREIGN" \
+      "${names[$i]}" "$st" "$rc" "$secs" "$s" "$e" "${INPUT_KEYS[$i]:--}" "$FOREIGN" \
       > "$RUNDIR/$i$sfx.leg.tmp" 2>/dev/null \
       && mv -f "$RUNDIR/$i$sfx.leg.tmp" "$RUNDIR/$i$sfx.leg" 2>/dev/null || true
   fi
@@ -2960,7 +3137,9 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     fails=$((fails+1)); c_ran=$((c_ran+1)); c_fail=$((c_fail+1)); printf 'GATE FAIL  %s  (no result)\n' "${names[$i]}"
     FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (no result)"$'\n'; return
   fi
-  rc=$(cat "$WORK/$i.rc")
+  # Read by the builtin (TOOL-aSparedSpawn-4 S6): every one of these files holds one line, so `read`
+  # answers what `$(cat …)` did without a fork, and a missing file leaves the default in place.
+  rc=""; { IFS= read -r rc < "$WORK/$i.rc"; } 2>/dev/null
   if [ "$rc" = ondemand ]; then
     # THE FIFTH VERB, and it is NOT `skip`. Two reasons, both load-bearing. `skip`'s tail says
     # `unchanged vs <branch>`, which is false here — the leg is not unchanged, it is out of subject —
@@ -2981,8 +3160,9 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     reuses=$((reuses+1)); c_reuse=$((c_reuse+1)); printf 'GATE reuse %s  (proven green, inputs unchanged)\n' "${names[$i]}"
   elif [ "$rc" = 0 ]; then c_ran=$((c_ran+1)); printf 'GATE ok    %s\n' "${names[$i]}"
   else c_ran=$((c_ran+1))
-       local fired; fired=$(cat "$WORK/$i.bound" 2>/dev/null || printf 0)
-       local secs; secs=$(cat "$WORK/$i.sec" 2>/dev/null) || secs=""
+       local fired=0 secs=""
+       { IFS= read -r fired < "$WORK/$i.bound"; } 2>/dev/null
+       { IFS= read -r secs < "$WORK/$i.sec"; } 2>/dev/null
        # THE SERIAL RETRY'S DEFERRAL (TOOL-dDerivedDocket-26 S1). A leg whose OWN ceiling fired is not
        # failed here: a bar under its own concurrency kills a leg at 5400 s that ran in 267 s alone
        # (TOOL-aSurfacedLexicon-22), so the first timeout is not yet a finding. It is DEFERRED, printed
@@ -3005,7 +3185,7 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
        FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  $ftail"$'\n'   # TOOL-aLeasedGauntlet-1 S3: keep for the durable summary
        # TOOL-dNomadicAtlas-1: a POINTER at the leg's own output, so the durable summary answers WHY
        # and not only WHICH. A pointer, never the bytes — this file is what an operator quotes.
-       lf="$(leg_log "${names[$i]}")" && [ -n "$lf" ] && FAILED_LEGS="${FAILED_LEGS}    log: $lf"$'\n'; fi
+       leg_log "${names[$i]}" && lf=$LEG_LOG && [ -n "$lf" ] && FAILED_LEGS="${FAILED_LEGS}    log: $lf"$'\n'; fi
 }
 
 # Dispatch and report from ONE shell, so this shell owns every worker and can BLOCK on `wait -n`
@@ -3491,7 +3671,7 @@ run_leg_retry() {
     fi
     printf 'GATE FAIL  %s  (%s)\n' "${names[$i]}" "$tail"; sed 's/^/    /' "$WORK/$i.retry.out"
     FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  ($tail)"$'\n'
-    lf="$(leg_log "${names[$i]}")" && [ -n "$lf" ] && FAILED_LEGS="${FAILED_LEGS}    log: $lf"$'\n'
+    leg_log "${names[$i]}" && lf=$LEG_LOG && [ -n "$lf" ] && FAILED_LEGS="${FAILED_LEGS}    log: $lf"$'\n'
   done
   if [ -f "$WORK/wall.breach" ]; then v=killed
   elif [ "$RETRY_FAILS" = 0 ]; then v=green
@@ -3515,7 +3695,7 @@ run_tail_retry() {
     [ -e "$f" ] || return 0
     j=${f##*/}; j=${j%.defer}
     case " $TAIL_RELEASED " in *" $j "*) continue ;; esac
-    nlive=$(live)
+    live; nlive=$LIVE_N
     [ "$nlive" -le 1 ] || return 0
     check_dispatch_pause "$nlive" && return 0
     TAIL_RELEASED="$TAIL_RELEASED $j"
@@ -3916,7 +4096,7 @@ sys.stdout.buffer.write(("\n".join(out) + "\n").encode())
 ' "$ATMP/manifest-at-R" "$(dirname "$KITREL")" > "$ATTR_ROWS" 2>/dev/null || ATTR_ROWS_STATE=unparseable
     fi
     # The worktree lives under the git COMMON dir, made absolute, as the baseline runner places its own.
-    gcd=$(git rev-parse --git-common-dir 2>/dev/null) || gcd=""
+    gcd=$RG_COMMON_RAW
     case "$gcd" in /*|[A-Za-z]:/*) : ;; '') gcd="$GD" ;; *) gcd="$ROOT/$gcd" ;; esac
     ATTR_WT_PATH="$gcd/gate-attr.$$"
     write_normaliser "$ATTR_NORM" "$ROOT" "$ATTR_WT_PATH" \
@@ -4005,7 +4185,15 @@ sys.stdout.buffer.write(("\n".join(out) + "\n").encode())
   return 0
 }
 
-live() { jobs -rp | wc -l; }
+# live -> LIVE_N, the count of RUNNING jobs, `jobs -rp`'s meaning unchanged: the listing goes to a
+# work-dir file and `mapfile` counts it, all in this shell, where `$(live)` and its `| wc -l` were a
+# fork and an exec per call on every pass of the reader (TOOL-aSparedSpawn-4 S6).
+live() {
+  local -a pids=()
+  jobs -rp > "$WORK/live.pids" 2>/dev/null
+  { mapfile -t pids < "$WORK/live.pids"; } 2>/dev/null
+  LIVE_N=${#pids[@]}
+}
 while [ "$wi" -lt "$nwalk" ]; do
   [ -f "$WORK/wall.breach" ] && break
   next=${WALK[$wi]}
@@ -4015,7 +4203,7 @@ while [ "$wi" -lt "$nwalk" ]; do
   di_before=$di
   # THE RUNNING COUNT IS CAPTURED from the test that already takes it, so the memory pause's decision
   # below asks nothing again and adds no spawn (TOOL-aGraftedHelix-7).
-  while [ "$di" -lt "$ndisp" ] && { nlive=$(live); [ "$nlive" -lt "$JOBS" ]; }; do
+  while [ "$di" -lt "$ndisp" ] && { live; nlive=$LIVE_N; [ "$nlive" -lt "$JOBS" ]; }; do
     k=${disp[$di]}; di=$((di+1))
     { [ -z "${names[$k]}" ] || [ -f "$WORK/$k.rc" ]; } && continue   # sentinel, or already decided by the guard pass
     # A HOLD steps the index back and leaves the pass: the reader below then blocks on `wait -n` as it
@@ -4030,7 +4218,7 @@ while [ "$wi" -lt "$nwalk" ]; do
   # retry starts here, beside at most one running job, rather than after the final `wait`.
   [ "$di" -lt "$ndisp" ] || run_tail_retry
   if [ -f "$WORK/$next.rc" ]; then report_one "$next"; wi=$((wi+1)); continue; fi
-  if [ "$(live)" -gt 0 ]; then wait -n 2>/dev/null || true; continue; fi
+  live; if [ "$LIVE_N" -gt 0 ]; then wait -n 2>/dev/null || true; continue; fi
   # Nothing running. That is NOT yet evidence this leg has no result: `jobs -rp` counts only RUNNING
   # jobs, so a worker that finished between the file check and the count is invisible, and with
   # instant legs the pool can drain faster than the reader walks. Exhaust dispatch, reap everything,
@@ -4110,7 +4298,10 @@ if [ -n "$LEDGER" ]; then
     # rather than leaving that rule to be re-implemented there. A key on a failed row would be a
     # true statement about the inputs and a dangerous one about the verdict.
     [ "$lst" = ok ] || lkey=-
-    printf '%s\t%s\t%s\t%s\t%s\n' "${names[$i]}" "$(cat "$lsec")" "$lst" "$lkey" "$lend" >> "$new"
+    # The seconds by the builtin, a one-line file whose `$(cat …)` was a fork and an exec per leg
+    # (TOOL-aSparedSpawn-4 S6).
+    lsv=""; { IFS= read -r lsv < "$lsec"; } 2>/dev/null
+    printf '%s\t%s\t%s\t%s\t%s\n' "${names[$i]}" "$lsv" "$lst" "$lkey" "$lend" >> "$new"
   done
   # A guard-SKIPPED leg never enters runleg(), so it produces no .sec. Rewriting the file from this
   # run's rows alone therefore DELETED the cached duration of every skipped leg — and the runs where
@@ -4350,7 +4541,7 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
   # boundary reads LAST, never displaces the primary's record. It is ONE slot per clone:
   # last writer wins, so one linked worktree's green can evict another's; that costs a saving, never a verdict,
   # because the boundary validates it with the same predicates as its own.
-  _gcd=$(git rev-parse --git-common-dir 2>/dev/null) || _gcd=""
+  _gcd=$RG_COMMON_RAW
   if [ -n "$_gcd" ] && [ -f "$gd/gate-full-green" ]; then
     _gcd_abs=$(cd "$_gcd" 2>/dev/null && pwd -P) || _gcd_abs=""
     _gd_abs=$(cd "$gd" 2>/dev/null && pwd -P) || _gd_abs=""

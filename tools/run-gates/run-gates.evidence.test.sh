@@ -88,7 +88,8 @@ DC_PY="${PYBIN:-}"
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -125,7 +126,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -146,7 +147,8 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=131
+FLOOR_ASSERTIONS=151
+# RAISED 131 -> 151 by TOOL-aSparedSpawn-4: the worker-builtin arms, AC1 to AC4, AC6 and AC7, twenty assertions.
 # RAISED 129 -> 131 by TOOL-aSparedSpawn-3: the dispatch-prior arms, AC5 and AC6, one assertion each.
 # RAISED 115 -> 129 by TOOL-aSparedSpawn-1: the content-keyed reuse arms, AC1 to AC6, fourteen assertions.
 # MERGED 112 / 87 -> 115 at the reconcile with origin/main 290d0d2d5: base 84, plus this branch's 28, plus main's 3.
@@ -1607,6 +1609,151 @@ printf '%s\n' "$pz_rep" | grep '^# set aside:' | grep -q '[^0-9]1 paused' \
   && ok "AC10 the set-aside line names 1 paused" \
   || { nope "AC10 the set-aside line does not name 1 paused"; printf '%s\n' "$pz_rep" | sed 's/^/      /'; }
 rm -rf "$PZ_T"
+
+# --- THE WORKER'S BUILTINS KEEP TODAY'S BYTES (TOOL-aSparedSpawn-4 AC1 to AC4, AC6, AC7) -----------
+# The worker reads its clock, its output, its log name and its key with builtins where it spawned. Each
+# arm grades the cut runner against what the spawning spelling produced, computed here by that spelling,
+# and then against a copy with each builtin swapped back for a variant that loses the byte it pins,
+# which must red. The copies sit OUTSIDE the scratch tree, so a copy's own bytes are no input of a key.
+# WHAT THIS DOES NOT CHECK: a mode where the host ignores `chmod`, announced as a skip; and the spawn
+# count itself, which the run-log suite's SPAWNS arm holds.
+SB_T=$(mktemp -d); SB_K=$(mktemp -d)
+build_sb_kit() { # name · runner file -> $SB_K/<name>/run-gates.sh beside its two siblings
+  mkdir -p "$SB_K/$1" && cp "$2" "$SB_K/$1/run-gates.sh" \
+    && cp "$ROOT/${PFX}${KIT}/gate-fingerprint.sh" "$ROOT/${PFX}${KIT}/gate-profiles.txt" "$SB_K/$1/"
+}
+run_sb_bar() { # tree · kit name · manifest · VAR=value… -> its rc, its output in $SB_K/<kit>.out
+  local t=$1 k=$2 m=$3; shift 3
+  ( cd "$t" && env -u GATE_BASE -u GATE_FULL -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES -u GATE_DOCS_BASE \
+      GATE_TURNSTILE=0 GATE_WALL=0 GATE_LEGS="$m" LC_ALL=C.UTF-8 "$@" bash "$SB_K/$k/run-gates.sh" > "$SB_K/$k.out" 2>&1; echo $? )
+}
+read_sb_run() { local c=""; IFS= read -r c < "$1/.git/gate-run/current" 2>/dev/null; SB_RUN="$1/.git/gate-run/$c"; }   # -> SB_RUN
+( cd "$SB_T" && git init -q -b main . && git config user.email sb@test.invalid && git config user.name sb \
+    && git config core.autocrlf false && mkdir -p ga/sub gb && printf 'one\n' > ga/one.txt && printf 'two\n' > ga/sub/two.txt \
+    && printf 'f\n' > gb/f.txt && printf 'g\n' > gb/g.txt && git add -A && git commit -qm seed \
+    && git remote add origin ../origin.git && git update-ref refs/remotes/origin/main HEAD \
+    && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
+# A dirty tree: an edited tracked file, an untracked one under a guard, a staged edit.
+printf 'edited\n' >> "$SB_T/ga/one.txt"; printf 'new\n' > "$SB_T/ga/sub/new.txt"
+printf 'staged\n' >> "$SB_T/gb/g.txt"; git -C "$SB_T" add gb/g.txt
+# The output legs, as names and `bash -c` programs, and the key legs, each guarded as a different shape:
+# a directory, a nested directory, two files, a glob that takes the per-leg path, a path that is absent.
+SB_NAMES=("trail" "nul" "crlf" "none" "url" "nourl" "sp é/x y" "sleeper")
+SB_CMDS=("printf 'a\n\n\n'" "printf 'x\0y\r\nz\n'" "printf 'l1\r\nl2\r\n\r\r\n'" "exit 0"
+  "echo fetch https://u:p@host/x; printf 'c\r\n'" "echo see https://host/x and a@b; printf 'd\r\n'" "echo multi" "sleep 1")
+"$DC_PY" -c '
+import json, sys
+a = sys.argv[2:]; h = len(a) // 2
+rows = [{"name": n, "argv": ["bash", "-c", c]} for n, c in zip(a[:h], a[h:])]
+for name, guard in (("ga", ["ga/"]), ("gsub", ["ga/sub"]), ("gfiles", ["gb/f.txt", "ga/one.txt"]),
+                    ("gglob", ["gb/*.txt"]), ("gnone", ["nosuch/"])):
+    rows.append({"name": name, "argv": ["bash", "-c", "exit 0"], "guard": guard})
+open(sys.argv[1], "w", encoding="utf-8", newline="\n").write(json.dumps(rows))
+' "$SB_K/sb.json" "${SB_NAMES[@]}" "${SB_CMDS[@]}"
+build_sb_kit cut "$RUNNER"
+# THE BROKEN COPY, one variant per criterion: the end stamp loses its scale, the trailing-newline strip
+# is gone, the log name is mapped in the caller locale, the redaction guard never matches, the mask is
+# never set, and the union listing sorts backwards.
+sed -e 's/^  if \[ -n "\${EPOCHREALTIME:-}" \]; then e=\${EPOCHREALTIME\/\[.,\]\/}000;/  if [ -n "${EPOCHREALTIME:-}" ]; then e=${EPOCHREALTIME\/[.,]\/};/' \
+    -e "s/^  while \[\[ \$out == \*\$'\\\\n' \]\]; do\$/  while false; do/" \
+    -e 's/^  local LC_ALL=C$/  local LC_UNUSED=C/' -e 's/^    \*:\/\/\*@\*) printf/    *:\/\/*@@@*) printf/' \
+    -e 's/^  umask 077$/  : umask 077/' -e 's/| LC_ALL=C sort > "\$WORK\/keys.listing"/| LC_ALL=C sort -r > "$WORK\/keys.listing"/' \
+    "$RUNNER" > "$SB_K/broken.sh"
+sb_moved=$(diff "$RUNNER" "$SB_K/broken.sh" | grep -c '^>')
+[ "$sb_moved" = 6 ] && ok "S2 the broken copy carries all six variants" \
+  || nope "S2 the broken copy carries $sb_moved of six variants: a sed no longer matches the runner"
+build_sb_kit broken "$SB_K/broken.sh"
+# THE PER-LEG REFERENCE: every leg keyed by `input_key`, the definition the precompute must reproduce.
+sed 's/^    plain=1$/    plain=0/' "$RUNNER" > "$SB_K/perleg.sh"
+[ "$(diff "$RUNNER" "$SB_K/perleg.sh" | grep -c '^>')" = 1 ] && ok "S5 the per-leg copy keys every leg through input_key" \
+  || nope "S5 the per-leg copy did not take its one variant"
+build_sb_kit perleg "$SB_K/perleg.sh"
+sb_rc=$(run_sb_bar "$SB_T" perleg "$SB_K/sb.json" GATE_FULL=1 GATE_JOBS=2); read_sb_run "$SB_T"; cp -r "$SB_RUN" "$SB_K/perleg.run"
+sb_rc=$(run_sb_bar "$SB_T" broken "$SB_K/sb.json" GATE_FULL=1 GATE_JOBS=2); read_sb_run "$SB_T"; cp -r "$SB_RUN" "$SB_K/broken.run"
+cp -r "$SB_T/.git/gate-logs" "$SB_K/broken.logs"; rm -rf "$SB_T/.git/gate-logs"
+sb_rc=$(run_sb_bar "$SB_T" cut "$SB_K/sb.json" GATE_FULL=1 GATE_JOBS=2); read_sb_run "$SB_T"
+[ "$sb_rc" = 0 ] && ok "S2 the cut runner's bar over the output and key legs is green" || nope "S2 the cut runner's bar exited $sb_rc"
+# AC1: three decimals of a second that really passed.
+check_sb_secs() { awk -F'\t' 'NR == 1 { exit !($4 ~ /^[0-9]+\.[0-9][0-9][0-9]$/ && $4 + 0 >= 1.0) }' "$1" 2>/dev/null; }
+check_sb_secs "$SB_RUN/7.leg" && ok "AC1 a one-second leg's seconds read $(cut -f4 "$SB_RUN/7.leg") from EPOCHREALTIME" \
+  || nope "AC1 a one-second leg's seconds field reads '$(cut -f4 "$SB_RUN/7.leg" 2>/dev/null)'"
+check_sb_secs "$SB_K/broken.run/7.leg" && nope "AC1 an end stamp that lost its scale still read as seconds" \
+  || ok "AC1 an end stamp that lost its scale reds: '$(cut -f4 "$SB_K/broken.run/7.leg" 2>/dev/null)'"
+# AC2 to AC4: each output leg's two copies against the spawning spelling's, and its log by today's name.
+sb_bad=0; sb_brk=0; sb_name_brk=0
+for ((sb_i=0; sb_i<${#SB_NAMES[@]}; sb_i++)); do
+  sb_x=$(bash -c "${SB_CMDS[$sb_i]}" 2>&1); sb_xr=$?
+  { printf '# run-gates | leg %s | exit %s\n' "${SB_NAMES[$sb_i]}" "$sb_xr"; printf '%s\n' "$sb_x"; } \
+    | sed -E 's#://[^/@[:space:]]+:[^/@[:space:]]+@#://***:***@#g' > "$SB_K/want.$sb_i" 2>/dev/null
+  printf '%s' "${SB_NAMES[$sb_i]}" > "$SB_K/name.$sb_i"
+  sb_log="$(tr -c 'A-Za-z0-9._-' '_' < "$SB_K/name.$sb_i").log"
+  cmp -s "$SB_K/want.$sb_i" "$SB_RUN/$sb_i.out" && cmp -s "$SB_K/want.$sb_i" "$SB_T/.git/gate-logs/$sb_log" \
+    || { sb_bad=$((sb_bad + 1)); echo "      leg ${SB_NAMES[$sb_i]}: a copy differs from the spawning spelling's, or no log at $sb_log"; }
+  cmp -s "$SB_K/want.$sb_i" "$SB_K/broken.run/$sb_i.out" || sb_brk=$((sb_brk + 1))
+  [ -f "$SB_K/broken.logs/$sb_log" ] || sb_name_brk=$((sb_name_brk + 1))
+done 2>/dev/null
+[ "$sb_bad" = 0 ] && ok "AC2 every output leg's run-record copy and gate-logs copy equal the \$(cat) capture's bytes, NUL, CRLF and trailing newlines included" \
+  || nope "AC2 $sb_bad output leg(s) differ from the spawning spelling's bytes"
+[ "$sb_brk" -ge 2 ] && ok "AC2 a strip that keeps the trailing newlines, or a guard that never redacts, moves $sb_brk copies" \
+  || nope "AC2 the broken copy moved only $sb_brk copies: the arm cannot see a lost byte"
+[ -f "$SB_T/.git/gate-logs/sp____x_y.log" ] && ok "AC3 a name with a space, a slash and a two-byte character maps one underscore per byte" \
+  || nope "AC3 no log at sp____x_y.log: $(ls "$SB_T/.git/gate-logs" | tr '\n' ' ')"
+if [ "$(LC_ALL=C.UTF-8 bash -c 'x="é"; echo ${#x}')" = 1 ]; then
+  [ "$sb_name_brk" -ge 1 ] && ok "AC3 the mapping in the caller's UTF-8 locale names a different log" \
+    || nope "AC3 the mapping without the C locale still named today's log"
+else
+  skipped "AC3 the locale-dropped variant: this host has no C.UTF-8 locale, so a multibyte character is two bytes either way"
+fi
+grep -q '://\*\*\*:\*\*\*@host/x' "$SB_RUN/4.out" && ! grep -q 'u:p@' "$SB_RUN/4.out" \
+  && ok "AC4 a credential URL is masked in the run-record copy" || nope "AC4 a credential survived into the run-record copy"
+grep -q 'u:p@' "$SB_K/broken.run/4.out" && ok "AC4 a guard that never matches leaks the credential, so the arm can see it" \
+  || nope "AC4 the never-matching guard still masked the credential: the arm cannot see a skipped redaction"
+: > "$SB_RUN/mode.probe"; chmod 600 "$SB_RUN/mode.probe"; sb_mode=$(ls -l "$SB_RUN/mode.probe" | cut -c1-10)
+if [ "$sb_mode" = -rw------- ]; then
+  [ "$(ls -l "$SB_RUN/4.out" | cut -c1-10)|$(ls -l "$SB_T/.git/gate-logs/url.log" | cut -c1-10)" = "$sb_mode|$sb_mode" ] \
+    && ok "AC4 both copies carry the mode chmod 600 gives" || nope "AC4 a copy is not owner-only"
+  [ "$(ls -l "$SB_K/broken.run/4.out" | cut -c1-10)" != "$sb_mode" ] && ok "AC4 a worker with no mask writes a wider copy" \
+    || nope "AC4 the unmasked worker still wrote owner-only"
+else
+  skipped "AC4 the mode: chmod 600 gives $sb_mode on this host, so no mask can be observed"; skipped "AC4 the unmasked variant, for the same reason"
+fi
+# AC6: every ledger key equals the per-leg definition's, and a backwards union reds the guarded ones.
+sb_same=0; sb_moved=0
+for ((sb_i=0; sb_i<13; sb_i++)); do
+  sb_k=$(cut -f7 "$SB_RUN/$sb_i.leg" 2>/dev/null); sb_p=$(cut -f7 "$SB_K/perleg.run/$sb_i.leg" 2>/dev/null)
+  { [ -n "$sb_k" ] && [ "$sb_k" != - ] && [ "$sb_k" = "$sb_p" ]; } && sb_same=$((sb_same + 1))
+  [ "$(cut -f7 "$SB_K/broken.run/$sb_i.leg" 2>/dev/null)" = "$sb_k" ] || sb_moved=$((sb_moved + 1))
+done
+[ "$sb_same" = 13 ] && ok "AC6 all 13 ledger keys equal input_key's, the glob and the absent guard included" \
+  || nope "AC6 only $sb_same of 13 ledger keys equal input_key's"
+[ "$sb_moved" -ge 1 ] && ok "AC6 a union listing sorted backwards moves $sb_moved key(s)" \
+  || nope "AC6 a backwards union moved no key: the arm cannot see the slice order"
+sb_rc=$(run_sb_bar "$SB_T" cut "$SB_K/sb.json" GATE_FULL=1 GATE_JOBS=2 GATE_REUSE=1)
+[ "$(grep -c '^GATE reuse' "$SB_K/cut.out")" = 13 ] && ok "AC6 a GATE_REUSE bar reuses all 13 legs on the precomputed keys" \
+  || nope "AC6 a GATE_REUSE bar reused $(grep -c '^GATE reuse' "$SB_K/cut.out") of 13 legs"
+# AC7: the header's head and worktree, and the log dir, from a primary tree, a linked worktree and an
+# unborn branch, against what git answers there; an unborn HEAD reads empty, never the word HEAD.
+mk_legs "$tmp/sb1.json" '{"name":"one","argv":["bash","-c","exit 0"]}'
+git -C "$SB_T" worktree add -q "$SB_K/wt" >/dev/null 2>&1
+SB_U=$(mktemp -d); ( cd "$SB_U" && git init -q -b main . && printf 'x\n' > x.txt ) >/dev/null 2>&1
+sed 's/^    printf '"'"'head\\t%s\\n'"'"' "\$RG_HEAD"$/    printf '"'"'head\\t%s\\n'"'"' "$(git rev-parse HEAD 2>\/dev\/null)"/' "$RUNNER" > "$SB_K/oldhead.sh"
+build_sb_kit oldhead "$SB_K/oldhead.sh"
+for sb_t in "$SB_T" "$SB_K/wt" "$SB_U"; do
+  run_sb_bar "$sb_t" cut "$tmp/sb1.json" >/dev/null
+  sb_gd=$(git -C "$sb_t" rev-parse --absolute-git-dir); sb_c=""; IFS= read -r sb_c < "$sb_gd/gate-run/current"
+  sb_h="$sb_gd/gate-run/$sb_c/header"
+  sb_got="$(awk -F'\t' '$1 == "head" { print $2 }' "$sb_h")|$(awk -F'\t' '$1 == "worktree" { print $2 }' "$sb_h")|$([ -f "$sb_gd/gate-logs/one.log" ] && echo logged)"
+  sb_want="$(git -C "$sb_t" rev-parse --verify -q HEAD)|$(git -C "$sb_t" rev-parse --show-toplevel)|logged"
+  [ "$sb_got" = "$sb_want" ] && ok "AC7 ${sb_t##*/}: head, worktree and the log dir are what git answers there" \
+    || nope "AC7 ${sb_t##*/}: the header and log dir read '$sb_got', git answers '$sb_want'"
+done
+run_sb_bar "$SB_U" oldhead "$tmp/sb1.json" >/dev/null
+sb_c=""; IFS= read -r sb_c < "$SB_U/.git/gate-run/current"
+[ "$(awk -F'\t' '$1 == "head" { print $2 }' "$SB_U/.git/gate-run/$sb_c/header")" = HEAD ] \
+  && ok "AC7 a bare rev-parse HEAD on an unborn branch reads the word, so the arm can see it" \
+  || nope "AC7 the bare-rev-parse variant did not read HEAD: the unborn arm proves nothing"
+git -C "$SB_T" worktree remove --force "$SB_K/wt" >/dev/null 2>&1
+rm -rf "$SB_T" "$SB_K" "$SB_U"
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "run-gates evidence: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }

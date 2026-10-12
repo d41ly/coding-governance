@@ -131,7 +131,7 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `run-gates.gov.test.sh` | the GOV-ONLY arms, withheld from the payload; see below |
 | `run-gates.evidence.test.sh` | the durability arm: a red leg's output survives on disk |
 | `run-gates.turnstile.test.sh` | the turnstile arms: peak occupancy, reaping, FIFO order, release on every signal |
-| `run-gates.runlog.test.sh` | the run-log arms: one line per bar on every exit path after the trap and on every caught signal, withheld from the payload |
+| `run-gates.runlog.test.sh` | the run-log arms: one line per bar on every exit path after the trap and on every caught signal, and the `SPAWNS` arm's per-leg spawn ceiling, withheld from the payload |
 | `adopt-run-gates.sh` | `--check` asserts a target's `[gate_runner]` declaration still matches this runner's output strings |
 | `adopt-run-gates.test.sh` | the adopter e2e, gated on EFFECTS rather than exit codes |
 | `check-receipt.py` | the leg `receipt sync (installed files match the receipt)`: every engine row of `.governance/install.json` still on disk and still hashing to its recorded sha256, or, where the raw bytes miss, hashing through the target's own clean filter to the row's `oid` while the raw bytes' blob does not: that row is graded clean and counted `eol-only` on the summary and `ok` lines, the rule `govkit check` applies, in one `git hash-object --stdin-paths` spawn for every such row. A row with no `oid`, a real edit, a CRLF copy no filter normalizes, a tampered `sha256` over bytes that are the blob, a tree with no `.git` and a git refusal all still red, the last two with a `GIT` line naming why. The INTEGRITY half only — it reads no `source`, `commit` or `gov_oid`, because those resolve against a gov checkout an adopter does not have, and it grades no `seed`, `merged`, `attributes` or `forked` row. A tree with no receipt is an announced `SKIP`, and the built-in fixture arms, the eol-only ones over real git repositories, run on every invocation so the leg has a verdict there too; its `fixtures:` line prints their count |
@@ -307,6 +307,30 @@ prints nothing new. Every shipped row declares 0 until the width A/B sets each r
 `derive-ceilings.py` sets aside, as `paused`, any reading whose leg ran while one of its own run's
 episodes was open. `run-selftests.sh --pooled` carries the same block, byte-identical and
 parity-graded, holds its next suite the same way, and prints the same line; it keeps no `pauses` row.
+
+## The runner's own spawns — a ceiling per leg, and no clock
+
+A fork costs a large fraction of a second on a loaded Windows host, so the bookkeeping a worker pays
+around each leg is held to a count rather than left to a timing (TOOL-aSparedSpawn-4). The worker reads
+its clock from `EPOCHREALTIME`, the leg's output with `mapfile`, and its log name with a parameter
+expansion; it runs `redact` only on output that holds `://` and then `@`, and sets `umask 077` once,
+after the leg exits, in place of two `chmod 600`. Every leg's input key is computed once before
+dispatch, the bar asks `git rev-parse` once for its git dir, common dir and HEAD, and the
+process-monitor kit dir is resolved inside the legs-parse python, so its
+`run-gates: process-monitor:` line now prints after the turnstile lines rather than before them.
+
+**The `SPAWNS` arm of `run-gates.runlog.test.sh`** holds that cost. It traces a one-leg and a two-leg
+bar at width 1 with a `PS4` that carries `${BASHPID}`, counts FORKS as the pids that trace a command of
+their own and EXECS as the command words that are no builtin, keyword or runner function, and reads
+the per-leg figure as the difference. It counts a specimen with known forks first and refuses when
+the counter disagrees, so a trace that cannot move reads as a refusal, never as zero. The ceiling is
+the `SPAWN_CEILING` constant in that file, pinned with its date and node. The arm reds on growth,
+printing the figure, the ceiling and the `file:line` sites the extra events came from, and reds as
+STALE when the ceiling sits more than max(3, 5 %) above the figure.
+
+**To move it:** lower the constant in the commit that saves a spawn, to the figure the arm printed.
+Raise it only with a reason line beside the constant naming the spawn that is worth its cost.
+`RGRL_ARMS=SPAWNS bash run-gates.runlog.test.sh` runs the arm alone.
 
 ## The held tier in WSL2 — `run-held-wsl.sh`
 

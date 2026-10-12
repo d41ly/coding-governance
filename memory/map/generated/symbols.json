@@ -1758,6 +1758,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "build_input_keys",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "build_invocations",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
@@ -1771,6 +1776,11 @@
       "id": "build_item_variant",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_key_text",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "build_killed_close_fixture",
@@ -2226,6 +2236,11 @@
       "id": "build_sandbox",
       "kind": "function",
       "file": "tools/unattended/runlog-writer.test.sh"
+    },
+    {
+      "id": "build_sb_kit",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "build_scan_text",
@@ -4228,6 +4243,11 @@
       "file": "tools/memory-tree/merge-rows.test.sh"
     },
     {
+      "id": "check_sb_secs",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "check_scratch_guard",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -4338,9 +4358,24 @@
       "file": "tools/hooks/agent-cap.test.sh"
     },
     {
+      "id": "check_spawn_calibration",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "check_spawn_ceiling",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
       "id": "check_spawn_substitution",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "check_spawns",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
       "id": "check_spec_audit",
@@ -9088,6 +9123,11 @@
       "file": "tools/codebase-map/replay-phrases.py"
     },
     {
+      "id": "measure_python_execs",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
       "id": "measure_ranks",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
@@ -9166,6 +9206,11 @@
       "id": "measure_spawn_rate",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "measure_spawns",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
       "id": "measure_timeline_events",
@@ -12288,6 +12333,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_sb_run",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "read_scan_overlaps",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -14660,11 +14710,6 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
-      "file": "tools/run-gates/run-gates.sh"
-    },
-    {
-      "id": "resolve_kit_dir",
-      "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
@@ -16628,6 +16673,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_sb_bar",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "run_scratch",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -16706,6 +16756,11 @@
       "id": "run_spawn_scan",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "run_spawn_trace",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
       "id": "run_spec_commit_block",
@@ -17326,6 +17381,11 @@
       "id": "scan_replaced_spellings",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_rkd_capture",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
     },
     {
       "id": "scan_round_writes",
@@ -20861,6 +20921,11 @@
       "id": "write_records",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "write_redacted",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "write_refs",
