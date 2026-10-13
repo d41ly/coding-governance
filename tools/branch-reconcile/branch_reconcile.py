@@ -379,7 +379,11 @@ def read_inventory(root):
     remote, branch, ref, notes = resolve_default(root)
     tip = read_git(root, "rev-parse", ref)
     primary, worktrees = read_worktrees(root)
+    # EVERY NAME THE DEFAULT GOES BY is kept (TOOL-dSweptBranches-12): the branch the ladder chose
+    # and the remote's own HEAD branch, which differ when GOV_DEFAULT_BRANCH overrides the remote.
+    observed = resolve_remote(root)[2]
     return {"root": str(root), "remote": remote, "branch": branch, "default_ref": ref,
+            "default_names": sorted({branch, observed} - {""}),
             "default_tip": tip, "default_ct": read_commit_time(root, ref), "notes": notes,
             "primary": primary, "worktrees": worktrees, "refs": read_refs(root, remote),
             "stash": read_stash(root), "skips": {}, "fresh": FRESH_HOURS * 3600, "now": time.time()}
@@ -871,8 +875,8 @@ def derive_action(inv, row, kept_branches):
     kind, name, verdict = row["kind"], row["name"], row["verdict"]
     if kind == "stash":
         return "keep (a stash entry is never deleted)"
-    if (kind == "local" and name == inv["branch"]) or \
-            (kind == "remote" and name == f"{inv['remote']}/{inv['branch']}"):
+    if (kind == "local" and name in inv["default_names"]) or \
+            (kind == "remote" and name in [f"{inv['remote']}/{n}" for n in inv["default_names"]]):
         return "keep (the default branch)"
     if kind == "worktree/primary":
         return "keep (the primary worktree)"
@@ -1039,7 +1043,7 @@ def write_deletions(inv, rows, remote_too):
     for r in rows:
         if r["action"] != "delete branch":
             continue
-        if r["name"] in still or r["name"] == inv["branch"]:
+        if r["name"] in still or r["name"] in inv["default_names"]:
             print(f"kept — branch {r['name']} · still checked out in a worktree")
             continue
         WRITE_TRACE.append(("delete-branch", r["name"]))
@@ -1048,7 +1052,7 @@ def write_deletions(inv, rows, remote_too):
         print(f"{'deleted' if rc == 0 else 'failed'} — branch {r['name']} · was {r['tip'][:12]}")
     names = [r["name"][len(inv["remote"]) + 1:] for r in rows
              if r["action"] == "delete remote branch (--remote)"]
-    names = [n for n in names if n != inv["branch"]]
+    names = [n for n in names if n not in inv["default_names"]]
     if remote_too and names:
         WRITE_TRACE.append(("push-delete", tuple(names)))
         try:

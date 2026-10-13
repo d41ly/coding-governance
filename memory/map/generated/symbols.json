@@ -718,6 +718,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_default_names",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_foreign",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"

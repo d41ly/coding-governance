@@ -815,9 +815,30 @@ def arm_row_edit():
           read_verdict(rows, "local", "row-edit")[0], "UNMERGED-LIVE")
 
 
+def arm_default_names():
+    """TOOL-dSweptBranches-12 — the remote's own HEAD branch is kept when an override names another."""
+    repo = seed_repo(build_dir())
+    with seed_environ():
+        run_git(repo, "checkout", "-q", "-b", "develop")
+        seed_commit(repo, "d.txt", "develop\n", "feat: develop")
+        run_git(repo, "push", "-q", "upstream", "develop")
+        run_git(repo, "fetch", "-q", "upstream")
+        os.environ["GOV_DEFAULT_BRANCH"] = "develop"
+        rows = read_rows(run_cli(repo, "--fresh-hours", "0", env=dict(ENV, GOV_DEFAULT_BRANCH="develop"))[1])
+        check("default-names: AC1 local main reads keep (the default branch)",
+              rows.get(("local", "main"), [""] * 8)[6], "keep (the default branch)")
+        check("default-names: AC1 upstream/main reads keep (the default branch)",
+              rows.get(("remote", "upstream/main"), [""] * 8)[6], "keep (the default branch)")
+        rc, _out = run_main("--root", str(repo), "--fresh-hours", "0", "--write", "--remote")
+        remote = run_git(repo, "ls-remote", "upstream")
+        branches = set(run_git(repo, "for-each-ref", "--format=%(refname:short)", "refs/heads").split())
+        check("default-names: AC1 --write --remote keeps local and remote main",
+              ("main" in branches, "refs/heads/main" in remote), (True, True))
+
+
 ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
         arm_content, arm_stash, arm_remover, arm_write, arm_keeps, arm_unread, arm_foreign,
-        arm_patch_negative, arm_probe_negative, arm_row_edit]
+        arm_patch_negative, arm_probe_negative, arm_row_edit, arm_default_names]
 
 
 def main():
