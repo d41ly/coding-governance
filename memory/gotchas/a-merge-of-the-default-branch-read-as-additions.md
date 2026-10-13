@@ -51,6 +51,12 @@ The sites `TOOL-dSweptBranches-20` classified, with their verdicts in that build
 - `tools/runlog/model.py`, `tools/memory-tree/row_grammar.py` and `tools/memory-tree/check-verdict-epoch.sh`
   read ranges in shapes the table marks safe.
 
+## Related
+
+- It coexists-with `a-gate-that-walks-the-repo-root-reads-other-worktrees`: both make a check read
+  files that are not the subject's own, but there the walk reaches other worktrees' files, and here a
+  range reads files the default branch added as the branch's own.
+
 ## Gate
 
 No machine gate: the class is a property of an invocation, and the shape table above is the check a reviewer
