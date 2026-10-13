@@ -64,3 +64,27 @@ base: a8f0e195a2d80a6d1480e4992aec6565342e35ea
 2026-10-13T01:11:28Z dispatch · item 0ac2418c TOOL-dSweptBranches-3 · reason tools/branch-reconcile/branch_reconcile.py tools/branch-reconcile/selftest.py tools/branch-reconcile/README.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-3.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-3-1-acceptance-ledger.md memory/builds/dSweptBranches/reviews/2026-10-13-review-TOOL-dSweptBranches-1-2-3-4-5-closing-diff-round1.md memory/map/features/branch-reconcile.md
 
 2026-10-13T01:13:50Z dispatch · item 0ac2418c TOOL-dSweptBranches-3 · reason tools/branch-reconcile/branch_reconcile.py tools/branch-reconcile/selftest.py tools/branch-reconcile/README.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-1.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-2.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-3.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-4.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-5.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-3-1-acceptance-ledger.md memory/builds/dSweptBranches/reviews/2026-10-13-review-TOOL-dSweptBranches-1-2-3-4-5-closing-diff-round1.md memory/map/features/branch-reconcile.md
+
+2026-10-13T01:19:35Z review · item dSweptBranches · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 10 · minors 10 · disposition promote
+
+2026-10-13T01:20:57Z rescope · item add TOOL-dSweptBranches-7 · reason promoted at the closing diff review's CONVERGED exit (round 2): H1, ids 2 9 15 26: an unread worktree status falls to the HEAD verdict
+
+2026-10-13T01:20:58Z rescope · item add TOOL-dSweptBranches-8 · reason promoted at the closing diff review's CONVERGED exit (round 2): H2, id 1: a foreign repository at a registered worktree path is graded and rm -rf'd
+
+2026-10-13T01:20:59Z rescope · item add TOOL-dSweptBranches-9 · reason promoted at the closing diff review's CONVERGED exit (round 2): H3, ids 4 11 25: the patch predicate matches an unrelated same-subject commit
+
+2026-10-13T01:20:59Z rescope · item add TOOL-dSweptBranches-10 · reason promoted at the closing diff review's CONVERGED exit (round 2): H4, ids 3 13: a probe is covered on a bare name substring
+
+2026-10-13T01:21:00Z rescope · item add TOOL-dSweptBranches-11 · reason promoted at the closing diff review's CONVERGED exit (round 2): H5, ids 5 24: rotated accepts a row edited in place
+
+2026-10-13T01:21:01Z rescope · item add TOOL-dSweptBranches-12 · reason promoted at the closing diff review's CONVERGED exit (round 2): H6, id 6: the default exclusion ignores the remote's own HEAD branch
+
+2026-10-13T01:21:01Z rescope · item add TOOL-dSweptBranches-13 · reason promoted at the closing diff review's CONVERGED exit (round 2): H7, id 7: the remote delete carries no lease
+
+2026-10-13T01:21:02Z rescope · item add TOOL-dSweptBranches-14 · reason promoted at the closing diff review's CONVERGED exit (round 2): H8, id 10: a merge commit's own content is never graded
+
+2026-10-13T01:21:02Z rescope · item add TOOL-dSweptBranches-15 · reason promoted at the closing diff review's CONVERGED exit (round 2): H9, id 27: submodule content reads covered by None == None
+
+2026-10-13T01:21:03Z rescope · item add TOOL-dSweptBranches-16 · reason promoted at the closing diff review's CONVERGED exit (round 2): H10, id 19: no fixture grades a tracked edit
+
+2026-10-13T01:21:04Z rescope · item add TOOL-dSweptBranches-17 · reason promoted at the closing diff review's CONVERGED exit (round 2): rounds 1 and 2 MEDIUM and LOW items, batched as one unit
