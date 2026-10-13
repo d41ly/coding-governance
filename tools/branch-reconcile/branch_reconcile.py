@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """branch_reconcile.py — every worktree, branch and stash entry, with one verdict each. gov:kit branch-reconcile@1.0
 
-    python <this kit>/branch_reconcile.py [--root <path>]
+    python <this kit>/branch_reconcile.py [--root <path>] [--fresh-hours <n>] [--write [--remote]]
 
-Read-only. It prints one report: a header naming the remote, the default branch and its tip, a
+Read-only without `--write`. It prints one report: a header naming the remote, the default branch and its tip, a
 `skipped — <predicate> · <why>` line for every predicate that could not run, and one row per
 worktree, local branch, remote branch and stash entry:
 
@@ -12,9 +12,15 @@ worktree, local branch, remote branch and stash entry:
 The age is whole days from the tip's commit date to the default tip's, so the report reads no clock
 and two runs over an unchanged repository print the same bytes. It fetches nothing: fetch first.
 
-Exit 0 with the report printed. Exit 2 on a refusal: no repository, a remote ladder that cannot
-choose, or a default branch that resolves nowhere. The verdicts, the write mode and the removal
-rules are the kit README's (TOOL-dSweptBranches-1 to -4).
+`--write` then writes a recovery manifest under the git common directory and removes the worktrees,
+then the local branches, whose verdict is MERGED, EQUIVALENT or SUPERSEDED; `--remote` adds those
+remote branches, deleted in one push. Nothing else is ever deleted, and the default branch is never
+touched.
+
+Exit 0 with the report printed and every write action done or busy; 1 when a write action failed.
+Exit 2 on a refusal: no repository, a remote ladder that cannot choose, a default branch that
+resolves nowhere, `--remote` without `--write`, or a manifest that could not be written. The
+verdicts, the write mode and the removal rules are the kit README's (TOOL-dSweptBranches-1 to -4).
 """
 from __future__ import annotations
 
@@ -571,14 +577,15 @@ def check_noop(inv, tip):
     landed conflicts heavily, so the count separates nothing.
     """
     def load():
-        if inv.get("no-merge-tree"):
-            return False
-        rc, out = run_git(inv["root"], "merge-tree", "--write-tree", inv["default_ref"], tip)
-        if rc not in (0, 1):
-            inv["no-merge-tree"] = True
+        tree = read_git(inv["root"], "rev-parse", inv["default_ref"] + "^{tree}")
+        # THE CAPABILITY IS PROBED ONCE, on the default merged with itself, because a per-tip
+        # failure is also what unrelated histories produce, and that is no statement about git.
+        able = read_cached(inv, "merge-tree", lambda: run_git(
+            inv["root"], "merge-tree", "--write-tree", inv["default_ref"], inv["default_ref"])[0] == 0)
+        if not able:
             inv["skips"]["merge-tree no-op proof"] = "this git has no `merge-tree --write-tree`"
             return False
-        tree = read_git(inv["root"], "rev-parse", inv["default_ref"] + "^{tree}")
+        rc, out = run_git(inv["root"], "merge-tree", "--write-tree", inv["default_ref"], tip)
         return rc == 0 and out.split("\n", 1)[0].strip() == tree
     return read_cached(inv, ("noop", tip), load)
 
@@ -788,8 +795,25 @@ def derive_verdict(inv, item):
     return UNKNOWN, "no predicate decided"
 
 
-def derive_action(inv, item, verdict):
-    return "keep"
+def derive_action(inv, row, kept_branches):
+    """-> what write mode does with a row: `remove worktree`, `delete branch`,
+    `delete remote branch (--remote)`, or `keep` with its reason. The default branch is excluded by
+    NAME before the verdict is read (TOOL-dSweptBranches-3)."""
+    kind, name, verdict = row["kind"], row["name"], row["verdict"]
+    if kind == "stash":
+        return "keep · a stash entry is never deleted"
+    if (kind == "local" and name == inv["branch"]) or \
+            (kind == "remote" and name == f"{inv['remote']}/{inv['branch']}"):
+        return "keep · the default branch"
+    if kind == "worktree/primary":
+        return "keep · the primary worktree"
+    if verdict not in DELETABLE:
+        return "keep"
+    if kind.startswith("worktree/"):
+        return "remove worktree"
+    if kind == "local":
+        return "keep · checked out in a kept worktree" if name in kept_branches else "delete branch"
+    return "delete remote branch (--remote)"
 
 
 # ------------------------------------------------------------------------------- the remover
@@ -884,6 +908,88 @@ def remove_worktree(root, path):
     return "removed", how
 
 
+# ------------------------------------------------------------------------------- write mode
+# TOOL-dSweptBranches-3. Deletes only, of the three landed verdicts, after a recovery manifest is on
+# disk. It never merges, commits, checks out or pushes the default branch; its one push is a delete.
+
+WRITE_TRACE = []  # every mutation in order, the manifest first: the self-test reads the order
+
+
+def write_manifest(inv):
+    """Write every tip and worktree HEAD under the git common dir, flushed, before any deletion."""
+    common = read_git(inv["root"], "rev-parse", "--git-common-dir")
+    if not common:
+        raise Refusal("cannot resolve the git common directory, so no recovery manifest can be written")
+    base = pathlib.Path(common)
+    base = (base if base.is_absolute() else pathlib.Path(inv["root"]) / base) / "branch-reconcile"
+    base.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    path, n = base / f"recovery-{stamp}.txt", 1
+    while path.exists():
+        n += 1
+        path = base / f"recovery-{stamp}-{n}.txt"
+    lines = [f"# branch-reconcile recovery manifest · {stamp} · {inv['remote'] or 'no remote'}/"
+             f"{inv['branch']} at {inv['default_tip']}",
+             "# restore a branch: git branch <name> <sha> · a worktree: git worktree add <path> <sha>"]
+    lines += [f"branch {r['name']} {r['tip']}" for r in inv["refs"] if r["kind"] == "local"]
+    lines += [f"remote {r['name']} {r['tip']}" for r in inv["refs"] if r["kind"] == "remote"]
+    lines += [f"stash {s['name']} {s['tip']}" for s in inv["stash"]]
+    lines += [f"worktree {w['path']} {w['head'] or 'none'}" for w in inv["worktrees"]]
+    try:
+        with open(path, "x", encoding="utf-8", newline="\n") as f:
+            f.write("\n".join(lines) + "\n")
+            f.flush()
+            os.fsync(f.fileno())
+    except OSError as exc:
+        raise Refusal(f"the recovery manifest could not be written, so nothing was deleted: {exc}")
+    WRITE_TRACE.append(("manifest", str(path)))
+    return path
+
+
+def write_deletions(inv, rows, remote_too):
+    """Act on the rows' actions: worktrees, then local branches, then ONE remote push. -> exit code."""
+    root, failed = inv["root"], False
+    print(f"manifest — {write_manifest(inv)}")
+    for r in rows:
+        if r["action"] != "remove worktree":
+            continue
+        WRITE_TRACE.append(("remove-worktree", r["name"]))  # recorded BEFORE the act it orders
+        result, detail = remove_worktree(root, r["item"]["worktree"]["path"])
+        failed = failed or result == "failed"
+        print(f"{result} — worktree {r['name']} · {detail}")
+    run_git(root, "worktree", "prune")
+    out = run_git(root, "worktree", "list", "--porcelain", "-z")[1]
+    still = {w["branch"] for w in parse_worktrees(out) if w["branch"]}
+    for r in rows:
+        if r["action"] != "delete branch":
+            continue
+        if r["name"] in still or r["name"] == inv["branch"]:
+            print(f"kept — branch {r['name']} · still checked out in a worktree")
+            continue
+        WRITE_TRACE.append(("delete-branch", r["name"]))
+        rc, _out = run_git(root, "branch", "-D", "--", r["name"])
+        failed = failed or rc != 0
+        print(f"{'deleted' if rc == 0 else 'failed'} — branch {r['name']} · was {r['tip'][:12]}")
+    names = [r["name"][len(inv["remote"]) + 1:] for r in rows
+             if r["action"] == "delete remote branch (--remote)"]
+    names = [n for n in names if n != inv["branch"]]
+    if remote_too and names:
+        WRITE_TRACE.append(("push-delete", tuple(names)))
+        try:
+            p = subprocess.run(["git", "-C", str(root), "push", inv["remote"], "--delete", *names],
+                               capture_output=True)
+            rc, err = p.returncode, p.stderr.decode("utf-8", errors="replace").strip()
+        except OSError as exc:
+            rc, err = 127, str(exc)
+        failed = failed or rc != 0
+        why = "" if rc == 0 else " · " + (err.splitlines() or ["git push failed"])[-1]
+        print(f"{'deleted' if rc == 0 else 'failed'} — {len(names)} remote branch(es) on {inv['remote']} "
+              f"in one push: {' '.join(names)}{why}")
+    elif names:
+        print(f"kept — {len(names)} deletable remote branch(es): --remote deletes them in one push")
+    return 1 if failed else 0
+
+
 def build_rows(inv):
     """-> one row per worktree, ref and stash entry, its verdict and action included, in report order."""
     rows = []
@@ -899,14 +1005,22 @@ def build_rows(inv):
         pieces = [" · ".join(flags), w["branch"] and f"branch {w['branch']}", render_dirt(w["dirt"]),
                   evidence]
         rows.append({"verdict": verdict, "kind": w["kind"], "name": name, "tip": w["head"],
-                     "ct": w["ct"], "action": derive_action(inv, item, verdict),
-                     "evidence": " · ".join(p for p in pieces if p), "item": item})
+                     "ct": w["ct"], "evidence": " · ".join(p for p in pieces if p), "item": item})
     for r in inv["refs"] + inv["stash"]:
         item = dict(r)
         verdict, evidence = derive_verdict(inv, item)
         rows.append({"verdict": verdict, "kind": r["kind"], "name": r["name"], "tip": r["tip"],
-                     "ct": r["ct"], "action": derive_action(inv, item, verdict),
-                     "evidence": evidence, "item": item})
+                     "ct": r["ct"], "evidence": evidence, "item": item})
+    # A branch stays while any worktree that keeps it checked out stays: git refuses to delete it.
+    wt_rows = [r for r in rows if "worktree" in r["item"]]
+    kept = set()
+    for r in wt_rows:
+        r["action"] = derive_action(inv, r, set())
+        if r["action"] != "remove worktree" and r["item"]["worktree"]["branch"]:
+            kept.add(r["item"]["worktree"]["branch"])
+    for r in rows:
+        if "worktree" not in r["item"]:
+            r["action"] = derive_action(inv, r, kept)
     rows.sort(key=lambda r: (VERDICT_RANK.index(r["verdict"]), KIND_RANK.index(r["kind"]), r["name"]))
     return rows
 
@@ -939,15 +1053,25 @@ def main(argv=None):
     ap.add_argument("--root", default=".", help="any path inside the repository (default: .)")
     ap.add_argument("--fresh-hours", type=float, default=FRESH_HOURS,
                     help=f"activity this recent reads IN-PROGRESS (default: {FRESH_HOURS:g})")
+    ap.add_argument("--write", action="store_true",
+                    help="remove the MERGED, EQUIVALENT and SUPERSEDED worktrees and local branches")
+    ap.add_argument("--remote", action="store_true",
+                    help="with --write, also delete those remote branches, in one push")
     args = ap.parse_args(argv)
+    if args.remote and not args.write:
+        print("branch-reconcile: --remote deletes only under --write", file=sys.stderr)
+        return 2
     try:
         inv = read_inventory(pathlib.Path(args.root))
         inv["fresh"] = args.fresh_hours * 3600
-        lines = render_report(inv, build_rows(inv))
+        rows = build_rows(inv)
+        lines = render_report(inv, rows)
+        print("\n".join(lines))
+        if args.write:
+            return write_deletions(inv, rows, args.remote)
     except Refusal as exc:
         print(f"branch-reconcile: {exc}", file=sys.stderr)
         return 2
-    print("\n".join(lines))
     return 0
 
 

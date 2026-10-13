@@ -43,3 +43,7 @@ base: a8f0e195a2d80a6d1480e4992aec6565342e35ea
 2026-10-13T00:41:19Z brief · item TOOL-dSweptBranches-4 · reason 6cdd2692f8fc memory/builds/dSweptBranches/prompts/2026-10-13-prompt-TOOL-dSweptBranches-4-1-build-brief.md
 
 2026-10-13T00:41:25Z dispatch · item f3ac796f TOOL-dSweptBranches-4 · reason tools/branch-reconcile/branch_reconcile.py tools/branch-reconcile/selftest.py tools/branch-reconcile/README.md memory/map/features/branch-reconcile.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-4.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-4-1-acceptance-ledger.md memory/builds/dSweptBranches/prompts/2026-10-13-prompt-TOOL-dSweptBranches-4-1-build-brief.md
+
+2026-10-13T00:44:37Z brief · item TOOL-dSweptBranches-3 · reason e7972bf1bd35 memory/builds/dSweptBranches/prompts/2026-10-13-prompt-TOOL-dSweptBranches-3-1-build-brief.md
+
+2026-10-13T00:44:41Z dispatch · item d48ccf0a TOOL-dSweptBranches-3 · reason tools/branch-reconcile/branch_reconcile.py tools/branch-reconcile/selftest.py tools/branch-reconcile/README.md memory/map/features/branch-reconcile.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-3.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-3-1-acceptance-ledger.md memory/builds/dSweptBranches/prompts/2026-10-13-prompt-TOOL-dSweptBranches-3-1-build-brief.md

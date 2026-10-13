@@ -26,7 +26,7 @@ from contextlib import redirect_stdout
 
 HERE = pathlib.Path(__file__).resolve().parent
 CLI = HERE / "branch_reconcile.py"
-ASSERTION_FLOOR = 40
+ASSERTION_FLOOR = 52
 PASS, FAIL = [], []
 SCRATCH = []
 
@@ -478,13 +478,13 @@ def arm_remover():
         run_git(repo, "worktree", "add", "-q", "-b", name + "-br", str(p), "main")
         return p
 
-    def fail_git(root, path):
+    def run_failing_remove(root, path):
         return 1, "error: failed to delete 'node_modules/x': Result too large"
 
     real_remove = BR.run_worktree_remove
     linked = []
 
-    def leave_skeleton(extra_file):
+    def build_skeleton_remover(extra_file):
         def remove(root, path):
             rc = real_remove(root, path)
             d = pathlib.Path(path) / "node_modules" / ".pnpm" / "pkg@1" / "node_modules"
@@ -502,7 +502,7 @@ def arm_remover():
     spawned = []
     real_run = subprocess.run
 
-    def spy(argv, *a, **k):
+    def run_spied(argv, *a, **k):
         spawned.append(list(argv))
         return real_run(argv, *a, **k)
 
@@ -510,16 +510,16 @@ def arm_remover():
         wt = seed_worktree("fallback")
         (wt / "deep").mkdir()
         (wt / "deep" / "f.txt").write_text("x", encoding="utf-8")
-        with seed_seam("run_worktree_remove", fail_git):
+        with seed_seam("run_worktree_remove", run_failing_remove):
             got = BR.remove_worktree(repo, str(wt))
         listed = run_git(repo, "worktree", "list", "--porcelain")
         check("remover: AC1 a failed git removal falls back to rm -rf",
               (got[0], wt.exists(), key(wt) in listed), ("removed", False, False))
 
         wt = seed_worktree("skeleton")
-        subprocess.run = spy
+        subprocess.run = run_spied
         try:
-            with seed_seam("run_worktree_remove", leave_skeleton(False)):
+            with seed_seam("run_worktree_remove", build_skeleton_remover(False)):
                 got = BR.remove_worktree(repo, str(wt))
         finally:
             subprocess.run = real_run
@@ -532,27 +532,136 @@ def arm_remover():
                   "empty directories only")
 
         wt = seed_worktree("holds")
-        with seed_seam("run_worktree_remove", leave_skeleton(True)):
+        with seed_seam("run_worktree_remove", build_skeleton_remover(True)):
             got = BR.remove_worktree(repo, str(wt))
         check("remover: AC3 a skeleton holding a regular file is kept",
               (got[0], "regular file" in got[1], wt.exists()), ("kept", True, True))
         shutil.rmtree(wt, ignore_errors=True)
 
         wt = seed_worktree("busy")
-        with seed_seam("run_worktree_remove", fail_git), seed_seam(
+        with seed_seam("run_worktree_remove", run_failing_remove), seed_seam(
                 "run_rm", lambda rm, path: (1, f"rm: cannot remove '{path}': Device or resource busy")):
             got = BR.remove_worktree(repo, str(wt))
         check("remover: AC4 a busy directory is reported busy, not failed", got[0], "busy")
 
         wt = seed_worktree("norm")
-        with seed_seam("run_worktree_remove", fail_git), seed_seam("RM_NAME", "rm-absent-from-path"):
+        with seed_seam("run_worktree_remove", run_failing_remove), seed_seam("RM_NAME", "rm-absent-from-path"):
             got = BR.remove_worktree(repo, str(wt))
         check("remover: AC5 with no rm on PATH the row fails and names rm",
               (got[0], "rm-absent-from-path" in got[1], wt.exists()), ("failed", True, True))
 
 
+def seed_write_fixture():
+    """One row of each verdict, worktrees on two of them, and two branches published to upstream."""
+    import datetime
+    old = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=10)).strftime(
+        "%Y-%m-%dT%H:%M:%S+0000")
+    base = build_dir()
+    repo = seed_repo(base)
+    run_git(repo, "checkout", "-q", "-b", "merged-br")
+    seed_commit(repo, "m.txt", "m\n", "feat: merged", when=old)
+    run_git(repo, "checkout", "-q", "main")
+    run_git(repo, "merge", "-q", "--ff-only", "merged-br")
+    run_git(repo, "checkout", "-q", "-b", "equiv-br", "HEAD~1")
+    seed_commit(repo, "e.txt", "e\n", "feat: equivalent", when=old)
+    run_git(repo, "checkout", "-q", "main")
+    run_git(repo, "cherry-pick", "equiv-br")
+    run_git(repo, "checkout", "-q", "-b", "live-br", "main")
+    seed_commit(repo, "l.txt", "unlanded\n", "feat: unlanded", when=old)
+    run_git(repo, "checkout", "-q", "-b", "open-br", "main")
+    seed_commit(repo, "memory/builds/dOpen/README.md", "**Build status:** INPROGRESS · 1 unit(s)\n",
+                "spec(dOpen): open the build", when=old)
+    run_git(repo, "checkout", "-q", "--orphan", "orphan-br")
+    seed_commit(repo, "o.txt", "o\n", "orphan: unrelated history", when=old)
+    run_git(repo, "checkout", "-q", "main")
+    seed_publish(repo)
+    run_git(repo, "push", "-q", "upstream", "merged-br", "live-br")
+    run_git(repo, "fetch", "-q", "upstream")
+    wt_gone = base / "fx" / "wt-merged"
+    run_git(repo, "worktree", "add", "-q", str(wt_gone), "merged-br")
+    wt_live = base / "fx" / "wt-live"
+    run_git(repo, "worktree", "add", "-q", str(wt_live), "live-br")
+    return repo, wt_gone, wt_live
+
+
+def run_main(*argv):
+    """-> (exit, stdout) of the CLI's main, in-process, so a seam can stage a failure."""
+    buf = io.StringIO()
+    with redirect_stdout(buf):
+        rc = BR.main(list(argv))
+    return rc, buf.getvalue()
+
+
+def arm_write():
+    """TOOL-dSweptBranches-3 AC1 to AC4 — the manifest first, the three verdicts only, one push."""
+    repo, wt_gone, wt_live = seed_write_fixture()
+    key = lambda p: str(p).replace("\\", "/")
+    with seed_environ():
+        before = read_rows(run_cli(repo, "--fresh-hours", "0")[1])
+        check("write: the fixture holds one row of each verdict", sorted({v[0] for v in before.values()}),
+              sorted(["MERGED", "EQUIVALENT", "UNMERGED-LIVE", "IN-PROGRESS", "UNKNOWN"]))
+        rc, _out, err = run_cli(repo, "--remote")
+        check("write: --remote without --write refuses", (rc, "--write" in err), (2, True))
+        BR.WRITE_TRACE.clear()
+        rc, out = run_main("--root", str(repo), "--fresh-hours", "0", "--write")
+        check("write: the run exits 0", rc, 0)
+        trace = [t[0] for t in BR.WRITE_TRACE]
+        check("write: AC1 the manifest precedes the first deletion",
+              (trace[:1], len(trace) > 1), (["manifest"], True))
+        manifest = pathlib.Path(BR.WRITE_TRACE[0][1]).read_text(encoding="utf-8")
+        common = run_git(repo, "rev-parse", "--path-format=absolute", "--git-common-dir")
+        check("write: AC1 the manifest sits under the git common dir",
+              key(BR.WRITE_TRACE[0][1]).startswith(key(common)), True)
+        check("write: AC1 the manifest lists every branch tip and worktree HEAD",
+              all(f"branch {b} " in manifest for b in ("main", "merged-br", "equiv-br", "live-br",
+                                                       "open-br", "orphan-br"))
+              and f"worktree {key(wt_gone)} " in manifest.replace("\\", "/")
+              and f"worktree {key(wt_live)} " in manifest.replace("\\", "/"), True)
+        branches = set(run_git(repo, "for-each-ref", "--format=%(refname:short)", "refs/heads").split())
+        check("write: AC2 only the landed worktree and branches are gone",
+              (wt_gone.exists(), wt_live.exists(), sorted(branches)),
+              (False, True, sorted(["main", "live-br", "open-br", "orphan-br"])))
+        remote_before = run_git(repo, "ls-remote", "upstream")
+        check("write: AC2 no remote branch is touched without --remote",
+              "refs/heads/merged-br" in remote_before, True)
+        main_tip = run_git(repo, "rev-parse", "upstream/main")
+
+        BR.WRITE_TRACE.clear()
+        rc, out = run_main("--root", str(repo), "--fresh-hours", "0", "--write", "--remote")
+        pushes = [t for t in BR.WRITE_TRACE if t[0] == "push-delete"]
+        remote_after = run_git(repo, "ls-remote", "upstream")
+        check("write: AC3 one push deletes exactly the landed remote branch, and exits 0",
+              (rc, [p[1] for p in pushes], "refs/heads/merged-br" in remote_after,
+               "refs/heads/live-br" in remote_after), (0, [("merged-br",)], False, True))
+        check("write: AC3 the default branch's tip on the remote is unchanged",
+              run_git(str(pathlib.Path(repo).parent.parent / "remote.git"), "rev-parse", "main"),
+              main_tip)
+
+    repo, wt_gone, wt_live = seed_write_fixture()
+    with seed_environ():
+        run_git(repo, "branch", "merged-two", "merged-br")
+        wt_two = pathlib.Path(repo).parent / "wt-two"
+        run_git(repo, "worktree", "add", "-q", str(wt_two), "merged-two")
+        real = BR.remove_worktree
+        def remove_one_failing(root, path):
+            if key(path) == key(wt_gone):
+                return "failed", "staged failure"
+            return real(root, path)
+        with seed_seam("remove_worktree", remove_one_failing):
+            rc, out = run_main("--root", str(repo), "--fresh-hours", "0", "--write")
+        check("write: AC4 one failed removal reports, the rest proceed, and the exit is 1",
+              (rc, "failed — worktree" in out, wt_two.exists()), (1, True, False))
+        repo2, wt_b, _wt_l = seed_write_fixture()
+        def remove_busy(root, path):
+            return "busy", "busy: held as a working directory"
+        with seed_seam("remove_worktree", remove_busy):
+            rc, out = run_main("--root", str(repo2), "--fresh-hours", "0", "--write")
+        check("write: AC4 a busy worktree is reported and the exit stays 0",
+              (rc, "busy — worktree" in out), (0, True))
+
+
 ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
-        arm_content, arm_stash, arm_remover]
+        arm_content, arm_stash, arm_remover, arm_write]
 
 
 def main():

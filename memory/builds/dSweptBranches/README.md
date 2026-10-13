@@ -73,11 +73,11 @@ ids TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3 TOOL-dSwep
 | [TOOL-dSweptBranches-1 — the census: the branch-reconcile kit, its remote ladder, the inventory and a byte-stable report](spec/2026-10-13-spec-TOOL-dSweptBranches-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-2 — the verdict ladder: six verdicts over refs and worktree content, each with its evidence](spec/2026-10-13-spec-TOOL-dSweptBranches-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-13 |
 | [TOOL-dSweptBranches-4 — the worktree remover: git first, then `rm -rf`, and a skeleton removed only when it holds no regular file](spec/2026-10-13-spec-TOOL-dSweptBranches-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-13 |
-| [TOOL-dSweptBranches-3 — write mode: a recovery manifest first, then deletes of the three landed verdicts only](spec/2026-10-13-spec-TOOL-dSweptBranches-3.md) | 4 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-dSweptBranches-3 — write mode: a recovery manifest first, then deletes of the three landed verdicts only](spec/2026-10-13-spec-TOOL-dSweptBranches-3.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-13 |
 | [TOOL-dSweptBranches-5 — the skill: a rendered `/branch-reconcile` that routes cleanup asks through the tool](spec/2026-10-13-spec-TOOL-dSweptBranches-5.md) | 5 | 2 | OPEN | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 9 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

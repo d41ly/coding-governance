@@ -2,12 +2,13 @@
 
 <!-- gov:kit branch-reconcile@1.0 -->
 
-One read-only command that answers the question an owner keeps asking an agent to answer by hand:
-which of this repository's worktrees, local branches, remote branches and stash entries can go, and
-which still hold work nobody has landed. Every row carries one verdict and the evidence for it.
+One command that answers the question an owner keeps asking an agent to answer by hand: which of
+this repository's worktrees, local branches, remote branches and stash entries can go, and which
+still hold work nobody has landed. Every row carries one verdict and the evidence for it. It is
+read-only unless `--write` is passed.
 
 ```bash
-python <this kit>/branch_reconcile.py [--root <path>]
+python <this kit>/branch_reconcile.py [--root <path>] [--fresh-hours <n>] [--write [--remote]]
 ```
 
 Fetch first: the tool reads the remote-tracking refs as this clone last saw them, and fetches
@@ -82,6 +83,36 @@ branch, else `UNKNOWN`.
 
 Run records are read at a tip, as data, and never written: the unattended kit's `--settle` and
 `--preflight` own them. The memory root is `MEMORY_ROOT` from `.memory-tree.conf`, else `memory`.
+
+## Write mode — deletes only, of what landed
+
+```bash
+python <this kit>/branch_reconcile.py --write             # worktrees, then local branches
+python <this kit>/branch_reconcile.py --write --remote    # and the remote branches, in one push
+```
+
+`--write` prints the same report, then acts on its action column:
+
+1. **The recovery manifest first.** Every local branch, remote branch and stash tip and every
+   worktree's path and `HEAD` go to `<git common dir>/branch-reconcile/recovery-<UTC stamp>.txt`,
+   flushed to disk before anything is deleted. A manifest that cannot be written refuses the run
+   with exit 2. Restoring is by hand: `git branch <name> <sha>`, `git worktree add <path> <sha>`.
+2. **Worktrees**, whose action is `remove worktree`, through the remover below; then
+   `git worktree prune`.
+3. **Local branches**, whose action is `delete branch`, with `git branch -D`. A branch some kept
+   worktree still has checked out is kept and reported.
+4. **Remote branches** only under `--remote`, all in ONE `git push <remote> --delete`. Without it
+   the report counts them and leaves them.
+
+Only `MERGED`, `EQUIVALENT` and `SUPERSEDED` rows are ever acted on. The default branch is excluded
+by name before its verdict is read, and so are the primary worktree and every stash entry. A
+worktree is acted on only when its content was graded covered: dirty content with no counterpart on
+the default branch makes it `UNMERGED-LIVE` before its `HEAD` is read. The tool never merges into,
+commits on, checks out or pushes the default branch, and passes no hook-bypass flag; pre-push hooks
+skip deletes on their own.
+
+Exit 0 when every action succeeded or ended `busy`, 1 when any failed. Each action prints one line:
+`removed`, `busy`, `kept`, `deleted` or `failed`, then what and why.
 
 ## Removing a worktree, on Windows too
 

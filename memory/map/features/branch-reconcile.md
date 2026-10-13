@@ -5,7 +5,8 @@ feature = "branch-reconcile"
 title = "One read-only report giving every worktree, branch and stash entry a verdict with its evidence, so a cleanup removes only what landed"
 status = "shipped"
 streams = ["tooling"]
-decisions = ["TOOL-dSweptBranches-1", "TOOL-dSweptBranches-2", "TOOL-dSweptBranches-4"]
+decisions = ["TOOL-dSweptBranches-1", "TOOL-dSweptBranches-2", "TOOL-dSweptBranches-3",
+             "TOOL-dSweptBranches-4"]
 
 [claims]
 gate-legs = ["branch-reconcile selftest"]
@@ -33,6 +34,10 @@ branches, 33 remote branches and 60 worktrees: 60 merged, 9 superseded by later 
 **The report is byte-stable.** The age column counts days to the default tip's commit date, never
 to the clock, and every list is sorted. A report that moves between two runs over the same repository
 cannot be diffed, and a diff is how an owner sees what a cleanup changed.
+
+**Write mode writes its recovery manifest before its first deletion**, under the git common
+directory where no worktree removal can take it, and deletes only the three landed verdicts. The
+default branch is excluded by name, twice, before its verdict is read.
 
 **It fetches nothing.** A read-only tool that wrote refs would change what it measures. The skill
 fetches first.

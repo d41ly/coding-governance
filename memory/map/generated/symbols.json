@@ -768,6 +768,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "arm_write",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "armed",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -16803,6 +16808,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_main",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "run_main_at_head",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -18136,6 +18146,11 @@
       "id": "seed_witness",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "seed_write_fixture",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "seed_write_fixture",
@@ -21003,6 +21018,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "write_deletions",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "write_dl_landing",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -21181,6 +21201,11 @@
       "id": "write_manifest",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "write_manifest",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "write_model_copy",

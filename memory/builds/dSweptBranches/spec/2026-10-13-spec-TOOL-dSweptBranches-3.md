@@ -1,12 +1,14 @@
 # TOOL-dSweptBranches-3 — write mode: a recovery manifest first, then deletes of the three landed verdicts only
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 4
+**Status:** CLOSED · rev-2 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-TOOL-dSweptBranches-3-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-dSweptBranches-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-13-prompt-TOOL-dSweptBranches-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-1-brief.md) | research | TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 |
+| [2026-10-13-prompt-TOOL-dSweptBranches-3-1-build-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-3-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -21,9 +23,10 @@ directory, so every deletion can be undone by hand.
 
 - **S1** — The deletable set is the rows whose verdict is `MERGED`, `EQUIVALENT` or `SUPERSEDED`.
   Every row's action column reads what write mode would do: `remove worktree`, `delete branch`,
-  `delete remote branch`, or `keep · <why>`. The keeps are the default branch, the primary worktree,
-  the invoking worktree, a branch checked out in a worktree that is kept, and every row outside the
-  deletable set. Observed by AC2.
+  `delete remote branch (--remote)`, or `keep · <why>`. The keeps are the default branch, matched by
+  name before the verdict is read, the primary worktree, a stash entry, a branch checked out in a
+  worktree that is kept, and every row outside the deletable set. The invoking worktree reads
+  `IN-PROGRESS` by unit 2's S5, so it is outside the set. Observed by AC2.
 - **S2** — The recovery manifest, `<git common dir>/branch-reconcile/recovery-<UTC stamp>.txt`, holds
   one line per local branch, remote branch and stash entry with its sha, and one per worktree with
   its path and `HEAD`. It is written and flushed before any deletion, and its path is printed.
@@ -106,8 +109,9 @@ arm points a bare repository at the fixture and observes which branches remain o
   deletable branches in one push, and its default branch's tip is unchanged.
   Red when: the push names the default branch or an undeletable branch.
 - **AC4** — When one removal is made to fail, `branch_reconcile.py --write` reports it, still
-  deletes the other deletable rows, and exits 1.
-  Red when: the failure aborts the run, or the exit is 0.
+  deletes the other deletable rows, and exits 1; when a removal returns `busy`, it reports it and
+  exits 0.
+  Red when: the failure aborts the run, the exit is 0 after a failure, or busy counts as one.
 
 ## 7. Gates
 
@@ -122,6 +126,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft.
+- rev-2 · 2026-10-13 · S1 · AC4 · what the build pass settled. The remote action names its flag, the
+  default branch is excluded by name in two places, and AC4 takes unit 4's busy half by that spec's
+  rev-2. `WRITE_TRACE` records each act before it runs, because a trace appended after the act let a
+  manifest written late still read first.
 
 ## 10. Reuse audit
 
