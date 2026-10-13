@@ -32,10 +32,11 @@ Annotation style: what a code comment citing a governance record must carry
 One read-only report giving every worktree, branch and stash entry a verdict with its evidence, so a cleanup removes only what landed
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/branch-reconcile.md`
-- decisions 4: `TOOL-dSweptBranches-1`, `TOOL-dSweptBranches-2`, `TOOL-dSweptBranches-3`, `TOOL-dSweptBranches-4`
-- gate-legs 1: `branch-reconcile selftest`
+- decisions 5: `TOOL-dSweptBranches-1`, `TOOL-dSweptBranches-2`, `TOOL-dSweptBranches-3`, `TOOL-dSweptBranches-4`, `TOOL-dSweptBranches-5`
+- gate-legs 2: `branch-reconcile selftest`, `branch-reconcile skill wiring`
 - kits 1: `branch-reconcile`
-- globs 1: `tools/branch-reconcile/*`
+- rendered-skills 1: `branch-reconcile`
+- globs 2: `tools/branch-reconcile/*`, `.claude/skills/branch-reconcile/SKILL.md`
 
 ## build-method
 

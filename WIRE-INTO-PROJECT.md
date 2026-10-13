@@ -701,9 +701,12 @@ CLI runs by path and reads the repository it is pointed at.
 1. `cp -r <gov>/<prefix>/branch-reconcile <project>/<prefix>/branch-reconcile`, then
    `rm -f <project>/<prefix>/branch-reconcile/selftest.py`, gov's own suite, which `kit.toml`
    withholds from `govkit apply` but a `cp -r` does not.
-2. `git fetch`, then `python <prefix>/branch-reconcile/branch_reconcile.py`. A node whose remote is
+2. `bash <prefix>/branch-reconcile/adopt-branch-reconcile.sh --scaffold` renders the
+   `/branch-reconcile` skill, and the kit's `branch-reconcile skill wiring` leg runs its `--check`.
+3. `git fetch`, then `python <prefix>/branch-reconcile/branch_reconcile.py`. A node whose remote is
    not `origin` needs nothing: the remote comes from the same ladder every kit inlines, and
-   `GOV_REMOTE` names it where several remotes leave the choice open.
+   `GOV_REMOTE` names it where several remotes leave the choice open. `--write` deletes only what
+   landed, after a recovery manifest; `--remote` adds the remote branches in one push.
 
 
 

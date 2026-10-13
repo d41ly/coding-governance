@@ -958,6 +958,17 @@
     "ceiling": 300
   },
   {
+    "name": "branch-reconcile skill wiring",
+    "argv": [
+      "bash",
+      "{prefix}/branch-reconcile/adopt-branch-reconcile.sh",
+      "--check"
+    ],
+    "chunk": "wiring",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "branch-reconcile selftest",
     "argv": [
       "python",

@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 131 · kits: 18 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 111 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 132 · kits: 18 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 6 · gotcha-classes: 111 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -18,6 +18,7 @@ Inventories: gate-legs: 131 · kits: 18 · git-hooks: 4 · harness-hooks: 11 · 
 | `backlog migration selftest` | memory-tree-hygiene |
 | `branch-guard self-test` | baseline |
 | `branch-reconcile selftest` | branch-reconcile |
+| `branch-reconcile skill wiring` | branch-reconcile |
 | `brief-recorded` | unattended |
 | `build README slot contract` | build-readme-surface |
 | `build-index selftest` | baseline |
@@ -217,6 +218,7 @@ Inventories: gate-legs: 131 · kits: 18 · git-hooks: 4 · harness-hooks: 11 · 
 
 | key | claimant |
 |---|---|
+| `branch-reconcile` | branch-reconcile |
 | `drift-audit` | baseline |
 | `lexicon` | lexicon |
 | `memory-recall` | memory-recall |

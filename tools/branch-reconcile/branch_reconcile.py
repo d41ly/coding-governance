@@ -817,7 +817,7 @@ def derive_action(inv, row, kept_branches):
 
 
 # ------------------------------------------------------------------------------- the remover
-# TOOL-dSweptBranches-4. Every trap below was measured on an inCMS node on 2026-10-13: git's removal
+# TOOL-dSweptBranches-4. Every trap below was measured on adopter ic's node on 2026-10-13: git's removal
 # fails with "Result too large" on deep node_modules; a clean removal often leaves an empty skeleton
 # of pnpm links made under MSYS whose targets are POSIX paths; .NET Directory.Delete and
 # `cmd rmdir /s /q` both refuse those links; GNU `rm -rf`, which never follows a link, removes them.

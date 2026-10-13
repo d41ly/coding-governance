@@ -1,12 +1,14 @@
 # TOOL-dSweptBranches-5 — the skill: a rendered `/branch-reconcile` that routes cleanup asks through the tool
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 5
+**Status:** CLOSED · rev-1 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-TOOL-dSweptBranches-5-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-dSweptBranches-5-1-acceptance-ledger.md) | journal | — |
 | [2026-10-13-prompt-TOOL-dSweptBranches-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-1-brief.md) | research | TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 |
+| [2026-10-13-prompt-TOOL-dSweptBranches-5-1-build-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-5-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

@@ -116,7 +116,7 @@ Exit 0 when every action succeeded or ended `busy`, 1 when any failed. Each acti
 
 ## Removing a worktree, on Windows too
 
-`remove_worktree` is the one remover, and every rule in it was measured on an inCMS node on
+`remove_worktree` is the one remover, and every rule in it was measured on adopter ic's node on
 2026-10-13:
 
 - **git first.** `git worktree remove --force --force`. It fails with "Result too large" on deep
@@ -133,6 +133,28 @@ Exit 0 when every action succeeded or ended `busy`, 1 when any failed. Each acti
 - **Busy is a result, not a failure.** A directory an idle desktop session holds as its working
   directory stays "Device or resource busy"; the row reports `busy`.
 
+## The skill
+
+`/branch-reconcile` triggers on asks like "clean up branches", "reconcile worktrees", "stale
+branches" and "is any unmerged work left", and routes them through the CLI. Attended, it fetches,
+runs the report, puts the `UNMERGED-LIVE` and `UNKNOWN` rows first as the owner's decisions, runs
+`--write` on the owner's yes and `--remote` only on its own yes, and offers to merge the default
+branch into a live branch in that branch's own worktree, re-rendering generated artifacts, unioning
+append-only logs and gating the result. Landing stays the owner's explicit ask, through the
+repository's own lander. Unattended, it runs the report and `--write`, never `--remote` without its
+own grant, and never a merge.
+
+The Skill is rendered, because it names the CLI by where this kit is installed:
+
+```bash
+bash <this kit>/adopt-branch-reconcile.sh --scaffold   # render .claude/skills/branch-reconcile/SKILL.md
+bash <this kit>/adopt-branch-reconcile.sh --check      # the wiring leg: is the render fresh?
+```
+
+`--check` re-renders the template and compares, stripping CR from the working copy, so a template
+edit nobody re-rendered reds the `branch-reconcile skill wiring` leg. `govkit update` re-renders it
+through the kit's `[[regenerate]]`.
+
 ## Why this is not the straggler inventory
 
 The relocation engine's `migrate_backlog.py --stragglers`, which `check-wiring.sh` reports, lists the
@@ -145,5 +167,6 @@ not consume that inventory.
 ## Files
 
 - `branch_reconcile.py` — the CLI. Stdlib and git only.
+- `SKILL.template.md` and `adopt-branch-reconcile.sh` — the skill's template and its renderer.
 - `selftest.py` — the self-test, withheld from adopters. Each fixture is a repository it builds
   under a temporary directory, with a remote named `upstream`.

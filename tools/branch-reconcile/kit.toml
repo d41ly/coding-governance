@@ -22,12 +22,44 @@ role = "engine"
 include = ["selftest.py"]
 role = "project-owned"
 
+# THE SKILL IS RENDERED (TOOL-dSweptBranches-5). It names the CLI by where this kit is installed, a
+# value that differs per repository, so the adopter renders it and its `--check` re-renders and
+# compares. The one token is substituted by the adopter, which the kit-placeholders gate joins
+# against this list.
+[[files]]
+include = ["SKILL.template.md"]
+role = "rendered"
+to = ".claude/skills/branch-reconcile/SKILL.md"
+placeholders = ["KIT_DIR"]
+
 [adopt]
-argv = []
+argv = ["bash", "{kit}/adopt-branch-reconcile.sh", "--scaffold"]
 mutates_index = false
-why_no_adopter = "the CLI runs by path from wherever the kit is installed and needs no wiring; it reads the repository it is pointed at and nothing of its own."
+
+# THE RE-RENDER an update runs with GOVKIT_RERENDER=1, which govkit rule 3b-ii requires of a kit
+# shipping a `rendered` row. The adopter's `--scaffold` IS the re-render: it rewrites the Skill from
+# the template whether or not one is already there, the runlog kit's pair exactly.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-branch-reconcile.sh", "--scaffold"]
+stage = 1
 
 [check]
-none = """
-the kit ships no rendered artifact yet, so there is nothing for this verb to run
-"""
+argv = ["bash", "{kit}/adopt-branch-reconcile.sh", "--check"]
+
+[[outcome]]
+code = 0
+probe = { must_exist = ".claude/skills/branch-reconcile/SKILL.md" }
+means = "adopted"
+
+# THE SKILL'S WIRING LEG SHIPS: its subject is the target's own rendered Skill, which goes stale when
+# the template is edited or the kit moves, with nobody touching the adopter.
+[[gate_leg]]
+name = "branch-reconcile skill wiring"
+subject = "repo"
+argv = ["bash", "{kit}/adopt-branch-reconcile.sh", "--check"]
+guard = []
+
+# ONE [[lf_pin]], for the rendered Skill, which its own leg byte-compares.
+[[lf_pin]]
+pattern = ".claude/skills/branch-reconcile/SKILL.md"
+why = "a rendered artifact its own gate byte-compares"
