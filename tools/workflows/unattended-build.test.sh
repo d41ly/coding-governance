@@ -1025,7 +1025,7 @@ d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
 has "F2 dispatch.args carries the mode — attended" "$d" '"mode":"attended"'
 
 # THE GENERAL FORM, not a substring arm. The refusal set is DERIVED from the driver itself — every
-# verb whose body refuses with `fail 4N "no run-state file` — so this keeps holding when a seventh
+# verb whose body refuses through `check_run_state` — so this keeps holding when a seventh
 # verb joins it, which a hand-typed list of two would not. The needle is the INSTRUCTION form
 # `--<verb> <slug>` and never the bare word: the attended text NAMES three of these verbs in the
 # sentence explaining that they are unavailable, and an arm aimed at the word would fail on the
@@ -1035,8 +1035,9 @@ childU=$(run_wf "$(printf "$CHILD_ARGS" unattended)" '{}' "$C")
 childA=$(run_wf "$(printf "$CHILD_ARGS" attended)" '{}' "$C")
 norun_verbs=''
 [ -f "$DRV" ] && norun_verbs=$(awk '
-  /^verb_[a-z]+\(\)/ { v = $0; sub(/^verb_/, "", v); sub(/\(\).*/, "", v); next }
-  v != "" && /fail 4[0-9] "no run-state file/ { print "--" v; v = "" }
+  /^verb_[a-z_]+\(\)/ { v = $0; sub(/^verb_/, "", v); sub(/\(\).*/, "", v); gsub(/_/, "-", v); next }
+  /^[A-Za-z_][A-Za-z0-9_]*\(\)/ { v = ""; next }
+  v != "" && /check_run_state "/ { print "--" v; v = "" }
 ' "$DRV" | sort -u)
 # A DERIVED SET THAT CAME BACK EMPTY IS NOT A CLEAN PASS. Without this the loop below iterates zero
 # times and every absence arm silently ceases to exist — the vacuous-selector shape, inside the arm.

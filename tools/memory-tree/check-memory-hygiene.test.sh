@@ -2835,6 +2835,8 @@ _pyparity() {  # $1 module directory · $2 example conf · $3 exemption names
 # other — plus one fixture VIEW key. Same rule as `_engexempt` above, asserted in both directions.
 #   GOV_BASH GOV_DEFAULT_BRANCH GOV_REMOTE PATH GIT_DIR GIT_GRAFT_FILE GIT_AUTHOR_DATE GIT_COMMITTER_DATE
 #     — environment, read or set through os.environ by the engine and by its own fixtures.
+#   GIT_INDEX_FILE — environment: gen_build_index.py carries it from os.environ into the hook's git
+#     environment, so both readers stay on one index (TOOL-aTrimmedHook-4).
 #   GRAMMAR_DIR GRAMMAR_WHERE READ_PATH_RULES_GATE — module-level constants, reached through
 #     globals() by selftest arms that save and restore them. GRAMMAR_WHERE is swapped beside
 #     GRAMMAR_DIR in corpus_ids.py (TOOL-aRepatriatedFork-46 S4).
@@ -2845,7 +2847,7 @@ _pyparity() {  # $1 module directory · $2 example conf · $3 exemption names
 #     on purpose: adopt-memory-tree.sh copies the example and appends the first two only when neither
 #     is assigned, so an uncommented blank would skip that append and leave the write gate unarmed on
 #     every new adopter. Discoverable in the example's comments, not by `^KEY=` (TOOL-dHomedResolver-8).
-_pyexempt="EXMP GATE_PUSH_BASE GIT_AUTHOR_DATE GIT_COMMITTER_DATE GIT_DIR GIT_GRAFT_FILE GOV_BASH GOV_DEFAULT_BRANCH GOV_REMOTE GRAMMAR_DIR GRAMMAR_WHERE PATH READ_PATH_RULES_GATE ROUTED_COMMIT_CUTOFF ROUTED_COMMIT_WAIVED ROUTED_PATHS"
+_pyexempt="EXMP GATE_PUSH_BASE GIT_AUTHOR_DATE GIT_COMMITTER_DATE GIT_DIR GIT_GRAFT_FILE GIT_INDEX_FILE GOV_BASH GOV_DEFAULT_BRANCH GOV_REMOTE GRAMMAR_DIR GRAMMAR_WHERE PATH READ_PATH_RULES_GATE ROUTED_COMMIT_CUTOFF ROUTED_COMMIT_WAIVED ROUTED_PATHS"
 _pk_real=$(_pykeys "$HERE")
 n=$((n+1))
 [ -n "$_pk_real" ] || { echo "FAIL could not derive a single conf key from $HERE/*.py; the python example-conf arms below would pass by finding nothing"; st=1; }

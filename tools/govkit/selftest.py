@@ -6380,9 +6380,13 @@ user_skills = "/tmp/gk-fake-skills"
             # seed 13 -> 14, TOOL-aOrientedCast-10 S9: `roles` seeds its effort policy
             # `house/policy.toml` beside the overlays. Not measured in the pass (no suite runs there);
             # the main loop observes it at the close.
+            # 32 -> 34, TOOL-aSparedSpawn-5 S3 and TOOL-aHeardState-1: run-gates withholds
+            # `windows-only-legs.txt` and agent-cap withholds `format-guard.test.sh` by the same
+            # `project-owned` mechanism; both landed after this pin and moved no row out.
+            # Measured by a default `plan` into a scratch target on 2026-10-13 (TOOL-aSweptBar-1 S10).
             check("...and the playbook file previews as a seed WRITE, not as an order",
                   marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 14
-                  and marks.get("ORDER|project-owned") == 32,
+                  and marks.get("ORDER|project-owned") == 34,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))

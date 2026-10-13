@@ -918,7 +918,7 @@ exec 9>&-; rm -f "$TMP/openstdin"
 
 # AC4 — the node cell: the real registry at HEAD, then the two fixtures, then no key at all.
 if [ "$CUSER" = daily-agent ]; then
-  check_eq "AC4 node — resolves this node from the real AGENTS.md" "node — a · daily-agent" "$(read_cell node "$NONCE-t1")"
+  check_eq "AC4 node — resolves this node from the real AGENTS.md" "node — a · daily-agent @ COMPEETO-AGENT" "$(read_cell node "$NONCE-t1")"
 else
   echo "skip AC4 the exact tag against the real AGENTS.md: this node's user is '$CUSER', and the row the spec names is node a's (the fixture arms below decide the predicate)"
 fi

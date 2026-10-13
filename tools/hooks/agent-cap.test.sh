@@ -2179,8 +2179,12 @@ function readBody(p) {
   }
 }
 
+// THE PAYLOAD CWD IS THE FIXTURE DIR, which no checkout holds (TOOL-aSweptBar-1 S3). With no `cwd` the
+// hook falls back to this checkout, whose `.claude/roles.json` arms rule 6 against every inline script,
+// so every BASE denial read as a rule 6 denial and nothing was ratified. Under no checkout rule 6 stays
+// unarmed and the property compares rules 1 to 5 with BASE, which predates rule 6.
 function buildPayload(body) {
-  return JSON.stringify({ tool_name: 'Workflow', tool_input: { script: body } })
+  return JSON.stringify({ tool_name: 'Workflow', cwd: path.resolve(fixdir), tool_input: { script: body } })
 }
 
 const tracked = cp.execFileSync('git', ['-C', root, 'ls-files'], { encoding: 'utf8', maxBuffer: 1 << 28 })
