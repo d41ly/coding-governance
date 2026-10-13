@@ -1,6 +1,6 @@
 # PLAY-aOrientedCast-2 — the charter's `[roles]` rule and its generated Agent roles section
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams playbook · order 20
+**Status:** OPEN · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams playbook · order 20
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-13-prompt-TOOL-aOrientedCast-16-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-16-1-spec-brief.md) | journal | TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-16-2-build-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-16-2-build-brief.md) | journal | TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 |
+| [2026-10-13-prompt-TOOL-aOrientedCast-20-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-20-1-spec-brief.md) | journal | TOOL-aOrientedCast-19 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 PLAY-aOrientedCast-3 |
 
 <!-- /gen:spec-records -->
 
@@ -17,9 +18,9 @@ The owner ruled on 2026-10-13 that role agents are non-negotiable wherever gov i
 tool or run that cannot spawn one, and that the charter must say so and list the roles in a generated
 section. This unit writes that into the charter template: a section 1 `[roles]` rule naming the
 exception and its waiver registry, and a `## Agent roles` section holding the derived roster. The
-Tools line that said a weaker version of the rule shrinks to its `/build` clause. The template moves
-to v4.4, gov's charter is re-rendered, and the size records, the kickoff manifest stamp and the help
-page follow.
+Tools line that said a weaker version of the rule shrinks to its `/build` clause. Gov's charter is
+re-rendered, and the size records, the kickoff manifest stamp and the help page follow. The
+template's version move is `PLAY-aOrientedCast-3`'s, the last unit of the set to touch it.
 
 ## 2. Scope (IN)
 
@@ -34,8 +35,9 @@ page follow.
 - **S3** — The Tools bullet inside the existing `kit:roles` fence (`:130`) becomes
   `- An attended code build runs through ` followed by the backticked `/build` and a full stop, as
   block B. Observed by AC1 and AC3.
-- **S4** — The template marker (`:9`) moves from `v4.3` to `v4.4`: the playbook kit's one version
-  move for this build. Observed by AC4.
+- **S4** — The template marker (`:9`) stays at `v4.3` in this unit's commit. The playbook kit's one
+  version move for this build is `PLAY-aOrientedCast-3`'s, which also edits the template and comes
+  after this unit (§4 "Kit version"). Observed by AC4.
 - **S5** — `AGENTS.md` is re-rendered with `bash tools/playbook/adopt-playbook.sh --target .`. The
   charter renders first, and the agent types are left as they are, because no edit here moves one.
   Observed by AC2 and AC6.
@@ -64,6 +66,7 @@ page follow.
 - Trimming other charter rules to fund the roster.
 - A render note for an adopter whose seeded template lags the shipped minor version (§3 Edges).
 - A new gate arm. The legs that grade the template and its render already cover every change here.
+- The template's version move, which `PLAY-aOrientedCast-3` carries (§3 Edges).
 
 ### Edges
 
@@ -81,6 +84,9 @@ page follow.
   tagged rules and carries its Protocols and Facts sections, and the help page's step 2 re-keyed to
   `rules`, which S8 extends. Without it `render_agents.py --check` refuses on the v4.3 charter, so
   AC6 cannot be observed.
+- **hands-off** `PLAY-aOrientedCast-3` — the template's one version move for this build, to `v4.4`,
+  in that unit's commit. The epoch leg clears this unit's template edit once a later commit bumps the
+  marker, so that move dates blocks A to C as well as that unit's own.
 - **hands-off** external — an adopter keeps its seeded template across `govkit update`, so a template
   seeded before v4.4 renders without the rule and the section until its owner merges them in. A
   render note naming a seeded template whose minor version lags the shipped one is a follow-up
@@ -167,13 +173,11 @@ Every section 1 tag is lowercase, and `roles` is unused there.
 
 With the roles kit selected, the render reads: the Tools close, a blank line, the heading, a blank
 line, the region, a blank line, `## Protocols`. Without it, the Tools close, a blank line and
-`## Protocols`, byte-identical to v4.3 apart from the marker.
-
-**Block D**, at `:9`: `<!-- governance-template: v4.4 -->`.
+`## Protocols`, byte-identical to v4.3.
 
 ### Bytes, measured
 
-PINNED on 2026-10-13 at `d518b483`, by splicing blocks A to D into CR-stripped copies of both files
+PINNED on 2026-10-13 at `d518b483`, by splicing blocks A to C into CR-stripped copies of both files
 and leaving the roster empty. The builder re-measures, because a sibling landing first moves both.
 
 | Subject | Now | After, roster excluded | Ceiling | Left for the roster |
@@ -210,18 +214,15 @@ like every other placeholder, from the output of `handoff.py roster`, the verb
 
 ### Kit version
 
-One kit moves: `playbook`, whose carrier is the marker at `coding-governance-agents.template.md:9`,
-read through `version_from` (`tools/govkit/entries/playbook.kit.toml:6`, `govkit.py` `entry_version`
-at `:529`). Its render at `AGENTS.md:10` follows at the re-render. This unit is the only one of the
-addendum's five that moves the template, so the bump lands in its own commit, and the bump commit
-equals the move commit, which the epoch leg accepts. v4.4 keeps major 4, so the parity pair with
-`TEMPLATE_MAJOR` holds. The size record and its gate are registry exemptions
-(`tools/govkit/registry.toml:280`); `help/` and `memory/` belong to no kit.
-
-That holds while no later unit of this build moves the template. The owner's third addendum,
-recorded under `prompts/` on 2026-10-13 while this spec was written, asks for new emission shapes,
-which may land in the template's micro-formats. A unit that moves the template after this one takes
-the bump instead, by an M2 AMEND of this section and S4.
+No kit version moves here. The template is the `playbook` kit's carrier, the marker at
+`coding-governance-agents.template.md:9`, read through `version_from`
+(`tools/govkit/entries/playbook.kit.toml:6`, `govkit.py` `entry_version` at `:529`). The owner's
+third addendum puts two micro-formats and a rule into the same template, and `PLAY-aOrientedCast-3`
+(order 21) adds them after this unit, so that unit carries the set's one move, to v4.4. The epoch leg
+clears a move of a kit's shipped bytes once a later commit bumps the kit's version
+(`derive_epoch_state`, `tools/govkit/govkit.py:12976`), so its bump dates this unit's commit too. The
+size record and its gate are registry exemptions (`tools/govkit/registry.toml:280`); `help/` and
+`memory/` belong to no kit.
 
 ### Probes
 
@@ -231,16 +232,16 @@ The two probes §6 names, run from the repository root on the unit's commit.
 # P1 (AC2): the rendered roster region equals the placeholder's value, one line per role file.
 python -c "import sys,json,subprocess as s,glob;v=json.loads(s.run([sys.executable,'tools/playbook/render_playbook.py','--target','.','--answers','ROLE_ROSTER'],capture_output=True,text=True,encoding='utf-8').stdout)['ROLE_ROSTER'];t=open('AGENTS.md',encoding='utf-8').read().replace('\r','');b=t.split('## Agent roles',1)[1].split('<!-- one-line -->\n',1)[1].split('\n<!-- /one-line -->',1)[0];L=b.split('\n');n=len(glob.glob('tools/roles/agents/*.agent.md'));assert b==v,'region differs from the probe';assert len(L)==n,(len(L),n);assert all(x.startswith('- ') and len(x)<=200 for x in L);print('roster ok',len(L),'lines, longest',max(map(len,L)))"
 
-# P2 (AC3): with the roles kit dropped, the template renders as its parent did, marker aside.
-python -c "import sys,subprocess as s;sys.path.insert(0,'tools/playbook');import render_playbook as r;g=lambda c:s.run(['git','show',c+':coding-governance-agents.template.md'],capture_output=True,text=True,encoding='utf-8').stdout.replace('\r','');d={('kit','roles')};assert r.remove_fenced(g('HEAD'),d).replace('governance-template: v4.4','governance-template: v4.3')==r.remove_fenced(g('HEAD~1'),d),'a target without roles renders a change';print('drop ok')"
+# P2 (AC3): with the roles kit dropped, the template renders as its parent did.
+python -c "import sys,subprocess as s;sys.path.insert(0,'tools/playbook');import render_playbook as r;g=lambda c:s.run(['git','show',c+':coding-governance-agents.template.md'],capture_output=True,text=True,encoding='utf-8').stdout.replace('\r','');d={('kit','roles')};assert r.remove_fenced(g('HEAD'),d)==r.remove_fenced(g('HEAD~1'),d),'a target without roles renders a change';print('drop ok')"
 ```
 
 P2 was run on 2026-10-13 against the spliced scratch copy in place of `HEAD`, and printed equality.
 
 ### Inventory
 
-Minted: the section 1 tag `roles`, the heading text `Agent roles — hand the work to its role`, and
-the template version `v4.4`. No function, file, conf key or placeholder is minted here, so no
+Minted: the section 1 tag `roles` and the heading text `Agent roles — hand the work to its role`.
+No function, file, conf key, placeholder or version is minted here, so no
 `.lexicon.conf` cell grades a name in this unit.
 
 ### Files touched (estimate)
@@ -249,7 +250,7 @@ the template version `v4.4`. No function, file, conf key or placeholder is minte
 
 ### Rollout
 
-1. Apply blocks A to D to the template.
+1. Apply blocks A to C to the template, leaving its marker at v4.3.
 2. Render the charter: `bash tools/playbook/adopt-playbook.sh --target .`.
 3. Run `python tools/roles/render_agents.py --check`. On any drift, stop and report (AC6).
 4. Measure `AGENTS.md` with carriage returns stripped. Past 16384, stop before committing (§8 F2).
@@ -303,8 +304,8 @@ specs spell them (§3 Edges).
   two answers to one question.
 - **The rule after `[spec]`.** Either placement reads. After `[tools]` keeps the two rules that point
   at section 3 adjacent.
-- **v5.0.** The change is additive, and a new major breaks the parity pair with `TEMPLATE_MAJOR`
-  until the renderer moves too.
+- **Moving the template's version here as well.** A second move in this build would date nothing the
+  later one does not, and the epoch leg needs only the last.
 - **Funding the roster by trimming other rules.** No rule here is made redundant by it, and each is
   an owner-ratified practice (§8 F2).
 
@@ -352,10 +353,10 @@ write mode, or runs a probe from §4 "Probes".
 - **AC3** — When probe P2, which applies `remove_fenced` with the roles kit dropped to the template
   at `HEAD` and `HEAD~1`, runs on the unit's commit, it prints `drop ok`.
   Red when: a target without the roles kit renders anything this unit added, a blank line included.
-- **AC4** — When `git show HEAD:coding-governance-agents.template.md | grep -c "governance-template: v4.4"`
-  and the same over `AGENTS.md` run, each prints 1, and both files at `HEAD~1` carry `v4.3`.
-  Red when: the template's bytes moved without its marker, or the render carries a different value
-  from its template.
+- **AC4** — When `git show HEAD:coding-governance-agents.template.md | grep -c "governance-template: v4.3"`
+  and the same over `AGENTS.md` run on the unit's commit, each prints 1.
+  Red when: this unit moves the template's marker, which `PLAY-aOrientedCast-3` moves once for the
+  set, or the render carries a different value from its template.
 - **AC5** — When `tr -d '\r' < AGENTS.md | wc -c` and the same over
   `coding-governance-agents.template.md` run on the unit's commit, the first prints at most 16384 and
   the second at most 49152, and each equals its row in `tools/template-size-highwater.txt`.
@@ -418,6 +419,12 @@ This unit adds no gate arm. The main loop runs the legs above once, at the close
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft.
+- rev-2 · 2026-10-13 · §1 · S4 · AC4 · §3 · §4 · the template's version move goes to
+  `PLAY-aOrientedCast-3`, which the owner's third addendum added and which edits the template after
+  this unit, so it is now the last unit to touch it. S4 and AC4 now hold the marker at v4.3 in this
+  unit's commit; block D, its Inventory entry and probe P2's marker rewrite leave §4, whose "Kit
+  version" says why; §3 gains the non-goal and a hands-off edge to that unit. The help page still
+  names v4.4, the version that first ships the rule and the section.
 
 ## 10. Reuse audit
 

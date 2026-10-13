@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-19 — an inline stand-in for a role declares itself through its handoff, and needs a dated owner waiver row
 
-**Status:** DEFERRED · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 19 · ratified 2026-10-13
+**Status:** DEFERRED · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 19 · ratified 2026-10-13
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-13-prompt-TOOL-aOrientedCast-16-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-16-1-spec-brief.md) | journal | TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 PLAY-aOrientedCast-2 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-16-2-build-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-16-2-build-brief.md) | journal | TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 PLAY-aOrientedCast-2 |
+| [2026-10-13-prompt-TOOL-aOrientedCast-20-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-20-1-spec-brief.md) | journal | TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 |
 
 <!-- /gen:spec-records -->
 
@@ -45,8 +46,9 @@ rule that joins the two in both directions.
   row grammar, the declaration and R15. The docstrings of `check_roles.py` and `handoff.py` name
   R15 and `--stand-in`, each with what it does not check. NOT OBSERVED by a criterion: prose, read
   by the review against §4.
-- **S7** — The roles kit and the memory-tree kit each move one minor version, with every carrier of
-  each version. Observed by AC9.
+- **S7** — The memory-tree kit moves one minor version, with every carrier of that version. The roles
+  kit's move is `TOOL-aOrientedCast-20`'s, the last unit of the set to touch `tools/roles/`.
+  Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -66,6 +68,10 @@ rule that joins the two in both directions.
   `agent` is true, and a waiver for a role that is never mandatory is harmless.
 - No harness change. A run whose harness cannot spawn is a run that cannot spawn, and its main loop
   declares each stage it stands in for through the same flag.
+- No roles kit version move, and so no edit to the Skill template or the rendered `/build` Skill,
+  whose `gov:kit roles@` marker was this unit's only reason to touch either. `TOOL-aOrientedCast-20`,
+  order 22, also writes `tools/roles/` and carries the set's one move, under the rule the
+  `TOOL-aOrientedCast-17` spec's §4 "Rollout" states.
 
 ### Edges
 
@@ -199,16 +205,17 @@ charter with tagged rules grade identically. R0 still requires `CHARTER` to name
 
 ### Rollout — the kit versions
 
-This is the last unit of the set that moves the roles kit, after `TOOL-aOrientedCast-16` and `-17`,
-and the only one that moves the memory-tree kit. Each moves once, here, by one minor step.
+This is the only unit of the set that moves the memory-tree kit, and it moves it once, by one minor
+step. It moves no roles kit carrier: `TOOL-aOrientedCast-20`, order 22, is the last unit of the set
+to touch `tools/roles/`, and the epoch leg clears every earlier move of the kit's shipped bytes once
+a later commit bumps its version, so that unit's bump dates this unit's edits too.
 
 | Kit | Constant | Every other carrier |
 |---|---|---|
-| roles | `KIT_ROLES_VERSION` at `tools/roles/roles_lib.py:18` | the `gov:kit roles@` marker in the README, in the Skill template, and in the rendered Skill, re-rendered with `adopt-roles.sh --scaffold` |
 | memory-tree | `KIT_MEMORY_TREE_VERSION` at `tools/memory-tree/check-memory-hygiene.sh:64`, with its same-line marker | the `gov:kit memory-tree@` marker in each of the four kit templates and their four rendered copies under `memory/` |
 
-`tools/check-kit-versions.sh` pairs each constant with its markers (`:259`, `:390`), and the epoch
-leg is what reds a kit whose shipped bytes moved with no bump.
+`tools/check-kit-versions.sh` pairs the constant with its markers (`:259`), and the epoch leg is what
+reds a kit whose shipped bytes moved with no bump.
 
 ### Migration
 
@@ -222,8 +229,6 @@ Rollback is a revert of the unit's commit.
 `tools/roles/check_roles.py`
 `tools/roles/handoff.py`
 `tools/roles/README.md`
-`tools/roles/SKILL.template.md`
-`.claude/skills/build/SKILL.md`
 `tools/memory-tree/check-memory-hygiene.sh`
 `tools/memory-tree/check-memory-hygiene.test.sh`
 `tools/memory-tree/HYGIENE.template.md`
@@ -326,13 +331,15 @@ run from the fixture root. Every staged break is restored after its observation.
   the widening case.
   Red when: the new case is absent, or sits below `F:*)`, which answers first and refuses any name
   `PROJECT_REGISTRY_EXTRA` does not list.
-- **AC9** — When `grep -c '^KIT_ROLES_VERSION = "1.3"' tools/roles/roles_lib.py` and
-  `grep -c '^KIT_MEMORY_TREE_VERSION=2.147' tools/memory-tree/check-memory-hygiene.sh` run, each
-  prints 1; and `grep -rl -e "gov:kit roles@1.2" -e "gov:kit memory-tree@2.146" tools/roles tools/memory-tree memory/HYGIENE.md memory/TEMPLATE-SPEC.md memory/guides .claude/skills/build`
-  prints nothing.
-  Red when: a constant does not move, or one carrier keeps the old marker.
-  figure: PINNED at `d518b483f`, where roles reads 1.2 and memory-tree 2.146; a bump another build
-  lands first moves each expected value by the same one step.
+- **AC9** — When `grep -c '^KIT_MEMORY_TREE_VERSION=2.147' tools/memory-tree/check-memory-hygiene.sh`
+  runs, it prints 1; `grep -rl "gov:kit memory-tree@2.146" tools/memory-tree memory/HYGIENE.md memory/TEMPLATE-SPEC.md memory/guides`
+  prints nothing; and on the unit's commit
+  `git diff HEAD~1 HEAD -- tools/roles/roles_lib.py tools/roles/SKILL.template.md .claude/skills/build | grep -c "KIT_ROLES_VERSION\|gov:kit roles@"`
+  prints 0.
+  Red when: the memory-tree constant does not move, one of its carriers keeps the old marker, or
+  this unit moves a roles kit carrier, which `TOOL-aOrientedCast-20` moves once for the set.
+  figure: PINNED at `d518b483f`, where memory-tree reads 2.146; a bump another build lands first
+  moves the expected value by the same one step.
 
 ## 7. Gates
 
@@ -399,6 +406,14 @@ The main loop observes each arm RED on its staged break and GREEN once restored,
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft.
+- rev-2 · 2026-10-13 · S7 · AC9 · §3 · §4 · the roles kit's version move goes to
+  `TOOL-aOrientedCast-20`, now the last unit of the set to touch `tools/roles/`. S7, AC9 and §4
+  "Rollout" keep the memory-tree move alone, §3 says why, and the Skill template and the rendered
+  `/build` Skill leave §4's files touched, because the `gov:kit roles@` marker was this unit's only
+  edit to either. The brief asked for `check-wiring self-test` on the §7 leg line, since the rendered
+  Skill's path tripped that leg's `.claude/` guard. With the path gone the guard no longer trips, so
+  the leg is not added. Re-derived with the spec-token checker's guard join read from its source,
+  not run: every leg the remaining paths trip is already on the leg line.
 
 ## 10. Reuse audit
 
