@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-27 — every spawned agent is named for its build, unit and action, and the spawn guard refuses a misnamed spawn
 
-**Status:** OPEN · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 28 · ratified 2026-10-13
+**Status:** INPROGRESS · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 28 · ratified 2026-10-13
 
 <!-- gen:spec-records -->
 
