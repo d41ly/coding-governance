@@ -62,7 +62,12 @@ skills/session-kickoff/SKILL.md	18432
 # alone and measured 13151 bytes, so the old row priced 51 KB of growth nobody had asked for. 16 KiB
 # keeps the whole file well under the 32768 bytes a Codex agent reads
 # (the agent-instructions kit's CODEX_MAX), which v3.5 exceeded.
-AGENTS.md	16384
+#
+# RAISED to 20480 (20 KiB) on owner order, 2026-10-13 (memory/DECISIONS.md, PLAY-aOrientedCast-3).
+# The agent and returned micro-formats and their rule put the charter at 16729 bytes against 16384,
+# once the role roster had left 83 free. 20 KiB leaves room for more roles and rules without another
+# owner turn soon, and keeps the whole file at 62% of the 32768 bytes a Codex agent reads.
+AGENTS.md	20480
 
 # --- the build method, as rendered -------------------------------------------------------------
 # 27648 bytes = 27 KiB. SEEDED FROM THE MEASUREMENT PLUS THE WORK THIS BUILD FUNDS, 2026-09-05

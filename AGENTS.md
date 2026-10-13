@@ -7,7 +7,7 @@ from the kits and answers it selected. Change a source and re-render with
 `<prefix>/playbook/adopt-playbook.sh`; never edit the rendered text. Every rule is one line: a tool,
 gate or protocol named in section 3 carries the detail.*
 
-<!-- governance-template: v4.3 -->
+<!-- governance-template: v4.4 -->
 
 ## 1. Governing practices
 
@@ -62,6 +62,8 @@ gate or protocol named in section 3 carries the detail.*
 - `READY — <slug> · node <tag> · <branch> · base <sha> · Tier-<n> · gates <list>`
 - `BUILD — <slug> · Tier-<n> · <done>/<total> <step> · left <ids|none|unspecced>`
 - `SPEC — [<unit-id>](<path>) · review <ids|none>[ · open <ids|none>]`
+- `agent — <role> · effort <level> · model <model> · <unit-id|label> · prompt [<name>](<path>) · writes <class> · gates <legs|none> · run <run-id|direct>/<agent-id>`
+- `returned — <role> · <outcome> · <wall> · <tokens> out · run <run-id|direct>/<agent-id>`
 - `unchanged — since <link> · delta <text|none>`
 - `⏳ — <what is running>`
 <!-- /microformats -->
@@ -69,6 +71,7 @@ gate or protocol named in section 3 carries the detail.*
 <!-- one-line -->
 - [never-omit] Every final message ends with the state block, short answers and conversation included; repeating it is not saying a thing twice, and omitting it is a defect.
 - [events] Each event in the turn gets its shape: a commit `committed`, a push `pushed`, a merge `merged`, a bar run `gates` or `skipped`, a server `up`, a kickoff `READY`, a long run `⏳`.
+- [agents] Every agent a turn dispatches gets its `agent` line and every agent it receives its `returned` line, both derived by the roles kit and never typed.
 - [r1] Emit each shape as a bare `- ` list item at column 0: no backticks, fence, bold or heading, and one shape per line.
 - [grammar] A shape is a head keyword, the ` — ` joiner and fields separated by ` · `; `[ · …]` marks an optional trailing field and never appears in an emission.
 - [pair] `BUILD` then `SPEC` sit adjacent in the state block of every final message while a build is in progress, one-line replies included; before a spec exists, `SPEC` is omitted.
