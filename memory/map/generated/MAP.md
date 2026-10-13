@@ -18,7 +18,6 @@ Inventories: gate-legs: 132 · kits: 18 · git-hooks: 4 · harness-hooks: 11 · 
 | `backlog migration selftest` | memory-tree-hygiene |
 | `branch-guard self-test` | baseline |
 | `branch-reconcile selftest` | branch-reconcile |
-| `branch-reconcile skill wiring` | branch-reconcile |
 | `brief-recorded` | unattended |
 | `build README slot contract` | build-readme-surface |
 | `build-index selftest` | baseline |
@@ -26,6 +25,7 @@ Inventories: gate-legs: 132 · kits: 18 · git-hooks: 4 · harness-hooks: 11 · 
 | `charter size` | playbook |
 | `check-arms selftest` | baseline |
 | `check-wiring self-test` | baseline |
+| `cleanup skill wiring` | branch-reconcile |
 | `codebase-map adopter e2e` | codebase-map |
 | `codebase-map coverage + freshness` | codebase-map |
 | `codebase-map gate coverage` | codebase-map |
@@ -218,7 +218,7 @@ Inventories: gate-legs: 132 · kits: 18 · git-hooks: 4 · harness-hooks: 11 · 
 
 | key | claimant |
 |---|---|
-| `branch-reconcile` | branch-reconcile |
+| `cleanup` | branch-reconcile |
 | `drift-audit` | baseline |
 | `lexicon` | lexicon |
 | `memory-recall` | memory-recall |

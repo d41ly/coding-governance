@@ -33,10 +33,10 @@ One read-only report giving every worktree, branch and stash entry a verdict wit
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/branch-reconcile.md`
 - decisions 5: `TOOL-dSweptBranches-1`, `TOOL-dSweptBranches-2`, `TOOL-dSweptBranches-3`, `TOOL-dSweptBranches-4`, `TOOL-dSweptBranches-5`
-- gate-legs 2: `branch-reconcile selftest`, `branch-reconcile skill wiring`
+- gate-legs 2: `branch-reconcile selftest`, `cleanup skill wiring`
 - kits 1: `branch-reconcile`
-- rendered-skills 1: `branch-reconcile`
-- globs 2: `tools/branch-reconcile/*`, `.claude/skills/branch-reconcile/SKILL.md`
+- rendered-skills 1: `cleanup`
+- globs 2: `tools/branch-reconcile/*`, `.claude/skills/cleanup/SKILL.md`
 
 ## build-method
 

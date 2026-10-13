@@ -9,19 +9,19 @@ decisions = ["TOOL-dSweptBranches-1", "TOOL-dSweptBranches-2", "TOOL-dSweptBranc
              "TOOL-dSweptBranches-4", "TOOL-dSweptBranches-5"]
 
 [claims]
-gate-legs = ["branch-reconcile selftest", "branch-reconcile skill wiring"]
+gate-legs = ["branch-reconcile selftest", "cleanup skill wiring"]
 kits = ["branch-reconcile"]
 git-hooks = []
 harness-hooks = []
 workflow-scripts = []
 skill-engines = []
-rendered-skills = ["branch-reconcile"]
+rendered-skills = ["cleanup"]
 gotcha-classes = []
 guides = []
 backlog-shards = []
 lexicon-verbs = []
 [paths]
-globs = ["tools/branch-reconcile/*", ".claude/skills/branch-reconcile/SKILL.md"]
+globs = ["tools/branch-reconcile/*", ".claude/skills/cleanup/SKILL.md"]
 ```
 
 The kit exists because owners keep asking agents to clean up branches and worktrees, and each

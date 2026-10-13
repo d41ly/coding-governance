@@ -1,11 +1,13 @@
 # TOOL-dSweptBranches-19 — the skill is `/cleanup`, renamed with every live reference
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 17
+**Status:** CLOSED · rev-1 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 17
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-TOOL-dSweptBranches-19-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-dSweptBranches-19-1-acceptance-ledger.md) | journal | — |
+| [2026-10-13-prompt-TOOL-dSweptBranches-19-1-build-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-19-1-build-brief.md) | journal | — |
 | [2026-10-13-prompt-TOOL-dSweptBranches-19-owner-follow-up.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-19-owner-follow-up.md) | research | TOOL-dSweptBranches-20 TOOL-dSweptBranches-21 |
 
 <!-- /gen:spec-records -->

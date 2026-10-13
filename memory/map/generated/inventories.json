@@ -11,7 +11,6 @@
       "backlog migration selftest",
       "branch-guard self-test",
       "branch-reconcile selftest",
-      "branch-reconcile skill wiring",
       "brief-recorded",
       "build README slot contract",
       "build-index selftest",
@@ -19,6 +18,7 @@
       "charter size",
       "check-arms selftest",
       "check-wiring self-test",
+      "cleanup skill wiring",
       "codebase-map adopter e2e",
       "codebase-map coverage + freshness",
       "codebase-map gate coverage",
@@ -193,7 +193,7 @@
       "session-kickoff"
     ],
     "rendered-skills": [
-      "branch-reconcile",
+      "cleanup",
       "drift-audit",
       "lexicon",
       "memory-recall",

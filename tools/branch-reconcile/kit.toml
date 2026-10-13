@@ -29,7 +29,7 @@ role = "project-owned"
 [[files]]
 include = ["SKILL.template.md"]
 role = "rendered"
-to = ".claude/skills/branch-reconcile/SKILL.md"
+to = ".claude/skills/cleanup/SKILL.md"
 placeholders = ["KIT_DIR"]
 
 [adopt]
@@ -48,18 +48,18 @@ argv = ["bash", "{kit}/adopt-branch-reconcile.sh", "--check"]
 
 [[outcome]]
 code = 0
-probe = { must_exist = ".claude/skills/branch-reconcile/SKILL.md" }
+probe = { must_exist = ".claude/skills/cleanup/SKILL.md" }
 means = "adopted"
 
 # THE SKILL'S WIRING LEG SHIPS: its subject is the target's own rendered Skill, which goes stale when
 # the template is edited or the kit moves, with nobody touching the adopter.
 [[gate_leg]]
-name = "branch-reconcile skill wiring"
+name = "cleanup skill wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-branch-reconcile.sh", "--check"]
 guard = []
 
 # ONE [[lf_pin]], for the rendered Skill, which its own leg byte-compares.
 [[lf_pin]]
-pattern = ".claude/skills/branch-reconcile/SKILL.md"
+pattern = ".claude/skills/cleanup/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"

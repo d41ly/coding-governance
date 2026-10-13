@@ -159,3 +159,7 @@ base: a8f0e195a2d80a6d1480e4992aec6565342e35ea
 2026-10-13T10:37:38Z rescope · item add TOOL-dSweptBranches-20 · reason owner instruction 2026-10-13: build out the asks; closes TOOL-dSweptBranches-6, the range-reader audit
 
 2026-10-13T10:37:39Z rescope · item add TOOL-dSweptBranches-21 · reason owner instruction 2026-10-13: build out the asks; closes TOOL-dSweptBranches-18, the census suite's live-tree arm
+
+2026-10-13T10:38:32Z brief · item TOOL-dSweptBranches-19 · reason 9b6dc808b99b memory/builds/dSweptBranches/prompts/2026-10-13-prompt-TOOL-dSweptBranches-19-1-build-brief.md
+
+2026-10-13T10:38:41Z dispatch · item 5c20cc2b TOOL-dSweptBranches-19 · reason tools/branch-reconcile/branch_reconcile.py tools/branch-reconcile/selftest.py tools/branch-reconcile/README.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-19.md memory/builds/dSweptBranches/prompts/2026-10-13-prompt-TOOL-dSweptBranches-19-1-build-brief.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-19-1-acceptance-ledger.md memory/map/features/branch-reconcile.md tools/branch-reconcile/SKILL.template.md tools/branch-reconcile/adopt-branch-reconcile.sh tools/branch-reconcile/kit.toml .claude/skills/cleanup/SKILL.md .claude/skills/branch-reconcile/SKILL.md .gitattributes tools/gate-legs.json tools/govkit/subject-pins.tsv WIRE-INTO-PROJECT.md memory/guides/SESSION-KICKOFF.md memory/project/unarmed-branches.txt

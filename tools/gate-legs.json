@@ -958,7 +958,7 @@
     "ceiling": 300
   },
   {
-    "name": "branch-reconcile skill wiring",
+    "name": "cleanup skill wiring",
     "argv": [
       "bash",
       "{prefix}/branch-reconcile/adopt-branch-reconcile.sh",

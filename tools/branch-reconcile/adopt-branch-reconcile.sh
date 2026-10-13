@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# adopt-branch-reconcile.sh — render the branch-reconcile Skill, and check the rendered copy has not drifted.
+# adopt-branch-reconcile.sh — render the /cleanup Skill, and check the rendered copy has not drifted.
 # gov:kit branch-reconcile@1.3
 #
-#   bash <this kit>/adopt-branch-reconcile.sh --scaffold    # render .claude/skills/branch-reconcile/SKILL.md
+#   bash <this kit>/adopt-branch-reconcile.sh --scaffold    # render .claude/skills/cleanup/SKILL.md
 #   bash <this kit>/adopt-branch-reconcile.sh --check       # the gate leg: is the rendered Skill a fresh render?
 #
 # The Skill names the CLI by where this kit is installed, which differs per repository, so it is
@@ -42,7 +42,7 @@ done
 [ -n "$MODE" ] || { echo "$USAGE"; exit 2; }
 
 TEMPLATE="$HERE/SKILL.template.md"
-SKILL_REL=".claude/skills/branch-reconcile/SKILL.md"
+SKILL_REL=".claude/skills/cleanup/SKILL.md"
 SKILL="$ROOT/$SKILL_REL"
 
 if [ ! -f "$TEMPLATE" ]; then
@@ -50,7 +50,7 @@ if [ ! -f "$TEMPLATE" ]; then
     echo "branch-reconcile: $SKILL_REL exists but $KIT_REL/SKILL.template.md does not, so its drift cannot be checked"
     exit 1
   fi
-  echo "skip     branch-reconcile skill — $KIT_REL/SKILL.template.md is not installed, so there is nothing to render"
+  echo "skip     cleanup skill — $KIT_REL/SKILL.template.md is not installed, so there is nothing to render"
   [ "$MODE" = "--check" ] && exit 0
   exit 1
 fi
@@ -102,7 +102,7 @@ check_render "$TMP" || exit 1
 if [ "$MODE" = "--check" ]; then
   [ -f "$SKILL" ] || { echo "branch-reconcile: $SKILL_REL is not rendered — run bash $KIT_REL/adopt-branch-reconcile.sh --scaffold"; exit 1; }
   if diff -q <(tr -d '\r' < "$SKILL") "$TMP" >/dev/null 2>&1; then
-    echo "ok       branch-reconcile skill — $SKILL_REL is a fresh render (CLI $KIT_REL/branch_reconcile.py)"
+    echo "ok       cleanup skill — $SKILL_REL is a fresh render (CLI $KIT_REL/branch_reconcile.py)"
     exit 0
   fi
   echo "branch-reconcile: $SKILL_REL has DRIFTED from a fresh render of $KIT_REL/SKILL.template.md."

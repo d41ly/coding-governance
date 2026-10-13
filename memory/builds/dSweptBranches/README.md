@@ -65,7 +65,7 @@ None yet.
 | 2 | `TOOL-dSweptBranches-2` | 2 | the verdict ladder: six verdicts over refs and worktree content, each with its evidence |
 | 3 | `TOOL-dSweptBranches-4` | 2 | the worktree remover: git first, then `rm -rf`, and a skeleton removed only when it holds no regular file |
 | 4 | `TOOL-dSweptBranches-3` | 2 | write mode: a recovery manifest first, then deletes of the three landed verdicts only |
-| 5 | `TOOL-dSweptBranches-5` | 2 | the skill: a rendered `/branch-reconcile` that routes cleanup asks through the tool |
+| 5 | `TOOL-dSweptBranches-5` | 2 | the skill: a rendered skill, `/cleanup` since unit 19, that routes cleanup asks through the tool |
 | 6 | `TOOL-dSweptBranches-7` | 2 | an unread worktree status reads UNKNOWN, never its HEAD's verdict (promoted, H1) |
 | 7 | `TOOL-dSweptBranches-8` | 2 | a worktree path is proven this repository's before it is graded or rm -rf'd (promoted, H2) |
 | 8 | `TOOL-dSweptBranches-9` | 2 | the patch predicate needs the same files and more shared lines than drift (promoted, H3) |
@@ -107,12 +107,12 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-15 — a submodule with uncommitted content makes its worktree UNKNOWN](spec/2026-10-13-spec-TOOL-dSweptBranches-15.md) | 14 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-16 — tracked edits in an idle worktree are graded by a fixture](spec/2026-10-13-spec-TOOL-dSweptBranches-16.md) | 15 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-17 — the closing review's MEDIUM and LOW items, batched](spec/2026-10-13-spec-TOOL-dSweptBranches-17.md) | 16 | 2 | CLOSED | rev-1 | 2026-10-13 |
-| [TOOL-dSweptBranches-19 — the skill is `/cleanup`, renamed with every live reference](spec/2026-10-13-spec-TOOL-dSweptBranches-19.md) | 17 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-dSweptBranches-19 — the skill is `/cleanup`, renamed with every live reference](spec/2026-10-13-spec-TOOL-dSweptBranches-19.md) | 17 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-20 — gov's range readers audited for a merge read as additions](spec/2026-10-13-spec-TOOL-dSweptBranches-20.md) | 18 | 1 | OPEN | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-21 — the census suite's live-tree arm waits for its tree, not for three seconds](spec/2026-10-13-spec-TOOL-dSweptBranches-21.md) | 19 | 2 | OPEN | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 37 bound to this build, across 4 record folder(s).
+Records: 39 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1,5 +1,5 @@
 ---
-name: branch-reconcile
+name: cleanup
 description: >-
   Reconcile and clean up this repository's branches and worktrees: which landed, which still hold
   work, and remove only what landed. Use whenever the ask is "clean up branches", "clean up
