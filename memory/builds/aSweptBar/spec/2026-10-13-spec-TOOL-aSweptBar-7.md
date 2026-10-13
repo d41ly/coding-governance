@@ -1,6 +1,6 @@
 # TOOL-aSweptBar-7 — the closing review's three mediums and four lows, batched
 
-**Status:** SPECCED · rev-1 · 2026-10-13 · node a · Tier-1 · base c99ce09c · streams tooling · order 5
+**Status:** INPROGRESS · rev-1 · 2026-10-13 · node a · Tier-1 · base c99ce09c · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
