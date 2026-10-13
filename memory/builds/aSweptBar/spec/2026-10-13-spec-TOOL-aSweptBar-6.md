@@ -1,6 +1,6 @@
 # TOOL-aSweptBar-6 — records, pins and ceilings re-measured over the fixed tree
 
-**Status:** SPECCED · rev-2 · 2026-10-13 · node a · Tier-1 · base 53b25884 · streams tooling · order 4 · ratified 2026-10-13
+**Status:** INPROGRESS · rev-2 · 2026-10-13 · node a · Tier-1 · base 53b25884 · streams tooling · order 4 · ratified 2026-10-13
 
 <!-- gen:spec-records -->
 
