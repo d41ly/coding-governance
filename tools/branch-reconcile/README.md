@@ -64,7 +64,8 @@ merge on the default branch names the same unit id or slug and touched every fil
 default branch shows landed (`records`); or when it adds only rows whose ids head a row somewhere in
 the default's memory tree, archives included (`rotated`). A line that merely cites an id is never a
 row: run over gov's own tree, an earlier version of that rule called a 250-line spec rewrite
-superseded. A merge commit is covered when each parent is landed or itself unique.
+superseded. A merge commit is covered only when `git diff-tree --cc` shows it introduces nothing of
+its own, and `git cherry`, which skips merges, decides `EQUIVALENT` only when every merge is clean.
 
 **Merge-tree is only a positive proof.** Its conflict count is never read: a stale branch whose
 every commit landed conflicts heavily.

@@ -723,6 +723,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_evil_merge",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_foreign",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -3926,6 +3931,11 @@
       "id": "check_marker_line",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "check_merge_clean",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "check_merge_head_builds",

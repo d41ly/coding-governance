@@ -880,9 +880,30 @@ def arm_graded_sha():
               ("moving" in branches, "moving" in out and "moved" in out), (True, True))
 
 
+def arm_evil_merge():
+    """TOOL-dSweptBranches-14 — a merge that adds content of its own is never covered."""
+    repo = seed_repo(build_dir())
+    run_git(repo, "checkout", "-q", "-b", "z")
+    seed_commit(repo, "f.txt", "f\n", "build(dFoo): TOOL-dFoo-1 — f")
+    run_git(repo, "checkout", "-q", "main")
+    seed_commit(repo, "m.txt", "m\n", "feat: main moves on")
+    run_git(repo, "checkout", "-q", "z")
+    run_git(repo, "merge", "-q", "--no-ff", "--no-commit", "main")
+    (repo / "evil.txt").write_text("only in the merge\n", encoding="utf-8", newline="\n")
+    run_git(repo, "add", "evil.txt")
+    run_git(repo, "commit", "-q", "-m", "merge main into z")
+    run_git(repo, "checkout", "-q", "main")
+    run_git(repo, "cherry-pick", run_git(repo, "rev-parse", "z^1"))
+    seed_publish(repo)
+    verdict, ev = read_verdict(read_report(repo, "--fresh-hours", "0"), "local", "z")
+    check("evil-merge: AC1 a branch whose merge adds its own content reads UNMERGED-LIVE",
+          verdict, "UNMERGED-LIVE")
+
+
 ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
         arm_content, arm_stash, arm_remover, arm_write, arm_keeps, arm_unread, arm_foreign,
-        arm_patch_negative, arm_probe_negative, arm_row_edit, arm_default_names, arm_graded_sha]
+        arm_patch_negative, arm_probe_negative, arm_row_edit, arm_default_names, arm_graded_sha,
+        arm_evil_merge]
 
 
 def main():

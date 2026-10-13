@@ -541,6 +541,19 @@ def check_build_landed(inv, slug, merges):
     return any(check_names({slug}, subject) for _sha, subject in merges)
 
 
+def check_merge_clean(inv, sha):
+    """True when the merge <sha> introduces nothing of its own: `git diff-tree --cc` prints no hunk.
+
+    TOOL-dSweptBranches-14. Every parent of a merge in <default>..<tip> is either in that range or
+    an ancestor of the default, so a parents-only rule holds for every merge and reads none; an
+    evil merge, or a conflict resolution, carries bytes that exist on no parent.
+    """
+    def load():
+        out = run_git(inv["root"], "diff-tree", "--cc", "-p", "--no-color", sha)[1]
+        return not any(line.startswith("@@@") for line in out.splitlines())
+    return read_cached(inv, ("merge-clean", sha), load)
+
+
 def check_rebased_copy(inv, lines, files, cand):
     """True when <cand> is a rebased copy of a commit with these patch lines and files.
 
@@ -568,7 +581,6 @@ def derive_coverage(inv, tip):
         if rc != 0:
             return {"error": "git rev-list failed"}
         commits = [line.split() for line in out.splitlines() if line.strip()]
-        unique = {c[0] for c in commits}
         applied = {line[2:].strip() for line in read_git(root, "cherry", dref, tip).splitlines()
                    if line.startswith("- ")}
         by_subject, merges = read_side(inv, mb)
@@ -581,7 +593,7 @@ def derive_coverage(inv, tip):
             slugs |= {n for n in derive_names(subject) if not ID_RE.fullmatch(n)}
             how = None
             if len(parents) > 1:
-                if all(p in unique or check_ancestor(inv, p) for p in parents):
+                if check_merge_clean(inv, sha):
                     how = "merge"
             elif sha in applied:
                 how = "patch-id"
@@ -786,6 +798,10 @@ def check_equivalent(inv, item):
         return None
     lines = [line for line in read_git(inv["root"], "cherry", inv["default_ref"], item["tip"])
              .splitlines() if line.strip()]
+    # `git cherry` skips merge commits, so it is trusted only when every merge introduces nothing.
+    merges = read_git(inv["root"], "rev-list", "--merges", f"{inv['default_ref']}..{item['tip']}").split()
+    if any(not check_merge_clean(inv, m) for m in merges):
+        return None
     if lines and all(line.startswith("- ") for line in lines):
         return EQUIVALENT, f"git cherry: all {len(lines)} commit(s) already applied"
     return None

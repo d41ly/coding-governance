@@ -1,10 +1,13 @@
 # TOOL-dSweptBranches-14 — a merge commit is covered only when it introduces nothing of its own
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 13
+**Status:** CLOSED · rev-1 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-13-build-TOOL-dSweptBranches-14-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-dSweptBranches-14-1-acceptance-ledger.md) | journal | — |
+| [2026-10-13-prompt-TOOL-dSweptBranches-14-1-build-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-14-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
