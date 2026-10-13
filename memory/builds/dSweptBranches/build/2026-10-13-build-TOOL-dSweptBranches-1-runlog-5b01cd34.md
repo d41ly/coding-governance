@@ -1,6 +1,6 @@
 # Run record
 
-**Serves:** journal TOOL-dSweptBranches-1..5 TOOL-dSweptBranches-7..17
+**Serves:** journal TOOL-dSweptBranches-1..5 TOOL-dSweptBranches-7..17 TOOL-dSweptBranches-19..21 TOOL-dSweptBranches-23..24
 
 Rendered from the run model by the runlog kit's `record` command. Every value below is drawn from a closed schema, so no line carries free text. Re-render it rather than edit it.
 
@@ -9,29 +9,29 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 - run-state: memory/builds/dSweptBranches/RUN.md
 - run: 1 of 1
 - start: 5b01cd3496af41478d96d859c702eac51a1a08e2
-- phase: HELD
+- phase: LANDING
 - terminal: no
-- window: 2026-10-13T00:16:53Z to 2026-10-13T07:31:36Z
+- window: 2026-10-13T00:16:53Z to 2026-10-13T12:01:30Z
 - window opened by: git
 - window closed by: last-activity
-- duration: 26083s
+- duration: 42277s
 - own commits: 0
 - last own commit: -
 - merged: -
-- units served: 16
+- units served: 21
 - sources present: 7 of 7
-- owner turns: launch 1 · pre-run 0 · in-window 0 · post-close 0
-- usage main: requests 341 · in 694 · out 370007 · cache-read 199064376 · cache-write 1369618
+- owner turns: launch 1 · pre-run 0 · in-window 1 · post-close 0
+- usage main: requests 580 · in 1180 · out 551764 · cache-read 292462629 · cache-write 2582152
 - usage agent: requests 0 · in 0 · out 0 · cache-read 0 · cache-write 0
-- usage workflow: requests 258 · in 516 · out 311660 · cache-read 25980576 · cache-write 1985673
-- attributed calls: 623 of 710
+- usage workflow: requests 390 · in 780 · out 407128 · cache-read 36420480 · cache-write 2797981
+- attributed calls: 976 of 1114
 - values withheld: 0
-- commitment: sha256 0c3c0970d45183e9114fe4d8a526e9a38f2e624cdf1356d8bd2bb75c8952acae · lines 174
+- commitment: sha256 07bcaf094bc5950e6e98e63f54513b31da4262203d2a392abeae05789323e253 · lines 273
 
 ## Timeline
 
-- events: 42 · shown 42 · elided 0
-- withheld rows: verb 80 · push 6 · push-refused 0 · gate 2 · compact 0 · limit 0 · idle 0 · workflow 2
+- events: 58 · shown 58 · elided 0
+- withheld rows: verb 123 · push 11 · push-refused 0 · gate 5 · compact 1 · limit 0 · idle 0 · workflow 3
 
 | UTC | source | event | value | phase | rc | more |
 |---|---|---|---|---|---|---|
@@ -77,29 +77,30 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | 2026-10-13T01:47:33Z | run-state | dispatch | TOOL-dSweptBranches-17 | - | - | - |
 | 2026-10-13T01:54:15Z | run-state | phase | a24c01529c3f | VERIFYING | - | - |
 | 2026-10-13T07:31:36Z | run-state | phase | 7138606411c9 | HELD | - | - |
+| 2026-10-13T10:35:29Z | run-state | phase | c07585e775b9 | VERIFYING | - | - |
+| 2026-10-13T10:38:32Z | run-state | brief | TOOL-dSweptBranches-19 | - | - | - |
+| 2026-10-13T10:38:41Z | run-state | dispatch | TOOL-dSweptBranches-19 | - | - | - |
+| 2026-10-13T10:41:10Z | run-state | brief | TOOL-dSweptBranches-20 | - | - | - |
+| 2026-10-13T10:41:19Z | run-state | dispatch | TOOL-dSweptBranches-20 | - | - | - |
+| 2026-10-13T10:44:56Z | run-state | dispatch | TOOL-dSweptBranches-20 | - | - | - |
+| 2026-10-13T10:46:07Z | run-state | brief | TOOL-dSweptBranches-21 | - | - | - |
+| 2026-10-13T10:46:17Z | run-state | dispatch | TOOL-dSweptBranches-21 | - | - | - |
+| 2026-10-13T11:01:22Z | run-state | dispatch | TOOL-dSweptBranches-21 | - | - | - |
+| 2026-10-13T11:17:21Z | run-state | brief | TOOL-dSweptBranches-23 | - | - | - |
+| 2026-10-13T11:17:32Z | run-state | dispatch | TOOL-dSweptBranches-23 | - | - | - |
+| 2026-10-13T11:22:11Z | run-state | brief | TOOL-dSweptBranches-24 | - | - | - |
+| 2026-10-13T11:22:21Z | run-state | dispatch | TOOL-dSweptBranches-24 | - | - | - |
+| 2026-10-13T11:24:42Z | run-state | dispatch | TOOL-dSweptBranches-24 | - | - | - |
+| 2026-10-13T11:41:42Z | run-state | dispatch | TOOL-dSweptBranches-24 | - | - | - |
+| 2026-10-13T12:01:30Z | run-state | phase | 3cb4e919d02b | LANDING | - | - |
 
 ## Units
 
-- units: 16 · shown 16 · aggregated no
+- units: 21 · shown 0 · aggregated yes
 
-| order | unit | status | commits | dispatched | briefed | built |
-|---|---|---|---|---|---|---|
-| 1 | TOOL-dSweptBranches-1 | CLOSED | 0 | 2 | 1 | - |
-| 2 | TOOL-dSweptBranches-2 | CLOSED | 0 | 1 | 1 | - |
-| 3 | TOOL-dSweptBranches-4 | CLOSED | 0 | 1 | 1 | - |
-| 4 | TOOL-dSweptBranches-3 | CLOSED | 0 | 3 | 1 | - |
-| 5 | TOOL-dSweptBranches-5 | CLOSED | 0 | 3 | 1 | - |
-| 6 | TOOL-dSweptBranches-7 | CLOSED | 0 | 1 | 1 | - |
-| 7 | TOOL-dSweptBranches-8 | CLOSED | 0 | 1 | 1 | - |
-| 8 | TOOL-dSweptBranches-9 | CLOSED | 0 | 1 | 1 | - |
-| 9 | TOOL-dSweptBranches-10 | CLOSED | 0 | 1 | 1 | - |
-| 10 | TOOL-dSweptBranches-11 | CLOSED | 0 | 1 | 1 | - |
-| 11 | TOOL-dSweptBranches-12 | CLOSED | 0 | 1 | 1 | - |
-| 12 | TOOL-dSweptBranches-13 | CLOSED | 0 | 1 | 1 | - |
-| 13 | TOOL-dSweptBranches-14 | CLOSED | 0 | 1 | 1 | - |
-| 14 | TOOL-dSweptBranches-15 | CLOSED | 0 | 1 | 1 | - |
-| 15 | TOOL-dSweptBranches-16 | CLOSED | 0 | 1 | 1 | - |
-| 16 | TOOL-dSweptBranches-17 | CLOSED | 0 | 1 | 1 | - |
+| # | status | units |
+|---|---|---|
+| 1 | CLOSED | 21 |
 
 ## Decisions
 
@@ -107,7 +108,7 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 - trailer near-misses: 0
 - decision-log rows the owner's: 0
 - spec marks: owner-before 0 · owner-inside 0 · agent-before 0 · agent-inside 0
-- excluded rows: proposal 0 · rescope 11 · dispatch 21 · review 2 · brief 16 · hold 1 · resume 0
+- excluded rows: proposal 0 · rescope 16 · dispatch 30 · review 2 · brief 21 · hold 1 · resume 1
 - review rounds: 2 · shown 2 · aggregated no
 
 | # | source | entries |
@@ -144,39 +145,38 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | # | item | unit | state |
 |---|---|---|---|
 | 1 | brief-before-build | - | UNJUDGEABLE |
-| 2 | phases-walked | - | UNJUDGEABLE |
-| 3 | green-at-close | - | UNJUDGEABLE |
+| 2 | phases-walked | - | MET |
+| 3 | green-at-close | - | MET |
 | 4 | keepalive-reaped | - | MET |
 | 5 | review-exited | - | MET |
 
 ## Anomalies
 
-- anomalies: 7 · shown 7 · aggregated no
+- anomalies: 21 · shown 0 · aggregated yes
 
-| # | kind | subclass |
-|---|---|---|
-| 1 | no-progress | - |
-| 2 | out-of-band-edit | - |
-| 3 | out-of-band-edit | - |
-| 4 | destructive-git | - |
-| 5 | red-behind-zero | - |
-| 6 | destructive-git | - |
-| 7 | destructive-git | - |
+| # | kind | subclass | count |
+|---|---|---|---|
+| 1 | no-progress | - | 1 |
+| 2 | out-of-band-edit | - | 8 |
+| 3 | refusal-loop | - | 3 |
+| 4 | killed-verb | - | 1 |
+| 5 | red-behind-zero | - | 1 |
+| 6 | destructive-git | - | 7 |
 
 ## Coverage
 
 - journal starts: 1 joined of 1 record-creating
 - unjoined starts: 0
 - sessions: 1 named · 1 extracted
-- idle gaps: judged yes · near an owner turn 0
+- idle gaps: judged yes · near an owner turn 1
 - anomaly kinds: judged 12 of 12
 
 | # | source | state | lines | bad |
 |---|---|---|---|---|
 | 1 | run-state | present | - | - |
-| 2 | driver | present | 160 | 0 |
-| 3 | gates | present | 2 | 0 |
-| 4 | pushes | present | 6 | 0 |
+| 2 | driver | present | 246 | 0 |
+| 3 | gates | present | 5 | 0 |
+| 4 | pushes | present | 11 | 0 |
 | 5 | git | present | - | - |
 | 6 | transcripts | present | - | - |
 | 7 | build-folder | present | - | - |
@@ -185,8 +185,8 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 ```json
 {"schema":1,"sections":{
-"Summary":{"facts":{"run-state":"memory/builds/dSweptBranches/RUN.md","run":"1 of 1","start":"5b01cd3496af41478d96d859c702eac51a1a08e2","phase":"HELD","terminal":"no","window":"2026-10-13T00:16:53Z to 2026-10-13T07:31:36Z","window opened by":"git","window closed by":"last-activity","duration":"26083s","own commits":"0","last own commit":"-","merged":"-","units served":"16","sources present":"7 of 7","owner turns":"launch 1 · pre-run 0 · in-window 0 · post-close 0","usage main":"requests 341 · in 694 · out 370007 · cache-read 199064376 · cache-write 1369618","usage agent":"requests 0 · in 0 · out 0 · cache-read 0 · cache-write 0","usage workflow":"requests 258 · in 516 · out 311660 · cache-read 25980576 · cache-write 1985673","attributed calls":"623 of 710","values withheld":"0","commitment":"sha256 0c3c0970d45183e9114fe4d8a526e9a38f2e624cdf1356d8bd2bb75c8952acae · lines 174"},"tables":[]},
-"Timeline":{"facts":{"events":"42 · shown 42 · elided 0","withheld rows":"verb 80 · push 6 · push-refused 0 · gate 2 · compact 0 · limit 0 · idle 0 · workflow 2"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
+"Summary":{"facts":{"run-state":"memory/builds/dSweptBranches/RUN.md","run":"1 of 1","start":"5b01cd3496af41478d96d859c702eac51a1a08e2","phase":"LANDING","terminal":"no","window":"2026-10-13T00:16:53Z to 2026-10-13T12:01:30Z","window opened by":"git","window closed by":"last-activity","duration":"42277s","own commits":"0","last own commit":"-","merged":"-","units served":"21","sources present":"7 of 7","owner turns":"launch 1 · pre-run 0 · in-window 1 · post-close 0","usage main":"requests 580 · in 1180 · out 551764 · cache-read 292462629 · cache-write 2582152","usage agent":"requests 0 · in 0 · out 0 · cache-read 0 · cache-write 0","usage workflow":"requests 390 · in 780 · out 407128 · cache-read 36420480 · cache-write 2797981","attributed calls":"976 of 1114","values withheld":"0","commitment":"sha256 07bcaf094bc5950e6e98e63f54513b31da4262203d2a392abeae05789323e253 · lines 273"},"tables":[]},
+"Timeline":{"facts":{"events":"58 · shown 58 · elided 0","withheld rows":"verb 123 · push 11 · push-refused 0 · gate 5 · compact 1 · limit 0 · idle 0 · workflow 3"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
 ["2026-10-13T00:16:53Z","run-state","phase","a8f0e195a2d8","RUNNING","-","-"],
 ["2026-10-13T00:17:46Z","run-state","brief","TOOL-dSweptBranches-1","-","-","-"],
 ["2026-10-13T00:21:09Z","run-state","dispatch","TOOL-dSweptBranches-1","-","-","-"],
@@ -228,25 +228,26 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["2026-10-13T01:47:25Z","run-state","brief","TOOL-dSweptBranches-17","-","-","-"],
 ["2026-10-13T01:47:33Z","run-state","dispatch","TOOL-dSweptBranches-17","-","-","-"],
 ["2026-10-13T01:54:15Z","run-state","phase","a24c01529c3f","VERIFYING","-","-"],
-["2026-10-13T07:31:36Z","run-state","phase","7138606411c9","HELD","-","-"]]}]},
-"Units":{"facts":{"units":"16 · shown 16 · aggregated no"},"tables":[{"name":"units","header":["order","unit","status","commits","dispatched","briefed","built"],"rows":[
-["1","TOOL-dSweptBranches-1","CLOSED","0","2","1","-"],
-["2","TOOL-dSweptBranches-2","CLOSED","0","1","1","-"],
-["3","TOOL-dSweptBranches-4","CLOSED","0","1","1","-"],
-["4","TOOL-dSweptBranches-3","CLOSED","0","3","1","-"],
-["5","TOOL-dSweptBranches-5","CLOSED","0","3","1","-"],
-["6","TOOL-dSweptBranches-7","CLOSED","0","1","1","-"],
-["7","TOOL-dSweptBranches-8","CLOSED","0","1","1","-"],
-["8","TOOL-dSweptBranches-9","CLOSED","0","1","1","-"],
-["9","TOOL-dSweptBranches-10","CLOSED","0","1","1","-"],
-["10","TOOL-dSweptBranches-11","CLOSED","0","1","1","-"],
-["11","TOOL-dSweptBranches-12","CLOSED","0","1","1","-"],
-["12","TOOL-dSweptBranches-13","CLOSED","0","1","1","-"],
-["13","TOOL-dSweptBranches-14","CLOSED","0","1","1","-"],
-["14","TOOL-dSweptBranches-15","CLOSED","0","1","1","-"],
-["15","TOOL-dSweptBranches-16","CLOSED","0","1","1","-"],
-["16","TOOL-dSweptBranches-17","CLOSED","0","1","1","-"]]}]},
-"Decisions":{"facts":{"entries":"3 · shown 3 · aggregated no","trailer near-misses":"0","decision-log rows the owner's":"0","spec marks":"owner-before 0 · owner-inside 0 · agent-before 0 · agent-inside 0","excluded rows":"proposal 0 · rescope 11 · dispatch 21 · review 2 · brief 16 · hold 1 · resume 0","review rounds":"2 · shown 2 · aggregated no"},"tables":[{"name":"by-source","header":["#","source","entries"],"rows":[
+["2026-10-13T07:31:36Z","run-state","phase","7138606411c9","HELD","-","-"],
+["2026-10-13T10:35:29Z","run-state","phase","c07585e775b9","VERIFYING","-","-"],
+["2026-10-13T10:38:32Z","run-state","brief","TOOL-dSweptBranches-19","-","-","-"],
+["2026-10-13T10:38:41Z","run-state","dispatch","TOOL-dSweptBranches-19","-","-","-"],
+["2026-10-13T10:41:10Z","run-state","brief","TOOL-dSweptBranches-20","-","-","-"],
+["2026-10-13T10:41:19Z","run-state","dispatch","TOOL-dSweptBranches-20","-","-","-"],
+["2026-10-13T10:44:56Z","run-state","dispatch","TOOL-dSweptBranches-20","-","-","-"],
+["2026-10-13T10:46:07Z","run-state","brief","TOOL-dSweptBranches-21","-","-","-"],
+["2026-10-13T10:46:17Z","run-state","dispatch","TOOL-dSweptBranches-21","-","-","-"],
+["2026-10-13T11:01:22Z","run-state","dispatch","TOOL-dSweptBranches-21","-","-","-"],
+["2026-10-13T11:17:21Z","run-state","brief","TOOL-dSweptBranches-23","-","-","-"],
+["2026-10-13T11:17:32Z","run-state","dispatch","TOOL-dSweptBranches-23","-","-","-"],
+["2026-10-13T11:22:11Z","run-state","brief","TOOL-dSweptBranches-24","-","-","-"],
+["2026-10-13T11:22:21Z","run-state","dispatch","TOOL-dSweptBranches-24","-","-","-"],
+["2026-10-13T11:24:42Z","run-state","dispatch","TOOL-dSweptBranches-24","-","-","-"],
+["2026-10-13T11:41:42Z","run-state","dispatch","TOOL-dSweptBranches-24","-","-","-"],
+["2026-10-13T12:01:30Z","run-state","phase","3cb4e919d02b","LANDING","-","-"]]}]},
+"Units":{"facts":{"units":"21 · shown 0 · aggregated yes"},"tables":[{"name":"by-status","header":["#","status","units"],"rows":[
+["1","CLOSED","21"]]}]},
+"Decisions":{"facts":{"entries":"3 · shown 3 · aggregated no","trailer near-misses":"0","decision-log rows the owner's":"0","spec marks":"owner-before 0 · owner-inside 0 · agent-before 0 · agent-inside 0","excluded rows":"proposal 0 · rescope 16 · dispatch 30 · review 2 · brief 21 · hold 1 · resume 1","review rounds":"2 · shown 2 · aggregated no"},"tables":[{"name":"by-source","header":["#","source","entries"],"rows":[
 ["1","decision","2"],
 ["2","abort","0"],
 ["3","override","0"],
@@ -269,23 +270,22 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["2","2026-10-13T01:19:35Z","CLEAN WITH FIXES","0","CONVERGED"]]}]},
 "Conformance":{"facts":{"items":"5 · shown 5 · aggregated no"},"tables":[{"name":"items","header":["#","item","unit","state"],"rows":[
 ["1","brief-before-build","-","UNJUDGEABLE"],
-["2","phases-walked","-","UNJUDGEABLE"],
-["3","green-at-close","-","UNJUDGEABLE"],
+["2","phases-walked","-","MET"],
+["3","green-at-close","-","MET"],
 ["4","keepalive-reaped","-","MET"],
 ["5","review-exited","-","MET"]]}]},
-"Anomalies":{"facts":{"anomalies":"7 · shown 7 · aggregated no"},"tables":[{"name":"anomalies","header":["#","kind","subclass"],"rows":[
-["1","no-progress","-"],
-["2","out-of-band-edit","-"],
-["3","out-of-band-edit","-"],
-["4","destructive-git","-"],
-["5","red-behind-zero","-"],
-["6","destructive-git","-"],
-["7","destructive-git","-"]]}]},
-"Coverage":{"facts":{"journal starts":"1 joined of 1 record-creating","unjoined starts":"0","sessions":"1 named · 1 extracted","idle gaps":"judged yes · near an owner turn 0","anomaly kinds":"judged 12 of 12"},"tables":[{"name":"sources","header":["#","source","state","lines","bad"],"rows":[
+"Anomalies":{"facts":{"anomalies":"21 · shown 0 · aggregated yes"},"tables":[{"name":"by-kind","header":["#","kind","subclass","count"],"rows":[
+["1","no-progress","-","1"],
+["2","out-of-band-edit","-","8"],
+["3","refusal-loop","-","3"],
+["4","killed-verb","-","1"],
+["5","red-behind-zero","-","1"],
+["6","destructive-git","-","7"]]}]},
+"Coverage":{"facts":{"journal starts":"1 joined of 1 record-creating","unjoined starts":"0","sessions":"1 named · 1 extracted","idle gaps":"judged yes · near an owner turn 1","anomaly kinds":"judged 12 of 12"},"tables":[{"name":"sources","header":["#","source","state","lines","bad"],"rows":[
 ["1","run-state","present","-","-"],
-["2","driver","present","160","0"],
-["3","gates","present","2","0"],
-["4","pushes","present","6","0"],
+["2","driver","present","246","0"],
+["3","gates","present","5","0"],
+["4","pushes","present","11","0"],
 ["5","git","present","-","-"],
 ["6","transcripts","present","-","-"],
 ["7","build-folder","present","-","-"]]}]}}}
