@@ -464,37 +464,37 @@ def check_ancestor(inv, sha):
         inv["root"], "merge-base", "--is-ancestor", sha, inv["default_ref"])[0] == 0)
 
 
-def check_row_on_default(inv, row_id):
-    """True when a ROW headed by <row_id> exists under the memory root at the default tip, archives
-    included. A row is a line whose first token, after list or table markup, is the id; a line that
-    merely cites the id elsewhere is not one (a spec citing ten ids is not ten rotated rows)."""
+def check_row_on_default(inv, row):
+    """True when the row text <row>, stripped, is a whole line under the memory root at the default
+    tip, archives included. The WHOLE text, not the id heading it (TOOL-dSweptBranches-11): a row
+    edited in place keeps its id, and the old row still on the default would vouch for the new one."""
     mem = read_memory_root(inv)
-    return read_cached(inv, ("row", row_id), lambda: run_git(
-        inv["root"], "grep", "-E", "-q", "-e", ROW_HEAD + row_id + "([^A-Za-z0-9]|$)",
-        inv["default_ref"], "--", mem)[0] == 0)
+
+    def load():
+        rc, out = run_git(inv["root"], "grep", "-F", "-h", "-e", row, inv["default_ref"], "--", mem)
+        return rc == 0 and any(line.strip() == row for line in out.splitlines())
+    return read_cached(inv, ("row", row), load)
 
 
-def derive_row_ids(lines):
-    """-> the row ids a commit adds, or an empty set when any added line is not a row.
+def derive_row_lines(lines):
+    """-> the row lines a commit adds, stripped, or an empty set when any added line is not a row.
 
     The rotated predicate covers a commit that adds ROWS only. One added line of prose means the
-    commit carries content of its own, which a row elsewhere cannot vouch for.
+    commit carries content of its own, which a row elsewhere cannot vouch for. A row is a line whose
+    first token, after list or table markup, is a row id; a line that merely cites an id is not one.
     """
-    ids = set()
+    rows = set()
     for line in lines:
         if not line.startswith("+") or not line[1:].strip():
             continue
-        m = re.match(ROW_HEAD + ID_RE.pattern, line[1:])
-        if not m:
+        if not re.match(ROW_HEAD + ID_RE.pattern, line[1:]):
             return set()
-        ids.add(ID_RE.search(line[1:]).group(0))
-    return ids
+        rows.add(line[1:].strip())
+    return rows
 
 
 ID_RE = re.compile(r"(?<![A-Za-z0-9-])[A-Z][A-Z0-9]{1,9}-[a-z][A-Za-z0-9]*-\d+(?![A-Za-z0-9])")
-# A row's head: optional list or table markup, an optional link bracket, then the id. POSIX ERE as
-# well as Python, because `git grep -E` reads it too, so no `(?:` group. Ids carry only letters,
-# digits and hyphens, so one spliced into it needs no escaping.
+# A row's head: optional list or table markup, an optional link bracket, then the id.
 ROW_HEAD = r"^[ \t]*([-*|][ \t]*)?\[?"
 SCOPE_RE = re.compile(r"^[a-z][a-z-]*\(([A-Za-z0-9]+)\)")
 DRIFT_LINES = 4
@@ -599,8 +599,8 @@ def derive_coverage(inv, tip):
                     if all(check_build_landed(inv, run_re.match(f).group(1), merges) for f in files):
                         how = "records"
                 if how is None and files and all(f.startswith(mem + "/") for f in files):
-                    ids = derive_row_ids(lines)
-                    if ids and all(check_row_on_default(inv, i) for i in sorted(ids)):
+                    rows = derive_row_lines(lines)
+                    if rows and all(check_row_on_default(inv, r) for r in sorted(rows)):
                         how = "rotated"
             if how is None:
                 uncovered.append((sha, subject))

@@ -801,9 +801,23 @@ def arm_probe_negative():
               read_verdict(rows, "worktree/sibling", key(base / "fx" / name))[0], "UNMERGED-LIVE")
 
 
+def arm_row_edit():
+    """TOOL-dSweptBranches-11 — a row edited in place is not a rotated row, though its id heads one."""
+    repo = seed_repo(build_dir())
+    seed_commit(repo, "memory/backlog/TOOL.md", "| TOOL-aSlug-1 | fix x | open |\n", "seed: backlog")
+    seed_publish(repo)
+    run_git(repo, "checkout", "-q", "-b", "row-edit")
+    seed_commit(repo, "memory/backlog/TOOL.md", "| TOOL-aSlug-1 | fix x, and y | RESOLVED |\n",
+                "records(aSlug): resolve the row")
+    run_git(repo, "checkout", "-q", "main")
+    rows = read_report(repo, "--fresh-hours", "0")
+    check("row-edit: AC1 a row edited in place reads UNMERGED-LIVE",
+          read_verdict(rows, "local", "row-edit")[0], "UNMERGED-LIVE")
+
+
 ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
         arm_content, arm_stash, arm_remover, arm_write, arm_keeps, arm_unread, arm_foreign,
-        arm_patch_negative, arm_probe_negative]
+        arm_patch_negative, arm_probe_negative, arm_row_edit]
 
 
 def main():

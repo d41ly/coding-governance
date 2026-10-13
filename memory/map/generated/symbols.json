@@ -778,6 +778,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_row_edit",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_stash",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -6553,7 +6558,7 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
-      "id": "derive_row_ids",
+      "id": "derive_row_lines",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
