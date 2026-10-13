@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling+kickoff+playbook
 roster: TOOL+KICK+PLAY
-ids: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 TOOL-aOrientedCast-22 TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25
+ids: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 TOOL-aOrientedCast-22 TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25 TOOL-aOrientedCast-26
 authorized-by: prompt
 ---
 
@@ -92,13 +92,14 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 28 | `TOOL-aOrientedCast-23` | the size-limits file and the build method's M3 say alike which declared ceilings a run may raise (adopted, split from TOOL-aOrientedCast-22) |
 | 29 | `TOOL-aOrientedCast-24` | the second closing review's hooks minors, batched: format-guard's turn and id reading, gate-guard's landed-run refusal, their arms and docs (review M1-M3, M7, L1-L3) |
 | 30 | `TOOL-aOrientedCast-25` | the second closing review's roles minors, batched: the marker normalisation, the missing arms, the third fence reader, the dossier (review M4-M6, L4-L7) |
+| 31 | `TOOL-aOrientedCast-26` | the policy file runs spec writers at high and builders at xhigh effort (addendum 4) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 30 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
+**Build status:** OPEN · 31 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
 ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9
 ids TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 TOOL-aOrientedCast-22
-ids TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25
+ids TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25 TOOL-aOrientedCast-26
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -130,18 +131,19 @@ ids TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25
 | [TOOL-aOrientedCast-20 — the roles kit derives each agent's dispatch and return lines, and adds them to a generated per-build agent ledger](spec/2026-10-13-spec-TOOL-aOrientedCast-20.md) | 22 | 2 | CLOSED | rev-2 | 2026-10-13 |
 | [TOOL-aOrientedCast-21 — format-guard refuses a final message that omits an agent line for an agent its turn dispatched or received](spec/2026-10-13-spec-TOOL-aOrientedCast-21.md) | 23 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-aOrientedCast-22 — gate-guard refuses AskUserQuestion from the session holding a live unattended run's lease, and names the park](spec/2026-10-13-spec-TOOL-aOrientedCast-22.md) | 24 | 2 | CLOSED | rev-1 | 2026-10-13 |
-| [TOOL-aOrientedCast-23 — one stated answer on which declared size ceilings a run may raise, held in the limits file and pointed at by M3 and the size gate](spec/2026-10-13-spec-TOOL-aOrientedCast-23.md) | 25 | 2 | CLOSED | rev-2 | 2026-10-13 |
+| [TOOL-aOrientedCast-23 — one stated answer on which declared size ceilings a run may raise, held in the limits file and pointed at by M3 and the size gate](spec/2026-10-13-spec-TOOL-aOrientedCast-23.md) | 25 | 2 | OPEN | rev-3 | 2026-10-13 |
 | [TOOL-aOrientedCast-24 — format-guard reads a notification's header alone and opens no turn mid-turn, gate-guard asks the driver whether a leased run is finished, and the arms and docs that pin both](spec/2026-10-13-spec-TOOL-aOrientedCast-24.md) | 26 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-26 — spec writers run at high effort and builders at xhigh, as the owner ruled](spec/2026-10-13-spec-TOOL-aOrientedCast-26.md) | 26 | 1 | OPEN | rev-1 | 2026-10-13 |
 | [TOOL-aOrientedCast-25 — the second closing review's roles minors: one marker reading, armed rules, one fence reading, and records that say what was built](spec/2026-10-13-spec-TOOL-aOrientedCast-25.md) | 27 | 2 | OPEN | rev-2 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 56 bound to this build, across 4 record folder(s).
+Records: 57 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aOrientedCast-26.
 
 Ids no `spec-audit` record has ever named: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7
 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20
-TOOL-aOrientedCast-21 TOOL-aOrientedCast-22 TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25.
+TOOL-aOrientedCast-21 TOOL-aOrientedCast-22 TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25 TOOL-aOrientedCast-26.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -173,7 +175,7 @@ TOOL-aOrientedCast-21 TOOL-aOrientedCast-22 TOOL-aOrientedCast-23 TOOL-aOriented
 | 23 | `TOOL-aOrientedCast-21` | no |
 | 24 | `TOOL-aOrientedCast-22` | no |
 | 25 | `TOOL-aOrientedCast-23` | no |
-| 26 | `TOOL-aOrientedCast-24` | no |
+| 26 | `TOOL-aOrientedCast-24`, `TOOL-aOrientedCast-26` | yes |
 | 27 | `TOOL-aOrientedCast-25` | no |
 <!-- /gen:build-order -->
 

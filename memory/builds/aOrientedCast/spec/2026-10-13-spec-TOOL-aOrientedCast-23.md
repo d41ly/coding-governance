@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-23 — one stated answer on which declared size ceilings a run may raise, held in the limits file and pointed at by M3 and the size gate
 
-**Status:** CLOSED · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 25
+**Status:** OPEN · rev-3 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-13-build-KICK-aOrientedCast-1-agent-ledger.md](../build/2026-10-13-build-KICK-aOrientedCast-1-agent-ledger.md) | journal | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 TOOL-aOrientedCast-22 |
 | [2026-10-13-build-TOOL-aOrientedCast-23-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-aOrientedCast-23-1-acceptance-ledger.md) | journal | — |
+| [2026-10-13-prompt-TOOL-aOrientedCast-1-7-owner-addendum.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-7-owner-addendum.md) | research | TOOL-aOrientedCast-25 |
 
 <!-- /gen:spec-records -->
 
@@ -39,6 +40,10 @@ gate point at it rather than answer the question a second time.
   `tools/check-kit-versions.sh` asserts. Observed by AC6.
 - **S6** — The same commit re-stamps `last-audit` in `memory/guides/SESSION-KICKOFF.md`, whose
   `watch:` list holds the build method, the size gate and the hygiene engine. Observed by AC8.
+- **S7** — A second build pass changes term 4's one line in `tools/template-size-limits.txt`
+  (`:23` at `dfc13bc1a`, where the first pass wrote "the same commit adds that unit's row to
+  memory/DECISIONS.md") to §4 "The rule"'s wording, and nothing else in the file. The file is in no
+  kit and on no `watch:` list, so the pass owes no version move and no re-stamp. Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -97,7 +102,7 @@ after a `#` line, the rule:
 #      keeps to any rule that block states, such as no headroom;
 #   3. the movement is argued in place above the row, in the shape the movements below take:
 #      RAISED <old> -> <new>, the date, the unit, the measured figure and why the new value;
-#   4. the same commit adds that unit's row to memory/DECISIONS.md.
+#   4. the run records that unit's row in memory/DECISIONS.md before or with the raise.
 # A class row, a lowering, a new row and a removal stay the owner's. This paragraph is the one
 # statement of these terms: the build method's M3 and check-template-size.sh's over-budget message
 # point here rather than restate them. Ruled by the owner on 2026-10-13, of the AGENTS.md raise this
@@ -263,6 +268,12 @@ commit.
   `last-audit:` lines differ and the first ends with the sha `git rev-parse HEAD~1` prints.
   Red when: the commit stages a watched file with no new stamp.
 
+- **AC9** — When `grep -c "^#   4. the run records that unit's row in memory/DECISIONS.md before or with the raise.$" tools/template-size-limits.txt`
+  runs it prints 1, `grep -c "the same commit adds that unit's row" tools/template-size-limits.txt`
+  prints 0, and on the second pass's commit `git diff --numstat HEAD~1 HEAD -- tools/template-size-limits.txt`
+  prints one line changed each way.
+  Red when: term 4 keeps the first pass's wording, or the pass moves another line of the file.
+
 ## 7. Gates
 
 `build-method size` · `template size <=48KiB` · `template size gate selftest` · `kit/dogfood doc parity` · `method carriers (every pointer declared)` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `verdict epoch (kit version dates the engine)` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `memory hygiene` · `memory-hygiene self-test` · `spec tokens (a spec's own names resolve)`
@@ -295,6 +306,13 @@ This unit adds no gate arm. The main loop runs the legs once, at the close; no p
   Recommendation: (a).
   RESOLVED (agent, 2026-10-13, delegated): (a), as §4 "The rule" and "The pointers" state it.
 
+- **F3 — Term 4 has the raising unit's own commit add its `memory/DECISIONS.md` row, and a pass may
+  not declare that shared record. Which gives?**
+  (a) Reword term 4 so the run records the row before or with the raise; (b) keep the wording and let
+  a raising unit declare the record.
+  RESOLVED (owner, 2026-10-13): (a), verbatim "Reword term 4 so the run records the row "before or
+  with the raise"", recorded in the build's fourth owner addendum; §4 "The rule", S7 and AC9 carry it.
+
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft.
@@ -303,6 +321,9 @@ This unit adds no gate arm. The main loop runs the legs once, at the close; no p
   marked. The decision row moves to the main loop, written before the build because a pass may not
   declare that shared record: S4, §4 "The decision row", rollout step 4 and AC5 have the builder
   observe it and write none, and files touched drops `memory/DECISIONS.md`.
+- rev-3 · 2026-10-13 · §4 · S7 · AC9 · §8 F3 · the owner reworded term 4: the run records the
+  raising unit's row before or with the raise. §4 "The rule" carries it, S7 and AC9 add the one-line
+  change a second pass makes to the file the first pass wrote, and F3 records the ruling.
 
 ## 10. Reuse audit
 
