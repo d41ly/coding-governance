@@ -468,15 +468,17 @@ else
 fi
 
 # 25b — a tracked bar that is NOT this kit's runner adopts no runner stamp (TOOL-aFrugalTurnstile-1
-#       AC4): a green the runner earned proves the runner's legs, never this bar's. The stamp is at the
-#       tip and otherwise valid, so before the unit this push scoped. The pushed tree is one no earlier
-#       push carried, or arm 25's gate-bar-green record covers it and no bar, so no decision, runs.
+#       AC4): a green the runner earned proves the runner's legs, never this bar's. Its own green is a
+#       candidate in the stamp's place (TOOL-aFrugalTurnstile-2 S3b), so the push scopes from arm 25's
+#       gate-bar-green, 2 landings back. The stamp is 1 back and otherwise valid, so nearest-wins would
+#       pick it were it a candidate. The pushed tree is one no earlier push carried, or arm 25's record
+#       covers it and no bar, so no decision, runs. GATE_SELFTESTS is cleared as `decide` clears it.
 git commit -q --allow-empty -m c25b >/dev/null 2>&1
 stamp "$(git rev-parse HEAD)"
 printf 'c25b2\n' > c25b2.txt; git add c25b2.txt >/dev/null 2>&1; git commit -q -m c25b2 >/dev/null 2>&1
-line=$( ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD="bash tracked-bar.sh" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true )
+line=$( ( unset GOV_GATE_CMD_TEST; GATE_SELFTESTS= GOV_GATE_CMD="bash tracked-bar.sh" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true )
 case "$line" in
-  *"FULL gate"*"is not this kit's runner"*) ok "25b a non-runner bar forces FULL and names why no runner stamp is a candidate" ;;
+  *"scoped gate"*"bar green"*"from this git dir's gate-bar-green "*) ok "25b a non-runner bar scopes from its own gate-bar-green, never from the nearer runner stamp" ;;
   *) bad "25b a runner stamp was a candidate for a bar that is not the runner: ${line:-<no decision line>}" ;;
 esac
 

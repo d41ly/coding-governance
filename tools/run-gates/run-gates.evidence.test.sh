@@ -1517,7 +1517,8 @@ grep -q $'^reused_cache\t0$' "$RU_GD/gate-full-green" 2>/dev/null \
   || nope "TOOL-aSparedSpawn-32 S8 the lineage stamp carries no reused_cache 0"
 rm -f "$RU_GD/gate-full-green"
 # The earning bar: only a bar without GATE_FULL, a key input, writes an entry under the env mode's key.
-ru_run >/dev/null
+# A plain bar on a clean tree stamps a full green too (the AC8 control above), removed before the opt-in run.
+ru_run >/dev/null; rm -f "$RU_GD/gate-full-green"
 ru_run GATE_REUSE=1 >/dev/null
 grep -q '^GATE reuse pa  ' "$REC_OUT" && [ ! -f "$RU_GD/gate-full-green" ] \
   && ok "AC6 the opt-in mode, the cache's env mode since TOOL-aSparedSpawn-13, reuses and still writes no full green" \
