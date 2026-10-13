@@ -188,6 +188,8 @@ run_stop "AC1 a message with no pair blocks" block "$TMP/none.md"
 check_contains "AC1 the reason names the missing BUILD line" "$TMP/out" "no BUILD line"
 check_contains "AC1 the reason quotes the charter's BUILD definition" "$TMP/out" 'BUILD — <slug> · Tier-<n>'
 run_stop "AC1 stop_hook_active true allows" allow "$TMP/none.md" '{"stop_hook_active":true}'
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
 # AC2 — rule r1: five non-bare spellings.
 for f in tick indent bold head fenced; do

@@ -69,7 +69,7 @@ ids TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-3 TOOL-aSweptBar-4 TOOL-aSw
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aSweptBar-1 — stale suite fixtures re-armed against the code the bar-less landings left](spec/2026-10-13-spec-TOOL-aSweptBar-1.md) | 1 | 1 | INPROGRESS | rev-1 | 2026-10-13 |
-| [TOOL-aSweptBar-2 — the foreign-prefix probe contract: three engine self-tests declared whole, and format-guard's suite takes the probe stop](spec/2026-10-13-spec-TOOL-aSweptBar-2.md) | 1 | 1 | INPROGRESS | rev-1 | 2026-10-13 |
+| [TOOL-aSweptBar-2 — the foreign-prefix probe contract: three engine self-tests declared whole, and format-guard's suite takes the probe stop](spec/2026-10-13-spec-TOOL-aSweptBar-2.md) | 1 | 1 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-aSweptBar-3 — the run-gates evidence and pre-push suites' standalone reds, each at its root](spec/2026-10-13-spec-TOOL-aSweptBar-3.md) | 1 | 1 | INPROGRESS | rev-2 | 2026-10-13 |
 | [TOOL-aSweptBar-4 — shipped-surface bans: each ban's own remedy, applied to the offenders it names](spec/2026-10-13-spec-TOOL-aSweptBar-4.md) | 2 | 1 | SPECCED | rev-1 | 2026-10-13 |
 | [TOOL-aSweptBar-5 — fork idioms re-grown past the spawn-idiom registry, converted](spec/2026-10-13-spec-TOOL-aSweptBar-5.md) | 3 | 1 | SPECCED | rev-1 | 2026-10-13 |

@@ -1,6 +1,6 @@
 # TOOL-aSweptBar-2 — the foreign-prefix probe contract: three engine self-tests declared whole, and format-guard's suite takes the probe stop
 
-**Status:** INPROGRESS · rev-1 · 2026-10-13 · node a · Tier-1 · base 53b25884 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-10-13 · node a · Tier-1 · base 53b25884 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
