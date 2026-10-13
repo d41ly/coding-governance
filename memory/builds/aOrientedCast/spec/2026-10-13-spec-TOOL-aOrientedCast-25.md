@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-25 — the second closing review's roles minors: one marker reading, armed rules, one fence reading, and records that say what was built
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 27 · ratified 2026-10-13
+**Status:** OPEN · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 27 · ratified 2026-10-13
 
 <!-- gen:spec-records -->
 
@@ -55,7 +55,7 @@ stays off the files the brief gives `TOOL-aOrientedCast-24`.
   re-stamp. Observed by AC7; the re-stamp is NOT OBSERVED by a criterion, because the kickoff
   manifest ratchet grades it at the close.
 - **S8** — The suite's bookkeeping. The header of `tools/roles/adopt-roles.test.sh` lists arms 10
-  and 11 and states what arm 11 does not compare, and `FLOOR_ASSERTIONS` moves from 19 to 32.
+  and 11 and states what arm 11 does not compare, and `FLOOR_ASSERTIONS` moves from 19 to 33.
   Observed by AC5.
 - **S9** — L5 and L6. This unit's acceptance ledger record carries a section,
   `## Criteria amended in closed specs`, with one sub-head for `TOOL-aOrientedCast-21` AC2 and one
@@ -71,6 +71,10 @@ stays off the files the brief gives `TOOL-aOrientedCast-24`.
 - **S12** — The roles kit moves from 1.3 to 1.4 over its four carriers, after the unit's last edit
   of `tools/roles/`, and the map's generated artifacts are re-rendered for the new function.
   Observed by AC11.
+- **S13** — `handoff.py agents` prints and writes nothing unless given `--write`, which adds the
+  complete lines to the agent ledger as before (§4 "The write flag"). Its docstring, the README's
+  "The agent lines", `help/roles.md`'s "What each agent line tells you" and the Skill template's
+  agents bullet (`:26-30`) say a mid-pass call runs without it. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -176,6 +180,17 @@ After arm 9's two `--handoff` runs, from the fixture root:
 Labels: `arm 9 agents --run prints the run's two agent lines and its one returned line`,
 `arm 9 ...and the ledger gains exactly those three`, and
 `arm 9 a prompt opening with a blank line still matches its handoff`.
+
+### The write flag (S13)
+
+At `3a57a986a`, `print_agent_lines` always calls `write_agent_ledger`
+(`tools/roles/handoff.py:894-895`), so a mid-pass call dirties a tracked file, and the harness's
+commit stage refused a whole spec commit for it. The `agents` subparser (`:921-925`) gains
+`--write`; `print_agent_lines` gains `write=False` and writes only when it is true, else one note
+names the held lines and `--write`. Arm 9's `--handoff` runs and step 1 of "Arm 9, extended" pass
+`--write`, and one more step runs `--run` without it and asserts `git hash-object` of the ledger
+and the listing of the build's `build/` folder unchanged.
+The docs say to pass `--write` only at a bookkeeping step, when no pass is running.
 
 ### Arm 10 (S3)
 
@@ -436,6 +451,7 @@ takes in the hook. No shell function, constant or gate leg is minted. The new br
 `tools/roles/README.md`
 `tools/roles/SKILL.template.md`
 `.claude/skills/build/SKILL.md`
+`help/roles.md`
 `tools/check-microformats.sh`
 `tools/check-microformats.test.sh`
 `.memory-tree.conf`
@@ -521,13 +537,13 @@ suite arms are under `New arm:` in §7.
   Red when: a mandatory role under a hookless workflow, a writer whose output lacks its folder, or
   a conf with no memory root passes.
 - **AC5** — When, in F after arm 9's two `--handoff` runs,
-  `python tools/roles/handoff.py agents --run wf_00000001-aaa --session <S>` runs, it exits 0 and
+  `python tools/roles/handoff.py agents --run wf_00000001-aaa --session <S> --write` runs, it exits 0 and
   prints exactly A9L3, A9L4 and A9L5 of §4 in that order, and the build's agent ledger then holds
   five `- ` lines, those three once each with the link re-rooted to `../prompts/`; and
-  `grep -c "^FLOOR_ASSERTIONS=32$" tools/roles/adopt-roles.test.sh` prints 1.
+  `grep -c "^FLOOR_ASSERTIONS=33$" tools/roles/adopt-roles.test.sh` prints 1.
   Red when: the journal branch drops an agent, reports `a0000000000000003` as returned, reads its
   unit as anything but its label, or adds a line to the ledger twice.
-  figure: 32 is PINNED: 19 at base, plus arm 9's three new assertions and arm 10's ten. Arm 11
+  figure: 33 is PINNED: 19 at base, plus arm 9's four new assertions and arm 10's ten. Arm 11
   SKIPs without `node` and stays out of the floor, as arm 6 does.
 - **AC6** — When `extract_microformat_shapes` and format-guard's exported `readCharterShapes` read
   the three copies of §4 "Arm 11", part B, in the run's scratch path, they return the same `agent`
@@ -571,6 +587,11 @@ suite arms are under `New arm:` in §7.
   permission: the rendered Skill reads 1.4 only after the main loop's second pass runs
   `bash tools/roles/adopt-roles.sh --scaffold`.
   figure: PINNED at `debc4bad6`, where the kit reads 1.3.
+- **AC12** — When AC1's command runs in F, it leaves `git hash-object` of the ledger unchanged and
+  stderr names `--write`; with `--write` the ledger gains its lines; and
+  `grep -c -- "--write" tools/roles/README.md help/roles.md tools/roles/SKILL.template.md` prints at
+  least 1 for each file.
+  Red when: a call without `--write` changes the ledger, or a doc still says every run writes it.
 
 ## 7. Gates
 
@@ -579,6 +600,7 @@ suite arms are under `New arm:` in §7.
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC5 · arm 9's three new assertions, against `print_agent_lines` staged to read every journal agent as not returned, and against the `--handoff` matcher staged back to the raw first line · `FLOOR_ASSERTIONS` raised by 3
 New arm: tools/roles/adopt-roles.test.sh · covers AC3 AC4 · arm 10, against the R15 join in `check_roles.py` staged to report no uncovered declaration · `FLOOR_ASSERTIONS` raised by 10
 New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC6 · arm 11, against `extract_microformat_shapes` staged back to keeping the first definition of a head · none, as it SKIPs without node or the hooks kit
+New arm: tools/roles/adopt-roles.test.sh · covers AC12 · arm 9's no-write step, against `print_agent_lines` staged to write the ledger without `--write` · `FLOOR_ASSERTIONS` raised by 1
 New arm: tools/check-microformats.test.sh · covers AC7 · the repeated-head and part-line opener arms, against the repeated-head check staged out of `check-microformats.sh` · `FLOOR_ASSERTIONS` 18 to 20, and the gate's `ARMS_FLOORS` entry 8:8 to 9:9
 
 The main loop observes each arm RED on its staged break and GREEN once restored, at the close
@@ -640,9 +662,19 @@ The main loop observes each arm RED on its staged break and GREEN once restored,
   raise would stand as a follow-up. (a) costs one token and one stamp. No veto applies.
   RESOLVED (agent, 2026-10-13, delegated): (a), as §4 "The source refusal" states it.
 
+- **F6 — Which spelling keeps a mid-pass `agents` call from writing?**
+  (a) Print by default, the write behind `--write`; (b) write by default, a `--no-ledger` flag to
+  skip it. Under (b) a call that forgets the flag dirties the tree again, the defect itself. (a)
+  makes the safe call the default and is the house spelling (`render_agents.py --write`,
+  `gen_map.py --write`, `gotchas.py --write`).
+  RESOLVED (agent, 2026-10-13, delegated): (a), as §4 "The write flag" states it.
+
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft.
+- rev-2 · 2026-10-13 · S13 · S8 · AC5 · AC12 · §4 · §7 · §8 · the `agents` ledger write moves
+  behind `--write` after a mid-pass call dirtied the tree: S13, §4, F6, AC12, a New arm line, the
+  docs in files touched, and the floor at 33.
 
 ## 10. Reuse audit
 
