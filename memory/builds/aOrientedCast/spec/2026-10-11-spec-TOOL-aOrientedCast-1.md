@@ -17,6 +17,8 @@
 | [2026-10-13-prompt-TOOL-aOrientedCast-1-4-owner-addendum.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-4-owner-addendum.md) | research | PLAY-aOrientedCast-1 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-1-5-resume-handoff.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-5-resume-handoff.md) | journal | PLAY-aOrientedCast-1 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-1-6-owner-addendum.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-6-owner-addendum.md) | research | TOOL-aOrientedCast-2 |
+| [2026-10-13-prompt-TOOL-aOrientedCast-1-7-owner-addendum.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-7-owner-addendum.md) | research | TOOL-aOrientedCast-23 TOOL-aOrientedCast-26 |
+| [2026-10-13-prompt-TOOL-aOrientedCast-1-8-owner-addendum.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-8-owner-addendum.md) | research | TOOL-aOrientedCast-27 TOOL-aOrientedCast-28 |
 | [2026-10-12-review-TOOL-aOrientedCast-1-closing-diff-round1.md](../reviews/2026-10-12-review-TOOL-aOrientedCast-1-closing-diff-round1.md) | diff-review | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 |
 
 <!-- /gen:spec-records -->

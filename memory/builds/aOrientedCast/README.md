@@ -137,12 +137,12 @@ ids TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25 TOOL-aOrie
 | [TOOL-aOrientedCast-24 — format-guard reads a notification's header alone and opens no turn mid-turn, gate-guard asks the driver whether a leased run is finished, and the arms and docs that pin both](spec/2026-10-13-spec-TOOL-aOrientedCast-24.md) | 26 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-aOrientedCast-26 — spec writers run at high effort and builders at xhigh, as the owner ruled](spec/2026-10-13-spec-TOOL-aOrientedCast-26.md) | 26 | 1 | OPEN | rev-1 | 2026-10-13 |
 | [TOOL-aOrientedCast-25 — the second closing review's roles minors: one marker reading, armed rules, one fence reading, and records that say what was built](spec/2026-10-13-spec-TOOL-aOrientedCast-25.md) | 27 | 2 | OPEN | rev-3 | 2026-10-13 |
-| [TOOL-aOrientedCast-27 — every spawned agent is named for its build, unit and action, and the spawn guard refuses a misnamed spawn](spec/2026-10-13-spec-TOOL-aOrientedCast-27.md) | 28 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-27 — every spawned agent is named for its build, unit and action, and the spawn guard refuses a misnamed spawn](spec/2026-10-13-spec-TOOL-aOrientedCast-27.md) | 28 | 2 | OPEN | rev-2 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 62 bound to this build, across 4 record folder(s).
+Records: 64 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aOrientedCast-26.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7
 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20

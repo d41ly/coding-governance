@@ -1,14 +1,16 @@
 # TOOL-aOrientedCast-27 — every spawned agent is named for its build, unit and action, and the spawn guard refuses a misnamed spawn
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 28 · ratified 2026-10-13
+**Status:** OPEN · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 28 · ratified 2026-10-13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-13-prompt-TOOL-aOrientedCast-1-8-owner-addendum.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-8-owner-addendum.md) | research | — |
+| [2026-10-13-prompt-TOOL-aOrientedCast-1-8-owner-addendum.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-8-owner-addendum.md) | research | TOOL-aOrientedCast-1 TOOL-aOrientedCast-28 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-27-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-27-1-spec-brief.md) | journal | TOOL-aOrientedCast-25 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-27-2-spec-writer.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-27-2-spec-writer.md) | journal | — |
+| [2026-10-13-prompt-TOOL-aOrientedCast-27-3-fold-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-27-3-fold-brief.md) | journal | — |
+| [2026-10-13-prompt-TOOL-aOrientedCast-27-4-spec-writer.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-27-4-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -20,7 +22,9 @@ two specs, spec three units" across later work, and harness agents carry labels 
 name neither the build nor the round. This unit derives a direct spawn's name from its handoff,
 prints it from the renderer, and has the spawn guard refuse an `Agent` call whose `description` is
 not that name. It gives every agent of the three declared harnesses a label of the same three parts,
-and the agents verb then reads a unit id from every harness label that names one unit.
+and the agents verb then reads a unit id from every harness label that names one unit. The owner's
+sixth addendum adds the runs: a run's title is its script's literal `meta`, so each harness run
+states its build, scope and action in its first log line and its return's leading `identity`.
 
 ## 2. Scope (IN)
 
@@ -52,6 +56,10 @@ and the agents verb then reads a unit id from every harness label that names one
 - **S8** — The roles dossier gains this unit in `decisions` and a sentence, the review-harnesses
   dossier gains a sentence, and the generated map is re-rendered; the agent-cap dossier is left as it
   is. Observed by AC13.
+- **S9** — Each harness logs its identity of §4 "Run identity" as its first log line, before its
+  first `phase` call, and leads every return with it as `identity`. Observed by AC14, AC15 and AC16.
+- **S10** — `help/roles.md`, `tools/roles/README.md` and `tools/workflows/README.md` say the tool
+  fixes a run's title, and where the owner reads its identity. Observed by AC17.
 
 ## 3. Non-goals (OUT)
 
@@ -59,7 +67,7 @@ and the agents verb then reads a unit id from every harness label that names one
 - A `Workflow` run's own title. The tool takes it from the script's static `meta.name`
   (`unattended-build`, `unattended-unit`, `tier2-review`), and a call carries only `scriptPath`,
   `script`, `name` and `args`, none of which sets a title (§4 "Evidence"). The run's agents carry
-  the new names; the run keeps its script's.
+  the new names; the run keeps its script's, and announces itself (S9).
 - Re-opening an owner ruling of this build.
 - Checking a harness agent's label at run time. An `agent()` call is a runtime call and not a tool
   call, so no hook sees it (`TOOL-aOrientedCast-7` §3). The two harness suites hold the labels.
@@ -67,7 +75,8 @@ and the agents verb then reads a unit id from every harness label that names one
   orientation counterfactual, which rule 6 already refuses to start.
 - A message to an agent already running. It is not an `Agent` call, so a name is set by the spawning
   call alone.
-- What a harness returns. The review harness's `pending` keeps its stage keys, so no caller changes.
+- What a harness returns, beyond the leading `identity` of S9. The review harness's `pending` keeps
+  its stage keys and no existing key changes, so no caller changes.
 - The `unattended-build@` and `unattended-unit@` identity markers, which this build's earlier
   harness units left as they were (§4 "Kit versions").
 
@@ -83,7 +92,8 @@ and the agents verb then reads a unit id from every harness label that names one
 
 Line numbers were read at `aa561ec9f`, the run branch's HEAD on 2026-10-13, where
 `TOOL-aOrientedCast-24` and `TOOL-aOrientedCast-25` are OPEN and unbuilt. Both write files this unit
-writes (§4 "Rollout"), so the builder finds each site by its content, not its number.
+writes (§4 "Rollout"), so the builder finds each site by its content, not its number. The workflow
+files hold them unchanged at `dd6e4ed76`, where rev-2's were read.
 
 ### Evidence
 
@@ -120,6 +130,12 @@ writes (§4 "Rollout"), so the builder finds each site by its content, not its n
   11, which sends more.
 - Each harness's `meta.name` is a literal (`tools/workflows/unattended-build.template.js:2`,
   `tools/workflows/tier2-review.template.js:2`, `tools/workflows/unattended-unit.js:66`).
+- First `log` calls: `tools/workflows/unattended-unit.js:319`, after `phase('Unit')` at `:218`;
+  `tools/workflows/unattended-build.template.js:482` and `tools/workflows/tier2-review.template.js:281`,
+  each before its first `phase` call. Returns: `unattended-unit.js:336`; build template `:1648`,
+  `:1895`, `:2197`, `:2318`, `:2356`; review template `:1225`, `:1250`, `:1577`, `:1610`, `:1915`.
+  No reader keys on a return's first key: the suites and the build harness read by key or substring,
+  and the agents verb reads `committed` (`tools/roles/handoff.py:698`).
 
 ### The spawn name
 
@@ -193,11 +209,25 @@ Line numbers are the templates'; each render holds the same lines.
   review outside a build folder carries no slug part. The scope is `reviewScope`, the run's `kind`,
   ` round ` and `round` (`:184`, `:307`). The stage is today's label, so `pending`, the log lines
   and every suite read of a stage keep their spelling.
-- **`unattended-unit`** defines nothing, under its header's one-definition rule (`:20-26`). Its call
-  carries `cfg.slug + ' · ' + cfg.unitId + ' · build'`.
+- **`unattended-unit`** defines nothing, under its header's one-definition rule (`:20-26`). It holds
+  `cfg.slug + ' · ' + cfg.unitId + ' · build'` as `identity`, and its call passes `label: identity`.
 
 A spec-writer group serving several units names them all, which is what the owner asked for. The
 agents verb then reads a unit only from a label naming exactly one (S4).
+
+### Run identity
+
+| Harness | `identity` |
+|---|---|
+| `unattended-unit` | `<slug> · <unitId> · build`, its agent's label |
+| `unattended-build` | `<slug> · <mode> round <n> · spec, audit, disposal, hand-out`; `spec, hand-out` without `specAudit` |
+| `tier2-review` | `<slug> · <kind> round <n> · review`, under its labels' slug rule |
+
+The templates build it with `renderAgentLabel`; `<mode>` and `<n>` are `mode` and `roundNo`.
+`log(identity)` is each run's first log call: in the unit harness above `phase('Unit')`, in the build
+harness above its roles loop (`:480`), and in the review harness above `:280`, where its
+`priorFindings`, `round` and `reviewDir` move unchanged, with `reviewSlug` and `reviewScope`. `identity` leads each return §4 "Evidence" lists; no other key
+moves.
 
 ### The agents verb
 
@@ -252,6 +282,10 @@ unit, such as `unit:TOOL-tFix-1`, still names one unit and reads as it did.
 - `tools/workflows/README.md`: a section `## Agent labels — slug, scope, stage` after "roles — stage
   agents spawned as catalogue roles", holding the shape `<slug> · <scope> · <stage>`, the table
   above, the review harness's slug rule, and that `pending` keeps stage keys.
+- S10: `help/roles.md`'s `## How agents are named` and a paragraph in `tools/roles/README.md`'s "The
+  agent lines" say the tool fixes a run's title from its `meta` block, and that its identity is its
+  first log line and its return's `identity`. The workflows README's `## Agent labels` gains §4
+  "Run identity"'s table.
 - The roles dossier: `TOOL-aOrientedCast-27` joins `decisions`, and its prose gains one sentence on
   the spawn name and the label reading. The review-harnesses dossier gains one sentence giving the
   label shape `<slug> · <scope> · <stage>`. The agent-cap dossier read 20474 bytes against a 20480
@@ -283,6 +317,7 @@ As §8 F1 resolved: one step for each kit, from its value at this unit's parent 
 | `renderAgentLabel` | function in the two harness templates and their renders | `js.function`; answered OK |
 | `render_spawn_name`, `extract_label_unit` | functions in `handoff.py` | `py.function`; answered OK for each |
 | `reviewSlug`, `reviewScope` | constants in the review harness | none: `js.constant` is undeclared |
+| `identity` | constant in the three harnesses, and their return key | none: `js.constant` is undeclared |
 | `HO_DESC`, the `nounit` variant | agent-cap suite variable and fixture key | none: no shell-variable cell is declared |
 
 ### Files touched (estimate)
@@ -329,8 +364,8 @@ As §8 F1 resolved: one step for each kit, from its value at this unit's parent 
 - **Binding.** A hook script is read afresh on every call, so the step binds every session whose
   hooks run from a tree holding this commit, from its next spawn; for this run, once the landing
   merge is in the primary tree (`TOOL-aOrientedCast-7` §3). From then each direct spawn of the main
-  loop passes the name, and a refusal prints it. Harness labels take effect at the next `Workflow`
-  call that reads the new scripts.
+  loop passes the name, and a refusal prints it. Harness labels and run identities take effect at the
+  next `Workflow` call that reads the new scripts.
 - No settings, matcher or kickoff-manifest `watch:` path moves. Adopters receive the step, the labels
   and the renderer's line at `govkit update`; an adopter's index already carries every role's
   `workflow`. Rollback is a revert of the unit's commits and a re-render of the Skill, the harness
@@ -357,6 +392,8 @@ As §8 F1 resolved: one step for each kit, from its value at this unit's parent 
 - **Whole labels in `pending`.** A return-shape change for every caller, which no reader needs.
 - **One shared label helper.** A workflow script has no filesystem and imports nothing. Each copy is
   one line, and the suites' stage split reds a drifted separator.
+- **A build run's roster ids as its scope.** Dozens of ids would bury the slug and the action.
+- **A review run's stage list as its action.** It never varies, so `review` says as much.
 
 ## 5. Production-readiness checklist
 
@@ -370,14 +407,14 @@ As §8 F1 resolved: one step for each kit, from its value at this unit's parent 
   slug part rather than an empty one.
 - observability — Each refusal prints the expected name verbatim. Each harness agent's label shows
   its build, scope and stage in the Workflow view and in the run journal, where the agents verb
-  reads it.
+  reads it. Each run's first log line and leading `identity` name the run.
 - risks — A main loop that skips the stderr line is refused once and shown the name. The build
   suite's label reads move to the stage words and are verified only at the close, while the review
   suite's reads stay as they are. Two kits take a second step within this build (§8 F1).
 - testing — The direct probes and fixtures of §6 in the pass; the `New arm:` lines of §7, observed
   RED then GREEN by the main loop at the close.
 - migration — None: no stored shape changes, and past ledger lines keep their unit fields.
-- user docs — `help/roles.md` (S6).
+- user docs — `help/roles.md` (S6, S10).
 
 ## 6. Acceptance criteria
 
@@ -491,6 +528,26 @@ evaluates a render with `node`.
   prints at least 1 for each file; and
   `git diff --quiet <c>~1 <c> -- memory/map/features/agent-cap.md` exits 0.
   Red when: a dossier misses the change, or the agent-cap dossier is pushed past its cap.
+- **AC14** — When stub T runs `tools/workflows/unattended-unit.js` with the build suite's
+  `CHILD_ARGS` in each mode, its first `log:` line is `log:tB · A-tB-1 · build`, ahead of
+  `phase:Unit`, and its RESULT line opens `RESULT {"identity":"tB · A-tB-1 · build",`.
+  Red when: the line is missing or late, or the return leads with `committed`.
+- **AC15** — When stub T runs `tools/workflows/unattended-build.js` over the build suite's `UNITS`,
+  with `SPEC_OK` answering `spec-write` and `DEF` the `workflow` call, its first `log:` line is
+  `log:tB · unattended round 1 · spec, audit, disposal, hand-out`, ahead of `phase:Spec`, and its
+  RESULT line opens `RESULT {"identity":` with that text. Over `A_UNITS` the line reads `attended`
+  for `unattended`, and over `OFF_UNITS` it is `log:tB · unattended round 1 · spec, hand-out`.
+  Red when: the line names the wrong mode, round or stages, a `roles:` line precedes it, or the
+  return leads with `slug`.
+- **AC16** — When stub R runs `tools/workflows/tier2-review.js` over the review suite's `DIFF` args
+  with `reviewDir` `memory/builds/tB/reviews` and its `ALL_OK` stubs, `logs[0]` is
+  `tB · diff-review round 1 · review` and the result's first key is `identity`, holding it; over
+  `SPEC` it is `spec-audit round 1 · review`. `grep -n "log(identity)" tools/workflows/tier2-review.js`
+  prints a line above `phase('Resume')`.
+  Red when: the line is not first, names the wrong kind, or the return leads with `shape`.
+- **AC17** — When `grep -c "first log line" help/roles.md tools/roles/README.md tools/workflows/README.md`
+  and `grep -c "title" help/roles.md tools/roles/README.md` run, each prints at least 1 per file.
+  Red when: a page leaves out where a run's identity is read, or that the tool fixes its title.
 
 ## 7. Gates
 
@@ -501,6 +558,8 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC5 · arm 6's named spawn, a
 New arm: tools/roles/adopt-roles.test.sh · covers AC9 · arm 12, against `extract_label_unit` staged back to the first unit id a label holds · `FLOOR_ASSERTIONS` raised by its assertions
 New arm: tools/workflows/tier2-review.test.sh · covers AC8 · the whole-label assertions, against `renderAgentLabel` staged to return the stage alone · `FLOOR_ASSERTIONS` raised by the assertions added
 New arm: tools/workflows/unattended-build.test.sh · covers AC6 AC7 · the `label:` assertions, against the spec writer's scope staged to its group's first unit id and the unit harness's label staged back to `unit:` and its unit id · `FLOOR_ASSERTIONS` raised by the assertions added
+New arm: tools/workflows/unattended-build.test.sh · covers AC14 AC15 · the identity assertions, against `log(identity)` staged after the roles loop and the builder line, and `identity` staged last in one return per script · `FLOOR_ASSERTIONS` raised by them
+New arm: tools/workflows/tier2-review.test.sh · covers AC16 · the identity assertions, against `log(identity)` staged after the role lines and `identity` staged last in the deferred return · `FLOOR_ASSERTIONS` raised by them
 
 The main loop observes each arm RED on its staged break and GREEN once restored, at the close (M8).
 No pass runs a leg above.
@@ -526,6 +585,8 @@ No pass runs a leg above.
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft.
+- rev-2 · 2026-10-13 · §1 S9 S10 §3 §4 §5 AC14 AC15 AC16 AC17 §7 §10 · folded the owner's sixth
+  addendum: each harness run logs its identity first and leads its return with it.
 
 ## 10. Reuse audit
 
@@ -546,4 +607,10 @@ write set selected `fixture-passes-by-finding-nothing`, `staged-break-substitute
 and `two-answers-to-one-question`, which AC8's counts, §7's code-level staged breaks and arm 6's
 renderer-to-hook check answer.
 
+Rev-2: `reuse_lookup.py` on "announce a workflow run's build slug, scope and action as its first log
+line and the first field of its return" ranked name-stem neighbours only (`run`, `slug`, `scope`),
+so the fold extends `renderAgentLabel` and each harness's `log` calls and returns. `gotchas.py
+--for-paths` added `amendment-leaves-its-other-half-standing`, which §3's amendments answer.
+
 Recall terms used: `agent description label spawn-guard handoff marker harness journal slug unit-id stage name`
+Recall terms used (rev-2): `workflow run meta title first log line return identity announce`
