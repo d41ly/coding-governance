@@ -53,5 +53,5 @@ The sites `TOOL-dSweptBranches-20` classified, with their verdicts in that build
 
 ## Gate
 
-None: the class is a property of an invocation, and the shape table above is the check a reviewer
+No machine gate: the class is a property of an invocation, and the shape table above is the check a reviewer
 runs. The audit record's probe rebuilds the measurement in seconds.

@@ -20,7 +20,7 @@ hold-until: owner
 hold-code: owner-decision
 held-from: VERIFYING
 gates-run: unattended-179185751247603718038-1121 45f76319
-parked-surfaced: yes, 1 surfaced
+parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 refreshed-at: 2b852f5fd87147540a0a73d310354440c84c72ea · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
