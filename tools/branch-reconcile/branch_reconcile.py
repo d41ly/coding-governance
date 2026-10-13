@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""branch_reconcile.py — every worktree, branch and stash entry, with one verdict each. gov:kit branch-reconcile@1.1
+"""branch_reconcile.py — every worktree, branch and stash entry, with one verdict each. gov:kit branch-reconcile@1.2
 
     python <this kit>/branch_reconcile.py [--root <path>] [--fresh-hours <n>] [--write [--remote]]
 
@@ -36,7 +36,7 @@ import sys
 import tempfile
 import time
 
-KIT_BRANCH_RECONCILE_VERSION = "1.1"
+KIT_BRANCH_RECONCILE_VERSION = "1.2"
 
 MERGED = "MERGED"
 EQUIVALENT = "EQUIVALENT"
