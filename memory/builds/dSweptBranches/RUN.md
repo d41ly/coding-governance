@@ -153,3 +153,9 @@ base: a8f0e195a2d80a6d1480e4992aec6565342e35ea
 2026-10-13T07:31:26Z hold · item owner-decision · reason until owner · reaped a17ed934 · resume none(owner)
 
 2026-10-13T10:32:18Z resume · item dSweptBranches · reason held · keepalive ca711d31 · manual
+
+2026-10-13T10:37:38Z rescope · item add TOOL-dSweptBranches-19 · reason owner instruction 2026-10-13 after the hand-off: rename the skill /branch-reconcile to /cleanup with all its references, first
+
+2026-10-13T10:37:38Z rescope · item add TOOL-dSweptBranches-20 · reason owner instruction 2026-10-13: build out the asks; closes TOOL-dSweptBranches-6, the range-reader audit
+
+2026-10-13T10:37:39Z rescope · item add TOOL-dSweptBranches-21 · reason owner instruction 2026-10-13: build out the asks; closes TOOL-dSweptBranches-18, the census suite's live-tree arm

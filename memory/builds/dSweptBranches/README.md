@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-13
 streams: tooling
 roster: TOOL
-ids: TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-6 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-18
+ids: TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-6 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-18 TOOL-dSweptBranches-19 TOOL-dSweptBranches-20 TOOL-dSweptBranches-21
 authorized-by: prompt
 ---
 
@@ -49,6 +49,9 @@ verbatim under `prompts/`.
 - Closing review: round 1 BLOCKED (2 blockers, 10 HIGH and 7 minor items); the blockers folded into
   unit 3 rev-3; round 2 CLEAN WITH FIXES, CONVERGED. Each HIGH became its own unit, 7 to 16, and
   every MEDIUM and LOW of both rounds unit 17, per M4's exit rule.
+- The run was handed off `owner-decision` on five inherited reds the runner labels OWN. The owner
+  then ruled (2026-10-13, `prompts/`): rename the skill to `/cleanup` first (unit 19), then build
+  both asks (units 20 and 21). The kit keeps its `branch-reconcile` name; only the skill moves.
 
 ## Parked decisions
 
@@ -74,13 +77,16 @@ None yet.
 | 14 | `TOOL-dSweptBranches-15` | 2 | submodule content makes its worktree UNKNOWN (promoted, H9) |
 | 15 | `TOOL-dSweptBranches-16` | 2 | tracked edits in an idle worktree are graded by a fixture (promoted, H10) |
 | 16 | `TOOL-dSweptBranches-17` | 2 | the closing review's MEDIUM and LOW items, batched (promoted) |
+| 17 | `TOOL-dSweptBranches-19` | 2 | the skill is `/cleanup`, renamed with every live reference (owner) |
+| 18 | `TOOL-dSweptBranches-20` | 1 | gov's range readers audited for a merge read as additions (closes ask 6) |
+| 19 | `TOOL-dSweptBranches-21` | 2 | the census suite's live-tree arm waits for its tree, not three seconds (closes ask 18) |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 16 unit(s) · node d · opened 2026-10-13 · streams tooling
+**Build status:** OPEN · 19 unit(s) · node d · opened 2026-10-13 · streams tooling
 ids TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-6 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13
-ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-18
+ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-18 TOOL-dSweptBranches-19 TOOL-dSweptBranches-20 TOOL-dSweptBranches-21
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -101,14 +107,17 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-15 — a submodule with uncommitted content makes its worktree UNKNOWN](spec/2026-10-13-spec-TOOL-dSweptBranches-15.md) | 14 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-16 — tracked edits in an idle worktree are graded by a fixture](spec/2026-10-13-spec-TOOL-dSweptBranches-16.md) | 15 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-17 — the closing review's MEDIUM and LOW items, batched](spec/2026-10-13-spec-TOOL-dSweptBranches-17.md) | 16 | 2 | CLOSED | rev-1 | 2026-10-13 |
+| [TOOL-dSweptBranches-19 — the skill is `/cleanup`, renamed with every live reference](spec/2026-10-13-spec-TOOL-dSweptBranches-19.md) | 17 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-dSweptBranches-20 — gov's range readers audited for a merge read as additions](spec/2026-10-13-spec-TOOL-dSweptBranches-20.md) | 18 | 1 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-dSweptBranches-21 — the census suite's live-tree arm waits for its tree, not for three seconds](spec/2026-10-13-spec-TOOL-dSweptBranches-21.md) | 19 | 2 | OPEN | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 36 bound to this build, across 4 record folder(s).
+Records: 37 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dSweptBranches-1 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3
-TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9.
+Ids no `spec-audit` record has ever named: TOOL-dSweptBranches-1 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-19 TOOL-dSweptBranches-2
+TOOL-dSweptBranches-20 TOOL-dSweptBranches-21 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -131,6 +140,9 @@ TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-7 TOOL-dSweptBra
 | 14 | `TOOL-dSweptBranches-15` | no |
 | 15 | `TOOL-dSweptBranches-16` | no |
 | 16 | `TOOL-dSweptBranches-17` | no |
+| 17 | `TOOL-dSweptBranches-19` | no |
+| 18 | `TOOL-dSweptBranches-20` | no |
+| 19 | `TOOL-dSweptBranches-21` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
