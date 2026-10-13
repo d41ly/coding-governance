@@ -19,8 +19,8 @@ hold-until: probe host
 hold-code: host-degraded
 held-from: REVIEWING
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 4795172cba8a5817df9e70d09d6f29d89f4cc024
-phase: REVIEWING
+witness: a5dad3a5a790b4539764ad52d1b7a81adaf00d2d
+phase: SPECCING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/deterministic-attended-workflows-943570
@@ -242,3 +242,9 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-13T03:01:05Z dispatch · item 77e84580 TOOL-aOrientedCast-22 · reason tools/unattended memory/map/features/unattended.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/aOrientedCast/spec/2026-10-13-spec-TOOL-aOrientedCast-22.md memory/builds/aOrientedCast/build/2026-10-13-build-TOOL-aOrientedCast-22-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
 
 2026-10-13T03:07:43Z dispatch · item 8ddc0a48 TOOL-aOrientedCast-22 · reason memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-ASKS.md memory/guides/PLAYBOOK-TEMPLATE.md .claude/skills/unattended/SKILL.md .claude/settings.json memory/builds/aOrientedCast/build
+
+2026-10-13T03:24:15Z review · item TOOL-aOrientedCast-16 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 14 · disposition promote
+
+2026-10-13T03:24:33Z rescope · item add TOOL-aOrientedCast-24 · reason M4 promotion of the second closing review (CLEAN WITH FIXES, 0 blockers): its hooks and unattended minors M1, M2, M3, M7, L1, L2, L3, batched by write set (memory/builds/aOrientedCast/reviews/2026-10-13-review-TOOL-aOrientedCast-16-closing-diff-round1.md)
+
+2026-10-13T03:24:35Z rescope · item add TOOL-aOrientedCast-25 · reason M4 promotion of the second closing review: its roles minors M4, M5, M6, L4, L5, L6, L7, batched by write set, disjoint from TOOL-aOrientedCast-24 (memory/builds/aOrientedCast/reviews/2026-10-13-review-TOOL-aOrientedCast-16-closing-diff-round1.md)

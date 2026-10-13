@@ -11,6 +11,7 @@
 | [2026-10-13-prompt-TOOL-aOrientedCast-16-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-16-1-spec-brief.md) | journal | TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 PLAY-aOrientedCast-2 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-16-2-build-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-16-2-build-brief.md) | journal | TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 PLAY-aOrientedCast-2 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-20-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-20-1-spec-brief.md) | journal | TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 |
+| [2026-10-13-review-TOOL-aOrientedCast-16-closing-diff-round1.md](../reviews/2026-10-13-review-TOOL-aOrientedCast-16-closing-diff-round1.md) | diff-review | TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 TOOL-aOrientedCast-22 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 |
 
 <!-- /gen:spec-records -->
 
