@@ -19,8 +19,8 @@ hold-until: probe host
 hold-code: host-degraded
 held-from: REVIEWING
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 99dfe6d7bc7433794373f3aff9b3461c33abc108
-phase: BUILDING
+witness: 4795172cba8a5817df9e70d09d6f29d89f4cc024
+phase: REVIEWING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/deterministic-attended-workflows-943570
