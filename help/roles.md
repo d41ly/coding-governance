@@ -86,6 +86,10 @@ until an owner writes its first row.
 - A spec write from anything but the spec writer, and a product write from anything but the builder
   on a specced unit. The main loop may still flip a spec's `**Status:**` line.
 - A role agent running the bar, the self-test runner or any suite, beyond what `[gates]` allows.
+- In a session routed to a live build, a final message that leaves out the `agent` or `returned`
+  line of an agent its turn dispatched or received. It is refused once per turn end, and
+  `handoff.py agents` prints the lines to paste. This one switches on with the route, not with
+  `roles.json`, and only where the governing doc's micro-formats define both lines.
 
 All of these switch on only where `.claude/roles.json` exists. They do not see writes made through
 Bash or PowerShell, `--bare` runs, agents a harness spawns internally, session-to-session messages,

@@ -328,9 +328,19 @@
       "file": "tools/memory-tree/transition-audit.test.sh"
     },
     {
+      "id": "addRequired",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "addRoot",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "addRun",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "addTarget",
@@ -2858,6 +2868,11 @@
       "file": "tools/workflows/unattended-unit.js"
     },
     {
+      "id": "checkAgentLines",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "checkAuthorizedReadme",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -2871,6 +2886,11 @@
       "id": "checkBuildable",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkCarries",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "checkCommand",
@@ -2978,6 +2998,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "checkSpoke",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "checkStatusOnlyEdit",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3003,6 +3028,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkTyped",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "checkUnarmed",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3016,6 +3046,11 @@
       "id": "checkUnwalkableTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "check_absent",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
     },
     {
       "id": "check_absorb_subject",
@@ -7578,6 +7613,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "extractTurnAgents",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "extractWorkflowArgs",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -11418,6 +11458,11 @@
       "file": "tools/process-monitor/procmon-hook.js"
     },
     {
+      "id": "readJournalAgents",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "readLiveSlugs",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
@@ -11461,6 +11506,11 @@
       "id": "readRegion",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readResult",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "readSegment",
@@ -18393,6 +18443,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "scanTurnRecords",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "scanWriteTargets",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -22616,6 +22671,11 @@
       "id": "write_text",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "write_transcript",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
     },
     {
       "id": "write_transcript_lines",

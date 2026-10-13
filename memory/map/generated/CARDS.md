@@ -9,14 +9,14 @@ One card per feature dossier, at most 1024 bytes each, derived from each dossier
 PreToolUse guards — fan-out bounded across Workflow+Agent, scratch bounded across Bash+PowerShell
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/agent-cap.md`
-- decisions 0
+- decisions 1: `TOOL-aOrientedCast-21`
 - gate-legs 10: `agent-cap self-test`, `scratch-guard self-test`, `format-guard self-test`, `verifier fan-out`, `verifier fan-out self-test`, `review-protocol parity (kit vs dogfood)`, `agent-cap restatement`, `agent-cap restatement self-test`, `hook destinations (every declared hook path ships)`, `hook destinations self-test`
 - kits 1: `hooks`
 - harness-hooks 4: `PreToolUse tools/hooks/agent-cap.js`, `PreToolUse tools/hooks/scratch-guard.js`, `SubagentStart tools/hooks/scratch-guard.js`, `Stop tools/hooks/format-guard.js`
 - gotcha-classes 9: `bash-c-multiline-flattens-under-msys.md`, `held-suite-guard-misses-a-sibling-kit.md`, `git-rm-cached-refuses-a-diverged-index-blob.md`
-- guides 1: `REVIEW-PROTOCOL.md`
+- guides 1
 - globs 11
-- cut 17 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 18 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## annotation-style
 
