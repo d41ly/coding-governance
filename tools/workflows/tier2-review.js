@@ -1,6 +1,6 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.49', // gov:kit tier2-review@1.49 // gov:kit review-harness@1.49 — BOTH ids: the
+  version: '1.50', // gov:kit tier2-review@1.50 // gov:kit review-harness@1.50 — BOTH ids: the
   // second is this entry's REGISTRY id, and without it a deployer grepping the id the
   // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
@@ -277,6 +277,31 @@ function renderRerunTail(only, synthToo) {
     ? `re-run with identical args to dispatch only ${only}`
     : `this run wrote no result file, so a re-run with identical args dispatches every finder and skeptic again${synthToo ? ', plus the synthesis' : ''}`
 }
+// TOOL-aBoundedVerdict-14 S1/S2 - the fold-scoping inputs. `priorFindings` is deliberately NOT merged
+// into `byDesign`: they are different instructions. byDesign says "this is intended, do not report
+// it"; a prior finding says "this was reported and FIXED - check the fix, and do not re-raise the
+// original". Collapsing them loses the second half, which is the half this unit exists for. When
+// that unit measured, no caller filled `byDesign`; the checklist's by-design block now does, and it is
+// intended behaviour, never a fixed defect, so the two stay apart.
+const priorFindings = Array.isArray(a.priorFindings) ? a.priorFindings : []
+// F1 resolved: accept an explicit integer AND infer 2 when prior findings arrive without one, so a
+// caller cannot silently get a round-1 brief while handing over a previous round's confirmed set.
+const round = Number.isInteger(a.round) && a.round > 0 ? a.round : priorFindings.length ? 2 : 1
+const reviewDir = a.reviewDir || 'reviews/'
+// TOOL-aOrientedCast-27 S3/S9 - every agent's label and the run's identity, `<slug> · <scope> · <stage>`.
+// The slug is the segment after a `builds/` segment of `reviewDir` when it is letters only, else none,
+// so a review outside a build folder carries no slug part. The stage is the label a spawn carried
+// before, so `pending`, the log lines and every reader of a stage keep their spelling. The build
+// harness holds its own copy of the function, because a workflow script imports nothing.
+const reviewSlug = (/(?:^|\/)builds\/([A-Za-z]+)(?:\/|$)/.exec(String(reviewDir).replace(/\\/g, '/')) || [])[1] || ''
+const reviewScope = kind + ' round ' + round
+function renderAgentLabel(scope, stage) {
+  return [reviewSlug, scope, stage].filter(Boolean).join(' · ')
+}
+// The run's identity is its first log line and the first key of every return: the tool titles the
+// run with `meta.name` alone.
+const identity = renderAgentLabel(reviewScope, 'review')
+log(identity)
 if (workerType && !roledJudges)
   log(`worker type ${workerType} — every finder and skeptic spawns as it and writes no find-*.json or verify-*.json, so this run's lens and batch results are NOT durable and a resume re-dispatches them`)
 if (!durable && roledJudges)
@@ -295,16 +320,6 @@ if (efforts[otherFinderKey] !== undefined)
 // S7 - the context default is per-kind, and each is wrong if the other kind inherits it.
 const context = a.context || (isSpec ? 'the spec set under audit' : 'the cumulative diff landing on main')
 // `byDesign` is RESOLVED below, after the checklist's by-design block is cut out (TOOL-aGraftedHelix-3).
-// TOOL-aBoundedVerdict-14 S1/S2 - the fold-scoping inputs. `priorFindings` is deliberately NOT merged
-// into `byDesign`: they are different instructions. byDesign says "this is intended, do not report
-// it"; a prior finding says "this was reported and FIXED - check the fix, and do not re-raise the
-// original". Collapsing them loses the second half, which is the half this unit exists for. When
-// that unit measured, no caller filled `byDesign`; the checklist's by-design block now does, and it is
-// intended behaviour, never a fixed defect, so the two stay apart.
-const priorFindings = Array.isArray(a.priorFindings) ? a.priorFindings : []
-// F1 resolved: accept an explicit integer AND infer 2 when prior findings arrive without one, so a
-// caller cannot silently get a round-1 brief while handing over a previous round's confirmed set.
-const round = Number.isInteger(a.round) && a.round > 0 ? a.round : priorFindings.length ? 2 : 1
 // S3 - a base that is not an immutable sha is REFUSED at round > 1 and warned at round 1. The
 // harness has no filesystem and cannot resolve a ref, so this is a STRING check on the shape of what
 // it was handed: the caller resolves, and the harness refuses anything that does not look resolved.
@@ -526,7 +541,6 @@ if (!baseLooksPinned) {
   if (round > 1) throw new Error(why)
   log('WARNING: ' + why)
 }
-const reviewDir = a.reviewDir || 'reviews/'
 // `diffCmd` is built AFTER the resume probe now, from the shas it resolves (TOOL-dDerivedDocket-29 S3).
 // H2/AC5, HONEST LIMIT: the harness CANNOT verify its own root. Workflow scripts have no
 // filesystem and no Node/Bun API, so there is no way to prove `repo` resolves to a git worktree
@@ -941,7 +955,7 @@ const probe = await agent(
     `does not parse, or lacks a field the schema requires, is left out and its name listed in skipped.\n` +
     `Return JSON {commonDir, ${isSpec ? 'blobs:[...], ' : 'base, head, '}finds:[...], verifies:[...], skipped:[...]}.`,
   {
-    label: 'resume:probe',
+    label: renderAgentLabel(reviewScope, 'resume:probe'),
     phase: 'Resume',
     schema: {
       type: 'object',
@@ -1136,7 +1150,7 @@ const finderResults = await boundedParallel(
         (isSpec
           ? `Return JSON {lens:"${L.key}", path, findings:[{file,where,severity,claim,impact,fix,evidence}]}.`
           : `Return JSON {lens:"${L.key}", path, findings:[{file,line,severity,claim,impact,fix}]}.`),
-        Object.assign({ label: `find:${L.key}`, phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA }, findOpts),
+        Object.assign({ label: renderAgentLabel(reviewScope, `find:${L.key}`), phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA }, findOpts),
       ),
   ),
 )
@@ -1223,6 +1237,7 @@ if (lensesDead === lensesRunning) {
   const lensYield = deriveLensYield([], null) // TOOL-aEvidencedLens-6 S5 - every row returned: false, zeros
   printLensYield(lensYield)
   return {
+    identity,
     shape: shapeLine,
     // TOOL-dTieredTribunal-1 S3 - null, never 0. No synthesis ran, so there is no adjudicated count.
     exit: 'deferred-platform', key: reviewKey, pending: deadLensLabels, durable,
@@ -1248,6 +1263,7 @@ if (allFindings.length === 0) {
   printLensYield(lensYield)
   // TOOL-dTieredTribunal-1 S3 - null, never 0: no synthesis ran on this path either.
   return {
+    identity,
     shape: shapeLine,
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels, durable,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
@@ -1347,7 +1363,7 @@ const verdictResults = await boundedParallel(
         `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted"|"uncertain", reason, severity:"blocker"|"high"|"medium"|"low" (on a confirmed verdict), fixVerdict:"sound"|"unsound"|"none", fixNote}]}. ` +
         `Emit EXACTLY one verdict per finding above (${group.length} verdicts, ids ${group.map((f) => f.id).join(', ')}). ` +
         `Copy the integer id — do NOT re-type the file path, and do not renumber.`,
-        Object.assign({ label: batchLabels[gi], phase: 'Verify', schema: VERDICT_SCHEMA }, verifyOpts),
+        Object.assign({ label: renderAgentLabel(reviewScope, batchLabels[gi]), phase: 'Verify', schema: VERDICT_SCHEMA }, verifyOpts),
       ),
   ),
 )
@@ -1575,6 +1591,7 @@ if (confirmed.length + unverified.length === 0) {
   const lensYield = deriveLensYield(ledger, null) // TOOL-aEvidencedLens-6 S4 - no synthesis, no items
   printLensYield(lensYield)
   return {
+    identity,
     shape: shapeLine,
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: pendingLabels, durable,
     // TOOL-dTieredTribunal-1 S3 - null, never 0. Every finding was refuted, which is a RESULT, but
@@ -1608,6 +1625,7 @@ if (pendingLabels.length) {
   const lensYield = deriveLensYield(ledger, null) // TOOL-aEvidencedLens-6 S4/S5 - a dead lens's row reads returned: false
   printLensYield(lensYield)
   return {
+    identity,
     shape: shapeLine,
     exit: 'deferred-platform', key: reviewKey, pending: pendingLabels, durable,
     root: repo, raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length,
@@ -1809,7 +1827,7 @@ const synth = await agent(
     `Return JSON {path, items, summary} with a FORWARD-SLASH path.`,
   {
     ...synthOpts,
-    label: 'synth',
+    label: renderAgentLabel(reviewScope, 'synth'),
     phase: 'Synthesize',
     schema: {
       type: 'object',
@@ -1913,6 +1931,7 @@ printLensYield(lensYield)
 // TOOL-dDerivedDocket-29 S5 - past the partial-fan return above, the synthesis is the only agent left
 // that can have died, so it alone decides `exit` here. The tally fault stays `complete`.
 return {
+  identity,
   shape: synthShape, // TOOL-aMendedFleet-18 S3 - the line handed to the synthesis, unchanged
   exit: synth ? 'complete' : 'deferred-platform',
   key: reviewKey,

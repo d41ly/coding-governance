@@ -476,6 +476,10 @@ for (const k of Object.keys(roles)) {
     )
   }
 }
+// TOOL-aOrientedCast-27 S9 - the run's identity, its first log line and the first key of every return:
+// the tool titles the run with `meta.name` alone, so this is where the owner reads what it is doing.
+const identity = renderAgentLabel(mode + ' round ' + roundNo, specAudit ? 'spec, audit, disposal, hand-out' : 'spec, hand-out')
+log(identity)
 // S4 - one line per stage key, typed, forwarded or untyped, so a fallback is never a silent one.
 for (const k of ROLE_KEYS) {
   const reviewKey = k === 'specFinder' || k === 'skeptic' || k === 'synthesis'
@@ -532,6 +536,11 @@ for (const k of ['skeptic', 'specFinder', 'synthesis']) {
 // and its effort when one is named, so a stage neither names is today's call byte for byte.
 function renderStageOpts(key, base) {
   return Object.assign(base, roles[key] ? { agentType: roles[key] } : {}, efforts[key] ? { effort: efforts[key] } : {})
+}
+// TOOL-aOrientedCast-27 S3 - every agent's label, `<slug> · <scope> · <stage>`. The review harness
+// holds its own copy, because a workflow script imports nothing; the suites' stage split reds a drift.
+function renderAgentLabel(scope, stage) {
+  return [slug, scope, stage].filter(Boolean).join(' · ')
 }
 // S7 - warn and continue, which is the owner's ruling AGAINST this file's own recommendation to
 // refuse. A run under a mandate does not get to opt out of the mandate's enforcement by passing an
@@ -992,7 +1001,11 @@ const specResults = await boundedParallel(
           'NAME every unit you could not spec, in `refused`, with the reason in your summary. ' +
           'Name every unit in `authored`, `alreadyPresent` and `refused` by its unit id, exactly as this ' +
           'roster spells it, never by a path.',
-        renderStageOpts('specWriter', { label: 'spec:' + slug + ':g' + gi, phase: 'Spec', schema: SPEC_SCHEMA }),
+        renderStageOpts('specWriter', {
+          label: renderAgentLabel(gUnits.map(function (u) { return u.id }).join(' '), 'spec-write'),
+          phase: 'Spec',
+          schema: SPEC_SCHEMA,
+        }),
       )
     }
   }),
@@ -1209,7 +1222,7 @@ if (!authoredIds.length) {
       '5. Return `sha` as the full 40-hex `git rev-parse HEAD`.\n' +
       '6. Run `' + SPEC_COMMIT_CHECKLIST + '` over the commit just made and return its stdout VERBATIM as ' +
       '`checklist`, whatever its exit status; an empty selection returns an empty string.',
-    renderStageOpts('committer', { label: 'commit:specs:' + slug, phase: 'Spec', schema: SPEC_COMMIT_SCHEMA }),
+    renderStageOpts('committer', { label: renderAgentLabel('specs', 'commit'), phase: 'Spec', schema: SPEC_COMMIT_SCHEMA }),
   )
   // S3 — FIVE REFUSALS, in the order the spec's table states, each before the resolver can spawn and
   // each ending in the one remedy. Nothing past this line can verify the commit, so a return that
@@ -1419,7 +1432,7 @@ if (specAudit && !subjects) {
       '`checklistPaths`. Return NO `checklist` and a `checklistError` naming why instead when no path ' +
       'was declared, the command exits non-zero (name the code), it times out, or its stdout carries no ' +
       'line starting `- ` (write `no bug class selected`).',
-    { label: 'audit:subjects:r' + roundNo, phase: 'Audit', schema: SUBJECTS_SCHEMA },
+    { label: renderAgentLabel('audit round ' + roundNo, 'subjects'), phase: 'Audit', schema: SUBJECTS_SCHEMA },
   )
   subjects = (res && Array.isArray(res.subjects)) ? res.subjects : []
   // S3/S8 - a checklist reaches the callee only when it carries a `- ` item, which is what its
@@ -1646,6 +1659,7 @@ if (specAudit && auRaw.exit === 'deferred-platform') {
   log('audit round ' + roundNo + ': DEFERRED by the platform — ' + (pending.length ? pending.join(', ') : 'no label named') +
     ' did not return; no round recorded, no unit built')
   return {
+    identity: identity,
     slug: slug,
     mode: mode,
     base: base,
@@ -1807,7 +1821,7 @@ async function writeRound(disposition, adjudicated) {
       'If the command REFUSES saying the subject already carries a terminal review ' +
       'round, return terminalSubject: true with its stderr and no token — do not retry under another ' +
       'subject. If the command fails for any other reason, return its stderr rather than a token.',
-    { label: 'audit:record:r' + roundNo, phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
+    { label: renderAgentLabel('audit round ' + roundNo, 'record'), phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
   )
   if (attended) log('attended mode: verdict computed from the blocker count; no round was recorded')
   // THE TERMINAL-SUBJECT REFUSAL IS ITS OWN THROW. It used to surface as "the round was not
@@ -1893,6 +1907,7 @@ if (verdict === 'CONVERGING') {
   const handPrior = Array.isArray(auRaw.confirmedFindings) ? auRaw.confirmedFindings : null
   if (!handPrior) log('WARNING: the review returned no `confirmedFindings` array, so no `priorFindings` is handed back for the fold re-invoke')
   return {
+    identity: identity,
     slug: slug,
     // THE MODE TRAVELS ON THIS RETURN TOO. It is the path an attended run takes on every
     // non-terminal round, and the terminal return's own comment says the field exists so a caller
@@ -2042,7 +2057,7 @@ if (!specAudit) {
       'unit that promotion repairs, or the bare string `none`, and `order` is the integer you ' +
       'wrote into its status header. Both fields are REQUIRED, and `edges: []` is a declared ' +
       'absence rather than a missing key.',
-    renderStageOpts('disposal', { label: 'dispose:' + slug, phase: 'Disposal', schema: DISPOSAL_SCHEMA }),
+    renderStageOpts('disposal', { label: renderAgentLabel('audit round ' + roundNo, 'dispose'), phase: 'Disposal', schema: DISPOSAL_SCHEMA }),
   )
   // NO PARTIAL HAND-OUT. Deciding which units a standing finding touches needs the tree, which this
   // runtime does not have, so an empty roster is the honest refusal. `d.disposed !== true` covers a
@@ -2195,6 +2210,7 @@ if (!specAudit) {
         '`none` may sit above every unit in this build'
     log('disposal: NOT done — ' + why)
     return {
+      identity: identity,
       slug: slug, mode: mode, base: base, round: roundNo, units: ordered.length,
       specced: speccedCount, specRefused: specRefused, verdict: verdict, audit: audit, blockers: au.blockers,
       unverified: au.unverified,
@@ -2316,6 +2332,7 @@ const buildUnits = ordered.filter(function (u) { return skippedDone.indexOf(u.id
 if (attended && !buildUnits.length) {
   log('attended mode: every unit is already terminal — nothing to build')
   return {
+    identity: identity,
     slug: slug, mode: mode, base: base, round: roundNo, units: ordered.length,
     specced: speccedCount, specRefused: specRefused, verdict: verdict, audit: audit, blockers: au.blockers,
     unverified: au.unverified,
@@ -2354,6 +2371,7 @@ if (attended && !buildUnits.length) {
 // `specCommit` rides the audit-OFF hand-out only: on the audit route the spec commit's checklist items
 // went to the audit, which is the pass M6 says acts on them, and its by-design block was left out.
 const handOut = {
+  identity: identity,
   slug: slug,
   mode: mode,
   base: base,

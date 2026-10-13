@@ -7,10 +7,25 @@
 # model was READ_PATH_CEILING, retired by TOOL-dSpentCeiling-1 after 27 movements bought no trim —
 # the LESSON kept here is the argued-in-place justification, not the summed budget.
 #
-# WHO WRITES THIS FILE: a person, deliberately. This is NOT the high-water record — that one is
-# `<prefix>/template-size-highwater.txt`, which `--bump` WRITES as a side effect of measuring. Keeping
-# them apart is the point: a mode that can move a ceiling while recording a measurement would destroy
-# the ratchet's only real property, which is that raising a ceiling is a visible, deliberate act.
+# WHO WRITES THIS FILE: a person or a run, deliberately, and never a measurement. This is NOT the
+# high-water record — that one is `<prefix>/template-size-highwater.txt`, which `--bump` WRITES as a
+# side effect of measuring. Keeping them apart is the point: a mode that can move a ceiling while
+# recording a measurement would destroy the ratchet's only real property, which is that raising a
+# ceiling is a visible, deliberate act.
+#
+# WHEN A RUN MAY RAISE A ROW. Every row here is the owner's to move, except that a run may RAISE a
+# measured-file row, in the commit of a unit of a build the owner mandated, when all four hold:
+#   1. that unit's own change takes the row's subject past the row, measured CR-stripped;
+#   2. the row's comment block does not reserve its next movement to the owner, and the new value
+#      keeps to any rule that block states, such as no headroom;
+#   3. the movement is argued in place above the row, in the shape the movements below take:
+#      RAISED <old> -> <new>, the date, the unit, the measured figure and why the new value;
+#   4. the run records that unit's row in memory/DECISIONS.md before or with the raise.
+# A class row, a lowering, a new row and a removal stay the owner's. This paragraph is the one
+# statement of these terms: the build method's M3 and check-template-size.sh's over-budget message
+# point here rather than restate them. Ruled by the owner on 2026-10-13, of the AGENTS.md raise this
+# file records below: it "was perfectly resolvable on your own" (memory/DECISIONS.md,
+# TOOL-aOrientedCast-23).
 #
 # RESOLUTION: positional $2, then THIS declaration, then the MAX_BYTES environment variable, then the
 # gate's hard default. The declaration sits ABOVE the environment on purpose — see the kickoff-engine
@@ -62,7 +77,12 @@ skills/session-kickoff/SKILL.md	18432
 # alone and measured 13151 bytes, so the old row priced 51 KB of growth nobody had asked for. 16 KiB
 # keeps the whole file well under the 32768 bytes a Codex agent reads
 # (the agent-instructions kit's CODEX_MAX), which v3.5 exceeded.
-AGENTS.md	16384
+#
+# RAISED to 20480 (20 KiB) on owner order, 2026-10-13 (memory/DECISIONS.md, PLAY-aOrientedCast-3).
+# The agent and returned micro-formats and their rule put the charter at 16729 bytes against 16384,
+# once the role roster had left 83 free. 20 KiB leaves room for more roles and rules without another
+# owner turn soon, and keeps the whole file at 62% of the 32768 bytes a Codex agent reads.
+AGENTS.md	20480
 
 # --- the build method, as rendered -------------------------------------------------------------
 # 27648 bytes = 27 KiB. SEEDED FROM THE MEASUREMENT PLUS THE WORK THIS BUILD FUNDS, 2026-09-05

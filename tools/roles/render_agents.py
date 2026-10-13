@@ -6,14 +6,16 @@
 `--write` renders one agent type per role whose `agent` is true, at `.claude/agents/<name>.md` under
 the repository root: the role's Claude keys, then `effort: <level>` as `roles_lib.resolve_effort`
 reads it from the kit's `house/policy.toml` (TOOL-aOrientedCast-10), then `omitClaudeMd: true`, then gov's `workflow` and
-`writes`, then a body that is `roles_lib.render_role`'s output followed, under `## Charter`, by one
-`### charter §<n>` block per id the role's `charter` key names. Beside them it writes the generated
+`writes`, then a body that is `roles_lib.render_role`'s output followed, under `## Charter`, by
+`roles_lib.render_charter_blocks` for the role: the section 1 rule lines its `rules` key cites, then
+the charter's carried sections whole (TOOL-aOrientedCast-16). A pre-tag charter renders no
+`## Charter` and prints one note. Beside them it writes the generated
 index `.claude/roles.json`: every role with its `workflow`, `writes`, `agent` and `gates`, the gate legs
 the policy's `[gates]` table lets it run (empty where it names none), `harnesses`, the repo-relative
 scripts of every workflow whose `driver` is `workflow`, and `gates.manifest`, the repo-relative path of
 the tool root's gate manifest or null when no file is there (TOOL-aOrientedCast-11; scratch-guard.js reads
 both to refuse a role agent a gate). Everything is rendered in memory first, so a role, overlay or
-charter section that fails to resolve writes nothing.
+rule tag that fails to resolve writes nothing.
 
 OWNERSHIP. The renderer owns the agent types its catalogue names plus every name the on-disk index
 lists, which is exactly the set a previous render wrote. `--write` unlinks an owned file the
@@ -76,6 +78,11 @@ FIXTURE_MISSING = "{prefix}/workflows/missing.js"
 FIXTURE_ROOT = "toolroot"
 #: Every fixture kit carries a policy, so an absent file never reads as the fixture's normal state.
 FIXTURE_POLICY = '[effort]\ndefault = "medium"\n'
+#: The fixture's governing doc: a tagged charter inside a playbook region, an authored section after it.
+FIXTURE_DOC = ("<!-- gov:playbook -->\n# Doc\n\n## 1. Practices\n\n<!-- one-line -->\n- [one] Rule one.\n"
+               "- [two] Rule two.\n<!-- /one-line -->\n\n## Protocols — read the one whose trigger holds\n\n"
+               "- A pass: `mem/P.md`.\n\n## Facts\n\n- **Fact:** one.\n<!-- /gov:playbook -->\n\n"
+               "## Authored\n\nafter the region\n")
 
 
 def derive_tool_root(script_dir):
@@ -98,7 +105,7 @@ def derive_tool_root(script_dir):
 
 
 def load_catalogue(kit_dir, target_root):
-    """The roles, the workflow table, MEMORY_ROOT and the governing doc's sections, through the library."""
+    """The roles, the workflow table, MEMORY_ROOT and the parsed governing doc, through the library."""
     roles = lib.load_roles(kit_dir)
     if not roles:
         raise lib.RolesError("%s holds zero roles, and a render of nothing compares clean against an "
@@ -108,29 +115,26 @@ def load_catalogue(kit_dir, target_root):
     if not memory_root:
         raise lib.RolesError("%s declares no MEMORY_ROOT, or is absent" % conf.as_posix())
     charter_path = lib.resolve_charter_path(target_root)
+    doc = pathlib.Path(os.path.relpath(str(charter_path), str(target_root))).as_posix()
+    charter = lib.parse_charter(lib.load_text(charter_path), doc)
     workflows = lib.load_workflows(kit_dir)
-    notes = []
+    notes = [lib.LEGACY_NOTE % doc] if charter["shape"] == "legacy" else []
     return {"roles": roles, "workflows": workflows, "memory_root": memory_root,
-            "charter_path": charter_path, "policy": lib.load_policy(kit_dir, roles, workflows, notes),
-            "notes": notes, "sections": lib.extract_charter_sections(lib.load_text(charter_path))}
+            "policy": lib.load_policy(kit_dir, roles, workflows, notes),
+            "notes": notes, "charter": charter}
 
 
-def render_agent_file(kit_dir, slot, role, memory_root, sections, charter_path, effort):
+def render_agent_file(kit_dir, slot, role, memory_root, charter, notes, effort):
     """One agent type's text: Claude keys, its effort, the trim, gov's two keys, the rendered role,
-    its charter blocks."""
+    then `## Charter` and the role's charter blocks when the charter yields any."""
     keys = role["keys"]
     head = ["---"] + ["%s: %s" % (k, keys[k]) for k in CLAUDE_KEYS if k in keys]
     head += ["effort: %s" % effort, "omitClaudeMd: true", "workflow: %s" % keys.get("workflow", ""),
              "writes: %s" % keys.get("writes", ""), "---"]
     text = "\n".join(head) + "\n" + lib.render_role(kit_dir, slot, memory_root)
-    ids = [x.strip() for x in keys.get("charter", "").split(",") if x.strip()]
-    if ids:
-        text += "\n## Charter\n"
-    for cid in ids:
-        if cid not in sections:
-            raise lib.RolesError("%s: charter %s names no section of %s" % (
-                role["path"].as_posix(), cid, pathlib.Path(charter_path).as_posix()))
-        text += "\n### charter %s\n\n%s\n" % (cid, sections[cid])
+    blocks = lib.render_charter_blocks(charter, role["path"].as_posix(), keys.get("rules", ""), notes)
+    if blocks:
+        text += "\n## Charter\n\n" + blocks
     return text
 
 
@@ -224,7 +228,7 @@ def run_mode(mode, kit_dir, tool_root, target_root):
         for slot, role in cat["roles"].items():
             if role["keys"].get("agent", "true") == "true":
                 rendered["%s/%s.md" % (AGENTS_REL, slot)] = render_agent_file(
-                    kit_dir, slot, role, cat["memory_root"], cat["sections"], cat["charter_path"],
+                    kit_dir, slot, role, cat["memory_root"], cat["charter"], cat["notes"],
                     lib.resolve_effort(cat["policy"], slot))
         harnesses, absent = derive_harness_paths(cat["workflows"], tool_root, target_root)
         manifest = resolve_gate_manifest(tool_root, target_root)
@@ -286,8 +290,7 @@ def build_fixture(root, roles, policy=FIXTURE_POLICY):
         '[[workflow]]\nname = "w4"\ndriver = "agent"\nharness = "none"\n'
         % (FIXTURE_HARNESS, FIXTURE_HARNESS), encoding="utf-8")
     (root / ".memory-tree.conf").write_text("MEMORY_ROOT=mem\nCHARTER=DOC.md\n", encoding="utf-8")
-    (root / "DOC.md").write_text("# Doc\n\n## §1 — One\n\nbody one\n\n## §2 — Two\n\nbody two\n",
-                                 encoding="utf-8")
+    (root / "DOC.md").write_text(FIXTURE_DOC, encoding="utf-8")
     return kit, root / FIXTURE_ROOT
 
 
@@ -299,12 +302,12 @@ def check_arm(state, arm, ok, what):
 
 
 def run_selftest():
-    """The twelve arms over fixture catalogues; prints PASS or FAIL with the assertion count."""
+    """The arms over fixture catalogues; prints PASS or FAIL with the assertion count."""
     state = {"n": 0, "fail": []}
     roles = {"r-one": ("maxTurns: 7\nworkflow: w1\nreads: input:spec\nwrites: product\n"
-                       "charter: §2, §1\n", "Overlay line.\n"),
-             "r-two": ("workflow: w1\nreads: input:spec\nwrites: spec\ncharter: \n", ""),
-             "r-off": ("workflow: w4\nreads: input:spec\nwrites: none\ncharter: §1\nagent: false\n", "")}
+                       "rules: two, one\n", "Overlay line.\n"),
+             "r-two": ("workflow: w1\nreads: input:spec\nwrites: spec\nrules: \n", ""),
+             "r-off": ("workflow: w4\nreads: input:spec\nwrites: none\nrules: one\nagent: false\n", "")}
     with tempfile.TemporaryDirectory() as tmp:
         root = pathlib.Path(tmp)
         kit, tool_root = build_fixture(root, roles)
@@ -329,11 +332,16 @@ def run_selftest():
                   "a one-line overlay did not reach the type")
         check_arm(state, 3, "## House rules" not in texts.get("r-two", "x## House rules"),
                   "an empty overlay added a House rules heading")
+        carried = ("### Protocols — read the one whose trigger holds\n\n- A pass: `mem/P.md`.\n\n"
+                   "### Facts\n\n- **Fact:** one.\n")
         check_arm(state, 4, texts.get("r-one", "").endswith(
-            "\n## Charter\n\n### charter §2\n\nbody two\n\n### charter §1\n\nbody one\n"),
-            "two charter ids were not appended in list order")
-        check_arm(state, 4, "## Charter" not in texts.get("r-two", "## Charter"),
-                  "an empty charter list added a Charter heading")
+            "\n## Charter\n\n### Charter rules\n\n- [one] Rule one.\n- [two] Rule two.\n\n" + carried),
+            "two rule tags were not carried in charter order before the carried sections")
+        check_arm(state, 4, texts.get("r-two", "").endswith("\n## Charter\n\n" + carried)
+                  and "### Charter rules" not in texts.get("r-two", ""),
+                  "an empty rules list did not carry the two sections alone")
+        check_arm(state, 4, not any("after the region" in t for t in texts.values()),
+                  "a type carries text from outside the playbook region")
         check_arm(state, 5, index["harnesses"] == [FIXTURE_HARNESS.format(prefix=FIXTURE_ROOT)],
                   "harnesses is %r, not the one workflow-driver script" % index["harnesses"])
         target = agents / "r-one.md"
@@ -463,6 +471,41 @@ def run_selftest():
                   "an optional leg the manifest lacks exited %d without a note naming it" % rc)
         check_arm(state, 13, held == ["leg a", "absent"],
                   "r-one's index gates are %r, not the two leg names with the ? taken off" % held)
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        kit, tool_root = build_fixture(root, {s: roles[s] for s in ("r-one", "r-two")})
+        (root / "DOC.md").write_text("# Doc\n\n## §1 — One\n\nbody one\n\n## §2 — Two\n\nbody two\n",
+                                     encoding="utf-8")
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            rc = run_mode("write", kit, tool_root, root)
+        texts = [p.read_text(encoding="utf-8") for p in (root / ".claude" / "agents").glob("*.md")]
+        check_arm(state, 14, rc == 0 and len([ln for ln in out.getvalue().splitlines()
+                                              if ln.startswith("render_agents: note") and "reseed" in ln]) == 1,
+                  "a pre-tag charter exited %d without one reseed note line" % rc)
+        check_arm(state, 14, len(texts) == 2 and not any("## Charter" in t for t in texts),
+                  "a pre-tag charter did not render both types with no Charter section")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        base = roles["r-one"][0]
+        for extra, want in ((", three?", 0), (", three", 2)):
+            cut = {"r-one": (base.replace("rules: two, one\n", "rules: two, one%s\n" % extra), roles["r-one"][1]),
+                   "r-two": roles["r-two"]}
+            kit, tool_root = build_fixture(root, cut)
+            before = {p: p.read_bytes() for p in (root / ".claude").rglob("*") if p.is_file()}
+            out, err = io.StringIO(), io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                rc = run_mode("write", kit, tool_root, root)
+            if want == 0:
+                check_arm(state, 15, rc == 0 and len([ln for ln in out.getvalue().splitlines()
+                                                      if ln.startswith("render_agents: note")
+                                                      and "'three?'" in ln]) == 1,
+                          "an optional tag the charter lacks exited %d without one note naming it" % rc)
+            else:
+                check_arm(state, 15, rc == 2 and "'three'" in err.getvalue() and "R4" in err.getvalue(),
+                          "a bare tag the charter lacks exited %d without naming it and R4" % rc)
+                after = {p: p.read_bytes() for p in (root / ".claude").rglob("*") if p.is_file()}
+                check_arm(state, 15, bool(before) and after == before, "a refused rule tag wrote a file")
     for line in state["fail"]:
         print("render_agents selftest: FAIL %s" % line)
     print("%s (%d assertions)" % ("FAIL" if state["fail"] else "PASS", state["n"]))

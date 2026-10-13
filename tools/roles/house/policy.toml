@@ -7,9 +7,9 @@ default = "medium"            # every role and stage this file does not name
 
 [effort.roles]                # one entry per role slot whose `agent` is true
 gov-orienter = "xhigh"
-gov-spec-writer = "xhigh"
+gov-spec-writer = "high"
 gov-spec-reviewer = "medium"
-gov-builder = "high"
+gov-builder = "xhigh"
 gov-diff-reviewer = "high"
 gov-skeptic = "high"
 gov-synthesizer = "high"

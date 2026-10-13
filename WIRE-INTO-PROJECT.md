@@ -717,8 +717,11 @@ a tree whose receipt predates it, printing `default-gained`.
    agents, the handoffs and the gates still work, and `check-wiring.sh` prints one `note` per absent
    harness. Add `review-harness` to `kits` in `.governance/deploy.toml` to use `/build`.
 
-The roles need the governing doc `.memory-tree.conf` names by `CHARTER` to carry every `## §<n>`
-section a role's `charter` key cites; `roles catalogue` reds naming the missing one. With no file at
+The roles need the governing doc `.memory-tree.conf` names by `CHARTER` to carry every section 1
+rule tag a role's `rules` key cites bare, and its `## Protocols` and `## Facts` sections;
+`roles catalogue` reds naming the missing one, and a tag cited with a trailing `?` is a note. A
+pre-tag (v3.x) charter renders every agent type with no charter text and prints one note: reseed
+the charter template from gov, then re-render. With no file at
 `CHARTER` the install still succeeds: the adopter renders the Skill alone, renders no agent type and
 no role index, and exits 3, which the kit declares as its `no-governing-doc` outcome. Write that doc,
 or point `CHARTER` at the one you have, then re-run `--scaffold`.

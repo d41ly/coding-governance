@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.146 -->
+<!-- gov:kit memory-tree@2.148 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -80,6 +80,7 @@ resolved before it, a decision.
 the forks its specs state, AND that build's own scope by M2's AMEND acts. Two bounds: the README's GOAL statement is what a run may not amend (under a canon it IS the immutable description slot, folded there because two slots that must agree are one fact twice), and the delegation does not reach veto 2's governance-carrier clause,
 M1's own budget included. Vetoes 1 and 3 stand. A fork the goal cannot survive is still not yours — park it.
 A `may:` grant in an owner-committed README lifts veto 2 for what it names; protocol §1 is the rule.
+A declared ceiling is the owner's to move unless the file declaring it states which rows a run may raise and on what terms; a raise on those terms changes no governance carrier.
 With no mandate, forks go to the owner and this is preparation.
 
 **Ratify the most FEATURE-RICH option** — most stated acceptance criteria satisfied, fewest follow-ups left open —

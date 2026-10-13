@@ -328,9 +328,19 @@
       "file": "tools/memory-tree/transition-audit.test.sh"
     },
     {
+      "id": "addRequired",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "addRoot",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "addRun",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "addTarget",
@@ -2858,6 +2868,16 @@
       "file": "tools/workflows/unattended-unit.js"
     },
     {
+      "id": "checkAgentLines",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "checkAsk",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "checkAuthorizedReadme",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -2871,6 +2891,11 @@
       "id": "checkBuildable",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkCarries",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "checkCommand",
@@ -2973,9 +2998,19 @@
       "file": "tools/unattended/stop-guard.js"
     },
     {
+      "id": "checkSettles",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "checkSpecAuditDeclared",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "checkSpoke",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "checkStatusOnlyEdit",
@@ -3003,6 +3038,16 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkToolResult",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
+      "id": "checkTyped",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "checkUnarmed",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3016,6 +3061,11 @@
       "id": "checkUnwalkableTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "check_absent",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
     },
     {
       "id": "check_absorb_subject",
@@ -4508,6 +4558,11 @@
       "file": "tools/memory-tree/routed_commits.py"
     },
     {
+      "id": "check_rule_tags",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "check_run_call",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -5116,6 +5171,11 @@
       "id": "classify_row",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "clean",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
     },
     {
       "id": "cleanup",
@@ -6713,6 +6773,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_role_roster",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "derive_root_confs",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -7513,6 +7578,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "extractAskQuestions",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "extractBuildSlug",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -7568,6 +7638,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "extractTurnAgents",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "extractWorkflowArgs",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -7611,11 +7686,6 @@
       "id": "extract_card_tokens",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
-    },
-    {
-      "id": "extract_charter_sections",
-      "kind": "function",
-      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "extract_chunks",
@@ -7698,9 +7768,19 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "extract_label_unit",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "extract_line_ref",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
+    },
+    {
+      "id": "extract_microformat_shapes",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "extract_modes_section",
@@ -7736,6 +7816,11 @@
       "id": "extract_print_message",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "extract_prompt_marker",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "extract_range",
@@ -8673,6 +8758,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "load_agent_transcript",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "load_aliases",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
@@ -8908,9 +8998,19 @@
       "file": "tools/runlog/runlog_lib.py"
     },
     {
+      "id": "load_run_journal",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "load_scenarios",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
+      "id": "load_session_calls",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "load_spec_facts",
@@ -8921,6 +9021,11 @@
       "id": "load_spec_paths",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "load_stand_in_waivers",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "load_text",
@@ -10423,6 +10528,11 @@
       "file": "tools/lexicon/lexicon_conf.py"
     },
     {
+      "id": "parse_charter",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "parse_cim",
       "kind": "function",
       "file": "tools/process-monitor/census.py"
@@ -10763,6 +10873,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_agent_lines",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "print_audit",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -11056,6 +11171,11 @@
       "id": "print_resume_orientation",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "print_roster",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "print_route_body",
@@ -11373,6 +11493,11 @@
       "file": "tools/process-monitor/procmon-hook.js"
     },
     {
+      "id": "readJournalAgents",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "readLiveSlugs",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
@@ -11416,6 +11541,11 @@
       "id": "readRegion",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readResult",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "readSegment",
@@ -13998,6 +14128,26 @@
       "file": "tools/workflows/check-protocol-parity.test.sh"
     },
     {
+      "id": "renderAgentLabel",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderAgentLabel",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderAgentLabel",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "renderAgentLabel",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "renderAppendix",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -14006,6 +14156,11 @@
       "id": "renderAppendix",
       "kind": "function",
       "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderAskDeny",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
     },
     {
       "id": "renderBlankedLiterals",
@@ -14263,6 +14418,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "renderSpawnName",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "renderStageOpts",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -14411,6 +14571,11 @@
       "id": "render_census",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "render_charter_blocks",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "render_check_report",
@@ -14638,6 +14803,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "render_outcome",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "render_path",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
@@ -14808,6 +14978,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "render_shape_line",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "render_shard",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -14836,6 +15011,11 @@
       "id": "render_skill_copy",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "render_spawn_name",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "render_spawn_summary",
@@ -14918,6 +15098,11 @@
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
     },
     {
+      "id": "render_tokens",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "render_transition_conf",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -14951,6 +15136,11 @@
       "id": "render_views",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "render_wall",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "render_worksheet",
@@ -16638,6 +16828,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "resolve_session_file",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "resolve_session_tree",
       "kind": "function",
       "file": "tools/runlog/extract.py"
@@ -17111,6 +17306,11 @@
       "id": "run_arms",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "run_ask",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.test.sh"
     },
     {
       "id": "run_ask_query",
@@ -18323,6 +18523,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "scanTurnRecords",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "scanWriteTargets",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -18756,6 +18961,11 @@
       "id": "scan_spec_sizes",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "scan_stand_in_declarations",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "scan_substituted",
@@ -21793,6 +22003,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "write_agent_ledger",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "write_alias_fixture",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -22536,6 +22751,11 @@
       "id": "write_text",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "write_transcript",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
     },
     {
       "id": "write_transcript_lines",

@@ -9,14 +9,14 @@ One card per feature dossier, at most 1024 bytes each, derived from each dossier
 PreToolUse guards — fan-out bounded across Workflow+Agent, scratch bounded across Bash+PowerShell
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/agent-cap.md`
-- decisions 0
+- decisions 1: `TOOL-aOrientedCast-21`
 - gate-legs 10: `agent-cap self-test`, `scratch-guard self-test`, `format-guard self-test`, `verifier fan-out`, `verifier fan-out self-test`, `review-protocol parity (kit vs dogfood)`, `agent-cap restatement`, `agent-cap restatement self-test`, `hook destinations (every declared hook path ships)`, `hook destinations self-test`
 - kits 1: `hooks`
 - harness-hooks 4: `PreToolUse tools/hooks/agent-cap.js`, `PreToolUse tools/hooks/scratch-guard.js`, `SubagentStart tools/hooks/scratch-guard.js`, `Stop tools/hooks/format-guard.js`
 - gotcha-classes 9: `bash-c-multiline-flattens-under-msys.md`, `held-suite-guard-misses-a-sibling-kit.md`, `git-rm-cached-refuses-a-diverged-index-blob.md`
-- guides 1: `REVIEW-PROTOCOL.md`
+- guides 1
 - globs 11
-- cut 17 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 18 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## annotation-style
 
@@ -217,7 +217,7 @@ Workflow review harnesses — one pipeline, three implementations, one hardened
 The role catalogue: one owner-editable agent definition per role with an empty house overlay beside it, the table of the workflows a governed session runs it...
 
 - status `building` · streams `tooling` · dossier `memory/map/features/roles.md`
-- decisions 7: `TOOL-aOrientedCast-1`, `TOOL-aOrientedCast-2`, `TOOL-aOrientedCast-3`, `KICK-aOrientedCast-2`, `TOOL-aOrientedCast-8`, `TOOL-aOrientedCast-10`, `TOOL-aOrientedCast-11`
+- decisions 11: `TOOL-aOrientedCast-1`, `TOOL-aOrientedCast-2`, `TOOL-aOrientedCast-3`, `KICK-aOrientedCast-2`, `TOOL-aOrientedCast-8`, `TOOL-aOrientedCast-10`, `TOOL-aOrientedCast-11`, `TOOL-aOrientedCast-16`, `TOOL-aOrientedCast-17`, `TOOL-aOrientedCast-20`, `TOOL-aOrientedCast-27`
 - gate-legs 4: `roles adopter self-test`, `roles catalogue`, `roles render selftest`, `roles render wiring`
 - kits 1: `roles`
 - rendered-skills 1: `build`
@@ -305,17 +305,17 @@ Executed assertion counts, in one shape, against a shrink-only floor
 Unattended runs — a mandate on disk, not a block of chat
 
 - status `shipped` · streams `tooling`, `playbook`, `kickoff`, `deployer` · dossier `memory/map/features/unattended.md`
-- decisions 0
+- decisions 1: `TOOL-aOrientedCast-22`
 - gate-legs 6: `unattended kit gate`, `unattended skill wiring`, `pass-order history`, `brief-recorded`, `unattended protocol size`, `unattended skill size`
 - kits 1: `unattended`
 - harness-hooks 3: `PreToolUse tools/unattended/gate-guard.js`, `Stop tools/unattended/stop-guard.js`, `StopFailure tools/unattended/stall-recorder.js`
 - workflow-scripts 2: `unattended-build.js`, `unattended-unit.js`
 - skill-engines 1: `session-kickoff`
 - rendered-skills 1: `unattended`
-- gotcha-classes 25: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`, `second-implementation-is-not-a-second-opinion.md`, `inputs-inside-the-subjects-reach.md`
+- gotcha-classes 25: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`, `second-implementation-is-not-a-second-opinion.md`
 - guides 4
 - globs 3
-- cut 27 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 28 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## unattended-mandate
 

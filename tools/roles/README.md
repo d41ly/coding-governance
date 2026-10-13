@@ -1,12 +1,12 @@
-<!-- gov:kit roles@1.2 -->
+<!-- gov:kit roles@1.5 -->
 # roles — the role catalogue: one agent definition per role, the workflow table, and the checker
 
 A governed session runs its LLM work through ten declared WORKFLOWS — `orient`, `research`, `reuse`,
 `handoff`, `spec-write`, `spec-review`, `build`, `closing-review`, `gate-bar` and `bookkeeping` —
 each driven by an agent ROLE, a harness, a program or the main loop. A role is an agent-definition
 file under `agents/`: a CONSTANT block its agent starts from, plus front matter saying which
-workflow it serves, which inputs it reads, which path class it may write and which sections of the
-governing doc it needs. The workflow table, `workflows.toml`, says which roles drive each workflow,
+workflow it serves, which inputs it reads, which path class it may write, which sections of the
+governing doc it needs, when it is mandatory and where its output goes. The workflow table, `workflows.toml`, says which roles drive each workflow,
 which harness stage spawns as which role, and what refuses a bypass. The library, `roles_lib.py`, is
 the one reader of all of it and the one composition of a role with its house overlay
 (`render_role`): every route that hands a role to an agent goes through it, so a role reaches an
@@ -19,6 +19,8 @@ block is the kit's and is overwritten on update; the overlay is yours and is kep
 overlay is appended to the base block under a `## House rules` heading when the role is rendered;
 an empty or absent one adds nothing. An overlay carries no `#` or `##` heading of its own and no
 render token but `{{MEMORY_ROOT}}`. Its size is printed on every check run and never graded.
+The `mandatory` and `output` keys ride the base file, as `writes` does, so an overlay cannot change
+them.
 
 A base block POINTS at the document that owns a rule — the spec format, the build method, the
 review protocol, all under `{{MEMORY_ROOT}}` — and never restates it. Stage protocol (return
@@ -37,10 +39,11 @@ The checker grades that each entry names something, not that the thing exists.
 ## The handoff renderer
 
 `python handoff.py render --role <name> --build <slug> [--unit <id>] [--card <path>]
-[--input <key>=<value>]... [--out <path> | --stdout] [--part full|task]` turns a role and one task
+[--input <key>=<value>]... [--out <path> | --stdout | --stand-in] [--part full|task]` turns a role and one task
 into the prompt its agent is handed (TOOL-aOrientedCast-2). The file holds the role as `render_role`
 renders it under `## Role`, then `## Task`: one block per key of the role's `reads`, in declared
-order, then one block per `charter` id. A `task:` key is read from the session card's `## task`
+order, then, as its last block, the role's charter blocks (described under "The agent types"),
+whose library notes print on stderr as `handoff: note — `. A `task:` key is read from the session card's `## task`
 field by the kickoff checker's field grammar, a `card:` key from that card's section, a `brief:` key
 from the build's brief record, and an `input:` key from `--input`. A required key that resolves to
 nothing, an empty value or a placeholder refuses by name and writes nothing; an optional one is named
@@ -55,12 +58,115 @@ The file is written under the build's `prompts/` folder as
 `<date>-prompt-<id>-<n>-<role without gov->.md`, and its `gov:handoff` marker line carries a hash of
 each section. `python handoff.py check <file>` re-derives both hashes and the marker's path;
 `--part task` prints the marker and the task section alone, which is what a typed agent spawn
-carries. `python handoff.py harness-args <harness>` prints the `roles` object a harness takes: the
+carries. Outside `--stand-in`, `render` also prints one stderr line, `handoff: description — <name>`,
+after its notes: the spawn's name, `<build> · <unit> · <workflow>` with the role's catalogue
+`workflow`, or `<build> · <workflow>` with no `--unit`. The `Agent` call passes it as `description`,
+and the hooks kit's spawn guard derives the same name from the marker and the role index and refuses
+a call carrying any other (TOOL-aOrientedCast-27). stdout does not change in any mode.
+`python handoff.py harness-args <harness>` prints the `roles` object a harness takes: the
 union of the `stages` tables of every workflow whose harness is that script, as one line of JSON.
 `python handoff.py stage-efforts <workflow>` prints the `efforts` object a harness call takes for one
 workflow, as the next section states.
 Exit 0, 1 on a refusal, 2 on usage or an unarmed tree; the script's header states what it does not
 check.
+
+`python handoff.py roster` prints the charter's roles section, one line per role, every role
+included, `agent: false` too (TOOL-aOrientedCast-17):
+``- `<slot>`: <description> <when>. Output: <output>.``, where `<when>` is `Optional` for a
+`mandatory` of `no`, `Optional, <text>` for `no — <text>`, and `Mandatory <value>` otherwise, and
+`{{MEMORY_ROOT}}` is the conf's value. The order is the workflow table's: by the file position of
+the entry a role's `workflow` names, then by its place in that entry's `roles`, with a role naming
+no entry last. A line past 200 characters, the playbook's one-line rule limit, refuses naming the
+role and its length, as do a missing key and an empty catalogue, with nothing printed: exit 1. No
+repository or no `MEMORY_ROOT` exits 2. It reads no charter, since on a first install the playbook
+render writes the charter; the playbook kit's derived roster placeholder is its consumer.
+
+## The agent lines
+
+`python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>] [--write]` prints
+the governing doc's `agent` line for each agent the selector names, then its `returned` line once
+it has returned (TOOL-aOrientedCast-20). The two shapes are read from the doc's micro-format fence
+by `roles_lib.extract_microformat_shapes`, each marker a whole line and the last definition of a
+head winning, as the hooks kit's format guard reads the fence, and filled by placeholder name. A
+missing shape, or a placeholder the verb does not derive, refuses. `--handoff` names a direct spawn:
+every `Agent` call whose prompt opens with that file's marker line as the spawn guard reads it,
+through `roles_lib.extract_prompt_marker`, and whose result names an agent. `--run`
+names a harness run: one agent per `started` entry of its journal. The session is `--session`, else
+the transcript `CLAUDE_CODE_SESSION_ID` names under the Claude projects folder, found by the run-log
+kit's rule.
+
+Every agent a declared harness spawns carries the label `<slug> · <scope> · <stage>`: a spec writer
+serving a group names all its unit ids, so its line reads the label rather than one unit
+(TOOL-aOrientedCast-27). A harness run's own title is not the agent's to set: the tool fixes it from
+the script's `meta` block, so it reads `unattended-build`, `unattended-unit` or `tier2-review`. The
+run's identity, its build, scope and action, is its first log line and the leading `identity` field
+of its return.
+
+| Field | From | When nothing answers |
+|---|---|---|
+| role | the agent's meta `agentType`; for a direct spawn, else the marker's `role` | `unknown` |
+| effort | the agent transcript's last `effort`; else the agent type's `effort:` line | `unknown` |
+| model | the transcript's last `message.model`; for a direct spawn, else the call's `resolvedModel` | `unknown` |
+| unit or label | the marker's `unit`, else the meta's `description`; for a harness agent, the one unit id its journal label names, else the label | `unknown` |
+| prompt | the handoff and its marker's `path`; for a harness agent, the call's `briefPath`, else its `scriptPath` | `unknown` |
+| writes, gates | the role index's `writes` and `gates` for the role | `none` |
+| outcome | `failed`, a notification status that is not `completed`, `committed <sha>` or `not committed` from the unit harness's result, else `wrote <n> files` | — |
+| wall | the transcript's first `timestamp` to its last, as `45s`, `7m47s` or `1h02m` | `unknown` |
+| tokens | the sum, over distinct message ids, of the largest `output_tokens`, as `812` or `41.2k` | `unknown` |
+
+A direct spawn has returned when a notification names its call or its result says `completed`; a
+harness agent when its journal holds a `result` or `failed` entry for it.
+
+**The ledger.** Only with `--write`, each printed line holding no `unknown` field is added to the
+build's one `<MEMORY_ROOT>/builds/<build>/build/<date>-build-<id>-agent-ledger.md`, created on first
+use; without it the verb writes nothing and one note names the held lines and `--write`, so a call
+made mid-pass leaves the tree as it found it. Pass `--write` only at a bookkeeping step, when no pass
+is running (TOOL-aOrientedCast-25). It is
+added only if no line already carries the same head and the same last field, its `run` token. A line
+held back for an `unknown` field is added by a later run. In the ledger the prompt link is re-rooted
+at the ledger's folder. The ledger's `**Serves:**` line lists every unit id the build's specs define
+on their first line, and it is re-derived on every write. The build is the marker's `build`, else the
+`Workflow` call's `slug`, else the session card's last `## route`. A build with no folder or no
+specced id writes nothing and says why.
+
+Exit 0 on lines printed, notes or none; 1 on a refusal: no marker in the handoff, no matching call,
+no run journal, a missing shape, an underived placeholder, or two ledgers in one build. Exit 2 with
+no repository, `MEMORY_ROOT`, `CHARTER`, session file or `.claude/roles.json`.
+
+## Standing in for a role
+
+Work goes to its role agent. The one exception is a tool or run that cannot spawn a sub-agent at all:
+there the main loop does the role's work itself, as a stand-in, and the owner grants that by a dated
+waiver row (TOOL-aOrientedCast-19). A waiver relaxes the `[roles]` rule for one role in one build. It
+never admits a write a hook refuses and never removes a leg from the bar; in Claude Code a sub-agent
+can always be spawned, so the hooks read no waiver row.
+
+**The registry** is `<MEMORY_ROOT>/project/role-stand-in-waiver.txt`, written by the owner and by
+nobody else. No tree holds it until the first row, and an absent registry waives nothing. Blank lines
+and lines opening `#` are ignored; every other line is one row of five TAB-separated fields, split at
+the first four TABs so the reason may hold anything:
+
+```
+<date>	owner <who>	<role>	<build>	<reason>
+```
+
+The date is a `YYYY-MM-DD` calendar date, the attribution `owner ` and one token, the role a role
+file whose `agent` is not `false`, the build a slug of letters, and the reason non-empty. A second row
+for the same build and role is a defect naming the line it repeats.
+
+**The declaration.** A stand-in renders its role's handoff with
+`python handoff.py render --role <role> --build <slug> ... --stand-in` and follows it, so the role's
+text reaches it exactly as it would reach an agent. With no valid row for that build and role the
+render exits 1, naming the registry and the row the owner writes, and writes nothing; otherwise the
+file takes the derived name with a `-stand-in` tail before `.md`. `--stand-in` excludes `--out` and
+`--stdout`: a handoff printed to stdout declares nothing.
+
+**R15** in the checker joins the two both ways: a `*-stand-in.md` file under a build's `prompts/`
+whose marker's build and role no row covers is a defect, a tailed file with no marker is a defect,
+and a row no declaration consumes is stale and a defect, as the sibling registries red a stale row.
+Every valid row prints as one `roles: note: stand-in waiver` line on every run, green included, and
+the summary carries both counts. R15 does not check that the tool truly could not spawn, that the
+signer is the owner, or that the reason says anything, and it cannot see a stand-in nobody declared.
 
 ## The effort policy
 
@@ -102,12 +208,17 @@ then every role's list is empty, the strict reading.
 `python render_agents.py --write | --check | --selftest` renders each role whose `agent` is true
 into a Claude Code agent type, `.claude/agents/<name>.md` (TOOL-aOrientedCast-3). Its front matter
 is the role's Claude keys, then `omitClaudeMd: true`, then the role's `workflow` and `writes` for
-the hooks to read. Its body is `render_role`'s output, then, under `## Charter`, one
-`### charter §<n>` block per id of the role's `charter` key, in the order the key names them, spelled
-as a handoff spells its blocks. An agent started with the charter omitted holds only its system
-prompt and its task, so a harness that hands it no handoff would otherwise give it no charter section
-at all; a typed spawn that IS handed a handoff carries those sections twice, which is the accepted
-cost. Beside the types sits `.claude/roles.json`, the generated index the hooks read: every role
+the hooks to read. Its body is `render_role`'s output, then `## Charter` and
+`render_charter_blocks` for the role (TOOL-aOrientedCast-16): a `### Charter rules` block holding the
+section 1 rule lines whose tag the role's `rules` key cites, in charter order, then the charter's
+`## Protocols` and `## Facts` sections whole, each under a `### ` heading — the same text a handoff
+appends to its task. `parse_charter` reads only the span between the `gov:playbook` region markers
+when the doc holds them, so an adopter's own sections around the region never reach an agent. An
+agent started with the charter omitted holds only its system prompt and its task, so a harness that
+hands it no handoff would otherwise give it no charter at all; a typed spawn that IS handed a
+handoff carries the blocks twice, which is the accepted cost. A pre-tag (v3.x) charter, with
+`## §<n> — ` headings and no rule tag, renders every type with no `## Charter` and prints one note
+asking for a reseed; a doc of neither shape refuses. Beside the types sits `.claude/roles.json`, the generated index the hooks read: every role
 with its `workflow`, `writes` and `agent`, `agent: false` roles included, and `harnesses`, the
 repo-relative scripts of every workflow whose `driver` is `workflow`. A harness the tree does not
 hold is listed where the resolver places it and printed on a `note` line; it refuses nothing.
@@ -118,8 +229,9 @@ longer renders and rewrites the index last; it never touches any other file unde
 `.claude/agents/`, where your own definitions may live. `--check` writes nothing, names every
 `missing`, `drift` or `stale` owned path and the remedy, and strips carriage returns from the
 on-disk side, so a CRLF checkout of a correct render reads fresh. The adopter's `--check` runs it
-beside the Skill's compare as the `roles render wiring` leg, so editing a role, an overlay or a
-cited charter section without a re-render reds the bar.
+beside the Skill's compare as the `roles render wiring` leg, so editing a role, an overlay, a
+cited rule line or a carried section without a re-render reds the bar: a rule edit stales exactly
+the types whose role cites its tag, and a carried-section edit stales every type.
 `--selftest` runs the renderer's arms over a catalogue it builds in a temporary directory and is the
 `roles render selftest` leg. Exit 0, 1 on drift or a failed arm, 2 on usage, a library refusal or a
 zero-role catalogue.
@@ -141,7 +253,14 @@ record in the build that shipped this renderer is the instrument to re-run.
 `govkit update --write` installs it where a receipt predates it, printing `default-gained`. It
 requires the kickoff kit, whose card writer every `task:` and `card:` input is read from, and the
 memory-tree kit, whose `.memory-tree.conf` names the memory root and, by `CHARTER`, the governing
-doc the roles' charter ids resolve against.
+doc the roles' rule tags resolve against.
+
+**A role's `rules` tags.** A tag every v4.x charter template carries outside any `when:` or `kit:`
+block is cited bare. A tag a target's charter may lack is cited with a trailing `?` — `cross-os`,
+fenced by `when:cross-os`, and `spec`, which v4.0 and the first v4.1 template lack — so a charter
+without it prints a note instead of refusing. Write the tags in charter order, and name a protocol
+in a body by its name ("the build method's M6"), never by its file: the checker refuses the file
+name of any protocol the charter's Protocols section lists.
 
 - The base role files, the workflow table, the library, the checker, the renderers, the adopter and
   this README are the kit's, overwritten on every update.
@@ -195,11 +314,15 @@ invoking `/build`.
 
 `python check_roles.py [--root <dir>] [--write]`, run as the `roles catalogue` gate leg. It grades
 the role files, the overlays and the workflow table against each other in both directions, and every
-`charter` id against a `## §<n> — ` heading of the governing doc, which it locates through the
-memory-tree conf's `CHARTER` key. It prints one line per defect naming the file and the rule (R0 to
-R11, listed in its header with what it does not check), then a summary of every count it graded.
-Exit 0 clean, 1 on a defect or an empty catalogue (DEAD PROBE), 2 when the conf or its `CHARTER`
-is missing. `--write` re-renders the region below from the table and the front matter, and nothing
+`rules` tag against the section 1 rule tags of the governing doc, which it locates through the
+memory-tree conf's `CHARTER` key; a body or an overlay spelling a protocol's file name reds as R5 or
+R10. A role called mandatory under a workflow whose `enforced-by` names no hook script, without an
+`unenforced — <why>` clause, reds as R13, and a writer role whose `output` lacks its class's folder
+as R14. A stand-in declaration and the owner's waiver rows are joined as R15, under "Standing in for
+a role". It prints one line per defect naming the file and the rule (the rules are listed in its
+header, with what it does not check), then a summary of every count it graded, the charter's shape among
+them. Exit 0 clean, 1 on a defect or an empty catalogue (DEAD PROBE), 2 when the conf, its
+`CHARTER` or its `MEMORY_ROOT` is missing, or the doc is no charter this kit reads. `--write` re-renders the region below from the table and the front matter, and nothing
 else; the check compares the two on every run.
 
 <!-- gen:roles-catalogue -->
@@ -220,17 +343,17 @@ else; the check compares the two on every run.
 
 **Roles**, from `agents/*.agent.md`:
 
-| role | workflow | writes | reads | charter | agent | returns |
+| role | workflow | writes | reads | rules | agent | returns |
 |---|---|---|---|---|---|---|
-| `gov-builder` | build | product | input:spec, card:route?, brief:non-goals? | §3, §7, §9, §11, §12 | true | whether the unit was committed, the commit, why when it was not, and which check ran for which gate |
-| `gov-diff-reviewer` | closing-review | none | input:diff, input:spec? | §7, §8, §9, §10 | true | concrete findings, each with its file and line, the input that reaches it, the consequence and a proposed fix |
-| `gov-orienter` | orient | none | input:question, input:prompt? | §1, §2, §5 | true | the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows |
-| `gov-researcher` | research | none | input:question, brief:goal?, brief:non-goals? | §5, §12 | true | the candidates, each with its mechanism, the smallest test that would make it lose and that test's result, then the pick and its reason |
-| `gov-reuse-scout` | reuse | none | input:question, task:in?, card:reuse? | §12 | true | the seam to extend, cited by path, or "no existing seam fits" with the evidence |
-| `gov-session` | handoff | none | input:question, brief:goal?, task:todo?, card:route? | §2, §3 | false | nothing to the sender; the receiving session acts on the task block and reports in its own session |
-| `gov-skeptic` | closing-review | none | input:diff?, input:spec? | §8, §10 | true | a verdict per finding, confirmed or refuted, with the reason observed and, for a confirmed one, its severity |
-| `gov-spec-reviewer` | spec-review | none | input:spec, brief:goal?, brief:non-goals? | §7, §8, §9, §10 | true | concrete findings, each with the spec and section, the evidence probed, the consequence and a proposed fix |
-| `gov-spec-writer` | spec-write | spec | brief:goal, brief:items, brief:acceptance, brief:gates, brief:non-goals, input:spec?, task:reuse?, card:route? | §1, §7, §9, §12 | true | the units authored, already present and refused, each by its unit id, with the reason for every refusal |
-| `gov-synthesizer` | closing-review | review | input:diff?, input:spec? | §8, §16 | true | the report's path and the items it adjudicated, each with its severity and the ids of the findings it covers |
+| `gov-builder` | build | product | input:spec, card:route?, brief:non-goals? | yagni, reuse, core, derive, verify, gate, security, bytes, cross-os?, tools | true | whether the unit was committed, the commit, why when it was not, and which check ran for which gate |
+| `gov-diff-reviewer` | closing-review | none | input:diff, input:spec? | verify, gate, class, left-shift, security, risk, bytes, cross-os? | true | concrete findings, each with its file and line, the input that reaches it, the consequence and a proposed fix |
+| `gov-orienter` | orient | none | input:question, input:prompt? | small, ids, memory, tokens, tools | true | the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows |
+| `gov-researcher` | research | none | input:question, brief:goal?, brief:non-goals? | reuse, verify, class, memory | true | the candidates, each with its mechanism, the smallest test that would make it lose and that test's result, then the pick and its reason |
+| `gov-reuse-scout` | reuse | none | input:question, task:in?, card:reuse? | reuse | true | the seam to extend, cited by path, or "no existing seam fits" with the evidence |
+| `gov-session` | handoff | none | input:question, brief:goal?, task:todo?, card:route? | ids, memory | false | nothing to the sender; the receiving session acts on the task block and reports in its own session |
+| `gov-skeptic` | closing-review | none | input:diff?, input:spec? | verify, class, risk | true | a verdict per finding, confirmed or refuted, with the reason observed and, for a confirmed one, its severity |
+| `gov-spec-reviewer` | spec-review | none | input:spec, brief:goal?, brief:non-goals? | spec?, verify, gate, class, security, risk | true | concrete findings, each with the spec and section, the evidence probed, the consequence and a proposed fix |
+| `gov-spec-writer` | spec-write | spec | brief:goal, brief:items, brief:acceptance, brief:gates, brief:non-goals, input:spec?, task:reuse?, card:route? | yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security | true | the units authored, already present and refused, each by its unit id, with the reason for every refusal |
+| `gov-synthesizer` | closing-review | review | input:diff?, input:spec? | left-shift, risk, signal | true | the report's path and the items it adjudicated, each with its severity and the ids of the findings it covers |
 
 <!-- /gen:roles-catalogue -->

@@ -5,7 +5,7 @@ feature = "agent-cap"
 title = "PreToolUse guards — fan-out bounded across Workflow+Agent, scratch bounded across Bash+PowerShell"
 status = "shipped"
 streams = ["tooling"]
-decisions = []
+decisions = ["TOOL-aOrientedCast-21"]
 
 [claims]
 gate-legs = [
@@ -102,15 +102,14 @@ and reads a shell command string. Both deny by stderr plus exit 2, both fail OPE
 they cannot parse, and both are matched on a `|`-joined pair of exact tool names because a guard
 wired to one modality leaves the same act available through the other. The kit entry is still named
 `agent-cap` and versions the whole home: `version_from` is entry-level and single-valued, so a
-second constant would be invisible to govkit rather than gated by it. Each wiring is a
-`harness-hooks` claim.
+second constant would be invisible to govkit rather than gated by it.
 
 **`scratch-guard.js` carries a SECOND check, and it rides the process that already spawns.**
 `TOOL-aReplayedCard-1`: after the scratch verdict, `checkOriented` refuses a main-loop `git commit`
 while the session's orientation card under `<git-common-dir>/orientation/` still holds the kickoff
 writer's sentinel `READY — none yet`, or names another tree than the commit targets. It is inside
 this file and not a third hook because a second file on the `Bash|PowerShell` matcher doubles
-every shell call's spawn cost, which that unit's spec measured. The predicate has ONE
+every shell call's spawn cost (measured). The predicate has ONE
 evaluation order, written above the function: shape, `agent_id`, missing fields, an unwalkable
 target, an absent or replay-written card, then the sentinel-or-mismatch test, and only then the
 exemption — the commit that CREATES a build README carrying `authorized-by:` with a value in the
@@ -191,7 +190,7 @@ two entry points. A bash re-implementation would not disagree loudly — it woul
 either side is tightened.
 
 `tools/settings-merge.py` owns the wiring fragment (event, matcher, marker, hook path, plus the
-optional interpreter and args `TOOL-aReplayedCard-2` added for the bash-scripted card verb) and
+optional interpreter and args from `TOOL-aReplayedCard-2`) and
 `tools/check-wiring.sh` joins on it, asserting the matcher VALUE rather than merely that the file
 mentions `agent-cap.js`. The merger re-matches an entry it finds under the wrong matcher, and both
 readers expand a fragment's `{kit}` or `{here}` token identically — `check-hook-destinations.sh`
@@ -210,7 +209,8 @@ scripts the join ban judges. A closed `--only=` set (`join`, `scripts`) lets fil
 predicate; a WIRED command never carries it (`tools/check-wiring.sh`).
 
 Rule 6 (`TOOL-aOrientedCast-7`) admits an `Agent` call only as a rendered handoff and a `Workflow`
-call only as a declared harness, per `.claude/roles.json`.
+call only as a declared harness, per `.claude/roles.json`. `format-guard.js` reads agents
+from the transcript, never the agent ledger (`TOOL-aOrientedCast-21`).
 
 ## Gaps
 

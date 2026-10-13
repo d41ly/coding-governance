@@ -1,27 +1,36 @@
 """roles_lib — the one reader of the role catalogue, and the one composition of a role (TOOL-aOrientedCast-1).
 
 Reads the role files under `agents/`, the workflow table `workflows.toml`, the memory-tree conf and
-the governing doc's `§<n>` sections. `render_role` is the one composition of a role with its house
-overlay: every consumer that hands a role to an agent calls it, so a role reaches an agent the same
-way by every route. Stdlib only; every text read folds CRLF to LF and names its encoding.
+the governing doc: its section 1 rule tags and its carried sections (TOOL-aOrientedCast-16). It is
+also the one reader of the owner's stand-in waiver registry and of the stand-in declarations under
+the builds' `prompts/` folders (TOOL-aOrientedCast-19), and of the governing doc's micro-format
+fence, `<!-- microformats -->` to `<!-- /microformats -->`, whose `agent` and `returned` shapes
+`handoff.py agents` fills (TOOL-aOrientedCast-20): each marker a whole line and the last definition
+of a head winning, as the hooks kit's format guard reads the fence (TOOL-aOrientedCast-25). Its
+`extract_prompt_marker` reads an `Agent` prompt's marker line as the hooks kit's spawn guard does.
+`render_role` is the one composition of a role with its house overlay, and `render_charter_blocks`
+the one composition of the charter text a role carries: every consumer that hands a role to an agent
+calls both, so a role reaches an agent the same way by every route. Stdlib only; every text read
+folds CRLF to LF and names its encoding.
 
 The front-matter grammar: a `---` block at line 1, one `key: value` per line at COLUMN 0, values kept
 RAW (a list is comma-separated on one line, the form Claude Code's own `tools:` takes). An indented,
 a repeated or an unknown key is refused, because a simple parser drops an indented key without a
 word and a repeated one silently keeps the last.
 """
+import datetime
 import json
 import pathlib
 import re
 import tomllib
 
-KIT_ROLES_VERSION = "1.2"
+KIT_ROLES_VERSION = "1.5"
 
 #: Every front-matter key a role file may carry: Claude Code's own, then gov's.
 #: Split from one string, because a quoted `"tools"` beside a quoted segment reads to the
 #: install-prefix ban as a kit path (TOOL-aOrientedCast-8 S14).
 FRONT_MATTER_KEYS = tuple("name description tools model maxTurns "
-                          "workflow reads writes charter returns agent".split())
+                          "workflow reads writes rules returns agent mandatory output".split())
 
 #: The closed `reads` vocabulary: `<family>:<field>`, a trailing `?` marking one optional.
 READ_KEYS = frozenset(
@@ -46,8 +55,36 @@ TOKEN_RE = re.compile(r"\{\{[^{}]*\}\}")
 FRONT_MATTER_RE = re.compile(r"---[ \t]*\n(.*?)\n---[ \t]*(?:\n|$)", re.S)
 CONF_LINE_RE = re.compile(
     r"^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(?:\"([^\"]*)\"|'([^']*)'|(\S*))(?:\s+#.*)?\s*$")
+#: The playbook render's region markers. A charter rendered into a larger file sits between them,
+#: and only that span is read, so an adopter's own sections around it never reach an agent.
+PLAYBOOK_OPEN, PLAYBOOK_CLOSE = "<!-- gov:playbook -->", "<!-- /gov:playbook -->"
+SECTION_ONE_RE = re.compile(r"^## 1\. ")
+#: A section 1 rule line, `- [<tag>] <text>`; the whole line is the rule.
+RULE_LINE_RE = re.compile(r"^- \[([a-z0-9][a-z0-9-]*)\] ")
+#: One entry of a role's `rules` value: a tag, a trailing `?` marking it optional.
+RULE_KEY_RE = re.compile(r"^[a-z0-9][a-z0-9-]*\??$")
+#: The section 3 headings every agent type and handoff carries whole, in this order (§8 F3).
+CARRIED_SECTIONS = ("Protocols", "Facts")
+#: A v3.x charter's numbered heading, kept only to tell a pre-tag charter from an unknown doc.
 SECTION_RE = re.compile(r"^## (§\d+) — ")
+LEGACY_NOTE = ("%s is a pre-tag charter: it carries `## §<n> — ` headings and no section 1 rule tag, "
+               "so no role's rules resolve and no agent type or handoff carries the charter; reseed "
+               "the charter template from gov, then re-render")
 HARNESS_RE = re.compile(r"^\{prefix\}/([^/{}\s]+)/([^/{}\s]+)$")
+#: A build slug, as `handoff.py render --build` takes it and a stand-in waiver row names it.
+SLUG_RE = re.compile(r"^[A-Za-z]+$")
+#: The rendered handoff's marker line; `handoff.py` reads this one pattern (TOOL-aOrientedCast-19).
+MARKER_RE = re.compile(r"^<!-- gov:handoff role=(\S+) build=(\S+) unit=(\S+) path=(\S+) "
+                       r"role-sha=([0-9a-f]{12}) task-sha=([0-9a-f]{12}) -->$", re.M)
+#: The owner's stand-in waiver registry under `<MEMORY_ROOT>/project/`, and the file-name tail a
+#: handoff rendered by a stand-in carries before `.md` (TOOL-aOrientedCast-19).
+STAND_IN_WAIVER = "role-stand-in-waiver.txt"
+STAND_IN_TAIL = "-stand-in"
+WAIVER_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+WAIVER_OWNER_RE = re.compile(r"^owner \S+$")
+#: The governing doc's micro-format fence and one definition line inside it (TOOL-aOrientedCast-20).
+MICROFORMATS_OPEN, MICROFORMATS_CLOSE = "<!-- microformats -->", "<!-- /microformats -->"
+MICROFORMAT_LINE_RE = re.compile(r"^- `(.*)`$")
 
 
 class RolesError(Exception):
@@ -131,18 +168,134 @@ def resolve_charter_path(root):
     return charter
 
 
-def extract_charter_sections(text):
-    """`{"§<n>": body}` for every `## §<n> — ` heading; a body runs to the next `## ` line."""
-    sections, current, lines = {}, None, []
-    for line in text.replace("\r\n", "\n").split("\n") + ["## "]:
+def parse_charter(text, where):
+    """The governing doc as `{"shape", "rules", "carried"}`; RolesError (R0) on a doc this kit cannot read.
+
+    Only the playbook region is read when the text holds its two markers once each, in order. A
+    section is a `## ` line and the lines up to the next one. Section 1's `- [<tag>] ` lines are the
+    rules, kept whole in charter order; each CARRIED_SECTIONS name is the first section headed by it,
+    as `(heading, body)` with the body's blank edges trimmed. With a rule the shape is `tagged` and
+    every carried section is required; with none and a `## §<n> — ` heading it is `legacy`, carrying
+    nothing; otherwise the doc is refused. `where` is the path every message names.
+    """
+    text = text.replace("\r\n", "\n")
+    i = text.find(PLAYBOOK_OPEN)
+    j = text.find(PLAYBOOK_CLOSE, i + len(PLAYBOOK_OPEN)) if i >= 0 else -1
+    if j >= 0 and text.count(PLAYBOOK_OPEN) == 1 and text.count(PLAYBOOK_CLOSE) == 1:
+        text = text[i + len(PLAYBOOK_OPEN):j]
+    sections = []
+    for line in text.split("\n"):
         if line.startswith("## "):
-            if current is not None and current not in sections:
-                sections[current] = "\n".join(lines).strip("\n")
-            m = SECTION_RE.match(line)
-            current, lines = (m.group(1) if m else None), []
-        elif current is not None:
-            lines.append(line)
-    return sections
+            sections.append((line, []))
+        elif sections:
+            sections[-1][1].append(line)
+    rules = {}
+    one = next((body for head, body in sections if SECTION_ONE_RE.match(head)), [])
+    for line in one:
+        m = RULE_LINE_RE.match(line)
+        if m and m.group(1) in rules:
+            raise RolesError("%s: R0 — the governing doc repeats the rule tag [%s] in section 1"
+                             % (where, m.group(1)))
+        if m:
+            rules[m.group(1)] = line
+    if not rules:
+        if any(SECTION_RE.match(ln) for ln in text.split("\n")):
+            return {"shape": "legacy", "rules": {}, "carried": []}
+        raise RolesError("%s: R0 — the governing doc carries neither a section 1 rule tag nor a "
+                         "'## §<n> — ' heading, so it is no charter this kit reads" % where)
+    carried = []
+    for name in CARRIED_SECTIONS:
+        hit = next(((head, body) for head, body in sections
+                    if head == "## " + name or head.startswith("## %s " % name)), None)
+        if hit is None:
+            raise RolesError("%s: R0 — the governing doc carries section 1 rule tags and no '## %s' "
+                             "section, which every role agent carries" % (where, name))
+        body = list(hit[1])
+        while body and not body[0].strip():
+            body.pop(0)
+        while body and not body[-1].strip():
+            body.pop()
+        carried.append((hit[0][3:], "\n".join(body)))
+    return {"shape": "tagged", "rules": rules, "carried": carried}
+
+
+def extract_microformat_shapes(text):
+    """`{head: definition}` for every ``- `<definition>` `` line between the fence's two markers,
+    each marker a whole line: the first line that is exactly `<!-- microformats -->` and the first
+    that is exactly `<!-- /microformats -->`, CRLF folded. Keyed by the text before the
+    definition's first ` — `; a head defined twice keeps its last definition. `{}` when either
+    marker is absent or the closer comes first. This is how the hooks kit's format guard and the
+    run-log kit's prose reader read the fence (TOOL-aOrientedCast-20, TOOL-aOrientedCast-25)."""
+    lines = text.replace("\r\n", "\n").split("\n")
+    if MICROFORMATS_OPEN not in lines or MICROFORMATS_CLOSE not in lines:
+        return {}
+    a, b = lines.index(MICROFORMATS_OPEN), lines.index(MICROFORMATS_CLOSE)
+    shapes = {}
+    for line in lines[a + 1:b]:
+        m = MICROFORMAT_LINE_RE.match(line)
+        if m:
+            shapes[m.group(1).split(" — ", 1)[0]] = m.group(1)
+    return shapes
+
+
+def extract_prompt_marker(prompt):
+    """The `MARKER_RE` match of the marker line an `Agent` prompt opens with, read as the hooks
+    kit's spawn guard reads it (its rule 6): exactly one line, carriage returns removed, is a whole
+    marker line, and it is the prompt's first line once CRLF is folded, the two ends trimmed and
+    that line's trailing whitespace dropped. None otherwise (TOOL-aOrientedCast-25)."""
+    text = str(prompt)
+    marks = [ln for ln in (raw.replace("\r", "") for raw in text.split("\n")) if MARKER_RE.fullmatch(ln)]
+    first = text.replace("\r\n", "\n").strip().split("\n")[0].rstrip()
+    return MARKER_RE.fullmatch(first) if len(marks) == 1 and first == marks[0] else None
+
+
+def check_rule_tags(charter, value):
+    """`(defects, notes)` for one role's raw `rules` value against `parse_charter`'s structure.
+
+    An entry that is not a lowercase tag (optionally ending in `?`) or repeats a tag is a defect on
+    either shape. On a tagged charter a bare tag section 1 lacks is a defect and an optional one a
+    note; on a legacy charter every well-formed entry is admitted and resolves to nothing.
+    """
+    defects, notes, seen = [], [], set()
+    for e in [x.strip() for x in value.split(",") if x.strip()]:
+        if not RULE_KEY_RE.match(e):
+            defects.append("rules entry '%s' is not a lowercase tag, optionally ending in ?" % e)
+            continue
+        tag = e.rstrip("?")
+        if tag in seen:
+            defects.append("rules tag '%s' is named twice" % tag)
+            continue
+        seen.add(tag)
+        if charter["shape"] != "tagged" or tag in charter["rules"]:
+            continue
+        if e == tag:
+            defects.append("rules tag '%s' names no section 1 rule of the governing doc" % tag)
+        else:
+            notes.append("rules tag '%s' names no section 1 rule of the governing doc, so this role "
+                         "carries no such rule here" % e)
+    return defects, notes
+
+
+def render_charter_blocks(charter, where, value, notes=None):
+    """The charter text a role agent carries: `### Charter rules` holding the section 1 lines the
+    `rules` value cites, in charter order, when it cites any, then each carried section under a
+    `### ` heading, joined by one blank line and ending in one newline; `""` on a legacy charter.
+
+    A defect raises RolesError, one `<where>: R4 — <defect>` line each; a note is appended to
+    `notes` as `<where>: <note>` when a list is given.
+    """
+    defects, found = check_rule_tags(charter, value)
+    if defects:
+        raise RolesError("\n".join("%s: R4 — %s" % (where, d) for d in defects))
+    if notes is not None:
+        notes.extend("%s: %s" % (where, n) for n in found)
+    if charter["shape"] != "tagged":
+        return ""
+    cited = {x.strip().rstrip("?") for x in value.split(",")}
+    lines = [line for tag, line in charter["rules"].items() if tag in cited]
+    blocks = ["### Charter rules\n\n" + "\n".join(lines)] if lines else []
+    blocks += ["### %s\n\n%s" % (head, body) for head, body in charter["carried"]]
+    return "\n\n".join(blocks) + "\n"
 
 
 def parse_front_matter(path, text):
@@ -320,6 +473,83 @@ def load_policy(kit_dir, roles, workflows, notes=None):
     for slot in gates:
         gates[slot] = [n[:-1] if n.endswith("?") else n for n in gates[slot]]
     return data
+
+
+def load_stand_in_waivers(root, memory_root, roles):
+    """`(rows, defects)` of `<MEMORY_ROOT>/project/role-stand-in-waiver.txt` (TOOL-aOrientedCast-19).
+
+    `rows` maps `(build, role)` to `{"line", "date", "who", "role", "build", "reason"}` for each
+    valid row; `defects` holds one `<registry>:<line>: R15 — <what>` line per invalid row, naming
+    the first field that fails. A row is five TAB-separated fields split at the first four TABs,
+    `<date>`, `owner <who>`, `<role>`, `<build>`, `<reason>`; blank lines and `#` lines are ignored. A
+    second row for a `(build, role)` already held is a defect, and the first stays valid. An absent
+    registry yields neither; nothing here raises on a row. `roles` is `load_roles`'s shape.
+    """
+    rel = (pathlib.Path(memory_root) / "project" / STAND_IN_WAIVER).as_posix()
+    path = pathlib.Path(root) / rel
+    rows, defects = {}, []
+    if not path.is_file():
+        return rows, defects
+    try:
+        text = load_text(path)
+    except (RolesError, UnicodeDecodeError) as e:
+        return rows, ["%s: R15 — the registry cannot be read as UTF-8 — %s" % (rel, e)]
+    for n, line in enumerate(text.split("\n"), 1):
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        fields = line.split("\t", 4)
+        what = None
+        if len(fields) < 5:
+            what = "is %d TAB-separated field(s), and a row is five: date, owner, role, build, reason" % len(fields)
+        else:
+            date, who, role, build, reason = fields
+            try:
+                dated = WAIVER_DATE_RE.match(date) and datetime.date.fromisoformat(date)
+            except ValueError:
+                dated = None
+            agent = roles.get(role, {}).get("keys", {}).get("agent", "true")
+            if not dated:
+                what = "date '%s' is not a YYYY-MM-DD calendar date" % date
+            elif not WAIVER_OWNER_RE.match(who):
+                what = "attribution '%s' is not 'owner <who>', so the row is not the owner's" % who
+            elif role not in roles:
+                what = "role '%s' names no role file" % role
+            elif agent == "false":
+                what = "role '%s' is an agent: false role, which is never spawned, so nothing stands in for it" % role
+            elif not SLUG_RE.match(build):
+                what = "build '%s' is not a slug of letters" % build
+            elif not reason.strip():
+                what = "the reason is empty; a waiver says why the role cannot be spawned"
+            elif (build, role) in rows:
+                what = "repeats the row for role %s in build %s at line %d" % (role, build, rows[(build, role)]["line"])
+            else:
+                rows[(build, role)] = {"line": n, "date": date, "who": who[len("owner "):], "role": role,
+                                       "build": build, "reason": reason.strip()}
+        if what:
+            defects.append("%s:%d: R15 — %s" % (rel, n, what))
+    return rows, defects
+
+
+def scan_stand_in_declarations(root, memory_root):
+    """`(declarations, defects)`: every `<MEMORY_ROOT>/builds/*/prompts/*-stand-in.md`, sorted, read
+    through its `gov:handoff` marker as `{"path", "role", "build", "unit"}`, `path` root-relative
+    (TOOL-aOrientedCast-19). A tailed file with no marker line is one `<path>: R15 — ` defect: its
+    name declares a stand-in and it names no role. A handoff without the tail is never read."""
+    root = pathlib.Path(root)
+    found, defects = [], []
+    for p in sorted((root / memory_root / "builds").glob("*/prompts/*%s.md" % STAND_IN_TAIL)):
+        rel = p.relative_to(root).as_posix()
+        try:
+            m = MARKER_RE.search(load_text(p))
+        except (RolesError, UnicodeDecodeError) as e:
+            defects.append("%s: R15 — the stand-in declaration cannot be read as UTF-8 — %s" % (rel, e))
+            continue
+        if not m:
+            defects.append("%s: R15 — named as a stand-in declaration and carries no gov:handoff "
+                           "marker line, so it names no role" % rel)
+            continue
+        found.append({"path": rel, "role": m.group(1), "build": m.group(2), "unit": m.group(3)})
+    return found, defects
 
 
 def resolve_effort(policy, slot):
