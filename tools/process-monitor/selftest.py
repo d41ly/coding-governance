@@ -763,8 +763,8 @@ def test_msys_signal_is_backstopped_by_winpid():
         reap.resolve_signal_binaries, reap.check_msys_addressable, reap.subprocess.run = saved
     backstops = [c[2] for c in calls if c[0] == "taskkill" and c[1:] == ["/PID", c[2], "/F"]]
     check("test_msys_signal_is_backstopped_by_winpid",
-          (sorted(backstops), rep["errors"], sorted(rep["signalled"])),
-          (["1", "2", "4"], [], [1, 2, 4]))
+          (sorted(backstops), rep["errors"], sorted(rep["signalled"]), sorted(rep["backstopped"])),
+          (["1", "2", "4"], [], [1, 2, 4], [1, 2, 4]))
 
 
 def test_taskkill_argv_uses_one_slash():
@@ -776,14 +776,39 @@ def test_taskkill_argv_uses_one_slash():
           ('"/PID"' in src, '"//PID"' in src, '"/T"' in src), (True, False, False))
 
 
-def test_already_gone_is_not_a_signal_error():
-    """Measured against a real tree: a leaves-first kill still cascades, so an ancestor's remaining
-    descendants are gone by the time the walk reaches them. Reporting that as an error trains an
-    operator to ignore the field that matters."""
-    with open(os.path.join(HERE, "reap.py"), encoding="utf-8") as _fh:
-        src = _fh.read()
-    check("test_already_gone_is_not_a_signal_error",
-          ("already_gone" in src and "not found" in src), True)
+def test_backstop_outcomes_are_each_classified():
+    """TOOL-dSweptBranches-24: three members whose MSYS signal is refused, and three backstop answers.
+    A landed backstop is no error; one that finds the process gone is `already_gone`, never an error
+    — a leaves-first kill still cascades, and reporting that as an error trains an operator to
+    ignore the field that matters; a denied one is an error carrying both messages. This replaced an
+    arm that only grepped reap.py for `already_gone`, which stayed green whatever the call sites did."""
+    rows = [build_row(w, p, c, msys_pid=w + 100) for w, p, c in
+            ((1, 999, "bash -c run"), (2, 1, "bash -c ./a.sh"), (3, 1, "bash -c ./b.sh"))]
+    native = {"1": (0, b""), "2": (128, b'ERROR: The process "2" not found.'),
+              "3": (1, b"ERROR: Access is denied.")}
+
+    def stub_run(argv, **_kw):
+        if argv[0] == "kill":
+            return subprocess.CompletedProcess(argv, 1, b"", b"kill: %s: Permission denied"
+                                               % argv[-1].encode())
+        rc, msg = native[argv[2]]
+        return subprocess.CompletedProcess(argv, rc, msg, b"")
+    saved = (reap.resolve_signal_binaries, reap.check_msys_addressable, reap.subprocess.run)
+    reap.resolve_signal_binaries = lambda: {"msys": "kill", "native": "taskkill"}
+    reap.check_msys_addressable = lambda row, binaries: True
+    reap.subprocess.run = stub_run
+    try:
+        rep = reap.run_kill(1, rows, build_scope(1, 2, 3))
+    finally:
+        reap.resolve_signal_binaries, reap.check_msys_addressable, reap.subprocess.run = saved
+    check("test_backstop_outcomes_are_each_classified",
+          (sorted(rep["backstopped"]), rep["already_gone"], [e[0] for e in rep["errors"]]),
+          ([1, 2, 3], [2], [3]))
+    rep.update(killed=[1, 2], survivors=[3], rereads=1)
+    text = reap.render_kill(rep)
+    check("test_backstop_outcomes_are_each_classified (rendered)",
+          ("backstopped 3" in text,
+           "Permission denied" in text and "Access is denied" in text), (True, True))
 
 
 def build_scope(*winpids, **kw):
@@ -1159,6 +1184,7 @@ def test_live_tree_dies_completely():
         # until the launcher and every member the arm grades are present, up to TREE_SPAWN_BOUND; a
         # tree that never completes falls through, and the member check below names what is missing.
         started = time.time()
+        whole = False
         while True:
             rows = read_live_census()
             if rows is None:
@@ -1169,11 +1195,15 @@ def test_live_tree_dies_completely():
             cmds = [by_win.get(w, "") for w in reap.build_walk(rows, launched.pid)]
             if launched.pid in by_win and \
                     all(any(hit(c) for c in cmds) for _name, hit in staged[1:]):
+                whole = True
                 break
             if time.time() - started > TREE_SPAWN_BOUND:
                 break
             time.sleep(0.5)
-        print("  the staged tree was whole in the census after %.1fs" % (time.time() - started))
+        # Two exits, so the line reads the flag, never one exit's outcome.
+        print("  the staged tree was %s in the census after %.1fs"
+              % ("whole" if whole else "NOT whole (bound %ds)" % TREE_SPAWN_BOUND,
+                 time.time() - started))
         # OUR launcher by pid, never the first row carrying the marker: a stray from an earlier
         # run — one staged under a clone the roots do not admit, measured — is found first and
         # reads as "not in scope" for a tree that is.

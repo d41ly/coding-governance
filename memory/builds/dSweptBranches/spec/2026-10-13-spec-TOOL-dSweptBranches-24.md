@@ -1,10 +1,13 @@
 # TOOL-dSweptBranches-24 — the follow-up review's process-monitor items, batched
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 21
+**Status:** CLOSED · rev-1 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 21
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-13-build-TOOL-dSweptBranches-24-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-dSweptBranches-24-1-acceptance-ledger.md) | journal | — |
+| [2026-10-13-prompt-TOOL-dSweptBranches-24-1-build-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-24-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -64,6 +67,7 @@ an unloaded node, because the tree usually spawns inside three seconds. The clas
 - `tools/process-monitor/selftest.py`
 - `memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-21.md`, the erratum
 - `memory/gotchas/observed-by-claim-no-arm-discharges.md`
+- `memory/gotchas/one-value-field-records-a-mixed-outcome.md`
 
 ### Alternatives rejected
 

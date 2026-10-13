@@ -18768,11 +18768,6 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
-      "id": "test_already_gone_is_not_a_signal_error",
-      "kind": "function",
-      "file": "tools/process-monitor/selftest.py"
-    },
-    {
       "id": "test_archive_segment_after_archive_is_durable",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -18826,6 +18821,11 @@
       "id": "test_backlog_stragglers",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_backstop_outcomes_are_each_classified",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_base_is_remote_tracking",

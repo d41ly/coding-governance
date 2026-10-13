@@ -51,6 +51,10 @@ carry the split: a second grammar nothing reads is worse than a lossy field ever
 Say in the record's own provenance that the value is a lower bound and where the rest of the story
 is. A lossy field that ADMITS it is lossy is fine; one that reads as complete is not.
 
+The same shape in a log line: a loop with two exits followed by one message that states one exit's
+outcome. `TOOL-dSweptBranches-24` met it in a spawn poll that printed "whole" after a timeout too;
+the message reads a flag set at the exit it describes.
+
 ## Arming it
 
 **There is NO MACHINE GATE for this class, and the gap is stated rather than implied away.** No check can see that an outcome was

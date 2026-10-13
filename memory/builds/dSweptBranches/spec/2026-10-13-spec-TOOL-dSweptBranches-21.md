@@ -120,6 +120,9 @@ none
 - rev-1 · 2026-10-13 · initial draft, at the owner's instruction to build the asks.
 - rev-2 · 2026-10-13 · S2, AC2 and AC3: measuring the arm found the reaper's MSYS signal missing a
   native grandchild, a larger cause than the fixed sleep.
+- erratum · 2026-10-13 · §7's AC1 line names a shipped arm with a staged five-second delay, and none
+  ships: AC1 was observed by hand on a scratch edit, its bytes restored. A poll reverted to the fixed
+  wait stays green on an unloaded node. `TOOL-dSweptBranches-24` records this.
 
 ## 10. Reuse audit
 

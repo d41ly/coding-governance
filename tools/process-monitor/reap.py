@@ -228,6 +228,7 @@ def run_kill(target, rows, scope, dry_run=False):
                 unsignalable.append(winpid)
                 continue
             done = subprocess.run(argv, capture_output=True, timeout=SIGNAL_TIMEOUT_S)
+            also = ""
             if argv[0] == binaries["msys"] and binaries.get("native"):
                 # THE WINPID BACKSTOP (TOOL-dSweptBranches-21). An MSYS id does not always address
                 # the process the census paired it with. Measured on a live tree: a native
@@ -243,6 +244,9 @@ def run_kill(target, rows, scope, dry_run=False):
                 if done.returncode != 0 and (backstop.returncode == 0
                                              or check_gone_blob(backstop)):
                     done = backstop
+                elif done.returncode != 0:
+                    # Both refused: the error carries both messages, never only the first.
+                    also = " · taskkill: " + read_signal_blob(backstop)[:120]
             if done.returncode != 0:
                 # CLASSIFIED, not collapsed. invalid-argument, access-denied and no-such-process
                 # are three outcomes and reporting all three the same way is how a wrong-namespace
@@ -256,7 +260,7 @@ def run_kill(target, rows, scope, dry_run=False):
                 if check_gone_blob(done):
                     already_gone.append(winpid)
                 else:
-                    errors.append((winpid, done.returncode, read_signal_blob(done)[:120]))
+                    errors.append((winpid, done.returncode, read_signal_blob(done)[:120] + also))
             signalled.append(winpid)
 
     return {
@@ -325,10 +329,11 @@ def render_kill(report):
               len(report.get("withheld", ())))]
     if "killed" in report:
         out.append("reap: killed %d · survivors %d · already gone %d · unsignalable %d "
-                   "· signal errors %d · census reads %d"
+                   "· signal errors %d · backstopped %d · census reads %d"
                    % (len(report["killed"]), len(report["survivors"]),
                       len(report.get("already_gone", ())), len(report["unsignalable"]),
-                      len(report["errors"]), report.get("rereads", 1)))
+                      len(report["errors"]), len(report.get("backstopped", ())),
+                      report.get("rereads", 1)))
     for winpid, rc, msg in report["errors"]:
         out.append("reap:   signal error on %d (rc %d): %s" % (winpid, rc, msg))
     for winpid in report["unsignalable"]:
