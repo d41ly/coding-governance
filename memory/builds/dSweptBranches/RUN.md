@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: 2b852f5fd87147540a0a73d310354440c84c72ea · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 0ac2418c05fad32467e20a93f04b8546383a1c4d
-phase: REVIEWING
+witness: a24c01529c3f805b22e650bbb2963fc7b7fafa45
+phase: VERIFYING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/musing-lumiere-ab7980
