@@ -24,19 +24,19 @@ parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 refreshed-at: 2b852f5fd87147540a0a73d310354440c84c72ea · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 42f6109ac130c0b7d795fac78d38b81c33508840
-phase: HELD
+witness: e8a7b7ca470937a5f43c19ce72c89e9f6266c7d8
+phase: LANDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/musing-lumiere-ab7980
 anchor-kind: local
 cli-version: 2.1.295
-lease-utc: 2026-10-13T10:32:13Z
+lease-utc: 2026-10-13T13:22:32Z
 pid-image: claude.exe
 host: compeeto
 pid: 26524
 session: b5b52897-9613-45cf-bd70-69865ae3878c
-keepalive: ca711d31
+keepalive: 0755d46d
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 2b852f5fd87147540a0a73d310354440c84c72ea
 anchor-ref: refs/heads/main
@@ -193,3 +193,5 @@ base: a8f0e195a2d80a6d1480e4992aec6565342e35ea
 2026-10-13T11:41:42Z dispatch · item 553c01f8 TOOL-dSweptBranches-24 · reason tools/process-monitor/selftest.py tools/process-monitor/reap.py memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-24.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-5.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-19.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-21.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-24-1-acceptance-ledger.md memory/project/unarmed-branches.txt memory/map/features/process-monitor.md
 
 2026-10-13T12:04:22Z hold · item host-owner-action · reason until owner · reaped ca711d31 · resume none(owner)
+
+2026-10-13T13:22:36Z resume · item dSweptBranches · reason held · keepalive 0755d46d · manual
