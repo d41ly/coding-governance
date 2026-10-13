@@ -92,7 +92,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 26 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
+**Build status:** INPROGRESS · 27 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
 ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9
 ids TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 TOOL-aOrientedCast-22
 
@@ -123,17 +123,18 @@ ids TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrie
 | [TOOL-aOrientedCast-19 — an inline stand-in for a role declares itself through its handoff, and needs a dated owner waiver row](spec/2026-10-13-spec-TOOL-aOrientedCast-19.md) | 19 | 2 | INPROGRESS | rev-2 | 2026-10-13 |
 | [PLAY-aOrientedCast-2 — the charter's `[roles]` rule and its generated Agent roles section](spec/2026-10-13-spec-PLAY-aOrientedCast-2.md) | 20 | 2 | OPEN | rev-2 | 2026-10-13 |
 | [PLAY-aOrientedCast-3 — the charter's `agent` and `returned` micro-formats, mandatory for every agent a turn dispatches or receives](spec/2026-10-13-spec-PLAY-aOrientedCast-3.md) | 21 | 2 | OPEN | rev-2 | 2026-10-13 |
-| [TOOL-aOrientedCast-20 — the roles kit derives each agent's dispatch and return lines, and adds them to a generated per-build agent ledger](spec/2026-10-13-spec-TOOL-aOrientedCast-20.md) | 22 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-20 — the roles kit derives each agent's dispatch and return lines, and adds them to a generated per-build agent ledger](spec/2026-10-13-spec-TOOL-aOrientedCast-20.md) | 22 | 2 | OPEN | rev-2 | 2026-10-13 |
 | [TOOL-aOrientedCast-21 — format-guard refuses a final message that omits an agent line for an agent its turn dispatched or received](spec/2026-10-13-spec-TOOL-aOrientedCast-21.md) | 23 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-22 — gate-guard refuses AskUserQuestion from the session holding a live unattended run's lease, and names the park](spec/2026-10-13-spec-TOOL-aOrientedCast-22.md) | 24 | 2 | OPEN | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
 Records: 45 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aOrientedCast-22.
 
 Ids no `spec-audit` record has ever named: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7
 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20
-TOOL-aOrientedCast-21.
+TOOL-aOrientedCast-21 TOOL-aOrientedCast-22.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -163,6 +164,7 @@ TOOL-aOrientedCast-21.
 | 21 | `PLAY-aOrientedCast-3` | no |
 | 22 | `TOOL-aOrientedCast-20` | no |
 | 23 | `TOOL-aOrientedCast-21` | no |
+| 24 | `TOOL-aOrientedCast-22` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

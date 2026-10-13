@@ -1,6 +1,6 @@
 # PLAY-aOrientedCast-3 — the charter's `agent` and `returned` micro-formats, mandatory for every agent a turn dispatches or receives
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams playbook · order 21
+**Status:** OPEN · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams playbook · order 21
 
 <!-- gen:spec-records -->
 
@@ -17,7 +17,8 @@ its role, effort, model, unit, the prompt it was oriented with, its write class 
 its run and agent ids, and on return what it produced, its wall time and its tokens. This unit puts
 the two line shapes into the charter's micro-format fence and a rule making them mandatory, so the
 roles kit's verb fills them and `format-guard` reads them from one source. The template moves to
-v4.4, the build's one move of it.
+v4.4, the build's one move of it, and the charter's size ceiling rises to 20480 bytes on the owner's
+ruling, recorded beside the figure and in the decision index.
 
 ## 2. Scope (IN)
 
@@ -31,9 +32,14 @@ v4.4, the build's one move of it.
 - **S4** — `AGENTS.md` is re-rendered with `bash tools/playbook/adopt-playbook.sh --target .`, and
   the agent types are left as they are. Observed by AC2 and AC6.
 - **S5** — Both size subjects re-record their row in `tools/template-size-highwater.txt` with
-  `--bump`, inside the ceiling §8 F1 settles. Observed by AC5.
+  `--bump`, inside the 20480-byte ceiling S7 declares. Observed by AC5.
 - **S6** — The same commit re-stamps `last-audit` in `memory/guides/SESSION-KICKOFF.md`, whose
   `watch:` list holds the template, as `PLAY-aOrientedCast-2` S7 states the rule. Observed by AC7.
+- **S7** — The `AGENTS.md` row of `tools/template-size-limits.txt` (`:65`) moves from 16384 to
+  20480, and its comment block gains the movement, argued as the file's earlier movements are, under
+  §4 "The ceiling". Observed by AC9.
+- **S8** — `memory/DECISIONS.md` gains the raise as one row at the end of its `## PLAY — playbook`
+  group, under §4 "The ceiling". Observed by AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -45,7 +51,8 @@ v4.4, the build's one move of it.
   (`:162`). None of the three lists a head it would have to learn, so none moves here.
 - A help page. The fields and where each comes from are the verb's to describe, so
   `TOOL-aOrientedCast-20` edits `help/roles.md`.
-- Raising `AGENTS.md`'s ceiling without the owner's ruling (§8 F1).
+- Any other row of `tools/template-size-limits.txt`, and any value for `AGENTS.md`'s but the
+  owner's 20480 (§8 F1).
 - Rewording any other charter rule to make room.
 
 ### Edges
@@ -134,10 +141,39 @@ help page that unit edits are where an agent learns its name.
 PINNED on 2026-10-13 at `1e89fa5cd`. Block E costs 272 bytes with its newlines and block F 156;
 the four marker lines render to nothing. Gov's `AGENTS.md` is 14762 bytes. `PLAY-aOrientedCast-2`
 §4 "Bytes, measured" projects 14918 without the roster, and the roster measures 1383 bytes from
-`handoff.py roster` here, so the charter reaches 16301 before this unit and 16729 after it. The
-ceiling is 16384 (`tools/template-size-limits.txt:65`), so this unit cannot land under it: 345 bytes
-over, which §8 F1 puts to the owner. The template grows by about 510 bytes to roughly 13700 against
-its 49152 ceiling (`:33`). The builder re-measures both after `PLAY-aOrientedCast-2` lands.
+`handoff.py roster` here, so the charter reaches 16301 before this unit and 16729 after it. That is
+345 bytes over the 16384 ceiling of `tools/template-size-limits.txt:65`, and the owner raised the
+ceiling to 20480 (§8 F1), which leaves 3751 bytes. The template grows by about 510 bytes to roughly
+13700 against its 49152 ceiling (`:33`). The builder re-measures both after `PLAY-aOrientedCast-2`
+lands.
+
+### The ceiling
+
+The owner ruled on 2026-10-13 to raise `AGENTS.md`'s ceiling to 20480 bytes, 20 KiB. The row
+becomes `AGENTS.md`, a TAB, `20480`. The file argues each movement in place, in capitals, inside the
+subject's comment block. The template's opens `RAISED from 32768 on owner order, 2026-08-16` and
+cites the decision index and the unit that ruled it (`:28-32`); this one's opens
+`LOWERED to 16384 (16 KiB) at v4.0` and names its unit (`:61-64`), inside its block at `:47-64`. So a
+paragraph follows the LOWERED one, directly above the row:
+
+```text
+# RAISED to 20480 (20 KiB) on owner order, 2026-10-13 (memory/DECISIONS.md, PLAY-aOrientedCast-3).
+# The agent and returned micro-formats and their rule put the charter at 16729 bytes against 16384,
+# once the role roster had left 83 free. 20 KiB leaves room for more roles and rules without another
+# owner turn soon, and keeps the whole file at 62% of the 32768 bytes a Codex agent reads.
+```
+
+The decision row is appended after the `## PLAY — playbook` group's last row and before
+`## KICK — kickoff`, in the `- <id> · <decision> (owner)` shape of `TOOL-aSiftedPlaybook-1`'s ceiling
+row (`memory/DECISIONS.md:40`). It is 260 characters, under the 300 that `ENTRY_CAP_CHARS` allows an
+index entry (hygiene check 7):
+
+```text
+- PLAY-aOrientedCast-3 · `AGENTS.md` ceiling 16384->20480 (owner, 2026-10-13): the agent and returned micro-formats put the charter at 16729; 20 KiB leaves room for more roles and rules without another owner turn soon, still 62% of the 32768 bytes Codex reads.
+```
+
+The index holds no other `PLAY-aOrientedCast-3` row, as check 20 requires of a row document, and
+the id resolves to this spec's H1.
 
 ### Kit version
 
@@ -168,17 +204,16 @@ conf key is minted, so no `.lexicon.conf` cell grades a name here.
 
 ### Files touched (estimate)
 
-`coding-governance-agents.template.md` · `AGENTS.md` · `tools/template-size-highwater.txt` · `tools/template-size-limits.txt` · `memory/guides/SESSION-KICKOFF.md`
-
-The ceiling row is touched only under §8 F1 (a), in the commit that records the owner's ruling.
+`coding-governance-agents.template.md` · `AGENTS.md` · `tools/template-size-highwater.txt` · `tools/template-size-limits.txt` · `memory/guides/SESSION-KICKOFF.md` · `memory/DECISIONS.md`
 
 ### Rollout
 
-1. Apply blocks E to G to the template.
+1. Apply blocks E to G to the template, and write the row, comment and decision row of §4 "The
+   ceiling".
 2. Render: `bash tools/playbook/adopt-playbook.sh --target .`.
 3. `python tools/roles/render_agents.py --check`; on any drift, stop and report (AC6).
-4. Measure `AGENTS.md` with carriage returns stripped. Past the ceiling §8 F1 settles, commit
-   nothing and return the figure.
+4. Measure `AGENTS.md` with carriage returns stripped. Past 20480, commit nothing and return the
+   figure.
 5. `bash tools/check-template-size.sh --bump`, then `bash tools/check-template-size.sh --bump AGENTS.md`.
 6. Re-stamp `last-audit` as `PLAY-aOrientedCast-2` §4 "Rollout" step 7 states, check 9's count included.
 7. Commit once, with the unit id in the subject.
@@ -189,8 +224,8 @@ until its owner merges them, as for `PLAY-aOrientedCast-2`'s blocks.
 ### Alternatives rejected
 
 - **Extending `[events]` instead of a new rule.** At 188 characters it has no room for the two
-  heads under the 200-character one-line limit, and a reworded `[events]` still leaves the shapes
-  over the ceiling, so it buys nothing §8 F1 does not already decide.
+  heads under the 200-character one-line limit, and a reworded `[events]` still left the shapes
+  over the old ceiling, so it bought nothing §8 F1 did not decide.
 - **Unfenced blocks.** A charter without the roles kit would demand lines nothing derives.
 - **Labels dropped from the agent shape**, such as `effort` and `model`. It saves about 40 bytes,
   far short of the overage, and a bare `high` beside a bare model name reads ambiguously.
@@ -206,7 +241,8 @@ until its owner merges them, as for `PLAY-aOrientedCast-2`'s blocks.
 - error / empty / loading states — a target without the roles kit renders none of this (AC3); a
   definition breaking the grammar reds `micro-format definitions` at the close.
 - observability — the render's notes, and P4's line.
-- risks — the charter ceiling (§8 F1). A role that later cites `agents` changes its agent type,
+- risks — the charter sits at about 16729 of its new 20480 bytes, so the raise funds roughly 3.7 KB
+  of later rules before the next owner turn. A role that later cites `agents` changes its agent type,
   which `render_agents.py --check` reports. Seeded templates lag, as for `PLAY-aOrientedCast-2`.
 - testing — P3, P4 and the greps of §6; the size, line-length, micro-format, parity, render,
   placeholder, epoch, version, manifest and roles legs at the close. No new arm.
@@ -247,6 +283,20 @@ write mode or runs a probe of §4.
 - **AC8** — When probe P4 runs on the unit's commit, it prints `shapes ok`.
   Red when: a reader of the fence cannot key either head, a well-formed line fails its shape, or a
   line without its run field passes.
+- **AC9** — When `awk -F'\t' '$1 == "AGENTS.md" { print $2 }' tools/template-size-limits.txt` runs on
+  the unit's commit, it prints `20480`;
+  `grep -n "LOWERED to 16384\|RAISED to 20480 (20 KiB) on owner order, 2026-10-13\|^AGENTS.md" tools/template-size-limits.txt`
+  prints the LOWERED line, then the RAISED line, then the row, in that order; and
+  `grep -c "RAISED to 20480.*DECISIONS.md, PLAY-aOrientedCast-3" tools/template-size-limits.txt`
+  prints 1.
+  Red when: the ceiling moves to another value, or moves with no argued movement above its row.
+- **AC10** — When `grep -c "^- PLAY-aOrientedCast-3 · " memory/DECISIONS.md` runs on the unit's
+  commit, it prints 1; `grep -n "^## \|^- PLAY-aOrientedCast-3 · " memory/DECISIONS.md` shows the row
+  between `## PLAY — playbook` and `## KICK — kickoff`; and
+  `grep "^- PLAY-aOrientedCast-3 · " memory/DECISIONS.md | awk '{ print length($0) }'` prints at most
+  300.
+  Red when: the raise has no decision row, the row sits outside its family group or twice, or it
+  passes the index's entry cap.
 
 ## 7. Gates
 
@@ -258,6 +308,9 @@ of gov's `AGENTS.md`. The main loop runs the legs once, at the close; no pass ru
 ## 8. Open questions
 
 - **F1 — `AGENTS.md` measures 16729 bytes after this unit, past its 16384-byte ceiling. What gives?**
+  RESOLVED (owner, 2026-10-13): (a), raising the ceiling to 20480 bytes, +4 KiB, rather than the
+  recommended 17408. It leaves room for more roles and rules without another owner turn soon, and the
+  charter is still 62% of the 32768 bytes Codex reads. §4 "The ceiling" carries it; S7 and S8 land it.
   (a) Raise the `AGENTS.md` row of `tools/template-size-limits.txt` to 17408, one KiB more, with the
   owner's ruling recorded in `memory/DECISIONS.md`. That file and the size gate's own message make a
   raise an owner decision: M3 veto 2, so no delegated resolver exists.
@@ -279,6 +332,11 @@ of gov's `AGENTS.md`. The main loop runs the legs once, at the close; no pass ru
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft.
+- rev-2 · 2026-10-13 · §8 F1 · §1 · S5 · S7 · S8 · §3 · §4 · §5 · AC9 · AC10 · folded the owner's
+  ruling on F1: `AGENTS.md`'s ceiling rises to 20480. S7 and AC9 add the limits row and its argued
+  movement, S8 and AC10 the decision row; §4 gains "The ceiling" with both texts, its files touched
+  gain `memory/DECISIONS.md`, and its bytes, rollout step 4, §3 and §5 read the new ceiling. AC5
+  already read the ceiling from the limits file, so its text did not move.
 
 ## 10. Reuse audit
 

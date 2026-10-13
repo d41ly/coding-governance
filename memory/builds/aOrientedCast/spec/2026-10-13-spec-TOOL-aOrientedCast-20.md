@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-20 — the roles kit derives each agent's dispatch and return lines, and adds them to a generated per-build agent ledger
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 22
+**Status:** OPEN · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 22
 
 <!-- gen:spec-records -->
 
@@ -44,6 +44,9 @@ the build's agent ledger.
   Observed by AC10 for the help page; the rest is NOT OBSERVED: prose, read by the closing review.
 - **S8** — The roles kit moves from 1.2 to 1.3 with every carrier: this is the last unit of the set
   to touch `tools/roles/`. Observed by AC9.
+- **S9** — The two location probes at `tools/roles/adopt-roles.test.sh:29-30` run with `GIT_DIR` and
+  `GIT_WORK_TREE` unset, first in their substitutions, under §4 "The suite's location probes", and
+  arm 9 adds no bare one. Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -256,6 +259,21 @@ The header's arm list gains the arm, and `FLOOR_ASSERTIONS` (`:52`) rises from 1
 comment naming this unit. Gov's charter is the fixture's charter, so the arm needs
 `PLAY-aOrientedCast-3`'s shapes in gov's `AGENTS.md`.
 
+### The suite's location probes
+
+The leg `shell hygiene (a location probe asked from a moved directory)` flags
+`tools/roles/adopt-roles.test.sh:29-30` at `1e89fa5cd`: `REPO=$(git -C "$HERE" rev-parse --show-toplevel …)`
+and `KREL=$(git -C "$HERE" rev-parse --show-prefix …)` are asked bare. With `GIT_DIR` exported and
+no `GIT_WORK_TREE`, as git exports it into a linked worktree's hooks, git takes `$HERE` itself for
+the top of the work tree, so the toplevel reads as the kit's own directory and the prefix as empty
+(`tools/gate-lint/sh_hygiene.py:22-28`). The one scrub the scanner accepts is the probe as the FIRST
+command of a substitution opening `(unset GIT_DIR GIT_WORK_TREE;` (`PROBE_SCRUB` and `SCRUBBED`,
+`:189-190`); a top-level `unset`, the other variable order or a third variable still grade bare
+(`:1133-1134`). So each line becomes `$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse …)`,
+the spelling `TOOL-aHeardState-8` gave the format-guard suite (`tools/hooks/format-guard.test.sh:19`),
+with the rest of each line unchanged. No registry row is written: a waiver would keep a probe that a
+scrub corrects. Arm 9 asks git nothing about its own location; any probe it adds takes the same scrub.
+
 ### Documentation
 
 - `handoff.py`'s docstring: the usage line, one paragraph on the verb, the exits, and, under WHAT THIS
@@ -418,10 +436,17 @@ break is restored before the next.
 - **AC10** — When `grep -n "## What each agent line tells you\|handoff.py agents\|agent-ledger\|unknown" help/roles.md`
   runs, it shows the section, the verb, the ledger's name and the meaning of `unknown`.
   Red when: the page omits the section, the verb, the ledger or `unknown`.
+- **AC11** — When
+  `python -c "import sys; sys.path.insert(0, 'tools/gate-lint'); import sh_hygiene as s; r = s.scan_probe_file(open(sys.argv[1], encoding='utf-8').read()); print(len(r['bare']), sorted(k for _, k, _ in r['scrubbed']))" tools/roles/adopt-roles.test.sh`
+  runs on the unit's commit, it prints `0` and two scrubbed keys, one ending `--show-prefix` and one
+  ending `--show-toplevel`; and `grep -c "=\$(unset GIT_DIR GIT_WORK_TREE; git -C" tools/roles/adopt-roles.test.sh`
+  prints 2.
+  Red when: either probe is still asked bare, or its scrub sits anywhere but first in its
+  substitution, which the scanner grades bare.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `install-prefix (shipped surface)` · `encoding posture (text IO names its encoding)` · `govkit selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `install-prefix (shipped surface)` · `encoding posture (text IO names its encoding)` · `shell hygiene (a location probe asked from a moved directory)` · `govkit selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC5 · arm 9, against a `handoff.py` whose per-message-id maximum is staged to a per-record sum, so the returned line reads `1.9k out` · `FLOOR_ASSERTIONS` raised from 16 to 19
 
@@ -468,6 +493,10 @@ No pass runs a leg above.
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft.
+- rev-2 · 2026-10-13 · S9 · AC11 · §4 · §7 · the location-probe leg flags the two bare probes at
+  `tools/roles/adopt-roles.test.sh:29-30`, a file this unit already edits: S9 and §4 "The suite's
+  location probes" scrub both as the scanner accepts, AC11 observes it through the scanner's own
+  `scan_probe_file`, and §7 names the leg.
 
 ## 10. Reuse audit
 
