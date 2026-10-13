@@ -21,11 +21,14 @@
 # THE LOAD is AB_LOAD concurrent loops of `true` spawns, armed before the arm's bar and killed by
 # pid after it: repeatable, unlike a neighbouring bar.
 set -u
+# The launcher, resolved before any cd from the repository this record sits in, four levels up.
+. "${BASH_SOURCE[0]%/*}/../../../../tools/lib/resolve-python.sh" || exit 2
+PY=$(resolve_python) || exit 2
 clone=${1:?frozen clone}; legs=${2:?legs subset manifest}; rows=${3:?rows file}
 AB_LOAD=${AB_LOAD:-8}
 legs=$(cd "$(dirname "$legs")" && pwd)/$(basename "$legs")
 common=$(git -C "$clone" rev-parse --path-format=absolute --git-common-dir) || exit 2
-nlegs=$(python -c 'import json,sys; print(len(json.load(open(sys.argv[1], encoding="utf-8"))))' "$legs") || exit 2
+nlegs=$("$PY" -c 'import json,sys; print(len(json.load(open(sys.argv[1], encoding="utf-8"))))' "$legs") || exit 2
 node=$(hostname)
 loader=()
 

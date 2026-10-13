@@ -22,3 +22,13 @@ tools/template-size-limits.txt · the DECLARED byte ceiling for the rendered met
 tools/template-size-highwater.txt · the MEASURED high-water for the rendered method, written by --bump and never by hand — a measurement of the file, never a restatement of it
 tools/unattended/ASKS.template.md · the ask guide names M2 as the one carrier of how asks group into a unit and points there; it states no rule of the method
 coding-governance-agents.template.md · v4.0's memory-tree protocol line points a build of more than one pass at the method
+.claude/agents/gov-builder.md · rendered role agent; it cites M6 for the gate and suite verdicts the main loop runs at the close
+.claude/agents/gov-diff-reviewer.md · rendered role agent; it cites M6 for the gates it judges from source and never runs
+.claude/agents/gov-orienter.md · rendered role agent; it cites M5 for the two context commands of a path set
+.claude/agents/gov-researcher.md · rendered role agent; it cites M12 as how it works, and restates no step of it
+.claude/agents/gov-skeptic.md · rendered role agent; it cites M6 for why it runs no gate
+.claude/agents/gov-spec-reviewer.md · rendered role agent; it cites M6 for why it runs no gate
+.claude/agents/gov-spec-writer.md · rendered role agent; it cites M2 for the one-mechanism unit it writes
+.claude/agents/gov-synthesizer.md · rendered role agent; it cites M6 for the verdicts left to the main loop
+.claude/skills/build/SKILL.md · rendered router Skill; it names the method as the procedure it loads whole, and restates none of it
+tools/roles/SKILL.template.md · the SOURCE the build router Skill is rendered from; it names the method as the procedure the router loads

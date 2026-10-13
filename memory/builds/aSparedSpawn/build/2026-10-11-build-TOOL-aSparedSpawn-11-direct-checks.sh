@@ -12,6 +12,9 @@
 #   onesignal  selftest.read_one_signal against the report subprocess for every signal, over a
 #              hand-built repository; no selftest test function is called.
 set -u
+# The launcher, resolved before any cd from the repository this record sits in, four levels up.
+. "${BASH_SOURCE[0]%/*}/../../../../tools/lib/resolve-python.sh" || exit 2
+PY=$(resolve_python) || exit 2
 GOV=$1; W=$2; shift 2
 STEPS=${*:-ac7 runner onesignal}
 mkdir -p "$W"
@@ -136,7 +139,7 @@ print("map %d for %d SIGNALS; report() %.1fs; %d in-process reads %.1fs; %d diff
 shutil.rmtree(tmp, ignore_errors=True)
 sys.exit(1 if bad or len(st.SIGNAL_ORDER) != len(dr.SIGNALS) else 0)
 PY
-  python -B -c "$ONESIG" "$GOV/tools/drift-audit" "$W" > "$W/onesig.out" 2>&1
+  "$PY" -B -c "$ONESIG" "$GOV/tools/drift-audit" "$W" > "$W/onesig.out" 2>&1
   check_step $? "AC4 on a hand-built repository: $(tail -1 "$W/onesig.out")"
 ;; esac
 

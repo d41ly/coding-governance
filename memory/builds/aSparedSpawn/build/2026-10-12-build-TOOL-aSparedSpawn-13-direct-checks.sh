@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** journal TOOL-aSparedSpawn-13
 # The direct checks TOOL-aSparedSpawn-13's pass ran: the changed runner and the changed pre-push hook,
 # each invoked directly in a hand-built fixture with its own local bare remote. No suite, no bar.
 #   bash memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-13-direct-checks.sh [scratch dir]

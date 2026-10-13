@@ -16,6 +16,9 @@
 #   ac8  the kickoff S4 command over the shipped checker and a copy whose read_session_id reads
 #        stdin although --session answered (the second waits 120 s)
 set -u
+# The launcher, resolved before any cd from the repository this record sits in, four levels up.
+. "${BASH_SOURCE[0]%/*}/../../../../tools/lib/resolve-python.sh" || exit 2
+PY=$(resolve_python) || exit 2
 R=${1:?repo root}; S=${2:?scratch dir}; step=${3:?step}
 mkdir -p "$S" || exit 2
 # The shell's own spelling of the scratch dir: ac3 puts a directory under it on PATH, and a `C:/`
@@ -31,7 +34,7 @@ ac1)
   B='  if (!/([A-Za-z_$][\w$]*)$/.test(line.slice(0, p + 1))) return false' \
     awk '/^  let s = p\r?$/ { print ENVIRON["B"] } { print }' "$R/tools/hooks/agent-cap.js" > "$S/broken-cap.js"
   cmp -s "$S/broken-cap.js" "$R/tools/hooks/agent-cap.js" && { echo "the staged break matched nothing"; exit 2; }
-  build_payload() { python -c "
+  build_payload() { "$PY" -c "
 import json, sys
 n = 8000; j = (',' + chr(10)) if sys.argv[1] == 'nl' else ','
 print(json.dumps({'tool_name':'Workflow','tool_input':{'script': 'const x = [' + j.join(\"f(a%d, void 'lit%d')\" % (i, i) for i in range(n)) + ']'}}))
