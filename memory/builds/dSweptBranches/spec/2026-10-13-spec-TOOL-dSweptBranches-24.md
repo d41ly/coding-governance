@@ -1,6 +1,6 @@
 # TOOL-dSweptBranches-24 — the follow-up review's process-monitor items, batched
 
-**Status:** CLOSED · rev-1 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 21
+**Status:** CLOSED · rev-2 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 21
 
 <!-- gen:spec-records -->
 
@@ -114,6 +114,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · promoted at the follow-up's closing diff review, round 1 (M2, M3, M4, L1, L2).
+- rev-2 · 2026-10-13 · the close's bar, §4: S2's stubs are `run_stub`, a declared verb (lexicon pin 1070
+  over 1068); unit 23's two `check_old_render || exit 1` sites are pinned beside the adopter's other
+  exits; specs 5, 19 and 21 declare the hands-off edges their consumers name (hygiene check 12).
 
 ## 10. Reuse audit
 

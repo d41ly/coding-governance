@@ -46,7 +46,7 @@ the winpid the census read kills it every time.
 
 ### Edges
 
-none
+- **hands-off** `TOOL-dSweptBranches-24` — the follow-up unit that consumes this one.
 
 ## 4. Design
 

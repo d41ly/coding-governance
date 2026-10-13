@@ -51,6 +51,7 @@ reference moves with it, so no adopter renders, triggers or wires a skill by the
 ### Edges
 
 - **consumes-from** `TOOL-dSweptBranches-5` — the skill, its adopter and its descriptor rows.
+- **hands-off** `TOOL-dSweptBranches-23` — the follow-up unit that consumes this one.
 
 ## 4. Design
 

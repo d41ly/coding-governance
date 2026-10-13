@@ -51,6 +51,7 @@ safe rows.
 ### Edges
 
 - **consumes-from** `TOOL-dSweptBranches-3` — the write flags the routes drive.
+- **hands-off** `TOOL-dSweptBranches-19` — the follow-up unit that consumes this one.
 
 ## 4. Design
 

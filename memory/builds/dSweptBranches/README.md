@@ -115,7 +115,7 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-20 — gov's range readers audited for a merge read as additions](spec/2026-10-13-spec-TOOL-dSweptBranches-20.md) | 18 | 1 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-21 — the reaper backstops an MSYS signal with the winpid, and the live-tree arm waits for its tree](spec/2026-10-13-spec-TOOL-dSweptBranches-21.md) | 19 | 2 | CLOSED | rev-2 | 2026-10-13 |
 | [TOOL-dSweptBranches-23 — the adopter withdraws the old `/branch-reconcile` render, and `--check` reds while it stays](spec/2026-10-13-spec-TOOL-dSweptBranches-23.md) | 20 | 2 | CLOSED | rev-1 | 2026-10-13 |
-| [TOOL-dSweptBranches-24 — the follow-up review's process-monitor items, batched](spec/2026-10-13-spec-TOOL-dSweptBranches-24.md) | 21 | 2 | CLOSED | rev-1 | 2026-10-13 |
+| [TOOL-dSweptBranches-24 — the follow-up review's process-monitor items, batched](spec/2026-10-13-spec-TOOL-dSweptBranches-24.md) | 21 | 2 | CLOSED | rev-2 | 2026-10-13 |
 <!-- /gen:build-units -->
 
 Records: 49 bound to this build, across 4 record folder(s).

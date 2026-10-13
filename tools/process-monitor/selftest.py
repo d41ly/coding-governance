@@ -748,7 +748,7 @@ def test_msys_signal_is_backstopped_by_winpid():
             ((1, 999, "bash -c run"), (2, 1, "bash -c ./rel.sh"), (4, 2, "python.exe -c pass"))]
     calls = []
 
-    def stub_run(argv, **_kw):
+    def run_stub(argv, **_kw):
         calls.append(list(argv))
         refused = argv[0] == "kill" and argv[-1] == "104"
         return subprocess.CompletedProcess(argv, 1 if refused else 0, b"",
@@ -756,7 +756,7 @@ def test_msys_signal_is_backstopped_by_winpid():
     saved = (reap.resolve_signal_binaries, reap.check_msys_addressable, reap.subprocess.run)
     reap.resolve_signal_binaries = lambda: {"msys": "kill", "native": "taskkill"}
     reap.check_msys_addressable = lambda row, binaries: True
-    reap.subprocess.run = stub_run
+    reap.subprocess.run = run_stub
     try:
         rep = reap.run_kill(1, rows, build_scope(1, 2, 4))
     finally:
@@ -787,7 +787,7 @@ def test_backstop_outcomes_are_each_classified():
     native = {"1": (0, b""), "2": (128, b'ERROR: The process "2" not found.'),
               "3": (1, b"ERROR: Access is denied.")}
 
-    def stub_run(argv, **_kw):
+    def run_stub(argv, **_kw):
         if argv[0] == "kill":
             return subprocess.CompletedProcess(argv, 1, b"", b"kill: %s: Permission denied"
                                                % argv[-1].encode())
@@ -796,7 +796,7 @@ def test_backstop_outcomes_are_each_classified():
     saved = (reap.resolve_signal_binaries, reap.check_msys_addressable, reap.subprocess.run)
     reap.resolve_signal_binaries = lambda: {"msys": "kill", "native": "taskkill"}
     reap.check_msys_addressable = lambda row, binaries: True
-    reap.subprocess.run = stub_run
+    reap.subprocess.run = run_stub
     try:
         rep = reap.run_kill(1, rows, build_scope(1, 2, 3))
     finally:
