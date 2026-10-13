@@ -103,7 +103,7 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-17 — the closing review's MEDIUM and LOW items, batched](spec/2026-10-13-spec-TOOL-dSweptBranches-17.md) | 16 | 2 | CLOSED | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 35 bound to this build, across 4 record folder(s).
+Records: 36 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
