@@ -99,13 +99,13 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-13 — a deletion acts only on the sha it graded](spec/2026-10-13-spec-TOOL-dSweptBranches-13.md) | 12 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-14 — a merge commit is covered only when it introduces nothing of its own](spec/2026-10-13-spec-TOOL-dSweptBranches-14.md) | 13 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-15 — a submodule with uncommitted content makes its worktree UNKNOWN](spec/2026-10-13-spec-TOOL-dSweptBranches-15.md) | 14 | 2 | CLOSED | rev-1 | 2026-10-13 |
-| [TOOL-dSweptBranches-16 — tracked edits in an idle worktree are graded by a fixture](spec/2026-10-13-spec-TOOL-dSweptBranches-16.md) | 15 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-dSweptBranches-16 — tracked edits in an idle worktree are graded by a fixture](spec/2026-10-13-spec-TOOL-dSweptBranches-16.md) | 15 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-17 — the closing review's MEDIUM and LOW items, batched](spec/2026-10-13-spec-TOOL-dSweptBranches-17.md) | 16 | 2 | OPEN | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 31 bound to this build, across 4 record folder(s).
+Records: 33 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dSweptBranches-16 TOOL-dSweptBranches-17.
+Ids no record names: TOOL-dSweptBranches-17.
 
 Ids no `spec-audit` record has ever named: TOOL-dSweptBranches-1 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3
 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9.

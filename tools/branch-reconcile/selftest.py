@@ -426,6 +426,24 @@ def arm_content():
     fresh = read_report(repo)
     check("content: AC7 under the default bound a fresh worktree reads IN-PROGRESS",
           read_verdict(fresh, "worktree/nested", ".claude/worktrees/nest")[0], "IN-PROGRESS")
+    # TOOL-dSweptBranches-16: tracked edits, graded once the freshness bound is out of the way.
+    edited = base / "fx" / "edited"
+    run_git(repo, "worktree", "add", "-q", "-b", "edited-br", str(edited), "main")
+    (edited / "a.txt").write_text("unstaged new bytes\n", encoding="utf-8", newline="\n")
+    (edited / "b.txt").write_text("staged new bytes\n", encoding="utf-8", newline="\n")
+    run_git(edited, "add", "b.txt")
+    restored = base / "fx" / "restored"
+    run_git(repo, "worktree", "add", "-q", "-b", "restored-br", str(restored), old_main)
+    (restored / "tests").mkdir(exist_ok=True)
+    (restored / "tests" / "test_land.py").write_text(
+        run_git(repo, "show", "upstream/main:tests/test_land.py") + "\n", encoding="utf-8", newline="\n")
+    run_git(restored, "add", "tests/test_land.py")
+    rows = read_report(repo, "--fresh-hours", "0")
+    v, ev = read_verdict(rows, "worktree/sibling", key(edited))
+    check("content: AC1 (unit 16) staged and unstaged edits to new bytes read UNMERGED-LIVE",
+          (v, "changed a.txt" in ev or "changed b.txt" in ev), ("UNMERGED-LIVE", True))
+    check("content: AC1 (unit 16) an edit restoring the default's bytes takes its HEAD's verdict",
+          read_verdict(rows, "worktree/sibling", key(restored))[0], "MERGED")
 
 
 def arm_stash():
