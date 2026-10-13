@@ -1361,7 +1361,7 @@ def run_selftest() -> int:
     # refusal here rolls the kit back. The declarations are the real ones beside this engine, so the
     # arm fails the day a legacy name leaves the descriptor.
     real_engine = Path(__file__).resolve().parent
-    v3 = ('<!-- governance-template: v1.27 -->\n<!-- when:node-table -->\n'
+    v3 = ('<!-- governance-template: v1.28 -->\n<!-- when:node-table -->\n'
           '| `{{TAG_A}}` | `{{MACHINE_A}}` | `{{PRIMARY_TREE_A}}` | `{{WORKTREE_ROOT_A}}` | '
           '{{VARIANCES_A}} |\n<!-- /when:node-table -->\n<!-- when:security-outbound -->\nSSRF\n'
           '<!-- /when:security-outbound -->\naudit {{PROSE_AUDIT}}\n')
@@ -1725,4 +1725,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.27"  # gov:kit playbook-render@1.27
+KIT_PLAYBOOK_RENDER_VERSION = "1.28"  # gov:kit playbook-render@1.28

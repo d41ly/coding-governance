@@ -958,6 +958,31 @@
     "ceiling": 300
   },
   {
+    "name": "branch-reconcile skill wiring",
+    "argv": [
+      "bash",
+      "{prefix}/branch-reconcile/adopt-branch-reconcile.sh",
+      "--check"
+    ],
+    "chunk": "wiring",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
+    "name": "branch-reconcile selftest",
+    "argv": [
+      "python",
+      "{prefix}/branch-reconcile/selftest.py"
+    ],
+    "guard": [
+      "{prefix}/branch-reconcile/",
+      "{prefix}/lib/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 600
+  },
+  {
     "name": "drift-audit records",
     "argv": [
       "python",

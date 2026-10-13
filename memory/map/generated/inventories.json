@@ -10,6 +10,8 @@
       "agent-instructions wiring",
       "backlog migration selftest",
       "branch-guard self-test",
+      "branch-reconcile selftest",
+      "branch-reconcile skill wiring",
       "brief-recorded",
       "build README slot contract",
       "build-index selftest",
@@ -136,6 +138,7 @@
     ],
     "kits": [
       "agent-instructions",
+      "branch-reconcile",
       "codebase-map",
       "drift-audit",
       "gate-lint",
@@ -190,6 +193,7 @@
       "session-kickoff"
     ],
     "rendered-skills": [
+      "branch-reconcile",
       "drift-audit",
       "lexicon",
       "memory-recall",

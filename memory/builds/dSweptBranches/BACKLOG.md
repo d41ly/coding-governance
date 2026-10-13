@@ -1,0 +1,8 @@
+# dSweptBranches — asks
+
+## Asks
+- TOOL-dSweptBranches-6 · filed 2026-10-13 · audit gov's memory-tree checks that read files a range ADDS, for the blind spot inCMS's memory-local check 21 has: it reads a merge of the default branch into a feature branch as adding every `memory/` file the default branch gained, while its sibling check 29 already skips merge commits. Gov's checks of the same shape, those listing `--diff-filter=A` over a commit range, should skip a merge's first-parent side or be shown not to need to · accept each gov check that lists additions over a range is named, with a fixture that merges the default branch into a feature branch, and is observed either to ignore the merged-in additions or red before its fix
+
+## Dispositions
+- SEV · TOOL-dSweptBranches-6 · MED · a false refusal on every feature branch that merges the default branch in, which is the reconcile this build's skill recommends
+- KEEP · TOOL-dSweptBranches-6 · the owner's prompt of 2026-10-13 files it as a separate ask rather than this run's unit
