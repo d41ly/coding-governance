@@ -14,7 +14,8 @@
 # and commits made there. The real repository's card, LIVE.md and HEAD are never read, so the suite
 # measures the same thing on every node.
 set -u
-HERE="$(cd "$(dirname "$0")" && pwd)"
+HERE=.; [[ $0 == */* ]] && HERE=${0%/*}
+HERE="$(cd "$HERE" && pwd)"
 HOOK="$HERE/format-guard.js"
 ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "format-guard.test: not inside a git repository"; exit 2; }
 command -v node >/dev/null 2>&1 || { echo "format-guard.test: node is not on PATH"; exit 2; }
@@ -152,11 +153,11 @@ run_stop() {
 }
 check_contains() { # <name> <file> <fixed string>
   if grep -qF -- "$3" "$2"; then echo "ok   $1"; pass=$((pass+1))
-  else echo "FAIL $1 (no '$3' in $(basename "$2"))"; sed 's/^/     /' "$2"; fail=$((fail+1)); fi
+  else echo "FAIL $1 (no '$3' in ${2##*/})"; sed 's/^/     /' "$2"; fail=$((fail+1)); fi
 }
 check_empty() { # <name> <file>
   if [ ! -s "$2" ]; then echo "ok   $1"; pass=$((pass+1))
-  else echo "FAIL $1 ($(basename "$2") not empty)"; sed 's/^/     /' "$2"; fail=$((fail+1)); fi
+  else echo "FAIL $1 (${2##*/} not empty)"; sed 's/^/     /' "$2"; fail=$((fail+1)); fi
 }
 
 # write_message <name> <line>... — one message file, one argument per line. Every string here is one line and
@@ -165,7 +166,7 @@ check_empty() { # <name> <file>
 write_message() { local f=$1; shift; printf '%s\n' "$@" > "$TMP/$f.md"; }
 B='BUILD — tBuild · Tier-2 · 1/2 build · left TOOL-tBuild-2'
 S='SPEC — [TOOL-tBuild-1](memory/builds/tBuild/spec/x.md) · review none'
-BT=$(printf '\140'); FENCE="$BT$BT$BT"
+BT=$'\140'; FENCE="$BT$BT$BT"
 write_message good   "Done." "" "- $B" "- $S"
 write_message none   "Done, all good."
 write_message tick   "- $BT$B$BT" "- $BT$S$BT"
@@ -223,13 +224,13 @@ check_contains "AC6 the reason names the new commit" "$TMP/out" "commit ${sha:0:
 check_contains "TOOL-aHeardState-8 the commit defect names both line shapes" "$TMP/out" "committed or merged line"
 check_contains "TOOL-aHeardState-8 the reason says not yet terminal" "$TMP/out" "not yet terminal"
 sha=$(seed_fixture_commit "two")
-printf '%s\n\n- committed — %s · main · two\n' "$(cat "$TMP/good.md")" "${sha:0:7}" > "$TMP/reported.md"
+printf '%s\n\n- committed — %s · main · two\n' "$(<"$TMP/good.md")" "${sha:0:7}" > "$TMP/reported.md"
 run_stop "AC6 a commit named by a committed line allows" allow "$TMP/reported.md"
 sha=$(seed_fixture_commit "three")
-printf '%s\n\n- committed — 0000000 · main · three\n' "$(cat "$TMP/good.md")" > "$TMP/wrong.md"
+printf '%s\n\n- committed — 0000000 · main · three\n' "$(<"$TMP/good.md")" > "$TMP/wrong.md"
 run_stop "AC6 a committed line naming another sha blocks" block "$TMP/wrong.md"
 sha=$(seed_fixture_commit "four")
-printf '%s\n\n- merged — --no-ff tBranch → main · %s\n' "$(cat "$TMP/good.md")" "${sha:0:8}" > "$TMP/merged.md"
+printf '%s\n\n- merged — --no-ff tBranch → main · %s\n' "$(<"$TMP/good.md")" "${sha:0:8}" > "$TMP/merged.md"
 run_stop "AC6 a merged line naming the commit allows" allow "$TMP/merged.md"
 # TOOL-aHeardState-7 — a chained stop leaves the baseline alone, so its commit is owed at the next
 # unchained stop: the behaviour the header now states.

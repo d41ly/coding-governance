@@ -1115,9 +1115,11 @@ render_ready_line() { printf 'READY — aTest · node a · card-wt · base %s ·
 # render_task_section [title] — a `## task` section with all eight fields filled (KICK-aOrientedCast-1).
 # Every arm whose body carries a real READY line takes its task from here, so the field refusal never
 # answers for an arm that observes another refusal. No value holds a path- or id-shaped token, so an
-# arm's token and miss counts stay its own rows'.
+# arm's token and miss counts stay its own rows'. It also leaves the section in `_render_task_section`,
+# as `rec` does in unattended-build.test.sh, so a caller wanting the text reads that and forks nothing.
 render_task_section() {
-  printf '## task\n- **Title:** %s\n- **Goal (1–2 sentences):** refuse a kickoff whose task is unfilled\n- **IN scope:** the append verb\n- **OUT / non-goals** (explicit cut-line): the stored card\n- **To-do:** grade the fields, then store the body\n- **Reuse:** the presence refusal beside it\n- **Acceptance check** (the observation that proves THIS change): an arm sees it\n- **Gates it must pass:** the checker self-test\n' "${1:-t}"
+  printf -v _render_task_section '## task\n- **Title:** %s\n- **Goal (1–2 sentences):** refuse a kickoff whose task is unfilled\n- **IN scope:** the append verb\n- **OUT / non-goals** (explicit cut-line): the stored card\n- **To-do:** grade the fields, then store the body\n- **Reuse:** the presence refusal beside it\n- **Acceptance check** (the observation that proves THIS change): an arm sees it\n- **Gates it must pass:** the checker self-test\n' "${1:-t}"
+  printf '%s' "$_render_task_section"
 }
 
 # AC1 — a clean body: appended, no annotation, ONE ls-files and ONE reader spawn from the checker.
@@ -1480,7 +1482,7 @@ check_eq "KC AC1 ...spelling **To-do:** and **Reuse:** as interface 6 does" "1 1
   "$(grep -c '^> - \*\*To-do:\*\* ' "$TMP/task.sk") $(grep -c '^> - \*\*Reuse:\*\* ' "$TMP/task.sk")"
 KC="$NONCE-kc"; KCCARD="$CARD_HOME/$KC.md"
 run_card "KC setup: a card in worktree B" "$CWT2" 0 - --card --write --session "$KC"
-KC_TASK=$(render_task_section)
+render_task_section >/dev/null; KC_TASK=${_render_task_section%$'\n'}
 KC_TAIL=$(printf '## read\n- `AGENTS.md:1`\n'; print_route_ready)
 # AC2 — all eight filled: it lands, and the card carries the eight.
 printf '%s\n%s\n' "$KC_TASK" "$KC_TAIL" | run_route_append "$KC"; got=$?
@@ -1686,7 +1688,7 @@ t0=$(date +%s%N)
 run_card "AGH2 AC1 --card --write over the seven-claim remote" "$CWT" 0 "claims — 7 on the remote · 5 shown · 2 hidden" --card --write --session "$NONCE-c1"
 cl_ms_on=$(( ($(date +%s%N) - t0) / 1000000 ))
 check_eq "AGH2 AC1 the five kept claims in verdict order; the three-day stale and aborted ones hidden, the held and unknown ones not" \
-  "$(printf 'claims — 7 on the remote · 5 shown · 2 hidden\n  zLive · n1 · live · beat Ns · live\n  yHeld · n1 · held · beat Ns · held\n  xBare · n1 · live · beat - · unknown\n  wStale · n1 · live · beat Ns · stale\n  vLanded · n1 · landed · beat Ns · terminal')" \
+  $'claims — 7 on the remote · 5 shown · 2 hidden\n  zLive · n1 · live · beat Ns · live\n  yHeld · n1 · held · beat Ns · held\n  xBare · n1 · live · beat - · unknown\n  wStale · n1 · live · beat Ns · stale\n  vLanded · n1 · landed · beat Ns · terminal' \
   "$(read_claims_cell "$NONCE-c1")"
 check_eq "AGH2 AC2 the claims — head sits directly below live —, so the startup split files it before recent —" \
   "claims — 7 on the remote · 5 shown · 2 hidden" "$(awk '/^live — /{getline; print; exit}' "$CARD_HOME/$NONCE-c1.md")"

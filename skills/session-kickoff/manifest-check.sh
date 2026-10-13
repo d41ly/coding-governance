@@ -354,16 +354,20 @@ fi
 # The audit block's text, CR-stripped; `getval` reads one key from it. Defined here because the card
 # reads the block's `registry:` key before the checks below ever run, and one reader is one reader.
 # Both are read on every commit by the staged leg, so neither pipes (KICK-aTrimmedHook-1): the CR goes
-# inside the one awk, and the key is matched in the shell. `getval` answers what the retired
+# inside the one awk, and the key is matched in the shell. `getval KEY VAR` answers what the retired
 # `sed | head | sed` did: the FIRST matching line, the value after the colon with leading and
-# trailing whitespace removed, and nothing at all when no line matches.
+# trailing whitespace removed, and the empty string when no line matches. It assigns VAR by
+# `printf -v` instead of printing, so no caller forks a subshell to capture it, and it empties VAR
+# first because `LBC` has no initialiser and would otherwise keep a value the environment exported.
+# VAR is never `_gl` or `_gre`: `printf -v` into a name declared local here writes this copy.
 read_block() { awk '{ gsub(/\r/, "") } /<!-- manifest-audit/{f=1;next} f&&/-->/{exit} f' "$1"; }
 getval() {
   local _gl _gre="^[[:space:]]*$1:[[:space:]]*(.*)$"
+  printf -v "$2" '%s' ''
   while IFS= read -r _gl; do
     if [[ $_gl =~ $_gre ]]; then
       _gl=${BASH_REMATCH[1]}
-      printf '%s\n' "${_gl%"${_gl##*[![:space:]]}"}"
+      printf -v "$2" '%s' "${_gl%"${_gl##*[![:space:]]}"}"
       return 0
     fi
   done <<<"$BLOCK"
@@ -512,7 +516,7 @@ read_memory_root() {
 }
 render_card() {
   local verb="$1" registry="" memroot live
-  [ -n "$MF" ] && [ -f "$MF" ] && { BLOCK=$(read_block "$MF"); registry=$(getval 'registry'); }
+  [ -n "$MF" ] && [ -f "$MF" ] && { BLOCK=$(read_block "$MF"); getval 'registry' registry; }
   derive_head_state
   if ! memroot=$(read_memory_root); then
     live='live — skipped: no .memory-tree.conf in this tree'
@@ -1246,7 +1250,7 @@ esac
 # the three — that is the full leg's finding, at the push boundary.
 if [ "$STAGED" = 1 ]; then
   BLOCK=$(read_block "$MF")
-  _ew=$(getval 'watch'); _ev=$(getval 'verify-paths')
+  getval 'watch' _ew; getval 'verify-paths' _ev
   _el=()
   if [ -n "$_ew" ] && [ -n "$_ev" ]; then
     IFS=';' read -ra _ep <<<"$_ew;$_ev"
@@ -1351,8 +1355,8 @@ fi
 LA=""; WATCH_RAW=""; VP_RAW=""
 if [ "$BLOCK_OK" = 1 ]; then
   BLOCK=$(read_block "$MF")
-  LA=$(getval 'last-audit'); WATCH_RAW=$(getval 'watch'); VP_RAW=$(getval 'verify-paths')
-  LBC=$(getval 'last-body-change')
+  getval 'last-audit' LA; getval 'watch' WATCH_RAW; getval 'verify-paths' VP_RAW
+  getval 'last-body-change' LBC
   [ -n "$LA" ] || { fail 2 "manifest-audit block lacks a last-audit value — stamp '<ISO datetime> @ <full sha>' after verifying §B."; BLOCK_OK=0; }
   # The C9 baseline. It is RECORDED rather than derived, because deriving it means walking the
   # manifest's own path history, and a path-scoped `git log --name-status` reports a `git mv` as an

@@ -1955,9 +1955,9 @@ git worktree add -q "$_wt" -b wtb >/dev/null 2>&1
   rm -f "$docs_env"
   env GATE_SELFTESTS= DOCS_ENV="$docs_env" GOV_GATE_CMD="bash $docstub" git push origin HEAD:main 2>&1
 ) > "$tmp/docs-wt.out"
-case "$(cat "$tmp/docs-wt.out")" in
+case "$(<"$tmp/docs-wt.out")" in
   *"scoped gate on main push"*"from the common dir's gate-full-green "*) ok "DOCS L3b a linked worktree adopts the primary's stamp and names it" ;;
-  *) bad "DOCS L3b expected the common dir's own stamp adopted, got: $(cat "$tmp/docs-wt.out")" ;;
+  *) bad "DOCS L3b expected the common dir's own stamp adopted, got: $(<"$tmp/docs-wt.out")" ;;
 esac
 cd "$pfx_home" || exit 2
 

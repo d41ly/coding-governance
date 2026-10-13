@@ -706,7 +706,7 @@ elif (cd "$SGWT" && bash "$SG_WRITER" --card --write --session sgtest-w1 </dev/n
     sg_task_src="$SG_WRITER_BASE:skills/session-kickoff/manifest-check.test.sh"
     sg_task_def=$(git -C "$HERE" show "$sg_task_src" 2>/dev/null | tr -d '\r' | sed -n '/^render_task_section() {$/,/^}$/p')
   else
-    sg_task_src="$(dirname "$SG_WRITER")/manifest-check.test.sh"
+    sg_task_src="${SG_WRITER%/*}/manifest-check.test.sh"
     sg_task_def=$(tr -d '\r' < "$sg_task_src" 2>/dev/null | sed -n '/^render_task_section() {$/,/^}$/p')
   fi
   sg_task_ok=0

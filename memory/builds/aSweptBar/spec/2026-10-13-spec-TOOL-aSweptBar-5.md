@@ -1,6 +1,6 @@
 # TOOL-aSweptBar-5 — fork idioms re-grown past the spawn-idiom registry, converted
 
-**Status:** INPROGRESS · rev-1 · 2026-10-13 · node a · Tier-1 · base 53b25884 · streams tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-10-13 · node a · Tier-1 · base 53b25884 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

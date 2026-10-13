@@ -1542,14 +1542,17 @@ measure_held_slots() { # -> TS_HELD_N, how many of this runner's slot paths exis
 }
 TS_DOCS_ROOT=""; [ -n "$TS_DIR_C" ] && TS_DOCS_ROOT="${TS_DIR_C%/*}/gate-docs-beacon"
 scan_dead_docs_beacons() { # -> removes each docs beacon whose pid is dead or whose heartbeat outlived its ttl, nonce-guarded
-  local d hpid hb hn httl age mt
+  local d hpid hb hn httl age mt cur
   [ -n "$TS_DOCS_ROOT" ] && [ -d "$TS_DOCS_ROOT" ] || return 0
   for d in "$TS_DOCS_ROOT"/*; do
     [ -d "$d" ] || continue
     # THE NONCE FIRST (TOOL-aPairedSlots-15), as `ts_try_reap` reads it: every fact judged below then
-    # belongs to the holder whose nonce guards the removal.
-    hn=$(cat "$d/nonce" 2>/dev/null); hpid=$(cat "$d/pid" 2>/dev/null); hb=$(cat "$d/heartbeat" 2>/dev/null)
-    httl=$(cat "$d/ttl" 2>/dev/null); num_ok "$httl" || httl=$TS_TTL
+    # belongs to the holder whose nonce guards the removal. Each one-line beacon file is read by the
+    # builtin, as `ts_tick_start` reads the nonce (TOOL-aSweptBar-5): a missing file reads empty.
+    hn=""; { IFS= read -r hn < "$d/nonce"; } 2>/dev/null
+    hpid=""; { IFS= read -r hpid < "$d/pid"; } 2>/dev/null
+    hb=""; { IFS= read -r hb < "$d/heartbeat"; } 2>/dev/null
+    httl=""; { IFS= read -r httl < "$d/ttl"; } 2>/dev/null; num_ok "$httl" || httl=$TS_TTL
     # AN UNFINISHED BEACON, interrupted between its `mkdir` and its first writes, has neither a pid nor
     # a heartbeat, and nothing else would ever sweep it. Its directory's age is the only clock it has;
     # one that cannot be read is left alone, since a beacon being written right now has none yet.
@@ -1557,20 +1560,21 @@ scan_dead_docs_beacons() { # -> removes each docs beacon whose pid is dead or wh
       mt=$(date -r "$d" +%s 2>/dev/null) || mt=""
       num_ok "$mt" || continue
       age=$(( EPOCHSECONDS - mt ))
-      if [ "$age" -gt "$httl" ] && [ "$(cat "$d/nonce" 2>/dev/null)" = "$hn" ]; then
+      if [ "$age" -gt "$httl" ] && { cur=""; { IFS= read -r cur < "$d/nonce"; } 2>/dev/null; [ "$cur" = "$hn" ]; }; then
         printf 'run-gates: sweeping the docs beacon of an unfinished holder (no pid or heartbeat, %ss old)\n' "$age" >&2
         rm -rf "$d" 2>/dev/null
       fi
       continue
     fi
     if [ -n "$hpid" ] && ! ts_alive "$hpid"; then
-      [ "$(cat "$d/nonce" 2>/dev/null)" = "$hn" ] || continue
+      cur=""; { IFS= read -r cur < "$d/nonce"; } 2>/dev/null
+      [ "$cur" = "$hn" ] || continue
       printf 'run-gates: sweeping the docs beacon of a dead holder (pid %s)\n' "$hpid" >&2
       rm -rf "$d" 2>/dev/null; continue
     fi
     case "$hb" in ''|*[!0-9]*) continue ;; esac
     age=$(( EPOCHSECONDS - hb ))
-    if [ "$age" -gt "$httl" ] && [ "$(cat "$d/nonce" 2>/dev/null)" = "$hn" ]; then
+    if [ "$age" -gt "$httl" ] && { cur=""; { IFS= read -r cur < "$d/nonce"; } 2>/dev/null; [ "$cur" = "$hn" ]; }; then
       printf 'run-gates: sweeping the docs beacon of a stalled holder (heartbeat %ss old, ttl %ss)\n' "$age" "$httl" >&2
       rm -rf "$d" 2>/dev/null
     fi
@@ -1595,7 +1599,7 @@ check_worktree_unheld() { # -> rc 0 when no holder names this run's top level; r
   TS_SAME=""
   for d in "$TS_DIR_C" "$TS_DIR_C".* ${TS_DOCS_ROOT:+"$TS_DOCS_ROOT"/*}; do
     [ -d "$d" ] || continue
-    r=$(cat "$d/repo" 2>/dev/null)
+    r=""; { IFS= read -r r < "$d/repo"; } 2>/dev/null
     if [ -n "$r" ] && [ "$r" = "$ROOT" ]; then TS_SAME=$d; return 1; fi
   done
   return 0
@@ -1640,7 +1644,8 @@ ts_alive(){ kill -0 "$1" 2>/dev/null; }
 # through its own cleanup path.
 ts_release() {
   [ -n "$TS_DIR" ] || return 0
-  if [ "$(cat "$TS_DIR/nonce" 2>/dev/null)" = "$TS_NONCE" ]; then rm -rf "$TS_DIR" 2>/dev/null || true; fi
+  local _cur=""; { IFS= read -r _cur < "$TS_DIR/nonce"; } 2>/dev/null
+  if [ "$_cur" = "$TS_NONCE" ]; then rm -rf "$TS_DIR" 2>/dev/null || true; fi
   TS_DIR=""
 }
 ts_drop_ticket() { [ -n "$TS_TICKET" ] && rm -f "$TS_TICKET" 2>/dev/null; TS_TICKET=""; }
@@ -1716,7 +1721,7 @@ ts_tick_stop() {
 # other cannot: a dead PID is immediate and certain, and a stale heartbeat catches the holder whose
 # PID was recycled or which is alive but wedged.
 ts_try_reap() {
-  local d hpid hb age httl hn reaped=1
+  local d hpid hb age httl hn cur reaped=1
   # SLOT BY SLOT (TOOL-aPairedSlots-2): each slot is judged by its own pid and its own ttl, every dead
   # or stalled one is reaped on this tick, and a live neighbour is never touched. THE REMOVAL IS
   # NONCE-GUARDED, and the nonce is read FIRST (TOOL-aPairedSlots-15): every fact the slot is judged by
@@ -1726,16 +1731,17 @@ ts_try_reap() {
   # re-read and the `rm`; it does not close it.
   for d in ${TS_SLOT_DIRS[@]+"${TS_SLOT_DIRS[@]}"}; do
     [ -d "$d" ] || continue
-    hn=$(cat "$d/nonce" 2>/dev/null)
-    hpid=$(cat "$d/pid" 2>/dev/null)
-    hb=$(cat "$d/heartbeat" 2>/dev/null)
+    hn=""; { IFS= read -r hn < "$d/nonce"; } 2>/dev/null
+    hpid=""; { IFS= read -r hpid < "$d/pid"; } 2>/dev/null
+    hb=""; { IFS= read -r hb < "$d/heartbeat"; } 2>/dev/null
     # THE HOLDER'S TTL is the bound (TOOL-aFrugalTurnstile-5 S3): on a host-wide beacon the holder may be
     # another repository running a longer one. Anything but a positive integer, as from an older
     # runner's beacon, falls back to this waiter's own.
-    httl=$(cat "$d/ttl" 2>/dev/null)
+    httl=""; { IFS= read -r httl < "$d/ttl"; } 2>/dev/null
     num_ok "$httl" || httl=$TS_TTL
     if [ -n "$hpid" ] && ! ts_alive "$hpid"; then
-      [ "$(cat "$d/nonce" 2>/dev/null)" = "$hn" ] || continue
+      cur=""; { IFS= read -r cur < "$d/nonce"; } 2>/dev/null
+      [ "$cur" = "$hn" ] || continue
       printf 'run-gates: reaping the beacon of a dead holder (pid %s)\n' "$hpid" >&2
       rm -rf "$d" 2>/dev/null
       add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "dead holder pid $hpid"; reaped=0; continue
@@ -1743,7 +1749,8 @@ ts_try_reap() {
     case "$hb" in ''|*[!0-9]*) hb=0 ;; esac
     age=$(( EPOCHSECONDS - hb ))
     if [ "$hb" != 0 ] && [ "$age" -gt "$httl" ]; then
-      [ "$(cat "$d/nonce" 2>/dev/null)" = "$hn" ] || continue
+      cur=""; { IFS= read -r cur < "$d/nonce"; } 2>/dev/null
+      [ "$cur" = "$hn" ] || continue
       printf 'run-gates: reaping the beacon of a stalled holder (heartbeat %ss old, ttl %ss)\n' "$age" "$httl" >&2
       rm -rf "$d" 2>/dev/null
       add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "stalled holder heartbeat ${age}s ttl ${httl}s"; reaped=0
@@ -1826,13 +1833,16 @@ TS_NEST_DIR=""
 if [ -n "$TS_DIR_C" ] && [ -n "${GATE_TURNSTILE_HOLDER:-}" ]; then
   for _ts_d in "$TS_DIR_C" "$TS_DIR_C".* ${TS_DOCS_ROOT:+"$TS_DOCS_ROOT"/*}; do
     [ -d "$_ts_d" ] || continue
-    [ "$(cat "$_ts_d/nonce" 2>/dev/null)" = "$GATE_TURNSTILE_HOLDER" ] && { TS_NEST_DIR=$_ts_d; break; }
+    _ts_n=""; { IFS= read -r _ts_n < "$_ts_d/nonce"; } 2>/dev/null
+    [ "$_ts_n" = "$GATE_TURNSTILE_HOLDER" ] && { TS_NEST_DIR=$_ts_d; break; }
   done
-  unset _ts_d
+  unset _ts_d _ts_n
 fi
 if [ -n "$TS_NEST_DIR" ]; then
   TS_NESTED=1
-  ts_hr=$(cat "$TS_NEST_DIR/run" 2>/dev/null); ts_hd=$(cat "$TS_NEST_DIR/repo" 2>/dev/null); ts_hp=$(cat "$TS_NEST_DIR/pid" 2>/dev/null)
+  ts_hr=""; { IFS= read -r ts_hr < "$TS_NEST_DIR/run"; } 2>/dev/null
+  ts_hd=""; { IFS= read -r ts_hd < "$TS_NEST_DIR/repo"; } 2>/dev/null
+  ts_hp=""; { IFS= read -r ts_hp < "$TS_NEST_DIR/pid"; } 2>/dev/null
   echo "gate queue: nested under ${ts_hr:--} — ${ts_hd:--} pid ${ts_hp:--}"
 elif [ -n "$TS_DIR_C" ] && [ -n "${DOCS_BASE:-}" ] && [ "${#TS_HOLD[@]}" = 0 ]; then
   # THE DOCS KEY (TOOL-aPairedSlots-4): admitted at once, visible, nestable, released on every exit.
@@ -2047,7 +2057,9 @@ elif [ -n "$TS_DIR_C" ]; then
         measure_held_slots; ts_names=""
         for _ts_d in "${TS_SLOT_DIRS[@]}"; do
           [ -d "$_ts_d" ] || continue
-          ts_hr=$(cat "$_ts_d/run" 2>/dev/null); ts_hd=$(cat "$_ts_d/repo" 2>/dev/null); ts_hp=$(cat "$_ts_d/pid" 2>/dev/null)
+          ts_hr=""; { IFS= read -r ts_hr < "$_ts_d/run"; } 2>/dev/null
+          ts_hd=""; { IFS= read -r ts_hd < "$_ts_d/repo"; } 2>/dev/null
+          ts_hp=""; { IFS= read -r ts_hp < "$_ts_d/pid"; } 2>/dev/null
           ts_names="$ts_names${ts_names:+; }${ts_hd:--} run ${ts_hr:--} pid ${ts_hp:--}"
         done
         unset _ts_d
@@ -2059,7 +2071,9 @@ elif [ -n "$TS_DIR_C" ]; then
           echo "run-gates: $TS_HELD_N of $TS_SLOTS bar slots on this host are held, and a ticket sorts ahead of this one — queued at position $pos (waited ${TS_WAITED}s)" >&2
         fi
       elif [ -d "$TS_DIR_C" ]; then
-        ts_hr=$(cat "$TS_DIR_C/run" 2>/dev/null); ts_hd=$(cat "$TS_DIR_C/repo" 2>/dev/null); ts_hp=$(cat "$TS_DIR_C/pid" 2>/dev/null)
+        ts_hr=""; { IFS= read -r ts_hr < "$TS_DIR_C/run"; } 2>/dev/null
+        ts_hd=""; { IFS= read -r ts_hd < "$TS_DIR_C/repo"; } 2>/dev/null
+        ts_hp=""; { IFS= read -r ts_hp < "$TS_DIR_C/pid"; } 2>/dev/null
         echo "run-gates: another bar holds this host — ${ts_hd:--} run ${ts_hr:--} pid ${ts_hp:--} — queued at position $pos (waited ${TS_WAITED}s)" >&2
       elif ! check_worktree_unheld; then
         echo "run-gates: no bar holds this host's first slot, but this worktree's bar holds $(render_same_holder) — queued at position $pos (waited ${TS_WAITED}s)" >&2

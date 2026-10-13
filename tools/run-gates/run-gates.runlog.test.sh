@@ -269,7 +269,7 @@ write_legs() { printf '%s\n' "$2" > "$WORK/$1.json"; }   # name · JSON array ->
 run_bar() { # NAME=VALUE... -> RC, OUT, ERR
   env TMPDIR="$WORK/ambient" GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 "$@" bash "$KR/run-gates.sh" \
     >"$WORK/out" 2>"$WORK/err"; RC=$?
-  OUT=$(cat "$WORK/out"); ERR=$(cat "$WORK/err")
+  OUT=$(<"$WORK/out"); ERR=$(cat "$WORK/err")
 }
 
 measure_lines() { # -> the journal's line count, 0 when it is absent
