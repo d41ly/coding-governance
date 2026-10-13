@@ -12,11 +12,16 @@ two-line adoption step for that is documented here rather than left implicit.
 ## ps-hygiene.py
 
 ```bash
-python3 <prefix>/gate-lint/ps-hygiene.py [root]   # exit 0 clean, 1 findings, 2 usage
+python3 <prefix>/gate-lint/ps-hygiene.py [root]   # exit 0 clean, 1 findings, 2 refusal
 python3 <prefix>/gate-lint/ps-hygiene.py --selftest
 ```
 
-Scans **every** `.ps1` under `root` for two classes:
+Scans **every tracked** `.ps1` under `root`, listed by `git ls-files` and never by a walk of the
+disk, so a worktree parked untracked inside the tree is not graded. The suffix matches in any case,
+because a git pathspec glob would not, and the walk it replaced graded `Deploy.PS1` on Windows. A failed listing and a root that
+tracks no `.ps1` each refuse with exit 2: both yield zero files, and only one of them means there is
+nothing to grade. A repository that wired the scanner with no tracked `.ps1` therefore reds; drop the
+line until PowerShell exists. It looks for two classes:
 
 - **Case-only identifier collisions.** PowerShell variable names are case-INSENSITIVE, so `$LEGS`
   and `$legs` are ONE variable. Upstream this bit one file three times: `$LEGS = @($legs.legs)`
@@ -217,10 +222,9 @@ can still fail after a refactor.
 ## What is still unwired
 
 `ps-hygiene.py` is on no leg, here or anywhere. That is deliberate and it is a gap rather than a
-decision: the kit's home repository has zero tracked `.ps1` files, so a leg over it would report a
-green line produced by an empty population — which is the shape both scanners exist to refuse, and
-which the shell scanner now refuses outright. Wiring it earns its place in a repo where PowerShell
-exists.
+decision: the kit's home repository has zero tracked `.ps1` files, and both scanners refuse an empty
+population, so a leg here would red on every run. Wiring it earns its place in a repo where
+PowerShell exists.
 
-**Adoption is not automatic.** A repo with no `.ps1` files gets `0 files clean`, which is honest but
-proves nothing; the scan only earns its place where PowerShell exists.
+**Adoption is not automatic.** A repo with no tracked `.ps1` files gets the refusal and exit 2, not
+a green line; the scan only earns its place where PowerShell exists.

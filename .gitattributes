@@ -260,3 +260,7 @@ tools/runlog/*.tsv text eol=lf
 # renders from it independently.
 .claude/skills/runlog/SKILL.md text eol=lf
 tools/runlog/SKILL.template.md text eol=lf
+# The /cleanup Skill (TOOL-dSweptBranches-5, renamed by -19), pinned for the runlog Skill's reason:
+# `adopt-branch-reconcile.sh --check` byte-compares the rendered copy against a fresh LF render.
+.claude/skills/cleanup/SKILL.md text eol=lf
+tools/branch-reconcile/SKILL.template.md text eol=lf

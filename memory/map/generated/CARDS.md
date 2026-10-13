@@ -27,6 +27,18 @@ Annotation style: what a code comment citing a governance record must carry
 - guides 1: `ANNOTATION-STYLE.md`
 - globs 2: `tools/memory-tree/ANNOTATION-STYLE.template.md`, `memory/guides/ANNOTATION-STYLE.md`
 
+## branch-reconcile
+
+One read-only report giving every worktree, branch and stash entry a verdict with its evidence, so a cleanup removes only what landed
+
+- status `shipped` · streams `tooling` · dossier `memory/map/features/branch-reconcile.md`
+- decisions 5: `TOOL-dSweptBranches-1`, `TOOL-dSweptBranches-2`, `TOOL-dSweptBranches-3`, `TOOL-dSweptBranches-4`, `TOOL-dSweptBranches-5`
+- gate-legs 2: `branch-reconcile selftest`, `cleanup skill wiring`
+- kits 1: `branch-reconcile`
+- rendered-skills 1: `cleanup`
+- gotcha-classes 1: `a-merge-of-the-default-branch-read-as-additions.md`
+- globs 2: `tools/branch-reconcile/*`, `.claude/skills/cleanup/SKILL.md`
+
 ## build-method
 
 The build method: how to spec, review and build, rendered from the memory-tree kit
@@ -63,10 +75,12 @@ Codebase map — CI-verified inventory claims + the reuse recall index
 Three scanners for the failure modes a reader cannot see: PowerShell's decoding traps, a shell loop that blocks forever, and Python text IO that decodes with...
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/gate-lint.md`
-- decisions 1: `TOOL-aLeakedHandle-1`
+- decisions 2: `TOOL-aLeakedHandle-1`, `TOOL-cListedCensus-1`
 - gate-legs 6: `shell hygiene (a loop fed by a command substitution)`, `shell-hygiene selftest`, `encoding posture (text IO names its encoding)`, `shell hygiene (a location probe asked from a moved directory)`, `shell hygiene (a fork spent on builtin work)`, `spawn budget (forks per hot entrypoint)`
 - kits 1: `gate-lint`
-- globs 6: `tools/gate-lint/*`, `memory/project/substitution-fed-loops.txt`, `memory/project/encoding-posture-sites.txt`, `memory/project/location-probe-waivers.txt`, `memory/project/spawn-idiom-sites.txt`, `memory/project/fork-ceilings.txt`
+- gotcha-classes 1: `a-gate-that-walks-the-repo-root-reads-other-worktrees.md`
+- globs 6: `tools/gate-lint/*`, `memory/project/substitution-fed-loops.txt`, `memory/project/encoding-posture-sites.txt`, `memory/project/location-probe-waivers.txt`, `memory/project/spawn-idiom-sites.txt`
+- cut 1 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## govkit
 

@@ -133,9 +133,9 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
 - **Parallel-test guardrails** (`pytest-parallel-guardrails/` kit): drop it if the project is not
   Python or does not run `pytest -n auto`. The charter's one line on the bug classes it fixes is
   that kit's tools line, so a selection without the kit carries no line on them.
-- **A source-hygiene scan for PowerShell** (`gate-lint/` kit): drop it if the project has no `.ps1`
-  files. A repo with none gets a clean report that proves nothing, which is honest and is why it is
-  adopted only where the language exists.
+- **A source-hygiene scan for PowerShell** (`gate-lint/` kit): drop it if the project tracks no
+  `.ps1` files. A repo with none gets a refusal, exit 2, because a scan that graded nothing is not a
+  pass, and that is why it is adopted only where the language exists.
 - **A deployer for your own tooling** (`govkit/` kit): drop it unless this repo DEPLOYS kits into
   other repos. An adopter that only consumes them has no population to declare.
 - **A naming lexicon** (`lexicon/` kit): a closed verb table every definition leads with, banned type
@@ -727,6 +727,27 @@ no role index, and exits 3, which the kit declares as its `no-governing-doc` out
 or point `CHARTER` at the one you have, then re-run `--scaffold`.
 `check-wiring.sh` reports an install left unrendered as `UNWIRED  roles`, with `--scaffold` as the
 remedy, and names the doc and the `CHARTER` key first when that is the cause.
+
+<!-- govkit:entry branch-reconcile -->
+## 3h — Adopt the branch-reconcile kit (optional)
+
+One read-only report over every worktree, local branch, remote branch and stash entry, each with a
+verdict and its evidence, so a cleanup removes only what landed. It needs no conf and no wiring: the
+CLI runs by path and reads the repository it is pointed at.
+
+1. `cp -r <gov>/<prefix>/branch-reconcile <project>/<prefix>/branch-reconcile`, then
+   `rm -f <project>/<prefix>/branch-reconcile/selftest.py`, gov's own suite, which `kit.toml`
+   withholds from `govkit apply` but a `cp -r` does not.
+2. `bash <prefix>/branch-reconcile/adopt-branch-reconcile.sh --scaffold` renders the
+   `/cleanup` skill, and the kit's `cleanup skill wiring` leg runs its `--check`.
+3. `git fetch`, then `python <prefix>/branch-reconcile/branch_reconcile.py`. A node whose remote is
+   not `origin` needs nothing: the remote comes from the same ladder every kit inlines, and
+   `GOV_REMOTE` names it where several remotes leave the choice open. `--write` deletes only what
+   landed, after a recovery manifest; `--remote` adds the remote branches in one push.
+4. An adopter that installed the kit before its skill became `/cleanup` (kit 1.4): `govkit update`
+   runs `--scaffold`, which withdraws the old `.claude/skills/branch-reconcile/SKILL.md`; commit the
+   removal. Then delete the manifest's `branch-reconcile skill wiring` leg row, which the
+   `cleanup skill wiring` row replaces with the same `--check`.
 
 ## 4 — Write the kickoff manifest (the engine's project layer)
 

@@ -205,6 +205,11 @@
     {
       "id": "Refusal",
       "kind": "class",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "Refusal",
+      "kind": "class",
       "file": "tools/govkit/govkit.py"
     },
     {
@@ -720,6 +725,11 @@
     {
       "id": "arm_census",
       "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_census",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
     },
     {
@@ -728,14 +738,124 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "arm_content",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_default_names",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_evil_merge",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_foreign",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_graded_sha",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_growth_denies",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
     },
     {
+      "id": "arm_keeps",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_landing",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_lease",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_minor",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_noop",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_old_render",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_patch",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_patch_negative",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_probe_negative",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_records",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_remover",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_rotated",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_row_edit",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_stash",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_submodule",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_unread",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_wall",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "arm_write",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "armed",
@@ -1511,6 +1631,11 @@
       "id": "build_diff_lines",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "build_dir",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "build_discarded_work_landed",
@@ -2318,6 +2443,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "build_rows",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "build_rr_fixture",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
@@ -2805,6 +2935,11 @@
     {
       "id": "check",
       "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "check",
+      "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },
     {
@@ -3248,6 +3383,11 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "check_ancestor",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "check_anomaly_sources",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -3381,6 +3521,11 @@
       "id": "check_build_backlog",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "check_build_landed",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "check_built_from_history",
@@ -3703,6 +3848,11 @@
       "file": "tools/process-monitor/adopt-process-monitor.test.sh"
     },
     {
+      "id": "check_equivalent",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "check_exit_rows",
       "kind": "function",
       "file": "tools/unattended/runlog-writer.test.sh"
@@ -3801,6 +3951,11 @@
       "id": "check_git_split_parses",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_gone_blob",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
     },
     {
       "id": "check_grant",
@@ -3918,6 +4073,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_holds_file",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "check_honest_rotation",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -3976,6 +4136,11 @@
       "id": "check_in_hold",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "check_in_progress",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "check_in_window",
@@ -4088,6 +4253,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_merge_clean",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "check_merge_head_builds",
       "kind": "function",
       "file": ".githooks/straggler-guard.sh"
@@ -4111,6 +4281,11 @@
       "id": "check_merge_rows",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_merged",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "check_method",
@@ -4155,6 +4330,11 @@
     {
       "id": "check_names",
       "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_names",
+      "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
     },
     {
@@ -4166,6 +4346,16 @@
       "id": "check_names_id",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "check_noop",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_old_render",
+      "kind": "function",
+      "file": "tools/branch-reconcile/adopt-branch-reconcile.sh"
     },
     {
       "id": "check_one_line_regions",
@@ -4313,6 +4503,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_probe_landed",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "check_probe_scrubbed",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
@@ -4388,6 +4583,11 @@
       "file": "tools/memory-tree/marker-contract.test.sh"
     },
     {
+      "id": "check_rebased_copy",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "check_recall_opened",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -4438,6 +4638,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "check_ref",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "check_refusal_sites",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -4466,6 +4671,11 @@
       "id": "check_relations",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "check_render",
+      "kind": "function",
+      "file": "tools/branch-reconcile/adopt-branch-reconcile.sh"
     },
     {
       "id": "check_render",
@@ -4556,6 +4766,11 @@
       "id": "check_routed_commits",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "check_row_on_default",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "check_rule_tags",
@@ -4798,6 +5013,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "check_stash",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "check_status_one_line",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -4816,6 +5036,11 @@
       "id": "check_substitution",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "check_superseded",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "check_survivors",
@@ -4938,6 +5163,16 @@
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
+      "id": "check_under",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_unmerged_live",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "check_untouched_r3",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -5021,6 +5256,16 @@
       "id": "check_worksheets_signed",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "check_worktree",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_worktree_identity",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "check_worktree_unheld",
@@ -5928,6 +6173,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "derive_action",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "derive_age",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -6136,6 +6386,11 @@
       "id": "derive_counted_sources",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "derive_coverage",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "derive_dead_streaks",
@@ -6463,6 +6718,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_key",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "derive_kit_glob",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
@@ -6543,6 +6803,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "derive_location",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "derive_low_waters",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -6581,6 +6846,11 @@
       "id": "derive_moved_invariants",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "derive_names",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "derive_nearest_vintage",
@@ -6773,6 +7043,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_rm_failure",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "derive_role_roster",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -6796,6 +7071,11 @@
       "id": "derive_row_kinds",
       "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
+      "id": "derive_row_lines",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "derive_row_re",
@@ -7216,6 +7496,11 @@
       "id": "derive_unsatisfied_requires",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_verdict",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "derive_verdict",
@@ -8948,6 +9233,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "load_module",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "load_owned_names",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
@@ -9111,6 +9401,16 @@
       "id": "ma_sha",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "main",
@@ -10738,6 +11038,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "parse_status",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "parse_time",
       "kind": "function",
       "file": "tools/runlog/extract.py"
@@ -10776,6 +11081,11 @@
       "id": "parse_waiver",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "parse_worktrees",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "pass_commit",
@@ -11708,6 +12018,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "read_at",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "read_attribution_tokens",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -11883,6 +12198,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "read_cached",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "read_canon_refusal",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -11961,6 +12281,11 @@
       "id": "read_commit_paths",
       "kind": "function",
       "file": "tools/codebase-map/map_diff.py"
+    },
+    {
+      "id": "read_commit_time",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "read_conf",
@@ -12083,6 +12408,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "read_default_tree",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "read_defs_at_sha",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -12111,6 +12441,11 @@
       "id": "read_descriptors",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "read_dirt",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "read_dirty_paths",
@@ -12223,6 +12558,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_files",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "read_files_touched",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -12305,6 +12645,11 @@
     {
       "id": "read_git",
       "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "read_git",
+      "kind": "function",
       "file": "tools/playbook/render_playbook.py"
     },
     {
@@ -12321,6 +12666,11 @@
       "id": "read_git_lines",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_git_path",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "read_git_range",
@@ -12501,6 +12851,11 @@
       "id": "read_input",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_inventory",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "read_ir_policy",
@@ -12753,6 +13108,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "read_memory_root",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "read_merge_heads",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -12823,6 +13183,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_newest_activity",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "read_newest_unit",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
@@ -12886,6 +13251,11 @@
       "id": "read_pass_declarations",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "read_patch_lines",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "read_pauses",
@@ -13105,6 +13475,11 @@
     {
       "id": "read_refs",
       "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "read_refs",
+      "kind": "function",
       "file": "tools/runlog/model.py"
     },
     {
@@ -13158,6 +13533,11 @@
       "file": "tools/run-gates/post-merge.sh"
     },
     {
+      "id": "read_report",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "read_rev",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -13208,6 +13588,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_rows",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "read_rp_line",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -13231,6 +13616,11 @@
       "id": "read_run_exclusions",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "read_run_fact",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "read_run_fact",
@@ -13316,6 +13706,16 @@
       "id": "read_shell_sources",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "read_side",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "read_signal_blob",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
     },
     {
       "id": "read_signal_table_names",
@@ -13441,6 +13841,11 @@
       "id": "read_stale_header_waiver",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_stash",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "read_stderr_tail",
@@ -13705,6 +14110,11 @@
     {
       "id": "read_verdict",
       "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "read_verdict",
+      "kind": "function",
       "file": "tools/govkit/matrix.py"
     },
     {
@@ -13776,6 +14186,11 @@
       "id": "read_worktree_status",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "read_worktrees",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "read_writer_fns",
@@ -14076,6 +14491,11 @@
       "id": "remove_wired_fragments",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "remove_worktree",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "render",
@@ -14608,6 +15028,16 @@
       "file": "tools/codebase-map/map_diff.py"
     },
     {
+      "id": "render_date",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "render_dirt",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "render_doc",
       "kind": "function",
       "file": "tools/lib/render-doc.sh"
@@ -14920,6 +15350,11 @@
     {
       "id": "render_report",
       "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "render_report",
+      "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
     },
     {
@@ -14991,6 +15426,11 @@
       "id": "render_shards",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_skill",
+      "kind": "function",
+      "file": "tools/branch-reconcile/adopt-branch-reconcile.sh"
     },
     {
       "id": "render_skill",
@@ -15370,6 +15810,11 @@
     {
       "id": "resolve_bash",
       "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "resolve_bash",
+      "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
     {
@@ -15506,6 +15951,11 @@
       "id": "resolve_declared_sources",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "resolve_default",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "resolve_default_ref",
@@ -16660,6 +17110,11 @@
     {
       "id": "resolve_remote",
       "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "resolve_remote",
+      "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
     },
     {
@@ -17275,6 +17730,11 @@
     {
       "id": "run_adopter",
       "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "run_adopter",
+      "kind": "function",
       "file": "tools/roles/adopt-roles.test.sh"
     },
     {
@@ -17430,6 +17890,11 @@
     {
       "id": "run_cli",
       "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "run_cli",
+      "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
     {
@@ -17576,6 +18041,16 @@
       "id": "run_gh35_command",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "run_git",
@@ -17803,6 +18278,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_main",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "run_main_at_head",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -17996,6 +18476,11 @@
       "id": "run_render_helper",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_rm",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "run_rm3",
@@ -18316,6 +18801,11 @@
       "id": "run_wf",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "run_worktree_remove",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "run_write",
@@ -18978,6 +19468,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "scan_test_cases",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "scan_text_io",
       "kind": "function",
       "file": "tools/gate-lint/encoding_posture.py"
@@ -19123,6 +19618,11 @@
       "file": "tools/unattended/check-playbook.test.sh"
     },
     {
+      "id": "seed_adopter",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "seed_affordances",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -19163,6 +19663,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "seed_commit",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "seed_corpus",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -19176,6 +19681,16 @@
       "id": "seed_driver_kit",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
+      "id": "seed_env",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "seed_environ",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "seed_f4_tree",
@@ -19213,6 +19728,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "seed_lines",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "seed_log",
       "kind": "function",
       "file": "tools/unattended/resume-tick.test.sh"
@@ -19221,6 +19741,11 @@
       "id": "seed_mode_fixture",
       "kind": "function",
       "file": "tools/check-wiring.test.sh"
+    },
+    {
+      "id": "seed_publish",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "seed_range_fixture",
@@ -19245,12 +19770,22 @@
     {
       "id": "seed_repo",
       "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "seed_repo",
+      "kind": "function",
       "file": "tools/hooks/format-guard.test.sh"
     },
     {
       "id": "seed_ros",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "seed_seam",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "seed_shards_base",
@@ -19281,6 +19816,11 @@
       "id": "seed_witness",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "seed_write_fixture",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "seed_write_fixture",
@@ -19783,11 +20323,6 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
-      "id": "test_already_gone_is_not_a_signal_error",
-      "kind": "function",
-      "file": "tools/process-monitor/selftest.py"
-    },
-    {
       "id": "test_archive_segment_after_archive_is_durable",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -19841,6 +20376,11 @@
       "id": "test_backlog_stragglers",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_backstop_outcomes_are_each_classified",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_base_is_remote_tracking",
@@ -20754,6 +21294,11 @@
     },
     {
       "id": "test_msys_row_is_signalled_by_the_kill_binary",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_msys_signal_is_backstopped_by_winpid",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
     },
@@ -22183,6 +22728,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "write_deletions",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "write_dl_landing",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -22376,6 +22926,11 @@
       "id": "write_manifest",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "write_manifest",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "write_message",

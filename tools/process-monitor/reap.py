@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """reap.py — kill a tree and PROVE each member died.
 
-gov:kit process-monitor@0.17
+gov:kit process-monitor@0.18
 
 Contract: memory/builds/aReapedSpinner/spec/2026-09-08-spec-TOOL-aReapedSpinner-4.md
 
@@ -164,6 +164,17 @@ def build_walk(rows, target):
     return [w for w, _d in sorted(depth.items(), key=lambda kv: -kv[1])]
 
 
+def read_signal_blob(done):
+    """A signal command's message: stderr, else stdout, decoded and stripped."""
+    return (done.stderr or done.stdout or b"").decode("utf-8", "replace").strip()
+
+
+def check_gone_blob(done):
+    """Did the signal fail because the process is already gone? Both binaries' wordings."""
+    blob = read_signal_blob(done).lower()
+    return "not found" in blob or "no such process" in blob
+
+
 def run_kill(target, rows, scope, dry_run=False):
     """Kill `target` and its descendants. Returns a report dict; NEVER a bare success.
 
@@ -204,7 +215,7 @@ def run_kill(target, rows, scope, dry_run=False):
     withheld = [w for w in walked if w in scope and not scope[w].get("killable")]
     kill_set = [w for w in walked if w in scope and scope[w].get("killable")]
 
-    signalled, unsignalable, errors, already_gone = [], [], [], []
+    signalled, unsignalable, errors, already_gone, backstopped = [], [], [], [], []
     if not dry_run:
         for winpid in kill_set:
             row = by_win[winpid]
@@ -217,6 +228,25 @@ def run_kill(target, rows, scope, dry_run=False):
                 unsignalable.append(winpid)
                 continue
             done = subprocess.run(argv, capture_output=True, timeout=SIGNAL_TIMEOUT_S)
+            also = ""
+            if argv[0] == binaries["msys"] and binaries.get("native"):
+                # THE WINPID BACKSTOP (TOOL-dSweptBranches-21). An MSYS id does not always address
+                # the process the census paired it with. Measured on a live tree: a native
+                # python.exe that bash spawned answers `kill -0` on its MSYS id, then either refuses
+                # `kill -9` with `Permission denied` or accepts it and runs on past the whole settle,
+                # `kill -f` included; 2 runs in 6, and 2 in 10. The winpid is the address the census
+                # read, so every MSYS signal is followed by a single-pid taskkill on it. Either
+                # signal landing is a delivered signal; whether anything DIED is still the census's
+                # answer, never these exit statuses.
+                backstopped.append(winpid)
+                backstop = subprocess.run([binaries["native"], "/PID", str(winpid), "/F"],
+                                          capture_output=True, timeout=SIGNAL_TIMEOUT_S)
+                if done.returncode != 0 and (backstop.returncode == 0
+                                             or check_gone_blob(backstop)):
+                    done = backstop
+                elif done.returncode != 0:
+                    # Both refused: the error carries both messages, never only the first.
+                    also = " · taskkill: " + read_signal_blob(backstop)[:120]
             if done.returncode != 0:
                 # CLASSIFIED, not collapsed. invalid-argument, access-denied and no-such-process
                 # are three outcomes and reporting all three the same way is how a wrong-namespace
@@ -227,11 +257,10 @@ def run_kill(target, rows, scope, dry_run=False):
                 # walk reaches an ancestor its remaining descendants are already gone. A clean
                 # 8-of-8 kill reported four "signal errors" until this branch existed, which would
                 # have trained an operator to ignore the field that matters.
-                blob = (done.stderr or done.stdout or b"").decode("utf-8", "replace").strip()
-                if "not found" in blob.lower() or "no such process" in blob.lower():
+                if check_gone_blob(done):
                     already_gone.append(winpid)
                 else:
-                    errors.append((winpid, done.returncode, blob[:120]))
+                    errors.append((winpid, done.returncode, read_signal_blob(done)[:120] + also))
             signalled.append(winpid)
 
     return {
@@ -244,6 +273,7 @@ def run_kill(target, rows, scope, dry_run=False):
         "unsignalable": unsignalable,
         "errors": errors,
         "already_gone": already_gone,
+        "backstopped": backstopped,
         "dry_run": dry_run,
     }
 
@@ -299,10 +329,11 @@ def render_kill(report):
               len(report.get("withheld", ())))]
     if "killed" in report:
         out.append("reap: killed %d · survivors %d · already gone %d · unsignalable %d "
-                   "· signal errors %d · census reads %d"
+                   "· signal errors %d · backstopped %d · census reads %d"
                    % (len(report["killed"]), len(report["survivors"]),
                       len(report.get("already_gone", ())), len(report["unsignalable"]),
-                      len(report["errors"]), report.get("rereads", 1)))
+                      len(report["errors"]), len(report.get("backstopped", ())),
+                      report.get("rereads", 1)))
     for winpid, rc, msg in report["errors"]:
         out.append("reap:   signal error on %d (rc %d): %s" % (winpid, rc, msg))
     for winpid in report["unsignalable"]:

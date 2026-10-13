@@ -372,6 +372,7 @@ Cite ids, never line numbers.
 | [TOOL-cFinalBerth-4](../builds/cFinalBerth/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-13 | the three named refusals aMooredAnchor S4 scoped for check 9's silent… |
 | [TOOL-cFinalBerth-5](../builds/cFinalBerth/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-13 | the run-gates canary's par*2 < ser ratio FLIPS run to run on one tree:… |
 | [TOOL-cGradedDebt-3](../builds/cGradedDebt/BACKLOG.md) | OPEN | — | — | 2026-09-13 | ARMS_FLOORS FOR THE HYGIENE GATE TRAILS ITS POPULATION BY FOUR.… |
+| [TOOL-cListedCensus-2](../builds/cListedCensus/BACKLOG.md) | OPEN | LOW | — | 2026-10-13 | the two sibling scanners list their population case-sensitively, the… |
 | [TOOL-cMendedVintage-20](../builds/cMendedVintage/BACKLOG.md) | OPEN | — | — | 2026-09-20 | the unattended driver gains a rotation the verbs understand, so a long… |
 | [TOOL-cSettledDocket-7](../builds/cSettledDocket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | tools/memory-recall/recall-opened.test.sh is tracked and NO gate leg… |
 | [TOOL-cSettledDocket-8](../builds/cSettledDocket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | DIRECTIVES_EXTRA_TABLE has one reader, check 16. Unit 2's 'shown to the… |
@@ -483,6 +484,8 @@ Cite ids, never line numbers.
 | [TOOL-dSpentCeiling-6](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | two waiver registries pin LINE NUMBERS into files that get edited, so… |
 | [TOOL-dSpentCeiling-7](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | FLIP READ_PATH_RULES_GATE to True in tools/memory-tree/corpus_ids.py,… |
 | [TOOL-dSpentCeiling-8](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | THE FULL BAR IS NONDETERMINISTIC UNDER ITS OWN CONCURRENCY, on at least… |
+| [TOOL-dSweptBranches-22](../builds/dSweptBranches/BACKLOG.md) | OPEN | LOW | — | 2026-10-13 | two staged-set readers read a merge of the default branch as additions… |
+| [TOOL-dSweptBranches-25](../builds/dSweptBranches/BACKLOG.md) | OPEN | HIGH | — | 2026-10-13 | held red: suite process-monitor census selftest red at 37200355 on the… |
 | [TOOL-dThriftyLanding-7](../builds/dThriftyLanding/BACKLOG.md) | OPEN | MED | — | 2026-10-05 | unattended kit gate costs 222 s standalone on node d and reads every… |
 | [TOOL-dTieredTribunal-4](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | the args-must-be-an-object guard is not ported into the two drift-audit… |
 | [TOOL-dTieredTribunal-6](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | The RECLASSIFICATION that created this row was ratified 2026-08-26… |

@@ -103,6 +103,7 @@ run-gates gov canary	60		worst of 11 readings 19s, x1.5
 run-gates run-log line	280		worst of 6 readings 186s on node d 2026-09-13 by direct invocation, the fastest 62s, x1.5. TOOL-dLoggedFlight-3, withheld from adopters
 run-gates turnstile	3630		worst of 9 readings 2419s, x1.5
 run-selftests self-test	1217		measured 811s on node a 2026-09-14, direct timed run of the suite alone on a frozen git clone --local at f23b71e0 (108 arms, inner width 1, 15 bash processes on the box before it started, PASS), x1.5 rounded up; the 300s ceiling it replaces was killed at 300.333s exit 124 and had observed no wall
+branch-reconcile selftest	78		measured 52s on node d 2026-10-13, the whole suite run once at VERIFYING over 92 assertions, x1.5
 runlog selftest	93		measured 62s on node d 2026-09-16, the worst of the direct runs (58 to 62 s) after the closing review's round-1 fold and the second origin/main reconcile raised the suite to 1291 assertions, x1.5
 scratch-guard self-test	220		worst of 8 readings 145s, x1.5
 format-guard self-test	30		worst of 2 readings 16s on node a 2026-10-13 (73 assertions, post-reboot), x1.5 rounded up; re-declared at aHeardState's VERIFYING from the ESTIMATE of 120

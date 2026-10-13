@@ -193,3 +193,5 @@ memory/builds/dRemeasuredRender/README.md
 memory/builds/aHeardState/README.md
 memory/builds/aTrimmedHook/README.md
 memory/builds/aOrientedCast/README.md
+memory/builds/cListedCensus/README.md
+memory/builds/dSweptBranches/README.md

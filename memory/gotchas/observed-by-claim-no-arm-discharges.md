@@ -32,6 +32,12 @@ rendered on the synthesis-death log, the deferred-batch log, RUN INTEGRITY and t
 staging a break on each of those lines left all of `tools/workflows/tier2-review.test.sh` green. The behaviour was
 correct; the claim that something observed it was not.
 
+It bit again in `TOOL-dSweptBranches-21` (the follow-up review of dSweptBranches, finding 8). A spec's
+§7 `New arm:` line named a staged five-second delay as the arm's condition, and the delay lived only
+in a scratch edit whose bytes were restored. The arm in the tree runs undelayed, so reverting the
+spawn poll to a fixed wait leaves it green. A staged condition that is not in the shipped arm is an
+observation by hand: say so on the line.
+
 ## The fix
 
 Stage the break of the scope item's OWN surface and watch the cited arm go red. Never read the arm
