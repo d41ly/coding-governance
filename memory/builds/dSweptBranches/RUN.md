@@ -24,19 +24,19 @@ parked-surfaced: yes, 1 surfaced
 keepalive-reaped: yes
 refreshed-at: 2b852f5fd87147540a0a73d310354440c84c72ea · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 7138606411c9b46b0a6028cb40a9a8ed5d7eea9f
-phase: HELD
+witness: c07585e775b92bed40f2d2e6787223f3a5fd38d2
+phase: VERIFYING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/musing-lumiere-ab7980
 anchor-kind: local
 cli-version: 2.1.295
-lease-utc: 2026-10-13T00:16:07Z
+lease-utc: 2026-10-13T10:32:13Z
 pid-image: claude.exe
 host: compeeto
 pid: 26524
 session: b5b52897-9613-45cf-bd70-69865ae3878c
-keepalive: a17ed934
+keepalive: ca711d31
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 2b852f5fd87147540a0a73d310354440c84c72ea
 anchor-ref: refs/heads/main
@@ -151,3 +151,5 @@ base: a8f0e195a2d80a6d1480e4992aec6565342e35ea
 2026-10-13T07:31:26Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dSweptBranches && bash tools/push-main.sh --land --slug dSweptBranches && bash tools/unattended/unattended.sh --settle dSweptBranches
 
 2026-10-13T07:31:26Z hold · item owner-decision · reason until owner · reaped a17ed934 · resume none(owner)
+
+2026-10-13T10:32:18Z resume · item dSweptBranches · reason held · keepalive ca711d31 · manual
