@@ -14,7 +14,8 @@
 # and commits made there. The real repository's card, LIVE.md and HEAD are never read, so the suite
 # measures the same thing on every node.
 set -u
-HERE="$(cd "$(dirname "$0")" && pwd)"
+HERE=.; [[ $0 == */* ]] && HERE=${0%/*}
+HERE="$(cd "$HERE" && pwd)"
 HOOK="$HERE/format-guard.js"
 ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "format-guard.test: not inside a git repository"; exit 2; }
 command -v node >/dev/null 2>&1 || { echo "format-guard.test: node is not on PATH"; exit 2; }
@@ -59,7 +60,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -96,7 +98,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -133,16 +135,18 @@ seed_fixture_commit() { # subject -> the new HEAD's sha
 }
 
 # run_stop <name> <block|allow> <message-file> [extra JSON fields] — builds the payload with node, so
-# no message byte passes through a shell quote.
+# no message byte passes through a shell quote. The payload names an empty transcript by default
+# (TOOL-aOrientedCast-21), so the agent arm reads a turn with no agent and writes nothing.
+: > "$TMP/empty.jsonl"
 run_stop() {
   local name=$1 want=$2 msg=$3 extra=${4:-}
   [ -n "$extra" ] || extra='{}'
   node -e '
     const fs = require("fs")
     const p = { hook_event_name: "Stop", session_id: process.argv[2], cwd: process.argv[3], stop_hook_active: false,
-                last_assistant_message: fs.readFileSync(process.argv[1], "utf8") }
+                transcript_path: process.argv[5], last_assistant_message: fs.readFileSync(process.argv[1], "utf8") }
     Object.assign(p, JSON.parse(process.argv[4] || "{}"))
-    process.stdout.write(JSON.stringify(p))' "$msg" "$SID" "$(resolve_native "$REPO")" "$extra" > "$TMP/payload"
+    process.stdout.write(JSON.stringify(p))' "$msg" "$SID" "$(resolve_native "$REPO")" "$extra" "$(resolve_native "$TMP")/empty.jsonl" > "$TMP/payload"
   node "$HOOK" < "$TMP/payload" > "$TMP/out" 2> "$TMP/err"
   local rc=$? got=allow
   [ -s "$TMP/out" ] && got=block
@@ -151,11 +155,15 @@ run_stop() {
 }
 check_contains() { # <name> <file> <fixed string>
   if grep -qF -- "$3" "$2"; then echo "ok   $1"; pass=$((pass+1))
-  else echo "FAIL $1 (no '$3' in $(basename "$2"))"; sed 's/^/     /' "$2"; fail=$((fail+1)); fi
+  else echo "FAIL $1 (no '$3' in ${2##*/})"; sed 's/^/     /' "$2"; fail=$((fail+1)); fi
 }
 check_empty() { # <name> <file>
   if [ ! -s "$2" ]; then echo "ok   $1"; pass=$((pass+1))
-  else echo "FAIL $1 ($(basename "$2") not empty)"; sed 's/^/     /' "$2"; fail=$((fail+1)); fi
+  else echo "FAIL $1 (${2##*/} not empty)"; sed 's/^/     /' "$2"; fail=$((fail+1)); fi
+}
+check_absent() { # <name> <file> <fixed string>
+  if ! grep -qF -- "$3" "$2"; then echo "ok   $1"; pass=$((pass+1))
+  else echo "FAIL $1 ('$3' in $(basename "$2"))"; sed 's/^/     /' "$2"; fail=$((fail+1)); fi
 }
 
 # write_message <name> <line>... — one message file, one argument per line. Every string here is one line and
@@ -164,7 +172,7 @@ check_empty() { # <name> <file>
 write_message() { local f=$1; shift; printf '%s\n' "$@" > "$TMP/$f.md"; }
 B='BUILD — tBuild · Tier-2 · 1/2 build · left TOOL-tBuild-2'
 S='SPEC — [TOOL-tBuild-1](memory/builds/tBuild/spec/x.md) · review none'
-BT=$(printf '\140'); FENCE="$BT$BT$BT"
+BT=$'\140'; FENCE="$BT$BT$BT"
 write_message good   "Done." "" "- $B" "- $S"
 write_message none   "Done, all good."
 write_message tick   "- $BT$B$BT" "- $BT$S$BT"
@@ -188,6 +196,8 @@ run_stop "AC1 a message with no pair blocks" block "$TMP/none.md"
 check_contains "AC1 the reason names the missing BUILD line" "$TMP/out" "no BUILD line"
 check_contains "AC1 the reason quotes the charter's BUILD definition" "$TMP/out" 'BUILD — <slug> · Tier-<n>'
 run_stop "AC1 stop_hook_active true allows" allow "$TMP/none.md" '{"stop_hook_active":true}'
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
 # AC2 — rule r1: five non-bare spellings.
 for f in tick indent bold head fenced; do
@@ -220,13 +230,13 @@ check_contains "AC6 the reason names the new commit" "$TMP/out" "commit ${sha:0:
 check_contains "TOOL-aHeardState-8 the commit defect names both line shapes" "$TMP/out" "committed or merged line"
 check_contains "TOOL-aHeardState-8 the reason says not yet terminal" "$TMP/out" "not yet terminal"
 sha=$(seed_fixture_commit "two")
-printf '%s\n\n- committed — %s · main · two\n' "$(cat "$TMP/good.md")" "${sha:0:7}" > "$TMP/reported.md"
+printf '%s\n\n- committed — %s · main · two\n' "$(<"$TMP/good.md")" "${sha:0:7}" > "$TMP/reported.md"
 run_stop "AC6 a commit named by a committed line allows" allow "$TMP/reported.md"
 sha=$(seed_fixture_commit "three")
-printf '%s\n\n- committed — 0000000 · main · three\n' "$(cat "$TMP/good.md")" > "$TMP/wrong.md"
+printf '%s\n\n- committed — 0000000 · main · three\n' "$(<"$TMP/good.md")" > "$TMP/wrong.md"
 run_stop "AC6 a committed line naming another sha blocks" block "$TMP/wrong.md"
 sha=$(seed_fixture_commit "four")
-printf '%s\n\n- merged — --no-ff tBranch → main · %s\n' "$(cat "$TMP/good.md")" "${sha:0:8}" > "$TMP/merged.md"
+printf '%s\n\n- merged — --no-ff tBranch → main · %s\n' "$(<"$TMP/good.md")" "${sha:0:8}" > "$TMP/merged.md"
 run_stop "AC6 a merged line naming the commit allows" allow "$TMP/merged.md"
 # TOOL-aHeardState-7 — a chained stop leaves the baseline alone, so its commit is owed at the next
 # unchained stop: the behaviour the header now states.
@@ -295,6 +305,148 @@ printf 'ref: refs/heads/tNowhere\n' > "$REPO/.git/HEAD"
 run_stop "TOOL-aHeardState-8 an unreadable HEAD allows" allow "$TMP/good.md"
 check_contains "TOOL-aHeardState-8 the witness names the unreadable HEAD" "$TMP/err" "HEAD is unreadable"
 
+# TOOL-aOrientedCast-21 — every agent the turn dispatched or received owes its bare line.
+# write_transcript <scenario> — a fixture transcript at $TMP/sess/$SID.jsonl and its session dir, built
+# by node from JSON objects so no byte crosses a shell quote; prints the payload field naming it.
+write_transcript() {
+  rm -rf "$TMP/sess"; mkdir -p "$TMP/sess"
+  node -e '
+    const fs = require("fs"), path = require("path")
+    const [scenario, file] = process.argv.slice(1)
+    const dir = file.replace(/\.jsonl$/, "")
+    const typed = (text) => ({ type: "user", message: { role: "user", content: text } })
+    const call = (id, name) => ({ type: "assistant", message: { role: "assistant", content: [{ type: "tool_use", id, name, input: {} }] } })
+    const result = (id, r) => ({ type: "user", message: { role: "user", content: [{ type: "tool_result", tool_use_id: id, content: "ok" }] }, toolUseResult: r })
+    const said = (text) => ({ type: "assistant", message: { role: "assistant", content: [{ type: "text", text }] } })
+    // A notification with no id leaves its header without one; a body becomes its <result> (TOOL-aOrientedCast-24).
+    const block = (id, body) => "<task-notification>\n" + (id ? "<tool-use-id>" + id + "</tool-use-id>\n" : "") + "<status>completed</status>\n" + (body ? "<result>" + body + "</result>\n" : "") + "</task-notification>"
+    const notice = (id, body) => ({ type: "user", origin: { kind: "task-notification" }, message: { role: "user", content: block(id, body) } })
+    const queued = (id) => ({ type: "attachment", attachment: { type: "queued_command", prompt: block(id) } })
+    const meta = (text, extra) => Object.assign({ type: "user", isMeta: true, message: { role: "user", content: [{ type: "text", text }] } }, extra || {})
+    const summary = { type: "user", isCompactSummary: true, message: { role: "user", content: "This session is being continued from a previous conversation." } }
+    const journal = (sub, entries) => {
+      fs.mkdirSync(path.join(dir, "subagents", sub), { recursive: true })
+      fs.writeFileSync(path.join(dir, "subagents", sub, "journal.jsonl"), entries.map((e) => JSON.stringify(e)).join("\n") + "\n")
+    }
+    const dispatch = [call("t1", "Agent"), result("t1", { status: "async_launched", agentId: "a1" })]
+    const agentTurn = [typed("go"), ...dispatch, said("Launched.")]
+    const runTurn = [typed("go"), call("t2", "Workflow"), result("t2", { status: "async_launched", runId: "wf_t-1" }), said("Launched.")]
+    const quotedTurn = [typed("go"), ...dispatch, call("t9", "Agent"), result("t9", { status: "async_launched", agentId: "a9" }), said("Launched.")]
+    const quote = "I also saw <tool-use-id>t9</tool-use-id> go by."
+    const records = {
+      agent: agentTurn,
+      "agent-notified": [...agentTurn, notice("t1"), said("Done.")],
+      run: runTurn,
+      "run-notified": [...runTurn, notice("t2"), said("Done.")],
+      "bad-run": [typed("go"), call("t3", "Workflow"), result("t3", { status: "async_launched", runId: "../x" }), said("Launched.")],
+      quoted: [...quotedTurn, notice("t1", quote), said("Done.")],
+      "quoted-headless": [...quotedTurn, notice(null, quote), said("Done.")],
+      skill: [typed("go"), ...dispatch, call("t5", "Skill"), result("t5", { success: true }), meta("Base directory for this skill: x", { sourceToolUseID: "t5" }), said("Done.")],
+      image: [typed("go"), ...dispatch, call("t6", "Read"), result("t6", { type: "image" }), meta("[Image: original 10x10, displayed at 10x10]"), said("Done.")],
+      compact: [typed("go"), ...dispatch, { type: "system", subtype: "compact_boundary", content: "Conversation compacted" }, summary, said("Done.")],
+      tick: [...agentTurn, meta("<tick>"), said("Idle.")],
+      queued: [...agentTurn, queued("t1"), said("Done.")],
+      foreground: [typed("go"), call("t1", "Agent"), result("t1", { status: "completed", agentId: "a1" }), said("Done.")],
+      "run-foreground": [typed("go"), call("t2", "Workflow"), result("t2", { status: "completed", runId: "wf_t-1" }), said("Done.")],
+      torn: [typed("go"), call("t1", "Agent"), "{torn", result("t1", { status: "async_launched", agentId: "a1" }), said("Launched.")],
+    }[scenario]
+    // A string element is one raw line, which is how the torn line is written.
+    fs.writeFileSync(file, records.map((r) => (typeof r === "string" ? r : JSON.stringify(r))).join("\n") + "\n")
+    const started = [{ type: "started", agentId: "a2" }, { type: "started", agentId: "a3" }]
+    const ended = scenario === "run-notified" || scenario === "run-foreground"
+    journal("workflows/wf_t-1", ended ? [...started, { type: "result", agentId: "a2" }, { type: "failed", agentId: "a3" }] : started)
+    journal("x", [{ type: "started", agentId: "aOutside" }])
+    process.stdout.write(JSON.stringify({ transcript_path: file }))' "$1" "$(resolve_native "$TMP/sess")/$SID.jsonl"
+}
+A1='agent — gov-builder · effort high · model m · TOOL-tBuild-1 · prompt [x.txt](x.txt) · writes product · gates none · run direct/a1'
+R1='returned — gov-builder · committed · 3m · 12k out · run direct/a1'
+A2='agent — gov-builder · effort high · model m · TOOL-tBuild-1 · prompt [x.txt](x.txt) · writes product · gates none · run wf_t-1/a2'
+A3='agent — gov-builder · effort high · model m · TOOL-tBuild-2 · prompt [y.txt](y.txt) · writes product · gates none · run wf_t-1/a3'
+R2='returned — gov-builder · committed · 3m · 12k out · run wf_t-1/a2'
+R3='returned — gov-builder · failed · 1m · 2k out · run wf_t-1/a3'
+write_message agent1   "Done." "" "- $A1" "- $B" "- $S"
+write_message agenttick "Done." "" "- $BT$A1$BT" "- $B" "- $S"
+write_message agentcut "Done." "" "- ${A1/run direct/direct}" "- $B" "- $S"
+write_message returned1 "Done." "" "- $R1" "- $B" "- $S"
+write_message runboth  "Done." "" "- $A2" "- $A3" "- $B" "- $S"
+write_message runa2    "Done." "" "- $A2" "- $B" "- $S"
+write_message runall   "Done." "" "- $A2" "- $A3" "- $R2" "- $R3" "- $B" "- $S"
+seed_repo "$TMP/charter.md"
+TP=$(write_transcript agent)
+run_stop "TOOL-aOrientedCast-21 a dispatched agent with no agent line blocks" block "$TMP/good.md" "$TP"
+check_contains "TOOL-aOrientedCast-21 the reason names the agent" "$TMP/out" "agent a1"
+check_contains "TOOL-aOrientedCast-21 the reason says the turn dispatched it" "$TMP/out" "which this turn dispatched"
+check_contains "TOOL-aOrientedCast-21 the reason names the verb" "$TMP/out" "handoff.py agents"
+run_stop "TOOL-aOrientedCast-21 a bare agent line ending run direct/a1 allows" allow "$TMP/agent1.md" "$TP"
+run_stop "TOOL-aOrientedCast-21 the agent line in backticks blocks" block "$TMP/agenttick.md" "$TP"
+check_contains "TOOL-aOrientedCast-21 the backticked line names rule r1" "$TMP/out" "rule r1"
+run_stop "TOOL-aOrientedCast-21 the agent line with its last field cut blocks" block "$TMP/agentcut.md" "$TP"
+check_contains "TOOL-aOrientedCast-21 the cut line names its charter shape" "$TMP/out" "does not match its charter shape"
+TP=$(write_transcript agent-notified)
+run_stop "TOOL-aOrientedCast-21 a received agent with no returned line blocks" block "$TMP/good.md" "$TP"
+check_contains "TOOL-aOrientedCast-21 the reason names the returned line for a1" "$TMP/out" "no returned line for agent a1"
+run_stop "TOOL-aOrientedCast-21 a returned line alone allows: the earlier dispatch is not owed again" allow "$TMP/returned1.md" "$TP"
+TP=$(write_transcript run)
+run_stop "TOOL-aOrientedCast-21 both of a run's started agents shown allows" allow "$TMP/runboth.md" "$TP"
+run_stop "TOOL-aOrientedCast-21 a run's agent left out blocks" block "$TMP/runa2.md" "$TP"
+check_contains "TOOL-aOrientedCast-21 the reason names the agent left out" "$TMP/out" "agent a3"
+check_absent "TOOL-aOrientedCast-21 the reason does not name the agent shown" "$TMP/out" "agent a2"
+TP=$(write_transcript run-notified)
+run_stop "TOOL-aOrientedCast-21 a received run owes its returned lines too" block "$TMP/runboth.md" "$TP"
+check_contains "TOOL-aOrientedCast-21 the reason names a failed agent's returned line" "$TMP/out" "no returned line for agent a3"
+run_stop "TOOL-aOrientedCast-21 a received run with all four lines allows" allow "$TMP/runall.md" "$TP"
+awk -v bt="$BT" 'index($0, "- " bt "agent — ") != 1' "$TMP/charter.md" > "$TMP/noagent.md"
+grep -qF -- "- ${BT}agent — " "$TMP/noagent.md" && { echo "FAIL TOOL-aOrientedCast-21 the fixture edit did not delete the agent definition"; fail=$((fail+1)); }
+seed_repo "$TMP/noagent.md"
+TP=$(write_transcript agent)
+run_stop "TOOL-aOrientedCast-21 a charter with no agent shape allows" allow "$TMP/good.md" "$TP"
+check_contains "TOOL-aOrientedCast-21 the witness names the missing agent shape" "$TMP/err" "no agent shape"
+check_contains "TOOL-aOrientedCast-21 the witness counts the agent" "$TMP/err" "1 agent(s)"
+run_stop "TOOL-aOrientedCast-21 a charter with no agent shape and no agent in the turn allows" allow "$TMP/good.md"
+check_empty "TOOL-aOrientedCast-21 no agent in the turn writes nothing" "$TMP/err"
+seed_repo "$TMP/charter.md"
+run_stop "TOOL-aOrientedCast-21 a payload with no transcript_path allows" allow "$TMP/good.md" '{"transcript_path":null}'
+check_contains "TOOL-aOrientedCast-21 the witness names transcript_path" "$TMP/err" "transcript_path"
+TP=$(write_transcript bad-run)
+# The fixture plants a journal at subagents/x, where ../x would land: read, its agent would block.
+run_stop "TOOL-aOrientedCast-21 a run id off its shape allows, its outside journal unread" allow "$TMP/good.md" "$TP"
+check_contains "TOOL-aOrientedCast-21 the witness names the run id" "$TMP/err" '"../x"'
+
+# TOOL-aOrientedCast-24 — the notification's header id (M1), the two opener exceptions and the tick they
+# must not reach (M2), both delivery routes and the foreground endings (M7), and a torn line (L1).
+write_message agentret "Done." "" "- $A1" "- $R1" "- $B" "- $S"
+seed_repo "$TMP/charter.md"
+TP=$(write_transcript quoted)
+run_stop "TOOL-aOrientedCast-24 a notification quoting another id in its result allows the R1 message" allow "$TMP/returned1.md" "$TP"
+run_stop "TOOL-aOrientedCast-24 the same notification blocks pair-only" block "$TMP/good.md" "$TP"
+check_contains "TOOL-aOrientedCast-24 the reason names the header's agent" "$TMP/out" "no returned line for agent a1"
+check_absent "TOOL-aOrientedCast-24 the reason does not name the quoted agent" "$TMP/out" "agent a9"
+TP=$(write_transcript quoted-headless)
+run_stop "TOOL-aOrientedCast-24 a notification with no header id requires nothing its result quotes" allow "$TMP/good.md" "$TP"
+for sc in skill image compact; do
+  TP=$(write_transcript "$sc")
+  run_stop "TOOL-aOrientedCast-24 the $sc record opens no turn: pair-only blocks" block "$TMP/good.md" "$TP"
+  check_contains "TOOL-aOrientedCast-24 the $sc reason names the agent" "$TMP/out" "agent a1"
+  check_contains "TOOL-aOrientedCast-24 the $sc reason says the turn dispatched it" "$TMP/out" "which this turn dispatched"
+done
+TP=$(write_transcript tick)
+run_stop "TOOL-aOrientedCast-24 an idle tick after assistant text opens the turn: pair-only allows" allow "$TMP/good.md" "$TP"
+check_empty "TOOL-aOrientedCast-24 the tick writes nothing to stderr" "$TMP/err"
+for sc in queued foreground; do
+  TP=$(write_transcript "$sc")
+  run_stop "TOOL-aOrientedCast-24 the $sc agent's agent line alone blocks" block "$TMP/agent1.md" "$TP"
+  check_contains "TOOL-aOrientedCast-24 the $sc reason names the returned line" "$TMP/out" "no returned line for agent a1"
+  run_stop "TOOL-aOrientedCast-24 the $sc agent's two lines allow" allow "$TMP/agentret.md" "$TP"
+done
+TP=$(write_transcript run-foreground)
+run_stop "TOOL-aOrientedCast-24 a foreground run's agent lines alone block" block "$TMP/runboth.md" "$TP"
+check_contains "TOOL-aOrientedCast-24 the reason names the failed agent's returned line" "$TMP/out" "no returned line for agent a3"
+run_stop "TOOL-aOrientedCast-24 a foreground run with all four lines allows" allow "$TMP/runall.md" "$TP"
+TP=$(write_transcript torn)
+run_stop "TOOL-aOrientedCast-24 a torn line in the turn still grades its agent: pair-only blocks" block "$TMP/good.md" "$TP"
+check_contains "TOOL-aOrientedCast-24 the torn reason names the agent" "$TMP/out" "agent a1"
+check_contains "TOOL-aOrientedCast-24 the witness counts the torn line" "$TMP/err" "1 line(s)"
+
 # AC9 — a payload that is not JSON allows.
 printf 'not json' | node "$HOOK" > "$TMP/out" 2> "$TMP/err"; rc=$?
 if [ "$rc" = 0 ] && [ ! -s "$TMP/out" ]; then echo "ok   AC9 non-JSON stdin exits 0 with empty stdout"; pass=$((pass+1))
@@ -337,9 +489,11 @@ else echo "FAIL AC6 liveness: the verdicts never moved, so agreement proves noth
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count. 43 = the suite as TOOL-aHeardState-1 landed it; 54 = 43 + TOOL-aHeardState-2's AC6 arm (10
 # messages and its liveness); 57 = 54 + TOOL-aHeardState-7's three chained-stop assertions; 73 =
-# 57 + TOOL-aHeardState-8's 16: 2 wording, 13 in its fixture block, 1 inline parity message.
+# 57 + TOOL-aHeardState-8's 16: 2 wording, 13 in its fixture block, 1 inline parity message; 101 =
+# 73 + TOOL-aOrientedCast-21's 28 agent-line assertions; 129 = 101 + TOOL-aOrientedCast-24's 28: 4 quoted,
+# 1 headless, 9 in the three-record loop, 2 tick, 6 in the two-route loop, 3 foreground-run, 3 torn.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=73
+FLOOR_ASSERTIONS=129
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

@@ -1,0 +1,65 @@
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/.
+# Contract: memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-1.md
+
+id = "branch-reconcile"
+home = "branch-reconcile"
+scope = "repo"
+
+# Pinned at the CLI, which lands in the SAME unit as this descriptor, so the file the pattern reads
+# exists from the first commit.
+version_from = { file = "branch_reconcile.py", pattern = "^KIT_BRANCH_RECONCILE_VERSION = " }
+requires = []
+
+[[files]]
+include = "**"
+role = "engine"
+
+# THE SELF-TEST IS WITHHELD, as every kit's is (TOOL-aQuenchedHarness-3): its subject is the CLI in
+# this directory, so it has a job only where that code changes, and none in a tree that copy-installs
+# the kit. Withheld by claiming the destination with `project-owned`, which `apply` never writes. The
+# `branch-reconcile selftest` leg is gov's own, carried by an [[exempt_leg]] row in the registry.
+[[files]]
+include = ["selftest.py"]
+role = "project-owned"
+
+# THE SKILL IS RENDERED (TOOL-dSweptBranches-5). It names the CLI by where this kit is installed, a
+# value that differs per repository, so the adopter renders it and its `--check` re-renders and
+# compares. The one token is substituted by the adopter, which the kit-placeholders gate joins
+# against this list.
+[[files]]
+include = ["SKILL.template.md"]
+role = "rendered"
+to = ".claude/skills/cleanup/SKILL.md"
+placeholders = ["KIT_DIR"]
+
+[adopt]
+argv = ["bash", "{kit}/adopt-branch-reconcile.sh", "--scaffold"]
+mutates_index = false
+
+# THE RE-RENDER an update runs with GOVKIT_RERENDER=1, which govkit rule 3b-ii requires of a kit
+# shipping a `rendered` row. The adopter's `--scaffold` IS the re-render: it rewrites the Skill from
+# the template whether or not one is already there, the runlog kit's pair exactly.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-branch-reconcile.sh", "--scaffold"]
+stage = 1
+
+[check]
+argv = ["bash", "{kit}/adopt-branch-reconcile.sh", "--check"]
+
+[[outcome]]
+code = 0
+probe = { must_exist = ".claude/skills/cleanup/SKILL.md" }
+means = "adopted"
+
+# THE SKILL'S WIRING LEG SHIPS: its subject is the target's own rendered Skill, which goes stale when
+# the template is edited or the kit moves, with nobody touching the adopter.
+[[gate_leg]]
+name = "cleanup skill wiring"
+subject = "repo"
+argv = ["bash", "{kit}/adopt-branch-reconcile.sh", "--check"]
+guard = []
+
+# ONE [[lf_pin]], for the rendered Skill, which its own leg byte-compares.
+[[lf_pin]]
+pattern = ".claude/skills/cleanup/SKILL.md"
+why = "a rendered artifact its own gate byte-compares"

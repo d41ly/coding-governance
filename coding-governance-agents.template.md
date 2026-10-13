@@ -6,7 +6,7 @@ from the kits and answers it selected. Change a source and re-render with
 `<prefix>/playbook/adopt-playbook.sh`; never edit the rendered text. Every rule is one line: a tool,
 gate or protocol named in section 3 carries the detail.*
 
-<!-- governance-template: v4.3 -->
+<!-- governance-template: v4.4 -->
 
 ## 1. Governing practices
 
@@ -44,6 +44,9 @@ gate or protocol named in section 3 carries the detail.*
 <!-- /when:cross-os -->
 - [tokens] Spend tokens on new judgment: never re-read what is in context, bound every output, pin a diff base to a sha, and stop once verified.
 - [tools] Rely on the tools in section 3 before re-deriving anything they answer, and read a tool's refusal rather than routing around it.
+<!-- kit:roles -->
+- [roles] Spec writing and review, building and the closing review run in role agents (Agent roles); inline only if none can spawn and `{{MEMORY_ROOT}}/project/role-stand-in-waiver.txt` waives it.
+<!-- /kit:roles -->
 - [voice] Voice: dry, snarky, faintly sarcastic and genuinely friendly; wit never bends a fact, and bad news is delivered straight.
 - [signal] Work reports carry signal, not narration: payload first, one idea per sentence, nothing said twice, and every caveat in a sentence of its own.
 - [formats] The micro-formats below are NON-NEGOTIABLE: every final message carries them, byte-for-byte, for every event it reports; no length, voice or brevity rule overrides them.
@@ -62,6 +65,10 @@ gate or protocol named in section 3 carries the detail.*
 - `READY — <slug> · node <tag> · <branch> · base <sha> · Tier-<n> · gates <list>`
 - `BUILD — <slug> · Tier-<n> · <done>/<total> <step> · left <ids|none|unspecced>`
 - `SPEC — [<unit-id>](<path>) · review <ids|none>[ · open <ids|none>]`
+<!-- kit:roles -->
+- `agent — <role> · effort <level> · model <model> · <unit-id|label> · prompt [<name>](<path>) · writes <class> · gates <legs|none> · run <run-id|direct>/<agent-id>`
+- `returned — <role> · <outcome> · <wall> · <tokens> out · run <run-id|direct>/<agent-id>`
+<!-- /kit:roles -->
 - `unchanged — since <link> · delta <text|none>`
 - `⏳ — <what is running>`
 <!-- /microformats -->
@@ -69,6 +76,9 @@ gate or protocol named in section 3 carries the detail.*
 <!-- one-line -->
 - [never-omit] Every final message ends with the state block, short answers and conversation included; repeating it is not saying a thing twice, and omitting it is a defect.
 - [events] Each event in the turn gets its shape: a commit `committed`, a push `pushed`, a merge `merged`, a bar run `gates` or `skipped`, a server `up`, a kickoff `READY`, a long run `⏳`.
+<!-- kit:roles -->
+- [agents] Every agent a turn dispatches gets its `agent` line and every agent it receives its `returned` line, both derived by the roles kit and never typed.
+<!-- /kit:roles -->
 - [r1] Emit each shape as a bare `- ` list item at column 0: no backticks, fence, bold or heading, and one shape per line.
 - [grammar] A shape is a head keyword, the ` — ` joiner and fields separated by ` · `; `[ · …]` marks an optional trailing field and never appears in an emission.
 - [pair] `BUILD` then `SPEC` sit adjacent in the state block of every final message while a build is in progress, one-line replies included; before a spec exists, `SPEC` is omitted.
@@ -127,7 +137,7 @@ gate or protocol named in section 3 carries the detail.*
 - The write gate refuses a product-code write that no specced unit owns; route the unit through `/session-kickoff` first.
 <!-- /kit:agent-cap -->
 <!-- kit:roles -->
-- Every agent is handed a rendered role from `<prefix>/roles/`; spec, review and build work runs only in role agents. An attended code build runs through `/build`.
+- An attended code build runs through `/build`.
 <!-- /kit:roles -->
 <!-- kit:unattended -->
 - `/unattended` starts, resumes or closes a run that merges and pushes with no owner turn.
@@ -149,6 +159,14 @@ gate or protocol named in section 3 carries the detail.*
 <!-- /kit:gate-lint -->
 <!-- /one-line -->
 
+<!-- kit:roles -->
+## Agent roles — hand the work to its role
+
+<!-- one-line -->
+{{ROLE_ROSTER}}
+<!-- /one-line -->
+
+<!-- /kit:roles -->
 ## Protocols — read the one whose trigger holds
 
 <!-- one-line -->

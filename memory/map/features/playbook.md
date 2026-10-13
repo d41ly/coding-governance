@@ -49,6 +49,7 @@ map had no playbook dossier until now.
 
 ## Constraints & why
 
+- `{{ROLE_ROSTER}}` is derived by `derive_role_roster` in `tools/playbook/render_playbook.py`, which reaches the roles kit through `resolve_kit_dir` and substitutes its `roster` verb's stdout verbatim, so the roles kit stays the one reader of role files and this kit spells no sibling path (TOOL-aOrientedCast-18).
 - Its `[[regenerate]]` render row is staged, stage 1: run-gates' `regen.py` re-renders it on `--regen`, and every bar proves it fresh with this kit's `[check]` first (TOOL-aPrimedIndex-1).
 - **The size ceiling is 49152 bytes, and that is a REVERSAL.** It read 32 KiB and "never raise the
   limit" in four carriers until 2026-08-16, when the owner ordered the raise

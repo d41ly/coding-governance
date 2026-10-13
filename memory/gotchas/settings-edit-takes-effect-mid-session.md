@@ -19,6 +19,10 @@ whether it was present. The probe had two halves — does the edit take effect, 
 it not taking effect — and the second is the one a reader skips: a hook that never fires and a hook
 that fires silently are the same observation until the probe proves it can produce a negative.
 
+A second instance, TOOL-aOrientedCast-22: its spec and the unattended kit's README said a session
+started before the gate-guard matcher was widened keeps the narrower one until it restarts, when the
+widened matcher reached that session at its next tool call.
+
 ## The fix
 
 Treat a settings edit as a live change. A hook added to reproduce a problem is armed before the

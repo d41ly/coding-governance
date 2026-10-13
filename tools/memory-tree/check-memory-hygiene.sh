@@ -61,7 +61,7 @@ esac
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.146   # gov:kit memory-tree@2.146 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.148   # gov:kit memory-tree@2.148 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -736,6 +736,9 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # under <M>/project/, so an adopter of that kit owns the file whether or not it lists it in
   # PROJECT_REGISTRY_EXTRA. TOOL-aRepatriatedFork-10 S4.
   F:pass-order-waiver.txt) ;;
+  # The same class again: the roles kit's catalogue checker reads the owner's stand-in waivers at
+  # this DEFAULT path under <M>/project/ (TOOL-aOrientedCast-19 S5).
+  F:role-stand-in-waiver.txt) ;;
   # S2 — PROJECT_REGISTRY_EXTRA. A project may ADD registries under <M>/project/ without
   # forking this whitelist, which is what adopter nc carved this file out to do.
   #

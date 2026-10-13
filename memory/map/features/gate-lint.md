@@ -5,7 +5,7 @@ feature = "gate-lint"
 title = "Three scanners for the failure modes a reader cannot see: PowerShell's decoding traps, a shell loop that blocks forever, and Python text IO that decodes with the locale"
 status = "shipped"
 streams = ["tooling"]
-decisions = ["TOOL-aLeakedHandle-1"]
+decisions = ["TOOL-aLeakedHandle-1", "TOOL-cListedCensus-1"]
 
 [claims]
 gate-legs = [
@@ -22,7 +22,7 @@ harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = []
+gotcha-classes = ["a-gate-that-walks-the-repo-root-reads-other-worktrees.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -57,6 +57,15 @@ undischargeable by construction — `discharge = { command = ["bash", "-c", "exi
 as a silence. `TOOL-aLeakedHandle-1` discharged it by giving the kit its first two legs; the hole is
 gone from the descriptor and the PowerShell half is still unlegged, which is a real gap and is
 listed as one below rather than closed by association.
+
+**Every scanner grades the files the index holds, never a walk of the disk.** An adopter may park its
+linked worktrees inside its primary tree, untracked, and a walk from the root grades each of them as
+another copy of the tree. `ps-hygiene.py` was the last walker: NicoCares' lander went red on six
+findings in worktree copies on 2026-10-11, and `TOOL-cListedCensus-1` moved it to `git ls-files`. A
+listing that failed exits 2 in all three scanners, and an empty one is never a pass: the two shell and
+PowerShell scanners refuse it with 2, `encoding_posture.py` with 1. Both yield zero files, and only one
+of them means there is nothing to grade. The class is
+`memory/gotchas/a-gate-that-walks-the-repo-root-reads-other-worktrees.md`.
 
 **A kit file names nothing outside itself by literal, and the registry is what that costs.** The
 shell scanner grades a repository's own sites, so the list of carried exceptions is nothing but
@@ -172,7 +181,8 @@ that must land green over a non-compliant population without keying on a line nu
   that does not resolve it refuses.
 - `python tools/gate-lint/sh_hygiene.py --selftest` — the predicate proved in both directions over a
   fixture holding the failing form and its nearest innocent neighbour.
-- `python tools/gate-lint/ps-hygiene.py [root]` — the PowerShell scans, and `--selftest` for the
+- `python tools/gate-lint/ps-hygiene.py [root]` — the PowerShell scans over every tracked `.ps1`,
+  refusing with 2 when there is none, and `--selftest` for the
   same proof. Neither is on the bar.
 - `memory/project/substitution-fed-loops.txt` — the carried sites. Delete a row when its site is
   drained; the leg reds if you delete one too early or too late.
@@ -200,10 +210,9 @@ that must land green over a non-compliant population without keying on a line nu
   no adopter receives; the drain is a follow-up the owner ruled out of the unit that wired the leg.
 
 - **`ps-hygiene.py` is still on no leg.** This kit's original defect, half-closed. There are zero
-  tracked `.ps1` files in this repository, so wiring it would put a leg on the bar whose population
-  is empty and whose green line proves nothing — the refusal `sh_hygiene.py` now implements would
-  red it on the first run. The honest fix is the same refusal in the PowerShell scanner plus a leg
-  that an adopter with `.ps1` files receives; neither is built.
+  tracked `.ps1` files in this repository, so a leg here would refuse on every run. The scanner's
+  half of the fix is built: it refuses an empty population with exit 2 (`TOOL-cListedCensus-1`).
+  The other half, a leg that an adopter with `.ps1` files receives, is not.
 - **The carried sites, and nothing that schedules the drain.** The registry ratchets — the count
   can only fall — but a ratchet that never drains is a waiver wearing a ratchet's clothes. The drain
   is a backlog row against the tooling family, not a unit of the build that wired the leg.

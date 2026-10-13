@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** journal TOOL-aSparedSpawn-32
 # Direct fixtures for TOOL-aSparedSpawn-32 AC7 to AC10 and AC12, over a kit source tree:
 #   fx.sh <kit tree> <label>
 # <kit tree> holds .githooks/pre-push and tools/run-gates/{run-gates.sh,gate-fingerprint.sh,gate-profiles.txt}.

@@ -1,6 +1,6 @@
 ---
 name: criterion-asserts-what-its-own-command-cannot-show
-description: an acceptance criterion names a command and then asserts a figure that command never prints, a field nothing the change moves, or a state that holds when the scope item is skipped
+description: an acceptance criterion names a command and then asserts a figure that command never prints, a field nothing the change moves, a state that holds when the scope item is skipped, or an absence its own records break by quoting the pattern
 kind: class
 universal: false
 ---
@@ -10,7 +10,7 @@ universal: false
 ## Symptom
 
 An acceptance criterion looks rigorous — it names a real command, gives a real number, reads like an
-observation. It cannot fail. Three ways, and a spec set usually has more than one:
+observation. It cannot fail, or cannot pass. Four ways, and a spec set usually has more than one:
 
 - **The command does not print that.** The criterion asserts on a per-subject set or a breakdown the
   named invocation never emits, so nobody can run it as written and the nearest printed total moves
@@ -20,6 +20,9 @@ observation. It cannot fail. Three ways, and a spec set usually has more than on
   criterion then demands the first field stay put, so the two contradict on one number.
 - **It holds when the scope item is skipped.** Every clause asserts residue — what still exists —
   rather than removal, so never doing the work satisfies it.
+- **Its own records answer it.** A "prints nothing" search with no pathspec spans the spec and the
+  ledger that quote its pattern, so it never holds for a correct build, and read loosely it also
+  misses a real carrier.
 
 ## Where it bit
 
@@ -32,6 +35,13 @@ prose-only-citation criterion named an orphan count that structurally cannot see
 was written for.
 
 Every one of them was written by someone who had just read the code.
+
+A later build's closing review found two more, review items L5 and L6. `TOOL-aOrientedCast-21` AC2
+said a line with its run field cut blocks on the charter shape, and the command does not print
+that: a line with the field cut whole names no agent and gets the missing-line message instead, and
+the deviation lived only in a commit trailer. `TOOL-aOrientedCast-22` AC6 said a search for the old
+version marker prints nothing, and its own spec answered the search, since the spec and its ledger
+quote the pattern.
 
 One leg keeps being cited for this: `tools/check-testsuite-counts.sh` asserts a suite's SHAPE and
 never a count. It runs nothing, and it only reads that a `PASS ($n assertions)` echo, a non-zero
@@ -52,6 +62,11 @@ deleted, it is not an acceptance criterion.
 Where one criterion covers two failure modes, split it and say which clause catches which. One
 number covering both covers neither.
 
+A "prints nothing" search carries a pathspec that leaves out the records quoting its pattern, and a
+liveness twin, the same search for the current value, that must list the carriers: a pathspec that
+excluded everything would print nothing for both. And a criterion found wrong at build time is
+amended where its spec allows, never only in a commit trailer.
+
 ## Related
 
 [[fixture-passes-by-finding-nothing]] is the same defect one level down, in a test rather than in
@@ -63,4 +78,4 @@ becomes once a sibling criterion contradicts it.
 No machine gate, and it is a documented check by construction: deciding whether a criterion can fail
 needs the criterion's intent. `tools/check-spec-tokens.py` already walks the spec population and is
 where a partial join would go — a backticked leg name or path in a criterion that resolves nowhere
-is the mechanical half — but the three forms above are not reachable that way.
+is the mechanical half — but the four forms above are not reachable that way.

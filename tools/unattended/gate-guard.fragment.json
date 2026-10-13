@@ -1,7 +1,7 @@
 {
   "name": "gate-guard",
   "event": "PreToolUse",
-  "matcher": "Bash|PowerShell",
+  "matcher": "Bash|PowerShell|AskUserQuestion",
   "marker": "gate-guard.js",
   "hook_path": "{kit}/unattended/gate-guard.js"
 }

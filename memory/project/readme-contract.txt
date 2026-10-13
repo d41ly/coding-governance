@@ -70,6 +70,7 @@ memory/builds/aCollapsedScan/README.md
 !memory/builds/aTetheredConvoy/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aTetheredRecord/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aTetheredScratch/README.md - predates the contract; drains when its build's owner conforms it
+memory/builds/aSweptBar/README.md
 memory/builds/aThawedCorpus/README.md
 !memory/builds/aTimedTurnstile/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aUnmannedHelm/README.md - predates the contract; drains when its build's owner conforms it
@@ -193,3 +194,5 @@ memory/builds/dRemeasuredRender/README.md
 memory/builds/aHeardState/README.md
 memory/builds/aTrimmedHook/README.md
 memory/builds/aOrientedCast/README.md
+memory/builds/cListedCensus/README.md
+memory/builds/dSweptBranches/README.md

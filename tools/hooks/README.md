@@ -211,6 +211,11 @@ exactly the output of `handoff.py render --role <name> --build <slug> --part tas
 marker's `path` names. That path is repo-relative under `builds/<build>/prompts/`; the file must hold
 the same single marker, and its section must hash to the marker's `task-sha`, so a file edited after
 rendering is refused too. A refusal names the first prompt line that differs; resend the file's bytes.
+Last, its `description`, ends trimmed, must be the spawn's name `handoff.py render` prints on stderr
+as `handoff: description — <name>`: `<build> · <unit> · <workflow>`, from the marker's build and unit
+and the index's `workflow` for that role, or `<build> · <workflow>` for a marker whose unit is `-`
+(TOOL-aOrientedCast-27). A missing or different description is refused with the expected name
+printed, and an index role with no `workflow` refuses, naming the index.
 
 A `Workflow` call passes only by a `scriptPath` listed in `harnesses` (never an inline `script` or a
 `name:` run), with `args.roles` a non-empty object whose every value is an `agent`-true role: pass
@@ -221,8 +226,10 @@ claims no slot; before rule 0. Skipped under any `--only=`. A throw inside the r
 
 **What it does not stop**, said rather than implied: a hook-less or `--bare` run; the agents a running
 harness spawns through its own `agent()`, which is a runtime call and not a tool call; a
-session-to-session message; a hand-written prompt file that agrees with itself; and a hand-edited
-index. It never compares `role-sha` with the role an agent type was rendered from.
+session-to-session message; a hand-written prompt file that agrees with itself; a hand-edited
+index; a forged name, since any caller can copy the right one; and a harness agent's label, which
+its script sets inside a runtime call no hook sees. It never compares `role-sha` with the role an
+agent type was rendered from.
 
 ## Lowering the cap — `.agent-cap.conf`
 
@@ -412,8 +419,9 @@ and how many route lines were left out. It never blocks, and a throw prints noth
 `format-guard.js` is the third hook in this home, wired on `Stop` through
 `format-guard.fragment.json` (`TOOL-aHeardState-1`). It reads the payload's `last_assistant_message`
 and refuses the turn end, `{"decision":"block","reason":…}` on exit 0, when a session routed to a
-live build ends without the charter's `BUILD`/`SPEC` pair, breaks rule r1, or leaves a commit made
-since its previous stop unreported. The reason reaches the model as `Stop hook feedback:`, names each
+live build ends without the charter's `BUILD`/`SPEC` pair, breaks rule r1, leaves a commit made
+since its previous stop unreported, or leaves out the `agent` or `returned` line of an agent its turn
+dispatched or received. The reason reaches the model as `Stop hook feedback:`, names each
 defect and quotes the charter definition it breaks.
 
 **When it arms.** All three, or it exits 0 and prints nothing: the session's orientation card under
@@ -435,6 +443,33 @@ line backticked, bold, indented, a heading, fenced or missing its `- ` (rule r1)
 derived shape; and a first-parent commit since the previous armed stop that no bare `committed` or
 `merged` line names by a 7+ hex prefix. The last HEAD seen lives in
 `<git-dir>/format-guard/<session_id>.head`; the first armed stop records it and requires nothing.
+Since `TOOL-aOrientedCast-21`, also an agent the turn dispatched with no bare `agent` line, or
+received with no bare `returned` line, in its derived shape and ending `/<agent-id>` after its last
+` · `: a line that names the agent but is not bare is rule r1, and a bare one off its shape is named
+as such. The reason then quotes both definitions and says to paste the lines `handoff.py agents`
+prints. This arm runs only when the fence defines both shapes; otherwise a turn holding an agent
+writes one witness line and requires nothing.
+
+**How the turn's agents are read.** From the transcript the payload's `transcript_path` names, read
+once and parsed from the end. The turn opens at the earliest of the last run of typed `user` records,
+the rule `runlog.py prose` uses, with two exceptions since `TOOL-aOrientedCast-24`: a compaction
+summary opens nothing, and neither does a meta record in a run of meta records directly after a tool
+result, such as a Skill's expansion or an image's size note. Walking from the end, such a record waits
+until the next older `user` or `assistant` record that is not a meta record is parsed, and opens the
+turn only when that record holds no `tool_result` or there is none. An idle-wake tick or a stop hook's
+feedback follows assistant text, so it still opens its turn. An `Agent` result carrying `agentId` owes an `agent` line, and a
+`returned` line too when its status is `completed`. A `Workflow` result carrying `runId` owes an
+`agent` line for every `started` entry of `<session dir>/subagents/workflows/<run id>/journal.jsonl`,
+and a `returned` line for every `result` or `failed` entry unless it was launched in the background.
+A delivered task notification — a `user` record of origin `task-notification`, or a `queued_command`
+attachment — owes the `returned` line of the agent its `<tool-use-id>` names, or both lines for every
+agent of the run it names; a call in an earlier turn is found by the one raw line carrying its id and
+`toolUseResult`. That id is read from the notification's header alone: the first `<tool-use-id>`
+before its first `<result>`, so an id the agent quotes in its result names nothing. A run id outside
+`[A-Za-z0-9_-]{1,64}` is never joined into a path, and the result's own `transcriptDir` is never
+followed. No `transcript_path`, an unreadable transcript or journal, or a run id off its shape allows
+the arm with one witness line each; lines in the turn that do not parse are counted into one witness
+line, and the arm still grades the records that parsed.
 
 **The bound.** It never blocks when `stop_hook_active` is true, so it refuses at most once per turn
 end and keeps no count. Every failure path allows, and an uncaught error exits 0.
@@ -442,8 +477,16 @@ end and keeps no count. Every failure path allows, and an uncaught error exits 0
 **The ceiling.** It does not grade emission mid-turn, the ⏳ heartbeat, any other micro-format, any
 field value, or where in the message the pair sits. It never sees a sub-agent's stop. It grades no
 stop that follows a block in the same chain, whichever hook blocked, so under an unattended run only
-the first stop of each chain is graded. It does not prove it is wired. The transcript-level measure
-that covers what it cannot see is `runlog.py prose` (`TOOL-aHeardState-2`).
+the first stop of each chain is graded. Of the agent lines it does not grade field values, an agent a
+sub-agent spawned, an agent a harness run starts after this stop, or a notification queued but not
+yet delivered; and it cannot tell a changed transcript format from a turn with no agent, since a
+renamed field reads as no agent at all. Of a record carrying two notification blocks it reads the
+first block's header id only, so the second agent's `returned` line is not required; no measured
+delivery carried two. A typed record that is not a meta record opens a turn wherever it sits, a tool
+result before it included, so an owner's interjection or an interrupt splits the turn there and an
+agent dispatched before it is not required after it. It does not prove it is wired. The
+transcript-level measure that covers what it cannot see is `runlog.py prose` (`TOOL-aHeardState-2`),
+which still opens a turn at every typed record, so the two readers differ on the two exceptions above.
 
 ## scratch-guard's fourth check: a role agent runs no gate
 

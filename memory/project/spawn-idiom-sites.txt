@@ -144,7 +144,7 @@ tools/memory-tree/check-memory-hygiene.sh	date-fmt	1	predates the lint; `printf 
 tools/memory-tree/check-memory-hygiene.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/memory-tree/check-memory-hygiene.sh	printf-subst	5	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
 tools/memory-tree/check-memory-hygiene.sh	pure-fn-subst	1	callees arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile, drained by a follow-up unit: resolve_live_index_home×1
-tools/memory-tree/check-memory-hygiene.sh	var-pipe	26	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/check-memory-hygiene.sh	var-pipe	25	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/memory-tree/check-memory-hygiene.test.sh	cat-file	1	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/memory-tree/check-memory-hygiene.test.sh	path-subst	7	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/memory-tree/check-memory-hygiene.test.sh	printf-subst	19	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
@@ -206,7 +206,7 @@ tools/run-gates/run-gates.runlog.test.sh	cat-file	5	predates the lint; `$(<file)
 tools/run-gates/run-gates.runlog.test.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/run-gates/run-gates.runlog.test.sh	printf-subst	4	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.runlog.test.sh	var-pipe	10	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
-tools/run-gates/run-gates.sh	cat-file	23	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.sh	cat-file	13	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.sh	date-fmt	10	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.sh	path-subst	7	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/run-gates/run-gates.sh	pure-fn-subst	7	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: derive_fail_tail×2 derive_health_log×2 prof_n×2 measure_neighbours×1
@@ -220,10 +220,11 @@ tools/run-gates/run-gates.test.sh	var-pipe	141	predates the lint; a parameter ex
 tools/run-gates/run-gates.turnstile.test.sh	cat-file	15	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.turnstile.test.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.turnstile.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
-tools/run-gates/run-gates.turnstile.test.sh	pure-fn-subst	20	callees arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile, drained by a follow-up unit: beacon×16 queue×4
+tools/run-gates/run-gates.turnstile.test.sh	pure-fn-subst	16	callees arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile, drained by a follow-up unit: beacon×16
 tools/run-gates/run-gates.turnstile.test.sh	var-pipe	36	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-held-wsl.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-held-wsl.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/run-held-wsl.sh	var-pipe	3	arrived with the inlined `remote_ladder_sh` block at TOOL-aSweptBar-4, which converts only with its canonical and every copy, the parity arm reading them byte for byte; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-selftests.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-selftests.sh	path-subst	9	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/run-gates/run-selftests.sh	pure-fn-subst	3	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: read_now_ms×2 read_registry_tags×1

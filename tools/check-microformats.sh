@@ -10,7 +10,10 @@
 # WHAT IT KEYS ON. The HTML-comment fence pair around the definition list, and nothing else. It
 # cannot key on a heading: the section has none. It cannot key on a column-zero list marker either,
 # because the emission rule de-indents the definitions into siblings of the section's own prose
-# rules, so a marker-anchored selector would select the whole section.
+# rules, so a marker-anchored selector would select the whole section. Each marker is a WHOLE line,
+# as every reader of the fence finds it: a marker inside a longer line is no marker, so it counts
+# zero and the gate cannot run. Check 9 refuses a head two definitions share, because a reader
+# keeping a head's first definition and one keeping its last would read two different shapes.
 #
 # WHAT IT DOES NOT CHECK, said here rather than implied away: it holds SYNTAX. Whether a shape's
 # FIELDS are the right fields is a design question this gate has no opinion about, and a shape that
@@ -34,8 +37,8 @@ fail() { printf 'MICROFORMAT check %s FAILED — %s\n' "$1" "$2"; status=1; }
 
 [ -f "$FILE" ] || { echo "check-microformats: no such file: $FILE"; exit 2; }
 
-n_open=$(grep -cF "$OPEN" "$FILE" || true)
-n_close=$(grep -cF "$CLOSE" "$FILE" || true)
+n_open=$(grep -cxF "$OPEN" "$FILE" || true)
+n_close=$(grep -cxF "$CLOSE" "$FILE" || true)
 if [ "$n_open" -ne 1 ] || [ "$n_close" -ne 1 ]; then
   echo "check-microformats: the definition block is not delimited by exactly one fence pair in"
   echo "check-microformats: $FILE — found $n_open opener(s) and $n_close closer(s). A gate that"
@@ -43,7 +46,7 @@ if [ "$n_open" -ne 1 ] || [ "$n_close" -ne 1 ]; then
   exit 2
 fi
 
-block=$(awk -v o="$OPEN" -v c="$CLOSE" 'index($0,o){f=1;next} index($0,c){f=0} f' "$FILE")
+block=$(awk -v o="$OPEN" -v c="$CLOSE" '$0 == o {f=1; next} $0 == c {f=0} f' "$FILE")
 defs=$(printf '%s\n' "$block" | grep -E '^- `.*`$' || true)
 n_defs=$(printf '%s\n' "$defs" | grep -c . || true)
 
@@ -58,10 +61,23 @@ if ! printf '%s\n' "$keywords" | grep -qx "$SENTINEL"; then
   fail 1 "the keyword derivation lost its frozen sentinel member, so the derivation is broken rather than the block being empty: expected to find $SENTINEL"
 fi
 
+nl=$'\n'; seen=$nl; reported=$nl
 while IFS= read -r line; do
   [ -n "$line" ] || continue
   body=${line#- \`}; body=${body%\`}
   head=${body%% — *}
+  # ---- a head defined twice (TOOL-aOrientedCast-25). The readers disagree on which definition
+  #      wins: the hooks kit's format guard and the run-log kit keep the last, so one charter would
+  #      read as two shapes to any reader keeping the first. Refused here, at the source every reader
+  #      shares, once per head. Fork-free, so it adds no loop, heredoc or substitution.
+  case "$seen" in
+    *"$nl$head$nl"*)
+      if [[ $reported != *"$nl$head$nl"* ]]; then
+        fail 9 "a definition head is defined more than once, so a reader keeping its first definition and one keeping its last read two different shapes: $head"
+        reported+="$head$nl"
+      fi ;;
+    *) seen+="$head$nl" ;;
+  esac
   # ---- the joiner appears exactly once
   n_join=$(printf '%s' "$body" | grep -o ' — ' | grep -c . || true)
   if [ "$n_join" -ne 1 ]; then

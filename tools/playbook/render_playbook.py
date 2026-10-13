@@ -464,6 +464,38 @@ def derive_node_table(root: Path, _a: dict, _e: Path | None = None) -> str:
     return '\n'.join(out)
 
 
+def derive_role_roster(root: Path, _a: dict, _e: Path | None = None) -> str:
+    """The section-3 Agent roles lines, printed by the roles kit's own `roster` verb.
+
+    TOOL-aOrientedCast-18. The roles kit stays the one reader of role files: this probe runs its verb
+    and substitutes the stdout verbatim, adding, cutting and reordering nothing, because the line shape
+    and its cap are the verb's and the one-line region grades the result. The kit is found through the
+    sibling resolver, as `derive_gate_runner` finds its own, so no kit path is spelled here. A miss —
+    no kit, a verb that cannot start, a non-zero exit, or an exit 0 printing nothing — prints its cause
+    and returns the empty string, so an answer still outranks it and an unanswered miss refuses at
+    `resolve_placeholder_raw` naming the key (F2)."""
+    here = _e or Path(__file__).resolve().parent
+    top = root.resolve()
+    home, anchor = 'roles', 'handoff.py'
+    env = {k: v for k, v in os.environ.items() if not k.startswith('GIT_')}
+    try:
+        kit = resolve_kit_dir(home, anchor, here if top in here.parents else top)
+        r = subprocess.run([sys.executable, str(kit / anchor), 'roster'], cwd=str(top), env=env,
+                           capture_output=True, text=True, encoding='utf-8', errors='replace',
+                           timeout=30)
+    except LookupError as e:
+        why = str(e)
+    except (OSError, subprocess.SubprocessError) as e:
+        why = f'the roster verb did not run: {e}'
+    else:
+        if r.returncode == 0 and r.stdout.strip():
+            return r.stdout.strip()
+        said = (r.stderr.strip().splitlines() or ['it printed no line'])[0][:240]
+        why = f'the roster verb exited {r.returncode}: {said}'
+    print(f'render-playbook: ROLE_ROSTER: {why}', file=sys.stderr)
+    return ''
+
+
 def write_fleet_claim(engine_dir: Path, user: str, host: str, projects_root: str,
                       variances: str) -> str:
     """Append a row with the lowest letter the fleet has not used, and return that letter.
@@ -537,6 +569,7 @@ PROBES = {
     'gate_runner': derive_gate_runner,
     'lexicon_conf': derive_lexicon_conf,
     'node_table': derive_node_table,
+    'role_roster': derive_role_roster,
     'primary_tree': derive_primary_tree,
     'worktree_root': derive_worktree_root,
 }
@@ -1361,7 +1394,7 @@ def run_selftest() -> int:
     # refusal here rolls the kit back. The declarations are the real ones beside this engine, so the
     # arm fails the day a legacy name leaves the descriptor.
     real_engine = Path(__file__).resolve().parent
-    v3 = ('<!-- governance-template: v1.27 -->\n<!-- when:node-table -->\n'
+    v3 = ('<!-- governance-template: v1.28 -->\n<!-- when:node-table -->\n'
           '| `{{TAG_A}}` | `{{MACHINE_A}}` | `{{PRIMARY_TREE_A}}` | `{{WORKTREE_ROOT_A}}` | '
           '{{VARIANCES_A}} |\n<!-- /when:node-table -->\n<!-- when:security-outbound -->\nSSRF\n'
           '<!-- /when:security-outbound -->\naudit {{PROSE_AUDIT}}\n')
@@ -1601,6 +1634,84 @@ def run_selftest() -> int:
         failed += 1
         print(f'  arm FAIL a flat runner under the top-level deploy prefix renders — got {flat!r}')
 
+    # TOOL-aOrientedCast-18 — `{{ROLE_ROSTER}}` is the roles kit's `roster` verb, verbatim. The stub
+    # verb sits at td/<home>/<anchor>, found through the resolver's second probe from the target's
+    # root; `home` and `anchor` are joined at run time, never spelled as one path. The stub drops a
+    # `ran` sentinel beside itself, so the unreached arm's "no sentinel" is proved against a stub the
+    # kept-fence arm has already seen run.
+    home, anchor = 'roles', 'handoff.py'
+    bullets = ('- `gov-a`: the first stub role.', '- `gov-b`: the second stub role.')
+    current_tpl = (f'<!-- governance-template: v{TEMPLATE_MAJOR}.4 -->\n<!-- kit:{home} -->\n'
+                   f'{ONE_LINE_OPEN}\n{{{{ROLE_ROSTER}}}}\n{ONE_LINE_CLOSE}\n<!-- /kit:{home} -->\n')
+    older_tpl = '<!-- governance-template: v3.5 -->\nno roster here\n'
+
+    def write_roster_fixture(td: Path, kit: str, tpl: str, stub: str | None,
+                             answered: bool = False) -> tuple[Path, Path, Path]:
+        """Write the engine, target and stub verb; `stub` is 'ok', 'fail' or None for no kit."""
+        eng, tgt = td / 'engine', td / 'target'
+        eng.mkdir()
+        (tgt / '.governance').mkdir(parents=True)
+        (eng / 'playbook.kit.toml').write_text(
+            '[[placeholder]]\nkey = "ROLE_ROSTER"\nclass = "derived"\nprobe = "role_roster"\n'
+            f'kit = "{home}"\n', encoding='utf-8')
+        (eng / 'registry.toml').write_text(f'[[entry]]\nid = "{home}"\n\n[[entry]]\nid = "lexicon"\n',
+                                           encoding='utf-8')
+        (tgt / 'CHARTER.md').write_text(tpl, encoding='utf-8')
+        (tgt / '.governance' / 'deploy.toml').write_text(
+            f'kits = ["{kit}"]\n\n[answers]\nplaybook_path = "CHARTER.md"\n'
+            + ('role_roster = "- answered"\n' if answered else ''), encoding='utf-8')
+        kd = td / home
+        if stub:
+            kd.mkdir()
+            tail = ("print('stub: no role file to read', file=sys.stderr)\nsys.exit(1)\n"
+                    if stub == 'fail' else ''.join(f'print({b!r})\n' for b in bullets))
+            (kd / anchor).write_text('import sys\nfrom pathlib import Path\n'
+                                     "(Path(__file__).parent / 'ran').write_text('x')\n" + tail,
+                                     encoding='utf-8')
+        return eng, tgt, kd / 'ran'
+
+    seen = {}   # case -> (body, notes, refusal or None, whether the stub ran, captured stderr)
+    for case, kit, tpl, stub, answered in (('kept', home, current_tpl, 'ok', False),
+                                           ('pruned', 'lexicon', current_tpl, 'ok', False),
+                                           ('older', home, older_tpl, 'ok', False),
+                                           ('failing', home, current_tpl, 'fail', False),
+                                           ('answered', home, current_tpl, 'fail', True),
+                                           ('absent', home, current_tpl, None, False)):
+        with tempfile.TemporaryDirectory() as td:
+            eng, tgt, ran = write_roster_fixture(Path(td), kit, tpl, stub, answered)
+            err = io.StringIO()
+            try:
+                with contextlib.redirect_stderr(err):
+                    body, notes = render(eng, Path(td), tgt)
+                got = None
+            except Refusal as e:
+                body, notes, got = '', [], str(e)
+            seen[case] = (body, notes, got, ran.is_file(), err.getvalue())
+
+    body, _n, got, ran, _s = seen['kept']
+    check_arm(got is None and ran and f'{ONE_LINE_OPEN}\n{bullets[0]}\n{bullets[1]}\n{ONE_LINE_CLOSE}'
+              in body, 'a kept roles fence carries the roster verb\'s lines verbatim in its region',
+              f'refused {got!r}, stub ran {ran}, body {body!r}')
+    unreached = [seen['pruned'], seen['older']]
+    check_arm(all(g is None and not r and not any(b in bd for b in bullets)
+                  for bd, _n, g, r, _s in unreached),
+              'the roster verb never runs for a pruned fence or a token-less v3.5 template',
+              f'(refused, stub ran) per case {[(g, r) for _b, _n, g, r, _s in unreached]}')
+    _b, _n, got, _r, said = seen['failing']
+    abody, anotes, agot, _r2, _s2 = seen['answered']
+    check_arm(got is not None and 'ROLE_ROSTER' in got and 'role_roster' in got
+              and 'render-playbook: ROLE_ROSTER:' in said and 'stub: no role file to read' in said
+              and agot is None and '- answered' in abody
+              and any(n.startswith('answered  ROLE_ROSTER') and n.endswith('(probe derives nothing)')
+                      for n in anotes),
+              'a failing roster verb prints its reason and refuses, and an answer outranks it',
+              f'refused {got!r}, stderr {said!r}; answered: refused {agot!r}, notes {anotes!r}')
+    _b, _n, got, _r, said = seen['absent']
+    check_arm(got is not None and 'ROLE_ROSTER' in got
+              and 'render-playbook: ROLE_ROSTER:' in said and 'looked in' in said,
+              'an absent roles kit prints the resolver\'s reason and refuses',
+              f'refused {got!r}, stderr {said!r}')
+
     if failed:
         print(f'render_playbook.selftest FAILED — {failed} of {passed + failed} arm(s)')
         return 1
@@ -1725,4 +1836,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.27"  # gov:kit playbook-render@1.27
+KIT_PLAYBOOK_RENDER_VERSION = "1.28"  # gov:kit playbook-render@1.28

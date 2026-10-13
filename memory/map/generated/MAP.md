@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 138 · kits: 18 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 6 · gotcha-classes: 119 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 121 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -17,6 +17,7 @@ Inventories: gate-legs: 138 · kits: 18 · git-hooks: 4 · harness-hooks: 12 · 
 | `agent-instructions wiring` | baseline |
 | `backlog migration selftest` | memory-tree-hygiene |
 | `branch-guard self-test` | baseline |
+| `branch-reconcile selftest` | branch-reconcile |
 | `brief-recorded` | unattended |
 | `build README slot contract` | build-readme-surface |
 | `build-index selftest` | baseline |
@@ -24,6 +25,7 @@ Inventories: gate-legs: 138 · kits: 18 · git-hooks: 4 · harness-hooks: 12 · 
 | `charter size` | playbook |
 | `check-arms selftest` | baseline |
 | `check-wiring self-test` | baseline |
+| `cleanup skill wiring` | branch-reconcile |
 | `codebase-map adopter e2e` | codebase-map |
 | `codebase-map coverage + freshness` | codebase-map |
 | `codebase-map gate coverage` | codebase-map |
@@ -154,6 +156,7 @@ Inventories: gate-legs: 138 · kits: 18 · git-hooks: 4 · harness-hooks: 12 · 
 | key | claimant |
 |---|---|
 | `agent-instructions` | baseline |
+| `branch-reconcile` | branch-reconcile |
 | `codebase-map` | codebase-map |
 | `drift-audit` | baseline |
 | `gate-lint` | gate-lint |
@@ -226,6 +229,7 @@ Inventories: gate-legs: 138 · kits: 18 · git-hooks: 4 · harness-hooks: 12 · 
 | key | claimant |
 |---|---|
 | `build` | roles |
+| `cleanup` | branch-reconcile |
 | `drift-audit` | baseline |
 | `lexicon` | lexicon |
 | `memory-recall` | memory-recall |
@@ -237,8 +241,10 @@ Inventories: gate-legs: 138 · kits: 18 · git-hooks: 4 · harness-hooks: 12 · 
 | key | claimant |
 |---|---|
 | `a-folded-field-leaves-its-row-shape-docs-behind.md` | build-method |
+| `a-gate-that-walks-the-repo-root-reads-other-worktrees.md` | gate-lint |
 | `a-grep-for-a-word-is-a-presence-probe.md` | memory-tree-hygiene |
 | `a-helper-extraction-blinds-a-per-function-rule.md` | unattended |
+| `a-merge-of-the-default-branch-read-as-additions.md` | branch-reconcile |
 | `a-merged-in-check-can-refuse-a-pinned-record.md` | unattended-mandate |
 | `a-new-leg-trips-a-growing-set-of-meta-gates.md` | run-gates |
 | `a-new-local-collides-in-a-long-function.md` | govkit |

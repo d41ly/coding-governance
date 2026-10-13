@@ -410,6 +410,44 @@ harness's reserved untyped literal; an untyped stage is spelled by leaving its k
   own copy of the shape. The protocol-parity leg's agent-type shape arm compares every copy in this kit
   with the one `tier2-review.template.js` owns, and reds on a difference or on an owner yielding none.
 
+## Agent labels — slug, scope, stage
+
+Every agent the three declared harnesses spawn carries the label `<slug> · <scope> · <stage>`
+(TOOL-aOrientedCast-27), the parts joined by a space, a middle dot and a space. The scope is the unit
+id where the stage serves one unit, the ids of its group where a spec writer serves several, and else
+the stage's scope.
+
+| Harness | Stage | Label |
+|---|---|---|
+| `unattended-build` | spec writer | `<slug> · <the group's unit ids> · spec-write` |
+| | spec commit | `<slug> · specs · commit` |
+| | audit subjects | `<slug> · audit round <n> · subjects` |
+| | audit record | `<slug> · audit round <n> · record` |
+| | disposal | `<slug> · audit round <n> · dispose` |
+| `unattended-unit` | builder | `<slug> · <unitId> · build` |
+| `tier2-review` | resume probe | `<slug> · <kind> round <n> · resume:probe` |
+| | finder | `<slug> · <kind> round <n> · find:<lens>` |
+| | verify batch | `<slug> · <kind> round <n> · verify:ids-<a>-<b>` |
+| | synthesis | `<slug> · <kind> round <n> · synth` |
+
+The group's unit ids are joined by single spaces in roster order, and `<n>` is the run's round. The
+review harness reads its slug from `reviewDir`: the segment after a `builds/` segment, when it is
+letters only, else none, so a review outside a build folder carries no slug part. Its stage is the
+label it carried before, so `pending`, its log lines and every reader of a stage keep their spelling:
+`pending` lists stage keys, never whole labels. The roles kit's `handoff.py agents` reads a harness
+agent's unit as the one unit id its label names. No hook sees a label, since `agent()` is a runtime
+call; the two harness suites hold them.
+
+A run's title is not a label: the tool fixes it from the script's `meta.name`. Each run says what it
+is in its first log line, before its first phase, and leads every return with the same text as
+`identity`:
+
+| Harness | `identity` |
+|---|---|
+| `unattended-unit` | `<slug> · <unitId> · build`, its agent's label |
+| `unattended-build` | `<slug> · <mode> round <n> · spec, audit, disposal, hand-out`; `spec, hand-out` without `specAudit` |
+| `tier2-review` | `<slug> · <kind> round <n> · review`, under its labels' slug rule |
+
 ## `review_replay.py` — a review scored for recall against a past round
 
 Stdlib Python, run under the repo's python launcher. It answers one question nothing else here can:

@@ -20,7 +20,7 @@
 #        own verdict and rc
 #   AC3  TERM, INT and HUP each end a running bar with exactly ONE line, verdict=NONE and 128+n, and a
 #        TERM held behind a command substitution still carries 143, not the command's 0
-#   AC4  the writer adds no external exec after the last leg; a clone's first bar pays one mkdir
+#   AC4  the writer adds one sanctioned exec after the last leg, its cat; a clone's first bar pays one mkdir
 #   AC5  a failed append leaves rc and stdout alone and says so once; GOV_RUNLOG=0 writes nothing
 #   AC6  this suite's own declarations: withheld, budgeted, a held leg with a ceiling
 #   AC7  21 failing legs: fail.1 to fail.20, fail_more=1, and the line under the cap
@@ -269,7 +269,7 @@ write_legs() { printf '%s\n' "$2" > "$WORK/$1.json"; }   # name · JSON array ->
 run_bar() { # NAME=VALUE... -> RC, OUT, ERR
   env TMPDIR="$WORK/ambient" GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 "$@" bash "$KR/run-gates.sh" \
     >"$WORK/out" 2>"$WORK/err"; RC=$?
-  OUT=$(cat "$WORK/out"); ERR=$(cat "$WORK/err")
+  OUT=$(<"$WORK/out"); ERR=$(cat "$WORK/err")
 }
 
 measure_lines() { # -> the journal's line count, 0 when it is absent
@@ -573,8 +573,13 @@ check_ac4_spawns() {
   check "AC4 the window opens in the writer's trace" "$([ "$on" != nowindow ] && echo yes)" yes
   check "AC4 the probe sees execs after the last leg" "$([ "${off%% *}" -gt 0 ] 2>/dev/null && echo yes)" yes
   echo "AC4 execs after the last leg: baseline ${off%% *}, writer on ${on%% *}"
-  check "AC4 the writer adds no external exec after the last leg" "$on" "$off"
-  # The one sanctioned spawn: a clone's FIRST bar makes the journal directory, once.
+  # THE WRITER'S ONE SANCTIONED EXEC IS ITS `cat`: it appends through `printf … | cat >>`, one write per
+  # line, because two concurrent bars tore lines without it (TOOL-aPairedSlots-7). The difference must be
+  # exactly that name and the count exactly one more, so any other exec in its place still reds.
+  extra=$(comm -13 <(printf '%s\n' ${off#* } | sort) <(printf '%s\n' ${on#* } | sort) | tr '\n' ' ')
+  check "AC4 the writer adds exactly one exec after the last leg, its cat" "$extra" "cat "
+  check "AC4 and nothing else beside it" "${on%% *}" "$(( ${off%% *} + 1 ))"
+  # The other sanctioned spawn: a clone's FIRST bar makes the journal directory, once.
   mv "$REPO/.git/runlog" "$WORK/runlog.keep"
   run_traced "$WORK/t.first" "$after" GATE_LEGS="$WORK/ac4.json"; rc=$?
   check "AC4 the first bar ran green" "$rc" 0
@@ -894,6 +899,9 @@ kill -0 "$_me" 2>/dev/null || exit 0	2	exempt: the wall watcher's and the census
 [ -f "$_work/census.disarm" ] && exit 0	1	exempt: the census sampler's ( … ) & subshell, from TOOL-aGraftedHelix-5, which runs no trap of the runner's
 measure_foreign >> "$_f" 2>/dev/null || exit 0	1	exempt: the census sampler's ( … ) & subshell, from TOOL-aGraftedHelix-5, which runs no trap of the runner's
 cd "$dir" || exit 97	1	exempt: run_leg_at's ( … ) subshell, from TOOL-dDerivedDocket-23's red attribution, which runs no trap of the runner's
+git version 2>/dev/null || exit 1	1	exempt: the reuse digest's $( … ) substitution, from TOOL-aSparedSpawn-1 and TOOL-aSparedSpawn-33, which runs no trap of the runner's
+{ mapfile -t evl < "$REUSE_ASK_DIGEST_ENV"; } 2>/dev/null || exit 1	1	exempt: the reuse digest's $( … ) substitution, from TOOL-aSparedSpawn-1 and TOOL-aSparedSpawn-33, which runs no trap of the runner's
+[ -n "$vp" ] || exit 1	1	exempt: the reuse digest's $( … ) substitution, from TOOL-aSparedSpawn-1 and TOOL-aSparedSpawn-33, which runs no trap of the runner's
 exit 1	2	AC2 wall|AC1 red
 exit 2	1	AC2 refused
 echo "gates GREEN — $ran/$ran legs passed$skipnote"; exit 0	1	AC2 green

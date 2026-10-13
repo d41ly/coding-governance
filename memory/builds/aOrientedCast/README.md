@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling+kickoff+playbook
 roster: TOOL+KICK+PLAY
-ids: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15
+ids: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 TOOL-aOrientedCast-22 TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25 TOOL-aOrientedCast-26 TOOL-aOrientedCast-27 TOOL-aOrientedCast-28
 authorized-by: prompt
 ---
 
@@ -46,6 +46,13 @@ JavaScript the owner cannot adjust. The owner's prose is the mandate, recorded u
 - The two enforcement units build last, so no pass of this run meets a gate it has not finished.
 - The catalogue does not exist yet, so this run's own spec and build briefs are written by hand.
 - One kit-version bump per touched kit, after that kit's last unit.
+- Owner rulings of 2026-10-13, the second addendum under `prompts/`: roles cite section 1 rule tags,
+  agents carry the rendered Protocols section whole, and an inline stand-in needs a run that cannot
+  spawn agents and an owner waiver. Its five units are MISSING at the resume, and their briefs are
+  written by hand because the handoff renderer refuses until the first of them lands.
+- The owner's third addendum, the same day: every agent a turn dispatches or receives is shown with
+  its effort, model, unit, prompt, ids, outcome and authority, kept in a per-build ledger, and
+  enforced by extending format-guard. The build reconciles from local main, never waiting on origin.
 
 ## Parked decisions
 
@@ -73,12 +80,28 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 16 | `TOOL-aOrientedCast-13` | a gate allowlist may name a leg a target lacks without redding the catalogue (review H2) |
 | 17 | `TOOL-aOrientedCast-14` | the hooks scan every launcher option and anchor on the project dir (review M2, M3) |
 | 18 | `TOOL-aOrientedCast-15` | the remaining review minors, batched (review M4, M5, L1, L2, L3) |
+| 19 | `TOOL-aOrientedCast-16` | a role cites section 1 rule tags, and its agent type carries those rules and the rendered Protocols section (addendum 2) |
+| 20 | `TOOL-aOrientedCast-17` | a role declares when it is mandatory and where its output goes, and the kit prints the charter's roster lines (addendum 2) |
+| 21 | `TOOL-aOrientedCast-18` | the playbook renders a derived role-roster placeholder from the roles kit's roster (addendum 2) |
+| 22 | `PLAY-aOrientedCast-2` | the charter's `[roles]` rule and its generated Agent roles section (addendum 2) |
+| 23 | `TOOL-aOrientedCast-19` | an inline stand-in for a role needs a dated owner waiver row (addendum 2) |
+| 24 | `TOOL-aOrientedCast-20` | the roles kit derives each agent's dispatch and return lines, and appends them to a generated per-build agent ledger (addendum 3) |
+| 25 | `PLAY-aOrientedCast-3` | the charter's `agent` and `returned` micro-formats, mandatory for every agent a turn dispatches or receives (addendum 3) |
+| 26 | `TOOL-aOrientedCast-21` | format-guard refuses a final message that omits an agent line for an agent its turn dispatched or received (addendum 3) |
+| 27 | `TOOL-aOrientedCast-22` | a hook refuses AskUserQuestion from a session holding a live run's lease (adopted) |
+| 28 | `TOOL-aOrientedCast-23` | the size-limits file and the build method's M3 say alike which declared ceilings a run may raise (adopted, split from TOOL-aOrientedCast-22) |
+| 29 | `TOOL-aOrientedCast-24` | the second closing review's hooks minors, batched: format-guard's turn and id reading, gate-guard's landed-run refusal, their arms and docs (review M1-M3, M7, L1-L3) |
+| 30 | `TOOL-aOrientedCast-25` | the second closing review's roles minors, batched: the marker normalisation, the missing arms, the third fence reader, the dossier (review M4-M6, L4-L7) |
+| 31 | `TOOL-aOrientedCast-26` | the policy file runs spec writers at high and builders at xhigh effort (addendum 4) |
+| 32 | `TOOL-aOrientedCast-27` | every spawned agent is named for its slug, unit and action, and the spawn guard refuses a misnamed one (addendum 5) |
+| 33 | `TOOL-aOrientedCast-28` | spec folds run through the build harness as typed, effort-set spec-writer agents, and the spawn guard refuses a direct spec-writer spawn under a live lease (addendum 6) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 18 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
-ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11
-ids TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15
+**Build status:** OPEN · 33 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
+ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9
+ids TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 TOOL-aOrientedCast-22
+ids TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25 TOOL-aOrientedCast-26 TOOL-aOrientedCast-27 TOOL-aOrientedCast-28
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -101,14 +124,30 @@ ids TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrie
 | [TOOL-aOrientedCast-13 — a gate allowlist may name a leg the target lacks, marked optional](spec/2026-10-12-spec-TOOL-aOrientedCast-13.md) | 13 | 2 | CLOSED | rev-2 | 2026-10-12 |
 | [TOOL-aOrientedCast-14 — the role gate reads past every launcher option, and both role arms find the session's checkout](spec/2026-10-12-spec-TOOL-aOrientedCast-14.md) | 14 | 2 | CLOSED | rev-4 | 2026-10-12 |
 | [TOOL-aOrientedCast-15 — the closing review's minors: oracles that rot, readers that disagree, a verdict over a broken index](spec/2026-10-12-spec-TOOL-aOrientedCast-15.md) | 15 | 2 | CLOSED | rev-4 | 2026-10-12 |
+| [TOOL-aOrientedCast-16 — a role cites section 1 rule tags, and its agent carries those rules with the Protocols and Facts sections](spec/2026-10-13-spec-TOOL-aOrientedCast-16.md) | 16 | 2 | CLOSED | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-17 — a role declares when it is mandatory and where its output goes, and the kit prints the charter's roster lines](spec/2026-10-13-spec-TOOL-aOrientedCast-17.md) | 17 | 2 | CLOSED | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-18 — the role roster, derived into the charter by the roles kit's own verb](spec/2026-10-13-spec-TOOL-aOrientedCast-18.md) | 18 | 2 | CLOSED | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-19 — an inline stand-in for a role declares itself through its handoff, and needs a dated owner waiver row](spec/2026-10-13-spec-TOOL-aOrientedCast-19.md) | 19 | 2 | CLOSED | rev-2 | 2026-10-13 |
+| [PLAY-aOrientedCast-2 — the charter's `[roles]` rule and its generated Agent roles section](spec/2026-10-13-spec-PLAY-aOrientedCast-2.md) | 20 | 2 | CLOSED | rev-2 | 2026-10-13 |
+| [PLAY-aOrientedCast-3 — the charter's `agent` and `returned` micro-formats, mandatory for every agent a turn dispatches or receives](spec/2026-10-13-spec-PLAY-aOrientedCast-3.md) | 21 | 2 | CLOSED | rev-2 | 2026-10-13 |
+| [TOOL-aOrientedCast-20 — the roles kit derives each agent's dispatch and return lines, and adds them to a generated per-build agent ledger](spec/2026-10-13-spec-TOOL-aOrientedCast-20.md) | 22 | 2 | CLOSED | rev-2 | 2026-10-13 |
+| [TOOL-aOrientedCast-21 — format-guard refuses a final message that omits an agent line for an agent its turn dispatched or received](spec/2026-10-13-spec-TOOL-aOrientedCast-21.md) | 23 | 2 | CLOSED | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-22 — gate-guard refuses AskUserQuestion from the session holding a live unattended run's lease, and names the park](spec/2026-10-13-spec-TOOL-aOrientedCast-22.md) | 24 | 2 | CLOSED | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-23 — one stated answer on which declared size ceilings a run may raise, held in the limits file and pointed at by M3 and the size gate](spec/2026-10-13-spec-TOOL-aOrientedCast-23.md) | 25 | 2 | CLOSED | rev-3 | 2026-10-13 |
+| [TOOL-aOrientedCast-24 — format-guard reads a notification's header alone and opens no turn mid-turn, gate-guard asks the driver whether a leased run is finished, and the arms and docs that pin both](spec/2026-10-13-spec-TOOL-aOrientedCast-24.md) | 26 | 2 | CLOSED | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-26 — spec writers run at high effort and builders at xhigh, as the owner ruled](spec/2026-10-13-spec-TOOL-aOrientedCast-26.md) | 26 | 1 | CLOSED | rev-1 | 2026-10-13 |
+| [TOOL-aOrientedCast-25 — the second closing review's roles minors: one marker reading, armed rules, one fence reading, and records that say what was built](spec/2026-10-13-spec-TOOL-aOrientedCast-25.md) | 27 | 2 | CLOSED | rev-6 | 2026-10-13 |
+| [TOOL-aOrientedCast-27 — every spawned agent is named for its build, unit and action, and the spawn guard refuses a misnamed spawn](spec/2026-10-13-spec-TOOL-aOrientedCast-27.md) | 28 | 2 | CLOSED | rev-2 | 2026-10-13 |
+| [TOOL-aOrientedCast-28 — spec folds run through the build harness, and a leased session spawns no spec writer directly](spec/2026-10-13-spec-TOOL-aOrientedCast-28.md) | 29 | 2 | OPEN | rev-2 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 35 bound to this build, across 4 record folder(s).
+Records: 76 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7
-TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15.
+TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20
+TOOL-aOrientedCast-21 TOOL-aOrientedCast-22 TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25 TOOL-aOrientedCast-26 TOOL-aOrientedCast-27 TOOL-aOrientedCast-28.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -130,6 +169,20 @@ TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-12 TOOL-aOrientedCa
 | 13 | `TOOL-aOrientedCast-13` | no |
 | 14 | `TOOL-aOrientedCast-14` | no |
 | 15 | `TOOL-aOrientedCast-15` | no |
+| 16 | `TOOL-aOrientedCast-16` | no |
+| 17 | `TOOL-aOrientedCast-17` | no |
+| 18 | `TOOL-aOrientedCast-18` | no |
+| 19 | `TOOL-aOrientedCast-19` | no |
+| 20 | `PLAY-aOrientedCast-2` | no |
+| 21 | `PLAY-aOrientedCast-3` | no |
+| 22 | `TOOL-aOrientedCast-20` | no |
+| 23 | `TOOL-aOrientedCast-21` | no |
+| 24 | `TOOL-aOrientedCast-22` | no |
+| 25 | `TOOL-aOrientedCast-23` | no |
+| 26 | `TOOL-aOrientedCast-24`, `TOOL-aOrientedCast-26` | yes |
+| 27 | `TOOL-aOrientedCast-25` | no |
+| 28 | `TOOL-aOrientedCast-27` | no |
+| 29 | `TOOL-aOrientedCast-28` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

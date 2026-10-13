@@ -12,8 +12,9 @@
 #
 # NO GOVERNING DOC IS A DECLARED OUTCOME, NOT A REFUSAL (TOOL-aOrientedCast-8 section 8 F3). A default
 # install lands the playbook wherever its answers put it while the memory-tree seed writes
-# `CHARTER="AGENTS.md"`, so a fresh adopter often has no file there. Every agent type appends charter
-# sections, so none can be rendered; the Skill needs no charter, so it still is, and the descriptor's
+# `CHARTER="AGENTS.md"`, so a fresh adopter often has no file there. Every agent type appends the
+# charter's cited rule lines and carried sections, so none can be rendered; the Skill needs no
+# charter, so it still is, and the descriptor's
 # `no-governing-doc` outcome accepts exit 3, so the apply succeeds and check-wiring names the doc.
 #
 # THE AGENT RENDER is `render_agents.py --write` or `--check` beside this file, run through the

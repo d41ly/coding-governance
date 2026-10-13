@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** journal TOOL-aSparedSpawn-3
 # TOOL-aSparedSpawn-3 — the pass's direct checks: the runner itself, driven over hand-built fixture
 # repositories with a tiny manifest of sleep and hang legs. No suite, no slice of one.
 #

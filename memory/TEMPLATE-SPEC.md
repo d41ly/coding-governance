@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.146 -->
+<!-- gov:kit memory-tree@2.148 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -381,7 +381,7 @@ Carried from the charter's v3.5 review section when v4.0 cut it to one `[risk]` 
   egress surface, and no shared-contract change. It owes the gates and one focused self-review of the
   diff, and NO multi-agent review.
 - **Tier 2** — any of the above, or a cross-stream merge. It owes the adversarial find, verify and
-  synthesize pattern of the review protocol (`REVIEW-PROTOCOL.md`, review-harness kit), with the project's recurring bug-class checklist run as part of it.
+  synthesize pattern of `memory/guides/REVIEW-PROTOCOL.md`, with the project's recurring bug-class checklist run as part of it.
 - A Tier-2 review reads the diff at an immutable sha plus its immediate callers and callees, ONCE, at
   the integration boundary: the cumulative diff landing on the default branch. Per-increment reviews
   re-scan overlapping code and never see the seam between two increments.

@@ -2835,6 +2835,8 @@ _pyparity() {  # $1 module directory · $2 example conf · $3 exemption names
 # other — plus one fixture VIEW key. Same rule as `_engexempt` above, asserted in both directions.
 #   GOV_BASH GOV_DEFAULT_BRANCH GOV_REMOTE PATH GIT_DIR GIT_GRAFT_FILE GIT_AUTHOR_DATE GIT_COMMITTER_DATE
 #     — environment, read or set through os.environ by the engine and by its own fixtures.
+#   GIT_INDEX_FILE — environment: gen_build_index.py carries it from os.environ into the hook's git
+#     environment, so both readers stay on one index (TOOL-aTrimmedHook-4).
 #   GRAMMAR_DIR GRAMMAR_WHERE READ_PATH_RULES_GATE — module-level constants, reached through
 #     globals() by selftest arms that save and restore them. GRAMMAR_WHERE is swapped beside
 #     GRAMMAR_DIR in corpus_ids.py (TOOL-aRepatriatedFork-46 S4).
@@ -2845,7 +2847,7 @@ _pyparity() {  # $1 module directory · $2 example conf · $3 exemption names
 #     on purpose: adopt-memory-tree.sh copies the example and appends the first two only when neither
 #     is assigned, so an uncommented blank would skip that append and leave the write gate unarmed on
 #     every new adopter. Discoverable in the example's comments, not by `^KEY=` (TOOL-dHomedResolver-8).
-_pyexempt="EXMP GATE_PUSH_BASE GIT_AUTHOR_DATE GIT_COMMITTER_DATE GIT_DIR GIT_GRAFT_FILE GOV_BASH GOV_DEFAULT_BRANCH GOV_REMOTE GRAMMAR_DIR GRAMMAR_WHERE PATH READ_PATH_RULES_GATE ROUTED_COMMIT_CUTOFF ROUTED_COMMIT_WAIVED ROUTED_PATHS"
+_pyexempt="EXMP GATE_PUSH_BASE GIT_AUTHOR_DATE GIT_COMMITTER_DATE GIT_DIR GIT_GRAFT_FILE GIT_INDEX_FILE GOV_BASH GOV_DEFAULT_BRANCH GOV_REMOTE GRAMMAR_DIR GRAMMAR_WHERE PATH READ_PATH_RULES_GATE ROUTED_COMMIT_CUTOFF ROUTED_COMMIT_WAIVED ROUTED_PATHS"
 _pk_real=$(_pykeys "$HERE")
 n=$((n+1))
 [ -n "$_pk_real" ] || { echo "FAIL could not derive a single conf key from $HERE/*.py; the python example-conf arms below would pass by finding nothing"; st=1; }
@@ -3168,6 +3170,7 @@ printf 'status\n' > "$_b1/memory/builds/tOne/NOTES.md"
 printf '# a build record\n\nno serves line\n' > "$_b1/memory/builds/tOne/build/2026-08-01-build-tOne-1.md"
 printf '{"a": 1}\n' > "$_b1/memory/builds/tOne/build/result.json"
 printf '# pass-order waivers\n' > "$_b1/memory/project/pass-order-waiver.txt"
+printf '# stand-in waivers\n' > "$_b1/memory/project/role-stand-in-waiver.txt"
 printf 'x\n' > "$_b1/memory/project/zz-probe.txt"
 printf '# legacy\n' > "$_b1/memory/project/legacy-files.txt"
 ( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10 --no-verify ) >/dev/null 2>&1
@@ -3195,8 +3198,9 @@ esac
 n=$((n+1))
 case "$o" in
   *"memory/project/pass-order-waiver.txt"*) echo "FAIL check 3 named pass-order-waiver.txt, a registry the unattended kit reads at its default path"; st=1 ;;
-  *"HYGIENE check 3 FAILED"*"memory/project/zz-probe.txt"*) echo "ok   check 3 admits the kit registry pass-order-waiver.txt by name" ;;
-  *) echo "FAIL check 3 did not name the unlisted zz-probe.txt, so its silence about pass-order-waiver.txt proves nothing"; st=1 ;;
+  *"memory/project/role-stand-in-waiver.txt"*) echo "FAIL check 3 named role-stand-in-waiver.txt, a registry the roles kit reads at its default path"; st=1 ;;
+  *"HYGIENE check 3 FAILED"*"memory/project/zz-probe.txt"*) echo "ok   check 3 admits the kit registries pass-order-waiver.txt and role-stand-in-waiver.txt by name" ;;
+  *) echo "FAIL check 3 did not name the unlisted zz-probe.txt, so its silence about either kit registry proves nothing"; st=1 ;;
 esac
 printf '# legacy\nmemory/builds/tOne/NOTES.md\nmemory/builds/tOne/build/2026-08-01-build-tOne-1.md\n' > "$_b1/memory/project/legacy-files.txt"
 ( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10-legacy --no-verify ) >/dev/null 2>&1

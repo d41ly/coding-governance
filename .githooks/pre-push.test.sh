@@ -468,15 +468,33 @@ else
 fi
 
 # 25b — a tracked bar that is NOT this kit's runner adopts no runner stamp (TOOL-aFrugalTurnstile-1
-#       AC4): a green the runner earned proves the runner's legs, never this bar's. The stamp is at the
-#       tip and otherwise valid, so before the unit this push scoped.
+#       AC4): a green the runner earned proves the runner's legs, never this bar's. Its own green is a
+#       candidate in the stamp's place (TOOL-aFrugalTurnstile-2 S3b), so the push scopes from arm 25's
+#       gate-bar-green, 2 landings back. The stamp is 1 back and otherwise valid, so nearest-wins would
+#       pick it were it a candidate. The pushed tree is one no earlier push carried, or arm 25's record
+#       covers it and no bar, so no decision, runs. GATE_SELFTESTS is cleared as `decide` clears it.
 git commit -q --allow-empty -m c25b >/dev/null 2>&1
 stamp "$(git rev-parse HEAD)"
-git commit -q --allow-empty -m c25b2 >/dev/null 2>&1
-line=$( ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD="bash tracked-bar.sh" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true )
+printf 'c25b2\n' > c25b2.txt; git add c25b2.txt >/dev/null 2>&1; git commit -q -m c25b2 >/dev/null 2>&1
+line=$( ( unset GOV_GATE_CMD_TEST; GATE_SELFTESTS= GOV_GATE_CMD="bash tracked-bar.sh" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true )
 case "$line" in
-  *"FULL gate"*"is not this kit's runner"*) ok "25b a non-runner bar forces FULL and names why no runner stamp is a candidate" ;;
+  *"scoped gate"*"bar green"*"from this git dir's gate-bar-green "*) ok "25b a non-runner bar scopes from its own gate-bar-green, never from the nearer runner stamp" ;;
   *) bad "25b a runner stamp was a candidate for a bar that is not the runner: ${line:-<no decision line>}" ;;
+esac
+
+# 25c — and with NO bar record to adopt, the same bar pushes FULL and says why (TOOL-aFrugalTurnstile-1
+#       AC4's reason, which 25b no longer reaches). Every bar-record slot of this git dir goes — it is
+#       the common dir here, so that is `gate-bar-green`, `.scoped` and their `.shared` copies. The
+#       runner stamp is valid and 1 landing back, so a hook without the non-runner force scopes from it
+#       and this arm reds; the pushed file is one no earlier push carried, so no cover pass answers.
+rm -f "$(git rev-parse --git-dir)"/gate-bar-green*
+git commit -q --allow-empty -m c25c >/dev/null 2>&1
+stamp "$(git rev-parse HEAD)"
+printf 'c25c2\n' > c25c2.txt; git add c25c2.txt >/dev/null 2>&1; git commit -q -m c25c2 >/dev/null 2>&1
+line=$( ( unset GOV_GATE_CMD_TEST; GATE_SELFTESTS= GOV_GATE_CMD="bash tracked-bar.sh" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true )
+case "$line" in
+  *"FULL gate"*"is not this kit's runner"*) ok "25c a non-runner bar with no record to adopt pushes FULL, naming why no runner stamp counts" ;;
+  *) bad "25c a non-runner bar with no record to adopt did not refuse the runner stamp by name: ${line:-<no decision line>}" ;;
 esac
 
 # 26 — an UNTRACKED bar is refused. $green lives under mktemp, so it is untracked by construction —
@@ -970,7 +988,7 @@ run_rp_push() { # [remote] [NAME=VALUE…] -> the push's merged output; the knob
   printf 'sha\t%s\n%s' "$(git rev-parse HEAD)" "${RP_GREEN_EXTRA:-}" > "$rp_gd/gate-full-green"
   git commit -q --allow-empty -m "rp $RANDOM" >/dev/null 2>&1
   printf 'unset' > "$rp/knob"
-  env GOV_GATE_CMD="bash $rp/stub.sh" "$@" git push origin main 2>&1
+  env GOV_GATE_CMD="bash $rp/stub.sh" "$@" git push "$remote" main 2>&1
 }
 
 read_rp_line() { printf '%s' "$1" | grep -m1 'gate on main push'; }   # the decision line alone, never the whole output
@@ -1480,8 +1498,11 @@ VRSTUB
   touch "$(git rev-parse --git-dir)/push-main-active"
   GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
 }
+# Each push carries a tree no earlier push carried, through a counter no reset rewinds: a tree a green
+# push recorded in gate-bar-green is covered, and the cover pass runs no bar.
 run_vr_push() { # [env assignments…] -> VR_OUT and VR_RC, the push's merged output and its status
-  git commit -q --allow-empty -m "vr $RANDOM" >/dev/null 2>&1
+  VR_N=$((${VR_N:-0} + 1)); printf '%s\n' "$VR_N" > vr-count
+  git add vr-count >/dev/null 2>&1; git commit -q -m "vr $VR_N" >/dev/null 2>&1
   VR_OUT=$( env -u GOV_GATE_CMD -u GATE_RUN_ID GATE_SELFTESTS= "$@" git push origin main 2>&1 ); VR_RC=$?
 }
 build_vr_fixture ac5 || bad "VR could not build its fixture"
@@ -1951,9 +1972,9 @@ git worktree add -q "$_wt" -b wtb >/dev/null 2>&1
   rm -f "$docs_env"
   env GATE_SELFTESTS= DOCS_ENV="$docs_env" GOV_GATE_CMD="bash $docstub" git push origin HEAD:main 2>&1
 ) > "$tmp/docs-wt.out"
-case "$(cat "$tmp/docs-wt.out")" in
+case "$(<"$tmp/docs-wt.out")" in
   *"scoped gate on main push"*"from the common dir's gate-full-green "*) ok "DOCS L3b a linked worktree adopts the primary's stamp and names it" ;;
-  *) bad "DOCS L3b expected the common dir's own stamp adopted, got: $(cat "$tmp/docs-wt.out")" ;;
+  *) bad "DOCS L3b expected the common dir's own stamp adopted, got: $(<"$tmp/docs-wt.out")" ;;
 esac
 cd "$pfx_home" || exit 2
 
@@ -2391,14 +2412,14 @@ case "$BG_OUT" in
 esac
 cd "$pfx_home" || exit 2
 
-# AC3 — undeclared at R, a present red is never read and the decision does not move.
+# AC3 — undeclared at R, a present red is never read (the reuse probe's `ls-remote --heads` is no read of it) and the decision does not move.
 build_bg_fixture pm-undecl || bad "PM could not build its fixture"; build_pm_shim
 _f=$(git rev-parse HEAD); write_bg_stamp "$_f"; echo 1 >> src/x.sh; git commit -qam p; _p=$(git rev-parse HEAD)
 echo 2 >> src/x.sh; git commit -qam t; write_pm_red "$_p"; run_bg_push PATH="$PM_PATH"
-case "$(grep -c ls-remote "$BG_D/shim.log")|$BG_OUT" in
+case "$(grep -c 'ls-remote.*refs/gov/bar-red' "$BG_D/shim.log")|$BG_OUT" in
   "0|"*"post-merge bar"*) bad "PM AC3 an undeclared push printed a post-merge line: $BG_OUT" ;;
-  "0|"*"scoped gate on main push"*"full green ${_f:0:8}"*) ok "PM AC3 undeclared: no ls-remote and the decision is unchanged" ;;
-  *) bad "PM AC3 expected no ls-remote and a scoped gate from ${_f:0:8}, got: $(grep ls-remote "$BG_D/shim.log") $BG_OUT" ;;
+  "0|"*"scoped gate on main push"*"full green ${_f:0:8}"*) ok "PM AC3 undeclared: no ls-remote of refs/gov/bar-red and the decision is unchanged" ;;
+  *) bad "PM AC3 expected no ls-remote of refs/gov/bar-red and a scoped gate from ${_f:0:8}, got: $(grep 'ls-remote.*refs/gov/bar-red' "$BG_D/shim.log") $BG_OUT" ;;
 esac
 cd "$pfx_home" || exit 2
 

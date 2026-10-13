@@ -86,6 +86,10 @@ cannot import it. The resume probe never takes one, and `efforts` stays out of t
 moves how hard a judge reasons, not what it was asked. The caller composes it per WORKFLOW with
 `handoff.py stage-efforts`, since this harness serves spec review and closing review at two levels.
 
+**Every agent the three declared harnesses spawn is labelled `<slug> · <scope> · <stage>`, and each
+run's first log line and leading return key, `identity`, say the same of the run
+(`TOOL-aOrientedCast-27`).**
+
 ## Shared seams
 
 `tools/workflows/check-review-join.sh` scans every `*.js` under `tools/` with NO marker filter, so a

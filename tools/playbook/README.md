@@ -106,6 +106,16 @@ repository overrides one node's `primary_tree`, `worktree_root` or `variances` u
 member naming a block v4.0 retired, and notes a `## Node registry` the charter carries outside the
 region, which readers would take first.
 
+## The role roster
+
+`{{ROLE_ROSTER}}` is filled by the roles kit's own `roster` verb, found through the sibling
+resolver as the gate runner is, so this kit names no sibling kit by literal and the roles kit stays
+the one reader of role files. The verb's lines arrive verbatim: this engine adds no `- `, cuts
+nothing and reorders nothing, and the one-line region grades the result. A missing kit, a verb that
+cannot start, a non-zero exit or an empty stdout prints a `render-playbook: ROLE_ROSTER:` line naming
+the cause, and the render refuses unless `role_roster` is answered. A role edit that changes the
+roster stales the region, which `--check` reports.
+
 ## Two namespaces, and neither reads a boolean
 
 `kit:<id>` drops when the target did not select that kit. `when:<name>` drops when the name is a

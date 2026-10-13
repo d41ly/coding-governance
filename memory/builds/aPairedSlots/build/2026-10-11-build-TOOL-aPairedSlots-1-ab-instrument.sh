@@ -35,6 +35,9 @@
 #   ab-instrument.sh arm  <root> <arm> <rep>                one arm-run, normally under --hold
 # Results land in <root>/results.tsv (one row per bar, then one per arm-run) and <root>/samples.tsv.
 set -u
+# The launcher, resolved before any cd from the repository this record sits in, four levels up.
+_d=.; [[ ${BASH_SOURCE[0]} == */* ]] && _d=${BASH_SOURCE[0]%/*}; . "$_d/../../../../tools/lib/resolve-python.sh" || exit 2
+PY=$(resolve_python) || exit 2
 
 QUIET_MAX=${QUIET_MAX:-7200}
 SAMPLE_EVERY=${SAMPLE_EVERY:-60}
@@ -46,7 +49,7 @@ print_err() { printf 'ab: %s\n' "$*" >&2; }
 # `subjects[i] = kit || chunks[i] = selftests` with GATE_SELFTESTS unset, read from the CLONE's own
 # manifest so a manifest that moved between bases cannot be graded against another's count.
 measure_expected_legs() { # clone -> stdout: the count
-  python -c '
+  "$PY" -c '
 import json, sys
 d = json.load(open(sys.argv[1], encoding="utf-8"))
 print(sum(1 for l in d if not (l.get("subject") == "kit" or l.get("chunk") == "selftests")))
