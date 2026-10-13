@@ -140,7 +140,7 @@ ids TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25 TOOL-aOrie
 | [TOOL-aOrientedCast-27 — every spawned agent is named for its build, unit and action, and the spawn guard refuses a misnamed spawn](spec/2026-10-13-spec-TOOL-aOrientedCast-27.md) | 28 | 2 | OPEN | rev-2 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 64 bound to this build, across 4 record folder(s).
+Records: 65 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
