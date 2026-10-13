@@ -2,7 +2,7 @@
 name: build
 description: Drive an ATTENDED code build through the harness pipeline an unattended run uses - spec writers, the spec audit where the owner declared one, one builder per unit, the closing review and one bar - with every agent spawned as its rendered role. Use after /session-kickoff's READY card and the owner's go, for a build that writes product code. Do NOT use for a run that merges and pushes with no owner turn, which is /unattended, or for a change that writes no product code.
 ---
-<!-- gov:kit roles@1.3 -->
+<!-- gov:kit roles@1.4 -->
 
 # Attended builds
 
@@ -26,8 +26,9 @@ before stage 3, and it wins any difference. The stages below are the workflows o
   `efforts`, the JSON `handoff.py stage-efforts <workflow>` prints for the workflow that call runs.
 - Every agent the session dispatches or receives is reported by pasting, unchanged, what
   `handoff.py agents --handoff <path>` prints for a direct spawn, or `handoff.py agents --run <run-id>`
-  for a harness call. Run it once the call returns and again when its notification arrives; the
-  same run adds each complete line to the build's agent ledger.
+  for a harness call. Run it once the call returns and again when its notification arrives, without
+  `--write`, which writes nothing mid-pass. Add the complete lines to the build's agent ledger with
+  `--write` only at a bookkeeping step, when no pass is running.
 
 ## Stage 1 — orient
 

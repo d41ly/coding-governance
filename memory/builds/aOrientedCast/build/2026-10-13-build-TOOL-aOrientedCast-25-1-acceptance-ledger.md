@@ -19,6 +19,9 @@ of `tools/check-microformats.sh`, which are the `micro-format definitions` leg; 
 second pass; and the RED-first observation of each of §7's five `New arm:` lines, on its staged
 break and green once restored.
 
+The second pass ran at the main loop, declared at `e8c7e326`: `adopt-roles.sh --scaffold` re-rendered
+`.claude/skills/build/SKILL.md`, which now carries `roles@1.4`, and `adopt-roles.sh --check` exited 0.
+
 **Evidences:** TOOL-aOrientedCast-25
 - AC1 — `toolu_A` — in F, with `toolu_A`'s prompt prefixed with one `\n`, `handoff.py agents --handoff <H> --session <S>` exited 0 and printed exactly arm 9's two lines; the base `handoff.py` over the same session exited 1, "no Agent call … opens its prompt with the marker line", so the criterion discriminates. `grep -n "extract_prompt_marker"` printed the matcher's call at `tools/roles/handoff.py:820`, its docstring at `:43`, and the README's sentence at `tools/roles/README.md:88`.
 - AC2 — `agent-cap.js` — over the task part of a `gov-researcher` render in F, the spawn guard and `extract_prompt_marker` both admitted v1, v2 and v3 and both refused v4 and v5, the guard exiting 2 with rule 6's "carries 0 gov:handoff marker lines".
