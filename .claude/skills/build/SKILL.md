@@ -2,7 +2,7 @@
 name: build
 description: Drive an ATTENDED code build through the harness pipeline an unattended run uses - spec writers, the spec audit where the owner declared one, one builder per unit, the closing review and one bar - with every agent spawned as its rendered role. Use after /session-kickoff's READY card and the owner's go, for a build that writes product code. Do NOT use for a run that merges and pushes with no owner turn, which is /unattended, or for a change that writes no product code.
 ---
-<!-- gov:kit roles@1.4 -->
+<!-- gov:kit roles@1.5 -->
 
 # Attended builds
 
@@ -20,7 +20,8 @@ before stage 3, and it wins any difference. The stages below are the workflows o
   `unattended.sh --plan <slug> --paths`. Merge and push each wait for the owner's explicit ask.
 - A fork goes to the owner through `AskUserQuestion`, never to a park: no mandate delegates it (M3).
 - You write no freeform agent prompt. A direct spawn is an `Agent` call whose `subagent_type` is the
-  role and whose `prompt` is the output of this line, unchanged:
+  role, whose `prompt` is the output of this line, unchanged, and whose `description` is the name
+  the line prints on stderr after `handoff: description — `; the spawn guard refuses any other:
   `python tools/roles/handoff.py render --role <role> --build <slug> --unit <id> --input <key>=<value> --part task`
   Every harness call carries `roles`, the JSON `handoff.py harness-args <harness>` prints, and
   `efforts`, the JSON `handoff.py stage-efforts <workflow>` prints for the workflow that call runs.
