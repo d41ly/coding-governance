@@ -78,7 +78,7 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 16 unit(s) · node d · opened 2026-10-13 · streams tooling
+**Build status:** CLOSED · 16 unit(s) · node d · opened 2026-10-13 · streams tooling
 ids TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-6 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13
 ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17
 
@@ -88,7 +88,7 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-1 — the census: the branch-reconcile kit, its remote ladder, the inventory and a byte-stable report](spec/2026-10-13-spec-TOOL-dSweptBranches-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-2 — the verdict ladder: six verdicts over refs and worktree content, each with its evidence](spec/2026-10-13-spec-TOOL-dSweptBranches-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-13 |
 | [TOOL-dSweptBranches-4 — the worktree remover: git first, then `rm -rf`, and a skeleton removed only when it holds no regular file](spec/2026-10-13-spec-TOOL-dSweptBranches-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-13 |
-| [TOOL-dSweptBranches-3 — write mode: a recovery manifest first, then deletes of the three landed verdicts only](spec/2026-10-13-spec-TOOL-dSweptBranches-3.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-13 |
+| [TOOL-dSweptBranches-3 — write mode: a recovery manifest first, then deletes of the three landed verdicts only](spec/2026-10-13-spec-TOOL-dSweptBranches-3.md) | 4 | 2 | CLOSED | rev-4 | 2026-10-13 |
 | [TOOL-dSweptBranches-5 — the skill: a rendered `/branch-reconcile` that routes cleanup asks through the tool](spec/2026-10-13-spec-TOOL-dSweptBranches-5.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-7 — a worktree whose status was never read reads UNKNOWN, never its HEAD's verdict](spec/2026-10-13-spec-TOOL-dSweptBranches-7.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-8 — a registered worktree path holding another repository is never graded as the worktree, and rm -rf reaches only a proven worktree](spec/2026-10-13-spec-TOOL-dSweptBranches-8.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-13 |
@@ -100,12 +100,12 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-14 — a merge commit is covered only when it introduces nothing of its own](spec/2026-10-13-spec-TOOL-dSweptBranches-14.md) | 13 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-15 — a submodule with uncommitted content makes its worktree UNKNOWN](spec/2026-10-13-spec-TOOL-dSweptBranches-15.md) | 14 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-16 — tracked edits in an idle worktree are graded by a fixture](spec/2026-10-13-spec-TOOL-dSweptBranches-16.md) | 15 | 2 | CLOSED | rev-1 | 2026-10-13 |
-| [TOOL-dSweptBranches-17 — the closing review's MEDIUM and LOW items, batched](spec/2026-10-13-spec-TOOL-dSweptBranches-17.md) | 16 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-dSweptBranches-17 — the closing review's MEDIUM and LOW items, batched](spec/2026-10-13-spec-TOOL-dSweptBranches-17.md) | 16 | 2 | CLOSED | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 33 bound to this build, across 4 record folder(s).
+Records: 35 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dSweptBranches-17.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dSweptBranches-1 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3
 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9.

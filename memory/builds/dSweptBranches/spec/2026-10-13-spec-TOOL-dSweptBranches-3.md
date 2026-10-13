@@ -1,6 +1,6 @@
 # TOOL-dSweptBranches-3 — write mode: a recovery manifest first, then deletes of the three landed verdicts only
 
-**Status:** CLOSED · rev-3 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 4
+**Status:** CLOSED · rev-4 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -68,9 +68,9 @@ The manifest's lines are `branch <name> <sha>`, `remote <remote>/<name> <sha>`,
 `stash <index> <sha>` and `worktree <path> <sha|none>`. The stamp is UTC to the second, with a
 numeric suffix when one exists already, so two runs in one second never share a file.
 
-The self-test proves the ordering with a trace: the module exposes `write_trace`, a list each
-mutation appends to, and the arm asserts the manifest entry precedes the first removal. The remote
-arm points a bare repository at the fixture and observes which branches remain on it.
+The self-test proves the ordering with a trace: the module exposes `WRITE_TRACE`, a list each
+mutation appends to BEFORE the act it records, and the arm asserts the manifest entry precedes
+the first removal. The remote arm points a bare repository at the fixture and observes which branches remain on it.
 
 ### Files touched (estimate)
 
@@ -102,7 +102,7 @@ arm points a bare repository at the fixture and observes which branches remain o
 ## 6. Acceptance criteria
 
 - **AC1** — When `branch_reconcile.py --write` runs over the write fixture, the manifest under the
-  common directory lists every branch tip and worktree `HEAD`, and `write_trace` records it before
+  common directory lists every branch tip and worktree `HEAD`, and `WRITE_TRACE` records it before
   the first removal.
   Red when: the manifest is written after the first deletion, or omits a worktree.
 - **AC2** — When `branch_reconcile.py --write` runs over a fixture holding one row of each verdict,
@@ -144,6 +144,8 @@ none
   contains a kept worktree is kept, because read_dirt hides the nested one from its container. B2:
   the primary and default-branch keeps get a fixture in which each is the deciding keep. The keep
   reasons move into parentheses, because the action column carried the row separator.
+- rev-4 · 2026-10-13 · §4 · AC1 · the closing review's round-1 L2, folded by unit 17: the trace
+  is named `WRITE_TRACE`, as the module spells it, and records each act before it runs.
 
 ## 10. Reuse audit
 

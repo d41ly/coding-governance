@@ -26,8 +26,8 @@ from contextlib import redirect_stdout
 
 HERE = pathlib.Path(__file__).resolve().parent
 CLI = HERE / "branch_reconcile.py"
-ASSERTION_FLOOR = 59
-PASS, FAIL = [], []
+ASSERTION_FLOOR = 90
+PASS, FAIL, SKIPPED = [], [], []
 SCRATCH = []
 
 
@@ -206,6 +206,9 @@ def arm_census():
           out.splitlines()[0].split(" at ")[0] + " · " + out.splitlines()[0].split(" · ", 1)[1],
           "branch-reconcile — upstream/main · 6 worktree(s) · 7 local · 2 remote · 1 stash")
 
+    check("census: (unit 17) a repository with no memory tree announces the skipped predicates",
+          "skipped — records, rotated and run-record predicates · no memory tree" in out, True)
+
     # AC2 — byte-stable
     rc2, out2, _ = run_cli(repo)
     check("census: AC2 two runs over the unchanged fixture print the same bytes", out2, out)
@@ -225,9 +228,10 @@ def arm_census():
     saved = BR.PREDICATES[:]
     BR.PREDICATES[:] = []
     try:
-        inv = BR.read_inventory(repo)
-        verdicts = {r["verdict"] for r in BR.build_rows(inv)}
-        evidence = all("no predicate decided" in r["evidence"] for r in BR.build_rows(inv))
+        with seed_environ():
+            inv = BR.read_inventory(repo)
+            verdicts = {r["verdict"] for r in BR.build_rows(inv)}
+            evidence = all("no predicate decided" in r["evidence"] for r in BR.build_rows(inv))
     finally:
         BR.PREDICATES[:] = saved
     check("census: AC5 with no predicate every row reads UNKNOWN", (verdicts, evidence),
@@ -502,6 +506,9 @@ def arm_remover():
 
     real_remove = BR.run_worktree_remove
     linked = []
+    outside = build_dir() / "pnpm-store"
+    outside.mkdir()
+    (outside / "index.js").write_text("module.exports = 1\n", encoding="utf-8")
 
     def build_skeleton_remover(extra_file):
         def remove(root, path):
@@ -510,6 +517,7 @@ def arm_remover():
             d.mkdir(parents=True)
             try:
                 os.symlink("/" + "c/nonexistent/pnpm/target", d / "pkg")
+                os.symlink(str(outside), d / "store", target_is_directory=True)
                 linked.append(True)
             except OSError:
                 linked.append(False)
@@ -546,9 +554,12 @@ def arm_remover():
               ("removed", False))
         check("remover: AC2 no readlink is spawned",
               [a for a in spawned if any("readlink" in str(x) for x in a)], [])
-        if linked and not linked[-1]:
-            print("remover: skipped — this node cannot create a symlink, so the skeleton held "
-                  "empty directories only")
+        if linked and linked[-1]:
+            check("remover: (unit 17) a skeleton link's outside target survives the removal",
+                  (outside / "index.js").exists(), True)
+        else:
+            SKIPPED.append("remover: a skeleton link's outside target survives — this node cannot "
+                           "create a symlink")
 
         wt = seed_worktree("holds")
         with seed_seam("run_worktree_remove", build_skeleton_remover(True)):
@@ -577,6 +588,9 @@ def seed_write_fixture():
         "%Y-%m-%dT%H:%M:%S+0000")
     base = build_dir()
     repo = seed_repo(base)
+    (repo / "a.txt").write_text("a2\n", encoding="utf-8", newline="\n")
+    run_git(repo, "stash", "push", "-q", "-m", "landed stash")
+    seed_commit(repo, "a.txt", "a2\n", "feat: a2", when=old)
     run_git(repo, "checkout", "-q", "-b", "merged-br")
     seed_commit(repo, "m.txt", "m\n", "feat: merged", when=old)
     run_git(repo, "checkout", "-q", "main")
@@ -590,6 +604,10 @@ def seed_write_fixture():
     run_git(repo, "checkout", "-q", "-b", "open-br", "main")
     seed_commit(repo, "memory/builds/dOpen/README.md", "**Build status:** INPROGRESS · 1 unit(s)\n",
                 "spec(dOpen): open the build", when=old)
+    run_git(repo, "checkout", "-q", "-b", "super-br", "main")
+    seed_commit(repo, "n.txt", "net zero\n", "try: a file", when=old)
+    run_git(repo, "rm", "-q", "n.txt")
+    run_git(repo, "commit", "-q", "-m", "revert: the file")
     run_git(repo, "checkout", "-q", "--orphan", "orphan-br")
     seed_commit(repo, "o.txt", "o\n", "orphan: unrelated history", when=old)
     run_git(repo, "checkout", "-q", "main")
@@ -600,6 +618,9 @@ def seed_write_fixture():
     run_git(repo, "worktree", "add", "-q", str(wt_gone), "merged-br")
     wt_live = base / "fx" / "wt-live"
     run_git(repo, "worktree", "add", "-q", str(wt_live), "live-br")
+    wt_super = base / "fx" / "wt-super"
+    run_git(repo, "worktree", "add", "-q", str(wt_super), "super-br")
+    (wt_super / "copy.txt").write_text("m\n", encoding="utf-8", newline="\n")
     return repo, wt_gone, wt_live
 
 
@@ -618,7 +639,16 @@ def arm_write():
     with seed_environ():
         before = read_rows(run_cli(repo, "--fresh-hours", "0")[1])
         check("write: the fixture holds one row of each verdict", sorted({v[0] for v in before.values()}),
-              sorted(["MERGED", "EQUIVALENT", "UNMERGED-LIVE", "IN-PROGRESS", "UNKNOWN"]))
+              sorted(BR.VERDICT_RANK))
+        inv = BR.read_inventory(repo)
+        inv["fresh"] = 0
+        actions = [r["action"] for r in BR.build_rows(inv)]
+        check("write: (unit 17) no action carries the row separator, every keep reads keep (<why>)",
+              [a for a in actions if " · " in a or not (a.startswith("keep (") or a in (
+                  "remove worktree", "delete branch", "delete remote branch (--remote)"))], [])
+        check("write: (unit 17) the stash keep reads keep (a stash entry is never deleted)",
+              "keep (a stash entry is never deleted)" in actions, True)
+        stashes = run_git(repo, "stash", "list")
         rc, _out, err = run_cli(repo, "--remote")
         check("write: --remote without --write refuses", (rc, "--write" in err), (2, True))
         BR.WRITE_TRACE.clear()
@@ -640,6 +670,8 @@ def arm_write():
         check("write: AC2 only the landed worktree and branches are gone",
               (wt_gone.exists(), wt_live.exists(), sorted(branches)),
               (False, True, sorted(["main", "live-br", "open-br", "orphan-br"])))
+        check("write: (unit 17) the superseded branch's worktree, its dirt covered, is gone",
+              (pathlib.Path(repo).parent / "wt-super").exists(), False)
         remote_before = run_git(repo, "ls-remote", "upstream")
         check("write: AC2 no remote branch is touched without --remote",
               "refs/heads/merged-br" in remote_before, True)
@@ -652,6 +684,8 @@ def arm_write():
         check("write: AC3 one push deletes exactly the landed remote branch, and exits 0",
               (rc, [p[1] for p in pushes], "refs/heads/merged-br" in remote_after,
                "refs/heads/live-br" in remote_after), (0, [("merged-br",)], False, True))
+        check("write: (unit 17) no stash entry is touched by --write --remote",
+              run_git(repo, "stash", "list"), stashes)
         check("write: AC3 the default branch's tip on the remote is unchanged",
               run_git(str(pathlib.Path(repo).parent.parent / "remote.git"), "rev-parse", "main"),
               main_tip)
@@ -713,6 +747,15 @@ def arm_keeps():
         inv["fresh"] = 0
         check("keeps: no action carries the row separator, so the report parses",
               [r["action"] for r in BR.build_rows(inv) if " · " in r["action"]], [])
+        cont = repo / ".claude" / "worktrees" / "cont"
+        run_git(repo, "worktree", "add", "-q", "-b", "cont-br", str(cont), "main")
+        held = cont / ".claude" / "worktrees" / "held"
+        run_git(repo, "worktree", "add", "-q", "-b", "held-br", str(held), "main")
+        (held / "work.txt").write_text("unlanded\n", encoding="utf-8")
+        rows2 = read_rows(run_cli(here, "--fresh-hours", "0")[1])
+        check("keeps: (unit 17) a container's reason names the kept worktree by its row name",
+              rows2.get(("worktree/nested", ".claude/worktrees/cont"), [""] * 8)[6],
+              "keep (contains kept worktree .claude/worktrees/cont/.claude/worktrees/held)")
         rc, out = run_main("--root", str(here), "--fresh-hours", "0", "--write")
         branches = set(run_git(repo, "for-each-ref", "--format=%(refname:short)", "refs/heads").split())
         check("keeps: B1 --write spares the container and the live worktree inside it",
@@ -939,10 +982,50 @@ def arm_submodule():
           (verdict, "submodule content" in ev), ("UNKNOWN", True))
 
 
+def arm_minor():
+    """TOOL-dSweptBranches-17 — ignored files named, the env hold-out, and the manifest refusal."""
+    base = build_dir()
+    repo = seed_repo(base)
+    key = lambda p: str(p).replace("\\", "/")
+    with seed_environ():
+        (repo / ".git" / "info").mkdir(exist_ok=True)
+        (repo / ".git" / "info" / "exclude").write_text("*.log\n", encoding="utf-8")
+        wt = base / "fx" / "logs"
+        run_git(repo, "worktree", "add", "-q", "-b", "logs-br", str(wt), "main")
+        (wt / "debug.log").write_text("local state\n", encoding="utf-8")
+        ev = read_verdict(read_report(repo, "--fresh-hours", "0"), "worktree/sibling", key(wt))[1]
+        check("minor: AC2 a worktree's ignored files are named in its evidence", "ignored 1" in ev, True)
+    saved = os.environ.get("GOV_REMOTE")
+    os.environ["GOV_REMOTE"] = "nope"
+    try:
+        with seed_environ():
+            remote = BR.read_inventory(repo)["remote"]
+    except BR.Refusal:
+        remote = "refused"
+    finally:
+        if saved is None:
+            os.environ.pop("GOV_REMOTE", None)
+        else:
+            os.environ["GOV_REMOTE"] = saved
+    check("minor: AC3 an outer GOV_REMOTE does not reach an in-process call under seed_environ",
+          remote, "upstream")
+    with seed_environ():
+        run_git(repo, "branch", "landed", "main")
+        common = pathlib.Path(run_git(repo, "rev-parse", "--path-format=absolute", "--git-common-dir"))
+        (common / "branch-reconcile").write_text("a file where the directory goes\n", encoding="utf-8")
+        try:
+            rc, _out = run_main("--root", str(repo), "--fresh-hours", "0", "--write")
+        except OSError:
+            rc = "raised"
+        branches = run_git(repo, "for-each-ref", "--format=%(refname:short)", "refs/heads").split()
+        check("minor: AC6 an uncreatable manifest directory refuses with exit 2 and deletes nothing",
+              (rc, "landed" in branches), (2, True))
+
+
 ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
         arm_content, arm_stash, arm_remover, arm_write, arm_keeps, arm_unread, arm_foreign,
         arm_patch_negative, arm_probe_negative, arm_row_edit, arm_default_names, arm_graded_sha,
-        arm_evil_merge, arm_submodule]
+        arm_evil_merge, arm_submodule, arm_minor]
 
 
 def main():
@@ -960,6 +1043,8 @@ def main():
         for d in SCRATCH:
             shutil.rmtree(d, ignore_errors=True)
     total = len(PASS) + len(FAIL)
+    if SKIPPED:
+        print(f"branch-reconcile: {len(SKIPPED)} skipped, not counted: {SKIPPED}")
     print(f"branch-reconcile: {len(PASS)} passed, {len(FAIL)} failed "
           f"({total} assertions, floor {ASSERTION_FLOOR})")
     if total < ASSERTION_FLOOR:

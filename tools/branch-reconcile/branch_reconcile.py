@@ -215,7 +215,7 @@ def parse_worktrees(text):
 def parse_status(text):
     """`git status --porcelain=v2 -z --untracked-files=all` -> counts and the paths behind them."""
     st = {"staged": 0, "unstaged": 0, "unmerged": 0, "untracked": [], "drift": 0, "changed": [],
-          "submodules": []}
+          "submodules": [], "ignored": []}
     fields = text.split("\0")
     i = 0
     while i < len(fields):
@@ -243,6 +243,8 @@ def parse_status(text):
             st["changed"].append(f.split(" ", 10)[-1])
         elif kind == "?":
             st["untracked"].append(f[2:])
+        elif kind == "!":
+            st["ignored"].append(f[2:])
     return st
 
 
@@ -260,18 +262,21 @@ def read_dirt(path, others):
     A nested harness worktree is a directory its primary's status lists as untracked; counting it
     would make every primary read dirty (gotcha a-gate-that-walks-the-repo-root-reads-other-worktrees).
     """
+    # IGNORED PATHS ARE READ TOO (TOOL-dSweptBranches-17): a removal takes them with the worktree,
+    # so the evidence names them. `matching` reports a wholly ignored directory as one entry.
     rc, out = run_git(path, "status", "--porcelain=v2", "-z", "--untracked-files=all",
-                      "--ignore-submodules=none")
+                      "--ignored=matching", "--ignore-submodules=none")
     if rc != 0:
         return None
     st = parse_status(out)
-    keep = []
-    for rel in st["untracked"]:
-        full = pathlib.Path(path) / rel.rstrip("/")
-        if any(derive_key(full) == derive_key(o) or check_under(o, full) for o in others):
-            continue
-        keep.append(rel)
-    st["untracked"] = sorted(keep)
+    for field in ("untracked", "ignored"):
+        keep = []
+        for rel in st[field]:
+            full = pathlib.Path(path) / rel.rstrip("/")
+            if any(derive_key(full) == derive_key(o) or check_under(o, full) for o in others):
+                continue
+            keep.append(rel)
+        st[field] = sorted(keep)
     st["merge"] = ""
     merge_head = read_git_path(path, "MERGE_HEAD")
     if merge_head is not None and merge_head.is_file():
@@ -291,6 +296,8 @@ def render_dirt(st):
     bits = [f"{key} {st[key]}" for key in ("staged", "unstaged", "unmerged") if st[key]]
     if st["untracked"]:
         bits.append(f"untracked {len(st['untracked'])}")
+    if st["ignored"]:
+        bits.append(f"ignored {len(st['ignored'])}, which go with the worktree")
     if st["merge"]:
         bits.append(f"merging {st['merge'][:12]}")
     if st["rebase"]:
@@ -906,7 +913,7 @@ def derive_action(inv, row, kept_branches):
     if kind == "worktree/primary":
         return "keep (the primary worktree)"
     if verdict not in DELETABLE:
-        return "keep"
+        return f"keep ({verdict})"
     if kind.startswith("worktree/"):
         return "remove worktree"
     if kind == "local":
@@ -1027,7 +1034,6 @@ def write_manifest(inv):
         raise Refusal("cannot resolve the git common directory, so no recovery manifest can be written")
     base = pathlib.Path(common)
     base = (base if base.is_absolute() else pathlib.Path(inv["root"]) / base) / "branch-reconcile"
-    base.mkdir(parents=True, exist_ok=True)
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     path, n = base / f"recovery-{stamp}.txt", 1
     while path.exists():
@@ -1041,6 +1047,7 @@ def write_manifest(inv):
     lines += [f"stash {s['name']} {s['tip']}" for s in inv["stash"]]
     lines += [f"worktree {w['path']} {w['head'] or 'none'}" for w in inv["worktrees"]]
     try:
+        base.mkdir(parents=True, exist_ok=True)
         with open(path, "x", encoding="utf-8", newline="\n") as f:
             f.write("\n".join(lines) + "\n")
             f.flush()
@@ -1115,6 +1122,13 @@ def write_deletions(inv, rows, remote_too):
 def build_rows(inv):
     """-> one row per worktree, ref and stash entry, its verdict and action included, in report order."""
     rows = []
+    # A REPOSITORY WITH NO MEMORY TREE is announced, not silently graded against one
+    # (TOOL-dSweptBranches-17): the three predicates that read run and decision records find none.
+    mem = read_memory_root(inv)
+    top = read_git(inv["root"], "rev-parse", "--show-toplevel") or inv["root"]
+    if not (pathlib.Path(top) / ".memory-tree.conf").is_file() and \
+            not any(p.startswith(mem + "/") for p in read_default_tree(inv)):
+        inv["skips"]["records, rotated and run-record predicates"] = "no memory tree"
     for w in inv["worktrees"]:
         name = w["path"].replace("\\", "/")
         if check_under(w["path"], inv["primary"]):
@@ -1140,12 +1154,13 @@ def build_rows(inv):
     # A WORKTREE THAT CONTAINS A KEPT WORKTREE IS KEPT (closing review round 1, B1). read_dirt hides
     # a nested worktree from its container's untracked content, so removing the container would take
     # the kept one with it. Containment is transitive, so one pass over the kept set suffices.
-    held = [r["item"]["worktree"]["path"] for r in wt_rows if r["action"] != "remove worktree"]
+    held = [(r["item"]["worktree"]["path"], r["name"]) for r in wt_rows
+            if r["action"] != "remove worktree"]
     for r in wt_rows:
         if r["action"] == "remove worktree":
-            inner = sorted(p for p in held if check_under(p, r["item"]["worktree"]["path"]))
+            inner = sorted(n for p, n in held if check_under(p, r["item"]["worktree"]["path"]))
             if inner:
-                r["action"] = f"keep (contains kept worktree {inner[0].replace(chr(92), '/')})"
+                r["action"] = f"keep (contains kept worktree {inner[0]})"
     kept = {r["item"]["worktree"]["branch"] for r in wt_rows
             if r["action"] != "remove worktree" and r["item"]["worktree"]["branch"]}
     for r in rows:

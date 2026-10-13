@@ -118,6 +118,10 @@ the default branch makes it `UNMERGED-LIVE` before its `HEAD` is read. The tool 
 commits on, checks out or pushes the default branch, and passes no hook-bypass flag; pre-push hooks
 skip deletes on their own.
 
+**Ignored files go with the worktree.** A removal takes a worktree's gitignored files too — a local
+`.env`, a database, build output — so the report names them in the row's evidence as
+`ignored <n>, which go with the worktree`. Read it before `--write`.
+
 Exit 0 when every action succeeded or ended `busy`, 1 when any failed. Each action prints one line:
 `removed`, `busy`, `kept`, `deleted` or `failed`, then what and why.
 

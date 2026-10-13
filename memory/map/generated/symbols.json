@@ -758,6 +758,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_minor",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_noop",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
