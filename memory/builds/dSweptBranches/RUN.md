@@ -12,20 +12,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 asks-at-landing: TOOL-dSweptBranches-6=CLOSED TOOL-dSweptBranches-18=CLOSED TOOL-dSweptBranches-22=OPEN
 units-at-landing: TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-4 TOOL-dSweptBranches-3 TOOL-dSweptBranches-5 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-19 TOOL-dSweptBranches-20 TOOL-dSweptBranches-21 TOOL-dSweptBranches-23 TOOL-dSweptBranches-24
 hold-run: 
-hold-streak: 1 · at 71386064
+hold-streak: 1 · at 42f6109a
 resume-owed: none · owner
-held-at: 2026-10-13T07:31:24Z
-hold-reason: the build is complete and closed-reviewed; landing waits on the parked decision about five red legs the runner labels OWN by its comparator rule, four of them red with the same arms on main and the fifth green by hand at base and HEAD
+held-at: 2026-10-13T12:04:21Z
+hold-reason: closed green at 64701174 (full bar green on the prepared merge d4debb1a, every DoD item met); the owner's prompt puts landing out of scope, so the owner lands it: bash tools/push-main.sh --land --slug dSweptBranches, then unattended.sh --landed dSweptBranches
 hold-until: owner
-hold-code: owner-decision
-held-from: VERIFYING
+hold-code: host-owner-action
+held-from: LANDING
 gates-run: unattended-179189249165843924681-49995 d4debb1a
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 refreshed-at: 2b852f5fd87147540a0a73d310354440c84c72ea · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 3cb4e919d02ba8a574882d2302d37200a98366f4
-phase: LANDING
+witness: 42f6109ac130c0b7d795fac78d38b81c33508840
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/musing-lumiere-ab7980
@@ -191,3 +191,5 @@ base: a8f0e195a2d80a6d1480e4992aec6565342e35ea
 2026-10-13T11:24:42Z dispatch · item b7be73e4 TOOL-dSweptBranches-24 · reason tools/branch-reconcile/branch_reconcile.py tools/branch-reconcile/selftest.py tools/branch-reconcile/README.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-24.md memory/builds/dSweptBranches/prompts/2026-10-13-prompt-TOOL-dSweptBranches-24-1-build-brief.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-24-1-acceptance-ledger.md memory/map/features/branch-reconcile.md tools/process-monitor/reap.py tools/process-monitor/selftest.py memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-21.md memory/gotchas/observed-by-claim-no-arm-discharges.md memory/gotchas/one-value-field-records-a-mixed-outcome.md memory/map/features/process-monitor.md
 
 2026-10-13T11:41:42Z dispatch · item 553c01f8 TOOL-dSweptBranches-24 · reason tools/process-monitor/selftest.py tools/process-monitor/reap.py memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-24.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-5.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-19.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-21.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-24-1-acceptance-ledger.md memory/project/unarmed-branches.txt memory/map/features/process-monitor.md
+
+2026-10-13T12:04:22Z hold · item host-owner-action · reason until owner · reaped ca711d31 · resume none(owner)
