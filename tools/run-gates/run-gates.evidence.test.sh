@@ -1143,10 +1143,13 @@ ru_run GATE_REUSE=1 PYTHONUTF8=0 >/dev/null
 ru_done
 
 # REUSE_SCHEMA IS IN THE KEY. The control runs AFTER the miss, and the miss is what earns its entries:
-# the missing run executed on a clean tree, so it wrote them under the staged schema.
+# the missing run executed on a clean tree, so it wrote them under the staged schema. The edited copy
+# is COMMITTED, because ru_repo tracks it and a run on a dirty tree writes no entry; HEAD is no input of
+# an undeclared leg's key, so the commit is not what makes the miss miss.
 ru_repo
 ru_run >/dev/null
 sed -i 's/^REUSE_SCHEMA=.*/REUSE_SCHEMA=staged/' "$RU_T/${PFX}${KIT}/run-gates.sh"
+( cd "$RU_T" && git add -A && git commit -qm schema ) >/dev/null 2>&1
 grep -q '^REUSE_SCHEMA=staged$' "$RU_T/${PFX}${KIT}/run-gates.sh" && ok "AC5 the staged schema value is in the runner copy" \
                                                                   || nope "AC5 the runner copy carries no REUSE_SCHEMA line to change"
 ru_run GATE_REUSE=1 >/dev/null
@@ -1481,10 +1484,15 @@ build_lin_repo() {
 write_lin_fix() { echo fixed > "$RU_T/gb/f"; ( cd "$RU_T" && git add -A && git commit -qm fix ) >/dev/null 2>&1; }
 read_lin_header() { awk -F'\t' -v k="$1" '$1 == k { print $2 }' "$RU_GD/gate-run/$(cat "$RU_GD/gate-run/current" 2>/dev/null)/header" 2>/dev/null; }
 read_lin_stamp() { awk -F'\t' '$1 == "reused" { print $2 }' "$RU_GD/gate-full-green" 2>/dev/null; }
-check_lin_control() { # <AC label> — prove the cache's env mode reuses pa under the key lineage refused
-  cp "$tmp/ru.led" "$RU_GD/gate-ledger.tsv"; ru_run GATE_REUSE=1 >/dev/null
-  grep -q '^GATE reuse pa  ' "$REC_OUT" && ok "$1 control: GATE_REUSE=1 reuses pa from the cache, so the key matched" \
-                                        || nope "$1 control: GATE_REUSE=1 did not reuse pa either, so the refusal above proves nothing"
+# check_lin_control <AC label> — prove the refusal is the named term's, not a key that never matched:
+# pa's saved row (field 4, the input key) equals the key the lineage run computed. Not the cache's env
+# mode, which runs without GATE_FULL, a key input, so its key never equals a full bar's.
+check_lin_control() {
+  local led run
+  led=$(awk -F'\t' '$1 == "pa" { print $4; exit }' "$tmp/ru.led" 2>/dev/null); run=$(read_ru_key pa)
+  [ -n "$led" ] && [ "$led" != - ] && [ "$led" = "$run" ] \
+    && ok "$1 control: pa's saved row carries the key the lineage run computed, so the key matched" \
+    || nope "$1 control: pa's saved row keys '$led' and the lineage run '$run', so the refusal above proves nothing"
 }
 
 # AC1, AC2, AC8 and AC6 share one scratch: the red full run, the fix, the lineage run, the opt-in run.
@@ -1508,6 +1516,8 @@ grep -q $'^reused_cache\t0$' "$RU_GD/gate-full-green" 2>/dev/null \
   && ok "TOOL-aSparedSpawn-32 S8 the lineage stamp records reused_cache 0 beside reused 1" \
   || nope "TOOL-aSparedSpawn-32 S8 the lineage stamp carries no reused_cache 0"
 rm -f "$RU_GD/gate-full-green"
+# The earning bar: only a bar without GATE_FULL, a key input, writes an entry under the env mode's key.
+ru_run >/dev/null
 ru_run GATE_REUSE=1 >/dev/null
 grep -q '^GATE reuse pa  ' "$REC_OUT" && [ ! -f "$RU_GD/gate-full-green" ] \
   && ok "AC6 the opt-in mode, the cache's env mode since TOOL-aSparedSpawn-13, reuses and still writes no full green" \
@@ -1518,13 +1528,16 @@ touch "$RU_T/untracked"; ru_run GATE_FULL=1 >/dev/null
   || nope "AC1 a dirty full run wrote a row with full set"
 ru_done
 
-# AC3: rows earned WITHOUT the full flag are not lineage-qualifying. The touch commit makes every leg
-# execute on the earning run, so each one has a row.
+# AC3: rows with an empty full are not lineage-qualifying. The touch commit makes every leg execute on
+# the earning run, so each one has a row. The earning bar is a FULL bar over an untracked file outside
+# ga/: GATE_FULL is a key input, so pa's row keys as the lineage run does, and the dirty tree leaves
+# `full` empty. The file goes before write_lin_fix, whose `git add -A` would commit it.
 build_lin_repo
 echo x2 > "$RU_T/ga/f"; echo broken2 > "$RU_T/gb/f"; ( cd "$RU_T" && git add -A && git commit -qm touch ) >/dev/null 2>&1
-ru_run >/dev/null; write_lin_fix; cp "$RU_GD/gate-ledger.tsv" "$tmp/ru.led"
+touch "$RU_T/untracked"; ru_run GATE_FULL=1 >/dev/null; rm -f "$RU_T/untracked"
+write_lin_fix; cp "$RU_GD/gate-ledger.tsv" "$tmp/ru.led"
 ru_run GATE_FULL=1 GATE_REUSE_LINEAGE=1 >/dev/null
-grep -q '^GATE reuse ' "$REC_OUT" && nope "AC3 lineage reused a row a run without the full flag earned" \
+grep -q '^GATE reuse ' "$REC_OUT" && nope "AC3 lineage reused a row whose full is empty" \
                                   || ok "AC3 lineage reuses nothing from rows with an empty full"
 check_lin_control AC3
 ru_done
@@ -2150,8 +2163,9 @@ build_sb_kit cut "$RUNNER"
 # is gone, the log name is mapped in the caller locale, the redaction guard never matches, the mask is
 # never set, and the union listing sorts backwards.
 sed -e 's/^  if \[ -n "\${EPOCHREALTIME:-}" \]; then e=\${EPOCHREALTIME\/\[.,\]\/}000;/  if [ -n "${EPOCHREALTIME:-}" ]; then e=${EPOCHREALTIME\/[.,]\/};/' \
-    -e "s/^  while \[\[ \$out == \*\$'\\\\n' \]\]; do\$/  while false; do/" \
-    -e 's/^  local LC_ALL=C$/  local LC_UNUSED=C/' -e 's/^    \*:\/\/\*@\*) printf/    *:\/\/*@@@*) printf/' \
+    -e "s/^  while \[\[ \$out == \*\$'\\\\n' \]\]; do /  while false; do /" \
+    -e 's/^  local LC_ALL=C$/  local LC_UNUSED=C/' \
+    -e "s/^    \*:\/\/\*@\*|\*\\\$'\\\\r\\\\n'\*) printf/    *:\/\/*@@@*|*\$'\\\\r'@@@*) printf/" \
     -e 's/^  umask 077$/  : umask 077/' -e 's/| LC_ALL=C sort > "\$WORK\/keys.listing"/| LC_ALL=C sort -r > "$WORK\/keys.listing"/' \
     "$RUNNER" > "$SB_K/broken.sh"
 sb_moved=$(diff "$RUNNER" "$SB_K/broken.sh" | grep -c '^>')
@@ -2164,6 +2178,7 @@ sed 's/^    plain=1$/    plain=0/' "$RUNNER" > "$SB_K/perleg.sh"
   || nope "S5 the per-leg copy did not take its one variant"
 build_sb_kit perleg "$SB_K/perleg.sh"
 sb_rc=$(run_sb_bar "$SB_T" perleg "$SB_K/sb.json" GATE_FULL=1 GATE_JOBS=2); read_sb_run "$SB_T"; cp -r "$SB_RUN" "$SB_K/perleg.run"
+rm -rf "$SB_T/.git/gate-logs"   # the runner never clears it, so broken.logs would carry the per-leg bar's names too
 sb_rc=$(run_sb_bar "$SB_T" broken "$SB_K/sb.json" GATE_FULL=1 GATE_JOBS=2); read_sb_run "$SB_T"; cp -r "$SB_RUN" "$SB_K/broken.run"
 cp -r "$SB_T/.git/gate-logs" "$SB_K/broken.logs"; rm -rf "$SB_T/.git/gate-logs"
 sb_rc=$(run_sb_bar "$SB_T" cut "$SB_K/sb.json" GATE_FULL=1 GATE_JOBS=2); read_sb_run "$SB_T"
@@ -2245,7 +2260,7 @@ for sb_t in "$SB_T" "$SB_K/wt" "$SB_U"; do
   sb_gd=$(git -C "$sb_t" rev-parse --absolute-git-dir); sb_c=""; IFS= read -r sb_c < "$sb_gd/gate-run/current"
   sb_h="$sb_gd/gate-run/$sb_c/header"
   sb_got="$(awk -F'\t' '$1 == "head" { print $2 }' "$sb_h")|$(awk -F'\t' '$1 == "worktree" { print $2 }' "$sb_h")|$([ -f "$sb_gd/gate-logs/one.log" ] && echo logged)"
-  sb_want="$(git -C "$sb_t" rev-parse --verify -q HEAD)|$(git -C "$sb_t" rev-parse --show-toplevel)|logged"
+  sb_want="$(git -C "$sb_t" rev-parse --verify -q HEAD)|$(unset GIT_DIR GIT_WORK_TREE; git -C "$sb_t" rev-parse --show-toplevel)|logged"
   [ "$sb_got" = "$sb_want" ] && ok "AC7 ${sb_t##*/}: head, worktree and the log dir are what git answers there" \
     || nope "AC7 ${sb_t##*/}: the header and log dir read '$sb_got', git answers '$sb_want'"
 done
