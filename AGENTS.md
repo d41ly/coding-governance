@@ -43,6 +43,7 @@ gate or protocol named in section 3 carries the detail.*
 - [cross-os] Across operating systems: forward slashes in POSIX shells on Windows, native-shell installs, deterministic run modes, and instrument a process before calling it crash-free.
 - [tokens] Spend tokens on new judgment: never re-read what is in context, bound every output, pin a diff base to a sha, and stop once verified.
 - [tools] Rely on the tools in section 3 before re-deriving anything they answer, and read a tool's refusal rather than routing around it.
+- [roles] Spec writing and review, building and the closing review run in role agents (Agent roles); inline only if none can spawn and `memory/project/role-stand-in-waiver.txt` waives it.
 - [voice] Voice: dry, snarky, faintly sarcastic and genuinely friendly; wit never bends a fact, and bad news is delivered straight.
 - [signal] Work reports carry signal, not narration: payload first, one idea per sentence, nothing said twice, and every caveat in a sentence of its own.
 - [formats] The micro-formats below are NON-NEGOTIABLE: every final message carries them, byte-for-byte, for every event it reports; no length, voice or brevity rule overrides them.
@@ -122,13 +123,28 @@ gate or protocol named in section 3 carries the detail.*
 - `<prefix>/workflows/tier2-review.js` runs a Tier-2 review as one bounded `Workflow`.
 - The agent-cap hook refuses an unbounded fan-out at the tool call; consolidate the fan-out rather than routing around it.
 - The write gate refuses a product-code write that no specced unit owns; route the unit through `/session-kickoff` first.
-- Every agent is handed a rendered role from `<prefix>/roles/`; spec, review and build work runs only in role agents. An attended code build runs through `/build`.
+- An attended code build runs through `/build`.
 - `/unattended` starts, resumes or closes a run that merges and pushes with no owner turn.
 - `/runlog` answers what an unattended run did, decided or cost, and why it stopped.
 - `<prefix>/push-main.sh` lands and pushes the default branch, and nothing bypasses it.
 - `<prefix>/process-monitor/reap.py` reaps processes past their declared ceiling; `--dry-run` lists them first.
 - Parallel pytest runs take the guardrails kit's settings: per-file isolation, per-test timeouts, fail-fast on worker death, crash attribution, structural test classes and opt-in parallelism.
 - The gate-lint scans catch shell failures that are silent by construction, such as case-colliding PowerShell names and BOM-less non-ASCII.
+<!-- /one-line -->
+
+## Agent roles — hand the work to its role
+
+<!-- one-line -->
+- `gov-orienter`: Orients one session for one task, read-only. Optional, the main loop may orient itself. Output: the card, to the main loop.
+- `gov-reuse-scout`: Finds the seam a new behaviour should extend. Optional, when kickoff asks for one. Output: the seam, to its caller.
+- `gov-spec-writer`: Writes each unit's spec, never code. Mandatory for every spec written. Output: specs in `memory/builds/<slug>/spec/`.
+- `gov-spec-reviewer`: Hunts defects in a spec set, read-only. Mandatory for every spec audit owed. Output: findings, to its harness.
+- `gov-builder`: Builds one unit from its spec and commits it. Mandatory for every unit built. Output: commits under `ROUTED_PATHS`.
+- `gov-diff-reviewer`: Reviews a diff through one lens. Mandatory for every closing review. Output: findings, to its harness.
+- `gov-skeptic`: Tries to refute each finding it is handed. Mandatory for every review's findings. Output: verdicts, to its harness.
+- `gov-synthesizer`: Merges verified findings into one report. Mandatory for every review's report. Output: a report in `memory/builds/<slug>/reviews/`.
+- `gov-researcher`: Finds candidates and the test each could lose. Optional, when no seam decides a design. Output: candidates, to its caller.
+- `gov-session`: Opens a handoff to another session. Optional, when work leaves this session. Output: a prompt file in the build's `prompts/`.
 <!-- /one-line -->
 
 ## Protocols — read the one whose trigger holds

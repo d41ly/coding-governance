@@ -4,7 +4,8 @@
 orientation, research, reuse, spec writing, spec review, building, the closing review, the gate bar,
 handoffs and bookkeeping. Spec writing, spec review, building and the closing review run only inside
 role agents. The main session orients, hands work off and keeps the records. Hooks refuse the
-bypasses, so this holds without anyone remembering it.
+bypasses, so this holds without anyone remembering it. The charter states this as its `[roles]`
+rule and lists every role under `## Agent roles`, a section generated from the role files.
 
 The kit is `<prefix>/roles/`, which is `tools/roles/` in this repository. Its README is the full
 reference; this page is the short version.
@@ -15,13 +16,15 @@ reference; this page is the short version.
    acceptance check and gates.
 2. **A role supplies the constant part.** Each role is one file under `<prefix>/roles/agents/`: its
    instructions, the inputs it reads, the file class it may write and the charter's section 1 rule
-   tags it needs, under `rules`. Its agent carries those rule lines and the charter's Protocols and
-   Facts sections whole.
+   tags it needs, under `rules`. It also says when the role is mandatory, under `mandatory`, and
+   where its output goes, under `output`. Its agent carries those rule lines and the charter's
+   Protocols and Facts sections whole.
 3. **The handoff renderer joins them.** `handoff.py render` writes one prompt file under the build's
    `prompts/` folder, with `## Role` and then `## Task`, filled from the card, the build's brief and
    any `--input` values. A required input that is missing or still a placeholder refuses by name.
 4. **The agent runs as a native type.** Each role is rendered into `.claude/agents/gov-<role>.md`,
-   which starts without the full charter and at the reasoning effort the policy file sets.
+   which starts without the full charter and at the reasoning effort the policy file sets. It
+   carries the section 1 rules its role cites and the charter's Protocols and Facts sections.
 
 ## How to use it
 
@@ -40,8 +43,21 @@ reference; this page is the short version.
 - **Change a role's effort, or the gates a role may run:** edit `<prefix>/roles/house/policy.toml`.
   Its `[effort]` tables set levels per role and per harness stage; its `[gates]` table lists the
   only gate legs a role agent may run.
-- **After any change to a role, overlay or policy:** run `python tools/roles/render_agents.py --write`,
-  then start a new session. A running session cannot spawn an agent type written after it started.
+- **Render in this order.** After changing a role file, re-render the charter first with
+  `bash tools/playbook/adopt-playbook.sh --target .`, because its Agent roles section is generated
+  from the role files. After changing a role, an overlay, the policy or a charter rule, run
+  `python tools/roles/render_agents.py --write`. Then start a new session: a running session cannot
+  spawn an agent type written after it started.
+
+## When no role agent can be spawned
+
+Inline work is refused: the main session does not write a spec, review one, build a unit or run the
+closing review itself. The one exception is a tool or run that cannot spawn a role agent at all, and
+only where an owner has waived it in `role-stand-in-waiver.txt` under `<memory root>/project/`,
+which holds an owner's row per build and role. A stand-in declares itself by rendering the role's
+handoff with `handoff.py render ... --stand-in`. A waiver never admits a write the hooks refuse. For
+the row grammar, read the roles README's "Standing in for a role" section; no tree holds the registry
+until an owner writes its first row.
 
 ## What the hooks refuse
 
@@ -67,3 +83,7 @@ needs the kickoff and memory-tree kits.
   hook check turns on.
 - `/build`'s harnesses ship in the `review-harness` kit, which is not a default. Without it the role
   agents and handoffs still work, and each tool prints a note naming the missing harness.
+- The `[roles]` rule and the Agent roles section ship with template v4.4. A template seeded earlier
+  keeps rendering without them: merge the `[roles]` rule, the shortened Tools bullet and the Agent
+  roles section from gov's template into yours, then re-render. Without the playbook renderer,
+  fill `{{ROLE_ROSTER}}` from `python <prefix>/roles/handoff.py roster`.

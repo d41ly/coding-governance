@@ -1,11 +1,12 @@
 # PLAY-aOrientedCast-2 — the charter's `[roles]` rule and its generated Agent roles section
 
-**Status:** INPROGRESS · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams playbook · order 20
+**Status:** CLOSED · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams playbook · order 20
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-PLAY-aOrientedCast-2-1-acceptance-ledger.md](../build/2026-10-13-build-PLAY-aOrientedCast-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-13-prompt-TOOL-aOrientedCast-16-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-16-1-spec-brief.md) | journal | TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-16-2-build-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-16-2-build-brief.md) | journal | TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-20-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-20-1-spec-brief.md) | journal | TOOL-aOrientedCast-19 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 PLAY-aOrientedCast-3 |
