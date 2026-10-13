@@ -66,7 +66,7 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-10-13 · streams tooling
+**Build status:** SPECCED · 7 unit(s) · node a · opened 2026-10-13 · streams tooling
 ids TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-3 TOOL-aSweptBar-4 TOOL-aSweptBar-5 TOOL-aSweptBar-6 TOOL-aSweptBar-7
 
 <!-- gen:build-units -->
@@ -74,17 +74,18 @@ ids TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-3 TOOL-aSweptBar-4 TOOL-aSw
 |---|---|---|---|---|---|
 | [TOOL-aSweptBar-1 — stale suite fixtures re-armed against the code the bar-less landings left](spec/2026-10-13-spec-TOOL-aSweptBar-1.md) | 1 | 1 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-aSweptBar-2 — the foreign-prefix probe contract: three engine self-tests declared whole, and format-guard's suite takes the probe stop](spec/2026-10-13-spec-TOOL-aSweptBar-2.md) | 1 | 1 | CLOSED | rev-1 | 2026-10-13 |
-| [TOOL-aSweptBar-3 — the run-gates evidence and pre-push suites' standalone reds, each at its root](spec/2026-10-13-spec-TOOL-aSweptBar-3.md) | 1 | 1 | CLOSED | rev-2 | 2026-10-13 |
+| [TOOL-aSweptBar-3 — the run-gates evidence and pre-push suites' standalone reds, each at its root](spec/2026-10-13-spec-TOOL-aSweptBar-3.md) | 1 | 1 | CLOSED | rev-3 | 2026-10-13 |
 | [TOOL-aSweptBar-4 — shipped-surface bans: each ban's own remedy, applied to the offenders it names](spec/2026-10-13-spec-TOOL-aSweptBar-4.md) | 2 | 1 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-aSweptBar-5 — fork idioms re-grown past the spawn-idiom registry, converted](spec/2026-10-13-spec-TOOL-aSweptBar-5.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-aSweptBar-6 — records, pins and ceilings re-measured over the fixed tree](spec/2026-10-13-spec-TOOL-aSweptBar-6.md) | 4 | 1 | CLOSED | rev-2 | 2026-10-13 |
+| [TOOL-aSweptBar-7 — the closing review's three mediums and four lows, batched](spec/2026-10-13-spec-TOOL-aSweptBar-7.md) | 5 | 1 | SPECCED | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
 Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-3 TOOL-aSweptBar-4 TOOL-aSweptBar-5 TOOL-aSweptBar-6.
+Ids no `spec-audit` record has ever named: TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-3 TOOL-aSweptBar-4 TOOL-aSweptBar-5 TOOL-aSweptBar-6 TOOL-aSweptBar-7.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -95,6 +96,7 @@ Ids no `spec-audit` record has ever named: TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOO
 | 2 | `TOOL-aSweptBar-4` | no |
 | 3 | `TOOL-aSweptBar-5` | no |
 | 4 | `TOOL-aSweptBar-6` | no |
+| 5 | `TOOL-aSweptBar-7` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -1,6 +1,6 @@
 # TOOL-aSweptBar-3 — the run-gates evidence and pre-push suites' standalone reds, each at its root
 
-**Status:** CLOSED · rev-2 · 2026-10-13 · node a · Tier-1 · base 53b25884 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-10-13 · node a · Tier-1 · base 53b25884 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -110,8 +110,10 @@ tree leaves `full` empty (`tools/run-gates/run-gates.sh:5200`), which the suite'
 
 **S5.** AC6 asserts the opt-in mode reuses `pa` and stamps no full green. Its reuse needs an entry
 under the env mode's key, and only a bar without `GATE_FULL` writes one. A plain bar between lines
-1510 and 1511 earns it on the fixed, clean tree and stamps nothing, because only a full bar stamps.
-The ledger still holds one row per leg, so the AC1 row count that follows is unchanged.
+1510 and 1511 earns it on the fixed, clean tree. That bar also stamps a full green on the clean
+tree, as the evidence suite's AC8 control observes, so the arm clears `gate-full-green` before the
+opt-in run (`bc024b8b1`: red with the stamp kept, green with it cleared). The ledger still holds one
+row per leg, so the AC1 row count that follows is unchanged.
 
 **S6.** The shell-hygiene leg flags line 2248 and prints its remedy:
 `$(unset GIT_DIR GIT_WORK_TREE; git -C "$sb_t" rev-parse --show-toplevel)`. The line takes it as
@@ -212,6 +214,9 @@ none
 - rev-1 · 2026-10-13 · initial draft from the build brief and the standalone logs, every cause re-read
   at `53b25884`.
 - rev-2 · 2026-10-13 · AC6 rewrapped so its failure mode reads `Red when:` on one line, which check 12 parses; a main-loop edit by the owner's leave, since no spec-writer role renders until aOrientedCast lands.
+- rev-3 · 2026-10-13 · §4 S5 · the plain earning bar stamps a full green on the clean tree and the
+  arm clears it before the opt-in run, as `bc024b8b1` built it; the closing review's L4 (finding 12),
+  revised in the `TOOL-aSweptBar-7` spec pass.
 
 ## 9. Reuse audit
 
