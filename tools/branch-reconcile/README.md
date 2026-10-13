@@ -164,7 +164,7 @@ bash <this kit>/adopt-branch-reconcile.sh --check      # the wiring leg: is the 
 
 `--check` re-renders the template and compares, stripping CR from the working copy, so a template
 edit nobody re-rendered reds the `branch-reconcile skill wiring` leg. `govkit update` re-renders it
-through the kit's `[[regenerate]]`.
+through the kit's `[[regenerate]]` unless `GOVKIT_RERENDER=0` is exported.
 
 ## Why this is not the straggler inventory
 

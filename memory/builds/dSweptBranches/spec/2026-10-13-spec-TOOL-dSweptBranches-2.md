@@ -1,6 +1,6 @@
 # TOOL-dSweptBranches-2 — the verdict ladder: six verdicts over refs and worktree content, each with its evidence
 
-**Status:** CLOSED · rev-2 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -98,6 +98,14 @@ predicates are the method one inCMS session derived by hand over several hours, 
 
 - **consumes-from** `TOOL-dSweptBranches-1` — the inventory, the row shape and the stub seam.
 - **hands-off** `TOOL-dSweptBranches-3` — the verdicts write mode deletes by.
+- **hands-off** `TOOL-dSweptBranches-7` — check_worktree's unread-status rule, promoted from the closing review (H1).
+- **hands-off** `TOOL-dSweptBranches-8` — the worktree identity proof before grading and removal (H2).
+- **hands-off** `TOOL-dSweptBranches-9` — the patch predicate's file-set and shared-lines rule (H3).
+- **hands-off** `TOOL-dSweptBranches-10` — the probe predicate's body check (H4).
+- **hands-off** `TOOL-dSweptBranches-11` — the rotated predicate's whole-row check (H5).
+- **hands-off** `TOOL-dSweptBranches-14` — the merge-content check for coverage and EQUIVALENT (H8).
+- **hands-off** `TOOL-dSweptBranches-15` — submodule content in check_worktree (H9).
+- **hands-off** `TOOL-dSweptBranches-16` — the tracked-edit fixture over check_worktree (H10).
 
 ## 4. Design
 
@@ -201,6 +209,8 @@ none
   cited existed somewhere, and AC4 gains that case as a negative. S4 lets a default-branch copy of a
   build README that is terminal override the tip's. S6 names a stash with untracked files. S7 states
   the raise rule.
+- rev-3 · 2026-10-13 · §3 · the hand-offs to the units the closing review promoted onto this
+  unit's predicates, 7 to 11 and 14 to 16, so each edge is declared from both ends.
 
 ## 10. Reuse audit
 

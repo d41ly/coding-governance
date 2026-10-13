@@ -1,6 +1,6 @@
 # TOOL-dSweptBranches-3 — write mode: a recovery manifest first, then deletes of the three landed verdicts only
 
-**Status:** CLOSED · rev-4 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 4
+**Status:** CLOSED · rev-5 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -54,9 +54,13 @@ directory, so every deletion can be undone by hand.
 
 ### Edges
 
+- **consumes-from** `TOOL-dSweptBranches-1` — the inventory and the rows write mode acts on.
 - **consumes-from** `TOOL-dSweptBranches-2` — the verdicts that define the deletable set.
 - **consumes-from** `TOOL-dSweptBranches-4` — the worktree remover S3 calls.
 - **hands-off** `TOOL-dSweptBranches-5` — the write flags the skill drives.
+- **hands-off** `TOOL-dSweptBranches-12` — every default name kept in derive_action and write_deletions (H6).
+- **hands-off** `TOOL-dSweptBranches-13` — the lease on each remote delete and the local re-check (H7).
+- **hands-off** `TOOL-dSweptBranches-17` — the closing review's MEDIUM and LOW items on write mode, batched.
 
 ## 4. Design
 
@@ -146,6 +150,8 @@ none
   reasons move into parentheses, because the action column carried the row separator.
 - rev-4 · 2026-10-13 · §4 · AC1 · the closing review's round-1 L2, folded by unit 17: the trace
   is named `WRITE_TRACE`, as the module spells it, and records each act before it runs.
+- rev-5 · 2026-10-13 · §3 · the edge from unit 1 declared back, and the hand-offs to the units
+  the closing review promoted onto write mode, 12, 13 and 17.
 
 ## 10. Reuse audit
 

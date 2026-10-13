@@ -33,4 +33,5 @@ The `branch-reconcile selftest` leg and the spec's §7 legs run in the close's b
 Folded on `0ac2418c` from the closing review, round 1
 (`2026-10-13-review-TOOL-dSweptBranches-1-2-3-4-5-closing-diff-round1.md`).
 
+**Evidences:** TOOL-dSweptBranches-3
 - AC5 — `arm_keeps` — run from a linked worktree with the primary on `side`: a merged worktree holding a live nested worktree reads `keep (contains kept worktree …)` and survives `--write` with the nested file; the primary reads `keep (the primary worktree)`, and local and `upstream` `main` read `keep (the default branch)`, and all survive; no action carries ` · `. Red with the containment keep removed; red with the primary keep removed, where `--write` deleted the fixture's primary repository outright; red with both default-branch guards removed
