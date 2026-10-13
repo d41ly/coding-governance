@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-13
 streams: tooling
 roster: TOOL
-ids: TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-6 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-18 TOOL-dSweptBranches-19 TOOL-dSweptBranches-20 TOOL-dSweptBranches-21 TOOL-dSweptBranches-22
+ids: TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-6 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-18 TOOL-dSweptBranches-19 TOOL-dSweptBranches-20 TOOL-dSweptBranches-21 TOOL-dSweptBranches-22 TOOL-dSweptBranches-23 TOOL-dSweptBranches-24
 authorized-by: prompt
 ---
 
@@ -52,6 +52,8 @@ verbatim under `prompts/`.
 - The run was handed off `owner-decision` on five inherited reds the runner labels OWN. The owner
   then ruled (2026-10-13, `prompts/`): rename the skill to `/cleanup` first (unit 19), then build
   both asks (units 20 and 21). The kit keeps its `branch-reconcile` name; only the skill moves.
+- The follow-up's closing diff review (units 19 to 21, round 1) was CLEAN WITH FIXES: one HIGH, the
+  adopter's stranded old render, became unit 23, and the process-monitor minors unit 24.
 
 ## Parked decisions
 
@@ -80,13 +82,15 @@ None yet.
 | 17 | `TOOL-dSweptBranches-19` | 2 | the skill is `/cleanup`, renamed with every live reference (owner) |
 | 18 | `TOOL-dSweptBranches-20` | 1 | gov's range readers audited for a merge read as additions (closes ask 6) |
 | 19 | `TOOL-dSweptBranches-21` | 2 | the census suite's live-tree arm waits for its tree, not three seconds (closes ask 18) |
+| 20 | `TOOL-dSweptBranches-23` | 2 | the adopter withdraws the old `/branch-reconcile` render (promoted, follow-up H1) |
+| 21 | `TOOL-dSweptBranches-24` | 2 | the follow-up review's process-monitor items, batched (promoted) |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 19 unit(s) · node d · opened 2026-10-13 · streams tooling
+**Build status:** OPEN · 21 unit(s) · node d · opened 2026-10-13 · streams tooling
 ids TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-6 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13
-ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-18 TOOL-dSweptBranches-19 TOOL-dSweptBranches-20 TOOL-dSweptBranches-21 TOOL-dSweptBranches-22
+ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-18 TOOL-dSweptBranches-19 TOOL-dSweptBranches-20 TOOL-dSweptBranches-21 TOOL-dSweptBranches-22 TOOL-dSweptBranches-23 TOOL-dSweptBranches-24
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -110,14 +114,16 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-19 — the skill is `/cleanup`, renamed with every live reference](spec/2026-10-13-spec-TOOL-dSweptBranches-19.md) | 17 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-20 — gov's range readers audited for a merge read as additions](spec/2026-10-13-spec-TOOL-dSweptBranches-20.md) | 18 | 1 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-21 — the reaper backstops an MSYS signal with the winpid, and the live-tree arm waits for its tree](spec/2026-10-13-spec-TOOL-dSweptBranches-21.md) | 19 | 2 | CLOSED | rev-2 | 2026-10-13 |
+| [TOOL-dSweptBranches-23 — the adopter withdraws the old `/branch-reconcile` render, and `--check` reds while it stays](spec/2026-10-13-spec-TOOL-dSweptBranches-23.md) | 20 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-dSweptBranches-24 — the follow-up review's process-monitor items, batched](spec/2026-10-13-spec-TOOL-dSweptBranches-24.md) | 21 | 2 | OPEN | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 44 bound to this build, across 4 record folder(s).
+Records: 45 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dSweptBranches-23 TOOL-dSweptBranches-24.
 
 Ids no `spec-audit` record has ever named: TOOL-dSweptBranches-1 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-19 TOOL-dSweptBranches-2
-TOOL-dSweptBranches-20 TOOL-dSweptBranches-21 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9.
+TOOL-dSweptBranches-20 TOOL-dSweptBranches-21 TOOL-dSweptBranches-23 TOOL-dSweptBranches-24 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -143,6 +149,8 @@ TOOL-dSweptBranches-20 TOOL-dSweptBranches-21 TOOL-dSweptBranches-3 TOOL-dSweptB
 | 17 | `TOOL-dSweptBranches-19` | no |
 | 18 | `TOOL-dSweptBranches-20` | no |
 | 19 | `TOOL-dSweptBranches-21` | no |
+| 20 | `TOOL-dSweptBranches-23` | no |
+| 21 | `TOOL-dSweptBranches-24` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
