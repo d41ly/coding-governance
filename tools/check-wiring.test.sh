@@ -218,7 +218,7 @@ install_driver() {
 # AC1 — unset core.hooksPath -> UNWIRED + exit 1
 newrepo
 out=$(chk --check); rc=$?
-{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  hooks'; } && ck "AC1 unset -> UNWIRED, exit 1" 1 || ck "AC1 unset -> UNWIRED, exit 1" 0
+{ [ "$rc" = 1 ] && [[ $out == *'UNWIRED  hooks'* ]]; } && ck "AC1 unset -> UNWIRED, exit 1" 1 || ck "AC1 unset -> UNWIRED, exit 1" 0
 # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 # AC2 — --fix sets it, re-check exits 0
@@ -231,7 +231,7 @@ newrepo
 OOT=$(mktemp -d); printf '#!/bin/sh\nexit 0\n' > "$OOT/pre-commit"; chmod +x "$OOT/pre-commit"
 git config core.hooksPath "$OOT"
 out=$(chk --check); rc=$?
-{ [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       hooks'; } && ck "AC3 out-of-tree -> WIRED" 1 || ck "AC3 out-of-tree -> WIRED" 0
+{ [ "$rc" = 0 ] && [[ $out == *'ok       hooks'* ]]; } && ck "AC3 out-of-tree -> WIRED" 1 || ck "AC3 out-of-tree -> WIRED" 0
 # never-clobber: git may re-spell the path (MSYS /tmp -> C:/Temp), so compare git's OWN value
 # before vs after --fix, and assert it was NOT reset to the .githooks fix target.
 before=$(git config core.hooksPath); chk --fix >/dev/null; after=$(git config core.hooksPath)
@@ -241,7 +241,7 @@ cleanup
 # AC4 — non-literal ./.githooks -> WIRED
 newrepo; git config core.hooksPath ./.githooks
 out=$(chk --check); rc=$?
-{ [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       hooks'; } && ck "AC4 ./.githooks -> WIRED" 1 || ck "AC4 ./.githooks -> WIRED" 0
+{ [ "$rc" = 0 ] && [[ $out == *'ok       hooks'* ]]; } && ck "AC4 ./.githooks -> WIRED" 1 || ck "AC4 ./.githooks -> WIRED" 0
 cleanup
 
 # AC5a — all wired -> exit 0
@@ -281,7 +281,7 @@ if [ -f "$SMERGE" ]; then
   printf '// stub\n' > $KIT_REL/${HOOKS}/agent-cap.js
   git config core.hooksPath .githooks     # isolate: hooks wired, so only agent-cap can be unwired
   out=$(chk --check); rc=$?
-  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  agent-cap'; } && ck "AC7 agent-cap unwired -> UNWIRED, exit 1" 1 || ck "AC7 agent-cap unwired -> UNWIRED, exit 1" 0
+  { [ "$rc" = 1 ] && [[ $out == *'UNWIRED  agent-cap'* ]]; } && ck "AC7 agent-cap unwired -> UNWIRED, exit 1" 1 || ck "AC7 agent-cap unwired -> UNWIRED, exit 1" 0
   chk --session >/dev/null; [ "$?" = 0 ] && ck "AC6 --session exit 0 despite agent-cap unwired" 1 || ck "AC6 --session exit 0 despite agent-cap unwired" 0
 
   # AC7b — THE STALE MATCHER. `.claude/settings.json` carries the hook under `Workflow` alone: the
@@ -308,7 +308,7 @@ if [ -f "$SMERGE" ]; then
 JSON
   sed -i "s#{KP}#${KP}#; s#{HOOKS}#${HOOKS}#" .claude/settings.json   # the quoted heredoc cannot expand either
   out=$(chk --check); rc=$?
-  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  agent-cap' \
+  { [ "$rc" = 1 ] && [[ $out == *'UNWIRED  agent-cap'* ]] \
       && printf '%s' "$out" | grep -q "wired under matcher 'Workflow'"; } \
     && ck "AC7b a stale Workflow-only matcher -> UNWIRED naming the value found" 1 \
     || ck "AC7b a stale Workflow-only matcher -> UNWIRED naming the value found" 0
@@ -318,7 +318,7 @@ JSON
   # the two-group state, which is a different fact.
   sed -i 's/"matcher": "Workflow"/"matcher": "Workflow|Agent"/' .claude/settings.json
   out=$(chk --check); rc=$?
-  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       agent-cap'; } \
+  { [ "$rc" = 0 ] && [[ $out == *'ok       agent-cap'* ]]; } \
     && ck "AC7b the widened matcher -> ok, exit 0" 1 || ck "AC7b the widened matcher -> ok, exit 0" 0
   # AC7d — THE --only BYPASS, and the arm that should have landed with the guard. `--only=<rule>`
   # narrows agent-cap to one rule, so a wired command carrying `--only=join` turns the three cap
@@ -328,7 +328,7 @@ JSON
   # not fail, guarding a bypass the same build introduced. This arm fails against that spelling.
   sed -i 's|agent-cap\.js\\"|agent-cap.js\\" --only=join|' .claude/settings.json
   out=$(chk --check); rc=$?
-  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  agent-cap' \
+  { [ "$rc" = 1 ] && [[ $out == *'UNWIRED  agent-cap'* ]] \
       && printf '%s' "$out" | grep -q -- '--only'; } \
     && ck "AC7d a wired command carrying --only -> UNWIRED" 1 \
     || ck "AC7d a wired command carrying --only -> UNWIRED" 0
@@ -336,7 +336,7 @@ JSON
   # checker that denies every wired command there is.
   sed -i 's| --only=join||' .claude/settings.json
   out=$(chk --check); rc=$?
-  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       agent-cap'; } \
+  { [ "$rc" = 0 ] && [[ $out == *'ok       agent-cap'* ]]; } \
     && ck "AC7d the flag removed -> ok, exit 0" 1 || ck "AC7d the flag removed -> ok, exit 0" 0
   # BP12 AC7 — AN INHERITED VIEW IS NOT A SETTINGS READ (TOOL-aBriskPreflight-12 S5). The view is
   # captured from matchers_of's OWN flatten over this correctly wired file, lifted alone as
@@ -349,14 +349,14 @@ JSON
   # so a missing one reds there whether or not the view was inherited, and grades nothing.
   sed -i 's/"matcher": "Workflow|Agent"/"matcher": "Workflow"/' .claude/settings.json
   out=$(_SJ_RC=0 _SJ_VIEW=$_bpv chk --check); rc=$?
-  { [ "$rc" = 1 ] && ! printf '%s' "$out" | grep -q 'ok       agent-cap' \
+  { [ "$rc" = 1 ] && ! [[ $out == *'ok       agent-cap'* ]] \
       && printf '%s' "$out" | grep -q "wired under matcher 'Workflow'"; } \
     && ck "BP12 AC7 an inherited _SJ_RC=0 view over a stale settings file -> UNWIRED agent-cap, exit 1" 1 \
     || ck "BP12 AC7 an inherited _SJ_RC=0 view over a stale settings file -> UNWIRED agent-cap, exit 1 [rc=$rc]" 0
   # (b) an inherited EMPTY view over the correct file: the file's own wiring must still read ok.
   sed -i 's/"matcher": "Workflow"/"matcher": "Workflow|Agent"/' .claude/settings.json
   out=$(_SJ_RC=0 _SJ_VIEW= chk --check); rc=$?
-  printf '%s' "$out" | grep -q 'ok       agent-cap' \
+  [[ $out == *'ok       agent-cap'* ]] \
     && ck "BP12 AC7 an inherited empty view over a correct settings file -> ok agent-cap" 1 \
     || ck "BP12 AC7 an inherited empty view over a correct settings file -> ok agent-cap [rc=$rc]" 0
   cleanup
@@ -378,7 +378,7 @@ if [ -f "$SGFRAG" ] && [ -f "$SMERGE" ]; then
 
   # 13a — fragment shipped, hook not installed, nothing in settings: NOT adopted, must not gate.
   out=$(chk --check); rc=$?
-  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     scratch'; } \
+  { [ "$rc" = 0 ] && [[ $out == *'skip     scratch'* ]]; } \
     && ck "AC13a fragment present, hook absent -> skip, exit 0" 1 \
     || ck "AC13a fragment present, hook absent -> skip, exit 0" 0
 
@@ -390,7 +390,7 @@ if [ -f "$SGFRAG" ] && [ -f "$SMERGE" ]; then
   # the arm then reports "not adopted" and the state it exists to catch goes ungraded.
   printf '// stub\n' > $KIT_REL/${HOOKS}/scratch-guard.js
   out=$(chk --check); rc=$?
-  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  scratch'; } \
+  { [ "$rc" = 1 ] && [[ $out == *'UNWIRED  scratch'* ]]; } \
     && ck "AC13b hook present, unwired -> UNWIRED, exit 1" 1 \
     || ck "AC13b hook present, unwired -> UNWIRED, exit 1" 0
   chk --session >/dev/null; [ "$?" = 0 ] \
@@ -420,7 +420,7 @@ if [ -f "$SGFRAG" ] && [ -f "$SMERGE" ]; then
 JSON
   sed -i "s#{KP}#${KP}#; s#{HOOKS}#${HOOKS}#" .claude/settings.json   # the quoted heredoc cannot expand either
   out=$(chk --check); rc=$?
-  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  scratch' \
+  { [ "$rc" = 1 ] && [[ $out == *'UNWIRED  scratch'* ]] \
       && printf '%s' "$out" | grep -q "wired under matcher 'Bash'"; } \
     && ck "AC13c a stale Bash-only matcher -> UNWIRED naming the value found" 1 \
     || ck "AC13c a stale Bash-only matcher -> UNWIRED naming the value found" 0
@@ -438,7 +438,7 @@ JSON
   printf 'MEMORY_ROOT=memory\nROUTED_PATHS=".githooks/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' > .memory-tree.conf
   SGHOME=$(mktemp -d); mkdir -p "$SGHOME/.claude/skills/session-kickoff"
   out=$(HOME="$SGHOME" chk --check); rc=$?
-  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       scratch'; } \
+  { [ "$rc" = 0 ] && [[ $out == *'ok       scratch'* ]]; } \
     && ck "AC13d the fragment's own matcher -> ok, exit 0" 1 \
     || ck "AC13d the fragment's own matcher -> ok, exit 0" 0
   ck "RQ5 AC7 LIVENESS an armed conf beside a wired gate reads ok routed" \
@@ -575,13 +575,13 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
 
   # state 1 — kit not adopted (no fragment anywhere) -> skip, exit 0
   out=$(chk --check); rc=$?
-  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     recall' && printf '%s' "$out" | grep -q 'kit not adopted'; } \
+  { [ "$rc" = 0 ] && [[ $out == *'skip     recall'* ]] && [[ $out == *'kit not adopted'* ]]; } \
     && ck "AC8 recall kit absent -> skip, exit 0" 1 || ck "AC8 recall kit absent -> skip, exit 0" 0
 
   # state 2 — kit adopted, hook opt-in NOT taken -> skip, exit 0 (never UNWIRED)
   cp "$FRAG" "$rk/recall-opened.fragment.json"
   out=$(chk --check); rc=$?
-  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     recall' && printf '%s' "$out" | grep -q 'opt-in not taken'; } \
+  { [ "$rc" = 0 ] && [[ $out == *'skip     recall'* ]] && [[ $out == *'opt-in not taken'* ]]; } \
     && ck "AC8 recall opt-in not taken -> skip, exit 0" 1 || ck "AC8 recall opt-in not taken -> skip, exit 0" 0
 
   # state 3 — hook file present but no settings block -> UNWIRED, exit 1; --session still exits 0
@@ -591,7 +591,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # the arm then reports "not adopted" and the state it exists to catch goes ungraded.
   printf '// stub\n' > "$rk/recall-opened.js"
   out=$(chk --check); rc=$?
-  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall'; } \
+  { [ "$rc" = 1 ] && [[ $out == *'UNWIRED  recall'* ]]; } \
     && ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 1 || ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 0
   chk --session >/dev/null; [ "$?" = 0 ] && ck "AC6 --session exit 0 despite recall unwired" 1 || ck "AC6 --session exit 0 despite recall unwired" 0
 
@@ -600,14 +600,14 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # used to print `skip … cannot verify` and exit 0 on the state the doc calls the one bad state.
   rm -f ${KP}settings-merge.py
   out=$(chk --check); rc=$?
-  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall'; } \
+  { [ "$rc" = 1 ] && [[ $out == *'UNWIRED  recall'* ]]; } \
     && ck "AC8 recall unmerged, no settings-merge.py -> UNWIRED, exit 1" 1 || ck "AC8 recall unmerged, no settings-merge.py -> UNWIRED, exit 1" 0
   cp "$SMERGE" ${KP}settings-merge.py
 
   # state 4 — merged into settings.json -> ok, exit 0
   "$py" ${KP}settings-merge.py --fragment "$rk/recall-opened.fragment.json" >/dev/null 2>&1
   out=$(chk --check); rc=$?
-  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       recall'; } \
+  { [ "$rc" = 0 ] && [[ $out == *'ok       recall'* ]]; } \
     && ck "AC8 recall merged -> ok, exit 0" 1 || ck "AC8 recall merged -> ok, exit 0" 0
 
   # state 5 — settings still dispatch the hook, the script is gone: UNWIRED, exit 1. Reachable from

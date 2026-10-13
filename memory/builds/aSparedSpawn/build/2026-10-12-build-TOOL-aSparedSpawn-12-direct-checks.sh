@@ -10,6 +10,9 @@
 # What this does NOT check: the new suite arms themselves (owed at VERIFYING), and AC9's replay, which
 # the select-sim instrument beside this file makes.
 set -u
+# The launcher, resolved before any cd from the repository this record sits in, four levels up.
+_d=.; [[ ${BASH_SOURCE[0]} == */* ]] && _d=${BASH_SOURCE[0]%/*}; . "$_d/../../../../tools/lib/resolve-python.sh" || exit 2
+PY=$(resolve_python) || exit 2
 S=${1:?a scratch root}; mkdir -p "$S" || exit 2
 GOV=$(pwd)
 bad=0
@@ -161,7 +164,7 @@ cp "$GOV/tools/govkit/govkit.py" "$GOV/tools/govkit/adopters.toml" "$G/tools/gov
 printf '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/govkit/entries/demo.kit.toml"\n' > "$G/tools/govkit/registry.toml"
 printf 'id = "demo"\nhome = "demo"\n\n[[files]]\ninclude = ["run.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n\n[[files]]\ninclude = ["seed.txt"]\nrole = "generated"\nto = "{prefix}/seed.txt"\n' > "$G/tools/govkit/entries/demo.kit.toml"
 ( cd "$G" && git init -q --template= -b main . ) >/dev/null 2>&1
-e=$(cd "$G" && python tools/govkit/govkit.py shipped --epoch | tr -d '\r'); a=$(cd "$G" && python tools/govkit/govkit.py shipped | tr -d '\r')
+e=$(cd "$G" && "$PY" tools/govkit/govkit.py shipped --epoch | tr -d '\r'); a=$(cd "$G" && "$PY" tools/govkit/govkit.py shipped | tr -d '\r')
 [ "$e" = $'demo\tengine\ttools/demo/run.sh' ] && ok "AC8 --epoch prints only the engine row" || nope "AC8 --epoch prints only the engine row: [$e]"
 printf '%s\n' "$a" | grep -q $'\tgenerated\t' && ok "AC8 control: the plain verb prints the generated row" || nope "AC8 control: the plain verb prints the generated row"
 

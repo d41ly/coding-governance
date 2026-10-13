@@ -21,6 +21,10 @@ import os
 import subprocess
 import sys
 
+# The canonical {prefix} resolver, from the repository this record sits in, four levels up.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "..", "tools", "lib"))
+from resolve_prefix_token import resolve_prefix_token  # noqa: E402
+
 
 def read_git(repo, *args):
     """The stdout of one git command in <repo>."""
@@ -37,7 +41,7 @@ def read_shipped(repo, *extra):
 
 def derive_suites(argv):
     """The suite files a leg runs: its argv words carrying a slash and ending .sh, .py or .js."""
-    words = [a.replace("{prefix}", "tools") for a in argv]
+    words = [resolve_prefix_token(a, "tools") for a in argv]
     return [w for w in words if "/" in w and not any(c.isspace() for c in w) and w.endswith((".sh", ".py", ".js"))]
 
 
@@ -47,7 +51,7 @@ def derive_selection(leg, owners, epoch):
     ents = set().union(*(owners.get(s, set()) for s in suites))
     if ents:
         return ents, set(suites).union(*(epoch.get(e, set()) for e in ents))
-    guard = [g.replace("{prefix}", "tools") for g in leg.get("guard") or []]
+    guard = [resolve_prefix_token(g, "tools") for g in leg.get("guard") or []]
     return set(), (set(suites) | set(guard)) if guard else {""}
 
 

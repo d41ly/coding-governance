@@ -547,13 +547,15 @@ case "$UNATTENDED_HARNESS" in
   process|inproc) ;;
   *) echo "FAIL UNATTENDED_HARNESS is '$UNATTENDED_HARNESS', and the harness modes are process and inproc"; exit 2 ;;
 esac
-DRV_INPROC_TALLY="$TMP/harness-inproc.tally"; DRV_PROC_TALLY="$TMP/harness-proc.tally"
+# Under `$TMP/.git/`, as askstub is (TOOL-aSweptBar-1 S5): `$TMP` IS the fixture work tree, so a tally
+# there dirties it and `--preflight` refuses check 2, and every `reset_tree` cleans the files away.
+DRV_INPROC_TALLY="$TMP/.git/harness-inproc.tally"; DRV_PROC_TALLY="$TMP/.git/harness-proc.tally"
 : > "$DRV_INPROC_TALLY"; : > "$DRV_PROC_TALLY"
 # The driver's and its library's function names, and their definitions as sourced: the namespace arm
 # in the tail compares this shell's definitions against these, so a double an arm left behind, or a
 # function it unset, is named before it can answer an in-process call in the driver's place.
 DRV_FNS=$(grep -ohE '^[A-Za-z_][A-Za-z0-9_]*\(\)' "$SCRIPT" "$HERE/lib-unattended.sh" | tr -d '()' | sort -u | tr '\n' ' ')
-declare -f $DRV_FNS > "$TMP/harness-fns.sourced"
+declare -f $DRV_FNS > "$TMP/.git/harness-fns.sourced"
 run_inproc() { ( load_driver_conf && main "$@" ); }   # argv... -> one in-process call, uncounted
 run_driver() { # argv... -> the driver's output and status, in process or as a process per UNATTENDED_HARNESS
   if [ "$UNATTENDED_HARNESS" = inproc ]; then
@@ -17304,12 +17306,12 @@ fi   # ---- end REGION 8 -------------------------------------------------------
 # in-process call runs, in the driver's place and with no other signal. A static scan for a colliding
 # name cannot tell a double fenced in `( … )` or restored by re-sourcing from one that leaks, so this
 # compares the definitions themselves and names each that moved.
-declare -f $DRV_FNS > "$TMP/harness-fns.now" 2>/dev/null
+declare -f $DRV_FNS > "$TMP/.git/harness-fns.now" 2>/dev/null
 _hn=$(awk 'FNR == 1 { f++ }
   /^[A-Za-z_][A-Za-z0-9_]* \(\) *$/ { fn = $1; seen[fn] = 1 }
   fn != "" { b[f, fn] = b[f, fn] $0 "\n" }
-  END { for (k in seen) if (b[1, k] != b[2, k]) print k }' "$TMP/harness-fns.sourced" "$TMP/harness-fns.now" | sort | tr '\n' ' ')
-n=$((n+1)); [ -s "$TMP/harness-fns.sourced" ] || { echo "FAIL the namespace arm holds no sourced definitions, so it compares nothing"; st=1; }
+  END { for (k in seen) if (b[1, k] != b[2, k]) print k }' "$TMP/.git/harness-fns.sourced" "$TMP/.git/harness-fns.now" | sort | tr '\n' ' ')
+n=$((n+1)); [ -s "$TMP/.git/harness-fns.sourced" ] || { echo "FAIL the namespace arm holds no sourced definitions, so it compares nothing"; st=1; }
 n=$((n+1)); [ -z "$_hn" ] || { echo "FAIL a driver or library function in this shell is no longer the definition the prologue sourced, so an in-process call after it runs a double or nothing: ${_hn% }"; st=1; }
 # THE LIVENESS LINE. One byte per call in each mode's tally; under UNATTENDED_HARNESS=inproc a run
 # that made NO in-process call claimed a harness it never exercised, and reds. Counted in both modes,

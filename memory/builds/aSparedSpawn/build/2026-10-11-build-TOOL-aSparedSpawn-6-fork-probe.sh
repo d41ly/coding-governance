@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** journal TOOL-aSparedSpawn-6
 # TOOL-aSparedSpawn-6 unit 0 (S1, AC1) - the price of one `( : )` fork in a shell that holds the
 # unattended driver's definitions, against the same fork in a bare shell, quiet and under load.
 #

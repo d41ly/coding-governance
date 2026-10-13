@@ -6,6 +6,9 @@
 # folder `aTimedFixture` is committed on top as the only commit the branch carries past local main.
 # origin is the local bare mirror, fetch AND push, so a claim push never reaches GitHub.
 set -u
+# The launcher, resolved before any cd from the repository this record sits in, four levels up.
+_d=.; [[ ${BASH_SOURCE[0]} == */* ]] && _d=${BASH_SOURCE[0]%/*}; . "$_d/../../../../tools/lib/resolve-python.sh" || exit 2
+PY=$(resolve_python) || exit 2
 arm=$1; code=$2; tree=$3
 SRC=C:/projects/coding-governance
 R="$TEMP/bp/R.git"
@@ -40,7 +43,7 @@ sed 's/aBriskPreflight/aTimedFixture/g' memory/builds/aBriskPreflight/README.md 
   | awk '/^<!-- gen:build-index -->/{print; print "<!-- /gen:build-index -->"; skip=1; next} skip&&/^<!-- \/gen:build-edges -->/{skip=0; next} !skip' > "$F/README.md"
 sed 's/aBriskPreflight/aTimedFixture/g' memory/builds/aBriskPreflight/prompts/2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md \
   > "$F/prompts/2026-10-11-prompt-TOOL-aTimedFixture-1-brief.md"
-git add "$F" && python tools/memory-tree/gen_build_index.py --write >/dev/null 2>&1
+git add "$F" && "$PY" tools/memory-tree/gen_build_index.py --write >/dev/null 2>&1
 git add "$F"
 git commit -q -m "records(aTimedFixture): the A/B fixture build" --no-verify -- "$F" || exit 2
 # the generator also re-rendered views outside the folder; the arm starts from a clean tree

@@ -97,7 +97,7 @@ ids TOOL-aSparedSpawn-29 TOOL-aSparedSpawn-30 TOOL-aSparedSpawn-31 TOOL-aSparedS
 | [TOOL-aSparedSpawn-34 — reconcile the build with local main, so it lands there conflict-free](spec/2026-10-13-spec-TOOL-aSparedSpawn-34.md) | 7 | 2 | CLOSED | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 63 bound to this build, across 4 record folder(s).
+Records: 70 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

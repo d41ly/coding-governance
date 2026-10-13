@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** journal TOOL-aSparedSpawn-4
 # TOOL-aSparedSpawn-4 — the pass's direct checks: the runner itself, a copy at the pass's base and the
 # working tree's, driven over hand-built fixture repositories with tiny manifests of `bash -c` legs.
 # No suite, no slice of one: every counter and comparison here is written for this record.

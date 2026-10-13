@@ -429,6 +429,9 @@ fi
 # pair loop's), and whether the expression is a good one.
 _at_owner="$KITREL/tier2-review.template.js"
 _at_tracked=$(git ls-files -- "$KITREL/*.js")
+# The loop reads the population from a scratch file, never through a substitution: a loop fed by one
+# is the class the shell-hygiene leg counts (TOOL-aSweptBar-4). `_at_tracked` stays for the `case`.
+printf '%s\n' "$_at_tracked" > "$TMPD/at-tracked"
 _at_pop=()
 while IFS= read -r _f; do
   [ -n "$_f" ] || continue
@@ -442,9 +445,7 @@ ${_f%.js}.template.js
 "*) continue ;; esac ;;
   esac
   _at_pop+=("$_f")
-done <<EOF
-$_at_tracked
-EOF
+done < "$TMPD/at-tracked"
 _at_hits=""
 [ "${#_at_pop[@]}" -gt 0 ] && _at_hits=$(awk '
   /a\.workerType|const AGENT_TYPE_SHAPE =/ {

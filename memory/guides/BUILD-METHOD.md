@@ -127,7 +127,7 @@ reviewed by that run is false.
 **Run it as a `Workflow` script, not as direct `Agent` spawns.** The direct-spawn budget is keyed per PROMPT TURN
 and an unattended run has no next prompt to reset it: three specs audited directly exhaust it mid-set and the rest
 are refused with nobody reading. Agents inside a `Workflow` sidechain are not counted. Shape and caps:
-the review protocol of this repo, **read there.**
+`memory/guides/REVIEW-PROTOCOL.md`, **read there.**
 
 **Lenses: 3–5, primed with the mandate, the overview and the spec format.** The catalogue is `SPEC_LENSES` in
 `tools/workflows/tier2-review.js`.
@@ -328,7 +328,7 @@ the unattended-run protocol of this repo, deliberately not paraphrased here.
 
 The carriers, what each owns, and when to load it: **`tools/memory-tree/README.md`, section "The method's
 pointer table"**. The six are `~/.claude/skills/session-kickoff/SKILL.md`, `memory/TEMPLATE-SPEC.md`,
-the review protocol of this repo, `memory/HYGIENE.md`, the governance template with its companion, and
+`memory/guides/REVIEW-PROTOCOL.md`, `memory/HYGIENE.md`, the governance template with its companion, and
 the unattended-run protocol of this repo. Names here, scopes there — one hop, and this file stays re-readable.
 
 ## M12 — Research, test, choose — when the solution is not given
