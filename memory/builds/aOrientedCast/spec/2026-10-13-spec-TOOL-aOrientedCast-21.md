@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-21 — format-guard refuses a final message that omits an agent line for an agent its turn dispatched or received
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 23
+**Status:** INPROGRESS · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 23
 
 <!-- gen:spec-records -->
 
