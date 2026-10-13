@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-25 — the second closing review's roles minors: one marker reading, armed rules, one fence reading, and records that say what was built
 
-**Status:** OPEN · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 27 · ratified 2026-10-13
+**Status:** OPEN · rev-3 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 27 · ratified 2026-10-13
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-13-prompt-TOOL-aOrientedCast-1-7-owner-addendum.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-7-owner-addendum.md) | research | TOOL-aOrientedCast-23 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-24-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-24-1-spec-brief.md) | journal | TOOL-aOrientedCast-24 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-24-2-build-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-24-2-build-brief.md) | journal | TOOL-aOrientedCast-24 |
+| [2026-10-13-prompt-TOOL-aOrientedCast-25-1-spec-writer.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-25-1-spec-writer.md) | journal | — |
 | [2026-10-13-prompt-TOOL-aOrientedCast-27-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-27-1-spec-brief.md) | journal | TOOL-aOrientedCast-27 |
 
 <!-- /gen:spec-records -->
@@ -16,12 +17,10 @@
 ## 1. Goal
 
 This unit closes review items M4, M5, M6, L4, L5, L6 and L7 of
-[the second closing review, round 1](../reviews/2026-10-13-review-TOOL-aOrientedCast-16-closing-diff-round1.md),
-batched into one unit as BUILD-METHOD M4 orders for the medium and low findings of an exit. Two
-readers of one marker line and three of one fence are made to give one answer and a check compares
-them; the rules and verbs the reviewed diff added gain the persisted arms they lack; and the records
-that misstate what was built are corrected where a CLOSED spec can be corrected. Its write set
-stays off the files the brief gives `TOOL-aOrientedCast-24`.
+[the second closing review, round 1](../reviews/2026-10-13-review-TOOL-aOrientedCast-16-closing-diff-round1.md).
+Two readers of one marker line and three of one fence are made to give one answer and a check
+compares them; the rules and verbs the reviewed diff added gain the persisted arms they lack; and
+the records that misstate what was built are corrected where a CLOSED spec can be corrected.
 
 ## 2. Scope (IN)
 
@@ -84,7 +83,6 @@ stays off the files the brief gives `TOOL-aOrientedCast-24`.
   fence reader are read as they stand, and both hooks files are `TOOL-aOrientedCast-24`'s. M4's
   fix needs no hooks edit: rule 6 stays the owner of the marker reading, the Python reader points
   at it, and arm 11 compares the two, which is the second form of the charter's `[one-fact]` rule.
-  So M4 stays whole in this unit, and neither unit's item list moves.
 - No edit of a CLOSED spec. L5 and L6 are corrected in this unit's record (F4).
 - No `closes` verb in the status header (F3).
 - No fixture arms for R1 to R12, which the review notes lack them too: a convention older than the
@@ -101,20 +99,16 @@ stays off the files the brief gives `TOOL-aOrientedCast-24`.
   version: its descriptor's `version_from` is `none`, and `govkit.py epoch` skips such an entry.
 
 **What it is built on.** S1, S2 and S4 extend `TOOL-aOrientedCast-20`'s `print_agent_lines` and arm
-9; S3 arms `TOOL-aOrientedCast-17`'s R13 and R14 and `TOOL-aOrientedCast-19`'s R15, R0 refusal and
-`--stand-in`; arm 11 reuses `TOOL-aOrientedCast-15`'s arm 6 idiom and reads
-`TOOL-aOrientedCast-7`'s rule 6; S5 corrects `TOOL-aOrientedCast-20`'s fence reader; S9 corrects
-the records of `TOOL-aOrientedCast-21` and `TOOL-aOrientedCast-22`. Those specs are CLOSED and
-declare no edge to this unit, and a one-sided edge reds the hygiene gate's join, so the dependency
-is stated here rather than as an edge, as `TOOL-aOrientedCast-15` states its own.
+9; S3 arms the rules of `TOOL-aOrientedCast-17` and `TOOL-aOrientedCast-19`; arm 11 reuses
+`TOOL-aOrientedCast-15`'s arm 6 idiom and reads `TOOL-aOrientedCast-7`'s rule 6. Those specs are
+CLOSED and declare no edge to this unit, and a one-sided edge reds the hygiene gate's join, so the
+dependency is stated here rather than as an edge.
 
 **It writes none of `TOOL-aOrientedCast-24`'s files, and reads two of them.** Arm 11 runs the
 spawn guard and loads format-guard's exported `readCharterShapes`, and AC8's probe calls its
-exported `checkAgentLines`. That unit is `order 26` and builds first, and its scope as the brief
-states it moves none of the three. Nothing this unit builds rests on that unit's output. Two
-generated artifacts this unit re-renders, `memory/gotchas/INDEX.md` and `memory/map/generated/`,
-may be re-rendered by that unit too; a generated index is re-rendered from the tree, never
-reconciled, and this unit renders second.
+exported `checkAgentLines`. That unit is `order 26`, builds first and moves none of the three. Both
+units may re-render `memory/gotchas/INDEX.md` and `memory/map/generated/`; a generated index is
+re-rendered from the tree, never reconciled, and this unit renders second.
 
 ### Edges
 
@@ -146,9 +140,8 @@ def extract_prompt_marker(prompt):
 
 The matcher at `tools/roles/handoff.py:814-816` keeps its other two tests and reads the prompt
 through it: `(m := lib.extract_prompt_marker(c["input"].get("prompt", ""))) and m.group(0) ==
-marker.group(0)`. A probe of the function at writing, over a marker-and-task prompt, answered a
-match for the prompt as written, with one leading `\n` and with CRLF line ends, and None with a
-space after `-->`, with two spaces before the marker and with a second marker line. The README
+marker.group(0)`. A probe at writing answered as arm 11's table states, and None for a second
+marker line. The README
 sentence reads: every `Agent` call whose prompt opens with that file's marker line as the spawn
 guard reads it, through `roles_lib.extract_prompt_marker`, and whose result names an agent.
 
@@ -166,13 +159,9 @@ After arm 9's two `--handoff` runs, from the fixture root:
    | A9L5 | `- agent — workflow-subagent · effort high · model claude-test-2 · commit:specs:tFix · prompt [${A9H##*/}]($A9H) · writes none · gates none · run wf_00000001-aaa/a0000000000000003` |
 
    Derived by reading `print_agent_lines` (`tools/roles/handoff.py:829-893`) over the fixture
-   `A9_WRITE` already writes: the role from each agent's meta, the effort and model from its
-   transcript's last record, the unit from the journal label or the label itself, the prompt from
-   the `Workflow` call's `briefPath`, the class and legs from the fixture's role index, which holds
-   no `workflow-subagent`, the outcome from the journal's `result`, the wall from 10:00:00 to
-   10:00:45 and the tokens 1000 plus 500. `a0000000000000003` has no `result`, so it prints no
-   `returned` line. The pass confirms each line by running the verb once; a line that differs is a
-   defect against `TOOL-aOrientedCast-20`'s AC2, recorded in the ledger, and never re-pinned.
+   `A9_WRITE` already writes; `a0000000000000003` has no `result`, so it prints no `returned` line.
+   The pass confirms each line by running the verb once; a line that differs is a defect against
+   `TOOL-aOrientedCast-20`'s AC2, recorded in the ledger, and never re-pinned.
 2. The build's one agent ledger holds five `- ` lines: arm 9's two and these three, each once, the
    prompt link re-rooted to `(../prompts/${A9H##*/})` as `_ll1` re-roots arm 9's.
 3. A python edit of `$A9S` prefixes the `toolu_A` prompt with one `\n`. Then
@@ -186,9 +175,8 @@ Labels: `arm 9 agents --run prints the run's two agent lines and its one returne
 ### The write flag (S13)
 
 At `3a57a986a`, `print_agent_lines` always calls `write_agent_ledger`
-(`tools/roles/handoff.py:894-895`), so a mid-pass call dirties a tracked file, and the harness's
-commit stage refused a whole spec commit for it. The `agents` subparser (`:921-925`) gains
-`--write`; `print_agent_lines` gains `write=False` and writes only when it is true, else one note
+(`tools/roles/handoff.py:894-895`), so a mid-pass call dirties a tracked file. The `agents`
+subparser (`:921-925`) gains `--write`; `print_agent_lines` gains `write=False` and writes only when it is true, else one note
 names the held lines and `--write`. Arm 9's `--handoff` runs and step 1 of "Arm 9, extended" pass
 `--write`, and one more step runs `--run` without it and asserts `git hash-object` of the ledger
 and the listing of the build's `build/` folder unchanged.
@@ -273,10 +261,6 @@ Node prints, per copy, the `def` of `agent` and of `returned` from
 `check_arm` per copy asserts the two outputs are equal, and one asserts the three node `agent`
 answers hold two distinct definitions and one `none`.
 
-Against the base reader, c2 reds because `setdefault` keeps the first definition
-(`tools/roles/roles_lib.py:234`), and c3 reds because `text.find` finds the opener inside a longer
-line (`tools/roles/roles_lib.py:226`).
-
 ### The fence reader (S5)
 
 ```python
@@ -331,8 +315,8 @@ arm "an opener that is not a whole line is cannot-run" cannot \
 
 The first `want` is the branch's whole literal signature up to its interpolation, as the harness
 meta-gate requires. `ARMS_FLOORS` in `.memory-tree.conf` changes `tools/check-microformats.sh:8:8`
-to `tools/check-microformats.sh:9:9` and nothing else. The shipped template passes both new rules,
-by this probe at writing, which printed nothing while its heads printed one each:
+to `tools/check-microformats.sh:9:9` and nothing else. At writing, this probe of the shipped
+template printed nothing, then 1:
 
 ```bash
 awk '$0 == "<!-- microformats -->" {f=1; next} $0 == "<!-- /microformats -->" {f=0} f && /^- `/' \
@@ -340,10 +324,8 @@ awk '$0 == "<!-- microformats -->" {f=1; next} $0 == "<!-- /microformats -->" {f
 grep -c '^<!-- microformats -->$' coding-governance-agents.template.md      # 1
 ```
 
-`.memory-tree.conf` is in the kickoff manifest's `watch:` list (`memory/guides/SESSION-KICKOFF.md:6`),
-so the pass re-stamps that manifest's `last-audit` line and its commit carries a
-`manifest-audit: delta none · …` line naming the floor move, the shape `TOOL-aOrientedCast-19`'s
-commit `825a7cd55` shows.
+The pass re-stamps the kickoff manifest's `last-audit` line (S7), and its commit carries a
+`manifest-audit: delta none · …` line naming the floor move.
 
 ### The criterion amendments (S9)
 
@@ -424,16 +406,14 @@ outside itself, and which of it is a contract", one sub-bullet each:
 | the fields `handoff.py agents` reads | the session transcript, each subagent's `.meta.json`, a run's `journal.jsonl` (TOOL-aOrientedCast-20) | a reading, not a contract: a renamed field prints `unknown` |
 
 The first row keeps the bullet's existing clause: a cited tag the charter drops reds the
-`roles catalogue` leg, and a pre-tag charter is one reseed note. The dossier is 9808 bytes at
-writing, well under its 20480-byte cap, so no split is owed.
+`roles catalogue` leg, and a pre-tag charter is one reseed note.
 
 ### The roles bump (S12)
 
 `KIT_ROLES_VERSION = "1.4"` (`tools/roles/roles_lib.py:25`) and `<!-- gov:kit roles@1.4 -->` in
 `tools/roles/README.md:1` and `tools/roles/SKILL.template.md:5`; `tools/check-kit-versions.sh:387-393`
 pairs the constant with the README's marker. The rendered `.claude/skills/build/SKILL.md:5` follows
-by `bash tools/roles/adopt-roles.sh --scaffold`, the main loop's second pass, as it was for
-`TOOL-aOrientedCast-20` and `TOOL-aOrientedCast-22`. The bump lands after S1 to S8, so no later
+by `bash tools/roles/adopt-roles.sh --scaffold`, the main loop's second pass. The bump lands after S1 to S8, so no later
 edit of this unit moves the kit's bytes past 1.4. The pass re-renders the map with
 `python tools/codebase-map/gen_map.py --write`, which adds the new function to its symbol index.
 
@@ -508,8 +488,7 @@ migrates. Rollback is a revert of the unit's commit and a re-render of the Skill
 No criterion runs a gate leg or a suite. Each runs the unit's own code on a scratch fixture, a probe
 of code it reads, or a search of a file. Fixture F is the repository `build_fixture` scaffolds, made
 in the run's scratch path. S is arm 9's session tree and H its handoff, both written by `A9_WRITE`,
-cut out of the suite and run with python against F, as `TOOL-aOrientedCast-20`'s pass ran it. The
-suite arms are under `New arm:` in §7.
+cut out of the suite and run with python against F. The suite arms are under `New arm:` in §7.
 
 - **AC1** — When S's `Agent` call `toolu_A` has its prompt prefixed with one `\n`,
   `python tools/roles/handoff.py agents --handoff <H> --session <S>` run from F's root exits 0 and
@@ -677,6 +656,8 @@ The main loop observes each arm RED on its staged break and GREEN once restored,
 - rev-2 · 2026-10-13 · S13 · S8 · AC5 · AC12 · §4 · §7 · §8 · the `agents` ledger write moves
   behind `--write` after a mid-pass call dirtied the tree: S13, §4, F6, AC12, a New arm line, the
   docs in files touched, and the floor at 33.
+- rev-3 · 2026-10-13 · §1 · §3 · §4 · §6 · §10 · trimmed under the spec size ceiling: history
+  and restated evidence cut; no scope item and no criterion's meaning moved.
 
 ## 10. Reuse audit
 
@@ -692,10 +673,8 @@ probes and by reading: `MARKER_RE` and `extract_microformat_shapes` in `tools/ro
 resolution and arm 9's `A9_WRITE` in `tools/roles/adopt-roles.test.sh`; the per-definition loop of
 `tools/check-microformats.sh` and the `arm` helper of its test; the gotcha record
 `criterion-asserts-what-its-own-command-cannot-show`; and the roles dossier. No new seam is built.
-The recall probe surfaced this build's review and brief, `PLAY-aOrientedCast-3`'s §10 naming the two
-fence readers, `TOOL-aReplayedCard-2`'s three readers of one token held together by a parity check
-(the shape arm 11 takes), and `TOOL-aMouldedFolio-5`, where check 20 reuses its kit's fence reader
-rather than deriving its own. `python tools/memory-tree/gotchas.py --for-paths` over the write set
+The recall probe surfaced `TOOL-aReplayedCard-2`'s three readers of one token held together by a
+parity check, the shape arm 11 takes. `python tools/memory-tree/gotchas.py --for-paths` over the write set
 selected `amendment-leaves-its-other-half-standing`, `staged-break-substitutes-a-synthetic-value`
 and `fixture-passes-by-finding-nothing`, which §4's liveness steps and shipped fixtures answer.
 
