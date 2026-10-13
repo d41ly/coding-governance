@@ -5,7 +5,7 @@ feature = "branch-reconcile"
 title = "One read-only report giving every worktree, branch and stash entry a verdict with its evidence, so a cleanup removes only what landed"
 status = "shipped"
 streams = ["tooling"]
-decisions = ["TOOL-dSweptBranches-1", "TOOL-dSweptBranches-2"]
+decisions = ["TOOL-dSweptBranches-1", "TOOL-dSweptBranches-2", "TOOL-dSweptBranches-4"]
 
 [claims]
 gate-legs = ["branch-reconcile selftest"]
@@ -39,6 +39,10 @@ fetches first.
 
 **Untracked content that is another worktree is not the primary's.** A nested harness worktree is a
 directory its primary lists as untracked; counting it would make every primary read dirty.
+
+**GNU `rm -rf` is the only fallback deleter.** It never follows a link, so it removes the empty
+skeletons of MSYS-made pnpm links that .NET `Directory.Delete` and `cmd rmdir /s /q` refuse. A
+skeleton goes only when a link-blind walk finds no regular file in it.
 
 **It does not consume the straggler inventory.** `migrate_backlog.py --stragglers` lists the refs
 owing a backlog relocation, a narrower population answering a different question. The kit README

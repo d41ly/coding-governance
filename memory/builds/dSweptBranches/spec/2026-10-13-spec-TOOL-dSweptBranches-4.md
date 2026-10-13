@@ -1,12 +1,14 @@
 # TOOL-dSweptBranches-4 — the worktree remover: git first, then `rm -rf`, and a skeleton removed only when it holds no regular file
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-TOOL-dSweptBranches-4-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-dSweptBranches-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-13-prompt-TOOL-dSweptBranches-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-1-brief.md) | research | TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3 TOOL-dSweptBranches-5 |
+| [2026-10-13-prompt-TOOL-dSweptBranches-4-1-build-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-4-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -24,7 +26,8 @@ refuse those links, and a directory a desktop session holds as its working direc
 - **S2** — When the directory survives a clean removal, it is a skeleton candidate. A walk with
   `os.scandir` that follows no link and no junction counts the regular files beneath it, and a
   reparse point never counts. Zero regular files: `rm -rf <path>`. Any regular file: the directory is
-  kept and the row reports the count. Observed by AC2 and AC3.
+  kept and the row says so. An entry the walk cannot read counts as a file, so doubt keeps the
+  directory. Observed by AC2 and AC3.
 - **S3** — No link is resolved. No `readlink` is spawned, and the walk asks only `is_dir` and
   `is_file` with `follow_symlinks=False`. Observed by AC2.
 - **S4** — An `rm` that fails with `Device or resource busy` is reported as `busy`, a result and not a
@@ -93,10 +96,10 @@ this node can create links; where it cannot, that arm prints a skip line.
   `remove_worktree` removes it and reports `removed`, and no `readlink` process is spawned.
   Red when: the skeleton step is removed, or the walk follows a link.
 - **AC3** — When the skeleton holds one regular file, `remove_worktree` keeps it and reports
-  `kept · 1 regular file`.
+  `kept · it still holds a regular file`.
   Red when: the zero-file assertion is removed.
-- **AC4** — When `rm` reports `Device or resource busy`, `remove_worktree` returns `busy` and write
-  mode's exit is not 1 for it.
+- **AC4** — When `rm` reports `Device or resource busy`, `remove_worktree` returns `busy`. Write
+  mode's exit for a busy row is unit 3's AC4.
   Red when: busy is classed as a failure.
 - **AC5** — When `rm` is absent from `PATH`, `remove_worktree` reports a skip naming `rm` and fails
   the row.
@@ -115,6 +118,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft.
+- rev-2 · 2026-10-13 · S2 · AC3 · AC4 · what the build pass settled. The walk stops at the first
+  regular file, so the kept row says that it holds one rather than a count, and an unreadable entry
+  keeps the directory. AC4's write-mode half moves to unit 3, which owns the exit.
 
 ## 10. Reuse audit
 

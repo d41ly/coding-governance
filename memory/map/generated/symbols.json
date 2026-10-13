@@ -748,6 +748,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_remover",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_rotated",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -3708,6 +3713,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_holds_file",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "check_honest_rotation",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -6471,6 +6481,11 @@
       "id": "derive_review_verdict",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_rm_failure",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "derive_root_confs",
@@ -13368,6 +13383,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "remove_worktree",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "render",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -16953,6 +16973,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_rm",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "run_rm3",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -17181,6 +17206,11 @@
       "id": "run_wf",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "run_worktree_remove",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "run_write",
@@ -17993,6 +18023,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "seed_environ",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "seed_f4_tree",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -18066,6 +18101,11 @@
       "id": "seed_ros",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "seed_seam",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "seed_shards_base",

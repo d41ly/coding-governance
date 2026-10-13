@@ -24,6 +24,7 @@ import datetime
 import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -789,6 +790,98 @@ def derive_verdict(inv, item):
 
 def derive_action(inv, item, verdict):
     return "keep"
+
+
+# ------------------------------------------------------------------------------- the remover
+# TOOL-dSweptBranches-4. Every trap below was measured on an inCMS node on 2026-10-13: git's removal
+# fails with "Result too large" on deep node_modules; a clean removal often leaves an empty skeleton
+# of pnpm links made under MSYS whose targets are POSIX paths; .NET Directory.Delete and
+# `cmd rmdir /s /q` both refuse those links; GNU `rm -rf`, which never follows a link, removes them.
+
+RM_NAME = "rm"
+FILE_ATTRIBUTE_REPARSE_POINT = 0x400
+BUSY_MARKERS = ("Device or resource busy", "EBUSY")
+
+
+def run_worktree_remove(root, path):
+    """-> (returncode, stderr) of `git worktree remove --force --force <path>`."""
+    try:
+        p = subprocess.run(["git", "-C", str(root), "worktree", "remove", "--force", "--force",
+                            str(path)], capture_output=True)
+    except OSError as exc:
+        return 127, str(exc)
+    return p.returncode, p.stderr.decode("utf-8", errors="replace").strip()
+
+
+def run_rm(rm, path):
+    """-> (returncode, stderr) of GNU `rm -rf -- <path>`."""
+    try:
+        p = subprocess.run([rm, "-rf", "--", str(path)], capture_output=True)
+    except OSError as exc:
+        return 127, str(exc)
+    return p.returncode, p.stderr.decode("utf-8", errors="replace").strip()
+
+
+def check_holds_file(path):
+    """True when a regular file sits anywhere under <path>. Follows no link and no junction: a
+    reparse point is neither descended nor counted, and no link is ever resolved. An entry that
+    cannot be read counts as a file, so doubt keeps the directory. Stops at the first file."""
+    stack = [str(path)]
+    while stack:
+        try:
+            entries = list(os.scandir(stack.pop()))
+        except OSError:
+            return True
+        for e in entries:
+            try:
+                st = e.stat(follow_symlinks=False)
+            except OSError:
+                return True
+            if getattr(st, "st_file_attributes", 0) & FILE_ATTRIBUTE_REPARSE_POINT or e.is_symlink():
+                continue
+            if e.is_dir(follow_symlinks=False):
+                stack.append(e.path)
+            elif e.is_file(follow_symlinks=False):
+                return True
+    return False
+
+
+def derive_rm_failure(err):
+    line = (err.splitlines() or ["rm failed"])[-1]
+    if any(m in err for m in BUSY_MARKERS):
+        return "busy", f"busy: a process holds it, likely as its working directory ({line})"
+    return "failed", line
+
+
+def remove_worktree(root, path):
+    """-> (result, detail), result one of removed, busy, kept or failed.
+
+    git's removal first. On its failure, `rm -rf` and `git worktree prune`. A directory that survives
+    a clean removal is a skeleton candidate, removed only when it holds no regular file.
+    """
+    rc, err = run_worktree_remove(root, path)
+    rm = shutil.which(RM_NAME)
+    how = "git worktree remove"
+    if rc != 0:
+        first = (err.splitlines() or ["no message"])[-1]
+        if not rm:
+            return "failed", (f"skipped — git worktree remove failed ({first}) and `{RM_NAME}` is "
+                              "not on PATH, so no fallback ran")
+        rc, err = run_rm(rm, path)
+        run_git(root, "worktree", "prune")
+        if rc != 0:
+            return derive_rm_failure(err)
+        how = f"rm -rf after git refused ({first})"
+    if os.path.lexists(path):
+        if check_holds_file(path):
+            return "kept", "kept · it still holds a regular file, so it is no empty skeleton"
+        if not rm:
+            return "failed", f"skipped — an empty skeleton survived and `{RM_NAME}` is not on PATH"
+        rc, err = run_rm(rm, path)
+        if rc != 0:
+            return derive_rm_failure(err)
+        how += ", then its empty skeleton with rm -rf"
+    return "removed", how
 
 
 def build_rows(inv):

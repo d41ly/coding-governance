@@ -83,6 +83,25 @@ branch, else `UNKNOWN`.
 Run records are read at a tip, as data, and never written: the unattended kit's `--settle` and
 `--preflight` own them. The memory root is `MEMORY_ROOT` from `.memory-tree.conf`, else `memory`.
 
+## Removing a worktree, on Windows too
+
+`remove_worktree` is the one remover, and every rule in it was measured on an inCMS node on
+2026-10-13:
+
+- **git first.** `git worktree remove --force --force`. It fails with "Result too large" on deep
+  `node_modules`, and then GNU `rm -rf` removes the directory and `git worktree prune` drops the
+  record.
+- **A surviving skeleton.** After a clean removal the directory often survives as an empty skeleton
+  of pnpm links made under MSYS, whose targets are POSIX paths (`/c/...`). It is removed with
+  `rm -rf` only when a walk that follows no link and no junction finds no regular file beneath it; a
+  reparse point is neither descended nor counted, and an unreadable entry keeps the directory.
+- **Never another deleter.** .NET `Directory.Delete` and `cmd rmdir /s /q` both refuse those links
+  ("The parameter is incorrect"), and a guard hook once misread `rmdir`'s `/s` as a path. GNU
+  `rm -rf` never follows a link. With no `rm` on `PATH` the row fails and says so.
+- **No link is resolved.** One spawned `readlink` per link timed out at 600 s over 40 directories.
+- **Busy is a result, not a failure.** A directory an idle desktop session holds as its working
+  directory stays "Device or resource busy"; the row reports `busy`.
+
 ## Why this is not the straggler inventory
 
 The relocation engine's `migrate_backlog.py --stragglers`, which `check-wiring.sh` reports, lists the

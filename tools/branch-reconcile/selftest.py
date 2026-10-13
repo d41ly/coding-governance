@@ -13,6 +13,7 @@ failure or when fewer assertions ran than the floor.
 """
 from __future__ import annotations
 
+import contextlib
 import importlib.util
 import io
 import os
@@ -25,7 +26,7 @@ from contextlib import redirect_stdout
 
 HERE = pathlib.Path(__file__).resolve().parent
 CLI = HERE / "branch_reconcile.py"
-ASSERTION_FLOOR = 34
+ASSERTION_FLOOR = 40
 PASS, FAIL = [], []
 SCRATCH = []
 
@@ -442,8 +443,116 @@ def arm_stash():
           read_verdict(rows, "stash", "stash@{0}")[0], "UNKNOWN")
 
 
+@contextlib.contextmanager
+def seed_environ():
+    """Run in-process calls of the CLI's functions under the fixture's git environment."""
+    saved = dict(os.environ)
+    os.environ.clear()
+    os.environ.update(ENV)
+    try:
+        yield
+    finally:
+        os.environ.clear()
+        os.environ.update(saved)
+
+
+@contextlib.contextmanager
+def seed_seam(name, value):
+    """Replace one module attribute of the CLI for the length of a block."""
+    saved = getattr(BR, name)
+    setattr(BR, name, value)
+    try:
+        yield
+    finally:
+        setattr(BR, name, saved)
+
+
+def arm_remover():
+    """TOOL-dSweptBranches-4 AC1 to AC5 — the removal fallbacks, the skeleton rule and busy."""
+    base = build_dir()
+    repo = seed_repo(base)
+    key = lambda p: str(p).replace("\\", "/")
+
+    def seed_worktree(name):
+        p = base / "fx" / name
+        run_git(repo, "worktree", "add", "-q", "-b", name + "-br", str(p), "main")
+        return p
+
+    def fail_git(root, path):
+        return 1, "error: failed to delete 'node_modules/x': Result too large"
+
+    real_remove = BR.run_worktree_remove
+    linked = []
+
+    def leave_skeleton(extra_file):
+        def remove(root, path):
+            rc = real_remove(root, path)
+            d = pathlib.Path(path) / "node_modules" / ".pnpm" / "pkg@1" / "node_modules"
+            d.mkdir(parents=True)
+            try:
+                os.symlink("/" + "c/nonexistent/pnpm/target", d / "pkg")
+                linked.append(True)
+            except OSError:
+                linked.append(False)
+            if extra_file:
+                (pathlib.Path(path) / "node_modules" / "leftover.txt").write_text("x", encoding="utf-8")
+            return rc
+        return remove
+
+    spawned = []
+    real_run = subprocess.run
+
+    def spy(argv, *a, **k):
+        spawned.append(list(argv))
+        return real_run(argv, *a, **k)
+
+    with seed_environ():
+        wt = seed_worktree("fallback")
+        (wt / "deep").mkdir()
+        (wt / "deep" / "f.txt").write_text("x", encoding="utf-8")
+        with seed_seam("run_worktree_remove", fail_git):
+            got = BR.remove_worktree(repo, str(wt))
+        listed = run_git(repo, "worktree", "list", "--porcelain")
+        check("remover: AC1 a failed git removal falls back to rm -rf",
+              (got[0], wt.exists(), key(wt) in listed), ("removed", False, False))
+
+        wt = seed_worktree("skeleton")
+        subprocess.run = spy
+        try:
+            with seed_seam("run_worktree_remove", leave_skeleton(False)):
+                got = BR.remove_worktree(repo, str(wt))
+        finally:
+            subprocess.run = real_run
+        check("remover: AC2 an empty skeleton of links is removed", (got[0], os.path.lexists(wt)),
+              ("removed", False))
+        check("remover: AC2 no readlink is spawned",
+              [a for a in spawned if any("readlink" in str(x) for x in a)], [])
+        if linked and not linked[-1]:
+            print("remover: skipped — this node cannot create a symlink, so the skeleton held "
+                  "empty directories only")
+
+        wt = seed_worktree("holds")
+        with seed_seam("run_worktree_remove", leave_skeleton(True)):
+            got = BR.remove_worktree(repo, str(wt))
+        check("remover: AC3 a skeleton holding a regular file is kept",
+              (got[0], "regular file" in got[1], wt.exists()), ("kept", True, True))
+        shutil.rmtree(wt, ignore_errors=True)
+
+        wt = seed_worktree("busy")
+        with seed_seam("run_worktree_remove", fail_git), seed_seam(
+                "run_rm", lambda rm, path: (1, f"rm: cannot remove '{path}': Device or resource busy")):
+            got = BR.remove_worktree(repo, str(wt))
+        check("remover: AC4 a busy directory is reported busy, not failed", got[0], "busy")
+
+        wt = seed_worktree("norm")
+        with seed_seam("run_worktree_remove", fail_git), seed_seam("RM_NAME", "rm-absent-from-path"):
+            got = BR.remove_worktree(repo, str(wt))
+        check("remover: AC5 with no rm on PATH the row fails and names rm",
+              (got[0], "rm-absent-from-path" in got[1], wt.exists()), ("failed", True, True))
+
+
 ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
-        arm_content, arm_stash]
+        arm_content, arm_stash, arm_remover]
 
 
 def main():
