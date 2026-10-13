@@ -1,10 +1,13 @@
 # TOOL-dSweptBranches-10 — an untracked probe is covered only when its cases are declared on the default branch and its body exists there
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 9
+**Status:** CLOSED · rev-2 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-13-build-TOOL-dSweptBranches-10-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-dSweptBranches-10-1-acceptance-ledger.md) | journal | — |
+| [2026-10-13-prompt-TOOL-dSweptBranches-10-1-build-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-10-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -14,7 +17,7 @@ Promoted from the closing review's round 1, H4 (ids 3, 13). An untracked test fi
 
 ## 2. Scope (IN)
 
-- **S1** — Each case must match its declaration form on the default tip by `git grep -E` (`def <name>(`, `it("<name>"` or `test("<name>"`, `arm "<name>"`), the name escaped, and every non-blank stripped line of the probe must exist whole (`git grep -F -x`) in a file that matched a declaration. Observed by AC1.
+- **S1** — An untracked probe is covered only when it declares test cases and every non-blank line of it, stripped, exists in a default-branch file that names one of those cases. The line declaring each case is itself a probe line, so the body check requires the declaration, whole, without a separate anchor; the name only narrows which files are read. Observed by AC1.
 
 ## 3. Non-goals (OUT)
 
@@ -54,7 +57,7 @@ there and observed red before it lands.
 ## 6. Acceptance criteria
 
 - **AC1** — When the default branch holds only a longer name with the probe's name as a prefix, or the name only in prose, or the declaration under another body, `branch_reconcile.py` reads the probe's worktree `UNMERGED-LIVE`; the landed probe still reads covered.
-  Red when: the declaration anchor or the body check is removed.
+  Red when: the body check is removed and a name hit alone covers the probe.
 
 ## 7. Gates
 
@@ -69,6 +72,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft, promoted at the closing diff review's exit.
+- rev-2 · 2026-10-13 · S1 · AC1 · the declaration-form ERE is dropped: a staged break replacing it with a bare name match stayed green, because the declaring line is one of the probe's own lines and the body check already demands it whole. The positive fixture's default test now carries the probe's body.
 
 ## 10. Reuse audit
 

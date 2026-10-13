@@ -93,7 +93,7 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-7 — a worktree whose status was never read reads UNKNOWN, never its HEAD's verdict](spec/2026-10-13-spec-TOOL-dSweptBranches-7.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-8 — a registered worktree path holding another repository is never graded as the worktree, and rm -rf reaches only a proven worktree](spec/2026-10-13-spec-TOOL-dSweptBranches-8.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-13 |
 | [TOOL-dSweptBranches-9 — the patch predicate matches only a copy that shares more lines than it drifts, on the same files](spec/2026-10-13-spec-TOOL-dSweptBranches-9.md) | 8 | 2 | CLOSED | rev-2 | 2026-10-13 |
-| [TOOL-dSweptBranches-10 — an untracked probe is covered only when its cases are declared on the default branch and its body exists there](spec/2026-10-13-spec-TOOL-dSweptBranches-10.md) | 9 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-dSweptBranches-10 — an untracked probe is covered only when its cases are declared on the default branch and its body exists there](spec/2026-10-13-spec-TOOL-dSweptBranches-10.md) | 9 | 2 | CLOSED | rev-2 | 2026-10-13 |
 | [TOOL-dSweptBranches-11 — the rotated predicate requires each added row's whole text on the default branch](spec/2026-10-13-spec-TOOL-dSweptBranches-11.md) | 10 | 2 | OPEN | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-12 — every name the default branch goes by is kept, the remote's own HEAD branch included](spec/2026-10-13-spec-TOOL-dSweptBranches-12.md) | 11 | 2 | OPEN | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-13 — a deletion acts only on the sha it graded](spec/2026-10-13-spec-TOOL-dSweptBranches-13.md) | 12 | 2 | OPEN | rev-1 | 2026-10-13 |
@@ -103,9 +103,9 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-17 — the closing review's MEDIUM and LOW items, batched](spec/2026-10-13-spec-TOOL-dSweptBranches-17.md) | 16 | 2 | OPEN | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 19 bound to this build, across 4 record folder(s).
+Records: 21 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17.
+Ids no record names: TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17.
 
 Ids no `spec-audit` record has ever named: TOOL-dSweptBranches-1 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3
 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9.

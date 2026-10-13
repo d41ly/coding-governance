@@ -758,6 +758,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_probe_negative",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_records",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -4136,6 +4141,11 @@
       "id": "check_probe_command",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "check_probe_landed",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "check_probe_scrubbed",

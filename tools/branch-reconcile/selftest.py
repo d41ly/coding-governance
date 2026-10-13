@@ -390,7 +390,8 @@ def arm_content():
     run_git(repo, "checkout", "-q", "-b", "side")
     seed_commit(repo, "side.txt", "side\n", "feat: side")
     run_git(repo, "checkout", "-q", "main")
-    seed_commit(repo, "tests/test_land.py", "def test_merge_survives():\n    pass\n", "test: landed")
+    seed_commit(repo, "tests/test_land.py",
+                "import os\n\n\ndef test_merge_survives():\n    assert True\n", "test: landed")
     run_git(repo, "merge", "-q", "--no-ff", "-m", "merge: side", "side")
     seed_publish(repo)
     det = base / "fx" / "det"
@@ -775,9 +776,34 @@ def arm_patch_negative():
           read_verdict(rows, "local", "same-lines")[0], "UNMERGED-LIVE")
 
 
+def arm_probe_negative():
+    """TOOL-dSweptBranches-10 — a probe's case NAME on the default branch does not cover its body."""
+    base = build_dir()
+    repo = seed_repo(base)
+    seed_commit(repo, "tests/test_land.py", "def test_merge_survives_twice():\n    assert True\n",
+                "test: a longer name")
+    seed_commit(repo, "docs/notes.md", "We still owe test_mentioned a real fixture.\n", "docs: prose")
+    seed_commit(repo, "tests/test_other.py", "def test_parse():\n    return 1\n", "test: parse")
+    seed_publish(repo)
+    key = lambda p: str(p).replace("\\", "/")
+    probes = {"prefix": "def test_merge_survives():\n    assert True\n",
+              "prose": "def test_mentioned():\n    assert False\n",
+              "body": "def test_parse():\n    return 2\n"}
+    for name, text in probes.items():
+        wt = base / "fx" / name
+        run_git(repo, "worktree", "add", "-q", "-b", name + "-br", str(wt), "main")
+        (wt / "test_probe.py").write_text(text, encoding="utf-8", newline="\n")
+    rows = read_report(repo, "--fresh-hours", "0")
+    for name, why in (("prefix", "only a longer name shares its prefix"),
+                      ("prose", "its name appears only in prose"),
+                      ("body", "its name is declared under another body")):
+        check(f"probe-negative: AC1 a probe is uncovered when {why}",
+              read_verdict(rows, "worktree/sibling", key(base / "fx" / name))[0], "UNMERGED-LIVE")
+
+
 ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
         arm_content, arm_stash, arm_remover, arm_write, arm_keeps, arm_unread, arm_foreign,
-        arm_patch_negative]
+        arm_patch_negative, arm_probe_negative]
 
 
 def main():

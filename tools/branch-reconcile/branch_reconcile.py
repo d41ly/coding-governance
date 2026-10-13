@@ -640,12 +640,35 @@ TEST_CASE_RES = [re.compile(r"^\s*def (test_\w+)\s*\(", re.M),
                  re.compile(r"^\s*arm\s+\"([^\"]+)\"", re.M)]
 
 
-def scan_test_cases(path):
+def scan_test_cases(text):
+    """-> the sorted names of every test case <text> declares."""
+    return sorted({m for rx in TEST_CASE_RES for m in rx.findall(text)})
+
+
+def check_probe_landed(inv, path):
+    """True when the untracked file at <path> declares test cases and every non-blank line of it,
+    stripped, exists in a default-branch file naming one of those cases: its case and its body landed.
+
+    TOOL-dSweptBranches-10. A name alone proves nothing — `it("works")` is in half the suites ever
+    written, and `test_parse` is a prefix of `test_parse_args`. The body check needs no separate
+    declaration anchor: the line declaring each case is itself one of the probe's lines, so it must
+    exist, whole, in a file the name led to. The name only narrows which files are read.
+    """
     try:
         text = pathlib.Path(path).read_text(encoding="utf-8", errors="replace")
     except OSError:
-        return []
-    return sorted({m for rx in TEST_CASE_RES for m in rx.findall(text)})
+        return False
+    names = scan_test_cases(text)
+    if not names:
+        return False
+    files = set()
+    for name in names:
+        out = read_git(inv["root"], "grep", "-F", "-l", "-e", name, inv["default_ref"], "--")
+        files.update(line.split(":", 1)[1] for line in out.splitlines() if ":" in line)
+    landed = set()
+    for f in sorted(files):
+        landed |= {line.strip() for line in (read_at(inv, inv["default_ref"], f) or "").splitlines()}
+    return all(line.strip() in landed for line in text.splitlines() if line.strip())
 
 
 def read_newest_activity(inv, w):
@@ -715,11 +738,9 @@ def check_worktree(inv, item):
             uncovered.append(f"changed {p}")
     default_blobs = set(tree.values())
     for p in probes:
-        cases = scan_test_cases(pathlib.Path(w["path"]) / p)
         if have[p] in default_blobs:
             covered.append(f"untracked {p} exists on {inv['branch']}")
-        elif cases and all(run_git(inv["root"], "grep", "-F", "-q", "-e", c, inv["default_ref"])[0] == 0
-                           for c in cases):
+        elif check_probe_landed(inv, pathlib.Path(w["path"]) / p):
             covered.append(f"probe {p}: its case landed as a test")
         else:
             uncovered.append(f"untracked {p}")
