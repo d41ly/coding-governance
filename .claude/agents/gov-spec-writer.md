@@ -3,7 +3,7 @@ name: gov-spec-writer
 description: Writes each unit's spec, never code.
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: inherit
-effort: xhigh
+effort: high
 omitClaudeMd: true
 workflow: spec-write
 writes: spec

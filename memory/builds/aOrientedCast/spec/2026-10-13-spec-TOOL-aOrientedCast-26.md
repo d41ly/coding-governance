@@ -1,11 +1,12 @@
 # TOOL-aOrientedCast-26 — spec writers run at high effort and builders at xhigh, as the owner ruled
 
-**Status:** INPROGRESS · rev-1 · 2026-10-13 · node a · Tier-1 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 26
+**Status:** CLOSED · rev-1 · 2026-10-13 · node a · Tier-1 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 26
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-TOOL-aOrientedCast-26-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-aOrientedCast-26-1-acceptance-ledger.md) | journal | — |
 | [2026-10-13-prompt-TOOL-aOrientedCast-1-7-owner-addendum.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-7-owner-addendum.md) | research | TOOL-aOrientedCast-1 TOOL-aOrientedCast-23 |
 
 <!-- /gen:spec-records -->

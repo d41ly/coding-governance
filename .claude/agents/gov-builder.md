@@ -3,7 +3,7 @@ name: gov-builder
 description: Builds one unit from its spec and commits it.
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: inherit
-effort: high
+effort: xhigh
 omitClaudeMd: true
 workflow: build
 writes: product
