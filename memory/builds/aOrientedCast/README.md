@@ -133,7 +133,7 @@ ids TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25
 | [TOOL-aOrientedCast-23 — one stated answer on which declared size ceilings a run may raise, held in the limits file and pointed at by M3 and the size gate](spec/2026-10-13-spec-TOOL-aOrientedCast-23.md) | 25 | 2 | OPEN | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 53 bound to this build, across 4 record folder(s).
+Records: 55 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
