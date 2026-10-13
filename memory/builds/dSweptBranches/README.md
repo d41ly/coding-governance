@@ -84,7 +84,7 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 19 unit(s) · node d · opened 2026-10-13 · streams tooling
+**Build status:** CLOSED · 19 unit(s) · node d · opened 2026-10-13 · streams tooling
 ids TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-6 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13
 ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-18 TOOL-dSweptBranches-19 TOOL-dSweptBranches-20 TOOL-dSweptBranches-21 TOOL-dSweptBranches-22
 
@@ -109,10 +109,10 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-17 — the closing review's MEDIUM and LOW items, batched](spec/2026-10-13-spec-TOOL-dSweptBranches-17.md) | 16 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-19 — the skill is `/cleanup`, renamed with every live reference](spec/2026-10-13-spec-TOOL-dSweptBranches-19.md) | 17 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-20 — gov's range readers audited for a merge read as additions](spec/2026-10-13-spec-TOOL-dSweptBranches-20.md) | 18 | 1 | CLOSED | rev-1 | 2026-10-13 |
-| [TOOL-dSweptBranches-21 — the census suite's live-tree arm waits for its tree, not for three seconds](spec/2026-10-13-spec-TOOL-dSweptBranches-21.md) | 19 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-dSweptBranches-21 — the reaper backstops an MSYS signal with the winpid, and the live-tree arm waits for its tree](spec/2026-10-13-spec-TOOL-dSweptBranches-21.md) | 19 | 2 | CLOSED | rev-2 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 42 bound to this build, across 4 record folder(s).
+Records: 44 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

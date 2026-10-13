@@ -233,7 +233,7 @@ Inventories: gate-legs: 132 · kits: 18 · git-hooks: 4 · harness-hooks: 11 · 
 | `a-gate-that-walks-the-repo-root-reads-other-worktrees.md` | gate-lint |
 | `a-grep-for-a-word-is-a-presence-probe.md` | memory-tree-hygiene |
 | `a-helper-extraction-blinds-a-per-function-rule.md` | unattended |
-| `a-merge-of-the-default-branch-read-as-additions.md` | UNCLAIMED |
+| `a-merge-of-the-default-branch-read-as-additions.md` | branch-reconcile |
 | `a-merged-in-check-can-refuse-a-pinned-record.md` | unattended-mandate |
 | `a-new-leg-trips-a-growing-set-of-meta-gates.md` | run-gates |
 | `a-new-local-collides-in-a-long-function.md` | govkit |

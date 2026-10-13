@@ -3668,6 +3668,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_gone_blob",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
+    },
+    {
       "id": "check_grant",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -12728,6 +12733,11 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "read_signal_blob",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
+    },
+    {
       "id": "read_signal_table_names",
       "kind": "function",
       "file": "tools/drift-audit/drift_signals.py"
@@ -19694,6 +19704,11 @@
     },
     {
       "id": "test_msys_row_is_signalled_by_the_kill_binary",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_msys_signal_is_backstopped_by_winpid",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
     },

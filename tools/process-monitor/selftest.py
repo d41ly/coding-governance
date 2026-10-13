@@ -739,6 +739,34 @@ def test_unaddressable_row_is_reported_not_claimed():
           (len(rep["unsignalable"]), rep["signalled"]), (4, []))
 
 
+def test_msys_signal_is_backstopped_by_winpid():
+    """TOOL-dSweptBranches-21: an MSYS id does not always address the process the census paired it
+    with. A live native python.exe refused `kill -9` on its MSYS id, or accepted it and ran on, in
+    2 runs of 6. Every MSYS signal is therefore followed by a single-pid taskkill on the winpid, and
+    a refusal the backstop lands is no signal error. Stubbed: nothing is signalled."""
+    rows = [build_row(w, p, c, msys_pid=w + 100) for w, p, c in
+            ((1, 999, "bash -c run"), (2, 1, "bash -c ./rel.sh"), (4, 2, "python.exe -c pass"))]
+    calls = []
+
+    def stub_run(argv, **_kw):
+        calls.append(list(argv))
+        refused = argv[0] == "kill" and argv[-1] == "104"
+        return subprocess.CompletedProcess(argv, 1 if refused else 0, b"",
+                                           b"kill: 104: Permission denied" if refused else b"")
+    saved = (reap.resolve_signal_binaries, reap.check_msys_addressable, reap.subprocess.run)
+    reap.resolve_signal_binaries = lambda: {"msys": "kill", "native": "taskkill"}
+    reap.check_msys_addressable = lambda row, binaries: True
+    reap.subprocess.run = stub_run
+    try:
+        rep = reap.run_kill(1, rows, build_scope(1, 2, 4))
+    finally:
+        reap.resolve_signal_binaries, reap.check_msys_addressable, reap.subprocess.run = saved
+    backstops = [c[2] for c in calls if c[0] == "taskkill" and c[1:] == ["/PID", c[2], "/F"]]
+    check("test_msys_signal_is_backstopped_by_winpid",
+          (sorted(backstops), rep["errors"], sorted(rep["signalled"])),
+          (["1", "2", "4"], [], [1, 2, 4]))
+
+
 def test_taskkill_argv_uses_one_slash():
     """`//PID` is an MSYS SHELL idiom. A list argv is not shell-mangled, and taskkill rejects the
     doubled form with rc 1 from a non-shell exec."""
@@ -1074,6 +1102,10 @@ def resolve_launcher():
     return None, ran
 
 
+# How long the live-tree arm waits for its staged tree to appear whole in the census.
+TREE_SPAWN_BOUND = 30
+
+
 def test_live_tree_dies_completely():
     """The arm this whole build exists for: a real bash -> bash -c -> sleep tree PLUS a native
     python grandchild, killed by winpid, verified by re-read. A fixture cannot show this.
@@ -1111,11 +1143,37 @@ def test_live_tree_dies_completely():
     )
     launched = subprocess.Popen([launcher, "-c", "# " + marker + "\n" + body],
                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(3)
+    staged = [
+        ("the marked launcher", lambda c: marker in c),
+        ("the nested shell", lambda c: marker not in c and "bash" in c.lower()),
+        ("the native python grandchild",
+         lambda c: marker not in c and "time.sleep(613)" in c),
+        ("a staged sleep",
+         lambda c: marker not in c and "sleep" in c.lower()
+         and "bash" not in c.lower() and "python" not in c.lower()),
+    ]
     try:
-        rows = read_live_census()
-        if rows is None:
-            return
+        # WAIT FOR THE TREE, NOT FOR THREE SECONDS (TOOL-dSweptBranches-21). A fixed sleep is a guess
+        # about the scheduler: on a loaded Windows runner the grandchildren had not spawned when the
+        # census was read, and the arm went red on a tree it never saw whole. The census is re-read
+        # until the launcher and every member the arm grades are present, up to TREE_SPAWN_BOUND; a
+        # tree that never completes falls through, and the member check below names what is missing.
+        started = time.time()
+        while True:
+            rows = read_live_census()
+            if rows is None:
+                return
+            # THE LAUNCHED TREE ONLY, by the reaper's own walk: across the whole census a stray from
+            # an earlier run, or any shell on the machine, satisfies a member predicate early.
+            by_win = {r["winpid"]: (r.get("command") or "") for r in rows}
+            cmds = [by_win.get(w, "") for w in reap.build_walk(rows, launched.pid)]
+            if launched.pid in by_win and \
+                    all(any(hit(c) for c in cmds) for _name, hit in staged[1:]):
+                break
+            if time.time() - started > TREE_SPAWN_BOUND:
+                break
+            time.sleep(0.5)
+        print("  the staged tree was whole in the census after %.1fs" % (time.time() - started))
         # OUR launcher by pid, never the first row carrying the marker: a stray from an earlier
         # run — one staged under a clone the roots do not admit, measured — is found first and
         # reads as "not in scope" for a tree that is.
@@ -1138,15 +1196,6 @@ def test_live_tree_dies_completely():
         rep = reap.check_settled_survivors(rep, "")
         by_win = {r["winpid"]: (r.get("command") or "") for r in rows}
         walked_cmds = [by_win.get(w, "") for w in rep["walked"]]
-        staged = [
-            ("the marked launcher", lambda c: marker in c),
-            ("the nested shell", lambda c: marker not in c and "bash" in c.lower()),
-            ("the native python grandchild",
-             lambda c: marker not in c and "time.sleep(613)" in c),
-            ("a staged sleep",
-             lambda c: marker not in c and "sleep" in c.lower()
-             and "bash" not in c.lower() and "python" not in c.lower()),
-        ]
         found = [name for name, hit in staged if any(hit(c) for c in walked_cmds)]
         missing = [name for name, hit in staged if not any(hit(c) for c in walked_cmds)]
         print("  walked %d through %s · census reads %d · members seen: %s"

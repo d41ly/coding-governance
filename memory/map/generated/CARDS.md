@@ -36,6 +36,7 @@ One read-only report giving every worktree, branch and stash entry a verdict wit
 - gate-legs 2: `branch-reconcile selftest`, `cleanup skill wiring`
 - kits 1: `branch-reconcile`
 - rendered-skills 1: `cleanup`
+- gotcha-classes 1: `a-merge-of-the-default-branch-read-as-additions.md`
 - globs 2: `tools/branch-reconcile/*`, `.claude/skills/cleanup/SKILL.md`
 
 ## build-method
