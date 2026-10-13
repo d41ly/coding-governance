@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: a8f0e195a2d80a6d1480e4992aec6565342e35ea
-phase: RUNNING
+witness: 5b01cd3496af41478d96d859c702eac51a1a08e2
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/musing-lumiere-ab7980
@@ -29,3 +29,9 @@ anchor-ref: refs/heads/main
 base: a8f0e195a2d80a6d1480e4992aec6565342e35ea
 
 ## Parked
+
+2026-10-13T00:17:46Z brief · item TOOL-dSweptBranches-1 · reason 2e9a148402de memory/builds/dSweptBranches/prompts/2026-10-13-prompt-TOOL-dSweptBranches-1-1-build-brief.md
+
+2026-10-13T00:21:09Z dispatch · item 5b01cd34 TOOL-dSweptBranches-1 · reason tools/branch-reconcile/branch_reconcile.py tools/branch-reconcile/selftest.py tools/branch-reconcile/README.md tools/branch-reconcile/kit.toml tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/gate-legs.json tools/run-gates/selftest-budgets.txt memory/map/features/branch-reconcile.md README.md WIRE-INTO-PROJECT.md .claude/rules/product.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-1.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-5.md memory/builds/dSweptBranches/README.md
+
+2026-10-13T00:30:09Z dispatch · item 5b01cd34 TOOL-dSweptBranches-1 · reason tools/branch-reconcile/branch_reconcile.py tools/branch-reconcile/selftest.py tools/branch-reconcile/README.md tools/branch-reconcile/kit.toml tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/gate-legs.json tools/run-gates/selftest-budgets.txt memory/map/features/branch-reconcile.md README.md WIRE-INTO-PROJECT.md .claude/rules/product.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-1.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-2.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-3.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-4.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-5.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-1-1-acceptance-ledger.md memory/guides/SESSION-KICKOFF.md

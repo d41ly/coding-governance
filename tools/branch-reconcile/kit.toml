@@ -1,0 +1,33 @@
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/.
+# Contract: memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-1.md
+
+id = "branch-reconcile"
+home = "branch-reconcile"
+scope = "repo"
+
+# Pinned at the CLI, which lands in the SAME unit as this descriptor, so the file the pattern reads
+# exists from the first commit.
+version_from = { file = "branch_reconcile.py", pattern = "^KIT_BRANCH_RECONCILE_VERSION = " }
+requires = []
+
+[[files]]
+include = "**"
+role = "engine"
+
+# THE SELF-TEST IS WITHHELD, as every kit's is (TOOL-aQuenchedHarness-3): its subject is the CLI in
+# this directory, so it has a job only where that code changes, and none in a tree that copy-installs
+# the kit. Withheld by claiming the destination with `project-owned`, which `apply` never writes. The
+# `branch-reconcile selftest` leg is gov's own, carried by an [[exempt_leg]] row in the registry.
+[[files]]
+include = ["selftest.py"]
+role = "project-owned"
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "the CLI runs by path from wherever the kit is installed and needs no wiring; it reads the repository it is pointed at and nothing of its own."
+
+[check]
+none = """
+the kit ships no rendered artifact yet, so there is nothing for this verb to run
+"""

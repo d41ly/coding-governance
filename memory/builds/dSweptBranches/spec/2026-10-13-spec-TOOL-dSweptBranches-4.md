@@ -104,7 +104,7 @@ this node can create links; where it cannot, that arm prints a skip line.
 
 ## 7. Gates
 
-`codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `memory hygiene`
+`branch-reconcile selftest` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `memory hygiene`
 
 New arm: `tools/branch-reconcile/selftest.py` · covers AC1 AC2 AC3 AC4 AC5 · a linked worktree per arm, with the removal seam replaced where the arm needs a failure · none
 

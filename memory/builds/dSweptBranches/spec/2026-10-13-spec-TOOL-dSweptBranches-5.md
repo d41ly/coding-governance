@@ -21,7 +21,7 @@ safe rows.
 
 - **S1** — `tools/branch-reconcile/SKILL.template.md`, rendered by
   `tools/branch-reconcile/adopt-branch-reconcile.sh --scaffold` to
-  `.claude/skills/branch-reconcile/SKILL.md` with `KIT_DIR` substituted, and graded by `--check`,
+  the skills directory as branch-reconcile/SKILL.md, with `KIT_DIR` substituted, and graded by `--check`,
   which re-renders and compares. Observed by AC1.
 - **S2** — The skill's description triggers on "clean up branches", "reconcile worktrees", "stale
   branches" and "is any unmerged work left". Observed by AC2.
@@ -85,7 +85,7 @@ repository root.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When one byte is appended to `.claude/skills/branch-reconcile/SKILL.md`,
+- **AC1** — When one byte is appended to the rendered `SKILL.md`,
   `adopt-branch-reconcile.sh --check` exits 1 naming it, and `--scaffold` restores the bytes.
   Red when: `--check` compares nothing.
 - **AC2** — When `grep -c` runs over the rendered `SKILL.md` for the four trigger phrases, the
@@ -97,7 +97,7 @@ repository root.
 
 ## 7. Gates
 
-`govkit selfcheck` · `kit version markers` · `codebase-map coverage + freshness` · `memory hygiene` · `check-wiring self-test` · `recall floor` · `recall floor arms` · `govkit selftest` · `lexicon naming predicates` · `govkit refusal join` · `govkit acceptance matrix` · `install-prefix (shipped surface)` · `kit placeholders (a declared token its adopter substitutes)` · `run-gates canary` · `run-gates gov canary`
+`branch-reconcile selftest` · `govkit selfcheck` · `kit version markers` · `codebase-map coverage + freshness` · `memory hygiene` · `check-wiring self-test` · `recall floor` · `recall floor arms` · `govkit selftest` · `lexicon naming predicates` · `govkit refusal join` · `govkit acceptance matrix` · `install-prefix (shipped surface)` · `kit placeholders (a declared token its adopter substitutes)` · `run-gates canary` · `run-gates gov canary`
 
 New arm: `tools/branch-reconcile/adopt-branch-reconcile.sh` · covers AC1 · one byte appended to the render, then restored · none
 

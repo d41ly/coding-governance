@@ -171,7 +171,7 @@ arm is written and observed red against unit 1's stub before its predicate is wr
 
 ## 7. Gates
 
-`codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `memory hygiene`
+`branch-reconcile selftest` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `memory hygiene`
 
 New arm: `tools/branch-reconcile/selftest.py` · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 · one fixture repository per verdict, each arm observed red against the stub before its predicate · none
 

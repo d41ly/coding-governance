@@ -111,7 +111,7 @@ arm points a bare repository at the fixture and observes which branches remain o
 
 ## 7. Gates
 
-`codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `memory hygiene`
+`branch-reconcile selftest` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `memory hygiene`
 
 New arm: `tools/branch-reconcile/selftest.py` · covers AC1 AC2 AC3 AC4 · a write fixture per arm, rebuilt before each, with the guarded line broken once by hand · none
 

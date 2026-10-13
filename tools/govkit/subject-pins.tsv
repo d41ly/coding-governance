@@ -112,6 +112,7 @@ run-gates run-log line	kit	selftests
 run-gates turnstile	kit	selftests
 run-gates wiring	repo	wiring
 run-selftests self-test	kit	selftests
+branch-reconcile selftest	kit	selftests
 runlog record schema	repo	declarations
 runlog selftest	kit	selftests
 runlog skill wiring	repo	wiring
