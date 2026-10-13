@@ -523,7 +523,7 @@ local runlog store, read by hand; a suite or an acceptance ledger does not count
 record whose Goal shows an observed occurrence. **R3**: its condition survives — in another refusal or
 leg cited by file, in a family's shared table or helper, or in one structural check. **R4**: it is not
 security-shaped: self-authorization, git object or config substitution, record forgery at a write
-boundary, or any charter §9 surface is never a candidate, whatever R1 to R3 say. An agent PROPOSES a
+boundary, or any surface of the charter's `[security]` practice is never a candidate, whatever R1 to R3 say. An agent PROPOSES a
 batch with those columns filled; the owner decides each row. Cadence: each minor bump of the kit that
 owns the gate, or monthly, whichever comes first, and always when a ceiling reds.
 

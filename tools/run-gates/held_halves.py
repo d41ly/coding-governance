@@ -323,7 +323,7 @@ def write_held_stamp(record_dir, fields):
 
 def read_git(args, cwd=None):
     try:
-        return subprocess.run(["git"] + args, cwd=cwd, capture_output=True, text=True,
+        return subprocess.run(["git"] + args, cwd=cwd, capture_output=True, text=True, encoding="utf-8",
                               check=True).stdout.strip()
     except (OSError, subprocess.CalledProcessError):
         return ""

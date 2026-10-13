@@ -2956,7 +2956,9 @@ if [ "${GATE_SELFTESTS:-}" = changed ]; then
   done
   # Output rows, RS-separated: `F` and a note printed once; `R`, a leg index and why it runs; `H`, a
   # leg index and the short sha it is unchanged since. NOTE: single-quoted, so no apostrophe below.
-  _sel_out=$(printf '%s' "$_sel_in" | "$PYBIN" -c "$RKD_PROGRAM"'
+  # The rows go to a scratch file the loop below reads, never through a substitution: a loop fed by
+  # one is the class the shell-hygiene leg counts (TOOL-aSweptBar-4).
+  printf '%s' "$_sel_in" | "$PYBIN" -c "$RKD_PROGRAM"'
 import subprocess, sys
 here, rdir, head, bound = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4])
 legs = [r.split("\x1e") for r in sys.stdin.buffer.read().decode("utf-8").split("\n") if r]
@@ -3049,7 +3051,7 @@ elif fallback:
     out.insert(0, "F\x1eno kit ships the suite of %d held leg(s), so each selects by its guard plus its suite file: %s"
                % (len(fallback), ", ".join(fallback)))
 sys.stdout.buffer.write("".join(r + "\n" for r in out).encode("utf-8"))
-' "$KITDIR" "$HELD_DIR" "$RG_HEAD" "$SELFTESTS_MAX_LAG") \
+' "$KITDIR" "$HELD_DIR" "$RG_HEAD" "$SELFTESTS_MAX_LAG" > "$WORK/held-select" \
     || echo "run-gates: selftests changed: the selection program failed, so every held leg it did not decide executes" >&2
   while IFS=$'\x1e' read -r _sel_k _sel_i _sel_v; do
     case "$_sel_k" in
@@ -3057,8 +3059,8 @@ sys.stdout.buffer.write("".join(r + "\n" for r in out).encode("utf-8"))
       R) printf 'run-gates: selftests changed: %s runs (%s)\n' "${names[$_sel_i]}" "$_sel_v" ;;
       H) printf '%s' "$_sel_v" > "$WORK/$_sel_i.unchanged" ;;
     esac
-  done <<<"$_sel_out"
-  unset _sel_in _sel_out _sel_k _sel_i _sel_v
+  done < "$WORK/held-select"
+  unset _sel_in _sel_k _sel_i _sel_v
 fi
 
 # UNBOUNDED LEGS ARE REPORTED, NEVER REFUSED. TOOL-aBoundedCeiling-1 S6. The runner cannot know

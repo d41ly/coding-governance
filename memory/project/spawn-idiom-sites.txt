@@ -224,6 +224,7 @@ tools/run-gates/run-gates.turnstile.test.sh	pure-fn-subst	20	callees arrived wit
 tools/run-gates/run-gates.turnstile.test.sh	var-pipe	36	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-held-wsl.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-held-wsl.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/run-held-wsl.sh	var-pipe	3	arrived with the inlined `remote_ladder_sh` block at TOOL-aSweptBar-4, which converts only with its canonical and every copy, the parity arm reading them byte for byte; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-selftests.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-selftests.sh	path-subst	9	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/run-gates/run-selftests.sh	pure-fn-subst	3	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: read_now_ms×2 read_registry_tags×1

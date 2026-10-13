@@ -1077,69 +1077,73 @@ print(json.dumps(d))' "$type" "$tool" "$cmd" "$cwd")
   got=$?
   check_stderr "$name" "$want" "$got" "$expect"
 }
+# The fixture's kit names are held in variables, the form the install-prefix gate's first DOES-NOT-CHECK
+# row names: a kit name typed after the fixture's literal `kit/` prefix is what its rule 3 counts.
+SG_K_HOOKS=hooks SG_K_GOVKIT=govkit SG_K_MEMORY_TREE=memory-tree SG_K_ROLES=roles
+SG_K_LEXICON=lexicon SG_K_WORKFLOWS=workflows SG_K_UNATTENDED=unattended
 write_gate_manifest kit/gate-legs.json
 # ---- AC1: the REFUSED payloads for gov-builder, each naming its row; the main loop's controls -----
-run_role_bash "G-AC1 the bar runner -> deny naming G2" 2 "any;;G2 runner;;gov-builder;;$SG_ROLES_SHOWN;;merge or push threshold" gov-builder Bash 'bash kit/run-gates/run-gates.sh'
-run_role_bash "G-AC1 the bar under a GATE_ prefix -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'GATE_SELFTESTS=1 bash kit/run-gates/run-gates.sh'
-run_role_bash "G-AC1 the self-test runner -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash kit/run-gates/run-selftests.sh --pooled'
-run_role_bash "G-AC1 the unattended gates runner -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash kit/unattended/run-unattended-gates.sh --checks'
-run_role_bash "G-AC1 a *.test.sh suite -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'bash kit/hooks/agent-cap.test.sh'
-run_role_bash "G-AC1 a selftest.py script -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'python kit/govkit/selftest.py'
-run_role_bash "G-AC1 a script carrying --selftest -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'python3 kit/memory-tree/gotchas.py --selftest'
-run_role_bash "G-AC1 a leg the allowlist does not name -> deny naming G1 and the leg" 2 "any;;G1 leg;;roles catalogue" gov-builder Bash 'python kit/roles/check_roles.py'
-run_role_bash "G-AC1 a suite inside bash -c -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash -c 'bash kit/hooks/agent-cap.test.sh'"
-run_role_bash "G-AC1 PowerShell: the bar after an env assignment -> deny naming G2" 2 "any;;G2 runner" gov-builder PowerShell '$env:GATE_FULL=1; bash kit/run-gates/run-gates.sh'
-run_role_bash "G-AC1 the main loop runs the bar -> allow, stderr EMPTY" 0 empty - Bash 'bash kit/run-gates/run-gates.sh'
-run_role_bash "G-AC1 the main loop runs a suite -> allow, stderr EMPTY" 0 empty - Bash 'bash kit/hooks/agent-cap.test.sh'
-run_role_bash "G-AC1 the main loop runs a leg -> allow, stderr EMPTY" 0 empty - Bash 'python kit/roles/check_roles.py'
+run_role_bash "G-AC1 the bar runner -> deny naming G2" 2 "any;;G2 runner;;gov-builder;;$SG_ROLES_SHOWN;;merge or push threshold" gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh"
+run_role_bash "G-AC1 the bar under a GATE_ prefix -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "GATE_SELFTESTS=1 bash kit/$RUN_GATES/run-gates.sh"
+run_role_bash "G-AC1 the self-test runner -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash kit/$RUN_GATES/run-selftests.sh --pooled"
+run_role_bash "G-AC1 the unattended gates runner -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash kit/$SG_K_UNATTENDED/run-unattended-gates.sh --checks"
+run_role_bash "G-AC1 a *.test.sh suite -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "G-AC1 a selftest.py script -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "python kit/$SG_K_GOVKIT/selftest.py"
+run_role_bash "G-AC1 a script carrying --selftest -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "python3 kit/$SG_K_MEMORY_TREE/gotchas.py --selftest"
+run_role_bash "G-AC1 a leg the allowlist does not name -> deny naming G1 and the leg" 2 "any;;G1 leg;;roles catalogue" gov-builder Bash "python kit/$SG_K_ROLES/check_roles.py"
+run_role_bash "G-AC1 a suite inside bash -c -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash -c 'bash kit/$SG_K_HOOKS/agent-cap.test.sh'"
+run_role_bash "G-AC1 PowerShell: the bar after an env assignment -> deny naming G2" 2 "any;;G2 runner" gov-builder PowerShell "\$env:GATE_FULL=1; bash kit/$RUN_GATES/run-gates.sh"
+run_role_bash "G-AC1 the main loop runs the bar -> allow, stderr EMPTY" 0 empty - Bash "bash kit/$RUN_GATES/run-gates.sh"
+run_role_bash "G-AC1 the main loop runs a suite -> allow, stderr EMPTY" 0 empty - Bash "bash kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "G-AC1 the main loop runs a leg -> allow, stderr EMPTY" 0 empty - Bash "python kit/$SG_K_ROLES/check_roles.py"
 # ---- AC1: BY ROLE — the allowlist decides ---------------------------------------------------------
-run_role_bash "G-AC1 gov-spec-writer runs memory hygiene -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash 'bash kit/memory-tree/check-memory-hygiene.sh'
-run_role_bash "G-AC1 gov-builder runs memory hygiene -> deny naming the leg" 2 "any;;G1 leg;;memory hygiene" gov-builder Bash 'bash kit/memory-tree/check-memory-hygiene.sh'
-run_role_bash "G-AC1 workflow-subagent runs memory hygiene -> deny naming the leg" 2 "any;;G1 leg;;memory hygiene" workflow-subagent Bash 'bash kit/memory-tree/check-memory-hygiene.sh'
-run_role_bash "G-AC1 gov-builder runs the lexicon -> allow, stderr EMPTY" 0 empty gov-builder Bash 'python kit/lexicon/lexicon.py'
-run_role_bash "G-AC1 gov-spec-writer runs the lexicon -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash 'python kit/lexicon/lexicon.py'
-run_role_bash "G-AC1 gov-skeptic runs the lexicon -> deny naming the leg" 2 "any;;G1 leg;;lexicon naming predicates" gov-skeptic Bash 'python kit/lexicon/lexicon.py'
+run_role_bash "G-AC1 gov-spec-writer runs memory hygiene -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash "bash kit/$SG_K_MEMORY_TREE/check-memory-hygiene.sh"
+run_role_bash "G-AC1 gov-builder runs memory hygiene -> deny naming the leg" 2 "any;;G1 leg;;memory hygiene" gov-builder Bash "bash kit/$SG_K_MEMORY_TREE/check-memory-hygiene.sh"
+run_role_bash "G-AC1 workflow-subagent runs memory hygiene -> deny naming the leg" 2 "any;;G1 leg;;memory hygiene" workflow-subagent Bash "bash kit/$SG_K_MEMORY_TREE/check-memory-hygiene.sh"
+run_role_bash "G-AC1 gov-builder runs the lexicon -> allow, stderr EMPTY" 0 empty gov-builder Bash "python kit/$SG_K_LEXICON/lexicon.py"
+run_role_bash "G-AC1 gov-spec-writer runs the lexicon -> allow, stderr EMPTY" 0 empty gov-spec-writer Bash "python kit/$SG_K_LEXICON/lexicon.py"
+run_role_bash "G-AC1 gov-skeptic runs the lexicon -> deny naming the leg" 2 "any;;G1 leg;;lexicon naming predicates" gov-skeptic Bash "python kit/$SG_K_LEXICON/lexicon.py"
 # ---- AC2: the NEAR-MISSES — a mention, a scoped variant or a render is not a gate run --------------
-run_role_bash "G-AC2 gotchas.py --for-diff -> allow, stderr EMPTY" 0 empty gov-builder Bash 'python3 kit/memory-tree/gotchas.py --for-diff HEAD~1..HEAD'
-run_role_bash "G-AC2 lexicon.py --suggest -> allow, stderr EMPTY" 0 empty gov-builder Bash 'python3 kit/lexicon/lexicon.py --suggest checkRoleGate --as js.function'
-run_role_bash "G-AC2 a *.test.sh carrying --render -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash kit/workflows/check-protocol-parity.test.sh --render'
-run_role_bash "G-AC2 bash -n on a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash -n kit/hooks/agent-cap.test.sh'
-run_role_bash "G-AC2 git log naming a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash 'git log --oneline -- kit/hooks/agent-cap.test.sh'
+run_role_bash "G-AC2 gotchas.py --for-diff -> allow, stderr EMPTY" 0 empty gov-builder Bash "python3 kit/$SG_K_MEMORY_TREE/gotchas.py --for-diff HEAD~1..HEAD"
+run_role_bash "G-AC2 lexicon.py --suggest -> allow, stderr EMPTY" 0 empty gov-builder Bash "python3 kit/$SG_K_LEXICON/lexicon.py --suggest checkRoleGate --as js.function"
+run_role_bash "G-AC2 a *.test.sh carrying --render -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash kit/$SG_K_WORKFLOWS/check-protocol-parity.test.sh --render"
+run_role_bash "G-AC2 bash -n on a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -n kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "G-AC2 git log naming a suite -> allow, stderr EMPTY" 0 empty gov-builder Bash "git log --oneline -- kit/$SG_K_HOOKS/agent-cap.test.sh"
 run_role_bash "G-AC2 grep for the runner's name -> allow, stderr EMPTY" 0 empty gov-builder Bash 'grep -n run-gates.sh AGENTS.md'
-run_role_bash "G-AC2 a commit message naming the bar -> allow, stderr EMPTY" 0 empty gov-builder Bash 'git commit -m "names bash kit/run-gates/run-gates.sh"'
+run_role_bash "G-AC2 a commit message naming the bar -> allow, stderr EMPTY" 0 empty gov-builder Bash "git commit -m \"names bash kit/$RUN_GATES/run-gates.sh\""
 run_role_bash "G-AC2 gov-orienter's manifest-check --card (a leg's script, more words) -> allow, stderr EMPTY" 0 empty gov-orienter Bash 'bash skills/session-kickoff/manifest-check.sh --card --path'
 # ---- TOOL-aOrientedCast-14 AC1: every launcher option and prefix-word option is stepped past by ----
 # ---- the rule table. Against a walk of one option per launcher with no prefix-word options, each --
 # ---- exit-2 row below exits 0 except the node row: its `--selftest` refuses whichever word heads --
-run_role_bash "O-AC1 bash -o pipefail <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash -o pipefail kit/run-gates/run-gates.sh'
-run_role_bash "O-AC1 bash -O extglob <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash -O extglob kit/run-gates/run-gates.sh'
-run_role_bash "O-AC1 bash -e -x <suite> -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'bash -e -x kit/hooks/agent-cap.test.sh'
-run_role_bash "O-AC1 bash -e -c '<runner>' -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash -e -c 'bash kit/run-gates/run-gates.sh'"
-run_role_bash "O-AC1 python -X utf8 <selftest.py> -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'python -X utf8 kit/govkit/selftest.py'
-run_role_bash "O-AC1 env -u FOO bash <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'env -u FOO bash kit/run-gates/run-gates.sh'
-run_role_bash "O-AC1 exec bash <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'exec bash kit/run-gates/run-gates.sh'
-run_role_bash "O-AC1 nice -n 10 bash <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'nice -n 10 bash kit/run-gates/run-gates.sh'
+run_role_bash "O-AC1 bash -o pipefail <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash -o pipefail kit/$RUN_GATES/run-gates.sh"
+run_role_bash "O-AC1 bash -O extglob <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash -O extglob kit/$RUN_GATES/run-gates.sh"
+run_role_bash "O-AC1 bash -e -x <suite> -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "bash -e -x kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "O-AC1 bash -e -c '<runner>' -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash -e -c 'bash kit/$RUN_GATES/run-gates.sh'"
+run_role_bash "O-AC1 python -X utf8 <selftest.py> -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash "python -X utf8 kit/$SG_K_GOVKIT/selftest.py"
+run_role_bash "O-AC1 env -u FOO bash <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "env -u FOO bash kit/$RUN_GATES/run-gates.sh"
+run_role_bash "O-AC1 exec bash <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "exec bash kit/$RUN_GATES/run-gates.sh"
+run_role_bash "O-AC1 nice -n 10 bash <runner> -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "nice -n 10 bash kit/$RUN_GATES/run-gates.sh"
 run_role_bash "O-AC1 node -r <preload> <script> --selftest -> deny naming G3" 2 "any;;G3 suite" gov-builder Bash 'node -r kit/p.js kit/x.js --selftest'
 # ---- AC2: the near-misses — a syntax check, a lookup and an inline program run no script ----------
-run_role_bash "O-AC2 bash -n <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash -n kit/hooks/scratch-guard.test.sh'
-run_role_bash "O-AC2 bash -e -n <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash -e -n kit/hooks/agent-cap.test.sh'
-run_role_bash "O-AC2 command -v <runner> -> allow, stderr EMPTY" 0 empty gov-builder Bash 'command -v kit/run-gates/run-gates.sh'
-run_role_bash "O-AC2 python -c <program> <selftest.py> -> allow, stderr EMPTY" 0 empty gov-builder Bash 'python -c "print(1)" kit/govkit/selftest.py'
+run_role_bash "O-AC2 bash -n <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -n kit/$SG_K_HOOKS/scratch-guard.test.sh"
+run_role_bash "O-AC2 bash -e -n <suite> -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash -e -n kit/$SG_K_HOOKS/agent-cap.test.sh"
+run_role_bash "O-AC2 command -v <runner> -> allow, stderr EMPTY" 0 empty gov-builder Bash "command -v kit/$RUN_GATES/run-gates.sh"
+run_role_bash "O-AC2 python -c <program> <selftest.py> -> allow, stderr EMPTY" 0 empty gov-builder Bash "python -c \"print(1)\" kit/$SG_K_GOVKIT/selftest.py"
 run_role_bash "O-AC2 node -e <program> <script> --selftest -> allow, stderr EMPTY" 0 empty gov-builder Bash 'node -e "1" kit/x.js --selftest'
 # ---- AC3: the anchor — a cwd under no checkout falls back to CLAUDE_PROJECT_DIR; against a ---------
 # ---- checkRoleGate reading the payload cwd alone, the first row exits 0 and the third says nothing -
-run_role_bash "O-AC3 cwd under no checkout, CLAUDE_PROJECT_DIR the fixture -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash kit/run-gates/run-gates.sh' "$SG_NOREPO" "$SG_CWD_WT"
-run_role_bash "O-AC3 cwd under no checkout, no CLAUDE_PROJECT_DIR -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash kit/run-gates/run-gates.sh' "$SG_NOREPO"
-run_role_bash "O-AC3 cwd and CLAUDE_PROJECT_DIR under no checkout -> allow, one witness" 0 "one;;role-gate unarmed" gov-builder Bash 'bash kit/run-gates/run-gates.sh' "$SG_NOREPO" "$SG_NOREPO/$SGP"
+run_role_bash "O-AC3 cwd under no checkout, CLAUDE_PROJECT_DIR the fixture -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh" "$SG_NOREPO" "$SG_CWD_WT"
+run_role_bash "O-AC3 cwd under no checkout, no CLAUDE_PROJECT_DIR -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh" "$SG_NOREPO"
+run_role_bash "O-AC3 cwd and CLAUDE_PROJECT_DIR under no checkout -> allow, one witness" 0 "one;;role-gate unarmed" gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh" "$SG_NOREPO" "$SG_NOREPO/$SGP"
 # ---- AC3: arming — no index, a broken index, a manifest that does not read ------------------------
 write_roles absent
-run_role_bash "G-AC3 no index: gov-builder runs the bar -> allow, stderr EMPTY" 0 empty gov-builder Bash 'bash kit/run-gates/run-gates.sh'
+run_role_bash "G-AC3 no index: gov-builder runs the bar -> allow, stderr EMPTY" 0 empty gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh"
 write_roles broken
-run_role_bash "G-AC3 an index holding { : gov-builder runs the bar -> deny naming the index" 2 "any;;$SG_ROLES_SHOWN;;is not JSON" gov-builder Bash 'bash kit/run-gates/run-gates.sh'
+run_role_bash "G-AC3 an index holding { : gov-builder runs the bar -> deny naming the index" 2 "any;;$SG_ROLES_SHOWN;;is not JSON" gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh"
 run_role_bash "G-AC3 an index holding { : gov-builder runs ls -> allow, stderr EMPTY (no candidate reads no index)" 0 empty gov-builder Bash 'ls'
 write_gate_manifest kit/missing.json
-run_role_bash "G-AC3 a manifest that does not read: a leg's exact argv -> allow, one witness naming the unarmed row" 0 "one;;G1 leg unarmed" gov-builder Bash 'python kit/roles/check_roles.py'
-run_role_bash "G-AC3 a manifest that does not read: the bar runner still -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash 'bash kit/run-gates/run-gates.sh'
+run_role_bash "G-AC3 a manifest that does not read: a leg's exact argv -> allow, one witness naming the unarmed row" 0 "one;;G1 leg unarmed" gov-builder Bash "python kit/$SG_K_ROLES/check_roles.py"
+run_role_bash "G-AC3 a manifest that does not read: the bar runner still -> deny naming G2" 2 "any;;G2 runner" gov-builder Bash "bash kit/$RUN_GATES/run-gates.sh"
 write_roles absent
 rm -rf "$SGWT/kit"
 

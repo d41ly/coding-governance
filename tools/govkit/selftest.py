@@ -2776,7 +2776,7 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = 
         lines = ["", "[gate_runner]"]
         for k, v in seed.items():
             vals = v if isinstance(v, list) else [v]
-            vals = [x.replace("{prefix}", PFX[:-1]).replace("{kit}", PFX + KIT_NAMES["run-gates"])
+            vals = [resolve_prefix_token(x, PFX.rstrip("/")).replace("{kit}", PFX + KIT_NAMES["run-gates"])
                     for x in vals]
             manifest = vals[0] if k == "file" else manifest
             lines.append('%s = %s' % (k, "[" + ", ".join('"%s"' % x for x in vals) + "]"

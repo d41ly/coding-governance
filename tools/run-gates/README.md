@@ -696,11 +696,11 @@ can run its Linux-safe legs in WSL and only the declared Windows-only legs nativ
 never committed: `GATE_WSL_DISTRO=<distro>` and `GATE_WSL_MIRROR=<absolute ext4 path>`, the only two
 keys it admits. Without it the run asks WSL's default distro and uses the shared default mirror,
 `GATE_WSL_MIRROR_DEFAULT` in `.githooks/gate-env.sh`, and every run prints each value with its source.
-Then `bash tools/run-gates/run-held-wsl.sh --setup` clones the mirror from this clone, with remote
+Then `bash <prefix>/run-gates/run-held-wsl.sh --setup` clones the mirror from this clone, with remote
 `win` as the fetch source and `origin` the hosted URL. The mirror's parent must be writable inside
 WSL; the clone is the only write `--setup` makes.
 
-**A run.** `bash tools/run-gates/run-held-wsl.sh` refuses a dirty tree, pins `HEAD` and its
+**A run.** `bash <prefix>/run-gates/run-held-wsl.sh` refuses a dirty tree, pins `HEAD` and its
 fingerprint, and runs two halves at once: the runner under `GATE_FULL=1 GATE_SELFTESTS=1` over the
 Windows-only partition in a scratch `git clone --local`, and over the rest in a detached worktree of
 the mirror after `git fetch win`, with `/mnt/*` off `PATH` and `TMPDIR` on ext4. Each partition row

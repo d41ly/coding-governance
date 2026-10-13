@@ -1,6 +1,6 @@
 # TOOL-aSweptBar-4 — shipped-surface bans: each ban's own remedy, applied to the offenders it names
 
-**Status:** INPROGRESS · rev-1 · 2026-10-13 · node a · Tier-1 · base 53b25884 · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-10-13 · node a · Tier-1 · base 53b25884 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
