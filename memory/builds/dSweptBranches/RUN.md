@@ -9,8 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-asks-at-landing: TOOL-dSweptBranches-6=OPEN TOOL-dSweptBranches-18=OPEN
-units-at-landing: TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-4 TOOL-dSweptBranches-3 TOOL-dSweptBranches-5 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17
+asks-at-landing: TOOL-dSweptBranches-6=CLOSED TOOL-dSweptBranches-18=CLOSED TOOL-dSweptBranches-22=OPEN
+units-at-landing: TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-4 TOOL-dSweptBranches-3 TOOL-dSweptBranches-5 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-19 TOOL-dSweptBranches-20 TOOL-dSweptBranches-21 TOOL-dSweptBranches-23 TOOL-dSweptBranches-24
 hold-run: 
 hold-streak: 1 · at 71386064
 resume-owed: none · owner
@@ -19,13 +19,13 @@ hold-reason: the build is complete and closed-reviewed; landing waits on the par
 hold-until: owner
 hold-code: owner-decision
 held-from: VERIFYING
-gates-run: unattended-179185751247603718038-1121 45f76319
+gates-run: unattended-179189249165843924681-49995 d4debb1a
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 refreshed-at: 2b852f5fd87147540a0a73d310354440c84c72ea · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 3cb4e919d02ba8a574882d2302d37200a98366f4
-phase: VERIFYING
+phase: LANDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/musing-lumiere-ab7980
