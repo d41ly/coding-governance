@@ -1,6 +1,6 @@
 # PLAY-aOrientedCast-3 — the charter's `agent` and `returned` micro-formats, mandatory for every agent a turn dispatches or receives
 
-**Status:** OPEN · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams playbook · order 21
+**Status:** INPROGRESS · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams playbook · order 21
 
 <!-- gen:spec-records -->
 
