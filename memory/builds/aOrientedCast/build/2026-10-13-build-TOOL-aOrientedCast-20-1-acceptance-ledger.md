@@ -20,6 +20,12 @@ per-record sum, the returned line read `1.9k out` and the arm's comparison answe
 the second pass's re-render of `.claude/skills/build/SKILL.md` with `adopt-roles.sh --scaffold`,
 which AC8 and AC9's third grep observe, and AC7 on the live session.
 
+The second pass ran at the main loop, declared at `8ff53055`: `adopt-roles.sh --scaffold` re-rendered
+`.claude/skills/build/SKILL.md` to `roles@1.3` and `adopt-roles.sh --check` exited 0. In the dispatching
+session, `handoff.py agents --run wf_e1f19607-a29` printed this unit's `agent` and `returned` lines with
+no `unknown` field and created the build's agent ledger; eight more `--run` calls and one `--handoff`
+call over this resume's agents brought it to 36 lines. Arm 9's RED-first observation remains owed.
+
 **Evidences:** TOOL-aOrientedCast-20
 - AC1 — `1.6k out` — `agents --handoff <H> --session <S>` exited 0 and printed exactly the two lines §6 states, `effort medium` from the transcript, `wrote 2 files` and `7m47s`.
 - AC2 — `committed abc123def` — `agents --run wf_00000001-aaa` exited 0 and printed three lines: a0000000000000002's `agent` line with `effort xhigh`, `model claude-test-2`, `TOOL-tFix-1` and H's link; its `returned` line `committed abc123def · 45s · 1.5k out`; and a0000000000000003's `agent` line with `commit:specs:tFix` and `writes none · gates none`, with no `returned` line.
