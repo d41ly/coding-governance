@@ -9,9 +9,10 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 2b852f5fd87147540a0a73d310354440c84c72ea · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 5b01cd3496af41478d96d859c702eac51a1a08e2
-phase: BUILDING
+witness: 0ac2418c05fad32467e20a93f04b8546383a1c4d
+phase: REVIEWING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/musing-lumiere-ab7980
@@ -55,3 +56,11 @@ base: a8f0e195a2d80a6d1480e4992aec6565342e35ea
 2026-10-13T00:54:52Z dispatch · item 5bd6ca59 TOOL-dSweptBranches-5 · reason tools/branch-reconcile/SKILL.template.md tools/branch-reconcile/adopt-branch-reconcile.sh tools/branch-reconcile/kit.toml tools/branch-reconcile/README.md tools/branch-reconcile/branch_reconcile.py .claude/skills/branch-reconcile/SKILL.md .gitattributes tools/gate-legs.json tools/govkit/subject-pins.tsv memory/map/features/branch-reconcile.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-5.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-5-1-acceptance-ledger.md memory/builds/dSweptBranches/prompts/2026-10-13-prompt-TOOL-dSweptBranches-5-1-build-brief.md WIRE-INTO-PROJECT.md
 
 2026-10-13T00:55:31Z dispatch · item 5bd6ca59 TOOL-dSweptBranches-5 · reason tools/branch-reconcile/SKILL.template.md tools/branch-reconcile/adopt-branch-reconcile.sh tools/branch-reconcile/kit.toml tools/branch-reconcile/README.md tools/branch-reconcile/branch_reconcile.py .claude/skills/branch-reconcile/SKILL.md .gitattributes tools/gate-legs.json tools/govkit/subject-pins.tsv memory/map/features/branch-reconcile.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-5.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-5-1-acceptance-ledger.md memory/builds/dSweptBranches/prompts/2026-10-13-prompt-TOOL-dSweptBranches-5-1-build-brief.md WIRE-INTO-PROJECT.md memory/guides/SESSION-KICKOFF.md
+
+2026-10-13T00:57:21Z decision · item brief item 6: audit gov's memory-tree checks that read a merge of the default branch as additions, the blind spot inCMS's check 21 has (TOOL-dSweptBranches-6) · reason options: build it in this run, or file it; refused building it because the owner's prompt names it a separate ask rather than this run's unit, so it is filed as TOOL-dSweptBranches-6 in this build's BACKLOG.md for the owner to schedule
+
+2026-10-13T01:10:59Z review · item dSweptBranches · reason verdict BLOCKED · blockers 2
+
+2026-10-13T01:11:28Z dispatch · item 0ac2418c TOOL-dSweptBranches-3 · reason tools/branch-reconcile/branch_reconcile.py tools/branch-reconcile/selftest.py tools/branch-reconcile/README.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-3.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-3-1-acceptance-ledger.md memory/builds/dSweptBranches/reviews/2026-10-13-review-TOOL-dSweptBranches-1-2-3-4-5-closing-diff-round1.md memory/map/features/branch-reconcile.md
+
+2026-10-13T01:13:50Z dispatch · item 0ac2418c TOOL-dSweptBranches-3 · reason tools/branch-reconcile/branch_reconcile.py tools/branch-reconcile/selftest.py tools/branch-reconcile/README.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-1.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-2.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-3.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-4.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-5.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-3-1-acceptance-ledger.md memory/builds/dSweptBranches/reviews/2026-10-13-review-TOOL-dSweptBranches-1-2-3-4-5-closing-diff-round1.md memory/map/features/branch-reconcile.md

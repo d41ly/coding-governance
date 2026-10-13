@@ -1,6 +1,6 @@
 # TOOL-dSweptBranches-3 — write mode: a recovery manifest first, then deletes of the three landed verdicts only
 
-**Status:** CLOSED · rev-2 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 4
+**Status:** CLOSED · rev-3 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-13-build-TOOL-dSweptBranches-3-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-dSweptBranches-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-13-prompt-TOOL-dSweptBranches-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-1-brief.md) | research | TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 |
 | [2026-10-13-prompt-TOOL-dSweptBranches-3-1-build-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-3-1-build-brief.md) | journal | — |
+| [2026-10-13-review-TOOL-dSweptBranches-1-2-3-4-5-closing-diff-round1.md](../reviews/2026-10-13-review-TOOL-dSweptBranches-1-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 |
 
 <!-- /gen:spec-records -->
 
@@ -23,10 +24,12 @@ directory, so every deletion can be undone by hand.
 
 - **S1** — The deletable set is the rows whose verdict is `MERGED`, `EQUIVALENT` or `SUPERSEDED`.
   Every row's action column reads what write mode would do: `remove worktree`, `delete branch`,
-  `delete remote branch (--remote)`, or `keep · <why>`. The keeps are the default branch, matched by
-  name before the verdict is read, the primary worktree, a stash entry, a branch checked out in a
-  worktree that is kept, and every row outside the deletable set. The invoking worktree reads
-  `IN-PROGRESS` by unit 2's S5, so it is outside the set. Observed by AC2.
+  `delete remote branch (--remote)`, or `keep (<why>)`; no action carries the row separator
+  ` · `, so a report row parses. The keeps are the default branch, matched by name before the
+  verdict is read, the primary worktree, a stash entry, a deletable worktree that contains a kept
+  worktree, a branch checked out in a worktree that is kept, and every row outside the deletable
+  set. The invoking worktree reads `IN-PROGRESS` by unit 2's S5, so it is outside the set. Observed
+  by AC2 and AC5.
 - **S2** — The recovery manifest, `<git common dir>/branch-reconcile/recovery-<UTC stamp>.txt`, holds
   one line per local branch, remote branch and stash entry with its sha, and one per worktree with
   its path and `HEAD`. It is written and flushed before any deletion, and its path is printed.
@@ -113,6 +116,12 @@ arm points a bare repository at the fixture and observes which branches remain o
   exits 0.
   Red when: the failure aborts the run, the exit is 0 after a failure, or busy counts as one.
 
+- **AC5** — When `branch_reconcile.py --write` runs from a linked worktree, with the primary on
+  another branch and a kept worktree nested inside a deletable one, the primary, local `main` and
+  both nested worktrees survive, and their rows read `keep (the primary worktree)`,
+  `keep (the default branch)` and `keep (contains kept worktree …)`.
+  Red when: the containment keep, the primary keep, or both default-branch guards are removed.
+
 ## 7. Gates
 
 `branch-reconcile selftest` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `memory hygiene`
@@ -130,6 +139,10 @@ none
   default branch is excluded by name in two places, and AC4 takes unit 4's busy half by that spec's
   rev-2. `WRITE_TRACE` records each act before it runs, because a trace appended after the act let a
   manifest written late still read first.
+- rev-3 · 2026-10-13 · S1 · AC5 · the closing review's two blockers. B1: a deletable worktree that
+  contains a kept worktree is kept, because read_dirt hides the nested one from its container. B2:
+  the primary and default-branch keeps get a fixture in which each is the deciding keep. The keep
+  reasons move into parentheses, because the action column carried the row separator.
 
 ## 10. Reuse audit
 

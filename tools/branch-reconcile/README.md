@@ -106,6 +106,9 @@ python <this kit>/branch_reconcile.py --write --remote    # and the remote branc
 
 Only `MERGED`, `EQUIVALENT` and `SUPERSEDED` rows are ever acted on. The default branch is excluded
 by name before its verdict is read, and so are the primary worktree and every stash entry. A
+deletable worktree that contains a kept worktree — a session's harness worktrees under its own
+`.claude/worktrees/` — is kept, because removing it would take the kept one with it. Each keep reads
+`keep (<why>)` in the action column. A
 worktree is acted on only when its content was graded covered: dirty content with no counterpart on
 the default branch makes it `UNMERGED-LIVE` before its `HEAD` is read. The tool never merges into,
 commits on, checks out or pushes the default branch, and passes no hook-bypass flag; pre-push hooks

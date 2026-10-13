@@ -723,6 +723,11 @@
       "file": "tools/hooks/agent-cap.test.sh"
     },
     {
+      "id": "arm_keeps",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_landing",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"

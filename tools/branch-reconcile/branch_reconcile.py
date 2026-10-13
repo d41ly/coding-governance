@@ -801,18 +801,18 @@ def derive_action(inv, row, kept_branches):
     NAME before the verdict is read (TOOL-dSweptBranches-3)."""
     kind, name, verdict = row["kind"], row["name"], row["verdict"]
     if kind == "stash":
-        return "keep · a stash entry is never deleted"
+        return "keep (a stash entry is never deleted)"
     if (kind == "local" and name == inv["branch"]) or \
             (kind == "remote" and name == f"{inv['remote']}/{inv['branch']}"):
-        return "keep · the default branch"
+        return "keep (the default branch)"
     if kind == "worktree/primary":
-        return "keep · the primary worktree"
+        return "keep (the primary worktree)"
     if verdict not in DELETABLE:
         return "keep"
     if kind.startswith("worktree/"):
         return "remove worktree"
     if kind == "local":
-        return "keep · checked out in a kept worktree" if name in kept_branches else "delete branch"
+        return "keep (checked out in a kept worktree)" if name in kept_branches else "delete branch"
     return "delete remote branch (--remote)"
 
 
@@ -1013,11 +1013,19 @@ def build_rows(inv):
                      "ct": r["ct"], "evidence": evidence, "item": item})
     # A branch stays while any worktree that keeps it checked out stays: git refuses to delete it.
     wt_rows = [r for r in rows if "worktree" in r["item"]]
-    kept = set()
     for r in wt_rows:
         r["action"] = derive_action(inv, r, set())
-        if r["action"] != "remove worktree" and r["item"]["worktree"]["branch"]:
-            kept.add(r["item"]["worktree"]["branch"])
+    # A WORKTREE THAT CONTAINS A KEPT WORKTREE IS KEPT (closing review round 1, B1). read_dirt hides
+    # a nested worktree from its container's untracked content, so removing the container would take
+    # the kept one with it. Containment is transitive, so one pass over the kept set suffices.
+    held = [r["item"]["worktree"]["path"] for r in wt_rows if r["action"] != "remove worktree"]
+    for r in wt_rows:
+        if r["action"] == "remove worktree":
+            inner = sorted(p for p in held if check_under(p, r["item"]["worktree"]["path"]))
+            if inner:
+                r["action"] = f"keep (contains kept worktree {inner[0].replace(chr(92), '/')})"
+    kept = {r["item"]["worktree"]["branch"] for r in wt_rows
+            if r["action"] != "remove worktree" and r["item"]["worktree"]["branch"]}
     for r in rows:
         if "worktree" not in r["item"]:
             r["action"] = derive_action(inv, r, kept)

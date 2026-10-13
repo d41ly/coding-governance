@@ -26,7 +26,7 @@ from contextlib import redirect_stdout
 
 HERE = pathlib.Path(__file__).resolve().parent
 CLI = HERE / "branch_reconcile.py"
-ASSERTION_FLOOR = 52
+ASSERTION_FLOOR = 59
 PASS, FAIL = [], []
 SCRATCH = []
 
@@ -660,8 +660,51 @@ def arm_write():
               (rc, "busy — worktree" in out), (0, True))
 
 
+def arm_keeps():
+    """Closing review round 1, B1 and B2 — every keep is the DECIDING keep in some fixture.
+
+    B1: a deletable linked worktree holding a kept worktree inside it is kept. B2: run from a linked
+    worktree, with the primary on another branch, the primary worktree and local `main` survive only
+    through their own keeps, and their rows say so.
+    """
+    base = build_dir()
+    repo = seed_repo(base)
+    key = lambda p: str(p).replace("\\", "/")
+    with seed_environ():
+        run_git(repo, "branch", "x-br", "main")
+        outer = base / "fx" / "outer"
+        run_git(repo, "worktree", "add", "-q", str(outer), "x-br")
+        inner = outer / ".claude" / "worktrees" / "inner"
+        run_git(repo, "worktree", "add", "-q", "-b", "y-br", str(inner), "main")
+        (inner / "precious.txt").write_text("unlanded\n", encoding="utf-8")
+        run_git(repo, "checkout", "-q", "-b", "side")
+        here = base / "fx" / "here"
+        run_git(repo, "worktree", "add", "-q", "-b", "here-br", str(here), "main")
+        rows = read_rows(run_cli(here, "--fresh-hours", "0")[1])
+        outer_row = rows.get(("worktree/sibling", key(outer)))
+        check("keeps: B1 a worktree holding a kept worktree reads keep (contains kept worktree ...)",
+              bool(outer_row) and outer_row[6].startswith("keep (contains kept worktree"), True)
+        check("keeps: B2 the primary worktree reads keep (the primary worktree)",
+              rows.get(("worktree/primary", key(repo)), [""] * 8)[6], "keep (the primary worktree)")
+        check("keeps: B2 local main reads keep (the default branch)",
+              rows.get(("local", "main"), [""] * 8)[6], "keep (the default branch)")
+        check("keeps: B2 upstream/main reads keep (the default branch)",
+              rows.get(("remote", "upstream/main"), [""] * 8)[6], "keep (the default branch)")
+        inv = BR.read_inventory(here)
+        inv["fresh"] = 0
+        check("keeps: no action carries the row separator, so the report parses",
+              [r["action"] for r in BR.build_rows(inv) if " · " in r["action"]], [])
+        rc, out = run_main("--root", str(here), "--fresh-hours", "0", "--write")
+        branches = set(run_git(repo, "for-each-ref", "--format=%(refname:short)", "refs/heads").split())
+        check("keeps: B1 --write spares the container and the live worktree inside it",
+              (rc, outer.exists(), (inner / "precious.txt").exists(), "x-br" in branches),
+              (0, True, True, True))
+        check("keeps: B2 --write spares the primary and local main",
+              (repo.exists(), (repo / ".git").exists(), "main" in branches), (True, True, True))
+
+
 ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
-        arm_content, arm_stash, arm_remover, arm_write]
+        arm_content, arm_stash, arm_remover, arm_write, arm_keeps]
 
 
 def main():

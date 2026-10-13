@@ -9,6 +9,7 @@
 | [2026-10-13-build-TOOL-dSweptBranches-2-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-dSweptBranches-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-13-prompt-TOOL-dSweptBranches-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-1-brief.md) | research | TOOL-dSweptBranches-1 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 |
 | [2026-10-13-prompt-TOOL-dSweptBranches-2-1-build-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-2-1-build-brief.md) | journal | — |
+| [2026-10-13-review-TOOL-dSweptBranches-1-2-3-4-5-closing-diff-round1.md](../reviews/2026-10-13-review-TOOL-dSweptBranches-1-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-dSweptBranches-1 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 |
 
 <!-- /gen:spec-records -->
 
