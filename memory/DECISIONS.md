@@ -135,6 +135,7 @@
 - TOOL-dUnstuckLanding-23 · OWNER RULING (2026-10-04), superseding D8 as `build-complete` applies it: a build lands its CLOSED units when every other unit is DEFERRED with an open ask it filed and no CLOSED unit consumes-from one.
 - TOOL-dUnstuckLanding-24 · OWNER RULING (2026-10-04): dUnstuckLanding's close runs the kit self-tests once (`GATE_FULL=1 GATE_SELFTESTS=1`), as the kit Definition of Done asks; unit passes still run no suite. A per-build exception to the standing rule of 2026-08-23.
 - TOOL-dUnstuckLanding-28 · OWNER RULING (2026-10-04), superseding TOOL-dDerivedDocket-73's 'the template's section 7 line stays': the template's section 7 line now also points at the inherited-red policy, UNATTENDED-STOPS.md section 13, since the kit default is land.
+- TOOL-aOrientedCast-23 · a run may RAISE a measured-file row of the size limits on the four terms that file's header states; M3 and the size gate point there (owner, 2026-10-13: the AGENTS.md raise "was perfectly resolvable on your own").
 
 ## DEPL — deployer
 

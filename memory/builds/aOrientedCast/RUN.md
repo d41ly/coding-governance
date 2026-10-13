@@ -248,3 +248,13 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-13T03:24:33Z rescope · item add TOOL-aOrientedCast-24 · reason M4 promotion of the second closing review (CLEAN WITH FIXES, 0 blockers): its hooks and unattended minors M1, M2, M3, M7, L1, L2, L3, batched by write set (memory/builds/aOrientedCast/reviews/2026-10-13-review-TOOL-aOrientedCast-16-closing-diff-round1.md)
 
 2026-10-13T03:24:35Z rescope · item add TOOL-aOrientedCast-25 · reason M4 promotion of the second closing review: its roles minors M4, M5, M6, L4, L5, L6, L7, batched by write set, disjoint from TOOL-aOrientedCast-24 (memory/builds/aOrientedCast/reviews/2026-10-13-review-TOOL-aOrientedCast-16-closing-diff-round1.md)
+
+2026-10-13T08:52:13Z brief · item TOOL-aOrientedCast-24 · reason e7ed11e25bf7 memory/builds/aOrientedCast/prompts/2026-10-13-prompt-TOOL-aOrientedCast-24-2-build-brief.md
+
+2026-10-13T08:52:43Z rescope · item defer TOOL-aOrientedCast-23 · reason parked for the owner: §8 F1 asks to change BUILD-METHOD M3, a governance carrier the owner's AGENTS.md ruling did not cover; deferred so the order gate admits TOOL-aOrientedCast-24 and -25 behind it
+
+2026-10-13T08:55:23Z decision · item TOOL-aOrientedCast-23 ratified term 4 says the raising unit's same commit adds its memory/DECISIONS.md row, but a pass may not declare that shared record · reason options: (a) reword term 4 to 'the run records that unit's row in memory/DECISIONS.md before or with the raise'; (b) keep it and let a raising pass write the row as a declared exception. Refused: the owner ratified the text as written, and rewording ratified text of a governance carrier is the owner's
+
+2026-10-13T08:55:49Z brief · item TOOL-aOrientedCast-23 · reason e7ed11e25bf7 memory/builds/aOrientedCast/prompts/2026-10-13-prompt-TOOL-aOrientedCast-24-2-build-brief.md
+
+2026-10-13T08:56:46Z dispatch · item 95667f05 TOOL-aOrientedCast-23 · reason tools/template-size-limits.txt tools/check-template-size.sh tools/memory-tree/BUILD-METHOD.template.md tools/memory-tree/HYGIENE.template.md tools/memory-tree/SPEC-TEMPLATE.template.md tools/memory-tree/ANNOTATION-STYLE.template.md tools/memory-tree/check-memory-hygiene.sh memory/guides/BUILD-METHOD.md memory/HYGIENE.md memory/TEMPLATE-SPEC.md memory/guides/ANNOTATION-STYLE.md memory/guides/SESSION-KICKOFF.md memory/map/features/memory-tree.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/aOrientedCast/spec/2026-10-13-spec-TOOL-aOrientedCast-23.md memory/builds/aOrientedCast/build/2026-10-13-build-TOOL-aOrientedCast-23-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md

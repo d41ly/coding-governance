@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-23 — one stated answer on which declared size ceilings a run may raise, held in the limits file and pointed at by M3 and the size gate
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 25
+**Status:** INPROGRESS · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
@@ -31,8 +31,9 @@ gate point at it rather than answer the question a second time.
   stated terms changes no governance carrier. Observed by AC2, AC4 and AC7.
 - **S3** — The over-budget message of `tools/check-template-size.sh` (`:144-148`) stops calling every
   raise the owner's and points at the limits file's header. Observed by AC3 and AC4.
-- **S4** — `memory/DECISIONS.md` gains this unit's row at the end of its `## TOOL — tooling` group.
-  Observed by AC5.
+- **S4** — `memory/DECISIONS.md` holds this unit's row at the end of its `## TOOL — tooling` group,
+  written by the main loop before the build: a pass may not declare that shared record, so the
+  pass observes the row and writes none (§4 "The decision row"). Observed by AC5.
 - **S5** — The memory-tree kit moves from 2.147 to 2.148 with every carrier
   `tools/check-kit-versions.sh` asserts. Observed by AC6.
 - **S6** — The same commit re-stamps `last-audit` in `memory/guides/SESSION-KICKOFF.md`, whose
@@ -139,9 +140,10 @@ it, and neither restates a term. AC4 observes that.
 
 ### The decision row
 
-Appended after the `## TOOL — tooling` group's last row and before `## DEPL — deployer`
-(`memory/DECISIONS.md:138`), 239 characters, under the 300 that `ENTRY_CAP_CHARS` allows an index
-entry:
+The main loop appends this row before the build, after the `## TOOL — tooling` group's last row and
+before `## DEPL — deployer` (`memory/DECISIONS.md:138`). A pass may not declare that shared record
+in its write set, so the builder writes no row: it observes this one by AC5 and leaves the file
+alone. The row is 239 characters, under the 300 that `ENTRY_CAP_CHARS` allows an index entry:
 
 ```text
 - TOOL-aOrientedCast-23 · a run may RAISE a measured-file row of the size limits on the four terms that file's header states; M3 and the size gate point there (owner, 2026-10-13: the AGENTS.md raise "was perfectly resolvable on your own").
@@ -176,7 +178,6 @@ version 2.148. No function, file, conf key or flag is minted, so no `.lexicon.co
 `memory/HYGIENE.md`
 `memory/TEMPLATE-SPEC.md`
 `memory/guides/ANNOTATION-STYLE.md`
-`memory/DECISIONS.md`
 `memory/guides/SESSION-KICKOFF.md`
 
 ### Rollout
@@ -187,7 +188,7 @@ version 2.148. No function, file, conf key or flag is minted, so no `.lexicon.co
 3. Move the version in every carrier; `python tools/govkit/govkit.py selfcheck --fix` writes the
    template markers from the constant, and where the role gate refuses it to the builder, the
    builder edits every file `git grep -l "gov:kit memory-tree@2.147"` lists.
-4. Append the decision row.
+4. Confirm the decision row the main loop wrote before the build is in place, by AC5; write none.
 5. Re-stamp `last-audit` in `memory/guides/SESSION-KICKOFF.md` at staging, and derive check 9's count
    as `PLAY-aOrientedCast-2` §4 "Rollout" step 7 states, advancing `last-body-change` at 9 or more.
 6. Commit once, with the unit id in the subject.
@@ -213,7 +214,7 @@ gov's alone. Rollback is a revert of the one commit.
 - observability — every raise a run takes leaves an argued RAISED paragraph and a decision row, by
   terms 3 and 4.
 - risks — the terms are graded by review, not by a gate (§3), so a raise that skips term 4 lands
-  green; the size-gate arm is the named follow-up. Whether this unit may change M3 at all is §8 F1.
+  green; the size-gate arm is the named follow-up. The owner ratified the change to M3 (§8 F1).
 - testing — the greps of §6; the size, parity, version, method-carrier, manifest and hygiene legs at
   the close. No new arm.
 - migration — none; rollback is a revert.
@@ -243,9 +244,10 @@ commit.
   `grep -n "^## \|^- TOOL-aOrientedCast-23 · " memory/DECISIONS.md` shows the row between
   `## TOOL — tooling` and `## DEPL — deployer`; and
   `grep "^- TOOL-aOrientedCast-23 · " memory/DECISIONS.md | awk '{ print length($0) }'` prints at
-  most 300.
-  Red when: the rule has no decision row, the row sits outside its group or twice, or it passes the
-  index's entry cap.
+  most 300; and on the unit's commit `git diff --name-only HEAD~1 HEAD -- memory/DECISIONS.md`
+  prints nothing.
+  Red when: the rule has no decision row, the row sits outside its group or twice, it passes the
+  index's entry cap, or the unit's own commit writes the record the main loop owns.
 - **AC6** — When `grep -c "^KIT_MEMORY_TREE_VERSION=2.148" tools/memory-tree/check-memory-hygiene.sh`
   prints 1 and `git grep -l "gov:kit memory-tree@2.147" -- tools memory/HYGIENE.md memory/TEMPLATE-SPEC.md memory/guides`
   prints nothing, every carrier moved.
@@ -280,6 +282,8 @@ This unit adds no gate arm. The main loop runs the legs once, at the close; no p
   run to take for itself. (c) leaves M3 and the gate answering the question the other way, which
   is the defect this unit exists to remove.
   Recommendation: (a). This fork is the owner's; the builder takes no option before the ruling.
+  RESOLVED (owner, 2026-10-13): (a), §4 "The rule" and "The pointers" ratified as written, with no
+  cap on a raise, chosen over a capped raise and over retiring the unit.
 - **F2 — Which text holds the terms, and which point?**
   (a) The limits file's header holds them; M3 and the gate point at it. (b) M3 holds them; the header
   and the gate point at M3. (c) Each states them.
@@ -293,6 +297,11 @@ This unit adds no gate arm. The main loop runs the legs once, at the close; no p
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft.
+- rev-2 · 2026-10-13 · §8 F1 · S4 · AC5 · §4 · §5 · the owner ratified §4 "The rule" and "The
+  pointers" as written, with no cap, over a capped raise and over retiring the unit, and F1 is
+  marked. The decision row moves to the main loop, written before the build because a pass may not
+  declare that shared record: S4, §4 "The decision row", rollout step 4 and AC5 have the builder
+  observe it and write none, and files touched drops `memory/DECISIONS.md`.
 
 ## 10. Reuse audit
 
