@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-25 — the second closing review's roles minors: one marker reading, armed rules, one fence reading, and records that say what was built
 
-**Status:** OPEN · rev-3 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 27 · ratified 2026-10-13
+**Status:** INPROGRESS · rev-3 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 27 · ratified 2026-10-13
 
 <!-- gen:spec-records -->
 
