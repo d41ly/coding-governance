@@ -1,12 +1,14 @@
 # TOOL-dSweptBranches-2 — the verdict ladder: six verdicts over refs and worktree content, each with its evidence
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-TOOL-dSweptBranches-2-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-dSweptBranches-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-13-prompt-TOOL-dSweptBranches-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-1-brief.md) | research | TOOL-dSweptBranches-1 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 |
+| [2026-10-13-prompt-TOOL-dSweptBranches-2-1-build-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-2-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -30,8 +32,9 @@ predicates are the method one inCMS session derived by hand over several hours, 
   Observed by AC1 to AC8.
 - **S2** — A unique commit is one `git rev-list <default>..<tip>` lists. A merge commit among them is
   covered when every parent is an ancestor of the default branch or is itself a unique commit. A
-  non-merge commit is covered by the first of four predicates that holds, and the evidence counts
-  each predicate's commits:
+  non-merge commit `git cherry` marks `-` is covered as `patch-id`. Any other non-merge commit is
+  covered by the first of four predicates that holds, and the evidence counts each predicate's
+  commits:
   - **patch** — a commit in `<merge-base>..<default>` carries the identical subject, and the
     multisets of the two patches' `+` and `-` lines differ by at most `DRIFT_LINES` (4) lines. A
     rebased copy that drifted by a line or two per patch is matched; `git cherry` misses it.
@@ -43,9 +46,10 @@ predicates are the method one inCMS session derived by hand over several hours, 
     (`<memory root>/builds/<slug>/RUN*.md`), and the default branch shows that build landed: its
     `RUN.md` there records phase `LANDED`, or a merge in `<merge-base>..<default>` names the slug.
     Observed by AC3.
-  - **rotated** — every file the commit touched is under the memory root, at least one added line
-    carries a row id, and every row id it adds is found by `git grep -F` anywhere under the memory
-    root at the default tip, archives included. Observed by AC4.
+  - **rotated** — every file the commit touched is under the memory root, every non-blank line it
+    adds is a ROW (its first token, after list or table markup, is a row id), and a row headed by
+    each such id exists anywhere under the memory root at the default tip, archives included. A line
+    that merely cites an id is content of its own, never a rotated row. Observed by AC4.
 - **S3** — The merge-tree no-op proof: `git merge-tree --write-tree <default> <tip>` exits 0 and
   prints the default tip's own tree. It is only ever a positive proof. Its conflict count is never
   read, because a stale, fully landed branch conflicts heavily. A git without `--write-tree` makes it
@@ -55,7 +59,7 @@ predicates are the method one inCMS session derived by hand over several hours, 
     commits name, whose `phase` fact is not `LANDED` or `ABORTED` and whose `lease-utc` lies within
     the freshness bound;
   - a build README the tip carries, for a slug the unique commits name, whose generated status is
-    not `CLOSED`;
+    not `CLOSED` or `WONTDO`, unless the default branch's copy is;
   - a tip committed within the freshness bound, `FRESH_HOURS` (24), which `--fresh-hours` overrides.
   The run records are read as data at the tip and are never written. Observed by AC6.
 - **S5** — A worktree's verdict. A worktree is `IN-PROGRESS` when it is the one the tool was invoked
@@ -72,7 +76,12 @@ predicates are the method one inCMS session derived by hand over several hours, 
     never covered and makes the worktree `UNKNOWN`.
   Uncovered content makes the worktree `UNMERGED-LIVE`. Observed by AC7.
 - **S6** — A stash entry is `SUPERSEDED` when every path its working-tree commit changed already
-  holds those bytes at the default tip, else `UNKNOWN`. Observed by AC8.
+  holds those bytes at the default tip, else `UNKNOWN`. A stash carrying untracked files is
+  `UNKNOWN`. Observed by AC8.
+- **S7** — A predicate that raises an `OSError`, `ValueError`, `KeyError` or `IndexError` leaves its
+  row `UNKNOWN`, naming the predicate, and adds one `skipped` line. NOT OBSERVED — no
+  fixture this node can build makes git fail mid-predicate, and a monkeypatched raise would test the
+  wrapper and not git.
 
 ## 3. Non-goals (OUT)
 
@@ -150,8 +159,10 @@ arm is written and observed red against unit 1's stub before its predicate is wr
 - **AC3** — When it runs over the records-only fixture, the branch reads `SUPERSEDED` by `records`.
   Red when: the predicate is the stub, or the default branch's `RUN.md` is not `LANDED`.
 - **AC4** — When it runs over the rotated-row fixture, whose row id exists only under the memory
-  root's `archive/`, the branch reads `SUPERSEDED` by `rotated`.
-  Red when: the predicate is the stub, or the search reads only the live log.
+  root's `archive/`, the branch reads `SUPERSEDED` by `rotated`; a branch whose spec prose cites
+  that same id reads `UNMERGED-LIVE`.
+  Red when: the predicate is the stub, the search reads only the live log, or an added line that
+  only cites an id counts as a row.
 - **AC5** — When the merge-tree fixture's branch adds and then reverts a line, it reads `SUPERSEDED`
   by the no-op proof, and a stale landed branch with conflicts never reads `SUPERSEDED` by it.
   Red when: the proof is the stub, or it reads the conflict count.
@@ -182,6 +193,12 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft.
+- rev-2 · 2026-10-13 · S2 · S4 · S6 · S7 · AC4 · what the build pass settled. S2 counts a commit
+  `git cherry` marks applied as `patch-id`. The rotated predicate takes rows only: run over gov's own
+  tree, the first version called a 250-line spec rewrite `SUPERSEDED` because every id its prose
+  cited existed somewhere, and AC4 gains that case as a negative. S4 lets a default-branch copy of a
+  build README that is terminal override the tip's. S6 names a stash with untracked files. S7 states
+  the raise rule.
 
 ## 10. Reuse audit
 

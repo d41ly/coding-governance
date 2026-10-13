@@ -5,7 +5,7 @@ feature = "branch-reconcile"
 title = "One read-only report giving every worktree, branch and stash entry a verdict with its evidence, so a cleanup removes only what landed"
 status = "shipped"
 streams = ["tooling"]
-decisions = ["TOOL-dSweptBranches-1"]
+decisions = ["TOOL-dSweptBranches-1", "TOOL-dSweptBranches-2"]
 
 [claims]
 gate-legs = ["branch-reconcile selftest"]
@@ -62,6 +62,8 @@ extend via one predicate function in `PREDICATES`, at the rung its verdict belon
 
 ## Gaps
 
-- The verdicts are `UNKNOWN` until the verdict ladder lands (TOOL-dSweptBranches-2).
+- `landing` trusts a merge that names the unit and touched the same files; it does not compare
+  bytes, so a pre-fold edit the fold then reverted reads covered. The prompt that commissioned the
+  kit chose that rule.
 - A worktree whose path git reports in a form `os.path.normcase` does not fold, such as an 8.3 short
   name, compares unequal to its long form.

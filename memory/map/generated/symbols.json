@@ -713,9 +713,49 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "arm_content",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_growth_denies",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "arm_landing",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_lease",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_noop",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_patch",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_records",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_rotated",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_stash",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "arm_wall",
@@ -3043,6 +3083,11 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "check_ancestor",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "check_anomaly_sources",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -3161,6 +3206,11 @@
       "id": "check_build_backlog",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "check_build_landed",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "check_built_from_history",
@@ -3895,6 +3945,11 @@
     {
       "id": "check_names",
       "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_names",
+      "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
     },
     {
@@ -3906,6 +3961,11 @@
       "id": "check_names_id",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "check_noop",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "check_one_line_regions",
@@ -4253,6 +4313,11 @@
       "file": "tools/memory-tree/routed_commits.py"
     },
     {
+      "id": "check_row_on_default",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "check_run_call",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -4426,6 +4491,11 @@
       "id": "check_stamp_line",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "check_stash",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "check_status_one_line",
@@ -4651,6 +4721,11 @@
       "id": "check_worksheets_signed",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "check_worktree",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "check_written_asks",
@@ -5758,6 +5833,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_coverage",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "derive_dead_streaks",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -6203,6 +6283,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "derive_names",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "derive_nearest_vintage",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -6401,6 +6486,11 @@
       "id": "derive_row_identity",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "derive_row_ids",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "derive_row_re",
@@ -10993,6 +11083,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "read_at",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "read_attribution_tokens",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -11151,6 +11246,11 @@
       "id": "read_cache",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "read_cached",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "read_canon_refusal",
@@ -11338,6 +11438,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "read_default_tree",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "read_defs_at_sha",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -11481,6 +11586,11 @@
       "id": "read_filed_days",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_files",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "read_files_touched",
@@ -11998,6 +12108,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "read_memory_root",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "read_merge_heads",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -12068,6 +12183,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_newest_activity",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "read_newest_unit",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
@@ -12121,6 +12241,11 @@
       "id": "read_pass_declarations",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "read_patch_lines",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "read_pauses",
@@ -12353,6 +12478,11 @@
       "file": "tools/run-gates/post-merge.sh"
     },
     {
+      "id": "read_report",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "read_rev",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -12416,6 +12546,11 @@
       "id": "read_run_exclusions",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "read_run_fact",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "read_run_fact",
@@ -12486,6 +12621,11 @@
       "id": "read_shell_function",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_side",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "read_signal_table_names",
@@ -12846,6 +12986,11 @@
       "id": "read_utc_now",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_verdict",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "read_verdict",
@@ -17643,6 +17788,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "scan_test_cases",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
       "id": "scan_text_io",
       "kind": "function",
       "file": "tools/gate-lint/encoding_posture.py"
@@ -17868,6 +18018,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "seed_lines",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "seed_log",
       "kind": "function",
       "file": "tools/unattended/resume-tick.test.sh"
@@ -17876,6 +18031,11 @@
       "id": "seed_mode_fixture",
       "kind": "function",
       "file": "tools/check-wiring.test.sh"
+    },
+    {
+      "id": "seed_publish",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "seed_range_fixture",

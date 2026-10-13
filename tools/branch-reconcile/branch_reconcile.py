@@ -19,12 +19,15 @@ rules are the kit README's (TOOL-dSweptBranches-1 to -4).
 from __future__ import annotations
 
 import argparse
+import collections
 import datetime
 import os
 import pathlib
+import re
 import subprocess
 import sys
 import tempfile
+import time
 
 KIT_BRANCH_RECONCILE_VERSION = "1.0"
 
@@ -40,6 +43,8 @@ DELETABLE = frozenset([MERGED, EQUIVALENT, SUPERSEDED])
 KIND_RANK = ["worktree/primary", "worktree/nested", "worktree/sibling", "worktree/temp",
              "worktree/elsewhere", "local", "remote", "stash"]
 NESTED_DIR = ".claude/worktrees"
+# A tip, a lease or a worktree touched this recently is somebody's work in progress.
+FRESH_HOURS = 24.0
 
 
 class Refusal(Exception):
@@ -344,42 +349,441 @@ def read_inventory(root):
     return {"root": str(root), "remote": remote, "branch": branch, "default_ref": ref,
             "default_tip": tip, "default_ct": read_commit_time(root, ref), "notes": notes,
             "primary": primary, "worktrees": worktrees, "refs": read_refs(root, remote),
-            "stash": read_stash(root), "skips": {}}
+            "stash": read_stash(root), "skips": {}, "fresh": FRESH_HOURS * 3600, "now": time.time()}
+
+
+# ------------------------------------------------------------------------------- the default side
+# Everything a predicate compares against is read once per repository or per merge base and cached
+# in inv["cache"]: the default tree's blobs, the commits the default branch gained since a merge base,
+# and each commit's patch lines and files.
+
+def read_cached(inv, key, fn):
+    cache = inv.setdefault("cache", {})
+    if key not in cache:
+        cache[key] = fn()
+    return cache[key]
+
+
+def read_memory_root(inv):
+    """MEMORY_ROOT from `.memory-tree.conf` at the repository top, else `memory`."""
+    def load():
+        top = read_git(inv["root"], "rev-parse", "--show-toplevel")
+        conf = pathlib.Path(top or inv["root"]) / ".memory-tree.conf"
+        if conf.is_file():
+            for line in conf.read_text(encoding="utf-8", errors="replace").splitlines():
+                m = re.match(r'^\s*MEMORY_ROOT\s*=\s*"?([^"#\s]+)"?', line)
+                if m:
+                    return m.group(1).strip("/")
+        return "memory"
+    return read_cached(inv, "memory-root", load)
+
+
+def read_default_tree(inv):
+    """-> {path: blob sha} for every file at the default tip."""
+    def load():
+        out = read_git(inv["root"], "ls-tree", "-r", "-z", "--full-tree", inv["default_ref"])
+        tree = {}
+        for entry in out.split("\0"):
+            meta, _, path = entry.partition("\t")
+            parts = meta.split()
+            if len(parts) == 3 and parts[1] == "blob":
+                tree[path] = parts[2]
+        return tree
+    return read_cached(inv, "default-tree", load)
+
+
+def read_side(inv, mb):
+    """-> ({subject: [non-merge sha]}, [(merge sha, subject)]) for <mb>..<default>."""
+    def load():
+        by_subject, merges = {}, []
+        out = read_git(inv["root"], "log", "--format=%H%x00%P%x00%s", f"{mb}..{inv['default_ref']}")
+        for line in out.splitlines():
+            sha, parents, subject = line.split("\0", 2)
+            if len(parents.split()) > 1:
+                merges.append((sha, subject))
+            else:
+                by_subject.setdefault(subject, []).append(sha)
+        return by_subject, merges
+    return read_cached(inv, ("side", mb), load)
+
+
+def read_patch_lines(inv, sha):
+    """-> Counter of a commit's `+` and `-` lines, headers dropped."""
+    def load():
+        out = run_git(inv["root"], "show", "--format=", "--no-color", "--no-ext-diff", "-U0",
+                      "--no-renames", sha)[1]
+        return collections.Counter(line for line in out.splitlines()
+                                   if line[:1] in "+-" and not line.startswith(("+++", "---")))
+    return read_cached(inv, ("lines", sha), load)
+
+
+def read_files(inv, sha, merge=False):
+    """-> the paths a commit touched; a merge's against its first parent."""
+    def load():
+        args = ["diff", "--name-only", "--no-renames", f"{sha}^1", sha] if merge else \
+            ["show", "--format=", "--name-only", "--no-renames", sha]
+        return frozenset(p for p in read_git(inv["root"], *args).splitlines() if p)
+    return read_cached(inv, ("files", sha, merge), load)
+
+
+def check_ancestor(inv, sha):
+    return read_cached(inv, ("anc", sha), lambda: run_git(
+        inv["root"], "merge-base", "--is-ancestor", sha, inv["default_ref"])[0] == 0)
+
+
+def check_row_on_default(inv, row_id):
+    """True when a ROW headed by <row_id> exists under the memory root at the default tip, archives
+    included. A row is a line whose first token, after list or table markup, is the id; a line that
+    merely cites the id elsewhere is not one (a spec citing ten ids is not ten rotated rows)."""
+    mem = read_memory_root(inv)
+    return read_cached(inv, ("row", row_id), lambda: run_git(
+        inv["root"], "grep", "-E", "-q", "-e", ROW_HEAD + row_id + "([^A-Za-z0-9]|$)",
+        inv["default_ref"], "--", mem)[0] == 0)
+
+
+def derive_row_ids(lines):
+    """-> the row ids a commit adds, or an empty set when any added line is not a row.
+
+    The rotated predicate covers a commit that adds ROWS only. One added line of prose means the
+    commit carries content of its own, which a row elsewhere cannot vouch for.
+    """
+    ids = set()
+    for line in lines:
+        if not line.startswith("+") or not line[1:].strip():
+            continue
+        m = re.match(ROW_HEAD + ID_RE.pattern, line[1:])
+        if not m:
+            return set()
+        ids.add(ID_RE.search(line[1:]).group(0))
+    return ids
+
+
+ID_RE = re.compile(r"(?<![A-Za-z0-9-])[A-Z][A-Z0-9]{1,9}-[a-z][A-Za-z0-9]*-\d+(?![A-Za-z0-9])")
+# A row's head: optional list or table markup, an optional link bracket, then the id. POSIX ERE as
+# well as Python, because `git grep -E` reads it too, so no `(?:` group. Ids carry only letters,
+# digits and hyphens, so one spliced into it needs no escaping.
+ROW_HEAD = r"^[ \t]*([-*|][ \t]*)?\[?"
+SCOPE_RE = re.compile(r"^[a-z][a-z-]*\(([A-Za-z0-9]+)\)")
+DRIFT_LINES = 4
+
+
+def derive_names(subject):
+    """-> the unit ids and slugs a commit subject names: `FAMILY-slug-seq` ids and a `type(slug):` scope."""
+    names = set(ID_RE.findall(subject))
+    names |= {i.split("-")[1] for i in list(names)}
+    m = SCOPE_RE.match(subject)
+    if m:
+        names.add(m.group(1))
+    return names
+
+
+def check_names(names, subject):
+    return any(re.search(r"(?<![A-Za-z0-9-])" + re.escape(n) + r"(?![A-Za-z0-9])", subject)
+               for n in names)
+
+
+def read_run_fact(text, key):
+    m = re.search(rf"^{re.escape(key)}:[ \t]*(\S.*?)\s*$", text or "", re.M)
+    return m.group(1) if m else ""
+
+
+def read_at(inv, rev, path):
+    rc, out = run_git(inv["root"], "show", f"{rev}:{path}")
+    return out if rc == 0 else None
+
+
+def check_build_landed(inv, slug, merges):
+    """The default branch shows <slug> landed: its run record says LANDED, or a merge names it."""
+    mem = read_memory_root(inv)
+    run = read_at(inv, inv["default_ref"], f"{mem}/builds/{slug}/RUN.md")
+    if read_run_fact(run, "phase") == "LANDED":
+        return True
+    tree = read_default_tree(inv)
+    if any(p.startswith(f"{mem}/builds/{slug}/RUN.LANDED.") for p in tree):
+        return True
+    return any(check_names({slug}, subject) for _sha, subject in merges)
+
+
+def derive_coverage(inv, tip):
+    """-> what covers each unique commit of <tip>, or why that could not be read. Cached by tip."""
+    def load():
+        root, dref = inv["root"], inv["default_ref"]
+        mb = read_git(root, "merge-base", dref, tip)
+        if not mb:
+            return {"error": f"shares no history with {inv['branch']}"}
+        rc, out = run_git(root, "rev-list", "--parents", f"{dref}..{tip}")
+        if rc != 0:
+            return {"error": "git rev-list failed"}
+        commits = [line.split() for line in out.splitlines() if line.strip()]
+        unique = {c[0] for c in commits}
+        applied = {line[2:].strip() for line in read_git(root, "cherry", dref, tip).splitlines()
+                   if line.startswith("- ")}
+        by_subject, merges = read_side(inv, mb)
+        mem = read_memory_root(inv)
+        run_re = re.compile(rf"^{re.escape(mem)}/builds/([A-Za-z0-9]+)/RUN(\.[^/]*)?\.md$")
+        counts, landings, uncovered, slugs = {}, set(), [], set()
+        for c in commits:
+            sha, parents = c[0], c[1:]
+            subject = read_git(root, "log", "-1", "--format=%s", sha)
+            slugs |= {n for n in derive_names(subject) if not ID_RE.fullmatch(n)}
+            how = None
+            if len(parents) > 1:
+                if all(p in unique or check_ancestor(inv, p) for p in parents):
+                    how = "merge"
+            elif sha in applied:
+                how = "patch-id"
+            else:
+                lines = read_patch_lines(inv, sha)
+                for cand in by_subject.get(subject, []):
+                    a, b = lines, read_patch_lines(inv, cand)
+                    if sum(((a - b) + (b - a)).values()) <= DRIFT_LINES:
+                        how = "patch"
+                        break
+                files = read_files(inv, sha)
+                names = derive_names(subject)
+                if how is None and names:
+                    for msha, msubject in merges:
+                        if check_names(names, msubject) and files <= read_files(inv, msha, True):
+                            how = "landing"
+                            landings.add(msha[:12])
+                            break
+                if how is None and files and all(run_re.match(f) for f in files):
+                    if all(check_build_landed(inv, run_re.match(f).group(1), merges) for f in files):
+                        how = "records"
+                if how is None and files and all(f.startswith(mem + "/") for f in files):
+                    ids = derive_row_ids(lines)
+                    if ids and all(check_row_on_default(inv, i) for i in sorted(ids)):
+                        how = "rotated"
+            if how is None:
+                uncovered.append((sha, subject))
+            else:
+                counts[how] = counts.get(how, 0) + 1
+        return {"error": "", "unique": len(commits), "counts": counts, "landings": sorted(landings),
+                "uncovered": uncovered, "slugs": sorted(slugs)}
+    return read_cached(inv, ("coverage", tip), load)
+
+
+def check_noop(inv, tip):
+    """The merge-tree proof: merging <tip> into the default branch yields the default's own tree.
+
+    Only ever a POSITIVE proof. Its conflict count is never read: a stale branch whose every commit
+    landed conflicts heavily, so the count separates nothing.
+    """
+    def load():
+        if inv.get("no-merge-tree"):
+            return False
+        rc, out = run_git(inv["root"], "merge-tree", "--write-tree", inv["default_ref"], tip)
+        if rc not in (0, 1):
+            inv["no-merge-tree"] = True
+            inv["skips"]["merge-tree no-op proof"] = "this git has no `merge-tree --write-tree`"
+            return False
+        tree = read_git(inv["root"], "rev-parse", inv["default_ref"] + "^{tree}")
+        return rc == 0 and out.split("\n", 1)[0].strip() == tree
+    return read_cached(inv, ("noop", tip), load)
 
 
 # ------------------------------------------------------------------------------- the verdict seam
 # One function per predicate, each returning (verdict, evidence) or None for "not decided". The
-# ladder reads them in order and falls to UNKNOWN. TOOL-dSweptBranches-2 replaces the stubs.
+# ladder reads them in order and falls to UNKNOWN (TOOL-dSweptBranches-2).
+
+TEST_CASE_RES = [re.compile(r"^\s*def (test_\w+)\s*\(", re.M),
+                 re.compile(r"\b(?:it|test)\(\s*[\"']([^\"']+)[\"']"),
+                 re.compile(r"^\s*arm\s+\"([^\"]+)\"", re.M)]
+
+
+def scan_test_cases(path):
+    try:
+        text = pathlib.Path(path).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return []
+    return sorted({m for rx in TEST_CASE_RES for m in rx.findall(text)})
+
+
+def read_newest_activity(inv, w):
+    """-> the newest of the worktree's HEAD commit time, its index's mtime and each dirty path's mtime."""
+    stamps = [w["ct"]]
+    st = w["dirt"]
+    if st is not None:
+        index = read_git_path(w["path"], "index")
+        paths = [index] if index is not None else []
+        paths += [pathlib.Path(w["path"]) / p for p in st["changed"] + st["untracked"]]
+        for p in paths:
+            try:
+                stamps.append(int(os.stat(p).st_mtime))
+            except OSError:
+                pass
+    return max(stamps)
+
+
+def check_worktree(inv, item):
+    """A worktree's activity and content, decided before its HEAD's ref ladder.
+
+    It is IN-PROGRESS when it is the tree the report was run from, or when anything in it moved inside
+    the freshness bound. Otherwise each piece of its content must already exist on the default branch;
+    covered content is recorded on the item and the HEAD's verdict decides the row.
+    """
+    w = item.get("worktree")
+    if w is None:
+        return None
+    if w["invoking"]:
+        return IN_PROGRESS, "the worktree this report was run from"
+    if inv["now"] - read_newest_activity(inv, w) < inv["fresh"]:
+        return IN_PROGRESS, f"activity inside the {inv['fresh'] / 3600:g}h freshness bound"
+    st = w["dirt"]
+    if st is None:
+        return None
+    covered, uncovered, unknown = [], [], []
+    if st["merge"]:
+        if check_ancestor(inv, st["merge"]):
+            covered.append(f"the merge's other side {st['merge'][:12]} landed")
+        else:
+            uncovered.append(f"a merge of {st['merge'][:12]} in progress")
+    if st["rebase"]:
+        unknown.append("a rebase in progress")
+    if st["drift"]:
+        unknown.append(f"submodule pointer drift {st['drift']}")
+    tree = read_default_tree(inv)
+    files = [p for p in sorted(set(st["changed"])) if (pathlib.Path(w["path"]) / p).is_file()]
+    probes = [p for p in st["untracked"] if not p.endswith("/")]
+    unknown += [f"untracked directory {p}" for p in st["untracked"] if p.endswith("/")]
+    blobs = read_git(w["path"], "hash-object", "--", *(files + probes)).split() \
+        if files + probes else []
+    if len(blobs) != len(files + probes):
+        return UNKNOWN, "git hash-object failed over the worktree's content"
+    have = dict(zip(files + probes, blobs))
+    for p in sorted(set(st["changed"])):
+        if have.get(p) == tree.get(p) or (p not in have and p not in tree
+                                           and not (pathlib.Path(w["path"]) / p).exists()):
+            covered.append(f"{p} matches {inv['branch']}")
+        elif not st["drift"] or (pathlib.Path(w["path"]) / p).is_file():
+            uncovered.append(f"changed {p}")
+    default_blobs = set(tree.values())
+    for p in probes:
+        cases = scan_test_cases(pathlib.Path(w["path"]) / p)
+        if have[p] in default_blobs:
+            covered.append(f"untracked {p} exists on {inv['branch']}")
+        elif cases and all(run_git(inv["root"], "grep", "-F", "-q", "-e", c, inv["default_ref"])[0] == 0
+                           for c in cases):
+            covered.append(f"probe {p}: its case landed as a test")
+        else:
+            uncovered.append(f"untracked {p}")
+    if unknown:
+        return UNKNOWN, "content undecidable: " + ", ".join(unknown)
+    if uncovered:
+        more = f" (+{len(uncovered) - 3} more)" if len(uncovered) > 3 else ""
+        return UNMERGED_LIVE, "uncovered content: " + ", ".join(uncovered[:3]) + more
+    if covered:
+        item["content"] = "content covered: " + ", ".join(covered)
+    return None
+
+
+def check_stash(inv, item):
+    """A stash entry is SUPERSEDED when every path it changed already holds its bytes on the default."""
+    if item["kind"] != "stash":
+        return None
+    root, w = inv["root"], item["tip"]
+    if check_ref(root, f"{w}^3"):
+        return UNKNOWN, "it carries untracked files"
+    paths = [p for p in read_git(root, "diff", "--name-only", "--no-renames", f"{w}^1", w).splitlines()
+             if p]
+    tree = read_default_tree(inv)
+    differ = [p for p in paths if (read_git(root, "rev-parse", "--verify", "--quiet", f"{w}:{p}")
+                                   or None) != tree.get(p)]
+    if paths and not differ:
+        return SUPERSEDED, f"every path it changed ({len(paths)}) holds its bytes on {inv['branch']}"
+    return UNKNOWN, f"{len(differ)} of {len(paths)} path(s) hold bytes {inv['branch']} does not"
+
 
 def check_merged(inv, item):
+    if item["tip"] and check_ancestor(inv, item["tip"]):
+        return MERGED, f"an ancestor of {inv['branch']}"
     return None
 
 
 def check_equivalent(inv, item):
+    if not item["tip"]:
+        return None
+    lines = [line for line in read_git(inv["root"], "cherry", inv["default_ref"], item["tip"])
+             .splitlines() if line.strip()]
+    if lines and all(line.startswith("- ") for line in lines):
+        return EQUIVALENT, f"git cherry: all {len(lines)} commit(s) already applied"
     return None
 
 
 def check_superseded(inv, item):
-    return None
+    if not item["tip"]:
+        return None
+    if check_noop(inv, item["tip"]):
+        return SUPERSEDED, f"merge-tree no-op: merging it into {inv['branch']} yields {inv['branch']}'s tree"
+    cov = derive_coverage(inv, item["tip"])
+    if cov["error"] or cov["uncovered"] or not cov["unique"]:
+        return None
+    parts = [f"{k} {cov['counts'][k]}" for k in ("patch-id", "patch", "landing", "records",
+                                                  "rotated", "merge") if k in cov["counts"]]
+    landed = f" (landing {' '.join(cov['landings'])})" if cov["landings"] else ""
+    return SUPERSEDED, f"covered: {', '.join(parts)}{landed}"
 
 
 def check_in_progress(inv, item):
+    """A run record with a live lease, a build not yet closed, or a tip inside the freshness bound."""
+    if not item["tip"]:
+        return None
+    cov = derive_coverage(inv, item["tip"])
+    mem = read_memory_root(inv)
+    hours = f"{inv['fresh'] / 3600:g}h"
+    for slug in cov.get("slugs", []):
+        run = read_at(inv, item["tip"], f"{mem}/builds/{slug}/RUN.md")
+        phase, lease = read_run_fact(run, "phase"), read_run_fact(run, "lease-utc")
+        if phase and phase not in ("LANDED", "ABORTED") and lease:
+            try:
+                at = datetime.datetime.strptime(lease, "%Y-%m-%dT%H:%M:%SZ").replace(
+                    tzinfo=datetime.timezone.utc).timestamp()
+            except ValueError:
+                at = 0
+            if inv["now"] - at < inv["fresh"]:
+                return IN_PROGRESS, f"run {slug} at {phase}, its lease inside the {hours} bound"
+        readme = read_at(inv, item["tip"], f"{mem}/builds/{slug}/README.md")
+        m = re.search(r"\*\*Build status:\*\* ([A-Z]+)", readme or "")
+        if m and m.group(1) not in ("CLOSED", "WONTDO"):
+            there = re.search(r"\*\*Build status:\*\* ([A-Z]+)",
+                              read_at(inv, inv["default_ref"], f"{mem}/builds/{slug}/README.md") or "")
+            if not there or there.group(1) not in ("CLOSED", "WONTDO"):
+                return IN_PROGRESS, f"build {slug} is {m.group(1)}"
+    if item["ct"] and inv["now"] - item["ct"] < inv["fresh"]:
+        return IN_PROGRESS, f"tip committed inside the {hours} freshness bound"
     return None
 
 
 def check_unmerged_live(inv, item):
+    if not item["tip"]:
+        return None
+    cov = derive_coverage(inv, item["tip"])
+    if cov["error"]:
+        return UNKNOWN, cov["error"]
+    if cov["uncovered"]:
+        sha, subject = cov["uncovered"][0]
+        return UNMERGED_LIVE, (f"{len(cov['uncovered'])} of {cov['unique']} unique commit(s) uncovered, "
+                               f"first {sha[:12]} {subject}")
     return None
 
 
-PREDICATES = [check_merged, check_equivalent, check_superseded, check_in_progress,
-              check_unmerged_live]
+PREDICATES = [check_worktree, check_stash, check_merged, check_equivalent, check_superseded,
+              check_in_progress, check_unmerged_live]
 
 
 def derive_verdict(inv, item):
+    """The first predicate that decides, with any covered worktree content prefixed to its evidence."""
     for pred in PREDICATES:
-        got = pred(inv, item)
+        try:
+            got = pred(inv, item)
+        except (OSError, ValueError, KeyError, IndexError) as exc:
+            inv["skips"][pred.__name__] = f"raised {type(exc).__name__} on at least one row"
+            return UNKNOWN, f"{pred.__name__} could not run"
         if got is not None:
-            return got
+            verdict, evidence = got
+            if item.get("content"):
+                evidence = f"{item['content']} · {evidence}"
+            return verdict, evidence
     return UNKNOWN, "no predicate decided"
 
 
@@ -440,9 +844,12 @@ def render_report(inv, rows):
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="branch_reconcile.py")
     ap.add_argument("--root", default=".", help="any path inside the repository (default: .)")
+    ap.add_argument("--fresh-hours", type=float, default=FRESH_HOURS,
+                    help=f"activity this recent reads IN-PROGRESS (default: {FRESH_HOURS:g})")
     args = ap.parse_args(argv)
     try:
         inv = read_inventory(pathlib.Path(args.root))
+        inv["fresh"] = args.fresh_hours * 3600
         lines = render_report(inv, build_rows(inv))
     except Refusal as exc:
         print(f"branch-reconcile: {exc}", file=sys.stderr)

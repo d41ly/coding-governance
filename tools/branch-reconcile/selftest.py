@@ -25,7 +25,7 @@ from contextlib import redirect_stdout
 
 HERE = pathlib.Path(__file__).resolve().parent
 CLI = HERE / "branch_reconcile.py"
-ASSERTION_FLOOR = 14
+ASSERTION_FLOOR = 34
 PASS, FAIL = [], []
 SCRATCH = []
 
@@ -73,13 +73,26 @@ def run_git(cwd, *args, ok=True):
     return p.stdout.strip()
 
 
-def seed_commit(repo, rel, text, msg):
+def seed_commit(repo, rel, text, msg, when=None):
+    """Write <rel>, commit it, and return the sha. <when> backdates the commit (git date syntax)."""
     p = pathlib.Path(repo) / rel
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(text, encoding="utf-8", newline="\n")
     run_git(repo, "add", "--", rel)
-    run_git(repo, "commit", "-q", "-m", msg)
+    if when:
+        p = subprocess.run(["git", "-C", str(repo), "commit", "-q", "-m", msg], capture_output=True,
+                           text=True, env=dict(ENV, GIT_AUTHOR_DATE=when, GIT_COMMITTER_DATE=when))
+        if p.returncode != 0:
+            raise RuntimeError(f"fixture: backdated commit failed: {p.stderr.strip()}")
+    else:
+        run_git(repo, "commit", "-q", "-m", msg)
     return run_git(repo, "rev-parse", "HEAD")
+
+
+def seed_publish(repo):
+    """Push main to `upstream` and fetch, so upstream/main is the default tip the report grades."""
+    run_git(repo, "push", "-q", "upstream", "main")
+    run_git(repo, "fetch", "-q", "upstream")
 
 
 def build_dir():
@@ -224,7 +237,213 @@ def arm_census():
     check("census: a directory that is no repository refuses with exit 2", rc, 2)
 
 
-ARMS = [arm_census]
+def read_report(repo, *args):
+    rc, out, err = run_cli(repo, *args)
+    if rc != 0:
+        raise RuntimeError(f"report exited {rc}: {err.strip()}")
+    return read_rows(out)
+
+
+def read_verdict(rows, kind, name):
+    row = rows.get((kind, name))
+    return (row[0], row[7]) if row else ("absent", "")
+
+
+def seed_lines(n, tag=""):
+    return "".join(f"line {i}{tag}\n" for i in range(n))
+
+
+def arm_patch():
+    """TOOL-dSweptBranches-2 AC1 — a rebased copy that drifted by one and two lines per patch."""
+    repo = seed_repo(build_dir())
+    run_git(repo, "checkout", "-q", "-b", "rebased")
+    seed_commit(repo, "one.txt", seed_lines(6), "feat: one")
+    seed_commit(repo, "two.txt", seed_lines(8), "feat: two")
+    run_git(repo, "checkout", "-q", "main")
+    seed_commit(repo, "other.txt", "o\n", "unrelated")
+    seed_commit(repo, "one.txt", seed_lines(5) + "line 5 drifted\n", "feat: one")
+    seed_commit(repo, "two.txt", seed_lines(6) + "line 6 drifted\nline 7 drifted\n", "feat: two")
+    seed_publish(repo)
+    cherry = run_git(repo, "cherry", "upstream/main", "rebased").split()
+    check("patch: git cherry misses both rebased copies", cherry.count("+"), 2)
+    verdict, ev = read_verdict(read_report(repo, "--fresh-hours", "0"), "local", "rebased")
+    check("patch: AC1 the rebased copy reads SUPERSEDED by patch", (verdict, "patch 2" in ev),
+          ("SUPERSEDED", True))
+
+
+def arm_landing():
+    """AC2 — a pre-fold variant whose later landing merge touched every file it did."""
+    repo = seed_repo(build_dir())
+    run_git(repo, "checkout", "-q", "-b", "prefold")
+    (repo / "y.md").write_text("draft\n", encoding="utf-8", newline="\n")
+    seed_commit(repo, "x.py", "x = 1\n", "build(dFoo): TOOL-dFoo-1 — the thing")
+    run_git(repo, "add", "y.md")
+    run_git(repo, "commit", "-q", "--amend", "--no-edit")
+    run_git(repo, "checkout", "-q", "-b", "folded", "main")
+    (repo / "y.md").write_text("folded\n", encoding="utf-8", newline="\n")
+    seed_commit(repo, "x.py", "x = 2\n", "build(dFoo): TOOL-dFoo-1 — the thing, folded")
+    run_git(repo, "add", "y.md")
+    run_git(repo, "commit", "-q", "--amend", "--no-edit")
+    seed_commit(repo, "z.txt", "z\n", "records(dFoo): ledger")
+    run_git(repo, "checkout", "-q", "main")
+    run_git(repo, "merge", "-q", "--no-ff", "-m", "merge: dFoo — land onto upstream/main", "folded")
+    run_git(repo, "branch", "-q", "-D", "folded")
+    seed_publish(repo)
+    verdict, ev = read_verdict(read_report(repo, "--fresh-hours", "0"), "local", "prefold")
+    check("landing: AC2 the pre-fold variant reads SUPERSEDED by its landing merge",
+          (verdict, "landing 1" in ev, "no-op" in ev), ("SUPERSEDED", True, False))
+
+
+def arm_records():
+    """AC3 — a run-records-only commit for a build the default branch shows landed."""
+    repo = seed_repo(build_dir())
+    run_git(repo, "checkout", "-q", "-b", "records")
+    seed_commit(repo, "memory/builds/dBar/RUN.md", "phase: VERIFYING\n", "records(dBar): verifying")
+    run_git(repo, "checkout", "-q", "main")
+    seed_commit(repo, "memory/builds/dBar/RUN.md", "phase: LANDED\n", "records(dBar): landed")
+    seed_publish(repo)
+    verdict, ev = read_verdict(read_report(repo, "--fresh-hours", "0"), "local", "records")
+    check("records: AC3 a records-only commit for a landed build reads SUPERSEDED",
+          (verdict, "records 1" in ev), ("SUPERSEDED", True))
+
+
+def arm_rotated():
+    """AC4 — a decision row the default branch keeps only in an archive."""
+    repo = seed_repo(build_dir())
+    seed_commit(repo, "memory/DECISIONS.md", "# decisions\n", "seed: decisions")
+    seed_publish(repo)
+    run_git(repo, "checkout", "-q", "-b", "rotated")
+    seed_commit(repo, "memory/DECISIONS.md", "# decisions\n- TOOL-dBaz-3 · the rotated ruling\n",
+                "records(dBaz): a decision row")
+    run_git(repo, "checkout", "-q", "main")
+    seed_commit(repo, "memory/archive/DECISIONS-2026-09.md", "- TOOL-dBaz-3 · the rotated ruling\n",
+                "rotate: decisions")
+    seed_publish(repo)
+    # The negative, found on gov's own tree while this predicate was built: a spec rewrite whose
+    # prose CITES ids the default branch holds is content of its own, never a rotated row.
+    run_git(repo, "checkout", "-q", "-b", "cites", "main")
+    seed_commit(repo, "memory/builds/dBaz/spec.md",
+                "# spec\n\nThis rewrite cites TOOL-dBaz-3 and adds a design of its own.\n",
+                "spec(dBaz): rev-2")
+    run_git(repo, "checkout", "-q", "main")
+    rows = read_report(repo, "--fresh-hours", "0")
+    verdict, ev = read_verdict(rows, "local", "rotated")
+    check("rotated: AC4 a row kept only in the archive reads SUPERSEDED",
+          (verdict, "rotated 1" in ev), ("SUPERSEDED", True))
+    check("rotated: AC4 prose citing an id the default holds is not a rotated row",
+          read_verdict(rows, "local", "cites")[0], "UNMERGED-LIVE")
+
+
+def arm_noop():
+    """AC5 — a net-zero branch is proven by merge-tree; a conflicting one is never."""
+    repo = seed_repo(build_dir())
+    run_git(repo, "checkout", "-q", "-b", "netzero")
+    seed_commit(repo, "a.txt", "a1\nextra\n", "try: a line")
+    seed_commit(repo, "a.txt", "a1\n", "revert: the line")
+    run_git(repo, "checkout", "-q", "-b", "clash", "main")
+    seed_commit(repo, "b.txt", "mine\n", "clash: b")
+    run_git(repo, "checkout", "-q", "main")
+    seed_commit(repo, "b.txt", "theirs\n", "main: b")
+    seed_publish(repo)
+    rows = read_report(repo, "--fresh-hours", "0")
+    verdict, ev = read_verdict(rows, "local", "netzero")
+    check("noop: AC5 a net-zero branch reads SUPERSEDED by the merge-tree proof",
+          (verdict, "no-op" in ev), ("SUPERSEDED", True))
+    check("noop: AC5 a conflicting branch is never superseded by merge-tree",
+          read_verdict(rows, "local", "clash")[0], "UNMERGED-LIVE")
+
+
+def arm_lease():
+    """AC6 — a live run lease is IN-PROGRESS; a stale lease on an old tip is not."""
+    import datetime
+    now = datetime.datetime.now(datetime.timezone.utc)
+    fresh = (now - datetime.timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    stale = (now - datetime.timedelta(days=10)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    old = (now - datetime.timedelta(days=10)).strftime("%Y-%m-%dT%H:%M:%S+0000")
+    repo = seed_repo(build_dir())
+    run_git(repo, "checkout", "-q", "-b", "leased")
+    seed_commit(repo, "memory/builds/dQux/RUN.md", f"phase: BUILDING\nlease-utc: {fresh}\n",
+                "records(dQux): preflight", when=old)
+    run_git(repo, "checkout", "-q", "-b", "stale-lease", "main")
+    seed_commit(repo, "memory/builds/dQuy/RUN.md", f"phase: BUILDING\nlease-utc: {stale}\n",
+                "records(dQuy): preflight", when=old)
+    run_git(repo, "checkout", "-q", "-b", "live-work", "main")
+    seed_commit(repo, "feature.py", "print('unlanded')\n", "feat: the unlanded fix", when=old)
+    run_git(repo, "checkout", "-q", "main")
+    rows = read_report(repo)
+    check("lease: AC6 a live run lease reads IN-PROGRESS", read_verdict(rows, "local", "leased")[0],
+          "IN-PROGRESS")
+    check("lease: AC6 a stale lease on an old tip is not IN-PROGRESS",
+          read_verdict(rows, "local", "stale-lease")[0], "UNMERGED-LIVE")
+    check("lease: AC6 the unlanded fix reads UNMERGED-LIVE",
+          read_verdict(rows, "local", "live-work")[0], "UNMERGED-LIVE")
+    check("lease: AC6 the unlanded fix's evidence names its uncovered commit",
+          "uncovered" in read_verdict(rows, "local", "live-work")[1], True)
+
+
+def arm_content():
+    """AC7 — worktree content: a landed merge, a landed probe, an uncovered file, and freshness."""
+    base = build_dir()
+    repo = seed_repo(base)
+    old_main = run_git(repo, "rev-parse", "main")
+    run_git(repo, "checkout", "-q", "-b", "side")
+    seed_commit(repo, "side.txt", "side\n", "feat: side")
+    run_git(repo, "checkout", "-q", "main")
+    seed_commit(repo, "tests/test_land.py", "def test_merge_survives():\n    pass\n", "test: landed")
+    run_git(repo, "merge", "-q", "--no-ff", "-m", "merge: side", "side")
+    seed_publish(repo)
+    det = base / "fx" / "det"
+    run_git(repo, "worktree", "add", "-q", "--detach", str(det), old_main)
+    run_git(det, "merge", "-q", "--no-ff", "--no-commit", "side")
+    probe = base / "fx" / "probe"
+    run_git(repo, "worktree", "add", "-q", "-b", "probe-br", str(probe), "main")
+    (probe / "tests").mkdir(exist_ok=True)
+    (probe / "tests" / "test_probe.py").write_text("def test_merge_survives():\n    assert True\n",
+                                                   encoding="utf-8", newline="\n")
+    live = base / "fx" / "live"
+    run_git(repo, "worktree", "add", "-q", "-b", "live-br", str(live), "main")
+    (live / "notes.txt").write_text("only here\n", encoding="utf-8", newline="\n")
+    nest = repo / ".claude" / "worktrees" / "nest"
+    run_git(repo, "worktree", "add", "-q", "-b", "nest-br", str(nest), "main")
+    tmp_wt = build_dir() / "wt"
+    run_git(repo, "worktree", "add", "-q", "-b", "tmp-br", str(tmp_wt), "main")
+    rows = read_report(repo, "--fresh-hours", "0")
+    key = lambda p: str(p).replace("\\", "/")
+    det_v, det_ev = read_verdict(rows, "worktree/sibling", key(det))
+    check("content: AC7 the detached worktree's in-progress merge landed",
+          (det_v, "the merge's other side" in det_ev), ("MERGED", True))
+    probe_v, probe_ev = read_verdict(rows, "worktree/sibling", key(probe))
+    check("content: AC7 the probe whose case landed as a test is covered",
+          (probe_v, "its case landed as a test" in probe_ev), ("MERGED", True))
+    check("content: AC7 an uncovered untracked file reads UNMERGED-LIVE",
+          read_verdict(rows, "worktree/sibling", key(live))[0], "UNMERGED-LIVE")
+    check("content: AC7 the nested harness worktree reads its HEAD's verdict",
+          read_verdict(rows, "worktree/nested", ".claude/worktrees/nest")[0], "MERGED")
+    check("content: AC7 the temp-dir worktree reads its HEAD's verdict",
+          read_verdict(rows, "worktree/temp", key(tmp_wt))[0], "MERGED")
+    fresh = read_report(repo)
+    check("content: AC7 under the default bound a fresh worktree reads IN-PROGRESS",
+          read_verdict(fresh, "worktree/nested", ".claude/worktrees/nest")[0], "IN-PROGRESS")
+
+
+def arm_stash():
+    """AC8 — a stash whose bytes landed is SUPERSEDED; one with new bytes is UNKNOWN."""
+    repo = seed_repo(build_dir())
+    (repo / "a.txt").write_text("a2\n", encoding="utf-8", newline="\n")
+    run_git(repo, "stash", "push", "-q", "-m", "landed")
+    seed_commit(repo, "a.txt", "a2\n", "feat: a2")
+    seed_publish(repo)
+    (repo / "a.txt").write_text("zzz\n", encoding="utf-8", newline="\n")
+    run_git(repo, "stash", "push", "-q", "-m", "new bytes")
+    rows = read_report(repo, "--fresh-hours", "0")
+    check("stash: AC8 a stash whose bytes landed reads SUPERSEDED",
+          read_verdict(rows, "stash", "stash@{1}")[0], "SUPERSEDED")
+    check("stash: AC8 a stash with new bytes reads UNKNOWN",
+          read_verdict(rows, "stash", "stash@{0}")[0], "UNKNOWN")
+
+
+ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
+        arm_content, arm_stash]
 
 
 def main():

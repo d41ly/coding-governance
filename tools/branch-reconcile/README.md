@@ -42,6 +42,47 @@ skipped — <predicate> · <why>
 
 Exit 0 with the report printed; exit 2 on a refusal.
 
+## The verdicts
+
+A ref's ladder, first match wins, for a local branch, a remote branch or a worktree's `HEAD`:
+
+| Verdict | Decided by |
+|---|---|
+| `MERGED` | the tip is an ancestor of the default branch |
+| `EQUIVALENT` | `git cherry` lists commits and marks every one `-`, already applied |
+| `SUPERSEDED` | `git merge-tree --write-tree` yields the default's own tree, or every unique commit is covered (below) |
+| `IN-PROGRESS` | a run record at the tip with a non-terminal phase and a lease inside the freshness bound; a build README at the tip whose status is not `CLOSED` or `WONTDO` while the default's copy is not terminal either; or a tip committed inside the bound |
+| `UNMERGED-LIVE` | unique commits remain uncovered |
+| `UNKNOWN` | a predicate the answer depended on could not run |
+
+**A unique commit is covered** when `git cherry` marks it applied (`patch-id`); when a commit on the
+default branch carries the identical subject and the two patches' `+`/`-` lines differ by at most 4
+(`patch`: a rebased copy that drifted by a line or two, which `git cherry` misses); when a later
+merge on the default branch names the same unit id or slug and touched every file it did
+(`landing`: a pre-fold or pre-squash variant); when it touches only run-state files of a build the
+default branch shows landed (`records`); or when it adds only rows whose ids head a row somewhere in
+the default's memory tree, archives included (`rotated`). A line that merely cites an id is never a
+row: run over gov's own tree, an earlier version of that rule called a 250-line spec rewrite
+superseded. A merge commit is covered when each parent is landed or itself unique.
+
+**Merge-tree is only a positive proof.** Its conflict count is never read: a stale branch whose
+every commit landed conflicts heavily.
+
+**A worktree is graded before its `HEAD`.** It is `IN-PROGRESS` when it is the tree the report runs
+from, or when its `HEAD` commit, its index or any dirty path moved inside the freshness bound
+(`--fresh-hours`, 24 by default). Otherwise each piece of its content must already exist on the
+default branch: an in-progress merge whose other side landed, an untracked file whose blob is in the
+default tree or whose every test case (`def test_…`, `it("…")`, `test("…")`, `arm "…"`) exists there,
+a changed path whose bytes equal the default's. Uncovered content makes it `UNMERGED-LIVE`; a rebase
+in progress, submodule drift or an untracked directory makes it `UNKNOWN`. Covered content is named
+in the evidence and the `HEAD`'s verdict decides the row.
+
+**A stash entry** is `SUPERSEDED` when every path it changed already holds its bytes on the default
+branch, else `UNKNOWN`.
+
+Run records are read at a tip, as data, and never written: the unattended kit's `--settle` and
+`--preflight` own them. The memory root is `MEMORY_ROOT` from `.memory-tree.conf`, else `memory`.
+
 ## Why this is not the straggler inventory
 
 The relocation engine's `migrate_backlog.py --stragglers`, which `check-wiring.sh` reports, lists the
