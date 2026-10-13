@@ -136,12 +136,12 @@ ids TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-25 TOOL-aOrie
 | [TOOL-aOrientedCast-23 — one stated answer on which declared size ceilings a run may raise, held in the limits file and pointed at by M3 and the size gate](spec/2026-10-13-spec-TOOL-aOrientedCast-23.md) | 25 | 2 | CLOSED | rev-3 | 2026-10-13 |
 | [TOOL-aOrientedCast-24 — format-guard reads a notification's header alone and opens no turn mid-turn, gate-guard asks the driver whether a leased run is finished, and the arms and docs that pin both](spec/2026-10-13-spec-TOOL-aOrientedCast-24.md) | 26 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-aOrientedCast-26 — spec writers run at high effort and builders at xhigh, as the owner ruled](spec/2026-10-13-spec-TOOL-aOrientedCast-26.md) | 26 | 1 | CLOSED | rev-1 | 2026-10-13 |
-| [TOOL-aOrientedCast-25 — the second closing review's roles minors: one marker reading, armed rules, one fence reading, and records that say what was built](spec/2026-10-13-spec-TOOL-aOrientedCast-25.md) | 27 | 2 | INPROGRESS | rev-3 | 2026-10-13 |
+| [TOOL-aOrientedCast-25 — the second closing review's roles minors: one marker reading, armed rules, one fence reading, and records that say what was built](spec/2026-10-13-spec-TOOL-aOrientedCast-25.md) | 27 | 2 | INPROGRESS | rev-4 | 2026-10-13 |
 | [TOOL-aOrientedCast-27 — every spawned agent is named for its build, unit and action, and the spawn guard refuses a misnamed spawn](spec/2026-10-13-spec-TOOL-aOrientedCast-27.md) | 28 | 2 | OPEN | rev-2 | 2026-10-13 |
 | [TOOL-aOrientedCast-28 — spec folds run through the build harness, and a leased session spawns no spec writer directly](spec/2026-10-13-spec-TOOL-aOrientedCast-28.md) | 29 | 2 | OPEN | rev-2 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 68 bound to this build, across 4 record folder(s).
+Records: 70 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

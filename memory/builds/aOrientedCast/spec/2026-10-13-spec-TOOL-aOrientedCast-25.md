@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-25 — the second closing review's roles minors: one marker reading, armed rules, one fence reading, and records that say what was built
 
-**Status:** INPROGRESS · rev-3 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 27 · ratified 2026-10-13
+**Status:** INPROGRESS · rev-4 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 27 · ratified 2026-10-13
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,8 @@
 | [2026-10-13-prompt-TOOL-aOrientedCast-24-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-24-1-spec-brief.md) | journal | TOOL-aOrientedCast-24 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-24-2-build-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-24-2-build-brief.md) | journal | TOOL-aOrientedCast-24 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-25-1-spec-writer.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-25-1-spec-writer.md) | journal | — |
+| [2026-10-13-prompt-TOOL-aOrientedCast-25-2-fold-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-25-2-fold-brief.md) | journal | — |
+| [2026-10-13-prompt-TOOL-aOrientedCast-25-3-spec-writer.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-25-3-spec-writer.md) | journal | — |
 | [2026-10-13-prompt-TOOL-aOrientedCast-27-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-27-1-spec-brief.md) | journal | TOOL-aOrientedCast-27 |
 
 <!-- /gen:spec-records -->
@@ -27,7 +29,7 @@ the records that misstate what was built are corrected where a CLOSED spec can b
   one Python reading of the marker line an `Agent` prompt opens with, written to give the hooks
   kit's spawn guard's answer (its rule 6). The `--handoff` matcher in `print_agent_lines`
   (`tools/roles/handoff.py:814-816`) calls it instead of comparing the prompt's raw first line. The
-  `handoff.py` docstring and the `agents` paragraph of `tools/roles/README.md` (`:84-86`) say so.
+  `handoff.py` docstring and the `agents` paragraph of `tools/roles/README.md` (`:85-86`) say so.
   Observed by AC1 and AC2.
 - **S2** — M4, the arms. Arm 9 of `tools/roles/adopt-roles.test.sh` gains one assertion: its
   session's `Agent` prompt, prefixed with one blank line, still yields arm 9's two lines. A new
@@ -43,7 +45,7 @@ the records that misstate what was built are corrected where a CLOSED spec can b
 - **S5** — L4, the reader. `extract_microformat_shapes` in `tools/roles/roles_lib.py`
   (`:220-235`) reads the fence as format-guard's `readCharterShapes` reads it: each marker a whole
   line, the first opener and the first closer, and the last definition of a head kept. Its
-  docstring, the module docstring and the README's sentence (`:82-83`) say so. Observed by AC6.
+  docstring, the module docstring and the README's sentence (`:83-84`) say so. Observed by AC6.
 - **S6** — L4, the parity arm. Arm 11, part B, feeds three charter copies to
   `extract_microformat_shapes` and to `readCharterShapes` and asserts the same `agent` and
   `returned` definitions from both. Observed by AC6.
@@ -74,7 +76,7 @@ the records that misstate what was built are corrected where a CLOSED spec can b
 - **S13** — `handoff.py agents` prints and writes nothing unless given `--write`, which adds the
   complete lines to the agent ledger as before (§4 "The write flag"). Its docstring, the README's
   "The agent lines", `help/roles.md`'s "What each agent line tells you" and the Skill template's
-  agents bullet (`:26-30`) say a mid-pass call runs without it. Observed by AC12.
+  agents bullet (`:27-30`) say a mid-pass call runs without it. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -283,7 +285,7 @@ def extract_microformat_shapes(text):
 ```
 
 A closer before the opener leaves `lines[a + 1:b]` empty, which is format-guard's `b < a` refusal
-(`tools/hooks/format-guard.js:171-174`) and the run-log reader's empty slice
+(`tools/hooks/format-guard.js:187`) and the run-log reader's empty slice
 (`tools/runlog/prose.py:65`). The README sentence adds: each marker a whole line and the last
 definition of a head winning, as the hooks kit's format guard reads the fence.
 
@@ -336,7 +338,7 @@ sub-heads. Neither carries an `AC<n>` bullet, so check 23 reads no second answer
 
 `### TOOL-aOrientedCast-21 AC2` states the criterion as written (spec 21, `:278-281`): with its last
 field cut, the line blocks with "does not match its charter shape". It states what the code does,
-citing `checkAgentLines` (`tools/hooks/format-guard.js:396-415`): a line still ending `/a1` with the
+citing `checkAgentLines` (`tools/hooks/format-guard.js:429-450`): a line still ending `/a1` with the
 `run ` label cut, `· direct/a1`, gets the shape message; a line with the run field cut whole names
 no agent and gets "no agent line for agent a1, which this turn dispatched". It names the suite's
 staged break, `${A1/run direct/direct}` in `tools/hooks/format-guard.test.sh`, as the observation
@@ -356,17 +358,20 @@ for (const t of [A + ' · run direct/a1', A + ' · direct/a1', A]) console.log(J
 `### TOOL-aOrientedCast-22 AC6` states the criterion as written (spec 22, `:263-267`): a search for
 the old marker with no pathspec prints nothing. It states why that never holds: the search spans
 the spec and its ledger, which quote the pattern. The observation that stands, the first printing
-nothing and the second listing the kit's carriers at writing:
+nothing and the second listing the kit's files and their rendered copies,
+`tools/unattended/unattended.sh` among them:
 
 ```bash
 git grep -l "gov:kit unattended@1.104" -- ':!memory/builds'
-v=$(sed -n 's/^KIT_UNATTENDED_VERSION=//p' tools/unattended/unattended.sh)
+v=$(sed -n 's/^KIT_UNATTENDED_VERSION=\([0-9.]*\).*/\1/p' tools/unattended/unattended.sh)
 git grep -l "gov:kit unattended@$v" -- ':!memory/builds'
 ```
 
 The second search is the liveness twin: a pathspec that excluded everything would print nothing for
-both. Both sub-heads cite review items L5 and L6. The commit stage's index render lists the record
-in both closed specs' generated records regions.
+both. Its `v` is the bare version, because the constant's line ends in a `# gov:kit` comment that
+would otherwise ride into the pattern and match nothing. Both sub-heads cite review items L5 and
+L6. The commit stage's index render lists the record in both closed specs' generated records
+regions.
 
 ### The gotcha (S10)
 
@@ -410,7 +415,7 @@ The first row keeps the bullet's existing clause: a cited tag the charter drops 
 ### The roles bump (S12)
 
 `KIT_ROLES_VERSION = "1.4"` (`tools/roles/roles_lib.py:25`) and `<!-- gov:kit roles@1.4 -->` in
-`tools/roles/README.md:1` and `tools/roles/SKILL.template.md:5`; `tools/check-kit-versions.sh:387-393`
+`tools/roles/README.md:1` and `tools/roles/SKILL.template.md:5`; `tools/check-kit-versions.sh:387-395`
 pairs the constant with the README's marker. The rendered `.claude/skills/build/SKILL.md:5` follows
 by `bash tools/roles/adopt-roles.sh --scaffold`, the main loop's second pass. The bump lands after S1 to S8, so no later
 edit of this unit moves the kit's bytes past 1.4. The pass re-renders the map with
@@ -540,15 +545,19 @@ cut out of the suite and run with python against F. The suite arms are under `Ne
   prints 1; and `grep -c "tools/check-microformats.sh:9:9" .memory-tree.conf` prints 1.
   Red when: a charter carrying two definitions of one head, or a marker inside a longer line,
   passes the gate.
+  permission: the three gate runs are the `micro-format definitions` leg, which the role gate
+  refuses a builder even on a scratch copy; the main loop observes them at the close, and the
+  builder observes the probe and the two searches.
   figure: PINNED at `debc4bad6`, where the suite's floor is 18 and the gate's meta-gate floor 8:8.
 - **AC8** — When `git grep -c "^### TOOL-aOrientedCast-21 AC2$\|^### TOOL-aOrientedCast-22 AC6$" -- memory/builds/aOrientedCast/build`
   runs, it prints one record with the count 2, whose Serves line names `TOOL-aOrientedCast-21` and
   `TOOL-aOrientedCast-22`; the §4 `checkAgentLines` probe prints the charter-shape message for the
   run field cut to `direct/a1` and `no agent line for agent a1` for the run field cut whole, as the
-  first sub-head states; and the §4 `git grep` pair prints nothing for the old marker and the kit's
-  carriers for the version `tools/unattended/unattended.sh` declares, as the second states.
-  Red when: an amendment states a reading the code does not give, or the corrected search still
-  spans the records that quote its pattern.
+  first sub-head states; and the §4 `git grep` pair prints nothing for the old marker, while the
+  twin, its `v` the bare version `tools/unattended/unattended.sh` declares, lists that file among
+  the kit's files and rendered copies, as the second states.
+  Red when: an amendment states a reading the code does not give, the corrected search still spans
+  the records that quote its pattern, or the twin lists nothing.
 - **AC9** — When `grep -c "its own records break by quoting the pattern" memory/gotchas/criterion-asserts-what-its-own-command-cannot-show.md memory/gotchas/INDEX.md`
   runs, it prints 1 for each file, and `grep -c "TOOL-aOrientedCast-2[12]" memory/gotchas/criterion-asserts-what-its-own-command-cannot-show.md`
   prints at least 1.
@@ -615,7 +624,7 @@ The main loop observes each arm RED on its staged break and GREEN once restored,
   brief asks?**
   Probe: `python -c "import sys; sys.path.insert(0, 'tools/memory-tree'); import gen_build_index as g; print(g._expand_ids('M4 L5 TOOL-aOrientedCast-24', 'TOOL|KICK|PLAY'))"`.
   Observation at writing: it printed `(['TOOL-aOrientedCast-24'], ['M4', 'L5'])`, so
-  `read_header_verbs` (`tools/memory-tree/backlog.py:741-744`) refuses such a header as "not an id
+  `read_header_verbs` (`tools/memory-tree/backlog.py:744-747`) refuses such a header as "not an id
   or an id range", and every render of the build index refuses with it. Liveness: the real id in
   the same call expands, so the probe answers either way. The build keeps no `BACKLOG.md`, so the
   verb would join nothing.
@@ -657,12 +666,16 @@ The main loop observes each arm RED on its staged break and GREEN once restored,
   docs in files touched, and the floor at 33.
 - rev-3 · 2026-10-13 · §1 · §3 · §4 · §6 · §10 · trimmed under the spec size ceiling: history
   and restated evidence cut; no scope item and no criterion's meaning moved.
+- rev-4 · 2026-10-13 · §4 · AC7 · AC8 · §2 · §8 · §10 · after the builder's divergence: the
+  liveness twin reads the bare version, since the old `sed` kept the line's comment and matched
+  nothing, and AC8 and the sub-head say what it lists; AC7's gate runs go to the main loop under
+  `permission:`; the `path:line` cites re-read, `checkAgentLines` now at `:429-450`.
 
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "normalise a handoff prompt's marker line the way the
 spawn guard admits it"` ranked name-token neighbours (`check_line`, `render_line`,
-`derive_marker_basis`) and the four hook inventory keys, none of which reads a prompt's marker. `"read
+`derive_marker_basis`) and the hooks' inventory keys, none of which reads a prompt's marker. `"read
 the micro-format fence of the governing doc into shapes"` ranked `read_charter_shapes` in the
 run-log kit, one of the two readers this unit's reader must match. `"fixture arm that builds a
 scratch repo and runs the roles catalogue checker"` ranked `build_fixture`, a seam at fan-in 5, with
