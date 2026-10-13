@@ -59,9 +59,9 @@ with `--stand-in`, which refuses unless the owner's stand-in waiver registry und
 root's `project/` folder holds a dated row for that role and build; the checker joins the tailed
 handoffs and the rows both ways as R15 (TOOL-aOrientedCast-19).
 `handoff.py agents` fills the governing doc's `agent` and `returned` micro-format shapes for a direct
-spawn or a harness run from the session's transcripts, the role index and the agent types, and adds
-each line holding no `unknown` field once to the build's agent ledger under its `build/` folder
-(TOOL-aOrientedCast-20).
+spawn or a harness run from the session's transcripts, the role index and the agent types, and,
+given `--write`, adds each line holding no `unknown` field once to the build's agent ledger under
+its `build/` folder (TOOL-aOrientedCast-20, TOOL-aOrientedCast-25).
 
 ## Constraints & why
 
@@ -120,10 +120,26 @@ CRLF working copy hashes like its blob.
   conf grammar line for line from the hooks kit's `readConfKey`, rather than imported: a kit file
   names nothing outside itself.
 - `resolve_kit_dir` is carried inline under the lib dir's parity table, as every consumer carries it.
-- The governing doc's section 1 `- [<tag>] ` rule lines and its `## Protocols` and `## Facts`
-  sections, read inside its `gov:playbook` region, are the only contract read from outside the kit
-  (TOOL-aOrientedCast-16): a cited tag the charter drops reds this leg, and a pre-tag charter with
-  `## §<n> — ` headings is one reseed note.
+- What the kit reads from outside itself, and which of it is a contract:
+  - contract: the governing doc's section 1 `- [<tag>] ` rule lines and its `## Protocols` and
+    `## Facts` sections, read inside its `gov:playbook` region and found by the conf's `CHARTER` key
+    (TOOL-aOrientedCast-16): a cited tag the charter drops reds the `roles catalogue` leg, and a
+    pre-tag charter with `## §<n> — ` headings is one reseed note.
+  - contract: the governing doc's `agent` and `returned` definitions of the `<!-- microformats -->`
+    fence, each marker a whole line, the last definition winning (TOOL-aOrientedCast-20,
+    TOOL-aOrientedCast-25).
+  - contract: `MEMORY_ROOT` and `CHARTER` from the memory-tree conf.
+  - contract: leg names for R12's `[gates]`, from the tool root's gate manifest, when it reads.
+  - contract: the kickoff checker's `--card --path` and `--task-skeleton` output, and the card field
+    grammar ported from it (TOOL-aOrientedCast-2, TOOL-aOrientedCast-15).
+  - contract: the install receipt's rows naming a kit's source and installed path, through
+    `resolve_kit_dir`.
+  - contract: the hooks kit's spawn guard's reading of a prompt's marker line, which
+    `extract_prompt_marker` mirrors and the adopter self-test's arm 11 compares
+    (TOOL-aOrientedCast-25).
+  - a reading, not a contract: the fields `handoff.py agents` reads from the session transcript, each
+    subagent's `.meta.json` and a run's `journal.jsonl` (TOOL-aOrientedCast-20); a renamed field
+    prints `unknown`.
 
 **The renderer owns the catalogue's names plus the on-disk index's, never the directory.** An
 adopter keeps agent definitions of its own under `.claude/agents/`; the index already records every

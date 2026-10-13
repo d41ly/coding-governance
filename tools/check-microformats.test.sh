@@ -125,12 +125,21 @@ arm "a bare ASCII pipe outside a placeholder reds" red \
 arm "an ASCII pipe INSIDE a placeholder does NOT red" ok "" \
   's/<subject>/<subject|topic>/'
 
+# TOOL-aOrientedCast-25: the readers of the fence keep a head's LAST definition and find each marker
+# as a WHOLE line, so the source refuses a repeated head and counts no marker inside a longer line.
+arm "a head defined twice reds" red \
+  "a definition head is defined more than once, so a reader keeping its first definition and one keeping its last read two different shapes" \
+  '/^- `gates/a\
+- `gates — RED · <leg>`'
+arm "an opener that is not a whole line is cannot-run" cannot \
+  "not delimited by exactly one fence pair" 's/^<!-- microformats -->$/x <!-- microformats -->/'
+
 printf '\n'
 if [ "$FAILED" -ne 0 ]; then
   printf 'check-microformats.test.sh FAILED — %d arm(s)\n' "$FAILED"
   exit 1
 fi
-FLOOR_ASSERTIONS=18
+FLOOR_ASSERTIONS=20
 if [ "$ASSERTIONS" -lt "$FLOOR_ASSERTIONS" ]; then
   printf 'check-microformats.test.sh FAILED — ran %d assertion(s) against a floor of %d\n' \
     "$ASSERTIONS" "$FLOOR_ASSERTIONS"

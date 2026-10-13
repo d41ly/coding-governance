@@ -65,9 +65,11 @@ unchanged from `handoff.py agents --handoff <path>` for an agent it spawned itse
 - **`unknown`** means nothing has recorded that field yet: for example, a model the agent has not
   replied with and its call did not report. Such a line is not added to the ledger until a later
   run fills the field.
-- **The ledger.** Every complete line is added once to the build's agent ledger,
+- **The ledger.** A run with `--write` adds every complete line once to the build's agent ledger,
   `<memory root>/builds/<slug>/build/<date>-build-<unit id>-agent-ledger.md`. One ledger per build
-  holds every agent of that build, in the order the lines were added.
+  holds every agent of that build, in the order the lines were added. A run without it writes
+  nothing, so a mid-pass call leaves your tree clean; pass `--write` only at a bookkeeping step,
+  when no pass is running.
 
 ## When no role agent can be spawned
 

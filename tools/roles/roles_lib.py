@@ -5,7 +5,9 @@ the governing doc: its section 1 rule tags and its carried sections (TOOL-aOrien
 also the one reader of the owner's stand-in waiver registry and of the stand-in declarations under
 the builds' `prompts/` folders (TOOL-aOrientedCast-19), and of the governing doc's micro-format
 fence, `<!-- microformats -->` to `<!-- /microformats -->`, whose `agent` and `returned` shapes
-`handoff.py agents` fills (TOOL-aOrientedCast-20).
+`handoff.py agents` fills (TOOL-aOrientedCast-20): each marker a whole line and the last definition
+of a head winning, as the hooks kit's format guard reads the fence (TOOL-aOrientedCast-25). Its
+`extract_prompt_marker` reads an `Agent` prompt's marker line as the hooks kit's spawn guard does.
 `render_role` is the one composition of a role with its house overlay, and `render_charter_blocks`
 the one composition of the charter text a role carries: every consumer that hands a role to an agent
 calls both, so a role reaches an agent the same way by every route. Stdlib only; every text read
@@ -22,7 +24,7 @@ import pathlib
 import re
 import tomllib
 
-KIT_ROLES_VERSION = "1.3"
+KIT_ROLES_VERSION = "1.4"
 
 #: Every front-matter key a role file may carry: Claude Code's own, then gov's.
 #: Split from one string, because a quoted `"tools"` beside a quoted segment reads to the
@@ -218,21 +220,33 @@ def parse_charter(text, where):
 
 
 def extract_microformat_shapes(text):
-    """`{head: definition}` for every ``- `<definition>` `` line between the first
-    `<!-- microformats -->` and the `<!-- /microformats -->` after it, keyed by the text before the
-    definition's first ` — `: the selector the format guard and the run-log prose reader key on.
-    `{}` when the pair is absent (TOOL-aOrientedCast-20)."""
-    text = text.replace("\r\n", "\n")
-    i = text.find(MICROFORMATS_OPEN)
-    j = text.find(MICROFORMATS_CLOSE, i + len(MICROFORMATS_OPEN)) if i >= 0 else -1
-    if j < 0:
+    """`{head: definition}` for every ``- `<definition>` `` line between the fence's two markers,
+    each marker a whole line: the first line that is exactly `<!-- microformats -->` and the first
+    that is exactly `<!-- /microformats -->`, CRLF folded. Keyed by the text before the
+    definition's first ` — `; a head defined twice keeps its last definition. `{}` when either
+    marker is absent or the closer comes first. This is how the hooks kit's format guard and the
+    run-log kit's prose reader read the fence (TOOL-aOrientedCast-20, TOOL-aOrientedCast-25)."""
+    lines = text.replace("\r\n", "\n").split("\n")
+    if MICROFORMATS_OPEN not in lines or MICROFORMATS_CLOSE not in lines:
         return {}
+    a, b = lines.index(MICROFORMATS_OPEN), lines.index(MICROFORMATS_CLOSE)
     shapes = {}
-    for line in text[i + len(MICROFORMATS_OPEN):j].split("\n"):
+    for line in lines[a + 1:b]:
         m = MICROFORMAT_LINE_RE.match(line)
         if m:
-            shapes.setdefault(m.group(1).split(" — ", 1)[0], m.group(1))
+            shapes[m.group(1).split(" — ", 1)[0]] = m.group(1)
     return shapes
+
+
+def extract_prompt_marker(prompt):
+    """The `MARKER_RE` match of the marker line an `Agent` prompt opens with, read as the hooks
+    kit's spawn guard reads it (its rule 6): exactly one line, carriage returns removed, is a whole
+    marker line, and it is the prompt's first line once CRLF is folded, the two ends trimmed and
+    that line's trailing whitespace dropped. None otherwise (TOOL-aOrientedCast-25)."""
+    text = str(prompt)
+    marks = [ln for ln in (raw.replace("\r", "") for raw in text.split("\n")) if MARKER_RE.fullmatch(ln)]
+    first = text.replace("\r\n", "\n").strip().split("\n")[0].rstrip()
+    return MARKER_RE.fullmatch(first) if len(marks) == 1 and first == marks[0] else None
 
 
 def check_rule_tags(charter, value):

@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-13-build-KICK-aOrientedCast-1-agent-ledger.md](../build/2026-10-13-build-KICK-aOrientedCast-1-agent-ledger.md) | journal | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 TOOL-aOrientedCast-23 |
 | [2026-10-13-build-TOOL-aOrientedCast-22-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-aOrientedCast-22-1-acceptance-ledger.md) | journal | — |
+| [2026-10-13-build-TOOL-aOrientedCast-25-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-aOrientedCast-25-1-acceptance-ledger.md) | journal | TOOL-aOrientedCast-25 TOOL-aOrientedCast-21 |
 | [2026-10-13-review-TOOL-aOrientedCast-16-closing-diff-round1.md](../reviews/2026-10-13-review-TOOL-aOrientedCast-16-closing-diff-round1.md) | diff-review | TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 |
 
 <!-- /gen:spec-records -->

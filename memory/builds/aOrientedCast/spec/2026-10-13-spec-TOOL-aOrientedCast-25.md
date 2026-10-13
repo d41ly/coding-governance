@@ -1,11 +1,12 @@
 # TOOL-aOrientedCast-25 — the second closing review's roles minors: one marker reading, armed rules, one fence reading, and records that say what was built
 
-**Status:** INPROGRESS · rev-6 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 27 · ratified 2026-10-13
+**Status:** CLOSED · rev-6 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 27 · ratified 2026-10-13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-TOOL-aOrientedCast-25-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-aOrientedCast-25-1-acceptance-ledger.md) | journal | TOOL-aOrientedCast-21 TOOL-aOrientedCast-22 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-24-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-24-1-spec-brief.md) | journal | TOOL-aOrientedCast-24 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-24-2-build-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-24-2-build-brief.md) | journal | TOOL-aOrientedCast-24 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-25-1-spec-writer.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-25-1-spec-writer.md) | journal | — |

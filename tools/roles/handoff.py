@@ -8,7 +8,7 @@
     python handoff.py stage-efforts <workflow>
     python handoff.py check <file>
     python handoff.py roster
-    python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>]
+    python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>] [--write]
 
 `render` composes the role as `roles_lib.render_role` renders it with a task block holding exactly
 the inputs the role's `reads` declares, in that order, then `roles_lib.render_charter_blocks` for
@@ -39,10 +39,14 @@ charter (TOOL-aOrientedCast-17).
 `returned` line once it has returned, each shape read from the doc's micro-format fence and filled
 by placeholder name from the session's own records, the role index and the agent types; a field
 nothing answers prints `unknown` (TOOL-aOrientedCast-20). `--handoff` names a direct spawn, every
-`Agent` call whose prompt opens with the file's marker line; `--run` a harness run, one agent per
-`started` entry of its journal. The session is `--session`, else the transcript
-CLAUDE_CODE_SESSION_ID names. Each line holding no `unknown` is added, once, to the build's one
-`<MEMORY_ROOT>/builds/<build>/build/*-agent-ledger.md`, its prompt link re-rooted at that folder.
+`Agent` call whose prompt opens with the file's marker line as the hooks kit's spawn guard reads it,
+through `roles_lib.extract_prompt_marker` (TOOL-aOrientedCast-25); `--run` a harness run, one agent
+per `started` entry of its journal. The session is `--session`, else the transcript
+CLAUDE_CODE_SESSION_ID names. With `--write`, each line holding no `unknown` is added, once, to the
+build's one `<MEMORY_ROOT>/builds/<build>/build/*-agent-ledger.md`, its prompt link re-rooted at
+that folder; without it nothing is written and one note names the held lines and `--write`, so a
+mid-pass call leaves the tree as it found it. Pass `--write` only at a bookkeeping step, when no
+pass is running.
 
 Sources, by key family: `task:` the card's `## task` field, read by the kickoff checker's grammar
 (stated above its `check_card_task`, and ported here because that one is shell) under the labels
@@ -772,11 +776,12 @@ def write_agent_ledger(root, memory_root, build, lines):
     return "%s: %d line(s) added" % (path.relative_to(root).as_posix(), added)
 
 
-def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run_id):
+def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run_id, write=False):
     """Print the governing doc's `agent` line for each agent the selector names, then its `returned`
     line once it has returned, filled by name from the session's records, the role index and the
-    agent types, and add each line holding no UNKNOWN field to the build's agent ledger
-    (TOOL-aOrientedCast-20). RolesError on a refusal, with nothing printed."""
+    agent types (TOOL-aOrientedCast-20). When `write` is true, add each line holding no UNKNOWN
+    field to the build's agent ledger; else write nothing and note the held lines and `--write`
+    (TOOL-aOrientedCast-25). RolesError on a refusal, with nothing printed."""
     from render_agents import AGENTS_REL, INDEX_REL  # the renderer's two paths, as print_roster imports the checker's
     doc = charter_path.relative_to(root).as_posix() if root in charter_path.parents else charter_path.as_posix()
     shapes = lib.extract_microformat_shapes(lib.load_text(charter_path))
@@ -812,7 +817,7 @@ def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run
             raise lib.RolesError("%s carries no gov:handoff marker line, so no Agent call can be matched to "
                                  "it" % hrel)
         hits = [c for c in calls if c["name"] == "Agent"
-                and str(c["input"].get("prompt", "")).split("\n", 1)[0].rstrip("\r") == marker.group(0)
+                and (m := lib.extract_prompt_marker(c["input"].get("prompt", ""))) and m.group(0) == marker.group(0)
                 and isinstance(c["result"], dict) and isinstance(c["result"].get("agentId"), str)]
         if not hits:
             raise lib.RolesError("no Agent call in %s opens its prompt with the marker line of %s and has a "
@@ -891,8 +896,11 @@ def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run
             rooted = dict(fields, path=os.path.relpath(root / path, folder).replace("\\", "/")) \
                 if fields["path"] != UNKNOWN else fields
             ledger.append(render_shape_line(shapes[head], rooted))
-    if ledger:
+    if ledger and write:
         notes.append(write_agent_ledger(root, memory_root, build, ledger))
+    elif ledger:
+        notes.append("%d complete line(s) held, nothing written; pass --write to add them to the agent "
+                     "ledger at a bookkeeping step, when no pass is running" % len(ledger))
     if out:
         sys.stdout.buffer.write(("\n".join(out) + "\n").encode("utf-8"))
     for line in notes:
@@ -923,6 +931,7 @@ def main(argv):
     sel.add_argument("--handoff")
     sel.add_argument("--run")
     ag.add_argument("--session")
+    ag.add_argument("--write", action="store_true")
     a = ap.parse_args(argv)
     if a.verb == "agents" and a.run is not None and not PATH_ID_RE.match(a.run):
         ap.error("--run '%s' is not a run id of letters, digits, '_' and '-'" % a.run)
@@ -982,7 +991,7 @@ def main(argv):
                   file=sys.stderr)
             return 2
         try:
-            print_agent_lines(root, memory_root, charter_path, session, a.handoff, a.run)
+            print_agent_lines(root, memory_root, charter_path, session, a.handoff, a.run, a.write)
         except lib.RolesError as e:
             print("\n".join("handoff: " + ln for ln in str(e).split("\n")), file=sys.stderr)
             return 1

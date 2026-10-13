@@ -7813,6 +7813,11 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "extract_prompt_marker",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "extract_range",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"

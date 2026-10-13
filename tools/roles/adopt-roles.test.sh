@@ -16,13 +16,19 @@
 # without that kit or node); an `export` conf line with a trailing comment (arm 7); the roster verb's
 # one line per role and its refusal of a line past 200 characters (arm 8); the agents verb's two
 # lines for a direct spawn, its tokens counted once per message id, each added to the build's agent
-# ledger exactly once across two runs (arm 9). Every arm is a
+# ledger exactly once across two runs, a run without `--write` writing nothing, a harness run's two
+# agent lines and one returned line, and a prompt opening with a blank line still matching (arm 9);
+# the stand-in render's refusal, R15 both ways and over eight bad rows, R13, R14 and R0 (arm 10);
+# and the roles kit's reading of a prompt's marker line and of the charter's micro-format fence
+# against the hooks kit's own (arm 11, which SKIPs out loud as arm 6 does). Every arm is a
 # self-contained block below the prologue, so a slice of the prologue and one
 # block runs that arm alone.
 #
 # WHAT THIS DOES NOT CHECK: what the rendered Skill or an agent type SAYS, which the catalogue checker
 # and the renderer's own self-test grade; the `--scaffold` restart notice's wording; or an adopter run
-# at another install prefix, since the fixture mirrors this repository's own.
+# at another install prefix, since the fixture mirrors this repository's own. Arm 11 does not
+# compare a refusal's wording, any marker field beyond the whole line, or any micro-format head but
+# `agent` and `returned`.
 #
 # Withheld from the payload by the kit's descriptor (`project-owned`): its subject is the adopter in
 # this directory, so it has a job only where that source changes.
@@ -50,8 +56,9 @@ TMP_ROOT=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP_ROOT"' EXIT
 # 10, then +3 for arm 7 (TOOL-aOrientedCast-15). Arm 6 is NOT in the floor: it SKIPs out loud on a
 # host with no hooks kit or no node, and a skip must not red the floor.
-# +3 for arm 8 (TOOL-aOrientedCast-17). +3 for arm 9 (TOOL-aOrientedCast-20).
-FLOOR_ASSERTIONS=19
+# +3 for arm 8 (TOOL-aOrientedCast-17). +3 for arm 9 (TOOL-aOrientedCast-20). +4 for arm 9 and +10
+# for arm 10 (TOOL-aOrientedCast-25); arm 11 is out of the floor, as arm 6 is.
+FLOOR_ASSERTIONS=33
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""
@@ -220,16 +227,221 @@ A9S="$TMP_ROOT/s9/projects/p/11111111-1111-4111-8111-111111111111.jsonl"
 "$PY" -B -c "$A9_WRITE" "$FX" "$A9S" "$A9H" || echo "    arm 9: the fixture writer exited non-zero"
 A9L1="- agent — gov-builder · effort medium · model claude-test-1 · TOOL-tFix-1 · prompt [${A9H##*/}]($A9H) · writes product · gates lexicon naming predicates · run direct/a0000000000000001"
 A9L2="- returned — gov-builder · wrote 2 files · 7m47s · 1.6k out · run direct/a0000000000000001"
-out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A9S" 2>"$TMP_ROOT/a9.err"); rc=$?
+out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A9S" --write 2>"$TMP_ROOT/a9.err"); rc=$?
 check_arm "arm 9 agents prints a direct spawn's agent and returned lines, its tokens the per-message-id maximum" \
    "$([ "$rc" = 0 ] && [ "$(printf '%s' "$out" | tr -d '\r')" = "$A9L1"$'\n'"$A9L2" ] && echo 1 || echo 0)"
 [ "$rc" = 0 ] || sed 's/^/    /' "$TMP_ROOT/a9.err"
-(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A9S" >/dev/null 2>&1)
+(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A9S" --write >/dev/null 2>&1)
 _lg=$(ls "$FX/$MR/builds/tFix/build/"*-agent-ledger.md 2>/dev/null)
 _ll1=${A9L1/"($A9H)"/"(../prompts/${A9H##*/})"}
 check_arm "arm 9 ...and after a second run the build's one agent ledger holds each line, its link re-rooted, once" \
    "$([ "$(printf '%s\n' "$_lg" | grep -c .)" = 1 ] && [ "$(tr -d '\r' < "$_lg" | grep -cxF -e "$_ll1")" = 1 ] \
       && [ "$(tr -d '\r' < "$_lg" | grep -cxF -e "$A9L2")" = 1 ] && echo 1 || echo 0)"
+# TOOL-aOrientedCast-25 S13: a call without --write writes nothing, so one made mid-pass leaves the
+# tree as it found it. It runs BEFORE the run's lines are written, so a verb that wrote anyway would
+# add them here and move the hash.
+_h0=$(git hash-object "$_lg"); _d0=$(ls -A "$FX/$MR/builds/tFix/build")
+(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --run wf_00000001-aaa --session "$A9S" >/dev/null 2>"$TMP_ROOT/a9n.err"); rc=$?
+check_arm "arm 9 agents without --write leaves the ledger and the build folder unchanged, naming --write" \
+   "$([ "$rc" = 0 ] && [ "$(git hash-object "$_lg")" = "$_h0" ] && [ "$(ls -A "$FX/$MR/builds/tFix/build")" = "$_d0" ] \
+      && grep -q -e '--write' "$TMP_ROOT/a9n.err" && echo 1 || echo 0)"
+# TOOL-aOrientedCast-25 S4: the journal branch, over the same fixture. a0000000000000003 has no
+# `result`, so it prints no returned line.
+A9L3="- agent — gov-builder · effort xhigh · model claude-test-2 · TOOL-tFix-1 · prompt [${A9H##*/}]($A9H) · writes product · gates lexicon naming predicates · run wf_00000001-aaa/a0000000000000002"
+A9L4="- returned — gov-builder · committed abc123def · 45s · 1.5k out · run wf_00000001-aaa/a0000000000000002"
+A9L5="- agent — workflow-subagent · effort high · model claude-test-2 · commit:specs:tFix · prompt [${A9H##*/}]($A9H) · writes none · gates none · run wf_00000001-aaa/a0000000000000003"
+out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --run wf_00000001-aaa --session "$A9S" --write 2>"$TMP_ROOT/a9r.err"); rc=$?
+check_arm "arm 9 agents --run prints the run's two agent lines and its one returned line" \
+   "$([ "$rc" = 0 ] && [ "${out//$'\r'/}" = "$A9L3"$'\n'"$A9L4"$'\n'"$A9L5" ] && echo 1 || echo 0)"
+[ "$rc" = 0 ] || sed 's/^/    /' "$TMP_ROOT/a9r.err"
+_r=0
+for _l in "$_ll1" "$A9L2" "${A9L3/"($A9H)"/"(../prompts/${A9H##*/})"}" "$A9L4" "${A9L5/"($A9H)"/"(../prompts/${A9H##*/})"}"; do
+  [ "$(tr -d '\r' < "$_lg" | grep -cxF -e "$_l")" = 1 ] && _r=$((_r+1))
+done
+check_arm "arm 9 ...and the ledger gains exactly those three" \
+   "$([ "$(tr -d '\r' < "$_lg" | grep -c '^- ')" = 5 ] && [ "$_r" = 5 ] && echo 1 || echo 0)"
+# TOOL-aOrientedCast-25 S2: the spawn guard admits a prompt opening with a blank line, so the verb
+# matches it too.
+"$PY" -B -c 'import json, sys
+rows = [json.loads(ln) for ln in open(sys.argv[1], encoding="utf-8") if ln.strip()]
+for r in rows:
+    for c in (r.get("message") or {}).get("content") or []:
+        if isinstance(c, dict) and c.get("id") == "toolu_A":
+            c["input"]["prompt"] = "\n" + c["input"]["prompt"]
+open(sys.argv[1], "w", encoding="utf-8", newline="\n").write("".join(json.dumps(r) + "\n" for r in rows))' "$A9S"
+out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A9S" 2>"$TMP_ROOT/a9b.err"); rc=$?
+check_arm "arm 9 a prompt opening with a blank line still matches its handoff" \
+   "$([ "$rc" = 0 ] && [ "${out//$'\r'/}" = "$A9L1"$'\n'"$A9L2" ] && echo 1 || echo 0)"
+[ "$rc" = 0 ] || sed 's/^/    /' "$TMP_ROOT/a9b.err"
+
+# ---- arm 10: the stand-in refusal, R15 both ways and over eight bad rows, R13, R14 and R0 --------
+# TOOL-aOrientedCast-25 S3: the rules TOOL-aOrientedCast-17 and TOOL-aOrientedCast-19 added, each
+# answered by the shipped checker over the shipped role files, charter and renderer the fixture
+# copies. Step 1 is the liveness half: a fixture that is not clean reds there, before any staged
+# break is read.
+build_fixture
+A10W="$FX/$MR/project/role-stand-in-waiver.txt"
+A10P="$FX/$MR/builds/tFix/prompts"
+A10R="$TMP_ROOT/a10.out"
+_t=$'\t'
+A10G="2026-10-13${_t}owner a${_t}gov-researcher${_t}tFix${_t}this tool exposes no sub-agent primitive"
+mkdir -p "$A10P" "$FX/$MR/project"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
+check_arm "arm 10 the fixture's catalogue checks clean, with no stand-in waiver or declaration" \
+   "$([ "$rc" = 0 ] && grep -qF '0 stand-in waiver(s), 0 stand-in declaration(s)' "$A10R" && echo 1 || echo 0)"
+[ "$rc" = 0 ] || sed 's/^/    /' "$A10R"
+(cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build tFix --unit TOOL-tFix-1 \
+   --input "question=q" --stand-in) > "$TMP_ROOT/a10.render" 2>"$TMP_ROOT/a10.err"; rc=$?
+_ls=$(ls -A "$A10P")
+check_arm "arm 10 a stand-in render with no registry refuses, naming it, and writes nothing" \
+   "$([ "$rc" = 1 ] && grep -qF "role-stand-in-waiver.txt" "$TMP_ROOT/a10.err" && [ -z "$_ls" ] && echo 1 || echo 0)"
+printf '%s\n' "$A10G" > "$A10W"
+A10D=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build tFix --unit TOOL-tFix-1 \
+   --input "question=q" --stand-in 2>/dev/null); rc=$?
+A10D=${A10D%$'\r'}
+check_arm "arm 10 ...and with the owner's row it writes the declaration, named -researcher-stand-in.md" \
+   "$([ "$rc" = 0 ] && [[ "$A10D" == *-researcher-stand-in.md ]] && [ -f "$FX/$A10D" ] && echo 1 || echo 0)"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
+check_arm "arm 10 the row and its declaration join: one waiver note, exit 0" \
+   "$([ "$rc" = 0 ] && [ "$(grep -c '^roles: note: stand-in waiver' "$A10R")" = 1 ] \
+      && grep -qF '1 stand-in waiver(s), 1 stand-in declaration(s)' "$A10R" && echo 1 || echo 0)"
+mv "$A10W" "$TMP_ROOT/a10.waiver"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
+check_arm "arm 10 a declaration no row covers is one R15 line, naming it, its role and its build" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R15 — ' "$A10R")" = 1 ] \
+      && grep ': R15 — ' "$A10R" | grep -F "$A10D" | grep -F 'gov-researcher' | grep -qF 'tFix' && echo 1 || echo 0)"
+mv "$TMP_ROOT/a10.waiver" "$A10W"; mv "$FX/$A10D" "$TMP_ROOT/a10.decl"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
+check_arm "arm 10 a row covering no declaration is one R15 line, stale" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R15 — ' "$A10R")" = 1 ] && grep ': R15 — ' "$A10R" | grep -qF 'stale' && echo 1 || echo 0)"
+# The eight bad rows of TOOL-aOrientedCast-19's AC1, each otherwise the good row: four fields, a
+# date that is no calendar date, an attribution that is not the owner's, a role with no file, the
+# catalogue's one agent: false role, a build that is not a slug, an empty reason after a fifth TAB,
+# and a second copy of the good row. They are registry lines 2 to 9.
+mv "$TMP_ROOT/a10.decl" "$FX/$A10D"
+printf '%s\n' "2026-10-13${_t}owner a${_t}gov-researcher${_t}tFix" \
+  "2026-13-01${A10G#2026-10-13}" \
+  "2026-10-13${_t}agent a${A10G#*owner a}" \
+  "${A10G/gov-researcher/gov-ghost}" \
+  "${A10G/gov-researcher/gov-session}" \
+  "${A10G/tFix/t-Fix}" \
+  "2026-10-13${_t}owner a${_t}gov-researcher${_t}tFix${_t}" \
+  "$A10G" >> "$A10W"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
+_r=0
+for _i in 2 3 4 5 6 7 8 9; do
+  [ "$(grep -cF "role-stand-in-waiver.txt:$_i: R15 — " "$A10R")" = 1 ] && _r=$((_r+1))
+done
+check_arm "arm 10 eight bad rows are eight R15 lines, naming registry lines 2 to 9 once each" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R15 — ' "$A10R")" = 8 ] && [ "$_r" = 8 ] && echo 1 || echo 0)"
+printf '%s\n' "$A10G" > "$A10W"
+cp "$FX/$KREL/agents/gov-orienter.agent.md" "$TMP_ROOT/a10.orienter"
+sed -i 's/^mandatory: .*/mandatory: for every session/' "$FX/$KREL/agents/gov-orienter.agent.md"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
+check_arm "arm 10 a mandatory role whose workflow no hook enforces is one R13 line, naming its file" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R13 — ' "$A10R")" = 1 ] && grep ': R13 — ' "$A10R" | grep -qF 'gov-orienter.agent.md' && echo 1 || echo 0)"
+cp "$TMP_ROOT/a10.orienter" "$FX/$KREL/agents/gov-orienter.agent.md"
+cp "$FX/$KREL/agents/gov-spec-writer.agent.md" "$TMP_ROOT/a10.writer"
+sed -i 's/^output: .*/output: specs/' "$FX/$KREL/agents/gov-spec-writer.agent.md"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
+check_arm "arm 10 a spec writer whose output lacks its folder is one R14 line, naming the folder" \
+   "$([ "$rc" = 1 ] && [ "$(grep -c ': R14 — ' "$A10R")" = 1 ] && grep ': R14 — ' "$A10R" | grep -qF '{{MEMORY_ROOT}}/builds/<slug>/spec/' && echo 1 || echo 0)"
+cp "$TMP_ROOT/a10.writer" "$FX/$KREL/agents/gov-spec-writer.agent.md"
+printf 'CHARTER=%s\n' "$CH" > "$FX/.memory-tree.conf"
+(cd "$FX" && "$PY" -B "$KREL/check_roles.py" > "$A10R" 2>&1); rc=$?
+check_arm "arm 10 a conf with its CHARTER line alone is unarmed, exit 2 naming MEMORY_ROOT" \
+   "$([ "$rc" = 2 ] && grep -qF 'MEMORY_ROOT' "$A10R" && echo 1 || echo 0)"
+
+# ---- arm 11: the roles kit reads a prompt's marker and the charter's fence as the hooks kit does --
+# TOOL-aOrientedCast-25 S2 and S6, after arm 6's idiom: the hooks kit is found the derived way, and
+# with no hooks kit or no node the arm SKIPs, naming what is absent. It stays out of the floor. Part A
+# feeds five prompt variants to roles_lib.extract_prompt_marker and to the spawn guard; part B three
+# charter copies to roles_lib.extract_microformat_shapes and to format-guard's readCharterShapes.
+# WHAT IT DOES NOT COMPARE: a refusal's wording, any marker field beyond the whole line, and any head
+# but `agent` and `returned`.
+HK11=$("$PY" -B -c 'import sys
+sys.path.insert(0, sys.argv[1])
+import roles_lib
+found = []
+for anchor in ("agent-cap.js", "format-guard.js"):
+    try:
+        found.append(roles_lib.resolve_kit_dir("hooks", anchor, sys.argv[1]).as_posix())
+    except LookupError:
+        found.append("")
+sys.stdout.write("|".join(found))' "$HERE")
+HKA=${HK11%%|*}; HKF=${HK11#*|}
+if [ -z "$HKA" ] || [ -z "$HKF" ]; then
+  echo "SKIP arm 11 — no hooks kit holding agent-cap.js and format-guard.js was found from $KREL"
+elif ! command -v node >/dev/null 2>&1; then
+  echo "SKIP arm 11 — no node on PATH to run $HKA/agent-cap.js and $HKF/format-guard.js"
+else
+  build_fixture
+  printf -v _d '%(%Y-%m-%d)T' -1
+  A11P="$MR/builds/bx/prompts/$_d-prompt-TOOL-bx-1-1-researcher.md"
+  mkdir -p "$FX/$MR/builds/bx/prompts" "$TMP_ROOT/a11"
+  (cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build bx --unit TOOL-bx-1 \
+     --input "question=which mechanism fits" --out "$A11P" --part task) > "$TMP_ROOT/a11/task" 2>/dev/null
+  FXN=$(cd "$FX" && { pwd -W 2>/dev/null || pwd; })
+  # Each variant's bytes written exact, then its two answers: `admit` or `refuse`, one line per variant.
+  "$PY" -B -c 'import json, pathlib, sys
+sys.path.insert(0, sys.argv[1])
+import roles_lib
+out, fxn, pid = pathlib.Path(sys.argv[2]), sys.argv[3], sys.argv[4]
+t = (out / "task").read_bytes().decode("utf-8")
+m = t.replace("\r", "").split("\n", 1)[0]
+head, rest = t.split("\n", 1)
+variants = {"v1": t, "v2": "\n" + t, "v3": t.replace("\r\n", "\n").replace("\n", "\r\n"),
+            "v4": head.rstrip("\r") + " \n" + rest, "v5": "  " + t}
+for name, text in variants.items():
+    with open(out / (name + ".json"), "w", encoding="utf-8", newline="") as fh:
+        json.dump({"tool_name": "Agent", "cwd": fxn, "session_id": "a11-s-" + name,
+                   "prompt_id": "a11-p-%s-%s" % (name, pid), "tool_use_id": "a11-u-" + name,
+                   "tool_input": {"subagent_type": "gov-researcher", "prompt": text}}, fh)
+    hit = roles_lib.extract_prompt_marker(text)
+    with open(out / (name + ".py"), "w", encoding="utf-8", newline="") as fh:
+        fh.write("admit" if hit and hit.group(0) == m else "refuse")' "$HERE" "$TMP_ROOT/a11" "$FXN" "$$"
+  _seen=""
+  for _v in v1 v2 v3 v4 v5; do
+    (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR node "$HKA/agent-cap.js" < "$TMP_ROOT/a11/$_v.json" >/dev/null 2>"$TMP_ROOT/a11/$_v.hook"); hrc=$?
+    _js=refuse; [ "$hrc" = 0 ] && [ ! -s "$TMP_ROOT/a11/$_v.hook" ] && _js=admit
+    _py=$(<"$TMP_ROOT/a11/$_v.py")
+    _seen+=" $_js"
+    check_arm "arm 11 prompt variant $_v: the spawn guard and extract_prompt_marker both $_js" \
+       "$([ "$_js" = "$_py" ] && echo 1 || echo 0)"
+  done
+  check_arm "arm 11 ...and the five answers hold both an admit and a refuse" \
+     "$([[ "$_seen" == *admit* && "$_seen" == *refuse* ]] && echo 1 || echo 0)"
+  # Part B: three charter copies, each written as AGENTS.md in its own folder, the name format-guard reads.
+  "$PY" -B -c 'import pathlib, sys
+src, out = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+text = src.read_bytes().decode("utf-8").replace("\r\n", "\n")
+d2 = "- `agent — <role> · run <run-id|direct>/<agent-id>`"
+copies = {"c1": text, "c2": text.replace("\n<!-- /microformats -->\n", "\n%s\n<!-- /microformats -->\n" % d2, 1),
+          "c3": text.replace("\n<!-- microformats -->\n", "\nx <!-- microformats -->\n", 1)}
+for name, body in copies.items():
+    (out / name).mkdir(parents=True, exist_ok=True)
+    with open(out / name / "AGENTS.md", "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(body)' "$REPO/$CH" "$TMP_ROOT/a11"
+  _nn=0; _nd=0; _defs=$'\n'
+  for _c in c1 c2 c3; do
+    _cn=$(cd "$TMP_ROOT/a11/$_c" && { pwd -W 2>/dev/null || pwd; })
+    _js=$(node -e 'const r = require(process.argv[1]).readCharterShapes(process.argv[2])
+const s = r.shapes || {}
+process.stdout.write(["agent", "returned"].map((h) => s[h] ? s[h].def : "none").join("\n"))' "$HKF/format-guard.js" "$_cn")
+    _py=$("$PY" -B -c 'import sys
+sys.path.insert(0, sys.argv[1])
+import roles_lib
+s = roles_lib.extract_microformat_shapes(roles_lib.load_text(sys.argv[2]))
+sys.stdout.buffer.write("\n".join(s.get(h, "none") for h in ("agent", "returned")).encode("utf-8"))' "$HERE" "$TMP_ROOT/a11/$_c/AGENTS.md")
+    _a=${_js%%$'\n'*}
+    if [ "$_a" = none ]; then _nn=$((_nn+1))
+    elif [[ "$_defs" != *$'\n'"$_a"$'\n'* ]]; then _nd=$((_nd+1)); _defs+="$_a"$'\n'; fi
+    check_arm "arm 11 charter copy $_c: readCharterShapes and extract_microformat_shapes read the same agent and returned" \
+       "$([ "$_js" = "$_py" ] && echo 1 || echo 0)"
+  done
+  check_arm "arm 11 ...and the three agent answers hold two distinct definitions and one none" \
+     "$([ "$_nd" = 2 ] && [ "$_nn" = 1 ] && echo 1 || echo 0)"
+fi
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

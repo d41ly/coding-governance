@@ -1,4 +1,4 @@
-<!-- gov:kit roles@1.3 -->
+<!-- gov:kit roles@1.4 -->
 # roles — the role catalogue: one agent definition per role, the workflow table, and the checker
 
 A governed session runs its LLM work through ten declared WORKFLOWS — `orient`, `research`, `reuse`,
@@ -78,12 +78,14 @@ render writes the charter; the playbook kit's derived roster placeholder is its 
 
 ## The agent lines
 
-`python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>]` prints the
-governing doc's `agent` line for each agent the selector names, then its `returned` line once it
-has returned (TOOL-aOrientedCast-20). The two shapes are read from the doc's micro-format fence by
-`roles_lib.extract_microformat_shapes` and filled by placeholder name. A missing shape, or a
-placeholder the verb does not derive, refuses. `--handoff` names a direct spawn: every `Agent` call
-whose prompt's first line is that file's marker line, and whose result names an agent. `--run`
+`python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>] [--write]` prints
+the governing doc's `agent` line for each agent the selector names, then its `returned` line once
+it has returned (TOOL-aOrientedCast-20). The two shapes are read from the doc's micro-format fence
+by `roles_lib.extract_microformat_shapes`, each marker a whole line and the last definition of a
+head winning, as the hooks kit's format guard reads the fence, and filled by placeholder name. A
+missing shape, or a placeholder the verb does not derive, refuses. `--handoff` names a direct spawn:
+every `Agent` call whose prompt opens with that file's marker line as the spawn guard reads it,
+through `roles_lib.extract_prompt_marker`, and whose result names an agent. `--run`
 names a harness run: one agent per `started` entry of its journal. The session is `--session`, else
 the transcript `CLAUDE_CODE_SESSION_ID` names under the Claude projects folder, found by the run-log
 kit's rule.
@@ -103,8 +105,11 @@ kit's rule.
 A direct spawn has returned when a notification names its call or its result says `completed`; a
 harness agent when its journal holds a `result` or `failed` entry for it.
 
-**The ledger.** Each printed line holding no `unknown` field is added to the build's one
-`<MEMORY_ROOT>/builds/<build>/build/<date>-build-<id>-agent-ledger.md`, created on first use. It is
+**The ledger.** Only with `--write`, each printed line holding no `unknown` field is added to the
+build's one `<MEMORY_ROOT>/builds/<build>/build/<date>-build-<id>-agent-ledger.md`, created on first
+use; without it the verb writes nothing and one note names the held lines and `--write`, so a call
+made mid-pass leaves the tree as it found it. Pass `--write` only at a bookkeeping step, when no pass
+is running (TOOL-aOrientedCast-25). It is
 added only if no line already carries the same head and the same last field, its `run` token. A line
 held back for an `unknown` field is added by a later run. In the ledger the prompt link is re-rooted
 at the ledger's folder. The ledger's `**Serves:**` line lists every unit id the build's specs define
