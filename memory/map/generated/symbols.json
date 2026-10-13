@@ -753,6 +753,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_patch_negative",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_records",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -4201,6 +4206,11 @@
       "id": "check_reader_pair",
       "kind": "function",
       "file": "tools/memory-tree/marker-contract.test.sh"
+    },
+    {
+      "id": "check_rebased_copy",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
       "id": "check_recall_opened",

@@ -750,8 +750,34 @@ def arm_foreign():
               (got[0], (wt / "own.txt").exists()), ("failed", True))
 
 
+def arm_patch_negative():
+    """TOOL-dSweptBranches-9 — a same subject is not a rebased copy unless the patches share lines."""
+    repo = seed_repo(build_dir())
+    seed_commit(repo, "x.txt", seed_lines(10), "seed: x")
+    seed_publish(repo)
+    run_git(repo, "checkout", "-q", "-b", "other-file")
+    seed_commit(repo, "b.txt", "b2\n", "fix: typo")
+    run_git(repo, "checkout", "-q", "-b", "disjoint", "main")
+    seed_commit(repo, "x.txt", seed_lines(10).replace("line 1\n", "line 1 edited\n"), "fix: spacing")
+    run_git(repo, "checkout", "-q", "-b", "same-lines", "main")
+    seed_commit(repo, "c1.txt", seed_lines(5, " shared"), "feat: the table")
+    run_git(repo, "checkout", "-q", "main")
+    seed_commit(repo, "a.txt", "a2\n", "fix: typo")
+    seed_commit(repo, "x.txt", seed_lines(10).replace("line 8\n", "line 8 edited\n"), "fix: spacing")
+    seed_commit(repo, "c2.txt", seed_lines(5, " shared"), "feat: the table")
+    seed_publish(repo)
+    rows = read_report(repo, "--fresh-hours", "0")
+    check("patch-negative: AC1 a same-subject commit on another file is not a copy",
+          read_verdict(rows, "local", "other-file")[0], "UNMERGED-LIVE")
+    check("patch-negative: AC1 a same-subject edit of disjoint lines is not a copy",
+          read_verdict(rows, "local", "disjoint")[0], "UNMERGED-LIVE")
+    check("patch-negative: AC1 the same lines added to a different file are not a copy",
+          read_verdict(rows, "local", "same-lines")[0], "UNMERGED-LIVE")
+
+
 ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
-        arm_content, arm_stash, arm_remover, arm_write, arm_keeps, arm_unread, arm_foreign]
+        arm_content, arm_stash, arm_remover, arm_write, arm_keeps, arm_unread, arm_foreign,
+        arm_patch_negative]
 
 
 def main():

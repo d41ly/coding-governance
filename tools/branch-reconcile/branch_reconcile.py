@@ -537,6 +537,22 @@ def check_build_landed(inv, slug, merges):
     return any(check_names({slug}, subject) for _sha, subject in merges)
 
 
+def check_rebased_copy(inv, lines, files, cand):
+    """True when <cand> is a rebased copy of a commit with these patch lines and files.
+
+    TOOL-dSweptBranches-9: a shared subject proves nothing on its own. Two one-line edits of
+    unrelated lines differ by exactly 4, which an absolute drift bound accepts, and a binary-only
+    commit has no lines at all. So the copy must touch the same files, and the lines the two share
+    must outnumber the lines that drifted, which also refuses an empty patch: none shared is never
+    more than the drift.
+    """
+    other = read_patch_lines(inv, cand)
+    if read_files(inv, cand) != files:
+        return False
+    drift = sum(((lines - other) + (other - lines)).values())
+    return drift <= DRIFT_LINES and sum((lines & other).values()) > drift
+
+
 def derive_coverage(inv, tip):
     """-> what covers each unique commit of <tip>, or why that could not be read. Cached by tip."""
     def load():
@@ -567,12 +583,11 @@ def derive_coverage(inv, tip):
                 how = "patch-id"
             else:
                 lines = read_patch_lines(inv, sha)
+                files = read_files(inv, sha)
                 for cand in by_subject.get(subject, []):
-                    a, b = lines, read_patch_lines(inv, cand)
-                    if sum(((a - b) + (b - a)).values()) <= DRIFT_LINES:
+                    if check_rebased_copy(inv, lines, files, cand):
                         how = "patch"
                         break
-                files = read_files(inv, sha)
                 names = derive_names(subject)
                 if how is None and names:
                     for msha, msubject in merges:
