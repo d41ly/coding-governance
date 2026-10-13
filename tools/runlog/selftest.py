@@ -331,6 +331,7 @@ from collections import Counter  # noqa: E402
 # RAISED 1578 -> 1580 by TOOL-aHeardState-8: the refusal arm's UTF-16 charter, its exit and its
 # `unknown` pair line. The figures arm's mixed scenario now carries a two-block message and a
 # sidechain record, which move its pinned narration line and add no check.
+# 1 + 1 = 2
 ASSERTION_FLOOR = 1580
 
 PASS = []

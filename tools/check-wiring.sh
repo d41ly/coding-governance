@@ -571,7 +571,7 @@ resolve_kit_file() { # <kit-home> <file> -> <repo-relative kit dir>/<file>, or n
 }
 # EVERY `<home> <file>` PAIR AN ARM PASSES `resolve_kit_file`, declared, one line: the self-test
 # compares it with the literal pairs this file's call sites spell, so it cannot drift without a red.
-KIT_FILE_PAIRS=(hooks agent-cap.js hooks scratch-guard.fragment.json memory-recall recall-opened.fragment.json memory-tree merge-rows.py lib pyrun.sh memory-tree adopt-memory-tree.sh)
+KIT_FILE_PAIRS=(hooks agent-cap.js hooks scratch-guard.fragment.json memory-recall recall-opened.fragment.json memory-tree merge-rows.py lib pyrun.sh memory-tree adopt-memory-tree.sh roles workflows.toml)
 _KF_KEYS=(); _KF_DIRS=()
 # ONE python start for every declared pair, run once after the print verb's exit. Its answers reach
 # the arrays by parameter expansion, one line per pair: no loop fed by a substitution, and no IFS

@@ -500,7 +500,7 @@ PYEOF
 )
 [ -n "$before" ] || bad "AC11: delta() over two tips with no merge between them returned nothing"; ok
 git -C "$F11" merge -q --no-ff -m "merge the straggler" strag
-audit "$F11" --report --expect-builds >/dev/null; after=$(printf '%s\n' "$_audit" | sed -n's/^entry [0-9a-f]* \xc2\xb7 \([^ ]*\) \xc2\xb7 \([^ ]*\) \xc2\xb7 \([0-9a-f]*\) .*/\1|\2|\3/p' | LC_ALL=C sort)
+audit "$F11" --report --expect-builds >/dev/null; after=$(printf '%s\n' "$_audit" | sed -n 's/^entry [0-9a-f]* \xc2\xb7 \([^ ]*\) \xc2\xb7 \([^ ]*\) \xc2\xb7 \([0-9a-f]*\) .*/\1|\2|\3/p' | LC_ALL=C sort)
 [ "$before" = "$after" ] \
   || bad "AC11: delta() before the merge and --report after it disagree (before='$before' after='$after')"; ok
 

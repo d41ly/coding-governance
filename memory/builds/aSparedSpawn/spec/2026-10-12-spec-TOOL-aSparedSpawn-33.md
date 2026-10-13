@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-12-build-TOOL-aSparedSpawn-33-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aSparedSpawn-33-acceptance-ledger.md) | journal | — |
+| [2026-10-12-build-TOOL-aSparedSpawn-33-fixtures.sh](../build/2026-10-12-build-TOOL-aSparedSpawn-33-fixtures.sh) | journal | — |
 | [2026-10-12-prompt-TOOL-aSparedSpawn-33-build-brief.md](../prompts/2026-10-12-prompt-TOOL-aSparedSpawn-33-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

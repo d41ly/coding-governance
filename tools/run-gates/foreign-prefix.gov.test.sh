@@ -133,6 +133,9 @@ WHOLE_RUN=(
   "shell-hygiene selftest|a --selftest mode of a shipped engine, so a probe site would be adopter-facing"
   "playbook render selftest|a --selftest mode of a shipped engine, so a probe site would be adopter-facing"
   "review-replay selftest|a --selftest mode of a shipped engine, so a probe site would be adopter-facing"
+  "held-halves selftest|a --selftest mode of a shipped engine, so a probe site would be adopter-facing"
+  "roles render selftest|a --selftest mode of a shipped engine, so a probe site would be adopter-facing"
+  "routed-commits selftest|a --selftest mode of a shipped engine, so a probe site would be adopter-facing"
   "tier2-review self-test|its arms run inside ONE node process, which no shell site can stop between arms"
 )
 # THE GOV-LAYOUT DECLARATION, `row|reason` (S3, rev-6). An unshipped suite whose first arm grades

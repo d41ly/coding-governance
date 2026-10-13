@@ -219,9 +219,10 @@ peak()  { awk 'BEGIN{m=0} {if ($1+0>m) m=$1+0} END{print m+0}' "$1/peaks" 2>/dev
 # The beacon and the queue of the HOST turnstile every fixture repo shares (TOOL-aFrugalTurnstile-5),
 # under the suite's own `GATE_TURNSTILE_DIR`. The repo argument is kept so each arm still names the
 # repository it is about; the path no longer depends on it. They were the git common dir's, resolved
-# absolutely, and the arms planting there were what that resolution existed for.
+# absolutely, and the arms planting there were what that resolution existed for. `queue` also leaves
+# its path in `_queue`, which its callers read instead of forking a substitution (TOOL-aSweptBar-5).
 beacon(){ printf '%s/gate-bar-beacon' "$GATE_TURNSTILE_DIR"; }
-queue(){  printf '%s/gate-bar-queue' "$GATE_TURNSTILE_DIR"; }
+queue(){  printf -v _queue '%s/gate-bar-queue' "$GATE_TURNSTILE_DIR"; printf '%s' "$_queue"; }
 
 # ------------------------------------------------------ 1/2: peak occupancy, and its control -------
 # AC1 with AC2 beneath it. AC1 alone passes on an implementation that serializes by accident — two
@@ -261,7 +262,7 @@ out3=$( cd "$R3" && env GATE_FULL=1 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gate
 printf '%s' "$out3" | grep -q 'dead holder (pid 999999)' \
   && ok "a holder with a dead PID is reaped, and the reason recorded is the dead PID" \
   || { nope "a dead holder was not reaped by its PID"; printf '%s\n' "$out3" | tail -4 | sed 's/^/      /'; }
-printf '%s' "$out3" | grep -q 'gates GREEN' \
+[[ $out3 == *'gates GREEN'* ]] \
   && ok "the run proceeded after reaping a dead holder" || nope "the run did not complete after the reap"
 # TOOL-aGraftedHelix-8: the reap is a self-heal, so it leaves ONE I3 line in the repository's health
 # log, naming the dead pid. The log is read by its fields; its stamp and fold are the resolver suite's.
@@ -278,7 +279,7 @@ R4=$tmp/stale; mk_repo "$R4"; B4=$(beacon "$R4")
 mkdir -p "$B4"; printf '%s' "$$" > "$B4/pid"; printf '%s' "$(( $(date +%s) - 99999 ))" > "$B4/heartbeat"; printf '%s' stale > "$B4/nonce"
 legs "$R4" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
 out4=$( cd "$R4" && env GATE_FULL=1 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
-if printf '%s' "$out4" | grep -q 'stalled holder'; then
+if [[ $out4 == *'stalled holder'* ]]; then
   ok "a LIVE holder with a stale heartbeat is reaped, and the reason recorded is the TTL"
   printf '%s' "$out4" | grep -q 'dead holder' \
     && nope "the TTL case also reported a dead PID — the two reap reasons are not distinguishable" \
@@ -453,12 +454,12 @@ legs "$R6c" '[ {"name": "long", "argv": ["bash", "fx/long.sh"]} ]'
 h6c=$!
 for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do [ -f "$B6c/heartbeat" ] && break; sleep 1; done
 if [ -f "$B6c/pid" ]; then
-  hp6c=$(cat "$B6c/pid" 2>/dev/null)
+  { hp6c=$(<"$B6c/pid"); } 2>/dev/null
   sleep 2
   kill -9 "$hp6c" 2>/dev/null || true
-  sleep 1; hb_at_kill=$(cat "$B6c/heartbeat" 2>/dev/null)
+  sleep 1; { hb_at_kill=$(<"$B6c/heartbeat"); } 2>/dev/null
   sleep 4
-  hb_after=$(cat "$B6c/heartbeat" 2>/dev/null)
+  { hb_after=$(<"$B6c/heartbeat"); } 2>/dev/null
   [ "$hb_at_kill" = "$hb_after" ] \
     && ok "a SIGKILLed holder's ticker stops writing, so its beacon goes stale and stays reapable" \
     || nope "the beacon kept advancing after its holder was SIGKILLed ($hb_at_kill -> $hb_after) — an orphan ticker is still writing"
@@ -650,7 +651,7 @@ for sig in INT TERM HUP; do
     # and TERM and HUP failed on the same run, which is the shape of a race rather than of a defect in
     # the trap. The beacon records the holder's own pid, which is the handle the runner itself writes
     # and therefore the only one that cannot be a wrapper.
-    hp=$(cat "$Bs/pid" 2>/dev/null)
+    { hp=$(<"$Bs/pid"); } 2>/dev/null
     if [ -n "$hp" ]; then kill -"$sig" "$hp" 2>/dev/null; else kill -"$sig" "$pid" 2>/dev/null; fi
     wait "$pid" 2>/dev/null
     rel=0
@@ -820,7 +821,7 @@ legs "$R13" '[ {"name": "bad", "argv": ["bash", "fx/bad.sh"]} ]'
 # shorten the wait would make the fixture's own beacon reapable and the runner would ACQUIRE instead
 # of queueing, which is arm 4's mechanism quietly disarming this one.
 for sig in INT TERM HUP; do
-  Rq=$tmp/sig$sig; mk_repo "$Rq"; Bq=$(beacon "$Rq"); Qq=$(queue "$Rq")
+  Rq=$tmp/sig$sig; mk_repo "$Rq"; Bq=$(beacon "$Rq"); queue "$Rq" >/dev/null; Qq=$_queue
   mkdir -p "$Bq"; printf '%s' "$$" > "$Bq/pid"; printf '%s' "$(date +%s)" > "$Bq/heartbeat"
   printf '%s' held > "$Bq/nonce"
   legs "$Rq" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
@@ -842,7 +843,7 @@ done
 # The arm that FAILED on the runner as it stood at this build's BASE: it printed `another bar holds
 # this repository` with nothing holding it, waited out the whole bound, ran UNQUEUED, and left the
 # ticket in place for the next bar and every bar after it.
-R14=$tmp/deadticket; mk_repo "$R14"; Q14=$(queue "$R14")
+R14=$tmp/deadticket; mk_repo "$R14"; queue "$R14" >/dev/null; Q14=$_queue
 mkdir -p "$Q14"; : > "$Q14/20200101T000000-999999-1"
 legs "$R14" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
 out14=$( cd "$R14" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
@@ -867,7 +868,7 @@ hl14=$(awk -F'\t' '$2 == "run-gates" && $3 == "ticket-swept"' "$R14/.git/health.
 # Against the UNMODIFIED runner, exactly as arm 4 does for the holder: the ticket's PID is this
 # shell, so the dead-PID branch CANNOT fire, and only the name's stamp is forced old. An arm that
 # planted a dead PID would prove the first signal twice and the second not at all.
-R15=$tmp/oldticket; mk_repo "$R15"; Q15=$(queue "$R15")
+R15=$tmp/oldticket; mk_repo "$R15"; queue "$R15" >/dev/null; Q15=$_queue
 mkdir -p "$Q15"; : > "$Q15/$(date -u -d "@$(( $(date +%s) - 99999 ))" +%Y%m%dT%H%M%S)-$$-1"
 legs "$R15" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
 out15=$( cd "$R15" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
@@ -885,7 +886,7 @@ fi
 # ticket it finds passes both of those and is strictly WORSE than the bug, because a waiter whose
 # ticket is deleted can never match the acquire predicate again. The TTL is raised so the planted
 # ticket is nowhere near the staleness cutoff, and its PID is this shell.
-R16=$tmp/liveticket; mk_repo "$R16"; Q16=$(queue "$R16")
+R16=$tmp/liveticket; mk_repo "$R16"; queue "$R16" >/dev/null; Q16=$_queue
 mkdir -p "$Q16"; : > "$Q16/$(date -u +%Y%m%dT%H%M%S)-$$-1"
 legs "$R16" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
 # FORTY-FIVE SECONDS, and the number is load, not caution. At 15 this run did not reach the queued
@@ -901,7 +902,7 @@ legs "$R16" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
 # this suite before these arms introduced it.
 ( cd "$R16" && env GATE_FULL=1 GATE_TURNSTILE_TTL=300 GATE_TURNSTILE_TICK=1 \
     timeout -s TERM -k 10 45 bash $KIT_REL/run-gates.sh ) </dev/null >"$tmp/out16.raw" 2>&1 || true
-out16=$(cat "$tmp/out16.raw" 2>/dev/null)
+{ out16=$(<"$tmp/out16.raw"); } 2>/dev/null
 [ "$(ls -1 "$Q16" 2>/dev/null | wc -l)" -ge 1 ] \
   && ok "a LIVE waiter's fresh ticket is NOT swept" \
   || nope "the sweep deleted a live waiter's ticket — it cannot tell a waiter from a corpse"
@@ -928,7 +929,7 @@ fi
 # predicate false FOREVER and the run burned the entire bound to reach a fail-open it was entitled to
 # on the first tick. Forced by creating the queue path as a FILE, which is portable — a mode change
 # on a directory this user owns is routinely ignored on this platform.
-R17=$tmp/noticket; mk_repo "$R17"; Q17=$(queue "$R17")
+R17=$tmp/noticket; mk_repo "$R17"; queue "$R17" >/dev/null; Q17=$_queue
 rm -rf "$Q17" 2>/dev/null; : > "$Q17" 2>/dev/null || true
 if [ -f "$Q17" ]; then
   # BOUNDED, because the defect this arm covers is a HANG. TTL 1800 makes the bound 7200s, so a
@@ -944,7 +945,7 @@ if [ -f "$Q17" ]; then
   t17s=$(date +%s)
   ( cd "$R17" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1800 \
       timeout -s TERM -k 10 180 bash $KIT_REL/run-gates.sh ) </dev/null >"$tmp/out17.raw" 2>&1; rc17=$?
-  out17=$(cat "$tmp/out17.raw" 2>/dev/null)
+  { out17=$(<"$tmp/out17.raw"); } 2>/dev/null
   t17=$(( $(date +%s) - t17s ))
   printf '%s' "$out17" | grep -q 'could not create a queue ticket' \
     && ok "a run that cannot take a ticket says so" \
@@ -1069,8 +1070,8 @@ printf '[ {"name": "hold", "argv": ["bash", "%s"]} ]\n' "$tmp/hold23.sh" > "$tmp
     bash $KIT_REL/run-gates.sh ) >"$tmp/out23a" 2>&1 &
 h23=$!
 i23=0; while [ ! -s "$S23/peaks" ] && kill -0 "$h23" 2>/dev/null && [ "$i23" -lt 2400 ]; do sleep 0.1; i23=$((i23 + 1)); done
-f23_repo=$(cat "$B23/repo" 2>/dev/null); f23_run=$(cat "$B23/run" 2>/dev/null)
-f23_ttl=$(cat "$B23/ttl" 2>/dev/null); f23_pid=$(cat "$B23/pid" 2>/dev/null)
+{ f23_repo=$(<"$B23/repo"); } 2>/dev/null; { f23_run=$(<"$B23/run"); } 2>/dev/null
+{ f23_ttl=$(<"$B23/ttl"); } 2>/dev/null; { f23_pid=$(<"$B23/pid"); } 2>/dev/null
 ( cd "$R23b" && env TS_SHARED="$S23" GATE_FULL=1 GATE_TURNSTILE_TICK=1 GATE_LEGS="$tmp/hold23.json" \
     bash $KIT_REL/run-gates.sh ) >"$tmp/out23b" 2>&1 &
 w23=$!
@@ -1222,7 +1223,7 @@ R29a=$tmp/slotA; R29b=$tmp/slotB; R29c=$tmp/slotC; mk_repo "$R29a"; mk_repo "$R2
 S29=$tmp/shared29; mkdir -p "$S29"
 run_slot_bar "$R29a" "$S29" "$tmp/out29a"; p29a=$SLOT_PID; check_registered "$S29" 1 "$p29a"
 run_slot_bar "$R29b" "$S29" "$tmp/out29b"; p29b=$SLOT_PID; check_registered "$S29" 2 "$p29b"
-h29a=$(cat "$BS/pid" 2>/dev/null); h29b=$(cat "$BS.2/pid" 2>/dev/null)
+{ h29a=$(<"$BS/pid"); } 2>/dev/null; { h29b=$(<"$BS.2/pid"); } 2>/dev/null
 run_slot_bar "$R29c" "$tmp/shared29c" "$tmp/out29c"; p29c=$SLOT_PID; mkdir -p "$tmp/shared29c"; : > "$tmp/shared29c/go"
 i29=0; while ! grep -q 'queued at position' "$tmp/out29c" 2>/dev/null && kill -0 "$p29c" 2>/dev/null && [ "$i29" -lt 2400 ]; do sleep 0.1; i29=$((i29 + 1)); done
 peak29=$(peak "$S29")
@@ -1242,12 +1243,12 @@ s29a=$(hdrkey "$R29a" slot); s29b=$(hdrkey "$R29b" slot)
 R30a=$tmp/reapA; R30b=$tmp/reapB; mk_repo "$R30a"; mk_repo "$R30b"; S30=$tmp/shared30; mkdir -p "$S30"
 legs "$R30b" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
 run_slot_bar "$R30a" "$S30" "$tmp/out30a"; p30a=$SLOT_PID; check_registered "$S30" 1 "$p30a"
-n30a=$(cat "$BS/nonce" 2>/dev/null)
+{ n30a=$(<"$BS/nonce"); } 2>/dev/null
 sh -c 'exit 0' & dead30=$!; wait "$dead30" 2>/dev/null
 mkdir -p "$BS.2"; printf '%s' "$dead30" > "$BS.2/pid"; printf '%s' "$(date +%s)" > "$BS.2/heartbeat"; printf 'planted30' > "$BS.2/nonce"
 out30=$( cd "$R30b" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 ); rc30=$?
 alive30=0; kill -0 "$p30a" 2>/dev/null && alive30=1
-n30after=$(cat "$BS/nonce" 2>/dev/null)
+{ n30after=$(<"$BS/nonce"); } 2>/dev/null
 : > "$S30/go"; wait "$p30a" 2>/dev/null
 [ "$(printf '%s\n' "$out30" | grep -c 'reaping the beacon of a dead holder')" = 1 ] && ok "the dead slot was reaped once" \
   || nope "the dead slot was not reaped exactly once"

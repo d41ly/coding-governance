@@ -16730,6 +16730,11 @@
     {
       "id": "resolve_remote_sh",
       "kind": "function",
+      "file": "tools/run-gates/run-held-wsl.sh"
+    },
+    {
+      "id": "resolve_remote_sh",
+      "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },
     {

@@ -7,6 +7,9 @@
 # clone of gov is made, and the population is a `run-selftests.sh --list` captured once.
 #   bash <this> <leg path> <a captured run-selftests.sh --list> <scratch dir> <gov root>
 set -u
+# The launcher, resolved before any cd from the repository this record sits in, four levels up.
+_d=.; [[ ${BASH_SOURCE[0]} == */* ]] && _d=${BASH_SOURCE[0]%/*}; . "$_d/../../../../tools/lib/resolve-python.sh" || exit 2
+PY=$(resolve_python) || exit 2
 SUITE="$1"; LIST="$2"; W="$3"; GOV="$4"
 step_fail=0
 check_step() { if [ "$1" = 0 ]; then echo "ok    $2"; else echo "FAIL  $2"; step_fail=1; fi; }
@@ -53,7 +56,7 @@ run_plan none > "$W/p2.txt"
 [ "$(grep -c '^\[plan\] [0-9]*\. unattended .* shard [1-8]/8 · probe ·' "$W/p2.txt")" = 2 ]; check_step $? "exactly one shard row per family is a probe"
 grep -q '^fixture: fails=0$' "$W/p2.txt"; check_step $? "the rotating plan is green"
 # The answer is the arithmetic: HEAD's sha mod 8, plus one.
-sha=$(git -C "$R" rev-parse HEAD); want=$(python -c "import sys; print(int(sys.argv[1], 16) % 8 + 1)" "$sha")
+sha=$(git -C "$R" rev-parse HEAD); want=$("$PY" -c "import sys; print(int(sys.argv[1], 16) % 8 + 1)" "$sha")
 grep -q "unattended.test.sh' · rule input HEAD $sha as an integer mod 8 = $((want - 1)) · .* probes shard $want/8," "$W/p2.txt"; check_step $? "the representative is HEAD's sha mod 8 plus one, computed independently ($want/8)"
 # Whole rows lead the order, by descending budget, before any probe row.
 awk -F' · ' '/^\[plan\] [0-9]+\. / { k = $2; b = $3 + 0; if (k == "whole") { if (seenp || (nw && b > last)) bad = 1; last = b; nw++ } else if (k == "probe") seenp = 1 } END { exit (bad || nw == 0) }' "$W/p2.txt"

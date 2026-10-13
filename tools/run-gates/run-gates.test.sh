@@ -1283,10 +1283,10 @@ n=$((n+1))
 [ "$rc" = 2 ] \
   || { echo "canary: an all-held run exited $rc, not the configuration-refusal code 2"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 n=$((n+1))
-printf '%s\n' "$o" | grep -q 'executed NOTHING' \
+[[ $o == *'executed NOTHING'* ]] \
   || { echo "canary: an all-held run did not say it executed nothing"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 n=$((n+1))
-printf '%s\n' "$o" | grep -q 'GATE_SELFTESTS=1' \
+[[ $o == *'GATE_SELFTESTS=1'* ]] \
   || { echo "canary: the refusal did not name the switch that would fix it"; fail=1; }
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates GREEN' \
@@ -1450,7 +1450,7 @@ printf '%s\n' "$o" | grep -q '^GATE ok    reads b only$' \
   || { echo "canary: a doc path touched and restored on a merged side branch read as unmoved"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 o=$( cd "$D" && GATE_FULL= GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=no-such-rev GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
-printf '%s\n' "$o" | grep -q 'docs mode is OFF' \
+[[ $o == *'docs mode is OFF'* ]] \
   && printf '%s\n' "$o" | grep -q '^gates GREEN — 5/5 legs passed$' \
   || { echo "canary: an unresolvable GATE_DOCS_BASE did not turn the mode off ALOUD"; fail=1; }
 # M4 (closing review): arm 1b's tracked-path rule at a PATH COMPONENT BOUNDARY, over a fixture. A
@@ -1899,7 +1899,7 @@ n=$((n+1))
 n=$((n+1))
 n=$((n+1))
 o=$( cd "$P" && env GATE_FULL= GATE_BASE= PATH="$P/shim:$PATH" GATE_PROFILES=fx/tbl-timeout.txt bash $KIT_REL/run-gates.sh 2>&1 )
-printf '%s\n' "$o" | grep -q 'INERT' \
+[[ $o == *'INERT'* ]] \
   || { echo "canary: with no working timeout the runner did not announce the knob INERT — a knob the operator set and the host cannot honour is worse than no knob"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 case "$(profline "$o")" in *'timeout off'*) ;; *) echo "canary: the INERT run still reported a live timeout on its visibility line: $(profline "$o")"; fail=1 ;; esac
 printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed$' \

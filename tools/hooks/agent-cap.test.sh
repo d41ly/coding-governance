@@ -2179,8 +2179,12 @@ function readBody(p) {
   }
 }
 
+// THE PAYLOAD CWD IS THE FIXTURE DIR, which no checkout holds (TOOL-aSweptBar-1 S3). With no `cwd` the
+// hook falls back to this checkout, whose `.claude/roles.json` arms rule 6 against every inline script,
+// so every BASE denial read as a rule 6 denial and nothing was ratified. Under no checkout rule 6 stays
+// unarmed and the property compares rules 1 to 5 with BASE, which predates rule 6.
 function buildPayload(body) {
-  return JSON.stringify({ tool_name: 'Workflow', tool_input: { script: body } })
+  return JSON.stringify({ tool_name: 'Workflow', cwd: path.resolve(fixdir), tool_input: { script: body } })
 }
 
 const tracked = cp.execFileSync('git', ['-C', root, 'ls-files'], { encoding: 'utf8', maxBuffer: 1 << 28 })
@@ -2352,12 +2356,13 @@ EOF
 # a subdirectory so the root walk is exercised. Every deny asserts its own reason, since every rule
 # exits 2; every allow asserts an empty stderr.
 HOREPO="$TMP/horepo"
-mkdir -p "$HOREPO/.git" "$HOREPO/.claude" "$HOREPO/sub" "$HOREPO/tools/workflows" \
+HO_WF=workflows
+mkdir -p "$HOREPO/.git" "$HOREPO/.claude" "$HOREPO/sub" "$HOREPO/tools/$HO_WF" \
   "$HOREPO/memory/builds/bx/prompts" "$HOREPO/memory/builds/bx/spec"
 HOJ="$NODEDIR/horepo"
-printf 'const s = await agent("one")\n' > "$HOREPO/tools/workflows/h.js"
-printf 'const s = await agent("one")\n' > "$HOREPO/tools/workflows/other.js"
-HO_ROLES='{"roles":{"gov-researcher":{"agent":true,"workflow":"research","writes":"none"},"gov-builder":{"agent":true,"workflow":"build","writes":"product"},"gov-session":{"agent":false,"workflow":"handoff","writes":"none"}},"harnesses":["tools/workflows/h.js"]}'
+printf 'const s = await agent("one")\n' > "$HOREPO/tools/$HO_WF/h.js"
+printf 'const s = await agent("one")\n' > "$HOREPO/tools/$HO_WF/other.js"
+HO_ROLES='{"roles":{"gov-researcher":{"agent":true,"workflow":"research","writes":"none"},"gov-builder":{"agent":true,"workflow":"build","writes":"product"},"gov-session":{"agent":false,"workflow":"handoff","writes":"none"}},"harnesses":["tools/'"$HO_WF"'/h.js"]}'
 HO_FLAG=""
 HO_CWD=""
 HO_PROJECT=""
@@ -2442,7 +2447,7 @@ print(json.dumps({"tool_name":"Workflow","cwd":sys.argv[1],"tool_input":json.loa
 }
 write_handoff
 write_roles "$HO_ROLES"
-HO_H="$HOJ/tools/workflows/h.js"
+HO_H="$HOJ/tools/$HO_WF/h.js"
 # AC1 — the rendered handoff is admitted and claims its slot; CRLF and blank ends do not move it.
 run_spawn "rule6 AC1: a rendered handoff is admitted" 0 gov-researcher ok "" ho-s ho-ac1 ho-ac1-u
 if grep -rqF ho-ac1-u "$HOREPO/.git/agent-cap" 2>/dev/null; then
@@ -2481,7 +2486,7 @@ run_harness "rule6 AC4: the harness with roles as an object" 0 "{\"scriptPath\":
 run_harness "rule6 AC4: the harness with roles in a JSON string" 0 "{\"scriptPath\":\"$HO_H\",\"args\":\"{\\\"roles\\\":{\\\"builder\\\":\\\"gov-builder\\\"}}\"}" ""
 run_harness "rule6 AC4: an inline script refused" 2 '{"script":"const s = await agent(\"one\")\n","args":{"roles":{"builder":"gov-builder"}}}' 'an inline `script`'
 run_harness "rule6 AC4: a name-only call refused" 2 '{"name":"tier2-review"}' 'names no `scriptPath`'
-run_harness "rule6 AC4: a scriptPath not in harnesses refused" 2 "{\"scriptPath\":\"$HOJ/tools/workflows/other.js\",\"args\":{\"roles\":{\"builder\":\"gov-builder\"}}}" 'is not a declared harness'
+run_harness "rule6 AC4: a scriptPath not in harnesses refused" 2 "{\"scriptPath\":\"$HOJ/tools/$HO_WF/other.js\",\"args\":{\"roles\":{\"builder\":\"gov-builder\"}}}" 'is not a declared harness'
 run_harness "rule6 AC4: args that do not parse refused" 2 "{\"scriptPath\":\"$HO_H\",\"args\":\"{nope\"}" '`args` is not a plain object'
 run_harness "rule6 AC4: the harness with no roles refused" 2 "{\"scriptPath\":\"$HO_H\",\"args\":{\"repo\":\".\"}}" 'handoff.py harness-args'
 run_harness "rule6 AC4: the harness with roles {} refused" 2 "{\"scriptPath\":\"$HO_H\",\"args\":{\"roles\":{}}}" 'handoff.py harness-args'
@@ -2508,7 +2513,7 @@ HO_FLAG=--only=scripts
 run_harness "rule6 AC5: --only=scripts never meets rule 6" 0 "$HO_INLINE" ""
 run_harness "rule6 AC5: --only=scripts still runs the fan-out rules" 2 '{"script":"const r = await parallel([() => agent(\"a\"), () => agent(\"b\")])\n"}' 'raw parallel()/pipeline()'
 HO_FLAG=""
-write_roles '{"roles":{"gov-session":{"agent":false,"workflow":"handoff","writes":"none"}},"harnesses":["tools/workflows/h.js"]}'
+write_roles '{"roles":{"gov-session":{"agent":false,"workflow":"handoff","writes":"none"}},"harnesses":["tools/'"$HO_WF"'/h.js"]}'
 run_spawn "rule6 AC5: no agent-true role refuses the spawn as UNARMED" 2 gov-session ok 'UNARMED'
 write_roles "$("$TESTPY" -c 'import json,sys; d=json.loads(sys.argv[1]); d["harnesses"]=[]; print(json.dumps(d))' "$HO_ROLES")"
 run_harness "rule6 AC5: no harness refuses the harness call as UNARMED" 2 "{\"scriptPath\":\"$HO_H\",\"args\":{\"roles\":{\"builder\":\"gov-builder\"}}}" 'UNARMED'
