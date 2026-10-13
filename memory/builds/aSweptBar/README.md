@@ -2,7 +2,6 @@
 slug: aSweptBar
 node: a
 opened: 2026-10-13
-status: OPEN
 streams: tooling
 roster: TOOL
 ids: TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-3 TOOL-aSweptBar-4 TOOL-aSweptBar-5 TOOL-aSweptBar-6
@@ -63,23 +62,35 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-10-13 · streams tooling
+**Build status:** SPECCED · 6 unit(s) · node a · opened 2026-10-13 · streams tooling
 ids TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-3 TOOL-aSweptBar-4 TOOL-aSweptBar-5 TOOL-aSweptBar-6
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aSweptBar-1 — stale suite fixtures re-armed against the code the bar-less landings left](spec/2026-10-13-spec-TOOL-aSweptBar-1.md) | 1 | 1 | SPECCED | rev-1 | 2026-10-13 |
+| [TOOL-aSweptBar-2 — the foreign-prefix probe contract: three engine self-tests declared whole, and format-guard's suite takes the probe stop](spec/2026-10-13-spec-TOOL-aSweptBar-2.md) | 1 | 1 | SPECCED | rev-1 | 2026-10-13 |
+| [TOOL-aSweptBar-3 — the run-gates evidence and pre-push suites' standalone reds, each at its root](spec/2026-10-13-spec-TOOL-aSweptBar-3.md) | 1 | 1 | SPECCED | rev-2 | 2026-10-13 |
+| [TOOL-aSweptBar-4 — shipped-surface bans: each ban's own remedy, applied to the offenders it names](spec/2026-10-13-spec-TOOL-aSweptBar-4.md) | 2 | 1 | SPECCED | rev-1 | 2026-10-13 |
+| [TOOL-aSweptBar-5 — fork idioms re-grown past the spawn-idiom registry, converted](spec/2026-10-13-spec-TOOL-aSweptBar-5.md) | 3 | 1 | SPECCED | rev-1 | 2026-10-13 |
+| [TOOL-aSweptBar-6 — records, pins and ceilings re-measured over the fixed tree](spec/2026-10-13-spec-TOOL-aSweptBar-6.md) | 4 | 1 | SPECCED | rev-2 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-3 TOOL-aSweptBar-4 TOOL-aSweptBar-5 TOOL-aSweptBar-6.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aSweptBar-1`, `TOOL-aSweptBar-2`, `TOOL-aSweptBar-3` | yes |
+| 2 | `TOOL-aSweptBar-4` | no |
+| 3 | `TOOL-aSweptBar-5` | no |
+| 4 | `TOOL-aSweptBar-6` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
