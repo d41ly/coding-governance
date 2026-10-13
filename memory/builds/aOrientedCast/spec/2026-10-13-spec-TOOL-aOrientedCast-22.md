@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-22 — gate-guard refuses AskUserQuestion from the session holding a live unattended run's lease, and names the park
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 24
+**Status:** INPROGRESS · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 24
 
 <!-- gen:spec-records -->
 
