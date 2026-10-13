@@ -99,7 +99,35 @@ trap 'rm -f "$TMP"' EXIT
 render_skill > "$TMP" || { echo "branch-reconcile: $KIT_REL/SKILL.template.md could not be read"; exit 1; }
 check_render "$TMP" || exit 1
 
+# THE OLD RENDER (TOOL-dSweptBranches-23). The skill moved from branch-reconcile/ to cleanup/ while
+# its template stayed put, and govkit's rename path keys on a row's SOURCE, so an updating adopter
+# keeps the old copy beside the new one: two skills answering one ask, and nothing reading the old.
+# `--scaffold` withdraws it only when it is recognisably this kit's render — its front matter names
+# branch-reconcile and its body names the CLI. Anything else at that path is someone's work: named,
+# kept, and the mode exits 1. `--check` withdraws nothing and reds while either stays.
+OLD_REL=".claude/skills/branch-reconcile/SKILL.md"
+OLD="$ROOT/$OLD_REL"
+check_old_render() { # -> 0 when no old render stays (withdrawing it under --scaffold), 1 with why
+  [ -e "$OLD" ] || return 0
+  local front
+  front=$(tr -d '\r' < "$OLD" | awk 'NR == 1 && $0 != "---" { exit } NR > 1 && $0 == "---" { exit } NR > 1')
+  if ! printf '%s\n' "$front" | grep -qx 'name: branch-reconcile' || ! grep -qF 'branch_reconcile.py' "$OLD"; then
+    echo "branch-reconcile: $OLD_REL is not this kit's old render, so it is kept; remove it by hand once"
+    echo "  nothing needs it — /cleanup at $SKILL_REL replaces the old /branch-reconcile skill"
+    return 1
+  fi
+  if [ "$MODE" = "--check" ]; then
+    echo "branch-reconcile: $OLD_REL is the old /branch-reconcile render, which /cleanup replaces."
+    echo "Fix: bash $KIT_REL/adopt-branch-reconcile.sh --scaffold"
+    return 1
+  fi
+  rm -f "$OLD" || return 1
+  rmdir "$(dirname "$OLD")" 2>/dev/null || true
+  echo "withdrew $OLD_REL, the old /branch-reconcile render"
+}
+
 if [ "$MODE" = "--check" ]; then
+  check_old_render || exit 1
   [ -f "$SKILL" ] || { echo "branch-reconcile: $SKILL_REL is not rendered — run bash $KIT_REL/adopt-branch-reconcile.sh --scaffold"; exit 1; }
   if diff -q <(tr -d '\r' < "$SKILL") "$TMP" >/dev/null 2>&1; then
     echo "ok       cleanup skill — $SKILL_REL is a fresh render (CLI $KIT_REL/branch_reconcile.py)"
@@ -114,4 +142,5 @@ fi
 mkdir -p "$(dirname "$SKILL")" || exit 1
 cp "$TMP" "$SKILL.tmp" && mv "$SKILL.tmp" "$SKILL" || exit 1
 echo "rendered $SKILL_REL (CLI $KIT_REL/branch_reconcile.py)"
+check_old_render || exit 1
 echo "Next: run bash $KIT_REL/adopt-branch-reconcile.sh --check on your bar, so a template edit nobody re-rendered reds."

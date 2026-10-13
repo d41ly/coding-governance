@@ -114,13 +114,13 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-19 — the skill is `/cleanup`, renamed with every live reference](spec/2026-10-13-spec-TOOL-dSweptBranches-19.md) | 17 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-20 — gov's range readers audited for a merge read as additions](spec/2026-10-13-spec-TOOL-dSweptBranches-20.md) | 18 | 1 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-21 — the reaper backstops an MSYS signal with the winpid, and the live-tree arm waits for its tree](spec/2026-10-13-spec-TOOL-dSweptBranches-21.md) | 19 | 2 | CLOSED | rev-2 | 2026-10-13 |
-| [TOOL-dSweptBranches-23 — the adopter withdraws the old `/branch-reconcile` render, and `--check` reds while it stays](spec/2026-10-13-spec-TOOL-dSweptBranches-23.md) | 20 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-dSweptBranches-23 — the adopter withdraws the old `/branch-reconcile` render, and `--check` reds while it stays](spec/2026-10-13-spec-TOOL-dSweptBranches-23.md) | 20 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-24 — the follow-up review's process-monitor items, batched](spec/2026-10-13-spec-TOOL-dSweptBranches-24.md) | 21 | 2 | OPEN | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 45 bound to this build, across 4 record folder(s).
+Records: 47 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dSweptBranches-23 TOOL-dSweptBranches-24.
+Ids no record names: TOOL-dSweptBranches-24.
 
 Ids no `spec-audit` record has ever named: TOOL-dSweptBranches-1 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-19 TOOL-dSweptBranches-2
 TOOL-dSweptBranches-20 TOOL-dSweptBranches-21 TOOL-dSweptBranches-23 TOOL-dSweptBranches-24 TOOL-dSweptBranches-3 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9.

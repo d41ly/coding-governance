@@ -179,3 +179,7 @@ base: a8f0e195a2d80a6d1480e4992aec6565342e35ea
 2026-10-13T11:14:53Z rescope · item add TOOL-dSweptBranches-23 · reason promoted at the follow-up's closing diff review (round 1): H1 with M1, ids 1 6 10: the renamed skill strands the adopter's old render
 
 2026-10-13T11:14:53Z rescope · item add TOOL-dSweptBranches-24 · reason promoted at the follow-up's closing diff review (round 1): M2 M3 M4 L1 L2, ids 5 7 8 9 12 13 14, batched
+
+2026-10-13T11:17:21Z brief · item TOOL-dSweptBranches-23 · reason bf2ab8b22d53 memory/builds/dSweptBranches/prompts/2026-10-13-prompt-TOOL-dSweptBranches-23-1-build-brief.md
+
+2026-10-13T11:17:32Z dispatch · item 67cb3c10 TOOL-dSweptBranches-23 · reason tools/branch-reconcile/branch_reconcile.py tools/branch-reconcile/selftest.py tools/branch-reconcile/README.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-23.md memory/builds/dSweptBranches/prompts/2026-10-13-prompt-TOOL-dSweptBranches-23-1-build-brief.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-23-1-acceptance-ledger.md memory/map/features/branch-reconcile.md tools/branch-reconcile/adopt-branch-reconcile.sh WIRE-INTO-PROJECT.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-19.md

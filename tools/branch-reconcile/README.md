@@ -166,6 +166,11 @@ bash <this kit>/adopt-branch-reconcile.sh --check      # the wiring leg: is the 
 edit nobody re-rendered reds the `cleanup skill wiring` leg. `govkit update` re-renders it
 through the kit's `[[regenerate]]` unless `GOVKIT_RERENDER=0` is exported.
 
+The skill was `/branch-reconcile` until kit 1.4 renamed it `/cleanup`, and `govkit update` does not
+move a rendered file whose template stayed put. So `--scaffold` withdraws
+`.claude/skills/branch-reconcile/SKILL.md` when it is this kit's own old render, and `--check` reds
+while one stays. A file at that path that is not the kit's render is named and kept.
+
 ## Why this is not the straggler inventory
 
 The relocation engine's `migrate_backlog.py --stragglers`, which `check-wiring.sh` reports, lists the

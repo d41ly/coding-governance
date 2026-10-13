@@ -26,7 +26,7 @@ from contextlib import redirect_stdout
 
 HERE = pathlib.Path(__file__).resolve().parent
 CLI = HERE / "branch_reconcile.py"
-ASSERTION_FLOOR = 92
+ASSERTION_FLOOR = 96
 PASS, FAIL, SKIPPED = [], [], []
 SCRATCH = []
 
@@ -1023,10 +1023,77 @@ def arm_minor():
               (rc, "landed" in branches), (2, True))
 
 
+def seed_adopter(base):
+    """A repository holding the kit's three shipped files under a non-default prefix, rendered."""
+    repo = base / "ad" / "repo"
+    kit = repo / "kits" / "br"
+    kit.mkdir(parents=True)
+    for name in ("adopt-branch-reconcile.sh", "SKILL.template.md", "branch_reconcile.py"):
+        shutil.copyfile(HERE / name, kit / name)
+    run_git(repo, "init", "-q", "-b", "main")
+    return repo, kit / "adopt-branch-reconcile.sh"
+
+
+def resolve_bash():
+    """The bash sharing this filesystem: the bare name reaches WSL's System32 launcher first on
+    Windows (gotcha subprocess-resolves-a-different-shell). Accepted only if it runs."""
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in ("bash.exe", "bash"):
+            cand = os.path.join(d, name)
+            low = cand.replace("\\", "/").lower()
+            if not os.path.isfile(cand) or "/system32/" in low or "/windowsapps/" in low:
+                continue
+            try:
+                if subprocess.run([cand, "-c", ":"], capture_output=True).returncode == 0:
+                    return cand
+            except OSError:
+                continue
+    return "bash"
+
+
+def run_adopter(script, mode):
+    p = subprocess.run([resolve_bash(), script.as_posix(), mode], capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", env=ENV)
+    return p.returncode, p.stdout + p.stderr
+
+
+def arm_old_render():
+    """TOOL-dSweptBranches-23: the skill moved from branch-reconcile/ to cleanup/ while its template
+    stayed put, so govkit's rename path never moves an adopter's copy. The kit's own adopter
+    withdraws a recognised old render, keeps anything else, and `--check` reds while one stays."""
+    repo, script = seed_adopter(build_dir())
+    new = repo / ".claude" / "skills" / "cleanup" / "SKILL.md"
+    old = repo / ".claude" / "skills" / "branch-reconcile" / "SKILL.md"
+    rc, out = run_adopter(script, "--scaffold")
+    if rc != 0 or not new.is_file():
+        check("test_scaffold_withdraws_the_old_render (fixture render)", (rc, out[-200:]), (0, ""))
+        return
+    old.parent.mkdir(parents=True, exist_ok=True)
+    old.write_text(new.read_text(encoding="utf-8").replace("name: cleanup\n",
+                                                           "name: branch-reconcile\n", 1),
+                   encoding="utf-8", newline="\n")
+    rc, out = run_adopter(script, "--check")
+    check("test_check_reds_while_the_old_render_stays",
+          (rc, ".claude/skills/branch-reconcile/SKILL.md" in out), (1, True))
+    rc, out = run_adopter(script, "--scaffold")
+    check("test_scaffold_withdraws_the_old_render",
+          (rc, old.exists(), old.parent.exists(), new.is_file()), (0, False, False, True))
+    rc, out = run_adopter(script, "--check")
+    check("test_check_reds_while_the_old_render_stays (withdrawn, green)", rc, 0)
+    old.parent.mkdir(parents=True, exist_ok=True)
+    old.write_text("---\nname: my-own-skill\n---\nan adopter's own file\n", encoding="utf-8",
+                   newline="\n")
+    rc, out = run_adopter(script, "--scaffold")
+    check("test_scaffold_keeps_an_unrecognised_old_file",
+          (rc, ".claude/skills/branch-reconcile/SKILL.md" in out,
+           old.read_text(encoding="utf-8") if old.exists() else None),
+          (1, True, "---\nname: my-own-skill\n---\nan adopter's own file\n"))
+
+
 ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
         arm_content, arm_stash, arm_remover, arm_write, arm_keeps, arm_unread, arm_foreign,
         arm_patch_negative, arm_probe_negative, arm_row_edit, arm_default_names, arm_graded_sha,
-        arm_evil_merge, arm_submodule, arm_minor]
+        arm_evil_merge, arm_submodule, arm_minor, arm_old_render]
 
 
 def main():

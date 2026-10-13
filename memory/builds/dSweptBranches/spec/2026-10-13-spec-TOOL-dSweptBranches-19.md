@@ -111,6 +111,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft, at the owner's instruction.
+- erratum · 2026-10-13 · §4 and §5 are wrong that `govkit update` moves an adopter's copy: govkit's
+  rename path keys on the source, which did not move. `TOOL-dSweptBranches-23` makes the adopter
+  withdraw the old render.
 
 ## 10. Reuse audit
 

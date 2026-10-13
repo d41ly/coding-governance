@@ -768,6 +768,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_old_render",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_patch",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -4046,6 +4051,11 @@
       "id": "check_noop",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_old_render",
+      "kind": "function",
+      "file": "tools/branch-reconcile/adopt-branch-reconcile.sh"
     },
     {
       "id": "check_one_line_regions",
@@ -14600,6 +14610,11 @@
     {
       "id": "resolve_bash",
       "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "resolve_bash",
+      "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
     {
@@ -16405,6 +16420,11 @@
     {
       "id": "run_adopter",
       "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "run_adopter",
+      "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
     {
@@ -18066,6 +18086,11 @@
       "id": "seed",
       "kind": "function",
       "file": "tools/unattended/check-playbook.test.sh"
+    },
+    {
+      "id": "seed_adopter",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
     },
     {
       "id": "seed_affordances",

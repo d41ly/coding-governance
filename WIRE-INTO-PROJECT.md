@@ -707,6 +707,10 @@ CLI runs by path and reads the repository it is pointed at.
    not `origin` needs nothing: the remote comes from the same ladder every kit inlines, and
    `GOV_REMOTE` names it where several remotes leave the choice open. `--write` deletes only what
    landed, after a recovery manifest; `--remote` adds the remote branches in one push.
+4. An adopter that installed the kit before its skill became `/cleanup` (kit 1.4): `govkit update`
+   runs `--scaffold`, which withdraws the old `.claude/skills/branch-reconcile/SKILL.md`; commit the
+   removal. Then delete the manifest's `branch-reconcile skill wiring` leg row, which the
+   `cleanup skill wiring` row replaces with the same `--check`.
 
 
 
