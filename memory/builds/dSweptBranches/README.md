@@ -88,7 +88,7 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-1 — the census: the branch-reconcile kit, its remote ladder, the inventory and a byte-stable report](spec/2026-10-13-spec-TOOL-dSweptBranches-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-2 — the verdict ladder: six verdicts over refs and worktree content, each with its evidence](spec/2026-10-13-spec-TOOL-dSweptBranches-2.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-13 |
 | [TOOL-dSweptBranches-4 — the worktree remover: git first, then `rm -rf`, and a skeleton removed only when it holds no regular file](spec/2026-10-13-spec-TOOL-dSweptBranches-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-13 |
-| [TOOL-dSweptBranches-3 — write mode: a recovery manifest first, then deletes of the three landed verdicts only](spec/2026-10-13-spec-TOOL-dSweptBranches-3.md) | 4 | 2 | CLOSED | rev-5 | 2026-10-13 |
+| [TOOL-dSweptBranches-3 — write mode: a recovery manifest first, then deletes of the three landed verdicts only](spec/2026-10-13-spec-TOOL-dSweptBranches-3.md) | 4 | 2 | CLOSED | rev-6 | 2026-10-13 |
 | [TOOL-dSweptBranches-5 — the skill: a rendered `/branch-reconcile` that routes cleanup asks through the tool](spec/2026-10-13-spec-TOOL-dSweptBranches-5.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-7 — a worktree whose status was never read reads UNKNOWN, never its HEAD's verdict](spec/2026-10-13-spec-TOOL-dSweptBranches-7.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-8 — a registered worktree path holding another repository is never graded as the worktree, and rm -rf reaches only a proven worktree](spec/2026-10-13-spec-TOOL-dSweptBranches-8.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-13 |

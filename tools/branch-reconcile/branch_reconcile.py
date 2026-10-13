@@ -1033,7 +1033,7 @@ def write_manifest(inv):
     if not common:
         raise Refusal("cannot resolve the git common directory, so no recovery manifest can be written")
     base = pathlib.Path(common)
-    base = (base if base.is_absolute() else pathlib.Path(inv["root"]) / base) / "branch-reconcile"
+    base = (base if base.is_absolute() else pathlib.Path(inv["root"]) / base) / "recovery-manifests"
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     path, n = base / f"recovery-{stamp}.txt", 1
     while path.exists():

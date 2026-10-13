@@ -82,7 +82,8 @@ def seed_commit(repo, rel, text, msg, when=None):
     run_git(repo, "add", "--", rel)
     if when:
         p = subprocess.run(["git", "-C", str(repo), "commit", "-q", "-m", msg], capture_output=True,
-                           text=True, env=dict(ENV, GIT_AUTHOR_DATE=when, GIT_COMMITTER_DATE=when))
+                           text=True, encoding="utf-8", errors="replace",
+                           env=dict(ENV, GIT_AUTHOR_DATE=when, GIT_COMMITTER_DATE=when))
         if p.returncode != 0:
             raise RuntimeError(f"fixture: backdated commit failed: {p.stderr.strip()}")
     else:
@@ -1012,7 +1013,7 @@ def arm_minor():
     with seed_environ():
         run_git(repo, "branch", "landed", "main")
         common = pathlib.Path(run_git(repo, "rev-parse", "--path-format=absolute", "--git-common-dir"))
-        (common / "branch-reconcile").write_text("a file where the directory goes\n", encoding="utf-8")
+        (common / "recovery-manifests").write_text("a file where the directory goes\n", encoding="utf-8")
         try:
             rc, _out = run_main("--root", str(repo), "--fresh-hours", "0", "--write")
         except OSError:
@@ -1039,6 +1040,13 @@ def main():
             except Exception as exc:  # an arm that raised is one failure, named, and the rest run
                 FAIL.append(f"{arm.__name__} raised")
                 print(f"FAIL {arm.__name__} raised {type(exc).__name__}: {exc}")
+            # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the census arm ran the CLI against a
+            # fixture, which is this suite's subject, and a probe stops here.
+            if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+                print("foreign-prefix-probe: stopped after 1 arm")
+                total = len(PASS) + len(FAIL)
+                print(("FAIL" if FAIL else "PASS") + f" ({total} assertions)")
+                return 1 if FAIL else 0
     finally:
         for d in SCRATCH:
             shutil.rmtree(d, ignore_errors=True)

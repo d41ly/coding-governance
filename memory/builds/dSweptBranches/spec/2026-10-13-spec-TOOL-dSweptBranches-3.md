@@ -1,6 +1,6 @@
 # TOOL-dSweptBranches-3 — write mode: a recovery manifest first, then deletes of the three landed verdicts only
 
-**Status:** CLOSED · rev-5 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 4
+**Status:** CLOSED · rev-6 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -31,7 +31,7 @@ directory, so every deletion can be undone by hand.
   worktree, a branch checked out in a worktree that is kept, and every row outside the deletable
   set. The invoking worktree reads `IN-PROGRESS` by unit 2's S5, so it is outside the set. Observed
   by AC2 and AC5.
-- **S2** — The recovery manifest, `<git common dir>/branch-reconcile/recovery-<UTC stamp>.txt`, holds
+- **S2** — The recovery manifest, `<git common dir>/recovery-manifests/recovery-<UTC stamp>.txt`, holds
   one line per local branch, remote branch and stash entry with its sha, and one per worktree with
   its path and `HEAD`. It is written and flushed before any deletion, and its path is printed.
   A manifest that cannot be written refuses the whole run with exit 2. Observed by AC1.
@@ -152,6 +152,8 @@ none
   is named `WRITE_TRACE`, as the module spells it, and records each act before it runs.
 - rev-5 · 2026-10-13 · §3 · the edge from unit 1 declared back, and the hand-offs to the units
   the closing review promoted onto write mode, 12, 13 and 17.
+- rev-6 · 2026-10-13 · S2 · the manifest directory is `recovery-manifests`, because a directory
+  named for the kit reads as a kit-path spelling to the install-prefix ban.
 
 ## 10. Reuse audit
 

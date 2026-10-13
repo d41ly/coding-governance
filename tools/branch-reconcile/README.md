@@ -95,7 +95,7 @@ python <this kit>/branch_reconcile.py --write --remote    # and the remote branc
 `--write` prints the same report, then acts on its action column:
 
 1. **The recovery manifest first.** Every local branch, remote branch and stash tip and every
-   worktree's path and `HEAD` go to `<git common dir>/branch-reconcile/recovery-<UTC stamp>.txt`,
+   worktree's path and `HEAD` go to `<git common dir>/recovery-manifests/recovery-<UTC stamp>.txt`,
    flushed to disk before anything is deleted. A manifest that cannot be written refuses the run
    with exit 2. Restoring is by hand: `git branch <name> <sha>`, `git worktree add <path> <sha>`.
 2. **Worktrees**, whose action is `remove worktree`, through the remover below; then
