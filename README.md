@@ -48,6 +48,9 @@ machines/sessions on the same repo.
   closed specs with no product commit, hand-kept inventories disagreeing with their source. Stdlib +
   git, seconds, no agents; every signal carries a liveness assertion, so a probe that cannot move
   prints DEAD PROBE rather than a reassuring 0. See `tools/drift-audit/README.md`.
+- **`tools/branch-reconcile/`** — which worktrees, branches and stash entries landed, and which still
+  hold work: one read-only, byte-stable report giving each a verdict with its evidence. See
+  `tools/branch-reconcile/README.md`.
 - **`tools/memory-recall/`** — offline, conf-driven retrieval over the memory tree, plus the rendered
   recall Skill and its opt-in hook. Asks the decision corpus a question and ranks the records that
   answer it. See `tools/memory-recall/README.md`.

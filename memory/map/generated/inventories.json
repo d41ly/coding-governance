@@ -10,6 +10,7 @@
       "agent-instructions wiring",
       "backlog migration selftest",
       "branch-guard self-test",
+      "branch-reconcile selftest",
       "brief-recorded",
       "build README slot contract",
       "build-index selftest",
@@ -17,6 +18,7 @@
       "charter size",
       "check-arms selftest",
       "check-wiring self-test",
+      "cleanup skill wiring",
       "codebase-map adopter e2e",
       "codebase-map coverage + freshness",
       "codebase-map gate coverage",
@@ -136,6 +138,7 @@
     ],
     "kits": [
       "agent-instructions",
+      "branch-reconcile",
       "codebase-map",
       "drift-audit",
       "gate-lint",
@@ -190,6 +193,7 @@
       "session-kickoff"
     ],
     "rendered-skills": [
+      "cleanup",
       "drift-audit",
       "lexicon",
       "memory-recall",
@@ -201,6 +205,7 @@
       "a-gate-that-walks-the-repo-root-reads-other-worktrees.md",
       "a-grep-for-a-word-is-a-presence-probe.md",
       "a-helper-extraction-blinds-a-per-function-rule.md",
+      "a-merge-of-the-default-branch-read-as-additions.md",
       "a-merged-in-check-can-refuse-a-pinned-record.md",
       "a-new-leg-trips-a-growing-set-of-meta-gates.md",
       "a-new-local-collides-in-a-long-function.md",

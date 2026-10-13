@@ -27,6 +27,18 @@ Annotation style: what a code comment citing a governance record must carry
 - guides 1: `ANNOTATION-STYLE.md`
 - globs 2: `tools/memory-tree/ANNOTATION-STYLE.template.md`, `memory/guides/ANNOTATION-STYLE.md`
 
+## branch-reconcile
+
+One read-only report giving every worktree, branch and stash entry a verdict with its evidence, so a cleanup removes only what landed
+
+- status `shipped` · streams `tooling` · dossier `memory/map/features/branch-reconcile.md`
+- decisions 5: `TOOL-dSweptBranches-1`, `TOOL-dSweptBranches-2`, `TOOL-dSweptBranches-3`, `TOOL-dSweptBranches-4`, `TOOL-dSweptBranches-5`
+- gate-legs 2: `branch-reconcile selftest`, `cleanup skill wiring`
+- kits 1: `branch-reconcile`
+- rendered-skills 1: `cleanup`
+- gotcha-classes 1: `a-merge-of-the-default-branch-read-as-additions.md`
+- globs 2: `tools/branch-reconcile/*`, `.claude/skills/cleanup/SKILL.md`
+
 ## build-method
 
 The build method: how to spec, review and build, rendered from the memory-tree kit
