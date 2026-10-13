@@ -144,8 +144,9 @@ if [ "$bytes" -gt "$MAX_BYTES" ]; then
   fail 2 "the file is over its size budget: $name is $bytes bytes, $over over $MAX_BYTES.
   Drop a conditional block, or trim non-instructional prose — the v3.0 charter is ONE file, so
   there is no companion to move a section into.
-  Raising the limit is an OWNER decision recorded in memory/DECISIONS.md, never a fix for
-  the edit that hit it — and this message is shared with the kickoff engine at its own limit."
+  Raising the limit is the owner's decision, or a run's on the terms the header of $LIMITS
+  states; either way it is argued beside the row and recorded in memory/DECISIONS.md, never a fix
+  for the edit that hit it. This message is shared with the kickoff engine at its own limit."
 fi
 
 # --- the high-water ratchet -------------------------------------------------------------------
