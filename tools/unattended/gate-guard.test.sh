@@ -149,13 +149,14 @@ resolve_native() { cygpath -m "$1" 2>/dev/null || printf '%s' "$1"; }
 
 # build_fixture <phase> [fact-line ...] -> a scratch tree: .git/HEAD on refs/heads/fx, a conf, one record.
 # The default record is run-branch-anchored and carries branch-ref: refs/heads/fx, which is the
-# fallback key; arms that need another shape pass their own fact lines.
+# fallback key; arms that need another shape pass their own fact lines. Every record carries the
+# lease fact `session: tSess-1`, which the question arm keys on and the bar arm never reads.
 build_fixture() {
   local d; d=$(mktemp -d "$TMP/fx.XXXXXX")
   mkdir -p "$d/.git" "$d/memory/builds/fx"
   printf 'ref: refs/heads/fx\n' > "$d/.git/HEAD"
   printf 'MEMORY_ROOT=memory\n' > "$d/.unattended.conf"
-  { printf '# fx\n\n## Run facts\nwitness: abc\nphase: %s\n' "$1"; shift
+  { printf '# fx\n\n## Run facts\nwitness: abc\nphase: %s\nsession: tSess-1\n' "$1"; shift
     if [ "$#" = 0 ]; then printf 'anchor-kind: run-branch\nbranch-ref: refs/heads/fx\n'
     else for l in "$@"; do printf '%s\n' "$l"; done; fi
   } > "$d/memory/builds/fx/RUN.md"
@@ -545,6 +546,43 @@ got=$(node -p "require(require('path').resolve(process.argv[1])).PHASES_ALLOW.jo
 if [ -n "$want" ] && [ "$want" = "$got" ]; then echo "ok   PHASES_ALLOW equals the driver's PHASES_CORE tail from VERIFYING: $got"; pass=$((pass+1))
 else echo "FAIL PHASES_ALLOW [$got] != the driver's tail [$want] — a restatement that drifted"; fail=$((fail+1)); fi
 
+# ---- TOOL-aOrientedCast-22: the question arm, keyed on the session's lease and not the branch -----
+# run_ask <name> <expected_exit> <fixture> <session_id> [tool] [command] — an AskUserQuestion payload
+# by default, BUILT like run's; an ALLOW also requires an empty stderr, so a hook that prints a deny
+# and exits 0 is no pass. The Bash form carries the leaseholder's session to prove the widened
+# dispatch leaves the bar arm's verdicts alone.
+run_ask() {
+  local name=$1 want=$2 fix=$3 sess=$4 tool=${5:-AskUserQuestion} cmd=${6:-}
+  local payload got
+  payload=$("$TESTPY" -c 'import json,sys
+t, cwd, s, c = sys.argv[1:5]
+q = {"questions": [{"question": "Raise the ceiling?", "header": "Ceiling", "multiSelect": False,
+     "options": [{"label": "17408", "description": "d"}, {"label": "20480", "description": "d"}]}]}
+print(json.dumps({"tool_name": t, "session_id": s, "cwd": cwd, "tool_input": {"command": c} if c else q}))' "$tool" "$(resolve_native "$fix")" "$sess" "$cmd")
+  case "$payload" in *'"session_id"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
+  printf '%s' "$payload" | node "$HOOK" >/dev/null 2>"$TMP/err"
+  got=$?
+  if [ "$got" = "$want" ] && { [ "$want" != 0 ] || [ ! -s "$TMP/err" ]; }; then echo "ok   $name (exit $got)"; pass=$((pass+1))
+  else echo "FAIL $name (exit $got, want $want; an allow wants an empty stderr)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+}
+run_ask "Q1 the leaseholder asks at BUILDING -> deny" 2 "$B" tSess-1
+for tok in 'run fx, at BUILDING' 'unattended.sh --park fx' '--item' 'Raise the ceiling?' '17408' '20480'; do
+  case "$(cat "$TMP/err")" in *"$tok"*) echo "ok   Q1 the deny names $tok"; pass=$((pass+1)) ;; *) echo "FAIL Q1 the deny does not name $tok"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)) ;; esac
+done
+run_ask "Q2 another session asks at BUILDING -> allow" 0 "$B" tSess-2
+for ph in LANDED ABORTED; do F=$(build_fixture "$ph"); run_ask "Q3 the leaseholder asks at $ph -> allow" 0 "$F" tSess-1; done
+F=$(build_fixture HELD); run_ask "Q3 the leaseholder asks at HELD -> deny" 2 "$F" tSess-1
+F=$(build_fixture BUILDING); sed -i 's/^session: tSess-1$/session: absent/' "$F/memory/builds/fx/RUN.md"
+run_ask "Q4 a record whose session reads absent -> allow" 0 "$F" tSess-1
+F=$(build_fixture BUILDING); rm "$F/.unattended.conf"
+run_ask "Q4 no .unattended.conf -> allow" 0 "$F" tSess-1
+run_ask "Q5 the leaseholder's plain bar under Bash at BUILDING -> allow" 0 "$B" tSess-1 Bash 'bash '"${PFX}${RUN_GATES}/run-gates.sh"''
+# The PHASES_TERMINAL parity arm, read from the driver the way the PHASES_ALLOW arm reads its tail.
+want=$(sed -n 's/^PHASES_TERMINAL="\(.*\)"/\1/p' "$DRIVER")
+got=$(node -p "require(require('path').resolve(process.argv[1])).PHASES_TERMINAL.join(' ')" "$HOOK" 2>/dev/null)
+if [ -n "$want" ] && [ "$want" = "$got" ]; then echo "ok   Q6 PHASES_TERMINAL equals the driver's: $got"; pass=$((pass+1))
+else echo "FAIL Q6 PHASES_TERMINAL [$got] != the driver's [$want] — a restatement that drifted"; fail=$((fail+1)); fi
+
 # ---- the meta-arm: prove the liveness guard itself fires ------------------------------------------
 if [ "${GG_META:-}" != "1" ]; then
   # The copy runs from $TMP, outside every repository, so its HERE is pinned to this suite's own:
@@ -563,7 +601,10 @@ n=$((pass+fail))
 # static count of the arms above at ~10% headroom, because the pass that wrote this file may not
 # run it (the hook it tests denies the invocation at BUILDING); the main loop's first green at
 # VERIFYING confirms the executed count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=148
+FLOOR_ASSERTIONS=163
+# RAISED 148 -> 163 at TOOL-aOrientedCast-22, by the static count of the question arm's assertions:
+# the Q1 deny and its six named tokens, Q2's allow, Q3's three phases, Q4's two allows, Q5's Bash
+# allow and the Q6 parity arm — fifteen.
 # RAISED 90 -> 94 at the closing review's F2, by the static count of the arms it added: the
 # selftest.py deny with its token check, the --selftest flag allow, and the two parity assertions —
 # five assertions, credited as four when this comment was first written (round 2, R16), so the

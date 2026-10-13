@@ -1,12 +1,13 @@
 /**
  * run-lease — the session-keyed binder every unattended hook shares: the repo walk that returns
  * the per-worktree git dir, the conf-line reader, the lease scan over the run-state records, the
- * sidecar path derivation and the append. Required by `__dirname` from `stop-guard.js` and from
- * `stall-recorder.js`; nothing here reads stdin or exits, and nothing here spells a path outside
+ * sidecar path derivation and the append. Required by `__dirname` from `stop-guard.js`, from
+ * `stall-recorder.js` and from `gate-guard.js`'s question arm (TOOL-aOrientedCast-22); nothing here
+ * reads stdin or exits, and nothing here spells a path outside
  * this directory — the conf basename, the conf keys, the record basename and the sidecar dir name
  * are the only literals.
  *
- * gov:kit unattended@1.104 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.105 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for TOOL-aWokenSentinel-3 under the build folder of that slug, §4 "The key".

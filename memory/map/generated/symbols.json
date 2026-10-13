@@ -2873,6 +2873,11 @@
       "file": "tools/hooks/format-guard.js"
     },
     {
+      "id": "checkAsk",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "checkAuthorizedReadme",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -5156,6 +5161,11 @@
       "id": "classify_row",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "clean",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
     },
     {
       "id": "cleanup",
@@ -7556,6 +7566,11 @@
       "id": "extract",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "extractAskQuestions",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
     },
     {
       "id": "extractBuildSlug",
@@ -14103,6 +14118,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderAskDeny",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "renderBlankedLiterals",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -17231,6 +17251,11 @@
       "id": "run_arms",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "run_ask",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.test.sh"
     },
     {
       "id": "run_ask_query",

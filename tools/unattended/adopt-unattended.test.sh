@@ -275,10 +275,10 @@ mv "$A/.claude/settings.json.aside" "$A/.claude/settings.json"
 sed 's/PreToolUse/PostToolUse/' "$A/.claude/settings.json" > "$A/.claude/s.tmp" && mv "$A/.claude/s.tmp" "$A/.claude/settings.json"
 ( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
 same "arm 1a a marker under PostToolUse is UNWIRED" "$?" "1"
-sed 's/PostToolUse/PreToolUse/; s/Bash|PowerShell/Bash/' "$A/.claude/settings.json" > "$A/.claude/s.tmp" && mv "$A/.claude/s.tmp" "$A/.claude/settings.json"
+sed 's/PostToolUse/PreToolUse/; s/Bash|PowerShell|AskUserQuestion/Bash/' "$A/.claude/settings.json" > "$A/.claude/s.tmp" && mv "$A/.claude/s.tmp" "$A/.claude/settings.json"
 ( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
 same "arm 1a a marker under another matcher is UNWIRED" "$?" "1"
-sed 's/"Bash"/"Bash|PowerShell"/' "$A/.claude/settings.json" > "$A/.claude/s.tmp" && mv "$A/.claude/s.tmp" "$A/.claude/settings.json"
+sed 's/"Bash"/"Bash|PowerShell|AskUserQuestion"/' "$A/.claude/settings.json" > "$A/.claude/s.tmp" && mv "$A/.claude/s.tmp" "$A/.claude/settings.json"
 # The marker under SessionStart BEHIND A MATCHERLESS GROUP — the repo's own settings shape (closing
 # round 2, R9). The resolver kept only the last key of the previous flattened line and left the
 # event alone when that key was `hooks`, so the group after a matcherless one inherited PreToolUse

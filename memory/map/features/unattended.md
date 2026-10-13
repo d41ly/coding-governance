@@ -5,7 +5,7 @@ feature = "unattended"
 title = "Unattended runs — a mandate on disk, not a block of chat"
 status = "shipped"
 streams = ["tooling", "playbook", "kickoff", "deployer"]
-decisions = []
+decisions = ["TOOL-aOrientedCast-22"]
 
 [claims]
 gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history", "brief-recorded", "unattended protocol size", "unattended skill size"]
@@ -207,6 +207,8 @@ as a note.
   (govkit wires each landed fragment, `TOOL-aRepatriatedFork-11`), the hook denying the flagged bar
   and every suite before `VERIFYING`. Its `buildCommandView` is COPIED from `tools/hooks/scratch-guard.js`:
   a `require` of a sibling kit is a literal the install-prefix ban refuses (`TOOL-aDeferredBar-3`).
+  On `AskUserQuestion` it refuses the session holding a non-terminal run's lease, read through
+  `run-lease.js`, and names `--park` (`TOOL-aOrientedCast-22`).
 
 ## Reuse affordance
 

@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
  * gate-guard — a PreToolUse guard that refuses the flagged merge bar and every self-test suite
- * while the unattended run on the current branch is in a phase before VERIFYING.
+ * while the unattended run on the current branch is in a phase before VERIFYING, and refuses an
+ * `AskUserQuestion` call from the session holding a non-terminal run's lease.
  *
- * gov:kit unattended@1.104 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.105 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for TOOL-aDeferredBar-3 under the build folder of that slug.
@@ -44,6 +45,18 @@
  * by its declared ceiling and printing each exemption (round 2 R3) — the flag form is textual and
  * this hook does not read a ceiling, so a flag-form suite above the bound is declared there by name.
  *
+ * THE QUESTION ARM (TOOL-aOrientedCast-22). An unattended run never asks (BUILD-METHOD M10): nobody
+ * is there to answer, and a run that called `AskUserQuestion` stalled until the owner came back. A
+ * payload whose `tool_name` is `AskUserQuestion` goes to `checkAsk`, which keys on the SESSION and
+ * not the branch: `run-lease.js`, required by `__dirname` as stop-guard.js requires it, returns the
+ * records whose `session:` fact under `## Run facts` equals the payload's `session_id`, and a lease
+ * whose phase is neither empty, `absent`, nor in PHASES_TERMINAL denies. The deny names the run, its
+ * phase and record, and the driver's `--park` route with each question and its option labels quoted
+ * from the payload, each value cut to ASK_QUOTE_MAX characters and stripped of control characters.
+ * It does NOT check whether the question is one the protocol lets the run decide, whether the
+ * session is alive, or which branch it is on; and it sees nothing the harness does not route
+ * through PreToolUse, which only a live session can observe (the spec's AC7).
+ *
  * WHAT IT NEVER DENIES. The plain bar — `run-gates.sh` with neither flag — is the scoped form the
  * owner allows at the main loop, and this hook cannot tell a child from the main loop; the child
  * prompt forbids it there by instruction. A quoted MENTION of any of the shapes — a commit
@@ -54,7 +67,9 @@
  * R13), scanned as one of its own the way row D5 scans a `bash -c` body, so
  * `printf '%s' "$(bash <suite>)"` is the run it is, a grep argument or a string tail beside the
  * span stays content, and the same span in single quotes stays content. Under PowerShell the
- * backtick inside double quotes is the escape character and opens no span (round 3 T3).
+ * backtick inside double quotes is the escape character and opens no span (round 3 T3). Nor does
+ * it deny a question from a session holding no lease — an owner's attended session on the run's
+ * branch may still ask — or from one whose run is at `LANDED` or `ABORTED`.
  *
  * THE KEY. The predicate runs first, and the filesystem is read only on a hit: the overwhelming
  * majority of tool calls carry no deny shape and cost one scan of one string. On a hit the hook
@@ -71,6 +86,8 @@
  * The four allowed phase names are restated here deliberately (spec §8 F5): reading them from the
  * driver at run time would switch this hook off silently the day the driver could not be read,
  * because the hook fails open; four literals pinned by a direct read and a suite arm fail loudly.
+ * PHASES_TERMINAL restates the driver's terminal pair for the same reason, pinned by its own arm.
+ * The question arm names the driver by its bare file name, as the bar arm names the runner.
  *
  * ponytail: the predicate is TEXTUAL, the same ceiling scratch-guard.js states of itself. A path
  * assembled at run time (`s=<dir>; bash $s/x.test.sh`) and a python heredoc that spawns a suite
@@ -79,7 +96,8 @@
  * would run whole behind it. No call in the corpus has that shape either.
  *
  * FAILS OPEN. Unparseable stdin, an unknown tool, a missing command, no `.git`, a detached HEAD,
- * no conf, no record on this branch: every one exits 0. This is a hygiene rule, not a containment
+ * no conf, no record on this branch, no lease for the session, an unloadable `run-lease.js`:
+ * every one exits 0. This is a hygiene rule, not a containment
  * boundary; a security control would have to fail the other way.
  *
  * Protocol: deny = stderr text + exit 2. Allow = print nothing, exit 0. Matches the sibling hooks.
@@ -96,6 +114,11 @@ const TOOLS = ['Bash', 'PowerShell']
 // read (spec AC6) and by the parity arm in gate-guard.test.sh; every other phase denies, a
 // project's PHASES_EXTRA members included, because an extra phase is by construction before landing.
 const PHASES_ALLOW = ['VERIFYING', 'LANDING', 'LANDED', 'ABORTED']
+// The question arm's tool, and the driver's PHASES_TERMINAL restated (pinned by its parity arm in
+// gate-guard.test.sh): a leased run in any other phase, HELD included, refuses its session's question.
+const ASK_TOOL = 'AskUserQuestion'
+const PHASES_TERMINAL = ['LANDED', 'ABORTED']
+const ASK_QUOTE_MAX = 300
 // Measured on node a, 2026-09-13, each direct: --list 5 s · --check 17 s · --rank 3 s · --help 3 s ·
 // --render 1 s. Generic over rows D2 to D4 and never over D1.
 const READ_ONLY_VERBS = ['--list', '--check', '--rank', '--help', '--render']
@@ -645,12 +668,79 @@ function renderDeny(hits, live) {
   )
 }
 
+/**
+ * Each question of an `AskUserQuestion` input as `{question, labels}`, every value cut to
+ * ASK_QUOTE_MAX characters with its control characters removed. An input of another shape yields
+ * one `(no question text)` entry rather than a throw: the deny must still name the park route.
+ */
+function extractAskQuestions(input) {
+  const clean = (v) => String(v).replace(/[\u0000-\u001f\u007f-\u009f]/g, '').slice(0, ASK_QUOTE_MAX)
+  const list = input && Array.isArray(input.questions) ? input.questions : []
+  const out = []
+  for (const q of list) {
+    if (!q || typeof q !== 'object') continue
+    const text = typeof q.question === 'string' && q.question.trim() ? clean(q.question) : '(no question text)'
+    const opts = Array.isArray(q.options) ? q.options : []
+    const labels = opts.filter((o) => o && typeof o.label === 'string').map((o) => clean(o.label))
+    out.push({ question: text, labels })
+  }
+  return out.length ? out : [{ question: '(no question text)', labels: [] }]
+}
+
+/**
+ * The question arm's decision: the leases `run-lease.js` binds to the payload's `session_id` whose
+ * phase is live — non-empty, not `absent`, not in PHASES_TERMINAL. Null means allow, and every
+ * unreadable input answers null.
+ */
+function checkAsk(data) {
+  const lease = require(path.join(__dirname, 'run-lease.js'))
+  const repo = lease.resolveRepo(data.cwd || process.cwd())
+  if (!repo) return null
+  const memoryRoot = lease.readMemoryRoot(repo.root)
+  if (!memoryRoot) return null
+  const live = lease.resolveLease(repo.root, memoryRoot, data.session_id)
+    .filter((l) => l.phase && l.phase !== 'absent' && !PHASES_TERMINAL.includes(l.phase))
+  if (live.length === 0) return null
+  return { live, questions: extractAskQuestions(data.tool_input) }
+}
+
+/** The deny text: the first live lease, the park route, and each question with its option labels. */
+function renderAskDeny(live, questions) {
+  const r = live[0]
+  const asked = questions
+    .map((q) => `  - ${q.question} — options: ${q.labels.length ? q.labels.join(', ') : '(none)'}`)
+    .join('\n')
+  return (
+    `BLOCKED by gate-guard: this session holds the lease of the unattended run ${r.slug}, at ${r.phase} (${r.record}).\n` +
+    'An unattended run never asks: nobody is there to answer, so the question stalls the run until\n' +
+    'the owner comes back. A question the protocol lets you decide is decided: take the option that\n' +
+    'makes no measured observable worse, and record why. One no delegated resolver can take is parked,\n' +
+    'and the run goes on to its next READY unit or holds:\n\n' +
+    `  unattended.sh --park ${r.slug} --item "<the question, and its options>" --reason "<why no resolver the mandate delegates exists>"\n\n` +
+    'The question this call asked:\n' +
+    asked + '\n'
+  )
+}
+
 function main() {
   let data
   try {
     data = JSON.parse(readStdin())
   } catch {
     process.exit(0)
+  }
+  if (data && data.tool_name === ASK_TOOL) {
+    // Dispatched before the TOOLS test (TOOL-aOrientedCast-22). Wrapped and failing open like the
+    // bar arm below: a throw here must not exit 1 on a question that was probably fine.
+    let ask
+    try {
+      ask = checkAsk(data)
+    } catch {
+      process.exit(0)
+    }
+    if (!ask) process.exit(0)
+    process.stderr.write(renderAskDeny(ask.live, ask.questions))
+    process.exit(2)
   }
   if (!data || !TOOLS.includes(data.tool_name)) process.exit(0)
   const cmd = (data.tool_input && data.tool_input.command) || ''
@@ -673,6 +763,6 @@ module.exports = {
   readStdin, readHeredocs, buildHeredocView, readSpanEnd, buildCommandView, readQuotedSubstitutions,
   scanSegments, scanDenyHits,
   resolveRepoRoot, readHeadRef, readMemoryRoot,
-  resolveRunPhase, checkCommand, renderDeny, main,
-  PHASES_ALLOW, READ_ONLY_VERBS, TOOLS, KIT_GATE_GUARD_VERSION,
+  resolveRunPhase, checkCommand, renderDeny, extractAskQuestions, checkAsk, renderAskDeny, main,
+  PHASES_ALLOW, PHASES_TERMINAL, ASK_TOOL, ASK_QUOTE_MAX, READ_ONLY_VERBS, TOOLS, KIT_GATE_GUARD_VERSION,
 }

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.104 -->
+<!-- gov:kit unattended@1.105 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -86,7 +86,7 @@ file before anything runs `--check`.
 
 ## The act is refused at the tool call, not only forbidden
 
-`gate-guard.js` is a `PreToolUse` hook on `Bash|PowerShell`, wired by
+`gate-guard.js` is a `PreToolUse` hook on `Bash|PowerShell|AskUserQuestion`, wired by
 `gate-guard.fragment.json` through the settings merger the hooks kit ships, and `--check` reports
 it UNWIRED with the merge command as the remedy. While the run-state record on the CURRENT branch
 is in any phase before `VERIFYING`, it exits 2 on a command that would run the flagged bar
@@ -99,6 +99,16 @@ back to `branch-ref:` for a record written before that fact existed, and it fail
 unreadable input. Its suite, `gate-guard.test.sh`, is withheld like the others and runs at
 `VERIFYING`; the predicate's coverage over real usage is the corpus probe in the build record of
 `TOOL-aDeferredBar-3`.
+
+The same hook refuses an unattended run's QUESTION (`TOOL-aOrientedCast-22`). An `AskUserQuestion`
+call exits 2 when a run-state record leased to the payload's `session_id` — its `session:` fact,
+read through `run-lease.js` — is in a phase outside `LANDED` and `ABORTED`, `HELD` included, and
+the deny names the run, its phase and record, and `unattended.sh --park` with the question and its
+option labels quoted from the payload. It keys on the session, not the branch, so an owner's
+attended session in the same checkout holds no lease and may still ask. It does not judge whether
+the question is one the protocol lets the run decide, and it fires only where the harness routes
+the tool through `PreToolUse`, which the suite cannot see because it feeds the hook its payload
+directly. A session started before the settings merge keeps the narrower matcher until it restarts.
 
 `govkit update` and `govkit apply` wire every fragment an install lands, before the kit's own
 `[check]` runs, through the target's `settings-merge.py` (a required kit since 1.33); a verify
