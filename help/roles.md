@@ -37,7 +37,8 @@ reference; this page is the short version.
   ```
 
   Pass that output, unchanged, as the prompt of an `Agent` call whose `subagent_type` is
-  `gov-builder`. An edited prompt is refused.
+  `gov-builder`. An edited prompt is refused. Pass the name it prints on stderr after
+  `handoff: description — ` as the call's `description`; any other name is refused.
 - **Change how a role behaves:** edit `<prefix>/roles/house/<role>.md`, never the file under
   `agents/`. Your overlay is appended under `## House rules`, and updates never overwrite it.
 - **Change a role's effort, or the gates a role may run:** edit `<prefix>/roles/house/policy.toml`.
@@ -49,6 +50,23 @@ reference; this page is the short version.
   `python tools/roles/render_agents.py --write`. Then start a new session: a running session cannot
   spawn an agent type written after it started.
 
+## How agents are named
+
+Every agent's name says what it is doing now: the build, the unit and the action.
+
+- **An agent the main session spawns** is named by `handoff.py render`, which prints the name on
+  stderr as `handoff: description — <name>`. It reads `<build> · <unit> · <workflow>`, for example
+  `aOrientedCast · TOOL-aOrientedCast-27 · build`, or `<build> · <workflow>` when the render names no
+  unit. The workflow is the role's, from its role file. A spawn whose `description` is missing or
+  differs is refused, and the refusal prints the right name.
+- **An agent a harness spawns** carries the label `<build> · <scope> · <stage>`. The scope is the
+  unit it serves, the units of a spec writer's group, or a review's kind and round, as in
+  `aOrientedCast · diff-review round 1 · synth`.
+- **A harness run** keeps its script's name, `unattended-build`, `unattended-unit` or `tier2-review`:
+  the tool fixes a run's title from the script's `meta` block, and no call can change it. The run
+  says what it is in its first log line, `<build> · <scope> · <action>`, and in the `identity` field
+  that leads its return.
+
 ## What each agent line tells you
 
 The main session reports every agent it dispatches or receives with two lines. It pastes them
@@ -57,7 +75,8 @@ unchanged from `handoff.py agents --handoff <path>` for an agent it spawned itse
 
 - **The `agent` line** says which role ran and at what effort and model. It also gives the unit or
   label it worked on, the prompt file it was handed, the file class it may write and the gate legs
-  it may run. It ends with the run and the agent's id, or `direct` for an agent spawned without a
+  it may run. A harness agent's unit comes from its label: the one unit id the label names, else the
+  whole label. It ends with the run and the agent's id, or `direct` for an agent spawned without a
   harness.
 - **The `returned` line** appears once the agent has finished. It says what the agent produced:
   `committed <sha>`, `not committed`, `failed`, or how many files it wrote. It then gives the wall
@@ -84,6 +103,7 @@ until an owner writes its first row.
 ## What the hooks refuse
 
 - An `Agent` call whose type is not a `gov-*` role, or whose prompt is not a rendered handoff.
+- A misnamed spawn: an `Agent` call whose `description` is not the name `handoff.py render` printed.
 - A `Workflow` call that runs anything other than a listed harness with its `roles` argument.
 - A spec write from anything but the spec writer, and a product write from anything but the builder
   on a specced unit. The main loop may still flip a spec's `**Status:**` line.

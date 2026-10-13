@@ -215,6 +215,12 @@ const UNIT_SCHEMA = {
   },
 }
 
+// TOOL-aOrientedCast-27 - the builder's label and the run's identity, one string: its first log line
+// and the first key of its return. Spelled here rather than through a helper, under the one-definition
+// rule above; the two harness templates each define `renderAgentLabel` for theirs.
+const identity = cfg.slug + ' · ' + cfg.unitId + ' · build'
+log(identity)
+
 phase('Unit')
 
 // THE DRIVER STEPS ARE MODE-BRANCHED, and this is the one thing in this file that is not optional.
@@ -326,7 +332,7 @@ log(effort ? 'effort builder: ' + effort + ' — efforts.builder'
 
 const r = await agent(
   PROMPT,
-  Object.assign({ label: 'unit:' + cfg.unitId, schema: UNIT_SCHEMA },
+  Object.assign({ label: identity, schema: UNIT_SCHEMA },
     builder ? { agentType: builder } : {}, effort ? { effort: effort } : {}),
 )
 
@@ -334,6 +340,7 @@ log('unit ' + cfg.unitId + ': committed=' + String(!!(r && r.committed)) + ' sha
 
 // S8 - `diverged` is a field, so a caller branches on it rather than on the prose of `why`.
 return {
+  identity: identity,
   committed: !!(r && r.committed),
   sha: (r && r.sha) || '',
   why: (r && r.why) || '',

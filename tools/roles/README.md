@@ -1,4 +1,4 @@
-<!-- gov:kit roles@1.4 -->
+<!-- gov:kit roles@1.5 -->
 # roles — the role catalogue: one agent definition per role, the workflow table, and the checker
 
 A governed session runs its LLM work through ten declared WORKFLOWS — `orient`, `research`, `reuse`,
@@ -58,7 +58,12 @@ The file is written under the build's `prompts/` folder as
 `<date>-prompt-<id>-<n>-<role without gov->.md`, and its `gov:handoff` marker line carries a hash of
 each section. `python handoff.py check <file>` re-derives both hashes and the marker's path;
 `--part task` prints the marker and the task section alone, which is what a typed agent spawn
-carries. `python handoff.py harness-args <harness>` prints the `roles` object a harness takes: the
+carries. Outside `--stand-in`, `render` also prints one stderr line, `handoff: description — <name>`,
+after its notes: the spawn's name, `<build> · <unit> · <workflow>` with the role's catalogue
+`workflow`, or `<build> · <workflow>` with no `--unit`. The `Agent` call passes it as `description`,
+and the hooks kit's spawn guard derives the same name from the marker and the role index and refuses
+a call carrying any other (TOOL-aOrientedCast-27). stdout does not change in any mode.
+`python handoff.py harness-args <harness>` prints the `roles` object a harness takes: the
 union of the `stages` tables of every workflow whose harness is that script, as one line of JSON.
 `python handoff.py stage-efforts <workflow>` prints the `efforts` object a harness call takes for one
 workflow, as the next section states.
@@ -90,12 +95,19 @@ names a harness run: one agent per `started` entry of its journal. The session i
 the transcript `CLAUDE_CODE_SESSION_ID` names under the Claude projects folder, found by the run-log
 kit's rule.
 
+Every agent a declared harness spawns carries the label `<slug> · <scope> · <stage>`: a spec writer
+serving a group names all its unit ids, so its line reads the label rather than one unit
+(TOOL-aOrientedCast-27). A harness run's own title is not the agent's to set: the tool fixes it from
+the script's `meta` block, so it reads `unattended-build`, `unattended-unit` or `tier2-review`. The
+run's identity, its build, scope and action, is its first log line and the leading `identity` field
+of its return.
+
 | Field | From | When nothing answers |
 |---|---|---|
 | role | the agent's meta `agentType`; for a direct spawn, else the marker's `role` | `unknown` |
 | effort | the agent transcript's last `effort`; else the agent type's `effort:` line | `unknown` |
 | model | the transcript's last `message.model`; for a direct spawn, else the call's `resolvedModel` | `unknown` |
-| unit or label | the marker's `unit`, else the meta's `description`; for a harness agent, the first unit id in its journal label, else the label | `unknown` |
+| unit or label | the marker's `unit`, else the meta's `description`; for a harness agent, the one unit id its journal label names, else the label | `unknown` |
 | prompt | the handoff and its marker's `path`; for a harness agent, the call's `briefPath`, else its `scriptPath` | `unknown` |
 | writes, gates | the role index's `writes` and `gates` for the role | `none` |
 | outcome | `failed`, a notification status that is not `completed`, `committed <sha>` or `not committed` from the unit harness's result, else `wrote <n> files` | — |

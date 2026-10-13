@@ -253,9 +253,12 @@ async function runReview(args, stubs, source) {
   const trace = []
   const logs = []
   const agent = async (prompt, opts) => {
-    const label = (opts && opts.label) || '(unlabelled)'
+    // TOOL-aOrientedCast-27 - a label is `<slug> · <scope> · <stage>`: the whole one is kept as `full`,
+    // and `label` is the stage after its last ` · `, which every stub and stage read keys on as before.
+    const full = (opts && opts.label) || '(unlabelled)'
+    const label = full.split(' · ').pop()
     // TOOL-aOrientedCast-10 - the effort each spawn asked for, and whether its options carry the key at all.
-    trace.push({ label: label, prompt: String(prompt), schema: opts && opts.schema, agentType: opts && opts.agentType,
+    trace.push({ label: label, full: full, prompt: String(prompt), schema: opts && opts.schema, agentType: opts && opts.agentType,
       effort: opts && opts.effort, hasEffort: !!opts && Object.prototype.hasOwnProperty.call(opts, 'effort') })
     let v = resolveStub(stubs, label)
     if (typeof v === 'function') v = v(label, String(prompt))
@@ -313,6 +316,35 @@ async function runWholeScriptArms() {
     ck(r.trace[0] && r.trace[0].label === 'resume:probe', 'the resume probe is the first agent, before any lens')
   }
   const K = r.result ? r.result.key : ''
+
+  // ---- TOOL-aOrientedCast-27 AC8: every whole label is `<slug> · <kind> round <n> · <stage>`, the slug
+  // read from a `builds/<slug>/` reviewDir and absent outside one; every check carries its count, so an
+  // empty trace cannot pass. Against renderAgentLabel staged to return the stage alone, each reds.
+  {
+    const rb = await runReview(Object.assign({}, DIFF, { reviewDir: 'memory/builds/tB/reviews' }), ALL_OK)
+    const fb = rb.trace.map((t) => t.full)
+    ck(!rb.threw && fb.length > 0 && fb.every((f) => f.indexOf('tB · diff-review round 1 · ') === 0),
+      'OC27 AC8 in a build folder every label opens "tB · diff-review round 1 · ": ' + fb.length + ' label(s)')
+    const ends = [/ · resume:probe$/, / · find:[a-z-]+$/, / · verify:ids-\d+-\d+$/, / · synth$/].map((re) => fb.filter((f) => re.test(f)).length)
+    ck(ends.every((c) => c > 0), 'OC27 AC8 ...and the probe, a finder, a skeptic batch and the synthesis each carry one: ' + ends.join(' '))
+    const fr = r.trace.map((t) => t.full)
+    ck(fr.length > 0 && fr.every((f) => f.indexOf('diff-review round 1 · ') === 0),
+      'OC27 AC8 outside a build folder every label opens "diff-review round 1 · ", with no slug part: ' + fr.length + ' label(s)')
+    const rs = await runReview(SPEC, ALL_OK)
+    const fsa = rs.trace.map((t) => t.full)
+    ck(!rs.threw && fsa.length > 0 && fsa.every((f) => f.indexOf('spec-audit round 1 · ') === 0),
+      'OC27 AC8 a spec audit labels every agent "spec-audit round 1 · ": ' + fsa.length + ' label(s)')
+    const rd = await runReview(Object.assign({}, DIFF, { reviewDir: 'memory/builds/tB/reviews' }), buildStubs({ 'find:seams': null }))
+    ck(!rd.threw && rd.result && JSON.stringify(rd.result.pending) === '["find:seams"]',
+      'OC27 AC8 a dead find:seams leaves pending holding its stage key, never a whole label: ' + JSON.stringify(rd.result && rd.result.pending))
+    // ---- AC16: the run's identity is its first log line and the first key of every return.
+    ck(rb.logs[0] === 'tB · diff-review round 1 · review' && rb.result && Object.keys(rb.result)[0] === 'identity' &&
+      rb.result.identity === rb.logs[0], 'OC27 AC16 the first log line is the identity, and the complete return leads with it: ' + JSON.stringify(rb.logs[0]))
+    ck(rs.logs[0] === 'spec-audit round 1 · review' && rs.result && Object.keys(rs.result)[0] === 'identity',
+      'OC27 AC16 a spec audit outside a build folder logs "spec-audit round 1 · review" first: ' + JSON.stringify(rs.logs[0]))
+    ck(rd.result && Object.keys(rd.result)[0] === 'identity' && rd.result.identity === 'tB · diff-review round 1 · review',
+      'OC27 AC16 the deferred return leads with the identity too: ' + (rd.result ? Object.keys(rd.result)[0] : 'no result'))
+  }
 
   // ---- AC1: every find: prompt and every verify: prompt NAMES its file under review-lenses/, and
   // ---- all three agent schemas REQUIRE path. The skeptic half is read too, which is the half a
@@ -2065,7 +2097,9 @@ printf '%s\n' "$out"
 # RAISED 301 -> 314 by TOOL-aOrientedCast-10: 13 assertions, counted off the `efforts:` block — three
 # refusals (3), the spec audit's routing, probe and log (5), the diff routing and log (3), the untyped
 # skeptic (1) and the absent argument (1). Counted by hand, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=314
+# RAISED 314 -> 322 by TOOL-aOrientedCast-27: 8 assertions, counted off the `OC27` block — the whole
+# labels (5) and the run's identity (3). Counted by hand, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=322
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

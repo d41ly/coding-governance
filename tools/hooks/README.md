@@ -211,6 +211,11 @@ exactly the output of `handoff.py render --role <name> --build <slug> --part tas
 marker's `path` names. That path is repo-relative under `builds/<build>/prompts/`; the file must hold
 the same single marker, and its section must hash to the marker's `task-sha`, so a file edited after
 rendering is refused too. A refusal names the first prompt line that differs; resend the file's bytes.
+Last, its `description`, ends trimmed, must be the spawn's name `handoff.py render` prints on stderr
+as `handoff: description — <name>`: `<build> · <unit> · <workflow>`, from the marker's build and unit
+and the index's `workflow` for that role, or `<build> · <workflow>` for a marker whose unit is `-`
+(TOOL-aOrientedCast-27). A missing or different description is refused with the expected name
+printed, and an index role with no `workflow` refuses, naming the index.
 
 A `Workflow` call passes only by a `scriptPath` listed in `harnesses` (never an inline `script` or a
 `name:` run), with `args.roles` a non-empty object whose every value is an `agent`-true role: pass
@@ -221,8 +226,10 @@ claims no slot; before rule 0. Skipped under any `--only=`. A throw inside the r
 
 **What it does not stop**, said rather than implied: a hook-less or `--bare` run; the agents a running
 harness spawns through its own `agent()`, which is a runtime call and not a tool call; a
-session-to-session message; a hand-written prompt file that agrees with itself; and a hand-edited
-index. It never compares `role-sha` with the role an agent type was rendered from.
+session-to-session message; a hand-written prompt file that agrees with itself; a hand-edited
+index; a forged name, since any caller can copy the right one; and a harness agent's label, which
+its script sets inside a runtime call no hook sees. It never compares `role-sha` with the role an
+agent type was rendered from.
 
 ## Lowering the cap — `.agent-cap.conf`
 

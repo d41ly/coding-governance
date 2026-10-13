@@ -46,7 +46,10 @@
  * line endings folded and its ends trimmed, exactly one `gov:handoff` marker line naming that role,
  * blank lines, and the `## Task` section of the file the marker's `path` names under
  * `builds/<build>/prompts/`, that file holding the same single marker and a section whose SHA-256
- * prefix is the marker's `task-sha`. A `Workflow` call is admitted only by a `scriptPath` listed in
+ * prefix is the marker's `task-sha`, and its `description`, ends trimmed, the name the renderer
+ * prints on stderr: `<build> · <unit> · <workflow>` from the marker and the index's `workflow` for
+ * that role, the unit part left out for a `-` unit (TOOL-aOrientedCast-27). That step stops a stale
+ * or freeform name, never a forged one. A `Workflow` call is admitted only by a `scriptPath` listed in
  * `harnesses`, with `args.roles` a non-empty object whose every value is an `agent`-true role. ORDER:
  * after the AGENT_CAP refusal and the declared-cap read, before rule 4 (so a refused spawn claims no
  * slot) and before rule 0; skipped under `--only=`. A throw inside it refuses. CEILING, said rather
@@ -98,7 +101,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.37' // gov:kit agent-cap@1.37 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.38' // gov:kit agent-cap@1.38 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -2076,7 +2079,7 @@ function renderHandoffDeny(tool, why, index) {
   const route = tool === 'Agent'
     ? `The agent-true roles are: ${roles.join(', ') || '(none)'}. Render the handoff with ` +
       `\`handoff.py render --role <name> --build <slug> --part task\`, then pass its output unchanged as ` +
-      `\`prompt\` with \`subagent_type\` that role.`
+      `\`prompt\` with \`subagent_type\` that role and \`description\` the name it prints on stderr.`
     : `The declared harnesses are: ${(index && index.harnesses ? index.harnesses : []).join(', ') || '(none)'}. ` +
       `Run one by \`scriptPath\` and pass, in \`args\`, the \`roles\` object \`handoff.py harness-args <harness>\` prints.`
   return `BLOCKED by agent-cap: rule 6 (TOOL-aOrientedCast-7) refused this ${tool} call — ${why}\n${route}\n`
@@ -2131,7 +2134,23 @@ function checkHandoffSpawn(data, index, root) {
   }
   const digest = buildTaskDigest(section)
   if (digest !== m.taskSha) return renderHandoffDeny('Agent', `${m.path}'s \`## Task\` section hashes to ${digest}, and its marker says task-sha=${m.taskSha}: the file was edited after rendering.`, index)
+  // TOOL-aOrientedCast-27 step 2.10 - after the digest, so the one remedy left is the description.
+  const workflow = index.roles[type].workflow
+  if (typeof workflow !== 'string' || workflow === '') {
+    return renderHandoffDeny('Agent', `${index.shown} declares no workflow for ${type}, so this spawn's name cannot be derived; re-render the role index.`, index)
+  }
+  const spawnName = renderSpawnName(m, workflow)
+  if (typeof ti.description !== 'string' || ti.description.trim() !== spawnName) {
+    return renderHandoffDeny('Agent', `the call's description ${JSON.stringify(ti.description === undefined ? null : ti.description)} is not this handoff's name ` +
+      `${JSON.stringify(spawnName)}: the marker's build and unit and the ${type} role's workflow. Pass description exactly as handoff.py render prints it.`, index)
+  }
   return null
+}
+
+// A direct spawn's name, `<build> · <unit> · <workflow>`, the unit part left out when the marker's is
+// `-`. The renderer's `render_spawn_name` builds the same string; a kit file imports no sibling kit.
+function renderSpawnName(marker, workflow) {
+  return [marker.build, marker.unit === '-' ? '' : marker.unit, workflow].filter(Boolean).join(' · ')
 }
 
 // Rule 6 on a `Workflow` call (§4 "The evaluation order", step 3): null to admit, else a deny string.

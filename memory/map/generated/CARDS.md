@@ -217,7 +217,7 @@ Workflow review harnesses — one pipeline, three implementations, one hardened
 The role catalogue: one owner-editable agent definition per role with an empty house overlay beside it, the table of the workflows a governed session runs it...
 
 - status `building` · streams `tooling` · dossier `memory/map/features/roles.md`
-- decisions 10: `TOOL-aOrientedCast-1`, `TOOL-aOrientedCast-2`, `TOOL-aOrientedCast-3`, `KICK-aOrientedCast-2`, `TOOL-aOrientedCast-8`, `TOOL-aOrientedCast-10`, `TOOL-aOrientedCast-11`, `TOOL-aOrientedCast-16`, `TOOL-aOrientedCast-17`, `TOOL-aOrientedCast-20`
+- decisions 11: `TOOL-aOrientedCast-1`, `TOOL-aOrientedCast-2`, `TOOL-aOrientedCast-3`, `KICK-aOrientedCast-2`, `TOOL-aOrientedCast-8`, `TOOL-aOrientedCast-10`, `TOOL-aOrientedCast-11`, `TOOL-aOrientedCast-16`, `TOOL-aOrientedCast-17`, `TOOL-aOrientedCast-20`, `TOOL-aOrientedCast-27`
 - gate-legs 4: `roles adopter self-test`, `roles catalogue`, `roles render selftest`, `roles render wiring`
 - kits 1: `roles`
 - rendered-skills 1: `build`

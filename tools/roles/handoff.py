@@ -16,6 +16,10 @@ the role as the last block: the section 1 rule lines its `rules` tags cite and t
 sections (TOOL-aOrientedCast-16), each library note printed on stderr as `handoff: note — `. It writes
 the file under the build's `prompts/` folder, printing its repo-relative path. `--part task` prints
 the marker line, a blank line and the `## Task` section instead; `--stdout` writes nothing and prints.
+Outside `--stand-in` it prints one stderr line after the notes, `handoff: description — <name>`, the
+spawn's name `<build> · <unit> · <workflow>`, the unit part left out with no `--unit`: the `Agent`
+call passes it as `description`, and the hooks kit's spawn guard derives the same name and refuses
+any other (TOOL-aOrientedCast-27). stdout is unchanged by it in every mode.
 `--stand-in` declares that the main loop does the role's work itself, because its tool cannot spawn
 a sub-agent (TOOL-aOrientedCast-19): it refuses with exit 1, writing nothing, unless a valid row of
 the owner's `<MEMORY_ROOT>/project/role-stand-in-waiver.txt` names the role and the build, and
@@ -42,7 +46,8 @@ nothing answers prints `unknown` (TOOL-aOrientedCast-20). `--handoff` names a di
 `Agent` call whose prompt opens with the file's marker line as the hooks kit's spawn guard reads it,
 through `roles_lib.extract_prompt_marker` (TOOL-aOrientedCast-25); `--run` a harness run, one agent
 per `started` entry of its journal. The session is `--session`, else the transcript
-CLAUDE_CODE_SESSION_ID names. With `--write`, each line holding no `unknown` is added, once, to the
+CLAUDE_CODE_SESSION_ID names. A harness agent's unit is the one unit id its journal label names, else
+the label (TOOL-aOrientedCast-27). With `--write`, each line holding no `unknown` is added, once, to the
 build's one `<MEMORY_ROOT>/builds/<build>/build/*-agent-ledger.md`, its prompt link re-rooted at
 that folder; without it nothing is written and one note names the held lines and `--write`, so a
 mid-pass call leaves the tree as it found it. Pass `--write` only at a bookkeeping step, when no
@@ -128,6 +133,20 @@ def check_placeholder(value):
     v = " ".join(value.split())
     return (v.lower() in PLACEHOLDERS or not v.replace(".", "").replace("…", "")
             or re.fullmatch(r"<[^<>]*>", v) is not None)
+
+
+def render_spawn_name(slug, unit, workflow):
+    """A direct spawn's name, `<build> · <unit> · <workflow>`, the unit part left out for no unit or
+    `-` (TOOL-aOrientedCast-27). The hooks kit's spawn guard derives the same string from the marker
+    and the role index, its own copy because a kit file imports no sibling kit."""
+    return " · ".join(p for p in (slug, "" if unit in (None, "-") else unit, workflow) if p)
+
+
+def extract_label_unit(label):
+    """The one distinct unit id a harness agent's label names, else None: a spec writer serving a
+    group names several and so no one unit (TOOL-aOrientedCast-27)."""
+    hits = set(LABEL_UNIT_RE.findall(label or ""))
+    return hits.pop() if len(hits) == 1 else None
 
 
 def extract_card_section(text, heading):
@@ -864,8 +883,7 @@ def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run
         run = run_id
         for e in started:
             tr = read_transcript(sdir / "subagents" / "workflows" / run_id, e["id"])
-            hit = LABEL_UNIT_RE.search(e["label"] or "")
-            unit = hit.group(0) if hit else (e["label"] or tr["description"])
+            unit = extract_label_unit(e["label"]) or e["label"] or tr["description"]
             agents.append((e["id"], tr, None, unit, (prompt.rsplit("/", 1)[-1], prompt) if prompt else (None, None),
                            None, e["returned"], render_outcome(e["failed"], None, e["result"], tr["files"])))
     out, ledger = [], []
@@ -1027,6 +1045,9 @@ def main(argv):
                                                lib.STAND_IN_TAIL if a.stand_in else "")
         for line in notes:
             print("handoff: note — %s" % line, file=sys.stderr)
+        if not a.stand_in:
+            print("handoff: description — %s" % render_spawn_name(a.build, a.unit, keys["workflow"]),
+                  file=sys.stderr)
     except lib.RolesError as e:
         print("\n".join("handoff: " + ln for ln in str(e).split("\n")), file=sys.stderr)
         return 1

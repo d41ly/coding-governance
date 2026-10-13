@@ -7768,6 +7768,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "extract_label_unit",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "extract_line_ref",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
@@ -14123,6 +14128,26 @@
       "file": "tools/workflows/check-protocol-parity.test.sh"
     },
     {
+      "id": "renderAgentLabel",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderAgentLabel",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderAgentLabel",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "renderAgentLabel",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "renderAppendix",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -14389,6 +14414,11 @@
     },
     {
       "id": "renderShippedView",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderSpawnName",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
     },
@@ -14981,6 +15011,11 @@
       "id": "render_skill_copy",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "render_spawn_name",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "render_spawn_summary",

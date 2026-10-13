@@ -24,7 +24,7 @@ import pathlib
 import re
 import tomllib
 
-KIT_ROLES_VERSION = "1.4"
+KIT_ROLES_VERSION = "1.5"
 
 #: Every front-matter key a role file may carry: Claude Code's own, then gov's.
 #: Split from one string, because a quoted `"tools"` beside a quoted segment reads to the

@@ -5,7 +5,7 @@ feature = "roles"
 title = "The role catalogue: one owner-editable agent definition per role with an empty house overlay beside it, the table of the workflows a governed session runs its LLM work through, the library every consumer reads them by, and the leg that holds the three and the governing doc to one another"
 status = "building"
 streams = ["tooling"]
-decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2", "TOOL-aOrientedCast-8", "TOOL-aOrientedCast-10", "TOOL-aOrientedCast-11", "TOOL-aOrientedCast-16", "TOOL-aOrientedCast-17", "TOOL-aOrientedCast-20"]
+decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2", "TOOL-aOrientedCast-8", "TOOL-aOrientedCast-10", "TOOL-aOrientedCast-11", "TOOL-aOrientedCast-16", "TOOL-aOrientedCast-17", "TOOL-aOrientedCast-20", "TOOL-aOrientedCast-27"]
 
 [claims]
 gate-legs = ["roles adopter self-test", "roles catalogue", "roles render selftest", "roles render wiring"]
@@ -62,6 +62,10 @@ handoffs and the rows both ways as R15 (TOOL-aOrientedCast-19).
 spawn or a harness run from the session's transcripts, the role index and the agent types, and,
 given `--write`, adds each line holding no `unknown` field once to the build's agent ledger under
 its `build/` folder (TOOL-aOrientedCast-20, TOOL-aOrientedCast-25).
+`render` also prints the spawn's name, `<build> · <unit> · <workflow>`, on stderr, which the hooks
+kit's spawn guard requires as the `Agent` call's `description`, and `agents` reads a harness agent's
+unit as the one unit id its label names, so a spec writer serving a group reads as its label
+(TOOL-aOrientedCast-27).
 
 ## Constraints & why
 

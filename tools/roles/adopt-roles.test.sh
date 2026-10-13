@@ -57,8 +57,10 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # 10, then +3 for arm 7 (TOOL-aOrientedCast-15). Arm 6 is NOT in the floor: it SKIPs out loud on a
 # host with no hooks kit or no node, and a skip must not red the floor.
 # +3 for arm 8 (TOOL-aOrientedCast-17). +3 for arm 9 (TOOL-aOrientedCast-20). +4 for arm 9 and +10
-# for arm 10 (TOOL-aOrientedCast-25); arm 11 is out of the floor, as arm 6 is.
-FLOOR_ASSERTIONS=33
+# for arm 10 (TOOL-aOrientedCast-25); arm 11 is out of the floor, as arm 6 is. +1 for arm 6's named
+# spawn and +4 for arm 12 (TOOL-aOrientedCast-27): arm 6's one floored assertion is taken back off the
+# floor by the SKIP that announces the arm unrun, so a skip still cannot red it.
+FLOOR_ASSERTIONS=38
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""
@@ -122,9 +124,9 @@ try:
 except LookupError:
     pass' "$HERE"); HK=${HK%$'\r'}
 if [ -z "$HK" ]; then
-  echo "SKIP arm 6 — no hooks kit holding agent-cap.js was found from $KREL"
+  echo "SKIP arm 6 — no hooks kit holding agent-cap.js was found from $KREL"; FLOOR_ASSERTIONS=$((FLOOR_ASSERTIONS-1))
 elif ! command -v node >/dev/null 2>&1; then
-  echo "SKIP arm 6 — no node on PATH to run $HK/agent-cap.js"
+  echo "SKIP arm 6 — no node on PATH to run $HK/agent-cap.js"; FLOOR_ASSERTIONS=$((FLOOR_ASSERTIONS-1))
 else
   build_fixture
   A6P="$MR/builds/bx/prompts/$(date +%F)-prompt-TOOL-bx-1-1-researcher.md"
@@ -132,15 +134,26 @@ else
   (cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build bx --unit TOOL-bx-1 \
      --input "question=which mechanism fits" --out "$A6P" --part task) > "$TMP_ROOT/a6.task" 2>"$TMP_ROOT/a6.err"; rc=$?
   FXN=$(cd "$FX" && { pwd -W 2>/dev/null || pwd; })
+  # TOOL-aOrientedCast-27: the payload's `description` is the name the render printed on stderr after
+  # `handoff: description — `, and a second payload carries the role's slot name in its place. The
+  # rendered name, JSON-quoted as the hook's refusal spells it, goes to a6.name.
   "$PY" -c 'import json, sys
-print(json.dumps({"tool_name": "Agent", "cwd": sys.argv[1], "session_id": "a6-s", "prompt_id": "a6-p-" + sys.argv[3],
-                  "tool_use_id": "a6-u", "tool_input": {"subagent_type": "gov-researcher",
-                  "prompt": open(sys.argv[2], newline="", encoding="utf-8").read()}}))' \
-    "$FXN" "$TMP_ROOT/a6.task" "$$" > "$TMP_ROOT/a6.json"
+err = open(sys.argv[4], encoding="utf-8").read().replace("\r", "").split("\n")
+name = next((l[len("handoff: description — "):] for l in err if l.startswith("handoff: description — ")), None)
+for out, desc in ((sys.argv[5], name), (sys.argv[6], "bx · TOOL-bx-1 · researcher")):
+    with open(out, "w", encoding="utf-8") as fh:
+        json.dump({"tool_name": "Agent", "cwd": sys.argv[1], "session_id": "a6-s", "prompt_id": "a6-p-" + sys.argv[3],
+                   "tool_use_id": "a6-u", "tool_input": {"subagent_type": "gov-researcher", "description": desc,
+                   "prompt": open(sys.argv[2], newline="", encoding="utf-8").read()}}, fh)
+sys.stdout.buffer.write(json.dumps(name, ensure_ascii=False).encode("utf-8"))' \
+    "$FXN" "$TMP_ROOT/a6.task" "$$" "$TMP_ROOT/a6.err" "$TMP_ROOT/a6.json" "$TMP_ROOT/a6s.json" > "$TMP_ROOT/a6.name"
   (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR node "$HK/agent-cap.js" < "$TMP_ROOT/a6.json" >/dev/null 2>"$TMP_ROOT/a6.hook"); hrc=$?
-  check_arm "arm 6 the renderer's task part is admitted by the spawn guard" \
+  check_arm "arm 6 the renderer's task part, named as it printed, is admitted by the spawn guard" \
      "$([ "$rc" = 0 ] && [ "$hrc" = 0 ] && [ ! -s "$TMP_ROOT/a6.hook" ] && echo 1 || echo 0)"
   [ "$rc" = 0 ] && [ "$hrc" = 0 ] && [ ! -s "$TMP_ROOT/a6.hook" ] || sed 's/^/    /' "$TMP_ROOT/a6.err" "$TMP_ROOT/a6.hook"
+  (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR node "$HK/agent-cap.js" < "$TMP_ROOT/a6s.json" >/dev/null 2>"$TMP_ROOT/a6s.hook"); hrc=$?
+  check_arm "arm 6 ...and named by the role's slot it is refused, naming the rendered name" \
+     "$([ "$hrc" = 2 ] && [ "$(<"$TMP_ROOT/a6.name")" != null ] && grep -qF -- "$(<"$TMP_ROOT/a6.name")" "$TMP_ROOT/a6s.hook" && echo 1 || echo 0)"
   msha=$(tr -d '\r' < "$TMP_ROOT/a6.task" | sed -n '1s/.* task-sha=\([0-9a-f]\{12\}\) -->$/\1/p')
   out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" check "$A6P" 2>&1); rc=$?
   check_arm "arm 6 check re-derives the marker's task-sha" \
@@ -380,13 +393,16 @@ else
   A11P="$MR/builds/bx/prompts/$_d-prompt-TOOL-bx-1-1-researcher.md"
   mkdir -p "$FX/$MR/builds/bx/prompts" "$TMP_ROOT/a11"
   (cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build bx --unit TOOL-bx-1 \
-     --input "question=which mechanism fits" --out "$A11P" --part task) > "$TMP_ROOT/a11/task" 2>/dev/null
+     --input "question=which mechanism fits" --out "$A11P" --part task) > "$TMP_ROOT/a11/task" 2>"$TMP_ROOT/a11/err"
   FXN=$(cd "$FX" && { pwd -W 2>/dev/null || pwd; })
   # Each variant's bytes written exact, then its two answers: `admit` or `refuse`, one line per variant.
+  # Every payload carries the name the render printed as its `description` (TOOL-aOrientedCast-27).
   "$PY" -B -c 'import json, pathlib, sys
 sys.path.insert(0, sys.argv[1])
 import roles_lib
 out, fxn, pid = pathlib.Path(sys.argv[2]), sys.argv[3], sys.argv[4]
+err = (out / "err").read_bytes().decode("utf-8").replace("\r", "").split("\n")
+desc = next((l[len("handoff: description — "):] for l in err if l.startswith("handoff: description — ")), None)
 t = (out / "task").read_bytes().decode("utf-8")
 m = t.replace("\r", "").split("\n", 1)[0]
 head, rest = t.split("\n", 1)
@@ -396,7 +412,7 @@ for name, text in variants.items():
     with open(out / (name + ".json"), "w", encoding="utf-8", newline="") as fh:
         json.dump({"tool_name": "Agent", "cwd": fxn, "session_id": "a11-s-" + name,
                    "prompt_id": "a11-p-%s-%s" % (name, pid), "tool_use_id": "a11-u-" + name,
-                   "tool_input": {"subagent_type": "gov-researcher", "prompt": text}}, fh)
+                   "tool_input": {"subagent_type": "gov-researcher", "description": desc, "prompt": text}}, fh)
     hit = roles_lib.extract_prompt_marker(text)
     with open(out / (name + ".py"), "w", encoding="utf-8", newline="") as fh:
         fh.write("admit" if hit and hit.group(0) == m else "refuse")' "$HERE" "$TMP_ROOT/a11" "$FXN" "$$"
@@ -442,6 +458,23 @@ sys.stdout.buffer.write("\n".join(s.get(h, "none") for h in ("agent", "returned"
   check_arm "arm 11 ...and the three agent answers hold two distinct definitions and one none" \
      "$([ "$_nd" = 2 ] && [ "$_nn" = 1 ] && echo 1 || echo 0)"
 fi
+
+# ---- arm 12: a harness agent's unit is the one unit id its label names ---------------------------
+# TOOL-aOrientedCast-27 S4: a spec writer serving a group names several ids and so no one unit, and a
+# label written before the unit's labels still yields its unit. Against extract_label_unit staged back
+# to the first id a label holds, the group label reads as its first unit and the second row reds.
+_a12=$("$PY" -B -c 'import sys
+sys.path.insert(0, sys.argv[1])
+import handoff
+sys.stdout.buffer.write("\n".join(str(handoff.extract_label_unit(x)) for x in sys.argv[2:]).encode("utf-8"))' "$HERE" \
+  "aOrientedCast · TOOL-aOrientedCast-27 · build" "aOrientedCast · TOOL-aOrientedCast-26 TOOL-aOrientedCast-27 · spec-write" \
+  "aOrientedCast · diff-review round 1 · find:security" "unit:TOOL-tFix-1"); _a12=${_a12//$'\r'/}
+_i=0
+for _w in "TOOL-aOrientedCast-27|a builder's label names its one unit" "None|a spec writer's group label names no one unit" \
+          "None|a review label names no unit" "TOOL-tFix-1|a label written before the new shape still yields its unit"; do
+  _i=$((_i+1))
+  check_arm "arm 12 ${_w#*|}" "$([ "$(printf '%s\n' "$_a12" | sed -n "${_i}p")" = "${_w%%|*}" ] && echo 1 || echo 0)"
+done
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
