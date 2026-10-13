@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-prompt-TOOL-aOrientedCast-1-8-owner-addendum.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-8-owner-addendum.md) | research | — |
 | [2026-10-13-prompt-TOOL-aOrientedCast-27-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-27-1-spec-brief.md) | journal | TOOL-aOrientedCast-25 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-27-2-spec-writer.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-27-2-spec-writer.md) | journal | — |
 
