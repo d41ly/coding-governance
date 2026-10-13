@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-23 — one stated answer on which declared size ceilings a run may raise, held in the limits file and pointed at by M3 and the size gate
 
-**Status:** OPEN · rev-3 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 25
+**Status:** INPROGRESS · rev-3 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 25
 
 <!-- gen:spec-records -->
 

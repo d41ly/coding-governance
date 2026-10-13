@@ -264,3 +264,5 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-13T09:05:48Z rescope · item add TOOL-aOrientedCast-26 · reason the owner's fourth addendum (prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-7-owner-addendum.md): spec writers at high effort, builders at xhigh, in the seeded policy file
 
 2026-10-13T09:09:04Z rescope · item add TOOL-aOrientedCast-27 · reason the owner's fifth addendum (prompts/2026-10-13-prompt-TOOL-aOrientedCast-27-1-spec-brief.md): spawned agents carry a stale name; every agent and harness label names the slug, the unit and the action
+
+2026-10-13T09:51:19Z dispatch · item a56b63f5 TOOL-aOrientedCast-23 · reason tools/template-size-limits.txt memory/builds/aOrientedCast/spec/2026-10-13-spec-TOOL-aOrientedCast-23.md memory/builds/aOrientedCast/build/2026-10-13-build-TOOL-aOrientedCast-23-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
