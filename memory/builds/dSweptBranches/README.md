@@ -90,7 +90,7 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-4 — the worktree remover: git first, then `rm -rf`, and a skeleton removed only when it holds no regular file](spec/2026-10-13-spec-TOOL-dSweptBranches-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-13 |
 | [TOOL-dSweptBranches-3 — write mode: a recovery manifest first, then deletes of the three landed verdicts only](spec/2026-10-13-spec-TOOL-dSweptBranches-3.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-13 |
 | [TOOL-dSweptBranches-5 — the skill: a rendered `/branch-reconcile` that routes cleanup asks through the tool](spec/2026-10-13-spec-TOOL-dSweptBranches-5.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-13 |
-| [TOOL-dSweptBranches-7 — a worktree whose status was never read reads UNKNOWN, never its HEAD's verdict](spec/2026-10-13-spec-TOOL-dSweptBranches-7.md) | 6 | 2 | OPEN | rev-1 | 2026-10-13 |
+| [TOOL-dSweptBranches-7 — a worktree whose status was never read reads UNKNOWN, never its HEAD's verdict](spec/2026-10-13-spec-TOOL-dSweptBranches-7.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-8 — a registered worktree path holding another repository is never graded as the worktree, and rm -rf reaches only a proven worktree](spec/2026-10-13-spec-TOOL-dSweptBranches-8.md) | 7 | 2 | OPEN | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-9 — the patch predicate matches only a copy that shares more lines than it drifts, on the same files](spec/2026-10-13-spec-TOOL-dSweptBranches-9.md) | 8 | 2 | OPEN | rev-1 | 2026-10-13 |
 | [TOOL-dSweptBranches-10 — an untracked probe is covered only when its cases are declared on the default branch and its body exists there](spec/2026-10-13-spec-TOOL-dSweptBranches-10.md) | 9 | 2 | OPEN | rev-1 | 2026-10-13 |
@@ -103,9 +103,9 @@ ids TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dS
 | [TOOL-dSweptBranches-17 — the closing review's MEDIUM and LOW items, batched](spec/2026-10-13-spec-TOOL-dSweptBranches-17.md) | 16 | 2 | OPEN | rev-1 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 13 bound to this build, across 4 record folder(s).
+Records: 15 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9.
+Ids no record names: TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9.
 
 Ids no `spec-audit` record has ever named: TOOL-dSweptBranches-1 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17 TOOL-dSweptBranches-2 TOOL-dSweptBranches-3
 TOOL-dSweptBranches-4 TOOL-dSweptBranches-5 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9.

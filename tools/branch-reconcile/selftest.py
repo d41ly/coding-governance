@@ -703,8 +703,25 @@ def arm_keeps():
               (repo.exists(), (repo / ".git").exists(), "main" in branches), (True, True, True))
 
 
+def arm_unread():
+    """TOOL-dSweptBranches-7 — a worktree whose status was never read is kept, its files untouched."""
+    base = build_dir()
+    repo = seed_repo(base)
+    key = lambda p: str(p).replace("\\", "/")
+    with seed_environ():
+        wt = base / "fx" / "lost"
+        run_git(repo, "worktree", "add", "-q", "-b", "lost-br", str(wt), "main")
+        (wt / ".git").unlink()
+        (wt / "notes.txt").write_text("never committed\n", encoding="utf-8")
+        rows = read_rows(run_cli(repo, "--fresh-hours", "0")[1])
+        check("unread: AC1 a worktree whose status was not read reads UNKNOWN",
+              read_verdict(rows, "worktree/sibling", key(wt))[0], "UNKNOWN")
+        rc, _out = run_main("--root", str(repo), "--fresh-hours", "0", "--write")
+        check("unread: AC1 --write leaves its untracked file", (wt / "notes.txt").exists(), True)
+
+
 ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
-        arm_content, arm_stash, arm_remover, arm_write, arm_keeps]
+        arm_content, arm_stash, arm_remover, arm_write, arm_keeps, arm_unread]
 
 
 def main():

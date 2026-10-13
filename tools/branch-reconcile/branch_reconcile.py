@@ -639,6 +639,11 @@ def check_worktree(inv, item):
         return IN_PROGRESS, f"activity inside the {inv['fresh'] / 3600:g}h freshness bound"
     st = w["dirt"]
     if st is None:
+        # UNDECIDED IS NEVER "NO OBJECTION" (TOOL-dSweptBranches-7). A directory whose status could
+        # not be read holds content nobody graded; only a worktree whose path is gone falls through
+        # to its HEAD's verdict, to be pruned.
+        if os.path.lexists(w["path"]) and "bare" not in w["flags"]:
+            return UNKNOWN, "worktree status could not be read; its content is ungraded"
         return None
     covered, uncovered, unknown = [], [], []
     if st["merge"]:

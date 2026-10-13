@@ -768,6 +768,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_unread",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_wall",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
