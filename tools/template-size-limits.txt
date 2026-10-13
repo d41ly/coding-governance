@@ -20,7 +20,7 @@
 #      keeps to any rule that block states, such as no headroom;
 #   3. the movement is argued in place above the row, in the shape the movements below take:
 #      RAISED <old> -> <new>, the date, the unit, the measured figure and why the new value;
-#   4. the same commit adds that unit's row to memory/DECISIONS.md.
+#   4. the run records that unit's row in memory/DECISIONS.md before or with the raise.
 # A class row, a lowering, a new row and a removal stay the owner's. This paragraph is the one
 # statement of these terms: the build method's M3 and check-template-size.sh's over-budget message
 # point here rather than restate them. Ruled by the owner on 2026-10-13, of the AGENTS.md raise this

@@ -266,3 +266,5 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-13T09:09:04Z rescope · item add TOOL-aOrientedCast-27 · reason the owner's fifth addendum (prompts/2026-10-13-prompt-TOOL-aOrientedCast-27-1-spec-brief.md): spawned agents carry a stale name; every agent and harness label names the slug, the unit and the action
 
 2026-10-13T09:51:19Z dispatch · item a56b63f5 TOOL-aOrientedCast-23 · reason tools/template-size-limits.txt memory/builds/aOrientedCast/spec/2026-10-13-spec-TOOL-aOrientedCast-23.md memory/builds/aOrientedCast/build/2026-10-13-build-TOOL-aOrientedCast-23-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-13T09:54:20Z dispatch · item a3a493f3 TOOL-aOrientedCast-23 · reason tools/template-size-limits.txt memory/builds/aOrientedCast/spec/2026-10-13-spec-TOOL-aOrientedCast-23.md memory/builds/aOrientedCast/build/2026-10-13-build-TOOL-aOrientedCast-23-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
