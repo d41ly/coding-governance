@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-13-prompt-TOOL-aSweptBar-1-brief.md](../prompts/2026-10-13-prompt-TOOL-aSweptBar-1-brief.md) | research | TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-4 TOOL-aSweptBar-5 TOOL-aSweptBar-6 |
 | [2026-10-13-prompt-TOOL-aSweptBar-3-2-fix-brief.md](../prompts/2026-10-13-prompt-TOOL-aSweptBar-3-2-fix-brief.md) | journal | — |
+| [2026-10-13-review-TOOL-aSweptBar-1-6-closing-diff-round1.md](../reviews/2026-10-13-review-TOOL-aSweptBar-1-6-closing-diff-round1.md) | diff-review | TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-4 TOOL-aSweptBar-5 TOOL-aSweptBar-6 |
 
 <!-- /gen:spec-records -->
 

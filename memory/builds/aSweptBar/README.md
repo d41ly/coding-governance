@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-13
 streams: tooling
 roster: TOOL
-ids: TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-3 TOOL-aSweptBar-4 TOOL-aSweptBar-5 TOOL-aSweptBar-6
+ids: TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-3 TOOL-aSweptBar-4 TOOL-aSweptBar-5 TOOL-aSweptBar-6 TOOL-aSweptBar-7
 ---
 
 # aSweptBar — the full bar with self-tests goes green over local main
@@ -44,6 +44,9 @@ landed beside it renders agent types from them.
 - Owner rulings, 2026-10-13: go; no spec audit; build through the Workflow harness while hand role
   spawns refuse; run the unattended suites serially.
 - A leg that timed out under contention is re-run alone before it counts as red.
+- Unit 7 is the closing review's promotion (M4): round 1 read CLEAN WITH FIXES, 0 blockers and 0
+  highs, so its 3 mediums and 4 lows batch into one unit; owner, 2026-10-13: merge to local main
+  once the build is complete, before the full bar and the unattended suites run.
 
 ## Parked decisions
 
@@ -59,11 +62,12 @@ None yet.
 | 4 | `TOOL-aSweptBar-4` | shipped-surface bans: kit-path literals, the remote ladder, encodings, `{prefix}`, a gov path in a template |
 | 5 | `TOOL-aSweptBar-5` | fork idioms re-grown past the spawn-idiom registry, converted |
 | 6 | `TOOL-aSweptBar-6` | records, pins and ceilings re-measured over the fixed tree |
+| 7 | `TOOL-aSweptBar-7` | the closing review's three mediums and four lows, batched (M4) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 6 unit(s) · node a · opened 2026-10-13 · streams tooling
-ids TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-3 TOOL-aSweptBar-4 TOOL-aSweptBar-5 TOOL-aSweptBar-6
+ids TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-3 TOOL-aSweptBar-4 TOOL-aSweptBar-5 TOOL-aSweptBar-6 TOOL-aSweptBar-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -76,7 +80,7 @@ ids TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-3 TOOL-aSweptBar-4 TOOL-aSw
 | [TOOL-aSweptBar-6 — records, pins and ceilings re-measured over the fixed tree](spec/2026-10-13-spec-TOOL-aSweptBar-6.md) | 4 | 1 | CLOSED | rev-2 | 2026-10-13 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
