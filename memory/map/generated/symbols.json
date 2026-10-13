@@ -7708,6 +7708,11 @@
       "file": "tools/workflows/review_replay.py"
     },
     {
+      "id": "extract_microformat_shapes",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "extract_modes_section",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -8678,6 +8683,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "load_agent_transcript",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "load_aliases",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
@@ -8913,9 +8923,19 @@
       "file": "tools/runlog/runlog_lib.py"
     },
     {
+      "id": "load_run_journal",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "load_scenarios",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
+      "id": "load_session_calls",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "load_spec_facts",
@@ -10776,6 +10796,11 @@
       "id": "print_abort_notice",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "print_agent_lines",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "print_audit",
@@ -14663,6 +14688,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "render_outcome",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "render_path",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
@@ -14833,6 +14863,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "render_shape_line",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "render_shard",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -14943,6 +14978,11 @@
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
     },
     {
+      "id": "render_tokens",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "render_transition_conf",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -14976,6 +15016,11 @@
       "id": "render_views",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "render_wall",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "render_worksheet",
@@ -16656,6 +16701,11 @@
       "id": "resolve_self_path",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "resolve_session_file",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "resolve_session_tree",
@@ -21816,6 +21866,11 @@
       "id": "write_aged_commit",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_agent_ledger",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "write_alias_fixture",

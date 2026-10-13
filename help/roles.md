@@ -49,6 +49,26 @@ reference; this page is the short version.
   `python tools/roles/render_agents.py --write`. Then start a new session: a running session cannot
   spawn an agent type written after it started.
 
+## What each agent line tells you
+
+The main session reports every agent it dispatches or receives with two lines. It pastes them
+unchanged from `handoff.py agents --handoff <path>` for an agent it spawned itself, or from
+`handoff.py agents --run <run-id>` for a harness run.
+
+- **The `agent` line** says which role ran and at what effort and model. It also gives the unit or
+  label it worked on, the prompt file it was handed, the file class it may write and the gate legs
+  it may run. It ends with the run and the agent's id, or `direct` for an agent spawned without a
+  harness.
+- **The `returned` line** appears once the agent has finished. It says what the agent produced:
+  `committed <sha>`, `not committed`, `failed`, or how many files it wrote. It then gives the wall
+  time, the output tokens and the same run and agent id.
+- **`unknown`** means nothing has recorded that field yet: for example, a model the agent has not
+  replied with and its call did not report. Such a line is not added to the ledger until a later
+  run fills the field.
+- **The ledger.** Every complete line is added once to the build's agent ledger,
+  `<memory root>/builds/<slug>/build/<date>-build-<unit id>-agent-ledger.md`. One ledger per build
+  holds every agent of that build, in the order the lines were added.
+
 ## When no role agent can be spawned
 
 Inline work is refused: the main session does not write a spec, review one, build a unit or run the

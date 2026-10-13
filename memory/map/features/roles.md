@@ -5,7 +5,7 @@ feature = "roles"
 title = "The role catalogue: one owner-editable agent definition per role with an empty house overlay beside it, the table of the workflows a governed session runs its LLM work through, the library every consumer reads them by, and the leg that holds the three and the governing doc to one another"
 status = "building"
 streams = ["tooling"]
-decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2", "TOOL-aOrientedCast-8", "TOOL-aOrientedCast-10", "TOOL-aOrientedCast-11", "TOOL-aOrientedCast-16", "TOOL-aOrientedCast-17"]
+decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2", "TOOL-aOrientedCast-8", "TOOL-aOrientedCast-10", "TOOL-aOrientedCast-11", "TOOL-aOrientedCast-16", "TOOL-aOrientedCast-17", "TOOL-aOrientedCast-20"]
 
 [claims]
 gate-legs = ["roles adopter self-test", "roles catalogue", "roles render selftest", "roles render wiring"]
@@ -58,6 +58,10 @@ Where a tool cannot spawn a sub-agent, the main loop stands in for a role by ren
 with `--stand-in`, which refuses unless the owner's stand-in waiver registry under the memory
 root's `project/` folder holds a dated row for that role and build; the checker joins the tailed
 handoffs and the rows both ways as R15 (TOOL-aOrientedCast-19).
+`handoff.py agents` fills the governing doc's `agent` and `returned` micro-format shapes for a direct
+spawn or a harness run from the session's transcripts, the role index and the agent types, and adds
+each line holding no `unknown` field once to the build's agent ledger under its `build/` folder
+(TOOL-aOrientedCast-20).
 
 ## Constraints & why
 

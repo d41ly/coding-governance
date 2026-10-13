@@ -1,4 +1,4 @@
-<!-- gov:kit roles@1.2 -->
+<!-- gov:kit roles@1.3 -->
 # roles — the role catalogue: one agent definition per role, the workflow table, and the checker
 
 A governed session runs its LLM work through ten declared WORKFLOWS — `orient`, `research`, `reuse`,
@@ -75,6 +75,46 @@ no entry last. A line past 200 characters, the playbook's one-line rule limit, r
 role and its length, as do a missing key and an empty catalogue, with nothing printed: exit 1. No
 repository or no `MEMORY_ROOT` exits 2. It reads no charter, since on a first install the playbook
 render writes the charter; the playbook kit's derived roster placeholder is its consumer.
+
+## The agent lines
+
+`python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>]` prints the
+governing doc's `agent` line for each agent the selector names, then its `returned` line once it
+has returned (TOOL-aOrientedCast-20). The two shapes are read from the doc's micro-format fence by
+`roles_lib.extract_microformat_shapes` and filled by placeholder name. A missing shape, or a
+placeholder the verb does not derive, refuses. `--handoff` names a direct spawn: every `Agent` call
+whose prompt's first line is that file's marker line, and whose result names an agent. `--run`
+names a harness run: one agent per `started` entry of its journal. The session is `--session`, else
+the transcript `CLAUDE_CODE_SESSION_ID` names under the Claude projects folder, found by the run-log
+kit's rule.
+
+| Field | From | When nothing answers |
+|---|---|---|
+| role | the agent's meta `agentType`; for a direct spawn, else the marker's `role` | `unknown` |
+| effort | the agent transcript's last `effort`; else the agent type's `effort:` line | `unknown` |
+| model | the transcript's last `message.model`; for a direct spawn, else the call's `resolvedModel` | `unknown` |
+| unit or label | the marker's `unit`, else the meta's `description`; for a harness agent, the first unit id in its journal label, else the label | `unknown` |
+| prompt | the handoff and its marker's `path`; for a harness agent, the call's `briefPath`, else its `scriptPath` | `unknown` |
+| writes, gates | the role index's `writes` and `gates` for the role | `none` |
+| outcome | `failed`, a notification status that is not `completed`, `committed <sha>` or `not committed` from the unit harness's result, else `wrote <n> files` | — |
+| wall | the transcript's first `timestamp` to its last, as `45s`, `7m47s` or `1h02m` | `unknown` |
+| tokens | the sum, over distinct message ids, of the largest `output_tokens`, as `812` or `41.2k` | `unknown` |
+
+A direct spawn has returned when a notification names its call or its result says `completed`; a
+harness agent when its journal holds a `result` or `failed` entry for it.
+
+**The ledger.** Each printed line holding no `unknown` field is added to the build's one
+`<MEMORY_ROOT>/builds/<build>/build/<date>-build-<id>-agent-ledger.md`, created on first use. It is
+added only if no line already carries the same head and the same last field, its `run` token. A line
+held back for an `unknown` field is added by a later run. In the ledger the prompt link is re-rooted
+at the ledger's folder. The ledger's `**Serves:**` line lists every unit id the build's specs define
+on their first line, and it is re-derived on every write. The build is the marker's `build`, else the
+`Workflow` call's `slug`, else the session card's last `## route`. A build with no folder or no
+specced id writes nothing and says why.
+
+Exit 0 on lines printed, notes or none; 1 on a refusal: no marker in the handoff, no matching call,
+no run journal, a missing shape, an underived placeholder, or two ledgers in one build. Exit 2 with
+no repository, `MEMORY_ROOT`, `CHARTER`, session file or `.claude/roles.json`.
 
 ## Standing in for a role
 

@@ -3,7 +3,9 @@
 Reads the role files under `agents/`, the workflow table `workflows.toml`, the memory-tree conf and
 the governing doc: its section 1 rule tags and its carried sections (TOOL-aOrientedCast-16). It is
 also the one reader of the owner's stand-in waiver registry and of the stand-in declarations under
-the builds' `prompts/` folders (TOOL-aOrientedCast-19).
+the builds' `prompts/` folders (TOOL-aOrientedCast-19), and of the governing doc's micro-format
+fence, `<!-- microformats -->` to `<!-- /microformats -->`, whose `agent` and `returned` shapes
+`handoff.py agents` fills (TOOL-aOrientedCast-20).
 `render_role` is the one composition of a role with its house overlay, and `render_charter_blocks`
 the one composition of the charter text a role carries: every consumer that hands a role to an agent
 calls both, so a role reaches an agent the same way by every route. Stdlib only; every text read
@@ -20,7 +22,7 @@ import pathlib
 import re
 import tomllib
 
-KIT_ROLES_VERSION = "1.2"
+KIT_ROLES_VERSION = "1.3"
 
 #: Every front-matter key a role file may carry: Claude Code's own, then gov's.
 #: Split from one string, because a quoted `"tools"` beside a quoted segment reads to the
@@ -78,6 +80,9 @@ STAND_IN_WAIVER = "role-stand-in-waiver.txt"
 STAND_IN_TAIL = "-stand-in"
 WAIVER_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 WAIVER_OWNER_RE = re.compile(r"^owner \S+$")
+#: The governing doc's micro-format fence and one definition line inside it (TOOL-aOrientedCast-20).
+MICROFORMATS_OPEN, MICROFORMATS_CLOSE = "<!-- microformats -->", "<!-- /microformats -->"
+MICROFORMAT_LINE_RE = re.compile(r"^- `(.*)`$")
 
 
 class RolesError(Exception):
@@ -210,6 +215,24 @@ def parse_charter(text, where):
             body.pop()
         carried.append((hit[0][3:], "\n".join(body)))
     return {"shape": "tagged", "rules": rules, "carried": carried}
+
+
+def extract_microformat_shapes(text):
+    """`{head: definition}` for every ``- `<definition>` `` line between the first
+    `<!-- microformats -->` and the `<!-- /microformats -->` after it, keyed by the text before the
+    definition's first ` — `: the selector the format guard and the run-log prose reader key on.
+    `{}` when the pair is absent (TOOL-aOrientedCast-20)."""
+    text = text.replace("\r\n", "\n")
+    i = text.find(MICROFORMATS_OPEN)
+    j = text.find(MICROFORMATS_CLOSE, i + len(MICROFORMATS_OPEN)) if i >= 0 else -1
+    if j < 0:
+        return {}
+    shapes = {}
+    for line in text[i + len(MICROFORMATS_OPEN):j].split("\n"):
+        m = MICROFORMAT_LINE_RE.match(line)
+        if m:
+            shapes.setdefault(m.group(1).split(" — ", 1)[0], m.group(1))
+    return shapes
 
 
 def check_rule_tags(charter, value):

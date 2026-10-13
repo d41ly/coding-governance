@@ -1,11 +1,12 @@
 # TOOL-aOrientedCast-20 — the roles kit derives each agent's dispatch and return lines, and adds them to a generated per-build agent ledger
 
-**Status:** INPROGRESS · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 22
+**Status:** CLOSED · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 22
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-TOOL-aOrientedCast-20-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-aOrientedCast-20-1-acceptance-ledger.md) | journal | — |
 | [2026-10-13-prompt-TOOL-aOrientedCast-20-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-20-1-spec-brief.md) | journal | TOOL-aOrientedCast-19 TOOL-aOrientedCast-21 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-20-2-spec-writer.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-20-2-spec-writer.md) | journal | — |
 

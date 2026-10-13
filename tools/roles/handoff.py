@@ -8,6 +8,7 @@
     python handoff.py stage-efforts <workflow>
     python handoff.py check <file>
     python handoff.py roster
+    python handoff.py agents (--handoff <path> | --run <run-id>) [--session <file>]
 
 `render` composes the role as `roles_lib.render_role` renders it with a task block holding exactly
 the inputs the role's `reads` declares, in that order, then `roles_lib.render_charter_blocks` for
@@ -34,6 +35,15 @@ is `Optional` for a `mandatory` of `no`, `Optional, <text>` for `no — <text>`,
 200 characters, a missing key or an empty catalogue refuses with nothing printed. It reads no
 charter (TOOL-aOrientedCast-17).
 
+`agents` prints the governing doc's `agent` line for each agent its selector names, then its
+`returned` line once it has returned, each shape read from the doc's micro-format fence and filled
+by placeholder name from the session's own records, the role index and the agent types; a field
+nothing answers prints `unknown` (TOOL-aOrientedCast-20). `--handoff` names a direct spawn, every
+`Agent` call whose prompt opens with the file's marker line; `--run` a harness run, one agent per
+`started` entry of its journal. The session is `--session`, else the transcript
+CLAUDE_CODE_SESSION_ID names. Each line holding no `unknown` is added, once, to the build's one
+`<MEMORY_ROOT>/builds/<build>/build/*-agent-ledger.md`, its prompt link re-rooted at that folder.
+
 Sources, by key family: `task:` the card's `## task` field, read by the kickoff checker's grammar
 (stated above its `check_card_task`, and ported here because that one is shell) under the labels
 that checker's `--task-skeleton` prints, so a skeleton that does not yield eight refuses; `card:` the lines
@@ -45,12 +55,18 @@ or a placeholder refuses and writes nothing; an optional one is named on the `No
 A relative path given to `--card`, `--out`, an `--input` or `check` is read from the repository root.
 
 Exit 0 on success, 1 on a refusal naming its key, file, role or missing waiver row, 2 on usage or an unarmed
-environment: no repository, no MEMORY_ROOT, no CHARTER (`roster` needs no CHARTER).
+environment: no repository, no MEMORY_ROOT, no CHARTER (`roster` needs no CHARTER). `agents` exits 1
+on no marker in the handoff, no matching call, no run journal, a missing shape, an underived
+placeholder or two ledgers in one build, and 2 with no session file or role index as well.
 
 WHAT THIS DOES NOT CHECK: whether a card or brief value says anything true, since a value present,
 single and not a placeholder is copied verbatim; whether a rendered role is current against the
 catalogue, since `check` hashes the file's own bytes and nothing more; and whether a secret sits in
-a card or a brief, which the charter's `[security]` rule guards and this script does not.
+a card or a brief, which the charter's `[security]` rule guards and this script does not. For
+`agents`: the transcript format is no contract, so a renamed field reads as `unknown`; an `effort`
+or a `model` is what the transcript records, not proved to be what the API applied; a file written
+through Bash is not counted as written; the session read may not be the one the build ran in; and
+a ledger line edited by hand passes, since nothing re-derives the ledger.
 """
 import argparse
 import datetime
@@ -86,6 +102,20 @@ BRIEF_HEAD_RE = re.compile(r"^## The brief[ \t]*$", re.M)
 # ponytail: the playbook's one-line region refuses a rendered rule past 200 characters; spelled
 # again because a kit file may not import a sibling kit. A drift fails closed either way.
 ROSTER_LINE_MAX = 200
+#: `agents` (TOOL-aOrientedCast-20): the ledger's file-name tail, the value of a field nothing
+#: answers, and the tool uses whose paths a `returned` line counts as written.
+LEDGER_TAIL = "-agent-ledger.md"
+UNKNOWN = "unknown"
+WRITE_TOOLS = ("Write", "Edit", "MultiEdit", "NotebookEdit")
+SESSION_ID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
+#: A run id or an agent id reaches a path only in this shape; so does a role naming an agent type.
+PATH_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+LABEL_UNIT_RE = re.compile(r"[A-Z]+-[A-Za-z]+-[0-9]+")
+EFFORT_LINE_RE = re.compile(r"^effort:[ \t]*(\S+)$", re.M)
+SHAPE_FIELD_RE = re.compile(r"<([^<>]+)>")
+NOTIFICATION_RE = re.compile(r"<task-notification>(.*?)</task-notification>", re.S)
+#: The session file's lines worth parsing: every other line is skipped unparsed, by its bytes.
+SESSION_LINE_TOKENS = (b'"Agent"', b'"Workflow"', b"toolUseResult", b"task-notification")
 
 
 def check_placeholder(value):
@@ -481,6 +511,394 @@ def print_roster(memory_root):
     sys.stdout.buffer.write(("\n".join(lines) + "\n").encode("utf-8"))
 
 
+def resolve_session_file(root, session_arg):
+    """`(path, why)`: the session's transcript, or None and why there is none. `--session` when given,
+    read from the repository root when relative; else CLAUDE_CODE_SESSION_ID, which must be a
+    lowercase UUID before it reaches a path, globbed as `<projects>/*/<id>.jsonl`, the largest hit
+    winning. `<projects>` is `$CLAUDE_CONFIG_DIR/projects`, else `.claude/projects` under USERPROFILE
+    on Windows and HOME elsewhere. That is the run-log kit's rule for finding a session, spelled
+    again here because a kit file imports no sibling kit."""
+    if session_arg is not None:
+        p = pathlib.Path(os.path.normpath(root / session_arg))
+        return (p, None) if p.is_file() else (None, "--session names no file, %s" % p.as_posix())
+    sid = os.environ.get("CLAUDE_CODE_SESSION_ID", "")
+    if not sid:
+        return None, "CLAUDE_CODE_SESSION_ID is unset and no --session was given"
+    if not SESSION_ID_RE.match(sid):
+        return None, "CLAUDE_CODE_SESSION_ID %r is not a lowercase UUID, and nothing else reaches a path" % sid[:80]
+    if os.environ.get("CLAUDE_CONFIG_DIR"):
+        projects = pathlib.Path(os.environ["CLAUDE_CONFIG_DIR"]) / "projects"
+    else:
+        home = (os.environ.get("USERPROFILE") or os.environ.get("HOME")) if sys.platform.startswith("win") \
+            else os.environ.get("HOME")
+        if not home:
+            return None, "CLAUDE_CONFIG_DIR and the profile's home are both unset; pass --session"
+        projects = pathlib.Path(home) / ".claude" / "projects"
+    hits = sorted(projects.glob("*/%s.jsonl" % sid))
+    if not hits:
+        return None, "no session file %s/*/%s.jsonl; pass --session" % (projects.as_posix(), sid)
+    return max(hits, key=lambda p: (p.stat().st_size, p.as_posix())), None
+
+
+def load_session_calls(path):
+    """`(calls, notified, bad)` of one session file, read once, line by line. `calls` holds each
+    `Agent` and `Workflow` call as `{"id", "name", "input", "result"}` in call order, `result` its
+    record's `toolUseResult` or None; `notified` maps a tool-use id to the `<status>` (None when it
+    carries none) of a `<task-notification>` naming it, delivered in a user record or still queued
+    in a `queued_command` attachment or a `queue-operation` record; `bad` counts the lines that did
+    not parse. Only a line whose bytes carry one of SESSION_LINE_TOKENS is parsed."""
+    calls, by_id, notified, bad = [], {}, {}, 0
+    with open(path, "rb") as fh:
+        for raw in fh:
+            if not any(t in raw for t in SESSION_LINE_TOKENS):
+                continue
+            try:
+                rec = json.loads(raw)
+            except (ValueError, RecursionError):
+                rec = None
+            if not isinstance(rec, dict):
+                bad += 1
+                continue
+            msg = rec.get("message") if isinstance(rec.get("message"), dict) else {}
+            content, texts = msg.get("content"), []
+            if rec.get("type") == "user" and isinstance(content, str):
+                texts.append(content)
+            for b in content if isinstance(content, list) else []:
+                if not isinstance(b, dict):
+                    continue
+                if rec.get("type") == "assistant" and b.get("type") == "tool_use" \
+                        and b.get("name") in ("Agent", "Workflow"):
+                    call = {"id": b.get("id"), "name": b["name"], "result": None,
+                            "input": b.get("input") if isinstance(b.get("input"), dict) else {}}
+                    calls.append(call)
+                    by_id[call["id"]] = call
+                elif b.get("type") == "tool_result" and b.get("tool_use_id") in by_id \
+                        and isinstance(rec.get("toolUseResult"), dict):
+                    by_id[b["tool_use_id"]]["result"] = rec["toolUseResult"]
+                elif rec.get("type") == "user" and b.get("type") == "text" and isinstance(b.get("text"), str):
+                    texts.append(b["text"])
+            att = rec.get("attachment")
+            if isinstance(att, dict) and att.get("type") == "queued_command" and isinstance(att.get("prompt"), str):
+                texts.append(att["prompt"])
+            if rec.get("type") == "queue-operation" and isinstance(rec.get("content"), str):
+                texts.append(rec["content"])
+            for block in (n for t in texts for n in NOTIFICATION_RE.findall(t)):
+                tid = re.search(r"<tool-use-id>([^<]*)</tool-use-id>", block)
+                status = re.search(r"<status>([^<]*)</status>", block)
+                if tid:
+                    notified[tid.group(1).strip()] = status.group(1).strip() if status else None
+    return calls, notified, bad
+
+
+def load_agent_transcript(path):
+    """What one agent's transcript and the `.meta.json` beside it record, each None when nothing does:
+    `type` and `description` from the meta; `effort` and `model`, the last `assistant` record's
+    carrying one; `wall`, the seconds from the transcript's first `timestamp` to its last; `tokens`,
+    the sum over distinct `message.id` values of the largest `output_tokens`, because one response
+    is split into records each carrying its usage as it streamed, which is the run-log kit's
+    per-request rule; and `files`, the set of distinct paths its WRITE_TOOLS uses name."""
+    out = dict.fromkeys(("type", "description", "effort", "model", "wall", "tokens"))
+    out["files"] = set()
+    try:
+        with open(path.with_name(path.name[:-len(".jsonl")] + ".meta.json"), encoding="utf-8") as fh:
+            meta = json.load(fh)
+    except (OSError, ValueError):
+        meta = None
+    for key, src in (("type", "agentType"), ("description", "description")):
+        if isinstance(meta, dict) and isinstance(meta.get(src), str) and meta[src].strip():
+            out[key] = meta[src].strip()
+    stamps, per_id = [], {}
+    try:
+        with open(path, "rb") as fh:
+            raw_lines = fh.read().split(b"\n")
+    except OSError:
+        raw_lines = []
+    for n, raw in enumerate(raw_lines):
+        try:
+            rec = json.loads(raw) if raw.strip() else None
+        except (ValueError, RecursionError):
+            rec = None
+        if not isinstance(rec, dict):
+            continue
+        try:
+            stamps.append(datetime.datetime.fromisoformat(rec["timestamp"].replace("Z", "+00:00")))
+        except (KeyError, AttributeError, TypeError, ValueError):
+            pass
+        msg = rec.get("message")
+        if rec.get("type") != "assistant" or not isinstance(msg, dict):
+            continue
+        if isinstance(rec.get("effort"), str) and rec["effort"]:
+            out["effort"] = rec["effort"]
+        # ponytail: `<synthetic>` marks a record Claude Code wrote itself, which no model ran
+        if isinstance(msg.get("model"), str) and msg["model"] and msg["model"] != "<synthetic>":
+            out["model"] = msg["model"]
+        tokens = (msg.get("usage") or {}).get("output_tokens") if isinstance(msg.get("usage"), dict) else None
+        if isinstance(tokens, int) and not isinstance(tokens, bool):
+            mid = msg.get("id") if isinstance(msg.get("id"), str) else ("record", n)
+            per_id[mid] = max(per_id.get(mid, 0), tokens)
+        for b in msg.get("content") if isinstance(msg.get("content"), list) else []:
+            if isinstance(b, dict) and b.get("type") == "tool_use" and b.get("name") in WRITE_TOOLS \
+                    and isinstance(b.get("input"), dict):
+                # ponytail: NotebookEdit names its file `notebook_path`, every other write tool `file_path`
+                target = b["input"].get("file_path") or b["input"].get("notebook_path")
+                if isinstance(target, str) and target:
+                    out["files"].add(target)
+    if stamps:
+        out["wall"] = max(0, int((stamps[-1] - stamps[0]).total_seconds()))
+    if per_id:
+        out["tokens"] = sum(per_id.values())
+    return out
+
+
+def load_run_journal(path):
+    """One harness run's agents from its `journal.jsonl`, one per `started` entry in journal order, as
+    `{"id", "label", "returned", "failed", "result"}`: `returned` once a `result` or `failed` entry
+    names the agent, `result` that `result` entry's value. A line that does not parse is skipped."""
+    agents, by_id = [], {}
+    for line in lib.load_text(path).split("\n"):
+        try:
+            e = json.loads(line) if line.strip() else None
+        except (ValueError, RecursionError):
+            e = None
+        if not isinstance(e, dict) or not isinstance(e.get("agentId"), str):
+            continue
+        if e.get("type") == "started" and e["agentId"] not in by_id:
+            by_id[e["agentId"]] = {"id": e["agentId"], "returned": False, "failed": False, "result": None,
+                                   "label": e["label"] if isinstance(e.get("label"), str) and e["label"] else None}
+            agents.append(by_id[e["agentId"]])
+        elif e.get("type") in ("result", "failed") and e["agentId"] in by_id:
+            by_id[e["agentId"]].update(returned=True, failed=e["type"] == "failed" or by_id[e["agentId"]]["failed"],
+                                       **({"result": e.get("result")} if e["type"] == "result" else {}))
+    return agents
+
+
+def render_shape_line(definition, fields):
+    """`- <definition>` with each `<name>` replaced by `fields[name]`, every ` · ` inside a value made
+    `, ` and every line break a space, so no value can add a field; RolesError naming a placeholder
+    the dict does not hold, since a line printed from a guessed shape is no line."""
+    head = definition.split(" — ", 1)[0]
+
+    def render_field(m):
+        if m.group(1) not in fields:
+            raise lib.RolesError("the governing doc's %s shape names %s, a field handoff.py agents does "
+                                 "not derive" % (head, m.group(1)))
+        return " ".join(str(fields[m.group(1)]).splitlines()).replace(" · ", ", ")
+    return "- " + SHAPE_FIELD_RE.sub(render_field, definition)
+
+
+def render_outcome(failed, status, result, files):
+    """What a `returned` line says the agent produced, the first that applies: `failed` for a journal
+    `failed` entry, a notification's status when it is not `completed`; `committed <sha>` or `not
+    committed` for a result holding a boolean `committed`, the unit harness's verdict; else `wrote
+    <n> files`, the distinct paths its write tool uses name."""
+    if failed:
+        return "failed"
+    if status and status != "completed":
+        return status
+    if isinstance(result, dict) and isinstance(result.get("committed"), bool):
+        sha = result.get("sha")
+        return "committed %s" % sha if result["committed"] and isinstance(sha, str) else "not committed"
+    return "wrote 1 file" if len(files) == 1 else "wrote %d files" % len(files)
+
+
+def render_wall(seconds):
+    """`45s` under a minute, `7m47s` under an hour, `1h02m` beyond; UNKNOWN for None."""
+    if seconds is None:
+        return UNKNOWN
+    if seconds < 60:
+        return "%ds" % seconds
+    if seconds < 3600:
+        return "%dm%02ds" % divmod(seconds, 60)
+    return "%dh%02dm" % (seconds // 3600, seconds % 3600 // 60)
+
+
+def render_tokens(count):
+    """A count under 1000 as is, one at or above it in thousands to one decimal; UNKNOWN for None."""
+    if count is None:
+        return UNKNOWN
+    return str(count) if count < 1000 else "%.1fk" % (count / 1000)
+
+
+def write_agent_ledger(root, memory_root, build, lines):
+    """Add each of `lines` (already re-rooted at the ledger's folder) whose head and last field no line
+    of the ledger holds, and return one note naming what happened. The ledger is the one
+    `*-agent-ledger.md` under `<MEMORY_ROOT>/builds/<build>/build/`, else it is created as
+    `<today>-build-<first id>-agent-ledger.md`; its Serves line is re-derived on every write from the
+    unit ids the build's specs define on their first line. Two ledgers raise RolesError naming both;
+    no build, no build folder or no specced id writes nothing. The file is rewritten whole, UTF-8
+    with LF line ends, only when it changes."""
+    if not build:
+        return "no build names these agents, so no agent ledger is written"
+    bdir = root / memory_root / "builds" / build
+    if not bdir.is_dir():
+        return "%s does not exist, so no agent ledger is written" % bdir.relative_to(root).as_posix()
+    folder = bdir / "build"
+    found = sorted(folder.glob("*" + LEDGER_TAIL)) if folder.is_dir() else []
+    if len(found) > 1:
+        raise lib.RolesError("%s holds %d agent ledgers, %s; one build keeps one" % (
+            folder.relative_to(root).as_posix(), len(found), " and ".join(p.name for p in found)))
+    id_re = re.compile(r"^# ([A-Z]+)-%s-([0-9]+) — " % re.escape(build))
+    ids = set()
+    for p in sorted((bdir / "spec").rglob("*.md")) if (bdir / "spec").is_dir() else []:
+        m = id_re.match(lib.load_text(p).split("\n", 1)[0])
+        if m:
+            ids.add((m.group(1), int(m.group(2))))
+    if not ids:
+        return ("no spec under %s/spec defines a unit id on its first line, so the ledger would serve "
+                "nothing and is not written" % bdir.relative_to(root).as_posix())
+    ids = ["%s-%s-%d" % (fam, build, num) for fam, num in sorted(ids)]
+    path = found[0] if found else folder / ("%s-build-%s%s" % (datetime.date.today().isoformat(), ids[0],
+                                                                 LEDGER_TAIL))
+    serves = "**Serves:** journal " + " ".join(ids)
+    old = lib.load_text(path) if path.is_file() else None
+    text = re.sub(r"^\*\*Serves:\*\*.*$", lambda _: serves, old, count=1, flags=re.M) if old is not None else (
+        "# %s — agent ledger\n\n%s\n\nGenerated by the roles kit's `handoff.py agents`: one line per agent "
+        "dispatch and return, each added once and never edited.\n\n" % (build, serves))
+
+    def derive_key(line):
+        return line[2:].split(" — ", 1)[0], line.rsplit(" · ", 1)[-1]
+    held = {derive_key(ln) for ln in text.split("\n") if ln.startswith("- ")}
+    added = 0
+    for line in lines:
+        if derive_key(line) not in held:
+            text = (text if text.endswith("\n") else text + "\n") + line + "\n"
+            held.add(derive_key(line))
+            added += 1
+    if text == old or (old is None and not added):
+        return "%s: 0 line(s) added" % path.relative_to(root).as_posix()
+    folder.mkdir(exist_ok=True)
+    with open(path, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(text)
+    return "%s: %d line(s) added" % (path.relative_to(root).as_posix(), added)
+
+
+def print_agent_lines(root, memory_root, charter_path, session, handoff_arg, run_id):
+    """Print the governing doc's `agent` line for each agent the selector names, then its `returned`
+    line once it has returned, filled by name from the session's records, the role index and the
+    agent types, and add each line holding no UNKNOWN field to the build's agent ledger
+    (TOOL-aOrientedCast-20). RolesError on a refusal, with nothing printed."""
+    from render_agents import AGENTS_REL, INDEX_REL  # the renderer's two paths, as print_roster imports the checker's
+    doc = charter_path.relative_to(root).as_posix() if root in charter_path.parents else charter_path.as_posix()
+    shapes = lib.extract_microformat_shapes(lib.load_text(charter_path))
+    for head in ("agent", "returned"):
+        if head not in shapes:
+            raise lib.RolesError("the governing doc %s defines no `%s` shape in its micro-format fence, so "
+                                 "no %s line can be composed" % (doc, head, head))
+    try:
+        index = json.loads(lib.load_text(root / INDEX_REL))
+    except ValueError as e:
+        raise lib.RolesError("%s is not JSON — %s; re-render it with render_agents.py --write" % (INDEX_REL, e))
+    held = index.get("roles") if isinstance(index, dict) and isinstance(index.get("roles"), dict) else {}
+    calls, notified, bad = load_session_calls(session)
+    notes = ["%s: %d line(s) did not parse as JSON and were skipped" % (session.as_posix(), bad)] if bad else []
+    sdir = session.with_name(session.name[:-len(".jsonl")] if session.name.endswith(".jsonl") else session.stem)
+
+    def resolve_repo_path(value, need_file):
+        p = pathlib.Path(os.path.normpath(root / value)) if isinstance(value, str) and value else None
+        ok = p is not None and root in p.parents and (p.is_file() or not need_file)
+        return p.relative_to(root).as_posix() if ok else None
+
+    def read_transcript(folder, aid):  # an agent id reaches a path only in PATH_ID_RE's shape
+        if PATH_ID_RE.match(aid):
+            return load_agent_transcript(folder / ("agent-%s.jsonl" % aid))
+        return dict(dict.fromkeys(("type", "description", "effort", "model", "wall", "tokens")), files=set())
+
+    agents = []  # (agent id, transcript, role fallback, unit, prompt path, model fallback, returned, outcome)
+    if handoff_arg is not None:
+        hpath = pathlib.Path(os.path.normpath(root / handoff_arg))
+        hrel = hpath.relative_to(root).as_posix() if root in hpath.parents else hpath.as_posix()
+        marker = MARKER_RE.search(lib.load_text(hpath))
+        if not marker:
+            raise lib.RolesError("%s carries no gov:handoff marker line, so no Agent call can be matched to "
+                                 "it" % hrel)
+        hits = [c for c in calls if c["name"] == "Agent"
+                and str(c["input"].get("prompt", "")).split("\n", 1)[0].rstrip("\r") == marker.group(0)
+                and isinstance(c["result"], dict) and isinstance(c["result"].get("agentId"), str)]
+        if not hits:
+            raise lib.RolesError("no Agent call in %s opens its prompt with the marker line of %s and has a "
+                                 "result naming its agent" % (session.as_posix(), hrel))
+        build, run = marker.group(2), "direct"
+        for c in hits:
+            aid = c["result"]["agentId"]
+            tr = read_transcript(sdir / "subagents", aid)
+            unit = marker.group(3) if marker.group(3) != "-" else tr["description"]
+            returned = c["id"] in notified or c["result"].get("status") == "completed"
+            agents.append((aid, tr, marker.group(1), unit, (hpath.name, marker.group(4)),
+                           c["result"].get("resolvedModel"), returned,
+                           render_outcome(False, notified.get(c["id"]), None, tr["files"])))
+    else:
+        journal = sdir / "subagents" / "workflows" / run_id / "journal.jsonl"
+        if not journal.is_file():
+            raise lib.RolesError("run %s has no journal: %s is absent" % (run_id, journal.as_posix()))
+        started = load_run_journal(journal)
+        wf = next((c for c in calls if c["name"] == "Workflow" and isinstance(c["result"], dict)
+                   and c["result"].get("runId") == run_id), None)
+        args = (wf or {}).get("input", {}).get("args")
+        if isinstance(args, str):
+            try:
+                args = json.loads(args)
+            except ValueError:
+                args = None
+        args = args if isinstance(args, dict) else {}
+        prompt = resolve_repo_path(args.get("briefPath"), True) \
+            or resolve_repo_path((wf or {}).get("input", {}).get("scriptPath"), False)
+        if wf is None:
+            notes.append("no Workflow call in %s has run %s, so its prompt link is unknown and its build is "
+                          "the session card's" % (session.as_posix(), run_id))
+        build = args.get("slug") if isinstance(args.get("slug"), str) and SLUG_RE.match(args["slug"]) else None
+        if build is None and started:
+            card, why = resolve_card_path(root, None)
+            route = extract_card_section(lib.load_text(card), "route") if card else None
+            m = re.search(r"^- build:[ \t]*(\S+)[ \t]*$", route or "", re.M)
+            build = m.group(1) if m and SLUG_RE.match(m.group(1)) else None
+            if build is None:
+                notes.append("no build from the Workflow call's slug or the session card's last route: %s"
+                             % (why or "the route names no `- build: <slug>` line"))
+        if not started:
+            notes.append("run %s has started no agent yet" % run_id)
+        run = run_id
+        for e in started:
+            tr = read_transcript(sdir / "subagents" / "workflows" / run_id, e["id"])
+            hit = LABEL_UNIT_RE.search(e["label"] or "")
+            unit = hit.group(0) if hit else (e["label"] or tr["description"])
+            agents.append((e["id"], tr, None, unit, (prompt.rsplit("/", 1)[-1], prompt) if prompt else (None, None),
+                           None, e["returned"], render_outcome(e["failed"], None, e["result"], tr["files"])))
+    out, ledger = [], []
+    for aid, tr, role_fallback, unit, (name, path), model_fallback, returned, outcome in agents:
+        role = tr["type"] or role_fallback
+        level = tr["effort"]
+        if level is None and role and PATH_ID_RE.match(role) and (root / AGENTS_REL / (role + ".md")).is_file():
+            fm = lib.FRONT_MATTER_RE.match(lib.load_text(root / AGENTS_REL / (role + ".md")))
+            hit = EFFORT_LINE_RE.search(fm.group(1)) if fm else None
+            level = hit.group(1) if hit else None
+        entry = held.get(role) if isinstance(held.get(role), dict) else {}
+        gates = entry.get("gates") if isinstance(entry.get("gates"), list) else []
+        fields = {"role": role, "level": level, "model": tr["model"] or model_fallback, "unit-id|label": unit,
+                  "name": name, "path": path,
+                  "class": entry.get("writes") if isinstance(entry.get("writes"), str) and entry["writes"] else "none",
+                  "legs|none": ", ".join(str(g) for g in gates) or "none", "run-id|direct": run, "agent-id": aid,
+                  "outcome": outcome, "wall": render_wall(tr["wall"]), "tokens": render_tokens(tr["tokens"])}
+        fields = {k: UNKNOWN if v is None or v == "" else v for k, v in fields.items()}
+        for head in ("agent", "returned") if returned else ("agent",):
+            used = SHAPE_FIELD_RE.findall(shapes[head])
+            out.append(render_shape_line(shapes[head], fields))
+            missing = [k for k in used if fields.get(k) == UNKNOWN]
+            if missing:
+                notes.append("run %s/%s: no record answers %s, so its %s line holds %s and stays out of the "
+                             "ledger" % (run, aid, ", ".join(dict.fromkeys(missing)), head, UNKNOWN))
+                continue
+            folder = root / memory_root / "builds" / str(build) / "build"
+            rooted = dict(fields, path=os.path.relpath(root / path, folder).replace("\\", "/")) \
+                if fields["path"] != UNKNOWN else fields
+            ledger.append(render_shape_line(shapes[head], rooted))
+    if ledger:
+        notes.append(write_agent_ledger(root, memory_root, build, ledger))
+    if out:
+        sys.stdout.buffer.write(("\n".join(out) + "\n").encode("utf-8"))
+    for line in notes:
+        print("handoff: note — %s" % line, file=sys.stderr)
+
+
 def main(argv):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(prog="handoff.py", description="Render, check and map role handoffs.")
@@ -500,7 +918,14 @@ def main(argv):
     sub.add_parser("stage-efforts").add_argument("workflow")
     sub.add_parser("check").add_argument("file")
     sub.add_parser("roster")
+    ag = sub.add_parser("agents")
+    sel = ag.add_mutually_exclusive_group(required=True)
+    sel.add_argument("--handoff")
+    sel.add_argument("--run")
+    ag.add_argument("--session")
     a = ap.parse_args(argv)
+    if a.verb == "agents" and a.run is not None and not PATH_ID_RE.match(a.run):
+        ap.error("--run '%s' is not a run id of letters, digits, '_' and '-'" % a.run)
     if a.verb in ("harness-args", "stage-efforts"):
         try:
             if a.verb == "harness-args":
@@ -548,6 +973,20 @@ def main(argv):
     except lib.RolesError as e:
         print("handoff: %s" % e, file=sys.stderr)
         return 2
+    if a.verb == "agents":
+        from render_agents import INDEX_REL
+        session, why = resolve_session_file(root, a.session)
+        if session is None or not (root / INDEX_REL).is_file():
+            print("handoff: %s" % (why or "%s is absent, so no line can name a role's write class or gate "
+                                         "legs; render it with render_agents.py --write" % INDEX_REL),
+                  file=sys.stderr)
+            return 2
+        try:
+            print_agent_lines(root, memory_root, charter_path, session, a.handoff, a.run)
+        except lib.RolesError as e:
+            print("\n".join("handoff: " + ln for ln in str(e).split("\n")), file=sys.stderr)
+            return 1
+        return 0
     try:
         if a.verb == "roster":
             print_roster(memory_root)

@@ -14,7 +14,9 @@
 # names; a token surviving the substitution; a byte appended to a rendered agent type; an unknown
 # argument; the renderer's task part sent to the hooks kit's spawn guard (arm 6, which SKIPs out loud
 # without that kit or node); an `export` conf line with a trailing comment (arm 7); the roster verb's
-# one line per role and its refusal of a line past 200 characters (arm 8). Every arm is a
+# one line per role and its refusal of a line past 200 characters (arm 8); the agents verb's two
+# lines for a direct spawn, its tokens counted once per message id, each added to the build's agent
+# ledger exactly once across two runs (arm 9). Every arm is a
 # self-contained block below the prologue, so a slice of the prologue and one
 # block runs that arm alone.
 #
@@ -27,8 +29,8 @@
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ADOPTER="${ROLES_ADOPTER:-$HERE/adopt-roles.sh}"
-REPO=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "adopt-roles.test: not inside a git repository"; exit 2; }
-KREL=$(git -C "$HERE" rev-parse --show-prefix 2>/dev/null) || exit 2
+REPO=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "adopt-roles.test: not inside a git repository"; exit 2; }
+KREL=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-prefix 2>/dev/null) || exit 2
 KREL=${KREL%/}
 [ -n "$KREL" ] || { echo "adopt-roles.test: the kit's directory derived empty"; exit 2; }
 # The python launcher, by an inline candidate loop RUN per candidate: this suite defines no helper
@@ -48,8 +50,8 @@ TMP_ROOT=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP_ROOT"' EXIT
 # 10, then +3 for arm 7 (TOOL-aOrientedCast-15). Arm 6 is NOT in the floor: it SKIPs out loud on a
 # host with no hooks kit or no node, and a skip must not red the floor.
-# +3 for arm 8 (TOOL-aOrientedCast-17).
-FLOOR_ASSERTIONS=16
+# +3 for arm 8 (TOOL-aOrientedCast-17). +3 for arm 9 (TOOL-aOrientedCast-20).
+FLOOR_ASSERTIONS=19
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""
@@ -166,6 +168,68 @@ sed -i "s/^description: \(.*\)\.\(\r\{0,1\}\)\$/description: \1$_pad.\2/" "$FX/$
 (cd "$FX" && "$PY" -B "$KREL/handoff.py" roster) > "$TMP_ROOT/a8.out" 2>"$TMP_ROOT/a8.err"; rc=$?
 check_arm "arm 8 a gov-builder line lengthened by 200 characters refuses, naming it, with stdout empty" \
    "$([ "$rc" = 1 ] && grep -q 'gov-builder' "$TMP_ROOT/a8.err" && [ ! -s "$TMP_ROOT/a8.out" ] && echo 1 || echo 0)"
+
+# ---- arm 9: the agents verb's two lines for a direct spawn, each added to the ledger once ------
+# TOOL-aOrientedCast-20 S6: a build folder and a session tree, the unit's section 6 fixture: an
+# `Agent` call whose prompt opens with the handoff's marker line, its notification, and a transcript
+# whose two records sharing one message id count once, at the larger output, so a per-record sum
+# reads 1.9k where the line says 1.6k. Arm 9 asks git nothing about its own location.
+A9_WRITE='import json, pathlib, sys
+fx, sess, hrel = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2]), sys.argv[3]
+def put(path, rows):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    text = rows if isinstance(rows, str) else "".join(json.dumps(r) + "\n" for r in rows)
+    path.write_text(text, encoding="utf-8", newline="\n")
+marker = "<!-- gov:handoff role=gov-builder build=tFix unit=TOOL-tFix-1 path=%s role-sha=%s task-sha=%s -->" % (
+    hrel, "0" * 12, "1" * 12)
+put(fx / hrel.split("/prompts/")[0] / "spec" / "2026-10-13-spec-TOOL-tFix-1.md", "# TOOL-tFix-1 — t\n")
+put(fx / hrel, marker + "\n\n## Task\n\nt\n")
+def use(tid, name, inp):
+    return {"type": "assistant", "message": {"content": [{"type": "tool_use", "id": tid, "name": name, "input": inp}]}}
+def res(tid, result):
+    return {"type": "user", "toolUseResult": result, "message": {"content": [{"type": "tool_result", "tool_use_id": tid}]}}
+put(sess, [use("toolu_A", "Agent", {"subagent_type": "gov-builder", "prompt": marker + "\n\n## Task\n"}),
+           res("toolu_A", {"status": "async_launched", "agentId": "a0000000000000001", "resolvedModel": "claude-test-1"}),
+           use("toolu_W", "Workflow", {"scriptPath": "harness/unit.js",
+                                       "args": {"slug": "tFix", "briefPath": hrel}}),
+           res("toolu_W", {"runId": "wf_00000001-aaa"}),
+           {"type": "user", "message": {"content": "<task-notification>\n<tool-use-id>toolu_A</tool-use-id>\n"
+                                                   "<status>completed</status>\n</task-notification>"}}])
+def turn(at, model, effort, mid, tokens, writes=()):
+    return {"type": "assistant", "timestamp": "2026-10-13T%s.000Z" % at, "effort": effort,
+            "message": {"model": model, "id": mid, "usage": {"output_tokens": tokens},
+                        "content": [{"type": "tool_use", "name": n, "input": {"file_path": p}} for n, p in writes]}}
+sub = sess.with_suffix("") / "subagents"
+put(sub / "agent-a0000000000000001.jsonl", [{"type": "user", "timestamp": "2026-10-13T10:00:00.000Z"},
+    turn("10:00:05", "claude-test-1", "medium", "m1", 300, [("Write", "a.txt")]),
+    turn("10:00:06", "claude-test-1", "medium", "m1", 700, [("Write", "b.txt")]),
+    turn("10:07:47", "claude-test-1", "medium", "m2", 900, [("Edit", "a.txt")])])
+put(sub / "agent-a0000000000000001.meta.json", json.dumps({"agentType": "gov-builder", "description": "build one"}))
+wf = sub / "workflows" / "wf_00000001-aaa"
+put(wf / "journal.jsonl", [{"type": "started", "agentId": "a0000000000000002", "label": "unit:TOOL-tFix-1"},
+    {"type": "result", "agentId": "a0000000000000002", "result": {"committed": True, "sha": "abc123def"}},
+    {"type": "started", "agentId": "a0000000000000003", "label": "commit:specs:tFix"}])
+put(wf / "agent-a0000000000000002.jsonl", [turn("10:00:00", "claude-test-2", "xhigh", "m3", 1000),
+                                           turn("10:00:45", "claude-test-2", "xhigh", "m4", 500)])
+put(wf / "agent-a0000000000000002.meta.json", json.dumps({"agentType": "gov-builder"}))
+put(wf / "agent-a0000000000000003.jsonl", [turn("10:01:00", "claude-test-2", "high", "m5", 10)])
+put(wf / "agent-a0000000000000003.meta.json", json.dumps({"agentType": "workflow-subagent"}))'
+build_fixture; check_arm "arm 9 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
+A9H="$MR/builds/tFix/prompts/2026-10-13-prompt-TOOL-tFix-1-1-builder.md"
+A9S="$TMP_ROOT/s9/projects/p/11111111-1111-4111-8111-111111111111.jsonl"
+"$PY" -B -c "$A9_WRITE" "$FX" "$A9S" "$A9H" || echo "    arm 9: the fixture writer exited non-zero"
+A9L1="- agent — gov-builder · effort medium · model claude-test-1 · TOOL-tFix-1 · prompt [${A9H##*/}]($A9H) · writes product · gates lexicon naming predicates · run direct/a0000000000000001"
+A9L2="- returned — gov-builder · wrote 2 files · 7m47s · 1.6k out · run direct/a0000000000000001"
+out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A9S" 2>"$TMP_ROOT/a9.err"); rc=$?
+check_arm "arm 9 agents prints a direct spawn's agent and returned lines, its tokens the per-message-id maximum" \
+   "$([ "$rc" = 0 ] && [ "$(printf '%s' "$out" | tr -d '\r')" = "$A9L1"$'\n'"$A9L2" ] && echo 1 || echo 0)"
+[ "$rc" = 0 ] || sed 's/^/    /' "$TMP_ROOT/a9.err"
+(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A9S" >/dev/null 2>&1)
+_lg=$(ls "$FX/$MR/builds/tFix/build/"*-agent-ledger.md 2>/dev/null)
+_ll1=${A9L1/"($A9H)"/"(../prompts/${A9H##*/})"}
+check_arm "arm 9 ...and after a second run the build's one agent ledger holds each line, its link re-rooted, once" \
+   "$([ "$(printf '%s\n' "$_lg" | grep -c .)" = 1 ] && [ "$(tr -d '\r' < "$_lg" | grep -cxF -e "$_ll1")" = 1 ] \
+      && [ "$(tr -d '\r' < "$_lg" | grep -cxF -e "$A9L2")" = 1 ] && echo 1 || echo 0)"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
