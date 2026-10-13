@@ -1,12 +1,13 @@
 # TOOL-aSweptBar-3 — the run-gates evidence and pre-push suites' standalone reds, each at its root
 
-**Status:** CLOSED · rev-2 · 2026-10-13 · node a · Tier-1 · base 53b25884 · streams tooling · order 1
+**Status:** INPROGRESS · rev-2 · 2026-10-13 · node a · Tier-1 · base 53b25884 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-13-prompt-TOOL-aSweptBar-1-brief.md](../prompts/2026-10-13-prompt-TOOL-aSweptBar-1-brief.md) | research | TOOL-aSweptBar-1 TOOL-aSweptBar-2 TOOL-aSweptBar-4 TOOL-aSweptBar-5 TOOL-aSweptBar-6 |
+| [2026-10-13-prompt-TOOL-aSweptBar-3-2-fix-brief.md](../prompts/2026-10-13-prompt-TOOL-aSweptBar-3-2-fix-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
