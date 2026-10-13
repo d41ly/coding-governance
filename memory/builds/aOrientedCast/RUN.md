@@ -9,18 +9,19 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 2b852f5fd87147540a0a73d310354440c84c72ea · park · 4 touching
+units-at-landing: KICK-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 KICK-aOrientedCast-2 TOOL-aOrientedCast-9 TOOL-aOrientedCast-8 PLAY-aOrientedCast-1 TOOL-aOrientedCast-10 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-11 TOOL-aOrientedCast-12 TOOL-aOrientedCast-13 TOOL-aOrientedCast-14 TOOL-aOrientedCast-15 TOOL-aOrientedCast-16 TOOL-aOrientedCast-17 TOOL-aOrientedCast-18 TOOL-aOrientedCast-19 PLAY-aOrientedCast-2 PLAY-aOrientedCast-3 TOOL-aOrientedCast-20 TOOL-aOrientedCast-21 TOOL-aOrientedCast-22 TOOL-aOrientedCast-23 TOOL-aOrientedCast-24 TOOL-aOrientedCast-26 TOOL-aOrientedCast-25 TOOL-aOrientedCast-27 TOOL-aOrientedCast-28
+refreshed-at: 2a9d8191da18bc6db663e39eb562c9a2dfe8480e · handoff · 33 touching
 hold-run: 
-hold-streak: 1 · at ea8c8728
-resume-owed: unattended-resume-aorientedcast · fire 2026-10-12T20:17:05Z
-held-at: 2026-10-12T19:47:05Z
-hold-reason: all 18 units are CLOSED; the close owes about ten kit suites, red-then-green arm observations and the bar, which the main session must run under the owner's addendum; node a leaks about 26 GB of kernel pool (0.4 to 2 s per process spawn), so the owner chose to reboot before the close
-hold-until: probe host
-hold-code: host-degraded
-held-from: REVIEWING
+hold-streak: 1 · at a7b2c968
+resume-owed: none · owner
+held-at: 2026-10-13T13:58:00Z
+hold-reason: the build is merged onto local main at 39ed3d035, unpushed. The owner ordered a push with the bar bypassed, but a push publishes ~360 local-main commits of other held builds, and origin/main's 58 commits (dSweptBranches, mid-landing in another session, and cListedCensus) conflict in 8 files. Options: (a) merge origin/main, resolve, push all; (b) hold until dSweptBranches lands; (c) land this build alone. Owed: the bar on another node, the closing review of 4795172c..HEAD, the new arms' RED-first observations, AC7's gate runs, and TOOL-aOrientedCast-28 (specced, unbuilt)
+hold-until: owner
+hold-code: owner-decision
+held-from: SPECCING
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: a5dad3a5a790b4539764ad52d1b7a81adaf00d2d
-phase: SPECCING
+witness: a7b2c9682b3d69e707399c2297ab13f78ce467ed
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/deterministic-attended-workflows-943570
@@ -304,3 +305,7 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-13T13:20:04Z dispatch · item a16806d5 TOOL-aOrientedCast-27 · reason tools/hooks/agent-cap.js tools/hooks/agent-cap.test.sh tools/hooks/README.md tools/hooks/format-guard.js tools/hooks/scratch-guard.js tools/roles/handoff.py tools/roles/roles_lib.py tools/roles/README.md tools/roles/SKILL.template.md tools/roles/adopt-roles.test.sh help/roles.md tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-unit.js tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/unattended-build.test.sh tools/workflows/tier2-review.test.sh tools/workflows/README.md memory/map/features/roles.md memory/map/features/review-harnesses.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/aOrientedCast/build memory/builds/aOrientedCast/spec/2026-10-13-spec-TOOL-aOrientedCast-27.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
 
 2026-10-13T13:50:47Z dispatch · item c2efd98b TOOL-aOrientedCast-27 · reason .claude/skills/build/SKILL.md
+
+2026-10-13T13:58:08Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aOrientedCast && bash tools/push-main.sh --land --slug aOrientedCast && bash tools/unattended/unattended.sh --settle aOrientedCast
+
+2026-10-13T13:58:08Z hold · item owner-decision · reason until owner · reaped d98cca1e · resume none(owner)
