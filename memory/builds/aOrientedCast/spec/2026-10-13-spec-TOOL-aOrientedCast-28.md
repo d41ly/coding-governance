@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-28 — spec folds run through the build harness, and a leased session spawns no spec writer directly
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 29 · ratified 2026-10-13
+**Status:** OPEN · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 29 · ratified 2026-10-13
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,8 @@
 |---|---|---|
 | [2026-10-13-prompt-TOOL-aOrientedCast-1-8-owner-addendum.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-8-owner-addendum.md) | research | TOOL-aOrientedCast-1 TOOL-aOrientedCast-27 |
 | [2026-10-13-prompt-TOOL-aOrientedCast-28-1-spec-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-28-1-spec-brief.md) | journal | — |
+| [2026-10-13-prompt-TOOL-aOrientedCast-28-2-fold-brief.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-28-2-fold-brief.md) | journal | — |
+| [2026-10-13-prompt-TOOL-aOrientedCast-28-3-spec-writer.md](../prompts/2026-10-13-prompt-TOOL-aOrientedCast-28-3-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -19,7 +21,9 @@ per-prompt-turn spawn budget an unattended run cannot reset, leaves no harness j
 free text (the owner's sixth addendum, "The follow-up"). This unit gives the build harness a fold
 route that rev-bumps a present spec through the spec stage's own typed, effort-set, labelled and
 schema-checked writer and its own commit stage. The unattended kit's PreToolUse hook then refuses a
-direct spec-writer spawn from a session holding a live run's lease, naming that route.
+direct spec-writer spawn from a session holding a live run's lease, naming that route. The commit
+stage both routes share refuses a spec the spec-token checker reds, which `--dispatch` would refuse
+later.
 
 ## 2. Scope (IN)
 
@@ -47,12 +51,17 @@ direct spec-writer spawn from a session holding a live run's lease, naming that 
   under §7's `New arm:` lines. Every arm re-observes a criterion below.
 - **S7** — The prose of §4 "Documentation": the verbs template and the `/build` Skill template name
   the fold route where they say how a spec is revised, and the hook's header, two kit READMEs and
-  `help/roles.md` describe the route and the refusal. Observed by AC11.
+  `help/roles.md` describe the route and the refusal, the workflows README the token check.
+  Observed by AC11.
 - **S8** — The unattended, review-harness and roles kits each move one version step with every
   carrier, after `TOOL-aOrientedCast-27`'s steps. Observed by AC12.
 - **S9** — The unattended and review-harnesses dossiers gain this unit, and the map is re-rendered.
   Observed by AC13.
 - **S10** — The template's edit reaches its render line for line. Observed by AC14.
+- **S11** — The spec commit block runs the checker `SPEC_TOKENS_CLI` names once the specs are
+  staged and rendered, and refuses the commit, quoting each hit line, when it reds on a spec the
+  block commits, authored or folded (§4 "The token check"). Observed by AC15, and by AC4 for the
+  fold block.
 
 ## 3. Non-goals (OUT)
 
@@ -72,12 +81,16 @@ direct spec-writer spawn from a session holding a live run's lease, naming that 
   or `handoff.py stage-efforts`, the driver `unattended.sh`, or the protocol's §12.
 - The `unattended-build@` identity marker in the harness's `meta.version`, which this build's
   harness units have left as it was (§4 "Kit versions").
+- Any change to `tools/check-spec-tokens.py`, a per-spec mode included, and refusing a spec commit
+  on a hit in a spec it does not commit.
 
 ### Edges
 
 - **consumes-from** external — Claude Code delivers an `Agent` tool call to a PreToolUse hook whose
   matcher names `Agent`, with `session_id` and `tool_input.subagent_type` in its payload, as the
   spawn guard already reads them (`tools/hooks/agent-cap.js:2092`, `:2220`).
+- **consumes-from** external — the spec-token checker's hit line names its spec by the
+  repo-relative path (`tools/check-spec-tokens.py:1347`), which the token check's filter reads.
 - **hands-off** external — the same lease-keyed refusal for other roles, should the owner want every
   leased session's agent to run inside a harness.
 
@@ -189,8 +202,8 @@ const FOLD_SCHEMA = {
 - The commit stage runs as written on `authoredIds`. Two strings move on a fold call: the prompt's
   "just authored" reads "just folded", and the `git commit` line's message is
   `spec(<slug>): <id> rev-<foldRev> ...`, one pair per folded unit. Every other line of
-  `commitBlock` is the spec stage's, so its foreign-change and input-check refusals are the same
-  bytes.
+  `commitBlock` is the spec stage's, so its foreign-change, input-check and token-check refusals
+  are the same bytes.
 
 ### The fold return
 
@@ -209,6 +222,33 @@ After the commit stage, a fold call logs
 
 `identity` is `renderAgentLabel(<every fold unit's id, space-joined>, 'fold, commit')`. It carries no
 `roster`, `dispatch`, `verdict` or `audit` key.
+
+### The token check
+
+`commitBlock` gains one step after the second `git add -- <spec paths>` and its record guard
+(`:1163-1164`), before the delta loop.
+
+- It reads `SPEC_TOKENS_CLI` by sourcing `.unattended.conf` in a subshell, as the driver does
+  (`tools/unattended/unattended.sh:617`). `--dispatch` runs the same key's checker over the live
+  tree (`tools/unattended/unattended.sh:13493-13509`); gov sets it at `.unattended.conf:201`.
+- A blank key or no conf prints
+  `spec stage: SPEC_TOKENS_CLI is blank or undeclared, so no spec-token check ran` and goes on, an
+  announced skip. A key naming no file refuses, naming the value.
+- Otherwise it runs `python -B` on that path, keeping output and status without ending the block
+  under `set -e`. A non-zero status refuses when an output line names one of `<spec paths>`,
+  quoting each such line, or when no line carries ` live spec(s) · `, the report line printed only
+  once the checker has graded (`tools/check-spec-tokens.py:1282-1284`), quoting the first line.
+  Any other non-zero status is another spec's hit or a stale row, which `--dispatch` answers: the
+  block prints the status and goes on.
+- It runs once the specs are staged, since the checker's population is `git ls-files`
+  (`tools/check-spec-tokens.py:1011-1015`) and holds no authored spec before, and after the
+  render, so it grades the bytes committed.
+- A refusal opens `refused before the commit:` and ends with the cleanup that record guard names.
+
+Step 2's prose gains the step's purpose, spelling none of its commands, and step 3 names the
+checker beside the input check. The program is unchanged: the refusal reaches it as
+`committed: false` and throws with `resumeRemedy`. It does not see a hit the checker files under
+another spec, such as a sibling's hands-off payload.
 
 ### The spawn arm
 
@@ -253,8 +293,10 @@ names.
 
 - **`tools/workflows/unattended-build.test.sh`.** Fold arms over the runner `TOOL-aOrientedCast-27`
   leaves: the refusals of AC1, the spawn and return of AC2, the rev mismatch and dead fan of AC3,
-  the block identity of AC4, and the unchanged non-fold trace of AC5. `FLOOR_ASSERTIONS` (`:2820`)
-  rises by them.
+  the block identity of AC4, and the unchanged non-fold trace of AC5. Token-check arms run the
+  block of AC15 over the GH16 fixture (`:2277-2307`), reading the checker's path from `$ROOT`'s
+  conf, never typed; an undeclared key announces them as SKIP. `FLOOR_ASSERTIONS` (`:2820`) rises
+  by them.
 - **`tools/unattended/gate-guard.test.sh`.** Spawn arms over the stub-driver fixture the question
   arms use (`:551-558`), its checkout given a `.claude/roles.json`: the deny of AC6, the allows of
   AC7, and the `SPEC_WRITE_WORKFLOW` liveness arm of AC10 over gov's own index. `FLOOR_ASSERTIONS`
@@ -275,7 +317,7 @@ names.
   `roles` and `efforts`; then dispatch the unit again.
 - `tools/workflows/README.md`: the builder's hand-back bullet (`:380-384`) names the fold route, and a
   bullet after it, `**The fold route.**`, gives §4 "The fold call", "The fold writer" and "The fold
-  return" in prose.
+  return" in prose. The spec-commit paragraph (`:228`) gains §4 "The token check".
 - `tools/unattended/README.md`, "The act is refused at the tool call" (`:87-100`): the matcher gains
   `Agent`, and a paragraph gives the spawn arm, its key and what it does not check.
 - `gate-guard.js`'s header gains THE SPAWN ARM beside THE QUESTION ARM, and WHAT IT NEVER DENIES
@@ -378,26 +420,34 @@ version line and nothing else.
   total, and a second grouping rule would be a second answer to one question.
 - **A fold route that refuses a unit by reading its header rev.** The runtime has no filesystem; the
   writer refuses on the rev it reads, and the program refuses the rev it claims.
+- **The checker's path as a render token or a harness argument.** It is declared in
+  `SPEC_TOKENS_CLI`, never spelled (`tools/unattended/unattended.sh:13485-13487`), and a second
+  spelling is a second answer. Refusing on any non-zero exit would stall every spec commit on
+  another spec's hit.
 
 ## 5. Production-readiness checklist
 
 - security — The arm only narrows: it refuses a spawn and writes nothing. It reads the role index
   and the run-state records the question arm already reads, and fails open on every unreadable input
   but the liveness, as that arm does. The fold route adds no write class: the spec writer writes the
-  spec its role already may, and the commit stage's git block is unchanged.
+  spec its role already may. The token check sources the tracked conf the driver sources, and
+  writes nothing.
 - perf / scale — One small JSON read per `Agent` call. The lease scan and the driver's
   `--liveness`, 3.9 s on node a (PINNED 2026-10-13 in `TOOL-aOrientedCast-24` AC8), run only for a
-  spec-writer spawn. A fold call spawns at most `SPEC_WRITERS` writers and one committer.
+  spec-writer spawn. A fold call spawns at most `SPEC_WRITERS` writers and one committer. Each
+  spec commit adds one whole-tree checker run, the run `--dispatch` makes before each pass.
 - error / empty / loading states — A malformed fold call refuses by name before any spawn. A dead
   writer's units are refused and named, an all-dead fan throws, a rev mismatch throws before the
-  commit, and nothing committed returns `specCommit: null` with a DEGRADED note.
+  commit, and nothing committed returns `specCommit: null` with a DEGRADED note. A checker that
+  did not grade refuses the commit; a blank key is an announced skip.
 - observability — The fold writers carry `<slug> · <ids> · spec-fold` labels, the run's first log
   line and `identity` read `<slug> · <ids> · fold, commit`, and the journal feeds
   `handoff.py agents --run`. The deny names the run, its phase, liveness and record, and the route.
 - risks — The main loop of this run loses its direct fold route the moment the settings land
   mid-session; the fold route is its replacement. The role body's done sentence speaks of
   authoring, while the fold prompt names a different return; the role says the harness's shape
-  wins. `SPEC_WRITE_WORKFLOW` is a restated catalogue name, pinned by AC10.
+  wins. `SPEC_WRITE_WORKFLOW` is a restated catalogue name, pinned by AC10. The token check finds
+  a hit by its spec's path on the checker's line, pinned by AC15's real-checker run.
 - testing — The direct probes and fixtures of §6 in the pass; the `New arm:` lines of §7, observed
   RED then GREEN by the main loop at the close.
 - migration — None: no stored shape changes, and a call without `foldRev` runs as before (AC5).
@@ -439,6 +489,15 @@ workflow `build`, each `agent: true`. Payload S is
 `{"tool_name": "Agent", "session_id": "tSess-1", "cwd": <the checkout>, "tool_input": {"subagent_type": "gov-spec-writer", "prompt": "x", "description": "fx · spec-write"}}`.
 Each staged break is restored before the next.
 
+Fixture K is the repository the build suite's `build_spec_commit_repo` makes
+(`tools/workflows/unattended-build.test.sh:2277-2307`), in a scratch directory, plus a copy of
+`tools/check-spec-tokens.py` at that path, `tools/gate-legs.json` holding one leg named x, an empty
+`memory/project/spec-token-waivers.txt` and a `.unattended.conf` whose `SPEC_TOKENS_CLI` names the
+copy, all committed. Its authored spec gains a numbered Acceptance criteria section of one bullet
+whose one token is the path nope/x.md in backticks. Block K is the fenced `sh` block of the commit
+stage's decoded `promptjson:` line, filled and run as `run_spec_commit_block` does. A variant's edit
+to any file but the authored spec is committed before its run.
+
 - **AC1** — When stub T runs `tools/workflows/unattended-build.js` over FOLD with one change each —
   `foldRev` dropped from `A-tB-2`; `foldRev` `1`; `foldRev` `"2"`; a `specPath` under
   build `tC`'s spec folder; `specBriefPath` dropped; `closes` `["ASK-1"]` on `A-tB-1`;
@@ -468,9 +527,11 @@ Each staged break is restored before the next.
   Red when: the fold route's commit block drops or rewrites a refusal of the spec stage's block.
 - **AC5** — When stub T runs the render at `<c>` and the render from
   `git show <c>~1:tools/workflows/unattended-build.js` over FOLD with every `foldRev` removed and
-  AC4's authoring returns, the two outputs are byte-identical; so are they with `mode` `attended`
-  and each unit given `planState` `MISSING`.
-  Red when: a call without `foldRev` sees a changed prompt, label, log line or return.
+  AC4's authoring returns, the two outputs are byte-identical once each drops its `prompt:` and
+  `promptjson:` lines labelled `tB · specs · commit`, which AC15's token check moves on every call;
+  so are they with `mode` `attended` and each unit given `planState` `MISSING`.
+  Red when: a call without `foldRev` sees a changed prompt, label, log line or return outside the
+  commit stage's prompt.
 - **AC6** — When payload S is piped to fixture G's copied `gate-guard.js` with the record at
   `BUILDING` and the stub printing `verdict: LIVE`, it exits 2, and stderr names `fx`, `BUILDING`,
   `liveness LIVE`, `unattended-build.js`, `foldRev` and `gov-spec-writer`.
@@ -493,16 +554,17 @@ Each staged break is restored before the next.
   `grep -c '"matcher": "Bash|PowerShell|AskUserQuestion|Agent"' .claude/settings.json` prints 1.
   Red when: the hook is not wired on `Agent`, in the fragment or in gov's settings.
 - **AC10** — When
-  `node -e "const g = require('./tools/unattended/gate-guard.js'); const r = require('./.claude/roles.json').roles; console.log(Object.keys(r).filter((k) => r[k].workflow === g.SPEC_WRITE_WORKFLOW).join(','))"`
+  `node -e "const p = require('path'); const g = require(p.resolve(process.argv[1])); const r = require(p.resolve(process.argv[2])).roles; console.log(Object.keys(r).filter((k) => r[k].workflow === g.SPEC_WRITE_WORKFLOW).join(','))" tools/unattended/gate-guard.js .claude/roles.json`
   runs in this checkout, it prints `gov-spec-writer`.
   Red when: the restated workflow name matches no role, so the arm can never fire.
 - **AC11** — When
   `grep -c "foldRev" tools/unattended/VERBS.template.md tools/roles/SKILL.template.md tools/workflows/README.md help/roles.md tools/unattended/README.md tools/unattended/gate-guard.js`
   runs it prints at least 1 for each file;
   `grep -n "spawn .gov-spec-writer. on it" tools/roles/SKILL.template.md` prints nothing; and
-  `grep -c "Bash|PowerShell|AskUserQuestion|Agent" tools/unattended/README.md` prints at least 1.
-  Red when: a page that says how a spec is revised still names a direct spawn, or the route is
-  undocumented.
+  `grep -c "Bash|PowerShell|AskUserQuestion|Agent" tools/unattended/README.md` and
+  `grep -c "SPEC_TOKENS_CLI" tools/workflows/README.md` each print at least 1.
+  Red when: a page that says how a spec is revised still names a direct spawn, or the route or the
+  token check is undocumented.
 - **AC12** — When `KIT_UNATTENDED_VERSION` is read from `git show <c>~1:tools/unattended/unattended.sh`
   and from `tools/unattended/unattended.sh`, the second is one minor step above the first, and
   `git grep -l "gov:kit unattended@<the first>" -- tools/unattended/ memory/guides/ .claude/skills/unattended/`
@@ -525,6 +587,15 @@ Each staged break is restored before the next.
   rendered tokens, and so are those of `tools/workflows/tier2-review.template.js` and
   `tools/workflows/tier2-review.js`.
   Red when: an edit reached a template and not its render, or the reverse.
+- **AC15** — When block K, decoded from the AC2 run and from AC4's authoring run, runs in fixture
+  K, it exits non-zero with HEAD unmoved, and its output carries `refused before the commit:` and
+  the checker's `[path]` line naming the authored spec. It exits 0 and commits when that token is
+  respelled `memory/README.md`, when the hit sits instead in the committed sibling spec, and when
+  `SPEC_TOKENS_CLI` is blank, its output then carrying `no spec-token check ran`. It exits non-zero
+  naming the value when the key names no file, and saying the checker did not grade when the copy
+  is replaced by a script that prints one line and exits 1.
+  Red when: the block commits a spec the checker reds, refuses on another spec's hit, or reads a
+  checker that never graded as clean.
 
 ## 7. Gates
 
@@ -533,6 +604,7 @@ Each staged break is restored before the next.
 New arm: tools/workflows/unattended-build.test.sh · covers AC1 AC2 AC3 AC4 AC5 · the fold arms, against the fold refusals staged out, then the merge's rev compare staged to accept any rev, then the commit message staged to the authoring form · `FLOOR_ASSERTIONS` raised by the assertions added
 New arm: tools/unattended/gate-guard.test.sh · covers AC6 AC7 · the spawn arms, against `checkSpawn` staged to return null, then its `roles[type].workflow` test staged out so every role is refused · `FLOOR_ASSERTIONS` raised by the assertions added
 New arm: tools/unattended/gate-guard.test.sh · covers AC10 · the `SPEC_WRITE_WORKFLOW` liveness arm over gov's index, against the constant staged to `spec-writer` · `FLOOR_ASSERTIONS` raised by its assertion
+New arm: tools/workflows/unattended-build.test.sh · covers AC15 · the token-check arms over fixture K, against the token-check step staged out of `commitBlock`, then its spec-path filter staged to match no line, then its did-not-grade refusal staged out · `FLOOR_ASSERTIONS` raised by the assertions added
 
 The main loop observes each arm RED on its staged break and GREEN once restored, at the close (M8).
 No pass runs a leg above.
@@ -574,6 +646,10 @@ No pass runs a leg above.
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft.
+- rev-2 · 2026-10-13 · §1 · S7 S11 · §3 · §4 · §5 · AC5 AC10 AC11 AC15 · §7 · §10 · the fold brief
+  of 2026-10-13: the commit block runs the `SPEC_TOKENS_CLI` checker and refuses on a hit in a
+  spec it commits (§4 "The token check"); AC10 passes its two paths as arguments, each a tracked
+  path token; AC5 drops the commit stage's prompt from its compare.
 
 ## 10. Reuse audit
 
@@ -591,6 +667,10 @@ its fragment and the two doc templates selected `fixture-passes-by-finding-nothi
 `staged-break-substitutes-a-synthetic-value`, `two-answers-to-one-question` and
 `guard-above-a-fold-makes-its-fallback-dead`. AC5's and AC8's byte-identity checks, §7's code-level
 staged breaks and AC10's liveness pin answer them. Where the brief and the code disagreed: the brief
-places the refusal in `agent-cap.js`, and the kit boundary moves it (§8 F1).
+places the refusal in `agent-cap.js`, and the kit boundary moves it (§8 F1). At rev-2,
+`"run the spec token checker over specs before a commit and refuse the commit naming each hit"`
+ranked stem neighbours only (`hit`, `run`, `build_commit`). The token check's seam is the key
+`--dispatch` reads, `SPEC_TOKENS_CLI` (`tools/unattended/unattended.sh:13493-13509`), run inside
+the commit block both routes share.
 
-Recall terms used: `fold rev-N spec-writer harness unattended-build specWriter efforts lease gate-guard spawn direct`
+Recall terms used: `fold rev-N spec-writer harness unattended-build specWriter efforts lease gate-guard spawn direct SPEC_TOKENS_CLI check-spec-tokens commitBlock`

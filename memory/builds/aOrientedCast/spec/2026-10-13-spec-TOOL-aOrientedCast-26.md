@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-26 — spec writers run at high effort and builders at xhigh, as the owner ruled
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node a · Tier-1 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 26
+**Status:** INPROGRESS · rev-1 · 2026-10-13 · node a · Tier-1 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 26
 
 <!-- gen:spec-records -->
 
