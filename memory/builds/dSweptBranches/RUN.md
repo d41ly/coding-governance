@@ -9,13 +9,23 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dSweptBranches-6=OPEN TOOL-dSweptBranches-18=OPEN
+units-at-landing: TOOL-dSweptBranches-1 TOOL-dSweptBranches-2 TOOL-dSweptBranches-4 TOOL-dSweptBranches-3 TOOL-dSweptBranches-5 TOOL-dSweptBranches-7 TOOL-dSweptBranches-8 TOOL-dSweptBranches-9 TOOL-dSweptBranches-10 TOOL-dSweptBranches-11 TOOL-dSweptBranches-12 TOOL-dSweptBranches-13 TOOL-dSweptBranches-14 TOOL-dSweptBranches-15 TOOL-dSweptBranches-16 TOOL-dSweptBranches-17
+hold-run: 
+hold-streak: 1 · at 71386064
+resume-owed: none · owner
+held-at: 2026-10-13T07:31:24Z
+hold-reason: the build is complete and closed-reviewed; landing waits on the parked decision about five red legs the runner labels OWN by its comparator rule, four of them red with the same arms on main and the fifth green by hand at base and HEAD
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
 gates-run: unattended-179185751247603718038-1121 45f76319
 parked-surfaced: yes, 1 surfaced
 keepalive-reaped: yes
-refreshed-at: 2b852f5fd87147540a0a73d310354440c84c72ea · park · 0 touching
+refreshed-at: 2b852f5fd87147540a0a73d310354440c84c72ea · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: aa75b549ef77e369737221a726505729ff7cd144
-phase: VERIFYING
+witness: 7138606411c9b46b0a6028cb40a9a8ed5d7eea9f
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/musing-lumiere-ab7980
@@ -137,3 +147,7 @@ base: a8f0e195a2d80a6d1480e4992aec6565342e35ea
 2026-10-13T01:47:33Z dispatch · item 8bfafdca TOOL-dSweptBranches-17 · reason tools/branch-reconcile/branch_reconcile.py tools/branch-reconcile/selftest.py tools/branch-reconcile/README.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-17.md memory/builds/dSweptBranches/prompts/2026-10-13-prompt-TOOL-dSweptBranches-17-1-build-brief.md memory/builds/dSweptBranches/README.md memory/builds/dSweptBranches/build/2026-10-13-build-TOOL-dSweptBranches-17-1-acceptance-ledger.md memory/map/features/branch-reconcile.md memory/builds/dSweptBranches/spec/2026-10-13-spec-TOOL-dSweptBranches-3.md
 
 2026-10-13T07:30:55Z decision · item land 45f76319 though the close's flagged bar reads 5 of 132 legs red, all five labelled OWN by the runner's comparator rule · reason options: land as is; fix main's four broken suites inside this build; or keep it unlanded. Refused to decide: memory-hygiene self-test, pre-push self-test, foreign-prefix parity and govkit selftest fail with the same arms at main's own 2b852f5f under the close's GIT_GRAFT_FILE=/dev/null, and remote CI's daily held job shows them red with open HIGH asks (TOOL-aPrimedIndex-12/-13, TOOL-aLevelledCopy-11/-14); run-gates evidence passes 160/160 by hand at both 2b852f5f and HEAD, so its close red is the bar's concurrency nondeterminism (TOOL-dSpentCeiling-8). The runner labels every one OWN because this build's diff touches each leg's comparator (README.md, .gitattributes, selftest-budgets.txt, registry.toml), so --override gates-green and an owner-landing hand-off are both refused; fixing main's suites is outside this build's goal
+
+2026-10-13T07:31:26Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dSweptBranches && bash tools/push-main.sh --land --slug dSweptBranches && bash tools/unattended/unattended.sh --settle dSweptBranches
+
+2026-10-13T07:31:26Z hold · item owner-decision · reason until owner · reaped a17ed934 · resume none(owner)
