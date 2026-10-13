@@ -1,6 +1,6 @@
 # PLAY-aOrientedCast-2 — the charter's `[roles]` rule and its generated Agent roles section
 
-**Status:** OPEN · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams playbook · order 20
+**Status:** INPROGRESS · rev-2 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams playbook · order 20
 
 <!-- gen:spec-records -->
 
