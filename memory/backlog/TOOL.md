@@ -457,8 +457,8 @@ Cite ids, never line numbers.
 | [TOOL-dSpentCeiling-6](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | two waiver registries pin LINE NUMBERS into files that get edited, so… |
 | [TOOL-dSpentCeiling-7](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | FLIP READ_PATH_RULES_GATE to True in tools/memory-tree/corpus_ids.py,… |
 | [TOOL-dSpentCeiling-8](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | THE FULL BAR IS NONDETERMINISTIC UNDER ITS OWN CONCURRENCY, on at least… |
-| [TOOL-dSweptBranches-6](../builds/dSweptBranches/BACKLOG.md) | SPECCED | MED | TOOL-dSweptBranches-20 | 2026-10-13 | audit gov's memory-tree checks that read files a range ADDS, for the… |
 | [TOOL-dSweptBranches-18](../builds/dSweptBranches/BACKLOG.md) | SPECCED | HIGH | TOOL-dSweptBranches-21 | 2026-10-13 | held red: suite process-monitor census selftest red at 37200355 on the… |
+| [TOOL-dSweptBranches-22](../builds/dSweptBranches/BACKLOG.md) | OPEN | LOW | — | 2026-10-13 | two staged-set readers read a merge of the default branch as additions… |
 | [TOOL-dThriftyLanding-7](../builds/dThriftyLanding/BACKLOG.md) | OPEN | MED | — | 2026-10-05 | unattended kit gate costs 222 s standalone on node d and reads every… |
 | [TOOL-dTieredTribunal-4](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | the args-must-be-an-object guard is not ported into the two drift-audit… |
 | [TOOL-dTieredTribunal-6](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | The RECLASSIFICATION that created this row was ratified 2026-08-26… |

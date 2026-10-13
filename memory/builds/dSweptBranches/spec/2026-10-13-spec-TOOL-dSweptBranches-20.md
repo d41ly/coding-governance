@@ -1,12 +1,15 @@
 # TOOL-dSweptBranches-20 — gov's range readers audited for a merge read as additions
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node d · Tier-1 · base 2b852f5f · streams tooling · order 18 · closes TOOL-dSweptBranches-6
+**Status:** CLOSED · rev-1 · 2026-10-13 · node d · Tier-1 · base 2b852f5f · streams tooling · order 18 · closes TOOL-dSweptBranches-6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-13-build-TOOL-dSweptBranches-20-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-dSweptBranches-20-1-acceptance-ledger.md) | journal | — |
+| [2026-10-13-build-TOOL-dSweptBranches-20-1-range-reader-audit.md](../build/2026-10-13-build-TOOL-dSweptBranches-20-1-range-reader-audit.md) | journal | — |
 | [2026-10-13-prompt-TOOL-dSweptBranches-19-owner-follow-up.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-19-owner-follow-up.md) | research | TOOL-dSweptBranches-19 TOOL-dSweptBranches-21 |
+| [2026-10-13-prompt-TOOL-dSweptBranches-20-1-build-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-20-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

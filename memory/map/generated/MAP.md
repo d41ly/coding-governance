@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 132 · kits: 18 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 6 · gotcha-classes: 111 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 132 · kits: 18 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 6 · gotcha-classes: 112 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -233,6 +233,7 @@ Inventories: gate-legs: 132 · kits: 18 · git-hooks: 4 · harness-hooks: 11 · 
 | `a-gate-that-walks-the-repo-root-reads-other-worktrees.md` | gate-lint |
 | `a-grep-for-a-word-is-a-presence-probe.md` | memory-tree-hygiene |
 | `a-helper-extraction-blinds-a-per-function-rule.md` | unattended |
+| `a-merge-of-the-default-branch-read-as-additions.md` | UNCLAIMED |
 | `a-merged-in-check-can-refuse-a-pinned-record.md` | unattended-mandate |
 | `a-new-leg-trips-a-growing-set-of-meta-gates.md` | run-gates |
 | `a-new-local-collides-in-a-long-function.md` | govkit |
