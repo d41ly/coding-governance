@@ -276,3 +276,5 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-13T10:20:16Z rescope · item add TOOL-aOrientedCast-28 · reason the owner's sixth addendum follow-up (prompts/2026-10-13-prompt-TOOL-aOrientedCast-1-8-owner-addendum.md): spec writers ran as direct spawns for every fold, at the agent type's effort, with no harness route; adopted
 
 2026-10-13T11:05:32Z brief · item TOOL-aOrientedCast-26 · reason e7ed11e25bf7 memory/builds/aOrientedCast/prompts/2026-10-13-prompt-TOOL-aOrientedCast-24-2-build-brief.md
+
+2026-10-13T11:22:09Z dispatch · item 0cd55c54 TOOL-aOrientedCast-26 · reason tools/roles/house/policy.toml .claude/agents/gov-spec-writer.md .claude/agents/gov-builder.md memory/builds/aOrientedCast/spec/2026-10-13-spec-TOOL-aOrientedCast-26.md memory/builds/aOrientedCast/build/2026-10-13-build-TOOL-aOrientedCast-26-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
