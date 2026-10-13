@@ -1466,9 +1466,9 @@ fi
 # writes the three reuse knobs it sees into the git dir, and a `pb` that stays red until `gb/f` says fixed.
 # RE-STAGED BY TOOL-aSparedSpawn-32 S10: the mode is asked for by `GATE_REUSE_LINEAGE`, and the opt-in
 # control below runs the cache's `env` mode, the opt-in store since TOOL-aSparedSpawn-13.
-# EVERY REFUSAL ARM CARRIES ITS CONTROL: a GATE_REUSE=1 run after the lineage run must reuse `pa` from
-# the cache under the same key. Without that, a key that never matched would pass the refusal arm as
-# well as the lineage term it names.
+# EVERY REFUSAL ARM CARRIES ITS CONTROL: `check_lin_control` runs no bar; `pa`'s saved ledger row must
+# carry, in field 4, the input key the lineage run computed. Without that, a key that never matched
+# would pass the refusal arm as well as the lineage term it names.
 build_lin_repo() {
   ru_repo || return 1
   printf '#!/usr/bin/env bash\ngrep -q fixed gb/f\n' > "$RU_T/fx/b.sh"

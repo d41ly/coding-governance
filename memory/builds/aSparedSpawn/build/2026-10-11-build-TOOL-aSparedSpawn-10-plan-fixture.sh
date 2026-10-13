@@ -8,7 +8,7 @@
 #   bash <this> <leg path> <a captured run-selftests.sh --list> <scratch dir> <gov root>
 set -u
 # The launcher, resolved before any cd from the repository this record sits in, four levels up.
-. "${BASH_SOURCE[0]%/*}/../../../../tools/lib/resolve-python.sh" || exit 2
+_d=.; [[ ${BASH_SOURCE[0]} == */* ]] && _d=${BASH_SOURCE[0]%/*}; . "$_d/../../../../tools/lib/resolve-python.sh" || exit 2
 PY=$(resolve_python) || exit 2
 SUITE="$1"; LIST="$2"; W="$3"; GOV="$4"
 step_fail=0

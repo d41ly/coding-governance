@@ -17,7 +17,7 @@
 #        stdin although --session answered (the second waits 120 s)
 set -u
 # The launcher, resolved before any cd from the repository this record sits in, four levels up.
-. "${BASH_SOURCE[0]%/*}/../../../../tools/lib/resolve-python.sh" || exit 2
+_d=.; [[ ${BASH_SOURCE[0]} == */* ]] && _d=${BASH_SOURCE[0]%/*}; . "$_d/../../../../tools/lib/resolve-python.sh" || exit 2
 PY=$(resolve_python) || exit 2
 R=${1:?repo root}; S=${2:?scratch dir}; step=${3:?step}
 mkdir -p "$S" || exit 2

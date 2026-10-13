@@ -11,7 +11,7 @@
 # the select-sim instrument beside this file makes.
 set -u
 # The launcher, resolved before any cd from the repository this record sits in, four levels up.
-. "${BASH_SOURCE[0]%/*}/../../../../tools/lib/resolve-python.sh" || exit 2
+_d=.; [[ ${BASH_SOURCE[0]} == */* ]] && _d=${BASH_SOURCE[0]%/*}; . "$_d/../../../../tools/lib/resolve-python.sh" || exit 2
 PY=$(resolve_python) || exit 2
 S=${1:?a scratch root}; mkdir -p "$S" || exit 2
 GOV=$(pwd)

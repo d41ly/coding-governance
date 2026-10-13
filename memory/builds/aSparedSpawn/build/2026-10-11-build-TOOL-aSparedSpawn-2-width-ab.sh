@@ -22,7 +22,7 @@
 # pid after it: repeatable, unlike a neighbouring bar.
 set -u
 # The launcher, resolved before any cd from the repository this record sits in, four levels up.
-. "${BASH_SOURCE[0]%/*}/../../../../tools/lib/resolve-python.sh" || exit 2
+_d=.; [[ ${BASH_SOURCE[0]} == */* ]] && _d=${BASH_SOURCE[0]%/*}; . "$_d/../../../../tools/lib/resolve-python.sh" || exit 2
 PY=$(resolve_python) || exit 2
 clone=${1:?frozen clone}; legs=${2:?legs subset manifest}; rows=${3:?rows file}
 AB_LOAD=${AB_LOAD:-8}

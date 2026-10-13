@@ -482,6 +482,21 @@ case "$line" in
   *) bad "25b a runner stamp was a candidate for a bar that is not the runner: ${line:-<no decision line>}" ;;
 esac
 
+# 25c — and with NO bar record to adopt, the same bar pushes FULL and says why (TOOL-aFrugalTurnstile-1
+#       AC4's reason, which 25b no longer reaches). Every bar-record slot of this git dir goes — it is
+#       the common dir here, so that is `gate-bar-green`, `.scoped` and their `.shared` copies. The
+#       runner stamp is valid and 1 landing back, so a hook without the non-runner force scopes from it
+#       and this arm reds; the pushed file is one no earlier push carried, so no cover pass answers.
+rm -f "$(git rev-parse --git-dir)"/gate-bar-green*
+git commit -q --allow-empty -m c25c >/dev/null 2>&1
+stamp "$(git rev-parse HEAD)"
+printf 'c25c2\n' > c25c2.txt; git add c25c2.txt >/dev/null 2>&1; git commit -q -m c25c2 >/dev/null 2>&1
+line=$( ( unset GOV_GATE_CMD_TEST; GATE_SELFTESTS= GOV_GATE_CMD="bash tracked-bar.sh" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true )
+case "$line" in
+  *"FULL gate"*"is not this kit's runner"*) ok "25c a non-runner bar with no record to adopt pushes FULL, naming why no runner stamp counts" ;;
+  *) bad "25c a non-runner bar with no record to adopt did not refuse the runner stamp by name: ${line:-<no decision line>}" ;;
+esac
+
 # 26 — an UNTRACKED bar is refused. $green lives under mktemp, so it is untracked by construction —
 #      the same shape every stub in this file has. GREEN, not red, deliberately: with a red stub the
 #      push fails either way and the arm cannot tell a refusal from a bar doing its job.

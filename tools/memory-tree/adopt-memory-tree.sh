@@ -198,7 +198,8 @@ _PY=$(resolve_python) || exit 2
 # pipes are UTF-8 whatever the code page (C3, I2). The kickoff answers take govkit's per-entry
 # overlay, and a memory root declared apart from the conf must equal it (C4). A repo-relative skill
 # renders only where git tracks it (I3). The two protocols render the path of their kit's
-# `rendered` receipt row, the destination govkit wrote, or a phrase (C5, I4).
+# `rendered` receipt row, the destination govkit wrote, or a phrase (C5, I4). The source repo, with
+# no row to answer, renders the review protocol at the memory root's guides/REVIEW-PROTOCOL.md.
 derive_kit_paths() {
   local _rkd
   IFS= read -r -d '' _rkd <<'RKD' || :
@@ -364,6 +365,7 @@ if eng is not None:
         "{{MANIFEST_PATH}}": "kickoff-manifest" in kits and ans[ek + "manifest_path"],
         "{{KICKOFF_SKILL}}": skill,
         "{{SPEC_TOKEN_CHECKER}}": ans["gov_source"] == "." and "{{TOOL_ROOT}}check-spec-tokens.py",
+        "{{REVIEW_PROTOCOL}}": got["{{REVIEW_PROTOCOL}}"] or (ans["gov_source"] == "." and "{{MEMORY_ROOT}}/guides/REVIEW-PROTOCOL.md"),
     })
 for p in need:
     emit(p, "`%s`" % got[p] if got.get(p) else said[p])

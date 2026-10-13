@@ -575,6 +575,9 @@ run "C8 exempts the audit block's own long watch line" "$R" 0 -
 mkrepo c2k; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"; commit_all "$R" manifest
 sed -i '/^last-body-change:/d' "$R/memory/guides/SESSION-KICKOFF.md"; commit_all "$R" "drop the key"
 run "C2 a missing last-body-change is named" "$R" 1 "manifest-audit block lacks a last-body-change value — add the full sha of the commit where this manifest's BODY was last genuinely revised; it is what check 9 measures the stall against."
+# ...and a caller's EXPORTED `LBC` does not survive the absent key: `getval` empties it first, and
+# without that line check 2 never fires. The temporary assignment reaches the checker `run` starts.
+LBC=$(head_sha "$R") run "C2 an exported LBC does not hide the missing key" "$R" 1 "manifest-audit block lacks a last-body-change value — add the full sha of the commit where this manifest's BODY was last genuinely revised; it is what check 9 measures the stall against."
 
 # C9 — the four ways a recorded baseline can be unusable, then the two thresholds.
 mkrepo c9a; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" "" "not-a-sha"

@@ -7,7 +7,7 @@
 # origin is the local bare mirror, fetch AND push, so a claim push never reaches GitHub.
 set -u
 # The launcher, resolved before any cd from the repository this record sits in, four levels up.
-. "${BASH_SOURCE[0]%/*}/../../../../tools/lib/resolve-python.sh" || exit 2
+_d=.; [[ ${BASH_SOURCE[0]} == */* ]] && _d=${BASH_SOURCE[0]%/*}; . "$_d/../../../../tools/lib/resolve-python.sh" || exit 2
 PY=$(resolve_python) || exit 2
 arm=$1; code=$2; tree=$3
 SRC=C:/projects/coding-governance

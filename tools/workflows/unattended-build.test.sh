@@ -1024,26 +1024,50 @@ o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refus
 d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
 has "F2 dispatch.args carries the mode — attended" "$d" '"mode":"attended"'
 
-# THE GENERAL FORM, not a substring arm. The refusal set is DERIVED from the driver itself — every
-# verb whose body refuses through `check_run_state` — so this keeps holding when a seventh
-# verb joins it, which a hand-typed list of two would not. The needle is the INSTRUCTION form
+# THE GENERAL FORM, not a substring arm. The refusal set is DERIVED from the driver itself, by two
+# readings of it joined: pass one records every top-level function whose body, up to the next
+# top-level definition, holds `check_run_state "`; pass two reads each `--<flag>)` case arm up to its
+# `;;` and keeps the flag when the arm calls a recorded function. So a verb dispatched to a handler
+# not named `verb_*` (`--hold` → `run_hold`) is in the set, and an arm spanning lines (`--phase` in
+# the argument loop) is read whole. Two arms pin the derivation: a LIVENESS arm that three
+# helper-dispatched verbs are in it, and a REACH arm that every recorded function is some derived
+# flag's handler, naming any that is not. A hand-typed list of two would not keep holding when a
+# verb joins; this does. The needle is the INSTRUCTION form
 # `--<verb> <slug>` and never the bare word: the attended text NAMES three of these verbs in the
 # sentence explaining that they are unavailable, and an arm aimed at the word would fail on the
 # explanation. That trap is already recorded against the attended preamble arm above.
 CHILD_ARGS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. goes under /tmp/s. ","checklist":"CK","mode":"%s"}'
 childU=$(run_wf "$(printf "$CHILD_ARGS" unattended)" '{}' "$C")
 childA=$(run_wf "$(printf "$CHILD_ARGS" attended)" '{}' "$C")
-norun_verbs=''
-[ -f "$DRV" ] && norun_verbs=$(awk '
-  /^verb_[a-z_]+\(\)/ { v = $0; sub(/^verb_/, "", v); sub(/\(\).*/, "", v); gsub(/_/, "-", v); next }
-  /^[A-Za-z_][A-Za-z0-9_]*\(\)/ { v = ""; next }
-  v != "" && /check_run_state "/ { print "--" v; v = "" }
-' "$DRV" | sort -u)
+norun_out=''
+[ -f "$DRV" ] && norun_out=$(awk '
+  FNR == NR && /^[A-Za-z_][A-Za-z0-9_]*\(\)/ { f = $0; sub(/\(\).*/, "", f); next }
+  FNR == NR { if (f != "" && /check_run_state "/) { r[f] = 1; f = "" }; next }
+  arm == "" && /^[ \t]*--[a-z][a-z-]*\)/ { arm = $0; sub(/^[ \t]*/, "", arm); sub(/\).*/, "", arm); body = "" }
+  arm != "" { body = body " " $0
+    if (/;;/) { k = split(body, w, /[^A-Za-z0-9_]+/)
+      for (i = 1; i <= k; i++) if (w[i] in r) { print arm; seen[w[i]] = 1 }
+      arm = "" } }
+  END { for (g in r) if (!(g in seen)) print "unreached " g }
+' "$DRV" "$DRV")
+norun_verbs=$(printf '%s\n' "$norun_out" | grep '^--' | sort -u)
+norun_miss=$(printf '%s\n' "$norun_out" | sed -n 's/^unreached //p' | sort | tr '\n' ' ')
 # A DERIVED SET THAT CAME BACK EMPTY IS NOT A CLEAN PASS. Without this the loop below iterates zero
 # times and every absence arm silently ceases to exist — the vacuous-selector shape, inside the arm.
 n=$((n+1)); nv=$(printf '%s\n' "$norun_verbs" | grep -c .)
 if [ "$nv" -ge 3 ]; then echo "ok   F2 the no-run-state refusal set derived $nv verb(s) from the driver"
 else echo "FAIL F2 the no-run-state refusal set derived $nv verb(s) — the absence arms below would be vacuous"; st=1; fi
+# LIVENESS: three verbs whose handler is not named `verb_*`. A predicate that keys on that name reds here.
+for verb in --hold --settle --audit; do
+  has "F2 the refusal set holds the helper-dispatched $verb" "$(printf '\n%s\n' "$norun_verbs")" "
+$verb
+"
+done
+# REACH: every refusing handler is dispatched by some derived flag. An arm reader that stops at the
+# arm's first line misses `verb_phase` and reds here, naming it.
+n=$((n+1))
+if [ -z "$norun_miss" ]; then echo "ok   F2 every handler refusing through check_run_state is reached by a derived flag"
+else echo "FAIL F2 no derived flag reaches the refusing handler(s): $norun_miss"; st=1; fi
 
 # THE POSITIVE HALF FIRST. An absence assertion over the attended prompt passes just as well when
 # the whole clause is empty, so the unattended prompt is armed for the same instructions BEING there.
