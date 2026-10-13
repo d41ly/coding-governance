@@ -547,6 +547,17 @@ if [ -n "$want" ] && [ "$want" = "$got" ]; then echo "ok   PHASES_ALLOW equals t
 else echo "FAIL PHASES_ALLOW [$got] != the driver's tail [$want] — a restatement that drifted"; fail=$((fail+1)); fi
 
 # ---- TOOL-aOrientedCast-22: the question arm, keyed on the session's lease and not the branch -----
+# THE KIT COPY (TOOL-aOrientedCast-24): the question arms run a copy of the hook, stop-guard.js and
+# run-lease.js beside a STUB driver, stop-guard.test.sh's pattern: on --liveness the stub prints the
+# file GG_LIVENESS names and exits GG_LIVENESS_RC. The default prints `verdict: LIVE`, so Q1 to Q5
+# keep their exits; both parity arms keep reading the hook in place.
+KIT="$TMP/kit"; mkdir -p "$KIT"
+cp "$HERE/gate-guard.js" "$HERE/stop-guard.js" "$HERE/run-lease.js" "$KIT/"
+ASK_HOOK="$KIT/gate-guard.js"
+printf '%s\n' '#!/usr/bin/env bash' '[ "${1:-}" = --liveness ] && [ -n "${GG_LIVENESS:-}" ] && cat "$GG_LIVENESS"' 'exit "${GG_LIVENESS_RC:-0}"' > "$KIT/unattended.sh"
+export GG_LIVENESS="$TMP/liveness.txt"
+unset GG_LIVENESS_RC
+printf 'phase: BUILDING\nverdict: LIVE\n' > "$GG_LIVENESS"
 # run_ask <name> <expected_exit> <fixture> <session_id> [tool] [command] — an AskUserQuestion payload
 # by default, BUILT like run's; an ALLOW also requires an empty stderr, so a hook that prints a deny
 # and exits 0 is no pass. The Bash form carries the leaseholder's session to prove the widened
@@ -560,13 +571,13 @@ q = {"questions": [{"question": "Raise the ceiling?", "header": "Ceiling", "mult
      "options": [{"label": "17408", "description": "d"}, {"label": "20480", "description": "d"}]}]}
 print(json.dumps({"tool_name": t, "session_id": s, "cwd": cwd, "tool_input": {"command": c} if c else q}))' "$tool" "$(resolve_native "$fix")" "$sess" "$cmd")
   case "$payload" in *'"session_id"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
-  printf '%s' "$payload" | node "$HOOK" >/dev/null 2>"$TMP/err"
+  printf '%s' "$payload" | node "$ASK_HOOK" >/dev/null 2>"$TMP/err"
   got=$?
   if [ "$got" = "$want" ] && { [ "$want" != 0 ] || [ ! -s "$TMP/err" ]; }; then echo "ok   $name (exit $got)"; pass=$((pass+1))
   else echo "FAIL $name (exit $got, want $want; an allow wants an empty stderr)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
 }
 run_ask "Q1 the leaseholder asks at BUILDING -> deny" 2 "$B" tSess-1
-for tok in 'run fx, at BUILDING' 'unattended.sh --park fx' '--item' 'Raise the ceiling?' '17408' '20480'; do
+for tok in 'run fx, at BUILDING' 'liveness LIVE' 'unattended.sh --park fx' '--item' 'Raise the ceiling?' '17408' '20480'; do
   case "$(cat "$TMP/err")" in *"$tok"*) echo "ok   Q1 the deny names $tok"; pass=$((pass+1)) ;; *) echo "FAIL Q1 the deny does not name $tok"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)) ;; esac
 done
 run_ask "Q2 another session asks at BUILDING -> allow" 0 "$B" tSess-2
@@ -582,6 +593,38 @@ want=$(sed -n 's/^PHASES_TERMINAL="\(.*\)"/\1/p' "$DRIVER")
 got=$(node -p "require(require('path').resolve(process.argv[1])).PHASES_TERMINAL.join(' ')" "$HOOK" 2>/dev/null)
 if [ -n "$want" ] && [ "$want" = "$got" ]; then echo "ok   Q6 PHASES_TERMINAL equals the driver's: $got"; pass=$((pass+1))
 else echo "FAIL Q6 PHASES_TERMINAL [$got] != the driver's [$want] — a restatement that drifted"; fail=$((fail+1)); fi
+
+# ---- TOOL-aOrientedCast-24: the question arm asks the driver whether the leased run is finished ---
+# Q7 to Q10 set what the stub prints (M3); Q11 and Q12 are the fail-open arms the suite lacked (L3).
+F=$(build_fixture LANDING); printf 'phase: LANDING\nverdict: TERMINAL\n' > "$GG_LIVENESS"
+run_ask "Q7 the leaseholder asks at LANDING, liveness TERMINAL -> allow" 0 "$F" tSess-1
+printf 'phase: LANDING\nverdict: FINISHED-UNSTAMPED\n' > "$GG_LIVENESS"
+run_ask "Q8 the leaseholder asks at LANDING, liveness FINISHED-UNSTAMPED -> deny" 2 "$F" tSess-1
+case "$(cat "$TMP/err")" in *'unattended.sh --landed fx'*) echo "ok   Q8 the deny names the landing stamp"; pass=$((pass+1)) ;; *) echo "FAIL Q8 the deny does not name unattended.sh --landed fx"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)) ;; esac
+case "$(cat "$TMP/err")" in *'--park'*) echo "FAIL Q8 the deny tells a finished run to park"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)) ;; *) echo "ok   Q8 the deny does not name --park"; pass=$((pass+1)) ;; esac
+F=$(build_fixture HELD); printf 'phase: HELD\nverdict: TERMINAL\n' > "$GG_LIVENESS"
+run_ask "Q9 a HELD record at TERMINAL -> allow" 0 "$F" tSess-1
+printf 'phase: HELD\nverdict: HELD\n' > "$GG_LIVENESS"
+run_ask "Q9 a HELD record at HELD -> deny" 2 "$F" tSess-1
+F=$(build_fixture BUILDING); printf 'phase: BUILDING\nverdict: LIVE\n' > "$GG_LIVENESS"
+export GG_LIVENESS_RC=1
+run_ask "Q10 the stub exits 1 -> deny" 2 "$F" tSess-1
+unset GG_LIVENESS_RC
+case "$(cat "$TMP/err")" in *'liveness could not be read'*) echo "ok   Q10 a non-zero exit: the deny says the liveness could not be read"; pass=$((pass+1)) ;; *) echo "FAIL Q10 a non-zero exit: the deny does not say the liveness could not be read"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)) ;; esac
+printf 'phase: BUILDING\n' > "$GG_LIVENESS"
+run_ask "Q10 the stub prints no verdict line -> deny" 2 "$F" tSess-1
+case "$(cat "$TMP/err")" in *'liveness could not be read'*) echo "ok   Q10 no verdict: the deny says the liveness could not be read"; pass=$((pass+1)) ;; *) echo "FAIL Q10 no verdict: the deny does not say the liveness could not be read"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)) ;; esac
+mv "$KIT/unattended.sh" "$KIT/unattended.sh.off"
+run_ask "Q10 the stub absent -> deny" 2 "$F" tSess-1
+case "$(cat "$TMP/err")" in *'liveness could not be read'*) echo "ok   Q10 no driver: the deny says the liveness could not be read"; pass=$((pass+1)) ;; *) echo "FAIL Q10 no driver: the deny does not say the liveness could not be read"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)) ;; esac
+F=$(build_fixture LANDED)
+run_ask "Q10 a LANDED record with the stub absent -> allow" 0 "$F" tSess-1
+mv "$KIT/unattended.sh.off" "$KIT/unattended.sh"; printf 'phase: BUILDING\nverdict: LIVE\n' > "$GG_LIVENESS"
+F=$(build_fixture BUILDING); sed -i '/^phase: /d' "$F/memory/builds/fx/RUN.md"
+run_ask "Q11 a BUILDING record with its phase line deleted -> allow" 0 "$F" tSess-1
+printf '%s' '{"tool_name":"AskUserQuestion","session_id":"tSess-1","cwd":42,"tool_input":{}}' | node "$ASK_HOOK" >/dev/null 2>"$TMP/err"; got=$?
+if [ "$got" = 0 ] && [ ! -s "$TMP/err" ]; then echo "ok   Q12 a cwd of 42 makes resolveRepo throw -> allow (exit 0)"; pass=$((pass+1))
+else echo "FAIL Q12 a cwd of 42 (exit $got, want 0 with an empty stderr)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
 
 # ---- the meta-arm: prove the liveness guard itself fires ------------------------------------------
 if [ "${GG_META:-}" != "1" ]; then
@@ -601,7 +644,10 @@ n=$((pass+fail))
 # static count of the arms above at ~10% headroom, because the pass that wrote this file may not
 # run it (the hook it tests denies the invocation at BUILDING); the main loop's first green at
 # VERIFYING confirms the executed count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=163
+FLOOR_ASSERTIONS=179
+# RAISED 163 -> 179 at TOOL-aOrientedCast-24, by the static count of the assertions it added: Q1's
+# `liveness LIVE` token, Q7's allow, Q8's deny with its two token checks, Q9's two, Q10's three denies
+# with a token check each and its LANDED allow, Q11's allow and Q12's — sixteen.
 # RAISED 148 -> 163 at TOOL-aOrientedCast-22, by the static count of the question arm's assertions:
 # the Q1 deny and its six named tokens, Q2's allow, Q3's three phases, Q4's two allows, Q5's Bash
 # allow and the Q6 parity arm — fifteen.

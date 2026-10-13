@@ -4,7 +4,7 @@
  * while the unattended run on the current branch is in a phase before VERIFYING, and refuses an
  * `AskUserQuestion` call from the session holding a non-terminal run's lease.
  *
- * gov:kit unattended@1.105 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.106 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for TOOL-aDeferredBar-3 under the build folder of that slug.
@@ -49,9 +49,15 @@
  * is there to answer, and a run that called `AskUserQuestion` stalled until the owner came back. A
  * payload whose `tool_name` is `AskUserQuestion` goes to `checkAsk`, which keys on the SESSION and
  * not the branch: `run-lease.js`, required by `__dirname` as stop-guard.js requires it, returns the
- * records whose `session:` fact under `## Run facts` equals the payload's `session_id`, and a lease
- * whose phase is neither empty, `absent`, nor in PHASES_TERMINAL denies. The deny names the run, its
- * phase and record, and the driver's `--park` route with each question and its option labels quoted
+ * records whose `session:` fact under `## Run facts` equals the payload's `session_id`. A lease whose
+ * phase is empty, `absent` or in PHASES_TERMINAL is not live and costs no spawn. For each lease left
+ * the arm asks the driver whether the run is finished (TOOL-aOrientedCast-24): `runLiveness` and
+ * `parseLiveness`, required from stop-guard.js by `__dirname`, run `unattended.sh --liveness <slug>`
+ * under stop-guard's bound, so the two hooks read one answer. A lease whose liveness reads TERMINAL
+ * is finished and allows; any other verdict denies and is named in the deny; an unreadable liveness
+ * leaves the recorded phase standing and the deny says so. The deny names the run, its phase, its
+ * liveness and record, and the driver's `--park` route, or `--landed` at FINISHED-UNSTAMPED, with
+ * each question and its option labels quoted
  * from the payload, each value cut to ASK_QUOTE_MAX characters and stripped of control characters.
  * It does NOT check whether the question is one the protocol lets the run decide, whether the
  * session is alive, or which branch it is on; and it sees nothing the harness does not route
@@ -69,7 +75,8 @@
  * span stays content, and the same span in single quotes stays content. Under PowerShell the
  * backtick inside double quotes is the escape character and opens no span (round 3 T3). Nor does
  * it deny a question from a session holding no lease — an owner's attended session on the run's
- * branch may still ask — or from one whose run is at `LANDED` or `ABORTED`.
+ * branch may still ask — or from one whose run is at `LANDED` or `ABORTED`, or whose `--liveness`
+ * reads TERMINAL.
  *
  * THE KEY. The predicate runs first, and the filesystem is read only on a hit: the overwhelming
  * majority of tool calls carry no deny shape and cost one scan of one string. On a hit the hook
@@ -87,7 +94,8 @@
  * driver at run time would switch this hook off silently the day the driver could not be read,
  * because the hook fails open; four literals pinned by a direct read and a suite arm fail loudly.
  * PHASES_TERMINAL restates the driver's terminal pair for the same reason, pinned by its own arm.
- * The question arm names the driver by its bare file name, as the bar arm names the runner.
+ * The question arm requires `run-lease.js` and `stop-guard.js`, sibling basenames of this kit, by
+ * `__dirname`, and names the driver by its bare file name, as the bar arm names the runner.
  *
  * ponytail: the predicate is TEXTUAL, the same ceiling scratch-guard.js states of itself. A path
  * assembled at run time (`s=<dir>; bash $s/x.test.sh`) and a python heredoc that spawns a suite
@@ -98,7 +106,11 @@
  * FAILS OPEN. Unparseable stdin, an unknown tool, a missing command, no `.git`, a detached HEAD,
  * no conf, no record on this branch, no lease for the session, an unloadable `run-lease.js`:
  * every one exits 0. This is a hygiene rule, not a containment
- * boundary; a security control would have to fail the other way.
+ * boundary; a security control would have to fail the other way. ONE input does not allow: an
+ * unreadable liveness (no `verdict:` line, a non-zero exit, the bound, or stop-guard.js failing to
+ * load) leaves a leased run's recorded phase standing, because an allow there would switch the
+ * question arm off on every node whose driver cannot run, which is the silent switch-off
+ * PHASES_TERMINAL is restated to avoid.
  *
  * Protocol: deny = stderr text + exit 2. Allow = print nothing, exit 0. Matches the sibling hooks.
  */
@@ -689,8 +701,10 @@ function extractAskQuestions(input) {
 
 /**
  * The question arm's decision: the leases `run-lease.js` binds to the payload's `session_id` whose
- * phase is live — non-empty, not `absent`, not in PHASES_TERMINAL. Null means allow, and every
- * unreadable input answers null.
+ * phase is live — non-empty, not `absent`, not in PHASES_TERMINAL — and whose driver `--liveness`,
+ * read through stop-guard.js's own reader, is not TERMINAL (TOOL-aOrientedCast-24 S3). Each lease
+ * left carries `verdict`, empty when the liveness could not be read, and then its recorded phase
+ * stands. Null means allow, and every other unreadable input answers null.
  */
 function checkAsk(data) {
   const lease = require(path.join(__dirname, 'run-lease.js'))
@@ -698,28 +712,48 @@ function checkAsk(data) {
   if (!repo) return null
   const memoryRoot = lease.readMemoryRoot(repo.root)
   if (!memoryRoot) return null
-  const live = lease.resolveLease(repo.root, memoryRoot, data.session_id)
-    .filter((l) => l.phase && l.phase !== 'absent' && !PHASES_TERMINAL.includes(l.phase))
+  const live = []
+  for (const l of lease.resolveLease(repo.root, memoryRoot, data.session_id)) {
+    if (!l.phase || l.phase === 'absent' || PHASES_TERMINAL.includes(l.phase)) continue
+    // Its own try: a load failure, a throw or a bad read is an unreadable liveness, never an allow.
+    let liveness = null
+    try {
+      const guard = require(path.join(__dirname, 'stop-guard.js'))
+      const run = guard.runLiveness(__dirname, repo.root, l.slug)
+      liveness = run.ok ? guard.parseLiveness(run.stdout) : null
+    } catch {
+      liveness = null
+    }
+    if (liveness && liveness.verdict === 'TERMINAL') continue
+    live.push(Object.assign({}, l, { verdict: liveness ? liveness.verdict : '' }))
+  }
   if (live.length === 0) return null
   return { live, questions: extractAskQuestions(data.tool_input) }
 }
 
-/** The deny text: the first live lease, the park route, and each question with its option labels. */
+/**
+ * The deny text: the first live lease with its liveness, the park route — or, at FINISHED-UNSTAMPED,
+ * the landing stamp, as stop-guard's `landing-unstamped` reason says — and each question with its
+ * option labels.
+ */
 function renderAskDeny(live, questions) {
   const r = live[0]
   const asked = questions
     .map((q) => `  - ${q.question} — options: ${q.labels.length ? q.labels.join(', ') : '(none)'}`)
     .join('\n')
-  return (
-    `BLOCKED by gate-guard: this session holds the lease of the unattended run ${r.slug}, at ${r.phase} (${r.record}).\n` +
-    'An unattended run never asks: nobody is there to answer, so the question stalls the run until\n' +
-    'the owner comes back. A question the protocol lets you decide is decided: take the option that\n' +
-    'makes no measured observable worse, and record why. One no delegated resolver can take is parked,\n' +
-    'and the run goes on to its next READY unit or holds:\n\n' +
-    `  unattended.sh --park ${r.slug} --item "<the question, and its options>" --reason "<why no resolver the mandate delegates exists>"\n\n` +
-    'The question this call asked:\n' +
-    asked + '\n'
-  )
+  const head = r.verdict
+    ? `BLOCKED by gate-guard: this session holds the lease of the unattended run ${r.slug}, at ${r.phase}, liveness ${r.verdict} (${r.record}).\n`
+    : `BLOCKED by gate-guard: this session holds the lease of the unattended run ${r.slug}, at ${r.phase} (${r.record}); its liveness could not be read, so the recorded phase stands.\n`
+  const route = r.verdict === 'FINISHED-UNSTAMPED'
+    ? 'Its witness is already on the default branch, so the run is finished and unstamped. The one act\n' +
+      'left is the landing stamp, not a question:\n\n' +
+      `  unattended.sh --landed ${r.slug}\n\n`
+    : 'An unattended run never asks: nobody is there to answer, so the question stalls the run until\n' +
+      'the owner comes back. A question the protocol lets you decide is decided: take the option that\n' +
+      'makes no measured observable worse, and record why. One no delegated resolver can take is parked,\n' +
+      'and the run goes on to its next READY unit or holds:\n\n' +
+      `  unattended.sh --park ${r.slug} --item "<the question, and its options>" --reason "<why no resolver the mandate delegates exists>"\n\n`
+  return head + route + 'The question this call asked:\n' + asked + '\n'
 }
 
 function main() {

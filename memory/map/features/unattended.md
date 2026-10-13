@@ -208,7 +208,9 @@ as a note.
   and every suite before `VERIFYING`. Its `buildCommandView` is COPIED from `tools/hooks/scratch-guard.js`:
   a `require` of a sibling kit is a literal the install-prefix ban refuses (`TOOL-aDeferredBar-3`).
   On `AskUserQuestion` it refuses the session holding a non-terminal run's lease, read through
-  `run-lease.js`, and names `--park` (`TOOL-aOrientedCast-22`).
+  `run-lease.js`, and names `--park` (`TOOL-aOrientedCast-22`), unless the run is finished: a lease
+  is finished when the driver's `--liveness` reads TERMINAL, read through `stop-guard.js`'s own
+  reader, and at FINISHED-UNSTAMPED the deny names `--landed` (`TOOL-aOrientedCast-24`).
 
 ## Reuse affordance
 

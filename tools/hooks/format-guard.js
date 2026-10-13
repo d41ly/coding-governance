@@ -4,7 +4,7 @@
  * final message lacks the charter's BUILD/SPEC pair, breaks rule r1, leaves a new commit unreported, or
  * leaves out the `agent` or `returned` line of an agent its turn dispatched or received.
  *
- * gov:kit agent-cap@1.36 — ships inside the hooks kit entry; the kit version is agent-cap.js's.
+ * gov:kit agent-cap@1.37 — ships inside the hooks kit entry; the kit version is agent-cap.js's.
  *
  * Contract: the spec for TOOL-aHeardState-1 under the build folder of that slug.
  *
@@ -38,15 +38,22 @@
  *     (TOOL-aOrientedCast-21). Only when the fence defines both shapes; otherwise a turn that holds an
  *     agent writes one witness and requires nothing.
  * HOW THE TURN'S AGENTS ARE READ. From the transcript the payload's `transcript_path` names: the turn
- * opens at the earliest of the last run of typed `user` records, the run-log prose reader's rule. An
+ * opens at the earliest of the last run of typed `user` records, the run-log prose reader's rule, with
+ * two exceptions (TOOL-aOrientedCast-24): a compaction summary opens nothing, and neither does a meta
+ * record in a run of meta records directly after a tool result, such as a Skill's expansion or an
+ * image's size note. An idle-wake tick or a stop hook's feedback follows assistant text, so it still
+ * opens its turn. An
  * `Agent` result carrying `agentId` owes its `agent` line, and its `returned` line when `completed`; a
  * `Workflow` result carrying `runId` owes an `agent` line per `started` entry of
  * `<session dir>/subagents/workflows/<run id>/journal.jsonl`, and a `returned` line per `result` or
- * `failed` entry unless it was `async_launched`; a delivered task notification owes the `returned`
- * line of the agent its tool-use id names, or both lines for every agent of the run it names. A run id
- * outside `[A-Za-z0-9_-]{1,64}` is never joined into a path. Every unreadable input of this arm — no
- * `transcript_path`, an unreadable transcript or journal, a run id off its shape, unparsable lines in
- * the turn — allows the arm with one witness line each.
+ * `failed` entry unless it was `async_launched`; a delivered task notification, a `user` record or a
+ * `queued_command` attachment, owes the `returned` line of the agent its tool-use id names, or both
+ * lines for every agent of the run it names. That id is read from the notification's header alone:
+ * the first `<tool-use-id>` before its first `<result>`, so an id the agent quotes in its result names
+ * nothing. A run id outside `[A-Za-z0-9_-]{1,64}` is never joined into a path. No `transcript_path`,
+ * an unreadable transcript or journal, or a run id off its shape allows the arm with one witness line
+ * each; lines in the turn that do not parse are counted into one witness line, and the arm
+ * still grades the records that parsed.
  * The last HEAD seen lives in `<git-dir>/format-guard/<sid>.head`, per worktree, written on every
  * armed stop that reached the checks. The first armed stop of a session records a baseline only; a
  * recorded sha that is not an ancestor of HEAD writes a witness and blocks nothing. Git is spawned
@@ -66,7 +73,13 @@
  * in the continuation is not graded there and is demanded at the next unchained armed stop, even when
  * a chained message already reported it. An `agent` or `returned` line's field VALUES: a well-formed
  * line naming the right agent with a wrong model passes. An agent a sub-agent spawned. An agent a
- * harness run starts after this stop. A task notification queued but not yet delivered. Whether the
+ * harness run starts after this stop. A task notification queued but not yet delivered. A second
+ * notification block in one record: only the first block's header id is read, so that second agent's
+ * `returned` line is not required (no measured delivery carried two). An agent dispatched before an
+ * owner's interjection or an interrupt: a typed record that is not a meta record opens a turn
+ * wherever it sits, a tool result before it included, so the turn splits there. The run-log prose
+ * reader still opens a turn at every typed record, so the two readers differ on the two exceptions
+ * above. Whether the
  * transcript format still holds: a renamed field reads as a turn with no agent, silently. Whether this hook is WIRED: check-wiring.sh and check-hook-destinations.sh own that. A
  * broken hook never blocks a stop — every failure path is an allow, and an uncaught error exits 0.
  */
@@ -256,9 +269,13 @@ function checkCommitLines(rows, shapes, shas) {
 /**
  * The final turn of a main transcript: `{ records, text, skipped }`, or `{ error }` when the file is
  * unreadable. A turn opens at a typed `user` record — string content, or text blocks with no
- * `tool_result` — and back-to-back openers are one turn (the run-log prose reader's rule). The file
- * is read once and its lines parsed from the end only until the opener is passed; a line that does
- * not parse is skipped and counted. Sidechain records are left out.
+ * `tool_result` — and back-to-back openers are one turn (the run-log prose reader's rule), with two
+ * exceptions (TOOL-aOrientedCast-24 S2): a compaction summary opens nothing, and neither does a meta
+ * record whose nearest earlier main-file `user` or `assistant` record that is not itself a typed meta
+ * record holds a `tool_result`. Walking from the end, such a meta record is PENDING until that older
+ * record is parsed, and a pending record with none before it opens the turn. The file is read once
+ * and its lines parsed from the end only until the opener is passed; a line that does not parse is
+ * skipped and counted. Sidechain records are left out.
  */
 function scanTurnRecords(transcriptPath) {
   let text
@@ -272,17 +289,30 @@ function scanTurnRecords(transcriptPath) {
   // An assistant record that carries text or a tool call ends a run of openers; thinking alone does not.
   const checkSpoke = (rec) => !!rec && rec.type === 'assistant' && rec.isSidechain !== true && !!rec.message && Array.isArray(rec.message.content) &&
     rec.message.content.some((b) => b && ((b.type === 'text' && String(b.text || '').trim()) || b.type === 'tool_use'))
+  // The record that settles a pending meta record: main-file, `user` or `assistant`, and not a typed meta record.
+  const checkSettles = (rec) => !!rec && (rec.type === 'user' || rec.type === 'assistant') && rec.isSidechain !== true &&
+    !(rec.isMeta === true && checkTyped(rec))
+  const checkToolResult = (rec) => !!rec.message && Array.isArray(rec.message.content) && rec.message.content.some((b) => b && b.type === 'tool_result')
   const lines = text.split(/\r?\n/)
   const seen = [] // newest first; null marks a line that did not parse
   let opener = -1
+  let pending = -1 // the oldest typed meta record of the run still waiting for the record before it
   for (let i = lines.length - 1; i >= 0; i--) {
     if (!lines[i].trim()) continue
     let rec
     try { rec = JSON.parse(lines[i]) } catch { seen.push(null); continue }
+    if (pending >= 0 && checkSettles(rec)) {
+      if (!checkToolResult(rec)) opener = pending
+      pending = -1
+    }
     if (opener >= 0 && checkSpoke(rec)) break
     seen.push(rec)
-    if (checkTyped(rec)) opener = seen.length - 1
+    if (checkTyped(rec) && rec.isCompactSummary !== true) {
+      if (rec.isMeta === true) pending = seen.length - 1
+      else opener = seen.length - 1
+    }
   }
+  if (pending >= 0) opener = pending
   const turn = opener < 0 ? [] : seen.slice(0, opener + 1).reverse()
   return {
     records: turn.filter((r) => r && r.isSidechain !== true),
@@ -352,7 +382,10 @@ function extractTurnAgents(turn, transcriptText, sessionDir) {
     } else if (rec.type === 'attachment' && rec.attachment && rec.attachment.type === 'queued_command' && typeof rec.attachment.prompt === 'string') {
       note = rec.attachment.prompt.includes('<task-notification>') ? rec.attachment.prompt : ''
     }
-    for (const m of String(note || '').matchAll(/<tool-use-id>([^<]+)<\/tool-use-id>/g)) notified.push(m[1].trim())
+    // The HEADER's id alone (TOOL-aOrientedCast-24 S1): the first tag before the first `<result>`, so an
+    // id the agent quotes in its result names nothing. A second notification block in one record is lost.
+    const m = /<tool-use-id>([^<]+)<\/tool-use-id>/.exec(String(note || '').split('<result>')[0])
+    if (m) notified.push(m[1].trim())
   }
   let lines = null
   const readResult = (toolUseId) => {

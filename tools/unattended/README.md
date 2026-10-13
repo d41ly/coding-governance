@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.105 -->
+<!-- gov:kit unattended@1.106 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -103,12 +103,18 @@ unreadable input. Its suite, `gate-guard.test.sh`, is withheld like the others a
 The same hook refuses an unattended run's QUESTION (`TOOL-aOrientedCast-22`). An `AskUserQuestion`
 call exits 2 when a run-state record leased to the payload's `session_id` — its `session:` fact,
 read through `run-lease.js` — is in a phase outside `LANDED` and `ABORTED`, `HELD` included, and
-the deny names the run, its phase and record, and `unattended.sh --park` with the question and its
-option labels quoted from the payload. It keys on the session, not the branch, so an owner's
-attended session in the same checkout holds no lease and may still ask. It does not judge whether
-the question is one the protocol lets the run decide, and it fires only where the harness routes
-the tool through `PreToolUse`, which the suite cannot see because it feeds the hook its payload
-directly. A session started before the settings merge keeps the narrower matcher until it restarts.
+the run is not finished. A lease is finished when the driver's `--liveness` reads TERMINAL
+(`TOOL-aOrientedCast-24`), read through `stop-guard.js`'s own reader, so the two hooks ask one
+question and get one answer; any other verdict denies and is named, and a liveness that cannot be
+read leaves the recorded phase standing and says so. The deny names the run, its phase, liveness and
+record, and `unattended.sh --park` with the question and its option labels quoted from the payload;
+at `FINISHED-UNSTAMPED` it names `unattended.sh --landed` instead, the one act left. It keys on the
+session, not the branch, so an owner's attended session in the same checkout holds no lease and may
+still ask. It does not judge whether the question is one the protocol lets the run decide, and it
+fires only where the harness routes the tool through `PreToolUse`, which the suite cannot see because
+it feeds the hook its payload directly. The widened matcher reaches every session from its
+next tool call, one already running included, because the harness re-reads the hooks settings on
+each call (measured 2026-08-10, and recorded as a bug class in the memory tree).
 
 `govkit update` and `govkit apply` wire every fragment an install lands, before the kit's own
 `[check]` runs, through the target's `settings-merge.py` (a required kit since 1.33); a verify

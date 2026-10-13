@@ -2998,6 +2998,11 @@
       "file": "tools/unattended/stop-guard.js"
     },
     {
+      "id": "checkSettles",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
+    },
+    {
       "id": "checkSpecAuditDeclared",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -3031,6 +3036,11 @@
       "id": "checkTmpRoot",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkToolResult",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.js"
     },
     {
       "id": "checkTyped",

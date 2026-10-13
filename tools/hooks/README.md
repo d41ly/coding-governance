@@ -445,16 +445,24 @@ writes one witness line and requires nothing.
 
 **How the turn's agents are read.** From the transcript the payload's `transcript_path` names, read
 once and parsed from the end. The turn opens at the earliest of the last run of typed `user` records,
-the rule `runlog.py prose` uses. An `Agent` result carrying `agentId` owes an `agent` line, and a
+the rule `runlog.py prose` uses, with two exceptions since `TOOL-aOrientedCast-24`: a compaction
+summary opens nothing, and neither does a meta record in a run of meta records directly after a tool
+result, such as a Skill's expansion or an image's size note. Walking from the end, such a record waits
+until the next older `user` or `assistant` record that is not a meta record is parsed, and opens the
+turn only when that record holds no `tool_result` or there is none. An idle-wake tick or a stop hook's
+feedback follows assistant text, so it still opens its turn. An `Agent` result carrying `agentId` owes an `agent` line, and a
 `returned` line too when its status is `completed`. A `Workflow` result carrying `runId` owes an
 `agent` line for every `started` entry of `<session dir>/subagents/workflows/<run id>/journal.jsonl`,
 and a `returned` line for every `result` or `failed` entry unless it was launched in the background.
 A delivered task notification — a `user` record of origin `task-notification`, or a `queued_command`
 attachment — owes the `returned` line of the agent its `<tool-use-id>` names, or both lines for every
 agent of the run it names; a call in an earlier turn is found by the one raw line carrying its id and
-`toolUseResult`. A run id outside `[A-Za-z0-9_-]{1,64}` is never joined into a path, and the result's
-own `transcriptDir` is never followed. No `transcript_path`, an unreadable transcript or journal, a
-run id off its shape, or lines in the turn that do not parse each allow the arm with one witness line.
+`toolUseResult`. That id is read from the notification's header alone: the first `<tool-use-id>`
+before its first `<result>`, so an id the agent quotes in its result names nothing. A run id outside
+`[A-Za-z0-9_-]{1,64}` is never joined into a path, and the result's own `transcriptDir` is never
+followed. No `transcript_path`, an unreadable transcript or journal, or a run id off its shape allows
+the arm with one witness line each; lines in the turn that do not parse are counted into one witness
+line, and the arm still grades the records that parsed.
 
 **The bound.** It never blocks when `stop_hook_active` is true, so it refuses at most once per turn
 end and keeps no count. Every failure path allows, and an uncaught error exits 0.
@@ -465,8 +473,13 @@ stop that follows a block in the same chain, whichever hook blocked, so under an
 the first stop of each chain is graded. Of the agent lines it does not grade field values, an agent a
 sub-agent spawned, an agent a harness run starts after this stop, or a notification queued but not
 yet delivered; and it cannot tell a changed transcript format from a turn with no agent, since a
-renamed field reads as no agent at all. It does not prove it is wired. The transcript-level measure
-that covers what it cannot see is `runlog.py prose` (`TOOL-aHeardState-2`).
+renamed field reads as no agent at all. Of a record carrying two notification blocks it reads the
+first block's header id only, so the second agent's `returned` line is not required; no measured
+delivery carried two. A typed record that is not a meta record opens a turn wherever it sits, a tool
+result before it included, so an owner's interjection or an interrupt splits the turn there and an
+agent dispatched before it is not required after it. It does not prove it is wired. The
+transcript-level measure that covers what it cannot see is `runlog.py prose` (`TOOL-aHeardState-2`),
+which still opens a turn at every typed record, so the two readers differ on the two exceptions above.
 
 ## scratch-guard's fourth check: a role agent runs no gate
 
