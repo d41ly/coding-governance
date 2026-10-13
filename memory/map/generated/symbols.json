@@ -728,6 +728,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_graded_sha",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_growth_denies",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"

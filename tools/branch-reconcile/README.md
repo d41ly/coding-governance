@@ -100,9 +100,12 @@ python <this kit>/branch_reconcile.py --write --remote    # and the remote branc
 2. **Worktrees**, whose action is `remove worktree`, through the remover below; then
    `git worktree prune`.
 3. **Local branches**, whose action is `delete branch`, with `git branch -D`. A branch some kept
-   worktree still has checked out is kept and reported.
-4. **Remote branches** only under `--remote`, all in ONE `git push <remote> --delete`. Without it
-   the report counts them and leaves them.
+   worktree still has checked out is kept and reported, and so is one whose tip moved since it was
+   graded.
+4. **Remote branches** only under `--remote`, all in ONE push, each delete under a
+   `--force-with-lease` on the tip it was graded at, so a branch somebody pushed to after this
+   clone's fetch is refused and reported `failed` by name while the others still go. Without
+   `--remote` the report counts them and leaves them.
 
 Only `MERGED`, `EQUIVALENT` and `SUPERSEDED` rows are ever acted on. The default branch is excluded
 by name before its verdict is read, and so are the primary worktree and every stash entry. A

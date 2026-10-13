@@ -836,9 +836,53 @@ def arm_default_names():
               ("main" in branches, "refs/heads/main" in remote), (True, True))
 
 
+def arm_graded_sha():
+    """TOOL-dSweptBranches-13 — a ref that moved after it was graded is not deleted."""
+    base = build_dir()
+    repo = seed_repo(base)
+    with seed_environ():
+        run_git(repo, "branch", "landed-a", "main")
+        run_git(repo, "branch", "landed-b", "main")
+        run_git(repo, "push", "-q", "upstream", "landed-a", "landed-b")
+        run_git(repo, "fetch", "-q", "upstream")
+        other = base / "other"
+        run_git(base, "clone", "-q", "-o", "upstream", str(base / "remote.git"), str(other))
+        run_git(other, "checkout", "-q", "landed-b")
+        seed_commit(other, "late.txt", "pushed after the grading fetch\n", "feat: late work")
+        run_git(other, "push", "-q", "upstream", "landed-b")
+        rc, out = run_main("--root", str(repo), "--fresh-hours", "0", "--write", "--remote")
+        remote = run_git(repo, "ls-remote", "upstream")
+        check("graded-sha: AC1 a remote branch that moved after the fetch survives, named as failed",
+              ("refs/heads/landed-b" in remote, "landed-b" in out and "failed" in out, rc),
+              (True, True, 1))
+        check("graded-sha: AC1 the other deletable remote branch still goes",
+              "refs/heads/landed-a" in remote, False)
+
+    base = build_dir()
+    repo = seed_repo(base)
+    with seed_environ():
+        run_git(repo, "branch", "moving", "main")
+        run_git(repo, "checkout", "-q", "-b", "elsewhere")
+        later = seed_commit(repo, "later.txt", "x\n", "feat: later")
+        run_git(repo, "checkout", "-q", "main")
+        wt = base / "fx" / "wt"
+        run_git(repo, "worktree", "add", "-q", "-b", "wt-br", str(wt), "main")
+        real = BR.remove_worktree
+
+        def remove_then_move(root, path):
+            got = real(root, path)
+            run_git(repo, "branch", "-f", "moving", later)
+            return got
+        with seed_seam("remove_worktree", remove_then_move):
+            rc, out = run_main("--root", str(repo), "--fresh-hours", "0", "--write")
+        branches = set(run_git(repo, "for-each-ref", "--format=%(refname:short)", "refs/heads").split())
+        check("graded-sha: AC2 a local branch that moved after grading is kept and reported",
+              ("moving" in branches, "moving" in out and "moved" in out), (True, True))
+
+
 ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
         arm_content, arm_stash, arm_remover, arm_write, arm_keeps, arm_unread, arm_foreign,
-        arm_patch_negative, arm_probe_negative, arm_row_edit, arm_default_names]
+        arm_patch_negative, arm_probe_negative, arm_row_edit, arm_default_names, arm_graded_sha]
 
 
 def main():

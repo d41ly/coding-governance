@@ -1046,25 +1046,42 @@ def write_deletions(inv, rows, remote_too):
         if r["name"] in still or r["name"] in inv["default_names"]:
             print(f"kept — branch {r['name']} · still checked out in a worktree")
             continue
+        # COMPARE BEFORE DELETE (TOOL-dSweptBranches-13): the verdict was graded on r["tip"], and a
+        # branch that moved since holds work nobody graded.
+        now = read_git(root, "rev-parse", "--verify", "--quiet", "refs/heads/" + r["name"])
+        if now != r["tip"]:
+            print(f"kept — branch {r['name']} · moved since it was graded "
+                  f"({r['tip'][:12]} -> {now[:12] or 'gone'})")
+            continue
         WRITE_TRACE.append(("delete-branch", r["name"]))
         rc, _out = run_git(root, "branch", "-D", "--", r["name"])
         failed = failed or rc != 0
         print(f"{'deleted' if rc == 0 else 'failed'} — branch {r['name']} · was {r['tip'][:12]}")
-    names = [r["name"][len(inv["remote"]) + 1:] for r in rows
-             if r["action"] == "delete remote branch (--remote)"]
-    names = [n for n in names if n not in inv["default_names"]]
+    graded = {r["name"][len(inv["remote"]) + 1:]: r["tip"] for r in rows
+              if r["action"] == "delete remote branch (--remote)"}
+    names = [n for n in graded if n not in inv["default_names"]]
     if remote_too and names:
         WRITE_TRACE.append(("push-delete", tuple(names)))
+        # ONE push, EACH REF UNDER ITS OWN LEASE on the tip it was graded at (TOOL-dSweptBranches-13):
+        # the tracking ref may be stale, and a delete must never take a tip nobody graded. Not
+        # --atomic, so a refused ref keeps only itself.
+        leases = [f"--force-with-lease=refs/heads/{n}:{graded[n]}" for n in names]
         try:
-            p = subprocess.run(["git", "-C", str(root), "push", inv["remote"], "--delete", *names],
-                               capture_output=True)
-            rc, err = p.returncode, p.stderr.decode("utf-8", errors="replace").strip()
+            p = subprocess.run(["git", "-C", str(root), "push", "--porcelain", *leases, inv["remote"],
+                                *[f":refs/heads/{n}" for n in names]], capture_output=True)
+            out = p.stdout.decode("utf-8", errors="replace")
         except OSError as exc:
-            rc, err = 127, str(exc)
-        failed = failed or rc != 0
-        why = "" if rc == 0 else " · " + (err.splitlines() or ["git push failed"])[-1]
-        print(f"{'deleted' if rc == 0 else 'failed'} — {len(names)} remote branch(es) on {inv['remote']} "
-              f"in one push: {' '.join(names)}{why}")
+            out = ""
+            print(f"failed — the push could not run: {exc}")
+        done = {line.split("\t")[1].split(":refs/heads/", 1)[-1]: line[0] for line in out.splitlines()
+                if line[:1] in "-!*=" and "\t:refs/heads/" in line}
+        for n in names:
+            ok = done.get(n) == "-"
+            failed = failed or not ok
+            print(f"{'deleted' if ok else 'failed'} — remote branch {inv['remote']}/{n} · was "
+                  f"{graded[n][:12]}" + ("" if ok else " · refused: it moved since it was graded, or "
+                                         "the push failed"))
+        print(f"push — one push carried {len(names)} remote branch deletion(s) to {inv['remote']}")
     elif names:
         print(f"kept — {len(names)} deletable remote branch(es): --remote deletes them in one push")
     return 1 if failed else 0
