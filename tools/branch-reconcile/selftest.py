@@ -26,7 +26,7 @@ from contextlib import redirect_stdout
 
 HERE = pathlib.Path(__file__).resolve().parent
 CLI = HERE / "branch_reconcile.py"
-ASSERTION_FLOOR = 90
+ASSERTION_FLOOR = 92
 PASS, FAIL, SKIPPED = [], [], []
 SCRATCH = []
 
