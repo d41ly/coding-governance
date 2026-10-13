@@ -720,8 +720,38 @@ def arm_unread():
         check("unread: AC1 --write leaves its untracked file", (wt / "notes.txt").exists(), True)
 
 
+def arm_foreign():
+    """TOOL-dSweptBranches-8 — another repository at a registered worktree path survives --write."""
+    base = build_dir()
+    repo = seed_repo(base)
+    key = lambda p: str(p).replace("\\", "/")
+    with seed_environ():
+        wt = base / "fx" / "taken"
+        run_git(repo, "worktree", "add", "-q", "-b", "taken-br", str(wt), "main")
+        shutil.rmtree(wt)
+        wt.mkdir()
+        run_git(wt, "init", "-q", "-b", "main")
+        seed_commit(wt, "own.txt", "its own history\n", "foreign: unpushed work")
+        gone = base / "fx" / "gone"
+        run_git(repo, "worktree", "add", "-q", "-b", "gone-br", str(gone), "main")
+        shutil.rmtree(gone)
+        rows = read_rows(run_cli(repo, "--fresh-hours", "0")[1])
+        check("foreign: AC1 a foreign repository at a worktree path reads UNKNOWN",
+              read_verdict(rows, "worktree/sibling", key(wt))[0], "UNKNOWN")
+        rc, out = run_main("--root", str(repo), "--fresh-hours", "0", "--write")
+        check("foreign: AC1 --write leaves the foreign repository and its commit",
+              ((wt / ".git").is_dir(), (wt / "own.txt").exists()), (True, True))
+        listed = run_git(repo, "worktree", "list", "--porcelain")
+        check("foreign: AC1 a worktree whose path is gone is pruned, and the run exits 0",
+              (rc, key(gone) in listed), (0, False))
+        with seed_seam("run_worktree_remove", lambda root, path: (1, "fatal: '.git' is not a .git file")):
+            got = BR.remove_worktree(repo, str(wt))
+        check("foreign: AC1 the rm -rf fallback refuses a path that is not this repository's worktree",
+              (got[0], (wt / "own.txt").exists()), ("failed", True))
+
+
 ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
-        arm_content, arm_stash, arm_remover, arm_write, arm_keeps, arm_unread]
+        arm_content, arm_stash, arm_remover, arm_write, arm_keeps, arm_unread, arm_foreign]
 
 
 def main():

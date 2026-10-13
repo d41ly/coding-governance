@@ -303,6 +303,26 @@ def read_commit_time(root, rev):
     return int(out) if out.isdigit() else 0
 
 
+def check_worktree_identity(root, path):
+    """-> "" when <path> is provably a linked worktree of the repository at <root>, else why not.
+
+    git's registry names a path, not what now sits there (TOOL-dSweptBranches-8): the directory may
+    have been replaced by another repository, whose clean status would grade it on the registered
+    HEAD and whose refusal to be removed as a worktree would hand it to `rm -rf`. Proof is a `.git`
+    FILE whose common dir is this repository's.
+    """
+    dotgit = pathlib.Path(path) / ".git"
+    if dotgit.is_dir():
+        return "it holds a .git directory of its own, so it is another repository"
+    if not dotgit.is_file():
+        return "it has no .git file"
+    mine = read_git(root, "rev-parse", "--path-format=absolute", "--git-common-dir")
+    theirs = read_git(path, "rev-parse", "--path-format=absolute", "--git-common-dir")
+    if not mine or not theirs or derive_key(mine) != derive_key(theirs):
+        return "its git common dir is not this repository's"
+    return ""
+
+
 def read_worktrees(root):
     rc, out = run_git(root, "worktree", "list", "--porcelain", "-z")
     if rc != 0:
@@ -316,6 +336,12 @@ def read_worktrees(root):
         w["invoking"] = bool(here) and derive_key(here) == derive_key(w["path"])
         readable = "prunable" not in w["flags"] and "bare" not in w["flags"] \
             and os.path.isdir(w["path"])
+        w["foreign"] = ""
+        if readable and w["kind"] != "worktree/primary":
+            w["foreign"] = check_worktree_identity(root, w["path"])
+            if w["foreign"]:
+                w["flags"].append("foreign")
+                readable = False
         others = [p for p in paths if derive_key(p) != derive_key(w["path"])]
         w["dirt"] = read_dirt(w["path"], others) if readable else None
         w["ct"] = read_commit_time(root, w["head"]) if w["head"] else 0
@@ -635,6 +661,8 @@ def check_worktree(inv, item):
         return None
     if w["invoking"]:
         return IN_PROGRESS, "the worktree this report was run from"
+    if w.get("foreign"):
+        return UNKNOWN, f"not provably this repository's worktree: {w['foreign']}"
     if inv["now"] - read_newest_activity(inv, w) < inv["fresh"]:
         return IN_PROGRESS, f"activity inside the {inv['fresh'] / 3600:g}h freshness bound"
     st = w["dirt"]
@@ -888,11 +916,18 @@ def remove_worktree(root, path):
     git's removal first. On its failure, `rm -rf` and `git worktree prune`. A directory that survives
     a clean removal is a skeleton candidate, removed only when it holds no regular file.
     """
+    # A registered worktree whose directory is gone needs no special case: git's own removal drops
+    # it, measured. PROVED BEFORE git's removal runs, because a removal that fails part-way may already have
+    # taken the .git file the proof reads (TOOL-dSweptBranches-8).
+    foreign = check_worktree_identity(root, path)
     rc, err = run_worktree_remove(root, path)
     rm = shutil.which(RM_NAME)
     how = "git worktree remove"
     if rc != 0:
         first = (err.splitlines() or ["no message"])[-1]
+        if foreign:
+            return "failed", (f"git worktree remove failed ({first}) and the path is not provably "
+                              f"this repository's worktree ({foreign}), so no rm -rf ran")
         if not rm:
             return "failed", (f"skipped — git worktree remove failed ({first}) and `{RM_NAME}` is "
                               "not on PATH, so no fallback ran")

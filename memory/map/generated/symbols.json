@@ -718,6 +718,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_foreign",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
       "id": "arm_growth_denies",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
@@ -4754,6 +4759,11 @@
     },
     {
       "id": "check_worktree",
+      "kind": "function",
+      "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_worktree_identity",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },

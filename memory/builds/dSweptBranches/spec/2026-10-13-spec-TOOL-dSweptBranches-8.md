@@ -1,10 +1,13 @@
 # TOOL-dSweptBranches-8 — a registered worktree path holding another repository is never graded as the worktree, and rm -rf reaches only a proven worktree
 
-**Status:** OPEN · rev-1 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 7
+**Status:** CLOSED · rev-2 · 2026-10-13 · node d · Tier-2 · base 2b852f5f · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-13-build-TOOL-dSweptBranches-8-1-acceptance-ledger.md](../build/2026-10-13-build-TOOL-dSweptBranches-8-1-acceptance-ledger.md) | journal | — |
+| [2026-10-13-prompt-TOOL-dSweptBranches-8-1-build-brief.md](../prompts/2026-10-13-prompt-TOOL-dSweptBranches-8-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -15,7 +18,7 @@ Promoted from the closing review's round 1, H2 (ids 1). A worktree path is grade
 ## 2. Scope (IN)
 
 - **S1** — read_worktrees proves each existing linked worktree's identity: `<path>/.git` is a FILE and `git -C <path> rev-parse --path-format=absolute --git-common-dir` equals the inventory's common dir by `derive_key`. A worktree that fails it is flagged `foreign`, its status is not read, and it reads `UNKNOWN`. Observed by AC1.
-- **S2** — remove_worktree runs only `git worktree prune` when the path does not exist, and reports `removed`. Its `rm -rf` fallback runs only after S1's identity check passes on the path; otherwise the row fails. Observed by AC1.
+- **S2** — remove_worktree runs S1's identity check before git's removal, because a removal that fails part-way may take the `.git` file the check reads, and its `rm -rf` fallback runs only when that check passed; otherwise the row fails. A registered worktree whose path is gone needs no special case: git's own removal drops it, measured. Observed by AC1.
 
 ## 3. Non-goals (OUT)
 
@@ -70,6 +73,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft, promoted at the closing diff review's exit.
+- rev-2 · 2026-10-13 · S2 · the prune-only branch for a gone path is dropped: git's removal already drops such a worktree, so a staged break of the branch stayed green, and the check is run before git's removal rather than after it.
 
 ## 10. Reuse audit
 
