@@ -1,0 +1,985 @@
+// **Serves:** research TOOL-aScoutedSeam-1
+[
+ {
+  "id": "incms-decor-texture",
+  "short": "c01",
+  "repo": "incms",
+  "point": "in-build",
+  "sha": "f7df425de21fc38abad8cbbff987a452d6b4d60c",
+  "sha_before": "f7df425de21fc38abad8cbbff987a452d6b4d60c",
+  "slug": "aEtchedColophon",
+  "prompt": "Owner, 2026-07-02 (session bccf7851): \"Torn-Paper Collage (04) looks incredible for the primary style. Editorial Ink & Wash (02) and Evergreen Linework (05) ... look amazing as well. ... What can we do to spin all of these to production as the actual project design?\" Then ratified decision O-1 (2026-07-03): build the richer per-section `decor` field (pattern catalog key + optional `source:MediaRef` + placement + opacity + scale) as NicoCares editorial Phase 1 core capability. The build-session prompt itself was not recovered.",
+  "reconstructed": true,
+  "ground_truth": [
+   {
+    "path": "packages/blocks/src/fields/imageField.tsx",
+    "symbol": "imageField",
+    "why": "the Puck custom-field factory for an image prop, in packages/blocks; 14 files already called it; its control opens the shared gallery modal"
+   },
+   {
+    "path": "packages/blocks/src/fields/MediaPickerField.tsx",
+    "symbol": "MediaPickerField",
+    "why": "the field imageField wraps; rewired to the shared modal on 2026-07-01 (756c395b1)"
+   },
+   {
+    "path": "packages/blocks/src/fields/mediaPickerBridge.tsx",
+    "symbol": "useMediaPickerBridge",
+    "why": "the blocks-to-web bridge that reaches MediaGalleryModal from packages/blocks"
+   },
+   {
+    "path": "apps/web/components/admin/media/MediaGalleryModal.tsx",
+    "symbol": "MediaGalleryModal",
+    "why": "the modal itself: browse, search, upload, select, multi-select"
+   }
+  ],
+  "reinvention": {
+   "sha": "f5b390ee2fe77a13920f3ee288c828e1e22e4370",
+   "paths": [
+    "packages/blocks/src/shared/decor.tsx"
+   ],
+   "what": "DECOR_FIELD.source.url is a plain Puck text input labelled 'Image URL (/uploads/... or https://...)', applied to every section and block. No browse, search, upload, focal point, alt text or mediaId. The spec asked for `source:MediaRef`; the build copied Background.tsx's pre-picker `url: text` field (2026-06-10). Still present at 81800a0f9."
+  },
+  "probe_evidence": "No probe existed at sha_before: there was no reuse_lookup, no symbols.json and no memory/map. Counterfactual (HEAD reuse_lookup transplanted, map generated fresh, 0 dossiers, 2237 symbols): 'pick an image for a block property' put imageField #1 and MediaPickerField #7 of 146. 'choose or upload media in the block inspector' put MediaPickerField #4 of 206, with imageField absent. 'let the author select a texture image from the media library' put imageField #3 of 128. Session-framed 'a decorative pattern or texture layer behind section content' returned none of the picker seams (0 of 62)."
+ },
+ {
+  "id": "incms-dsl-designdata-media",
+  "short": "c02",
+  "repo": "incms",
+  "point": "in-build",
+  "sha": "80277653aa781ad6f12832fa17f90cc87a28865a",
+  "sha_before": "80277653aa781ad6f12832fa17f90cc87a28865a",
+  "slug": "dGraftedAtelier",
+  "prompt": "Reconstructed from spec dGraftedAtelier-1 section 0, 'The two gaps the owner names': (1) let plugins contribute designs to the pre-built sections at install time, not just build time; (2) plugin (DSL) blocks are second-class and 'compiled components' have no plugin path. Q2 was ratified IN: plugin designs may declare a propsSchema, whose author values live in `designData`, edited through the `descriptorInspectorFields` output (WU-A).",
+  "reconstructed": true,
+  "ground_truth": [
+   {
+    "path": "packages/blocks/src/fields/imageField.tsx",
+    "symbol": "imageField",
+    "why": "a packages/blocks custom field that defineSection's resolveFields can return directly; Hero.tsx (a defineSection section) already used imageField for backgroundImage at sha_before"
+   },
+   {
+    "path": "packages/blocks/src/fields/MediaPickerField.tsx",
+    "symbol": "MediaPickerField",
+    "why": "already the widget for DSL ref:\"media\" on the PluginBlock path (pluginBlockFields.tsx, dChiseledGrammar, 2026-07-02)"
+   },
+   {
+    "path": "packages/blocks/src/fields/mediaPickerBridge.tsx",
+    "symbol": "useMediaPickerBridge",
+    "why": "built on 2026-07-01 specifically so packages/blocks can open the apps/web modal without importing apps/web"
+   }
+  ],
+  "reinvention": {
+   "sha": "4ce836c037540d2c5dabf379100914f6940a1d24",
+   "paths": [
+    "packages/blocks/src/dsl/editorFields.ts"
+   ],
+   "what": "nativeScalarField maps a DSL `ref:\"media\"` prop to `{type:\"text\"}` in a plugin section design's designData inspector, so the author has to type a URL. The code comment claims the 'media picker live[s] in apps/web; packages/blocks can't import them', which was false at sha_before. Still present at 81800a0f9."
+  },
+  "probe_evidence": "No probe existed at sha_before. Counterfactual (HEAD tool transplanted, fresh map, 2547 symbols, 0 dossiers): 'pick an image for a block property' put imageField #1 and MediaPickerField #7 of 151. 'choose or upload media in the block inspector' put MediaPickerField #4 of 222. Session-framed 'inspector fields for a plugin section design's author data' put imageField #8 and MediaPickerField #22 of 265."
+ },
+ {
+  "id": "incms-hero-accents",
+  "short": "c03",
+  "repo": "incms",
+  "point": "in-build",
+  "sha": "be4c1bb4843ca631fd97ecb422089c42b63803d1",
+  "sha_before": "be4c1bb4843ca631fd97ecb422089c42b63803d1",
+  "prompt": "Reconstructed: NicoCares exact-port core program, STREAM C (eFacetedPortico), gap V5 '[DELTA]', described as 'the owner's literal torn-paper build'. Asks for positioned multi-spot decorative accents on the Hero: corner-anchored image or pattern spots with bounded offset, size, rotation and opacity.",
+  "reconstructed": true,
+  "ground_truth": [
+   {
+    "path": "packages/blocks/src/fields/imageField.tsx",
+    "symbol": "imageField",
+    "why": "the image-prop field factory, already used in the SAME file being edited (Hero.tsx backgroundImage: imageField(...))"
+   },
+   {
+    "path": "packages/blocks/src/fields/MediaPickerField.tsx",
+    "symbol": "MediaPickerField",
+    "why": "the gallery-backed picker the factory renders"
+   },
+   {
+    "path": "apps/web/components/admin/media/MediaGalleryModal.tsx",
+    "symbol": "MediaGalleryModal",
+    "why": "the shared modal"
+   }
+  ],
+  "reinvention": {
+   "sha": "82e7fecc33d0d52972b5d7e325e50d708d1642ee",
+   "paths": [
+    "packages/blocks/src/shared/decor.tsx",
+    "packages/blocks/src/sections/Hero.tsx"
+   ],
+   "what": "HERO_ACCENTS_FIELD gives each spot `source.url` as a text input ('Image URL (/uploads/... or https://...)'), copied from DECOR_FIELD, so it is a copy of a copy. Hero.tsx itself already used imageField for its background image."
+  },
+  "probe_evidence": "As-of-then artifacts (the repo's own committed map read by HEAD reuse_lookup: 0 symbols, 487 inventory keys, 8 dossiers): no picker symbol on any phrase. The closest rows were the unclaimed help key media-gallery.md (#20 of 27 for q3, #35 of 47 for q2) and the media-embeds Shared-seams block (#18 to #33). Counterfactual fresh map (2706 symbols): q1 put imageField #1 and MediaPickerField #7 of 167. Session-framed 'positioned decorative accent spots on the hero' returned none of the picker seams (0 of 20)."
+ },
+ {
+  "id": "incms-productcard-image",
+  "short": "c04",
+  "repo": "incms",
+  "point": "in-build",
+  "sha": "b0e1d6c7331ba30f8157477d06391ef4108a9386",
+  "sha_before": "b0e1d6c7331ba30f8157477d06391ef4108a9386",
+  "prompt": "Reconstructed: owner mandate 2026-07-16, 'build ALL 15 specs in .../2026-07-16-ARCH-aWeighedArena/spec/ ... fully unattended'. Unit U10/B10's goal: 'Give inCMS a truthful \"can I sell things?\" answer' with a thin ProductCard block (optional image, name, price text, hosted-checkout buy button).",
+  "reconstructed": true,
+  "ground_truth": [
+   {
+    "path": "packages/blocks/src/fields/imageField.tsx",
+    "symbol": "imageField",
+    "why": "an optional product image is exactly an ImageRef prop; imageField yields the gallery picker, focal point and alt text"
+   },
+   {
+    "path": "packages/blocks/src/fields/MediaPickerField.tsx",
+    "symbol": "MediaPickerField",
+    "why": "the gallery-backed widget"
+   },
+   {
+    "path": "apps/web/components/admin/media/MediaGalleryModal.tsx",
+    "symbol": "MediaGalleryModal",
+    "why": "the shared modal"
+   }
+  ],
+  "reinvention": {
+   "sha": "a5bbb20d7991ff011ef7733d4029a46d5a7c48a6",
+   "paths": [
+    "packages/blocks/src/blocks/ProductCard.tsx"
+   ],
+   "what": "`image: { type: \"text\", label: \"Image URL (optional)\" }` plus a separate `imageAlt` text field, rendered as a raw <img> carrying `eslint-disable-next-line incms/focal-coverage -- bare-URL image, no mediaId`. The sub-spec planned that disable in advance."
+  },
+  "probe_evidence": "As-of-then artifacts (0 symbols, 622 keys, 40 dossiers): no picker symbol on any phrase; media-gallery.md was #26 of 35 for q3. Counterfactual fresh map (3131 symbols): q1 put imageField #1 and MediaPickerField #8 of 185. Session-framed 'a product card block with an image, name, price and a buy button' put imageField #2 of 205, with MediaPickerField absent."
+ },
+ {
+  "id": "incms-email-image",
+  "short": "c05",
+  "repo": "incms",
+  "point": "in-build",
+  "sha": "7f35d58b97bcd12edc8accc7180dd1c5a9745313",
+  "sha_before": "7f35d58b97bcd12edc8accc7180dd1c5a9745313",
+  "slug": "dCandidPostmark",
+  "prompt": "Reconstructed: the owner's email objective (dCandidPostmark, 2026-07-18): 'account-creation notifications, magic-link login, marketing email creation, subscription lists, and rate-limited sending'. Unit 5 builds the email block family, including EmailImage {src, alt, width, href}.",
+  "reconstructed": true,
+  "ground_truth": [
+   {
+    "path": "packages/blocks/src/fields/imageField.tsx",
+    "symbol": "imageField",
+    "why": "an author-picked campaign image; the picker returns the asset URL. Caveat: email needs an absolute URL, so the renderer must absolutize a site-relative /uploads path, which is a renderer concern and not a reason for a text box"
+   },
+   {
+    "path": "packages/blocks/src/fields/MediaPickerField.tsx",
+    "symbol": "MediaPickerField",
+    "why": "the gallery-backed widget"
+   }
+  ],
+  "reinvention": {
+   "sha": "eaee8652351952e31a6e62d50714a2ad088f3c8a",
+   "paths": [
+    "packages/blocks/src/email/blocks/EmailImage.tsx"
+   ],
+   "what": "`src: { type: \"text\", label: \"Image URL\" }`, so an email author types a URL. The spec never mentions the picker. Duplicative with the absolutization caveat above."
+  },
+  "probe_evidence": "As-of-then artifacts (0 symbols, 691 keys, 63 dossiers): no picker symbol; media-embeds Shared-seams was #43 to #59. Counterfactual fresh map (3517 symbols): q1 put imageField #1 and MediaPickerField #10 of 204. Session-framed 'an image block for email campaigns' put imageField #1 of 270."
+ },
+ {
+  "id": "incms-ctl-remoteform-file",
+  "short": "c06",
+  "repo": "incms",
+  "point": "kickoff",
+  "sha": "1e409fefdd9cd3fd92623040f984ab44cfdd842a",
+  "sha_before": "5252ec8f3ac0ee3418aa4cb799200945b8c03666",
+  "slug": "aSluicedConduit",
+  "prompt": "Reconstructed: ARCH-aSluicedConduit-1 C5 (S3), a DSL remoteForm `file` control: a site VISITOR attaches a file to a form step, and the multipart body is relayed byte-identical to the plugin's upstream route.",
+  "reconstructed": true,
+  "ground_truth": [],
+  "decoys": [
+   {
+    "path": "packages/blocks/src/fields/imageField.tsx",
+    "symbol": "imageField",
+    "why": "the admin media picker factory; a visitor file goes to the plugin upstream and never becomes a MediaAsset"
+   },
+   {
+    "path": "packages/blocks/src/fields/MediaPickerField.tsx",
+    "symbol": "MediaPickerField",
+    "why": "admin picker"
+   },
+   {
+    "path": "apps/web/components/admin/media/MediaGalleryModal.tsx",
+    "symbol": "MediaGalleryModal",
+    "why": "admin picker"
+   }
+  ],
+  "reinvention": {
+   "sha": "823340d1c9c65fbbeeeaa8561fa848f5bc165b93",
+   "paths": [
+    "packages/blocks/src/dsl/RemoteMount.tsx"
+   ],
+   "what": "A native <input type=file> in the public remoteForm. This is legitimately different: the user is an anonymous visitor with no access to the admin media library, and the bytes go to a third-party upstream and never become a MediaAsset."
+  },
+  "probe_evidence": "Native reuse_lookup at sha_before (codebase-map/reuse_lookup.py, 4190 symbols, 78 dossiers): 'let a visitor attach a file to a remote form' surfaced no picker seam (0 of 147). 'upload a file from a form field to the upstream route' put imageField #6 and MediaPickerField #32 of 412, which is a false-positive lure a reuse workflow must reject."
+ },
+ {
+  "id": "incms-ctl-entry-image-fieldname",
+  "short": "c07",
+  "repo": "incms",
+  "point": "kickoff",
+  "sha": "00ad59d2df54b9a1a55141ae941493e411514797",
+  "sha_before": "0046c40021820a28a599e5c011b7a4341271a9bc",
+  "slug": "bIndexedAlmanac",
+  "prompt": "Reconstructed: BLOCK-bIndexedAlmanac-3, EntryPrevNext links the older and newer entry by publish date and can show each entry's image.",
+  "reconstructed": true,
+  "ground_truth": [],
+  "decoys": [
+   {
+    "path": "packages/blocks/src/fields/MediaPickerField.tsx",
+    "symbol": "MediaPickerField",
+    "why": "the text box names WHICH entry field holds the image, a schema key; a picker is the wrong control. resolveEntryImage in imageField.tsx IS the right render seam, so imageField.tsx is not a decoy by path"
+   },
+   {
+    "path": "apps/web/components/admin/media/MediaGalleryModal.tsx",
+    "symbol": "MediaGalleryModal",
+    "why": "admin picker"
+   }
+  ],
+  "reinvention": {
+   "sha": "758da28e3f233d1dbd0ad237d4c15867da435569",
+   "paths": [
+    "packages/blocks/src/blocks/EntryPrevNext.tsx"
+   ],
+   "what": "`imageField: { type: \"text\", label: \"Image field (blank = image/photo/cover...)\" }` names WHICH entry field holds the image. It is a schema-key selector, not an image picker, and it follows the CollectionList and EntryFields precedent. Legitimately different."
+  },
+  "probe_evidence": "The native reuse_lookup at sha_before REFUSED to run (exit 2): '.cjs/.js/.sh ... is NOT declared dark', because the conf had RECALL_DARK_LAYERS=\"\". The probe was unusable in inCMS from about 2026-09-09 until a2ba4c7c5 (2026-10-02)."
+ },
+ {
+  "id": "nc-medint-v1",
+  "short": "c08",
+  "repo": "nicocares",
+  "point": "in-build",
+  "sha": "69cfcd6720c076cf107ce3fbb7127659531ccf38",
+  "sha_before": "69cfcd6720c076cf107ce3fbb7127659531ccf38",
+  "core_point_sha": "79985db193f24a9a58fbe3ca346cb2a66f037555",
+  "core_sha": "069f04599637017f33abfabebd48f66d5ad977fd",
+  "slug": "aMendedThreshold",
+  "prompt": "When a user is eligible and finishes paying their platform subscription, they are redirected to the /medical-intake page - the second part of the intake quiz which covers medical question and document upload. This functionality fully exists in the NicoCares backend API but has no been build into the NicoCares submodule AT ALL. ... Build the full medical intake route for authorized users only, fully reconcile with the NicoCares backend api ... Medical intake should be visible in the user account area ... This intake should submit information to the backend ON EVERY STEP (every question) ... [test-instance login lines omitted: they carry a credential]",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "package/nicocares-v3/blocks/descriptors.json",
+    "symbol": "quiz-intake (parts nc-quiz-stage, nc-quiz-bg, nc-quiz-topbar, nc-quiz-card)",
+    "repo": "nicocares",
+    "why": "the /intake quiz is the 'first part' the owner names; its descriptor already carried the stage, topbar, card, option-card and step-motion design the second part should share"
+   },
+   {
+    "path": "package/nicocares-v3/site-css/site.css",
+    "symbol": "--nc-r, --nc-shadow-lg, --nc-card (:root token layer)",
+    "repo": "nicocares",
+    "why": "the card radius/shadow tokens the quiz card reads; the new card used core's --radius-lg with a 14px fallback instead, a different radius from the quiz's 16px"
+   },
+   {
+    "path": "package/nicocares-v3/content/pages/21-quiz-a.json",
+    "symbol": "quiz-intake mount (/intake)",
+    "repo": "nicocares",
+    "why": "the live page that is the visual reference"
+   },
+   {
+    "path": "help/package-styling-surface.md",
+    "symbol": "core-step / core-* data-part contract",
+    "repo": "incms",
+    "why": "the stable remoteForm chrome hooks the quiz sheet styles; a second stepped form inherits them"
+   }
+  ],
+  "reinvention": {
+   "sha": "f31e8991b6827072192139e4a13a064ea09d1868",
+   "paths": [
+    "package/nicocares-v3/blocks/descriptors.json"
+   ],
+   "what": "new medical-intake descriptor with its own nc-mi-* part namespace: a plain 44rem section, a bordered nc-mi-form card (border-radius var(--radius-lg,14px), padding clamp(16px,3vw,28px)), literal h1/h2 type (clamp(1.6rem,3vw,2.2rem), 1.25rem, -.02em); 957 css chars vs the quiz's 7714; no stage, topbar, option cards, progress or motion. dLimnedTriage's README later tabulated the gap."
+  },
+  "probe_evidence": "Spec aMendedThreshold-2 section 10 audits functional seams only: 'The wizard reuses remotePanel + remoteForm + flow, which the shipped quiz-intake descriptor already proves'. Scope S8 and the files list say only that the descriptor carries its own scoped CSS. No probe-log rows exist that day (lookups.jsonl starts 2026-09-23). Replay at sha_before: 'stepped medical questionnaire page styled like the intake quiz' gives 5 name-sorted candidates, with quiz-intake 4th as a bare descriptor slug. 'card surface with radius and shadow for a form step' gives 14 candidates, none of them quiz-intake, s..."
+ },
+ {
+  "id": "nc-medint-restage",
+  "short": "c09",
+  "repo": "nicocares",
+  "point": "kickoff",
+  "sha": "9264eed04da1d174cd53043ae99d8cc9d2a39e67",
+  "sha_before": "2d7d417667074316ac42576531b467751d39c260",
+  "core_point_sha": "89d9ffb297935019f4e59c67391e5082c991de44",
+  "core_sha": "ccdec1649ca04746c606ca6c0f5c075f621614c6",
+  "slug": "dLimnedTriage",
+  "prompt": "New work session in NicoCares. Fund any core functionality as necessary. Focus: `medical-intake` route. `medical-intake` design **not developed properly**. It should follow the same pattern as `/intake` currently does. Drive through `medical-intake` AND review backend documentation `backend/medical_intake.md`, find all points of improvement, converge them into a build, execute per the protocol.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "package/nicocares-v3/blocks/descriptors.json",
+    "symbol": "quiz-intake (nc-quiz-stage dark ink ground + radial glow, transparent nc-quiz-topbar, nc-quiz-card on --nc-shadow-lg, 680px column)",
+    "repo": "nicocares",
+    "why": "the pattern the owner named, verbatim"
+   },
+   {
+    "path": "package/nicocares-v3/site-css/site.css",
+    "symbol": "--nc-ink, --nc-shadow-lg, --nc-r",
+    "repo": "nicocares",
+    "why": "the stage ground and card elevation tokens the quiz reads"
+   },
+   {
+    "path": "package/nicocares-v3/content/pages/21-quiz-a.json",
+    "symbol": "/intake page",
+    "repo": "nicocares",
+    "why": "the live reference surface"
+   }
+  ],
+  "reinvention": {
+   "sha": "f46d8c75b5fa891b911715ca956d10e18a6580f4",
+   "paths": [
+    "package/nicocares-v3/blocks/descriptors.json"
+   ],
+   "what": "the stage is 're-expressed, not copied' as a parallel nc-mi-stage/-bg/-topbar/-content/-col/-card namespace. The sheet landed in 9c5fa6ec9f605f61370b3fd2f1809fcadcc4cf81, and it paints a different design: a light --nc-paper ground, a white topbar with a bottom border, the card on --nc-shadow with clamp(20px,4vw,40px) padding in a 44rem column. The quiz paints a dark --nc-ink ground with a radial glow, a transparent topbar, and the card on --nc-shadow-lg with clamp(24px,4vw,44px) padding in a 680px column. Fourteen days later the owner reported the route 'considerably visually different from the intake quiz'."
+  },
+  "probe_evidence": "Spec dLimnedTriage-1 section 10 names the right seam: 'The seam is quiz-intake's stage composition, read structurally rather than copied'. It rejects a port because the quiz sheet is '7 714 authored chars against a 10 000-char post-scope cap'. The probe phrase the spec records ('stepped multi-step wizard page design for a medical questionnaire') does NOT list quiz-intake on replay. Its 7 candidates are the plumbing seams plus the medical-intake slug, and the seam came from dossier prose. Replay of 'medical intake page that follows the same design pattern as the intake quiz' lists quiz-intak..."
+ },
+ {
+  "id": "nc-medint-gilded",
+  "short": "c10",
+  "repo": "nicocares",
+  "point": "kickoff",
+  "sha": "946e3d87938b64f00abd3630405fc877f9dbcbd9",
+  "sha_before": "ea723ce784af2a35d216de65f3214d24afa379b1",
+  "core_point_sha": "ddbf2786b70fd4b05e2f2dd9f81f69e119b9295c",
+  "core_sha": "a8fc21d401402ddda6ce71a022cded1d3ba19fce",
+  "slug": "bGildedVestibule",
+  "prompt": "Medical intake route (`account/medical-intake`) isn't properly styled at the moment - it is considerably visually different from the intake quiz `/intake` and glares several styling issues. Fund and required core inCMS functionality and fix the following: * Fully review every current step of the Medical Intake, find styling issues and correct them. * Suggest and implement visual improvements for the route. * Ensure that 'Medical Intake is next' card is greyed out ...",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "package/nicocares-v3/blocks/descriptors.json",
+    "symbol": "quiz-intake step metrics (nc-quiz-stage, nc-quiz-card, option-card rules)",
+    "repo": "nicocares",
+    "why": "the measured instance the medical intake must match. Its spacing/type/control metrics existed only as literals, so the correct move was to EXTRACT them into shared tokens at instance #2 (charter section 12). bResumedWicket-1 did that a week later."
+   },
+   {
+    "path": "package/nicocares-v3/site-css/site.css",
+    "symbol": "--nc-fs-h2, --nc-fs-card-title, --nc-r-sm, --nc-track-display",
+    "repo": "nicocares",
+    "why": "type and radius tokens that already existed (dPolishedVitrine, 2026-09-11) and that the restyle's literals restated"
+   }
+  ],
+  "reinvention": {
+   "sha": "a0cbc474f060c01408a73bab211b3f3afca5f6ea",
+   "paths": [
+    "package/nicocares-v3/blocks/descriptors.json",
+    "package/nicocares-v3/site-css/site.css"
+   ],
+   "what": "'quiz-intake is the REFERENCE, not the donor': the quiz stage was re-expressed a second time, and the step surface followed in 825dbbac94849888416cca31f648e0be255039be. The medical-intake sheet kept 77 to 84 length literals restating the quiz's measured values. On 2026-09-23 the owner wrote that it 'still introduces multiple design discrepancies against the entire module. Ensure everything in the quiz is properly tokenized.' 721c415da309dca003b60c46ecda6dbdd4d1a5af (bResumedWicket-1) then minted the --nc-step-* tokens, and the literals fell 84 to 36."
+  },
+  "probe_evidence": "Replay at sha_before. 'medical intake styled like the intake quiz' lists quiz-intake among 10 candidates, again as a bare slug. 'spacing and type tokens for a quiz step' lists 9 candidates and no token. The palette arm of check_descriptor_css.py gates colour literals only, so bResumedWicket's reading notes record that 'the palette census already reports zero literals for this descriptor' while non-colour metrics stayed literal. The owner asked about the same surface on 09-02, 09-16 and 09-23."
+ },
+ {
+  "id": "nc-acct-area-v1",
+  "short": "c11",
+  "repo": "nicocares",
+  "point": "in-build",
+  "sha": "1ff116f17811712f3bf7242e65ad8efcf5435e44",
+  "sha_before": "1ff116f17811712f3bf7242e65ad8efcf5435e44",
+  "core_point_sha": "069f04599637017f33abfabebd48f66d5ad977fd",
+  "core_sha": "069f04599637017f33abfabebd48f66d5ad977fd",
+  "slug": "aPlaitedVestibule",
+  "prompt": "inCMS+NicoCares lacks its proper user account area. The account template currently built into the module does not conform to the account dashboard template look at all. Neither does the functionality converge with the user account map (you mapped it out yourself). Fix it. Create a proper user account area template from the static account dashboard template [brand/site/pages/account-a.html], make it flexible to accommodate for the future additions, build it into the submodule with all the necessary block components. ... [test-instance login lines omitted: they carry a credential]",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "packages/blocks/src/dsl/interpreter.tsx",
+    "symbol": "Section width wmap ('normal' -> site width, --site-max-w)",
+    "repo": "incms",
+    "why": "57 package descriptors already declared width normal and followed the operator's site width; the account area was the lone 'wide' (a fixed 64rem)"
+   },
+   {
+    "path": "package/nicocares-v3/blocks/descriptors.json",
+    "symbol": "hero-overlay nc-hero-eyebrow; the flat-eyebrow recipe font-size:.74rem;font-weight:700;letter-spacing:.14em (20 copies)",
+    "repo": "nicocares",
+    "why": "the site's existing flat label pattern; the account shipped core's white Eyebrow pill instead"
+   },
+   {
+    "path": "packages/ui/src/components/Eyebrow.tsx",
+    "symbol": "Eyebrow bare",
+    "repo": "incms",
+    "why": "core already had the flat arm. The DSL vocabulary exposed only `light`, so reusing it needed a core ask (taken later as aTailoredParlor-6)"
+   },
+   {
+    "path": "package/nicocares-v3/site-css/site.css",
+    "symbol": "--nc-ink, --nc-green, --nc-green-deep (:root palette tokens)",
+    "repo": "nicocares",
+    "why": "the palette tokens the new label and heading rules should read"
+   }
+  ],
+  "reinvention": {
+   "sha": "58031428f3d7a9efdd8e27d4afaf65bb83997ae1",
+   "paths": [
+    "package/nicocares-v3/blocks/descriptors.json",
+    "package/nicocares-v3/site-css/site.css"
+   ],
+   "what": "account-area root Section declared width: wide, the only one in the package. It also restated literal h1 1.8rem and h3 1.05rem type and left 38 eyebrows as core pills. On 2026-09-23 the owner wrote: 'Logged-in user account template diverges from the applied styling, it must be evaluated, tokenized, fixed.' aTailoredParlor-1/-3/-6 repaired it."
+  },
+  "probe_evidence": "Spec aTiledEstuary-10 (PKG-aPlaitedVestibule-1) section 10 is gateway plumbing only: the probe 'signed-in patient account area screens reading the backend through the plugin api gateway' and the seam 'plugin.json's api_gateway.services.patient route list'. The design source handed to the session was a static brand HTML mockup, not the site's live tokens. Replay at sha_before: 'section content width that follows the site width setting' returns ONE candidate, `site.css` [site_css], matched on the stem 'sit'. 'flat uppercase label above a card' returns 8 card descriptors and no eyebrow. Core's..."
+ },
+ {
+  "id": "nc-acct-plancards",
+  "short": "c12",
+  "repo": "nicocares",
+  "point": "kickoff",
+  "sha": "1d2742cb6c5074c0309cac1d2afed3b0b9d856f7",
+  "sha_before": "3c695662df110496c4b20462afddce48121e915e",
+  "core_point_sha": "c755f228849a74fb35b3c9692246f7b65fab5345",
+  "core_sha": "2b6aeae353fbc6d314526422b0827fcae2946746",
+  "slug": "bRoutedConcierge",
+  "prompt": "Instead of the 'Choose a plan to start your care' visitors should see plan selection in their account, so they could resume straight to payment. This needs to be designed and implemented - each plan needs a product picture and should be represented as an ecommerce card.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "scripts/gen_product_card.py",
+    "symbol": "the generated shared product-card subtree (+ --check drift gate)",
+    "repo": "nicocares",
+    "why": "the products dossier's seam: 'A third product surface adds a call, not a third copy.'"
+   },
+   {
+    "path": "package/nicocares-v3/blocks/descriptors.json",
+    "symbol": "product-cards-live (pc-card, pc-body)",
+    "repo": "nicocares",
+    "why": "the shipped e-commerce card anatomy (image, body, price, CTA)"
+   },
+   {
+    "path": "package/nicocares-v3/site-css/site.css",
+    "symbol": "--nc-fs-stat, --nc-fs-card-title, --nc-track-display, --nc-btn-h",
+    "repo": "nicocares",
+    "why": "type/CTA tokens that existed; the new card wrote font-size:1.6rem and literal heading type"
+   },
+   {
+    "path": "memory/map/features/products.md",
+    "symbol": "## Reuse affordance seam gen_product_card.py",
+    "repo": "nicocares",
+    "why": "the dossier that states the rule"
+   }
+  ],
+  "reinvention": {
+   "sha": "cc0183a510113a9e314e3a0e8734922dfec24234",
+   "paths": [
+    "package/nicocares-v3/blocks/descriptors.json",
+    "package/nicocares-v3/site-css/site.css",
+    "package/nicocares-v3/account-layouts/layouts.json"
+   ],
+   "what": "a second, unrelated product-card shape skinned in the site sheet: nc-acct-plans, -plangrid, -plancard, -planbody and -planprice, with font-size:1.6rem on the price and literal h1/h3 type. A same-day fix (eb30664a43353d8c142df4d0e1f5232d5c79439e) followed: 'the plan card's checkout is a green pill and the card row's buttons line up'. On 2026-10-05 the owner wrote 'Product card appearance should be consistent across the whole site', and dLacqueredShowcase-3 (1687038954b707207107d153feb8bf8556096ebc) replaced the card."
+  },
+  "probe_evidence": "Spec bRoutedConcierge-4 section 10 inherits a build-level probe on routing ('account notice routed by the member's state') and states 'product-cards-live's card anatomy (media then a padded body), which this card follows'. Node b, so there are no rows in node a's log. Replay at sha_before: 'ecommerce plan card with a product picture and a checkout button' DOES list scripts/gen_product_card.py and product-cards-live, 2 of 21 name-sorted candidates with no fan-in ranking (0 symbols). 'display font size token for a price' lists 4 noise candidates and no token. The seam was found. It was 'follo..."
+ },
+ {
+  "id": "nc-api-carousel",
+  "short": "c13",
+  "repo": "nicocares",
+  "point": "kickoff",
+  "sha": "411e5c5331c4664cd07318693f6fbd422f979fd7",
+  "sha_before": "a08c63610bae6f8995a609cca6047be00881de0b",
+  "core_point_sha": "bce06f7ca62282b66d05d5f51c9768552ceaec77",
+  "core_sha": "8f2931ab66ef26c831d2069401770870fc8df547",
+  "slug": "aClearedPortico",
+  "prompt": "'/product-a' 'Products' page is still not exactly correct - one of the previous builds was meant to ensure that products are imported from the backend product endpoint, however, this is still not shown on the site. Make sure that the first block on the site dispays a carousel of products imported from the API. Hide the 'Family Foundations' hero block.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "scripts/gen_product_card.py",
+    "symbol": "shared product-card generator",
+    "repo": "nicocares",
+    "why": "'a third product surface adds a call, not a third copy'. Its source was `each over collections.products` only, so the correct move was to EXTEND it to a remote source, which dLacqueredShowcase-1 later did"
+   },
+   {
+    "path": "package/nicocares-v3/blocks/descriptors.json",
+    "symbol": "product-carousel-live (pc-card in a CardCarousel)",
+    "repo": "nicocares",
+    "why": "the same block over the synced collection; the API carousel is its twin"
+   },
+   {
+    "path": "memory/map/features/products.md",
+    "symbol": "seam: scripts/gen_product_card.py",
+    "repo": "nicocares",
+    "why": "names the rule"
+   }
+  ],
+  "reinvention": {
+   "sha": "a3e23b9bca27ca7951fc23b132448dca89aa50ea",
+   "paths": [
+    "package/nicocares-v3/blocks/descriptors.json",
+    "package/nicocares-v3/content/pages/18-product-a.json"
+   ],
+   "what": "product-carousel-api with a third card anatomy, pca-card/pca-ico/pca-chip/pca-body: a 52px icon tile, a chip and no image. It is token-clean, but it is a new design element. On 2026-10-05 the owner called it 'underdesigned' and asked that 'Product card appearance should be consistent across the whole site'."
+  },
+  "probe_evidence": "Spec aClearedPortico-10 section 10 claims 'the card styling of product-carousel-live' as reused and never names gen_product_card.py. Replay at sha_before: 'carousel of products from the backend API with product cards' lists gen_product_card.py and product-carousel-live among 21 name-sorted candidates, and so does 'product card with image and eligibility button'. No design probe row in node a's log that day (the 09-29 rows are functional). The probe surfaced the seam. The decision forked it because extending it was the expensive path."
+ },
+ {
+  "id": "nc-legal-pages",
+  "short": "c14",
+  "repo": "nicocares",
+  "point": "as-given",
+  "sha": "3231b7743f760bc466bbbe2da650ce561d11cdd1",
+  "sha_before": "3231b7743f760bc466bbbe2da650ce561d11cdd1",
+  "core_point_sha": "1079053fa3b5ea1f84b2733eec670115eeb36897",
+  "core_sha": "1079053fa3b5ea1f84b2733eec670115eeb36897",
+  "prompt": "Build all the following backlog rows per the protocol, fund any core functionality if necessary: * ref `PKG-aBridledCanticle-6` — there is no privacy or legal page in the package at all. Footer Privacy and Terms both point at /about, and the home splash collects name and email with showFooter:false, so it has no reachable policy link. ... [five further compliance rows omitted]",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "packages/blocks/src/blocks/Article.tsx",
+    "symbol": "Article",
+    "repo": "incms",
+    "why": "core long-form block, reachable from a package page's puck.content"
+   },
+   {
+    "path": "package/nicocares-v3/content/pages/36-about.json",
+    "symbol": "page shape (PluginBlock + puck content)",
+    "repo": "nicocares",
+    "why": "the page skeleton the spec copied"
+   }
+  ],
+  "probe_evidence": "POSITIVE CONTROL: reuse succeeded, and 101559a92bf2268c592025d89e1ef12e7a5b4574 adds three pages with zero CSS and zero descriptors. Section 10 cites core's Article block and the about page's shape, with recall prior art. Replay at sha_before: 'privacy policy legal page with long-form text' lists 5 noise candidates. 'long form article page layout' lists the nc article-* descriptors but never core's Article. The success came from recall and reading, not from the lookup."
+ },
+ {
+  "id": "nc-code-boxes",
+  "short": "c15",
+  "repo": "nicocares",
+  "point": "as-given",
+  "sha": "cc5803c741fe4aff19271c318e280322d7f566bb",
+  "sha_before": "cc5803c741fe4aff19271c318e280322d7f566bb",
+  "core_point_sha": "8f2931ab66ef26c831d2069401770870fc8df547",
+  "core_sha": "8f2931ab66ef26c831d2069401770870fc8df547",
+  "prompt": "`/intake` quiz (and potentially more routes? They should all be fixed) contains a email verification step - a code must be entered to continue. The code input field has poor UX - any characters can be entered, nothing is stripped, not even spaces, and that leads to errors. Redesign the field - one box for each character, only allowed characters can be entered, full copy paste support ...",
+  "reconstructed": false,
+  "ground_truth": [],
+  "probe_evidence": "NEGATIVE CONTROL: legitimately new. packages/blocks/src/dsl/CodeInput.tsx is ABSENT at core_sha (cat-file -e fails). It was built core-first as BLOCK-aBoxedCipher-1 (237c869217aada8131e5314f9e4d7bbfac0963bb), then consumed by nc 47212ce2d0fd1f6aebb34dccbc07a4e9103c1a65. Replay of 'one box per digit verification code input' lists 7 candidates, all stem noise ('one', 'per', 'input'). 'No seam fits' is correct here, but only by the reader's judgment."
+ },
+ {
+  "id": "nc-modern-skin",
+  "short": "c16",
+  "repo": "nicocares",
+  "point": "as-given",
+  "sha": "16b338a747efceb0c2fb6c624d05abda73c9369c",
+  "sha_before": "16b338a747efceb0c2fb6c624d05abda73c9369c",
+  "core_point_sha": "59d8aada526e5edbbc128e934b1fcaf4f35c0668",
+  "core_sha": "59d8aada526e5edbbc128e934b1fcaf4f35c0668",
+  "prompt": "NicoCares current appearance was previously built as close to parity as possible from the flat `brand/site` template pages, which was not accurately translated to the inCMS pages. The owner's current issue is that while the site doesn't look bad, it looks behind in comparison to industry leaders: hims.com; ro.co. ... Build an inCMS-conformant NicoCares design template of the current look + improvements ...",
+  "reconstructed": false,
+  "ground_truth": [],
+  "probe_evidence": "NEGATIVE CONTROL: the --nc-fs-* display ramp and the CTA metrics in 9d087b6380a22c67c6fe8eef1a9ee2312e6e4449 are new design the owner asked for, written on the token layer that dPolishedVitrine-1 had just derived from core's appearance tokens. Replay of 'larger display type ramp for headings' lists 4 noise candidates (article-header descriptors and two plumbing seams). Core's FONT_SCALES and heading-tracking controls are invisible from the package."
+ },
+ {
+  "id": "gov-reaped-census",
+  "short": "c17",
+  "repo": "gov",
+  "point": "kickoff",
+  "sha": "d499258daca17f851ab1e4a359bb6c6aa106c0f6",
+  "sha_before": "e2b82a53dd8e9e422aea96bd57bcf6e63b5eb96c",
+  "slug": "aReapedSpinner",
+  "prompt": "Give every later unit ONE normalized view of the live process table — identity, BOTH parent graphs, age, CPU, command — read once, bounded, with every row proven to be a real process rather than a fragment of one, and with the namespace question answered in the data rather than left to each consumer.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tools/run-gates/run-gates.sh",
+    "symbol": "scan_descendants",
+    "why": "walks ps -ef ppid edges from a root; numeric field guard later adopted by citation"
+   },
+   {
+    "path": "tools/run-gates/run-gates.sh",
+    "symbol": "remove_descendants",
+    "why": "snapshots ps -ef and kills a process tree; the live process-table reader rev-1 denied existed"
+   }
+  ],
+  "reinvention": {
+   "sha": "62dae064842f5369217bab762bc798f8ed2fe222",
+   "paths": [
+    "tools/process-monitor/census.py"
+   ],
+   "what": "a second process-table reader; rev-1 section 10 (bb7581f5) said no process-table reader exists anywhere; rev-2 corrected it and kept a justified divergence (whole table, two parent graphs, winpid key)"
+  },
+  "probe_evidence": "Recorded phrase 'kill a hung or idle background process and report it to the session' at e2b82a53: 28 candidates, both seams ABSENT, coverage line 'unscanned layers: .sh'. Mechanism phrase 'read the live process table and walk parent pid edges to find descendants': 102 candidates, ABSENT. Spec rev-2 records the miss itself.",
+  "classification": "section-10-claimed-no-seam-falsely"
+ },
+ {
+  "id": "gov-lexicon-subtokens",
+  "short": "c18",
+  "repo": "gov",
+  "point": "in-build",
+  "sha": "a9bd87d5bf3de1319d5da74e435985bc9ccc9482",
+  "sha_before": "a9bd87d5bf3de1319d5da74e435985bc9ccc9482",
+  "slug": "dClosedLexicon",
+  "prompt": "This unit ships tools/lexicon/, an OPT-IN kit that gates three naming predicates against a per-repo DECLARATION, and the companion section 12 rules that route to it.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tools/codebase-map/map_lib.py",
+    "symbol": "subtokens",
+    "why": "the shipped identifier splitter/case normaliser; rev-1 called the case normaliser 'the one genuinely new mechanism'"
+   }
+  ],
+  "reinvention": {
+   "sha": "0007b357cea51c5d06469d912b39f70fe93c5ee4",
+   "paths": [
+    "tools/lexicon/subtokens.py"
+   ],
+   "what": "after the audit (F-A11) the normaliser landed as a declared PORT of map_lib.subtokens with a gov-internal parity leg, because a copy-installed kit may not import a sibling kit; the correct outcome is port-plus-parity, not import"
+  },
+  "probe_evidence": "Recorded phrase 'naming vocabulary gate' at a9bd87d5: 28 candidates, map_lib dossier at rank 7, subtokens ABSENT. Behaviour phrase 'split a camelCase or snake_case identifier into lowercase word pieces per language': 16 candidates, subtokens ABSENT although it is in symbols.json at that sha (no shared stem with the query).",
+  "classification": "section-10-claimed-no-seam-falsely"
+ },
+ {
+  "id": "gov-ruled-markerindex",
+  "short": "c19",
+  "repo": "gov",
+  "point": "kickoff",
+  "sha": "96141aed368273cb82e21e23bfa8eb817e10785a",
+  "sha_before": "40ddf6e3e52a623e68a9af7a3780511e82245c6c",
+  "slug": "aRuledFrontispiece",
+  "prompt": "Make the build README's GENERATED SURFACE one mechanism: a declared order of named slots, the verb that checks it, and the four regions that render into it.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tools/memory-tree/gen_build_index.py",
+    "symbol": "unfenced_lines",
+    "why": "the module's fence-aware line walk; _marker_index was fence-blind, so a quoted marker in a fenced block broke the slot walk and apply_region"
+   },
+   {
+    "path": "tools/memory-tree/gen_build_index.py",
+    "symbol": "apply_region",
+    "why": "its nested _is carries the column-0 one-trailing-CR marker identity rule that _marker_index re-implemented as a fifth reader"
+   }
+  ],
+  "reinvention": {
+   "sha": "6523575d98880be37a971861cd9c9a94491bd83b",
+   "paths": [
+    "tools/memory-tree/gen_build_index.py"
+   ],
+   "what": "_marker_index re-implements the marker identity rule and walks raw lines instead of unfenced_lines(); found by the TOOL-aRuledFrontispiece-1-3 diff review (MEDIUM fence-blind, LOW fifth live reader)"
+  },
+  "probe_evidence": "At spec base 96141aed the recorded phrase 'render a marker-delimited generated region into a committed markdown file' gave 42 candidates: apply_region rank 13, render_region rank 22, unfenced_lines ABSENT. At build parent 40ddf6e3 'find the line index of a marker in a markdown file, ignoring fenced code blocks': unfenced_lines rank 5 of 42. Discovery worked; the helper written below spec granularity did not use it.",
+  "classification": "seam-present-not-chosen"
+ },
+ {
+  "id": "gov-quoted-headings",
+  "short": "c20",
+  "repo": "gov",
+  "point": "in-build",
+  "sha": "98d212d7925cced2a1f0e5750f299ce7f8253a6d",
+  "sha_before": "98d212d7925cced2a1f0e5750f299ce7f8253a6d",
+  "slug": "aQuotedBrief",
+  "prompt": "build-complete grades the roster a prompt-mode run wrote for itself, so an item the owner asked for that orientation merged away, dropped or left unspecced still closes green. This unit makes every brief item declare its disposition at the pinned BASE, joins those dispositions to the roster at preflight, and adds a seventh build-complete term that refuses the close while any item is neither built by a CLOSED unit nor parked where the wrap-up surfaces it.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tools/unattended/unattended.sh",
+    "symbol": "check_prompt_brief",
+    "why": "already normalises '## ' headings with sub(/^## +/) when reading a prompt record; term 7 used a stricter grep and read_brief_items split headings a third way"
+   },
+   {
+    "path": "tools/unattended/unattended.sh",
+    "symbol": "read_audit_ask_record",
+    "why": "the third reader the review's fix names; one is_prompt_record predicate should serve all"
+   }
+  ],
+  "reinvention": {
+   "sha": "cc627830097f2e88cab5e196fc301fbf1d6f1a40",
+   "paths": [
+    "tools/unattended/unattended.sh"
+   ],
+   "what": "read_brief_items (awk) and the term-7 grep '^## The prompt[[:space:]]*' are second and third answers to 'is this a prompt record heading'; closing review H2 (raised to high)"
+  },
+  "probe_evidence": "The seam did not exist at the spec base fa68a767: sibling unit TOOL-aQuotedBrief-1 (c3d7761a) created check_prompt_brief between spec and build. At build parent 98d212d7, with the shell symbol tier live, the recorded phrase put check_prompt_brief at rank 155 of 529 and read_audit_ask_record at 226; 'parse the numbered items under a heading of a prompt record markdown file' put it at 106 of 282.",
+  "classification": "probe-run-seam-absent"
+ },
+ {
+  "id": "gov-pooled-wall",
+  "short": "c21",
+  "repo": "gov",
+  "point": "kickoff",
+  "sha": "ab58d1ccfe1da2d6672e15b833eb854adfd61da6",
+  "sha_before": "96679934a717768124f4bb39eaf19ee17e72a3dc",
+  "slug": "aPooledSweep",
+  "prompt": "tools/run-gates/run-selftests.sh runs its declared population one suite at a time, so its wall clock is the SUM of 59 suites. Run them through a bounded outer pool instead, so the wall clock falls toward the longest suite, over the whole population and with no suite rewritten.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tools/run-gates/run-gates.sh",
+    "symbol": "arm_wall",
+    "why": "the sibling runner's wall watcher: writes the breach marker BEFORE any kill, with the measured 57 s-late third leg recorded beside it"
+   },
+   {
+    "path": "tools/run-gates/run-gates.sh",
+    "symbol": "dispatch loop guard '[ -f \"$WORK/wall.breach\" ] && break'",
+    "why": "the one line run-selftests.sh's new pool lacked; review round 2 D1 BLOCKER"
+   }
+  ],
+  "reinvention": {
+   "sha": "6ab577de6c0346e3329816108a36a7e1e768de45",
+   "paths": [
+    "tools/run-gates/run-selftests.sh"
+   ],
+   "what": "a private wall watchdog with no dispatch-loop break, so after a breach the pool kept launching suites (fold 16def840 then removed its only stopping mechanism)"
+  },
+  "probe_evidence": "Recorded phrase 'run a shell self-test suite's arms in parallel with isolated scratch copies' at spec base 05fb897c: 262 candidates, boundedParallel rank 6, arm_wall / remove_wall_watcher / run-gates.sh ABSENT ('unscanned layers: .sh'). Build parent 96679934 'stop a pool of parallel jobs at a wall-clock bound, kill the stragglers and launch nothing after the breach': 32 candidates, all ABSENT.",
+  "classification": "seam-present-not-chosen"
+ },
+ {
+  "id": "gov-deferred-settings",
+  "short": "c22",
+  "repo": "gov",
+  "point": "kickoff",
+  "sha": "c4f0230860daf81e2988f247ab29eea73a931dba",
+  "sha_before": "d59e70228e0d454e135a52c97eb249e8228be0d9",
+  "slug": "aDeferredBar",
+  "prompt": "Refuse the act where it is committed: tools/unattended/gate-guard.js, a PreToolUse hook on matcher Bash|PowerShell, exits 2 on a command that would run the flagged merge bar or a self-test suite while the unattended run on the current branch is in a phase before VERIFYING.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tools/check-wiring.sh",
+    "symbol": "GOV_SETTINGS_JSON resolution (lines 57-84)",
+    "why": "resolves an out-of-tree settings file first; the new adopter arm hardcoded $ROOT/.claude/settings.json"
+   },
+   {
+    "path": "tools/check-wiring.sh",
+    "symbol": "matchers_of",
+    "why": "asserts the marker sits in a group with the fragment's matcher; the new arm passed a marker under any matcher"
+   }
+  ],
+  "reinvention": {
+   "sha": "7e9bbeff788b0ba023e1da7857d0d06d90792d08",
+   "paths": [
+    "tools/unattended/adopt-unattended.sh"
+   ],
+   "what": "a wiring arm that greps one hardcoded settings path and any matcher, copied from the defective precedent tools/process-monitor/adopt-process-monitor.sh:192; closing review F5"
+  },
+  "probe_evidence": "Recorded phrase at spec base b2a330be: 342 candidates, matchers_of ABSENT, nearest the 'check-wiring self-test' gate-leg key at rank 38; the author noted 'unscanned layers: .sh' and read shell by hand but not check-wiring.sh. 'check that a hook is wired in the claude settings json under the right matcher': 118 candidates, matchers_of ABSENT, gate-leg key rank 28.",
+  "classification": "seam-present-not-chosen"
+ },
+ {
+  "id": "gov-declared-gitcommondir",
+  "short": "c23",
+  "repo": "gov",
+  "point": "in-build",
+  "sha": "497d25d0ab47e29b29f08189473adf05f926399f",
+  "sha_before": "497d25d0ab47e29b29f08189473adf05f926399f",
+  "slug": "aDeclaredBound",
+  "prompt": "agent-cap.js holds three fan-out bounds as file constants and refuses an environment override on the record. Give the owner a channel to change them that keeps every property the refusal was protecting, and make an agent's use of that channel loud rather than impossible.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tools/hooks/agent-cap.js",
+    "symbol": "gitCommonDir",
+    "why": "already walks up to a .git entry, handles the worktree .git-file case and anchors on the payload cwd (line 637) that the test harness isolates on; S2 proposed a new own-location walk"
+   }
+  ],
+  "reinvention": {
+   "sha": "1d45f8c98624457b58a4057c0554b53ae34cc362",
+   "paths": [
+    "memory/builds/aDeclaredBound/spec/2026-08-18-spec-TOOL-aDeclaredBound-4.md"
+   ],
+   "what": "spec-stage only: S2 specified a second repo-root resolver in the same file; caught by the spec review (finding 7, HIGH); the unit is still OPEN and never built"
+  },
+  "probe_evidence": "Recorded phrase 'read a per-adopter numeric limit from a declaration instead of a source constant' at 497d25d0: 55 candidates, gitCommonDir ABSENT (agent-cap.js only via readStdin, rank 24). Mechanism phrase 'find the repository root or git common dir from a hook by walking up to the .git entry': gitCommonDir rank 7 of 60, attributed to the recall-opened.js copy. The seam was indexed; goal-phrased queries do not reach it.",
+  "classification": "section-10-claimed-no-seam-falsely"
+ },
+ {
+  "id": "gov-warded-terminal",
+  "short": "c24",
+  "repo": "gov",
+  "point": "kickoff",
+  "sha": "35438ba0a188cf38c1d73b6e1df7b3a1342a17de",
+  "sha_before": "6bba1786eaedc694a750a0a85ee41307375e5f77",
+  "slug": "aWardedAudit",
+  "prompt": "Rule 0 of the fan-out hook denies a kind: spec-audit Workflow call unless the build README in the WORKTREE carries a dated spec-audit: key or the worktree conf a dated SPEC_AUDIT_DEFAULT. A run can write either line a second before the call, so the hook admits exactly the self-opt-in the driver now refuses. This unit makes the hook agree with the driver before any audit token is spent.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tools/unattended/unattended.sh",
+    "symbol": "PHASES_TERMINAL",
+    "why": "the driver's terminal-phase set; the hook hard-coded LANDED/ABORTED"
+   },
+   {
+    "path": "tools/drift-audit/drift_report.py",
+    "symbol": "_RUN_PHASES_TERMINAL",
+    "why": "the precedent for a cross-language copy: parity-checked against the driver at tools/drift-audit/selftest.py:2871; the hook's copy has no such pair"
+   }
+  ],
+  "reinvention": {
+   "sha": "0268517dc10872821d63459b31a921c440f55d5d",
+   "paths": [
+    "tools/hooks/agent-cap.js"
+   ],
+   "what": "phase !== 'LANDED' && phase !== 'ABORTED' — an unchecked third copy of the terminal set; closing review L5 (id 13)"
+  },
+  "probe_evidence": "Recorded phrase 'refuse a front-matter key the run could have written under a second-anchor mode' at spec base 35438ba0: 213 candidates, readFrontMatterKey rank 22 (the seam the author did reuse), PHASES_TERMINAL and _RUN_PHASES_TERMINAL ABSENT. 'decide whether an unattended run is live or in a terminal phase from its run-state file': ABSENT of 203 at both 35438ba0 and the build parent. A shell variable is not a symbol.",
+  "classification": "seam-present-not-chosen"
+ },
+ {
+  "id": "gov-keyed-decisions",
+  "short": "c25",
+  "repo": "gov",
+  "point": "in-build",
+  "sha": "0d7d9414fdc867c3f183866492c54eb96b3f2c88",
+  "sha_before": "0d7d9414fdc867c3f183866492c54eb96b3f2c88",
+  "slug": "aKeyedAnnotation",
+  "prompt": "Should code annotations be governed, keyed and read by the orientation tooling?",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tools/codebase-map/map_lib.py",
+    "symbol": "parse_dossier (required 'decisions' field)",
+    "why": "the code-to-decision link the build was asked to invent already existed, validated and inert"
+   },
+   {
+    "path": "tools/codebase-map/map_lib.py",
+    "symbol": "DEFAULT_DECISION_ID_RE",
+    "why": "the id grammar the fold later retyped byte-for-byte as _ID_SHAPE in reuse_lookup.py"
+   },
+   {
+    "path": "tools/drift-audit/drift_report.py",
+    "symbol": "_OWN_ID",
+    "why": "an existing consumer that reads unit ids out of source as shipped-evidence"
+   }
+  ],
+  "reinvention": {
+   "sha": "d53129af2872eef1262af2b7334fddd67e2fde77",
+   "paths": [
+    "tools/codebase-map/reuse_lookup.py"
+   ],
+   "what": "the design pass averted the large reinvention (a new annotation grammar); a fold then retyped DEFAULT_DECISION_ID_RE as _ID_SHAPE in a module that already imports map_lib; round-2 M1"
+  },
+  "probe_evidence": "Recorded phrase 'scanning source code comments for build ids and spec references' at 0d7d9414: 84 candidates, parse_dossier / DEFAULT_DECISION_ID_RE / any 'decisions' row ABSENT (parse_dossier is in symbols.json). 'link a piece of code to the decision records that explain why it is built that way': 38 candidates, ABSENT. The seam is a schema key, which no symbol index carries; the design pass found it by reading.",
+  "classification": "probe-run-seam-absent"
+ },
+ {
+  "id": "gov-rowgrammar-loadconf",
+  "short": "c26",
+  "repo": "gov",
+  "point": "kickoff",
+  "sha": "af6de23172009f150e46c482fce140a724597422",
+  "sha_before": "1db0a96f4db379c291f29fca9ac6e0fd97d26424",
+  "slug": "aMouldedFolio",
+  "prompt": "Add hygiene check 20 as a Python module delegated through the same seam as checks 13-19: assert one id, one row per document in the decision index and backlogs, reading the declared id families from .memory-tree.conf.",
+  "reconstructed": true,
+  "ground_truth": [
+   {
+    "path": "tools/memory-tree/gen_build_index.py",
+    "symbol": "load_conf",
+    "why": "one of four same-kit copies already present; any one of them, or one shared reader, should have been called"
+   },
+   {
+    "path": "tools/memory-tree/gotchas.py",
+    "symbol": "load_conf",
+    "why": "same body, same kit"
+   },
+   {
+    "path": "tools/codebase-map/map_lib.py",
+    "symbol": "load_conf",
+    "why": "the kit-external original the others copied"
+   }
+  ],
+  "reinvention": {
+   "sha": "4483fe815d8c7848887d1ddaac8177f0d7913fee",
+   "paths": [
+    "tools/memory-tree/row_grammar.py"
+   ],
+   "what": "a fifth private KEY=VALUE conf parser; aScouredKit wave-1 duplication lens F1 (BLOCKER) later showed all five keep a trailing '# comment' and ignore 'export', unlike the bash sourcing the gate uses"
+  },
+  "probe_evidence": "'read the memory-tree conf file into a dict of keys and values' at 1db0a96f: load_conf rank 5 of 53 (fan-in 10, SEAM). The probe would have answered; nobody asked. At e2b82a53 load_conf already lists nine definers.",
+  "classification": "probe-not-run"
+ },
+ {
+  "id": "gov-sealed-versionfrom",
+  "short": "c27",
+  "repo": "gov",
+  "point": "in-build",
+  "sha": "51af767586758fb0bee6c2469f8cd41171c3b2a1",
+  "sha_before": "51af767586758fb0bee6c2469f8cd41171c3b2a1",
+  "prompt": "Replace the prose adoption runbook with govkit — a descriptor-driven deployer that lands a chosen subset of this repo's kits into a target repo that has none, either unattended or by prompting the owner, and writes a receipt recording what was installed from which commit.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tools/check-kit-versions.sh",
+    "symbol": "need table ({label, file, pattern} per kit)",
+    "why": "the existing source of where each kit's version constant lives; descriptor version_from became a second spelling of the same fact"
+   }
+  ],
+  "reinvention": {
+   "sha": "a4caea91c43e0cc06d3a80db697782083a12d5ad",
+   "paths": [
+    "tools/govkit/registry.toml",
+    "tools/govkit/govkit.py"
+   ],
+   "what": "version_from per descriptor duplicating the shell table; review id=45; resolved the same day by a parity cross-check (754a6e65) rather than a single source"
+  },
+  "probe_evidence": "Recorded phrase 'deploy a kit into a target repo: copy files, render config, wire gates, write an install receipt' at spec base 16aeb5ef: 60 candidates, check-kit-versions.sh ABSENT, the 'kit version markers' gate-leg key at rank 24. 'find each kit's version constant in its source file': that key at rank 7 of 34, the script itself never.",
+  "classification": "probe-run-seam-absent"
+ },
+ {
+  "id": "gov-batched-launcher",
+  "short": "c28",
+  "repo": "gov",
+  "point": "in-build",
+  "sha": "a938fb0cbc37296bcf199e88671deb2db4c08181",
+  "sha_before": "a938fb0cbc37296bcf199e88671deb2db4c08181",
+  "slug": "aBatchedTribunal",
+  "prompt": "Extend tools/hooks/agent-cap.test.sh with fixtures that build Workflow tool-call JSON payloads and feed them to the hook, as part of making the review protocol's verify-stage cap a gate.",
+  "reconstructed": true,
+  "ground_truth": [
+   {
+    "path": "tools/lib/resolve-python.sh",
+    "symbol": "resolve_python",
+    "why": "landed 2.5 h earlier (a86fc3ee) and bans the retired 'python3 || python' idiom repo-wide; js() used a fourth spelling the ban could not see"
+   }
+  ],
+  "reinvention": {
+   "sha": "3c794dcd364fe1486d4b0ed8b3e295586b45cc6d",
+   "paths": [
+    "tools/hooks/agent-cap.test.sh"
+   ],
+   "what": "js() builds its payload with 'python3 -c ... || python -c ...' instead of resolve_python (or the node JSON.stringify builder in the same commit's check-verifier-fanout.sh); review 3 L1"
+  },
+  "probe_evidence": "Not probed at the commit. The organic query 'resolve the python launcher' (lookups.jsonl, 2026-09-05, three runs, n_shown 62) re-run at f89a397e: 62 candidates, resolve_python and resolve-python.sh ABSENT.",
+  "classification": "probe-not-run"
+ },
+ {
+  "id": "gov-control-moored-anchor",
+  "short": "c29",
+  "repo": "gov",
+  "point": "as-given",
+  "sha": "af6de23172009f150e46c482fce140a724597422",
+  "sha_before": "af6de23172009f150e46c482fce140a724597422",
+  "prompt": "Close the five reproduced defeats in the unattended kit that do not depend on which commit the anchor names, and state the anchor's real bound in the protocol instead of asserting a guarantee that does not hold.",
+  "reconstructed": false,
+  "ground_truth": [],
+  "decoys": [
+   {
+    "path": "tools/drift-audit/drift_report.py",
+    "symbol": "Git",
+    "why": "an ancestry wrapper that resolves its base from GOV_DEFAULT_BRANCH first — wiring through it imports the defect; the review challenged section 10 and the challenge was refuted"
+   }
+  ],
+  "probe_evidence": "'resolve the commit an unattended run's authorization is anchored to and check the recorded base is its ancestor' at af6de231: 55 candidates, decoy Git ABSENT. The unit hardened existing region() and check 9 in place; it reused nothing foreign.",
+  "control": true,
+  "classification": "control-no-seam-correct"
+ },
+ {
+  "id": "gov-control-health-log",
+  "short": "c30",
+  "repo": "gov",
+  "point": "as-given",
+  "sha": "5266d22eba31cdbf15425773d245cd23d7b9cdf5",
+  "sha_before": "5266d22eba31cdbf15425773d245cd23d7b9cdf5",
+  "prompt": "Gov repairs its own state in several places, and each repair is reported only on the stdout of the process that made it. This unit gives every automatic self-heal one append-only line in <git-common-dir>/health.log, and gives the orientation card a health line counting what happened in the last 24 hours.",
+  "reconstructed": false,
+  "ground_truth": [],
+  "decoys": [
+   {
+    "path": "tools/runlog/runlog_lib.py",
+    "symbol": "read_journal / PRODUCER_FILES",
+    "why": "a spec-audit prior-art finding (id 42, high) said health.log duplicates the run-log journals; the skeptic refuted it — run logs are per-producer journals under runlog/, a different population"
+   }
+  ],
+  "probe_evidence": "Recorded phrase 'append an event line to a shared log under the git common dir that a session start card reads' at 5266d22e: 374 candidates; the decoy runlog read_journal at rank 6, the shapes the author legitimately copied at writeSidecarLine rank 25 and common_git_dir rank 102. A workflow that trusts rank would have pushed the decoy.",
+  "control": true,
+  "classification": "control-no-seam-correct"
+ }
+]
