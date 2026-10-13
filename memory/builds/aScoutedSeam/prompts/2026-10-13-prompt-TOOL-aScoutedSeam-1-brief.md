@@ -49,17 +49,19 @@ Revise four SPECCED units of aScoutedSeam so the reuse scout is specified on the
 10. TOOL-aScoutedSeam-3, the next revision: the diff mode is a third stage key of the same `reuse` row, `diffCheck`. Its default effort `high` is a stage override in gov's `house/policy.toml`, `[effort.stages.reuse] diffCheck = "high"`, not a default written in the harness. Its harness args follow item 2.
 11. DEPL-aScoutedSeam-1, the next revision: the roles kit's `house/policy.toml` is seeded and never rewritten. An adopter that wants the diff mode at `high` adds the `diffCheck` stage line itself, and the adopter checklist says so. An adopter's own scout rules go in its `house/gov-reuse-scout.md` overlay.
 
-12. All four units: spell the role files against the roles front matter that aOrientedCast is
-    landing next. These are consumes-from external edges on aOrientedCast's sixteenth and
-    seventeenth TOOL units, specced 2026-10-13 on branch/deterministic-attended-workflows-943570. They
-    are named here in words because their ids are not yet in this tree, and a cited id the tree lacks
-    joins that build's derived roster as an orphan.
-    - The sixteenth renames a role's `charter` key to `rules`, which names section 1 rule tags. The
-      scout's `charter: §12` becomes `rules: reuse`.
-    - The seventeenth adds required `mandatory` and `output` keys. Its values table gives the
-      scout `mandatory: no — when kickoff asks for one` and `output: the seam, to its caller`. The
-      re-spec keeps the role optional, because opt-in is the owner's. Its `output` becomes the
-      `## reuse` section and the full seam list, to its caller.
+12. All four units: spell the role files against the roles front matter as it now stands. It
+    landed on local main at ebce889c7 by TOOL-aOrientedCast-16 and TOOL-aOrientedCast-17, which are
+    consumes-from external edges, LANDED. Read `tools/roles/agents/gov-reuse-scout.agent.md` and
+    `tools/roles/README.md` as they are in this tree.
+    - A role cites section 1 rule tags under `rules:`. The scout already reads `rules: reuse`, and
+      any spec text naming its `charter` key or a `§12` id is out of date.
+    - Every role carries `mandatory` and `output`. The scout's are `mandatory: no — when kickoff asks
+      for one` and `output: the seam, to its caller`. The re-spec keeps the role optional, because
+      opt-in is the owner's. Its `output` becomes the `## reuse` section and the full seam list, to
+      its caller.
+    - `handoff.py render` prints the Agent description an invocation must carry,
+      `<build> · <unit> · <workflow>`, and the spawn guard compares the two. Any spec text that
+      composes a handoff names that.
     - R13 needs a hook only for a mandatory role. The reuse row's `enforced-by` still opens with
       `agent-cap.js`, which its hook pattern reads as one.
 
