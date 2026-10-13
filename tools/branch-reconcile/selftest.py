@@ -900,10 +900,31 @@ def arm_evil_merge():
           verdict, "UNMERGED-LIVE")
 
 
+def arm_submodule():
+    """TOOL-dSweptBranches-15 — uncommitted work inside a submodule makes its worktree UNKNOWN."""
+    base = build_dir()
+    repo = seed_repo(base)
+    sub_src = base / "subsrc"
+    sub_src.mkdir()
+    run_git(sub_src, "init", "-q", "-b", "main")
+    seed_commit(sub_src, "s.txt", "s\n", "sub: seed")
+    run_git(repo, "submodule", "-q", "add", str(sub_src), "sub")
+    run_git(repo, "commit", "-q", "-m", "seed: submodule")
+    seed_publish(repo)
+    wt = base / "fx" / "subwt"
+    run_git(repo, "worktree", "add", "-q", "-b", "subwt-br", str(wt), "main")
+    run_git(wt, "submodule", "-q", "update", "--init")
+    (wt / "sub" / "s.txt").write_text("edited inside the submodule\n", encoding="utf-8")
+    verdict, ev = read_verdict(read_report(repo, "--fresh-hours", "0"), "worktree/sibling",
+                               str(wt).replace("\\", "/"))
+    check("submodule: AC1 a worktree whose submodule holds uncommitted work reads UNKNOWN",
+          (verdict, "submodule content" in ev), ("UNKNOWN", True))
+
+
 ARMS = [arm_census, arm_patch, arm_landing, arm_records, arm_rotated, arm_noop, arm_lease,
         arm_content, arm_stash, arm_remover, arm_write, arm_keeps, arm_unread, arm_foreign,
         arm_patch_negative, arm_probe_negative, arm_row_edit, arm_default_names, arm_graded_sha,
-        arm_evil_merge]
+        arm_evil_merge, arm_submodule]
 
 
 def main():

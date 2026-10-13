@@ -214,7 +214,8 @@ def parse_worktrees(text):
 
 def parse_status(text):
     """`git status --porcelain=v2 -z --untracked-files=all` -> counts and the paths behind them."""
-    st = {"staged": 0, "unstaged": 0, "unmerged": 0, "untracked": [], "drift": 0, "changed": []}
+    st = {"staged": 0, "unstaged": 0, "unmerged": 0, "untracked": [], "drift": 0, "changed": [],
+          "submodules": []}
     fields = text.split("\0")
     i = 0
     while i < len(fields):
@@ -232,6 +233,8 @@ def parse_status(text):
                 st["unstaged"] += 1
             if sub.startswith("S") and sub[1] == "C":
                 st["drift"] += 1
+            if sub.startswith("S"):
+                st["submodules"].append(parts[-1])
             st["changed"].append(parts[-1])
             if kind == "2":
                 i += 1  # a rename's original path rides the next NUL-separated field
@@ -747,10 +750,16 @@ def check_worktree(inv, item):
         return UNKNOWN, "git hash-object failed over the worktree's content"
     have = dict(zip(files + probes, blobs))
     for p in sorted(set(st["changed"])):
-        if have.get(p) == tree.get(p) or (p not in have and p not in tree
-                                           and not (pathlib.Path(w["path"]) / p).exists()):
+        full = pathlib.Path(w["path"]) / p
+        # A SUBMODULE OR DIRECTORY IS NEVER COMPARED AS A BLOB (TOOL-dSweptBranches-15): it is in
+        # neither `have` nor the blob tree, and None == None would grade its uncommitted work covered.
+        if p in st["submodules"] or full.is_dir():
+            unknown.append(f"submodule content {p}")
+        elif p in have and have[p] == tree.get(p):
             covered.append(f"{p} matches {inv['branch']}")
-        elif not st["drift"] or (pathlib.Path(w["path"]) / p).is_file():
+        elif p not in have and p not in tree and not os.path.lexists(full):
+            covered.append(f"{p} is absent here and on {inv['branch']}")
+        else:
             uncovered.append(f"changed {p}")
     default_blobs = set(tree.values())
     for p in probes:
