@@ -1,6 +1,6 @@
 # DEPL-aScoutedSeam-1 — adopters get the scout and a resolved host tree, and the adopter-side gaps the research found are handed over
 
-**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams deployer+kickoff · order 5
+**Status:** SPECCED · rev-3 · 2026-10-13 · node a · Tier-2 · base ebce889c · streams deployer+kickoff · order 5
 
 <!-- gen:spec-records -->
 
@@ -51,11 +51,19 @@ reads them.
   - never let a lint opt-out sanction the bypass of a shared seam;
   - extend a style gate from colour to the lengths and type a token layer owns;
   - declare the lint-rule directory and the DSL vocabulary in `.codebase-map.conf`'s
-    `HOUSE_INDEX_DIRS` and `HOUSE_INDEX_KINDS`, so the house index lists them.
+    `HOUSE_INDEX_DIRS` and `HOUSE_INDEX_KINDS`, so the house index lists them;
+  - to run the diff mode at `high`, add `[effort.stages.reuse] diffCheck = "high"` to the roles
+    kit's `house/policy.toml` yourself. That file is seeded and never rewritten
+    (`tools/roles/README.md:173-176`), so an update does not bring gov's line, and the line is legal
+    only once the installed roles kit's `reuse` row carries the `diffCheck` stage key, which
+    `check_roles.py` refuses otherwise (R12);
+  - put the project's own scout rules in the roles kit's `house/gov-reuse-scout.md` overlay, never
+    in the base role, which every update overwrites (`tools/roles/README.md:17-23`).
   - AC4 observes it.
 - **S5** — The scout's files reach an adopter through the kits that already carry them: the
-  review-harness kit renders `reuse-scout.js` at the adopter's fan-out cap, the kickoff kit carries
-  the verbs, and the memory-tree kit carries the §10 join. No new kit and no new descriptor.
+  review-harness kit renders `reuse-scout.js` at the adopter's fan-out cap, the roles kit carries the
+  role, its catalogue row and its overlay seed, the codebase-map kit the procedure document, the
+  kickoff kit the verbs, and the memory-tree kit the §10 join. No new kit and no new descriptor.
   - AC5 observes it.
 
 ## 3. Non-goals (OUT)
@@ -72,6 +80,7 @@ reads them.
   verb sits beside.
 - **consumes-from** `TOOL-aScoutedSeam-1` — the harness's `hostTrees` argument, and the calibration
   figures S4 quotes.
+- **consumes-from** `TOOL-aScoutedSeam-3` — the `diffCheck` stage key S4's policy line names.
 - **hands-off** external — to the NicoCares owner: its charter's "no design system of its own" claim,
   which predates the 101-token layer, and its design gates, which refuse palette literals but not
   lengths or type.
@@ -150,8 +159,10 @@ and one runbook section.
   carries `REUSE_SCOUT_DEFAULT` and `REUSE_HOST_TREES`, both blank.
   Red when: either key ships armed.
 - **AC4** — When `WIRE-INTO-PROJECT.md` is read, its reuse-scout section names the two owner
-  decisions, the measured cost with its date, and the four checklist items.
-  Red when: the cost is written without the date it was measured.
+  decisions, the measured cost with its date, and the seven checklist items of S4, the `diffCheck`
+  policy line and the overlay among them.
+  Red when: the cost is written without the date it was measured, or the section says an update
+  writes the `diffCheck` line into an adopter's policy.
 - **AC5** — When `govkit.py plan` runs for a fixture adopter selecting the review-harness kit,
   `reuse-scout.js` is planned as a rendered file at the adopter's fan-out cap.
   Red when: the harness ships as an engine file spelling the literal cap.
@@ -173,6 +184,11 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 · a fixtur
 - rev-1 · 2026-10-11 · initial draft.
 - rev-2 · 2026-10-11 · S2 · S4 · §3 · `TOOL-aScoutedSeam-1` rev-4 added the house index. The host trees
   feed it, the adopter checklist gains the two listing keys, and the inCMS hand-off names them.
+- rev-3 · 2026-10-13 · S4 · S5 · §3 · AC4 · the scout is re-specced on the landed roles kit. The
+  adopter checklist gains the `diffCheck` policy line an adopter adds itself, since the policy is
+  seeded and never rewritten, and the overlay as the home of an adopter's scout rules. S5 names the
+  roles and codebase-map kits, §3 gains the edge to `TOOL-aScoutedSeam-3`, and AC4 counts the
+  checklist as S4 now lists it.
 
 ## 10. Reuse audit
 

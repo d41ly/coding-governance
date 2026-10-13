@@ -1,6 +1,6 @@
 # KICK-aScoutedSeam-1 — kickoff asks once, runs the scout on opt-in, and carries its seams onto the card and into the brief
 
-**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams kickoff · order 2
+**Status:** SPECCED · rev-3 · 2026-10-13 · node a · Tier-2 · base ebce889c · streams kickoff · order 2
 
 <!-- gen:spec-records -->
 
@@ -34,19 +34,29 @@ binding seams on the READY card, as the owner asked, and into the brief the buil
   as absent, never as yes.
   - AC1 and AC5 observe it.
 - **S2** — The invocation. The manifest command catalog gains one line, in `MANIFEST-TEMPLATE.md` and
-  in this repo's `memory/guides/SESSION-KICKOFF.md`. The line runs three things in order:
+  in this repo's `memory/guides/SESSION-KICKOFF.md`. The line runs these in order:
   - `gen_map.py --house-index`, with one `--host` per host tree, writing the index beside the card as
     `<git-common-dir>/orientation/<session>.house-index.md`;
-  - `handoff.py harness-args reuse-scout`, for the `roles` object;
-  - the `Workflow` call by `scriptPath`, with the args `TOOL-aScoutedSeam-1` declares and that path
-    as `index`.
+  - `handoff.py render --role gov-reuse-scout --build <slug> --part task --input question=<the
+    request>`, for the `task` arg;
+  - `handoff.py harness-args reuse-scout`, for the `roles` object, and
+    `handoff.py stage-efforts reuse`, for the `efforts` object;
+  - the `Workflow` call by `scriptPath`, with the args `TOOL-aScoutedSeam-1` declares and the index
+    path as `index`.
+
+  The render needs the build folder, and with no `--unit` it reads the first id of the build
+  README's `ids:` (`tools/roles/handoff.py:317-329`), refusing otherwise. So the line runs after the
+  README exists, and the session creates it first when the DoR authors it, as Step 3 already does
+  for `spec-audit:` (`skills/session-kickoff/SKILL.md:155-156`). The render also prints the Agent
+  description `<build> · <unit> · <workflow>` on stderr. The spawn guard compares that name only on
+  an `Agent` call, so the `Workflow` call passes none, and the harness labels its own spawns.
 
   Engine Step 4 gains one clause pointing at that line; the engine carries no procedure.
   - AC2 observes it.
 - **S3** — Step 5 appends the harness's `section` as a SEVENTH section of the READY body, in the same
   single `--card --append`, so the READY tail never erases it. `--card --append` grades the section:
   - every line under `## reuse` is one of the six line kinds of `TOOL-aScoutedSeam-1`'s grammar;
-  - the section holds exactly one `scout` line;
+  - the section holds exactly one `scout` line, carrying the `demoted` field;
   - a malformed line refuses the append, naming that line.
   - AC3 observes it.
 - **S4** — The brief's `### Reuse` sub-head carries the harness's FULL return in the same line
@@ -86,6 +96,9 @@ binding seams on the READY card, as the owner asked, and into the brief the buil
 - **consumes-from** external — aOrientedCast's two kickoff units, which edit `manifest-check.sh` and
   `SKILL.md` first and add the `**Reuse:**` task field. This unit builds after them and reconciles if
   it lands second.
+- **consumes-from** external — aOrientedCast's roles kit, LANDED on local main at ebce889c:
+  `handoff.py render`, `harness-args` and `stage-efforts`, and the spawn guard, which admits the
+  `Workflow` call only once `.claude/roles.json` lists the harness (`TOOL-aScoutedSeam-1` S9).
 - **consumes-from** external — aRoutedQuill's landed brief flow: `BRIEF_SKELETON`, the brief written
   at Step 5 and committed with the specs.
 
@@ -105,8 +118,8 @@ The `## open` answer line takes one of three forms, the same shapes `spec audit:
 
 1. Step 3 resolves the opt-in (S1). With none declared, and a task that writes product code, it asks
    once.
-2. Step 4, on opt-in, runs the catalog line (S2): the house index, then the harness. The card is not
-   touched yet.
+2. Step 4, on opt-in, runs the catalog line (S2): the house index, the scout's task render, the
+   `roles` and `efforts` objects, then the harness. The card is not touched yet.
 3. Step 5 writes the brief with `### Reuse` filled from the return (S4). It appends the READY body
    with `## reuse` as its seventh section (S3), and rewrites the `**Reuse:**` field to its pointer
    (S5).
@@ -116,7 +129,9 @@ The `## open` answer line takes one of three forms, the same shapes `spec audit:
 
 `--card --append` parses `## reuse` with a closed set of line heads: `- MUST `, `- SHOULD `,
 `- constraint `, `- convention `, `- unmet ` and `- scout `. A seam line must carry ` :: ` and ` — `.
-A convention line must carry `: ` and end in `(<n> of <m>)` with `n` at most `m`. The check grades
+A convention line must carry `: ` and end in `(<n> of <m>)` with `n` at most `m`. The scout line is
+`- scout <ISO date> · lenses <n>/2 · seams <n> · cut <n> · demoted <n>`, each count a non-negative
+integer, and a scout line lacking the `demoted` field is refused. The check grades
 SHAPE: a well-formed line naming the wrong seam passes, and that is `TOOL-aScoutedSeam-2`'s and the
 diff mode's to catch.
 
@@ -163,8 +178,9 @@ card that carries `## reuse`, so no existing card reds.
 - error / empty / loading states: a dead lens is announced in the section and on the READY hand-back.
   A refused append names the line, and the session repairs it before the hand-back.
 - observability: the `## open` answer line and the section's `scout` line.
-- risks: the engine is 176 bytes under its 18432-byte ceiling, measured this session, and aOrientedCast's
-  kickoff units edit it first. The clause is priced against the high-water before it is written.
+- risks: the engine is 18310 bytes, 122 under its 18432-byte ceiling, re-measured 2026-10-13 after
+  aOrientedCast's kickoff units landed. The clause is priced against the high-water before it is
+  written.
 - testing: `manifest-check.test.sh` gains arms for the grammar check and the opt-in precedence.
 - migration: N/A — a new optional key and a new optional section.
 - user docs: the manifest template's catalog line and the conf key's comment.
@@ -181,9 +197,12 @@ card that carries `## reuse`, so no existing card reds.
   Red when: the procedure is written into the engine and the size gate reds.
 - **AC3** — When `manifest-check.sh --card --append` receives a body whose `## reuse` holds a line
   starting `- maybe `, it refuses naming that line and writes nothing. It also refuses a line
-  reading `- convention Section width: normal (5 of 3)`. A conforming section with one line of each
-  of the six kinds appends and survives `--card --replay`.
-  Red when: the append accepts an unknown line head, or a convention count above its population.
+  reading `- convention Section width: normal (5 of 3)`, and a scout line with no `demoted` field.
+  A conforming section with one line of each of the six kinds, its scout line reading
+  `- scout 2026-10-13 · lenses 2/2 · seams 7 · cut 0 · demoted 2`, appends and survives
+  `--card --replay`.
+  Red when: the append accepts an unknown line head or a convention count above its population, or
+  refuses a conforming scout line that carries `demoted`.
 - **AC4** — When `manifest-check.sh --brief-skeleton` prints the skeleton, its `### Reuse` placeholder
   names the scout's line grammar and the fallback for a build with no opt-in.
   Red when: the placeholder still names only the two probes.
@@ -215,13 +234,20 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC3 AC4 AC5
   trial's scout. The catalog line now writes the house index before the harness, and the grammar
   check gains the `convention` line kind. The brief carries conventions and leaves out the harness's
   `edits`.
+- rev-3 · 2026-10-13 · S2 · S3 · §3 · §4 · §5 · §10 · AC3 · `TOOL-aScoutedSeam-1` rev-6 re-specced the
+  harness on the landed roles kit. The catalog line renders the scout's task with `handoff.py render`
+  and passes `roles` and `efforts` from `harness-args` and `stage-efforts`, after the build README
+  exists. The grammar check grades the scout line's shape, which gains `demoted`. §3 gains the roles
+  kit edge, and §5's engine figure is re-measured.
 
 ## 10. Reuse audit
 
 The opt-in extends the spec audit's pattern: the README key, the conf default read at BASE, the one
 kickoff question and the self-declaration refusal. The front-matter reader is `readFrontMatterKey` in
 `tools/hooks/scratch-guard.js`, and the card writer is `add_card_body` in
-`skills/session-kickoff/manifest-check.sh`. The brief sub-head is the `### Reuse` of `BRIEF_SKELETON`,
+`skills/session-kickoff/manifest-check.sh`. The scout's task, `roles` and `efforts` come from
+`tools/roles/handoff.py`'s `render_handoff`, `print_harness_args` and `print_stage_efforts`, the same
+verbs the attended router's stages already call. The brief sub-head is the `### Reuse` of `BRIEF_SKELETON`,
 which aRoutedQuill landed. `tools/codebase-map/reuse_lookup.py "ask the owner once for a dated opt-in
 declared in the build README front matter or a project conf default"` ranked `build`, `load_conf` and
 `parse_conf` by stem and missed all four, so they were found by reading. The house index the
