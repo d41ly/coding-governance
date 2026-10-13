@@ -3168,6 +3168,7 @@ printf 'status\n' > "$_b1/memory/builds/tOne/NOTES.md"
 printf '# a build record\n\nno serves line\n' > "$_b1/memory/builds/tOne/build/2026-08-01-build-tOne-1.md"
 printf '{"a": 1}\n' > "$_b1/memory/builds/tOne/build/result.json"
 printf '# pass-order waivers\n' > "$_b1/memory/project/pass-order-waiver.txt"
+printf '# stand-in waivers\n' > "$_b1/memory/project/role-stand-in-waiver.txt"
 printf 'x\n' > "$_b1/memory/project/zz-probe.txt"
 printf '# legacy\n' > "$_b1/memory/project/legacy-files.txt"
 ( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10 --no-verify ) >/dev/null 2>&1
@@ -3195,8 +3196,9 @@ esac
 n=$((n+1))
 case "$o" in
   *"memory/project/pass-order-waiver.txt"*) echo "FAIL check 3 named pass-order-waiver.txt, a registry the unattended kit reads at its default path"; st=1 ;;
-  *"HYGIENE check 3 FAILED"*"memory/project/zz-probe.txt"*) echo "ok   check 3 admits the kit registry pass-order-waiver.txt by name" ;;
-  *) echo "FAIL check 3 did not name the unlisted zz-probe.txt, so its silence about pass-order-waiver.txt proves nothing"; st=1 ;;
+  *"memory/project/role-stand-in-waiver.txt"*) echo "FAIL check 3 named role-stand-in-waiver.txt, a registry the roles kit reads at its default path"; st=1 ;;
+  *"HYGIENE check 3 FAILED"*"memory/project/zz-probe.txt"*) echo "ok   check 3 admits the kit registries pass-order-waiver.txt and role-stand-in-waiver.txt by name" ;;
+  *) echo "FAIL check 3 did not name the unlisted zz-probe.txt, so its silence about either kit registry proves nothing"; st=1 ;;
 esac
 printf '# legacy\nmemory/builds/tOne/NOTES.md\nmemory/builds/tOne/build/2026-08-01-build-tOne-1.md\n' > "$_b1/memory/project/legacy-files.txt"
 ( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m rf10-legacy --no-verify ) >/dev/null 2>&1

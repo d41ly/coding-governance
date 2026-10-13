@@ -39,7 +39,7 @@ The checker grades that each entry names something, not that the thing exists.
 ## The handoff renderer
 
 `python handoff.py render --role <name> --build <slug> [--unit <id>] [--card <path>]
-[--input <key>=<value>]... [--out <path> | --stdout] [--part full|task]` turns a role and one task
+[--input <key>=<value>]... [--out <path> | --stdout | --stand-in] [--part full|task]` turns a role and one task
 into the prompt its agent is handed (TOOL-aOrientedCast-2). The file holds the role as `render_role`
 renders it under `## Role`, then `## Task`: one block per key of the role's `reads`, in declared
 order, then, as its last block, the role's charter blocks (described under "The agent types"),
@@ -75,6 +75,41 @@ no entry last. A line past 200 characters, the playbook's one-line rule limit, r
 role and its length, as do a missing key and an empty catalogue, with nothing printed: exit 1. No
 repository or no `MEMORY_ROOT` exits 2. It reads no charter, since on a first install the playbook
 render writes the charter; the playbook kit's derived roster placeholder is its consumer.
+
+## Standing in for a role
+
+Work goes to its role agent. The one exception is a tool or run that cannot spawn a sub-agent at all:
+there the main loop does the role's work itself, as a stand-in, and the owner grants that by a dated
+waiver row (TOOL-aOrientedCast-19). A waiver relaxes the `[roles]` rule for one role in one build. It
+never admits a write a hook refuses and never removes a leg from the bar; in Claude Code a sub-agent
+can always be spawned, so the hooks read no waiver row.
+
+**The registry** is `<MEMORY_ROOT>/project/role-stand-in-waiver.txt`, written by the owner and by
+nobody else. No tree holds it until the first row, and an absent registry waives nothing. Blank lines
+and lines opening `#` are ignored; every other line is one row of five TAB-separated fields, split at
+the first four TABs so the reason may hold anything:
+
+```
+<date>	owner <who>	<role>	<build>	<reason>
+```
+
+The date is a `YYYY-MM-DD` calendar date, the attribution `owner ` and one token, the role a role
+file whose `agent` is not `false`, the build a slug of letters, and the reason non-empty. A second row
+for the same build and role is a defect naming the line it repeats.
+
+**The declaration.** A stand-in renders its role's handoff with
+`python handoff.py render --role <role> --build <slug> ... --stand-in` and follows it, so the role's
+text reaches it exactly as it would reach an agent. With no valid row for that build and role the
+render exits 1, naming the registry and the row the owner writes, and writes nothing; otherwise the
+file takes the derived name with a `-stand-in` tail before `.md`. `--stand-in` excludes `--out` and
+`--stdout`: a handoff printed to stdout declares nothing.
+
+**R15** in the checker joins the two both ways: a `*-stand-in.md` file under a build's `prompts/`
+whose marker's build and role no row covers is a defect, a tailed file with no marker is a defect,
+and a row no declaration consumes is stale and a defect, as the sibling registries red a stale row.
+Every valid row prints as one `roles: note: stand-in waiver` line on every run, green included, and
+the summary carries both counts. R15 does not check that the tool truly could not spawn, that the
+signer is the owner, or that the reason says anything, and it cannot see a stand-in nobody declared.
 
 ## The effort policy
 
@@ -226,10 +261,11 @@ the role files, the overlays and the workflow table against each other in both d
 memory-tree conf's `CHARTER` key; a body or an overlay spelling a protocol's file name reds as R5 or
 R10. A role called mandatory under a workflow whose `enforced-by` names no hook script, without an
 `unenforced — <why>` clause, reds as R13, and a writer role whose `output` lacks its class's folder
-as R14. It prints one line per defect naming the file and the rule (the rules are listed in its
+as R14. A stand-in declaration and the owner's waiver rows are joined as R15, under "Standing in for
+a role". It prints one line per defect naming the file and the rule (the rules are listed in its
 header, with what it does not check), then a summary of every count it graded, the charter's shape among
-them. Exit 0 clean, 1 on a defect or an empty catalogue (DEAD PROBE), 2 when the conf or its
-`CHARTER` is missing, or the doc is no charter this kit reads. `--write` re-renders the region below from the table and the front matter, and nothing
+them. Exit 0 clean, 1 on a defect or an empty catalogue (DEAD PROBE), 2 when the conf, its
+`CHARTER` or its `MEMORY_ROOT` is missing, or the doc is no charter this kit reads. `--write` re-renders the region below from the table and the front matter, and nothing
 else; the check compares the two on every run.
 
 <!-- gen:roles-catalogue -->

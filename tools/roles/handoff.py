@@ -2,7 +2,8 @@
 """handoff.py — a role and one task's inputs, rendered into one hashed prompt file (TOOL-aOrientedCast-2).
 
     python handoff.py render --role <name> --build <slug> [--unit <id>] [--card <path>]
-                             [--input <key>=<value>]... [--out <path> | --stdout] [--part full|task]
+                             [--input <key>=<value>]... [--out <path> | --stdout | --stand-in]
+                             [--part full|task]
     python handoff.py harness-args <harness>
     python handoff.py stage-efforts <workflow>
     python handoff.py check <file>
@@ -14,6 +15,12 @@ the role as the last block: the section 1 rule lines its `rules` tags cite and t
 sections (TOOL-aOrientedCast-16), each library note printed on stderr as `handoff: note — `. It writes
 the file under the build's `prompts/` folder, printing its repo-relative path. `--part task` prints
 the marker line, a blank line and the `## Task` section instead; `--stdout` writes nothing and prints.
+`--stand-in` declares that the main loop does the role's work itself, because its tool cannot spawn
+a sub-agent (TOOL-aOrientedCast-19): it refuses with exit 1, writing nothing, unless a valid row of
+the owner's `<MEMORY_ROOT>/project/role-stand-in-waiver.txt` names the role and the build, and
+otherwise writes the derived name with a `-stand-in` tail before `.md`, which the catalogue
+checker's R15 joins with that row. It does not check that the tool truly cannot spawn, nor relax
+any hook or gate.
 The marker carries two hashes, each the first 12 hex digits of the SHA-256 of one section's bytes
 with CRLF folded to LF: `## Role` up to the byte before the `## Task` line, and `## Task` to the end
 of the file. `check` re-derives both and compares the marker's `path` with the file's own.
@@ -37,7 +44,7 @@ the card's location stays that checker's rule. A required key resolving to nothi
 or a placeholder refuses and writes nothing; an optional one is named on the `Not supplied` line.
 A relative path given to `--card`, `--out`, an `--input` or `check` is read from the repository root.
 
-Exit 0 on success, 1 on a refusal naming its key, file or role, 2 on usage or an unarmed
+Exit 0 on success, 1 on a refusal naming its key, file, role or missing waiver row, 2 on usage or an unarmed
 environment: no repository, no MEMORY_ROOT, no CHARTER (`roster` needs no CHARTER).
 
 WHAT THIS DOES NOT CHECK: whether a card or brief value says anything true, since a value present,
@@ -68,12 +75,11 @@ PATH_INPUTS = ("spec", "prompt")
 PLACEHOLDERS = ("…", "...", "tbd", "todo", "n/a", "none", "-", "?")
 KICKOFF_HOME, KICKOFF_CHECKER = "session-kickoff", "manifest-check.sh"
 CHECKER_BOUND_S = 30
-SLUG_RE = re.compile(r"^[A-Za-z]+$")
+SLUG_RE = lib.SLUG_RE
 UNIT_RE = re.compile(r"^[A-Z]+-([A-Za-z]+)-[0-9]+$")
 READY_RE = re.compile(r"^(- )?READY — ")
 BLANK_EDGES_RE = re.compile(r"\A\s*\n|\n\s*\Z")
-MARKER_RE = re.compile(r"^<!-- gov:handoff role=(\S+) build=(\S+) unit=(\S+) path=(\S+) "
-                       r"role-sha=([0-9a-f]{12}) task-sha=([0-9a-f]{12}) -->$", re.M)
+MARKER_RE = lib.MARKER_RE
 ROLE_HEAD_RE, TASK_HEAD_RE = re.compile(r"^## Role$", re.M), re.compile(r"^## Task$", re.M)
 PROMPT_HEAD_RE = re.compile(r"^## The prompt[ \t]*$", re.M)
 BRIEF_HEAD_RE = re.compile(r"^## The brief[ \t]*$", re.M)
@@ -235,13 +241,14 @@ def resolve_brief_record(prompts_dir, prompt_path):
     return hits[0] if hits else None
 
 
-def derive_prompt_name(prompts_dir, date, unit_id, role):
-    """`<date>-prompt-<id>-<n>-<role without gov->.md`, `<n>` one above the highest that date and id
-    already use under the folder, by any role, so the derived path never overwrites a file."""
+def derive_prompt_name(prompts_dir, date, unit_id, role, tail=""):
+    """`<date>-prompt-<id>-<n>-<role without gov-><tail>.md`, `<n>` one above the highest that date
+    and id already use under the folder, by any role, so the derived path never overwrites a file."""
     stem = "%s-prompt-%s-" % (date, unit_id)
     seq_re = re.compile(re.escape(stem) + r"([0-9]+)-")
     used = [int(m.group(1)) for p in prompts_dir.glob(stem + "*") if (m := seq_re.match(p.name))]
-    return "%s%d-%s.md" % (stem, max(used, default=0) + 1, role[4:] if role.startswith("gov-") else role)
+    return "%s%d-%s%s.md" % (stem, max(used, default=0) + 1,
+                             role[4:] if role.startswith("gov-") else role, tail)
 
 
 def derive_section_sha(section):
@@ -250,9 +257,10 @@ def derive_section_sha(section):
 
 
 def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card_arg, inputs, out_path,
-                   notes=None):
+                   notes=None, tail=""):
     """`(path, text, task_part)` of the prompt file; raises RolesError naming every key that refused.
-    The charter library's notes are appended to `notes` when a list is given."""
+    The charter library's notes are appended to `notes` when a list is given; `tail` goes before
+    the derived name's `.md`."""
     build_dir = root / memory_root / "builds" / slug
     if not build_dir.is_dir():
         raise lib.RolesError("the build folder %s does not exist" % build_dir.as_posix())
@@ -354,7 +362,7 @@ def render_handoff(root, memory_root, charter_path, role, keys, slug, unit, card
     role_sec = "## Role\n\n%s\n\n" % lib.render_role(KIT_DIR, role, memory_root).strip("\n")
     task_sec = "\n\n".join(["## Task", opening] + blocks) + "\n"
     path = out_path or build_dir / "prompts" / derive_prompt_name(
-        build_dir / "prompts", datetime.date.today().isoformat(), unit_id, role)
+        build_dir / "prompts", datetime.date.today().isoformat(), unit_id, role, tail)
     rel = path.relative_to(root).as_posix()
     marker = "<!-- gov:handoff role=%s build=%s unit=%s path=%s role-sha=%s task-sha=%s -->" % (
         role, slug, unit or "-", rel, derive_section_sha(role_sec), derive_section_sha(task_sec))
@@ -486,6 +494,7 @@ def main(argv):
     dest = r.add_mutually_exclusive_group()
     dest.add_argument("--out")
     dest.add_argument("--stdout", action="store_true")
+    dest.add_argument("--stand-in", action="store_true")
     r.add_argument("--part", choices=("full", "task"), default="full")
     sub.add_parser("harness-args").add_argument("harness")
     sub.add_parser("stage-efforts").add_argument("workflow")
@@ -556,9 +565,18 @@ def main(argv):
         if out and prompts not in out.parents:
             ap.error("--out %s is not under %s, the only folder the spawn guard admits a marker in"
                      % (a.out, prompts.relative_to(root).as_posix()))
+        if a.stand_in:
+            waivers, bad = lib.load_stand_in_waivers(root, memory_root, roles)
+            if (a.build, a.role) not in waivers:
+                raise lib.RolesError("\n".join([
+                    "--stand-in: no valid row in %s/project/%s waives role %s in build %s, so this "
+                    "stand-in is not the owner's; the owner adds the TAB-separated row "
+                    "'<date> owner <who> %s %s <reason>'" % (memory_root, lib.STAND_IN_WAIVER, a.role,
+                                                               a.build, a.role, a.build)] + bad))
         notes = []
         path, text, task_part = render_handoff(root, memory_root, charter_path, a.role, keys, a.build,
-                                               a.unit, a.card, inputs, out, notes)
+                                               a.unit, a.card, inputs, out, notes,
+                                               lib.STAND_IN_TAIL if a.stand_in else "")
         for line in notes:
             print("handoff: note — %s" % line, file=sys.stderr)
     except lib.RolesError as e:

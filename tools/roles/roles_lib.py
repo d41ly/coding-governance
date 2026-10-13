@@ -1,7 +1,9 @@
 """roles_lib — the one reader of the role catalogue, and the one composition of a role (TOOL-aOrientedCast-1).
 
 Reads the role files under `agents/`, the workflow table `workflows.toml`, the memory-tree conf and
-the governing doc: its section 1 rule tags and its carried sections (TOOL-aOrientedCast-16).
+the governing doc: its section 1 rule tags and its carried sections (TOOL-aOrientedCast-16). It is
+also the one reader of the owner's stand-in waiver registry and of the stand-in declarations under
+the builds' `prompts/` folders (TOOL-aOrientedCast-19).
 `render_role` is the one composition of a role with its house overlay, and `render_charter_blocks`
 the one composition of the charter text a role carries: every consumer that hands a role to an agent
 calls both, so a role reaches an agent the same way by every route. Stdlib only; every text read
@@ -12,6 +14,7 @@ RAW (a list is comma-separated on one line, the form Claude Code's own `tools:` 
 a repeated or an unknown key is refused, because a simple parser drops an indented key without a
 word and a repeated one silently keeps the last.
 """
+import datetime
 import json
 import pathlib
 import re
@@ -64,6 +67,17 @@ LEGACY_NOTE = ("%s is a pre-tag charter: it carries `## §<n> — ` headings and
                "so no role's rules resolve and no agent type or handoff carries the charter; reseed "
                "the charter template from gov, then re-render")
 HARNESS_RE = re.compile(r"^\{prefix\}/([^/{}\s]+)/([^/{}\s]+)$")
+#: A build slug, as `handoff.py render --build` takes it and a stand-in waiver row names it.
+SLUG_RE = re.compile(r"^[A-Za-z]+$")
+#: The rendered handoff's marker line; `handoff.py` reads this one pattern (TOOL-aOrientedCast-19).
+MARKER_RE = re.compile(r"^<!-- gov:handoff role=(\S+) build=(\S+) unit=(\S+) path=(\S+) "
+                       r"role-sha=([0-9a-f]{12}) task-sha=([0-9a-f]{12}) -->$", re.M)
+#: The owner's stand-in waiver registry under `<MEMORY_ROOT>/project/`, and the file-name tail a
+#: handoff rendered by a stand-in carries before `.md` (TOOL-aOrientedCast-19).
+STAND_IN_WAIVER = "role-stand-in-waiver.txt"
+STAND_IN_TAIL = "-stand-in"
+WAIVER_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+WAIVER_OWNER_RE = re.compile(r"^owner \S+$")
 
 
 class RolesError(Exception):
@@ -422,6 +436,83 @@ def load_policy(kit_dir, roles, workflows, notes=None):
     for slot in gates:
         gates[slot] = [n[:-1] if n.endswith("?") else n for n in gates[slot]]
     return data
+
+
+def load_stand_in_waivers(root, memory_root, roles):
+    """`(rows, defects)` of `<MEMORY_ROOT>/project/role-stand-in-waiver.txt` (TOOL-aOrientedCast-19).
+
+    `rows` maps `(build, role)` to `{"line", "date", "who", "role", "build", "reason"}` for each
+    valid row; `defects` holds one `<registry>:<line>: R15 — <what>` line per invalid row, naming
+    the first field that fails. A row is five TAB-separated fields split at the first four TABs,
+    `<date>`, `owner <who>`, `<role>`, `<build>`, `<reason>`; blank lines and `#` lines are ignored. A
+    second row for a `(build, role)` already held is a defect, and the first stays valid. An absent
+    registry yields neither; nothing here raises on a row. `roles` is `load_roles`'s shape.
+    """
+    rel = (pathlib.Path(memory_root) / "project" / STAND_IN_WAIVER).as_posix()
+    path = pathlib.Path(root) / rel
+    rows, defects = {}, []
+    if not path.is_file():
+        return rows, defects
+    try:
+        text = load_text(path)
+    except (RolesError, UnicodeDecodeError) as e:
+        return rows, ["%s: R15 — the registry cannot be read as UTF-8 — %s" % (rel, e)]
+    for n, line in enumerate(text.split("\n"), 1):
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        fields = line.split("\t", 4)
+        what = None
+        if len(fields) < 5:
+            what = "is %d TAB-separated field(s), and a row is five: date, owner, role, build, reason" % len(fields)
+        else:
+            date, who, role, build, reason = fields
+            try:
+                dated = WAIVER_DATE_RE.match(date) and datetime.date.fromisoformat(date)
+            except ValueError:
+                dated = None
+            agent = roles.get(role, {}).get("keys", {}).get("agent", "true")
+            if not dated:
+                what = "date '%s' is not a YYYY-MM-DD calendar date" % date
+            elif not WAIVER_OWNER_RE.match(who):
+                what = "attribution '%s' is not 'owner <who>', so the row is not the owner's" % who
+            elif role not in roles:
+                what = "role '%s' names no role file" % role
+            elif agent == "false":
+                what = "role '%s' is an agent: false role, which is never spawned, so nothing stands in for it" % role
+            elif not SLUG_RE.match(build):
+                what = "build '%s' is not a slug of letters" % build
+            elif not reason.strip():
+                what = "the reason is empty; a waiver says why the role cannot be spawned"
+            elif (build, role) in rows:
+                what = "repeats the row for role %s in build %s at line %d" % (role, build, rows[(build, role)]["line"])
+            else:
+                rows[(build, role)] = {"line": n, "date": date, "who": who[len("owner "):], "role": role,
+                                       "build": build, "reason": reason.strip()}
+        if what:
+            defects.append("%s:%d: R15 — %s" % (rel, n, what))
+    return rows, defects
+
+
+def scan_stand_in_declarations(root, memory_root):
+    """`(declarations, defects)`: every `<MEMORY_ROOT>/builds/*/prompts/*-stand-in.md`, sorted, read
+    through its `gov:handoff` marker as `{"path", "role", "build", "unit"}`, `path` root-relative
+    (TOOL-aOrientedCast-19). A tailed file with no marker line is one `<path>: R15 — ` defect: its
+    name declares a stand-in and it names no role. A handoff without the tail is never read."""
+    root = pathlib.Path(root)
+    found, defects = [], []
+    for p in sorted((root / memory_root / "builds").glob("*/prompts/*%s.md" % STAND_IN_TAIL)):
+        rel = p.relative_to(root).as_posix()
+        try:
+            m = MARKER_RE.search(load_text(p))
+        except (RolesError, UnicodeDecodeError) as e:
+            defects.append("%s: R15 — the stand-in declaration cannot be read as UTF-8 — %s" % (rel, e))
+            continue
+        if not m:
+            defects.append("%s: R15 — named as a stand-in declaration and carries no gov:handoff "
+                           "marker line, so it names no role" % rel)
+            continue
+        found.append({"path": rel, "role": m.group(1), "build": m.group(2), "unit": m.group(3)})
+    return found, defects
 
 
 def resolve_effort(policy, slot):

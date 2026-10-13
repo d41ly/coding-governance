@@ -54,6 +54,10 @@ manifest's path, which the hooks kit's scratch guard reads to refuse a role agen
 (TOOL-aOrientedCast-11). Every role also says when it is `mandatory` and where its `output` goes,
 graded as R13 against its workflow's hook and R14 against its writer class's folder, and
 `handoff.py roster` composes the charter's one line per role from them (TOOL-aOrientedCast-17).
+Where a tool cannot spawn a sub-agent, the main loop stands in for a role by rendering its handoff
+with `--stand-in`, which refuses unless the owner's stand-in waiver registry under the memory
+root's `project/` folder holds a dated row for that role and build; the checker joins the tailed
+handoffs and the rows both ways as R15 (TOOL-aOrientedCast-19).
 
 ## Constraints & why
 

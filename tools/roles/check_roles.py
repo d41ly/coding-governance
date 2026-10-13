@@ -9,7 +9,8 @@ then one summary line naming every count it graded and each overlay's bytes. Exi
 defect, 2 when the check is unarmed. `--write` renders the README's catalogue region and writes it,
 touching nothing else, then grades as usual.
 
-  R0  no `.memory-tree.conf`, no CHARTER key in it, or no file at that path; a governing doc that
+  R0  no `.memory-tree.conf`, no CHARTER key in it, or no file at that path; a blank or absent
+      MEMORY_ROOT in it (TOOL-aOrientedCast-19); a governing doc that
       carries neither a section 1 rule tag nor a `## §<n> — ` heading, a tagged doc lacking a
       carried section (`## Protocols`, `## Facts`), or a tag repeated in section 1 (exit 2)
   R1  zero role files or zero workflow entries, or a tagged charter no role's `rules` cites a tag
@@ -52,6 +53,11 @@ touching nothing else, then grades as usual.
   R14 an `output` value carrying a token other than {{MEMORY_ROOT}}; or a `spec`, `review`,
       `product` or `records` writer's `output` lacking its class's folder spelling from
       WRITE_FOLDERS (TOOL-aOrientedCast-17)
+  R15 a row of `<MEMORY_ROOT>/project/role-stand-in-waiver.txt` with a bad date, attribution, role,
+      build or reason, or repeating a held `(build, role)`; a `*-stand-in.md` handoff under a
+      build's `prompts/` with no marker, or whose `(build, role)` no row covers; a row covering no
+      such declaration (stale). Every valid row prints one `roles: note: stand-in waiver` line
+      (TOOL-aOrientedCast-19)
 
 WHAT THIS DOES NOT CHECK, because a structural check reads as a semantic one to everybody who did not
 write it: the MEANING of a body; the truth of an `enforced-by` entry; a `tools:` name, which moves
@@ -61,7 +67,10 @@ whether a cited rule suits its role; and whether a bare tag exists in every v4.x
 hold. An overlay's size is printed and never graded: it is the adopter's own text. R13 reads a
 first word ending in `.js` as a hook by spelling convention alone, never asking whether that script
 exists, is wired or refuses an inline stand-in; R14 does not compare an `output` with where the role
-actually writes; and a `mandatory` value's when-clause is never tested for truth.
+actually writes; and a `mandatory` value's when-clause is never tested for truth. R15 does not check
+whether the tool truly could not spawn, whether the `owner` who signed a row is the owner, whether a
+reason says anything, whether a marker's build matches its folder, an inline stand-in nobody
+declared, or a declared stand-in that was in fact spawned, which is harmless overstatement.
 """
 import pathlib
 import re
@@ -148,6 +157,10 @@ def check_roles(root, kit_dir, write=False):
     root, kit_dir = pathlib.Path(root), pathlib.Path(kit_dir)
     tool_root = kit_dir.parent
     charter_path = lib.resolve_charter_path(root)
+    memory_root = lib.read_conf_key(root / ".memory-tree.conf", "MEMORY_ROOT")
+    if not memory_root:
+        raise lib.RolesError("%s: R0 — declares no MEMORY_ROOT key, or a blank one, so no memory root "
+                             "holds the stand-in waiver registry" % (root / ".memory-tree.conf").as_posix())
     doc = resolve_display_path(root, charter_path)
     charter = lib.parse_charter(lib.load_text(charter_path), doc)
     defects, notes = [], []
@@ -344,6 +357,23 @@ def check_roles(root, kit_dir, write=False):
     except lib.RolesError as e:
         defects.extend("roles: %s" % ln for ln in str(e).split("\n"))
 
+    # R15 — the owner's stand-in waiver rows joined with the declarations, both ways (TOOL-aOrientedCast-19).
+    waivers, bad = lib.load_stand_in_waivers(root, memory_root, roles)
+    declared, scan_bad = lib.scan_stand_in_declarations(root, memory_root)
+    defects.extend("roles: %s" % ln for ln in bad + scan_bad)
+    registry = (pathlib.Path(memory_root) / "project" / lib.STAND_IN_WAIVER).as_posix()
+    for d in declared:
+        if (d["build"], d["role"]) not in waivers:
+            add_defect(root / d["path"], "R15", "no waiver row in %s covers this stand-in for role %s in "
+                       "build %s" % (registry, d["role"], d["build"]))
+    held = {(d["build"], d["role"]) for d in declared}
+    for (build, role), w in waivers.items():
+        if (build, role) not in held:
+            defects.append("roles: %s:%d: R15 — stale: it covers no stand-in declaration of role %s "
+                           "under %s/builds/%s/prompts/" % (registry, w["line"], role, memory_root, build))
+        notes.append("roles: note: stand-in waiver %s owner %s %s %s — %s"
+                     % (w["date"], w["who"], role, build, w["reason"]))
+
     readme = kit_dir / "README.md"
     region = render_catalogue_region(roles, workflows)
     text = lib.load_text(readme) if readme.is_file() else ""
@@ -359,11 +389,12 @@ def check_roles(root, kit_dir, write=False):
 
     summary = ("roles: graded %d roles, %d overlays, %d workflows, %d reads keys, %d mandatory roles, "
                "%d writer outputs, %d rule tags and %d protocol file names against %s, a %s charter; "
-               "overlay bytes %s; %d defect(s)" % (
+               "overlay bytes %s; %d stand-in waiver(s), %d stand-in declaration(s); %d defect(s)" % (
                    len(files), len(overlays), len(workflows), n_reads, n_mandatory, n_outputs, n_rules,
                    len(protocol_files), doc,
                    "tagged" if charter["shape"] == "tagged" else "pre-tag",
-                   ", ".join("%s=%d" % kv for kv in overlays.items()) or "none", len(defects)))
+                   ", ".join("%s=%d" % kv for kv in overlays.items()) or "none",
+                   len(waivers), len(declared), len(defects)))
     return defects, notes, summary
 
 
