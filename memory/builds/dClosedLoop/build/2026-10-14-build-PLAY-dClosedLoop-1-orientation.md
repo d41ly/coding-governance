@@ -339,3 +339,12 @@ Three more gaps came with it: `gap-orient-11` (cards are keyed by session, so no
 process or other node finds a build's card), `gap-orient-12` (a resume in this session delivered no
 card, cause unknown) and `gap-orient-13` (the card never reaches the charter's slot, a subagent beyond
 its route, or another harness).
+
+### Confirmed, 2026-10-14
+
+Put to the owner as two interpretations, both answered "Confirm both":
+
+- **At rank 1, the charter wins any conflict with the build's card**, which is rendered under it.
+- **"A session that doesn't have a card READY"** means a session with no saved READY card for the
+  build and slice it is placed into; such a session runs the full kickoff, and any other session
+  reorients from the saved card.

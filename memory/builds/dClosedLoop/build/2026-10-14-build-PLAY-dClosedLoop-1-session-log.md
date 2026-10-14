@@ -143,6 +143,8 @@ from the ledger for the same reason:
   progress along the flow. Four researchers measured routing, cost, trust and determinism; the
   orientation record holds the design and eight forks, answered; a fifth researcher was sent at the
   owner's request to find a better way to preserve the build's card.
+- 2026-10-14, session 1799cb98: the owner confirmed both orientation interpretations and asked for a
+  session modelled through every step; the model found fourteen holes, recorded and not yet decided.
 
 ## Instruments
 
@@ -363,6 +365,7 @@ Runs, 2026-10-14:
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-maintain.md` | The main loop's Maintain research, with every instrument beside its output. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-{routing,cost,trust,determinism}.md` | The four orientation researchers' returns, verbatim, the harness's entity escapes restored. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-preserve.md` | The fifth orientation researcher's return, verbatim: how the build's card is preserved and reaches priority 1, adopted at the owner's request. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-session-model.md` | One build modelled through every step under the `standard` preset, the owner's part in it, and the fourteen holes the model exposed. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |

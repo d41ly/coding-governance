@@ -81,6 +81,10 @@ by every session-start hook in the session's own tree; the clone's copy is a cac
 `card.snapshot` joins the catalogue and the presets; `gap-orient-11` to `gap-orient-13` are owned by
 dDeclaredLoop and dOrderedCharter.
 
+Revised: 2026-10-14, after the owner confirmed both orientation interpretations: the charter wins any
+conflict with the build's card at rank 1, and a session runs the full kickoff only when it has no saved
+READY card for the build and slice it is placed into.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -180,7 +184,8 @@ limit, Codex's 32 KiB. The foundation build,
 dOrderedCharter, writes it (foundations step 1; it took the front door from the Spine, walk S5).
 
 **The ladder** (foundations F1-2): 0 the platform's own system and safety instructions, not the
-repository's to rank; 1 the charter, and beside it the build's orientation card (orientation OR-5);
+repository's to rank; 1 the charter, and beside it the build's orientation card, the charter winning
+any conflict between them (orientation OR-5, confirmed);
 2 the loop and the repository's policy values; 3 stage methods
 and protocols; 4 kit runbooks, Skills and path-scoped rules; 5 the role; 6 the task; 7 records and
 memory, evidence only, never instructions.
@@ -444,9 +449,10 @@ out with the owner's ratification and confirms dPolishedVitrine's track, which w
   verified tree for the landing order; each transition keeps the messages it disposed in the build's
   transition log, and Maintain prunes a closed build's mailbox ref once its folder holds them all.
 
-- Orientation (`build/2026-10-14-build-PLAY-dClosedLoop-1-orientation.md`): at rank 1 the charter wins a
-  conflict with the build's card, which is rendered under it; "a session that doesn't have a card READY"
-  means no saved READY card for the build and slice the session is placed into.
+
+- The session model (`build/2026-10-14-build-PLAY-dClosedLoop-1-session-model.md`, `[holes]`): fourteen
+  places where the settled design is silent or does not hold together when one build is walked
+  through every step, H1 to H14, each with a proposed resolution, none decided.
 
 ## [owed] Owed to the chain re-cut
 
