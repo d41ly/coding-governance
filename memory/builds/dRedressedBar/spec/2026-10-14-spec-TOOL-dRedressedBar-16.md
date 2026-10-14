@@ -1,11 +1,12 @@
 # TOOL-dRedressedBar-16 — an apply that keeps a carried kit's claim keeps that kit's gate-leg ownership too, so a later argv change does not wedge the kit
 
-**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
+**Status:** CLOSED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-14-build-TOOL-dRedressedBar-16-1-acceptance-ledger.md](../build/2026-10-14-build-TOOL-dRedressedBar-16-1-acceptance-ledger.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md) | research | TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md) | research | TOOL-dRedressedBar-12 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-16-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-16-5-spec-writer.md) | journal | — |

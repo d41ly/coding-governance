@@ -4039,13 +4039,14 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
     already on disk, so an abort would leave the target updated with an un-restamped receipt and no
     emission — a wedge recorded against this step twice.
 
-    `carry_out_of_scope` is S4, and the two verbs need different answers because they keep different
-    receipts. `update` narrows which rows it classifies and leaves its receipt's `kits` list whole,
-    so an out-of-scope kit is still claimed and its ownership rows must survive this run. `apply`
+    `carry_out_of_scope` is S4, and both verbs now pass it, because both keep every claimed kit in
+    the receipt's `kits`. `update` narrows which rows it classifies and leaves `kits` whole; `apply`
     keeps `kits` and `files` whole for every claimed kit its selection did not name
-    (TOOL-dRedressedBar-12) and still passes no carry set: a leg row such a kit loses from `emitted`
-    here is re-claimed by the same-argv rule (`check_leg_claimable`, DEPL-aRepatriatedFork-17 S8)
-    on that kit's next run.
+    (TOOL-dRedressedBar-12). Either way an out-of-scope kit is still claimed, so its ownership rows
+    must survive this run (TOOL-dRedressedBar-16). The same-argv rule (`check_leg_claimable`,
+    DEPL-aRepatriatedFork-17 S8) cannot stand in for the carry: it claims a leg only while gov's
+    resolved argv equals the runner's, and an argv gov has changed is never claimable, so a kit
+    whose row this run dropped would be refused by either verb once gov changed that leg's argv.
 
     `orders` is `apply`'s list and `update` passes None: the non-manifest branch writes the same
     order at the same path either way, and `update` maintains no `orders` list at BASE. Minting one
@@ -7991,7 +7992,8 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- THE BODY IS `write_gate_legs`, shared with `update` since DEPL-cMendedVintage-13. What
     # ---- stays here is what is this verb's alone: the step announcement, the index read, the
     # ---- kit-subject advice below, and the before/after verdict maps around them. `orders` is
-    # ---- passed because the non-manifest branch's order row is `apply`'s to record.
+    # ---- passed because the non-manifest branch's order row is `apply`'s to record, and the carry
+    # ---- for the reason `write_gate_legs`' docstring gives (TOOL-dRedressedBar-16).
     # ----
     # ---- S6, and the index is read ONCE for this step and handed to both consumers inside it.
     # ---- `tracked(target)` is correct for BOTH kind branches: the stage step above has already
@@ -8000,7 +8002,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     step(STEP_LEGS, gr.get("kind", "absent"))
     emitted, _legs_withheld = write_gate_legs(
         "apply", target, deploy, gr, descs, selection, receipt, set(tracked(target)), r,
-        orders=orders)
+        orders=orders, carry_out_of_scope=True)
     if gr.get("kind") == "manifest":
         # THE KIT-SUBJECT LEGS ARE HELD, and an adopter has to be told twice: once here, where
         # they can run them for the first time against the kit they just installed, and once as

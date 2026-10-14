@@ -15988,6 +15988,68 @@ user_skills = "/tmp/gk-fake-skills"
               and "the gate-leg step refused" not in _u13c.stdout,
               _u13c.stdout[-1400:] + _u13c.stderr[-600:])
 
+        # ---- [dRB-16]. A NARROWER APPLY KEEPS THE CARRIED KIT'S LEG OWNERSHIP TOO.
+        # ---- TOOL-dRedressedBar-12 keeps a kit the selection did not name in the receipt's `kits`,
+        # ---- and until this unit `apply` passed no carry, so that kit's leg left `emitted` while its
+        # ---- row stayed in the runner. The same-argv rule re-claims such a row only while gov's argv
+        # ---- is unchanged, so once gov moves it `update --write` reports `does not claim it` and
+        # ---- exits 1, and `apply --kits demo2` raises `already has a leg named` and exits 2. One
+        # ---- gov, two targets, one verb each. The ARGV moves in gov's descriptor, so
+        # ---- `write_vintage13`, which moves an engine byte, is not used.
+        _g16 = build_gov13("drb16")
+        _t16u = build_target13("drb16-u")
+        _t16a = build_target13("drb16-a")
+        for _t16 in (_t16u, _t16a):
+            _p16all = run_gov13(_g16, "apply", "--target", str(_t16))
+            settle(_t16, "both kits")
+            _p16demo = run_gov13(_g16, "apply", "--target", str(_t16), "--kits", "demo")
+            settle(_t16, "demo alone")
+            check(f"[dRB-16] LIVENESS {_t16.name}: both applies exit 0, the runner holds both kits' "
+                  f"legs, and the second apply emitted demo's leg alone",
+                  _p16all.returncode == 0 and _p16demo.returncode == 0
+                  and read_legs13(_t16) == ["demo leg", "demo2 leg"]
+                  and any(ln.startswith("govkit apply — gate legs: emitted 1 ")
+                          for ln in _p16demo.stdout.splitlines()),
+                  f"rc {_p16all.returncode}, {_p16demo.returncode} legs {read_legs13(_t16)}"
+                  + NL13 + (_p16demo.stdout + _p16demo.stderr)[-900:])
+            check(f"[dRB-16] AC1 {_t16.name}: after `apply --kits demo` the receipt's emitted still "
+                  f"holds demo2's leg row, kit demo2",
+                  ("demo2 leg", "demo2") in read_owned13(_t16), str(read_owned13(_t16)))
+        _kit16 = _g16 / PFX / "demo2" / "kit.toml"
+        _src16 = _kit16.read_text(encoding="utf-8")
+        _moved16 = _src16.replace('argv = ["bash", "{prefix}/demo2/engine.sh"]',
+                                  'argv = ["bash", "{prefix}/demo2/engine.sh", "--drb16"]', 1)
+        check("[dRB-16] LIVENESS the argv change matched demo2's leg, so both runs below meet an "
+              "argv gov has moved", _moved16 != _src16, _src16)
+        _kit16.write_text(_moved16, encoding="utf-8", newline="\n")
+        git(_g16, "add", "-A")
+        git(_g16, "commit", "-qm", "B: demo2's leg argv moves")
+        _p16u = run_gov13(_g16, "update", "--target", str(_t16u), "--write")
+        _p16a = run_gov13(_g16, "apply", "--target", str(_t16a), "--kits", "demo2")
+        _argv16 = {}
+        for _t16 in (_t16u, _t16a):
+            _argv16[_t16.name] = next(
+                (e.get("argv") for e in json.loads(
+                    (_t16 / "scripts" / "gate-legs.json").read_text(encoding="utf-8"))
+                 if e.get("name") == "demo2 leg"), None)
+        _out16u = (_p16u.stdout + _p16u.stderr).splitlines()
+        check("[dRB-16] AC1 `update --write` after the argv change exits 0, and no line carries "
+              "`does not claim it` or `the gate-leg step refused`",
+              _p16u.returncode == 0
+              and not any("does not claim it" in ln or "the gate-leg step refused" in ln
+                          for ln in _out16u),
+              f"rc {_p16u.returncode}" + NL13 + NL13.join(_out16u[-14:]))
+        check("[dRB-16] AC1 ...and the runner's demo2 leg row carries the new argv",
+              "--drb16" in (_argv16[_t16u.name] or []), str(_argv16[_t16u.name]))
+        _out16a = (_p16a.stdout + _p16a.stderr).splitlines()
+        check("[dRB-16] AC2 `apply --kits demo2` after the argv change exits 0, and no line carries "
+              "`already has a leg named`",
+              _p16a.returncode == 0
+              and not any("already has a leg named" in ln for ln in _out16a),
+              f"rc {_p16a.returncode}" + NL13 + NL13.join(_out16a[-14:]))
+        check("[dRB-16] AC2 ...and the runner's demo2 leg row carries the new argv",
+              "--drb16" in (_argv16[_t16a.name] or []), str(_argv16[_t16a.name]))
+
         # ========= DEPL-cMendedVintage-21 — THE ATOMIC WRITE IS ONE HELPER, AND OBSERVED =========
         # The mitigation above (`-13` S6) was implemented and UNGRADED. `-13` AC6 compares the
         # runner two runs of `apply` produce, and an ordinary in-place `write_text` produces those
