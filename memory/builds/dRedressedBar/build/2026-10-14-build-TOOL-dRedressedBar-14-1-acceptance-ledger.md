@@ -6,8 +6,9 @@ This is the build pass of the first-apply-at-a-per-kit-prefix defect. It changed
 `_cmd_apply` in `tools/govkit/govkit.py` now writes `.governance/install.json` between HOOKPROBE and
 CONFIGURE. It writes one dict, `_rcpt_doc`, built from unit 12's carry, which is now bound there once.
 The three keys later steps fill take the prior receipt's values, or the empty ones. One line follows
-the write: `govkit apply — receipt written ahead of CONFIGURE: <n> row(s), <k> kit(s); RECEIPT
-rewrites it`. The RECEIPT step updates the same dict with `files` re-derived and this run's
+the write:
+`govkit apply — receipt written ahead of CONFIGURE: <n> row(s), <k> kit(s); RECEIPT rewrites it`.
+The RECEIPT step updates the same dict with `files` re-derived and this run's
 `orders`, `after` and `gate_runner`, then writes it. `install.sums` and the `STEP_RECEIPT` counts
 read that dict's lists. `tools/govkit/selftest.py` gains the `[dRB-14]` block after the `[dRB-12]`
 block. The pass also wrote this ledger and spec 14's status cell. The spec-11 correction is the
@@ -29,18 +30,20 @@ ledger). The section 7 gates are owed to the close, with the `New arm:` line's R
 observation of the `[dRB-14]` block over `<p13>`'s engine.
 
 **Evidences:** TOOL-dRedressedBar-14
-- AC1 — `scripts/hooks/agent-cap.js` — at the tip, `apply --kits
-  agent-cap,settings-merge,kickoff-manifest` over the per-kit-prefix target `%TEMP%/b14t` exited 1.
-  Output line 12 was `govkit apply — receipt written ahead of CONFIGURE: 18 row(s), 3 kit(s);
-  RECEIPT rewrites it`. Line 13, the first carrying `CONFIGURE `, was the one line opening
+- AC1 — `scripts/hooks/agent-cap.js` — at the tip, the three-kit apply,
+  `apply --kits agent-cap,settings-merge,kickoff-manifest`, over the per-kit-prefix target
+  `%TEMP%/b14t` exited 1. Output line 12 was
+  `govkit apply — receipt written ahead of CONFIGURE: 18 row(s), 3 kit(s); RECEIPT rewrites it`.
+  Line 13, the first carrying `CONFIGURE `, was the one line opening
   `govkit apply — CONFIGURE settings-merge:`, and it ended `adopter exit 0`. The receipt held the
   row `scripts/hooks/agent-cap.js` with source `tools/hooks/agent-cap.js`. `.claude/settings.json`'s
   `PreToolUse` group with matcher `Workflow|Agent` held one command,
   `node "${CLAUDE_PROJECT_DIR}/scripts/hooks/agent-cap.js"`. No line opened
   `govkit: kit 'settings-merge'`. One line opened `govkit: kit 'agent-cap'`, and its stderr tail named
   `scripts\settings-merge.py`, which python could not open (§8 F1, unit 15). Over the `<p13>` clone,
-  in `%TEMP%/b14r`, the run exited 1 and printed `CONFIGURE settings-merge: adopter exit 2 —
-  no-agent-cap-to-wire [accepted stop]` and no ahead line. Its settings.json held no `Workflow|Agent`
+  in `%TEMP%/b14r`, the run exited 1 and printed
+  `CONFIGURE settings-merge: adopter exit 2 — no-agent-cap-to-wire [accepted stop]`
+  and no ahead line. Its settings.json held no `Workflow|Agent`
   group, and `agent-cap.js` appears in it 0 times. The tip worktree before this pass's edit read the
   same at `%TEMP%/b14h`.
 - AC2 — `cmp` — the default-prefix apply ran from the tip into `%TEMP%/b14d1` and from the `<p13>`
@@ -53,18 +56,20 @@ observation of the `[dRB-14]` block over `<p13>`'s engine.
   line. Exactly one line opened `govkit: kit 'settings-merge'`, and it carried `cannot read`. No line
   carried `no-agent-cap-to-wire`, and the CONFIGURE line read `adopter exit 2`. In the `%TEMP%/b14s`
   copy, the S1 write took `selection` and `rows` in place of the carried lists. Over that copy, in
-  `%TEMP%/b14fs`, the same second apply exited 0 and printed `CONFIGURE settings-merge: adopter
-  exit 2 — no-agent-cap-to-wire [accepted stop]`.
-- AC4 — `drb14 staged fault` — the `%TEMP%/b14s` copy got `raise RuntimeError("drb14 staged
-  fault")` after `inert = read_inert_kits(deploy)`. Its AC1 apply over the per-kit-prefix target
+  `%TEMP%/b14fs`, the same second apply exited 0 and printed
+  `CONFIGURE settings-merge: adopter exit 2 — no-agent-cap-to-wire [accepted stop]`.
+- AC4 — `drb14 staged fault` — the `%TEMP%/b14s` copy got the line
+  `raise RuntimeError("drb14 staged fault")` after `inert = read_inert_kits(deploy)`. Its AC1 apply
+  over the per-kit-prefix target
   `%TEMP%/b14f4` exited 1 on the uncaught RuntimeError. It left `.governance/install.json` claiming
   `kickoff-manifest`, `settings-merge` and `agent-cap`. All 13 of its `engine` rows carried an `oid`,
   and its `orders` was `[]`. Then the tip's unpatched apply ran over the same uncommitted target and
   exited 1, from agent-cap's argv. No line carried `already carries` or `DIRTY`, and exactly one line
   opened `govkit apply — CONFIGURE settings-merge:`, reading `adopter exit 0`. With the same patch
   over the `<p13>` clone, in `%TEMP%/b14f5`, the faulted apply exited 1 and left no receipt. The
-  re-run exited 2 on `govkit: the target already carries agent-cap (at
-  scripts/hooks/agent-cap.js), kickoff-manifest (…), settings-merge (…)`. It ran from the patched
+  re-run exited 2 on a line opening
+  `govkit: the target already carries agent-cap (at scripts/hooks/agent-cap.js), kickoff-manifest`.
+  It ran from the patched
   clone, and that refusal fires at the foreign check, ahead of the patched line.
 - AC5 — `scan_text_io` — `git diff 8df39101b -- tools/govkit/` over the worktree printed no `def`
   or `class` line. `grep -c '_rcpt_doc' tools/govkit/govkit.py` printed 9. The comment above the S1
