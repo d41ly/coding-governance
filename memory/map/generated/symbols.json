@@ -15768,6 +15768,11 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "resolve_adopter_argv",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "resolve_anchor",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"

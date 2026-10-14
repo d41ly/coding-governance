@@ -3565,6 +3565,23 @@ def main() -> int:
               len(_rb14ac) == 1 and "settings-merge.py" in _rb14ac[0],
               " | ".join(_rb14ac) or _rb14p.stdout[-900:])
 
+        # --- TOOL-dRedressedBar-15. THE SAME APPLY, READ FOR AGENT-CAP'S OWN ADOPTER. Its argv was a
+        # --- copy of settings-merge's, resolved through `[kit.agent-cap]`, so it ran
+        # --- `scripts/settings-merge.py`, a file nothing installed there, and python exited 2.
+        # --- `[adopt] via = "settings-merge"` runs settings-merge's argv at settings-merge's home.
+        _rb15cfg = {k: [ln for ln in _rb14out if ln.startswith(f"govkit apply — CONFIGURE {k}:")]
+                    for k in ("settings-merge", "agent-cap")}
+        check("[dRB-15] AC1 the per-kit-prefix apply exits 0",
+              _rb14p.returncode == 0,
+              f"rc {_rb14p.returncode} · {(_rb14p.stdout + _rb14p.stderr)[-900:]}")
+        check("[dRB-15] AC1 exactly one CONFIGURE line each for settings-merge and agent-cap, and "
+              "each ends `adopter exit 0`",
+              all(len(v) == 1 and v[0].endswith("adopter exit 0") for v in _rb15cfg.values()),
+              json.dumps(_rb15cfg))
+        check("[dRB-15] AC1 no line opens `govkit: kit '`",
+              not any(ln.startswith("govkit: kit '") for ln in _rb14out),
+              " | ".join(ln for ln in _rb14out if ln.startswith("govkit: kit '")))
+
         # --- DEPL-dGaugedVintage-8 S3. THE STAMP MUST NOT OUTRUN ROWS THIS RUN NEVER GRADED.
         # --- An `evidence: "unattributed"` row is skipped before `classify_row`, by
         # --- DEPL-dCarriedReceipt-13's ratified design, and it is graded against the receipt's OWN
@@ -5855,6 +5872,81 @@ user_skills = "/tmp/gk-fake-skills"
         bad_g = run_in(scratch_gov("true", "docs/nowhere/"))
         check("a guard in no declared class reds",
               bad_g.returncode == 1 and "declared classes" in bad_g.stdout, bad_g.stdout)
+
+        # ---- TOOL-dRedressedBar-15 S5: THE CROSS-ENTRY ARGV ARM AND THE `via` RULES, ON FIXTURES.
+        # Over gov's own tree the arm grades ownership and finds nothing once agent-cap delegates, so
+        # each branch is armed here. A second entry, `other`, is shaped as settings-merge is: flat,
+        # its home the tool root, one engine rule landing `other.py` at `{prefix}/other.py`, and an
+        # adopter naming that file. `demo` requires it. Every gov must print the arm's note, which is
+        # what tells an absent finding from an arm that never ran.
+        def build_scratch_gov_cross(tag: str, adopt: str, requires: str = '["other"]',
+                                    other_argv: str = '["python", "{prefix}/other.py"]'
+                                    ) -> pathlib.Path:
+            g = build_scratch_gov_kit(
+                f"drb15-{tag}",
+                'id = "demo"\nhome = "demo"\nversion_from = { none = "fixture" }\n'
+                f'requires = {requires}\n\n[check]\nnone = "a fixture kit"\n\n'
+                '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                f'[adopt]\nwhy_no_regenerate = "a fixture adopter"\n{adopt}\n')
+            (g / PFX / KIT_NAMES["govkit"] / "entries").mkdir(parents=True, exist_ok=True)
+            (g / PFX / KIT_NAMES["govkit"] / "entries" / "other.kit.toml").write_text(
+                'id = "other"\nscope = "repo"\nkind = "flat"\nhome = "."\n'
+                'version_from = { none = "fixture" }\nrequires = []\n\n'
+                '[check]\nnone = "a fixture kit"\n\n'
+                '[[files]]\ninclude = ["other.py"]\nrole = "engine"\nto = "{prefix}/other.py"\n\n'
+                '[adopt]\nwhy_no_regenerate = "a fixture adopter"\n'
+                f'argv = {other_argv}\nmutates_index = false\n', encoding="utf-8", newline="\n")
+            (g / PFX / "other.py").write_text("print('other')\n", encoding="utf-8", newline="\n")
+            _reg = g / PFX / KIT_NAMES["govkit"] / "registry.toml"
+            _gk = KIT_NAMES["govkit"]
+            _reg.write_text(_reg.read_text(encoding="utf-8") + '\n[[entry]]\nid = "other"\n'
+                            f'descriptor = "{{prefix}}/{_gk}/entries/other.kit.toml"\n',
+                            encoding="utf-8", newline="\n")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "other")
+            return g
+
+        _rb15gov = {
+            "argv": build_scratch_gov_cross("argv", 'argv = ["python", "{prefix}/other.py"]'),
+            "via": build_scratch_gov_cross("via", 'via = "other"'),
+            "nobody": build_scratch_gov_cross("nobody", 'via = "nobody"'),
+            "norequire": build_scratch_gov_cross("norequire", 'via = "other"', requires="[]"),
+            "noargv": build_scratch_gov_cross("noargv", 'via = "other"', other_argv="[]"),
+            "beside": build_scratch_gov_cross(
+                "beside", 'via = "other"\nargv = ["python", "{prefix}/other.py"]'),
+            "ungraded": build_scratch_gov_cross("ungraded", 'argv = ["bash", "{nosuch}/x.sh"]',
+                                                other_argv="[]"),
+        }
+        _rb15out = {k: run_in(g).stdout.splitlines() for k, g in _rb15gov.items()}
+        _rb15note = {k: [ln for ln in v if ln.startswith("govkit: cross-entry argv:")
+                         and "offered by" in ln] for k, v in _rb15out.items()}
+        check("[dRB-15] AC7 every cross-entry scratch gov prints exactly one `cross-entry argv:` "
+              "note carrying `offered by`",
+              all(len(v) == 1 for v in _rb15note.values()), json.dumps(_rb15note))
+        _rb15hit = [ln for ln in _rb15out["argv"]
+                    if ln.startswith("govkit: entry 'demo': its [adopt] argv names")]
+        check("[dRB-15] AC7 an [adopt] argv naming the file `other` ships reds once, naming both",
+              len(_rb15hit) == 1 and "other.py" in _rb15hit[0] and "'other'" in _rb15hit[0],
+              " | ".join(_rb15hit) or "\n".join(_rb15out["argv"][-30:]))
+        check("[dRB-15] AC7 `via = \"other\"` reds neither the join nor a `via` rule for demo",
+              not any(ln.startswith(("govkit: entry 'demo': its [adopt] argv",
+                                     "govkit: entry 'demo' declares [adopt] via"))
+                      for ln in _rb15out["via"]),
+              "\n".join(_rb15out["via"][-30:]))
+        for _rb15k, _rb15why in (("nobody", "names no registry entry"),
+                                 ("norequire", "is not in its requires"),
+                                 ("noargv", "declares no [adopt] argv of its own"),
+                                 ("beside", "sits beside an [adopt] argv")):
+            _rb15via = [ln for ln in _rb15out[_rb15k]
+                        if ln.startswith("govkit: entry 'demo' declares [adopt] via")]
+            check(f"[dRB-15] AC7 the `{_rb15k}` gov's `via` line carries `{_rb15why}`",
+                  len(_rb15via) == 1 and _rb15why in _rb15via[0],
+                  " | ".join(_rb15via) or "\n".join(_rb15out[_rb15k][-30:]))
+        _rb15live = [ln for ln in _rb15out["ungraded"]
+                     if ln.startswith("govkit: cross-entry argv:") and "none graded" in ln]
+        check("[dRB-15] AC7 LIVENESS offered elements with none graded red on a second "
+              "`cross-entry argv:` line",
+              len(_rb15live) == 1, "\n".join(_rb15out["ungraded"][-30:]))
 
         # ---- D3 (TOOL-dThriftyLanding-4): 7h holds a descriptor's doc_reads and the manifest's equal
         _d3 = scratch_gov("true", f"{PFX}demo/", tag="d3")

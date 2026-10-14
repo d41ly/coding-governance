@@ -1480,6 +1480,44 @@ def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> 
     return ctx
 
 
+def resolve_adopter_argv(target: pathlib.Path, deploy: dict, eid: str,
+                         descs: dict[str, tuple[dict, str]]) -> list[str]:
+    """The adopter argv CONFIGURE runs for `eid`, resolved in the context of the entry that owns it.
+
+    THE `via` GRAMMAR (TOOL-dRedressedBar-15). An entry's `[adopt]` table may hold `via = "<entry>"`
+    in place of an `argv`: "my adopter is that entry's adopter". The source entry is then `<entry>`,
+    else `eid` itself, and the source's `[adopt].argv` comes back with every element passed through
+    `resolve_tokens` against the SOURCE's `target_context`, so `{prefix}` and `{kit}` take the
+    source's per-kit table, exactly as its own CONFIGURE resolves them. Element `[0]` is kept as both
+    spawn sites always kept it. An entry, or a source, with no argv returns `[]`. The key is read
+    from gov's descriptors only: a target's `[kit.<eid>]` values become ctx tokens, never `[adopt]`
+    keys, so a target cannot point one entry's adopter at another.
+
+    The measured case: agent-cap's adopter is settings-merge.py's default action, and the file is
+    settings-merge's. Spelled as its own `{prefix}/settings-merge.py`, it resolved through
+    agent-cap's table, so `[kit.agent-cap] prefix = "scripts"` ran `scripts/settings-merge.py`, a
+    file nothing installed there, and python exited 2.
+
+    THE FOUR RULES selfcheck enforces on every `via`, the first broken one reported: it names a
+    registry entry; that entry is in `eid`'s `requires`, so its script is installed whenever `eid`
+    is configured; that entry declares a non-empty `[adopt] argv` of its own, which rules out a
+    chain; and `eid`'s own `[adopt]` declares no non-empty `argv` beside it.
+
+    IT VALIDATES NOTHING. selfcheck is the one validator of a gov-authored descriptor, and run over
+    a `via` naming no entry without it, this raises a `KeyError`. The CONFIGURED entry's own
+    descriptor and context still classify the exit and still decide the inert, hole and resume
+    skips; only the argv and the context its tokens resolve in are the source's.
+    """
+    via = (descs[eid][0].get("adopt") or {}).get("via")
+    src = via if isinstance(via, str) and via else eid
+    d_src = descs[src][0]
+    argv = (d_src.get("adopt") or {}).get("argv") or []
+    if not argv:
+        return []
+    ctx = target_context(target, deploy, src, d_src)
+    return [resolve_tokens(a, ctx)[0] for a in argv]
+
+
 def load_deploy(target: pathlib.Path) -> dict:
     p = target / ".governance" / "deploy.toml"
     if not p.is_file():
@@ -3222,6 +3260,95 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                f"{len(_silent)} naming a path no rule produces · "
                f"{len(_dests)} planned destination(s) graded against the reserved "
                f"`{{memory_root}}/project/` prefix, {len(_reserved_hits)} under it")
+
+        # ---- TOOL-dRedressedBar-15: NO ARGV NAMES A FILE ONLY ANOTHER ENTRY SHIPS.
+        #
+        # Each entry's tokens resolve from its OWN `[kit.<eid>]` table, so an argv spelling
+        # `{prefix}/<file>` for a file a SIBLING ships agrees with that sibling only while both
+        # share one prefix. Measured: agent-cap's adopter was a copy of settings-merge's, and at
+        # `[kit.agent-cap] prefix = "scripts"` it ran `scripts/settings-merge.py`, which nothing
+        # installed, and python exited 2. A per-entry prefix on either side moves one half and not
+        # the other. The remedy is `[adopt] via`, which `resolve_adopter_argv` resolves in the named
+        # entry's context.
+        #
+        # TWO PARTS. The `via` rules, the first broken one per entry, and an entry breaking one is
+        # left out of the join so the helper never meets an invalid `via`. Then the OWNERSHIP JOIN
+        # over the four argv kinds the engine resolves through the declaring entry's own
+        # `target_context`: `[adopt]` (through the helper, joined to the SOURCE entry), `[check]`
+        # (`run_kit_check`), `[[gate_leg]]` (`write_gate_legs`) and `[[regenerate]]` (`update`'s
+        # re-render). An element is OFFERED when its declared text carries `/`, GRADED when its
+        # resolved text carries no `{` and no space, and a HIT when some entry plans that path and
+        # the source entry does not. Owners are the bare rows with nothing missing.
+        #
+        # WHAT THIS DOES NOT CHECK: an element with no `/` (the gap `silenced_legs` pins); a
+        # space-bearing or unresolved element, which is counted and not graded; `[[hole]]` discharge
+        # commands; `[[outcome]]` probe paths; a path NO entry ships, which `silenced_legs` grades
+        # for legs; whether the delegate's adopter succeeds; and a real per-entry prefix, since the
+        # bare target has one, so the class shows here as ownership rather than as a missing file.
+        _xa_owners: dict[str, set[str]] = {}
+        for _xa_row in _bare_rows:
+            if not _xa_row["missing"]:
+                _xa_owners.setdefault(_xa_row["dest"], set()).add(_xa_row["kit"])
+        _xa_offered = _xa_graded = _xa_hits = 0
+        for _xa_e in _bare_sel:
+            _xa_d = descs[_xa_e][0]
+            _xa_adopt = _xa_d.get("adopt") or {}
+            if "via" in _xa_adopt:
+                _xa_v = _xa_adopt.get("via")
+                _xa_vd = descs[_xa_v][0] if isinstance(_xa_v, str) and _xa_v in descs else None
+                if _xa_vd is None:
+                    _xa_why = "names no registry entry"
+                elif _xa_v not in (_xa_d.get("requires") or []):
+                    _xa_why = "is not in its requires, so that entry's script may not be installed"
+                elif not ((_xa_vd.get("adopt") or {}).get("argv") or []):
+                    _xa_why = "declares no [adopt] argv of its own"
+                elif _xa_adopt.get("argv") or []:
+                    _xa_why = "sits beside an [adopt] argv in the same table"
+                else:
+                    _xa_why = ""
+                if _xa_why:
+                    r.fail(f"entry '{_xa_e}' declares [adopt] via = '{_xa_v}', which {_xa_why}")
+                    continue
+            _xa_src = _xa_adopt.get("via") or _xa_e
+            _xa_ctx = target_context(_bare_t, _bare_deploy, _xa_e, _xa_d)
+            _xa_kinds = [("[adopt]", _xa_src,
+                          (descs[_xa_src][0].get("adopt") or {}).get("argv") or [],
+                          resolve_adopter_argv(_bare_t, _bare_deploy, _xa_e, descs))]
+            _xa_chk = (_xa_d.get("check") or {}).get("argv") or []
+            _xa_kinds.append(("[check]", _xa_e, _xa_chk,
+                              [resolve_tokens(str(_xa_a), _xa_ctx)[0] for _xa_a in _xa_chk]))
+            for _xa_leg in _xa_d.get("gate_leg", []):
+                _xa_la = _xa_leg.get("argv") or []
+                _xa_kinds.append((f"gate leg '{_xa_leg.get('name')}'", _xa_e, _xa_la,
+                                  [resolve_tokens(str(_xa_a), _xa_ctx)[0] for _xa_a in _xa_la]))
+            for _xa_blk in _xa_d.get("regenerate") or []:
+                _xa_ga = _xa_blk.get("argv") or []
+                _xa_kinds.append(("[[regenerate]]", _xa_e, _xa_ga,
+                                  [resolve_tokens(str(_xa_a), _xa_ctx)[0] for _xa_a in _xa_ga]))
+            for _xa_kind, _xa_s, _xa_decl, _xa_res in _xa_kinds:
+                for _xa_a, _xa_p in zip(_xa_decl, _xa_res):
+                    if "/" not in str(_xa_a):
+                        continue
+                    _xa_offered += 1
+                    if "{" in _xa_p or " " in _xa_p:
+                        continue
+                    _xa_graded += 1
+                    _xa_own = _xa_owners.get(_xa_p) or set()
+                    if not _xa_own or _xa_s in _xa_own:
+                        continue
+                    _xa_hits += 1
+                    _xa_o = ", ".join(sorted(_xa_own))
+                    r.fail(f"entry '{_xa_e}': its {_xa_kind} argv names '{_xa_p}', a file entry "
+                           f"'{_xa_o}' ships and '{_xa_s}' does not. Each entry's tokens resolve "
+                           f"from its own table, so a per-entry prefix on either moves one side and "
+                           f"not the other. An adopter that runs another entry's script declares "
+                           f"[adopt] via = \"{_xa_o}\"")
+        r.note(f"cross-entry argv: {_xa_offered} slash-bearing element(s) offered by [adopt], "
+               f"[check], [[gate_leg]] and [[regenerate]] across {len(_bare_sel)} entries, "
+               f"{_xa_graded} graded, {_xa_hits} naming a file only another entry ships")
+        if _xa_offered and not _xa_graded:
+            r.fail(f"cross-entry argv: {_xa_offered} element(s) offered and none graded — every one "
+                   f"carried an unresolved token or a space, so the predicate read nothing")
 
     # ---- 7i: per-file claim inside a NON-FLAT entry's home. Scoped deliberately: five `kind="flat"`
     #          entries declare `home = "tools"` as a source-resolution base, and quantifying over
@@ -7804,16 +7931,22 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                   f"'{blocked[0].get('id')}' — landed but inert")
             configure_skipped.add(eid)
             continue
-        argv = d.get("adopt", {}).get("argv") or []
-        if not argv:
+        # The `via` entry's argv when this descriptor declares one, resolved in THAT entry's context
+        # (TOOL-dRedressedBar-15). `d` and `ctx` stay this entry's, so its own descriptor classifies
+        # the exit and the line below names it.
+        resolved = resolve_adopter_argv(target, deploy, eid, descs)
+        if not resolved:
             continue
-        resolved = [resolve_tokens(a, ctx)[0] for a in argv]
         # BOUND, not reduced to its code (TOOL-dRedressedBar-11 S3): a refused exit below ends its
         # problem line with the adopter's own stderr, the regenerate site's shape, so the operator
         # reads the reason and not only an integer. UTF-8 as the regenerate site and the gained loop
-        # decode, never the host codepage, and REPLACED where it cannot decode: this runs after the
-        # bytes landed and before the receipt is written, so a decode error raised here is the
-        # half-install the F4 comment above says this verb avoids (TOOL-dRedressedBar-13).
+        # decode, never the host codepage, and REPLACED where it cannot decode (TOOL-dRedressedBar-13).
+        # This runs after the early receipt was written ahead of CONFIGURE (TOOL-dRedressedBar-14),
+        # and RECEIPT rewrites it once every adopter has run. So a decode error raised here would
+        # stop `apply` between the two writes. The landed bytes and the early receipt stay, the
+        # receipt carrying the prior run's orders, `after` and gate runner, `install.sums` is not
+        # rewritten, and the adopters after this kit never run: the interrupt the receipt comment
+        # above says a re-run of `apply` recovers from.
         _cfg_run = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True,
                                   text=True, encoding="utf-8", errors="replace")
         rc = _cfg_run.returncode
@@ -11198,11 +11331,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         _ran_gained: set[tuple[str, ...]] = set()
         for _ge in gained:
             _d_g = descs[_ge][0]
-            _argv_g = (_d_g.get("adopt") or {}).get("argv") or []
-            if not _argv_g or _ge in _held_kits or _ge in read_inert_kits(deploy):
+            # Resolved in the `via` entry's context where one is declared (TOOL-dRedressedBar-15),
+            # so a shared script is one resolved argv at every prefix and the dedup below runs it
+            # once; `_ctx_g` stays this entry's, for the classification.
+            _res_g = tuple(resolve_adopter_argv(target, deploy, _ge, descs))
+            if not _res_g or _ge in _held_kits or _ge in read_inert_kits(deploy):
                 continue
             _ctx_g = target_context(target, deploy, _ge, _d_g)
-            _res_g = tuple(resolve_tokens(a, _ctx_g)[0] for a in _argv_g)
             if _res_g in _ran_gained:
                 continue
             if not _rerender_on:
