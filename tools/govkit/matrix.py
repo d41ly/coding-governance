@@ -148,7 +148,7 @@ def shape(tmp: pathlib.Path, name: str, *, lang: str = "none", hook: str | None 
 
 
 def check_outcome_states(descs: dict, g: pathlib.Path, eid: str, rc: int,
-                         rows: list[tuple[str, list[str], bool]]) -> None:
+                         rows: list[tuple]) -> None:
     """THE ENGINE'S OWN VERDICT on one entry's exit code, over states a row each.
 
     A row is `(label, present paths, expected verdict)`. Every path any row names is made to exist
@@ -160,8 +160,10 @@ def check_outcome_states(descs: dict, g: pathlib.Path, eid: str, rc: int,
     """
     d, _p = descs[eid]
     ctx = govkit.target_context(g, govkit.load_toml(g / ".governance" / "deploy.toml"), eid, d)
-    named = sorted({rel for _label, present, _want in rows for rel in present})
-    for label, present, want in rows:
+    named = sorted({rel for row in rows for rel in row[1]})
+    for row in rows:
+        label, present, want = row[:3]
+        texts = row[3] if len(row) > 3 else {}
         for rel in named:
             f = g / rel
             if rel in present:
@@ -169,8 +171,13 @@ def check_outcome_states(descs: dict, g: pathlib.Path, eid: str, rc: int,
                 f.write_text("x" + NL, encoding="utf-8", newline=NL)
             elif f.exists():
                 f.unlink()
+        for rel, text in texts.items():
+            (g / rel).parent.mkdir(parents=True, exist_ok=True)
+            (g / rel).write_text(text, encoding="utf-8", newline=NL)
         oc = govkit.classify_outcome(g, d, ctx, rc)
         got = govkit.outcome_accepted(rc, oc, govkit.declares_outcome_for(d, rc))
+        for rel in texts:
+            (g / rel).unlink()
         check("%s exit %d after %s is %s" % (eid, rc, label, "ACCEPTED" if want else "REFUSED"),
               got is want, "means=%r accepted=%s" % (oc.get("means") if oc else None, got))
 
@@ -225,9 +232,17 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
     # reported 0 hits and 1 near-miss pair, and it reds that same pair with the pre-fix probe staged
     # back in -- both measured. A descriptor that legitimately discriminates two accepted stops by
     # one file takes a named exemption here rather than a silent widening.
-    def derive_probe_paths(block, key):
-        spec = (block.get("probe") or {}).get(key) or []
-        return set(spec if isinstance(spec, list) else [spec])
+    #
+    # BY `want`, never by typed key (TOOL-dRedressedBar-11): every key the engine's own mapping says
+    # must be found is one side, every key it says must not be is the other, so a key added to
+    # `OUTCOME_PROBE_KEYS` joins this rule without an edit here.
+    def derive_probe_paths(block, want):
+        paths = set()
+        for key, key_want in govkit.OUTCOME_PROBE_KEYS.items():
+            spec = (block.get("probe") or {}).get(key) or []
+            if key_want is want:
+                paths |= set(spec if isinstance(spec, list) else [spec])
+        return paths
 
     _pairs = 0
     for eid, (d, _p) in sorted(descs.items()):
@@ -235,7 +250,8 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
         for _i, _a in enumerate(_stops):
             for _b in _stops[_i + 1:]:
                 _pairs += 1
-                _clash = (derive_probe_paths(_a, "must_exist") & derive_probe_paths(_b, "must_not_exist")) |                          (derive_probe_paths(_a, "must_not_exist") & derive_probe_paths(_b, "must_exist"))
+                _clash = ((derive_probe_paths(_a, True) & derive_probe_paths(_b, False))
+                          | (derive_probe_paths(_a, False) & derive_probe_paths(_b, True)))
                 check("accepted stops: '%s' %r and %r agree about every path they both name"
                       % (eid, _a.get("means"), _b.get("means")),
                       not _clash,
@@ -247,6 +263,25 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
     check("accepted stops: at least one descriptor declares two, so the agreement rule graded a pair",
           _pairs > 0,
           "no descriptor carries two ok = true blocks, so the contradiction rule above graded nothing")
+
+    # EVERY PROBE KEY A SHIPPED BLOCK CARRIES IS ONE THE ENGINE EVALUATES (TOOL-dRedressedBar-11).
+    # `classify_outcome` loops over `OUTCOME_PROBE_KEYS` and nothing else, so a misspelled key is not
+    # refused at run time: it is SKIPPED, and the block matches on its remaining terms. A typo in an
+    # absence term therefore widens an accepted stop with no message anywhere. THE CLASS, over every
+    # `[[outcome]]` block of every descriptor, accepted or not, since an unaccepted block's key is
+    # skipped just the same.
+    _blocks = [(eid, b) for eid, (d, _p) in sorted(descs.items()) for b in d.get("outcome", [])]
+    for eid, b in _blocks:
+        _unknown = sorted(set(b.get("probe") or {}) - set(govkit.OUTCOME_PROBE_KEYS))
+        check("probe keys: '%s' code %s %r carries only keys the engine evaluates"
+              % (eid, b.get("code"), b.get("means")),
+              not _unknown,
+              "%s is not in govkit.OUTCOME_PROBE_KEYS %s, so classify_outcome skips it and the block "
+              "matches without it" % (_unknown, sorted(govkit.OUTCOME_PROBE_KEYS)))
+    # The liveness half: over blocks that carry no probe key at all, every label above reads true.
+    check("probe keys: at least one shipped [[outcome]] block carries a key, so the rule graded one",
+          any(b.get("probe") for _eid, b in _blocks),
+          "%d block(s), none with a probe key, so the key rule above graded nothing" % len(_blocks))
 
     # AND THE ENGINE AGREES, over the shipped lexicon descriptor and the two states it has to
     # separate. Both have no `.lexicon.conf`; only one has the Skill the adopter renders beside it.
@@ -264,13 +299,14 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
     # not. Both paths are where the ENGINE lands each kit's version-carrying file in this
     # directory's context, never typed, so a probe naming a path agent-cap does not land at reds a
     # row here.
-    engine = {}
+    engine, writes = {}, {}
     for _eid in ("agent-cap", "settings-merge"):
         _d, _p = descs[_eid]
         _f = "/" + str((_d.get("version_from") or {}).get("file") or "")
-        engine[_eid] = sorted(dest for dest, w in govkit.resolve_entry(
-            ROOT, _d, govkit.target_context(g, deploy, _eid, _d))["writes"].items()
-            if w["src"] and ("/" + w["src"]).endswith(_f))
+        writes[_eid] = govkit.resolve_entry(
+            ROOT, _d, govkit.target_context(g, deploy, _eid, _d))["writes"]
+        engine[_eid] = sorted(dest for dest, w in writes[_eid].items()
+                              if w["src"] and ("/" + w["src"]).endswith(_f))
     check("settings-merge exit 2: each kit's version-carrying file lands at exactly one path",
           all(len(v) == 1 for v in engine.values()), str(engine))
     if all(len(v) == 1 for v in engine.values()):
@@ -281,12 +317,27 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
         # that prefix's parent, never typed; the join climbs one level, so it never equals `hook`.
         _sm = govkit.target_context(g, deploy, "settings-merge", descs["settings-merge"][0])["prefix"]
         parent = posixpath.normpath(posixpath.join(_sm, "..", posixpath.relpath(hook, _sm)))
+        # A HOME ONLY THE RECEIPT RECORDS (TOOL-dRedressedBar-11): the adopter's resolver reads
+        # `.governance/install.json` first, so a hook at a renamed home is found and an exit 2 is a
+        # failure, where no static term sees it. The row's `source` is agent-cap's engine source as
+        # `resolve_entry` gives it, never typed; the home is a fixture value, asserted to be neither
+        # static path, so the REFUSED row cannot pass on a static home. The `.git` entry stops the
+        # resolver's root walk HERE, so it never reads a receipt of a repository above the scratch.
+        guard = "guard/agent-cap.js"
+        check("settings-merge exit 2: the receipt-only home is neither static home the probe names",
+              guard not in (hook, parent), "%s vs %s, %s" % (guard, hook, parent))
+        (g / ".git").mkdir(exist_ok=True)
+        receipt = {".governance/install.json": json.dumps({"files": [
+            {"path": guard, "kit": "agent-cap", "role": "engine",
+             "source": writes["agent-cap"][hook]["src"]}]}, indent=2) + NL}
         check_outcome_states(descs, g, "settings-merge", 2,
                              [("an install with no hooks kit", [adopter], True),
                               ("an install with the hook beside it", [adopter, hook], False),
                               ("an install that landed neither", [], False),
                               ("an install with the hook at its prefix's parent home only",
-                               [adopter, parent], False)])
+                               [adopter, parent], False),
+                              ("a hook only the receipt locates", [adopter, guard], False, receipt),
+                              ("a receipt row whose path is absent", [adopter], True, receipt)])
 
 
 #: The fixture kit, in two vintages. The FIRST is what the target installs from; the SECOND is the

@@ -3353,6 +3353,84 @@ def main() -> int:
               and f"default-gained settings-merge: adopter exit 2 — {means9[0]}" in p9.stdout,
               f"code-2 means {means9} · {p9.stdout[-900:]}")
 
+        # --- TOOL-dRedressedBar-11. A HOOK ONLY THE RECEIPT LOCATES IS FOUND, SO ITS EXIT 2 FAILS.
+        # --- settings-merge.py finds agent-cap through the receipt before its two static homes, so
+        # --- with the hook at a renamed home and a malformed settings file it exits 2 on the PARSE,
+        # --- and a code-2 block reading the static homes alone accepted that as "no hook to wire"
+        # --- and swallowed the reason. Fixture A drives `apply`, fixture B the `update` that gains
+        # --- settings-merge with agent-cap at its per-kit prefix, and each must refuse on ONE
+        # --- problem line that carries the adopter's own `cannot read` (the line, never the whole
+        # --- output: four fragment lines in B carry it too). A-absent is the stop still accepted.
+        _rb11gk = govkit_module()
+        _rb11src = f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js"
+        _rb11a = make_target(tmp / "rq11a", DEPLOY_FULL)
+        run("apply", "--target", str(_rb11a), "--kits", "settings-merge")
+        settle(_rb11a, "the first apply")
+        _rb11hk = idx_of(_rb11src)
+        (_rb11a / "guard").mkdir()
+        (_rb11a / "guard" / "agent-cap.js").write_bytes(_rb11hk)
+        _rb11rp = _rb11a / ".governance" / "install.json"
+        _rb11rec = json.loads(_rb11rp.read_text(encoding="utf-8"))
+        _rb11rec["files"].append({"path": "guard/agent-cap.js", "kit": "agent-cap", "role": "engine",
+                                  "source": _rb11src, "sha256": _rb11gk._sha(_rb11hk),
+                                  "gov_oid": _rb11gk.blob_oid(_rb11hk)})
+        _rb11rec["kits"] = [*(_rb11rec.get("kits") or []), "agent-cap"]
+        _rb11rp.write_text(json.dumps(_rb11rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+        (_rb11a / ".claude").mkdir(exist_ok=True)
+        (_rb11a / ".claude" / "settings.json").write_text("{", encoding="utf-8", newline="\n")
+        settle(_rb11a, "agent-cap at a home only the receipt records, and a malformed settings file")
+        _rb11pa = run("apply", "--target", str(_rb11a), "--kits", "settings-merge")
+
+        _rb11n = make_target(tmp / "rq11n", DEPLOY_FULL)
+        run("apply", "--target", str(_rb11n), "--kits", "settings-merge")
+        settle(_rb11n, "the first apply")
+        (_rb11n / ".claude").mkdir(exist_ok=True)
+        (_rb11n / ".claude" / "settings.json").write_text("{", encoding="utf-8", newline="\n")
+        settle(_rb11n, "a malformed settings file, and no agent-cap anywhere")
+        _rb11pn = run("apply", "--target", str(_rb11n), "--kits", "settings-merge")
+        check("[dRB-11] with agent-cap absent everywhere, the apply exits 0 on the declared stop",
+              _rb11pn.returncode == 0 and len(means9) == 1
+              and f"CONFIGURE settings-merge: adopter exit 2 — {means9[0]} [accepted stop]"
+              in _rb11pn.stdout,
+              f"rc {_rb11pn.returncode} · code-2 means {means9} · {_rb11pn.stdout[-900:]}")
+
+        # B's hook row is an OLDER INSTALL: its bytes and both identities at OLD, as the receipt's.
+        _rb11b = stale_target("rq11b", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n')
+        _rb11dest = f"scripts/{KIT_NAMES['hooks']}/agent-cap.js"
+        _rb11hk = subprocess.run(["git", "-C", str(govroot), "show", f"{OLD}:{_rb11src}"],
+                                 capture_output=True).stdout
+        check("[dRB-11] LIVENESS gov shipped the hook at OLD, so fixture B's row is an older install",
+              bool(_rb11hk), f"{_rb11src} at {OLD[:8]}")
+        (_rb11b / _rb11dest).parent.mkdir(parents=True, exist_ok=True)
+        (_rb11b / _rb11dest).write_bytes(_rb11hk)
+        _rb11rp = _rb11b / ".governance" / "install.json"
+        _rb11rec = json.loads(_rb11rp.read_text(encoding="utf-8"))
+        _rb11rec["files"].append({"path": _rb11dest, "kit": "agent-cap", "role": "engine",
+                                  "source": _rb11src, "commit": OLD, "sha256": _rb11gk._sha(_rb11hk),
+                                  "gov_oid": _rb11gk.blob_oid(_rb11hk)})
+        _rb11rec["kits"] = [*(_rb11rec.get("kits") or []), "agent-cap"]
+        _rb11rp.write_text(json.dumps(_rb11rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+        (_rb11b / ".claude").mkdir(exist_ok=True)
+        (_rb11b / ".claude" / "settings.json").write_text("{", encoding="utf-8", newline="\n")
+        settle(_rb11b, "agent-cap at its per-kit prefix at OLD, and a malformed settings file")
+        _rb11pb = run("update", "--target", str(_rb11b), "--write")
+        check("[dRB-11] update over fixture B leaves the receipt's gov_commit where it was",
+              json.loads(_rb11rp.read_text(encoding="utf-8"))["gov_commit"] == _rb11rec["gov_commit"],
+              _rb11rp.read_text(encoding="utf-8")[:300])
+        for _rb11tag, _rb11p in (("apply over fixture A", _rb11pa), ("update over fixture B", _rb11pb)):
+            _rb11out = _rb11p.stdout.splitlines() + _rb11p.stderr.splitlines()
+            _rb11sm = [ln for ln in _rb11out if ln.startswith("govkit: kit 'settings-merge'")]
+            check(f"[dRB-11] {_rb11tag} exits non-zero", _rb11p.returncode != 0,
+                  f"rc {_rb11p.returncode} · {_rb11p.stdout[-900:]}")
+            check(f"[dRB-11] {_rb11tag}: exactly one problem line names settings-merge, and it "
+                  "carries the adopter's `cannot read`",
+                  len(_rb11sm) == 1 and "cannot read" in _rb11sm[0], " | ".join(_rb11sm) or
+                  _rb11p.stdout[-900:])
+            check(f"[dRB-11] {_rb11tag}: no line carries the declared stop's means",
+                  len(means9) == 1 and not any(means9[0] in ln for ln in _rb11out),
+                  f"code-2 means {means9} · "
+                  + " | ".join(ln for ln in _rb11out if means9 and means9[0] in ln))
+
         # --- DEPL-dGaugedVintage-8 S3. THE STAMP MUST NOT OUTRUN ROWS THIS RUN NEVER GRADED.
         # --- An `evidence: "unattributed"` row is skipped before `classify_row`, by
         # --- DEPL-dCarriedReceipt-13's ratified design, and it is graded against the receipt's OWN

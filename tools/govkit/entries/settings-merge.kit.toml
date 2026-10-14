@@ -43,7 +43,7 @@ why_no_regenerate = "the adopter merges hook fragments into .claude/settings.jso
 # still fails wherever agent-cap is selected.
 [[outcome]]
 code = 2
-probe = { must_exist = "{prefix}/settings-merge.py", must_not_exist = ["{prefix}/hooks/agent-cap.js", "{prefix}/../hooks/agent-cap.js"] }
+probe = { must_exist = "{prefix}/settings-merge.py", must_not_exist = ["{prefix}/hooks/agent-cap.js", "{prefix}/../hooks/agent-cap.js"], must_not_resolve = "{prefix}/hooks/agent-cap.js" }
 means = "no-agent-cap-to-wire"
 ok = true
 

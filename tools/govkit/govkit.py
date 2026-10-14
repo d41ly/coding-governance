@@ -6295,6 +6295,12 @@ def declares_outcome_for(desc: dict, rc: int) -> bool:
                for b in (desc.get("outcome") or []))
 
 
+#: Every key an `[[outcome]] probe` may carry, mapped to whether the thing it names must be found.
+#: DECLARED ONCE (TOOL-dRedressedBar-11): `classify_outcome` loops over it, and the matrix reads it
+#: both for the agreement rule's union by `want` and for the rule that every shipped key is one here.
+OUTCOME_PROBE_KEYS = {"must_exist": True, "must_not_exist": False, "must_not_resolve": False}
+
+
 def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: int) -> dict | None:
     """The DECLARED meaning of an adopter's exit code, decided by a filesystem PROBE.
 
@@ -6307,13 +6313,24 @@ def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: 
     invented. The block rather than its `means` string, because the caller needs `ok` too: a
     descriptor declares whether a classified outcome is an ACCEPTED STOP or a failure, and reducing
     it to a name here would throw that away.
+
+    THE KEYS are `OUTCOME_PROBE_KEYS`, each a string or a list of strings, every one of which must
+    hold. `must_exist` and `must_not_exist` hold when `target / <string>` exists, or does not.
+    `must_not_resolve = "<here>/<home>/<anchor>"` (TOOL-dRedressedBar-11) holds when
+    `resolve_kit_dir(<home>, <anchor>, target / <here>)` raises LookupError: the adopter's own
+    question, asked with the adopter's own resolver, so a kit homed where only the install receipt
+    records it reads as found. `<anchor>` is the last segment, `<home>` the one before it, `<here>`
+    every earlier segment (none means the target root). With NO RECEIPT, or one that is unreadable
+    or malformed, the resolver reads no rows, so the term reads the two static homes alone. A string
+    of fewer than two segments, a `<home>` or `<anchor>` that is empty, `.` or `..`, and an
+    unresolved token each fail the term, so the block does not match: deny by default.
     """
     for oc in desc.get("outcome", []):
         if oc.get("code") != rc:
             continue
         probe = oc.get("probe") or {}
         ok = True
-        for key, want in (("must_exist", True), ("must_not_exist", False)):
+        for key, want in OUTCOME_PROBE_KEYS.items():
             spec = probe.get(key)
             if not spec:
                 continue
@@ -6322,7 +6339,19 @@ def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: 
                 if miss:
                     ok = False
                     break
-                if (target / resolved).exists() is not want:
+                if key != "must_not_resolve":
+                    found = (target / resolved).exists()
+                else:
+                    segs = resolved.split("/")
+                    if len(segs) < 2 or any(s in ("", ".", "..") for s in segs[-2:]):
+                        ok = False
+                        break
+                    try:
+                        resolve_kit_dir(segs[-2], segs[-1], target.joinpath(*segs[:-2]))
+                        found = True
+                    except LookupError:
+                        found = False
+                if found is not want:
                     ok = False
                     break
             if not ok:
@@ -7744,7 +7773,11 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         if not argv:
             continue
         resolved = [resolve_tokens(a, ctx)[0] for a in argv]
-        rc = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True, text=True).returncode
+        # BOUND, not reduced to its code (TOOL-dRedressedBar-11 S3): a refused exit below ends its
+        # problem line with the adopter's own stderr, the regenerate site's shape, so the operator
+        # reads the reason and not only an integer.
+        _cfg_run = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True, text=True)
+        rc = _cfg_run.returncode
         outcome = classify_outcome(target, d, ctx, rc)
         means = outcome.get("means") if outcome else None
         accepted = bool(outcome and outcome.get("ok"))
@@ -7764,7 +7797,10 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             # The `[[outcome]]` blocks were declared by six descriptors and read by ZERO code, so an
             # exit code shared by six unrelated branches was reported as an integer. A declared
             # meaning lets a fixture assert a MEANING, which is what the acceptance layer needs.
-            r.fail(f"kit '{eid}': its adopter exited {rc} — {means}")
+            r.fail(f"kit '{eid}': its adopter exited {rc} — {means}"
+                   + (". Its stderr ended: " + " | ".join(
+                       [ln.strip() for ln in _cfg_run.stderr.splitlines() if ln.strip()][-3:])
+                      if (_cfg_run.stderr or "").strip() else ". It printed nothing to stderr"))
         elif rc != 0:
             # A non-zero adopter exit is a FINDING, not a printed integer. Measured before this:
             # `apply --resume` printed 'adopter exit 1' and exited 0, so an install whose configure
@@ -7772,7 +7808,10 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             # `[[outcome]]` evaluator, which is a later unit's; until then it is unclassified and
             # says so rather than being interpreted.
             r.fail(f"kit '{eid}': its adopter exited {rc} — unclassified, because no `[[outcome]]` "
-                   f"evaluator exists yet to say WHICH declared outcome that code means")
+                   f"evaluator exists yet to say WHICH declared outcome that code means"
+                   + (". Its stderr ended: " + " | ".join(
+                       [ln.strip() for ln in _cfg_run.stderr.splitlines() if ln.strip()][-3:])
+                      if (_cfg_run.stderr or "").strip() else ". It printed nothing to stderr"))
 
     # ---- TOOL-aRepatriatedFork-11 S3: WIRE the hook fragments this install landed, after every
     # ---- adopter ran — settings-merge's own adopter included, which is what created the file — and
@@ -11119,14 +11158,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                       f"exported, and configuring runs target-side code")
                 continue
             _ran_gained.add(_res_g)
-            _rc_g = subprocess.run(resolve_shell_argv(list(_res_g)), cwd=str(target),
-                                   capture_output=True, text=True, encoding="utf-8").returncode
+            # BOUND for its stderr (TOOL-dRedressedBar-11 S3), which a refusal below ends with.
+            _proc_g = subprocess.run(resolve_shell_argv(list(_res_g)), cwd=str(target),
+                                     capture_output=True, text=True, encoding="utf-8")
+            _rc_g = _proc_g.returncode
             _oc_g = classify_outcome(target, _d_g, _ctx_g, _rc_g)
             print(f"govkit update — default-gained {_ge}: adopter exit {_rc_g}"
                   + (f" — {_oc_g.get('means')}" if _oc_g else ""))
             if not outcome_accepted(_rc_g, _oc_g, declares_outcome_for(_d_g, _rc_g)):
                 r.fail(f"kit '{_ge}': its adopter exited {_rc_g} on the update that gained it, and no "
-                       f"declared outcome accepts that")
+                       f"declared outcome accepts that"
+                       + (". Its stderr ended: " + " | ".join(
+                           [ln.strip() for ln in _proc_g.stderr.splitlines() if ln.strip()][-3:])
+                          if (_proc_g.stderr or "").strip() else ". It printed nothing to stderr"))
 
     # ======================= DEPL-dCarriedReceipt-14 S4..S8 — POST-WRITE VERIFICATION ============
     # Every byte this run was going to move has moved. Now ask each TOUCHED kit the one question it
