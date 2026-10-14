@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.40` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.41` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -154,6 +154,8 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file, both walked with `--untracked-files=all` so a file inside a new directory is hashed rather than collapsed into its `?? dir/` line; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
 | `profile_bar.py` | the profiling verb: runs the bar, records it as a RUN, and names the regime — floor-bound or packing-bound — so the next fix is chosen from a measurement |
 | `profile_bar.test.sh` | the profiler's own arms |
+| `measure_legs.py` | the gate profiler: every manifest leg run clean and unbounded, serially or under a load cap, each in its own Windows Job Object and profiled to its processes; see "The gate profiler" below |
+| `fixtures/measure-legs/` | the fixture legs and manifests `measure_legs.py --selftest` runs |
 | `run-gates.test.sh` | the SHIPPED canary — every assertion here is true in any tree |
 | `run-gates.gov.test.sh` | the GOV-ONLY arms, withheld from the payload; see below |
 | `run-gates.evidence.test.sh` | the durability arm: a red leg's output survives on disk |
@@ -716,6 +718,56 @@ runs at this manifest blob agree on every compared leg, and otherwise prints `pa
 the legs that disagreed. `held-green` certifies the held tier at one sha and fingerprint across both
 hosts, and nothing more: it is never `gate-full-green`, the push bar never reads it, and a WSL green
 covers only the POSIX branch of a mixed suite, whose Windows arms the daily `held` CI job keeps.
+
+## The gate profiler — `measure_legs.py`
+
+`profile_bar.py` times the bar. `measure_legs.py` looks inside each leg (TOOL-dRedressedBar-18). It
+runs every row of the manifest beside this kit, or of `--legs <path>`, with no guard, hold, reuse,
+ceiling, retry or reap, and profiles each leg down to its processes. Guarded, kit-subject and
+`selftests` legs are all included.
+
+```bash
+python <prefix>/run-gates/measure_legs.py --serial        # one leg at a time
+python <prefix>/run-gates/measure_legs.py --concurrent    # next leg only at or under 80% CPU and 90% memory
+python <prefix>/run-gates/measure_legs.py --selftest      # its arms, over fixtures/measure-legs/
+```
+
+**What each reading comes from.** Each leg's root starts suspended inside its own Windows Job
+Object, so the kernel counts every process the leg starts, with its CPU, peak commit and I/O,
+short-lived processes included. The process-monitor census is polled every `--census-every` seconds
+(default 5) for per-process rows, and the job's count minus the census rows is recorded as `unseen`.
+The runner's own `measure_spawn_cost` is sampled at each census tick. Host CPU and memory are read
+every second with calls that spawn nothing. The runner's foreign-census predicate counts gate work
+beside a leg, and the host turnstile's queue and slot beacons are read but never written.
+
+**The environment.** Every `GATE_*` name, every `git rev-parse --local-env-vars` name and the push
+hook's `unset GIT_…` names are scrubbed, the turnstile's two nesting names included. The scrubbed set
+is printed and recorded, and values are stored only as digests. The legs get the runner's own
+`TMPDIR` shape, its python and its bash. Python opens the scratch dir and the turnstile key only by
+their `cygpath -m` spelling, and the envelope keeps both spellings.
+
+**An alias launcher is substituted.** Every process a Microsoft Store App Execution Alias starts
+leaves the job. So a launcher whose file carries the alias reparse tag runs, in every leg, as the
+interpreter the alias reports as `sys.executable`, and the legs' `GOV_PYTHON` names that interpreter.
+Each substitution prints `measure-legs: SUBSTITUTED <launcher> <alias> -> <resolved>` and is
+recorded in the envelope's `substitutions`. A substituted reading lacks the alias's own process per
+launch, so it is not exactly the bar's. Before the first leg, the interpreter the legs will run is
+launched twice in test jobs, once with one child and once with none. Unless the two totals differ by
+exactly 1, the run refuses. An alias that is not PYBIN also refuses.
+
+**The record.** `<git-dir>/gate-profile/<run id>/` holds `envelope.json`, `host.tsv`, `census.tsv`,
+`legs.tsv` and, per leg, a `.leg` row in the runner's eight-field grammar, a redacted `.log` and the
+full `.json` profile. Nothing prunes it. Each raw capture is deleted once its redacted copy exists,
+and one that cannot be deleted is named in `raw_kept`. A `.leg` row's eighth field is the foreign
+count plus the foreign turnstile holders plus the leg's own queued bars. So `derive-ceilings.py`'s
+`read_runs` sets a contended reading aside, and a serial reading with eighth field `0` can be carried
+by `--observed`.
+
+**What it does not check.** It grades no leg, because `ok` and `fail` are the exit status. It cannot
+see work done for a leg by another process, or a bar on another turnstile key. A leg that sleeps, or
+waits in the host queue, longer than `--stall-window` reads STALLED, and nothing is ever signalled.
+It runs only on Windows and refuses anywhere else. Exit 0 every leg ended and every record was
+written · 1 a record write failed · 2 a refusal before the first leg · 130 an interrupt.
 
 ## The scratch directory — owned, redirected and swept
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the process-monitor engine's arms.
 
-gov:kit process-monitor@0.18
+gov:kit process-monitor@0.19
 
 Two kinds of arm and the split is deliberate. PARSING arms run over captured fixtures, so they grade
 column contracts without a live table. LIVENESS arms run over a live read, because a property like
@@ -68,10 +68,10 @@ def build_cim_fixture():
     """
     s = census._CIM_SEP
     return "\n".join([
-        s.join(["4242", "1000", "12.5", "3600", "C:/x/bash.exe -c sleep"]),
-        s.join(["4243", "4242", "0.0", "60", ""]),
+        s.join(["4242", "1000", "12.5", "3600", "2048", "1048576", "C:/x/bash.exe -c sleep"]),
+        s.join(["4243", "4242", "0.0", "60", "", "", ""]),
         "  && export TEMP='C:/tmp' && echo hi",          # continuation: no numeric head
-        s.join(["notanumber", "4242", "1.0", "10", "x"]),  # non-numeric id
+        s.join(["notanumber", "4242", "1.0", "10", "1", "1", "x"]),  # non-numeric id
     ])
 
 
@@ -105,8 +105,9 @@ def test_row_contract_is_complete():
     cim, _ = census.parse_cim(build_cim_fixture())
     psw, _ = census.parse_ps_w(build_ps_w_fixture())
     rows = census.build_windows_rows(cim, psw)
+    # FIELDS plus the two memory keys every row carries beside them (TOOL-dRedressedBar-18 S4).
     check("test_row_contract_is_complete",
-          all(sorted(r) == sorted(census.FIELDS) for r in rows) and
+          all(sorted(r) == sorted(census.FIELDS + ("peak_mem_b", "mem_b")) for r in rows) and
           all(r["winpid"] is not None for r in rows) and
           all(r["win_ppid"] is not None for r in rows),
           True)
@@ -205,9 +206,31 @@ def test_non_utf8_backend_output_survives():
     """
     raw = (b"4242" + census._CIM_SEP.encode() + b"1000" + census._CIM_SEP.encode()
            + b"1.0" + census._CIM_SEP.encode() + b"60" + census._CIM_SEP.encode()
+           + b"64" + census._CIM_SEP.encode() + b"65536" + census._CIM_SEP.encode()
            + b"caf\xe7 /x/y")
     cim, rejected = census.parse_cim(raw.decode("utf-8", "replace"))
     check("test_non_utf8_backend_output_survives", (len(cim), rejected), (1, 0))
+
+
+def test_cim_memory_fields_are_bytes():
+    """TOOL-dRedressedBar-18 AC3: the seven-field CIM line carries both memory keys as BYTES and the
+    command intact, a POSIX row carries both as None, and `FIELDS` keeps its bytes.
+
+    Red when `parse_cim` reads the command from index 4 as it did before the two fields: the command
+    then reads as the peak-memory number.
+    """
+    s = census._CIM_SEP
+    cim, rejected = census.parse_cim(
+        s.join(["5151", "1000", "2.0", "30", "300", "409600", "C:/x/python.exe -I -c pass"]))
+    row = census.build_windows_rows(cim, {})[0]
+    prow, _ = census.parse_posix("  PID  PPID ELAPSED     TIME COMMAND\n"
+                                 " 4242  1000    3600 00:00:12 /bin/bash -c sleep")
+    check("test_cim_memory_fields_are_bytes",
+          (rejected, row["peak_mem_b"], row["mem_b"], row["command"],
+           prow[0]["peak_mem_b"], prow[0]["mem_b"], census.FIELDS),
+          (0, 300 * 1024, 409600, "C:/x/python.exe -I -c pass", None, None,
+           ("winpid", "msys_pid", "win_ppid", "msys_ppid", "kind", "age_s", "cpu_s", "command",
+            "backend")))
 
 
 def test_summary_counts_are_derived():

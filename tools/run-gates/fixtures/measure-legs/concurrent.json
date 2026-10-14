@@ -1,0 +1,10 @@
+[
+  {
+    "name": "hog",
+    "argv": ["python3", "{prefix}/run-gates/fixtures/measure-legs/hog.py", "10"]
+  },
+  {
+    "name": "steady",
+    "argv": ["python3", "{prefix}/run-gates/fixtures/measure-legs/steady.py", "2"]
+  }
+]

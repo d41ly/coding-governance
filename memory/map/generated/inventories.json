@@ -61,6 +61,7 @@
       "line-length gate selftest",
       "manifest-check self-test",
       "marker contracts",
+      "measure-legs selftest",
       "memory hygiene",
       "memory-hygiene self-test",
       "memory-recall kit selftest",

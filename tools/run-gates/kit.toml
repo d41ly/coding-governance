@@ -151,6 +151,17 @@ subject = "kit"
 argv = ["python3", "{kit}/held_halves.py", "--selftest"]
 guard = []
 
+# THE GATE PROFILER'S SELF-TEST. TOOL-dRedressedBar-18. `measure_legs.py` is an engine file under
+# `**`, and `--selftest` runs it in-process over the fixture manifests under `fixtures/measure-legs/`.
+# It needs a Windows host and the process-monitor kit as a sibling, and refuses without either.
+# `subject = "kit"` puts it under the 2026-08-23 hold. GUARDED by the files whose text it reads or
+# imports, the same list as its manifest row.
+[[gate_leg]]
+name = "measure-legs selftest"
+subject = "kit"
+argv = ["python3", "{kit}/measure_legs.py", "--selftest"]
+guard = ["{kit}/measure_legs.py", "{kit}/profile_bar.py", "{kit}/run-gates.sh", "{kit}/fixtures/measure-legs/", "{prefix}/process-monitor/census.py", "{prefix}/process-monitor/reap.py", "{prefix}/process-monitor/scope.py"]
+
 # The seed for a target's own [gate_runner] declaration. `cmd_intake` emits this block when this
 # entry is selected (S9), resolving the path tokens ONLY: the runner's own `{name}` placeholder in
 # `observed_ran` passes through verbatim, because it is the RUNNER's substitution and not the

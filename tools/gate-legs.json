@@ -1252,6 +1252,26 @@
     "ceiling": 300
   },
   {
+    "name": "measure-legs selftest",
+    "argv": [
+      "python3",
+      "{prefix}/run-gates/measure_legs.py",
+      "--selftest"
+    ],
+    "guard": [
+      "{prefix}/run-gates/measure_legs.py",
+      "{prefix}/run-gates/profile_bar.py",
+      "{prefix}/run-gates/run-gates.sh",
+      "{prefix}/run-gates/fixtures/measure-legs/",
+      "{prefix}/process-monitor/census.py",
+      "{prefix}/process-monitor/reap.py",
+      "{prefix}/process-monitor/scope.py"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 500
+  },
+  {
     "name": "install-prefix (shipped surface)",
     "argv": [
       "bash",

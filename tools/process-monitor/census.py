@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """census.py — one bounded read of the process table, or a refusal.
 
-gov:kit process-monitor@0.18
+gov:kit process-monitor@0.19
 
 Contract: memory/builds/aReapedSpinner/spec/2026-09-08-spec-TOOL-aReapedSpinner-1.md
 
@@ -20,6 +20,15 @@ THE ROW CONTRACT, and every field is load-bearing:
     cpu_s      float|None  None means UNJOINED or unreported, NEVER zero
     command    str|None    the full command line. None for a process reporting none.
     backend    str         'windows-join' | 'posix-ps'
+    peak_mem_b int|None    the process's peak working set in BYTES (CIM PeakWorkingSetSize, which
+                           is KiB, times 1024). None when unreported, NEVER zero for unreported.
+    mem_b      int|None    its working set in BYTES (CIM WorkingSetSize). None as above.
+
+THE TWO MEMORY KEYS ARE NOT IN `FIELDS` (TOOL-dRedressedBar-18 S4). They are extra keys on every
+row, POSIX rows carrying None, so `render_rows` and every line the reap and classify verbs print keep
+their bytes. Their reader is the gate profiler beside the run-gates kit. The KiB unit was confirmed
+on node d, 2026-10-15, against one live row: CIM read 78232 beside Get-Process PeakWorkingSet64 of
+76533760 bytes taken a moment before, and WorkingSetSize read 79138816, already bytes.
 
 WHY TWO PARENT FIELDS. Measured on the machine this was built for: MSYS rows are 26 of 332, and the
 gate runner dispatches its legs as NATIVE processes. A descendant walk over MSYS edges alone
@@ -54,6 +63,7 @@ _CIM_QUERY = (
     "@($_.ProcessId, $_.ParentProcessId, "
     "(($_.KernelModeTime + $_.UserModeTime)/1e7), "
     "([int]((Get-Date) - $_.CreationDate).TotalSeconds), "
+    "$_.PeakWorkingSetSize, $_.WorkingSetSize, "
     "($_.CommandLine -replace '[\\r\\n]+',' ')) -join [char]1 }"
 )
 _CIM_SEP = ""
@@ -80,8 +90,18 @@ def run_bounded(argv, timeout=BACKEND_TIMEOUT_S):
     return (done.stdout or b"").decode("utf-8", "replace")
 
 
+def parse_cim_bytes(text, scale):
+    """One CIM memory field -> bytes, or None for a blank or non-integer field. Never a zero for absent."""
+    text = text.strip()
+    return int(text) * scale if text.isdigit() else None
+
+
 def parse_cim(text):
-    """CIM lines -> {winpid: (win_ppid, cpu_s, age_s, command)} plus the rejected-row count."""
+    """CIM lines -> {winpid: (win_ppid, cpu_s, age_s, peak_mem_b, mem_b, command)} plus the rejected-row count.
+
+    Seven fields a line: the four numbers, the two memory fields, then the command LAST, so free text
+    stays the final field.
+    """
     rows, rejected = {}, 0
     # THE PRODUCER'S TERMINATOR, not Python's. `str.splitlines()` also breaks on \v, \f, \x1c,
     # \x1d, \x1e, \x85, U+2028 and U+2029, while the CIM query strips only [\r\n]. A process whose
@@ -104,8 +124,10 @@ def parse_cim(text):
         except ValueError:
             rejected += 1
             continue
-        command = parts[4].strip() if len(parts) > 4 else ""
-        rows[int(parts[0])] = (int(parts[1]), cpu, age, command or None)
+        peak = parse_cim_bytes(parts[4], 1024) if len(parts) > 4 else None
+        mem = parse_cim_bytes(parts[5], 1) if len(parts) > 5 else None
+        command = parts[6].strip() if len(parts) > 6 else ""
+        rows[int(parts[0])] = (int(parts[1]), cpu, age, peak, mem, command or None)
     return rows, rejected
 
 
@@ -133,7 +155,7 @@ def parse_ps_w(text):
 def build_windows_rows(cim_rows, psw_rows):
     """Join the two reads into the row contract."""
     out = []
-    for winpid, (win_ppid, cpu, age, command) in cim_rows.items():
+    for winpid, (win_ppid, cpu, age, peak, mem, command) in cim_rows.items():
         overlay = psw_rows.get(winpid)
         msys_pid = msys_ppid = None
         kind = "native"
@@ -156,6 +178,8 @@ def build_windows_rows(cim_rows, psw_rows):
             "cpu_s": cpu,
             "command": command,
             "backend": "windows-join",
+            "peak_mem_b": peak,
+            "mem_b": mem,
         })
     return out
 
@@ -190,6 +214,8 @@ def parse_posix(text):
             "cpu_s": cpu,
             "command": (parts[4].strip() if len(parts) > 4 else "") or None,
             "backend": "posix-ps",
+            "peak_mem_b": None,
+            "mem_b": None,
         })
     return rows, rejected
 

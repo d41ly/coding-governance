@@ -33,7 +33,10 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.40   # gov:kit run-gates@1.40
+KIT_RUN_GATES_VERSION=1.41   # gov:kit run-gates@1.41
+# 1.40 -> 1.41: the kit ships `measure_legs.py`, a gate profiler that runs every manifest leg clean and
+# unbounded, each in its own Windows Job Object, with its fixtures and its `measure-legs selftest` leg
+# (TOOL-dRedressedBar-18). This runner's behaviour does not move; the profiler reads its text.
 # 1.30 + 1.30 -> 1.31: merging local main's reconcile (a30f4589) into aGraftedHelix. Both lines bumped
 # 1.29 -> 1.30 with different bytes, so the number alone could not tell the two kits apart.
 # 1.29 -> 1.30: the shard-join comment in run-selftests.sh stops justifying its unported reverse half

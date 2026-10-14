@@ -1,0 +1,18 @@
+[
+  {
+    "name": "spawn six",
+    "argv": ["python3", "{prefix}/run-gates/fixtures/measure-legs/spawn.py", "6", "3"]
+  },
+  {
+    "name": "spawn none",
+    "argv": ["python3", "{prefix}/run-gates/fixtures/measure-legs/spawn.py", "0", "3"]
+  },
+  {
+    "name": "memio",
+    "argv": ["python3", "{prefix}/run-gates/fixtures/measure-legs/memio.py", "200"]
+  },
+  {
+    "name": "printenv",
+    "argv": ["python3", "{prefix}/run-gates/fixtures/measure-legs/printenv.py"]
+  }
+]

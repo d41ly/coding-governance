@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-18 — a gate profiler: every leg run clean and unbounded, serially or under a load cap, each profiled to its processes, stalls reported and never killed
 
-**Status:** SPECCED · rev-4 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 13 · ratified 2026-10-15
+**Status:** CLOSED · rev-4 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 13 · ratified 2026-10-15
 
 <!-- gen:spec-records -->
 
