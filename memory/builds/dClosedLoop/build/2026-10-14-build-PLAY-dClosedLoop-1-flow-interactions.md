@@ -69,6 +69,78 @@ the interactions the design has not yet defined.
 6. **The card across transitions.** One unattended session can carry a build from Design to Deploy;
    nothing says how the card's slice follows it.
 
+### Forks asked, 2026-10-14
+
+**FI-1. "A mid-build amendment sends some units back to Design while others are built. Which step is
+the build in?"** Offered: Least-advanced unit (Recommended); Units advance alone. Answer:
+Least-advanced unit (Recommended).
+
+**FI-2. "A build declares a dependency (`parents:`) on another. What does that gate by default?"**
+Offered: Build waits for parent's landing (Recommended); Design waits too; Order only. Answer, in the
+owner's words: "Builds interact with each other if they can (message other relevant sessions) and
+progress to the best of their ability, otherwise build waits for parent's landing (if they cannot
+communicate)."
+
+**FI-3. "Test's prepared merge with the default branch's tip hits a conflict. Where does it go?"**
+Offered: Resolution pass, or Design (Recommended); Always Design; Owner decides. Answer: Resolution
+pass, or Design (Recommended).
+
+**FI-4. "A patch build enters at Design with a derived plan record. Which of Plan's obligations does
+it still owe?"** Offered: The light five (Recommended); Intake and lease only; Plan's full checklist.
+Answer: The light five (Recommended).
+
+### Settled, 2026-10-14
+
+- **A build's step is its least-advanced unit's**; it enters Test only when every unit in scope is
+  built, so the build still moves as one integrated process.
+- **Builds coordinate across sessions.** A dependent build messages the sessions working on the builds
+  it depends on (a lease names each build's session and node), and progresses as far as that
+  coordination allows; when it cannot reach them, it enters Build only after the parent has landed.
+  What "as far as it can" permits, and how sessions on different nodes reach each other, are asked
+  below. The behaviour is a policy, `deps.coordination`.
+- **A conflict in the prepared merge** goes back to Build as a recorded resolution pass in the units it
+  touches; when it clashes with another build's declared interface, those units re-enter Design first.
+- **A patch build owes the light five** of Plan's items: the intake recorded verbatim, the duplicate
+  check against live builds, its derived plan record placed in the plan view, the build lease, and
+  ratification as `patch.ratify` says.
+
+### Follow-ups asked, 2026-10-14
+
+**FI-5. ""Progress to the best of their ability": what may a dependent build do before its parent
+lands?"** Offered: Build on confirmed interfaces (Recommended); Design only; Anything, coordinated.
+Answer: Build on confirmed interfaces (Recommended).
+
+**FI-6. "How do sessions reach each other, given that builds run on different nodes?"** Offered: Live
+where possible, mailbox always (Recommended); Live only; Mailbox only. Answer: Live where possible,
+mailbox always (Recommended).
+
+**FI-7. "Several builds hold current verdicts at once. Which lands first?"** Offered: Plan priority,
+then first verified (Recommended); First verified lands first; You order landings. Answer: Plan
+priority, then first verified (Recommended).
+
+**FI-8. "One unattended session can carry a build across several steps. How does its card
+follow?"** Offered: Re-rendered at each transition (Recommended); One card per step; Fixed at session
+start. Answer: Re-rendered at each transition (Recommended).
+
+### Settled after the follow-ups, 2026-10-14
+
+- **Early progress** (`deps.early-build`): a dependent build designs at any time and enters Build once
+  the interfaces it consumes are confirmed, by the parent's session or by the parent's frozen feature
+  design; a later breaking change in the parent triggers the dependent's re-design of the affected
+  units (a `design.reentry` interface-change trigger reaching across builds).
+- **Messaging** (`deps.messaging`): sessions on one machine message each other live; every message is
+  also written to a durable mailbox on the shared remote, keyed by build, which sessions on other nodes
+  read at each transition; no reply within a bound means unreachable, and the dependent then waits for
+  the parent's landing.
+- **Landing order** (`landing.order`): the plan's priority orders landings, ties to the build verified
+  first; each landing makes the others' verdicts stale, and they re-verify against the new tip.
+- **The card follows the build** (`card.follows`): each transition re-renders the card's slice (the
+  build's current step, its checklist position, the next action), so an agent that resets mid-build
+  rebuilds its place from the card.
+- **All six open interactions are now settled.** Each is owned by a chain build: mixed-step state and
+  the card by dDeclaredLoop, coordination and the mailbox by dLeasedFleet, conflicts by dWitnessedBar,
+  landing order by dShippedRelease, a patch build's obligations by dRankedPlan.
+
 ## [diagram] Overview, in mermaid
 
 ```mermaid

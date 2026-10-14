@@ -261,6 +261,11 @@ names updated to match): the join exits 0 on 69 keys and 11 builds; the preset c
 catalogue keys, 48 presettable, 48 preset rows. The v2 amendments ran through a script that refused
 unless each old text matched exactly once.
 
+After the flow walk's Build, Test, Deploy, Maintain and Review stages and the flow-interactions round
+(`gap-flow-05` to `gap-flow-09`; seventeen policies added in all since the Design stage): the join
+exits 0 on 74 keys and 11 builds; the preset check exits 0 on 69 catalogue keys, 64 presettable,
+64 preset rows.
+
 ## Records index
 
 | Record | What it holds |
@@ -278,3 +283,4 @@ unless each old text matched exactly once.
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` | The converged design, amended in place under dated `Revised:` lines: principles, the policy catalogue and presets, the chain's rosters. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-foundations.md` | The owner's foundations revisit, step by step: their words, the measured current state, the response, the forks and answers. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-flow.md` | The flow walk, stage by stage: the layers, each stage's scope, boundaries and checklist, the forks and answers. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-flow-interactions.md` | Each step's scope, the eighteen interaction edges, the shared state, and the six interactions settled after. |

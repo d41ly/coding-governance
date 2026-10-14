@@ -78,6 +78,10 @@ extends.
 | gap-flow-02 | Flow | HIGH | The decision principles that resolve unattended forks (the most feature-rich option, then the most expandable, fully recorded) are stated nowhere; M3 names feature-rich only, and nothing ranks them above the charter's adjustable practices. Raised by the owner. | flow FL-D3, FL-D6; `memory/guides/BUILD-METHOD.md` M3 | — |
 | gap-flow-03 | Flow | MED | The plan is written up to three times (README, brief, card) and the levels of card, plan and brief are declared nowhere. Raised by the owner. | flow Plan, current state; FL-P2, FL-P5 | — |
 | gap-flow-05 | Flow | MED | Built specs are revised retroactively: a closing review's blockers can be folded into an already-built unit as a spec revision (dSweptBranches, "the blockers folded into unit 3 rev-3"), so the trail of what was built against which spec breaks. Raised by the owner. | flow FL-B3; `memory/builds/dSweptBranches/README.md` | — |
+| gap-flow-06 | Flow | HIGH | No cross-build coordination: a build cannot reach the session working on a build it depends on, no message survives a session, and a dependency gates nothing. Raised by the owner. | flow interactions FI-2, FI-5, FI-6 | — |
+| gap-flow-07 | Flow | MED | A build whose units sit in different steps has no defined step, and a session's card does not follow its build across transitions. Raised by the owner. | flow interactions FI-1, FI-8 | — |
+| gap-flow-08 | Flow | MED | Landing order among builds verified at once is undefined; the first landing silently stales the others' verdicts. Raised by the owner. | flow interactions FI-7 | — |
+| gap-flow-09 | Flow | MED | A merge conflict between a build and the default branch's tip has no route. Raised by the owner. | flow interactions FI-3 | — |
 | gap-flow-04 | Flow | MED | A critical planning issue has no path: no recorded plan revision and no re-design inventory of completed work, though none has occurred in 173 builds. Raised by the owner. | flow FL-P6 and its measurement | — |
 | gap-spine-01 | Spine | HIGH | No stage model: no kit, leg, dossier, role or hook declares the stage it serves, and the loop exists only implicitly. | design §4.1 (0 of 31 dossiers carry a stage); `tools/roles/workflows.toml` covers stages 0–7 only | — |
 | gap-spine-02 | Spine | HIGH | Guards read agent-written state across stages, against `[class]`. | build §4 (write gate), design §4.4 (INPROGRESS), test §5 C (pusher-written receipt), deploy §5 C | — |
@@ -186,4 +190,12 @@ instrument:
 ```text
 Deploy=8 Plan=7 Flow=4 Spine=9 Test=9 Review=3 Foundation=8 Build=4 Maintain=8 Design=9
 LOW=5 MED=26 HIGH=38
+```
+
+Re-measured after the flow walk's Build stage and the flow-interactions round added `gap-flow-05`
+to `gap-flow-09`, same instrument:
+
+```text
+Deploy=8 Plan=7 Spine=9 Test=9 Review=3 Foundation=8 Build=4 Flow=9 Maintain=8 Design=9
+LOW=5 MED=30 HIGH=39
 ```
