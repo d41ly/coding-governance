@@ -77,10 +77,10 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 13 | gov-researcher | Orientation: trust | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-8-researcher.md` | 1799cb98 | returned, 7m53s, 32.4k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-trust.md` |
 | 14 | gov-researcher | Orientation: determinism | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-9-researcher.md` | 1799cb98 | returned, 8m43s, 47.9k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-determinism.md` |
 | 15 | gov-researcher | Orientation: preserving the card | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-10-researcher.md` | 1799cb98 | returned, 4m45s, 22.8k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-preserve.md` |
-| 16 | gov-researcher | Roles: anatomy | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-11-researcher.md` | 1799cb98 | dispatched | — |
-| 17 | gov-researcher | Roles: coverage | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-12-researcher.md` | 1799cb98 | dispatched | — |
-| 18 | gov-researcher | Roles: interactions | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-13-researcher.md` | 1799cb98 | dispatched | — |
-| 19 | gov-researcher | Roles: prior art | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-14-researcher.md` | 1799cb98 | dispatched | — |
+| 16 | gov-researcher | Roles: anatomy | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-11-researcher.md` | 1799cb98 | returned, 3m55s, 21.8k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-roles-anatomy.md` |
+| 17 | gov-researcher | Roles: coverage | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-12-researcher.md` | 1799cb98 | returned, 4m37s, 23.9k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-roles-coverage.md` |
+| 18 | gov-researcher | Roles: interactions | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-13-researcher.md` | 1799cb98 | returned, 4m40s, 22.0k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-roles-interactions.md` |
+| 19 | gov-researcher | Roles: prior art | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-14-researcher.md` | 1799cb98 | returned, 4m41s, 24.5k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-roles-priorart.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -122,6 +122,22 @@ from the ledger for the same reason:
 - returned — gov-researcher · wrote 0 files · 8m43s · 47.9k out · run direct/a5adf84caf1a988de
 - agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-10-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-10-researcher.md) · writes none · gates none · run direct/a9189c646b6ed94eb
 - returned — gov-researcher · wrote 0 files · 4m45s · 22.8k out · run direct/a9189c646b6ed94eb
+```
+
+The roles round's four handoffs (dispatches 16 to 19), derived the same way and held from the ledger.
+Dispatch 18's `returned` line says `wrote 0 files`, while its return reports saving a helper script in the
+session scratchpad through its shell: the derivation, like the write gate, counts only Write and Edit
+calls.
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-11-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-11-researcher.md) · writes none · gates none · run direct/a1c33d3cab73979e7
+- returned — gov-researcher · wrote 0 files · 3m55s · 21.8k out · run direct/a1c33d3cab73979e7
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-12-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-12-researcher.md) · writes none · gates none · run direct/a64b914ce553c4ab5
+- returned — gov-researcher · wrote 0 files · 4m37s · 23.9k out · run direct/a64b914ce553c4ab5
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-13-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-13-researcher.md) · writes none · gates none · run direct/a444485861ad18d2b
+- returned — gov-researcher · wrote 0 files · 4m40s · 22.0k out · run direct/a444485861ad18d2b
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-14-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-14-researcher.md) · writes none · gates none · run direct/a2750bbc386a192e4
+- returned — gov-researcher · wrote 0 files · 4m41s · 24.5k out · run direct/a2750bbc386a192e4
 ```
 
 ## Events
@@ -374,6 +390,7 @@ Runs, 2026-10-14:
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-preserve.md` | The fifth orientation researcher's return, verbatim: how the build's card is preserved and reaches priority 1, adopted at the owner's request. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-session-model.md` | One build modelled through every step under the `standard` preset, the owner's part in it, and the fourteen holes the model exposed. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-roles.md` | The roles layer: the owner's words, what it must answer, the research dispatched, then the design, forks and answers. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-research-roles-{anatomy,coverage,interactions,priorart}.md` | The four roles researchers' returns, verbatim, the harness's entity escapes restored. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |
