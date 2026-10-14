@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-11 — a receipt-reading probe term in govkit's declared-outcome contract, closing settings-merge's last false-accept route
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 7
+**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -87,10 +87,14 @@ both refusal sites print the adopter's own reason (owner, 2026-10-14, unit 10 §
   by `want` on a staged pair, and decodes CONFIGURE's stderr as UTF-8. It rebuilds fixture B through
   `write_vintage_receipt` and restates the code-2 block's comment. It corrects this spec's §4, §5 and
   §7 in one rev bump.
-- **hands-off** external — measured at spec time: a first `apply` selecting agent-cap with
-  `[kit.agent-cap] prefix = "scripts"` exits 1 with both adopters at exit 2. CONFIGURE runs before the
-  receipt is written, so neither resolver finds the hook. The term agrees with the adopter there,
-  and agent-cap's own refusal still reports the install. That defect is its own unit.
+- **hands-off** `TOOL-dRedressedBar-14` — settings-merge's half of a defect measured at spec time: a
+  first `apply` selecting agent-cap with `[kit.agent-cap] prefix = "scripts"` exits 1 with both
+  adopters at exit 2. CONFIGURE runs before the receipt is written, so neither resolver finds the
+  hook. The term agrees with the adopter there. Unit 14 writes the receipt ahead of CONFIGURE, which
+  this unit's `must_not_resolve` term then reads.
+- **hands-off** `TOOL-dRedressedBar-15` — agent-cap's half of the same defect. Its adopter argv names
+  settings-merge's file through agent-cap's own `{prefix}`, and its refusal reports the install
+  through S3's stderr tail, which unit 15's red half reads.
 - **hands-off** external — the stale `unclassified` clause, and the six inline spellings of a
   stderr tail in `tools/govkit/govkit.py`, consolidated into one helper by their own unit.
 
@@ -432,6 +436,10 @@ none
   units-10-11 spec audit's one high was promoted into, for report id 23. They also gain the hands-off
   to `TOOL-dRedressedBar-13`, the batch its minors were promoted into, for report ids 6, 7, 10, 11,
   12, 13, 17, 20, 21, 22 and 24. No scope, design or criterion moves.
+- rev-3 · 2026-10-14 · §3 · Edges split the external hand-off for the apply-prefix defect into the
+  hands-off to `TOOL-dRedressedBar-14`, for settings-merge's half, and the hands-off to
+  `TOOL-dRedressedBar-15`, for agent-cap's half, the units the owner added for it. No scope, design
+  or criterion moves.
 
 ## 10. Reuse audit
 

@@ -1,10 +1,12 @@
 # TOOL-dRedressedBar-12 — an apply narrower than its receipt keeps every other installed kit's claim and rows, so a refused settings-merge exit stays refused on the next run
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-14-prompt-TOOL-dRedressedBar-12-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-1-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -85,6 +87,9 @@ the `pins` union at `:7402-7407` already does for line-ending pins.
   unit's rev bump, which unit 13's bump of spec 11 follows. It holds the `[dRB-11]` block with fixture
   A's third run, beside which unit 13 rebuilds fixture B through `write_vintage_receipt`. And it holds
   `_cmd_apply` with S1's carry, in which unit 13 changes how the CONFIGURE call decodes.
+- **hands-off** `TOOL-dRedressedBar-14` — `_carried_kits` and `_carried_rows`, which unit 14 binds
+  once ahead of CONFIGURE so its early receipt write and the RECEIPT write both carry them. Without
+  the carry, fixture A's planted `agent-cap` row leaves the receipt during CONFIGURE.
 - **hands-off** external — `apply` writes `orders` for its selection alone (`:7666-7712`), so an
   outbox order a carried kit's hole owns leaves the receipt on a narrower apply. `check` grades only
   the orders a receipt records (`:5394-5405`), so the loss is a missing instruction and never a
@@ -278,6 +283,9 @@ none
 - rev-1 · 2026-10-14 · initial draft, promoted at the CONVERGED exit of the units-10-11 spec audit
   for report id 23 (H1). The drop was reproduced on a three-kit install at `29c72f51`, and five
   candidates were graded by M12, with the pick taken by M3's rule.
+- rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-14`, which consumes this
+  unit's two carried lists for the receipt it writes ahead of CONFIGURE. No scope, design or
+  criterion moves.
 
 ## 10. Reuse audit
 

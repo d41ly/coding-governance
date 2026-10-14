@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-13
 streams: tooling
 roster: TOOL
-ids: TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13
+ids: TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15
 spec-audit: 2026-10-13
 ---
 
@@ -52,12 +52,23 @@ are causes of their own.
   a receipt-recorded home also refuses the false accept. Its brief is
   `prompts/2026-10-14-prompt-TOOL-dRedressedBar-11-brief.md`, and unit 10's revision record is
   `prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-2-revision.md`.
+- **Amendment (M2 ADD), 2026-10-14**: unit 14 added by the owner ("add the apply prefix defect"), the
+  defect unit 11's writer measured. A first `apply` at a per-kit agent-cap prefix exits 1, because
+  CONFIGURE runs before the receipt exists. It was drafted as unit 12 and re-id'd to 14 when the
+  round-2 disposal claimed 12 and 13 in the same minute. Its brief is
+  `prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-brief.md`.
+- **Amendment (M2 ADD), 2026-10-14**: unit 15 added by the owner's resolution of unit 14's F1 as
+  (a). agent-cap's adopter argv runs `{prefix}/settings-merge.py` at agent-cap's own prefix, a file
+  that kit never installed there. Its brief is
+  `prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-brief.md`, and the edge revisions are
+  `prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-2-revision.md`.
 - `GATE_REGEN_CHECK` reaching the canary's nested runners is a separate finding and not this build's.
 - Write sets overlap on `tools/roles/adopt-roles.test.sh`, so order sequences them: units 1, 2, 8
   and 9 are disjoint; 3 follows 9, whose fix its three unscoped arms witness; 4 follows 1; 5 follows
   4; 6 follows 5; 7, the records and kit versions, is measured over the code units 1 to 6, 8 and 9
-  leave. Units 10 and 11 follow 7 in that order. Each touches only govkit-exempt files and adds no
-  function, so neither moves a kit version or the symbol index unit 7 regenerates.
+  leave. Units 10, 11, 12, 13 and 14 follow 7 in that order. Each touches only govkit-exempt files
+  and adds no function, so none moves a kit version or the symbol index unit 7 regenerates. Unit 15
+  follows 14, and because it moves the hooks kit's shipped bytes after 7, it bumps that version itself.
 - Tiers per the manifest's tier rule: a unit moving a shipped engine's bytes is Tier-2, a stale
   fixture, a registry row, a pin or a regenerated output Tier-1.
 - No `tools/unattended/` self-test suite runs: standing owner instruction, 2026-08-23.
@@ -85,11 +96,14 @@ None yet.
 | 11 | `TOOL-dRedressedBar-11` | a receipt-reading probe term in govkit's declared-outcome contract, closing settings-merge's last false-accept route |
 | 12 | `TOOL-dRedressedBar-12` | PROMOTED: the units-10-11 spec audit's one high, report id 23 — an apply narrower than its receipt keeps every other installed kit's claim and rows |
 | 13 | `TOOL-dRedressedBar-13` | PROMOTED: the units-10-11 spec audit's 5 mediums and 18 lows, batched — report ids 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 and 24 |
+| 14 | `TOOL-dRedressedBar-14` | a first apply at a per-kit prefix writes its receipt before CONFIGURE, so settings-merge finds the hook it just installed |
+| 15 | `TOOL-dRedressedBar-15` | agent-cap's adopter resolves settings-merge at settings-merge's own home, not at agent-cap's prefix |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 13 unit(s) · node d · opened 2026-10-13 · streams tooling
+**Build status:** SPECCED · 15 unit(s) · node d · opened 2026-10-13 · streams tooling
 ids TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13
+ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -104,16 +118,18 @@ ids TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedress
 | [TOOL-dRedressedBar-6 — the roles adopter's two exit-1 refusals, armed in its own suite](spec/2026-10-14-spec-TOOL-dRedressedBar-6.md) | 4 | 1 | SPECCED | rev-2 | 2026-10-14 |
 | [TOOL-dRedressedBar-7 — records, the regenerated index and the kit versions, measured over the fixed tree](spec/2026-10-14-spec-TOOL-dRedressedBar-7.md) | 5 | 2 | SPECCED | rev-2 | 2026-10-14 |
 | [TOOL-dRedressedBar-10 — the round-1 spec audit's 12 mediums and 11 lows, batched: each criterion observed in a form that can pass and fail, each false sentence corrected, and settings-merge's accepted stop narrowed](spec/2026-10-14-spec-TOOL-dRedressedBar-10.md) | 6 | 2 | SPECCED | rev-3 | 2026-10-14 |
-| [TOOL-dRedressedBar-11 — a receipt-reading probe term in govkit's declared-outcome contract, closing settings-merge's last false-accept route](spec/2026-10-14-spec-TOOL-dRedressedBar-11.md) | 7 | 2 | SPECCED | rev-2 | 2026-10-14 |
-| [TOOL-dRedressedBar-12 — an apply narrower than its receipt keeps every other installed kit's claim and rows, so a refused settings-merge exit stays refused on the next run](spec/2026-10-14-spec-TOOL-dRedressedBar-12.md) | 8 | 2 | SPECCED | rev-1 | 2026-10-14 |
+| [TOOL-dRedressedBar-11 — a receipt-reading probe term in govkit's declared-outcome contract, closing settings-merge's last false-accept route](spec/2026-10-14-spec-TOOL-dRedressedBar-11.md) | 7 | 2 | SPECCED | rev-3 | 2026-10-14 |
+| [TOOL-dRedressedBar-12 — an apply narrower than its receipt keeps every other installed kit's claim and rows, so a refused settings-merge exit stays refused on the next run](spec/2026-10-14-spec-TOOL-dRedressedBar-12.md) | 8 | 2 | SPECCED | rev-2 | 2026-10-14 |
 | [TOOL-dRedressedBar-13 — the units-10-11 spec audit's 5 mediums and 18 lows, batched: each criterion half observed in a form that can fail, each false sentence corrected, and the code sites they describe made to say what the specs claim](spec/2026-10-14-spec-TOOL-dRedressedBar-13.md) | 9 | 2 | SPECCED | rev-2 | 2026-10-14 |
+| [TOOL-dRedressedBar-14 — a first apply at a per-kit prefix configures against the homes it just wrote: the receipt is written ahead of CONFIGURE](spec/2026-10-14-spec-TOOL-dRedressedBar-14.md) | 10 | 2 | SPECCED | rev-2 | 2026-10-14 |
+| [TOOL-dRedressedBar-15 — agent-cap's adopter runs settings-merge's own adopter at settings-merge's home, declared as `[adopt] via`, and selfcheck refuses any argv naming another entry's file](spec/2026-10-14-spec-TOOL-dRedressedBar-15.md) | 11 | 2 | SPECCED | rev-1 | 2026-10-14 |
 <!-- /gen:build-units -->
 
-Records: 16 bound to this build, across 4 record folder(s).
+Records: 22 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dRedressedBar-12.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-12 TOOL-dRedressedBar-13.
+Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -129,6 +145,8 @@ Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-12 TOOL-dRedressed
 | 7 | `TOOL-dRedressedBar-11` | no |
 | 8 | `TOOL-dRedressedBar-12` | no |
 | 9 | `TOOL-dRedressedBar-13` | no |
+| 10 | `TOOL-dRedressedBar-14` | no |
+| 11 | `TOOL-dRedressedBar-15` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
