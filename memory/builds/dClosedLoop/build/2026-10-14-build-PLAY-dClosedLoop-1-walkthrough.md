@@ -779,3 +779,45 @@ front door already moved to the Spine (S5).
 
 **Risks.** It edits every governing surface at once, so it lands in small units behind the Loop
 Review's ratifications; adopters run production systems and migrate only on their owners' go.
+
+### Forks asked, 2026-10-14
+
+**CV1. "Where should the charter's gov-only rules go?"** Offered: Gov's overlay (Recommended);
+Shipped, tagged gov-only; Leave them as they are. Answer, in the owner's words: "any adopter rules
+(including gov's own - gov is an adopter just like any other) should render from its own
+set/overlay. However, charter is the foundation - project-specific global rules should render as a
+separate block."
+
+**CV2. "What should happen to the 301 KB of guides and the 163 KB runbook?"** Offered: Derive and
+consolidate (Recommended); Index only; Rewrite per stage. Answer, in the owner's words: "Derive and
+consolidate, any non load-bearing prose should be gone. Any protocol/method/runbook should only
+carry clear facts/definitions/policies/descriptors. In addition, any '§' references should be
+retired and structure should be transitioned to TAGS (eg. '[Task];[Orientation]) which clearly
+define sections and survive reordering."
+
+**CV3. "How should records be consolidated (57% of commits touch only memory/)?"** Offered: Merge by
+evidence (Recommended); One record per stage; Leave records as is. Answer: Merge by evidence
+(Recommended).
+
+### Revised: 2026-10-14, after CV1 to CV3
+
+- **Every adopter is an adopter, gov included.** The charter is the shared foundation; each
+  repository's own rules render from its own overlay as a separate project block beneath it. Gov's
+  rules move to gov's overlay like any adopter's.
+- **Protocol text carries facts, definitions, policies and descriptors only.** Prose that bears no
+  load is removed, not condensed.
+- **Tags replace `§` references.** Sections are named by tags that define them and survive
+  reordering (the owner's example: `[Task]`, `[Orientation]`), as the charter's rules already are
+  (`[yagni]`, `[reuse]`). Because the Spine writes the charter's front door and Design redesigns
+  the spec, the tag grammar and its resolver land in the SPINE, the spec redesign uses them, and
+  Convergence migrates every remaining `§` reference. The grammar's resolver is a check: a tag
+  reference that names no section reds, so tags cannot dangle the way positional references do.
+- **Interpretation to confirm at chain approval:** other positional section references, such as
+  numbered method steps (`M5`), numbered spec sections and numbered hygiene checks, carry the same
+  defect the owner named for `§`, so Convergence inventories them as candidates for tags.
+
+| Fork | Policy key | Values | Default |
+|---|---|---|---|
+| CV1 | structural | — | foundation plus a per-repo overlay block, gov included |
+| CV2 | structural | — | derived facts only; tags replace `§` |
+| CV3 | structural | — | merge record kinds by evidence |

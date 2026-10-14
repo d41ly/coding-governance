@@ -110,6 +110,61 @@ it is re-run once the spec lands. Rows 1 to 4 have no `returned` line: their pro
   until the spec defines `PLAY-dClosedLoop-1`, which is expected, and check 23 on acceptance-ledger
   lines of `aSparedSpawn` and `aOrientedCast`, which this build did not write: Test-stage evidence.
 
+## Instruments
+
+### The gap-ownership join
+
+The check behind acceptance (c), run first against the architecture records and, once the chain
+opens, against the chain READMEs. It reads two files and writes nothing:
+
+```python
+"""Join the gap register's keys against architecture v1's chain table: every gap owned exactly once,
+every chain build owning at least one. Reads both records; writes nothing. Ranges like
+`gap-test-01 to gap-test-09` are expanded."""
+import re
+import sys
+
+reg_path, arch_path = sys.argv[1], sys.argv[2]
+with open(reg_path, encoding="utf-8") as fh:
+    keys = [m.group(1) for m in re.finditer(r"^\| (gap-[a-z]+-\d\d) \|", fh.read(), flags=re.M)]
+with open(arch_path, encoding="utf-8") as fh:
+    arch = fh.read()
+
+owners = {}
+for line in arch.splitlines():
+    m = re.match(r"^\| (d[A-Z][A-Za-z]+) \| [^|]+ \| [^|]+ \| [^|]+ \| (.+) \|$", line)
+    if not m:
+        continue
+    build, cell = m.group(1), m.group(2)
+    owned = set()
+    for a, b in re.findall(r"(gap-[a-z]+-\d\d) to (gap-[a-z]+-\d\d)", cell):
+        stem, lo, hi = a.rsplit("-", 1)[0], int(a.rsplit("-", 1)[1]), int(b.rsplit("-", 1)[1])
+        owned |= {f"{stem}-{i:02d}" for i in range(lo, hi + 1)}
+    owned |= set(re.findall(r"gap-[a-z]+-\d\d", re.sub(r"gap-[a-z]+-\d\d to gap-[a-z]+-\d\d", "", cell)))
+    owners[build] = owned
+
+count = {k: [b for b, s in owners.items() if k in s] for k in keys}
+unowned = [k for k, bs in count.items() if not bs]
+multi = {k: bs for k, bs in count.items() if len(bs) > 1}
+phantom = sorted({g for s in owners.values() for g in s} - set(keys))
+empty = [b for b, s in owners.items() if not s]
+print(f"register keys {len(keys)} · chain builds {len(owners)}")
+print("unowned:", unowned or "none")
+print("owned twice or more:", multi or "none")
+print("owned but not in the register:", phantom or "none")
+print("builds owning nothing:", empty or "none")
+sys.exit(1 if (unowned or multi or phantom or empty) else 0)
+```
+
+Runs, 2026-10-14:
+
+| Against | Result |
+|---|---|
+| the register and architecture v1 | exit 0: 57 keys, 10 builds, none unowned, none owned twice, none phantom, none empty |
+| the register with `gap-review-03` renamed `gap-review-99`, and v1 | exit 1: `gap-review-99` unowned, `gap-review-03` phantom |
+| the register and architecture v2 | exit 0: 57 keys, 10 builds, the same four clean lines |
+| the register with `gap-plan-07` renamed `gap-plan-99`, and v2 | exit 1 |
+
 ## Records index
 
 | Record | What it holds |
@@ -119,3 +174,9 @@ it is re-run once the spec lands. Rows 1 to 4 have no `returned` line: their pro
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md` | This log. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-{plan,design,build,test,deploy}.md` | The five stage researchers' returns, verbatim. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-maintain.md` | The main loop's Maintain research, with every instrument beside its output. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The 57 gaps, keyed, graded and evidenced, each owed one chain build. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v1.md` | The design after rounds 1 to 4, unedited. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-walkthrough.md` | The ten chain builds' designs as presented, each fork and answer, and each revision. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` | The converged design: twelve principles, 41 policy keys, the chain's final rosters. |
