@@ -496,3 +496,286 @@ committed history at the push, and make each unit's write scope and workspace it
 
 **Risks.** Unit 5 replaces the write gate's decision path, which every product write crosses;
 unit 4 multiplies worktrees on Windows, where removal leaves skeletons the cleanup kit knows.
+
+### Forks asked, 2026-10-14
+
+**B1. "When a commit writes outside its unit's declared kit directories, what's the default at the
+push?"** Offered: Warn and file an ask (Recommended); Refuse at kit level; Report only. Answer:
+Warn and file an ask (Recommended).
+
+**B2. "Where should a unit's work happen?"** Offered: One per unit (Recommended); Only for parallel
+units; Shared, as today. Answer, in the owner's words: "shared by the default, owner-adjustable."
+
+**B3. "When is the closing review owed?"** Offered: Once per build (Recommended); Per unit; Per
+landing. Answer: Once per build (Recommended).
+
+### Revised: 2026-10-14, after B1 to B3
+
+Unit 4 ships the per-unit worktree as an allowed value, not the default: units share the build's
+worktree unless the owner switches `build.worktree`; the harness's parallel dispatch still needs
+disjoint write sets, which the lease's write set now states.
+
+| Fork | Policy key | Values | Default |
+|---|---|---|---|
+| B1 | `build.scope` | warn-and-ask, refuse, report | warn-and-ask |
+| B2 | `build.worktree` | per-unit, parallel-only, shared | shared |
+| B3 | `review.build.when` | per-build, per-unit, per-landing | per-build |
+
+## 7. dShippedRelease — Deploy: landing, distributing gov, and releasing an adopter's product
+
+**Purpose.** Give Deploy all three of its senses a contract: a landing that records what moved and
+on what verdict; gov's kits released and kept current in every adopter; and an adopter's own
+product released, deployed, verified and rolled back by tooling gov ships (round 1: ship deploy
+tooling; round 3: a generic engine plus adapters, the first fitted to incms).
+
+**Seams it extends, verified 2026-10-14** (the Deploy research record holds the citations).
+- `tools/push-main.sh` (attended, `--prepare`, `--land`, `--carry`; kit mints; regeneration; the
+  post-merge bar), `.githooks/pre-push`, `tools/run-gates/post-merge.sh` and `refs/gov/bar-red`.
+- `tools/govkit/govkit.py` (selfcheck, intake, plan, apply, check, update, adopt, epoch, mint,
+  contribute), `tools/govkit/registry.toml` and its entries, the per-kit `adopt-*.sh`, the receipt
+  (`.governance/install.json`, `install.sums`) and `tools/run-gates/check-receipt.py`, which checks
+  integrity, not currency; `skills/deploy-governance/`.
+- incms's own deploy surface, built outside gov: `infra/deploy.sh`, `infra/deploy-native.sh`,
+  `infra/fleet-roll.sh`, `infra/docker-compose.yml`, `infra/systemd/`, `infra/nginx/`, and the
+  workflows `release.yml` (a signed GHCR image pair and a signed channel manifest),
+  `sign-release.yml` and `restore-drill.yml`.
+- `memory/builds/aDeployScout/spec/governance-deployer-research.md`, whose CI riding was never built.
+
+**Planned units.**
+1. **The landing record.** Each landing records the SHA, the builds and units it carried and the
+   verdict it moved on; landing review is opt-in with the stage-exit recommendation; the autonomy
+   level decides whether the owner authorizes it.
+2. **Kit releases with notes.** A kit mint carries release notes generated from the units that
+   changed the kit since its last version.
+3. **The deploy engine** (a new kit): declared environments and their promotion order, a versioned
+   and signed release artifact, a deploy step, a verify step, a rollback step, and optional canary
+   and fleet-roll steps; every step writes its verdict for the SHA.
+4. **The first adapter**, fitted to incms: signed container images, compose and systemd hosts,
+   rolling fleet updates, restore drills; incms becomes its first consumer.
+5. **The fleet register and currency watch.** A register of adopters and the gov commit each runs;
+   Maintain's cadence reports how far behind each is; outbox orders are graded.
+6. **Lander hardening.** A killed hook detected rather than reported afterwards; hooks-path drift
+   refused; the lander kit versioned, with its dependency on the bar's kit declared.
+7. **Emitted CI, optional.** For an adopter that has CI, govkit can emit a job that runs the bar and
+   the deploy engine's verify; a designed slot for gov itself.
+8. **A runbook derived from the descriptors**, replacing 163 KB of narrative with generated pages.
+
+**Gaps owned.** gap-deploy-01 to gap-deploy-08.
+
+**Parents.** dWitnessedBar. **Children.** dConvergedCharter.
+
+**Risks.** Unit 3 is a new product surface for systems gov does not run, so it needs the strongest
+review of the chain; unit 4 changes how a production adopter ships, so it lands in incms only with
+that repository's own owner go.
+
+### Forks asked, 2026-10-14
+
+**DP1. "Where should the deploy engine run by default?"** Offered: Landing node, after verdict
+(Recommended); In the adopter's CI; Operator-run. Answer: Landing node, after verdict
+(Recommended).
+
+**DP2. "Who approves a promotion into production by default?"** Offered: You approve prod
+(Recommended); Auto on green verify; You approve every environment. Answer, in the owner's words:
+"Auto on green by default, owner-adjustable".
+
+**DP3. "What happens by default when a deploy's verify step fails?"** Offered: Roll back, file an
+ask (Recommended); Halt and alert; Roll forward only. Answer, in the owner's words: "Roll forward by
+default, owner adjustable".
+
+**DP4. "How should adopters stay current with gov by default?"** Offered: Pull + currency watch
+(Recommended); Push update branches; Pull only, as today. Answer: Pull + currency watch
+(Recommended).
+
+### Revised: 2026-10-14, after DP1 to DP4
+
+The engine promotes through every environment, production included, on a green verify, and a
+failed verify is recorded for its SHA and fixed forward; owner approval of production and
+automatic rollback ship as allowed values. Because nothing stops a bad release by default, the
+verify step's record is the one place a failure is seen: it files an ask and joins the loop
+metrics, so roll-forward never means unrecorded.
+
+| Fork | Policy key | Values | Default |
+|---|---|---|---|
+| DP1 | `deploy.runs` | landing-node, adopter-ci, operator | landing-node |
+| DP2 | `deploy.promotion` | owner-approves-prod, auto-on-green, owner-approves-each | auto-on-green |
+| DP3 | `deploy.on-verify-fail` | rollback-and-ask, halt-and-alert, roll-forward | roll-forward |
+| DP4 | `deploy.currency` | pull-and-watch, push-branches, pull-only | pull-and-watch |
+
+## 8. dTendedCadence — Maintain: a cadence, a mandate, safe fixes, and detectors that are owned
+
+**Purpose.** Give the loop a stage that runs without anyone asking: on a cadence, under a
+maintenance mandate, it applies the declared safe fixes (round 2), binds every detector to a pin
+and an owner, closes what is finished or abandoned, and files the rest into Plan.
+
+**Seams it extends, verified 2026-10-14** (the Maintain research record holds the instruments).
+- `tools/drift-audit/drift_report.py`: 27 signals with liveness assertions, 15 nonzero today, most
+  report-only, two dead probes.
+- `tools/process-monitor/reap.py`, `tools/branch-reconcile/branch_reconcile.py` (`/cleanup`): the
+  actuators for reaping and pruning, each run by hand today.
+- Recipe mode in `tools/unattended/` (`check-playbook.sh`, `PLAYBOOK-TEMPLATE.template.md`; the
+  `playbook-mode` dossier, status `building`; dScriptedRepeat SPECCED): an authorization discipline
+  for repeatable work.
+- The unattended kit's keepalive and resume ticks registered through `CronCreate`, which live only
+  as long as a session does.
+- `memory/LIVE.md`'s dormancy label; 89 live `RUN.md` files, 10 of them for merged work.
+
+**Planned units.**
+1. **The maintenance recipe.** A playbook in recipe mode: run the detectors, apply the safe fixes
+   the mandate allows, draft triage under Plan's rules, file every other finding as an ask, record
+   the run.
+2. **The cadence and its host.** Where and how often the recipe runs is a policy; the build ships
+   the hosts the owner keeps.
+3. **The safe-fix set**, declared and owner-switchable: reap stale processes, prune landed branches
+   and worktrees through `/cleanup`'s write mode, regenerate stale outputs, defer builds dormant past
+   the threshold, land records-only fixes, close finished run records; the currency probe and the
+   backlog's rule-based labelling ride the same run.
+4. **Detectors with owners.** Every drift signal carries a pin and the stage that owns its breach; a
+   breach is handled by policy; dead probes are fixed or removed.
+5. **Map freshness.** Dossiers older than their paths are refreshed or proposed for refresh.
+6. **The maintenance record.** Each run records what it checked, what it fixed and what it filed,
+   so the Loop Review can read the loop's health over time.
+
+**Gaps owned.** gap-maint-01, gap-maint-02, gap-maint-05 to gap-maint-08.
+
+**Parents.** dWitnessedBar, dRankedPlan. **Children.** dCalibratedLens.
+
+**Risks.** A run that mutates with no owner turn must stay inside its declared fix set, so the set
+is checked against what the run's commits touched; with no always-on host, a cadence is only as
+regular as the host the owner picks.
+
+### Forks asked, 2026-10-14
+
+**M1. "With no always-on server, where should the maintenance cadence run by default?"** Offered:
+At session start (Recommended); OS scheduler on a node; Cloud routine. Answer, in the owner's
+words: "At session start, other options in-scope owner-adjustable".
+
+**M2. "How often should maintenance run by default?"** Offered: Daily (Recommended); Weekly; Every
+session. Answer: Daily (Recommended).
+
+**M3. "When a detector breaches its pin, what's the default?"** Offered: File an ask for its stage
+(Recommended); Red a leg; Report only. Answer: File an ask for its stage (Recommended).
+
+### Revised: 2026-10-14, after M1 to M3
+
+Unit 2 ships three hosts, not one: the session-start host is the default, and the OS scheduler and
+the cloud routine are in scope as switchable values, the cloud host limited to what it can reach
+from the remote. A maintenance lease, from dLeasedFleet, keeps two nodes from running the same
+day's maintenance.
+
+| Fork | Policy key | Values | Default |
+|---|---|---|---|
+| M1 | `maintain.host` | session-start, os-scheduler, cloud-routine | session-start |
+| M2 | `maintain.cadence` | daily, weekly, every-session | daily |
+| M3 | `maintain.on-breach` | file-ask, red-leg, report | file-ask |
+
+## 9. dCalibratedLens — Review: review where it pays, recommended everywhere, and a loop that prunes itself
+
+**Purpose.** Give every stage a review the owner can switch on and size, make every transition
+carry the agent's reasoned recommendation, and give the loop its one missing feedback: a Loop
+Review that reads what each gate, rule and bug class has caught and cost, and retires what does not
+pay (round 3: value ledger plus retirement plus budgets).
+
+**Seams it extends, verified 2026-10-14.**
+- `tools/workflows/tier2-review.js` (finder lenses, batched skeptics, one synthesis; spec and diff
+  modes) and `memory/guides/REVIEW-PROTOCOL.md`; the diff reviewer, spec reviewer, skeptic and
+  synthesizer roles; agent-cap rule 0, the audit opt-in guard.
+- `GATE_ATTRIBUTE`'s OWN label, the nearest thing to "this gate caught something"; the per-node
+  gate ledger; `tools/run-gates/ceiling-evidence.txt` for cost.
+- The 122 bug classes under `memory/gotchas/` and `tools/memory-tree/gotchas.py`; the charter's
+  `[left-shift]` rule, today the loop's only way of correcting itself.
+- The transition record (dDeclaredLoop), the gate-health record (dWitnessedBar) and the maintenance
+  record (dTendedCadence): the metrics the Loop Review reads.
+
+**Planned units.**
+1. **Review by policy, per stage and effort.** `review.<stage>` and its effort read by every review
+   harness; the closing review owed by default, everything else opt-in.
+2. **The stage-exit recommendation.** A micro-format line and a trailer carrying the agent's
+   recommendation and reason before every transition; advice by default, binding by policy.
+3. **Lenses for the stages that have none.** Plan (order, dependencies, duplicates, readiness), Test
+   (seen red, arms, cost, flakes), Deploy (what landed against the plan, release notes against the
+   epoch, adopter updates), Maintain (fixes inside the declared set, detectors owned).
+4. **The value ledger.** For each gate leg, charter rule and bug class: what it caught (an OWN red,
+   a review finding citing it), what it cost (wall time, tokens), and when it last caught anything;
+   shared across nodes, not per node.
+5. **The Loop Review.** A periodic retrospective over stage cycle times, review yield, bypass counts,
+   records overhead and surface size against budgets; it files proposals (retire, merge, demote a
+   gate, rule or class; change a stage contract) into Plan.
+6. **Budgets and review cost.** Owner-switchable caps on legs, guide bytes and registry rows, and a
+   records-overhead ceiling; review batching and lens selection guided by the recommendation.
+
+**Gaps owned.** gap-review-01 to gap-review-03, gap-maint-03, gap-design-08.
+
+**Parents.** dTendedCadence. **Children.** dConvergedCharter.
+
+**Risks.** A retirement removes a guard, so the ledger's catch count must be one nobody can inflate
+or deflate from their own session; the ledger starts empty, so nothing should retire before it has
+a full window of evidence.
+
+### Forks asked, 2026-10-14
+
+**R1. "How often should the Loop Review run by default?"** Offered: Monthly (Recommended); Weekly;
+Every N landings. Answer, in the owner's words: "Weekly by default, owner-adjustable".
+
+**R2. "When the Loop Review finds a gate, rule or bug class that caught nothing in its window,
+what's the default?"** Offered: Propose, you ratify (Recommended); Demote, then propose; Report
+only. Answer: Propose, you ratify (Recommended).
+
+**R3. "How long a window without a catch makes something a retirement candidate by default?"**
+Offered: 60 days (Recommended); 90 days; 30 days. Answer, in the owner's words: "60 days def,
+owner-adjustable".
+
+**R4. "What should the governing-surface budgets be by default?"** Offered: Cap at today's size
+(Recommended); Shrink targets; Measure, no caps. Answer, in the owner's words: "rederive the caps,
+currently it's uncertain how meaningful the caps are. Caps often get in the way of work but it's
+clear caps are needed to prevent bloat."
+
+### Revised: 2026-10-14, after R1 to R4
+
+Unit 6 becomes **caps re-derived from evidence**. Inventory every cap the product enforces today
+(the charter's 48 KiB size gate, the build README slot budgets, the guide and dossier caps, the
+kickoff card's 8,192-byte cap, the entry budgets, the shrink-only pins), measure for each how often
+it blocked work and how often it stopped growth that would otherwise have landed, and re-derive
+each value and its mode from that evidence: a hard cap where bloat is the real risk, a soft cap
+that warns and asks for a recorded reason where blocking costs more than it saves. New budgets on
+legs, guide bytes, registry rows and records overhead are derived the same way, never typed.
+
+| Fork | Policy key | Values | Default |
+|---|---|---|---|
+| R1 | `review.loop.cadence` | weekly, monthly, every-n-landings | weekly |
+| R2 | `review.loop.retire` | propose-ratify, demote-then-propose, report | propose-ratify |
+| R3 | `review.loop.window-days` | days | 60 |
+| R4 | `budgets.*` | each cap's value and mode, hard or soft | re-derived from evidence |
+
+## 10. dConvergedCharter — Convergence: one product, its parts consolidated, the superseded retired
+
+**Purpose.** Finish the convergence the earlier builds make possible: the charter regrouped around
+the loop with gov's own rules split into gov's overlay, the protocol text consolidated and derived,
+record kinds consolidated against the records-overhead metric, superseded legs, rules and builds
+retired through the Loop Review, and every adopter moved onto the converged loop. The charter's
+front door already moved to the Spine (S5).
+
+**Seams it extends.** The charter template and its renderer (`coding-governance-agents.template.md`,
+`tools/playbook/`, the 48 KiB size gate and its high-water); the guides under `memory/guides/`
+(301 KB) and `WIRE-INTO-PROJECT.md` (163 KB); the memory tree's record kinds
+(`memory/HYGIENE.md`); govkit's `update` and the receipts; every earlier chain build's outputs.
+
+**Planned units.**
+1. **The charter regrouped.** Section 1's rules grouped by the stage they govern, each one line
+   tagged with its stage; rules that govern only gov move to gov's overlay; the current policy
+   values rendered.
+2. **Protocol text derived.** Every guide sentence that states a fact the loop definition, a policy
+   or a kit descriptor already holds is replaced by a rendered pointer; prose stays only for
+   rationale, per stage, inside a re-derived budget.
+3. **Records consolidated.** Record kinds that answer one question merge; bookkeeping folds into
+   the pass commit where it can; the records-overhead metric is brought under its ceiling.
+4. **Superseded parts retired.** Legs, rules, bug classes and builds that the chain made redundant
+   are retired through the Loop Review's ratified proposals, never by assertion.
+5. **Adopters migrated.** Each adopter moves to the converged loop through govkit, with its own
+   owner's go.
+
+**Gaps owned.** gap-spine-04, gap-spine-05, gap-maint-04.
+
+**Parents.** dScopedBuild, dShippedRelease, dCalibratedLens, and through them every chain build.
+
+**Risks.** It edits every governing surface at once, so it lands in small units behind the Loop
+Review's ratifications; adopters run production systems and migrate only on their owners' go.
