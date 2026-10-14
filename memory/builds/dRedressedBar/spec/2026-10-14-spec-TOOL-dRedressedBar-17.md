@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-17 — the units-12-15 spec audit's 12 mediums and 9 lows, batched: each faulted criterion observed in a form that can pass and fail, each false sentence corrected, and the code sites they describe made to hold what the specs claim
 
-**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 12
+**Status:** SPECCED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,8 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md) | research | TOOL-dRedressedBar-10 TOOL-dRedressedBar-13 TOOL-dRedressedBar-19 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md) | research | TOOL-dRedressedBar-9 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-17-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-5-spec-writer.md) | journal | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-17-6-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-6-revision.md) | research | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-17-7-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-7-spec-writer.md) | journal | — |
 | [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-16 TOOL-dRedressedBar-18 |
 
 <!-- /gen:spec-records -->
@@ -45,7 +47,7 @@ report item it shares:
 | 21 | LOW | L9 | unit 15 S8, §4 Files touched | runs the whole `regen.py --write` and accounts only for the map | S21 |
 | 22 | MEDIUM | M9 | unit 14 §4 "When CONFIGURE fails" row 2, AC4 | the early receipt holds STAGE's oids, so an interrupt after RENORMALIZE makes the re-run refuse DIRTY | S22 |
 | 23 | MEDIUM | M10 | unit 14 S1, S2, §4 | both receipt writes use a plain `write_text`, so a mid-write fault truncates `install.json` | S23 |
-| 24 | MEDIUM | M11 | unit 15 S1, S5, §4, AC7 | a malformed `via` value is undefined: `via = ""` silently unwires the hook and a list crashes selfcheck | S24 |
+| 24 | MEDIUM | M11 | unit 15 S1, S5, §4, AC7 | a malformed `via` value is undefined at run time: `via = ""` falls back to the entry's own argv, which silently unwires agent-cap's hook. As built at `<p15>`, selfcheck refuses `""` and a list as naming no registry entry, and crashes on neither | S24 |
 
 Id 16 was graded medium by its finder and low by the skeptic, and the skeptic's grade binds. Id 11's
 fix was judged UNSOUND, and the skeptic's corrected fix is the one S11 takes. Ids 14 and 17 were
@@ -164,12 +166,20 @@ report item share its observation, and each still names its own id.
   `adopt`'s (`:12692`). The comment above the constant and `write_atomic`'s docstring name the
   receipt. Spec 14's "When CONFIGURE fails" table gains a row for an interrupt during a receipt
   write: the previous file stays whole. Observed by AC23.
-- **S24** — id 24, M11. Unit 15's `via` rules gain a first rule, ahead of the four: `<v>` is a
-  non-empty string, reason `is not a non-empty string`. The rules' population is every entry whose
-  `[adopt]` table holds the `via` key, whatever its value. `scan_entry_argv` takes the key's presence
-  as the delegate declaration: a value that is not a non-empty string naming a registry entry
-  raises `KeyError` naming the entry, and never falls back to the entry's own argv. Spec 15's S1
-  sentence on a non-string `via` and its §4 rule table are corrected. Observed by AC24.
+- **S24** — id 24, M11, restated against `<p15>`. There selfcheck already takes every entry whose
+  `[adopt]` table holds the `via` key, whatever its value (`tools/govkit/govkit.py:3296`), and
+  refuses a value that is not a string naming a registry entry under rule 1's reason,
+  `names no registry entry`, with no traceback (`:3297-3300`). So the selfcheck half is a reason
+  refinement: unit 15's `via` rules gain a first rule, ahead of the four, that `<v>` is a non-empty
+  string, reason `is not a non-empty string`, and `""` and a list read that reason in place of
+  `names no registry entry`. The run-time half is the behaviour change. At `<p15>`,
+  `resolve_adopter_argv` takes `via` as the source only when it is a non-empty string and otherwise
+  falls back to the entry itself (`:1511-1512`), so `via = ""` on an entry with no argv of its own,
+  as agent-cap, resolves to `[]` and CONFIGURE skips it with no line (`:7937-7939`).
+  `scan_entry_argv` takes the key's presence as the delegate declaration: a value that is not a
+  non-empty string naming a registry entry raises `KeyError` naming the entry, and never falls back
+  to the entry's own argv. Spec 15's S1 sentence on a non-string `via` and its §4 rule table are
+  corrected. Observed by AC24.
 - **S25** — The record, in two passes. Specs 9, 12, 13, 14 and 15 each take ONE rev bump in this
   unit's spec-writer pass, `<w17>`, which runs once units 9 to 16 are CLOSED and before the build
   pass. Each revision line names `TOOL-dRedressedBar-17` and every report id §4's table assigns that
@@ -372,8 +382,9 @@ Specs 9, 12, 13, 14 and 15 are `<w17>`'s write set, not the build pass's.
 ## 5. Production-readiness checklist
 
 - security — S23 narrows a failure mode: no interrupted run leaves a truncated receipt for the next
-  `apply` to crash on or for a resolver to read as empty. S24 turns a silent fallback into a
-  refusal at selfcheck and a `KeyError` at run time. `via` is still read only from gov's
+  `apply` to crash on or for a resolver to read as empty. S24 turns `resolve_adopter_argv`'s
+  silent fallback into a `KeyError` at run time. Selfcheck already refuses a malformed `via` at
+  `<p15>`, and S24 gives that refusal its own reason. `via` is still read only from gov's
   descriptors.
 - perf / scale — N/A — one more receipt write on a renormalizing apply, one generator replacing two
   loops, and four fixture cases.
@@ -564,9 +575,12 @@ A target is a fresh `git init` tree under `%TEMP%/<short-name>`, never inside th
   exactly one line opening `govkit: entry 'demo' declares [adopt] via` and carrying
   `is not a non-empty string`. Neither output carries `Traceback`. A python program importing that
   gov's `govkit` and calling `resolve_adopter_argv` for `demo` with `via = ""` raises `KeyError`.
-  Red when: around the `<p15>` `govkit.py`, `via = ""` prints no line opening
-  `govkit: entry 'demo' declares [adopt] via`, and `via = ["other"]` prints `Traceback` and
-  `unhashable`.
+  Red when: around the `<p15>` `govkit.py`, `via = ""` and `via = ["other"]` each print exactly one
+  line opening `govkit: entry 'demo' declares [adopt] via`, and it carries `names no registry entry`
+  in place of `is not a non-empty string` (`tools/govkit/govkit.py:3296-3300`). Neither output
+  carries `Traceback`. The same program over that `govkit.py` raises nothing for `via = ""`:
+  `resolve_adopter_argv` falls back to `demo` and returns what demo's own `[adopt]` argv resolves
+  to, `[]` where it declares none (`:1511-1518`).
   cost: three scratch govs and four selfchecks, about a minute.
 - **AC25** — `git diff <w17>~1 <w17> -- memory/builds/dRedressedBar/spec/` shows specs 9, 12, 13, 14
   and 15 each with one header rev change and one new revision line. Each line names
@@ -584,7 +598,7 @@ A target is a fresh `git init` tree under `%TEMP%/<short-name>`, never inside th
 New arm: tools/govkit/selftest.py · covers AC2 · the `[dRB-12]` and `[dRB-14]` sidecar checks over a copy whose `install.sums` write iterates this run's `rows` alone, where the carried rows are missing from the sidecar · none
 New arm: tools/govkit/selftest.py · covers AC3 · fixture B's identity check over a copy that appends the agent-cap row with `commit`, `sha256` and `gov_oid` already set, where the before-half reds · none
 New arm: tools/govkit/selftest.py · covers AC13 · the `[dRB-9]` per-kit gaining case over a gov whose gained loop reads the declared `[adopt].argv`, where the one adopter line opens `default-gained settings-merge:` · none
-New arm: tools/govkit/selftest.py · covers AC11 AC24 · the `[dRB-15]` scratch-gov cases for the first and fifth `via` rules over the `<p15>` `govkit.py`, where `via = ""` prints no `via` line, `via = ["other"]` prints a traceback, and `via` beside a `rendered` rule prints none · none
+New arm: tools/govkit/selftest.py · covers AC11 AC24 · the `[dRB-15]` scratch-gov cases for the first and fifth `via` rules over the `<p15>` `govkit.py`, where `via = ""` and `via = ["other"]` each print their `via` line carrying `names no registry entry` in place of `is not a non-empty string`, `resolve_adopter_argv` falls back to `demo` for `via = ""` in place of raising `KeyError`, and `via` beside a `rendered` rule prints no `via` line · none
 New arm: tools/govkit/selftest.py · covers AC23 · the `[-21] AC2` routing assertion with one receipt write respelled as `receipt_path.write_text(`, where its no-direct-write check reds · none
 
 The refusal join's floor does not move. S11 and S24 add rules to the `via` site unit 15 adds and no
@@ -615,6 +629,17 @@ none
   the ledger only. AC25 reads `<w17>` in place of `<p17>` and observes that neither build-pass commit
   writes another spec. Alternatives rejected gains one row. No product design or other criterion
   moves.
+- rev-4 · 2026-10-14 · §1 · S24 · §5 · AC24 · §7 · the `<w17>` writer's finding
+  (`prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-6-revision.md`): AC24's red half could not
+  reproduce over the built `<p15>`. Its selfcheck already reads the `via` key's presence and checks
+  that the value is a string naming a registry entry before using it
+  (`tools/govkit/govkit.py:3296-3300`), so `via = ""` and `via = ["other"]` each print one `via` line
+  carrying `names no registry entry`, with no traceback, where rev-3 expected no line and an
+  `unhashable` traceback. S24 is restated as a reason refinement at selfcheck and a behaviour change
+  at run time, where `resolve_adopter_argv` still falls back to the entry's own argv for `via = ""`
+  (`:1511-1512`, read at the tip, whose `govkit.py` equals `<p15>`'s). AC24's red half, the
+  `New arm:` line for AC11 and AC24, §1's row 24 and §5's security sentence now name what `<p15>`
+  does. AC24's green half, and every other scope item and criterion, do not move.
 
 ## 10. Reuse audit
 
