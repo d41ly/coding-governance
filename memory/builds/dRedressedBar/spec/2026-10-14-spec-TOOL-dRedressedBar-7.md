@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-7 — records, the regenerated index and the kit versions, measured over the fixed tree
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 5
+**Status:** INPROGRESS · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,9 @@
 |---|---|---|
 | [2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md](../build/2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 | [2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-20-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-20-2-revision.md) | research | TOOL-dRedressedBar-20 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-7-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-7-2-revision.md) | research | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-7-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-7-3-spec-writer.md) | journal | — |
 | [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 
 <!-- /gen:spec-records -->
@@ -77,6 +80,13 @@ four or more kits.
   branch-reconcile and roles kits, which S3 bumps.
 - **consumes-from** `TOOL-dRedressedBar-6` — the last edit to the roles adopter's suite before the
   measure. The roles re-render that S3 triggers runs the adopter whose exits that unit arms.
+- **consumes-from** `TOOL-dRedressedBar-20` — S3's mint runs over that unit's tightened carrier
+  writer. Without it, `write_version_carriers` (`tools/govkit/govkit.py:798`) lets the `playbook`
+  entry's pattern `governance-template: v` (`tools/govkit/entries/playbook.kit.toml:6`) rewrite the
+  selftest fixture at `tools/playbook/render_playbook.py:1646`, a false carrier that reds AC4.
+  Unit 20's S6 then restores `render_playbook.py:1397` from `v1.28` to `v3.5` in its own commit,
+  with no bump. That restore is the one move of playbook-render's shipped bytes over
+  `ebce889c7..HEAD`, so S3's mint bumps playbook-render from 1.28 to 1.29.
 - **hands-off** `TOOL-dRedressedBar-10` — the correction the round-1 spec audit found owed (report
   ids 9, 19 and 23): §1, §4 "Why one unit" and AC4 count the siblings as 1 through 6 only, and these Edges name no
   `consumes-from` for units 8 and 9, though both land before this unit. That unit corrects the
@@ -98,6 +108,9 @@ Each figure is read off its own checker over this unit's tree and never copied f
 1. **Baseline, read-only.** Run the two probes below and keep their output for the acceptance
    ledger. The first is the liveness half of AC4. The second is the liveness half of AC2: at
    `f079464e2` it read `12 declared · 11 fresh · 1 stale`, naming the index (PINNED, 2026-10-14).
+   The builder's run before the write, later on 2026-10-14, read `10 fresh · 2 stale`, naming the
+   gotchas index and this build's README build index (PINNED; recorded in
+   `prompts/2026-10-14-prompt-TOOL-dRedressedBar-7-2-revision.md`).
 
    ```bash
    python tools/govkit/govkit.py epoch --base ebce889c7
@@ -113,7 +126,9 @@ Each figure is read off its own checker over this unit's tree and never copied f
    kit's value. `write_version_carriers` (`:798`) then moves every carrier, and each minted kit's
    `[[regenerate]]` argv runs. It stages and commits nothing. The kits expected from the briefed
    write sets, with the version source each descriptor declares, are below. The set is DERIVED by
-   step 1's output, and unit 3 may add to it.
+   step 1's output. The builder's mint on 2026-10-14, over the closed unit 3, moved exactly the first
+   four versioned kits below and no other. That mint ran before unit 20's restore, which adds the
+   fifth.
 
    | Kit | Moved by | Version source |
    |---|---|---|
@@ -121,13 +136,37 @@ Each figure is read off its own checker over this unit's tree and never copied f
    | branch-reconcile | unit 5 | `tools/branch-reconcile/kit.toml:10`, in `branch_reconcile.py` |
    | roles | unit 5, `tools/roles/adopt-roles.sh` | `tools/roles/kit.toml:22`, in `roles_lib.py` |
    | unattended | unit 2, `tools/unattended/gate-guard.js` | `tools/unattended/kit.toml:6`, in `unattended.sh` |
+   | playbook-render, 1.28 → 1.29 | unit 20's S6, `tools/playbook/render_playbook.py:1397` | `tools/playbook/kit.toml:11`, in `render_playbook.py` |
    | push-main | unit 1, `.githooks/pre-push.test.sh` | none (`tools/govkit/entries/push-main.kit.toml:7`), so `skip` |
 
    The renders this runs rewrite files outside those kits. The roles render
    `bash tools/roles/adopt-roles.sh --scaffold` (`tools/roles/kit.toml:72-73`) rewrites the
    `.claude/agents/gov-*.md` files and `.claude/roles.json`. The unattended render
    (`tools/unattended/kit.toml:193-194`) rewrites `memory/guides/UNATTENDED-PROTOCOL.md` and
-   `.claude/skills/unattended/SKILL.md`.
+   `.claude/skills/unattended/SKILL.md`. The playbook-render render
+   `bash tools/playbook/adopt-playbook.sh --target .` (`tools/playbook/kit.toml:53-55`, declaring
+   `writes = ["AGENTS.md"]`) re-renders `AGENTS.md` and writes no other file. Its write mode makes
+   one write, `write_region` (`tools/playbook/render_playbook.py:698-706`, called at `:1829`), into
+   `--charter`, which defaults to `AGENTS.md` (`:1725`). The engine's version appears nowhere in the rendered region.
+   On 2026-10-14 `grep -n "1\.28\|playbook-render" AGENTS.md` printed nothing. So the re-render
+   leaves `AGENTS.md`'s bytes as they are unless the region was already stale. The builder's
+   `regen.py --check` before the write found the playbook item fresh: it named only the gotchas index
+   and the build index stale (step 1). `AGENTS.md` is not in playbook-render's epoch set, so the
+   re-render moves no kit. In `render_playbook.py`, the mint's own write and the carrier writer change
+   line 1839 alone: the `KIT_PLAYBOOK_RENDER_VERSION` value and the `gov:kit playbook-render@` marker
+   on that line. That is the kit's only carrier: `git grep -n "playbook-render@"` outside
+   `memory/builds/` printed that one line on 2026-10-14. This matches the last playbook-render mint,
+   `ed1e9db3c`.
+
+   The mint must move exactly the five versioned kits in the table: agent-cap, branch-reconcile,
+   roles, unattended and playbook-render. It prints one `mint: <kit> · <old> -> <new>` line per moved
+   kit (`tools/govkit/govkit.py:13188`). The playbook-render line reads `1.28 -> 1.29`. It must write
+   no file outside those five kits' carriers and the renders named above, and in `render_playbook.py`
+   no line other than 1839. Read `git status --porcelain` and
+   `git diff -U0 -- tools/playbook/render_playbook.py` after the mint. If the mint moved any other
+   kit, or wrote any other file or line, the pass stops before step 3, commits nothing, and returns to
+   the main loop. The builder's first mint on 2026-10-14 did exactly that: it also rewrote
+   `tools/playbook/render_playbook.py:1646` from `v3.5` to `v1.28`, which unit 20 fixes.
 3. **S2, carrier row.** Measure after the mint, because the roles render rewrites the agent file.
    The probe mirrors the checker's population (`tools/memory-tree/check-method-carriers.sh:63-71`)
    and its checks 3 and 4, without running the leg.
@@ -153,7 +192,8 @@ Each figure is read off its own checker over this unit's tree and never copied f
    the declared pair `gotchas.py --write` / `gotchas.py --check` (`tools/memory-tree/kit.toml:487-490`).
    The expected move is the two rows S1 names. The commit body names any other path the command
    moves, because a sibling unit or step 2's renders left it stale.
-5. **Probe and commit.** Run AC1 to AC5 and commit with the unit id in the subject.
+5. **Probe and commit.** Run AC1 to AC5 and commit with the unit id in the subject. Run AC7 over
+   that commit.
 6. **S4, stamp.** Run the AC6 probe. If it prints a commit, follow `manifest-check.sh`'s C5
    remedy (`skills/session-kickoff/manifest-check.sh:1450-1475`). Re-read the §B claims derived
    from each touched watch path, and re-stamp `last-audit:` as `<ISO time> @ <HEAD sha>`, which is
@@ -161,6 +201,18 @@ Each figure is read off its own checker over this unit's tree and never copied f
    line, in the shape of `2e187ee8b`. The stamp cannot name the commit that carries it, which is why
    it is a second commit. A watch path moves only if the minter bumped a kit that carries one, such
    as memory-tree's marker in `memory/guides/BUILD-METHOD.md` (TOOL-aMendedFleet-108).
+
+   Playbook-render's bump and render owe no stamp. The manifest's three path lists are `watch:`
+   (`memory/guides/SESSION-KICKOFF.md:6`), `verify-paths:` (`:7`) and `registry:` (`:10`). The
+   re-render's one file, `AGENTS.md`, is a `verify-paths:` entry and the `registry:` file, and it is
+   not on `watch:`. `tools/playbook/render_playbook.py` is on none of them. C5 reads only the watch
+   list: it takes the newest commit touching `${WATCH[@]}` since the stamp
+   (`skills/session-kickoff/manifest-check.sh:1459`), and its staged form C5s reads the staged watch
+   list (`:1586`). A verify-path is graded by C4 alone, which requires it to be tracked
+   (`:1420-1428`). A staged `AGENTS.md` makes the pre-commit leg run in full rather than skip
+   (`:1251-1264`), and that full run passes C5 when no watched file moved. The registry file is read by
+   the card verbs (`:519`). So AC6 is owed only if a watch path moves, as before, and the fifth kit
+   adds none.
 
 ### Why one unit
 
@@ -190,6 +242,8 @@ render, and the sequence above orders that.
 - `tools/branch-reconcile/branch_reconcile.py`
 - `tools/roles/roles_lib.py`
 - `tools/unattended/unattended.sh`
+- `tools/playbook/render_playbook.py` (line 1839)
+- `AGENTS.md` (only if its region was stale before the render)
 - `memory/guides/SESSION-KICKOFF.md`
 
 ## 5. Production-readiness checklist
@@ -208,8 +262,10 @@ render, and the sequence above orders that.
   summary. The commit body names each kit with its old and new value.
 - risks — A closing-review fold that moves bytes after this unit leaves a bump undated until the
   lander's mint. The roles render rewrites every agent file, which is why S2 is measured after
-  step 2. A minted memory-tree marker moves a watched path, which is why S4 exists.
-- testing — The direct probes of §6 in the pass. The unit adds no arm. The close's bar observes the
+  step 2. A minted memory-tree marker moves a watched path, which is why S4 exists. The
+  playbook-render render rewrites the `gov:playbook` region of `AGENTS.md`. When the region is fresh,
+  the bytes come out the same, and `playbook render wiring` grades the region at the close.
+- testing — The direct probes of §6 in the pass, AC7 included. The unit adds no arm. The close's bar observes the
   §7 legs, including push-main self-test arms 28 and 29.
 - migration — None. Version values move forward, and an adopter reads them through
   `govkit.py update`.
@@ -232,8 +288,9 @@ render, and the sequence above orders that.
   Red when: the agent file has no row in `memory/project/method-carriers.txt`, a row names a file
   that no longer mentions the method, or the agent file holds a copied method heading.
 - **AC4** — When `python tools/govkit/govkit.py epoch --base ebce889c7` runs before the mint, it
-  prints a `FAILED` line for each kit that units 1 to 6 moved. When the same command runs at the
-  unit's tip, it prints no `FAILED` line and exits 0.
+  prints a `FAILED` line for each kit that units 1 to 6 moved, and one for playbook-render, which
+  unit 20's S6 moved. When the same command runs at the unit's tip, it prints no `FAILED` line and
+  exits 0.
   Red when: a moved kit keeps its value, or its bump precedes a later move of its bytes.
   figure: the kit set is DERIVED by the pre-mint run; §4's table is the expectation from the brief.
 - **AC5** — For each kit the minter moved from value `<old>`, `git grep -nF "gov:kit <kit>@<old>"`
@@ -245,12 +302,28 @@ render, and the sequence above orders that.
   newest one is an ancestor of, or equal to, the newest commit that moved the `last-audit:` value.
   Red when: a watched path moved after the last stamp, the C5 condition at
   `skills/session-kickoff/manifest-check.sh:1468`.
+- **AC7** — At the unit's step-5 commit, `git diff -U0 <its first parent> <that commit> --
+  tools/playbook/render_playbook.py` changes line 1839 only, and that line reads
+  `KIT_PLAYBOOK_RENDER_VERSION = "1.29"  # gov:kit playbook-render@1.29`.
+  `grep -n "governance-template: v[0-9]" tools/playbook/render_playbook.py` prints lines `1397` and
+  `1646`, both reading `v3.5`. `git diff --name-only <its first parent> <that commit>` names only
+  these: the five kits' version sources and carriers, the roles, unattended and playbook-render
+  render outputs §4 step 2 names, `memory/project/method-carriers.txt`, and the outputs
+  `regen.py --write` moved, which the commit body lists (§4 step 4).
+  Red when: the mint rewrote a fixture line in `render_playbook.py`, left playbook-render at 1.28, or
+  wrote a file no step of §4 names.
+  figure: `1.29` is DERIVED by the mint from the `1.28` at `ebce889c7`. The line numbers are PINNED at
+  `9d0ad1c0a` on 2026-10-14. Unit 20 adds and removes no line of the file, so they hold.
 
 ## 7. Gates
 
-`memory hygiene` · `method carriers (every pointer declared)` · `kickoff-manifest ratchet` · `push-main self-test` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `govkit selfcheck` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `branch-reconcile selftest` · `recall floor` · `recall floor arms`
+`memory hygiene` · `method carriers (every pointer declared)` · `kickoff-manifest ratchet` · `push-main self-test` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `govkit selfcheck` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `branch-reconcile selftest` · `playbook render wiring` · `playbook render selftest` · `playbook parity` · `recall floor` · `recall floor arms`
 
-The close runs these in its one bar. Its push-main self-test is where arms 28 and 29 go green: their
+The close runs these in its one bar. `playbook render wiring` grades the `AGENTS.md` region that
+playbook-render's render rewrites. `playbook render selftest` is owed by its `{prefix}/playbook/`
+guard (`tools/gate-legs.json:1637-1640`), which the line-1839 mint trips. `playbook parity` has no
+guard and runs every bar. It holds the playbook's stated values to the sources that own them
+(`tools/check-playbook-parity.sh:12-14`), so it reds if the re-rendered charter states a stale one. Its push-main self-test is where arms 28 and 29 go green: their
 fixture clones HEAD, and HEAD's index is fresh after this unit. The unit adds no arm.
 
 ## 8. Open questions
@@ -263,6 +336,19 @@ none
 - rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
   spec audit's minors were promoted into, for report ids 9, 19 and 23. No scope, design or criterion
   moves.
+- rev-3 · 2026-10-14 · §3 · §4 · S3 · Edges gain the consumes-from to TOOL-dRedressedBar-20, after
+  the builder's first mint rewrote the non-carrier `tools/playbook/render_playbook.py:1646`. §4 step
+  2 states that the mint moves exactly the four versioned kits and writes no file outside their
+  carriers and renders, or the pass stops, and drops "unit 3 may add to it". §4 step 1 adds the
+  builder's `regen.py --check` reading of `10 fresh · 2 stale`. No criterion moves.
+- rev-4 · 2026-10-14 · §3 · §4 · S3 · S4 · §5 · AC4 · AC7 · §7 · the owner resolved unit 20's F1 as
+  (b), so unit 20 restores `tools/playbook/render_playbook.py:1397` to `v3.5` and this unit's mint
+  dates that move. The `consumes-from TOOL-dRedressedBar-20` edge names the restore as playbook-render's
+  one move. §4 step 2's table and rule grow to five kits, with playbook-render 1.28 → 1.29. The
+  allowed writes gain `AGENTS.md`, the render's only output, and line 1839 of `render_playbook.py`.
+  §4 step 6 records that `AGENTS.md` is a `verify-paths:` and `registry:` path and not a `watch:`
+  path, so the fifth kit owes AC6 no re-stamp. AC4 counts playbook-render. AC7 is new and observes
+  the line-level write, and the three playbook legs join §7.
 
 ## 10. Reuse audit
 
