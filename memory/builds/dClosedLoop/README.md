@@ -46,10 +46,20 @@ asks, 435 of them unlabelled. The owner's prompt is recorded verbatim under `pro
   specs (owner, 2026-10-14).
 - Mapping the non-terminal builds onto the chain is a recommendation: no existing build or ask
   changes status here.
+- The chain counts on no build outside it (owner, 2026-10-14): what the design needs, a chain build
+  builds; a live build sharing a subject finishes on its own track and is reconciled at the merge,
+  never waited on.
 
 ## Parked decisions
 
 None yet.
+
+<!-- roster:units -->
+
+| # | Unit | Mechanism |
+|---|---|---|
+| 1 | `PLAY-dClosedLoop-1` | design: the architecture and the chain plan, one spec written from the ratified decisions, then the declared audit |
+<!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-14 · streams playbook+kickoff+tooling+deployer
@@ -59,7 +69,7 @@ ids PLAY-dClosedLoop-1
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 22 bound to this build, across 2 record folder(s).
+Records: 23 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -141,6 +141,13 @@ start. Answer: Re-rendered at each transition (Recommended).
   the card by dDeclaredLoop, coordination and the mailbox by dLeasedFleet, conflicts by dWitnessedBar,
   landing order by dShippedRelease, a patch build's obligations by dRankedPlan.
 
+### Revised: 2026-10-14, at the owner's directive
+
+The owner: "dLeasedFleet is out of scope for this build, no foreign build should be counted on - bring
+any necessary functionality into this plan+design." Coordination and the mailbox move to dDeclaredLoop, with the leases, as the
+flow's own mechanics. The bound on a reply is read as the parent's build lease: live means
+reachable. The design is `build/2026-10-14-build-PLAY-dClosedLoop-1-coordination.md`.
+
 ## [diagram] Overview, in mermaid
 
 ```mermaid

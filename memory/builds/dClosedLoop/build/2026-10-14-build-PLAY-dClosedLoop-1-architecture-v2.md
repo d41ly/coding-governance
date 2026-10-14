@@ -63,6 +63,12 @@ P21 is added; `deps.coordination`, `deps.early-build`, `deps.messaging`, `landin
 join the catalogue and the presets; four owner-raised gaps are owned by dLeasedFleet, dDeclaredLoop,
 dWitnessedBar and dShippedRelease.
 
+Revised: 2026-10-14, at the owner's directive that no build outside the chain is counted on
+(`build/2026-10-14-build-PLAY-dClosedLoop-1-coordination.md`): dLeasedFleet leaves the chain, and its
+leases, the mailbox and dependency coordination become dDeclaredLoop's coordination feature, with
+gap-conc-01, gap-conc-02 and gap-flow-06; P5 is restated; no chain build waits for a live build's
+close, and Maintain's run no longer rides recipe mode; the chain has ten builds.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -75,7 +81,9 @@ dWitnessedBar and dShippedRelease.
   remote CI is a designed slot.
 - **P4 One contract, two authorizations.** Attended and unattended work run the same stage
   contracts; the autonomy level decides which transitions need the owner (R1.4).
-- **P5 Concurrency by lease.** Builds and units hold remote leases; overlap warns by default (R2.2).
+- **P5 Concurrency by lease, inside the flow.** Builds, units and cadence runs hold remote leases, and
+  builds reach each other through a durable mailbox; both are the flow's own mechanics, built with the
+  loop and never by a separate build, and overlap warns by default (R2.2; coordination record).
 - **P6 Maintain closes the loop.** On a cadence, under a mandate, it applies declared safe fixes
   and files everything else into Plan (R2.3).
 - **P7 Review by policy, recommended everywhere.** Agent review is opt-in except the closing review;
@@ -361,27 +369,42 @@ where `verdict = peer-node`.
 | Deploy | a verified tree | a landing record; kit release notes; per-SHA deploy and verify records; adopter currency | lander and engine records; the currency probe | landing authorization | opt-in |
 | Maintain | the daily cadence at session start | safe fixes applied; asks filed by stage; a maintenance record | detectors pinned and owned; fixes inside the declared set | none | the weekly Loop Review |
 
-## [chain] The chain: eleven builds, final rosters
+## [chain] The chain: ten builds, final rosters
 
 | Build | Stage | Parents | Planned units | Gaps owned |
 |---|---|---|---|---|
 | dOrderedCharter | Foundation | dClosedLoop | the practice catalogue with each practice's reach per stage, and `charter.practices`; the charter re-founded in its rank-1 envelope (front door, precedence and override rule with `charter.override` and its record, instruction map, active practices with reach, hand-off to the loop, the repository's project block from its own overlay); the instruction registry and the ladder; envelopes rendered for every registered document and the gate over them; the instruction map re-injected on compact and resume; ranked envelopes in every subagent handoff; the section-tag grammar and its resolver; the drive section composed from a drive table in each adopted kit's descriptor, checked both ways, each subagent's role line repeated in its handoff, the charter held inside 32 KiB; the core: the principle registry, the meta-check, the kinds register with each kind's owning build, the conformance-gate contract, the exception register and the `core.*` policies, and the factories and gates for governing documents, practices and Skills | gap-found-01, gap-found-02, gap-found-03, gap-found-04, gap-found-05, gap-found-07, gap-found-08, gap-flow-02 |
-| dDeclaredLoop | Spine | dOrderedCharter | the loop kit and definition keyed by the stage tags, roles re-pointed after aOrientedCast closes; `.governance/policy.toml`, schema, one reader, JSON mirror; the named presets and their completeness check; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; policy at govkit intake; the `next` verb over the loop's state, the `next —` micro-format, and the check that every declared command ends with one or declares itself terminal, laggards on a shrink-only list owned by their stage's build; the factories and conformance gates for commands, policy keys, presets, stages, hooks, roles and workflows | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01, gap-found-06, gap-flow-07 |
-| dLeasedFleet | Concurrency | dDeclaredLoop | the lease grammar with run claims migrated; acquisition and release in both modes; overlap warn or refuse and takeover; fleet identity and remote uniqueness; offline behaviour | gap-conc-01, gap-conc-02, gap-flow-06 |
+| dDeclaredLoop | Spine | dOrderedCharter | the loop kit and definition keyed by the stage tags, the roles kit's stage table moved and its seven readers re-pointed in the same unit, never waiting for a live build's close; `.governance/policy.toml`, schema, one reader, JSON mirror; the named presets and their completeness check; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; policy at govkit intake; the `next` verb over the loop's state, the `next —` micro-format, and the check that every declared command ends with one or declares itself terminal, laggards on a shrink-only list owned by their stage's build; the factories and conformance gates for commands, policy keys, presets, stages, hooks, roles and workflows; the coordination feature: one lease grammar for builds, units and cadence runs with run claims migrated onto it, acquired, renewed, released and taken over through CLI verbs the step checklists call, overlap warned or refused, fleet identity and uniqueness against the remote, offline behaviour; the mailbox per build, its closed set of message kinds checked on write, read and disposed at every transition, shown on the card and kept in the build's transition log; live delivery where the harness has it; dependency coordination by the parent's lease, interfaces confirmed at Design's exit, change and landing notices | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01, gap-found-06, gap-flow-07, gap-conc-01, gap-conc-02, gap-flow-06 |
 | dWitnessedBar | Test | dDeclaredLoop | gate health measured and the reliability bar; bypasses recorded; attribution deciding what blocks; the hook-written verdict; held legs by policy; the peer-node verifier; seen-red records; flake quarantine; the product-test contract with runner adapters; derived pre-commit list and multi-node cost evidence; the gate-leg factory and its conformance gate, every leg declaring the principles it enforces | gap-test-01, gap-test-02, gap-test-03, gap-test-04, gap-test-05, gap-test-06, gap-test-07, gap-test-08, gap-test-09, gap-flow-09 |
-| dRankedPlan | Plan | dDeclaredLoop, dLeasedFleet | priority beside `parents:` and the generated plan view; the planner and triager role and Plan workflow; the placement predicate; rule-based triage; dormancy disposal; the live-build mapping carried out; Plan Review; kickoff offering the next item and attended briefs gated | gap-plan-01, gap-plan-02, gap-plan-03, gap-plan-04, gap-plan-05, gap-plan-06, gap-plan-07, gap-flow-03, gap-flow-04 |
+| dRankedPlan | Plan | dDeclaredLoop | priority beside `parents:` and the generated plan view; the planner and triager role and Plan workflow; the placement predicate; rule-based triage; dormancy disposal; the live-build mapping carried out; Plan Review; kickoff offering the next item and attended briefs gated | gap-plan-01, gap-plan-02, gap-plan-03, gap-plan-04, gap-plan-05, gap-plan-06, gap-plan-07, gap-flow-03, gap-flow-04 |
 | dIndexedDesign | Design | dDeclaredLoop | the derived-READY hand-off; the design index; design review by policy; reuse and alternatives backed by recorded probes; the research harness; agreement and tier checks; the spec measured, recommendations emitted, and the spec redesigned as a structured, tagged contract; the feature level (build, features, units) with each feature's interfaces declared structurally, two-level re-entry by `design.reentry`, additive-versus-breaking interface classification (proposed), fork resolution by `design.forks` | gap-flow-01, gap-design-02, gap-design-03, gap-design-04, gap-design-05, gap-design-06, gap-design-07, gap-design-09 |
-| dScopedBuild | Build | dIndexedDesign, dLeasedFleet, dWitnessedBar | one exit contract with a history-derived base, refusing a build's exit while a core red its own commits introduced stands; built specs frozen, every closing-review finding disposed as new units by `review.findings`; scope at the push; the closing review recorded; worktrees by policy; a write gate reading derived state; the checklist witnessed | gap-spine-03, gap-conc-03, gap-build-01, gap-build-02, gap-build-03, gap-build-04, gap-flow-05 |
+| dScopedBuild | Build | dIndexedDesign, dWitnessedBar | one exit contract with a history-derived base, refusing a build's exit while a core red its own commits introduced stands; built specs frozen, every closing-review finding disposed as new units by `review.findings`; scope at the push; the closing review recorded; worktrees by policy; a write gate reading derived state; the checklist witnessed | gap-spine-03, gap-conc-03, gap-build-01, gap-build-02, gap-build-03, gap-build-04, gap-flow-05 |
 | dShippedRelease | Deploy | dWitnessedBar | the landing record; kit release notes; the deploy engine; the incms adapter; the fleet register and currency watch; lander hardening; optional emitted CI; a derived runbook; the kit factory and its conformance gate | gap-deploy-01, gap-deploy-02, gap-deploy-03, gap-deploy-04, gap-deploy-05, gap-deploy-06, gap-deploy-07, gap-deploy-08, gap-flow-08 |
-| dTendedCadence | Maintain | dWitnessedBar, dRankedPlan | the maintenance recipe; three hosts and the cadence; the safe-fix set; detectors with owners; map freshness; the maintenance record | gap-maint-01, gap-maint-02, gap-maint-05, gap-maint-06, gap-maint-07, gap-maint-08 |
+| dTendedCadence | Maintain | dWitnessedBar, dRankedPlan | the Maintain run as its step checklist on the flow's executor, never a recipe-mode playbook; three hosts and the cadence; the safe-fix set; detectors with owners; map freshness; the maintenance record | gap-maint-01, gap-maint-02, gap-maint-05, gap-maint-06, gap-maint-07, gap-maint-08 |
 | dCalibratedLens | Review | dTendedCadence | review by policy per stage and effort; the stage-exit recommendation; lenses for Plan, Test, Deploy and Maintain; the shared value ledger; the weekly Loop Review; caps re-derived from evidence and review cost | gap-review-01, gap-review-02, gap-review-03, gap-maint-03, gap-design-08 |
 | dConvergedCharter | Convergence | dScopedBuild, dShippedRelease, dCalibratedLens | protocol text derived to facts only, each document in its envelope; every remaining positional reference migrated to tags; records merged by evidence; superseded parts retired through ratified proposals; adopters migrated onto the ranked charter and the loop; the record-kind factory and its conformance gate | gap-spine-04, gap-spine-05, gap-maint-04 |
 
-The live-build mapping is v1's table, unchanged; the Plan build carries it out with the owner's
-ratification and confirms dPolishedVitrine's track, which went dormant on 2026-10-14.
+The live-build mapping is v1's table with one change: no chain build waits for a live build to close
+or relies on what it delivers, so "after it closes" no longer holds. The active builds finish on
+their own track (R3.3); the chain build covering each one's area builds what the design needs, and a
+concurrent change is reconciled in Test's prepared merge (FI-3). The Plan build carries the mapping
+out with the owner's ratification and confirms dPolishedVitrine's track, which went dormant on
+2026-10-14.
 
 ## [open] Interpretations to confirm at chain approval
 
 - Positional section references other than `§` (numbered method steps such as `M5`, numbered spec
   sections, numbered hygiene checks) carry the defect walk CV2 names, so the tag grammar would
   replace them too, inventoried by Convergence.
+- Coordination (`build/2026-10-14-build-PLAY-dClosedLoop-1-coordination.md`, `[interpretations]`): a
+  parent is reachable while its build lease is live, with no separate timeout; Design's exit posts each
+  frozen feature's declared interfaces to the dependents' mailboxes; a transition is refused while a
+  message addressed to the build is neither answered nor acknowledged; the lease carries the build's
+  verified tree for the landing order; each transition keeps the messages it disposed in the build's
+  transition log, and Maintain prunes a closed build's mailbox ref once its folder holds them all.
+
+## [owed] Owed to the chain re-cut
+
+- The flow's executor and checklist engine (P20: the unattended kit executing each stage's
+  checklist) has no owning chain build yet; the re-cut assigns it inside the chain, so no live build
+  working on the unattended kit is counted on.

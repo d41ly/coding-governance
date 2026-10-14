@@ -137,6 +137,12 @@ The Spine's units become:
    policy values rendered from the loop definition and the policy file, inside the size gate.
 8. **Policy at deployment**, unchanged.
 
+### Revised: 2026-10-14, at the owner's directive that no foreign build is counted on
+
+Unit 1 no longer waits for aOrientedCast's close: it moves the stage table and re-points the seven
+readers itself, and a concurrent change to `tools/roles/` is reconciled in Test's prepared merge
+(FI-3). The build also gains dLeasedFleet's units as its coordination feature (section 2's note).
+
 ## 2. dLeasedFleet — Concurrency: who holds what, across nodes and sessions
 
 **Purpose.** Make concurrent multi-node work visible by default and refusable by policy: every
@@ -210,6 +216,14 @@ different product. Applied to the walk so far:
 | C4 | `leases.offline` | warn, refuse, follow-leases | warn |
 
 S1, S1b, S2 and S5 are structural and stay decisions.
+
+### Revised: 2026-10-14, at the owner's directive: out of the chain
+
+The owner: "dLeasedFleet is out of scope for this build, no foreign build should be counted on - bring
+any necessary functionality into this plan+design." Units 1 to 5 above, with the mailbox and dependency coordination, become
+dDeclaredLoop's coordination feature (`build/2026-10-14-build-PLAY-dClosedLoop-1-coordination.md`);
+C1 to C4 stand as policies. Where a later section names dLeasedFleet as a parent or a source, read
+dDeclaredLoop.
 
 ## 3. dWitnessedBar — Test: a local verdict worth trusting, and gates reliable enough to keep
 
@@ -667,6 +681,10 @@ day's maintenance.
 | M1 | `maintain.host` | session-start, os-scheduler, cloud-routine | session-start |
 | M2 | `maintain.cadence` | daily, weekly, every-session | daily |
 | M3 | `maintain.on-breach` | file-ask, red-leg, report | file-ask |
+
+Revised: 2026-10-14, at the owner's directive that no foreign build is counted on: the maintenance
+lease comes from dDeclaredLoop's coordination feature, and unit 1 is the Maintain step's checklist on
+the flow's executor, not a playbook in recipe mode, whose build is SPECCED and dormant.
 
 ## 9. dCalibratedLens — Review: review where it pays, recommended everywhere, and a loop that prunes itself
 

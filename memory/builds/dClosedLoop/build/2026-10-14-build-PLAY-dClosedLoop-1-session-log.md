@@ -109,6 +109,15 @@ it is re-run once the spec lands. Rows 1 to 4 have no `returned` line: their pro
 - 2026-10-14, session 1799cb98: the full memory-hygiene run reds check 21 on this build's records
   until the spec defines `PLAY-dClosedLoop-1`, which is expected, and check 23 on acceptance-ledger
   lines of `aSparedSpawn` and `aOrientedCast`, which this build did not write: Test-stage evidence.
+- 2026-10-14, session 1799cb98: the context was compacted, and the session reoriented from this
+  build's records and the card the compact hook re-rendered. Local main sits at `97e782d51`, four
+  commits past this branch's base `742957fcf`: dTracedLedger traced check 23's 37 reds at
+  `ebce889c7` and routed them to their owners as asks. `origin/main` is still `ebce889c7`.
+- 2026-10-14, session 1799cb98: the owner ruled dLeasedFleet out of scope, with no build outside the
+  chain counted on. The census found four reliances: dLeasedFleet itself, aOrientedCast's close,
+  three more live builds' closes in the adopted mapping, and dScriptedRepeat's recipe mode. The
+  coordination record moves leases, the mailbox and dependency coordination into dDeclaredLoop;
+  the chain has ten builds.
 
 ## Instruments
 
@@ -266,6 +275,50 @@ After the flow walk's Build, Test, Deploy, Maintain and Review stages and the fl
 exits 0 on 74 keys and 11 builds; the preset check exits 0 on 69 catalogue keys, 64 presettable,
 64 preset rows.
 
+After the owner's no-foreign-build directive (dLeasedFleet's row removed, its three gaps moved to
+dDeclaredLoop): the join exits 0 on 74 keys and 10 builds; with `gap-flow-06` struck from
+dDeclaredLoop's row and `gap-conc-01` added to dRankedPlan's in a copy, it exits 1 naming both; the
+preset check exits 0 on 69 catalogue keys, 64 presettable, 64 preset rows, unchanged.
+
+### The foreign-build census
+
+Lists every build slug a design record names that is not a chain build, the chain read from v2's
+chain table. It reads one or two files, writes nothing and judges nothing: whether a hit is counted
+on is decided by reading it (the coordination record's `[audit]`), and a reliance worded without a
+slug is invisible to it.
+
+```python
+"""List every build slug a design record names that is not a chain build, with the lines naming it.
+The chain is read from the record's own chain table (rows `| dXxx | stage | parents | units | gaps |`)
+plus dClosedLoop. Reads one file, writes nothing, judges nothing: whether a hit is counted on or only
+cited as evidence is decided by reading it, and the census exits 0 either way."""
+import re
+import sys
+
+path = sys.argv[1]
+chain_src = sys.argv[2] if len(sys.argv) > 2 else path
+with open(chain_src, encoding="utf-8") as fh:
+    chain = {"dClosedLoop"} | set(re.findall(r"^\| (d[A-Z][A-Za-z]+) \| [^|]+ \| [^|]+ \| [^|]+ \| [^|]+ \|$",
+                                              fh.read(), flags=re.M))
+with open(path, encoding="utf-8") as fh:
+    lines = fh.read().splitlines()
+hits = {}
+for n, line in enumerate(lines, 1):
+    for slug in re.findall(r"\b[abcd][A-Z][a-z]+[A-Z][a-z]+\b", line):
+        if slug not in chain:
+            hits.setdefault(slug, []).append(n)
+print(f"chain builds {len(chain) - 1} (+ dClosedLoop) · foreign slugs {len(hits)}")
+for slug in sorted(hits):
+    print(f"{slug}: lines {', '.join(str(n) for n in sorted(set(hits[slug])))}")
+```
+
+Runs, 2026-10-14:
+
+| Against | Result |
+|---|---|
+| the six design records, before the directive's changes, chain from v2 | v2: aOrientedCast, dPolishedVitrine; walkthrough: aDeployScout, aOrientedCast, dNarrowedAnchor, dScriptedRepeat; flow: four evidence citations; flow interactions and foundations: none; v1: 24, all in the live-build mapping |
+| v2 after the changes, its own chain of ten | dLeasedFleet only in the revision lines, and dPolishedVitrine in the mapping's Plan action |
+
 ## Records index
 
 | Record | What it holds |
@@ -275,7 +328,7 @@ exits 0 on 74 keys and 11 builds; the preset check exits 0 on 69 catalogue keys,
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md` | This log. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-{plan,design,build,test,deploy}.md` | The five stage researchers' returns, verbatim. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-maintain.md` | The main loop's Maintain research, with every instrument beside its output. |
-| `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The 57 gaps, keyed, graded and evidenced, each owed one chain build. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v1.md` | The design after rounds 1 to 4, unedited. |
@@ -284,3 +337,4 @@ exits 0 on 74 keys and 11 builds; the preset check exits 0 on 69 catalogue keys,
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-foundations.md` | The owner's foundations revisit, step by step: their words, the measured current state, the response, the forks and answers. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-flow.md` | The flow walk, stage by stage: the layers, each stage's scope, boundaries and checklist, the forks and answers. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-flow-interactions.md` | Each step's scope, the eighteen interaction edges, the shared state, and the six interactions settled after. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-coordination.md` | The owner's no-foreign-build directive, the census of what the design counted on, and leases, the mailbox and dependency coordination designed into dDeclaredLoop. |
