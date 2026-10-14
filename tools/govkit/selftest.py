@@ -3312,6 +3312,31 @@ def main() -> int:
         check("a second update over the same target reports current",
               "current" in p.stdout and "stale" not in p.stdout, p.stdout)
 
+        # --- TOOL-dRedressedBar-9. A NARROW RECEIPT'S UPDATE GAINS settings-merge AND COMPLETES.
+        # --- The default set gained settings-merge since OLD and agent-cap is left out for its
+        # --- unmet `kickoff-manifest`, so the gained adopter exits 2 with no hook to wire. The
+        # --- descriptor declares that exit an accepted stop: the run exits 0, re-stamps and claims
+        # --- the entry. A fixture of its own, sharing nothing with the arms above it witnesses. The
+        # --- `means` is read from the descriptor's code-2 block rather than typed here, so the line
+        # --- proves the adopter ran AND the declared stop accepted it; the claim is the half an
+        # --- exit-code-only arm would let a dropped gain pass.
+        rq9 = stale_target("rq9")
+        p9 = run("update", "--target", str(rq9), "--write")
+        rec9 = json.loads((rq9 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        sm9 = govroot / PFX / KIT_NAMES["govkit"] / "entries" / "settings-merge.kit.toml"
+        means9 = [b.get("means") for b in govkit_module().load_toml(sm9).get("outcome", [])
+                  if b.get("code") == 2]
+        check("[dRB-9] update --write over a narrow receipt that gains settings-merge exits 0",
+              p9.returncode == 0, f"rc {p9.returncode} · {(p9.stdout + p9.stderr)[-900:]}")
+        check("[dRB-9] and re-stamps the receipt at the pin",
+              rec9["gov_commit"] == run_gov_git(govroot, "rev-parse", GOV_PIN), rec9["gov_commit"])
+        check("[dRB-9] and the receipt claims settings-merge",
+              "settings-merge" in (rec9.get("kits") or []), str(rec9.get("kits")))
+        check("[dRB-9] and the gained adopter's exit 2 was the descriptor's declared stop",
+              len(means9) == 1
+              and f"default-gained settings-merge: adopter exit 2 — {means9[0]}" in p9.stdout,
+              f"code-2 means {means9} · {p9.stdout[-900:]}")
+
         # --- DEPL-dGaugedVintage-8 S3. THE STAMP MUST NOT OUTRUN ROWS THIS RUN NEVER GRADED.
         # --- An `evidence: "unattributed"` row is skipped before `classify_row`, by
         # --- DEPL-dCarriedReceipt-13's ratified design, and it is graded against the receipt's OWN

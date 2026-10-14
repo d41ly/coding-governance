@@ -4378,6 +4378,11 @@
       "file": "tools/govkit/matrix.py"
     },
     {
+      "id": "check_outcome_states",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
+    },
+    {
       "id": "check_owed_at_lander",
       "kind": "function",
       "file": "tools/memory-tree/check-verdict-epoch.sh"

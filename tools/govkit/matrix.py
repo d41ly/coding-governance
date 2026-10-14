@@ -146,6 +146,34 @@ def shape(tmp: pathlib.Path, name: str, *, lang: str = "none", hook: str | None 
     return g
 
 
+def check_outcome_states(descs: dict, g: pathlib.Path, eid: str, rc: int,
+                         rows: list[tuple[str, list[str], bool]]) -> None:
+    """THE ENGINE'S OWN VERDICT on one entry's exit code, over states a row each.
+
+    A row is `(label, present paths, expected verdict)`. Every path any row names is made to exist
+    or not before the engine is asked, so each state is exactly the one its row declares, and the
+    verdict is `outcome_accepted` over `classify_outcome` as `apply` and `update` both read it.
+    Extracted at the kind's second instance (TOOL-dRedressedBar-9): lexicon's code-1 stop was the
+    first, settings-merge's code-2 stop the second, and two copies of this loop would be two answers
+    to what "the engine agrees" means. `g` carries `.governance/deploy.toml`, read for the ctx.
+    """
+    d, _p = descs[eid]
+    ctx = govkit.target_context(g, govkit.load_toml(g / ".governance" / "deploy.toml"), eid, d)
+    named = sorted({rel for _label, present, _want in rows for rel in present})
+    for label, present, want in rows:
+        for rel in named:
+            f = g / rel
+            if rel in present:
+                f.parent.mkdir(parents=True, exist_ok=True)
+                f.write_text("x" + NL, encoding="utf-8", newline=NL)
+            elif f.exists():
+                f.unlink()
+        oc = govkit.classify_outcome(g, d, ctx, rc)
+        got = govkit.outcome_accepted(rc, oc, govkit.declares_outcome_for(d, rc))
+        check("%s exit %d after %s is %s" % (eid, rc, label, "ACCEPTED" if want else "REFUSED"),
+              got is want, "means=%r accepted=%s" % (oc.get("means") if oc else None, got))
+
+
 def check_outcome_probes(tmp: pathlib.Path) -> None:
     """AN ACCEPTED NON-ZERO STOP MUST NAME SOMETHING THAT EXISTS — the class, then its instance.
 
@@ -159,8 +187,8 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
 
     THE CLASS, NOT THE ENTRY. Naming lexicon in the assertion would certify the one block that
     exists and say nothing about the next kit to declare the same shape, which is the could-not-fail
-    shape one level up. The second half then grades lexicon's own two states, because a class rule
-    over descriptors cannot show that the engine reaches the same verdict.
+    shape one level up. The second half then grades lexicon's own two states and settings-merge's
+    three, because a class rule over descriptors cannot show the engine reaches the same verdict.
 
     WHAT IT DOES NOT CHECK: whether the entry's adopter actually WRITES the path its `must_not_exist`
     names — that would need a reading of a shell script, and no static rule gets it. The presence
@@ -225,20 +253,31 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
     (g / ".governance").mkdir(parents=True, exist_ok=True)
     (g / ".governance" / "deploy.toml").write_text(DEPLOY, encoding="utf-8", newline=NL)
     deploy = govkit.load_toml(g / ".governance" / "deploy.toml")
-    d, _p = descs["lexicon"]
-    ctx = govkit.target_context(g, deploy, "lexicon", d)
-    skill = g / ".claude" / "skills" / "lexicon" / "SKILL.md"
-    skill.parent.mkdir(parents=True, exist_ok=True)
-    for label, rendered, want in (("a failed first scaffold", False, False),
-                                  ("a declaration removed after one", True, True)):
-        if rendered:
-            skill.write_text("x" + NL, encoding="utf-8", newline=NL)
-        elif skill.exists():
-            skill.unlink()
-        oc = govkit.classify_outcome(g, d, ctx, 1)
-        got = govkit.outcome_accepted(1, oc, govkit.declares_outcome_for(d, 1))
-        check("lexicon exit 1 after %s is %s" % (label, "ACCEPTED" if want else "REFUSED"),
-              got is want, "means=%r accepted=%s" % (oc.get("means") if oc else None, got))
+    skill = ".claude/skills/lexicon/SKILL.md"
+    check_outcome_states(descs, g, "lexicon", 1,
+                         [("a failed first scaffold", [], False),
+                          ("a declaration removed after one", [skill], True)])
+
+    # AND OVER settings-merge's CODE-2 STOP (TOOL-dRedressedBar-9): the bare adopter refuses to wire
+    # an agent-cap.js that is not installed, accepted only where the adopter landed and the hook did
+    # not. Both paths are where the ENGINE lands each kit's version-carrying file in this
+    # directory's context, never typed, so a probe naming a path agent-cap does not land at reds a
+    # row here.
+    engine = {}
+    for _eid in ("agent-cap", "settings-merge"):
+        _d, _p = descs[_eid]
+        _f = "/" + str((_d.get("version_from") or {}).get("file") or "")
+        engine[_eid] = sorted(dest for dest, w in govkit.resolve_entry(
+            ROOT, _d, govkit.target_context(g, deploy, _eid, _d))["writes"].items()
+            if w["src"] and ("/" + w["src"]).endswith(_f))
+    check("settings-merge exit 2: each kit's version-carrying file lands at exactly one path",
+          all(len(v) == 1 for v in engine.values()), str(engine))
+    if all(len(v) == 1 for v in engine.values()):
+        hook, adopter = engine["agent-cap"][0], engine["settings-merge"][0]
+        check_outcome_states(descs, g, "settings-merge", 2,
+                             [("an install with no hooks kit", [adopter], True),
+                              ("an install with the hook beside it", [adopter, hook], False),
+                              ("an install that landed neither", [], False)])
 
 
 #: The fixture kit, in two vintages. The FIRST is what the target installs from; the SECOND is the
