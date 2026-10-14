@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-3 — the govkit selftest's 56 reds, traced to four root causes and re-armed
 
-**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 2 · ratified 2026-10-14
+**Status:** CLOSED · rev-3 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 2 · ratified 2026-10-14
 
 <!-- gen:spec-records -->
 

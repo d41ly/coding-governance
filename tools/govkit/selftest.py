@@ -2762,7 +2762,8 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = 
     With `charter=False` it holds none, and this asserts AC13 instead: the apply still exits 0 through
     the adopter's accepted exit 3, the Skill alone is rendered, and check-wiring names the doc.
     With `runner=True` (TOOL-aOrientedCast-13 AC4) the deploy text also carries a `[gate_runner]`
-    built from the run-gates kit's `[gate_runner_seed]`, so the apply writes the target's own gate
+    built from the run-gates kit's `[gate_runner_seed]`, and the `gate_file` answer codebase-map's
+    leg reads (TOOL-dRedressedBar-3 S3), so the apply writes the target's own gate
     manifest, which holds no lexicon leg; the seed policy's optional lexicon grant must then leave
     the adopter's `--check` and the target's `check_roles.py` at exit 0, the latter with a note.
     WHAT THIS DOES NOT CHECK: the rendered bytes, which the kit's own legs grade, or an update's
@@ -2781,7 +2782,14 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = 
             manifest = vals[0] if k == "file" else manifest
             lines.append('%s = %s' % (k, "[" + ", ".join('"%s"' % x for x in vals) + "]"
                                       if isinstance(v, list) else '"%s"' % vals[0]))
-        deploy = DEPLOY_REGISTRY_DEFAULT.rstrip("\n") + "\n" + "\n".join(lines) + "\n"
+        # TOOL-dRedressedBar-3 S3: a runner renders every selected kit's `[[gate_leg]]`, and
+        # codebase-map's argv carries `{gate_file}`, which intake asks for and the registry default
+        # omits. Unresolved, the LEGS step withholds every leg and writes no manifest. The value is
+        # the descriptor's own `GATE_FILE` default, read rather than typed.
+        gate_file = tomllib.loads((KIT_DIRS["codebase-map"] / "kit.toml").read_text(
+            encoding="utf-8"))["config"]["defaults"]["GATE_FILE"]
+        deploy = (DEPLOY_REGISTRY_DEFAULT.replace("[answers]\n", '[answers]\ngate_file = "%s"\n' % gate_file)
+                  .rstrip("\n") + "\n" + "\n".join(lines) + "\n")
     t = make_target(pathlib.Path(tmp) / ("roles-runner" if runner else "roles-default" if charter
                                          else "roles-no-doc"), deploy)
     # The seed's CHARTER, read from the memory-tree kit's own conf example rather than typed.
@@ -8028,7 +8036,11 @@ user_skills = "/tmp/gk-fake-skills"
         t8 = delta_target("d8-ac1")
         check("[-8] AC1 the fixture holds the operator's line before any update",
               mine_count(t8) == 1, repr((t8 / CWS).read_bytes()[-160:]))
-        _r81 = run("update", "--target", str(t8), "--to", V8[2], "--write")
+        # TOOL-dRedressedBar-3 S4: every writing update over `d8-ac1` and `d8-ac4` is scoped to the
+        # kit the fixture installed. Unscoped, the update gains the registry default's growth since
+        # V8[0] (TOOL-aRoutedQuill-5 S4), and the `run-gates` gained at V8[3] names files that
+        # vintage lacks; these arms grade the delta row, never the gaining.
+        _r81 = run("update", "--target", str(t8), "--kits", "check-wiring", "--to", V8[2], "--write")
         check("[-8] AC1 the first update MERGES the delta row rather than overwriting it",
               _r81.returncode == 0 and verdict_of(_r81.stdout, CWS) == "diverged",
               _r81.stdout[-900:] + _r81.stderr[-600:])
@@ -8067,7 +8079,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # ---- AC1, second half: the run that used to destroy the edit.
         settle(t8, "after the first update")
-        _r82 = run("update", "--target", str(t8), "--to", V8[3], "--write")
+        _r82 = run("update", "--target", str(t8), "--kits", "check-wiring", "--to", V8[3], "--write")
         check("[-8] AC1 the SECOND update reports `diverged`, never `stale`",
               _r82.returncode == 0 and verdict_of(_r82.stdout, CWS) == "diverged",
               _r82.stdout[-900:] + _r82.stderr[-600:])
@@ -8079,10 +8091,10 @@ user_skills = "/tmp/gk-fake-skills"
         t84 = delta_target("d8-ac4")
         _seen8: list[tuple[str, int, int]] = []
         for _i, _v in enumerate(V8[1:]):
-            _p8 = run("update", "--target", str(t84), "--to", _v, "--write")
+            _p8 = run("update", "--target", str(t84), "--kits", "check-wiring", "--to", _v, "--write")
             _seen8.append((verdict_of(_p8.stdout, CWS), _p8.returncode, mine_count(t84)))
             settle(t84, f"after update {_i + 1}")
-        _p8 = run("update", "--target", str(t84), "--write")
+        _p8 = run("update", "--target", str(t84), "--kits", "check-wiring", "--write")
         _seen8.append((verdict_of(_p8.stdout, CWS), _p8.returncode, mine_count(t84)))
         check("[-8] AC4 all four updates exit 0",
               all(rc == 0 for _v, rc, _n in _seen8), str(_seen8))
@@ -14099,7 +14111,14 @@ user_skills = "/tmp/gk-fake-skills"
         # SKIPS each by name. The consumer-edited engine row is `review-step.js` for that reason:
         # `tier2-review.js` is a render now, and an edited render is not the engine row these arms
         # grade.
-        _pvCAP_T = "// a fixture harness, fan-out cap {{FANOUT_CAP}}\n"
+        # TOOL-dRedressedBar-3 S1: the copied parity script's agent-type arm (TOOL-aOrientedCast-4)
+        # exits 1 on a DEAD PROBE when the owner `tier2-review.template.js` declares no
+        # `const AGENT_TYPE_SHAPE =` literal, and wants a copy elsewhere in the kit, which the two
+        # drift-audit templates sharing this text supply. The line is READ from the real owner at
+        # run time, never typed: a typed literal would be a second copy of the owner's value.
+        _pvAT_LINE = next((_ln for _ln in (_pvREAL / "tier2-review.template.js").read_text(
+            encoding="utf-8").splitlines() if _ln.startswith("const AGENT_TYPE_SHAPE = ")), "")
+        _pvCAP_T = "// a fixture harness, fan-out cap {{FANOUT_CAP}}\n" + _pvAT_LINE + "\n"
         _pvLOCAL_B = "line one\nline two, as gov has it at B\nline three\n"
 
         def build_pv_gov():
@@ -15311,12 +15330,18 @@ user_skills = "/tmp/gk-fake-skills"
             json.dumps([{"name": "control", "argv": ["true"]}], indent=2) + "\n",
             encoding="utf-8", newline="\n")
         (_qg / ".governance").mkdir(exist_ok=True)
+        import tomllib as _qtoml  # noqa: PLC0415
+        _qans = _qtoml.loads(DEPLOY_FULL)["answers"]
         (_qg / ".governance" / "deploy.toml").write_text(
             f'gov_source = "local"\nprefix = "{PFX[:-1]}"\n'
             # settings-merge is DECLARED by agent-cap as a dependency, and govkit refuses a
-            # selection that omits it rather than widening one on the caller's behalf.
-            'kits = ["agent-cap", "settings-merge"]\n\n'
-            '[answers]\nmemory_root = "memory"\n\n'
+            # selection that omits it rather than widening one on the caller's behalf. So is
+            # kickoff-manifest since TOOL-aRoutedQuill-5 S2 (TOOL-dRedressedBar-3 S2), and its
+            # destinations and leg read the two answers below, at DEPLOY_FULL's values, read
+            # from that constant rather than typed a second time.
+            'kits = ["agent-cap", "settings-merge", "kickoff-manifest"]\n\n'
+            '[answers]\nmemory_root = "memory"\n'
+            f'manifest_path = "{_qans["manifest_path"]}"\nuser_skills = "{_qans["user_skills"]}"\n\n'
             f'[gate_runner]\nkind = "manifest"\nfile = "{PFX}legs.json"\n'
             'grammar = "json-array"\ndedupe_key = "name"\n'
             f'command = ["bash", "{PFX}runner.sh"]\n'
@@ -15328,7 +15353,7 @@ user_skills = "/tmp/gk-fake-skills"
         git(_qg, "config", "user.name", "t"); git(_qg, "config", "core.autocrlf", "false")
         git(_qg, "add", "-A"); git(_qg, "commit", "-qm", "base")
 
-        _qa = run("apply", "--target", str(_qg), "--kits", "agent-cap,settings-merge")
+        _qa = run("apply", "--target", str(_qg), "--kits", "agent-cap,settings-merge,kickoff-manifest")
         check("aQuenchedHarness-3: the apply itself succeeds", _qa.returncode == 0,
               _qa.stdout + _qa.stderr)
 
