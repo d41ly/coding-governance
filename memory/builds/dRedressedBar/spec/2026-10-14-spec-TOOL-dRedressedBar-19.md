@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-19 — the units-16-18 spec audit's 19 mediums and 22 lows, batched: the profiler's census, path, launch, turnstile, redaction and leg-declaration gaps closed, the receipt sidecar made atomic, and specs 12 and 14 to 18 corrected
 
-**Status:** SPECCED · rev-5 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 14
+**Status:** SPECCED · rev-6 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
@@ -12,6 +12,8 @@
 | [2026-10-15-prompt-TOOL-dRedressedBar-18-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-18-4-revision.md) | research | TOOL-dRedressedBar-18 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-5-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-5-spec-writer.md) | journal | — |
+| [2026-10-15-prompt-TOOL-dRedressedBar-19-6-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-6-revision.md) | research | — |
+| [2026-10-15-prompt-TOOL-dRedressedBar-19-7-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-7-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -84,15 +86,19 @@ corrected form of each faulted criterion over the tree they leave.
 Item S<n> closes report id n. Ids 3 and 28 were refuted, so no S3 or S28 exists. S44 is the
 record. Items that share a report item share its observation, and each still names its own id.
 
-- **S1** — id 1, M1. In a second commit, `<p19m>`, the kickoff manifest
-  `memory/guides/SESSION-KICKOFF.md` is re-audited against the edits units 18 and 19 make to
-  `tools/gate-legs.json` and `tools/run-gates/run-gates.sh`, and its `last-audit:` is re-stamped,
-  in the shape of commit `2e187ee8b` and unit 17's S18, with a `manifest-audit:` line in the commit
-  body. Spec 18's §7 leg line names `kickoff-manifest ratchet`, and its revision line states that
-  unit 18 owed the re-stamp and names AC1. Since spec 18 rev-4, unit 18's pass commit carries the
-  re-stamp the ratchet's staged check requires, naming a sha before its own, and spec 18's §7
-  already names the ratchet. `<p19m>` is still the reviewed re-audit over both units' edits.
-  Observed by AC1.
+- **S1** — id 1, M1. The kickoff manifest `memory/guides/SESSION-KICKOFF.md` is re-stamped twice.
+  `<p19>` stages `tools/gate-legs.json` (S21, S29), which the manifest's `watch:` line names
+  (`memory/guides/SESSION-KICKOFF.md:6`). The staged ratchet leg (`.githooks/pre-commit:188-195`)
+  runs check C5s (`skills/session-kickoff/manifest-check.sh:1582-1593`), which refuses a commit
+  staging a watched file unless the staged manifest's audit stamp differs from HEAD's. So `<p19>`
+  carries its own re-stamp, naming `<p19>~1`, the sha before it, with a `manifest-audit:` line in
+  its body, as unit 18's pass commit `6783992aa` did. A second commit, `<p19m>`, then re-audits the
+  manifest against the edits units 18 and 19 make to `tools/gate-legs.json` and
+  `tools/run-gates/run-gates.sh`, and re-stamps naming `<p19>`, in the shape of commit `2e187ee8b`
+  and unit 17's S18, with a `manifest-audit:` line in the commit body. Only `<p19>`'s manifest
+  holds S21's guard paths, so AC1 holds at `<p19m>` alone. Spec 18's §7 leg line names
+  `kickoff-manifest ratchet`, and its revision line states that unit 18 owed the re-stamp and names
+  AC1. Observed by AC1.
 - **S26** — id 26, M1. The blast-radius lens's reading of S1's defect. Closed by S1's re-stamp.
   Observed by AC1.
 - **S10** — id 10, M2. Unit 18 built part of this (`tools/process-monitor/census.py` at
@@ -169,12 +175,30 @@ record. Items that share a report item share its observation, and each still nam
   as `held-halves selftest` carries. Observed by AC25.
 - **S27** — id 27, M9. Spec 18's §7 leg line names `measure-legs selftest`, and the paragraph that
   said the leg stays off the line says it is named once the manifest row exists. Observed by AC27.
-- **S29** — id 29, M10, by the skeptic's corrected fix. `tools/run-gates/kit.toml` withholds
-  `fixtures/measure-legs/**` in a `[[files]]` rule with `role = "project-owned"`, and declares no
-  `[[gate_leg]]` named `measure-legs selftest`. `tools/govkit/registry.toml` carries an
-  `[[exempt_leg]]` row for that name. Its `why` states that the fixtures are withheld, that the
-  tool needs a process-monitor sibling and a Windows host, and that the leg stays on gov's bar,
-  held like every self-test. Observed by AC29.
+- **S29** — id 29, M10, by the skeptic's corrected fix. `tools/run-gates/kit.toml` withholds the
+  profiler's fixtures in one `[[files]]` rule with `role = "project-owned"`, whose include names
+  every file under `fixtures/measure-legs/` literally and kit-relatively. That is the form
+  `tools/runlog/kit.toml:37-40` uses, with a comment saying why, as its `:31-35` does. The list
+  holds 13 paths once S32 adds `forks.sh`, and it equals what
+  `git ls-files tools/run-gates/fixtures/measure-legs` prints. A glob cannot withhold them, because
+  a list include claims literal paths only. `rule_sources` (`tools/govkit/govkit.py:318-335`) drops
+  every element carrying `*`, `?` or `[`, and only the exact element `**` reads as a wildcard
+  (`resolve_rule_pool`, `:6603-6625`). So `scan_claimed_paths` (`:6628-6659`) claims nothing for a
+  glob element under the fixture directory, and the `**` engine rule ships every fixture. Observed
+  by AC29.
+  - **The arm.** The list is typed beside the directory it describes, so a new arm in
+    `tools/run-gates/measure_legs.py --selftest`, `test_fixtures_withheld`, reds when the two
+    differ, as `test_kit_declarations` does for runlog (`tools/runlog/selftest.py:1010-1026`). It
+    reads `kit.toml` beside the module with `tomllib`. It collects every element of a list include
+    on a `project-owned` rule and compares those opening `fixtures/measure-legs/` with the files
+    under `FIXTURES` (`measure_legs.py:81`), read off the filesystem, both ways. It requires that
+    population to be non-empty, so the comparison can fail, and no `project-owned` element to carry
+    `*`, `?` or `[`. The arm reads `kit.toml`, so the `measure-legs selftest` guard in
+    `tools/gate-legs.json` gains `{prefix}/run-gates/kit.toml` as an exact file, beside S21's three.
+  - **The leg.** The descriptor declares no `[[gate_leg]]` named `measure-legs selftest`.
+    `tools/govkit/registry.toml` carries an `[[exempt_leg]]` row for that name. Its `why` states
+    that the fixtures are withheld, that the tool needs a process-monitor sibling and a Windows
+    host, and that the leg stays on gov's bar, held like every self-test.
   - **Readers:** S29 drops the descriptor's `[[gate_leg]]` row that unit 18 added, at
     `tools/run-gates/kit.toml:154-163` at `997fc294f`, its comment block included.
     by name: `tools/gate-legs.json`, `tools/run-gates/selftest-budgets.txt`,
@@ -361,7 +385,8 @@ record. Items that share a report item share its observation, and each still nam
   `requires`, the `.governance/` write lint and the new checklist entries. S34's arm and S40's
   routing member are the gates the report names for their findings, so they are in scope.
 - No change to the merge bar's runner, to any existing leg's argv, or to `read_runs` and
-  `derive-ceilings.py`. S21 widens one guard, S29 moves one leg's declaration, and S25 adds one row.
+  `derive-ceilings.py`. S21 and S29 widen one guard, S29 moves one leg's declaration, and S25 adds
+  one row.
 - No staged stale output in the turnstile arm. The report's case for S12 writes into the tree the
   selftest runs over, which a leg run on every bar must not do (§4 "Alternatives rejected").
 - No kit version moved by this unit. Unit 18 moved both kits' versions on this branch, and the
@@ -476,7 +501,29 @@ readings above stand as evidence of the defects. At the tip:
   (`:4154-4171`, `:4174-4195`), and S40's five sidecar writes, each a plain `write_text` after its
   receipt write (`:8339`, `:12341`, `:12379`, `:12386`, `:13016`).
 - The kickoff manifest's `last-audit:` names `4a4960958`, whose `tools/gate-legs.json` holds no
-  `measure-legs selftest` row, so S1's `<p19m>` still re-stamps.
+  `measure-legs selftest` row, so S1's `<p19m>` still re-stamps. Unit 18's `6783992aa` moved that
+  line from `6057a55c` to `4a4960958`, its parent, and its body carries `manifest-audit:`.
+
+### Evidence, read at `3275f305a` on 2026-10-15
+
+Unit 19's builder returned a divergence before writing any file: rev-5's S29 named a
+`fixtures/measure-legs/**` include, which govkit cannot honour. Re-read here:
+
+- `tools/run-gates/kit.toml` holds one `**` engine rule (`:17-19`) and six `project-owned` rules,
+  each a literal list (`:39-97`); no `project-owned` element carries a glob.
+- A python probe loaded the descriptor through `govkit.resolve_descriptor_paths(<desc>, "tools")`,
+  took `govkit.canonical_ctx("run-gates")`, and called `govkit.resolve_rule_pool` over the `**`
+  rule. As built, 12 of the 12 tracked fixtures sit in the engine pool. With a `project-owned`
+  rule `include = ["fixtures/measure-legs/**"]` appended, 12 of 12 still do. With a rule naming
+  the 12 literally, none does.
+- `tools/runlog/kit.toml:31-35` records the same trap ("`fixtures/**` here claimed nothing"), and
+  its self-test compares its literal list with the directory both ways
+  (`tools/runlog/selftest.py:1010-1026`).
+- No run-gates suite compares a `[[files]]` list with a directory. The `measure-legs selftest`
+  guard already holds `{prefix}/run-gates/fixtures/measure-legs/` (`tools/gate-legs.json:1265`), so
+  a new fixture runs that leg on a scoped bar, which makes its suite the arm's home. No guard in
+  `tools/gate-legs.json` names `{prefix}/run-gates/kit.toml` exactly, and no other live spec lists
+  that file under Files touched.
 
 ### The profiler, item by item
 
@@ -525,16 +572,21 @@ spec 18's §4. The docstring states that unit, and the probe re-reads it from sp
 
 | File | Row |
 |---|---|
-| `tools/gate-legs.json` | the `measure-legs selftest` guard gains three exact paths (S21) |
-| `tools/run-gates/kit.toml` | a `[[files]]` rule, `include = ["fixtures/measure-legs/**"]`, `role = "project-owned"`; no `[[gate_leg]]` for the leg (S29) |
+| `tools/gate-legs.json` | the `measure-legs selftest` guard gains three exact paths (S21) and `{prefix}/run-gates/kit.toml` (S29) |
+| `tools/run-gates/kit.toml` | a `[[files]]` rule with `role = "project-owned"` whose include names each fixture under `fixtures/measure-legs/` literally, one element per file, as `tools/runlog/kit.toml:37-40` does; no `[[gate_leg]]` for the leg (S29) |
+| `tools/run-gates/measure_legs.py` | `test_fixtures_withheld`, run by `cmd_selftest` (S29) |
 | `tools/govkit/registry.toml` | one `[[exempt_leg]]` row (S29) |
 | `tools/govkit/subject-pins.tsv` | one row, by `selfcheck --write` (S22) |
 | `tools/run-gates/foreign-prefix.gov.test.sh` | one `WHOLE_RUN` row (S25) |
-| `memory/guides/SESSION-KICKOFF.md` | the re-stamp, in `<p19m>` (S1) |
+| `memory/guides/SESSION-KICKOFF.md` | a re-stamp naming `<p19>~1` in `<p19>`, and one naming `<p19>` in `<p19m>` (S1) |
 
-The three guard paths are exact files, so none joins a broad guard, and each is carried by at most
+The four guard paths are exact files, so none joins a broad guard, and each is carried by at most
 five legs. With the fixtures withheld, the LF pin on `{kit}/*.sh` has nothing to miss in an adopter,
 and gov's own `.gitattributes` pins `*.sh` LF (`git check-attr eol` reads `lf` for a fixture path).
+The fixture list is typed beside the directory it describes, and `test_fixtures_withheld` is the
+check in both directions that keeps it one fact. Its population is read off the filesystem, never
+off the list it is compared against. The arm reads paths relative to `measure_legs.py`'s own
+directory, so it passes at every prefix the foreign-prefix leg moves the tree to.
 
 ### The govkit sites
 
@@ -592,12 +644,12 @@ runs `python tools/codebase-map/gen_map.py --write` alone before the product com
 | `build_holder_env` | function | `py.function`, `build` |
 | `derive_abandoned_scratch` | function | `py.function`, `derive` |
 | `write_recovered_logs` | function | `py.function`, `write` |
-| `test_no_bare_bash_argv`, `test_fork_count`, `test_manifest_refusals` | selftest arms | `py.function`, `test` |
+| `test_no_bare_bash_argv`, `test_fork_count`, `test_manifest_refusals`, `test_fixtures_withheld` | selftest arms | `py.function`, `test` |
 | `OPTIONAL_FIELDS`, `HOLD_BEACON_WAIT_S` | constants | none declared for constants |
 | `owner.json`, `raw_recovered`, `launch_error` | record names | none |
 
 Each function name answered OK under `python tools/lexicon/lexicon.py --suggest <name> --as py.function`
-on 2026-10-14.
+on 2026-10-14, and `test_fixtures_withheld` on 2026-10-15.
 
 ### Files touched (estimate)
 
@@ -617,7 +669,9 @@ on 2026-10-14.
 - `memory/guides/SESSION-KICKOFF.md`
 - `memory/builds/dRedressedBar/build/`
 
-Specs 12 and 14 to 18 are `<w19>`'s write set, not the build pass's.
+`<p19>` touches `memory/guides/SESSION-KICKOFF.md` for the staged ratchet's re-stamp, and `<p19m>`
+touches it again for the re-audit (S1). Specs 12 and 14 to 18 are `<w19>`'s write set, not the
+build pass's.
 
 ### Alternatives rejected
 
@@ -650,9 +704,10 @@ Specs 12 and 14 to 18 are `<w19>`'s write set, not the build pass's.
 - risks — `held_halves.load_manifest` gains a keyword and a longer refusal message, and its three
   callers pass nothing new, so `held-halves selftest` grades it unchanged. The census's legacy
   rule keeps a five-field line readable, so a census taken by an older query still parses. The
-  `measure-legs selftest` guard widens by three files, so a scoped bar runs it on an edit to any.
+  `measure-legs selftest` guard widens by four files, so a scoped bar runs it on an edit to any.
   Editing `tools/gate-legs.json` trips both run-gates canaries and the kickoff-manifest ratchet,
-  which S1 re-stamps.
+  which `<p19>` and `<p19m>` each re-stamp (S1). A fixture added without its name in the
+  descriptor's list would ship to adopters; `test_fixtures_withheld` reds on it instead.
 - testing — AC1 to AC44 are direct runs of the profiler over committed fixtures, in-process python
   probes, `ast` and grep probes over source and specs, and a fault-injected apply under `%TEMP%`.
   The new arms are declared in §7.
@@ -677,11 +732,15 @@ piped through `tr '\n' ' ' | tr -s ' '`. A red half "over `<p18>`" runs the file
 `git clone` of gov under `%TEMP%`, checked out at `<p18>`. Every command runs from the
 worktree root on node d.
 
-- **AC1** — The `last-audit:` line of `memory/guides/SESSION-KICKOFF.md` names a sha at which
-  `git show <sha>:tools/gate-legs.json` holds a row named `measure-legs selftest` whose guard holds
+- **AC1** — `git show <p19> -- memory/guides/SESSION-KICKOFF.md` moves the `last-audit:` line to
+  name `<p19>~1`, and `git log -1 --format=%B <p19>` carries `manifest-audit:`. At `<p19m>`, the
+  `last-audit:` line of `memory/guides/SESSION-KICKOFF.md` names `<p19>`, and
+  `git show <p19>:tools/gate-legs.json` holds a row named `measure-legs selftest` whose guard holds
   the derive-ceilings path S21 adds. `git log -1 --format=%B <p19m>` carries `manifest-audit:`.
   Spec 18's §7 leg line carries `` `kickoff-manifest ratchet` ``.
-  Red when: over `<p18>`, the line names a sha whose manifest holds no `measure-legs selftest` row.
+  Red when: over `<p18>`, the line names a sha whose manifest holds no `measure-legs selftest` row;
+  and with `<p19>`'s product files staged and no re-stamp, `bash skills/session-kickoff/manifest-check.sh --staged`
+  exits non-zero, printing `staged changes touch watched files`.
 - **AC10** — A python program imports `tools/process-monitor/census.py`. `census.OPTIONAL_FIELDS`
   equals `("peak_mem_b", "mem_b")` and `census.FIELDS` is the nine-key tuple. Fed to `parse_cim`
   and `build_windows_rows`, a seven-field line gives a row with both keys as ints and its command
@@ -732,14 +791,24 @@ worktree root on node d.
   every guarded leg from `derive_guarded_legs` over `tools/gate-legs.json`. Every joined leg it
   finds is named on the line.
   Red when: the same program over `git show <p18>:<s18>` finds `measure-legs selftest` unnamed.
-- **AC29** — A python program reads `tools/run-gates/kit.toml` with `tomllib`. No `[[gate_leg]]`
-  is named `measure-legs selftest`, and a `[[files]]` rule with role `project-owned` includes
-  `fixtures/measure-legs/**`. `tools/govkit/registry.toml` holds an `[[exempt_leg]]` with that name
-  whose `why` carries `process-monitor` and `Windows`. `tools/gate-legs.json`,
-  `tools/run-gates/selftest-budgets.txt` and `tools/run-gates/windows-only-legs.txt` each carry the
-  name.
-  Red when: over `<p18>`, the descriptor holds the `[[gate_leg]]` and the registry holds no such
-  `[[exempt_leg]]`.
+- **AC29** — A python program run from `tools/govkit` imports `govkit`, reads
+  `tools/run-gates/kit.toml` with `tomllib`, and loads it through
+  `govkit.resolve_descriptor_paths(<desc>, "tools")`. The elements of every list include on a
+  `project-owned` rule that open `fixtures/measure-legs/`, each prefixed `tools/run-gates/`, equal
+  the set `git ls-files tools/run-gates/fixtures/measure-legs` prints, and no `project-owned`
+  element carries `*`, `?` or `[`. `govkit.resolve_rule_pool` over the rule whose include is `**`,
+  with `govkit.canonical_ctx("run-gates")` and the loaded descriptor's `home`, holds no path under
+  `tools/run-gates/fixtures/measure-legs/`. No `[[gate_leg]]` is named `measure-legs selftest`.
+  `tools/govkit/registry.toml` holds an `[[exempt_leg]]` with that name whose `why` carries
+  `process-monitor` and `Windows`. `tools/gate-legs.json`, `tools/run-gates/selftest-budgets.txt`
+  and `tools/run-gates/windows-only-legs.txt` each carry the name, and the leg's guard in
+  `tools/gate-legs.json` holds `{prefix}/run-gates/kit.toml`.
+  Red when: the same program, with that rule's include respelled `["fixtures/measure-legs/**"]`,
+  finds every fixture in the `**` rule's pool, the vacuous pass rev-5's string check allowed; and
+  over `<p18>`, the descriptor holds the `[[gate_leg]]`, the registry holds no such
+  `[[exempt_leg]]`, and the pool holds every fixture.
+  figure: the fixture set is DERIVED from `git ls-files` at observation time, 13 once S32 lands.
+  The glob spelling's 12 of 12 in the pool is PINNED, measured on 2026-10-15 at `3275f305a`.
 - **AC34** — `test_no_bare_bash_argv`'s scan, run by a python program over
   `tools/run-gates/measure_legs.py` with `ast`, finds no call to a `subprocess` function whose first
   argument is a list or tuple opening with the constant `'bash'`. A program that rebinds
@@ -902,6 +971,7 @@ resolves: unit 18 landed its row in `6783992aa`.
 New arm: tools/run-gates/measure_legs.py --selftest · covers AC11 AC12 AC34 AC36 · the turnstile key's `cygpath` fallback kept, `build_holder_env` setting nothing, a bare `'bash'` argv, and a pid-less beacon read as refused, each on a copy in the selftest's temp dir · none
 New arm: tools/run-gates/measure_legs.py --selftest · covers AC20 AC39 · a port dropping `\s` from its classes, and a port decoding with replacement · none
 New arm: tools/run-gates/measure_legs.py --selftest · covers AC32 AC35 AC37 AC38 AC42 · breakaway allowed, the launch terminate taken out, a refusal class let through, a pid-only liveness test, and a STALLED line naming a sibling · none
+New arm: tools/run-gates/measure_legs.py --selftest · covers AC29 · `test_fixtures_withheld` over `tools/run-gates/kit.toml` with one fixture name taken out of the list, and again with the list respelled as one `fixtures/measure-legs/**` element · none
 New arm: tools/process-monitor/selftest.py · covers AC10 · `test_row_contract_is_complete` over a row carrying an undeclared extra key, and `test_cim_memory_fields_are_bytes`' blank-memory and legacy cases over a parser that rejects a blank memory field or reads a five-field line's command as memory · none
 New arm: tools/run-gates/foreign-prefix.gov.test.sh · covers AC25 · the `WHOLE_RUN` row taken out, where the leg reds as an undeclared whole run · none
 New arm: tools/govkit/selftest.py · covers AC40 · the `[-21] AC2` routing assertion with one sidecar write respelled as a direct `write_text`, where its no-direct-write check reds · none
@@ -977,6 +1047,22 @@ none
   S7 no longer writes. Both reds unit 18's builder handed here still hold: `subject-pins.tsv` has
   no `measure-legs selftest` row (S22) and `WHOLE_RUN` names it nowhere (S25). No other scope
   item, criterion or the `<w19>` table moves.
+- rev-6 · 2026-10-15 · S1 S29 · §3 · §4 · §5 · AC1 AC29 · §7 · unit 19's builder divergence
+  (`prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-6-revision.md`), re-read at `3275f305a` in §4's
+  new evidence. S29, §4's `kit.toml` row and AC29 named a `fixtures/measure-legs/**` include, and
+  govkit's `rule_sources` drops every glob-bearing element of a list include, so that rule claimed
+  nothing and the `**` engine rule kept all 12 fixtures. AC29's string check would have passed over
+  that. S29 now names each fixture literally, 13 once S32 lands, as `tools/runlog/kit.toml:37-40`
+  does. AC29 reads that the list equals `git ls-files` of the fixture directory and that
+  `govkit.resolve_rule_pool` over the `**` rule holds no fixture, and its red half is the glob
+  spelling. A new arm, `test_fixtures_withheld` in `measure_legs.py --selftest`, reds when the list
+  and the directory differ, and the leg's guard gains `{prefix}/run-gates/kit.toml`, the file the
+  arm reads (§3, §4 Inventory and table, §5, §7 `New arm:`). The builder's second finding: `<p19>`
+  stages `tools/gate-legs.json`, which the kickoff manifest watches, so the staged ratchet refuses
+  it without a re-stamp. S1 and §4's table now give `<p19>` its own re-stamp naming `<p19>~1`, as
+  unit 18's pass commit did, and `<p19m>` re-stamps naming `<p19>`. AC1 observes both, and Files
+  touched says both commits touch the manifest. No other scope item, criterion or the `<w19>` table
+  moves.
 
 ## 10. Reuse audit
 
@@ -995,7 +1081,10 @@ are the writer and the gate S40 extends, and the `[-21] AC2` routing arm
 (`tools/govkit/selftest.py:15838-15917`) grades the new member with no new code. The
 `[[exempt_leg]]` shape follows `profile-bar selftest` (`tools/govkit/registry.toml:610-612`), and
 the `WHOLE_RUN` row follows `held-halves selftest`. The manifest re-stamp follows commit
-`2e187ee8b` and unit 17's S18.
+`2e187ee8b` and unit 17's S18, and `<p19>`'s bundled re-stamp follows unit 18's `6783992aa`. S29's
+literal fixture list follows `tools/runlog/kit.toml:31-40`, and `test_fixtures_withheld` follows
+that kit's `test_kit_declarations` (`tools/runlog/selftest.py:1010-1026`), its population read off
+the filesystem and never off the list.
 
 The gotchas checklist for `tools/run-gates/measure_legs.py`, `tools/process-monitor/census.py`,
 `tools/govkit/govkit.py` and `tools/gate-legs.json` selected these classes, each answered here:
