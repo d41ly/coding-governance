@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-11 — a receipt-reading probe term in govkit's declared-outcome contract, closing settings-merge's last false-accept route
 
-**Status:** CLOSED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 7
+**Status:** CLOSED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-14-prompt-TOOL-dRedressedBar-11-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-11-1-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-11-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-11-brief.md) | research | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-12-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-4-revision.md) | research | TOOL-dRedressedBar-12 |
 | [2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-10 |
 
 <!-- /gen:spec-records -->
@@ -169,6 +170,11 @@ only. With neither present it holds and the stop is accepted, which is also what
 classification, which is right after the adopter returns. `_cmd_apply` writes its receipt at `:8019`,
 after CONFIGURE (`:7740-7772`). `_cmd_update` writes at `:12017-12062`, after the gained loop
 (`:11104-11126`). So in both verbs the term reads the prior receipt, the same bytes the adopter read.
+A refused apply still writes its receipt: a non-accepted CONFIGURE exit only calls `r.fail`
+(`:7764`, `:7771`), and the RECEIPT step at `:8019` then writes `kits` and `files` from this run's
+selection alone (`:8021`). A later run's term reads that receipt. `TOOL-dRedressedBar-12` keeps it
+whole, carrying every kit the prior receipt claims with its rows, so the hook's receipt row
+outlives the refused apply.
 
 ### The declared key set
 
@@ -222,7 +228,7 @@ joined by ` | `. Otherwise it is `. It printed nothing to stderr`. CONFIGURE's c
 
 | Situation | At unit 10's tip | After |
 |---|---|---|
-| `apply --kits settings-merge`, agent-cap at a home only the receipt records, malformed settings | exit 0; `CONFIGURE settings-merge: adopter exit 2 — no-agent-cap-to-wire [accepted stop]` | exit 1; `CONFIGURE settings-merge: adopter exit 2`; the problem line ends `Its stderr ended: settings-merge: cannot read …` |
+| `apply --kits settings-merge`, agent-cap at a home only the receipt records, malformed settings | exit 0; `CONFIGURE settings-merge: adopter exit 2 — no-agent-cap-to-wire [accepted stop]` | exit 1; `CONFIGURE settings-merge: adopter exit 2`; the problem line ends `Its stderr ended: settings-merge: cannot read …`; with `TOOL-dRedressedBar-12`'s carry, the refusal holds on every re-run |
 | `update --write` gaining settings-merge, the same state | exit 0; re-stamped; `default-gained settings-merge: adopter exit 2 — no-agent-cap-to-wire` | exit 1; not re-stamped; the problem line ends with the same reason |
 | agent-cap absent everywhere, any settings file | the accepted stop | unchanged |
 | agent-cap at a receipt-recorded home, valid settings | adopter exit 0 | unchanged; the code-2 block is never consulted |
@@ -440,6 +446,12 @@ none
   hands-off to `TOOL-dRedressedBar-14`, for settings-merge's half, and the hands-off to
   `TOOL-dRedressedBar-15`, for agent-cap's half, the units the owner added for it. No scope, design
   or criterion moves.
+- rev-4 · 2026-10-14 · §4 · a records fix for TOOL-dRedressedBar-12, closing the units-10-11 spec
+  audit's report id 23 (H1), written by that unit's spec-writer pass `<w12>` as its S4. The status
+  stays CLOSED. §4 "Which receipt bytes" states that a refused apply still writes its receipt and
+  that a later run reads that receipt, which unit 12 keeps whole. The first "What an adopter sees
+  change" row's "After" cell says the refusal holds on every re-run, which TOOL-dRedressedBar-12's
+  AC2 observes. AC3's text does not move. No scope or criterion moves.
 
 ## 10. Reuse audit
 
