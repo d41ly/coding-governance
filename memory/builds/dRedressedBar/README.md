@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-13
 streams: tooling
 roster: TOOL
-ids: TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11
+ids: TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13
 spec-audit: 2026-10-13
 ---
 
@@ -83,11 +83,13 @@ None yet.
 | 9 | `TOOL-dRedressedBar-9` | govkit update's gained settings-merge no longer fails an update that left agent-cap out |
 | 10 | `TOOL-dRedressedBar-10` | PROMOTED: the round-1 spec audit's 12 mediums and 11 lows, batched — report ids 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 and 23 |
 | 11 | `TOOL-dRedressedBar-11` | a receipt-reading probe term in govkit's declared-outcome contract, closing settings-merge's last false-accept route |
+| 12 | `TOOL-dRedressedBar-12` | PROMOTED: the units-10-11 spec audit's one high, report id 23 — an apply narrower than its receipt keeps every other installed kit's claim and rows |
+| 13 | `TOOL-dRedressedBar-13` | PROMOTED: the units-10-11 spec audit's 5 mediums and 18 lows, batched — report ids 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 and 24 |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 11 unit(s) · node d · opened 2026-10-13 · streams tooling
-ids TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11
+**Build status:** SPECCED · 13 unit(s) · node d · opened 2026-10-13 · streams tooling
+ids TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -101,15 +103,17 @@ ids TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedress
 | [TOOL-dRedressedBar-5 — fork idioms past the spawn-idiom registry, converted to their no-fork forms](spec/2026-10-14-spec-TOOL-dRedressedBar-5.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-14 |
 | [TOOL-dRedressedBar-6 — the roles adopter's two exit-1 refusals, armed in its own suite](spec/2026-10-14-spec-TOOL-dRedressedBar-6.md) | 4 | 1 | SPECCED | rev-2 | 2026-10-14 |
 | [TOOL-dRedressedBar-7 — records, the regenerated index and the kit versions, measured over the fixed tree](spec/2026-10-14-spec-TOOL-dRedressedBar-7.md) | 5 | 2 | SPECCED | rev-2 | 2026-10-14 |
-| [TOOL-dRedressedBar-10 — the round-1 spec audit's 12 mediums and 11 lows, batched: each criterion observed in a form that can pass and fail, each false sentence corrected, and settings-merge's accepted stop narrowed](spec/2026-10-14-spec-TOOL-dRedressedBar-10.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-14 |
-| [TOOL-dRedressedBar-11 — a receipt-reading probe term in govkit's declared-outcome contract, closing settings-merge's last false-accept route](spec/2026-10-14-spec-TOOL-dRedressedBar-11.md) | 7 | 2 | SPECCED | rev-1 | 2026-10-14 |
+| [TOOL-dRedressedBar-10 — the round-1 spec audit's 12 mediums and 11 lows, batched: each criterion observed in a form that can pass and fail, each false sentence corrected, and settings-merge's accepted stop narrowed](spec/2026-10-14-spec-TOOL-dRedressedBar-10.md) | 6 | 2 | SPECCED | rev-3 | 2026-10-14 |
+| [TOOL-dRedressedBar-11 — a receipt-reading probe term in govkit's declared-outcome contract, closing settings-merge's last false-accept route](spec/2026-10-14-spec-TOOL-dRedressedBar-11.md) | 7 | 2 | SPECCED | rev-2 | 2026-10-14 |
+| [TOOL-dRedressedBar-12 — an apply narrower than its receipt keeps every other installed kit's claim and rows, so a refused settings-merge exit stays refused on the next run](spec/2026-10-14-spec-TOOL-dRedressedBar-12.md) | 8 | 2 | SPECCED | rev-1 | 2026-10-14 |
+| [TOOL-dRedressedBar-13 — the units-10-11 spec audit's 5 mediums and 18 lows, batched: each criterion half observed in a form that can fail, each false sentence corrected, and the code sites they describe made to say what the specs claim](spec/2026-10-14-spec-TOOL-dRedressedBar-13.md) | 9 | 2 | SPECCED | rev-2 | 2026-10-14 |
 <!-- /gen:build-units -->
 
-Records: 13 bound to this build, across 4 record folder(s).
+Records: 16 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dRedressedBar-12.
 
-Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-10 TOOL-dRedressedBar-11.
+Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-12 TOOL-dRedressedBar-13.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -123,6 +127,8 @@ Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-10 TOOL-dRedressed
 | 5 | `TOOL-dRedressedBar-7` | no |
 | 6 | `TOOL-dRedressedBar-10` | no |
 | 7 | `TOOL-dRedressedBar-11` | no |
+| 8 | `TOOL-dRedressedBar-12` | no |
+| 9 | `TOOL-dRedressedBar-13` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

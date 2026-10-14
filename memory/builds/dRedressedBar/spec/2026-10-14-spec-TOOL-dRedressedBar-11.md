@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-11 — a receipt-reading probe term in govkit's declared-outcome contract, closing settings-merge's last false-accept route
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-14-prompt-TOOL-dRedressedBar-11-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-11-1-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-11-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-11-brief.md) | research | — |
+| [2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-10 |
 
 <!-- /gen:spec-records -->
 
@@ -74,6 +75,18 @@ both refusal sites print the adopter's own reason (owner, 2026-10-14, unit 10 §
   `[dRB-9]` block, which S5's block follows. Without it there is no block to extend and no helper
   to add rows to. AC2's, AC3's and AC4's red halves read its block at its pass commit. Unit 9 is
   reached through this edge, because unit 10 already consumes it and this unit lands after both.
+- **hands-off** `TOOL-dRedressedBar-12` — report id 23 (H1) of the units-10-11 spec audit. An apply
+  narrower than the receipt's claimed kits writes a receipt holding only its selection's rows
+  (`tools/govkit/govkit.py:8019-8021`). So the refusal this unit adds on fixture A's second apply is
+  lost on the next one. Unit 12 keeps every claimed kit the selection did not name, with its rows,
+  and runs fixture A a third time. It corrects §4 "Which receipt bytes" and the first "What an
+  adopter sees change" row.
+- **hands-off** `TOOL-dRedressedBar-13` — the same audit's minors on this spec, report ids 6, 7, 10,
+  11, 12, 13, 17, 20, 21, 22 and 24. Unit 13 documents the fourth row element of
+  `check_outcome_states` and prefixes the key rule's labels. It observes the agreement rule's union
+  by `want` on a staged pair, and decodes CONFIGURE's stderr as UTF-8. It rebuilds fixture B through
+  `write_vintage_receipt` and restates the code-2 block's comment. It corrects this spec's §4, §5 and
+  §7 in one rev bump.
 - **hands-off** external — measured at spec time: a first `apply` selecting agent-cap with
   `[kit.agent-cap] prefix = "scripts"` exits 1 with both adopters at exit 2. CONFIGURE runs before the
   receipt is written, so neither resolver finds the hook. The term agrees with the adopter there,
@@ -415,6 +428,10 @@ none
 - rev-1 · 2026-10-14 · initial draft from the unit-11 brief. The residual was reproduced on both
   verbs at `60fa5534` with planted receipt rows, and the planted shape was matched against a real
   per-kit-prefix install. Seven candidates were graded by M12, and the pick was taken by M3's rule.
+- rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-12`, the unit the
+  units-10-11 spec audit's one high was promoted into, for report id 23. They also gain the hands-off
+  to `TOOL-dRedressedBar-13`, the batch its minors were promoted into, for report ids 6, 7, 10, 11,
+  12, 13, 17, 20, 21, 22 and 24. No scope, design or criterion moves.
 
 ## 10. Reuse audit
 

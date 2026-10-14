@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-10 — the round-1 spec audit's 12 mediums and 11 lows, batched: each criterion observed in a form that can pass and fail, each false sentence corrected, and settings-merge's accepted stop narrowed
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 6 · ratified 2026-10-14
+**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 6 · ratified 2026-10-14
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-2-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-3-spec-writer.md) | journal | — |
+| [2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-11 |
 
 <!-- /gen:spec-records -->
 
@@ -194,6 +195,11 @@ names its own id.
   hook at a home only the receipt records, with a `.claude/settings.json` that fails to parse or
   write, still reads as the accepted stop over this unit's two-term block. Unit 11's receipt-reading
   probe term in `classify_outcome` closes it, in the code-2 block this unit narrows.
+- **hands-off** `TOOL-dRedressedBar-13` — the units-10-11 spec audit's minors on this spec, report
+  ids 1, 2, 3, 4, 5, 8, 9, 12, 14, 15, 16, 18 and 19. Unit 13 observes, over the tree this unit
+  leaves, the criterion halves of AC3, AC5, AC8 and AC12 in a form that can fail, and S17's spec-9
+  half. It corrects this spec's §1, §3, §4, §5, §7 and §10 in one rev bump. It derives the
+  parent-home matrix row's path through `resolve_prefix_token`.
 
 ## 4. Design
 
@@ -495,6 +501,9 @@ home, so they stay green. `memory hygiene` grades the nine rev bumps and their r
   11's name in spec 9's §5. Edges gain the hands-off to `TOOL-dRedressedBar-11`. §1 says this unit
   follows every unit the audit read, since unit 11 follows it. The header carries `ratified
   2026-10-14`. No product file, criterion command or order moves.
+- rev-3 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-13`, the batch the
+  units-10-11 spec audit's minors were promoted into, for report ids 1, 2, 3, 4, 5, 8, 9, 12, 14,
+  15, 16, 18 and 19. No scope, design or criterion moves.
 
 ## 10. Reuse audit
 
