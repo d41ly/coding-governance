@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-11 — a receipt-reading probe term in govkit's declared-outcome contract, closing settings-merge's last false-accept route
 
-**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 7
+**Status:** CLOSED · rev-6 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-11-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-11-brief.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-4-revision.md) | research | TOOL-dRedressedBar-12 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-13-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-13-4-revision.md) | research | TOOL-dRedressedBar-13 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-14-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-4-revision.md) | research | TOOL-dRedressedBar-14 |
 | [2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-10 |
 
 <!-- /gen:spec-records -->
@@ -168,13 +169,19 @@ string with fewer than two segments, an unresolved token, and a `home` or `ancho
 only. With neither present it holds and the stop is accepted, which is also what the adopter did.
 
 **Which receipt bytes.** The term reads `.governance/install.json` as it is on disk at
-classification, which is right after the adopter returns. `_cmd_apply` writes its receipt at `:8019`,
-after CONFIGURE (`:7740-7772`). `_cmd_update` writes at `:12017-12062`, after the gained loop
-(`:11104-11126`). So in both verbs the term reads the prior receipt, the same bytes the adopter read.
-A refused apply still writes its receipt: a non-accepted CONFIGURE exit only calls `r.fail`
-(`:7764`, `:7771`), and the RECEIPT step at `:8019` then writes `kits` and `files` from this run's
-selection alone (`:8021`). A later run's term reads that receipt. `TOOL-dRedressedBar-12` keeps it
-whole, carrying every kit the prior receipt claims with its rows, so the hook's receipt row
+classification, which is right after the adopter returns. `_cmd_apply` writes its receipt twice.
+`TOOL-dRedressedBar-14`'s S1 writes it between HOOKPROBE and CONFIGURE, and the RECEIPT step
+rewrites it at `:8019`, after CONFIGURE (`:7740-7772`). So in `apply` the term reads the receipt this
+run wrote ahead of CONFIGURE. That receipt holds this run's rows and the carried ones, and it is
+still the same bytes the adopter read. A first `apply` therefore never reaches the "With no receipt"
+reading above: the term reads this run's rows before the two static homes. `_cmd_update` writes at
+`:12017-12062`, after the gained loop (`:11104-11126`), so there the term reads the prior receipt,
+the same bytes the adopter read. A refused apply still writes its receipt: a non-accepted CONFIGURE
+exit only calls `r.fail` (`:7764`, `:7771`), and the RECEIPT step at `:8019` then writes `kits` and
+`files` from this run's selection alone (`:8021`). A later run's term reads that receipt's rows:
+`update` reads the receipt itself, and a later `apply` reads them carried into its own early write.
+`TOOL-dRedressedBar-12` keeps it whole, carrying every kit the prior receipt claims with its rows,
+and `TOOL-dRedressedBar-14` binds that carry ahead of the early write, so the hook's receipt row
 outlives the refused apply.
 
 ### The declared key set
@@ -501,6 +508,21 @@ none
   "Nothing else in the descriptor moves" left the code-2 block's comment describing one term. No
   criterion text moves. The CONFIGURE call is cited at `tools/govkit/govkit.py:7781`, read at
   `fda78c56`, where the report read `:7744`, because later build passes moved `_cmd_apply`.
+- rev-6 · 2026-10-14 · §4 · a records fix for TOOL-dRedressedBar-14, written by that unit's
+  spec-writer pass `<w14>` as its S5. The status stays CLOSED. §4 "Which receipt bytes" states
+  that `_cmd_apply` writes its receipt twice, and that in `apply` the term reads the receipt this
+  run wrote ahead of CONFIGURE. That receipt holds this run's rows and the carried ones, and it is
+  still the bytes the adopter read. `update` is unchanged. Two rev-1 sentences are reworded because
+  unit 14's ordering made them false. "`_cmd_apply` writes its receipt at `:8019`, after CONFIGURE"
+  now names both writes, and "So in both verbs the term reads the prior receipt" now says that of
+  `update` alone. One `<w12>` sentence is reworded for the same reason. "A later run's term reads
+  that receipt" now says that `update` reads the receipt itself, and that a later `apply` reads its
+  rows carried into its own early write. `<w12>`'s sentence naming `TOOL-dRedressedBar-12` keeps
+  its words and adds that unit 14 binds that carry ahead of the early write. `<w12>`'s other
+  sentences stay as written, and `<w13>` wrote nothing into this paragraph. The paragraph also says
+  that a first `apply` never reaches the "With no receipt" reading above it. That reading describes
+  the base, and its paragraph is not edited. The base line citations are unchanged. Unit 14's write
+  is cited by its spec's S1, because unit 14 is not built yet. No scope or criterion moves.
 
 ## 10. Reuse audit
 
