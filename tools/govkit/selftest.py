@@ -3518,6 +3518,53 @@ def main() -> int:
                           for ln in (_rb12p3.stdout + _rb12p3.stderr).splitlines()),
               f"rc {_rb12p3.returncode} · {(_rb12p3.stdout + _rb12p3.stderr)[-600:]}")
 
+        # --- TOOL-dRedressedBar-14. A FIRST APPLY AT A PER-KIT PREFIX CONFIGURES AGAINST THE HOMES IT
+        # --- JUST WROTE. settings-merge.py finds agent-cap's hook through the receipt, and `apply`
+        # --- wrote the receipt only at its last step, so on a first apply with `[kit.agent-cap]
+        # --- prefix = "scripts"` the adopter probed the two static homes alone, exited 2 for want of
+        # --- the hook, and the stop was accepted with the hook unwired. The receipt is now written
+        # --- ahead of CONFIGURE. Each fact is read on the line it names, and no exit code is
+        # --- asserted: the run's exit belongs to agent-cap's own argv (spec 14 §8 F1, unit 15).
+        _rb14 = make_target(tmp / "rq14", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n')
+        _rb14p = run("apply", "--target", str(_rb14), "--kits",
+                     "agent-cap,settings-merge,kickoff-manifest")
+        _rb14so = _rb14p.stdout.splitlines()
+        _rb14out = _rb14so + _rb14p.stderr.splitlines()
+        _rb14dest = f"scripts/{KIT_NAMES['hooks']}/agent-cap.js"
+        _rb14src = f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js"
+        _rb14sm = [ln for ln in _rb14out if ln.startswith("govkit apply — CONFIGURE settings-merge:")]
+        check("[dRB-14] AC1 exactly one CONFIGURE settings-merge line, and it ends `adopter exit 0`",
+              len(_rb14sm) == 1 and _rb14sm[0].endswith("adopter exit 0"),
+              " | ".join(_rb14sm) or _rb14p.stdout[-900:])
+        _rb14ahead = [i for i, ln in enumerate(_rb14so)
+                      if ln.startswith("govkit apply — receipt written ahead of CONFIGURE")]
+        _rb14cfg = [i for i, ln in enumerate(_rb14so) if "CONFIGURE " in ln]
+        check("[dRB-14] AC1 the receipt-written-ahead line prints before the first line carrying "
+              "`CONFIGURE `",
+              bool(_rb14ahead) and bool(_rb14cfg) and _rb14ahead[0] < _rb14cfg[0],
+              f"ahead at {_rb14ahead} · CONFIGURE at {_rb14cfg[:3]} · {_rb14p.stdout[-900:]}")
+        _rb14rp = _rb14 / ".governance" / "install.json"
+        _rb14rows = [f for f in (json.loads(_rb14rp.read_text(encoding="utf-8"))["files"]
+                                 if _rb14rp.is_file() else []) if f.get("path") == _rb14dest]
+        check("[dRB-14] AC1 the receipt rows the hook at its per-kit prefix, sourced from gov's hook",
+              any(f.get("source") == _rb14src for f in _rb14rows),
+              f"{_rb14dest}: {json.dumps(_rb14rows)}")
+        _rb14sp = _rb14 / ".claude" / "settings.json"
+        _rb14set = json.loads(_rb14sp.read_text(encoding="utf-8")) if _rb14sp.is_file() else {}
+        _rb14cmds = [h.get("command") for g in (_rb14set.get("hooks") or {}).get("PreToolUse") or []
+                     if g.get("matcher") == "Workflow|Agent" for h in g.get("hooks") or []]
+        check("[dRB-14] AC1 settings.json's Workflow|Agent group holds exactly one command, and it "
+              "carries the hook at its per-kit prefix",
+              len(_rb14cmds) == 1 and _rb14dest in str(_rb14cmds[0]), json.dumps(_rb14cmds))
+        check("[dRB-14] AC1 no line opens `govkit: kit 'settings-merge'`",
+              not any(ln.startswith("govkit: kit 'settings-merge'") for ln in _rb14out),
+              " | ".join(ln for ln in _rb14out if ln.startswith("govkit: kit 'settings-merge'")))
+        _rb14ac = [ln for ln in _rb14out if ln.startswith("govkit: kit 'agent-cap'")]
+        check("[dRB-14] AC1 exactly one line opens `govkit: kit 'agent-cap'`, and it carries "
+              "`settings-merge.py`",
+              len(_rb14ac) == 1 and "settings-merge.py" in _rb14ac[0],
+              " | ".join(_rb14ac) or _rb14p.stdout[-900:])
+
         # --- DEPL-dGaugedVintage-8 S3. THE STAMP MUST NOT OUTRUN ROWS THIS RUN NEVER GRADED.
         # --- An `evidence: "unattributed"` row is skipped before `classify_row`, by
         # --- DEPL-dCarriedReceipt-13's ratified design, and it is graded against the receipt's OWN

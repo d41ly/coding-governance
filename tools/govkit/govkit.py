@@ -7695,6 +7695,38 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             r.fail("on_hook_block = refuse and the target's pre-commit hook refuses; the install is "
                    "on disk and staged, and nothing was rolled back")
 
+    # ---- THE RECEIPT, WRITTEN AHEAD OF CONFIGURE (TOOL-dRedressedBar-14). The class: an adopter
+    # ---- that finds a SIBLING kit through the receipt, by `resolve_kit_dir` — settings-merge finding
+    # ---- agent-cap's hook, lexicon finding codebase-map, unattended finding memory-tree. Written only
+    # ---- at RECEIPT, a first apply's adopters read no receipt and probed the two static homes alone,
+    # ---- so a kit landed at a per-kit prefix was invisible to them. Measured: `[kit.agent-cap]
+    # ---- prefix = "scripts"` landed the hook at `scripts/hooks/agent-cap.js`, and settings-merge
+    # ---- exited 2 for want of it on the first apply and wired it on the second. So the file is on
+    # ---- disk before any adopter runs, from the lists RECEIPT writes: this run's selection and rows,
+    # ---- unit 12's carry, and, for the three keys later steps fill, what the target holds now — the
+    # ---- prior run's, or none. RECEIPT REWRITES IT from this same dict, so it is a true statement at
+    # ---- every instant up to that step, and an interrupt between the two writes leaves a receipt a
+    # ---- re-run of `apply` recovers from. `receipt` above stays the PRIOR one and is never rebound;
+    # ---- what reads this file is target-side code, and unit 11's `must_not_resolve` term, which so
+    # ---- reads the bytes the adopter read. Unit 12's carry is bound HERE, once, for both writes.
+    _carried_kits = [k for k in (receipt or {}).get("kits") or [] if k not in selection]
+    _carried_rows = [f for f in (receipt or {}).get("files") or []
+                     if isinstance(f, dict) and f.get("kit") in _carried_kits]
+    _rcpt_doc = {
+        "schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
+        "prefix": (deploy.get("prefix") or "tools"), "kits": selection + _carried_kits,
+        "files": rows + _carried_rows,
+        "orders": (receipt or {}).get("orders") or [], "baseline": baseline,
+        "after": (receipt or {}).get("after") or {},
+        "hook_block": {"state": hook_state},
+        "gate_runner": (receipt or {}).get("gate_runner") or {
+            "kind": gr.get("kind", "absent"), "file": gr.get("file"),
+            "emitted": [], "legs_withheld": False}}
+    (target / ".governance").mkdir(exist_ok=True)
+    receipt_path.write_text(json.dumps(_rcpt_doc, indent=2) + "\n", encoding="utf-8", newline="\n")
+    print(f"govkit apply — receipt written ahead of CONFIGURE: {len(_rcpt_doc['files'])} row(s), "
+          f"{len(_rcpt_doc['kits'])} kit(s); RECEIPT rewrites it")
+
     # ---- CONFIGURE. A kit with a blocks_adopt hole lands and is NOT configured.
     outbox = target / ".governance" / "outbox"
     outbox.mkdir(parents=True, exist_ok=True)
@@ -8072,28 +8104,24 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # so a refused settings-merge exit read as the accepted stop one run later. Keyed on the CLAIM,
     # never on "outside the selection": the `(govkit)` attributes row is claimed by no kit and is
     # rebuilt above, so a selection-keyed carry would write it twice. `receipt` is the prior one,
-    # bound before anything was written and never rebound.
-    _carried_kits = [k for k in (receipt or {}).get("kits") or [] if k not in selection]
-    _carried_rows = [f for f in (receipt or {}).get("files") or []
-                     if isinstance(f, dict) and f.get("kit") in _carried_kits]
-    (target / ".governance").mkdir(exist_ok=True)
-    receipt_path.write_text(json.dumps(
-        {"schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
-         "prefix": (deploy.get("prefix") or "tools"), "kits": selection + _carried_kits,
-         "files": rows + _carried_rows,
-         "orders": orders, "baseline": baseline, "after": after_map,
-         "hook_block": {"state": hook_state},
-         "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
-                         "emitted": emitted, "legs_withheld": _legs_withheld}},
-        indent=2) + "\n", encoding="utf-8", newline="\n")
+    # bound before anything was written and never rebound; the carry is bound once, ahead of CONFIGURE.
+    # TOOL-dRedressedBar-14 S2. THE DICT WRITTEN AHEAD OF CONFIGURE, completed: `files` re-derived,
+    # because OBSERVE and the `oid` re-stamp mutated rows after that write, and this run's `orders`,
+    # `after` and `gate_runner` in place of the prior run's. ONE dict, so the two writes cannot
+    # disagree about a key, and the sidecar and the step's counts read the lists it writes.
+    _rcpt_doc.update({
+        "files": rows + _carried_rows, "orders": orders, "after": after_map,
+        "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
+                        "emitted": emitted, "legs_withheld": _legs_withheld}})
+    receipt_path.write_text(json.dumps(_rcpt_doc, indent=2) + "\n", encoding="utf-8", newline="\n")
     (target / ".governance" / "install.sums").write_text(
-        "".join(f"{w['sha256']}  {w['path']}\n" for w in rows + _carried_rows if "sha256" in w),
+        "".join(f"{w['sha256']}  {w['path']}\n" for w in _rcpt_doc["files"] if "sha256" in w),
         encoding="utf-8", newline="\n")
     if _carried_kits:
         print(f"govkit apply — receipt KEEPS {len(_carried_kits)} kit(s) this selection did not "
               f"name, with their {len(_carried_rows)} row(s) verbatim: {', '.join(_carried_kits)}")
-    step(STEP_RECEIPT, f"{len(rows) + len(_carried_rows)} row(s), "
-                       f"{len(selection) + len(_carried_kits)} kit(s), schema {RECEIPT_SCHEMA}")
+    step(STEP_RECEIPT, f"{len(_rcpt_doc['files'])} row(s), "
+                       f"{len(_rcpt_doc['kits'])} kit(s), schema {RECEIPT_SCHEMA}")
     return r.emit()
 
 

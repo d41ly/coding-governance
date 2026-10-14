@@ -1,11 +1,12 @@
 # TOOL-dRedressedBar-14 — a first apply at a per-kit prefix configures against the homes it just wrote: the receipt is written ahead of CONFIGURE
 
-**Status:** SPECCED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 10
+**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-14-build-TOOL-dRedressedBar-14-1-acceptance-ledger.md](../build/2026-10-14-build-TOOL-dRedressedBar-14-1-acceptance-ledger.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md) | research | TOOL-dRedressedBar-12 TOOL-dRedressedBar-16 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-14-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-2-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-14-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-3-spec-writer.md) | journal | — |
