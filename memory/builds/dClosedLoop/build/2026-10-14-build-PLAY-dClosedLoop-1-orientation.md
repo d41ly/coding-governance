@@ -308,3 +308,34 @@ only; Your ceiling. Answer: Record only.
   from the card; unattended items always run in fresh agents.
 - **Orientation cost is recorded only** (`orient.budget`, default `record-only`): per session, agent
   and stage, read by the Loop Review, never warned.
+
+### Adopted, 2026-10-14: preserving the card (dispatch 15)
+
+The owner asked that a better way to preserve orientation be researched and adopted if one exists
+(OR-5). The research found one (`build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-preserve.md`),
+and it is adopted:
+
+- **The truth is a ref per build on the shared remote**, written by compare-and-swap at every
+  transition beside the lease. A reader trusts it only while its object id and its HEAD, tree and
+  remote keys recompute equal. It survives a process death and reaches every node.
+- **It is delivered in the charter's own slot.** `next` renders it into an ignored per-worktree card
+  file that the charter's entry file imports beside `AGENTS.md`, so the card loads at rank 1 with the
+  charter at launch and is re-read from disk after a compaction. Every session-start hook (startup,
+  resume, clear, compact) re-renders that file in the session's own working tree and prints a
+  one-line key, which closes both the replay that read the primary tree and the resume that
+  delivered no card.
+- **Subagents get the build's slice through their brief and the subagent-start hook**, since they
+  load no entry file. Another harness gets it through a generated override file inside its
+  instruction limit: Codex reads 32 KiB, and the charter plus a full card measure 24,924 bytes.
+- **The three places become**: the remote ref, the truth; the clone's `.git/orientation/`, a cache
+  keyed by build and by the ref's object id instead of by session; the build folder's committed
+  card, a snapshot at the build's terminal transition only, kept as evidence (`card.snapshot`,
+  default `terminal-only`, with `every-transition` allowed). `card.store` still selects the stores.
+- **Owed before the import path is counted on**: a fixture in which a session launched in the
+  primary tree moves into a worktree and compacts must load that worktree's card file, not the
+  primary tree's and not none.
+
+Three more gaps came with it: `gap-orient-11` (cards are keyed by session, so no new session, dead
+process or other node finds a build's card), `gap-orient-12` (a resume in this session delivered no
+card, cause unknown) and `gap-orient-13` (the card never reaches the charter's slot, a subagent beyond
+its route, or another harness).

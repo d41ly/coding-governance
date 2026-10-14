@@ -76,7 +76,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 12 | gov-researcher | Orientation: cost | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-7-researcher.md` | 1799cb98 | returned, 7m01s, 35.9k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-cost.md` |
 | 13 | gov-researcher | Orientation: trust | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-8-researcher.md` | 1799cb98 | returned, 7m53s, 32.4k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-trust.md` |
 | 14 | gov-researcher | Orientation: determinism | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-9-researcher.md` | 1799cb98 | returned, 8m43s, 47.9k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-determinism.md` |
-| 15 | gov-researcher | Orientation: preserving the card | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-10-researcher.md` | 1799cb98 | dispatched | — |
+| 15 | gov-researcher | Orientation: preserving the card | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-10-researcher.md` | 1799cb98 | returned, 4m45s, 22.8k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-preserve.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -116,6 +116,8 @@ from the ledger for the same reason:
 - returned — gov-researcher · wrote 0 files · 7m53s · 32.4k out · run direct/ae47198f40bd9a4c0
 - agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-9-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-9-researcher.md) · writes none · gates none · run direct/a5adf84caf1a988de
 - returned — gov-researcher · wrote 0 files · 8m43s · 47.9k out · run direct/a5adf84caf1a988de
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-10-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-10-researcher.md) · writes none · gates none · run direct/a9189c646b6ed94eb
+- returned — gov-researcher · wrote 0 files · 4m45s · 22.8k out · run direct/a9189c646b6ed94eb
 ```
 
 ## Events
@@ -307,6 +309,10 @@ After the orientation round (`gap-orient-01` to `gap-orient-10`; eight policies 
 0 on 84 keys and 10 builds; the preset check exits 0 on 77 catalogue keys, 72 presettable, 72 preset
 rows.
 
+After the adopted preservation research (`gap-orient-11` to `gap-orient-13`; `card.snapshot` added): the
+join exits 0 on 87 keys and 10 builds; the preset check exits 0 on 78 catalogue keys, 73 presettable,
+73 preset rows.
+
 ### The foreign-build census
 
 Lists every build slug a design record names that is not a chain build, the chain read from v2's
@@ -356,6 +362,7 @@ Runs, 2026-10-14:
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-{plan,design,build,test,deploy}.md` | The five stage researchers' returns, verbatim. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-maintain.md` | The main loop's Maintain research, with every instrument beside its output. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-{routing,cost,trust,determinism}.md` | The four orientation researchers' returns, verbatim, the harness's entity escapes restored. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-preserve.md` | The fifth orientation researcher's return, verbatim: how the build's card is preserved and reaches priority 1, adopted at the owner's request. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |

@@ -93,6 +93,9 @@ extends.
 | gap-orient-08 | Orient | HIGH | Work is bound to no checklist item: about 63% of main-loop tool calls follow no protocol step, typed role agents are 4.1% of subagents, a harness branches on free text, and researcher returns are unchecked (5 of 10 ended without a final turn). Raised by the owner. | orientation research, determinism; `tools/workflows/unattended-unit.js:348` | — |
 | gap-orient-09 | Orient | HIGH | Allowances escape in the field: the role-gate arm let 34 typed gate runs through though a replay of the same commands is refused, cause unknown, and the `none` and `review` write classes are declared but read by nothing. Raised by the owner. | orientation research, determinism probes 2 and 3; `tools/hooks/scratch-guard.js:101-104` | — |
 | gap-orient-10 | Orient | MED | Memory loads unchecked: 12 of the 98 paths the auto-memory names no longer exist, and the dangling-pointer signal only reports. Raised by the owner. | orientation research, trust; `tools/drift-audit/drift_signals.py:470` | — |
+| gap-orient-11 | Orient | HIGH | A build's card cannot be found by its build: cards are keyed by session id in the clone's git directory, so a new session, a dead process or another node never finds the card of the build it picks up, and no card exists on the remote. Raised by the owner. | orientation research, preserve; `skills/session-kickoff/manifest-check.sh:311-316` | — |
+| gap-orient-12 | Orient | HIGH | A resume delivered no card: in this session the resume hooks printed only the process and wiring checks, though the replay is wired for resume; the cause is unknown. Raised by the owner. | orientation research, preserve (this session's transcript, the resume at 16:21:01Z) | — |
+| gap-orient-13 | Orient | MED | The card never reaches the charter's instruction slot: hook output lands as a reminder at the hook point, subagents (`omitClaudeMd: true`) get only the route, and another harness gets nothing. Raised by the owner. | orientation research, preserve; `tools/roles/render_agents.py:132`; https://code.claude.com/docs/en/hooks | — |
 | gap-spine-01 | Spine | HIGH | No stage model: no kit, leg, dossier, role or hook declares the stage it serves, and the loop exists only implicitly. | design §4.1 (0 of 31 dossiers carry a stage); `tools/roles/workflows.toml` covers stages 0–7 only | — |
 | gap-spine-02 | Spine | HIGH | Guards read agent-written state across stages, against `[class]`. | build §4 (write gate), design §4.4 (INPROGRESS), test §5 C (pusher-written receipt), deploy §5 C | — |
 | gap-spine-03 | Spine | HIGH | Attended and unattended builds run different exit contracts. | build §3, §4 (DoD needs RUN.md) | — |
@@ -216,4 +219,12 @@ orientation researchers and the main loop, same instrument:
 ```text
 Deploy=8 Plan=7 Spine=9 Orient=10 Test=9 Review=3 Foundation=8 Build=4 Flow=9 Maintain=8 Design=9
 LOW=5 MED=33 HIGH=46
+```
+
+Re-measured after the adopted preservation research added `gap-orient-11` to `gap-orient-13`, same
+instrument:
+
+```text
+Deploy=8 Plan=7 Spine=9 Orient=13 Test=9 Review=3 Foundation=8 Build=4 Flow=9 Maintain=8 Design=9
+LOW=5 MED=34 HIGH=48
 ```
