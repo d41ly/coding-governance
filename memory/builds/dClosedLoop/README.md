@@ -59,7 +59,7 @@ ids PLAY-dClosedLoop-1
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 2 record folder(s).
+Records: 13 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

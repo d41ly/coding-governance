@@ -67,11 +67,37 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 3 | gov-researcher | Build | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-3-researcher.md` | b73dcb0a | lost: process exited | — |
 | 4 | gov-researcher | Test | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-4-researcher.md` | b73dcb0a | lost: process exited | — |
 | 5 | gov-researcher | Deploy | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-5-researcher.md` | b73dcb0a | never launched: the tool call returned an internal error | — |
-| 6–10 | gov-researcher | Plan, Design, Build, Test, Deploy | the same five handoffs, unchanged | 1799cb98 | running | — |
+| 6 | gov-researcher | Plan | handoff 1, unchanged | 1799cb98 | returned, 5m17s, 23.0k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-plan.md` |
+| 7 | gov-researcher | Design | handoff 2, unchanged | 1799cb98 | returned, 5m24s, 29.0k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-design.md` |
+| 8 | gov-researcher | Build | handoff 3, unchanged | 1799cb98 | returned, 4m39s, 24.0k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-build.md` |
+| 9 | gov-researcher | Test | handoff 4, unchanged | 1799cb98 | returned, 3m47s, 20.9k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-test.md` |
+| 10 | gov-researcher | Deploy | handoff 5, unchanged | 1799cb98 | returned, 4m08s, 22.6k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-deploy.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
-(`tools/hooks/agent-cap.js`, `CAP` and `SLOT_TTL_MS`).
+(`tools/hooks/agent-cap.js`, `CAP` and `SLOT_TTL_MS`). Its record is
+`build/2026-10-14-build-PLAY-dClosedLoop-1-research-maintain.md`.
+
+The lines `tools/roles/handoff.py agents --handoff <path>` derived for the five handoffs, verbatim.
+The verb's `--write` held the agent ledger back, because no spec defines `PLAY-dClosedLoop-1` yet;
+it is re-run once the spec lands. Rows 1 to 4 have no `returned` line: their process died.
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-1-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-1-researcher.md) · writes none · gates none · run direct/aa7e3d6c065321e82
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-1-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-1-researcher.md) · writes none · gates none · run direct/adedd1eec07881ab6
+- returned — gov-researcher · wrote 0 files · 5m17s · 23.0k out · run direct/adedd1eec07881ab6
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-2-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-2-researcher.md) · writes none · gates none · run direct/accff2d8daecc1566
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-2-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-2-researcher.md) · writes none · gates none · run direct/a0cce9c329c0c17d2
+- returned — gov-researcher · wrote 0 files · 5m24s · 29.0k out · run direct/a0cce9c329c0c17d2
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-3-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-3-researcher.md) · writes none · gates none · run direct/a6e0851dac91f6647
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-3-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-3-researcher.md) · writes none · gates none · run direct/a5886ceb960724423
+- returned — gov-researcher · wrote 0 files · 4m39s · 24.0k out · run direct/a5886ceb960724423
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-4-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-4-researcher.md) · writes none · gates none · run direct/af05ef0640a026274
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-4-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-4-researcher.md) · writes none · gates none · run direct/a636d8714b2045642
+- returned — gov-researcher · wrote 0 files · 3m47s · 20.9k out · run direct/a636d8714b2045642
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-5-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-5-researcher.md) · writes none · gates none · run direct/aaf0e3ee001682096
+- returned — gov-researcher · wrote 0 files · 4m08s · 22.6k out · run direct/aaf0e3ee001682096
+```
 
 ## Events
 
@@ -91,3 +117,5 @@ this session rather than by a sixth agent: the direct-spawn budget is five per o
 | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-brief.md` | The owner's prompt, verbatim; the brief; the owner's confirmation; the route. |
 | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-{1..5}-researcher.md` | The five research handoffs, one stage each. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md` | This log. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-research-{plan,design,build,test,deploy}.md` | The five stage researchers' returns, verbatim. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-research-maintain.md` | The main loop's Maintain research, with every instrument beside its output. |
