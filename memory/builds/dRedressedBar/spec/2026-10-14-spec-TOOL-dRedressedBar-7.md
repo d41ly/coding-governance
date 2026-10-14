@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-7 — records, the regenerated index and the kit versions, measured over the fixed tree
 
-**Status:** INPROGRESS · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 5
+**Status:** CLOSED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 5
 
 <!-- gen:spec-records -->
 

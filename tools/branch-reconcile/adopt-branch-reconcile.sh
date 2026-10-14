@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # adopt-branch-reconcile.sh — render the /cleanup Skill, and check the rendered copy has not drifted.
-# gov:kit branch-reconcile@1.4
+# gov:kit branch-reconcile@1.5
 #
 #   bash <this kit>/adopt-branch-reconcile.sh --scaffold    # render .claude/skills/cleanup/SKILL.md
 #   bash <this kit>/adopt-branch-reconcile.sh --check       # the gate leg: is the rendered Skill a fresh render?
