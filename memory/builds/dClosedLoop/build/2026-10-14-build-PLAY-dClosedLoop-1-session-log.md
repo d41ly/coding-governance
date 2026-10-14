@@ -179,6 +179,12 @@ calls.
 - 2026-10-15, session 1799cb98: the owner set up a compaction-retention experiment at 834.1k of 1M
   tokens; the inventory (the answer key) and a questions-only probe file were committed before the
   owner's compaction, to be answered blind afterwards and scored.
+- 2026-10-15, session 1799cb98: after the owner's compaction, the probes were answered blind into the
+  recall record, committed at `ae229d4ee` before the key was opened, then scored and traced in the
+  results record. The summary kept decisions, policies, procedure and the owner's words, and dropped
+  identifiers, measured numbers, qualifiers and harness notices. The compact hook replayed the
+  kickoff's card. Conclusions for unattended builds were drawn, and three forks, CX-1 to CX-3, put to
+  the owner.
 
 ## Instruments
 
@@ -414,6 +420,8 @@ Runs, 2026-10-14:
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-flow-roles.md` | The flow revisited with roles: the item cycle, each step's role sequence and routes, the record chain, the owner's touchpoints, and the holes as forks. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-compaction-inventory.md` | The compaction experiment's inventory of the context before compaction, by segment, and its answer key. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-compaction-probes.md` | The compaction experiment's seventy-one probes, questions only, answered blind after the compaction. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-compaction-recall.md` | The compaction experiment's blind recall: every probe answered from the context that survived, with its confidence and channel, committed before the key was read. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-compaction-results.md` | The compaction experiment's results: each answer scored and traced, the derived tallies and their instrument, findings, conclusions for unattended builds, and the forks they raise. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |
