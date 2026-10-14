@@ -24,6 +24,7 @@ from __future__ import annotations
 import json
 import os
 import pathlib
+import posixpath
 import shutil
 import subprocess
 import sys
@@ -188,7 +189,7 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
     THE CLASS, NOT THE ENTRY. Naming lexicon in the assertion would certify the one block that
     exists and say nothing about the next kit to declare the same shape, which is the could-not-fail
     shape one level up. The second half then grades lexicon's own two states and settings-merge's
-    three, because a class rule over descriptors cannot show the engine reaches the same verdict.
+    four, because a class rule over descriptors cannot show the engine reaches the same verdict.
 
     WHAT IT DOES NOT CHECK: whether the entry's adopter actually WRITES the path its `must_not_exist`
     names — that would need a reading of a shell script, and no static rule gets it. The presence
@@ -274,10 +275,18 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
           all(len(v) == 1 for v in engine.values()), str(engine))
     if all(len(v) == 1 for v in engine.values()):
         hook, adopter = engine["agent-cap"][0], engine["settings-merge"][0]
+        # THE RESOLVER'S SECOND STATIC HOME (TOOL-dRedressedBar-10): settings-merge.py probes
+        # `<here>/../hooks` after `<here>/hooks`, so a hook there is found and an exit 2 is a
+        # failure. Derived from the hook's landed path with settings-merge's `{prefix}` replaced by
+        # that prefix's parent, never typed; the join climbs one level, so it never equals `hook`.
+        _sm = govkit.target_context(g, deploy, "settings-merge", descs["settings-merge"][0])["prefix"]
+        parent = posixpath.normpath(posixpath.join(_sm, "..", posixpath.relpath(hook, _sm)))
         check_outcome_states(descs, g, "settings-merge", 2,
                              [("an install with no hooks kit", [adopter], True),
                               ("an install with the hook beside it", [adopter, hook], False),
-                              ("an install that landed neither", [], False)])
+                              ("an install that landed neither", [], False),
+                              ("an install with the hook at its prefix's parent home only",
+                               [adopter, parent], False)])
 
 
 #: The fixture kit, in two vintages. The FIRST is what the target installs from; the SECOND is the

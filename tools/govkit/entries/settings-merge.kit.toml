@@ -35,13 +35,15 @@ why_no_regenerate = "the adopter merges hook fragments into .claude/settings.jso
 # entry requires nothing and may stand alone, so a target with no hooks kit reaches that exit on
 # every correct install, and on every `update` that gains this entry while leaving agent-cap out for
 # an unmet requirement. The adopter refused before writing, so nothing naming a missing file is
-# wired. The ABSENCE is read where the adopter looked, `{prefix}/hooks/agent-cap.js`; the PRESENCE
-# pins `{prefix}` to the adopter's own directory, and with the hook present an exit 2 stays a failure.
+# wired. The ABSENCE is read at both static homes the adopter's resolver probes, `{prefix}/hooks` and
+# `{prefix}/../hooks` (TOOL-dRedressedBar-10); the PRESENCE pins `{prefix}` to the adopter's own
+# directory, and with the hook at either home an exit 2 stays a failure. A hook only the receipt
+# locates is OPEN, not accepted: no static term sees it, and only a probe reading the receipt can.
 # agent-cap runs the same argv under its own descriptor, which declares no outcome, so its refusal
 # still fails wherever agent-cap is selected.
 [[outcome]]
 code = 2
-probe = { must_exist = "{prefix}/settings-merge.py", must_not_exist = "{prefix}/hooks/agent-cap.js" }
+probe = { must_exist = "{prefix}/settings-merge.py", must_not_exist = ["{prefix}/hooks/agent-cap.js", "{prefix}/../hooks/agent-cap.js"] }
 means = "no-agent-cap-to-wire"
 ok = true
 

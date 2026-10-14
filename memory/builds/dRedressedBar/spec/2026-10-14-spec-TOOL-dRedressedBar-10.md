@@ -1,11 +1,12 @@
 # TOOL-dRedressedBar-10 — the round-1 spec audit's 12 mediums and 11 lows, batched: each criterion observed in a form that can pass and fail, each false sentence corrected, and settings-merge's accepted stop narrowed
 
-**Status:** INPROGRESS · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 6 · ratified 2026-10-14
+**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 6 · ratified 2026-10-14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-14-build-TOOL-dRedressedBar-10-1-acceptance-ledger.md](../build/2026-10-14-build-TOOL-dRedressedBar-10-1-acceptance-ledger.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-2-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-3-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md) | research | TOOL-dRedressedBar-13 TOOL-dRedressedBar-17 TOOL-dRedressedBar-19 |
