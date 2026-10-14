@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-4 — the `workflows` homonyms the install-prefix ban reads as a kit path, held in a named constant
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 2
 
 <!-- gen:spec-records -->
 

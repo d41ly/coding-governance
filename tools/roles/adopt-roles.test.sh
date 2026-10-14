@@ -222,12 +222,14 @@ def turn(at, model, effort, mid, tokens, writes=()):
             "message": {"model": model, "id": mid, "usage": {"output_tokens": tokens},
                         "content": [{"type": "tool_use", "name": n, "input": {"file_path": p}} for n, p in writes]}}
 sub = sess.with_suffix("") / "subagents"
+# The Claude Code session directory holding one subdirectory per Workflow run, not the review-harness kit.
+WORKFLOW_RUNS_DIR = "workflows"
 put(sub / "agent-a0000000000000001.jsonl", [{"type": "user", "timestamp": "2026-10-13T10:00:00.000Z"},
     turn("10:00:05", "claude-test-1", "medium", "m1", 300, [("Write", "a.txt")]),
     turn("10:00:06", "claude-test-1", "medium", "m1", 700, [("Write", "b.txt")]),
     turn("10:07:47", "claude-test-1", "medium", "m2", 900, [("Edit", "a.txt")])])
 put(sub / "agent-a0000000000000001.meta.json", json.dumps({"agentType": "gov-builder", "description": "build one"}))
-wf = sub / "workflows" / "wf_00000001-aaa"
+wf = sub / WORKFLOW_RUNS_DIR / "wf_00000001-aaa"
 put(wf / "journal.jsonl", [{"type": "started", "agentId": "a0000000000000002", "label": "unit:TOOL-tFix-1"},
     {"type": "result", "agentId": "a0000000000000002", "result": {"committed": True, "sha": "abc123def"}},
     {"type": "started", "agentId": "a0000000000000003", "label": "commit:specs:tFix"}])

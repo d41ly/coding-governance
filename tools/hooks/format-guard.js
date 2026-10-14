@@ -99,6 +99,8 @@ const SHA_MIN = 7
 const GIT_BOUND_MS = 10000
 const AGENT_HEADS = ['agent', 'returned']
 const RUN_ID_RE = /^[A-Za-z0-9_-]{1,64}$/
+// The Claude Code session directory holding one subdirectory per Workflow run, not the review-harness kit.
+const WORKFLOW_RUNS_DIR = 'workflows'
 
 function readStdin() {
   try {
@@ -330,7 +332,7 @@ function readJournalAgents(sessionDir, runId) {
   if (typeof runId !== 'string' || !RUN_ID_RE.test(runId)) {
     return { error: `the Workflow run id ${JSON.stringify(String(runId).slice(0, 80))} fails ${RUN_ID_RE} and names no journal` }
   }
-  const file = path.join(sessionDir, 'subagents', 'workflows', runId, 'journal.jsonl')
+  const file = path.join(sessionDir, 'subagents', WORKFLOW_RUNS_DIR, runId, 'journal.jsonl')
   let text
   try { text = fs.readFileSync(file, 'utf8') } catch (e) { return { error: `the journal ${file} is unreadable (${(e && e.code) || e})` } }
   const started = []
