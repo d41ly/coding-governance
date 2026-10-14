@@ -592,7 +592,96 @@ releases (FL-DP2); the Loop Review reads its metrics weekly.
 8. The maintenance record is written, and the metrics handed to the Loop Review.
 9. The lease is released.
 
-### Entry points, partly settled
+### Forks asked, 2026-10-14
+
+**FL-M1. "How does a Maintain safe fix land?"** Offered: Maintain's own short path (Recommended);
+Through the full flow; Through the small-change path. Answer: Through the small-change path.
+
+**FL-M2. "What starts a Maintain run besides its daily cadence?"** Offered: Cadence plus events
+(Recommended); Cadence only. Answer: Cadence plus events (Recommended).
+
+**FL-M3. "Where does a small, self-contained PRODUCT change enter the flow when no planned build
+covers it (a bugfix, a small tweak, a hotfix)?"** Offered: A patch build at Design (Recommended);
+Amend the nearest live build; Plan with a short checklist. Answer: A patch build at Design
+(Recommended).
+
+### Settled for Maintain, 2026-10-14
+
+- **Nothing changes the repository outside the flow.** A safe fix that changes tracked content
+  (regenerated outputs, records-only fixes, deferring a dormant build, closing a finished run record)
+  becomes a patch build (FL-M1, FL-M3). Maintain applies directly only the actions that change no
+  tracked content: reaping processes and pruning landed branches and worktrees.
+- **A run starts on its cadence or on an event**: a red verdict on the default branch, a failed
+  release verify, a breach found at session start; an event run carries only the detectors and fixes
+  that concern it (`maintain.events`).
+
+### Entry points, settled 2026-10-14
+
+| Change | Enters at | How |
+|---|---|---|
+| A new, complex feature and its integration | Plan | the full Plan checklist and the owner's ratification |
+| An amendment inside an open build's goal | Design | unit-level re-entry, or feature-level when `design.reentry`'s triggers hold |
+| A critical planning issue | Design, after a recorded plan revision | the plan record revised and ratified, completed work kept, amended by new units, or retired |
+| A small, self-contained product change no planned build covers | Design, as a patch build | a minimal plan record derived from the intake and ratified as `patch.ratify` says (automatically by default), then a micro-spec |
+| A Maintain safe fix that changes tracked content | Design, as a patch build | as above, opened by Maintain's run |
+| A Maintain action that changes no tracked content | no build | applied and recorded by the run |
+| A failed verify after its build closed at landing | Plan's triage | filed as an ask, then a patch build or a planned build by its size |
+
+## [review] Review
+
+### Current state, measured 2026-10-14
+
+Review exists at two stages: the spec audit at Design (declared by 3 of 173 builds, 0 of 254 audits
+clean, about 9 agents and 0.81 M tokens each) and the closing review at Build (29 of 59 attended
+builds, 86 of 89 unattended). The harness is `tools/workflows/tier2-review.js`: finder lenses, batched
+skeptics, one synthesis. The loop corrects itself only by adding: every confirmed finding's class
+becomes a gate or a bug class (`[left-shift]`), and nothing retires one. Settled since: agent review
+opt-in by default except Build's closing review, each stage's review and effort switchable; an
+advisory recommendation at every transition; findings disposed as units by `review.findings`; a
+weekly Loop Review with a value ledger, retirement proposals the owner ratifies after 60 days without
+a catch, and caps re-derived from evidence.
+
+### Draft scope
+
+- **Stage reviews**, one lens set per stage: Plan (order, dependencies, duplicates, readiness), Design
+  (the spec audit's lenses and the cross-build index), Build (the closing review), Test (gates seen
+  red, armed branches, cost, flakes), Deploy (what landed against the plan, release notes against
+  the versions), Maintain (fixes inside the declared set, detectors owned).
+- **The recommendation** at every transition: whether this stage's review is needed, and why.
+- **Disposition**: each confirmed finding disposed by `review.findings`, its class left-shifted into a
+  gate or a bug class, and the review's cost written to the value ledger.
+- **The Loop Review**: on its cadence, it reads the loop's metrics (stage cycle times from the
+  transitions, review yield, each gate's catches against its cost, bypasses, flakes, plan
+  revisions, records overhead, surface size against the caps) and files proposals into Plan:
+  retirements, merges, cap re-derivations, contract changes.
+
+### Draft boundaries
+
+- **A stage review starts** at that stage's exit, when policy owes it, the recommendation binds, or
+  the owner asks; **it ends** when its report is recorded and every confirmed finding is disposed.
+- **The Loop Review starts** on its cadence and **ends** when its proposals are filed.
+- **Review never edits what it reviews**: its findings are disposed by the stage that owns the work,
+  as new units or asks.
+
+### Draft checklists (each item witnessed by a check)
+
+A stage review:
+1. The trigger is recorded: owed by policy, a binding recommendation, or the owner's request.
+2. The reviewed artifact is pinned: the plan revision, the spec revisions, or the commit range.
+3. The stage's lenses run within the fan-out bound.
+4. Every finding is put to a skeptic; an unverified one stays outstanding, never refuted.
+5. The synthesized report is recorded under the build's reviews.
+6. Every confirmed finding is disposed and its class left-shifted.
+7. The review's cost is written to the value ledger.
+
+The Loop Review:
+1. The cadence lease is held.
+2. The metrics are gathered from the records, never typed.
+3. Proposals are drafted: retirements, merges, cap re-derivations, contract changes.
+4. The proposals are filed into Plan, ratified as `review.loop.retire` says.
+5. The Loop Review's record is written.
+
+### Entry points, partly settled (superseded by the settled table under Maintain)
 
 - **Settled:** a new, complex feature enters at Plan; an amendment that fits an open build's plan
   enters at Design; no build re-enters Plan.

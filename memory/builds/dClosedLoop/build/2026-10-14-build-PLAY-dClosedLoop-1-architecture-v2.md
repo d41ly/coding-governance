@@ -50,6 +50,10 @@ Revised: 2026-10-14, after the flow walk's Deploy stage: `build.closes` and `rel
 the catalogue and the presets; a build closes at landing by default, and Deploy's release is recorded
 per SHA across landings; gov's kits reach adopters as tagged releases cut on a cadence.
 
+Revised: 2026-10-14, after the flow walk's Maintain stage: `maintain.events` and `patch.ratify`
+join the catalogue and the presets; nothing changes tracked content outside the flow, so Maintain's
+safe fixes and small product changes enter at Design as patch builds; the entry points are settled.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -184,6 +188,8 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 | `maintain.cadence` | daily, weekly, every-session | daily | walk M2 |
 | `maintain.fixes` | a set of named safe fixes | reap, prune landed, regenerate stale, defer dormant, records-only fixes, close finished run records | R2.3 |
 | `maintain.on-breach` | file-ask, red-leg, report | file-ask | walk M3 |
+| `maintain.events` | any subset of default-branch-red, release-verify-failed, session-start-breach | all three | flow FL-M2 |
+| `patch.ratify` | auto, owner | auto | flow FL-M3 |
 | `review.<stage>` | off, opt-in, owed, owed-above-tier | opt-in; Build owed | R2.1 |
 | `review.<stage>.effort` | the role efforts | the role's declared effort | R2.1 |
 | `review.recommendation` | advice, binding, binding-above-tier | advice | R4.3 |
@@ -279,6 +285,8 @@ repository on either overrides `verdict` to `local-hook`.
 | `maintain.cadence` | weekly | daily | daily | daily |
 | `maintain.fixes` | the full safe set | the full safe set | reap and regenerate only; the rest filed as asks | the full safe set |
 | `maintain.on-breach` | report | file-ask | red-leg | file-ask |
+| `maintain.events` | default-branch-red | all three | all three | all three |
+| `patch.ratify` | auto | auto | owner | auto |
 | `review.plan` | opt-in | opt-in | opt-in | opt-in |
 | `review.design` | opt-in | opt-in | owed | owed-above-tier |
 | `review.build` | opt-in | owed | owed | owed |
