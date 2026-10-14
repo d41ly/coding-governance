@@ -5418,11 +5418,6 @@
       "file": "tools/govkit/govkit.py"
     },
     {
-      "id": "clean",
-      "kind": "function",
-      "file": "tools/unattended/gate-guard.js"
-    },
-    {
       "id": "cleanup",
       "kind": "function",
       "file": "tools/check-wiring.test.sh"
@@ -14579,6 +14574,11 @@
     },
     {
       "id": "renderAskDeny",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "renderAskQuote",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
     },

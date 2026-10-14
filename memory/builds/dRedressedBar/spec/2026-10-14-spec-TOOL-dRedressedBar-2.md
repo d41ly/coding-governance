@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-2 — the one verb offender over the lexicon pin, renamed to a declared verb
 
-**Status:** INPROGRESS · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
