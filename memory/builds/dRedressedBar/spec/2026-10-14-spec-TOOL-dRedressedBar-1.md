@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-1 — stale suite fixtures re-armed against the code the bar-less landings moved
 
-**Status:** CLOSED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -205,6 +205,18 @@ none
 - rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
   spec audit's minors were promoted into, for report ids 1, 2, 3, 11, 20 and 21. No scope, design or
   criterion moves.
+- rev-3 · 2026-10-14 · AC1 · AC4 · AC5 · a records fix for TOOL-dRedressedBar-10, closing round-1
+  report ids 1, 2, 3, 11, 20 and 21, written by that unit's spec-writer pass. The status stays
+  CLOSED, and no criterion text moves, because this unit's ledger answered each as written. Three
+  halves could not make the reading they claim. AC1's `grep -c` counts lines, not calls: over a
+  correct build the spaced pattern reads 5 lines holding 14 calls. TOOL-dRedressedBar-10's AC1 is
+  the count, through `grep -o` and `wc -l`. AC4's placement half compares with the first line
+  `grep -n 'git push'` prints, the header comment at line 2, so it cannot fail. Its scratch-clone
+  half drives only the hook, so it reads green at the base too and is a liveness reading of the
+  forcing case. TOOL-dRedressedBar-10's AC2 anchors the placement on the first executed push and
+  shows it red on a staged misplacement. AC5 expects one `FOREIGN_PREFIX_PROBE` line where the
+  copied shape carries two, the attribution comment and the `if` line. TOOL-dRedressedBar-10's AC3
+  is the count.
 
 ## 9. Reuse audit
 

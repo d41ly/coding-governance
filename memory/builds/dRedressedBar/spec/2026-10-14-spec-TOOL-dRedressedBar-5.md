@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-5 — fork idioms past the spawn-idiom registry, converted to their no-fork forms
 
-**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 3
+**Status:** CLOSED · rev-6 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -120,6 +120,13 @@ renames a literal inside the single-quoted `A9_WRITE` program. The builder confi
 edit with `git diff ebce889c -- <the five files>`, reading every `-`/`+` line that spells
 `$(basename`, `$(dirname`, `$(date`, `$(printf` or a `printf`/`echo` piped into a filter. A diff that
 moves a site changes the excess, and the builder stops and returns that to the main loop.
+
+Both edits add lines to `tools/roles/adopt-roles.test.sh` before this unit starts: unit 1 adds its
+probe stop after arm 1, and unit 4 adds its `WORKFLOW_RUNS_DIR` comment and constant in `A9_WRITE`.
+So the `adopt-roles.test.sh` numbers in the table above and in "The suites" below are `ebce889c`
+numbers. Re-map by content: unit 1's probe stop and unit 4's `WORKFLOW_RUNS_DIR` lines are the two
+insertions, and the builder finds every cited site with `grep -n` on its content at unit start,
+writing no new offset into this spec.
 
 ### The forms table
 
@@ -462,6 +469,13 @@ none
   alternatives. AC9 observes the diff of the pin file and AC10 runs the check-arms probe. §7 corrects
   what `harness arms` reads and adds `recall floor` and `recall floor arms`, which the pin file's
   `memory/` guard requires. No other scope, design or criterion moves.
+- rev-6 · 2026-10-14 · §4 · AC1 · AC2 · a records fix for TOOL-dRedressedBar-10, closing round-1
+  report ids 14 and 15, written by that unit's spec-writer pass. The status stays CLOSED, and no
+  criterion text moves. Id 14: §4's working-set section gains the paragraph stating that units 1 and
+  4 insert lines into `tools/roles/adopt-roles.test.sh` first, so its cited numbers are `ebce889c`
+  numbers, re-mapped by content with `grep -n` at unit start. Id 15: AC1's path-subst and date-fmt
+  half and AC2 count with a re-typed regex, not the leg's own classifier. TOOL-dRedressedBar-10's
+  AC12 is the count, through `scan_spawn_file` (`tools/gate-lint/sh_hygiene.py:798`).
 
 ## 10. Reuse audit
 

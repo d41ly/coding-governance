@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-8 — arm 11g AC14 bounded, and its FIFO server kept alive through MSYS's failed opens and broken pipes
 
-**Status:** CLOSED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -63,6 +63,10 @@ so a dead or silent server reds the arm with a line naming it.
   grades it for the registry classes. That unit reads this unit's pass commit alone, counts its sites
   with the leg's classifier, corrects §6, and writes the hands-off to `TOOL-dRedressedBar-7` these
   Edges lack.
+- **hands-off** `TOOL-dRedressedBar-7` — the tree this unit leaves, which that unit measures. Its one
+  `tools/` file, `tools/run-gates/run-gates.test.sh`, is `project-owned`
+  (`tools/run-gates/kit.toml:40-41`), outside `EPOCH_ROLES`, so this unit leaves that unit no
+  version to bump.
 
 ## 4. Design
 
@@ -349,8 +353,12 @@ observed in both canary attempts over `ebce889c7`. The brief's last acceptance, 
 completing under its 13200 s ceiling in the closing bar, is the main loop's observation and not a
 criterion here.
 
-What these legs do not check of this change: the fork leg's argv excludes `*.test.sh`, so it reads
-none of this file. The loop leg does read it, through one registry row
+What these legs read of this change. The fork leg's argv excludes `*.test.sh` from its product
+population (`tools/gate-legs.json:187-195`), and it still grades this file for the registry classes:
+`scan_spawn_tree` adds every tracked `*.test.sh` (`tools/gate-lint/sh_hygiene.py:843-850`), counted
+against this file's six rows at `memory/project/spawn-idiom-sites.txt:214-219`. So a counted site
+this unit added would red it, and `TOOL-dRedressedBar-10`'s AC5 reads this pass and finds none
+added. The loop leg reads the file too, through one registry row
 (`memory/project/substitution-fed-loops.txt:45`, one `<<<` reader). No line this unit adds feeds a
 `done <<` or `done <<<` reader, so that row does not move. The gov canary reads only the suite's
 manifest-derivation lines, which this unit leaves alone. The touched path trips only the broad
@@ -370,6 +378,14 @@ none
 - rev-2 · 2026-10-14 · §3 · Edges, which read `none`, gain the hands-off to TOOL-dRedressedBar-10,
   the batch the round-1 spec audit's minors were promoted into, for report ids 4, 5 and 12. No scope,
   design or criterion moves.
+- rev-3 · 2026-10-14 · §3 · §6 · AC6 · a records fix for TOOL-dRedressedBar-10, closing round-1
+  report ids 4, 5 and 12, written by that unit's spec-writer pass. The status stays CLOSED, and no
+  criterion text moves. Ids 5 and 12: §6 said the fork leg reads none of this suite. It grades the
+  suite for the registry classes through `scan_spawn_tree`, against six registry rows, and the
+  paragraph now says so. Id 4: AC6 diffs from the build base, so a sibling's `tools/` edit on the
+  branch reds it over a correct build. TOOL-dRedressedBar-10's AC4 reads this unit's pass commit
+  alone, `<p8>~1..<p8>`. Edges gain the hands-off to `TOOL-dRedressedBar-7`, the mirror of that
+  spec's new `consumes-from`.
 
 ## 9. Reuse audit
 

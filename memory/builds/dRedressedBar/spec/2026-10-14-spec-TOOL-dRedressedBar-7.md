@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-7 — records, the regenerated index and the kit versions, measured over the fixed tree
 
-**Status:** CLOSED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 5
+**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -19,10 +19,11 @@
 
 At `ebce889c7` the regen preflight refused, and three legs read red, on a stale generated index and
 an undeclared carrier rather than on code: `memory hygiene` check 17, `push-main self-test` arms 28
-and 29, and `method carriers (every pointer declared)` check 3. The bytes units 1 to 6 move owe kit
-version bumps, and possibly a kickoff manifest re-stamp. This unit brings each one back to what its
-own checker measures, over the tree the other six units leave. It runs last because every figure it
-writes is read off that tree.
+and 29, and `method carriers (every pointer declared)` check 3. The bytes moved by every unit
+ordered before this one, 1 to 6, 8, 9 and 20, owe kit version bumps where they ship, and possibly a
+kickoff manifest re-stamp. This unit brings each one back to what its own checker measures, over
+the tree those units leave. It runs after them because every figure it writes is read off that
+tree.
 
 Tier-2 by the README's tier rule: the version constants it moves are shipped engine bytes, across
 four or more kits.
@@ -80,6 +81,15 @@ four or more kits.
   branch-reconcile and roles kits, which S3 bumps.
 - **consumes-from** `TOOL-dRedressedBar-6` — the last edit to the roles adopter's suite before the
   measure. The roles re-render that S3 triggers runs the adopter whose exits that unit arms.
+- **consumes-from** `TOOL-dRedressedBar-8` — its edit to `tools/run-gates/run-gates.test.sh`, the one
+  `tools/` file its pass moved, is part of the tree S1 and S3 measure. That suite is `project-owned`
+  (`tools/run-gates/kit.toml:40-41`), outside `EPOCH_ROLES`, so it moves no kit version and §4 step
+  1's run-gates stop is not reached from it.
+- **consumes-from** `TOOL-dRedressedBar-9` — its descriptor block, its `tools/govkit/matrix.py`
+  helper and its selftest arm are part of the tree S1 and S3 measure. All three sit under
+  `{prefix}/govkit`, which the registry exempts (`tools/govkit/registry.toml:295-297`), so they move
+  no kit version. Its pass committed the regenerated `memory/map/generated/symbols.json`, which S1's
+  `regen.py --write` then reads fresh.
 - **consumes-from** `TOOL-dRedressedBar-20` — S3's mint runs over that unit's tightened carrier
   writer. Without it, `write_version_carriers` (`tools/govkit/govkit.py:798`) lets the `playbook`
   entry's pattern `governance-template: v` (`tools/govkit/entries/playbook.kit.toml:6`) rewrite the
@@ -217,7 +227,8 @@ Each figure is read off its own checker over this unit's tree and never copied f
 ### Why one unit
 
 The README's roster gives this unit three records and the version values. None of them is designed
-here: each is the output of a tool that already exists, run over the tree the other six units leave.
+here: each is the output of a tool that already exists, run over the tree the units ordered before
+this one leave.
 `TOOL-aSweptBar-6` had the same shape and closed. A split would add order steps and no reviewable
 seam, because no record here reads another's output except the carrier row, which reads the mint's
 render, and the sequence above orders that.
@@ -288,9 +299,9 @@ render, and the sequence above orders that.
   Red when: the agent file has no row in `memory/project/method-carriers.txt`, a row names a file
   that no longer mentions the method, or the agent file holds a copied method heading.
 - **AC4** — When `python tools/govkit/govkit.py epoch --base ebce889c7` runs before the mint, it
-  prints a `FAILED` line for each kit that units 1 to 6 moved, and one for playbook-render, which
-  unit 20's S6 moved. When the same command runs at the unit's tip, it prints no `FAILED` line and
-  exits 0.
+  prints a `FAILED` line for each kit whose shipped bytes a unit ordered before this one moved, 1 to
+  6, 8, 9 and 20, playbook-render among them, which unit 20's S6 moved. When the same command runs
+  at the unit's tip, it prints no `FAILED` line and exits 0.
   Red when: a moved kit keeps its value, or its bump precedes a later move of its bytes.
   figure: the kit set is DERIVED by the pre-mint run; §4's table is the expectation from the brief.
 - **AC5** — For each kit the minter moved from value `<old>`, `git grep -nF "gov:kit <kit>@<old>"`
@@ -349,6 +360,14 @@ none
   §4 step 6 records that `AGENTS.md` is a `verify-paths:` and `registry:` path and not a `watch:`
   path, so the fifth kit owes AC6 no re-stamp. AC4 counts playbook-render. AC7 is new and observes
   the line-level write, and the three playbook legs join §7.
+- rev-5 · 2026-10-14 · §1 · §3 · §4 · AC4 · a records fix for TOOL-dRedressedBar-10, closing round-1
+  report ids 9, 19 and 23, written by that unit's spec-writer pass. The status stays CLOSED. §1 and
+  §4 "Why one unit" stop counting the siblings as a fixed six and name every unit ordered before this
+  one: 1 to 6, 8, 9 and 20. AC4's wording names the same population, the one criterion text this
+  fix moves. The kit set AC4 derives from its own `epoch` run is unchanged by it, because units 8
+  and 9 move no kit version, so this unit's ledger still answers it. Edges gain `consumes-from` lines
+  for `TOOL-dRedressedBar-8` and `TOOL-dRedressedBar-9`, each read from that unit's pass commit, and
+  specs 8 and 9 gain the mirroring `hands-off` in the same pass.
 
 ## 10. Reuse audit
 

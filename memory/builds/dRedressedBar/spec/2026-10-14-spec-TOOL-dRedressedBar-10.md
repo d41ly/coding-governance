@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-10 — the round-1 spec audit's 12 mediums and 11 lows, batched: each criterion observed in a form that can pass and fail, each false sentence corrected, and settings-merge's accepted stop narrowed
 
-**Status:** SPECCED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 6 · ratified 2026-10-14
+**Status:** INPROGRESS · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 6 · ratified 2026-10-14
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,8 @@
 |---|---|---|
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-2-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-3-spec-writer.md) | journal | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md) | research | TOOL-dRedressedBar-13 TOOL-dRedressedBar-17 TOOL-dRedressedBar-19 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-10-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-5-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-19-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-19-2-revision.md) | research | TOOL-dRedressedBar-19 |
 | [2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-11 |
 
@@ -48,10 +50,11 @@ id, with the report item each shares:
 | 22 | MEDIUM | M8 | unit 9 §4, §5 | understates the routes into the false-accept state | S22 |
 | 23 | LOW | L4 | unit 7 §1, §3, AC4 | as id 9, from the failure-envelope lens | S23 |
 
-Every sibling unit builds first, as written. This unit then observes, over the tree they leave, the
-corrected form of each criterion the audit found could not pass or could not fail. It records each
-reading in its own acceptance ledger, corrects the false prose in the sibling specs, and narrows
-settings-merge's accepted stop to the two homes a static probe can see.
+Every sibling unit builds first, as written. This unit's spec-writer pass then corrects the false
+prose in the sibling specs and writes each one's revision line, because only that role writes spec
+files. Its build pass observes, over the tree they leave, the corrected form of each criterion the
+audit found could not pass or could not fail. It records each reading in its own acceptance ledger,
+and it narrows settings-merge's accepted stop to the two homes a static probe can see.
 
 ## 2. Scope (IN)
 
@@ -85,17 +88,19 @@ names its own id.
   `tools/govkit/selftest.py`, the one `check_outcome_states` definition and its two calls in
   `tools/govkit/matrix.py`, and lexicon's two check labels, byte for byte as at the base. Spec 9's
   revision line names this unit's AC7. Observed by AC7.
-- **S8** — id 8, L3. Spec 4 is corrected in place at three addresses: the kit-bump non-goal, its
-  hands-off to `TOOL-dRedressedBar-7`, and the §7 epoch sentence. Only `tools/hooks/format-guard.js`
+- **S8** — id 8, L3. Spec 4 is corrected in place at four addresses: the kit-bump non-goal, its
+  hands-off to `TOOL-dRedressedBar-7`, the §7 epoch sentence, and the §5 migration line, which says
+  the same false fact as "once unit 7 bumps the two kits". Only `tools/hooks/format-guard.js`
   ships and moves a version, for kit `agent-cap` (engine, `tools/hooks/kit.toml:87-90`).
   `tools/roles/adopt-roles.test.sh` is `project-owned` (`tools/roles/kit.toml:46-48`), outside
-  `EPOCH_ROLES` (`tools/govkit/govkit.py:12935`), so it moves no roles version. The hooks kit is
+  `EPOCH_ROLES` (`tools/govkit/govkit.py:12938`), so it moves no roles version. The hooks kit is
   named by its id, `agent-cap` (`tools/hooks/kit.toml:3`). Observed by AC8.
 - **S9** — id 9, L4. Spec 7 is corrected in place: §1's "the bytes units 1 to 6 move" and "the other
   six units", §4 "Why one unit"'s "the other six units", and AC4's "each kit that units 1 to 6
-  moved" name every unit ordered before it, 1 to 6, 8 and 9. Its Edges gain
-  `consumes-from TOOL-dRedressedBar-8` and `consumes-from TOOL-dRedressedBar-9`, and specs 8 and 9
-  each gain the mirroring `hands-off TOOL-dRedressedBar-7`, in the same pass. Observed by AC9.
+  moved" name every unit ordered before it, 1 to 6, 8, 9 and 20. Its Edges gain
+  `consumes-from TOOL-dRedressedBar-8` and `consumes-from TOOL-dRedressedBar-9`, beside the
+  `consumes-from TOOL-dRedressedBar-20` they already hold. Specs 8 and 9 each gain the mirroring
+  `hands-off TOOL-dRedressedBar-7` in the same spec-writer pass. Observed by AC9.
 - **S10** — id 10, M6. Unit 3's S5 non-goal is observed by a grep keyed on the fixture alone, so a
   call scoped with `--kits` still prints, and the observation is shown to red on a staged scope.
   Spec 3's revision line names this unit's AC10. Observed by AC10.
@@ -146,9 +151,11 @@ names its own id.
 - **S23** — id 23, L4. The failure-envelope lens's reading of S9's defect, with the skeptic's caveat
   that each new edge's description is verified when written. S9's two edges are written from the
   readings in §4, not copied from the report. Observed by AC9.
-- **S24** — The record. Each sibling spec the table names takes ONE rev bump in this pass, whose
-  revision line names every report id this unit closes in it. Every reading above is written to this
-  unit's acceptance ledger,
+- **S24** — The record, in two passes. Each sibling spec §4's table names took ONE rev bump in this
+  unit's spec-writer pass, `<s10>`, the commit that moved this spec to rev-5. Its revision line names
+  `TOOL-dRedressedBar-10` and every report id this unit closes in it. The build pass writes no spec
+  file but this one's status and date cells. Every reading above is written to this unit's
+  acceptance ledger,
   `memory/builds/dRedressedBar/build/2026-10-14-build-TOOL-dRedressedBar-10-1-acceptance-ledger.md`,
   carrying `**Serves:** journal TOOL-dRedressedBar-10`. Observed by AC19.
 
@@ -251,13 +258,15 @@ settings-merge.py finds the hook through `resolve_kit_dir("hooks", "agent-cap.js
 `.claude/settings.json` (`_load`, `:491-500`) and on a write `OSError` (`:507-539`).
 
 Unit 9's block refuses exit 2 only where `{prefix}/hooks/agent-cap.js` exists. Three routes reach a
-found hook with that path absent, and in each no agent-cap adopter runs to report the failure:
+found hook with that path absent, and in each no agent-cap adopter runs to report the failure. The
+`tools/govkit/govkit.py` lines in this section were re-read at `671f25c7`, after unit 20 moved every
+line past about 870 by three:
 
 | Route | Why agent-cap's adopter does not run | Cited |
 |---|---|---|
-| `apply --kits settings-merge` over a target already holding agent-cap | CONFIGURE runs only the selected kits | `tools/govkit/govkit.py:7740-7764` |
-| `update` gaining settings-merge where agent-cap is already claimed | the loop runs adopters only for `gained` entries | `tools/govkit/govkit.py:11104-11126` |
-| either verb, agent-cap homed elsewhere by `[kit.agent-cap] prefix` or a renamed directory | the receipt row finds it; the probe cannot read the receipt | `tools/govkit/govkit.py:1450-1456`, `tools/settings-merge.py:146-160` |
+| `apply --kits settings-merge` over a target already holding agent-cap | CONFIGURE runs only the selected kits | `tools/govkit/govkit.py:7743-7767` |
+| `update` gaining settings-merge where agent-cap is already claimed | the loop runs adopters only for `gained` entries | `tools/govkit/govkit.py:11107-11129` |
+| either verb, agent-cap homed elsewhere by `[kit.agent-cap] prefix` or a renamed directory | the receipt row finds it; the probe cannot read the receipt | `tools/govkit/govkit.py:1453-1459`, `tools/settings-merge.py:146-160` |
 
 The narrowing adds the resolver's second static home to the probe:
 
@@ -265,8 +274,9 @@ The narrowing adds the resolver's second static home to the probe:
 probe = { must_exist = "{prefix}/settings-merge.py", must_not_exist = ["{prefix}/hooks/agent-cap.js", "{prefix}/../hooks/agent-cap.js"] }
 ```
 
-`classify_outcome` already takes a list for either key (`tools/govkit/govkit.py:6313-6324`), and
-the matrix's agreement rule reads a list through `derive_probe_paths` (`tools/govkit/matrix.py:199-201`).
+`classify_outcome` already takes a list for either key (`tools/govkit/govkit.py:6316-6327`), and
+the matrix's agreement rule reads a list through `derive_probe_paths` (`tools/govkit/matrix.py:227-229`,
+where unit 9's helper moved it).
 No reader of the probe keys exists outside those two. With `prefix` at `tools`, the new term
 normalises to `hooks/agent-cap.js` at the target root, inside the target. With `prefix` at `.`, it
 resolves outside the target and reads absent there, which leaves the stop exactly as wide as unit 9's.
@@ -275,7 +285,7 @@ What still reads as an accepted stop: a hook the receipt alone locates, under ei
 `settings.json` that fails to parse or write. The verb exits 0 and prints `no-agent-cap-to-wire`.
 On the `update` route, a fragment the same run wires prints its own
 `REFUSED by settings-merge (exit 2)` line first (`run_fragment_merges`,
-`tools/govkit/govkit.py:5913-5917`), which names the parse failure without counting a problem.
+`tools/govkit/govkit.py:5916-5920`), which names the parse failure without counting a problem.
 Spec 9 §4 and §5 state it in those words, as an open false accept and not an accepted one, closed by
 `TOOL-dRedressedBar-11`'s receipt-reading probe term (§8 F1).
 
@@ -284,38 +294,42 @@ present, the hook present at the parent home only, rc 2, expected REFUSED. Its p
 typed: agent-cap's destination from `resolve_entry`, with settings-merge's `{prefix}` replaced by
 that prefix's parent.
 
-### The sibling rev bumps
+### The sibling rev bumps, a pass of their own
 
-Each of the nine sibling specs already carries, from this spec's writing, a `hands-off` line naming
-this unit. The pass adds one rev bump per spec it amends, with the revision line S24 states:
+No one role can write the sibling corrections and the product files in one commit. Under
+`.claude/roles.json`, only `gov-spec-writer` writes spec files, and only `gov-builder` writes product
+files. scratch-guard admits a builder's spec edit only where it moves the status and date cells of a
+spec its card routes (`tools/hooks/scratch-guard.js:91-99`). So the corrections are their own pass,
+M6's "a review's fixes folded in", made by this unit's spec writer before the build pass. That is
+`<s10>`, the commit that moved this spec to rev-5. Every target was CLOSED by then, so each took the
+correction as a records fix with its status unchanged.
 
-| Spec | Ids | What moves in it |
-|---|---|---|
-| 1 | 1, 2, 3, 11, 20, 21 | the revision line only |
-| 3 | 6, 10, 16 | §4 S5 paragraph |
-| 4 | 8, 13, 18 | §3 non-goal, Edges line, §7 sentence |
-| 5 | 14, 15 | §4 working-set paragraph |
-| 6 | 14 | §4, one sentence |
-| 7 | 9, 19, 23 | §1, §4 "Why one unit", AC4 wording, Edges |
-| 8 | 4, 5, 12, and S9's mirror | §6 sentence, Edges |
-| 9 | 7, 22, and S9's mirror | §4, §5, Edges |
+Each of the nine sibling specs already carried, from this spec's writing, a `hands-off` line naming
+this unit. `<s10>` added one rev bump per spec it amends, with the revision line S24 states:
 
-Spec 2 takes no bump from this pass, and spec 9's bump names no id 17. Report id 17 was closed in
-both specs before this unit builds, by spec 2's rev-3 and spec 9's rev-4, and S17 only observes it.
+| Spec | Ids | What moves in it | Rev at `<s10>` |
+|---|---|---|---|
+| 1 | 1, 2, 3, 11, 20, 21 | the revision line only | rev-3 |
+| 3 | 6, 10, 16 | §4 S5 paragraph | rev-4 |
+| 4 | 8, 13, 18 | §3 non-goal, Edges line, §5 migration line, §7 sentence | rev-3 |
+| 5 | 14, 15 | §4 working-set paragraph | rev-6 |
+| 6 | 14 | §4, one sentence | rev-3 |
+| 7 | 9, 19, 23 | §1, §4 "Why one unit", AC4 wording, Edges | rev-5 |
+| 8 | 4, 5, 12, and S9's mirror | §6 sentence, Edges | rev-3 |
+| 9 | 7, 22, and S9's mirror | §4, §5, Edges | rev-5 |
+
+Spec 2 takes no bump from this unit, and spec 9's bump names no id 17. Report id 17 was closed in
+both specs before this unit's passes, by spec 2's rev-3 and spec 9's rev-4, and S17 only observes it.
+
+The build pass then writes only the files below, and reads every corrected sentence at the tip.
 
 ### Files touched (estimate)
 
 - `tools/govkit/entries/settings-merge.kit.toml`
 - `tools/govkit/matrix.py`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-1.md`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-3.md`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-4.md`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-5.md`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-6.md`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-7.md`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-8.md`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-9.md`
 - `memory/builds/dRedressedBar/build/2026-10-14-build-TOOL-dRedressedBar-10-1-acceptance-ledger.md`
+
+The eight sibling specs are `<s10>`'s write set, not this pass's.
 
 ### Alternatives rejected
 
@@ -325,6 +339,8 @@ both specs before this unit builds, by spec 2's rev-3 and spec 9's rev-4, and S1
 | Rewrite each faulted criterion in place after its unit closes | The sibling's ledger answered the criterion as written; a rewrite leaves the ledger answering text that no longer exists | Rejected; the revision line points here instead |
 | Two batch units split by write set | S7, S9 and S22 all write spec 9, so no split leaves two disjoint write sets (M6 clause 1) | Rejected |
 | S22 by pricing alone, §8 F1 option (b) | It leaves a false accept a static probe can see, at the resolver's own second home, against the charter's deny-by-default rule | Recommended against in F1 |
+| The sibling corrections in the build pass's own commit, as rev-4 wrote it | scratch-guard refuses a builder's edit to a spec other than its own status and date cells, and the spec writer writes no product file, so no role can make that commit | Refused by the hook; the builder's divergence |
+| A second unit for the sibling corrections | M4 batches these minors into ONE unit, and M6 already names a spec-writer pass as a pass, so a second id adds a roster row for no new mechanism | Rejected |
 
 ## 5. Production-readiness checklist
 
@@ -336,8 +352,10 @@ both specs before this unit builds, by spec 2's rev-3 and spec 9's rev-4, and S1
   verb, so a malformed `settings.json` is reported as a problem instead of an accepted stop.
 - observability — Unchanged output shapes. A refused stop prints the existing
   `no declared outcome accepts that` and `adopter exit 2` lines.
-- risks — The pass edits eight CLOSED specs. Each edit is one rev bump with a revision line, and no
-  criterion text moves, so no ledger is contradicted. A narrowed probe that also matched the
+- risks — The spec-writer pass `<s10>` edits eight CLOSED specs. Each edit is one rev bump with a
+  revision line, and no criterion text moves, so no ledger is contradicted. A build pass that
+  started before `<s10>` exists would read the uncorrected siblings, so the builder returns that to
+  the main loop before any write. A narrowed probe that also matched the
   no-hook state would red unit 9's `[dRB-9]` arm, and AC16's first row refuses that.
 - testing — AC1 to AC19 are direct probes, greps and scratch fixtures under `%TEMP%`, each seconds
   long except AC17. The one moved arm is declared in §7.
@@ -346,8 +364,10 @@ both specs before this unit builds, by spec 2's rev-3 and spec 9's rev-4, and S1
 
 ## 6. Acceptance criteria
 
-`<pN>` is the commit of unit N's build pass, as unit N's acceptance ledger names it. Every command
-runs from the worktree root.
+`<pN>` is the commit of unit N's build pass, as unit N's acceptance ledger names it. `<s10>` is the
+commit of this unit's spec-writer pass, the one that added this spec's rev-5 line, found with
+`git log -1 --format=%H -S'- rev-5 · 2026-10-14' -- memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-10.md`.
+Every command runs from the worktree root.
 
 - **AC1** — When `grep -o "build_gh33_writer [A-Z]-tB-[0-9]'" tools/workflows/unattended-build.test.sh | wc -l`
   runs over the tip, it prints 0, and the same command with a space before the quote prints 14.
@@ -462,11 +482,14 @@ runs from the worktree root.
   runs, it prints nothing. Spec 9's §4 "What it does not check" names the three routes of §4's table,
   and its §5 security line names the receipt-homed residual and `TOOL-dRedressedBar-11`.
   Red when: the envelope still claims one route, or §5 still says the failure is always reported.
-- **AC19** — When `git diff <p10>~1 <p10> -- memory/builds/dRedressedBar/spec/` runs at this unit's
-  pass commit, each of specs 1 and 3 to 9 shows one header rev change and one new revision line, and
-  that line names every report id §4's table assigns the spec. Spec 2 shows no change. The ledger file S24 names exists and
-  carries `**Serves:** journal TOOL-dRedressedBar-10`.
-  Red when: a spec takes no bump, two bumps, or a revision line missing one of its ids.
+- **AC19** — When `git diff <s10>~1 <s10> -- memory/builds/dRedressedBar/spec/` runs, each of specs 1
+  and 3 to 9 shows one header rev change, to the rev §4's table gives it, and one new revision line.
+  That line names `TOOL-dRedressedBar-10` and every report id §4's table assigns the spec. Spec 2
+  shows no change. `git diff --name-only <p10>~1 <p10> -- memory/builds/dRedressedBar/spec/` names
+  no file but this spec. The ledger file S24 names exists and carries
+  `**Serves:** journal TOOL-dRedressedBar-10`.
+  Red when: a spec takes no bump, two bumps, or a revision line missing one of its ids, or the build
+  pass writes a sibling spec.
 
 ## 7. Gates
 
@@ -476,7 +499,8 @@ New arm: tools/govkit/matrix.py · covers AC16 · stage unit 9's single-term blo
 
 The main loop runs these once, at the close. `govkit selftest` reads unit 9's `[dRB-9]` arm and the
 three arms unit 3 leaves unscoped over the narrowed block; their fixtures hold no hook at either
-home, so they stay green. `memory hygiene` grades the eight rev bumps and their revision lines.
+home, so they stay green. `memory hygiene` grades the ledger, and the eight rev bumps and their
+revision lines at `<s10>`.
 
 ## 8. Open questions
 
@@ -520,6 +544,19 @@ home, so they stay green. `memory hygiene` grades the eight rev bumps and their 
   touched, spec 9's row drops id 17, and the Alternatives row names S9 in S17's place. AC19, §5 risks
   and §7 count eight bumps. The Edges lines to units 2 and 7 no longer read the map after unit 7's
   regen.
+- rev-5 · 2026-10-14 · §1 · S8 · S9 · S24 · §4 · §5 · AC19 · §7 · the builder's divergence
+  (`prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md`): no role can make the one commit
+  rev-4's AC19 read. Only `gov-spec-writer` writes spec files, and scratch-guard admits a builder's
+  spec edit only to its own spec's status and date cells (`tools/hooks/scratch-guard.js:91-99`). The
+  sibling corrections moved to this unit's spec-writer pass, `<s10>`, which applied them to specs 1
+  and 3 to 9 with one rev bump each, CLOSED status unchanged. S24, §1, §4 "The sibling rev bumps, a
+  pass of their own" with its rev column, §4 Files touched, §5 risks and §7 follow, and the build
+  pass writes only the two product files and the ledger. AC19 reads `<s10>`, not `<p10>`, and also
+  observes that the build pass writes no sibling spec. S8 and §4's table gain spec 4's §5 migration
+  line, the same false fact. S9's population gains unit 20, also ordered before unit 7. §4's
+  `tools/govkit/govkit.py` cites and S8's `EPOCH_ROLES` cite move by +3, read at `671f25c7` after
+  unit 20, and `derive_probe_paths` is cited at `tools/govkit/matrix.py:227-229` after unit 9.
+  Alternatives rejected gains two rows. No product design or other criterion moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-3 — the govkit selftest's 56 reds, traced to four root causes and re-armed
 
-**Status:** CLOSED · rev-3 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 2 · ratified 2026-10-14
+**Status:** CLOSED · rev-4 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 2 · ratified 2026-10-14
 
 <!-- gen:spec-records -->
 
@@ -153,15 +153,11 @@ the failure is `settings-merge`'s adopter alone, so S5 leaves them unscoped as u
 paired halves at lines 6886 and 7064 stay unscoped beside their negatives, so each pair still differs
 in one input only, the dirt.
 
-**S5, the exposed defect, fixed by unit 9.** `settings-merge`
-(`tools/govkit/entries/settings-merge.kit.toml`) and `agent-cap` (`tools/hooks/kit.toml:102-108`)
-share one adopter argv, `python {prefix}/settings-merge.py`, which wires the built-in `agent-cap.js`
-entry and refuses when that file is absent (`tools/settings-merge.py:1040-1052`). `apply` runs a
-requirement-complete selection, so the two always arrive together there. `update`'s gaining drops
-`agent-cap` alone for its unmet requirement and keeps `settings-merge`. So any receipt that does not
-claim `kickoff-manifest` fails every writing update. `TOOL-dRedressedBar-9` fixes that, by a
-mechanism its own spec chooses. This unit changes nothing for S5. It holds the three arms' calls as
-they are and observes them over unit 9's fix.
+**S5, the exposed defect, fixed by unit 9.** The three arms S5 holds fail on the defect
+`TOOL-dRedressedBar-9` fixes. Its mechanism, the routes into it and the fix are stated once, in that
+spec's §4, "The defect, and where it sits", and this spec points there rather than restating them.
+This unit changes nothing for S5. It holds the three arms' calls as they are and observes them over
+unit 9's fix.
 UNVERIFIED: that the three arms read green once unit 9's fix lands. At the base the log shows only
 the `settings-merge` adopter failing those updates, and a further red behind it, such as the gained
 `run-gates` to HEAD, would surface only after that failure clears. A red there is new evidence for
@@ -275,6 +271,16 @@ New arm: tools/govkit/selftest.py · covers AC5 · run the suite over a tree wit
 - rev-3 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
   spec audit's minors were promoted into, for report ids 6, 10 and 16. No scope, design or criterion
   moves.
+- rev-4 · 2026-10-14 · §4 · AC2 · AC5 · a records fix for TOOL-dRedressedBar-10, closing round-1
+  report ids 6, 10 and 16, written by that unit's spec-writer pass. The status stays CLOSED, and no
+  criterion text moves. Id 16: §4's S5 paragraph restated unit 9's defect, and its claim that
+  `apply` lands the two kits as a pair contradicted the `apply --kits settings-merge` route unit 9
+  measured. The paragraph now points at `TOOL-dRedressedBar-9` §4, "The defect, and where it
+  sits", as the one owner. Id 6: AC2 drives `apply` over a target and reads no line of S2's fixture edit in
+  `tools/govkit/selftest.py`. TOOL-dRedressedBar-10's AC6 reads that edit directly. Id 10: AC5's
+  guard regex ends `, "--write"\)`, so it cannot match a call scoped with `--kits` and its "no line
+  carries `--kits`" half cannot fail. TOOL-dRedressedBar-10's AC10 keys on the fixture alone and
+  shows the guard red on a staged scope.
 
 ## 9. Reuse audit
 

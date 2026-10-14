@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-6 — the roles adopter's two exit-1 refusals, armed in its own suite
 
-**Status:** CLOSED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 4
+**Status:** CLOSED · rev-3 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -63,6 +63,11 @@ roles adopter as fully armed and each arm is seen red on a staged break of the a
   unit leaves in that file.
 
 ## 4. Design
+
+Every `tools/roles/adopt-roles.test.sh` number below, `:100-107` and `:63` among them, is an
+`ebce889c` number. Units 1 and 4 insert lines into that file before this unit starts: unit 1's
+probe stop after arm 1, and unit 4's `WORKFLOW_RUNS_DIR` comment and constant in `A9_WRITE`. The
+builder re-maps each cited site by content with `grep -n` at unit start and writes no new offset.
 
 ### What the leg reads
 
@@ -208,6 +213,10 @@ none
 - rev-1 · 2026-10-14 · initial draft, from item 6 of the build brief.
 - rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
   spec audit's minors were promoted into, for report id 14. No scope, design or criterion moves.
+- rev-3 · 2026-10-14 · §4 · a records fix for TOOL-dRedressedBar-10, closing round-1 report id 14,
+  written by that unit's spec-writer pass. The status stays CLOSED. §4 opens with the sentence
+  stating that its `tools/roles/adopt-roles.test.sh` cites are `ebce889c` numbers, which units 1 and
+  4 shift, re-mapped by content at unit start. No scope, design or criterion moves.
 
 ## 9. Reuse audit
 

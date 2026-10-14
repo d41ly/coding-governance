@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-4 — the `workflows` homonyms the install-prefix ban reads as a kit path, held in a named constant
 
-**Status:** CLOSED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -40,16 +40,20 @@ literal there and the leg goes green without a waiver, a predicate change or a p
   `tools/check-install-prefix.test.sh:149` requires to exist, so touching it would red that census.
 - No change to what `readJournalAgents` reads, refuses or returns, and no change to arm 9's
   assertions.
-- No kit version bump. Both touched files ship: `format-guard.js` from the hooks kit
-  (tools/hooks/kit.toml:88) and `adopt-roles.test.sh` from the roles kit (tools/roles/kit.toml:47).
-  The bump is unit 7's, measured over the finished tree.
+- No kit version bump. Of the two touched files, only `tools/hooks/format-guard.js` ships and moves
+  a version, for kit `agent-cap` (engine, `tools/hooks/kit.toml:87-90`; the id at
+  `tools/hooks/kit.toml:3`). `tools/roles/adopt-roles.test.sh` is withheld:
+  `project-owned` at `tools/roles/kit.toml:47-48`, a role outside those the version epoch measures
+  (`EPOCH_ROLES`, `tools/govkit/govkit.py:12938`), so it moves no version of the `roles` entry. The
+  bump is unit 7's, measured over the finished tree.
 - No conversion of the fork idioms in `tools/roles/adopt-roles.test.sh` (unit 5's) and no new arm in
   it (unit 6's).
 
 ### Edges
 
-- **hands-off** `TOOL-dRedressedBar-7` — the hooks and roles kit version bumps for the shipped bytes
-  this unit moves, which that unit derives by measurement over the tree the build leaves.
+- **hands-off** `TOOL-dRedressedBar-7` — the `agent-cap` kit's version bump for
+  `tools/hooks/format-guard.js`, the one shipped file this unit moves, which that unit derives by
+  measurement over the tree the build leaves.
 - **hands-off** `TOOL-dRedressedBar-10` — the correction of three sentences the round-1 spec audit
   found false (report ids 8, 13 and 18): the kit-bump non-goal, the hands-off line above and §7's
   epoch sentence. They count `adopt-roles.test.sh` among the `roles` entry's shipped files, and that
@@ -168,8 +172,9 @@ a script of this spec writer's, not the gate.
   extracted arm-9 fixture writer. At the close, the `format-guard self-test` exercises the same read
   through the hook (its `journal("workflows/wf_t-1", …)` scenario, tools/hooks/format-guard.test.sh:357).
   The `roles adopter self-test` exercises arm 9 end to end.
-- migration — N/A — no data, conf or receipt shape changes. An adopter receives the new bytes on
-  its next `govkit apply` once unit 7 bumps the two kits.
+- migration — N/A — no data, conf or receipt shape changes. An adopter receives the new
+  `format-guard.js` on its next `govkit apply` once unit 7 bumps the `agent-cap` kit. The edited
+  suite is withheld from every payload, so no adopter receives it.
 - user docs — N/A — no behaviour changes. `help/` has no page naming the journal path (`git grep -l
   journal -- help` prints nothing). `tools/hooks/README.md:462` describes the path, and that path
   is unchanged.
@@ -220,8 +225,8 @@ the suites that run both edited sites end to end. The main loop observes them on
 At the close, `install-prefix (shipped surface)` reads `GATE ok` with its two logged hits gone and
 no other hit added. That is this unit's own red leg, and the build brief's acceptance names it.
 `kit epoch (shipped bytes move, the version moves)` and `kit version markers` read red at this
-unit's tip by construction, until unit 7 bumps the hooks and roles kits. They are judged at the
-close, not here. `foreign-prefix parity (every self-test at three prefixes)` reds at `ebce889c` on
+unit's tip by construction, until unit 7 bumps the `agent-cap` kit, the one kit whose shipped bytes
+this unit moves. They are judged at the close, not here. `foreign-prefix parity (every self-test at three prefixes)` reds at `ebce889c` on
 the roles adopter's missing probe stop, which is unit 1's fix. Unit 1 is ordered before this unit.
 
 This unit adds no suite arm and moves none. The ban it satisfies is an existing leg that was already
@@ -238,6 +243,13 @@ none
 - rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
   spec audit's minors were promoted into, for report ids 8, 13 and 18. No scope, design or criterion
   moves.
+- rev-3 · 2026-10-14 · §3 · §5 · §7 · a records fix for TOOL-dRedressedBar-10, closing round-1 report
+  ids 8, 13 and 18, written by that unit's spec-writer pass. The status stays CLOSED. Four sentences
+  counted `tools/roles/adopt-roles.test.sh` as a shipped file whose bytes move a version, and each
+  is corrected in place: the kit-bump non-goal, the hands-off to `TOOL-dRedressedBar-7`, the §7
+  epoch sentence and the §5 migration line. That suite is `project-owned`
+  (`tools/roles/kit.toml:47-48`), outside `EPOCH_ROLES`, so only `agent-cap` moves, for
+  `tools/hooks/format-guard.js`. No scope, design or criterion moves.
 
 ## 10. Reuse audit
 

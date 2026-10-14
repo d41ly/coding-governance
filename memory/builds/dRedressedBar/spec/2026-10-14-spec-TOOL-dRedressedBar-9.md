@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-9 — settings-merge's adopter exit with no agent-cap hook declared an accepted stop, so a gaining update completes
 
-**Status:** CLOSED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
+**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -89,6 +89,11 @@ completes, and so does `apply --kits settings-merge`, which fails the same way t
   map, corrects §4 and §5, and, by its F1, narrows this unit's code-2 block with a second
   `must_not_exist` term and adds one row to settings-merge's `check_outcome_states` call. It also
   writes the hands-off to `TOOL-dRedressedBar-7` these Edges lack.
+- **hands-off** `TOOL-dRedressedBar-7` — the tree this unit leaves, which that unit measures. The
+  three product files sit under `{prefix}/govkit`, which the registry exempts
+  (`tools/govkit/registry.toml:295-297`), so they leave that unit no version to bump. The
+  `memory/map/generated/symbols.json` this pass commits leaves that unit's `regen.py --write` a
+  fresh map.
 - **hands-off** `TOOL-dRedressedBar-17` — the `[dRB-9]` update-gaining block, which that unit
   extends with a case gaining both agent-cap and settings-merge at a per-kit agent-cap prefix, so
   `update`'s gained loop is observed resolving agent-cap's `[adopt] via` (report id 13). Also §4's
@@ -175,12 +180,24 @@ settings-merge's exit is ever read through the new block.
 
 ### What it does not check
 
-The probe reads two paths and cannot see the receipt. A target whose hooks kit sits where the probe
-does not look, a renamed home the receipt records or the prefix's parent, has its hook found by
-settings-merge.py's resolver. If that target's `.claude/settings.json` then fails to parse, `run`
-exits 2 and the probe reads the stop as accepted. That state is reachable only by `apply`, where
-agent-cap's own adopter runs the same argv under its own descriptor and fails on the same file. So
-the failure is still reported, by the kit whose file it is.
+The probe reads static paths and cannot see the receipt. settings-merge.py's resolver finds the hook
+through the receipt first, then at `<here>/hooks`, then at `<here>/../hooks`
+(`tools/settings-merge.py:78-108`). Where it finds the hook, `run` still exits 2 on a
+`.claude/settings.json` that fails to parse or is not an object (`_load`, `:491-500`) and on a write
+`OSError` (`:507-539`). This block refuses that exit only where `{prefix}/hooks/agent-cap.js`
+exists. Three routes reach a found hook with that path absent, and in each no agent-cap adopter runs
+to report the failure, so the probe reads the stop as accepted:
+
+| Route | Why agent-cap's adopter does not run | Cited at `671f25c7` |
+|---|---|---|
+| `apply --kits settings-merge` over a target already holding agent-cap | CONFIGURE runs only the selected kits | `tools/govkit/govkit.py:7743-7767` |
+| `update` gaining settings-merge where agent-cap is already claimed | the gained loop runs adopters only for gained entries | `tools/govkit/govkit.py:11107-11129` |
+| either verb, agent-cap homed elsewhere by `[kit.agent-cap] prefix` or a renamed directory | the receipt row finds it, and the probe cannot read the receipt | `tools/govkit/govkit.py:1453-1459`, `tools/settings-merge.py:146-160` |
+
+`TOOL-dRedressedBar-10` narrows this block with a second `must_not_exist` term,
+`{prefix}/../hooks/agent-cap.js`, the resolver's other static home. What still reads as an accepted
+stop after it is a hook the receipt alone locates, under either verb. That is an open false accept,
+not an accepted one, and `TOOL-dRedressedBar-11`'s receipt-reading probe term closes it.
 
 ### What an adopter sees change
 
@@ -286,7 +303,11 @@ pick is M3's: the most feature-rich survivor after the vetoes.
 - security — No write surface widens. The accepted stop writes nothing: the adopter refused before
   touching `.claude/settings.json`, and no command naming a missing file is wired. agent-cap's own
   adopter keeps the bare refusal, so a target that selects the fan-out guard and lacks its file still
-  fails. §4 names the one false-accept state and the kit that still reports it.
+  fails. §4 "What it does not check" names three routes into a false accept: settings-merge exits 2
+  on a `.claude/settings.json` it cannot parse or write, the hook sits where this probe does not
+  look, and no agent-cap adopter runs in that run to report it. `TOOL-dRedressedBar-10` refuses the
+  resolver's second static home. The receipt-homed residual stays an open false accept, closed by
+  `TOOL-dRedressedBar-11`'s receipt-reading probe term.
 - perf / scale — N/A — one descriptor block; the probe is two `exists` calls on a path the run
   already resolved.
 - error / empty / loading states — An exit 2 is accepted only with the hook absent and the adopter
@@ -402,6 +423,15 @@ none
   committed map. §7 names `codebase-map coverage + freshness` and `recall floor`. The Edges line to
   `TOOL-dRedressedBar-10` no longer defers the map to unit 7's regen: report id 17's half on
   this spec is closed here.
+- rev-5 · 2026-10-14 · §3 · §4 · §5 · S5 · S6 · a records fix for TOOL-dRedressedBar-10, closing
+  round-1 report ids 7 and 22, written by that unit's spec-writer pass. The status stays CLOSED, and
+  no criterion text moves. Id 22: §4 "What it does not check" claimed one route into the false
+  accept, reached only by `apply`. It now names the three routes, the narrowing
+  `TOOL-dRedressedBar-10` adds and the receipt-homed residual as open, closed by
+  `TOOL-dRedressedBar-11`, and §5 security follows. Id 7: S5 and S6 name AC2 and AC4 as their
+  observations, and neither criterion reads `tools/govkit/selftest.py` or `tools/govkit/matrix.py`.
+  TOOL-dRedressedBar-10's AC7 reads both files directly. Edges gain the hands-off to
+  `TOOL-dRedressedBar-7`, the mirror of that spec's new `consumes-from`.
 
 ## 10. Reuse audit
 

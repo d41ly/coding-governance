@@ -1,11 +1,12 @@
 # TOOL-dRedressedBar-19 — the units-16-18 spec audit's 19 mediums and 22 lows, batched: the profiler's census, path, launch, turnstile, redaction and leg-declaration gaps closed, the receipt sidecar made atomic, and specs 12 and 14 to 18 corrected
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 14
+**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md) | research | TOOL-dRedressedBar-10 TOOL-dRedressedBar-13 TOOL-dRedressedBar-17 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-19-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-19-2-revision.md) | research | TOOL-dRedressedBar-10 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-19-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-19-3-spec-writer.md) | journal | — |
 
@@ -69,10 +70,11 @@ It closes these findings, by report id, each with the report item it shares:
 
 Ids 2, 32 and 37 were re-graded by the skeptic, and the skeptic's grade binds. Ids 19, 29 and 38
 had their fixes judged UNSOUND, and S19, S29 and S38 take the skeptic's corrected fix. Ids 3 and 28
-were refuted by the audit and are not findings. Units 12 to 18 build first, as written. This unit
-then changes the code sites §4 lists so they hold what the corrected specs say, observes the
-corrected form of each faulted criterion over the tree they leave, and corrects the false prose in
-specs 12, 14, 15, 16, 17 and 18.
+were refuted by the audit and are not findings. Units 12 to 18 build first, as written. Once they
+are CLOSED, this unit's spec-writer pass corrects the false prose in specs 12, 14, 15, 16, 17 and 18
+and writes their revision lines, because only that role writes spec files. Its build pass then
+changes the code sites §4 lists so they hold what the corrected specs say, and observes the
+corrected form of each faulted criterion over the tree they leave.
 
 ## 2. Scope (IN)
 
@@ -276,9 +278,11 @@ record. Items that share a report item share its observation, and each still nam
   proves: a carried row whose kit the receipt claims names a claimed kit. Its §3 gains the orphan
   case as an accepted gap: a row whose kit the receipt no longer claims is carried too, because the
   carry is keyed on the selection, which that non-goal keeps. Observed by AC43.
-- **S44** — The record. Specs 12, 14, 15, 16, 17 and 18 each take ONE rev bump in this pass, and
-  each revision line names every report id §4's table assigns that spec. Every reading below goes
-  to this unit's acceptance ledger under `memory/builds/dRedressedBar/build/`, carrying
+- **S44** — The record, in two passes. Specs 12, 14, 15, 16, 17 and 18 each take ONE rev bump in
+  this unit's spec-writer pass, `<w19>`, which runs once units 12 to 18 are CLOSED and before the
+  build pass. Each revision line names `TOOL-dRedressedBar-19` and every report id §4's table
+  assigns that spec. The build pass and `<p19m>` write no spec file but this one's status and date
+  cells. Every reading below goes to this unit's acceptance ledger under `memory/builds/dRedressedBar/build/`, carrying
   `**Serves:** journal TOOL-dRedressedBar-19`. Observed by AC44.
 
 ## 3. Non-goals (OUT)
@@ -459,6 +463,17 @@ appears at `:12153` in a tuple of strings, which the arm's derivation rule does 
 A corrected design paragraph carries `TOOL-dRedressedBar-19` and one sentence naming the change,
 and this spec's §2 and §4 hold the design.
 
+No one role can write these corrections and the product files in one commit. Under
+`.claude/roles.json`, only `gov-spec-writer` writes spec files and only `gov-builder` writes
+product files, and scratch-guard admits a builder's spec edit only where it moves the status and
+date cells of a spec its card routes (`tools/hooks/scratch-guard.js:91-99`). So the rows below are
+this unit's spec-writer pass, `<w19>`, M6's "a review's fixes folded in". The main loop dispatches
+it once units 12 to 18 are CLOSED, with this table as its brief, and before the build pass. Each
+target then takes its correction as a records fix with its status unchanged. It does not run
+earlier: specs 12 and 14 to 18 are unbuilt until then, and folding into them before they build is
+the first rejected alternative below. A build pass that finds no `<w19>` returns that to the main
+loop before any write.
+
 | Spec | Ids | What moves |
 |---|---|---|
 | 12 | 31 | S2 gains the inline note; revision line |
@@ -510,13 +525,9 @@ on 2026-10-14.
 - `memory/map/features/run-gates.md`
 - `memory/map/generated/`
 - `memory/guides/SESSION-KICKOFF.md`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-12.md`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-14.md`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-15.md`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-16.md`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-17.md`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-18.md`
 - `memory/builds/dRedressedBar/build/`
+
+Specs 12 and 14 to 18 are `<w19>`'s write set, not the build pass's.
 
 ### Alternatives rejected
 
@@ -530,6 +541,7 @@ on 2026-10-14.
 | Id 38 by the finding's own fix, "a scratch still holding raw files" | a profile running at the same moment matches too, and its live captures would be deleted (the skeptic's refutation) | Rejected; S38 proves the owner dead |
 | Id 11 by refusing the whole run on an unconvertible turnstile key | the job readings stay true without the turnstile, and a refused read already sets every reading aside | Rejected; S11 refuses the run only for the scratch dir |
 | Id 41 by begin and end markers | they bind a layout the `[dRB-15]` checks may interleave with, where a label filter reads each check wherever it sits | Rejected; S41 reads by label |
+| The spec corrections in the build pass's own commit, as rev-2 wrote it | scratch-guard refuses a builder's edit to another spec, and the spec writer writes no product file, so no role can make that commit (unit 10's divergence, `prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md`) | Refused by the hook |
 
 ## 5. Production-readiness checklist
 
@@ -565,7 +577,9 @@ on 2026-10-14.
 AC<n> observes S<n>, so the numbering skips 3 and 28, and S26, S33, S24 and S31 are observed
 by AC1, AC10, AC7 and AC31. `<pN>` is the commit of unit N's build pass, as unit N's
 acceptance ledger names it. `<p19>` is this unit's product commit and `<p19m>` its manifest
-re-stamp commit. `<ml>` is `python tools/run-gates/measure_legs.py`, `<fx>` is
+re-stamp commit. `<w19>` is the commit of this unit's spec-writer pass, which §4 "What this unit
+corrects in each spec" describes; its subject names `TOOL-dRedressedBar-19`, and this unit's
+ledger names it. `<ml>` is `python tools/run-gates/measure_legs.py`, `<fx>` is
 `tools/run-gates/fixtures/measure-legs`, `<o>` is a fresh dir under `%TEMP%`, and `<r>` is the
 run dir the tool prints. `<sN>` is
 `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-N.md`. "Joined" means
@@ -771,11 +785,14 @@ worktree root on node d.
 - **AC43** — Spec 16's §4 cut, joined, carries no `so the carried row names a claimed kit`, and its
   §3 cut carries `orphan`.
   Red when: the sentence stands, as over `87f10494`.
-- **AC44** — `git diff <p19>~1 <p19> -- memory/builds/dRedressedBar/spec/` shows specs 12, 14, 15,
+- **AC44** — `git diff <w19>~1 <w19> -- memory/builds/dRedressedBar/spec/` shows specs 12, 14, 15,
   16, 17 and 18 each with one header rev change and one new revision line, and each line names
-  every report id §4's table assigns that spec. The ledger S44 names exists and carries
+  `TOOL-dRedressedBar-19` and every report id §4's table assigns that spec. Each of the six specs
+  carries a CLOSED header at `<w19>~1`. `git diff --name-only <p19>~1 <p19> -- memory/builds/dRedressedBar/spec/`
+  and the same over `<p19m>` name no file but this spec. The ledger S44 names exists and carries
   `**Serves:** journal TOOL-dRedressedBar-19`.
-  Red when: a spec takes no bump, two bumps, or a revision line missing one of its ids.
+  Red when: a spec takes no bump, two bumps, or a revision line missing one of its ids, a target was
+  folded before it closed, or a build-pass commit writes another spec.
 
 ## 7. Gates
 
@@ -813,6 +830,17 @@ none
   the criterion, which carries its `Red when:` line, but the §6 preamble, whose second line opened
   with `AC10,` at column 0 and so was read as a bullet with no clause: the preamble is rewrapped
   so no line opens with a label. No scope, design, criterion or order moves.
+- rev-3 · 2026-10-14 · §1 · S44 · §4 · AC44 · unit 10's builder divergence, applied here
+  (`prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md`): no role can make a build-pass
+  commit that also edits another spec, because scratch-guard admits a builder's spec edit only to
+  its own status and date cells (`tools/hooks/scratch-guard.js:91-99`). The moved items: S44's six
+  rev bumps, and the spec halves of S1, S2, S4 to S9, S13 to S23, S27, S30 to S32, S35, S38 and S40
+  to S43, are now this unit's spec-writer pass `<w19>`, dispatched once units 12 to 18 are CLOSED
+  and before the build pass. They are not folded now, because those six specs are unbuilt and the
+  first rejected alternative still holds. §4 Files touched lists product files, the manifest and the
+  ledger only. AC44 reads `<w19>` in place of `<p19>` and observes that neither build-pass commit
+  writes another spec. Alternatives rejected gains one row. No product design or other criterion
+  moves.
 
 ## 10. Reuse audit
 

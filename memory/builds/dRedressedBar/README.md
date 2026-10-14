@@ -126,36 +126,36 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 20 unit(s) · node d · opened 2026-10-13 · streams tooling
+**Build status:** INPROGRESS · 20 unit(s) · node d · opened 2026-10-13 · streams tooling
 ids TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13
 ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dRedressedBar-1 — stale suite fixtures re-armed against the code the bar-less landings moved](spec/2026-10-14-spec-TOOL-dRedressedBar-1.md) | 1 | 1 | CLOSED | rev-2 | 2026-10-14 |
+| [TOOL-dRedressedBar-1 — stale suite fixtures re-armed against the code the bar-less landings moved](spec/2026-10-14-spec-TOOL-dRedressedBar-1.md) | 1 | 1 | CLOSED | rev-3 | 2026-10-14 |
 | [TOOL-dRedressedBar-2 — the one verb offender over the lexicon pin, renamed to a declared verb](spec/2026-10-14-spec-TOOL-dRedressedBar-2.md) | 1 | 2 | CLOSED | rev-3 | 2026-10-14 |
-| [TOOL-dRedressedBar-8 — arm 11g AC14 bounded, and its FIFO server kept alive through MSYS's failed opens and broken pipes](spec/2026-10-14-spec-TOOL-dRedressedBar-8.md) | 1 | 1 | CLOSED | rev-2 | 2026-10-14 |
-| [TOOL-dRedressedBar-9 — settings-merge's adopter exit with no agent-cap hook declared an accepted stop, so a gaining update completes](spec/2026-10-14-spec-TOOL-dRedressedBar-9.md) | 1 | 2 | CLOSED | rev-4 | 2026-10-14 |
-| [TOOL-dRedressedBar-3 — the govkit selftest's 56 reds, traced to four root causes and re-armed](spec/2026-10-14-spec-TOOL-dRedressedBar-3.md) | 2 | 1 | CLOSED | rev-3 | 2026-10-14 |
-| [TOOL-dRedressedBar-4 — the `workflows` homonyms the install-prefix ban reads as a kit path, held in a named constant](spec/2026-10-14-spec-TOOL-dRedressedBar-4.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-14 |
-| [TOOL-dRedressedBar-5 — fork idioms past the spawn-idiom registry, converted to their no-fork forms](spec/2026-10-14-spec-TOOL-dRedressedBar-5.md) | 3 | 2 | CLOSED | rev-5 | 2026-10-14 |
+| [TOOL-dRedressedBar-8 — arm 11g AC14 bounded, and its FIFO server kept alive through MSYS's failed opens and broken pipes](spec/2026-10-14-spec-TOOL-dRedressedBar-8.md) | 1 | 1 | CLOSED | rev-3 | 2026-10-14 |
+| [TOOL-dRedressedBar-9 — settings-merge's adopter exit with no agent-cap hook declared an accepted stop, so a gaining update completes](spec/2026-10-14-spec-TOOL-dRedressedBar-9.md) | 1 | 2 | CLOSED | rev-5 | 2026-10-14 |
+| [TOOL-dRedressedBar-3 — the govkit selftest's 56 reds, traced to four root causes and re-armed](spec/2026-10-14-spec-TOOL-dRedressedBar-3.md) | 2 | 1 | CLOSED | rev-4 | 2026-10-14 |
+| [TOOL-dRedressedBar-4 — the `workflows` homonyms the install-prefix ban reads as a kit path, held in a named constant](spec/2026-10-14-spec-TOOL-dRedressedBar-4.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-14 |
+| [TOOL-dRedressedBar-5 — fork idioms past the spawn-idiom registry, converted to their no-fork forms](spec/2026-10-14-spec-TOOL-dRedressedBar-5.md) | 3 | 2 | CLOSED | rev-6 | 2026-10-14 |
 | [TOOL-dRedressedBar-20 — govkit's carrier writer counts an entry's version pattern only inside that entry's own basis, so a mint never writes another kit's file](spec/2026-10-14-spec-TOOL-dRedressedBar-20.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-14 |
-| [TOOL-dRedressedBar-6 — the roles adopter's two exit-1 refusals, armed in its own suite](spec/2026-10-14-spec-TOOL-dRedressedBar-6.md) | 4 | 1 | CLOSED | rev-2 | 2026-10-14 |
-| [TOOL-dRedressedBar-7 — records, the regenerated index and the kit versions, measured over the fixed tree](spec/2026-10-14-spec-TOOL-dRedressedBar-7.md) | 5 | 2 | CLOSED | rev-4 | 2026-10-14 |
-| [TOOL-dRedressedBar-10 — the round-1 spec audit's 12 mediums and 11 lows, batched: each criterion observed in a form that can pass and fail, each false sentence corrected, and settings-merge's accepted stop narrowed](spec/2026-10-14-spec-TOOL-dRedressedBar-10.md) | 6 | 2 | SPECCED | rev-4 | 2026-10-14 |
+| [TOOL-dRedressedBar-6 — the roles adopter's two exit-1 refusals, armed in its own suite](spec/2026-10-14-spec-TOOL-dRedressedBar-6.md) | 4 | 1 | CLOSED | rev-3 | 2026-10-14 |
+| [TOOL-dRedressedBar-7 — records, the regenerated index and the kit versions, measured over the fixed tree](spec/2026-10-14-spec-TOOL-dRedressedBar-7.md) | 5 | 2 | CLOSED | rev-5 | 2026-10-14 |
+| [TOOL-dRedressedBar-10 — the round-1 spec audit's 12 mediums and 11 lows, batched: each criterion observed in a form that can pass and fail, each false sentence corrected, and settings-merge's accepted stop narrowed](spec/2026-10-14-spec-TOOL-dRedressedBar-10.md) | 6 | 2 | INPROGRESS | rev-5 | 2026-10-14 |
 | [TOOL-dRedressedBar-11 — a receipt-reading probe term in govkit's declared-outcome contract, closing settings-merge's last false-accept route](spec/2026-10-14-spec-TOOL-dRedressedBar-11.md) | 7 | 2 | SPECCED | rev-3 | 2026-10-14 |
 | [TOOL-dRedressedBar-12 — an apply narrower than its receipt keeps every other installed kit's claim and rows, so a refused settings-merge exit stays refused on the next run](spec/2026-10-14-spec-TOOL-dRedressedBar-12.md) | 8 | 2 | SPECCED | rev-4 | 2026-10-14 |
-| [TOOL-dRedressedBar-13 — the units-10-11 spec audit's 5 mediums and 18 lows, batched: each criterion half observed in a form that can fail, each false sentence corrected, and the code sites they describe made to say what the specs claim](spec/2026-10-14-spec-TOOL-dRedressedBar-13.md) | 9 | 2 | SPECCED | rev-4 | 2026-10-14 |
+| [TOOL-dRedressedBar-13 — the units-10-11 spec audit's 5 mediums and 18 lows, batched: each criterion half observed in a form that can fail, each false sentence corrected, and the code sites they describe made to say what the specs claim](spec/2026-10-14-spec-TOOL-dRedressedBar-13.md) | 9 | 2 | SPECCED | rev-5 | 2026-10-14 |
 | [TOOL-dRedressedBar-16 — an apply that keeps a carried kit's claim keeps that kit's gate-leg ownership too, so a later argv change does not wedge the kit](spec/2026-10-14-spec-TOOL-dRedressedBar-16.md) | 9 | 2 | SPECCED | rev-2 | 2026-10-14 |
 | [TOOL-dRedressedBar-14 — a first apply at a per-kit prefix configures against the homes it just wrote: the receipt is written ahead of CONFIGURE](spec/2026-10-14-spec-TOOL-dRedressedBar-14.md) | 10 | 2 | SPECCED | rev-4 | 2026-10-14 |
 | [TOOL-dRedressedBar-15 — agent-cap's adopter runs settings-merge's own adopter at settings-merge's home, declared as `[adopt] via`, and selfcheck refuses any argv naming another entry's file](spec/2026-10-14-spec-TOOL-dRedressedBar-15.md) | 11 | 2 | SPECCED | rev-3 | 2026-10-14 |
-| [TOOL-dRedressedBar-17 — the units-12-15 spec audit's 12 mediums and 9 lows, batched: each faulted criterion observed in a form that can pass and fail, each false sentence corrected, and the code sites they describe made to hold what the specs claim](spec/2026-10-14-spec-TOOL-dRedressedBar-17.md) | 12 | 2 | SPECCED | rev-2 | 2026-10-14 |
+| [TOOL-dRedressedBar-17 — the units-12-15 spec audit's 12 mediums and 9 lows, batched: each faulted criterion observed in a form that can pass and fail, each false sentence corrected, and the code sites they describe made to hold what the specs claim](spec/2026-10-14-spec-TOOL-dRedressedBar-17.md) | 12 | 2 | SPECCED | rev-3 | 2026-10-14 |
 | [TOOL-dRedressedBar-18 — a gate profiler: every leg run clean and unbounded, serially or under a load cap, each profiled to its processes, stalls reported and never killed](spec/2026-10-14-spec-TOOL-dRedressedBar-18.md) | 13 | 2 | SPECCED | rev-3 | 2026-10-14 |
-| [TOOL-dRedressedBar-19 — the units-16-18 spec audit's 19 mediums and 22 lows, batched: the profiler's census, path, launch, turnstile, redaction and leg-declaration gaps closed, the receipt sidecar made atomic, and specs 12 and 14 to 18 corrected](spec/2026-10-14-spec-TOOL-dRedressedBar-19.md) | 14 | 2 | SPECCED | rev-2 | 2026-10-14 |
+| [TOOL-dRedressedBar-19 — the units-16-18 spec audit's 19 mediums and 22 lows, batched: the profiler's census, path, launch, turnstile, redaction and leg-declaration gaps closed, the receipt sidecar made atomic, and specs 12 and 14 to 18 corrected](spec/2026-10-14-spec-TOOL-dRedressedBar-19.md) | 14 | 2 | SPECCED | rev-3 | 2026-10-14 |
 <!-- /gen:build-units -->
 
-Records: 44 bound to this build, across 4 record folder(s).
+Records: 46 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
