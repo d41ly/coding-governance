@@ -1404,7 +1404,9 @@
       "{prefix}/govkit/selftest.py"
     ],
     "guard": [
-      "{prefix}/govkit/"
+      "{prefix}/govkit/",
+      "{prefix}/hooks/kit.toml",
+      "{prefix}/settings-merge.py"
     ],
     "chunk": "selftests",
     "subject": "kit",

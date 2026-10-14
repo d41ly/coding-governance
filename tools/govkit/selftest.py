@@ -3250,9 +3250,10 @@ def main() -> int:
              "24f39915b3de86010a30d8698d0d4b317db015de", "--", f"{PFX}check-wiring.sh"],
             capture_output=True, text=True).stdout.strip()
 
-        def stale_target(name: str, deploy: str = DEPLOY_FULL) -> pathlib.Path:
+        def stale_target(name: str, deploy: str = DEPLOY_FULL,
+                         kits: str = "check-wiring") -> pathlib.Path:
             t = make_target(tmp / name, deploy)
-            run("apply", "--target", str(t), "--kits", "check-wiring")
+            run("apply", "--target", str(t), "--kits", kits)
             # BOTH identities from OLD, and no row OLD never shipped: `write_vintage_receipt`'s
             # header says why each half is load-bearing. Measured before either: nine arms red on
             # a mixed-vintage row, and 27 on a row invented at a vintage that lacked its file.
@@ -3352,6 +3353,28 @@ def main() -> int:
               len(means9) == 1
               and f"default-gained settings-merge: adopter exit 2 — {means9[0]}" in p9.stdout,
               f"code-2 means {means9} · {p9.stdout[-900:]}")
+        # --- TOOL-dRedressedBar-17 S13. THE GAINED LOOP RESOLVES agent-cap THROUGH `via`. With
+        # --- kickoff-manifest claimed, the update gains BOTH agent-cap and settings-merge, and
+        # --- `[kit.agent-cap] prefix = "scripts"` once made agent-cap's own argv name
+        # --- `scripts/settings-merge.py`, a file nothing installed: two adopter lines, one tail
+        # --- carrying `can't open file`. Through `via` agent-cap runs first and its resolved argv
+        # --- equals settings-merge's, so the dedup leaves ONE line and it is agent-cap's; a loop
+        # --- reading the declared argv leaves settings-merge's. No exit code is asserted: the
+        # --- delegate finds no receipt row for the hook, since the gained loop runs before
+        # --- `update` writes its receipt (unit 14's hand-off, spec 17 §4 "Three choices").
+        rq9p = stale_target("rq9p", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n',
+                            kits="check-wiring,kickoff-manifest")
+        p9p = run("update", "--target", str(rq9p), "--write")
+        p9pout = p9p.stdout.splitlines() + p9p.stderr.splitlines()
+        p9pl = [ln for ln in p9pout if ln.startswith("govkit update — default-gained ")
+                and "adopter exit" in ln and ("agent-cap" in ln or "settings-merge" in ln)]
+        check("[dRB-9] AC13 a per-kit-prefix update gaining agent-cap and settings-merge prints "
+              "exactly one adopter line naming either, and it is agent-cap's",
+              len(p9pl) == 1 and p9pl[0].startswith("govkit update — default-gained agent-cap:"),
+              " | ".join(p9pl) or f"rc {p9p.returncode} · {(p9p.stdout + p9p.stderr)[-900:]}")
+        check("[dRB-9] AC13 and no line carries `can't open file`",
+              not any("can't open file" in ln for ln in p9pout),
+              " | ".join(ln for ln in p9pout if "can't open file" in ln))
 
         # --- TOOL-dRedressedBar-11. A HOOK ONLY THE RECEIPT LOCATES IS FOUND, SO ITS EXIT 2 FAILS.
         # --- settings-merge.py finds agent-cap through the receipt before its two static homes, so
@@ -3408,11 +3431,14 @@ def main() -> int:
               in _rb11pn.stdout,
               f"rc {_rb11pn.returncode} · code-2 means {means9} · {_rb11pn.stdout[-900:]}")
 
+        # [dRB-11] fixture B: begin
         # B's hook row is an OLDER INSTALL: its bytes and both identities at OLD, as the receipt's.
         # The row carries the source `resolve_entry` gives agent-cap's hook in B's own context, and
         # `write_vintage_receipt` writes that source's bytes at OLD and sets its `commit`, `sha256`
         # and `gov_oid`, so this block never derives an identity itself (TOOL-dRedressedBar-13). The
-        # helper re-sets the rows `stale_target` already rewound to the same values.
+        # helper re-sets the rows `stale_target` already rewound to the same values. The two
+        # identity checks either side of that call are TOOL-dRedressedBar-17's S3: the row is
+        # appended bare, and the helper is what gives it all three keys.
         _rb11b = stale_target("rq11b", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n')
         _rb11dest = f"scripts/{KIT_NAMES['hooks']}/agent-cap.js"
         _rb11d = _rb11gk.read_descriptors(govroot, _rb11gk.load_toml(
@@ -3427,9 +3453,19 @@ def main() -> int:
                                   "source": (_rb11w.get(_rb11dest) or {}).get("src")})
         _rb11rec["kits"] = [*(_rb11rec.get("kits") or []), "agent-cap"]
         _rb11rp.write_text(json.dumps(_rb11rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+        _rb11ids = ("commit", "sha256", "gov_oid")
+        _rb11pre = [f for f in json.loads(_rb11rp.read_text(encoding="utf-8"))["files"]
+                    if f.get("path") == _rb11dest]
+        check("[dRB-11] fixture B's appended agent-cap row carries none of commit, sha256 and "
+              "gov_oid before the vintage helper runs",
+              len(_rb11pre) == 1 and not any(k in _rb11pre[0] for k in _rb11ids),
+              json.dumps(_rb11pre))
         write_vintage_receipt(govroot, _rb11b, OLD)
         _rb11row = [f for f in json.loads(_rb11rp.read_text(encoding="utf-8"))["files"]
                     if f.get("path") == _rb11dest]
+        check("[dRB-11] ...and all three after it, so the helper is what gave the row its identity",
+              len(_rb11row) == 1 and all(_rb11row[0].get(k) for k in _rb11ids),
+              json.dumps(_rb11row))
         check("[dRB-11] LIVENESS gov shipped the hook at OLD, so fixture B's row is an older install",
               len(_rb11row) == 1 and _rb11row[0].get("commit") == OLD and (_rb11b / _rb11dest).is_file(),
               f"{_rb11dest} at {OLD[:8]}: {json.dumps(_rb11row)}")
@@ -3440,6 +3476,7 @@ def main() -> int:
         check("[dRB-11] update over fixture B leaves the receipt's gov_commit where it was",
               json.loads(_rb11rp.read_text(encoding="utf-8"))["gov_commit"] == _rb11rec["gov_commit"],
               _rb11rp.read_text(encoding="utf-8")[:300])
+        # [dRB-11] fixture B: end
         for _rb11tag, _rb11p in (("apply over fixture A", _rb11pa),
                                  ("a third identical apply over fixture A", _rb11pa3),
                                  ("update over fixture B", _rb11pb)):
@@ -3475,6 +3512,41 @@ def main() -> int:
         _rb12p2 = run("apply", "--target", str(_rb12), "--kits", "settings-merge")
         settle(_rb12, "settings-merge alone")
         _rb12r2 = json.loads(_rb12rp.read_text(encoding="utf-8"))
+        # TOOL-dRedressedBar-17 S2. THE STEP LINE AND THE SIDECAR READ THE RECEIPT'S OWN LISTS, the
+        # carried rows included. Spec 12 claimed both and no check read either, so a sidecar written
+        # from this run's `rows` alone, or a step line counting `rows` and `selection`, passed. The
+        # sidecar is parsed as `check` parses it, and `check` itself is asked last.
+        _rb12step = [ln for ln in _rb12p2.stdout.splitlines() if "/RECEIPT]" in ln]
+        check("[dRB-12] AC2 the narrower apply's RECEIPT step line counts the receipt's files and kits",
+              len(_rb12step) == 1 and f"{len(_rb12r2['files'])} row(s), {len(_rb12r2['kits'])} kit(s)"
+              in _rb12step[0],
+              f"{' | '.join(_rb12step)} · receipt {len(_rb12r2['files'])} row(s), "
+              f"{len(_rb12r2['kits'])} kit(s)")
+
+        def read_sums_pairs17(t: pathlib.Path) -> set:
+            """`.governance/install.sums` as `(sha256, path)` pairs, split as `check` splits it."""
+            out = set()
+            for ln in (t / ".governance" / "install.sums").read_text(encoding="utf-8").splitlines():
+                if ln.strip():
+                    h, _, pth = ln.partition("  ")
+                    out.add((h.strip(), pth.strip()))
+            return out
+
+        _rb12want = {(f["sha256"], f["path"]) for f in _rb12r2["files"] if "sha256" in f}
+        _rb12carry = {(f["sha256"], f["path"]) for f in _rb12r2["files"] if "sha256" in f
+                      and f.get("kit") in _rb12r2["kits"] and f.get("kit") != "settings-merge"}
+        _rb12sums = read_sums_pairs17(_rb12)
+        check("[dRB-12] AC2 install.sums holds exactly the receipt's hashed rows, every carried row "
+              "among them",
+              bool(_rb12carry) and _rb12sums == _rb12want and _rb12carry <= _rb12sums,
+              f"carried hashed {len(_rb12carry)} · sums {len(_rb12sums)} · receipt {len(_rb12want)} · "
+              f"missing {sorted(p for _h, p in _rb12want - _rb12sums)[:4]}")
+        _rb12chk = run("check", "--target", str(_rb12))
+        _rb12bad = [ln for ln in (_rb12chk.stdout + _rb12chk.stderr).splitlines()
+                    if "install.sums carries" in ln or "which install.sums does not" in ln]
+        check("[dRB-12] AC2 `check` finds the sidecar and the receipt in agreement",
+              not _rb12bad and "sidecar:" in _rb12chk.stdout,
+              " | ".join(_rb12bad) or _rb12chk.stdout[-600:])
         _rb12p3 = run("apply", "--target", str(_rb12), "--kits", "kickoff-manifest")
         _rb12other = [k for k in _rb12r1b["kits"] if k != "settings-merge"]
         _rb12rows1 = [f for f in _rb12r1b["files"] if f.get("kit") in _rb12other]
@@ -3559,11 +3631,17 @@ def main() -> int:
         check("[dRB-14] AC1 no line opens `govkit: kit 'settings-merge'`",
               not any(ln.startswith("govkit: kit 'settings-merge'") for ln in _rb14out),
               " | ".join(ln for ln in _rb14out if ln.startswith("govkit: kit 'settings-merge'")))
-        _rb14ac = [ln for ln in _rb14out if ln.startswith("govkit: kit 'agent-cap'")]
-        check("[dRB-14] AC1 exactly one line opens `govkit: kit 'agent-cap'`, and it carries "
-              "`settings-merge.py`",
-              len(_rb14ac) == 1 and "settings-merge.py" in _rb14ac[0],
-              " | ".join(_rb14ac) or _rb14p.stdout[-900:])
+        # TOOL-dRedressedBar-17 S1: agent-cap's own outcome on this apply is unit 15's checks'
+        # below, and the problem-line check that once stood here contradicted them on the same run.
+        # S2: the same sidecar equality unit 12's block reads, on this first apply.
+        _rb14rec = json.loads(_rb14rp.read_text(encoding="utf-8")) if _rb14rp.is_file() else {}
+        _rb14want = {(f["sha256"], f["path"]) for f in _rb14rec.get("files") or [] if "sha256" in f}
+        _rb14sums = (read_sums_pairs17(_rb14)
+                     if (_rb14 / ".governance" / "install.sums").is_file() else set())
+        check("[dRB-14] AC1 install.sums holds exactly the receipt's hashed rows",
+              bool(_rb14want) and _rb14sums == _rb14want,
+              f"sums {len(_rb14sums)} · receipt {len(_rb14want)} · "
+              f"differ {sorted(p for _h, p in _rb14sums ^ _rb14want)[:4]}")
 
         # --- TOOL-dRedressedBar-15. THE SAME APPLY, READ FOR AGENT-CAP'S OWN ADOPTER. Its argv was a
         # --- copy of settings-merge's, resolved through `[kit.agent-cap]`, so it ran
@@ -5880,13 +5958,13 @@ user_skills = "/tmp/gk-fake-skills"
         # adopter naming that file. `demo` requires it. Every gov must print the arm's note, which is
         # what tells an absent finding from an arm that never ran.
         def build_scratch_gov_cross(tag: str, adopt: str, requires: str = '["other"]',
-                                    other_argv: str = '["python", "{prefix}/other.py"]'
-                                    ) -> pathlib.Path:
+                                    other_argv: str = '["python", "{prefix}/other.py"]',
+                                    rules: str = "") -> pathlib.Path:
             g = build_scratch_gov_kit(
                 f"drb15-{tag}",
                 'id = "demo"\nhome = "demo"\nversion_from = { none = "fixture" }\n'
                 f'requires = {requires}\n\n[check]\nnone = "a fixture kit"\n\n'
-                '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                '[[files]]\ninclude = "**"\nrole = "engine"\n\n' + rules +
                 f'[adopt]\nwhy_no_regenerate = "a fixture adopter"\n{adopt}\n')
             (g / PFX / KIT_NAMES["govkit"] / "entries").mkdir(parents=True, exist_ok=True)
             (g / PFX / KIT_NAMES["govkit"] / "entries" / "other.kit.toml").write_text(
@@ -5916,8 +5994,16 @@ user_skills = "/tmp/gk-fake-skills"
                 "beside", 'via = "other"\nargv = ["python", "{prefix}/other.py"]'),
             "ungraded": build_scratch_gov_cross("ungraded", 'argv = ["bash", "{nosuch}/x.sh"]',
                                                 other_argv="[]"),
+            # TOOL-dRedressedBar-17: the first `via` rule (S24) and the sixth (S11).
+            "empty": build_scratch_gov_cross("empty", 'via = ""'),
+            "list": build_scratch_gov_cross("list", 'via = ["other"]'),
+            "rendered": build_scratch_gov_cross(
+                "rendered", 'via = "other"',
+                rules='[[files]]\ninclude = ["demo-rendered.md"]\nrole = "rendered"\n'
+                      'to = "docs/demo.md"\n\n'),
         }
-        _rb15out = {k: run_in(g).stdout.splitlines() for k, g in _rb15gov.items()}
+        _rb15run = {k: run_in(g) for k, g in _rb15gov.items()}
+        _rb15out = {k: p.stdout.splitlines() for k, p in _rb15run.items()}
         _rb15note = {k: [ln for ln in v if ln.startswith("govkit: cross-entry argv:")
                          and "offered by" in ln] for k, v in _rb15out.items()}
         check("[dRB-15] AC7 every cross-entry scratch gov prints exactly one `cross-entry argv:` "
@@ -5947,6 +6033,34 @@ user_skills = "/tmp/gk-fake-skills"
         check("[dRB-15] AC7 LIVENESS offered elements with none graded red on a second "
               "`cross-entry argv:` line",
               len(_rb15live) == 1, "\n".join(_rb15out["ungraded"][-30:]))
+        # TOOL-dRedressedBar-17 S24 and S11. A `via` that is not a non-empty string read
+        # `names no registry entry`; it now reads its own reason, and at run time the walk raises
+        # rather than falling back to the entry's own argv, which unwired agent-cap silently. A
+        # `via` entry carrying a `rendered` rule is refused, because the producer test reads its own
+        # declared argv; the `via` gov above, with no such rule, is the control.
+        for _rb17k, _rb17why in (("empty", "is not a non-empty string"),
+                                 ("list", "is not a non-empty string"),
+                                 ("rendered", "carries a rendered, generated or merged rule")):
+            _rb17via = [ln for ln in _rb15out[_rb17k]
+                        if ln.startswith("govkit: entry 'demo' declares [adopt] via")]
+            check(f"[dRB-15] dRB-17 the `{_rb17k}` gov prints one `via` line, carrying `{_rb17why}`",
+                  len(_rb17via) == 1 and _rb17why in _rb17via[0],
+                  " | ".join(_rb17via) or "\n".join(_rb15out[_rb17k][-30:]))
+            check(f"[dRB-15] dRB-17 the `{_rb17k}` gov's selfcheck prints no traceback",
+                  "Traceback" not in _rb15run[_rb17k].stdout + _rb15run[_rb17k].stderr,
+                  _rb15run[_rb17k].stderr[-900:])
+        _rb17gk = govkit_module()
+        _rb17g = _rb15gov["empty"]
+        _rb17descs = _rb17gk.read_descriptors(_rb17g, _rb17gk.load_toml(
+            _rb17g / PFX / KIT_NAMES["govkit"] / "registry.toml"), _rb17gk.Report())
+        try:
+            _rb17got = repr(_rb17gk.resolve_adopter_argv(
+                _rb17g, {"gov_source": "local", "prefix": "tools"}, "demo", _rb17descs))
+        except KeyError as _rb17err:
+            _rb17got = f"KeyError {_rb17err}"
+        check("[dRB-15] dRB-17 resolve_adopter_argv raises KeyError naming demo for `via = \"\"`, "
+              "never falling back to demo's own argv",
+              _rb17got.startswith("KeyError") and "'demo'" in _rb17got, _rb17got)
 
         # ---- D3 (TOOL-dThriftyLanding-4): 7h holds a descriptor's doc_reads and the manifest's equal
         _d3 = scratch_gov("true", f"{PFX}demo/", tag="d3")

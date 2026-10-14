@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-17 — the units-12-15 spec audit's 12 mediums and 9 lows, batched: each faulted criterion observed in a form that can pass and fail, each false sentence corrected, and the code sites they describe made to hold what the specs claim
 
-**Status:** SPECCED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 12
+**Status:** INPROGRESS · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
