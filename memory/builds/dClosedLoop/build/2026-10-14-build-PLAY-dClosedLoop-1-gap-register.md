@@ -83,6 +83,16 @@ extends.
 | gap-flow-08 | Flow | MED | Landing order among builds verified at once is undefined; the first landing silently stales the others' verdicts. Raised by the owner. | flow interactions FI-7 | — |
 | gap-flow-09 | Flow | MED | A merge conflict between a build and the default branch's tip has no route. Raised by the owner. | flow interactions FI-3 | — |
 | gap-flow-04 | Flow | MED | A critical planning issue has no path: no recorded plan revision and no re-design inventory of completed work, though none has occurred in 173 builds. Raised by the owner. | flow FL-P6 and its measurement | — |
+| gap-orient-01 | Orient | HIGH | Placement is unaided and unrecorded: kickoff tells the agent to derive a request's scope itself, an unattended run handed a prompt always opens a new build, and only 6 of 131 recent builds name a predecessor, so a mis-placement cannot be audited; path overlap cannot decide placement (the named predecessor ranked first 0 of 5 times). Raised by the owner. | orientation research, routing; `skills/session-kickoff/SKILL.md:126-131`; `tools/unattended/SKILL.template.md:28-32` | — |
+| gap-orient-02 | Orient | HIGH | Nothing binds a session to its build: the route check verifies existence and pairing only, so a route to a terminal build or to another session's build lands, and a resumed route is never re-checked. Raised by the owner. | orientation research, routing; `skills/session-kickoff/manifest-check.sh:995-1001` | — |
+| gap-orient-03 | Orient | HIGH | A build's position is read from typed state: a unit's step and pass come from status headers and RUN.md's phase, all 10 INPROGRESS units sat idle 8 days or more, no resolver says which pass is due, and `LIVE.md` inherits 7 of 30 stale non-terminal headers. Raised by the owner. | orientation research, routing (c) and trust | — |
+| gap-orient-04 | Orient | HIGH | Orientation is exploratory: a new session spends a median 35 tool calls and 146k fresh input tokens before its first productive write, 20% of them locating the work or re-reading git state; kickoff's Step 1 orders re-deriving what the card printed (median 6 calls), and READY reaches the card in 19 of 64 sessions. Raised by the owner. | orientation research, cost; `skills/session-kickoff/SKILL.md:49-56` | — |
+| gap-orient-05 | Orient | HIGH | Claims carry no freshness keys: the card's cells go stale unmarked, the replay's `now —` line read the primary tree instead of the session's worktree, and 4 of 17 run claims disagree with their RUN.md, so a session cannot tell a fresh claim from a stale one without re-deriving it. Raised by the owner. | orientation research, trust; `skills/session-kickoff/manifest-check.sh:499`; this session's compact hook output | — |
+| gap-orient-06 | Orient | MED | Resuming costs more than starting: a resume caches the whole context again (median 467k fresh input tokens, against 146k for a new session), and a compaction spends a median 15 calls re-reading content. Raised by the owner. | orientation research, cost | — |
+| gap-orient-07 | Orient | MED | Briefs carry pointers, not facts: briefed agents spend 15% of their calls on method documents and 15% locating, agents read their own prompt file 10 times, and `role-sha` is never compared with the role it was rendered from. Raised by the owner. | orientation research, cost P4 and P6; `tools/hooks/agent-cap.js:55-60` | — |
+| gap-orient-08 | Orient | HIGH | Work is bound to no checklist item: about 63% of main-loop tool calls follow no protocol step, typed role agents are 4.1% of subagents, a harness branches on free text, and researcher returns are unchecked (5 of 10 ended without a final turn). Raised by the owner. | orientation research, determinism; `tools/workflows/unattended-unit.js:348` | — |
+| gap-orient-09 | Orient | HIGH | Allowances escape in the field: the role-gate arm let 34 typed gate runs through though a replay of the same commands is refused, cause unknown, and the `none` and `review` write classes are declared but read by nothing. Raised by the owner. | orientation research, determinism probes 2 and 3; `tools/hooks/scratch-guard.js:101-104` | — |
+| gap-orient-10 | Orient | MED | Memory loads unchecked: 12 of the 98 paths the auto-memory names no longer exist, and the dangling-pointer signal only reports. Raised by the owner. | orientation research, trust; `tools/drift-audit/drift_signals.py:470` | — |
 | gap-spine-01 | Spine | HIGH | No stage model: no kit, leg, dossier, role or hook declares the stage it serves, and the loop exists only implicitly. | design §4.1 (0 of 31 dossiers carry a stage); `tools/roles/workflows.toml` covers stages 0–7 only | — |
 | gap-spine-02 | Spine | HIGH | Guards read agent-written state across stages, against `[class]`. | build §4 (write gate), design §4.4 (INPROGRESS), test §5 C (pusher-written receipt), deploy §5 C | — |
 | gap-spine-03 | Spine | HIGH | Attended and unattended builds run different exit contracts. | build §3, §4 (DoD needs RUN.md) | — |
@@ -198,4 +208,12 @@ to `gap-flow-09`, same instrument:
 ```text
 Deploy=8 Plan=7 Spine=9 Test=9 Review=3 Foundation=8 Build=4 Flow=9 Maintain=8 Design=9
 LOW=5 MED=30 HIGH=39
+```
+
+Re-measured after the orientation round added `gap-orient-01` to `gap-orient-10`, measured by the four
+orientation researchers and the main loop, same instrument:
+
+```text
+Deploy=8 Plan=7 Spine=9 Orient=10 Test=9 Review=3 Foundation=8 Build=4 Flow=9 Maintain=8 Design=9
+LOW=5 MED=33 HIGH=46
 ```
