@@ -172,6 +172,8 @@ calls.
   roles, orientation as a scout's sidechain workflow, a prompt writer for every task, cheap state reads
   only for the main session, a roles build of its own (`dBoundRoles`), schema-forced returns with three
   retries, and a harness that can always spawn subagents.
+- 2026-10-15, session 1799cb98: the owner opened the flow revisit with roles in place; the flow-roles
+  record sets one cycle for every role item and maps each step's role sequence and routes.
 
 ## Instruments
 
@@ -401,6 +403,7 @@ Runs, 2026-10-14:
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-session-model.md` | One build modelled through every step under the `standard` preset, the owner's part in it, and the fourteen holes the model exposed. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-roles.md` | The roles layer: the owner's words, what it must answer, the research dispatched, then the design, forks and answers. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-roles-{anatomy,coverage,interactions,priorart}.md` | The four roles researchers' returns, verbatim, the harness's entity escapes restored. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-flow-roles.md` | The flow revisited with roles: the item cycle, each step's role sequence and routes, the record chain, the owner's touchpoints, and the holes as forks. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |
