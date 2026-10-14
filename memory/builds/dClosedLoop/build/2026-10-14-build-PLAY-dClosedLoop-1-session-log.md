@@ -77,6 +77,10 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 13 | gov-researcher | Orientation: trust | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-8-researcher.md` | 1799cb98 | returned, 7m53s, 32.4k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-trust.md` |
 | 14 | gov-researcher | Orientation: determinism | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-9-researcher.md` | 1799cb98 | returned, 8m43s, 47.9k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-determinism.md` |
 | 15 | gov-researcher | Orientation: preserving the card | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-10-researcher.md` | 1799cb98 | returned, 4m45s, 22.8k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-preserve.md` |
+| 16 | gov-researcher | Roles: anatomy | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-11-researcher.md` | 1799cb98 | dispatched | — |
+| 17 | gov-researcher | Roles: coverage | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-12-researcher.md` | 1799cb98 | dispatched | — |
+| 18 | gov-researcher | Roles: interactions | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-13-researcher.md` | 1799cb98 | dispatched | — |
+| 19 | gov-researcher | Roles: prior art | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-14-researcher.md` | 1799cb98 | dispatched | — |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -145,6 +149,9 @@ from the ledger for the same reason:
   owner's request to find a better way to preserve the build's card.
 - 2026-10-14, session 1799cb98: the owner confirmed both orientation interpretations and asked for a
   session modelled through every step; the model found fourteen holes, recorded and not yet decided.
+- 2026-10-14, session 1799cb98: the owner deferred the flow steps' polish until all three layers are
+  consolidated and opened the roles layer; four researchers were sent on anatomy, coverage,
+  interactions and prior art.
 
 ## Instruments
 
@@ -366,6 +373,7 @@ Runs, 2026-10-14:
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-{routing,cost,trust,determinism}.md` | The four orientation researchers' returns, verbatim, the harness's entity escapes restored. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-preserve.md` | The fifth orientation researcher's return, verbatim: how the build's card is preserved and reaches priority 1, adopted at the owner's request. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-session-model.md` | One build modelled through every step under the `standard` preset, the owner's part in it, and the fourteen holes the model exposed. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-roles.md` | The roles layer: the owner's words, what it must answer, the research dispatched, then the design, forks and answers. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |

@@ -258,3 +258,9 @@ Each is a place where the settled design is silent or does not hold together. No
 | H12 | **Telling the owner.** A landing, a park or a refusal reaches the owner only when they next open a session. | Deploy, unattended | A notification policy, for example on park and on land |
 | H13 | **A dependent's landing.** A dependent could reach Deploy before its parent lands; only a red prepared merge would stop it. | Deploy step 8 | A dependency edge gates the dependent's Deploy until the parent has landed |
 | H14 | **A session that moves into its build's worktree.** The card imported at launch is the launch tree's; the worktree's own card file is not loaded until a re-read, which is the fixture the adopted preservation design still owes. | Entry, step 5 | Until the fixture passes, `next` recommends a fresh session launched in the build's worktree, whose import is that worktree's card |
+
+## [deferred] The owner's next step
+
+The owner, 2026-10-14: "We will revisit the [2. Architectural Flow Steps] later to polish once more
+given more consolidated detail from points 1-3 altogether." The holes above wait for that revisit,
+after the roles layer (`build/2026-10-14-build-PLAY-dClosedLoop-1-roles.md`).

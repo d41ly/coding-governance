@@ -452,7 +452,8 @@ out with the owner's ratification and confirms dPolishedVitrine's track, which w
 
 - The session model (`build/2026-10-14-build-PLAY-dClosedLoop-1-session-model.md`, `[holes]`): fourteen
   places where the settled design is silent or does not hold together when one build is walked
-  through every step, H1 to H14, each with a proposed resolution, none decided.
+  through every step, H1 to H14, each with a proposed resolution, none decided; they wait for the
+  owner's revisit of the flow steps once the roles layer is designed.
 
 ## [owed] Owed to the chain re-cut
 
