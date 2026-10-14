@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-20 — govkit's carrier writer counts an entry's version pattern only inside that entry's own basis, so a mint never writes another kit's file
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 4 · ratified 2026-10-14
+**Status:** CLOSED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 4 · ratified 2026-10-14
 
 <!-- gen:spec-records -->
 
