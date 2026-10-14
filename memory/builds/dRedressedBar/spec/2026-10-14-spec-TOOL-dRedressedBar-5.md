@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-5 — fork idioms past the spawn-idiom registry, converted to their no-fork forms
 
-**Status:** INPROGRESS · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 3
+**Status:** INPROGRESS · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -12,6 +12,8 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-5-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-5-3-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-5-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-5-4-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-5-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-5-5-spec-writer.md) | journal | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-5-6-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-5-6-revision.md) | research | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-5-7-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-5-7-spec-writer.md) | journal | — |
 | [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 
 <!-- /gen:spec-records -->
@@ -42,11 +44,22 @@ none raised.
   and AC4.
 - **S6** — `memory/project/spawn-idiom-sites.txt` gains no row and no row rises.
   Observed by AC8.
+- **S7** — Row 178 of `memory/project/unarmed-branches.txt`, the pin of the delegated refusal site
+  at `tools/branch-reconcile/adopt-branch-reconcile.sh:142`, is re-keyed in the pass commit to the
+  converted line's signature. Its gate, kind, occurrence and reason stay as they are, and the file
+  keeps its row count. Observed by AC9 and AC10.
 
 ## 3. Non-goals (OUT)
 
 - No registry row for any of the four files that carry none today, and no row raised. The brief
   says "register nothing new" (item 5), and its non-goal refuses a raise a code change can fix.
+- No pin added to or raised in `memory/project/unarmed-branches.txt`. Re-keying row 178 (S7) is not
+  raising a pin. The row count, and the row's gate, kind, occurrence and reason, stay the same. Only
+  its signature changes, because the code it keys moved. An unmarked delegated site is keyed by its
+  own source line with the whitespace squeezed (`tools/memory-tree/check-arms.py:551`), so the
+  `:142` conversion changes the key while the site, its line and the reason it is waived stay put.
+  No no-fork spelling keeps the old key, so the re-key goes with the conversion (§4, Alternatives
+  rejected).
 - No drain of `tools/workflows/unattended-build.test.sh` past the excess. A row that equals its
   scan after this unit stays, for the follow-up its reason names. This is the precedent
   TOOL-aSweptBar-5 set for the same leg.
@@ -157,6 +170,24 @@ they are.
   `"$ROOT/<relative path>"` (`:46`, `:109`), absolute and never `/x`. `:74` and `:84` print each hit
   line behind two spaces through the prefix row. `:114` takes the whole-line row, reading `front`,
   which `tr -d '\r'` already stripped (`:113`).
+- **The pin that follows `:142`.** `mkdir -p "$(dirname "$SKILL")" || exit 1` is a refusal site
+  whose left side is a command, so check-arms reads it as DELEGATED. It is unmarked, so its key is
+  its squeezed source line (`tools/memory-tree/check-arms.py:86-91`, `:551`).
+  `memory/project/unarmed-branches.txt:178` pins it under that key, and the pins are graded
+  (`ARMS_REFUSALS="graded"`, `.memory-tree.conf:639`). Converted, the line keys as
+  `mkdir -p "${SKILL%/*}" || exit 1`. Without a re-key, check-arms reports row 178 as a pin "which
+  no live site carries" (`:866-871`) and the new key as a site that "is not pinned" (`:863-865`).
+  The pass commit therefore rewrites field 4 of row 178, and only that field, from
+  `mkdir -p "$(dirname "$SKILL")" || exit 1` to `mkdir -p "${SKILL%/*}" || exit 1`. Fields 1-3
+  (`tools/branch-reconcile/adopt-branch-reconcile.sh`, `exit`, `1`) and the reason in field 5 stay
+  byte for byte. The reason still holds: `tools/branch-reconcile/adopt-branch-reconcile.test.sh`
+  still does not exist. The probe at spec time (PINNED, 2026-10-14) ran check-arms' own
+  `scan_refusal_sites` over the `ebce889c` adopter and over the converted one, with all six §4
+  conversions applied. Against the `ebce889c` rows, the converted adopter has one stale pin and one
+  unpinned site, which are exactly row 178's key and the new one. With row 178 re-keyed, all 11
+  rows for that gate are live and no site of it is unpinned. The `:25` conversion moves no key,
+  because `exit 2` is outside the population (`EXIT_RE`, `:146`). The two
+  `tools/roles/adopt-roles.sh` sites keep their keys, and TOOL-dRedressedBar-6 arms them.
 - **`tools/roles/adopt-roles.sh`.** `:45` takes the house form. The walk at `:53` takes the absolute
   `dirname` row: `_p` starts at `KIT_DIR`, which `pwd` prints with no trailing `/`, so `${_p%/*}`
   differs from `dirname` only on `/x`, where it is empty and `${_parent:-/}` restores `/`. That
@@ -224,8 +255,23 @@ time.
 - `tools/roles/adopt-roles.test.sh`
 - `tools/hooks/format-guard.test.sh`
 - `tools/workflows/unattended-build.test.sh`
+- `memory/project/unarmed-branches.txt`
 
 ### Alternatives rejected
+
+- A no-fork spelling of `tools/branch-reconcile/adopt-branch-reconcile.sh:142` whose squeezed line
+  still equals row 178's key. None exists. That key holds `$(dirname "$SKILL")`, and sh_hygiene
+  classifies any `$( )` whose first word is `dirname` as a `path-subst` site
+  (`tools/gate-lint/sh_hygiene.py:786-787`), whatever `dirname` resolves to. A `$( )` forks a
+  subshell in any case.
+- An `# arm-signature: mkdir -p "$(dirname "$SKILL")" || exit 1` marker above the converted line,
+  which would make the site's key equal the old row again. A marker declares the text the callee
+  prints on that refusal path (`tools/memory-tree/check-arms.py:88-90`). `mkdir` prints none of
+  that text, so the marker would put a false fact in the file to keep a stale key. It would also add
+  a line to the adopter, which §4 says no conversion does.
+- Leaving `:142` unconverted. The file would keep one `path-subst` site with no row in
+  `memory/project/spawn-idiom-sites.txt`, so the fork leg would stay red, and a row for it is the
+  raise §3 refuses.
 
 - Declaring rows for the four row-less files, as the TOOL-aSparedSpawn-32 reconcile did with its
   "arrived with" reasons. The brief refuses it, and the scanner calls the registry shrink-only
@@ -340,17 +386,47 @@ time.
 - **AC8** — When `git diff <pass>~1 <pass> -- memory/project/spawn-idiom-sites.txt` runs at this
   unit's pass commit, it prints nothing. Red when: a row is added for a site the forms table
   converts, or a row moves to absorb a miscount.
+- **AC9** — When `git diff -U0 <pass>~1 <pass> -- memory/project/unarmed-branches.txt` is read at
+  this unit's pass commit, it holds one hunk with one `-` line and one `+` line. The `-` line is the
+  row whose first field is `tools/branch-reconcile/adopt-branch-reconcile.sh` and whose fourth is
+  `mkdir -p "$(dirname "$SKILL")" || exit 1`. Split at tabs, the two lines have five fields each and
+  agree on fields 1, 2, 3 and 5. The `+` line's field 4 reads `mkdir -p "${SKILL%/*}" || exit 1`.
+  `git show <pass>:memory/project/unarmed-branches.txt | wc -l` prints the same count as the same
+  command at `<pass>~1`. Red when: the row is left on its old signature, is re-keyed to a spelling
+  the converted line does not carry, or has its gate, kind, occurrence or reason changed, or a row
+  is added or removed.
+  figure: row 178 of 181 lines, and 11 `exit` rows for that gate, at `ebce889c`, PINNED at spec
+  time. The row is named by its content, so a sibling edit that moves its line number does not
+  break the criterion.
+- **AC10** — When a probe imports `tools/memory-tree/check-arms.py` and calls its own
+  `scan_refusal_sites` over the pass tree, it keys every site of
+  `tools/branch-reconcile/adopt-branch-reconcile.sh` as (gate, kind, occurrence, `key_sig`). Every
+  pass `exit`/`status` row of `memory/project/unarmed-branches.txt` for that gate then matches a live
+  site, and no site of that gate lacks a row. Run with the `<pass>~1` adopter against the pass rows,
+  the same probe reports row 178 stale and the `mkdir -p "$(dirname "$SKILL")" || exit 1` site
+  unpinned. That is the staged red, and it shows the probe can move. The two
+  `tools/roles/adopt-roles.sh` sites have the same keys at `<pass>~1` and at the pass. Red when:
+  any pin of that gate is stale, any of its sites is unpinned, or the staged run reports nothing.
+  fixture: the probe lives in the session scratchpad and its output goes to the unit's acceptance
+  ledger; nothing is committed. The population comes from the probe's file list, not from
+  `git ls-files` in a scratch clone, because the isolation hook refuses git outside the worktree.
+  figure: 11 rows live and 13 sites across both adopters (11 + 2), PINNED at spec time from the
+  same probe over `ebce889c` with the six §4 conversions applied.
 
 ## 7. Gates
 
-`shell hygiene (a fork spent on builtin work)` · `shell hygiene (a loop fed by a command substitution)` · `roles adopter self-test` · `branch-reconcile selftest` · `format-guard self-test` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `foreign-prefix parity (every self-test at three prefixes)` · `harness arms (fail branches armed or pinned)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `memory hygiene`
+`shell hygiene (a fork spent on builtin work)` · `shell hygiene (a loop fed by a command substitution)` · `roles adopter self-test` · `branch-reconcile selftest` · `format-guard self-test` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `foreign-prefix parity (every self-test at three prefixes)` · `harness arms (fail branches armed or pinned)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `memory hygiene` · `recall floor` · `recall floor arms`
 
 The main loop runs these at the close. The first is the leg this unit turns green; its red was
 observed by the full bar over `ebce889c`. The second grades every line this unit writes. It would
 grade the `mapfile` row's `<<< "$out"` as `loop-var-sub` were it written on the `:183` loop line,
 and on the `:182` capture line, which holds no `done`, it grades nothing. The suites on the line are the ones whose files or guarded directories this unit
-touches, and `harness arms (fail branches armed or pinned)` reads the adopters' exit sites this
-unit keeps in place. `spawn budget (forks per hot entrypoint)` is not owed: no touched file has a
+touches. `harness arms (fail branches armed or pinned)` grades every `exit 1` site of both adopters
+against `memory/project/unarmed-branches.txt`. Every site keeps its line, but `:142`'s
+delegated key changes with the conversion, and row 178 is re-keyed with it (S7). That leg reads
+green for `tools/branch-reconcile/adopt-branch-reconcile.sh` only when the conversion and the
+re-key land in the same commit. `recall floor` and `recall floor arms` are on the line because their
+`memory/` guard covers the pin file. `spawn budget (forks per hot entrypoint)` is not owed: no touched file has a
 row in `memory/project/fork-ceilings.txt`. This unit adds and moves no suite arm and declares none.
 
 ## 8. Open questions
@@ -377,6 +453,15 @@ none
   `mapfile -t _l8 <<< "$out"` moves onto the `:182` capture line. The paragraph under the forms
   table and the §7 note now say what `scan_file` grades. Alternatives rejected gains the `_cr`
   variable and the loop-registry row. No other scope or criterion moves.
+- rev-5 · 2026-10-14 · §2 · S7 · §3 · §4 · AC9 · AC10 · §7 · the builder's third divergence report.
+  `memory/project/unarmed-branches.txt:178` pins the unmarked delegated site at
+  `tools/branch-reconcile/adopt-branch-reconcile.sh:142` under its squeezed source line, so the
+  `${SKILL%/*}` conversion changes its key. A probe found no no-fork spelling that keeps the key, so
+  S7 re-keys row 178 in the pass commit, changing field 4 only. §3 states that a re-key is not a
+  raise. §4 gains the paragraph on the pin, the pin file in Files touched, and three rejected
+  alternatives. AC9 observes the diff of the pin file and AC10 runs the check-arms probe. §7 corrects
+  what `harness arms` reads and adds `recall floor` and `recall floor arms`, which the pin file's
+  `memory/` guard requires. No other scope, design or criterion moves.
 
 ## 10. Reuse audit
 
