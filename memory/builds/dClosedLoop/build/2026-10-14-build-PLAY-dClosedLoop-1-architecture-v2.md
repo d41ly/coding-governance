@@ -42,6 +42,10 @@ Revised: 2026-10-14, after the flow walk's Build stage: P19 is added; `review.fi
 and the presets; dScopedBuild freezes built specs and disposes every closing-review finding as new
 units, owning `gap-flow-05`.
 
+Revised: 2026-10-14, after the flow walk's Test stage: `verdict.tree`, `verdict.red-route` and
+`tests.landing-levels` join the catalogue and the presets; Test verifies the prepared merge, so one
+bar serves Test and the landing.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -155,6 +159,9 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 | `verdict.held` | peer-or-cadence, push-selected, on-demand | on-demand | walk T2 |
 | `verdict.flakes` | quarantine, record, retry-only; a threshold | quarantine | walk T3 |
 | `tests.product` | declared, declared-with-runners, none | declared-with-runners | walk T4 |
+| `tests.landing-levels` | any subset of unit, integration, e2e, performance | unit, integration | flow FL-T3 |
+| `verdict.tree` | prepared-merge, build-tip | prepared-merge | flow FL-T1 |
+| `verdict.red-route` | fix-pass-or-design, always-new-unit | fix-pass-or-design | flow FL-T2 |
 | `plan.authority` | planner-drafts-owner-ratifies, planner-within-themes, owner-orders | planner-drafts-owner-ratifies | R2.4 |
 | `plan.unplaced` | warn, refuse-new, review-only | warn | walk P2 |
 | `plan.triage` | owner-batches, rules, archive-legacy | rules | walk P3 |
@@ -243,6 +250,9 @@ repository on either overrides `verdict` to `local-hook`.
 | `verdict.held` | on-demand | on-demand | peer-or-cadence | peer-or-cadence |
 | `verdict.flakes` | record | quarantine | record | quarantine |
 | `tests.product` | declared | declared-with-runners | declared-with-runners | declared-with-runners |
+| `tests.landing-levels` | unit | unit, integration | every declared level | unit, integration |
+| `verdict.tree` | prepared-merge | prepared-merge | prepared-merge | prepared-merge |
+| `verdict.red-route` | fix-pass-or-design | fix-pass-or-design | always-new-unit | fix-pass-or-design |
 | `plan.authority` | planner-within-themes | planner-drafts-owner-ratifies | owner-orders | planner-within-themes |
 | `plan.unplaced` | review-only | warn | refuse-new | warn |
 | `plan.triage` | rules | rules | owner-batches | rules |

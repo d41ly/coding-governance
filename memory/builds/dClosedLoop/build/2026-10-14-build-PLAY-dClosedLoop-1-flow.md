@@ -449,6 +449,78 @@ product tests with runner adapters.
 7. The review recommendation is emitted, and the gate review run where policy owes it.
 8. The Test-to-Deploy transition is recorded, its witness the items above.
 
+### Forks asked, 2026-10-14
+
+**FL-T1. "Which tree does Test verify?"** Offered: The prepared merge (Recommended); The build's own
+tip. Answer: The prepared merge (Recommended).
+
+**FL-T2. "When Test finds an OWN red, where does the fix go?"** Offered: Fix pass, or Design if the
+spec is wrong (Recommended); Always a new unit. Answer: Fix pass, or Design if the spec is wrong
+(Recommended).
+
+**FL-T3. "Which of an adopter's declared product-test levels run in Test by default?"** Offered:
+Unit + integration; rest on cadence (Recommended); Every declared level; Unit only. Answer: Unit +
+integration; rest on cadence (Recommended).
+
+### Settled for Test, 2026-10-14
+
+- **Test verifies the prepared merge**: the build merged onto the default branch's current tip in
+  Test's own worktree, the tree that would land. Deploy reuses that verdict while the tip has not
+  moved; a moved tip makes the verdict stale and sends the build back to Test. A policy,
+  `verdict.tree`: `prepared-merge` by default, `build-tip` allowed.
+- **A red's route** (`verdict.red-route`): a fix pass of the owning unit when the code misses its
+  spec, which leaves the frozen spec untouched; a new unit through Design when the spec is wrong.
+  `always-new-unit` is the allowed alternative.
+- **Product-test levels** (`tests.landing-levels`): unit and integration run in the bar, selected by
+  the paths changed; end-to-end and performance run on Maintain's cadence and file asks on a red.
+
+## [deploy] Deploy
+
+### Current state, measured 2026-10-14
+
+The Deploy research record holds the measurements: the lander (`tools/push-main.sh`) and its pre-push
+binding; a post-merge bar declared in 0 of 3 trees; remote CI unavailable to gov; govkit's pull-only
+`update` with adopters' receipts 990 commits behind after six days; no release notes (0 tracked);
+nothing for an adopter's own release, which incms built outside gov. Settled since: builds land under
+the plan's mandate by default (FL-P6); the deploy engine is shipped, generic with adapters, the first
+fitted to incms (R3.1); it runs on the landing node after the verdict, promotes on a green verify and
+rolls forward on a failed one; adopters pull, with a currency watch.
+
+### Draft scope
+
+- **Landing**: the verified prepared merge lands on the default branch through the lander as a
+  `--no-ff` merge and a push, its pre-push verdict reusing Test's for the same tree; a moved tip
+  returns the build to Test. A landing record holds the SHA, the builds and units carried and the
+  verdict.
+- **Gov's own releases**: kits whose shipped bytes moved get a version and generated release notes;
+  adopters pull them, and the currency watch reports each adopter's distance.
+- **An adopter's product release**: the deploy engine runs the declared environments in promotion
+  order on the landing node, recording each environment's verify per SHA; a failed verify rolls
+  forward by default, recorded with an ask.
+- **Review**: the stage-exit recommendation; landing and release review where policy owes it.
+- **Leases** released when the build's work is done.
+
+### Draft boundaries
+
+- **Starts** at the Test-to-Deploy transition with a current verdict.
+- **Ends** when the landing is pushed and recorded, gov's releases are minted with their notes, and
+  the adopter's release has a recorded verify in each environment it reached.
+- **Hands Maintain** the landed build and its open post-landing duties.
+- **Does not** change code, re-verify a stale tree itself (that is Test's), or re-design.
+
+### Draft checklist (each item witnessed by a check)
+
+1. The verdict is current for the tip being landed; otherwise the build returns to Test.
+2. The landing is authorized under the autonomy level: the plan's mandate by default.
+3. The lander merges `--no-ff` and pushes, the pre-push verdict reused for the same tree.
+4. The landing record is written: SHA, builds and units carried, verdict.
+5. Kit versions are minted and release notes generated for every kit whose shipped bytes moved.
+6. The deploy engine promotes through the declared environments, each verify recorded per SHA.
+7. A failed verify is handled by `deploy.on-verify-fail` and recorded.
+8. The review recommendation is emitted; the landing and release review is run where owed.
+9. The build's and units' leases are released.
+10. The Deploy-to-Maintain transition is recorded, its witness the items above.
+
 ### Entry points, partly settled
 
 - **Settled:** a new, complex feature enters at Plan; an amendment that fits an open build's plan
