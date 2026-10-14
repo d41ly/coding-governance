@@ -13,7 +13,7 @@ import sys
 TOK = re.compile(r"`([^`]+)`")
 
 
-def tracked(root, pat):
+def read_tracked(root, pat):
     out = subprocess.run(["git", "-C", root, "ls-files", pat], capture_output=True, text=True,
                          encoding="utf-8", check=True).stdout
     return [p for p in out.splitlines() if p]
@@ -24,10 +24,10 @@ def read(root, rel):
         return [l.rstrip("\r\n") for l in fh]
 
 
-def spec_side(root):
+def read_spec_side(root):
     res = {}
     lab_re = re.compile(r"^([ \t]*(-|\*)[ \t]*)?(\*\*)?AC[0-9]+[a-z]?(\*\*)?([^A-Za-z0-9]|$)")
-    for rel in tracked(root, "memory/builds/*/spec/*.md"):
+    for rel in read_tracked(root, "memory/builds/*/spec/*.md"):
         uid, inac, cur = None, False, None
         for line in read(root, rel):
             if uid is None and re.match(r"^# [A-Z][A-Za-z0-9-]* ", line):
@@ -51,9 +51,9 @@ def spec_side(root):
     return res
 
 
-def ledger_side(root):
+def read_ledger_side(root):
     res = {}
-    pats = tracked(root, "memory/builds/*/build/*.md") + tracked(root, "memory/builds/*/reviews/*.md")
+    pats = read_tracked(root, "memory/builds/*/build/*.md") + read_tracked(root, "memory/builds/*/reviews/*.md")
     for rel in pats:
         j, u, cur = False, "", None
         for line in read(root, rel):
@@ -82,7 +82,7 @@ def ledger_side(root):
     return res
 
 
-def joined(st, lt):
+def scan_join(st, lt):
     for a in st:
         for b in lt:
             if a.lower() in b.lower() or b.lower() in a.lower():
@@ -92,7 +92,7 @@ def joined(st, lt):
 
 def main():
     root, offs = sys.argv[1], sys.argv[2:]
-    sp, lg = spec_side(root), ledger_side(root)
+    sp, lg = read_spec_side(root), read_ledger_side(root)
     for o in offs:
         uid, lab = o.split("/")
         s, l = sp.get((uid, lab)), lg.get((uid, lab))
@@ -109,7 +109,7 @@ def main():
         else:
             print("  ledger (no answer found)")
         if s and l:
-            print(f"  join          : {joined(s['toks'], l['toks'])}")
+            print(f"  join          : {scan_join(s['toks'], l['toks'])}")
 
 
 if __name__ == "__main__":

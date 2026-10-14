@@ -1,11 +1,12 @@
 # TOOL-dTracedLedger-1 — check 23's reds at origin/main ebce889c7, traced and routed to owners
 
-**Status:** CLOSED · rev-1 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling
+**Status:** CLOSED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · records-only
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-14-build-TOOL-dTracedLedger-1-agent-ledger.md](../build/2026-10-14-build-TOOL-dTracedLedger-1-agent-ledger.md) | journal | — |
 | [2026-10-14-build-TOOL-dTracedLedger-1-pairs.py](../build/2026-10-14-build-TOOL-dTracedLedger-1-pairs.py) | research | — |
 | [2026-10-14-build-TOOL-dTracedLedger-1-research-check-23-reds.md](../build/2026-10-14-build-TOOL-dTracedLedger-1-research-check-23-reds.md) | research | — |
 | [2026-10-14-prompt-TOOL-dTracedLedger-1-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dTracedLedger-1-1-spec-writer.md) | journal | — |
@@ -118,3 +119,5 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-10-14 · initial draft.
+- rev-2 · 2026-10-14 · S4: the status header declares `records-only`; the unit ships no product,
+  and drift signal `closed_specs_with_no_product_commit` sets such a unit aside, not a miss.

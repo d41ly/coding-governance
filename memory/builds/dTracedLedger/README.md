@@ -53,10 +53,10 @@ ids TOOL-dTracedLedger-1 TOOL-dTracedLedger-2 TOOL-dTracedLedger-3
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dTracedLedger-1 — check 23's reds at origin/main ebce889c7, traced and routed to owners](spec/2026-10-14-spec-TOOL-dTracedLedger-1.md) | — | 1 | CLOSED | rev-1 | 2026-10-14 |
+| [TOOL-dTracedLedger-1 — check 23's reds at origin/main ebce889c7, traced and routed to owners](spec/2026-10-14-spec-TOOL-dTracedLedger-1.md) | — | 1 | CLOSED | rev-2 | 2026-10-14 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 6 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
