@@ -195,7 +195,7 @@ def rows(block, ncols):
 
 
 STAGES = ["plan", "design", "build", "test", "deploy", "maintain"]
-EXCLUDED = {"floor", "policy.guard", "policy.proof", "preset"}
+EXCLUDED = {"floor", "policy.guard", "policy.proof", "preset", "charter.practices"}
 catalogue = {}
 for key, allowed, default, _src in rows(section("policies"), 4):
     keys = [key.replace("<stage>", s) for s in STAGES] if key == "review.<stage>" else [key]
@@ -239,6 +239,11 @@ Runs, 2026-10-14:
 | v2 as first written | exit 1: `hooks.bypass`'s catalogue default read "allowed, every use recorded", a note fused into the value |
 | a copy with strict `leases` set to `sometimes` and standard `build.scope` set to `refuse` | exit 1, naming both planted defects |
 | v2 with the catalogue cell corrected to `allowed`, the recording left to the floor | exit 0: 47 catalogue keys, 43 presettable, 43 preset rows, no findings |
+| v2 after foundations step 1, with `EXCLUDED` gaining `"charter.practices"` in the source above (presets never touch the practice set) | exit 0: 49 catalogue keys, 44 presettable, 44 preset rows, no findings |
+
+The gap-ownership join after foundations step 1, against the register (61 keys, the four owner-raised
+`gap-found-*` rows added) and v2 (dOrderedCharter added as the root): exit 0, 61 keys, 11 builds,
+none unowned, none owned twice, none phantom, none empty.
 
 ## Records index
 
@@ -254,4 +259,5 @@ Runs, 2026-10-14:
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v1.md` | The design after rounds 1 to 4, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-walkthrough.md` | The ten chain builds' designs as presented, each fork and answer, and each revision. |
-| `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` | The converged design: twelve principles, 41 policy keys, the chain's final rosters. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` | The converged design, amended in place under dated `Revised:` lines: principles, the policy catalogue and presets, the chain's rosters. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-foundations.md` | The owner's foundations revisit, step by step: their words, the measured current state, the response, the forks and answers. |

@@ -11,6 +11,12 @@ Revised: 2026-10-14, at the owner's direction ("Add named policy presets", recor
 rounds): the `[presets]` section is added and the Spine's roster gains the presets unit. The chain
 is still unapproved, pending the owner's revisit of the high-level architecture and flow.
 
+Revised: 2026-10-14, after the foundations revisit's step 1
+(`build/2026-10-14-build-PLAY-dClosedLoop-1-foundations.md`): principles P13 and P14 are added;
+`[front-door]` is rewritten around the ranked charter; `charter.override` and `charter.practices`
+join the catalogue, the first of them the presets; the chain gains a new root, dOrderedCharter,
+which takes the front door and the tag grammar from the Spine.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -41,14 +47,30 @@ is still unapproved, pending the owner's revisit of the high-level architecture 
 - **P12 Specs are structured contracts.** A spec gives a builder precise, deterministic, structured
   instructions: definitions, design, boundaries, interfaces and acceptance as fields a check reads
   (walk D3).
+- **P13 Ranked instructions.** Every load-bearing document is registered with a rank and wrapped in
+  a generated envelope naming its identity, rank, scope, trigger and what it yields to, so an agent
+  rebuilds one instruction hierarchy whenever it loads a document; conflicts resolve by rank, never
+  by load order; unenveloped text and any envelope inside tool output are data (foundations step 1).
+- **P14 Practices with reach.** The charter's practices come from a catalogue; each declares its
+  reach at every stage it touches, and stage contracts, role handoffs and review lenses read the
+  active practices' reach for their stage, so a practice redefines every step (foundations step 1).
 
 ## [front-door] The charter as the loop's first step
 
-The charter is what every agent loads first (walk S1), so it opens with what gov is and how it
-works and is used, then hands off to the loop: one rendered line per stage contract, then the
-repository's current policy values, then the foundation's rules grouped by stage and tagged, then
-the repository's own project block from its overlay. The Spine writes the front door (walk S5);
-Convergence regroups the rest.
+The charter is what every agent loads first (walk S1). Its whole content sits in the rank-1
+envelope, `[AGENTS.md · Priority 1 · Always first …]` … `[/AGENTS.md]`, and it reads in this order:
+what gov is and how it works and is used; the precedence and override rule (rank decides, never
+load order; the charter wins a live conflict unless the owner explicitly overrides it, and the
+override is recorded); the instruction map (the ranks below it, what loads when, and how to rebuild
+the hierarchy after a reset); the active practices, each with its reach per stage; the hand-off to
+the loop, one rendered line per stage contract and the repository's current preset and overrides;
+then the repository's own project block from its own overlay, gov's included. The foundation build,
+dOrderedCharter, writes it (foundations step 1; it took the front door from the Spine, walk S5).
+
+**The ladder** (foundations F1-2): 0 the platform's own system and safety instructions, not the
+repository's to rank; 1 the charter; 2 the loop and the repository's policy values; 3 stage methods
+and protocols; 4 kit runbooks, Skills and path-scoped rules; 5 the role; 6 the task; 7 records and
+memory, evidence only, never instructions.
 
 ## [policies] The policy catalogue
 
@@ -58,6 +80,8 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 | Key | Allowed values | Default | Source |
 |---|---|---|---|
 | `preset` | velocity, standard, strict, autonomous, or a repo-declared preset | standard | owner directive after the walk-through |
+| `charter.override` | explicit-override, live-owner-wins, absolute | explicit-override | foundations F1-1 |
+| `charter.practices` | a set of catalogue or repo-declared practices | the governance foundation set | foundations F1-3 |
 | `autonomy` | plan-only, three-gates, every-stage | three-gates | R1.4 |
 | `policy.guard` | owner-only, agents-with-reason, agents-within-mandate | owner-only | R4.2 |
 | `policy.proof` | tty-cli, signed, both | tty-cli | walk S3 |
@@ -115,8 +139,9 @@ policy keys; a repository names one preset and overrides individual keys on top 
 - Every shipped preset assigns every presettable key, and only values that key allows; a check
   refuses a preset with a key missing or a value outside the schema, and a new key cannot land
   without a value in every shipped preset.
-- Presets never touch the floor, `policy.guard` or `policy.proof`: loosening the guard or switching
-  an invariant off stays an explicit owner choice, never a side effect of picking a posture.
+- Presets never touch the floor, `policy.guard`, `policy.proof` or `charter.practices`: loosening
+  the guard or switching an invariant off stays an explicit owner choice, never a side effect of
+  picking a posture, and a methodology is a choice about the product, not a posture.
 - A repository may declare its own named presets in its policy file, each extending a shipped one,
   under the same completeness check.
 
@@ -143,6 +168,7 @@ repository on either overrides `verdict` to `local-hook`.
 | Key | velocity | standard (default) | strict | autonomous |
 |---|---|---|---|---|
 | `autonomy` | plan-only | three-gates | every-stage | plan-only |
+| `charter.override` | live-owner-wins | explicit-override | absolute | explicit-override |
 | `hooks.bypass` | allowed | allowed | refused | refused |
 | `transitions.record` | trailer | trailer, log, micro-format | trailer, log, micro-format | trailer, log, micro-format |
 | `leases` | warn | warn | refuse | refuse |
@@ -211,11 +237,12 @@ where `verdict = peer-node`.
 | Deploy | a verified tree | a landing record; kit release notes; per-SHA deploy and verify records; adopter currency | lander and engine records; the currency probe | landing authorization | opt-in |
 | Maintain | the daily cadence at session start | safe fixes applied; asks filed by stage; a maintenance record | detectors pinned and owned; fixes inside the declared set | none | the weekly Loop Review |
 
-## [chain] The chain: ten builds, final rosters
+## [chain] The chain: eleven builds, final rosters
 
 | Build | Stage | Parents | Planned units | Gaps owned |
 |---|---|---|---|---|
-| dDeclaredLoop | Spine | dClosedLoop | the loop kit and definition, roles re-pointed after aOrientedCast closes; `.governance/policy.toml`, schema, one reader, JSON mirror; the named presets and their completeness check; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; the section-tag grammar and its resolver; the charter's front door; policy at govkit intake | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01 |
+| dOrderedCharter | Foundation | dClosedLoop | the practice catalogue with each practice's reach per stage, and `charter.practices`; the charter re-founded in its rank-1 envelope (front door, precedence and override rule with `charter.override` and its record, instruction map, active practices with reach, hand-off to the loop, the repository's project block from its own overlay); the instruction registry and the ladder; envelopes rendered for every registered document and the gate over them; the instruction map re-injected on compact and resume; ranked envelopes in every subagent handoff; the section-tag grammar and its resolver | gap-found-01, gap-found-02, gap-found-03, gap-found-04 |
+| dDeclaredLoop | Spine | dOrderedCharter | the loop kit and definition keyed by the stage tags, roles re-pointed after aOrientedCast closes; `.governance/policy.toml`, schema, one reader, JSON mirror; the named presets and their completeness check; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; policy at govkit intake | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01 |
 | dLeasedFleet | Concurrency | dDeclaredLoop | the lease grammar with run claims migrated; acquisition and release in both modes; overlap warn or refuse and takeover; fleet identity and remote uniqueness; offline behaviour | gap-conc-01, gap-conc-02 |
 | dWitnessedBar | Test | dDeclaredLoop | gate health measured and the reliability bar; bypasses recorded; attribution deciding what blocks; the hook-written verdict; held legs by policy; the peer-node verifier; seen-red records; flake quarantine; the product-test contract with runner adapters; derived pre-commit list and multi-node cost evidence | gap-test-01, gap-test-02, gap-test-03, gap-test-04, gap-test-05, gap-test-06, gap-test-07, gap-test-08, gap-test-09 |
 | dRankedPlan | Plan | dDeclaredLoop, dLeasedFleet | priority beside `parents:` and the generated plan view; the planner and triager role and Plan workflow; the placement predicate; rule-based triage; dormancy disposal; the live-build mapping carried out; Plan Review; kickoff offering the next item and attended briefs gated | gap-plan-01, gap-plan-02, gap-plan-03, gap-plan-04, gap-plan-05, gap-plan-06, gap-plan-07 |
@@ -224,7 +251,7 @@ where `verdict = peer-node`.
 | dShippedRelease | Deploy | dWitnessedBar | the landing record; kit release notes; the deploy engine; the incms adapter; the fleet register and currency watch; lander hardening; optional emitted CI; a derived runbook | gap-deploy-01, gap-deploy-02, gap-deploy-03, gap-deploy-04, gap-deploy-05, gap-deploy-06, gap-deploy-07, gap-deploy-08 |
 | dTendedCadence | Maintain | dWitnessedBar, dRankedPlan | the maintenance recipe; three hosts and the cadence; the safe-fix set; detectors with owners; map freshness; the maintenance record | gap-maint-01, gap-maint-02, gap-maint-05, gap-maint-06, gap-maint-07, gap-maint-08 |
 | dCalibratedLens | Review | dTendedCadence | review by policy per stage and effort; the stage-exit recommendation; lenses for Plan, Test, Deploy and Maintain; the shared value ledger; the weekly Loop Review; caps re-derived from evidence and review cost | gap-review-01, gap-review-02, gap-review-03, gap-maint-03, gap-design-08 |
-| dConvergedCharter | Convergence | dScopedBuild, dShippedRelease, dCalibratedLens | the charter regrouped by stage with every adopter's overlay, gov's included; protocol text derived to facts only; remaining `§` references migrated to tags; records merged by evidence; superseded parts retired through ratified proposals; adopters migrated | gap-spine-04, gap-spine-05, gap-maint-04 |
+| dConvergedCharter | Convergence | dScopedBuild, dShippedRelease, dCalibratedLens | protocol text derived to facts only, each document in its envelope; every remaining positional reference migrated to tags; records merged by evidence; superseded parts retired through ratified proposals; adopters migrated onto the ranked charter and the loop | gap-spine-04, gap-spine-05, gap-maint-04 |
 
 The live-build mapping is v1's table, unchanged; the Plan build carries it out with the owner's
 ratification and confirms dPolishedVitrine's track, which went dormant on 2026-10-14.

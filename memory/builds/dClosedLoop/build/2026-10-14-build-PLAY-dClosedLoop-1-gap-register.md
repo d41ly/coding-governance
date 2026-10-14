@@ -66,6 +66,10 @@ extends.
 
 | Key | Stage | Sev | Gap | Evidence | Owner build |
 |---|---|---|---|---|---|
+| gap-found-01 | Foundation | HIGH | No instruction hierarchy: about 25 load-bearing documents (about 551 KB) reach agents by six routes at different times, carry no identity or rank, and state precedence only for kickoff; nothing restores their order after a context reset. Raised by the owner. | foundations step 1, current state | — |
+| gap-found-02 | Foundation | HIGH | The charter's practices are one-line rules without reach: no stage contract, role or review lens reads them, and an adopter's methodology has no home but free prose. Raised by the owner. | foundations step 1, current state | — |
+| gap-found-03 | Foundation | HIGH | Subagents load no charter (`omitClaudeMd: true`) and receive unranked charter fragments, with nothing ordering charter, role and task. Raised by the owner. | foundations step 1, current state | — |
+| gap-found-04 | Foundation | MED | No rule and no record governs a live instruction that conflicts with the charter. Raised by the owner. | foundations step 1, F1-1 | — |
 | gap-spine-01 | Spine | HIGH | No stage model: no kit, leg, dossier, role or hook declares the stage it serves, and the loop exists only implicitly. | design §4.1 (0 of 31 dossiers carry a stage); `tools/roles/workflows.toml` covers stages 0–7 only | — |
 | gap-spine-02 | Spine | HIGH | Guards read agent-written state across stages, against `[class]`. | build §4 (write gate), design §4.4 (INPROGRESS), test §5 C (pusher-written receipt), deploy §5 C | — |
 | gap-spine-03 | Spine | HIGH | Attended and unattended builds run different exit contracts. | build §3, §4 (DoD needs RUN.md) | — |
@@ -141,4 +145,12 @@ Re-measured after round 4 added `gap-spine-06`, same instrument:
 ```text
 Deploy=8 Plan=7 Spine=9 Test=9 Review=3 Build=4 Maintain=8 Design=9
 LOW=5 MED=23 HIGH=29
+```
+
+Re-measured after the foundations revisit's step 1 added the four owner-raised `gap-found-*` rows,
+same instrument:
+
+```text
+Deploy=8 Plan=7 Spine=9 Test=9 Review=3 Foundation=4 Build=4 Maintain=8 Design=9
+LOW=5 MED=24 HIGH=32
 ```
