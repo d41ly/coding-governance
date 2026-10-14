@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-12 — an apply narrower than its receipt keeps every other installed kit's claim and rows, so a refused settings-merge exit stays refused on the next run
 
-**Status:** CLOSED · rev-6 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
+**Status:** CLOSED · rev-7 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -13,6 +13,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-4-revision.md) | research | TOOL-dRedressedBar-11 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-5-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md) | research | TOOL-dRedressedBar-16 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md) | research | TOOL-dRedressedBar-17 TOOL-dRedressedBar-9 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 |
 | [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 |
 
 <!-- /gen:spec-records -->
@@ -353,6 +354,16 @@ none
   Alternatives rejected row C5 states that its rejection rested on that false premise and that unit
   16 takes C5, which TOOL-dRedressedBar-16's AC1 and AC2 observe. S2 and the criteria do not move:
   unit 12 built against them as written.
+- rev-7 · 2026-10-14 · S1 · a records fix for TOOL-dRedressedBar-17, closing the units-12-15 spec
+  audit's report ids 2 and 12 (item M2), written by that unit's spec-writer pass `<w17>`. The
+  status stays CLOSED, and no text above this line moves. S1 says `install.sums` and the
+  `STEP_RECEIPT` counts are derived from the written list and are observed by AC1 and AC3. No
+  criterion of this spec read either: AC1 to AC6 read neither the sidecar nor the step line, so a
+  build carrying kits and rows into `install.json` alone would have passed them. Unit 12 built
+  against them as written. TOOL-dRedressedBar-17's AC2 observes the corrected form over §4's steps 1
+  and 2: the step line's counts against the receipt's own `files` and `kits`, the sidecar's
+  `(sha256, path)` pairs against every receipt row carrying `sha256`, the carried rows included, and
+  `govkit check` printing no sidecar mismatch.
 
 ## 10. Reuse audit
 

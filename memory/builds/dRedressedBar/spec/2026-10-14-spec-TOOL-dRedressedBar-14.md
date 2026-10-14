@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-14 — a first apply at a per-kit prefix configures against the homes it just wrote: the receipt is written ahead of CONFIGURE
 
-**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 10
+**Status:** CLOSED · rev-6 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -14,6 +14,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-14-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-5-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-14-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-brief.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-2-revision.md) | research | TOOL-dRedressedBar-15 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md) | research | TOOL-dRedressedBar-17 TOOL-dRedressedBar-9 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-15 |
 | [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-15 |
 
 <!-- /gen:spec-records -->
@@ -54,8 +55,12 @@ not reach. That cause is a separate mechanism, and §8 F1 asks where it goes.
   `[kit.agent-cap] prefix = "scripts"`, and runs `apply --kits agent-cap,settings-merge,kickoff-manifest`.
   It then asserts AC1's line, receipt and settings facts, each on the line it names. It asserts no
   exit code, because the exit belongs to agent-cap's argv (§8 F1). Its file reads name
-  `encoding="utf-8"`, and its process calls go through `run`. Observed by AC1, through the `New arm:`
-  line in §7.
+  `encoding="utf-8"`, and its process calls go through `run`. Once unit 15 lands,
+  `TOOL-dRedressedBar-17` (its S1, report id 1) narrows the block: its check that exactly one line
+  opens `govkit: kit 'agent-cap'` moves out, because unit 15's `[dRB-15]` checks on the same apply
+  assert no such line and own agent-cap's outcome. Its other checks stand, among them
+  settings-merge's CONFIGURE line, the receipt's `scripts/hooks/agent-cap.js` row and the
+  `.claude/settings.json` command. Observed by AC1, through the `New arm:` line in §7.
 - **S5** — Spec 11's §4 "Which receipt bytes" paragraph is corrected in place by this unit's
   spec-writer pass, `<w14>`, which runs once unit 11 is CLOSED and `<w12>` and `<w13>` have bumped
   spec 11, and before the build pass (§4 "The spec-11 correction's pass"). It takes one rev bump
@@ -95,6 +100,10 @@ not reach. That cause is a separate mechanism, and §8 F1 asks where it goes.
   ahead of CONFIGURE so both writes carry them. Without the carry, the early receipt holds only the
   selection's rows. Fixture A's planted `agent-cap` row then disappears during CONFIGURE, and the
   false accept unit 11 closed comes back. AC3 stages exactly that.
+- **consumes-from** `TOOL-dRedressedBar-13` — its pass commit `<p13>`, the red-half reference of
+  AC1, AC2 and AC4, AC5's diff base and the `New arm:` line's red half in §7. Also the CONFIGURE call
+  its S13 rewrote, right below the S1 write, and the encoding-posture registry its pass moved, which
+  AC5 derives from. Without it those red halves have no commit to run from.
 - **hands-off** `TOOL-dRedressedBar-15` — agent-cap's own adopter exit 2 at a per-kit prefix (§4,
   measured). Its argv `["python", "{prefix}/settings-merge.py"]` (`tools/hooks/kit.toml:108`)
   resolves `{prefix}` in agent-cap's context, while the file belongs to settings-merge. AC1 pins the
@@ -161,9 +170,13 @@ with no settings-merge problem.
 
 The three keys computed after CONFIGURE take what the target holds when the write lands. That is the
 prior run's orders, verdicts and legs, or none on a first install. So the early receipt is a true
-statement at any instant up to RECEIPT. Nothing is appended to `rows` after LAND. The only appends
-are `:7616` and `:7621`. `files` is re-derived at RECEIPT anyway, so a later append cannot be
-written to one file and lost from the other.
+statement at any instant up to RECEIPT. Nothing is appended to `rows` after LAND. Every
+`rows.append` in `_cmd_apply` sits before the STAGE step (`:7646`): `:7424`, `:7502`, `:7540`,
+`:7593`, `:7616` and `:7621`. That list is what
+`git show 46eb75ed:tools/govkit/govkit.py | awk 'NR>=7233 && NR<=8031 && /rows\.append/ {print NR}'`
+prints over `_cmd_apply`'s span at `46eb75ed`, whose `tools/` equals `29c72f51`'s. `files` is
+re-derived at RECEIPT anyway, so a later append cannot be written to one file and lost from the
+other.
 
 `receipt`, the in-memory prior receipt, is bound once at `:7251` and never rebound. The S1 write
 changes no in-process reader. `foreign_kit_present`, `derive_unsatisfied_requires`,
@@ -176,8 +189,10 @@ changes no in-process reader. `foreign_kit_present`, `derive_unsatisfied_require
 | How the run ends | What `.governance/install.json` claims | Does a re-run recover |
 |---|---|---|
 | An adopter exits non-zero, accepted or refused | RECEIPT overwrites the early write, so the receipt is the one written today. CONFIGURE only calls `r.fail` (`:7760-7772`) | as today |
-| An exception or interrupt escapes `_cmd_apply` between the two writes | the early receipt: this run's selection and carried kits, every landed row with its STAGE `oid`, `gov_commit` this run's commit, and the prior run's `orders`, `after` and `gate_runner` | `apply` does. The kits are claimed, so `foreign_kit_present` passes. Each staged path matches its row's `oid`, so `demand_claimed_paths_clean` passes (`:7036-7106`, carve-out 3; step 5 above measured both). Every adopter then runs again. `update` does not, because it runs no adopter of a claimed kit (`:11100-11103`) |
+| An exception or interrupt escapes `_cmd_apply` between the early write and RENORMALIZE's `git add --renormalize` (`:7857`) | the early receipt: this run's selection and carried kits, every landed row with its STAGE `oid`, `gov_commit` this run's commit, and the prior run's `orders`, `after` and `gate_runner` | `apply` does. The kits are claimed, so `foreign_kit_present` passes. Each staged path matches its row's `oid`, so `demand_claimed_paths_clean` passes (`:7036-7106`, carve-out 3; step 5 above measured both). Every adopter then runs again. `update` does not, because it runs no adopter of a claimed kit (`:11100-11103`) |
+| The same, after `git add --renormalize` and before RECEIPT, the stretch that holds LEGS and AFTER | the same early receipt. The renormalize rewrote the index blobs of LF-pinned paths, and the re-stamp (`:7926-7936`) set the new `oid`s in memory only | As this unit built it, `apply` does not: carve-out 3 keeps a staged path only when its index oid equals the recorded one (`:6918-6922`), so a renormalized path reads DIRTY and the re-run refuses (units-12-15 report id 22). `TOOL-dRedressedBar-17` (its S22) writes the receipt once more right after the re-stamp, with `files` re-derived as `rows + _carried_rows`, through `write_atomic`. After it, a re-run of `apply` recovers from an interrupt anywhere except between `git add --renormalize` and that write, a stretch in which no adopter, leg or runner runs |
 | The same, at the base | a first apply leaves no receipt, and a re-apply leaves the prior one | a first apply's re-run is refused as foreign (`:7257-7263`); AC4's red half observes it |
+| An exception raised during a receipt write: the early write, RECEIPT's, or the write after the re-stamp | As this unit built it, both writes are a plain `receipt_path.write_text` (`tools/govkit/govkit.py:7853`, `:8249` at `7da62c241`), so a fault mid-write leaves `install.json` truncated (units-12-15 report id 23) | Until `TOOL-dRedressedBar-17` lands, no: the next `apply` fails parsing the file at `json.loads`, outside any refusal. Its S23 routes every receipt write through `write_atomic`, a sibling file and `os.replace`, so the previous file stays whole and the row above that matches it applies |
 
 `cmd_apply`'s `finally` releases the write lock on every one of these paths (`:7220-7231`).
 
@@ -192,9 +207,16 @@ adds rows each one already reads on a later run.
 | lexicon's adopter, resolving codebase-map | `tools/lexicon/adopt-lexicon.sh:404` | static probes only | finds this run's codebase-map rows |
 | unattended's adopter, resolving memory-tree | `tools/unattended/adopt-unattended.sh:328` | static probes only, then `check_tracked`, which a staged path passes | finds this run's memory-tree rows |
 | memory-tree's adopter: `{{TOOL_ROOT}}` cites, `rendered_at` and the playbook engine | `tools/memory-tree/adopt-memory-tree.sh:277`, `:281-298`, `:317` | `rows = []` | sees this run's rows, as its next run does today |
+| playbook-render's adopter, through `tools/playbook/adopt-playbook.sh:59`: `derive_gate_runner` and the role roster | `tools/playbook/render_playbook.py:79-112`, `:285`, `:482` | static probes only | finds a run-gates or roles kit this run landed at a per-kit prefix, so the rendered gate-runner line and role roster name that home, and the rendered charter's bytes, which OBSERVE hashes, move with them. A fix, as for settings-merge |
 | `resolve_owned_hook`, run by settings-merge `--fragment` from `run_fragment_merges` | `tools/settings-merge.py:356-360`; `govkit.py:7777-7780` | the path, unchanged | joins an `[[own]]` hook's `adopter-owned` row, which apply built at `:7577-7594`, on this same run |
 | unit 11's `must_not_resolve` term in `classify_outcome` | `:7745`, unit 11 S1 | no rows | reads the bytes the adopter read |
 | the target's runner at AFTER, its `receipt sync` leg | `tools/run-gates/check-receipt.py:60-71` | a skip | grades the early receipt's engine rows against the bytes this run landed |
+
+The adopter-side resolver copies were listed with
+`git grep -l '>>> resolve_kit_dir' -- 'tools/*adopt-*.sh' 'tools/playbook/*.py' 'tools/settings-merge.py' ':!*.test.sh'`,
+which printed five files at `46eb75ed` and again at `7da62c241`: settings-merge.py, the lexicon,
+unattended and memory-tree adopters, and `render_playbook.py`. The `':!*.test.sh'` term leaves out
+`tools/unattended/adopt-unattended.test.sh`, a suite and no reader.
 
 ### What an adopter sees change
 
@@ -212,15 +234,16 @@ This unit follows unit 13 (order 9), so its order is 10. Units 12, 13 and 14 all
 `tools/govkit/govkit.py` and `tools/govkit/selftest.py`, and their spec-writer passes `<w12>`,
 `<w13>` and `<w14>` each bump spec 11, in that order. This unit also binds unit 12's
 locals at a new site, and unit 13's S13 rewrites the CONFIGURE call that sits right below the S1
-write. Unit 13 is a sequence and not an edge, because no criterion here rests on its work.
+write. Unit 13 is an edge as well as a sequence: AC1, AC2 and AC4's red halves, AC5's diff base and
+the `New arm:` line read its pass commit `<p13>` (§3 Edges).
 
 Unit 7's version measurement need not cover this unit. Both product files sit under
 `{prefix}/govkit`, which the registry exempts as the deployer (`tools/govkit/registry.toml:295-297`),
 so no kit version moves. S6 mints no function, so `memory/map/generated/symbols.json` stays as unit
-7 regenerates it. The README changes this implies are the dispatcher's. Unit 14 needs a roster row,
-and this header's `order 10` adds step 10 on regen. The Build-level rules sentence "Units 10 and 11
-follow 7 in that order" should name 12, 13 and 14 too. Under §8 F1 (b), `tools/hooks/kit.toml`
-would move agent-cap's version, which unit 7's measurement does not cover.
+7 regenerates it. This unit's place in the build is read from `memory/builds/dRedressedBar/README.md`:
+its Build-level rules name the units that follow 7, its roster lists this unit, and its derived
+build-order region holds it at step 10, from this header's `order 10`. Under §8 F1 (b),
+`tools/hooks/kit.toml` would move agent-cap's version, which unit 7's measurement does not cover.
 
 ### Inventory
 
@@ -415,6 +438,30 @@ no refusal branch. The main loop observes the new arm red, then green, at the cl
   lists product files and the ledger only, AC6 reads spec 11 at `<w14>` and observes that the build
   pass writes no other spec, §3's consumes-from edge names `<w14>`, and Alternatives rejected gains
   row C8. No product design or other criterion moves.
+- rev-6 · 2026-10-14 · S4 · §3 · §4 · a records fix for TOOL-dRedressedBar-17, closing the
+  units-12-15 spec audit's report ids 1, 2, 5, 9, 19, 22 and 23, written by that unit's
+  spec-writer pass `<w17>`. The status stays CLOSED, and no criterion text moves. Id 1: S4 states
+  that `TOOL-dRedressedBar-17` moves the `[dRB-14]` check on agent-cap's problem line out once unit
+  15 lands, because unit 15's `[dRB-15]` checks on the same apply assert no such line; at
+  `7da62c241` both checks stand (`tools/govkit/selftest.py:3562-3566` and `:3581-3583`). Id 2: S2
+  says `install.sums` and the `STEP_RECEIPT` counts are derived from `_rcpt_doc`'s lists and are
+  observed by AC1 and AC2, and no criterion of this spec read the sidecar or the step line.
+  TOOL-dRedressedBar-17's AC2 observes the sidecar after AC1's apply. Id 5: Edges gain the
+  `consumes-from` edge to `TOOL-dRedressedBar-13`, whose pass commit `<p13>` AC1, AC2, AC4, AC5 and
+  the `New arm:` line read, and "Order, and unit 7" says so and points at the README's Build-level
+  rules, roster and derived build-order region, all of which already hold this unit, in place of the
+  edits it described as pending. Id 9: "The receipt written ahead" lists all six appends to `rows`
+  and the command that printed them, at `46eb75ed`, which TOOL-dRedressedBar-17's AC9 pins. At
+  `7da62c241` the same awk over `_cmd_apply` prints six too, `:7586`, `:7664`, `:7702`, `:7755`,
+  `:7778` and `:7783`, each before STAGE at `:7808`. Id 19: the reader table gains
+  `render_playbook.py`, and a line under it records the inventory command and its five files. Id
+  22: "When CONFIGURE fails" splits the interrupt row at `git add --renormalize`, states that this
+  unit's re-run refuses DIRTY after it, and that `TOOL-dRedressedBar-17`'s write after the re-stamp
+  leaves exposed only the stretch from the renormalize to that write; at `7da62c241` that is
+  `:8071` to the re-stamp at `:8140-8151`, with LEGS at `:8167`. TOOL-dRedressedBar-17's AC22
+  observes it. Id 23: the table gains the row for a fault during a receipt write, which
+  TOOL-dRedressedBar-17's AC23 observes once every receipt write goes through `write_atomic`. §4
+  keeps the base lines its evidence reads; the tip's lines are named here.
 
 ## 10. Reuse audit
 

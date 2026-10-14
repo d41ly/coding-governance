@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-13 — the units-10-11 spec audit's 5 mediums and 18 lows, batched: each criterion half observed in a form that can fail, each false sentence corrected, and the code sites they describe made to say what the specs claim
 
-**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
+**Status:** CLOSED · rev-6 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -12,6 +12,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-13-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-13-3-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-13-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-13-4-revision.md) | research | TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-13-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-13-5-spec-writer.md) | journal | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md) | research | TOOL-dRedressedBar-17 TOOL-dRedressedBar-9 TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 |
 | [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 |
 
 <!-- /gen:spec-records -->
@@ -22,9 +23,10 @@ The spec audit of units 10 and 11
 (`reviews/2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md`) exited CONVERGED with
 24 confirmed findings: no blocker, one high, 5 mediums and 18 lows. BUILD-METHOD M4 promotes the
 high alone, as `TOOL-dRedressedBar-12`, and batches every medium and low into ONE unit. This is that
-unit. The minors land on specs 10 and 11, so it repairs no unit in particular, and it is ordered
-after every unit of this build. It closes these findings, by report id, each with the report item it
-shares:
+unit. The minors land on specs 10 and 11, so it repairs no unit in particular. It is ordered after
+units 10, 11 and 12, whose specs and tree it corrects, and the derived build-order region of
+`memory/builds/dRedressedBar/README.md` holds the units that follow it. It closes these findings,
+by report id, each with the report item it shares:
 
 | id | grade | item | sits in | what is wrong | closed by |
 |---|---|---|---|---|---|
@@ -183,7 +185,9 @@ names its own id.
   own mechanism, and none is needed to close these 23 findings. The classes the report names that
   already exist under `memory/gotchas/` stay as they are.
 - No change to the regenerate site's or the gained loop's decoding. Both already pass
-  `encoding="utf-8"` (`tools/govkit/govkit.py:10986-10987`, `:11119-11120`).
+  `encoding="utf-8"` (`tools/govkit/govkit.py:10986-10988`, `:11119-11120` at `29c72f51`;
+  `:11213-11215` and `:11349-11350` at `7da62c241`), and the regenerate site also passes
+  `errors="replace"`.
 - No module-level function or class minted, and no kit version moved. Every product file sits under
   `{prefix}/govkit`, which the registry exempts, so `memory/map/generated/symbols.json` stays as unit
   7 regenerates it and unit 7 need not follow.
@@ -207,6 +211,11 @@ names its own id.
   which S17 rebuilds fixture B. `_cmd_apply` holds unit 12's receipt carry, in which S13 changes the
   CONFIGURE call. Both units write `tools/govkit/govkit.py`, `tools/govkit/selftest.py` and spec 11, so this
   unit follows it.
+- **hands-off** `TOOL-dRedressedBar-14` — the tree this unit leaves. Its pass commit `<p13>` is the
+  red-half reference of spec 14's AC1, AC2 and AC4, AC5's diff base and its `New arm:` line. The
+  CONFIGURE call S13 rewrites sits right below the receipt write unit 14 adds, and the
+  encoding-posture row S13 lowers is the registry spec 14's AC5 derives from. This is the mirror
+  of the `consumes-from` edge spec 14 gains (report id 5).
 - **hands-off** `TOOL-dRedressedBar-17` — fixture B of the `[dRB-11]` block as S17 rebuilds it. AC15's
   spelling ban spans fixture A too (report id 3), so that unit brackets fixture B with markers and
   observes its identities by behaviour. Also this spec's §1 ordering sentence (report id 6), its §5,
@@ -340,8 +349,11 @@ Specs 9, 10 and 11 are `<w13>`'s write set, not the build pass's.
 - error / empty / loading states — A non-UTF-8 byte in an adopter's stderr now prints as U+FFFD in
   the tail instead of raising mid-install.
 - observability — The key rule's labels read as their own rule in the matrix output.
-- risks — `errors="replace"` diverges from the two sibling sites, which decode strictly; those sites
-  are not this unit's (§3). A label prefix change moves no check count, so no floor moves.
+- risks — The regenerate site already decodes UTF-8 with replacement
+  (`tools/govkit/govkit.py:10986-10988` at `29c72f51`, `:11213-11215` at `7da62c241`), and S13
+  makes CONFIGURE match it. Only the gained loop (`:11119-11120` at `29c72f51`, `:11349-11350` at
+  `7da62c241`) still decodes strictly, and it is not this unit's (§3). A label prefix change moves
+  no check count, so no floor moves.
 - testing — AC1 to AC21 are greps over specs and source, in-process python probes, and fixture B
   through the selftest helper. The two moved arms are declared in §7.
 - migration — N/A — no receipt, conf or deploy field moves.
@@ -515,6 +527,24 @@ none
   `<p13>` and observes that the build pass writes no other spec, S6's Readers clause says where
   spec 9 is written, and Alternatives rejected gains one row. No product design or other criterion
   moves.
+- rev-6 · 2026-10-14 · §1 · §3 · §5 · §10 · a records fix for TOOL-dRedressedBar-17, closing the
+  units-12-15 spec audit's report ids 3, 5, 6 and 8, written by that unit's spec-writer pass
+  `<w17>`. The status stays CLOSED, and no criterion text moves. Id 3: AC15's spelling ban ran
+  from the first to the last `[dRB-11]` line, so its span reached fixture A, whose planted row may
+  derive its identities with the selftest's own idiom; it could red a correct build and pass a
+  fixture B that respelled the derivation. Unit 13 built against it as written.
+  TOOL-dRedressedBar-17's AC3 observes the corrected form: fixture B between two markers, its
+  agent-cap row without `commit`, `sha256` and `gov_oid` before `write_vintage_receipt` runs and
+  with all three after. Id 5: Edges gain the hands-off to `TOOL-dRedressedBar-14`, the mirror of
+  the `consumes-from` edge spec 14 gains in the same pass. Id 6: §1 said this unit was ordered
+  after every unit of the build, and units 14 and 15 follow it; it now names units 10, 11 and 12
+  and points at the README's derived build-order region. Id 8: §5 risks said both sibling decode
+  sites decode strictly, and the regenerate site already passes `errors="replace"`; §5 now says
+  S13 makes CONFIGURE match it and only the gained loop decodes strictly, and §3's fourth non-goal
+  and §10 cite the regenerate site with its `errors` line included. Those citations keep the
+  `29c72f51` lines this spec's evidence reads, which TOOL-dRedressedBar-17's AC8 reads, and §3 and
+  §5 add the same sites at the tip, `7da62c241`: the regenerate site at `:11213-11215` and the
+  gained loop at `:11349-11350`.
 
 ## 10. Reuse audit
 
@@ -526,8 +556,8 @@ spawn leg's functions. That is a miss, recorded as one. The seams extended were 
 (`tools/gate-lint/sh_hygiene.py:384`, `:444`, `:843-879`). AC13 calls them read-only and never as the
 gate. The selftest's `write_vintage_receipt` (`tools/govkit/selftest.py:617-673`) is reused for
 fixture B. The marked canonical `resolve_prefix_token` (`tools/govkit/govkit.py:179-190`) is reused
-for the matrix row. The two sibling decode sites (`:10986-10987`, `:11119-11120`) give CONFIGURE its
-encoding. No code is minted. The gotchas checklist for the five product paths selected
+for the matrix row. The two sibling decode sites (`:10986-10988`, `:11119-11120` at `29c72f51`)
+give CONFIGURE its encoding, and the regenerate site its `errors="replace"`. No code is minted. The gotchas checklist for the five product paths selected
 `fixture-passes-by-finding-nothing`, which is why each criterion names the pinned blob where its red
 half reads. It selected `a-folded-field-leaves-its-row-shape-docs-behind`, the class of id 6, and
 `fixture-inherits-ambient-machine-state`, the class of id 13. It also selected

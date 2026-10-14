@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-15 — agent-cap's adopter runs settings-merge's own adopter at settings-merge's home, declared as `[adopt] via`, and selfcheck refuses any argv naming another entry's file
 
-**Status:** CLOSED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 11
+**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-2-revision.md) | research | TOOL-dRedressedBar-14 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-3-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-brief.md) | research | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md) | research | TOOL-dRedressedBar-17 TOOL-dRedressedBar-9 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 |
 | [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 |
 
 <!-- /gen:spec-records -->
@@ -34,8 +35,11 @@ which unit 14 left saying the receipt is not yet written (S10).
 - **S1** — One module-level function in `tools/govkit/govkit.py`, placed after `target_context`
   (`:1415-1477`):
   `resolve_adopter_argv(target: pathlib.Path, deploy: dict, eid: str, descs: dict[str, tuple[dict, str]]) -> list[str]`.
-  It reads `eid`'s `[adopt] via`. When that is a non-empty string it is the source entry, else `eid`
-  is. It returns the source entry's `[adopt].argv`, each element passed through `resolve_tokens`
+  It reads `eid`'s `[adopt] via`. As built at `0a178ed8f`, a non-empty string there is the source
+  entry, and any other value, or no key, leaves `eid` the source. `TOOL-dRedressedBar-17` (report
+  id 24) makes the key's presence the declaration: a `via` value that is not a non-empty string
+  naming a registry entry raises `KeyError` naming the entry, and never falls back to `eid`'s own
+  argv. It returns the source entry's `[adopt].argv`, each element passed through `resolve_tokens`
   with `target_context(target, deploy, <source>, descs[<source>][0])`, keeping element `[0]` as both
   spawn sites do today. An entry with no argv returns `[]`. Its docstring states the `via` grammar,
   the four rules S5 enforces, and that the configured entry's own descriptor still classifies the
@@ -62,7 +66,12 @@ which unit 14 left saying the receipt is not yet written (S10).
   `:3265`, `:3700`, `:7315`, `:7740`, `:11107` and `:12736`, `mutates_index` at `:2603`, and
   `why_no_regenerate` at `:1874`. `tools/check-kit-placeholders.py:133-139` and
   `tools/playbook/render_playbook.py:801` spell `argv`. S2 and S3 rewrite the two spawn sites, and
-  §3 says why the rest keep reading the declared argv.
+  §3 says why the rest keep reading the declared argv. Two spec sentences spelled agent-cap's
+  argv, both in spec 9 §4. The one opening "Why the shared argv stays safe"
+  (`memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-9.md:175`) is corrected
+  in place by `TOOL-dRedressedBar-17` (report id 20). The one in "What it does not check", that
+  agent-cap's own adopter ran the same argv, was already rewritten out by `TOOL-dRedressedBar-10`'s
+  pass, spec 9's rev-5.
   by value: the 3b-iii note at `:1882` counts one adopter fewer. The update dedup at `:11112`
   compares resolved argvs, and agent-cap's now equals settings-merge's at every prefix. Intake's
   token walk at `:12736` loses agent-cap's `{prefix}`, which is derived and never asked.
@@ -81,8 +90,9 @@ which unit 14 left saying the receipt is not yet written (S10).
   committed, `python tools/govkit/govkit.py mint --base ebce889c7` runs, and its writes are
   committed as a second commit carrying the unit id. If the mint names any entry other than
   agent-cap as minted, the pass stops before committing and returns to the main loop. Observed by AC8.
-- **S8** — S1 adds a function, so `python tools/run-gates/regen.py --write` runs before the product
-  commit, and that commit carries what it rewrites under `memory/map/generated/`. Observed by AC9.
+- **S8** — S1 adds a function, so the symbol index's one generator,
+  `python tools/codebase-map/gen_map.py --write`, runs alone before the product commit, and that
+  commit carries what it rewrites under `memory/map/generated/`. Observed by AC9.
 - **S9** — Every reading below goes to this unit's acceptance ledger under
   `memory/builds/dRedressedBar/build/`, carrying `**Serves:** journal TOOL-dRedressedBar-15`.
   Observed by AC10.
@@ -120,7 +130,12 @@ which unit 14 left saying the receipt is not yet written (S10).
   the merged-rule guard at `:7315`, intake's token walk and the two shipped readers each grade the
   script a descriptor declares, and the delegate's script is graded on its own entry. agent-cap
   ships no `rendered`, `generated` or `merged` rule, so `check_entry_producer`'s and `:7315`'s answer
-  for it does not move.
+  for it does not move. That argument covers agent-cap alone: both readers test the entry's own
+  declared argv, so a later `via` entry carrying such a rule would read as a non-producer, or be
+  refused a delegate CONFIGURE runs. `TOOL-dRedressedBar-17` (report id 11) adds a fifth `via` rule,
+  after the four this unit built (§4): the entry's `[[files]]` holds no rule whose role is `rendered`, `generated`
+  or `merged`. It keeps both readers' logic and restates `check_entry_producer`'s docstring, which
+  still quotes the CONFIGURE lines S2 rewrote.
 - No grading of `[[hole]]` discharge commands or `[[outcome]]` probe paths by the S5 arm (§4).
 - No raise of the refusal join's `BRANCH_PIN`. It is a floor, the leg runs enumeration-only
   (`tools/govkit/refusal_join.py:244-256`), and re-baselining it is not this unit's.
@@ -196,8 +211,11 @@ own. settings-merge declares no hole, and an inert settings-merge never stopped 
 
 ### The class gate
 
-**The `via` rules.** For every entry in `_bare_sel` whose `[adopt]` carries `via`, one `r.fail`
-site reports the first rule broken:
+**The `via` rules.** For every entry in `_bare_sel` whose `[adopt]` table holds the `via` key,
+whatever its value, one `r.fail` site reports the first rule broken. The build keys on the key's
+presence (`"via" in _xa_adopt`, `tools/govkit/govkit.py:3296` at `7da62c241`), so an empty or
+non-string value reads `names no registry entry` there. `TOOL-dRedressedBar-17` adds the first and
+last rows below (report ids 24 and 11):
 
 ```
 entry '<eid>' declares [adopt] via = '<v>', which <reason>
@@ -205,14 +223,16 @@ entry '<eid>' declares [adopt] via = '<v>', which <reason>
 
 | Rule | `<reason>` |
 |---|---|
+| `<v>` is a non-empty string (`TOOL-dRedressedBar-17`, report id 24) | `is not a non-empty string` |
 | `<v>` is a registry entry | `names no registry entry` |
 | `<v>` is in `<eid>`'s `requires` | `is not in its requires, so that entry's script may not be installed` |
 | `<v>`'s own `[adopt]` carries a non-empty `argv` | `declares no [adopt] argv of its own` |
 | `<eid>`'s `[adopt]` carries no non-empty `argv` | `sits beside an [adopt] argv in the same table` |
+| `<eid>`'s `[[files]]` holds no rule whose role is `rendered`, `generated` or `merged` (`TOOL-dRedressedBar-17`, report id 11) | `carries a rendered, generated or merged rule, which the producer test and the merged-rule guard read through its own [adopt] argv` |
 
-The second rule answers the question `TOOL-aScouredKit-26` leaves open for a token.
+The `requires` rule answers the question `TOOL-aScouredKit-26` leaves open for a token.
 `derive_unsatisfied_requires` (`:944-967`) admits a run only when every `requires` entry is
-selected or claimed, so the named script is installed whenever the configured entry is. The third rule rules out a chain, because a
+selected or claimed, so the named script is installed whenever the configured entry is. The own-argv rule rules out a chain, because a
 `via` entry has no argv. An entry that breaks a rule is left out of the join below, so the helper
 never meets an invalid `via`.
 
@@ -245,6 +265,14 @@ reading `cross-entry argv: <o> element(s) offered and none graded — every one 
 unresolved token or a space, so the predicate read nothing`. With nothing offered it stays silent,
 as arm 7j4 stands its zero-population reds down.
 
+This join is a second walk over descriptor argv beside `silenced_legs`
+(`tools/govkit/govkit.py:4038` at `7da62c241`), and the two disagree on which element is a path:
+`silenced_legs` grades on the resolved text, the OFFERED test above on the declared text (report
+id 10). `TOOL-dRedressedBar-17` folds both walks into one generator, `scan_entry_argv`, so S5
+extends `silenced_legs` through it. One rule then grades an element in both checks, its resolved
+text carrying `/` with nothing missing, and the `gate legs:` note and this note count one
+population and its part. The OFFERED and GRADED tests above are what unit 15 built.
+
 **Measured over the real registry first.** A scratch probe ran the join through `read_descriptors`,
 `planned_writes` and `target_context` at a bare target, at `95350ba5`. It graded 29 of 29 entries
 and 105 offered elements: 15 `[adopt]`, 11 `[check]`, 67 `[[gate_leg]]` and 12 `[[regenerate]]`.
@@ -275,7 +303,7 @@ count falls to 0. AC6 derives both at observation.
 | the same, `[kit.settings-merge] prefix = "scripts"` | exit 1, agent-cap `adopter exit 2` opening `tools\\settings-merge.py`. Derived from §4's rows 2 to 4 and unit 14 | exit 0 |
 | the same at the default prefix | exit 0, both `adopter exit 0` | unchanged: both resolve to `python tools/settings-merge.py`, as today |
 | `apply --kits agent-cap,kickoff-manifest` over a target claiming settings-merge | agent-cap's adopter wires the hook (§4, last row) | unchanged: the delegate runs though settings-merge is not selected |
-| `update --write` gaining both, `[kit.agent-cap] prefix = "scripts"` | two different resolved argvs. Both run, and agent-cap's cannot open its file | one resolved argv, run once and classified by agent-cap's descriptor, as at the default prefix. Derived, not run |
+| `update --write` gaining both, `[kit.agent-cap] prefix = "scripts"` | two different resolved argvs. Both run, and agent-cap's cannot open its file | one resolved argv, run once and classified by agent-cap's descriptor, as at the default prefix. `TOOL-dRedressedBar-17`'s AC13 observes it, in a case added to the `[dRB-9]` update-gaining block (report id 13) |
 | any `update` after this lands | — | the shipped `{prefix}/hooks/kit.toml` and the three version carriers move, one version up. No installed adopter re-runs (`:11100-11103`) |
 
 ### Versions and order
@@ -390,10 +418,16 @@ runs for settings-merge.
   `KeyError`, which is stated in its docstring. An entry with no adopter returns `[]`, as today.
 - observability — The CONFIGURE line is unchanged. The S5 note prints its offered, graded and hit
   counts on every selfcheck.
-- risks — A future cross-entry argv now reds selfcheck, and its message names the remedy. No arm
-  pins agent-cap's `[adopt].argv` or the 3b-iii count: `git grep` finds no `CONFIGURE agent-cap`
-  and no `descriptor(s) declare one` in `tools/govkit/selftest.py`. The `govkit selftest` leg grades
-  the rest at the close.
+- risks — A future cross-entry argv now reds selfcheck, and its message names the remedy. Read over
+  the tree unit 14 leaves, `109fbb4ab`, and not the base: no arm pins agent-cap's `[adopt].argv` or
+  the 3b-iii count, because `git grep` finds no `CONFIGURE agent-cap` and no
+  `descriptor(s) declare one` in `tools/govkit/selftest.py`. One arm reads agent-cap's outcome by
+  value: the `[dRB-14]` check that exactly one line opens `govkit: kit 'agent-cap'` and carries
+  `settings-merge.py` (`tools/govkit/selftest.py:3562-3566`). S6's `[dRB-15]` check that no line
+  opens `govkit: kit '` reads the same apply, so the two cannot both hold after S4.
+  `TOOL-dRedressedBar-17` (its S1, report id 1) moves that check out of the `[dRB-14]` block, and
+  the `[dRB-15]` checks own agent-cap's outcome. The `govkit selftest` leg grades the rest at the
+  close.
 - testing — AC1 to AC4 are scratch applies under `%TEMP%`, with `<p14>` clones for the red halves.
   AC5 is a python probe, AC6 and AC7 are selfcheck runs over a gov clone and scratch govs, and AC8
   and AC9 are verb and source probes, and AC11 reads S10's comment as a joined text cut. Two new
@@ -520,7 +554,14 @@ from a local `git clone` of gov under `%TEMP%`, checked out at `<p14>`.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selfcheck` · `receipt sync (installed files match the receipt)` · `hook destinations self-test` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `codebase-map coverage + freshness` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms` · `memory hygiene`
+`govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selfcheck` · `receipt sync (installed files match the receipt)` · `hook destinations self-test` · `agent-cap self-test` · `scratch-guard self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `kit placeholders (a declared token its adopter substitutes)` · `codebase-map coverage + freshness` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms` · `memory hygiene`
+
+The leg line is a floor. It is derived by joining §4 Files touched against every guard in
+`tools/gate-legs.json`, with `{prefix}` read as `tools` and a guard more than 5 legs carry skipped;
+that join adds `format-guard self-test`, whose guard names `tools/hooks/format-guard.js` and
+`tools/hooks/scratch-guard.js`, the two files S7's mint rewrites. The line then adds legs the join
+cannot see. `kit placeholders (a declared token its adopter substitutes)` carries no guard, and it
+runs `tools/check-kit-placeholders.py`, which S4's Readers name as a reader of `[adopt]` argv.
 
 New arm: tools/govkit/selftest.py · covers AC1 · the `[dRB-15]` checks on the `[dRB-14]` apply, over `<p14>`, where the run exits 1 and agent-cap's line ends `adopter exit 2` · none
 
@@ -556,6 +597,34 @@ none
   gains "The CONFIGURE comment, restated", AC11 reads it as a joined text cut, red at `ffe73d97d`,
   and AC10 counts the other criteria. §1, §3, §5, §7 and §10 say so. No arm is added, Files touched
   is unchanged, and no other scope, design or criterion moves.
+- rev-5 · 2026-10-14 · S1 · S4 · S8 · §3 · §4 · §5 · §7 · §10 · a records fix for
+  TOOL-dRedressedBar-17, closing the units-12-15 spec audit's report ids 1, 4, 10, 11, 13, 15, 16,
+  18, 20, 21 and 24, written by that unit's spec-writer pass `<w17>`. The status stays CLOSED, and
+  no criterion text moves. The criteria named below are TOOL-dRedressedBar-17's, not this spec's.
+  Id 1: §5 risks restates its reader inventory over unit 14's tree and names the `[dRB-14]` check on
+  agent-cap's problem line as a reader by value; at `7da62c241` it still stands beside S6's
+  `[dRB-15]` check, as this unit's ledger records, and TOOL-dRedressedBar-17's S1 moves it out
+  (its AC1). Ids 4 and 15: §7's leg line names `format-guard self-test` and the kit placeholders
+  leg, and the sentence below it says the line is a floor and how it is derived (its AC4). Id 10:
+  §4's ownership join and §10 say S5 extends `silenced_legs` through `scan_entry_argv`, the one
+  walker that unit mints (its AC10). Id 11: §3's non-goal on the other readers and §4's rule table
+  name the rendered-generated-merged `via` rule, and that unit restates `check_entry_producer`'s
+  docstring (its AC11). Id 13: row 5 of §4 "What an adopter sees change" points at its AC13 in
+  place of "Derived, not run". Id 16:
+  AC6's pass half matched `0 naming`, which a count of 10, 20 or 30 also carries; unit 15 built
+  against it as written, and its AC16 reads the count anchored. Id 18: the `govkit selftest` guard
+  holds `{prefix}/govkit/` alone, so an edit to `tools/hooks/kit.toml` or `tools/settings-merge.py`,
+  the files the `[dRB-15]` checks grade, skips that leg on a scoped bar; its AC18 observes the
+  widened guard. Id 20: S4's Readers name spec 9 §4's two sentences on agent-cap's argv, and only
+  the first still stood (its AC20). Id 21: S8 named the whole `regen.py --write` and accounted only
+  for the map; it now names `gen_map.py --write` alone (its AC21). The pass ran the whole command,
+  as the body of `0a178ed8f` says, and that product commit moved four paths, `tools/govkit/govkit.py`,
+  `tools/govkit/selftest.py`, `tools/hooks/kit.toml` and `memory/map/generated/symbols.json`, so
+  none moved outside §4 Files touched. Id 24: S1 states the fallback as built at `0a178ed8f` and
+  the key-presence rule that unit lands, §4's rule table gains the type rule, and its population
+  sentence names the key's presence, which the build already reads (its AC24). §4's paragraph
+  under the rule table names the `requires` and own-argv rules by content, since the new first row
+  moved their ordinals.
 
 ## 10. Reuse audit
 
@@ -566,7 +635,10 @@ context. The seams this unit extends are the two it calls rather than restates.
 `target_context` (`tools/govkit/govkit.py:1415-1477`) is called with the delegate's id, so the
 strict-class validation and the per-kit table apply unchanged. The selfcheck bare-target block
 (`:3158-3221`) already holds `planned_writes`' rows over every entry. The ownership join reads those
-rows as `silenced_legs` and the reserved-prefix check do, so no second planner exists.
+rows as `silenced_legs` and the reserved-prefix check do, so no second planner exists. It did add a
+second argv walker beside `silenced_legs` (`tools/govkit/govkit.py:4038` at `7da62c241`), the
+existing walker it should have extended (report id 10). `TOOL-dRedressedBar-17` folds the two into
+one generator, `scan_entry_argv`, so S5 extends `silenced_legs` through it.
 `resolve_kit_dir` was weighed as candidate C3 and rejected, with its test, in §4.
 
 The gotchas checklist for the four product paths selected these classes:

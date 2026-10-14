@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-9 — settings-merge's adopter exit with no agent-cap hook declared an accepted stop, so a gaining update completes
 
-**Status:** CLOSED · rev-6 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
+**Status:** CLOSED · rev-7 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md](../build/2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-13-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-13-4-revision.md) | research | TOOL-dRedressedBar-13 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md) | research | TOOL-dRedressedBar-17 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-9-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-9-1-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-9-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-9-brief.md) | research | — |
 | [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 |
@@ -172,12 +173,18 @@ added to an in-memory copy of the shipped descriptor. Nothing in the tree was wr
 
 ### Why the shared argv stays safe
 
-`agent-cap` declares the same argv (`tools/hooks/kit.toml:108`). In `update`, one resolved argv runs
-once per run (`tools/govkit/govkit.py:11112-11118`). The registry default lists `agent-cap` before
+At this unit's base, `agent-cap` spelled settings-merge's argv as its own (`tools/hooks/kit.toml:108`
+at `ebce889c`). Since `TOOL-dRedressedBar-15` its `[adopt]` table holds `via = "settings-merge"`
+alone (`tools/hooks/kit.toml:116` at `7da62c241`), and `resolve_adopter_argv`
+(`tools/govkit/govkit.py:1483` at `7da62c241`) runs settings-merge's argv resolved in
+settings-merge's context, so the two entries' resolved argvs are equal at every prefix. In
+`update`, one resolved argv runs once per run (`tools/govkit/govkit.py:11112-11118`; the dedup on
+resolved argvs sits at `:11331-11347` at `7da62c241`). The registry default lists `agent-cap` before
 `settings-merge` (`tools/govkit/registry.toml:48-49`), so when both are gained the one run is
 classified by agent-cap's descriptor, which declares no outcome. In `apply`, each kit's adopter runs
-under its own descriptor (`:7740-7764`), so an agent-cap refusal still fails there. Only
-settings-merge's exit is ever read through the new block.
+under its own descriptor (`:7740-7764`), and `via` changes only the argv, never the descriptor that
+classifies the exit, so an agent-cap refusal still fails there. Only settings-merge's exit is ever
+read through the new block. The argument holds through `via` and the dedup on resolved argvs.
 
 ### What it does not check
 
@@ -442,6 +449,16 @@ none
   elements, and `TOOL-dRedressedBar-11` gave them an optional fourth. The sentence now names it,
   cited at `tools/govkit/matrix.py:165` at `fda78c56`. TOOL-dRedressedBar-13's AC6 reads it beside
   the helper's docstring.
+- rev-7 · 2026-10-14 · §4 · a records fix for TOOL-dRedressedBar-17, closing the units-12-15 spec
+  audit's report id 20, written by that unit's spec-writer pass `<w17>`. The status stays CLOSED,
+  and no criterion text moves. `TOOL-dRedressedBar-15` replaced agent-cap's copied `[adopt]` argv
+  with `via = "settings-merge"`. §4 "Why the shared argv stays safe" opened on agent-cap's copy of
+  the argv; it now says the copy was the base's, cites the `via` line and `resolve_adopter_argv` at
+  `7da62c241`, and states that the argument holds through `via` and the dedup on resolved argvs,
+  which TOOL-dRedressedBar-17's AC20 reads. The row's second target, the "What it does not check"
+  sentence saying agent-cap's own adopter ran the same argv, no longer exists: rev-5's rewrite for
+  report id 22 took it out, and the routes table that stands there names no argv. Nothing moves for
+  it.
 
 ## 10. Reuse audit
 
