@@ -4,7 +4,7 @@
  * final message lacks the charter's BUILD/SPEC pair, breaks rule r1, leaves a new commit unreported, or
  * leaves out the `agent` or `returned` line of an agent its turn dispatched or received.
  *
- * gov:kit agent-cap@1.39 — ships inside the hooks kit entry; the kit version is agent-cap.js's.
+ * gov:kit agent-cap@1.40 — ships inside the hooks kit entry; the kit version is agent-cap.js's.
  *
  * Contract: the spec for TOOL-aHeardState-1 under the build folder of that slug.
  *
