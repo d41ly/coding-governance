@@ -821,3 +821,17 @@ evidence (Recommended); One record per stage; Leave records as is. Answer: Merge
 | CV1 | structural | — | foundation plus a per-repo overlay block, gov included |
 | CV2 | structural | — | derived facts only; tags replace `§` |
 | CV3 | structural | — | merge record kinds by evidence |
+
+## Chain approval, asked after architecture v2 (2026-10-14)
+
+**A1. "Approve the ten-build chain as walked (architecture v2)?"** Offered: Approve (Recommended);
+Approve, splitting the big ones; Not yet ("Something needs another pass first. Say what under
+Other."). Answer: Not yet, with no area named.
+Effect: the chain is not approved; no spec is written and no chain build opens until the owner
+names what needs another pass and it has had one.
+
+**A2. "You asked for § references to be replaced by tags. Do other positional references count
+too: numbered method steps such as M5, numbered spec sections, numbered hygiene checks?"** Offered:
+Yes, all positional refs (Recommended); Only §. Answer: Yes, all positional refs (Recommended).
+Effect: v2's open interpretation is confirmed. Every positional section reference is migrated to a
+tag by Convergence, and new text from the Spine onward uses tags only.
