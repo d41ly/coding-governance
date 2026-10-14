@@ -96,6 +96,7 @@ extends.
 | gap-orient-11 | Orient | HIGH | A build's card cannot be found by its build: cards are keyed by session id in the clone's git directory, so a new session, a dead process or another node never finds the card of the build it picks up, and no card exists on the remote. Raised by the owner. | orientation research, preserve; `skills/session-kickoff/manifest-check.sh:311-316` | — |
 | gap-orient-12 | Orient | HIGH | A resume delivered no card: in this session the resume hooks printed only the process and wiring checks, though the replay is wired for resume; the cause is unknown. Raised by the owner. | orientation research, preserve (this session's transcript, the resume at 16:21:01Z) | — |
 | gap-orient-13 | Orient | MED | The card never reaches the charter's instruction slot: hook output lands as a reminder at the hook point, subagents (`omitClaudeMd: true`) get only the route, and another harness gets nothing. Raised by the owner. | orientation research, preserve; `tools/roles/render_agents.py:132`; https://code.claude.com/docs/en/hooks | — |
+| gap-orient-14 | Orient | HIGH | Compaction is ungoverned: nothing persists an item's work in flight before an automatic compaction; the card the compact hook re-injects is the kickoff's, written once and never updated as the build progresses, so it points at none of the records made since; nothing sets what a session does as its window fills; and the summary is read as a source. In this session the summary alone carried 34 of the 55 facts that survived, 1 of 7 identifiers and 1 of 9 measured numbers came back, and the summary misstated one fact about the session. Raised by the owner. | compaction experiment, results (`build/2026-10-15-build-PLAY-dClosedLoop-1-compaction-results.md`); this session's compact hook output | — |
 | gap-roles-01 | Roles | HIGH | Most checklist items have no role: of 70 items across the steps, 11 are performed by a role, 18 by the main session, 9 by a command and 32 by nobody; no role exists for planning, feature design, testing, deployment, maintenance or the Plan, Test, Deploy and Loop reviews. Raised by the owner. | roles research, coverage | — |
 | gap-roles-02 | Roles | HIGH | The main session performs role functions: in 60 days it wrote or edited specs 605 times, product code 565 times, folded review findings 367 times, and wrote plans 336 times and task briefs 74 times. Raised by the owner. | roles research, coverage P2 and P5 | — |
 | gap-roles-03 | Roles | HIGH | Role limits are prose: 58 of the 59 prohibitions in role bodies name no enforcer, `writes` is a class rather than an allowance, and shell writes escape every role gate (85 from the main session and 66 from typed roles since the role arm landed). Raised by the owner. | roles research, anatomy probe 3, coverage P4 | — |
@@ -104,6 +105,7 @@ extends.
 | gap-roles-06 | Roles | HIGH | The guard shares state with what it guards: the role index and agent files sit outside every role gate, so a role holding Write could edit them, and a tree with no role index is unarmed. Raised by the owner. | roles research, anatomy; `tools/hooks/scratch-guard.js:99-101` | — |
 | gap-roles-07 | Roles | MED | Roles go unused or double up: the orienter, reuse scout and diff reviewer had no spawn in 60 days, the reuse scout's body adds nothing, the spec writer also holds disposal, and the session-handoff template has no agent. Raised by the owner. | roles research, coverage P6 | — |
 | gap-roles-08 | Roles | MED | The work order names no checklist item, allowance or witness key, and a builder's divergence returns to "the caller" with no route back. Raised by the owner. | roles research, anatomy; `tools/workflows/unattended-unit.js:269` | — |
+| gap-roles-09 | Roles | LOW | A return's harness notices cannot be recorded: the injection guard's matches on researcher returns and the MCP-failure notice lived only in the context and died at the compaction, and nothing can persist them, so `notices.record` has no mechanism for its values other than the default `none`. Raised by the owner. | compaction experiment, results (`build/2026-10-15-build-PLAY-dClosedLoop-1-compaction-results.md`), Q07 and Q68 | — |
 | gap-spine-01 | Spine | HIGH | No stage model: no kit, leg, dossier, role or hook declares the stage it serves, and the loop exists only implicitly. | design §4.1 (0 of 31 dossiers carry a stage); `tools/roles/workflows.toml` covers stages 0–7 only | — |
 | gap-spine-02 | Spine | HIGH | Guards read agent-written state across stages, against `[class]`. | build §4 (write gate), design §4.4 (INPROGRESS), test §5 C (pusher-written receipt), deploy §5 C | — |
 | gap-spine-03 | Spine | HIGH | Attended and unattended builds run different exit contracts. | build §3, §4 (DoD needs RUN.md) | — |
@@ -243,4 +245,12 @@ researchers, same instrument:
 ```text
 Roles=8 Deploy=8 Plan=7 Spine=9 Orient=13 Test=9 Review=3 Foundation=8 Build=4 Flow=9 Maintain=8 Design=9
 LOW=5 MED=36 HIGH=54
+```
+
+Re-measured after the compaction experiment added `gap-orient-14` and `gap-roles-09`
+(`build/2026-10-15-build-PLAY-dClosedLoop-1-compaction-results.md`), same instrument:
+
+```text
+Roles=9 Deploy=8 Plan=7 Spine=9 Orient=14 Test=9 Review=3 Foundation=8 Build=4 Flow=9 Maintain=8 Design=9
+LOW=6 MED=36 HIGH=55
 ```

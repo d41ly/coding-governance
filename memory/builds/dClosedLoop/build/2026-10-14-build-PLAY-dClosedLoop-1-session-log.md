@@ -185,6 +185,10 @@ calls.
   identifiers, measured numbers, qualifiers and harness notices. The compact hook replayed the
   kickoff's card. Conclusions for unattended builds were drawn, and three forks, CX-1 to CX-3, put to
   the owner.
+- 2026-10-15, session 1799cb98: the owner settled CX-1 to CX-3. Compaction with the current card is the
+  default and a fresh session at the boundary is allowed; the card's pointers are updated as the build
+  progresses; notices are recorded by default nowhere, and all three values are allowed; both gaps and
+  the compaction checks are recorded. v2, the register and the results record were amended.
 
 ## Instruments
 
@@ -290,7 +294,7 @@ for k in sorted(expected - set(presets)):
 for k in sorted(set(presets) - expected):
     findings.append(f"preset table names a key that is excluded or not in the catalogue: {k}")
 
-FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count")
+FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count|a share of the window")
 for k, vals in presets.items():
     if k not in catalogue:
         continue
@@ -363,6 +367,15 @@ preset rows, and exits 1 on a copy with strict `roles.no-spawn` set to `sometime
 
 After the flow revisit with roles (eight policies added; units added to six chain rows): the join exits 0
 on 95 keys and 11 builds; the preset check exits 0 on 90 catalogue keys, 85 presettable, 85 preset rows.
+
+After the compaction settlement (`gap-orient-14` to dDeclaredLoop and `gap-roles-09` to dBoundRoles;
+four policies added; the preset check's free-value pattern gains `a share of the window`, for
+`context.threshold`, in the source above), both instruments were run as extracted from this record.
+- The join exits 0 on 97 keys and 11 builds. On a copy with `gap-orient-14` struck from dDeclaredLoop's
+  row, it exits 1 naming it unowned.
+- The preset check exits 0 on 94 catalogue keys, 89 presettable, 89 preset rows. On a copy with
+  standard `context.on-full` set to `fresh-at-boundary` and strict `notices.record` set to
+  `sometimes`, it exits 1 naming both.
 
 ### The foreign-build census
 

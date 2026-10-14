@@ -331,6 +331,45 @@ It does not check whether a verdict is right. That is the scorer's judgment, sho
     - the re-attachment rule's count and size cap, so the card file is sized to come back too;
     - the requirement that the executor's engine holds no model context.
 
+## [settled] The owner's answers, 2026-10-15
+
+**CX-1.** The owner, verbatim: "There is an inherent problem with 'Fresh' - it drops cache
+(presumable). Even though resume seems to cost more but it's cached input, rather than fresh (not
+verified, assumption). Compact with card remains default option, but Fresh at boundary should be an
+owner-adjustable option. In addition, the session card should be updated as the build progressed with
+pointers to help the build reorient quicker on compaction."
+- `context.on-full` defaults to `compact-with-card`, with `fresh-at-boundary` allowed.
+  `context.threshold` (60%) is read only under `fresh-at-boundary`.
+- `card.pointers` defaults to `every-item`, with `at-transitions` allowed. The card's pointers are
+  updated as the build progresses: the latest records by tag, the open forks, the item in flight. This
+  sits beside `card.follows`, which re-renders the whole card at transitions.
+- On the cost question, as far as the records answer it:
+  - the cost research counts fresh input as `input + cache_creation`, with cache reads counted apart;
+  - so a resume's median 467k is cache written again, not cached input.
+
+  But conclusion 4 compared an idle resume with a new session. The comparison the fork needed, a
+  compaction against a fresh session at an item boundary, was never measured, and both rebuild
+  everything after the shared prefix. That measurement is owed in v2's `[owed]`. Conclusion 4 stands as
+  analysis; as the default, it is overruled.
+
+**CX-2.** The owner, verbatim: "None by default but all three options should be available as owner
+settings." `notices.record` defaults to `none`, with `security-and-failures` and `all` allowed.
+gap-roles-09 is graded LOW, because its mechanism serves only the values that are not the default.
+
+**CX-3.** "Both, as proposed (Recommended)."
+- gap-orient-14 (HIGH) is owned by dDeclaredLoop.
+- gap-roles-09 (LOW) is owned by dBoundRoles.
+- The compaction checks join v2's `[owed]`, with the owner's cost question added.
+
+The four new keys' preset values follow each preset's stated stance, and are walked with the presets:
+- `strict` sets `fresh-at-boundary` and records `all` notices;
+- `guarded` records `security-and-failures`;
+- `velocity` updates pointers only `at-transitions`.
+
+A script applied all of it, refusing unless each anchor matched exactly once. The join and the preset
+check, run as extracted from the session log, exit 0, and exit 1 on planted defects; the runs are in
+the session log's Instruments.
+
 ## [instrument] The scorer
 
 Run from the build folder:
