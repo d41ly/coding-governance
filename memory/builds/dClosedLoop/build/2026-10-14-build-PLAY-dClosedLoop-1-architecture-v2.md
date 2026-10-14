@@ -33,6 +33,11 @@ builds run unattended by default past Plan, so `autonomy`'s default and the `sta
 value move to `plan-only`; the owner's plan ratification is the mandate. A critical planning issue is a
 recorded plan revision followed by a re-design that preserves completed work.
 
+Revised: 2026-10-14, after the flow walk's Design stage: P17 and P18 are added; the preset `autonomous`
+is renamed `guarded`; `design.forks` and `design.reentry` join the catalogue and the presets; the charter's
+order ranks the core, then the decision principles, then the practices; four owner-raised `gap-flow-*`
+gaps are owned by dOrderedCharter, dRankedPlan and dIndexedDesign.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -63,6 +68,14 @@ recorded plan revision followed by a re-design that preserves completed work.
 - **P12 Specs are structured contracts.** A spec gives a builder precise, deterministic, structured
   instructions: definitions, design, boundaries, interfaces and acceptance as fields a check reads
   (walk D3).
+- **P17 Features carry the design between units.** A build decomposes into features and each feature
+  into units; a feature's design declares its units' interfaces structurally, so a change is classified
+  mechanically and re-design happens at the unit or the feature as the change requires (flow FL-D2,
+  FL-D4, FL-D5).
+- **P18 Decision principles outrank practices in unattended forks.** Agents resolve forks by the most
+  feature-rich option, then the most expandable, with a full record; the charter's practices govern
+  and are adjustable, and yield to these in a fork; only options the core admits are options (flow
+  FL-D3, FL-D6).
 - **P13 Ranked instructions.** Every load-bearing document is registered with a rank and wrapped in
   a generated envelope naming its identity, rank, scope, trigger and what it yields to, so an agent
   rebuilds one instruction hierarchy whenever it loads a document; conflicts resolve by rank, never
@@ -89,7 +102,9 @@ envelope, `[AGENTS.md · Priority 1 · Always first …]` … `[/AGENTS.md]`, an
 what gov is and how it works and is used; the precedence and override rule (rank decides, never
 load order; the charter wins a live conflict unless the owner explicitly overrides it, and the
 override is recorded); the instruction map (the ranks below it, what loads when, and how to rebuild
-the hierarchy after a reset); the active practices, each with its reach per stage; the drive
+the hierarchy after a reset); the core principles, fixed; the decision principles that resolve
+unattended forks (the most feature-rich option, then the most expandable, fully recorded), which
+outrank the practices; the active practices, each with its reach per stage; the drive
 section (how to start by situation, each stage's enter, advance and exit commands, one line per
 role, then "follow the `next —` lines; when unsure, run `next`"), composed from the adopted kits'
 descriptors; the repository's current preset and overrides; then the repository's own project block
@@ -109,11 +124,13 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 
 | Key | Allowed values | Default | Source |
 |---|---|---|---|
-| `preset` | velocity, standard, strict, autonomous, or a repo-declared preset | standard | owner directive after the walk-through |
+| `preset` | velocity, standard, strict, guarded, or a repo-declared preset | standard | owner directive after the walk-through; `autonomous` renamed `guarded`, flow FL-D0 |
 | `charter.override` | explicit-override, live-owner-wins, absolute | explicit-override | foundations F1-1 |
 | `charter.practices` | a set of catalogue or repo-declared practices | the governance foundation set | foundations F1-3 |
 | `core.bypass` | with-hooks-report, with-hooks-block, never | with-hooks-report | foundations K1 |
 | `core.exceptions` | any-session-recorded, owner-only-expiring, none | any-session-recorded | foundations K4 |
+| `design.forks` | agents-feature-rich-expandable, preference-forks-park, owner-decides-all | agents-feature-rich-expandable | flow FL-D3 |
+| `design.reentry` | any subset of interface-change, two-plus-units, review-cross-unit-flaw, planner-or-owner-flag | interface-change, review-cross-unit-flaw, planner-or-owner-flag | flow FL-D5 |
 | `autonomy` | plan-only, three-gates, every-stage | plan-only | R1.4, superseded by flow FL-P6 |
 | `policy.guard` | owner-only, agents-with-reason, agents-within-mandate | owner-only | R4.2 |
 | `policy.proof` | tty-cli, signed, both | tty-cli | walk S3 |
@@ -188,17 +205,18 @@ policy keys; a repository names one preset and overrides individual keys on top 
 - `strict`: maximum assurance. Overlaps and stray scope refuse, every red blocks, reviews are owed at
   Design and Build and above-tier at Test and Deploy, recommendations bind, production waits for the
   owner, failed verifies roll back.
-- `autonomous`: for unattended fleets under `plan-only` autonomy. The owner gates only the plan, so
-  the guardrails that stand in for the owner's eyes are on: leases refuse, kickoff opens only
+- `guarded` (named `autonomous` until flow FL-D0): the same unattended flow as `standard`, under
+  `plan-only` autonomy, with the guardrails that stand in for the owner's eyes switched on, for when
+  gates are reliable: leases refuse, kickoff opens only
   planned work, recommendations bind above the tier, worktrees are per unit, production waits for
   the owner, failed verifies roll back.
 
-`strict` and `autonomous` refuse hook bypass. Until dWitnessedBar's reliability bar is met, choosing
+`strict` and `guarded` refuse hook bypass. Until dWitnessedBar's reliability bar is met, choosing
 either one will stall on the same gate problems that made the owner allow bypass (R5.1). `strict`
-and `autonomous` also declare the peer-node verifier, which needs a second fleet node; a solo
+and `guarded` also declare the peer-node verifier, which needs a second fleet node; a solo
 repository on either overrides `verdict` to `local-hook`.
 
-| Key | velocity | standard (default) | strict | autonomous |
+| Key | velocity | standard (default) | strict | guarded |
 |---|---|---|---|---|
 | `autonomy` | plan-only | plan-only | every-stage | plan-only |
 | `charter.override` | live-owner-wins | explicit-override | absolute | explicit-override |
@@ -223,6 +241,8 @@ repository on either overrides `verdict` to `local-hook`.
 | `plan.kickoff` | advisory | offer-next | binding | binding |
 | `design.handoff` | derived-ready | derived-ready | ready-plus-audit | derived-ready |
 | `design.overlap` | index-only | warn | refuse | warn |
+| `design.forks` | agents-feature-rich-expandable | agents-feature-rich-expandable | owner-decides-all | agents-feature-rich-expandable |
+| `design.reentry` | planner-or-owner-flag | interface-change, review-cross-unit-flaw, planner-or-owner-flag | all four triggers | interface-change, review-cross-unit-flaw, planner-or-owner-flag |
 | `build.scope` | report | warn-and-ask | refuse | warn-and-ask |
 | `build.worktree` | shared | shared | per-unit | per-unit |
 | `deploy.runs` | landing-node | landing-node | landing-node | landing-node |
@@ -276,12 +296,12 @@ where `verdict = peer-node`.
 
 | Build | Stage | Parents | Planned units | Gaps owned |
 |---|---|---|---|---|
-| dOrderedCharter | Foundation | dClosedLoop | the practice catalogue with each practice's reach per stage, and `charter.practices`; the charter re-founded in its rank-1 envelope (front door, precedence and override rule with `charter.override` and its record, instruction map, active practices with reach, hand-off to the loop, the repository's project block from its own overlay); the instruction registry and the ladder; envelopes rendered for every registered document and the gate over them; the instruction map re-injected on compact and resume; ranked envelopes in every subagent handoff; the section-tag grammar and its resolver; the drive section composed from a drive table in each adopted kit's descriptor, checked both ways, each subagent's role line repeated in its handoff, the charter held inside 32 KiB; the core: the principle registry, the meta-check, the kinds register with each kind's owning build, the conformance-gate contract, the exception register and the `core.*` policies, and the factories and gates for governing documents, practices and Skills | gap-found-01, gap-found-02, gap-found-03, gap-found-04, gap-found-05, gap-found-07, gap-found-08 |
+| dOrderedCharter | Foundation | dClosedLoop | the practice catalogue with each practice's reach per stage, and `charter.practices`; the charter re-founded in its rank-1 envelope (front door, precedence and override rule with `charter.override` and its record, instruction map, active practices with reach, hand-off to the loop, the repository's project block from its own overlay); the instruction registry and the ladder; envelopes rendered for every registered document and the gate over them; the instruction map re-injected on compact and resume; ranked envelopes in every subagent handoff; the section-tag grammar and its resolver; the drive section composed from a drive table in each adopted kit's descriptor, checked both ways, each subagent's role line repeated in its handoff, the charter held inside 32 KiB; the core: the principle registry, the meta-check, the kinds register with each kind's owning build, the conformance-gate contract, the exception register and the `core.*` policies, and the factories and gates for governing documents, practices and Skills | gap-found-01, gap-found-02, gap-found-03, gap-found-04, gap-found-05, gap-found-07, gap-found-08, gap-flow-02 |
 | dDeclaredLoop | Spine | dOrderedCharter | the loop kit and definition keyed by the stage tags, roles re-pointed after aOrientedCast closes; `.governance/policy.toml`, schema, one reader, JSON mirror; the named presets and their completeness check; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; policy at govkit intake; the `next` verb over the loop's state, the `next —` micro-format, and the check that every declared command ends with one or declares itself terminal, laggards on a shrink-only list owned by their stage's build; the factories and conformance gates for commands, policy keys, presets, stages, hooks, roles and workflows | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01, gap-found-06 |
 | dLeasedFleet | Concurrency | dDeclaredLoop | the lease grammar with run claims migrated; acquisition and release in both modes; overlap warn or refuse and takeover; fleet identity and remote uniqueness; offline behaviour | gap-conc-01, gap-conc-02 |
 | dWitnessedBar | Test | dDeclaredLoop | gate health measured and the reliability bar; bypasses recorded; attribution deciding what blocks; the hook-written verdict; held legs by policy; the peer-node verifier; seen-red records; flake quarantine; the product-test contract with runner adapters; derived pre-commit list and multi-node cost evidence; the gate-leg factory and its conformance gate, every leg declaring the principles it enforces | gap-test-01, gap-test-02, gap-test-03, gap-test-04, gap-test-05, gap-test-06, gap-test-07, gap-test-08, gap-test-09 |
-| dRankedPlan | Plan | dDeclaredLoop, dLeasedFleet | priority beside `parents:` and the generated plan view; the planner and triager role and Plan workflow; the placement predicate; rule-based triage; dormancy disposal; the live-build mapping carried out; Plan Review; kickoff offering the next item and attended briefs gated | gap-plan-01, gap-plan-02, gap-plan-03, gap-plan-04, gap-plan-05, gap-plan-06, gap-plan-07 |
-| dIndexedDesign | Design | dDeclaredLoop | the derived-READY hand-off; the design index; design review by policy; reuse and alternatives backed by recorded probes; the research harness; agreement and tier checks; the spec measured, recommendations emitted, and the spec redesigned as a structured, tagged contract | gap-design-02, gap-design-03, gap-design-04, gap-design-05, gap-design-06, gap-design-07, gap-design-09 |
+| dRankedPlan | Plan | dDeclaredLoop, dLeasedFleet | priority beside `parents:` and the generated plan view; the planner and triager role and Plan workflow; the placement predicate; rule-based triage; dormancy disposal; the live-build mapping carried out; Plan Review; kickoff offering the next item and attended briefs gated | gap-plan-01, gap-plan-02, gap-plan-03, gap-plan-04, gap-plan-05, gap-plan-06, gap-plan-07, gap-flow-03, gap-flow-04 |
+| dIndexedDesign | Design | dDeclaredLoop | the derived-READY hand-off; the design index; design review by policy; reuse and alternatives backed by recorded probes; the research harness; agreement and tier checks; the spec measured, recommendations emitted, and the spec redesigned as a structured, tagged contract; the feature level (build, features, units) with each feature's interfaces declared structurally, two-level re-entry by `design.reentry`, additive-versus-breaking interface classification (proposed), fork resolution by `design.forks` | gap-flow-01, gap-design-02, gap-design-03, gap-design-04, gap-design-05, gap-design-06, gap-design-07, gap-design-09 |
 | dScopedBuild | Build | dIndexedDesign, dLeasedFleet, dWitnessedBar | one exit contract with a history-derived base, refusing a build's exit while a core red its own commits introduced stands; scope at the push; the closing review recorded; worktrees by policy; a write gate reading derived state; the checklist witnessed | gap-spine-03, gap-conc-03, gap-build-01, gap-build-02, gap-build-03, gap-build-04 |
 | dShippedRelease | Deploy | dWitnessedBar | the landing record; kit release notes; the deploy engine; the incms adapter; the fleet register and currency watch; lander hardening; optional emitted CI; a derived runbook; the kit factory and its conformance gate | gap-deploy-01, gap-deploy-02, gap-deploy-03, gap-deploy-04, gap-deploy-05, gap-deploy-06, gap-deploy-07, gap-deploy-08 |
 | dTendedCadence | Maintain | dWitnessedBar, dRankedPlan | the maintenance recipe; three hosts and the cadence; the safe-fix set; detectors with owners; map freshness; the maintenance record | gap-maint-01, gap-maint-02, gap-maint-05, gap-maint-06, gap-maint-07, gap-maint-08 |

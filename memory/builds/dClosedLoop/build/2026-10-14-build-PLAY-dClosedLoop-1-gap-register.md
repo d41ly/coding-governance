@@ -74,6 +74,10 @@ extends.
 | gap-found-07 | Foundation | HIGH | No principle declares its enforcement: 22 of the charter's 36 practices are cited by no code file, no leg names the principle it enforces (0 of 140), and nothing stops a principle existing only as prose. Raised by the owner. | foundations core, current state and instrument | — |
 | gap-found-08 | Foundation | HIGH | Extensions are hand-made: factories exist for 3 of 13 extension kinds (kit adoption, builds, micro-specs), so a new kit, command, document, policy key, leg, role, workflow, hook or Skill conforms only if its author remembers every rule. Raised by the owner. | foundations core, current state | — |
 | gap-found-06 | Foundation | HIGH | No tool names the next step: six adopt scripts print install hints and nothing else ends with the caller's next command, so the loop advances only by agents re-deriving it. Raised by the owner. | foundations step 1 continued, current state | — |
+| gap-flow-01 | Flow | HIGH | No feature level between build and unit: the interfaces between a feature's units have no record, so a change that breaks a feature cannot be told from one that touches a unit, and re-design has no granularity but the unit. Raised by the owner. | flow FL-D2, FL-D4, FL-D5 | — |
+| gap-flow-02 | Flow | HIGH | The decision principles that resolve unattended forks (the most feature-rich option, then the most expandable, fully recorded) are stated nowhere; M3 names feature-rich only, and nothing ranks them above the charter's adjustable practices. Raised by the owner. | flow FL-D3, FL-D6; `memory/guides/BUILD-METHOD.md` M3 | — |
+| gap-flow-03 | Flow | MED | The plan is written up to three times (README, brief, card) and the levels of card, plan and brief are declared nowhere. Raised by the owner. | flow Plan, current state; FL-P2, FL-P5 | — |
+| gap-flow-04 | Flow | MED | A critical planning issue has no path: no recorded plan revision and no re-design inventory of completed work, though none has occurred in 173 builds. Raised by the owner. | flow FL-P6 and its measurement | — |
 | gap-spine-01 | Spine | HIGH | No stage model: no kit, leg, dossier, role or hook declares the stage it serves, and the loop exists only implicitly. | design §4.1 (0 of 31 dossiers carry a stage); `tools/roles/workflows.toml` covers stages 0–7 only | — |
 | gap-spine-02 | Spine | HIGH | Guards read agent-written state across stages, against `[class]`. | build §4 (write gate), design §4.4 (INPROGRESS), test §5 C (pusher-written receipt), deploy §5 C | — |
 | gap-spine-03 | Spine | HIGH | Attended and unattended builds run different exit contracts. | build §3, §4 (DoD needs RUN.md) | — |
@@ -173,4 +177,12 @@ Re-measured after the core consistency step added `gap-found-07` and `gap-found-
 ```text
 Deploy=8 Plan=7 Spine=9 Test=9 Review=3 Foundation=8 Build=4 Maintain=8 Design=9
 LOW=5 MED=24 HIGH=36
+```
+
+Re-measured after the flow walk's Plan and Design stages added four `gap-flow-*` rows, same
+instrument:
+
+```text
+Deploy=8 Plan=7 Flow=4 Spine=9 Test=9 Review=3 Foundation=8 Build=4 Maintain=8 Design=9
+LOW=5 MED=26 HIGH=38
 ```

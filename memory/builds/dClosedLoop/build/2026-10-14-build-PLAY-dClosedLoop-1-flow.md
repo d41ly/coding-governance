@@ -236,6 +236,92 @@ unattended runs added after opening.
 9. Every unit in scope is in derived READY.
 10. The Design-to-Build transition is recorded, its witness the items above.
 
+### Forks asked, 2026-10-14
+
+**FL-D0. "`standard` now runs unattended past Plan, with your lighter guardrails (bypass allowed,
+leases warn, advice recommendations, shared worktrees, roll-forward). `autonomous` was the unattended
+preset with heavier ones. What now?"** Offered: Keep both, rename autonomous (Recommended); Standard
+takes the heavier guardrails; Keep both as they are. Answer: Keep both, rename autonomous
+(Recommended).
+
+**FL-D1. "Does a build move through Design as a whole, or unit by unit?"** Offered: Whole build, then
+Build (Recommended); Per-unit pipeline. Answer: Whole build, then Build (Recommended).
+
+**FL-D2. "When an in-goal amendment arrives mid-build (a review-promoted unit, a split), how does it
+enter Design?"** Offered: Unit-level re-entry (Recommended); Build returns to Design. Answer, in the
+owner's words: "There needs to be a two-level design re-entry. By default, it's unit-level, however,
+several units of a single feature (many builds can cover disjointed features) needs a
+mechanism/condition to be redesigned as a whole."
+
+**FL-D3. "With builds unattended past Plan, who resolves a design fork by default?"** Offered: Run
+decides within the goal (Recommended); Preference forks park; You decide every fork. Answer, in the
+owner's words: "Forks are resolved by agents with focus on the most feature-rich and expandable
+decisions first and foremost, with full record. Configurable by the owner."
+
+### Settled for Design, 2026-10-14
+
+- **The `autonomous` preset is renamed `guarded`**: the same unattended flow as `standard`, with
+  refusals switched on, for when gates are reliable. `standard` keeps the owner's lighter,
+  recorded guardrails.
+- **A build moves through Design whole**: building starts when every unit in scope is READY.
+- **A feature level sits between build and unit.** A build may cover several disjoint features;
+  Design decomposes the build into features and each feature into units. A feature carries its own
+  design (the interfaces between its units, its boundaries); each unit keeps its spec.
+- **Design re-entry has two levels.** By default an amendment re-enters at the unit: only the new or
+  amended units walk Design's checklist. When a condition holds (proposed below for the owner), the
+  whole feature is re-designed: every unit of that feature walks Design again against a revised
+  feature design, completed units kept, amended or retired with their reasons. The condition is a
+  policy, `design.reentry`.
+- **Agents resolve forks, preferring the most feature-rich and expandable option, with a full record**
+  (the option, the alternatives, the reason). The behaviour is a policy, `design.forks`:
+  `agents-feature-rich-expandable` by default, with `preference-forks-park` and
+  `owner-decides-all` as allowed values. A fork the goal cannot survive still stops the run for a plan
+  revision.
+- **To confirm: "expandable" and `[yagni]`.** Read literally, "expandable" invites building ahead,
+  which `[yagni]` forbids. The proposed reading: prefer the option whose seams admit later extension
+  without rework (open for extension), and never build an extension point no unit uses.
+
+### Follow-ups asked, 2026-10-14
+
+**FL-D4. "A feature level between build and unit: is this the shape you mean?"** Offered: Build →
+features → units (Recommended); Features as unit tags only; One feature per build. Answer: Build →
+features → units (Recommended).
+
+**FL-D5. "Which conditions should trigger a feature-level re-design by default? (Pick all that
+apply; the set is a policy you can change.)"** Offered, multi-select: An interface changes
+(Recommended); Two or more units touched; A review names a cross-unit flaw; Planner or owner flags
+it. Answer, in the owner's words, with the selections: "user-adjustable, per the flexibility
+principle. However, this needs further evaluation - a simple interface 'addition' (which falls under
+interface change?) shouldn't trigger a redesign - there should be a better way to handle this." —
+selected: An interface changes; A review names a cross-unit flaw; Planner or owner flags it.
+
+**FL-D6. "How should "expandable" sit beside [yagni] when agents resolve forks?"** Offered: Open for
+extension, not built ahead (Recommended); Expandable outranks yagni; Yagni outranks expandable.
+Answer, in the owner's words: "yagni is only a charter rule - which are adjustable (charter rules
+govern, but they are not set in stone), expandable is an agent decision-making principle when it
+comes to unattended builds, which outranks charter."
+
+### Settled after the follow-ups, 2026-10-14
+
+- **Build → features → units.** Design decomposes a build into its features and each feature into
+  units; a feature carries a feature design (its units' interfaces and its boundaries).
+- **`design.reentry`'s default triggers** for a feature-level re-design: an interface change, a review
+  finding naming a cross-unit flaw, and a flag by the planner or the owner. Two or more units touched
+  is not a trigger by default.
+- **Proposed for evaluation: additive interface changes stay unit-level.** Each feature design declares
+  its interfaces structurally (producer, consumers, contract), so an amendment's interface change is
+  classified by a structural diff: ADDITIVE (a new, optional element no current consumer must change
+  for) re-enters at the unit and updates the interface record; BREAKING (an element removed, renamed
+  or changed in meaning) triggers the feature-level re-design, its affected consumers derived from
+  the declaration. This mirrors the charter's `[core]` rule that data changes additively. It is a
+  proposal until the owner evaluates it.
+- **A ranking inside the charter, three tiers.** First, the core principles: fixed, never switched
+  (foundations `[core]`, K2). Second, the agent decision principles that resolve unattended forks:
+  the most feature-rich option, then the most expandable, always fully recorded. Third, the charter's
+  practices, such as `[yagni]`: they govern, the repository can adjust them, and in an unattended
+  fork they yield to the decision principles. An option that breaks a core principle is not an
+  option, so the decision principles only ever choose among options the core admits.
+
 ### Entry points, partly settled
 
 - **Settled:** a new, complex feature enters at Plan; an amendment that fits an open build's plan
