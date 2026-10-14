@@ -1,11 +1,12 @@
 # TOOL-dRedressedBar-12 — an apply narrower than its receipt keeps every other installed kit's claim and rows, so a refused settings-merge exit stays refused on the next run
 
-**Status:** SPECCED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
+**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-14-build-TOOL-dRedressedBar-12-1-acceptance-ledger.md](../build/2026-10-14-build-TOOL-dRedressedBar-12-1-acceptance-ledger.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-1-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md) | research | TOOL-dRedressedBar-14 TOOL-dRedressedBar-16 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-3-spec-writer.md) | journal | — |

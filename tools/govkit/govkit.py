@@ -4042,8 +4042,10 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
     `carry_out_of_scope` is S4, and the two verbs need different answers because they keep different
     receipts. `update` narrows which rows it classifies and leaves its receipt's `kits` list whole,
     so an out-of-scope kit is still claimed and its ownership rows must survive this run. `apply`
-    rewrites `kits` and `files` to its own selection, so carrying rows for kits its receipt no
-    longer claims would make `emitted` name kits `kits` does not.
+    keeps `kits` and `files` whole for every claimed kit its selection did not name
+    (TOOL-dRedressedBar-12) and still passes no carry set: a leg row such a kit loses from `emitted`
+    here is re-claimed by the same-argv rule (`check_leg_claimable`, DEPL-aRepatriatedFork-17 S8)
+    on that kit's next run.
 
     `orders` is `apply`'s list and `update` passes None: the non-manifest branch writes the same
     order at the same path either way, and `update` maintains no `orders` list at BASE. Minting one
@@ -8057,19 +8059,35 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                 r.fail(f"leg '{nm}' did not exist before this install and is red after")
 
     # ---- RECEIPT. Tool-written only, plus the flat sidecar a target verifies with bash alone.
+    # TOOL-dRedressedBar-12. A CLAIMED KIT THIS SELECTION DID NOT NAME KEEPS ITS CLAIM AND ITS ROWS,
+    # verbatim and in the prior receipt's order, after this run's own — the `pins` union above, applied
+    # to `kits` and `files`. Written from the selection alone, a narrower apply dropped them: the next
+    # apply of a dropped kit was refused as foreign, and a hook home only the receipt records was gone,
+    # so a refused settings-merge exit read as the accepted stop one run later. Keyed on the CLAIM,
+    # never on "outside the selection": the `(govkit)` attributes row is claimed by no kit and is
+    # rebuilt above, so a selection-keyed carry would write it twice. `receipt` is the prior one,
+    # bound before anything was written and never rebound.
+    _carried_kits = [k for k in (receipt or {}).get("kits") or [] if k not in selection]
+    _carried_rows = [f for f in (receipt or {}).get("files") or []
+                     if isinstance(f, dict) and f.get("kit") in _carried_kits]
     (target / ".governance").mkdir(exist_ok=True)
     receipt_path.write_text(json.dumps(
         {"schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
-         "prefix": (deploy.get("prefix") or "tools"), "kits": selection, "files": rows,
+         "prefix": (deploy.get("prefix") or "tools"), "kits": selection + _carried_kits,
+         "files": rows + _carried_rows,
          "orders": orders, "baseline": baseline, "after": after_map,
          "hook_block": {"state": hook_state},
          "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
                          "emitted": emitted, "legs_withheld": _legs_withheld}},
         indent=2) + "\n", encoding="utf-8", newline="\n")
     (target / ".governance" / "install.sums").write_text(
-        "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w),
+        "".join(f"{w['sha256']}  {w['path']}\n" for w in rows + _carried_rows if "sha256" in w),
         encoding="utf-8", newline="\n")
-    step(STEP_RECEIPT, f"{len(rows)} row(s), {len(selection)} kit(s), schema {RECEIPT_SCHEMA}")
+    if _carried_kits:
+        print(f"govkit apply — receipt KEEPS {len(_carried_kits)} kit(s) this selection did not "
+              f"name, with their {len(_carried_rows)} row(s) verbatim: {', '.join(_carried_kits)}")
+    step(STEP_RECEIPT, f"{len(rows) + len(_carried_rows)} row(s), "
+                       f"{len(selection) + len(_carried_kits)} kit(s), schema {RECEIPT_SCHEMA}")
     return r.emit()
 
 

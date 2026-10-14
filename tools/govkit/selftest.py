@@ -3380,6 +3380,20 @@ def main() -> int:
         (_rb11a / ".claude" / "settings.json").write_text("{", encoding="utf-8", newline="\n")
         settle(_rb11a, "agent-cap at a home only the receipt records, and a malformed settings file")
         _rb11pa = run("apply", "--target", str(_rb11a), "--kits", "settings-merge")
+        # TOOL-dRedressedBar-12 AC2. THE REFUSAL HOLDS ON THE NEXT RUN. The refused apply still writes
+        # its receipt, and a receipt written from the selection alone dropped the planted row, so a
+        # third identical apply found the hook nowhere and accepted the stop. The row is compared
+        # whole, as planted; the third run's problem line is graded by the loop below.
+        settle(_rb11a, "the refused second apply")
+        _rb11plant = [f for f in _rb11rec["files"] if f.get("path") == "guard/agent-cap.js"]
+        _rb11kept = [f for f in json.loads(_rb11rp.read_text(encoding="utf-8"))["files"]
+                     if f.get("path") == "guard/agent-cap.js"]
+        check("[dRB-12] AC2 fixture A's refused apply leaves the planted agent-cap row in its receipt",
+              len(_rb11plant) == 1 and _rb11kept == _rb11plant,
+              f"planted {json.dumps(_rb11plant)} · kept {json.dumps(_rb11kept)}")
+        _rb11pa3 = run("apply", "--target", str(_rb11a), "--kits", "settings-merge")
+        check("[dRB-12] AC2 a third identical apply over fixture A exits 1",
+              _rb11pa3.returncode == 1, f"rc {_rb11pa3.returncode} · {_rb11pa3.stdout[-900:]}")
 
         _rb11n = make_target(tmp / "rq11n", DEPLOY_FULL)
         run("apply", "--target", str(_rb11n), "--kits", "settings-merge")
@@ -3417,7 +3431,9 @@ def main() -> int:
         check("[dRB-11] update over fixture B leaves the receipt's gov_commit where it was",
               json.loads(_rb11rp.read_text(encoding="utf-8"))["gov_commit"] == _rb11rec["gov_commit"],
               _rb11rp.read_text(encoding="utf-8")[:300])
-        for _rb11tag, _rb11p in (("apply over fixture A", _rb11pa), ("update over fixture B", _rb11pb)):
+        for _rb11tag, _rb11p in (("apply over fixture A", _rb11pa),
+                                 ("a third identical apply over fixture A", _rb11pa3),
+                                 ("update over fixture B", _rb11pb)):
             _rb11out = _rb11p.stdout.splitlines() + _rb11p.stderr.splitlines()
             _rb11sm = [ln for ln in _rb11out if ln.startswith("govkit: kit 'settings-merge'")]
             check(f"[dRB-11] {_rb11tag} exits non-zero", _rb11p.returncode != 0,
@@ -3430,6 +3446,68 @@ def main() -> int:
                   len(means9) == 1 and not any(means9[0] in ln for ln in _rb11out),
                   f"code-2 means {means9} · "
                   + " | ".join(ln for ln in _rb11out if means9 and means9[0] in ln))
+
+        # --- TOOL-dRedressedBar-12. AN APPLY NARROWER THAN ITS RECEIPT KEEPS EVERY OTHER CLAIM.
+        # --- Three kits applied twice, then settings-merge alone, then kickoff-manifest alone. Written
+        # --- from its selection, the narrower apply dropped the other two kits' claims and their
+        # --- rows, and the next apply of either was refused as foreign. Every figure is read from the
+        # --- receipt the narrower apply read, so nothing here pins a row count. The carry is keyed
+        # --- on the claim: keyed on the selection, it also kept the prior `(govkit)` attributes row.
+        _rb12 = make_target(tmp / "rq12", DEPLOY_FULL)
+        _rb12rp = _rb12 / ".governance" / "install.json"
+        _rb12three = "agent-cap,settings-merge,kickoff-manifest"
+        _rb12keeps = "govkit apply — receipt KEEPS "
+        _rb12p1 = run("apply", "--target", str(_rb12), "--kits", _rb12three)
+        settle(_rb12, "three kits")
+        _rb12r1 = json.loads(_rb12rp.read_text(encoding="utf-8"))
+        _rb12p1b = run("apply", "--target", str(_rb12), "--kits", _rb12three)
+        settle(_rb12, "the same three kits again")
+        _rb12r1b = json.loads(_rb12rp.read_text(encoding="utf-8"))
+        _rb12p2 = run("apply", "--target", str(_rb12), "--kits", "settings-merge")
+        settle(_rb12, "settings-merge alone")
+        _rb12r2 = json.loads(_rb12rp.read_text(encoding="utf-8"))
+        _rb12p3 = run("apply", "--target", str(_rb12), "--kits", "kickoff-manifest")
+        _rb12other = [k for k in _rb12r1b["kits"] if k != "settings-merge"]
+        _rb12rows1 = [f for f in _rb12r1b["files"] if f.get("kit") in _rb12other]
+        _rb12rows2 = [f for f in _rb12r2["files"] if f.get("kit") in _rb12other]
+        check("[dRB-12] LIVENESS step 1 exits 0, claims all three kits, and holds rows for both kits "
+              "step 2 does not name",
+              _rb12p1.returncode == 0
+              and sorted(_rb12r1["kits"]) == sorted(_rb12three.split(","))
+              and {f.get("kit") for f in _rb12rows1} == set(_rb12other) and len(_rb12other) == 2,
+              f"rc {_rb12p1.returncode} · kits {_rb12r1.get('kits')} · "
+              f"{(_rb12p1.stdout + _rb12p1.stderr)[-600:]}")
+        check("[dRB-12] AC3 the same selection applied twice prints no KEEPS line and writes the same "
+              "kits and row count",
+              _rb12p1b.returncode == 0
+              and not any(ln.startswith(_rb12keeps) for ln in _rb12p1b.stdout.splitlines())
+              and _rb12r1b["kits"] == _rb12r1["kits"]
+              and len(_rb12r1b["files"]) == len(_rb12r1["files"]),
+              f"rc {_rb12p1b.returncode} · kits {_rb12r1['kits']} -> {_rb12r1b['kits']} · rows "
+              f"{len(_rb12r1['files'])} -> {len(_rb12r1b['files'])}")
+        check("[dRB-12] AC1 the narrower apply exits 0 and claims settings-merge, then the two kits it "
+              "did not name in the prior receipt's order",
+              _rb12p2.returncode == 0 and _rb12r2["kits"] == ["settings-merge", *_rb12other],
+              f"rc {_rb12p2.returncode} · kits {_rb12r2.get('kits')} · "
+              f"{(_rb12p2.stdout + _rb12p2.stderr)[-600:]}")
+        check("[dRB-12] AC1 and keeps their rows verbatim, holding the prior receipt's row count",
+              _rb12rows2 == _rb12rows1 and len(_rb12r2["files"]) == len(_rb12r1b["files"]),
+              f"carried {len(_rb12rows2)} of {len(_rb12rows1)} · rows {len(_rb12r2['files'])} of "
+              f"{len(_rb12r1b['files'])}")
+        _rb12kl = [ln for ln in _rb12p2.stdout.splitlines()
+                   if ln.startswith(f"{_rb12keeps}{len(_rb12other)} kit(s)")]
+        check("[dRB-12] AC1 the narrower apply prints exactly one KEEPS line, and it names both kits",
+              len(_rb12kl) == 1 and all(k in _rb12kl[0] for k in _rb12other),
+              " | ".join(_rb12kl) or _rb12p2.stdout[-600:])
+        check("[dRB-12] AC3 after the narrower apply exactly one receipt row has role attributes",
+              sum(1 for f in _rb12r2["files"] if f.get("role") == "attributes") == 1,
+              json.dumps([f.get("kit") for f in _rb12r2["files"] if f.get("role") == "attributes"]))
+        check("[dRB-12] AC1 a re-apply of a kit the narrower apply did not name exits 0, refused as "
+              "foreign nowhere",
+              _rb12p3.returncode == 0
+              and not any("already carries" in ln
+                          for ln in (_rb12p3.stdout + _rb12p3.stderr).splitlines()),
+              f"rc {_rb12p3.returncode} · {(_rb12p3.stdout + _rb12p3.stderr)[-600:]}")
 
         # --- DEPL-dGaugedVintage-8 S3. THE STAMP MUST NOT OUTRUN ROWS THIS RUN NEVER GRADED.
         # --- An `evidence: "unattributed"` row is skipped before `classify_row`, by
