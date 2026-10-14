@@ -1,12 +1,14 @@
 # TOOL-dRedressedBar-15 — agent-cap's adopter runs settings-merge's own adopter at settings-merge's home, declared as `[adopt] via`, and selfcheck refuses any argv naming another entry's file
 
-**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 11
+**Status:** SPECCED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-1-spec-writer.md) | journal | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-15-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-2-revision.md) | research | TOOL-dRedressedBar-14 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-15-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-3-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-brief.md) | research | — |
 | [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 |
 
@@ -23,6 +25,8 @@ reads `[kit.agent-cap]` (`:1452-1455`). So at `[kit.agent-cap] prefix = "scripts
 `[adopt] via = "settings-merge"`. The engine then runs the named entry's argv, resolved in that
 entry's context. A selfcheck arm refuses the class: an argv an entry declares that names a file
 only another entry ships. With unit 14's early receipt, the brief's reproduction then exits 0.
+Because this unit writes `_cmd_apply` next, it also restates the comment above the CONFIGURE spawn,
+which unit 14 left saying the receipt is not yet written (S10).
 
 ## 2. Scope (IN)
 
@@ -81,6 +85,20 @@ only another entry ships. With unit 14's early receipt, the brief's reproduction
 - **S9** — Every reading below goes to this unit's acceptance ledger under
   `memory/builds/dRedressedBar/build/`, carrying `**Serves:** journal TOOL-dRedressedBar-15`.
   Observed by AC10.
+- **S10** — The comment above `_cfg_run = subprocess.run(` in `_cmd_apply`
+  (`tools/govkit/govkit.py:7811-7816` at `ffe73d97d`) is restated as §4 "The CONFIGURE comment,
+  restated" gives it. Its first three sentences, on why the run is bound and why it decodes UTF-8
+  with `errors="replace"`, keep their meaning and their `TOOL-dRedressedBar-11 S3` and
+  `TOOL-dRedressedBar-13` attributions. Its last sentence, which says the run comes "before the
+  receipt is written" and calls a decode error there the F4 half-install, is replaced by what holds
+  after unit 14. The two lines of the `_cfg_run` call are not edited. It is a comment only, so it
+  declares no arm. Observed by AC11.
+  **Readers:**
+  by name: no code spells the sentence S10 drops. Its phrase "before the receipt is written" is
+  found at `tools/govkit/govkit.py:7815`, which S10 rewrites; in spec 11's §3 and spec 13's §4,
+  CLOSED records of the tree before unit 14, which S10 leaves alone; and in a docstring at
+  `tools/govkit/selftest.py:14460`, about the receipt `adopt` writes, which is a different verb.
+  by value: NO VALUE READERS, because a comment is read by no code. AC11 is its one reader.
 
 ## 3. Non-goals (OUT)
 
@@ -89,7 +107,9 @@ only another entry ships. With unit 14's early receipt, the brief's reproduction
 - No change to `tools/settings-merge.py`, to settings-merge's descriptor, or to any copy of
   `resolve_kit_dir`.
 - No edit to unit 14's receipt write (brief non-goal), and no change to which kits the registry's
-  default set holds (brief non-goal).
+  default set holds (brief non-goal). S10 rewords the comment above the CONFIGURE spawn only. It
+  does not touch the receipt's comment block (`tools/govkit/govkit.py:7698-7711`) or F4's
+  (`:7670-7672`), and F4's still holds, because `index_read` runs before the early write.
 - No change to which descriptor classifies agent-cap's exit. Spec 9 §4 "Why the shared argv stays
   safe" rests on agent-cap's refusal being read under agent-cap's descriptor, in both verbs.
 - No dedup in `apply`'s CONFIGURE. A default-prefix apply still runs the one script twice and
@@ -110,7 +130,8 @@ only another entry ships. With unit 14's early receipt, the brief's reproduction
 - **consumes-from** `TOOL-dRedressedBar-14` — the receipt written ahead of CONFIGURE, after which
   settings-merge's adopter exits 0 at a per-kit agent-cap prefix, so the reproduction's only exit 2
   is agent-cap's. AC1's exit 0 rests on it, and S6's first half reads the apply its `[dRB-14]` block
-  runs. Without it settings-merge still exits 2 and AC1 cannot pass.
+  runs. Without it settings-merge still exits 2 and AC1 cannot pass. S10 restates the comment that
+  unit 14's pass `109fbb4ab` left standing, and that is the state its new text describes.
 - **consumes-from** `TOOL-dRedressedBar-11` — S3's stderr tail on a refused CONFIGURE exit, which
   AC1's red half reads for python's "can't open file". Without it the red half shows only an exit code.
 - **hands-off** `TOOL-dRedressedBar-17` — `resolve_adopter_argv`, the S5 arm and the `[dRB-15]`
@@ -273,6 +294,45 @@ call and the lines above it. That is a sequence and not an edge, because no crit
 on unit 13's work. Unit 7 is a sequence too: S7's stop rule covers a mint that finds another kit
 owed, and AC8 reads only agent-cap.
 
+### The CONFIGURE comment, restated
+
+Unit 14's builder ran the bug-class checklist over its pass `109fbb4ab`, and it selected
+`amendment-leaves-its-other-half-standing`. Unit 13 wrote the comment above `_cfg_run`, and its last
+sentence still reads, at `ffe73d97d`, that the run comes "after the bytes landed and before the
+receipt is written, so a decode error raised here is the half-install the F4 comment above says
+this verb avoids" (`tools/govkit/govkit.py:7814-7816`). Unit 14 now writes the receipt at
+`:7725-7726`, ahead of the CONFIGURE loop that opens at `:7738`, and RECEIPT rewrites it from the
+same dict at `:8112-8116`. So "before the receipt is written" now holds only for that final write.
+Unit 14's builder could not reword it, because scratch-guard closes a CLOSED unit's product writes.
+This unit writes `_cmd_apply` next, so the correction lands here.
+
+What an exception raised at the spawn would leave behind, read from the code at `ffe73d97d`:
+
+- the landed bytes, staged (`:7662-7663`);
+- the early receipt. It holds this run's selection, rows and carry, and the PRIOR run's `orders`,
+  `after` and `gate_runner` (`:7715-7724`);
+- an outbox file for each hole of every kit up to and including this one (`:7742-7746`);
+- the kits before this one already configured or skipped, and no adopter after it run;
+- `install.sums` not rewritten, because `_cmd_apply` writes it only beside RECEIPT (`:8117-8119`).
+
+The receipt comment says that interrupt leaves "a receipt a re-run of `apply` recovers from"
+(`:7708-7709`). It is not F4's half-install with no receipt. F4's own comment at `:7670-7672` still
+holds, because `index_read` runs before the early write.
+
+The restated comment, wrapped to the file's width as the builder sees fit:
+
+```
+BOUND, not reduced to its code (TOOL-dRedressedBar-11 S3): a refused exit below ends its problem
+line with the adopter's own stderr, the regenerate site's shape, so the operator reads the reason
+and not only an integer. UTF-8 as the regenerate site and the gained loop decode, never the host
+codepage, and REPLACED where it cannot decode (TOOL-dRedressedBar-13). This runs after the early
+receipt was written ahead of CONFIGURE (TOOL-dRedressedBar-14), and RECEIPT rewrites it once every
+adopter has run. So a decode error raised here would stop `apply` between the two writes. The
+landed bytes and the early receipt stay, the receipt carrying the prior run's orders, `after` and
+gate runner, `install.sums` is not rewritten, and the adopters after this kit never run: the
+interrupt the receipt comment above says a re-run of `apply` recovers from.
+```
+
 ### Inventory
 
 | Identifier | Kind | Naming cell |
@@ -309,7 +369,7 @@ pick is M3's: the most feature-rich survivor after its vetoes.
 | C5 — keep agent-cap's argv and add a context key beside it | every test above | equal to C4 on each, but the argv is then stated in two descriptors and can drift | Rejected on `[one-fact]` |
 | C6 — ship a second `settings-merge.py` under agent-cap's home | selfcheck's one-claim-per-source rule (`tools/hooks/kit.toml:28-29`) | two entries claiming one source is the conflict selfcheck reports, and duplicated engine bytes are what `TOOL-dRetiredFork-14` removed | Rejected |
 
-M3's vetoes against C4. Veto 1: none of AC1 to AC10 fails, and no non-goal is crossed. Veto 2:
+M3's vetoes against C4. Veto 1: none of AC1 to AC11 fails, and no non-goal is crossed. Veto 2:
 `via` is no public surface. The only `[adopt]` readers outside the deployer are
 `tools/check-kit-placeholders.py` (registry-exempt at `tools/govkit/registry.toml:228`) and
 `render_playbook.py:801`, which reads only the playbook's own descriptor. No install location or
@@ -335,7 +395,8 @@ runs for settings-merge.
   the rest at the close.
 - testing — AC1 to AC4 are scratch applies under `%TEMP%`, with `<p14>` clones for the red halves.
   AC5 is a python probe, AC6 and AC7 are selfcheck runs over a gov clone and scratch govs, and AC8
-  and AC9 are verb and source probes. Two new arms are declared in §7.
+  and AC9 are verb and source probes, and AC11 reads S10's comment as a joined text cut. Two new
+  arms are declared in §7.
 - migration — N/A — no receipt field, conf key or deploy shape moves. An adopter's installed
   `{prefix}/hooks/kit.toml` takes the new bytes on their next `update`, and nothing at a target
   reads its `[adopt]` table.
@@ -441,8 +502,20 @@ from a local `git clone` of gov under `%TEMP%`, checked out at `<p14>`.
   the symbol index stale, or added an unencoded text-IO site.
   figure: the posture counts are DERIVED from the registry at observation.
 - **AC10** — The ledger S9 names exists under `memory/builds/dRedressedBar/build/` and carries
-  `**Serves:** journal TOOL-dRedressedBar-15`, with one line per criterion above.
+  `**Serves:** journal TOOL-dRedressedBar-15`, with one line for each of the other criteria in this
+  section.
   Red when: the pass closes with no ledger, as at `95350ba5`.
+- **AC11** — A python program reads `tools/govkit/govkit.py` at `<p15>`. It finds the one line whose
+  text, indentation stripped, opens `_cfg_run = subprocess.run(`. It walks up over the contiguous
+  lines whose stripped text opens `#`, takes each line's text after the `#`, stripped, and joins
+  them with single spaces. That joined cut carries no `before the receipt is written`. It carries
+  `ahead of CONFIGURE`, `RECEIPT rewrites`, `TOOL-dRedressedBar-14`, `TOOL-dRedressedBar-11 S3` and
+  `TOOL-dRedressedBar-13`. The anchor line and the line after it are byte-equal to the same two
+  lines in `git show ffe73d97d:tools/govkit/govkit.py`.
+  Red when: the same program over `git show ffe73d97d:tools/govkit/govkit.py` finds one anchor with
+  the cut at `:7811-7816`, carrying `before the receipt is written` and none of `ahead of CONFIGURE`,
+  `RECEIPT rewrites` or `TOOL-dRedressedBar-14`.
+  fixture: the red half was observed at spec time over that commit's file.
 
 ## 7. Gates
 
@@ -455,6 +528,7 @@ New arm: tools/govkit/selftest.py · covers AC7 · the `[dRB-15]` scratch govs b
 AC6 is also re-read by the `govkit selfcheck` leg over the real tree, which reds if any shipped argv
 names another entry's file. The refusal join's floor does not move: S5 adds three `r.fail` sites and
 the leg grades the floor alone. The main loop observes both new arms red, then green, at the close.
+S10 moves a comment and no code line, so it adds no arm, and AC11 is its observation.
 
 ## 8. Open questions
 
@@ -472,6 +546,15 @@ none
 - rev-3 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-19`, the batch the
   units-16-18 spec audit's minors were promoted into, for that report's id 2. No scope, design or
   criterion moves.
+- rev-4 · 2026-10-14 · S10 · AC10 · AC11 · §1 · §3 · §4 · §5 · §7 · §10 · unit 14's builder ran
+  the bug-class checklist over `109fbb4ab`, and it selected `amendment-leaves-its-other-half-standing`.
+  The comment above `_cfg_run` (`tools/govkit/govkit.py:7811-7816` at `ffe73d97d`) still says
+  CONFIGURE runs before the receipt is written, which unit 14's early receipt made false.
+  Scratch-guard closed that file to unit 14, so the correction is folded here
+  (`prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-2-revision.md`). S10 restates the comment, §4
+  gains "The CONFIGURE comment, restated", AC11 reads it as a joined text cut, red at `ffe73d97d`,
+  and AC10 counts the other criteria. §1, §3, §5, §7 and §10 say so. No arm is added, Files touched
+  is unchanged, and no other scope, design or criterion moves.
 
 ## 10. Reuse audit
 
@@ -495,7 +578,10 @@ The gotchas checklist for the four product paths selected these classes:
 - `line-claim-matched-over-the-whole-output`, which is why every criterion asserts on the line it
   names;
 - `a-new-local-collides-in-a-long-function`, which is why S2 keeps `resolved`, S3 keeps `_res_g`,
-  and S5's locals carry a prefix grepped unbound.
+  and S5's locals carry a prefix grepped unbound;
+- `amendment-leaves-its-other-half-standing`, selected by unit 14's builder over `109fbb4ab`,
+  which is why S10 restates the CONFIGURE comment unit 14's early receipt left false, and why AC11
+  reads that comment's whole joined cut rather than one line of it.
 
 The recall probe returned `TOOL-aScouredKit-26` (`memory/builds/aScouredKit/BACKLOG.md:16`). It
 records that no cross-entry token exists, and that adding one means deciding what it does when the
