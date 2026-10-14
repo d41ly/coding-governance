@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-5 — fork idioms past the spawn-idiom registry, converted to their no-fork forms
 
-**Status:** INPROGRESS · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 3
+**Status:** INPROGRESS · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,8 @@
 | [2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-5-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-5-2-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-5-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-5-3-spec-writer.md) | journal | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-5-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-5-4-revision.md) | research | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-5-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-5-5-spec-writer.md) | journal | — |
 | [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 
 <!-- /gen:spec-records -->
@@ -124,7 +126,7 @@ Each site converts through one row. The probe in AC4 runs every row.
 | `var-pipe` | `… \| grep -q 'A.*B'` | `re=$'A[^\n]*B'; [[ $v =~ $re ]]` | A and B are escaped for ERE |
 | `var-pipe` | `printf '%s\n' "$v" \| sed 's/^/P/'` | `printf 'P%s\n' "${v//$'\n'/$'\n'P}"` | P holds no `%`, `&` or `\` |
 | `var-pipe` | `printf '%s' "$v" \| sed 's#A#B#'` | `w=${v/'A'/'B'}`, then `"$w"` | `$v` is one line; A holds no regex metacharacter; B holds no `&` or `\` after expansion |
-| `var-pipe` | `printf '%s' "$v" \| tr -d '\r'` | `${v//$'\r'/}` | `$v` holds no newline directly before a CR at its end |
+| `var-pipe` | `printf '%s' "$v" \| tr -d '\r'` | `${v//$'\r'/}` | written outside every command substitution, since under the bar's MSYS bash a `$'\r'` inside `$( )` expands to nothing and the strip there removes nothing; `$v` holds no newline directly before a CR at its end |
 | `var-pipe` | `[ "$(printf '%s\n' "$v" \| wc -l …)" = N ]` | `nl=${v//[!$'\n']/}; [ "$(( ${#nl} + 1 ))" = N ]` | always |
 | `var-pipe` | `[ "$(printf '%s\n' "$v" \| grep -c .)" = 1 ]` | `[[ -n $v && $v != *$'\n'* ]]` | `$v` holds no empty line, which `ls` output never does |
 | `var-pipe` | `n=$(printf '%s\n' "$v" \| … \| grep -c 'RE')` | `n=0; mapfile -t a <<< "$v"; for x in "${a[@]}"; do [[ $x =~ $re ]] && n=$((n+1)); done` | RE carries over to ERE unchanged |
@@ -134,9 +136,15 @@ In the `var-pipe` rows, `…` is the `printf '%s'`, `printf '%s\n'` or `echo` of
 class admits. The `sed 's#A#B#'` form is written as a plain assignment, never inside double quotes,
 and its pattern and replacement are single-quoted. That is the spelling the AC4 probe observed equal
 to `sed` on bash 5.3.9, and quoting the replacement keeps bash 5.2's `patsub_replacement` from
-reading a `&` in it. The `mapfile` row is the one count the leg admits no expansion for. It is not
-a `while read` loop, so the loop leg does not grade it, and it is not graded by the follow either
-(`tools/gate-lint/sh_hygiene.py:101`).
+reading a `&` in it. The `mapfile` row is the one count the leg admits no expansion for, and the
+loop leg grades it by where its lines fall. `scan_file` reads a line as a loop when `done` appears
+anywhere on it (`DONE`, `tools/gate-lint/sh_hygiene.py:135`, applied at `:314`). On such a line it
+grades a `<<<` whose tail expands a name last assigned from a command substitution as
+`loop-var-sub` (`:317-322`). So the row written on one line, fed a `$v` captured by `$( )`, reds
+that leg. On a line with no `done`, a `<<<` is graded only when its own tail holds a substitution
+(`:319-320`), and `"$v"` holds none. The row is therefore written across two lines:
+`mapfile -t a <<< "$v"` on a line with no `done`, and the `for … done` count on the next. The
+`mapfile` assigns nothing the follow records (`:101`), so the `for` line reads no fed name.
 
 ### The adopters
 
@@ -165,9 +173,19 @@ they are.
   `:132` takes the `date-fmt` row into `_a6day`, on the line that builds `A6P`. The twelve
   `var-pipe` sites take the rows their filters name. `:83`, `:97`, `:98` and `:106` take the
   substring row, `:113` the start-anchored one, and `:107` the end-anchored one. `:90` takes the
-  `A.*B` row with `_re2`. `:160` and `:245` strip CR by expansion before the compare. `:183` counts
-  through the `mapfile` row into `_nl`, with `_l8`, `_x8` and `_re8`. `:185` counts lines through
-  `_nb`. `:251` takes the one-line row.
+  `A.*B` row with `_re2`. `:160` and `:245` sit inside the `"$( … )"` argument of `check_arm`,
+  where the CR row's `exact only when` cell rules the strip out. Their strip moves to the capture
+  line above each: `:158` and `:243` each end `; rc=$?; out=${out//$'\r'/}`, after `rc=$?`, so `rc`
+  still holds the substitution's status. Only `:160` and `:245` read those values of `out` before
+  `:168` and `:266` reassign it. `:160` then takes the end-anchored row over `out`, as
+  `[[ $out$'\n' == *" task-sha=$msha"$'\n'* ]]`, and `:245` compares `"$out"` itself. A `$'\n'`
+  inside `$( )` keeps its newline, as `:245`'s own `"$A9L1"$'\n'"$A9L2"` already relies on.
+  `:183` counts through the `mapfile` row into `_nl`, with `_l8`, `_x8` and `_re8`, across two
+  lines: `mapfile -t _l8 <<< "$out"` goes at the end of the `:182` capture line, after its `rc=$?`,
+  and the `for … done` count stays on `:183`. That count needs no CR strip while each CR sits at a
+  line's end, the shape the fixture's CRLF lines give it (the `\r\{0,1\}` the arm's own `sed` at
+  `:187` allows for): `mapfile -t` leaves the CR at the end of its element, and `_re8` anchors only
+  at the line's start. `:185` counts lines through `_nb`. `:251` takes the one-line row.
 - **`tools/hooks/format-guard.test.sh`.** `:166` takes `${2##*/}`, the spelling `check_empty`
   already uses two lines above it.
 - **`tools/workflows/unattended-build.test.sh`.** The builder converts exactly five `printf-subst`
@@ -221,6 +239,12 @@ time.
   leaves untouched, and the precedent refused the drain for the same leg.
 - Lifting the new assignments onto their own lines. It would shift every later line of the suites
   and of `tools/roles/adopt-roles.sh`, which TOOL-dRedressedBar-6 cites by number.
+- A CR held in a variable set at top level, such as `_cr=$'\r'`, expanded inside the substitution
+  as `${out//$_cr/}` at `:160` and `:245`. It works under MSYS bash, but it mints a name and an
+  Inventory row for what one expansion on each capture line already does.
+- Declaring the one-line `mapfile` row in `memory/project/substitution-fed-loops.txt`. The brief
+  refuses a row a code change can fix, and moving the `mapfile` onto the capture line is that
+  change.
 
 ## 5. Production-readiness checklist
 
@@ -235,7 +259,8 @@ time.
 - observability — N/A — no message, log line or exit status changes.
 - risks — A conversion that is not exact turns a suite assertion false-green or false-red, or moves
   an adopter's derived path. The traps are a slash-free `$0` or `CH`, `dirname` of `/x`, and a CR in
-  captured output. Each is a row of the forms table, and AC4 stages the first. A second risk is a
+  captured output. Each is a row of the forms table, and AC4 stages the first and the CR strip
+  written inside `$( )`. A second risk is a
   sibling unit adding a site to `tools/roles/adopt-roles.test.sh`, which now has no row; the
   hands-off to TOOL-dRedressedBar-6 names it.
 - testing — AC4's probe runs every form against its forking spelling. AC5, AC6 and AC7 run both
@@ -280,8 +305,10 @@ time.
   every row reports the same output and exit status. Its specimens include `AGENTS.md`, `docs/x.md`,
   `/c` and `/c/x` for the path rows, a value ending in `\r` for the CR row, and each `sed` site's own
   one-line JSON value from `tools/workflows/unattended-build.test.sh`, read at the converted line. The
-  staged wrong form, `${CH%/*}` alone on `AGENTS.md`, reports a difference. Red when: a row's two
-  spellings disagree on a specimen, or the staged wrong form reports none.
+  CR row also runs a CRLF capture through arm 9's shape: the strip at top level on the capture line,
+  then the compare inside `$( )`. Two staged wrong forms each report a difference: `${CH%/*}` alone
+  on `AGENTS.md`, and the CR strip written inside `$( )` on a value ending in `\r`. Red when: a
+  row's two spellings disagree on a specimen, or a staged wrong form reports none.
   fixture: the probe lives in the session scratchpad and its output goes to the unit's acceptance
   ledger; nothing is committed. Run under the bash the bar runs.
 - **AC5** — When `bash tools/roles/adopt-roles.sh --check` and
@@ -319,8 +346,9 @@ time.
 `shell hygiene (a fork spent on builtin work)` · `shell hygiene (a loop fed by a command substitution)` · `roles adopter self-test` · `branch-reconcile selftest` · `format-guard self-test` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `foreign-prefix parity (every self-test at three prefixes)` · `harness arms (fail branches armed or pinned)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `memory hygiene`
 
 The main loop runs these at the close. The first is the leg this unit turns green; its red was
-observed by the full bar over `ebce889c`. The second grades the `mapfile` form and the new
-assignments. The suites on the line are the ones whose files or guarded directories this unit
+observed by the full bar over `ebce889c`. The second grades every line this unit writes. It would
+grade the `mapfile` row's `<<< "$out"` as `loop-var-sub` were it written on the `:183` loop line,
+and on the `:182` capture line, which holds no `done`, it grades nothing. The suites on the line are the ones whose files or guarded directories this unit
 touches, and `harness arms (fail branches armed or pinned)` reads the adopters' exit sites this
 unit keeps in place. `spawn budget (forks per hot entrypoint)` is not owed: no touched file has a
 row in `memory/project/fork-ceilings.txt`. This unit adds and moves no suite arm and declares none.
@@ -340,6 +368,15 @@ none
   builder's divergence report found. The whole-file count is kept over a pipe-free one because a
   pipe-free count never sees a `var-pipe` conversion that leaves its `$(printf '%s' … |` behind. Its
   "Red when" and figure lines follow. No scope, design or other criterion moves.
+- rev-4 · 2026-10-14 · §4 · §5 · AC4 · §7 · the builder's second divergence report, both findings
+  probed again under Git Bash 5.3.9. (1) A `$'\r'` inside `$( )` expands to nothing there, so the
+  CR strip for `:160` and `:245` moves to the `:158` and `:243` capture lines as
+  `out=${out//$'\r'/}`. The CR row's `exact only when` cell excludes a command substitution, and
+  AC4 adds arm 9's shape and the strip inside `$( )` as a staged wrong form. (2) `scan_file` reads
+  any line holding `done` as a loop and grades the one-line `mapfile` row as `loop-var-sub`, so
+  `mapfile -t _l8 <<< "$out"` moves onto the `:182` capture line. The paragraph under the forms
+  table and the §7 note now say what `scan_file` grades. Alternatives rejected gains the `_cr`
+  variable and the loop-registry row. No other scope or criterion moves.
 
 ## 10. Reuse audit
 
