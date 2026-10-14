@@ -158,3 +158,142 @@ because its records accumulate and `next` reads them; no worker remembers where 
 - **New with roles, asked below:**
   - **H15:** an owner question raised mid-run while the owner is away.
   - **H16:** how many prompt-writer calls a step's batch of same-role tasks costs.
+
+## [forks] Asked, 2026-10-15
+
+**FR-1 (H1). "Your plan ratification is the mandate for every unattended step after Plan, so it must
+be witnessed, never relayed by an agent. How is it witnessed by default?"** Offered: Your words,
+hook-recorded (Recommended); A terminal command; A signed commit. Answer, in the owner's words:
+"Starting a session and requesting a build _is_ ratification. Hook-recorded keywords can be an
+owner-adjustable option."
+
+**FR-2 (H3). "After ratification, where does the executor run the unattended steps by default?"**
+Offered: The ratifying node, background (Recommended); The OS scheduler; A cloud routine. Answer, in
+the owner's words: "The ratifying node, background by default, but each option is owner-adjustable."
+
+**FR-3 (H12). "How should you hear about unattended progress by default?"** Offered: On park and on
+landing (Recommended); At every transition; Only on park. Answer, in the owner's words: "As it is now -
+microformats at the end of each turn. Each option is owner-adjustable."
+
+**FR-4 (H15). "Mid-run, a role needs your answer (a planner's scope question, a fork the goal cannot
+survive) while you are away. What happens by default?"** Offered: Park the item, continue the rest
+(Recommended); Park the whole build; Stop the run. Answer, in the owner's words: "An agent makes the
+best possible effort to resolve the fork and records it. Builds DO NOT get parked on the unresolved
+fork pretext."
+
+### Settled after FR-1 to FR-4, 2026-10-15
+
+- **The owner's request is the ratification** (`plan.ratification`, default `request`). Starting a
+  session and requesting a build is the mandate. Its witness is the request itself, written verbatim
+  by the prompt-submit hook, so H2's hook is now load-bearing. A hook-recorded keyword, a terminal
+  command or a signed commit are the allowed alternatives. Plan's item 10 is witnessed by the intake
+  record; there is no separate ratification turn. Where `autonomy` keeps the owner's gate at Plan,
+  that gate is met as `plan.ratification` says.
+- **The executor runs on the node where the request was made, in the background** (`run.host`,
+  default `requesting-node`, with `os-scheduler` and `cloud-routine` allowed); its liveness is its
+  build lease's beat.
+- **Progress reaches the owner as today: the micro-format lines that end each turn** (`notify.owner`,
+  default `turn-micro-formats`, with `park-and-landing`, `every-transition` and `park-only`
+  allowed). Nothing pushes a notification by default.
+- **A build never parks on an unresolved fork** (`run.on-owner-question`, default
+  `best-effort-recorded`, with `park-item`, `park-build` and `stop-run` allowed). The role that meets
+  the fork resolves it with its best effort under the decision principles, and records the options,
+  the choice and the reason. This holds for a question that would otherwise go to the owner, and, as
+  read here, for a fork the goal cannot survive: the planner's plan revision proceeds under the
+  request's mandate and is recorded for the owner. That reading awaits confirmation.
+
+### Follow-ups asked, 2026-10-15
+
+**FR-5 (H6). "Units with disjoint write sets build in parallel, but in the one shared worktree you
+chose as the default, two builders contend for git's index lock. What should the default be?"**
+Offered: Shared, commits queued (Recommended); Own worktree when parallel; Always one per unit.
+Answer, in the owner's words: "Shared, commits queued but 'own worktree' as an owner-adjustable option
+per adopter."
+
+**FR-6 (H7). "Every landing on a node needs that node's primary tree, so two builds landing at once on
+one node collide. What should the default be?"** Offered: A node landing lease (Recommended); Land
+from the build's worktree. Answer, in the owner's words: "Turnstile landing queue already exists in the
+repo. Tooling that changes how the product operates and its mechanical processes is to be reviewed at a
+later step."
+
+**FR-7 (H13). "A build that depends on another could reach Deploy before its parent has landed. What
+should the default be?"** Offered: Hold the dependent's landing (Recommended); Let its Test decide.
+Answer: Hold the dependent's landing (Recommended).
+
+**FR-8 (H5, H9). "Messages that arrive mid-step, such as an amendment from another session or a
+parent's breaking change, wait hours if the mailbox is read only at transitions. What should the
+default be?"** Offered: Every item, plus an intake kind (Recommended); Transitions only, as settled;
+Every item, amendments at transitions. Answer: Every item, plus an intake kind (Recommended).
+
+### Settled after FR-5 to FR-8, 2026-10-15
+
+- **Parallel units share the build's worktree, their commits queued by the executor** so the index
+  lock never collides; `build.worktree` keeps `shared` as its default, and a unit's own worktree stays
+  an allowed value each adopter can choose.
+- **Landings on a node pass through the turnstile landing queue that already exists.** How that
+  tooling fits the new architecture is reviewed at the lower-level step, with the other mechanical
+  processes.
+- **A dependent build's landing waits for its parent's** (`deps.landing`, default
+  `hold-until-parent-lands`, with `test-decides` allowed).
+- **The executor reads the build's mailbox at every item boundary** (`mailbox.reads`, default
+  `every-item`, with `transitions-only` and `every-item-amendments-at-transitions` allowed), and the
+  message kinds gain `intake`, which carries an amendment from a session that does not hold the
+  build's lease to the session that does.
+
+### Last round, asked 2026-10-15
+
+**FR-9 (H8). "Units created from a closing review's findings are built after that review. Does the
+closing review run again over them by default?"** Offered: Follow-up rounds while they find
+(Recommended); One closing review per build; Only after a HIGH finding. Answer, in the owner's words:
+"Only after a HIGH finding but it's an owner-adjustable setting per adopting repo - either option
+should be available."
+
+**FR-10 (H16). "The prompt writer precedes every role dispatch. When a step sends several workers of
+one role at once (five spec writers, say), how many prompt-writer calls by default?"** Offered: One
+per batch (Recommended); One per task. Answer: One per batch (Recommended).
+
+**FR-11 (H2, H10, H11, H14). "Which of these mechanical resolutions do you accept as proposed?"**
+Offered, multi-select: H2 Intake by hook; H10 Back-steps recorded; H11 Core checks at Build's exit;
+H14 Fresh session in the worktree. Answer: all four.
+
+**FR-12. ""Builds DO NOT get parked on the unresolved fork pretext." Read here: even a fork the goal
+cannot survive is resolved by best effort, and the planner's plan revision proceeds under your
+request's mandate, recorded for you. Is that right?"** Offered: Yes, even goal-level forks
+(Recommended); Goal-level forks still wait. Answer: Yes, even goal-level forks (Recommended).
+
+### Settled after the last round, 2026-10-15
+
+- **A follow-up closing review runs only after a HIGH or BLOCKER finding** (`review.follow-up`, default
+  `after-high`, with `while-finding` and `never` allowed per adopting repository).
+- **One prompt-writer call composes each batch of same-role tasks** (`prompts.batch`, default
+  `per-batch`, with `per-task` allowed); each task remains its own prompt, hashed on its own.
+- **H2**: the prompt-submit hook writes each of the owner's prompts verbatim to the session's intake log,
+  the witness for intake and, under `plan.ratification: request`, for the mandate.
+- **H10**: backward transitions (Test to Build, Build to Design) are recorded like forward ones; only
+  Plan is never re-entered.
+- **H11**: the executor runs the core checks, cheap and leg-free, at the Build-to-Test transition.
+- **H14**: until the card-import fixture passes, `next` recommends restarting in the build's worktree.
+- **No fork parks a build, a goal-level one included**: the planner's plan revision proceeds under the
+  request's mandate, recorded with its evidence for the owner.
+
+## [closed] Every hole, settled
+
+| Hole | Settled by |
+|---|---|
+| H1 ratification's witness | FR-1: the request is the ratification, witnessed by the hook |
+| H2 verbatim intake | FR-11: the prompt-submit hook |
+| H3 the executor's host | FR-2: `run.host` |
+| H4 actors per item | the roles layer's item map |
+| H5 an amendment without the lease | FR-8: the `intake` message kind |
+| H6 parallel units in one worktree | FR-5: commits queued; own worktree allowed |
+| H7 the primary tree at landing | FR-6: the existing turnstile landing queue; tooling reviewed later |
+| H8 review of review-born units | FR-9: `review.follow-up` |
+| H9 when the mailbox is read | FR-8: `mailbox.reads` |
+| H10 backward transitions | FR-11 |
+| H11 Build's core check | FR-11 |
+| H12 telling the owner | FR-3: `notify.owner` |
+| H13 a dependent's landing | FR-7: `deps.landing` |
+| H14 a session moving into its worktree | FR-11 |
+| H15 an owner question mid-run | FR-4 and FR-12: `run.on-owner-question` |
+| H16 prompt-writer calls per batch | FR-10: `prompts.batch` |
+

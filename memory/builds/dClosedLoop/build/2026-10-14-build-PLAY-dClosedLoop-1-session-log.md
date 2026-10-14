@@ -174,6 +174,8 @@ calls.
   retries, and a harness that can always spawn subagents.
 - 2026-10-15, session 1799cb98: the owner opened the flow revisit with roles in place; the flow-roles
   record sets one cycle for every role item and maps each step's role sequence and routes.
+- 2026-10-15, session 1799cb98: twelve forks answered across three rounds settled every hole the session
+  model left, H1 to H16; the owner's request became the ratification, and no fork parks a build.
 
 ## Instruments
 
@@ -349,6 +351,9 @@ chain): the join exits 0 on 95 keys and 11 builds. The preset check's free-value
 count`, for `roles.retries`, in the source above; it exits 0 on 82 catalogue keys, 77 presettable, 77
 preset rows, and exits 1 on a copy with strict `roles.no-spawn` set to `sometimes` and standard
 `prompts.author` set off its default, naming both.
+
+After the flow revisit with roles (eight policies added; units added to six chain rows): the join exits 0
+on 95 keys and 11 builds; the preset check exits 0 on 90 catalogue keys, 85 presettable, 85 preset rows.
 
 ### The foreign-build census
 

@@ -713,6 +713,11 @@ reasoning (Recommended); Agent judgment only; Signals only. Answer: Scored signa
 
 ## [walked] The flow walk, complete
 
+Revised: 2026-10-15, in the flow revisit with roles (`build/2026-10-15-build-PLAY-dClosedLoop-1-flow-roles.md`):
+the owner's request is the ratification (FR-1), so Plan's item 10 is witnessed by the intake record;
+and no build parks on an unresolved fork, a goal-level one included (FR-4, FR-12), so a critical
+planning issue's revision proceeds under the request's mandate, recorded, rather than waiting.
+
 All seven stages have a settled scope, boundaries and checklist, and the entry points are settled
 (the table under Maintain). Agent roles remain deferred at the owner's direction. What the walk
 changed, in brief: the flow is a layer above the build; Plan is for complex features and hands

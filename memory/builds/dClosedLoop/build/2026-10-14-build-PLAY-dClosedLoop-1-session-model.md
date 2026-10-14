@@ -264,3 +264,6 @@ Each is a place where the settled design is silent or does not hold together. No
 The owner, 2026-10-14: "We will revisit the [2. Architectural Flow Steps] later to polish once more
 given more consolidated detail from points 1-3 altogether." The holes above wait for that revisit,
 after the roles layer (`build/2026-10-14-build-PLAY-dClosedLoop-1-roles.md`).
+
+Settled, 2026-10-15: every hole above, and two found with roles (H15, H16), is settled in the flow
+revisit (`build/2026-10-15-build-PLAY-dClosedLoop-1-flow-roles.md`, `[closed]`).
