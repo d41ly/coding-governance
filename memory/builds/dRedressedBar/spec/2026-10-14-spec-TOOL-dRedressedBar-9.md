@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-9 — settings-merge's adopter exit with no agent-cap hook declared an accepted stop, so a gaining update completes
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -80,6 +80,11 @@ completes, and so does `apply --kits settings-merge`, which fails the same way t
   directly, corrects §4 and §5, and, by its F1, narrows this unit's code-2 block with a second
   `must_not_exist` term and adds one row to settings-merge's `check_outcome_states` call. It also
   writes the hands-off to `TOOL-dRedressedBar-7` these Edges lack.
+- **hands-off** `TOOL-dRedressedBar-17` — the `[dRB-9]` update-gaining block, which that unit
+  extends with a case gaining both agent-cap and settings-merge at a per-kit agent-cap prefix, so
+  `update`'s gained loop is observed resolving agent-cap's `[adopt] via` (report id 13). Also §4's
+  two sentences on agent-cap's argv, which `TOOL-dRedressedBar-15` takes away and that unit corrects
+  in place (report id 20).
 
 ## 4. Design
 
@@ -336,6 +341,9 @@ none
 - rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
   spec audit's minors were promoted into, for report ids 7, 17 and 22. No scope, design or criterion
   moves.
+- rev-3 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-17`, the batch the
+  units-12-15 spec audit's minors were promoted into, for report ids 13 and 20. No scope, design or
+  criterion moves.
 
 ## 10. Reuse audit
 

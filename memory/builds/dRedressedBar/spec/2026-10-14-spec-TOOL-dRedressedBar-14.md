@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-14 — a first apply at a per-kit prefix configures against the homes it just wrote: the receipt is written ahead of CONFIGURE
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 10
+**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-14-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-2-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-14-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-3-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-14-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-brief.md) | research | — |
+| [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-15 |
 
 <!-- /gen:spec-records -->
 
@@ -90,6 +91,12 @@ not reach. That cause is a separate mechanism, and §8 F1 asks where it goes.
   measured). Its argv `["python", "{prefix}/settings-merge.py"]` (`tools/hooks/kit.toml:108`)
   resolves `{prefix}` in agent-cap's context, while the file belongs to settings-merge. AC1 pins the
   exit 1 it leaves over this unit, and the reproduction's exit 0 is that unit's close (§8 F1).
+- **hands-off** `TOOL-dRedressedBar-17` — the two receipt writes and `_rcpt_doc`, which that unit
+  routes through `write_atomic` (report id 23) and writes once more after the `oid` re-stamp so an
+  interrupt after RENORMALIZE recovers (report id 22). Also the `[dRB-14]` block, whose agent-cap
+  problem-line check that unit narrows away once unit 15 lands (report id 1) and to which it adds the
+  sidecar check (report id 2). And this spec's S4, Edges and §4 prose, which that unit corrects in
+  place (report ids 1, 5, 9, 19, 22 and 23).
 - **hands-off** external — `update`'s gained loop runs a gained kit's adopter (`:11104-11126`) before
   its receipt write (`:12017-12062`). So a gained kit at a per-kit prefix is not in the receipt its
   sibling resolvers read. Not measured here.
@@ -358,6 +365,9 @@ no refusal branch. The main loop observes the new arm red, then green, at the cl
 - rev-2 · 2026-10-14 · §3 · §8 · F1 is marked resolved by the owner as option (a). Edges replace the
   external hand-off for agent-cap's exit 2 with the hands-off to `TOOL-dRedressedBar-15`, the unit
   the owner added for it. No scope, design or criterion moves, and AC1's pinned exit 1 stands.
+- rev-3 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-17`, the batch the
+  units-12-15 spec audit's minors were promoted into, for report ids 1, 2, 5, 9, 19, 22 and 23. No
+  scope, design or criterion moves.
 
 ## 10. Reuse audit
 

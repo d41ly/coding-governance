@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-13 — the units-10-11 spec audit's 5 mediums and 18 lows, batched: each criterion half observed in a form that can fail, each false sentence corrected, and the code sites they describe made to say what the specs claim
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
+**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-14-prompt-TOOL-dRedressedBar-13-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-13-2-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-13-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-13-3-spec-writer.md) | journal | — |
+| [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 |
 
 <!-- /gen:spec-records -->
 
@@ -197,6 +198,11 @@ names its own id.
   which S17 rebuilds fixture B. `_cmd_apply` holds unit 12's receipt carry, in which S13 changes the
   CONFIGURE call. Both units write `tools/govkit/govkit.py`, `tools/govkit/selftest.py` and spec 11, so this
   unit follows it.
+- **hands-off** `TOOL-dRedressedBar-17` — fixture B of the `[dRB-11]` block as S17 rebuilds it. AC15's
+  spelling ban spans fixture A too (report id 3), so that unit brackets fixture B with markers and
+  observes its identities by behaviour. Also this spec's §1 ordering sentence (report id 6), its §5,
+  §3 and §10 decode-site prose (report id 8), and the mirror of the edge spec 14 gains to this unit
+  (report id 5), each corrected in place by that unit.
 
 ## 4. Design
 
@@ -466,6 +472,9 @@ none
   25 refused rev-1 for it. By name it lists spec 9's line 200 and `tools/govkit/matrix.py`, both
   found by `git grep` over the tracked tree and both already in §4's Files touched. By value it
   answers NO VALUE READERS, because S6 changes prose only. No other section moves.
+- rev-3 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-17`, the batch the
+  units-12-15 spec audit's minors were promoted into, for report ids 3, 5, 6 and 8. No scope, design
+  or criterion moves.
 
 ## 10. Reuse audit
 

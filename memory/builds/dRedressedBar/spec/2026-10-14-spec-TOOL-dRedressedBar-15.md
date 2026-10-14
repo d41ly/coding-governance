@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-15 — agent-cap's adopter runs settings-merge's own adopter at settings-merge's home, declared as `[adopt] via`, and selfcheck refuses any argv naming another entry's file
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 11
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-1-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-brief.md) | research | — |
+| [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 |
 
 <!-- /gen:spec-records -->
 
@@ -112,6 +113,13 @@ only another entry ships. With unit 14's early receipt, the brief's reproduction
   runs. Without it settings-merge still exits 2 and AC1 cannot pass.
 - **consumes-from** `TOOL-dRedressedBar-11` — S3's stderr tail on a refused CONFIGURE exit, which
   AC1's red half reads for python's "can't open file". Without it the red half shows only an exit code.
+- **hands-off** `TOOL-dRedressedBar-17` — `resolve_adopter_argv`, the S5 arm and the `[dRB-15]`
+  checks. That unit folds S5's argv walk and `silenced_legs` into one generator (report id 10), adds
+  a type rule and a rendered-generated-merged rule to the `via` rules (report ids 24 and 11), arms
+  `update`'s gained loop in the `[dRB-9]` block (report id 13), and widens the `govkit selftest`
+  guard to the two sibling-kit files the arms grade (report id 18). It corrects this spec's S1, S4
+  Readers, S8, §3, §4, §5, §7 and §10 in place and observes AC6 anchored (report ids 1, 4, 15, 16,
+  20 and 21).
 - **hands-off** external — `TOOL-aScouredKit-26`, the open ask for a cross-entry destination token,
   stays open. `via` names a whole adopter and passes no sibling's destination into an argv, so
   drift-audit's `DRIFT_WORKFLOWS_REL` workaround is untouched.
@@ -455,6 +463,9 @@ none
   The class predicate ran over the real registry at `95350ba5` and found one hit in 105 elements.
   Two scratch applies measured the mirror case at a settings-merge per-kit prefix and the run that
   C2 would lose. Seven candidates were graded by M12, and the pick was taken by M3's rule.
+- rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-17`, the batch the
+  units-12-15 spec audit's minors were promoted into, for report ids 1, 4, 10, 11, 13, 15, 16, 18,
+  20, 21 and 24. No scope, design or criterion moves.
 
 ## 10. Reuse audit
 

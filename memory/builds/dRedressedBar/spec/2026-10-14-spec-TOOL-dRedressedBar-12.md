@@ -1,12 +1,13 @@
 # TOOL-dRedressedBar-12 — an apply narrower than its receipt keeps every other installed kit's claim and rows, so a refused settings-merge exit stays refused on the next run
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
+**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-1-spec-writer.md) | journal | — |
+| [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 |
 
 <!-- /gen:spec-records -->
 
@@ -90,6 +91,14 @@ the `pins` union at `:7402-7407` already does for line-ending pins.
 - **hands-off** `TOOL-dRedressedBar-14` — `_carried_kits` and `_carried_rows`, which unit 14 binds
   once ahead of CONFIGURE so its early receipt write and the RECEIPT write both carry them. Without
   the carry, fixture A's planted `agent-cap` row leaves the receipt during CONFIGURE.
+- **hands-off** `TOOL-dRedressedBar-16` — the `emitted` carry §3 leaves out, which the units-12-15
+  spec audit found wedges a carried kit once gov changes one of its leg argvs (report id 7). That
+  unit makes `apply` pass `carry_out_of_scope`, rewrites the docstring paragraph S2 writes, and
+  corrects this spec's §3 second non-goal and §4 row C5.
+- **hands-off** `TOOL-dRedressedBar-17` — the `[dRB-12]` block and the RECEIPT carry, whose
+  `install.sums` sidecar and `STEP_RECEIPT` counts S1 claims observed and no criterion here reads
+  (report ids 2 and 12). That unit adds those checks to the block and names its AC2 in this spec's
+  revision line.
 - **hands-off** external — `apply` writes `orders` for its selection alone (`:7666-7712`), so an
   outbox order a carried kit's hole owns leaves the receipt on a narrower apply. `check` grades only
   the orders a receipt records (`:5394-5405`), so the loss is a missing instruction and never a
@@ -286,6 +295,9 @@ none
 - rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-14`, which consumes this
   unit's two carried lists for the receipt it writes ahead of CONFIGURE. No scope, design or
   criterion moves.
+- rev-3 · 2026-10-14 · §3 · Edges gain the hands-offs to `TOOL-dRedressedBar-16` and
+  `TOOL-dRedressedBar-17`, the units the units-12-15 spec audit's findings were promoted into: report
+  id 7 to unit 16, and ids 2 and 12 to unit 17. No scope, design or criterion moves.
 
 ## 10. Reuse audit
 
