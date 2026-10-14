@@ -1,11 +1,12 @@
 # TOOL-dRedressedBar-14 — a first apply at a per-kit prefix configures against the homes it just wrote: the receipt is written ahead of CONFIGURE
 
-**Status:** SPECCED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 10
+**Status:** SPECCED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md) | research | TOOL-dRedressedBar-12 TOOL-dRedressedBar-16 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-14-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-2-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-14-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-3-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-14-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-brief.md) | research | — |
@@ -51,10 +52,13 @@ not reach. That cause is a separate mechanism, and §8 F1 asks where it goes.
   exit code, because the exit belongs to agent-cap's argv (§8 F1). Its file reads name
   `encoding="utf-8"`, and its process calls go through `run`. Observed by AC1, through the `New arm:`
   line in §7.
-- **S5** — Spec 11's §4 "Which receipt bytes" paragraph is corrected in place, in one rev bump whose
-  revision line names `TOOL-dRedressedBar-14`. It states that in `apply` the term reads the receipt
-  this run wrote ahead of CONFIGURE. That receipt holds this run's rows and the carried ones, and it
-  is still the bytes the adopter read. `update` is unchanged. Observed by AC6.
+- **S5** — Spec 11's §4 "Which receipt bytes" paragraph is corrected in place by this unit's
+  spec-writer pass, `<w14>`, which runs once unit 11 is CLOSED and `<w12>` and `<w13>` have bumped
+  spec 11, and before the build pass (§4 "The spec-11 correction's pass"). It takes one rev bump
+  whose revision line names `TOOL-dRedressedBar-14`. It states that in `apply` the term reads the
+  receipt this run wrote ahead of CONFIGURE. That receipt holds this run's rows and the carried ones,
+  and it is still the bytes the adopter read. `update` is unchanged. The build pass writes no spec
+  file but this one's status and date cells. Observed by AC6.
 - **S6** — The unit adds no module-level function or class. It adds no text-IO site without an
   encoding, and it moves no kit version. Observed by AC5.
 - **S7** — Every reading below goes to this unit's acceptance ledger under
@@ -81,7 +85,7 @@ not reach. That cause is a separate mechanism, and §8 F1 asks where it goes.
 - **consumes-from** `TOOL-dRedressedBar-11` — its `must_not_resolve` term, which reads the receipt
   that S1 now writes before classification. It also takes the `[dRB-11]` block's fixture A, whose
   refusal AC3 re-reads over the early write, and S3's stderr tail, which AC1's agent-cap line reads.
-  Spec 11's §4 "Which receipt bytes" paragraph is what S5 corrects. Without it, nothing in the
+  Spec 11's §4 "Which receipt bytes" paragraph is what S5's pass `<w14>` corrects. Without it, nothing in the
   CONFIGURE outcome reads the receipt, and AC3 has no refusal to keep.
 - **consumes-from** `TOOL-dRedressedBar-12` — `_carried_kits` and `_carried_rows`, which S1 binds
   ahead of CONFIGURE so both writes carry them. Without the carry, the early receipt holds only the
@@ -201,7 +205,8 @@ adds rows each one already reads on a later run.
 ### Order, and unit 7
 
 This unit follows unit 13 (order 9), so its order is 10. Units 12, 13 and 14 all write
-`tools/govkit/govkit.py`, `tools/govkit/selftest.py` and spec 11. This unit also binds unit 12's
+`tools/govkit/govkit.py` and `tools/govkit/selftest.py`, and their spec-writer passes `<w12>`,
+`<w13>` and `<w14>` each bump spec 11, in that order. This unit also binds unit 12's
 locals at a new site, and unit 13's S13 rewrites the CONFIGURE call that sits right below the S1
 write. Unit 13 is a sequence and not an edge, because no criterion here rests on its work.
 
@@ -220,12 +225,25 @@ would move agent-cap's version, which unit 7's measurement does not cover.
 | `_rcpt_doc` | a local in `_cmd_apply` | none: `lexicon.py --suggest _rcpt_doc --as py.local` answers that the closed set is function, type, file and constant |
 | `[dRB-14]` | the check-label prefix of the new selftest block | none |
 
+### The spec-11 correction's pass
+
+No one role can write S5's correction and the product files in one commit. Under
+`.claude/roles.json`, only `gov-spec-writer` writes spec files and only `gov-builder` writes
+product files, and scratch-guard admits a builder's spec edit only where it moves the status and
+date cells of a spec its card routes (`tools/hooks/scratch-guard.js:91-99`). So S5 is this unit's
+spec-writer pass, `<w14>`, M6's "a review's fixes folded in". The main loop dispatches it at this
+unit's turn, with S5 as its brief, once unit 11 is CLOSED and `<w12>` and `<w13>` have bumped spec
+11, and before the build pass. Spec 11 then takes its correction as a records fix with its status
+unchanged. It does not run earlier: spec 11 is unbuilt until then, and unit 11 builds against its
+§4 as written. A build pass that finds no `<w14>` returns that to the main loop before any write.
+
 ### Files touched (estimate)
 
 - `tools/govkit/govkit.py`
 - `tools/govkit/selftest.py`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-11.md`
 - `memory/builds/dRedressedBar/build/`
+
+Spec 11 is `<w14>`'s write set, not the build pass's.
 
 ### Alternatives rejected
 
@@ -240,6 +258,7 @@ Each candidate was written down with the test that could make it lose, and the p
 | C5 — the early bytes at another path, such as `install.pending.json` | No resolver reads that path, so it reduces to C3 | Rejected |
 | C6 — the early receipt with only the keys known before CONFIGURE | An interrupt then leaves a schema-3 receipt missing three keys every final receipt carries, read by `check` and `update` | Rejected |
 | C7 — the early receipt keyed on `rows` alone, without unit 12's carry | AC3's staged break: fixture A's planted row leaves the receipt during CONFIGURE, and the second apply reads `[accepted stop]` | Rejected |
+| C8 — the spec-11 correction in the build pass's own commit, as rev-4 wrote it | scratch-guard refuses a builder's edit to another spec, and the spec writer writes no product file, so no role can make that commit (unit 10's divergence, `prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md`) | Refused by the hook |
 
 ## 5. Production-readiness checklist
 
@@ -266,7 +285,8 @@ Each candidate was written down with the test that could make it lose, and the p
 ## 6. Acceptance criteria
 
 `<p13>` and `<p14>` are the commits of units 13 and 14's build passes, as their acceptance ledgers
-name them. Every command runs from the worktree root. Fixtures live in fresh `git init` targets under
+name them. `<w14>` is the commit of this unit's spec-writer pass, which §4 "The spec-11 correction's
+pass" describes; its subject names `TOOL-dRedressedBar-14`, and this unit's ledger names it. Every command runs from the worktree root. Fixtures live in fresh `git init` targets under
 `%TEMP%/<short-name>`, never inside the worktree, with `core.autocrlf false` and
 `.governance/deploy.toml` holding `DEPLOY_FULL`'s answers. Where a criterion adds
 `[kit.agent-cap] prefix = "scripts"`, it is appended to that file. A red half at `<p13>` runs
@@ -323,11 +343,16 @@ at `<p13>`.
   Per arm, it counts exactly the rows `memory/project/encoding-posture-sites.txt` declares.
   Red when: the pass minted a function, or added an unencoded text-IO site.
   figure: DERIVED from the registry at observation, after unit 13 moves it.
-- **AC6** — Cut spec 11's Design section with `sed -n '/^## 4. Design/,/^## 5/p'` and join it with
-  `tr '\n' ' ' | tr -s ' '`. It carries `TOOL-dRedressedBar-14`. Its revision log holds one new line
-  naming `TOOL-dRedressedBar-14`. The ledger S7 names exists and carries
+- **AC6** — When `git diff <w14>~1 <w14> -- memory/builds/dRedressedBar/spec/` runs, spec 11 shows
+  one header rev change and one new revision line, and that line names `TOOL-dRedressedBar-14`.
+  Spec 11 carries a CLOSED header at `<w14>~1`. Spec 11's Design section at `<w14>`, cut with
+  `sed -n '/^## 4. Design/,/^## 5/p'` and joined with `tr '\n' ' ' | tr -s ' '`, carries
+  `TOOL-dRedressedBar-14`. `git diff --name-only <p14>~1 <p14> -- memory/builds/dRedressedBar/spec/`
+  names no file but this spec. The ledger S7 names exists and carries
   `**Serves:** journal TOOL-dRedressedBar-14`.
-  Red when: spec 11's §4 names no unit 14, as at `29c72f51`.
+  Red when: spec 11 takes no bump or two, its revision line misses `TOOL-dRedressedBar-14`, it was
+  folded before it closed, its §4 names no unit 14 (as at `29c72f51`), or the build pass writes
+  another spec.
 
 ## 7. Gates
 
@@ -375,6 +400,17 @@ no refusal branch. The main loop observes the new arm red, then green, at the cl
 - rev-4 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-19`, the batch the
   units-16-18 spec audit's minors were promoted into, for that report's id 40. No scope, design or
   criterion moves.
+- rev-5 · 2026-10-14 · S5 · §3 · §4 · AC6 · unit 10's builder divergence, applied here
+  (`prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md`): no role can make a build-pass
+  commit that also edits another spec, because scratch-guard admits a builder's spec edit only to
+  its own status and date cells (`tools/hooks/scratch-guard.js:91-99`). The moved item: S5, spec
+  11's rev bump with its §4 "Which receipt bytes" correction, is now this unit's spec-writer pass
+  `<w14>`, dispatched once unit 11 is CLOSED and `<w12>` and `<w13>` have bumped spec 11, and before
+  the build pass. It is not folded now, because unit 11 is unbuilt. §4 gains "The spec-11
+  correction's pass", "Order, and unit 7" names the three passes that bump spec 11, Files touched
+  lists product files and the ledger only, AC6 reads spec 11 at `<w14>` and observes that the build
+  pass writes no other spec, §3's consumes-from edge names `<w14>`, and Alternatives rejected gains
+  row C8. No product design or other criterion moves.
 
 ## 10. Reuse audit
 

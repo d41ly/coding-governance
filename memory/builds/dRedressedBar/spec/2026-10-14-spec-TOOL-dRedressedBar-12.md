@@ -1,12 +1,14 @@
 # TOOL-dRedressedBar-12 — an apply narrower than its receipt keeps every other installed kit's claim and rows, so a refused settings-merge exit stays refused on the next run
 
-**Status:** SPECCED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
+**Status:** SPECCED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-1-spec-writer.md) | journal | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md) | research | TOOL-dRedressedBar-14 TOOL-dRedressedBar-16 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-12-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-3-spec-writer.md) | journal | — |
 | [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 |
 
 <!-- /gen:spec-records -->
@@ -49,11 +51,14 @@ the `pins` union at `:7402-7407` already does for line-ending pins.
   applies a narrower one over it, and re-applies a kit the narrower one did not name. Unit 11's
   fixture A, in the `[dRB-11]` block, gains a third identical apply. Observed by AC1, AC2 and AC3,
   through the `New arm:` lines in §7.
-- **S4** — Spec 11 is corrected in place, in one rev bump whose revision line names report id 23
-  and this unit's AC2. Two things change in its §4 "Which receipt bytes". It states that a refused
-  apply still writes its receipt and that a later run reads that receipt, which this unit keeps
-  whole. The "After" cell of the first "What an adopter sees change" row says the refusal holds on
-  every re-run. Spec 11's AC3 text does not move, and this unit's AC2 observes the re-run. Observed by AC5.
+- **S4** — Spec 11 is corrected in place by this unit's spec-writer pass, `<w12>`, which runs once
+  unit 11 is CLOSED and before the build pass (§4 "The spec-11 correction's pass"). It takes one rev
+  bump whose revision line names report id 23 and this unit's AC2. Two things change in its §4
+  "Which receipt bytes". It states that a refused apply still writes its receipt and that a later
+  run reads that receipt, which this unit keeps whole. The "After" cell of the first "What an adopter
+  sees change" row says the refusal holds on every re-run. Spec 11's AC3 text does not move, and
+  this unit's AC2 observes the re-run. The build pass writes no spec file but this one's status and
+  date cells. Observed by AC5.
 - **S5** — The unit adds no module-level function or class, no text-IO site without an encoding,
   and no kit version. Observed by AC6.
 - **S6** — Every reading below goes to this unit's acceptance ledger under
@@ -81,7 +86,7 @@ the `pins` union at `:7402-7407` already does for line-ending pins.
 
 - **consumes-from** `TOOL-dRedressedBar-11` — its `must_not_resolve` term, whose receipt reading the
   carried row keeps fed, and its `[dRB-11]` block's fixture A, which S3 runs a third time. Its spec's
-  §4 "Which receipt bytes" paragraph and first table row are what S4 corrects. Without that unit
+  §4 "Which receipt bytes" paragraph and first table row are what S4's pass `<w12>` corrects. Without that unit
   there is no receipt-reading term, and the third run has nothing to refuse. AC2's red half reads its
   pass commit `<p11>`.
 - **hands-off** `TOOL-dRedressedBar-13` — the tree this unit leaves. That tree holds spec 11 at this
@@ -168,12 +173,25 @@ appended at the write and enter no list that this run's later steps read. `run_f
 | unit 11's fixture A, a third identical apply | exit 0; `no-agent-cap-to-wire [accepted stop]` | exit 1; the problem line ends with `cannot read` |
 | an apply whose selection covers every claimed kit | as before | unchanged; no `KEEPS` line |
 
+### The spec-11 correction's pass
+
+No one role can write S4's correction and the product files in one commit. Under
+`.claude/roles.json`, only `gov-spec-writer` writes spec files and only `gov-builder` writes
+product files, and scratch-guard admits a builder's spec edit only where it moves the status and
+date cells of a spec its card routes (`tools/hooks/scratch-guard.js:91-99`). So S4 is this unit's
+spec-writer pass, `<w12>`, M6's "a review's fixes folded in". The main loop dispatches it at this
+unit's turn, once unit 11 is CLOSED, with S4 as its brief, and before the build pass. Spec 11 then
+takes its correction as a records fix with its status unchanged. It does not run earlier: spec 11
+is unbuilt until then, and unit 11 builds against its §4 as written. A build pass that finds no
+`<w12>` returns that to the main loop before any write.
+
 ### Files touched (estimate)
 
 - `tools/govkit/govkit.py`
 - `tools/govkit/selftest.py`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-11.md`
 - `memory/builds/dRedressedBar/build/`
+
+Spec 11 is `<w12>`'s write set, not the build pass's.
 
 ### Inventory
 
@@ -199,6 +217,7 @@ Each candidate was written down with the test that could make it lose, and the p
 | C3 — every apply keeps the claims and rows of claimed kits it did not select | Its losing test is step 3 and fixture A's third run: either still exiting as at `<p11>` would lose. Both are AC1 and AC2 | Chosen |
 | C4 — a hands-off edge naming the drop as an open false-accept route | It leaves a route the review graded HIGH, and the foreign-refusal wedge of step 3 | Rejected |
 | C5 — also pass `carry_out_of_scope` so `emitted` keeps a carried kit's legs | The same-argv rule already re-claims those legs on the kit's next run (`:4143-4152`). The switch would change `emitted` on a manifest target with no criterion that needs it | Rejected as YAGNI |
+| C6 — the spec-11 correction in the build pass's own commit, as rev-4 wrote it | scratch-guard refuses a builder's edit to another spec, and the spec writer writes no product file, so no role can make that commit (unit 10's divergence, `prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md`) | Refused by the hook |
 
 ## 5. Production-readiness checklist
 
@@ -226,7 +245,8 @@ Each candidate was written down with the test that could make it lose, and the p
 ## 6. Acceptance criteria
 
 `<p11>` and `<p12>` are the commits of units 11 and 12's build passes, as their acceptance ledgers
-name them. Every command runs from the worktree root. Fixtures live in fresh `git init` targets under
+name them. `<w12>` is the commit of this unit's spec-writer pass, which §4 "The spec-11 correction's
+pass" describes; its subject names `TOOL-dRedressedBar-12`, and this unit's ledger names it. Every command runs from the worktree root. Fixtures live in fresh `git init` targets under
 `%TEMP%/<short-name>`, never inside the worktree, with `.governance/deploy.toml` holding
 `DEPLOY_FULL`'s answers. Each target is committed after every apply, as `settle` does
 (`tools/govkit/selftest.py:583-597`).
@@ -263,11 +283,16 @@ name them. Every command runs from the worktree root. Fixtures live in fresh `gi
   runs at the tip, it prints 0. The docstring of `write_gate_legs`, read with `ast.get_docstring`,
   carries `TOOL-dRedressedBar-12`.
   Red when: the docstring still states the narrowing, as at `ebce889c`, where the count reads 1.
-- **AC5** — When spec 11's Design section is cut with `sed -n '/^## 4. Design/,/^## 5/p'` and joined
-  with `tr '\n' ' ' | tr -s ' '`, it carries `TOOL-dRedressedBar-12`. Its revision log holds one new
-  line naming report id 23 and this unit's AC2. The ledger S6 names exists and carries
+- **AC5** — When `git diff <w12>~1 <w12> -- memory/builds/dRedressedBar/spec/` runs, spec 11 shows
+  one header rev change and one new revision line, and that line names report id 23 and this unit's
+  AC2. Spec 11 carries a CLOSED header at `<w12>~1`. Spec 11's Design section at `<w12>`, cut with
+  `sed -n '/^## 4. Design/,/^## 5/p'` and joined with `tr '\n' ' ' | tr -s ' '`, carries
+  `TOOL-dRedressedBar-12`. `git diff --name-only <p12>~1 <p12> -- memory/builds/dRedressedBar/spec/`
+  names no file but this spec. The ledger S6 names exists and carries
   `**Serves:** journal TOOL-dRedressedBar-12`.
-  Red when: the §4 cut names no unit 12, as at the audited blob `1b4ea08c`.
+  Red when: spec 11 takes no bump or two, its revision line misses id 23 or AC2, it was folded before
+  it closed, its §4 cut names no unit 12 (as at the audited blob `1b4ea08c`), or the build pass
+  writes another spec.
 - **AC6** — When `git diff <p11> <p12> -- tools/govkit/ | grep -E '^[+-](def|class) '` runs, it prints
   nothing. A python program that imports `tools/gate-lint/encoding_posture.py` and runs `scan_text_io`
   over `tools/govkit/govkit.py` and `tools/govkit/selftest.py` at `<p12>` counts, per arm, exactly the
@@ -304,6 +329,16 @@ none
 - rev-4 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-19`, the batch the
   units-16-18 spec audit's minors were promoted into, for that report's ids 8 and 31. No scope,
   design or criterion moves.
+- rev-5 · 2026-10-14 · S4 · §3 · §4 · AC5 · unit 10's builder divergence, applied here
+  (`prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md`): no role can make a build-pass
+  commit that also edits another spec, because scratch-guard admits a builder's spec edit only to
+  its own status and date cells (`tools/hooks/scratch-guard.js:91-99`). The moved item: S4, spec
+  11's rev bump with its §4 "Which receipt bytes" and first-row corrections, is now this unit's
+  spec-writer pass `<w12>`, dispatched once unit 11 is CLOSED and before the build pass. It is not
+  folded now, because unit 11 is unbuilt. §4 gains "The spec-11 correction's pass", Files touched
+  lists product files and the ledger only, AC5 reads spec 11 at `<w12>` and observes that the build
+  pass writes no other spec, §3's consumes-from edge names `<w12>`, and Alternatives rejected gains
+  row C6. No product design or other criterion moves.
 
 ## 10. Reuse audit
 

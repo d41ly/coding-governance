@@ -1,11 +1,12 @@
 # TOOL-dRedressedBar-16 — an apply that keeps a carried kit's claim keeps that kit's gate-leg ownership too, so a later argv change does not wedge the kit
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
+**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md) | research | TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 |
 | [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 |
 
 <!-- /gen:spec-records -->
@@ -47,12 +48,14 @@ the narrower-apply-then-argv-change sequence that the report traced.
   `build_target13` from one gov built by `build_gov13`, and asserts AC1's and AC2's facts on the
   lines and rows they name. Every file write names `encoding="utf-8"`, and every process call goes
   through `run_gov13`, `git` or `settle`. Observed by AC1 and AC2, through the `New arm:` line in §7.
-- **S4** — Spec 12 is corrected in place, in one rev bump whose revision line names report id 7 and
-  this unit's AC1 and AC2. Its §3 second non-goal states that the `emitted` carry was taken by
-  `TOOL-dRedressedBar-16`, because the same-argv rule does not reach an argv gov has changed. Its §4
-  Alternatives row C5 states that its rejection rested on that false premise and that this unit
-  takes C5. Spec 12's S2 and criteria are not rewritten: unit 12 built against them as written, and
-  its revision line points here. Observed by AC4.
+- **S4** — Spec 12 is corrected in place by this unit's spec-writer pass, `<w16>`, which runs once
+  unit 12 is CLOSED and before the build pass (§4 "The spec-12 correction's pass"). It takes one rev
+  bump whose revision line names report id 7 and this unit's AC1 and AC2. Its §3 second non-goal
+  states that the `emitted` carry was taken by `TOOL-dRedressedBar-16`, because the same-argv rule
+  does not reach an argv gov has changed. Its §4 Alternatives row C5 states that its rejection
+  rested on that false premise and that this unit takes C5. Spec 12's S2 and criteria are not
+  rewritten: unit 12 built against them as written, and its revision line points here. The build
+  pass writes no spec file but this one's status and date cells. Observed by AC4.
 - **S5** — The unit adds no module-level function or class, no text-IO site without an encoding, and
   no kit version. Observed by AC5.
 - **S6** — Every reading below goes to this unit's acceptance ledger under
@@ -79,7 +82,7 @@ the narrower-apply-then-argv-change sequence that the report traced.
 - **consumes-from** `TOOL-dRedressedBar-12` — the receipt carry that keeps a kit apply did not select
   in `kits`, without which `apply --kits <carried kit>` is refused as foreign before it reaches LEGS
   and this unit's arm has no wedge to show. Also the `carry_out_of_scope` docstring paragraph its S2
-  writes, which S2 here rewrites, and its spec's §3 and §4 C5 row, which S4 corrects. AC1's and
+  writes, which S2 here rewrites, and its spec's §3 and §4 C5 row, which S4's pass `<w16>` corrects. AC1's and
   AC2's red halves read its pass commit `<p12>`.
 - **hands-off** `TOOL-dRedressedBar-19` — the docstring paragraph S2 rewrites, in which that unit
   keeps unit 12's id beside this unit's, and this spec's S2, S4, §3, §4 and AC3, which it corrects in
@@ -151,12 +154,25 @@ two carried lists and never the LEGS call, so it is a sequence after this unit a
 |---|---|---|
 | `[dRB-16]` | the check-label prefix of the new selftest block | none |
 
+### The spec-12 correction's pass
+
+No one role can write S4's correction and the product files in one commit. Under
+`.claude/roles.json`, only `gov-spec-writer` writes spec files and only `gov-builder` writes
+product files, and scratch-guard admits a builder's spec edit only where it moves the status and
+date cells of a spec its card routes (`tools/hooks/scratch-guard.js:91-99`). So S4 is this unit's
+spec-writer pass, `<w16>`, M6's "a review's fixes folded in". The main loop dispatches it at this
+unit's turn, once unit 12 is CLOSED, with S4 as its brief, and before the build pass. Spec 12 then
+takes its correction as a records fix with its status unchanged. It does not run earlier: spec 12
+is unbuilt until then, and unit 12 builds against its §3 and §4 as written. A build pass that finds
+no `<w16>` returns that to the main loop before any write.
+
 ### Files touched (estimate)
 
 - `tools/govkit/govkit.py`
 - `tools/govkit/selftest.py`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-12.md`
 - `memory/builds/dRedressedBar/build/`
+
+Spec 12 is `<w16>`'s write set, not the build pass's.
 
 ### Alternatives rejected
 
@@ -166,6 +182,7 @@ two carried lists and never the LEGS call, so it is a sequence after this unit a
 | C2 — loosen `check_leg_claimable` to accept an argv change for a leg gov emitted before | it cannot tell gov's earlier argv from a target's own command under gov's name, which is the laundering the Refusal exists to stop (`:4143-4148`) | Rejected on `[security]` |
 | C3 — let `update` and `apply` re-claim any leg whose kit the receipt claims | the same laundering, keyed on the kit instead of the argv | Rejected on `[security]` |
 | C4 — narrow unit 12's non-goal to "while the argv is unchanged" and leave the wedge | the report graded the wedge HIGH, and only hand-editing the target's runner clears it | Rejected |
+| C5 — the spec-12 correction in the build pass's own commit, as rev-2 wrote it | scratch-guard refuses a builder's edit to another spec, and the spec writer writes no product file, so no role can make that commit (unit 10's divergence, `prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md`) | Refused by the hook |
 
 ## 5. Production-readiness checklist
 
@@ -190,7 +207,8 @@ two carried lists and never the LEGS call, so it is a sequence after this unit a
 ## 6. Acceptance criteria
 
 `<p12>` and `<p16>` are the commits of units 12 and 16's build passes, as their acceptance ledgers
-name them. Every command runs from the worktree root. A target and a scratch gov live under
+name them. `<w16>` is the commit of this unit's spec-writer pass, which §4 "The spec-12 correction's
+pass" describes; its subject names `TOOL-dRedressedBar-16`, and this unit's ledger names it. Every command runs from the worktree root. A target and a scratch gov live under
 `%TEMP%/<short-name>`, never inside the worktree, built as `build_target13` and `build_gov13` build
 them (`tools/govkit/selftest.py:15428-15477`). A red half copies `tools/govkit/govkit.py` from a
 local `git clone` of gov under `%TEMP%`, checked out at `<p12>`, into the scratch gov.
@@ -217,13 +235,17 @@ local `git clone` of gov under `%TEMP%`, checked out at `<p12>`, into the scratc
   `tr '\n' ' ' | tr -s ' '`, carries no `passes no carry`.
   Red when: the call has no such keyword, as at `<p12>`, or the docstring still says `apply` passes
   no carry set, as unit 12's S2 writes it.
-- **AC4** — Spec 12's §3, cut with `sed -n '/^## 3. Non-goals/,/^### Edges/p'` and joined, carries
-  `TOOL-dRedressedBar-16` and no `so it wedges nothing`. Its Alternatives rejected sub-section, cut
-  with `sed -n '/^### Alternatives rejected/,/^## 5/p'`, carries `TOOL-dRedressedBar-16` on the C5
-  row. Its revision log holds one new line naming report id 7. The ledger S6 names exists and
-  carries `**Serves:** journal TOOL-dRedressedBar-16`.
-  Red when: spec 12's §3 still says the carried kit's legs wedge nothing, as at the audited blob
-  `62910df0`.
+- **AC4** — When `git diff <w16>~1 <w16> -- memory/builds/dRedressedBar/spec/` runs, spec 12 shows
+  one header rev change and one new revision line, and that line names report id 7 and this unit's
+  AC1 and AC2. Spec 12 carries a CLOSED header at `<w16>~1`. At `<w16>`, spec 12's §3, cut with
+  `sed -n '/^## 3. Non-goals/,/^### Edges/p'` and joined, carries `TOOL-dRedressedBar-16` and no
+  `so it wedges nothing`, and its Alternatives rejected sub-section, cut with
+  `sed -n '/^### Alternatives rejected/,/^## 5/p'`, carries `TOOL-dRedressedBar-16` on the C5 row.
+  `git diff --name-only <p16>~1 <p16> -- memory/builds/dRedressedBar/spec/` names no file but this
+  spec. The ledger S6 names exists and carries `**Serves:** journal TOOL-dRedressedBar-16`.
+  Red when: spec 12 takes no bump or two, its revision line misses id 7, AC1 or AC2, it was folded
+  before it closed, its §3 still says the carried kit's legs wedge nothing (as at the audited blob
+  `62910df0`), or the build pass writes another spec.
 - **AC5** — `git diff <p16>~1 <p16> -- tools/govkit/ | grep -E '^[+-](def|class) '` prints nothing. A
   python program imports `tools/gate-lint/encoding_posture.py` and runs `scan_text_io` over
   `tools/govkit/govkit.py` and `tools/govkit/selftest.py` at `<p16>`. Per arm, it counts exactly the
@@ -253,6 +275,16 @@ none
 - rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-19`, the batch the
   units-16-18 spec audit's minors were promoted into, for that report's ids 8, 9, 18, 30, 31 and 43.
   No scope, design or criterion moves.
+- rev-3 · 2026-10-14 · S4 · §3 · §4 · AC4 · unit 10's builder divergence, applied here
+  (`prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md`): no role can make a build-pass
+  commit that also edits another spec, because scratch-guard admits a builder's spec edit only to
+  its own status and date cells (`tools/hooks/scratch-guard.js:91-99`). The moved item: S4, spec
+  12's rev bump with its §3 second non-goal and §4 row C5 corrections, is now this unit's
+  spec-writer pass `<w16>`, dispatched once unit 12 is CLOSED and before the build pass. It is not
+  folded now, because unit 12 is unbuilt. §4 gains "The spec-12 correction's pass", Files touched
+  lists product files and the ledger only, AC4 reads spec 12 at `<w16>` and observes that the build
+  pass writes no other spec, §3's consumes-from edge names `<w16>`, and Alternatives rejected gains
+  row C5. No product design or other criterion moves.
 
 ## 10. Reuse audit
 
