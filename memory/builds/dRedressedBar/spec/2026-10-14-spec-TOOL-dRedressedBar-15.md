@@ -1,11 +1,12 @@
 # TOOL-dRedressedBar-15 — agent-cap's adopter runs settings-merge's own adopter at settings-merge's home, declared as `[adopt] via`, and selfcheck refuses any argv naming another entry's file
 
-**Status:** SPECCED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 11
+**Status:** CLOSED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-14-build-TOOL-dRedressedBar-15-1-acceptance-ledger.md](../build/2026-10-14-build-TOOL-dRedressedBar-15-1-acceptance-ledger.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-1-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-2-revision.md) | research | TOOL-dRedressedBar-14 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-3-spec-writer.md) | journal | — |
