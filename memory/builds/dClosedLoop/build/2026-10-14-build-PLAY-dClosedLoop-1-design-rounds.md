@@ -282,3 +282,22 @@ a planted orphan.
   `hooks.bypass` to `refused`.
 - The Test build ships the local hook and the peer-node verifier; remote CI is a designed slot.
 - The chain waits for a design-by-design walk-through.
+
+## Owner directives after the walk-through (2026-10-14, session 1799cb98)
+
+The walk-through and its chain-approval question are recorded in
+`build/2026-10-14-build-PLAY-dClosedLoop-1-walkthrough.md`. The owner held approval ("Not yet")
+and, offered four areas for another pass (risk posture, the size of the policy surface, the
+chain's size and order, the deploy engine's risk), answered:
+
+> Add named policy presets, then we'll revisit the high level architectural and flow decisions that
+> I'll explain to the best of my vision.
+
+- **Effect, presets:** architecture v2 gains a `[presets]` section: `preset` becomes a policy key
+  whose default is `standard`; four shipped presets (`velocity`, `standard`, `strict`,
+  `autonomous`) each assign all 43 presettable keys; a repository overrides keys on top of its
+  preset and may declare its own presets; presets never touch the floor, `policy.guard` or
+  `policy.proof`. `standard` is exactly the owner's recorded answers. The Spine's roster gains the
+  presets unit.
+- **Effect, the revisit:** the high-level architecture and flow decisions are reopened for the
+  owner's own account of them; no spec is written until that revisit settles.

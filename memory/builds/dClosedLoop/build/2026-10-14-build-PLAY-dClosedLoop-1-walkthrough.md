@@ -835,3 +835,12 @@ too: numbered method steps such as M5, numbered spec sections, numbered hygiene 
 Yes, all positional refs (Recommended); Only §. Answer: Yes, all positional refs (Recommended).
 Effect: v2's open interpretation is confirmed. Every positional section reference is migrated to a
 tag by Convergence, and new text from the Spine onward uses tags only.
+
+## Revised: 2026-10-14, the Spine gains named presets
+
+At the owner's direction ("Add named policy presets", recorded in the design rounds), the Spine's
+policy unit gains a sibling: **the named presets** `velocity`, `standard` (the default, equal to the
+owner's answers), `strict` and `autonomous`, each a complete assignment of the presettable keys,
+checked for completeness and allowed values; repository overrides on top; repository-declared
+presets allowed; the floor, `policy.guard` and `policy.proof` outside every preset. The table is
+architecture v2's `[presets]` section.

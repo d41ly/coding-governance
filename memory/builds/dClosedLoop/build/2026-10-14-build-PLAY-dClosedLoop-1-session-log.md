@@ -165,6 +165,81 @@ Runs, 2026-10-14:
 | the register and architecture v2 | exit 0: 57 keys, 10 builds, the same four clean lines |
 | the register with `gap-plan-07` renamed `gap-plan-99`, and v2 | exit 1 |
 
+### The preset check
+
+Checks architecture v2's `[presets]` table against its `[policies]` catalogue. It reads one file and
+writes nothing:
+
+```python
+"""Check architecture v2's preset table against its policy catalogue: every presettable key assigned
+in every preset, no excluded key present, every enumerated value allowed, and the `standard` column
+equal to the catalogue's defaults. Reads one file; writes nothing; exit 1 on any finding."""
+import re
+import sys
+
+text = open(sys.argv[1], encoding="utf-8").read()
+
+
+def section(tag):
+    m = re.search(r"^## \[" + re.escape(tag) + r"\].*?(?=^## \[|\Z)", text, flags=re.M | re.S)
+    return m.group(0) if m else ""
+
+
+def rows(block, ncols):
+    out = []
+    for line in block.splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) == ncols and cells[0].startswith("`"):
+            out.append([cells[0].strip("`")] + cells[1:])
+    return out
+
+
+STAGES = ["plan", "design", "build", "test", "deploy", "maintain"]
+EXCLUDED = {"floor", "policy.guard", "policy.proof", "preset"}
+catalogue = {}
+for key, allowed, default, _src in rows(section("policies"), 4):
+    keys = [key.replace("<stage>", s) for s in STAGES] if key == "review.<stage>" else [key]
+    for k in keys:
+        if key == "review.<stage>":
+            d = "owed" if k == "review.build" else "opt-in"
+        else:
+            d = default
+        catalogue[k] = (allowed, d)
+
+presets = {r[0]: r[1:] for r in rows(section("presets"), 5)}
+findings = []
+expected = {k for k in catalogue if k not in EXCLUDED}
+for k in sorted(expected - set(presets)):
+    findings.append(f"presettable key missing from the preset table: {k}")
+for k in sorted(set(presets) - expected):
+    findings.append(f"preset table names a key that is excluded or not in the catalogue: {k}")
+
+FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared")
+for k, vals in presets.items():
+    if k not in catalogue:
+        continue
+    allowed_text, default = catalogue[k]
+    if not FREE.search(allowed_text):
+        allowed = {a.strip() for a in re.split(r"[,;]", allowed_text) if a.strip()}
+        for name, v in zip(["velocity", "standard", "strict", "autonomous"], vals):
+            if v not in allowed:
+                findings.append(f"{k}: {name} = '{v}' is not an allowed value ({allowed_text})")
+        if vals[1] != default:
+            findings.append(f"{k}: standard = '{vals[1]}' but the catalogue default is '{default}'")
+
+print(f"catalogue keys {len(catalogue)} · presettable {len(expected)} · preset rows {len(presets)}")
+print("\n".join(findings) if findings else "no findings")
+sys.exit(1 if findings else 0)
+```
+
+Runs, 2026-10-14:
+
+| Against | Result |
+|---|---|
+| v2 as first written | exit 1: `hooks.bypass`'s catalogue default read "allowed, every use recorded", a note fused into the value |
+| a copy with strict `leases` set to `sometimes` and standard `build.scope` set to `refuse` | exit 1, naming both planted defects |
+| v2 with the catalogue cell corrected to `allowed`, the recording left to the floor | exit 0: 47 catalogue keys, 43 presettable, 43 preset rows, no findings |
+
 ## Records index
 
 | Record | What it holds |

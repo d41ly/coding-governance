@@ -7,6 +7,10 @@ and the build-by-build walk-through (`build/2026-10-14-build-PLAY-dClosedLoop-1-
 supersedes v1 as the spec writer's input; v0 and v1 stay unedited beside it. Fork ids cite their
 record: `R2.4` is round 2's fourth question, `walk T1` the walk-through's first Test fork.
 
+Revised: 2026-10-14, at the owner's direction ("Add named policy presets", recorded in the design
+rounds): the `[presets]` section is added and the Spine's roster gains the presets unit. The chain
+is still unapproved, pending the owner's revisit of the high-level architecture and flow.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -53,11 +57,12 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 
 | Key | Allowed values | Default | Source |
 |---|---|---|---|
+| `preset` | velocity, standard, strict, autonomous, or a repo-declared preset | standard | owner directive after the walk-through |
 | `autonomy` | plan-only, three-gates, every-stage | three-gates | R1.4 |
 | `policy.guard` | owner-only, agents-with-reason, agents-within-mandate | owner-only | R4.2 |
 | `policy.proof` | tty-cli, signed, both | tty-cli | walk S3 |
 | `floor` | each of the four invariants, on or off, under the guard | all on | R5.1 |
-| `hooks.bypass` | allowed, refused | allowed, every use recorded | R5.1 |
+| `hooks.bypass` | allowed, refused | allowed | R5.1 |
 | `transitions.record` | any subset of trailer, log, micro-format | all three | walk S4 |
 | `leases` | warn, refuse | warn | R2.2 |
 | `leases.granularity` | build-and-unit, build, unit | build-and-unit | walk C1 |
@@ -95,6 +100,92 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 | `review.loop.window-days` | days | 60 | walk R3 |
 | `budgets.*` | each cap's value and its mode, hard or soft | re-derived from evidence | walk R4 |
 
+## [presets] Named policy presets
+
+41 keys are too many to set one by one, and switching them one at a time is how a single policy file
+would rebuild the sprawl gap-spine-06 measured. A preset is a named, complete assignment of the
+policy keys; a repository names one preset and overrides individual keys on top of it.
+
+**Rules.**
+- `preset` is itself a policy key; its default is `standard`. Choosing or switching a preset is a
+  policy change: guarded and recorded like any other.
+- The effective policy is the preset's assignment with the repository's overrides applied. The
+  charter renders the preset's name and only the keys that differ from it, so a reader sees the
+  posture and its exceptions, not 41 lines.
+- Every shipped preset assigns every presettable key, and only values that key allows; a check
+  refuses a preset with a key missing or a value outside the schema, and a new key cannot land
+  without a value in every shipped preset.
+- Presets never touch the floor, `policy.guard` or `policy.proof`: loosening the guard or switching
+  an invariant off stays an explicit owner choice, never a side effect of picking a posture.
+- A repository may declare its own named presets in its policy file, each extending a shipped one,
+  under the same completeness check.
+
+**The four shipped presets.**
+- `velocity`: least friction, for a solo owner or an early repository. Everything warns or records,
+  nothing refuses but the floor, the closing review is opt-in too, and records are kept to the
+  commit trailer.
+- `standard`: the default. Exactly the owner's answers in rounds 1 to 5 and the walk-through:
+  guarded governance (owner-only guard, three gates, the closing review owed, flakes quarantined)
+  with speed-leaning delivery (bypass allowed, auto-promotion, roll-forward).
+- `strict`: maximum assurance. Overlaps and stray scope refuse, every red blocks, reviews are owed at
+  Design and Build and above-tier at Test and Deploy, recommendations bind, production waits for the
+  owner, failed verifies roll back.
+- `autonomous`: for unattended fleets under `plan-only` autonomy. The owner gates only the plan, so
+  the guardrails that stand in for the owner's eyes are on: leases refuse, kickoff opens only
+  planned work, recommendations bind above the tier, worktrees are per unit, production waits for
+  the owner, failed verifies roll back.
+
+`strict` and `autonomous` refuse hook bypass. Until dWitnessedBar's reliability bar is met, choosing
+either one will stall on the same gate problems that made the owner allow bypass (R5.1). `strict`
+and `autonomous` also declare the peer-node verifier, which needs a second fleet node; a solo
+repository on either overrides `verdict` to `local-hook`.
+
+| Key | velocity | standard (default) | strict | autonomous |
+|---|---|---|---|---|
+| `autonomy` | plan-only | three-gates | every-stage | plan-only |
+| `hooks.bypass` | allowed | allowed | refused | refused |
+| `transitions.record` | trailer | trailer, log, micro-format | trailer, log, micro-format | trailer, log, micro-format |
+| `leases` | warn | warn | refuse | refuse |
+| `leases.granularity` | build | build-and-unit | build-and-unit | build-and-unit |
+| `leases.renewal` | activity | activity | activity | activity |
+| `leases.expiry-hours` | 24 | 24 | 24 | 12 |
+| `leases.overlap` | kit-dirs | kit-dirs | files | kit-dirs |
+| `leases.offline` | warn | warn | refuse | follow-leases |
+| `verdict` | local-hook | local-hook | peer-node | peer-node |
+| `verdict.blocks` | own-only | own-only | every-red | own-mixed-contended |
+| `verdict.held` | on-demand | on-demand | peer-or-cadence | peer-or-cadence |
+| `verdict.flakes` | record | quarantine | record | quarantine |
+| `tests.product` | declared | declared-with-runners | declared-with-runners | declared-with-runners |
+| `plan.authority` | planner-within-themes | planner-drafts-owner-ratifies | owner-orders | planner-within-themes |
+| `plan.unplaced` | review-only | warn | refuse-new | warn |
+| `plan.triage` | rules | rules | owner-batches | rules |
+| `plan.kickoff` | advisory | offer-next | binding | binding |
+| `design.handoff` | derived-ready | derived-ready | ready-plus-audit | derived-ready |
+| `design.overlap` | index-only | warn | refuse | warn |
+| `build.scope` | report | warn-and-ask | refuse | warn-and-ask |
+| `build.worktree` | shared | shared | per-unit | per-unit |
+| `deploy.runs` | landing-node | landing-node | landing-node | landing-node |
+| `deploy.promotion` | auto-on-green | auto-on-green | owner-approves-each | owner-approves-prod |
+| `deploy.on-verify-fail` | roll-forward | roll-forward | rollback-and-ask | rollback-and-ask |
+| `deploy.currency` | pull-and-watch | pull-and-watch | push-branches | pull-and-watch |
+| `maintain.host` | session-start | session-start | os-scheduler | os-scheduler |
+| `maintain.cadence` | weekly | daily | daily | daily |
+| `maintain.fixes` | the full safe set | the full safe set | reap and regenerate only; the rest filed as asks | the full safe set |
+| `maintain.on-breach` | report | file-ask | red-leg | file-ask |
+| `review.plan` | opt-in | opt-in | opt-in | opt-in |
+| `review.design` | opt-in | opt-in | owed | owed-above-tier |
+| `review.build` | opt-in | owed | owed | owed |
+| `review.test` | opt-in | opt-in | owed-above-tier | opt-in |
+| `review.deploy` | opt-in | opt-in | owed-above-tier | opt-in |
+| `review.maintain` | opt-in | opt-in | opt-in | opt-in |
+| `review.<stage>.effort` | the role's effort | the role's effort | the role's effort | the role's effort |
+| `review.recommendation` | advice | advice | binding | binding-above-tier |
+| `review.build.when` | per-build | per-build | per-unit | per-build |
+| `review.loop.cadence` | monthly | weekly | weekly | weekly |
+| `review.loop.retire` | propose-ratify | propose-ratify | propose-ratify | propose-ratify |
+| `review.loop.window-days` | 60 | 60 | 90 | 60 |
+| `budgets.*` | every cap soft | each cap's evidence-derived mode | every cap hard | each cap's evidence-derived mode |
+
 ## [floor] The default floor
 
 On by default, each switchable only under the policy guard (R5.1): a binding verdict runs before
@@ -124,7 +215,7 @@ where `verdict = peer-node`.
 
 | Build | Stage | Parents | Planned units | Gaps owned |
 |---|---|---|---|---|
-| dDeclaredLoop | Spine | dClosedLoop | the loop kit and definition, roles re-pointed after aOrientedCast closes; `.governance/policy.toml`, schema, one reader, JSON mirror; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; the section-tag grammar and its resolver; the charter's front door; policy at govkit intake | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01 |
+| dDeclaredLoop | Spine | dClosedLoop | the loop kit and definition, roles re-pointed after aOrientedCast closes; `.governance/policy.toml`, schema, one reader, JSON mirror; the named presets and their completeness check; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; the section-tag grammar and its resolver; the charter's front door; policy at govkit intake | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01 |
 | dLeasedFleet | Concurrency | dDeclaredLoop | the lease grammar with run claims migrated; acquisition and release in both modes; overlap warn or refuse and takeover; fleet identity and remote uniqueness; offline behaviour | gap-conc-01, gap-conc-02 |
 | dWitnessedBar | Test | dDeclaredLoop | gate health measured and the reliability bar; bypasses recorded; attribution deciding what blocks; the hook-written verdict; held legs by policy; the peer-node verifier; seen-red records; flake quarantine; the product-test contract with runner adapters; derived pre-commit list and multi-node cost evidence | gap-test-01, gap-test-02, gap-test-03, gap-test-04, gap-test-05, gap-test-06, gap-test-07, gap-test-08, gap-test-09 |
 | dRankedPlan | Plan | dDeclaredLoop, dLeasedFleet | priority beside `parents:` and the generated plan view; the planner and triager role and Plan workflow; the placement predicate; rule-based triage; dormancy disposal; the live-build mapping carried out; Plan Review; kickoff offering the next item and attended briefs gated | gap-plan-01, gap-plan-02, gap-plan-03, gap-plan-04, gap-plan-05, gap-plan-06, gap-plan-07 |
