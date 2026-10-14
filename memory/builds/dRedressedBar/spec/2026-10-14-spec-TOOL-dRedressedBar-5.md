@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-5 — fork idioms past the spawn-idiom registry, converted to their no-fork forms
 
-**Status:** INPROGRESS · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 3
+**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

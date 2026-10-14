@@ -42,7 +42,7 @@ case "$MODE" in
   *) echo "usage: $0 --scaffold | --check"; exit 2 ;;
 esac
 
-KIT_DIR="$(cd "$(dirname "$0")" && pwd)"
+KIT_DIR=.; [[ $0 == */* ]] && KIT_DIR=${0%/*}; KIT_DIR="$(cd "$KIT_DIR" && pwd)"
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "roles: not a git repo"; exit 2; }
 
 # A LOGICAL upward walk from the kit dir to the first `.git` (a file in a linked worktree, hence -e),
@@ -50,9 +50,9 @@ ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "roles: not a git 
 # compared and why the walk is not physical.
 KIT_REL=""; _p="$KIT_DIR"
 while : ; do
-  _parent="$(dirname "$_p")"
+  _parent=${_p%/*}; _parent=${_parent:-/}
   [ "$_parent" = "$_p" ] && { KIT_REL=""; break; }
-  KIT_REL="$(basename "$_p")${KIT_REL:+/$KIT_REL}"
+  KIT_REL="${_p##*/}${KIT_REL:+/$KIT_REL}"
   [ -e "$_parent/.git" ] && break
   _p="$_parent"
 done
@@ -162,7 +162,7 @@ render_skill() { # -> the render on stdout; 1 a stage disagreement or a survivin
   out=${out//\{\{MEMORY_ROOT\}\}/"$MEMORY_ROOT"}
   if left=$(printf '%s' "$out" | grep -nF '{{'); then
     echo "roles: a token survived the render of $KIT_REL/SKILL.template.md:" >&2
-    printf '%s\n' "$left" | sed 's/^/    line /' >&2
+    printf '    line %s\n' "${left//$'\n'/$'\n'    line }" >&2
     return 1
   fi
   printf '%s' "$out"

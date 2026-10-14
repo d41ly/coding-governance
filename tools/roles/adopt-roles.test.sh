@@ -33,7 +33,7 @@
 # Withheld from the payload by the kit's descriptor (`project-owned`): its subject is the adopter in
 # this directory, so it has a job only where that source changes.
 set -u
-HERE="$(cd "$(dirname "$0")" && pwd)"
+HERE=.; [[ $0 == */* ]] && HERE=${0%/*}; HERE="$(cd "$HERE" && pwd)"
 ADOPTER="${ROLES_ADOPTER:-$HERE/adopt-roles.sh}"
 REPO=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "adopt-roles.test: not inside a git repository"; exit 2; }
 KREL=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-prefix 2>/dev/null) || exit 2
@@ -66,7 +66,7 @@ check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL 
 FX=""
 build_fixture() { # -> $FX: a repo holding this kit with $ADOPTER as its adopter, scaffolded; rc of the scaffold
   FX="$TMP_ROOT/fx$n"
-  mkdir -p "$FX/$KREL" "$FX/$(dirname "$CH")" || return 2
+  _chd=.; [[ $CH == */* ]] && _chd=${CH%/*}; mkdir -p "$FX/$KREL" "$FX/$_chd" || return 2
   git init -q "$FX" || return 2
   cp -R "$HERE"/. "$FX/$KREL"/ && cp "$ADOPTER" "$FX/$KREL/adopt-roles.sh" || return 2
   printf 'MEMORY_ROOT=%s\nCHARTER=%s\n' "$MR" "$CH" > "$FX/.memory-tree.conf"
@@ -80,7 +80,7 @@ build_fixture; check_arm "arm 1 the fixture scaffolds and checks clean" "$([ $? 
 sed -i 's/^## Stage 2 — reuse$/## Stage 3 — reuse/' "$FX/$KREL/SKILL.template.md"
 out=$(run_adopter --check); rc=$?
 check_arm "arm 1 a heading at the wrong stage refuses, naming the entry's own stage" \
-   "$([ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'says stage 3 but the entry reuse is stage 2' && echo 1 || echo 0)"
+   "$([ "$rc" = 1 ] && [[ $out == *'says stage 3 but the entry reuse is stage 2'* ]] && echo 1 || echo 0)"
 # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
@@ -89,15 +89,15 @@ build_fixture; check_arm "arm 2 the fixture scaffolds and checks clean" "$([ $? 
 sed -i '/^## Stage 2 — reuse$/d' "$FX/$KREL/SKILL.template.md"
 out=$(run_adopter --check); rc=$?
 check_arm "arm 2 a stage-2 workflow no heading names refuses, naming it" \
-   "$([ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'the entry reuse (stage 2) of .* is named by no ## Stage heading' && echo 1 || echo 0)"
+   "$([ "$rc" = 1 ] && _re2=$'the entry reuse \\(stage 2\\) of [^\n]* is named by no ## Stage heading' && [[ $out =~ $_re2 ]] && echo 1 || echo 0)"
 
 # ---- arm 3: a token surviving the substitution --------------------------------------------------
 build_fixture; check_arm "arm 3 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
 printf '{{UNKNOWN_TOKEN}}\n' >> "$FX/$KREL/SKILL.template.md"
 out=$(run_adopter --scaffold); rc=$?
 check_arm "arm 3 a surviving token refuses the scaffold, naming its line" \
-   "$([ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'a token survived the render' \
-      && printf '%s' "$out" | grep -q '{{UNKNOWN_TOKEN}}' && echo 1 || echo 0)"
+   "$([ "$rc" = 1 ] && [[ $out == *'a token survived the render'* ]] \
+      && [[ $out == *'{{UNKNOWN_TOKEN}}'* ]] && echo 1 || echo 0)"
 
 # ---- arm 4: a byte appended to a rendered agent type --------------------------------------------
 build_fixture; check_arm "arm 4 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
@@ -105,14 +105,14 @@ _a=""; for _a in "$FX"/.claude/agents/*.md; do break; done
 printf 'x' >> "$_a"
 out=$(run_adopter --check); rc=$?
 check_arm "arm 4 an agent type with one byte appended is stale, named with the scaffold remedy" \
-   "$([ "$rc" = 1 ] && printf '%s' "$out" | grep -qF "drift .claude/agents/${_a##*/}" \
-      && printf '%s' "$out" | grep -q 'adopt-roles.sh --scaffold$' && echo 1 || echo 0)"
+   "$([ "$rc" = 1 ] && [[ $out == *"drift .claude/agents/${_a##*/}"* ]] \
+      && [[ $out$'\n' == *'adopt-roles.sh --scaffold'$'\n'* ]] && echo 1 || echo 0)"
 
 # ---- arm 5: an unknown argument -----------------------------------------------------------------
 build_fixture; check_arm "arm 5 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
 out=$(run_adopter --render); rc=$?
 check_arm "arm 5 an unknown argument is the usage refusal, exit 2" \
-   "$([ "$rc" = 2 ] && printf '%s' "$out" | grep -q '^usage: ' && echo 1 || echo 0)"
+   "$([ "$rc" = 2 ] && [[ $'\n'$out == *$'\n''usage: '* ]] && echo 1 || echo 0)"
 
 # ---- arm 6: the renderer's task part, sent as an Agent prompt, is admitted by the spawn guard ----
 # TOOL-aOrientedCast-15 S4: the renderer and the hooks kit's rule 6 hash the same `## Task` bytes, and
@@ -131,7 +131,7 @@ elif ! command -v node >/dev/null 2>&1; then
   echo "SKIP arm 6 — no node on PATH to run $HK/agent-cap.js"; FLOOR_ASSERTIONS=$((FLOOR_ASSERTIONS-1))
 else
   build_fixture
-  A6P="$MR/builds/bx/prompts/$(date +%F)-prompt-TOOL-bx-1-1-researcher.md"
+  printf -v _a6day '%(%F)T' -1; A6P="$MR/builds/bx/prompts/$_a6day-prompt-TOOL-bx-1-1-researcher.md"
   mkdir -p "$FX/$MR/builds/bx/prompts"
   (cd "$FX" && "$PY" -B "$KREL/handoff.py" render --role gov-researcher --build bx --unit TOOL-bx-1 \
      --input "question=which mechanism fits" --out "$A6P" --part task) > "$TMP_ROOT/a6.task" 2>"$TMP_ROOT/a6.err"; rc=$?
@@ -157,9 +157,9 @@ sys.stdout.buffer.write(json.dumps(name, ensure_ascii=False).encode("utf-8"))' \
   check_arm "arm 6 ...and named by the role's slot it is refused, naming the rendered name" \
      "$([ "$hrc" = 2 ] && [ "$(<"$TMP_ROOT/a6.name")" != null ] && grep -qF -- "$(<"$TMP_ROOT/a6.name")" "$TMP_ROOT/a6s.hook" && echo 1 || echo 0)"
   msha=$(tr -d '\r' < "$TMP_ROOT/a6.task" | sed -n '1s/.* task-sha=\([0-9a-f]\{12\}\) -->$/\1/p')
-  out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" check "$A6P" 2>&1); rc=$?
+  out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" check "$A6P" 2>&1); rc=$?; out=${out//$'\r'/}
   check_arm "arm 6 check re-derives the marker's task-sha" \
-     "$([ "$rc" = 0 ] && [ -n "$msha" ] && printf '%s' "$out" | tr -d '\r' | grep -q " task-sha=$msha\$" && echo 1 || echo 0)"
+     "$([ "$rc" = 0 ] && [ -n "$msha" ] && [[ $out$'\n' == *" task-sha=$msha"$'\n'* ]] && echo 1 || echo 0)"
 fi
 
 # ---- arm 7: an `export` conf line with a trailing comment ---------------------------------------
@@ -181,10 +181,10 @@ check_arm "arm 7 ...and the Skill and every agent type name the root the plain c
 # a line past the one-line region's 200 characters must refuse with nothing on stdout.
 build_fixture; check_arm "arm 8 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
 _nr=$(ls "$FX/$KREL/agents/"*.agent.md | wc -l | tr -d ' ')
-out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" roster 2>/dev/null); rc=$?
-_nl=$(printf '%s\n' "$out" | tr -d '\r' | grep -c '^- `[a-z-]*`: ')
+out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" roster 2>/dev/null); rc=$?; mapfile -t _l8 <<< "$out"
+_re8='^- `[a-z-]*`: '; _nl=0; for _x8 in "${_l8[@]}"; do [[ $_x8 =~ $_re8 ]] && _nl=$((_nl+1)); done
 check_arm "arm 8 roster exits 0 with one backticked-slot line per role file" \
-   "$([ "$rc" = 0 ] && [ "$_nr" -gt 0 ] && [ "$_nl" = "$_nr" ] && [ "$(printf '%s\n' "$out" | wc -l | tr -d ' ')" = "$_nr" ] && echo 1 || echo 0)"
+   "$([ "$rc" = 0 ] && [ "$_nr" -gt 0 ] && [ "$_nl" = "$_nr" ] && _nb=${out//[!$'\n']/} && [ "$(( ${#_nb} + 1 ))" = "$_nr" ] && echo 1 || echo 0)"
 _pad=$(printf '%200s' '' | tr ' ' 'x')
 sed -i "s/^description: \(.*\)\.\(\r\{0,1\}\)\$/description: \1$_pad.\2/" "$FX/$KREL/agents/gov-builder.agent.md"
 (cd "$FX" && "$PY" -B "$KREL/handoff.py" roster) > "$TMP_ROOT/a8.out" 2>"$TMP_ROOT/a8.err"; rc=$?
@@ -244,15 +244,15 @@ A9S="$TMP_ROOT/s9/projects/p/11111111-1111-4111-8111-111111111111.jsonl"
 "$PY" -B -c "$A9_WRITE" "$FX" "$A9S" "$A9H" || echo "    arm 9: the fixture writer exited non-zero"
 A9L1="- agent — gov-builder · effort medium · model claude-test-1 · TOOL-tFix-1 · prompt [${A9H##*/}]($A9H) · writes product · gates lexicon naming predicates · run direct/a0000000000000001"
 A9L2="- returned — gov-builder · wrote 2 files · 7m47s · 1.6k out · run direct/a0000000000000001"
-out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A9S" --write 2>"$TMP_ROOT/a9.err"); rc=$?
+out=$(cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A9S" --write 2>"$TMP_ROOT/a9.err"); rc=$?; out=${out//$'\r'/}
 check_arm "arm 9 agents prints a direct spawn's agent and returned lines, its tokens the per-message-id maximum" \
-   "$([ "$rc" = 0 ] && [ "$(printf '%s' "$out" | tr -d '\r')" = "$A9L1"$'\n'"$A9L2" ] && echo 1 || echo 0)"
+   "$([ "$rc" = 0 ] && [ "$out" = "$A9L1"$'\n'"$A9L2" ] && echo 1 || echo 0)"
 [ "$rc" = 0 ] || sed 's/^/    /' "$TMP_ROOT/a9.err"
 (cd "$FX" && "$PY" -B "$KREL/handoff.py" agents --handoff "$A9H" --session "$A9S" --write >/dev/null 2>&1)
 _lg=$(ls "$FX/$MR/builds/tFix/build/"*-agent-ledger.md 2>/dev/null)
 _ll1=${A9L1/"($A9H)"/"(../prompts/${A9H##*/})"}
 check_arm "arm 9 ...and after a second run the build's one agent ledger holds each line, its link re-rooted, once" \
-   "$([ "$(printf '%s\n' "$_lg" | grep -c .)" = 1 ] && [ "$(tr -d '\r' < "$_lg" | grep -cxF -e "$_ll1")" = 1 ] \
+   "$([[ -n $_lg && $_lg != *$'\n'* ]] && [ "$(tr -d '\r' < "$_lg" | grep -cxF -e "$_ll1")" = 1 ] \
       && [ "$(tr -d '\r' < "$_lg" | grep -cxF -e "$A9L2")" = 1 ] && echo 1 || echo 0)"
 # TOOL-aOrientedCast-25 S13: a call without --write writes nothing, so one made mid-pass leaves the
 # tree as it found it. It runs BEFORE the run's lines are written, so a verb that wrote anyway would

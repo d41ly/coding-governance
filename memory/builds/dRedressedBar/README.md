@@ -117,7 +117,7 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 19 unit(s) · node d · opened 2026-10-13 · streams tooling
+**Build status:** SPECCED · 19 unit(s) · node d · opened 2026-10-13 · streams tooling
 ids TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13
 ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19
 
@@ -130,7 +130,7 @@ ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedr
 | [TOOL-dRedressedBar-9 — settings-merge's adopter exit with no agent-cap hook declared an accepted stop, so a gaining update completes](spec/2026-10-14-spec-TOOL-dRedressedBar-9.md) | 1 | 2 | CLOSED | rev-4 | 2026-10-14 |
 | [TOOL-dRedressedBar-3 — the govkit selftest's 56 reds, traced to four root causes and re-armed](spec/2026-10-14-spec-TOOL-dRedressedBar-3.md) | 2 | 1 | CLOSED | rev-3 | 2026-10-14 |
 | [TOOL-dRedressedBar-4 — the `workflows` homonyms the install-prefix ban reads as a kit path, held in a named constant](spec/2026-10-14-spec-TOOL-dRedressedBar-4.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-14 |
-| [TOOL-dRedressedBar-5 — fork idioms past the spawn-idiom registry, converted to their no-fork forms](spec/2026-10-14-spec-TOOL-dRedressedBar-5.md) | 3 | 2 | INPROGRESS | rev-5 | 2026-10-14 |
+| [TOOL-dRedressedBar-5 — fork idioms past the spawn-idiom registry, converted to their no-fork forms](spec/2026-10-14-spec-TOOL-dRedressedBar-5.md) | 3 | 2 | CLOSED | rev-5 | 2026-10-14 |
 | [TOOL-dRedressedBar-6 — the roles adopter's two exit-1 refusals, armed in its own suite](spec/2026-10-14-spec-TOOL-dRedressedBar-6.md) | 4 | 1 | SPECCED | rev-2 | 2026-10-14 |
 | [TOOL-dRedressedBar-7 — records, the regenerated index and the kit versions, measured over the fixed tree](spec/2026-10-14-spec-TOOL-dRedressedBar-7.md) | 5 | 2 | SPECCED | rev-2 | 2026-10-14 |
 | [TOOL-dRedressedBar-10 — the round-1 spec audit's 12 mediums and 11 lows, batched: each criterion observed in a form that can pass and fail, each false sentence corrected, and settings-merge's accepted stop narrowed](spec/2026-10-14-spec-TOOL-dRedressedBar-10.md) | 6 | 2 | SPECCED | rev-4 | 2026-10-14 |
