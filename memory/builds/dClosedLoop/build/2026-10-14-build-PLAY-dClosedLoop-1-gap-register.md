@@ -71,6 +71,7 @@ extends.
 | gap-spine-03 | Spine | HIGH | Attended and unattended builds run different exit contracts. | build §3, §4 (DoD needs RUN.md) | — |
 | gap-spine-04 | Spine | MED | gov's own governance and the shipped product are one body; adopters receive partial stage contracts. (main loop) | test §4, deploy §4; `.claude/rules/product.md` | — |
 | gap-spine-05 | Spine | MED | Protocol volume: guides 301 KB, runbook 163 KB, unattended guides about 216 KB. (main loop) | maintain instrument 2; `wc -c` of `memory/guides/` | — |
+| gap-spine-06 | Spine | HIGH | No single answer to "what is this repo's policy": per-repo configuration spans at least eight surfaces holding about 160 keys, owner choices mixed with kit mechanics. Added after round 4. (main loop) | design-rounds R4; five dotfile confs hold 138 keys | — |
 | gap-conc-01 | Spine | HIGH | Cross-build and cross-node overlap is advisory: the probe always returns 0 and sees only pushed refs; no unit or path claim exists. | build §4, design §4.2 (41 pairs across 22 build pairs) | — |
 | gap-conc-02 | Spine | MED | Claims never age, name a user rather than a fleet tag, and cover unattended runs only; slug uniqueness is checked against local history only. | plan §4 (8 of 17 held, 17 of 17 user names) | — |
 | gap-conc-03 | Spine | MED | `[isolate]` has no mechanism: harness passes share one worktree and meet git's index lock. | build §4 | — |
