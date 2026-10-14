@@ -155,7 +155,7 @@ ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedr
 | [TOOL-dRedressedBar-19 — the units-16-18 spec audit's 19 mediums and 22 lows, batched: the profiler's census, path, launch, turnstile, redaction and leg-declaration gaps closed, the receipt sidecar made atomic, and specs 12 and 14 to 18 corrected](spec/2026-10-14-spec-TOOL-dRedressedBar-19.md) | 14 | 2 | SPECCED | rev-3 | 2026-10-14 |
 <!-- /gen:build-units -->
 
-Records: 70 bound to this build, across 4 record folder(s).
+Records: 71 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
