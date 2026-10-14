@@ -28,6 +28,11 @@ kind's factory and gate lands with its owning build; dScopedBuild's exit refuses
 build's own commits introduced stands. `core.bypass`'s default rests on an interpretation of the
 owner's K1 answer that awaits confirmation.
 
+Revised: 2026-10-14, after the flow walk's Plan stage (`build/2026-10-14-build-PLAY-dClosedLoop-1-flow.md`):
+builds run unattended by default past Plan, so `autonomy`'s default and the `standard` preset's
+value move to `plan-only`; the owner's plan ratification is the mandate. A critical planning issue is a
+recorded plan revision followed by a re-design that preserves completed work.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -109,7 +114,7 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 | `charter.practices` | a set of catalogue or repo-declared practices | the governance foundation set | foundations F1-3 |
 | `core.bypass` | with-hooks-report, with-hooks-block, never | with-hooks-report | foundations K1 |
 | `core.exceptions` | any-session-recorded, owner-only-expiring, none | any-session-recorded | foundations K4 |
-| `autonomy` | plan-only, three-gates, every-stage | three-gates | R1.4 |
+| `autonomy` | plan-only, three-gates, every-stage | plan-only | R1.4, superseded by flow FL-P6 |
 | `policy.guard` | owner-only, agents-with-reason, agents-within-mandate | owner-only | R4.2 |
 | `policy.proof` | tty-cli, signed, both | tty-cli | walk S3 |
 | `floor` | each of the four invariants, on or off, under the guard | all on | R5.1 |
@@ -177,7 +182,8 @@ policy keys; a repository names one preset and overrides individual keys on top 
   nothing refuses but the floor, the closing review is opt-in too, and records are kept to the
   commit trailer.
 - `standard`: the default. Exactly the owner's answers in rounds 1 to 5 and the walk-through:
-  guarded governance (owner-only guard, three gates, the closing review owed, flakes quarantined)
+  guarded governance (owner-only guard, the closing review owed, flakes quarantined), the owner gating
+  only the plan with builds unattended past it (flow FL-P6),
   with speed-leaning delivery (bypass allowed, auto-promotion, roll-forward).
 - `strict`: maximum assurance. Overlaps and stray scope refuse, every red blocks, reviews are owed at
   Design and Build and above-tier at Test and Deploy, recommendations bind, production waits for the
@@ -194,7 +200,7 @@ repository on either overrides `verdict` to `local-hook`.
 
 | Key | velocity | standard (default) | strict | autonomous |
 |---|---|---|---|---|
-| `autonomy` | plan-only | three-gates | every-stage | plan-only |
+| `autonomy` | plan-only | plan-only | every-stage | plan-only |
 | `charter.override` | live-owner-wins | explicit-override | absolute | explicit-override |
 | `core.bypass` | with-hooks-report | with-hooks-report | never | never |
 | `core.exceptions` | any-session-recorded | any-session-recorded | owner-only-expiring | owner-only-expiring |
@@ -257,7 +263,7 @@ where `verdict = peer-node`.
 
 ## [contracts] Stage contracts
 
-| Stage | Takes in | Hands out | Witness | Owner gate under three-gates | Review default |
+| Stage | Takes in | Hands out | Witness | Owner gate under `three-gates` (the default `plan-only` keeps only Plan's) | Review default |
 |---|---|---|---|---|---|
 | Plan | a prompt, an ask, a Maintain finding, a Loop Review proposal | a build placed in the plan by priority and `parents:`, leased | the placement predicate (warn); the ratification change | plan ratification | opt-in |
 | Design | a planned, leased build and its brief | a structured spec set at a revision, forks resolved, overlaps acknowledged | derived READY; the design index (warn) | the design go | opt-in |
