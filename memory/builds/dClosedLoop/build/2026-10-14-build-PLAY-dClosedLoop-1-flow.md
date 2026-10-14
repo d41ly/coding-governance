@@ -681,6 +681,47 @@ The Loop Review:
 4. The proposals are filed into Plan, ratified as `review.loop.retire` says.
 5. The Loop Review's record is written.
 
+### Forks asked, 2026-10-14
+
+**FL-R1. "Does a review block its stage's transition?"** Offered: Owed blocks; recommended runs
+alongside (Recommended); Every review blocks; Every review runs alongside. Answer: Every review
+blocks.
+
+**FL-R2. "Left-shift turns every confirmed finding's class into a gate or a bug class, and that's
+how legs grew from 17 to 140 in ten weeks. When should a class become a gate?"** Offered: On its
+second occurrence (Recommended); Every confirmed class; Owner selects. Answer: On its second
+occurrence (Recommended).
+
+**FL-R3. "Where should the stage-exit review recommendation come from?"** Offered: Scored signals +
+reasoning (Recommended); Agent judgment only; Signals only. Answer: Scored signals + reasoning
+(Recommended).
+
+### Settled for Review, 2026-10-14
+
+- **Every review that runs blocks its stage's transition** (`review.blocks`: `every-review`, with
+  `owed-only` and `none` allowed). A review that is recommended but not run blocks nothing, so the
+  recommendation's default of advice (R4.3) stays the brake on how often reviews run.
+- **A class becomes a gate on its second occurrence** (`review.left-shift`: `second-occurrence`, with
+  `every-class` and `owner-selects` allowed). Its first confirmed occurrence becomes a bug class, a
+  checklist line; a recurrence earns a gate, which the value ledger then prices. The charter's
+  `[left-shift]` practice is reworded to match by the foundation build, since practices are the
+  repository's to adjust.
+- **The recommendation is scored, then reasoned** (`review.recommendation.source`:
+  `scored-signals-and-reasoning`, with `agent-judgment` and `signals-only` allowed): deterministic
+  signals (the change's size, the kits it touches, a new write path, an interface change, its tier,
+  the build's past findings) produce a score, and the agent records the score with its reasoning.
+
+## [walked] The flow walk, complete
+
+All seven stages have a settled scope, boundaries and checklist, and the entry points are settled
+(the table under Maintain). Agent roles remain deferred at the owner's direction. What the walk
+changed, in brief: the flow is a layer above the build; Plan is for complex features and hands
+Design a single plan record; builds run unattended past Plan, with the unattended kit as the
+executor; a build is designed whole, with features between it and its units; built specs are frozen;
+Test verifies the prepared merge once; a build closes at landing; nothing changes tracked content
+outside the flow; every review that runs blocks, and left-shift gates a class on its second
+occurrence.
+
 ### Entry points, partly settled (superseded by the settled table under Maintain)
 
 - **Settled:** a new, complex feature enters at Plan; an amendment that fits an open build's plan

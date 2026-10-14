@@ -54,6 +54,10 @@ Revised: 2026-10-14, after the flow walk's Maintain stage: `maintain.events` and
 join the catalogue and the presets; nothing changes tracked content outside the flow, so Maintain's
 safe fixes and small product changes enter at Design as patch builds; the entry points are settled.
 
+Revised: 2026-10-14, after the flow walk's Review stage: P20 is added; `review.blocks`,
+`review.left-shift` and `review.recommendation.source` join the catalogue and the presets; the flow
+walk is complete, and the chain is re-cut around it after the owner's next steps.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -95,6 +99,11 @@ safe fixes and small product changes enter at Design as patch builds; the entry 
 - **P19 Built work is never rewritten in place.** A built unit's spec is frozen; every later change,
   a review finding's fix included, arrives as a new unit with its own spec, so the trail is complete
   (flow FL-B3).
+- **P20 The flow is the layer above the build.** Every stage is a deterministic process with a
+  mechanically enforced checklist; a build travels the flow, carrying each stage's records, and the
+  entry points are fixed: complex features at Plan, in-goal amendments and patch builds at Design;
+  nothing changes tracked content outside the flow. Builds run unattended past Plan by default, the
+  unattended kit executing the stages (flow record, walked 2026-10-14).
 - **P13 Ranked instructions.** Every load-bearing document is registered with a rank and wrapped in
   a generated envelope naming its identity, rank, scope, trigger and what it yields to, so an agent
   rebuilds one instruction hierarchy whenever it loads a document; conflicts resolve by rank, never
@@ -195,6 +204,9 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 | `review.recommendation` | advice, binding, binding-above-tier | advice | R4.3 |
 | `review.build.when` | per-build, per-unit, per-landing | per-build | walk B3 |
 | `review.findings` | blocker-high-own, all-own, blocker-own | blocker-high-own | flow FL-B3 |
+| `review.blocks` | every-review, owed-only, none | every-review | flow FL-R1 |
+| `review.left-shift` | second-occurrence, every-class, owner-selects | second-occurrence | flow FL-R2 |
+| `review.recommendation.source` | scored-signals-and-reasoning, agent-judgment, signals-only | scored-signals-and-reasoning | flow FL-R3 |
 | `review.loop.cadence` | weekly, monthly, every-n-landings | weekly | walk R1 |
 | `review.loop.retire` | propose-ratify, demote-then-propose, report | propose-ratify | walk R2 |
 | `review.loop.window-days` | days | 60 | walk R3 |
@@ -297,6 +309,9 @@ repository on either overrides `verdict` to `local-hook`.
 | `review.recommendation` | advice | advice | binding | binding-above-tier |
 | `review.build.when` | per-build | per-build | per-unit | per-build |
 | `review.findings` | blocker-own | blocker-high-own | all-own | blocker-high-own |
+| `review.blocks` | owed-only | every-review | every-review | every-review |
+| `review.left-shift` | second-occurrence | second-occurrence | every-class | second-occurrence |
+| `review.recommendation.source` | scored-signals-and-reasoning | scored-signals-and-reasoning | scored-signals-and-reasoning | scored-signals-and-reasoning |
 | `review.loop.cadence` | monthly | weekly | weekly | weekly |
 | `review.loop.retire` | propose-ratify | propose-ratify | propose-ratify | propose-ratify |
 | `review.loop.window-days` | 60 | 60 | 90 | 60 |
