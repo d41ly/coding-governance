@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-6 — the roles adopter's two exit-1 refusals, armed in its own suite
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 4
+**Status:** CLOSED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 4
 
 <!-- gen:spec-records -->
 

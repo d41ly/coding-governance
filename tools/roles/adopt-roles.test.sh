@@ -19,8 +19,9 @@
 # ledger exactly once across two runs, a run without `--write` writing nothing, a harness run's two
 # agent lines and one returned line, and a prompt opening with a blank line still matching (arm 9);
 # the stand-in render's refusal, R15 both ways and over eight bad rows, R13, R14 and R0 (arm 10);
-# and the roles kit's reading of a prompt's marker line and of the charter's micro-format fence
-# against the hooks kit's own (arm 11, which SKIPs out loud as arm 6 does). Every arm is a
+# the roles kit's reading of a prompt's marker line and of the charter's micro-format fence
+# against the hooks kit's own (arm 11, which SKIPs out loud as arm 6 does); and a `--scaffold` whose
+# agent render refuses, which exits 1 naming the refusal and writes no Skill (arm 13). Every arm is a
 # self-contained block below the prologue, so a slice of the prologue and one
 # block runs that arm alone.
 #
@@ -28,7 +29,9 @@
 # and the renderer's own self-test grade; the `--scaffold` restart notice's wording; or an adopter run
 # at another install prefix, since the fixture mirrors this repository's own. Arm 11 does not
 # compare a refusal's wording, any marker field beyond the whole line, or any micro-format head but
-# `agent` and `returned`.
+# `agent` and `returned`. Arm 13 does not check which rule refused: any non-zero exit of the agent
+# render takes the same branch, so it grades the adopter's handling of a refusal, and R10 only as
+# the trigger.
 #
 # Withheld from the payload by the kit's descriptor (`project-owned`): its subject is the adopter in
 # this directory, so it has a job only where that source changes.
@@ -60,7 +63,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # for arm 10 (TOOL-aOrientedCast-25); arm 11 is out of the floor, as arm 6 is. +1 for arm 6's named
 # spawn and +4 for arm 12 (TOOL-aOrientedCast-27): arm 6's one floored assertion is taken back off the
 # floor by the SKIP that announces the arm unrun, so a skip still cannot red it.
-FLOOR_ASSERTIONS=38
+# +2 for arm 13 (TOOL-dRedressedBar-6).
+FLOOR_ASSERTIONS=40
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""
@@ -106,7 +110,7 @@ printf 'x' >> "$_a"
 out=$(run_adopter --check); rc=$?
 check_arm "arm 4 an agent type with one byte appended is stale, named with the scaffold remedy" \
    "$([ "$rc" = 1 ] && [[ $out == *"drift .claude/agents/${_a##*/}"* ]] \
-      && [[ $out$'\n' == *'adopt-roles.sh --scaffold'$'\n'* ]] && echo 1 || echo 0)"
+      && [[ $'\n'$out$'\n' == *$'\n'"roles: remedy — bash $KREL/adopt-roles.sh --scaffold"$'\n'* ]] && echo 1 || echo 0)"
 
 # ---- arm 5: an unknown argument -----------------------------------------------------------------
 build_fixture; check_arm "arm 5 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
@@ -479,6 +483,20 @@ for _w in "TOOL-aOrientedCast-27|a builder's label names its one unit" "None|a s
   _i=$((_i+1))
   check_arm "arm 12 ${_w#*|}" "$([ "$(printf '%s\n' "$_a12" | sed -n "${_i}p")" = "${_w%%|*}" ] && echo 1 || echo 0)"
 done
+
+# ---- arm 13: a --scaffold whose agent render refuses stops before the Skill ----------------------
+# TOOL-dRedressedBar-6 S2: the adopter runs the agent render before it writes the Skill, so a refused
+# render exits 1, names the refusal, and leaves the Skill unwritten. The break is arm 3's token idiom
+# appended to a house overlay, which roles_lib.render_role refuses as R10 whatever the overlay held;
+# the Skill is unlinked first, so a scaffold that went on to write it is seen.
+build_fixture; check_arm "arm 13 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
+rm -f "$FX/.claude/skills/build/SKILL.md"
+printf '{{UNKNOWN_TOKEN}}\n' >> "$FX/$KREL/house/gov-builder.md"
+out=$(run_adopter --scaffold); rc=$?
+check_arm "arm 13 a refused agent render stops the scaffold, naming the refusal, and writes no Skill" \
+   "$([ "$rc" = 1 ] \
+      && [[ $out == *'roles: the agent render refused, so nothing more was written — fix what it named and re-run'* ]] \
+      && [[ $out == *'{{UNKNOWN_TOKEN}}'* ]] && [ ! -e "$FX/.claude/skills/build/SKILL.md" ] && echo 1 || echo 0)"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
