@@ -322,6 +322,133 @@ comes to unattended builds, which outranks charter."
   fork they yield to the decision principles. An option that breaks a core principle is not an
   option, so the decision principles only ever choose among options the core admits.
 
+## [build] Build
+
+### Current state, measured 2026-10-14
+
+The Build research record holds the measurements: the attended `/build` router and the unattended
+harnesses (`tools/workflows/unattended-build.js`, `unattended-unit.js`); a write gate that admits any
+product write once any routed unit is buildable, shell writes passing it; `routed_commits.py`
+accepting any named unit; 120 of 584 unit-attributed commits writing outside their unit's files (42
+of 582 at kit level); the closing review recorded by 29 of 59 attended builds and 86 of 89 unattended
+ones; one shared worktree per build, which meets git's index lock; the unattended definition of done
+(13 items) bound to `RUN.md`. Builds now run unattended by default past Plan (FL-P6), so the
+unattended kit carries this stage.
+
+### Draft scope
+
+- **Execution under the mandate**: each unit built by its builder in passes, one commit per pass
+  carrying the unit id and its trailers, in the declared order, units with disjoint write sets in
+  parallel; the worktree as `build.worktree` says.
+- **Unit-level verification**: each unit's own acceptance observations, the commands its spec names,
+  run and recorded by the pass that builds it. System-level verification is Test's.
+- **Divergence**: a spec found wrong is never edited here; the unit returns to Design, at the unit or
+  the feature level as `design.reentry` decides, and comes back READY.
+- **Scope**: each commit's paths checked against its unit's write set (`build.scope`).
+- **The closing review**: owed by default, once per build over the build's range; its findings
+  disposed (below).
+
+### Draft boundaries
+
+- **Starts** when every unit in scope is READY (FL-D1) and the build's mandate is active.
+- **Ends** when every unit is built with its acceptance recorded and the closing review is folded.
+- **Hands Test** the built range from the build's history-derived base, with each unit's acceptance
+  record.
+- **Does not** change a spec, run the merge bar, land or push, or re-plan.
+
+### Draft checklist (each item witnessed by a check)
+
+1. The build's base is pinned from history and its mandate recorded.
+2. Each starting unit holds its lease and declares its write set.
+3. Each unit's passes are committed with the unit id and its trailers.
+4. Each unit's acceptance observations are run and recorded.
+5. The bug-class checklist after each pass leaves its trailer.
+6. Every divergence went back to Design and returned READY.
+7. Each commit's scope is checked against its unit's write set.
+8. The closing review is run where owed, its blockers folded and its other findings disposed.
+9. No core red the build's own commits introduced stands.
+10. The Build-to-Test transition is recorded, its witness the items above.
+
+### Forks asked, 2026-10-14
+
+**FL-B1. "Where does Build's verification end and Test's begin?"** Offered: Unit in Build, system in
+Test (Recommended); Everything in Test; Build runs affected legs too. Answer: Unit in Build, system
+in Test (Recommended).
+
+**FL-B2. "How should units of one build be scheduled by default?"** Offered: Order, disjoint in
+parallel (Recommended); Strictly sequential; Maximum parallel. Answer: Order, disjoint in parallel
+(Recommended).
+
+**FL-B3. "What happens to closing-review findings by default?"** Offered: Fix blockers, promote the
+rest (Recommended); Fix blockers, file the rest; Fix everything here. Answer, in the owner's words:
+"As it is today, by default - BLOCKER and HIGH findings become their own units, MEDIUM and LOW are
+batched. The idea here is that retroactively adjusting a spec after it's already been built should
+be forbidden - any future changes should leave a full trail. How it works should be owner-adjustable
+(eg., mediums or lows can become individual units, too)."
+
+**FL-B4. "Proposal from Design: should an additive interface change stay unit-level?"** Offered:
+Additive stays unit-level (Recommended); Any interface change is feature-level; Evaluate later.
+Answer: Additive stays unit-level (Recommended).
+
+### Settled for Build, 2026-10-14
+
+- **Unit-level verification in Build, system-level in Test**; units in their declared order, those
+  with disjoint write sets in parallel up to the fan-out bound.
+- **A built unit's spec is frozen.** No spec is adjusted retroactively once its unit is built; every
+  later change, a review finding's fix included, is a NEW unit with its own spec, so the trail is
+  complete. This tightens today's practice, where a blocker could be folded into a built unit as a
+  spec revision (dSweptBranches, "the blockers folded into unit 3 rev-3").
+- **`review.findings`**, a policy: by default each BLOCKER and each HIGH finding becomes its own unit
+  and the MEDIUM and LOW findings are batched into one unit; `all-own` (every finding its own unit)
+  and `blocker-own` (only blockers their own units) are allowed values.
+- **Additive interface changes stay unit-level** (FL-B4 confirms the Design proposal); a breaking
+  change triggers the feature re-design.
+- **Revised wording, earlier in this record**: where Plan's revision path and Design's re-entry say a
+  completed unit is "amended", the freeze reads it as amended by a new unit that names the built one,
+  never by a revision of the built unit's spec.
+
+## [test] Test
+
+### Current state, measured 2026-10-14
+
+The Test research record holds the measurements: 140 legs, 70 of them held and carrying 23,494 s of
+28,066 s summed maxima; the binding verdict a local pre-push hook that `--no-verify` skips; remote CI
+unavailable to gov; attribution report-only; flakes handled by one timeout retry; no seen-red record;
+no product-test contract for an adopter. Rounds and walks since settled: the local hook binds by
+default with a peer node as the switchable backend, OWN reds block and MIXED or CONTENDED are
+reported, held legs run on demand, flakes are recorded then quarantined, and adopters get declared
+product tests with runner adapters.
+
+### Draft scope
+
+- **Input**: the built range and each unit's acceptance record.
+- **The verdict**: the bar over the tree to be landed: gov's legs claimed by the build's paths, the
+  adopter's product tests by their declared levels and selection, the held legs as `verdict.held`
+  says; attribution deciding what blocks; flakes recorded and quarantined; the verdict written by the
+  hook for that tree.
+- **Gate review**: every gate the build adds or changes is seen red, with its record (a core witness,
+  not an optional review); the agent gate-review lens is opt-in.
+- **A red**: sends the build back: a fix pass of the owning unit when the code misses its spec, or a
+  new unit through Design when the spec is what is wrong.
+
+### Draft boundaries
+
+- **Starts** at the Build-to-Test transition.
+- **Ends** when the verdict for the tree to be landed is recorded with no blocking red.
+- **Hands Deploy** that tree and its verdict.
+- **Does not** change code itself, land, push, or re-design.
+
+### Draft checklist (each item witnessed by a check)
+
+1. The tree under test is fixed and recorded.
+2. The legs the build's paths claim, and the declared product-test levels, are selected and recorded.
+3. The bar runs on the declared backend, and its verdict is written by the hook for that tree.
+4. Every red is attributed; OWN reds are sent back to Build or Design; reported reds are filed.
+5. Flakes are recorded, and quarantined past the threshold.
+6. Every gate the build added or changed has its seen-red record.
+7. The review recommendation is emitted, and the gate review run where policy owes it.
+8. The Test-to-Deploy transition is recorded, its witness the items above.
+
 ### Entry points, partly settled
 
 - **Settled:** a new, complex feature enters at Plan; an amendment that fits an open build's plan

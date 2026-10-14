@@ -255,6 +255,12 @@ keys and 11 builds; the preset check exits 0 on 51 catalogue keys, 46 presettabl
 The four chain-row amendments were applied by a script that refused unless each old row matched
 exactly once.
 
+After the flow walk's Plan and Design stages (four `gap-flow-*` rows; `design.forks` and
+`design.reentry` added; the preset `autonomous` renamed `guarded`, and the preset check's column
+names updated to match): the join exits 0 on 69 keys and 11 builds; the preset check exits 0 on 53
+catalogue keys, 48 presettable, 48 preset rows. The v2 amendments ran through a script that refused
+unless each old text matched exactly once.
+
 ## Records index
 
 | Record | What it holds |
@@ -271,9 +277,4 @@ exactly once.
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-walkthrough.md` | The ten chain builds' designs as presented, each fork and answer, and each revision. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` | The converged design, amended in place under dated `Revised:` lines: principles, the policy catalogue and presets, the chain's rosters. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-foundations.md` | The owner's foundations revisit, step by step: their words, the measured current state, the response, the forks and answers. |
-
-After the flow walk's Plan and Design stages (four `gap-flow-*` rows; `design.forks` and
-`design.reentry` added; the preset `autonomous` renamed `guarded`, and the preset check's column
-names updated to match): the join exits 0 on 69 keys and 11 builds; the preset check exits 0 on 53
-catalogue keys, 48 presettable, 48 preset rows. The v2 amendments ran through a script that refused
-unless each old text matched exactly once.
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-flow.md` | The flow walk, stage by stage: the layers, each stage's scope, boundaries and checklist, the forks and answers. |

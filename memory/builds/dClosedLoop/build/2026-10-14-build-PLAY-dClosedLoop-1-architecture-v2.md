@@ -38,6 +38,10 @@ is renamed `guarded`; `design.forks` and `design.reentry` join the catalogue and
 order ranks the core, then the decision principles, then the practices; four owner-raised `gap-flow-*`
 gaps are owned by dOrderedCharter, dRankedPlan and dIndexedDesign.
 
+Revised: 2026-10-14, after the flow walk's Build stage: P19 is added; `review.findings` joins the catalogue
+and the presets; dScopedBuild freezes built specs and disposes every closing-review finding as new
+units, owning `gap-flow-05`.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -76,6 +80,9 @@ gaps are owned by dOrderedCharter, dRankedPlan and dIndexedDesign.
   feature-rich option, then the most expandable, with a full record; the charter's practices govern
   and are adjustable, and yield to these in a fork; only options the core admits are options (flow
   FL-D3, FL-D6).
+- **P19 Built work is never rewritten in place.** A built unit's spec is frozen; every later change,
+  a review finding's fix included, arrives as a new unit with its own spec, so the trail is complete
+  (flow FL-B3).
 - **P13 Ranked instructions.** Every load-bearing document is registered with a rank and wrapped in
   a generated envelope naming its identity, rank, scope, trigger and what it yields to, so an agent
   rebuilds one instruction hierarchy whenever it loads a document; conflicts resolve by rank, never
@@ -168,6 +175,7 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 | `review.<stage>.effort` | the role efforts | the role's declared effort | R2.1 |
 | `review.recommendation` | advice, binding, binding-above-tier | advice | R4.3 |
 | `review.build.when` | per-build, per-unit, per-landing | per-build | walk B3 |
+| `review.findings` | blocker-high-own, all-own, blocker-own | blocker-high-own | flow FL-B3 |
 | `review.loop.cadence` | weekly, monthly, every-n-landings | weekly | walk R1 |
 | `review.loop.retire` | propose-ratify, demote-then-propose, report | propose-ratify | walk R2 |
 | `review.loop.window-days` | days | 60 | walk R3 |
@@ -262,6 +270,7 @@ repository on either overrides `verdict` to `local-hook`.
 | `review.<stage>.effort` | the role's effort | the role's effort | the role's effort | the role's effort |
 | `review.recommendation` | advice | advice | binding | binding-above-tier |
 | `review.build.when` | per-build | per-build | per-unit | per-build |
+| `review.findings` | blocker-own | blocker-high-own | all-own | blocker-high-own |
 | `review.loop.cadence` | monthly | weekly | weekly | weekly |
 | `review.loop.retire` | propose-ratify | propose-ratify | propose-ratify | propose-ratify |
 | `review.loop.window-days` | 60 | 60 | 90 | 60 |
@@ -302,7 +311,7 @@ where `verdict = peer-node`.
 | dWitnessedBar | Test | dDeclaredLoop | gate health measured and the reliability bar; bypasses recorded; attribution deciding what blocks; the hook-written verdict; held legs by policy; the peer-node verifier; seen-red records; flake quarantine; the product-test contract with runner adapters; derived pre-commit list and multi-node cost evidence; the gate-leg factory and its conformance gate, every leg declaring the principles it enforces | gap-test-01, gap-test-02, gap-test-03, gap-test-04, gap-test-05, gap-test-06, gap-test-07, gap-test-08, gap-test-09 |
 | dRankedPlan | Plan | dDeclaredLoop, dLeasedFleet | priority beside `parents:` and the generated plan view; the planner and triager role and Plan workflow; the placement predicate; rule-based triage; dormancy disposal; the live-build mapping carried out; Plan Review; kickoff offering the next item and attended briefs gated | gap-plan-01, gap-plan-02, gap-plan-03, gap-plan-04, gap-plan-05, gap-plan-06, gap-plan-07, gap-flow-03, gap-flow-04 |
 | dIndexedDesign | Design | dDeclaredLoop | the derived-READY hand-off; the design index; design review by policy; reuse and alternatives backed by recorded probes; the research harness; agreement and tier checks; the spec measured, recommendations emitted, and the spec redesigned as a structured, tagged contract; the feature level (build, features, units) with each feature's interfaces declared structurally, two-level re-entry by `design.reentry`, additive-versus-breaking interface classification (proposed), fork resolution by `design.forks` | gap-flow-01, gap-design-02, gap-design-03, gap-design-04, gap-design-05, gap-design-06, gap-design-07, gap-design-09 |
-| dScopedBuild | Build | dIndexedDesign, dLeasedFleet, dWitnessedBar | one exit contract with a history-derived base, refusing a build's exit while a core red its own commits introduced stands; scope at the push; the closing review recorded; worktrees by policy; a write gate reading derived state; the checklist witnessed | gap-spine-03, gap-conc-03, gap-build-01, gap-build-02, gap-build-03, gap-build-04 |
+| dScopedBuild | Build | dIndexedDesign, dLeasedFleet, dWitnessedBar | one exit contract with a history-derived base, refusing a build's exit while a core red its own commits introduced stands; built specs frozen, every closing-review finding disposed as new units by `review.findings`; scope at the push; the closing review recorded; worktrees by policy; a write gate reading derived state; the checklist witnessed | gap-spine-03, gap-conc-03, gap-build-01, gap-build-02, gap-build-03, gap-build-04, gap-flow-05 |
 | dShippedRelease | Deploy | dWitnessedBar | the landing record; kit release notes; the deploy engine; the incms adapter; the fleet register and currency watch; lander hardening; optional emitted CI; a derived runbook; the kit factory and its conformance gate | gap-deploy-01, gap-deploy-02, gap-deploy-03, gap-deploy-04, gap-deploy-05, gap-deploy-06, gap-deploy-07, gap-deploy-08 |
 | dTendedCadence | Maintain | dWitnessedBar, dRankedPlan | the maintenance recipe; three hosts and the cadence; the safe-fix set; detectors with owners; map freshness; the maintenance record | gap-maint-01, gap-maint-02, gap-maint-05, gap-maint-06, gap-maint-07, gap-maint-08 |
 | dCalibratedLens | Review | dTendedCadence | review by policy per stage and effort; the stage-exit recommendation; lenses for Plan, Test, Deploy and Maintain; the shared value ledger; the weekly Loop Review; caps re-derived from evidence and review cost | gap-review-01, gap-review-02, gap-review-03, gap-maint-03, gap-design-08 |
