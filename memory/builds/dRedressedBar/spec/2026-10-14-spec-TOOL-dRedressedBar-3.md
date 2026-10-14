@@ -1,12 +1,15 @@
 # TOOL-dRedressedBar-3 — the govkit selftest's 56 reds, traced to four root causes and re-armed
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 2 · ratified 2026-10-14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md](../build/2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 | [2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-3-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-3-2-revision.md) | research | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-3-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-3-3-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -15,8 +18,9 @@
 `govkit selftest` reads 56 failures in the full bar with self-tests over `ebce889c`, and the
 standalone run reproduces them. They trace to four causes, each a landing that moved code under a
 fixture which no bar re-ran. This unit re-arms each fixture against the code as it stands, so the
-suite grades its subjects again. It also names the product defect one cause exposed, which is the
-owner's to schedule.
+suite grades its subjects again. Three arms of one cause witness a product defect, which
+`TOOL-dRedressedBar-9` fixes. This unit leaves those three arms unscoped, so they read green only
+over that fix.
 
 ## 2. Scope (IN)
 
@@ -32,38 +36,44 @@ owner's to schedule.
 - **S3** — OC8 AC4 with the runner and OC13 AC4, 3 arms. In `check_roles_install`'s `runner` branch
   (lines 2770-2784), the deploy text's `[answers]` table gains `gate_file`. Its value is read from
   `tools/codebase-map/kit.toml`'s `[config]` `defaults` `GATE_FILE`, never typed. Observed by AC3.
-- **S4** — The default-gained cluster, 5 arms: `and re-stamps the receipt at the new commit`,
-  `[-12] AC4 NEGATIVE`, `[-12] AC9 NEGATIVE`, `[-8] AC1 the SECOND update` and `[-8] AC4 all four
-  updates exit 0`. They are disposed as §7 F1 resolves. Under its recommended option, every writing
-  `update` over the `u2a`, `ac4`, `ac9`, `d8-ac1` and `d8-ac4` fixtures passes
-  `"--kits", "check-wiring"`. Those are lines 3299, 6886, 6900, 7064, 7074, 8006, 8045, 8057 and 8060.
-  Observed by AC4.
-- **S5** — The product defect S4's cause exposes is recorded, not fixed here. When `update` gains
-  `settings-merge` but leaves `agent-cap` out for its unmet `kickoff-manifest` requirement, it runs
-  `settings-merge`'s adopter. That adopter is the bare `settings-merge.py`, which wires `agent-cap.js`
-  and refuses because the file is absent, so the update fails and never re-stamps. NOT OBSERVED by
-  this unit's criteria: it is a finding for the owner, carried by §7 F1 and the build's wrap-up.
+- **S4** — The default-gained cluster's two `[-8]` arms, `[-8] AC1 the SECOND update` and
+  `[-8] AC4 all four updates exit 0`, as §7 F1's resolution scopes them. Every writing `update` over
+  the `d8-ac1` and `d8-ac4` fixtures passes `"--kits", "check-wiring"`. Those are the four calls at
+  lines 8006, 8045, 8057 and 8060, numbered at the base. No other `update` call is scoped. Observed
+  by AC4.
+- **S5** — The cluster's other three arms, `and re-stamps the receipt at the new commit`,
+  `[-12] AC4 NEGATIVE` and `[-12] AC9 NEGATIVE`, stay unscoped. Their writing calls over the `u2a`,
+  `ac4` and `ac9` fixtures, lines 3299, 6886, 6900, 7064 and 7074 at the base, are unchanged. The product defect
+  they expose is fixed by `TOOL-dRedressedBar-9`, not here, and the three arms are that fix's
+  witness: they read green only over it. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
 - No edit to `tools/govkit/govkit.py`, to any kit descriptor or to `tools/settings-merge.py`. Every
-  red here is the suite's own fixture. The product defect in S5 is a separate mechanism, and a fix for
-  it is its own unit at the owner's word.
+  red this unit re-arms is the suite's own fixture. The product defect S5's arms witness is a separate
+  mechanism, and `TOOL-dRedressedBar-9` owns every product edit its fix needs.
+- No scoping of the writing calls S5 names. A `--kits` scope there would stop the three arms from
+  exercising the gaining path, so they would witness nothing of unit 9's fix.
+- No fix for the `run-gates` an update to an older `--to` vintage gains, whose legs name files that
+  vintage lacks. The owner's resolution of §7 F1 scoped the `[-8]` arms around it, and it is a
+  follow-up for the owner, not a red this build carries.
 - No edit to `tools/workflows/check-protocol-parity.test.sh`. Its agent-type arm is right to refuse a
   dead owner, and the PV fixture now gives it a live one.
 - No change to `DEPLOY_REGISTRY_DEFAULT` itself. The `gate_file` answer is needed only where a runner
   is declared, and the constant feeds arms that declare none.
 - No scoping of the read-only `update` calls at lines 3288, 3294 and 3311, or of `_p9c` at line 7088.
   Each reads green today and writes nothing the five arms read.
-- No `ASSERTION_FLOOR` move and no new arm. Every arm here exists and is re-armed.
+- No `ASSERTION_FLOOR` move and no new arm. Every arm here exists and is re-armed. The arm
+  reproducing the narrow-receipt update is unit 9's.
 - No kit version bump. govkit ships to no adopter, and `TOOL-dRedressedBar-7` measures the tree.
 
 ### Edges
 
 - **hands-off** `TOOL-dRedressedBar-7` — the root-cause fixes to the govkit selftest land in a file
   no kit ships, so this unit leaves that unit no bump to make for it.
-- **hands-off** external — S5's product defect, a gained `settings-merge` whose adopter refuses
-  without `agent-cap`, goes to the owner as §7 F1's recorded finding.
+- **consumes-from** `TOOL-dRedressedBar-9` — its fix to a gained `settings-merge` whose adopter
+  refuses without `agent-cap`. Without it, the three arms S5 leaves unscoped stay red and AC5 cannot
+  pass, so this unit's order follows unit 9's.
 
 ## 4. Design
 
@@ -114,7 +124,7 @@ leaves every new leg green or exempt. A spec-time probe of the apply queued behi
 turnstile and was stopped unfinished, so it was not left beside the bar running on this host. A red
 it reports is new evidence for the main loop.
 
-**S4, the default-gained cluster.** TOOL-aRoutedQuill-5 S4 made a writing `update` install every
+**S4 and S5, the default-gained cluster.** TOOL-aRoutedQuill-5 S4 made a writing `update` install every
 entry the registry's default set gained since the receipt's `gov_commit`, unless the run passes
 `--kits` (`tools/govkit/govkit.py:8863-8879`, `derive_default_gained` at `:970`). The `stale_target`
 and `delta_target` fixtures apply `--kits check-wiring` and rewind the receipt to `24f39915` or an
@@ -125,20 +135,31 @@ shows what follows. To HEAD, `default-gained settings-merge: adopter exit 2` fai
 neither exits 0 nor re-stamps. To `9ddcc5c9`, the gained `run-gates` declares legs naming
 `check-receipt.py` and `held_halves.py`, which that vintage does not hold, and the run reports 2
 problems. None of the five arms is about gaining. Each grades `check-wiring`'s rows: a re-stamp, the
-dirty scope, a committed deletion, and a delta kept across vintages. Option (a) of F1 gives each
-writing call the scope the arm already assumes, and `update` documents that a `--kits` run gains
-nothing. The paired halves at lines 6886 and 7064 take the same scope, so each pair still differs in
-one input only, the dirt.
+dirty scope, a committed deletion, and a delta kept across vintages.
 
-**S5, the exposed defect.** `settings-merge` (`tools/govkit/entries/settings-merge.kit.toml`) and
-`agent-cap` (`tools/hooks/kit.toml:102-108`) share one adopter argv,
-`python {prefix}/settings-merge.py`, which wires the built-in `agent-cap.js` entry and refuses
-when that file is absent (`tools/settings-merge.py:1040-1052`). `apply` runs a requirement-complete
-selection, so the two always arrive together there. `update`'s gaining drops `agent-cap` alone for its
-unmet requirement and keeps `settings-merge`. So any receipt that does not claim `kickoff-manifest`
-fails every writing update from now on. The arms under S4 found this, and a real narrow install would
-meet it the same way. Fixing it moves a kit contract or the deployer's gaining rule. That is a second
-mechanism, so the decision is the owner's (§7 F1).
+The owner's resolution of F1 as (c) splits the cluster by cause. The two `[-8]` arms red on the
+`run-gates` gained at `9ddcc5c9` (`V8[3]`, line 7956), which no `settings-merge` fix reaches. So S4
+gives their four writing calls the scope the arm already assumes, and `update` gives a `--kits` run
+an empty gained set (`tools/govkit/govkit.py:8868`). The last call in the `d8-ac4` loop, line 8060,
+carries no `--to`, so it updates to HEAD and would also gain `settings-merge`. The same scope covers
+it, so `[-8] AC4` grades the delta and never unit 9. The other three arms update to HEAD only, where
+the failure is `settings-merge`'s adopter alone, so S5 leaves them unscoped as unit 9's witness. The
+paired halves at lines 6886 and 7064 stay unscoped beside their negatives, so each pair still differs
+in one input only, the dirt.
+
+**S5, the exposed defect, fixed by unit 9.** `settings-merge`
+(`tools/govkit/entries/settings-merge.kit.toml`) and `agent-cap` (`tools/hooks/kit.toml:102-108`)
+share one adopter argv, `python {prefix}/settings-merge.py`, which wires the built-in `agent-cap.js`
+entry and refuses when that file is absent (`tools/settings-merge.py:1040-1052`). `apply` runs a
+requirement-complete selection, so the two always arrive together there. `update`'s gaining drops
+`agent-cap` alone for its unmet requirement and keeps `settings-merge`. So any receipt that does not
+claim `kickoff-manifest` fails every writing update. `TOOL-dRedressedBar-9` fixes that, by a
+mechanism its own spec chooses. This unit changes nothing for S5. It holds the three arms' calls as
+they are and observes them over unit 9's fix.
+UNVERIFIED: that the three arms read green once unit 9's fix lands. At the base the log shows only
+the `settings-merge` adopter failing those updates, and a further red behind it, such as the gained
+`run-gates` to HEAD, would surface only after that failure clears. A red there is new evidence for
+the main loop, not a scope this unit widens.
 
 ### Files touched (estimate)
 
@@ -154,6 +175,8 @@ mechanism, so the decision is the owner's (§7 F1).
   the registry default, and none of them renders legs.
 - S3 having govkit skip legs of a kit its hole leaves inert: a product change. The hole's own `why`
   (`tools/codebase-map/kit.toml:113`) names an absent leg scoring green as the danger.
+- S5 scoping the three HEAD-bound arms too, F1's option (a): it greens them without the fix, so no
+  existing arm would witness unit 9. The owner chose (c).
 
 ## 5. Acceptance criteria
 
@@ -179,16 +202,26 @@ mechanism, so the decision is the owner's (§7 F1).
   cost: the apply runs the target's runner, which waits at the host turnstile behind any bar already
   running on the node; observed at spec time.
   fixture: a fresh `git init` target under `%TEMP%/<short-name>`.
-- **AC4** — When `grep -nE 'run\("update", "--target", str\((up|u4|u9|t8|t84)\)' tools/govkit/selftest.py`
-  runs, every printed line carrying `--write` also carries `"--kits", "check-wiring"`, and the lines
-  without `--write` carry no `--kits`. A probe that imports `tools/govkit/govkit.py` prints
-  `derive_default_gained` for a receipt claiming `check-wiring` at `24f39915`, and to HEAD it lists
-  `run-gates` and `settings-merge` among its entries.
+- **AC4** — When `grep -nE 'run\("update", "--target", str\((t8|t84)\)' tools/govkit/selftest.py`
+  runs, every printed line carries `"--kits", "check-wiring"`, and it prints the four calls S4 names.
+  A probe that imports `tools/govkit/govkit.py` prints `derive_default_gained` for a receipt claiming
+  `check-wiring` at `24f39915` with `to_commit` `9ddcc5c9`, and its list holds `run-gates`.
   `grep -n 'if kits else derive_default_gained' tools/govkit/govkit.py` hits the line that gives a
   `--kits` run an empty gained set.
-  Red when: a writing call over one of those fixtures stays unscoped, gains `settings-merge`, and its
-  adopter's exit 2 fails the run.
-  figure: the gained set is DERIVED from the registry at both vintages at observation.
+  Red when: a `[-8]` writing call stays unscoped, gains `run-gates` at `9ddcc5c9`, and the run
+  reports the problems naming `check-receipt.py` and `held_halves.py`.
+  figure: the four calls are PINNED, counted at `ebce889c`; the gained set is DERIVED from the
+  registry at both vintages at observation.
+- **AC5** — When `grep -nE 'run\("update", "--target", str\((up|u4|u9)\), "--write"\)' tools/govkit/selftest.py`
+  runs, no printed line carries `--kits`. When `python tools/govkit/govkit.py update --target <t> --write`
+  runs over a tree holding `TOOL-dRedressedBar-9`'s fix, against a target built as `stale_target`
+  builds one (line 3237: `apply --kits check-wiring`, the receipt rewound to `OLD` by
+  `write_vintage_receipt`, then settled), it exits 0, and the receipt's `gov_commit` in
+  `.governance/install.json` is the gov HEAD.
+  Red when: unit 9's fix is absent, and the update exits non-zero on
+  `default-gained settings-merge: adopter exit 2`, which is what the base prints.
+  fixture: a fresh `git init` target under `%TEMP%/<short-name>`, built only after unit 9 has landed
+  on the branch; the tree holds no such target today.
 
 ## 6. Gates
 
@@ -197,11 +230,14 @@ mechanism, so the decision is the owner's (§7 F1).
 New arm: tools/govkit/selftest.py · covers AC1 · drop the owner's line from `_pvCAP_T` and the first PV block-1 arm reds on `agent-type shape DEAD PROBE`, with 45 more cascading · none
 New arm: tools/govkit/selftest.py · covers AC2 · remove `kickoff-manifest` from the aQuenchedHarness-3 selection and its apply arm reds on the unmet requirement · none
 New arm: tools/govkit/selftest.py · covers AC3 · remove the `gate_file` answer and OC13 AC4 reads `None` for the manifest · none
-New arm: tools/govkit/selftest.py · covers AC4 · remove the scope from the `u2a` write and `and re-stamps the receipt at the new commit` reds on the old `gov_commit` · none
+New arm: tools/govkit/selftest.py · covers AC4 · remove the scope from the `d8-ac1` write at line 8045 and `[-8] AC1 the SECOND update` reds on the problems the gained `run-gates` reports · none
+New arm: tools/govkit/selftest.py · covers AC5 · run the suite over a tree without `TOOL-dRedressedBar-9`'s fix and `and re-stamps the receipt at the new commit` reds on the old `gov_commit` · none
 
 ## 7. Open questions
 
 - **F1 — How are the five default-gained arms re-armed, and who fixes the defect they expose?**
+  RESOLVED (owner, 2026-10-14): (c). S4 scopes the two `[-8]` arms with `--kits check-wiring`, and
+  `TOOL-dRedressedBar-9` fixes the defect, which the three arms S5 leaves unscoped witness.
   The arms red because `update` now gains `run-gates` and `settings-merge` into fixtures receipted
   before the default widened. `settings-merge`'s adopter then refuses without `agent-cap`, and the
   gained `run-gates` at `9ddcc5c9` names files that vintage lacks.
@@ -224,6 +260,12 @@ New arm: tools/govkit/selftest.py · covers AC4 · remove the scope from the `u2
 
 - rev-1 · 2026-10-14 · initial draft. The four causes were traced from the bar log and re-derived at
   `ebce889c`. The brief's symptoms map onto them in full: 46, 2, 3 and 5 arms.
+- rev-2 · 2026-10-14 · §1 · S4 · S5 · §3 · §4 · AC4 · AC5 · §6 · §7 · the owner resolved F1 as (c).
+  S4 now scopes only the four `[-8]` writing calls, at lines 8006, 8045, 8057 and 8060. S5 stops
+  being a recorded finding: it holds the other three arms unscoped as the witness of
+  `TOOL-dRedressedBar-9`'s fix, observed by the new AC5. AC4 drops the HEAD-bound calls and probes the
+  `9ddcc5c9` gain instead. Edges trade the external hand-off for consumes-from unit 9, the order moves
+  from 1 to 2, and the header carries `ratified 2026-10-14`.
 
 ## 9. Reuse audit
 
@@ -237,7 +279,8 @@ answers for S2, and `update`'s documented `--kits` scope for S4. The gotchas che
 `fixture-inherits-ambient-machine-state`. The recall probe returned TOOL-aSweptBar-1, whose non-goals
 attributed `OC8 AC4` and the re-stamp arm to aOrientedCast with the cause UNVERIFIED. This unit traces
 them to S3 and S4 instead. The brief and the code agree on every symptom. The brief's `outside the
-selection` wording for aQuenchedHarness-3 is S2's unmet requirement.
+selection` wording for aQuenchedHarness-3 is S2's unmet requirement. At rev-2 the three arms S5
+holds are reused as unit 9's witness rather than scoped and replaced by a new arm.
 
 Recall terms used: `python tools/memory-recall/query.py "why do suite arms go red after a bar-less
 landing moves the code under them, and how were they re-armed" --terms "bar-less landing stale
