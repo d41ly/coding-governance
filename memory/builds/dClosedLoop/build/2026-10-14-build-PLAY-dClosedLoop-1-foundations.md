@@ -351,13 +351,20 @@ session by default, owner-adjustable".
 - **`core.bypass`**, a policy: `with-hooks-report` by default, with `with-hooks-block` and `never` as
   allowed values (K1). A permitted bypass skips the core checks along with every other leg, and the
   floor records it.
-- **INTERPRETATION TO CONFIRM.** K1's answer does not say what happens to a core red found after a
+- **INTERPRETATION, CONFIRMED 2026-10-15.** K1's answer does not say what happens to a core red found after a
   bypass. The default above reads it as report-after, because the owner's other answers keep one
   agent's red from blocking another's unrelated work (walk T1). The core is kept from being built
   around a different way: the core red is filed as a BLOCKER ask against the build whose commit
   introduced it, and THAT build cannot reach its exit until the red is fixed or excepted. The
   violation stops the violator, not the fleet. `with-hooks-block` (every later push blocks) and
   `never` (core checks always run) are the switches if that reading is wrong.
+- **Confirmed, 2026-10-15.** The reading went back to the owner as a fork offering all three values,
+  and the owner chose "A: the violator pays": `with-hooks-report` stands as read, and P16 is unchanged.
+  One leak is closed with it. A core red that first appears in the landing merge, after Build's exit
+  and under a bypassed Test verdict, could land with a build that closes before the red is
+  attributed. So dShippedRelease's lander runs the core checks on the landed tree before it releases
+  the build (v2 `[chain]`). Under `core.exceptions: any-session-recorded`, "fixed or excepted" lets
+  the build's own session record the exception, and the Loop Review audits it.
 - **`core.exceptions`**, a policy: `any-session-recorded` by default, with `owner-only-expiring` and
   `none` as allowed values (K4). Every exception carries its principle, the part it excuses and a
   reason; the Loop Review audits the register on each pass.

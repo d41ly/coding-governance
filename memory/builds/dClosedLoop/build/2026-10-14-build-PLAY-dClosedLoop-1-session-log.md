@@ -192,6 +192,9 @@ calls.
 - 2026-10-15, session 1799cb98: the owner asked how the product design looks at this stage. An
   overview was composed from the records rather than from the compaction summary, saved with its two
   diagrams, and shown.
+- 2026-10-15, session 1799cb98: K1 was explained and put back to the owner as a fork, and the owner
+  confirmed "the violator pays" (`with-hooks-report` as read). The foundations record and v2 were
+  amended, and dShippedRelease's lander gains a core re-check on the landed tree.
 
 ## Instruments
 
