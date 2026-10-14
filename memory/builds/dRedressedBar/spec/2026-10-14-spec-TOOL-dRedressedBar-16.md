@@ -7,6 +7,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md) | research | TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md) | research | TOOL-dRedressedBar-12 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-16-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-16-5-spec-writer.md) | journal | — |
 | [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 |
 
 <!-- /gen:spec-records -->

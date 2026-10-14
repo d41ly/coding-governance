@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-12 — an apply narrower than its receipt keeps every other installed kit's claim and rows, so a refused settings-merge exit stays refused on the next run
 
-**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
+**Status:** CLOSED · rev-6 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -12,6 +12,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-3-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-4-revision.md) | research | TOOL-dRedressedBar-11 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-5-spec-writer.md) | journal | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md) | research | TOOL-dRedressedBar-16 |
 | [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 |
 
 <!-- /gen:spec-records -->
@@ -72,9 +73,12 @@ the `pins` union at `:7402-7407` already does for line-ending pins.
 
 - No change to how the selection's own rows are built, staged or stamped. A carried row is the prior
   receipt's dict, unchanged. It gets no new `oid` and no new `commit`.
-- No carry of `gate_runner.emitted`. `write_gate_legs` is still called with no carry set
-  (`:7953-7955`). A leg row a carried kit loses there is re-claimed on its next run by the
-  same-argv rule (`:4143-4152`, DEPL-aRepatriatedFork-17 S8), so it wedges nothing.
+- No carry of `gate_runner.emitted` in this unit. `write_gate_legs` is still called with no carry
+  set (`:7953-7955`). That carry was taken by `TOOL-dRedressedBar-16` (the units-12-15 spec audit's
+  report id 7), because the same-argv rule (`:4143-4152`, DEPL-aRepatriatedFork-17 S8) does not
+  reach an argv gov has changed. `check_leg_claimable` demands exact argv equality (`:4003-4008`),
+  so once gov changes a leg a carried kit lost from `emitted`, that kit's next `update --write` or
+  `apply --kits` meets the "already has a leg named" Refusal (`:4153-4159`).
 - No carry of an orphan row, one whose `kit` the prior receipt does not claim. `apply` drops it as
   today. The orphan arm (`tools/govkit/selftest.py:10978-11010`) grades that state under `update`.
 - No early return on a refused CONFIGURE exit (§4, alternatives).
@@ -219,7 +223,7 @@ Each candidate was written down with the test that could make it lose, and the p
 | C2 — only a refused CONFIGURE keeps the prior rows of kits outside the selection | Step 2 exits 0 and drops 16 rows. A later malformed `settings.json` then reaches the accepted stop with no refusal anywhere on the route | Rejected; closes the instance, not the class |
 | C3 — every apply keeps the claims and rows of claimed kits it did not select | Its losing test is step 3 and fixture A's third run: either still exiting as at `<p11>` would lose. Both are AC1 and AC2 | Chosen |
 | C4 — a hands-off edge naming the drop as an open false-accept route | It leaves a route the review graded HIGH, and the foreign-refusal wedge of step 3 | Rejected |
-| C5 — also pass `carry_out_of_scope` so `emitted` keeps a carried kit's legs | The same-argv rule already re-claims those legs on the kit's next run (`:4143-4152`). The switch would change `emitted` on a manifest target with no criterion that needs it | Rejected as YAGNI |
+| C5 — also pass `carry_out_of_scope` so `emitted` keeps a carried kit's legs | The rejection rested on the premise that the same-argv rule re-claims those legs on the kit's next run (`:4143-4152`). That premise is false for an argv gov has changed, which `check_leg_claimable`'s exact equality (`:4003-4008`) refuses (report id 7) | Rejected as YAGNI on that false premise; `TOOL-dRedressedBar-16` takes C5 |
 | C6 — the spec-11 correction in the build pass's own commit, as rev-4 wrote it | scratch-guard refuses a builder's edit to another spec, and the spec writer writes no product file, so no role can make that commit (unit 10's divergence, `prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md`) | Refused by the hook |
 
 ## 5. Production-readiness checklist
@@ -342,6 +346,13 @@ none
   lists product files and the ledger only, AC5 reads spec 11 at `<w12>` and observes that the build
   pass writes no other spec, §3's consumes-from edge names `<w12>`, and Alternatives rejected gains
   row C6. No product design or other criterion moves.
+- rev-6 · 2026-10-14 · §3 · §4 · a records fix for TOOL-dRedressedBar-16, closing the units-12-15
+  spec audit's report id 7 (H1), written by that unit's spec-writer pass `<w16>` as its S4. The
+  status stays CLOSED. §3's second non-goal states that the `emitted` carry was taken by
+  TOOL-dRedressedBar-16, because the same-argv rule does not reach an argv gov has changed. §4
+  Alternatives rejected row C5 states that its rejection rested on that false premise and that unit
+  16 takes C5, which TOOL-dRedressedBar-16's AC1 and AC2 observe. S2 and the criteria do not move:
+  unit 12 built against them as written.
 
 ## 10. Reuse audit
 
