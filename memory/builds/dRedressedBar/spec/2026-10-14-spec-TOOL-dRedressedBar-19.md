@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-19 — the units-16-18 spec audit's 19 mediums and 22 lows, batched: the profiler's census, path, launch, turnstile, redaction and leg-declaration gaps closed, the receipt sidecar made atomic, and specs 12 and 14 to 18 corrected
 
-**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 14
+**Status:** SPECCED · rev-4 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md) | research | TOOL-dRedressedBar-10 TOOL-dRedressedBar-13 TOOL-dRedressedBar-17 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-19-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-19-2-revision.md) | research | TOOL-dRedressedBar-10 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-19-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-19-3-spec-writer.md) | journal | — |
+| [2026-10-15-prompt-TOOL-dRedressedBar-18-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-18-4-revision.md) | research | TOOL-dRedressedBar-18 |
 
 <!-- /gen:spec-records -->
 
@@ -86,7 +87,10 @@ record. Items that share a report item share its observation, and each still nam
   `tools/gate-legs.json` and `tools/run-gates/run-gates.sh`, and its `last-audit:` is re-stamped,
   in the shape of commit `2e187ee8b` and unit 17's S18, with a `manifest-audit:` line in the commit
   body. Spec 18's §7 leg line names `kickoff-manifest ratchet`, and its revision line states that
-  unit 18 owed the re-stamp and names AC1. Observed by AC1.
+  unit 18 owed the re-stamp and names AC1. Since spec 18 rev-4, unit 18's pass commit carries the
+  re-stamp the ratchet's staged check requires, naming a sha before its own, and spec 18's §7
+  already names the ratchet. `<p19m>` is still the reviewed re-audit over both units' edits.
+  Observed by AC1.
 - **S26** — id 26, M1. The blast-radius lens's reading of S1's defect. Closed by S1's re-stamp.
   Observed by AC1.
 - **S10** — id 10, M2. `tools/process-monitor/census.py` declares
@@ -104,13 +108,15 @@ record. Items that share a report item share its observation, and each still nam
   blank-memory line that stays a row. Observed by AC10.
 - **S33** — id 33, M2. The failure-envelope lens's reading of S10's defect. Closed by S10's change.
   Observed by AC10.
-- **S11** — id 11, M3. Every path the profiler's bash hands to Python goes through
-  `resolve_win_path`, which runs `cygpath -m` once in the resolved bash. The scratch dir and the
-  turnstile key are each converted at start. The envelope's `scratch` and `turnstile_dir` hold the
-  converted spellings the tool opens, and `scratch_posix` and `turnstile_dir_posix` the bash
-  spellings the legs see. A conversion that exits non-zero, or prints a path with no drive letter,
-  refuses the run with exit 2 for the scratch dir. For the turnstile key it is a refused read at
-  every tick, and never an empty one. Observed by AC11.
+- **S11** — id 11, M3. Spec 18 rev-4's S15 converts the scratch dir, the turnstile key and each
+  probed launcher with `cygpath -m` in the resolved bash and records both spellings, because its
+  own legs could not run without it. Its scratch dir refuses the run when the converted spelling
+  is no directory. What stays here is the turnstile key's failure rule. The set-aside
+  `TURNSTILE_SCRIPT` falls back to the bash spelling when `cygpath` fails, and Python then reads the
+  key as absent and empty, so every leg would record no holder and no wait. In this unit a key whose
+  conversion exits non-zero, or prints a line that does not open with a drive letter, makes
+  `resolve_turnstile_dir` return its unresolved pair `("", "")`. Every tick is then a refused read,
+  and never an empty one. Observed by AC11.
 - **S12** — id 12, M4. `build_holder_env` returns the legs' scrubbed environment with
   `GATE_REGEN_CHECK=0` set after the scrub, as `queued.sh` sets it, and the selftest's holder runs
   under it. The wait for the holder's slot beacon is `read_hold_beacon`, bounded by
@@ -184,8 +190,8 @@ record. Items that share a report item share its observation, and each still nam
   `recovered/<scratch name>/<i>.log.recovered` under this run's own record when that record dir is
   gone. It then deletes the raw file. This run's envelope names each in `raw_recovered`. Spec 18's
   §5 security line states the endings the sweep covers. The record table of `help/measure-legs.md`
-  names `raw_recovered`, S35's `launch_error` and S11's two `_posix` keys, and says a later run
-  sweeps a dead run's raw captures. Observed by AC38.
+  names `raw_recovered` and S35's `launch_error`, and says a later run sweeps a dead run's raw
+  captures. Observed by AC38.
   - **Readers:** S38 deletes an abandoned run's raw captures, `raw/<i>.out`, once each is redacted.
     by name: READER NOT IN TREE, because the captures are runtime files under a scratch dir outside
     the tree, and the only code spelling their name is the profiler unit 18 builds, which writes
@@ -305,8 +311,7 @@ record. Items that share a report item share its observation, and each still nam
 - No change to `write_gate_legs`' carry keying (S43), to `check`'s sidecar compare, or to
   `derive_parity_lines` (S30).
 - No new `help/` page. `help/measure-legs.md` is unit 18's, and no flag or record a user reads
-  moves except `raw_recovered`, `launch_error` and the two `_posix` keys, which S38 adds to that
-  page's record table.
+  moves except `raw_recovered` and `launch_error`, which S38 adds to that page's record table.
 
 ### Edges
 
@@ -392,7 +397,7 @@ names another file.
 
 | Id | Change |
 |---|---|
-| 11 | `resolve_win_path(bash, path)` runs `cygpath -m -- "$1"` in the resolved bash and returns the line it prints when it opens with a drive letter. Called once for the scratch dir and once for the turnstile key |
+| 11 | `TURNSTILE_SCRIPT` keeps no fallback after `cygpath -m`, and `resolve_turnstile_dir` returns `("", "")` unless the converted line matches `^[A-Za-z]:/`. The conversion itself is spec 18's S15 |
 | 12 | `build_holder_env(env)` scrubs as the legs are scrubbed, then sets `GATE_REGEN_CHECK=0`. `read_hold_beacon(key, holder, bound_s)` polls for any slot beacon's `pid` file and returns it, or None on a timeout or on the holder's exit |
 | 19, 37 | `read_profile_legs(path)` replaces the profiler's `read_legs`. `held_halves.load_manifest(path, refuse=...)` |
 | 20 | a parity arm over eight LF-only shapes: plain `https://u:p@h`, two on one line, `git+ssh://`, a password holding `:`, no colon, a `/` in the userinfo, a tab in the userinfo, and a non-ASCII byte beside a match |
@@ -496,13 +501,12 @@ runs `python tools/codebase-map/gen_map.py --write` alone before the product com
 | Identifier | Kind | Naming cell |
 |---|---|---|
 | `read_profile_legs`, `read_hold_beacon` | functions | `py.function`, `read` |
-| `resolve_win_path` | function | `py.function`, `resolve` |
 | `build_holder_env` | function | `py.function`, `build` |
 | `derive_abandoned_scratch` | function | `py.function`, `derive` |
 | `write_recovered_logs` | function | `py.function`, `write` |
 | `test_no_bare_bash_argv`, `test_fork_count`, `test_manifest_refusals`, `test_cim_memory_fields` | selftest arms | `py.function`, `test` |
 | `OPTIONAL_FIELDS`, `HOLD_BEACON_WAIT_S` | constants | none declared for constants |
-| `owner.json`, `raw_recovered`, `launch_error`, `scratch_posix`, `turnstile_dir_posix` | record names | none |
+| `owner.json`, `raw_recovered`, `launch_error` | record names | none |
 
 Each function name answered OK under `python tools/lexicon/lexicon.py --suggest <name> --as py.function`
 on 2026-10-14.
@@ -539,7 +543,7 @@ Specs 12 and 14 to 18 are `<w19>`'s write set, not the build pass's.
 | Id 19 by catching `SystemExit` from `load_manifest` | its line has already printed `held-halves: REFUSED`, which misnames the tool | Rejected; S19 passes a refusal function |
 | Id 12 with a stale output staged in the turnstile arm | the arm runs on every bar, and staging writes into the tree it runs over | Rejected; AC12 exercises the bound on a key no holder writes |
 | Id 38 by the finding's own fix, "a scratch still holding raw files" | a profile running at the same moment matches too, and its live captures would be deleted (the skeptic's refutation) | Rejected; S38 proves the owner dead |
-| Id 11 by refusing the whole run on an unconvertible turnstile key | the job readings stay true without the turnstile, and a refused read already sets every reading aside | Rejected; S11 refuses the run only for the scratch dir |
+| Id 11 by refusing the whole run on an unconvertible turnstile key | the job readings stay true without the turnstile, and a refused read already sets every reading aside | Rejected; S11 makes it a refused read, and only the scratch dir refuses the run, under spec 18's S15 |
 | Id 41 by begin and end markers | they bind a layout the `[dRB-15]` checks may interleave with, where a label filter reads each check wherever it sits | Rejected; S41 reads by label |
 | The spec corrections in the build pass's own commit, as rev-2 wrote it | scratch-guard refuses a builder's edit to another spec, and the spec writer writes no product file, so no role can make that commit (unit 10's divergence, `prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md`) | Refused by the hook |
 
@@ -550,13 +554,13 @@ Specs 12 and 14 to 18 are `<w19>`'s write set, not the build pass's.
   time before touching anything. S39 keeps the redaction byte-exact and S20 holds it to the
   runner's. S35 adds the tool's only terminate, on a suspended process that has run nothing. S29
   stops shipping a leg whose dependencies an adopter cannot see. S40 leaves no truncated sidecar.
-- perf / scale — N/A — one `cygpath` per run, one directory listing of scratch siblings per run,
-  and two atomic renames per receipt write.
-- error / empty / loading states — An empty `resolve_bash` result, an unconvertible scratch path and
-  each malformed manifest class refuse with exit 2 and one named line. A launch failure records the
-  leg as `fail` and the run continues. A half-written beacon or a vanished ticket is not judged.
-- observability — The envelope records both spellings of each path, every recovered capture, and
-  every launch failure.
+- perf / scale — N/A — one directory listing of scratch siblings per run, and two atomic renames
+  per receipt write.
+- error / empty / loading states — An empty `resolve_bash` result and each malformed manifest class
+  refuse with exit 2 and one named line. A turnstile key that does not convert is a refused read at
+  every tick. A launch failure records the leg as `fail` and the run continues. A half-written
+  beacon or a vanished ticket is not judged.
+- observability — The envelope records every recovered capture and every launch failure.
 - risks — `held_halves.load_manifest` gains a keyword and a longer refusal message, and its three
   callers pass nothing new, so `held-halves selftest` grades it unchanged. The census's legacy
   rule keeps a five-field line readable, so a census taken by an older query still parses. The
@@ -569,8 +573,8 @@ Specs 12 and 14 to 18 are `<w19>`'s write set, not the build pass's.
 - migration — `owner.json` is new and optional on read: a scratch without one, which every
   pre-unit-19 run leaves, is left alone. Census rows keep their two optional keys. No receipt
   field, conf key or deploy shape moves.
-- user docs — `help/measure-legs.md` gains `raw_recovered`, `launch_error` and the two `_posix`
-  keys in its record table, and a line saying a later run sweeps a dead run's raw captures.
+- user docs — `help/measure-legs.md` gains `raw_recovered` and `launch_error` in its record table,
+  and a line saying a later run sweeps a dead run's raw captures.
 
 ## 6. Acceptance criteria
 
@@ -602,12 +606,13 @@ worktree root on node d.
   `test_row_contract_is_complete` carries `OPTIONAL_FIELDS`.
   Red when: over `<p18>`, the blank-memory line is rejected, or its row is missing, and the module
   has no `OPTIONAL_FIELDS`.
-- **AC11** — `<ml> --serial --legs <fx>/serial.json --out <o>` exits 0. Its `envelope.json`
-  `scratch` and `turnstile_dir` each match `^[A-Za-z]:/` and pass `os.path.isdir`, and
-  `scratch_posix` and `turnstile_dir_posix` each open with `/`. A python program calling
-  `measure_legs.resolve_win_path(<bash>, "/c/Users")` gets `C:/Users`.
-  Red when: a copy that hands the bash spelling to Python unconverted records a `turnstile_dir`
-  for which `os.path.isdir` reads False.
+- **AC11** — A python program imports `measure_legs` and calls
+  `resolve_turnstile_dir(<bash>, <env>)`, where `<env>` is its own environment with `PATH` set to
+  `/nonexistent`, so the script finds no `cygpath`. It returns `("", "")`, and
+  `measure_legs.read_turnstile` over that key raises `OSError`, the refused read. Under its own
+  `PATH` the same call returns a pair whose second member matches `^[A-Za-z]:/`.
+  Red when: a copy keeping the set-aside fallback returns the bash spelling as the key it opens.
+  `read_turnstile` over it raises nothing and lists no holder, and a leg's eighth field would read 0.
 - **AC12** — A python program imports `measure_legs`. `build_holder_env({"GATE_REGEN_CHECK": "1", "GATE_JOBS": "3"})`
   returns a dict whose `GATE_REGEN_CHECK` is `0` and which holds no `GATE_JOBS`.
   `read_hold_beacon(<temp key>, <a child running sleep 30>, 2)` returns None within 4 s, and the
@@ -677,7 +682,7 @@ worktree root on node d.
   The dead raw file is gone. `<o>`'s recovered log carries `://***:***@`, and `grep -r s3cret <o>`
   and the same over the dead scratch print nothing. The live raw file still reads `live-bytes`. The
   new run's envelope names the dead capture in `raw_recovered`. `help/measure-legs.md` carries
-  `raw_recovered`, `launch_error`, `scratch_posix` and `turnstile_dir_posix`.
+  `raw_recovered` and `launch_error`.
   Red when: a copy whose test reads the pid alone, with the live owner's creation time altered,
   deletes the live raw file; and with the sweep taken out, the dead raw file still carries
   `s3cret`.
@@ -802,7 +807,7 @@ The line is a floor, derived by joining §4 Files touched against the guards in 
 with `BROAD_LEG_FLOOR` applied, plus the unguarded legs the change moves. `measure-legs selftest`
 resolves once unit 18 lands its row, which precedes this unit.
 
-New arm: tools/run-gates/measure_legs.py --selftest · covers AC11 AC12 AC34 AC36 · `resolve_win_path` bypassed, `build_holder_env` setting nothing, a bare `'bash'` argv, and a pid-less beacon read as refused, each on a copy in the selftest's temp dir · none
+New arm: tools/run-gates/measure_legs.py --selftest · covers AC11 AC12 AC34 AC36 · the turnstile key's `cygpath` fallback kept, `build_holder_env` setting nothing, a bare `'bash'` argv, and a pid-less beacon read as refused, each on a copy in the selftest's temp dir · none
 New arm: tools/run-gates/measure_legs.py --selftest · covers AC20 AC39 · a port dropping `\s` from its classes, and a port decoding with replacement · none
 New arm: tools/run-gates/measure_legs.py --selftest · covers AC32 AC35 AC37 AC38 AC42 · breakaway allowed, the launch terminate taken out, a refusal class let through, a pid-only liveness test, and a STALLED line naming a sibling · none
 New arm: tools/process-monitor/selftest.py · covers AC10 · `test_row_contract_is_complete` over a row carrying an undeclared extra key, and `test_cim_memory_fields` over a parser that rejects a blank memory field · none
@@ -841,6 +846,15 @@ none
   ledger only. AC44 reads `<w19>` in place of `<p19>` and observes that neither build-pass commit
   writes another spec. Alternatives rejected gains one row. No product design or other criterion
   moves.
+- rev-4 · 2026-10-15 · S1 S11 S38 · §3 · §4 · §5 · AC11 AC38 · §7 · unit 18's builder divergence
+  (`prompts/2026-10-15-prompt-TOOL-dRedressedBar-18-4-revision.md`): native Python cannot open the
+  profiler's bash scratch spelling, so unit 18 needs the `cygpath -m` conversion already. Spec 18
+  rev-4's S15 takes the conversion of the scratch dir, the turnstile key and the probed launchers,
+  with both spellings in the envelope and the help page. S11 keeps the turnstile key's
+  failed-conversion rule, and AC11 observes that alone; `resolve_win_path` leaves the inventory.
+  S38, AC38, §3 and §5 no longer claim the two `_posix` keys. S1 states that unit 18's pass commit
+  carries the ratchet's staged re-stamp and keeps `<p19m>` as the reviewed re-audit. The `<w19>`
+  pass and its table do not move.
 
 ## 10. Reuse audit
 

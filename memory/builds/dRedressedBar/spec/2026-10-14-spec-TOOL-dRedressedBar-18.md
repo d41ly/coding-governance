@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-18 — a gate profiler: every leg run clean and unbounded, serially or under a load cap, each profiled to its processes, stalls reported and never killed
 
-**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 13
+**Status:** SPECCED · rev-4 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 13 · ratified 2026-10-15
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,8 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-18-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-2-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-18-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-3-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-18-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-brief.md) | research | — |
+| [2026-10-15-prompt-TOOL-dRedressedBar-18-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-18-4-revision.md) | research | TOOL-dRedressedBar-19 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-18-5-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-18-5-spec-writer.md) | journal | — |
 | [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
 
 <!-- /gen:spec-records -->
@@ -22,7 +24,9 @@ rebuilt from scratch files the runner erases. It ran with a knob set, saw nothin
 called the bar spawn-bound from a 10 s CPU average. This unit ships `measure_legs.py` in the run-gates
 kit. It runs every manifest leg with no knob, no ceiling and no reap, one at a time or under a live
 80% CPU and 90% memory cap. It keeps every record and profiles each leg down to its processes, so the
-ceilings, the width profiles and the spawn claim rest on measurement.
+ceilings, the width profiles and the spawn claim rest on measurement. A launcher that is an App
+Execution Alias is run as the interpreter it starts, because its children leave any job, and the
+record names each such substitution (F3).
 
 ## 2. Scope (IN)
 
@@ -50,7 +54,8 @@ ceilings, the width profiles and the spawn claim rest on measurement.
   sample taken after the previous admission that reads CPU at or under 80% and memory at or under 90%,
   or when no leg of the run is running. Observed by AC4 and AC5.
 - **S3** — Each leg runs in its own Windows Job Object, so the kernel counts its processes, user and
-  kernel time, peak memory and I/O, short-lived processes included. Observed by AC1 and AC2.
+  kernel time, peak memory and I/O, short-lived processes included. On a host whose PYBIN is an
+  App Execution Alias this holds only through S14. Observed by AC1 and AC2.
 - **S4** — Per-process rows come from `scan_processes` walked with `build_walk` from the leg's root.
   The census row gains two optional fields, `peak_mem_b` and `mem_b`, read by the CIM query it already
   runs. Observed by AC1 and AC3.
@@ -64,7 +69,8 @@ ceilings, the width profiles and the spawn claim rest on measurement.
   running. Observed by AC6 and AC7.
 - **S8** — The knobs are scrubbed from every leg's environment, the two turnstile nesting names
   included, and the scrubbed set is derived and printed. The verdict-relevant environment is recorded
-  as digests. The legs get the runner's own exports, its python and its bash. Observed by AC9.
+  as digests. The legs get the runner's own exports, its python and its bash. When S14 resolves an
+  alias, its python is the interpreter the alias starts. Observed by AC9.
 - **S9** — The profile holds no host turnstile (F1, resolved b), so a bar nested in a leg queues on
   the host like any bar. At each census tick the tool reads the host turnstile's queue and slot
   beacons. Per leg it records the foreign holders it saw and its own bars' queue wait, apart from its
@@ -98,6 +104,18 @@ ceilings, the width profiles and the spawn claim rest on measurement.
   `tools/run-gates/fixtures/measure-legs/`. It comes with its descriptor row, its manifest, budget
   and Windows-only rows, both kits' version bumps, the kit README section, a `help/` page and the map
   claim. Observed by AC13 and AC14.
+- **S14** — Before the first leg, `resolve_launcher_aliases` probes PYBIN and each distinct first
+  word of the legs' argvs after the PYBIN mapping. A launcher whose file is an App Execution Alias
+  runs, in every leg, as the interpreter that alias starts, and the legs' `GOV_PYTHON` names that
+  interpreter. The interpreter the legs will run must keep its child inside a test job, or the run
+  refuses with exit 2. The envelope's `substitutions` names each substitution with its alias path
+  and its resolved path (F3, resolved b; §4 "Alias launchers"). Observed by AC1, AC2 and AC16.
+- **S15** — The scratch dir, the turnstile key and each probed launcher are converted once with
+  `cygpath -m`, in the resolved bash and in the script that produces each. Python opens only the
+  converted spelling. The envelope records both spellings of the scratch dir and the key. This
+  part of `TOOL-dRedressedBar-19`'s S11 moved here, because native Python cannot open bash's
+  scratch spelling and no leg could run without it. That unit keeps the turnstile key's
+  failed-conversion rule. Observed by AC17.
 
 ## 3. Non-goals (OUT)
 
@@ -107,7 +125,11 @@ ceilings, the width profiles and the spawn claim rest on measurement.
 - No Event Tracing for Windows and no elevation (§4 "Alternatives rejected").
 - No POSIX backend (§4 "Platform").
 - No width cap in `--concurrent`. The owner set the caps as load, not width.
-- No knob. Every setting is a flag, so the tool adds no `GATE_` or `GOV_` variable.
+- No knob. Every setting is a flag, so the tool reads no new `GATE_` or `GOV_` variable. It sets one
+  existing variable in the legs' environment, `GOV_PYTHON`, and only when S14 resolves an alias.
+  No flag turns the resolution off: AC1's red half disables it in a probe program.
+- No resolution rule for an alias other than PYBIN's. A leg launcher that is an alias and is not
+  PYBIN refuses the run (§4 "Alias launchers").
 - No report renderer. `legs.tsv` is the table source, and the chunk and slowest-leg tables are a
   `sort` or a five-line script over it.
 - No full profiled bar inside a pass. That run is the main loop's, at the close.
@@ -124,11 +146,14 @@ ceilings, the width profiles and the spawn claim rest on measurement.
   against the reader, so a layout change reds that arm.
 - **hands-off** `TOOL-dRedressedBar-19` — the profiler, its fixtures, its leg's declarations and
   the census fields this unit builds, which that unit corrects: the census readers of the old row
-  shape, the path conversion across the bash seam, the holder's preflight and bounded wait, one
+  shape, the refused read for a turnstile key whose conversion fails (the conversion itself is
+  S15 here, since rev-4), the holder's preflight and bounded wait, one
   manifest reader, the redaction's byte contract and parity, the leg's guard, parity row, subject
   pin and adopter declaration, one resolved bash, the launch-failure branch, turnstile churn, the
-  sweep of a dead run's raw captures, the manifest refusals and the fork fixture. Also the kickoff
-  manifest re-stamp this unit owes, and this spec's prose, §7 leg line and revision line, which it
+  sweep of a dead run's raw captures, the manifest refusals and the fork fixture. Also the reviewed
+  kickoff manifest re-audit in its own second commit, over this unit's edits and that unit's, while
+  this unit's pass commit carries only the re-stamp the ratchet's staged check requires (§4 "Files
+  touched"). And this spec's prose, §7 leg line and revision line, which it
   corrects in place (units-16-18 report ids 1, 6, 7, 10 to 15, 19 to 22, 24 to 27, 29, 32 to 39
   and 42).
 - **hands-off** external — a `derive-ceilings.py` that reads `gate-profile/` records directly. It is
@@ -143,7 +168,14 @@ ceilings, the width profiles and the spawn claim rest on measurement.
 
 | Measure | Candidate | Loses when | Result |
 |---|---|---|---|
-| per-leg totals | Job Object per leg | an MSYS-forked descendant escapes the job | CHOSEN; AC1 is the refutation |
+| per-leg totals | Job Object per leg | a descendant leaves the job | CHOSEN; AC1 is the refutation. An alias's children do leave it (measured below), so S14 resolves the alias first |
+| alias launcher | refuse at preflight, remedy `GOV_PYTHON` (F3 a) | the operator must act before any profile runs | REJECTED by the owner, F3 |
+| alias launcher | run the interpreter the alias starts (F3 b) | that interpreter's child leaves a test job too | CHOSEN; the run then refuses (S14) |
+| alias launcher | census tree against job membership, totals `unknown` (F3 c) | every reading on node d reads `unknown` | REJECTED by the owner, F3 |
+| alias detection | the file's reparse tag is `IO_REPARSE_TAG_APPEXECLINK` | the tag cannot be read | CHOSEN, measured below; an unreadable tag refuses |
+| alias detection | the path sits under `WindowsApps` | an alias elsewhere, or a plain program in that dir | REJECTED: a convention, where the tag is the file system's own type |
+| alias detection | the launcher's child leaves a test job | it needs a child-starting program per launcher kind | REJECTED as the detector; kept as the interpreter's verification |
+| real interpreter | the alias's own `sys.executable` | the alias starts no Python | CHOSEN, measured below |
 | per-leg totals | sum of census rows | a process lives shorter than one scan | REJECTED, measured below |
 | per-leg totals | ETW kernel process trace | the token is not elevated | REJECTED, §4 Alternatives |
 | per-process rows | census polling | a process lives shorter than one scan | CHOSEN, with `unseen` counted |
@@ -165,11 +197,26 @@ source: Cygwin's spawn adds the breakaway flag only when its own job allows brea
 created with no limit flags at all: no `BREAKAWAY_OK`, no `SILENT_BREAKAWAY_OK`, no
 `KILL_ON_JOB_CLOSE`. AC1 fails if a descendant escapes anyway.
 
+**Measured on node d, 2026-10-15 (PINNED).** AC1 failed on the first build
+(`build/2026-10-15-build-TOOL-dRedressedBar-18-1-set-aside-work.md`). PYBIN was `python3`, and
+`command -v python3` resolved to the App Execution Alias in the user's `WindowsApps` dir, which
+starts `pythoncore-3.14-64`. Every leg of `serial.json` read `procs_total` 1, and `memio.py 200`
+read `peak_job_mem_b` 6950912 with `write_bytes` 0. The builder's scratch manifest isolated the
+cause. A bash leg running only `sleep`s counted 7, so bash-forked processes stay in the job, which
+settles the Cygwin question above. A plain `Python312` interpreter running `spawn.py 2 1` counted 4,
+and the `python3` and `py` aliases counted 1 each. A direct probe for this revision, with no bash,
+created each interpreter suspended, assigned it to a fresh job and resumed it, running a program
+that starts one child and waits for it. `TotalProcesses` read 1 for the alias, 2 for the
+interpreter the alias starts, and 2 for `Python312`. `os.lstat` gave the reparse tag `0x8000001b`,
+`IO_REPARSE_TAG_APPEXECLINK`, for `python3.exe`, `python.exe` and `py.exe` in that dir, and
+`os.path.islink` read False for the alias. Run through the alias, `sys.executable` printed the
+interpreter it starts, under the user's `AppData\Local\Python\pythoncore-3.14-64`.
+
 ### What each cannot see
 
 | Mechanism | On this node (Windows, Git-Bash) | On a POSIX node |
 |---|---|---|
-| Job Object | Work done for the leg in another process, such as a WMI provider host answering a CIM query or an on-access scanner opening each image. A process that broke away. Per-process detail. Its peak is commit, not working set. | Does not exist. `getrusage(RUSAGE_CHILDREN)` sums only waited-for descendants, counts no processes and reports the largest single peak RSS. A cgroup v2 scope needs delegation and keeps no spawn total. |
+| Job Object | Work done for the leg in another process, such as a WMI provider host answering a CIM query or an on-access scanner opening each image. A process that broke away. A process an App Execution Alias starts, unless S14 resolved that alias. Per-process detail. Its peak is commit, not working set. | Does not exist. `getrusage(RUSAGE_CHILDREN)` sums only waited-for descendants, counts no processes and reports the largest single peak RSS. A cgroup v2 scope needs delegation and keeps no spawn total. |
 | census polling | Any process that starts and ends between scans. CPU a process burns after its last sighting. MSYS-only parent edges for a process `ps -W` does not list. | `ps -eo` gives no peak memory, so the two new fields read None. |
 | ETW | Nothing, with elevation. Without it, the session cannot start. | eBPF, the proc connector and auditd need root. `strace -f` slows fork-heavy work several-fold, which is contamination. |
 | turnstile read | A bar on another turnstile key. A wait shorter than one census period. A holder or waiter whose pid no scan saw. | The same files exist, and no backend reads them (§4 "Platform"). |
@@ -187,7 +234,8 @@ only on Windows.
 1. The argv is the manifest row's, with `{prefix}` resolved by the inlined canonical
    `resolve_prefix_token` block, against the tool root the runner derives (`run-gates.sh:2727-2736`).
    A first word `python` or `python3` maps to PYBIN, as at `run-gates.sh:3836`. PYBIN comes from the
-   runner's own `resolve_python` (`run-gates.sh:137-166`), run once in bash from its source.
+   runner's own `resolve_python` (`run-gates.sh:137-166`), run once in bash from its source. A first
+   word S14 resolved then maps to its resolved interpreter (§4 "Alias launchers").
 2. The root is a wrapper, `<bash> -c 'exec "$@"' measure-legs <argv…>`. `<bash>` is
    `profile_bar.resolve_bash` (`profile_bar.py:282-304`), which skips the WSL launcher. The leg thus
    resolves `bash`, `node` and PYBIN through MSYS `PATH`, as the runner's worker does
@@ -202,6 +250,58 @@ only on Windows.
    is therefore kernel-clocked, and the loop's poll latency does not enter it. Descendants still alive
    are counted as `left_running` and left alone. In `--serial`, the next leg starts at the root's
    exit, as the runner's would.
+
+### Alias launchers (F3, resolved b)
+
+An App Execution Alias is a reparse point that Windows answers by activating a packaged app, and
+every process it starts leaves the leg's job (§4 "Measured on node d, 2026-10-15").
+`resolve_launcher_aliases` runs once, after PYBIN is known and before the first leg. Steps 1 to 4
+are inside it, so a probe program that rebinds it disables the detection and the verification
+together, which is how AC1 stages its resolution red half.
+
+1. **Probed set.** PYBIN, and each distinct first word of the legs' argvs after the PYBIN mapping.
+   On today's manifest that is `bash`, `node` and PYBIN, DERIVED from the manifest at run time. The
+   set-aside `TOOLS_SCRIPT` resolves each with `command -v` in the legs' bash, and S15 adds each
+   one's `cygpath -m` spelling beside it. That spelling carries the `.exe` the bash spelling omits
+   (measured on node d, 2026-10-15). A launcher `command -v` does not find is recorded unresolved
+   and probed no further, and its leg fails as it would under the bar.
+2. **Detection.** `check_app_alias(path)` is True when `os.lstat(path).st_reparse_tag` equals
+   `stat.IO_REPARSE_TAG_APPEXECLINK`. A found launcher whose file `os.lstat` cannot read refuses the
+   run with exit 2, because the tool cannot prove it is no alias.
+3. **Resolution.** For PYBIN, `resolve_alias_interpreter` runs
+   `"$1" -I -c 'import sys; print(sys.executable)'` once in the legs' bash, with `$1` the launcher
+   as PYBIN spells it. The printed path, forward-slashed, is the resolved interpreter when it is a
+   file and `check_app_alias` reads False for it. Anything else refuses with exit 2, naming the
+   alias and what it printed. A leg launcher that is an alias and is not PYBIN refuses with exit 2,
+   naming it, because no rule here resolves one (§3).
+4. **Verification.** `measure_job_children` launches the interpreter the legs will run twice, as a
+   leg is launched (steps 2 and 3 of "Launching a leg"), with its output sent to `os.devnull`. That
+   interpreter is the resolved one, or PYBIN itself when PYBIN is no alias. One run's `-I -c`
+   program starts `sys.executable -I -c pass` and waits for it, and its twin runs `-I -c pass`.
+   The two jobs' `TotalProcesses` must differ by exactly 1. Any other difference refuses with exit
+   2, naming the interpreter, because no job reading of a leg it runs would be true (§5 risks).
+   The step runs on every run, alias or not, so any python whose child leaves a job is refused,
+   not only an alias.
+5. **Application.** Each leg whose mapped first word was resolved runs the resolved interpreter.
+   The legs' environment gains `GOV_PYTHON` set to it, so every `resolve_python` a leg's own
+   scripts run picks it before `python3` (`tools/lib/resolve-python.sh:30`, inline at
+   `run-gates.sh:142`). A `GOV_PYTHON` the operator set to the alias is overridden the same way.
+   It is set before the environment digest is taken, so `env_digest` records it.
+6. **Record.** The envelope's `substitutions` holds one object per substitution: `launcher` as the
+   manifest or PYBIN spelled it, `alias` and `resolved` as converted paths, and `applied`, which
+   names `argv0` and `GOV_PYTHON`. It reads `[]` when nothing was substituted. `interpreter_probe`
+   holds the interpreter step 4 ran and both counts. Each `<i>.json` already carries the argv the
+   leg ran. The start prints one line per substitution,
+   `measure-legs: SUBSTITUTED <launcher> <alias> -> <resolved>`, and the summary line repeats the
+   count.
+
+**What it cannot see.** A leg's own code that starts a launcher by name outside `resolve_python`,
+or through a caller's override such as `resolve_python "${MAP_PY:-}"` set to an alias, still
+starts the alias, and that launch's children leave the job unmarked. A `git grep` at `1f45ba9a`
+for `python`, `python3` or `py` at command position in tracked `.sh` files under `tools/` found
+one, inside a string a suite prints. A search of `tools/` Python and JavaScript for a list opening
+with one of those names found only manifest-shaped test data. Code that spells a launcher another
+way is UNVERIFIED.
 
 ### The environment a leg gets
 
@@ -224,6 +324,10 @@ capture is its `raw/<i>.out`, beside it, as the runner's raw sits in its scratch
 until its redacted copy is written (§4 "The record"). It is not under the
 git dir, because git discovery from inside `.git/` answers differently, which would change a leg's
 verdict. This scratch is the one path outside the run directory, and the envelope names it.
+The same bash run prints the dir's `cygpath -m` spelling (S15). Python opens only that spelling,
+and a spelling that `os.path.isdir` rejects refuses the run with exit 2. The envelope keeps both,
+`scratch` for the converted one and `scratch_posix` for the one the legs see. The legs also get
+`GOV_PYTHON` when S14 resolves an alias, and nothing else is added.
 
 **Recorded, never scrubbed.** These are the names the runner's reuse digest calls verdict-relevant:
 `GATE_*|GOV_*|*_PY|GIT_*|PYTHON*|LC_*|LANG|TZ` (`run-gates.sh:3404`, read from its `# digest-env-names`
@@ -245,7 +349,9 @@ such a reading aside by the rule it already applies.
 **What is read.** The key is the one the legs' bars resolve. The scrub removes `GATE_TURNSTILE_DIR`,
 so that key is the runner's default, `$HOME/.gov/gate-turnstile` (`run-gates.sh:1513-1514`).
 `resolve_turnstile_dir` resolves it once at start, by the runner's own expression in the resolved
-bash. At each census tick, after the scan returns, `read_turnstile` lists `gate-bar-queue/` and reads
+bash, and the same run prints its `cygpath -m` spelling (S15). Every read below opens that
+spelling, and the envelope keeps both, as `turnstile_dir` and `turnstile_dir_posix`. At each
+census tick, after the scan returns, `read_turnstile` lists `gate-bar-queue/` and reads
 the `pid` file of each slot beacon: `gate-bar-beacon` and every `gate-bar-beacon.<k>`
 (`:1534-1535`, `:1951`), by the glob the nesting test uses (`:1834`). A ticket's name is
 `<UTC stamp>-<pid>-<random>` (`:1892`), and its pid is taken as `unattended.sh:6687-6688` takes it.
@@ -356,10 +462,16 @@ its window, or `unknown` when one of them was refused.
 `_CIM_QUERY` (`census.py:52-58`) gains `PeakWorkingSetSize` and `WorkingSetSize`, before the command
 line, so free text stays last. `parse_cim` and `build_windows_rows` carry them as `peak_mem_b` and
 `mem_b`, int or None, and never zero for unreported, as `cpu_s` is (`census.py:12-22`). The builder
-confirms the CIM unit of `PeakWorkingSetSize` against one live row's `Get-Process` `PeakWorkingSet64`.
-The documented unit is kilobytes, UNVERIFIED. POSIX rows carry None. `FIELDS` (`:264`) and
+measured the CIM units on node d on 2026-10-15 (set-aside record). `PeakWorkingSetSize` is KiB, 78232
+beside `Get-Process` `PeakWorkingSet64` 76533760 bytes, so `peak_mem_b` is that value times 1024.
+`WorkingSetSize` is already bytes. POSIX rows carry None. `FIELDS` (`:264`) and
 `render_rows` keep their bytes, so `census.py --print` and every reap and classify line are
 unchanged. process-monitor's version moves, with every marker that `kit version markers` reads.
+
+`test_row_contract_is_complete` (`tools/process-monitor/selftest.py:102-110`) asserts each row's
+key set equals `FIELDS` exactly, so it reds the moment rows gain the two keys. It changes in the
+same commit, to `FIELDS` plus the two keys, as the set-aside diff has it. `TOOL-dRedressedBar-19`'s
+S10 then states the pair once as `OPTIONAL_FIELDS`.
 
 ### The record
 
@@ -415,7 +527,8 @@ These are the only deletes the tool performs.
 Width is 1 under `--serial` and the peak concurrency under `--concurrent`. `queued` does not apply:
 the profile takes no ticket, and each leg's turnstile wait is its own `ts_wait_s`. The ledger keys
 do not apply either, because this tool writes no ledger. It adds `mode`, the caps, the periods, W and
-C, `scrubbed`, `env_digest`, `tools`, `scratch`, `turnstile_dir`, `raw_kept`, the manifest path and
+C, `scrubbed`, `env_digest`, `tools`, `scratch`, `scratch_posix`, `turnstile_dir`,
+`turnstile_dir_posix`, `substitutions`, `interpreter_probe`, `raw_kept`, the manifest path and
 blob, the leg count, `census_backend`, `spawn_floor_us`, the kit version and `regimes`. `regimes` is `derive_regime` at every power of two
 up to the logical core count: the width profile, read off unbounded durations. It is labelled with
 the mode.
@@ -427,7 +540,9 @@ of the leg's bars waited, which is the reading `read_runs` admits. A positive or
 one `read_runs` sets aside, and AC15 observes that with `read_runs` itself. `--observed` is the one
 route `derive-ceilings.py` does not census (`:49`), so only a row whose eighth field reads 0 is
 carried there. They enter as `--observed '<leg>=<s>' --how 'measure_legs <run id>'`, so each row
-names its provenance. The tool
+names its provenance. A run whose `substitutions` is not empty measured the resolved interpreter
+and not the alias the bar runs, so its readings lack the alias's own process per launch. The help
+page says so, and says to write `substituted` into such a row's `--how` text. The tool
 does not feed `read_runs` (`:199`, `:267`), because the record sits outside `gate-run/`, and an
 automatic second source would let one profile raise ceilings unseen.
 
@@ -452,7 +567,10 @@ are four manifests, `serial.json`, `concurrent.json`, `stall.json` and `turnstil
 The turnstile arm sets `HOME` to a temp dir, so its key is private, and starts the real runner's hold
 verb over `sleep 20` outside any leg before it runs `turnstile.json`. The pure arms are the scrub
 derivation, `check_admit`, the platform refusal and the foreign parity. Every fixture ends by
-itself.
+itself. The alias halves, AC1 and AC2's resolution red half and AC16's alias half, need a host
+whose PYBIN is an App Execution Alias. On any other host each prints
+`unexercised: no alias on this host` and adds no assertion, so a pass there says nothing about an
+alias. The interpreter verification of S14 and the path arm of AC17 run on every host.
 
 The leg row:
 
@@ -479,17 +597,20 @@ at 60, by the file's own rule. Both figures are PINNED with node and date in the
 | `derive_scrub_set`, `derive_redacted`, `derive_leg_turnstile` | functions | `py.function`, `derive` |
 | `extract_runner_function` | function | `py.function`, `extract` |
 | `resolve_leg_python`, `resolve_job_backend`, `resolve_turnstile_dir` | functions | `py.function`, `resolve` |
-| `measure_spawn_us`, `measure_foreign` | functions | `py.function`, `measure` |
-| `check_admit`, `check_stalled` | functions | `py.function`, `check` |
+| `resolve_launcher_aliases`, `resolve_alias_interpreter` | functions | `py.function`, `resolve` |
+| `measure_spawn_us`, `measure_foreign`, `measure_job_children` | functions | `py.function`, `measure` |
+| `check_admit`, `check_stalled`, `check_app_alias` | functions | `py.function`, `check` |
 | `run_leg`, `build_job`, `scan_leg_trees` | functions | `py.function`, `run`, `build`, `scan` |
 | `write_leg_record`, `render_leg_row` | functions | `py.function`, `write`, `render` |
 | `test_*` | selftest arms | `py.function`, `test` |
 | `HOST_EVERY_S` | constant | none declared for constants |
 | `peak_mem_b`, `mem_b` | census row keys | none |
+| `substitutions`, `interpreter_probe`, `scratch_posix`, `turnstile_dir_posix` | envelope keys | none |
 | `measure-legs selftest` | gate leg | none |
 
 Every name above answered OK under `python tools/lexicon/lexicon.py --suggest <name> --as py.function`
-on 2026-10-14. A name the builder adds is asked the same way.
+on 2026-10-14, and the four rev-4 functions on 2026-10-15. A name the builder adds is asked the
+same way.
 
 ### Files touched (estimate)
 
@@ -500,12 +621,41 @@ on 2026-10-14. A name the builder adds is asked the same way.
 `tools/process-monitor/adopt-process-monitor.sh` · `tools/process-monitor/reap.py` ·
 `tools/process-monitor/scope.py` · `tools/process-monitor/classify.py` ·
 `tools/process-monitor/procmon-hook.js` · `tools/process-monitor/README.md` ·
-`memory/map/features/run-gates.md` · `help/measure-legs.md` · `help/README.md`, plus the outputs
-`regen.py --write` moves, which the pass commits.
+`memory/map/features/run-gates.md` · `help/measure-legs.md` · `help/README.md` ·
+`memory/guides/SESSION-KICKOFF.md`, plus the outputs `regen.py --write` moves, which the pass
+commits.
 
 `run-gates.sh` moves by `KIT_RUN_GATES_VERSION` and its history comment. The process-monitor engine
 files move by their markers only, except `census.py`. Both kits move to the next minor over whatever
 the tree carries when this unit builds, DERIVED then.
+
+`memory/guides/SESSION-KICKOFF.md` watches `tools/gate-legs.json` and `tools/run-gates/run-gates.sh`
+(its `watch:` line, `:6`). The pre-commit hook runs the kickoff ratchet's staged leg
+(`.githooks/pre-commit:191`), which refuses a commit staging a watched file without a
+`last-audit:` re-stamp. So the pass commit carries that re-stamp with a `manifest-audit:` line in
+its body, as unit 17's `6057a55c1` did. This unit makes no second re-stamp commit:
+`TOOL-dRedressedBar-19`'s S1 keeps its reviewed one, over both units' edits.
+
+### Restoring the set-aside work
+
+The first build's code is kept verbatim in
+`build/2026-10-15-build-TOOL-dRedressedBar-18-1-set-aside-work.md`: `measure_legs.py`, twelve
+fixtures and a 255-line process-monitor diff. The redispatch restores it from that record and
+changes it only where this revision requires:
+
+- S14: the four functions of "Alias launchers", called before the first leg; `derive_leg_argv`
+  mapping a resolved first word; `GOV_PYTHON` in the legs' environment before `env_digest`; the
+  envelope's `substitutions` and `interpreter_probe`; the start and summary lines.
+- S15: `TOOLS_SCRIPT` prints each launcher's `cygpath -m` spelling beside its bash one. The
+  envelope keys the record calls `scratch_bash` and `turnstile_dir_bash` are spelled
+  `scratch_posix` and `turnstile_dir_posix`, the names `TOOL-dRedressedBar-19` already uses.
+- The selftest: the alias halves and the unexercised line of "The selftest and its leg", the AC16
+  and AC17 arms, and AC9's PYBIN compared under the scrubbed environment.
+- The declarations the first build never wrote: the manifest row, `kit.toml`, the budget and
+  Windows-only rows, the runner's version line, both READMEs, the help page, the map claim and
+  the kickoff re-stamp.
+
+The process-monitor diff is applied as kept, its row-contract arm included.
 
 ### Alternatives rejected
 
@@ -529,6 +679,9 @@ the tree carries when this unit builds, DERIVED then.
   leg's log never carries it and the wait would read 0. A bar on a suite's private key prints waits
   that are no host contention. The queue itself is read instead.
 - **Keeping the raw capture (F2 a).** The owner chose (b) on 2026-10-14.
+- **Refusing an alias at preflight (F3 a), or marking its totals `unknown` (F3 c).** The owner
+  chose (b) on 2026-10-15. (a) costs every operator with the Store python a `GOV_PYTHON` before the
+  first profile, and (c) leaves every reading on node d without a job total.
 
 ## 5. Production-readiness checklist
 
@@ -538,29 +691,41 @@ the tree carries when this unit builds, DERIVED then.
   delete is named in `raw_kept`. The turnstile is read, never written.
   Environment values are stored only as digests. Flags are bounded at parse, so an over-long value
   refuses with exit 2. The process handle asks for `PROCESS_TERMINATE` only because the job assign
-  requires it, and the code never calls a terminate.
+  requires it, and the code never calls a terminate. S14 runs no program the bar would not: the
+  resolved interpreter is the very process the alias starts, and it is accepted only as a file that
+  is no alias and that keeps its child in a test job.
 - perf / scale — A scan took about 1 s at 327 rows on node d. A concurrent run has more rows, and
   the scan's own seconds are in `census.tsv`. Host sampling is about 13 µs a tick. The turnstile
   read adds one directory listing and one small read per slot to each census tick, and no spawn.
 - error / empty / loading states — An empty manifest refuses with exit 2. A refused scan is an
-  `unknown` tick. A missing process-monitor kit or job API refuses at start. A leg that never ends
-  keeps the run open, which the owner chose.
-- observability — The scrubbed set, the turnstile key and the record path print at start. Each leg
+  `unknown` tick. A missing process-monitor kit or job API refuses at start. So do an unreadable
+  launcher file, an alias that is not PYBIN, an alias whose `sys.executable` is no plain file, an
+  interpreter whose child leaves the test job, and a scratch dir whose converted spelling is no
+  directory. A leg that never ends keeps the run open, which the owner chose.
+- observability — The scrubbed set, each substitution, the turnstile key and the record path print
+  at start. Each leg
   prints one line as it ends, naming its `ts_wait_s` and `ts_holders` when either is above zero, and
   each STALLED or RESUMED prints one line. A summary line gives the totals, including the
   summed `spawn_s_est` over the summed wall.
-- risks — The job semantics are UNVERIFIED until AC1 runs, and a breakaway there parks the unit
-  rather than shipping a census-only count. With no hold (F1b), a leg's bars queue behind any bar on
+- risks — AC1 ran on 2026-10-15 and failed through an App Execution Alias, and this rule parked the
+  unit. The rule now holds at run time: an interpreter whose child leaves the test job refuses the
+  run rather than shipping a census-only count (S14). The alias's own process per launch, and the
+  activation work it does, are in no reading of a substituted run, so those readings are not the
+  bar's. That is the owner's accepted cost of F3 (b), and `substitutions` says so on every such
+  run. A leg that starts the alias outside `resolve_python` still loses that launch's children
+  from its job, unmarked (§4 "Alias launchers"). With no hold (F1b), a leg's bars queue behind any bar on
   the host, and another session's bar can run beside the profile. Both are recorded and set aside,
   not prevented, so a busy host yields readings that argue no ceiling. A profile started inside a
   bar queues each of its legs' bars behind that very bar, for up to the runner's `TS_MAXWAIT` each,
   so the help page says to start one outside any bar. The legs' scratch is never swept, so the
   canary's clones can reach gigabytes, and the end line prints its size.
-- testing — AC1 to AC15 run against committed fixtures, the real runner's hold verb and pure probes.
-  The new arms are declared in §7.
+- testing — AC1 to AC17 run against committed fixtures, the real runner's hold verb and pure probes.
+  The alias halves need a host whose PYBIN is an alias, node d at 2026-10-15. The new arms are
+  declared in §7.
 - migration — Census rows gain two keys that default to None. No conf key and no record format
   moves.
 - user docs — `help/measure-legs.md`, linked from `help/README.md`, and a run-gates README section.
+  The page names `substitutions` and says a substituted run's readings are not the bar's.
 
 ## 6. Acceptance criteria
 
@@ -570,18 +735,35 @@ the run dir the tool prints. Every criterion is a direct run of the tool or a pr
 `--selftest` re-observes them as §7 declares.
 
 - **AC1** — `<ml> --serial --legs <fx>/serial.json --out <o> --census-every 1` runs
-  `spawn.py 6 3` and its zero-child twin `spawn.py 0 3`. The difference of
-  their `procs_total` in `<r>/legs.tsv` is 6. The spawn leg's `procs` holds 6 rows whose command
+  `spawn.py 6 3` and its zero-child twin `spawn.py 0 3`, under the interpreter the envelope names.
+  `tools.pybin` is what the runner's `resolve_python` printed. When that is an alias,
+  `substitutions` holds one entry whose `resolved` is the first word of both legs' `argv` in their
+  `<i>.json`, and `interpreter_probe` reads a difference of 1. On node d at 2026-10-15 PYBIN is
+  `python3`, the alias in the user's `WindowsApps` dir, resolved to the `python.exe` of
+  `pythoncore-3.14-64` under the user's local `Python` dir. The difference of the two legs'
+  `procs_total` in `<r>/legs.tsv` is 6. The spawn leg's `procs` holds 6 rows whose command
   carries `-I -c`, each with ppid, start, first and last seen, cpu_s and `peak_mem_b`.
   Red when: the job is created with `JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK`. The children then leave
-  it, and the difference reads 0.
+  it, so S14's verification refuses the run with exit 2 naming the interpreter, and a copy that
+  also skips the verification reads a difference of 0.
+  Red when: the resolution is disabled on node d. A python program rebinds
+  `measure_legs.resolve_launcher_aliases` to return no substitution and no probe, and calls
+  `measure_legs.main` with the same arguments. Both legs then run the alias, and the difference
+  reads 0, as the first build read it on 2026-10-15.
   figure: 6 is the fixture's argument. The twin cancels the wrapper and the interpreter, so the
-  expectation is DERIVED.
-- **AC2** — On the same run, the `memio.py 200` leg's `peak_job_mem_b` is at least 200 MiB, its
-  `io.write_bytes` is at least 200 MiB, and `user_s + kernel_s` is above 0. Every leg's
+  expectation is DERIVED. The interpreter paths are PINNED, node d, 2026-10-15.
+  fixture: the resolution red half needs a host whose PYBIN is an App Execution Alias, and node d
+  is one at 2026-10-15. Elsewhere the rebinding changes nothing, and that half reads unexercised.
+- **AC2** — On the same run, under the same interpreter, the `memio.py 200` leg's
+  `peak_job_mem_b` is at least 200 MiB, its `io.write_bytes` is at least 200 MiB, and
+  `user_s + kernel_s` is above 0. Every leg's
   `spawn_us.median` is above 0, and its `spawn_s_est` equals `procs_total x median / 1e6`.
   Red when: `extract_runner_function` is pointed at a name the runner lacks. The run then refuses
   with exit 2 before the first leg, rather than recording no spawn cost.
+  Red when: the resolution is disabled as AC1 disables it. The memio leg then runs the alias, and
+  its `peak_job_mem_b` reads under 200 MiB with `io.write_bytes` 0.
+  figure: the first build read 6950912 and 0 on node d, 2026-10-15, PINNED.
+  fixture: as AC1's resolution red half.
 - **AC3** — `python -c` imports `tools/process-monitor/census.py`, feeds `parse_cim` one
   `\x01`-joined line carrying seven fields, and feeds `build_windows_rows` the result. The row carries
   `peak_mem_b` and `mem_b` as ints, and `command` intact. A `parse_posix` row carries both as None.
@@ -619,7 +801,8 @@ the run dir the tool prints. Every criterion is a direct run of the tool or a pr
   Its `<r>/<i>.log` prints no `GATE_` name, the two nesting names included, and no name from
   `git rev-parse --local-env-vars`. `envelope.json` `scrubbed` lists `GATE_JOBS`, `GATE_REUSE`,
   `GATE_TURNSTILE_HOLDER` and `GIT_NAMESPACE`, each with its rule. The envelope's PYBIN equals what
-  the runner's `resolve_python` prints under the same environment.
+  the runner's `resolve_python` prints under the scrubbed environment, before S14 sets
+  `GOV_PYTHON`.
   Red when: the pre-push half is skipped. `GIT_NAMESPACE` then reaches the leg.
 - **AC10** — After AC1's run exits, `<r>` holds `envelope.json`, `host.tsv`, `census.tsv`,
   `legs.tsv`, and one `.leg`, `.log` and `.json` for each leg. Each `.log` is the leg's redacted copy,
@@ -645,7 +828,8 @@ the run dir the tool prints. Every criterion is a direct run of the tool or a pr
 - **AC14** — `grep -n 'gov:kit run-gates@' tools/run-gates/README.md` and
   `grep -n '^KIT_RUN_GATES_VERSION' tools/run-gates/run-gates.sh` show one equal version above 1.40.
   The process-monitor markers all show one equal version above 0.18. `help/measure-legs.md` names
-  `--serial`, `--concurrent`, the record path and `ts_wait_s`, and `help/README.md` links it.
+  `--serial`, `--concurrent`, the record path, `ts_wait_s`, `substitutions` and `scratch_posix`,
+  and `help/README.md` links it.
   Red when: one marker lags, as `kit version markers` would find.
 - **AC15** — `<ml> --selftest`'s turnstile arm, with `HOME` set to a fresh temp dir, starts the real
   runner's hold verb over `sleep 20` outside any leg, in the legs' scrubbed environment, and waits
@@ -665,14 +849,36 @@ the run dir the tool prints. Every criterion is a direct run of the tool or a pr
   measured, and the arm prints the wait it saw.
   fixture: the holder is the profiler's own child, so the census excludes it, and only the turnstile
   read can count it. The temp `HOME` keeps the arm off the host key a surrounding bar holds.
+- **AC16** — A python program imports `measure_legs`. `check_app_alias` returns True for the
+  `python3.exe` that `command -v python3` resolves on node d, spelled by `cygpath -m`, and False
+  for the program's own `sys.executable` and for a path that does not exist. On AC9's run the
+  output carries one line opening `measure-legs: SUBSTITUTED python3`. The envelope's
+  `substitutions` entry has an `alias` ending in the WindowsApps `python3.exe`, a `resolved` for
+  which `os.path.isfile` reads True and `check_app_alias` False, and an `applied` naming `argv0`
+  and `GOV_PYTHON`. `interpreter_probe` holds two counts that differ by 1, and `printenv.py`'s
+  `<i>.log` lists the name `GOV_PYTHON`.
+  Red when: `check_app_alias` tests `os.path.islink`, which reads False for the alias (measured on
+  node d, 2026-10-15). No substitution is made, step 4 then verifies the alias itself, and the run
+  refuses with exit 2 naming `python3`.
+  fixture: the alias half needs node d's alias as of 2026-10-15. Elsewhere `substitutions` reads
+  `[]` and that half reads unexercised, while the two False results and the probe's difference
+  still hold.
+- **AC17** — On AC1's run, the envelope's `scratch` and `turnstile_dir` each match `^[A-Za-z]:/`,
+  `scratch` passes `os.path.isdir`, and `scratch_posix` and `turnstile_dir_posix` each open with
+  `/`. On AC15's run, whose key exists under the temp `HOME`, `turnstile_dir` passes
+  `os.path.isdir`, which AC15's counts rest on.
+  Red when: a copy's start-up scripts print the bash spelling where `cygpath -m`'s belongs. Native
+  Python resolves an MSYS spelling against the drive root, where no such dir exists (measured on
+  node d, 2026-10-15: `/c/Users` reads as no directory), so the run refuses at start naming the
+  scratch dir.
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates gov canary` · `shell hygiene (a fork spent on builtin work)` · `encoding posture (text IO names its encoding)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `harness arms (fail branches armed or pinned)` · `govkit selfcheck` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `python resolver (behaviour + inline parity + idiom ban)` · `every held leg is budgeted, every budget row resolves` · `held-halves selftest` · `process-monitor census selftest` · `process-monitor adopter selftest` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
+`run-gates canary` · `run-gates gov canary` · `shell hygiene (a fork spent on builtin work)` · `encoding posture (text IO names its encoding)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `harness arms (fail branches armed or pinned)` · `govkit selfcheck` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `python resolver (behaviour + inline parity + idiom ban)` · `every held leg is budgeted, every budget row resolves` · `held-halves selftest` · `process-monitor census selftest` · `process-monitor adopter selftest` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)` · `kickoff-manifest ratchet`
 
-New arm: tools/run-gates/measure_legs.py --selftest · covers AC1 AC2 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC11 AC12 AC15 · each criterion's Red when, staged on a copy of the tool in the selftest's temp dir · none
+New arm: tools/run-gates/measure_legs.py --selftest · covers AC1 AC2 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC11 AC12 AC15 AC16 AC17 · each criterion's Red when, staged on a copy of the tool in the selftest's temp dir; the alias halves only on a host whose PYBIN is an alias, and unexercised, never passed, elsewhere · none
 
-New arm: tools/process-monitor/selftest.py · covers AC3 · a parse_cim reading the command at index 4 · none
+New arm: tools/process-monitor/selftest.py · covers AC3 · a parse_cim reading the command at index 4, and test_row_contract_is_complete over a row lacking one of the two keys · none
 
 `measure-legs selftest` is the leg the first arm line adds. It joins the manifest in this unit, so it
 is not on the leg line above. The inlined `resolve_prefix_token` and `resolve_kit_dir` blocks join
@@ -706,6 +912,21 @@ at the close.
   `[security]` outranks the letter of "nothing erased" for a file holding the same bytes unredacted.
   RESOLVED (owner, 2026-10-14): (b). Each leg's log is kept redacted only, and the raw capture is
   deleted once its redacted copy is written (§4 "The record", S11, AC11).
+- **F3 — How is a launcher that is an App Execution Alias handled?**
+  The first build found PYBIN to be the Store `python3` alias on node d, and every process it
+  starts leaves the leg's job, so AC1 and AC2 failed (§4 "Measured on node d, 2026-10-15").
+  (a) A preflight runs PYBIN and each distinct launcher once in a test job and refuses with exit 2,
+  naming the alias. The remedy is `GOV_PYTHON` set to a plain interpreter, which the runner honours
+  too, so the bar and the profile still run one python.
+  (b) The alias is resolved to the interpreter it starts, for the legs. The alias's own process per
+  launch then drops out of every reading, so the readings are no longer exactly the bar's.
+  (c) A per-leg escape check compares the census tree with job membership, and marks the job
+  totals `unknown` where they disagree.
+  Recommendation: the builder's divergence offered the three options without one, and the fork
+  went to the owner as returned.
+  RESOLVED (owner, 2026-10-15): (b). The profiler resolves an alias launcher to its real interpreter
+  for the legs, and the record names every substitution (§4 "Alias launchers", S14, AC1, AC2,
+  AC16).
 
 ## 9. Revision log
 
@@ -729,6 +950,21 @@ at the close.
   units-16-18 spec audit's minors were promoted into, for that report's ids 1, 6, 7, 10, 11, 12, 13,
   14, 15, 19, 20, 21, 22, 24, 25, 26, 27, 29, 32, 33, 34, 35, 36, 37, 38, 39 and 42. No scope, design
   or criterion moves.
+- rev-4 · 2026-10-15 · §1 · S3 S8 S14 S15 · §3 · §4 · §5 · AC1 AC2 AC9 AC14 AC16 AC17 · §7 · §8 · §10
+  · the first build's divergence (`prompts/2026-10-15-prompt-TOOL-dRedressedBar-18-4-revision.md`):
+  PYBIN was the Store `python3` alias on node d, whose processes leave the job, so AC1 and AC2
+  failed. The owner resolved F3 (b) on 2026-10-15. S14 and §4 "Alias launchers" add the probed set,
+  detection by reparse tag, resolution by the alias's `sys.executable`, a twin test-job
+  verification that refuses an interpreter whose child leaves, the substitution at argv0 and in
+  `GOV_PYTHON`, and the envelope's `substitutions`. AC1 and AC2 name their interpreter and gain a
+  red half with the resolution disabled, and AC16 is new. The builder's three notes: S15 takes
+  the `cygpath -m` conversion from `TOOL-dRedressedBar-19`'s S11 (AC17, new), which keeps the
+  turnstile key's failed-conversion rule; Files touched gains `memory/guides/SESSION-KICKOFF.md`
+  for the ratchet's staged re-stamp, and §7 names `kickoff-manifest ratchet`; §4 states that
+  `test_row_contract_is_complete` changes in the commit that adds the census keys. §4 records the
+  measured CIM units and says the redispatch restores the set-aside record. Claims new at rev-4
+  were read at `1f45ba9a`, whose `run-gates.sh`, `census.py` and process-monitor `selftest.py` equal
+  `ebce889c`'s. §10's turnstile-suite citation moves from `:1499` to `:1500`.
 
 ## 10. Reuse audit
 
@@ -740,7 +976,7 @@ gains two fields, and `build_walk` (`reap.py:136-164`) and `build_self_chain` (`
 used unchanged. From `profile_bar.py` come `resolve_bash`, `run_git`, `check_quiet` and
 `derive_regime`, imported as siblings. `resolve_python`, `measure_spawn_cost`, `read_spawn_floor` and
 the `measure_foreign` awk are run from the runner's source text, by the extraction seam
-`run-gates.turnstile.test.sh:1499` uses. The `resolve_prefix_token` and `resolve_kit_dir` canonical
+`run-gates.turnstile.test.sh:1500` uses. The `resolve_prefix_token` and `resolve_kit_dir` canonical
 blocks are inlined. `run_leg_at` gives the launch shape but is bound to the runner's globals, so it is
 mirrored, not called. The turnstile read (rev-2) follows the one reader of the runner's queue that
 already exists outside the runner, `unattended.sh:6684-6690`, which parses a ticket's pid the same
@@ -763,7 +999,31 @@ It returned the aMeteredSweep runner research, which measured spawn cost at 19-3
 against 78-251 ms on node a, the reason the spawn figure is sampled live rather than typed. It
 returned TOOL-aFrugalTurnstile-5's `--hold`, and the brief itself.
 
+Rev-4, for S14 and S15. `python tools/codebase-map/reuse_lookup.py "detect a Microsoft Store app
+execution alias python launcher and resolve it to its real interpreter"` ranked `resolve_python`
+(`tools/lib/resolve-python.sh`, SEAM, 70 installs) and `resolve_bash`, and no alias detector. The
+seam S14 extends is `resolve_python`'s `GOV_PYTHON` candidate (`tools/lib/resolve-python.sh:30`):
+setting it reaches every leg script that resolves its python, with no edit to any of them. For
+the alias itself no existing seam fits. A grep of `tools/` for `reparse`, `APPEXECLINK` and
+`WindowsApps` found no reader of a reparse TAG: `branch_reconcile.py:969` reads the reparse
+attribute to avoid descending a link. It found eight inline `/windowsapps/` substring skips in bash
+resolvers, such as `tools/govkit/govkit.py:1187` and `tools/roles/handoff.py:236`. Those skip a bash
+that runs on another file system, which is a different question, and no shared function exists to
+extend. S14 asks whether a file is an alias, which the tag answers exactly (§4
+candidates). S15 reuses the conversion the set-aside
+code already makes in its start-up scripts, which `TOOL-dRedressedBar-19`'s §10 found has no Python
+converter to reuse. The first build's code is the record
+`build/2026-10-15-build-TOOL-dRedressedBar-18-1-set-aside-work.md`, restored as §4 "Restoring the
+set-aside work" says. The precedent build `aSweptBar` carries no alias or job precedent. The recall
+probe returned TOOL-aDrainedSluice-6, the one resolver that runs its candidate because of the same
+Store stub, and TOOL-aBatchedTribunal-6p's launcher-idiom ban, which S14 does not touch because it
+writes no shell assignment.
+
 Recall terms used: `python tools/memory-recall/query.py "how is a gate leg profiled, its spawn cost
 measured, and a hung leg detected without a ceiling" --terms "profile_bar census scan_processes
 build_walk spawn floor measure_spawn_cost foreign census ceiling evidence stall hung canary turnstile
 hold job object"`
+
+Recall terms used at rev-4: `python tools/memory-recall/query.py "how is the Microsoft Store python3
+alias detected and resolved to a real interpreter" --terms "WindowsApps alias python3 stub 9009
+resolve_python GOV_PYTHON reparse APPEXECLINK sys.executable job breakaway"`
