@@ -249,6 +249,12 @@ After step 1's continuation (`gap-found-05` owned by dOrderedCharter, `gap-found
 dDeclaredLoop): the join exits 0 on 63 keys and 11 builds; the preset check exits 0 on 49 catalogue
 keys, 44 presettable, 44 preset rows.
 
+After the core consistency step (`gap-found-07` and `gap-found-08` owned by dOrderedCharter;
+`core.bypass` and `core.exceptions` added to the catalogue and every preset): the join exits 0 on 65
+keys and 11 builds; the preset check exits 0 on 51 catalogue keys, 46 presettable, 46 preset rows.
+The four chain-row amendments were applied by a script that refused unless each old row matched
+exactly once.
+
 ## Records index
 
 | Record | What it holds |

@@ -241,3 +241,142 @@ Code first. Answer: CLI-first (Recommended).
 - **Gaps the owner named, added to the register:** gap-found-05 (the charter does not teach an agent
   how to drive gov for its role), owned by dOrderedCharter; gap-found-06 (no tool names the next
   step, so the loop advances only by agents re-deriving it), owned by dDeclaredLoop.
+
+## [core] The principles cannot be built around
+
+### The owner's words
+
+> All the practices we're outlining here need an internal consistency mechanism - it should not be
+> possible to just build around them, if any part of the kit is being extended. These are
+> fundamental and must remain at the core of the entire product.
+
+### Current state, measured 2026-10-14
+
+- **Most practices name no enforcement.** Of the charter's 36 practices, 22 are cited by no code file
+  under `tools/`, `.githooks/` or `skills/` (instrument below): `[yagni]`, `[reuse]`, `[consistency]`,
+  `[one-fact]`, `[verify]`, `[left-shift]`, `[small]`, `[land]`, `[post-merge]`, `[migrations]`, `[ids]`,
+  `[memory]`, `[records]`, `[docs]`, `[risk]`, `[bytes]`, `[tokens]`, `[tools]`, `[roles]`, `[voice]`,
+  `[signal]`, `[formats]`. A citation is a proxy: `[roles]` and `[formats]` are enforced by the spawn
+  guard and the format guard without naming the tag. The defect is the missing declaration: nothing
+  states which check enforces which practice, so nothing notices a practice that nothing enforces.
+- **No leg declares the principle it serves.** `tools/gate-legs.json` has no `principle`, `practice` or
+  `enforces` key on any of its 140 legs.
+- **Factories exist for three kinds only**: adopting a kit (`tools/*/adopt-*.sh --scaffold`), opening a
+  build (`gen_build_index.py --new-build`) and writing a micro-spec (`--new-spec`). A new kit, command,
+  governing document, policy key, gate leg, role, workflow, hook or Skill is made by hand.
+- **Strong population checks already exist, per mechanism:** the codebase map's both-directions
+  claims, govkit's declared kit population, install-prefix and dead-path carriers, kit versions and
+  epochs, armed fail branches, executed-count floors, the README slot contract, method carriers,
+  spec tokens, hook destinations, the lexicon's naming predicates. They prove the pattern works; they
+  are organised by mechanism, not by principle, so a new principle has no place to declare its check.
+
+### Design response
+
+- **C1. A principle registry, the product's constitution.** Every architecture principle (P1 onward)
+  and every charter practice is registered: its tag, its one-line statement, the extension kinds it
+  binds, and the checks that enforce it. The charter's core block renders from it.
+- **C2. A meta-check: no principle without its enforcement.** Every registered principle names at least
+  one enforcing check (a gate leg, a hook or a factory invariant); every check names the principles it
+  enforces (legs gain an `enforces` key); a principle nothing enforces reds; a check naming an unknown
+  principle reds. Each check is seen red before it is trusted.
+- **C3. A closed set of extension kinds**: kit, command, governing document, policy key, preset, gate
+  leg, role, workflow, hook, Skill, practice, record kind, stage. Each lists the principles that bind
+  it; a part of a kind nobody registered reds, so a new kind cannot appear outside the mechanism.
+- **C4. One factory per kind.** A `new` verb per kind produces an instance that already conforms
+  (descriptor and drive table, stage claim, envelope, `next —` line, schema entry with a default and a
+  value in every preset, armed checks, map claim, lexicon-conforming names); the gates still check
+  hand-made instances, so the factory is the easy path and never the only guard.
+- **C5. Conformance gates per kind**, over each kind's whole population, both directions.
+- **C6. Principles are not policies.** A policy tunes behaviour inside the principles; no switch turns
+  a principle or its check off; a principle changes only through an owner-ratified amendment recorded
+  as a product change. Exceptions are a separate, owner-guarded register.
+- **C7. The core and the bypass.** Round 5 allows hook bypass by default because gates have caused
+  problems; a bypass that also skips the core checks would be the way to build around them, so the
+  core's relation to the bypass is the fork below.
+- **Placement.** The registry, the meta-check, the kinds register, the exception register and the core
+  checks' semantics belong to the foundation build, dOrderedCharter. Each later chain build registers
+  the checks for the principles it implements, and the meta-check refuses it a principle without one,
+  so no chain build can land around the core either.
+
+### Instrument
+
+```python
+"""For each practice tag in the charter's section 1, count the non-markdown files under tools/,
+.githooks/ and skills/ that cite the tag, a proxy for "some code names this practice as what it
+enforces". Reads the tree through git; writes nothing."""
+import re
+import subprocess
+import sys
+
+root = sys.argv[1]
+charter = open(f"{root}/AGENTS.md", encoding="utf-8").read()
+body = charter.split("## 1. Governing practices", 1)[1].split("### Micro-formats", 1)[0]
+tags = re.findall(r"^- \[([a-z-]+)\]", body, flags=re.M)
+files = subprocess.run(["git", "-C", root, "ls-files", "tools", ".githooks", "skills"],
+                       capture_output=True, text=True, encoding="utf-8").stdout.split()
+code = [f for f in files if not f.endswith(".md")]
+texts = {}
+for f in code:
+    try:
+        texts[f] = open(f"{root}/{f}", encoding="utf-8", errors="replace").read()
+    except OSError:
+        pass
+cited = {t: sum(1 for txt in texts.values() if f"[{t}]" in txt) for t in tags}
+none = [t for t, n in cited.items() if n == 0]
+print(f"practices {len(tags)} · code files scanned {len(texts)}")
+print(" ".join(f"{t}={n}" for t, n in cited.items()))
+print(f"cited by no code file: {len(none)} — {' '.join(none)}")
+```
+
+### Forks asked, 2026-10-14
+
+**K1. "You allowed hook bypass because gates cause problems. How should the core conformance checks
+relate to that bypass?"** Offered: Core never bypassed (Recommended); Bypass all, block after; Bypass
+all, report after. Answer, in the owner's words: "Bypass all by default, but owner-adjustable".
+
+**K2. "Can a principle itself be switched off by policy?"** Offered: Fixed; policies tune
+(Recommended); Switchable under the guard. Answer: Fixed; policies tune (Recommended).
+
+**K3. "Should every extension kind get a factory?"** Offered: A factory per kind (Recommended); Gates
+only. Answer: A factory per kind (Recommended).
+
+**K4. "How may an exception to a principle be granted?"** Offered: Owner-only, expiring, shrink-only
+(Recommended); No exceptions; Recorded, any session. Answer, in the owner's words: "Recorded, any
+session by default, owner-adjustable".
+
+### Settled design for the core
+
+- **Principles are fixed.** No policy turns a principle or its conformance check off; a principle
+  changes only through an owner-ratified amendment recorded as a product change (K2).
+- **`core.bypass`**, a policy: `with-hooks-report` by default, with `with-hooks-block` and `never` as
+  allowed values (K1). A permitted bypass skips the core checks along with every other leg, and the
+  floor records it.
+- **INTERPRETATION TO CONFIRM.** K1's answer does not say what happens to a core red found after a
+  bypass. The default above reads it as report-after, because the owner's other answers keep one
+  agent's red from blocking another's unrelated work (walk T1). The core is kept from being built
+  around a different way: the core red is filed as a BLOCKER ask against the build whose commit
+  introduced it, and THAT build cannot reach its exit until the red is fixed or excepted. The
+  violation stops the violator, not the fleet. `with-hooks-block` (every later push blocks) and
+  `never` (core checks always run) are the switches if that reading is wrong.
+- **`core.exceptions`**, a policy: `any-session-recorded` by default, with `owner-only-expiring` and
+  `none` as allowed values (K4). Every exception carries its principle, the part it excuses and a
+  reason; the Loop Review audits the register on each pass.
+- **A factory per extension kind** (K3), each landing with the build that defines that kind's
+  conformance gate: governing document, practice and Skill in dOrderedCharter; command, policy key,
+  preset, stage, hook, role and workflow in dDeclaredLoop; gate leg in dWitnessedBar; kit in
+  dShippedRelease; record kind in dConvergedCharter. Until a kind's factory lands, the kind sits on a
+  shrink-only pending list owned by that build, and its gate checks hand-made instances throughout.
+- **dOrderedCharter owns the mechanism**: the principle registry, the meta-check, the kinds register
+  with each kind's owning build, the conformance-gate contract, the exception register and the
+  `core.*` policies.
+- **Gaps the owner named, added to the register:** gap-found-07 (no principle declares its
+  enforcement) and gap-found-08 (extensions are hand-made, factories exist for 3 of 13 kinds), both
+  owned by dOrderedCharter.
+
+Output at `5a670d5c`:
+
+```text
+practices 36 · code files scanned 324
+yagni=0 reuse=0 consistency=0 core=2 contract=3 derive=3 one-fact=0 spec=6 verify=0 gate=17 class=1 left-shift=0 bar=2 cost=6 small=0 isolate=3 land=0 post-merge=0 reconcile=2 migrations=0 ids=0 memory=0 records=0 docs=0 security=2 risk=0 bound=1 bytes=0 cross-os=1 tokens=0 tools=0 roles=0 voice=0 signal=0 formats=0 default=1
+cited by no code file: 22 — yagni reuse consistency one-fact verify left-shift small land post-merge migrations ids memory records docs risk bytes tokens tools roles voice signal formats
+```

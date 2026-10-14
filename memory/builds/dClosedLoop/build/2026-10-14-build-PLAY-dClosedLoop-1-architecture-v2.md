@@ -21,6 +21,13 @@ Revised: 2026-10-14, after step 1's continuation: P15 is added; the charter gain
 and the 32 KiB bound; dOrderedCharter renders the drive section from kit descriptors and dDeclaredLoop
 builds the `next` verb and the `next —` line check.
 
+Revised: 2026-10-14, after the core consistency step (foundations `[core]`): P16 is added;
+`core.bypass` and `core.exceptions` join the catalogue and the presets; dOrderedCharter owns the
+principle registry, the meta-check, the kinds register and the exception register; each extension
+kind's factory and gate lands with its owning build; dScopedBuild's exit refuses while a core red the
+build's own commits introduced stands. `core.bypass`'s default rests on an interpretation of the
+owner's K1 answer that awaits confirmation.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -63,6 +70,12 @@ builds the `next` verb and the `next —` line check.
   descriptors; from there every gov command ends with a `next —` line, and a `next` verb answers
   "what now" for any role. Every step is a CLI command, so any harness can drive gov (foundations
   step 1 continued).
+- **P16 The core cannot be built around.** Every principle and practice is registered with the checks
+  that enforce it, and a meta-check refuses a principle nothing enforces; extension kinds form a
+  closed set, each with a factory that produces conforming parts and a gate over its whole
+  population. Principles are fixed: policies tune behaviour inside them, and a principle changes
+  only by an owner-ratified amendment. A violation the bypass let through stops the build that made
+  it from closing (foundations core).
 
 ## [front-door] The charter as the loop's first step
 
@@ -94,6 +107,8 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 | `preset` | velocity, standard, strict, autonomous, or a repo-declared preset | standard | owner directive after the walk-through |
 | `charter.override` | explicit-override, live-owner-wins, absolute | explicit-override | foundations F1-1 |
 | `charter.practices` | a set of catalogue or repo-declared practices | the governance foundation set | foundations F1-3 |
+| `core.bypass` | with-hooks-report, with-hooks-block, never | with-hooks-report | foundations K1 |
+| `core.exceptions` | any-session-recorded, owner-only-expiring, none | any-session-recorded | foundations K4 |
 | `autonomy` | plan-only, three-gates, every-stage | three-gates | R1.4 |
 | `policy.guard` | owner-only, agents-with-reason, agents-within-mandate | owner-only | R4.2 |
 | `policy.proof` | tty-cli, signed, both | tty-cli | walk S3 |
@@ -181,6 +196,8 @@ repository on either overrides `verdict` to `local-hook`.
 |---|---|---|---|---|
 | `autonomy` | plan-only | three-gates | every-stage | plan-only |
 | `charter.override` | live-owner-wins | explicit-override | absolute | explicit-override |
+| `core.bypass` | with-hooks-report | with-hooks-report | never | never |
+| `core.exceptions` | any-session-recorded | any-session-recorded | owner-only-expiring | owner-only-expiring |
 | `hooks.bypass` | allowed | allowed | refused | refused |
 | `transitions.record` | trailer | trailer, log, micro-format | trailer, log, micro-format | trailer, log, micro-format |
 | `leases` | warn | warn | refuse | refuse |
@@ -253,17 +270,17 @@ where `verdict = peer-node`.
 
 | Build | Stage | Parents | Planned units | Gaps owned |
 |---|---|---|---|---|
-| dOrderedCharter | Foundation | dClosedLoop | the practice catalogue with each practice's reach per stage, and `charter.practices`; the charter re-founded in its rank-1 envelope (front door, precedence and override rule with `charter.override` and its record, instruction map, active practices with reach, hand-off to the loop, the repository's project block from its own overlay); the instruction registry and the ladder; envelopes rendered for every registered document and the gate over them; the instruction map re-injected on compact and resume; ranked envelopes in every subagent handoff; the section-tag grammar and its resolver; the drive section composed from a drive table in each adopted kit's descriptor, checked both ways, each subagent's role line repeated in its handoff, the charter held inside 32 KiB | gap-found-01, gap-found-02, gap-found-03, gap-found-04, gap-found-05 |
-| dDeclaredLoop | Spine | dOrderedCharter | the loop kit and definition keyed by the stage tags, roles re-pointed after aOrientedCast closes; `.governance/policy.toml`, schema, one reader, JSON mirror; the named presets and their completeness check; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; policy at govkit intake; the `next` verb over the loop's state, the `next —` micro-format, and the check that every declared command ends with one or declares itself terminal, laggards on a shrink-only list owned by their stage's build | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01, gap-found-06 |
+| dOrderedCharter | Foundation | dClosedLoop | the practice catalogue with each practice's reach per stage, and `charter.practices`; the charter re-founded in its rank-1 envelope (front door, precedence and override rule with `charter.override` and its record, instruction map, active practices with reach, hand-off to the loop, the repository's project block from its own overlay); the instruction registry and the ladder; envelopes rendered for every registered document and the gate over them; the instruction map re-injected on compact and resume; ranked envelopes in every subagent handoff; the section-tag grammar and its resolver; the drive section composed from a drive table in each adopted kit's descriptor, checked both ways, each subagent's role line repeated in its handoff, the charter held inside 32 KiB; the core: the principle registry, the meta-check, the kinds register with each kind's owning build, the conformance-gate contract, the exception register and the `core.*` policies, and the factories and gates for governing documents, practices and Skills | gap-found-01, gap-found-02, gap-found-03, gap-found-04, gap-found-05, gap-found-07, gap-found-08 |
+| dDeclaredLoop | Spine | dOrderedCharter | the loop kit and definition keyed by the stage tags, roles re-pointed after aOrientedCast closes; `.governance/policy.toml`, schema, one reader, JSON mirror; the named presets and their completeness check; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; policy at govkit intake; the `next` verb over the loop's state, the `next —` micro-format, and the check that every declared command ends with one or declares itself terminal, laggards on a shrink-only list owned by their stage's build; the factories and conformance gates for commands, policy keys, presets, stages, hooks, roles and workflows | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01, gap-found-06 |
 | dLeasedFleet | Concurrency | dDeclaredLoop | the lease grammar with run claims migrated; acquisition and release in both modes; overlap warn or refuse and takeover; fleet identity and remote uniqueness; offline behaviour | gap-conc-01, gap-conc-02 |
-| dWitnessedBar | Test | dDeclaredLoop | gate health measured and the reliability bar; bypasses recorded; attribution deciding what blocks; the hook-written verdict; held legs by policy; the peer-node verifier; seen-red records; flake quarantine; the product-test contract with runner adapters; derived pre-commit list and multi-node cost evidence | gap-test-01, gap-test-02, gap-test-03, gap-test-04, gap-test-05, gap-test-06, gap-test-07, gap-test-08, gap-test-09 |
+| dWitnessedBar | Test | dDeclaredLoop | gate health measured and the reliability bar; bypasses recorded; attribution deciding what blocks; the hook-written verdict; held legs by policy; the peer-node verifier; seen-red records; flake quarantine; the product-test contract with runner adapters; derived pre-commit list and multi-node cost evidence; the gate-leg factory and its conformance gate, every leg declaring the principles it enforces | gap-test-01, gap-test-02, gap-test-03, gap-test-04, gap-test-05, gap-test-06, gap-test-07, gap-test-08, gap-test-09 |
 | dRankedPlan | Plan | dDeclaredLoop, dLeasedFleet | priority beside `parents:` and the generated plan view; the planner and triager role and Plan workflow; the placement predicate; rule-based triage; dormancy disposal; the live-build mapping carried out; Plan Review; kickoff offering the next item and attended briefs gated | gap-plan-01, gap-plan-02, gap-plan-03, gap-plan-04, gap-plan-05, gap-plan-06, gap-plan-07 |
 | dIndexedDesign | Design | dDeclaredLoop | the derived-READY hand-off; the design index; design review by policy; reuse and alternatives backed by recorded probes; the research harness; agreement and tier checks; the spec measured, recommendations emitted, and the spec redesigned as a structured, tagged contract | gap-design-02, gap-design-03, gap-design-04, gap-design-05, gap-design-06, gap-design-07, gap-design-09 |
-| dScopedBuild | Build | dIndexedDesign, dLeasedFleet, dWitnessedBar | one exit contract with a history-derived base; scope at the push; the closing review recorded; worktrees by policy; a write gate reading derived state; the checklist witnessed | gap-spine-03, gap-conc-03, gap-build-01, gap-build-02, gap-build-03, gap-build-04 |
-| dShippedRelease | Deploy | dWitnessedBar | the landing record; kit release notes; the deploy engine; the incms adapter; the fleet register and currency watch; lander hardening; optional emitted CI; a derived runbook | gap-deploy-01, gap-deploy-02, gap-deploy-03, gap-deploy-04, gap-deploy-05, gap-deploy-06, gap-deploy-07, gap-deploy-08 |
+| dScopedBuild | Build | dIndexedDesign, dLeasedFleet, dWitnessedBar | one exit contract with a history-derived base, refusing a build's exit while a core red its own commits introduced stands; scope at the push; the closing review recorded; worktrees by policy; a write gate reading derived state; the checklist witnessed | gap-spine-03, gap-conc-03, gap-build-01, gap-build-02, gap-build-03, gap-build-04 |
+| dShippedRelease | Deploy | dWitnessedBar | the landing record; kit release notes; the deploy engine; the incms adapter; the fleet register and currency watch; lander hardening; optional emitted CI; a derived runbook; the kit factory and its conformance gate | gap-deploy-01, gap-deploy-02, gap-deploy-03, gap-deploy-04, gap-deploy-05, gap-deploy-06, gap-deploy-07, gap-deploy-08 |
 | dTendedCadence | Maintain | dWitnessedBar, dRankedPlan | the maintenance recipe; three hosts and the cadence; the safe-fix set; detectors with owners; map freshness; the maintenance record | gap-maint-01, gap-maint-02, gap-maint-05, gap-maint-06, gap-maint-07, gap-maint-08 |
 | dCalibratedLens | Review | dTendedCadence | review by policy per stage and effort; the stage-exit recommendation; lenses for Plan, Test, Deploy and Maintain; the shared value ledger; the weekly Loop Review; caps re-derived from evidence and review cost | gap-review-01, gap-review-02, gap-review-03, gap-maint-03, gap-design-08 |
-| dConvergedCharter | Convergence | dScopedBuild, dShippedRelease, dCalibratedLens | protocol text derived to facts only, each document in its envelope; every remaining positional reference migrated to tags; records merged by evidence; superseded parts retired through ratified proposals; adopters migrated onto the ranked charter and the loop | gap-spine-04, gap-spine-05, gap-maint-04 |
+| dConvergedCharter | Convergence | dScopedBuild, dShippedRelease, dCalibratedLens | protocol text derived to facts only, each document in its envelope; every remaining positional reference migrated to tags; records merged by evidence; superseded parts retired through ratified proposals; adopters migrated onto the ranked charter and the loop; the record-kind factory and its conformance gate | gap-spine-04, gap-spine-05, gap-maint-04 |
 
 The live-build mapping is v1's table, unchanged; the Plan build carries it out with the owner's
 ratification and confirms dPolishedVitrine's track, which went dormant on 2026-10-14.
