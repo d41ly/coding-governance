@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-14 — a first apply at a per-kit prefix configures against the homes it just wrote: the receipt is written ahead of CONFIGURE
 
-**Status:** CLOSED · rev-6 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 10
+**Status:** CLOSED · rev-7 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -15,6 +15,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-14-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-brief.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-2-revision.md) | research | TOOL-dRedressedBar-15 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md) | research | TOOL-dRedressedBar-17 TOOL-dRedressedBar-9 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-15 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-19 TOOL-dRedressedBar-12 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 |
 | [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-15 |
 
 <!-- /gen:spec-records -->
@@ -193,6 +194,7 @@ changes no in-process reader. `foreign_kit_present`, `derive_unsatisfied_require
 | The same, after `git add --renormalize` and before RECEIPT, the stretch that holds LEGS and AFTER | the same early receipt. The renormalize rewrote the index blobs of LF-pinned paths, and the re-stamp (`:7926-7936`) set the new `oid`s in memory only | As this unit built it, `apply` does not: carve-out 3 keeps a staged path only when its index oid equals the recorded one (`:6918-6922`), so a renormalized path reads DIRTY and the re-run refuses (units-12-15 report id 22). `TOOL-dRedressedBar-17` (its S22) writes the receipt once more right after the re-stamp, with `files` re-derived as `rows + _carried_rows`, through `write_atomic`. After it, a re-run of `apply` recovers from an interrupt anywhere except between `git add --renormalize` and that write, a stretch in which no adopter, leg or runner runs |
 | The same, at the base | a first apply leaves no receipt, and a re-apply leaves the prior one | a first apply's re-run is refused as foreign (`:7257-7263`); AC4's red half observes it |
 | An exception raised during a receipt write: the early write, RECEIPT's, or the write after the re-stamp | As this unit built it, both writes are a plain `receipt_path.write_text` (`tools/govkit/govkit.py:7853`, `:8249` at `7da62c241`), so a fault mid-write leaves `install.json` truncated (units-12-15 report id 23) | Until `TOOL-dRedressedBar-17` lands, no: the next `apply` fails parsing the file at `json.loads`, outside any refusal. Its S23 routes every receipt write through `write_atomic`, a sibling file and `os.replace`, so the previous file stays whole and the row above that matches it applies |
+| An exception or interrupt between a receipt write and its `.governance/install.sums` sidecar write: RECEIPT's, `update`'s three or `adopt`'s one | As unit 17 left it, the sidecar is a plain `write_text` after the atomic receipt write (`tools/govkit/govkit.py:8338-8339` at `997fc294f`), so a fault there leaves a truncated sidecar, and an interrupt between the two leaves the new receipt beside the old sidecar (units-16-18 report id 40) | `TOOL-dRedressedBar-19` (its S40) writes the sidecar first, through `write_atomic`, and the receipt last. An interrupt between them then leaves a new sidecar beside the old receipt, each file whole. `check` reports the two apart until the next `apply` or `update` rewrites both, and a re-run of `apply` recovers as the rows above state |
 
 `cmd_apply`'s `finally` releases the write lock on every one of these paths (`:7220-7231`).
 
@@ -462,6 +464,15 @@ no refusal branch. The main loop observes the new arm red, then green, at the cl
   observes it. Id 23: the table gains the row for a fault during a receipt write, which
   TOOL-dRedressedBar-17's AC23 observes once every receipt write goes through `write_atomic`. §4
   keeps the base lines its evidence reads; the tip's lines are named here.
+- rev-7 · 2026-10-15 · §4 · a records fix for TOOL-dRedressedBar-19, closing the units-16-18 spec
+  audit's report id 40 (item M16), written by that unit's spec-writer pass `<w19>`. The status stays
+  CLOSED, and no criterion text moves. "When CONFIGURE fails" gains the row for a fault between a
+  receipt write and its `install.sums` sidecar write. Unit 17 routed every receipt write through
+  `write_atomic` and left the five sidecar writes plain, each after its receipt write: at
+  `997fc294f` they sit at `tools/govkit/govkit.py:8339`, `:12341`, `:12379`, `:12386` and `:13016`.
+  The row states the order TOOL-dRedressedBar-19's S40 sets, sidecar first and receipt last, and
+  that `check` reports the two apart until the next apply rewrites both. TOOL-dRedressedBar-19's
+  AC40 observes it with a fault staged on the sidecar write.
 
 ## 10. Reuse audit
 

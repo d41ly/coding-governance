@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-15 — agent-cap's adopter runs settings-merge's own adopter at settings-merge's home, declared as `[adopt] via`, and selfcheck refuses any argv naming another entry's file
 
-**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 11
+**Status:** CLOSED · rev-6 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -12,6 +12,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-3-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-brief.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md) | research | TOOL-dRedressedBar-17 TOOL-dRedressedBar-9 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-19 TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 |
 | [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 |
 
 <!-- /gen:spec-records -->
@@ -245,7 +246,11 @@ entry's own `target_context`. Four kinds qualify:
 - `[[regenerate]]`, which `update`'s re-render resolves per entry (`:10932`).
 
 Owners are `{dest: kits}` over `_bare_rows` rows whose `missing` is empty. An element is OFFERED
-when its declared text carries `/`. It is GRADED when its resolved text carries no `{` and no space.
+when `scan_entry_argv` yields it for one of the four kinds, over the entries the `via` rules left
+valid, whatever its text. It is GRADED when its resolved text carries `/` and its `missing` is
+empty. These are the tests `TOOL-dRedressedBar-17`'s S10 set, restated by `TOOL-dRedressedBar-19`
+(units-16-18 report id 2). Unit 15 built OFFERED on a declared text carrying `/`, and GRADED on a
+resolved text carrying no `{` and no space.
 It is a HIT when some entry ships the resolved path and the source entry does not. One `r.fail`
 site per hit:
 
@@ -257,21 +262,22 @@ entry '<eid>': its <kind> argv names '<path>', a file entry '<owner>' ships and 
 owners with `, `. The note, printed always:
 
 ```
-cross-entry argv: <o> slash-bearing element(s) offered by [adopt], [check], [[gate_leg]] and [[regenerate]] across <m> entries, <g> graded, <h> naming a file only another entry ships
+cross-entry argv: <o> argv element(s) offered by [adopt], [check], [[gate_leg]] and [[regenerate]] across <m> entries, <g> graded, <h> naming a file only another entry ships
 ```
 
 The third `r.fail` site is the liveness red. It fires when `<o>` is above zero and `<g>` is zero,
-reading `cross-entry argv: <o> element(s) offered and none graded — every one carried an
-unresolved token or a space, so the predicate read nothing`. With nothing offered it stays silent,
+reading ``cross-entry argv: <o> element(s) offered and none graded — every one carried an
+unresolved token or resolved with no `/`, so the predicate read nothing``, as unit 17 built it
+(`tools/govkit/govkit.py:3351-3354` at `997fc294f`). With nothing offered it stays silent,
 as arm 7j4 stands its zero-population reds down.
 
 This join is a second walk over descriptor argv beside `silenced_legs`
 (`tools/govkit/govkit.py:4038` at `7da62c241`), and the two disagree on which element is a path:
-`silenced_legs` grades on the resolved text, the OFFERED test above on the declared text (report
+`silenced_legs` grades on the resolved text, unit 15's OFFERED test on the declared text (report
 id 10). `TOOL-dRedressedBar-17` folds both walks into one generator, `scan_entry_argv`, so S5
 extends `silenced_legs` through it. One rule then grades an element in both checks, its resolved
 text carrying `/` with nothing missing, and the `gate legs:` note and this note count one
-population and its part. The OFFERED and GRADED tests above are what unit 15 built.
+population and its part. The OFFERED and GRADED tests stated above are that generator's.
 
 **Measured over the real registry first.** A scratch probe ran the join through `read_descriptors`,
 `planned_writes` and `target_context` at a bare target, at `95350ba5`. It graded 29 of 29 entries
@@ -286,7 +292,8 @@ count falls to 0. AC6 derives both at observation.
 
 - An element with no `/`, such as a repo-root file. This is the same gap `silenced_legs` pins
   (`:3919-3924`).
-- A space-bearing element or one with an unresolved token. Each is offered and counted, not graded.
+- An element with an unresolved token, or one whose resolved text carries no `/`. Each is offered
+  and counted, not graded.
 - `[[hole]]` discharge commands. Most are `bash -c` or `python -c` strings, which carry a space.
 - `[[outcome]]` probe paths. settings-merge's code-2 block names `{prefix}/hooks/agent-cap.js` by
   design (spec 9 §4), and units 10 and 11 bound that probe through the receipt.
@@ -625,6 +632,17 @@ none
   sentence names the key's presence, which the build already reads (its AC24). §4's paragraph
   under the rule table names the `requires` and own-argv rules by content, since the new first row
   moved their ordinals.
+- rev-6 · 2026-10-15 · §4 · a records fix for TOOL-dRedressedBar-19, closing the units-16-18 spec
+  audit's report id 2 (item L1), written by that unit's spec-writer pass `<w19>`. The status stays
+  CLOSED, and no criterion text moves. §4 "The ownership join" states the OFFERED and GRADED tests
+  TOOL-dRedressedBar-17's S10 set: every element `scan_entry_argv` yields is offered, and one whose
+  resolved text carries `/` with nothing missing is graded. Unit 15's declared-text and
+  no-space tests are named as what it built. The note template reads `argv element(s) offered`,
+  since the old label named a population the note no longer counts. Two sentences that followed
+  from the old tests move with them: the liveness red's text, as unit 17 built it
+  (`tools/govkit/govkit.py:3351-3354` at `997fc294f`), and the "What it does not check" bullet on
+  space-bearing elements, which the new GRADED test grades. At `997fc294f` the engine's note still
+  carries the old label (`:3348`), which TOOL-dRedressedBar-19's S2 corrects and its AC2 observes.
 
 ## 10. Reuse audit
 

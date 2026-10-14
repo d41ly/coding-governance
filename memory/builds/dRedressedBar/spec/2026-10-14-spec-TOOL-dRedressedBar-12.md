@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-12 — an apply narrower than its receipt keeps every other installed kit's claim and rows, so a refused settings-merge exit stays refused on the next run
 
-**Status:** CLOSED · rev-7 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
+**Status:** CLOSED · rev-8 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -14,6 +14,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-5-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md) | research | TOOL-dRedressedBar-16 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md) | research | TOOL-dRedressedBar-17 TOOL-dRedressedBar-9 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-19 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 |
 | [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 |
 
 <!-- /gen:spec-records -->
@@ -51,6 +52,9 @@ the `pins` union at `:7402-7407` already does for line-ending pins.
   them whole for a kit its selection did not name (`TOOL-dRedressedBar-12`) and still passes no
   carry set, because a leg row such a kit loses from `emitted` is re-claimed by the same-argv rule
   (`:4143-4152`) on that kit's next run. Observed by AC4.
+  Inline note (`TOOL-dRedressedBar-19`, units-16-18 report id 31): this rationale, the same-argv
+  re-claim, is superseded by TOOL-dRedressedBar-16. An argv gov has changed is never claimable, so
+  `apply` now passes the carry, and the paragraph keeps this unit's id beside unit 16's.
 - **S3** — Two arms in `tools/govkit/selftest.py`. A new `[dRB-12]` block follows unit 11's
   `[dRB-11]` block, in the scope that defines `stale_target`. It applies a three-kit selection,
   applies a narrower one over it, and re-applies a kit the narrower one did not name. Unit 11's
@@ -364,6 +368,14 @@ none
   and 2: the step line's counts against the receipt's own `files` and `kits`, the sidecar's
   `(sha256, path)` pairs against every receipt row carrying `sha256`, the carried rows included, and
   `govkit check` printing no sidecar mismatch.
+- rev-8 · 2026-10-15 · S2 · a records fix for TOOL-dRedressedBar-19, closing the units-16-18 spec
+  audit's report id 31 (item L6), written by that unit's spec-writer pass `<w19>`. The status stays
+  CLOSED. S2 gains an inline note that its rationale, the same-argv re-claim, is superseded by
+  TOOL-dRedressedBar-16, whose rev-6 correction of §3 and row C5 had left S2's half standing. S2's
+  claim and AC4 do not move: unit 12 built against them as written, and at `997fc294f` the
+  docstring of `write_gate_legs` still carries this unit's id beside unit 16's
+  (`tools/govkit/govkit.py:4248-4253`). TOOL-dRedressedBar-19's AC31 observes the note, and its AC8
+  observes both ids in the docstring.
 
 ## 10. Reuse audit
 

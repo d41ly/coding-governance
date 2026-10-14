@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-18 — a gate profiler: every leg run clean and unbounded, serially or under a load cap, each profiled to its processes, stalls reported and never killed
 
-**Status:** CLOSED · rev-4 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 13 · ratified 2026-10-15
+**Status:** CLOSED · rev-5 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 13 · ratified 2026-10-15
 
 <!-- gen:spec-records -->
 
@@ -13,6 +13,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-18-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-brief.md) | research | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-18-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-18-4-revision.md) | research | TOOL-dRedressedBar-19 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-18-5-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-18-5-spec-writer.md) | journal | — |
+| [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-19 TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
 | [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
 
 <!-- /gen:spec-records -->
@@ -37,6 +38,9 @@ record names each such substitution (F3).
   reap. It erases no record. The one file it deletes is each leg's raw capture, once its redacted
   copy is written (S11). An empty manifest, a row with no name
   or no argv list, and a duplicate name each refuse the run with exit 2. Observed by AC1 and AC10.
+  `TOOL-dRedressedBar-19` makes this reader `read_profile_legs`, which wraps
+  `held_halves.load_manifest`, and adds the malformed-input classes this list misses, each naming
+  its row (its S19 and S37, units-16-18 report ids 19 and 37).
   - **Readers:** S1 deletes one named thing, each leg's raw capture `raw/<i>.out` in the scratch
     dir, which this unit also creates. S11 carries the full inventory. It was read at `679afc31`
     with `git grep -n -F 'raw/<i>.out'` and
@@ -58,7 +62,9 @@ record names each such substitution (F3).
   App Execution Alias this holds only through S14. Observed by AC1 and AC2.
 - **S4** — Per-process rows come from `scan_processes` walked with `build_walk` from the leg's root.
   The census row gains two optional fields, `peak_mem_b` and `mem_b`, read by the CIM query it already
-  runs. Observed by AC1 and AC3.
+  runs. Observed by AC1 and AC3. The old row shape's readers, the pair declared once as
+  `OPTIONAL_FIELDS`, and the rule for a legacy line of four to six fields are
+  `TOOL-dRedressedBar-19`'s S10 (units-16-18 report ids 10 and 33).
 - **S5** — The cost of one spawn is sampled each census tick by the runner's own `measure_spawn_cost`,
   run from its source text. Observed by AC2.
 - **S6** — A host-load timeline is sampled every second, and a foreign-load census is taken by the
@@ -81,15 +87,19 @@ record names each such substitution (F3).
 - **S11** — Each leg's log is kept as its redacted copy only, redacted as the runner redacts its
   durable copies (F2, resolved b). The raw capture is deleted once that copy is written. A capture a
   process still holds is retried at run end, and otherwise kept and named in `raw_kept` with its
-  reason. Observed by AC10 and AC11.
+  reason. Observed by AC10 and AC11. The redaction's byte contract and its parity arm against the
+  runner's `redact`, and the next run's sweep of the raw captures a crashed or killed run leaves,
+  are `TOOL-dRedressedBar-19`'s S39, S20 and S38 (units-16-18 report ids 39, 20 and 38).
   - **Readers:** S11 deletes each leg's raw capture, `raw/<i>.out`, once `<i>.log` is written. The
     inventory was read at `679afc31` with `git grep -n -F 'raw/<i>.out'` and
     `git grep -n -l -e 'measure_legs' -e 'gate-profile/' -e 'raw_kept'` over the tracked tree. The
     first finds only this spec, at §4 "The environment a leg gets" and F2, and a spec is a record.
     The second also finds four other specs, which are records, and `tools/drift-audit/drift_report.py`
     with its map entry, whose `measure_legs_retried_after_timeout` contains the words and reads
-    nothing of this tool. The runner's own raw capture, `$WORK/$i$sfx.out` (`run-gates.sh:3916`), is a
-    different file, and this unit leaves it alone.
+    nothing of this tool. The runner's own raw capture, `$WORK/$i$sfx.raw` (`run-gates.sh:3877` at
+    the base, `:3876` and `:3880` at `997fc294f`), is a different file, and this unit leaves it
+    alone. Its processed copy, `$WORK/$i$sfx.out`, is not the raw capture (`TOOL-dRedressedBar-19`,
+    units-16-18 report id 15).
     by name: READER NOT IN TREE, because the capture lives under the scratch dir's TMPDIR,
     outside the tree, and the only code that will spell its name is this unit's unbuilt
     profiler, which creates it, redacts it and deletes it.
@@ -103,7 +113,12 @@ record names each such substitution (F3).
 - **S13** — The `measure-legs selftest` leg runs `--selftest` over committed fixtures under
   `tools/run-gates/fixtures/measure-legs/`. It comes with its descriptor row, its manifest, budget
   and Windows-only rows, both kits' version bumps, the kit README section, a `help/` page and the map
-  claim. Observed by AC13 and AC14.
+  claim. Observed by AC13 and AC14. Neither reads the kit README section or the map claim, which
+  `TOOL-dRedressedBar-19`'s AC7 observes (units-16-18 report ids 7 and 24). That unit also corrects
+  the declarations this list gives: the descriptor row gives way to an `[[exempt_leg]]` in the govkit
+  registry, with the fixtures withheld as `project-owned` (its S29), the guard gains three files
+  (S21), and the subject-pin row and the `WHOLE_RUN` row the leg owes, which this unit left out,
+  land there (S22, S25; report ids 21, 22, 25 and 29).
 - **S14** — Before the first leg, `resolve_launcher_aliases` probes PYBIN and each distinct first
   word of the legs' argvs after the PYBIN mapping. A launcher whose file is an App Execution Alias
   runs, in every leg, as the interpreter that alias starts, and the legs' `GOV_PYTHON` names that
@@ -119,8 +134,10 @@ record names each such substitution (F3).
 
 ## 3. Non-goals (OUT)
 
-- No change to the merge bar's behaviour, ceilings or legs. `run-gates.sh` moves by its version line
-  only. `derive-ceilings.py` is not edited (§4 "The record").
+- No change to any existing leg's argv, guard or ceiling, and no runner behaviour beyond the version
+  line: `run-gates.sh` moves by its version line and its history comment only. The one new leg is
+  S13's (`TOOL-dRedressedBar-19`, units-16-18 report id 6). `derive-ceilings.py` is not edited
+  (§4 "The record").
 - No run of the `tools/unattended/` suites that are not legs (owner rule, 2026-08-23).
 - No Event Tracing for Windows and no elevation (§4 "Alternatives rejected").
 - No POSIX backend (§4 "Platform").
@@ -168,7 +185,7 @@ record names each such substitution (F3).
 
 | Measure | Candidate | Loses when | Result |
 |---|---|---|---|
-| per-leg totals | Job Object per leg | a descendant leaves the job | CHOSEN; AC1 is the refutation. An alias's children do leave it (measured below), so S14 resolves the alias first |
+| per-leg totals | Job Object per leg | a descendant leaves the job | CHOSEN; AC1 is the refutation for the native-spawn path, and `TOOL-dRedressedBar-19`'s AC32 for the MSYS fork path, which AC1's python children never take (units-16-18 report id 32). An alias's children do leave it (measured below), so S14 resolves the alias first |
 | alias launcher | refuse at preflight, remedy `GOV_PYTHON` (F3 a) | the operator must act before any profile runs | REJECTED by the owner, F3 |
 | alias launcher | run the interpreter the alias starts (F3 b) | that interpreter's child leaves a test job too | CHOSEN; the run then refuses (S14) |
 | alias launcher | census tree against job membership, totals `unknown` (F3 c) | every reading on node d reads `unknown` | REJECTED by the owner, F3 |
@@ -241,11 +258,17 @@ only on Windows.
    resolves `bash`, `node` and PYBIN through MSYS `PATH`, as the runner's worker does
    (`run_leg_at`, `run-gates.sh:4592-4613`, ends in the same `exec`). Its cwd is the top level
    (`run-gates.sh:103`), its stdin is `DEVNULL`, and stdout and stderr go to one file, the raw
-   capture, as at `run-gates.sh:3877`.
+   capture, as at `run-gates.sh:3877`. Every bash the tool starts is this one `<bash>`, resolved
+   once at start: the wrapper, `mktemp`, the runner functions of step 1 and of "Sampling", and the
+   selftest's runner calls. An empty result refuses with exit 2, naming every candidate tried, and
+   an arm holds the rule (`TOOL-dRedressedBar-19`'s S34, units-16-18 report id 34).
 3. The root is created with `CREATE_SUSPENDED`. It is assigned to a fresh job through `OpenProcess`
    with `PROCESS_SET_QUOTA | PROCESS_TERMINATE`, which the assign requires and nothing else uses. Its
    one thread is then resumed through `CreateToolhelp32Snapshot` and `ResumeThread`. So no descendant
-   exists before the job does. The start stamp is taken at the resume.
+   exists before the job does. The start stamp is taken at the resume. This step states no outcome
+   for a failure of any of those calls, and a suspended root never exits.
+   `TOOL-dRedressedBar-19`'s S35 terminates that root, which has executed nothing, records the leg
+   as `fail` with its `launch_error`, and lets the run continue (units-16-18 report id 35).
 4. The end is the root's `ExitTime` from `GetProcessTimes` on a handle held since launch. Wall time
    is therefore kernel-clocked, and the loop's poll latency does not enter it. Descendants still alive
    are counted as `left_running` and left alone. In `--serial`, the next leg starts at the root's
@@ -324,6 +347,9 @@ capture is its `raw/<i>.out`, beside it, as the runner's raw sits in its scratch
 until its redacted copy is written (§4 "The record"). It is not under the
 git dir, because git discovery from inside `.git/` answers differently, which would change a leg's
 verdict. This scratch is the one path outside the run directory, and the envelope names it.
+`TOOL-dRedressedBar-19`'s S38 writes an `owner.json` into it, naming this run's pid and creation
+time, so a later run can prove a dead run's raw captures abandoned and sweep them
+(units-16-18 report id 38).
 The same bash run prints the dir's `cygpath -m` spelling (S15). Python opens only that spelling,
 and a spelling that `os.path.isdir` rejects refuses the run with exit 2. The envelope keeps both,
 `scratch` for the converted one and `scratch_posix` for the one the legs see. The legs also get
@@ -357,7 +383,12 @@ the `pid` file of each slot beacon: `gate-bar-beacon` and every `gate-bar-beacon
 `<UTC stamp>-<pid>-<random>` (`:1892`), and its pid is taken as `unattended.sh:6687-6688` takes it.
 Both kinds of pid are MSYS pids, which census rows carry as `msys_pid`. No read spawns, and nothing
 is written. An absent key or queue reads as empty, because the runner creates both on first use. A
-key that exists and cannot be read is a refused read.
+key that exists and cannot be read is a refused read. `TOOL-dRedressedBar-19` states two rules
+this paragraph leaves out. A key whose conversion fails, or prints no drive-letter spelling,
+resolves to no key, so every tick is a refused read and never an empty one (its S11). An entry
+gone between the listing and the read, or whose `pid` is absent, empty or not a number, is not
+judged at that tick, and only a failure to list the queue or to stat the key is a refused read
+(its S36; units-16-18 report ids 11 and 36).
 
 **Attribution**, by `derive_leg_turnstile` against the scan of the same tick. A pid in a running
 leg's `build_walk` set belongs to that leg. A pid in another row is foreign. A pid the scan did not
@@ -471,7 +502,10 @@ unchanged. process-monitor's version moves, with every marker that `kit version 
 `test_row_contract_is_complete` (`tools/process-monitor/selftest.py:102-110`) asserts each row's
 key set equals `FIELDS` exactly, so it reds the moment rows gain the two keys. It changes in the
 same commit, to `FIELDS` plus the two keys, as the set-aside diff has it. `TOOL-dRedressedBar-19`'s
-S10 then states the pair once as `OPTIONAL_FIELDS`.
+S10 then states the pair once as `OPTIONAL_FIELDS`. This paragraph gives no rule for a line of
+four to six fields, which `parse_cim` as built reads with its command lost to the memory fields;
+that unit's S10 reads such a line as the legacy shape, its command at `parts[4]`, and keeps one
+five-field fixture line (units-16-18 report ids 10 and 33).
 
 ### The record
 
@@ -497,7 +531,13 @@ at the root's exit, no leg process still writes the capture, and it is deleted t
 stays until run end, where `<i>.log` is rewritten from it and it is deleted. A delete that fails
 because a process still holds the file keeps it, and the envelope's `raw_kept` names it with its
 reason. An interrupt keeps each running leg's capture the same way, with the reason `interrupted`.
-These are the only deletes the tool performs.
+These are the only deletes the tool performs. They cover a leg end, a run end and an interrupt
+only: an unhandled exception, a kill or a power loss leaves every capture unredacted and unnamed.
+`TOOL-dRedressedBar-19`'s S38 has the next run redact and delete those once it proves their owner
+dead, naming each in `raw_recovered`. Its S39 states the byte contract `<i>.log` already meets as
+built: the capture is read as bytes and written byte for byte but for the masked spans, and
+`log_bytes` is the raw size. A leg whose launch failed records its `launch_error` under its S35
+(units-16-18 report ids 35, 38 and 39).
 
 **Per leg (`<i>.json`, and `legs.tsv` less `procs` and `stalls`):**
 
@@ -565,8 +605,14 @@ runner's hold verb over `true` from the top level, with `GATE_REGEN_CHECK=0` set
 are four manifests, `serial.json`, `concurrent.json`, `stall.json` and `turnstile.json`, with
 `{prefix}`-spelled argvs. The selftest runs at `--census-every 1 --stall-window 8 --stall-cpu 0.5`.
 The turnstile arm sets `HOME` to a temp dir, so its key is private, and starts the real runner's hold
-verb over `sleep 20` outside any leg before it runs `turnstile.json`. The pure arms are the scrub
-derivation, `check_admit`, the platform refusal and the foreign parity. Every fixture ends by
+verb over `sleep 20` outside any leg before it runs `turnstile.json`. That holder runs in the legs'
+scrubbed environment, which holds no `GATE_REGEN_CHECK`, so it runs the regen preflight before it
+holds; unit 18 bounds the wait for its beacon at 120 s inline. `TOOL-dRedressedBar-19`'s S12 sets
+`GATE_REGEN_CHECK=0` after the scrub, as `queued.sh` does, and moves the bounded wait into
+`read_hold_beacon` (units-16-18 report id 12). The pure arms are the scrub
+derivation, `check_admit`, the platform refusal and the foreign parity, and that unit adds the
+redaction parity against the runner's `redact` (its S20, report id 20) and the fork fixture
+`forks.sh` (its S32, report id 32). Every fixture ends by
 itself. The alias halves, AC1 and AC2's resolution red half and AC16's alias half, need a host
 whose PYBIN is an App Execution Alias. On any other host each prints
 `unexercised: no alias on this host` and adds no assertion, so a pass there says nothing about an
@@ -582,18 +628,25 @@ The leg row:
 
 The guard lists `measure_legs.py`, `profile_bar.py`, `run-gates.sh` and the
 `fixtures/measure-legs/` dir under `{prefix}/run-gates/`, plus `census.py`, `reap.py` and `scope.py`
-under `{prefix}/process-monitor/`. Those are the files whose text it reads or imports. The ceiling
+under `{prefix}/process-monitor/`. Those are the files whose text it reads or imports, less three
+the guard omits: `{prefix}/run-gates/derive-ceilings.py`, whose `read_runs` the turnstile arm
+loads, `.githooks/pre-push`, whose `unset GIT_…` line the scrub reads, and
+`{prefix}/run-gates/held_halves.py`, which `TOOL-dRedressedBar-19`'s S19 makes the tool import.
+That unit's S21 adds all three (units-16-18 report id 21). The ceiling
 `<c>` is `max(r + 120, 2r)`, rounded up to 10 s, where r is the direct-invocation reading at
 build. That clears `ceiling-margin.txt`'s rule. The kit.toml `[[gate_leg]]` row uses `{kit}`, with
 the same name, subject and argv, as `govkit.py:2750-2830` requires. The budget row is r x 1.5, floored
-at 60, by the file's own rule. Both figures are PINNED with node and date in their rows.
+at 60, by the file's own rule. Both figures are PINNED with node and date in their rows. The
+descriptor row ships the leg to adopters with a process-monitor sibling and a Windows host its
+`requires` does not declare; `TOOL-dRedressedBar-19`'s S29 withdraws it for an `[[exempt_leg]]`
+row and withholds the fixtures as `project-owned` (units-16-18 report id 29).
 
 ### Inventory
 
 | Identifier | Kind | Naming cell |
 |---|---|---|
 | `main`, `cmd_selftest` | functions | `py.function`, `main` and `cmd` are reserved verbs |
-| `read_legs`, `read_local_env_vars`, `read_host_load`, `read_job_accounting`, `read_turnstile` | functions | `py.function`, `read` |
+| `read_legs`, `read_local_env_vars`, `read_host_load`, `read_job_accounting`, `read_turnstile` | functions | `py.function`, `read`. `read_legs` shares its name with `derive-ceilings.py`'s reader, and `TOOL-dRedressedBar-19` renames it `read_profile_legs` (its S19, units-16-18 report id 19) |
 | `derive_scrub_set`, `derive_redacted`, `derive_leg_turnstile` | functions | `py.function`, `derive` |
 | `extract_runner_function` | function | `py.function`, `extract` |
 | `resolve_leg_python`, `resolve_job_backend`, `resolve_turnstile_dir` | functions | `py.function`, `resolve` |
@@ -693,7 +746,12 @@ The process-monitor diff is applied as kept, its row-contract arm included.
   refuses with exit 2. The process handle asks for `PROCESS_TERMINATE` only because the job assign
   requires it, and the code never calls a terminate. S14 runs no program the bar would not: the
   resolved interpreter is the very process the alias starts, and it is accepted only as a file that
-  is no alias and that keeps its child in a test job.
+  is no alias and that keeps its child in a test job. `TOOL-dRedressedBar-19` carves out one
+  terminate, of a root still suspended after a failed open, assign, snapshot or resume, which has
+  executed nothing (its S35). The raw-capture delete covers a leg end, a run end and an interrupt;
+  a crash, a kill or a power loss leaves captures that its S38 has the next run redact and delete,
+  and its S39 and S20 hold the redaction byte-exact and to the runner's (units-16-18 report ids 20,
+  35, 38 and 39).
 - perf / scale — A scan took about 1 s at 327 rows on node d. A concurrent run has more rows, and
   the scan's own seconds are in `census.tsv`. Host sampling is about 13 µs a tick. The turnstile
   read adds one directory listing and one small read per slot to each census tick, and no spawn.
@@ -702,6 +760,11 @@ The process-monitor diff is applied as kept, its row-contract arm included.
   launcher file, an alias that is not PYBIN, an alias whose `sys.executable` is no plain file, an
   interpreter whose child leaves the test job, and a scratch dir whose converted spelling is no
   directory. A leg that never ends keeps the run open, which the owner chose.
+  `TOOL-dRedressedBar-19` adds the states this list misses: an empty bash resolve refuses naming
+  every candidate (its S34), each malformed manifest class refuses naming its row (S37), a failed
+  launch records the leg as `fail` and the run continues (S35), a turnstile key that does not
+  convert is a refused read at every tick (S11), and a half-written beacon or a vanished ticket is
+  not judged (S36; units-16-18 report ids 11, 34, 35, 36 and 37).
 - observability — The scrubbed set, each substitution, the turnstile key and the record path print
   at start. Each leg
   prints one line as it ends, naming its `ts_wait_s` and `ts_holders` when either is above zero, and
@@ -874,14 +937,21 @@ the run dir the tool prints. Every criterion is a direct run of the tool or a pr
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates gov canary` · `shell hygiene (a fork spent on builtin work)` · `encoding posture (text IO names its encoding)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `harness arms (fail branches armed or pinned)` · `govkit selfcheck` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `python resolver (behaviour + inline parity + idiom ban)` · `every held leg is budgeted, every budget row resolves` · `held-halves selftest` · `process-monitor census selftest` · `process-monitor adopter selftest` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)` · `kickoff-manifest ratchet`
+`run-gates canary` · `run-gates gov canary` · `shell hygiene (a fork spent on builtin work)` · `encoding posture (text IO names its encoding)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `harness arms (fail branches armed or pinned)` · `govkit selfcheck` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `python resolver (behaviour + inline parity + idiom ban)` · `every held leg is budgeted, every budget row resolves` · `held-halves selftest` · `process-monitor census selftest` · `process-monitor adopter selftest` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)` · `kickoff-manifest ratchet` · `measure-legs selftest` · `kit epoch (shipped bytes move, the version moves)` · `foreign-prefix parity (every self-test at three prefixes)`
+
+The line is a floor, derived by joining §4 Files touched against the guards in `tools/gate-legs.json`
+with `BROAD_LEG_FLOOR` applied, plus the unguarded and broad-guarded legs the change moves: `kit epoch`
+grades both kits' version moves, and the new budget row joins the foreign-prefix parity population
+(`TOOL-dRedressedBar-19`, units-16-18 report ids 13 and 25).
 
 New arm: tools/run-gates/measure_legs.py --selftest · covers AC1 AC2 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC11 AC12 AC15 AC16 AC17 · each criterion's Red when, staged on a copy of the tool in the selftest's temp dir; the alias halves only on a host whose PYBIN is an alias, and unexercised, never passed, elsewhere · none
 
 New arm: tools/process-monitor/selftest.py · covers AC3 · a parse_cim reading the command at index 4, and test_row_contract_is_complete over a row lacking one of the two keys · none
 
-`measure-legs selftest` is the leg the first arm line adds. It joins the manifest in this unit, so it
-is not on the leg line above. The inlined `resolve_prefix_token` and `resolve_kit_dir` blocks join
+`measure-legs selftest` is the leg the first arm line adds. It joins the manifest in this unit, and
+it is named on the leg line above once the manifest row exists, which it does since unit 18's pass
+commit `6783992aa`; unnamed, its guard trips on `tools/run-gates/measure_legs.py` in §4 Files
+touched (`TOOL-dRedressedBar-19`, units-16-18 report id 27). The inlined `resolve_prefix_token` and `resolve_kit_dir` blocks join
 the resolver's parity population by their markers. The main loop observes each arm red, then green,
 at the close.
 
@@ -965,6 +1035,40 @@ at the close.
   measured CIM units and says the redispatch restores the set-aside record. Claims new at rev-4
   were read at `1f45ba9a`, whose `run-gates.sh`, `census.py` and process-monitor `selftest.py` equal
   `ebce889c`'s. §10's turnstile-suite citation moves from `:1499` to `:1500`.
+- rev-5 · 2026-10-15 · S1 S4 S11 S13 · §3 · §4 · §5 · §7 · §10 · a records fix for
+  TOOL-dRedressedBar-19, closing the units-16-18 spec audit's report ids 1, 6, 7, 10, 11, 12, 13,
+  14, 15, 19, 20, 21, 22, 24, 25, 26, 27, 29, 32, 33, 34, 35, 36, 37, 38, 39 and 42, written by
+  that unit's spec-writer pass `<w19>`. The status stays CLOSED. Unit 18 built against its
+  criteria as written, at `6783992aa` and `997fc294f`; each corrected paragraph names
+  TOOL-dRedressedBar-19 and the change, and that spec holds the design. The criteria named below
+  are TOOL-dRedressedBar-19's. Ids 1 and 26 were already true since rev-4: §7 names
+  `kickoff-manifest ratchet`, Files touched names the kickoff manifest, and the pass commit carried
+  the staged re-stamp, so nothing moves for them; unit 18 owed that re-stamp, whose `last-audit:`
+  names `4a4960958`, a manifest with no row for the new leg, and AC1 observes the reviewed re-audit
+  over both units. Id 6: §3's first non-goal no longer denies the leg S13 adds (AC6). Ids 7 and 24:
+  S13 names AC7 for the README section and the map claim no criterion here read; both stand at
+  `997fc294f`. Id 13: §7 names `kit epoch` and says the line is a floor (AC13). Id 14: this spec's
+  AC14 asked every process-monitor marker for one version, and
+  `tools/process-monitor/adopt-process-monitor.test.sh:4` reads `@0.15` beside nine at `@0.19`, so
+  its literal reading could not pass; AC14 scopes the grep to the shipped files. Id 15: S11's
+  Readers cite the runner's raw capture, `$WORK/$i$sfx.raw`, at its base line and the tip's (AC15).
+  Ids 19 and 37: S1, the Inventory and §10 name the profiler's reader, the two readers §10 missed,
+  and the refusals S1 lacks (AC19, AC37). Id 20: S11, §4 "The selftest and its leg" and §10 name the
+  redaction's parity arm (AC20). Ids 21, 22, 25 and 29: S13 and §4 name the three guard files, the
+  subject pin, the `WHOLE_RUN` row and the `[[exempt_leg]]` declaration; at `997fc294f` the pin and
+  the row are absent and the descriptor row stands, and this spec's AC13, which reads the
+  descriptor, no longer holds once S29 lands (AC21, AC22, AC25, AC29). Id 27: §7 names
+  `measure-legs selftest` now that its row exists (AC27). Ids 10 and 33: S4 and "The census fields"
+  name the legacy-line rule and `OPTIONAL_FIELDS`; AC3 read a seven-field line only (AC10). Id 11:
+  "The turnstile" names the failed-conversion rule (AC11). Id 12: "The selftest and its leg" names
+  the holder's preflight and the beacon wait; AC15's holder ran without `GATE_REGEN_CHECK=0` (AC12).
+  Id 32: the candidates row says AC1 covers the native-spawn path only (AC32). Ids 34 to 36: "Launching
+  a leg", "The turnstile" and §5 name the one bash, the launch-failure branch and turnstile churn
+  (AC34, AC35, AC36). Ids 38 and 39: "The environment a leg gets", "The record" and §5 name the
+  sweep of a dead run's captures and the byte contract, which `write_leg_capture` already meets
+  (AC38, AC39). Id 42: this spec's AC6 matched `STALLED` over the whole stdout of a three-leg run,
+  so a STALLED line naming a sibling would have passed it; AC42 reads the line by its leg. Runner
+  lines this pass cites are at the base `ebce889c`, the tip's named beside them where they moved.
 
 ## 10. Reuse audit
 
@@ -976,7 +1080,9 @@ gains two fields, and `build_walk` (`reap.py:136-164`) and `build_self_chain` (`
 used unchanged. From `profile_bar.py` come `resolve_bash`, `run_git`, `check_quiet` and
 `derive_regime`, imported as siblings. `resolve_python`, `measure_spawn_cost`, `read_spawn_floor` and
 the `measure_foreign` awk are run from the runner's source text, by the extraction seam
-`run-gates.turnstile.test.sh:1500` uses. The `resolve_prefix_token` and `resolve_kit_dir` canonical
+`run-gates.turnstile.test.sh:1500` uses. `redact` is run the same way, in
+`TOOL-dRedressedBar-19`'s parity arm against the port `derive_redacted` (its S20, units-16-18
+report id 20). The `resolve_prefix_token` and `resolve_kit_dir` canonical
 blocks are inlined. `run_leg_at` gives the launch shape but is bound to the runner's globals, so it is
 mirrored, not called. The turnstile read (rev-2) follows the one reader of the runner's queue that
 already exists outside the runner, `unattended.sh:6684-6690`, which parses a ticket's pid the same
@@ -988,7 +1094,10 @@ take the host key (`run-gates.test.sh:364`).
 The probe disagreed with the brief once. The brief names "the `gate-legs.json` reader the runner and
 `run-selftests.sh` already share", and none is shared: the runner parses inline
 (`run-gates.sh:2697-2845`), and `run-selftests.sh` twice (`:523-585`, `:827-834`). What they share is
-`resolve_prefix_token`, which this unit inlines over one `json.load`. `derive_scope` and `classify.py`
+`resolve_prefix_token`, which this unit inlines over one `json.load`. That probe missed two Python
+readers of the manifest in this kit: `held_halves.load_manifest` (`held_halves.py:80-88`) and
+`derive-ceilings.read_legs` (`derive-ceilings.py:139-142`), which honours `GATE_LEGS`.
+`TOOL-dRedressedBar-19`'s S19 makes the profiler wrap the first (units-16-18 report id 19). `derive_scope` and `classify.py`
 were weighed and left out (§4). The gotchas checklist for the touched paths selected
 `a-new-leg-trips-a-growing-set-of-meta-gates`, which is why §7 names every meta-gate a new leg trips.
 It selected `fixture-passes-by-finding-nothing`, which is why AC4 and AC7 carry liveness halves.

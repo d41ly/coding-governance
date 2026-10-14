@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-17 — the units-12-15 spec audit's 12 mediums and 9 lows, batched: each faulted criterion observed in a form that can pass and fail, each false sentence corrected, and the code sites they describe made to hold what the specs claim
 
-**Status:** CLOSED · rev-4 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 12
+**Status:** CLOSED · rev-5 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -12,6 +12,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-17-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-5-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-17-6-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-6-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-17-7-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-7-spec-writer.md) | journal | — |
+| [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-19 TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-18 |
 | [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-16 TOOL-dRedressedBar-18 |
 
 <!-- /gen:spec-records -->
@@ -22,9 +23,10 @@ The spec audit of units 12 to 15
 (`reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md`) exited CONVERGED with
 22 confirmed findings: no blocker, one high, 12 mediums and 9 lows. BUILD-METHOD M4 promotes the
 high alone, as `TOOL-dRedressedBar-16`, and batches every medium and low into ONE unit. This is that
-unit. The minors land on specs 9, 12, 13, 14 and 15, so it repairs no unit in particular, and its
-order is above every unit of this build. It closes these findings, by report id, each with the
-report item it shares:
+unit. The minors land on specs 9, 12, 13, 14 and 15, so it repairs no unit in particular. It is
+ordered after units 9 to 16, whose specs and tree it corrects, and the README's derived build-order
+region says what follows it (`TOOL-dRedressedBar-19`, units-16-18 report id 4). It closes these
+findings, by report id, each with the report item it shares:
 
 | id | grade | item | sits in | what is wrong | closed by |
 |---|---|---|---|---|---|
@@ -113,7 +115,10 @@ report item share its observation, and each still names its own id.
   ownership join asks for all four. One rule grades an element in both checks: its resolved text
   carries `/` and its `missing` is empty. The `gate legs:` note counts the `[[gate_leg]]` tuples and
   the `cross-entry argv:` note counts all of them, so the two offered counts are one population and
-  its part. Spec 15's §4 "The ownership join" and §10 say S5 extends `silenced_legs` through the
+  its part. That note reads
+  `cross-entry argv: <o> argv element(s) offered by [adopt], [check], [[gate_leg]] and [[regenerate]] across <m> entries, <g> graded, <h> naming a file only another entry ships`,
+  with no label narrowing the population it counts (`TOOL-dRedressedBar-19`, units-16-18 report
+  id 2). Spec 15's §4 "The ownership join" and §10 say S5 extends `silenced_legs` through the
   generator. `python tools/codebase-map/gen_map.py --write` runs alone before the product commit.
   Observed by AC10.
 - **S11** — id 11, M6, by the skeptic's corrected fix. The docstring of `check_entry_producer`
@@ -166,7 +171,11 @@ report item share its observation, and each still names its own id.
   early write and RECEIPT write, S22's write, `update`'s three (`:12017`, `:12055`, `:12062`) and
   `adopt`'s (`:12692`). The comment above the constant and `write_atomic`'s docstring name the
   receipt. Spec 14's "When CONFIGURE fails" table gains a row for an interrupt during a receipt
-  write: the previous file stays whole. Observed by AC23.
+  write: the previous file stays whole. Observed by AC23. The `install.sums` sidecar written beside
+  each receipt stays a plain write here. `TOOL-dRedressedBar-19`'s S40 writes it first through
+  `write_atomic` and the receipt last, declares it a member, and has both comments name it; an
+  interrupt between the two writes then leaves a new sidecar beside the old receipt, which `check`
+  reports until the next apply rewrites both (units-16-18 report ids 23 and 40).
 - **S24** — id 24, M11, restated against `<p15>`. There selfcheck already takes every entry whose
   `[adopt]` table holds the `via` key, whatever its value (`tools/govkit/govkit.py:3296`), and
   refuses a value that is not a string naming a registry entry under rule 1's reason,
@@ -243,7 +252,7 @@ every reading of a code site they add is derived from their specs.
 - `silenced_legs` walks `[[gate_leg]]` argv per entry through `target_context` and grades an element
   whose resolved text carries `/` and whose `missing` is empty (`tools/govkit/govkit.py:3908-3946`).
   The selfcheck note at `:3217-3221` counts every declared gate-leg argv element as offered.
-  `tools/codebase-map/kit.toml:103` declares `argv = ["python", "{gate_file}"]`, whose declared text
+  `tools/codebase-map/kit.toml:104` declares `argv = ["python", "{gate_file}"]`, whose declared text
   carries no `/`.
 - `check_entry_producer`'s docstring quotes `argv = d.get("adopt", {}).get("argv") or []` and
   `if not argv: continue` (`:3687-3699`). The merged-rule guard reads the declared argv (`:7314-7316`).
@@ -295,9 +304,10 @@ same truncation reaches `update`'s three and `adopt`'s one, and the report's lef
 check over `.governance/` writes. `ADOPTER_BAR_PATHS` is that check's existing seam: the routing arm
 already refuses a direct write to any declared member, and its comment says adding a member is meant
 to be deliberate (`:3955-3963`). The receipt is read by the adopter's `receipt sync` leg
-(`tools/run-gates/check-receipt.py:60-71`), so it is an adopter-bar path. Declaring it routes all
-six writes, or the arm reds on the one left behind. That is the charter's `[class]` and `[reuse]`
-rules, so the narrower option is not a fork.
+(`tools/run-gates/check-receipt.py:60-71`), so it is an adopter-bar path. Declaring it routes every
+receipt write, or the arm reds on the one left behind. That is the charter's `[class]` and `[reuse]`
+rules, so the narrower option is not a fork. The `install.sums` sidecar written after each receipt
+write is not routed here, and `TOOL-dRedressedBar-19`'s S40 routes it (units-16-18 report id 40).
 
 ### What this unit corrects in each spec
 
@@ -318,7 +328,7 @@ before any write.
 | 12 | 2, 12 | revision line only: S1's sidecar and step-line claim was observed by no criterion; it names AC2 |
 | 13 | 3, 5, 6, 8 | §1 ordering sentence; §3 fourth non-goal's citation; Edges gain the hands-off to unit 14; §5 risks; §10 citation; its revision line names AC3 |
 | 14 | 1, 2, 5, 9, 19, 22, 23 | S4 sentence; Edges gain the consumes-from unit 13; §4 "The receipt written ahead", "When CONFIGURE fails", the reader table and "Order, and unit 7"; its revision line names AC2, AC22 and AC23 |
-| 15 | 1, 4, 10, 11, 13, 15, 16, 18, 20, 21, 24 | S1 and S8 sentences; S4 Readers; §3 non-goal on the other readers; §4 rule table, ownership join and "What an adopter sees change" row 5; §5 risks; §7 leg line and its floor sentence; §10; its revision line names AC10, AC11, AC13, AC16, AC18 and AC24 |
+| 15 | 1, 4, 10, 11, 13, 15, 16, 18, 20, 21, 24 | S1 and S8 sentences; S4 Readers; §3 non-goal on the other readers; §4 rule table, ownership join and "What an adopter sees change" row 5; §5 risks; §7 leg line and its floor sentence; §10; its revision line names AC10, AC11, AC13, AC16, AC18 and AC24. The ownership join's OFFERED and GRADED sentences and its note template, which S10's population changes, were left out of this row and move in `TOOL-dRedressedBar-19`'s pass (units-16-18 report id 2) |
 
 ### The code sites
 
@@ -332,7 +342,7 @@ before any write.
 | 13 | `tools/govkit/selftest.py` | the `[dRB-9]` per-kit gaining case |
 | 18 | `tools/gate-legs.json`, `memory/guides/SESSION-KICKOFF.md` | two guard paths; the manifest re-stamp |
 | 22 | `tools/govkit/govkit.py` | the receipt write after the re-stamp |
-| 23 | `tools/govkit/govkit.py` | `receipt_path` in `ADOPTER_BAR_PATHS`; six writes through `write_atomic`; two comments |
+| 23 | `tools/govkit/govkit.py` | `receipt_path` in `ADOPTER_BAR_PATHS`; every receipt write through `write_atomic`; two comments |
 | 24 | `tools/govkit/govkit.py`, `tools/govkit/selftest.py` | the first `via` rule; key presence in `scan_entry_argv`; two `[dRB-15]` scratch-gov cases |
 
 `scan_entry_argv` yields `[adopt]` tuples only when asked for that kind, so `silenced_legs`, which
@@ -341,7 +351,9 @@ only the entries its `via` rules left valid, as unit 15 already states for its j
 
 ### Order, and unit 7
 
-Order 12 is above every unit of this build. Units 13, 14, 15 and 16 each write
+Order 12 places this unit after units 9 to 16, whose specs and tree it corrects, and the README's
+derived build-order region says what follows it (`TOOL-dRedressedBar-19`, units-16-18 report
+id 4). Units 13, 14, 15 and 16 each write
 `tools/govkit/govkit.py` or `tools/govkit/selftest.py`, so M6 sequences this unit after all of
 them. Unit 16 is a sequence and not an edge: it moves `apply`'s LEGS call and spec 12's §3 and §4,
 and no criterion here reads its pass. Unit 7's measurement need not cover this unit, because no kit
@@ -390,7 +402,11 @@ Specs 9, 12, 13, 14 and 15 are `<w17>`'s write set, not the build pass's.
 - perf / scale — N/A — one more receipt write on a renormalizing apply, one generator replacing two
   loops, and four fixture cases.
 - error / empty / loading states — A malformed `via` is a selfcheck finding with a reason, never a
-  traceback. An interrupt during any receipt write leaves the previous file whole.
+  traceback. An interrupt during any receipt write leaves the previous file whole. The
+  `install.sums` sidecar beside it is a plain write after the receipt here; once
+  `TOOL-dRedressedBar-19`'s S40 writes it first through `write_atomic` and the receipt last, an
+  interrupt between the two leaves a new sidecar beside the old receipt, each whole, which `check`
+  reports until the next apply rewrites both (units-16-18 report id 40).
 - observability — The two selfcheck notes count one population and its part, so their offered
   figures agree by construction.
 - risks — `scan_entry_argv` replaces the bodies of `silenced_legs` and `resolve_adopter_argv`; spec
@@ -421,14 +437,16 @@ A target is a fresh `git init` tree under `%TEMP%/<short-name>`, never inside th
 "over `<pN>`" runs `python <clone>/tools/govkit/govkit.py` from a local `git clone` of gov under
 `%TEMP%`, checked out at `<pN>`.
 
-- **AC1** — A python program reads `tools/govkit/selftest.py` from the first to the last line
-  carrying `[dRB-14]`. No `check(` call in that span carries `kit 'agent-cap'`. The span from the
-  first to the last line carrying `[dRB-15]` holds the check that no line opens `govkit: kit '`.
-  Spec 14's §2, cut with `sed -n '/^## 2. Scope/,/^## 3/p'` and joined, carries
+- **AC1** — A python program reads `tools/govkit/selftest.py` and selects `check(` calls by label:
+  every call whose first argument is a string opening `[dRB-14]`, wherever it sits. None of those
+  carries `kit 'agent-cap'`. A call whose label opens `[dRB-15]` holds the check that no line opens
+  `govkit: kit '`. Unit 17 observed this over the span bounded by each label's outermost lines,
+  which a late label can stretch over the other block's checks; the label reading is
+  `TOOL-dRedressedBar-19`'s AC41 (units-16-18 report id 41). Spec 14's §2, cut with `sed -n '/^## 2. Scope/,/^## 3/p'` and joined, carries
   `TOOL-dRedressedBar-17`. Spec 15's §5, cut with `sed -n '/^## 5. Production/,/^## 6/p'` and joined,
   carries `[dRB-14]`.
-  Red when: over `<p15>`, the `[dRB-14]` span holds a check carrying `kit 'agent-cap'` beside the
-  `[dRB-15]` check that no such line prints, so one apply cannot satisfy both.
+  Red when: over `<p15>`, a `[dRB-14]`-labelled check carries `kit 'agent-cap'` beside the
+  `[dRB-15]`-labelled check that no such line prints, so one apply cannot satisfy both.
 - **AC2** — Run spec 12's §4 steps 1 and 2 with `python tools/govkit/govkit.py apply` over a target,
   committing it after each. After step 2, the line carrying `/RECEIPT]` carries
   `<n> row(s), <k> kit(s)`, where `<n>` and `<k>` are the lengths of `.governance/install.json`'s
@@ -474,10 +492,11 @@ A target is a fresh `git init` tree under `%TEMP%/<short-name>`, never inside th
   `:11119-11120`.
   Red when: the first count prints 1 and the second 2, as over `4cc48572`.
 - **AC9** — When spec 14's §4 is cut with `sed -n '/^## 4. Design/,/^## 5/p'` and joined,
-  `grep -c 'The only appends are'` prints 0. The cut carries `:7424`, `:7502`, `:7540`, `:7593` and
-  `rows\.append`.
+  `grep -c 'The only appends are'` prints 0. The cut carries `:7424`, `:7502`, `:7540`, `:7593`,
+  `:7616`, `:7621` and `rows\.append`.
   `git show 46eb75ed:tools/govkit/govkit.py | awk 'NR>=7233 && NR<=8031 && /rows\.append/ {print NR}'`
-  prints exactly the six numbers the cut names.
+  prints exactly 7424 7502 7540 7593 7616 7621 at 46eb75ed (`TOOL-dRedressedBar-19`, units-16-18
+  report id 5).
   Red when: the two-site sentence stands, as over `565574ae`.
   figure: the six line numbers are PINNED at `46eb75ed` on 2026-10-14.
 - **AC10** — A python program run from `tools/govkit` imports `govkit` at `<p17>`. Over a bare target
@@ -485,7 +504,7 @@ A target is a fresh `git init` tree under `%TEMP%/<short-name>`, never inside th
   `[[gate_leg]]` tuples of `scan_entry_argv` whose resolved text carries `/`, whose `missing` is
   empty and whose resolved text is not in `have` group to exactly what `silenced_legs` returns. The
   tuple for the `codebase-map coverage + freshness` leg's `{gate_file}` element
-  (`tools/codebase-map/kit.toml:103`) has kind `[[gate_leg]]`. `inspect.getsource` of `silenced_legs`
+  (`tools/codebase-map/kit.toml:104`) has kind `[[gate_leg]]`. `inspect.getsource` of `silenced_legs`
   and of `resolve_adopter_argv` each carries `scan_entry_argv(` and no `resolve_tokens(`.
   `python tools/govkit/govkit.py selfcheck` prints one line opening `govkit: gate legs:` and one
   opening `govkit: cross-entry argv:`. The first's offered count equals the program's count of
@@ -568,7 +587,12 @@ A target is a fresh `git init` tree under `%TEMP%/<short-name>`, never inside th
   receipt from an earlier unpatched apply, it calls `govkit.main` with the arguments of
   `apply --target <t> --kits check-wiring`. The call raises or returns non-zero. `.governance/install.json`
   then parses with `json.loads` and equals its earlier bytes, and no `install.json.govkit-new` is
-  left. Spec 14's "When CONFIGURE fails" table, cut and joined, carries `write_atomic`.
+  left. Spec 14's "When CONFIGURE fails" table, cut and joined, carries `write_atomic`. This
+  criterion reads neither `write_atomic`'s docstring nor the comment block above
+  `ADOPTER_BAR_PATHS`, which S23 claims observed, and it faults `install.json` alone, so a fault on
+  the `install.sums` sidecar written beside it is not seen. `TOOL-dRedressedBar-19`'s AC23 reads
+  the docstring and the comment block, and its AC40 faults the sidecar (units-16-18 report ids 23
+  and 40).
   Red when: the same program over the `<p15>` engine leaves an `install.json` that `json.loads`
   refuses, because unit 14's early write truncates it in place.
 - **AC24** — In scratch govs shaped as spec 15's AC7 builds them, with `demo`'s `[adopt]` holding
@@ -641,6 +665,26 @@ none
   (`:1511-1512`, read at the tip, whose `govkit.py` equals `<p15>`'s). AC24's red half, the
   `New arm:` line for AC11 and AC24, §1's row 24 and §5's security sentence now name what `<p15>`
   does. AC24's green half, and every other scope item and criterion, do not move.
+- rev-5 · 2026-10-15 · §1 · S10 · S23 · §4 · §5 · AC1 · AC9 · AC10 · AC23 · §10 · a records fix for
+  TOOL-dRedressedBar-19, closing the units-16-18 spec audit's report ids 2, 4, 5, 16, 17, 23, 40
+  and 41 (items L1, L2, L3, L11, L12, L15, M16 and M17), written by that unit's spec-writer pass
+  `<w19>`. The status stays CLOSED. Id 4: §1 and "Order, and unit 7" say this unit is ordered after
+  units 9 to 16 and point at the README's derived build-order region, since unit 18 follows it at
+  order 13. Id 2: S10 restates the `cross-entry argv:` note with no label narrowing its population,
+  and §4's row 15 names the ownership join's OFFERED and GRADED sentences and note template, which
+  spec 15 takes in the same pass. At `997fc294f` the engine's note still carries the old label
+  (`tools/govkit/govkit.py:3348`); TOOL-dRedressedBar-19's AC2 observes it gone. Id 5: AC9's cut
+  requires all six append sites and its awk half names the six numbers; unit 17 observed it as
+  written, and TOOL-dRedressedBar-19's AC5 reads the corrected cut. Id 16: §4 Evidence, AC10 and
+  §10 cite the codebase-map argv at `:104`, which the report had right, and §10 says so. Id 17:
+  "Three choices" and the code-sites row 23 say "every receipt write" with no count, since S23
+  enumerates seven. Id 23: AC23 states that it read neither comment S23 claims observed, and
+  TOOL-dRedressedBar-19's AC23 reads both. Id 40: S23, "Three choices", §5 and AC23 state that the
+  `install.sums` sidecar stayed a plain write after each receipt write, and the order and
+  interrupt behaviour TOOL-dRedressedBar-19's S40 gives it, which its AC40 observes. Id 41: AC1
+  selects the `[dRB-14]` and `[dRB-15]` checks by label rather than by the span between a label's
+  outermost lines; unit 17 observed the span form, which held at its pass, and
+  TOOL-dRedressedBar-19's AC41 observes the label form. No other criterion's assertion moves.
 
 ## 10. Reuse audit
 
@@ -673,9 +717,10 @@ The gotchas checklist for `tools/govkit/govkit.py`, `tools/govkit/selftest.py` a
 The recall probe returned `TOOL-aEvidencedLens-20`, `TOOL-dRedressedBar-10` and
 `TOOL-dRedressedBar-13`, the precedent minors batches. Each observed built units' criteria in a
 corrected form and corrected prose with one rev bump per spec, and this unit takes their shape. The
-report and the code agree on every citation re-read, with two exceptions: the codebase-map leg's
-argv sits at `tools/codebase-map/kit.toml:103`, not `:104`, and the receipt-reader grep prints six
-files, not five, until a suite is excluded.
+report and the code agree on every citation re-read, with one exception: the receipt-reader grep
+prints six files, not five, until a suite is excluded. The report's
+`tools/codebase-map/kit.toml:104` for the codebase-map leg's argv was right, at the base and at
+`46eb75ed` alike (`TOOL-dRedressedBar-19`, units-16-18 report id 16).
 
 Recall terms used: `python tools/memory-recall/query.py "how is a spec audit's batch of minor
 findings closed after the faulted units are built" --terms "spec-audit minors batch promoted unit

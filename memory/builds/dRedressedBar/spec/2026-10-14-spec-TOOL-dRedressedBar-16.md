@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-16 — an apply that keeps a carried kit's claim keeps that kit's gate-leg ownership too, so a later argv change does not wedge the kit
 
-**Status:** CLOSED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
+**Status:** CLOSED · rev-4 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-2-revision.md) | research | TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md) | research | TOOL-dRedressedBar-12 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-16-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-16-5-spec-writer.md) | journal | — |
+| [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-19 TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 |
 | [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 |
 
 <!-- /gen:spec-records -->
@@ -44,7 +45,9 @@ the narrower-apply-then-argv-change sequence that the report traced.
 - **S2** — The `carry_out_of_scope` paragraph of `write_gate_legs`' docstring, as unit 12's S2
   leaves it, says that both verbs now keep every claimed kit in the receipt's `kits`, so both pass
   the carry, and names `TOOL-dRedressedBar-16`. It no longer argues from the same-argv rule, and it
-  states why that rule is not enough: an argv gov changes is never claimable. Observed by AC3.
+  states why that rule is not enough: an argv gov changes is never claimable. The rewritten
+  paragraph keeps `TOOL-dRedressedBar-12` beside `TOOL-dRedressedBar-16`, because spec 12's AC4
+  reads that id there (`TOOL-dRedressedBar-19`, units-16-18 report id 8). Observed by AC3.
 - **S3** — One `[dRB-16]` block in `tools/govkit/selftest.py`, after the `DEPL-cMendedVintage-13`
   arms, inside the scope that defines `build_gov13`, `build_target13`, `run_gov13`, `read_legs13`
   and `read_owned13` (`:15428-15512`). It runs §4's sequence on two targets built by
@@ -57,7 +60,9 @@ the narrower-apply-then-argv-change sequence that the report traced.
   states that the `emitted` carry was taken by `TOOL-dRedressedBar-16`, because the same-argv rule
   does not reach an argv gov has changed. Its §4 Alternatives row C5 states that its rejection
   rested on that false premise and that this unit takes C5. Spec 12's S2 and criteria are not
-  rewritten: unit 12 built against them as written, and its revision line points here. The build
+  rewritten: unit 12 built against them as written, and its revision line points here. Spec 12's
+  S2 states the same premise, so it carries an inline note that its rationale is superseded by
+  this unit, written by `TOOL-dRedressedBar-19`'s pass `<w19>` (units-16-18 report id 31). The build
   pass writes no spec file but this one's status and date cells. Observed by AC4.
 - **S5** — The unit adds no module-level function or class, no text-IO site without an encoding, and
   no kit version. Observed by AC5.
@@ -70,6 +75,10 @@ the narrower-apply-then-argv-change sequence that the report traced.
 - No change to how `write_gate_legs` keys its carry. It keeps the prior row of every kit outside the
   selection, and a prior row with no `kit`, as `update` already relies on (`:4297-4305`). Keying it
   on the claim, as unit 12 keys its row carry, would be a second rule for one list.
+- No claim test on the carried rows. An orphan, a prior `emitted` row whose kit the receipt no
+  longer claims, is carried too, because the carry is keyed on the selection, which the non-goal
+  above keeps. It is re-carried on every narrower apply. That is an accepted gap
+  (`TOOL-dRedressedBar-19`, units-16-18 report id 43).
 - No change to `update`'s call (`:11888-11890`), which already passes the carry.
 - No change to `check_leg_claimable` or to the Refusal it guards. A leg the target wrote under gov's
   name with another argv is still refused, which is the point of that rule.
@@ -106,7 +115,7 @@ unit 12's spec, not run. The report's skeptic traced the same path and judged th
 | 1. `apply` selecting A and B | `emitted` holds A's leg and B's leg | unchanged |
 | 2. `apply --kits A` | `kits` keeps B (unit 12). `write_gate_legs` builds `owned` from the prior `emitted` (`:4094`) and, with no carry, returns A's row alone. B's row in the runner stays, because the write is append and replace by name | `emitted` keeps B's row, ahead of A's (`:4303-4305`) |
 | 3. gov commits a change to B's leg argv | — | — |
-| 4. `update --write` | `_legs_scope` holds B (`:11876-11877`). B's leg is in the runner and not in `owned`, its argv differs, so `write_gate_legs` raises; `update` catches it as a problem (`:11880-11891`) and exits 1 | B's leg is owned and rewritten with the new argv; exit 0 |
+| 4. `update --write` | `_legs_scope` holds B (`:11876-11877`). B's leg is in the runner and not in `owned`, its argv differs, so `write_gate_legs`, called at `:11888-11890`, raises; `update`'s `except Refusal` at `:11898-11903` catches it as a problem and exits 1 | B's leg is owned and rewritten with the new argv; exit 0 |
 | 5. `apply --kits B` | the same raise, uncaught in `apply`; exit 2 | B's leg is owned and rewritten; exit 0 |
 
 At the base, without unit 12, step 5 is refused earlier as foreign (`foreign_kit_present`,
@@ -118,8 +127,10 @@ lands, and both red halves read `<p12>`.
 The docstring's reason for `apply` passing no carry was that `apply` rewrote `kits` and `files` to
 its own selection, so a carried `emitted` row could name a kit `kits` does not (`:4039-4043`). Unit
 12 removes that premise: every kit the prior receipt claims stays in `kits`. A prior `emitted` row
-was written by a run that selected its kit, and that kit is still claimed, so the carried row names
-a claimed kit. A prior row with no `kit` is carried too, which the comment at `:4297-4302` calls the
+whose kit the prior receipt claims was written by a run that selected its kit, and that kit is
+still claimed, so such a carried row names a claimed kit. That is the case this proves. A row whose
+kit the receipt no longer claims is carried too, an accepted gap (§3,
+`TOOL-dRedressedBar-19`, units-16-18 report id 43). A prior row with no `kit` is carried too, which the comment at `:4297-4302` calls the
 safe direction. On the withheld path `emitted` is still the prior list whole (`:4327`), so S1 does
 not reach it.
 
@@ -132,11 +143,12 @@ not reach it.
 | or `apply --kits <that kit>` runs | exit 2, `already has a leg named` | exit 0 |
 | a narrower apply where the carried kits declare `subject = "kit"` legs | the held-legs advice counts this run's legs | it counts every kit-subject leg the runner holds, which is what its own comment says it counts (`:7967-7972`) |
 | any apply whose selection covers every claimed kit | as before | unchanged |
+| after a narrower apply, a failing contract clause whose installed consumer sits on a carried kit's leg | `check` and `update` print it as unwired, because `emitted` lost that leg | `check` and `update` red it again, as after a full apply: `derive_parity_lines` (`tools/govkit/govkit.py:6075`, its `r.fail` at `:6119-6121`, called at `:5416` and `:9658`) builds its leg words from `emitted` (`TOOL-dRedressedBar-19`, units-16-18 report id 30) |
 
 ### The arm
 
 `build_gov13` builds a scratch gov with two kits, `demo` and `demo2`, each declaring one gate leg
-(`tools/govkit/selftest.py:15412-15459`). `build_target13` builds a manifest target whose runner is
+(`tools/govkit/selftest.py:15428-15459`). `build_target13` builds a manifest target whose runner is
 `scripts/gate-legs.json` (`:15461-15477`). The `[dRB-16]` block builds one gov and two targets. On
 each target it runs `apply`, `settle`, `apply --kits demo` and `settle`. It then rewrites `demo2`'s
 leg argv in the gov to `["bash", "{prefix}/demo2/engine.sh", "--drb16"]` and commits it. The block
@@ -223,8 +235,9 @@ local `git clone` of gov under `%TEMP%`, checked out at `<p12>`, into the scratc
   `demo2 leg` row carries `--drb16` in its `argv`.
   Red when: with the `<p12>` engine, step 2's `emitted` holds no `demo2 leg` row, and step 4 exits 1
   with a line carrying `does not claim it`.
-  fixture: the red half is derived from `tools/govkit/govkit.py:4094`, `:4143-4159` and
-  `:11880-11891` and was not run at spec time, because unit 12 is unbuilt. The pass observes it
+  fixture: the red half is derived from `tools/govkit/govkit.py:4094`, `:4143-4159`, the
+  `write_gate_legs` call at `:11888-11890` and its `except Refusal` at `:11898-11903`, and was not
+  run at spec time, because unit 12 is unbuilt. The pass observes it
   first, and a red half that exits 0 is returned to the main loop and not counted.
   cost: one gov clone, two scratch govs and eight verb runs, about two minutes.
 - **AC2** — Run steps 1 to 3 on a second target, then `apply --target <t2> --kits demo2`. It exits 0,
@@ -235,7 +248,9 @@ local `git clone` of gov under `%TEMP%`, checked out at `<p12>`, into the scratc
 - **AC3** — A python program parses `tools/govkit/govkit.py` with `ast` and finds the call to
   `write_gate_legs` inside `_cmd_apply`. Its keywords include `carry_out_of_scope` with the constant
   `True`. `ast.get_docstring` of `write_gate_legs` carries `TOOL-dRedressedBar-16`, and, joined with
-  `tr '\n' ' ' | tr -s ' '`, carries no `passes no carry`.
+  `tr '\n' ' ' | tr -s ' '`, carries no `passes no carry`. The docstring also keeps
+  `TOOL-dRedressedBar-12` beside it, which `TOOL-dRedressedBar-19`'s AC8 observes (units-16-18
+  report id 8).
   Red when: the call has no such keyword, as at `<p12>`, or the docstring still says `apply` passes
   no carry set, as unit 12's S2 writes it.
 - **AC4** — When `git diff <w16>~1 <w16> -- memory/builds/dRedressedBar/spec/` runs, spec 12 shows
@@ -288,6 +303,21 @@ none
   lists product files and the ledger only, AC4 reads spec 12 at `<w16>` and observes that the build
   pass writes no other spec, §3's consumes-from edge names `<w16>`, and Alternatives rejected gains
   row C5. No product design or other criterion moves.
+- rev-4 · 2026-10-15 · S2 · S4 · §3 · §4 · AC1 · AC3 · a records fix for TOOL-dRedressedBar-19,
+  closing the units-16-18 spec audit's report ids 8, 9, 18, 30, 31 and 43 (items L6, L7, L13, L16
+  and L20), written by that unit's spec-writer pass `<w19>`. The status stays CLOSED. Id 8: S2 and
+  AC3 state that the rewritten paragraph keeps `TOOL-dRedressedBar-12` beside this unit's id. AC3
+  read this unit's id alone, so a rewrite dropping unit 12's would have passed it and red spec 12's
+  AC4; unit 16 built both ids in (`tools/govkit/govkit.py:4248-4253` at `997fc294f`), and
+  TOOL-dRedressedBar-19's AC8 observes both. Id 31: S4 names the inline note spec 12's S2 now
+  carries. Id 43: §3 gains the orphan carry as an accepted gap, and §4 "Why the carry is
+  consistent" narrows its sentence to rows whose kit the receipt claims. Id 30: "What an adopter
+  sees change" gains the row for `derive_parity_lines`. Id 9: "The arm" cites `build_gov13` from
+  its `def` at `:15428`, where it cited the last line of `M13_DEPLOY`, `:15412`. Id 18: §4 step 4
+  and AC1's fixture line cite the `write_gate_legs` call at `:11888-11890` and the `except Refusal`
+  at `:11898-11903` apart, where both cited one range from `:11880` to `:11891` holding the call
+  alone. AC1's assertions do not move. Every citation is at the base `ebce889c`, as §4's evidence
+  reads it. TOOL-dRedressedBar-19's AC8, AC9, AC18, AC30, AC31 and AC43 observe these.
 
 ## 10. Reuse audit
 
