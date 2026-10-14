@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-11 — a receipt-reading probe term in govkit's declared-outcome contract, closing settings-merge's last false-accept route
 
-**Status:** CLOSED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 7
+**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-11-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-11-1-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-11-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-11-brief.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-12-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-12-4-revision.md) | research | TOOL-dRedressedBar-12 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-13-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-13-4-revision.md) | research | TOOL-dRedressedBar-13 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 |
 | [2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-10 |
 
 <!-- /gen:spec-records -->
@@ -219,10 +220,15 @@ Both sites bind the `CompletedProcess` they already create, rather than taking `
 under a name the long function does not bind: `_cfg_run` in `_cmd_apply` and `_proc_g` in
 `_cmd_update` (each `grep -c` reads 0 today). The problem line then ends in the regenerate site's
 shape. When stderr has lines, that is `. Its stderr ended: ` and the last three non-blank lines
-joined by ` | `. Otherwise it is `. It printed nothing to stderr`. CONFIGURE's call keeps
-`capture_output=True, text=True` with no encoding. So its site count in
-`memory/project/encoding-posture-sites.txt` stays 36, the scanner's reading at `60fa5534` through
-`scan_text_io`. An accepted exit prints no tail.
+joined by ` | `. Otherwise it is `. It printed nothing to stderr`. CONFIGURE's call kept
+`capture_output=True, text=True` with no encoding at this unit's pass
+(`tools/govkit/govkit.py:7781`, read at `fda78c56`). So the tail it prints is decoded with the
+host's codepage, and on a host without UTF-8 mode a non-ASCII character in an adopter's stderr,
+such as settings-merge's em dash, prints garbled. The regenerate site and the gained loop already
+decode UTF-8. Its site count in `memory/project/encoding-posture-sites.txt` was 36, the scanner's
+reading at `60fa5534` through `scan_text_io`. `TOOL-dRedressedBar-13`'s S13 gives that call
+`encoding="utf-8", errors="replace"`, and the row falls to 35 in the same commit. An accepted exit
+prints no tail.
 
 ### What an adopter sees change
 
@@ -251,16 +257,17 @@ Unit 7 need not follow this unit. It mints kit versions and runs `regen.py --wri
 no version, as above. Its only possible generated-output effect is `symbols.json`, which records
 `id`, `kind` and `file` with no line numbers. S6 keeps that set unchanged, and AC7 observes it.
 
-The README ordering this implies: the roster row for unit 11 already stands. This spec's `order 7`
-adds step 7 to the derived build-order region on the dispatcher's regen. The Build-level rules
-sentence saying unit 7 "is measured last over the code the others leave" has been inexact since
-unit 10. It should say that units 10 and 11 follow 7, that each moves only govkit-exempt files, and
-that neither mints a function. The dispatcher owns that README edit.
+The README ordering this implies already stands in `memory/builds/dRedressedBar/README.md`. Its
+Build-level rules say that units 10, 11, 12, 13 and 14 follow 7 in that order, and that each
+touches only govkit-exempt files and adds no function. Its derived build-order region lists this
+unit at step 7.
 
 ### The witnessing arms
 
 `check_outcome_states` gains an optional fourth row element: a mapping from a target-relative path
-to text. The helper writes it before it classifies and deletes it after. Lexicon's rows and unit 9's
+to text. The helper writes it before it classifies and deletes it after. Two texts state the row
+shape: the helper's docstring and spec 9's §4 sentence on its rows. `TOOL-dRedressedBar-13`'s S6
+makes both name the fourth element. Lexicon's rows and unit 9's
 and unit 10's settings-merge rows carry none, so their labels and verdicts are unchanged.
 settings-merge's call gives its scratch directory a `.git` entry. The resolver's root walk then stops
 there and never reaches an ambient repository above the scratch directory. Its two new rows are
@@ -277,7 +284,14 @@ static term's resolved path, so it cannot pass on a static home.
 
 The `[dRB-11]` block follows unit 9's `[dRB-9]` block inside the scope that defines `stale_target`.
 It builds fixtures A, A-absent and B of §6, through `make_target`, `settle`, `stale_target` with
-`DEPLOY_FULL` plus `[kit.agent-cap] prefix = "scripts"`, and `run`. For A and B it asserts four
+`DEPLOY_FULL` plus `[kit.agent-cap] prefix = "scripts"`, and `run`. Fixture B's old-vintage
+agent-cap row comes from the selftest's `write_vintage_receipt` (`tools/govkit/selftest.py:617-673`),
+which writes a row's bytes at a vintage and sets its `commit`, `sha256` and `gov_oid`, and is
+idempotent over rows already rewound. The block appends the row and claims `agent-cap`, then calls
+`write_vintage_receipt(govroot, t, OLD)` before `settle`, so it never derives an identity itself.
+Unit 11's pass derived them by hand with a `git show`, `_sha` and `blob_oid`, and
+`TOOL-dRedressedBar-13`'s S17 rebuilds fixture B through the helper. For A and B the block asserts
+four
 facts. The run exits non-zero. Exactly one line opens with the problem prefix for settings-merge, and
 that line carries `cannot read` (the line, never the whole output). No line carries `means`, which
 is read from the descriptor's code-2 block at run time. For B, `gov_commit` is unchanged. A-absent
@@ -305,6 +319,8 @@ upgrade step. The next `apply` or `update` an adopter runs reads the new descrip
 - `tools/govkit/matrix.py`
 - `tools/govkit/selftest.py`
 - `tools/govkit/entries/settings-merge.kit.toml`
+- `memory/builds/dRedressedBar/build/`, for the acceptance ledger §6's `<p11>` reads. Unit 11's
+  pass, `b65688cde`, wrote no ledger there, and its commit body carries its readings.
 
 ### Alternatives rejected
 
@@ -324,9 +340,22 @@ Each candidate was written down with the test that could make it lose, and the p
 
 - security — Narrows an accepted stop and widens nothing: one more state is refused, none is newly
   accepted. The term reads the receipt through the resolver's own containment, so a row whose path
-  escapes the tree is skipped, never followed. S3 prints an adopter's stderr tail to the operator's
-  terminal, as the regenerate site already does. settings-merge's stderr carries paths and parse
-  positions, never settings values.
+  escapes the tree is skipped, never followed. That containment covers receipt rows only
+  (`tools/govkit/govkit.py:222`). The resolver's two static probes, `<here>/hooks` and
+  `<here>/../hooks` (`:224`), carry none, so with `prefix` at `.` the term's second static probe may
+  leave the tree, as unit 10's parent-home `must_not_exist` term may. Each fails closed there: a
+  hook in the target's parent makes the term refuse an exit unit 9 accepted, never accept one. S3
+  prints, verbatim
+  and to the operator's terminal, the last three stderr lines of whichever adopter CONFIGURE or the
+  gained loop refuses, as the regenerate site already does. So its producers are every shipped
+  descriptor's `[adopt].argv`: thirteen bash adopters, and `tools/settings-merge.py`, which
+  agent-cap's and settings-merge's argv both run. The bash adopters' own stderr lines were read
+  with `git ls-files 'tools/*adopt-*.sh' 'tools/playbook/adopt-playbook.sh' | grep -v test | xargs grep -h '>&2'`
+  at `fda78c56`. They print kit names, paths such as `$KIT_REL`, `$TARGET` and `$FIXTURE_REL`,
+  refusal and usage text, the `ROUTED_PATHS` candidate memory-tree appends to its conf, and
+  unfilled template lines, and none expands a credential. settings-merge's stderr carries paths and
+  parse positions, never settings values. A child process an adopter runs reaches the tail too, as
+  the target-side code's own output.
 - perf / scale — N/A — one receipt read per settings-merge exit 2, and two matrix rows.
 - error / empty / loading states — No receipt, an unreadable receipt and a malformed receipt each
   read as no rows, which is the adopter's reading. A malformed term value refuses the block.
@@ -420,7 +449,7 @@ name them. Every command runs from the worktree root. Fixtures live in fresh `gi
 
 ## 7. Gates
 
-`govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selfcheck` · `receipt sync (installed files match the receipt)` · `recall floor arms` · `encoding posture (text IO names its encoding)`
+`govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selfcheck` · `receipt sync (installed files match the receipt)` · `recall floor` · `recall floor arms` · `memory hygiene` · `encoding posture (text IO names its encoding)`
 
 New arm: tools/govkit/matrix.py · covers AC2 AC6 · settings-merge's receipt-homed row over unit 10's block at `<p10>` reads ACCEPTED, and the key rule over a descriptor patched to `must_not_resolves` reads false · none
 New arm: tools/govkit/selftest.py · covers AC3 AC4 AC5 · the `[dRB-11]` block over unit 10's block, where fixtures A and B exit 0 on the accepted stop, and at `ebce889c`, where the problem lines carry no `cannot read` · none
@@ -452,6 +481,26 @@ none
   that a later run reads that receipt, which unit 12 keeps whole. The first "What an adopter sees
   change" row's "After" cell says the refusal holds on every re-run, which TOOL-dRedressedBar-12's
   AC2 observes. AC3's text does not move. No scope or criterion moves.
+- rev-5 · 2026-10-14 · §4 · §5 · §7 · a records fix for TOOL-dRedressedBar-13, closing the
+  units-10-11 spec audit's report ids 6, 7, 10, 11, 12, 13, 17, 20, 21, 22 and 24, written by that
+  unit's spec-writer pass `<w13>`. The status stays CLOSED. Corrected in place: §4 "The witnessing
+  arms" names the two texts that state the row shape and that they gain the fourth element (id 6),
+  and builds fixture B's old-vintage row through `write_vintage_receipt` (id 17). §4 "The refused
+  exit names its reason" states that CONFIGURE decoded its stderr with the host's codepage, and that
+  TOOL-dRedressedBar-13 decodes it as UTF-8 and moves the row from 36 to 35 (id 13). §4 "Order, and
+  unit 7" points at the build README, which already holds the ordering it called pending (ids 11
+  and 21). Files touched gains `memory/builds/dRedressedBar/build/`, and §7 gains `recall floor` and
+  `memory hygiene` (id 20). §5 security states that the resolver's containment covers receipt rows
+  only (id 12), and prices the stderr tail over every adopter that can print it (id 24). Criterion
+  halves that did not hold, each observed in its corrected form by TOOL-dRedressedBar-13: AC6 pinned
+  the two `lexicon ` labels while S4 gave the key rule no label prefix (id 7, its AC7). AC6 never
+  exercised the agreement rule's union by `want`, because settings-merge has one `ok = true` block
+  (id 10, its AC9). AC4's "Before the commit" was inexact, because `stale_target` has already
+  settled when the plant begins (id 17, its AC15). The fourth element is observed in the helper's
+  docstring and spec 9 (id 6, its AC6). Id 22 is a code fix that unit's build pass owns: S2's
+  "Nothing else in the descriptor moves" left the code-2 block's comment describing one term. No
+  criterion text moves. The CONFIGURE call is cited at `tools/govkit/govkit.py:7781`, read at
+  `fda78c56`, where the report read `:7744`, because later build passes moved `_cmd_apply`.
 
 ## 10. Reuse audit
 

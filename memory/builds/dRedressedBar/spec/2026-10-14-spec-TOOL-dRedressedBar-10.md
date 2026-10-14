@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-10 — the round-1 spec audit's 12 mediums and 11 lows, batched: each criterion observed in a form that can pass and fail, each false sentence corrected, and settings-merge's accepted stop narrowed
 
-**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 6 · ratified 2026-10-14
+**Status:** CLOSED · rev-6 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 6 · ratified 2026-10-14
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-3-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md) | research | TOOL-dRedressedBar-13 TOOL-dRedressedBar-17 TOOL-dRedressedBar-19 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-5-spec-writer.md) | journal | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-13-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-13-4-revision.md) | research | TOOL-dRedressedBar-13 TOOL-dRedressedBar-9 TOOL-dRedressedBar-11 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-19-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-19-2-revision.md) | research | TOOL-dRedressedBar-19 |
 | [2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-11 |
 
@@ -21,7 +22,7 @@
 The spec audit of units 1 to 9
 (`reviews/2026-10-14-review-TOOL-dRedressedBar-spec-audit-round1.md`) exited CONVERGED with 23
 confirmed findings: no blocker, no high, 12 mediums and 11 lows. BUILD-METHOD M4 promotes every
-one, the minors batched into ONE unit, and this is that unit. The findings land on eight specs, so
+one, the minors batched into ONE unit, and this is that unit. The findings land on nine specs, so
 it repairs no unit in particular and is ordered after every unit the audit read. It closes, by report
 id, with the report item each shares:
 
@@ -165,7 +166,13 @@ names its own id.
 - Rewriting a sibling's criteria. Each sibling is built against its §6 as written. Its revision line
   states which half did not hold and names the criterion here that observes the corrected form.
   Prose that states a false fact is corrected in place, because that is a design claim and not a
-  criterion something was built against.
+  criterion something was built against. One criterion text is the exception: spec 7's AC4 wording
+  is the single criterion text S9 edits, because its range of units is that false fact and AC9
+  reads all of spec 7. Unit 7's ledger is not contradicted. The range gains units 8 and 9, beside
+  unit 20, which AC4 already counted through playbook-render, and neither moves a kit version. Unit
+  8's one `tools/` file is `project-owned` (`tools/run-gates/kit.toml:40-41`), and unit 9's files
+  sit under `{prefix}/govkit`, which the registry exempts (`tools/govkit/registry.toml:295-297`).
+  So the kit set AC4 derives from its own `epoch` run is the same set before and after.
 - Re-running a sibling's build or re-observing a criterion the audit did not fault.
 - The report's left-shift proposals: the spec-lint checks for `grep -c` against a call count, for a
   base-anchored diff in a parallel unit, for hard-coded unit ranges after an M2 ADD, and for a
@@ -278,9 +285,15 @@ probe = { must_exist = "{prefix}/settings-merge.py", must_not_exist = ["{prefix}
 `classify_outcome` already takes a list for either key (`tools/govkit/govkit.py:6316-6327`), and
 the matrix's agreement rule reads a list through `derive_probe_paths` (`tools/govkit/matrix.py:227-229`,
 where unit 9's helper moved it).
-No reader of the probe keys exists outside those two. With `prefix` at `tools`, the new term
-normalises to `hooks/agent-cap.js` at the target root, inside the target. With `prefix` at `.`, it
-resolves outside the target and reads absent there, which leaves the stop exactly as wide as unit 9's.
+A third reader exists: the accepted-stops class rule in `check_outcome_probes`
+(`tools/govkit/matrix.py:216-221`, read at `fda78c56`), which reads `must_exist` alone and which this
+unit leaves untouched. The inventory is `git grep -n 'must_exist\|must_not_exist' -- 'tools/*.py'`,
+whose other hits are docstrings, comments and two selftest fixtures. With `prefix` at `tools`, the
+new term normalises to `hooks/agent-cap.js` at the target root, inside the target. With `prefix` at
+`.`, it resolves to the target's parent directory, which `classify_outcome` tests with no containment
+(`tools/govkit/govkit.py:6345`, read at `fda78c56`). It reads absent unless that directory holds
+`hooks/agent-cap.js`, and then the stop is as wide as unit 9's. Where that directory holds it, the
+stop is refused where unit 9 accepted it, which fails closed.
 
 What still reads as an accepted stop: a hook the receipt alone locates, under either verb, with a
 `settings.json` that fails to parse or write. The verb exits 0 and prints `no-agent-cap-to-wire`.
@@ -292,8 +305,13 @@ Spec 9 §4 and §5 state it in those words, as an open false accept and not an a
 
 The matrix row joins settings-merge's call to `check_outcome_states` as a fourth state: settings-merge.py
 present, the hook present at the parent home only, rc 2, expected REFUSED. Its path is derived, never
-typed: agent-cap's destination from `resolve_entry`, with settings-merge's `{prefix}` replaced by
-that prefix's parent.
+typed: agent-cap's destination from `resolve_entry`, re-homed one level above settings-merge's
+prefix. The parent-home path comes from `govkit.resolve_prefix_token`
+(`tools/govkit/govkit.py:179-190`, the marked canonical copy), never from a hand `.replace` of the
+`{prefix}` token. The `python resolver (behaviour + inline parity + idiom ban)` leg refuses that
+idiom in any tracked python file outside the marked block. Unit 10's pass joined the path with
+`posixpath` (`tools/govkit/matrix.py:318-319`, read at `fda78c56`), and `TOOL-dRedressedBar-13`'s
+S18 routes it through `resolve_prefix_token`.
 
 ### The sibling rev bumps, a pass of their own
 
@@ -337,7 +355,7 @@ The eight sibling specs are `<s10>`'s write set, not this pass's.
 | Candidate | The test that rejected it | Verdict |
 |---|---|---|
 | Fold each fix into its sibling spec now, before the siblings build | M4 forbids folding at a CONVERGED exit (owner, SPEC 2026-10-05) | Refused by the method |
-| Rewrite each faulted criterion in place after its unit closes | The sibling's ledger answered the criterion as written; a rewrite leaves the ledger answering text that no longer exists | Rejected; the revision line points here instead |
+| Rewrite each faulted criterion in place after its unit closes | The sibling's ledger answered the criterion as written; a rewrite leaves the ledger answering text that no longer exists. Spec 7's AC4 wording is the one criterion text S9 edits, a false range whose ledger reading does not move (§3) | Rejected; the revision line points here instead |
 | Two batch units split by write set | S7, S9 and S22 all write spec 9, so no split leaves two disjoint write sets (M6 clause 1) | Rejected |
 | S22 by pricing alone, §8 F1 option (b) | It leaves a false accept a static probe can see, at the resolver's own second home, against the charter's deny-by-default rule | Recommended against in F1 |
 | The sibling corrections in the build pass's own commit, as rev-4 wrote it | scratch-guard refuses a builder's edit to a spec other than its own status and date cells, and the spec writer writes no product file, so no role can make that commit | Refused by the hook; the builder's divergence |
@@ -354,10 +372,12 @@ The eight sibling specs are `<s10>`'s write set, not this pass's.
 - observability — Unchanged output shapes. A refused stop prints the existing
   `no declared outcome accepts that` and `adopter exit 2` lines.
 - risks — The spec-writer pass `<s10>` edits eight CLOSED specs. Each edit is one rev bump with a
-  revision line, and no criterion text moves, so no ledger is contradicted. A build pass that
-  started before `<s10>` exists would read the uncorrected siblings, so the builder returns that to
-  the main loop before any write. A narrowed probe that also matched the
-  no-hook state would red unit 9's `[dRB-9]` arm, and AC16's first row refuses that.
+  revision line. One criterion text moves, spec 7's AC4 wording, the single criterion edit §3 names,
+  and unit 7's ledger still answers it, because the kit set AC4 derives from its own `epoch` run is
+  the same before and after. Every other criterion text stands, so no ledger is contradicted. A
+  build pass that started before `<s10>` exists would read the uncorrected siblings, so the builder
+  returns that to the main loop before any write. A narrowed probe that also matched the no-hook
+  state would red unit 9's `[dRB-9]` arm, and AC16's first row refuses that.
 - testing — AC1 to AC19 are direct probes, greps and scratch fixtures under `%TEMP%`, each seconds
   long except AC17. The one moved arm is declared in §7.
 - migration — N/A — no receipt, conf or deploy field moves.
@@ -494,7 +514,7 @@ Every command runs from the worktree root.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `memory hygiene` · `codebase-map coverage + freshness`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `memory hygiene` · `codebase-map coverage + freshness` · `python resolver (behaviour + inline parity + idiom ban)` · `spec tokens (a spec's own names resolve)` · `encoding posture (text IO names its encoding)`
 
 New arm: tools/govkit/matrix.py · covers AC16 · stage unit 9's single-term block and the parent-home row of settings-merge's `check_outcome_states` call reads ACCEPTED · none
 
@@ -558,6 +578,26 @@ revision lines at `<s10>`.
   `tools/govkit/govkit.py` cites and S8's `EPOCH_ROLES` cite move by +3, read at `671f25c7` after
   unit 20, and `derive_probe_paths` is cited at `tools/govkit/matrix.py:227-229` after unit 9.
   Alternatives rejected gains two rows. No product design or other criterion moves.
+- rev-6 · 2026-10-14 · §1 · §3 · §4 · §5 · §7 · §10 · a records fix for TOOL-dRedressedBar-13,
+  closing the units-10-11 spec audit's report ids 1, 2, 3, 4, 5, 8, 9, 12, 14, 15, 16, 18 and 19,
+  written by that unit's spec-writer pass `<w13>`. The status stays CLOSED. Corrected in place: §1
+  counts nine specs (id 5). §3's first non-goal, §4 Alternatives row 2 and §5 risks name spec 7's
+  AC4 wording as the single criterion text S9 edits, and say why unit 7's ledger still holds (id 2).
+  §4's prefix-`.` sentence states when the parent-home term reads present and that it fails closed
+  there (id 12). Its reader inventory names the accepted-stops class rule as a third reader, with the
+  `git grep` that found it (id 15). Its matrix-row paragraph takes the parent-home path from
+  `resolve_prefix_token`, never a hand `.replace` (id 18). §7 names the resolver leg (id 18) and the
+  spec-tokens and encoding-posture legs (id 19). §10 names the spawn leg's counter and comparator
+  (id 16). Criterion halves that did not hold, each observed in its corrected form by
+  TOOL-dRedressedBar-13: AC5's line-wise grep printed nothing at the pinned spec 8, which wraps the
+  sentence across two lines (ids 1 and 8, its AC1). S17's spec-9 half was observed by no criterion
+  (id 3, its AC3). AC8's `project-owned` half passed on spec 4's hands-off line (id 4, its AC4).
+  AC3's `n` half matched any shell line (id 9, its AC8). S5 claimed six registry classes observed
+  where AC5 compared five, and AC5 and AC12 counted through `scan_spawn_file` alone (ids 14 and 16,
+  its AC13). No criterion text moves. The new cites were read at `fda78c56`, after units 10, 11 and
+  12 moved `tools/govkit/govkit.py` and `tools/govkit/matrix.py`: the class rule the report cites at
+  `matrix.py:181-185` is at `:216-221`, and the unguarded exists test it cites in
+  `govkit.py:6311-6325` is at `:6345`.
 
 ## 10. Reuse audit
 
@@ -567,7 +607,12 @@ sibling kit's hook at either static home"` ranked `classify_outcome`, `outcome_a
 `classify_outcome` in `tools/govkit/govkit.py`, which already reads a list, and unit 9's
 `check_outcome_states` in `tools/govkit/matrix.py`, which takes rows. No code is minted. The other
 items extend existing readers: the leg's own classifier `scan_spawn_file` for AC5 and AC12, so no
-regex is re-typed, and each sibling's own criteria commands, corrected. The recall probe returned
+regex is re-typed, and each sibling's own criteria commands, corrected. The leg's counter and
+comparator are its seams too: `build_spawn_measured`, `read_registry` with `SPAWN_KEY_SHAPE`, and
+`check_registry` (`tools/gate-lint/sh_hygiene.py:872`, `:384`, `:444`), beside `scan_spawn_file`
+(`:798`). AC5 and AC12 named the classifier alone, whose lists carry near misses flagged False, and
+`TOOL-dRedressedBar-13`'s AC13 observes both through the whole chain, read-only and never as the
+gate. The recall probe returned
 `TOOL-aEvidencedLens-20`, the precedent minors batch that observed a built unit's criteria and
 corrected its prose with one rev bump, and this unit takes its shape. The gotchas checklist for the
 two product paths selected `fixture-passes-by-finding-nothing`, which is why AC16's no-hook row and

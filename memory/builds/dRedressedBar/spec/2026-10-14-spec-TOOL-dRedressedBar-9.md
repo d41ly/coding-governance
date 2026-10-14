@@ -1,12 +1,13 @@
 # TOOL-dRedressedBar-9 — settings-merge's adopter exit with no agent-cap hook declared an accepted stop, so a gaining update completes
 
-**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
+**Status:** CLOSED · rev-6 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md](../build/2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-13-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-13-4-revision.md) | research | TOOL-dRedressedBar-13 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-9-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-9-1-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-9-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-9-brief.md) | research | — |
 | [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 |
@@ -228,9 +229,12 @@ sites predating that leg, do not move.
 `tools/govkit/matrix.py:222-241` grades lexicon's code-1 stop through the engine over two states.
 This is that kind's second instance, so the loop becomes `check_outcome_states`, a module-level
 helper taking the descriptors, the scratch directory, an entry id, an exit code and a list of
-`(label, present paths, expected verdict)` rows. Lexicon's call keeps its two rows and its two check
-labels byte for byte. settings-merge's call grades rc 2 over the three states in the table above. Its
-two paths come from the engine's own resolver, `resolve_entry` (`tools/govkit/govkit.py:449`), over
+`(label, present paths, expected verdict)` rows. A row may carry an optional fourth element, which
+`TOOL-dRedressedBar-11` added: a mapping from a target-relative path to text, which the helper
+writes before it classifies and deletes after (`tools/govkit/matrix.py:165`). Lexicon's call keeps
+its two rows and its two check labels byte for byte. settings-merge's call grades rc 2 over the
+three states in the table above. Its two paths come from the engine's own resolver, `resolve_entry`
+(`tools/govkit/govkit.py:449`), over
 the agent-cap and settings-merge descriptors in the probe directory's context. So a probe naming a
 path agent-cap does not land at reds the "agent-cap.js absent" row rather than passing on a typed
 copy of itself.
@@ -432,6 +436,12 @@ none
   observations, and neither criterion reads `tools/govkit/selftest.py` or `tools/govkit/matrix.py`.
   TOOL-dRedressedBar-10's AC7 reads both files directly. Edges gain the hands-off to
   `TOOL-dRedressedBar-7`, the mirror of that spec's new `consumes-from`.
+- rev-6 · 2026-10-14 · §4 · a records fix for TOOL-dRedressedBar-13, closing the units-10-11 spec
+  audit's report id 6, written by that unit's spec-writer pass `<w13>`. The status stays CLOSED, and
+  no criterion text moves. §4 "The witnessing arms" stated `check_outcome_states`'s rows as three
+  elements, and `TOOL-dRedressedBar-11` gave them an optional fourth. The sentence now names it,
+  cited at `tools/govkit/matrix.py:165` at `fda78c56`. TOOL-dRedressedBar-13's AC6 reads it beside
+  the helper's docstring.
 
 ## 10. Reuse audit
 
