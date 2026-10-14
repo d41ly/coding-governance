@@ -7777,8 +7777,12 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         resolved = [resolve_tokens(a, ctx)[0] for a in argv]
         # BOUND, not reduced to its code (TOOL-dRedressedBar-11 S3): a refused exit below ends its
         # problem line with the adopter's own stderr, the regenerate site's shape, so the operator
-        # reads the reason and not only an integer.
-        _cfg_run = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True, text=True)
+        # reads the reason and not only an integer. UTF-8 as the regenerate site and the gained loop
+        # decode, never the host codepage, and REPLACED where it cannot decode: this runs after the
+        # bytes landed and before the receipt is written, so a decode error raised here is the
+        # half-install the F4 comment above says this verb avoids (TOOL-dRedressedBar-13).
+        _cfg_run = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True,
+                                  text=True, encoding="utf-8", errors="replace")
         rc = _cfg_run.returncode
         outcome = classify_outcome(target, d, ctx, rc)
         means = outcome.get("means") if outcome else None

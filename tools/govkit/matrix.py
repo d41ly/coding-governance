@@ -151,7 +151,10 @@ def check_outcome_states(descs: dict, g: pathlib.Path, eid: str, rc: int,
                          rows: list[tuple]) -> None:
     """THE ENGINE'S OWN VERDICT on one entry's exit code, over states a row each.
 
-    A row is `(label, present paths, expected verdict)`. Every path any row names is made to exist
+    A row is `(label, present paths, expected verdict)`, with an optional fourth element
+    (TOOL-dRedressedBar-11): a mapping from a target-relative path to text, written before the
+    engine classifies and deleted after, which is how a row states a receipt. A three-element row
+    still reads, because the fourth is optional. Every path any row names is made to exist
     or not before the engine is asked, so each state is exactly the one its row declares, and the
     verdict is `outcome_accepted` over `classify_outcome` as `apply` and `update` both read it.
     Extracted at the kind's second instance (TOOL-dRedressedBar-9): lexicon's code-1 stop was the
@@ -269,17 +272,20 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
     # refused at run time: it is SKIPPED, and the block matches on its remaining terms. A typo in an
     # absence term therefore widens an accepted stop with no message anywhere. THE CLASS, over every
     # `[[outcome]]` block of every descriptor, accepted or not, since an unaccepted block's key is
-    # skipped just the same.
+    # skipped just the same. Every label opens `outcome probe keys: `, the liveness one included, so
+    # the rule reads as its own rule in the output, and a count of the labels that open with an
+    # entry's id counts that entry's verdict rows alone (TOOL-dRedressedBar-13).
     _blocks = [(eid, b) for eid, (d, _p) in sorted(descs.items()) for b in d.get("outcome", [])]
     for eid, b in _blocks:
         _unknown = sorted(set(b.get("probe") or {}) - set(govkit.OUTCOME_PROBE_KEYS))
-        check("probe keys: '%s' code %s %r carries only keys the engine evaluates"
+        check("outcome probe keys: '%s' code %s %r carries only keys the engine evaluates"
               % (eid, b.get("code"), b.get("means")),
               not _unknown,
               "%s is not in govkit.OUTCOME_PROBE_KEYS %s, so classify_outcome skips it and the block "
               "matches without it" % (_unknown, sorted(govkit.OUTCOME_PROBE_KEYS)))
     # The liveness half: over blocks that carry no probe key at all, every label above reads true.
-    check("probe keys: at least one shipped [[outcome]] block carries a key, so the rule graded one",
+    check("outcome probe keys: at least one shipped [[outcome]] block carries a key, so the rule "
+          "graded one",
           any(b.get("probe") for _eid, b in _blocks),
           "%d block(s), none with a probe key, so the key rule above graded nothing" % len(_blocks))
 
@@ -313,10 +319,13 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
         hook, adopter = engine["agent-cap"][0], engine["settings-merge"][0]
         # THE RESOLVER'S SECOND STATIC HOME (TOOL-dRedressedBar-10): settings-merge.py probes
         # `<here>/../hooks` after `<here>/hooks`, so a hook there is found and an exit 2 is a
-        # failure. Derived from the hook's landed path with settings-merge's `{prefix}` replaced by
-        # that prefix's parent, never typed; the join climbs one level, so it never equals `hook`.
+        # failure. Derived from the hook's landed path, re-homed one level above settings-merge's
+        # `{prefix}` and resolved by the marked canonical `govkit.resolve_prefix_token`, never typed
+        # and never a hand replacement of the token (TOOL-dRedressedBar-13). The root it resolves
+        # against climbs one level, so the path never equals `hook`.
         _sm = govkit.target_context(g, deploy, "settings-merge", descs["settings-merge"][0])["prefix"]
-        parent = posixpath.normpath(posixpath.join(_sm, "..", posixpath.relpath(hook, _sm)))
+        parent = govkit.resolve_prefix_token("{prefix}/" + posixpath.relpath(hook, _sm),
+                                             posixpath.normpath(posixpath.join(_sm, "..")))
         # A HOME ONLY THE RECEIPT RECORDS (TOOL-dRedressedBar-11): the adopter's resolver reads
         # `.governance/install.json` first, so a hook at a renamed home is found and an exit 2 is a
         # failure, where no static term sees it. The row's `source` is agent-cap's engine source as

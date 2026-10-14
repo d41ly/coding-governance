@@ -1,11 +1,12 @@
 # TOOL-dRedressedBar-13 — the units-10-11 spec audit's 5 mediums and 18 lows, batched: each criterion half observed in a form that can fail, each false sentence corrected, and the code sites they describe made to say what the specs claim
 
-**Status:** SPECCED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
+**Status:** CLOSED · rev-5 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-14-build-TOOL-dRedressedBar-13-1-acceptance-ledger.md](../build/2026-10-14-build-TOOL-dRedressedBar-13-1-acceptance-ledger.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-4-revision.md) | research | TOOL-dRedressedBar-10 TOOL-dRedressedBar-17 TOOL-dRedressedBar-19 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-13-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-13-2-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-13-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-13-3-spec-writer.md) | journal | — |

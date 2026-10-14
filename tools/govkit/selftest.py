@@ -3409,21 +3409,30 @@ def main() -> int:
               f"rc {_rb11pn.returncode} · code-2 means {means9} · {_rb11pn.stdout[-900:]}")
 
         # B's hook row is an OLDER INSTALL: its bytes and both identities at OLD, as the receipt's.
+        # The row carries the source `resolve_entry` gives agent-cap's hook in B's own context, and
+        # `write_vintage_receipt` writes that source's bytes at OLD and sets its `commit`, `sha256`
+        # and `gov_oid`, so this block never derives an identity itself (TOOL-dRedressedBar-13). The
+        # helper re-sets the rows `stale_target` already rewound to the same values.
         _rb11b = stale_target("rq11b", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n')
         _rb11dest = f"scripts/{KIT_NAMES['hooks']}/agent-cap.js"
-        _rb11hk = subprocess.run(["git", "-C", str(govroot), "show", f"{OLD}:{_rb11src}"],
-                                 capture_output=True).stdout
-        check("[dRB-11] LIVENESS gov shipped the hook at OLD, so fixture B's row is an older install",
-              bool(_rb11hk), f"{_rb11src} at {OLD[:8]}")
+        _rb11d = _rb11gk.read_descriptors(govroot, _rb11gk.load_toml(
+            govroot / PFX / KIT_NAMES["govkit"] / "registry.toml"), _rb11gk.Report())["agent-cap"][0]
+        _rb11w = _rb11gk.resolve_entry(govroot, _rb11d, _rb11gk.target_context(
+            _rb11b, _rb11gk.load_toml(_rb11b / ".governance" / "deploy.toml"), "agent-cap",
+            _rb11d))["writes"]
         (_rb11b / _rb11dest).parent.mkdir(parents=True, exist_ok=True)
-        (_rb11b / _rb11dest).write_bytes(_rb11hk)
         _rb11rp = _rb11b / ".governance" / "install.json"
         _rb11rec = json.loads(_rb11rp.read_text(encoding="utf-8"))
         _rb11rec["files"].append({"path": _rb11dest, "kit": "agent-cap", "role": "engine",
-                                  "source": _rb11src, "commit": OLD, "sha256": _rb11gk._sha(_rb11hk),
-                                  "gov_oid": _rb11gk.blob_oid(_rb11hk)})
+                                  "source": (_rb11w.get(_rb11dest) or {}).get("src")})
         _rb11rec["kits"] = [*(_rb11rec.get("kits") or []), "agent-cap"]
         _rb11rp.write_text(json.dumps(_rb11rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+        write_vintage_receipt(govroot, _rb11b, OLD)
+        _rb11row = [f for f in json.loads(_rb11rp.read_text(encoding="utf-8"))["files"]
+                    if f.get("path") == _rb11dest]
+        check("[dRB-11] LIVENESS gov shipped the hook at OLD, so fixture B's row is an older install",
+              len(_rb11row) == 1 and _rb11row[0].get("commit") == OLD and (_rb11b / _rb11dest).is_file(),
+              f"{_rb11dest} at {OLD[:8]}: {json.dumps(_rb11row)}")
         (_rb11b / ".claude").mkdir(exist_ok=True)
         (_rb11b / ".claude" / "settings.json").write_text("{", encoding="utf-8", newline="\n")
         settle(_rb11b, "agent-cap at its per-kit prefix at OLD, and a malformed settings file")
