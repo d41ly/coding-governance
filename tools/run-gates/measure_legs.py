@@ -582,12 +582,12 @@ def derive_leg_turnstile(rows, trees, ts):
         for w in tree:
             owner_of[w] = i
 
-    def owner(pid):
+    def resolve_owner(pid):
         w = by_msys.get(pid)
         return None if w is None else owner_of.get(w, "foreign")
 
-    return {"holders": [(pid, owner(pid)) for _slot, pid in ts["holders"]],
-            "tickets": [(name, owner(pid)) for name, pid, _stamp in ts["tickets"]]}
+    return {"holders": [(pid, resolve_owner(pid)) for _slot, pid in ts["holders"]],
+            "tickets": [(name, resolve_owner(pid)) for name, pid, _stamp in ts["tickets"]]}
 
 
 def derive_turnstile_wait(sightings, tick_t, stamps, lo, hi):
@@ -1447,7 +1447,7 @@ def run_profile(opts):
     state = {"prev": None, "cpu": None, "mem": None, "sample_m": -1.0, "admit_m": -1.0, "peak": 0,
              "first_admit_m": None, "last_end_m": None, "eligible_m": time.monotonic()}
 
-    def admit(event_rows):
+    def run_admission(event_rows):
         i = pending.pop(0)
         lg = legs[i]
         now = time.monotonic()
@@ -1467,7 +1467,7 @@ def run_profile(opts):
         event_rows.append("admit %d" % i)
         return i
 
-    def end_leg(i, ended_ns, rc):
+    def write_leg_end(i, ended_ns, rc):
         lg = running.pop(i)
         lg["ended_ns"], lg["rc"], lg["end_m"] = ended_ns, rc, time.monotonic()
         try:
@@ -1487,7 +1487,7 @@ def run_profile(opts):
                           render_host_row(time.time_ns(), state["cpu"], state["mem"], len(running), "end %d" % i))
         ending[i] = lg
 
-    def finalize(lg):
+    def write_leg_profile(lg):
         rec = derive_leg_profile(lg, ctx["ticks"], ctx)
         lg["record"] = rec
         write_atomic(os.path.join(run_dir, "%d.leg" % lg["i"]), (render_leg_row(rec) + "\n").encode("utf-8"))
@@ -1525,7 +1525,7 @@ def run_profile(opts):
                 events, n_before = [], len(running)
                 if opts.mode == "concurrent" and pending and running \
                         and check_admit(cpu, mem, len(running), state["sample_m"] > state["admit_m"]):
-                    admit(events)
+                    run_admission(events)
                 write_record_line(os.path.join(run_dir, "host.tsv"),
                                   render_host_row(time.time_ns(), cpu, mem, n_before, ",".join(events)))
                 next_tick += HOST_EVERY_S
@@ -1533,7 +1533,7 @@ def run_profile(opts):
                     next_tick = now + HOST_EVERY_S
             if pending and not running:
                 events = []
-                admit(events)
+                run_admission(events)
                 write_record_line(os.path.join(run_dir, "host.tsv"),
                                   render_host_row(time.time_ns(), state["cpu"], state["mem"], 0, ",".join(events)))
             if worker is not None and not worker.is_alive():
@@ -1547,7 +1547,7 @@ def run_profile(opts):
                 next_census = state["worker_m0"] + opts.census_every
             for i in sorted(ending):
                 if worker is None or state["worker_m0"] > ending[i]["end_m"]:
-                    finalize(ending.pop(i))
+                    write_leg_profile(ending.pop(i))
             wake = next_tick
             if worker is None and (pending or running):
                 wake = min(wake, next_census)
@@ -1561,12 +1561,12 @@ def run_profile(opts):
             for i in sorted(running):
                 ex = read_root_exit(api, running[i]["hq"])
                 if ex is not None:
-                    end_leg(i, *ex)
+                    write_leg_end(i, *ex)
     except KeyboardInterrupt:
         for lg in running.values():
             raw_kept.append({"leg": lg["name"], "path": lg["capture"], "reason": "interrupted"})
         for i in sorted(ending):
-            finalize(ending.pop(i))
+            write_leg_profile(ending.pop(i))
         envelope["exit"] = 130
         envelope["failed_legs"] = [lg["name"] for lg in legs if lg.get("record") and lg["record"]["verdict"] != "ok"]
         write_envelope(run_dir, envelope)
