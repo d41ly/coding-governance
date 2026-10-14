@@ -1,10 +1,13 @@
 # TOOL-dRedressedBar-10 — the round-1 spec audit's 12 mediums and 11 lows, batched: each criterion observed in a form that can pass and fail, each false sentence corrected, and settings-merge's accepted stop narrowed
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 6 · ratified 2026-10-14
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-14-prompt-TOOL-dRedressedBar-10-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-2-revision.md) | research | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-10-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-3-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -14,7 +17,7 @@ The spec audit of units 1 to 9
 (`reviews/2026-10-14-review-TOOL-dRedressedBar-spec-audit-round1.md`) exited CONVERGED with 23
 confirmed findings: no blocker, no high, 12 mediums and 11 lows. BUILD-METHOD M4 promotes every
 one, the minors batched into ONE unit, and this is that unit. The findings land on eight specs, so
-it repairs no unit in particular and is ordered after every unit of the build. It closes, by report
+it repairs no unit in particular and is ordered after every unit the audit read. It closes, by report
 id, with the report item each shares:
 
 | id | grade | item | sits in | what is wrong | closed by |
@@ -131,7 +134,8 @@ names its own id.
   claimed, and agent-cap at a home the receipt records. The code-2 block in
   `tools/govkit/entries/settings-merge.kit.toml` takes a second `must_not_exist` term,
   `{prefix}/../hooks/agent-cap.js`, so the stop is refused wherever settings-merge.py's resolver can
-  find the hook without the receipt. The receipt-homed residual is stated and priced. settings-merge's
+  find the hook without the receipt. The receipt-homed residual is stated as open, never as accepted,
+  and pointed at `TOOL-dRedressedBar-11`, whose receipt-reading probe term closes it. settings-merge's
   call to `check_outcome_states` in `tools/govkit/matrix.py` gains one row for the parent home.
   Observed by AC15, AC16, AC17 and AC18.
 - **S23** — id 23, L4. The failure-envelope lens's reading of S9's defect, with the skeptic's caveat
@@ -154,9 +158,9 @@ names its own id.
   base-anchored diff in a parallel unit, for hard-coded unit ranges after an M2 ADD, and for a
   `[[generated]]` output in a Readers list, and the checklist entries. Each is its own mechanism, and
   none is needed to close these 23 findings.
-- A receipt-reading probe term in `classify_outcome`, which would close the receipt-homed residual
-  S22 prices. It is a new vocabulary in the descriptor contract three verbs read, a separate
-  mechanism, and an owner turn (§8 F1 option (c)).
+- A receipt-reading probe term in `classify_outcome`, which closes the receipt-homed residual S22
+  leaves. It is a new vocabulary in the descriptor contract three verbs read and a separate
+  mechanism, so the owner added it as `TOOL-dRedressedBar-11` (§8 F1).
 - No edit to `tools/govkit/govkit.py`, `tools/settings-merge.py`, `tools/hooks/kit.toml` or
   `tools/govkit/selftest.py`. No kit version bump: both product files sit under `{prefix}/govkit`,
   which the registry exempts (`tools/govkit/registry.toml:295-297`).
@@ -186,6 +190,10 @@ names its own id.
 - **consumes-from** `TOOL-dRedressedBar-9` — its code-2 block, which S22 narrows, its
   `check_outcome_states`, which S22's row joins, and its `[dRB-9]` arm, which AC7 reads. Its spec's
   §4 and §5 are corrected by S22, and its Edges gain S9's hands-off.
+- **hands-off** `TOOL-dRedressedBar-11` — the receipt-homed residual S22 leaves open: agent-cap's
+  hook at a home only the receipt records, with a `.claude/settings.json` that fails to parse or
+  write, still reads as the accepted stop over this unit's two-term block. Unit 11's receipt-reading
+  probe term in `classify_outcome` closes it, in the code-2 block this unit narrows.
 
 ## 4. Design
 
@@ -258,8 +266,9 @@ What still reads as an accepted stop: a hook the receipt alone locates, under ei
 `settings.json` that fails to parse or write. The verb exits 0 and prints `no-agent-cap-to-wire`.
 On the `update` route, a fragment the same run wires prints its own
 `REFUSED by settings-merge (exit 2)` line first (`run_fragment_merges`,
-`tools/govkit/govkit.py:5913-5917`), which names the parse failure without counting a problem. Spec 9 §4 and §5 state it in those words, as the residual
-this build prices and the owner's follow-up in §8 F1 option (c).
+`tools/govkit/govkit.py:5913-5917`), which names the parse failure without counting a problem.
+Spec 9 §4 and §5 state it in those words, as an open false accept and not an accepted one, closed by
+`TOOL-dRedressedBar-11`'s receipt-reading probe term (§8 F1).
 
 The matrix row joins settings-merge's call to `check_outcome_states` as a fourth state: settings-merge.py
 present, the hook present at the parent home only, rc 2, expected REFUSED. Its path is derived, never
@@ -310,7 +319,8 @@ this unit. The pass adds one rev bump per spec it amends, with the revision line
 ## 5. Production-readiness checklist
 
 - security — S22 narrows an accepted stop and widens nothing: one more state is refused, none is
-  newly accepted. The receipt-homed residual is stated where unit 9's spec claimed none existed.
+  newly accepted. The receipt-homed residual is stated where unit 9's spec claimed none existed, as
+  open and handed off to `TOOL-dRedressedBar-11`.
 - perf / scale — N/A — one more `exists` call per settings-merge exit 2, and one matrix row.
 - error / empty / loading states — An exit 2 with the hook at either static home now fails the
   verb, so a malformed `settings.json` is reported as a problem instead of an accepted stop.
@@ -421,7 +431,8 @@ runs from the worktree root.
   with the hook at the prefix's parent home only, and ACCEPTED with the hook at a third path only.
   Red when: the parent-home row reads ACCEPTED, as it does over unit 9's block, or the no-hook row
   reads REFUSED and unit 9's stop is lost.
-  figure: the fourth row is the priced residual, PINNED as ACCEPTED by design.
+  figure: the fourth row is PINNED as ACCEPTED at this unit's pass. No receipt in the scratch
+  directory records the third path, and the receipt-homed route is `TOOL-dRedressedBar-11`'s.
 - **AC17** — When a scratch target applies `--kits settings-merge`, then gets `hooks/agent-cap.js`
   at its root and a `.claude/settings.json` holding `{`, a second
   `python tools/govkit/govkit.py apply --target <t> --kits settings-merge` exits 1. Its output
@@ -435,7 +446,7 @@ runs from the worktree root.
   cost: the update half builds a `stale_target`-shaped program, about a minute.
 - **AC18** — When `grep -n 'reachable only by' memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-9.md`
   runs, it prints nothing. Spec 9's §4 "What it does not check" names the three routes of §4's table,
-  and its §5 security line names the receipt-homed residual.
+  and its §5 security line names the receipt-homed residual and `TOOL-dRedressedBar-11`.
   Red when: the envelope still claims one route, or §5 still says the failure is always reported.
 - **AC19** — When `git diff <p10>~1 <p10> -- memory/builds/dRedressedBar/spec/` runs at this unit's
   pass commit, each of specs 1 to 9 shows one header rev change and one new revision line, and that
@@ -467,12 +478,23 @@ home, so they stay green. `memory hygiene` grades the nine rev bumps and their r
   Recommendation: (a). It refuses a state the resolver reaches with no receipt and no per-kit
   prefix, at no new surface and no version bump. It leaves one follow-up, (c), for the owner to
   schedule.
+  RESOLVED (owner, 2026-10-14): (c). This unit keeps S22 as (a) states it: the second
+  `must_not_exist` term, the matrix row, AC15, AC16, AC17 and the §7 arm. The receipt-reading probe
+  term is not held in this minors batch (M2, M4). The owner added it as `TOOL-dRedressedBar-11`, which
+  the §3 Edges hand the receipt-homed residual to.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-14 · initial draft, promoted at the CONVERGED exit of the round-1 spec audit. All
   23 confirmed findings, by report id, batched into this unit by M4, with each claim re-read at
   `38384036`.
+- rev-2 · 2026-10-14 · §1 · S22 · §3 · §4 · §5 · AC16 · AC18 · §8 · the owner resolved F1 as (c).
+  S22 keeps option (a)'s narrowing, AC15, AC16, AC17 and the §7 arm as written. The receipt-homed
+  residual is no longer stated as priced or accepted: S22, the §3 non-goal, §4's residual paragraph,
+  §5 security and AC16's figure line point it at `TOOL-dRedressedBar-11`, and AC18 also reads unit
+  11's name in spec 9's §5. Edges gain the hands-off to `TOOL-dRedressedBar-11`. §1 says this unit
+  follows every unit the audit read, since unit 11 follows it. The header carries `ratified
+  2026-10-14`. No product file, criterion command or order moves.
 
 ## 10. Reuse audit
 
