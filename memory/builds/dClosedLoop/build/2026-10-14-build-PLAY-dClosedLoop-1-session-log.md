@@ -189,6 +189,9 @@ calls.
   default and a fresh session at the boundary is allowed; the card's pointers are updated as the build
   progresses; notices are recorded by default nowhere, and all three values are allowed; both gaps and
   the compaction checks are recorded. v2, the register and the results record were amended.
+- 2026-10-15, session 1799cb98: the owner asked how the product design looks at this stage. An
+  overview was composed from the records rather than from the compaction summary, saved with its two
+  diagrams, and shown.
 
 ## Instruments
 
@@ -435,6 +438,8 @@ Runs, 2026-10-14:
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-compaction-probes.md` | The compaction experiment's seventy-one probes, questions only, answered blind after the compaction. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-compaction-recall.md` | The compaction experiment's blind recall: every probe answered from the context that survived, with its confidence and channel, committed before the key was read. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-compaction-results.md` | The compaction experiment's results: each answer scored and traced, the derived tallies and their instrument, findings, conclusions for unattended builds, and the forks they raise. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-design-overview.md` | The design at `2323a2a23`, a snapshot for the owner: the three layers, the mechanics that hold them together, the chain and what is open, each section pointing at its owning record. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-design-overview-{layers.svg,cycle.html}` | The two diagrams shown with that overview: the three layers, and the item cycle as a stepper. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |
