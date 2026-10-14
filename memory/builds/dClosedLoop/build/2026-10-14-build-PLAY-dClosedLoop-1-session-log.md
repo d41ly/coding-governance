@@ -72,10 +72,10 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 8 | gov-researcher | Build | handoff 3, unchanged | 1799cb98 | returned, 4m39s, 24.0k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-build.md` |
 | 9 | gov-researcher | Test | handoff 4, unchanged | 1799cb98 | returned, 3m47s, 20.9k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-test.md` |
 | 10 | gov-researcher | Deploy | handoff 5, unchanged | 1799cb98 | returned, 4m08s, 22.6k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-deploy.md` |
-| 11 | gov-researcher | Orientation: routing and step | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-6-researcher.md` | 1799cb98 | dispatched | — |
-| 12 | gov-researcher | Orientation: cost | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-7-researcher.md` | 1799cb98 | dispatched | — |
-| 13 | gov-researcher | Orientation: trust | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-8-researcher.md` | 1799cb98 | dispatched | — |
-| 14 | gov-researcher | Orientation: determinism | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-9-researcher.md` | 1799cb98 | dispatched | — |
+| 11 | gov-researcher | Orientation: routing and step | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-6-researcher.md` | 1799cb98 | returned, 6m21s, 27.1k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-routing.md` |
+| 12 | gov-researcher | Orientation: cost | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-7-researcher.md` | 1799cb98 | returned, 7m01s, 35.9k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-cost.md` |
+| 13 | gov-researcher | Orientation: trust | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-8-researcher.md` | 1799cb98 | returned, 7m53s, 32.4k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-trust.md` |
+| 14 | gov-researcher | Orientation: determinism | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-9-researcher.md` | 1799cb98 | returned, 8m43s, 47.9k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-determinism.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -101,6 +101,20 @@ it is re-run once the spec lands. Rows 1 to 4 have no `returned` line: their pro
 - returned — gov-researcher · wrote 0 files · 3m47s · 20.9k out · run direct/a636d8714b2045642
 - agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-5-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-5-researcher.md) · writes none · gates none · run direct/aaf0e3ee001682096
 - returned — gov-researcher · wrote 0 files · 4m08s · 22.6k out · run direct/aaf0e3ee001682096
+```
+
+The orientation round's four handoffs (dispatches 11 to 14), their lines derived the same way and held
+from the ledger for the same reason:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-6-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-6-researcher.md) · writes none · gates none · run direct/aeec60231dad94d52
+- returned — gov-researcher · wrote 0 files · 6m21s · 27.1k out · run direct/aeec60231dad94d52
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-7-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-7-researcher.md) · writes none · gates none · run direct/a20e50b8f18ac8f59
+- returned — gov-researcher · wrote 0 files · 7m01s · 35.9k out · run direct/a20e50b8f18ac8f59
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-8-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-8-researcher.md) · writes none · gates none · run direct/ae47198f40bd9a4c0
+- returned — gov-researcher · wrote 0 files · 7m53s · 32.4k out · run direct/ae47198f40bd9a4c0
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-9-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-9-researcher.md) · writes none · gates none · run direct/a5adf84caf1a988de
+- returned — gov-researcher · wrote 0 files · 8m43s · 47.9k out · run direct/a5adf84caf1a988de
 ```
 
 ## Events
@@ -332,6 +346,7 @@ Runs, 2026-10-14:
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md` | This log. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-{plan,design,build,test,deploy}.md` | The five stage researchers' returns, verbatim. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-maintain.md` | The main loop's Maintain research, with every instrument beside its output. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-{routing,cost,trust,determinism}.md` | The four orientation researchers' returns, verbatim, the harness's entity escapes restored. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |
