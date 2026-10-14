@@ -1491,14 +1491,15 @@ fi
 # the judgement and the removal would. Pid 999999 is dead to the runner's own `ts_alive`. A reap that
 # read the nonce first spares the successor; one that read it after the pid, or that does not re-read
 # it, deletes it. The routed count is asserted, so a runner whose pid read changed spelling reds here.
+# The reader fills the caller's local `hpid` with the runner's own builtin read, by bash's dynamic scope.
 F44=$tmp/reap44; mkdir -p "$F44/slot" "$F44/docs/b"
 for d44 in "$F44/slot" "$F44/docs/b"; do
   printf '999999' > "$d44/pid"; printf '%s' "$(date +%s)" > "$d44/heartbeat"; printf 'judged' > "$d44/nonce"
 done
 (
   eval "$(sed -n '/^num_ok() {/p;/^ts_now()/p;/^ts_alive()/p;/^ts_try_reap() {/,/^}/p;/^scan_dead_docs_beacons() {/,/^}/p' \
-    "$HERE/run-gates.sh" | sed 's|cat "\$d/pid"|read_pid_and_swap "$d"|')"
-  read_pid_and_swap() { cat "$1/pid"; printf 'successor' > "$1/nonce"; }
+    "$HERE/run-gates.sh" | sed 's|IFS= read -r hpid < "\$d/pid"|read_pid_and_swap "$d"|')"
+  read_pid_and_swap() { IFS= read -r hpid < "$1/pid"; printf 'successor' > "$1/nonce"; }
   add_health_event() { :; }
   TS_TTL=600; TS_SLOT_DIRS=("$F44/slot"); TS_DOCS_ROOT="$F44/docs"; RG_HEALTH_LOG=/dev/null
   declare -f ts_try_reap scan_dead_docs_beacons | grep -c read_pid_and_swap > "$F44/routed"

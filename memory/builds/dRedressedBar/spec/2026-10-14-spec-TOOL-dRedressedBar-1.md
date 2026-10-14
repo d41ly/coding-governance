@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-1 — stale suite fixtures re-armed against the code the bar-less landings moved
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

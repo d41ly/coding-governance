@@ -2468,7 +2468,7 @@ run_gh33() { # args · writer doubles · commit specs-json -> the run, its commi
 # AC1 - an id, an absolute path and two relative paths reach ONE commit naming all four, and four roster paths.
 GH33_U4='[{"id":"A-tB-1","order":1},{"id":"A-tB-2","order":2},{"id":"A-tB-3","order":3},{"id":"A-tB-4","order":4}]'
 GH33_S4='[{"id":"A-tB-1","path":"'$GH33_SF'/2026-10-06-spec-A-tB-1.md"},{"id":"A-tB-2","path":"'$GH33_SF'/2026-10-06-spec-A-tB-2.md"},{"id":"A-tB-3","path":"'$GH33_SF'/2026-10-06-spec-A-tB-3.md"},{"id":"A-tB-4","path":"'$GH33_SF'/2026-10-06-spec-A-tB-4.md"}]'
-o=$(run_gh33 "$(build_gh33_args "$GH33_U4")" "$(build_gh33_writer A-tB-1'["A-tB-1"]'),$(build_gh33_writer A-tB-2'["C:/w/r/'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]'),$(build_gh33_writer A-tB-3'["'$GH33_SF'/2026-10-06-spec-A-tB-3.md"]'),$(build_gh33_writer A-tB-4'["'$GH33_SF'/2026-10-06-spec-A-tB-4.md"]')" "$GH33_S4")
+o=$(run_gh33 "$(build_gh33_args "$GH33_U4")" "$(build_gh33_writer A-tB-1 '["A-tB-1"]'),$(build_gh33_writer A-tB-2 '["C:/w/r/'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]'),$(build_gh33_writer A-tB-3 '["'$GH33_SF'/2026-10-06-spec-A-tB-3.md"]'),$(build_gh33_writer A-tB-4 '["'$GH33_SF'/2026-10-06-spec-A-tB-4.md"]')" "$GH33_S4")
 same   "GH33 four spellings reach ONE commit stage" "$(printf '%s\n' "$o" | grep -c '^agent:commit$')" "1"
 has    "GH33 ...whose commit names all four ids" "$(printf '%s\n' "$o" | grep '^prompt:commit:')" "spec(tB): A-tB-1 A-tB-2 A-tB-3 A-tB-4"
 has    "GH33 ...committing four specs" "$o" "log:spec stage: committed 4 spec(s) at $CSHA"
@@ -2480,7 +2480,7 @@ same   "GH33 every writer is asked for ids, never paths" "$(printf '%s\n' "$o" |
 # AC2 - five more spellings, each placed: backslashes, the MSYS drive form, no family, a tail, the caller's path.
 GH33_U5='[{"id":"A-tB-1","order":1},{"id":"A-tB-2","order":2},{"id":"A-tB-3","order":3},{"id":"A-tB-4","order":4},{"id":"A-tB-5","order":5,"specPath":"'$GH33_SF'/notes-five.md"}]'
 GH33_S5='[{"id":"A-tB-1","path":"'$GH33_SF'/2026-10-06-spec-A-tB-1.md"},{"id":"A-tB-2","path":"'$GH33_SF'/2026-10-06-spec-A-tB-2.md"},{"id":"A-tB-3","path":"'$GH33_SF'/2026-10-06-spec-tB-3.md"},{"id":"A-tB-4","path":"'$GH33_SF'/2026-10-06-spec-A-tB-4-u6-indexed-join.md"},{"id":"A-tB-5","path":"'$GH33_SF'/notes-five.md"}]'
-o=$(run_gh33 "$(build_gh33_args "$GH33_U5")" "$(build_gh33_writer A-tB-1'["C:\\w\\r\\memory\\builds\\tB\\spec\\2026-10-06-spec-A-tB-1.md"]'),$(build_gh33_writer A-tB-2'["/c/w/r/'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]'),$(build_gh33_writer A-tB-3'["'$GH33_SF'/2026-10-06-spec-tB-3.md"]'),$(build_gh33_writer A-tB-4'["'$GH33_SF'/2026-10-06-spec-A-tB-4-u6-indexed-join.md"]'),$(build_gh33_writer A-tB-5'["'$GH33_SF'/notes-five.md"]')" "$GH33_S5")
+o=$(run_gh33 "$(build_gh33_args "$GH33_U5")" "$(build_gh33_writer A-tB-1 '["C:\\w\\r\\memory\\builds\\tB\\spec\\2026-10-06-spec-A-tB-1.md"]'),$(build_gh33_writer A-tB-2 '["/c/w/r/'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]'),$(build_gh33_writer A-tB-3 '["'$GH33_SF'/2026-10-06-spec-tB-3.md"]'),$(build_gh33_writer A-tB-4 '["'$GH33_SF'/2026-10-06-spec-A-tB-4-u6-indexed-join.md"]'),$(build_gh33_writer A-tB-5 '["'$GH33_SF'/notes-five.md"]')" "$GH33_S5")
 same   "GH33 five more spellings: nothing refuses" "$(printf '%s\n' "$o" | grep -c '^THROW')" "0"
 has    "GH33 ...and the commit names all five ids" "$(printf '%s\n' "$o" | grep '^prompt:commit:')" "spec(tB): A-tB-1 A-tB-2 A-tB-3 A-tB-4 A-tB-5"
 # AC3 - an entry no unit owns THROWS by name before any commit stage, once per spelling.
@@ -2493,14 +2493,14 @@ for c in "A-tB-9|$GH33_U1" \
          "C:/w/rx/$GH33_SF/2026-10-06-spec-A-tB-1.md|$GH33_U1" \
          "$GH33_SF/2026-10-06-spec-tB-1.md|"'[{"id":"A-tB-1","order":1},{"id":"B-tB-1","order":2}]'; do
   e=${c%%|*}
-  o=$(run_gh33 "$(build_gh33_args "${c#*|}")" "$(build_gh33_writer A-tB-1'["'"$e"'"]'),$(build_gh33_writer B-tB-1 '[]')" '[]')
+  o=$(run_gh33 "$(build_gh33_args "${c#*|}")" "$(build_gh33_writer A-tB-1 '["'"$e"'"]'),$(build_gh33_writer B-tB-1 '[]')" '[]')
   t=$(printf '%s\n' "$o" | grep '^THROW')
   has    "GH33 unplaceable [$e]: THROWS with the phrase" "$t" "names no roster unit by id and no unit's spec by path"
   has    "GH33 unplaceable [$e]: ...quoting the entry as JSON" "$t" "authored \"$e\""
   hasnt_ "GH33 unplaceable [$e]: ...before any commit stage" "$o" "agent:commit"
 done
 # AC4 - a path routed to a unit whose committed spec, found by its H1, is another file THROWS after the commit.
-o=$(run_gh33 "$(build_gh33_args '[{"id":"A-tB-1","order":1},{"id":"A-tB-2","order":2}]')" "$(build_gh33_writer A-tB-1'["A-tB-1"]'),$(build_gh33_writer A-tB-2'["'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]')" \
+o=$(run_gh33 "$(build_gh33_args '[{"id":"A-tB-1","order":1},{"id":"A-tB-2","order":2}]')" "$(build_gh33_writer A-tB-1 '["A-tB-1"]'),$(build_gh33_writer A-tB-2 '["'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]')" \
   '[{"id":"A-tB-1","path":"'$GH33_SF'/2026-10-06-spec-A-tB-1.md"},{"id":"A-tB-2","path":"'$GH33_SF'/2026-10-05-spec-A-tB-2-other.md"}]')
 t=$(printf '%s\n' "$o" | grep '^THROW')
 has    "GH33 H1 disagreement: THROWS naming the H1" "$t" "the spec whose H1 defines A-tB-2"
@@ -2509,7 +2509,7 @@ has    "GH33 ...before any audit or hand-out" "$t" "Refusing before any audit or
 hasnt_ "GH33 ...and no roster is handed out" "$o" '"roster"'
 # AC5 - an absolute caller path and an absolute commit path fold equal: placed, repo-relative, no difference logged.
 GH33_ABS="C:/w/r/$GH33_SF/2026-10-06-spec-A-tB-1.md"
-o=$(run_gh33 "$(build_gh33_args '[{"id":"A-tB-1","order":1,"specPath":"'$GH33_ABS'"}]')" "$(build_gh33_writer A-tB-1'["A-tB-1"]')" '[{"id":"A-tB-1","path":"'$GH33_ABS'"}]')
+o=$(run_gh33 "$(build_gh33_args '[{"id":"A-tB-1","order":1,"specPath":"'$GH33_ABS'"}]')" "$(build_gh33_writer A-tB-1 '["A-tB-1"]')" '[{"id":"A-tB-1","path":"'$GH33_ABS'"}]')
 same   "GH33 absolute caller and commit paths: nothing refuses" "$(printf '%s\n' "$o" | grep -c '^THROW')" "0"
 has    "GH33 ...the roster row carries the repo-relative path" "$o" '"id":"A-tB-1","order":1,"specPath":"'$GH33_SF'/2026-10-06-spec-A-tB-1.md"'
 hasnt_ "GH33 ...and no difference is logged" "$o" "the caller's path differs"

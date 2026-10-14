@@ -81,6 +81,8 @@ sed -i 's/^## Stage 2 — reuse$/## Stage 3 — reuse/' "$FX/$KREL/SKILL.templat
 out=$(run_adopter --check); rc=$?
 check_arm "arm 1 a heading at the wrong stage refuses, naming the entry's own stage" \
    "$([ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'says stage 3 but the entry reuse is stage 2' && echo 1 || echo 0)"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
 # ---- arm 2: a catalogue workflow no heading names ----------------------------------------------
 build_fixture; check_arm "arm 2 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
