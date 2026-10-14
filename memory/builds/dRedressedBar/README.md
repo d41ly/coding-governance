@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-13
 streams: tooling
 roster: TOOL
-ids: TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17
+ids: TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18
 spec-audit: 2026-10-13
 ---
 
@@ -62,6 +62,11 @@ are causes of their own.
   that kit never installed there. Its brief is
   `prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-brief.md`, and the edge revisions are
   `prompts/2026-10-14-prompt-TOOL-dRedressedBar-14-2-revision.md`.
+- **Amendment (M2 ADD), 2026-10-14**: unit 18 added by the owner: a gate profiler that runs every
+  leg in `tools/gate-legs.json`, serially or concurrently under 80% CPU and 90% memory load. Each leg
+  runs with no knob, no ceiling and every log kept, and is profiled down to each process it spawns,
+  with stall detection that reports and never kills. It is ordered after every other unit. Its brief
+  is `prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-brief.md`.
 - `GATE_REGEN_CHECK` reaching the canary's nested runners is a separate finding and not this build's.
 - Write sets overlap on `tools/roles/adopt-roles.test.sh`, so order sequences them: units 1, 2, 8
   and 9 are disjoint; 3 follows 9, whose fix its three unscoped arms witness; 4 follows 1; 5 follows
@@ -74,6 +79,11 @@ are causes of their own.
 - No `tools/unattended/` self-test suite runs: standing owner instruction, 2026-08-23.
 - Owner rulings, 2026-10-13: confirm the four unconfirmed reds, then fix every traced red; spec
   audit declared; go.
+- **Owner ruling, 2026-10-14, the audit chain's end**: run spec-audit round 4 over units 16, 17
+  and 18, then build. Every unit round 4 promotes is built from its spec as written, under a
+  recorded override of `specs-audited` for those units only. No round 5 runs. Each round so far
+  confirmed a new high plus about 22 minors at precision 1.00, 1.00 and 0.92, so the chain would not
+  end on M4's precision floor. The closing diff review covers the promoted units' code.
 
 ## Parked decisions
 
@@ -100,12 +110,13 @@ None yet.
 | 15 | `TOOL-dRedressedBar-15` | agent-cap's adopter resolves settings-merge at settings-merge's own home, not at agent-cap's prefix |
 | 16 | `TOOL-dRedressedBar-16` | PROMOTED: the units-12-15 spec audit's one high, report id 7 — an apply that keeps a carried kit's claim keeps that kit's gate-leg ownership too |
 | 17 | `TOOL-dRedressedBar-17` | PROMOTED: the units-12-15 spec audit's 12 mediums and 9 lows, batched — report ids 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 15, 16, 18, 19, 20, 21, 22, 23 and 24 |
+| 18 | `TOOL-dRedressedBar-18` | a gate profiler: every leg run clean and unbounded, serially or under a load cap, each profiled to its processes, stalls reported and never killed |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 17 unit(s) · node d · opened 2026-10-13 · streams tooling
+**Build status:** SPECCED · 18 unit(s) · node d · opened 2026-10-13 · streams tooling
 ids TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13
-ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17
+ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -127,13 +138,14 @@ ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedr
 | [TOOL-dRedressedBar-14 — a first apply at a per-kit prefix configures against the homes it just wrote: the receipt is written ahead of CONFIGURE](spec/2026-10-14-spec-TOOL-dRedressedBar-14.md) | 10 | 2 | SPECCED | rev-3 | 2026-10-14 |
 | [TOOL-dRedressedBar-15 — agent-cap's adopter runs settings-merge's own adopter at settings-merge's home, declared as `[adopt] via`, and selfcheck refuses any argv naming another entry's file](spec/2026-10-14-spec-TOOL-dRedressedBar-15.md) | 11 | 2 | SPECCED | rev-2 | 2026-10-14 |
 | [TOOL-dRedressedBar-17 — the units-12-15 spec audit's 12 mediums and 9 lows, batched: each faulted criterion observed in a form that can pass and fail, each false sentence corrected, and the code sites they describe made to hold what the specs claim](spec/2026-10-14-spec-TOOL-dRedressedBar-17.md) | 12 | 2 | SPECCED | rev-1 | 2026-10-14 |
+| [TOOL-dRedressedBar-18 — a gate profiler: every leg run clean and unbounded, serially or under a load cap, each profiled to its processes, stalls reported and never killed](spec/2026-10-14-spec-TOOL-dRedressedBar-18.md) | 13 | 2 | SPECCED | rev-2 | 2026-10-14 |
 <!-- /gen:build-units -->
 
-Records: 23 bound to this build, across 4 record folder(s).
+Records: 27 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-dRedressedBar-16 TOOL-dRedressedBar-17.
 
-Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-16 TOOL-dRedressedBar-17.
+Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -152,6 +164,7 @@ Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-16 TOOL-dRedressed
 | 10 | `TOOL-dRedressedBar-14` | no |
 | 11 | `TOOL-dRedressedBar-15` | no |
 | 12 | `TOOL-dRedressedBar-17` | no |
+| 13 | `TOOL-dRedressedBar-18` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -1,0 +1,754 @@
+# TOOL-dRedressedBar-18 — a gate profiler: every leg run clean and unbounded, serially or under a load cap, each profiled to its processes, stalls reported and never killed
+
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 13
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-14-prompt-TOOL-dRedressedBar-18-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-1-spec-writer.md) | journal | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-18-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-2-revision.md) | research | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-18-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-3-spec-writer.md) | journal | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-18-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-brief.md) | research | — |
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+This build's bar profile (`build/2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md`) was
+rebuilt from scratch files the runner erases. It ran with a knob set, saw nothing inside a leg, and
+called the bar spawn-bound from a 10 s CPU average. This unit ships `measure_legs.py` in the run-gates
+kit. It runs every manifest leg with no knob, no ceiling and no reap, one at a time or under a live
+80% CPU and 90% memory cap. It keeps every record and profiles each leg down to its processes, so the
+ceilings, the width profiles and the spawn claim rest on measurement.
+
+## 2. Scope (IN)
+
+- **S1** — `tools/run-gates/measure_legs.py`, a run-gates engine file. Its population is every row of
+  the manifest beside the kit dir, read at run time, or of `--legs <path>`. Guarded, kit-subject and
+  `selftests`-chunk legs are all in it, and the six `tools/unattended/` suites that are not rows stay
+  out by construction. It applies no guard, hold, reuse, docs mode, ceiling, whole-run wall, retry or
+  reap. It erases no record. The one file it deletes is each leg's raw capture, once its redacted
+  copy is written (S11). An empty manifest, a row with no name
+  or no argv list, and a duplicate name each refuse the run with exit 2. Observed by AC1 and AC10.
+  - **Readers:** S1 deletes one named thing, each leg's raw capture `raw/<i>.out` in the scratch
+    dir, which this unit also creates. S11 carries the full inventory. It was read at `679afc31`
+    with `git grep -n -F 'raw/<i>.out'` and
+    `git grep -n -l -e 'measure_legs' -e 'gate-profile/' -e 'raw_kept'` over the tracked tree. The
+    first finds only this spec, which is a record. The second finds this spec, four other specs
+    and `drift_report.py`'s `measure_legs_retried_after_timeout` with its map entry, which hold the
+    words but read nothing of this tool.
+    by name: READER NOT IN TREE, because the file is a runtime artifact under the scratch dir's
+    TMPDIR, outside the tree, and the only code that will spell its name is this unit's unbuilt
+    profiler, which creates and deletes it.
+    by value: the capture's bytes are read only by this unit's redaction pass in
+    `tools/run-gates/measure_legs.py`, which writes `<i>.log` from them before the delete (S11).
+    That file is already in §4's Files touched, so no file is added.
+- **S2** — `--serial` runs one leg at a time. `--concurrent` admits the next leg only on a host
+  sample taken after the previous admission that reads CPU at or under 80% and memory at or under 90%,
+  or when no leg of the run is running. Observed by AC4 and AC5.
+- **S3** — Each leg runs in its own Windows Job Object, so the kernel counts its processes, user and
+  kernel time, peak memory and I/O, short-lived processes included. Observed by AC1 and AC2.
+- **S4** — Per-process rows come from `scan_processes` walked with `build_walk` from the leg's root.
+  The census row gains two optional fields, `peak_mem_b` and `mem_b`, read by the CIM query it already
+  runs. Observed by AC1 and AC3.
+- **S5** — The cost of one spawn is sampled each census tick by the runner's own `measure_spawn_cost`,
+  run from its source text. Observed by AC2.
+- **S6** — A host-load timeline is sampled every second, and a foreign-load census is taken by the
+  runner's rule over each census scan. A selftest arm holds the port to the runner's own predicate.
+  Observed by AC4 and AC8.
+- **S7** — A leg is STALLED when, over a declared window, its tree's census CPU delta and its job
+  CPU delta both stay under a threshold and its log does not grow. The tree is reported and left
+  running. Observed by AC6 and AC7.
+- **S8** — The knobs are scrubbed from every leg's environment, the two turnstile nesting names
+  included, and the scrubbed set is derived and printed. The verdict-relevant environment is recorded
+  as digests. The legs get the runner's own exports, its python and its bash. Observed by AC9.
+- **S9** — The profile holds no host turnstile (F1, resolved b), so a bar nested in a leg queues on
+  the host like any bar. At each census tick the tool reads the host turnstile's queue and slot
+  beacons. Per leg it records the foreign holders it saw and its own bars' queue wait, apart from its
+  work, and folds both into the `.leg` row's `foreign` field so `derive-ceilings.py` sets the reading
+  aside. Observed by AC9 and AC15.
+- **S10** — One run directory, `<git-dir>/gate-profile/<run id>/`, holds every record and log, in the
+  formats of §4. Each `<i>.leg` row uses the runner's eight-field grammar. Observed by AC10.
+- **S11** — Each leg's log is kept as its redacted copy only, redacted as the runner redacts its
+  durable copies (F2, resolved b). The raw capture is deleted once that copy is written. A capture a
+  process still holds is retried at run end, and otherwise kept and named in `raw_kept` with its
+  reason. Observed by AC10 and AC11.
+  - **Readers:** S11 deletes each leg's raw capture, `raw/<i>.out`, once `<i>.log` is written. The
+    inventory was read at `679afc31` with `git grep -n -F 'raw/<i>.out'` and
+    `git grep -n -l -e 'measure_legs' -e 'gate-profile/' -e 'raw_kept'` over the tracked tree. The
+    first finds only this spec, at §4 "The environment a leg gets" and F2, and a spec is a record.
+    The second also finds four other specs, which are records, and `tools/drift-audit/drift_report.py`
+    with its map entry, whose `measure_legs_retried_after_timeout` contains the words and reads
+    nothing of this tool. The runner's own raw capture, `$WORK/$i$sfx.out` (`run-gates.sh:3916`), is a
+    different file, and this unit leaves it alone.
+    by name: READER NOT IN TREE, because the capture lives under the scratch dir's TMPDIR,
+    outside the tree, and the only code that will spell its name is this unit's unbuilt
+    profiler, which creates it, redacts it and deletes it.
+    by value: the capture's bytes are read only by this unit's redaction pass in
+    `tools/run-gates/measure_legs.py`, at leg end and again at run end for a leg that left processes
+    running. Each read comes before the delete, so no reader loses the value. Once `<i>.log` exists
+    it is the only copy anything reads. That file is already in §4's Files touched, so no file is
+    added.
+- **S12** — On a non-Windows host the tool refuses with exit 2 and names the platform. Observed by
+  AC12.
+- **S13** — The `measure-legs selftest` leg runs `--selftest` over committed fixtures under
+  `tools/run-gates/fixtures/measure-legs/`. It comes with its descriptor row, its manifest, budget
+  and Windows-only rows, both kits' version bumps, the kit README section, a `help/` page and the map
+  claim. Observed by AC13 and AC14.
+
+## 3. Non-goals (OUT)
+
+- No change to the merge bar's behaviour, ceilings or legs. `run-gates.sh` moves by its version line
+  only. `derive-ceilings.py` is not edited (§4 "The record").
+- No run of the `tools/unattended/` suites that are not legs (owner rule, 2026-08-23).
+- No Event Tracing for Windows and no elevation (§4 "Alternatives rejected").
+- No POSIX backend (§4 "Platform").
+- No width cap in `--concurrent`. The owner set the caps as load, not width.
+- No knob. Every setting is a flag, so the tool adds no `GATE_` or `GOV_` variable.
+- No report renderer. `legs.tsv` is the table source, and the chunk and slowest-leg tables are a
+  `sort` or a five-line script over it.
+- No full profiled bar inside a pass. That run is the main loop's, at the close.
+- No hold of the host turnstile (F1), and no write to it. The tool reads the queue and the slot
+  beacons, and never takes, drops or reaps a ticket or a beacon.
+
+### Edges
+
+- **consumes-from** external — a Windows host, and the process-monitor kit resolvable as a sibling
+  of run-gates. Without either, the tool refuses rather than profiling less.
+- **consumes-from** external — the runner's turnstile layout on disk: the host key, the ticket name
+  and each slot beacon's `pid` file (`run-gates.sh:1513-1514`, `:1534-1535`, `:1892`, `:1951`).
+  It is read as `unattended.sh:6684-6690` already reads the queue, and AC15 runs the real runner
+  against the reader, so a layout change reds that arm.
+- **hands-off** external — a `derive-ceilings.py` that reads `gate-profile/` records directly. It is
+  not built here: readings enter through the existing `--observed` route.
+- **hands-off** external — the first full profiled run over the fixed tree, and the
+  `selftest-pooled-evidence.txt` calibration of the new leg. Both run suites, so both are the main
+  loop's.
+
+## 4. Design
+
+### Candidates per measurement, and the test each could lose (M12)
+
+| Measure | Candidate | Loses when | Result |
+|---|---|---|---|
+| per-leg totals | Job Object per leg | an MSYS-forked descendant escapes the job | CHOSEN; AC1 is the refutation |
+| per-leg totals | sum of census rows | a process lives shorter than one scan | REJECTED, measured below |
+| per-leg totals | ETW kernel process trace | the token is not elevated | REJECTED, §4 Alternatives |
+| per-process rows | census polling | a process lives shorter than one scan | CHOSEN, with `unseen` counted |
+| per-process rows | job completion-port messages plus per-pid handles | the brief bars a second process reader, and Windows documents delivery as not guaranteed | REJECTED |
+| host load | `GetSystemTimes` and `GlobalMemoryStatusEx` | a call spawns or blocks | CHOSEN: 12.6 µs and 0.6 µs a call |
+| stall CPU | census walk alone | a silent leg works through short-lived children | KEPT, with a job veto (AC7) |
+| spawn cost | the runner's `measure_spawn_cost` from its source | its text is not found | CHOSEN; a miss refuses |
+| turnstile wait | the host queue's tickets, attributed to a leg by the census | a wait shorter than one census period | CHOSEN, §4 "The turnstile" |
+| turnstile wait | the printed `gate queue: waited` line in the leg's log | the suite captures its bar's output | REJECTED, §4 Alternatives |
+| foreign holder | each slot beacon's `pid`, attributed by the census | a holder that starts and ends between scans | CHOSEN |
+
+**Measured on node d, 2026-10-14 (PINNED).** Three `scan_processes()` calls took 0.95 to 0.97 s at 327
+rows. The clone's spawn floor reads 8.323 ms (`gate-spawn-floor`, 2026-10-11). A trivial process
+therefore lives about 1% of one scan, so a census-only count misses nearly all of the churn the
+spawn claim is about. `shell32.IsUserAnAdmin()` returned 1 for this session, so ETW would run here.
+It is rejected because the tool may not assume an elevated token. `msys-2.0.dll` carries the strings
+`CREATE_BREAKAWAY_FROM_JOB`, `NtCreateJobObject` and `NtAssignProcessToJobObject`. UNVERIFIED from
+source: Cygwin's spawn adds the breakaway flag only when its own job allows breakaway. So the job is
+created with no limit flags at all: no `BREAKAWAY_OK`, no `SILENT_BREAKAWAY_OK`, no
+`KILL_ON_JOB_CLOSE`. AC1 fails if a descendant escapes anyway.
+
+### What each cannot see
+
+| Mechanism | On this node (Windows, Git-Bash) | On a POSIX node |
+|---|---|---|
+| Job Object | Work done for the leg in another process, such as a WMI provider host answering a CIM query or an on-access scanner opening each image. A process that broke away. Per-process detail. Its peak is commit, not working set. | Does not exist. `getrusage(RUSAGE_CHILDREN)` sums only waited-for descendants, counts no processes and reports the largest single peak RSS. A cgroup v2 scope needs delegation and keeps no spawn total. |
+| census polling | Any process that starts and ends between scans. CPU a process burns after its last sighting. MSYS-only parent edges for a process `ps -W` does not list. | `ps -eo` gives no peak memory, so the two new fields read None. |
+| ETW | Nothing, with elevation. Without it, the session cannot start. | eBPF, the proc connector and auditd need root. `strace -f` slows fork-heavy work several-fold, which is contamination. |
+| turnstile read | A bar on another turnstile key. A wait shorter than one census period. A holder or waiter whose pid no scan saw. | The same files exist, and no backend reads them (§4 "Platform"). |
+
+### Platform
+
+Every registered node in `tools/playbook/fleet.toml` is Windows, and every job in
+`.github/workflows/remote-ci.yml` runs `windows-latest`. A POSIX backend would be untested scaffolding
+(charter `[yagni]`). The tool refuses on any platform without the job API and names it. The selftest
+row joins `tools/run-gates/windows-only-legs.txt`, whose bar admits a suite that exercises its subject
+only on Windows.
+
+### Launching a leg
+
+1. The argv is the manifest row's, with `{prefix}` resolved by the inlined canonical
+   `resolve_prefix_token` block, against the tool root the runner derives (`run-gates.sh:2727-2736`).
+   A first word `python` or `python3` maps to PYBIN, as at `run-gates.sh:3836`. PYBIN comes from the
+   runner's own `resolve_python` (`run-gates.sh:137-166`), run once in bash from its source.
+2. The root is a wrapper, `<bash> -c 'exec "$@"' measure-legs <argv…>`. `<bash>` is
+   `profile_bar.resolve_bash` (`profile_bar.py:282-304`), which skips the WSL launcher. The leg thus
+   resolves `bash`, `node` and PYBIN through MSYS `PATH`, as the runner's worker does
+   (`run_leg_at`, `run-gates.sh:4592-4613`, ends in the same `exec`). Its cwd is the top level
+   (`run-gates.sh:103`), its stdin is `DEVNULL`, and stdout and stderr go to one file, the raw
+   capture, as at `run-gates.sh:3877`.
+3. The root is created with `CREATE_SUSPENDED`. It is assigned to a fresh job through `OpenProcess`
+   with `PROCESS_SET_QUOTA | PROCESS_TERMINATE`, which the assign requires and nothing else uses. Its
+   one thread is then resumed through `CreateToolhelp32Snapshot` and `ResumeThread`. So no descendant
+   exists before the job does. The start stamp is taken at the resume.
+4. The end is the root's `ExitTime` from `GetProcessTimes` on a handle held since launch. Wall time
+   is therefore kernel-clocked, and the loop's poll latency does not enter it. Descendants still alive
+   are counted as `left_running` and left alone. In `--serial`, the next leg starts at the root's
+   exit, as the runner's would.
+
+### The environment a leg gets
+
+**Scrubbed, derived at run time.** The set is every variable whose name starts `GATE_`, the names
+`git rev-parse --local-env-vars` prints, and the names on `.githooks/pre-push`'s `unset GIT_…` line
+(`:100`) when that file exists. No `GATE_` name is exempt. The two the runner exports to its legs
+for nesting, `GATE_TURNSTILE_HOLDER` and `GATE_TURNSTILE_HELD` (`run-gates.sh:1875`, `:1885`, `:1961`,
+`:2092`), go with the rest. The profile holds no turnstile (F1), so an inherited holder nonce would
+nest a leg's bar under some other holder rather than queue it. Every name in
+`BAR_SCRUBBED_KNOBS` (`pre-push:1839`) and in the loops at `:1861` and `:1869` starts `GATE_`. The
+git list holds every pointer on `:100` except `GIT_NAMESPACE`, which the hook line contributes.
+`GIT_EXEC_PATH` stays, for the hook's reason at `:98`. A refused `git` call leaves that half
+unarmed, and the tool says so rather than printing an empty set. The tool prints, and records,
+each name it scrubbed and the rule that matched it. It never records a value.
+
+**Added, as the runner adds.** A scratch dir is made once by
+`mktemp -d "${TMPDIR:-/tmp}/gate-profile.XXXXXXXX"` in the resolved bash. `TMPDIR` is its `tmp/`,
+so a leg sees the spelling the runner's `export` at `run-gates.sh:2272` gives it. Each leg's raw
+capture is its `raw/<i>.out`, beside it, as the runner's raw sits in its scratch, and it lives only
+until its redacted copy is written (§4 "The record"). It is not under the
+git dir, because git discovery from inside `.git/` answers differently, which would change a leg's
+verdict. This scratch is the one path outside the run directory, and the envelope names it.
+
+**Recorded, never scrubbed.** These are the names the runner's reuse digest calls verdict-relevant:
+`GATE_*|GOV_*|*_PY|GIT_*|PYTHON*|LC_*|LANG|TZ` (`run-gates.sh:3404`, read from its `# digest-env-names`
+line). `PATH` is recorded too. Each is stored as its name and the first 12 hex of the SHA-256 of its
+value. So are each leg launcher's resolved path, `bash --version`'s first line, PYBIN with its
+version, `git version`, and `core.autocrlf` and `core.eol`. Every leg of a run gets one environment
+by construction, and two runs are comparable by these digests. What this cannot see, as the runner
+says of its digest, is a variable outside the class that a leg reads.
+
+### The turnstile (F1, resolved b)
+
+The profile takes no ticket and holds no slot. Its legs get no nesting name (above), so a bar nested
+in a leg takes a ticket on the host turnstile as any bar does (`run-gates.sh:1886-1892`), and it
+queues behind whatever holds the host. That is another session's bar, or under `--concurrent` a
+sibling leg's bar. Another session's bar can also hold the host while a leg runs. Neither is
+prevented. Both are recorded per leg, and the record is shaped so that `derive-ceilings.py` sets
+such a reading aside by the rule it already applies.
+
+**What is read.** The key is the one the legs' bars resolve. The scrub removes `GATE_TURNSTILE_DIR`,
+so that key is the runner's default, `$HOME/.gov/gate-turnstile` (`run-gates.sh:1513-1514`).
+`resolve_turnstile_dir` resolves it once at start, by the runner's own expression in the resolved
+bash. At each census tick, after the scan returns, `read_turnstile` lists `gate-bar-queue/` and reads
+the `pid` file of each slot beacon: `gate-bar-beacon` and every `gate-bar-beacon.<k>`
+(`:1534-1535`, `:1951`), by the glob the nesting test uses (`:1834`). A ticket's name is
+`<UTC stamp>-<pid>-<random>` (`:1892`), and its pid is taken as `unattended.sh:6687-6688` takes it.
+Both kinds of pid are MSYS pids, which census rows carry as `msys_pid`. No read spawns, and nothing
+is written. An absent key or queue reads as empty, because the runner creates both on first use. A
+key that exists and cannot be read is a refused read.
+
+**Attribution**, by `derive_leg_turnstile` against the scan of the same tick. A pid in a running
+leg's `build_walk` set belongs to that leg. A pid in another row is foreign. A pid the scan did not
+see is not judged at that tick.
+
+- A slot holder that belongs to no running leg is someone else holding the host. Each running leg
+  counts it in `ts_holders`, the distinct foreign holder pids seen in its window. A holder in a
+  sibling leg is this profile's own neighbour, as a bar's neighbours are its own
+  (`run-gates.sh:2912-2913`), and is not counted.
+- A ticket that belongs to a leg and is seen at two consecutive census ticks is that leg's bar
+  waiting in the queue. An uncontended acquire holds its ticket only for the few processes of one
+  attempt (`run-gates.sh:1996-2000`), so one sighting is not a wait. The leg's `ts_queued` counts
+  such tickets. Its `ts_wait_s` is the length of the union of their intervals, each from the stamp
+  in the ticket's name to its last sighting.
+
+**Wait apart from work.** A `--concurrent` reading of a leg that runs bars includes their queue wait
+in `wall_s`. With no hold to nest under, those bars queue behind each other and behind any sibling's
+bar. `ts_wait_s` is that wait, and `work_s`, which is `wall_s - ts_wait_s`, is the rest.
+`ts_wait_s` under-counts by up to one census period per ticket, and the stamp truncates to the
+second.
+
+**Set aside.** The `.leg` row's eighth field is `foreign + ts_holders + ts_queued`. It reads
+`unknown` when the census or the turnstile read was refused at any tick of the leg's window. So a
+reading taken while foreign gate work ran, while someone else held the host, or while the leg's own
+bar waited reads positive, and `read_runs` sets it aside as `contended`
+(`derive-ceilings.py:290-306`). AC15 runs that function over the rows. The three counts stay apart
+in `<i>.json`.
+
+**What this cannot see.** A bar on another turnstile key: an operator's own `GATE_TURNSTILE_DIR`,
+the private key a suite exports for its own bars (`run-gates.evidence.test.sh:154`), or the
+common-dir fallback a runner takes when the host dir cannot be made (`run-gates.sh:1518-1519`). A
+wait shorter than one census period. A holder or waiter that came and went between scans.
+
+**No hold, so no preflight.** The regen preflight that a hold runs (`run-gates.sh:1416-1452`) does
+not run. A stale generated output reds the legs that grade it, and the record carries them as `fail`.
+
+### Sampling, admission and its cost
+
+The main loop ticks every `HOST_EVERY_S = 1` s, a declared constant. Each tick reads `GetSystemTimes`
+(busy = 100 x (kernel + user - idle) / (kernel + user) over the interval) and
+`GlobalMemoryStatusEx.dwMemoryLoad`, then queries each running job. Neither read spawns. In
+`--concurrent`, `check_admit(cpu, mem, running, fresh)` admits one leg when `fresh` holds, meaning
+the newest sample was taken after the previous admission, and that sample reads at or under both
+caps. It also admits when no leg of the run is running, the `drained` release of the runner's
+memory pause (`run-gates.sh:566-569`). So foreign load can delay a profile and never deadlock it.
+**One admission costs** at least one tick, plus one suspended bash spawn, a job assign and a thread
+resume. A manifest of N legs takes at least N seconds to ramp, DERIVED from N at run time.
+
+Every `--census-every` seconds (default 5, bounded 1 to 3600) one worker thread runs
+`scan_processes()`. A scan slower than the period lowers the rate and never stacks. The same tick runs
+the runner's `measure_spawn_cost 3` from its source text (`run-gates.sh:3762-3776`), one bash process
+timing three `true` spawns. Its `read_spawn_floor` (`:3739-3754`) runs once at start. The same tick
+then runs `read_turnstile` (§4 "The turnstile"), a directory listing and one small read per slot.
+Each scan's own seconds are recorded, so the observer's cost is visible.
+
+### Stall detection
+
+At each census tick k, for each running leg, let j be the newest earlier tick with
+t_j <= t_k - W, where W is `--stall-window` (default 300 s, bounded 2 x the census period to
+86400). The test has three inputs:
+
+- **tree delta**: the sum, over the rows `build_walk(rows_k, root)` returns, of cpu_s at k minus
+  cpu_s at j, taken as 0 for a process j did not see. A row with `cpu_s` None makes the tick
+  unjudgeable.
+- **job delta**: the job's user plus kernel time at k minus at j. It is exact and includes every
+  short-lived process.
+- **log**: the capture file's size at k against at j.
+
+STALLED holds when both deltas are under C, `--stall-cpu` (default 1.0 s, bounded above 0 and to
+3600), and the log size is equal. W and C are declared bounds, not measurements. A leg sleeping
+deliberately longer than W reads STALLED, and the record says so. So does a leg whose bar waits in
+the host queue longer than W, because a waiting runner sleeps between polls (`run-gates.sh:2086`)
+and prints only when its position moves (`:2045`). The episode therefore records the leg's waiting
+tickets seen in its window, so a queue wait reads as one and not as a hang.
+
+The first STALLED tick opens an episode. It prints
+`measure-legs: STALLED  <leg>  (<W>s: job +<x>s, tree +<y>s, log <n> B unchanged)` and records the
+tree: winpid, msys_pid, ppid, age, cpu_s, its delta, mem_b and the redacted command. The record also
+carries the window's churn, the job's `TotalProcesses` delta, which is context only. The first tick
+that fails the test closes the episode with a `RESUMED` line, and the leg's end closes it as `ended`.
+Nothing signals any process. `classify.py`'s verdicts are not consulted: they grade age against the
+ceiling this tool removes (`classify.py:38-49`).
+
+**Why the job veto.** The brief's census-only test reads near zero for a silent leg that works only
+through children shorter than a scan. The job delta sees them. The canary's hang was blocked on a
+FIFO while a sampler spawned `sleep 60`, a few spawns per window, so it should stay under C on both
+counts. The CPU of one such spawn is UNVERIFIED, and AC6's fixture is where it is observed.
+
+### The foreign census
+
+`measure_foreign(rows, tokens, own)` is the runner's predicate at `run-gates.sh:4220-4245`, applied to
+the census population. Its tokens are the two runner paths and every argv word carrying `/` and ending
+`.sh`, `.py` or `.js`, as at `:2924-2933`. A word ending `.test.sh` or `selftest.py` also matches. The
+profiler's own ancestors (`build_self_chain`) and descendants are excluded, and a tree counts once, at
+its topmost match. The census also sees native rows that `ps -ef` cannot, so its population is wider
+than the runner's. The predicate is the same, and AC8's arm runs the runner's awk program from its
+source beside the port over one snapshot. A leg's `foreign` is the largest count over the ticks in
+its window, or `unknown` when one of them was refused.
+
+### The census fields (process-monitor)
+
+`_CIM_QUERY` (`census.py:52-58`) gains `PeakWorkingSetSize` and `WorkingSetSize`, before the command
+line, so free text stays last. `parse_cim` and `build_windows_rows` carry them as `peak_mem_b` and
+`mem_b`, int or None, and never zero for unreported, as `cpu_s` is (`census.py:12-22`). The builder
+confirms the CIM unit of `PeakWorkingSetSize` against one live row's `Get-Process` `PeakWorkingSet64`.
+The documented unit is kilobytes, UNVERIFIED. POSIX rows carry None. `FIELDS` (`:264`) and
+`render_rows` keep their bytes, so `census.py --print` and every reap and classify line are
+unchanged. process-monitor's version moves, with every marker that `kit version markers` reads.
+
+### The record
+
+`<git-dir>/gate-profile/<run id>/`, mode 700. The id has the runner's shape
+(`run-gates.sh:1456`), and `--out <root>` moves the root. Nothing prunes it. The runner's sweep at
+`run-gates.sh:5658` keeps only five entries of `gate-run/`, which is why the record does not live
+there.
+
+| File | Written | Holds |
+|---|---|---|
+| `envelope.json` | at start, rewritten tmp-then-rename at end | the run |
+| `host.tsv` | each tick | epoch ns, cpu %, mem %, running count, event (`admit <i>`, `end <i>`) |
+| `census.tsv` | each scan | epoch, foreign count or `unknown`, roots as `pid:token`, scan s, spawn us, slot holders as `pid:<i>` or `pid:foreign`, tickets as `<name>:<i>` |
+| `<i>.leg` | leg end | the runner's row: name, status, rc, seconds, started ns, ended ns, key `-`, foreign (`run-gates.sh:3936-3939`), the eighth field as §4 "The turnstile" sets it |
+| `<i>.log` | leg end, and again at run end for a leg that left processes running | the capture, redacted, the only copy kept (F2) |
+| `<i>.json` | leg end, rewritten at run end | the full profile below |
+| `legs.tsv` | leg end | one row per leg, headed, the table source |
+
+**The raw capture is deleted (F2, resolved b).** It holds the same bytes as `<i>.log` unredacted,
+which the runner calls "a credential leak the old scratch-dir lifetime was merely hiding"
+(`run-gates.sh:3922-3925`). `<i>.log` is written at leg end. When the job's `ActiveProcesses` read 0
+at the root's exit, no leg process still writes the capture, and it is deleted then. Otherwise it
+stays until run end, where `<i>.log` is rewritten from it and it is deleted. A delete that fails
+because a process still holds the file keeps it, and the envelope's `raw_kept` names it with its
+reason. An interrupt keeps each running leg's capture the same way, with the reason `interrupted`.
+These are the only deletes the tool performs.
+
+**Per leg (`<i>.json`, and `legs.tsv` less `procs` and `stalls`):**
+
+| Field | Source | Why it earns its place |
+|---|---|---|
+| `wall_s`, `started_ns`, `ended_ns` | resume stamp, root `ExitTime` | the duration, on the kernel's clock |
+| `rc`, `verdict` | root exit; `ok` or `fail` | the runner's status vocabulary |
+| `user_s`, `kernel_s` | job accounting | process creation and I/O land in kernel time |
+| `procs_total`, `active_peak`, `left_running` | job `TotalProcesses`, max sampled `ActiveProcesses`, `ActiveProcesses` at root exit | the spawn count; fan-out against serial churn; leaks the runner reaps only at a ceiling |
+| `peak_job_mem_b`, `peak_proc_mem_b` | job extended limit info | peak commit, short-lived processes included |
+| `avg_ws_b` | time-weighted mean of the tree's summed `mem_b` | the average, over the processes the census saw |
+| `io` | job `IO_COUNTERS` | read, write and other ops and bytes, which nothing measured before |
+| `spawn_us` min/median/max, `spawn_s_est`, `spawn_share` | ticks in the window; `procs_total` x median; over `wall_s` | the spawn claim, per leg. It is MSYS-spawn priced, which is high for a native child |
+| `procs` | census walk | per process: winpid, msys_pid, ppid, redacted command, first and last tick seen, start (tick - age), last cpu_s, max `peak_mem_b` |
+| `unseen` | `procs_total` - `len(procs)` | the census's blind spot, as a count |
+| `foreign` | the census, max over the window | foreign gate work beside the leg, one of the three counts the `.leg` row's eighth field sums |
+| `ts_holders`, `ts_queued` | the turnstile read, attributed by the census | someone else holding the host; the leg's own bars waiting in the queue |
+| `ts_wait_s`, `work_s` | union of the waiting tickets' intervals; `wall_s - ts_wait_s` | the queue wait kept apart from the work, which a concurrent reading of a nesting leg needs |
+| `host_cpu`, `host_mem` | mean and max over the window | the load the reading ran under |
+| `queued_s`, `concurrency` | admission | why a concurrent reading differs from a serial one. `queued_s` is the profile's own admission wait, not the turnstile's |
+| `ceiling`, `share`, `over_ceiling` | manifest; `wall_s / ceiling` | a ceiling argued from a reading no ceiling cut |
+| `stalls`, `log_bytes`, `job_final` | episodes; capture size; job re-read at run end | the report; output volume; orphans' work after the root exited |
+
+**The envelope** carries `profile_bar.py`'s keys where they apply (`profile_bar.py:468-492`): `run`,
+`at`, `sha`, `host`, `width`, `width_source`, `full` (always true), `wall`, `exit`,
+`failed_legs`, `env.quiet` and `env.quiet_detail` (`check_quiet`), and `regime` (`derive_regime`).
+Width is 1 under `--serial` and the peak concurrency under `--concurrent`. `queued` does not apply:
+the profile takes no ticket, and each leg's turnstile wait is its own `ts_wait_s`. The ledger keys
+do not apply either, because this tool writes no ledger. It adds `mode`, the caps, the periods, W and
+C, `scrubbed`, `env_digest`, `tools`, `scratch`, `turnstile_dir`, `raw_kept`, the manifest path and
+blob, the leg count, `census_backend`, `spawn_floor_us`, the kit version and `regimes`. `regimes` is `derive_regime` at every power of two
+up to the logical core count: the width profile, read off unbounded durations. It is labelled with
+the mode.
+
+**derive-ceilings.** Its readings are admissible: a serial `ok` reading whose `.leg` eighth field
+reads 0 is the uncut duration that `--observed` exists to carry (`derive-ceilings.py:40-63`). That
+field reads 0 only when the census found no foreign gate work, no one else held the host, and none
+of the leg's bars waited, which is the reading `read_runs` admits. A positive or `unknown` field is
+one `read_runs` sets aside, and AC15 observes that with `read_runs` itself. `--observed` is the one
+route `derive-ceilings.py` does not census (`:49`), so only a row whose eighth field reads 0 is
+carried there. They enter as `--observed '<leg>=<s>' --how 'measure_legs <run id>'`, so each row
+names its provenance. The tool
+does not feed `read_runs` (`:199`, `:267`), because the record sits outside `gate-run/`, and an
+automatic second source would let one profile raise ceilings unseen.
+
+**Exit:** 0 when every leg ended and every record was written, whatever the legs' verdicts. 2 on a
+refusal before the first leg. 1 when a record write failed, naming it. 130 on an interrupt, which
+writes the envelope, with each running leg's kept capture in `raw_kept`, and leaves the legs running. A console Ctrl-C still reaches them, as it reaches
+a bar's legs.
+
+### The selftest and its leg
+
+`--selftest` runs the tool in-process over fixture manifests under
+`tools/run-gates/fixtures/measure-legs/`, writing to a temp `--out`. It prints one line per arm and
+`PASS (<n> assertions)`. The fixtures are `spawn.py <n> <hold_s>`, which starts n children of
+`sys._base_executable -I -c` sleeping hold_s; `memio.py <mb>`; `hog.py <s>`, which runs one busy
+child per logical core; `stall.sh <s>`, which blocks opening a FIFO while a loop spawns `sleep 1`,
+and a delayed writer frees it; `steady.py <s>`, which is silent and busy; `churn.py <s>`, which is
+silent and spawns `-c pass` children back to back; `printenv.py`, which prints variable names,
+never values, then one URL carrying a planted credential; and `queued.sh`, which runs the real
+runner's hold verb over `true` from the top level, with `GATE_REGEN_CHECK=0` set inside it. There
+are four manifests, `serial.json`, `concurrent.json`, `stall.json` and `turnstile.json`, with
+`{prefix}`-spelled argvs. The selftest runs at `--census-every 1 --stall-window 8 --stall-cpu 0.5`.
+The turnstile arm sets `HOME` to a temp dir, so its key is private, and starts the real runner's hold
+verb over `sleep 20` outside any leg before it runs `turnstile.json`. The pure arms are the scrub
+derivation, `check_admit`, the platform refusal and the foreign parity. Every fixture ends by
+itself.
+
+The leg row:
+
+```json
+{"name": "measure-legs selftest",
+ "argv": ["python3", "{prefix}/run-gates/measure_legs.py", "--selftest"],
+ "chunk": "selftests", "subject": "kit", "guard": ["..."], "ceiling": "<c>"}
+```
+
+The guard lists `measure_legs.py`, `profile_bar.py`, `run-gates.sh` and the
+`fixtures/measure-legs/` dir under `{prefix}/run-gates/`, plus `census.py`, `reap.py` and `scope.py`
+under `{prefix}/process-monitor/`. Those are the files whose text it reads or imports. The ceiling
+`<c>` is `max(r + 120, 2r)`, rounded up to 10 s, where r is the direct-invocation reading at
+build. That clears `ceiling-margin.txt`'s rule. The kit.toml `[[gate_leg]]` row uses `{kit}`, with
+the same name, subject and argv, as `govkit.py:2750-2830` requires. The budget row is r x 1.5, floored
+at 60, by the file's own rule. Both figures are PINNED with node and date in their rows.
+
+### Inventory
+
+| Identifier | Kind | Naming cell |
+|---|---|---|
+| `main`, `cmd_selftest` | functions | `py.function`, `main` and `cmd` are reserved verbs |
+| `read_legs`, `read_local_env_vars`, `read_host_load`, `read_job_accounting`, `read_turnstile` | functions | `py.function`, `read` |
+| `derive_scrub_set`, `derive_redacted`, `derive_leg_turnstile` | functions | `py.function`, `derive` |
+| `extract_runner_function` | function | `py.function`, `extract` |
+| `resolve_leg_python`, `resolve_job_backend`, `resolve_turnstile_dir` | functions | `py.function`, `resolve` |
+| `measure_spawn_us`, `measure_foreign` | functions | `py.function`, `measure` |
+| `check_admit`, `check_stalled` | functions | `py.function`, `check` |
+| `run_leg`, `build_job`, `scan_leg_trees` | functions | `py.function`, `run`, `build`, `scan` |
+| `write_leg_record`, `render_leg_row` | functions | `py.function`, `write`, `render` |
+| `test_*` | selftest arms | `py.function`, `test` |
+| `HOST_EVERY_S` | constant | none declared for constants |
+| `peak_mem_b`, `mem_b` | census row keys | none |
+| `measure-legs selftest` | gate leg | none |
+
+Every name above answered OK under `python tools/lexicon/lexicon.py --suggest <name> --as py.function`
+on 2026-10-14. A name the builder adds is asked the same way.
+
+### Files touched (estimate)
+
+`tools/run-gates/measure_legs.py` · `tools/run-gates/fixtures/measure-legs/` ·
+`tools/run-gates/kit.toml` · `tools/run-gates/run-gates.sh` · `tools/run-gates/README.md` ·
+`tools/run-gates/selftest-budgets.txt` · `tools/run-gates/windows-only-legs.txt` ·
+`tools/gate-legs.json` · `tools/process-monitor/census.py` · `tools/process-monitor/selftest.py` ·
+`tools/process-monitor/adopt-process-monitor.sh` · `tools/process-monitor/reap.py` ·
+`tools/process-monitor/scope.py` · `tools/process-monitor/classify.py` ·
+`tools/process-monitor/procmon-hook.js` · `tools/process-monitor/README.md` ·
+`memory/map/features/run-gates.md` · `help/measure-legs.md` · `help/README.md`, plus the outputs
+`regen.py --write` moves, which the pass commits.
+
+`run-gates.sh` moves by `KIT_RUN_GATES_VERSION` and its history comment. The process-monitor engine
+files move by their markers only, except `census.py`. Both kits move to the next minor over whatever
+the tree carries when this unit builds, DERIVED then.
+
+### Alternatives rejected
+
+- **ETW, or WMI start and stop traces.** These see every process, but need an elevated token, which
+  is a privilege widening that M3's veto 3 sends to the owner. They also run system-wide.
+- **Job completion-port notifications.** These give a row for short-lived processes, but they are a
+  second process reader the brief bars, and Windows documents their delivery as not guaranteed. The
+  job's exact count plus `unseen` states the gap instead.
+- **Capture through a pipe.** It is streamable to redact, but closing the read end at exit sends
+  SIGPIPE to an orphan still writing, which kills it. A file is what the runner uses
+  (`run-gates.sh:3846-3852`) and kills nothing.
+- **Records under `gate-run/`.** That would feed `read_runs` for free, but the runner's sweep erases
+  all but five entries there.
+- **`derive_scope` attribution.** It needs `PROCMON_ROOTS` declared, and the leg's root pid is
+  already known exactly.
+- **Holding the turnstile for the profile (F1 a).** The owner chose (b) on 2026-10-14. Contention
+  is recorded and set aside, not prevented.
+- **The printed queue line.** `gate queue: waited <n>s` (`run-gates.sh:2145`) is what
+  `profile_bar.py:415` parses from a bar's own stdout. Inside a leg it goes wherever the suite sends
+  its bar's output, and the canary captures that into a variable (`run-gates.test.sh:364`), so the
+  leg's log never carries it and the wait would read 0. A bar on a suite's private key prints waits
+  that are no host contention. The queue itself is read instead.
+- **Keeping the raw capture (F2 a).** The owner chose (b) on 2026-10-14.
+
+## 5. Production-readiness checklist
+
+- security — No elevation, no network, no signal. Command lines and logs are written with the runner's
+  URL-credential redaction (`run-gates.sh:301`), mode 700 and 600, under the untracked git dir. Each
+  leg's unredacted capture is deleted once its redacted copy is written (F2), and one it cannot
+  delete is named in `raw_kept`. The turnstile is read, never written.
+  Environment values are stored only as digests. Flags are bounded at parse, so an over-long value
+  refuses with exit 2. The process handle asks for `PROCESS_TERMINATE` only because the job assign
+  requires it, and the code never calls a terminate.
+- perf / scale — A scan took about 1 s at 327 rows on node d. A concurrent run has more rows, and
+  the scan's own seconds are in `census.tsv`. Host sampling is about 13 µs a tick. The turnstile
+  read adds one directory listing and one small read per slot to each census tick, and no spawn.
+- error / empty / loading states — An empty manifest refuses with exit 2. A refused scan is an
+  `unknown` tick. A missing process-monitor kit or job API refuses at start. A leg that never ends
+  keeps the run open, which the owner chose.
+- observability — The scrubbed set, the turnstile key and the record path print at start. Each leg
+  prints one line as it ends, naming its `ts_wait_s` and `ts_holders` when either is above zero, and
+  each STALLED or RESUMED prints one line. A summary line gives the totals, including the
+  summed `spawn_s_est` over the summed wall.
+- risks — The job semantics are UNVERIFIED until AC1 runs, and a breakaway there parks the unit
+  rather than shipping a census-only count. With no hold (F1b), a leg's bars queue behind any bar on
+  the host, and another session's bar can run beside the profile. Both are recorded and set aside,
+  not prevented, so a busy host yields readings that argue no ceiling. A profile started inside a
+  bar queues each of its legs' bars behind that very bar, for up to the runner's `TS_MAXWAIT` each,
+  so the help page says to start one outside any bar. The legs' scratch is never swept, so the
+  canary's clones can reach gigabytes, and the end line prints its size.
+- testing — AC1 to AC15 run against committed fixtures, the real runner's hold verb and pure probes.
+  The new arms are declared in §7.
+- migration — Census rows gain two keys that default to None. No conf key and no record format
+  moves.
+- user docs — `help/measure-legs.md`, linked from `help/README.md`, and a run-gates README section.
+
+## 6. Acceptance criteria
+
+Commands run from the worktree root on node d. `<ml>` is `python tools/run-gates/measure_legs.py`,
+`<fx>` is `tools/run-gates/fixtures/measure-legs`, and `<o>` is a fresh dir under `%TEMP%`. `<r>` is
+the run dir the tool prints. Every criterion is a direct run of the tool or a probe of its code, and
+`--selftest` re-observes them as §7 declares.
+
+- **AC1** — `<ml> --serial --legs <fx>/serial.json --out <o> --census-every 1` runs
+  `spawn.py 6 3` and its zero-child twin `spawn.py 0 3`. The difference of
+  their `procs_total` in `<r>/legs.tsv` is 6. The spawn leg's `procs` holds 6 rows whose command
+  carries `-I -c`, each with ppid, start, first and last seen, cpu_s and `peak_mem_b`.
+  Red when: the job is created with `JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK`. The children then leave
+  it, and the difference reads 0.
+  figure: 6 is the fixture's argument. The twin cancels the wrapper and the interpreter, so the
+  expectation is DERIVED.
+- **AC2** — On the same run, the `memio.py 200` leg's `peak_job_mem_b` is at least 200 MiB, its
+  `io.write_bytes` is at least 200 MiB, and `user_s + kernel_s` is above 0. Every leg's
+  `spawn_us.median` is above 0, and its `spawn_s_est` equals `procs_total x median / 1e6`.
+  Red when: `extract_runner_function` is pointed at a name the runner lacks. The run then refuses
+  with exit 2 before the first leg, rather than recording no spawn cost.
+- **AC3** — `python -c` imports `tools/process-monitor/census.py`, feeds `parse_cim` one
+  `\x01`-joined line carrying seven fields, and feeds `build_windows_rows` the result. The row carries
+  `peak_mem_b` and `mem_b` as ints, and `command` intact. A `parse_posix` row carries both as None.
+  `census.FIELDS` is unchanged.
+  Red when: `parse_cim` reads the command from index 4 as before. The command then reads as a number.
+- **AC4** — `<ml> --concurrent --legs <fx>/concurrent.json --out <o>` runs `hog.py 10`, then
+  `steady.py 2`. In `<r>/host.tsv`, no `admit` event sits on a sample above 80% CPU while another
+  leg runs, and at least one sample above 80% falls between the hog's admission and the steady
+  leg's.
+  Red when: `check_admit` compares with the caps disabled. The steady leg is then admitted on the next
+  tick, on a sample above 80%.
+  fixture: the liveness half fails, and does not pass, on a host where `hog.py` cannot raise CPU above
+  80%.
+- **AC5** — `python -c` calls `check_admit` at (cpu, mem, running, fresh) = (81, 50, 1, True),
+  (80, 90, 1, True), (50, 91, 1, True), (50, 50, 1, False) and (99, 99, 0, False). It gets hold,
+  admit, hold, hold and admit.
+  Red when: the drained clause is missing, so (99, 99, 0, False) holds.
+- **AC6** — `<ml> --serial --legs <fx>/stall.json --out <o> --census-every 1` with
+  `--stall-window 8 --stall-cpu 0.5` runs `stall.sh 20`. Its `stalls` holds one episode whose tree
+  names `sleep`, and stdout carries `STALLED`. `steady.py 20` holds none, and the run ends with
+  every leg's `rc` 0.
+  Red when: the log test is inverted. Then `stall.sh` never reads STALLED.
+- **AC7** — On the same run, `churn.py 20` holds no episode. At least one of its windows records a
+  tree delta under 0.5 s with a job delta above it.
+  Red when: the job veto is dropped from `check_stalled`. `churn.py` then reads STALLED.
+  fixture: if no window has a tree delta under 0.5 s, the arm reports the veto unexercised and does
+  not pass.
+- **AC8** — `--selftest`'s parity arm builds one `ps -ef`-shaped snapshot of six rows. It runs the awk
+  program `extract_runner_function` takes from `measure_foreign`, with `ps` shimmed to print the
+  snapshot, and runs `measure_foreign` over the same rows. Both give the same count and the same
+  roots.
+  Red when: the port drops the `selftest.py` word rule, and the counts differ.
+- **AC9** — `GATE_JOBS=3 GATE_REUSE=1 GATE_TURNSTILE_HOLDER=probe GIT_NAMESPACE=probe <ml> --serial`
+  with `--legs <fx>/serial.json --out <o>` runs `printenv.py`.
+  Its `<r>/<i>.log` prints no `GATE_` name, the two nesting names included, and no name from
+  `git rev-parse --local-env-vars`. `envelope.json` `scrubbed` lists `GATE_JOBS`, `GATE_REUSE`,
+  `GATE_TURNSTILE_HOLDER` and `GIT_NAMESPACE`, each with its rule. The envelope's PYBIN equals what
+  the runner's `resolve_python` prints under the same environment.
+  Red when: the pre-push half is skipped. `GIT_NAMESPACE` then reaches the leg.
+- **AC10** — After AC1's run exits, `<r>` holds `envelope.json`, `host.tsv`, `census.tsv`,
+  `legs.tsv`, and one `.leg`, `.log` and `.json` for each leg. Each `.log` is the leg's redacted copy,
+  the only log the run keeps. Every `.leg` line splits on tab into 8 fields with a numeric fourth.
+  The `scratch` dir the envelope names still exists.
+  Red when: an exit handler erases the run dir, as the runner's `cleanup` erases its scratch. The
+  listing is then empty.
+- **AC11** — On AC9's run, `printenv.py` also prints `https://u:s3cret@example.invalid/x`. Its
+  `<i>.log` carries `://***:***@`. With `<s>` the `scratch` dir the envelope names,
+  `grep -r s3cret <r> <s>/raw` prints nothing, `<s>/raw/` holds no file, and the envelope's
+  `raw_kept` is empty.
+  Red when: the log is copied without redaction, or the raw capture is left in place. Either way
+  `grep` finds `s3cret`.
+  fixture: `printenv.py` leaves no process running, so its capture is deleted at leg end, and a
+  `raw_kept` entry for it is a failure, not an allowance.
+- **AC12** — `python -c` calls `measure_legs.resolve_job_backend('linux')`. It raises naming `linux`
+  and the job API.
+  Red when: it returns a backend.
+- **AC13** — A `python -c` probe reads `tools/gate-legs.json`, the run-gates `kit.toml` through
+  `tomllib`, `selftest-budgets.txt` and `windows-only-legs.txt`. It finds `measure-legs selftest` in
+  all four, with equal name, subject and argv once `{kit}` is resolved to `{prefix}/run-gates`.
+  Red when: the descriptor row is left out, which `govkit selfcheck` would red at the close.
+- **AC14** — `grep -n 'gov:kit run-gates@' tools/run-gates/README.md` and
+  `grep -n '^KIT_RUN_GATES_VERSION' tools/run-gates/run-gates.sh` show one equal version above 1.40.
+  The process-monitor markers all show one equal version above 0.18. `help/measure-legs.md` names
+  `--serial`, `--concurrent`, the record path and `ts_wait_s`, and `help/README.md` links it.
+  Red when: one marker lags, as `kit version markers` would find.
+- **AC15** — `<ml> --selftest`'s turnstile arm, with `HOME` set to a fresh temp dir, starts the real
+  runner's hold verb over `sleep 20` outside any leg, in the legs' scrubbed environment, and waits
+  for its slot beacon's `pid` file. It
+  then runs `<fx>/turnstile.json` with `--serial --census-every 1`: `steady.py 3`, then `queued.sh`,
+  whose own hold queues behind the first. `steady.py`'s `ts_holders` is 1 and its `ts_queued` 0.
+  `queued.sh`'s `ts_queued` is 1, its `ts_wait_s` is at least 5, and its `work_s` equals
+  `wall_s - ts_wait_s`. Both `.leg` rows carry a positive eighth field. A third row is
+  `render_leg_row` over `steady.py`'s record with `foreign`, `ts_holders` and `ts_queued` set to 0.
+  `read_runs`, loaded from `tools/run-gates/derive-ceilings.py` and pointed at a temp
+  `gate-run/<id>/` holding the three rows, sets the first two aside as `contended` and admits the
+  third.
+  Red when: `derive_leg_turnstile` ignores tickets. `queued.sh`'s `ts_wait_s` then reads 0, and its
+  `work_s` equals its `wall_s`.
+  figure: 5 s is the holder's 20 s, less `steady.py`'s 3 s, less a declared 12 s allowance for two
+  runner start-ups, one census period and the stamp's truncation. The allowance is declared, not
+  measured, and the arm prints the wait it saw.
+  fixture: the holder is the profiler's own child, so the census excludes it, and only the turnstile
+  read can count it. The temp `HOME` keeps the arm off the host key a surrounding bar holds.
+
+## 7. Gates
+
+`run-gates canary` · `run-gates gov canary` · `shell hygiene (a fork spent on builtin work)` · `encoding posture (text IO names its encoding)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `harness arms (fail branches armed or pinned)` · `govkit selfcheck` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `python resolver (behaviour + inline parity + idiom ban)` · `every held leg is budgeted, every budget row resolves` · `held-halves selftest` · `process-monitor census selftest` · `process-monitor adopter selftest` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
+
+New arm: tools/run-gates/measure_legs.py --selftest · covers AC1 AC2 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC11 AC12 AC15 · each criterion's Red when, staged on a copy of the tool in the selftest's temp dir · none
+
+New arm: tools/process-monitor/selftest.py · covers AC3 · a parse_cim reading the command at index 4 · none
+
+`measure-legs selftest` is the leg the first arm line adds. It joins the manifest in this unit, so it
+is not on the leg line above. The inlined `resolve_prefix_token` and `resolve_kit_dir` blocks join
+the resolver's parity population by their markers. The main loop observes each arm red, then green,
+at the close.
+
+## 8. Open questions
+
+- **F1 — Does the profile hold the host turnstile?**
+  (a) Yes, through `run-gates.sh --hold`, with the legs keeping the two nesting names (rev-1's §4 "The
+  turnstile"). Nested bars inside legs then nest as they do under a bar, and a real bar queues
+  instead of overlapping the profile. The cost is that the profile holds the host for as long as it
+  runs, which is unbounded by design, and other bars wait out `TS_MAXWAIT` and then run beside it.
+  (b) No. Leg-nested bars queue on the host turnstile. Under `--concurrent` they queue behind each
+  other, which inflates exactly the readings this tool exists to make truthful, and a real bar can
+  overlap the profile, visible only in `foreign`.
+  Recommendation: (a). It removes a contention source that (b) can only record.
+  RESOLVED (owner, 2026-10-14): (b). The profile holds no turnstile. A leg's bars queue on the host,
+  and each leg's record carries foreign holders, its queue wait apart from its work, and an eighth
+  `.leg` field that `read_runs` sets aside (§4 "The turnstile", S9, AC15).
+- **F2 — What happens to the unredacted capture once its redacted copy exists?**
+  The leg writes its raw output into the scratch dir's `raw/<i>.out`, because a file kills nothing
+  (§4 Alternatives). The brief says nothing is erased. The runner's own record says a durable
+  unredacted copy is "a credential leak the old scratch-dir lifetime was merely hiding"
+  (`run-gates.sh:3922-3925`).
+  (a) The raw capture is kept in the scratch dir, and the envelope names it.
+  (b) The raw capture is unlinked once `<i>.log` is written and no process holds it. A held file is
+  retried at run end and otherwise kept, with `raw_kept` and its reason recorded. This is the one
+  erase the tool performs.
+  Recommendation: (b). Every log is kept as the runner keeps its durable copies, and charter
+  `[security]` outranks the letter of "nothing erased" for a file holding the same bytes unredacted.
+  RESOLVED (owner, 2026-10-14): (b). Each leg's log is kept redacted only, and the raw capture is
+  deleted once its redacted copy is written (§4 "The record", S11, AC11).
+
+## 9. Revision log
+
+- rev-1 · 2026-10-14 · initial draft from the owner's brief. The seams were read at `ebce889c`, the
+  census, spawn-floor, admin, job and host-load probes were run on node d, and §4's candidates were
+  graded by M12.
+- rev-2 · 2026-10-14 · S1 S8 S9 S10 S11 · §3 · §4 · §5 · AC9 AC10 AC11 AC14 AC15 · §7 · §8 ·
+  §10 · the owner resolved F1 (b) and F2 (b), marked in place. F1: the hold, `--inside-hold` and `run_held`
+  are gone, and so is `derive_held_env`, because the nesting names are now scrubbed (AC9). S9 and
+  §4 "The turnstile" add a read of the host queue and slot beacons at each census tick, attributed
+  by the census. They give per-leg `ts_holders`, `ts_queued`, `ts_wait_s` and `work_s`, and fold
+  them into the `.leg` row's eighth field, which `read_runs` sets aside (AC15, new). A concurrent
+  reading of a nesting leg is stated to include its queue wait. The envelope drops `queued` and
+  gains `turnstile_dir`. The printed `gate queue: waited` line was weighed and rejected, because
+  the canary captures its bars' output (`run-gates.test.sh:364`). F2: the raw capture is deleted
+  once `<i>.log` is written, `raw_kept` names any it cannot delete, and AC10 and AC11 read the
+  redacted copies and the empty `raw/`. S1 and S11 each gain a **Readers:** clause for that
+  delete, read by grep at `679afc31`: no tracked reader spells the capture's name, and its only
+  value reader is this unit's own redaction pass.
+
+## 10. Reuse audit
+
+`python tools/codebase-map/reuse_lookup.py "profile every gate leg's process tree, CPU, memory and
+spawned processes, and detect a stalled leg"` ranked `scan_processes`
+(`tools/process-monitor/census.py`, SEAM, fan-in 4) and `run_leg_at` and `run_leg_reap`
+(`tools/run-gates/run-gates.sh`). It found no profiler. The seams extended are these. `scan_processes`
+gains two fields, and `build_walk` (`reap.py:136-164`) and `build_self_chain` (`scope.py:254`) are
+used unchanged. From `profile_bar.py` come `resolve_bash`, `run_git`, `check_quiet` and
+`derive_regime`, imported as siblings. `resolve_python`, `measure_spawn_cost`, `read_spawn_floor` and
+the `measure_foreign` awk are run from the runner's source text, by the extraction seam
+`run-gates.turnstile.test.sh:1499` uses. The `resolve_prefix_token` and `resolve_kit_dir` canonical
+blocks are inlined. `run_leg_at` gives the launch shape but is bound to the runner's globals, so it is
+mirrored, not called. The turnstile read (rev-2) follows the one reader of the runner's queue that
+already exists outside the runner, `unattended.sh:6684-6690`, which parses a ticket's pid the same
+way. The set-aside reuses `read_runs` unchanged by shaping the `.leg` row it reads. The brief named
+the evidence suite's nested bar as one that queues on the host. It does not: that suite exports a
+private `GATE_TURNSTILE_DIR` for its bars (`run-gates.evidence.test.sh:154`). The canary's bars do
+take the host key (`run-gates.test.sh:364`).
+
+The probe disagreed with the brief once. The brief names "the `gate-legs.json` reader the runner and
+`run-selftests.sh` already share", and none is shared: the runner parses inline
+(`run-gates.sh:2697-2845`), and `run-selftests.sh` twice (`:523-585`, `:827-834`). What they share is
+`resolve_prefix_token`, which this unit inlines over one `json.load`. `derive_scope` and `classify.py`
+were weighed and left out (§4). The gotchas checklist for the touched paths selected
+`a-new-leg-trips-a-growing-set-of-meta-gates`, which is why §7 names every meta-gate a new leg trips.
+It selected `fixture-passes-by-finding-nothing`, which is why AC4 and AC7 carry liveness halves.
+And it selected `a-runner-knob-owes-a-push-class`, which is why the tool adds flags and no knob.
+
+The recall probe returned TOOL-aGraftedHelix-5's foreign census, which is the predicate ported here.
+It returned the aMeteredSweep runner research, which measured spawn cost at 19-39 ms on node d
+against 78-251 ms on node a, the reason the spawn figure is sampled live rather than typed. It
+returned TOOL-aFrugalTurnstile-5's `--hold`, and the brief itself.
+
+Recall terms used: `python tools/memory-recall/query.py "how is a gate leg profiled, its spawn cost
+measured, and a hung leg detected without a ceiling" --terms "profile_bar census scan_processes
+build_walk spawn floor measure_spawn_cost foreign census ceiling evidence stall hung canary turnstile
+hold job object"`
