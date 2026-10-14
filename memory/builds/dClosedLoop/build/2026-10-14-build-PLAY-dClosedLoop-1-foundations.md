@@ -150,3 +150,94 @@ kit, role, task (Recommended).
   gap-found-02 (practices without reach, methodologies without a home), gap-found-03 (subagents hold
   unranked charter fragments), gap-found-04 (no rule or record for overriding the charter); all
   owned by dOrderedCharter.
+
+### Step 1, continued: the charter teaches every agent how to drive gov
+
+#### The owner's words
+
+> 1. Continued. As charter is the very first instruction set loaded into any agent (Claude Code
+> main sessions, any sidechain agents, or any other LLM), it HAS to contain a set of high-level
+> instructions how to interact with Gov and how to drive it forward. By default, any agent would
+> need to derive how to use the kit, read multiple sets of files, this gap should be closed from
+> the start - any agent loading the charter not only should learn how the founding rules of the
+> project but also how to initiate and drive the loop forward, according to its role. Further
+> instructions should come from the tooling messages and similar. This should be mechanically
+> rendered into the charter based on the adopted pieces of the kit.
+
+#### Current state, measured 2026-10-14
+
+- **Per-kit rendering exists, as template blocks.** The charter's generated "Tools to rely on"
+  section comes from `<!-- kit:<id> -->` blocks inside `coding-governance-agents.template.md`
+  (lines 111-160): one line per kit saying what the tool answers, dropped when a target lacks the
+  kit. The lines live in the template, not in the kits' own descriptors (`tools/*/kit.toml` carry
+  files, roles and versions, nothing for the charter), and none says how to start, advance or
+  finish a stage, or what a given role does first.
+- **Tools rarely say what comes next.** `git grep` finds a next-step line in six adopt scripts
+  (`tools/*/adopt-*.sh`, installation hints) and the string `next —` in three files under `tools/` and
+  `skills/`; the hooks put a remedy in their refusal reasons (`tools/hooks/scratch-guard.js` names
+  one in eight places), but no command ends by naming the caller's next step.
+- **Other harnesses load the charter.** `tools/agent-instructions/` wires `AGENTS.md` for Codex,
+  Copilot, Cursor, Windsurf, Amp, Devin, Zed, Aider and Jules natively and Gemini through its
+  settings, so the charter is the one document every harness reads. Codex reads at most 32 KiB of
+  project instructions (`tools/agent-instructions/README.md`, verified there 2026-10-05), below the
+  template's 48 KiB gate: a hard input to the charter's re-derived cap.
+- **Claude Code hooks guide only Claude.** A non-Claude agent meets no PreToolUse or Stop hook; the
+  git hooks (`.githooks/pre-commit`, `.githooks/pre-push`) are what every harness passes through.
+
+#### Design response
+
+**R3. The charter's drive section, rendered from the adopted kits.** Inside the rank-1 envelope,
+after the practices: how to start, by situation and role (a new task from the owner, a resumed
+session, an unattended run, a subagent's task, another harness without gov's hooks); for each stage,
+the command that enters it, the one that advances it and the witness that ends it; and one line per
+role (its stage, its inputs, its first move, what it hands back). Each kit declares its own lines in
+its descriptor; the renderer composes the section from the adopted kits alone, in the loop's stage
+order, so an adopter's charter names exactly the tools it has.
+
+**R4. The tools drive the rest.** Every gov command ends its output, success or refusal, with a
+`next —` line naming the caller's next command; a `next` verb in the loop kit reads the current state
+(the card, the route, derived unit states, leases, the plan, the policy) and prints the next action
+for a named role. The charter's last drive instruction is "follow the `next —` lines; when unsure, run
+`next`". A check holds every declared command to ending with a `next —` line or declaring itself
+terminal.
+
+**R5. Harness-independent by construction.** Every drive step names a CLI command; a Skill is a
+Claude Code shortcut over the same command; the git hooks enforce for every harness, and Claude
+Code's own hooks add guidance on top.
+
+**R6. A charter every harness can read whole.** The drive section is one line per stage and per role;
+per-role detail travels in handoffs and `next —` lines, and the charter's re-derived cap starts from
+the smallest consumer's limit (Codex's 32 KiB).
+
+#### Forks asked, 2026-10-14
+
+**F1-5. "After the charter's start, how should an agent learn its next step?"** Offered: next verb +
+next-lines (Recommended); next-lines only; Charter table only. Answer: next verb + next-lines
+(Recommended).
+
+**F1-6. "Where should each kit's drive lines be declared?"** Offered: Each kit's descriptor
+(Recommended); Centrally, in the loop; Template kit blocks, as today. Answer: Each kit's descriptor
+(Recommended).
+
+**F1-7. "How much of the per-role guide belongs in the charter itself?"** Offered: One line per role
+(Recommended); Main session only; Full per-role guides. Answer: One line per role (Recommended).
+
+**F1-8. "How harness-independent should driving gov be?"** Offered: CLI-first (Recommended); Claude
+Code first. Answer: CLI-first (Recommended).
+
+#### Settled, and where each piece lands
+
+- **dOrderedCharter (Foundation)** renders the drive section: how to start by situation, each
+  stage's enter, advance and exit commands, one line per role, and the closing "follow the `next —`
+  lines; when unsure, run `next`". Kit descriptors gain a drive table (stage, role, command, when)
+  whose schema this build defines; the section is composed from the adopted kits alone and checked
+  both ways. Each subagent's handoff repeats its role's line, ranked. The charter stays inside the
+  smallest harness's limit, Codex's 32 KiB, from this build on.
+- **dDeclaredLoop (Spine)** builds the `next` verb over the loop's state and the `next —` micro-format,
+  plus the check that every command a descriptor declares ends with a `next —` line or declares itself
+  terminal; commands that do not yet emit one sit on a shrink-only list, each owned by the chain
+  build of its kit's stage.
+- **CLI-first**: every drive line names a CLI command, and a Skill is a shortcut over it.
+- **Gaps the owner named, added to the register:** gap-found-05 (the charter does not teach an agent
+  how to drive gov for its role), owned by dOrderedCharter; gap-found-06 (no tool names the next
+  step, so the loop advances only by agents re-deriving it), owned by dDeclaredLoop.

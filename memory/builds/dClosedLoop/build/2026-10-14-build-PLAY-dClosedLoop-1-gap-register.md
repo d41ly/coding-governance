@@ -70,6 +70,8 @@ extends.
 | gap-found-02 | Foundation | HIGH | The charter's practices are one-line rules without reach: no stage contract, role or review lens reads them, and an adopter's methodology has no home but free prose. Raised by the owner. | foundations step 1, current state | — |
 | gap-found-03 | Foundation | HIGH | Subagents load no charter (`omitClaudeMd: true`) and receive unranked charter fragments, with nothing ordering charter, role and task. Raised by the owner. | foundations step 1, current state | — |
 | gap-found-04 | Foundation | MED | No rule and no record governs a live instruction that conflicts with the charter. Raised by the owner. | foundations step 1, F1-1 | — |
+| gap-found-05 | Foundation | HIGH | The charter does not teach an agent how to drive gov for its role: its generated tool lines say what each tool answers, so every agent re-derives how to start and advance the loop from many files. Raised by the owner. | foundations step 1 continued, current state | — |
+| gap-found-06 | Foundation | HIGH | No tool names the next step: six adopt scripts print install hints and nothing else ends with the caller's next command, so the loop advances only by agents re-deriving it. Raised by the owner. | foundations step 1 continued, current state | — |
 | gap-spine-01 | Spine | HIGH | No stage model: no kit, leg, dossier, role or hook declares the stage it serves, and the loop exists only implicitly. | design §4.1 (0 of 31 dossiers carry a stage); `tools/roles/workflows.toml` covers stages 0–7 only | — |
 | gap-spine-02 | Spine | HIGH | Guards read agent-written state across stages, against `[class]`. | build §4 (write gate), design §4.4 (INPROGRESS), test §5 C (pusher-written receipt), deploy §5 C | — |
 | gap-spine-03 | Spine | HIGH | Attended and unattended builds run different exit contracts. | build §3, §4 (DoD needs RUN.md) | — |
@@ -153,4 +155,13 @@ same instrument:
 ```text
 Deploy=8 Plan=7 Spine=9 Test=9 Review=3 Foundation=4 Build=4 Maintain=8 Design=9
 LOW=5 MED=24 HIGH=32
+```
+
+Re-measured after step 1's continuation added `gap-found-05` and `gap-found-06`, same instrument. The
+Stage column groups the owner's foundations; `gap-found-06` is owned by the Spine, which builds the
+`next` verb:
+
+```text
+Deploy=8 Plan=7 Spine=9 Test=9 Review=3 Foundation=6 Build=4 Maintain=8 Design=9
+LOW=5 MED=24 HIGH=34
 ```

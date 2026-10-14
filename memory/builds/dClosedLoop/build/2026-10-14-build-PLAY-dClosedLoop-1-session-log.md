@@ -245,6 +245,10 @@ The gap-ownership join after foundations step 1, against the register (61 keys, 
 `gap-found-*` rows added) and v2 (dOrderedCharter added as the root): exit 0, 61 keys, 11 builds,
 none unowned, none owned twice, none phantom, none empty.
 
+After step 1's continuation (`gap-found-05` owned by dOrderedCharter, `gap-found-06` by
+dDeclaredLoop): the join exits 0 on 63 keys and 11 builds; the preset check exits 0 on 49 catalogue
+keys, 44 presettable, 44 preset rows.
+
 ## Records index
 
 | Record | What it holds |

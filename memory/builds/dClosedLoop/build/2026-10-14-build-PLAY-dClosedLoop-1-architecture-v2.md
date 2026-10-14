@@ -17,6 +17,10 @@ Revised: 2026-10-14, after the foundations revisit's step 1
 join the catalogue, the first of them the presets; the chain gains a new root, dOrderedCharter,
 which takes the front door and the tag grammar from the Spine.
 
+Revised: 2026-10-14, after step 1's continuation: P15 is added; the charter gains its drive section
+and the 32 KiB bound; dOrderedCharter renders the drive section from kit descriptors and dDeclaredLoop
+builds the `next` verb and the `next —` line check.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -54,6 +58,11 @@ which takes the front door and the tag grammar from the Spine.
 - **P14 Practices with reach.** The charter's practices come from a catalogue; each declares its
   reach at every stage it touches, and stage contracts, role handoffs and review lenses read the
   active practices' reach for their stage, so a practice redefines every step (foundations step 1).
+- **P15 The charter starts the loop; the tools continue it.** The charter teaches every agent, by
+  role, how to start and drive the loop, in a drive section composed from the adopted kits'
+  descriptors; from there every gov command ends with a `next —` line, and a `next` verb answers
+  "what now" for any role. Every step is a CLI command, so any harness can drive gov (foundations
+  step 1 continued).
 
 ## [front-door] The charter as the loop's first step
 
@@ -62,9 +71,12 @@ envelope, `[AGENTS.md · Priority 1 · Always first …]` … `[/AGENTS.md]`, an
 what gov is and how it works and is used; the precedence and override rule (rank decides, never
 load order; the charter wins a live conflict unless the owner explicitly overrides it, and the
 override is recorded); the instruction map (the ranks below it, what loads when, and how to rebuild
-the hierarchy after a reset); the active practices, each with its reach per stage; the hand-off to
-the loop, one rendered line per stage contract and the repository's current preset and overrides;
-then the repository's own project block from its own overlay, gov's included. The foundation build,
+the hierarchy after a reset); the active practices, each with its reach per stage; the drive
+section (how to start by situation, each stage's enter, advance and exit commands, one line per
+role, then "follow the `next —` lines; when unsure, run `next`"), composed from the adopted kits'
+descriptors; the repository's current preset and overrides; then the repository's own project block
+from its own overlay, gov's included. The whole charter fits the smallest harness's instruction
+limit, Codex's 32 KiB. The foundation build,
 dOrderedCharter, writes it (foundations step 1; it took the front door from the Spine, walk S5).
 
 **The ladder** (foundations F1-2): 0 the platform's own system and safety instructions, not the
@@ -241,8 +253,8 @@ where `verdict = peer-node`.
 
 | Build | Stage | Parents | Planned units | Gaps owned |
 |---|---|---|---|---|
-| dOrderedCharter | Foundation | dClosedLoop | the practice catalogue with each practice's reach per stage, and `charter.practices`; the charter re-founded in its rank-1 envelope (front door, precedence and override rule with `charter.override` and its record, instruction map, active practices with reach, hand-off to the loop, the repository's project block from its own overlay); the instruction registry and the ladder; envelopes rendered for every registered document and the gate over them; the instruction map re-injected on compact and resume; ranked envelopes in every subagent handoff; the section-tag grammar and its resolver | gap-found-01, gap-found-02, gap-found-03, gap-found-04 |
-| dDeclaredLoop | Spine | dOrderedCharter | the loop kit and definition keyed by the stage tags, roles re-pointed after aOrientedCast closes; `.governance/policy.toml`, schema, one reader, JSON mirror; the named presets and their completeness check; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; policy at govkit intake | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01 |
+| dOrderedCharter | Foundation | dClosedLoop | the practice catalogue with each practice's reach per stage, and `charter.practices`; the charter re-founded in its rank-1 envelope (front door, precedence and override rule with `charter.override` and its record, instruction map, active practices with reach, hand-off to the loop, the repository's project block from its own overlay); the instruction registry and the ladder; envelopes rendered for every registered document and the gate over them; the instruction map re-injected on compact and resume; ranked envelopes in every subagent handoff; the section-tag grammar and its resolver; the drive section composed from a drive table in each adopted kit's descriptor, checked both ways, each subagent's role line repeated in its handoff, the charter held inside 32 KiB | gap-found-01, gap-found-02, gap-found-03, gap-found-04, gap-found-05 |
+| dDeclaredLoop | Spine | dOrderedCharter | the loop kit and definition keyed by the stage tags, roles re-pointed after aOrientedCast closes; `.governance/policy.toml`, schema, one reader, JSON mirror; the named presets and their completeness check; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; policy at govkit intake; the `next` verb over the loop's state, the `next —` micro-format, and the check that every declared command ends with one or declares itself terminal, laggards on a shrink-only list owned by their stage's build | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01, gap-found-06 |
 | dLeasedFleet | Concurrency | dDeclaredLoop | the lease grammar with run claims migrated; acquisition and release in both modes; overlap warn or refuse and takeover; fleet identity and remote uniqueness; offline behaviour | gap-conc-01, gap-conc-02 |
 | dWitnessedBar | Test | dDeclaredLoop | gate health measured and the reliability bar; bypasses recorded; attribution deciding what blocks; the hook-written verdict; held legs by policy; the peer-node verifier; seen-red records; flake quarantine; the product-test contract with runner adapters; derived pre-commit list and multi-node cost evidence | gap-test-01, gap-test-02, gap-test-03, gap-test-04, gap-test-05, gap-test-06, gap-test-07, gap-test-08, gap-test-09 |
 | dRankedPlan | Plan | dDeclaredLoop, dLeasedFleet | priority beside `parents:` and the generated plan view; the planner and triager role and Plan workflow; the placement predicate; rule-based triage; dormancy disposal; the live-build mapping carried out; Plan Review; kickoff offering the next item and attended briefs gated | gap-plan-01, gap-plan-02, gap-plan-03, gap-plan-04, gap-plan-05, gap-plan-06, gap-plan-07 |
