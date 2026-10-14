@@ -51,8 +51,8 @@ staged, where the parent-home row must read ACCEPTED.
   times. With `check` replaced by a recorder, `check_outcome_probes` recorded exactly two `lexicon `
   labels, equal to §4's pins: `lexicon exit 1 after a failed first scaffold is REFUSED` and
   `lexicon exit 1 after a declaration removed after one is ACCEPTED`. All 16 recorded checks passed.
-  These include the new `settings-merge exit 2 after an install with the hook at its prefix's
-  parent home only is REFUSED`.
+  These include the new row, recorded as settings-merge exit 2 after an install with the hook at
+  its prefix's parent home only is REFUSED.
 - AC8 — `project-owned` — `grep -n 'roles kit'` over spec 4 printed nothing. `project-owned`
   printed the corrected non-goal at line 46 and the hands-off at line 60, both citing
   `tools/roles/kit.toml:47-48`. The hands-off to `TOOL-dRedressedBar-7` at line 54 names the
@@ -112,8 +112,8 @@ staged, where the parent-home row must read ACCEPTED.
 ## Finding for the close
 
 Spec 10 §5 "observability" says a refused stop prints `no declared outcome accepts that` and
-`adopter exit 2`. That holds for `update`. On `apply`, the refusal line reads `its adopter exited 2
-— unclassified, because no [[outcome]] evaluator exists yet to say WHICH declared outcome that code
-means`, a message `tools/govkit/govkit.py` still prints though the evaluator exists. No criterion
+`adopter exit 2`. That holds for `update`. On `apply`, the refusal line reads instead: its adopter
+exited 2, unclassified, because no outcome evaluator exists yet to say which declared outcome that
+code means. `tools/govkit/govkit.py` still prints that message though the evaluator exists. No criterion
 reads that line, and govkit.py is outside this unit's write set. Unit 13, which corrects spec 10
 §5, is the place for the sentence. The stale message itself is not owned by any unit yet.
