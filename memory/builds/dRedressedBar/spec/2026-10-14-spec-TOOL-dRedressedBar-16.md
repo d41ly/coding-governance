@@ -1,10 +1,12 @@
 # TOOL-dRedressedBar-16 — an apply that keeps a carried kit's claim keeps that kit's gate-leg ownership too, so a later argv change does not wedge the kit
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 |
 
 <!-- /gen:spec-records -->
 
@@ -79,6 +81,11 @@ the narrower-apply-then-argv-change sequence that the report traced.
   and this unit's arm has no wedge to show. Also the `carry_out_of_scope` docstring paragraph its S2
   writes, which S2 here rewrites, and its spec's §3 and §4 C5 row, which S4 corrects. AC1's and
   AC2's red halves read its pass commit `<p12>`.
+- **hands-off** `TOOL-dRedressedBar-19` — the docstring paragraph S2 rewrites, in which that unit
+  keeps unit 12's id beside this unit's, and this spec's S2, S4, §3, §4 and AC3, which it corrects in
+  place: both ids required, spec 12's inline note named, the orphan carry stated as an accepted gap,
+  two citations, and a row for the contract-parity reader (units-16-18 report ids 8, 9, 18, 30, 31
+  and 43).
 
 ## 4. Design
 
@@ -243,6 +250,9 @@ none
   for report id 7 (H1). The wedge was traced through `write_gate_legs`, `check_leg_claimable` and
   both callers at `46eb75ed`, and four candidates were graded by M12, with the pick taken by M3's
   rule.
+- rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-19`, the batch the
+  units-16-18 spec audit's minors were promoted into, for that report's ids 8, 9, 18, 30, 31 and 43.
+  No scope, design or criterion moves.
 
 ## 10. Reuse audit
 

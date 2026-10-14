@@ -1,10 +1,12 @@
 # TOOL-dRedressedBar-17 — the units-12-15 spec audit's 12 mediums and 9 lows, batched: each faulted criterion observed in a form that can pass and fail, each false sentence corrected, and the code sites they describe made to hold what the specs claim
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 12
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-16 TOOL-dRedressedBar-18 |
 
 <!-- /gen:spec-records -->
 
@@ -207,6 +209,11 @@ report item share its observation, and each still names its own id.
   ownership join, the gained loop's `_res_g` and the `[dRB-15]` checks, which S10, S11, S13 and S24
   extend. Its spec is what S4, S10, S11, S13, S15, S16, S18, S20, S21 and S24 correct. Most red
   halves here read its pass commit `<p15>`.
+- **hands-off** `TOOL-dRedressedBar-19` — the receipt routing S23 adds, beside which that unit
+  writes the sidecar first through the atomic writer and declares it a member; the comments S23
+  claims observed, which it observes; the note S10 counts, whose label it corrects; the `[dRB-14]`
+  checks, which it reads by label. Also this spec's §1, S10, S23, §4, §5, AC1, AC9, AC10, AC23 and
+  §10, which it corrects in place (units-16-18 report ids 2, 4, 5, 16, 17, 23, 40 and 41).
 
 ## 4. Design
 
@@ -574,6 +581,9 @@ none
   All 21 confirmed medium and low findings, by report id, are batched into this unit by M4. Each
   claim was re-read at `46eb75ed` and at the blobs the report pins. Id 13's observation departs from
   the report's sketch, which `update`'s receipt order makes unreachable (§4).
+- rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-19`, the batch the
+  units-16-18 spec audit's minors were promoted into, for that report's ids 2, 4, 5, 16, 17, 23, 40
+  and 41. No scope, design or criterion moves.
 
 ## 10. Reuse audit
 

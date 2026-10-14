@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-12 — an apply narrower than its receipt keeps every other installed kit's claim and rows, so a refused settings-merge exit stays refused on the next run
 
-**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
+**Status:** SPECCED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -99,6 +99,9 @@ the `pins` union at `:7402-7407` already does for line-ending pins.
   `install.sums` sidecar and `STEP_RECEIPT` counts S1 claims observed and no criterion here reads
   (report ids 2 and 12). That unit adds those checks to the block and names its AC2 in this spec's
   revision line.
+- **hands-off** `TOOL-dRedressedBar-19` — the docstring paragraph S2 writes, whose unit-12 id that
+  unit keeps beside unit 16's after unit 16 rewrites the paragraph, and S2 itself, which it marks
+  superseded by unit 16 in place (units-16-18 report ids 8 and 31).
 - **hands-off** external — `apply` writes `orders` for its selection alone (`:7666-7712`), so an
   outbox order a carried kit's hole owns leaves the receipt on a narrower apply. `check` grades only
   the orders a receipt records (`:5394-5405`), so the loss is a missing instruction and never a
@@ -298,6 +301,9 @@ none
 - rev-3 · 2026-10-14 · §3 · Edges gain the hands-offs to `TOOL-dRedressedBar-16` and
   `TOOL-dRedressedBar-17`, the units the units-12-15 spec audit's findings were promoted into: report
   id 7 to unit 16, and ids 2 and 12 to unit 17. No scope, design or criterion moves.
+- rev-4 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-19`, the batch the
+  units-16-18 spec audit's minors were promoted into, for that report's ids 8 and 31. No scope,
+  design or criterion moves.
 
 ## 10. Reuse audit
 

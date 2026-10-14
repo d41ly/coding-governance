@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-2-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-10-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-10-3-spec-writer.md) | journal | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-19-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-19-2-revision.md) | research | TOOL-dRedressedBar-19 |
 | [2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-10-11-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-11 |
 
 <!-- /gen:spec-records -->

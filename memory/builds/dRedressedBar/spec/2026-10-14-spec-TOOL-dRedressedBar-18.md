@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-18 — a gate profiler: every leg run clean and unbounded, serially or under a load cap, each profiled to its processes, stalls reported and never killed
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 13
+**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-18-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-2-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-18-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-3-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-18-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-brief.md) | research | — |
+| [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
 
 <!-- /gen:spec-records -->
 
@@ -120,6 +121,15 @@ ceilings, the width profiles and the spawn claim rest on measurement.
   and each slot beacon's `pid` file (`run-gates.sh:1513-1514`, `:1534-1535`, `:1892`, `:1951`).
   It is read as `unattended.sh:6684-6690` already reads the queue, and AC15 runs the real runner
   against the reader, so a layout change reds that arm.
+- **hands-off** `TOOL-dRedressedBar-19` — the profiler, its fixtures, its leg's declarations and
+  the census fields this unit builds, which that unit corrects: the census readers of the old row
+  shape, the path conversion across the bash seam, the holder's preflight and bounded wait, one
+  manifest reader, the redaction's byte contract and parity, the leg's guard, parity row, subject
+  pin and adopter declaration, one resolved bash, the launch-failure branch, turnstile churn, the
+  sweep of a dead run's raw captures, the manifest refusals and the fork fixture. Also the kickoff
+  manifest re-stamp this unit owes, and this spec's prose, §7 leg line and revision line, which it
+  corrects in place (units-16-18 report ids 1, 6, 7, 10 to 15, 19 to 22, 24 to 27, 29, 32 to 39
+  and 42).
 - **hands-off** external — a `derive-ceilings.py` that reads `gate-profile/` records directly. It is
   not built here: readings enter through the existing `--observed` route.
 - **hands-off** external — the first full profiled run over the fixed tree, and the
@@ -714,6 +724,10 @@ at the close.
   redacted copies and the empty `raw/`. S1 and S11 each gain a **Readers:** clause for that
   delete, read by grep at `679afc31`: no tracked reader spells the capture's name, and its only
   value reader is this unit's own redaction pass.
+- rev-3 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-19`, the batch the
+  units-16-18 spec audit's minors were promoted into, for that report's ids 1, 6, 7, 10, 11, 12, 13,
+  14, 15, 19, 20, 21, 22, 24, 25, 26, 27, 29, 32, 33, 34, 35, 36, 37, 38, 39 and 42. No scope, design
+  or criterion moves.
 
 ## 10. Reuse audit
 

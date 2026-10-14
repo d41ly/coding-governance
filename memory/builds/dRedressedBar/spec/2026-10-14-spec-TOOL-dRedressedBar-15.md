@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-15 — agent-cap's adopter runs settings-merge's own adopter at settings-merge's home, declared as `[adopt] via`, and selfcheck refuses any argv naming another entry's file
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 11
+**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -120,6 +120,9 @@ only another entry ships. With unit 14's early receipt, the brief's reproduction
   guard to the two sibling-kit files the arms grade (report id 18). It corrects this spec's S1, S4
   Readers, S8, §3, §4, §5, §7 and §10 in place and observes AC6 anchored (report ids 1, 4, 15, 16,
   20 and 21).
+- **hands-off** `TOOL-dRedressedBar-19` — the cross-entry selfcheck note S5 mints, whose label that
+  unit corrects once unit 17 has widened the offered population, and this spec's ownership-join
+  paragraph and note template, which it corrects in place (units-16-18 report id 2).
 - **hands-off** external — `TOOL-aScouredKit-26`, the open ask for a cross-entry destination token,
   stays open. `via` names a whole adopter and passes no sibling's destination into an argv, so
   drift-audit's `DRIFT_WORKFLOWS_REL` workaround is untouched.
@@ -466,6 +469,9 @@ none
 - rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-17`, the batch the
   units-12-15 spec audit's minors were promoted into, for report ids 1, 4, 10, 11, 13, 15, 16, 18,
   20, 21 and 24. No scope, design or criterion moves.
+- rev-3 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-19`, the batch the
+  units-16-18 spec audit's minors were promoted into, for that report's id 2. No scope, design or
+  criterion moves.
 
 ## 10. Reuse audit
 

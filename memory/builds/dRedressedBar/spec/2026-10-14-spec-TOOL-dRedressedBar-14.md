@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-14 — a first apply at a per-kit prefix configures against the homes it just wrote: the receipt is written ahead of CONFIGURE
 
-**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 10
+**Status:** SPECCED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -97,6 +97,10 @@ not reach. That cause is a separate mechanism, and §8 F1 asks where it goes.
   problem-line check that unit narrows away once unit 15 lands (report id 1) and to which it adds the
   sidecar check (report id 2). And this spec's S4, Edges and §4 prose, which that unit corrects in
   place (report ids 1, 5, 9, 19, 22 and 23).
+- **hands-off** `TOOL-dRedressedBar-19` — the RECEIPT step's sidecar write, which that unit moves
+  ahead of the receipt write and routes through the atomic writer, and this spec's "When CONFIGURE
+  fails" table, to which it adds the row for an interrupt between the two writes (units-16-18
+  report id 40).
 - **hands-off** external — `update`'s gained loop runs a gained kit's adopter (`:11104-11126`) before
   its receipt write (`:12017-12062`). So a gained kit at a per-kit prefix is not in the receipt its
   sibling resolvers read. Not measured here.
@@ -368,6 +372,9 @@ no refusal branch. The main loop observes the new arm red, then green, at the cl
 - rev-3 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-17`, the batch the
   units-12-15 spec audit's minors were promoted into, for report ids 1, 2, 5, 9, 19, 22 and 23. No
   scope, design or criterion moves.
+- rev-4 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-19`, the batch the
+  units-16-18 spec audit's minors were promoted into, for that report's id 40. No scope, design or
+  criterion moves.
 
 ## 10. Reuse audit
 
