@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-2 — the one verb offender over the lexicon pin, renamed to a declared verb
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md](../build/2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 | [2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 |
+| [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-1 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 
 <!-- /gen:spec-records -->
 
@@ -55,6 +56,10 @@ declared verb brings the count back to the pin, so both legs go green with no pi
 
 - **hands-off** `TOOL-dRedressedBar-7` — the rename in `tools/unattended/gate-guard.js` moves the
   unattended kit's shipped bytes, and that unit bumps the kit once the build's tree is final.
+- **hands-off** `TOOL-dRedressedBar-10` — S4's Readers miss `memory/map/generated/symbols.json`,
+  which lists `clean` for this file, and §7 omits `codebase-map coverage + freshness`, which reads
+  that map stale until unit 7 regenerates it (report id 17). That unit corrects both and reads the
+  re-derived map.
 
 ## 4. Design
 
@@ -163,6 +168,8 @@ none
 
 - rev-1 · 2026-10-14 · initial draft from the build brief; the arrival re-read against `301a36664`
   and the new name checked with `lexicon.py --suggest`.
+- rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
+  spec audit's minors were promoted into, for report id 17. No scope, design or criterion moves.
 
 ## 10. Reuse audit
 

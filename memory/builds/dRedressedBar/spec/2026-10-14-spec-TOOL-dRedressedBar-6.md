@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-6 — the roles adopter's two exit-1 refusals, armed in its own suite
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md](../build/2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 | [2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-7 |
+| [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,10 @@ roles adopter as fully armed and each arm is seen red on a staged break of the a
 - **consumes-from** `TOOL-dRedressedBar-1` — the foreign-prefix parity fix for this suite. Without
   it, the parity leg stays red on this suite whatever arm 13 does.
 - **consumes-from** `TOOL-dRedressedBar-4` — the arm 9 rewrite at the old line 228, in the same file.
+- **hands-off** `TOOL-dRedressedBar-10` — §4's cites of `tools/roles/adopt-roles.test.sh` at
+  `:100-107` and `:63` are `ebce889c` line numbers, which units 1 and 4 shift before this unit
+  starts (report id 14). That unit adds the sentence stating so to §4, and classifies the arms this
+  unit leaves in that file.
 
 ## 4. Design
 
@@ -201,6 +206,8 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-10-14 · initial draft, from item 6 of the build brief.
+- rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
+  spec audit's minors were promoted into, for report id 14. No scope, design or criterion moves.
 
 ## 9. Reuse audit
 

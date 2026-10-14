@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-9 — settings-merge's adopter exit with no agent-cap hook declared an accepted stop, so a gaining update completes
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md](../build/2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-9-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-9-1-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-9-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-9-brief.md) | research | — |
+| [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 |
 
 <!-- /gen:spec-records -->
 
@@ -70,6 +71,15 @@ completes, and so does `apply --kits settings-merge`, which fails the same way t
   `and re-stamps the receipt at the new commit`, `[-12] AC4 NEGATIVE` and `[-12] AC9 NEGATIVE`, read
   green only over this unit's descriptor block. That unit lands after this one and owns every other
   edit to `tools/govkit/selftest.py`.
+- **hands-off** `TOOL-dRedressedBar-10` — what the round-1 spec audit found (report ids 7, 17 and
+  22). S5 and S6 name criteria that never read `tools/govkit/selftest.py` or `tools/govkit/matrix.py`.
+  §4's false-accept envelope names one route where three reach it: a single-kit `apply` over a target
+  already holding agent-cap, an `update` gaining settings-merge with agent-cap already claimed, and a
+  hook the receipt alone locates. The new `check_outcome_states` reads stale in
+  `memory/map/generated/symbols.json` until unit 7 regenerates it. That unit observes S5 and S6
+  directly, corrects §4 and §5, and, by its F1, narrows this unit's code-2 block with a second
+  `must_not_exist` term and adds one row to settings-merge's `check_outcome_states` call. It also
+  writes the hands-off to `TOOL-dRedressedBar-7` these Edges lack.
 
 ## 4. Design
 
@@ -323,6 +333,9 @@ none
 - rev-1 · 2026-10-14 · initial draft from the unit-9 brief. The defect was reproduced at the base on
   three narrow-update shapes and on `apply --kits settings-merge`. Four candidates were graded by M12,
   and the pick was taken by M3's rule.
+- rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
+  spec audit's minors were promoted into, for report ids 7, 17 and 22. No scope, design or criterion
+  moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-8 — arm 11g AC14 bounded, and its FIFO server kept alive through MSYS's failed opens and broken pipes
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md](../build/2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-9 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-8-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-8-1-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-8-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-8-brief.md) | research | — |
+| [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-9 |
 
 <!-- /gen:spec-records -->
 
@@ -56,7 +57,12 @@ so a dead or silent server reds the arm with a line naming it.
 
 ### Edges
 
-none
+- **hands-off** `TOOL-dRedressedBar-10` — what the round-1 spec audit found (report ids 4, 5 and
+  12). AC6 diffs from the build base, so a sibling's `tools/` edit on the branch reds it on a correct
+  build. §6 says the fork leg reads none of `tools/run-gates/run-gates.test.sh`, yet `scan_spawn_tree`
+  grades it for the registry classes. That unit reads this unit's pass commit alone, counts its sites
+  with the leg's classifier, corrects §6, and writes the hands-off to `TOOL-dRedressedBar-7` these
+  Edges lack.
 
 ## 4. Design
 
@@ -361,6 +367,9 @@ none
 
 - rev-1 · 2026-10-14 · initial draft, from the build's unit-8 brief, the retry's fixture records and
   three scratch probes of the server's loop.
+- rev-2 · 2026-10-14 · §3 · Edges, which read `none`, gain the hands-off to TOOL-dRedressedBar-10,
+  the batch the round-1 spec audit's minors were promoted into, for report ids 4, 5 and 12. No scope,
+  design or criterion moves.
 
 ## 9. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-7 — records, the regenerated index and the kit versions, measured over the fixed tree
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 5
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md](../build/2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 | [2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 |
+| [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 
 <!-- /gen:spec-records -->
 
@@ -76,6 +77,11 @@ four or more kits.
   branch-reconcile and roles kits, which S3 bumps.
 - **consumes-from** `TOOL-dRedressedBar-6` — the last edit to the roles adopter's suite before the
   measure. The roles re-render that S3 triggers runs the adopter whose exits that unit arms.
+- **hands-off** `TOOL-dRedressedBar-10` — the correction the round-1 spec audit found owed (report
+  ids 9, 19 and 23): §1, §4 "Why one unit" and AC4 count the siblings as 1 through 6 only, and these Edges name no
+  `consumes-from` for units 8 and 9, though both land before this unit. That unit corrects the
+  population and writes both edges with their other ends. It also lands after this unit's regen, and
+  its two product files are govkit-exempt, so it owes this unit no bump.
 - **hands-off** external — a closing-review fold that moves shipped bytes after this unit owes
   another bump. The lander's mint writes it at the push, as TOOL-aMendedFleet-65 states.
 - **hands-off** external — push-main self-test arms 28 and 29 clone HEAD's bug-class index. The main
@@ -254,6 +260,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-14 · initial draft from the build brief, with every attribution and figure re-verified against the tree at `f079464e2`.
+- rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
+  spec audit's minors were promoted into, for report ids 9, 19 and 23. No scope, design or criterion
+  moves.
 
 ## 10. Reuse audit
 

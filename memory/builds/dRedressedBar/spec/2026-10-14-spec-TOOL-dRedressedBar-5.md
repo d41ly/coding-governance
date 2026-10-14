@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-5 — fork idioms past the spawn-idiom registry, converted to their no-fork forms
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md](../build/2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 | [2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 |
+| [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 
 <!-- /gen:spec-records -->
 
@@ -64,6 +65,11 @@ none raised.
 - **hands-off** `TOOL-dRedressedBar-7` — the version bumps for the branch-reconcile and roles kits,
   whose shipped adopters this unit moves; the three suites it touches are withheld from every
   payload, so they move no kit.
+- **hands-off** `TOOL-dRedressedBar-10` — two things the round-1 spec audit found (report ids 14 and
+  15). §4 cites `tools/roles/adopt-roles.test.sh` sites by `ebce889c` line numbers, which units 1 and
+  4 shift before this unit starts, while each site is also named by its content. AC1's path-subst
+  and date-fmt half and AC2 count with a re-typed regex, not the leg's `scan_spawn_file`. That unit
+  corrects §4 and counts the converted files through the leg's classifier.
 
 ## 4. Design
 
@@ -318,6 +324,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-14 · initial draft, from item 5 of the build brief.
+- rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
+  spec audit's minors were promoted into, for report ids 14 and 15. No scope, design or criterion
+  moves.
 
 ## 10. Reuse audit
 

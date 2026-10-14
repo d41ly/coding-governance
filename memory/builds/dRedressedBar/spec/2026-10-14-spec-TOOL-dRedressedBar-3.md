@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-3 — the govkit selftest's 56 reds, traced to four root causes and re-armed
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 2 · ratified 2026-10-14
+**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 2 · ratified 2026-10-14
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-3-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-3-2-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-3-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-3-3-spec-writer.md) | journal | — |
+| [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 
 <!-- /gen:spec-records -->
 
@@ -74,6 +75,11 @@ over that fix.
 - **consumes-from** `TOOL-dRedressedBar-9` — its fix to a gained `settings-merge` whose adopter
   refuses without `agent-cap`. Without it, the three arms S5 leaves unscoped stay red and AC5 cannot
   pass, so this unit's order follows unit 9's.
+- **hands-off** `TOOL-dRedressedBar-10` — what the round-1 spec audit found this spec cannot say
+  (report ids 6, 10 and 16). AC2 reads no line of S2's fixture edit. AC5's guard regex cannot match a
+  call scoped with `--kits`. §4's S5 paragraph restates unit 9's defect and contradicts it. That unit
+  observes S2 and S5 in `tools/govkit/selftest.py` over the file this unit leaves, and corrects the
+  paragraph to a pointer at unit 9.
 
 ## 4. Design
 
@@ -266,6 +272,9 @@ New arm: tools/govkit/selftest.py · covers AC5 · run the suite over a tree wit
   `TOOL-dRedressedBar-9`'s fix, observed by the new AC5. AC4 drops the HEAD-bound calls and probes the
   `9ddcc5c9` gain instead. Edges trade the external hand-off for consumes-from unit 9, the order moves
   from 1 to 2, and the header carries `ratified 2026-10-14`.
+- rev-3 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
+  spec audit's minors were promoted into, for report ids 6, 10 and 16. No scope, design or criterion
+  moves.
 
 ## 9. Reuse audit
 

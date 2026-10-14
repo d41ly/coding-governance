@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-4 — the `workflows` homonyms the install-prefix ban reads as a kit path, held in a named constant
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md](../build/2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 | [2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 |
+| [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 
 <!-- /gen:spec-records -->
 
@@ -49,6 +50,11 @@ literal there and the leg goes green without a waiver, a predicate change or a p
 
 - **hands-off** `TOOL-dRedressedBar-7` — the hooks and roles kit version bumps for the shipped bytes
   this unit moves, which that unit derives by measurement over the tree the build leaves.
+- **hands-off** `TOOL-dRedressedBar-10` — the correction of three sentences the round-1 spec audit
+  found false (report ids 8, 13 and 18): the kit-bump non-goal, the hands-off line above and §7's
+  epoch sentence. They count `adopt-roles.test.sh` among the `roles` entry's shipped files, and that
+  entry claims it `project-owned` (`tools/roles/kit.toml:47-48`), so only the `agent-cap` kit moves.
+  That unit corrects them in place.
 
 ## 4. Design
 
@@ -229,6 +235,9 @@ none
 
 - rev-1 · 2026-10-14 · initial draft, authored by the dRedressedBar build harness's spec writer from
   the brief at `memory/builds/dRedressedBar/prompts/2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md`.
+- rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
+  spec audit's minors were promoted into, for report ids 8, 13 and 18. No scope, design or criterion
+  moves.
 
 ## 10. Reuse audit
 

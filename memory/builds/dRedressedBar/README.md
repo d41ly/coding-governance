@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-13
 streams: tooling
 roster: TOOL
-ids: TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9
+ids: TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10
 spec-audit: 2026-10-13
 ---
 
@@ -73,31 +73,33 @@ None yet.
 | 7 | `TOOL-dRedressedBar-7` | records, the regenerated index and the kit versions, measured over the fixed tree |
 | 8 | `TOOL-dRedressedBar-8` | the canary's memory-pause arm 11g AC14 hangs when its FIFO server dies, bounded and its server kept alive |
 | 9 | `TOOL-dRedressedBar-9` | govkit update's gained settings-merge no longer fails an update that left agent-cap out |
+| 10 | `TOOL-dRedressedBar-10` | PROMOTED: the round-1 spec audit's 12 mediums and 11 lows, batched — report ids 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 and 23 |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 9 unit(s) · node d · opened 2026-10-13 · streams tooling
-ids TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9
+**Build status:** SPECCED · 10 unit(s) · node d · opened 2026-10-13 · streams tooling
+ids TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dRedressedBar-1 — stale suite fixtures re-armed against the code the bar-less landings moved](spec/2026-10-14-spec-TOOL-dRedressedBar-1.md) | 1 | 1 | SPECCED | rev-1 | 2026-10-14 |
-| [TOOL-dRedressedBar-2 — the one verb offender over the lexicon pin, renamed to a declared verb](spec/2026-10-14-spec-TOOL-dRedressedBar-2.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-14 |
-| [TOOL-dRedressedBar-8 — arm 11g AC14 bounded, and its FIFO server kept alive through MSYS's failed opens and broken pipes](spec/2026-10-14-spec-TOOL-dRedressedBar-8.md) | 1 | 1 | SPECCED | rev-1 | 2026-10-14 |
-| [TOOL-dRedressedBar-9 — settings-merge's adopter exit with no agent-cap hook declared an accepted stop, so a gaining update completes](spec/2026-10-14-spec-TOOL-dRedressedBar-9.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-14 |
-| [TOOL-dRedressedBar-3 — the govkit selftest's 56 reds, traced to four root causes and re-armed](spec/2026-10-14-spec-TOOL-dRedressedBar-3.md) | 2 | 1 | SPECCED | rev-2 | 2026-10-14 |
-| [TOOL-dRedressedBar-4 — the `workflows` homonyms the install-prefix ban reads as a kit path, held in a named constant](spec/2026-10-14-spec-TOOL-dRedressedBar-4.md) | 2 | 2 | SPECCED | rev-1 | 2026-10-14 |
-| [TOOL-dRedressedBar-5 — fork idioms past the spawn-idiom registry, converted to their no-fork forms](spec/2026-10-14-spec-TOOL-dRedressedBar-5.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-14 |
-| [TOOL-dRedressedBar-6 — the roles adopter's two exit-1 refusals, armed in its own suite](spec/2026-10-14-spec-TOOL-dRedressedBar-6.md) | 4 | 1 | SPECCED | rev-1 | 2026-10-14 |
-| [TOOL-dRedressedBar-7 — records, the regenerated index and the kit versions, measured over the fixed tree](spec/2026-10-14-spec-TOOL-dRedressedBar-7.md) | 5 | 2 | SPECCED | rev-1 | 2026-10-14 |
+| [TOOL-dRedressedBar-1 — stale suite fixtures re-armed against the code the bar-less landings moved](spec/2026-10-14-spec-TOOL-dRedressedBar-1.md) | 1 | 1 | SPECCED | rev-2 | 2026-10-14 |
+| [TOOL-dRedressedBar-2 — the one verb offender over the lexicon pin, renamed to a declared verb](spec/2026-10-14-spec-TOOL-dRedressedBar-2.md) | 1 | 2 | SPECCED | rev-2 | 2026-10-14 |
+| [TOOL-dRedressedBar-8 — arm 11g AC14 bounded, and its FIFO server kept alive through MSYS's failed opens and broken pipes](spec/2026-10-14-spec-TOOL-dRedressedBar-8.md) | 1 | 1 | SPECCED | rev-2 | 2026-10-14 |
+| [TOOL-dRedressedBar-9 — settings-merge's adopter exit with no agent-cap hook declared an accepted stop, so a gaining update completes](spec/2026-10-14-spec-TOOL-dRedressedBar-9.md) | 1 | 2 | SPECCED | rev-2 | 2026-10-14 |
+| [TOOL-dRedressedBar-3 — the govkit selftest's 56 reds, traced to four root causes and re-armed](spec/2026-10-14-spec-TOOL-dRedressedBar-3.md) | 2 | 1 | SPECCED | rev-3 | 2026-10-14 |
+| [TOOL-dRedressedBar-4 — the `workflows` homonyms the install-prefix ban reads as a kit path, held in a named constant](spec/2026-10-14-spec-TOOL-dRedressedBar-4.md) | 2 | 2 | SPECCED | rev-2 | 2026-10-14 |
+| [TOOL-dRedressedBar-5 — fork idioms past the spawn-idiom registry, converted to their no-fork forms](spec/2026-10-14-spec-TOOL-dRedressedBar-5.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-14 |
+| [TOOL-dRedressedBar-6 — the roles adopter's two exit-1 refusals, armed in its own suite](spec/2026-10-14-spec-TOOL-dRedressedBar-6.md) | 4 | 1 | SPECCED | rev-2 | 2026-10-14 |
+| [TOOL-dRedressedBar-7 — records, the regenerated index and the kit versions, measured over the fixed tree](spec/2026-10-14-spec-TOOL-dRedressedBar-7.md) | 5 | 2 | SPECCED | rev-2 | 2026-10-14 |
+| [TOOL-dRedressedBar-10 — the round-1 spec audit's 12 mediums and 11 lows, batched: each criterion observed in a form that can pass and fail, each false sentence corrected, and settings-merge's accepted stop narrowed](spec/2026-10-14-spec-TOOL-dRedressedBar-10.md) | 6 | 2 | SPECCED | rev-1 | 2026-10-14 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 3 record folder(s).
+Records: 9 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dRedressedBar-10.
 
-Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9.
+Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-10.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -109,6 +111,7 @@ Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-1 TOOL-dRedressedB
 | 3 | `TOOL-dRedressedBar-5` | no |
 | 4 | `TOOL-dRedressedBar-6` | no |
 | 5 | `TOOL-dRedressedBar-7` | no |
+| 6 | `TOOL-dRedressedBar-10` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

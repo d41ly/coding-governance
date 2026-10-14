@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-1 — stale suite fixtures re-armed against the code the bar-less landings moved
 
-**Status:** SPECCED · rev-1 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md](../build/2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md) | research | TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 | [2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md) | research | TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 |
+| [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 
 <!-- /gen:spec-records -->
 
@@ -60,6 +61,11 @@ stands, so it grades its subject again and reds again on its own staged break.
   after arm 1, so arms that unit appends run only in a whole run.
 - **hands-off** `TOOL-dRedressedBar-7` — the moved suite bytes, `.githooks/pre-push.test.sh` among
   them, are part of the tree that unit measures.
+- **hands-off** `TOOL-dRedressedBar-10` — three readings the round-1 spec audit found this spec's
+  criteria cannot make, report ids 1, 2, 3, 11, 20 and 21. AC1's `grep -c` reads 5 lines where 14
+  calls are meant. AC4's placement half is anchored on the header comment at line 2. AC5 expects one
+  `FOREIGN_PREFIX_PROBE` line where the copied shape has two. That unit observes each corrected form
+  over the suites this unit leaves, and writes this spec's revision line naming them.
 
 ## 4. Design
 
@@ -196,6 +202,9 @@ none
 
 - rev-1 · 2026-10-14 · initial draft from the build brief, every cause re-read at `ebce889c`; S2 and
   S4 correct the brief's reading.
+- rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
+  spec audit's minors were promoted into, for report ids 1, 2, 3, 11, 20 and 21. No scope, design or
+  criterion moves.
 
 ## 9. Reuse audit
 
