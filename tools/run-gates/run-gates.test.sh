@@ -3408,7 +3408,10 @@ SH
 ( cd "$MP/r" && git add -A && git commit -qm mempause ) >/dev/null 2>&1
 write_mp_meminfo() { printf 'MemTotal: 1000 kB\nMemAvailable: %s kB\n' "$(( (100 - $2) * 10 ))" > "$1"; }
 run_mp_bar() { # run id · manifest · VAR=value… -> MP_OUT (stdout), MP_ERR (stderr) and MP_RC
-  ( cd "$MP/r" && env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_WALL= GATE_SELFTESTS= GATE_ATTRIBUTE= \
+  # MP_BOUND=<s> set by the caller runs the nested runner under `timeout -k 5s <s>`, MP_RC 124 or 137
+  # on expiry; unset, the runner runs exactly as before. Captured to files, the form arm 1c shows a
+  # `timeout` bounds on the clock. Only arm 11g's FIFO read can block forever (TOOL-dRedressedBar-8).
+  ( cd "$MP/r" && ${MP_BOUND:+timeout -k 5s "$MP_BOUND"} env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_WALL= GATE_SELFTESTS= GATE_ATTRIBUTE= \
       GATE_PROFILES= GATE_PROFILE= GATE_JOBS= GATE_MEMPAUSE= GATE_MEMPAUSE_HOLD= GATE_MEMINFO= \
       GATE_TURNSTILE=0 GATE_CGROUP_ROOT="$MP/cg" GATE_RUN_ID="$1" GATE_LEGS="$2" "${@:3}" \
       bash $KIT_REL/run-gates.sh >"$MP/x/out" 2>"$MP/x/err" ); MP_RC=$?
@@ -3595,9 +3598,18 @@ cat > "$MP/x/serve.sh" <<'SH'
 # ROWS, NOT ON A READ COUNT (TOOL-aMeteredSweep-1): an MSYS reader can take two writer opens before
 # its EOF, which advanced a count by two, served 95 % to the second dispatch and opened a second
 # episode, red in two of three quiet runs. A doubled read now serves the same answer twice.
+# IT OUTLIVES MSYS'S FIFO (TOOL-dRedressedBar-8). A loop that re-opened at once died in every scratch
+# run on node d, 2026-10-14: after 31, 31 and 4 reads, twice because an open failed with `No such
+# file or directory` on a FIFO that exists and `|| exit 0` ended it, once because a write met a
+# reader that had left and SIGPIPE killed it, 141. A dead server leaves the runner's next dispatch
+# decision blocked opening a FIFO with no writer, which held the canary to its ceiling. So SIGPIPE is
+# ignored and a failed open retries after 0.1 s while the FIFO exists: that alone lived through 300
+# reads in two runs, but 12 and 1 of them came back empty. With 0.2 s after each answer before the
+# next open, all 300 carried a reading in two runs, with no failed open and no failed write.
+trap '' PIPE
 f=$1; await=$2; go=$3; shift 3; held=""
-while :; do
-  exec 3>"$f" || exit 0
+while [ -p "$f" ]; do
+  exec 3>"$f" || { sleep 0.1; continue; }
   pct=10
   for t in "$@"; do [ -f "$t" ] && pct=95; done
   if [ "$pct" = 95 ] && [ -z "$held" ]; then
@@ -3607,20 +3619,40 @@ while :; do
   fi
   printf 'MemTotal: 1000 kB\nMemAvailable: %s kB\n' "$(( (100 - pct) * 10 ))" >&3
   exec 3>&-
+  sleep 0.2
 done
 SH
+# BOUNDED, AND THE SERVER READ BEFORE THE VERDICT (TOOL-dRedressedBar-8). The run's nested bar runs
+# under arm 11c's calibrated wall, so a dead or silent server reds this half inside that bound and
+# names itself, where it used to hold the leg to its ceiling. The wait's own status is the liveness
+# reading, never `kill -0`, which still answers for a child that has exited and not been reaped: 143
+# is this arm's TERM reaching a live server, anything else the status it died with. WHAT THIS DOES
+# NOT CHECK: the bound proves the half ends, not that the forced branch decided, which the verdict
+# check grades. The settle makes a lost answer rare but cannot rule it out under load, and a lost
+# one reds as `[]` rather than hanging. A host with no runnable `timeout -k` skips the half, announced,
+# because an unbounded read of a FIFO is the defect; its count stays above the branch either way.
 n=$((n+1))
-if ! mkfifo "$MP/x/fifo" 2>/dev/null; then
+if [ "$HAVE_TIMEOUT" != 1 ]; then
+  echo "canary: SKIP arm 11g's forced-branch half — this host has no runnable 'timeout -k', so the nested bar that reads the FIFO cannot be bounded"
+elif ! mkfifo "$MP/x/fifo" 2>/dev/null; then
   echo "canary: SKIP arm 11g's forced-branch half — this host has no mkfifo, so the FIFO that holds a decision until the last leg is gone cannot be built"
 else
   run_mp_bar ac14seed "$MP/x/ac14.json" GATE_JOBS=2 GATE_MEMPAUSE=0
   # The trigger is the FIRST quick leg's row, C's or Y's, whichever the seed's ledger dispatched second.
   bash "$MP/x/serve.sh" "$MP/x/fifo" "$(resolve_mp_record ac14)/1.leg" "$MP/x/ac14.go" \
-    "$(resolve_mp_record ac14)/0.leg" "$(resolve_mp_record ac14)/2.leg" >/dev/null 2>&1 & _mpsv=$!
-  run_mp_bar ac14 "$MP/x/ac14run.json" GATE_JOBS=2 GATE_MEMPAUSE=90 GATE_MEMINFO="$MP/x/fifo"
+    "$(resolve_mp_record ac14)/0.leg" "$(resolve_mp_record ac14)/2.leg" >/dev/null 2>"$MP/x/serve.err" & _mpsv=$!
+  _mpa0=$(date +%s)
+  MP_BOUND=$_mpwall run_mp_bar ac14 "$MP/x/ac14run.json" GATE_JOBS=2 GATE_MEMPAUSE=90 GATE_MEMINFO="$MP/x/fifo"
+  _mpas=$(( $(date +%s) - _mpa0 ))
   # A writer blocked opening the FIFO is released by a read-write open, which never blocks itself.
-  kill "$_mpsv" 2>/dev/null; exec 4<>"$MP/x/fifo"; exec 4>&-; wait "$_mpsv" 2>/dev/null
-  if [ "$MP_RC" = 0 ] && [ "$(read_mp_ends ac14)" = "drained " ]; then :; else
+  kill "$_mpsv" 2>/dev/null; exec 4<>"$MP/x/fifo"; exec 4>&-; wait "$_mpsv" 2>/dev/null; _mpsrc=$?
+  if [ "$_mpsrc" != 143 ]; then
+    echo "canary: memory pause — AC14 the FIFO server serve.sh died before the run ended (exit $_mpsrc), so a dispatch decision read a FIFO with no writer; the nested bar exited $MP_RC after ${_mpas}s"
+    sed 's/^/    /' "$MP/x/serve.err" 2>/dev/null; fail=1
+  elif [ "$MP_RC" = 124 ] || [ "$MP_RC" = 137 ]; then
+    echo "canary: memory pause — AC14 the nested bar outlived its ${_mpwall}s bound (exit $MP_RC after ${_mpas}s) with the FIFO server serve.sh alive, so the server stopped answering"
+    fail=1
+  elif [ "$MP_RC" = 0 ] && [ "$(read_mp_ends ac14)" = "drained " ]; then :; else
     echo "canary: memory pause — AC14 the forced branch's held leg closed [$(read_mp_ends ac14)] with exit $MP_RC, wanted [drained ] and 0"
     printf '%s\n' "$MP_OUT" | sed 's/^/    /'; fail=1
   fi

@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-8 — arm 11g AC14 bounded, and its FIFO server kept alive through MSYS's failed opens and broken pipes
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-10-14 · node d · Tier-1 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
