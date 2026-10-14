@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-5 — fork idioms past the spawn-idiom registry, converted to their no-fork forms
 
-**Status:** SPECCED · rev-2 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 3
+**Status:** INPROGRESS · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,8 @@
 |---|---|---|
 | [2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md](../build/2026-10-14-build-TOOL-dRedressedBar-1-research-bar-profile.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 | [2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md](../prompts/2026-10-13-prompt-TOOL-dRedressedBar-1-brief.md) | research | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 |
+| [2026-10-14-prompt-TOOL-dRedressedBar-5-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-5-2-revision.md) | research | — |
+| [2026-10-14-prompt-TOOL-dRedressedBar-5-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-5-3-spec-writer.md) | journal | — |
 | [2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-1-9-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 |
 
 <!-- /gen:spec-records -->
@@ -263,10 +265,16 @@ time.
   at this unit's pass commit, exactly five `-` lines spell `$(printf ` with no `|` inside that
   substitution, and their `+` lines spell `printf -v _wfj` and no `$(printf `. Run before and after
   the pass, `grep -o '\$(printf ' tools/workflows/unattended-build.test.sh | wc -l` falls by exactly
-  five. Red when: a sixth site converts and its row drifts below the scan, or a conversion leaves
-  its substitution behind.
-  figure: 288 occurrences at `ebce889c`, PINNED at spec time; the excess of 5 holds only while the
-  start-of-unit diff in §4 moves no `$(printf ` line.
+  thirteen: one for each of the five `printf-subst` sites, and one for the
+  `$(printf '%s' … | sed …)` each of the eight `sed` sites §4 pins carries, which the
+  `w=${v/'A'/'B'}` row removes. Red when: a `printf-subst` site stays unconverted, a sixth converts
+  and its row drifts below the scan, a `var-pipe` conversion leaves its `$(printf ` behind, or a
+  `var-pipe` site other than the eight pinned `sed` sites converts in place of one. Each moves the
+  fall off thirteen or the `-` lines off five.
+  figure: 288 occurrences at `ebce889c` and 275 after the pass, PINNED at spec time. Each of the
+  fourteen §4 candidate lines carries exactly one, so the six `printf-subst` candidates and eight
+  `sed` sites hold 14 of the 288. The fall of 13 holds only while the start-of-unit diff in §4 moves
+  no `$(printf ` line.
 - **AC4** — When the forms probe runs each row of the §4 table, forking spelling against no-fork
   form, over a match, a non-match and a specimen at the boundary its `exact only when` cell names,
   every row reports the same output and exit status. Its specimens include `AGENTS.md`, `docs/x.md`,
@@ -327,6 +335,11 @@ none
 - rev-2 · 2026-10-14 · §3 · Edges gain the hands-off to TOOL-dRedressedBar-10, the batch the round-1
   spec audit's minors were promoted into, for report ids 14 and 15. No scope, design or criterion
   moves.
+- rev-3 · 2026-10-14 · AC3 · the whole-file `$(printf ` count falls by thirteen, not five: each of
+  the eight `sed` sites S5 converts carries one inside its `$(printf '%s' … | sed …)`, which the
+  builder's divergence report found. The whole-file count is kept over a pipe-free one because a
+  pipe-free count never sees a `var-pipe` conversion that leaves its `$(printf '%s' … |` behind. Its
+  "Red when" and figure lines follow. No scope, design or other criterion moves.
 
 ## 10. Reuse audit
 
