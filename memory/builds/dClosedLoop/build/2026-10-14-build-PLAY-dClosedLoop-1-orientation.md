@@ -238,3 +238,73 @@ binding, position, orientation cost, claim keys, resume cost and unbound work (0
 dDeclaredLoop, the flow's build; briefs (07) to dOrderedCharter; allowances (09) to dScopedBuild; the
 memory's dead pointers (10) to dTendedCadence. The executor's home is still owed to the chain re-cut,
 and `gap-orient-08` moves with the executor if the re-cut places it elsewhere.
+
+## [forks] Asked, 2026-10-14
+
+**OR-1. "A request names no build and the session holds no build's lease. How is it placed by
+default? (Paths can't decide it: the build a README names as its predecessor ranked first 0 of 5
+times.)"** Offered: Declared, checked (Recommended); You place every request; Agent places alone.
+Answer: Agent places alone.
+
+**OR-2. "When should a session run the full kickoff (manifest audit, scope derivation, READY)? Today
+every session is told to, and re-derives what the card printed (a median 6 calls)."** Offered: Only
+when opening a build (Recommended); Every session; Never: Plan absorbs it. Answer, in the owner's
+words: "Full kickoff should be run in a session that doesn't have a card READY (there should be a
+mechanism to save and update it as necessary). When a build/flow step is resumed, a card should be
+looked up first and used to reorient."
+
+**OR-3. "What may a session or agent do that no checklist item names? Today about 63% of main-loop
+tool calls follow no protocol step."** Offered: Read-only probes only (Recommended); Only the item's
+declared reads; Anything, recorded. Answer: Read-only probes only (Recommended).
+
+**OR-4. "A session picks up a build and finds uncommitted work inside the next item's write set,
+which no witness covers. What happens by default?"** Offered: Continue from it (Recommended); Restart
+the item clean; Ask you. Answer: Continue from it (Recommended).
+
+### Follow-ups asked, 2026-10-14
+
+**OR-5. "Your kickoff answer saves the READY card and looks it up when a build or step resumes. Where
+should a build's saved card live?"** Offered: On the remote, beside the lease (Recommended); Committed
+in the build folder; Local to the clone. Answer, in the owner's words: "All three options currently. A
+better way to preserve orientation should be researched and adopted if there is one. A build
+orientation card should be priority 1 along the charter."
+
+**OR-6. "Under "agent places alone", should a placement whose facts fail still be refused, e.g.
+continuing a closed build, or one another session's live lease holds?"** Offered: Yes, still refused
+(Recommended); No, recorded only. Answer: Yes, still refused (Recommended).
+
+**OR-7. "Resuming a session re-caches its whole context (median 467k fresh tokens, against 146k for a
+new one), while a fresh session reorients from its saved card in one call. What should gov recommend
+for attended sessions? Unattended items always run in fresh agents."** Offered: Fresh when idle
+(Recommended); Always resume; Always fresh. Answer: Fresh when idle (Recommended).
+
+**OR-8. "Each session's and agent's calls and tokens before its first item action will be recorded per
+stage. Should orientation have a ceiling?"** Offered: Warn at an evidence ceiling (Recommended); Record
+only; Your ceiling. Answer: Record only.
+
+### Settled, 2026-10-14
+
+- **The agent places every request alone** (`placement`, default `agent-places`): it declares the
+  disposition and its reason in the intake record and asks the owner nothing; the Plan Review audits
+  placements. A placement whose facts fail is still refused (`placement.check`, default `refuse`): a
+  live build, a free or own lease, a filed ask.
+- **The full kickoff runs only in a session with no READY card** (`kickoff.runs`, default
+  `no-ready-card`). The card is saved, and updated as the build moves (`card.follows`, FI-8); a
+  resumed build or step looks its card up first and reorients from it.
+- **The build's orientation card ranks at priority 1, beside the charter.** The ladder's rank 1 now
+  holds the charter and the build's card; every session and agent loads both first.
+- **The card is kept in all three places for now** (`card.store`, any subset, default all three): a
+  ref per build on the shared remote beside the lease, a card record committed in the build's folder
+  with each transition, and the local clone under `.git/orientation/`, looked up by build. A better
+  way to preserve orientation is researched (dispatch 15) and adopted if one is found.
+- **Off-item acts are read-only probes** (`actions.free`, default `read-only-probes`): free inside the
+  current item and counted against it; every write, spawn, commit or push belongs to an item, and
+  anything else is filed as an intake.
+- **Partial work is continued** (`resume.partial`, default `continue-item`): uncommitted work inside
+  the item's write set is kept, the item continues and its witness is still owed; changes outside the
+  write set are reported.
+- **Gov recommends a fresh session when one is idle** (`resume.context`, default `fresh-when-idle`):
+  past the prompt-cache window with a large context, `next` recommends starting fresh and reorienting
+  from the card; unattended items always run in fresh agents.
+- **Orientation cost is recorded only** (`orient.budget`, default `record-only`): per session, agent
+  and stage, read by the Loop Review, never warned.

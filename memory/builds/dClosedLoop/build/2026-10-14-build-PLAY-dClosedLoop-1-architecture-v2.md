@@ -69,6 +69,12 @@ leases, the mailbox and dependency coordination become dDeclaredLoop's coordinat
 gap-conc-01, gap-conc-02 and gap-flow-06; P5 is restated; no chain build waits for a live build's
 close, and Maintain's run no longer rides recipe mode; the chain has ten builds.
 
+Revised: 2026-10-14, after the orientation round (`build/2026-10-14-build-PLAY-dClosedLoop-1-orientation.md`):
+P22 to P24 are added; the build's orientation card joins the charter at the ladder's rank 1;
+`placement`, `placement.check`, `kickoff.runs`, `card.store`, `actions.free`, `resume.partial`,
+`resume.context` and `orient.budget` join the catalogue and the presets; `gap-orient-01` to
+`gap-orient-10` are owned by dDeclaredLoop, dRankedPlan, dOrderedCharter, dScopedBuild and dTendedCadence.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -121,6 +127,16 @@ close, and Maintain's run no longer rides recipe mode; the chain has ten builds.
   build messages the sessions of the builds it depends on, live where it can and through a durable
   mailbox always, builds on interfaces once confirmed, and waits for its parent's landing only when
   it cannot reach them; landings go in plan priority, then first verified (flow interactions).
+- **P22 Position is derived, never remembered.** Every request gets a recorded disposition whose facts
+  are checked; a session's build, step, next item and actor are then computed from witnesses by one
+  engine, `next`, and a build's saved card lets any session on any node pick it up in one step
+  (orientation record).
+- **P23 Claims are trusted by key and source.** A claim is acted on only when its stored key recomputes
+  equal and its weakest source is not typed by an agent; otherwise it is re-derived, or held as
+  evidence (orientation record).
+- **P24 The checklist is a program.** Every action that changes state belongs to a checklist item with
+  one actor, a rendered brief, an allowance and a structured return, and the item's witness is
+  resolved before the next item starts (orientation record).
 - **P13 Ranked instructions.** Every load-bearing document is registered with a rank and wrapped in
   a generated envelope naming its identity, rank, scope, trigger and what it yields to, so an agent
   rebuilds one instruction hierarchy whenever it loads a document; conflicts resolve by rank, never
@@ -158,7 +174,8 @@ limit, Codex's 32 KiB. The foundation build,
 dOrderedCharter, writes it (foundations step 1; it took the front door from the Spine, walk S5).
 
 **The ladder** (foundations F1-2): 0 the platform's own system and safety instructions, not the
-repository's to rank; 1 the charter; 2 the loop and the repository's policy values; 3 stage methods
+repository's to rank; 1 the charter, and beside it the build's orientation card (orientation OR-5);
+2 the loop and the repository's policy values; 3 stage methods
 and protocols; 4 kit runbooks, Skills and path-scoped rules; 5 the role; 6 the task; 7 records and
 memory, evidence only, never instructions.
 
@@ -193,6 +210,14 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 | `deps.messaging` | live-and-mailbox, live-only, mailbox-only | live-and-mailbox | flow interactions FI-6 |
 | `landing.order` | plan-priority-then-first-verified, first-verified, owner-orders | plan-priority-then-first-verified | flow interactions FI-7 |
 | `card.follows` | re-render-at-transition, card-per-step, fixed-at-start | re-render-at-transition | flow interactions FI-8 |
+| `placement` | agent-places, declared-checked, owner-places | agent-places | orientation OR-1 |
+| `placement.check` | refuse, record | refuse | orientation OR-6 |
+| `kickoff.runs` | no-ready-card, opening-a-build, every-session, plan-absorbs | no-ready-card | orientation OR-2 |
+| `card.store` | any subset of remote-ref, build-folder, local-clone | all three | orientation OR-5 |
+| `actions.free` | read-only-probes, item-reads-only, recorded-anything | read-only-probes | orientation OR-3 |
+| `resume.partial` | continue-item, restart-item, ask-owner | continue-item | orientation OR-4 |
+| `resume.context` | fresh-when-idle, always-resume, always-fresh | fresh-when-idle | orientation OR-7 |
+| `orient.budget` | record-only, warn-at-evidence-ceiling, owner-ceiling | record-only | orientation OR-8 |
 | `verdict` | local-hook, peer-node, remote-ci | local-hook | R1.3, R4.4, R5.2 |
 | `verdict.blocks` | own-mixed-contended, every-red, own-only | own-only | walk T1 |
 | `verdict.held` | peer-or-cadence, push-selected, on-demand | on-demand | walk T2 |
@@ -236,7 +261,7 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 
 ## [presets] Named policy presets
 
-41 keys are too many to set one by one, and switching them one at a time is how a single policy file
+The catalogue's keys are too many to set one by one, and switching them one at a time is how a single policy file
 would rebuild the sprawl gap-spine-06 measured. A preset is a named, complete assignment of the
 policy keys; a repository names one preset and overrides individual keys on top of it.
 
@@ -245,7 +270,7 @@ policy keys; a repository names one preset and overrides individual keys on top 
   policy change: guarded and recorded like any other.
 - The effective policy is the preset's assignment with the repository's overrides applied. The
   charter renders the preset's name and only the keys that differ from it, so a reader sees the
-  posture and its exceptions, not 41 lines.
+  posture and its exceptions, not the whole catalogue.
 - Every shipped preset assigns every presettable key, and only values that key allows; a check
   refuses a preset with a key missing or a value outside the schema, and a new key cannot land
   without a value in every shipped preset.
@@ -296,6 +321,14 @@ repository on either overrides `verdict` to `local-hook`.
 | `deps.messaging` | live-and-mailbox | live-and-mailbox | live-and-mailbox | live-and-mailbox |
 | `landing.order` | first-verified | plan-priority-then-first-verified | owner-orders | plan-priority-then-first-verified |
 | `card.follows` | re-render-at-transition | re-render-at-transition | re-render-at-transition | re-render-at-transition |
+| `placement` | agent-places | agent-places | owner-places | declared-checked |
+| `placement.check` | record | refuse | refuse | refuse |
+| `kickoff.runs` | no-ready-card | no-ready-card | every-session | no-ready-card |
+| `card.store` | remote-ref, build-folder, local-clone | remote-ref, build-folder, local-clone | remote-ref, build-folder, local-clone | remote-ref, build-folder, local-clone |
+| `actions.free` | recorded-anything | read-only-probes | item-reads-only | read-only-probes |
+| `resume.partial` | continue-item | continue-item | ask-owner | restart-item |
+| `resume.context` | always-resume | fresh-when-idle | always-fresh | fresh-when-idle |
+| `orient.budget` | record-only | record-only | warn-at-evidence-ceiling | warn-at-evidence-ceiling |
 | `verdict` | local-hook | local-hook | peer-node | peer-node |
 | `verdict.blocks` | own-only | own-only | every-red | own-mixed-contended |
 | `verdict.held` | on-demand | on-demand | peer-or-cadence | peer-or-cadence |
@@ -373,14 +406,14 @@ where `verdict = peer-node`.
 
 | Build | Stage | Parents | Planned units | Gaps owned |
 |---|---|---|---|---|
-| dOrderedCharter | Foundation | dClosedLoop | the practice catalogue with each practice's reach per stage, and `charter.practices`; the charter re-founded in its rank-1 envelope (front door, precedence and override rule with `charter.override` and its record, instruction map, active practices with reach, hand-off to the loop, the repository's project block from its own overlay); the instruction registry and the ladder; envelopes rendered for every registered document and the gate over them; the instruction map re-injected on compact and resume; ranked envelopes in every subagent handoff; the section-tag grammar and its resolver; the drive section composed from a drive table in each adopted kit's descriptor, checked both ways, each subagent's role line repeated in its handoff, the charter held inside 32 KiB; the core: the principle registry, the meta-check, the kinds register with each kind's owning build, the conformance-gate contract, the exception register and the `core.*` policies, and the factories and gates for governing documents, practices and Skills | gap-found-01, gap-found-02, gap-found-03, gap-found-04, gap-found-05, gap-found-07, gap-found-08, gap-flow-02, gap-orient-07 |
-| dDeclaredLoop | Spine | dOrderedCharter | the loop kit and definition keyed by the stage tags, the roles kit's stage table moved and its seven readers re-pointed in the same unit, never waiting for a live build's close; `.governance/policy.toml`, schema, one reader, JSON mirror; the named presets and their completeness check; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; policy at govkit intake; the `next` verb over the loop's state, the `next —` micro-format, and the check that every declared command ends with one or declares itself terminal, laggards on a shrink-only list owned by their stage's build; the factories and conformance gates for commands, policy keys, presets, stages, hooks, roles and workflows; the coordination feature: one lease grammar for builds, units and cadence runs with run claims migrated onto it, acquired, renewed, released and taken over through CLI verbs the step checklists call, overlap warned or refused, fleet identity and uniqueness against the remote, offline behaviour; the mailbox per build, its closed set of message kinds checked on write, read and disposed at every transition, shown on the card and kept in the build's transition log; live delivery where the harness has it; dependency coordination by the parent's lease, interfaces confirmed at Design's exit, change and landing notices | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01, gap-found-06, gap-flow-07, gap-conc-01, gap-conc-02, gap-flow-06, gap-orient-02, gap-orient-03, gap-orient-04, gap-orient-05, gap-orient-06, gap-orient-08 |
+| dOrderedCharter | Foundation | dClosedLoop | the practice catalogue with each practice's reach per stage, and `charter.practices`; the charter re-founded in its rank-1 envelope (front door, precedence and override rule with `charter.override` and its record, instruction map, active practices with reach, hand-off to the loop, the repository's project block from its own overlay); the instruction registry and the ladder; envelopes rendered for every registered document and the gate over them; the instruction map re-injected on compact and resume; ranked envelopes in every subagent handoff; the section-tag grammar and its resolver; the drive section composed from a drive table in each adopted kit's descriptor, checked both ways, each subagent's role line repeated in its handoff, the charter held inside 32 KiB; the core: the principle registry, the meta-check, the kinds register with each kind's owning build, the conformance-gate contract, the exception register and the `core.*` policies, and the factories and gates for governing documents, practices and Skills; briefs rendered from the checklist item, carrying its facts at their source SHAs rather than pointers; `role-sha` compared with the role at spawn | gap-found-01, gap-found-02, gap-found-03, gap-found-04, gap-found-05, gap-found-07, gap-found-08, gap-flow-02, gap-orient-07 |
+| dDeclaredLoop | Spine | dOrderedCharter | the loop kit and definition keyed by the stage tags, the roles kit's stage table moved and its seven readers re-pointed in the same unit, never waiting for a live build's close; `.governance/policy.toml`, schema, one reader, JSON mirror; the named presets and their completeness check; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; policy at govkit intake; the `next` verb over the loop's state, the `next —` micro-format, and the check that every declared command ends with one or declares itself terminal, laggards on a shrink-only list owned by their stage's build; the factories and conformance gates for commands, policy keys, presets, stages, hooks, roles and workflows; the coordination feature: one lease grammar for builds, units and cadence runs with run claims migrated onto it, acquired, renewed, released and taken over through CLI verbs the step checklists call, overlap warned or refused, fleet identity and uniqueness against the remote, offline behaviour; the mailbox per build, its closed set of message kinds checked on write, read and disposed at every transition, shown on the card and kept in the build's transition log; live delivery where the harness has it; dependency coordination by the parent's lease, interfaces confirmed at Design's exit, change and landing notices; the position engine: `next` deriving each unit's step, the build's step, the next item and its interrupts from witnesses, items idempotent by witness, the read set and each claim's key and verdict printed; the build's orientation card at rank 1 beside the charter, saved where `card.store` says, looked up and re-keyed in the session's own tree on resume, a fresh session recommended by `resume.context`, partial work handled by `resume.partial`; claims keyed and trusted by key and source; each step's items declared with actor, inputs, allowance, return schema and witness; `actions.free` at the tool call; orientation cost recorded per stage | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01, gap-found-06, gap-flow-07, gap-conc-01, gap-conc-02, gap-flow-06, gap-orient-02, gap-orient-03, gap-orient-04, gap-orient-05, gap-orient-06, gap-orient-08 |
 | dWitnessedBar | Test | dDeclaredLoop | gate health measured and the reliability bar; bypasses recorded; attribution deciding what blocks; the hook-written verdict; held legs by policy; the peer-node verifier; seen-red records; flake quarantine; the product-test contract with runner adapters; derived pre-commit list and multi-node cost evidence; the gate-leg factory and its conformance gate, every leg declaring the principles it enforces | gap-test-01, gap-test-02, gap-test-03, gap-test-04, gap-test-05, gap-test-06, gap-test-07, gap-test-08, gap-test-09, gap-flow-09 |
-| dRankedPlan | Plan | dDeclaredLoop | priority beside `parents:` and the generated plan view; the planner and triager role and Plan workflow; the placement predicate; rule-based triage; dormancy disposal; the live-build mapping carried out; Plan Review; kickoff offering the next item and attended briefs gated | gap-plan-01, gap-plan-02, gap-plan-03, gap-plan-04, gap-plan-05, gap-plan-06, gap-plan-07, gap-flow-03, gap-flow-04, gap-orient-01 |
+| dRankedPlan | Plan | dDeclaredLoop | priority beside `parents:` and the generated plan view; the planner and triager role and Plan workflow; the placement predicate; rule-based triage; dormancy disposal; the live-build mapping carried out; Plan Review; kickoff offering the next item and attended briefs gated; placement: a disposition for every request, made by `placement` and recorded with its reason in the intake record, its facts checked by `placement.check`, an unattended prompt placed the same way; the full kickoff only where `kickoff.runs` says | gap-plan-01, gap-plan-02, gap-plan-03, gap-plan-04, gap-plan-05, gap-plan-06, gap-plan-07, gap-flow-03, gap-flow-04, gap-orient-01 |
 | dIndexedDesign | Design | dDeclaredLoop | the derived-READY hand-off; the design index; design review by policy; reuse and alternatives backed by recorded probes; the research harness; agreement and tier checks; the spec measured, recommendations emitted, and the spec redesigned as a structured, tagged contract; the feature level (build, features, units) with each feature's interfaces declared structurally, two-level re-entry by `design.reentry`, additive-versus-breaking interface classification (proposed), fork resolution by `design.forks` | gap-flow-01, gap-design-02, gap-design-03, gap-design-04, gap-design-05, gap-design-06, gap-design-07, gap-design-09 |
-| dScopedBuild | Build | dIndexedDesign, dWitnessedBar | one exit contract with a history-derived base, refusing a build's exit while a core red its own commits introduced stands; built specs frozen, every closing-review finding disposed as new units by `review.findings`; scope at the push; the closing review recorded; worktrees by policy; a write gate reading derived state; the checklist witnessed | gap-spine-03, gap-conc-03, gap-build-01, gap-build-02, gap-build-03, gap-build-04, gap-flow-05, gap-orient-09 |
+| dScopedBuild | Build | dIndexedDesign, dWitnessedBar | one exit contract with a history-derived base, refusing a build's exit while a core red its own commits introduced stands; built specs frozen, every closing-review finding disposed as new units by `review.findings`; scope at the push; the closing review recorded; worktrees by policy; a write gate reading derived state; the checklist witnessed; the role-gate arm's field escape explained and closed; the `none` and `review` write classes enforced | gap-spine-03, gap-conc-03, gap-build-01, gap-build-02, gap-build-03, gap-build-04, gap-flow-05, gap-orient-09 |
 | dShippedRelease | Deploy | dWitnessedBar | the landing record; kit release notes; the deploy engine; the incms adapter; the fleet register and currency watch; lander hardening; optional emitted CI; a derived runbook; the kit factory and its conformance gate | gap-deploy-01, gap-deploy-02, gap-deploy-03, gap-deploy-04, gap-deploy-05, gap-deploy-06, gap-deploy-07, gap-deploy-08, gap-flow-08 |
-| dTendedCadence | Maintain | dWitnessedBar, dRankedPlan | the Maintain run as its step checklist on the flow's executor, never a recipe-mode playbook; three hosts and the cadence; the safe-fix set; detectors with owners; map freshness; the maintenance record | gap-maint-01, gap-maint-02, gap-maint-05, gap-maint-06, gap-maint-07, gap-maint-08, gap-orient-10 |
+| dTendedCadence | Maintain | dWitnessedBar, dRankedPlan | the Maintain run as its step checklist on the flow's executor, never a recipe-mode playbook; three hosts and the cadence; the safe-fix set; detectors with owners; map freshness; the maintenance record; a detector for the memory's dead pointers, owned by Maintain | gap-maint-01, gap-maint-02, gap-maint-05, gap-maint-06, gap-maint-07, gap-maint-08, gap-orient-10 |
 | dCalibratedLens | Review | dTendedCadence | review by policy per stage and effort; the stage-exit recommendation; lenses for Plan, Test, Deploy and Maintain; the shared value ledger; the weekly Loop Review; caps re-derived from evidence and review cost | gap-review-01, gap-review-02, gap-review-03, gap-maint-03, gap-design-08 |
 | dConvergedCharter | Convergence | dScopedBuild, dShippedRelease, dCalibratedLens | protocol text derived to facts only, each document in its envelope; every remaining positional reference migrated to tags; records merged by evidence; superseded parts retired through ratified proposals; adopters migrated onto the ranked charter and the loop; the record-kind factory and its conformance gate | gap-spine-04, gap-spine-05, gap-maint-04 |
 
@@ -403,8 +436,16 @@ out with the owner's ratification and confirms dPolishedVitrine's track, which w
   verified tree for the landing order; each transition keeps the messages it disposed in the build's
   transition log, and Maintain prunes a closed build's mailbox ref once its folder holds them all.
 
+- Orientation (`build/2026-10-14-build-PLAY-dClosedLoop-1-orientation.md`): at rank 1 the charter wins a
+  conflict with the build's card, which is rendered under it; "a session that doesn't have a card READY"
+  means no saved READY card for the build and slice the session is placed into; with all three stores
+  on, a resumed session takes the card whose key still holds, local clone first, then the remote ref,
+  then the committed record.
+
 ## [owed] Owed to the chain re-cut
 
 - The flow's executor and checklist engine (P20: the unattended kit executing each stage's
   checklist) has no owning chain build yet; the re-cut assigns it inside the chain, so no live build
   working on the unattended kit is counted on.
+- A better way to preserve orientation, researched at the owner's request (orientation OR-5) and
+  adopted if one is found; until then the card is kept in all three stores.

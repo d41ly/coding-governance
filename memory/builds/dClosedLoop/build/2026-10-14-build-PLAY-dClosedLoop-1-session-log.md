@@ -76,6 +76,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 12 | gov-researcher | Orientation: cost | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-7-researcher.md` | 1799cb98 | returned, 7m01s, 35.9k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-cost.md` |
 | 13 | gov-researcher | Orientation: trust | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-8-researcher.md` | 1799cb98 | returned, 7m53s, 32.4k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-trust.md` |
 | 14 | gov-researcher | Orientation: determinism | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-9-researcher.md` | 1799cb98 | returned, 8m43s, 47.9k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-orientation-determinism.md` |
+| 15 | gov-researcher | Orientation: preserving the card | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-10-researcher.md` | 1799cb98 | dispatched | — |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -136,6 +137,10 @@ from the ledger for the same reason:
   three more live builds' closes in the adopted mapping, and dScriptedRepeat's recipe mode. The
   coordination record moves leases, the mailbox and dependency coordination into dDeclaredLoop;
   the chain has ten builds.
+- 2026-10-14, session 1799cb98: the owner asked how sessions and agents enter, orient, resume and
+  progress along the flow. Four researchers measured routing, cost, trust and determinism; the
+  orientation record holds the design and eight forks, answered; a fifth researcher was sent at the
+  owner's request to find a better way to preserve the build's card.
 
 ## Instruments
 
@@ -297,6 +302,10 @@ After the owner's no-foreign-build directive (dLeasedFleet's row removed, its th
 dDeclaredLoop): the join exits 0 on 74 keys and 10 builds; with `gap-flow-06` struck from
 dDeclaredLoop's row and `gap-conc-01` added to dRankedPlan's in a copy, it exits 1 naming both; the
 preset check exits 0 on 69 catalogue keys, 64 presettable, 64 preset rows, unchanged.
+
+After the orientation round (`gap-orient-01` to `gap-orient-10`; eight policies added): the join exits
+0 on 84 keys and 10 builds; the preset check exits 0 on 77 catalogue keys, 72 presettable, 72 preset
+rows.
 
 ### The foreign-build census
 
