@@ -1394,7 +1394,7 @@ def run_selftest() -> int:
     # refusal here rolls the kit back. The declarations are the real ones beside this engine, so the
     # arm fails the day a legacy name leaves the descriptor.
     real_engine = Path(__file__).resolve().parent
-    v3 = ('<!-- governance-template: v1.28 -->\n<!-- when:node-table -->\n'
+    v3 = ('<!-- governance-template: v3.5 -->\n<!-- when:node-table -->\n'
           '| `{{TAG_A}}` | `{{MACHINE_A}}` | `{{PRIMARY_TREE_A}}` | `{{WORKTREE_ROOT_A}}` | '
           '{{VARIANCES_A}} |\n<!-- /when:node-table -->\n<!-- when:security-outbound -->\nSSRF\n'
           '<!-- /when:security-outbound -->\naudit {{PROSE_AUDIT}}\n')
