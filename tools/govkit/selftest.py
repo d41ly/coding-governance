@@ -1120,10 +1120,12 @@ def check_fix_carriers(tmp: pathlib.Path) -> None:
     """TOOL-aMendedFleet-64 S7 — `write_version_carriers` over a two-entry fixture, then again.
 
     `vk`'s constant is bumped alone to 1.1. Its same-line copy, a `version:` field matching the OTHER
-    entry's pattern in a file carrying `vk`'s marker, its CRLF README marker and the alias on its own
-    constant line must all move; `wk`'s own field and a decoy carrying no registry marker must not,
-    and a file that does not decode is skipped. A second run rewrites nothing. Skipping the same-line
-    clause leaves `copy.sh` at 1.0 and reds the first assertion.
+    entry's pattern in a file carrying `vk`'s marker that both entries' bases hold, its CRLF README
+    marker and the alias on its own constant line must all move; `wk`'s own field and a decoy
+    carrying no registry marker must not, and a file that does not decode is skipped. The same
+    `version:` field in a file outside `wk`'s basis keeps its number while `vk`'s marker moves
+    (TOOL-dRedressedBar-20). A second run rewrites nothing. Skipping the same-line clause leaves
+    `copy.sh` at 1.0 and reds the first assertion.
     """
     gk = govkit_module()
     fx = tmp / "fix-fx"
@@ -1135,6 +1137,9 @@ def check_fix_carriers(tmp: pathlib.Path) -> None:
         "vk/blob.dat": b"\xff\xfe gov:kit vk@1.0\n",
         "wk/wk.js": b"  version: '2.0', // gov:kit wk@2.0\n",
         "wk/decoy.js": b"  version: '9.9', // gov:kit other@9.9\n",
+        "wk/harness.js": b"  version: '1.0',\n// gov:kit vk@1.0\n",
+        # The stub `derive_tool_root` globs for, so vk's `{prefix}` carrier resolves to this root.
+        f"{gk.GOVKIT_DIR.name}/{gk.REGISTRY_NAME}": b"",
     }
     for rel, data in files.items():
         (fx / rel).parent.mkdir(parents=True, exist_ok=True)
@@ -1143,7 +1148,7 @@ def check_fix_carriers(tmp: pathlib.Path) -> None:
     # `-f`: a machine-global excludes file may ignore `*.dat`, and the basis reads tracked paths only.
     git(fx, "add", "-A", "-f")
     descs = {
-        "vk": ({"id": "vk", "home": "vk",
+        "vk": ({"id": "vk", "home": "vk", "marker_carriers": ["{prefix}/wk/harness.js"],
                 "version_from": {"file": "vk.sh", "pattern": "^KIT_VK_VERSION="}}, "vk/kit.toml"),
         "wk": ({"id": "wk", "home": "wk",
                 "version_from": {"file": "wk.js", "pattern": "version: "}}, "wk/kit.toml"),
@@ -1155,8 +1160,11 @@ def check_fix_carriers(tmp: pathlib.Path) -> None:
         return (fx / rel).read_bytes()
     check("[aMF-64 S2] a same-line constant copy moves with the constant",
           read_fx("vk/copy.sh") == b"KIT_VK_VERSION=1.1   # gov:kit vk@1.1\n", repr(read_fx("vk/copy.sh")))
-    check("[aMF-64 S2] another entry's pattern moves in a file carrying only this entry's marker",
-          read_fx("vk/harness.js") == b"  version: '1.1',\n// gov:kit vk@1.1\n", repr(read_fx("vk/harness.js")))
+    check("[aMF-64 S2] another entry's pattern moves in a file carrying only this entry's marker"
+          " that both entries' bases hold",
+          read_fx("wk/harness.js") == b"  version: '1.1',\n// gov:kit vk@1.1\n", repr(read_fx("wk/harness.js")))
+    check("[dRB-20] another entry's pattern in a file outside that entry's basis is not a carrier",
+          read_fx("vk/harness.js") == b"  version: '1.0',\n// gov:kit vk@1.1\n", repr(read_fx("vk/harness.js")))
     check("[aMF-64 S2] the alias on the constant's own line moves, the constant does not",
           read_fx("vk/vk.sh") == b"KIT_VK_VERSION=1.1   # gov:kit vk@1.1 // gov:kit vk-alias@1.1\n",
           repr(read_fx("vk/vk.sh")))
@@ -1169,7 +1177,7 @@ def check_fix_carriers(tmp: pathlib.Path) -> None:
     check("[aMF-64 S3] a file that does not decode is named and left untouched",
           read_fx("vk/blob.dat") == files["vk/blob.dat"] and "vk/blob.dat" in said.getvalue(),
           said.getvalue())
-    check("[aMF-64 S2] the rewrites are returned one per carrier", len(first) == 7, repr(first))
+    check("[aMF-64 S2] the rewrites are returned one per carrier", len(first) == 8, repr(first))
     with contextlib.redirect_stdout(io.StringIO()):
         second = gk.write_version_carriers(fx, descs, gk.derive_marker_basis(fx, descs))
     check("[aMF-64 S5] a second run over a fixed tree rewrites nothing", second == [], repr(second))

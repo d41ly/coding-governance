@@ -801,12 +801,14 @@ def write_version_carriers(root: pathlib.Path, descs: dict[str, tuple[dict, str]
     `version_from` constant; return one `(path, entry, carrier id, old, new)` per rewrite.
 
     Within an entry's basis it rewrites: every `gov:kit <entry>@<n>` marker whose number differs;
-    and, on a line matching ANY entry's `version_from` pattern then an optional quote and a number,
-    that number plus every same-line `gov:kit <alias>@<n>` whose alias is no OTHER entry's id — but
-    only when the line carries this entry's marker, or the file does elsewhere and carries no other
-    entry's marker at all. That ownership clause is what keeps review-harness's `version: ` number
-    out of the drift-audit harnesses its `**` also claims. On the constant's own line only the
-    aliases move; its number is the source.
+    and, on a line matching a `version_from` pattern then an optional quote and a number, that
+    number plus every same-line `gov:kit <alias>@<n>` whose alias is no OTHER entry's id — but only
+    when the line carries this entry's marker, or the file does elsewhere and carries no other
+    entry's marker at all. That ownership clause keeps review-harness's `version: ` number out of
+    the drift-audit harnesses its `**` also claims. A pattern counts only in its own entry's basis:
+    `playbook`'s matched a playbook-render selftest fixture outside playbook's basis, so every mint
+    wrote playbook-render's number there with no bump (TOOL-dRedressedBar-20). On the constant's
+    own line only the aliases move; its number is the source.
 
     WHAT IT DOES NOT DO: mint a value, run a `[[regenerate]]` argv, or touch a file outside the
     basis. Bytes are kept: read and written as UTF-8 with `newline=""`, split on `\\n` alone, and a
@@ -814,13 +816,13 @@ def write_version_carriers(root: pathlib.Path, descs: dict[str, tuple[dict, str]
     """
     mk = re.compile(r"gov:kit ([a-z0-9-]+)@([0-9]+(?:\.[0-9]+)*)")
     numv = re.compile(r"([0-9]+(?:\.[0-9]+)+)")
-    carrier_rxs = []
-    for d, _dp in descs.values():
+    carrier_rxs: dict[str, re.Pattern] = {}   # entry id -> its pattern, an optional quote, a number
+    for rid, (d, _dp) in descs.items():
         vf = d.get("version_from") or {}
         if "none" in vf or not vf.get("pattern"):
             continue
         try:
-            carrier_rxs.append(re.compile("(?:" + vf["pattern"] + r")['\"]?([0-9]+(?:\.[0-9]+)*)"))
+            carrier_rxs[rid] = re.compile("(?:" + vf["pattern"] + r")['\"]?([0-9]+(?:\.[0-9]+)*)")
         except re.error:
             continue
     texts: dict[str, list[str]] = {}   # path -> [as read, as rewritten so far]
@@ -860,12 +862,13 @@ def write_version_carriers(root: pathlib.Path, descs: dict[str, tuple[dict, str]
             lines = texts[f][1].split("\n")
             file_ids = {h.group(1) for h in mk.finditer(texts[f][1])}
             foreign = any(i != eid and i in descs for i in file_ids)
+            file_rxs = [rx for rid, rx in carrier_rxs.items() if f in basis.get(rid, ())]
             const_at = (next((n for n, ln in enumerate(lines) if own_rx.search(ln)), -1)
                         if f == src else -1)
             for n, ln in enumerate(lines):
                 line_own = any(h.group(1) == eid for h in mk.finditer(ln))
                 owned = line_own or (eid in file_ids and not foreign)
-                hits = [h for h in (rx.search(ln) for rx in carrier_rxs) if h] if n != const_at else []
+                hits = [h for h in (rx.search(ln) for rx in file_rxs) if h] if n != const_at else []
                 num = min(hits, key=lambda h: h.start(1)) if hits and owned else None
                 aliases = num is not None or (n == const_at and line_own)
                 edits = []   # (start, end, carrier id, old)
