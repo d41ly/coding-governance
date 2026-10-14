@@ -294,3 +294,120 @@ A worker is trusted because it is constrained and checked, not because it is bel
    holds disposal.
 8. MED. The work order names no checklist item, allowance or witness key, and a builder's divergence
    has no route back.
+
+## [forks] Asked, 2026-10-14
+
+**RL-1. "Every step's review needs a reviewer. Should one reviewer role cover them all, with the lens
+set by the step's artifact (plan, specs, diff, gates, landing, maintenance run), or should each have
+its own?"** Offered: One reviewer, lens per step (Recommended); One reviewer per step; Keep two, add
+four. Answer, in the owner's words: "Which setup is better? Doesn't seem that having more than a single
+reviewer role is actually beneficial - what matters is the instructions given and the way their task
+is explained." The main loop's reply: one reviewer is better. Its job is the same at every step, to
+hunt defects in one pinned artifact; what differs per step is the lens and the artifact, and both
+belong in the task. Two reviewer roles exist today and one had no spawn in 60 days; the published
+failure taxonomy finds disobeyed task specifications (11.8%) far more often than disobeyed roles
+(1.5%).
+
+**RL-2. "Test, Deploy and Maintain are mostly commands, with a few items that need judgment:
+attributing reds, release notes and verifies, filing breaches. How many roles carry that
+judgment?"** Offered: Three: tester, deployer, maintainer (Recommended); One operations role; Tester,
+plus one for release and upkeep. Answer: Three: tester, deployer, maintainer (Recommended).
+
+**RL-3. "Session orientation is in your list of role functions. With `next` and the build's card now
+orienting every session, where should it live?"** Offered: Commands only (Recommended); Keep the
+orienter role. Answer, in the owner's words: "No sessions should orient inline, that's one of the major
+points. Upon a new user session being started, orientation should be handled by a scout role workflow,
+keeping any unnecessary tool output in the sidechain - outside the main session. Main session should
+receive an extensive, fully composed orientation card with all the necessary scope details to continue
+its session without the noise."
+
+**RL-4. "Prompt writing is in your list too. Today 64.5% of a task's text is typed by the main
+session. Who writes a worker's task?"** Offered: The requesting worker, rendered (Recommended); A
+prompt-writer role. Answer, in the owner's words: "Main session's primary purpose is to ORIENT its
+sidechain agents/roles - new prompt-writer roles receives only the details necessary to write a tight,
+well-oriented prompt from the main session and passes it further along to its destination. Main
+session, again, should keep as much of the noise out of its context as possible."
+
+### Settled after RL-1 to RL-4, 2026-10-14
+
+- **One reviewer role**, its lens and artifact set by the task: plan, specs, diff, gates, landing,
+  maintenance run, and the loop's metrics. The loop reviewer folds into it, the synthesizer's report
+  carrying the Loop Review's proposals; the skeptic and synthesizer stay shared.
+- **Three operations roles**: tester, deployer and maintainer.
+- **Orientation is a scout's workflow in a sidechain, never inline.** At session start an orientation
+  scout (today's orienter, re-scoped) composes the card: the full kickoff where no READY card exists,
+  a refreshed card where one does. The main session receives one extensive, fully composed card with
+  every scope detail it needs, and none of the tool output that produced it.
+- **A prompt-writer role writes every worker's task.** The main session's primary purpose is to orient
+  its sidechains: it hands the prompt writer only the details the task needs, and the prompt writer
+  composes a tight, well-oriented prompt that passes unchanged to its destination role, bound by the
+  spawn marker's hash. The rendered work order (item, allowance, return schema, witness) stays
+  mechanical around it. Today's session-handoff template folds into the prompt writer.
+- **The main session keeps the noise out of its context**: it holds composed cards and typed returns,
+  never the raw output that produced them.
+
+### Follow-ups asked, 2026-10-14
+
+**RL-5. "No session orients inline, and the main session keeps the noise out. Can the main session
+still run read-only probes itself (file reads, greps, git commands)?"** Offered: None: probes go to a
+scout (Recommended); Cheap state reads only; As settled before. Answer: Cheap state reads only.
+
+**RL-6. "Where does the roles layer get built? Charter and flow each have a foundation build in the
+chain (`dOrderedCharter`, `dDeclaredLoop`)."** Offered: Its own chain build (Recommended); Spread over
+the step builds; Decide at the re-cut. Answer: Its own chain build (Recommended).
+
+**RL-7. "A worker's return fails its schema. What happens by default?"** Offered: Retry up to 3, then
+park (Recommended); Retry once, then park; Park at once. Answer, in the owner's words: "Retry up to 3,
+then park by default. The number of retries is owner-adjustable. Why would a worker fail its schema in
+the first place? Workers should be handed templates that structurally eliminate the possibility." The
+main loop's reply: today's direct spawns are asked for their shape in prose, so 48 of 48 returned free
+text, while harness spawns return through a schema-forced tool, 94 of 94 structured. A template filled
+through that forced channel makes a format failure impossible by construction; what remains is a value
+that fails to resolve, such as a claimed commit that does not exist, and the retries cover only that.
+
+**RL-8. "A harness that cannot spawn subagents, or you working by hand, reaches an item a role must
+perform. What happens by default?"** Offered: A role session the executor starts (Recommended); A
+recorded stand-in, by waiver; Refuse. Answer, in the owner's words: "This possibility should be
+mechanically and structurally eliminated - a built-in harness should be used that can ALWAYS spawn
+subagents as necessary. This already exists in the repo, it should be improved to the new architecture
+(this is a lower level design we haven't reached yet). Otherwise, a role session the executor starts."
+
+### Settled after RL-5 to RL-8, 2026-10-14
+
+- **The main session reads only cheap state** (`driver.reads`, default `state-reads-only`): `next`, a
+  record it was handed, a short git state command. Anything exploratory is a scout's task. Workers keep
+  their read-only probes inside their items.
+- **The roles layer is built by its own chain build**, the third foundation beside the charter's and the
+  flow's: `dBoundRoles`, child of `dDeclaredLoop`.
+- **Returns are filled templates through a schema-forced channel**, so a format failure cannot occur. A
+  value that fails to resolve is retried up to `roles.retries` times (default 3, any count the owner
+  sets), then the item parks.
+- **The no-spawn case is eliminated by construction**: the executor runs on a built-in harness that can
+  always spawn subagents (the repository's workflow harness, improved to this architecture in the
+  lower-level design). Where it is absent, the executor starts a role session for the item
+  (`roles.no-spawn`, default `executor-role-session`).
+
+### The roster, settled
+
+| Role | Job | Never | Returns |
+|---|---|---|---|
+| gov-orientation-scout | composes the session's card in a sidechain at session start: the full kickoff where no READY card exists, a refreshed card where one does; composes a request's placement evidence | acts on the work it orients | the composed card; placement evidence |
+| gov-prompt-writer | composes each worker's task from the main session's details and the records, a tight prompt passed unchanged to its destination | dispatches, or performs the task | the task prompt |
+| gov-planner | drafts the plan record and its Plan reach; triages what no rule decides | chooses a mechanism, splits units, writes code | plan fields; research requests |
+| gov-researcher | answers one question with candidates and the test that could make each lose | writes files; decides | a research record |
+| gov-reuse-scout | finds the seams a mechanism should extend, each with its probe's digest | designs; writes | seams and digests |
+| gov-architect | decomposes a build into features and units; declares interfaces, order and write sets; resolves feature forks | writes unit specs or code | roster; feature designs; fork records |
+| gov-spec-writer | writes each unit's structured spec, including units born of findings and re-designs, and folds audit findings into a new revision | edits a built unit's spec; writes code | spec path and SHA |
+| gov-builder | builds one unit from its spec and records its acceptance | edits a spec; runs gate legs; writes outside its write set | committed or diverged; SHA; checks run |
+| gov-tester | attributes each red and names its route; files reported reds | fixes code; re-runs the bar | per red: class, route, evidence |
+| gov-deployer | writes release notes; disposes a release verify that needs judgment | lands or pushes by hand; changes code | notes; verify dispositions |
+| gov-maintainer | turns detector readings into filings: severity, acceptance, patch-build intakes | changes tracked content directly | filings |
+| gov-reviewer | reviews one pinned artifact through the lens its task names: plan, specs, diff, gates, landing, maintenance run, the loop's metrics | edits what it reviews | findings |
+| gov-skeptic | tries to refute each finding | adds findings | verdicts |
+| gov-synthesizer | merges verified findings into one report; for the Loop Review, the proposals | changes a verdict | report path |
+
+The main session is the driver, not a worker, and the executor drives when no one is attending. Every
+row of the item map whose actor is a role is now dispatched through the prompt writer. The orientation
+scout runs at session start, before Plan's first item. Loop Review item 3 is the reviewer with the
+loop's lens, its skeptic and its synthesizer.
+

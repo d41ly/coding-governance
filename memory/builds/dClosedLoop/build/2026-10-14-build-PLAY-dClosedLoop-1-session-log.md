@@ -168,6 +168,10 @@ calls.
 - 2026-10-14, session 1799cb98: the owner deferred the flow steps' polish until all three layers are
   consolidated and opened the roles layer; four researchers were sent on anatomy, coverage,
   interactions and prior art.
+- 2026-10-14, session 1799cb98: the owner answered eight roles forks: one reviewer, three operations
+  roles, orientation as a scout's sidechain workflow, a prompt writer for every task, cheap state reads
+  only for the main session, a roles build of its own (`dBoundRoles`), schema-forced returns with three
+  retries, and a harness that can always spawn subagents.
 
 ## Instruments
 
@@ -273,7 +277,7 @@ for k in sorted(expected - set(presets)):
 for k in sorted(set(presets) - expected):
     findings.append(f"preset table names a key that is excluded or not in the catalogue: {k}")
 
-FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared")
+FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count")
 for k, vals in presets.items():
     if k not in catalogue:
         continue
@@ -337,6 +341,12 @@ rows.
 After the adopted preservation research (`gap-orient-11` to `gap-orient-13`; `card.snapshot` added): the
 join exits 0 on 87 keys and 10 builds; the preset check exits 0 on 78 catalogue keys, 73 presettable,
 73 preset rows.
+
+After the roles round (`gap-roles-01` to `gap-roles-08`; four policies added; `dBoundRoles` joins the
+chain): the join exits 0 on 95 keys and 11 builds. The preset check's free-value pattern gains `a retry
+count`, for `roles.retries`, in the source above; it exits 0 on 82 catalogue keys, 77 presettable, 77
+preset rows, and exits 1 on a copy with strict `roles.no-spawn` set to `sometimes` and standard
+`prompts.author` set off its default, naming both.
 
 ### The foreign-build census
 

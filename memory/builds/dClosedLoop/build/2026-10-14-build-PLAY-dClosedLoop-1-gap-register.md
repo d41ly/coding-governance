@@ -96,6 +96,14 @@ extends.
 | gap-orient-11 | Orient | HIGH | A build's card cannot be found by its build: cards are keyed by session id in the clone's git directory, so a new session, a dead process or another node never finds the card of the build it picks up, and no card exists on the remote. Raised by the owner. | orientation research, preserve; `skills/session-kickoff/manifest-check.sh:311-316` | — |
 | gap-orient-12 | Orient | HIGH | A resume delivered no card: in this session the resume hooks printed only the process and wiring checks, though the replay is wired for resume; the cause is unknown. Raised by the owner. | orientation research, preserve (this session's transcript, the resume at 16:21:01Z) | — |
 | gap-orient-13 | Orient | MED | The card never reaches the charter's instruction slot: hook output lands as a reminder at the hook point, subagents (`omitClaudeMd: true`) get only the route, and another harness gets nothing. Raised by the owner. | orientation research, preserve; `tools/roles/render_agents.py:132`; https://code.claude.com/docs/en/hooks | — |
+| gap-roles-01 | Roles | HIGH | Most checklist items have no role: of 70 items across the steps, 11 are performed by a role, 18 by the main session, 9 by a command and 32 by nobody; no role exists for planning, feature design, testing, deployment, maintenance or the Plan, Test, Deploy and Loop reviews. Raised by the owner. | roles research, coverage | — |
+| gap-roles-02 | Roles | HIGH | The main session performs role functions: in 60 days it wrote or edited specs 605 times, product code 565 times, folded review findings 367 times, and wrote plans 336 times and task briefs 74 times. Raised by the owner. | roles research, coverage P2 and P5 | — |
+| gap-roles-03 | Roles | HIGH | Role limits are prose: 58 of the 59 prohibitions in role bodies name no enforcer, `writes` is a class rather than an allowance, and shell writes escape every role gate (85 from the main session and 66 from typed roles since the role arm landed). Raised by the owner. | roles research, anatomy probe 3, coverage P4 | — |
+| gap-roles-04 | Roles | HIGH | Returns between roles are uncontracted on the direct route: 48 of 48 direct-spawn returns are free text, `returns` is prose no code reads, and no subagent-stop check exists. Raised by the owner. | roles research, prior art probe C, anatomy | — |
+| gap-roles-05 | Roles | HIGH | Exchanges between roles are retyped by the main session: 64.5% of a rendered task's bytes are typed input, 71 of 126 direct spawns carried free-text prompts, and 844 of 901 spec fold commits came from no unit. Raised by the owner. | roles research, interactions probes 3, 4 and 7 | — |
+| gap-roles-06 | Roles | HIGH | The guard shares state with what it guards: the role index and agent files sit outside every role gate, so a role holding Write could edit them, and a tree with no role index is unarmed. Raised by the owner. | roles research, anatomy; `tools/hooks/scratch-guard.js:99-101` | — |
+| gap-roles-07 | Roles | MED | Roles go unused or double up: the orienter, reuse scout and diff reviewer had no spawn in 60 days, the reuse scout's body adds nothing, the spec writer also holds disposal, and the session-handoff template has no agent. Raised by the owner. | roles research, coverage P6 | — |
+| gap-roles-08 | Roles | MED | The work order names no checklist item, allowance or witness key, and a builder's divergence returns to "the caller" with no route back. Raised by the owner. | roles research, anatomy; `tools/workflows/unattended-unit.js:269` | — |
 | gap-spine-01 | Spine | HIGH | No stage model: no kit, leg, dossier, role or hook declares the stage it serves, and the loop exists only implicitly. | design §4.1 (0 of 31 dossiers carry a stage); `tools/roles/workflows.toml` covers stages 0–7 only | — |
 | gap-spine-02 | Spine | HIGH | Guards read agent-written state across stages, against `[class]`. | build §4 (write gate), design §4.4 (INPROGRESS), test §5 C (pusher-written receipt), deploy §5 C | — |
 | gap-spine-03 | Spine | HIGH | Attended and unattended builds run different exit contracts. | build §3, §4 (DoD needs RUN.md) | — |
@@ -227,4 +235,12 @@ instrument:
 ```text
 Deploy=8 Plan=7 Spine=9 Orient=13 Test=9 Review=3 Foundation=8 Build=4 Flow=9 Maintain=8 Design=9
 LOW=5 MED=34 HIGH=48
+```
+
+Re-measured after the roles round added `gap-roles-01` to `gap-roles-08`, measured by the four roles
+researchers, same instrument:
+
+```text
+Roles=8 Deploy=8 Plan=7 Spine=9 Orient=13 Test=9 Review=3 Foundation=8 Build=4 Flow=9 Maintain=8 Design=9
+LOW=5 MED=36 HIGH=54
 ```
