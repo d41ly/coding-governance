@@ -72,6 +72,10 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 8 | gov-researcher | Build | handoff 3, unchanged | 1799cb98 | returned, 4m39s, 24.0k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-build.md` |
 | 9 | gov-researcher | Test | handoff 4, unchanged | 1799cb98 | returned, 3m47s, 20.9k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-test.md` |
 | 10 | gov-researcher | Deploy | handoff 5, unchanged | 1799cb98 | returned, 4m08s, 22.6k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-deploy.md` |
+| 11 | gov-researcher | Orientation: routing and step | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-6-researcher.md` | 1799cb98 | dispatched | — |
+| 12 | gov-researcher | Orientation: cost | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-7-researcher.md` | 1799cb98 | dispatched | — |
+| 13 | gov-researcher | Orientation: trust | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-8-researcher.md` | 1799cb98 | dispatched | — |
+| 14 | gov-researcher | Orientation: determinism | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-9-researcher.md` | 1799cb98 | dispatched | — |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -338,3 +342,4 @@ Runs, 2026-10-14:
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-flow.md` | The flow walk, stage by stage: the layers, each stage's scope, boundaries and checklist, the forks and answers. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-flow-interactions.md` | Each step's scope, the eighteen interaction edges, the shared state, and the six interactions settled after. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-coordination.md` | The owner's no-foreign-build directive, the census of what the design counted on, and leases, the mailbox and dependency coordination designed into dDeclaredLoop. |
+| `build/2026-10-14-build-PLAY-dClosedLoop-1-orientation.md` | The owner's questions on how sessions and agents enter, orient, resume and progress along the flow; the research dispatched; then the current state, the design and the forks. |
