@@ -234,3 +234,51 @@ Asked after measuring today's configuration surface: five dotfile confs holding 
   design problem in its own right: the hooks an agent cannot bypass, the paths only the owner may
   write, and verdict records written by hooks rather than by the agent.
 - **Review recommendations advise by default.**
+
+## Round 5 — the floor, the verifiers, the chain (2026-10-14, session 1799cb98)
+
+Asked after architecture v1 (`build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v1.md`) and
+a gap-ownership join that found all 57 gaps owned exactly once across its ten builds and reddened on
+a planted orphan.
+
+### R5.1 Floor: "Should a safety floor hold no matter what any policy says?"
+
+- Offered: **Minimal floor (Recommended)**: five invariants no policy can switch off: (1) a binding
+  verdict always runs before the default branch moves, only its backend a policy; (2) every policy
+  change and stage transition recorded; (3) the policy guard protects its own switch; (4) no stage
+  witness reads agent-typed state; (5) agents cannot bypass hooks (no `--no-verify`, no hooks-path
+  override, no agent writes to hooks, the policy file or verdict refs outside the guard).
+- Offered: **No floor**. Offered: **Wider floor**: the five plus the closing review and lease
+  refusal.
+- **Answer, in the owner's words:** "minimal floor by default, but the --no-verify policy should be
+  off by default - gates have been causing problems and should be bypassable until this is
+  resolved."
+- **Effect:** the floor ships as a default rather than a hard-coded law, in keeping with P10.
+  Invariant 5 splits: refusing a hook bypass becomes a policy, `hooks.bypass`, ALLOWED by default
+  until gate reliability is fixed; the other four invariants stay in the default floor. The reason
+  is itself a finding: gates are a source of friction the Test stage must resolve before refusal
+  can be the default. A bypass still falls under invariant 2, so each one is recorded and the Loop
+  Review can count it.
+
+### R5.2 Verifiers: "With remote CI unavailable, which verdict backends should the Test build provide?"
+
+- Offered: **Local + peer node (Recommended)**: the hardened local hook first, then a peer-node
+  backend; remote CI designed as a slot, built when CI exists.
+- Offered: **Local hook only**. Offered: **Local, peer and CI**.
+- **Answer:** Local + peer node (Recommended).
+
+### R5.3 Chain: "Approve the ten-build chain?"
+
+- Offered: **Approve as drafted (Recommended)**. Offered: **Merge to seven**. Offered: **Split
+  further**.
+- **Answer, in the owner's words:** "Prior to approval we walk design by design first."
+- **Effect:** the chain is not approved yet. Each chain build's design is walked with the owner,
+  one build at a time, before approval; each walk is recorded below as it happens.
+
+### What round 5 changed
+
+- `hooks.bypass` joins the policy catalogue, default `allowed`, every use recorded.
+- Gate reliability becomes an explicit goal of the Test build: the condition for flipping
+  `hooks.bypass` to `refused`.
+- The Test build ships the local hook and the peer-node verifier; remote CI is a designed slot.
+- The chain waits for a design-by-design walk-through.

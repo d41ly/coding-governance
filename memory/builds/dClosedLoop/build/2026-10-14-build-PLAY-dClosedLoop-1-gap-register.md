@@ -135,3 +135,10 @@ grep '^| gap-' <this file> | awk -F'|' '{gsub(/ /,"",$3); gsub(/ /,"",$4); s[$3]
 Deploy=8 Plan=7 Spine=8 Test=9 Review=3 Build=4 Maintain=8 Design=9
 LOW=5 MED=23 HIGH=28
 ```
+
+Re-measured after round 4 added `gap-spine-06`, same instrument:
+
+```text
+Deploy=8 Plan=7 Spine=9 Test=9 Review=3 Build=4 Maintain=8 Design=9
+LOW=5 MED=23 HIGH=29
+```
