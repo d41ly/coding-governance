@@ -46,6 +46,10 @@ Revised: 2026-10-14, after the flow walk's Test stage: `verdict.tree`, `verdict.
 `tests.landing-levels` join the catalogue and the presets; Test verifies the prepared merge, so one
 bar serves Test and the landing.
 
+Revised: 2026-10-14, after the flow walk's Deploy stage: `build.closes` and `release.cadence` join
+the catalogue and the presets; a build closes at landing by default, and Deploy's release is recorded
+per SHA across landings; gov's kits reach adopters as tagged releases cut on a cadence.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -174,6 +178,8 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 | `deploy.promotion` | owner-approves-prod, auto-on-green, owner-approves-each | auto-on-green | walk DP2 |
 | `deploy.on-verify-fail` | rollback-and-ask, halt-and-alert, roll-forward | roll-forward | walk DP3 |
 | `deploy.currency` | pull-and-watch, push-branches, pull-only | pull-and-watch | walk DP4 |
+| `build.closes` | at-landing, after-release-verifies, at-landing-maintain-owns | at-landing | flow FL-DP1 |
+| `release.cadence` | every-landing, daily, weekly, owner-cut | weekly | flow FL-DP2; the period is the main loop's choice |
 | `maintain.host` | session-start, os-scheduler, cloud-routine | session-start | walk M1 |
 | `maintain.cadence` | daily, weekly, every-session | daily | walk M2 |
 | `maintain.fixes` | a set of named safe fixes | reap, prune landed, regenerate stale, defer dormant, records-only fixes, close finished run records | R2.3 |
@@ -267,6 +273,8 @@ repository on either overrides `verdict` to `local-hook`.
 | `deploy.promotion` | auto-on-green | auto-on-green | owner-approves-each | owner-approves-prod |
 | `deploy.on-verify-fail` | roll-forward | roll-forward | rollback-and-ask | rollback-and-ask |
 | `deploy.currency` | pull-and-watch | pull-and-watch | push-branches | pull-and-watch |
+| `build.closes` | at-landing | at-landing | after-release-verifies | after-release-verifies |
+| `release.cadence` | every-landing | weekly | owner-cut | weekly |
 | `maintain.host` | session-start | session-start | os-scheduler | os-scheduler |
 | `maintain.cadence` | weekly | daily | daily | daily |
 | `maintain.fixes` | the full safe set | the full safe set | reap and regenerate only; the rest filed as asks | the full safe set |

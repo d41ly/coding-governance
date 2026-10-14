@@ -521,6 +521,77 @@ rolls forward on a failed one; adopters pull, with a currency watch.
 9. The build's and units' leases are released.
 10. The Deploy-to-Maintain transition is recorded, its witness the items above.
 
+### Forks asked, 2026-10-14
+
+**FL-DP1. "When does a build close?"** Offered: After its release verifies (Recommended); At
+landing; At landing, Maintain owns the rest. Answer, in the owner's words: "At landing by default,
+but owner-adjustable of the three options."
+
+**FL-DP2. "How should gov's own kit changes reach adopters?"** Offered: Tagged releases on a cadence
+(Recommended); Every landing is a release; Owner-cut releases. Answer: Tagged releases on a cadence
+(Recommended).
+
+### Settled for Deploy, 2026-10-14
+
+- **A build closes at landing by default** (`build.closes`: `at-landing`, with
+  `after-release-verifies` and `at-landing-maintain-owns` allowed). Deploy therefore holds two
+  processes: the LANDING, which belongs to the build and closes it; and the RELEASE, recorded per
+  SHA, which promotes landings through the declared environments. Under the default, a failed verify
+  after the build has closed is new work: an ask, or the small-change entry once it is settled.
+- **Gov's kits reach adopters as tagged releases**: kits still mint a version at each landing, and
+  Maintain's run cuts a tagged release with notes when the release cadence is due; adopters'
+  currency is measured in releases behind. The cadence is a policy, `release.cadence`, and its
+  default of weekly is the main loop's choice, recorded as such, because the answer named the
+  mechanism, not the period.
+- **Checklist amendment**: items 6 and 7 (the engine's promotions and a failed verify) belong to the
+  release record rather than the build's exit under `at-landing`; under `after-release-verifies` they
+  stay in the build's checklist.
+
+## [maintain] Maintain
+
+### Current state, measured 2026-10-14
+
+The Maintain research record holds the instruments: 27 drift signals, 15 nonzero, most report-only,
+two dead; reaping, cleanup and map refresh run by hand; nothing on a schedule; 89 live run records;
+the governing surface only growing. Settled since: Maintain runs daily at session start (other hosts
+switchable), applies a declared set of safe fixes under its own mandate, files every breach as an ask
+for its owning stage; the slower product-test levels run on its cadence (FL-T3); it cuts gov's tagged
+releases (FL-DP2); the Loop Review reads its metrics weekly.
+
+### Draft scope
+
+- **The run**: on its cadence, or on an event, under a maintenance lease so one node runs it.
+- **Detection**: every drift signal against its pin and owning stage, gate health and flakes, the
+  process census, branch and worktree reconciliation, map freshness, dormant builds, adopter currency
+  and outbox orders, the slower product-test levels, and any held legs the policy assigns here.
+- **Safe fixes**: each fix in the declared set applied, verified by the legs its paths trip, and
+  landed under the maintenance mandate; a safe fix touches records, generated outputs and refs,
+  never product code.
+- **Filing**: every breach and finding outside the safe set filed as an ask with a severity and an
+  acceptance, for its owning stage.
+- **Releasing**: gov's tagged release cut, with notes, when the release cadence is due.
+- **Recording**: the maintenance record (checked, fixed, filed) and the metrics handed to the Loop
+  Review.
+
+### Draft boundaries
+
+- **Starts** on a cadence tick or a declared event.
+- **Ends** when the run's record is written and its lease released.
+- **Hands Plan** the asks it filed, and **Review** the run's metrics.
+- **Does not** change product code, build a feature, or decide a plan.
+
+### Draft checklist (each item witnessed by a check)
+
+1. The maintenance lease is held for this cadence period.
+2. Every detector runs, and its reading is recorded against its pin and owner.
+3. The cadence-assigned test levels and held legs run, and their reds are filed.
+4. Each declared safe fix is applied, verified and landed; anything else is filed.
+5. Every breach and finding is filed with a severity and an acceptance.
+6. The tagged release is cut with its notes when the cadence is due.
+7. Adopter currency is probed and recorded.
+8. The maintenance record is written, and the metrics handed to the Loop Review.
+9. The lease is released.
+
 ### Entry points, partly settled
 
 - **Settled:** a new, complex feature enters at Plan; an amendment that fits an open build's plan
