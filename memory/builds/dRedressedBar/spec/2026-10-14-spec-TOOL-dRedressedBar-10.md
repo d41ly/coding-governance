@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-10 — the round-1 spec audit's 12 mediums and 11 lows, batched: each criterion observed in a form that can pass and fail, each false sentence corrected, and settings-merge's accepted stop narrowed
 
-**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 6 · ratified 2026-10-14
+**Status:** SPECCED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 6 · ratified 2026-10-14
 
 <!-- gen:spec-records -->
 
@@ -117,11 +117,14 @@ names its own id.
 - **S16** — id 16, L6. Spec 3 §4's paragraph "S5, the exposed defect, fixed by unit 9" drops its
   restated mechanism, including "the two always arrive together there", and points at
   `TOOL-dRedressedBar-9` §4, "The defect, and where it sits", as its one owner. Observed by AC13.
-- **S17** — id 17, L7. Spec 2's S4 Readers names `memory/map/generated/symbols.json` by name, which
-  `gen_map.py --write` writes (the `[[generated]]` row at `tools/codebase-map/kit.toml:148-156`) and
-  unit 7's `regen.py --write` re-derives. Spec 2's §7 names `codebase-map coverage + freshness` as
-  reading stale until unit 7. Spec 9 carries the same note for `check_outcome_states`. Observed by
-  AC14.
+- **S17** — id 17, L7. Observed, not written: spec 2's rev-3 and spec 9's rev-4 closed it in place,
+  after unit 2's builder found the pre-commit hook refusing a commit that left the map stale
+  (`prompts/2026-10-14-prompt-TOOL-dRedressedBar-2-2-revision.md`). Spec 2's S4 Readers names
+  `memory/map/generated/symbols.json` by name, which `gen_map.py --write` writes (the `[[generated]]`
+  row at `tools/codebase-map/kit.toml:148-156`). Spec 2's S5 and spec 9's S7 each regenerate and
+  commit that map in their own pass, and both specs' §7 leg lines name
+  `codebase-map coverage + freshness`. This unit writes nothing into spec 2 for it and nothing into
+  spec 9 for it. Observed by AC14.
 - **S18** — id 18, L3. The blast-radius lens's reading of S8's defect, citing `EPOCH_ROLES`. Closed
   by S8's correction. Observed by AC8.
 - **S19** — id 19, L4. The blast-radius lens's reading of S9's defect. Closed by S9's correction.
@@ -173,8 +176,8 @@ names its own id.
 - **consumes-from** `TOOL-dRedressedBar-1` — its built suites, which AC1, AC2 and AC3 read: the
   spaced GH33 calls, the `unset GATE_SELFTESTS` line and the roles probe stop. Its spec takes the one
   revision line S1, S2, S3, S11, S20 and S21 name.
-- **consumes-from** `TOOL-dRedressedBar-2` — its rename, which AC14 reads in `symbols.json` after
-  unit 7's regen, and its spec's S4 Readers and §7, which S17 corrects.
+- **consumes-from** `TOOL-dRedressedBar-2` — its rename, which AC14 reads in the `symbols.json` its
+  pass commits, and its spec's S4 Readers, S5 and §7 leg line, which S17 observes.
 - **consumes-from** `TOOL-dRedressedBar-3` — its fixture edits in `tools/govkit/selftest.py`, which
   AC6 and AC10 read, and its spec's §4 S5 paragraph, which S16 corrects.
 - **consumes-from** `TOOL-dRedressedBar-4` — its spec's kit-bump non-goal, hands-off line and §7
@@ -184,9 +187,8 @@ names its own id.
   §4, which S14 corrects.
 - **consumes-from** `TOOL-dRedressedBar-6` — its arms in `tools/roles/adopt-roles.test.sh`, a file
   AC12 classifies, and its spec's §4 line cites, which S14 corrects.
-- **consumes-from** `TOOL-dRedressedBar-7` — its `regen.py --write`, after which AC14 reads
-  `symbols.json`, and its spec's population and Edges, which S9, S19 and S23 correct. Its mint runs
-  before this unit, whose two product files are govkit-exempt and owe no bump.
+- **consumes-from** `TOOL-dRedressedBar-7` — its spec's population and Edges, which S9, S19 and S23
+  correct. Its mint runs before this unit, whose two product files are govkit-exempt and owe no bump.
 - **consumes-from** `TOOL-dRedressedBar-8` — its pass commit, which AC4 and AC5 read, and its spec's
   §6 sentence and Edges, which S5, S12 and S9 amend.
 - **consumes-from** `TOOL-dRedressedBar-9` — its code-2 block, which S22 narrows, its
@@ -290,21 +292,22 @@ this unit. The pass adds one rev bump per spec it amends, with the revision line
 | Spec | Ids | What moves in it |
 |---|---|---|
 | 1 | 1, 2, 3, 11, 20, 21 | the revision line only |
-| 2 | 17 | S4 Readers, §7 |
 | 3 | 6, 10, 16 | §4 S5 paragraph |
 | 4 | 8, 13, 18 | §3 non-goal, Edges line, §7 sentence |
 | 5 | 14, 15 | §4 working-set paragraph |
 | 6 | 14 | §4, one sentence |
 | 7 | 9, 19, 23 | §1, §4 "Why one unit", AC4 wording, Edges |
 | 8 | 4, 5, 12, and S9's mirror | §6 sentence, Edges |
-| 9 | 7, 17, 22, and S9's mirror | §4, §5, Edges |
+| 9 | 7, 22, and S9's mirror | §4, §5, Edges |
+
+Spec 2 takes no bump from this pass, and spec 9's bump names no id 17. Report id 17 was closed in
+both specs before this unit builds, by spec 2's rev-3 and spec 9's rev-4, and S17 only observes it.
 
 ### Files touched (estimate)
 
 - `tools/govkit/entries/settings-merge.kit.toml`
 - `tools/govkit/matrix.py`
 - `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-1.md`
-- `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-2.md`
 - `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-3.md`
 - `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-4.md`
 - `memory/builds/dRedressedBar/spec/2026-10-14-spec-TOOL-dRedressedBar-5.md`
@@ -320,7 +323,7 @@ this unit. The pass adds one rev bump per spec it amends, with the revision line
 |---|---|---|
 | Fold each fix into its sibling spec now, before the siblings build | M4 forbids folding at a CONVERGED exit (owner, SPEC 2026-10-05) | Refused by the method |
 | Rewrite each faulted criterion in place after its unit closes | The sibling's ledger answered the criterion as written; a rewrite leaves the ledger answering text that no longer exists | Rejected; the revision line points here instead |
-| Two batch units split by write set | S7, S17 and S22 all write spec 9, so no split leaves two disjoint write sets (M6 clause 1) | Rejected |
+| Two batch units split by write set | S7, S9 and S22 all write spec 9, so no split leaves two disjoint write sets (M6 clause 1) | Rejected |
 | S22 by pricing alone, §8 F1 option (b) | It leaves a false accept a static probe can see, at the resolver's own second home, against the charter's deny-by-default rule | Recommended against in F1 |
 
 ## 5. Production-readiness checklist
@@ -333,7 +336,7 @@ this unit. The pass adds one rev bump per spec it amends, with the revision line
   verb, so a malformed `settings.json` is reported as a problem instead of an accepted stop.
 - observability — Unchanged output shapes. A refused stop prints the existing
   `no declared outcome accepts that` and `adopter exit 2` lines.
-- risks — The pass edits nine CLOSED specs. Each edit is one rev bump with a revision line, and no
+- risks — The pass edits eight CLOSED specs. Each edit is one rev bump with a revision line, and no
   criterion text moves, so no ledger is contradicted. A narrowed probe that also matched the
   no-hook state would red unit 9's `[dRB-9]` arm, and AC16's first row refuses that.
 - testing — AC1 to AC19 are direct probes, greps and scratch fixtures under `%TEMP%`, each seconds
@@ -422,11 +425,15 @@ runs from the worktree root.
   pointer to unit 9.
   Red when: spec 3 still states its own mechanism for unit 9's defect.
 - **AC14** — When spec 2's Scope section is cut out with `sed -n '/^## 2. Scope/,/^## 3/p'` and
-  searched with `grep -n 'symbols.json'`, it prints S4's by-name Readers line, and spec 2's §7 leg
-  line names `codebase-map coverage + freshness`.
-  Over the tip, `grep -n 'renderAskQuote\|check_outcome_states' memory/map/generated/symbols.json`
-  prints both names, and no `clean` entry names `tools/unattended/gate-guard.js`.
-  Red when: the Readers list omits the map, or the map was not re-derived after unit 7.
+  searched with `grep -n 'symbols.json'`, it prints S4's by-name Readers line and S5's line. The same
+  cut of spec 9 prints S7's line. Spec 2's and spec 9's §7 leg lines each name
+  `codebase-map coverage + freshness`. Over the tip,
+  `grep -n 'renderAskQuote\|check_outcome_states' memory/map/generated/symbols.json` prints both
+  names, and no `clean` entry names `tools/unattended/gate-guard.js`.
+  `git show --name-only --format= <p2>` and `git show --name-only --format= <p9>`, over the two
+  units' product commits, each list `memory/map/generated/symbols.json`.
+  Red when: the Readers list omits the map, or a pass that moved a mapped name committed without the
+  map, so its commit does not list `symbols.json`.
 - **AC15** — When `grep -n -A5 '^\[\[outcome\]\]' tools/govkit/entries/settings-merge.kit.toml`
   runs, it prints one block whose `must_not_exist` is the two-term list in §4, with `code = 2`,
   `must_exist = "{prefix}/settings-merge.py"`, `means = "no-agent-cap-to-wire"` and `ok = true`.
@@ -456,8 +463,8 @@ runs from the worktree root.
   and its §5 security line names the receipt-homed residual and `TOOL-dRedressedBar-11`.
   Red when: the envelope still claims one route, or §5 still says the failure is always reported.
 - **AC19** — When `git diff <p10>~1 <p10> -- memory/builds/dRedressedBar/spec/` runs at this unit's
-  pass commit, each of specs 1 to 9 shows one header rev change and one new revision line, and that
-  line names every report id §4's table assigns the spec. The ledger file S24 names exists and
+  pass commit, each of specs 1 and 3 to 9 shows one header rev change and one new revision line, and
+  that line names every report id §4's table assigns the spec. Spec 2 shows no change. The ledger file S24 names exists and
   carries `**Serves:** journal TOOL-dRedressedBar-10`.
   Red when: a spec takes no bump, two bumps, or a revision line missing one of its ids.
 
@@ -469,7 +476,7 @@ New arm: tools/govkit/matrix.py · covers AC16 · stage unit 9's single-term blo
 
 The main loop runs these once, at the close. `govkit selftest` reads unit 9's `[dRB-9]` arm and the
 three arms unit 3 leaves unscoped over the narrowed block; their fixtures hold no hook at either
-home, so they stay green. `memory hygiene` grades the nine rev bumps and their revision lines.
+home, so they stay green. `memory hygiene` grades the eight rev bumps and their revision lines.
 
 ## 8. Open questions
 
@@ -505,6 +512,14 @@ home, so they stay green. `memory hygiene` grades the nine rev bumps and their r
 - rev-3 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-13`, the batch the
   units-10-11 spec audit's minors were promoted into, for report ids 1, 2, 3, 4, 5, 8, 9, 12, 14,
   15, 16, 18 and 19. No scope, design or criterion moves.
+- rev-4 · 2026-10-14 · S17 · §3 · §4 · §5 · AC14 · AC19 · §7 · the correction unit 2's builder
+  divergence carried here (`prompts/2026-10-14-prompt-TOOL-dRedressedBar-2-2-revision.md`). S17 and
+  AC14 no longer write a note into spec 2 or spec 9 that defers the map to unit 7's regen. Spec 2's rev-3 and spec 9's
+  rev-4 closed report id 17 in place, each pass regenerating and committing `symbols.json`, and S17
+  and AC14 now observe that, including each pass commit's map. Spec 2 leaves §4's table and Files
+  touched, spec 9's row drops id 17, and the Alternatives row names S9 in S17's place. AC19, §5 risks
+  and §7 count eight bumps. The Edges lines to units 2 and 7 no longer read the map after unit 7's
+  regen.
 
 ## 10. Reuse audit
 

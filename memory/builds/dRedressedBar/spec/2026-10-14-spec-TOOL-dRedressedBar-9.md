@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-9 — settings-merge's adopter exit with no agent-cap hook declared an accepted stop, so a gaining update completes
 
-**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
+**Status:** SPECCED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -44,6 +44,11 @@ completes, and so does `apply --kits settings-merge`, which fails the same way t
   called once for lexicon's two existing states and once for settings-merge's three. The
   settings-merge paths are derived from the agent-cap and settings-merge descriptors, never typed.
   Observed by AC4, through the `New arm:` line in §7.
+- **S7** — The symbol index moves with S6's mint. After S1 to S6, the pass runs
+  `python tools/codebase-map/gen_map.py --write` alone, before the product commit. That commit
+  carries `memory/map/generated/symbols.json`, and the map then lists `check_outcome_states` for
+  `tools/govkit/matrix.py`. If `--write` moves any other path, the pass commits nothing and returns
+  to the main loop (§4, "The symbol index"). Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -64,6 +69,8 @@ completes, and so does `apply --kits settings-merge`, which fails the same way t
   `[[files]]` source whose role the version epoch reads (`EPOCH_ROLES`,
   `tools/govkit/govkit.py:12935`). `TOOL-dRedressedBar-7`'s mint over the finished tree measures that
   rather than this spec asserting it.
+- No `python tools/run-gates/regen.py --write`, and no generated output other than the map S7
+  regenerates. Every other declared output is `TOOL-dRedressedBar-7`'s.
 
 ### Edges
 
@@ -75,9 +82,11 @@ completes, and so does `apply --kits settings-merge`, which fails the same way t
   22). S5 and S6 name criteria that never read `tools/govkit/selftest.py` or `tools/govkit/matrix.py`.
   §4's false-accept envelope names one route where three reach it: a single-kit `apply` over a target
   already holding agent-cap, an `update` gaining settings-merge with agent-cap already claimed, and a
-  hook the receipt alone locates. The new `check_outcome_states` reads stale in
-  `memory/map/generated/symbols.json` until unit 7 regenerates it. That unit observes S5 and S6
-  directly, corrects §4 and §5, and, by its F1, narrows this unit's code-2 block with a second
+  hook the receipt alone locates. Report id 17's half on this spec, the map that lists
+  `check_outcome_states`, is closed here by rev-4: S7 regenerates and commits
+  `memory/map/generated/symbols.json` in this unit's own pass, and §7 names
+  `codebase-map coverage + freshness`. That unit observes S5 and S6 directly, reads the committed
+  map, corrects §4 and §5, and, by its F1, narrows this unit's code-2 block with a second
   `must_not_exist` term and adds one row to settings-merge's `check_outcome_states` call. It also
   writes the hands-off to `TOOL-dRedressedBar-7` these Edges lack.
 - **hands-off** `TOOL-dRedressedBar-17` — the `[dRB-9]` update-gaining block, which that unit
@@ -209,6 +218,32 @@ the agent-cap and settings-merge descriptors in the probe directory's context. S
 path agent-cap does not land at reds the "agent-cap.js absent" row rather than passing on a typed
 copy of itself.
 
+### The symbol index
+
+The map's python layer lists every public module-level function under `tools/`
+(`python_symbols`, `tools/codebase-map/map_lib.py:318-360`), and `tools/govkit/matrix.py` is in
+that population: `memory/map/generated/symbols.json:4375-4379` lists its `check_outcome_probes`. So
+the new `check_outcome_states` moves the map. `.githooks/pre-commit:233-246` runs the codebase-map
+gate on any commit that stages a `.py` file and refuses a stale `symbols.json`, and lines 253-257
+refuse regenerated artifacts left unstaged. So the pass regenerates the map with its one declared
+generator, `gen_map.py --write` (the `[[generated]]` row at `tools/codebase-map/kit.toml:148-156`),
+and commits it with the product files. This build's specs 17 (S10) and 19 (§4, "Order, and unit 7")
+take the same step for their own mints.
+
+`gen_map.py --write` renders `inventories.json`, `MAP.md`, `CARDS.md` and `symbols.json`
+(`tools/codebase-map/gen_map.py:137-152`). The first three are built from the kit, hook, gate-leg
+and dossier inventories, not from function names, so this unit moves only `symbols.json`. At
+`3d1adca9`, `python tools/codebase-map/gen_map.py --check` exited 0 (PINNED, 2026-10-14), so a
+second moved path would be a sibling's staleness, which S7 returns rather than commits.
+
+`TOOL-dRedressedBar-2` renames `clean` in `tools/unattended/gate-guard.js`, and its pass also
+commits a regenerated `symbols.json`. Both units sit at order 1. Their write sets meet on that file,
+so by M6 clause 1 they are not disjoint and are built one after the other. `--dispatch` refuses a
+path a still-open sibling pass in the same group already declared
+(`tools/unattended/unattended.sh:13718-13729`). Whichever unit runs second regenerates over a tree
+holding the first one's commit, so its map carries both names. Unit 7's `regen.py --write` then finds
+the map fresh.
+
 ### Inventory
 
 | Identifier | Kind | Naming cell |
@@ -231,6 +266,7 @@ an upgrade step. The next `update` an adopter runs reads the new descriptor and 
 - `tools/govkit/entries/settings-merge.kit.toml`
 - `tools/govkit/selftest.py`
 - `tools/govkit/matrix.py`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -263,7 +299,8 @@ pick is M3's: the most feature-rich survivor after the vetoes.
   prints regardless of the problem count. The main loop's selftest run at the close is the verdict on
   them.
 - testing — AC1 to AC6 are direct probes: greps of the descriptor and scratch targets under `%TEMP%`
-  driven through `tools/govkit/govkit.py`, each seconds long. The two new arms are declared in §7.
+  driven through `tools/govkit/govkit.py`, each seconds long. AC7 reads the committed map. The two
+  new arms are declared in §7.
 - migration — N/A — no receipt, conf or deploy field moves, and existing receipts need nothing.
 - user docs — N/A — `help/` holds one page, `help/roles.md`, and no page covers govkit. The runbook's
   sentence that `apply` and `update --write` wire every hook a default install lands
@@ -316,10 +353,23 @@ pick is M3's: the most feature-rich survivor after the vetoes.
   Red when: the block is keyed on a code the full install reaches, or its probe stops the wiring.
   fixture: a fresh `git init` target under `%TEMP%`; at base the exit, both CONFIGURE lines and the
   wired `agent-cap.js` command read the same, observed at spec time.
+- **AC7** — When a `python` one-liner loads `memory/map/generated/symbols.json` at the unit's tip, it
+  finds one entry with id `check_outcome_states` and file `tools/govkit/matrix.py`. Over
+  `git show 3d1adca9:memory/map/generated/symbols.json` it finds none.
+  `python tools/codebase-map/gen_map.py --check` exits 0 at the tip.
+  `git show --name-only --format= <p9>`, over the pass's product commit, lists
+  `tools/govkit/matrix.py` and `memory/map/generated/symbols.json`, and no other path under
+  `memory/map/`.
+  Red when: the mint is committed without the map, so the map lacks `check_outcome_states` and
+  `--check` names `symbols.json` stale.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `receipt sync (installed files match the receipt)` · `recall floor arms`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `receipt sync (installed files match the receipt)` · `recall floor arms` · `codebase-map coverage + freshness` · `recall floor`
+
+`codebase-map coverage + freshness` reads the map S7 regenerates. `recall floor` is owed by the
+guard join: `memory/map/generated/symbols.json` sits under the `memory/` guard it carries
+(`tools/gate-legs.json:868-875`).
 
 New arm: tools/govkit/selftest.py · covers AC2 · the `[dRB-9]` block over the base descriptor, where the update exits 1 on `no declared outcome accepts that` and `gov_commit` stays at the old vintage · none
 New arm: tools/govkit/matrix.py · covers AC4 · settings-merge's rows of `check_outcome_states` over the base descriptor, where the absent-hook row reads REFUSED; and over a block staged without `must_not_exist`, where the both-present row reads ACCEPTED · none
@@ -344,6 +394,14 @@ none
 - rev-3 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-17`, the batch the
   units-12-15 spec audit's minors were promoted into, for report ids 13 and 20. No scope, design or
   criterion moves.
+- rev-4 · 2026-10-14 · S7 · §3 · §4 · §5 · AC7 · §7 · the correction unit 2's builder divergence
+  carried here (`prompts/2026-10-14-prompt-TOOL-dRedressedBar-2-2-revision.md`): a commit staging a
+  mapped file with a stale `symbols.json` is refused by the pre-commit hook. S7 regenerates the map
+  with `gen_map.py --write` alone and commits it with the product files. §4 Files touched names the
+  map, and §4 gains "The symbol index", with the M6 sequencing against unit 2. AC7 observes the
+  committed map. §7 names `codebase-map coverage + freshness` and `recall floor`. The Edges line to
+  `TOOL-dRedressedBar-10` no longer defers the map to unit 7's regen: report id 17's half on
+  this spec is closed here.
 
 ## 10. Reuse audit
 
@@ -356,7 +414,8 @@ changed. The matrix's engine-agrees loop over lexicon (`tools/govkit/matrix.py:2
 seam, and this unit extracts it into `check_outcome_states` at its second instance. The gotchas
 checklist for the three files selected `staged-break-substitutes-a-synthetic-value` and
 `two-answers-to-one-question`. Both are why the matrix rows derive their paths from the descriptors
-and the selftest arm reads `means` from the descriptor.
+and the selftest arm reads `means` from the descriptor. S7 builds nothing: its seam is the map's
+declared generator, `gen_map.py --write`, the remedy the pre-commit hook names.
 
 The brief and the code disagree in one place. The brief's reuse line says `apply`'s
 requirement-complete selection never meets this defect. It does: settings-merge alone is a

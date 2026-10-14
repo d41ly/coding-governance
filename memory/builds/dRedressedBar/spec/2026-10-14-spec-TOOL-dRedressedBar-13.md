@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-13 — the units-10-11 spec audit's 5 mediums and 18 lows, batched: each criterion half observed in a form that can fail, each false sentence corrected, and the code sites they describe made to say what the specs claim
 
-**Status:** SPECCED · rev-3 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
+**Status:** SPECCED · rev-4 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -71,9 +71,10 @@ names its own id.
   files sit under `{prefix}/govkit`, which the registry exempts (`tools/govkit/registry.toml:295-297`).
   So the kit set AC4 derives from its own `epoch` run is the same set before and after. Observed by
   AC2.
-- **S3** — id 3, L1. Unit 10 S17's spec-9 half is observed in spec 9's Gates section: it names
-  `codebase-map coverage + freshness` as reading stale until unit 7. Spec 10's revision line names
-  this unit's AC3. Observed by AC3.
+- **S3** — id 3, L1. Unit 10 S17's spec-9 half is observed in spec 9's Gates section: its leg line
+  names `codebase-map coverage + freshness`, the leg that reads the `symbols.json` unit 9's own pass
+  regenerates and commits (spec 9's S7). Spec 10's revision line names this unit's AC3. Observed by
+  AC3.
 - **S4** — id 4, L2. Unit 10 AC8's `project-owned` half is observed over spec 4's non-goal list
   alone, cut before its Edges, so the hands-off line cannot satisfy it. Spec 10's revision line
   names this unit's AC4. Observed by AC4.
@@ -475,6 +476,10 @@ none
 - rev-3 · 2026-10-14 · §3 · Edges gain the hands-off to `TOOL-dRedressedBar-17`, the batch the
   units-12-15 spec audit's minors were promoted into, for report ids 3, 5, 6 and 8. No scope, design
   or criterion moves.
+- rev-4 · 2026-10-14 · S3 · the correction unit 2's builder divergence carried here
+  (`prompts/2026-10-14-prompt-TOOL-dRedressedBar-2-2-revision.md`). S3 no longer describes spec 9's
+  leg as deferring the map to unit 7's regen: spec 9's rev-4 has its own pass regenerate and commit
+  `symbols.json`. AC3 and every other item stand as written.
 
 ## 10. Reuse audit
 
