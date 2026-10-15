@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-17 — the units-12-15 spec audit's 12 mediums and 9 lows, batched: each faulted criterion observed in a form that can pass and fail, each false sentence corrected, and the code sites they describe made to hold what the specs claim
 
-**Status:** CLOSED · rev-5 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 12
+**Status:** CLOSED · rev-6 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -13,6 +13,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-17-6-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-6-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-17-7-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-7-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-19 TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-18 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-23-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-23-2-revision.md) | research | TOOL-dRedressedBar-23 TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 |
 | [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-16 TOOL-dRedressedBar-18 |
 | [2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md) | diff-review | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 |
 
@@ -168,7 +169,9 @@ report item share its observation, and each still names its own id.
   `git add --renormalize` and that write, a stretch in which no adopter, leg or runner runs.
   Spec 14's revision line names AC22. Observed by AC22.
 - **S23** — id 23, M10. `ADOPTER_BAR_PATHS` (`:3964`) gains `receipt_path`, so the self-test's
-  routing assertion grades the receipt. Every write to it goes through `write_atomic`: unit 14's
+  routing assertion grades the receipt. That arm's liveness was aggregate over the members, so a
+  member matching nothing passed until `TOOL-dRedressedBar-23` graded each (round-1 closing diff
+  review report id 13). Every write to it goes through `write_atomic`: unit 14's
   early write and RECEIPT write, S22's write, `update`'s three (`:12017`, `:12055`, `:12062`) and
   `adopt`'s (`:12692`). The comment above the constant and `write_atomic`'s docstring name the
   receipt. Spec 14's "When CONFIGURE fails" table gains a row for an interrupt during a receipt
@@ -241,6 +244,10 @@ report item share its observation, and each still names its own id.
   claims observed, which it observes; the note S10 counts, whose label it corrects; the `[dRB-14]`
   checks, which it reads by label. Also this spec's §1, S10, S23, §4, §5, AC1, AC9, AC10, AC23 and
   §10, which it corrects in place (units-16-18 report ids 2, 4, 5, 16, 17, 23, 40 and 41).
+- **hands-off** `TOOL-dRedressedBar-23` — `receipt_path` as a member of `ADOPTER_BAR_PATHS`, which
+  S23 adds, and the `[dRB-12]` sidecar checks S2 adds, beside which that unit's `[dRB-12]` order
+  checks sit. That unit grades the `[-21] AC2` routing arm's liveness per member, and its pass
+  `<w23>` corrects this spec's S23 and §10 in place (round-1 closing diff review report id 13).
 
 ## 4. Design
 
@@ -686,6 +693,14 @@ none
   selects the `[dRB-14]` and `[dRB-15]` checks by label rather than by the span between a label's
   outermost lines; unit 17 observed the span form, which held at its pass, and
   TOOL-dRedressedBar-19's AC41 observes the label form. No other criterion's assertion moves.
+- rev-6 · 2026-10-15 · S23 · §3 · §10 · a records fix for TOOL-dRedressedBar-23, closing the
+  round-1 closing diff review's report id 13 (item L4), written by that unit's spec-writer pass
+  `<w23>`. The status stays CLOSED, and no criterion text moves. S23's routing sentence and §10's
+  "grades the new member with no new code" each gain that the arm's liveness was aggregate: at
+  `c84518fff` its two liveness checks are `bool(_dest21)` and `bool(_routed21)` over the union of
+  the members (`tools/govkit/selftest.py:16449-16455`), so a member matching nothing, as a renamed
+  `receipt_path` would, passed. Edges gain the hands-off to TOOL-dRedressedBar-23, whose AC6
+  observes one liveness check per member.
 
 ## 10. Reuse audit
 
@@ -698,8 +713,9 @@ extended were found by reading the report's citations. `silenced_legs`
 (`tools/govkit/govkit.py:3908-3946`) is the walker S10 generalises, and `write_atomic` with its
 declared population `ADOPTER_BAR_PATHS` (`:3964-3967`) is the writer and the gate S23 extends. The
 selftest's `[-21] AC2` routing arm (`tools/govkit/selftest.py:15838-15917`) grades the new member
-with no new code. `stale_target`, `build_scratch_gov_kit` and the `-13` builders are reused for the
-fixtures. The manifest re-stamp follows commit `2e187ee8b`.
+with no new code. Its liveness was aggregate over the members, so a member matching nothing passed
+until `TOOL-dRedressedBar-23` graded each. `stale_target`, `build_scratch_gov_kit` and the `-13`
+builders are reused for the fixtures. The manifest re-stamp follows commit `2e187ee8b`.
 
 The gotchas checklist for `tools/govkit/govkit.py`, `tools/govkit/selftest.py` and
 `tools/gate-legs.json` selected these classes, each answered here:

@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-16 — an apply that keeps a carried kit's claim keeps that kit's gate-leg ownership too, so a later argv change does not wedge the kit
 
-**Status:** CLOSED · rev-4 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 9
+**Status:** CLOSED · rev-5 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md) | research | TOOL-dRedressedBar-12 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-16-5-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-16-5-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-19 TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-23-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-23-2-revision.md) | research | TOOL-dRedressedBar-23 TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-17 |
 | [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 |
 | [2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md) | diff-review | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 |
 
@@ -41,8 +42,11 @@ the narrower-apply-then-argv-change sequence that the report traced.
 - **S1** — `_cmd_apply`'s LEGS call to `write_gate_legs` (`tools/govkit/govkit.py:7953-7955`) passes
   `carry_out_of_scope=True`. Nothing else in the call or in `write_gate_legs`' body moves: the carry
   at `:4303-4305` already keeps every prior `emitted` row whose `kit` is outside the selection, and
-  the withheld and non-manifest branches already keep the prior rows whole. Observed by AC1, AC2
-  and AC3.
+  the withheld and non-manifest branches already keep the prior rows whole. The non-manifest branch
+  kept `emitted` whole while its order file, `.governance/outbox/gate-legs.md`, listed the
+  selection's legs alone, so a narrower apply over a target with no runner left a carried kit's
+  legs out of the order; `TOOL-dRedressedBar-23` corrects that (round-1 closing diff review report
+  id 4). Observed by AC1, AC2 and AC3.
 - **S2** — The `carry_out_of_scope` paragraph of `write_gate_legs`' docstring, as unit 12's S2
   leaves it, says that both verbs now keep every claimed kit in the receipt's `kits`, so both pass
   the carry, and names `TOOL-dRedressedBar-16`. It no longer argues from the same-argv rule, and it
@@ -102,6 +106,11 @@ the narrower-apply-then-argv-change sequence that the report traced.
   place: both ids required, spec 12's inline note named, the orphan carry stated as an accepted gap,
   two citations, and a row for the contract-parity reader (units-16-18 report ids 8, 9, 18, 30, 31
   and 43).
+- **hands-off** `TOOL-dRedressedBar-23` — `apply`'s `carry_out_of_scope=True`, which S1 passes, so
+  `write_gate_legs`' non-manifest branch sees a carry on a narrower apply. That unit lists every
+  claimed kit's legs in that branch's order file, each through the `_silenced` test, and its pass
+  `<w23>` corrects this spec's S1 and "What an adopter sees change" in place (round-1 closing diff
+  review report id 4).
 
 ## 4. Design
 
@@ -144,6 +153,7 @@ not reach it.
 | or `apply --kits <that kit>` runs | exit 2, `already has a leg named` | exit 0 |
 | a narrower apply where the carried kits declare `subject = "kit"` legs | the held-legs advice counts this run's legs | it counts every kit-subject leg the runner holds, which is what its own comment says it counts (`:7967-7972`) |
 | any apply whose selection covers every claimed kit | as before | unchanged |
+| a narrower `apply` over a target with no `[gate_runner]` | `emitted` is the prior list whole, and `.governance/outbox/gate-legs.md` lists the selection's legs alone | unchanged by this unit. `TOOL-dRedressedBar-23` lists every claimed kit's legs in the order, a carried kit's leg naming a path the target lacks under `## WITHHELD` |
 | after a narrower apply, a failing contract clause whose installed consumer sits on a carried kit's leg | `check` and `update` print it as unwired, because `emitted` lost that leg | `check` and `update` red it again, as after a full apply: `derive_parity_lines` (`tools/govkit/govkit.py:6075`, its `r.fail` at `:6119-6121`, called at `:5416` and `:9658`) builds its leg words from `emitted` (`TOOL-dRedressedBar-19`, units-16-18 report id 30) |
 
 ### The arm
@@ -319,6 +329,14 @@ none
   at `:11898-11903` apart, where both cited one range from `:11880` to `:11891` holding the call
   alone. AC1's assertions do not move. Every citation is at the base `ebce889c`, as §4's evidence
   reads it. TOOL-dRedressedBar-19's AC8, AC9, AC18, AC30, AC31 and AC43 observe these.
+- rev-5 · 2026-10-15 · S1 · §3 · §4 · a records fix for TOOL-dRedressedBar-23, closing the round-1
+  closing diff review's report id 4 (item M3), written by that unit's spec-writer pass `<w23>`. The
+  status stays CLOSED, and no criterion text moves. S1's sentence on the non-manifest branch states
+  that it kept `emitted` whole while its order file listed the selection's legs alone: at
+  `c84518fff` that branch loops `selection` (`tools/govkit/govkit.py:4552`) and sets
+  `emitted = list(prior)` (`:4591`). "What an adopter sees change" gains the row for a narrower
+  apply over a target with no runner, and Edges gain the hands-off to TOOL-dRedressedBar-23, whose
+  AC2 observes the order listing a carried kit's legs.
 
 ## 10. Reuse audit
 

@@ -9,6 +9,8 @@
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-4-revision.md) | research | TOOL-dRedressedBar-21 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-brief.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-brief.md) | research | TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-23-1-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-23-1-spec-writer.md) | journal | — |
+| [2026-10-15-prompt-TOOL-dRedressedBar-23-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-23-2-revision.md) | research | TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-23-3-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-23-3-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

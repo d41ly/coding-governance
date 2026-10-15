@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-14 — a first apply at a per-kit prefix configures against the homes it just wrote: the receipt is written ahead of CONFIGURE
 
-**Status:** CLOSED · rev-7 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 10
+**Status:** CLOSED · rev-8 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -16,6 +16,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-2-revision.md) | research | TOOL-dRedressedBar-15 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md) | research | TOOL-dRedressedBar-17 TOOL-dRedressedBar-9 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-15 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-19 TOOL-dRedressedBar-12 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-23-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-23-2-revision.md) | research | TOOL-dRedressedBar-23 TOOL-dRedressedBar-12 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
 | [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-15 |
 | [2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md) | diff-review | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 |
 
@@ -46,7 +47,8 @@ not reach. That cause is a separate mechanism, and §8 F1 asks where it goes.
   write: `govkit apply — receipt written ahead of CONFIGURE: <n> row(s), <k> kit(s); RECEIPT rewrites it`.
   Observed by AC1, AC3 and AC4.
 - **S2** — The RECEIPT step updates `_rcpt_doc` with `files` re-derived as `rows + _carried_rows`,
-  and with this run's `orders`, `after_map` and `gate_runner`. It writes `_rcpt_doc` with the encoding
+  with this run's `after_map` and `gate_runner`, and with `orders` as this run's `orders`, then every
+  prior order of a carried kit (`TOOL-dRedressedBar-23`). It writes `_rcpt_doc` with the encoding
   and newline arguments it uses today. `install.sums` and the `STEP_RECEIPT` counts are derived from
   `_rcpt_doc`'s lists. Observed by AC1 and AC2.
 - **S3** — A comment above the S1 write says why it exists. It gives the per-kit-prefix case. It
@@ -120,6 +122,11 @@ not reach. That cause is a separate mechanism, and §8 F1 asks where it goes.
   ahead of the receipt write and routes through the atomic writer, and this spec's "When CONFIGURE
   fails" table, to which it adds the row for an interrupt between the two writes (units-16-18
   report id 40).
+- **hands-off** `TOOL-dRedressedBar-23` — `_rcpt_doc` and the RECEIPT update S2 writes, whose
+  `orders` that unit writes as this run's orders followed by every prior order of a carried kit, so
+  a narrower apply no longer drops a carried kit's outbox orders. Also S2 and the `orders` row of
+  "The receipt written ahead", which its pass `<w23>` corrects in place (round-1 closing diff review
+  report id 4).
 - **hands-off** external — `update`'s gained loop runs a gained kit's adopter (`:11104-11126`) before
   its receipt write (`:12017-12062`). So a gained kit at a per-kit prefix is not in the receipt its
   sibling resolvers read. Not measured here.
@@ -164,7 +171,7 @@ with no settings-merge problem.
 | `schema`, `gov_source`, `gov_commit`, `prefix` | as `:8020-8021` computes them today | unchanged |
 | `kits` | `selection + _carried_kits` | unchanged |
 | `files` | `rows + _carried_rows`. Every landed row already carries the `oid` STAGE stamped (`:7638-7645`) | re-derived from `rows + _carried_rows`, after OBSERVE and the re-stamp mutated rows in place |
-| `orders` | the prior receipt's `orders`, else `[]` | this run's `orders` |
+| `orders` | the prior receipt's `orders`, else `[]` | this run's `orders`, then every prior order of a carried kit (`TOOL-dRedressedBar-23`) |
 | `baseline` | this run's `baseline` (BASELINE ran at `:7364-7391`) | unchanged |
 | `after` | the prior receipt's `after`, else `{}` | `after_map` |
 | `hook_block` | `{"state": hook_state}` | unchanged |
@@ -474,6 +481,14 @@ no refusal branch. The main loop observes the new arm red, then green, at the cl
   The row states the order TOOL-dRedressedBar-19's S40 sets, sidecar first and receipt last, and
   that `check` reports the two apart until the next apply rewrites both. TOOL-dRedressedBar-19's
   AC40 observes it with a fault staged on the sidecar write.
+- rev-8 · 2026-10-15 · S2 · §3 · §4 · a records fix for TOOL-dRedressedBar-23, closing the round-1
+  closing diff review's report id 4 (item M3), written by that unit's spec-writer pass `<w23>`. The
+  status stays CLOSED, and no criterion text moves. S2 and the At RECEIPT cell of the `orders` row
+  in "The receipt written ahead" read this run's `orders`, then every prior order of a carried kit.
+  The RECEIPT update this unit built writes `"orders": orders`, this run's alone
+  (`tools/govkit/govkit.py:8341-8344` at `c84518fff`), so a narrower apply kept a carried kit's
+  claim and rows and dropped its hole and machine orders. Edges gain the hands-off to
+  TOOL-dRedressedBar-23, whose AC1 observes the corrected form.
 
 ## 10. Reuse audit
 

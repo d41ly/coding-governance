@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-15 — agent-cap's adopter runs settings-merge's own adopter at settings-merge's home, declared as `[adopt] via`, and selfcheck refuses any argv naming another entry's file
 
-**Status:** CLOSED · rev-6 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 11
+**Status:** CLOSED · rev-7 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -13,6 +13,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-15-brief.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-15-brief.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md) | research | TOOL-dRedressedBar-17 TOOL-dRedressedBar-9 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-19 TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-23-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-23-2-revision.md) | research | TOOL-dRedressedBar-23 TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
 | [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 |
 | [2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md) | diff-review | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 |
 
@@ -162,6 +163,11 @@ which unit 14 left saying the receipt is not yet written (S10).
 - **hands-off** `TOOL-dRedressedBar-19` — the cross-entry selfcheck note S5 mints, whose label that
   unit corrects once unit 17 has widened the offered population, and this spec's ownership-join
   paragraph and note template, which it corrects in place (units-16-18 report id 2).
+- **hands-off** `TOOL-dRedressedBar-23` — the gained loop's spawn of `_res_g`, which S3 resolves,
+  and the CONFIGURE comment S10 restates. That unit routes the CONFIGURE, regenerate and gained-loop
+  spawns through one helper, `run_target_argv`, which decodes UTF-8 with replacement, so the
+  comment's decode sentence holds for all three. Its pass `<w23>` corrects this spec's §4 "The
+  CONFIGURE comment, restated" in place (round-1 closing diff review report id 5).
 - **hands-off** external — `TOOL-aScouredKit-26`, the open ask for a cross-entry destination token,
   stays open. `via` names a whole adopter and passes no sibling's destination into an argv, so
   drift-audit's `DRIFT_WORKFLOWS_REL` workaround is untouched.
@@ -369,6 +375,13 @@ landed bytes and the early receipt stay, the receipt carrying the prior run's or
 gate runner, `install.sums` is not rewritten, and the adopters after this kit never run: the
 interrupt the receipt comment above says a re-run of `apply` recovers from.
 ```
+
+Its decode sentence read as saying the gained loop decodes as CONFIGURE does. It did not: the gained
+loop passed `encoding="utf-8"` with no `errors` keyword, so it decoded strictly
+(`tools/govkit/govkit.py:11445-11446` at `c84518fff`), until `TOOL-dRedressedBar-23`. From that
+unit on, the CONFIGURE spawn, the regenerate spawn and the gained loop's share one helper,
+`run_target_argv`, which decodes UTF-8 with replacement, so the three cannot disagree (round-1
+closing diff review report id 5).
 
 ### Inventory
 
@@ -644,6 +657,15 @@ none
   (`tools/govkit/govkit.py:3351-3354` at `997fc294f`), and the "What it does not check" bullet on
   space-bearing elements, which the new GRADED test grades. At `997fc294f` the engine's note still
   carries the old label (`:3348`), which TOOL-dRedressedBar-19's S2 corrects and its AC2 observes.
+- rev-7 · 2026-10-15 · §3 · §4 · a records fix for TOOL-dRedressedBar-23, closing the round-1
+  closing diff review's report id 5 (item M4), written by that unit's spec-writer pass `<w23>`. The
+  status stays CLOSED, and neither S10 nor any criterion moves. The comment S10 restated says the
+  CONFIGURE spawn decodes UTF-8 "as the regenerate site and the gained loop decode", and the gained
+  loop decoded strictly (`tools/govkit/govkit.py:11445-11446` at `c84518fff`), so a non-UTF-8 byte
+  in a refused gained adopter's stderr made its problem line claim it printed nothing on Windows and
+  raised `UnicodeDecodeError` on POSIX. §4 "The CONFIGURE comment, restated" gains a paragraph under
+  the quoted comment saying so, and Edges gain the hands-off to TOOL-dRedressedBar-23, whose AC3
+  observes the shared helper.
 
 ## 10. Reuse audit
 

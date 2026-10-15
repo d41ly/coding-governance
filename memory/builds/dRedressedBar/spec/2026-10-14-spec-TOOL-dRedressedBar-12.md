@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-12 — an apply narrower than its receipt keeps every other installed kit's claim and rows, so a refused settings-merge exit stays refused on the next run
 
-**Status:** CLOSED · rev-8 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 8
+**Status:** CLOSED · rev-9 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -15,6 +15,7 @@
 | [2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-16-4-revision.md) | research | TOOL-dRedressedBar-16 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-17-4-revision.md) | research | TOOL-dRedressedBar-17 TOOL-dRedressedBar-9 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-19 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-23-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-23-2-revision.md) | research | TOOL-dRedressedBar-23 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
 | [2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 |
 | [2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md) | diff-review | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 |
 
@@ -120,10 +121,12 @@ the `pins` union at `:7402-7407` already does for line-ending pins.
 - **hands-off** `TOOL-dRedressedBar-19` — the docstring paragraph S2 writes, whose unit-12 id that
   unit keeps beside unit 16's after unit 16 rewrites the paragraph, and S2 itself, which it marks
   superseded by unit 16 in place (units-16-18 report ids 8 and 31).
-- **hands-off** external — `apply` writes `orders` for its selection alone (`:7666-7712`), so an
-  outbox order a carried kit's hole owns leaves the receipt on a narrower apply. `check` grades only
-  the orders a receipt records (`:5394-5405`), so the loss is a missing instruction and never a
-  refusal. Whether a carried kit's order should survive is its own unit.
+- **hands-off** `TOOL-dRedressedBar-23` — the receipt's `orders`. `apply` writes `orders` for its
+  selection alone (`:7666-7712`), so an outbox order a carried kit's hole or machine-scoped rule
+  owns leaves the receipt on a narrower apply. `check` grades only the orders a receipt records
+  (`:5394-5405`), so the loss is a missing instruction and never a refusal. That unit carries every
+  prior order of a carried kit after this run's, as S1 carries its rows, and extends the `[dRB-12]`
+  block to observe it (round-1 closing diff review report id 4).
 
 ## 4. Design
 
@@ -377,6 +380,14 @@ none
   docstring of `write_gate_legs` still carries this unit's id beside unit 16's
   (`tools/govkit/govkit.py:4248-4253`). TOOL-dRedressedBar-19's AC31 observes the note, and its AC8
   observes both ids in the docstring.
+- rev-9 · 2026-10-15 · §3 · a records fix for TOOL-dRedressedBar-23, closing the round-1 closing
+  diff review's report id 4 (item M3), written by that unit's spec-writer pass `<w23>`. The status
+  stays CLOSED, and no scope, design or criterion moves. The external hand-off on `orders` becomes
+  the hands-off to TOOL-dRedressedBar-23, the unit the owner promoted id 4 into, which carries a
+  carried kit's orders as this unit carries its rows. Its base citations stand. At `c84518fff`
+  `_cmd_apply` builds the orders at `tools/govkit/govkit.py:7962-7963` and `:7993-7994` and writes
+  them at `:8341-8344`, and `check` grades them at `:5611-5631`. TOOL-dRedressedBar-23's AC1
+  observes the carried orders.
 
 ## 10. Reuse audit
 
