@@ -1036,3 +1036,235 @@ verbatim:
  "checklist": "# recurring-bug-class checklist for e7839224c..9e0e43aef (12 changed file(s))\n- two-answers-to-one-question (universal)\n  a fact stated in two places drifts, and the copies need not disagree loudly to be wrong\n- amendment-leaves-its-other-half-standing (directory)\n  a criterion is amended and the clause, scope item or log line that only made sense under the old wording is left behind, so one rule now returns two verdicts\n- fixture-passes-by-finding-nothing (universal)\n  a test arm whose fixture never triggers the rule passes, and proves nothing\n- retirement-inventory-misses-readers-by-value (directory)\n  an inventory of what reads a retired thing, built by searching for its name, misses every assertion on a count or a value that thing carries, because those name nothing\n- staged-break-substitutes-a-synthetic-value (universal)\n  an arm that proves a mechanism by replacing the shipped value with a simpler one proves the mechanism for the simpler value\n- inline-fence-swallows-the-rest-of-the-file (universal)\n  a triple-backtick written inline in prose opens a fence the reader never closes, so every section after it silently disappears from the checker's view"
 }
 ```
+
+### The follow-up round's args
+
+Dispatch 48, run as `wf_e26eda01-523`: round 2 over the fixes, handed round 1's confirmed set in the harness's own shape, trimmed to the fields its prompt reads. Verbatim:
+
+```json
+{
+ "kind": "diff-review",
+ "base": "9e0e43aef628987c5a63ec8e0b2ad1fba438b5c7",
+ "head": "2e6f9aa1b100aa190d2099fcc990a0a2292f98b2",
+ "repo": "C:/projects/coding-governance/.claude/worktrees/gov-architecture-plan-e34297",
+ "round": 2,
+ "priorFindings": [
+  {
+   "id": 1,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:250",
+   "claim": "The fix for `flakes-quarantine-seam` puts `test.flakes` on the wrong branch. It is reached only from `test.verdict`'s green outcome, but the bar prints `nondeterministic · <leg>` only on a run it has already turned red.",
+   "severity": "high"
+  },
+  {
+   "id": 2,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:297",
+   "claim": "`deploy.core` is called 'the lander's post-merge bar', with 'clean → deploy.record'. The lander starts that bar only on its exit-0 path, starts it detached, and records no result. This tree also declares no `GATE_POST_MERGE`.",
+   "severity": "high"
+  },
+  {
+   "id": 3,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:296",
+   "claim": "`deploy.land` claims to push 'the prepared merge and nothing else, reusing its verdict', with 'the tip moved → Test' as its own outcome. On a push race, though, `--land` re-prepares onto the new tip and pushes that new merge itself, and it never returns a 'tip moved' class.",
+   "severity": "medium"
+  },
+  {
+   "id": 4,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:405",
+   "claim": "The build's transition table lacks transitions that the folded items route. The engine 'refuses any transition the table lacks', so those routes cannot be taken.",
+   "severity": "medium"
+  },
+  {
+   "id": 5,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:294",
+   "claim": "C1: the owner's landing gate is placed in two incompatible spots. `deploy.mandate` checks 'the owner's landing gate before it' and is proven by 'the gate's witness'. Lines 319 and 348 put that gate 'before `deploy.parents`', which is after `deploy.mandate`.",
+   "severity": "medium"
+  },
+  {
+   "id": 6,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:340",
+   "claim": "C1, LR-3 misapplied: 'An owner breakpoint is an owner item. It parks the build, and resolves as `run.on-owner-question` says.' Under the default `best-effort-recorded` no build parks, and `park-build` is only one of four values.",
+   "severity": "medium"
+  },
+  {
+   "id": 7,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:389",
+   "claim": "C1: there are two copies of the mailbox-prune rule, and they disagree. `deploy.release` prunes the mailbox ref 'once the build folder holds every disposed message'. `life.release` 'deletes the leases and the mailbox ref' with no such condition.",
+   "severity": "medium"
+  },
+  {
+   "id": 8,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md:804",
+   "claim": "C1: v2's dDeclaredLoop row was edited by the fold, which added `gap-flow-15`, but it still specifies 'a default failure route (the refusal recorded, `next` naming the first unwitnessed item)'. That is the wording the `first-unwitnessed-item` defect retired.",
+   "severity": "low"
+  },
+  {
+   "id": 9,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:35",
+   "claim": "Under LR-5, every ask a core item files must use one of four mechanical acceptance forms: a red, an unverified finding, a stray or a repair. But several core items here file asks that fit none of the four.",
+   "severity": "medium"
+  },
+  {
+   "id": 10,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:38",
+   "claim": "C1: flow-steps' copy of the mechanical acceptance forms has drifted from memory [asks]:441-444, its source. Here a red is 'the leg green on the default branch' (memory: 'a later green of the same leg'), and a stray is 'the stray claimed' (memory: 'the path claimed or reverted').",
+   "severity": "low"
+  },
+  {
+   "id": 11,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:314",
+   "claim": "The fix for `record-concurrent-mint` mints every id 'under the build's lease'. But the flow writes the first records of a build before any build lease exists, and the slug that the lease is keyed by is itself minted by `record`.",
+   "severity": "medium"
+  },
+  {
+   "id": 12,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:622",
+   "claim": "Under LR-6, a build lands its `gov:feature` anchor while its reuse entry is only 'proposed or accepted', and the check runs both ways. No rule covers the owner rejecting the proposal after the build has landed.",
+   "severity": "medium"
+  },
+  {
+   "id": 15,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md:801",
+   "claim": "C1: 'All four layers are folded: 206 defects placed, and every map row's disposition set' gives a different total from the per-layer entries above it and from the comparison record. Those count 54 + 61 + 39 + 73 = 227 placed defects, and [folded] tallies 227 rows.",
+   "severity": "low"
+  },
+  {
+   "id": 16,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:221",
+   "claim": "The `policy-lists-incomplete` fix is still incomplete for `flow.route-backs`. [rules]:32-34 says every route back counts against it, yet only the breakpoint's policy list (line 374) names it.",
+   "severity": "low"
+  },
+  {
+   "id": 17,
+   "lens": "seams",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:296",
+   "claim": "deploy.land's exit routes misread the lander. On exit 4 the route goes to deploy.core and then deploy.record, but the lander exits 4 before it writes the marker or starts the post-merge bar. And exit 1 also covers a push that landed but could not be recorded, yet it is routed back to Test to prepare again.",
+   "severity": "high"
+  },
+  {
+   "id": 18,
+   "lens": "seams",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:297",
+   "claim": "deploy.core's actor is 'the lander's post-merge bar (GATE_POST_MERGE)', but that bar is optional and fire-and-forget, and it is not declared on this tree at all. The item's witness has no producer to read and no route for the case where no result ever arrives.",
+   "severity": "medium"
+  },
+  {
+   "id": 19,
+   "lens": "seams",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:253",
+   "claim": "test.flakes never reads `verdict.flakes`. It always turns a leg past the threshold into a held leg, and it uses `verdict.held` as the quarantine carrier, although that key only sets when held legs run.",
+   "severity": "medium"
+  },
+  {
+   "id": 20,
+   "lens": "seams",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:405",
+   "claim": "The new [transitions] table does not cover routes the Plan program declares. Triage's defer, retire and refuse, `plan.dedupe`'s duplicate route back to `entry.place`, and a triage-selected ask entering Plan have no row, and none of them has a terminal state.",
+   "severity": "medium"
+  },
+  {
+   "id": 21,
+   "lens": "seams",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:35",
+   "claim": "[rules] closes every ask a core item files to the four mechanical acceptances (LR-5), but the programs' own items file asks that fit none of the four.",
+   "severity": "medium"
+  },
+  {
+   "id": 22,
+   "lens": "seams",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md:804",
+   "claim": "C2: the fold edited dDeclaredLoop's row (adding gap-flow-15) but left its default failure route as '`next` naming the first unwitnessed item'. flow-steps [rules] was amended (`first-unwitnessed-item`) so that `next` returns the frontier.",
+   "severity": "medium"
+  },
+  {
+   "id": 23,
+   "lens": "seams",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-flow.md:36",
+   "claim": "C2: the fold made `test.verdict` runner-written ('the runner writes the verdict record for the tree, which the pre-push hook reads', `hook-actor-kind`). It left four carriers of the hook-written verdict standing: layer-flow's Test row ('the declared backend's hook-written verdict'), v2 [contracts]' Test row (v2:788), dWitnessedBar's planned unit 'the hook-written verdict' (v2:809), and flow-roles:95.",
+   "severity": "medium"
+  },
+  {
+   "id": 24,
+   "lens": "seams",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-roles.md:242",
+   "claim": "C2: the fold concluded that no landing queue exists, because the turnstile is a host-wide bar semaphore that push-main.sh never takes (gap-flow-08; flow-steps [deploy]). flow-roles still settles that 'Landings on a node pass through the turnstile landing queue that already exists', and its [closed] H7 row repeats 'the existing turnstile landing queue'. layer-runtime:892 also still gives dShippedRelease 'the turnstile queue'.",
+   "severity": "medium"
+  },
+  {
+   "id": 25,
+   "lens": "seams",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md:54",
+   "claim": "C2: the fold amended flow-roles [cycle] step 2 so that the prompt writer receives the resolved work order with inputs as keyed content (`cycle-amendment`). The roles record's own summary of that cycle still says 'The driver hands the prompt writer the item's details, with references to its input records', although the fold edited the bullet just above it (line 47).",
+   "severity": "low"
+  },
+  {
+   "id": 26,
+   "lens": "seams",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md:446",
+   "claim": "Two carriers are named for the same load-point budget. Instruction R-C says the budgets extend `tools/template-size-limits.txt` and 'a new load point joins that table'. The roles fold says a role's static block's budget is `check_roles.py`'s `BODY_CEILINGS`, 'one carrier' (layer-roles:376, R3-A).",
+   "severity": "medium"
+  },
+  {
+   "id": 28,
+   "lens": "verification",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:628",
+   "claim": "C3: The `[annotations]` resolve check is built on a drift-audit signal that cannot fail. `source_cited_ids_resolving_to_no_record` is report-only (`gateable: False`), and its RATCHETS row only guards raising the pin. The signal counts record ids matched by the id grammar, so it never reads a `refs=<path>` or a `gov:feature` tag. The fold's own fix for `annotation-green-vacuous` (row 1043), 'seen red on a planted reference', therefore has no red to observe.",
+   "severity": "medium"
+  },
+  {
+   "id": 29,
+   "lens": "verification",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md:1159",
+   "claim": "C3: The revised `role_matrix.py` drops every item row under a heading outside its hard-coded STEPS list without any message. It asserts no item population, so all three arms pass by not reading the rows.",
+   "severity": "medium"
+  },
+  {
+   "id": 30,
+   "lens": "verification",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:415",
+   "claim": "The new `[transitions]` table says 'the engine refuses any transition the table lacks', yet it lacks routes that the folded items declare. No check joins the items' `Then` cells to the table.",
+   "severity": "medium"
+  },
+  {
+   "id": 31,
+   "lens": "verification",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md:950",
+   "claim": "`tally_folded.py`'s only refusal, an unknown disposition, was never seen red, and none of its runs is recorded. `set_dispositions.py` beside it has both reds recorded.",
+   "severity": "low"
+  }
+ ],
+ "intensity": "light",
+ "reviewDir": "memory/builds/dClosedLoop/reviews",
+ "roles": {
+  "diffFinder": "gov-diff-reviewer",
+  "skeptic": "gov-skeptic",
+  "synthesis": "gov-synthesizer"
+ },
+ "efforts": {
+  "diffFinder": "high",
+  "skeptic": "high",
+  "synthesis": "high"
+ },
+ "specs": [
+  "memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md",
+  "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared.md",
+  "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md"
+ ],
+ "context": "The follow-up round of the closing review of build dClosedLoop's fold, a design-only build that re-architects gov onto one loop. Round 1 (memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md) reviewed the fold of two Tier-2 rounds into the four layer records and found 28 confirmed findings in 24 items, handed here as priorFindings. This diff is the fix of those items, plus the owner's LR-7 answer, plus the dispatch record: flow-steps.md (the Test and Deploy items, the transition table, the breakpoint, the mailbox rule), the memory, instruction and roles records, layer-flow, flow-roles, the runtime record, v2, the gap register, the session log, the comparison record's [closing-review] table, the instruments record, role_matrix.py's arm 0 inside the roles record, and three new bug-class records under memory/gotchas/. Review it for three things: (1) a prior finding whose fix is absent, partial, or not what the [closing-review] table says it is; (2) fix text that introduces a new defect: a route, outcome, witness or carrier the named actor never produces, a statement that contradicts another record, or an owner answer misapplied; (3) a check said to be seen red with no recorded run, or a new gotcha record whose anchors or resolution do not hold. Write the report to memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md. Its head carries an H1, then, within its first twelve lines, the line `**Serves:** diff-review PLAY-dClosedLoop-1`. It carries exactly one `## Verdict:` line, whose token is CLEAN, CLEAN WITH FIXES or BLOCKED and nothing else.",
+ "byDesign": "- The build is design-only: no product code and no unit specs. Unit-level detail is absent by design and owed to the chain builds.\n- The owner's settled answers (F*, R-*, RT-*, LR-1 to LR-7) are decisions: a finding may show that one contradicts a record or the tree, but does not re-argue the owner's choice.\n- Round 1's refuted findings (ids 13, 14 and 27) are out of scope unless the fix made them true.\n- Dated records keep what held when they were written: research returns, snapshots, revision notes and the session log's past entries.\n- Generated files (memory/LIVE.md, the build README's generated regions and memory/gotchas/INDEX.md) are rendered and not under review.",
+ "checklist": "# recurring-bug-class checklist for 9e0e43aef..2e6f9aa1b (18 changed file(s))\n# 10 class(es) selected by an anchor + 6 universal\n# by anchor specificity: 3 path · 4 directory · 3 basename; a cut tier prints one line per class\n# invariants are read at 9e0e43aef628; 0 that this subject adds, edits or takes out are listed as items, never by design\n\n- [ ] fixture-passes-by-finding-nothing (universal)\n      a test arm whose fixture never triggers the rule passes, and proves nothing\n      memory/gotchas/fixture-passes-by-finding-nothing.md\n\n- [ ] guard-above-a-fold-makes-its-fallback-dead (universal)\n      a guard added above a fold settles the predicate the fold's own fallback re-tests, leaving a dead arm that reads as coverage\n      memory/gotchas/guard-above-a-fold-makes-its-fallback-dead.md\n\n- [ ] heredoc-escape-reaches-the-regex (universal)\n      source written through a shell heredoc into a non-raw string turns an escape into a control byte, and the symptom never looks like a quoting problem\n      memory/gotchas/heredoc-escape-reaches-the-regex.md\n\n- [ ] inline-fence-swallows-the-rest-of-the-file (universal)\n      a triple-backtick written inline in prose opens a fence the reader never closes, so every section after it silently disappears from the checker's view\n      memory/gotchas/inline-fence-swallows-the-rest-of-the-file.md\n\n- [ ] staged-break-substitutes-a-synthetic-value (universal)\n      an arm that proves a mechanism by replacing the shipped value with a simpler one proves the mechanism for the simpler value\n      memory/gotchas/staged-break-substitutes-a-synthetic-value.md\n\n- [ ] two-answers-to-one-question (universal)\n      a fact stated in two places drifts, and the copies need not disagree loudly to be wrong\n      memory/gotchas/two-answers-to-one-question.md\n\n- [ ] parser-drops-rows-it-cannot-place (path)\n      a record-parsing instrument skips rows under a heading or key it does not know and still prints a clean run, so its population shrinks without a word\n      memory/gotchas/parser-drops-rows-it-cannot-place.md\n\n- [ ] owner-item-without-its-reject-outcome (path)\n      a design hands a decision to the owner and routes only the yes, so a no leaves landed work with no route and a check that turns red on the default branch\n      memory/gotchas/owner-item-without-its-reject-outcome.md\n\n- [ ] route-names-an-output-its-actor-never-emits (path)\n      a designed route or witness names an output, exit class or record that its actor never produces on that path, so the route is dead or waits forever\n      memory/gotchas/route-names-an-output-its-actor-never-emits.md\n\n- [ ] a-merge-of-the-default-branch-read-as-additions (directory)\n      a check that lists the files a range or a commit ADDS reads a merge of the default branch into a feature branch as adding every file the default branch gained, unless its git invocation is one of the shapes that cannot\n      memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md\n\n- [ ] amendment-leaves-its-other-half-standing (directory)\n      a criterion is amended and the clause, scope item or log line that only made sense under the old wording is left behind, so one rule now returns two verdicts\n      memory/gotchas/amendment-leaves-its-other-half-standing.md\n\n- [ ] ledger-token-wrapped-across-a-line-joins-nothing (directory)\n      hygiene check 23 extracts a ledger line's backticked tokens PER LINE, so a token the writer wrapped across a line break belongs to no line and the criterion it answers reads as unanswered\n      memory/gotchas/ledger-token-wrapped-across-a-line-joins-nothing.md\n\n- [ ] retirement-inventory-misses-readers-by-value (directory)\n      an inventory of what reads a retired thing, built by searching for its name, misses every assertion on a count or a value that thing carries, because those name nothing\n      memory/gotchas/retirement-inventory-misses-readers-by-value.md\n\n- [ ] record-without-serves-or-with-a-round-counter (basename)\n      a new build record owes a Serves line and a filename that projects it, and a round counter in that filename mints an id nothing defines\n      memory/gotchas/record-without-serves-or-with-a-round-counter.md\n\n- [ ] a-folded-field-leaves-its-row-shape-docs-behind (basename)\n      a review fold adds a key to a declared row shape in the code and its gate, and the spec body and the README that describe that shape keep the old key set\n      memory/gotchas/a-folded-field-leaves-its-row-shape-docs-behind.md\n\n- [ ] git-rm-cached-refuses-a-diverged-index-blob (basename)\n      `git rm --cached` refuses a path whose index blob differs from both HEAD and the worktree, so a fixture cleanup without `-f` silently leaves the file staged and the next arm measures the wrong fixture\n      memory/gotchas/git-rm-cached-refuses-a-diverged-index-blob.md\n\n# by design — 0 invariant(s) this selection touches"
+}
+```
