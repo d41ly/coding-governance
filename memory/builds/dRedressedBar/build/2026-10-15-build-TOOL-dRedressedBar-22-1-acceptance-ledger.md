@@ -35,11 +35,12 @@ the new code are the `New arm:` lines' RED-first observations, owed to the close
   and the wrapped `scan_root_exits` raised on its next call. `main` returned 130 in 3.1 s, the
   envelope's `exit` read 130, and `raw_kept` held `hold` with `interrupted` and `orphan`, its path
   still on disk, with `interrupted; held by a process still running: [WinError 32] ...`. `0.json`
-  existed, the stderr line read `INTERRUPTED — 1 leg(s) left running; 2 raw capture(s) kept, each
-  named in raw_kept`, and `run_profile`'s source carries `write_final_capture(` twice. Both kept
-  captures unlinked within the probe's 30 s wait. Spec 18's "The record" carries
-  `TOOL-dRedressedBar-22`. Red over `<pre>`: `raw_kept` named `hold` alone, the line read `their
-  captures kept`, and the orphan's unredacted capture stayed on disk with no name.
+  existed, and the stderr line read
+  `INTERRUPTED — 1 leg(s) left running; 2 raw capture(s) kept, each named in raw_kept`.
+  `run_profile`'s source carries `write_final_capture(` twice. Both kept captures unlinked within
+  the probe's 30 s wait. Spec 18's "The record" carries `TOOL-dRedressedBar-22`. Red over `<pre>`:
+  `raw_kept` named `hold` alone, the line read `their captures kept`, and the orphan's unredacted
+  capture stayed on disk with no name.
 - AC3 — `_base_executable` — a venv made by `-m venv --without-pip` from `sys._base_executable`
   took 0.05 s. `measure_job_children` over its `Scripts/python.exe` read (4, 3), a difference of 1,
   and with `JOB_CHILD_PROGRAM` rebound to spawn `sys.executable` read (5, 3), a difference of 2.
@@ -52,12 +53,13 @@ the new code are the `New arm:` lines' RED-first observations, owed to the close
 - AC11 — `keeps no child` — with `measure_job_children` rebound to (2, 2), `main` over
   `serial.json` returned 2 with exactly one REFUSED line carrying `keeps no child`, no `Traceback`
   and `--out` empty. With `check_app_alias` also reading True for a `bash` stem, it returned 2 with
-  one line naming `C:/Program Files/Git/usr/bin/bash.exe` and `no rule here resolves an alias that
-  is not PYBIN`, `--out` empty. `resolve_launcher_aliases` over a launcher whose path names no file
-  refused carrying `os.lstat cannot`, and over the base interpreter with `measure_job_children` at
-  (2, 1) returned no substitution. `resolve_alias_interpreter` refused `echo` carrying `no plain
-  file`, and returned `C:/Users/d41ly/AppData/Local/Programs/Python/Python312/python.exe`, a file,
-  for the base interpreter. Spec 18's §5 carries `TOOL-dRedressedBar-22`. Both red halves are
+  one line naming `C:/Program Files/Git/usr/bin/bash.exe` and carrying
+  `no rule here resolves an alias that is not PYBIN`, `--out` empty. `resolve_launcher_aliases`
+  over a launcher whose path names no file refused carrying `os.lstat cannot`, and over the base
+  interpreter with `measure_job_children` at (2, 1) returned no substitution.
+  `resolve_alias_interpreter` refused `echo` carrying `no plain file`, and returned
+  `C:/Users/d41ly/AppData/Local/Programs/Python/Python312/python.exe`, a file, for the base
+  interpreter. Spec 18's §5 carries `TOOL-dRedressedBar-22`. Both red halves are
   staged breaks, owed with the `test_alias_refusals` arm.
 - AC15 — `memio: wrote 200 MiB` — `measure_legs.py --serial` over `memio.py 1` exited 0 and its
   `0.log` read `memio: wrote 1 MiB`. On node d, with `resolve_launcher_aliases` rebound to
