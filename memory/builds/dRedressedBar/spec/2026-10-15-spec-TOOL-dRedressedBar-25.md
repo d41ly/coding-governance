@@ -1,11 +1,12 @@
 # TOOL-dRedressedBar-25 — the round-2 review's profiler findings, batched: the A/B verdict gate grades the condition, the selftest's guard covers its kit dir, and AC9's orphan is waited on
 
-**Status:** INPROGRESS · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 19
+**Status:** CLOSED · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 19
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-15-build-TOOL-dRedressedBar-25-1-acceptance-ledger.md](../build/2026-10-15-build-TOOL-dRedressedBar-25-1-acceptance-ledger.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-25-1-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-25-1-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-25-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-25-2-revision.md) | research | TOOL-dRedressedBar-18 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-25-3-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-25-3-spec-writer.md) | journal | — |
