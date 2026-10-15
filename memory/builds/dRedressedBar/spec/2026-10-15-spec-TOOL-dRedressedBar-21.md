@@ -11,6 +11,8 @@
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-3-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-3-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-4-revision.md) | research | TOOL-dRedressedBar-23 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-5-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-5-spec-writer.md) | journal | — |
+| [2026-10-15-prompt-TOOL-dRedressedBar-21-6-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-6-revision.md) | research | TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-21-7-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-7-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-brief.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-brief.md) | research | TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-24-brief.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-24-brief.md) | research | TOOL-dRedressedBar-24 |
 

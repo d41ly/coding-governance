@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-18 — a gate profiler: every leg run clean and unbounded, serially or under a load cap, each profiled to its processes, stalls reported and never killed
 
-**Status:** CLOSED · rev-5 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 13 · ratified 2026-10-15
+**Status:** CLOSED · rev-6 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 13 · ratified 2026-10-15
 
 <!-- gen:spec-records -->
 
@@ -14,6 +14,7 @@
 | [2026-10-15-prompt-TOOL-dRedressedBar-18-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-18-4-revision.md) | research | TOOL-dRedressedBar-19 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-18-5-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-18-5-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-19 TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-21-6-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-6-revision.md) | research | TOOL-dRedressedBar-21 TOOL-dRedressedBar-19 |
 | [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
 | [2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md) | diff-review | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 |
 
@@ -174,6 +175,10 @@ record names each such substitution (F3).
   touched"). And this spec's prose, §7 leg line and revision line, which it
   corrects in place (units-16-18 report ids 1, 6, 7, 10 to 15, 19 to 22, 24 to 27, 29, 32 to 39
   and 42).
+- **hands-off** `TOOL-dRedressedBar-21` — `write_atomic`, whose fixed `.tmp` name that unit
+  replaces with a `tempfile.mkstemp` temp (closing review round 1, H1), and the capture's open in
+  `run_leg` and its read and delete in `write_leg_capture`, which that unit holds to the file
+  `build_capture_file` made (the owner's ruling of 2026-10-15).
 - **hands-off** external — a `derive-ceilings.py` that reads `gate-profile/` records directly. It is
   not built here: readings enter through the existing `--observed` route.
 - **hands-off** external — the first full profiled run over the fixed tree, and the
@@ -1070,6 +1075,16 @@ at the close.
   (AC38, AC39). Id 42: this spec's AC6 matched `STALLED` over the whole stdout of a three-leg run,
   so a STALLED line naming a sibling would have passed it; AC42 reads the line by its leg. Runner
   lines this pass cites are at the base `ebce889c`, the tip's named beside them where they moved.
+- rev-6 · 2026-10-15 · §3 · a records fix for TOOL-dRedressedBar-21, which closes the round-1
+  closing diff review's H1 (report id 1) and, by the owner's ruling of 2026-10-15, the same class at
+  a leg's own capture, written by that unit's spec-writer pass `<w21>`. The status stays CLOSED.
+  §3's Edges gain the hands-off to TOOL-dRedressedBar-21: `write_atomic`'s fixed `.tmp` name, and
+  the capture's open in `run_leg` and its read and delete in `write_leg_capture`, which that spec
+  holds. No sentence here is false after that unit. Each was re-read at `9bf1eb443`, where it sits
+  on the line that spec cites, and this revision's §3 bullet moves each down four: `:351`, `:520`,
+  `:537` and `:752-755` still hold, and so does `:528-536`, because a capture kept for any reason is
+  named in `raw_kept` and the deletes it lists stay the only ones. No scope item, design or
+  criterion moves.
 
 ## 10. Reuse audit
 

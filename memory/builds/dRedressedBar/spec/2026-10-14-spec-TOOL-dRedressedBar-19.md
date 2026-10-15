@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-19 — the units-16-18 spec audit's 19 mediums and 22 lows, batched: the profiler's census, path, launch, turnstile, redaction and leg-declaration gaps closed, the receipt sidecar made atomic, and specs 12 and 14 to 18 corrected
 
-**Status:** CLOSED · rev-6 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 14
+**Status:** CLOSED · rev-7 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
@@ -15,6 +15,7 @@
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-5-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-5-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-6-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-6-revision.md) | research | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-7-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-7-spec-writer.md) | journal | — |
+| [2026-10-15-prompt-TOOL-dRedressedBar-21-6-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-6-revision.md) | research | TOOL-dRedressedBar-21 TOOL-dRedressedBar-18 |
 | [2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md) | diff-review | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-20 |
 
 <!-- /gen:spec-records -->
@@ -241,16 +242,16 @@ record. Items that share a report item share its observation, and each still nam
   error other than absence raises. What remains is the arm the §7 `New arm:` line declares, over
   AC36's key. Observed by AC36.
 - **S38** — id 38, M14, by the skeptic's corrected fix. Right after `mktemp`, the profiler writes
-  `owner.json` into its scratch dir: its own Windows pid, that process's creation time from
-  `GetProcessTimes`, and its record dir. At start, `derive_abandoned_scratch` lists every
+  `owner.json` into its scratch dir: its own Windows pid and that process's creation time from
+  `GetProcessTimes`. At start, `derive_abandoned_scratch` lists every
   `gate-profile.*` sibling of its own scratch dir. One is abandoned only when its `owner.json` reads
   and no live process carries that pid with that creation time. A scratch with no readable
   `owner.json`, or one whose owner cannot be opened for a reason other than absence, is left alone.
   For each abandoned scratch, `write_recovered_logs` redacts each `raw/<i>.out` with
-  `derive_redacted` into `<record>/<i>.log.recovered`, or into
-  `recovered/<scratch name>/<i>.log.recovered` under this run's own record when that record dir is
-  gone. It then deletes the raw file. This run's envelope names each in `raw_recovered`. Spec 18's
-  §5 security line states the endings the sweep covers. The "What it writes" section of
+  `derive_redacted` into `recovered/<scratch name>/<i>.log.recovered` under this run's own record
+  alone, as `TOOL-dRedressedBar-21` S1 holds it. It then deletes the raw file. This run's envelope
+  names each in `raw_recovered`. Spec 18's §5 security line states the endings the sweep covers.
+  The "What it writes" section of
   `help/measure-legs.md`, a list with no record table at `997fc294f`, names `raw_recovered` and
   S35's `launch_error`, and says a later run sweeps a dead run's raw captures. The scratch dir is
   made by `build_scratch` (`measure_legs.py:309-323`), and `owner.json` is written right after it
@@ -419,6 +420,9 @@ record. Items that share a report item share its observation, and each still nam
   census fields, which every profiler item here changes. Its spec is what S1, S6, S7, S11 to S15,
   S19 to S22, S25, S27, S29, S32 and S34 to S42 correct. Most red halves read its pass commit
   `<p18>`.
+- **hands-off** `TOOL-dRedressedBar-21` — the S38 sweep: `derive_abandoned_scratch`,
+  `write_recovered_logs`, the `owner.json` write whose `record` key that unit retires, and AC38's
+  arm `test_scratch_sweep` (closing review round 1, H1).
 
 ## 4. Design
 
@@ -546,7 +550,7 @@ names another file.
 | 39 | `printenv.py` gains its two lines; `derive_redacted`'s bytes path is built |
 | 42 | the stall arm's line rule: exactly one STALLED line, naming `stall`, and none naming `steady` or `churn` |
 
-`owner.json` holds `{"pid": <int>, "created": <FILETIME as int>, "record": "<converted path>"}`.
+`owner.json` holds `{"pid": <int>, "created": <FILETIME as int>}`.
 A process is live when `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)` opens it,
 `GetExitCodeProcess` reads `STILL_ACTIVE`, and `GetProcessTimes` gives the recorded creation time.
 `ERROR_INVALID_PARAMETER` from `OpenProcess` means no such pid, so the scratch is abandoned. Any
@@ -1065,6 +1069,17 @@ none
   unit 18's pass commit did, and `<p19m>` re-stamps naming `<p19>`. AC1 observes both, and Files
   touched says both commits touch the manifest. No other scope item, criterion or the `<w19>` table
   moves.
+- rev-7 · 2026-10-15 · S38 · §3 · §4 · a records fix for TOOL-dRedressedBar-21, which closes the
+  round-1 closing diff review's H1 (report id 1), written by that unit's spec-writer pass `<w21>`.
+  The status stays CLOSED. S38's `owner.json` no longer names its record dir, and its destination
+  sentence names `recovered/<scratch name>/<i>.log.recovered` under this run's own record alone,
+  pointing at TOOL-dRedressedBar-21. §4's `owner.json holds` line, `:549` at `9bf1eb443` and `:552`
+  here, loses `record`. §3's Edges gain the hands-off to TOOL-dRedressedBar-21, which holds the S38
+  sweep. AC38's arm `test_scratch_sweep` now plants its dead owner's record dir outside `<o>` and
+  reads the recovered log under `<r>/recovered/`, which that spec's AC1 observes. AC38 stands as
+  written for this unit's pass commit. S35 holds as written: it states the four call failures, and
+  a refused capture is a fifth cause, which TOOL-dRedressedBar-21 states. No other scope item,
+  criterion or the `<w19>` table moves.
 
 ## 10. Reuse audit
 
