@@ -1,11 +1,12 @@
 # TOOL-dRedressedBar-26 — the round-2 temp-name findings, batched: every command-word `mv` is read, no positional or two-hop source reds, no bare `SRANDOM` is admitted, and the cache writer and leftover check hold on every runtime
 
-**Status:** INPROGRESS · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 20
+**Status:** CLOSED · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 20
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-15-build-TOOL-dRedressedBar-26-1-acceptance-ledger.md](../build/2026-10-15-build-TOOL-dRedressedBar-26-1-acceptance-ledger.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-25-brief.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-25-brief.md) | research | TOOL-dRedressedBar-25 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-26-1-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-26-1-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-26-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-26-2-revision.md) | research | TOOL-dRedressedBar-24 |
