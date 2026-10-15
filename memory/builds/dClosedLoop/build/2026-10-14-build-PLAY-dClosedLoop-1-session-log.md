@@ -232,6 +232,11 @@ way and held from the ledger:
   - the slower test levels run at landing without Maintain (`tests.without-cadence`).
 
   Four keys joined the catalogue.
+- 2026-10-15, session 1799cb98: the owner opened the roles layer's review. It was set against the
+  settled roles, orientation and flow designs. The main loop measured what role agents receive and
+  re-derive over 171 transcripts, and derived the role-by-step matrix from the step definitions.
+  It proposed a trust mechanism (P29) and recorded eight gaps, all owned by dBoundRoles. Four
+  questions were put to the owner.
 
 ## Instruments
 
@@ -446,6 +451,11 @@ After the step definitions' answers, both instruments were run as extracted from
   standard `review.unverified` set to `block` and strict set to `maybe`, it exits 1 naming both.
 - **The join** still exits 0 on 111 keys and 11 builds.
 
+After layers round three registered its gaps, the join was run as extracted from this record:
+- **The changes:** `gap-roles-10` to `gap-roles-17` went to dBoundRoles.
+- **The join** exits 0 on 119 keys and 11 builds. On a copy with `gap-roles-17` struck from
+  dBoundRoles' row, it exits 1 naming it unowned.
+
 ### The foreign-build census
 
 Lists every build slug a design record names that is not a chain build, the chain read from v2's
@@ -511,6 +521,7 @@ Runs, 2026-10-14:
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-flow.md` | The layer review's second round: the flow layer, each step at a glance, the owner's requirements against the design, the gaps, the recommendations and the forks. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-{a,b}.md` | The flow layer's item audit, verbatim: every item of the 70 declared (tag, actor, witness, inputs by layer, instruction scope, routes, dependencies), with each step's extension points and the findings. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md` | The flow's steps defined item by item: Entry, the five core steps and the breakpoint, each with its actors, witnesses, routes and layer ingredients, with the audit's fixes applied. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md` | The layer review's third round: the roles layer set against the settled roles, orientation and flow designs, what role agents receive and re-derive measured over 171 transcripts, the trust mechanism proposed, the role-by-step matrix derived, eight gaps and four forks, with the instruments. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |

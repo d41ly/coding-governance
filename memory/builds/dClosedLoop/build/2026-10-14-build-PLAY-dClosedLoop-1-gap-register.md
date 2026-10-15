@@ -120,6 +120,14 @@ extends.
 | gap-roles-07 | Roles | MED | Roles go unused or double up: the orienter, reuse scout and diff reviewer had no spawn in 60 days, the reuse scout's body adds nothing, the spec writer also holds disposal, and the session-handoff template has no agent. Raised by the owner. | roles research, coverage P6 | — |
 | gap-roles-08 | Roles | MED | The work order names no checklist item, allowance or witness key, and a builder's divergence returns to "the caller" with no route back. Raised by the owner. | roles research, anatomy; `tools/workflows/unattended-unit.js:269` | — |
 | gap-roles-09 | Roles | LOW | A return's harness notices cannot be recorded: the injection guard's matches on researcher returns and the MCP-failure notice lived only in the context and died at the compaction, and nothing can persist them, so `notices.record` has no mechanism for its values other than the default `none`. Raised by the owner. | compaction experiment, results (`build/2026-10-15-build-PLAY-dClosedLoop-1-compaction-results.md`), Q07 and Q68 | — |
+| gap-roles-10 | Roles | HIGH | Role definitions order re-verification and declare no trust: `gov-spec-writer.md:26` and `gov-researcher.md:29` order every claim about current code verified by reading the code, `gov-builder.md:15` orders the spec read whole, and no role declares what it may act on without re-checking or which inputs its job verifies. Raised by the owner. | layer review, roles (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md`), `[current]` | — |
+| gap-roles-11 | Roles | HIGH | Work orders hand references, not content: 42.0% of the files directly spawned role agents read were files their parent had read before the dispatch (spec writers 46.8%, researchers 25.8%; 61 agents), and the item cycle hands the prompt writer references to its input records. Raised by the owner. | layer review, roles (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md`), `[current]` and `[instrument]` | — |
+| gap-roles-12 | Roles | MED | Role files point at whole protocol documents: 9 of 9 carry "Protocols — read the one whose trigger holds", and role agents made 805 method-document calls, among them `BUILD-METHOD.md` 130, `TEMPLATE-SPEC.md` 127, `SESSION-KICKOFF.md` 59 and `HYGIENE.md` 41. | layer review, roles (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md`), `[current]` and `[instrument]` | — |
+| gap-roles-13 | Roles | MED | Nothing sees or bounds an answered call: state, locate and method calls are 12.7% of 9,980 role calls and 16.9% of the bytes role agents take in, spec writers read their own prompt file 17 times, and no hook compares a call with the work order. | layer review, roles (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md`), `[current]` and `[instrument]` | — |
+| gap-roles-14 | Roles | MED | The roster is not sorted by layer: the settled roster lists the deployer and the maintainer beside the core roles and the reviewer's maintenance and loop lenses as core, and no check keeps core items to core roles (P28). | layer review, roles (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md`), `[roster]` | — |
+| gap-roles-15 | Roles | MED | The role-to-step relation is typed, never derived or joined: the roles round's item map and the step definitions' Actor cells are authored tables, and nothing checks that every actor is declared and every core role acts. | layer review, roles (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md`), `[matrix]` | — |
+| gap-roles-16 | Roles | LOW | Nothing declares what a verifying role receives: a reviewer's or skeptic's packet is whatever its prompt's author put in, so nothing keeps an author's reasoning out of it. | layer review, roles (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md`), `[trust]` | — |
+| gap-roles-17 | Roles | LOW | A handed fact found false has no route outside the builder: only the builder's `diverged` routes back, and no other role's return has a contradiction outcome. | layer review, roles (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md`), `[trust]`; step definitions, `[build]` | — |
 | gap-spine-01 | Spine | HIGH | No stage model: no kit, leg, dossier, role or hook declares the stage it serves, and the loop exists only implicitly. | design §4.1 (0 of 31 dossiers carry a stage); `tools/roles/workflows.toml` covers stages 0–7 only | — |
 | gap-spine-02 | Spine | HIGH | Guards read agent-written state across stages, against `[class]`. | build §4 (write gate), design §4.4 (INPROGRESS), test §5 C (pusher-written receipt), deploy §5 C | — |
 | gap-spine-03 | Spine | HIGH | Attended and unattended builds run different exit contracts. | build §3, §4 (DoD needs RUN.md) | — |
@@ -283,4 +291,12 @@ Re-measured after layers round two added `gap-flow-10` to `gap-flow-14`
 ```text
 Roles=9 Deploy=8 Plan=7 Spine=9 Orient=14 Test=9 Review=3 Foundation=17 Build=4 Flow=14 Maintain=8 Design=9
 LOW=7 MED=41 HIGH=63
+```
+
+Re-measured after layers round three added `gap-roles-10` to `gap-roles-17`
+(`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md`), same instrument:
+
+```text
+Roles=17 Deploy=8 Plan=7 Spine=9 Orient=14 Test=9 Review=3 Foundation=17 Build=4 Flow=14 Maintain=8 Design=9
+LOW=9 MED=45 HIGH=65
 ```
