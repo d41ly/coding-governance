@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-25 — the round-2 review's profiler findings, batched: the A/B verdict gate grades the condition, the selftest's guard covers its kit dir, and AC9's orphan is waited on
 
-**Status:** SPECCED · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 19
+**Status:** INPROGRESS · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 19
 
 <!-- gen:spec-records -->
 

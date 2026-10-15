@@ -1664,6 +1664,16 @@ def parse_flags(argv):
     return opts
 
 
+def derive_kit_rel(top):
+    """This kit dir relative to the top level <top>, forward-slashed, or the absolute kit dir when it
+    lies outside <top>. Its dirname is the tool root `{prefix}` resolves to, so `run_profile` and
+    `read_guard_misses` read one tool root (TOOL-dRedressedBar-25 S23)."""
+    kitrel = os.path.relpath(KITDIR, top).replace("\\", "/")
+    if kitrel.startswith(".."):
+        kitrel = KITDIR.replace("\\", "/")
+    return kitrel
+
+
 def run_profile(opts):
     """The profile itself. Returns the exit status: 0, 1 on a failed record write, 2 on a refusal
     before the first leg, 130 on an interrupt."""
@@ -1694,9 +1704,7 @@ def run_profile(opts):
         gone = {name for name, _rule in scrubbed}
         base_env = {k: v for k, v in os.environ.items() if k not in gone}
         pybin = resolve_leg_python(bash, base_env, fns["resolve_python"])
-        kitrel = os.path.relpath(KITDIR, top).replace("\\", "/")
-        if kitrel.startswith(".."):
-            kitrel = KITDIR.replace("\\", "/")
+        kitrel = derive_kit_rel(top)
         troot = posixpath.dirname(kitrel) or "."
         argvs = [derive_leg_argv(r, troot, pybin) for r in rows]
         # S14, before anything is made: a refusal here leaves no scratch dir and no record behind.
@@ -3180,22 +3188,79 @@ def scan_own_calls(fn):
     return out
 
 
+def read_guard_misses(paths, legs_path=None):
+    """Every path of <paths>, and always the manifest's own path, that no entry of this tool's own
+    selftest leg's guard covers, each top-relative and forward-slashed (TOOL-dRedressedBar-25 S23).
+    The manifest is <legs_path>, by default the one beside this kit as `run_profile` reads it, through
+    `held_halves.load_manifest`. The row is the one whose argv carries `--selftest` and a token that
+    resolves, through `resolve_prefix_token` and the tool root `derive_kit_rel` gives, to this file's
+    top-relative path, and each guard entry is resolved the same way. A path is covered when it
+    equals an entry that does not end in `/`, or sits under an entry as a directory: the runner's
+    plain-guard rule, which is git's pathspec for a plain guard (`run-gates.sh`, `build_input_keys`).
+    A pure path rule, so a file not written yet can be asked about. An entry outside the runner's
+    plain class is returned itself, a miss naming it, because there that rule and git disagree. No
+    single such row, an unreadable manifest, a row with no guard or no top level is returned as one
+    string naming the cause, so a caller's assertion reds and never passes empty. What it does not
+    check: any file its caller does not pass, so a file outside the kit dir that an arm comes to read
+    is ungraded until that arm passes it."""
+    top = profile_bar.run_git(["rev-parse", "--show-toplevel"], cwd=KITDIR)
+    if not top:
+        return ["git answered no top level for %s, so no guard path can be read" % KITDIR]
+    top = os.path.normpath(top)
+    legs_path = os.path.abspath(legs_path or os.path.join(os.path.dirname(KITDIR), "gate-legs.json"))
+    try:
+        rows = held_halves.load_manifest(legs_path, refuse=lambda msg: (_ for _ in ()).throw(ProfileRefused(msg)))
+    except ProfileRefused as exc:
+        return ["the manifest is unreadable: %s" % exc]
+    kitrel = derive_kit_rel(top)
+    troot = posixpath.dirname(kitrel) or "."
+    own = kitrel + "/" + os.path.basename(os.path.abspath(__file__))
+    mine = [r for r in rows if isinstance(r.get("argv"), list) and "--selftest" in r["argv"]
+            and any(resolve_prefix_token(a, troot) == own for a in r["argv"])]
+    if len(mine) != 1:
+        return ["%d rows of %s run %s --selftest, where exactly one must" % (len(mine), legs_path, own)]
+    guard = mine[0].get("guard")
+    if not isinstance(guard, list) or not guard:
+        return ["the row '%s' of %s carries no guard" % (mine[0]["name"], legs_path)]
+    misses, entries = [], []
+    for entry in guard:
+        g = resolve_prefix_token(entry, troot)
+        if (g in (".", "./") or g.startswith(("/", ":")) or ".." in g or "//" in g
+                or not re.fullmatch(r"[A-Za-z0-9._/@+=-]+", g)):
+            misses.append(str(entry))
+        else:
+            entries.append(g)
+    for path in list(paths) + [legs_path]:
+        try:
+            rel = os.path.relpath(os.path.abspath(path), top).replace("\\", "/")
+        except ValueError:  # another drive than the top level: under no entry
+            rel = os.path.abspath(path).replace("\\", "/")
+        covered = any((rel == g and not g.endswith("/")) or rel.startswith(g.rstrip("/") + "/") for g in entries)
+        if not covered and rel not in misses:
+            misses.append(rel)
+    return misses
+
+
 def test_write_atomic_temp(tmp):
     """TOOL-dRedressedBar-21's AC5 and AC6. Static (S5): every `*.py` under this kit dir, found by
     `os.walk` with `__pycache__` skipped, parses, and every `os.replace` or `os.rename` call in one
     sits in a function that calls `tempfile.mkstemp` with a `dir` keyword and calls neither `os.open`
     nor `open`; the population is non-empty and holds `write_replace`'s call, and no exemption is
-    made, this selftest's own staging included. Behaviour (S4): a second name or a dangling link
-    planted at the old fixed `<name>.tmp` is neither written through nor created, through both
-    callers of `write_replace`. Red when `write_atomic` opens `path + ".tmp"` with `O_TRUNC`, or
-    `write_held_stamp` opens `path + ".tmp"` with `open`."""
-    population, bad, in_writer = [], [], False
+    made, this selftest's own staging included. Every `*.py` the walk finds, one that fails to parse
+    included, trips this leg's own guard by `read_guard_misses`, so a `*.py` added later under the kit
+    dir runs the leg that parses it (TOOL-dRedressedBar-25 S23). Behaviour (S4): a second name or a
+    dangling link planted at the old fixed `<name>.tmp` is neither written through nor created,
+    through both callers of `write_replace`. Red when `write_atomic` opens `path + ".tmp"` with
+    `O_TRUNC`, or `write_held_stamp` opens `path + ".tmp"` with `open`, and when a walked `*.py` sits
+    outside the guard."""
+    population, bad, in_writer, walked = [], [], False, []
     for folder, dirs, files in os.walk(KITDIR):
         dirs[:] = sorted(d for d in dirs if d != "__pycache__")
         for f in sorted(files):
             if not f.endswith(".py"):
                 continue
             path = os.path.join(folder, f)
+            walked.append(path)
             rel = os.path.relpath(path, KITDIR).replace("\\", "/")
             try:
                 with open(path, encoding="utf-8") as fh:
@@ -3221,6 +3286,9 @@ def test_write_atomic_temp(tmp):
               repr(population))
     check_arm("AC6 every rename under the kit renames a tempfile.mkstemp temp, opened by no name", not bad,
               "; ".join(bad)[:600])
+    misses = read_guard_misses(walked)
+    check_arm("AC6 every *.py the walk finds trips this leg's own guard, so a new one runs the leg",
+              bool(walked) and not misses, repr(misses)[:600])
 
     base = tempfile.mkdtemp(prefix="atomic.", dir=tmp)
     a, b = os.path.join(base, "a"), os.path.join(base, "b")
@@ -3299,6 +3367,7 @@ def test_fixtures_withheld(_tmp):
 
 ORPHAN_SH = "{prefix}/run-gates/fixtures/measure-legs/orphan.sh"
 SPAWN_PY = "{prefix}/run-gates/fixtures/measure-legs/spawn.py"
+WAITMARK_PY = "{prefix}/run-gates/fixtures/measure-legs/waitmark.py"
 
 
 def test_interrupt_capture(tmp):
@@ -3483,43 +3552,126 @@ def test_alias_refusals(tmp):
     check_arm("AC11 LIVENESS ...and one printing a plain file returns it", os.path.isfile(got[1]), got[1])
 
 
-def test_ab_arms_read_verdicts(_tmp):
-    """AC15 (S15), the record's left-shift for `ab-arm-never-did-the-work`. An `ast` walk of this file
-    takes every `test_*` function holding a subtraction whose two operands each read `procs_total`,
-    requires at least three, and requires each to read `verdict`, so no A/B difference is graded
-    before both legs are shown to have run. Red when one such arm's verdict read is taken out."""
-    with open(os.path.abspath(__file__), encoding="utf-8") as fh:
-        tree = ast.parse(fh.read())
+def check_verdict_read(node):
+    """True for a read of a leg record's verdict in a form the A/B arms use: a subscript whose slice is
+    the constant `"verdict"`, or a call of an attribute `get` whose first argument is that constant.
+    Any other constant `"verdict"`, an arm's name or a word of a message, is no read
+    (TOOL-dRedressedBar-25 S15)."""
+    if isinstance(node, ast.Subscript):
+        return isinstance(node.slice, ast.Constant) and node.slice.value == "verdict"
+    return (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == "get"
+            and bool(node.args) and isinstance(node.args[0], ast.Constant) and node.args[0].value == "verdict")
+
+
+def read_blind_ab_arms(tree):
+    """(found, blind) over the parsed module <tree>. `found` is every top-level `test_*` function
+    holding a subtraction whose two operands each read `procs_total`, an A/B arm. `blind` is each
+    found function holding no `check_verdict_read` once every `check_arm` call in it is walked through
+    its condition alone, the second positional argument or the keyword `ok`: its name and its detail,
+    the third positional argument or any other keyword, are not walked, so a verdict read only in a
+    failure message is no read (TOOL-dRedressedBar-25 S15). What it does not check: a verdict bound to
+    a local name outside any `check_arm` counts as read at the binding, though the name is then used
+    only in a message."""
     found, blind = [], []
     for fn in tree.body:
         if not (isinstance(fn, ast.FunctionDef) and fn.name.startswith("test_")):
             continue
-        reads = {n.value if isinstance(n, ast.Constant) else n.attr for n in ast.walk(fn)
-                 if isinstance(n, (ast.Constant, ast.Attribute))}
         subs = [n for n in ast.walk(fn) if isinstance(n, ast.BinOp) and isinstance(n.op, ast.Sub) and all(
             any((isinstance(m, ast.Constant) and m.value == "procs_total")
                 or (isinstance(m, ast.Attribute) and m.attr == "procs_total") for m in ast.walk(side))
             for side in (n.left, n.right))]
-        if subs:
-            found.append(fn.name)
-            if "verdict" not in reads:
-                blind.append(fn.name)
+        if not subs:
+            continue
+        found.append(fn.name)
+        stack, read = [fn], False
+        while stack and not read:
+            node = stack.pop()
+            read = check_verdict_read(node)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "check_arm":
+                stack.extend(node.args[1:2] + [kw.value for kw in node.keywords if kw.arg == "ok"])
+            else:
+                stack.extend(ast.iter_child_nodes(node))
+        if not read:
+            blind.append(fn.name)
+    return found, blind
+
+
+def derive_verdictless_tree(source, name):
+    """(tree, cut): <source> parsed, with every `check_arm` condition in its top-level function <name>
+    stripped of each `and` conjunct holding a `check_verdict_read`, and a condition that holds one and
+    is no `and` made the constant True. `cut` counts the conjuncts taken out. A name and a detail are
+    never touched, so a predicate that walks a failure message again still finds a verdict in the
+    copy. The staged break `test_ab_arms_read_verdicts` grades `read_blind_ab_arms` with
+    (TOOL-dRedressedBar-25 S15)."""
+    tree, cut = ast.parse(source), 0
+    for fn in tree.body:
+        if not (isinstance(fn, ast.FunctionDef) and fn.name == name):
+            continue
+        calls = [n for n in ast.walk(fn) if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+                 and n.func.id == "check_arm"]
+        for call in calls:
+            slots = [None] if len(call.args) > 1 else []
+            slots += [kw for kw in call.keywords if kw.arg == "ok"]
+            for kw in slots:
+                cond = call.args[1] if kw is None else kw.value
+                parts = cond.values if isinstance(cond, ast.BoolOp) and isinstance(cond.op, ast.And) else [cond]
+                kept = [p for p in parts if not any(check_verdict_read(m) for m in ast.walk(p))]
+                if len(kept) == len(parts):
+                    continue
+                cut += len(parts) - len(kept)
+                new = (ast.Constant(value=True) if not kept else kept[0] if len(kept) == 1
+                       else ast.BoolOp(op=ast.And(), values=kept))
+                if kw is None:
+                    call.args[1] = new
+                else:
+                    kw.value = new
+    return tree, cut
+
+
+def test_ab_arms_read_verdicts(_tmp):
+    """AC15 (S15), the record's left-shift for `ab-arm-never-did-the-work`. `read_blind_ab_arms` over
+    this file finds every `test_*` function holding a subtraction whose two operands each read
+    `procs_total`, requires at least three, and requires each to read its legs' verdicts, as a
+    subscript or a `.get`, outside every `check_arm` name and failure message, so no A/B difference
+    is graded before both legs are shown to have run. LIVENESS (TOOL-dRedressedBar-25 S15): each
+    found function is staged through `derive_verdictless_tree`, its verdict conditions taken out, and
+    each copy must lose at least one conjunct and be named blind, `test_serial_run` and
+    `test_fork_count` among them. Red when an arm's verdict condition is taken out while its failure
+    message still reads the verdict, and when the predicate walks a failure message again: the
+    copies then still read one. A verdict read in an `if` above a `check_arm` counts as read and the
+    copy keeps it, so that arm's copy is not named blind and this arm reds: a future A/B arm reads
+    its verdicts in a `check_arm` condition, as all three do."""
+    with open(os.path.abspath(__file__), encoding="utf-8") as fh:
+        source = fh.read()
+    found, blind = read_blind_ab_arms(ast.parse(source))
     check_arm("AC15 at least three arms subtract two legs' procs_total", len(found) >= 3, repr(found))
     check_arm("AC15 every such arm reads its legs' verdicts", not blind, repr(blind))
+    staged = {}
+    for name in found:
+        copy, cut = derive_verdictless_tree(source, name)
+        staged[name] = (cut, name in read_blind_ab_arms(copy)[1])
+    check_arm("AC15 LIVENESS each arm's copy with its verdict conditions taken out is named blind",
+              {"test_serial_run", "test_fork_count"} <= set(staged)
+              and all(cut >= 1 and named for cut, named in staged.values()), repr(staged))
 
 
 def test_legs_table(tmp):
-    """AC9 (S9), and AC5's loop half (S6). `orphan.sh 2` as `orphan`, then `spawn.py 0 5` as `hold`,
-    serially, with `check_admit` wrapped to record each call and to raise `KeyboardInterrupt` once
-    60 s have passed, so a loop that admits nothing ends red instead of hanging. Every `legs.tsv` row
-    equals `render_legs_row` over that leg's final `<i>.json`, column for column. LIVENESS: the
-    orphan's log carries `late` and reads 11 bytes, so its size moved after the row its leg end
-    appended, and two admissions were recorded. Exactly two calls answer True, each with no leg
-    running. Red when the run end writes no table: the orphan's row then reads 6 bytes."""
+    """AC9 (S9), and AC5's loop half (S6). `orphan.sh 2 <mark>` as `orphan`, then
+    `waitmark.py <mark> 30` as `hold`, serially, with `check_admit` wrapped to record each call and to
+    raise `KeyboardInterrupt` once 60 s have passed, so a loop that admits nothing ends red instead of
+    hanging. The orphan's background subshell creates the mark only after it printed `late` and closed
+    its stdout and stderr, so `hold` ends on that signal, not on a clock, and the run end follows the
+    orphan's last write and its last handle on the capture (TOOL-dRedressedBar-25 S18). Every
+    `legs.tsv` row equals `render_legs_row` over that leg's final `<i>.json`, column for column.
+    LIVENESS: the orphan's log carries `late` and reads 11 bytes, so its size moved after the row its
+    leg end appended, `hold` reads `ok`, the mark having come within its bound, and two admissions
+    were recorded. Exactly two calls answer True, each with no leg running. Red when the run end
+    writes no table: the orphan's row then reads 6 bytes."""
     base = tempfile.mkdtemp(prefix="table.", dir=tmp)
+    mark = os.path.join(base, "late.mark").replace("\\", "/")
     manifest = write_temp_manifest(base, "table.json", [
-        {"name": "orphan", "argv": ["bash", ORPHAN_SH, "2"]},
-        {"name": "hold", "argv": ["python3", SPAWN_PY, "0", "5"]}])
+        {"name": "orphan", "argv": ["bash", ORPHAN_SH, "2", mark]},
+        {"name": "hold", "argv": ["python3", WAITMARK_PY, mark, "30"]}])
     real, admitted, calls, t0 = globals()["check_admit"], [], [0], time.monotonic()
 
     def check_recorded_admit(mode, pending, running, *rest, **kw):
@@ -3546,9 +3698,10 @@ def test_legs_table(tmp):
     orphan = recs.get("orphan") or {}
     log = read_plant_bytes(os.path.join(run_dir, "%d.log" % orphan.get("i", 0))) if run_dir else b""
     kept = read_envelope(run_dir).get("raw_kept") if run_dir else None
-    check_arm("AC9 LIVENESS the orphan's capture moved after its root's exit: `late`, 11 bytes, none kept",
-              b"late" in log and orphan.get("log_bytes") == 11 and kept == [],
-              repr((log[-40:], orphan.get("log_bytes"), kept)))
+    hold = recs.get("hold") or {}
+    check_arm("AC9 LIVENESS the orphan's capture moved after its root's exit: `late`, 11 bytes, none kept, "
+              "and `hold` saw the mark", b"late" in log and orphan.get("log_bytes") == 11 and kept == []
+              and hold.get("verdict") == "ok", repr((log[-40:], orphan.get("log_bytes"), kept, hold.get("verdict"))))
     check_arm("AC5 the loop's admissions pass through check_admit: two, each with no leg running",
               len(admitted) == 2 and all(p >= 1 and r == 0 for p, r in admitted),
               repr((calls[0], admitted)))
@@ -3559,9 +3712,12 @@ def test_legs_table(tmp):
 def test_signal_docs(_tmp):
     """AC16 (S16), the record's parity option. The module docstring and the README's profiler section
     each carry `terminate` and `launch_error`, and neither carries `nothing is ever signalled`, read
-    joined. LIVENESS: the section is found and carries `measure_legs.py`. Red when the README's
-    absolute sentence is restored."""
-    with open(os.path.join(KITDIR, "README.md"), encoding="utf-8") as fh:
+    joined. LIVENESS: the section is found and carries `measure_legs.py`. The README path it opens
+    trips this leg's own guard by `read_guard_misses`, so a README-only commit runs the one arm that
+    grades the README (TOOL-dRedressedBar-25 S23). Red when the README's absolute sentence is restored,
+    and when the guard leaves the README out."""
+    readme = os.path.join(KITDIR, "README.md")
+    with open(readme, encoding="utf-8") as fh:
         text = fh.read()
     start = text.find("\n## The gate profiler")
     end = text.find("\n## ", start + 1) if start >= 0 else -1
@@ -3575,6 +3731,8 @@ def test_signal_docs(_tmp):
         if "nothing is ever signalled" in joined.lower():
             bad.append("%s says nothing is ever signalled" % where)
     check_arm("AC16 the docstring and the README say the same about signalling", not bad, "; ".join(bad))
+    misses = read_guard_misses([readme])
+    check_arm("AC16 the README this arm reads trips its own leg's guard", not misses, repr(misses))
 
 
 def cmd_selftest():

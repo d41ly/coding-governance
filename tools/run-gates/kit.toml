@@ -112,7 +112,7 @@ include = ["fixtures/measure-legs/churn.py", "fixtures/measure-legs/concurrent.j
            "fixtures/measure-legs/queued.sh", "fixtures/measure-legs/serial.json",
            "fixtures/measure-legs/spawn.py", "fixtures/measure-legs/stall.json",
            "fixtures/measure-legs/stall.sh", "fixtures/measure-legs/steady.py",
-           "fixtures/measure-legs/turnstile.json"]
+           "fixtures/measure-legs/turnstile.json", "fixtures/measure-legs/waitmark.py"]
 role = "project-owned"
 
 [adopt]

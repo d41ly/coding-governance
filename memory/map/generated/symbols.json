@@ -5318,6 +5318,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_verdict_read",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "check_view_line",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -6888,6 +6893,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "derive_kit_rel",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "derive_landed_counts",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -7711,6 +7721,11 @@
       "id": "derive_verdict",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "derive_verdictless_tree",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "derive_verdicts",
@@ -12363,6 +12378,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_blind_ab_arms",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_blob_at",
       "kind": "function",
       "file": ".githooks/straggler-guard.sh"
@@ -12966,6 +12986,11 @@
       "id": "read_grant_key_at",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "read_guard_misses",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "read_gw_record",
