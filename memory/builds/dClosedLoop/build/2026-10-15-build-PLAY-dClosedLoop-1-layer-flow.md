@@ -202,3 +202,122 @@ Already registered, and not proposed again:
 
 **F-H. Items are named by tags,** as settled in the instruction layer's round. The audit proposes the
 names.
+
+## [audit] The item audit, returned 2026-10-15
+
+Two researchers declared every item of the 70 and checked each against the layer's requirements.
+Their returns are saved verbatim:
+- `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-a.md` covers Plan, Design and Build:
+  31 items and 22 findings, by its own count;
+- `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-b.md` covers Test, Deploy, Maintain
+  and both reviews: 39 findings, by its own count.
+
+Each return gives, per item: a proposed tag, the actor, the witness, its inputs by layer, its instruction
+scope, its routes, its fan-out and dependencies, and its flags. Each also lists every step's extension
+points.
+
+The findings fall into these classes:
+- **The driver judges.** It places a request at Plan (a F1). It reasons out the review recommendation at
+  Plan, Design, Test and Deploy (a F2, b F-X1).
+- **Witnesses are typed by the acting agent and decide what happens next:**
+  - the tester's class routes a red (b F-T3);
+  - the builder's own "checks run" stands for acceptance (a F5);
+  - the bug-class trailer (a F6);
+  - the deployer's notes and dispositions (b F-D7, F-D8);
+  - Maintain's intake becoming a mandate (b F-M2);
+  - class identity for left-shift (b F-R2).
+- **Items have more than one actor:** a F4, b F-T1, F-D1, F-M7, F-R1.
+- **Witnesses are not stated:** a F10, b F-T10, F-D12, F-M10, F-R10.
+- **Failure routes are missing:** a F11, b F-T5, F-T7, F-M8, F-R3, F-R9. There is also the bar's labels
+  MIXED, CONTENDED and DEAD PROBE, which have no route (b F-T4).
+- **Core items need expansions:** the reuse probes, the bug classes, the lexicon (a F6 to F8); flakes
+  (b F-T8); Maintain's detectors (b F-M3); kit versions and currency (b F-D9, F-M4).
+- **Records disagree:**
+  - two disposition sets (a F12);
+  - checklist text against later settlements (a F15, b F-M1);
+  - actor rows (b F-D3, F-R6);
+  - `plan.authority`'s owner clause under `request` (a F14).
+- **Settled behaviours have no item:** the parent-landing hold, the core re-check, the `landed` notice and
+  the terminal snapshot (b F-D5).
+- **Order:** the landing review "blocks" but runs after the push (b F-D4).
+
+The researcher for Test, Deploy and Maintain also raised a sorting question. The core's test, "request to
+landing", cannot classify what runs after landing: the release record, Maintain and the Loop Review. The
+owner's answer on Maintain settles it by the same test, so all three sit outside the core.
+
+## [forks] Asked, 2026-10-15
+
+**F2-1. "How should the flow's steps be counted?"** Offered:
+- Five per build + repo Maintain (Recommended);
+- Six per build;
+- Maintain as an expansion.
+
+Answer: Maintain as an expansion.
+
+**F2-2. "How should review stop the flow?"** Offered:
+- Breakpoints anywhere (Recommended);
+- Fixed review points.
+
+Answer: Breakpoints anywhere (Recommended).
+
+**F2-3. "How may a build end besides landing?"** Offered:
+- Withdraw or supersede (Recommended);
+- Landing only.
+
+Answer: Withdraw or supersede (Recommended).
+
+**F2-4. "What shape should a step's process take?"** Offered:
+- Program with dependencies (Recommended);
+- Strict ordered checklist.
+
+Answer: Program with dependencies (Recommended).
+
+## [settled] What changed, 2026-10-15
+
+**The core flow is five steps,** Plan to Deploy, carrying a build from its request to its landing.
+- Maintain and the Loop Review are cadence steps delivered with the observability expansion. The owner
+  chose this, over the recommendation that Maintain be a core repository step.
+- By the same sorting test, promotion through environments after landing is an integrations extension
+  point. Deploy's core ends at the landing, its record, the leases released, the `landed` notice and the
+  terminal snapshot.
+- P6 is amended. Without Maintain, the loop closes through requests alone.
+
+**Review is a breakpoint** (P7 amended).
+- One mechanism carries reviews and owner gates.
+- `review.<stage>` and `autonomy` are its default declarations. `review.breakpoints` adds breakpoints at
+  any item boundary, defaulting to none beyond those.
+- An owner breakpoint parks a build by definition, and exists only where the owner places one.
+
+**A build ends landed, withdrawn or superseded** (P20 amended).
+- The owner pauses, resumes, withdraws or supersedes a build through the guarded command.
+- A withdrawn parent's dependents act as `deps.on-parent-withdrawn` says: `replan` by default, with
+  `adopt-parent-work` and `withdraw-too` allowed.
+
+**Steps are programs with dependencies** (P24 amended). An item's witness is resolved before any item
+that depends on it starts.
+
+**Consistency fixes the audit found.** Each follows from settled design, so no fork was put:
+- **The recommendation's reasoning** comes from the step's producing role: the planner, architect, tester
+  or deployer. Its score stays computed. This reads FL-R3's "the agent" through P25 (a F2, b F-X1).
+- **The placement disposition** is the orientation scout's return. The driver records it and runs
+  `placement.check` (a F1; OR-1's "agent places" is the scout).
+- **Ratification under `request`:** the request meets `plan.authority`'s owner clause, and a plan revision
+  proceeds under the request's mandate (a F14; FR-1, FR-12).
+- **The landing review** blocks the build's close, not the push. Its findings enter by the entry-point
+  table's post-close row (b F-D4).
+- **The bar's labels** MIXED, CONTENDED and DEAD PROBE route to asks (b F-T4).
+- **Research records:** a build's own are memory, the trail; the library across builds is knowledge
+  (a F9).
+- **Flake records** are a flow record kind that observability reads (b F-T8).
+- **Dispositions:** one closed set, continue, amend, new, patch, ask or none. Defer maps to ask, and a
+  duplicate maps to continue (a F12).
+- **Item tags** live in the `item` namespace, apart from policy keys (a F21; layers round one, R-B).
+
+**The register gains five gaps:**
+- `gap-flow-10`, `gap-flow-13` and `gap-flow-14`, owned by dDeclaredLoop;
+- `gap-flow-11` and `gap-flow-12`, owned by dCalibratedLens.
+
+**Units:**
+- dDeclaredLoop, dCalibratedLens, dBoundRoles, dTendedCadence and dShippedRelease gain the units that
+  carry the settlement.
+- The audit's tables are the input to dDeclaredLoop's item declarations.

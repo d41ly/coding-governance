@@ -81,8 +81,8 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 17 | gov-researcher | Roles: coverage | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-12-researcher.md` | 1799cb98 | returned, 4m37s, 23.9k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-roles-coverage.md` |
 | 18 | gov-researcher | Roles: interactions | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-13-researcher.md` | 1799cb98 | returned, 4m40s, 22.0k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-roles-interactions.md` |
 | 19 | gov-researcher | Roles: prior art | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-14-researcher.md` | 1799cb98 | returned, 4m41s, 24.5k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-roles-priorart.md` |
-| 20 | gov-researcher | Flow layer: Plan, Design and Build items | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | running | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-a.md` |
-| 21 | gov-researcher | Flow layer: Test, Deploy, Maintain and review items | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-2-researcher.md` | 1799cb98 | running | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-b.md` |
+| 20 | gov-researcher | Flow layer: Plan, Design and Build items | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | returned, 7m54s, 46.3k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-a.md` |
+| 21 | gov-researcher | Flow layer: Test, Deploy, Maintain and review items | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-2-researcher.md` | 1799cb98 | returned, 7m02s, 37.8k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -147,7 +147,9 @@ way and held from the ledger:
 
 ```text
 - agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-1-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-1-researcher.md) · writes none · gates none · run direct/a9cb53e6fd6bb4661
+- returned — gov-researcher · wrote 0 files · 7m54s · 46.3k out · run direct/a9cb53e6fd6bb4661
 - agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-2-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-2-researcher.md) · writes none · gates none · run direct/a2e4ed3684d8964ea
+- returned — gov-researcher · wrote 0 files · 7m02s · 37.8k out · run direct/a2e4ed3684d8964ea
 ```
 
 ## Events
@@ -216,6 +218,10 @@ way and held from the ledger:
 - 2026-10-15, session 1799cb98: the owner opened the flow layer's review. It was set against the
   design, and three new gaps were proposed. An item-by-item audit of the 70 checklist items went to two
   researchers (dispatches 20 and 21). Forks were put to the owner.
+- 2026-10-15, session 1799cb98: both researchers returned, and the owner settled F2-1 to F2-4: Maintain
+  as an expansion, breakpoints anywhere, withdraw or supersede, and programs with dependencies. P6,
+  P7, P20 and P24 were amended, two policies and five gaps added, and the audit's consistency fixes
+  recorded.
 
 ## Instruments
 
@@ -413,6 +419,15 @@ After layers round one, both instruments were run as extracted from this record:
 - **The preset check** exits 0 on 96 catalogue keys, 90 presettable, 90 preset rows. On a copy with
   standard `instructions.checks` set to `warn` and strict set to `sometimes`, it exits 1 naming both.
 
+After layers round two, both instruments were run as extracted from this record:
+- **The changes:** `gap-flow-10` to `gap-flow-14` went to dDeclaredLoop and dCalibratedLens, and
+  `review.breakpoints` and `deps.on-parent-withdrawn` joined the catalogue and every preset.
+- **The join** exits 0 on 111 keys and 11 builds. On a copy with `gap-flow-14` struck from
+  dDeclaredLoop's row, it exits 1 naming it unowned.
+- **The preset check** exits 0 on 98 catalogue keys, 92 presettable, 92 preset rows. On a copy with
+  standard `deps.on-parent-withdrawn` set to `adopt-parent-work` and strict set to `sometimes`, it
+  exits 1 naming both.
+
 ### The foreign-build census
 
 Lists every build slug a design record names that is not a chain build, the chain read from v2's
@@ -476,6 +491,7 @@ Runs, 2026-10-14:
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md` | The layer review's first round: the owner's layer model and the instruction layer, measured against the current design, with the gaps, the recommendations and the forks. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-model.svg` | The layer model as capabilities: the core cycle on Runtime, expansions plugged in at declared points, Distribution beneath. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-flow.md` | The layer review's second round: the flow layer, each step at a glance, the owner's requirements against the design, the gaps, the recommendations and the forks. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-{a,b}.md` | The flow layer's item audit, verbatim: every item of the 70 declared (tag, actor, witness, inputs by layer, instruction scope, routes, dependencies), with each step's extension points and the findings. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |

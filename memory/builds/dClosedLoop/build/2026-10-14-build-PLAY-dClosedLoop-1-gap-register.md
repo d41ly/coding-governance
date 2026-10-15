@@ -92,6 +92,11 @@ extends.
 | gap-flow-08 | Flow | MED | Landing order among builds verified at once is undefined; the first landing silently stales the others' verdicts. Raised by the owner. | flow interactions FI-7 | — |
 | gap-flow-09 | Flow | MED | A merge conflict between a build and the default branch's tip has no route. Raised by the owner. | flow interactions FI-3 | — |
 | gap-flow-04 | Flow | MED | A critical planning issue has no path: no recorded plan revision and no re-design inventory of completed work, though none has occurred in 173 builds. Raised by the owner. | flow FL-P6 and its measurement | — |
+| gap-flow-10 | Flow | HIGH | A build can end only by landing: no withdrawn, superseded or merged terminal state exists, the owner has no command to pause, resume or withdraw a build, and a dependent held until its parent lands (`deps.landing`) waits forever on a parent that never will. Raised by the owner. | layers round two, `[uncovered]`; flow-roles `[steps]` Deploy; coordination `[design]` | — |
+| gap-flow-11 | Flow | MED | Reviews and owner gates are two mechanisms fixed to set points: each step's review sits at one item (`review.<stage>`), owner gates sit at `autonomy`'s points, and neither can be placed at another item boundary. Raised by the owner. | layers round two, `[uncovered]`; flow `[review]` | — |
+| gap-flow-12 | Flow | MED | The driver reasons out the review recommendation at Plan, Design, Test and Deploy, against P25 and `driver.reads`: a command scores it, and no role is named to reason it (FL-R3). Raised by the owner. | layers round two, `[audit]`; research flow items a F2, b F-X1; roles `[map]` | — |
+| gap-flow-13 | Flow | HIGH | Item declarations are incomplete: items carry more than one actor, many state no witness or no failure route, the records disagree (two disposition sets; checklist text against later settlements), and Deploy has no item for settled behaviours (the parent-landing hold, the core re-check, the `landed` notice). Raised by the owner. | layers round two, `[audit]`; research flow items a F3, F4, F10 to F13, F15 to F21; b F-T1, F-T5 to F-T10, F-D1 to F-D12, F-M1, F-M3 to F-M11, F-R1, F-R3 to F-R10 | — |
+| gap-flow-14 | Flow | HIGH | Witnesses typed by the acting agent decide routes or mandates: the tester's class routes a red, the builder's own "checks run" stands for acceptance, the driver's typed disposition places a request, and Maintain's agent-typed intake becomes a patch build's mandate under `patch.ratify: auto`. Raised by the owner. | layers round two, `[audit]`; research flow items a F1, F5, F6; b F-T3, F-D7, F-D8, F-M2, F-R2, F-R7 | — |
 | gap-orient-01 | Orient | HIGH | Placement is unaided and unrecorded: kickoff tells the agent to derive a request's scope itself, an unattended run handed a prompt always opens a new build, and only 6 of 131 recent builds name a predecessor, so a mis-placement cannot be audited; path overlap cannot decide placement (the named predecessor ranked first 0 of 5 times). Raised by the owner. | orientation research, routing; `skills/session-kickoff/SKILL.md:126-131`; `tools/unattended/SKILL.template.md:28-32` | — |
 | gap-orient-02 | Orient | HIGH | Nothing binds a session to its build: the route check verifies existence and pairing only, so a route to a terminal build or to another session's build lands, and a resumed route is never re-checked. Raised by the owner. | orientation research, routing; `skills/session-kickoff/manifest-check.sh:995-1001` | — |
 | gap-orient-03 | Orient | HIGH | A build's position is read from typed state: a unit's step and pass come from status headers and RUN.md's phase, all 10 INPROGRESS units sat idle 8 days or more, no resolver says which pass is due, and `LIVE.md` inherits 7 of 30 stale non-terminal headers. Raised by the owner. | orientation research, routing (c) and trust | — |
@@ -270,4 +275,12 @@ Re-measured after layers round one added `gap-found-09` to `gap-found-17`
 ```text
 Roles=9 Deploy=8 Plan=7 Spine=9 Orient=14 Test=9 Review=3 Foundation=17 Build=4 Flow=9 Maintain=8 Design=9
 LOW=7 MED=39 HIGH=60
+```
+
+Re-measured after layers round two added `gap-flow-10` to `gap-flow-14`
+(`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-flow.md`), same instrument:
+
+```text
+Roles=9 Deploy=8 Plan=7 Spine=9 Orient=14 Test=9 Review=3 Foundation=17 Build=4 Flow=14 Maintain=8 Design=9
+LOW=7 MED=41 HIGH=63
 ```

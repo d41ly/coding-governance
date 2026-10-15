@@ -718,6 +718,14 @@ the owner's request is the ratification (FR-1), so Plan's item 10 is witnessed b
 and no build parks on an unresolved fork, a goal-level one included (FR-4, FR-12), so a critical
 planning issue's revision proceeds under the request's mandate, recorded, rather than waiting.
 
+Revised: 2026-10-15, in layers round two (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-flow.md`):
+- A build passes five core steps, Plan to Deploy, and ends landed, withdrawn or superseded.
+- Maintain, its checklist above, is a cadence step of the observability expansion.
+- Every review and owner gate is a breakpoint that can sit at any item boundary.
+- The checklists above are views of step programs. The item audit
+  (`build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-{a,b}.md`) declares their tags,
+  witnesses, routes and dependencies, and its findings are owned by `gap-flow-13` and `gap-flow-14`.
+
 All seven stages have a settled scope, boundaries and checklist, and the entry points are settled
 (the table under Maintain). Agent roles remain deferred at the owner's direction. What the walk
 changed, in brief: the flow is a layer above the build; Plan is for complex features and hands
