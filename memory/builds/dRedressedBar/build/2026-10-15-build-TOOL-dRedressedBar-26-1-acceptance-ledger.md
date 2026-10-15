@@ -17,9 +17,9 @@ index did not move. The pre-commit hook's staged legs, memory hygiene and the ma
 them, passed both commits. Before the first edit the gate turnstile's queue was empty, the common
 dir's `gate-run/current` named an October 9 push run, and no runner process was alive.
 
-No merge bar, gate leg or self-test suite was run by this pass, and no arm of `sh_hygiene.py
---selftest` or of the runlog suite was called: the new arms were compiled and read, never executed,
-so the close's runs are their first execution. The floor of 125 is counted off the arms, 92 before
+No merge bar, gate leg or self-test suite was run by this pass, and no arm of
+`sh_hygiene.py --selftest` or of the runlog suite was called: the new arms were compiled and read,
+never executed, so the close's runs are their first execution. The floor of 125 is counted off the arms, 92 before
 and 33 added, every one unconditional. The naming lexicon answered OK over the tree.
 
 Every criterion was observed by a direct probe written apart from the arms, on node d under Python
@@ -90,9 +90,9 @@ written under the session scratchpad. Each scratch repository and planted direct
 - AC24 — `manifest-audit:` — `git diff 3e2f387a6~1 3e2f387a6` under the spec dir shows spec 24,
   CLOSED at `<w26>~1`, with one header rev change, rev-1 to rev-2, one new revision line naming
   `TOOL-dRedressedBar-26` and ids 22, 6, 7, 10, 21, 8 and 19, and a §3 bullet `hands-off`
-  `TOOL-dRedressedBar-26`; spec 26 moves there only in its generated records rows. `git diff
-  --name-only` over `<p26>` under `memory/builds/dRedressedBar/spec/` names this spec alone, for
-  its dispatched header, and over `<p26m>` names nothing. `git log -1 --format=%B db2303a86`
+  `TOOL-dRedressedBar-26`; spec 26 moves there only in its generated records rows.
+  `git diff --name-only` over `<p26>` under `memory/builds/dRedressedBar/spec/` names this spec
+  alone, for its dispatched header, and over `<p26m>` names nothing. `git log -1 --format=%B db2303a86`
   carries one `manifest-audit:` line, and the `last-audit:` line of
   `memory/guides/SESSION-KICKOFF.md` names `f8bbdc85d`, at which `run-gates.sh` carries
   `"$PYBIN" -I -c` once. This ledger carries `**Serves:** journal TOOL-dRedressedBar-26`.
