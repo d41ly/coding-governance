@@ -204,7 +204,8 @@ that must land green over a non-compliant population without keying on a line nu
 - `python tools/gate-lint/sh_hygiene.py --temp-names [registry] [root] [pathspec ...]` — the temp-name
   lint: an `mv` whose source names a temp anyone can know before the write. It prints the `mv`,
   fixed, admitted and unfollowed counts, each unfollowed source and every registered row's reason;
-  a failing key lists each site's path, line and source, and the remedy names the three admitted forms.
+  a failing key is one finding listing each site's path, line and source, and the remedy names the
+  admitted forms: a `$(mktemp` temp, or a binder that expands `SRANDOM` only behind `${SRANDOM:-`.
 - `memory/project/temp-name-sites.txt` — the carried fixed-temp sites, per path. Lower a count or
   delete a row in the commit that fixes a site.
 - `bash tools/gate-lint/fork-count.sh memory/project/fork-ceilings.txt . [--only <id>]` — forks per

@@ -163,24 +163,38 @@ python3 <tool-root>/gate-lint/sh_hygiene.py --temp-names [registry-path] [root] 
 A fourth class. A file written at a temp name anyone can know before the write, then renamed over
 its destination, is a name a process that can write the directory plants a link at first; the write
 goes through the link into whatever it names. A `fixed-temp` site is an `mv` whose source names a
-temp no unpredictable part names: `"$f.tmp"`, `"$x.tmp.$$"`, or a variable assigned one. The mode
-admits three forms: a source holding `$(mktemp`, one holding a `$SRANDOM` expansion, and a variable
-bound by a BINDER — a function of the same file whose body sets `printf -v "$1"` and holds a
-`SRANDOM` expansion or `mktemp`, called as `<binder> <name> <dest>`. A source that is one expansion is
-followed one hop, to the latest binding of its name above it in the innermost function holding the
-line, else the top level; with none, it is UNFOLLOWED, counted and printed, never gated.
+temp no unpredictable part names: `"$f.tmp"`, `"$x.tmp.$$"`, or a variable assigned one. The `mv` is
+read as a command word at a segment's start or after `;`, `&`, `|`, `{`, `(` or `!`, past any run of
+the keywords `if`, `then`, `else`, `elif`, `do`, `while` and `until`, the prefixes `command`, `builtin`
+and `exec`, and assignment words such as `LC_ALL=C`. The mode admits two forms: a source holding
+`$(mktemp`, and a variable bound by a BINDER — a function of the same file whose body sets
+`printf -v "$1"`, holds `mktemp`, and expands `SRANDOM` only beside the test `${SRANDOM:-`, called as
+`<binder> <name> <dest>`. A bare `SRANDOM` name is fixed: a bash before 5.1 leaves the variable unset,
+so `"$f.$SRANDOM.tmp"` expands to `<f>..tmp`. A source that is one expansion is followed one hop, to
+the latest binding of its name above it in the innermost function holding the line, else the top
+level. A positional source, and one with no binding or whose binding is itself one expansion or one
+positional, is UNFOLLOWED, counted and printed, never gated.
 
 The population is the location-probe mode's: tracked `*.sh` files and extensionless shell-shebang
 files under the pathspecs. A comment half and a quoted heredoc's body are never graded. Every run
 prints the scanned count, the `mv` count, the fixed, admitted and unfollowed counts with their file
-counts, each unfollowed source, and every registered row's reason; a failing key lists
-`path:line  <source>` for each site, and a remedy line names the three admitted forms. The registry
-is the loop registry's four fields keyed on the one CLASS, `<path>\tfixed-temp\t<count>\t<reason>`,
-shrink-only with both-directions set equality. The argument is optional with the same three states,
-and an empty population or a failed `git ls-files` refuses with exit 2. What it does NOT check is
-listed on `run_temp_scan`: a temp bound in another scope or passed in, a binder in a sourced library,
-`mv` in a quoted string or under `eval` or across a line continuation, a fixed name written with no
-`mv` at all, and Python inside a shell string.
+counts, each unfollowed source, and every registered row's reason; a failing key, undeclared or
+drifted, is ONE finding listing `path:line  <source>` for each site, and a remedy line names the
+admitted forms. The registry is the loop registry's four fields keyed on the one CLASS,
+`<path>\tfixed-temp\t<count>\t<reason>`, shrink-only with both-directions set equality. The argument
+is optional with the same three states, and an empty population or a failed `git ls-files` refuses
+with exit 2.
+
+What it does NOT check is one table in the scanner, `TEMP_BOUNDARY`: `run_temp_scan`'s docstring and
+this section name each row, and the selftest runs each row's example and finds its label in both.
+Unfollowed, so a miss: a positional source; a binding that is itself one expansion; a temp bound in
+another scope; a loop variable; a binder in a sourced library; and an mv split across a line
+continuation. Unread, no `mv` counted, so a miss: an mv in a case arm; an mv run through a wrapper
+command, `env`, `time`, `nohup`, `xargs` or `command -p`; an mv named by a path or escaped; an mv
+inside a quoted string or under eval; a fixed name written with no mv; and Python inside a shell
+string. Admitted, so a miss: a mktemp temp in another directory, whose `mv` is a copy. Fixed, the
+mode's one known false red: a name a function prints, which is not followed into the function; its
+remedy is a binder.
 
 ## fork-count.sh
 

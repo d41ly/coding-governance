@@ -53,7 +53,9 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 # 211 -> 217, TOOL-aPairedSlots-7: TWO's six checks, two concurrent writers of the run log and the
 # shared full green, COUNTED off the arm.
 # 220 + 217 -> 226, TOOL-aSparedSpawn-34, the merge of local main: base 211, plus 9 and 6.
-FLOOR_ASSERTIONS=226
+# 226 -> 230, TOOL-dRedressedBar-26: TWO's four new checks, one over a planted staging name of each
+# spelling and three for its second pass on the helper's mktemp branch.
+FLOOR_ASSERTIONS=230
 # Where the scratch clone installs the runner: a FIXTURE-INTERNAL path, bound once, never gov's prefix.
 KR=kit/run-gates
 n=0; st=0
@@ -1052,9 +1054,11 @@ build_scratch || { echo "FAIL the scratch clone could not be built"; exit 1; }
 # stampers, each its own PROCESS as two bars are, stage under two different names, and after both
 # stamp concurrently the shared file is one whole stamp with no staging file left. The statement is
 # found by its `derive_temp_path` call and runs with the runner's helper line prepended, and the
-# helper run in two processes names two different temps (TOOL-dRedressedBar-24 S8).
+# helper run in two processes names two different temps (TOOL-dRedressedBar-24 S8). The leftover check
+# counts a staging name of either spelling the helper writes, and the stamp half runs a second time on
+# the helper's `mktemp` branch, the only one a bash before 5.1 has (TOOL-dRedressedBar-26 S19).
 check_two_writers() {
-  local t rl sg hp w i line pad dir p1 p2 a b
+  local t rl sg hp w i line pad dir p1 p2 a b stg
   t=$(mktemp -d) || { check "TWO scratch" no yes; return; }
   rl=$(grep -F '"$dir/gates.log"; } 2>/dev/null && return 0' "$HERE/run-gates.sh" | sed 's/ && return 0$//; s/^ *\[ -n "\$dir" \] && //')
   check "TWO the runner's run-log append statement is found" "$([ -n "$rl" ] && echo found)" found
@@ -1082,8 +1086,34 @@ derive_temp_path _tp stage && printf %s "$_tp"')
   a=$(cat "$_gcd_abs/gate-full-green.shared" 2>/dev/null)
   check "TWO after two concurrent stampers the shared green is one whole stamp" \
     "$(case "$a" in 'stamp A'|'stamp B') echo whole ;; *) echo "torn:$a" ;; esac)" whole
-  b=$(ls "$_gcd_abs" | grep -c '^gate-full-green\.shared\..*\.tmp$')
+  # A staging name of either spelling the helper writes: <dest>.<digits>.tmp from SRANDOM, and
+  # <dest>.XXXXXXXX from its mktemp fallback (TOOL-dRedressedBar-26).
+  stg='^gate-full-green\.shared\.'
+  mkdir -p "$t/plant"
+  : > "$t/plant/gate-full-green.shared"; : > "$t/plant/gate-full-green.shared.123.tmp"; : > "$t/plant/gate-full-green.shared.AbCd1234"
+  check "TWO the leftover pattern counts one staging name of each spelling and not the destination" \
+    "$(ls "$t/plant" | grep -c "$stg")" 2
+  b=$(ls "$_gcd_abs" | grep -c "$stg")
   check "TWO no staging file is left behind" "$b" 0
+  # THE SECOND PASS, on the helper's mktemp branch: every process is handed `unset SRANDOM` on the line
+  # above the helper, so a 5.1 host grades the branch a host before 5.1 ships with.
+  rm -f "$_gcd_abs"/gate-full-green.shared*
+  p1=$(bash -c "unset SRANDOM
+$hp"'
+derive_temp_path _tp stage && printf %s "$_tp"'); p2=$(bash -c "unset SRANDOM
+$hp"'
+derive_temp_path _tp stage && printf %s "$_tp"')
+  check "TWO on the mktemp branch two stamping processes stage under two different names" "$([ -n "$p1" ] && [ "$p1" != "$p2" ] && echo distinct)" distinct
+  ( export gd=$t/gA; for i in $(seq 1 25); do bash -c "unset SRANDOM
+$sg"; done ) &
+  ( export gd=$t/gB; for i in $(seq 1 25); do bash -c "unset SRANDOM
+$sg"; done ) &
+  wait
+  a=""; { a=$(<"$_gcd_abs/gate-full-green.shared"); } 2>/dev/null
+  check "TWO on the mktemp branch the shared green is one whole stamp" \
+    "$(case "$a" in 'stamp A'|'stamp B') echo whole ;; *) echo "torn:$a" ;; esac)" whole
+  b=$(ls "$_gcd_abs" | grep -c "$stg")
+  check "TWO on the mktemp branch no staging file is left behind" "$b" 0
   unset _gcd_abs
   rm -rf "$t"
 }

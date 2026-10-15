@@ -5478,7 +5478,8 @@ if [ -n "$REUSE_CACHE" ] && [ -n "$RG_HEAD" ]; then
     for _l in ${_cwl[@]+"${_cwl[@]}"}; do [ "${_l##*$'\t'}" = 1 ] || printf '%s\n' "$_l" >> "$_cw"; done
   fi
   if [ -s "$_cw" ] || [ "$REUSE_MODE" != off ]; then
-    "$PYBIN" -c '
+    # -I: this program runs from $ROOT, where a top-level tempfile.py would shadow the stdlib module (TOOL-dRedressedBar-26)
+    "$PYBIN" -I -c '
 import os, sys, tempfile, time
 root = sys.argv[1]
 for line in sys.stdin.read().splitlines():

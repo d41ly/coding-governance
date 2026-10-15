@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-26 — the round-2 temp-name findings, batched: every command-word `mv` is read, no positional or two-hop source reds, no bare `SRANDOM` is admitted, and the cache writer and leftover check hold on every runtime
 
-**Status:** SPECCED · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 20
+**Status:** INPROGRESS · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 20
 
 <!-- gen:spec-records -->
 
