@@ -195,6 +195,10 @@ calls.
 - 2026-10-15, session 1799cb98: K1 was explained and put back to the owner as a fork, and the owner
   confirmed "the violator pays" (`with-hooks-report` as read). The foundations record and v2 were
   amended, and dShippedRelease's lander gains a core re-check on the landed tree.
+- 2026-10-15, session 1799cb98: the owner opened a layer-by-layer review: four mandatory layers
+  (instruction, DLG, roles, memory) and expansion layers, then added instrument, monitoring and
+  deployment mid-turn. The instruction layer was measured and set against the design, and the layer
+  model was reframed as capabilities, with Runtime proposed as a core layer. Forks were put to the owner.
 
 ## Instruments
 
@@ -443,6 +447,8 @@ Runs, 2026-10-14:
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-compaction-results.md` | The compaction experiment's results: each answer scored and traced, the derived tallies and their instrument, findings, conclusions for unattended builds, and the forks they raise. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-design-overview.md` | The design at `2323a2a23`, a snapshot for the owner: the three layers, the mechanics that hold them together, the chain and what is open, each section pointing at its owning record. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-design-overview-{layers.svg,cycle.html}` | The two diagrams shown with that overview: the three layers, and the item cycle as a stepper. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md` | The layer review's first round: the owner's layer model and the instruction layer, measured against the current design, with the gaps, the recommendations and the forks. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-model.svg` | The layer model as capabilities: the core cycle on Runtime, expansions plugged in at declared points, Distribution beneath. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |
