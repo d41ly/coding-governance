@@ -758,16 +758,24 @@ exactly 1, the run refuses. An alias that is not PYBIN also refuses.
 **The record.** `<git-dir>/gate-profile/<run id>/` holds `envelope.json`, `host.tsv`, `census.tsv`,
 `legs.tsv` and, per leg, a `.leg` row in the runner's eight-field grammar, a redacted `.log` and the
 full `.json` profile. Nothing prunes it. Each raw capture is deleted once its redacted copy exists,
-and one that cannot be deleted is named in `raw_kept`. A `.leg` row's eighth field is the foreign
-count plus the foreign turnstile holders plus the leg's own queued bars. So `derive-ceilings.py`'s
-`read_runs` sets a contended reading aside, and a serial reading with eighth field `0` can be carried
-by `--observed`.
+and one that cannot be deleted is named in `raw_kept`. A capture a leg's processes still hold at
+its root's exit is retried at the run end, and an interrupt names every kept capture: a running
+leg's, and one an ended leg's processes still hold, retried first, its reason opening
+`interrupted; ` (TOOL-dRedressedBar-22). `legs.tsv` gains a row at each leg's end, so a run killed
+outright keeps its rows, and is rewritten whole from the final records at the run end and at an
+interrupt, so a retried capture's `log_bytes` reaches the table. A `.leg` row's eighth field is the
+foreign count plus the foreign turnstile holders plus the leg's own queued bars. So
+`derive-ceilings.py`'s `read_runs` sets a contended reading aside, and a serial reading with eighth
+field `0` can be carried by `--observed`.
 
 **What it does not check.** It grades no leg, because `ok` and `fail` are the exit status. It cannot
 see work done for a leg by another process, or a bar on another turnstile key. A leg that sleeps, or
-waits in the host queue, longer than `--stall-window` reads STALLED, and nothing is ever signalled.
-It runs only on Windows and refuses anywhere else. Exit 0 every leg ended and every record was
-written · 1 a record write failed · 2 a refusal before the first leg · 130 an interrupt.
+waits in the host queue, longer than `--stall-window` reads STALLED. No process that has run is ever
+signalled: a leg that never ends keeps the run open. The one terminate is a leg's root still
+suspended after a failed open, job assign, thread snapshot or resume, which has executed nothing and
+records `fail` with its `launch_error`. It runs only on Windows and refuses anywhere else. Exit 0
+every leg ended and every record was written · 1 a record write failed · 2 a refusal before the
+first leg · 130 an interrupt.
 
 ## The scratch directory — owned, redirected and swept
 

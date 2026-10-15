@@ -64,7 +64,9 @@ variable this tool sets in a leg's environment beyond the runner's `TMPDIR` is t
 
 EXIT 0 every leg ended and every record was written, whatever the legs' verdicts · 1 a record write
 failed, named on stderr · 2 a refusal before the first leg · 130 an interrupt, which writes the
-envelope, names each running leg's kept capture, and leaves the legs running.
+envelope and leaves the legs running. It names every kept capture in `raw_kept`: a running leg's,
+and one an ended leg's processes still hold, which it first retries as the run end does
+(TOOL-dRedressedBar-22 S2).
 """
 import argparse
 import ast
@@ -660,13 +662,19 @@ def derive_turnstile_wait(sightings, tick_t, stamps, lo, hi):
 
 # ================================================================== admission and stalls
 
-def check_admit(cpu, mem, running, fresh, cpu_cap=CPU_CAP_PCT, mem_cap=MEM_CAP_PCT):
-    """May --concurrent admit one more leg? Yes when no leg of the run is running — the `drained`
-    release of the runner's memory pause, so foreign load can delay a profile and never deadlock it.
-    Otherwise only on a FRESH sample, taken after the previous admission, at or under both caps."""
+def check_admit(mode, pending, running, cpu, mem, fresh, cpu_cap=CPU_CAP_PCT, mem_cap=MEM_CAP_PCT):
+    """May the loop admit one more leg? The loop's ONE admit decision, taken at both of its admission
+    sites, the host tick and the drained check (TOOL-dRedressedBar-22 S6). No when nothing is
+    pending. Yes when no leg of the run is running — the `drained` release of the runner's memory
+    pause, so foreign load can delay a profile and never deadlock it, and a serial run's only
+    admission. Otherwise only under --concurrent, on a FRESH sample, taken after the previous
+    admission, at or under both caps."""
+    if not pending:
+        return False
     if running == 0:
         return True
-    return bool(fresh) and cpu is not None and mem is not None and cpu <= cpu_cap and mem <= mem_cap
+    return (mode == "concurrent" and bool(fresh) and cpu is not None and mem is not None
+            and cpu <= cpu_cap and mem <= mem_cap)
 
 
 def check_stalled(tree_delta, job_delta, log_same, cpu_cap):
@@ -869,7 +877,10 @@ def scan_root_exits(api, handles, timeout_s):
 # starts (F3 b), so a substituted reading lacks the alias's own process per launch, and says so.
 
 # The child-starting program the interpreter probe runs, and the job wait that bounds each launch.
-JOB_CHILD_PROGRAM = "import subprocess, sys; sys.exit(subprocess.call([sys.executable, '-I', '-c', 'pass']))"
+# Its child is the BASE interpreter, the rule every fixture follows: a venv's `sys.executable` is a
+# redirector that starts the base interpreter as a second process (TOOL-dRedressedBar-22 S3).
+JOB_CHILD_PROGRAM = ("import subprocess, sys; exe = getattr(sys, '_base_executable', None) or sys.executable; "
+                     "sys.exit(subprocess.call([exe, '-I', '-c', 'pass']))")
 JOB_PROBE_WAIT_S = 120            # a probe launch not ended by then refuses; nothing is signalled
 
 
@@ -903,10 +914,11 @@ def resolve_alias_interpreter(bash, env, top, launcher, alias):
 
 def measure_job_children(api, bash, env, top, interp):
     """(TotalProcesses with one child, without one): <interp> launched twice as a leg is launched,
-    its output sent to the null device. One run starts `sys.executable -I -c pass` and waits for it;
-    its twin runs `-I -c pass`. The twin cancels the wrapper and the interpreter, so the difference
-    is 1 exactly when the child stayed in the job. Nothing is signalled: a launch that has not ended
-    within `JOB_PROBE_WAIT_S` refuses."""
+    its output sent to the null device. One run starts the base interpreter, `sys._base_executable`
+    or else `sys.executable`, as `-I -c pass` and waits for it; its twin runs `-I -c pass`. The twin
+    cancels the wrapper and the interpreter, a venv's redirector included, so the difference is 1
+    exactly when the child stayed in the job (TOOL-dRedressedBar-22 S3). Nothing is signalled: a
+    launch that has not ended within `JOB_PROBE_WAIT_S` refuses."""
     counts = []
     for program in (JOB_CHILD_PROGRAM, "pass"):
         try:
@@ -1117,6 +1129,16 @@ def render_legs_row(rec):
             v = v.get(part) if isinstance(v, dict) else None
         cells.append("-" if v is None else str(v).replace("\t", " ").replace("\n", " "))
     return "\t".join(cells)
+
+
+def write_legs_table(run_dir, legs):
+    """`legs.tsv` rewritten whole through `write_atomic` from the final records: the `LEGS_COLUMNS`
+    header, then `render_legs_row` of each leg holding a record, in index order. The leg-end appends
+    stay, so a run killed outright keeps its rows; this rewrite at the run end and at an interrupt
+    is what carries a field the exit moved, a retried capture's `log_bytes`, into the table
+    (TOOL-dRedressedBar-22 S9)."""
+    lines = ["\t".join(LEGS_COLUMNS)] + [render_legs_row(lg["record"]) for lg in legs if lg.get("record")]
+    return write_atomic(os.path.join(run_dir, "legs.tsv"), ("\n".join(lines) + "\n").encode("utf-8"))
 
 
 def measure_scratch_bytes(path):
@@ -1594,6 +1616,22 @@ def write_leg_capture(lg, final):
     return None
 
 
+def write_final_capture(lg, raw_kept, prefix):
+    """The one capture-accounting step every exit path that writes the envelope runs, per leg
+    (TOOL-dRedressedBar-22 S2). When the leg's `raw_pending` is set, its capture is retried by
+    `write_leg_capture(lg, final=True)`, the leg's new `log_bytes` is stored in its record, and a
+    capture still on disk is appended to `raw_kept` as {leg, path, reason}, the reason being
+    <prefix> and then what `write_leg_capture` returned. The run end passes an empty prefix and an
+    interrupt `interrupted; `. Returns whether it retried, so the caller rewrites `<i>.json`."""
+    if not lg.get("raw_pending"):
+        return False
+    why = write_leg_capture(lg, final=True)
+    lg["record"]["log_bytes"] = lg.get("log_bytes")
+    if why and os.path.lexists(lg["capture"]):
+        raw_kept.append({"leg": lg["name"], "path": lg["capture"], "reason": prefix + why})
+    return True
+
+
 def parse_flags(argv):
     """The flags, bounded at parse: an over-long value, a non-number or one out of its bounds exits 2."""
     for a in argv:
@@ -1861,15 +1899,16 @@ def run_profile(opts):
                         pass
                     lg["host"].append((cpu, mem))
                 events, n_before = [], len(running)
-                if opts.mode == "concurrent" and pending and running \
-                        and check_admit(cpu, mem, len(running), state["sample_m"] > state["admit_m"]):
+                # TOOL-dRedressedBar-22 S6: `check_admit` is the loop's one admit decision, so the
+                # drained release a tick takes passes through the clause the function grades.
+                if check_admit(opts.mode, len(pending), len(running), cpu, mem, state["sample_m"] > state["admit_m"]):
                     run_admission(events)
                 write_record_line(os.path.join(run_dir, "host.tsv"),
                                   render_host_row(time.time_ns(), cpu, mem, n_before, ",".join(events)))
                 next_tick += HOST_EVERY_S
                 if next_tick <= now:
                     next_tick = now + HOST_EVERY_S
-            if pending and not running:
+            if check_admit(opts.mode, len(pending), len(running), state["cpu"], state["mem"], False):
                 events = []
                 run_admission(events)
                 write_record_line(os.path.join(run_dir, "host.tsv"),
@@ -1905,14 +1944,20 @@ def run_profile(opts):
             raw_kept.append({"leg": lg["name"], "path": lg["capture"], "reason": "interrupted"})
         for i in sorted(ending):
             write_leg_profile(ending.pop(i))
+        # TOOL-dRedressedBar-22 S2 and S9: the run end's capture step, then the table, so a capture an
+        # ended leg's processes still hold is retried and named as the run end names it.
+        for lg in legs:
+            if lg.get("record") and write_final_capture(lg, raw_kept, "interrupted; "):
+                write_leg_record(run_dir, lg["record"])
+        write_legs_table(run_dir, legs)
         envelope["exit"] = 130
         envelope["failed_legs"] = [lg["name"] for lg in legs if lg.get("record") and lg["record"]["verdict"] != "ok"]
         write_envelope(run_dir, envelope)
-        print("measure-legs: INTERRUPTED — %d leg(s) left running, their captures kept; record %s"
-              % (len(running), run_dir), file=sys.stderr, flush=True)
+        print("measure-legs: INTERRUPTED — %d leg(s) left running; %d raw capture(s) kept, each named in "
+              "raw_kept; record %s" % (len(running), len(raw_kept), run_dir), file=sys.stderr, flush=True)
         return 130
 
-    # ---- run end: each job re-read, each kept capture retried, each profile rewritten
+    # ---- run end: each job re-read, each kept capture retried, each profile rewritten, the table too
     for lg in legs:
         rec = lg["record"]
         if lg["job"] is not None:  # a leg whose launch failed (S35) holds no job and no handle
@@ -1920,14 +1965,11 @@ def run_profile(opts):
                 rec["job_final"] = read_job_accounting(api, lg["job"])
             except OSError as exc:
                 rec["job_final"] = {"unread": str(exc)}
-        if lg.get("raw_pending"):
-            why = write_leg_capture(lg, final=True)
-            rec["log_bytes"] = lg.get("log_bytes")
-            if why:
-                raw_kept.append({"leg": lg["name"], "path": lg["capture"], "reason": why})
+        write_final_capture(lg, raw_kept, "")
         write_leg_record(run_dir, rec)
         if lg["hq"]:
             api.CloseHandle(lg["hq"])
+    write_legs_table(run_dir, legs)
     recs = [lg["record"] for lg in legs]
     width = 1 if opts.mode == "serial" else max(1, state["peak"])
     durs = [r["wall_s"] for r in recs]
@@ -2165,10 +2207,16 @@ def test_platform_refusal(_tmp):
 
 
 def test_check_admit(_tmp):
-    """AC5: hold, admit, hold, hold, admit. Red when the drained clause is missing."""
-    got = [check_admit(81, 50, 1, True), check_admit(80, 90, 1, True), check_admit(50, 91, 1, True),
-           check_admit(50, 50, 1, False), check_admit(99, 99, 0, False)]
-    check_arm("test_check_admit", got == [False, True, False, False, True], repr(got))
+    """AC5, over the loop's one admit decision (TOOL-dRedressedBar-22 S6): hold, admit, hold, hold,
+    admit, admit, hold, hold. The drained rows are the fifth and sixth, and the loop reaches them:
+    `test_legs_table` records every call a serial run makes. Red when the drained clause is missing."""
+    rows = ((("concurrent", 1, 1, 81, 50, True), False), (("concurrent", 1, 1, 80, 90, True), True),
+            (("concurrent", 1, 1, 50, 91, True), False), (("concurrent", 1, 1, 50, 50, False), False),
+            (("concurrent", 1, 0, 99, 99, False), True), (("serial", 1, 0, None, None, False), True),
+            (("serial", 1, 1, 10, 10, True), False), (("concurrent", 0, 0, 10, 10, True), False))
+    got = [check_admit(*args) for args, _want in rows]
+    want = [w for _args, w in rows]
+    check_arm("test_check_admit", got == want and True in want and False in want, repr(got))
 
 
 def test_scrub_derivation(_tmp):
@@ -2280,8 +2328,10 @@ def test_serial_run(tmp):
     env_rec = read_envelope(run_dir)
     six, none, memio, penv = recs["spawn six"], recs["spawn none"], recs["memio"], recs["printenv"]
     kids = [p for p in six["procs"] if "-I -c" in (p.get("command") or "")]
-    check_arm("AC1 spawn count", six["procs_total"] - none["procs_total"] == 6,
-              "%s - %s" % (six["procs_total"], none["procs_total"]))
+    # TOOL-dRedressedBar-22 S15: an A/B difference is read only once both legs are shown to have run.
+    check_arm("AC1 spawn count", six["verdict"] == none["verdict"] == "ok"
+              and six["procs_total"] - none["procs_total"] == 6,
+              "%s %s - %s %s" % (six["verdict"], six["procs_total"], none["verdict"], none["procs_total"]))
     check_arm("AC1 per-process rows", len(kids) == 6 and all(
         p.get(k) is not None for p in kids for k in ("ppid", "start", "first_seen", "last_seen", "cpu_s",
                                                     "peak_mem_b")), repr(kids)[:300])
@@ -2361,7 +2411,10 @@ def test_resolution_disabled(tmp):
     """AC1 and AC2's resolution red half, on a host whose PYBIN is an alias. `resolve_launcher_aliases`
     is rebound to resolve nothing and verify nothing, so both spawn legs run the alias: their process
     totals differ by 0, and the memio leg reads under 200 MiB with nothing written, as the first build
-    read it on node d, 2026-10-15. Elsewhere it prints `unexercised` and asserts nothing."""
+    read it on node d, 2026-10-15. Those readings are work done OUTSIDE the job only once the legs are
+    shown to have done it: `spawn six`, `spawn none` and `memio` each read verdict `ok`, and memio's
+    log carries the line it prints after its write (TOOL-dRedressedBar-22 S15). Elsewhere it prints
+    `unexercised` and asserts nothing."""
     pybin, _path, alias = read_pybin_alias()
     if not alias:
         print("  unexercised: no alias on this host (AC1 and AC2's resolution red half; PYBIN %s)" % pybin,
@@ -2377,6 +2430,10 @@ def test_resolution_disabled(tmp):
         check_arm("test_resolution_disabled", False, "exit %s, run dir %r, %d record(s)" % (rc, run_dir, len(recs)))
         return
     six, none, memio = recs["spawn six"], recs["spawn none"], recs["memio"]
+    log = read_plant_bytes(os.path.join(run_dir, "%d.log" % memio["i"]))
+    check_arm("AC1 AC2 red half: the three compared legs ran, each `ok`, and memio's write happened",
+              six["verdict"] == none["verdict"] == memio["verdict"] == "ok" and b"memio: wrote 200 MiB" in log,
+              repr((six["verdict"], none["verdict"], memio["verdict"], log[-120:])))
     check_arm("AC1 red half: unresolved, the spawn difference reads 0",
               six["procs_total"] - none["procs_total"] == 0, "%s - %s" % (six["procs_total"], none["procs_total"]))
     check_arm("AC2 red half: unresolved, memio's work is outside its job",
@@ -2655,8 +2712,11 @@ def test_fork_count(tmp):
     rc, _out, run_dir, recs = run_fixture(tmp, write_temp_manifest(tmp, "forks.json", rows))
     five, none = recs.get("forks five") or {}, recs.get("forks none") or {}
     diff = (five.get("procs_total") or 0) - (none.get("procs_total") or 0)
-    check_arm("AC32 the forked processes are counted", rc == 0 and len(rows) == 2 and diff >= 10,
-              "exit %s, %d row(s), %s - %s" % (rc, len(rows), five.get("procs_total"), none.get("procs_total")))
+    # TOOL-dRedressedBar-22 S15: both legs ran, so the difference is theirs and not two failed launches.
+    check_arm("AC32 the forked processes are counted",
+              rc == 0 and len(rows) == 2 and five.get("verdict") == none.get("verdict") == "ok" and diff >= 10,
+              "exit %s, %d row(s), %s %s - %s %s" % (rc, len(rows), five.get("verdict"), five.get("procs_total"),
+                                                     none.get("verdict"), none.get("procs_total")))
     if run_dir:
         remove_scratch(run_dir)
 
@@ -2699,20 +2759,23 @@ def test_manifest_refusals(tmp):
 
 
 def test_launch_failure(tmp):
-    """AC35. `build_job` hands the leg, after the interpreter probe's two real jobs, a job handle
-    already closed, so the assign fails: the run returns 0, the leg reads `fail` with rc 1 and a
-    `launch_error` naming the call, and no process carrying the leg's argv is left. Red when the
-    terminate is taken out: the suspended root is then still in the census."""
+    """AC35. `build_job` hands the first leg, after the interpreter probe's two real jobs, a job handle
+    already closed, so the assign fails, and hands the second leg a real job: the run returns 0, the
+    first leg reads `fail` with rc 1 and a `launch_error` naming the call, the second, `after`, runs
+    and reads `ok`, and no process carrying the first leg's argv is left (TOOL-dRedressedBar-22 S10).
+    Red when the terminate is taken out: the suspended root is then still in the census; and when the
+    failed launch drops the pending legs: `after` is then absent."""
     marker = "launch-probe-%d-%d" % (os.getpid(), time.time_ns())
+    spawn = "{prefix}/run-gates/fixtures/measure-legs/spawn.py"
     manifest = write_temp_manifest(tmp, "launch.json", [
-        {"name": "launch", "argv": ["python3", "{prefix}/run-gates/fixtures/measure-legs/spawn.py", "0", "1",
-                                    marker]}])
+        {"name": "launch", "argv": ["python3", spawn, "0", "1", marker]},
+        {"name": "after", "argv": ["python3", spawn, "0", "1"]}])
     real, made = globals()["build_job"], []
 
     def build_closed_job(api):
         job = real(api)
         made.append(job)
-        if len(made) > 2:
+        if len(made) == 3:
             api.CloseHandle(job)
         return job
 
@@ -2723,11 +2786,18 @@ def test_launch_failure(tmp):
     finally:
         globals()["build_job"] = real
     took = time.monotonic() - t0
-    rec = recs.get("launch") or {}
+    rec, after = recs.get("launch") or {}, recs.get("after") or {}
     check_arm("AC35 a failed launch is a failed leg, and the run goes on",
               rc == 0 and took < 60 and rec.get("verdict") == "fail" and rec.get("rc") == 1
               and str(rec.get("launch_error") or "").startswith("launch: AssignProcessToJobObject"),
               repr((rc, round(took, 1), rec.get("verdict"), rec.get("rc"), rec.get("launch_error"))))
+    table = ["no run dir"]
+    if run_dir:
+        rows = read_plant_bytes(os.path.join(run_dir, "legs.tsv")).decode("utf-8", "replace").split("\n")
+        table = [ln for ln in rows[1:] if ln]
+    check_arm("AC35 ...the next leg runs after it and reads `ok`, and the table holds both",
+              after.get("verdict") == "ok" and (after.get("procs_total") or 0) >= 1 and len(table) == 2,
+              repr((after.get("verdict"), after.get("procs_total"), table))[:300])
     try:
         rows = load_process_monitor().census.scan_processes()[0]
         left = [r["winpid"] for r in rows if marker in (r.get("command") or "")]
@@ -3225,6 +3295,288 @@ def test_fixtures_withheld(_tmp):
               not any(c in str(e) for e in owned for c in "*?["), repr(sorted(map(str, owned))))
 
 
+# ---- TOOL-dRedressedBar-22's arms
+
+ORPHAN_SH = "{prefix}/run-gates/fixtures/measure-legs/orphan.sh"
+SPAWN_PY = "{prefix}/run-gates/fixtures/measure-legs/spawn.py"
+
+
+def test_interrupt_capture(tmp):
+    """AC2 (S2, S14). `orphan.sh 6` as `orphan`, then `spawn.py 0 6` as `hold`, serially.
+    `write_leg_capture` is wrapped to note a non-final call that kept the capture, which is the
+    orphan's root ending while its background subshell still holds the capture, and `scan_root_exits`
+    to raise `KeyboardInterrupt` on its first call after that note, with `hold` running. The run
+    returns 130 and its envelope's `raw_kept` names `hold`, `interrupted`, and `orphan`, whose capture
+    is still on disk, with a reason opening `interrupted; `. The arm then waits, bounded at 30 s,
+    until both kept captures unlink, so no fixture process outlives it. Red when the interrupt branch's
+    pending-capture step is taken out: `raw_kept` then names `hold` alone."""
+    base = tempfile.mkdtemp(prefix="intr.", dir=tmp)
+    manifest = write_temp_manifest(base, "interrupt.json", [
+        {"name": "orphan", "argv": ["bash", ORPHAN_SH, "6"]},
+        {"name": "hold", "argv": ["python3", SPAWN_PY, "0", "6"]}])
+    out = tempfile.mkdtemp(prefix="out.", dir=base)
+    real_capture, real_scan, noted = globals()["write_leg_capture"], globals()["scan_root_exits"], []
+
+    def write_noted_capture(lg, final):
+        why = real_capture(lg, final)
+        if not final and why is not None:
+            noted.append(lg["name"])
+        return why
+
+    def scan_interrupted_exits(api, handles, timeout_s):
+        if noted:
+            raise KeyboardInterrupt
+        return real_scan(api, handles, timeout_s)
+
+    err, std = io.StringIO(), io.StringIO()
+    globals()["write_leg_capture"], globals()["scan_root_exits"] = write_noted_capture, scan_interrupted_exits
+    try:
+        with contextlib.redirect_stderr(err), contextlib.redirect_stdout(std):
+            rc = main(["--serial", "--legs", manifest, "--out", out] + SELFTEST_FLAGS)
+    finally:
+        globals()["write_leg_capture"], globals()["scan_root_exits"] = real_capture, real_scan
+    sys.stdout.write(std.getvalue())
+    runs = [os.path.join(out, r) for r in os.listdir(out)]
+    run_dir = runs[0] if len(runs) == 1 else ""
+    env_rec = read_envelope(run_dir) if run_dir else {}
+    kept = {k.get("leg"): k for k in env_rec.get("raw_kept") or ()}
+    hold, orphan = kept.get("hold") or {}, kept.get("orphan") or {}
+    line = [ln for ln in err.getvalue().split("\n") if ln.startswith("measure-legs: INTERRUPTED")]
+    held = bool(orphan.get("path")) and os.path.lexists(orphan["path"])
+    if not noted:
+        check_arm("AC2 the interrupt is staged", False, "no non-final capture was kept, so the interrupt never "
+                  "came: the orphan left its job or ended first (exit %s)" % rc)
+    else:
+        check_arm("AC2 LIVENESS the interrupt came after the orphan's capture was kept, and `hold` is named "
+                  "`interrupted`", noted == ["orphan"] and rc == 130 and env_rec.get("exit") == 130
+                  and hold.get("reason") == "interrupted", repr((noted, rc, env_rec.get("exit"), hold)))
+        check_arm("AC2 an interrupt names the capture an ended leg's processes still hold",
+                  str(orphan.get("reason") or "").startswith("interrupted; ") and held
+                  and os.path.isfile(os.path.join(run_dir, "0.json")) and len(line) == 1
+                  and "2 raw capture(s) kept" in line[0], repr((orphan, held, line))[:600])
+    paths = [k["path"] for k in kept.values() if k.get("path")]
+    deadline = time.monotonic() + 30
+    while paths and time.monotonic() < deadline:
+        for p in list(paths):
+            try:
+                os.remove(p)
+            except FileNotFoundError:
+                pass
+            except OSError:
+                continue
+            paths.remove(p)
+        if paths:
+            time.sleep(0.5)
+    if paths:
+        print("  NOTE: a kept capture was still held after 30 s: %s" % ", ".join(paths), flush=True)
+    if run_dir:
+        remove_scratch(run_dir)
+
+
+def test_venv_interpreter(tmp):
+    """AC3 (S3). A scratch venv made by `-m venv --without-pip` from this process's base interpreter:
+    `measure_job_children` over its `Scripts/python.exe` reads a difference of 1, because the probe's
+    child is the base interpreter. LIVENESS: the same probe with the program spawning
+    `sys.executable` reads 2, so this venv carries the redirector the rule exists for. Static, the
+    record's left-shift: `JOB_CHILD_PROGRAM` and every `.py` file under `FIXTURES` carry
+    `_base_executable` on each line that carries `sys.executable`, over at least four such lines,
+    three of them in the fixtures. Red when `JOB_CHILD_PROGRAM` spawns `sys.executable`."""
+    base_exe = getattr(sys, "_base_executable", None) or sys.executable
+    venv = os.path.join(tempfile.mkdtemp(prefix="venv.", dir=tmp), "v")
+    try:
+        made = subprocess.run([base_exe, "-I", "-m", "venv", "--without-pip", venv], capture_output=True,
+                              timeout=120)
+        made = (made.returncode, made.stderr.decode("utf-8", "replace")[-300:])
+    except (OSError, subprocess.SubprocessError) as exc:
+        made = (None, repr(exc))
+    interp = os.path.join(venv, "Scripts", "python.exe")
+    if made[0] != 0 or not os.path.isfile(interp):
+        check_arm("AC3 a scratch venv is made", False, repr(made))
+    else:
+        api = resolve_job_backend()
+        bash, _tried = profile_bar.resolve_bash(RUNNER)
+        top = profile_bar.run_git(["rev-parse", "--show-toplevel"])
+        pairs = []
+        real = globals()["JOB_CHILD_PROGRAM"]
+        for program in (real, "import subprocess, sys; sys.exit(subprocess.call([sys.executable, '-I', '-c', 'pass']))"):
+            globals()["JOB_CHILD_PROGRAM"] = program
+            try:
+                with_child, without_child = measure_job_children(api, bash, dict(os.environ), top,
+                                                                 interp.replace("\\", "/"))
+                pairs.append(with_child - without_child)
+            except ProfileRefused as exc:
+                pairs.append("refused: %s" % exc)
+            finally:
+                globals()["JOB_CHILD_PROGRAM"] = real
+        check_arm("AC3 the interpreter probe over a venv's python reads a difference of 1", pairs[0] == 1,
+                  repr(pairs[0]))
+        check_arm("AC3 LIVENESS ...where a child spawned through sys.executable reads 2, the redirector",
+                  pairs[1] == 2, repr(pairs[1]))
+    lines = [("JOB_CHILD_PROGRAM", ln) for ln in JOB_CHILD_PROGRAM.split("\n") if "sys.executable" in ln]
+    for folder, dirs, files in os.walk(FIXTURES):
+        dirs[:] = sorted(d for d in dirs if d != "__pycache__")
+        for f in sorted(files):
+            if f.endswith(".py"):
+                with open(os.path.join(folder, f), encoding="utf-8") as fh:
+                    lines += [(f, ln.strip()) for ln in fh.read().split("\n") if "sys.executable" in ln]
+    in_fixtures = [f for f, _ln in lines if f != "JOB_CHILD_PROGRAM"]
+    bare = [(f, ln) for f, ln in lines if "_base_executable" not in ln]
+    check_arm("AC3 every program line spawning sys.executable carries _base_executable",
+              len(lines) >= 4 and len(in_fixtures) >= 3 and not bare, repr((len(lines), in_fixtures, bare))[:600])
+
+
+def test_alias_refusals(tmp):
+    """AC11 (S11). Each of the alias rule's four refusals, driven. Through `main` over `serial.json`:
+    with `measure_job_children` rebound to (2, 2), and then with `check_app_alias` rebound to also
+    read True for a file whose stem is `bash`, each run returns 2 with one `REFUSED` line carrying its
+    reason, no traceback and nothing under `--out`. Called directly: `resolve_launcher_aliases`
+    refuses a launcher `os.lstat` cannot read, and `resolve_alias_interpreter` one that prints no
+    plain file. LIVENESS: each function answers a real input without refusing. Red when a raise is
+    deleted: the first run then profiles every leg and returns 0."""
+    for name, fake, phrase in (
+            ("measure_job_children", lambda *_a, **_k: (2, 2), "keeps no child"),
+            ("check_app_alias", lambda path, real=check_app_alias: real(path) or os.path.splitext(
+                os.path.basename(str(path)))[0].lower() == "bash", "no rule here resolves an alias that is not PYBIN")):
+        out = tempfile.mkdtemp(prefix="out.", dir=tmp)
+        err, std = io.StringIO(), io.StringIO()
+        real = globals()[name]
+        globals()[name] = fake
+        try:
+            with contextlib.redirect_stderr(err), contextlib.redirect_stdout(std):
+                rc = main(["--serial", "--legs", os.path.join(FIXTURES, "serial.json"), "--out", out]
+                          + SELFTEST_FLAGS)
+        except Exception as exc:  # a crash is a failure this arm names, never raises
+            rc = "raised %r" % exc
+        finally:
+            globals()[name] = real
+        lines = [ln for ln in err.getvalue().split("\n") if ln.startswith("measure-legs: REFUSED — ")]
+        check_arm("AC11 %s refuses with exit 2, one named line and nothing written" % name,
+                  rc == 2 and len(lines) == 1 and phrase in lines[0] and not os.listdir(out)
+                  and "Traceback" not in err.getvalue() + std.getvalue(),
+                  repr((rc, lines, os.listdir(out), err.getvalue()[-300:])))
+    api = resolve_job_backend()
+    bash, _tried = profile_bar.resolve_bash(RUNNER)
+    top = profile_bar.run_git(["rev-parse", "--show-toplevel"])
+    env = dict(os.environ)
+    base_exe = (getattr(sys, "_base_executable", None) or sys.executable).replace("\\", "/")
+    missing = os.path.join(tmp, "no-such-python.exe").replace("\\", "/")
+    real = globals()["measure_job_children"]
+    got = []
+    for launcher, path, children in (("py-missing", missing, real), (base_exe, base_exe, lambda *_a, **_k: (2, 1))):
+        globals()["measure_job_children"] = children
+        try:
+            got.append(resolve_launcher_aliases(api, bash, env, top, launcher, [],
+                                                {launcher: {"posix": "/probe/" + launcher, "path": path}})[0])
+        except ProfileRefused as exc:
+            got.append("refused: %s" % exc)
+        finally:
+            globals()["measure_job_children"] = real
+    check_arm("AC11 a launcher os.lstat cannot read refuses", "os.lstat cannot" in str(got[0]), repr(got[0]))
+    check_arm("AC11 LIVENESS ...and a real non-alias file is no substitution", got[1] == [], repr(got[1]))
+    got = []
+    for launcher in ("echo", base_exe):
+        try:
+            got.append(resolve_alias_interpreter(bash, env, top, launcher, "the alias probed for %s" % launcher))
+        except ProfileRefused as exc:
+            got.append("refused: %s" % exc)
+    check_arm("AC11 an alias whose printed interpreter is no file refuses", "no plain file" in got[0], got[0])
+    check_arm("AC11 LIVENESS ...and one printing a plain file returns it", os.path.isfile(got[1]), got[1])
+
+
+def test_ab_arms_read_verdicts(_tmp):
+    """AC15 (S15), the record's left-shift for `ab-arm-never-did-the-work`. An `ast` walk of this file
+    takes every `test_*` function holding a subtraction whose two operands each read `procs_total`,
+    requires at least three, and requires each to read `verdict`, so no A/B difference is graded
+    before both legs are shown to have run. Red when one such arm's verdict read is taken out."""
+    with open(os.path.abspath(__file__), encoding="utf-8") as fh:
+        tree = ast.parse(fh.read())
+    found, blind = [], []
+    for fn in tree.body:
+        if not (isinstance(fn, ast.FunctionDef) and fn.name.startswith("test_")):
+            continue
+        reads = {n.value if isinstance(n, ast.Constant) else n.attr for n in ast.walk(fn)
+                 if isinstance(n, (ast.Constant, ast.Attribute))}
+        subs = [n for n in ast.walk(fn) if isinstance(n, ast.BinOp) and isinstance(n.op, ast.Sub) and all(
+            any((isinstance(m, ast.Constant) and m.value == "procs_total")
+                or (isinstance(m, ast.Attribute) and m.attr == "procs_total") for m in ast.walk(side))
+            for side in (n.left, n.right))]
+        if subs:
+            found.append(fn.name)
+            if "verdict" not in reads:
+                blind.append(fn.name)
+    check_arm("AC15 at least three arms subtract two legs' procs_total", len(found) >= 3, repr(found))
+    check_arm("AC15 every such arm reads its legs' verdicts", not blind, repr(blind))
+
+
+def test_legs_table(tmp):
+    """AC9 (S9), and AC5's loop half (S6). `orphan.sh 2` as `orphan`, then `spawn.py 0 5` as `hold`,
+    serially, with `check_admit` wrapped to record each call and to raise `KeyboardInterrupt` once
+    60 s have passed, so a loop that admits nothing ends red instead of hanging. Every `legs.tsv` row
+    equals `render_legs_row` over that leg's final `<i>.json`, column for column. LIVENESS: the
+    orphan's log carries `late` and reads 11 bytes, so its size moved after the row its leg end
+    appended, and two admissions were recorded. Exactly two calls answer True, each with no leg
+    running. Red when the run end writes no table: the orphan's row then reads 6 bytes."""
+    base = tempfile.mkdtemp(prefix="table.", dir=tmp)
+    manifest = write_temp_manifest(base, "table.json", [
+        {"name": "orphan", "argv": ["bash", ORPHAN_SH, "2"]},
+        {"name": "hold", "argv": ["python3", SPAWN_PY, "0", "5"]}])
+    real, admitted, calls, t0 = globals()["check_admit"], [], [0], time.monotonic()
+
+    def check_recorded_admit(mode, pending, running, *rest, **kw):
+        if time.monotonic() - t0 > 60:
+            raise KeyboardInterrupt
+        got = real(mode, pending, running, *rest, **kw)
+        calls[0] += 1
+        if got:
+            admitted.append((pending, running))
+        return got
+
+    globals()["check_admit"] = check_recorded_admit
+    try:
+        rc, _out, run_dir, recs = run_fixture(base, manifest)
+    finally:
+        globals()["check_admit"] = real
+    lines = read_plant_bytes(os.path.join(run_dir, "legs.tsv")).decode("utf-8", "replace").split("\n") \
+        if run_dir else []
+    rows = [ln.split("\t") for ln in lines[1:] if ln]
+    want = [render_legs_row(recs[n]).split("\t") for n in sorted(recs, key=lambda n: recs[n]["i"])]
+    check_arm("AC9 every legs.tsv row is render_legs_row over its leg's final <i>.json",
+              rc == 0 and lines[:1] == ["\t".join(LEGS_COLUMNS)] and len(rows) == 2 and rows == want,
+              repr((rc, lines[:3], want))[:600])
+    orphan = recs.get("orphan") or {}
+    log = read_plant_bytes(os.path.join(run_dir, "%d.log" % orphan.get("i", 0))) if run_dir else b""
+    kept = read_envelope(run_dir).get("raw_kept") if run_dir else None
+    check_arm("AC9 LIVENESS the orphan's capture moved after its root's exit: `late`, 11 bytes, none kept",
+              b"late" in log and orphan.get("log_bytes") == 11 and kept == [],
+              repr((log[-40:], orphan.get("log_bytes"), kept)))
+    check_arm("AC5 the loop's admissions pass through check_admit: two, each with no leg running",
+              len(admitted) == 2 and all(p >= 1 and r == 0 for p, r in admitted),
+              repr((calls[0], admitted)))
+    if run_dir:
+        remove_scratch(run_dir)
+
+
+def test_signal_docs(_tmp):
+    """AC16 (S16), the record's parity option. The module docstring and the README's profiler section
+    each carry `terminate` and `launch_error`, and neither carries `nothing is ever signalled`, read
+    joined. LIVENESS: the section is found and carries `measure_legs.py`. Red when the README's
+    absolute sentence is restored."""
+    with open(os.path.join(KITDIR, "README.md"), encoding="utf-8") as fh:
+        text = fh.read()
+    start = text.find("\n## The gate profiler")
+    end = text.find("\n## ", start + 1) if start >= 0 else -1
+    section = text[start:end] if start >= 0 and end > start else text[start:] if start >= 0 else ""
+    check_arm("AC16 LIVENESS the README's profiler section is found", "measure_legs.py" in section,
+              "no `## The gate profiler` section in %s" % os.path.join(KITDIR, "README.md"))
+    bad = []
+    for where, body in (("the module docstring", __doc__ or ""), ("the README's profiler section", section)):
+        joined = " ".join(body.split())
+        bad += ["%s carries no `%s`" % (where, w) for w in ("terminate", "launch_error") if w not in joined]
+        if "nothing is ever signalled" in joined.lower():
+            bad.append("%s says nothing is ever signalled" % where)
+    check_arm("AC16 the docstring and the README say the same about signalling", not bad, "; ".join(bad))
+
+
 def cmd_selftest():
     del ARM_PASSED[:], ARM_FAILED[:]
     tmp = tempfile.mkdtemp(prefix="measure-legs-selftest.")
@@ -3240,7 +3592,8 @@ def cmd_selftest():
                         test_hold_beacon, test_redact_parity, test_no_bare_bash_argv, test_fork_count,
                         test_manifest_refusals, test_launch_failure, test_scratch_sweep,
                         test_scratch_read_pin, test_capture_pin, test_write_atomic_temp,
-                        test_fixtures_withheld):
+                        test_fixtures_withheld, test_interrupt_capture, test_venv_interpreter,
+                        test_alias_refusals, test_ab_arms_read_verdicts, test_legs_table, test_signal_docs):
                 try:
                     arm(tmp)
                 except Exception as exc:  # an arm that raised is a failed arm, named, never a crash

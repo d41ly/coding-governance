@@ -20,7 +20,7 @@ repository. The run-gates kit README's section "The gate profiler" is the full r
 - **Another manifest or record root:** add `--legs <path>` or `--out <root>`.
 - **Census and stall settings:** `--census-every <s>` (default 5), `--stall-window <s>` (default 300)
   and `--stall-cpu <s>` (default 1.0). A leg that does no work and writes nothing for a whole window
-  prints `STALLED`. Nothing is ever killed: a leg that never ends keeps the run open.
+  prints `STALLED`. No process that has run is ever killed: a leg that never ends keeps the run open.
 - **Start it outside any bar.** A profile started inside a bar queues each leg's own bars behind
   that bar.
 

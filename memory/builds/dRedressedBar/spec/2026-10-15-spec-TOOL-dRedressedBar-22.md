@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-22 — the closing review's profiler findings, batched: an interrupt names every kept capture, the probe spawns the base interpreter, and each faulted arm proves its work
 
-**Status:** SPECCED · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 16
+**Status:** INPROGRESS · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 16
 
 <!-- gen:spec-records -->
 

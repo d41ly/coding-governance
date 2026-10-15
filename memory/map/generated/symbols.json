@@ -20688,6 +20688,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "test_ab_arms_read_verdicts",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_aborted_work_landed",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -20786,6 +20791,11 @@
       "id": "test_alias_rebuild",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_alias_refusals",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_all_miss_fixture",
@@ -21548,6 +21558,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_interrupt_capture",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_js_probe_against_the_lexicon",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -21596,6 +21611,11 @@
       "id": "test_legs_retried_after_timeout",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_legs_table",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_lexicon_marginal_rate",
@@ -22473,6 +22493,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_signal_docs",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_signals_can_move",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -22746,6 +22771,11 @@
       "id": "test_used_joins_answers_to_the_next_commit",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_venv_interpreter",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_verbatim_files",
@@ -23368,6 +23398,11 @@
       "file": "tools/check-spec-tokens.test.sh"
     },
     {
+      "id": "write_final_capture",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "write_fixture",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
@@ -23496,6 +23531,11 @@
       "id": "write_legs",
       "kind": "function",
       "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "write_legs_table",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "write_lg_commit",
