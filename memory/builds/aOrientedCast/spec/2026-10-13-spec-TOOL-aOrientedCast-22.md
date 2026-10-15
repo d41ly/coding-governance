@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-22 — gate-guard refuses AskUserQuestion from the session holding a live unattended run's lease, and names the park
 
-**Status:** CLOSED · rev-1 · 2026-10-13 · node a · Tier-2 · base 646d4a73 · streams tooling · order 24
+**Status:** CLOSED · rev-2 · 2026-10-16 · node a · Tier-2 · base 646d4a73 · streams tooling · order 24
 
 <!-- gen:spec-records -->
 
@@ -308,6 +308,9 @@ No pass runs a leg above.
 ## 9. Revision log
 
 - rev-1 · 2026-10-13 · initial draft.
+- rev-2 · 2026-10-16 · AC7 · records, TOOL-dRedressedBar-27: the live refusal was owed to the main
+  loop's session at the close, and no record observes it. The criterion does not move, and the
+  status stays CLOSED.
 
 ## 10. Reuse audit
 

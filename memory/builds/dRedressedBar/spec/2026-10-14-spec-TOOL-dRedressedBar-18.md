@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-18 — a gate profiler: every leg run clean and unbounded, serially or under a load cap, each profiled to its processes, stalls reported and never killed
 
-**Status:** CLOSED · rev-8 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 13 · ratified 2026-10-15
+**Status:** CLOSED · rev-9 · 2026-10-16 · node d · Tier-2 · base ebce889c · streams tooling · order 13 · ratified 2026-10-15
 
 <!-- gen:spec-records -->
 
@@ -17,6 +17,7 @@
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-6-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-6-revision.md) | research | TOOL-dRedressedBar-21 TOOL-dRedressedBar-19 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-22-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-22-2-revision.md) | research | TOOL-dRedressedBar-22 TOOL-dRedressedBar-19 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-25-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-25-2-revision.md) | research | TOOL-dRedressedBar-25 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 |
+| [2026-10-16-prompt-TOOL-dRedressedBar-27-2-revision.md](../prompts/2026-10-16-prompt-TOOL-dRedressedBar-27-2-revision.md) | research | TOOL-dRedressedBar-27 |
 | [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
 | [2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md) | diff-review | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 |
 | [2026-10-15-review-TOOL-dRedressedBar-21-24-diff-review-round2.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-21-24-diff-review-round2.md) | diff-review | TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-19 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 TOOL-dRedressedBar-24 |
@@ -1163,6 +1164,9 @@ at the close.
   kit dir trip no entry. §3's Edges gain the hands-off to TOOL-dRedressedBar-25. The spec lines
   earlier revisions cite move lower by this revision's insertions. No other scope item, design or
   criterion moves.
+- rev-9 · 2026-10-16 · AC15 · records, TOOL-dRedressedBar-27: the turnstile arm runs the real
+  runner's hold verb inside `--selftest`, which no pass ran, and no record observes it. The
+  criterion does not move, and the status stays CLOSED.
 
 ## 10. Reuse audit
 

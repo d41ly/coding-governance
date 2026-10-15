@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-13 — content-addressed reuse: declared read classes, a shared cache, a soundness sample
 
-**Status:** CLOSED · rev-5 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
+**Status:** CLOSED · rev-6 · 2026-10-16 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -359,6 +359,8 @@ New arm: .githooks/pre-push.test.sh · covers AC12 AC13 AC14 AC15 · a moved tip
   `fork-count.sh --only`, the one-leg and two-leg rows read 51 and 53 forks with this change and at its
   parent alike, since the cache's python is an exec and no fork to that counter. Both rows already
   read STALE against ceilings of 72 and 74 at the parent, a saving an earlier unit did not bank.
+- rev-6 · 2026-10-16 · AC11 · records, TOOL-dRedressedBar-27: the two whole bars were never run, and
+  no record observes them. The criterion does not move, and the status stays CLOSED.
 
 ## 10. Reuse audit
 
