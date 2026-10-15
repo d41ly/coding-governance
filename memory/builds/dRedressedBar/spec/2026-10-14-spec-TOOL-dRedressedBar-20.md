@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-15-build-TOOL-dRedressedBar-20-1-acceptance-ledger.md](../build/2026-10-15-build-TOOL-dRedressedBar-20-1-acceptance-ledger.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-20-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-20-1-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-20-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-20-2-revision.md) | research | TOOL-dRedressedBar-7 |
 | [2026-10-14-prompt-TOOL-dRedressedBar-20-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-20-3-spec-writer.md) | journal | — |

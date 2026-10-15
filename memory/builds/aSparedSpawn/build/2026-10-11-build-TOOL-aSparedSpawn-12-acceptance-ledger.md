@@ -45,10 +45,11 @@ arms 23b and 23c of `.githooks/pre-push.test.sh` (AC7), and the two `[aSS-12 AC8
   owed at VERIFYING.
 - AC5 — `direct-checks.sh` — with a kx record present, a bar where kx moved and `KX_RED=1` printed
   `GATE FAIL  kx suite` and left no kx record. With ky's record removed and a tracked file dirtied,
-  ky executed green and no ky record was written. The suite arm is owed at VERIFYING.
+  under which the runner's `TREE_CLEAN` reads `no`, ky executed green and no ky record was written.
+  The suite arm is owed at VERIFYING.
 - AC6 — `direct-checks.sh` — after a commit adding `ky/extra.sh`, which no kit ships, ky was held
   while the stub govkit answered. With `GOVKIT_STUB_OFF=1` the bar printed `govkit is not reachable`
-  exactly once, ky ran naming `ky/extra.sh moved since <sha8>`, and kx was held unchanged on its
+  exactly once, ky ran by its `guard` naming `ky/extra.sh moved since <sha8>`, and kx was held unchanged on its
   diff. In the default mode a held leg still printed `set GATE_SELFTESTS=1 to run` and no selection
   line appeared. The suite arm is owed at VERIFYING.
 - AC7 — `direct-checks.sh` — the `gate-full-green` of a `changed` run read `selftests changed`, a

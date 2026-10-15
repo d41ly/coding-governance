@@ -33,19 +33,20 @@ observe is owed at VERIFYING and says so.
   `check-arms.py --emit-floors` prints `374:360` for the driver where `.memory-tree.conf` holds the
   floor `362:348`; the row set is unchanged, so the emission is the one the unchanged rows give and
   the token does not move. It does not literally reproduce the token, and the gap predates this unit.
-- AC6 — not run — owed at the owner's equivalence run: each shard once with
-  `UNATTENDED_HARNESS=process` and once with `inproc`, compared by assertion count and sorted
+- AC6 — amended rev-2, the spec's entry that names AC6 and makes this run the owner's equivalence
+  run once the harness landed dark — not run — owed at the owner's equivalence run: each shard once
+  with `UNATTENDED_HARNESS=process` and once with `inproc`, compared by assertion count and sorted
   assertion multiset.
 - AC7 — `unattended.sh --plan aSparedSpawn`, as a process and as `( load_driver_conf && main … )` in
   a shell that sourced the driver — 17 lines byte-identical, rc 0 and 0, `git status` unchanged. A
   grep of the parity rows against `VERBS_SLUG`, `VERBS_INLINE` and `--overlaps` found every verb
   carried by a row. The parity table itself and its staged `read_bound_key` break are owed at
   VERIFYING with shard 1.
-- AC8 — the two tail predicates, each confirmed byte-identical to the suite's text and run alone —
-  the top-level-exit scan found only the declared missing-library exit on line 90 of the real driver,
-  and also line 731 in a copy staged with an undeclared `exit 3`. The namespace comparison read empty
-  on two dumps of the 327 sourced definitions. It named `readme_of` and `verb_list` once one was
-  doubled and the other unset, and read empty again after re-sourcing the driver. The arms inside
-  their shard are owed at VERIFYING.
+- AC8 — `exit 3` — the two tail predicates, each confirmed byte-identical to the suite's text and
+  run alone — the top-level-exit scan found only the declared missing-library exit on line 90 of
+  the real driver, and also line 731 in a copy staged with an undeclared `exit 3`. The namespace
+  comparison read empty on two dumps of the 327 sourced definitions. It named `readme_of` and
+  `verb_list` once one was doubled and the other unset, and read empty again after re-sourcing the
+  driver. The arms inside their shard are owed at VERIFYING.
 - AC9 — not run — owed at VERIFYING: the staged zero under `UNATTENDED_HARNESS=inproc` and the green
   process-mode shard are shard runs.

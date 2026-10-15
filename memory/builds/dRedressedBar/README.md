@@ -159,7 +159,7 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 27 unit(s) · node d · opened 2026-10-13 · streams tooling
+**Build status:** CLOSED · 27 unit(s) · node d · opened 2026-10-13 · streams tooling
 ids TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13
 ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 TOOL-dRedressedBar-24 TOOL-dRedressedBar-25 TOOL-dRedressedBar-26
 ids TOOL-dRedressedBar-27
@@ -193,10 +193,10 @@ ids TOOL-dRedressedBar-27
 | [TOOL-dRedressedBar-24 — the runner scripts' fixed-name temp writers take unpredictable temps, and a shell-hygiene mode reds a new one](spec/2026-10-15-spec-TOOL-dRedressedBar-24.md) | 18 | 2 | CLOSED | rev-2 | 2026-10-15 |
 | [TOOL-dRedressedBar-25 — the round-2 review's profiler findings, batched: the A/B verdict gate grades the condition, the selftest's guard covers its kit dir, and AC9's orphan is waited on](spec/2026-10-15-spec-TOOL-dRedressedBar-25.md) | 19 | 2 | CLOSED | rev-1 | 2026-10-15 |
 | [TOOL-dRedressedBar-26 — the round-2 temp-name findings, batched: every command-word `mv` is read, no positional or two-hop source reds, no bare `SRANDOM` is admitted, and the cache writer and leftover check hold on every runtime](spec/2026-10-15-spec-TOOL-dRedressedBar-26.md) | 20 | 2 | CLOSED | rev-1 | 2026-10-15 |
-| [TOOL-dRedressedBar-27 — hygiene check 23 green by evidence: this build's eight missing acceptance ledgers written, and the base's 37 foreign ledger lines put in a legal form](spec/2026-10-15-spec-TOOL-dRedressedBar-27.md) | 21 | 1 | SPECCED | rev-2 | 2026-10-16 |
+| [TOOL-dRedressedBar-27 — hygiene check 23 green by evidence: this build's eight missing acceptance ledgers written, and the base's 37 foreign ledger lines put in a legal form](spec/2026-10-15-spec-TOOL-dRedressedBar-27.md) | 21 | 1 | CLOSED | rev-2 | 2026-10-16 |
 <!-- /gen:build-units -->
 
-Records: 117 bound to this build, across 4 record folder(s).
+Records: 126 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

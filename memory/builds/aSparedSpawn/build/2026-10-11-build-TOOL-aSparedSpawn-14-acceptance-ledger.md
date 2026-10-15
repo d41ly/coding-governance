@@ -37,11 +37,11 @@ on this tree and identically on the batch parent's extract.
 - AC2 — `check-arms.py --selftest` — a planted row missing its `survivor` field and one missing its
   `replay` field each red naming the field; staged breaks `survivor field` and `replay field` each
   turn their arm red.
-- AC3 — `check-arms.py --selftest` — a fixture gate whose census is one above its ceiling reds
-  naming the gate and the retirement review; at the ceiling it passes; staged break
-  `ceiling compare` turns the arm red.
+- AC3 — `check-arms.py --selftest` — a fixture gate whose census is one above its ceiling (its
+  `REFUSAL_CEILINGS` token) reds naming the gate and the retirement review; at the ceiling it
+  passes; staged break `ceiling compare` turns the arm red.
 - AC4 — `check-arms.py --selftest` — tokens lacking a date and lacking an id each red naming the
-  token, an id the fixture decision log does not carry reds, an id carried only as a prefix of a
+  token, an id the fixture decision log (`memory/DECISIONS.md`) does not carry reds, an id carried only as a prefix of a
   longer one is not carried, and a valid ceiling prints
   `ceiling <gate> 2/2 · 2026-10-12 · TOOL-tBudget-1`; staged breaks `ceiling date` and
   `ceiling id carried` each turn an arm red.
@@ -53,7 +53,7 @@ on this tree and identically on the batch parent's extract.
   the registry reads 5 rows, and the only reds are the six inherited `run-gates.sh` sites;
   `check-arms.py --report` lists 31 unbudgeted gates by name.
 - AC7 — `check-arms.py --selftest` — a family pattern matching no site in the planted gate reds
-  naming the family; staged break `family dead pattern` turns the arm red.
+  under `--check` naming the family; staged break `family dead pattern` turns the arm red.
 - AC8 — `direct-checks.sh` — the driver on a slug with no run-state file prints
   `UNATTENDED check 10 FAILED — no run-state file, so there is no run to report on: memory/builds/aNoSuchRun/RUN.md`,
   rc 1; `check-arms.py --report` counts one `no run-state file` site, inside `check_run_state`; the

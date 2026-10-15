@@ -20,8 +20,9 @@ and every other leg section 7 names are owed at VERIFYING.
 - AC4 — `run-gates.evidence.test.sh` AC4 arm, sliced — green: no reuse across a `PYTHONUTF8`
   change and two reuses on the repeat; with the env lines and the utf8 field out of the digest it
   redded. The `GATE_REUSE` half is the suite's first reuse arm, which passed in the same slice.
-- AC5 — `run-gates.evidence.test.sh` AC5 arm, sliced — green 3 of 3; with the schema line out of
-  the digest it redded. The first draft placed its control before the miss and stayed green on
-  that break, because a run that reuses every leg empties the ledger; reordered, rev-3 records it.
+- AC5 — `run-gates.evidence.test.sh` AC5 arm, sliced — green 3 of 3; with the schema line
+  (`REUSE_SCHEMA`) out of the digest it redded. The first draft placed its control before the miss
+  and stayed green on that break, because a run that reuses every leg empties the ledger;
+  reordered, rev-3 records it.
 - AC6 — `run-gates.evidence.test.sh` AC6 arm, sliced — green: a `touch` with identical bytes on a
   dirty guarded file reused both legs. Its red case, a key reading mtime, has no staged break here.

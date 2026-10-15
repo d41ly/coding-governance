@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-15-build-TOOL-dRedressedBar-18-1-set-aside-work.md](../build/2026-10-15-build-TOOL-dRedressedBar-18-1-set-aside-work.md) | journal | — |
+| [2026-10-15-build-TOOL-dRedressedBar-18-2-acceptance-ledger.md](../build/2026-10-15-build-TOOL-dRedressedBar-18-2-acceptance-ledger.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-18-1-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-1-spec-writer.md) | journal | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-18-2-revision.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-2-revision.md) | research | — |
 | [2026-10-14-prompt-TOOL-dRedressedBar-18-3-spec-writer.md](../prompts/2026-10-14-prompt-TOOL-dRedressedBar-18-3-spec-writer.md) | journal | — |

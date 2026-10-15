@@ -1,12 +1,13 @@
 # TOOL-dRedressedBar-27 — hygiene check 23 green by evidence: this build's eight missing acceptance ledgers written, and the base's 37 foreign ledger lines put in a legal form
 
-**Status:** SPECCED · rev-2 · 2026-10-16 · node d · Tier-1 · base ebce889c · streams tooling · order 21 · ratified 2026-10-15
+**Status:** CLOSED · rev-2 · 2026-10-16 · node d · Tier-1 · base ebce889c · streams tooling · order 21 · ratified 2026-10-15
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-16-build-TOOL-dRedressedBar-27-1-set-aside-work.md](../build/2026-10-16-build-TOOL-dRedressedBar-27-1-set-aside-work.md) | research | — |
+| [2026-10-16-build-TOOL-dRedressedBar-27-2-acceptance-ledger.md](../build/2026-10-16-build-TOOL-dRedressedBar-27-2-acceptance-ledger.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-27-1-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-27-1-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-27-brief.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-27-brief.md) | research | — |
 | [2026-10-16-prompt-TOOL-dRedressedBar-27-2-revision.md](../prompts/2026-10-16-prompt-TOOL-dRedressedBar-27-2-revision.md) | research | TOOL-dRedressedBar-18 |
