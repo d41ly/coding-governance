@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-21 — the profiler trusts no path a temp dir supplies: a dead run's logs land in this run's record, no capture is opened, read or deleted through a link, and run-gates' Python temp files take unpredictable names
 
-**Status:** SPECCED · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 15
+**Status:** SPECCED · rev-2 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 15 · ratified 2026-10-15
 
 <!-- gen:spec-records -->
 
@@ -12,6 +12,7 @@
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-4-revision.md) | research | TOOL-dRedressedBar-23 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-5-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-5-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-brief.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-brief.md) | research | TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-24-brief.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-24-brief.md) | research | TOOL-dRedressedBar-24 |
 
 <!-- /gen:spec-records -->
 
@@ -244,8 +245,9 @@ measurement §4 records: the temp file's name, and a pin on the open handle besi
 - **consumes-from** `TOOL-dRedressedBar-19` — S38's sweep: `derive_abandoned_scratch`,
   `write_recovered_logs`, the `owner.json` write and AC38's arm `test_scratch_sweep`, which S1 to
   S3 change and AC1 and AC2 extend; and S35's failed-launch shape, which S8 reuses.
-- **hands-off** external — the bash fixed-name temp writers and the `run-gates.sh` heredoc writer
-  under `tools/run-gates/`, F1, for the owner to promote as a unit of their own or record.
+- **hands-off** `TOOL-dRedressedBar-24` — the bash fixed-name temp writers under `tools/run-gates/`, in
+  `run-gates.sh`, `post-merge.sh` and `run-selftests.sh`, and the Python writer in the `run-gates.sh`
+  heredoc, which F1 resolved as (a) to that unit, with its bash-side static check.
 
 ## 4. Design
 
@@ -672,6 +674,8 @@ arm red, then green, at the close, and runs the bar once after the last unit is 
   - (c) A record alone: a gotcha entry names the class, and no unit builds it now.
   Recommendation: (a). The bash class is real and reaches `$WORK`, so it deserves its own unit and
   its own gate rather than a rider on this one.
+  RESOLVED (owner, 2026-10-15): (a). `TOOL-dRedressedBar-24` takes the bash writers and the heredoc
+  writer under a bash-side static check, and §3's edge hands them off to it.
 
 ## 9. Revision log
 
@@ -688,6 +692,11 @@ arm red, then green, at the close, and runs the bar once after the last unit is 
   `write_atomic` and `write_held_stamp`, S5 walks every `*.py` under the kit, S11 guards what it
   walks, the scratch helpers drop the job backend so `write_leg_capture` keeps the signature unit 22
   calls, F1 asks about the bash writers, and the H1 names the wider unit.
+- rev-2 · 2026-10-15 · §3 · §8 · F1 resolved by the owner as (a), marked in place. `TOOL-dRedressedBar-24`
+  takes the bash fixed-name temp writers and the heredoc writer, so §3's external hand-off becomes a
+  hands-off edge to that unit, which its consumes-from mirrors, and the header gains
+  `ratified 2026-10-15`. Written by unit 24's spec-writer pass. No scope item, design or criterion
+  of this unit moves.
 
 ## 10. Reuse audit
 
