@@ -153,6 +153,16 @@ extends.
 | gap-lex-05 | Lexicon | MED | No consistency beyond verbs: 57 objects carry two or more declared acquire-family verbs (`conf` is loaded 11 times, read 3 and parsed twice), and noun variants go unchecked (`sha` 13, `oid` 4, `hash` 4, `digest` 10; `dir` 101, `directory` 1, `folder` 2). Raised by the owner. | kit review, lexicon (`build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md`), `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-population.md` | — |
 | gap-lex-06 | Lexicon | MED | Exemptions need no reason and nothing checks one: waivers are keyed on a bare name corpus-wide with an optional reason, pins and un-armed cells change by plain edit, `ratified` certifies nothing about verb edits, and VERBS mixes vocabulary with forced names (`init` partly clears `__init__`). | kit review, lexicon (`build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md`), `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-kit.md`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-prior-art.md` | — |
 | gap-lex-07 | Lexicon | LOW | Kit defects: a repeated block header silently replaces the earlier block, four non-names (an IIFE value, three properties) are graded as verbs, `--brief` and `--help` exit 2 though about 130 calls used them, and the Skill, the conf and the README disagree on what the gate does. | kit review, lexicon (`build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md`), `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-kit.md`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-population.md` | — |
+| gap-rt-01 | Runtime | HIGH | A model session decides every next act: 19 of 20 sessions resumed from a compaction's summary instead of state, the driver refused 47 malformed or out-of-order transitions, one session improvised 17 inline workflows and another more than 25 ad-hoc scripts, and 2 runs were left at BUILDING with all work terminal. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-executor.md` | — |
+| gap-rt-02 | Runtime | HIGH | Every enforcement hook fails open: no entry sets `onFailure`, all 31 failures of one burst on 2026-10-14 admitted the call, and pre-commit, commit-msg and pre-rebase trap no signal. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-hooks.md` | — |
+| gap-rt-03 | Runtime | HIGH | Spawned work dies with its session: 4 background agents died with their parent, limits killed 57 agents in 16 Workflow runs and the whole fan in 10, 7 of 12 all-errored runs report `completed`, and a null becomes `committed:false` with no reason. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-spawn.md` | — |
+| gap-rt-04 | Runtime | HIGH | The headless resumer skips permissions (`resume-tick.sh:385`), so with hooks failing open, a resumed session under resource exhaustion would run unguarded. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-spawn.md` | — |
+| gap-rt-05 | Runtime | MED | Fan-out is bounded per prompt, not in flight: the direct budget resets on every notification, and Workflow calls and headless launches are outside the count. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-spawn.md` | — |
+| gap-rt-06 | Runtime | MED | Workspaces are neither allocated nor reclaimed: 8 merged worktrees and 497 stale temp directories remain, the directories' source unattributed, and concurrent agents share one scratch directory. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-hooks.md` | — |
+| gap-rt-07 | Runtime | LOW | Session hooks miss events: no matcher covers `fork`, and SubagentStop, PreCompact, PostCompact and SessionEnd are unwired. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-sessions.md` | — |
+| gap-rt-08 | Runtime | LOW | Node facts go unrecorded: the `claude` binaries and their versions, node d's clock running 8 to 13 s slow, and its `autocrlf` against CI's. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-sessions.md` | — |
+| gap-rt-09 | Runtime | LOW | gov wires none of the five hook events Codex ships. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-sessions.md` | — |
+| gap-rt-10 | Runtime | LOW | Runtime records contradict the code: the "four-verb driver" has 30 verbs, `/build` claims an identical spec review in both modes, an earlier design record said the spawn guard compares `role-sha`, the Facts line says "Worktrees: none yet" while 13 exist, and a keepalive comment says the cron store dies with its session. | layer review, runtime, `[current]`; the four runtime research returns | — |
 | gap-spine-01 | Spine | HIGH | No stage model: no kit, leg, dossier, role or hook declares the stage it serves, and the loop exists only implicitly. | design §4.1 (0 of 31 dossiers carry a stage); `tools/roles/workflows.toml` covers stages 0–7 only | — |
 | gap-spine-02 | Spine | HIGH | Guards read agent-written state across stages, against `[class]`. | build §4 (write gate), design §4.4 (INPROGRESS), test §5 C (pusher-written receipt), deploy §5 C | — |
 | gap-spine-03 | Spine | HIGH | Attended and unattended builds run different exit contracts. | build §3, §4 (DoD needs RUN.md) | — |
@@ -199,13 +209,13 @@ extends.
 | gap-deploy-06 | Deploy | MED | Landing and release have no review, no role and no changelog. | deploy §4 | — |
 | gap-deploy-07 | Deploy | MED | A killed hook on Windows still lands an ungated push; hooks-path drift is only a note; the lander kit is unversioned with an undeclared dependency. | deploy §4 | — |
 | gap-deploy-08 | Deploy | LOW | The runbook is 163 KB of narrative under an existence-only parity check; `[isolate]` ports and the `up —` line are stated only. | deploy §4 | — |
-| gap-maint-01 | Maintain | HIGH | No cadence: nothing runs on a schedule except an unattended run's own keepalive. | maintain §4 | — |
+| gap-maint-01 | Maintain | HIGH | No cadence: no declared cadence item runs on a schedule. The only scheduled actors are the OS-scheduled resume tick, the desktop durable-restart task and CI's read-only cron, and in-session cron expires after 7 days; corrected by the runtime layer's review. | maintain §4; runtime `[current]` | — |
 | gap-maint-02 | Maintain | HIGH | Detectors without owners: 15 of 27 drift signals nonzero, most report-only, 2 dead probes. | maintain §4, instrument 1 | — |
 | gap-maint-03 | Maintain | HIGH | The governing surface only grows, and nothing prices or retires a leg, rule or bug class. | maintain §4, instrument 2 | — |
 | gap-maint-04 | Maintain | HIGH | Records dominate the work: 1,598 of 2,827 commits in 30 days touched only `memory/`. (main loop) | maintain instrument 3 | — |
 | gap-maint-05 | Maintain | MED | Run records and dormant builds never close: 89 live `RUN.md`, 10 non-terminal for merged work. | maintain §4 | — |
 | gap-maint-06 | Maintain | MED | The map goes stale: 28 of 31 dossiers older than their paths. | maintain §4 | — |
-| gap-maint-07 | Maintain | MED | Ratchets that should shrink do not (3 of 5), timeouts are retried and forgotten, and reaping is manual. | maintain §4 | — |
+| gap-maint-07 | Maintain | MED | Ratchets that should shrink do not (3 of 5), timeouts are retried and forgotten, and reaping is manual: procmon-hook only dry-runs the sweep, 44 idle processes were flagged in 60 days and 4 were killed by hand. | maintain §4; runtime `[current]` | — |
 | gap-maint-08 | Maintain | LOW | Naming offense rate and dangling ledger pointers are report-only. | maintain §4 | — |
 | gap-review-01 | Review | HIGH | Review exists at two stages only; Plan, Test, Deploy and Maintain have none. | every record §3 | — |
 | gap-review-02 | Review | HIGH | No review of the loop itself: no retrospective reads the loop's metrics and changes a stage contract. | maintain §3, §4 | — |
@@ -348,4 +358,13 @@ Re-measured after the lexicon review added `gap-lex-01` to `gap-lex-07`
 ```text
 Roles=18 Deploy=8 Plan=7 Spine=9 Orient=14 Test=9 Lexicon=7 Tooling=6 Review=3 Foundation=17 Build=4 Memory=11 Flow=14 Maintain=8 Design=9
 LOW=14 MED=58 HIGH=72
+```
+
+Re-measured after the runtime layer's review added `gap-rt-01` to `gap-rt-10`
+(`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md`), same instrument. `gap-maint-01` and
+`gap-maint-07` took corrected facts, and their grades are unchanged:
+
+```text
+Roles=18 Deploy=8 Plan=7 Spine=9 Orient=14 Test=9 Runtime=10 Lexicon=7 Tooling=6 Review=3 Foundation=17 Build=4 Memory=11 Flow=14 Maintain=8 Design=9
+LOW=18 MED=60 HIGH=76
 ```

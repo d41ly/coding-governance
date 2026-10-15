@@ -97,6 +97,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 33 | gov-researcher | Runtime: sessions, context, scheduling, harnesses and nodes | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-14-researcher.md` | 1799cb98 | returned, 8m02s, 33.7k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-sessions.md` |
 | 34 | `tier2-review.js`: five `gov-spec-reviewer`, five `gov-skeptic` and one `gov-synthesizer`, all at medium | Runtime: Tier-2 review, run A | the args in `build/2026-10-15-build-PLAY-dClosedLoop-1-runtime-reviews-compared.md` `[runs]` | 1799cb98 | returned, CLEAN WITH FIXES, 56 of 60 confirmed | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-runtime-a.md` |
 | 35 | the same | Runtime: Tier-2 review, run B | the same | 1799cb98 | returned, CLEAN WITH FIXES, 57 of 61 confirmed | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-runtime-b.md` |
+| 36 | gov-researcher | Runtime: RT-2, whether CLI 2.1.295 is needed for failing closed | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-15-researcher.md` | 1799cb98 | dispatched | — |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -263,6 +264,12 @@ derived their lines, which are held from the ledger. Each run's first agent is t
 - returned — gov-skeptic · wrote 0 files · 1m02s · 6.0k out · run wf_3c895b43-8da/aa0c743c242313573
 - agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_3c895b43-8da/a0c25d653455d9690
 - returned — gov-synthesizer · wrote 1 file · 5m21s · 44.9k out · run wf_3c895b43-8da/a0c25d653455d9690
+```
+
+Dispatch 36, RT-2's re-verification, was derived the same way:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-15-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-15-researcher.md) · writes none · gates none · run direct/a3b492160d3807a27
 ```
 
 ## Events
@@ -436,6 +443,18 @@ derived their lines, which are held from the ledger. Each run's first agent is t
   - 13 found by run B only.
 
   All 59 were folded into the runtime record, and RT-1 to RT-3 went to the owner.
+- 2026-10-15, session 1799cb98: the owner answered.
+  - RT-1: "Fresh at an item boundary (Recommended)".
+  - RT-2: neither option. The owner wrote, verbatim: "Reverify that this version or above is actually
+    needed. Older claude binaries should be perfectly capable running the same functionality without
+    refusal/degradation." Dispatch 36 went out to re-verify it.
+  - RT-3: "Runtime takes `next` and the controls too", not the recommended option.
+
+  dWellOiledMachine joined the chain as its fourteenth build. It took the `next` verb, the owner's
+  controls, the executor's launch, the session hooks, the worktree mechanism and lander hardening,
+  each with its gaps. `context.on-full` now defaults to `fresh-at-boundary`, and six `runtime.*` keys
+  joined v2. Ten `gap-rt` rows were registered. Two proposed gaps restated `gap-maint-01` and
+  `gap-maint-07`, so those rows took the corrected facts instead.
 
 ## Instruments
 
@@ -692,6 +711,20 @@ After the lexicon review's answers, both instruments were run as extracted from 
   exits 1 naming both.
 - **The lexicon itself,** after `0ac38b016`, no longer reports the undeclared `html` and `svg`. It
   still exits 1 on 1,088 verb offenders against the pin of 1,087, a red inherited from `8ddc0a482`.
+
+After the runtime layer's answers to RT-1 and RT-3, both instruments were run as extracted from this
+record. RT-2 is being re-verified.
+- **The changes:**
+  - dWellOiledMachine joined the chain. It took `gap-found-06`, `gap-flow-10`, `gap-tool-03`,
+    `gap-orient-12` and `gap-orient-14` from dDeclaredLoop, `gap-conc-03` from dScopedBuild, and
+    `gap-deploy-07` from dShippedRelease;
+  - `gap-rt-01` to `gap-rt-10` were registered and owned;
+  - six keys joined the catalogue and every preset, and `context.on-full` changed its default.
+- **The join** exits 0 on 154 keys and 14 builds. It exits 1 on two planted copies:
+  - a register with a planted `gap-rt-11`, naming it unowned;
+  - a v2 with dWellOiledMachine's `gap-rt` range struck, naming all ten.
+- **The preset check** exits 0 on 124 catalogue keys, 118 presettable and 118 preset rows. On a copy
+  with velocity `runtime.relaunch` set to `maybe`, it exits 1, naming it.
 
 ### The foreign-build census
 

@@ -16,7 +16,7 @@ Revised: 2026-10-15, after two independent Tier-2 rounds on blob `767187aa`, as 
 - `[reviews]` keeps what was re-read rather than taken whole.
 
 The design keeps its shape (decide, supervise, act, enforce). It changes in five places:
-- deciding is wholly Flow's `next`;
+- deciding is Flow's position function, and Runtime owns the `next` verb that asks it (RT-3);
 - a session the runtime launches lives for one act;
 - returns survive any death, through a store the executor hands back;
 - binding happens at the call a hook can see;
@@ -258,7 +258,7 @@ six demands, and Runtime is built to satisfy each of them for every layer at onc
 | Defaults by mechanism, not by agent discretion (the lexicon) | enforcement at every boundary, failing closed, with every exception recorded (`core.exceptions`) and every bypass paid for (`core.bypass`) |
 | Every behaviour owner-switchable, every layer extendable by contract | every runtime behaviour a policy key, and every runtime part an adapter or a pack |
 
-**In one line: the other layers declare. Flow's `next` decides from what they declared. Runtime executes
+**In one line: the other layers declare. Flow's position function decides from what they declared. Runtime executes
 each decision through mechanisms it supervises, enforces at every boundary, and records that it did.**
 
 ## [design] The mechanism
@@ -268,8 +268,9 @@ each decision through mechanisms it supervises, enforces at every boundary, and 
  record kinds · policy file · hook packs · gate packs · adapters · cadence items
                                      │
                                      ▼
- Flow's next (dDeclaredLoop): a pure function of declaration, witnesses and policy, answering
- act · blocked · terminal · stuck · invalid-input · stale-remote
+ Flow's position function (dDeclaredLoop), asked through Runtime's next verb: a pure function of
+ declaration, witnesses and policy, answering act · blocked · terminal · stuck · invalid-input ·
+ stale-remote
                                      │ asked on every beat
                                      ▼
  ┌───────── THE SUPERVISOR: the executor as a process, no model (resume-tick grown) ─────────┐
@@ -305,13 +306,17 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | an act session | this record only | a headless `claude -p` session that the supervisor launches to host one role act's harness call. It decides nothing. The first draft called it a "driver session", a name the roles layer already uses. |
 | the actor kinds | the roles matrix: role, command, hook, executor, owner | a role item becomes a role act. The supervisor runs command and executor items. A hook item is awaited: its hook writes the witness when its event fires inside another act, and `next` reports it as awaiting that event. The supervisor raises an owner item. |
 
-### [decide] Deciding is Flow's `next`; Runtime acts on its answers
+### [decide] Deciding is Flow's; Runtime asks through `next` and acts on the answer
 
-- **One owner.** dDeclaredLoop owns the position function and the `next` verb (v2 `[chain]`).
-  - Runtime asks `next` on every beat and acts on the answer. It never derives position itself.
-  - This replaces the first draft's split, which gave the function to Flow and the CLI to Runtime.
-- **The answers Runtime needs.** dDeclaredLoop's `next` returns a closed set of answers, each a
-  declared supervisor transition:
+- **Two owners, one piece each** (RT-3, the owner's answer):
+  - dDeclaredLoop owns the position function: what position means, computed from witnesses;
+  - Runtime owns the `next` verb that asks it, the `next —` micro-format, the check that every declared
+    command ends with one, and the owner's controls below.
+
+  The supervisor asks on every beat and acts on the answer, and never derives position itself. v2's
+  `[chain]` now holds each piece in one row, which ends the duplicate claim both review rounds found.
+- **The answers Runtime needs.** The position function returns a closed set of answers, which `next`
+  prints. Each is a declared supervisor transition:
 
   | Answer | What it carries | What the supervisor does |
   |---|---|---|
@@ -329,12 +334,15 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - a backward transition.
 
   So "never runs again" holds per instance, and the flow's loops still loop.
-- **Clients.** Runtime adds one verb, `run <build>`.
-  - Attended, it binds the owner's session as the driver.
-  - Unattended, it takes the run lease and registers the build with the node's supervisor.
-  - The owner's pause, resume, withdraw and supersede stay dDeclaredLoop's guarded commands
-    (`gap-flow-10`). The supervisor honours them at its next beat.
-  - The `/build` and `/unattended` skills become clients of `next` and `run`.
+- **Clients.** Runtime's verbs are the whole client surface (RT-3):
+  - `next`, which prints the position function's answer, ending with its `next —` line;
+  - `run <build>`. Attended, it binds the owner's session as the driver. Unattended, it takes the run
+    lease and registers the build with the node's supervisor;
+  - the owner's pause, resume, withdraw and supersede (`gap-flow-10`), through dDeclaredLoop's guarded
+    command. They extend unattended's `--hold`, `--resume` and `--abort`; supersede is new. The
+    supervisor honours each at its next beat.
+
+  The `/build` and `/unattended` skills become clients of these verbs.
 
 ### [supervise] The supervisor: the executor, as a process outside any session
 
@@ -645,9 +653,11 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - **a subagent's own compaction, and a PreCompact flush inside a subagent:** out of scope, since 0 of
     2,708 agent transcripts compacted. A journaled detector reports the first one;
   - **the executor holding no model context:** true by construction (`[invariants]`);
-  - **compacting against starting fresh:** this is RT-1's evidence.
+  - **compacting against starting fresh:** settled by RT-1. An attended session starts fresh at an item
+    boundary by default.
 - **Context, by kind of session:**
-  - attended sessions follow `context.on-full` and `context.threshold` (RT-1);
+  - attended sessions follow `context.on-full`, which now defaults to `fresh-at-boundary` (RT-1), and
+    `context.threshold`;
   - act sessions read neither, since each serves one act, bounded by `--max-turns` and
     `runtime.act-ceiling`.
 
@@ -735,9 +745,9 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 
 | Contract field | Runtime's entry |
 |---|---|
-| tag and definition | `layer.runtime`: executes what Flow's `next` decides, through mechanisms it supervises; enforces at every boundary; records that it did |
+| tag and definition | `layer.runtime`: asks Flow's position function through `next`, executes each answer through mechanisms it supervises, enforces at every boundary, and records that it did |
 | instruction units | the act session's static block (make the one call your act names, nothing else); the supervisor's run rules; the compaction keep-list |
-| engine kits | unattended: the supervisor (resume-tick grown, act sessions, the commit queue), whose verbs become `run`; workflows: the role harnesses and the deferral block; hooks: the dispatcher, the fragments as packs through settings-merge, and check-wiring's class arm; process-monitor: reaping; and the journal grammar, moved from runlog into the core, so the core writes what observability reads |
+| engine kits | unattended: the supervisor (resume-tick grown, act sessions, the commit queue), whose verbs become `next`, `run` and the owner's controls; workflows: the role harnesses and the deferral block; hooks: the dispatcher, the fragments as packs through settings-merge, and check-wiring's class arm; process-monitor: reaping; and the journal grammar, moved from runlog into the core, so the core writes what observability reads |
 | record kinds | return records, and act records (launch, epoch, outcome). Flow's witnesses and leases are written through `record` too |
 | extension points declared | the nine in `[extend]` |
 | extension points used | none. Integrations fill the host and notification adapters. Observability and knowledge register packs and read the journal |
@@ -747,17 +757,18 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 ## [policies] Runtime's keys, set under the owner's delegation
 
 The owner handed this layer to the main loop, so these defaults are the main loop's. Every one is
-switchable, and the default is the `standard` preset's value.
+switchable, and the default is the `standard` preset's value. The six settled keys joined v2's catalogue
+and presets on 2026-10-15, and v2 is canonical from then on. `runtime.below-floor` waits on RT-2.
 
 | Key | Allowed values | Default | velocity | standard | strict | guarded |
 |---|---|---|---|---|---|---|
-| `runtime.spawn-backend` | registered spawn backends: in-session, headless | in-session, until the spike decides | in-session | in-session | in-session | in-session |
+| `runtime.spawn-backend` | in-session, headless, or a registered spawn backend | in-session, until the spike decides | in-session | in-session | in-session | in-session |
 | `runtime.relaunch` | fresh, resume | fresh | fresh | fresh | fresh | fresh |
-| `runtime.act-ceiling` | a duration | 90 min | 90 min | 90 min | 90 min | 90 min |
-| `runtime.hold-ceiling` | a duration | 6 h | 6 h | 6 h | 6 h | 6 h |
+| `runtime.act-ceiling` | hours | 1.5 | 1.5 | 1.5 | 1.5 | 1.5 |
+| `runtime.hold-ceiling` | hours | 6 | 6 | 6 | 6 | 6 |
 | `runtime.hook-failure` | closed, open | closed | closed | closed | closed | closed |
-| `runtime.below-floor` | refuse, degrade | refuse, provisional until RT-2 | degrade | refuse | refuse | refuse |
-| `runtime.harnesses` | a set of registered harness adapters | claude-code | claude-code | claude-code | claude-code | claude-code |
+| `runtime.below-floor` | refuse, degrade | pending RT-2's re-verification | — | — | — | — |
+| `runtime.harnesses` | a set of named harness adapters | claude-code | claude-code | claude-code | claude-code | claude-code |
 
 **Existing keys Runtime reads, without re-declaring them:**
 
@@ -784,65 +795,76 @@ That question is owed in v2's `[owed]`.
   keys above answer them;
 - `runtime.journal`, because the run record is observability's, to be settled in its review.
 
-## [build] Runtime's own chain build, as proposed
+## [build] Runtime's own chain build
+
+Settled by RT-3: the owner chose "Runtime takes `next` and the controls too".
 
 - **The build:** `dWellOiledMachine`, a child of dBoundRoles and dTotalRecall, which are both children
   of dDeclaredLoop. It needs:
-  - from dDeclaredLoop: `next`, the declarations, the hook factory and the lease grammar;
+  - from dDeclaredLoop: the position function, the declarations, the guarded command, the hook factory
+    and the lease grammar;
   - from dBoundRoles: the work-order renderer, the spawn marker and the return contract;
   - from dTotalRecall: `record`.
 - **Its units, in order:**
   1. the spike (`[tests]` `spike`), before any other unit;
-  2. the supervisor:
+  2. the client surface:
+     - the `next` verb over the position function, the `next —` micro-format, and the check that every
+       declared command ends with one, with the readers of `--plan` and `--status` re-pointed:
+       `model.py`, `stop-guard.js`, `unattended-build.js` and its template, `gen_build_index.py`, and
+       the build and unattended skills;
+     - the owner's controls, mapped onto unattended's verbs;
+  3. the supervisor:
      - `resume-tick.sh` grown, started and restarted by the node tick;
      - act sessions, relaunch and its cap, limit holds and fencing;
      - command adapters that are idempotent or reconcile;
-     - acting on `next`'s answers;
+     - acting on the position function's answers;
      - writing the shared records itself;
-  3. act binding, a runtime pack;
-  4. the persisted-return store, and the deferral block;
-  5. the slot reservation, under agent-cap's cap;
-  6. the enforcement surface:
+  4. act binding, a runtime pack;
+  5. the persisted-return store, and the deferral block;
+  6. the slot reservation, under agent-cap's cap;
+  7. the enforcement surface:
      - the fragments as packs, settings-merge's dispatcher entries with `onFailure`, and check-wiring's
        class arm;
      - the owner-pack table;
-     - the derived floor;
      - the witnesses and their readers;
      - signal traps on every git hook;
      - the trusted hooks copy;
-  7. workspaces by `build.worktree`: the commit queue, integration, and the sweep;
-  8. sessions: binding on every source, the resume card fix, the PreCompact flush, the keep-list, and
+     - lander hardening: the lander a versioned command adapter, with its dependency on the bar's kit
+       declared;
+  8. workspaces by `build.worktree`: the commit queue, integration, and the sweep;
+  9. sessions: binding on every source, the resume card fix, the PreCompact flush, the keep-list, and
      the card's size check;
-  9. the scheduler's host adapters, and per-period cadence witnesses;
-  10. harness adapters with capability tables, with Codex's at its measured floor;
-  11. the node registry's runtime facts;
-  12. the journal grammar, moved into the core, with the supervisor and the dispatcher declared as
+  10. the scheduler's host adapters, and per-period cadence witnesses;
+  11. harness adapters with capability tables, with Codex's at its measured floor;
+  12. the node registry's runtime facts;
+  13. the journal grammar, moved into the core, with the supervisor and the dispatcher declared as
       producers.
-- **What it takes from other builds** (RT-3). Each moved phrase is quoted from the v2 `[chain]` row it
-  leaves:
+- **What it takes from other builds.** Each moved phrase is quoted from the v2 `[chain]` row it left:
 
-  | From | v2 text that moves | Gaps that move |
+  | From | v2 text that moved | Gaps that moved |
   |---|---|---|
-  | dDeclaredLoop | "the executor launched where `run.host` says, its liveness its build lease's beat"; "a resume that delivers no card diagnosed and closed"; "the compact hook re-injecting the build's current card, never the kickoff's" | `gap-tool-03`, `gap-orient-12`, `gap-orient-14` |
+  | dDeclaredLoop | "the `next` verb over the loop's state, the `next —` micro-format, and the check that every declared command ends with one or declares itself terminal, laggards on a shrink-only list owned by their stage's build"; "the owner's pause, resume, withdraw and supersede through the guarded command"; "the executor launched where `run.host` says, its liveness its build lease's beat"; "a resume that delivers no card diagnosed and closed"; "the compact hook re-injecting the build's current card, never the kickoff's" | `gap-found-06`, `gap-flow-10`, `gap-tool-03`, `gap-orient-12`, `gap-orient-14` |
   | dScopedBuild | "worktrees by policy"; "parallel units' commits queued by the executor in the shared worktree" | `gap-conc-03` |
-  | dShippedRelease | the signal traps inside "lander hardening" | `gap-deploy-07` |
+  | dShippedRelease | "lander hardening": a killed hook detected, hooks-path drift refused, and the lander kit versioned with its dependency on the bar's kit declared (walkthrough) | `gap-deploy-07` |
+
+  `gap-found-06` ("No tool names the next step") and `gap-flow-10` follow the `next` verb and the
+  owner's controls. The terminal states that `gap-flow-10` also names stay dDeclaredLoop's, and they
+  land first, since that build is an ancestor.
 - **What stays where it is, and what each of those builds gains:**
   - **dDeclaredLoop** keeps:
-    - the `next` verb and the position engine, and gains the closed answer set (`[decide]`);
-    - the owner's pause, resume, withdraw and supersede through the guarded command, with
-      `gap-flow-10`, mapped onto unattended's `--hold`, `--resume` and `--abort`;
+    - the position engine, which gains the closed answer set and instance keys (`[decide]`);
+    - the guarded command, the terminal states and `deps.on-parent-withdrawn`;
     - the coordination feature (`gap-conc-01`, `gap-conc-02`), and the hook factory.
-
-    Its `next` unit re-points the readers of `--plan` and `--status`: `model.py`, `stop-guard.js`,
-    `unattended-build.js` and its template, `gen_build_index.py`, and the build and unattended skills.
   - **dBoundRoles** keeps the return contract and its validation (`gap-roles-04`), and the spawn marker.
     Runtime runs both.
   - **dScopedBuild** keeps the exit contract and the core checks at Build's exit, and gains
     dWellOiledMachine as a parent.
-  - **dTendedCadence** keeps its cadence and `gap-maint-01`. Its "three hosts and the cadence" becomes the
-    cadence on Runtime's hosts, and it gains dWellOiledMachine as a parent.
-  - **dShippedRelease** keeps the lander and its core re-check (K1).
-- **The chain grows to fourteen builds.**
+  - **dTendedCadence** keeps its cadence, `gap-maint-01` and `gap-maint-07`. Its "three hosts and the
+    cadence" became the cadence on Runtime's hosts, and it gains dWellOiledMachine as a parent.
+  - **dShippedRelease** keeps the landing record, the turnstile queue and the lander's core re-check (K1).
+- **The chain has fourteen builds.**
+- **An ordering consequence.** Every stage build whose commands must end with a `next —` line now
+  depends on dWellOiledMachine. v2's `[owed]` gives that ordering to the re-cut.
 - **Retired or rewritten, each with its consumers:**
   - resume-tick's launch, and the arms in `resume-tick.test.sh` that assert its flag;
   - the unattended skill's CronCreate keepalive;
@@ -948,60 +970,37 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
 - **`latency`:** ten dispatcher runs on a benign Bash payload. Their p50, against today's 57 ms, sets the
   dispatcher's declared budget.
 
-## [gaps-proposed] Gaps to register once the design settles
+## [gaps-proposed] Gaps, registered 2026-10-15
 
-A new area, `Runtime`, keyed `gap-rt-NN`. dWellOiledMachine owns every one:
+The register (`build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md`) is canonical. It holds a new
+area, `Runtime`, keyed `gap-rt-NN`, and dWellOiledMachine owns every one:
 
-- `gap-rt-01` HIGH. A model session decides every next act:
-  - 19 of 20 sessions resumed from a compaction's summary instead of state;
-  - the driver refused 47 malformed or out-of-order transitions;
-  - sessions improvised their own drivers: 17 inline workflows in one, 25+ scripts in another;
-  - 2 runs were left at BUILDING with all work terminal.
-- `gap-rt-02` HIGH. Every enforcement hook fails open:
-  - no entry sets `onFailure`;
-  - 31 failures in one burst on 2026-10-14 all admitted the call;
-  - three git hooks trap no signal;
-  - the switch needs CLI 2.1.295, and the PATH CLI is 2.1.292.
-- `gap-rt-03` HIGH. Spawned work dies with its session:
-  - 4 background agents died with their parent;
-  - limits killed 57 agents in 16 Workflow runs, and the whole fan in 10;
-  - 7 of 12 all-errored runs report `completed`;
-  - a null becomes `committed:false` with no reason.
-- `gap-rt-04` HIGH. The headless resumer skips permissions (`resume-tick.sh:385`). With hooks failing
-  open, a resumed session under resource exhaustion would run unguarded.
-- `gap-rt-05` MED. Fan-out is bounded per prompt, not in flight:
-  - the direct budget resets on every notification;
-  - Workflow calls and headless launches are outside the count.
-- `gap-rt-06` MED. Workspaces are neither allocated nor reclaimed:
-  - 8 merged worktrees and 497 stale temp directories remain, and the directories' source is
-    unattributed;
-  - every worktree runs the hooks of the primary tree's checkout, not a trusted copy;
-  - concurrent agents share one scratch directory.
-- `gap-rt-07` MED. Supervision reaps only by hand. procmon-hook dry-runs the sweep and prints the
-  command; 44 idle processes were flagged, and 4 were killed by hand.
-- `gap-rt-08` MED. No declared cadence item runs out of session:
-  - the only out-of-session actors are the resume tick, the desktop durable-restart task and CI's cron;
-  - in-session cron expires after 7 days.
-- `gap-rt-09` LOW. Session hooks miss events:
-  - no matcher covers `fork`;
-  - SubagentStop, PreCompact, PostCompact and SessionEnd are unwired.
-- `gap-rt-10` LOW. Node facts go unrecorded:
-  - the `claude` binaries and their versions;
-  - node d's clock, which runs 8 to 13 s slow;
-  - its `autocrlf`, against CI's.
-- `gap-rt-11` LOW. gov wires none of Codex's five hook events.
-- `gap-rt-12` LOW. Runtime records contradict the code:
-  - the "four-verb driver" has 30 verbs;
-  - `/build` claims an identical spec review in both modes;
-  - an earlier design record said the spawn guard compares `role-sha`;
-  - the Facts line says "Worktrees: none yet", and 13 exist;
-  - a keepalive comment says the cron store dies with its session.
+| Key | Sev | Gap |
+|---|---|---|
+| `gap-rt-01` | HIGH | a model session decides every next act |
+| `gap-rt-02` | HIGH | every enforcement hook fails open |
+| `gap-rt-03` | HIGH | spawned work dies with its session |
+| `gap-rt-04` | HIGH | the headless resumer skips permissions |
+| `gap-rt-05` | MED | fan-out is bounded per prompt, not in flight |
+| `gap-rt-06` | MED | workspaces are neither allocated nor reclaimed |
+| `gap-rt-07` | LOW | session hooks miss events |
+| `gap-rt-08` | LOW | node facts go unrecorded |
+| `gap-rt-09` | LOW | gov wires none of Codex's hook events |
+| `gap-rt-10` | LOW | runtime records contradict the code |
 
-Already registered gaps that take a fix designed here, with their owners after RT-3:
+**Two proposed gaps were not registered.** They restated rows the register already held:
+- "no declared cadence item runs out of session" is `gap-maint-01`;
+- "supervision reaps only by hand" is `gap-maint-07`'s third clause.
+
+Both rows took the corrected facts instead. dTendedCadence keeps both, and Runtime's scheduler and beat
+close them, since dWellOiledMachine is now its parent.
+
+**Registered gaps that take a fix designed here,** with their owners after RT-3:
 - `gap-roles-04` (returns uncontracted): dBoundRoles;
 - `gap-conc-02` (claims never age): dDeclaredLoop;
-- `gap-flow-10` (the owner's missing controls): dDeclaredLoop;
-- `gap-deploy-07` (a killed hook lands a push): moves to dWellOiledMachine.
+- `gap-found-06`, `gap-flow-10`, `gap-tool-03`, `gap-orient-12`, `gap-orient-14`, `gap-conc-03` and
+  `gap-deploy-07`: moved to dWellOiledMachine;
+- `gap-maint-01` and `gap-maint-07`: dTendedCadence.
 
 The trusted hooks copy also fixes what the open ask TOOL-aWeldedTribunal-10 asks for. That ask's status
 is unchanged.
@@ -1021,7 +1020,8 @@ is unchanged.
     defect. WIRE-INTO-PROJECT's documented position, an out-of-tree copy under the git common dir,
     settles it (`[enforce]`).
   - **`next-readers`.** Run A confirmed this defect, and run B's skeptic refuted it as unit-level. With
-    `next` staying in dDeclaredLoop, re-pointing its readers is listed as that build's work (`[build]`).
+    the `next` verb moved to Runtime (RT-3), re-pointing its readers is Runtime's client-surface unit
+    (`[build]`).
   - **`permission-mode`.** The owner's ruling, TOOL-aMendedFleet-116, is applied rather than re-asked.
 - **The refuted findings.** All eight stand refuted. A45's size ceilings are kept as a scoping fact in
   `[build]`.
@@ -1040,3 +1040,23 @@ is unchanged.
   above the derived floor, and on node d the desktop's 2.1.295 qualifies. The question is what happens
   on a node with no such binary. The provisional answer is refuse.
 - **RT-3.** dWellOiledMachine, and the chain edits in `[build]`.
+
+## [answers] The owner's answers, 2026-10-15
+
+- **RT-1:** "Fresh at an item boundary (Recommended)".
+  - `context.on-full` now defaults to `fresh-at-boundary` in every preset, in v2.
+  - The option read: "The default becomes `fresh-at-boundary`. Once `context.threshold` is crossed,
+    the session ends at the next item boundary, and a fresh one reorients from the card and the keyed
+    records."
+- **RT-2:** the owner chose neither option and wrote, verbatim: "Reverify that this version or above is
+  actually needed. Older claude binaries should be perfectly capable running the same functionality
+  without refusal/degradation."
+  - Dispatch 36 (`prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-15-researcher.md`) is re-verifying it.
+    It reads the primary sources, tests `onFailure` on both of this node's binaries, and tests
+    mechanisms that fail closed without the switch.
+  - Until it returns, `[enforce]`'s derived floor and `runtime.below-floor` stand as proposals only.
+- **RT-3:** "Runtime takes `next` and the controls too", not the recommended option.
+  - The `next` verb, its micro-format and the owner's controls moved to dWellOiledMachine, with
+    `gap-found-06` and `gap-flow-10`.
+  - dDeclaredLoop keeps the position function.
+  - `[build]` holds the settled re-cut.

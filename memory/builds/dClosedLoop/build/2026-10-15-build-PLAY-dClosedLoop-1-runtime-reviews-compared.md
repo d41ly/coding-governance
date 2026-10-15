@@ -195,7 +195,7 @@ B61 (resume-tick-consumers): confirmed twin A38, B43
 | `journal-owner` | the journal and the run record are claimed without runlog | 14, 35 | — | `[contract]`; `[build]` |
 | `hook-fragments` | the hook packs ignore the kits' fragments and settings-merge | 36, 41 | 33, 38 | `[enforce]` |
 | `resume-tick-consumers` | retiring the resume launch names none of its consumers | 38, 59 | 43, 61 | `[build]` retired, with consumers |
-| `next-readers` | `next` replaces `--plan` and `--status` without naming their readers | 39 | 47 | `[build]`: owed to dDeclaredLoop's `next` unit |
+| `next-readers` | `next` replaces `--plan` and `--status` without naming their readers | 39 | 47 | `[build]`: Runtime's client-surface unit, after RT-3 |
 | `catalogue-duplicates` | the `runtime.*` keys duplicate v2's catalogue and carry no presets | 43 | 2, 37 | `[policies]` |
 | `gap-keys` | the new gaps have no key prefix | 47 | — | `[gaps-proposed]` |
 | `relaunch-cap` | relaunch has no attempt cap | 48 | 52 | `[supervise]` relaunch |
