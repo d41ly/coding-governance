@@ -580,6 +580,9 @@ memory-tree, the instruction views and the expansions.
 
 ## [gaps-proposed] Gaps to register once the forks settle their home
 
+Registered on 2026-10-15, after the forks, as `gap-mem-01` to `gap-mem-11` and `gap-tool-01` to
+`gap-tool-06`, in the order below.
+
 New area `Memory`:
 1. HIGH. No memory contract:
    - no registry declares the record kinds;
@@ -712,6 +715,41 @@ should it move?"**
   - Shrink-only (Recommended).
   - Absorb, as today.
   - Retire the gate and keep the vocabulary.
+
+### Settled after F4-1 to F4-8, 2026-10-15
+
+All eight were answered with the recommended option.
+
+| Fork | Answer | Key | Default | Also allowed |
+|---|---|---|---|---|
+| F4-1 | Split by kind | `reuse.delivery` (the decisions split as `[decisions]` designs) | `rendered` | `on-demand` |
+| F4-2 | Voluntary `gov:note` | `annotations.grammar` | `voluntary` | `required`, `pushed-at-read` |
+| F4-3 | Retire the lookup, narrow recall | none: the choice is structural | — | — |
+| F4-4 | Its own chain build | none: dTotalRecall, a child of dDeclaredLoop | — | — |
+| F4-5 | The work order | `builds.agent-root` | `work-order` | `readme` |
+| F4-6 | Refused at filing | `asks.acceptance` | `refuse` | `grade` |
+| F4-7 | No date | `builds.slug-date` | `none` | `shown`, `in-slug` |
+| F4-8 | Shrink-only | `lexicon.pin` | `shrink-only` | `absorb`, `no-gate` |
+
+- **`gov:feature` stays required** on code a reuse entry points to, whatever `annotations.grammar`
+  says.
+- **dTotalRecall owns** the memory contract and Knowledge's stores, with `gap-mem-01` to
+  `gap-mem-11`.
+- **The owner's words set two more keys:**
+  - `builds.slug-words`: 1 to 3;
+  - `builds.slug-style`: `humorous`, with `descriptive` allowed.
+
+**Presets.** `velocity` grades an ask without an acceptance instead of refusing it, and lets the
+lexicon pin absorb. Every other new key holds its default in all four presets.
+
+**What changed elsewhere:**
+- **v2:**
+  - P30 is added.
+  - The eight keys join the catalogue and every preset.
+  - The chain gains dTotalRecall's row and becomes twelve builds.
+  - `[owed]` gains two items: dTotalRecall's place in the re-cut, and the tooling order.
+- **The register** gains `gap-mem-01` to `gap-mem-11` and `gap-tool-01` to `gap-tool-06`. The
+  tooling gaps go to dWitnessedBar, dShippedRelease, dDeclaredLoop and dConvergedCharter.
 
 ## [instrument] The comparison, as run 2026-10-15
 

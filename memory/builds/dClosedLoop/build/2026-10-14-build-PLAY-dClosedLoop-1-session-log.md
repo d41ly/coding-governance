@@ -282,6 +282,10 @@ ledger. Five is the direct-spawn budget for one owner turn:
   Eight questions were put to the owner. Two harness notices fired on the returns of dispatches 25
   and 26, pattern `settings-json`, because both cite `.claude/settings.json`. Neither return asked
   for an action, and under `notices.record` (`none`) the notices are not kept.
+- 2026-10-15, session 1799cb98: the owner settled F4-1 to F4-8, each with the recommended option:
+  - dTotalRecall joined the chain as the memory layer's build;
+  - P30 and eight keys joined v2;
+  - seventeen gaps were registered.
 
 ## Instruments
 
@@ -387,7 +391,7 @@ for k in sorted(expected - set(presets)):
 for k in sorted(set(presets) - expected):
     findings.append(f"preset table names a key that is excluded or not in the catalogue: {k}")
 
-FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count|a share of the window|a round count")
+FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count|a share of the window|a round count|a word range")
 for k, vals in presets.items():
     if k not in catalogue:
         continue
@@ -513,6 +517,18 @@ After round four opened, the join was run as extracted from this record:
 - **The changes:** `gap-roles-18` went to dBoundRoles.
 - **The join** exits 0 on 120 keys and 11 builds. On a copy with `gap-roles-18` struck from
   dBoundRoles' row, it exits 1 naming it unowned.
+
+After the memory layer's answers, both instruments were run as extracted from this record:
+- **The changes:**
+  - dTotalRecall joined the chain;
+  - `gap-mem-01` to `gap-mem-11` and `gap-tool-01` to `gap-tool-06` were registered and owned;
+  - eight keys joined the catalogue and every preset;
+  - the preset check's free-value pattern gained `a word range`, in the source above.
+- **The join** exits 0 on 137 keys and 12 builds. On a copy with `gap-mem-05` struck from
+  dTotalRecall's row, it exits 1 naming it unowned.
+- **The preset check** exits 0 on 114 catalogue keys, 108 presettable, 108 preset rows. On a copy
+  with standard `asks.acceptance` set to `grade` and strict `builds.slug-date` set to `sometimes`,
+  it exits 1 naming both.
 
 ### The foreign-build census
 
