@@ -755,6 +755,16 @@ Rounds 1 and 2 of the layers' reviews, dispatches 39 and 40, were derived from t
   `policy.on-missing-expansion` joins v2, with `refuse` as its default. The comparison record's
   `[answers]` says what each answer changes, and the fold applies them.
 
+- 2026-10-16, session 1799cb98: the instruction layer's 54 defects were folded, and its record's
+  `[revised]` says where each went:
+  - 43 amended in place;
+  - 3 amended, each with a gap for dWellOiledMachine: `gap-rt-11` to `gap-rt-13`;
+  - 1 amended after the owner's LR-1, and 1 owed to the re-cut;
+  - 6 refuted.
+
+  Foundations R2, C3 and C6, v2 and the register moved with it, and `instructions.proof` joined v2's
+  catalogue.
+
 ## Instruments
 
 ### The gap-ownership join
@@ -840,7 +850,14 @@ def rows(block, ncols):
 
 
 STAGES = ["plan", "design", "build", "test", "deploy", "maintain"]
-EXCLUDED = {"floor", "policy.guard", "policy.proof", "preset", "charter.practices", "instructions.edit"}
+never = re.search(r"Presets never touch (.*?):", section("presets"), flags=re.S)
+if not never:
+    sys.exit("v2 [presets] states no 'Presets never touch' list")
+EXCLUDED = set(re.findall(r"`([^`]+)`", never.group(1))) | {"preset"}
+if "the floor" in never.group(1):
+    EXCLUDED.add("floor")
+head = next((ln for ln in section("presets").splitlines() if ln.startswith("| Key |")), "")
+NAMES = [c.strip().split(" ")[0] for c in head.strip().strip("|").split("|")[1:]]
 catalogue = {}
 for key, allowed, default, _src in rows(section("policies"), 4):
     keys = [key.replace("<stage>", s) for s in STAGES] if key == "review.<stage>" else [key]
@@ -866,7 +883,7 @@ for k, vals in presets.items():
     allowed_text, default = catalogue[k]
     if not FREE.search(allowed_text):
         allowed = {a.strip() for a in re.split(r"[,;]", allowed_text) if a.strip()}
-        for name, v in zip(["velocity", "standard", "strict", "autonomous"], vals):
+        for name, v in zip(NAMES, vals):
             if v not in allowed:
                 findings.append(f"{k}: {name} = '{v}' is not an allowed value ({allowed_text})")
         if vals[1] != default:
@@ -1037,6 +1054,21 @@ record:
   - A copy with standard `review.opt-in` set to `security` stays at exit 0. A key whose allowed values
     are free-form (here "a set of named lenses") gets a presence check only: neither its values nor its
     default are graded.
+
+After the instruction layer's fold, both instruments were run as extracted from this record:
+- **The changes:**
+  - `gap-rt-11` to `gap-rt-13` were registered and owned by dWellOiledMachine;
+  - `instructions.proof` joined the catalogue, outside every preset;
+  - the preset check now derives its exclusions from v2's "Presets never touch" sentence, and its
+    preset names from the table's header, in the source above. It typed both before, and named the
+    fourth preset `autonomous`, which v2 calls `guarded`.
+- **The join** exits 0 on 163 keys and 15 builds. On a copy of v2 with dWellOiledMachine's range cut
+  to `gap-rt-12`, it exits 1, naming `gap-rt-13` unowned.
+- **The preset check** exits 0 on 126 catalogue keys, 119 presettable and 119 preset rows. It exits 1
+  on two planted copies:
+  - with `instructions.proof` struck from the "Presets never touch" sentence, naming it missing from
+    the preset table;
+  - with a preset row added for `instructions.proof`, naming it excluded.
 
 ### The foreign-build census
 

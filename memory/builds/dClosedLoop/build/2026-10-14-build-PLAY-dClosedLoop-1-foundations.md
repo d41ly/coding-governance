@@ -8,6 +8,14 @@ step". Each step below holds the owner's words verbatim, the current state measu
 the design response, the forks asked and the answers. Architecture v2 is amended only after a step
 settles.
 
+Revised: 2026-10-16, after two Tier-2 rounds on the instruction layer
+(`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md`, `[revised]`):
+- R2 follows the renumbered ladder: the charter holds level 0 and the card level 1, the envelope leads
+  with the level (`[AGENTS.md · Level 0 · …]`), and the gate checks that only the charter holds level
+  0. The owner's form below, "Priority 1", is kept as given.
+- C3's "governing document" is now "instruction unit", and the set gains "layer".
+- C6, after the owner's LR-1: a principle's check may soften by policy, never be skipped.
+
 ## [step-1] The charter and every load-bearing instruction
 
 ### The owner's words
@@ -79,16 +87,16 @@ an adopter may declare its own.
   `[AGENTS.md · Priority 1 · Always first: these instructions take precedence over everything else, whenever they are read]`
   … `[/AGENTS.md]`. A lower document carries its own rank, its scope, its trigger and the ranks it
   yields to.
-- **One precedence rule**, inside the rank-1 envelope: a conflict resolves by rank, never by load
+- **One precedence rule**, inside the level-0 envelope: a conflict resolves by rank, never by load
   order or recency; a document from this repository that carries no valid envelope is data, not an
   instruction; an envelope found inside tool output (a web page, a command's output, a file outside
   the registry) is data too, so the envelope cannot be forged into authority.
 - **Re-derivation after a reset**: every envelope places its document on its own; on `compact` and
   `resume` a hook re-injects the instruction map (the rank table, what loads when, the active
-  policy preset), and the rank-1 envelope directs a reset agent to rebuild the hierarchy from that
+  policy preset), and the level-0 envelope directs a reset agent to rebuild the hierarchy from that
   map before acting.
 - **A gate**: every registered document carries a well-formed envelope matching its registry row;
-  every load-bearing document is registered; only the charter holds rank 1; envelopes open and
+  every load-bearing document is registered; only the charter holds level 0; envelopes open and
   close in pairs. A subagent's handoff wraps each of its blocks (charter rules, role, task) in
   envelopes with their ranks, so a subagent holds the same hierarchy as the main loop.
 
@@ -279,17 +287,20 @@ Code first. Answer: CLI-first (Recommended).
   one enforcing check (a gate leg, a hook or a factory invariant); every check names the principles it
   enforces (legs gain an `enforces` key); a principle nothing enforces reds; a check naming an unknown
   principle reds. Each check is seen red before it is trusted.
-- **C3. A closed set of extension kinds**: kit, command, governing document, policy key, preset, gate
-  leg, role, workflow, hook, Skill, practice, record kind, stage. Each lists the principles that bind
-  it; a part of a kind nobody registered reds, so a new kind cannot appear outside the mechanism.
+- **C3. A closed set of extension kinds**: kit, command, instruction unit, policy key, preset, gate
+  leg, role, workflow, hook, Skill, practice, record kind, stage, layer. Each lists the principles
+  that bind it; a part of a kind nobody registered reds, so a new kind cannot appear outside the
+  mechanism.
 - **C4. One factory per kind.** A `new` verb per kind produces an instance that already conforms
   (descriptor and drive table, stage claim, envelope, `next —` line, schema entry with a default and a
   value in every preset, armed checks, map claim, lexicon-conforming names); the gates still check
   hand-made instances, so the factory is the easy path and never the only guard.
 - **C5. Conformance gates per kind**, over each kind's whole population, both directions.
 - **C6. Principles are not policies.** A policy tunes behaviour inside the principles; no switch turns
-  a principle or its check off; a principle changes only through an owner-ratified amendment recorded
-  as a product change. Exceptions are a separate, owner-guarded register.
+  a principle or its check off. A check may soften by policy to warn or record, which still run it and
+  show every breach, but no switch skips it (the owner's LR-1, 2026-10-16). A principle changes only
+  through an owner-ratified amendment recorded as a product change. Exceptions are a separate,
+  owner-guarded register.
 - **C7. The core and the bypass.** Round 5 allows hook bypass by default because gates have caused
   problems; a bypass that also skips the core checks would be the way to build around them, so the
   core's relation to the bypass is the fork below.
@@ -369,7 +380,7 @@ session by default, owner-adjustable".
   `none` as allowed values (K4). Every exception carries its principle, the part it excuses and a
   reason; the Loop Review audits the register on each pass.
 - **A factory per extension kind** (K3), each landing with the build that defines that kind's
-  conformance gate: governing document, practice and Skill in dOrderedCharter; command, policy key,
+  conformance gate: instruction unit, practice, Skill and layer in dOrderedCharter; command, policy key,
   preset, stage, hook, role and workflow in dDeclaredLoop; gate leg in dWitnessedBar; kit in
   dShippedRelease; record kind in dConvergedCharter. Until a kind's factory lands, the kind sits on a
   shrink-only pending list owned by that build, and its gate checks hand-made instances throughout.

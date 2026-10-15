@@ -285,60 +285,60 @@ Run A is `wf_261507e4-5ca` and run B is `wf_c5538013-6cc`. The ids are each repo
 
 | defect | what | A | B | disposition |
 |---|---|---|---|---|
-| `tag-spelling` | R-B fixes no tag spelling: example tags carry no namespace, and item and policy names collide (`design.reentry`, `build.scope`) | 1, 35 | — | pending |
-| `example-item-names` | R-B's example item tags are spelled differently from the settled items (`plan.intake` for `plan.input`, `build.unit-commit` for `build.unit-pass`) | — | 8 | pending |
-| `kit-layer-map-stale` | the kit-to-layer map v2 points to is stale: `next`, runlog's journal grammar, the research kind, unattended as "the executor", process-monitor and the reuse lookup all moved in later layers | 2, 32 | 14, 33 | pending |
-| `runtime-deferral-stale` | [settled] still defers Runtime's build to the re-cut, and [layers] calls the turnstile and the lander homeless runtime items, though dWellOiledMachine exists and Deploy keeps both | 12, 21, 32 | 14, 26, 33 | pending |
-| `stale-figures` | counts written before later layers: 94 keys, P1 to P26, a 67 KB largest guide | 21 | 16 | pending |
-| `skills-layer-split` | R-F files Skills and kits under different layers from the kit table, names a layer that does not exist, and keeps deploy-governance as a core entry that Distribution and the memory layer place elsewhere | 3, 18 | 28 | pending |
-| `harness-injected-loads` | R-C's refusing render and R-H's memory-index budget cannot reach loads the harness injects from outside the repository: the auto-memory index and the Skill and agent lists | 4, 44 | 32, 39 | pending |
-| `act-session-load-point` | the load-point inventory has no row for Runtime's act session, and the ladder gives its static block no level | 5, 38 | 29 | pending |
-| `codex-override` | Codex reads one instruction file per directory, so an override file replaces the charter; the 32 KiB cap covers the combined text; and nothing refreshes the override, since Codex has no SessionStart | 6, 14, 39 | 31, 40 | pending |
-| `harness-load-point-owner` | three places claim the per-harness load points: R-K's literal table, [layers]' Distribution row and the kit table, while Runtime gives them to registered harness adapters | 33 | 40 | pending |
-| `agent-instructions-seam` | the agent-instructions kit already wires each harness's instruction file and measures Codex's 32 KiB limit, and R-K neither names nor matches it | 26 | 24 | pending |
-| `join-population` | dOrderedCharter arms the both-ways joins before the builds that populate steps, items and roles exist, with no non-empty assertion | 7 | — | pending |
-| `charter-before-policy` | dOrderedCharter's units consume policy keys whose file, reader and guard land with dDeclaredLoop, its child | — | 6 | pending |
-| `write-path-bypass` | validation sits in the instruction command alone: edits at structured sources, merges, adopter overlays and kit installs bypass it, the lock is local, and partial failure is unspecified | 8, 43 | 44 | pending |
-| `knowledge-in-core-render` | the one-way rule covers work-order fields only, while the memory layer renders Knowledge's gotcha classes into every role's static block, a core render | 9 | — | pending |
-| `effectiveness-citations` | R-J measures effectiveness and prunes units from returns that cite unit tags, but no return schema has the field and "followed" is agent-typed, which P23 never acts on | 10, 48 | 46 | pending |
-| `effectiveness-seam` | runlog's prose measure already checks final messages against the micro-format units, and R-J does not name it | — | 23 | pending |
-| `heading-grammar` | R-D lets headings be directives or scope statements, while v2's P11 says headings are directives | 11 | — | pending |
-| `gap-count-mismatch` | [uncovered] proposes eight gaps and [settled] registers nine, and gap-found-17 appears in no [uncovered] entry | 13 | — | pending |
-| `skill-description-count` | "nine Skill descriptions" is wrong for this tree: seven project Skills, session-kickoff through a symlink, user Skills beside them, and deploy-governance not a Skill | 15 | 13 | pending |
-| `hook-injected-loads` | text hooks inject (SubagentStart context, Stop block reasons, deny reasons, SessionStart output) is a load point outside the unit registry, its grammar and its budgets | 16, 41 | — | pending |
-| `lexicon-dependency` | R-B's tag registry depends on the lexicon, a Knowledge expansion, against P28 | 17 | 27, 45 | pending |
-| `trigger-read-bytes` | the trigger-read byte figure counts guides no pointer names, and the kickoff engine's bytes are executed code, not loaded text | 19 | — | pending |
-| `crlf-byte-counts` | the byte counts were taken on a CRLF working copy, and R-C never says which bytes a budget measures | 20 | — | pending |
-| `existing-budgets` | gap 2 and R-C ignore the per-load-point byte budgets already declared, gated and ratcheted over six load points | 22, 31 | 11, 18 | pending |
-| `retired-summed-budget` | R-C's summed budget over a session's reads is what TOOL-dSpentCeiling-1 retired, uncited | 23 | — | pending |
-| `tag-registry-seams` | R-B mints item tags without naming the unattended driver's DIRECTIVES_CORE and DOD_CORE handle registries | 24 | — | pending |
-| `roles-tag-join` | the record says rule tags key the renderer and nothing else, but the roles kit already joins rule tags to roles and selects each role's units by tag | 29 | 10, 17 | pending |
-| `section-number-readers` | retiring numbered sections breaks readers keyed on them: roles_lib finds the rules under `## 1.`, and the hygiene gate and review prompts grade by section number | 29, 47 | 20 | pending |
-| `one-source-roles-list` | the charter's role list and the harness's agent list are already rendered from one source | 25 | — | pending |
-| `grammar-check-seams` | R-D designs a grammar check from scratch beside the existing instruction gates: check-microformats, format-guard, check-playbook-parity's § arm and others | 27 | 19 | pending |
-| `ladder-renumber-carriers` | the renumbered ladder leaves foundations R2's envelope and gate, v2's revision notes and [fit]'s "rank 3" on the old values | 28 | 38 | pending |
-| `card-rank-or5` | the card at level 1 below the charter departs from OR-5's priority 1 beside it | — | 15 | pending |
-| `provenance-marker-readers` | moving provenance out of loaded text names none of the markers' readers: the template marker, the playbook region, the install receipt | 30 | 21, 37 | pending |
-| `microformats-fence` | re-assembling the charter retires the micro-formats fence, which four readers key on and format-guard fails open without | — | 35 | pending |
-| `governing-document-rename` | renaming "governing document" to "instruction unit" leaves v2's dOrderedCharter row and foundations C3 on the old name | 36 | — | pending |
-| `gap-found-17-stale` | gap-found-17 still says runtime machinery has no layer or build | 37 | — | pending |
-| `owner-proof` | the instruction write path takes no proof that its caller is the owner, unlike the policy path's `policy.proof` | 40 | 34 | pending |
-| `load-set-contents` | R-C's load set omits the task and the handed facts, its refusal has no caller action and no unit, and its "too little" refusal cannot fail | 42 | 42 | pending |
-| `grammar-red-case` | the grammar check is proven red only on planted prose, not on the defect kinds the record found | 45 | 41 | pending |
-| `grammar-template-type` | the closed grammar has no type for a template skeleton or a literal format block | 46 | — | pending |
-| `reuse-entries-units` | the memory layer's reuse entries are level-3 units of strength MUST or SHOULD in per-feature sidecars, which this record's grammar, ladder and manifest admit nowhere | — | 1 | pending |
-| `command-items-units` | R-B requires a unit for every item, but command items have no model to read one, so those units bear no load | — | 2 | pending |
-| `scope-selection` | R-B's scope tags and R-C's load-set selectors disagree: some namespaces load nowhere, and a unit naming no role reaches only the driver | 34 | 3 | pending |
-| `principle-check-switchable` | P27's enforcer can be switched to warn by `instructions.checks`, which foundations C6 forbids for a principle's check | — | 4 | pending |
-| `layer-conformance-gate` | P28's enforcer, the layer contract's conformance gate, has no kind, factory or chain row behind it | — | 5 | pending |
-| `policy-level` | policy values sit at level 2 yet render inside the charter's level-0 envelope | — | 7 | pending |
-| `help-move-owner` | R-E sends explanation to `help/`, and no chain row owns the move | — | 9 | pending |
-| `node-registry-card` | the node registry leaves the loaded charter, but the card's node cell is derived from that very table | — | 12, 36 | pending |
-| `worktrees-placeholder` | "Worktrees: none yet" is the WORKTREE_SCRIPT placeholder, still true, and derive-at-render already exists | — | 22 | pending |
-| `instruction-paths` | the record never says which paths are instruction files, which Runtime's one-door invariant needs | — | 30 | pending |
-| `tag-lifecycle` | the write boundary checks no referential integrity on removal or rename, and tags have no lifecycle | — | 43 | pending |
-| `handed-content-grammar` | the grammar never says whether it applies to handed content, or how quoted text is fenced from directives | — | 47 | pending |
-| `instruction-command-seams` | R-I's new command names none of the render, check and overlay seams that already serve the same text | — | 25 | pending |
+| `tag-spelling` | R-B fixes no tag spelling: example tags carry no namespace, and item and policy names collide (`design.reentry`, `build.scope`) | 1, 35 | — | amend; `layer-instruction` `[revised]` |
+| `example-item-names` | R-B's example item tags are spelled differently from the settled items (`plan.intake` for `plan.input`, `build.unit-commit` for `build.unit-pass`) | — | 8 | amend; `layer-instruction` `[revised]` |
+| `kit-layer-map-stale` | the kit-to-layer map v2 points to is stale: `next`, runlog's journal grammar, the research kind, unattended as "the executor", process-monitor and the reuse lookup all moved in later layers | 2, 32 | 14, 33 | amend; `layer-instruction` `[revised]` |
+| `runtime-deferral-stale` | [settled] still defers Runtime's build to the re-cut, and [layers] calls the turnstile and the lander homeless runtime items, though dWellOiledMachine exists and Deploy keeps both | 12, 21, 32 | 14, 26, 33 | amend; `layer-instruction` `[revised]` |
+| `stale-figures` | counts written before later layers: 94 keys, P1 to P26, a 67 KB largest guide | 21 | 16 | amend; `layer-instruction` `[revised]` |
+| `skills-layer-split` | R-F files Skills and kits under different layers from the kit table, names a layer that does not exist, and keeps deploy-governance as a core entry that Distribution and the memory layer place elsewhere | 3, 18 | 28 | amend; `layer-instruction` `[revised]` |
+| `harness-injected-loads` | R-C's refusing render and R-H's memory-index budget cannot reach loads the harness injects from outside the repository: the auto-memory index and the Skill and agent lists | 4, 44 | 32, 39 | amend; `layer-instruction` `[revised]` |
+| `act-session-load-point` | the load-point inventory has no row for Runtime's act session, and the ladder gives its static block no level | 5, 38 | 29 | amend, gap; `layer-instruction` `[revised]` |
+| `codex-override` | Codex reads one instruction file per directory, so an override file replaces the charter; the 32 KiB cap covers the combined text; and nothing refreshes the override, since Codex has no SessionStart | 6, 14, 39 | 31, 40 | amend, gap; `layer-instruction` `[revised]` |
+| `harness-load-point-owner` | three places claim the per-harness load points: R-K's literal table, [layers]' Distribution row and the kit table, while Runtime gives them to registered harness adapters | 33 | 40 | amend; `layer-instruction` `[revised]` |
+| `agent-instructions-seam` | the agent-instructions kit already wires each harness's instruction file and measures Codex's 32 KiB limit, and R-K neither names nor matches it | 26 | 24 | amend; `layer-instruction` `[revised]` |
+| `join-population` | dOrderedCharter arms the both-ways joins before the builds that populate steps, items and roles exist, with no non-empty assertion | 7 | — | amend; `layer-instruction` `[revised]` |
+| `charter-before-policy` | dOrderedCharter's units consume policy keys whose file, reader and guard land with dDeclaredLoop, its child | — | 6 | owed; `layer-instruction` `[revised]` |
+| `write-path-bypass` | validation sits in the instruction command alone: edits at structured sources, merges, adopter overlays and kit installs bypass it, the lock is local, and partial failure is unspecified | 8, 43 | 44 | amend; `layer-instruction` `[revised]` |
+| `knowledge-in-core-render` | the one-way rule covers work-order fields only, while the memory layer renders Knowledge's gotcha classes into every role's static block, a core render | 9 | — | amend; `layer-instruction` `[revised]` |
+| `effectiveness-citations` | R-J measures effectiveness and prunes units from returns that cite unit tags, but no return schema has the field and "followed" is agent-typed, which P23 never acts on | 10, 48 | 46 | amend; `layer-instruction` `[revised]` |
+| `effectiveness-seam` | runlog's prose measure already checks final messages against the micro-format units, and R-J does not name it | — | 23 | none; `layer-instruction` `[revised]` |
+| `heading-grammar` | R-D lets headings be directives or scope statements, while v2's P11 says headings are directives | 11 | — | amend; `layer-instruction` `[revised]` |
+| `gap-count-mismatch` | [uncovered] proposes eight gaps and [settled] registers nine, and gap-found-17 appears in no [uncovered] entry | 13 | — | amend; `layer-instruction` `[revised]` |
+| `skill-description-count` | "nine Skill descriptions" is wrong for this tree: seven project Skills, session-kickoff through a symlink, user Skills beside them, and deploy-governance not a Skill | 15 | 13 | amend; `layer-instruction` `[revised]` |
+| `hook-injected-loads` | text hooks inject (SubagentStart context, Stop block reasons, deny reasons, SessionStart output) is a load point outside the unit registry, its grammar and its budgets | 16, 41 | — | amend, gap; `layer-instruction` `[revised]` |
+| `lexicon-dependency` | R-B's tag registry depends on the lexicon, a Knowledge expansion, against P28 | 17 | 27, 45 | amend; `layer-instruction` `[revised]` |
+| `trigger-read-bytes` | the trigger-read byte figure counts guides no pointer names, and the kickoff engine's bytes are executed code, not loaded text | 19 | — | amend; `layer-instruction` `[revised]` |
+| `crlf-byte-counts` | the byte counts were taken on a CRLF working copy, and R-C never says which bytes a budget measures | 20 | — | amend; `layer-instruction` `[revised]` |
+| `existing-budgets` | gap 2 and R-C ignore the per-load-point byte budgets already declared, gated and ratcheted over six load points | 22, 31 | 11, 18 | amend; `layer-instruction` `[revised]` |
+| `retired-summed-budget` | R-C's summed budget over a session's reads is what TOOL-dSpentCeiling-1 retired, uncited | 23 | — | amend; `layer-instruction` `[revised]` |
+| `tag-registry-seams` | R-B mints item tags without naming the unattended driver's DIRECTIVES_CORE and DOD_CORE handle registries | 24 | — | amend; `layer-instruction` `[revised]` |
+| `roles-tag-join` | the record says rule tags key the renderer and nothing else, but the roles kit already joins rule tags to roles and selects each role's units by tag | 29 | 10, 17 | amend; `layer-instruction` `[revised]` |
+| `section-number-readers` | retiring numbered sections breaks readers keyed on them: roles_lib finds the rules under `## 1.`, and the hygiene gate and review prompts grade by section number | 29, 47 | 20 | amend; `layer-instruction` `[revised]` |
+| `one-source-roles-list` | the charter's role list and the harness's agent list are already rendered from one source | 25 | — | amend; `layer-instruction` `[revised]` |
+| `grammar-check-seams` | R-D designs a grammar check from scratch beside the existing instruction gates: check-microformats, format-guard, check-playbook-parity's § arm and others | 27 | 19 | amend; `layer-instruction` `[revised]` |
+| `ladder-renumber-carriers` | the renumbered ladder leaves foundations R2's envelope and gate, v2's revision notes and [fit]'s "rank 3" on the old values | 28 | 38 | amend; `layer-instruction` `[revised]` |
+| `card-rank-or5` | the card at level 1 below the charter departs from OR-5's priority 1 beside it | — | 15 | none; `layer-instruction` `[revised]` |
+| `provenance-marker-readers` | moving provenance out of loaded text names none of the markers' readers: the template marker, the playbook region, the install receipt | 30 | 21, 37 | none; `layer-instruction` `[revised]` |
+| `microformats-fence` | re-assembling the charter retires the micro-formats fence, which four readers key on and format-guard fails open without | — | 35 | none; `layer-instruction` `[revised]` |
+| `governing-document-rename` | renaming "governing document" to "instruction unit" leaves v2's dOrderedCharter row and foundations C3 on the old name | 36 | — | amend; `layer-instruction` `[revised]` |
+| `gap-found-17-stale` | gap-found-17 still says runtime machinery has no layer or build | 37 | — | amend; `layer-instruction` `[revised]` |
+| `owner-proof` | the instruction write path takes no proof that its caller is the owner, unlike the policy path's `policy.proof` | 40 | 34 | amend; `layer-instruction` `[revised]` |
+| `load-set-contents` | R-C's load set omits the task and the handed facts, its refusal has no caller action and no unit, and its "too little" refusal cannot fail | 42 | 42 | amend; `layer-instruction` `[revised]` |
+| `grammar-red-case` | the grammar check is proven red only on planted prose, not on the defect kinds the record found | 45 | 41 | amend; `layer-instruction` `[revised]` |
+| `grammar-template-type` | the closed grammar has no type for a template skeleton or a literal format block | 46 | — | none; `layer-instruction` `[revised]` |
+| `reuse-entries-units` | the memory layer's reuse entries are level-3 units of strength MUST or SHOULD in per-feature sidecars, which this record's grammar, ladder and manifest admit nowhere | — | 1 | amend; `layer-instruction` `[revised]` |
+| `command-items-units` | R-B requires a unit for every item, but command items have no model to read one, so those units bear no load | — | 2 | amend; `layer-instruction` `[revised]` |
+| `scope-selection` | R-B's scope tags and R-C's load-set selectors disagree: some namespaces load nowhere, and a unit naming no role reaches only the driver | 34 | 3 | amend; `layer-instruction` `[revised]` |
+| `principle-check-switchable` | P27's enforcer can be switched to warn by `instructions.checks`, which foundations C6 forbids for a principle's check | — | 4 | fork, amend; `layer-instruction` `[revised]` |
+| `layer-conformance-gate` | P28's enforcer, the layer contract's conformance gate, has no kind, factory or chain row behind it | — | 5 | amend; `layer-instruction` `[revised]` |
+| `policy-level` | policy values sit at level 2 yet render inside the charter's level-0 envelope | — | 7 | amend; `layer-instruction` `[revised]` |
+| `help-move-owner` | R-E sends explanation to `help/`, and no chain row owns the move | — | 9 | amend; `layer-instruction` `[revised]` |
+| `node-registry-card` | the node registry leaves the loaded charter, but the card's node cell is derived from that very table | — | 12, 36 | amend; `layer-instruction` `[revised]` |
+| `worktrees-placeholder` | "Worktrees: none yet" is the WORKTREE_SCRIPT placeholder, still true, and derive-at-render already exists | — | 22 | amend; `layer-instruction` `[revised]` |
+| `instruction-paths` | the record never says which paths are instruction files, which Runtime's one-door invariant needs | — | 30 | amend; `layer-instruction` `[revised]` |
+| `tag-lifecycle` | the write boundary checks no referential integrity on removal or rename, and tags have no lifecycle | — | 43 | amend; `layer-instruction` `[revised]` |
+| `handed-content-grammar` | the grammar never says whether it applies to handed content, or how quoted text is fenced from directives | — | 47 | amend; `layer-instruction` `[revised]` |
+| `instruction-command-seams` | R-I's new command names none of the render, check and overlay seams that already serve the same text | — | 25 | none; `layer-instruction` `[revised]` |
 
 ## [map-flow] The flow layer's findings, placed
 
