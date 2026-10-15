@@ -105,9 +105,11 @@ def test_row_contract_is_complete():
     cim, _ = census.parse_cim(build_cim_fixture())
     psw, _ = census.parse_ps_w(build_ps_w_fixture())
     rows = census.build_windows_rows(cim, psw)
-    # FIELDS plus the two memory keys every row carries beside them (TOOL-dRedressedBar-18 S4).
+    # Every key of FIELDS, and nothing beyond FIELDS plus the declared OPTIONAL_FIELDS: an undeclared
+    # extra key reds here (TOOL-dRedressedBar-18 S4, TOOL-dRedressedBar-19 S10).
     check("test_row_contract_is_complete",
-          all(sorted(r) == sorted(census.FIELDS + ("peak_mem_b", "mem_b")) for r in rows) and
+          all(set(census.FIELDS) <= set(r) <= set(census.FIELDS + census.OPTIONAL_FIELDS)
+              for r in rows) and
           all(r["winpid"] is not None for r in rows) and
           all(r["win_ppid"] is not None for r in rows),
           True)
@@ -218,17 +220,28 @@ def test_cim_memory_fields_are_bytes():
 
     Red when `parse_cim` reads the command from index 4 as it did before the two fields: the command
     then reads as the peak-memory number.
+
+    TOOL-dRedressedBar-19 S10 adds two lines. A seven-field line with both memory fields blank stays
+    a row with both None, and a five-field LEGACY line keeps its command, with both None. Red when
+    the parser rejects a blank memory field, or reads a five-field line's command as memory.
     """
     s = census._CIM_SEP
-    cim, rejected = census.parse_cim(
-        s.join(["5151", "1000", "2.0", "30", "300", "409600", "C:/x/python.exe -I -c pass"]))
-    row = census.build_windows_rows(cim, {})[0]
+    cim, rejected = census.parse_cim("\n".join([
+        s.join(["5151", "1000", "2.0", "30", "300", "409600", "C:/x/python.exe -I -c pass"]),
+        s.join(["5152", "1000", "1.0", "20", "", "", "C:/x/blank.exe --mem"]),
+        s.join(["5153", "1000", "1.0", "20", "C:/x/legacy.exe -q"])]))
+    rows = {r["winpid"]: r for r in census.build_windows_rows(cim, {})}
+    row, blank, legacy = rows.get(5151, {}), rows.get(5152, {}), rows.get(5153, {})
     prow, _ = census.parse_posix("  PID  PPID ELAPSED     TIME COMMAND\n"
                                  " 4242  1000    3600 00:00:12 /bin/bash -c sleep")
     check("test_cim_memory_fields_are_bytes",
-          (rejected, row["peak_mem_b"], row["mem_b"], row["command"],
+          (rejected, row.get("peak_mem_b"), row.get("mem_b"), row.get("command"),
+           blank.get("peak_mem_b"), blank.get("mem_b"), blank.get("command"),
+           legacy.get("peak_mem_b"), legacy.get("mem_b"), legacy.get("command"),
            prow[0]["peak_mem_b"], prow[0]["mem_b"], census.FIELDS),
-          (0, 300 * 1024, 409600, "C:/x/python.exe -I -c pass", None, None,
+          (0, 300 * 1024, 409600, "C:/x/python.exe -I -c pass",
+           None, None, "C:/x/blank.exe --mem",
+           None, None, "C:/x/legacy.exe -q", None, None,
            ("winpid", "msys_pid", "win_ppid", "msys_ppid", "kind", "age_s", "cpu_s", "command",
             "backend")))
 
@@ -934,7 +947,8 @@ def test_exotic_line_terminators_cannot_forge_a_row():
     s = census._CIM_SEP
     results = []
     for sep in ("\x0b", "\x0c", "\x1c", "\x1d", "\x1e", "\x85", "\u2028", "\u2029"):
-        text = s.join(["4242", "1000", "1.0", "60", "prog" + sep + "9999" + s + "1" + s + "1.0" + s + "60" + s + "forged"])
+        text = s.join(["4242", "1000", "1.0", "60", "1", "1", "prog" + sep + "9999" + s + "1" + s + "1.0" + s
+                       + "60" + s + "1" + s + "1" + s + "forged"])
         rows, _rej = census.parse_cim(text)
         results.append(9999 in rows)
     check("test_exotic_line_terminators_cannot_forge_a_row", any(results), False)

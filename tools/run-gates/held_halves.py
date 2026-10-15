@@ -77,14 +77,20 @@ def test_held(leg):
     return leg.get("subject") == "kit" or leg.get("chunk") == "selftests"
 
 
-def load_manifest(path):
+def load_manifest(path, refuse=print_refusal):
+    """The manifest's rows, or a refusal through `refuse`, which must not return: `print_refusal`
+    here, and the gate profiler's own refusal in `measure_legs.py` (TOOL-dRedressedBar-19 S19), so
+    one reader serves both tools and each refusal names the tool that refused."""
     try:
         with open(path, encoding="utf-8") as fh:
             legs = json.load(fh)
     except (OSError, ValueError) as e:
-        print_refusal(f"the manifest {path} cannot be read: {e}")
-    if not isinstance(legs, list) or not all(isinstance(l, dict) and l.get("name") for l in legs):
-        print_refusal(f"the manifest {path} is not a list of named legs")
+        refuse(f"the manifest {path} cannot be read: {e}")
+    if not isinstance(legs, list):
+        refuse(f"the manifest {path} is not a list of named legs")
+    for k, l in enumerate(legs):
+        if not isinstance(l, dict) or not l.get("name"):
+            refuse(f"the manifest {path} is not a list of named legs: row {k} carries no name")
     return legs
 
 

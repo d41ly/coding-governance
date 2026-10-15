@@ -39,8 +39,14 @@ write it. It grades no leg: `ok` and `fail` are the leg's exit status, recorded.
 done for a leg by another process, a WMI host answering a query or a scanner opening an image, and
 no bar on another turnstile key. A leg sleeping, or waiting in the host queue, longer than the stall
 window reads STALLED, and the record names the waiting tickets so a queue wait reads as one. It
-runs on Windows only and refuses anywhere else. It never signals a process: a leg that never ends
-keeps the run open, by the owner's design.
+runs on Windows only and refuses anywhere else. It never signals a process that has run: a leg that
+never ends keeps the run open, by the owner's design. The one terminate is a leg's root that could
+not join its job or be resumed, still suspended and having executed nothing (TOOL-dRedressedBar-19
+S35); that leg records `fail`, rc 1 and a `launch_error`, and the run goes on.
+
+A DEAD RUN'S RAW CAPTURES ARE SWEPT. Each run writes `owner.json` into its scratch dir, and at start
+redacts and deletes the raw captures of every sibling scratch dir whose owner is proved dead by pid
+and creation time, naming each in the envelope's `raw_recovered` (TOOL-dRedressedBar-19 S38).
 
 NO KNOB. Every setting is a flag. Every `GATE_*` name, every name `git rev-parse --local-env-vars`
 prints and every name the push hook's `unset GIT_…` line names is scrubbed from each leg's
@@ -53,6 +59,7 @@ failed, named on stderr · 2 a refusal before the first leg · 130 an interrupt,
 envelope, names each running leg's kept capture, and leaves the legs running.
 """
 import argparse
+import ast
 import contextlib
 import ctypes
 import fnmatch
@@ -80,6 +87,7 @@ KITDIR = os.path.dirname(os.path.abspath(__file__))
 RUNNER = os.path.join(KITDIR, "run-gates.sh").replace("\\", "/")
 FIXTURES = os.path.join(KITDIR, "fixtures", "measure-legs")
 sys.path.insert(0, KITDIR)
+import held_halves  # noqa: E402  the sibling: load_manifest, the one leg-manifest reader (S19)
 import profile_bar  # noqa: E402  the sibling: resolve_bash, run_git, check_quiet, derive_regime
 
 # >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
@@ -139,6 +147,7 @@ CENSUS_EVERY_DEFAULT_S = 5.0      # --census-every, bounded 1 to 3600
 STALL_WINDOW_DEFAULT_S = 300.0    # --stall-window W, bounded 2 x the census period to 86400
 STALL_CPU_DEFAULT_S = 1.0         # --stall-cpu C, bounded above 0 and to 3600
 FLAG_MAX_CHARS = 4096             # any flag value longer than this refuses at parse
+HOLD_BEACON_WAIT_S = 120          # the selftest's wait for its holder's slot beacon, the bound its budget row prices
 # The runner functions this tool runs from the runner's own source text. A name the runner lacks is
 # a refusal before the first leg, never a profile that quietly records no spawn cost (AC2).
 RUNNER_FUNCTIONS = ("resolve_python", "measure_spawn_cost", "read_spawn_floor")
@@ -146,7 +155,7 @@ EPOCH_AS_FILETIME = 116444736000000000   # 1970-01-01 in 100 ns ticks since 1601
 
 # ---- the Windows API surface. Values from the Windows SDK headers.
 CREATE_SUSPENDED = 0x00000004
-PROCESS_TERMINATE = 0x0001        # AssignProcessToJobObject requires it; nothing here terminates
+PROCESS_TERMINATE = 0x0001        # AssignProcessToJobObject requires it; the one terminate is S35's
 PROCESS_SET_QUOTA = 0x0100
 PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
 SYNCHRONIZE = 0x00100000
@@ -157,12 +166,19 @@ JOB_EXTENDED_LIMIT = 9            # JobObjectExtendedLimitInformation
 WAIT_OBJECT_0 = 0
 MAX_WAIT_HANDLES = 64
 RESUME_FAILED = 0xFFFFFFFF
+STILL_ACTIVE = 259                # GetExitCodeProcess of a process that has not exited
+ERROR_INVALID_PARAMETER = 87      # OpenProcess of a pid no process carries
 
 WRITE_FAILURES = []               # every record write that failed this run; exit 1 names them
 
 
 class ProfileRefused(RuntimeError):
     """A precondition the profile cannot run without. Exit 2, before the first leg."""
+
+
+class LaunchFailed(OSError):
+    """A leg's root could not join its job or be resumed, and was terminated still suspended (S35).
+    Its one argument is the record's `launch_error`: `launch: <call> <winerror>`."""
 
 
 class IoCounters(ctypes.Structure):
@@ -323,21 +339,25 @@ def build_scratch(bash, env):
     return lines[0], lines[1]
 
 
+# No fallback after `cygpath -m` (TOOL-dRedressedBar-19 S11): the bash spelling handed to native
+# Python resolves against the drive root, where no key is, so every tick would read as an EMPTY host.
 TURNSTILE_SCRIPT = r'''d=${GATE_TURNSTILE_DIR:-$HOME/.gov/gate-turnstile}
 if [ -d "$d" ]; then d=$(cd "$d" 2>/dev/null && pwd) || exit 3; fi
 printf '%s\n' "$d"
-cygpath -m "$d" 2>/dev/null || printf '%s\n' "$d"
+cygpath -m "$d" 2>/dev/null
 '''
+DRIVE_SPELLING = re.compile(r"^[A-Za-z]:/")
 
 
 def resolve_turnstile_dir(bash, env):
     """The host turnstile key the legs' bars resolve, by the runner's own expression in the resolved
     bash under the legs' environment: (bash spelling, the spelling this process opens). Resolved
     once. Nothing is created: an absent key reads as an empty one. ("", "") when it did not resolve,
-    which every tick then reads as a refused read."""
+    or when its conversion failed or printed no drive-letter spelling, which every tick then reads
+    as a refused read, never as an empty one."""
     rc, out, _err = run_bash(bash, TURNSTILE_SCRIPT, env=env)
     lines = [ln for ln in out.split("\n") if ln]
-    if rc != 0 or len(lines) < 2:
+    if rc != 0 or len(lines) < 2 or not DRIVE_SPELLING.match(lines[1]):
         return "", ""
     return lines[0], lines[1]
 
@@ -435,27 +455,33 @@ def read_tool_versions(bash, env, pybin, launchers, top):
 
 # ================================================================== the manifest
 
-def read_legs(path):
-    """The manifest's rows, every one of them. Refuses an empty list, a row with no name or no argv
-    list, and a duplicate name: a profile of a malformed manifest is a profile of nothing in particular."""
-    try:
-        with open(path, encoding="utf-8") as fh:
-            data = json.load(fh)
-    except (OSError, ValueError) as exc:
-        raise ProfileRefused("cannot read the leg manifest %s: %s" % (path, exc))
-    if not isinstance(data, list) or not data:
+def read_profile_legs(path):
+    """The manifest's rows, every one of them, read by the runner kit's one manifest reader,
+    `held_halves.load_manifest`, whose refusals this tool raises as its own (S19). Then refuses an
+    empty list, a name that is no string or holds a tab, CR or LF, an argv that is not a non-empty
+    list of strings, a duplicate name, and an argv token still carrying `{` once `{prefix}` is
+    resolved: a profile of a malformed manifest is a profile of nothing in particular. Every row
+    refusal names the row's index (S37)."""
+    # load_manifest's `refuse` must not return; a lambda cannot `raise`, so it throws into a generator.
+    data = held_halves.load_manifest(path, refuse=lambda msg: (_ for _ in ()).throw(ProfileRefused(msg)))
+    if not data:
         raise ProfileRefused("the leg manifest %s holds no leg, so there is nothing to profile" % path)
     seen = set()
     for k, row in enumerate(data):
-        name = row.get("name") if isinstance(row, dict) else None
-        if not isinstance(name, str) or not name:
-            raise ProfileRefused("row %d of %s carries no name" % (k, path))
+        name = row["name"]
+        if not isinstance(name, str) or any(c in name for c in "\t\r\n"):
+            raise ProfileRefused("row %d of %s: its name %r is not one line of text, which every record "
+                                 "here keys a leg by" % (k, path, name))
         argv = row.get("argv")
         if not isinstance(argv, list) or not argv or not all(isinstance(a, str) for a in argv):
-            raise ProfileRefused("leg '%s' in %s carries no argv list" % (name, path))
+            raise ProfileRefused("row %d of %s: leg '%s' carries no argv list of strings" % (k, path, name))
         if name in seen:
-            raise ProfileRefused("leg '%s' appears twice in %s" % (name, path))
+            raise ProfileRefused("row %d of %s: leg '%s' appears a second time" % (k, path, name))
         seen.add(name)
+        unresolved = [a for a in argv if "{" in resolve_prefix_token(a, ".")]
+        if unresolved:
+            raise ProfileRefused("row %d of %s: leg '%s' carries %s, a token this tool cannot resolve"
+                                 % (k, path, name, ", ".join(repr(a) for a in unresolved)))
     return data
 
 
@@ -740,6 +766,12 @@ def run_leg(api, bash, argv, env, cwd, capture):
     the null device and its stdout and stderr go to one capture FILE: a pipe's read end closing
     would SIGPIPE an orphan still writing. No descendant exists before the job does, so the job
     counts every process the leg ever starts. The start stamp is taken at the resume.
+
+    THE ONE TERMINATE (S35). When `OpenProcess`, the job assign, the thread snapshot or the resume
+    fails, the root is still suspended and has executed nothing: it is terminated through the
+    handle `CreateProcess` returned, `Popen.terminate`'s `TerminateProcess(hProcess, 1)`, and
+    `LaunchFailed` names the call. Left alone it would stay suspended for ever, holding the capture.
+    The job is left to close with this process, as every leg's job is.
     """
     job = build_job(api)
     with open(capture, "wb") as fh:
@@ -747,30 +779,48 @@ def run_leg(api, bash, argv, env, cwd, capture):
                                 stdin=subprocess.DEVNULL, stdout=fh, stderr=subprocess.STDOUT,
                                 creationflags=CREATE_SUSPENDED)
     hq = api.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, False, proc.pid)
-    ha = api.OpenProcess(PROCESS_SET_QUOTA | PROCESS_TERMINATE, False, proc.pid)
-    try:
-        if not hq or not ha or not api.AssignProcessToJobObject(job, ha):
-            raise OSError(ctypes.get_last_error(), "the leg's root %d could not join its job" % proc.pid)
-    finally:
-        if ha:
-            api.CloseHandle(ha)
+    failed = None if hq else ("OpenProcess", ctypes.get_last_error())
+    ha = None
+    if failed is None:
+        ha = api.OpenProcess(PROCESS_SET_QUOTA | PROCESS_TERMINATE, False, proc.pid)
+        failed = None if ha else ("OpenProcess", ctypes.get_last_error())
+    if failed is None and not api.AssignProcessToJobObject(job, ha):
+        failed = ("AssignProcessToJobObject", ctypes.get_last_error())
+    if ha:
+        api.CloseHandle(ha)
     resumed = 0
-    snap = api.CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0)
-    if snap and snap != ctypes.c_void_p(-1).value:
-        te = ThreadEntry()
-        te.dwSize = ctypes.sizeof(te)
-        ok = api.Thread32First(snap, ctypes.byref(te))
-        while ok:
-            if te.th32OwnerProcessID == proc.pid:
-                ht = api.OpenThread(THREAD_SUSPEND_RESUME, False, te.th32ThreadID)
-                if ht:
-                    if api.ResumeThread(ht) != RESUME_FAILED:
-                        resumed += 1
-                    api.CloseHandle(ht)
-            ok = api.Thread32Next(snap, ctypes.byref(te))
-        api.CloseHandle(snap)
-    if not resumed:
-        raise OSError(ctypes.get_last_error(), "the leg's root %d could not be resumed" % proc.pid)
+    if failed is None:
+        snap = api.CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0)
+        if not snap or snap == ctypes.c_void_p(-1).value:
+            failed = ("CreateToolhelp32Snapshot", ctypes.get_last_error())
+        else:
+            te = ThreadEntry()
+            te.dwSize = ctypes.sizeof(te)
+            ok = api.Thread32First(snap, ctypes.byref(te))
+            while ok and failed is None:
+                if te.th32OwnerProcessID == proc.pid:
+                    ht = api.OpenThread(THREAD_SUSPEND_RESUME, False, te.th32ThreadID)
+                    if not ht:
+                        failed = ("OpenThread", ctypes.get_last_error())
+                    else:
+                        if api.ResumeThread(ht) == RESUME_FAILED:
+                            failed = ("ResumeThread", ctypes.get_last_error())
+                        else:
+                            resumed += 1
+                        api.CloseHandle(ht)
+                ok = api.Thread32Next(snap, ctypes.byref(te))
+            api.CloseHandle(snap)
+            if failed is None and not resumed:
+                failed = ("ResumeThread", ctypes.get_last_error())
+    if failed is not None:
+        proc.terminate()
+        try:
+            proc.wait(timeout=30)
+        except subprocess.TimeoutExpired:
+            pass
+        if hq:
+            api.CloseHandle(hq)
+        raise LaunchFailed("launch: %s %d" % failed)
     return {"proc": proc, "pid": proc.pid, "job": job, "hq": hq, "started_ns": time.time_ns()}
 
 
@@ -1144,6 +1194,7 @@ def derive_leg_profile(leg, ticks, ctx):
         "over_ceiling": (wall_s > ceiling) if ceiling else None,
         "stalls": leg["stalls"], "stall_windows": leg["stall_windows"],
         "log_bytes": leg.get("log_bytes"), "job_final": None,
+        "launch_error": leg.get("launch_error"),
     }
     return rec
 
@@ -1276,6 +1327,103 @@ def derive_stall_window(lg, tick, tree, by_win, ctx):
         print("measure-legs: RESUMED  %s  (after %.0fs stalled)" % (lg["name"], t0 - ep["opened"]), flush=True)
 
 
+# ================================================================== a dead run's raw captures (S38)
+#
+# A run killed, crashed or powered off between a leg's end and its log's redaction leaves the leg's
+# raw capture, unredacted, in its scratch dir. Each run therefore writes `owner.json` beside its own
+# captures, and at start sweeps the siblings whose owner is PROVED dead: a pid alone is not proof,
+# because pids are reused, and a profile running at the same moment must never lose a live capture.
+
+def read_process_created(api, pid):
+    """(state, creation FILETIME) of process <pid>. ("live", t) while it runs; ("dead", None) when
+    `OpenProcess` reads ERROR_INVALID_PARAMETER, no such pid, or the process has exited; ("unknown",
+    None) for any other failure, access denied included, which cannot prove an owner dead."""
+    h = api.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+    if not h:
+        return ("dead" if ctypes.get_last_error() == ERROR_INVALID_PARAMETER else "unknown"), None
+    try:
+        code = ctypes.c_uint32()
+        if not api.GetExitCodeProcess(h, ctypes.byref(code)):
+            return "unknown", None
+        if code.value != STILL_ACTIVE:
+            return "dead", None
+        created, exited, kern, user = (ctypes.c_uint64() for _ in range(4))
+        if not api.GetProcessTimes(h, ctypes.byref(created), ctypes.byref(exited), ctypes.byref(kern),
+                                   ctypes.byref(user)):
+            return "unknown", None
+        return "live", created.value
+    finally:
+        api.CloseHandle(h)
+
+
+def derive_abandoned_scratch(api, scratch):
+    """[(scratch dir, its owner's record dir)] for every `gate-profile.*` sibling of <scratch> whose
+    `owner.json` reads and whose owner is dead: no live process carries that pid with that creation
+    time. A scratch with no readable `owner.json`, or whose owner cannot be opened for a reason other
+    than absence, is left alone, and so is this run's own."""
+    parent, own = os.path.split(os.path.normpath(scratch))
+    try:
+        names = sorted(os.listdir(parent))
+    except OSError:
+        return []
+    out = []
+    for name in names:
+        if not name.startswith("gate-profile.") or name == own:
+            continue
+        d = os.path.join(parent, name)
+        try:
+            with open(os.path.join(d, "owner.json"), encoding="utf-8") as fh:
+                owner = json.load(fh)
+            pid, created = owner["pid"], owner["created"]
+        except (OSError, ValueError, TypeError, KeyError):
+            continue
+        if any(not isinstance(v, int) or isinstance(v, bool) for v in (pid, created)) or pid <= 0:
+            continue
+        state, now = read_process_created(api, pid)
+        if state == "dead" or (state == "live" and now != created):
+            out.append((d, owner.get("record")))
+    return out
+
+
+def write_recovered_logs(abandoned, run_dir):
+    """Each abandoned scratch's `raw/<i>.out`, redacted by `derive_redacted` into `<record>/<i>.log.recovered`,
+    or into `recovered/<scratch name>/` under this run's record when that record dir is gone; then the
+    raw file deleted. Returns the envelope's `raw_recovered` entries, one per capture, naming the raw
+    file, the recovered log and, where the raw file could not go, why it was kept."""
+    out = []
+    for d, record in abandoned:
+        try:
+            names = sorted(os.listdir(os.path.join(d, "raw")))
+        except OSError:
+            continue
+        for f in names:
+            stem = f[:-len(".out")] if f.endswith(".out") else ""
+            if not stem.isdigit():
+                continue
+            raw = os.path.join(d, "raw", f)
+            entry = {"raw": raw.replace("\\", "/"), "log": None}
+            out.append(entry)
+            dest_dir = (record if isinstance(record, str) and record and os.path.isdir(record)
+                        else os.path.join(run_dir, "recovered", os.path.basename(d)))
+            try:
+                with open(raw, "rb") as fh:
+                    data = fh.read()
+                os.makedirs(dest_dir, mode=0o700, exist_ok=True)
+            except OSError as exc:
+                entry["kept"] = str(exc)
+                continue
+            dest = os.path.join(dest_dir, stem + ".log.recovered")
+            if not write_atomic(dest, derive_redacted(data)):
+                entry["kept"] = "its redacted copy could not be written"
+                continue
+            entry["log"] = dest.replace("\\", "/")
+            try:
+                os.remove(raw)
+            except OSError as exc:
+                entry["kept"] = str(exc)
+    return out
+
+
 def write_leg_capture(lg, final):
     """`<i>.log` from the raw capture, redacted; then the raw capture deleted when no leg process can
     still write it. Returns None once deleted, else the reason it is kept."""
@@ -1351,7 +1499,7 @@ def run_profile(opts):
         if not bash:
             raise ProfileRefused("no bash could open the runner. Tried: %s" % ", ".join(tried))
         legs_path = os.path.abspath(opts.legs or os.path.join(os.path.dirname(KITDIR), "gate-legs.json"))
-        rows = read_legs(legs_path)
+        rows = read_profile_legs(legs_path)
         git_names = read_local_env_vars(top)
         hook_names = read_hook_unsets(top)
         scrubbed = derive_scrub_set(list(os.environ), git_names, hook_names)
@@ -1370,16 +1518,22 @@ def run_profile(opts):
                                                                     tools["launchers"])
         aliases = {s["launcher"]: s["resolved"] for s in substitutions}
         argvs = [derive_leg_argv(r, troot, pybin, aliases) for r in rows]
+        run_id = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime()) + "-" + str(os.getpid())
+        out_root = os.path.abspath(opts.out) if opts.out else os.path.join(gitdir, "gate-profile")
+        run_dir = os.path.join(out_root, run_id)
         scratch_posix, scratch = build_scratch(bash, base_env)
+        # S38: this run's owner, written before any capture exists. With no creation time to record
+        # none is written, and the scratch is then one no later run sweeps.
+        _state, created = read_process_created(api, os.getpid())
+        if created is not None:
+            write_atomic(os.path.join(scratch, "owner.json"), (json.dumps(
+                {"pid": os.getpid(), "created": created, "record": run_dir.replace("\\", "/")}) + "\n").encode("utf-8"))
         leg_env = dict(base_env)
         leg_env["TMPDIR"] = scratch_posix + "/tmp"
         if pybin in aliases:
             # Every `resolve_python` a leg's own scripts run picks GOV_PYTHON before `python3`, and an
             # operator's GOV_PYTHON naming the alias is overridden the same way. Set before the digest.
             leg_env["GOV_PYTHON"] = aliases[pybin]
-        run_id = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime()) + "-" + str(os.getpid())
-        out_root = os.path.abspath(opts.out) if opts.out else os.path.join(gitdir, "gate-profile")
-        run_dir = os.path.join(out_root, run_id)
         try:
             os.makedirs(run_dir, mode=0o700)
         except OSError as exc:
@@ -1388,6 +1542,7 @@ def run_profile(opts):
         print("measure-legs: REFUSED — %s" % exc, file=sys.stderr, flush=True)
         return 2
 
+    raw_recovered = write_recovered_logs(derive_abandoned_scratch(api, scratch), run_dir)
     ts_posix, ts_dir = resolve_turnstile_dir(bash, leg_env)
     tokens = derive_census_tokens(kitrel, argvs)
     floor_us, floor_state = read_spawn_floor_us(bash, leg_env, fns["read_spawn_floor"],
@@ -1411,6 +1566,7 @@ def run_profile(opts):
         "pybin": pybin, "scratch": scratch, "scratch_posix": scratch_posix,
         "turnstile_dir": ts_dir, "turnstile_dir_posix": ts_posix,
         "substitutions": substitutions, "interpreter_probe": interpreter_probe, "raw_kept": [],
+        "raw_recovered": raw_recovered,
         "manifest": {"path": legs_path, "blob": profile_bar.run_git(["hash-object", legs_path], cwd=top) or None},
         "legs": len(rows), "census_backend": None, "spawn_floor_us": floor_us,
         "spawn_floor_state": floor_state, "kit_version": read_kit_version(runner_text),
@@ -1428,6 +1584,9 @@ def run_profile(opts):
     print("measure-legs: turnstile key %s (read, never written)" % (ts_dir or "UNRESOLVED, every read refused"),
           flush=True)
     print("measure-legs: scratch %s (every leg's TMPDIR is its tmp/; nothing sweeps it)" % scratch, flush=True)
+    for k in raw_recovered:
+        print("measure-legs: dead run's raw capture %s -> %s%s" % (
+            k["raw"], k["log"] or "not recovered", "; KEPT: %s" % k["kept"] if k.get("kept") else ""), flush=True)
     write_record_line(os.path.join(run_dir, "host.tsv"), HOST_HEADER)
     write_record_line(os.path.join(run_dir, "census.tsv"), CENSUS_HEADER)
     write_record_line(os.path.join(run_dir, "legs.tsv"), "\t".join(LEGS_COLUMNS))
@@ -1452,7 +1611,13 @@ def run_profile(opts):
         lg = legs[i]
         now = time.monotonic()
         lg["queued_s"] = round(now - state["eligible_m"], 3)
-        launched = run_leg(api, bash, lg["argv"], leg_env, top, lg["capture"])
+        try:
+            launched = run_leg(api, bash, lg["argv"], leg_env, top, lg["capture"])
+        except LaunchFailed as exc:
+            # S35: its root was terminated still suspended. A failed leg with no job and no handle,
+            # ended at its admission, and the run goes on.
+            launched = {"proc": None, "pid": None, "job": None, "hq": None, "started_ns": time.time_ns(),
+                        "launch_error": str(exc)}
         lg.update(launched)
         lg["admit_m"] = time.monotonic()
         running[i] = lg
@@ -1465,21 +1630,26 @@ def run_profile(opts):
         if opts.mode == "concurrent":
             state["eligible_m"] = lg["admit_m"]
         event_rows.append("admit %d" % i)
+        if lg.get("launch_error"):
+            write_leg_end(i, lg["started_ns"], 1)
         return i
 
     def write_leg_end(i, ended_ns, rc):
         lg = running.pop(i)
         lg["ended_ns"], lg["rc"], lg["end_m"] = ended_ns, rc, time.monotonic()
-        try:
-            lg["acct"] = read_job_accounting(api, lg["job"])
-            lg["left_running"] = lg["acct"]["active"]
-        except OSError:
-            lg["acct"], lg["left_running"] = None, None
+        lg["acct"], lg["left_running"] = None, None
+        if lg["job"] is not None:
+            try:
+                lg["acct"] = read_job_accounting(api, lg["job"])
+                lg["left_running"] = lg["acct"]["active"]
+            except OSError:
+                lg["acct"], lg["left_running"] = None, None
         if lg["episode"] is not None:
             lg["episode"]["closed"], lg["episode"]["how"] = round(ended_ns / 1e9, 3), "ended"
             lg["episode"] = None
         lg["raw_pending"] = write_leg_capture(lg, final=False)
-        lg["proc"].poll()
+        if lg["proc"] is not None:
+            lg["proc"].poll()
         state["last_end_m"] = lg["end_m"]
         if opts.mode == "serial":
             state["eligible_m"] = lg["end_m"]
@@ -1500,6 +1670,8 @@ def run_profile(opts):
             tail.append("ts_holders %d" % rec["ts_holders"])
         if rec["stalls"]:
             tail.append("%d stall episode(s)" % len(rec["stalls"]))
+        if rec["launch_error"]:
+            tail.append(rec["launch_error"])
         print("measure-legs: %-4s  %s  (%s)" % (rec["verdict"], rec["name"], ", ".join(tail)), flush=True)
 
     box, worker = {}, None
@@ -1577,17 +1749,19 @@ def run_profile(opts):
     # ---- run end: each job re-read, each kept capture retried, each profile rewritten
     for lg in legs:
         rec = lg["record"]
-        try:
-            rec["job_final"] = read_job_accounting(api, lg["job"])
-        except OSError as exc:
-            rec["job_final"] = {"unread": str(exc)}
+        if lg["job"] is not None:  # a leg whose launch failed (S35) holds no job and no handle
+            try:
+                rec["job_final"] = read_job_accounting(api, lg["job"])
+            except OSError as exc:
+                rec["job_final"] = {"unread": str(exc)}
         if lg.get("raw_pending"):
             why = write_leg_capture(lg, final=True)
             rec["log_bytes"] = lg.get("log_bytes")
             if why:
                 raw_kept.append({"leg": lg["name"], "path": lg["capture"], "reason": why})
         write_leg_record(run_dir, rec)
-        api.CloseHandle(lg["hq"])
+        if lg["hq"]:
+            api.CloseHandle(lg["hq"])
     recs = [lg["record"] for lg in legs]
     width = 1 if opts.mode == "serial" else max(1, state["peak"])
     durs = [r["wall_s"] for r in recs]
@@ -1694,6 +1868,63 @@ def remove_scratch(run_dir):
         shutil.rmtree(read_envelope(run_dir)["scratch"], ignore_errors=True)
     except (OSError, ValueError, KeyError):
         pass
+
+
+def build_holder_env(env):
+    """<env> scrubbed as a leg's environment is, then `GATE_REGEN_CHECK=0`, as `queued.sh` sets it
+    (S12): the selftest's holder is a bar, and without it that bar runs the regen preflight first."""
+    top = profile_bar.run_git(["rev-parse", "--show-toplevel"])
+    gone = {n for n, _r in derive_scrub_set(list(env), read_local_env_vars(top), read_hook_unsets(top))}
+    out = {k: v for k, v in env.items() if k not in gone}
+    out["GATE_REGEN_CHECK"] = "0"
+    return out
+
+
+def read_hold_beacon(key, holder, bound_s):
+    """The `pid` file of any slot beacon under the turnstile key <key>, polled every 0.2 s, once one
+    exists. None when the process <holder> exits first or <bound_s> seconds pass: the beacon is the
+    holder's only proof of holding, and a holder that never takes the slot must end the arm, not
+    stall it (S12)."""
+    deadline = time.monotonic() + bound_s
+    while True:
+        try:
+            names = sorted(os.listdir(key))
+        except OSError:
+            names = []
+        for slot in names:
+            if slot == "gate-bar-beacon" or slot.startswith("gate-bar-beacon."):
+                pid = os.path.join(key, slot, "pid")
+                if os.path.exists(pid):
+                    return pid
+        if holder.poll() is not None or time.monotonic() >= deadline:
+            return None
+        time.sleep(0.2)
+
+
+def render_holder_failure(holder_out):
+    """The turnstile arm's failure line when no beacon appeared, with the holder's captured output."""
+    try:
+        with open(holder_out, "rb") as fh:
+            said = fh.read().decode("utf-8", "replace").strip()
+    except OSError as exc:
+        said = "its output is unreadable: %s" % exc
+    return "the holder's slot beacon never appeared; the holder printed: %s" % (said[-600:] or "nothing")
+
+
+def resolve_msys_dir(path):
+    """<path> as the resolved bash spells it (`cygpath -u`), forward-slashed as written when that fails."""
+    bash, _tried = profile_bar.resolve_bash(RUNNER)
+    rc, out, _err = run_bash(bash, 'cygpath -u -- "$1"', [path]) if bash else (1, "", "")
+    out = out.strip()
+    return out if rc == 0 and out.startswith("/") else path.replace("\\", "/")
+
+
+def write_temp_manifest(tmp, name, rows):
+    """A leg manifest of <rows> at <tmp>/<name>, for an arm that profiles legs no fixture manifest holds."""
+    path = os.path.join(tmp, name)
+    with open(path, "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(rows, fh)
+    return path
 
 
 def read_pybin_alias():
@@ -1824,9 +2055,10 @@ def test_foreign_parity(tmp):
 
 
 def test_serial_run(tmp):
-    """AC1 AC2 AC9 AC10 AC11 AC16 AC17, over one --serial run of serial.json with four knobs exported.
-    S14's interpreter verification is read on every host; AC1 and AC16's alias halves only where
-    PYBIN is an alias, and `substitutions` must read [] anywhere else."""
+    """AC1 AC2 AC9 AC10 AC11 AC16 AC17, over one --serial run of serial.json's six legs with four knobs
+    exported, and TOOL-dRedressedBar-19's AC39 over its printenv log. S14's interpreter verification
+    is read on every host; AC1 and AC16's alias halves only where PYBIN is an alias, and
+    `substitutions` must read [] anywhere else."""
     pybin_alias = read_pybin_alias()
     knobs = {"GATE_JOBS": "3", "GATE_REUSE": "1", "GATE_TURNSTILE_HOLDER": "probe", "GIT_NAMESPACE": "probe"}
     with set_environ(knobs):
@@ -1836,7 +2068,7 @@ def test_serial_run(tmp):
         env = {k: v for k, v in os.environ.items() if k not in {n for n, _r in scrub}}
         bash, _tried = profile_bar.resolve_bash(RUNNER)
         want_py = resolve_leg_python(bash, env, extract_runner_function(read_runner_text(), "resolve_python"))
-    if rc != 0 or not run_dir or len(recs) != 4:
+    if rc != 0 or not run_dir or len(recs) != 6:
         check_arm("test_serial_run", False, "exit %s, run dir %r, %d record(s)" % (rc, run_dir, len(recs)))
         return
     env_rec = read_envelope(run_dir)
@@ -1855,7 +2087,11 @@ def test_serial_run(tmp):
         and abs(r["spawn_s_est"] - r["procs_total"] * r["spawn_us"]["median"] / 1e6) < 1e-5
         for r in recs.values()), repr([(r["name"], r["spawn_us"], r["spawn_s_est"]) for r in recs.values()]))
     with open(os.path.join(run_dir, "%d.log" % penv["i"]), "rb") as fh:
-        log = fh.read().decode("utf-8", "replace")
+        log_bytes = fh.read()
+    log = log_bytes.decode("utf-8", "replace")
+    check_arm("AC39 the log keeps every byte but the two credentials",
+              b"\xe7" in log_bytes and b"\r" in log_bytes and log_bytes.count(b"://***:***@") == 2
+              and b"s3cret" not in log_bytes, repr(log_bytes[-160:]))
     names = set(log.split())
     git_names = set(read_local_env_vars(top) or ())
     scrubbed = {s["name"]: s["rule"] for s in env_rec["scrubbed"]}
@@ -1868,9 +2104,9 @@ def test_serial_run(tmp):
     check_arm("AC9 PYBIN is the runner's", env_rec["pybin"] == want_py, "%r vs %r" % (env_rec["pybin"], want_py))
     listing = set(os.listdir(run_dir))
     want = {"envelope.json", "host.tsv", "census.tsv", "legs.tsv"} | {
-        "%d.%s" % (i, ext) for i in range(4) for ext in ("leg", "log", "json")}
+        "%d.%s" % (i, ext) for i in range(6) for ext in ("leg", "log", "json")}
     rows_ok = True
-    for i in range(4):
+    for i in range(6):
         with open(os.path.join(run_dir, "%d.leg" % i), encoding="utf-8") as fh:
             f = fh.read().rstrip("\n").split("\t")
         rows_ok = rows_ok and len(f) == 8 and re.fullmatch(r"[0-9]+\.[0-9]{3}", f[3]) is not None
@@ -1931,7 +2167,7 @@ def test_resolution_disabled(tmp):
         rc, _out, run_dir, recs = run_fixture(tmp, "serial.json")
     finally:
         globals()["resolve_launcher_aliases"] = real
-    if rc != 0 or not run_dir or len(recs) != 4:
+    if rc != 0 or not run_dir or len(recs) != 6:
         check_arm("test_resolution_disabled", False, "exit %s, run dir %r, %d record(s)" % (rc, run_dir, len(recs)))
         return
     six, none, memio = recs["spawn six"], recs["spawn none"], recs["memio"]
@@ -1969,9 +2205,13 @@ def test_stall_run(tmp):
         check_arm("test_stall_run", False, "exit %s, %d record(s)" % (rc, len(recs)))
         return
     stall, steady, churn = recs["stall"], recs["steady"], recs["churn"]
+    # TOOL-dRedressedBar-19 S42: read line by line, so a STALLED line naming a sibling reds here.
+    lines = [ln for ln in out.split("\n") if ln.startswith("measure-legs: STALLED  ")]
     check_arm("AC6 the blocked leg reads STALLED",
               len(stall["stalls"]) == 1 and any("sleep" in (p.get("command") or "") for p in stall["stalls"][0]["tree"])
-              and re.search(r"^measure-legs: STALLED  stall  ", out, re.M) is not None, repr(stall["stalls"])[:300])
+              and len(lines) == 1 and lines[0].startswith("measure-legs: STALLED  stall  ")
+              and not any(ln.startswith("measure-legs: STALLED  %s  " % n) for ln in lines for n in ("steady", "churn")),
+              repr((lines, stall["stalls"]))[:300])
     check_arm("AC6 the steady leg does not", not steady["stalls"] and all(r["rc"] == 0 for r in recs.values()),
               repr((steady["stalls"], [r["rc"] for r in recs.values()])))
     vetoed = [w for w in churn["stall_windows"] if w["tree_delta"] is not None and w["tree_delta"] < 0.5
@@ -1991,19 +2231,18 @@ def test_turnstile_run(tmp):
     top = profile_bar.run_git(["rev-parse", "--show-toplevel"])
     bash, _tried = profile_bar.resolve_bash(RUNNER)
     with set_environ({"HOME": home}):
-        scrub = derive_scrub_set(list(os.environ), read_local_env_vars(top), read_hook_unsets(top))
-        env = {k: v for k, v in os.environ.items() if k not in {n for n, _r in scrub}}
-        log = open(os.path.join(tmp, "holder.out"), "wb")
+        env = build_holder_env(dict(os.environ))
+        holder_out = os.path.join(tmp, "holder.out")
+        log = open(holder_out, "wb")
         holder = subprocess.Popen([bash, RUNNER, "--hold", "--", "sleep", "20"], cwd=top, env=env,
                                   stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT)
         log.close()
-        beacon = os.path.join(home, ".gov", "gate-turnstile", "gate-bar-beacon", "pid")
-        deadline = time.monotonic() + 120
-        while not os.path.exists(beacon) and holder.poll() is None and time.monotonic() < deadline:
-            time.sleep(0.2)
-        if not os.path.exists(beacon):
-            check_arm("test_turnstile_run", False, "the holder's slot beacon never appeared")
-            holder.wait()
+        if read_hold_beacon(os.path.join(home, ".gov", "gate-turnstile"), holder, HOLD_BEACON_WAIT_S) is None:
+            check_arm("test_turnstile_run", False, render_holder_failure(holder_out))
+            try:
+                holder.wait(timeout=60)
+            except subprocess.TimeoutExpired:
+                pass
             return
         rc, _out, run_dir, recs = run_fixture(tmp, "turnstile.json")
     holder.wait()
@@ -2044,18 +2283,342 @@ def test_turnstile_run(tmp):
     remove_scratch(run_dir)
 
 
+# ---- TOOL-dRedressedBar-19's arms
+
+def test_turnstile_key(tmp):
+    """AC11 and AC36. A key whose `cygpath -m` conversion fails resolves to ("", ""), which
+    `read_turnstile` refuses; under this process's PATH it converts to a drive-letter spelling. A
+    beacon with no `pid` file, one whose `pid` is no number and a ticket with no pid field are not
+    judged, and a queue that cannot be listed is the one refused read. Red when the conversion keeps
+    its bash-spelling fallback, or when a pid-less beacon reads as refused."""
+    bash, _tried = profile_bar.resolve_bash(RUNNER)
+    got = resolve_turnstile_dir(bash, dict(os.environ, PATH="/nonexistent"))
+    try:
+        read_turnstile(got[1])
+        refused = False
+    except OSError:
+        refused = True
+    check_arm("AC11 a key that does not convert is a refused read, never an empty one",
+              got == ("", "") and refused, repr(got))
+    own = resolve_turnstile_dir(bash, dict(os.environ))
+    check_arm("AC11 ...and under this PATH the key converts to a drive-letter spelling",
+              DRIVE_SPELLING.match(own[1]) is not None, repr(own))
+    key = tempfile.mkdtemp(prefix="key.", dir=tmp)
+    os.makedirs(os.path.join(key, "gate-bar-beacon"))
+    os.makedirs(os.path.join(key, "gate-bar-beacon.1"))
+    os.makedirs(os.path.join(key, "gate-bar-queue"))
+    with open(os.path.join(key, "gate-bar-beacon.1", "pid"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("x\n")
+    with open(os.path.join(key, "gate-bar-queue", "20261015T000000-nopid-x"), "w", encoding="utf-8") as fh:
+        fh.write("")
+    try:
+        ts = read_turnstile(key)
+    except OSError as exc:
+        ts = "refused: %s" % exc
+    check_arm("AC36 a half-written beacon and a pid-less ticket are not judged",
+              ts == {"holders": [], "tickets": []}, repr(ts))
+    bad = tempfile.mkdtemp(prefix="key.", dir=tmp)
+    with open(os.path.join(bad, "gate-bar-queue"), "w", encoding="utf-8") as fh:
+        fh.write("")
+    try:
+        read_turnstile(bad)
+        refused = False
+    except OSError:
+        refused = True
+    check_arm("AC36 a queue that cannot be listed is a refused read", refused)
+
+
+def test_hold_beacon(tmp):
+    """AC12. The holder's environment is the legs' scrub with `GATE_REGEN_CHECK=0` set after it, and
+    the beacon wait ends on its bound with the holder still running, and at once on the holder's
+    exit, whose output the failure line carries. Red when `build_holder_env` sets nothing."""
+    env = build_holder_env({"GATE_REGEN_CHECK": "1", "GATE_JOBS": "3"})
+    check_arm("AC12 the holder runs under GATE_REGEN_CHECK=0, every other GATE_ name scrubbed",
+              env.get("GATE_REGEN_CHECK") == "0" and "GATE_JOBS" not in env, repr(env))
+    key = tempfile.mkdtemp(prefix="key.", dir=tmp)
+    waiter = subprocess.Popen([sys.executable, "-I", "-c", "import sys; sys.stdin.read()"],
+                              stdin=subprocess.PIPE, stdout=subprocess.DEVNULL)
+    try:
+        t0 = time.monotonic()
+        got = read_hold_beacon(key, waiter, 2)
+        took, alive = time.monotonic() - t0, waiter.poll() is None
+    finally:
+        waiter.stdin.close()
+        waiter.wait(timeout=60)
+    check_arm("AC12 the wait ends on its bound, the holder still running",
+              got is None and took < 4 and alive, repr((got, round(took, 2), alive)))
+    said = os.path.join(tmp, "said.out")
+    with open(said, "wb") as fh:
+        quitter = subprocess.Popen([sys.executable, "-I", "-c", "print('holder-said')"],
+                                   stdout=fh, stderr=subprocess.STDOUT)
+    quitter.wait(timeout=60)
+    t0 = time.monotonic()
+    got = read_hold_beacon(key, quitter, HOLD_BEACON_WAIT_S)
+    took = time.monotonic() - t0
+    line = render_holder_failure(said)
+    check_arm("AC12 ...and at once on the holder's exit, its output in the failure line",
+              got is None and took < 1 and "holder-said" in line, repr((got, round(took, 2), line)))
+
+
+# S20's eight shapes, LF only: the runner's `sed` drops the CR of a CRLF under MSYS, so no shape holds one.
+REDACT_SHAPES = (b"plain https://u:p@h/x\n"
+                 b"two https://u:p@h/x and https://a:b@c/y\n"
+                 b"ssh git+ssh://git:tok@host/repo\n"
+                 b"colon https://u:p:q@h/x\n"
+                 b"no colon https://user@h/x\n"
+                 b"slash https://u/v:p@h/x\n"
+                 b"tab https://u\tv:p@h/x\n"
+                 b"byte caf\xe7 https://u:p@h/\xe7\n")
+
+
+def test_redact_parity(_tmp):
+    """AC20: the runner's own `redact`, run from its source in the resolved bash over S20's eight
+    shapes on stdin, against `derive_redacted` over the same bytes, byte for byte. Red when the port
+    drops `\\s` from its classes: the tab shape then differs. A liveness half requires the runner to
+    have masked something, so a `redact` that printed nothing cannot pass."""
+    bash, _tried = profile_bar.resolve_bash(RUNNER)
+    fn = extract_runner_function(read_runner_text(), "redact")
+    try:
+        done = subprocess.run([bash, "-c", fn + "\nredact\n"], input=REDACT_SHAPES, capture_output=True,
+                              timeout=60)
+        got = done.stdout
+    except (OSError, subprocess.SubprocessError) as exc:
+        got = ("not run: %r" % exc).encode("utf-8")
+    port = derive_redacted(REDACT_SHAPES)
+    check_arm("AC20 the port masks every shape as the runner's redact does",
+              got == port and got.count(b"://***:***@") >= 5, repr((got, port))[:600])
+
+
+def test_no_bare_bash_argv(tmp):
+    """AC34. An `ast` scan of this file finds no subprocess call whose argv opens with the literal
+    'bash', so every bash this tool starts is the one `resolve_bash` found; and an empty resolve
+    refuses with exit 2 before any leg, naming each candidate. Red when one call spells `["bash", …]`."""
+    with open(os.path.abspath(__file__), encoding="utf-8") as fh:
+        tree = ast.parse(fh.read())
+    calls, bare = 0, []
+    for n in ast.walk(tree):
+        f = n.func if isinstance(n, ast.Call) else None
+        if not (isinstance(f, ast.Attribute) and isinstance(f.value, ast.Name) and f.value.id == "subprocess"
+                and n.args):
+            continue
+        calls += 1
+        a0 = n.args[0]
+        while isinstance(a0, ast.BinOp):
+            a0 = a0.left
+        if isinstance(a0, (ast.List, ast.Tuple)) and a0.elts and isinstance(a0.elts[0], ast.Constant) \
+                and a0.elts[0].value == "bash":
+            bare.append(n.lineno)
+    check_arm("AC34 no subprocess argv opens with a bare 'bash'", calls >= 3 and not bare,
+              "%d subprocess call(s) read, bare at %s" % (calls, bare))
+    out = tempfile.mkdtemp(prefix="out.", dir=tmp)
+    real = profile_bar.resolve_bash
+    profile_bar.resolve_bash = lambda *_a, **_k: ("", ["cand-a", "cand-b"])
+    err = io.StringIO()
+    try:
+        with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
+            rc = main(["--serial", "--legs", os.path.join(FIXTURES, "serial.json"), "--out", out])
+    finally:
+        profile_bar.resolve_bash = real
+    check_arm("AC34 an empty bash resolve refuses before any leg, naming every candidate",
+              rc == 2 and not os.listdir(out) and "cand-a" in err.getvalue() and "cand-b" in err.getvalue(),
+              repr((rc, os.listdir(out), err.getvalue()[-300:])))
+
+
+def test_fork_count(tmp):
+    """AC32: serial.json's `forks.sh 5` against its zero-count twin, alone. Each subshell and each
+    command substitution is at least one process, so the job totals differ by at least 10. Red when
+    the job lets a child break away: the difference then reads 0."""
+    with open(os.path.join(FIXTURES, "serial.json"), encoding="utf-8") as fh:
+        rows = [r for r in json.load(fh) if any(a.endswith("/forks.sh") for a in r["argv"])]
+    rc, _out, run_dir, recs = run_fixture(tmp, write_temp_manifest(tmp, "forks.json", rows))
+    five, none = recs.get("forks five") or {}, recs.get("forks none") or {}
+    diff = (five.get("procs_total") or 0) - (none.get("procs_total") or 0)
+    check_arm("AC32 the forked processes are counted", rc == 0 and len(rows) == 2 and diff >= 10,
+              "exit %s, %d row(s), %s - %s" % (rc, len(rows), five.get("procs_total"), none.get("procs_total")))
+    if run_dir:
+        remove_scratch(run_dir)
+
+
+# AC37's eight malformed manifests: (class, text, whether the refusal names a row).
+MANIFEST_CLASSES = (
+    ("unparseable JSON", '[{"name": ', False),
+    ("a top-level object", '{"name": "a", "argv": ["true"]}', False),
+    ("a non-object row", '[1]', True),
+    ("an empty list", '[]', False),
+    ("a duplicate name", '[{"name": "a", "argv": ["true"]}, {"name": "a", "argv": ["true"]}]', True),
+    ("an argv holding a number", '[{"name": "a", "argv": ["true", 1]}]', True),
+    ("a name holding a tab", '[{"name": "a\\tb", "argv": ["true"]}]', True),
+    ("an unresolved token", '[{"name": "a", "argv": ["{nope}/x"]}]', True),
+)
+
+
+def test_manifest_refusals(tmp):
+    """AC37: each malformed manifest class exits 2 before any leg with one `measure-legs: REFUSED — `
+    line on stderr and no traceback, and each row class's line names the row. Red when a class is let
+    through: the tab-named leg then runs."""
+    bad = []
+    for k, (what, text, row) in enumerate(MANIFEST_CLASSES):
+        path = os.path.join(tmp, "malformed-%d.json" % k)
+        with open(path, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(text)
+        out = tempfile.mkdtemp(prefix="out.", dir=tmp)
+        err, std = io.StringIO(), io.StringIO()
+        try:
+            with contextlib.redirect_stderr(err), contextlib.redirect_stdout(std):
+                rc = main(["--serial", "--legs", path, "--out", out])
+        except Exception as exc:  # a crash is the failure this arm exists for, named, never raised
+            rc = "raised %r" % exc
+        lines = [ln for ln in err.getvalue().split("\n") if ln.startswith("measure-legs: REFUSED — ")]
+        if rc != 2 or len(lines) != 1 or "Traceback" in err.getvalue() + std.getvalue() or os.listdir(out) \
+                or (row and "row " not in lines[0]):
+            bad.append((what, rc, lines))
+    check_arm("AC37 every malformed manifest class refuses with exit 2, by row where it is one",
+              not bad, repr(bad)[:600])
+
+
+def test_launch_failure(tmp):
+    """AC35. `build_job` hands the leg, after the interpreter probe's two real jobs, a job handle
+    already closed, so the assign fails: the run returns 0, the leg reads `fail` with rc 1 and a
+    `launch_error` naming the call, and no process carrying the leg's argv is left. Red when the
+    terminate is taken out: the suspended root is then still in the census."""
+    marker = "launch-probe-%d-%d" % (os.getpid(), time.time_ns())
+    manifest = write_temp_manifest(tmp, "launch.json", [
+        {"name": "launch", "argv": ["python3", "{prefix}/run-gates/fixtures/measure-legs/spawn.py", "0", "1",
+                                    marker]}])
+    real, made = globals()["build_job"], []
+
+    def build_closed_job(api):
+        job = real(api)
+        made.append(job)
+        if len(made) > 2:
+            api.CloseHandle(job)
+        return job
+
+    globals()["build_job"] = build_closed_job
+    t0 = time.monotonic()
+    try:
+        rc, _out, run_dir, recs = run_fixture(tmp, manifest)
+    finally:
+        globals()["build_job"] = real
+    took = time.monotonic() - t0
+    rec = recs.get("launch") or {}
+    check_arm("AC35 a failed launch is a failed leg, and the run goes on",
+              rc == 0 and took < 60 and rec.get("verdict") == "fail" and rec.get("rc") == 1
+              and str(rec.get("launch_error") or "").startswith("launch: AssignProcessToJobObject"),
+              repr((rc, round(took, 1), rec.get("verdict"), rec.get("rc"), rec.get("launch_error"))))
+    try:
+        rows = load_process_monitor().census.scan_processes()[0]
+        left = [r["winpid"] for r in rows if marker in (r.get("command") or "")]
+    except Exception as exc:  # a census that cannot answer cannot show the root gone
+        left = ["census refused: %s" % exc]
+    check_arm("AC35 ...and its suspended root is terminated", not left, repr(left))
+    if run_dir:
+        remove_scratch(run_dir)
+
+
+def test_scratch_sweep(tmp):
+    """AC38, under a TMPDIR of this arm's own. Two sibling scratch dirs: a dead owner's, an exited child
+    named with its own creation time and a record dir that exists, whose raw capture carries a
+    credential; and a live one's, this process. The run redacts the dead capture into that record
+    dir, deletes it and names it in `raw_recovered`, and leaves the live capture alone. Red when the
+    owner test reads the pid alone: the exited child, its handle still held, then reads live."""
+    api = resolve_job_backend()
+    sweep = tempfile.mkdtemp(prefix="sweep.", dir=tmp)
+    out = tempfile.mkdtemp(prefix="out.", dir=tmp)
+    record = os.path.join(out, "dead-record")
+    os.makedirs(record)
+    child = subprocess.Popen([sys.executable, "-I", "-c", "import sys; sys.stdin.read()"], stdin=subprocess.PIPE)
+    _state, child_created = read_process_created(api, child.pid)
+    child.stdin.close()
+    child.wait(timeout=60)
+    _state, own_created = read_process_created(api, os.getpid())
+    planted = {}
+    for name, pid, created, raw in (("dead", child.pid, child_created, b"https://u:s3cret@example.invalid/\n"),
+                                    ("live", os.getpid(), own_created, b"live-bytes")):
+        d = os.path.join(sweep, "gate-profile.%s0000" % name)
+        os.makedirs(os.path.join(d, "raw"))
+        with open(os.path.join(d, "owner.json"), "w", encoding="utf-8", newline="\n") as fh:
+            json.dump({"pid": pid, "created": created, "record": record.replace("\\", "/")}, fh)
+        planted[name] = os.path.join(d, "raw", "0.out")
+        with open(planted[name], "wb") as fh:
+            fh.write(raw)
+    manifest = write_temp_manifest(tmp, "sweep.json", [
+        {"name": "sweep", "argv": ["python3", "{prefix}/run-gates/fixtures/measure-legs/spawn.py", "0", "1"]}])
+    buf = io.StringIO()
+    with set_environ({"TMPDIR": resolve_msys_dir(sweep)}), contextlib.redirect_stdout(buf):
+        rc = main(["--serial", "--legs", manifest, "--out", out] + SELFTEST_FLAGS)
+    sys.stdout.write(buf.getvalue())
+    runs = [os.path.join(out, r) for r in os.listdir(out) if r != "dead-record"]
+    recovered = (read_envelope(runs[0]).get("raw_recovered") if len(runs) == 1 else None) or []
+    leaked = []
+    for base in (out, os.path.dirname(os.path.dirname(planted["dead"]))):
+        for d, _dirs, files in os.walk(base):
+            for f in files:
+                with open(os.path.join(d, f), "rb") as fh:
+                    if b"s3cret" in fh.read():
+                        leaked.append(f)
+    try:
+        with open(os.path.join(record, "0.log.recovered"), "rb") as fh:
+            masked = b"://***:***@" in fh.read()
+    except OSError:
+        masked = False
+    try:
+        with open(planted["live"], "rb") as fh:
+            live = fh.read()
+    except OSError as exc:
+        live = repr(exc).encode("utf-8")
+    named = [os.path.normcase(os.path.normpath(str(k.get("raw")))) for k in recovered]
+    check_arm("AC38 a dead run's raw capture is redacted, recorded and deleted",
+              rc == 0 and child_created is not None and not os.path.exists(planted["dead"]) and masked
+              and not leaked and named == [os.path.normcase(os.path.normpath(planted["dead"]))],
+              repr((rc, child_created, os.path.exists(planted["dead"]), masked, leaked, recovered))[:600])
+    check_arm("AC38 ...and a live run's is left alone", live == b"live-bytes", repr(live[:80]))
+    if len(runs) == 1:
+        remove_scratch(runs[0])
+
+
+def test_fixtures_withheld(_tmp):
+    """AC29: the run-gates descriptor's `project-owned` list names every file under the fixture
+    directory, and only those, read off the filesystem and never off the list, and no `project-owned`
+    element carries a glob, which a list include drops. Red when one fixture name is taken out of the
+    list, or the list is respelled as one `fixtures/measure-legs/**` element."""
+    import tomllib
+    with open(os.path.join(KITDIR, "kit.toml"), "rb") as fh:
+        desc = tomllib.load(fh)
+    owned = [e for rule in desc.get("files", []) if rule.get("role") == "project-owned"
+             and isinstance(rule.get("include"), list) for e in rule["include"]]
+    listed = {e for e in owned if str(e).startswith("fixtures/measure-legs/")}
+    on_disk = set()
+    for base, dirs, files in os.walk(FIXTURES):
+        dirs[:] = [d for d in dirs if d != "__pycache__"]  # bytecode is never tracked, so never shipped
+        on_disk.update(os.path.relpath(os.path.join(base, f), KITDIR).replace("\\", "/") for f in files)
+    check_arm("AC29 the fixture population is non-empty, so the comparison below can fail",
+              bool(on_disk), FIXTURES)
+    check_arm("AC29 every fixture, and only fixtures, is named project-owned",
+              listed == on_disk, repr(sorted(listed ^ on_disk)))
+    check_arm("AC29 no project-owned element carries a glob, which a list include would drop",
+              not any(c in str(e) for e in owned for c in "*?["), repr(sorted(map(str, owned))))
+
+
 def cmd_selftest():
     del ARM_PASSED[:], ARM_FAILED[:]
     tmp = tempfile.mkdtemp(prefix="measure-legs-selftest.")
     print("measure-legs selftest: arms", flush=True)
     try:
-        for arm in (test_platform_refusal, test_check_admit, test_scrub_derivation, test_extract_refuses,
-                    test_app_alias, test_foreign_parity, test_serial_run, test_resolution_disabled,
-                    test_concurrent_run, test_stall_run, test_turnstile_run):
-            try:
-                arm(tmp)
-            except Exception as exc:  # an arm that raised is a failed arm, named, never a crash
-                check_arm(arm.__name__, False, "raised %r" % exc)
+        # S38: every profile this selftest starts makes its scratch dir, and sweeps that dir's
+        # siblings, under the selftest's own temp dir, never the operator's real TMPDIR. Spelled as
+        # the resolved bash spells it, so `scratch_posix` still reads as the legs see it.
+        with set_environ({"TMPDIR": resolve_msys_dir(tmp)}):
+            for arm in (test_platform_refusal, test_check_admit, test_scrub_derivation, test_extract_refuses,
+                        test_app_alias, test_foreign_parity, test_serial_run, test_resolution_disabled,
+                        test_concurrent_run, test_stall_run, test_turnstile_run, test_turnstile_key,
+                        test_hold_beacon, test_redact_parity, test_no_bare_bash_argv, test_fork_count,
+                        test_manifest_refusals, test_launch_failure, test_scratch_sweep,
+                        test_fixtures_withheld):
+                try:
+                    arm(tmp)
+                except Exception as exc:  # an arm that raised is a failed arm, named, never a crash
+                    check_arm(arm.__name__, False, "raised %r" % exc)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     n = len(ARM_PASSED) + len(ARM_FAILED)

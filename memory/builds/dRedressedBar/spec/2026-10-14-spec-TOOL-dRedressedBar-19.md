@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-19 — the units-16-18 spec audit's 19 mediums and 22 lows, batched: the profiler's census, path, launch, turnstile, redaction and leg-declaration gaps closed, the receipt sidecar made atomic, and specs 12 and 14 to 18 corrected
 
-**Status:** SPECCED · rev-6 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 14
+**Status:** INPROGRESS · rev-6 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 14
 
 <!-- gen:spec-records -->
 

@@ -30,10 +30,19 @@ Every run writes one directory, `<git-dir>/gate-profile/<run id>/`. Nothing prun
 
 - `envelope.json`: the run. It holds the scrubbed variable names and their rules, the environment
   digests and tool versions, `substitutions`, and the scratch dir in both spellings, `scratch` as
-  Python opens it and `scratch_posix` as the legs see it.
+  Python opens it and `scratch_posix` as the legs see it. Its `raw_recovered` names each raw capture
+  this run recovered from a dead run, described below.
 - `legs.tsv`: one row per leg, the table to sort. Per-leg detail is in `<i>.json`, and the redacted
-  output is in `<i>.log`.
+  output is in `<i>.log`. A leg whose process could not be put in its job or started reads `fail`
+  with rc 1, and its `<i>.json` carries `launch_error`, `launch: <call> <winerror>`. Its process is
+  stopped before it runs anything, and the run goes on.
 - `host.tsv` and `census.tsv`: the load timeline and each process census.
+
+A run that was killed or crashed can leave a leg's raw output, unredacted, in its scratch dir. Each
+run writes `owner.json` into its own scratch dir, and a later run sweeps a dead run's raw captures:
+once it has proved that run's process gone, by its pid and creation time, it redacts each capture
+into `<i>.log.recovered` in that run's record dir, or under `recovered/` in its own record when that
+dir is gone, and deletes the raw file. A scratch dir whose owner might still be running is left alone.
 
 Per leg, `procs_total` is the job's exact process count, and `unseen` is how many of those the census
 never saw. `ts_wait_s` is the time the leg's own bars waited in the host turnstile queue, and

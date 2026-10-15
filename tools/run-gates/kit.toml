@@ -96,6 +96,24 @@ role = "project-owned"
 include = ["windows-only-legs.txt"]
 role = "project-owned"
 
+# AND SO ARE THE GATE PROFILER'S FIXTURES. TOOL-dRedressedBar-19 S29. `measure_legs.py` ships, but
+# its `--selftest` needs a Windows host and the process-monitor kit beside this one, so its leg is
+# GOV's, an [[exempt_leg]] in <prefix>/govkit/registry.toml, and the fixture legs it profiles have no
+# job in an adopter's tree. EACH FIXTURE IS NAMED, because a LIST include claims literal paths only:
+# govkit's `rule_sources` drops any element carrying a glob character, so `fixtures/measure-legs/**`
+# here would claim nothing and leave every fixture in the `**` engine pool, as <prefix>/runlog/kit.toml
+# records it measured. `measure_legs.py --selftest` asserts this list equals the files under
+# `fixtures/measure-legs/`, so a new fixture reds there instead of shipping.
+[[files]]
+include = ["fixtures/measure-legs/churn.py", "fixtures/measure-legs/concurrent.json",
+           "fixtures/measure-legs/forks.sh", "fixtures/measure-legs/hog.py",
+           "fixtures/measure-legs/memio.py", "fixtures/measure-legs/printenv.py",
+           "fixtures/measure-legs/queued.sh", "fixtures/measure-legs/serial.json",
+           "fixtures/measure-legs/spawn.py", "fixtures/measure-legs/stall.json",
+           "fixtures/measure-legs/stall.sh", "fixtures/measure-legs/steady.py",
+           "fixtures/measure-legs/turnstile.json"]
+role = "project-owned"
+
 [adopt]
 argv = ["bash", "{kit}/adopt-run-gates.sh"]
 mutates_index = false
@@ -150,17 +168,6 @@ name = "held-halves selftest"
 subject = "kit"
 argv = ["python3", "{kit}/held_halves.py", "--selftest"]
 guard = []
-
-# THE GATE PROFILER'S SELF-TEST. TOOL-dRedressedBar-18. `measure_legs.py` is an engine file under
-# `**`, and `--selftest` runs it in-process over the fixture manifests under `fixtures/measure-legs/`.
-# It needs a Windows host and the process-monitor kit as a sibling, and refuses without either.
-# `subject = "kit"` puts it under the 2026-08-23 hold. GUARDED by the files whose text it reads or
-# imports, the same list as its manifest row.
-[[gate_leg]]
-name = "measure-legs selftest"
-subject = "kit"
-argv = ["python3", "{kit}/measure_legs.py", "--selftest"]
-guard = ["{kit}/measure_legs.py", "{kit}/profile_bar.py", "{kit}/run-gates.sh", "{kit}/fixtures/measure-legs/", "{prefix}/process-monitor/census.py", "{prefix}/process-monitor/reap.py", "{prefix}/process-monitor/scope.py"]
 
 # The seed for a target's own [gate_runner] declaration. `cmd_intake` emits this block when this
 # entry is selected (S9), resolving the path tokens ONLY: the runner's own `{name}` placeholder in

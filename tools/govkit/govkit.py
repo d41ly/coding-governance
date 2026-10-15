@@ -3345,7 +3345,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                    f"from its own table, so a per-entry prefix on either moves one side and "
                    f"not the other. An adopter that runs another entry's script declares "
                    f"[adopt] via = \"{_xa_o}\"")
-        r.note(f"cross-entry argv: {_xa_offered} slash-bearing element(s) offered by [adopt], "
+        r.note(f"cross-entry argv: {_xa_offered} argv element(s) offered by [adopt], "
                f"[check], [[gate_leg]] and [[regenerate]] across {len(_bare_sel)} entries, "
                f"{_xa_graded} graded, {_xa_hits} naming a file only another entry ships")
         if _xa_offered and not _xa_graded:
@@ -4168,7 +4168,13 @@ def scan_entry_argv(descs: dict[str, tuple[dict, str]], selection: list[str], ta
 # were a plain `write_text`, so an exception mid-write left a truncated receipt the next run crashed
 # on or read as empty. Every one of them — `apply`'s early, re-stamp and RECEIPT writes, `update`'s
 # three and `adopt`'s one — now routes through `write_atomic`, and the assertion reds on any left.
-ADOPTER_BAR_PATHS = ('gr["file"]', 'receipt_path')
+#
+# `"install.sums"` IS THE THIRD (TOOL-dRedressedBar-19 S40): `.governance/install.sums`, the flat
+# sidecar of the receipt that `check` compares with it both ways. It is written beside the receipt at
+# `apply`'s RECEIPT step, `update`'s three and `adopt`'s one, each through `write_atomic` and each
+# BEFORE its receipt, so an interrupt between the two leaves a new sidecar beside the old receipt,
+# which `check` reports until the next apply rewrites both, and never a truncated sidecar.
+ADOPTER_BAR_PATHS = ('gr["file"]', 'receipt_path', '"install.sums"')
 
 
 def write_atomic(dest: pathlib.Path, text: str) -> None:
@@ -4176,7 +4182,8 @@ def write_atomic(dest: pathlib.Path, text: str) -> None:
     mid-write leaves the PREVIOUS file rather than a truncated one (DEPL-cMendedVintage-21 S1).
 
     THE ONE WRITER for every destination `ADOPTER_BAR_PATHS` declares: the gate-leg manifest an
-    adopter's whole bar reads, and the receipt, `.governance/install.json` (TOOL-dRedressedBar-17).
+    adopter's whole bar reads, the receipt, `.governance/install.json` (TOOL-dRedressedBar-17), and
+    its sidecar `.governance/install.sums`, written before the receipt (TOOL-dRedressedBar-19).
     Two verbs write the manifest since DEPL-cMendedVintage-13, and an exception between opening it
     and finishing it would hand the adopter a manifest that is not JSON — every leg of their bar,
     gone, on a deployer step that was only adding one. A receipt cut short the same way is one the
@@ -8335,10 +8342,10 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         "files": rows + _carried_rows, "orders": orders, "after": after_map,
         "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
                         "emitted": emitted, "legs_withheld": _legs_withheld}})
+    # TOOL-dRedressedBar-19 S40: the sidecar first, the receipt last, each through `write_atomic`.
+    write_atomic(target / ".governance" / "install.sums",
+                 "".join(f"{w['sha256']}  {w['path']}\n" for w in _rcpt_doc["files"] if "sha256" in w))
     write_atomic(receipt_path, json.dumps(_rcpt_doc, indent=2) + "\n")
-    (target / ".governance" / "install.sums").write_text(
-        "".join(f"{w['sha256']}  {w['path']}\n" for w in _rcpt_doc["files"] if "sha256" in w),
-        encoding="utf-8", newline="\n")
     if _carried_kits:
         print(f"govkit apply — receipt KEEPS {len(_carried_kits)} kit(s) this selection did not "
               f"name, with their {len(_carried_rows)} row(s) verbatim: {', '.join(_carried_kits)}")
@@ -12337,10 +12344,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # skips that guard entirely and overwrites the project-owned file the first run refused to touch.
     # A partial update leaves the receipt describing what it did, at the commit it came from.
     if r.problems:
+        write_atomic(target / ".governance" / "install.sums",
+                     "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f))
         write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
-        (target / ".governance" / "install.sums").write_text(
-            "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
-            encoding="utf-8", newline="\n")
         print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
               f"deleted {len(deleted)}, withheld {withheld}, "
               f"{conflicts} conflict(s). The receipt is NOT re-stamped: this run had findings, and a "
@@ -12375,17 +12381,15 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"and this run graded none of them, so advancing gov_commit would move the base they "
               f"must be attributed from. Clear them with "
               f"`govkit adopt --re-adopt --pin <path>=<rev> --write`")
+        write_atomic(target / ".governance" / "install.sums",
+                     "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f))
         write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
-        (target / ".governance" / "install.sums").write_text(
-            "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
-            encoding="utf-8", newline="\n")
         return r.emit()
 
     receipt["gov_commit"] = to_commit
+    write_atomic(target / ".governance" / "install.sums",
+                 "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f))
     write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
-    (target / ".governance" / "install.sums").write_text(
-        "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
-        encoding="utf-8", newline="\n")
     # DEPL-cMendedVintage-4 S3. dGaugedVintage-8 S2's "what it overrode" clause went with the
     # override: reaching here now proves `ungraded` is 0, so the clause could only ever render empty.
     print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
@@ -13012,10 +13016,9 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
             print(f"govkit adopt — carried {len(_carried)} install-record key(s) forward from the "
                   f"receipt being replaced: {', '.join(_carried)}. Re-measuring provenance does not "
                   f"un-perform an install, and dropping these bricks the next `apply`")
+    write_atomic(target / ".governance" / "install.sums",
+                 "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w))
     write_atomic(receipt_path, json.dumps(envelope, indent=2) + "\n")
-    (target / ".governance" / "install.sums").write_text(
-        "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w),
-        encoding="utf-8", newline="\n")
     print(f"govkit adopt — receipt written: {len(rows)} row(s), {len(selection)} kit(s), "
           f"schema {RECEIPT_SCHEMA}, gov_commit {commit[:8]}")
     if staged:

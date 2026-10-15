@@ -24,9 +24,11 @@ THE ROW CONTRACT, and every field is load-bearing:
                            is KiB, times 1024). None when unreported, NEVER zero for unreported.
     mem_b      int|None    its working set in BYTES (CIM WorkingSetSize). None as above.
 
-THE TWO MEMORY KEYS ARE NOT IN `FIELDS` (TOOL-dRedressedBar-18 S4). They are extra keys on every
-row, POSIX rows carrying None, so `render_rows` and every line the reap and classify verbs print keep
-their bytes. Their reader is the gate profiler beside the run-gates kit. The KiB unit was confirmed
+THE TWO MEMORY KEYS ARE NOT IN `FIELDS` (TOOL-dRedressedBar-18 S4). They are `OPTIONAL_FIELDS`, extra
+keys on every row, POSIX rows carrying None, so `render_rows` and every line the reap and classify
+verbs print keep their bytes. Their reader is the gate profiler beside the run-gates kit. A CIM line
+of four to six fields is the LEGACY shape, from a query taken before the two fields: its command is
+the fifth field and both memory keys read None (TOOL-dRedressedBar-19 S10). The KiB unit was confirmed
 on node d, 2026-10-15, against one live row: CIM read 78232 beside Get-Process PeakWorkingSet64 of
 76533760 bytes taken a moment before, and WorkingSetSize read 79138816, already bytes.
 
@@ -99,8 +101,9 @@ def parse_cim_bytes(text, scale):
 def parse_cim(text):
     """CIM lines -> {winpid: (win_ppid, cpu_s, age_s, peak_mem_b, mem_b, command)} plus the rejected-row count.
 
-    Seven fields a line: the four numbers, the two memory fields, then the command LAST, so free text
-    stays the final field.
+    A line is read by its field count. Seven or more: the four numbers, the two memory fields, then
+    the command LAST, so free text stays the final field and a separator inside it is kept, rejoined.
+    Four to six: the legacy shape, the command fifth when present and both memory fields None.
     """
     rows, rejected = {}, 0
     # THE PRODUCER'S TERMINATOR, not Python's. `str.splitlines()` also breaks on \v, \f, \x1c,
@@ -124,9 +127,13 @@ def parse_cim(text):
         except ValueError:
             rejected += 1
             continue
-        peak = parse_cim_bytes(parts[4], 1024) if len(parts) > 4 else None
-        mem = parse_cim_bytes(parts[5], 1) if len(parts) > 5 else None
-        command = parts[6].strip() if len(parts) > 6 else ""
+        if len(parts) >= 7:
+            peak = parse_cim_bytes(parts[4], 1024)
+            mem = parse_cim_bytes(parts[5], 1)
+            command = _CIM_SEP.join(parts[6:]).strip()
+        else:
+            peak = mem = None
+            command = parts[4].strip() if len(parts) > 4 else ""
         rows[int(parts[0])] = (int(parts[1]), cpu, age, peak, mem, command or None)
     return rows, rejected
 
@@ -289,6 +296,8 @@ def measure_rows(rows, rejected, backend):
 
 FIELDS = ("winpid", "msys_pid", "win_ppid", "msys_ppid", "kind", "age_s", "cpu_s", "command",
           "backend")
+# Keys a row carries beside `FIELDS` that `render_rows` never writes (TOOL-dRedressedBar-19 S10).
+OPTIONAL_FIELDS = ("peak_mem_b", "mem_b")
 
 
 def render_rows(rows, counts):
