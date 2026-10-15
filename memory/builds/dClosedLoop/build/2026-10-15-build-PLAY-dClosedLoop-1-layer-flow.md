@@ -301,6 +301,9 @@ Answer: Program with dependencies (Recommended).
 - An owner breakpoint parks a build by definition, and exists only where the owner places one.
 
 **A build ends landed, withdrawn or superseded** (P20 amended).
+- A build that ends in planning, by triage or by a re-placement after `plan.dedupe`, ends deferred,
+  retired, refused, merged or answered. flow-steps' `[transitions]` holds the whole terminal set
+  (revised 2026-10-16).
 - The owner pauses, resumes, withdraws or supersedes a build through the owner's controls, which
   Runtime executes (flow-steps `[lifecycle]`).
 - A withdrawn parent's dependents act as `deps.on-parent-withdrawn` says: `replan` by default, with
@@ -326,8 +329,9 @@ that depends on it starts.
   `test.route`; b F-T4).
 - **Research records:** a build's own are memory, the trail; the library across builds is knowledge
   (a F9).
-- **Flake records** are a flow record kind that observability reads: the bar's `nondeterministic`
-  classes made a record, and a flaky leg past the threshold is held (`verdict.held`) (b F-T8).
+- **Flake records** are a flow record kind that observability reads: the nondeterministic legs
+  `test.route`'s re-run finds, made a record. Under `verdict.flakes: quarantine`, a flaky leg past the
+  threshold is held (b F-T8; revised 2026-10-16).
 - **Dispositions:** one closed set, continue, amend, new, patch, ask or none. Defer maps to ask, and a
   duplicate maps to continue (a F12).
 - **Item tags** live in the `item` namespace, their full spelling `item.<step>.<name>`, apart from

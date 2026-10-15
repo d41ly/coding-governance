@@ -21,14 +21,20 @@ The memory layer's fold, 2026-10-16, in
 build proposes its reuse entry and lands its `gov:feature` anchor while the entry is only proposed.
 The fold's closing review (`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md`,
 M8) found no outcome for a rejected proposal. The anchor would stay, the check would red on the
-default branch, and every later build would inherit the red.
+default branch, and every later build would inherit the red. The follow-up round
+(`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md`, M7)
+found the fix's own reject-and-remove left the entry `rejected` until the patch build landed, a state
+the check refuses, so the red stood for that whole window.
 
 ## The fix
 
 List every owner item's dispositions, the refusal included, and say what each leaves on the default
-branch and which item cleans it up. For the reuse entry: accept, and the entry renders; reject and
-remove, and a patch build removes the anchor; reject and keep, and the entry stays `rejected`, which
-the check accepts.
+branch and which item cleans it up. Each disposition states the entry state it leaves, and every
+check that reads that state accepts it for as long as it persists. For the reuse entry: accept, and
+the entry renders; reject and remove, and the entry is `removal-pending` until one patch build
+removes the anchor and the entry; reject and keep, and the entry stays `rejected`, which the check
+accepts.
 
-It has no machine gate yet. Once owner items are declared as data, their disposition sets can be
+The class lives where owner items are designed: unit specs under `/spec/`, written from
+`memory/TEMPLATE-SPEC.md`, and a build's design records under `/build/`. It has no machine gate yet. Once owner items are declared as data, their disposition sets can be
 checked for a refusal outcome.

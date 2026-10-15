@@ -92,7 +92,7 @@ reviewer with the step's lens, then the skeptic, then the synthesizer.
 
 | Item | Actor | Work order carries | Returns | Routes |
 |---|---|---|---|---|
-| 1 to 3 | commands | — | the prepared merge; the selection; the hook-written verdict | — |
+| 1 to 3 | commands | — | the prepared merge; the selection; the runner-written verdict, which the pre-push hook reads (revised 2026-10-16) | — |
 | 4 | tester | the verdict; the attribution labels; the diff; the specs | per red: its class, its route, its evidence | code misses its spec: a builder fix pass, back to Build; spec wrong: a new unit, back to Design; inherited: an ask; a merge conflict: a builder resolution pass, or the architect when an interface clashes |
 | 5, 6 | commands | — | flakes; seen-red records | — |
 | 7 | command and driver; review roles, gate lens, when owed | the verdict and the gates | findings, then a report | disposed as in Build |

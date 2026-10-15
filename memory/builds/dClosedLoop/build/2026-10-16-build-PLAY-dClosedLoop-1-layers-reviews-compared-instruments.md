@@ -968,7 +968,8 @@ point there. `tally_folded.py` (the instruments record) counts the cells:
 
 - **owed** is the fifth disposition the fold needed: a fix that turns on the chain's order goes to v2's
   `[owed]`, for the re-cut.
-- **The gaps registered:** `gap-rt-11` to `gap-rt-14`, `gap-flow-15` and `gap-mem-12`.
+- **The gaps registered:** `gap-rt-11` to `gap-rt-14`, `gap-flow-15` and `gap-mem-12`; after the
+  follow-up round, `gap-deploy-09` and `gap-mem-13`, with `gap-test-04` and `gap-deploy-02` extended.
 - **The keys added to v2:** `instructions.proof`, `flow.route-backs`, and `policy.on-missing-expansion`
   from LR-4.
 """
@@ -1000,6 +1001,30 @@ exit 0
 $ planted: one instruction row's disposition misspelled `ammend` (1 line changed)
 instruction: unknown disposition 'ammend'
 exit 1
+```
+
+After the follow-up round, four rows moved to `amend, gap`: the comparison record's `[follow-up]`
+names them. The tally's text gained the gaps they carry, and the same scripts then printed:
+
+```text
+$ python set_dispositions.py flow <the flow layer record> <the step definitions>
+flow: 61 dispositions set · amend 48, amend, gap 5, fork, amend 4, none 4
+exit 0
+
+$ python set_dispositions.py memory <the memory layer record>
+memory: 73 dispositions set · amend 62, amend, gap 2, fork, amend 3, none 5, owed 1
+exit 0
+
+$ python tally_folded.py --write
+| Layer | amend | amend, gap | fork, amend | owed | none | Rows |
+|---|---|---|---|---|---|---|
+| instruction | 43 | 3 | 1 | 1 | 6 | 54 |
+| flow | 48 | 5 | 4 | 0 | 4 | 61 |
+| roles | 32 | 0 | 1 | 0 | 6 | 39 |
+| memory | 62 | 2 | 3 | 1 | 5 | 73 |
+| all four | 185 | 10 | 9 | 2 | 21 | 227 |
+[folded] written
+exit 0
 ```
 
 ## [fold-review] The fold's closing review

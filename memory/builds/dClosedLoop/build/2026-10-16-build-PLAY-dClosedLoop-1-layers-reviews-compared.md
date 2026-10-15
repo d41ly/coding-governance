@@ -294,14 +294,15 @@ point there. `tally_folded.py` (the instruments record) counts the cells:
 | Layer | amend | amend, gap | fork, amend | owed | none | Rows |
 |---|---|---|---|---|---|---|
 | instruction | 43 | 3 | 1 | 1 | 6 | 54 |
-| flow | 51 | 2 | 4 | 0 | 4 | 61 |
+| flow | 48 | 5 | 4 | 0 | 4 | 61 |
 | roles | 32 | 0 | 1 | 0 | 6 | 39 |
-| memory | 63 | 1 | 3 | 1 | 5 | 73 |
-| all four | 189 | 6 | 9 | 2 | 21 | 227 |
+| memory | 62 | 2 | 3 | 1 | 5 | 73 |
+| all four | 185 | 10 | 9 | 2 | 21 | 227 |
 
 - **owed** is the fifth disposition the fold needed: a fix that turns on the chain's order goes to v2's
   `[owed]`, for the re-cut.
-- **The gaps registered:** `gap-rt-11` to `gap-rt-14`, `gap-flow-15` and `gap-mem-12`.
+- **The gaps registered:** `gap-rt-11` to `gap-rt-14`, `gap-flow-15` and `gap-mem-12`; after the
+  follow-up round, `gap-deploy-09` and `gap-mem-13`, with `gap-test-04` and `gap-deploy-02` extended.
 - **The keys added to v2:** `instructions.proof`, `flow.route-backs`, and `policy.on-missing-expansion`
   from LR-4.
 
@@ -326,8 +327,8 @@ confirmed, in 24 items. Ids 13, 14 and 27 were refuted. Each item went here:
 | M9 | 18 | fixed | with H2: `deploy.core` starts the bar where the lander started none | `route-names-an-output-its-actor-never-emits` |
 | M10 | 19 | fixed | `test.flakes` acts as `verdict.flakes` says, and a held product leg is named; the policy-list join owed in `gap-flow-15` | `route-names-an-output-its-actor-never-emits` |
 | M11 | 22 | fixed | v2's dDeclaredLoop row returns the frontier | `amendment-leaves-its-other-half-standing` |
-| M12 | 23 | fixed | the runner writes Test's verdict in layer-flow, v2's contracts and dWitnessedBar's row | `amendment-leaves-its-other-half-standing` |
-| M13 | 24 | fixed | flow-roles' FR-6 and H7, and the runtime record's two rows, under dated notes | `amendment-leaves-its-other-half-standing` |
+| M12 | 23 | fixed | the runner writes Test's verdict in layer-flow, v2's contracts, dWitnessedBar's row and, after the follow-up round, flow-roles' Test row | `amendment-leaves-its-other-half-standing` |
+| M13 | 24 | fixed | flow-roles' FR-6 and H7 under dated notes; the runtime record's two rows edited in place, then dated after the follow-up round | `amendment-leaves-its-other-half-standing` |
 | M14 | 26 | fixed | instruction R-C: `BODY_CEILINGS` carries the role block | `two-answers-to-one-question` |
 | M15 | 28 | fixed | memory `[annotations]`: the resolve check is a gate leg, with three planted red cases owed | `fixture-passes-by-finding-nothing` |
 | M16 | 29 | fixed | `role_matrix.py`'s arm 0, seen red on a renamed section (the roles record's `[instrument]`) | `parser-drops-rows-it-cannot-place`, new |
@@ -342,6 +343,42 @@ confirmed, in 24 items. Ids 13, 14 and 27 were refuted. Each item went here:
   and the rest are existing classes. No gate fits a design record's prose. The checks owed instead
   are dDeclaredLoop's join beside `gap-flow-15` and the planted cases each fix names.
 - **The two high items were fixed in place,** and no follow-up round has reviewed those fixes.
+
+## [follow-up] The follow-up round, folded 2026-10-16
+
+Dispatch 48 reviewed the closing review's fixes, `9e0e43aef..2e6f9aa1b`, as round 2 at light intensity
+(`reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md`): CLEAN WITH FIXES, 31 of 34 findings
+confirmed, in 18 items. Ids 11, 14 and 17 were refuted. Each item went here:
+
+| Item | Ids | Disposition | Where the fix sits | Its class |
+|---|---|---|---|---|
+| H1 | 28 | fixed, gap | `test.route` re-runs each red leg once on the same tree; the runner mode and its probe are dWitnessedBar's (`gap-test-04`) | `route-names-an-output-its-actor-never-emits` |
+| H2 | 15 | fixed, gap | `entry.claim`'s compare-and-swap claim ref, memory `[contract]` and v2's dTotalRecall row; dTotalRecall owes the refs (`gap-mem-13`) | `route-names-an-output-its-actor-never-emits` |
+| M1 | 1, 21, 30 | fixed, gap | `deploy.core` starts the bar unless a start record names the SHA, reads its verdict keyed by SHA, and re-runs a REFUSED once; the per-SHA record is owed (`gap-deploy-02`) | `route-names-an-output-its-actor-never-emits` |
+| M2 | 2, 22 | fixed, gap | `deploy.land`'s witness is the remote holding the SHA, and it routes on outcome classes; the lander's outcome record is owed (`gap-deploy-09`) | `route-names-an-output-its-actor-never-emits` |
+| M3 | 3 | fixed, gap | the remote unreachable, a failed probe included, is its own class (`gap-deploy-09`) | `route-names-an-output-its-actor-never-emits` |
+| M4 | 4, 29 | fixed | `test.flakes` is witnessed under `retry-only`, and `quarantine` re-enters `test.select` | `route-names-an-output-its-actor-never-emits` |
+| M5 | 5, 13, 31 | fixed | memory `[asks]`: the held-flaky-leg form's acceptance, its recorder and its filer, `test.flakes` | `route-names-an-output-its-actor-never-emits` |
+| M6 | 6, 16, 32 | fixed | `entry.claim` before Plan and Design, taking the lease for a patch build; the intake record keyed by session and content | `invariant-held-on-one-admission-path` |
+| M7 | 7 | fixed | memory `[decisions]` 1 and `[annotations]`: `removal-pending` until the patch build lands | `owner-item-without-its-reject-outcome` |
+| M8 | 8, 18 | fixed | `[transitions]`: rows keyed on the re-placement after `plan.dedupe`, and the terminal `answered` | `two-answers-to-one-question` |
+| M9 | 9, 20 | fixed | `[rules]`: release marks the undisposed messages in the folder copy it writes | `route-names-an-output-its-actor-never-emits` |
+| M10 | 10, 23, 33 | fixed | `role_matrix.py`'s arm 0 reads every body row under a step heading, seen red on four malformed rows (the roles record's `[instrument]`) | `parser-drops-rows-it-cannot-place` |
+| M11 | 19 | fixed | v2's P20 and dDeclaredLoop row cite `[transitions]`; `deploy.parents`, the mailbox rule and layer-flow's settled ends swept too | `amendment-leaves-its-other-half-standing` |
+| M12 | 24 | fixed | memory `[asks]`: the unrun-level form, which S-3 cites | `amendment-leaves-its-other-half-standing` |
+| L1 | 12, 27 | fixed | dated notes at the runtime record's two rows; `[closing-review]`'s M13 cell corrected | `two-answers-to-one-question` |
+| L2 | 25 | fixed | flow-roles' Test row; `[closing-review]`'s M12 cell and the `hook-actor-kind` row | `amendment-leaves-its-other-half-standing` |
+| L3 | 26 | fixed | layer-flow `[settled]`: a flaky leg is held only under `verdict.flakes: quarantine` | `amendment-leaves-its-other-half-standing` |
+| L4 | 34 | fixed, gap | the parser class anchors on `tools/memory-tree/`, the owner-item class on spec and design records; the dead-anchor gate is owed (`gap-mem-14`) | `vacuous-selector-empty-population` |
+
+- **The method.** Where a fix needs a tool's own enumeration, the design text states the contract,
+  and the owning build's gap carries the enumeration. Round 1's fixes enumerated the lander's and the
+  runner's internals, and most of this round's findings sat in that text.
+- **The left-shift.** Every item's class is a catalogue entry under `memory/gotchas/`. The review's
+  checklist entries extend the fixes of the three classes the closing review filed. No gate fits a
+  design record's prose; the joins owed beside `gap-flow-15` stay the machine checks.
+- **Four map rows moved to `amend, gap`:** `lander-seams`, `lander-exit-classes`,
+  `flakes-quarantine-seam` and `record-concurrent-mint`, so `[folded]` was derived again.
 
 ## [map-instruction] The instruction layer's findings, placed
 
@@ -447,7 +484,7 @@ Run A is `wf_1532dea2-2f7` and run B is `wf_782666f6-e98`.
 | `review-harness-seam` | the breakpoint program rebuilds tier2-review.js's pipeline as separate items and drops its uncertain verdict | 33 | 21 | amend; `flow-steps` `[revised]` |
 | `owner-controls-exist` | gap-flow-10 says no pause, resume or withdraw command exists, though unattended ships `--hold`, `--resume` and `--abort` | 34 | 22 | amend; `flow-steps` `[revised]` |
 | `write-set-seams` | `build.unit-lease` and `build.scope` re-specify the driver's write-set declaration and check | 35 | 27 | amend; `flow-steps` `[revised]` |
-| `lander-seams` | `deploy.core` and `deploy.record` name none of the lander's post-merge bar and landing marker | 36 | — | amend; `flow-steps` `[revised]` |
+| `lander-seams` | `deploy.core` and `deploy.record` name none of the lander's post-merge bar and landing marker | 36 | — | amend, gap; `flow-steps` `[revised]` |
 | `tests-without-cadence-dup` | `tests.without-cadence` duplicates `tests.landing-levels` | 40 | — | none; `flow-steps` `[revised]` |
 | `tests-without-cadence-semantics` | `wait-for-expansion` is undefined without the expansion, and `run-at-landing` sets no time bound | — | 45 | amend; `flow-steps` `[revised]` |
 | `gap-flow-10-owner` | the record keeps gap-flow-10 and the owner's controls with dDeclaredLoop, which RT-3 moved to dWellOiledMachine | 42, 67 | 9, 22, 46 | amend; `flow-steps` `[revised]` |
@@ -457,7 +494,7 @@ Run A is `wf_1532dea2-2f7` and run B is `wf_782666f6-e98`.
 | `intake-hook-crash` | `entry.intake` rests on a prompt-submit hook outside Runtime's surface, with no crash behaviour, and none is wired today | 55 | 34 | amend, gap; `flow-steps` `[revised]` |
 | `intake-owner-scope` | nothing says which sessions' prompts are the owner's intake, so an act session's prompt could become the mandate | 56 | 35 | amend; `flow-steps` `[revised]` |
 | `intake-secrets` | verbatim intake has no secret scan, redaction or size cap, beside a scanner the tree already ships | 57 | 36 | amend; `flow-steps` `[revised]` |
-| `lander-exit-classes` | `deploy.land` routes two outcomes where the lander has five exit classes, including landed ungated | 58 | — | amend; `flow-steps` `[revised]` |
+| `lander-exit-classes` | `deploy.land` routes two outcomes where the lander has five exit classes, including landed ungated | 58 | — | amend, gap; `flow-steps` `[revised]` |
 | `owner-disposition-witness` | the owner's disposition is "hook-written", while unattended owner items are answered through the mailbox or a terminal | 63 | — | fork, amend; `flow-steps` `[revised]` |
 | `unverified-block-stuck` | under `review.unverified=block` nothing can unblock: no round is scheduled and the owner has no disposition | 63 | 42 | amend; `flow-steps` `[revised]` |
 | `item-count-readers` | the new item population updates none of the records that assert the old counts | 68 | — | amend; `flow-steps` `[revised]` |
@@ -465,7 +502,7 @@ Run A is `wf_1532dea2-2f7` and run B is `wf_782666f6-e98`.
 | `turnstile-not-queue` | the turnstile is a host-wide bar semaphore, not a landing queue, and the lander never takes it | — | 16 | amend; `flow-steps` `[revised]` |
 | `reasoning-field-timing` | the recommendation's reasoning field sits in a return that does not exist on the common path, or predates the score | — | 17 | amend; `flow-steps` `[revised]` |
 | `tier-preset-guarded` | [design] omits the guarded preset's `owed-above-tier` spec audit | — | 13 | amend; `flow-steps` `[revised]` |
-| `flakes-quarantine-seam` | `test.flakes` mints a new record beside the bar's nondeterministic class and quarantine, which mean something else | — | 23 | amend; `flow-steps` `[revised]` |
+| `flakes-quarantine-seam` | `test.flakes` mints a new record beside the bar's nondeterministic class and quarantine, which mean something else | — | 23 | amend, gap; `flow-steps` `[revised]` |
 | `placement-policy-routes` | `entry.place` fixes the scout as placer, leaving `placement`'s other two values, which strict and guarded set, with no route | — | 29 | amend; `flow-steps` `[revised]` |
 | `disposition-set-gaps` | the closed disposition set maps only defer and duplicate: no item retires, refuses or selects an ask | — | 30 | amend; `flow-steps` `[revised]` |
 | `deployer-expansion-mismatch` | release notes go to distribution while the deployer registers under integrations, breaking the expansion-role check | — | 32 | amend; `flow-steps` `[revised]` |
@@ -531,7 +568,7 @@ Run A is `wf_b6756400-d03` and run B is `wf_ec731bfc-925`.
 | `stale-runlog-unchanged` | [tools] keeps runlog unchanged, while the runtime layer moves the journal grammar into the core | 8, 28 | 28 | amend; `layer-memory` `[revised]` |
 | `slug-date-text-stale` | [names] still calls F4-7 open and recommends a shown date after the owner chose none | 36 | — | amend; `layer-memory` `[revised]` |
 | `record-idempotence` | `record` is specified only as an id-minting writer: nothing makes a replayed write idempotent or content-addressed, which the runtime layer's take-over reconcile relies on | 2, 47 | 2, 21, 49 | amend; `layer-memory` `[revised]` |
-| `record-concurrent-mint` | nothing says what `record` does when writers on two clones or nodes mint at once | 47 | 49 | amend; `layer-memory` `[revised]` |
+| `record-concurrent-mint` | nothing says what `record` does when writers on two clones or nodes mint at once | 47 | 49 | amend, gap; `layer-memory` `[revised]` |
 | `kind-list-incomplete` | the kind list omits kinds other layers write through `record` (return, act, lease, binding, mailbox, journal, run record, backlog, Flow's records), names instances where a class was meant, and gives no path to register a kind | 3, 28, 45, 61 | 15, 21, 32, 47, 50 | amend; `layer-memory` `[revised]` |
 | `ref-homed-kinds` | the registry holds only kinds homed at a path, while the card, leases and the mailbox live on refs | — | 50 | amend; `layer-memory` `[revised]` |
 | `generated-kinds-door` | the generated stores (symbols, callers, annotation index, recall index) are record kinds written by generators, a door beside `record` | — | 4 | amend; `layer-memory` `[revised]` |

@@ -109,7 +109,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 45 | the same | Memory layer: Tier-2 review, run A | the same | 1799cb98 | returned, CLEAN WITH FIXES, 52 of 61 confirmed; its first launch, `wf_c5046686-f17`, stopped when the session ended with no agent completed, and it was relaunched as `wf_b6756400-d03` with the same args | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-memory-a.md` |
 | 46 | the same | Memory layer: Tier-2 review, run B | the same | 1799cb98 | returned, CLEAN WITH FIXES, 51 of 58 confirmed | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-memory-b.md` |
 | 47 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The layers' fold: closing diff review over `e7839224c..9e0e43aef` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | returned as `wf_9349d401-2da`, CLEAN WITH FIXES, 28 of 31 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md` |
-| 48 | the same, round 2 with round 1's 28 confirmed findings handed as `priorFindings` | The layers' fold: the follow-up round over the closing review's fixes, `9e0e43aef..2e6f9aa1b`, after the owner chose it | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | dispatched as `wf_e26eda01-523` | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md` |
+| 48 | the same, round 2 with round 1's 28 confirmed findings handed as `priorFindings` | The layers' fold: the follow-up round over the closing review's fixes, `9e0e43aef..2e6f9aa1b`, after the owner chose it | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | returned as `wf_e26eda01-523`, CLEAN WITH FIXES, 31 of 34 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -537,6 +537,31 @@ The fold's closing review, dispatch 47, derived from its Workflow run the same w
 - returned — gov-synthesizer · wrote 1 file · 3m40s · 29.8k out · run wf_9349d401-2da/a1086d6f99f896fd7
 ```
 
+The follow-up round, dispatch 48, derived from its Workflow run the same way:
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, diff-review round 2, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e26eda01-523/a676a0b00c52b6d18
+- returned — workflow-subagent · wrote 0 files · 11s · 1.1k out · run wf_e26eda01-523/a676a0b00c52b6d18
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 2, find:correctness · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e26eda01-523/aa1e8aebdd0b2830c
+- returned — gov-diff-reviewer · wrote 0 files · 7m54s · 38.8k out · run wf_e26eda01-523/aa1e8aebdd0b2830c
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 2, find:seams · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e26eda01-523/a68eac24102d4fd66
+- returned — gov-diff-reviewer · wrote 0 files · 8m25s · 42.5k out · run wf_e26eda01-523/a68eac24102d4fd66
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 2, find:verification · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e26eda01-523/aacf736be1671ce1c
+- returned — gov-diff-reviewer · wrote 0 files · 6m09s · 29.6k out · run wf_e26eda01-523/aacf736be1671ce1c
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 2, verify:ids-1-7 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e26eda01-523/a788dff2051433e0d
+- returned — gov-skeptic · wrote 0 files · 2m21s · 13.4k out · run wf_e26eda01-523/a788dff2051433e0d
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 2, verify:ids-8-14 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e26eda01-523/a1530d334aed2f0c5
+- returned — gov-skeptic · wrote 0 files · 2m42s · 13.5k out · run wf_e26eda01-523/a1530d334aed2f0c5
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 2, verify:ids-15-21 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e26eda01-523/ac26f0ccd6e712125
+- returned — gov-skeptic · wrote 0 files · 2m16s · 12.6k out · run wf_e26eda01-523/ac26f0ccd6e712125
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 2, verify:ids-22-28 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e26eda01-523/aa84b2ede0570aafe
+- returned — gov-skeptic · wrote 0 files · 3m10s · 17.3k out · run wf_e26eda01-523/aa84b2ede0570aafe
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 2, verify:ids-29-34 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e26eda01-523/a35c5afd2db6548a5
+- returned — gov-skeptic · wrote 0 files · 2m35s · 13.6k out · run wf_e26eda01-523/a35c5afd2db6548a5
+- agent — gov-synthesizer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 2, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_e26eda01-523/a753d8e1483310a71
+- returned — gov-synthesizer · wrote 1 file · 3m24s · 28.8k out · run wf_e26eda01-523/a753d8e1483310a71
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -840,6 +865,14 @@ The fold's closing review, dispatch 47, derived from its Workflow run the same w
 
   Memory `[asks]` now gives every core ask kind its own mechanical acceptance, and flow-steps cites it.
   A light follow-up review runs over the closing review's fixes before the Knowledge layer opens.
+
+- 2026-10-16, session 1799cb98: dispatch 48, the follow-up round, returned CLEAN WITH FIXES: 31 of
+  34 findings confirmed, in 18 items, 2 of them high. All 18 were folded, and the comparison record's
+  `[follow-up]` says where. Where a fix needed a tool's own enumeration, the design text now states the
+  contract and the owning build's gap carries the rest: `gap-deploy-09`, `gap-mem-13` and `gap-mem-14`
+  are new, and `gap-test-04` and `gap-deploy-02` were extended. The flow program gained `entry.claim`
+  and the terminal state `answered`. Four map rows moved to `amend, gap`, and the matrix instrument's
+  arm 0 now refuses a row it cannot read, seen red on four malformed rows.
 
 ## Instruments
 

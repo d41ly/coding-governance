@@ -402,18 +402,20 @@ matrix from the step definitions as folded:
 | reviewer | — | — | — | — | — | — | `review.lens` | — |
 | skeptic | — | — | — | — | — | — | `review.refute` | — |
 | synthesizer | — | — | — | — | — | — | `review.report` | — |
-| command | `entry.place-check` | `plan.input`, `plan.dedupe`, `plan.triage-rule`, `plan.place`, `plan.lease`, `plan.recommend`, `plan.exit` | `design.input`, `design.reentry`, `design.overlaps`, `design.recommend`, `design.ready`, `design.exit` | `build.base`, `build.unit-lease`, `build.scope`, `build.recommend`, `build.exit` | `test.merge`, `test.select`, `test.verdict`, `test.route`, `test.flakes`, `test.seen-red`, `test.recommend`, `test.exit` | `deploy.current`, `deploy.mandate`, `deploy.parents`, `deploy.land`, `deploy.core`, `deploy.record`, `deploy.recommend`, `deploy.notify`, `deploy.snapshot`, `deploy.release`, `deploy.close` | `review.trigger`, `review.pin`, `review.dispose`, `review.cost` | `life.notify`, `life.snapshot`, `life.release`, `life.close` |
+| command | `entry.place-check`, `entry.claim` | `plan.input`, `plan.dedupe`, `plan.triage-rule`, `plan.place`, `plan.lease`, `plan.recommend`, `plan.exit` | `design.input`, `design.reentry`, `design.overlaps`, `design.recommend`, `design.ready`, `design.exit` | `build.base`, `build.unit-lease`, `build.scope`, `build.recommend`, `build.exit` | `test.merge`, `test.select`, `test.verdict`, `test.route`, `test.flakes`, `test.seen-red`, `test.recommend`, `test.exit` | `deploy.current`, `deploy.mandate`, `deploy.parents`, `deploy.land`, `deploy.core`, `deploy.record`, `deploy.recommend`, `deploy.notify`, `deploy.snapshot`, `deploy.release`, `deploy.close` | `review.trigger`, `review.pin`, `review.dispose`, `review.cost` | `life.notify`, `life.snapshot`, `life.release`, `life.close` |
 | executor | — | — | — | `build.acceptance`, `build.core` | — | — | — | `life.quiesce` |
 | hook | `entry.intake` | — | — | — | — | — | — | — |
 | owner | `entry.place-owner` | — | — | — | — | — | — | `life.request` |
 
-- **Counts:** 71 items, each with one actor; 15 actors; 19 items with a role.
+- **Counts:** 72 items, each with one actor; 15 actors; 19 items with a role.
 - **The prompt writer and the driver** act in no item. The prompt writer is a cycle role: it acts in
   every role item's cycle, framing each work order (`[roster]`, flow-roles `[cycle]`). The driver
   routes and never works.
 - **The check has four arms**, each a finding:
-  - every item row sits under a step's heading, and every step holds an item, since a parser that
-    skips what it cannot place reports a clean run (arm 0, added after the fold's closing review);
+  - every body row under a step's heading is an item row the pattern reads, every item row sits
+    under a step's heading, and every step holds an item, since a parser that skips what it cannot
+    place reports a clean run (arm 0, added after the fold's closing review and widened after its
+    follow-up round);
   - every item's actor is a command, the executor, a hook, the owner, or a declared item role;
   - every core item role acts in at least one core item;
   - no core item names an expansion role (P28).
@@ -1109,7 +1111,10 @@ UNMATCHED entry: entry.intake: nobody
 The fold's revision reads each Actor cell's opening only, takes the roster from `[roster]`, and
 implements all three arms. After the fold's closing review (M16), arm 0 refuses an item row under a
 heading that names no step, and a step with no item. Before it, a renamed heading dropped its items
-and the run still printed `findings 0`:
+and the run still printed `findings 0`. After the follow-up round (M10), arm 0 also reads every table
+body row under a step's heading as an item row, and refuses one its pattern cannot read. Before that,
+the revised instrument run over a copy with `test.reason`'s tag uppercased printed
+`items 71; … findings 0` and exited 0:
 
 ```python
 """Derive the role-by-step matrix from the step definitions, and check it against the roster both ways.
@@ -1120,8 +1125,9 @@ The roster is the roles record's `[roster]` table: each role's layer, and whethe
 role or as a cycle role, which acts in every role item's cycle and in no item.
 
 Four arms, each a finding (exit 1 if any):
-  0. every item row sits under a step's heading, and every step holds at least one item, since a
-     parser that skips what it cannot place reports a clean run;
+  0. every table body row under a step's heading is an item row the item pattern reads, every item
+     row sits under a step's heading, and every step holds at least one item, since a parser that
+     skips what it cannot place reports a clean run;
   1. every item's actor is a command, the executor, a hook, the owner, or a declared item role;
   2. every core item role acts in at least one core item;
   3. no core item names an expansion role (P28).
@@ -1134,6 +1140,8 @@ import sys
 
 KINDS = ("command", "executor", "hook", "owner")
 STEPS = ["entry", "plan", "design", "build", "test", "deploy", "breakpoint", "lifecycle"]
+ITEM = re.compile(r"^\| `([a-z]+\.[a-z0-9-]+)` \| ([^|]+) \|")
+SEPARATOR = re.compile(r"^\|(\s*:?-+:?\s*\|)+\s*$")
 
 
 def roster(text):
@@ -1154,23 +1162,31 @@ def actor_of(cell):
 
 
 def main(argv):
-    steps_text = open(argv[0], encoding="utf-8").read()
+    lines = open(argv[0], encoding="utf-8").read().splitlines()
     roles = roster(open(argv[1], encoding="utf-8").read())
     step = None
     matrix = collections.defaultdict(lambda: collections.defaultdict(list))
     findings = []
-    items = 0
+    items = body = 0
     per_step = collections.Counter()
-    for line in steps_text.splitlines():
+    for n, line in enumerate(lines):
         h = re.match(r"^## \[([a-z-]+)\]", line)
         if h:
             step = h.group(1)
             continue
-        row = re.match(r"^\| `([a-z]+\.[a-z0-9-]+)` \| ([^|]+) \|", line)
-        if not row or step is None:
+        if step is None or not line.startswith("|"):
             continue
+        header = n + 1 < len(lines) and SEPARATOR.match(lines[n + 1])
+        if header or SEPARATOR.match(line):
+            continue
+        row = ITEM.match(line)
         if step not in STEPS:
-            findings.append(f"arm 0: {row.group(1)} sits under [{step}], which is no step the matrix reads")
+            if row:
+                findings.append(f"arm 0: {row.group(1)} sits under [{step}], which is no step the matrix reads")
+            continue
+        body += 1
+        if not row:
+            findings.append(f"arm 0: a row under [{step}] that the item pattern cannot read: {line[:48]}")
             continue
         items += 1
         per_step[step] += 1
@@ -1201,7 +1217,7 @@ def main(argv):
         print(f"| {name} | " + " | ".join(cells) + " |")
     pairs = sum(len(v) for m in matrix.values() for v in m.values())
     role_items = sum(len(v) for n, m in matrix.items() if n not in KINDS for v in m.values())
-    print(f"\nitems {items}; actor-item pairs {pairs}; actors {len(matrix)}; "
+    print(f"\nitems {items} of {body} body rows; actor-item pairs {pairs}; actors {len(matrix)}; "
           f"items with a role {role_items}; cycle roles {sum(r['cycle'] for r in roles.values())}; findings {len(findings)}")
     for f in findings:
         print("FINDING", f)
@@ -1216,35 +1232,35 @@ Run as `python role_matrix.py <the step definitions> <this record>`, it exited 0
 in `[matrix]`, then:
 
 ```text
-items 71; actor-item pairs 71; actors 15; items with a role 19; cycle roles 1; findings 0
+items 72 of 72 body rows; actor-item pairs 72; actors 15; items with a role 19; cycle roles 1; findings 0
 ```
 
-Each arm was seen red on a planted copy of the step definitions, one line changed each. Each run
-exited 1:
+Each arm was seen red on a planted copy of the step definitions, one line changed each, the four
+malformed rows added after the follow-up round. Each run exited 1:
 
 ```text
 $ planted: `plan.reason`'s actor misspelled `plannr` (1 line changed)
-items 71; actor-item pairs 70; actors 15; items with a role 18; cycle roles 1; findings 1
+items 72 of 72 body rows; actor-item pairs 71; actors 15; items with a role 18; cycle roles 1; findings 1
 FINDING arm 1: plan.reason: actor 'plannr' is no kind and no declared role
 exit 1
 
 $ planted: `design.seams`'s actor changed to `command`, so the reuse scout acts in no item (1 line changed)
-items 71; actor-item pairs 71; actors 14; items with a role 18; cycle roles 1; findings 1
+items 72 of 72 body rows; actor-item pairs 72; actors 14; items with a role 18; cycle roles 1; findings 1
 FINDING arm 2: core role 'reuse scout' acts in no core item
 exit 1
 
 $ planted: `test.reason`'s actor changed to the expansion role `deployer` (1 line changed)
-items 71; actor-item pairs 71; actors 16; items with a role 19; cycle roles 1; findings 1
+items 72 of 72 body rows; actor-item pairs 72; actors 16; items with a role 19; cycle roles 1; findings 1
 FINDING arm 3: test.reason: core item names the expansion role 'deployer' (distribution, integrations)
 exit 1
 
 $ planted: `plan.reason`'s actor changed to the cycle role `prompt writer` (1 line changed)
-items 71; actor-item pairs 70; actors 15; items with a role 18; cycle roles 1; findings 1
+items 72 of 72 body rows; actor-item pairs 71; actors 15; items with a role 18; cycle roles 1; findings 1
 FINDING arm 1: plan.reason: 'prompt writer' is a cycle role, and acts in no item
 exit 1
 
 $ planted: the [lifecycle] heading renamed [controls] (1 line changed)
-items 65; actor-item pairs 65; actors 15; items with a role 19; cycle roles 1; findings 7
+items 66 of 66 body rows; actor-item pairs 66; actors 15; items with a role 19; cycle roles 1; findings 7
 FINDING arm 0: life.request sits under [controls], which is no step the matrix reads
 FINDING arm 0: life.quiesce sits under [controls], which is no step the matrix reads
 FINDING arm 0: life.notify sits under [controls], which is no step the matrix reads
@@ -1252,6 +1268,26 @@ FINDING arm 0: life.snapshot sits under [controls], which is no step the matrix 
 FINDING arm 0: life.release sits under [controls], which is no step the matrix reads
 FINDING arm 0: life.close sits under [controls], which is no step the matrix reads
 FINDING arm 0: step [lifecycle] holds no item
+exit 1
+
+$ planted: `test.reason`'s tag uppercased to `test.Reason` (1 line changed)
+items 71 of 72 body rows; actor-item pairs 71; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read: | `test.Reason` | tester | `test.recommend` | an
+exit 1
+
+$ planted: `test.attribute`'s tag given a second dot, `test.attribute.own` (1 line changed)
+items 71 of 72 body rows; actor-item pairs 71; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read: | `test.attribute.own` | tester | the OWN and MI
+exit 1
+
+$ planted: `deploy.notify`'s row with its backticks dropped (1 line changed)
+items 71 of 72 body rows; actor-item pairs 71; actors 15; items with a role 19; cycle roles 1; findings 1
+FINDING arm 0: a row under [deploy] that the item pattern cannot read: | deploy.notify | command, idempotent | `deploy.
+exit 1
+
+$ planted: a double space after `test.attribute`'s tag (1 line changed)
+items 71 of 72 body rows; actor-item pairs 71; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read: | `test.attribute`  | tester | the OWN and MIXED
 exit 1
 ```
 

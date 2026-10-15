@@ -311,12 +311,16 @@ once, with:
 
 One write command, `record`, is the only writer of authored record structure, as R-I's command is
 for instructions:
-- it mints the id under a lock held at each mint point. A build's slug is claimed first, by
-  compare-and-swap against the remote's claims (`check_slug_claimed`), at `plan.input`. The records a
-  build writes before its lease (intake, dupes, triage, plan) mint under that claim, and every later
-  one under the build's lease, taken at `plan.lease`. An ask filed outside any build mints under its
-  family's claim ref. So two clones never mint one id, and the charter's `[ids]` rule holds: the
-  session that owns an id mints it;
+- it mints the id under a claim or a lease. A build's slug is claimed first, by the flow's
+  `entry.claim`: a compare-and-swap push that creates `refs/gov/claims/<slug>` on the remote, the way
+  unattended claims `refs/gov/runs/<slug>`. `check_slug_claimed` is only its local pre-check, since
+  it reads the local clone. The records a build writes before its lease (dupes, triage, plan) mint
+  under that claim, and every later one under the build's lease, taken at `plan.lease`, or at
+  `entry.claim` for a patch build. The intake record mints nothing: it is keyed by its session and
+  content. An ask that `entry.place` files outside any build mints under its family's claim ref,
+  created the same compare-and-swap way. dTotalRecall owes both refs (`gap-mem-13`). A slug's claim
+  ref is never pruned, so a slug is minted once; the supervisor prunes run claims only. So two clones
+  never mint one id, and the charter's `[ids]` rule holds: the session that owns an id mints it;
 - it is idempotent and content-addressed: a write is keyed by its kind's key, an id or a content key
   such as a return's task-sha. Replaying an equal write is a no-op. A different value under an
   existing key is refused, or versioned where the kind's lifecycle says so. Runtime's take-over
@@ -449,7 +453,11 @@ across builds. v2's `[layers]` carries it.
   - a lander refusal: `--prepare` next succeeds for the build;
   - a carried commit: its build claims it;
   - an adapter fault: the adapter's next run passes;
-  - a held flaky leg: `verdict.held` releases it;
+  - a held flaky leg: the leg green on as many consecutive runs as `verdict.flakes`' threshold,
+    which the runner records in the flake record (`gap-test-04`), or its manifest row changed.
+    `test.flakes` files it under `quarantine`; the runs come as `verdict.held` schedules held legs, or
+    on demand by whoever takes the ask;
+  - an unrun test level: its first green run, once observability's Maintain runs it;
   - a confirmed finding filed below `review.findings`' threshold: its unit is built, or a review round
     rules it out.
 
@@ -493,9 +501,10 @@ records. Neither may instruct by being recalled.
      - the owner's disposition of the proposal is an owner item, and the entry renders into work
        orders once accepted;
      - best effort never accepts it, since `instructions.edit` is a guard that presets never touch;
-     - the owner item has three dispositions: accept, and the entry renders; reject and remove, and a
-       patch build removes the landed `gov:feature` anchor; reject and keep, and the entry stays
-       `rejected`, never rendered, which the both-ways check accepts.
+     - the owner item has three dispositions: accept, and the entry renders; reject and remove, and the
+       entry becomes `removal-pending`, which the both-ways check accepts until a patch build removes
+       the landed `gov:feature` anchor and the entry in one landing; reject and keep, and the entry
+       stays `rejected`, never rendered, which the check accepts.
    - **The owner's examples:**
      - the media picker becomes "MUST reuse the media picker wherever an image, video or media
        selector is needed", triggered by the need, anchored to `gov:feature media-picker`;
@@ -634,7 +643,7 @@ Around it:
   signal 2 must discriminate before and after.
 - **`gov:feature <tag>` marks the canonical implementation of a reuse entry.** It is checked both
   ways with the entry: the entry's anchor resolves, and every feature tag has an entry, proposed,
-  accepted, or rejected and kept (LR-6). This is the owner's "code tag references". A second `gov:feature` line for one tag is
+  accepted, rejected and kept, or pending removal (LR-6). This is the owner's "code tag references". A second `gov:feature` line for one tag is
   a finding, and a file with no extractor pack cannot hold an anchor.
 - **A generated annotation index** comes from the map's comment lexer, which today strips comments. The
   lexer gains a profile chosen by shebang for extensionless files, the git hooks among them, and reads
@@ -1003,7 +1012,7 @@ and its map's `disposition` cells point here. Each defect's fix sits in place, i
 | `stale-runlog-unchanged` | amend | `[tools]`: runlog re-engineered, its journal grammar in the core |
 | `slug-date-text-stale` | amend | `[names]`: `none` by F4-7, and what `shown` and `in-slug` do |
 | `record-idempotence` | amend | `[contract]`: `record` is idempotent and content-addressed |
-| `record-concurrent-mint` | amend | `[contract]`: a lock at each mint point: the slug claim, then the build's lease |
+| `record-concurrent-mint` | amend, gap | `[contract]`: `entry.claim`'s claim ref, then the build's lease; `gap-mem-13` owes the refs |
 | `kind-list-incomplete` | amend | `[contract]`: each layer registers its kinds; the run record, the backlog row and the witness class added |
 | `ref-homed-kinds` | amend | `[contract]`: a home is a path or a ref |
 | `generated-kinds-door` | amend | `[contract]`: one door per kind, generators for generated kinds |

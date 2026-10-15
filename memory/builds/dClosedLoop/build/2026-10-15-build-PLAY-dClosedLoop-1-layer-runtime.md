@@ -51,7 +51,7 @@ layer model and from what earlier rounds left owed.
   | P29's keyed handed facts, the answered-call hook, separation of duties at spawn | layers round three | dBoundRoles |
   | the card as a ref per build, the per-worktree card file, re-rendered by every session-start hook | orientation round | dOrderedCharter, dDeclaredLoop |
   | context on full (`context.on-full`, compact with the card), `context.threshold`, `card.pointers`, `resume.context`, `resume.partial` | orientation round, compaction CX-1 to CX-3 | dDeclaredLoop |
-  | the lander (`push-main.sh`) and the landing queue dShippedRelease builds (`gap-flow-08`) | flow-roles FR-6, deferred to the lower-level design | Deploy |
+  | the lander (`push-main.sh`) and the landing queue dShippedRelease builds (`gap-flow-08`; revised 2026-10-16: the turnstile is a bar semaphore, so no landing queue exists yet) | flow-roles FR-6, deferred to the lower-level design | Deploy |
 - **Owed with no owner** (v2 `[owed]`):
   - the executor and its checklist engine;
   - the harness that can always spawn the subagents an item needs (RL-8: "a built-in harness should
@@ -889,7 +889,8 @@ Settled by RT-3: the owner chose "Runtime takes `next` and the controls too".
     dWellOiledMachine as a parent.
   - **dTendedCadence** keeps its cadence, `gap-maint-01` and `gap-maint-07`. Its "three hosts and the
     cadence" became the cadence on Runtime's hosts, and it gains dWellOiledMachine as a parent.
-  - **dShippedRelease** keeps the landing record, the landing queue it builds and the lander's core re-check (K1).
+  - **dShippedRelease** keeps the landing record, the landing queue it builds and the lander's core
+    re-check (K1). Revised 2026-10-16: the turnstile is a bar semaphore, so no landing queue exists yet.
 - **The chain has fourteen builds.**
 - **An ordering consequence.** Every stage build whose commands must end with a `next —` line now
   depends on dWellOiledMachine. v2's `[owed]` gives that ordering to the re-cut.
