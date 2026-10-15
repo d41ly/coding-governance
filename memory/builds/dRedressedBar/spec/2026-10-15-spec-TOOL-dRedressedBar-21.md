@@ -1,11 +1,12 @@
 # TOOL-dRedressedBar-21 — the profiler trusts no path a temp dir supplies: a dead run's logs land in this run's record, no capture is opened, read or deleted through a link, and run-gates' Python temp files take unpredictable names
 
-**Status:** INPROGRESS · rev-2 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 15 · ratified 2026-10-15
+**Status:** CLOSED · rev-2 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 15 · ratified 2026-10-15
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-15-build-TOOL-dRedressedBar-21-1-acceptance-ledger.md](../build/2026-10-15-build-TOOL-dRedressedBar-21-1-acceptance-ledger.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-1-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-1-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-2-revision.md) | research | TOOL-dRedressedBar-13 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-3-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-3-spec-writer.md) | journal | — |
