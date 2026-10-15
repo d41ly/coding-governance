@@ -522,6 +522,35 @@ What happens by default?"**
   - `guarded` returns a contradiction.
 - **The register:** `gap-roles-17` now names the missing repair record and route.
 
+## [owner-notes] Raised when round four opened, 2026-10-15
+
+> So far, Layer 3 doesn't describe the actual MECHANICAL SHAPE of the role execution - workflows,
+> agent sets, agent orientation templates. Origin branch 'deterministic-reuse-workflows-f70c33' and its
+> build 'aScoutedSeam' ran an extensive reuse agent workflow test to find one important point -
+> agent/workflow shape matters for improved result. Individual agents at xhigh effort produce about
+> the same quality results as 2 scouts + 1 adjudicator at medium effort for fraction of the cost. How
+> the actual work is shaped matters, we will revisit this point later.
+
+**The evidence**, from aScoutedSeam's benchmark (`origin/branch/deterministic-reuse-workflows-f70c33` at `b0fe68f30`, `memory/builds/aScoutedSeam/build/2026-10-11-build-TOOL-aScoutedSeam-1-2-benchmark.md`). Its higher effort is named `extra`.
+- **Effort.** The three scout arms held their recall at `medium` for a fifth to a seventh of the cost:
+  about ten minutes and 4M cache-read tokens per scout, against two hours and 28M at `extra`. The
+  diff-time reviewer was the exception: its recall fell from 7 to 4 of 23.
+- **Agent set.** At `medium`, a code scout and a design scout followed by a judge solved 12 of 23
+  positives. One checklist scout solved the same 12, hit more items (22 against 20), and used a
+  third of the agents. A five-lens fan-out with skeptics was ruled out on cost after three pilots.
+- **Orientation template.** A checklist scout that first reads a generated house index, sketches the
+  implementation and takes a convention census solved 16 of 24 in each of two runs, where the plain
+  checklist scout solved 13.
+
+**What it means for this layer.** Shape moved recall more than agent count did:
+- the checklist and the orientation template;
+- the effort per role.
+
+Each role item therefore owes a declared execution shape: its agent set, effort, checklist,
+orientation template and merge. The owner set this for a later revisit. It is recorded as
+`gap-roles-18` and in v2's `[owed]`. aScoutedSeam is evidence only: its branch is unmerged and no
+chain build counts on its code.
+
 ## [instrument] The instruments, as run 2026-10-15
 
 ### `role_orientation.py`

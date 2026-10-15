@@ -83,6 +83,11 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 19 | gov-researcher | Roles: prior art | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-14-researcher.md` | 1799cb98 | returned, 4m41s, 24.5k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-roles-priorart.md` |
 | 20 | gov-researcher | Flow layer: Plan, Design and Build items | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | returned, 7m54s, 46.3k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-a.md` |
 | 21 | gov-researcher | Flow layer: Test, Deploy, Maintain and review items | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-2-researcher.md` | 1799cb98 | returned, 7m02s, 37.8k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-b.md` |
+| 22 | gov-researcher | Memory layer: builds | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-3-researcher.md` | 1799cb98 | dispatched | — |
+| 23 | gov-researcher | Memory layer: the ask register and the decision index | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-4-researcher.md` | 1799cb98 | dispatched | — |
+| 24 | gov-researcher | Memory layer: the codebase map and the reuse tools | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-5-researcher.md` | 1799cb98 | dispatched | — |
+| 25 | gov-researcher | Memory layer: code annotations, the gotchas and the lexicon | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-6-researcher.md` | 1799cb98 | dispatched | — |
+| 26 | gov-researcher | Memory layer: the tooling map | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-7-researcher.md` | 1799cb98 | dispatched | — |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -150,6 +155,17 @@ way and held from the ledger:
 - returned — gov-researcher · wrote 0 files · 7m54s · 46.3k out · run direct/a9cb53e6fd6bb4661
 - agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-2-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-2-researcher.md) · writes none · gates none · run direct/a2e4ed3684d8964ea
 - returned — gov-researcher · wrote 0 files · 7m02s · 37.8k out · run direct/a2e4ed3684d8964ea
+```
+
+The memory layer's five handoffs, dispatches 22 to 26, were derived the same way and held from the
+ledger. Five is the direct-spawn budget for one owner turn:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-3-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-3-researcher.md) · writes none · gates none · run direct/ad130bc5b0b446984
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-4-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-4-researcher.md) · writes none · gates none · run direct/a683df94188e34f7a
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-5-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-5-researcher.md) · writes none · gates none · run direct/aa631366c077d00d1
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-6-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-6-researcher.md) · writes none · gates none · run direct/a0f40dd21c9243c66
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-7-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-7-researcher.md) · writes none · gates none · run direct/aaba36be47df28242
 ```
 
 ## Events
@@ -245,6 +261,10 @@ way and held from the ledger:
     owner's answer, over the recommended return.
 
   P29 and four keys joined v2.
+- 2026-10-15, session 1799cb98: the owner opened the memory layer's review. The same message noted
+  that layer 3 still owes its mechanical shape, with aScoutedSeam's benchmark as evidence. The note is
+  recorded with layer 3 as `gap-roles-18`, for a later revisit. Five researchers were dispatched,
+  22 to 26, one per part of the memory layer. Their briefs hand the settled facts as content.
 
 ## Instruments
 
@@ -472,6 +492,11 @@ After the roles layer's answers, both instruments were run as extracted from thi
   `sometimes`, it exits 1 naming both.
 - **The join** still exits 0 on 119 keys and 11 builds.
 
+After round four opened, the join was run as extracted from this record:
+- **The changes:** `gap-roles-18` went to dBoundRoles.
+- **The join** exits 0 on 120 keys and 11 builds. On a copy with `gap-roles-18` struck from
+  dBoundRoles' row, it exits 1 naming it unowned.
+
 ### The foreign-build census
 
 Lists every build slug a design record names that is not a chain build, the chain read from v2's
@@ -538,6 +563,7 @@ Runs, 2026-10-14:
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-{a,b}.md` | The flow layer's item audit, verbatim: every item of the 70 declared (tag, actor, witness, inputs by layer, instruction scope, routes, dependencies), with each step's extension points and the findings. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md` | The flow's steps defined item by item: Entry, the five core steps and the breakpoint, each with its actors, witnesses, routes and layer ingredients, with the audit's fixes applied. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md` | The layer review's third round: the roles layer set against the settled roles, orientation and flow designs, what role agents receive and re-derive measured over 171 transcripts, the trust mechanism proposed, the role-by-step matrix derived, eight gaps and four forks, with the instruments. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md` | The layer review's fourth round: the memory layer, the owner's words, what the design already fixes, and the five researchers dispatched. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |

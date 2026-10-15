@@ -128,6 +128,7 @@ extends.
 | gap-roles-15 | Roles | MED | The role-to-step relation is typed, never derived or joined: the roles round's item map and the step definitions' Actor cells are authored tables, and nothing checks that every actor is declared and every core role acts. | layer review, roles (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md`), `[matrix]` | — |
 | gap-roles-16 | Roles | LOW | Nothing declares what a verifying role receives: a reviewer's or skeptic's packet is whatever its prompt's author put in, so nothing keeps an author's reasoning out of it. | layer review, roles (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md`), `[trust]` | — |
 | gap-roles-17 | Roles | LOW | A handed fact found false has no repair record and no route: only the builder's `diverged` routes back, no role's return can record a repair, and nothing files one against the producer's record. | layer review, roles (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md`), `[trust]`; step definitions, `[build]` | — |
+| gap-roles-18 | Roles | MED | Role items declare no execution shape: how many agents an item runs, at what effort, with what checklist, orientation template and merge, is chosen per harness or prompt, though aScoutedSeam measured that shape moves recall and cost: one checklist scout at medium matched a two-scout workflow with a judge (12 of 23) on a third of the agents, and a scout that reads a generated house index first solved 16 of 24 against 13. Raised by the owner. | aScoutedSeam benchmark (`origin/branch/deterministic-reuse-workflows-f70c33` at `b0fe68f30`, `memory/builds/aScoutedSeam/build/2026-10-11-build-TOOL-aScoutedSeam-1-2-benchmark.md`); layer review, roles, `[owner-notes]` | — |
 | gap-spine-01 | Spine | HIGH | No stage model: no kit, leg, dossier, role or hook declares the stage it serves, and the loop exists only implicitly. | design §4.1 (0 of 31 dossiers carry a stage); `tools/roles/workflows.toml` covers stages 0–7 only | — |
 | gap-spine-02 | Spine | HIGH | Guards read agent-written state across stages, against `[class]`. | build §4 (write gate), design §4.4 (INPROGRESS), test §5 C (pusher-written receipt), deploy §5 C | — |
 | gap-spine-03 | Spine | HIGH | Attended and unattended builds run different exit contracts. | build §3, §4 (DoD needs RUN.md) | — |
@@ -299,4 +300,12 @@ Re-measured after layers round three added `gap-roles-10` to `gap-roles-17`
 ```text
 Roles=17 Deploy=8 Plan=7 Spine=9 Orient=14 Test=9 Review=3 Foundation=17 Build=4 Flow=14 Maintain=8 Design=9
 LOW=9 MED=45 HIGH=65
+```
+
+Re-measured after round four's opening added `gap-roles-18`
+(`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md`, `[owner-notes]`), same instrument:
+
+```text
+Roles=18 Deploy=8 Plan=7 Spine=9 Orient=14 Test=9 Review=3 Foundation=17 Build=4 Flow=14 Maintain=8 Design=9
+LOW=9 MED=46 HIGH=65
 ```
