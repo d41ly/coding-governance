@@ -238,6 +238,47 @@ writes. How does a build's reuse entry land?"**
     directive. This reverses F4-1's "instruction units".
   - The owner commands each one: the build parks at its landing until the owner commands the entry.
 
+## [answers] Answered, 2026-10-16
+
+The owner took the recommended option on LR-1, LR-2, LR-5 and LR-6, and another on LR-3 and LR-4.
+
+| Fork | Answer | Key | Default | Also allowed |
+|---|---|---|---|---|
+| LR-1 | Soften, never off | none: C6 is amended, and `instructions.checks` stands | — | — |
+| LR-2 | Claimed guides, never decides | none: P29 is amended, and `roles.trust` stands | — | — |
+| LR-3 | As `run.on-owner-question` says | none: the offered alternatives are that key's own values | — | — |
+| LR-4 | Presets need the expansion | `policy.on-missing-expansion` | `refuse` | `fallback-reported` |
+| LR-5 | Mechanical, else stated | none: `asks.acceptance` stands, and an acceptance gains a definition | — | — |
+| LR-6 | Proposed with the build | none: the choice is structural | — | — |
+
+What each answer changes, applied by the fold:
+- **LR-1:** foundations C6 is amended. A principle's check may soften by policy to `warn` or `record`.
+  Both still run the check and show every breach, and no switch skips it. `velocity` keeps `warn`.
+- **LR-2:** v2's P29 is amended. A producing role works from every keyed fact. A `claimed` fact guides
+  the work, but nothing that changes state rests on it without P23's re-derivation: a verdict, a
+  position, a landing or a gate. P23 governs decisions, and P29 governs inputs.
+- **LR-3:** an owner gate is an owner item, resolved as `run.on-owner-question` says.
+  - Under `best-effort-recorded`, the supervisor's choice is recorded as the gate's witness. The
+    owner's own disposition is the other witness it may have.
+  - An adopter who wants gates held sets `park-item`, `park-build` or `stop-run`, the alternatives
+    LR-3 offered. `strict` already sets `park-item`.
+  - Best effort never accepts an instruction proposal. `instructions.edit` is a guard that presets
+    never touch, so a proposal stays open until the owner disposes of it (LR-6).
+- **LR-4:** a preset whose value needs an absent expansion is refused when it is selected, so `strict`
+  and `guarded` need integrations. `policy.on-missing-expansion` holds that rule.
+  - Its default is `refuse`.
+  - `fallback-reported` is allowed: such a value resolves to the key's default, and the policy check
+    reports the fallback.
+  - Presets never set the key, since it governs how a preset applies.
+- **LR-5:** a core filer states one of the four mechanical acceptances. Every other filer states an
+  `accept` line, and the ask's closing must cite it. Refusal stays the default. dTotalRecall extends
+  backlog.py's V14 and its `ASK_CUTOFF`, which already refuse an ask without one. F4-6's "as today" is
+  corrected.
+- **LR-6:** the builder proposes the reuse entry through the instruction command. The build's
+  `gov:feature` check counts a proposed entry. The owner's disposition of it is an owner item, and the
+  entry renders into work orders once accepted. The record kind list drops the reuse entry, so its one
+  door is the instruction command.
+
 ## [map-instruction] The instruction layer's findings, placed
 
 Run A is `wf_261507e4-5ca` and run B is `wf_c5538013-6cc`. The ids are each report's appendix ids.

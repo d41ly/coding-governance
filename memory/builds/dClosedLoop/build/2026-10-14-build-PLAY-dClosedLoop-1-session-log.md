@@ -744,6 +744,17 @@ Rounds 1 and 2 of the layers' reviews, dispatches 39 and 40, were derived from t
   two find. Six defects contradict answers the owner settled, so they went to the owner as LR-1 to
   LR-6 before the fold. The rest fold by the record's `[fold]`.
 
+- 2026-10-16, session 1799cb98: the owner answered LR-1 to LR-6:
+  - LR-1: "Soften, never off (Recommended)";
+  - LR-2: "Claimed guides, never decides (Recommended)";
+  - LR-3: "As on-owner-question says", not the recommended option;
+  - LR-4: "Presets need the expansion", not the recommended option;
+  - LR-5: "Mechanical, else stated (Recommended)";
+  - LR-6: "Proposed with the build (Recommended)".
+
+  `policy.on-missing-expansion` joins v2, with `refuse` as its default. The comparison record's
+  `[answers]` says what each answer changes, and the fold applies them.
+
 ## Instruments
 
 ### The gap-ownership join
