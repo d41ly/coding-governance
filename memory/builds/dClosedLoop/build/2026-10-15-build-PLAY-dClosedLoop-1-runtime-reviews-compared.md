@@ -180,7 +180,7 @@ B61 (resume-tick-consumers): confirmed twin A38, B43
 | `invariant-8-fixture` | the no-skipped-permissions invariant has no fixture | 13 | 7 | `[tests]` `no-skip` |
 | `invariant-coverage` | three more invariants and the primary-tree rule have no fixture | — | 7 | `[invariants]`; `[tests]` `coverage` |
 | `cli-binary` | which `claude` the supervisor launches is unresolved, and this node's PATH CLI is below the floor | 18 | 18 | `[supervise]` launch |
-| `cli-floor-decision` | an authored CLI floor re-opens what TOOL-aMendedFleet-61's review rejected | 29 | — | `[enforce]`: the floor is derived |
+| `cli-floor-decision` | an authored CLI floor re-opens what TOOL-aMendedFleet-61's review rejected | 29 | — | `[enforce]`: no floor, after RT-2 |
 | `supervisor-host` | nothing starts the supervisor or keeps it alive | 19 | 22 | `[supervise]` host |
 | `codex-events` | Codex's hook events do not match "one for one" | 22 | 13, 21 | `[harness]` capability tables |
 | `dispatcher-latency` | the dispatcher's 57 ms goal was never timed | 24 | 27 | `[enforce]`; `[tests]` `latency` |

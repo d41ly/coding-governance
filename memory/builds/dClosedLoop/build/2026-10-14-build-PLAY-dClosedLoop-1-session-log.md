@@ -97,7 +97,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 33 | gov-researcher | Runtime: sessions, context, scheduling, harnesses and nodes | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-14-researcher.md` | 1799cb98 | returned, 8m02s, 33.7k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-sessions.md` |
 | 34 | `tier2-review.js`: five `gov-spec-reviewer`, five `gov-skeptic` and one `gov-synthesizer`, all at medium | Runtime: Tier-2 review, run A | the args in `build/2026-10-15-build-PLAY-dClosedLoop-1-runtime-reviews-compared.md` `[runs]` | 1799cb98 | returned, CLEAN WITH FIXES, 56 of 60 confirmed | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-runtime-a.md` |
 | 35 | the same | Runtime: Tier-2 review, run B | the same | 1799cb98 | returned, CLEAN WITH FIXES, 57 of 61 confirmed | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-runtime-b.md` |
-| 36 | gov-researcher | Runtime: RT-2, whether CLI 2.1.295 is needed for failing closed | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-15-researcher.md` | 1799cb98 | dispatched | — |
+| 36 | gov-researcher | Runtime: RT-2, whether CLI 2.1.295 is needed for failing closed | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-15-researcher.md` | 1799cb98 | returned, 13m54s, 30.4k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-floor.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -270,6 +270,7 @@ Dispatch 36, RT-2's re-verification, was derived the same way:
 
 ```text
 - agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-15-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-15-researcher.md) · writes none · gates none · run direct/a3b492160d3807a27
+- returned — gov-researcher · wrote 0 files · 13m54s · 30.4k out · run direct/a3b492160d3807a27
 ```
 
 ## Events
@@ -455,6 +456,15 @@ Dispatch 36, RT-2's re-verification, was derived the same way:
   each with its gaps. `context.on-full` now defaults to `fresh-at-boundary`, and six `runtime.*` keys
   joined v2. Ten `gap-rt` rows were registered. Two proposed gaps restated `gap-maint-01` and
   `gap-maint-07`, so those rows took the corrected facts instead.
+- 2026-10-15, session 1799cb98: dispatch 36 returned on RT-2 (`build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-floor.md`; its probes are saved
+  beside it).
+  - The switch is new in 2.1.295, and 2.1.292 ignores it without a warning.
+  - On 2.1.292, an ask rule on each gated tool, answered by one PermissionRequest hook, denied the
+    call under every burst failure class.
+  - No floor is needed, as the owner expected, and no question went back.
+
+  `[enforce]` fails closed on every version through that baseline, and adds the switch where the CLI
+  carries it. `runtime.below-floor` is retired.
 
 ## Instruments
 
@@ -799,6 +809,8 @@ Runs, 2026-10-14:
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md` | The layer review's fifth round: the runtime layer, what earlier rounds fix for it, its four researchers, the design the owner delegated, two Tier-2 rounds folded into it, and the questions. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-runtime-reviews-compared.md` | The two Tier-2 rounds compared defect by defect: their args, the numbers, what one round alone would have missed, the map from every finding to its defect and fold, and the instrument. |
 | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-runtime-{a,b}.md` | The two Tier-2 reports on the runtime design, as their synthesizers wrote them. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-floor.md` | Dispatch 36's return, verbatim: whether CLI 2.1.295 is needed to fail closed, tested on both of this node's binaries. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-floor-probes.md` | Dispatch 36's probes, verbatim as fenced text: the runner, the hook fixtures, the settings and the 50 logs. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-{executor,spawn,hooks,sessions}.md` | The runtime round's four researcher returns, verbatim. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-instruments.md` | The runtime researchers' probe scripts, as fenced text, with the one lost probe noted. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-instruments.md` | The lexicon researchers' probe files, as fenced text. |

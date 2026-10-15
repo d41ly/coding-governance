@@ -176,8 +176,13 @@ record's map.
   Nothing sets `onFailure`, so every enforcement hook fails open.
 - **The fail-open burst.** On 2026-10-14, resource exhaustion crashed the guards 31 times, and every
   failure admitted the call.
-- **The fail-closed switch** (`onFailure: "block"`) needs CLI 2.1.295; this node's PATH CLI is 2.1.292.
-  It has no effect on Stop or SubagentStop.
+- **The fail-closed switch** (`onFailure: "block"`) needs CLI 2.1.295, which the changelog confirms.
+  This node's PATH CLI is 2.1.292, and it ignores the key without a warning. The switch has no effect on
+  Stop or SubagentStop.
+- **Failing closed without the switch** was re-verified for RT-2 by dispatch 36:
+  - on 2.1.292, an ask rule on each gated tool, answered by a PermissionRequest hook, denied the call
+    under every burst failure class, read-only commands included;
+  - a PreToolUse hook as the allow path fails open in auto mode.
 - **The git hooks:**
   - `pre-commit`, `commit-msg` and `pre-rebase` trap no signal, so a killed hook reads as success;
   - `core.hooksPath` is absolute and resolves into the primary tree's checkout, so every worktree runs
@@ -290,7 +295,8 @@ each decision through mechanisms it supervises, enforces at every boundary, and 
          └──────────── witnesses (memory) ◄──┘
  every tool call, write, spawn, return, stop, commit and push passes ONE enforcement surface:
  one dispatcher entry per event rendered from the kits' fragments, packs from every layer, failing
- closed above the derived CLI floor, and a witness with a named reader behind every event that cannot
+ closed on every CLI version through ask rules only the dispatcher answers, and a witness with a
+ named reader behind every event that cannot
  attended: the owner's session is the driver, and runs acts from next through the same harness
  calls, bound the same way
 ```
@@ -368,13 +374,11 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - with `--session-id` recorded beside the lease epoch, `--output-format json`, `--json-schema` set to
     the act's return schema, and `--max-turns` from `RESUME_TURNS`;
   - under `--permission-mode auto`, as the owner ruled for unattended runs (TOOL-aMendedFleet-116, built
-    by TOOL-aMendedFleet-117), with the act's allowance as its floor; act binding refuses anything
-    outside it;
-  - with the `claude` binary the supervisor resolved:
-    - the node registry records each binary's path and version;
-    - the supervisor prefers one at or above the derived floor (`[enforce]`); on node d that means
-      the desktop's 2.1.295 over PATH's 2.1.292;
-    - where none is, `runtime.below-floor` applies before the launch and is journaled;
+    by TOOL-aMendedFleet-117). Gated tools carry ask rules, and only the dispatcher answers them, by the
+    act's allowance (`[enforce]`);
+  - with the `claude` binary the supervisor resolved. The node registry records each binary's path,
+    version and capabilities, such as `onFailure`. Any version may launch, because the permission
+    baseline fails closed without the switch (`[enforce]`, RT-2);
   - registered with process-monitor under `runtime.act-ceiling`.
 
   The harness call runs in the foreground, so the session waits for its Workflow. The existing
@@ -551,20 +555,40 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   | stop-guard | Stop | unattended | runtime: run continuation, retired for act sessions |
   | format-guard | Stop | hooks | instruction: the micro-formats |
   | stall-recorder | StopFailure | unattended | runtime: the limit signal |
-- **Failing closed:**
-  - **The switch.** Enforcement entries set `onFailure: "block"` under `runtime.hook-failure=closed`.
-  - **The floor is derived, never authored.**
-    - Each feature the dispatcher relies on declares the CLI it needs. `onFailure` needs 2.1.295.
-    - The floor is the maximum of those.
-    - This keeps TOOL-aMendedFleet-61's rejection of an authored floor, and its launch-version pin
-      stands.
-    - `read_cli_version` and the pinned `cli-version` fact read the running session's version.
+- **Failing closed, on every CLI version, with no floor** (RT-2, re-verified by dispatch 36):
+  - **The permission baseline.** Under `runtime.hook-failure=closed`, every gated tool carries an ask
+    rule. The gated tools are Bash, PowerShell, Write, Edit, MultiEdit, NotebookEdit, Agent and
+    Workflow.
+    - Only the dispatcher's PermissionRequest entry answers the rule, with a JSON decision.
+    - A dispatcher that cannot run leaves the call unapproved. In an act session the call is denied;
+      in an attended session it goes to the person.
+    - Dispatch 36 saw every burst failure class denied this way on 2.1.292, read-only commands
+      included.
+  - **One checking hook is the allow path.**
+    - A crashed guard sitting beside a healthy allowing hook lets the call run, which is why the
+      dispatcher is a single entry.
+    - An allow rule on a gated tool would bypass the dispatcher. So a class check refuses one in
+      tracked settings, and check-wiring's session arm warns on one in local or user settings.
+    - This repo's `.claude/settings.local.json` allows `Bash(git fetch *)` today.
+  - **Auto mode stays, as the owner ruled** (TOOL-aMendedFleet-116).
+    - The classifier still judges ungated tools.
+    - An ask rule resolves before the classifier, so the dispatcher decides gated tools instead, by
+      the act's allowance.
+  - **The switch, where the CLI carries it.**
+    - `onFailure: "block"` is a capability the node registry detects from the version: 2.1.295 and
+      later.
+    - 2.1.292 ignores the key without a warning, so the switch is never assumed.
+    - Where it is present, every enforcement entry also fails closed, ungated tools included.
+  - **No version is refused or degraded.** TOOL-aMendedFleet-61's launch-version pin stands, and
+    `read_cli_version` with the pinned `cli-version` fact reads the running session's version.
+  - **What stays open below 2.1.295:** rules on ungated tools, such as the answered-call rule on reads.
+    None of them guards safety, so a failure there costs tokens, not safety.
   - **The events that cannot fail closed each have a witness with a named reader:**
 
     | Event | Witness | Its reader |
     |---|---|---|
     | SessionStart | the binding record | act binding, at the first PreToolUse |
-    | SubagentStart | the journal entry, with the spawn marker | the supervisor's reconciliation at the act's end |
+    | SubagentStart | the journal entry, with the spawn marker | the supervisor's reconciliation at the act's end. Enforcement sits on the ask rule for Agent and Workflow |
     | SubagentStop | the persisted return | the supervisor, which counts an item done only on it |
     | Stop | the act's outcome record | the supervisor |
     | pre-commit, commit-msg | a witness per commit, keyed by its tree and message | the supervisor, which counts a commit item done only with it. An attended commit without one meets the lander's core re-check (K1) and is reported (`core.bypass=with-hooks-report`). |
@@ -688,7 +712,8 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 - **One guard core, with per-harness wiring.** `runtime.harnesses` selects from the registered harness
   adapters.
 - **Each harness adapter carries a capability table, measured and never claimed:**
-  - **Claude Code:** every event in `[enforce]`, `onFailure`, and the Workflow tool.
+  - **Claude Code:** every event in `[enforce]`, the Workflow tool, ask rules answered by PermissionRequest
+    on every version, and `onFailure` from 2.1.295.
   - **Codex:**
     - it has PreToolUse (Bash, apply_patch, MCP), SubagentStart, SubagentStop, PreCompact and
       SessionEnd;
@@ -737,7 +762,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | `persisted-returns` | No result exists only in memory: every return is persisted through `record` before its item counts as done. | `spike`, `returns` |
 | `no-model-context` | Neither the decider nor the supervisor holds model context. | by construction: both are programs |
 | `one-door` | Records change only through `record`, instructions only through the instruction command, and main only through the lander. | `coverage` |
-| `fail-closed` | Under `runtime.hook-failure=closed`, on a CLI at or above the derived floor, every enforcement entry fails closed. Every event that cannot fail closed has a witness with a named reader. A bypass or an exception is journaled and re-checked, as K1 and K4 set. Under `open`, or below the floor, the class check reports the policy in force on every run. | `fail-closed`, `git-witness` |
+| `fail-closed` | Under `runtime.hook-failure=closed`, on every CLI version, a gated tool call runs only on the dispatcher's approval. A dispatcher that cannot run leaves the call denied, or put to the person when attended. Where the CLI carries `onFailure`, every enforcement entry fails closed too. Every event that cannot fail closed has a witness with a named reader. A bypass or an exception is journaled and re-checked, as K1 and K4 set. Under `open`, the class check reports the policy in force on every run. | `fail-closed`, `git-witness` |
 | `no-skip` | No session the runtime launches skips permissions. | `no-skip` |
 | `policy-and-journal` | Every runtime behaviour is a policy key with a reader, and every runtime event is journaled. | `coverage` |
 
@@ -758,7 +783,8 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 
 The owner handed this layer to the main loop, so these defaults are the main loop's. Every one is
 switchable, and the default is the `standard` preset's value. The six settled keys joined v2's catalogue
-and presets on 2026-10-15, and v2 is canonical from then on. `runtime.below-floor` waits on RT-2.
+and presets on 2026-10-15, and v2 is canonical from then on. RT-2 retired `runtime.below-floor`, since
+no floor exists.
 
 | Key | Allowed values | Default | velocity | standard | strict | guarded |
 |---|---|---|---|---|---|---|
@@ -767,7 +793,6 @@ and presets on 2026-10-15, and v2 is canonical from then on. `runtime.below-floo
 | `runtime.act-ceiling` | hours | 1.5 | 1.5 | 1.5 | 1.5 | 1.5 |
 | `runtime.hold-ceiling` | hours | 6 | 6 | 6 | 6 | 6 |
 | `runtime.hook-failure` | closed, open | closed | closed | closed | closed | closed |
-| `runtime.below-floor` | refuse, degrade | pending RT-2's re-verification | — | — | — | — |
 | `runtime.harnesses` | a set of named harness adapters | claude-code | claude-code | claude-code | claude-code | claude-code |
 
 **Existing keys Runtime reads, without re-declaring them:**
@@ -790,7 +815,8 @@ That question is owed in v2's `[owed]`.
 
 **Retired from the first draft:**
 - `runtime.driver-lifetime` and `runtime.driver-refresh`, because one act session per act is structural;
-- `runtime.cli-floor`, because the floor is derived;
+- `runtime.cli-floor` and `runtime.below-floor`, because no floor exists (RT-2): every version fails
+  closed through the permission baseline;
 - `runtime.fanout`, `runtime.isolation`, `runtime.reap` and `runtime.scheduler`, because the existing
   keys above answer them;
 - `runtime.journal`, because the run record is observability's, to be settled in its review.
@@ -823,8 +849,10 @@ Settled by RT-3: the owner chose "Runtime takes `next` and the controls too".
   5. the persisted-return store, and the deferral block;
   6. the slot reservation, under agent-cap's cap;
   7. the enforcement surface:
-     - the fragments as packs, settings-merge's dispatcher entries with `onFailure`, and check-wiring's
-       class arm;
+     - the fragments as packs, settings-merge's dispatcher entries, and check-wiring's class arm;
+     - the permission baseline: ask rules on gated tools, the dispatcher's PermissionRequest entry as the
+       only allow path, and the allow-rule class check;
+     - `onFailure`, wherever the node registry shows the CLI carries it;
      - the owner-pack table;
      - the witnesses and their readers;
      - signal traps on every git hook;
@@ -884,7 +912,9 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   `agent()` in the foreground. It is red if any of these fails:
   - SubagentStart and SubagentStop fire with `agent_type`;
   - the persisted return byte-matches what `agent()` resolved to;
-  - the session's `structured_output` carries the act's return.
+  - the session's `structured_output` carries the act's return;
+  - on 2.1.292, an ask rule on the Workflow tool sends the call to the dispatcher's PermissionRequest
+    entry, as dispatch 36 showed for Agent.
 
   The same act also runs through the headless backend. The cheaper feasible backend becomes the default
   for single-agent acts.
@@ -919,9 +949,13 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   - a malformed or oversized return is held `roles.retries` times, then persisted as a refusal;
   - a SubagentStop entry pointed at a missing path leaves the item unwitnessed and re-dispatchable.
 - **`fail-closed`:**
-  - the 2026-10-14 burst's repo-wired entries are replayed under `onFailure: "block"`, and each is
-    refused. The replay includes a guard with a missing interpreter path, and one killed by a resource
-    limit;
+  - on 2.1.292, with no switch, every burst failure class in the dispatcher leaves a gated call denied in
+    an act session, read-only commands included. Dispatch 36's probes are the seed;
+  - on 2.1.295 and later, the same replay under `onFailure: "block"` refuses every repo-wired entry,
+    ungated tools included;
+  - in an attended 2.1.292 session, a missing dispatcher puts a gated call to the person and never runs
+    it. Dispatch 36 could not run this case, because it needs a terminal;
+  - an allow rule matching a gated tool fails the class check;
   - a crashed SessionStart dispatcher makes the first tool call refuse;
   - the burst's user-level guards are reported, not counted.
 - **`workspaces`:**
@@ -956,9 +990,9 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
 - **`host`:**
   - kill the supervisor, then reboot the node, and the node tick restarts it within one period;
   - preflight refuses a run-host node without the tick's registration.
-- **`binary`:** with a stub `claude` printing 2.1.292 first on PATH, the supervisor either launches a
-  binary at or above the derived floor, or applies `runtime.below-floor` before the launch. Either way
-  it journals which.
+- **`binary`:** with a stub `claude` printing 2.1.292 first on PATH, the supervisor launches it, records
+  it in the node registry as lacking the switch, and journals that. The dispatcher's entries then omit
+  `onFailure`, and a gated call made while the dispatcher is missing is still denied.
 - **`git-witness`:** a SIGKILL to pre-commit lands no witness. The supervisor does not count that commit
   item done, and the lander reports the commit.
 - **`coverage`:**
@@ -1051,10 +1085,17 @@ is unchanged.
 - **RT-2:** the owner chose neither option and wrote, verbatim: "Reverify that this version or above is
   actually needed. Older claude binaries should be perfectly capable running the same functionality
   without refusal/degradation."
-  - Dispatch 36 (`prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-15-researcher.md`) is re-verifying it.
-    It reads the primary sources, tests `onFailure` on both of this node's binaries, and tests
-    mechanisms that fail closed without the switch.
-  - Until it returns, `[enforce]`'s derived floor and `runtime.below-floor` stand as proposals only.
+  - Dispatch 36 re-verified it in `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-floor.md`, with its probes beside it.
+    - The switch is new in 2.1.295, and 2.1.292 ignores it without a warning.
+    - But 2.1.292 already fails closed on gated calls, when one PermissionRequest hook answers an ask
+      rule on each.
+  - The owner was right: no floor is needed.
+    - `[enforce]` now fails closed on every version through that baseline, and adds the switch where
+      the CLI carries it.
+    - No version is refused.
+    - `runtime.below-floor` and the derived floor are retired.
+  - Two cases are untested and stay as losing tests in `[tests]`: an attended 2.1.292 session's
+    fallback to the person, and a permission host that crashes mid-run.
 - **RT-3:** "Runtime takes `next` and the controls too", not the recommended option.
   - The `next` verb, its micro-format and the owner's controls moved to dWellOiledMachine, with
     `gap-found-06` and `gap-flow-10`.
