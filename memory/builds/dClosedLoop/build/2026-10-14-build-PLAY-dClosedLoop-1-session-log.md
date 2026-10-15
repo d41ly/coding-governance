@@ -88,6 +88,9 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 24 | gov-researcher | Memory layer: the codebase map and the reuse tools | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-5-researcher.md` | 1799cb98 | returned, 6m23s, 27.9k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-map-reuse.md` |
 | 25 | gov-researcher | Memory layer: code annotations, the gotchas and the lexicon | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-6-researcher.md` | 1799cb98 | returned, 6m32s, 29.0k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-annotations.md` |
 | 26 | gov-researcher | Memory layer: the tooling map | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-7-researcher.md` | 1799cb98 | returned, 7m55s, 33.0k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-tooling.md` |
+| 27 | gov-researcher | Lexicon: the kit as built and as enforced | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-8-researcher.md` | 1799cb98 | dispatched | — |
+| 28 | gov-researcher | Lexicon: the offender population and the pin's history | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-9-researcher.md` | 1799cb98 | dispatched | — |
+| 29 | gov-researcher | Lexicon: prior art and the forced-name mechanism | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-10-researcher.md` | 1799cb98 | dispatched | — |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -171,6 +174,15 @@ ledger. Five is the direct-spawn budget for one owner turn:
 - returned — gov-researcher · wrote 0 files · 6m23s · 27.9k out · run direct/aa631366c077d00d1
 - returned — gov-researcher · wrote 0 files · 6m32s · 29.0k out · run direct/a0f40dd21c9243c66
 - returned — gov-researcher · wrote 0 files · 7m55s · 33.0k out · run direct/aaba36be47df28242
+```
+
+The lexicon review's three handoffs, dispatches 27 to 29, were derived the same way and held from
+the ledger:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-8-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-8-researcher.md) · writes none · gates none · run direct/a8c799ae3f8451de3
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-9-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-9-researcher.md) · writes none · gates none · run direct/ab88368be2b01aaa5
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-10-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-10-researcher.md) · writes none · gates none · run direct/a3c14cf4c0062421b
 ```
 
 ## Events
@@ -286,6 +298,12 @@ ledger. Five is the direct-spawn budget for one owner turn:
   - dTotalRecall joined the chain as the memory layer's build;
   - P30 and eight keys joined v2;
   - seventeen gaps were registered.
+- 2026-10-15, session 1799cb98: the owner asked for a full review of the lexicon kit:
+  - sessions raise its offender pin for verbs that third-party kits force, which are not debt;
+  - the kit should exclude such verbs by default, perhaps from tables per popular kit;
+  - its enforcement of naming should be reviewed and improved.
+
+  Three researchers were dispatched, 27 to 29.
 
 ## Instruments
 
@@ -598,6 +616,7 @@ Runs, 2026-10-14:
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md` | The layer review's third round: the roles layer set against the settled roles, orientation and flow designs, what role agents receive and re-derive measured over 171 transcripts, the trust mechanism proposed, the role-by-step matrix derived, eight gaps and four forks, with the instruments. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md` | The layer review's fourth round: the memory layer, the owner's words, what the design already fixes, the five researchers' returns measured, the design proposed, and the forks asked. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-{builds,asks-decisions,map-reuse,annotations,tooling}.md` | The memory layer's five researcher returns, verbatim: builds; the ask register and the decision index; the codebase map and the reuse tools; code annotations, the gotchas and the lexicon; the tooling map. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md` | The lexicon kit's review: the owner's words, what the design already fixes, the kit's history, and its three researchers. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-instruments.md` | The memory researchers' probe scripts, gathered from their scratch paths as fenced text. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
