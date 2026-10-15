@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-18 — a gate profiler: every leg run clean and unbounded, serially or under a load cap, each profiled to its processes, stalls reported and never killed
 
-**Status:** CLOSED · rev-6 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 13 · ratified 2026-10-15
+**Status:** CLOSED · rev-7 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 13 · ratified 2026-10-15
 
 <!-- gen:spec-records -->
 
@@ -15,6 +15,7 @@
 | [2026-10-15-prompt-TOOL-dRedressedBar-18-5-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-18-5-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-19 TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-6-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-6-revision.md) | research | TOOL-dRedressedBar-21 TOOL-dRedressedBar-19 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-22-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-22-2-revision.md) | research | TOOL-dRedressedBar-22 TOOL-dRedressedBar-19 |
 | [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
 | [2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md) | diff-review | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 |
 
@@ -92,6 +93,9 @@ record names each such substitution (F3).
   reason. Observed by AC10 and AC11. The redaction's byte contract and its parity arm against the
   runner's `redact`, and the next run's sweep of the raw captures a crashed or killed run leaves,
   are `TOOL-dRedressedBar-19`'s S39, S20 and S38 (units-16-18 report ids 39, 20 and 38).
+  `TOOL-dRedressedBar-22` has an interrupt run the run end's retry too, so a capture an ended leg's
+  processes still hold is retried there and, when still held, named in `raw_kept` (its S2; closing
+  review round 1, report ids 2 and 14).
   - **Readers:** S11 deletes each leg's raw capture, `raw/<i>.out`, once `<i>.log` is written. The
     inventory was read at `679afc31` with `git grep -n -F 'raw/<i>.out'` and
     `git grep -n -l -e 'measure_legs' -e 'gate-profile/' -e 'raw_kept'` over the tracked tree. The
@@ -106,9 +110,9 @@ record names each such substitution (F3).
     outside the tree, and the only code that will spell its name is this unit's unbuilt
     profiler, which creates it, redacts it and deletes it.
     by value: the capture's bytes are read only by this unit's redaction pass in
-    `tools/run-gates/measure_legs.py`, at leg end and again at run end for a leg that left processes
-    running. Each read comes before the delete, so no reader loses the value. Once `<i>.log` exists
-    it is the only copy anything reads. That file is already in §4's Files touched, so no file is
+    `tools/run-gates/measure_legs.py`, at leg end and again at run end, or at an interrupt since
+    `TOOL-dRedressedBar-22`, for a leg that left processes running. Each read comes before the
+    delete, so no reader loses the value. Once `<i>.log` exists it is the only copy anything reads. That file is already in §4's Files touched, so no file is
     added.
 - **S12** — On a non-Windows host the tool refuses with exit 2 and names the platform. Observed by
   AC12.
@@ -179,6 +183,11 @@ record names each such substitution (F3).
   replaces with a `tempfile.mkstemp` temp (closing review round 1, H1), and the capture's open in
   `run_leg` and its read and delete in `write_leg_capture`, which that unit holds to the file
   `build_capture_file` made (the owner's ruling of 2026-10-15).
+- **hands-off** `TOOL-dRedressedBar-22` — the interrupt branch's naming of a capture an ended leg's
+  processes still hold and the whole-table `legs.tsv` rewrite at run end and at an interrupt
+  (closing review round 1, report ids 2, 9 and 14), the interpreter probe's base-interpreter child
+  (id 3), `check_admit` as the loop's one admit decision (id 6), an arm for each of the four alias
+  refusals (id 11), and the resolution red half's verdict reads with `memio.py`'s line (id 15).
 - **hands-off** external — a `derive-ceilings.py` that reads `gate-profile/` records directly. It is
   not built here: readings enter through the existing `--observed` route.
 - **hands-off** external — the first full profiled run over the fixed tree, and the
@@ -310,7 +319,11 @@ together, which is how AC1 stages its resolution red half.
    The two jobs' `TotalProcesses` must differ by exactly 1. Any other difference refuses with exit
    2, naming the interpreter, because no job reading of a leg it runs would be true (§5 risks).
    The step runs on every run, alias or not, so any python whose child leaves a job is refused,
-   not only an alias.
+   not only an alias. `TOOL-dRedressedBar-22` makes that child the base interpreter,
+   `getattr(sys, '_base_executable', None) or sys.executable`, the rule every fixture follows,
+   because a venv's `sys.executable` is a redirector whose child is a second process, so a venv
+   PYBIN read a difference of 2 and every profile refused (its S3; closing review round 1, report
+   id 3).
 5. **Application.** Each leg whose mapped first word was resolved runs the resolved interpreter.
    The legs' environment gains `GOV_PYTHON` set to it, so every `resolve_python` a leg's own
    scripts run picks it before `python3` (`tools/lib/resolve-python.sh:30`, inline at
@@ -440,6 +453,11 @@ The main loop ticks every `HOST_EVERY_S = 1` s, a declared constant. Each tick r
 the newest sample was taken after the previous admission, and that sample reads at or under both
 caps. It also admits when no leg of the run is running, the `drained` release of the runner's
 memory pause (`run-gates.sh:566-569`). So foreign load can delay a profile and never deadlock it.
+`TOOL-dRedressedBar-22` makes `check_admit(mode, pending, running, cpu, mem, fresh)` the loop's one
+admit decision, called at the host tick and at the drained site, where the loop tested
+`pending and not running` itself and the function's drained clause was unreachable; a drained
+admission taken at a host tick is then logged on that tick's `host.tsv` row (its S6; closing review
+round 1, report id 6).
 **One admission costs** at least one tick, plus one suspended bash spawn, a job assign and a thread
 resume. A manifest of N legs takes at least N seconds to ramp, DERIVED from N at run time.
 
@@ -526,9 +544,9 @@ there.
 | `host.tsv` | each tick | epoch ns, cpu %, mem %, running count, event (`admit <i>`, `end <i>`) |
 | `census.tsv` | each scan | epoch, foreign count or `unknown`, roots as `pid:token`, scan s, spawn us, slot holders as `pid:<i>` or `pid:foreign`, tickets as `<name>:<i>` |
 | `<i>.leg` | leg end | the runner's row: name, status, rc, seconds, started ns, ended ns, key `-`, foreign (`run-gates.sh:3936-3939`), the eighth field as §4 "The turnstile" sets it |
-| `<i>.log` | leg end, and again at run end for a leg that left processes running | the capture, redacted, the only copy kept (F2) |
-| `<i>.json` | leg end, rewritten at run end | the full profile below |
-| `legs.tsv` | leg end | one row per leg, headed, the table source |
+| `<i>.log` | leg end, and again at run end or at an interrupt for a leg that left processes running | the capture, redacted, the only copy kept (F2) |
+| `<i>.json` | leg end, rewritten at run end, and at an interrupt for a leg whose capture it retried | the full profile below |
+| `legs.tsv` | leg end, rewritten whole at run end and at an interrupt | one row per leg, headed, the table source; each row rendered from that leg's final `<i>.json`, in index order (`TOOL-dRedressedBar-22` S9, report id 9) |
 
 **The raw capture is deleted (F2, resolved b).** It holds the same bytes as `<i>.log` unredacted,
 which the runner calls "a credential leak the old scratch-dir lifetime was merely hiding"
@@ -537,6 +555,10 @@ at the root's exit, no leg process still writes the capture, and it is deleted t
 stays until run end, where `<i>.log` is rewritten from it and it is deleted. A delete that fails
 because a process still holds the file keeps it, and the envelope's `raw_kept` names it with its
 reason. An interrupt keeps each running leg's capture the same way, with the reason `interrupted`.
+`TOOL-dRedressedBar-22` has an interrupt also run the run end's retry, `write_final_capture`, over
+each ended leg, so a capture an ended leg's processes still hold is named with a reason opening
+`interrupted; `, and an interrupt names every kept capture (its S2; closing review round 1, report
+ids 2 and 14).
 These are the only deletes the tool performs. They cover a leg end, a run end and an interrupt
 only: an unhandled exception, a kill or a power loss leaves every capture unredacted and unnamed.
 `TOOL-dRedressedBar-19`'s S38 has the next run redact and delete those once it proves their owner
@@ -594,8 +616,9 @@ automatic second source would let one profile raise ceilings unseen.
 
 **Exit:** 0 when every leg ended and every record was written, whatever the legs' verdicts. 2 on a
 refusal before the first leg. 1 when a record write failed, naming it. 130 on an interrupt, which
-writes the envelope, with each running leg's kept capture in `raw_kept`, and leaves the legs running. A console Ctrl-C still reaches them, as it reaches
-a bar's legs.
+writes the envelope, with every kept capture in `raw_kept`, a running leg's and one an ended leg's
+processes still hold, as `TOOL-dRedressedBar-22` has it (report ids 2 and 14), and leaves the legs
+running. A console Ctrl-C still reaches them, as it reaches a bar's legs.
 
 ### The selftest and its leg
 
@@ -623,6 +646,9 @@ itself. The alias halves, AC1 and AC2's resolution red half and AC16's alias hal
 whose PYBIN is an App Execution Alias. On any other host each prints
 `unexercised: no alias on this host` and adds no assertion, so a pass there says nothing about an
 alias. The interpreter verification of S14 and the path arm of AC17 run on every host.
+`TOOL-dRedressedBar-22` has `memio.py` print `memio: wrote <mb> MiB` once its write is synced,
+which the resolution red half reads beside each leg's verdict (its S15; closing review round 1,
+report id 15).
 
 The leg row:
 
@@ -771,6 +797,10 @@ The process-monitor diff is applied as kept, its row-contract arm included.
   launch records the leg as `fail` and the run continues (S35), a turnstile key that does not
   convert is a refused read at every tick (S11), and a half-written beacon or a vanished ticket is
   not judged (S36; units-16-18 report ids 11, 34, 35, 36 and 37).
+  `TOOL-dRedressedBar-22`'s `test_alias_refusals` drives each of the four alias refusals above, the
+  unreadable launcher, the alias that is not PYBIN, the alias whose `sys.executable` is no plain
+  file and the interpreter whose child leaves the test job, which no arm reached before (its S11;
+  closing review round 1, report id 11).
 - observability — The scrubbed set, each substitution, the turnstile key and the record path print
   at start. Each leg
   prints one line as it ends, naming its `ts_wait_s` and `ts_holders` when either is above zero, and
@@ -818,7 +848,9 @@ the run dir the tool prints. Every criterion is a direct run of the tool or a pr
   Red when: the resolution is disabled on node d. A python program rebinds
   `measure_legs.resolve_launcher_aliases` to return no substitution and no probe, and calls
   `measure_legs.main` with the same arguments. Both legs then run the alias, and the difference
-  reads 0, as the first build read it on 2026-10-15.
+  reads 0, as the first build read it on 2026-10-15. `TOOL-dRedressedBar-22` has this half first
+  read `spawn six` and `spawn none` at verdict `ok`, so the 0 is work done outside the job and not
+  legs that never ran (its AC15; closing review round 1, report id 15).
   figure: 6 is the fixture's argument. The twin cancels the wrapper and the interpreter, so the
   expectation is DERIVED. The interpreter paths are PINNED, node d, 2026-10-15.
   fixture: the resolution red half needs a host whose PYBIN is an App Execution Alias, and node d
@@ -830,7 +862,9 @@ the run dir the tool prints. Every criterion is a direct run of the tool or a pr
   Red when: `extract_runner_function` is pointed at a name the runner lacks. The run then refuses
   with exit 2 before the first leg, rather than recording no spawn cost.
   Red when: the resolution is disabled as AC1 disables it. The memio leg then runs the alias, and
-  its `peak_job_mem_b` reads under 200 MiB with `io.write_bytes` 0.
+  its `peak_job_mem_b` reads under 200 MiB with `io.write_bytes` 0. `TOOL-dRedressedBar-22` has
+  this half first read memio's verdict `ok` and the line `memio: wrote 200 MiB` in its `<i>.log`,
+  so the 0 is a write made outside the job (its AC15; closing review round 1, report id 15).
   figure: the first build read 6950912 and 0 on node d, 2026-10-15, PINNED.
   fixture: as AC1's resolution red half.
 - **AC3** — `python -c` imports `tools/process-monitor/census.py`, feeds `parse_cim` one
@@ -848,7 +882,11 @@ the run dir the tool prints. Every criterion is a direct run of the tool or a pr
   80%.
 - **AC5** — `python -c` calls `check_admit` at (cpu, mem, running, fresh) = (81, 50, 1, True),
   (80, 90, 1, True), (50, 91, 1, True), (50, 50, 1, False) and (99, 99, 0, False). It gets hold,
-  admit, hold, hold and admit.
+  admit, hold, hold and admit. `TOOL-dRedressedBar-22` widens the call to
+  `check_admit(mode, pending, running, cpu, mem, fresh)`, these five rows becoming the first five
+  of eight under `concurrent` with `pending` 1, and adds a loop half: over a serial run, each call
+  returning True has `running` 0, one per leg, and none returns True while a leg runs (its AC6;
+  closing review round 1, report id 6).
   Red when: the drained clause is missing, so (99, 99, 0, False) holds.
 - **AC6** — `<ml> --serial --legs <fx>/stall.json --out <o> --census-every 1` with
   `--stall-window 8 --stall-cpu 0.5` runs `stall.sh 20`. Its `stalls` holds one episode whose tree
@@ -1085,6 +1123,27 @@ at the close.
   `:537` and `:752-755` still hold, and so does `:528-536`, because a capture kept for any reason is
   named in `raw_kept` and the deletes it lists stay the only ones. No scope item, design or
   criterion moves.
+- rev-7 · 2026-10-15 · S11 · §3 · §4 · §5 · AC1 AC2 AC5 · a records fix for TOOL-dRedressedBar-22,
+  which closes the round-1 closing diff review's report ids 2, 3, 6, 9, 11, 14 and 15 in the
+  profiler, written by that unit's spec-writer pass `<w22>`. The status stays CLOSED. Unit 18 built
+  against its criteria as written; each corrected paragraph names TOOL-dRedressedBar-22 and the
+  change, and that spec holds the design. Code lines below are at `64e887ae6`. Ids 2 and 14: S11,
+  its by-value Readers, "The record"'s raw-capture paragraph, its `<i>.log` and `<i>.json` rows and
+  the Exit paragraph say an interrupt retries and names a capture an ended leg's processes still
+  hold, so every kept capture is named; the interrupt branch names only `running`'s
+  (`measure_legs.py:1903-1913`) and only the run end retries (`:1923-1927`). Id 9: the record
+  table's `legs.tsv` row reads "leg end, rewritten whole at run end and at an interrupt"; the row is
+  appended once at leg end (`:1831`) while the run end rewrites `<i>.json` (`:1928`). Id 3: "Alias
+  launchers" step 4's child is the base interpreter, where `JOB_CHILD_PROGRAM` spawns
+  `sys.executable` (`:872`). Id 6: "Sampling, admission and its cost" makes `check_admit` the loop's
+  one admit decision, where its drained clause (`:667-668`) sits under a call guarded by `running`
+  (`:1864-1866`) and the drained site tests `pending and not running` itself (`:1872`); AC5 names
+  the widened call shape and its loop half. Id 11: §5's error states say an arm drives each of the
+  four alias refusals (`:898`, `:959`, `:965`, `:974`). Id 15: "The selftest and its leg" names
+  `memio.py`'s line, and AC1 and AC2's resolution red halves read verdicts and that line, which
+  `test_resolution_disabled` reads neither of (`:2360-2385`). §3's Edges gain the hands-off to
+  TOOL-dRedressedBar-22. The spec lines rev-6 cites are as of `9bf1eb443`, and this revision's
+  insertions move them lower still. No other scope item, design or criterion moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-19 — the units-16-18 spec audit's 19 mediums and 22 lows, batched: the profiler's census, path, launch, turnstile, redaction and leg-declaration gaps closed, the receipt sidecar made atomic, and specs 12 and 14 to 18 corrected
 
-**Status:** CLOSED · rev-7 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 14
+**Status:** CLOSED · rev-8 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
@@ -16,6 +16,7 @@
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-6-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-6-revision.md) | research | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-7-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-7-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-6-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-6-revision.md) | research | TOOL-dRedressedBar-21 TOOL-dRedressedBar-18 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-22-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-22-2-revision.md) | research | TOOL-dRedressedBar-22 TOOL-dRedressedBar-18 |
 | [2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md) | diff-review | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-20 |
 
 <!-- /gen:spec-records -->
@@ -423,6 +424,10 @@ record. Items that share a report item share its observation, and each still nam
 - **hands-off** `TOOL-dRedressedBar-21` — the S38 sweep: `derive_abandoned_scratch`,
   `write_recovered_logs`, the `owner.json` write whose `record` key that unit retires, and AC38's
   arm `test_scratch_sweep` (closing review round 1, H1).
+- **hands-off** `TOOL-dRedressedBar-22` — `test_launch_failure`'s second leg, `after`, run behind
+  the failed one with only the third job closed (closing review round 1, report id 10), and the
+  literal fixture list `test_fixtures_withheld` reads and `test_fork_count`'s verdict reads, which
+  that unit's `orphan.sh` and its A/B verdict arm meet.
 
 ## 4. Design
 
@@ -829,7 +834,11 @@ worktree root on node d.
   manifest holding `spawn.py 0 1`. `main` returns 0
   within 60 s. The leg's `.leg` row reads `fail` with rc 1, its `<i>.json` `launch_error` opens
   `launch: AssignProcessToJobObject`, and a fresh `scan_processes()` holds no row with the root's
-  winpid.
+  winpid. `TOOL-dRedressedBar-22` makes the manifest two legs, `launch` running
+  `spawn.py 0 1 <marker>`, then `after` running `spawn.py 0 1`, with the wrapper closing only the
+  third job it makes, the first leg's, and requires `after` to read verdict `ok` with
+  `procs_total` at least 1 and `legs.tsv` to hold two rows, so the run is seen to go on (its S10
+  and AC10; closing review round 1, report id 10).
   Red when: a copy with the terminate taken out leaves the run open at the 60 s bound, with the
   suspended root alive.
   cost: up to a minute.
@@ -1080,6 +1089,15 @@ none
   written for this unit's pass commit. S35 holds as written: it states the four call failures, and
   a refused capture is a fifth cause, which TOOL-dRedressedBar-21 states. No other scope item,
   criterion or the `<w19>` table moves.
+- rev-8 · 2026-10-15 · §3 · AC35 · a records fix for TOOL-dRedressedBar-22, which closes the
+  round-1 closing diff review's report id 10, written by that unit's spec-writer pass `<w22>`. The
+  status stays CLOSED. AC35's one-leg manifest showed a failed launch recorded and `main`
+  returning, and never a leg run after it: at `64e887ae6` `test_launch_failure` runs one leg and
+  its wrapper closes every job from the third on (`measure_legs.py:2701-2742`, `len(made) > 2` at
+  `:2715`). AC35 gains one sentence naming the two-leg manifest, `launch` then `after`, closing only
+  the third job, and requiring `after` to read `ok`; that spec holds the design, and the rest of
+  AC35 stands as written for this unit's pass commit. §3's Edges gain the hands-off to
+  TOOL-dRedressedBar-22. No other scope item, criterion or the `<w19>` table moves.
 
 ## 10. Reuse audit
 
