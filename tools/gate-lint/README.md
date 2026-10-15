@@ -154,6 +154,34 @@ it sets a fixed global, clears it first so a miss never leaves the previous answ
 prints, so a caller writes `f x >/dev/null; v=$_f`. The scanner's header lists what it does NOT
 check — how often a site runs above all, which is what the counter below is for.
 
+### `--temp-names` — a fixed-name temp renamed into place
+
+```bash
+python3 <tool-root>/gate-lint/sh_hygiene.py --temp-names [registry-path] [root] [pathspec ...]
+```
+
+A fourth class. A file written at a temp name anyone can know before the write, then renamed over
+its destination, is a name a process that can write the directory plants a link at first; the write
+goes through the link into whatever it names. A `fixed-temp` site is an `mv` whose source names a
+temp no unpredictable part names: `"$f.tmp"`, `"$x.tmp.$$"`, or a variable assigned one. The mode
+admits three forms: a source holding `$(mktemp`, one holding a `$SRANDOM` expansion, and a variable
+bound by a BINDER — a function of the same file whose body sets `printf -v "$1"` and holds a
+`SRANDOM` expansion or `mktemp`, called as `<binder> <name> <dest>`. A source that is one expansion is
+followed one hop, to the latest binding of its name above it in the innermost function holding the
+line, else the top level; with none, it is UNFOLLOWED, counted and printed, never gated.
+
+The population is the location-probe mode's: tracked `*.sh` files and extensionless shell-shebang
+files under the pathspecs. A comment half and a quoted heredoc's body are never graded. Every run
+prints the scanned count, the `mv` count, the fixed, admitted and unfollowed counts with their file
+counts, each unfollowed source, and every registered row's reason; a failing key lists
+`path:line  <source>` for each site, and a remedy line names the three admitted forms. The registry
+is the loop registry's four fields keyed on the one CLASS, `<path>\tfixed-temp\t<count>\t<reason>`,
+shrink-only with both-directions set equality. The argument is optional with the same three states,
+and an empty population or a failed `git ls-files` refuses with exit 2. What it does NOT check is
+listed on `run_temp_scan`: a temp bound in another scope or passed in, a binder in a sourced library,
+`mv` in a quoted string or under `eval` or across a line continuation, a fixed name written with no
+`mv` at all, and Python inside a shell string.
+
 ## fork-count.sh
 
 ```bash

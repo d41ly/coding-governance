@@ -199,6 +199,21 @@
     "ceiling": 300
   },
   {
+    "name": "shell hygiene (a fixed-name temp renamed into place)",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/sh_hygiene.py",
+      "--temp-names",
+      "memory/project/temp-name-sites.txt",
+      ".",
+      ":!*.test.sh",
+      ":!memory/"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "spawn budget (forks per hot entrypoint)",
     "argv": [
       "bash",

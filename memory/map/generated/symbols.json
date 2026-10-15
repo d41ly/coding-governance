@@ -2793,6 +2793,11 @@
       "file": "tools/run-gates/adopt-run-gates.test.sh"
     },
     {
+      "id": "build_temp_measured",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "build_tempdir",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -5171,6 +5176,11 @@
       "id": "check_target_reads_subject",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "check_temp_source",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "check_time_classes",
@@ -7621,6 +7631,11 @@
       "id": "derive_targets",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
+      "id": "derive_temp_path",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "derive_tick_readings",
@@ -11788,6 +11803,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_temp_populations",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "print_touched_asks",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -14251,6 +14271,11 @@
       "id": "read_task_gone",
       "kind": "function",
       "file": "tools/unattended/resume-tick.test.sh"
+    },
+    {
+      "id": "read_temp_binders",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "read_text",
@@ -19178,6 +19203,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "run_temp_scan",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "run_tick",
       "kind": "function",
       "file": "tools/unattended/resume-tick.sh"
@@ -19931,6 +19961,16 @@
       "id": "scan_substituted",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
+    },
+    {
+      "id": "scan_temp_file",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "scan_temp_tree",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "scan_template_pairs",

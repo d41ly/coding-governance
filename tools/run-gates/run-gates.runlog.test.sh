@@ -1049,11 +1049,12 @@ build_scratch || { echo "FAIL the scratch clone could not be built"; exit 1; }
 # of 20000-byte lines. Tearing through the `printf` builtin's redirection is LIKELY, not certain: on
 # node a it tore 2 of 120 lines at 8000 bytes and 8 of 120 at 20000, and 146 of 3200 at 2000 bytes on
 # a busier host, while `cat` tore none at any size; 180 lines makes a red near-certain. AC3: two
-# stampers, each its own PROCESS as two bars are (a subshell keeps its parent's `$$`), stage under two
-# different names, and after both stamp concurrently the shared file is one whole stamp with no
-# staging file left.
+# stampers, each its own PROCESS as two bars are, stage under two different names, and after both
+# stamp concurrently the shared file is one whole stamp with no staging file left. The statement is
+# found by its `derive_temp_path` call and runs with the runner's helper line prepended, and the
+# helper run in two processes names two different temps (TOOL-dRedressedBar-24 S8).
 check_two_writers() {
-  local t rl sg sfx w i line pad dir p1 p2 a b
+  local t rl sg hp w i line pad dir p1 p2 a b
   t=$(mktemp -d) || { check "TWO scratch" no yes; return; }
   rl=$(grep -F '"$dir/gates.log"; } 2>/dev/null && return 0' "$HERE/run-gates.sh" | sed 's/ && return 0$//; s/^ *\[ -n "\$dir" \] && //')
   check "TWO the runner's run-log append statement is found" "$([ -n "$rl" ] && echo found)" found
@@ -1062,12 +1063,17 @@ check_two_writers() {
   wait
   check "TWO 180 concurrent 20000-byte run-log lines landed whole" \
     "$(awk -F'\t' 'NF == 3 && length($3) == 20004 { c++ } END { print c + 0 }' "$t/gates.log" 2>/dev/null)" 180
-  # The stamp statement runs from its `cp` line to the first line that does not continue.
-  sg=$(sed -n '/cp "\$gd\/gate-full-green" "\$_gcd_abs\/gate-full-green\.shared\.tmp/,/[^\\]$/p' "$HERE/run-gates.sh" | sed 's/^ *//; s/\\$//' | tr '\n' ' ')
-  check "TWO the runner's shared-green stamp statement is found" "$([ -n "$sg" ] && echo found)" found
-  sfx=$(printf '%s' "$sg" | sed -n 's/^cp "[^"]*" "[^"]*gate-full-green\.shared\.tmp\([^"]*\)".*/\1/p')
-  p1=$(bash -c "echo stage$sfx"); p2=$(bash -c "echo stage$sfx")
-  check "TWO two stamping processes stage under two different names" "$([ "$p1" != "$p2" ] && echo distinct)" distinct
+  # The stamp statement runs from its helper call to the first line that does not continue, and runs
+  # with the helper's own one-line definition ahead of it.
+  hp=$(sed -n '/^derive_temp_path()/p' "$HERE/run-gates.sh")
+  sg=$(sed -n '/derive_temp_path _tp "\$_gcd_abs\/gate-full-green\.shared"/,/[^\\]$/p' "$HERE/run-gates.sh" | sed 's/^ *//; s/\\$//' | tr '\n' ' ')
+  check "TWO the runner's shared-green stamp statement is found" "$([ -n "$hp" ] && [ -n "$sg" ] && echo found)" found
+  sg="$hp
+$sg"
+  p1=$(bash -c "$hp"'
+derive_temp_path _tp stage && printf %s "$_tp"'); p2=$(bash -c "$hp"'
+derive_temp_path _tp stage && printf %s "$_tp"')
+  check "TWO two stamping processes stage under two different names" "$([ -n "$p1" ] && [ "$p1" != "$p2" ] && echo distinct)" distinct
   export _gcd_abs=$t/common; mkdir -p "$_gcd_abs" "$t/gA" "$t/gB"
   printf 'stamp A\n' > "$t/gA/gate-full-green"; printf 'stamp B\n' > "$t/gB/gate-full-green"
   ( export gd=$t/gA; for i in $(seq 1 25); do bash -c "$sg"; done ) &
@@ -1076,7 +1082,7 @@ check_two_writers() {
   a=$(cat "$_gcd_abs/gate-full-green.shared" 2>/dev/null)
   check "TWO after two concurrent stampers the shared green is one whole stamp" \
     "$(case "$a" in 'stamp A'|'stamp B') echo whole ;; *) echo "torn:$a" ;; esac)" whole
-  b=$(ls "$_gcd_abs" | grep -c 'gate-full-green.shared.tmp')
+  b=$(ls "$_gcd_abs" | grep -c '^gate-full-green\.shared\..*\.tmp$')
   check "TWO no staging file is left behind" "$b" 0
   unset _gcd_abs
   rm -rf "$t"

@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-24 — the runner scripts' fixed-name temp writers take unpredictable temps, and a shell-hygiene mode reds a new one
 
-**Status:** SPECCED · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 18
+**Status:** INPROGRESS · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 18
 
 <!-- gen:spec-records -->
 

@@ -143,7 +143,7 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 24 unit(s) · node d · opened 2026-10-13 · streams tooling
+**Build status:** INPROGRESS · 24 unit(s) · node d · opened 2026-10-13 · streams tooling
 ids TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13
 ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 TOOL-dRedressedBar-24
 
@@ -173,7 +173,7 @@ ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedr
 | [TOOL-dRedressedBar-21 — the profiler trusts no path a temp dir supplies: a dead run's logs land in this run's record, no capture is opened, read or deleted through a link, and run-gates' Python temp files take unpredictable names](spec/2026-10-15-spec-TOOL-dRedressedBar-21.md) | 15 | 2 | CLOSED | rev-2 | 2026-10-15 |
 | [TOOL-dRedressedBar-22 — the closing review's profiler findings, batched: an interrupt names every kept capture, the probe spawns the base interpreter, and each faulted arm proves its work](spec/2026-10-15-spec-TOOL-dRedressedBar-22.md) | 16 | 2 | CLOSED | rev-1 | 2026-10-15 |
 | [TOOL-dRedressedBar-23 — the closing review's govkit findings M3, M4, M6 and L4: a narrower apply keeps a carried kit's orders and order-file legs, target spawns decode stderr through one helper, a leg guard widens, and a routing arm grades each member](spec/2026-10-15-spec-TOOL-dRedressedBar-23.md) | 17 | 2 | CLOSED | rev-1 | 2026-10-15 |
-| [TOOL-dRedressedBar-24 — the runner scripts' fixed-name temp writers take unpredictable temps, and a shell-hygiene mode reds a new one](spec/2026-10-15-spec-TOOL-dRedressedBar-24.md) | 18 | 2 | SPECCED | rev-1 | 2026-10-15 |
+| [TOOL-dRedressedBar-24 — the runner scripts' fixed-name temp writers take unpredictable temps, and a shell-hygiene mode reds a new one](spec/2026-10-15-spec-TOOL-dRedressedBar-24.md) | 18 | 2 | INPROGRESS | rev-1 | 2026-10-15 |
 <!-- /gen:build-units -->
 
 Records: 98 bound to this build, across 4 record folder(s).

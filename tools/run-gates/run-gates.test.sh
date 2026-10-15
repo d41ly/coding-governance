@@ -139,7 +139,8 @@ fail=0
 # 326 -> 339, TOOL-aPairedSlots-15: section 11s's nine checks (TOOL-aPairedSlots-1), which left this
 # floor where it was, and its four ceiling checks, counted off the arm.
 # 388 + 339 -> 401, TOOL-aSparedSpawn-34, the merge of local main: base 326, plus 62 and 13.
-FLOOR_ASSERTIONS=401
+# 401 -> 405, TOOL-dRedressedBar-24 S9: arm 9e2's four, outside the `HAVE_TIMEOUT` gate, counted off the arm.
+FLOOR_ASSERTIONS=405
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -3151,6 +3152,25 @@ wait "$_hvroot" 2>/dev/null
 check_hv_value "AC11 the same reap rooted at a LIVE pid reaches it" "$(kill -0 "$_hvgc" 2>/dev/null && echo alive || echo dead)" dead
 [ -n "$_hvgc" ] && kill -9 "$_hvgc" 2>/dev/null
 
+# 9e2. TOOL-dRedressedBar-24 S9 — A LINK PLANTED IN THE SCRATCH DIR IS NEVER WRITTEN THROUGH. The bar's
+#      scratch dir sits in the shared temp dir, and its leg derives it from the TMPDIR the runner hands
+#      it. The leg hard-links the two names a runner that staged its writes at fixed names there would
+#      write through, leg 0's rc temp and the ledger's merge, to a secret outside the repository, and
+#      writes a marker naming both. A runner that stages at an unpredictable name leaves the secret's
+#      bytes alone, exits 0, and the ledger carries the leg's row. The marker says the plants were made.
+H9e2="$HV/r9e2"; build_hv_repo "$H9e2"
+printf 'SECRET-TOKEN=abc123\n' > "$HV/secret9e2"; cp "$HV/secret9e2" "$HV/secret9e2.keep"
+printf '#!/usr/bin/env bash\nw=${TMPDIR%%/tmp}\nln "$HV_SECRET" "$w/0.rc.tmp" && ln "$HV_SECRET" "$w/ledger.merged" && printf "%%s\\n" "$w/0.rc.tmp" "$w/ledger.merged" > "$HV_MARK"\nexit 0\n' > "$H9e2/fx/plant.sh"
+printf '[{"name": "plant", "argv": ["bash", "fx/plant.sh"]}]\n' > "$HV/plant.json"
+( cd "$H9e2" && git add -A && git commit -qm plant ) >/dev/null 2>&1
+rm -f "$HV/mark9e2"
+run_hv_bar "$H9e2" "$HV/plant.json" HV_SECRET="$HV/secret9e2" HV_MARK="$HV/mark9e2"
+check_hv_value "S9 the leg planted both links and named them" "$(grep -c . "$HV/mark9e2" 2>/dev/null)" 2
+check_hv_value "S9 the secret the links share still holds its bytes" "$(cmp -s "$HV/secret9e2" "$HV/secret9e2.keep" && echo same)" same
+check_hv_value "S9 the bar over the planted links exits 0" "$HV_RC" 0
+check_hv_value "S9 the ledger carries the leg's row" \
+  "$(awk -F'\t' '$1 == "plant" { c++ } END { print c + 0 }' "$H9e2/.git/gate-ledger.tsv" 2>/dev/null)" 1
+
 if [ "$HAVE_TIMEOUT" = 1 ]; then
   # 9f. AC1 and AC2 — A LEG THAT TIMES OUT ONLY BESIDE A SPINNER. The contended leg waits for the
   #     spinner to start, hangs while its flag stands, and passes once the spinner has finished, so
@@ -3233,11 +3253,15 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   run_hv_bar "$H4W" "$HV/lone.json" GATE_SPAWN_FLOOR="$HV/floor-dir" GATE_SPAWN_CMD="bash $HV/slow50.sh"
   check_hv_line "AC4 a directory at the floor path is announced unreadable" '^run-gates: the spawn floor at .*floor-dir cannot be read, so it is treated as absent'
   check_hv_line "AC4 and a double timeout under it reads no HOST" '^GATE FAIL  lone  \(timed out after 1s, again on its serial retry; the spawn floor could not be read, so HOST was not measured\)$'
-  # ...and a temp path staged as a DIRECTORY fails the write, announced, the held line untouched.
-  printf '9999.000\t2026-01-01T00:00:00Z\n' > "$HV/held"; cp "$HV/held" "$HV/held.keep"; mkdir -p "$HV/held.tmp"
-  run_hv_bar "$H4W" "$HV/bounded.json" GATE_SPAWN_FLOOR="$HV/held"
+  # ...and a floor whose NAME is 250 characters fails the write, announced, the held line untouched.
+  #    The file exists, and every temp the runner names beside it is at least 257 characters, past
+  #    the 255 a name component may hold; the temp's name is unpredictable, so no plant can stage
+  #    the failure at it (TOOL-dRedressedBar-24).
+  printf -v _hvlong '%*s' 246 ''; _hvlong="$HV/${_hvlong// /h}held"
+  printf '9999.000\t2026-01-01T00:00:00Z\n' > "$_hvlong"; cp "$_hvlong" "$HV/held.keep"
+  run_hv_bar "$H4W" "$HV/bounded.json" GATE_SPAWN_FLOOR="$_hvlong"
   check_hv_line "AC4 an unwritable floor is announced" '^run-gates: the spawn floor at .*held could not be written, so the floor it held stays in force$'
-  check_hv_value "AC4 and the line it held survives byte-identical" "$(cmp -s "$HV/held" "$HV/held.keep" && echo same)" same
+  check_hv_value "AC4 and the line it held survives byte-identical" "$(cmp -s "$_hvlong" "$HV/held.keep" && echo same)" same
 
   # 9i. AC10 — THE EXIT PRECEDENCE. The only failed leg is HOST while another leg moves a tracked
   #     file: exit 4, the HOST line naming the move. With a third leg failing an assertion: exit 1,

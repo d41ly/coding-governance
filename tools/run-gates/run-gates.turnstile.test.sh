@@ -161,7 +161,8 @@ bad=0
 # assertions, every one unconditional or counted on both branches, counted off the blocks.
 # Raised from 101 to 144 by TOOL-aPairedSlots-15: the 33 of arms 29-43 (TOOL-aPairedSlots-2 to -5),
 # which left this floor where it was, and the 10 of arms 44-48, counted off the blocks.
-FLOOR_ASSERTIONS=144
+# Raised from 144 to 145 by TOOL-dRedressedBar-24 S8: arm R6's heartbeat check, unconditional.
+FLOOR_ASSERTIONS=145
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -368,7 +369,7 @@ fi
 #
 # THE TTL IS MEASURED, NOT TYPED (TOOL-aSparedSpawn-15 S3). A TTL is a time by definition, so this is
 # the one arm where a clock stays; what it stops being is a guess. Before the runs, the SHIPPED
-# `ts_tick_start`, with the one helper it calls, is sourced from the runner and run for ten ticks
+# `ts_tick_start`, with `ts_alive` and `derive_temp_path`, is sourced from the runner and run for ten ticks
 # against a scratch beacon, with a `sleep` stub first on its PATH: one spawn in place of the real
 # sleep's one, returning at once, so the ten bodies cost the spawns a real tick pays and nothing
 # waits a second. The stub counts its calls in a file and, on the eleventh, stamps the end and
@@ -379,7 +380,7 @@ fi
 # reaps. A tick body that grows a spawn (a `cat` or a `date` put back) raises the printed period,
 # and a period that cannot be read is a FAIL, never a typed fallback.
 tk6=$tmp/tick6; mkdir -p "$tk6/b" "$tk6/bin"; printf '%s' tick > "$tk6/b/nonce"
-sed -n '/^ts_alive()/p;/^ts_tick_start() {/,/^}$/p' "$HERE/run-gates.sh" > "$tk6/fn.sh"
+sed -n '/^ts_alive()/p;/^derive_temp_path()/p;/^ts_tick_start() {/,/^}$/p' "$HERE/run-gates.sh" > "$tk6/fn.sh"
 printf '%s\n' '#!/bin/bash' \
   'd=${0%/bin/sleep}; k=0; { read -r k < "$d/count"; } 2>/dev/null; k=$((k + 1)); printf "%s\n" "$k" > "$d/count"' \
   '[ "$k" -le 10 ] || { printf "%s\n" "${EPOCHREALTIME//[.,]/}" > "$d/end"; printf x > "$d/b/nonce"; }' > "$tk6/bin/sleep"
@@ -406,6 +407,13 @@ else
   ttl6=6; long6=14
   nope "R6 printed no measured period: the shipped ts_tick_start did not extract or did not tick ten times, so the TTL below is a typed guess"
 fi
+# THE TICKS WROTE (TOOL-dRedressedBar-24 S8). The ticker names its heartbeat temp through
+# `derive_temp_path`, so an extraction that drops the helper still ticks ten times and writes nothing.
+hb6=""; { IFS= read -r hb6 < "$tk6/b/heartbeat"; } 2>/dev/null
+case "$hb6" in
+  ''|*[!0-9]*) nope "R6 the shipped ticker left no number in heartbeat after its ticks (read '$hb6')" ;;
+  *) ok "R6 the shipped ticker wrote a number into heartbeat on its ticks" ;;
+esac
 rm -rf "$tk6"
 R6=$tmp/ceiling; mk_repo "$R6"; B6=$(beacon "$R6")
 legs "$R6" '[ {"name": "long", "argv": ["bash", "fx/long.sh"]} ]'

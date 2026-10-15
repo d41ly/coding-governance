@@ -14,6 +14,7 @@ gate-legs = [
   "encoding posture (text IO names its encoding)",
   "shell hygiene (a location probe asked from a moved directory)",
   "shell hygiene (a fork spent on builtin work)",
+  "shell hygiene (a fixed-name temp renamed into place)",
   "spawn budget (forks per hot entrypoint)",
 ]
 kits = ["gate-lint"]
@@ -200,6 +201,12 @@ that must land green over a non-compliant population without keying on a line nu
   row's reason; a BANNED site prints its path, line and remedy.
 - `memory/project/spawn-idiom-sites.txt` — the carried spawn-idiom sites, per (path, class). Lower a
   count in the commit that converts a site.
+- `python tools/gate-lint/sh_hygiene.py --temp-names [registry] [root] [pathspec ...]` — the temp-name
+  lint: an `mv` whose source names a temp anyone can know before the write. It prints the `mv`,
+  fixed, admitted and unfollowed counts, each unfollowed source and every registered row's reason;
+  a failing key lists each site's path, line and source, and the remedy names the three admitted forms.
+- `memory/project/temp-name-sites.txt` — the carried fixed-temp sites, per path. Lower a count or
+  delete a row in the commit that fixes a site.
 - `bash tools/gate-lint/fork-count.sh memory/project/fork-ceilings.txt . [--only <id>]` — forks per
   hot entrypoint against its ceiling; `--selftest` proves the calibration holds and that a moved
   declaration refuses. A red prints the delta and the top ten `file:line` contributors.
