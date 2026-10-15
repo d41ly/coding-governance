@@ -833,6 +833,13 @@ The fold's closing review, dispatch 47, derived from its Workflow run the same w
   `route-names-an-output-its-actor-never-emits`, `owner-item-without-its-reject-outcome` and
   `parser-drops-rows-it-cannot-place`.
 
+- 2026-10-16, session 1799cb98: the owner answered LR-7 and the follow-up round:
+  - LR-7: "Widen the mechanical forms (Recommended)";
+  - the follow-up round: "Light follow-up round (Recommended)".
+
+  Memory `[asks]` now gives every core ask kind its own mechanical acceptance, and flow-steps cites it.
+  A light follow-up review runs over the closing review's fixes before the Knowledge layer opens.
+
 ## Instruments
 
 ### The gap-ownership join

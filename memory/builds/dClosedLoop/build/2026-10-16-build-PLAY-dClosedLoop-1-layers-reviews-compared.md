@@ -252,6 +252,7 @@ The owner took the recommended option on LR-1, LR-2, LR-5 and LR-6, and another 
 | LR-4 | Presets need the expansion | `policy.on-missing-expansion` | `refuse` | `fallback-reported` |
 | LR-5 | Mechanical, else stated | none: `asks.acceptance` stands, and an acceptance gains a definition | — | — |
 | LR-6 | Proposed with the build | none: the choice is structural | — | — |
+| LR-7, asked after the closing review | Widen the mechanical forms | none: the forms are a definition | — | — |
 
 What each answer changes, applied by the fold:
 - **LR-1:** foundations C6 is amended. A principle's check may soften by policy to `warn` or `record`.
@@ -276,6 +277,10 @@ What each answer changes, applied by the fold:
   `accept` line, and the ask's closing must cite it. Refusal stays the default. dTotalRecall extends
   backlog.py's V14 and its `ASK_CUTOFF`, which already refuse an ask without one. F4-6's "as today" is
   corrected.
+- **LR-7,** asked after the fold's closing review (`[closing-review]`, M6): every core ask kind gets
+  its own mechanical acceptance in memory `[asks]`: a deferral, a lander refusal, a carried commit, an
+  adapter fault, a held flaky leg and a finding filed below `review.findings`' threshold, beside
+  LR-5's four. flow-steps cites the set rather than copying it.
 - **LR-6:** the builder proposes the reuse entry through the instruction command. The build's
   `gov:feature` check counts a proposed entry. The owner's disposition of it is an owner item, and the
   entry renders into work orders once accepted. The record kind list drops the reuse entry, so its one
@@ -315,7 +320,7 @@ confirmed, in 24 items. Ids 13, 14 and 27 were refuted. Each item went here:
 | M3 | 5 | fixed | the landing gate stands before `deploy.mandate`, in all three places | `two-answers-to-one-question` |
 | M4 | 6 | fixed | `[breakpoint]`: held or resolved as `run.on-owner-question` says; v2's dBoundRoles row | `amendment-leaves-its-other-half-standing` |
 | M5 | 7 | fixed | `[rules]`: one mailbox rule, cited by `deploy.release` and `life.release`; v2's `[open]` | `two-answers-to-one-question` |
-| M6 | 9, 21 | fork | LR-7, put to the owner: which acceptance the core asks that fit no mechanical form state | none yet |
+| M6 | 9, 21 | fork, fixed | LR-7, answered: memory `[asks]` widens the mechanical forms to every core ask kind | `route-names-an-output-its-actor-never-emits` |
 | M7 | 11 | fixed | memory `[contract]`: a lock at each mint point, the slug claim, then the build's lease | `invariant-held-on-one-admission-path` |
 | M8 | 12 | fixed | memory `[decisions]` 1 and `[annotations]`: the owner item's three dispositions | `owner-item-without-its-reject-outcome`, new |
 | M9 | 18 | fixed | with H2: `deploy.core` starts the bar where the lander started none | `route-names-an-output-its-actor-never-emits` |

@@ -236,7 +236,8 @@ folded layer by layer, each layer record's `[revised]` naming where every defect
     `run.on-owner-question` says, and Test's verdict is runner-written in the contracts and
     dWitnessedBar's row;
   - the close program keeps every mailbox message before pruning the ref;
-  - `gap-flow-15` gains the join between items' routes and the transition table.
+  - `gap-flow-15` gains the join between items' routes and the transition table;
+  - after LR-7, dTotalRecall's acceptance forms cover every core ask kind.
 - **The memory layer** (layer-memory's `[revised]`):
   - `record` is idempotent, content-addressed and minted under the build's lease, and each layer
     registers its own record kinds;

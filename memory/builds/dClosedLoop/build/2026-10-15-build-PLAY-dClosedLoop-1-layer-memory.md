@@ -444,9 +444,17 @@ across builds. v2's `[layers]` carries it.
   - a red: a later green of the same leg;
   - an unverified finding: a review round that rules on it;
   - a stray: the path claimed or reverted;
-  - a repair: the producer's record corrected.
+  - a repair: the producer's record corrected;
+  - a deferral: triage selects or retires it;
+  - a lander refusal: `--prepare` next succeeds for the build;
+  - a carried commit: its build claims it;
+  - an adapter fault: the adapter's next run passes;
+  - a held flaky leg: `verdict.held` releases it;
+  - a confirmed finding filed below `review.findings`' threshold: its unit is built, or a review round
+    rules it out.
 
-  Every other filer, whether the owner, a surfaced idea, an expansion or the supervisor on a role's
+  These are the core filers' whole set (LR-7). An item that files an ask names its form, and a new core
+  ask kind adds its form here first. Every other filer, whether the owner, a surfaced idea, an expansion or the supervisor on a role's
   behalf, states an `accept` line, and the ask's closing must cite it. Filing without either is
   refused. backlog.py's V14 already refuses an ask filed since `ASK_CUTOFF` without `accept` or a
   `seen … run` (owner ruling D12-d), so dTotalRecall extends V14 rather than building a refusal.
@@ -1018,7 +1026,7 @@ and its map's `disposition` cells point here. Each defect's fix sits in place, i
 | `grammar-change-existing-ids` | amend | `[names]`: a changed grammar binds new mints only |
 | `slug-style-unenforceable` | amend | `[names]`: the style is the minting source |
 | `v14-refusal-exists` | amend | `[current]` and `[asks]`: V14 is the seam; F4-6's premise corrected |
-| `ask-filer-coverage` | fork, amend | LR-5; `[asks]`: every other filer states an `accept` line |
+| `ask-filer-coverage` | fork, amend | LR-5 and LR-7; `[asks]`: a form for every core ask kind, and an `accept` line for every other filer |
 | `refused-ask-fate` | amend | `[asks]`: a refused ask returns to its filer |
 | `decisions-layer-placement` | amend | `[contract]`'s refinement covers major decisions; v2's `[layers]` |
 | `decisions-readers-unnamed` | amend | `[decisions]` 2: the log keeps its path, and its carriers are re-pointed |
