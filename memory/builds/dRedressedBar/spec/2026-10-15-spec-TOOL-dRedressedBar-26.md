@@ -8,6 +8,8 @@
 |---|---|---|
 | [2026-10-15-prompt-TOOL-dRedressedBar-25-brief.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-25-brief.md) | research | TOOL-dRedressedBar-25 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-26-1-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-26-1-spec-writer.md) | journal | — |
+| [2026-10-15-prompt-TOOL-dRedressedBar-26-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-26-2-revision.md) | research | TOOL-dRedressedBar-24 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-26-3-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-26-3-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

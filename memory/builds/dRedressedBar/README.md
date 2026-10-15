@@ -182,12 +182,12 @@ ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedr
 | [TOOL-dRedressedBar-21 — the profiler trusts no path a temp dir supplies: a dead run's logs land in this run's record, no capture is opened, read or deleted through a link, and run-gates' Python temp files take unpredictable names](spec/2026-10-15-spec-TOOL-dRedressedBar-21.md) | 15 | 2 | CLOSED | rev-3 | 2026-10-15 |
 | [TOOL-dRedressedBar-22 — the closing review's profiler findings, batched: an interrupt names every kept capture, the probe spawns the base interpreter, and each faulted arm proves its work](spec/2026-10-15-spec-TOOL-dRedressedBar-22.md) | 16 | 2 | CLOSED | rev-2 | 2026-10-15 |
 | [TOOL-dRedressedBar-23 — the closing review's govkit findings M3, M4, M6 and L4: a narrower apply keeps a carried kit's orders and order-file legs, target spawns decode stderr through one helper, a leg guard widens, and a routing arm grades each member](spec/2026-10-15-spec-TOOL-dRedressedBar-23.md) | 17 | 2 | CLOSED | rev-1 | 2026-10-15 |
-| [TOOL-dRedressedBar-24 — the runner scripts' fixed-name temp writers take unpredictable temps, and a shell-hygiene mode reds a new one](spec/2026-10-15-spec-TOOL-dRedressedBar-24.md) | 18 | 2 | CLOSED | rev-1 | 2026-10-15 |
+| [TOOL-dRedressedBar-24 — the runner scripts' fixed-name temp writers take unpredictable temps, and a shell-hygiene mode reds a new one](spec/2026-10-15-spec-TOOL-dRedressedBar-24.md) | 18 | 2 | CLOSED | rev-2 | 2026-10-15 |
 | [TOOL-dRedressedBar-25 — the round-2 review's profiler findings, batched: the A/B verdict gate grades the condition, the selftest's guard covers its kit dir, and AC9's orphan is waited on](spec/2026-10-15-spec-TOOL-dRedressedBar-25.md) | 19 | 2 | CLOSED | rev-1 | 2026-10-15 |
 | [TOOL-dRedressedBar-26 — the round-2 temp-name findings, batched: every command-word `mv` is read, no positional or two-hop source reds, no bare `SRANDOM` is admitted, and the cache writer and leftover check hold on every runtime](spec/2026-10-15-spec-TOOL-dRedressedBar-26.md) | 20 | 2 | SPECCED | rev-1 | 2026-10-15 |
 <!-- /gen:build-units -->
 
-Records: 106 bound to this build, across 4 record folder(s).
+Records: 108 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

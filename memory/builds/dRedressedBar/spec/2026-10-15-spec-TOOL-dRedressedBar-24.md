@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-24 — the runner scripts' fixed-name temp writers take unpredictable temps, and a shell-hygiene mode reds a new one
 
-**Status:** CLOSED · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 18
+**Status:** CLOSED · rev-2 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-15-build-TOOL-dRedressedBar-24-1-acceptance-ledger.md](../build/2026-10-15-build-TOOL-dRedressedBar-24-1-acceptance-ledger.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-24-1-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-24-1-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-24-brief.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-24-brief.md) | research | TOOL-dRedressedBar-21 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-26-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-26-2-revision.md) | research | TOOL-dRedressedBar-26 |
 | [2026-10-15-review-TOOL-dRedressedBar-21-24-diff-review-round2.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-21-24-diff-review-round2.md) | diff-review | TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 |
 
 <!-- /gen:spec-records -->
@@ -68,7 +69,9 @@ a shared block, and this unit registers it rather than fixing it (§3).
   imports `tempfile`, opens each entry's temp with `tempfile.mkstemp(dir=d, prefix=key + ".",
   suffix=".tmp")`, writes it through `os.fdopen(fd, "w", encoding="utf-8", newline="\n")`, and calls
   `os.replace`. An `OSError` after the temp exists deletes the temp, and the entry is skipped as now.
-  Observed by AC6.
+  `TOOL-dRedressedBar-26` runs the program under `-I`, as `"$PYBIN" -I -c '`, so a top-level
+  `tempfile.py` in `$ROOT`, its cwd, no longer shadows the standard module (closing review round 2,
+  report id 8). Observed by AC6.
   - **Readers:** S3 retires the temp name `<key>.tmp.<pid>`.
     by name: `tools/run-gates/run-gates.sh`, the one file that spells it (`:5472`).
     by value: NO VALUE READERS — no code opens the temp by name. The cache reader reads
@@ -114,7 +117,10 @@ a shared block, and this unit registers it rather than fixing it (§3).
   characters, past the 255 a name component may hold. TWO in `run-gates.runlog.test.sh` finds the
   statement by its `derive_temp_path _tp "$_gcd_abs/gate-full-green.shared"` call, runs it with the
   helper's line prepended, and checks distinct staging names by running the helper in two processes.
-  It counts leftovers as names matching `gate-full-green.shared.*.tmp`. R6 in
+  It counted leftovers as names matching `gate-full-green.shared.*.tmp`, the `SRANDOM` spelling
+  alone. `TOOL-dRedressedBar-26` has it count every `gate-full-green.shared.` staging name, plant one
+  name of each spelling the helper writes, and run a second pass on the helper's `mktemp` branch
+  (closing review round 2, report id 19). R6 in
   `run-gates.turnstile.test.sh` adds `/^derive_temp_path()/p` to its `sed`. It gains one check that
   `heartbeat` holds a number after the ticks, so an extraction that drops the helper reds, and its
   `FLOOR_ASSERTIONS` (`:164`) rises from 144 to 145. Observed by AC5 and AC9.
@@ -180,6 +186,9 @@ a shared block, and this unit registers it rather than fixing it (§3).
   dirs (§3), for the owner to promote as a unit or record.
 - **hands-off** external — the registered sites: the `health_log_sh` trim, ask `TOOL-aPairedSlots-10`,
   and the 15 sites in other kits, each drained by deleting its registry row in the commit that fixes it.
+- **hands-off** `TOOL-dRedressedBar-26` — the round-2 temp-name findings against this unit's
+  `--temp-names` predicate, its selftest rows, the reuse-cache writer and the TWO arm: report ids 22,
+  6, 7, 10, 21, 8 and 19, closed there, with the not-checked list as `TEMP_BOUNDARY`.
 
 ## 4. Design
 
@@ -281,27 +290,33 @@ and extensionless shell-shebang files under the pathspecs. Each file is read thr
 
 | Step | Rule |
 |---|---|
-| an `mv` | the word `mv` in a code half, at the start or after `;`, `&&`, `\|\|`, `\|`, `{`, `(` or `!`, or after the word `then`, `do` or `else` |
+| an `mv` | the word `mv` in a code half, at a segment's start or after `;`, `&`, `\|`, `{`, `(` or `!`, once a run of lead words is skipped: an opener or `!`, a keyword `if`, `then`, `else`, `elif`, `do`, `while` or `until`, a prefix `command`, `builtin` or `exec`, or an assignment word `NAME=value`. `TOOL-dRedressedBar-26` widened the lead run from the words `then`, `do` and `else`, and reads the keywords from the one list TEMP_LEAD reads (closing review round 2, report ids 22 and 6) |
 | its source | the first word after `mv` that does not open with `-` |
 | scope | the innermost function whose span holds the line, by `FUNCTION_DEF` (`:628`) and its closing brace, as `read_function_bodies` finds them; else the top level |
-| a binder | a function in the same file whose body holds `printf -v "$1"`; it admits when the body also holds a `SRANDOM` expansion or `mktemp`, and is fixed otherwise |
+| a binder | a function in the same file whose body holds `printf -v "$1"`; it admits when the body holds `mktemp` and, wherever it expands `SRANDOM`, also holds the test `${SRANDOM:-`, the shape of `derive_temp_path`, and is fixed otherwise. `TOOL-dRedressedBar-26` stopped a `SRANDOM` expansion alone admitting it, since that name is fixed on a bash before 5.1 (closing review round 2, report id 10) |
 | the scope's table | in line order, each `;`, `&&` or `\|\|` segment: an `ASSIGNMENT` (`:146`) binds its name to its value, and `<binder> <name>` binds the name to that binder |
-| follow | a source that is exactly one expansion, `"$n"`, `"${n}"` or `$n`, takes the latest binding of `n` in its scope; with none it is `unfollowed`, counted and printed, never gated |
-| verdict | a binder binding takes the binder's verdict; a word or value holding `$(mktemp` or a `SRANDOM` expansion is admitted; anything else is a `fixed-temp` site |
+| follow | a source that is exactly one expansion, `"$n"`, `"${n}"` or `$n`, takes the latest binding of `n` in its scope; with none it is `unfollowed`, counted and printed, never gated. `TOOL-dRedressedBar-26` makes a source that is one positional parameter, `$1`, `${1}`, `$@` or `$*`, and a binding whose value is itself one expansion or one positional parameter, `unfollowed` too (closing review round 2, report ids 7 and 21) |
+| verdict | a binder binding takes the binder's verdict; a word or value holding `$(mktemp` is admitted; anything else is a `fixed-temp` site. `TOOL-dRedressedBar-26` admits `$(mktemp` alone, where a `SRANDOM` expansion was admitted too (closing review round 2, report id 10) |
 
 The registry is `read_registry`'s grammar (`:384`), `<path>\tfixed-temp\t<count>\t<reason>`, with the
 key shape `\Afixed-temp\Z`. `resolve_declaration` (`:421`) and `check_registry` (`:444`) give it
 the optional argument's three states and set equality with counts. Every run prints the scanned
 count, the `mv` count, and the fixed, admitted and unfollowed counts with their files. It prints
 each registered row's reason, and lists `path:line  <source>` for each site of a failing key. The
-remedy line names the three admitted forms. An empty population, a failed `git ls-files` and a
+remedy line names the admitted forms. `TOOL-dRedressedBar-26` cuts them from three to two, a
+`t=$(mktemp -u "$dest.XXXXXXXX")` temp and a binder of `derive_temp_path`'s shape, spelling its
+`${SRANDOM:-}` test and its `mktemp` fallback, since a bare `SRANDOM` name is no longer admitted
+(closing review round 2, report id 10). An empty population, a failed `git ls-files` and a
 supplied registry that does not resolve each exit 2.
 
 What it does not check, written into `run_temp_scan`'s docstring: a temp passed in as an argument
 or bound in another scope (unfollowed); a binder in a sourced library; `mv` inside a quoted string,
 under `eval` or split across a line continuation; a temp admitted by `$(mktemp)` in another
 directory, whose `mv` is a copy and not a rename; a fixed name written without a `mv`, which is
-§3's wider class; and Python inside a shell string.
+§3's wider class; and Python inside a shell string. `TOOL-dRedressedBar-26` makes that list one
+table, `TEMP_BOUNDARY` in `sh_hygiene.py`, each row a label, a shell example and the class it lands
+in, which the docstring and the README name and the selftest runs, and it names the mode's one known
+false red (closing review round 2, report id 21).
 
 | Selftest arm | Fixture | Expected |
 |---|---|---|
@@ -309,7 +324,7 @@ directory, whose `mv` is a copy and not a rename; a fixed name written without a
 | pid suffix | `mv "$x.tmp.$$" "$x"` | a site |
 | one hop | `t="$WORK/owner.tmp"` then `mv -f "$t" "$WORK/owner"` | a site |
 | `mktemp -u` | `t=$(mktemp -u "$f.XXXXXXXX")` then `mv -f "$t" "$f"` | admitted |
-| `SRANDOM` | `t="$f.$SRANDOM$SRANDOM.tmp"` then `mv -f "$t" "$f"` | admitted |
+| `SRANDOM` | `t="$f.$SRANDOM$SRANDOM.tmp"` then `mv -f "$t" "$f"` | a site on line 2, since `TOOL-dRedressedBar-26`: a bare `SRANDOM` name is fixed on a bash before 5.1 (closing review round 2, report id 10) |
 | binder | a `derive_temp_path` body as above, then `derive_temp_path t "$f" && mv -f "$t" "$f"` | admitted |
 | fixed binder | `fake() { printf -v "$1" '%s.tmp' "$2"; }` then `fake t "$f"; mv "$t" "$f"` | a site |
 | scope | `t="$x.tmp"` in one function, `mv "$t" "$x"` in another | unfollowed, no site |
@@ -491,8 +506,9 @@ written into `<t>`. A `<pre>` clone is a local `git clone` of gov under `%TEMP%`
   Red when: the same over `<pre>` leaves `<secret>` holding the last writer's line, with `stat -c %i`
   equal on `<secret>` and a destination, and the 250-character write succeeds.
 - **AC6** — A python probe takes the program between `<rg>`'s line opening `' "$REUSE_CACHE"` and
-  the nearest line above it ending `"$PYBIN" -c '`, which is `run-gates.sh:5462` at `2aa18f2a3`. It
-  runs the program with argument
+  the nearest line above it ending `"$PYBIN" -I -c '`. That line ended `"$PYBIN" -c '` at `<pre>`,
+  `run-gates.sh:5462` at `2aa18f2a3`, until `TOOL-dRedressedBar-26` added `-I` (closing review
+  round 2, report id 8). It runs the program with argument
   `<t>/cache` and the stdin row `abcdef`, `3`, `r1`, `sha`, `1700000000`, `0`, tab-separated.
   `<t>/cache/ab/` lists exactly `abcdef`. With `<t>/cache2/ab/abcdef` made a directory, the run
   exits 0, and `<t>/cache2/ab/` lists exactly `abcdef`. `ast.parse` of the program finds a
@@ -555,6 +571,19 @@ none
   precedent of `TOOL-aPairedSlots-7`. The hot sites take a builtin `$SRANDOM` name, because the
   ticker forbids a fork and the fork ceilings hold the runner. The gate is a fourth `sh_hygiene.py`
   mode over every tracked product shell source, with 20 registered sites in 14 files.
+- rev-2 · 2026-10-15 · S3 · S5 · S8 · §3 · §4 · AC6 · a records fix for TOOL-dRedressedBar-26, which
+  closes the round-2 closing diff review's report ids 22, 6, 7, 10, 21, 8 and 19 against this unit,
+  written by that unit's spec-writer pass `<w26>`. The status stays CLOSED. Unit 24 built against
+  its criteria as written; each corrected paragraph names TOOL-dRedressedBar-26 and the change, and
+  that spec holds the design. Id 8: S3's program runs under `-I`, and AC6's anchor line ends
+  `-I -c '`. Id 19: S8's TWO counts every `gate-full-green.shared.` staging name, plants one of each
+  spelling, and runs a second pass on the helper's `mktemp` branch. Ids 22, 6, 7, 10 and 21, S5's
+  predicate in §4's step table: the `an mv` row reads the lead run, the `a binder` row admits on
+  `mktemp` with `SRANDOM` only behind `${SRANDOM:-`, the `follow` row makes a positional source and
+  a one-expansion value unfollowed, and the `verdict` row admits `$(mktemp` alone. Id 10: the
+  remedy line names two admitted forms, where it named three. The not-checked
+  paragraph points at `TEMP_BOUNDARY`, and the selftest table's `SRANDOM` row reads a site. §3's
+  Edges gain the hands-off to TOOL-dRedressedBar-26. No other scope item, design or criterion moves.
 
 ## 10. Reuse audit
 
