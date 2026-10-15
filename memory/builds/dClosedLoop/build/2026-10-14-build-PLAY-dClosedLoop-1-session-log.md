@@ -91,6 +91,10 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 27 | gov-researcher | Lexicon: the kit as built and as enforced | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-8-researcher.md` | 1799cb98 | returned, 5m23s, 28.0k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-kit.md` |
 | 28 | gov-researcher | Lexicon: the offender population and the pin's history | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-9-researcher.md` | 1799cb98 | returned, 7m43s, 38.9k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-population.md` |
 | 29 | gov-researcher | Lexicon: prior art and the forced-name mechanism | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-10-researcher.md` | 1799cb98 | returned, 8m15s, 38.8k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-prior-art.md` |
+| 30 | gov-researcher | Runtime: the executor and `next` | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-11-researcher.md` | 1799cb98 | dispatched | — |
+| 31 | gov-researcher | Runtime: the spawn harness | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-12-researcher.md` | 1799cb98 | dispatched | — |
+| 32 | gov-researcher | Runtime: hooks, isolation and supervision | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-13-researcher.md` | 1799cb98 | dispatched | — |
+| 33 | gov-researcher | Runtime: sessions, context, scheduling, harnesses and nodes | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-14-researcher.md` | 1799cb98 | dispatched | — |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -186,6 +190,16 @@ the ledger:
 - returned — gov-researcher · wrote 0 files · 5m23s · 28.0k out · run direct/a8c799ae3f8451de3
 - returned — gov-researcher · wrote 0 files · 7m43s · 38.9k out · run direct/ab88368be2b01aaa5
 - returned — gov-researcher · wrote 0 files · 8m15s · 38.8k out · run direct/a3c14cf4c0062421b
+```
+
+The runtime round's four handoffs, dispatches 30 to 33, were derived the same way and held from
+the ledger:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-11-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-11-researcher.md) · writes none · gates none · run direct/a27a0b29a52118e7c
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-12-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-12-researcher.md) · writes none · gates none · run direct/a09d005d5401a1ffa
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-13-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-13-researcher.md) · writes none · gates none · run direct/abd9da98c6527b6eb
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-14-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-14-researcher.md) · writes none · gates none · run direct/aa94d21851651d208
 ```
 
 ## Events
@@ -322,6 +336,9 @@ the ledger:
   - L-6 by declaring `html` and `svg` dark, which was committed the same day as `0ac38b016`.
 
   dMindYourWords joined the chain, four keys joined v2, and seven gaps were registered.
+- 2026-10-15, session 1799cb98: the owner opened the runtime layer's review, with no framing. The
+  main loop scoped it from the layer model and v2's owed items. Four researchers were dispatched,
+  30 to 33.
 
 ## Instruments
 
@@ -649,6 +666,7 @@ Runs, 2026-10-14:
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-{builds,asks-decisions,map-reuse,annotations,tooling}.md` | The memory layer's five researcher returns, verbatim: builds; the ask register and the decision index; the codebase map and the reuse tools; code annotations, the gotchas and the lexicon; the tooling map. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md` | The lexicon kit's review: the owner's words, what the design already fixes, the kit's history, the three researchers' findings, the design (classes, forced names, packs, enforcement, drift, vocabulary, integration) and the forks. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-{kit,population,prior-art}.md` | The lexicon review's three researcher returns, verbatim. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md` | The layer review's fifth round: the runtime layer, what earlier rounds already fix for it, its scope and boundaries, and its four researchers. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-instruments.md` | The lexicon researchers' probe files, as fenced text. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-instruments.md` | The memory researchers' probe scripts, gathered from their scratch paths as fenced text. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
