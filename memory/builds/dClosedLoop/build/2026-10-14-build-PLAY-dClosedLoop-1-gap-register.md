@@ -219,7 +219,13 @@ extends.
 | gap-maint-08 | Maintain | LOW | Naming offense rate and dangling ledger pointers are report-only. | maintain §4 | — |
 | gap-review-01 | Review | HIGH | Review exists at two stages only; Plan, Test, Deploy and Maintain have none. | every record §3 | — |
 | gap-review-02 | Review | HIGH | No review of the loop itself: no retrospective reads the loop's metrics and changes a stage contract. | maintain §3, §4 | — |
-| gap-review-03 | Review | MED | Review cost is high, about 9 agents and 0.81 M tokens per spec audit, and is why audits are off by default. | design §5 C3 | — |
+| gap-review-03 | Review | MED | Review cost is high: a spec audit runs 11 or 12 agents (9 when this row was written) and about 0.81 M tokens, and that cost is why audits are off by default. | design §5 C3; agent count re-measured by the review system's research, 2026-10-15 | — |
+| gap-review-04 | Review | HIGH | Design records are audited by a unit-spec preset: the spec lenses aim at unit-spec sections, and every defect found after the runtime design's two rounds (security, cost, alternatives, assumptions, adopter migration, portability) fell outside them. | review system `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-review-lenses.md` | — |
+| gap-review-05 | Review | MED | One defect splits across items by grade: same-address pairs with different grades were merged 0 times in 110, and synthesizers named the split 29 times. | review system `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-review-adjudication.md` | — |
+| gap-review-06 | Review | MED | Twins meet different skeptics: ids are assigned by lens and batches are contiguous slices, so only 8% of same-address pairs share a skeptic, and each of the 9 verified refutations by design beside a confirmed twin sat in a different batch. | review system `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-review-adjudication.md` | — |
+| gap-review-07 | Review | MED | Proposed gates have no home: 56% of 721 name nothing and 2% a bug class, and 2 of 5 round-2 reports re-found a defect whose fix had covered the instance, not the class. | review system `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-review-adjudication.md` | — |
+| gap-review-08 | Review | LOW | Duplicates count as refuted, understating precision (0.866 pooled against 0.880 merged), and the orphan-duplicate check runs on the spec kind only. | review system `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-review-adjudication.md` | — |
+| gap-review-09 | Review | LOW | Review records contradict the code: REVIEW-PROTOCOL.md lists retired lenses, allows three to six and calls skeptics default-refute; agent-cap.js says tier2-review has four lenses; the synthesizer's role says it is handed confirmed findings only. | review system `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-review-adjudication.md` | — |
 
 The counts are derived, never typed: a first draft typed 59 rows here over a table holding 56. The
 instrument, run against this file, and its output when the register was written:
@@ -367,4 +373,13 @@ Re-measured after the runtime layer's review added `gap-rt-01` to `gap-rt-10`
 ```text
 Roles=18 Deploy=8 Plan=7 Spine=9 Orient=14 Test=9 Runtime=10 Lexicon=7 Tooling=6 Review=3 Foundation=17 Build=4 Memory=11 Flow=14 Maintain=8 Design=9
 LOW=18 MED=60 HIGH=76
+```
+
+Re-measured after the review system's research added `gap-review-04` to `gap-review-09`
+(`build/2026-10-15-build-PLAY-dClosedLoop-1-review-system.md`), same instrument. `gap-review-03` took the
+measured agent count, and its grade is unchanged:
+
+```text
+Roles=18 Deploy=8 Plan=7 Spine=9 Orient=14 Test=9 Runtime=10 Lexicon=7 Tooling=6 Review=9 Foundation=17 Build=4 Memory=11 Flow=14 Maintain=8 Design=9
+LOW=20 MED=63 HIGH=77
 ```
