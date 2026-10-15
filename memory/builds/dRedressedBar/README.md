@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-13
 streams: tooling
 roster: TOOL
-ids: TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 TOOL-dRedressedBar-24
+ids: TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 TOOL-dRedressedBar-24 TOOL-dRedressedBar-25 TOOL-dRedressedBar-26
 spec-audit: 2026-10-13
 ---
 
@@ -107,6 +107,13 @@ are causes of their own.
   `run-gates.sh`, `post-merge.sh` and `run-selftests.sh` unpredictable temps under a bash-side static
   check, after unit 23 and before the bar. Its brief is
   `prompts/2026-10-15-prompt-TOOL-dRedressedBar-24-brief.md`.
+- **Owner ruling, 2026-10-15, the round-2 closing review**: the fold review
+  (`reviews/2026-10-15-review-TOOL-dRedressedBar-21-24-diff-review-round2.md`, CLEAN WITH FIXES, no
+  blocker) confirmed 2 highs, 6 mediums and 6 lows; the owner promoted all 14, "then stop". Unit 25
+  takes the profiler's arms and guards (H1, M1, L1, L6), unit 26 the temp-name lint and the runner's
+  temps (H2, M2, M3, M4, L2, L3, L4, L5), after unit 24 in that order. A round-3 review covers their
+  fold; it fixes blockers only, and its other findings go to a follow-up build. Their brief is
+  `prompts/2026-10-15-prompt-TOOL-dRedressedBar-25-brief.md`.
 
 ## Parked decisions
 
@@ -140,12 +147,14 @@ None yet.
 | 22 | `TOOL-dRedressedBar-22` | PROMOTED: the closing review's profiler findings M1, M2, M5, M7, L1, L2, L3 and L5, batched |
 | 23 | `TOOL-dRedressedBar-23` | PROMOTED: the closing review's govkit findings M3, M4, M6 and L4, batched |
 | 24 | `TOOL-dRedressedBar-24` | the runner scripts' fixed-name temp-then-replace writers take unpredictable temps, under a bash-side static check |
+| 25 | `TOOL-dRedressedBar-25` | PROMOTED: the round-2 review's profiler arm and guard findings H1, M1, L1 and L6 |
+| 26 | `TOOL-dRedressedBar-26` | PROMOTED: the round-2 review's temp-name lint and runner temp findings H2, M2, M3, M4, L2, L3, L4 and L5 |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 24 unit(s) · node d · opened 2026-10-13 · streams tooling
+**Build status:** SPECCED · 26 unit(s) · node d · opened 2026-10-13 · streams tooling
 ids TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13
-ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 TOOL-dRedressedBar-24
+ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 TOOL-dRedressedBar-24 TOOL-dRedressedBar-25 TOOL-dRedressedBar-26
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -174,13 +183,15 @@ ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedr
 | [TOOL-dRedressedBar-22 — the closing review's profiler findings, batched: an interrupt names every kept capture, the probe spawns the base interpreter, and each faulted arm proves its work](spec/2026-10-15-spec-TOOL-dRedressedBar-22.md) | 16 | 2 | CLOSED | rev-1 | 2026-10-15 |
 | [TOOL-dRedressedBar-23 — the closing review's govkit findings M3, M4, M6 and L4: a narrower apply keeps a carried kit's orders and order-file legs, target spawns decode stderr through one helper, a leg guard widens, and a routing arm grades each member](spec/2026-10-15-spec-TOOL-dRedressedBar-23.md) | 17 | 2 | CLOSED | rev-1 | 2026-10-15 |
 | [TOOL-dRedressedBar-24 — the runner scripts' fixed-name temp writers take unpredictable temps, and a shell-hygiene mode reds a new one](spec/2026-10-15-spec-TOOL-dRedressedBar-24.md) | 18 | 2 | CLOSED | rev-1 | 2026-10-15 |
+| [TOOL-dRedressedBar-25 — the round-2 review's profiler findings, batched: the A/B verdict gate grades the condition, the selftest's guard covers its kit dir, and AC9's orphan is waited on](spec/2026-10-15-spec-TOOL-dRedressedBar-25.md) | 19 | 2 | SPECCED | rev-1 | 2026-10-15 |
+| [TOOL-dRedressedBar-26 — the round-2 temp-name findings, batched: every command-word `mv` is read, no positional or two-hop source reds, no bare `SRANDOM` is admitted, and the cache writer and leftover check hold on every runtime](spec/2026-10-15-spec-TOOL-dRedressedBar-26.md) | 20 | 2 | SPECCED | rev-1 | 2026-10-15 |
 <!-- /gen:build-units -->
 
-Records: 100 bound to this build, across 4 record folder(s).
+Records: 103 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 TOOL-dRedressedBar-24.
+Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 TOOL-dRedressedBar-24 TOOL-dRedressedBar-25 TOOL-dRedressedBar-26.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -205,6 +216,8 @@ Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-19 TOOL-dRedressed
 | 16 | `TOOL-dRedressedBar-22` | no |
 | 17 | `TOOL-dRedressedBar-23` | no |
 | 18 | `TOOL-dRedressedBar-24` | no |
+| 19 | `TOOL-dRedressedBar-25` | no |
+| 20 | `TOOL-dRedressedBar-26` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
