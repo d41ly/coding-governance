@@ -222,6 +222,9 @@ way and held from the ledger:
   as an expansion, breakpoints anywhere, withdraw or supersede, and programs with dependencies. P6,
   P7, P20 and P24 were amended, two policies and five gaps added, and the audit's consistency fixes
   recorded.
+- 2026-10-15, session 1799cb98: before layer 3, the owner asked for each flow step to be defined.
+  Entry, the five core steps and the breakpoint were defined item by item, from the audit with its
+  fixes applied. Three open questions were put to the owner.
 
 ## Instruments
 
@@ -492,6 +495,7 @@ Runs, 2026-10-14:
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-model.svg` | The layer model as capabilities: the core cycle on Runtime, expansions plugged in at declared points, Distribution beneath. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-flow.md` | The layer review's second round: the flow layer, each step at a glance, the owner's requirements against the design, the gaps, the recommendations and the forks. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-{a,b}.md` | The flow layer's item audit, verbatim: every item of the 70 declared (tag, actor, witness, inputs by layer, instruction scope, routes, dependencies), with each step's extension points and the findings. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md` | The flow's steps defined item by item: Entry, the five core steps and the breakpoint, each with its actors, witnesses, routes and layer ingredients, with the audit's fixes applied. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |
