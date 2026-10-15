@@ -315,6 +315,13 @@ the ledger:
   - main reads 1,088 offenders against a pin of 1,087, since `8ddc0a482`.
 
   The design was written, and six questions were put to the owner.
+- 2026-10-15, session 1799cb98: the owner settled L-1 to L-6:
+  - L-1 to L-4 with the recommended options;
+  - L-5 with their own answer, "detected + declared by the owner (custom packs?)": custom packs are
+    allowed;
+  - L-6 by declaring `html` and `svg` dark, which was committed the same day as `0ac38b016`.
+
+  dMindYourWords joined the chain, four keys joined v2, and seven gaps were registered.
 
 ## Instruments
 
@@ -558,6 +565,19 @@ After the memory layer's answers, both instruments were run as extracted from th
 - **The preset check** exits 0 on 114 catalogue keys, 108 presettable, 108 preset rows. On a copy
   with standard `asks.acceptance` set to `grade` and strict `builds.slug-date` set to `sometimes`,
   it exits 1 naming both.
+
+After the lexicon review's answers, both instruments were run as extracted from this record:
+- **The changes:**
+  - dMindYourWords joined the chain, taking `gap-mem-10` from dTotalRecall;
+  - `gap-lex-01` to `gap-lex-07` were registered and owned;
+  - four keys joined the catalogue and every preset.
+- **The join** exits 0 on 144 keys and 13 builds. On a copy with `gap-lex-07` struck from
+  dMindYourWords' row, it exits 1 naming it unowned.
+- **The preset check** exits 0 on 118 catalogue keys, 112 presettable, 112 preset rows. On a copy
+  with standard `lexicon.at-commit` set to `warn` and strict `lexicon.drift` set to `always`, it
+  exits 1 naming both.
+- **The lexicon itself,** after `0ac38b016`, no longer reports the undeclared `html` and `svg`. It
+  still exits 1 on 1,088 verb offenders against the pin of 1,087, a red inherited from `8ddc0a482`.
 
 ### The foreign-build census
 

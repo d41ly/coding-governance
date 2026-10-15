@@ -314,6 +314,9 @@ is forced by its base or host, and to keep it.
 
 ## [gaps-proposed] Gaps to register once the forks settle their home
 
+Registered on 2026-10-15, after the forks, as `gap-lex-01` to `gap-lex-07`, in the order below.
+They go to dMindYourWords, with `gap-mem-10`.
+
 New area `Lexicon`. `gap-mem-10` (the gate absorbs debt) moves with them.
 
 1. HIGH. No class for forced names:
@@ -393,3 +396,40 @@ should that be fixed now?"**
     remedy.
   - Move the three files out of the tree: they become published artifacts, with Markdown pointers.
   - Wait for the path selector: the bar stays red until the lexicon build lands it.
+
+### Settled after L-1 to L-6, 2026-10-15
+
+| Fork | Answer | Key | Default | Also allowed |
+|---|---|---|---|---|
+| L-1 | By what forces them | `lexicon.forced` | `verified` | `by-name`, `by-annotation` |
+| L-2 | Commit refuses, bar compares | `lexicon.at-commit` | `refuse` | `warn`, `off` |
+| L-3 | Refuse new splits | `lexicon.drift` | `refuse-new` | `report`, `off` |
+| L-4 | Its own chain build | none: dMindYourWords, a child of dTotalRecall | — | — |
+| L-5 | "Detected + declared by the owner (custom packs?)" | `lexicon.packs` | `detected-and-declared` | `detected`, `declared`, `all` |
+| L-6 | Declare `html` and `svg` dark | none: applied the same day in `0ac38b016` | — | — |
+
+- **L-4.** dMindYourWords takes the lexicon pin and `gap-mem-10` from dTotalRecall.
+- **L-5, the owner's own answer, is the default.** The three offered options are kept as allowed
+  values.
+- **The owner's question: can there be custom packs? Yes.** A custom pack has the shipped packs'
+  shape:
+  - rows keyed by base member, base prefix or host namespace;
+  - a header naming its source, and its generator or its curation.
+
+  It is declared by the owner in the repository's lexicon declaration, and it is changed through the
+  instruction write path. It is verified like a shipped pack: a row applies only where the code
+  resolves to its base or host. An adopter's own framework is covered this way. gov's own
+  contract-forced names, declared beside their reader, are the in-repository case of the same idea.
+- **L-6** turned the undeclared-extension refusal off. The check still exits 1, on main's inherited
+  1,088 against 1,087.
+
+**Presets.** `velocity` warns at commit and only reports drift. Every other new key holds its
+default in all four presets.
+
+**What changed elsewhere:**
+- **v2:**
+  - The four keys join the catalogue and every preset.
+  - The chain gains dMindYourWords and becomes thirteen builds.
+  - dTotalRecall gives up the lexicon pin and `gap-mem-10`.
+  - `[owed]` gains the adopter census the second-wave packs wait on.
+- **The register** gains `gap-lex-01` to `gap-lex-07`.
