@@ -457,3 +457,82 @@ points and budgets. This extends foundations R5 and R6 and gap-orient-13.
 | Claude Code | `CLAUDE.md`, agents, Skills, hooks, rules |
 | Codex | `AGENTS.md` within 32 KiB, plus the card's override file |
 | The rest | `AGENTS.md` |
+
+## [forks] Asked, 2026-10-15
+
+**L1. "How should the layer model be framed?"**
+- Offered:
+  - Capabilities, Runtime core (Recommended);
+  - Capabilities, four core;
+  - Tool-based layers.
+- Answer: Capabilities, Runtime core (Recommended).
+
+**L2. "Which expansion layers should the design carry?"** Multi-select, with each expansion plugging in at
+a declared extension point and the core never depending on one.
+- Offered: Knowledge, Observability, Integrations, Distribution.
+- Answer: all four.
+
+**L3. "How should the importance levels be numbered?"**
+- Offered:
+  - Charter 0, card 1 (Recommended);
+  - Keep today's ladder.
+- Answer: Charter 0, card 1 (Recommended).
+
+**L4. "Are Skills part of the instruction layer, and what may they contain?"**
+- Offered:
+  - Level 4, thin entries (Recommended);
+  - Level 4, own procedures;
+  - Outside the layer.
+- Answer: Level 4, thin entries (Recommended).
+
+## [settled] What changed, 2026-10-15
+
+**v2 `[layers]` is added.** It holds:
+- the capability framing;
+- the test that sorts core from expansion;
+- five core layers: instruction, flow, roles, memory, runtime;
+- four expansions: knowledge, observability, integrations, distribution;
+- the cycle on a base;
+- the layer contract;
+- optional slots for expansion-filled work-order fields.
+
+**Principles.**
+- P11 now carries the owner's first instruction principle: everything loaded gives direction, through
+  six statement types.
+- P13 now carries the levels and the scope tags as the join keys.
+- P27, load is precise, is the owner's second instruction principle.
+- P28 says layers are capabilities and the core never depends on an expansion.
+- All four are owner-ratified in this round: the owner's own principles, and the layer framing they
+  chose. Each will need its enforcing check in the principle registry (P16):
+  - P27's is the load-set render check;
+  - P28's is the one-way dependency check and the layer contract's conformance gate.
+
+**The ladder** is renumbered:
+- the platform sits above it;
+- the charter is level 0, and the card level 1;
+- Skills are level-4 thin entries;
+- rendered text uses the one term "level".
+
+**Two policies** are set from the owner's own words in this round. Their alternatives are offered, but
+not yet walked:
+- `instructions.checks`:
+  - the values are `refuse`, `warn` and `record`;
+  - the default is `refuse`, from "enforced wherever possible";
+  - `velocity` sets `warn`.
+- `instructions.edit`:
+  - the values are `owner-command-agents-propose`, `flow-only` and `command-for-all`;
+  - the default is `owner-command-agents-propose`, from "a session or a scripting tool that allows
+    instruction addition/editing/deletion to its respective manifest";
+  - presets never touch it, because who may edit instructions is a guard-like choice.
+
+**The register** gains `gap-found-09` to `gap-found-17`:
+- dOrderedCharter owns 09, 10, 11, 14, 15 and 17;
+- dConvergedCharter owns 12 and 13;
+- dCalibratedLens owns 16.
+
+**The chain rows gain the units that carry them:**
+- dDeclaredLoop names every checklist item by a semantic tag;
+- dBoundRoles declares expansion-filled work-order fields as optional slots.
+
+**v2 `[owed]`:** Runtime gets its own chain build at the re-cut, once its layer review settles what that
+build holds.

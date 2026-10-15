@@ -199,6 +199,10 @@ calls.
   (instruction, DLG, roles, memory) and expansion layers, then added instrument, monitoring and
   deployment mid-turn. The instruction layer was measured and set against the design, and the layer
   model was reframed as capabilities, with Runtime proposed as a core layer. Forks were put to the owner.
+- 2026-10-15, session 1799cb98: the owner settled L1 to L4: capabilities with Runtime as a core layer,
+  all four expansions, the charter at level 0 with the card at level 1, and Skills as level-4 thin
+  entries. v2 gains `[layers]`, P11 and P13 are amended, and P27 and P28 are added; nine gaps join the
+  register.
 
 ## Instruments
 
@@ -285,7 +289,7 @@ def rows(block, ncols):
 
 
 STAGES = ["plan", "design", "build", "test", "deploy", "maintain"]
-EXCLUDED = {"floor", "policy.guard", "policy.proof", "preset", "charter.practices"}
+EXCLUDED = {"floor", "policy.guard", "policy.proof", "preset", "charter.practices", "instructions.edit"}
 catalogue = {}
 for key, allowed, default, _src in rows(section("policies"), 4):
     keys = [key.replace("<stage>", s) for s in STAGES] if key == "review.<stage>" else [key]
@@ -386,6 +390,15 @@ four policies added; the preset check's free-value pattern gains `a share of the
 - The preset check exits 0 on 94 catalogue keys, 89 presettable, 89 preset rows. On a copy with
   standard `context.on-full` set to `fresh-at-boundary` and strict `notices.record` set to
   `sometimes`, it exits 1 naming both.
+
+After layers round one, both instruments were run as extracted from this record:
+- **The changes:** `gap-found-09` to `gap-found-17` went to dOrderedCharter, dConvergedCharter and
+  dCalibratedLens; `instructions.checks` joined every preset; `instructions.edit` joined the catalogue
+  and was kept from the presets, so `EXCLUDED` gains `"instructions.edit"` in the source above.
+- **The join** exits 0 on 106 keys and 11 builds. On a copy with `gap-found-17` struck from
+  dOrderedCharter's row, it exits 1 naming it unowned.
+- **The preset check** exits 0 on 96 catalogue keys, 90 presettable, 90 preset rows. On a copy with
+  standard `instructions.checks` set to `warn` and strict set to `sometimes`, it exits 1 naming both.
 
 ### The foreign-build census
 

@@ -110,6 +110,53 @@ owner chose "the violator pays". `with-hooks-report` stands as read in foundatio
 is unchanged. dShippedRelease's lander gains a core re-check on the landed tree before it releases a
 build, so a core red that first appears in the landing merge still stops that build from closing.
 
+Revised: 2026-10-15, after layers round one (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md`): the owner framed the product as layers; the
+`[layers]` section is added (capabilities, five core layers with Runtime among them, four expansions);
+P11 and P13 are amended to the owner's two instruction principles and the tag system, P27 and P28 are
+added; the ladder is renumbered with the charter at level 0 and the card at level 1; Skills are level-4
+thin entries; `instructions.checks` and `instructions.edit` join the catalogue, the first in every
+preset, the second kept from presets; `gap-found-09` to `gap-found-17` join dOrderedCharter,
+dConvergedCharter and dCalibratedLens.
+
+## [layers] The product's layers
+
+A layer is a capability named by a tag. A kit implements layers, and its descriptor declares the layer
+and the extension point that each of its parts serves (P28). One test sorts them: the core alone
+carries one build from request to landing, and an expansion is never needed for that (layers round
+one, `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md`).
+
+| Layer | Kind | What it is |
+|---|---|---|
+| `instruction` | core | everything an agent is told, levelled 0 to 7 and tagged by scope |
+| `flow` | core | the DLG steps as checklists, with their verdict engine and their lander |
+| `roles` | core | the bound workers, and the driver |
+| `memory` | core | the build trail: records, transitions, witnesses, the card's truth |
+| `runtime` | core | what executes the cycle: the executor and checklist engine, the always-spawn harness, the hooks, isolation, process supervision |
+| `knowledge` | expansion | what agents consult to decide: the map, decisions, bug classes, the lexicon, research records |
+| `observability` | expansion | signals about the loop and the runtime, read by Maintain and the Loop Review |
+| `integrations` | expansion | adapters to outside services: remote CI, notifications, cloud hosts, trackers |
+| `distribution` | expansion | the product's delivery: govkit, the adopt scripts, overlays, render targets, currency |
+
+The core is a cycle on a base:
+- instruction directs the flow;
+- the flow names items;
+- roles perform them;
+- their returns become memory;
+- memory renders the card and feeds `next`;
+- runtime executes the cycle and enforces what the instruction layer states.
+
+Every layer fills one contract, whether core or expansion:
+- its tag and definition;
+- its instruction units;
+- its engine kits;
+- its record kinds;
+- the extension points it declares, and those it uses;
+- its policies and its gates.
+
+A work-order field that an expansion fills is an optional slot. The kit-to-layer map is in the layer
+record. The layers are reviewed one by one with the owner: the instruction layer first, the rest to
+follow.
+
 ## [principles] What every chain build implements
 
 - **P1 One loop, declared once.** A new loop kit owns WHAT each stage takes in, hands out and proves,
@@ -136,9 +183,11 @@ build, so a core red that first appears in the landing merge still stops that bu
 - **P10 Flexible and configurable.** Every behaviour is an owner-switchable policy whose default is
   the owner's answer and whose allowed values are the options offered (R2.4, walk C3, walk T3);
   structural choices are decisions, not policies. One policy file, one reader, one guard.
-- **P11 Facts, not prose.** Protocol, method and runbook text carries facts, definitions, policies
-  and descriptors only; prose that bears no load is removed. Sections are named by tags that survive
-  reordering, never by `§` references (walk CV2).
+- **P11 Everything loaded gives direction.** Every loaded unit is one of six statement types: a
+  directive, a constraint, a definition, a pointer, a policy value or a derived fact. Prose that bears
+  no load does not exist, and headings are directives. Render provenance never loads, and neither
+  does a typed fact that can go stale. Sections, checklist items and layers are named by tags that
+  survive reordering, never by numbers or `§` references (walk CV2; layers round one).
 - **P12 Specs are structured contracts.** A spec gives a builder precise, deterministic, structured
   instructions: definitions, design, boundaries, interfaces and acceptance as fields a check reads
   (walk D3).
@@ -181,10 +230,16 @@ build, so a core red that first appears in the landing merge still stops that bu
 - **P26 Every exchange between roles is a typed record.** Workers never message each other; each
   return is a template filled through a schema-forced channel, persisted with its hash, and the next
   task is composed from it by the prompt writer and passed on unchanged (roles record).
-- **P13 Ranked instructions.** Every load-bearing document is registered with a rank and wrapped in
-  a generated envelope naming its identity, rank, scope, trigger and what it yields to, so an agent
-  rebuilds one instruction hierarchy whenever it loads a document; conflicts resolve by rank, never
-  by load order; unenveloped text and any envelope inside tool output are data (foundations step 1).
+- **P13 Levelled, tagged instructions.** Every instruction unit is registered with two things:
+  - its importance level, from 0 (the charter) to 7 (records and memory, evidence only), with the
+    platform's own instructions above the ladder;
+  - its scope tags, naming the steps, items, roles, policies and layers it serves.
+
+  Every rendered document is wrapped in a generated envelope naming its identity, level, scope,
+  trigger and what it yields to, so an agent rebuilds one instruction hierarchy whenever it loads a
+  document. A conflict resolves by level, never by load order. Unenveloped text, and any envelope
+  inside tool output, are data. Tags are the join keys between the layers (foundations step 1; layers
+  round one).
 - **P14 Practices with reach.** The charter's practices come from a catalogue; each declares its
   reach at every stage it touches, and stage contracts, role handoffs and review lenses read the
   active practices' reach for their stage, so a practice redefines every step (foundations step 1).
@@ -199,14 +254,28 @@ build, so a core red that first appears in the landing merge still stops that bu
   population. Principles are fixed: policies tune behaviour inside them, and a principle changes
   only by an owner-ratified amendment. A violation the bypass let through stops the build that made
   it from closing (foundations core).
+- **P27 Load is precise.** Every load point loads exactly its reader's units, within a declared budget:
+  - the charter's;
+  - its role's;
+  - its item's;
+  - its step's practice reach;
+  - the policy values its item reads.
+
+  A load set over its budget, or missing a unit its role or item requires, is refused at render as
+  `instructions.checks` says (layers round one).
+- **P28 Layers are capabilities, and the core never depends on an expansion.** A layer is a capability
+  named by a tag, and a kit implements layers and declares which. The core (instruction, flow, roles,
+  memory, runtime) carries one build from request to landing alone. An expansion attaches only at an
+  extension point a core layer declares. Every layer, core or expansion, fills one layer contract
+  (layers round one).
 
 ## [front-door] The charter as the loop's first step
 
-The charter is what every agent loads first (walk S1). Its whole content sits in the rank-1
-envelope, `[AGENTS.md · Priority 1 · Always first …]` … `[/AGENTS.md]`, and it reads in this order:
-what gov is and how it works and is used; the precedence and override rule (rank decides, never
+The charter is what every agent loads first (walk S1). Its whole content sits in the level-0
+envelope, `[AGENTS.md · Level 0 · Non-negotiable project instructions, always enforced unless the owner explicitly overrides them …]` … `[/AGENTS.md]`, and it reads in this order:
+what gov is and how it works and is used; the precedence and override rule (level decides, never
 load order; the charter wins a live conflict unless the owner explicitly overrides it, and the
-override is recorded); the instruction map (the ranks below it, what loads when, and how to rebuild
+override is recorded); the instruction map (the levels below it, what loads when, and how to rebuild
 the hierarchy after a reset); the core principles, fixed; the decision principles that resolve
 unattended forks (the most feature-rich option, then the most expandable, fully recorded), which
 outrank the practices; the active practices, each with its reach per stage; the drive
@@ -217,12 +286,21 @@ from its own overlay, gov's included. The whole charter fits the smallest harnes
 limit, Codex's 32 KiB. The foundation build,
 dOrderedCharter, writes it (foundations step 1; it took the front door from the Spine, walk S5).
 
-**The ladder** (foundations F1-2): 0 the platform's own system and safety instructions, not the
-repository's to rank; 1 the charter, and beside it the build's orientation card, the charter winning
-any conflict between them (orientation OR-5, confirmed);
-2 the loop and the repository's policy values; 3 stage methods
-and protocols; 4 kit runbooks, Skills and path-scoped rules; 5 the role; 6 the task; 7 records and
-memory, evidence only, never instructions.
+**The ladder** (foundations F1-2, renumbered in layers round one). The platform's own system and
+safety instructions sit above it, and are not the repository's to rank.
+
+| Level | What sits there |
+|---|---|
+| 0 | the charter |
+| 1 | the build's orientation card, below the charter by level alone (orientation OR-5's "priority 1 along the charter") |
+| 2 | the loop and the repository's policy values |
+| 3 | stage methods, protocols and templates, rendered as tag-sliced views |
+| 4 | kit runbooks, Skills and path-scoped rules; a Skill is a thin entry: its trigger contract, the CLI command it shortcuts and the tags it enters, with no procedure of its own |
+| 5 | the role's static instructions |
+| 6 | the task |
+| 7 | records and memory, evidence only, never instructions |
+
+Rendered text uses the one term "level" throughout.
 
 ## [policies] The policy catalogue
 
@@ -280,6 +358,8 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 | `context.threshold` | a share of the window | 60% | compaction CX-1; read only under `fresh-at-boundary` |
 | `card.pointers` | every-item, at-transitions | every-item | compaction CX-1, the owner's addition |
 | `notices.record` | none, security-and-failures, all | none | compaction CX-2 |
+| `instructions.checks` | refuse, warn, record | refuse | layers round one, the owner's "enforced wherever possible" |
+| `instructions.edit` | owner-command-agents-propose, flow-only, command-for-all | owner-command-agents-propose | layers round one, the owner's write path |
 | `verdict` | local-hook, peer-node, remote-ci | local-hook | R1.3, R4.4, R5.2 |
 | `verdict.blocks` | own-mixed-contended, every-red, own-only | own-only | walk T1 |
 | `verdict.held` | peer-or-cadence, push-selected, on-demand | on-demand | walk T2 |
@@ -336,7 +416,8 @@ policy keys; a repository names one preset and overrides individual keys on top 
 - Every shipped preset assigns every presettable key, and only values that key allows; a check
   refuses a preset with a key missing or a value outside the schema, and a new key cannot land
   without a value in every shipped preset.
-- Presets never touch the floor, `policy.guard`, `policy.proof` or `charter.practices`: loosening
+- Presets never touch the floor, `policy.guard`, `policy.proof`, `charter.practices` or
+  `instructions.edit`: loosening
   the guard or switching an invariant off stays an explicit owner choice, never a side effect of
   picking a posture, and a methodology is a choice about the product, not a posture.
 - A repository may declare its own named presets in its policy file, each extending a shipped one,
@@ -408,6 +489,7 @@ repository on either overrides `verdict` to `local-hook`.
 | `context.threshold` | 60% | 60% | 60% | 60% |
 | `card.pointers` | at-transitions | every-item | every-item | every-item |
 | `notices.record` | none | none | all | security-and-failures |
+| `instructions.checks` | warn | refuse | refuse | refuse |
 | `verdict` | local-hook | local-hook | peer-node | peer-node |
 | `verdict.blocks` | own-only | own-only | every-red | own-mixed-contended |
 | `verdict.held` | on-demand | on-demand | peer-or-cadence | peer-or-cadence |
@@ -485,17 +567,17 @@ where `verdict = peer-node`.
 
 | Build | Stage | Parents | Planned units | Gaps owned |
 |---|---|---|---|---|
-| dOrderedCharter | Foundation | dClosedLoop | the practice catalogue with each practice's reach per stage, and `charter.practices`; the charter re-founded in its rank-1 envelope (front door, precedence and override rule with `charter.override` and its record, instruction map, active practices with reach, hand-off to the loop, the repository's project block from its own overlay); the instruction registry and the ladder; envelopes rendered for every registered document and the gate over them; the instruction map re-injected on compact and resume; ranked envelopes in every subagent handoff; the section-tag grammar and its resolver; the drive section composed from a drive table in each adopted kit's descriptor, checked both ways, each subagent's role line repeated in its handoff, the charter held inside 32 KiB; the core: the principle registry, the meta-check, the kinds register with each kind's owning build, the conformance-gate contract, the exception register and the `core.*` policies, and the factories and gates for governing documents, practices and Skills; the build's card delivered at rank 1 through an ignored per-worktree card file the charter's entry file imports, re-rendered by every session-start hook in the session's own tree, subagents' slices through the brief and the subagent-start hook, another harness's through a generated override file within its instruction limit, after the primary-to-worktree compaction fixture passes | gap-found-01, gap-found-02, gap-found-03, gap-found-04, gap-found-05, gap-found-07, gap-found-08, gap-flow-02, gap-orient-13 |
-| dDeclaredLoop | Spine | dOrderedCharter | the loop kit and definition keyed by the stage tags, the roles kit's stage table moved and its seven readers re-pointed in the same unit, never waiting for a live build's close; `.governance/policy.toml`, schema, one reader, JSON mirror; the named presets and their completeness check; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; policy at govkit intake; the `next` verb over the loop's state, the `next —` micro-format, and the check that every declared command ends with one or declares itself terminal, laggards on a shrink-only list owned by their stage's build; the factories and conformance gates for commands, policy keys, presets, stages, hooks, roles and workflows; the coordination feature: one lease grammar for builds, units and cadence runs with run claims migrated onto it, acquired, renewed, released and taken over through CLI verbs the step checklists call, overlap warned or refused, fleet identity and uniqueness against the remote, offline behaviour; the mailbox per build, its closed set of message kinds checked on write, read and disposed at every transition, shown on the card and kept in the build's transition log; live delivery where the harness has it; dependency coordination by the parent's lease, interfaces confirmed at Design's exit, change and landing notices; the position engine: `next` deriving each unit's step, the build's step, the next item and its interrupts from witnesses, items idempotent by witness, the read set and each claim's key and verdict printed; the build's orientation card at rank 1 beside the charter, kept as a ref per build on the remote (the truth), cached in the clone by build and object id and snapshotted into the build folder per `card.snapshot`, the stores selected by `card.store`, looked up and re-keyed in the session's own tree on resume, a resume that delivers no card diagnosed and closed, a fresh session recommended by `resume.context`, partial work handled by `resume.partial`; claims keyed and trusted by key and source; each step's items declared with actor, inputs, allowance, return schema and witness; `actions.free` at the tool call; orientation cost recorded per stage; the executor launched where `run.host` says, its liveness its build lease's beat; backward transitions recorded like forward ones; the mailbox read at every item boundary by `mailbox.reads`, with the `intake` message kind; progress reported by `notify.owner`; a fresh session in the build's worktree recommended until the card-import fixture passes; the card's pointers updated as the build progresses, by `card.pointers`: the latest records by tag, the open forks and the item in flight, so a compacted or fresh session reorients from them; the compact hook re-injecting the build's current card, never the kickoff's; what a session does as its window fills, by `context.on-full` and `context.threshold`; a compaction's summary read as a lead, never a source | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01, gap-found-06, gap-flow-07, gap-conc-01, gap-conc-02, gap-flow-06, gap-orient-02, gap-orient-03, gap-orient-04, gap-orient-05, gap-orient-06, gap-orient-08, gap-orient-11, gap-orient-12, gap-orient-14 |
-| dBoundRoles | Roles | dDeclaredLoop | the roster: orientation scout, prompt writer, planner, researcher, reuse scout, architect, spec writer, builder, tester, deployer, maintainer, one reviewer with a lens per step, skeptic, synthesizer; each role's static instructions as structured fields, every limit paired with its enforcer, a ceiling of tools, write classes and gate legs, and a typed return template; the work order rendered per item (the item, its inputs as record fields at their SHAs, its allowance, its return template, its witness), hashed into the spawn marker and bound to the agent's calls by its agent id; the prompt writer composing every role's task from the driver's details; the orientation scout composing the card in a sidechain at session start; returns through a schema-forced channel, residual failures retried by `roles.retries`; the role index and agent files beyond every worker's reach, a tree with no index refused, `role-sha` compared at spawn; shell writes held to the allowance; the role-gate arm's field escape explained and closed; the `none` and `review` write classes enforced; `driver.reads`, `prompts.author` and `roles.no-spawn`; every fork resolved by the role that meets it and recorded, never parking a build (`run.on-owner-question`); prompt-writer calls batched by `prompts.batch`; a return's harness notices persisted with it, by `notices.record` | gap-roles-01, gap-roles-02, gap-roles-03, gap-roles-04, gap-roles-05, gap-roles-06, gap-roles-07, gap-roles-08, gap-orient-07, gap-orient-09, gap-roles-09 |
+| dOrderedCharter | Foundation | dClosedLoop | the practice catalogue with each practice's reach per stage, and `charter.practices`; the charter re-founded in its level-0 envelope (front door, precedence and override rule with `charter.override` and its record, instruction map, active practices with reach, hand-off to the loop, the repository's project block from its own overlay); the instruction registry and the ladder; envelopes rendered for every registered document and the gate over them; the instruction map re-injected on compact and resume; ranked envelopes in every subagent handoff; the section-tag grammar and its resolver; the drive section composed from a drive table in each adopted kit's descriptor, checked both ways, each subagent's role line repeated in its handoff, the charter held inside 32 KiB; the core: the principle registry, the meta-check, the kinds register with each kind's owning build, the conformance-gate contract, the exception register and the `core.*` policies, and the factories and gates for governing documents, practices and Skills; the build's card delivered at level 1 through an ignored per-worktree card file the charter's entry file imports, re-rendered by every session-start hook in the session's own tree, subagents' slices through the brief and the subagent-start hook, another harness's through a generated override file within its instruction limit, after the primary-to-worktree compaction fixture passes; the instruction-unit registry (per unit: tag, level, statement type, scope tags, trigger, budget class, source, owning kit), documents rendered from units; the namespaced tag system (level, layer, step, item, role, policy, practice, principle, kind, record, kit), joined both ways, its names checked by the lexicon; load sets derived per reader and item, budgeted per load point and per harness, refused when over budget or missing a required unit (`instructions.checks`); the statement grammar and its check, render provenance in a sidecar lock; the ladder renumbered, the platform above it and the charter at level 0; memory instructing nothing, a standing directive promoted into a unit; the instruction manifest and its guarded write command (`instructions.edit`), instruction packs extending `charter.practices` into the preset catalogue; the layer register, the layer contract and the check that the core never depends on an expansion | gap-found-01, gap-found-02, gap-found-03, gap-found-04, gap-found-05, gap-found-07, gap-found-08, gap-flow-02, gap-orient-13, gap-found-09, gap-found-10, gap-found-11, gap-found-14, gap-found-15, gap-found-17 |
+| dDeclaredLoop | Spine | dOrderedCharter | the loop kit and definition keyed by the stage tags, the roles kit's stage table moved and its seven readers re-pointed in the same unit, never waiting for a live build's close; `.governance/policy.toml`, schema, one reader, JSON mirror; the named presets and their completeness check; the guard, the TTY CLI and the default floor; the transition record three ways; stage claims and the coverage gate; the witness-class rule; policy at govkit intake; the `next` verb over the loop's state, the `next —` micro-format, and the check that every declared command ends with one or declares itself terminal, laggards on a shrink-only list owned by their stage's build; the factories and conformance gates for commands, policy keys, presets, stages, hooks, roles and workflows; the coordination feature: one lease grammar for builds, units and cadence runs with run claims migrated onto it, acquired, renewed, released and taken over through CLI verbs the step checklists call, overlap warned or refused, fleet identity and uniqueness against the remote, offline behaviour; the mailbox per build, its closed set of message kinds checked on write, read and disposed at every transition, shown on the card and kept in the build's transition log; live delivery where the harness has it; dependency coordination by the parent's lease, interfaces confirmed at Design's exit, change and landing notices; the position engine: `next` deriving each unit's step, the build's step, the next item and its interrupts from witnesses, items idempotent by witness, the read set and each claim's key and verdict printed; the build's orientation card at level 1, below the charter, kept as a ref per build on the remote (the truth), cached in the clone by build and object id and snapshotted into the build folder per `card.snapshot`, the stores selected by `card.store`, looked up and re-keyed in the session's own tree on resume, a resume that delivers no card diagnosed and closed, a fresh session recommended by `resume.context`, partial work handled by `resume.partial`; claims keyed and trusted by key and source; each step's items declared with actor, inputs, allowance, return schema and witness; `actions.free` at the tool call; orientation cost recorded per stage; the executor launched where `run.host` says, its liveness its build lease's beat; backward transitions recorded like forward ones; the mailbox read at every item boundary by `mailbox.reads`, with the `intake` message kind; progress reported by `notify.owner`; a fresh session in the build's worktree recommended until the card-import fixture passes; the card's pointers updated as the build progresses, by `card.pointers`: the latest records by tag, the open forks and the item in flight, so a compacted or fresh session reorients from them; the compact hook re-injecting the build's current card, never the kickoff's; what a session does as its window fills, by `context.on-full` and `context.threshold`; a compaction's summary read as a lead, never a source; every checklist item named by a semantic tag, its number only display order | gap-spine-01, gap-spine-02, gap-spine-06, gap-design-01, gap-found-06, gap-flow-07, gap-conc-01, gap-conc-02, gap-flow-06, gap-orient-02, gap-orient-03, gap-orient-04, gap-orient-05, gap-orient-06, gap-orient-08, gap-orient-11, gap-orient-12, gap-orient-14 |
+| dBoundRoles | Roles | dDeclaredLoop | the roster: orientation scout, prompt writer, planner, researcher, reuse scout, architect, spec writer, builder, tester, deployer, maintainer, one reviewer with a lens per step, skeptic, synthesizer; each role's static instructions as structured fields, every limit paired with its enforcer, a ceiling of tools, write classes and gate legs, and a typed return template; the work order rendered per item (the item, its inputs as record fields at their SHAs, its allowance, its return template, its witness), hashed into the spawn marker and bound to the agent's calls by its agent id; the prompt writer composing every role's task from the driver's details; the orientation scout composing the card in a sidechain at session start; returns through a schema-forced channel, residual failures retried by `roles.retries`; the role index and agent files beyond every worker's reach, a tree with no index refused, `role-sha` compared at spawn; shell writes held to the allowance; the role-gate arm's field escape explained and closed; the `none` and `review` write classes enforced; `driver.reads`, `prompts.author` and `roles.no-spawn`; every fork resolved by the role that meets it and recorded, never parking a build (`run.on-owner-question`); prompt-writer calls batched by `prompts.batch`; a return's harness notices persisted with it, by `notices.record`; work-order fields an expansion fills (bug classes, the map's dossiers) declared as optional slots | gap-roles-01, gap-roles-02, gap-roles-03, gap-roles-04, gap-roles-05, gap-roles-06, gap-roles-07, gap-roles-08, gap-orient-07, gap-orient-09, gap-roles-09 |
 | dWitnessedBar | Test | dDeclaredLoop | gate health measured and the reliability bar; bypasses recorded; attribution deciding what blocks; the hook-written verdict; held legs by policy; the peer-node verifier; seen-red records; flake quarantine; the product-test contract with runner adapters; derived pre-commit list and multi-node cost evidence; the gate-leg factory and its conformance gate, every leg declaring the principles it enforces | gap-test-01, gap-test-02, gap-test-03, gap-test-04, gap-test-05, gap-test-06, gap-test-07, gap-test-08, gap-test-09, gap-flow-09 |
 | dRankedPlan | Plan | dDeclaredLoop | priority beside `parents:` and the generated plan view; the planner and triager role and Plan workflow; the placement predicate; rule-based triage; dormancy disposal; the live-build mapping carried out; Plan Review; kickoff offering the next item and attended briefs gated; placement: a disposition for every request, made by `placement` and recorded with its reason in the intake record, its facts checked by `placement.check`, an unattended prompt placed the same way; the full kickoff only where `kickoff.runs` says; the prompt-submit hook writing each owner prompt verbatim to the session's intake log, and the request as the ratification by `plan.ratification` | gap-plan-01, gap-plan-02, gap-plan-03, gap-plan-04, gap-plan-05, gap-plan-06, gap-plan-07, gap-flow-03, gap-flow-04, gap-orient-01 |
 | dIndexedDesign | Design | dDeclaredLoop | the derived-READY hand-off; the design index; design review by policy; reuse and alternatives backed by recorded probes; the research harness; agreement and tier checks; the spec measured, recommendations emitted, and the spec redesigned as a structured, tagged contract; the feature level (build, features, units) with each feature's interfaces declared structurally, two-level re-entry by `design.reentry`, additive-versus-breaking interface classification (proposed), fork resolution by `design.forks` | gap-flow-01, gap-design-02, gap-design-03, gap-design-04, gap-design-05, gap-design-06, gap-design-07, gap-design-09 |
 | dScopedBuild | Build | dIndexedDesign, dWitnessedBar | one exit contract with a history-derived base, refusing a build's exit while a core red its own commits introduced stands; built specs frozen, every closing-review finding disposed as new units by `review.findings`; scope at the push; the closing review recorded; worktrees by policy; a write gate reading derived state; the checklist witnessed; parallel units' commits queued by the executor in the shared worktree; the core checks run by the executor at Build's exit | gap-spine-03, gap-conc-03, gap-build-01, gap-build-02, gap-build-03, gap-build-04, gap-flow-05 |
 | dShippedRelease | Deploy | dWitnessedBar | the landing record; kit release notes; the deploy engine; the incms adapter; the fleet register and currency watch; lander hardening; optional emitted CI; a derived runbook; the kit factory and its conformance gate; a dependent's landing held until its parent lands (`deps.landing`); landings through the existing turnstile queue; the lander running the core checks on the landed tree before it releases the build, so a core red the landing merge introduced stops that build from closing (foundations K1) | gap-deploy-01, gap-deploy-02, gap-deploy-03, gap-deploy-04, gap-deploy-05, gap-deploy-06, gap-deploy-07, gap-deploy-08, gap-flow-08 |
 | dTendedCadence | Maintain | dWitnessedBar, dRankedPlan | the Maintain run as its step checklist on the flow's executor, never a recipe-mode playbook; three hosts and the cadence; the safe-fix set; detectors with owners; map freshness; the maintenance record; a detector for the memory's dead pointers, owned by Maintain | gap-maint-01, gap-maint-02, gap-maint-05, gap-maint-06, gap-maint-07, gap-maint-08, gap-orient-10 |
-| dCalibratedLens | Review | dTendedCadence | review by policy per stage and effort; the stage-exit recommendation; lenses for Plan, Test, Deploy and Maintain; the shared value ledger; the weekly Loop Review; caps re-derived from evidence and review cost; follow-up closing-review rounds by `review.follow-up` | gap-review-01, gap-review-02, gap-review-03, gap-maint-03, gap-design-08 |
-| dConvergedCharter | Convergence | dScopedBuild, dShippedRelease, dCalibratedLens | protocol text derived to facts only, each document in its envelope; every remaining positional reference migrated to tags; records merged by evidence; superseded parts retired through ratified proposals; adopters migrated onto the ranked charter and the loop; the record-kind factory and its conformance gate | gap-spine-04, gap-spine-05, gap-maint-04 |
+| dCalibratedLens | Review | dTendedCadence | review by policy per stage and effort; the stage-exit recommendation; lenses for Plan, Test, Deploy and Maintain; the shared value ledger; the weekly Loop Review; caps re-derived from evidence and review cost; follow-up closing-review rounds by `review.follow-up`; instruction effectiveness measured from returns and findings that cite unit tags, the Loop Review pruning units that bear no load and tightening those broken often | gap-review-01, gap-review-02, gap-review-03, gap-maint-03, gap-design-08, gap-found-16 |
+| dConvergedCharter | Convergence | dScopedBuild, dShippedRelease, dCalibratedLens | protocol text derived to facts only, each document in its envelope; every remaining positional reference migrated to tags; records merged by evidence; superseded parts retired through ratified proposals; adopters migrated onto the ranked charter and the loop; the record-kind factory and its conformance gate; protocols and templates rendered as tag-sliced views from the loop's checklists, the roles, the record schemas and the policies, the hand-written guides retired; Skills converged to level-4 thin entries, each described "Use when …; runs …" | gap-spine-04, gap-spine-05, gap-maint-04, gap-found-12, gap-found-13 |
 
 The live-build mapping is v1's table with one change: no chain build waits for a live build to close
 or relies on what it delivers, so "after it closes" no longer holds. The active builds finish on
@@ -526,7 +608,8 @@ out with the owner's ratification and confirms dPolishedVitrine's track, which w
 
 - The flow's executor and checklist engine (P20: the unattended kit executing each stage's
   checklist) has no owning chain build yet; the re-cut assigns it inside the chain, so no live build
-  working on the unattended kit is counted on.
+  working on the unattended kit is counted on. Runtime is a core layer (P28), so the re-cut gives it a
+  chain build of its own once its layer review settles what that build holds.
 - The executor's harness: the repository's workflow harness, improved so it can always spawn the
   subagents an item needs (roles RL-8), designed at the lower level, with the other mechanical
   processes the owner deferred there: the turnstile landing queue and the lander (flow-roles FR-6).
