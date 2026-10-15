@@ -95,6 +95,8 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 31 | gov-researcher | Runtime: the spawn harness | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-12-researcher.md` | 1799cb98 | returned, 11m10s, 41.5k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-spawn.md` |
 | 32 | gov-researcher | Runtime: hooks, isolation and supervision | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-13-researcher.md` | 1799cb98 | returned, 9m00s, 30.1k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-hooks.md` |
 | 33 | gov-researcher | Runtime: sessions, context, scheduling, harnesses and nodes | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-14-researcher.md` | 1799cb98 | returned, 8m02s, 33.7k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-sessions.md` |
+| 34 | `tier2-review.js`: five `gov-spec-reviewer`, five `gov-skeptic` and one `gov-synthesizer`, all at medium | Runtime: Tier-2 review, run A | the args in `build/2026-10-15-build-PLAY-dClosedLoop-1-runtime-reviews-compared.md` `[runs]` | 1799cb98 | returned, CLEAN WITH FIXES, 56 of 60 confirmed | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-runtime-a.md` |
+| 35 | the same | Runtime: Tier-2 review, run B | the same | 1799cb98 | returned, CLEAN WITH FIXES, 57 of 61 confirmed | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-runtime-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -204,6 +206,63 @@ the ledger:
 - returned — gov-researcher · wrote 0 files · 11m10s · 41.5k out · run direct/a09d005d5401a1ffa
 - returned — gov-researcher · wrote 0 files · 9m00s · 30.1k out · run direct/abd9da98c6527b6eb
 - returned — gov-researcher · wrote 0 files · 8m02s · 33.7k out · run direct/aa94d21851651d208
+```
+
+The two Tier-2 rounds, dispatches 34 and 35, ran as Workflow runs. `tools/roles/handoff.py agents --run <run> --session <transcript>`
+derived their lines, which are held from the ledger. Each run's first agent is the harness's resume probe.
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_6508cb22-7d6/abb3225c4744455e9
+- returned — workflow-subagent · wrote 0 files · 12s · 964 out · run wf_6508cb22-7d6/abb3225c4744455e9
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:coherence · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_6508cb22-7d6/aec30d37d8e3e0066
+- returned — gov-spec-reviewer · wrote 0 files · 3m52s · 23.7k out · run wf_6508cb22-7d6/aec30d37d8e3e0066
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:grounding · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_6508cb22-7d6/aac52732c1ab4dba5
+- returned — gov-spec-reviewer · wrote 0 files · 3m34s · 20.9k out · run wf_6508cb22-7d6/aac52732c1ab4dba5
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:reuse · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_6508cb22-7d6/ab20566ea04b1fe57
+- returned — gov-spec-reviewer · wrote 0 files · 6m10s · 32.7k out · run wf_6508cb22-7d6/ab20566ea04b1fe57
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:blast-radius · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_6508cb22-7d6/a97f86e719bdd4bc1
+- returned — gov-spec-reviewer · wrote 0 files · 5m23s · 33.9k out · run wf_6508cb22-7d6/a97f86e719bdd4bc1
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:failure-envelope · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_6508cb22-7d6/a72d89ac95c36c16a
+- returned — gov-spec-reviewer · wrote 0 files · 2m30s · 14.9k out · run wf_6508cb22-7d6/a72d89ac95c36c16a
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-1-12 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_6508cb22-7d6/a53450609f1bc4f83
+- returned — gov-skeptic · wrote 0 files · 1m07s · 7.2k out · run wf_6508cb22-7d6/a53450609f1bc4f83
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-13-24 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_6508cb22-7d6/a714bedf2ad6a7db8
+- returned — gov-skeptic · wrote 0 files · 1m56s · 11.8k out · run wf_6508cb22-7d6/a714bedf2ad6a7db8
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-25-36 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_6508cb22-7d6/a991ea8bb7b171f83
+- returned — gov-skeptic · wrote 0 files · 1m28s · 9.2k out · run wf_6508cb22-7d6/a991ea8bb7b171f83
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-37-48 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_6508cb22-7d6/add182940bcb49d6e
+- returned — gov-skeptic · wrote 0 files · 1m29s · 8.9k out · run wf_6508cb22-7d6/add182940bcb49d6e
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-49-60 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_6508cb22-7d6/ad5c98bb748a9d16a
+- returned — gov-skeptic · wrote 0 files · 55s · 5.8k out · run wf_6508cb22-7d6/ad5c98bb748a9d16a
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_6508cb22-7d6/a3dc8caf010741d61
+- returned — gov-synthesizer · wrote 1 file · 5m01s · 42.2k out · run wf_6508cb22-7d6/a3dc8caf010741d61
+```
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_3c895b43-8da/a8438ea97f460b4ac
+- returned — workflow-subagent · wrote 0 files · 13s · 1.2k out · run wf_3c895b43-8da/a8438ea97f460b4ac
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:coherence · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_3c895b43-8da/ac1f84d585e57cf3f
+- returned — gov-spec-reviewer · wrote 0 files · 3m36s · 22.5k out · run wf_3c895b43-8da/ac1f84d585e57cf3f
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:grounding · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_3c895b43-8da/afad235c65dfad5b5
+- returned — gov-spec-reviewer · wrote 0 files · 3m35s · 22.2k out · run wf_3c895b43-8da/afad235c65dfad5b5
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:reuse · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_3c895b43-8da/a0ec620f344b61b05
+- returned — gov-spec-reviewer · wrote 0 files · 5m53s · 34.8k out · run wf_3c895b43-8da/a0ec620f344b61b05
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:blast-radius · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_3c895b43-8da/ac299fe825c339c31
+- returned — gov-spec-reviewer · wrote 0 files · 5m05s · 29.3k out · run wf_3c895b43-8da/ac299fe825c339c31
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:failure-envelope · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_3c895b43-8da/a96c66cc22cfbe0b4
+- returned — gov-spec-reviewer · wrote 0 files · 2m37s · 16.0k out · run wf_3c895b43-8da/a96c66cc22cfbe0b4
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-1-13 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_3c895b43-8da/a09b4ac363774f558
+- returned — gov-skeptic · wrote 0 files · 1m19s · 7.9k out · run wf_3c895b43-8da/a09b4ac363774f558
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-14-26 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_3c895b43-8da/a39412b7f80540c2a
+- returned — gov-skeptic · wrote 0 files · 1m36s · 9.6k out · run wf_3c895b43-8da/a39412b7f80540c2a
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-27-39 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_3c895b43-8da/a0a2c8589fee727c9
+- returned — gov-skeptic · wrote 0 files · 1m49s · 10.7k out · run wf_3c895b43-8da/a0a2c8589fee727c9
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-40-52 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_3c895b43-8da/a0954856760f1be49
+- returned — gov-skeptic · wrote 0 files · 2m26s · 12.9k out · run wf_3c895b43-8da/a0954856760f1be49
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-53-61 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_3c895b43-8da/aa0c743c242313573
+- returned — gov-skeptic · wrote 0 files · 1m02s · 6.0k out · run wf_3c895b43-8da/aa0c743c242313573
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_3c895b43-8da/a0c25d653455d9690
+- returned — gov-synthesizer · wrote 1 file · 5m21s · 44.9k out · run wf_3c895b43-8da/a0c25d653455d9690
 ```
 
 ## Events
@@ -350,6 +409,33 @@ the ledger:
   `dangerously-skip-permissions`, because it cites `resume-tick.sh:385`, which the main loop
   verified. The design was written: deciding by `next`, supervising by a process, acting through
   thin bound sessions, and one enforcement surface failing closed.
+- 2026-10-15, session 1799cb98: agent-cap's rule 0 refused review run A. The owner was asked,
+  verbatim: "agent-cap refused review round A: a pre-code spec audit needs your opt-in where a run
+  cannot write it, and this build's README is prompt-authorized, so its own `spec-audit:` key admits
+  nothing. The only owner-level opt-in the guard reads is `SPEC_AUDIT_DEFAULT` in `.unattended.conf`,
+  honoured for builds whose README declares no key. How should I record your opt-in?"
+
+  The owner chose "Only for these two rounds". That option read: "Set the default in the working
+  tree, run both rounds, then restore the file uncommitted; the one-off is recorded in the session
+  log. The build's own later audit stays blocked."
+
+  So, in the working tree only:
+  - `SPEC_AUDIT_DEFAULT` was set to `2026-10-15`;
+  - the README's `spec-audit: 2026-10-14` line was set aside.
+
+  Both rounds then ran: run A as `wf_6508cb22-7d6`, run B as `wf_3c895b43-8da`. Afterwards both files
+  were restored to HEAD uncommitted, and `git diff --quiet` checked them clean. The build's own
+  declared audit stays blocked by rule 0.
+- 2026-10-15, session 1799cb98: both rounds returned CLEAN WITH FIXES:
+  - run A: 56 of 60 findings confirmed, 6 of them high;
+  - run B: 57 of 61 confirmed, 9 of them high.
+
+  `build/2026-10-15-build-PLAY-dClosedLoop-1-runtime-reviews-compared.md` places every finding on the defect it names. There are 59 defects:
+  - 32 found by both rounds;
+  - 14 found by run A only;
+  - 13 found by run B only.
+
+  All 59 were folded into the runtime record, and RT-1 to RT-3 went to the owner.
 
 ## Instruments
 
@@ -677,7 +763,9 @@ Runs, 2026-10-14:
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-{builds,asks-decisions,map-reuse,annotations,tooling}.md` | The memory layer's five researcher returns, verbatim: builds; the ask register and the decision index; the codebase map and the reuse tools; code annotations, the gotchas and the lexicon; the tooling map. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md` | The lexicon kit's review: the owner's words, what the design already fixes, the kit's history, the three researchers' findings, the design (classes, forced names, packs, enforcement, drift, vocabulary, integration) and the forks. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-{kit,population,prior-art}.md` | The lexicon review's three researcher returns, verbatim. |
-| `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md` | The layer review's fifth round: the runtime layer, what earlier rounds already fix for it, its scope and boundaries, and its four researchers. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md` | The layer review's fifth round: the runtime layer, what earlier rounds fix for it, its four researchers, the design the owner delegated, two Tier-2 rounds folded into it, and the questions. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-runtime-reviews-compared.md` | The two Tier-2 rounds compared defect by defect: their args, the numbers, what one round alone would have missed, the map from every finding to its defect and fold, and the instrument. |
+| `reviews/2026-10-15-review-PLAY-dClosedLoop-1-runtime-{a,b}.md` | The two Tier-2 reports on the runtime design, as their synthesizers wrote them. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-{executor,spawn,hooks,sessions}.md` | The runtime round's four researcher returns, verbatim. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-instruments.md` | The runtime researchers' probe scripts, as fenced text, with the one lost probe noted. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-instruments.md` | The lexicon researchers' probe files, as fenced text. |
