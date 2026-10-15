@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-13
 streams: tooling
 roster: TOOL
-ids: TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20
+ids: TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23
 spec-audit: 2026-10-13
 ---
 
@@ -94,6 +94,13 @@ are causes of their own.
   as round 4's promotions; no further audit round runs. Its brief is
   `prompts/2026-10-14-prompt-TOOL-dRedressedBar-20-brief.md`, and unit 7's revision record is
   `prompts/2026-10-14-prompt-TOOL-dRedressedBar-7-2-revision.md`.
+- **Owner ruling, 2026-10-15, the closing review's findings**: the round-1 closing diff review
+  (`reviews/2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md`, CLEAN WITH FIXES, no
+  blocker) confirmed 1 high, 7 mediums and 5 lows; the owner promoted all 13 into this build. Units
+  21 (H1, the profiler's dead-run sweep), 22 (the profiler's M1, M2, M5, M7, L1, L2, L3 and L5) and
+  23 (govkit's M3, M4, M6 and L4) follow unit 19 in that order, built from their specs under the same
+  recorded override as round 4's promotions. Closing review round 2 reviews their fold. Their brief
+  is `prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-brief.md`.
 
 ## Parked decisions
 
@@ -123,12 +130,15 @@ None yet.
 | 18 | `TOOL-dRedressedBar-18` | a gate profiler: every leg run clean and unbounded, serially or under a load cap, each profiled to its processes, stalls reported and never killed |
 | 19 | `TOOL-dRedressedBar-19` | PROMOTED: the units-16-18 spec audit's 19 mediums and 22 lows, batched — report ids 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 and 43 |
 | 20 | `TOOL-dRedressedBar-20` | govkit's mint writes a version only into its own entry's file group, never another kit's |
+| 21 | `TOOL-dRedressedBar-21` | PROMOTED: the closing review's one high, finding H1 — the profiler's dead-run sweep trusts no path a shared temp dir supplies |
+| 22 | `TOOL-dRedressedBar-22` | PROMOTED: the closing review's profiler findings M1, M2, M5, M7, L1, L2, L3 and L5, batched |
+| 23 | `TOOL-dRedressedBar-23` | PROMOTED: the closing review's govkit findings M3, M4, M6 and L4, batched |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 20 unit(s) · node d · opened 2026-10-13 · streams tooling
+**Build status:** SPECCED · 23 unit(s) · node d · opened 2026-10-13 · streams tooling
 ids TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13
-ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20
+ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -153,13 +163,16 @@ ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedr
 | [TOOL-dRedressedBar-17 — the units-12-15 spec audit's 12 mediums and 9 lows, batched: each faulted criterion observed in a form that can pass and fail, each false sentence corrected, and the code sites they describe made to hold what the specs claim](spec/2026-10-14-spec-TOOL-dRedressedBar-17.md) | 12 | 2 | CLOSED | rev-5 | 2026-10-15 |
 | [TOOL-dRedressedBar-18 — a gate profiler: every leg run clean and unbounded, serially or under a load cap, each profiled to its processes, stalls reported and never killed](spec/2026-10-14-spec-TOOL-dRedressedBar-18.md) | 13 | 2 | CLOSED | rev-5 | 2026-10-15 |
 | [TOOL-dRedressedBar-19 — the units-16-18 spec audit's 19 mediums and 22 lows, batched: the profiler's census, path, launch, turnstile, redaction and leg-declaration gaps closed, the receipt sidecar made atomic, and specs 12 and 14 to 18 corrected](spec/2026-10-14-spec-TOOL-dRedressedBar-19.md) | 14 | 2 | CLOSED | rev-6 | 2026-10-15 |
+| [TOOL-dRedressedBar-21 — the profiler trusts no path a temp dir supplies: a dead run's logs land in this run's record, no capture is opened, read or deleted through a link, and run-gates' Python temp files take unpredictable names](spec/2026-10-15-spec-TOOL-dRedressedBar-21.md) | 15 | 2 | SPECCED | rev-1 | 2026-10-15 |
+| [TOOL-dRedressedBar-22 — the closing review's profiler findings, batched: an interrupt names every kept capture, the probe spawns the base interpreter, and each faulted arm proves its work](spec/2026-10-15-spec-TOOL-dRedressedBar-22.md) | 16 | 2 | SPECCED | rev-1 | 2026-10-15 |
+| [TOOL-dRedressedBar-23 — the closing review's govkit findings M3, M4, M6 and L4: a narrower apply keeps a carried kit's orders and order-file legs, target spawns decode stderr through one helper, a leg guard widens, and a routing arm grades each member](spec/2026-10-15-spec-TOOL-dRedressedBar-23.md) | 17 | 2 | SPECCED | rev-1 | 2026-10-15 |
 <!-- /gen:build-units -->
 
-Records: 79 bound to this build, across 4 record folder(s).
+Records: 87 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-19 TOOL-dRedressedBar-20.
+Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -180,6 +193,9 @@ Ids no `spec-audit` record has ever named: TOOL-dRedressedBar-19 TOOL-dRedressed
 | 12 | `TOOL-dRedressedBar-17` | no |
 | 13 | `TOOL-dRedressedBar-18` | no |
 | 14 | `TOOL-dRedressedBar-19` | no |
+| 15 | `TOOL-dRedressedBar-21` | no |
+| 16 | `TOOL-dRedressedBar-22` | no |
+| 17 | `TOOL-dRedressedBar-23` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
