@@ -47,7 +47,8 @@ researchers of 2026-10-14 cover the field, and their records are cited where use
   - A role's static instructions are its system prompt, rendered from the roles kit at level 5 and
     keyed by `role-sha`.
   - A task is a work order rendered from its item at level 6. It is hashed into the spawn marker and
-    bound to the agent's calls by its agent id.
+    bound to its act by the act's task-sha and the session's binding record (Runtime), since a
+    headless act has no subagent agent id.
 - **The item cycle** (flow-roles `[cycle]`):
   1. `next` names the item and its actor.
   2. The driver hands the prompt writer the item's details, with references to its input records.
@@ -64,11 +65,11 @@ researchers of 2026-10-14 cover the field, and their records are cited where use
   it is believed.
 - **Why a session trusts a claim** (orientation `[trust]`): by key and source. A session acts on a
   claim only while its key recomputes equal and its weakest source is not actor-typed.
-- **Tags** (layer-instruction R-A, R-B, R-E):
+- **Tags** (layer-instruction R-A, R-B, R-C, R-E):
   - one namespaced tag system, with `role` among its namespaces;
   - a role's static instructions and a work order are each assembled from units by their tags;
   - protocols and templates are views sliced by tag;
-  - the render refuses a set over budget, and a set missing a unit it requires.
+  - R-C's render refuses a set over budget, and a set missing a unit it requires.
 - **The layers** (P28): the deployer's and the maintainer's items live in the integrations and
   observability expansions, and core Deploy has no role (step definitions).
 
@@ -84,17 +85,25 @@ researchers of 2026-10-14 cover the field, and their records are cited where use
 No block the size of `AGENTS.md` (16,732 B) or of the auto-memory index (13,187 B) arrives:
 - `omitClaudeMd: true` (`tools/roles/render_agents.py:132`) is honoured on CLI 2.1.295;
 - this settles what the anatomy research recorded as "STATED only";
-- the charter reaches a role only as its file's `## Charter` section.
+- the charter reaches a role only as its file's `## Charter` section;
+- this holds for subagents on CLI 2.1.295, the only version measured. Act sessions launch the node's
+  resolved binary, 2.1.292 here, where no prefix record of a gov role exists, and an act session
+  reads `CLAUDE.md` itself (the instruction layer's `gap-rt-12`).
 
 **What its static block tells it to do.** The nine role files (45,213 B) send agents back to their
 sources:
 - **Pointers:** 9 of 9 carry `### Protocols — read the one whose trigger holds`, each a pointer to a
   whole document.
-- **Re-verification:** the spec writer and the researcher are ordered to re-verify:
-  - `gov-spec-writer.md:26`: "Verify every claim about current code by reading that code";
-  - `gov-researcher.md:29`: "Verify every claim about current code by reading the code".
-- **Whole reads:** `gov-builder.md:15` says "Read the spec whole before you touch code, and the brief
-  your task names".
+- **Re-verification:** four places order it, cited at their sources:
+  - `tools/roles/agents/gov-spec-writer.agent.md:30`: "Verify every claim about current code by
+    reading that code";
+  - `tools/roles/agents/gov-researcher.agent.md:33`: "Verify every claim about current code by
+    reading the code";
+  - `tools/roles/agents/gov-session.agent.md:18`: a sender's records are "background to re-verify";
+  - `memory/TEMPLATE-SPEC.md:106`, rendered from `tools/memory-tree/SPEC-TEMPLATE.template.md:106`:
+    "Verify every claim about existing code against source at writing time".
+- **Whole reads:** `tools/roles/agents/gov-builder.agent.md:19` says "Read the spec whole before you
+  touch code, and the brief your task names".
 
 The skeptic (`gov-skeptic.md:19`) and the diff reviewer (`gov-diff-reviewer.md:20`) also read the
 cited source. That is their job, and it stays.
@@ -134,15 +143,16 @@ orientation-cost research's P5 classes:
   | `tools/run-gates/run-gates.sh` | 94 |
   | `tools/memory-tree/check-memory-hygiene.sh` | 82 |
   | `tools/gate-legs.json` | 75 |
-  | `memory/TEMPLATE-SPEC.md` | 64 |
-- **Method calls** (805 in all) go to whole documents:
+  | `memory/TEMPLATE-SPEC.md` | 68 |
+- **Method-class reads** go to whole documents: 811 file reads, from about 619 method-class calls
+  (6.2% of 9,980), as `ro_top.py` counts them:
 
   | Document | Calls |
   |---|---|
+  | `memory/TEMPLATE-SPEC.md` | 131 |
   | `memory/guides/BUILD-METHOD.md` | 130 |
-  | `memory/TEMPLATE-SPEC.md` | 127 |
   | `memory/guides/SESSION-KICKOFF.md` | 59 |
-  | `memory/HYGIENE.md` | 41 |
+  | `memory/HYGIENE.md` | 43 |
   | `AGENTS.md` | 17 |
 - **Own prompt:** spec writers read their own handoff prompt file 17 times.
 - **Repeats inside one agent:** re-reading within one agent is not the cost. Only 5 reads repeat an
@@ -204,6 +214,20 @@ job is to verify.**
    A reference stays only for depth the role may not need, and is marked optional. This amends the
    spawn in `[cycle]`, where the executor wraps the prompt in the work order, and dBoundRoles'
    "inputs as record fields at their SHAs".
+
+   It extends `tools/roles/handoff.py render`, which already resolves each role's declared `reads`
+   (`task:`, `card:`, `brief:`, `input:`) into the task block verbatim, and hashes the Role and Task
+   sections into the spawn marker. The card's slice is handed today. New are the excerpts cut at their
+   anchors, the method slices, and every fact's key and class.
+
+   Two failures have routes:
+   - **Over budget:** the render demotes the optional inputs to references first. Still over, the item
+     routes back to the item that produced its largest input, as a divergence: a unit too big for its
+     builder's packet returns to the architect for a split. The route counts against
+     `flow.route-backs`.
+   - **A vanished anchor:** a fact whose file was renamed, deleted or rewritten is found again by its
+     key's blob in history. Not found, it is handed as missing, and the role works without it on
+     record.
 2. **Every handed fact carries its key and its class.** The key names what the fact was derived from:
    - a blob SHA and a line range;
    - a record id at its SHA;
@@ -217,9 +241,18 @@ job is to verify.**
 
    The executor writes keys and classes, and no agent types one. This is the witness rule, applied to
    inputs.
-3. **Fresh at the spawn, by construction.** The executor recomputes every key just before the spawn,
-   and re-cuts any fact whose key moved. A role never checks freshness. This moves the orientation
-   `[trust]` check from the agent to the dispatch.
+3. **Fresh at act launch, by construction.** The supervisor recomputes every key when it cuts the
+   work order at act launch, and re-cuts any fact whose key moved. Attended, the driver cuts it
+   through the same renderer. A role never checks freshness. This moves the orientation `[trust]`
+   check from the agent to the dispatch.
+   - **After the cut.** Inside the act the harness spawns without a shell, so a fact can move between
+     the cut and the spawn: the commit queue in a shared worktree, or a fan's later stage. The
+     answered-call hook compares each read's blob SHA with the handed key at the call (10), so a moved
+     fact is read fresh, never refused. A staged fan's later stage is cut from the earlier stage's
+     keyed returns.
+   - **A claimed fact** is keyed by the sources it was judged from. When one of them moves, the fact is
+     not re-cut, since no command can recompute a judgment. It is handed as evidence, marked stale,
+     with the source that moved, and its producer re-judges it only when an item routes it back.
 4. **Acting on it is the default.** A producing role uses each handed fact as given:
    - it cites a handed excerpt by its key, as verified;
    - it reads beyond its packet only for what its own work produces from: the code it changes, or the
@@ -230,6 +263,10 @@ job is to verify.**
 
    `roles.trust` sets which facts a role acts on. F3-1 settled it as `keyed`: every keyed fact.
    `witnessed-only` makes every role re-check an upstream role's claim.
+
+   **A claimed fact guides; it never decides** (the owner's LR-2). A role works from a `claimed`
+   fact, but nothing that changes state rests on one without P23's re-derivation: a verdict, a
+   position, a landing or a gate. P23 governs decisions, and P29 governs inputs.
 5. **Verification is a job, not a habit.** Only verifying roles re-check what they are handed, and
    only their subject:
    - the reviewer checks the pinned artifact through its lens;
@@ -241,7 +278,8 @@ job is to verify.**
    profile in its static block.
 6. **Verifiers start cold.** A verifier's packet holds the artifact, the criterion and the claim. It
    never holds the author's reasoning, because a verifier's independence is what it produces. This is
-   `roles.verifier-context`, settled by F3-3 as `cold`.
+   `roles.verifier-context`, settled by F3-3 as `cold`. F3-3 named the reviewer and the skeptic; the
+   key covers every verifier of item 5, so the tester starts cold too.
 7. **A false handed fact is repaired and recorded.** A producing role that finds a handed fact false
    works from the corrected fact and finishes:
    - its return records the repair: the fact as handed, the fact as found, and the key of what it
@@ -255,6 +293,13 @@ job is to verify.**
      does today.
    - **Records:** a repair changes no record but the role's own return. A built spec stays frozen
      (P19).
+   - **Where the repair lives:** in its repair ask, keyed by the sources the repairing role read,
+     never by its immutable return. So it goes stale like any claimed fact when those sources move
+     (3). While the ask is open, the cut hands the repaired fact in place of the original.
+   - **When it ends:** when the producer's record is fixed. For a frozen built spec that is a new unit
+     (P19), and the repair holds until that unit is built and its spec supersedes the fact.
+   - **Two repairs of one fact:** the first filed holds. A second that differs is a contradiction
+     between roles, and routes to the producer as a divergence, its ask carrying both.
 
    This is `roles.on-contradiction`. F3-4 settled it as `repair-and-record`. The other values:
    - `return` stops with `contradicted` instead;
@@ -265,18 +310,27 @@ job is to verify.**
 9. **Returns hand forward.** A return carries the keys of what its role relied on and what it
    established, such as files read at their SHAs and probes with their digests. The next work order
    hands them on, so trust compounds along the chain instead of each role re-deriving.
-10. **Enforced at the call.** A PreToolUse hook, bound to the agent id, compares each call with the work
-    order. An answered call is one whose answer the work order already holds:
-    - a read of a handed range at the same blob SHA;
-    - a state or locate call whose answer is handed: HEAD, the branch, the base, the build's position;
+10. **Enforced at the call.** A PreToolUse hook compares each call with the work order. It finds the
+    work order through the act's task-sha and the session's binding record, or, for an in-session
+    spawn, the handoff's marker. An answered call is one whose answer the work order already holds:
+    - a read of a handed range at the same blob SHA. A read is any call that returns a file's content:
+      Read, Grep returning content, and the shell readers the hook parses. A read that only partly
+      overlaps a handed range is not answered, and runs;
+    - a state or locate call whose answer is handed and still holds: HEAD, the branch, the base, the
+      build's position. The hook recomputes the handed value at the call, so once the role's own commit
+      or a parallel pass moves it, the call runs;
     - a whole method document whose slice is handed.
+
+    Below CLI 2.1.295, a rule on an ungated tool, Read among them, stays open when its hook fails
+    (Runtime `[enforce]`, RT-2). There the rule holds while its hook runs, and a failure is recorded.
 
     `roles.answered-calls` decides what happens to one: refuse it and name the anchor of the handed
     answer, warn, or record. F3-2 settled it as `refuse`. A verifier's read of its subject is never an
     answered call, and neither is a read the packet does not cover.
 11. **Measured.** Every role agent's calls are classed, per role and item, into the value ledger, beside
-    the orientation cost `orient.budget` already records. The Loop Review reads the trend, and
-    `[current]` is the baseline.
+    the orientation cost `orient.budget` already records. The answered calls come from the hook's own
+    records, and the other classes from runlog's extractor (R3-F). The Loop Review reads the trend,
+    and `[current]` is the baseline.
 
 **Why trust holds.** A worker trusts a handed fact because the dispatch keyed it and checked the key
 at the spawn, not because another agent said it. The design keeps three boundaries:
@@ -288,6 +342,9 @@ at the spawn, not because another agent said it. The design keeps three boundari
 
 - **One tag per role**, `role.<name>`, in R-B's `role` namespace. Every instruction unit names the
   roles it binds. A unit that names none binds the driver alone.
+- **The binding extends a seam.** Today a role's front-matter `rules:` key names the charter rule tags
+  it binds, rendered by `roles_lib.render_charter_blocks` and checked by `check_rule_tags` (R4). R-B's
+  join widens it both ways: a unit's `role.*` scope tags and each role's `rules:` key must agree.
 - **The static block** holds the units tagged for the role that hold for every item it acts in:
   - its job, and its never-list, each line paired with its enforcer;
   - its allowance ceiling;
@@ -296,8 +353,10 @@ at the spawn, not because another agent said it. The design keeps three boundari
   - the practices it binds, by their reach;
   - the method slices every one of its items needs.
 
-  The block is the same at every spawn, so within the cache window the platform's cached prefix
-  serves every spawn of the role after the first.
+  The block is the same at every spawn. Within one act session and the platform's cache window, the
+  cached prefix serves every spawn of the role after the first. Across act sessions, with another
+  worktree's working directory or hours apart, the prefix is built again. R3-F measures it as
+  cache-read tokens per spawn.
 - **The task block** is the work order: the units tagged with the item, the handed facts, and the
   prompt writer's framing. The owner's "session-oriented" block is this one: the session's
   orientation, cut to the item and keyed.
@@ -306,9 +365,16 @@ at the spawn, not because another agent said it. The design keeps three boundari
   - A trigger that depends on what the role finds stays a pointer, and it points at a slice, never a
     whole document.
 
-  This applies R-E's "an agent reads its slice" to role agents. It answers the 805 method calls.
+  This applies R-E's "an agent reads its slice" to role agents. It answers the 811 method-class reads.
+- **The pointers' source.** The whole-document pointers come from the charter's `## Protocols`
+  section, which `roles_lib.CARRIED_SECTIONS` carries whole into every agent type and handoff. The
+  unit that slices them re-points that machinery in the same unit: `CARRIED_SECTIONS`, `check_roles.py`
+  R0 (a charter with no Protocols section), R5 and R10 (a body or overlay naming a protocol file), and
+  `render_agents.py`'s self-test arm 4, which asserts the carried text.
 - **Budgets both ways.** R-C's render refusals apply per role and per item. A block over its budget is
-  refused, and so is a block missing a unit its items require.
+  refused, and so is a block missing a unit its items require. The static block's budget is
+  `check_roles.py`'s `BODY_CEILINGS` (1,536 to 4,096 bytes per role, rule R5), one carrier. The
+  block's growth raises a ceiling only by an owner-approved change to it.
 - **Joins:**
   - every `role.*` tag names a declared role;
   - every declared role's static block resolves;
@@ -317,62 +383,70 @@ at the spawn, not because another agent said it. The design keeps three boundari
 ## [matrix] Each role's relation to the steps
 
 The relation is derived from the item declarations, never typed. Today the step definitions are the
-declarations, and `role_matrix.py` (`[instrument]`) derives the matrix from their Actor cells:
+declarations. Each Actor cell opens with one actor's kind: `command`, `executor`, `hook`, `owner`, or a
+role's name, which ends at the first comma, colon or parenthesis. `role_matrix.py` (`[instrument]`,
+revised 2026-10-16) reads only that opening, so prose in the cell never adds an actor, and derives the
+matrix from the step definitions as folded:
 
-| Actor | entry | plan | design | build | test | deploy | breakpoint |
-|---|---|---|---|---|---|---|---|
-| orientation scout | `entry.orient`, `entry.place` | — | — | — | — | — | — |
-| reuse scout | — | — | `design.seams` | — | — | — | — |
-| planner | — | `plan.triage-judge`, `plan.record` | — | — | — | — | — |
-| researcher | — | `plan.research` | `design.research` | — | — | — | — |
-| architect | — | — | `design.inventory`, `design.decompose` | — | — | — | — |
-| spec writer | — | — | `design.unit-spec` | — | — | — | — |
-| builder | — | — | — | `build.unit-pass` | — | — | — |
-| tester | — | — | — | — | `test.attribute` | — | — |
-| reviewer | — | — | — | — | — | — | `review.lens` |
-| skeptic | — | — | — | — | — | — | `review.refute` |
-| synthesizer | — | — | — | — | — | — | `review.report` |
-| executor | — | — | — | `build.unit-pass`, `build.acceptance`, `build.core` | — | — | — |
-| hook | `entry.intake` | — | — | — | `test.verdict` | — | — |
-| command | `entry.intake` | `plan.input`, `plan.dedupe`, `plan.triage-rule`, `plan.place`, `plan.lease`, `plan.recommend`, `plan.exit` | `design.input`, `design.reentry`, `design.overlaps`, `design.recommend`, `design.ready`, `design.exit` | `build.base`, `build.unit-lease`, `build.acceptance`, `build.scope`, `build.recommend`, `build.core`, `build.exit` | `test.merge`, `test.select`, `test.verdict`, `test.flakes`, `test.seen-red`, `test.recommend`, `test.exit` | `deploy.current`, `deploy.mandate`, `deploy.parents`, `deploy.land`, `deploy.core`, `deploy.record`, `deploy.recommend`, `deploy.close` | `review.trigger`, `review.pin`, `review.dispose`, `review.cost` |
+| Actor | entry | plan | design | build | test | deploy | breakpoint | lifecycle |
+|---|---|---|---|---|---|---|---|---|
+| orientation scout | `entry.orient`, `entry.place` | — | — | — | — | — | — | — |
+| planner | — | `plan.triage-judge`, `plan.record`, `plan.reason` | — | — | — | — | — | — |
+| researcher | — | `plan.research` | `design.research` | — | — | — | — | — |
+| reuse scout | — | — | `design.seams` | — | — | — | — | — |
+| architect | — | — | `design.inventory`, `design.decompose`, `design.reason` | — | — | — | — | — |
+| spec writer | — | — | `design.unit-spec` | — | — | — | `review.fold` | — |
+| builder | — | — | — | `build.unit-pass` | — | — | — | — |
+| tester | — | — | — | — | `test.attribute`, `test.reason` | — | — | — |
+| reviewer | — | — | — | — | — | — | `review.lens` | — |
+| skeptic | — | — | — | — | — | — | `review.refute` | — |
+| synthesizer | — | — | — | — | — | — | `review.report` | — |
+| command | `entry.place-check` | `plan.input`, `plan.dedupe`, `plan.triage-rule`, `plan.place`, `plan.lease`, `plan.recommend`, `plan.exit` | `design.input`, `design.reentry`, `design.overlaps`, `design.recommend`, `design.ready`, `design.exit` | `build.base`, `build.unit-lease`, `build.scope`, `build.recommend`, `build.exit` | `test.merge`, `test.select`, `test.verdict`, `test.route`, `test.flakes`, `test.seen-red`, `test.recommend`, `test.exit` | `deploy.current`, `deploy.mandate`, `deploy.parents`, `deploy.land`, `deploy.core`, `deploy.record`, `deploy.recommend`, `deploy.notify`, `deploy.snapshot`, `deploy.release`, `deploy.close` | `review.trigger`, `review.pin`, `review.dispose`, `review.cost` | `life.notify`, `life.snapshot`, `life.release`, `life.close` |
+| executor | — | — | — | `build.acceptance`, `build.core` | — | — | — | `life.quiesce` |
+| hook | `entry.intake` | — | — | — | — | — | — | — |
+| owner | `entry.place-owner` | — | — | — | — | — | — | `life.request` |
 
-- **Counts:** 55 items, 60 actor-item pairs and 14 actors. The eleven roles named in the Actor cells
-  act in 15 items. The other 40 items belong to commands, hooks or the executor.
-- **The prompt writer and the driver** do not appear in the Actor cells. They act in every role item's
-  cycle, not as items: in `[cycle]`, the driver hands the prompt writer the item's details, and the
-  executor wraps the prompt writer's task in the work order.
-- **The check runs both ways:**
-  - every item's actor is a declared role, a command, a hook, the executor or the owner;
-  - every core role acts in at least one core item;
-  - an expansion role acts only in its expansion's items, and no core item names one (P28).
-- **Seen red:** with the first item's actor replaced by `nobody`, the check exits 1 naming
-  `entry.intake`. On the record as written it exits 0.
+- **Counts:** 71 items, each with one actor; 15 actors; 19 items with a role.
+- **The prompt writer and the driver** act in no item. The prompt writer is a cycle role: it acts in
+  every role item's cycle, framing each work order (`[roster]`, flow-roles `[cycle]`). The driver
+  routes and never works.
+- **The check has three arms**, each a finding:
+  - every item's actor is a command, the executor, a hook, the owner, or a declared item role;
+  - every core item role acts in at least one core item;
+  - no core item names an expansion role (P28).
+- **Seen red:** each arm on a planted copy of the step definitions, one line changed: a misspelled
+  role, a core role left with no item, an expansion role in a core item, and a cycle role in an item.
+  On the records as written it exits 0.
 - **Each role's static block renders only its own row**: the items it acts in, each with its inputs and
   its return. A builder never loads the loop.
+- **Built from data.** Once dDeclaredLoop's loop definition declares the items as data, the matrix is
+  derived from that definition, not from this record's tables.
 
 ## [roster] Core and expansion roles
 
-P28 sorts the settled roster:
+P28 sorts the settled roster. Which items each role acts in is `[matrix]`'s, derived, so the roster
+names only each role's layer and how it acts:
 
-| Role | Layer | Acts in |
+| Role | Layer | Acts as |
 |---|---|---|
-| orientation scout | core | `entry.orient`, `entry.place` |
-| prompt writer | core | every role item's cycle |
-| planner | core | `plan.triage-judge`, `plan.record` |
-| researcher | core | `plan.research`, `design.research` |
-| reuse scout | core | `design.seams` |
-| architect | core | `design.decompose`, `design.inventory` |
-| spec writer | core | `design.unit-spec`, folds, and units born of findings |
-| builder | core | `build.unit-pass` |
-| tester | core | `test.attribute` |
-| reviewer | core; the maintenance-run and loop lenses arrive with observability | `review.lens` |
-| skeptic | core | `review.refute` |
-| synthesizer | core | `review.report` |
-| deployer | integrations | release notes; verify dispositions |
-| maintainer | observability | Maintain's filings |
+| orientation scout | core | item role |
+| prompt writer | core | cycle role: every role item's cycle, and no item |
+| planner | core | item role |
+| researcher | core | item role |
+| reuse scout | core | item role |
+| architect | core | item role |
+| spec writer | core | item role, folds included |
+| builder | core | item role |
+| tester | core | item role |
+| reviewer | core | item role; the maintenance-run and loop lenses arrive with observability |
+| skeptic | core | item role |
+| synthesizer | core | item role |
+| deployer | distribution, integrations | item role: release notes, and verify judgment |
+| maintainer | observability | item role: Maintain's filings |
 
 Twelve roles are core and two belong to expansions. An expansion registers its roles and lenses
-through its layer contract, and the core roster never names them.
+through its layer contract, and the core roster never names them. The deployer acts for two
+expansions: release notes for distribution, and verify judgment for integrations.
 
 ## [more] What else would improve the layer
 
@@ -381,26 +455,33 @@ through its layer contract, and the core roster never names them.
   - its tag and its layer;
   - its job, and its never-list with each line's enforcer;
   - its allowance ceiling;
-  - its model and effort;
+  - its model;
   - its trust profile;
   - its return template;
-  - its packet budget.
+  - its packet budget, beside its static block's ceiling in `BODY_CEILINGS`.
+- Its effort stays in the adopter-owned `tools/roles/house/policy.toml`, per role and per workflow
+  stage, read by `handoff.py stage-efforts` (TOOL-aOrientedCast-10).
+- Each role composes with the adopter-owned seeds the kit never rewrites: its house overlay,
+  `tools/roles/house/<role>.md`, rendered as `## House rules`, and that effort policy.
 - The agent files, the charter's role index, the matrix, the spawn guard's table and the return
   validator are all rendered from it.
 - This extends dBoundRoles' "static instructions as structured fields" with the layer, the trust
   profile, the budget and the tags.
 
 **R3-B. Static blocks cached, task blocks bounded.** The static block holds only what holds for all of
-the role's items, so every spawn of a role within the cache window reuses the cached prefix. Anything
-item-specific goes in the task.
+the role's items, so every spawn of a role within one act session and the cache window reuses the
+cached prefix (`[tags]`). Anything item-specific goes in the task.
 
 **R3-C. Separation of duties, checked.** The author of an artifact never verifies it:
 - a builder never reviews its own diff;
 - a spec writer never audits its own spec;
-- a skeptic never sees the reviewer's reasoning;
+- a skeptic never sees the reviewer's reasoning, under `roles.verifier-context: cold`;
 - each review round's reviewers are fresh agents.
 
-The ledger's agent ids per item check this, and the spawn guard refuses a breach.
+Every item spawns a fresh agent, so an agent-id check could never fail. The breach that can happen is
+in the packet: the spawn guard checks each verifier's work order against `roles.verifier-context`,
+and under `cold` refuses one that carries the author's packet or reasoning. Under `warm`, the
+`velocity` preset's value, the owner has chosen the faster, anchored review.
 
 **R3-D. Fresh agents stay cheap because packets are complete.**
 - The platform can continue an earlier agent with its context.
@@ -424,8 +505,15 @@ Without that packet, the prompt writer re-orients on every worker's behalf.
   - outcomes, retries and contradictions returned;
   - each lens's refutation rate.
 - **Who reads it:** the Loop Review.
-- **Acceptance:** dBoundRoles re-runs `role_orientation.py` on its own role agents. It must show
-  answered calls at zero under `refuse`, and method and locate calls below this round's baseline.
+- **Acceptance:** two measures, over every role act, whether a subagent, a workflow agent or a
+  headless session, keyed by its task-sha:
+  - answered calls, from the answered-call hook's own records: each one it refused, warned or
+    recorded. Under `refuse`, an attempt is counted as refused, not as zero;
+  - method and locate calls below this round's baseline, classed by runlog's extractor
+    (`tools/runlog/extract.py`, `derive_tool_class`), which already reads every subagent and workflow
+    agent's transcript with its agent type.
+
+  `role_orientation.py` stays this round's baseline instrument only.
 - **Measured since.** The memory round's five briefed researchers show why the measure must be
   the answered call, not the path class. Their subject was memory itself, so locate and method
   reads were their content (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md`,
@@ -439,15 +527,18 @@ Without that packet, the prompt writer re-orients on every worker's behalf.
 - They change only as instructions do, under `instructions.edit`.
 
 **R3-H. The platform's own role fields.** Agent files accept `skills` and agent-scoped `hooks` (roles
-anatomy research, inventory). The renderer can use both:
-- preload the level-4 Skills a role's tags select, as thin entries;
-- attach the answered-call hook to the role's own file, instead of a global matcher.
+anatomy research, inventory).
+- The level-4 Skills a role's tags select are handed in its static block as thin entries. An agent
+  file's `skills` field serves the subagent backend only, since a headless act has no agent file.
+- The answered-call rule is a pack in Runtime's one dispatcher entry per event, never an agent-scoped
+  hook. A guard beside the dispatcher fails open, and the anatomy research measured agent-scoped hooks
+  failing open (Runtime `[enforce]`).
 
-Both belong to the lower-level design.
+The rest belongs to the lower-level design.
 
 ## [gaps] Registered, 2026-10-15
 
-Eight gaps join the register, all owned by dBoundRoles:
+Eight gaps joined the register then, all owned by dBoundRoles. `[owner-notes]` later added `gap-roles-18`.
 
 | Gap | Severity | What it is |
 |---|---|---|
@@ -553,7 +644,16 @@ What happens by default?"**
 
 Each role item therefore owes a declared execution shape: its agent set, effort, checklist,
 orientation template and merge. The owner set this for a later revisit. It is recorded as
-`gap-roles-18` and in v2's `[owed]`. aScoutedSeam is evidence only: its branch is unmerged and no
+`gap-roles-18` and in v2's `[owed]`.
+
+Three of the five parts are declared data today, and the revisit extends them:
+- the agent set per workflow, with a `stages` table mapping each harness stage to a role
+  (`tools/roles/workflows.toml`);
+- the effort per role and per workflow stage (`tools/roles/house/policy.toml`), both served to the
+  harnesses by `handoff.py harness-args` and `stage-efforts`;
+- the bug-class checklist per diff (`tools/memory-tree/gotchas.py`).
+
+The orientation template and the merge are declared nowhere. aScoutedSeam is evidence only: its branch is unmerged and no
 chain build counts on its code.
 
 ## [instrument] The instruments, as run 2026-10-15
@@ -1000,3 +1100,184 @@ Run with `--plant`, it exited 1. The last lines of its output:
 actor-item pairs 58; actors 14; unmatched items 1
 UNMATCHED entry: entry.intake: nobody
 ```
+
+### `role_matrix.py`, revised 2026-10-16
+
+The fold's revision reads each Actor cell's opening only, takes the roster from `[roster]`, and
+implements all three arms:
+
+```python
+"""Derive the role-by-step matrix from the step definitions, and check it against the roster both ways.
+
+An Actor cell opens with its kind: `command`, `executor`, `hook`, `owner`, or a role's name, which ends
+at the first comma, colon or parenthesis. Nothing after that is read, so prose never adds an actor.
+The roster is the roles record's `[roster]` table: each role's layer, and whether it acts as an item
+role or as a cycle role, which acts in every role item's cycle and in no item.
+
+Three arms, each a finding (exit 1 if any):
+  1. every item's actor is a command, the executor, a hook, the owner, or a declared item role;
+  2. every core item role acts in at least one core item;
+  3. no core item names an expansion role (P28).
+
+Usage: python role_matrix.py <flow-steps record> <roles record>
+"""
+import collections
+import re
+import sys
+
+KINDS = ("command", "executor", "hook", "owner")
+STEPS = ["entry", "plan", "design", "build", "test", "deploy", "breakpoint", "lifecycle"]
+
+
+def roster(text):
+    block = text.split("\n## [roster]", 1)[1].split("\n## ", 1)[0]
+    roles = {}
+    for line in block.splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) == 3 and cells[0] not in ("Role", "---") and not cells[0].startswith("-"):
+            roles[cells[0]] = {"layer": cells[1], "cycle": cells[2].startswith("cycle role")}
+    if not roles:
+        sys.exit("no [roster] rows")
+    return roles
+
+
+def actor_of(cell):
+    head = re.split(r"[,:(]", cell.strip(), maxsplit=1)[0].strip().lower()
+    return head
+
+
+def main(argv):
+    steps_text = open(argv[0], encoding="utf-8").read()
+    roles = roster(open(argv[1], encoding="utf-8").read())
+    step = None
+    matrix = collections.defaultdict(lambda: collections.defaultdict(list))
+    findings = []
+    items = 0
+    for line in steps_text.splitlines():
+        h = re.match(r"^## \[([a-z]+)\]", line)
+        if h:
+            step = h.group(1) if h.group(1) in STEPS else None
+            continue
+        row = re.match(r"^\| `([a-z]+\.[a-z0-9-]+)` \| ([^|]+) \|", line)
+        if not row or step is None:
+            continue
+        items += 1
+        item, actor = row.group(1), actor_of(row.group(2))
+        if actor in KINDS:
+            matrix[actor][step].append(item)
+            continue
+        if actor not in roles:
+            findings.append(f"arm 1: {item}: actor '{actor}' is no kind and no declared role")
+            continue
+        if roles[actor]["cycle"]:
+            findings.append(f"arm 1: {item}: '{actor}' is a cycle role, and acts in no item")
+            continue
+        if roles[actor]["layer"] != "core":
+            findings.append(f"arm 3: {item}: core item names the expansion role '{actor}' ({roles[actor]['layer']})")
+        matrix[actor][step].append(item)
+    for name, r in roles.items():
+        if r["layer"] == "core" and not r["cycle"] and name not in matrix:
+            findings.append(f"arm 2: core role '{name}' acts in no core item")
+    order = [n for n in roles if n in matrix] + [k for k in KINDS if k in matrix]
+    print("| Actor | " + " | ".join(STEPS) + " |")
+    print("|---|" + "---|" * len(STEPS))
+    for name in order:
+        cells = [", ".join(f"`{i}`" for i in matrix[name].get(s, [])) or "—" for s in STEPS]
+        print(f"| {name} | " + " | ".join(cells) + " |")
+    pairs = sum(len(v) for m in matrix.values() for v in m.values())
+    role_items = sum(len(v) for n, m in matrix.items() if n not in KINDS for v in m.values())
+    print(f"\nitems {items}; actor-item pairs {pairs}; actors {len(matrix)}; "
+          f"items with a role {role_items}; cycle roles {sum(r['cycle'] for r in roles.values())}; findings {len(findings)}")
+    for f in findings:
+        print("FINDING", f)
+    return 1 if findings else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
+```
+
+Run as `python role_matrix.py <the step definitions> <this record>`, it exited 0 and printed the table
+in `[matrix]`, then:
+
+```text
+items 71; actor-item pairs 71; actors 15; items with a role 19; cycle roles 1; findings 0
+```
+
+Each arm was seen red on a planted copy of the step definitions, one line changed each. Each run
+exited 1:
+
+```text
+$ planted: `plan.reason`'s actor misspelled `plannr` (1 line changed)
+items 71; actor-item pairs 70; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 1: plan.reason: actor 'plannr' is no kind and no declared role
+exit 1
+
+$ planted: `design.seams`'s actor changed to `command`, so the reuse scout acts in no item (1 line changed)
+items 71; actor-item pairs 71; actors 14; items with a role 18; cycle roles 1; findings 1
+FINDING arm 2: core role 'reuse scout' acts in no core item
+exit 1
+
+$ planted: `test.reason`'s actor changed to the expansion role `deployer` (1 line changed)
+items 71; actor-item pairs 71; actors 16; items with a role 19; cycle roles 1; findings 1
+FINDING arm 3: test.reason: core item names the expansion role 'deployer' (distribution, integrations)
+exit 1
+
+$ planted: `plan.reason`'s actor changed to the cycle role `prompt writer` (1 line changed)
+items 71; actor-item pairs 70; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 1: plan.reason: 'prompt writer' is a cycle role, and acts in no item
+exit 1
+```
+
+## [revised] Revised 2026-10-16: the two Tier-2 rounds, folded
+
+Two Tier-2 rounds reviewed this record at blob `081ef3c1`. The comparison record places their findings
+on 39 defects (`build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared.md`, `[map-roles]`),
+and its map's `disposition` cells point here. Each defect's fix sits in place, in the sections named.
+The owner holds a revisit of the layer's mechanical shape, and the defects on execution shape are
+folded as facts and handed to it:
+- **amend:** this record, or a sibling record, now states the fix;
+- **fork:** the owner answered it, in the comparison record's `[answers]`;
+- **none:** every finding on it was refuted.
+
+| Defect | Disposition | Where the fix sits |
+|---|---|---|
+| `matrix-keyword-derivation` | amend | `[matrix]`: the Actor cell's opening names its one actor; `role_matrix.py` revised |
+| `matrix-prompt-writer` | amend | `[roster]`: the prompt writer is a cycle role; `[matrix]`'s second arm covers item roles |
+| `matrix-arms-unseen` | amend | `role_matrix.py` implements all three arms, each seen red (`[instrument]`) |
+| `sod-agent-id-check` | amend | R3-C: the spawn guard checks each verifier's packet against `roles.verifier-context` |
+| `acceptance-unmeasurable` | amend | R3-F: answered calls from the hook's records, other classes from runlog's extractor, keyed by task-sha |
+| `agent-file-hook` | amend | R3-H: the answered-call rule is a pack in Runtime's one dispatcher entry |
+| `agent-id-binding` | amend | `[settled]` and `[trust]` 10: the act's task-sha and the session's binding record |
+| `cut-at-launch` | amend | `[trust]` 3: fresh at act launch, and the window after it guarded; v2's P29 |
+| `method-call-figures` | amend | `[current]`: 811 method-class reads, from about 619 calls; `gap-roles-12` |
+| `recall-once-per-session` | none | refuted |
+| `gaps-count-stale` | amend | `[gaps]` notes `gap-roles-18` |
+| `answered-state-calls` | amend | `[trust]` 10: a state call is answered only while its handed value holds |
+| `answered-call-fail-open` | amend | `[trust]` 10: open below CLI 2.1.295 on ungated tools |
+| `settled-rule-attribution` | amend | `[settled]`: the render refusal is R-C's |
+| `effort-carrier` | amend | R3-A: effort stays in `house/policy.toml`; handed to the mechanical-shape revisit |
+| `execution-shape-seams` | amend | `[owner-notes]` and `gap-roles-18`: three of the five parts are declared; handed to the revisit |
+| `metrics-extractor-seam` | none | refuted; R3-F names runlog's extractor anyway |
+| `role-step-join-exists` | none | refuted |
+| `rules-key-binding` | amend | `[tags]`: the binding extends each role's `rules:` key, joined both ways |
+| `handoff-seam` | amend | `[trust]` 1: it extends `handoff.py render` |
+| `cycle-amendment` | amend | flow-roles `[cycle]` and `[records]`, under a dated `Revised:` line |
+| `protocol-pointer-machinery` | amend | `[tags]`: the slicing unit re-points the carry machinery; `gap-roles-12` |
+| `body-ceiling` | amend | R3-A: the packet and block budgets extend `BODY_CEILINGS` |
+| `keys-agent-typed` | none | refuted |
+| `reverify-order-sources` | amend | `[current]` cites the kit sources, `gov-session` and the spec template; `gap-roles-10` |
+| `claimed-fact-staleness` | amend | `[trust]` 3: a claimed fact whose source moved is handed as stale evidence |
+| `read-class-undefined` | amend | `[trust]` 10: a read is any call that returns a file's content; a partial overlap runs |
+| `over-budget-route` | amend | `[trust]` 1: optional inputs demote first, then the item routes back; a vanished anchor |
+| `repair-lifecycle` | amend | `[trust]` 7: when a repair ends, and concurrent repairs |
+| `repair-staleness` | amend | `[trust]` 7: the repair is keyed by its sources and preferred over the original |
+| `p29-vs-p23` | fork, amend | LR-2; `[trust]` 4; v2's P29 |
+| `flow-roles-steps-stale` | amend | flow-roles `[steps]` is marked superseded by `[matrix]` |
+| `dboundroles-order` | none | refuted |
+| `verifier-set-spelling` | amend | `[trust]` 6: `roles.verifier-context` covers the reviewer, the skeptic and the tester |
+| `cached-prefix-claim` | amend | `[tags]` and R3-B: the cached prefix holds within an act and the cache window |
+| `blob-sha-crlf` | none | refuted |
+| `cli-version-measurement` | amend | `[current]`: measured on 2.1.295 only |
+| `roster-fold-item` | amend | `[roster]`; the step definitions' `review.fold` |
+| `adopter-role-overlays` | amend | R3-A: the house overlays and the effort policy compose each role |

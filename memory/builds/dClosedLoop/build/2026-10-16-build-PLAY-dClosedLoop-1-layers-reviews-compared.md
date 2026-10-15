@@ -414,45 +414,45 @@ Run A is `wf_478254d1-ce0` and run B is `wf_08c634a0-1b4`.
 
 | defect | what | A | B | disposition |
 |---|---|---|---|---|
-| `matrix-keyword-derivation` | the "derived" matrix matches keywords anywhere in prose Actor cells, so items gain false actors and any cell naming a known word passes | 1, 13 | 3, 15 | pending |
-| `matrix-prompt-writer` | "every core role acts in a core item" fails on the prompt writer, a core role that appears in no Actor cell | 2, 14, 35 | 2, 16, 35, 36, 50 | pending |
-| `matrix-arms-unseen` | only the unmatched-actor arm is implemented or seen red, and only on a synthetic actor; the core-role and P28 arms exist in prose alone | 2, 12, 39 | 2, 36, 51 | pending |
-| `sod-agent-id-check` | R3-C's agent-id separation check cannot fail, since every item spawns a fresh agent, and "never sees the reasoning" contradicts velocity's warm verifiers | 3, 36 | 7, 23, 53 | pending |
-| `acceptance-unmeasurable` | R3-F's acceptance re-runs role_orientation.py, which has no answered-call measure, misses headless agents and has no parent-had for workflow spawns | 4, 16, 33 | 6, 18, 42, 49 | pending |
-| `agent-file-hook` | R3-H's agent-file hook is a second entry outside Runtime's single dispatcher, and agent-scoped hooks were measured to fail open | 5, 17, 28, 32 | 9, 22, 31, 39 | pending |
-| `agent-id-binding` | the work order and the answered-call hook bind by agent id, which headless acts lack and which Runtime replaced with task-sha | 6, 37, 44 | 9, 21, 33, 41 | pending |
-| `cut-at-launch` | "fresh at the spawn" does not hold: Runtime cuts the work order at act launch, and the Workflow runtime has no shell to re-key at the agent's spawn | 7, 11, 41 | 12, 20, 34, 40 | pending |
-| `method-call-figures` | the 805 method calls and their per-file counts disagree with the record's own instrument output, which counts file reads, not calls | 8, 15 | 5, 17 | pending |
-| `recall-once-per-session` | "recall is re-verified once" no longer holds once attended sessions start fresh at every item boundary | 9 | — | pending |
-| `gaps-count-stale` | [gaps] says eight gaps join the register, while gap-roles-18 joined later | 10 | — | pending |
-| `answered-state-calls` | refusing state calls whose answer was handed blocks the call that would find a stale fact once the role's own commit moves HEAD | 11, 42 | 46 | pending |
-| `answered-call-fail-open` | the answered-call rule is stated as enforced at the call, though it fails open below CLI 2.1.295, where Read is ungated | 4, 20 | 8, 25 | pending |
-| `settled-rule-attribution` | [settled] credits the render refusal to R-A, R-B and R-E, where it is R-C | 21 | — | pending |
-| `effort-carrier` | R3-A puts effort in the role definition, though effort lives in the adopter-owned house/policy.toml | 22 | 29, 38 | pending |
-| `execution-shape-seams` | gap-roles-18's execution shape is mostly declared already: workflows.toml's agent sets, policy.toml's efforts, gotchas.py's checklist | 23 | 32 | pending |
-| `metrics-extractor-seam` | role_orientation.py re-implements runlog's transcript extractor and its tool-call classifier | 24 | 27 | pending |
-| `role-step-join-exists` | the role-to-stage relation is already joined both ways by check_roles R6 to R9 over workflows.toml | 25 | 26, 43 | pending |
-| `rules-key-binding` | [tags] binds from the unit's side, while today each role's `rules:` key binds the other way and is checked | 26 | 30 | pending |
-| `handoff-seam` | "handed, not referenced" is framed as new, though handoff.py's render already resolves each role's declared inputs into content | 27 | 28 | pending |
-| `cycle-amendment` | [trust] amends [cycle] while flow-roles still says references, and R3-E reorders the cycle unannounced | 29 | — | pending |
-| `protocol-pointer-machinery` | replacing protocol pointers with slices trips the roles kit's carried Protocols section and the rules and self-test that read it | 30, 47 | 37, 54 | pending |
-| `body-ceiling` | the static block's growth crosses check_roles' existing per-role body ceilings, and R3-A adds a second carrier | 31 | 44 | pending |
-| `keys-agent-typed` | "no agent types a key" sits beside returns that carry agent-typed keys onward | 34 | — | pending |
-| `reverify-order-sources` | the re-verification orders are cited at rendered copies, not kit sources, and the inventory misses gov-session and the spec template | 38 | 45, 52 | pending |
-| `claimed-fact-staleness` | re-cutting covers only facts a command can recompute, not judgments whose source moved | 40 | — | pending |
-| `read-class-undefined` | the answered-call rule names "a read" without saying which tools count or how a partial overlap is treated | 43 | — | pending |
-| `over-budget-route` | an item whose handed content exceeds its packet budget, or whose anchor vanished at re-cut, has no route | 45 | 48 | pending |
-| `repair-lifecycle` | nothing says when a repair ends against a frozen record, or which of two concurrent repairs wins | 46 | 47 | pending |
-| `repair-staleness` | a repaired fact keyed to an immutable return never goes stale, and a re-cut can hand the false original again | — | 10, 47 | pending |
-| `p29-vs-p23` | P29 has roles act on claimed, agent-typed facts, which P23's source floor forbids, and neither scopes the other | — | 1, 24 | pending |
-| `flow-roles-steps-stale` | flow-roles [steps] still stands as a second typed role-to-step table that contradicts the derived matrix | — | 4 | pending |
-| `dboundroles-order` | dBoundRoles owns re-cutting at the spawn, while the executor that does it lands later in dWellOiledMachine | — | 11 | pending |
-| `verifier-set-spelling` | the verifier set is the reviewer, skeptic and tester in one place and the reviewer and skeptic in F3-3 | — | 13 | pending |
-| `cached-prefix-claim` | "the cached prefix serves every spawn after the first" has no criterion, and act sessions differ in cwd and time | — | 14 | pending |
-| `blob-sha-crlf` | the hook's blob SHA is unspecified, and CRLF working copies never hash to the keyed blob | 19 | 19 | pending |
-| `cli-version-measurement` | "no AGENTS.md block reaches a role" was measured only on CLI 2.1.295, while act sessions may launch 2.1.292 | 18 | — | pending |
-| `roster-fold-item` | the spec writer's folds are in [roster], but no step declares a fold item | — | 16 | pending |
-| `adopter-role-overlays` | declaring each role once in the kit leaves out the adopter-owned house overlays and effort policy | — | 38 | pending |
+| `matrix-keyword-derivation` | the "derived" matrix matches keywords anywhere in prose Actor cells, so items gain false actors and any cell naming a known word passes | 1, 13 | 3, 15 | amend; `layer-roles` `[revised]` |
+| `matrix-prompt-writer` | "every core role acts in a core item" fails on the prompt writer, a core role that appears in no Actor cell | 2, 14, 35 | 2, 16, 35, 36, 50 | amend; `layer-roles` `[revised]` |
+| `matrix-arms-unseen` | only the unmatched-actor arm is implemented or seen red, and only on a synthetic actor; the core-role and P28 arms exist in prose alone | 2, 12, 39 | 2, 36, 51 | amend; `layer-roles` `[revised]` |
+| `sod-agent-id-check` | R3-C's agent-id separation check cannot fail, since every item spawns a fresh agent, and "never sees the reasoning" contradicts velocity's warm verifiers | 3, 36 | 7, 23, 53 | amend; `layer-roles` `[revised]` |
+| `acceptance-unmeasurable` | R3-F's acceptance re-runs role_orientation.py, which has no answered-call measure, misses headless agents and has no parent-had for workflow spawns | 4, 16, 33 | 6, 18, 42, 49 | amend; `layer-roles` `[revised]` |
+| `agent-file-hook` | R3-H's agent-file hook is a second entry outside Runtime's single dispatcher, and agent-scoped hooks were measured to fail open | 5, 17, 28, 32 | 9, 22, 31, 39 | amend; `layer-roles` `[revised]` |
+| `agent-id-binding` | the work order and the answered-call hook bind by agent id, which headless acts lack and which Runtime replaced with task-sha | 6, 37, 44 | 9, 21, 33, 41 | amend; `layer-roles` `[revised]` |
+| `cut-at-launch` | "fresh at the spawn" does not hold: Runtime cuts the work order at act launch, and the Workflow runtime has no shell to re-key at the agent's spawn | 7, 11, 41 | 12, 20, 34, 40 | amend; `layer-roles` `[revised]` |
+| `method-call-figures` | the 805 method calls and their per-file counts disagree with the record's own instrument output, which counts file reads, not calls | 8, 15 | 5, 17 | amend; `layer-roles` `[revised]` |
+| `recall-once-per-session` | "recall is re-verified once" no longer holds once attended sessions start fresh at every item boundary | 9 | — | none; `layer-roles` `[revised]` |
+| `gaps-count-stale` | [gaps] says eight gaps join the register, while gap-roles-18 joined later | 10 | — | amend; `layer-roles` `[revised]` |
+| `answered-state-calls` | refusing state calls whose answer was handed blocks the call that would find a stale fact once the role's own commit moves HEAD | 11, 42 | 46 | amend; `layer-roles` `[revised]` |
+| `answered-call-fail-open` | the answered-call rule is stated as enforced at the call, though it fails open below CLI 2.1.295, where Read is ungated | 4, 20 | 8, 25 | amend; `layer-roles` `[revised]` |
+| `settled-rule-attribution` | [settled] credits the render refusal to R-A, R-B and R-E, where it is R-C | 21 | — | amend; `layer-roles` `[revised]` |
+| `effort-carrier` | R3-A puts effort in the role definition, though effort lives in the adopter-owned house/policy.toml | 22 | 29, 38 | amend; `layer-roles` `[revised]` |
+| `execution-shape-seams` | gap-roles-18's execution shape is mostly declared already: workflows.toml's agent sets, policy.toml's efforts, gotchas.py's checklist | 23 | 32 | amend; `layer-roles` `[revised]` |
+| `metrics-extractor-seam` | role_orientation.py re-implements runlog's transcript extractor and its tool-call classifier | 24 | 27 | none; `layer-roles` `[revised]` |
+| `role-step-join-exists` | the role-to-stage relation is already joined both ways by check_roles R6 to R9 over workflows.toml | 25 | 26, 43 | none; `layer-roles` `[revised]` |
+| `rules-key-binding` | [tags] binds from the unit's side, while today each role's `rules:` key binds the other way and is checked | 26 | 30 | amend; `layer-roles` `[revised]` |
+| `handoff-seam` | "handed, not referenced" is framed as new, though handoff.py's render already resolves each role's declared inputs into content | 27 | 28 | amend; `layer-roles` `[revised]` |
+| `cycle-amendment` | [trust] amends [cycle] while flow-roles still says references, and R3-E reorders the cycle unannounced | 29 | — | amend; `layer-roles` `[revised]` |
+| `protocol-pointer-machinery` | replacing protocol pointers with slices trips the roles kit's carried Protocols section and the rules and self-test that read it | 30, 47 | 37, 54 | amend; `layer-roles` `[revised]` |
+| `body-ceiling` | the static block's growth crosses check_roles' existing per-role body ceilings, and R3-A adds a second carrier | 31 | 44 | amend; `layer-roles` `[revised]` |
+| `keys-agent-typed` | "no agent types a key" sits beside returns that carry agent-typed keys onward | 34 | — | none; `layer-roles` `[revised]` |
+| `reverify-order-sources` | the re-verification orders are cited at rendered copies, not kit sources, and the inventory misses gov-session and the spec template | 38 | 45, 52 | amend; `layer-roles` `[revised]` |
+| `claimed-fact-staleness` | re-cutting covers only facts a command can recompute, not judgments whose source moved | 40 | — | amend; `layer-roles` `[revised]` |
+| `read-class-undefined` | the answered-call rule names "a read" without saying which tools count or how a partial overlap is treated | 43 | — | amend; `layer-roles` `[revised]` |
+| `over-budget-route` | an item whose handed content exceeds its packet budget, or whose anchor vanished at re-cut, has no route | 45 | 48 | amend; `layer-roles` `[revised]` |
+| `repair-lifecycle` | nothing says when a repair ends against a frozen record, or which of two concurrent repairs wins | 46 | 47 | amend; `layer-roles` `[revised]` |
+| `repair-staleness` | a repaired fact keyed to an immutable return never goes stale, and a re-cut can hand the false original again | — | 10, 47 | amend; `layer-roles` `[revised]` |
+| `p29-vs-p23` | P29 has roles act on claimed, agent-typed facts, which P23's source floor forbids, and neither scopes the other | — | 1, 24 | fork, amend; `layer-roles` `[revised]` |
+| `flow-roles-steps-stale` | flow-roles [steps] still stands as a second typed role-to-step table that contradicts the derived matrix | — | 4 | amend; `layer-roles` `[revised]` |
+| `dboundroles-order` | dBoundRoles owns re-cutting at the spawn, while the executor that does it lands later in dWellOiledMachine | — | 11 | none; `layer-roles` `[revised]` |
+| `verifier-set-spelling` | the verifier set is the reviewer, skeptic and tester in one place and the reviewer and skeptic in F3-3 | — | 13 | amend; `layer-roles` `[revised]` |
+| `cached-prefix-claim` | "the cached prefix serves every spawn after the first" has no criterion, and act sessions differ in cwd and time | — | 14 | amend; `layer-roles` `[revised]` |
+| `blob-sha-crlf` | the hook's blob SHA is unspecified, and CRLF working copies never hash to the keyed blob | 19 | 19 | none; `layer-roles` `[revised]` |
+| `cli-version-measurement` | "no AGENTS.md block reaches a role" was measured only on CLI 2.1.295, while act sessions may launch 2.1.292 | 18 | — | amend; `layer-roles` `[revised]` |
+| `roster-fold-item` | the spec writer's folds are in [roster], but no step declares a fold item | — | 16 | amend; `layer-roles` `[revised]` |
+| `adopter-role-overlays` | declaring each role once in the kit leaves out the adopter-owned house overlays and effort policy | — | 38 | amend; `layer-roles` `[revised]` |
 
 ## [map-memory] The memory layer's findings, placed
 

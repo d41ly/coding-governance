@@ -775,6 +775,17 @@ Rounds 1 and 2 of the layers' reviews, dispatches 39 and 40, were derived from t
   - `flow.route-backs` joined v2's catalogue, and `gap-flow-15` and `gap-rt-14` the register;
   - 4 defects were refuted.
 
+- 2026-10-16, session 1799cb98: the roles layer's 39 defects were folded, and its record's `[revised]`
+  says where each went:
+  - the matrix reads each Actor cell's opening only, and `role_matrix.py`, revised, implements its
+    three arms: 0 findings over 71 items, and each arm seen red on a planted copy;
+  - the prompt writer is a cycle role, the roster names only layers, and the deployer acts for
+    distribution and integrations;
+  - work orders bind by task-sha, are fresh at act launch, and hand content through `handoff.py`;
+    answered calls hold only while the handed answer does; repairs are keyed by their sources;
+  - P29 is amended after LR-2, and flow-roles' cycle hands content, its `[steps]` superseded;
+  - 6 defects were refuted.
+
 ## Instruments
 
 ### The gap-ownership join

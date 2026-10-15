@@ -16,8 +16,9 @@ orientation, session-model and roles records, and repeats none of their settled 
 ## [cycle] The item cycle: one shape for every role item
 
 1. **`next`** names the item and its actor.
-2. **The driver hands the prompt writer the item's details**: the item's definition and acceptance,
-   references to its input records, its allowance, and the actor's return template.
+2. **The driver hands the prompt writer the item's resolved work order**: the item's definition and
+   acceptance, its inputs as keyed handed content with a reference only for optional depth, its
+   allowance, and the actor's return template (layer-roles `[trust]` 1, R3-E).
 3. **The prompt writer returns the task prompt**, a record of its own.
 4. **The executor wraps it in the work order** (the item, its allowance, its return template, its
    witness, the hashes) and spawns the actor in a fresh agent. The actor's static instructions load
@@ -29,9 +30,17 @@ orientation, session-model and roles records, and repeats none of their settled 
 
 Every return template ends in an outcome from a closed set, and the driver routes on that outcome by
 a table, never on prose. A role carries nothing from one item to the next: whatever a later item
-needs is in a record its work order references.
+needs is in a record its work order hands it.
+
+Revised: 2026-10-16, after the roles layer's two Tier-2 rounds
+(`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md`, `[revised]`): steps 2 and 4 hand content,
+not references. The prompt writer frames a work order already resolved, and the executor wraps that
+framing in it.
 
 ## [steps] Each step as a sequence of role items
+
+Revised: 2026-10-16: the role-to-step relation is now derived from the step definitions
+(layer-roles `[matrix]`), and this table stays as the record of the flow revisit that produced it.
 
 Item numbers are those of each step's checklist in the flow record. "Review roles" means the
 reviewer with the step's lens, then the skeptic, then the synthesizer.
@@ -130,7 +139,7 @@ owner's words ──► intake ──► plan record ──► seams ──► f
 
 Review reports, from the synthesizer, branch off every step and return as new units or asks.
 
-Each role reads only what its work order references and writes only its own class. A build moves
+Each role works from what its work order hands it and writes only its own class. A build moves
 because its records accumulate and `next` reads them; no worker remembers where the build is.
 
 ## [owner] Where the owner appears
