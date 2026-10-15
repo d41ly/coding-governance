@@ -227,6 +227,9 @@ job is to verify.**
 
    The rule replaces "Verify every claim about current code by reading that code". A claim about code
    counts as verified when this item read the code, or was handed it with its key.
+
+   `roles.trust` sets which facts a role acts on. F3-1 settled it as `keyed`: every keyed fact.
+   `witnessed-only` makes every role re-check an upstream role's claim.
 5. **Verification is a job, not a habit.** Only verifying roles re-check what they are handed, and
    only their subject:
    - the reviewer checks the pinned artifact through its lens;
@@ -238,11 +241,24 @@ job is to verify.**
    profile in its static block.
 6. **Verifiers start cold.** A verifier's packet holds the artifact, the criterion and the claim. It
    never holds the author's reasoning, because a verifier's independence is what it produces. This is
-   `roles.verifier-context`, asked as F3-3.
-7. **A contradiction is an outcome.** A role that finds a handed fact false does not repair it and
-   carry on. It returns `contradicted` with its evidence. The driver routes it to the fact's producer,
-   as a builder's `diverged` already routes to Design. This is `roles.on-contradiction`, asked as
-   F3-4.
+   `roles.verifier-context`, settled by F3-3 as `cold`.
+7. **A false handed fact is repaired and recorded.** A producing role that finds a handed fact false
+   works from the corrected fact and finishes:
+   - its return records the repair: the fact as handed, the fact as found, and the key of what it
+     read;
+   - the driver files the repair as an ask against the producer's record;
+   - until that record is fixed, work orders hand the repaired fact, keyed to the repairing return.
+
+   The boundaries:
+   - **Mandate:** a repair stays inside the role's mandate. A false fact whose repair would change
+     what the role was asked to produce is a divergence. It routes back as a builder's `diverged`
+     does today.
+   - **Records:** a repair changes no record but the role's own return. A built spec stays frozen
+     (P19).
+
+   This is `roles.on-contradiction`. F3-4 settled it as `repair-and-record`. The other values:
+   - `return` stops with `contradicted` instead;
+   - `ask` parks the item for the owner.
 8. **Orientation happens once.** The orientation scout re-verifies recall at entry, once: memory, prior
    records and the card. It keys what it finds, and everything after it trusts the keys. The charter's
    `[memory]` rule holds: recall is re-verified, at one boundary instead of by every role.
@@ -256,7 +272,7 @@ job is to verify.**
     - a whole method document whose slice is handed.
 
     `roles.answered-calls` decides what happens to one: refuse it and name the anchor of the handed
-    answer, warn, or record. It is asked as F3-2. A verifier's read of its subject is never an
+    answer, warn, or record. F3-2 settled it as `refuse`. A verifier's read of its subject is never an
     answered call, and neither is a read the packet does not cover.
 11. **Measured.** Every role agent's calls are classed, per role and item, into the value ledger, beside
     the orientation cost `orient.budget` already records. The Loop Review reads the trend, and
@@ -437,7 +453,7 @@ Eight gaps join the register, all owned by dBoundRoles:
 | `gap-roles-14` | MED | the roster is not sorted by layer |
 | `gap-roles-15` | MED | the role-to-step relation is typed, never derived or joined |
 | `gap-roles-16` | LOW | nothing declares what a verifier receives |
-| `gap-roles-17` | LOW | outside the builder, a false handed fact has no route |
+| `gap-roles-17` | LOW | a false handed fact has no repair record and no route |
 
 ## [forks] Asked, 2026-10-15
 
@@ -474,6 +490,37 @@ What happens by default?"**
   - Repair, record and continue: the role works from the corrected fact and records the repair in
     its return, and the producer's record is fixed afterwards.
   - Ask the owner: the item parks for the owner. Unattended runs follow `run.on-owner-question`.
+
+### Settled after F3-1 to F3-4, 2026-10-15
+
+- **F3-1:** Every keyed fact (Recommended).
+  - The key is `roles.trust`. Its default is `keyed`, and `witnessed-only` is allowed.
+- **F3-2:** Refuse, naming the anchor (Recommended).
+  - The key is `roles.answered-calls`. Its default is `refuse`, and `warn` and `record` are allowed.
+- **F3-3:** Cold (Recommended).
+  - The key is `roles.verifier-context`. Its default is `cold`, and `warm` is allowed.
+- **F3-4:** Repair, record, continue. This is the owner's answer, over the recommended return.
+  - The key is `roles.on-contradiction`. Its default is `repair-and-record`, and `return` and `ask`
+    are allowed.
+  - `[trust]` is amended in place: the repair is recorded in the return and filed as an ask against
+    the producer's record. Until the record is fixed, the repaired fact is handed onward, keyed to
+    the repairing return.
+  - A repair stays inside the role's mandate. A false fact whose repair would change what the role
+    was asked to produce is still a divergence, and a built spec stays frozen (P19).
+
+**What changed elsewhere:**
+- **v2:**
+  - P29 is added.
+  - The four keys join the catalogue and every preset.
+  - dBoundRoles' roster is sorted into twelve core roles and two expansion roles. Its units gain
+    the trust mechanism, the derived matrix and role metrics.
+  - `[owed]` gains the roles layer's lower-level design and, at the re-cut, the expansion roles'
+    home.
+- **The presets** follow each stance:
+  - `velocity` warns on answered calls, sends verifiers warm, and repairs;
+  - `strict` trusts only witnessed and decided facts, and returns a contradiction;
+  - `guarded` returns a contradiction.
+- **The register:** `gap-roles-17` now names the missing repair record and route.
 
 ## [instrument] The instruments, as run 2026-10-15
 

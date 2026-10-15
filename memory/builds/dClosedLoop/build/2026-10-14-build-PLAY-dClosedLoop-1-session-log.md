@@ -237,6 +237,14 @@ way and held from the ledger:
   re-derive over 171 transcripts, and derived the role-by-step matrix from the step definitions.
   It proposed a trust mechanism (P29) and recorded eight gaps, all owned by dBoundRoles. Four
   questions were put to the owner.
+- 2026-10-15, session 1799cb98: the owner settled F3-1 to F3-4:
+  - every keyed fact is acted on;
+  - answered calls are refused, naming the anchor;
+  - verifiers start cold;
+  - a false handed fact is repaired, recorded and filed against its producer's record. This is the
+    owner's answer, over the recommended return.
+
+  P29 and four keys joined v2.
 
 ## Instruments
 
@@ -455,6 +463,14 @@ After layers round three registered its gaps, the join was run as extracted from
 - **The changes:** `gap-roles-10` to `gap-roles-17` went to dBoundRoles.
 - **The join** exits 0 on 119 keys and 11 builds. On a copy with `gap-roles-17` struck from
   dBoundRoles' row, it exits 1 naming it unowned.
+
+After the roles layer's answers, both instruments were run as extracted from this record:
+- **The changes:** `roles.trust`, `roles.answered-calls`, `roles.verifier-context` and
+  `roles.on-contradiction` joined the catalogue and every preset.
+- **The preset check** exits 0 on 106 catalogue keys, 100 presettable, 100 preset rows. On a copy with
+  standard `roles.on-contradiction` set to `return` and strict `roles.answered-calls` set to
+  `sometimes`, it exits 1 naming both.
+- **The join** still exits 0 on 119 keys and 11 builds.
 
 ### The foreign-build census
 
