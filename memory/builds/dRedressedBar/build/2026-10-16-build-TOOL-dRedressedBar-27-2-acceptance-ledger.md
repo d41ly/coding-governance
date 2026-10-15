@@ -32,7 +32,7 @@ Each target's key, arm, class and evidence, then its bullet as check 23 reads it
 the `- ACn` line to the next bullet, `**Evidences:**` line or heading, at `<parent>` and at `<p27>`.
 An added token's evidence names the commit and path `git grep -F` finds it at.
 
-### TOOL-aOrientedCast-22/AC7 · arm 3 · class U
+### Ledger line TOOL-aOrientedCast-22/AC7 · arm 3 · class U
 
 In
 `memory/builds/aOrientedCast/build/2026-10-13-build-TOOL-aOrientedCast-22-1-acceptance-ledger.md`.
@@ -55,7 +55,7 @@ At `<p27>`:
   `PreToolUse` — owed to the main loop's live session at the close, after the merge and a restart; not observable by a fixture. Never seen live: the refusal of an `AskUserQuestion` call.
 ~~~~
 
-### TOOL-aSparedSpawn-1/AC5 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-1/AC5 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-1-acceptance-ledger.md`.
 Added `REUSE_SCHEMA`, for "the schema line". `git grep -F` finds it at the unit's pass commit
@@ -79,7 +79,7 @@ At `<p27>`:
   reordered, rev-3 records it.
 ~~~~
 
-### TOOL-aSparedSpawn-10/AC9 · arm 2 · class O
+### Ledger line TOOL-aSparedSpawn-10/AC9 · arm 2 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-10-acceptance-ledger.md`.
 The check field's command wrapped after `--only`; it is joined onto line 1, so the first line
@@ -113,7 +113,7 @@ exited 0 with every registered count unchanged; `sh_hygiene.py --location-probes
 hit on this spec; `gen_map.py --check` exited 0 after `--write`.
 ~~~~
 
-### TOOL-aSparedSpawn-11/AC10 · arm 2, 3 · class U
+### Ledger line TOOL-aSparedSpawn-11/AC10 · arm 2, 3 · class U
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-11-acceptance-ledger.md`.
 `amended rev-4` names the rev-4 entry of
@@ -149,7 +149,7 @@ loop registry exited 0, and `lexicon.py` exited 0 after `gen_map.py --write`, wh
 definition had first moved both of its pins by one (spec rev-3).
 ~~~~
 
-### TOOL-aSparedSpawn-11/AC2 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-11/AC2 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-11-acceptance-ledger.md`.
 Added `process.exit`, for "the exit stub". `git grep -F` finds it at the unit's pass commit
@@ -175,7 +175,7 @@ At `<p27>`:
   denies, 0 disagreements. The same break in a scratch copy of the suite is OWED at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-11/AC3 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-11/AC3 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-11-acceptance-ledger.md`.
 Added `gov:sequential-agents`, for "the marker strip". `git grep -F` finds it at `086b3a66d` in the
@@ -197,7 +197,7 @@ At `<p27>`:
   is OWED at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-11/AC6 · arm 3 · class U
+### Ledger line TOOL-aSparedSpawn-11/AC6 · arm 3 · class U
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-11-acceptance-ledger.md`.
 `amended rev-4` names the same rev-4 entry of spec 11: AC6's suite run was owed at VERIFYING, and no
@@ -222,7 +222,7 @@ At `<p27>`:
   shared tree. Never run: the hook-destinations suite, in which `git archive` runs once.
 ~~~~
 
-### TOOL-aSparedSpawn-11/AC7 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-11/AC7 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-11-acceptance-ledger.md`.
 Added `build_commit`, for "two declared calls". `git grep -F` finds it at `086b3a66d` in the
@@ -251,7 +251,7 @@ At `<p27>`:
   counting through the same PATH stub, is OWED at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-12/AC5 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-12/AC5 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-12-acceptance-ledger.md`.
 Added `TREE_CLEAN` and `no`, for "a tracked file dirtied". `git grep -F` finds both at the unit's
@@ -275,7 +275,7 @@ At `<p27>`:
   The suite arm is owed at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-12/AC6 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-12/AC6 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-12-acceptance-ledger.md`.
 Added `guard`, for the held and selected legs. `git grep -F` finds it at `f848fe22e` in the
@@ -303,7 +303,7 @@ At `<p27>`:
   line appeared. The suite arm is owed at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-13/AC11 · arm 2 · class U
+### Ledger line TOOL-aSparedSpawn-13/AC11 · arm 2 · class U
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-13-acceptance-ledger.md`.
 `amended rev-6` names the rev-6 entry of
@@ -329,7 +329,7 @@ At `<p27>`:
   second bar in a fresh worktree reports.
 ~~~~
 
-### TOOL-aSparedSpawn-13/AC3 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-13/AC3 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-13-acceptance-ledger.md`.
 Added `clock`, for "`clk` executed". `git grep -F` finds it once at the unit's pass commit
@@ -351,7 +351,7 @@ At `<p27>`:
   (which reads `clock`) executed and `pure` was reused. The suite arm is owed at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-13/AC5 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-13/AC5 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-13-acceptance-ledger.md`.
 Added `TREE_CLEAN` and `no`, for "an untracked guarded file". `git grep -F` finds both at
@@ -376,7 +376,7 @@ At `<p27>`:
   unchanged after the reusing bar. The suite arm is owed at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-14/AC3 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-14/AC3 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-14-acceptance-ledger.md`.
 Added `REFUSAL_CEILINGS`, for "above its ceiling". `git grep -F` finds it at the unit's pass commit
@@ -399,7 +399,7 @@ At `<p27>`:
   passes; staged break `ceiling compare` turns the arm red.
 ~~~~
 
-### TOOL-aSparedSpawn-14/AC4 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-14/AC4 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-14-acceptance-ledger.md`.
 Added `memory/DECISIONS.md`, for "the fixture decision log". `git grep -F` finds it at `118c5c83e`
@@ -426,7 +426,7 @@ At `<p27>`:
   `ceiling id carried` each turn an arm red.
 ~~~~
 
-### TOOL-aSparedSpawn-14/AC7 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-14/AC7 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-14-acceptance-ledger.md`.
 Added `--check`, for the planted gate's refusal. `git grep -F` finds it at `118c5c83e` in
@@ -446,7 +446,7 @@ At `<p27>`:
   under `--check` naming the family; staged break `family dead pattern` turns the arm red.
 ~~~~
 
-### TOOL-aSparedSpawn-16/AC11 · arm 3 · class A
+### Ledger line TOOL-aSparedSpawn-16/AC11 · arm 3 · class A
 
 In `memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-16-acceptance-ledger.md`.
 Spec 16's rev-3 moved S10 with AC11 to the build's exit, and its rev-4 names that ask,
@@ -466,7 +466,7 @@ At `<p27>`:
   `--dispatch` — MOVED to the build's exit with S10 at rev-3, so no check observes it in this unit; it is an ask, not a discharge. The spec's rev-4 entry names that ask, `TOOL-aSparedSpawn-25`.
 ~~~~
 
-### TOOL-aSparedSpawn-16/AC12 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-16/AC12 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-16-acceptance-ledger.md`.
 Added `age.*` and `age.${heldkeys[$i]}`, for the base runner's count. `age.*` is the criterion's
@@ -488,7 +488,7 @@ At `<p27>`:
 - AC12 — `direct-checks.sh reuse` — changed runner: with K1's count at 9, a K2 execution on a dirty tree, then a K1 reuse, the next K1 run printed `GATE ok    pa  (executed: reused on 10 runs in a row)` and the age line; base runner: counting in its per-name `age.*` file (`age.${heldkeys[$i]}` at f53211e6c) that run printed `GATE reuse pa`. The evidence arm `16-AC12` is OWED at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-16/AC18 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-16/AC18 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-16-acceptance-ledger.md`.
 Added `GATE ok    <leg>  (sampled against a cached ok)`, the template of the printed line the answer
@@ -507,7 +507,7 @@ At `<p27>`:
 - AC18 — `direct-checks.sh reuse` — changed runner: `GATE ok    pa  (sampled against a cached ok)` (an instance of `GATE ok    <leg>  (sampled against a cached ok)`) on a drawn leg, the aged tail on a count of 10, and `GATE FAIL  pa  (exit 1) (sampled against a cached ok)` on a drawn red; base runner: the plain lines. The canary arm 9d2 is OWED at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-2/AC2 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-2/AC2 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-2-acceptance-ledger.md`.
 Added `GATE_CALIBRATION_RATES`, for "the seam's rates". `git grep -F` finds it at the unit's pass
@@ -525,7 +525,7 @@ At `<p27>`:
 - AC2 — `check_sp_value` arm 12a — the seam's rates (`GATE_CALIBRATION_RATES`) flat after K=4 picked 4 and rates still rising picked 8, under a `false` spawn command that reds any timed loop. With the selection changed to take the maximum, the flat case picked 6 and the arm redded.
 ~~~~
 
-### TOOL-aSparedSpawn-2/AC6 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-2/AC6 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-2-acceptance-ledger.md`.
 Added `spawnpause=2`, for the row arm 12e declares; it contains the criterion's `spawnpause`.
@@ -543,7 +543,7 @@ At `<p27>`:
 - AC6 — `check_sp_value` arm 12e (its row declares `spawnpause=2`) — with no floor recorded, one `run-gates: NOTE` and one `spawn: … INERT` line printed, no pauses row was written, and three legs reported. With the absent floor read as 0, both lines vanished and two pauses rows were written, so the arm redded.
 ~~~~
 
-### TOOL-aSparedSpawn-3/AC3 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-3/AC3 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-3-acceptance-ledger.md`.
 Added `GATE_WALL=50`, for "a 50 s wall". `git grep -F` finds it once at the unit's pass commit
@@ -571,7 +571,7 @@ At `<p27>`:
   The canary's 9l arm is OWED at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-3/AC4 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-3/AC4 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-3-acceptance-ledger.md`. The
 double-quoted FAIL text is backticked inside its quotes:
@@ -600,7 +600,7 @@ At `<p27>`:
   which the instrument and the canary's 9m arm now remove first. The 9m arm is OWED at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-3/AC7 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-3/AC7 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-3-acceptance-ledger.md`.
 Added `NR == FNR`, the criterion's spelling: `git grep -F` finds it at the unit's pass commit
@@ -637,7 +637,7 @@ pathspecs exited 0 once the three new canary reads took a here-string instead of
 added `run_tail_retry`.
 ~~~~
 
-### TOOL-aSparedSpawn-32/AC1 · arm 3 · class U
+### Ledger line TOOL-aSparedSpawn-32/AC1 · arm 3 · class U
 
 In `memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-32-acceptance-ledger.md`.
 `amended rev-5` names the rev-5 entry of
@@ -680,7 +680,7 @@ At `<p27>`:
   tip 6e8f8b1da, where the spec's §4 (f) took the merge.
 ~~~~
 
-### TOOL-aSparedSpawn-32/AC12 · arm 2 · class O
+### Ledger line TOOL-aSparedSpawn-32/AC12 · arm 2 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-12-build-TOOL-aSparedSpawn-32-acceptance-ledger.md`.
 Reflowed so the token `lineage` ends line 1. No token is added.
@@ -701,7 +701,7 @@ At `<p27>`:
   `GATE_REUSE_LINEAGE is not used without GATE_FULL`.
 ~~~~
 
-### TOOL-aSparedSpawn-34/AC1 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-34/AC1 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-13-build-TOOL-aSparedSpawn-34-acceptance-ledger.md`.
 Added `git diff 6e8f8b1da main -- F`, the criterion's spelling: `git grep -F` finds it at the unit's
@@ -722,7 +722,7 @@ At `<p27>`:
 - AC1 — the two-parent diff over the staged merge: every line `git diff -U0 6e8f8b1da main -- F` (the criterion's `git diff 6e8f8b1da main -- F`, whose added lines `-U0` does not change) adds, searched for in the result, per conflicted product or suite file — absent, and each a composite named above: 11 in the runner (the knob list, the profile initialiser, the template line, and the eight lines local main added that call `ts_now`), 3 in the driver, 2 in the unattended suite, 2 in the run-gates suite, 1 each in the run-log suite, the hygiene suite, the drift-audit selftest, the manifest-check suite and the pre-push suite (each a floor or a union list), and 0 in `gate-profiles.txt` and `check-memory-hygiene.sh`.
 ~~~~
 
-### TOOL-aSparedSpawn-4/AC10 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-4/AC10 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-4-acceptance-ledger.md`.
 Added `PROCMON_WHY`, for "the `run-gates: process-monitor:` line". `git grep -F` finds it at the
@@ -745,7 +745,7 @@ At `<p27>`:
   (which prints `PROCMON_WHY`) equals the base's for all three, the refusal's paths included. The SPAWNS arm's in-suite form is OWED.
 ~~~~
 
-### TOOL-aSparedSpawn-4/AC12 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-4/AC12 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-4-acceptance-ledger.md`.
 Added `"$(cat <<'RKD'`, for "its wrapper reverted". `git grep -F` finds it once at `989e9234b` in
@@ -781,7 +781,7 @@ the runner or any touched suite once the runner's `cat-file` row fell to 15 and 
 went; `check-arms.py --check` still reports the same six unarmed exit sites in the runner.
 ~~~~
 
-### TOOL-aSparedSpawn-4/AC6 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-4/AC6 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-4-acceptance-ledger.md`.
 Added `input_key`, for "all six ledger keys". `git grep -F` finds it at the unit's pass commit
@@ -809,7 +809,7 @@ At `<p27>`:
   backwards-union arms are OWED at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-4/AC8 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-4/AC8 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-4-acceptance-ledger.md`.
 Added `PS4`, for "its trace descriptor". `git grep -F` finds it at `eaab1dd38` in the instrument
@@ -832,7 +832,7 @@ At `<p27>`:
   carries the same counter and is OWED at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-6/AC6 · arm 2 · class A
+### Ledger line TOOL-aSparedSpawn-6/AC6 · arm 2 · class A
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-6-acceptance-ledger.md`.
 Spec 6's rev-2 names AC6 and makes the run the owner's equivalence run. The answer opens
@@ -855,7 +855,7 @@ At `<p27>`:
   assertion multiset.
 ~~~~
 
-### TOOL-aSparedSpawn-6/AC8 · arm 2 · class O
+### Ledger line TOOL-aSparedSpawn-6/AC8 · arm 2 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-6-acceptance-ledger.md`. The
 bullet's own `exit 3` becomes its check field on line 1; it contains the criterion's `exit`.
@@ -883,7 +883,7 @@ At `<p27>`:
   driver. The arms inside their shard are owed at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-8/AC10 · arm 2 · class O
+### Ledger line TOOL-aSparedSpawn-8/AC10 · arm 2 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-8-acceptance-ledger.md`. The
 wrapped check-field command is joined onto line 1, so the first line carries the complete token. No
@@ -913,7 +913,7 @@ At `<p27>`:
   here is a repository.
 ~~~~
 
-### TOOL-aSparedSpawn-8/AC11 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-8/AC11 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-8-acceptance-ledger.md`.
 Added `skipped — <id> · <why>`, the template of the printed line
@@ -939,7 +939,7 @@ At `<p27>`:
   `skipped — <id> · <why>`) and the summary read `0 passed · 1 red · 1 skipped`.
 ~~~~
 
-### TOOL-aSparedSpawn-8/AC12 · arm 3 · class O
+### Ledger line TOOL-aSparedSpawn-8/AC12 · arm 3 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-8-acceptance-ledger.md`.
 Added `tools/unattended/unattended.sh`, beside `unattended-status`. `git grep -F` finds it once at
@@ -971,7 +971,7 @@ At `<p27>`:
   before its ceiling moved; the leg's own green run over the final file is owed at VERIFYING.
 ~~~~
 
-### TOOL-aSparedSpawn-8/AC6 · arm 2 · class O
+### Ledger line TOOL-aSparedSpawn-8/AC6 · arm 2 · class O
 
 In `memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-8-acceptance-ledger.md`. The
 wrapped check-field command is joined onto line 1, so the first line carries the complete token. No
