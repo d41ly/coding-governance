@@ -3509,9 +3509,20 @@ def main() -> int:
         _rb12p1b = run("apply", "--target", str(_rb12), "--kits", _rb12three)
         settle(_rb12, "the same three kits again")
         _rb12r1b = json.loads(_rb12rp.read_text(encoding="utf-8"))
+        # TOOL-dRedressedBar-23 S1. THE CARRIED KITS' ORDERS, over a receipt an EARLIER engine wrote:
+        # its hole orders carry no `kit`, so the strip below models every target installed before
+        # that unit, and the narrower apply must still carry them through the descriptor join.
+        _rb23s = json.loads(_rb12rp.read_text(encoding="utf-8"))
+        for _rb23o in _rb23s.get("orders") or []:
+            if isinstance(_rb23o, dict) and _rb23o.get("kind") == "hole":
+                _rb23o.pop("kit", None)
+        _rb12rp.write_text(json.dumps(_rb23s, indent=2) + "\n", encoding="utf-8", newline="\n")
+        settle(_rb12, "the hole orders' kit keys stripped, as an earlier engine wrote them")
         _rb12p2 = run("apply", "--target", str(_rb12), "--kits", "settings-merge")
         settle(_rb12, "settings-merge alone")
         _rb12r2 = json.loads(_rb12rp.read_text(encoding="utf-8"))
+        _rb23glp = _rb12 / ".governance" / "outbox" / "gate-legs.md"
+        _rb23gl = _rb23glp.read_text(encoding="utf-8") if _rb23glp.is_file() else ""
         # TOOL-dRedressedBar-17 S2. THE STEP LINE AND THE SIDECAR READ THE RECEIPT'S OWN LISTS, the
         # carried rows included. Spec 12 claimed both and no check read either, so a sidecar written
         # from this run's `rows` alone, or a step line counting `rows` and `selection`, passed. The
@@ -3589,6 +3600,42 @@ def main() -> int:
               and not any("already carries" in ln
                           for ln in (_rb12p3.stdout + _rb12p3.stderr).splitlines()),
               f"rc {_rb12p3.returncode} · {(_rb12p3.stdout + _rb12p3.stderr)[-600:]}")
+        # TOOL-dRedressedBar-23 AC1. The stripped receipt's orders of the two carried kits are read
+        # off its own positions, joined to the unstripped receipt read just before the strip, so the
+        # expectation never asks the engine which hole is whose.
+        _rb23holes = [o for o in _rb12r1.get("orders") or [] if o.get("kind") == "hole"]
+        check("[dRB-12] dRB-23 AC1 every hole order a fresh three-kit apply writes carries `kit`",
+              bool(_rb23holes) and all("kit" in o for o in _rb23holes), json.dumps(_rb23holes))
+        _rb23so = _rb23s.get("orders") or []
+        _rb23pre = _rb12r1b.get("orders") or []
+        _rb23r2o = _rb12r2.get("orders") or []
+        _rb23want = [o for o, _pre in zip(_rb23so, _rb23pre) if _pre.get("kit") in _rb12other]
+        _rb23got = [o for o in _rb23r2o if o.get("kit") in _rb12other
+                    or (o.get("kind") == "hole" and "kit" not in o)]
+        check("[dRB-12] dRB-23 AC1 LIVENESS the strip left no hole order carrying `kit`, and the "
+              "carried kits held orders before the narrower apply",
+              bool(_rb23want) and len(_rb23so) == len(_rb23pre)
+              and not any("kit" in o for o in _rb23so if o.get("kind") == "hole"),
+              json.dumps(_rb23so))
+        check("[dRB-12] dRB-23 AC1 the narrower apply's receipt keeps the carried kits' orders, "
+              "the keyless hole order included, after its own, verbatim and in order",
+              json.dumps(_rb23got) == json.dumps(_rb23want)
+              and json.dumps(_rb23r2o[-len(_rb23want):]) == json.dumps(_rb23want),
+              f"want {json.dumps(_rb23want)} · got {json.dumps(_rb23r2o)}")
+        check("[dRB-12] dRB-23 AC1 ...and they hold a machine order and the manifest-section-b "
+              "hole order",
+              any(o.get("kind") == "machine" for o in _rb23got)
+              and any(o.get("kind") == "hole" and o.get("id") == "manifest-section-b"
+                      for o in _rb23got), json.dumps(_rb23got))
+        _rb23und = [ln for ln in _rb12chk.stdout.splitlines()
+                    if ln.startswith("govkit check — kickoff-manifest: undischargeable")]
+        check("[dRB-12] dRB-23 AC1 `check` after the narrower apply reports kickoff-manifest's "
+              "machine order undischargeable", bool(_rb23und), _rb12chk.stdout[-600:])
+        _rb23inst = _rb23gl.split("\n## WITHHELD", 1)[0].splitlines()
+        check("[dRB-12] dRB-23 AC1 the narrower apply's order lists kickoff-manifest's leg as an "
+              "instruction, above any WITHHELD heading",
+              any(ln.startswith("- kickoff-manifest ratchet: ") for ln in _rb23inst),
+              _rb23gl[:900] or "no .governance/outbox/gate-legs.md")
 
         # --- TOOL-dRedressedBar-14. A FIRST APPLY AT A PER-KIT PREFIX CONFIGURES AGAINST THE HOMES IT
         # --- JUST WROTE. settings-merge.py finds agent-cap's hook through the receipt, and `apply`
@@ -16303,6 +16350,132 @@ user_skills = "/tmp/gk-fake-skills"
         check("[dRB-16] AC2 ...and the runner's demo2 leg row carries the new argv",
               "--drb16" in (_argv16[_t16a.name] or []), str(_argv16[_t16a.name]))
 
+        # ---- [dRB-23] NO RUNNER. A NARROWER APPLY'S ORDER LISTS THE CARRIED KIT'S LEGS TOO.
+        # ---- With no `[gate_runner]` the legs go to `.governance/outbox/gate-legs.md`, rewritten
+        # ---- whole, and the loop read the selection alone, so `apply --kits demo` dropped demo2's
+        # ---- leg from the order while the receipt kept demo2's claim. Each half is cut at the
+        # ---- order's first `## WITHHELD` line, because the same leg name in the other half is the
+        # ---- D7 test answering, and no carried kit's withheld leg raises a problem.
+        _g23n = build_gov13("drb23n")
+        _t23n = build_target13("drb23n", M13_DEPLOY_NONE)
+        _o23n = _t23n / ".governance" / "outbox" / "gate-legs.md"
+
+        def read_order_halves23() -> tuple[list[str], list[str]]:
+            """The order's instruction lines and its WITHHELD lines, cut at the first heading."""
+            txt = _o23n.read_text(encoding="utf-8") if _o23n.is_file() else ""
+            head, _sep, tail = txt.partition("\n## WITHHELD")
+            return head.splitlines(), (tail.splitlines() if _sep else [])
+
+        _p23n1 = run_gov13(_g23n, "apply", "--target", str(_t23n))
+        settle(_t23n, "both kits")
+        _p23n2 = run_gov13(_g23n, "apply", "--target", str(_t23n), "--kits", "demo")
+        settle(_t23n, "demo alone")
+        _h23n2, _w23n2 = read_order_halves23()
+        check("[dRB-23] AC2 LIVENESS both applies exit 0 over a target with no runner, and the "
+              "receipt still claims demo2",
+              _p23n1.returncode == 0 and _p23n2.returncode == 0
+              and "demo2" in (read_receipt13(_t23n).get("kits") or []),
+              f"rc {_p23n1.returncode}, {_p23n2.returncode}" + NL13
+              + (_p23n2.stdout + _p23n2.stderr)[-900:])
+        check("[dRB-23] AC2 `apply --kits demo`'s order lists the carried demo2 leg as an "
+              "instruction", any(ln.startswith("- demo2 leg: ") for ln in _h23n2),
+              NL13.join(_h23n2 + _w23n2))
+        (_g23n / PFX / "demo2" / "kit.toml").write_text(
+            build_kit13("demo2", "demo2 leg", "demo2/absent.sh", False), encoding="utf-8",
+            newline="\n")
+        git(_g23n, "add", "-A")
+        git(_g23n, "commit", "-qm", "B: demo2's leg names an engine gov does not ship")
+        _p23n3 = run_gov13(_g23n, "apply", "--target", str(_t23n), "--kits", "demo")
+        _h23n3, _w23n3 = read_order_halves23()
+        _out23n3 = (_p23n3.stdout + _p23n3.stderr).splitlines()
+        check("[dRB-23] AC2 with demo2's leg naming an absent engine, `apply --kits demo` exits 0",
+              _p23n3.returncode == 0,
+              f"rc {_p23n3.returncode}" + NL13 + NL13.join(_out23n3[-14:]))
+        check("[dRB-23] AC2 ...its order's instruction half carries no demo2 leg, and its WITHHELD "
+              "half does",
+              not any("demo2 leg" in ln for ln in _h23n3)
+              and any("demo2 leg" in ln for ln in _w23n3), NL13.join(_h23n3 + _w23n3))
+        check("[dRB-23] AC2 ...and no output line raises the carried kit's withheld leg",
+              not any("declares gate leg 'demo2 leg'" in ln for ln in _out23n3),
+              NL13.join(ln for ln in _out23n3 if "demo2 leg" in ln))
+
+        # ---- [dRB-23] GAINED. A REFUSED GAINED ADOPTER'S STDERR SURVIVES A BYTE THAT IS NOT UTF-8.
+        # ---- The gained loop decoded strictly while CONFIGURE and the regenerate site replaced, so
+        # ---- one 0xF6 on stderr blanked the refusal's reason on Windows and raised out of `update`
+        # ---- on POSIX. demo3 joins gov's default set with an adopter that prints `J`, 0xF6, `rg`
+        # ---- and exits 2, and the one problem line naming it must carry those characters.
+        _g23g = build_gov13("drb23g")
+        _t23g = build_target13("drb23g", M13_DEPLOY_NONE)
+        _p23g1 = run_gov13(_g23g, "apply", "--target", str(_t23g))
+        settle(_t23g, "both kits")
+        (_g23g / PFX / "demo3").mkdir(parents=True, exist_ok=True)
+        _kit23g = build_kit13("demo3", "demo3 leg", "demo3/engine.sh", False)
+        _kit23ga = _kit23g.replace('[adopt]\nargv = []\n',
+                                   '[adopt]\nargv = ["bash", "{prefix}/demo3/adopt.sh"]\n', 1)
+        (_g23g / PFX / "demo3" / "kit.toml").write_text(_kit23ga, encoding="utf-8", newline="\n")
+        (_g23g / PFX / "demo3" / "engine.sh").write_text("exit 0\n", encoding="utf-8",
+                                                         newline="\n")
+        # Each backslash is a literal byte of the script, so bash's printf writes the octal 366.
+        (_g23g / PFX / "demo3" / "adopt.sh").write_bytes(b"printf 'J\\366rg\\n' >&2\nexit 2\n")
+        _reg23g = (M13_REG.replace('default = ["demo", "demo2"]',
+                                   'default = ["demo", "demo2", "demo3"]', 1)
+                   + '\n[[entry]]\nid = "demo3"\ndescriptor = "{prefix}/demo3/kit.toml"\n')
+        (_g23g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(_reg23g, encoding="utf-8",
+                                                                         newline="\n")
+        git(_g23g, "add", "-A")
+        git(_g23g, "commit", "-qm", "B: demo3 joins the default set")
+        check("[dRB-23] AC3 LIVENESS the first apply exits 0, demo3's descriptor declares the "
+              "adopter, and the registry names demo3 in its default set",
+              _p23g1.returncode == 0 and _kit23ga != _kit23g
+              and '"demo3"]' in _reg23g and _reg23g != M13_REG,
+              f"rc {_p23g1.returncode}" + NL13 + (_p23g1.stdout + _p23g1.stderr)[-600:])
+        _u23g = run_gov13(_g23g, "update", "--target", str(_t23g), "--write")
+        _out23g = (_u23g.stdout + _u23g.stderr).splitlines()
+        _pl23g = [ln for ln in _out23g if ln.startswith(
+            "govkit: kit 'demo3': its adopter exited 2 on the update that gained it")]
+        check("[dRB-23] AC3 `update --write` prints exactly one problem line for demo3's refused "
+              "adopter, and it carries the stderr with the byte replaced",
+              len(_pl23g) == 1 and ("Its stderr ended: J" + chr(0xFFFD) + "rg") in _pl23g[0]
+              and "It printed nothing to stderr" not in _pl23g[0],
+              " | ".join(_pl23g) or NL13.join(_out23g[-14:]))
+        check("[dRB-23] AC3 ...and no output line carries UnicodeDecodeError",
+              not any("UnicodeDecodeError" in ln for ln in _out23g), NL13.join(_out23g[-14:]))
+
+        # ---- [dRB-23] THE CLASS, over SOURCE. The population is every `subprocess.run` whose first
+        # ---- argument is a `resolve_shell_argv(...)` call and which names an `encoding`: the
+        # ---- target-side spawns that decode UTF-8. Each must replace what it cannot decode, and
+        # ---- the population must hold the helper's own call, so an empty walk reds. The three
+        # ---- spawn sites call the helper, which the count below holds them to.
+        _gsrc23 = GOVKIT.read_text(encoding="utf-8")
+        _tree23 = _ast.parse(_gsrc23)
+        _fn23 = next((n for n in _tree23.body if isinstance(n, _ast.FunctionDef)
+                      and n.name == "run_target_argv"), None)
+        _in23 = {id(n) for n in _ast.walk(_fn23)} if _fn23 is not None else set()
+        _pop23: list = []
+        for _n23 in _ast.walk(_tree23):
+            if not (isinstance(_n23, _ast.Call) and isinstance(_n23.func, _ast.Attribute)
+                    and _n23.func.attr == "run" and isinstance(_n23.func.value, _ast.Name)
+                    and _n23.func.value.id == "subprocess" and _n23.args
+                    and isinstance(_n23.args[0], _ast.Call)
+                    and isinstance(_n23.args[0].func, _ast.Name)
+                    and _n23.args[0].func.id == "resolve_shell_argv"):
+                continue
+            _kw23 = {k.arg: k.value for k in _n23.keywords if k.arg}
+            if "encoding" in _kw23:
+                _pop23.append((_n23, _kw23))
+        _bad23 = [_n.lineno for _n, _kw in _pop23
+                  if not (isinstance(_kw.get("errors"), _ast.Constant)
+                          and _kw["errors"].value == "replace")]
+        check("[dRB-23] AC4 every target-side UTF-8 spawn replaces what it cannot decode, and the "
+              "population holds run_target_argv's own call",
+              bool(_pop23) and not _bad23 and any(id(_n) in _in23 for _n, _kw in _pop23),
+              f"population {[_n.lineno for _n, _kw in _pop23]} · lacking errors=\"replace\" "
+              f"{_bad23} · run_target_argv {'found' if _fn23 is not None else 'absent'}")
+        _calls23 = [n.lineno for n in _ast.walk(_tree23) if isinstance(n, _ast.Call)
+                    and isinstance(n.func, _ast.Name) and n.func.id == "run_target_argv"]
+        check("[dRB-23] AC4 run_target_argv is called exactly three times: CONFIGURE, the "
+              "regenerate site and the gained loop", len(_calls23) == 3, str(_calls23))
+
         # ========= DEPL-cMendedVintage-21 — THE ATOMIC WRITE IS ONE HELPER, AND OBSERVED =========
         # The mitigation above (`-13` S6) was implemented and UNGRADED. `-13` AC6 compares the
         # runner two runs of `apply` produce, and an ordinary in-place `write_text` produces those
@@ -16373,18 +16546,22 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- ENGINE's own constant, read rather than restated: a second copy here would keep
         # ---- passing against the harness's idea of what an adopter's bar reads, which is the
         # ---- two-spellings class this file's header names.
-        def read_bar_writes21() -> tuple[set, list, list]:
-            """Walk the engine's syntax and return its derived adopter-bar destination NAMES, the
-            direct writes to one of them, and the sites already routed through `write_atomic`.
+        def read_bar_writes21(members, src: str) -> tuple[set, list, list]:
+            """Walk the engine source `src` and return the adopter-bar destination NAMES `members`
+            derive, the direct writes to one of them, and the sites already routed through
+            `write_atomic`.
 
             PATH-SHAPED DERIVATIONS ONLY, and this half was measured over the real tree before it
             was wired. A rule propagating through any RHS that MENTIONS a destination pulled in
             `existing = json.loads(rf.read_text(...))` and everything derived from that — three
             innocent names a later direct write would have redded for no reason. A read is not a
             derivation.
+
+            THE MEMBERS AND THE SOURCE ARE ARGUMENTS (TOOL-dRedressedBar-23), so the walk runs over
+            each member alone and over a staged copy of the engine: over the union, a member that
+            matches nothing passed, because the other members kept both liveness checks true.
             """
-            mk = tuple(govkit_module().ADOPTER_BAR_PATHS)
-            src = GOVKIT.read_text(encoding="utf-8")
+            mk = tuple(members)
             tree = _ast.parse(src)
             pathcall = ("with_name", "with_suffix", "joinpath", "resolve", "absolute", "expanduser")
 
@@ -16446,7 +16623,8 @@ user_skills = "/tmp/gk-fake-skills"
                     direct.append((n.lineno, d.replace(chr(10), " ")[:80]))
             return dests, direct, routed
 
-        _dest21, _direct21, _routed21 = read_bar_writes21()
+        _mk21 = tuple(govkit_module().ADOPTER_BAR_PATHS)
+        _dest21, _direct21, _routed21 = read_bar_writes21(_mk21, _gsrc21)
         check("[-21] AC2 LIVENESS the declared set still reaches a destination in this engine, so "
               "a renamed `[gate_runner].file` read reds here rather than emptying the population",
               bool(_dest21), "ADOPTER_BAR_PATHS matched no assignment at all")
@@ -16456,6 +16634,14 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-21] AC2 S4 no direct write_text/write_bytes/open-for-write names a declared "
               "adopter-bar destination — every one routes through the helper",
               not _direct21, str(_direct21))
+        # TOOL-dRedressedBar-23 S6. LIVENESS PER MEMBER: the two checks above are aggregate, so a
+        # member whose spelling the engine stopped using, `receipt_path` renamed say, graded nothing
+        # while the other members kept both true.
+        for _m21 in _mk21:
+            _md21, _mdir21, _mr21 = read_bar_writes21((_m21,), _gsrc21)
+            check(f"[-21] AC2 LIVENESS the member {_m21} alone reaches a write_atomic site, so a "
+                  f"member matching nothing reds here rather than passing inside the union",
+                  bool(_mr21), f"member {_m21}: destinations {sorted(_md21)}, no routed site")
 
         # ===== DEPL-cMendedVintage-14 — stale conflict orders are reaped, and keyed on the path ====
         #

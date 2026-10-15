@@ -1432,7 +1432,8 @@
     "guard": [
       "{prefix}/govkit/",
       "{prefix}/hooks/kit.toml",
-      "{prefix}/settings-merge.py"
+      "{prefix}/settings-merge.py",
+      "{prefix}/codebase-map/kit.toml"
     ],
     "chunk": "selftests",
     "subject": "kit",

@@ -1212,6 +1212,21 @@ def resolve_shell_argv(argv: list[str]) -> list[str]:
         return list(argv)
 
 
+def run_target_argv(argv: list[str] | tuple[str, ...],
+                    target: pathlib.Path) -> subprocess.CompletedProcess:
+    """Run a kit's resolved target-side argv in `target`, its output captured and decoded as UTF-8
+    with every undecodable byte REPLACED (TOOL-dRedressedBar-23).
+
+    THREE CALLERS, ONE DECODE RULE: `apply`'s CONFIGURE spawn, `update`'s `[[regenerate]]` spawn
+    and `update`'s gained-kit adopter spawn. Each spelled its own keywords, and the gained loop's
+    lacked `errors="replace"`, so an adopter writing one non-UTF-8 byte to stderr made its refusal
+    line claim it printed nothing on Windows, and raised `UnicodeDecodeError` out of `update` on
+    POSIX. One helper holds the rule so the three cannot disagree again.
+    """
+    return subprocess.run(resolve_shell_argv(list(argv)), cwd=str(target), capture_output=True,
+                          text=True, encoding="utf-8", errors="replace")
+
+
 def resolve_tokens(s: str, ctx: dict[str, str]) -> tuple[str, list[str]]:
     """Substitute `{token}`s from the target's answers. Unresolved tokens are RETURNED, not emitted.
 
@@ -4260,6 +4275,13 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
     DEPL-aRepatriatedFork-17 S8) cannot stand in for the carry: it claims a leg only while gov's
     resolved argv equals the runner's, and an argv gov has changed is never claimable, so a kit
     whose row this run dropped would be refused by either verb once gov changed that leg's argv.
+    The non-manifest branch's ORDER lists every claimed kit's legs under the carry, the selection's
+    first and then each carried kit gov's registry still declares, in the receipt's `kits` order
+    (TOOL-dRedressedBar-23): the file is rewritten whole, so listing the selection's alone dropped a
+    carried kit's legs from it while `emitted` kept them. Each carried leg takes the D7 test below,
+    and a carried kit's silenced leg is listed under WITHHELD and raises NO problem: the manifest
+    branch resolves no carried kit's leg and so raises none for the same selection, and one
+    selection must not get two exit codes by runner kind. The run that selected the kit raised it.
 
     `orders` is `apply`'s list and `update` passes None: the non-manifest branch writes the same
     order at the same path either way, and `update` maintains no `orders` list at BASE. Minting one
@@ -4285,8 +4307,14 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
     # finding anywhere. On a manifest target the same leg reds and is withheld. That is
     # `gate the CLASS, not the instance` broken one branch over from the unit that closed the class,
     # and no `-6` arm could see it because every fixture declared `kind = "manifest"`.
+    #
+    # TOOL-dRedressedBar-23 S2. Under the carry, the claimed kits outside `selection` that `descs`
+    # declares, bound ONCE in the receipt's `kits` order, and `_silenced` asked of them too, so the
+    # order branch lists their legs through the same test the selection's take.
+    _carried_kits = ([k for k in (receipt or {}).get("kits") or []
+                      if k not in selection and k in descs] if carry_out_of_scope else [])
     _silenced = {(eid, nm): bad for eid, nm, bad in
-                 silenced_legs(descs, selection, target, deploy, have)}
+                 silenced_legs(descs, [*selection, *_carried_kits], target, deploy, have)}
     _silenced_found: list[str] = []
     if gr.get("kind") == "manifest":
         rf = target / gr["file"]
@@ -4549,7 +4577,9 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
         (target / ".governance" / "outbox").mkdir(parents=True, exist_ok=True)
         lines = ["# gate legs — ORDERED, not emitted", ""]
         _withheld: list[str] = []
-        for eid in selection:
+        # THE SELECTION'S LEGS, THEN EVERY CARRIED KIT'S (TOOL-dRedressedBar-23 S2), because this
+        # file is rewritten whole and a claimed kit's legs are still the adopter's to wire.
+        for eid in [*selection, *_carried_kits]:
             d, _p = descs[eid]
             ctx = target_context(target, deploy, eid, d)
             for leg in d.get("gate_leg", []):
@@ -4562,6 +4592,10 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 if _bad:
                     _withheld.append(f"- {nm}: {_argv}\n  WITHHELD — names {', '.join(_bad)}, "
                                      f"which this target does not hold and no kit ships here")
+                    # A CARRIED kit's withheld leg is listed and raises nothing, for the reason the
+                    # docstring's carry paragraph gives.
+                    if eid in _carried_kits:
+                        continue
                     _silenced_found.append(
                         f"entry '{eid}' declares gate leg '{nm}' whose argv names "
                         f"{', '.join(_bad)}, which this target does not hold — ordering it would "
@@ -7927,6 +7961,18 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     _carried_kits = [k for k in (receipt or {}).get("kits") or [] if k not in selection]
     _carried_rows = [f for f in (receipt or {}).get("files") or []
                      if isinstance(f, dict) and f.get("kit") in _carried_kits]
+    # TOOL-dRedressedBar-23 S1. A carried kit's ORDERS too, which RECEIPT writes after this run's.
+    # A hole order carries `kit` since that unit; one an earlier engine wrote carries none, and is
+    # matched through the hole ids the carried kit's descriptor declares, so the first narrower
+    # apply after the upgrade does not lose it. Either kind is carried verbatim, keyless or not, and
+    # a carried kit gov's registry no longer declares keeps its keyed orders alone.
+    _carried_orders = [o for o in (receipt or {}).get("orders") or []
+                       if isinstance(o, dict)
+                       and (o.get("kit") in _carried_kits
+                            or (o.get("kind") == "hole" and "kit" not in o
+                                and o.get("id") in {h.get("id") for k in _carried_kits
+                                                    if k in descs
+                                                    for h in descs[k][0].get("hole", [])}))]
     _rcpt_doc = {
         "schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
         "prefix": (deploy.get("prefix") or "tools"), "kits": selection + _carried_kits,
@@ -7960,7 +8006,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                 f"Discharge is decided by RUNNING this hole's probe, never by deleting this file.\n",
                 encoding="utf-8", newline="\n")
             orders.append({"kind": "hole", "id": h.get("id"),
-                           "path": f".governance/outbox/{h.get('id')}.md"})
+                           "path": f".governance/outbox/{h.get('id')}.md", "kit": eid})
 
         # A machine-scoped RULE gets an ORDER, never a write. The population is the RULE and not the
         # entry: every descriptor declares an entry-level scope of `repo` and exactly one rule in the
@@ -8027,16 +8073,16 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             continue
         # BOUND, not reduced to its code (TOOL-dRedressedBar-11 S3): a refused exit below ends its
         # problem line with the adopter's own stderr, the regenerate site's shape, so the operator
-        # reads the reason and not only an integer. UTF-8 as the regenerate site and the gained loop
-        # decode, never the host codepage, and REPLACED where it cannot decode (TOOL-dRedressedBar-13).
+        # reads the reason and not only an integer. UTF-8, never the host codepage, and REPLACED
+        # where it cannot decode, the rule `run_target_argv` holds for this site, the regenerate
+        # site and the gained loop alike (TOOL-dRedressedBar-13, TOOL-dRedressedBar-23).
         # This runs after the early receipt was written ahead of CONFIGURE (TOOL-dRedressedBar-14),
         # and RECEIPT rewrites it once every adopter has run. So a decode error raised here would
         # stop `apply` between the two writes. The landed bytes and the early receipt stay, the
         # receipt carrying the prior run's orders, `after` and gate runner, `install.sums` is not
         # rewritten, and the adopters after this kit never run: the interrupt the receipt comment
         # above says a re-run of `apply` recovers from.
-        _cfg_run = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True,
-                                  text=True, encoding="utf-8", errors="replace")
+        _cfg_run = run_target_argv(resolved, target)
         rc = _cfg_run.returncode
         outcome = classify_outcome(target, d, ctx, rc)
         means = outcome.get("means") if outcome else None
@@ -8338,8 +8384,12 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # because OBSERVE and the `oid` re-stamp mutated rows after that write, and this run's `orders`,
     # `after` and `gate_runner` in place of the prior run's. ONE dict, so the writes cannot
     # disagree about a key, and the sidecar and the step's counts read the lists it writes.
+    # TOOL-dRedressedBar-23 S1. ORDERS ARE CARRIED AS ROWS ARE: this run's first, then every prior
+    # order of a carried kit, verbatim and in the prior receipt's order. Written from this run's
+    # alone, a narrower apply dropped a carried kit's hole and machine orders while keeping its claim,
+    # so `check` stopped reporting its machine destination and verifying its outbox files.
     _rcpt_doc.update({
-        "files": rows + _carried_rows, "orders": orders, "after": after_map,
+        "files": rows + _carried_rows, "orders": orders + _carried_orders, "after": after_map,
         "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
                         "emitted": emitted, "legs_withheld": _legs_withheld}})
     # TOOL-dRedressedBar-19 S40: the sidecar first, the receipt last, each through `write_atomic`.
@@ -11306,9 +11356,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 if not _argv:
                     continue
                 _res = [resolve_tokens(a, _ctx_rr)[0] for a in _argv]
-                _out = subprocess.run(resolve_shell_argv(_res), cwd=str(target),
-                                      capture_output=True, text=True, encoding="utf-8",
-                                      errors="replace")
+                _out = run_target_argv(_res, target)
                 # THE EXIT CODE GOES THROUGH THE DECLARED PROBE, exactly as `_cmd_apply`'s
                 # CONFIGURE step does, and NOT through `rc != 0`. Writing the naive test here
                 # would have failed every update that touched `memory-tree`, whose adopter
@@ -11442,8 +11490,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 continue
             _ran_gained.add(_res_g)
             # BOUND for its stderr (TOOL-dRedressedBar-11 S3), which a refusal below ends with.
-            _proc_g = subprocess.run(resolve_shell_argv(list(_res_g)), cwd=str(target),
-                                     capture_output=True, text=True, encoding="utf-8")
+            _proc_g = run_target_argv(_res_g, target)
             _rc_g = _proc_g.returncode
             _oc_g = classify_outcome(target, _d_g, _ctx_g, _rc_g)
             print(f"govkit update — default-gained {_ge}: adopter exit {_rc_g}"

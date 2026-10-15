@@ -19173,6 +19173,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "run_target_argv",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "run_tick",
       "kind": "function",
       "file": "tools/unattended/resume-tick.sh"

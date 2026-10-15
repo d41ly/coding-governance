@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-23 — the closing review's govkit findings M3, M4, M6 and L4: a narrower apply keeps a carried kit's orders and order-file legs, target spawns decode stderr through one helper, a leg guard widens, and a routing arm grades each member
 
-**Status:** SPECCED · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 17
+**Status:** INPROGRESS · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 17
 
 <!-- gen:spec-records -->
 
