@@ -426,6 +426,11 @@ Without that packet, the prompt writer re-orients on every worker's behalf.
 - **Who reads it:** the Loop Review.
 - **Acceptance:** dBoundRoles re-runs `role_orientation.py` on its own role agents. It must show
   answered calls at zero under `refuse`, and method and locate calls below this round's baseline.
+- **Measured since.** The memory round's five briefed researchers show why the measure must be
+  the answered call, not the path class. Their subject was memory itself, so locate and method
+  reads were their content (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md`,
+  `[research]`). Their brief's one explicit instruction, to leave the design records alone, held:
+  0 reads, against 24 before.
 
 **R3-G. A role's version travels with its work.**
 - The `role-sha` each item ran under is kept with its return. The Loop Review can then tie a change in

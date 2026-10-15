@@ -83,11 +83,11 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 19 | gov-researcher | Roles: prior art | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-14-researcher.md` | 1799cb98 | returned, 4m41s, 24.5k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-roles-priorart.md` |
 | 20 | gov-researcher | Flow layer: Plan, Design and Build items | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | returned, 7m54s, 46.3k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-a.md` |
 | 21 | gov-researcher | Flow layer: Test, Deploy, Maintain and review items | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-2-researcher.md` | 1799cb98 | returned, 7m02s, 37.8k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-b.md` |
-| 22 | gov-researcher | Memory layer: builds | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-3-researcher.md` | 1799cb98 | dispatched | — |
-| 23 | gov-researcher | Memory layer: the ask register and the decision index | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-4-researcher.md` | 1799cb98 | dispatched | — |
-| 24 | gov-researcher | Memory layer: the codebase map and the reuse tools | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-5-researcher.md` | 1799cb98 | dispatched | — |
-| 25 | gov-researcher | Memory layer: code annotations, the gotchas and the lexicon | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-6-researcher.md` | 1799cb98 | dispatched | — |
-| 26 | gov-researcher | Memory layer: the tooling map | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-7-researcher.md` | 1799cb98 | dispatched | — |
+| 22 | gov-researcher | Memory layer: builds | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-3-researcher.md` | 1799cb98 | returned, 10m58s, 39.4k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-builds.md` |
+| 23 | gov-researcher | Memory layer: the ask register and the decision index | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-4-researcher.md` | 1799cb98 | returned, 7m05s, 39.7k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-asks-decisions.md` |
+| 24 | gov-researcher | Memory layer: the codebase map and the reuse tools | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-5-researcher.md` | 1799cb98 | returned, 6m23s, 27.9k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-map-reuse.md` |
+| 25 | gov-researcher | Memory layer: code annotations, the gotchas and the lexicon | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-6-researcher.md` | 1799cb98 | returned, 6m32s, 29.0k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-annotations.md` |
+| 26 | gov-researcher | Memory layer: the tooling map | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-7-researcher.md` | 1799cb98 | returned, 7m55s, 33.0k out | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-tooling.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -166,6 +166,11 @@ ledger. Five is the direct-spawn budget for one owner turn:
 - agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-5-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-5-researcher.md) · writes none · gates none · run direct/aa631366c077d00d1
 - agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-6-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-6-researcher.md) · writes none · gates none · run direct/a0f40dd21c9243c66
 - agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-7-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-7-researcher.md) · writes none · gates none · run direct/aaba36be47df28242
+- returned — gov-researcher · wrote 0 files · 10m58s · 39.4k out · run direct/ad130bc5b0b446984
+- returned — gov-researcher · wrote 0 files · 7m05s · 39.7k out · run direct/a683df94188e34f7a
+- returned — gov-researcher · wrote 0 files · 6m23s · 27.9k out · run direct/aa631366c077d00d1
+- returned — gov-researcher · wrote 0 files · 6m32s · 29.0k out · run direct/a0f40dd21c9243c66
+- returned — gov-researcher · wrote 0 files · 7m55s · 33.0k out · run direct/aaba36be47df28242
 ```
 
 ## Events
@@ -265,6 +270,18 @@ ledger. Five is the direct-spawn budget for one owner turn:
   that layer 3 still owes its mechanical shape, with aScoutedSeam's benchmark as evidence. The note is
   recorded with layer 3 as `gap-roles-18`, for a later revisit. Five researchers were dispatched,
   22 to 26, one per part of the memory layer. Their briefs hand the settled facts as content.
+- 2026-10-15, session 1799cb98: all five researchers returned. Their returns are saved verbatim,
+  and their probe scripts are gathered into one evidence record. The memory design was written
+  against them:
+  - one memory contract;
+  - decisions split by kind, with reuse entries as ranked instruction units;
+  - a generated caller map;
+  - a `gov:note` annotation grammar;
+  - the tooling verdicts.
+
+  Eight questions were put to the owner. Two harness notices fired on the returns of dispatches 25
+  and 26, pattern `settings-json`, because both cite `.claude/settings.json`. Neither return asked
+  for an action, and under `notices.record` (`none`) the notices are not kept.
 
 ## Instruments
 
@@ -563,7 +580,9 @@ Runs, 2026-10-14:
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-{a,b}.md` | The flow layer's item audit, verbatim: every item of the 70 declared (tag, actor, witness, inputs by layer, instruction scope, routes, dependencies), with each step's extension points and the findings. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md` | The flow's steps defined item by item: Entry, the five core steps and the breakpoint, each with its actors, witnesses, routes and layer ingredients, with the audit's fixes applied. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md` | The layer review's third round: the roles layer set against the settled roles, orientation and flow designs, what role agents receive and re-derive measured over 171 transcripts, the trust mechanism proposed, the role-by-step matrix derived, eight gaps and four forks, with the instruments. |
-| `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md` | The layer review's fourth round: the memory layer, the owner's words, what the design already fixes, and the five researchers dispatched. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md` | The layer review's fourth round: the memory layer, the owner's words, what the design already fixes, the five researchers' returns measured, the design proposed, and the forks asked. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-{builds,asks-decisions,map-reuse,annotations,tooling}.md` | The memory layer's five researcher returns, verbatim: builds; the ask register and the decision index; the codebase map and the reuse tools; code annotations, the gotchas and the lexicon; the tooling map. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-instruments.md` | The memory researchers' probe scripts, gathered from their scratch paths as fenced text. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |
