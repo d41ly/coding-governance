@@ -786,6 +786,19 @@ Rounds 1 and 2 of the layers' reviews, dispatches 39 and 40, were derived from t
   - P29 is amended after LR-2, and flow-roles' cycle hands content, its `[steps]` superseded;
   - 6 defects were refuted.
 
+- 2026-10-16, session 1799cb98: the memory layer's 73 defects were folded, and its record's `[revised]`
+  says where each went:
+  - `record` is idempotent, content-addressed and minted under the build's lease; each layer registers
+    its own record kinds, each with one door; a schema binds records after its cutoff;
+  - the reuse entry is an instruction unit proposed with its build (LR-6), extending the dossiers'
+    reuse-affordance blocks; an acceptance extends V14 (LR-5);
+  - the lookup's retirement names its readers by value; the house index takes M1c's shape, and the
+    benchmark re-run is dTotalRecall's acceptance;
+  - the id parser moves into memory-tree, and the decision log keeps its path, append-only;
+  - `gap-mem-12` joined the register, one item went to the re-cut, and 5 defects were refuted.
+
+  All four layers are folded: 206 defects placed, and every map row's disposition set.
+
 ## Instruments
 
 ### The gap-ownership join
@@ -1105,6 +1118,12 @@ After the flow layer's fold, both instruments were run as extracted from this re
   - with the `flow.route-backs` preset row removed, naming it missing;
   - with `policy.on-missing-expansion` struck from the "Presets never touch" sentence, naming it
     missing from the preset table.
+
+After the memory layer's fold, both instruments were run as extracted from this record:
+- **The changes:** `gap-mem-12` was registered and owned by dTotalRecall. No key joined the catalogue.
+- **The join** exits 0 on 166 keys and 15 builds. On a copy of v2 with `gap-mem-12` struck from
+  dTotalRecall's row, it exits 1, naming it unowned.
+- **The preset check** still exits 0 on 128 catalogue keys, 120 presettable and 120 preset rows.
 
 ### The foreign-build census
 

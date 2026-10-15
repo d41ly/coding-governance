@@ -846,3 +846,137 @@ $ planted: summarize_layers.py over a copy whose [map-roles] heading is renamed
 roles: compare_rounds refused: <the session scratchpad>/l14/red-nomap.md: no section ## [map-roles]
 exit 1
 ```
+
+## [fold] The fold's instruments
+
+`set_dispositions.py` fills each layer map's `disposition` cells from the layer record's `[revised]`
+table, and refuses unless the two hold the same defects, each once. It writes nothing when it refuses.
+
+```python
+"""Fill a layer's map dispositions in the comparison record from the layer record's [revised] table.
+
+Usage: python set_dispositions.py <layer> <layer-record> [<more layer records>...]
+Refuses, exit 1, unless the map's defects and the [revised] tables' defects are the same set, each
+once. Writes only the comparison record's `disposition` cells for that layer's map.
+"""
+import re
+import sys
+
+COMPARE = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared.md"
+layer, records = sys.argv[1], sys.argv[2:]
+
+revised = {}
+for rec in records:
+    text = open(rec, encoding="utf-8", newline="").read()
+    if "\n## [revised]" not in text:
+        sys.exit(f"{rec}: no [revised] section")
+    block = text.split("\n## [revised]", 1)[1].split("\n## ", 1)[0]
+    short = re.sub(r"^.*PLAY-dClosedLoop-1-", "", rec).removesuffix(".md")
+    for line in block.splitlines():
+        m = re.match(r"^\| `([a-z0-9-]+)` \| ([^|]+?) \| ", line)
+        if m:
+            if m.group(1) in revised:
+                sys.exit(f"{m.group(1)}: placed twice across the [revised] tables")
+            revised[m.group(1)] = f"{m.group(2)}; `{short}` `[revised]`"
+
+text = open(COMPARE, encoding="utf-8", newline="").read()
+head = f"\n## [map-{layer}]"
+before, rest = text.split(head, 1)
+section, after = rest.split("\n## ", 1)
+lines, seen = [], set()
+for line in section.split("\n"):
+    m = re.match(r"^(\| `([a-z0-9-]+)` \|.*\| )([^|]*)( \|)$", line)
+    if m:
+        tag = m.group(2)
+        if tag not in revised:
+            sys.exit(f"map row {tag}: no disposition in any [revised] table")
+        seen.add(tag)
+        line = m.group(1) + revised[tag] + m.group(4)
+    lines.append(line)
+extra = sorted(set(revised) - seen)
+if extra:
+    sys.exit(f"[revised] rows the map lacks: {extra}")
+open(COMPARE, "w", encoding="utf-8", newline="").write(before + head + "\n".join(lines) + "\n## " + after)
+kinds = {}
+for tag in seen:
+    k = revised[tag].split(";")[0]
+    kinds[k] = kinds.get(k, 0) + 1
+print(f"{layer}: {len(seen)} dispositions set · " + ", ".join(f"{k} {v}" for k, v in sorted(kinds.items())))
+```
+
+Run once per layer as each fold landed, it printed:
+
+```text
+instruction: 54 dispositions set · amend 43, amend, gap 3, fork, amend 1, none 6, owed 1
+flow: 61 dispositions set · amend 51, amend, gap 2, fork, amend 4, none 4
+roles: 39 dispositions set · amend 32, fork, amend 1, none 6
+memory: 73 dispositions set · amend 63, amend, gap 1, fork, amend 3, none 5, owed 1
+```
+
+Seen red both ways on planted copies of the roles record. The comparison record was byte-identical
+after both runs:
+
+```text
+$ planted: the `blob-sha-crlf` row removed from the roles record's [revised] (1 line)
+map row blob-sha-crlf: no disposition in any [revised] table
+exit 1
+
+$ planted: a [revised] row for a defect the map lacks, `ghost-defect`, appended (1 line)
+[revised] rows the map lacks: ['ghost-defect']
+exit 1
+```
+
+`tally_folded.py` counts the dispositions and writes `[folded]` in the comparison record:
+
+```python
+"""Tally each layer map's dispositions in the comparison record, and write its [folded] section.
+
+Usage: python tally_folded.py [--write]
+Reads the four `[map-<layer>]` tables; each row's last cell opens with its disposition, before `;`.
+"""
+import re
+import sys
+
+C = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared.md"
+KINDS = ["amend", "amend, gap", "fork, amend", "owed", "none"]
+text = open(C, encoding="utf-8", newline="").read()
+rows, tot = [], {k: 0 for k in KINDS}
+for layer in ("instruction", "flow", "roles", "memory"):
+    block = text.split(f"\n## [map-{layer}]", 1)[1].split("\n## ", 1)[0]
+    counts = {k: 0 for k in KINDS}
+    for line in block.splitlines():
+        if line.startswith("| `"):
+            disp = line.rstrip(" |").rsplit(" | ", 1)[1].split(";")[0].strip()
+            if disp not in counts:
+                sys.exit(f"{layer}: unknown disposition {disp!r}")
+            counts[disp] += 1
+    rows.append((layer, counts))
+    for k in KINDS:
+        tot[k] += counts[k]
+table = ["| Layer | " + " | ".join(KINDS) + " | Rows |", "|---|" + "---|" * (len(KINDS) + 1)]
+for layer, c in rows + [("all four", tot)]:
+    table.append(f"| {layer} | " + " | ".join(str(c[k]) for k in KINDS) + f" | {sum(c.values())} |")
+section = """## [folded] Where the defects went, 2026-10-16
+
+Each layer record's `[revised]` names where every defect's fix sits, and the maps' `disposition` cells
+point there. `tally_folded.py` (the instruments record) counts the cells:
+
+""" + "\n".join(table) + """
+
+- **owed** is the fifth disposition the fold needed: a fix that turns on the chain's order goes to v2's
+  `[owed]`, for the re-cut.
+- **The gaps registered:** `gap-rt-11` to `gap-rt-14`, `gap-flow-15` and `gap-mem-12`.
+- **The keys added to v2:** `instructions.proof`, `flow.route-backs`, and `policy.on-missing-expansion`
+  from LR-4.
+"""
+print("\n".join(table))
+if "--write" in sys.argv:
+    if "\n## [folded]" in text:
+        a, rest = text.split("\n## [folded]", 1)
+        b = rest.split("\n## ", 1)[1]
+        text = a + "\n" + section + "\n## " + b
+    else:
+        text = text.replace("\n## [map-instruction]", "\n" + section + "\n## [map-instruction]", 1)
+    open(C, "w", encoding="utf-8", newline="").write(text)
+    print("[folded] written")
+```

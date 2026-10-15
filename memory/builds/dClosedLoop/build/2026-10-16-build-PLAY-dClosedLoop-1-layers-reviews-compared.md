@@ -136,7 +136,7 @@ There are four additions:
 The layers fold oldest first: instruction, flow, roles, then memory. Each later record is then folded
 against its predecessors' corrected text. The main loop folds, as it folded the runtime layer.
 
-Each defect takes one of four dispositions, written into its map row's `disposition` cell:
+Each defect takes a disposition, written into its map row's `disposition` cell:
 - **Amend:** the layer record states the fix, under a dated `Revised:` line. This covers:
   - stale statements;
   - wrong figures;
@@ -148,6 +148,8 @@ Each defect takes one of four dispositions, written into its map row's `disposit
   chain build carries it as a registered gap, with the defect's evidence.
 - **Fork:** the fix would change an owner-settled answer. The six are in `[forks]`.
 - **None:** the defect is refuted-only, and its row cites the skeptic's reason.
+- **Owed**, added while folding: the fix turns on the chain's order, so v2's `[owed]` carries it to
+  the re-cut (`[folded]`).
 
 Four rules bound the fold:
 - **The owner's revisits stay the owner's.** A defect that turns on the flow layer's relations to the
@@ -278,6 +280,25 @@ What each answer changes, applied by the fold:
   `gov:feature` check counts a proposed entry. The owner's disposition of it is an owner item, and the
   entry renders into work orders once accepted. The record kind list drops the reuse entry, so its one
   door is the instruction command.
+
+## [folded] Where the defects went, 2026-10-16
+
+Each layer record's `[revised]` names where every defect's fix sits, and the maps' `disposition` cells
+point there. `tally_folded.py` (the instruments record) counts the cells:
+
+| Layer | amend | amend, gap | fork, amend | owed | none | Rows |
+|---|---|---|---|---|---|---|
+| instruction | 43 | 3 | 1 | 1 | 6 | 54 |
+| flow | 51 | 2 | 4 | 0 | 4 | 61 |
+| roles | 32 | 0 | 1 | 0 | 6 | 39 |
+| memory | 63 | 1 | 3 | 1 | 5 | 73 |
+| all four | 189 | 6 | 9 | 2 | 21 | 227 |
+
+- **owed** is the fifth disposition the fold needed: a fix that turns on the chain's order goes to v2's
+  `[owed]`, for the re-cut.
+- **The gaps registered:** `gap-rt-11` to `gap-rt-14`, `gap-flow-15` and `gap-mem-12`.
+- **The keys added to v2:** `instructions.proof`, `flow.route-backs`, and `policy.on-missing-expansion`
+  from LR-4.
 
 ## [map-instruction] The instruction layer's findings, placed
 
@@ -460,79 +481,79 @@ Run A is `wf_b6756400-d03` and run B is `wf_ec731bfc-925`.
 
 | defect | what | A | B | disposition |
 |---|---|---|---|---|
-| `stale-lexicon-owner` | the record still gives dTotalRecall the lexicon pin, gap-mem-10 and the lexicon handling (`--suggest` unchanged), which the lexicon review moved to dMindYourWords | 8, 20, 44 | 5, 37, 47, 58 | pending |
-| `stale-gap-tool-03` | the record still gives gap-tool-03 to dDeclaredLoop, which the runtime layer moved to dWellOiledMachine | 8, 20, 44 | 5, 28, 37, 47 | pending |
-| `stale-chain-count` | the record says the chain becomes twelve builds | 20, 44 | 5, 28, 37, 47, 58 | pending |
-| `stale-map-tokenizers` | [map] still routes callers through the lexicon kit's tokenizers and lists no definition context, though the lexicon review made the map own extraction | 8, 34 | — | pending |
-| `stale-runlog-unchanged` | [tools] keeps runlog unchanged, while the runtime layer moves the journal grammar into the core | 8, 28 | 28 | pending |
-| `slug-date-text-stale` | [names] still calls F4-7 open and recommends a shown date after the owner chose none | 36 | — | pending |
-| `record-idempotence` | `record` is specified only as an id-minting writer: nothing makes a replayed write idempotent or content-addressed, which the runtime layer's take-over reconcile relies on | 2, 47 | 2, 21, 49 | pending |
-| `record-concurrent-mint` | nothing says what `record` does when writers on two clones or nodes mint at once | 47 | 49 | pending |
-| `kind-list-incomplete` | the kind list omits kinds other layers write through `record` (return, act, lease, binding, mailbox, journal, run record, backlog, Flow's records), names instances where a class was meant, and gives no path to register a kind | 3, 28, 45, 61 | 15, 21, 32, 47, 50 | pending |
-| `ref-homed-kinds` | the registry holds only kinds homed at a path, while the card, leases and the mailbox live on refs | — | 50 | pending |
-| `generated-kinds-door` | the generated stores (symbols, callers, annotation index, recall index) are record kinds written by generators, a door beside `record` | — | 4 | pending |
-| `scaffold-seams` | `record`'s minting, slug checks and template rendering re-specify `gen_build_index.py --new-build` and `--new-spec`, unnamed | 27 | 32 | pending |
-| `runlog-schema-seam` | runlog's `RECORD_SCHEMA`, renderer and `check-records` leg already make the run record a schema-as-data kind, unnamed | 28 | 32 | pending |
-| `hygiene-render-seam` | HYGIENE.md is already rendered from a template by `adopt-memory-tree.sh --render` under a `gov:kit` carrier, unnamed | 41 | 44 | pending |
-| `hygiene-checks-not-schema` | many hygiene checks are history, size-cap and grandfather checks that no schema generates | — | 11 | pending |
-| `check-numbers-stable` | generating the checks keeps no rule for today's check numbers, which comments, gotchas and guides cite | — | 45 | pending |
-| `legacy-population` | the schemas, refusals and generated checks never say how they treat the records, asks and front-matter keys that predate them | 12, 49 | 11, 54 | pending |
-| `frozen-refs-resolve` | every reference must resolve whatever its lifecycle, though append-only and frozen records legitimately name later-deleted paths | 48 | — | pending |
-| `new-stores-concurrency` | the new committed views and row stores have no merge rule for parallel changes and join neither `SHARED_RECORDS` nor `GENERATED_INDEXES` | 60 | 42 | pending |
-| `relation-target-unlanded` | nothing says where a relation's target is looked up when it sits on another node's unlanded branch | 60 | — | pending |
-| `authority-keys-via-record` | the README schema names only derived keys, so the owner-authority keys the hooks read could be supplied through `record` | 39 | — | pending |
-| `derived-keys-front-matter` | the record does not say whether derived keys stay in README front matter, which gen_build_index requires and 16 of 167 READMEs contradict | — | 46 | pending |
-| `readme-root-vs-views` | [views] says agents never read a view, while [build] makes the generated README the orientation scout's root, and the `readme` value has no renderer path | 14 | 17, 18 | pending |
-| `id-grammar-seam` | the id grammar is already single-sourced in memory-recall's `extract.grammar_for`, imported by memory-tree and drift-audit; [names] proposes a new export without naming or moving it | 29 | 31 | pending |
-| `slug-re-carrier` | `BUILD_SLUG_RE` stays a second carrier of the slug grammar beside the `builds.slug-*` keys, its fate unstated | 29, 42 | 35 | pending |
-| `flip-acceptance-unfailable` | "turn green, or be named" passes a reader that stays broken, over an enumerated population | 11 | — | pending |
-| `flip-values-unnamed` | the grammar-flip proof names no values to flip to, though the breakage depends on the value | 51 | 53 | pending |
-| `grammar-change-existing-ids` | nothing says whether a changed slug grammar applies to new mints only or to the existing slugs | 51 | — | pending |
-| `slug-style-unenforceable` | `humorous` names no word source and cannot be told from `descriptive` mechanically | 13, 52 | 17 | pending |
-| `v14-refusal-exists` | the refusal at filing already ships as backlog.py's V14 under `ASK_CUTOFF` (D12-d), so "only lowers a grade" and F4-6's "as today" are false and the design rebuilds it | — | 30 | pending |
-| `ask-filer-coverage` | refusal at filing rests on four filer instances, while owner, surfaced, expansion and supervisor filers state no mechanical acceptance | 12, 50 | 1, 25, 51 | pending |
-| `refused-ask-fate` | nothing says what happens to an ask refused at filing | — | 51 | pending |
-| `decisions-layer-placement` | [contract] moves major decisions to core while [settled] and v2 [layers] keep decisions in Knowledge | 7 | — | pending |
-| `decisions-readers-unnamed` | routing about 188 of 200 rows out of DECISIONS.md names none of its readers or the carriers that send readers there for "why" | 40 | 16, 40 | pending |
-| `decisions-append-only` | moving rows out of an append-only index contradicts the rotation rulings, and the rotation seam is unnamed | 33 | — | pending |
-| `decision-id-readers` | dossiers' `decisions = [...]`, `DOSSIER_DECISIONS_EMPTY_PIN`, gotchas' `decision:` and the recall bench hold decision ids by value | 33, 55 | 41 | pending |
-| `kappa-below-threshold` | the migration counts at kappa 0.8 with no raters named and no disposition below it | 15 | 13, 57 | pending |
-| `supersession-seam` | check 27's typed relations and memory-recall's supersession map already do supersession and holds-now, unnamed | 25 | 33 | pending |
-| `amends-vs-frozen-spec` | `amends` revises a built unit's frozen spec against P19, and `@rev-N` is in no grammar | — | 8 | pending |
-| `reuse-entry-two-doors` | a reuse entry is a record kind only `record` writes and an instruction unit only `instructions.edit` changes, homed in a sidecar neither door owns | 4, 21, 35, 46, 56 | 4, 43 | pending |
-| `reuse-entry-proposal-path` | with agents only proposing instructions, the build that ships a feature cannot create the entry its own checks require | 1 | — | pending |
-| `reuse-entry-level` | level 3 holds stage methods, not directives, while the entry is delivered at the card and the task | 5 | — | pending |
-| `reuse-entry-should` | the entry's "MUST or SHOULD" strength fails the instruction grammar, which allows MUST, NEVER and ALWAYS | — | 3 | pending |
-| `reuse-affordance-seam` | each dossier's gated `## Reuse affordance` block already holds the reuse record the sidecar re-creates | 24 | 29 | pending |
-| `core-needs-knowledge` | core parts require Knowledge kinds against P28: the `implements <reuse-entry>` relation and the charter's `[records]` reuse-entry rule | 6 | 55 | pending |
-| `reuse-field-seam` | the card's `reuse` slot is the existing task-card `**Reuse:**` field handoff.py renders, and the scout's turn from reader to producer is unstated | 6, 26 | 6 | pending |
-| `reuse-slot-states` | an empty `reuse` slot cannot tell "no match" from "Knowledge absent, stale or failed" | 54 | 55 | pending |
-| `house-index-evidence` | M1c's 16 of 24 came from a small curated digest with a sketch and a census, not the whole-store house index designed | 53 | 20 | pending |
-| `reuse-benchmark-rerun` | no acceptance re-runs the reuse benchmark against the built house index | — | 14 | pending |
-| `on-demand-no-mechanism` | `reuse.delivery=on-demand` rested on the retired lookup and now has no mechanism | 13, 18 | 17 | pending |
-| `foundation-home` | a cross-feature entry's home is "FOUNDATION", a map-root file check 3 refuses | 43 | — | pending |
-| `lookup-name-inventory` | the lookup retirement's reader inventory is short and unnamed: about 40 files, 17 documents and the scout's agent files cite the tool | 16, 17, 32, 38 | 38 | pending |
-| `spec10-token` | hygiene check 12's §10 arm accepts the token `reuse_lookup` as reuse evidence, and the template and charter require running the tool | 17, 38 | 38, 48 | pending |
-| `lookup-map-cli` | unattended finds the stale-dossier reader through `MAP_CLI`, set to reuse_lookup.py, so the retirement silently stops stale-dossier asking | 37 | 39 | pending |
-| `reuse-probed-readers` | the `reuse-probed` DoD item and M5 read the lookup and recall logs, and the retirement silences them | 37 | 39, 48 | pending |
-| `reuse-obligation-witness` | after the retirement nothing witnesses the reuse-first obligation | — | 19 | pending |
-| `ratchets-seam` | shrink-only for `VERB_OFFENDER_PIN` is one drift-audit RATCHETS row, not a lexicon re-engineering | — | 36 | pending |
-| `method-callers-floor` | "11 of 1,997" covers import-resolvable calls only: 21,588 method calls stay unresolved, so methods added as definitions get no callers | 19 | 22 | pending |
-| `map-cost-untimed` | the 7.8 s is the rejected name-only probe, and the designed pipeline was never timed | 23 | 26 | pending |
-| `callers-restale` | a tracked callers file under the freshness check restales on every commit, the reason the map omits fan-in | — | 10 | pending |
-| `dossier-anchor-seam` | symbol anchoring ignores the gated `[claims]` table and `measure_dossier_staleness`, and the 28-of-31 figure is path ancestry | 31 | — | pending |
-| `inventory-counts` | the record's counts of check files, legs and kits are miscounted | — | 27 | pending |
-| `annotation-green-vacuous` | the annotation checks are justified by a first green run over an empty population, and none is seen red | 10, 30, 59 | 9, 24, 52 | pending |
-| `dangling-ids-exist` | 35 cited ids resolve nowhere (fixtures, foreign families), drift-audit pins the signal at 2, and no exemption class is designed | — | 24, 34, 52 | pending |
-| `resolve-check-seam` | drift-audit's `source_cited_ids_resolving_to_no_record` signal is the resolve check the design proposes as new | 30 | 34 | pending |
-| `lexer-blind-spots` | the comment lexer picks profiles by suffix, so extensionless git hooks and docstrings go unseen | 22 | 23 | pending |
-| `annotation-grammar-inputs` | the grammar is one example line: block extent, separators, per-language syntax, wrapped heads and literals are unstated | 58 | 56 | pending |
-| `feature-anchor-cases` | no rule covers a `gov:feature` anchor that appears many times or sits in a file with no extractor pack | 57 | — | pending |
-| `annotation-style-overturned` | the design overturns ANNOTATION-STYLE.md A1 and A2 and naming neither it nor the parity leg that pairs it with a template | — | 44 | pending |
-| `follow-through-test` | the follow-through test has no threshold, sample or window, and cannot separate following a pointer from same-build work | — | 12 | pending |
-| `pushed-at-read-no-hook` | `annotations.grammar=pushed-at-read` has no read hook in any chain row | 13 | — | pending |
-| `gap-owner-order` | fixes designed into dTotalRecall serve gaps owned by builds that land first or have no edge to it | 9 | — | pending |
-| `recall-boundroles-order` | dTotalRecall and dBoundRoles each need the other's deliverable, and neither is the other's parent | — | 7 | pending |
+| `stale-lexicon-owner` | the record still gives dTotalRecall the lexicon pin, gap-mem-10 and the lexicon handling (`--suggest` unchanged), which the lexicon review moved to dMindYourWords | 8, 20, 44 | 5, 37, 47, 58 | amend; `layer-memory` `[revised]` |
+| `stale-gap-tool-03` | the record still gives gap-tool-03 to dDeclaredLoop, which the runtime layer moved to dWellOiledMachine | 8, 20, 44 | 5, 28, 37, 47 | amend; `layer-memory` `[revised]` |
+| `stale-chain-count` | the record says the chain becomes twelve builds | 20, 44 | 5, 28, 37, 47, 58 | amend; `layer-memory` `[revised]` |
+| `stale-map-tokenizers` | [map] still routes callers through the lexicon kit's tokenizers and lists no definition context, though the lexicon review made the map own extraction | 8, 34 | — | amend; `layer-memory` `[revised]` |
+| `stale-runlog-unchanged` | [tools] keeps runlog unchanged, while the runtime layer moves the journal grammar into the core | 8, 28 | 28 | amend; `layer-memory` `[revised]` |
+| `slug-date-text-stale` | [names] still calls F4-7 open and recommends a shown date after the owner chose none | 36 | — | amend; `layer-memory` `[revised]` |
+| `record-idempotence` | `record` is specified only as an id-minting writer: nothing makes a replayed write idempotent or content-addressed, which the runtime layer's take-over reconcile relies on | 2, 47 | 2, 21, 49 | amend; `layer-memory` `[revised]` |
+| `record-concurrent-mint` | nothing says what `record` does when writers on two clones or nodes mint at once | 47 | 49 | amend; `layer-memory` `[revised]` |
+| `kind-list-incomplete` | the kind list omits kinds other layers write through `record` (return, act, lease, binding, mailbox, journal, run record, backlog, Flow's records), names instances where a class was meant, and gives no path to register a kind | 3, 28, 45, 61 | 15, 21, 32, 47, 50 | amend; `layer-memory` `[revised]` |
+| `ref-homed-kinds` | the registry holds only kinds homed at a path, while the card, leases and the mailbox live on refs | — | 50 | amend; `layer-memory` `[revised]` |
+| `generated-kinds-door` | the generated stores (symbols, callers, annotation index, recall index) are record kinds written by generators, a door beside `record` | — | 4 | amend; `layer-memory` `[revised]` |
+| `scaffold-seams` | `record`'s minting, slug checks and template rendering re-specify `gen_build_index.py --new-build` and `--new-spec`, unnamed | 27 | 32 | amend; `layer-memory` `[revised]` |
+| `runlog-schema-seam` | runlog's `RECORD_SCHEMA`, renderer and `check-records` leg already make the run record a schema-as-data kind, unnamed | 28 | 32 | amend; `layer-memory` `[revised]` |
+| `hygiene-render-seam` | HYGIENE.md is already rendered from a template by `adopt-memory-tree.sh --render` under a `gov:kit` carrier, unnamed | 41 | 44 | amend; `layer-memory` `[revised]` |
+| `hygiene-checks-not-schema` | many hygiene checks are history, size-cap and grandfather checks that no schema generates | — | 11 | amend; `layer-memory` `[revised]` |
+| `check-numbers-stable` | generating the checks keeps no rule for today's check numbers, which comments, gotchas and guides cite | — | 45 | amend; `layer-memory` `[revised]` |
+| `legacy-population` | the schemas, refusals and generated checks never say how they treat the records, asks and front-matter keys that predate them | 12, 49 | 11, 54 | amend; `layer-memory` `[revised]` |
+| `frozen-refs-resolve` | every reference must resolve whatever its lifecycle, though append-only and frozen records legitimately name later-deleted paths | 48 | — | amend; `layer-memory` `[revised]` |
+| `new-stores-concurrency` | the new committed views and row stores have no merge rule for parallel changes and join neither `SHARED_RECORDS` nor `GENERATED_INDEXES` | 60 | 42 | amend; `layer-memory` `[revised]` |
+| `relation-target-unlanded` | nothing says where a relation's target is looked up when it sits on another node's unlanded branch | 60 | — | amend; `layer-memory` `[revised]` |
+| `authority-keys-via-record` | the README schema names only derived keys, so the owner-authority keys the hooks read could be supplied through `record` | 39 | — | none; `layer-memory` `[revised]` |
+| `derived-keys-front-matter` | the record does not say whether derived keys stay in README front matter, which gen_build_index requires and 16 of 167 READMEs contradict | — | 46 | amend; `layer-memory` `[revised]` |
+| `readme-root-vs-views` | [views] says agents never read a view, while [build] makes the generated README the orientation scout's root, and the `readme` value has no renderer path | 14 | 17, 18 | amend; `layer-memory` `[revised]` |
+| `id-grammar-seam` | the id grammar is already single-sourced in memory-recall's `extract.grammar_for`, imported by memory-tree and drift-audit; [names] proposes a new export without naming or moving it | 29 | 31 | amend; `layer-memory` `[revised]` |
+| `slug-re-carrier` | `BUILD_SLUG_RE` stays a second carrier of the slug grammar beside the `builds.slug-*` keys, its fate unstated | 29, 42 | 35 | amend; `layer-memory` `[revised]` |
+| `flip-acceptance-unfailable` | "turn green, or be named" passes a reader that stays broken, over an enumerated population | 11 | — | amend; `layer-memory` `[revised]` |
+| `flip-values-unnamed` | the grammar-flip proof names no values to flip to, though the breakage depends on the value | 51 | 53 | amend; `layer-memory` `[revised]` |
+| `grammar-change-existing-ids` | nothing says whether a changed slug grammar applies to new mints only or to the existing slugs | 51 | — | amend; `layer-memory` `[revised]` |
+| `slug-style-unenforceable` | `humorous` names no word source and cannot be told from `descriptive` mechanically | 13, 52 | 17 | amend; `layer-memory` `[revised]` |
+| `v14-refusal-exists` | the refusal at filing already ships as backlog.py's V14 under `ASK_CUTOFF` (D12-d), so "only lowers a grade" and F4-6's "as today" are false and the design rebuilds it | — | 30 | amend; `layer-memory` `[revised]` |
+| `ask-filer-coverage` | refusal at filing rests on four filer instances, while owner, surfaced, expansion and supervisor filers state no mechanical acceptance | 12, 50 | 1, 25, 51 | fork, amend; `layer-memory` `[revised]` |
+| `refused-ask-fate` | nothing says what happens to an ask refused at filing | — | 51 | amend; `layer-memory` `[revised]` |
+| `decisions-layer-placement` | [contract] moves major decisions to core while [settled] and v2 [layers] keep decisions in Knowledge | 7 | — | amend; `layer-memory` `[revised]` |
+| `decisions-readers-unnamed` | routing about 188 of 200 rows out of DECISIONS.md names none of its readers or the carriers that send readers there for "why" | 40 | 16, 40 | amend; `layer-memory` `[revised]` |
+| `decisions-append-only` | moving rows out of an append-only index contradicts the rotation rulings, and the rotation seam is unnamed | 33 | — | amend; `layer-memory` `[revised]` |
+| `decision-id-readers` | dossiers' `decisions = [...]`, `DOSSIER_DECISIONS_EMPTY_PIN`, gotchas' `decision:` and the recall bench hold decision ids by value | 33, 55 | 41 | amend; `layer-memory` `[revised]` |
+| `kappa-below-threshold` | the migration counts at kappa 0.8 with no raters named and no disposition below it | 15 | 13, 57 | amend; `layer-memory` `[revised]` |
+| `supersession-seam` | check 27's typed relations and memory-recall's supersession map already do supersession and holds-now, unnamed | 25 | 33 | amend; `layer-memory` `[revised]` |
+| `amends-vs-frozen-spec` | `amends` revises a built unit's frozen spec against P19, and `@rev-N` is in no grammar | — | 8 | amend; `layer-memory` `[revised]` |
+| `reuse-entry-two-doors` | a reuse entry is a record kind only `record` writes and an instruction unit only `instructions.edit` changes, homed in a sidecar neither door owns | 4, 21, 35, 46, 56 | 4, 43 | fork, amend; `layer-memory` `[revised]` |
+| `reuse-entry-proposal-path` | with agents only proposing instructions, the build that ships a feature cannot create the entry its own checks require | 1 | — | fork, amend; `layer-memory` `[revised]` |
+| `reuse-entry-level` | level 3 holds stage methods, not directives, while the entry is delivered at the card and the task | 5 | — | none; `layer-memory` `[revised]` |
+| `reuse-entry-should` | the entry's "MUST or SHOULD" strength fails the instruction grammar, which allows MUST, NEVER and ALWAYS | — | 3 | amend; `layer-memory` `[revised]` |
+| `reuse-affordance-seam` | each dossier's gated `## Reuse affordance` block already holds the reuse record the sidecar re-creates | 24 | 29 | amend; `layer-memory` `[revised]` |
+| `core-needs-knowledge` | core parts require Knowledge kinds against P28: the `implements <reuse-entry>` relation and the charter's `[records]` reuse-entry rule | 6 | 55 | amend; `layer-memory` `[revised]` |
+| `reuse-field-seam` | the card's `reuse` slot is the existing task-card `**Reuse:**` field handoff.py renders, and the scout's turn from reader to producer is unstated | 6, 26 | 6 | amend; `layer-memory` `[revised]` |
+| `reuse-slot-states` | an empty `reuse` slot cannot tell "no match" from "Knowledge absent, stale or failed" | 54 | 55 | amend; `layer-memory` `[revised]` |
+| `house-index-evidence` | M1c's 16 of 24 came from a small curated digest with a sketch and a census, not the whole-store house index designed | 53 | 20 | amend; `layer-memory` `[revised]` |
+| `reuse-benchmark-rerun` | no acceptance re-runs the reuse benchmark against the built house index | — | 14 | amend; `layer-memory` `[revised]` |
+| `on-demand-no-mechanism` | `reuse.delivery=on-demand` rested on the retired lookup and now has no mechanism | 13, 18 | 17 | amend; `layer-memory` `[revised]` |
+| `foundation-home` | a cross-feature entry's home is "FOUNDATION", a map-root file check 3 refuses | 43 | — | amend; `layer-memory` `[revised]` |
+| `lookup-name-inventory` | the lookup retirement's reader inventory is short and unnamed: about 40 files, 17 documents and the scout's agent files cite the tool | 16, 17, 32, 38 | 38 | amend; `layer-memory` `[revised]` |
+| `spec10-token` | hygiene check 12's §10 arm accepts the token `reuse_lookup` as reuse evidence, and the template and charter require running the tool | 17, 38 | 38, 48 | amend; `layer-memory` `[revised]` |
+| `lookup-map-cli` | unattended finds the stale-dossier reader through `MAP_CLI`, set to reuse_lookup.py, so the retirement silently stops stale-dossier asking | 37 | 39 | amend; `layer-memory` `[revised]` |
+| `reuse-probed-readers` | the `reuse-probed` DoD item and M5 read the lookup and recall logs, and the retirement silences them | 37 | 39, 48 | amend; `layer-memory` `[revised]` |
+| `reuse-obligation-witness` | after the retirement nothing witnesses the reuse-first obligation | — | 19 | none; `layer-memory` `[revised]` |
+| `ratchets-seam` | shrink-only for `VERB_OFFENDER_PIN` is one drift-audit RATCHETS row, not a lexicon re-engineering | — | 36 | amend; `layer-memory` `[revised]` |
+| `method-callers-floor` | "11 of 1,997" covers import-resolvable calls only: 21,588 method calls stay unresolved, so methods added as definitions get no callers | 19 | 22 | amend; `layer-memory` `[revised]` |
+| `map-cost-untimed` | the 7.8 s is the rejected name-only probe, and the designed pipeline was never timed | 23 | 26 | amend; `layer-memory` `[revised]` |
+| `callers-restale` | a tracked callers file under the freshness check restales on every commit, the reason the map omits fan-in | — | 10 | amend; `layer-memory` `[revised]` |
+| `dossier-anchor-seam` | symbol anchoring ignores the gated `[claims]` table and `measure_dossier_staleness`, and the 28-of-31 figure is path ancestry | 31 | — | amend; `layer-memory` `[revised]` |
+| `inventory-counts` | the record's counts of check files, legs and kits are miscounted | — | 27 | amend; `layer-memory` `[revised]` |
+| `annotation-green-vacuous` | the annotation checks are justified by a first green run over an empty population, and none is seen red | 10, 30, 59 | 9, 24, 52 | amend; `layer-memory` `[revised]` |
+| `dangling-ids-exist` | 35 cited ids resolve nowhere (fixtures, foreign families), drift-audit pins the signal at 2, and no exemption class is designed | — | 24, 34, 52 | amend; `layer-memory` `[revised]` |
+| `resolve-check-seam` | drift-audit's `source_cited_ids_resolving_to_no_record` signal is the resolve check the design proposes as new | 30 | 34 | amend; `layer-memory` `[revised]` |
+| `lexer-blind-spots` | the comment lexer picks profiles by suffix, so extensionless git hooks and docstrings go unseen | 22 | 23 | amend; `layer-memory` `[revised]` |
+| `annotation-grammar-inputs` | the grammar is one example line: block extent, separators, per-language syntax, wrapped heads and literals are unstated | 58 | 56 | none; `layer-memory` `[revised]` |
+| `feature-anchor-cases` | no rule covers a `gov:feature` anchor that appears many times or sits in a file with no extractor pack | 57 | — | amend; `layer-memory` `[revised]` |
+| `annotation-style-overturned` | the design overturns ANNOTATION-STYLE.md A1 and A2 and naming neither it nor the parity leg that pairs it with a template | — | 44 | amend; `layer-memory` `[revised]` |
+| `follow-through-test` | the follow-through test has no threshold, sample or window, and cannot separate following a pointer from same-build work | — | 12 | amend, gap; `layer-memory` `[revised]` |
+| `pushed-at-read-no-hook` | `annotations.grammar=pushed-at-read` has no read hook in any chain row | 13 | — | amend; `layer-memory` `[revised]` |
+| `gap-owner-order` | fixes designed into dTotalRecall serve gaps owned by builds that land first or have no edge to it | 9 | — | owed; `layer-memory` `[revised]` |
+| `recall-boundroles-order` | dTotalRecall and dBoundRoles each need the other's deliverable, and neither is the other's parent | — | 7 | none; `layer-memory` `[revised]` |
 
 ## [instrument] The scripts and their runs
 
@@ -542,4 +563,5 @@ Run A is `wf_b6756400-d03` and run B is `wf_ec731bfc-925`.
 - the comparison script, with its map-tag change;
 - the summary script;
 - every output this record states;
-- the runs that saw each script red.
+- the runs that saw each script red;
+- the fold's disposition check and its tally, in `[fold]`.
