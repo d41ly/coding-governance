@@ -13,6 +13,7 @@
 | [2026-10-15-prompt-TOOL-dRedressedBar-22-3-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-22-3-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-25-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-25-2-revision.md) | research | TOOL-dRedressedBar-25 TOOL-dRedressedBar-18 TOOL-dRedressedBar-21 |
 | [2026-10-15-review-TOOL-dRedressedBar-21-24-diff-review-round2.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-21-24-diff-review-round2.md) | diff-review | TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-21 TOOL-dRedressedBar-23 TOOL-dRedressedBar-24 |
+| [2026-10-15-review-TOOL-dRedressedBar-25-26-diff-review-round3.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-25-26-diff-review-round3.md) | diff-review | TOOL-dRedressedBar-18 TOOL-dRedressedBar-21 TOOL-dRedressedBar-24 TOOL-dRedressedBar-25 TOOL-dRedressedBar-26 |
 
 <!-- /gen:spec-records -->
 

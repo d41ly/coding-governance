@@ -187,7 +187,7 @@ ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedr
 | [TOOL-dRedressedBar-26 — the round-2 temp-name findings, batched: every command-word `mv` is read, no positional or two-hop source reds, no bare `SRANDOM` is admitted, and the cache writer and leftover check hold on every runtime](spec/2026-10-15-spec-TOOL-dRedressedBar-26.md) | 20 | 2 | CLOSED | rev-1 | 2026-10-15 |
 <!-- /gen:build-units -->
 
-Records: 109 bound to this build, across 4 record folder(s).
+Records: 112 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
