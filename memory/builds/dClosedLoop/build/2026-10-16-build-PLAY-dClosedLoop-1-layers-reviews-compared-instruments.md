@@ -980,3 +980,38 @@ if "--write" in sys.argv:
     open(C, "w", encoding="utf-8", newline="").write(text)
     print("[folded] written")
 ```
+
+## [fold-review] The fold's closing review
+
+The fold's own diff review, dispatch 47, run as `wf_9349d401-2da`: light, three lenses, at the
+closing-review roles' declared effort (`handoff.py stage-efforts closing-review`). Its args,
+verbatim:
+
+```json
+{
+ "kind": "diff-review",
+ "base": "e7839224cff1b7553fb9567109155e805289f0d1",
+ "head": "9e0e43aef628987c5a63ec8e0b2ad1fba438b5c7",
+ "repo": "C:/projects/coding-governance/.claude/worktrees/gov-architecture-plan-e34297",
+ "intensity": "light",
+ "reviewDir": "memory/builds/dClosedLoop/reviews",
+ "roles": {
+  "diffFinder": "gov-diff-reviewer",
+  "skeptic": "gov-skeptic",
+  "synthesis": "gov-synthesizer"
+ },
+ "efforts": {
+  "diffFinder": "high",
+  "skeptic": "high",
+  "synthesis": "high"
+ },
+ "specs": [
+  "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared.md",
+  "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md",
+  "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md"
+ ],
+ "context": "The diff folds two Tier-2 rounds' findings into the four layer design records of build dClosedLoop, a design-only build that re-architects gov onto one loop: the instruction layer (layer-instruction.md), the flow layer (layer-flow.md and flow-steps.md), the roles layer (layer-roles.md) and the memory layer (layer-memory.md). It also moves the sibling records they touch: foundations.md, architecture-v2.md, the gap register, flow-roles.md and the session log, and fills the comparison record's map dispositions. Each layer record's new [revised] table names, per defect tag, where its fix sits. The comparison record's [map-<layer>] tables list each defect with the finding ids behind it, and the eight reports memory/builds/dClosedLoop/reviews/2026-10-15-review-PLAY-dClosedLoop-1-{instruction,flow,roles,memory}-{a,b}.md hold each finding. The owner's answers LR-1 to LR-6 are in the comparison record's [answers]. Review the fold for three things: (1) a [revised] row whose named fix is absent from the section it names, or does not fix the defect its findings describe; (2) fold text that contradicts another statement in the same or a sibling record, including an owner answer misapplied or a later layer's change not carried; (3) new design text that is wrong about the tree, such as a seam, file, line, key or value that does not exist or says otherwise, or a check said to be seen red with no recorded run. Write the report to memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md. Its head carries an H1, then, within its first twelve lines, the line `**Serves:** diff-review PLAY-dClosedLoop-1`. It carries exactly one `## Verdict:` line, whose token is CLEAN, CLEAN WITH FIXES or BLOCKED and nothing else.",
+ "byDesign": "- The build is design-only: no product code and no unit specs. Unit-level detail is absent by design and owed to the chain builds.\n- The owner's settled answers (F*, R-*, RT-*, LR-*) are decisions: a finding may show that one contradicts a record or the tree, but does not re-argue the owner's choice.\n- A defect whose [revised] disposition is `none` was refuted by the rounds' skeptics; re-reporting it is out of scope unless the fold made it true.\n- Dated records keep what held when they were written: research returns, snapshots, revision notes and the session log's past entries.\n- Generated files (memory/LIVE.md and the build README's generated regions) are rendered and not under review.",
+ "checklist": "# recurring-bug-class checklist for e7839224c..9e0e43aef (12 changed file(s))\n- two-answers-to-one-question (universal)\n  a fact stated in two places drifts, and the copies need not disagree loudly to be wrong\n- amendment-leaves-its-other-half-standing (directory)\n  a criterion is amended and the clause, scope item or log line that only made sense under the old wording is left behind, so one rule now returns two verdicts\n- fixture-passes-by-finding-nothing (universal)\n  a test arm whose fixture never triggers the rule passes, and proves nothing\n- retirement-inventory-misses-readers-by-value (directory)\n  an inventory of what reads a retired thing, built by searching for its name, misses every assertion on a count or a value that thing carries, because those name nothing\n- staged-break-substitutes-a-synthetic-value (universal)\n  an arm that proves a mechanism by replacing the shipped value with a simpler one proves the mechanism for the simpler value\n- inline-fence-swallows-the-rest-of-the-file (universal)\n  a triple-backtick written inline in prose opens a fence the reader never closes, so every section after it silently disappears from the checker's view"
+}
+```

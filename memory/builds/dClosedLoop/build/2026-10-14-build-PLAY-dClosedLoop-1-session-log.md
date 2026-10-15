@@ -108,6 +108,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 44 | the same | Roles layer: Tier-2 review, run B | the same | 1799cb98 | returned, CLEAN WITH FIXES, 43 of 54 confirmed | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-roles-b.md` |
 | 45 | the same | Memory layer: Tier-2 review, run A | the same | 1799cb98 | returned, CLEAN WITH FIXES, 52 of 61 confirmed; its first launch, `wf_c5046686-f17`, stopped when the session ended with no agent completed, and it was relaunched as `wf_b6756400-d03` with the same args | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-memory-a.md` |
 | 46 | the same | Memory layer: Tier-2 review, run B | the same | 1799cb98 | returned, CLEAN WITH FIXES, 51 of 58 confirmed | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-memory-b.md` |
+| 47 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The layers' fold: closing diff review over `e7839224c..9e0e43aef` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | dispatched as `wf_9349d401-2da` | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
