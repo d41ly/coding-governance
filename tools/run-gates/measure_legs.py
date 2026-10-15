@@ -2317,6 +2317,22 @@ def test_turnstile_key(tmp):
         ts = "refused: %s" % exc
     check_arm("AC36 a half-written beacon and a pid-less ticket are not judged",
               ts == {"holders": [], "tickets": []}, repr(ts))
+    # LIVENESS: the same reader over a key holding one whole beacon and one whole ticket lists both,
+    # so the empty reading above is the per-entry rule and not a reader that reads nothing.
+    live = tempfile.mkdtemp(prefix="key.", dir=tmp)
+    os.makedirs(os.path.join(live, "gate-bar-beacon.2"))
+    os.makedirs(os.path.join(live, "gate-bar-queue"))
+    with open(os.path.join(live, "gate-bar-beacon.2", "pid"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("4242\n")
+    with open(os.path.join(live, "gate-bar-queue", "20261015T000000-4243-x"), "w", encoding="utf-8") as fh:
+        fh.write("")
+    try:
+        ts = read_turnstile(live)
+    except OSError as exc:
+        ts = "refused: %s" % exc
+    check_arm("AC36 LIVENESS a whole beacon and a whole ticket are read",
+              isinstance(ts, dict) and ts["holders"] == [("gate-bar-beacon.2", 4242)]
+              and [t[:2] for t in ts["tickets"]] == [("20261015T000000-4243-x", 4243)], repr(ts))
     bad = tempfile.mkdtemp(prefix="key.", dir=tmp)
     with open(os.path.join(bad, "gate-bar-queue"), "w", encoding="utf-8") as fh:
         fh.write("")
@@ -2509,6 +2525,10 @@ def test_launch_failure(tmp):
     try:
         rows = load_process_monitor().census.scan_processes()[0]
         left = [r["winpid"] for r in rows if marker in (r.get("command") or "")]
+        # LIVENESS: the census reads command lines at all, so `left` empty is the root gone and not
+        # a census that sees no argv. This process's own row must carry its own command line.
+        if not any(r["winpid"] == os.getpid() and r.get("command") for r in rows):
+            left.append("the census read no command line for this process, so it cannot show the root gone")
     except Exception as exc:  # a census that cannot answer cannot show the root gone
         left = ["census refused: %s" % exc]
     check_arm("AC35 ...and its suspended root is terminated", not left, repr(left))
