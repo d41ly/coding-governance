@@ -1265,6 +1265,8 @@
       "{prefix}/run-gates/fixtures/measure-legs/",
       "{prefix}/run-gates/derive-ceilings.py",
       "{prefix}/run-gates/held_halves.py",
+      "{prefix}/run-gates/check-receipt.py",
+      "{prefix}/run-gates/regen.py",
       "{prefix}/run-gates/kit.toml",
       ".githooks/pre-push",
       "{prefix}/process-monitor/census.py",

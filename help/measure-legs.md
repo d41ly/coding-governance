@@ -35,14 +35,24 @@ Every run writes one directory, `<git-dir>/gate-profile/<run id>/`. Nothing prun
 - `legs.tsv`: one row per leg, the table to sort. Per-leg detail is in `<i>.json`, and the redacted
   output is in `<i>.log`. A leg whose process could not be put in its job or started reads `fail`
   with rc 1, and its `<i>.json` carries `launch_error`, `launch: <call> <winerror>`. Its process is
-  stopped before it runs anything, and the run goes on.
+  stopped before it runs anything, and the run goes on. A leg whose capture could not be made as a
+  new file in this run's scratch, because something already sits at its name, reads `fail` with
+  rc 1 and a `launch_error` opening `capture: `, having started nothing, and the run goes on.
 - `host.tsv` and `census.tsv`: the load timeline and each process census.
 
 A run that was killed or crashed can leave a leg's raw output, unredacted, in its scratch dir. Each
-run writes `owner.json` into its own scratch dir, and a later run sweeps a dead run's raw captures:
-once it has proved that run's process gone, by its pid and creation time, it redacts each capture
-into `<i>.log.recovered` in that run's record dir, or under `recovered/` in its own record when that
-dir is gone, and deletes the raw file. A scratch dir whose owner might still be running is left alone.
+run writes `owner.json`, its own pid and creation time, into its own scratch dir, and a later run
+sweeps a dead run's raw captures: once it has proved that run's process gone, by its pid and
+creation time, it redacts each capture into `recovered/<scratch name>/<i>.log.recovered` in its own
+record, and deletes the raw file. A scratch dir whose owner might still be running is left alone.
+
+Scratch dirs sit in the shared temp dir, so the profiler trusts no path found there. A capture
+reached through a link, a junction or a second name (a hard link) is not read: it is left in place,
+and named in `raw_recovered` with no log and a reason opening `not read: `. A capture that is no
+longer the file that was read when its delete comes is left in place too, its reason opening
+`not deleted: `. A leg's own capture is read and deleted only while it is the file this run made;
+otherwise it is left in place and named in `raw_kept`. A refused plant stays where it is, so every
+later run names it again until someone removes it.
 
 Per leg, `procs_total` is the job's exact process count, and `unseen` is how many of those the census
 never saw. `ts_wait_s` is the time the leg's own bars waited in the host turnstile queue, and

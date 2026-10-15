@@ -317,13 +317,34 @@ def derive_verdict(v):
     return "ok" if v in ("ok", "reuse") else v
 
 
+def write_replace(path, data):
+    """`data` (bytes) into `path` through a temp file beside it, renamed over it with `os.replace`.
+
+    The kit's one temp-then-replace writer (TOOL-dRedressedBar-21 S4). The temp takes
+    `tempfile.mkstemp`'s unpredictable name, `<name>.<random>.tmp` in the destination's own dir,
+    opened O_CREAT | O_EXCL, binary and owner-only, so no link or second name planted in advance
+    can occupy it: a fixed `<name>.tmp` is a name a planted link redirects. Any exception after the
+    temp exists removes the temp and is raised again."""
+    folder, name = os.path.split(os.path.abspath(path))
+    fd, tmp = tempfile.mkstemp(dir=folder, prefix=name + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "wb") as fh:
+            fh.write(data)
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+        raise
+
+
 def write_held_stamp(record_dir, fields):
+    """`<record_dir>/held-green`, one `<key>\\t<value>` line per field, UTF-8 and LF, through
+    `write_replace`'s unpredictable temp (TOOL-dRedressedBar-21 S4). Returns its path. A failure
+    removes the temp and raises, out of `run_combine`."""
     path = os.path.join(record_dir, STAMP_FILE)
-    tmp = path + ".tmp"
-    with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
-        for k, v in fields:
-            fh.write(f"{k}\t{v}\n")
-    os.replace(tmp, path)
+    write_replace(path, "".join(f"{k}\t{v}\n" for k, v in fields).encode("utf-8"))
     return path
 
 

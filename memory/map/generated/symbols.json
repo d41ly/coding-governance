@@ -1563,6 +1563,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "build_capture_file",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "build_carry",
       "kind": "function",
       "file": "tools/push-main.test.sh"
@@ -2039,6 +2044,11 @@
     },
     {
       "id": "build_job",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "build_junction",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
     },
@@ -2756,6 +2766,11 @@
       "id": "build_swapped_rules",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_symlink",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "build_synthetic_log",
@@ -4398,6 +4413,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_module_call",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "check_mp_value",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -4536,6 +4556,11 @@
       "id": "check_pid_alive",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "check_pinned_handle",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "check_placeholder",
@@ -7021,6 +7046,11 @@
       "id": "derive_parity_lines",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_path_key",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "derive_path_key",
@@ -13573,6 +13603,16 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_plain_stat",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_plant_bytes",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_pm_key",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
@@ -13921,6 +13961,11 @@
       "id": "read_scan_overlaps",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "read_scratch_file",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "read_serves_ids",
@@ -19688,6 +19733,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "scan_own_calls",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "scan_owner_spellings",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -19746,6 +19796,11 @@
       "id": "scan_refusal_sites",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "scan_rename_calls",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "scan_replaced_spellings",
@@ -20911,6 +20966,11 @@
       "id": "test_by_leg_yield",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_capture_pin",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_ceiling_decides_before_any_label",
@@ -22333,6 +22393,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_scratch_read_pin",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_scratch_sweep",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -22711,6 +22776,11 @@
       "id": "test_worker_survives_post_to_closed_loop_and_connection_stays_usable",
       "kind": "function",
       "file": "tools/pytest-parallel-guardrails/aiosqlite_worker_resilience.test-template.py"
+    },
+    {
+      "id": "test_write_atomic_temp",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_writes_nothing_in_worktree",
@@ -23671,6 +23741,11 @@
       "id": "write_rendered",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "write_replace",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "write_rev_spec",

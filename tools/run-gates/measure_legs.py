@@ -44,9 +44,17 @@ never ends keeps the run open, by the owner's design. The one terminate is a leg
 not join its job or be resumed, still suspended and having executed nothing (TOOL-dRedressedBar-19
 S35); that leg records `fail`, rc 1 and a `launch_error`, and the run goes on.
 
-A DEAD RUN'S RAW CAPTURES ARE SWEPT. Each run writes `owner.json` into its scratch dir, and at start
-redacts and deletes the raw captures of every sibling scratch dir whose owner is proved dead by pid
-and creation time, naming each in the envelope's `raw_recovered` (TOOL-dRedressedBar-19 S38).
+A DEAD RUN'S RAW CAPTURES ARE SWEPT. Each run writes `owner.json`, its pid and creation time, into its
+scratch dir, and at start redacts and deletes the raw captures of every sibling scratch dir whose
+owner is proved dead by pid and creation time, naming each in the envelope's `raw_recovered`
+(TOOL-dRedressedBar-19 S38). NO PATH THE SHARED TEMP DIR SUPPLIES IS TRUSTED (TOOL-dRedressedBar-21):
+a recovered log lands under `recovered/<scratch name>/` in this run's own record and nowhere a file
+in a scratch dir names. A scratch dir, `owner.json` or capture reached through a link, a junction or
+a second name is not read: the capture is left in place and named with `not read: <reason>`, and one
+that is no longer the file read when its delete comes is left in place with `not deleted: <reason>`.
+A leg's own capture is a new file this run made, refused when anything already sits at its name, and
+read and deleted only while it is still that file. A refused capture makes its leg `fail`, rc 1, with
+`launch_error` `capture: <reason>` and nothing started, and the run goes on.
 
 NO KNOB. Every setting is a flag. Every `GATE_*` name, every name `git rev-parse --local-env-vars`
 prints and every name the push hook's `unset GIT_…` line names is scrubbed from each leg's
@@ -178,7 +186,9 @@ class ProfileRefused(RuntimeError):
 
 class LaunchFailed(OSError):
     """A leg's root could not join its job or be resumed, and was terminated still suspended (S35).
-    Its one argument is the record's `launch_error`: `launch: <call> <winerror>`."""
+    Its one argument is the record's `launch_error`: `launch: <call> <winerror>`. The record's other
+    form, `capture: <reason>`, is a leg whose capture `build_capture_file` refused before anything
+    was launched, so no process, job or handle exists (TOOL-dRedressedBar-21 S8)."""
 
 
 class IoCounters(ctypes.Structure):
@@ -675,7 +685,8 @@ def resolve_job_backend(platform=None):
 
     Windows only, by design: every registered node is Windows and so is every CI job, so a POSIX
     backend would be untested scaffolding. A platform without the Job Object API refuses rather
-    than profiling less.
+    than profiling less. The table also binds `GetFinalPathNameByHandleW`, the final-path read
+    `check_pinned_handle` pins an open scratch file with, so kernel32 is bound in one place.
     """
     platform = sys.platform if platform is None else platform
     if not str(platform).startswith("win"):
@@ -701,6 +712,7 @@ def resolve_job_backend(platform=None):
         "WaitForMultipleObjects": (d, [d, p, b, d]),
         "GetSystemTimes": (b, [p, p, p]),
         "GlobalMemoryStatusEx": (b, [p]),
+        "GetFinalPathNameByHandleW": (d, [h, ctypes.c_wchar_p, d, d]),
     }
     api = {}
     for name, (restype, argtypes) in sigs.items():
@@ -758,14 +770,16 @@ def read_host_load(api, prev):
     return cpu, mem, cur
 
 
-def run_leg(api, bash, argv, env, cwd, capture):
+def run_leg(api, bash, argv, env, cwd, stdout):
     """Launch one leg SUSPENDED, put its root in a fresh job, then resume its one thread.
 
     The root is `<bash> -c 'exec "$@"' measure-legs <argv…>`, the runner's own worker shape, so the
     leg resolves `bash`, `node` and PYBIN through MSYS `PATH` as it would under the bar. Its stdin is
-    the null device and its stdout and stderr go to one capture FILE: a pipe's read end closing
-    would SIGPIPE an orphan still writing. No descendant exists before the job does, so the job
-    counts every process the leg ever starts. The start stamp is taken at the resume.
+    the null device and its stdout and stderr go to `stdout`, handed to `subprocess.Popen` as is:
+    the binary file object over the capture `build_capture_file` made, which the caller opened and
+    closes, or `subprocess.DEVNULL`. A FILE, never a pipe: a pipe's read end closing would SIGPIPE an
+    orphan still writing. No descendant exists before the job does, so the job counts every process
+    the leg ever starts. The start stamp is taken at the resume.
 
     THE ONE TERMINATE (S35). When `OpenProcess`, the job assign, the thread snapshot or the resume
     fails, the root is still suspended and has executed nothing: it is terminated through the
@@ -774,10 +788,9 @@ def run_leg(api, bash, argv, env, cwd, capture):
     The job is left to close with this process, as every leg's job is.
     """
     job = build_job(api)
-    with open(capture, "wb") as fh:
-        proc = subprocess.Popen([bash, "-c", 'exec "$@"', "measure-legs"] + list(argv), cwd=cwd, env=env,
-                                stdin=subprocess.DEVNULL, stdout=fh, stderr=subprocess.STDOUT,
-                                creationflags=CREATE_SUSPENDED)
+    proc = subprocess.Popen([bash, "-c", 'exec "$@"', "measure-legs"] + list(argv), cwd=cwd, env=env,
+                            stdin=subprocess.DEVNULL, stdout=stdout, stderr=subprocess.STDOUT,
+                            creationflags=CREATE_SUSPENDED)
     hq = api.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, False, proc.pid)
     failed = None if hq else ("OpenProcess", ctypes.get_last_error())
     ha = None
@@ -897,7 +910,7 @@ def measure_job_children(api, bash, env, top, interp):
     counts = []
     for program in (JOB_CHILD_PROGRAM, "pass"):
         try:
-            launched = run_leg(api, bash, [interp, "-I", "-c", program], env, top, os.devnull)
+            launched = run_leg(api, bash, [interp, "-I", "-c", program], env, top, subprocess.DEVNULL)
         except OSError as exc:
             raise ProfileRefused("the interpreter probe could not launch %s in a job: %s" % (interp, exc))
         try:
@@ -1020,14 +1033,12 @@ def run_census_worker(box, *args):
 # ================================================================== records
 
 def write_atomic(path, data):
-    """`data` (bytes) into `path`, owner-only, through a temp file and a rename. A failure is named
-    and remembered, never raised: the run goes on, and exits 1."""
-    tmp = path + ".tmp"
+    """`data` (bytes) into `path`, owner-only, through `held_halves.write_replace`: a temp file at an
+    unpredictable `<name>.<random>.tmp` beside it, created exclusively so no planted link can occupy
+    it, then a rename (TOOL-dRedressedBar-21 S4). True once written. A failure removes the temp, is
+    named and remembered, and is never raised: the run goes on, and exits 1."""
     try:
-        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, "O_BINARY", 0), 0o600)
-        with os.fdopen(fd, "wb") as fh:
-            fh.write(data)
-        os.replace(tmp, path)
+        held_halves.write_replace(path, data)
         return True
     except OSError as exc:
         WRITE_FAILURES.append("%s: %s" % (path, exc))
@@ -1327,6 +1338,107 @@ def derive_stall_window(lg, tick, tree, by_win, ctx):
         print("measure-legs: RESUMED  %s  (after %.0fs stalled)" % (lg["name"], t0 - ep["opened"]), flush=True)
 
 
+# ================================================================== scratch files (TOOL-dRedressedBar-21)
+#
+# Every scratch dir sits under the shared temp dir, where any process that can write there can plant
+# a link, a junction or a second name. Nothing here follows one. The `lstat` checks settle every
+# static plant; the pin on the open handle catches a swap made after a check, because a check and a
+# later open of the same path are two reads. `O_NOFOLLOW` does not exist on this platform.
+
+def read_plain_stat(root, parts, want):
+    """The `os.lstat` of `<root>/<parts...>`, once each component, lstat'ed in turn, is plain.
+
+    Every component but the last must be a directory, and the last a directory or a regular file as
+    `want` ("dir" or "file") says. No component may carry an `st_reparse_tag` (a symlink, a junction
+    or any other reparse point), and a regular file must have `st_nlink == 1`, because a hard link
+    is a regular file to `lstat` and its link count is the only sign of it. Raises OSError naming
+    the first component that fails. <root> itself is the caller's, never read from a scratch file."""
+    if want not in ("dir", "file"):
+        raise ValueError("want is 'dir' or 'file', not %r" % (want,))
+    path, st = root, None
+    for k, part in enumerate(parts):
+        path = os.path.join(path, part)
+        st = os.lstat(path)
+        tag = getattr(st, "st_reparse_tag", 0)
+        if tag:
+            raise OSError("%s is a reparse point (tag 0x%08x): a link or a junction, never followed" % (path, tag))
+        if k < len(parts) - 1 or want == "dir":
+            if not stat.S_ISDIR(st.st_mode):
+                raise OSError("%s is no plain directory" % path)
+        elif not stat.S_ISREG(st.st_mode):
+            raise OSError("%s is no regular file" % path)
+        elif st.st_nlink != 1:
+            raise OSError("%s has %d names: a second name of it may lie anywhere" % (path, st.st_nlink))
+    return st
+
+
+def check_pinned_handle(fd, root, parts):
+    """The `os.fstat` of the open descriptor <fd>, once it is a regular file with one name, opened at
+    `<root>/<parts...>` itself: the handle's final path, `GetFinalPathNameByHandleW`'s with its
+    `\\\\?\\` prefix dropped and `\\\\?\\UNC\\` read as `\\\\`, must equal
+    `os.path.join(os.path.realpath(root), *parts)` under `os.path.normcase`. A junction or a link
+    swapped in after a check moves the final path; a hard link swapped in reads two names. Raises
+    OSError naming the final path."""
+    import msvcrt  # Windows only, so never at the top of a module that loads anywhere
+    api = resolve_job_backend()
+    buf = ctypes.create_unicode_buffer(32768)
+    n = api.GetFinalPathNameByHandleW(msvcrt.get_osfhandle(fd), buf, len(buf), 0)
+    want = os.path.join(os.path.realpath(root), *parts)
+    if not n or n >= len(buf):
+        raise OSError(ctypes.get_last_error(), "GetFinalPathNameByHandleW read no final path for %s" % want)
+    final = buf.value
+    if final.startswith("\\\\?\\UNC\\"):
+        final = "\\\\" + final[len("\\\\?\\UNC\\"):]
+    elif final.startswith("\\\\?\\"):
+        final = final[len("\\\\?\\"):]
+    st = os.fstat(fd)
+    if not stat.S_ISREG(st.st_mode) or st.st_nlink != 1:
+        raise OSError("the handle opened at %s reaches %s, which is no regular file with one name (%d names)"
+                      % (want, final, st.st_nlink))
+    if os.path.normcase(final) != os.path.normcase(want):
+        raise OSError("the handle opened at %s reaches %s, another file: a link or a junction lies on the way"
+                      % (want, final))
+    return st
+
+
+def read_scratch_file(root, parts):
+    """(bytes, (st_dev, st_ino)) of the regular file `<root>/<parts...>`, read through no link,
+    junction or second name: `read_plain_stat`, an open, `check_pinned_handle`, and a read only when
+    the open handle names the file the check read. Raises OSError otherwise."""
+    st = read_plain_stat(root, parts, want="file")
+    path = os.path.join(root, *parts)
+    fd = os.open(path, os.O_RDONLY | getattr(os, "O_BINARY", 0))
+    with os.fdopen(fd, "rb") as fh:
+        pinned = check_pinned_handle(fh.fileno(), root, parts)
+        if (pinned.st_dev, pinned.st_ino) != (st.st_dev, st.st_ino):
+            raise OSError("%s opened another file than the one its check read" % path)
+        return fh.read(), (st.st_dev, st.st_ino)
+
+
+def build_capture_file(root, parts):
+    """(descriptor, (st_dev, st_ino)) of a NEW file at `<root>/<parts...>`, a leg's capture
+    (TOOL-dRedressedBar-21 S8). Every directory on the way must pass `read_plain_stat`, and the
+    name must be free: an entry already there, a dangling link included, is refused before any
+    open. Then an exclusive owner-only open and `check_pinned_handle`, which catches a dangling link
+    planted after the `lstat`: `O_EXCL` follows one here and creates its target, left behind empty.
+    A failure after the open closes the descriptor. Raises OSError."""
+    read_plain_stat(root, parts[:-1], want="dir")
+    path = os.path.join(root, *parts)
+    try:
+        os.lstat(path)
+    except FileNotFoundError:
+        pass
+    else:
+        raise OSError("%s already exists, so it is no capture this run made" % path)
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0), 0o600)
+    try:
+        st = check_pinned_handle(fd, root, parts)
+    except BaseException:
+        os.close(fd)
+        raise
+    return fd, (st.st_dev, st.st_ino)
+
+
 # ================================================================== a dead run's raw captures (S38)
 #
 # A run killed, crashed or powered off between a leg's end and its log's redaction leaves the leg's
@@ -1357,10 +1469,13 @@ def read_process_created(api, pid):
 
 
 def derive_abandoned_scratch(api, scratch):
-    """[(scratch dir, its owner's record dir)] for every `gate-profile.*` sibling of <scratch> whose
-    `owner.json` reads and whose owner is dead: no live process carries that pid with that creation
-    time. A scratch with no readable `owner.json`, or whose owner cannot be opened for a reason other
-    than absence, is left alone, and so is this run's own."""
+    """[scratch dir] for every `gate-profile.*` sibling of <scratch> whose `owner.json` reads and
+    whose owner is dead: no live process carries that pid with that creation time. `owner.json` is
+    read only through `read_scratch_file`, so a scratch dir or an `owner.json` that is a link, a
+    junction or a second name is left alone and unlisted, as is one with no readable `owner.json`,
+    one whose owner cannot be opened for a reason other than absence, and this run's own. Nothing
+    but `pid` and `created` is read from the file: an older run's `record` key chooses nothing
+    (TOOL-dRedressedBar-21 S1)."""
     parent, own = os.path.split(os.path.normpath(scratch))
     try:
         names = sorted(os.listdir(parent))
@@ -1370,10 +1485,9 @@ def derive_abandoned_scratch(api, scratch):
     for name in names:
         if not name.startswith("gate-profile.") or name == own:
             continue
-        d = os.path.join(parent, name)
         try:
-            with open(os.path.join(d, "owner.json"), encoding="utf-8") as fh:
-                owner = json.load(fh)
+            data, _ident = read_scratch_file(parent, (name, "owner.json"))
+            owner = json.loads(data.decode("utf-8"))
             pid, created = owner["pid"], owner["created"]
         except (OSError, ValueError, TypeError, KeyError):
             continue
@@ -1381,33 +1495,45 @@ def derive_abandoned_scratch(api, scratch):
             continue
         state, now = read_process_created(api, pid)
         if state == "dead" or (state == "live" and now != created):
-            out.append((d, owner.get("record")))
+            out.append(os.path.join(parent, name))
     return out
 
 
 def write_recovered_logs(abandoned, run_dir):
-    """Each abandoned scratch's `raw/<i>.out`, redacted by `derive_redacted` into `<record>/<i>.log.recovered`,
-    or into `recovered/<scratch name>/` under this run's record when that record dir is gone; then the
-    raw file deleted. Returns the envelope's `raw_recovered` entries, one per capture, naming the raw
-    file, the recovered log and, where the raw file could not go, why it was kept."""
+    """Each abandoned scratch's `raw/<i>.out`, redacted by `derive_redacted` into this run's own
+    `<run_dir>/recovered/<scratch name>/<i>.log.recovered`, and never anywhere a file in the scratch
+    names (TOOL-dRedressedBar-21 S1). Returns the envelope's `raw_recovered` entries, one per
+    capture, naming the raw file, the recovered log and, where the raw file stays, why it was kept.
+
+    `raw/` is listed only once `read_plain_stat` passes it as a directory; otherwise one entry names
+    `raw/`, `log` null, `kept` opening `not read: `. Each capture is read only through
+    `read_scratch_file`; one that fails is left in place, `log` null, `kept` opening `not read: `.
+    A recovered capture is deleted only when a second `read_plain_stat` passes and names the
+    `(st_dev, st_ino)` that was read; otherwise it stays, `kept` opening `not deleted: ` (S2, S3)."""
     out = []
-    for d, record in abandoned:
+    for d in abandoned:
+        parent, name = os.path.split(os.path.normpath(d))
+        raw_dir = os.path.join(d, "raw")
         try:
-            names = sorted(os.listdir(os.path.join(d, "raw")))
-        except OSError:
+            read_plain_stat(parent, (name, "raw"), want="dir")
+            names = sorted(os.listdir(raw_dir))
+        except OSError as exc:
+            out.append({"raw": raw_dir.replace("\\", "/"), "log": None, "kept": "not read: %s" % exc})
             continue
         for f in names:
             stem = f[:-len(".out")] if f.endswith(".out") else ""
             if not stem.isdigit():
                 continue
-            raw = os.path.join(d, "raw", f)
+            raw = os.path.join(raw_dir, f)
             entry = {"raw": raw.replace("\\", "/"), "log": None}
             out.append(entry)
-            dest_dir = (record if isinstance(record, str) and record and os.path.isdir(record)
-                        else os.path.join(run_dir, "recovered", os.path.basename(d)))
             try:
-                with open(raw, "rb") as fh:
-                    data = fh.read()
+                data, ident = read_scratch_file(parent, (name, "raw", f))
+            except OSError as exc:
+                entry["kept"] = "not read: %s" % exc
+                continue
+            dest_dir = os.path.join(run_dir, "recovered", name)
+            try:
                 os.makedirs(dest_dir, mode=0o700, exist_ok=True)
             except OSError as exc:
                 entry["kept"] = str(exc)
@@ -1418,6 +1544,14 @@ def write_recovered_logs(abandoned, run_dir):
                 continue
             entry["log"] = dest.replace("\\", "/")
             try:
+                again = read_plain_stat(parent, (name, "raw", f), want="file")
+            except OSError as exc:
+                entry["kept"] = "not deleted: %s" % exc
+                continue
+            if (again.st_dev, again.st_ino) != ident:
+                entry["kept"] = "not deleted: %s is no longer the file that was read" % raw
+                continue
+            try:
                 os.remove(raw)
             except OSError as exc:
                 entry["kept"] = str(exc)
@@ -1426,17 +1560,33 @@ def write_recovered_logs(abandoned, run_dir):
 
 def write_leg_capture(lg, final):
     """`<i>.log` from the raw capture, redacted; then the raw capture deleted when no leg process can
-    still write it. Returns None once deleted, else the reason it is kept."""
+    still write it. Returns None once deleted, else the reason it is kept.
+
+    Only the file this run made is read or deleted (TOOL-dRedressedBar-21 S9, S10). With no
+    `capture_id` on the row it opens nothing and returns `unreadable: this run made no capture at
+    <path>`. Otherwise the capture is read through `read_scratch_file(*lg["capture_at"])`, and its
+    bytes are used only when the `(st_dev, st_ino)` read equals `capture_id`; a failure or a mismatch
+    returns a reason opening `unreadable: ` and writes no log. The delete comes only once a second
+    `read_plain_stat` passes and names `capture_id`; otherwise the capture stays, `not deleted: `."""
+    if lg.get("capture_id") is None:
+        return "unreadable: this run made no capture at %s" % lg["capture"]
     try:
-        with open(lg["capture"], "rb") as fh:
-            raw = fh.read()
+        raw, ident = read_scratch_file(*lg["capture_at"])
     except OSError as exc:
         return "unreadable: %s" % exc
+    if ident != lg["capture_id"]:
+        return "unreadable: %s is not the capture this run made" % lg["capture"]
     lg["log_bytes"] = len(raw)
     if not write_atomic(lg["log"], derive_redacted(raw)):
         return "its redacted copy could not be written"
     if not final and lg.get("left_running"):
         return "%d process(es) still running at the root's exit" % lg["left_running"]
+    try:
+        again = read_plain_stat(*lg["capture_at"], want="file")
+    except OSError as exc:
+        return "not deleted: %s" % exc
+    if (again.st_dev, again.st_ino) != lg["capture_id"]:
+        return "not deleted: %s is no longer the capture this run made" % lg["capture"]
     try:
         os.remove(lg["capture"])
     except OSError as exc:
@@ -1522,12 +1672,16 @@ def run_profile(opts):
         out_root = os.path.abspath(opts.out) if opts.out else os.path.join(gitdir, "gate-profile")
         run_dir = os.path.join(out_root, run_id)
         scratch_posix, scratch = build_scratch(bash, base_env)
+        # TOOL-dRedressedBar-21 S8: split once. Every capture is opened as (parent, (own, ...)), so
+        # no path a file in the shared temp dir holds ever names one.
+        scratch_parent, scratch_own = os.path.split(os.path.normpath(scratch))
         # S38: this run's owner, written before any capture exists. With no creation time to record
-        # none is written, and the scratch is then one no later run sweeps.
+        # none is written, and the scratch is then one no later run sweeps. Its pid and creation time
+        # alone: a later run recovers into its own record, never into one this file names (S1).
         _state, created = read_process_created(api, os.getpid())
         if created is not None:
             write_atomic(os.path.join(scratch, "owner.json"), (json.dumps(
-                {"pid": os.getpid(), "created": created, "record": run_dir.replace("\\", "/")}) + "\n").encode("utf-8"))
+                {"pid": os.getpid(), "created": created}) + "\n").encode("utf-8"))
         leg_env = dict(base_env)
         leg_env["TMPDIR"] = scratch_posix + "/tmp"
         if pybin in aliases:
@@ -1594,7 +1748,9 @@ def run_profile(opts):
     legs = [{"i": i, "name": r["name"], "argv": argvs[i],
              "ceiling": r["ceiling"] if isinstance(r.get("ceiling"), int) and not isinstance(r.get("ceiling"), bool)
              and r["ceiling"] > 0 else None,
-             "capture": os.path.join(scratch, "raw", "%d.out" % i), "log": os.path.join(run_dir, "%d.log" % i),
+             "capture": os.path.join(scratch, "raw", "%d.out" % i),
+             "capture_at": (scratch_parent, (scratch_own, "raw", "%d.out" % i)),
+             "log": os.path.join(run_dir, "%d.log" % i),
              "host": [], "census": [], "procs": {}, "mem": [], "stall_windows": [], "stalls": [],
              "episode": None, "ts_holder_pids": set(), "ts_sightings": {}, "ts_stamps": {},
              "active_peak": 0, "conc_max": 0, "admit_m": None, "end_m": None}
@@ -1612,12 +1768,22 @@ def run_profile(opts):
         now = time.monotonic()
         lg["queued_s"] = round(now - state["eligible_m"], 3)
         try:
-            launched = run_leg(api, bash, lg["argv"], leg_env, top, lg["capture"])
-        except LaunchFailed as exc:
-            # S35: its root was terminated still suspended. A failed leg with no job and no handle,
-            # ended at its admission, and the run goes on.
+            fd, capture_id = build_capture_file(*lg["capture_at"])
+        except OSError as exc:
+            # TOOL-dRedressedBar-21 S8: no new file could be made at the capture's name, so nothing
+            # is launched. S35's failed-launch shape, with the capture's reason.
             launched = {"proc": None, "pid": None, "job": None, "hq": None, "started_ns": time.time_ns(),
-                        "launch_error": str(exc)}
+                        "launch_error": "capture: %s" % exc}
+        else:
+            lg["capture_id"] = capture_id
+            try:
+                with os.fdopen(fd, "wb") as stdout:
+                    launched = run_leg(api, bash, lg["argv"], leg_env, top, stdout)
+            except LaunchFailed as exc:
+                # S35: its root was terminated still suspended. A failed leg with no job and no handle,
+                # ended at its admission, and the run goes on.
+                launched = {"proc": None, "pid": None, "job": None, "hq": None, "started_ns": time.time_ns(),
+                            "launch_error": str(exc)}
         lg.update(launched)
         lg["admit_m"] = time.monotonic()
         running[i] = lg
@@ -1925,6 +2091,46 @@ def write_temp_manifest(tmp, name, rows):
     with open(path, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(rows, fh)
     return path
+
+
+# TOOL-dRedressedBar-21's plants: what a temp-dir writer would aim a link at, and a capture's credential.
+SECRET_BYTES = b"SECRET-TOKEN=abc123"
+CREDENTIAL_BYTES = b"https://u:s3cret@example.invalid/\n"
+ONE_SPAWN_LEG = {"name": "capture", "argv": ["python3", "{prefix}/run-gates/fixtures/measure-legs/spawn.py", "0", "1"]}
+
+
+def build_junction(target, link):
+    """A directory junction at <link> to the existing dir <target>. No privilege is needed, so a
+    junction plant is graded on every host. Raises OSError."""
+    import _winapi  # Windows only, as every arm here is
+    _winapi.CreateJunction(os.path.abspath(target), os.path.abspath(link))
+
+
+def build_symlink(target, link):
+    """True once <link> is a file symlink to <target>, which need not exist; False on a host where
+    this process may make none (no Developer Mode, no symlink privilege). The caller prints that
+    plant UNEXERCISED and counts no assertion for it."""
+    try:
+        os.symlink(target, link)
+        return True
+    except (OSError, NotImplementedError):
+        return False
+
+
+def read_plant_bytes(path):
+    """The bytes at <path>, followed as `open` follows it, or a marker naming why they could not be
+    read: an arm's after-read of a plant compares, and never raises."""
+    try:
+        with open(path, "rb") as fh:
+            return fh.read()
+    except OSError as exc:
+        return ("<unreadable: %s>" % exc).encode("utf-8")
+
+
+def derive_path_key(path):
+    """<path> as one comparable string, so a record's forward-slashed path and an arm's native one
+    compare equal."""
+    return os.path.normcase(os.path.normpath(str(path)))
 
 
 def read_pybin_alias():
@@ -2537,64 +2743,463 @@ def test_launch_failure(tmp):
 
 
 def test_scratch_sweep(tmp):
-    """AC38, under a TMPDIR of this arm's own. Two sibling scratch dirs: a dead owner's, an exited child
-    named with its own creation time and a record dir that exists, whose raw capture carries a
-    credential; and a live one's, this process. The run redacts the dead capture into that record
-    dir, deletes it and names it in `raw_recovered`, and leaves the live capture alone. Red when the
-    owner test reads the pid alone: the exited child, its handle still held, then reads live."""
+    """AC38, and TOOL-dRedressedBar-21's AC1 and AC2, in one profile under a TMPDIR of this arm's own.
+
+    Sibling scratch dirs: a dead owner's, an exited child named with its own creation time, whose
+    `owner.json` names a `record` dir OUTSIDE the out root and whose raw capture carries a
+    credential; a live one's, this process; and four hostile plants beside `secret.txt`, each owned
+    by the same dead owner: `hln` whose `raw/0.out` is a hard link to it, `sym` whose `raw/0.out` is
+    a file symlink to it, `jnr` whose `raw/` is a junction out, and `jnd`, itself a junction to a
+    scratch dir outside. The run redacts the dead capture into its OWN record's `recovered/`, deletes
+    it and names it, leaves the live capture alone, and reads no plant and deletes nothing through
+    one, naming each refused capture `not read: `. Red when the owner test reads the pid alone
+    (AC38), when the destination is the owner's `record` (AC1), or when a capture or `owner.json`
+    is read through a plain `open` (AC2)."""
     api = resolve_job_backend()
-    sweep = tempfile.mkdtemp(prefix="sweep.", dir=tmp)
-    out = tempfile.mkdtemp(prefix="out.", dir=tmp)
-    record = os.path.join(out, "dead-record")
-    os.makedirs(record)
+    base = tempfile.mkdtemp(prefix="sweep-arm.", dir=tmp)
+    sweep, out, elsewhere = (os.path.join(base, d) for d in ("sweep", "out", "elsewhere"))
+    outside_raw, outside_scratch = os.path.join(base, "outside-raw"), os.path.join(base, "outside-scratch")
+    for d in (sweep, out, elsewhere, outside_raw, os.path.join(outside_scratch, "raw")):
+        os.makedirs(d)
+    secret = os.path.join(base, "secret.txt")
+    for path in (secret, os.path.join(outside_raw, "0.out"), os.path.join(outside_scratch, "raw", "0.out")):
+        with open(path, "wb") as fh:
+            fh.write(SECRET_BYTES)
     child = subprocess.Popen([sys.executable, "-I", "-c", "import sys; sys.stdin.read()"], stdin=subprocess.PIPE)
     _state, child_created = read_process_created(api, child.pid)
     child.stdin.close()
     child.wait(timeout=60)
     _state, own_created = read_process_created(api, os.getpid())
-    planted = {}
-    for name, pid, created, raw in (("dead", child.pid, child_created, b"https://u:s3cret@example.invalid/\n"),
-                                    ("live", os.getpid(), own_created, b"live-bytes")):
+    dead = {"pid": child.pid, "created": child_created, "record": elsewhere.replace("\\", "/")}
+    live = {"pid": os.getpid(), "created": own_created, "record": elsewhere.replace("\\", "/")}
+    with open(os.path.join(outside_scratch, "owner.json"), "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(dead, fh)
+    planted, made_sym = {}, False
+    for name, owner in (("dead", dead), ("live", live), ("hln", dead), ("sym", dead), ("jnr", dead)):
         d = os.path.join(sweep, "gate-profile.%s0000" % name)
-        os.makedirs(os.path.join(d, "raw"))
+        os.makedirs(d)
         with open(os.path.join(d, "owner.json"), "w", encoding="utf-8", newline="\n") as fh:
-            json.dump({"pid": pid, "created": created, "record": record.replace("\\", "/")}, fh)
+            json.dump(owner, fh)
         planted[name] = os.path.join(d, "raw", "0.out")
-        with open(planted[name], "wb") as fh:
-            fh.write(raw)
-    manifest = write_temp_manifest(tmp, "sweep.json", [
-        {"name": "sweep", "argv": ["python3", "{prefix}/run-gates/fixtures/measure-legs/spawn.py", "0", "1"]}])
+        if name == "jnr":
+            planted[name] = os.path.join(d, "raw")
+            build_junction(outside_raw, planted[name])
+            continue
+        os.makedirs(os.path.join(d, "raw"))
+        if name == "hln":
+            os.link(secret, planted[name])
+        elif name == "sym":
+            made_sym = build_symlink(secret, planted[name])
+        else:
+            with open(planted[name], "wb") as fh:
+                fh.write(CREDENTIAL_BYTES if name == "dead" else b"live-bytes")
+    build_junction(outside_scratch, os.path.join(sweep, "gate-profile.jnd0000"))
+    manifest = write_temp_manifest(base, "sweep.json", [dict(ONE_SPAWN_LEG, name="sweep")])
     buf = io.StringIO()
     with set_environ({"TMPDIR": resolve_msys_dir(sweep)}), contextlib.redirect_stdout(buf):
         rc = main(["--serial", "--legs", manifest, "--out", out] + SELFTEST_FLAGS)
     sys.stdout.write(buf.getvalue())
-    runs = [os.path.join(out, r) for r in os.listdir(out) if r != "dead-record"]
-    recovered = (read_envelope(runs[0]).get("raw_recovered") if len(runs) == 1 else None) or []
-    leaked = []
-    for base in (out, os.path.dirname(os.path.dirname(planted["dead"]))):
-        for d, _dirs, files in os.walk(base):
+    runs = [os.path.join(out, r) for r in os.listdir(out)]
+    env_rec = read_envelope(runs[0]) if len(runs) == 1 else {}
+    recovered = env_rec.get("raw_recovered") or []
+    try:
+        with open(os.path.join(env_rec.get("scratch") or "", "owner.json"), encoding="utf-8") as fh:
+            own_keys = sorted(json.load(fh))
+    except (OSError, ValueError) as exc:
+        own_keys = repr(exc)
+    leaked, secret_in = [], []
+    for root in (out, sweep, elsewhere):
+        for d, _dirs, files in os.walk(root):
             for f in files:
-                with open(os.path.join(d, f), "rb") as fh:
-                    if b"s3cret" in fh.read():
-                        leaked.append(f)
-    try:
-        with open(os.path.join(record, "0.log.recovered"), "rb") as fh:
-            masked = b"://***:***@" in fh.read()
-    except OSError:
-        masked = False
-    try:
-        with open(planted["live"], "rb") as fh:
-            live = fh.read()
-    except OSError as exc:
-        live = repr(exc).encode("utf-8")
-    named = [os.path.normcase(os.path.normpath(str(k.get("raw")))) for k in recovered]
+                data = read_plant_bytes(os.path.join(d, f))
+                if b"s3cret" in data:
+                    leaked.append(f)
+                if root != sweep and SECRET_BYTES in data:
+                    secret_in.append(os.path.join(d, f))
+    by_raw = {derive_path_key(k.get("raw")): k for k in recovered}
+    log = os.path.join(runs[0], "recovered", "gate-profile.dead0000", "0.log.recovered") if len(runs) == 1 else ""
+    masked = b"://***:***@" in read_plant_bytes(log)
+    with_log = [derive_path_key(k["raw"]) for k in recovered if k.get("log")]
+    dead_entry = by_raw.get(derive_path_key(planted["dead"])) or {}
     check_arm("AC38 a dead run's raw capture is redacted, recorded and deleted",
               rc == 0 and child_created is not None and not os.path.exists(planted["dead"]) and masked
-              and not leaked and named == [os.path.normcase(os.path.normpath(planted["dead"]))],
+              and not leaked and with_log == [derive_path_key(planted["dead"])],
               repr((rc, child_created, os.path.exists(planted["dead"]), masked, leaked, recovered))[:600])
-    check_arm("AC38 ...and a live run's is left alone", live == b"live-bytes", repr(live[:80]))
+    check_arm("AC38 ...and a live run's is left alone", read_plant_bytes(planted["live"]) == b"live-bytes",
+              repr(read_plant_bytes(planted["live"])[:80]))
+    check_arm("AC1 the recovered log lands in this run's own record, never in the record owner.json names",
+              not any(files for _d, _ds, files in os.walk(elsewhere)) and masked
+              and derive_path_key(dead_entry.get("log")) == derive_path_key(log),
+              repr((list(os.walk(elsewhere)), log, dead_entry))[:600])
+    check_arm("AC1 ...and this run's own owner.json holds pid and created alone", own_keys == ["created", "pid"],
+              repr(own_keys))
+    graded = ["hln", "jnr"] + (["sym"] if made_sym else [])
+    refused = {n: by_raw.get(derive_path_key(planted[n])) or {} for n in graded}
+    check_arm("AC2 a capture reached through a second name, a link or a junction is not read, and named",
+              all(e.get("log") is None and str(e.get("kept") or "").startswith("not read: ") for e in refused.values()),
+              repr(refused)[:600])
+    check_arm("AC2 ...nothing behind a plant is copied, deleted or followed, and the plants stay",
+              not secret_in and all(read_plant_bytes(p) == SECRET_BYTES for p in (
+                  secret, os.path.join(outside_raw, "0.out"), os.path.join(outside_scratch, "raw", "0.out")))
+              and os.path.lexists(planted["hln"]) and (not made_sym or os.path.lexists(planted["sym"])),
+              repr(secret_in)[:300])
+    check_arm("AC2 ...and a scratch dir that is a junction is left alone and unlisted",
+              not any("gate-profile.jnd0000" in str(k.get("raw")) for k in recovered), repr(recovered)[:600])
+    if not made_sym:
+        print("  UNEXERCISED: this host makes no file symlink (AC2's `sym` plant; the hard link and both "
+              "junctions are graded)", flush=True)
     if len(runs) == 1:
         remove_scratch(runs[0])
+
+
+def test_scratch_read_pin(tmp):
+    """TOOL-dRedressedBar-21's AC3 and AC4, in-process. The `lstat` checks settle every static plant
+    before the open, so no static plant reaches the final-path compare or the delete-time compare:
+    each is reached by staging the state an attacker leaves AFTER a check passed. AC3 rebinds
+    `os.lstat` to `os.stat`, which is what a check sees once a junction is swapped in after it ran;
+    AC4 rebinds `derive_redacted` to swap the capture between its read and its delete. Both are
+    restored in a `finally`. Red when the final-path compare, or the identity compare before
+    `os.remove`, is taken out."""
+    base = tempfile.mkdtemp(prefix="pin.", dir=tmp)
+    # LIVENESS: a plain scratch file reads, so each refusal below is the pin, not a reader that refuses all.
+    plain = os.path.join(base, "gate-profile.pin0001", "raw")
+    os.makedirs(plain)
+    with open(os.path.join(plain, "0.out"), "wb") as fh:
+        fh.write(b"PLAIN")
+    try:
+        got = read_scratch_file(base, ("gate-profile.pin0001", "raw", "0.out"))
+        st = os.lstat(os.path.join(plain, "0.out"))
+        check_arm("AC3 LIVENESS a plain scratch file reads, with its identity", got == (b"PLAIN", (st.st_dev, st.st_ino)),
+                  repr(got))
+    except OSError as exc:
+        check_arm("AC3 LIVENESS a plain scratch file reads, with its identity", False, repr(exc))
+    target = os.path.join(base, "pin-target")
+    os.makedirs(target)
+    with open(os.path.join(target, "0.out"), "wb") as fh:
+        fh.write(b"SECRET")
+    os.makedirs(os.path.join(base, "gate-profile.pin0000"))
+    build_junction(target, os.path.join(base, "gate-profile.pin0000", "raw"))
+    final = os.path.normcase(os.path.join(os.path.realpath(target), "0.out"))
+    try:
+        got = read_scratch_file(base, ("gate-profile.pin0000", "raw", "0.out"))
+    except OSError as exc:
+        got = exc
+    check_arm("AC3 a junction on the way is refused by its check", isinstance(got, OSError), repr(got))
+    real_lstat = os.lstat
+    os.lstat = os.stat
+    try:
+        got = read_scratch_file(base, ("gate-profile.pin0000", "raw", "0.out"))
+    except OSError as exc:
+        got = exc
+    finally:
+        os.lstat = real_lstat
+    check_arm("AC3 ...and one swapped in after the check is refused by the pin, naming its final path",
+              isinstance(got, OSError) and final in os.path.normcase(str(got)), repr(got))
+
+    real_redacted = globals()["derive_redacted"]
+    capture = os.path.join(base, "gate-profile.swp0000", "raw", "0.out")
+
+    def write_swapped_capture(data):
+        """The swap an attacker makes between the sweep's read and its delete: a plain file of other
+        bytes renamed over the capture, written as every rename under this kit is written."""
+        fd, tmp_path = tempfile.mkstemp(dir=os.path.dirname(capture))
+        with os.fdopen(fd, "wb") as fh:
+            fh.write(b"swapped")
+        os.replace(tmp_path, capture)
+        return real_redacted(data)
+
+    entries = {}
+    for name, swap in (("gate-profile.swp0001", False), ("gate-profile.swp0000", True)):
+        os.makedirs(os.path.join(base, name, "raw"))
+        with open(os.path.join(base, name, "raw", "0.out"), "wb") as fh:
+            fh.write(CREDENTIAL_BYTES)
+        if swap:
+            globals()["derive_redacted"] = write_swapped_capture
+        try:
+            entries[name] = write_recovered_logs([os.path.join(base, name)], os.path.join(base, "run"))
+        finally:
+            globals()["derive_redacted"] = real_redacted
+    kept = entries["gate-profile.swp0001"]
+    check_arm("AC4 LIVENESS an unswapped dead capture is recovered and deleted",
+              len(kept) == 1 and kept[0].get("log") and "kept" not in kept[0]
+              and not os.path.lexists(os.path.join(base, "gate-profile.swp0001", "raw", "0.out")), repr(kept))
+    kept = entries["gate-profile.swp0000"]
+    check_arm("AC4 a capture swapped between its read and its delete stays, `not deleted: `",
+              len(kept) == 1 and bool(kept[0].get("log")) and str(kept[0].get("kept") or "").startswith("not deleted: ")
+              and read_plant_bytes(capture) == b"swapped", repr((kept, read_plant_bytes(capture)[:40])))
+
+
+def test_capture_pin(tmp):
+    """TOOL-dRedressedBar-21's AC9, AC10 and AC11: a leg's own capture is a new file this run made,
+    read and deleted only while it is that file. AC9 runs one profile whose `build_scratch` is
+    rebound to plant a hard link to a secret at `raw/0.out`, the window between the scratch's
+    `mktemp -d` and the capture's open. The rest call `build_capture_file` and `write_leg_capture`
+    in-process over plants made here, staging the post-check state as `test_scratch_read_pin` does,
+    every rebinding restored in a `finally`. Red when `run_leg` opens its capture with
+    `open(capture, "wb")`, when `write_leg_capture` reads with a plain `open`, or when its identity
+    compare before `os.remove` is taken out."""
+    base = tempfile.mkdtemp(prefix="cap.", dir=tmp)
+    secret = os.path.join(base, "secret.txt")
+    with open(secret, "wb") as fh:
+        fh.write(SECRET_BYTES)
+    real_scratch, planted = globals()["build_scratch"], []
+
+    def build_planted_scratch(bash, env):
+        made = real_scratch(bash, env)
+        planted.append(os.path.join(made[1], "raw", "0.out"))
+        os.link(secret, planted[0])
+        return made
+
+    globals()["build_scratch"] = build_planted_scratch
+    try:
+        rc, _out, run_dir, recs = run_fixture(base, write_temp_manifest(base, "capture.json", [ONE_SPAWN_LEG]))
+    finally:
+        globals()["build_scratch"] = real_scratch
+    rec = recs.get("capture") or {}
+    kept = read_envelope(run_dir).get("raw_kept") if run_dir else None
+    link = planted[0] if planted else ""
+    named = [k for k in kept or () if derive_path_key(k.get("path")) == derive_path_key(link)
+             and str(k.get("reason") or "").startswith("unreadable: ")]
+    check_arm("AC9 a capture name already taken fails the leg, `capture: `, and the run goes on",
+              rc == 0 and rec.get("verdict") == "fail" and rec.get("rc") == 1
+              and str(rec.get("launch_error") or "").startswith("capture: "),
+              repr((rc, rec.get("verdict"), rec.get("rc"), rec.get("launch_error"))))
+    check_arm("AC9 ...writes nothing through the plant, keeps it, and names it in raw_kept",
+              read_plant_bytes(secret) == SECRET_BYTES and bool(link) and os.path.lexists(link) and len(named) == 1,
+              repr((read_plant_bytes(secret), link, kept)))
+    if run_dir:
+        remove_scratch(run_dir)
+
+    os.makedirs(os.path.join(base, "gate-profile.cap0000", "raw"))
+    made_by = os.path.join(base, "made-by-capture")
+    if build_symlink(made_by, os.path.join(base, "gate-profile.cap0000", "raw", "1.out")):
+        try:
+            fd, _ident = build_capture_file(base, ("gate-profile.cap0000", "raw", "1.out"))
+            os.close(fd)
+            got = "a descriptor"
+        except OSError as exc:
+            got = exc
+        check_arm("AC9 a dangling link at the capture's name is refused before any open",
+                  isinstance(got, OSError) and not os.path.lexists(made_by), repr(got))
+    else:
+        print("  UNEXERCISED: this host makes no file symlink (AC9's dangling-link plant)", flush=True)
+    try:
+        fd, ident = build_capture_file(base, ("gate-profile.cap0000", "raw", "3.out"))
+        st = os.fstat(fd)
+        os.close(fd)
+        check_arm("AC9 LIVENESS a free name gives a descriptor naming the identity returned",
+                  (st.st_dev, st.st_ino) == ident, repr(((st.st_dev, st.st_ino), ident)))
+    except OSError as exc:
+        check_arm("AC9 LIVENESS a free name gives a descriptor naming the identity returned", False, repr(exc))
+    cap_target = os.path.join(base, "cap-target")
+    os.makedirs(cap_target)
+    os.makedirs(os.path.join(base, "gate-profile.cjn0000"))
+    build_junction(cap_target, os.path.join(base, "gate-profile.cjn0000", "raw"))
+    final = os.path.normcase(os.path.join(os.path.realpath(cap_target), "2.out"))
+    real_lstat = os.lstat
+    os.lstat = os.stat
+    try:
+        fd, _ident = build_capture_file(base, ("gate-profile.cjn0000", "raw", "2.out"))
+        os.close(fd)
+        got = "a descriptor"
+    except OSError as exc:
+        got = exc
+    finally:
+        os.lstat = real_lstat
+    check_arm("AC9 a junction swapped in after the check is refused by the pin, naming its final path",
+              isinstance(got, OSError) and final in os.path.normcase(str(got)), repr(got))
+
+    rows = {}
+    for name in ("gate-profile.rd0000", "gate-profile.rd0001", "gate-profile.del0000", "gate-profile.del1000"):
+        os.makedirs(os.path.join(base, name, "raw"))
+        at = (base, (name, "raw", "0.out"))
+        fd, ident = build_capture_file(*at)
+        with os.fdopen(fd, "wb") as fh:
+            fh.write(CREDENTIAL_BYTES)
+        rows[name] = {"capture": os.path.join(base, name, "raw", "0.out"), "capture_at": at, "capture_id": ident,
+                      "log": os.path.join(base, name + ".log"), "left_running": 0}
+    lg = rows["gate-profile.rd0000"]
+    os.remove(lg["capture"])
+    os.link(secret, lg["capture"])
+    why = write_leg_capture(dict(lg), True)
+    check_arm("AC10 a hard link at the capture's name is not read: `unreadable: `, no log, the link kept",
+              str(why).startswith("unreadable: ") and not os.path.lexists(lg["log"])
+              and read_plant_bytes(secret) == SECRET_BYTES and os.path.lexists(lg["capture"]), repr(why))
+    os.remove(lg["capture"])
+    with open(lg["capture"], "wb") as fh:
+        fh.write(b"planted")
+    why = write_leg_capture(dict(lg), True)
+    check_arm("AC10 a plain file planted at the name is not this run's capture: `unreadable: `, no log",
+              str(why).startswith("unreadable: ") and not os.path.lexists(lg["log"])
+              and read_plant_bytes(lg["capture"]) == b"planted", repr(why))
+    why = write_leg_capture({k: v for k, v in lg.items() if k != "capture_id"}, True)
+    check_arm("AC10 a row with no capture_id opens nothing",
+              why == "unreadable: this run made no capture at %s" % lg["capture"], repr(why))
+    lg = rows["gate-profile.rd0001"]
+    why = write_leg_capture(lg, True)
+    check_arm("AC10 LIVENESS the capture this run made is read, redacted and deleted",
+              why is None and b"://***:***@" in read_plant_bytes(lg["log"]) and not os.path.lexists(lg["capture"]),
+              repr(why))
+
+    victim = os.path.join(base, "victim")
+    os.makedirs(victim)
+    with open(os.path.join(victim, "0.out"), "wb") as fh:
+        fh.write(b"victim")
+    real_redacted, stage = globals()["derive_redacted"], {}
+
+    def build_swapped_raw(data):
+        """The swap an attacker makes after the read: `raw/` replaced by a junction to a victim dir
+        holding a `0.out`; with `post_check`, the delete-time check then sees what it would see had
+        the swap come after it, so the identity compare is the one left to refuse."""
+        shutil.rmtree(stage["raw"])
+        build_junction(victim, stage["raw"])
+        if stage["post_check"]:
+            os.lstat = os.stat
+        return real_redacted(data)
+
+    for name, post_check, label in (
+            ("gate-profile.del0000", False, "AC11 a junction swapped in for raw/ after the read deletes nothing "
+                                            "through it: `not deleted: `"),
+            ("gate-profile.del1000", True, "AC11 ...and one past the delete-time check meets the identity compare")):
+        lg = rows[name]
+        stage.update(raw=os.path.dirname(lg["capture"]), post_check=post_check)
+        globals()["derive_redacted"] = build_swapped_raw
+        try:
+            why = write_leg_capture(lg, True)
+        finally:
+            globals()["derive_redacted"] = real_redacted
+            os.lstat = real_lstat
+        check_arm(label, str(why).startswith("not deleted: ") and b"://***:***@" in read_plant_bytes(lg["log"])
+                  and read_plant_bytes(os.path.join(victim, "0.out")) == b"victim", repr(why))
+
+
+# The static arm's population: every rename call, and the calls of the function holding it.
+FUNCTION_NODES = (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)
+
+
+def check_module_call(call, module, names):
+    """True when <call> is `<module>.<name>(...)` for a name in <names>, spelled as an attribute."""
+    f = call.func
+    return (isinstance(f, ast.Attribute) and isinstance(f.value, ast.Name) and f.value.id == module
+            and f.attr in names)
+
+
+def scan_rename_calls(tree):
+    """[(call, its innermost enclosing function or None)] for every `os.replace` and `os.rename`
+    call in the module <tree>."""
+    out, stack = [], [(tree, None)]
+    while stack:
+        node, fn = stack.pop()
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, ast.Call) and check_module_call(child, "os", ("replace", "rename")):
+                out.append((child, fn))
+            stack.append((child, child if isinstance(child, FUNCTION_NODES) else fn))
+    return out
+
+
+def scan_own_calls(fn):
+    """Every call in <fn>'s own body: a nested function's or lambda's body is its own, not <fn>'s."""
+    out, stack = [], list(ast.iter_child_nodes(fn))
+    while stack:
+        node = stack.pop()
+        if isinstance(node, FUNCTION_NODES):
+            continue
+        if isinstance(node, ast.Call):
+            out.append(node)
+        stack.extend(ast.iter_child_nodes(node))
+    return out
+
+
+def test_write_atomic_temp(tmp):
+    """TOOL-dRedressedBar-21's AC5 and AC6. Static (S5): every `*.py` under this kit dir, found by
+    `os.walk` with `__pycache__` skipped, parses, and every `os.replace` or `os.rename` call in one
+    sits in a function that calls `tempfile.mkstemp` with a `dir` keyword and calls neither `os.open`
+    nor `open`; the population is non-empty and holds `write_replace`'s call, and no exemption is
+    made, this selftest's own staging included. Behaviour (S4): a second name or a dangling link
+    planted at the old fixed `<name>.tmp` is neither written through nor created, through both
+    callers of `write_replace`. Red when `write_atomic` opens `path + ".tmp"` with `O_TRUNC`, or
+    `write_held_stamp` opens `path + ".tmp"` with `open`."""
+    population, bad, in_writer = [], [], False
+    for folder, dirs, files in os.walk(KITDIR):
+        dirs[:] = sorted(d for d in dirs if d != "__pycache__")
+        for f in sorted(files):
+            if not f.endswith(".py"):
+                continue
+            path = os.path.join(folder, f)
+            rel = os.path.relpath(path, KITDIR).replace("\\", "/")
+            try:
+                with open(path, encoding="utf-8") as fh:
+                    tree = ast.parse(fh.read(), filename=path)
+            except (OSError, SyntaxError, ValueError) as exc:
+                bad.append("%s does not parse: %s" % (rel, exc))
+                continue
+            for call, fn in scan_rename_calls(tree):
+                where = "%s:%d %s" % (rel, call.lineno, getattr(fn, "name", "<lambda>" if fn else "<module>"))
+                population.append(where)
+                if fn is None:
+                    bad.append(where + ": a rename outside any function")
+                    continue
+                own = scan_own_calls(fn)
+                if not any(check_module_call(c, "tempfile", ("mkstemp",)) and any(k.arg == "dir" for k in c.keywords)
+                           for c in own):
+                    bad.append(where + ": renames no tempfile.mkstemp(dir=...) temp")
+                if any(check_module_call(c, "os", ("open",)) or (isinstance(c.func, ast.Name) and c.func.id == "open")
+                       for c in own):
+                    bad.append(where + ": opens a file by name beside the rename")
+                in_writer = in_writer or getattr(fn, "name", "") == "write_replace"
+    check_arm("AC6 the rename population is non-empty and holds write_replace's", bool(population) and in_writer,
+              repr(population))
+    check_arm("AC6 every rename under the kit renames a tempfile.mkstemp temp, opened by no name", not bad,
+              "; ".join(bad)[:600])
+
+    base = tempfile.mkdtemp(prefix="atomic.", dir=tmp)
+    a, b = os.path.join(base, "a"), os.path.join(base, "b")
+    os.makedirs(a)
+    os.makedirs(b)
+    outside = os.path.join(b, "outside.txt")
+    with open(outside, "wb") as fh:
+        fh.write(b"outside-bytes")
+    os.link(outside, os.path.join(a, "x.json.tmp"))
+    ok = write_atomic(os.path.join(a, "x.json"), b"new")
+    check_arm("AC5 write_atomic writes nothing through a second name planted at the old fixed temp",
+              ok is True and read_plant_bytes(outside) == b"outside-bytes"
+              and read_plant_bytes(os.path.join(a, "x.json.tmp")) == b"outside-bytes"
+              and read_plant_bytes(os.path.join(a, "x.json")) == b"new" and sorted(os.listdir(a)) == ["x.json", "x.json.tmp"],
+              repr((ok, read_plant_bytes(outside), sorted(os.listdir(a)))))
+    made_by = os.path.join(b, "made-by-link")
+    if build_symlink(made_by, os.path.join(a, "y.json.tmp")):
+        ok = write_atomic(os.path.join(a, "y.json"), b"y")
+        check_arm("AC5 ...nor creates the target of a dangling link planted there",
+                  ok is True and not os.path.lexists(made_by) and read_plant_bytes(os.path.join(a, "y.json")) == b"y",
+                  repr((ok, os.path.lexists(made_by))))
+    else:
+        print("  UNEXERCISED: this host makes no file symlink (AC5's dangling-link plant)", flush=True)
+    os.makedirs(os.path.join(a, "sub"))
+    failures = len(WRITE_FAILURES)
+    with contextlib.redirect_stderr(io.StringIO()):
+        ok = write_atomic(os.path.join(a, "sub"), b"x")
+    del WRITE_FAILURES[failures:]
+    left = [f for f in os.listdir(a) if f.startswith("sub.") and f.endswith(".tmp")]
+    check_arm("AC5 a failed write_atomic returns False and leaves no temp", ok is False and not left, repr((ok, left)))
+    gd, gd2 = os.path.join(base, "gd"), os.path.join(base, "gd2")
+    os.makedirs(gd)
+    os.makedirs(os.path.join(gd2, held_halves.STAMP_FILE))
+    os.link(outside, os.path.join(gd, "held-green.tmp"))
+    try:
+        got = held_halves.write_held_stamp(gd, (("sha", "x"),))
+    except OSError as exc:
+        got = repr(exc)
+    check_arm("AC5 write_held_stamp writes nothing through a second name planted at the old fixed temp",
+              got == os.path.join(gd, "held-green") and read_plant_bytes(got) == b"sha\tx\n"
+              and read_plant_bytes(outside) == b"outside-bytes" and sorted(os.listdir(gd)) == ["held-green", "held-green.tmp"],
+              repr((got, read_plant_bytes(outside), sorted(os.listdir(gd)))))
+    try:
+        held_halves.write_held_stamp(gd2, (("sha", "x"),))
+        raised = False
+    except OSError:
+        raised = True
+    left = [f for f in os.listdir(gd2) if f.startswith("held-green.") and f.endswith(".tmp")]
+    check_arm("AC5 a failed write_held_stamp raises and leaves no temp", raised and not left, repr((raised, left)))
 
 
 def test_fixtures_withheld(_tmp):
@@ -2634,6 +3239,7 @@ def cmd_selftest():
                         test_concurrent_run, test_stall_run, test_turnstile_run, test_turnstile_key,
                         test_hold_beacon, test_redact_parity, test_no_bare_bash_argv, test_fork_count,
                         test_manifest_refusals, test_launch_failure, test_scratch_sweep,
+                        test_scratch_read_pin, test_capture_pin, test_write_atomic_temp,
                         test_fixtures_withheld):
                 try:
                     arm(tmp)
