@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-18 — a gate profiler: every leg run clean and unbounded, serially or under a load cap, each profiled to its processes, stalls reported and never killed
 
-**Status:** CLOSED · rev-7 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 13 · ratified 2026-10-15
+**Status:** CLOSED · rev-8 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 13 · ratified 2026-10-15
 
 <!-- gen:spec-records -->
 
@@ -16,6 +16,7 @@
 | [2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-19-4-revision.md) | research | TOOL-dRedressedBar-19 TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-6-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-6-revision.md) | research | TOOL-dRedressedBar-21 TOOL-dRedressedBar-19 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-22-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-22-2-revision.md) | research | TOOL-dRedressedBar-22 TOOL-dRedressedBar-19 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-25-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-25-2-revision.md) | research | TOOL-dRedressedBar-25 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 |
 | [2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md](../reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md) | spec-audit | TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 |
 | [2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-1-20-diff-review-round1.md) | diff-review | TOOL-dRedressedBar-1 TOOL-dRedressedBar-2 TOOL-dRedressedBar-3 TOOL-dRedressedBar-4 TOOL-dRedressedBar-5 TOOL-dRedressedBar-6 TOOL-dRedressedBar-7 TOOL-dRedressedBar-8 TOOL-dRedressedBar-9 TOOL-dRedressedBar-10 TOOL-dRedressedBar-11 TOOL-dRedressedBar-12 TOOL-dRedressedBar-13 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-19 TOOL-dRedressedBar-20 |
 | [2026-10-15-review-TOOL-dRedressedBar-21-24-diff-review-round2.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-21-24-diff-review-round2.md) | diff-review | TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-19 TOOL-dRedressedBar-21 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 TOOL-dRedressedBar-24 |
@@ -189,6 +190,9 @@ record names each such substitution (F3).
   (closing review round 1, report ids 2, 9 and 14), the interpreter probe's base-interpreter child
   (id 3), `check_admit` as the loop's one admit decision (id 6), an arm for each of the four alias
   refusals (id 11), and the resolution red half's verdict reads with `memio.py`'s line (id 15).
+- **hands-off** `TOOL-dRedressedBar-25` — the `measure-legs selftest` guard, whose run-gates
+  entries that unit folds into `{prefix}/run-gates/` beside `{prefix}/gate-legs.json` (round 2, ids
+  4, 11, 20 and 23).
 - **hands-off** external — a `derive-ceilings.py` that reads `gate-profile/` records directly. It is
   not built here: readings enter through the existing `--observed` route.
 - **hands-off** external — the first full profiled run over the fixed tree, and the
@@ -665,7 +669,9 @@ under `{prefix}/process-monitor/`. Those are the files whose text it reads or im
 the guard omits: `{prefix}/run-gates/derive-ceilings.py`, whose `read_runs` the turnstile arm
 loads, `.githooks/pre-push`, whose `unset GIT_…` line the scrub reads, and
 `{prefix}/run-gates/held_halves.py`, which `TOOL-dRedressedBar-19`'s S19 makes the tool import.
-That unit's S21 adds all three (units-16-18 report id 21). The ceiling
+That unit's S21 adds all three (units-16-18 report id 21). `TOOL-dRedressedBar-25` folds the
+run-gates entries into `{prefix}/run-gates/`, and `{prefix}/gate-legs.json` joins the guard (closing
+review round 2, report ids 4, 11, 20 and 23). The ceiling
 `<c>` is `max(r + 120, 2r)`, rounded up to 10 s, where r is the direct-invocation reading at
 build. That clears `ceiling-margin.txt`'s rule. The kit.toml `[[gate_leg]]` row uses `{kit}`, with
 the same name, subject and argv, as `govkit.py:2750-2830` requires. The budget row is r x 1.5, floored
@@ -1145,6 +1151,17 @@ at the close.
   `test_resolution_disabled` reads neither of (`:2360-2385`). §3's Edges gain the hands-off to
   TOOL-dRedressedBar-22. The spec lines rev-6 cites are as of `9bf1eb443`, and this revision's
   insertions move them lower still. No other scope item, design or criterion moves.
+- rev-8 · 2026-10-15 · §3 · §4 · a records fix for TOOL-dRedressedBar-25, which closes the round-2
+  closing diff review's report ids 4, 11, 20 and 23 at the `measure-legs selftest` guard, written by
+  that unit's spec-writer pass `<w25>`. The status stays CLOSED. Unit 18 built against its criteria
+  as written; the corrected paragraph names TOOL-dRedressedBar-25 and the change, and that spec
+  holds the design. Ids 4, 11, 20 and 23: §4 "The selftest and its leg" says the run-gates entries
+  fold into `{prefix}/run-gates/` and `{prefix}/gate-legs.json` joins the guard. At `b5472169f` the
+  row names nine run-gates files and dirs one by one (`tools/gate-legs.json:1277-1285`), so
+  `tools/run-gates/README.md`, which `test_signal_docs` reads, and a `*.py` added later under the
+  kit dir trip no entry. §3's Edges gain the hands-off to TOOL-dRedressedBar-25. The spec lines
+  earlier revisions cite move lower by this revision's insertions. No other scope item, design or
+  criterion moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-22 — the closing review's profiler findings, batched: an interrupt names every kept capture, the probe spawns the base interpreter, and each faulted arm proves its work
 
-**Status:** CLOSED · rev-1 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 16
+**Status:** CLOSED · rev-2 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 16
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-10-15-prompt-TOOL-dRedressedBar-22-1-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-22-1-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-22-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-22-2-revision.md) | research | TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-22-3-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-22-3-spec-writer.md) | journal | — |
+| [2026-10-15-prompt-TOOL-dRedressedBar-25-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-25-2-revision.md) | research | TOOL-dRedressedBar-25 TOOL-dRedressedBar-18 TOOL-dRedressedBar-21 |
 | [2026-10-15-review-TOOL-dRedressedBar-21-24-diff-review-round2.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-21-24-diff-review-round2.md) | diff-review | TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-21 TOOL-dRedressedBar-23 TOOL-dRedressedBar-24 |
 
 <!-- /gen:spec-records -->
@@ -106,7 +107,9 @@ builder finds each site by the function this spec names.
   with `ast` and takes every `test_*` function holding a subtraction whose two operands each read
   `procs_total`. It requires at least three such functions, and requires each to read `verdict`.
   `test_serial_run`'s spawn count and `test_fork_count` (`:2443-2455`) read their two legs'
-  verdicts, so they meet it. Observed by AC15.
+  verdicts, so they meet it. `TOOL-dRedressedBar-25` has a verdict read count only outside a
+  `check_arm` failure message, as a subscript or a `.get`, and has the arm stage a verdictless copy
+  of each A/B function (closing review round 2, report id 15). Observed by AC15.
 - **S6** — id 6, L1, by the skeptic's corrected fix. `check_admit` becomes the loop's one admit
   decision, `check_admit(mode, pending, running, cpu, mem, fresh, cpu_cap=CPU_CAP_PCT, mem_cap=MEM_CAP_PCT)`.
   It reads False when nothing is pending, True when no leg of the run is running, which is the
@@ -127,7 +130,8 @@ builder finds each site by the function this spec names.
   It requires every `legs.tsv` row to equal `render_legs_row` over that leg's final `<i>.json`,
   which is the record's invariant, and the orphan's `<i>.log` to carry `late`, so its size did
   move after the root's exit. The README's record paragraph says when the table is rewritten.
-  Observed by AC9.
+  `TOOL-dRedressedBar-25` makes the manifest `orphan.sh 2 <mark>` then `waitmark.py <mark> 30`, and
+  requires `hold` to read `ok` (closing review round 2, report id 18). Observed by AC9.
 - **S10** — id 10, L3. `test_launch_failure`'s temp manifest holds two legs: `launch`, which runs
   `spawn.py 0 1 <marker>`, then `after`, which runs `spawn.py 0 1`. Its `build_closed_job` closes
   only the third job it makes, `len(made) == 3`, which is the first leg's, where today it closes
@@ -141,7 +145,9 @@ builder finds each site by the function this spec names.
   `help/measure-legs.md:23`, says no process that has run is ever killed. A new arm,
   `test_signal_docs`, is the record's parity option: the module docstring and the README's
   profiler section each carry `terminate` and `launch_error`, and neither carries
-  `nothing is ever signalled`. Observed by AC16.
+  `nothing is ever signalled`. `TOOL-dRedressedBar-25` has `test_signal_docs` also require its
+  README path to trip its own leg's guard, through `read_guard_misses` (closing review round 2,
+  report ids 4, 11 and 23). Observed by AC16.
 - **S17** — The record, in two passes. Specs 18 and 19 each take ONE rev bump in this unit's
   spec-writer pass, `<w22>`, which runs once unit 21 is CLOSED and before the build pass. Each
   revision line names `TOOL-dRedressedBar-22` and every report id §4's table assigns that spec,
@@ -184,6 +190,10 @@ builder finds each site by the function this spec names.
   which S10 extends, `test_fork_count` and the literal fixture list with `test_fixtures_withheld`,
   which S15 and S2 meet, and its spec's AC35, which `<w22>` corrects.
 - **hands-off** external — the class-level left-shifts §3 names, for the build's close to dispose.
+- **hands-off** `TOOL-dRedressedBar-25` — `test_ab_arms_read_verdicts`, which that unit makes count
+  a verdict read only outside a `check_arm` failure message (round 2, H1), `test_legs_table`, whose
+  `hold` waits on the mark `orphan.sh` writes (L6), and `test_signal_docs`, which calls
+  `read_guard_misses` (M1).
 
 ## 4. Design
 
@@ -285,11 +295,11 @@ a rebinding through `globals()` restored in a `finally` as `test_launch_failure`
 | `test_venv_interpreter` | a venv under the arm's temp dir; `measure_job_children` twice over its python | the `sys.executable` program reads 2 | 5 s |
 | `test_alias_refusals` | two `main` runs over `serial.json` that refuse before any scratch is made; two direct calls of each function | each function answers a real input without refusing | 10 s |
 | `test_resolution_disabled` | as today, on an alias host only | three verdicts `ok` and memio's line | as today |
-| `test_ab_arms_read_verdicts` | `ast` over this file | at least three A/B functions found | under 1 s |
+| `test_ab_arms_read_verdicts` | `ast` over this file; since `TOOL-dRedressedBar-25` a verdict read counts only outside a `check_arm` failure message, as a subscript or a `.get`, and the arm stages a verdictless copy of each A/B function | at least three A/B functions found | under 1 s |
 | `test_check_admit` | eight pure rows | rows of both answers | under 1 s |
-| `test_legs_table` | `orphan.sh 2` as `orphan`, then `spawn.py 0 5` as `hold`, with `check_admit` wrapped to record each call and to raise `KeyboardInterrupt` once 60 s have passed | `orphan`'s log carries `late`, and two admissions were recorded | 15 s |
+| `test_legs_table` | `orphan.sh 2` as `orphan`, then `spawn.py 0 5` as `hold`, with `check_admit` wrapped to record each call and to raise `KeyboardInterrupt` once 60 s have passed; since `TOOL-dRedressedBar-25` the two legs are `orphan.sh 2 <mark>` then `waitmark.py <mark> 30` | `orphan`'s log carries `late`, and two admissions were recorded; since `TOOL-dRedressedBar-25` `hold` also reads `ok` | 15 s |
 | `test_launch_failure` | as today, two legs | `after` reads `ok` | 2 s more |
-| `test_signal_docs` | the module docstring and the README's profiler section | the section is found and carries `measure_legs.py` | under 1 s |
+| `test_signal_docs` | the module docstring and the README's profiler section; since `TOOL-dRedressedBar-25` it also requires its README path to trip its own leg's guard, through `read_guard_misses` | the section is found and carries `measure_legs.py` | under 1 s |
 
 `test_legs_table`'s 60 s deadline bounds the staged break of S6. With the drained clause taken out of
 `check_admit`, a serial run admits nothing, and the deadline turns that into a red `130` instead of a
@@ -465,7 +475,10 @@ Every command runs from the worktree root on node d.
   memio's `<i>.log` carries `memio: wrote 200 MiB`, and the spawn difference reads 0. An `ast`
   walk of `tools/run-gates/measure_legs.py` finds at least three `test_*` functions holding a
   subtraction whose operands each read `procs_total`, and each of them reads `verdict`. Spec 18's
-  AC1, cut from `- **AC1**` to `- **AC2**` and joined, carries `verdict`.
+  AC1, cut from `- **AC1**` to `- **AC2**` and joined, carries `verdict`. Since
+  `TOOL-dRedressedBar-25`, a verdict read counts only outside a `check_arm` failure message, as a
+  subscript or a `.get`, and the arm stages a verdictless copy of each A/B function, as that
+  unit's AC15 observes.
   Red when: on an alias host, a `serial.json` copy whose memio row names a script that does not
   exist is run with the resolution disabled. The gate as at `<p22>~1` passes it, memio reading
   under 200 MiB with 0 bytes written, and the new half reds on memio's verdict `fail` and its
@@ -486,7 +499,9 @@ Every command runs from the worktree root on node d.
   call return True for a serial run.
 - **AC9** — A python program runs `main` with `--serial --legs <m> --out <o>` and `<sf>`, where
   `<m>` is a temp manifest of `bash <fx>/orphan.sh 2` named `orphan` and `spawn.py 0 5` named
-  `hold`. `legs.tsv` holds the header and two rows, and each row equals
+  `hold`; since `TOOL-dRedressedBar-25` the arm runs `orphan.sh 2 <mark>` then
+  `waitmark.py <mark> 30`, and `hold` reads `ok`, as that unit's AC18 observes. `legs.tsv` holds the
+  header and two rows, and each row equals
   `measure_legs.render_legs_row` over that leg's `<i>.json`, column for column. `orphan`'s
   `<i>.log` carries `late`, its `<i>.json` `log_bytes` is 11, and `raw_kept` is empty.
   `tools/run-gates/README.md`'s profiler section, cut and joined, carries `rewritten whole`. Spec
@@ -512,7 +527,9 @@ Every command runs from the worktree root on node d.
   `grep -c 'Nothing is ever killed' help/measure-legs.md` prints 0, and the page carries
   `has run is ever killed`. A python program applies
   `test_signal_docs`' rule to `measure_legs.__doc__` and that section: each carries `terminate`
-  and `launch_error`, and neither carries `nothing is ever signalled`.
+  and `launch_error`, and neither carries `nothing is ever signalled`. Since
+  `TOOL-dRedressedBar-25`, `test_signal_docs` also requires its README path to trip its own leg's
+  guard, through `read_guard_misses`, as that unit's AC23 observes.
   Red when: over the README as at `<p22>~1`, the grep prints 1 and the section carries no
   `terminate`.
 - **AC17** — `git diff <w22>~1 <w22> -- memory/builds/dRedressedBar/spec/` shows `<s18>` and
@@ -556,6 +573,20 @@ none
   and the venv redirector was measured on node d. Ids 6 and 9 take the skeptic's corrected fixes. S16
   also corrects `help/measure-legs.md:23`, the same absolute claim in the page that points at the
   README, which the record's left-shift grep over the kit's docs finds.
+- rev-2 · 2026-10-15 · S9 · S15 · S16 · §3 · §4 · AC9 · AC15 · AC16 · a records fix for
+  TOOL-dRedressedBar-25, which closes the round-2 closing diff review's report ids 15, 18, 4, 11
+  and 23 in this unit's arms, written by that unit's spec-writer pass `<w25>`. The status stays
+  CLOSED. Unit 22 built against its criteria as written; each corrected paragraph names
+  TOOL-dRedressedBar-25 and the change, and that spec holds the design. Code lines below are at
+  `b5472169f`. Id 15: S15, AC15 and §4's arm-table row say a verdict read counts only outside a
+  `check_arm` failure message, as a subscript or a `.get`, and the arm stages a verdictless copy of
+  each A/B function; today the arm counts every constant value and attribute name in the function
+  (`tools/run-gates/measure_legs.py:3497-3498`), so a verdict read only in a message passes it. Id
+  18: S9, AC9 and the arm-table row run `orphan.sh 2 <mark>` then `waitmark.py <mark> 30`, and
+  `hold` reads `ok`, where two fixed sleeps set the order (`:3520-3522`). Ids 4, 11 and 23: S16,
+  AC16 and the arm-table row say `test_signal_docs` also requires its README path (`:3564`) to trip
+  its own leg's guard, through `read_guard_misses`. §3's Edges gain the hands-off to
+  TOOL-dRedressedBar-25. No other scope item, design or criterion moves.
 
 ## 10. Reuse audit
 

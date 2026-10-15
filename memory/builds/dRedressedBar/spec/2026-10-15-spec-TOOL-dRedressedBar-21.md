@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-21 — the profiler trusts no path a temp dir supplies: a dead run's logs land in this run's record, no capture is opened, read or deleted through a link, and run-gates' Python temp files take unpredictable names
 
-**Status:** CLOSED · rev-2 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 15 · ratified 2026-10-15
+**Status:** CLOSED · rev-3 · 2026-10-15 · node d · Tier-2 · base ebce889c · streams tooling · order 15 · ratified 2026-10-15
 
 <!-- gen:spec-records -->
 
@@ -16,6 +16,7 @@
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-7-spec-writer.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-7-spec-writer.md) | journal | — |
 | [2026-10-15-prompt-TOOL-dRedressedBar-21-brief.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-21-brief.md) | research | TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 |
 | [2026-10-15-prompt-TOOL-dRedressedBar-24-brief.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-24-brief.md) | research | TOOL-dRedressedBar-24 |
+| [2026-10-15-prompt-TOOL-dRedressedBar-25-2-revision.md](../prompts/2026-10-15-prompt-TOOL-dRedressedBar-25-2-revision.md) | research | TOOL-dRedressedBar-25 TOOL-dRedressedBar-18 TOOL-dRedressedBar-22 |
 | [2026-10-15-review-TOOL-dRedressedBar-21-24-diff-review-round2.md](../reviews/2026-10-15-review-TOOL-dRedressedBar-21-24-diff-review-round2.md) | diff-review | TOOL-dRedressedBar-12 TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedressedBar-17 TOOL-dRedressedBar-18 TOOL-dRedressedBar-19 TOOL-dRedressedBar-22 TOOL-dRedressedBar-23 TOOL-dRedressedBar-24 |
 
 <!-- /gen:spec-records -->
@@ -146,7 +147,9 @@ measurement §4 records: the temp file's name, and a pin on the open handle besi
   must call `tempfile.mkstemp` with a `dir` keyword and must call neither `os.open` nor `open`, and a
   call outside any function reds. The arm asserts that the population is non-empty and holds a call
   inside `write_replace`. The selftest's own staging functions are in the population, with no
-  exemption, so AC4's swap is written to meet the predicate. Observed by AC6.
+  exemption, so AC4's swap is written to meet the predicate. `TOOL-dRedressedBar-25` has the arm
+  also require every `*.py` it walks to trip its own leg's guard, through `read_guard_misses`
+  (closing review round 2, report ids 20 and 23). Observed by AC6.
 - **S6** — The docs say where a recovered log lands, what the sweep refuses, and what a planted
   capture does. In `help/measure-legs.md`, "What it writes" says a recovered log lands under
   `recovered/<scratch name>/` in the new run's own record. It says a capture reached through a link,
@@ -217,7 +220,9 @@ measurement §4 records: the temp file's name, and a pin on the open handle besi
   kickoff-manifest re-stamp at its parent that the ratchet's staged check requires, as `809f794e4`
   did. A second commit, `<p21m>`, re-stamps `last-audit:` in `memory/guides/SESSION-KICKOFF.md` at
   the product commit after a section B re-read, with a `manifest-audit:` line in its body, as
-  `cafbbc460` did. Observed by AC12.
+  `cafbbc460` did. `TOOL-dRedressedBar-25` folds the run-gates entries into `{prefix}/run-gates/`,
+  so these two now sit under that directory entry (closing review round 2, report ids 4, 11, 20 and
+  23). Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -252,6 +257,9 @@ measurement §4 records: the temp file's name, and a pin on the open handle besi
 - **hands-off** `TOOL-dRedressedBar-24` — the bash fixed-name temp writers under `tools/run-gates/`, in
   `run-gates.sh`, `post-merge.sh` and `run-selftests.sh`, and the Python writer in the `run-gates.sh`
   heredoc, which F1 resolved as (a) to that unit, with its bash-side static check.
+- **hands-off** `TOOL-dRedressedBar-25` — `test_write_atomic_temp`, which that unit makes call
+  `read_guard_misses` over every `*.py` it walks, and S11's two guard entries, which it folds into
+  `{prefix}/run-gates/` (round 2, ids 20 and 23).
 
 ## 4. Design
 
@@ -477,8 +485,10 @@ Specs 18 and 19 are `<w21>`'s write set, not the build pass's.
   empty file at the link's target, though the pin refuses the capture. The census's size read
   follows a link (§3). The deletes keep the race §3 states. The bash writers and the heredoc writer
   F1 names keep their fixed names. The static arm sees `os.replace` and `os.rename` called as
-  attributes of `os`, so a `from os import replace` writer escapes it, and a `*.py` added later under
-  `tools/run-gates/` outside the guard is parsed but does not trip the leg.
+  attributes of `os`, so a `from os import replace` writer escapes it. A `*.py` added later under
+  `tools/run-gates/` was parsed but tripped no leg until `TOOL-dRedressedBar-25` folded the guard
+  into `{prefix}/run-gates/`; it now trips the leg, and what stays unchecked is a file outside the
+  kit dir that an arm comes to read.
 - perf / scale — N/A — at most five `lstat`s, one `fstat` and one final-path call per capture or
   `owner.json`, on paths taken once per leg and once per run.
 - error / empty / loading states — A refused `owner.json` or scratch dir is skipped as an unreadable
@@ -633,9 +643,11 @@ holding `SECRET-TOKEN=abc123`.
   copy with S10's identity compare taken out does the same.
 - **AC12** — A python program loads `tools/gate-legs.json`. With `{prefix}` read as `tools`, every
   `*.py` under `tools/run-gates/` outside `__pycache__` is the exact path or under a directory entry
-  of the `measure-legs selftest` row's `guard`, which names `{prefix}/run-gates/check-receipt.py`
-  and `{prefix}/run-gates/regen.py`. The `last-audit:` line of `memory/guides/SESSION-KICKOFF.md`
-  names a commit at which `git show <sha>:tools/gate-legs.json` holds both paths, and
+  of the `measure-legs selftest` row's `guard`, which holds `{prefix}/run-gates/` since
+  `TOOL-dRedressedBar-25`, where it named `{prefix}/run-gates/check-receipt.py` and
+  `{prefix}/run-gates/regen.py` as exact files. The `last-audit:` line of
+  `memory/guides/SESSION-KICKOFF.md` names a commit at which `git show <sha>:tools/gate-legs.json`
+  covers both paths in that row, and
   `git log -1 --format=%B <p21m>` carries `manifest-audit:`.
   Red when: over `bf42c5113`, `check-receipt.py` and `regen.py` are outside that guard.
 
@@ -701,6 +713,18 @@ arm red, then green, at the close, and runs the bar once after the last unit is 
   hands-off edge to that unit, which its consumes-from mirrors, and the header gains
   `ratified 2026-10-15`. Written by unit 24's spec-writer pass. No scope item, design or criterion
   of this unit moves.
+- rev-3 · 2026-10-15 · S5 · S11 · §3 · §5 · AC12 · a records fix for TOOL-dRedressedBar-25, which
+  closes the round-2 closing diff review's report ids 4, 11, 20 and 23 at the
+  `measure-legs selftest` guard, written by that unit's spec-writer pass `<w25>`. The status stays CLOSED. Unit 21
+  built against its criteria as written, and its ledger observed AC12 over the two exact entries;
+  each corrected paragraph names TOOL-dRedressedBar-25 and the change, and that spec holds the
+  design. Ids 20 and 23: S5 says the arm also requires every `*.py` it walks to trip its own leg's
+  guard, through `read_guard_misses`. Ids 4, 11, 20 and 23: S11 says its two entries now sit under
+  `{prefix}/run-gates/`, and AC12 reads that directory where it named the two files. Ids 20 and 23:
+  §5 security says a `*.py` added later under the kit dir trips the leg, and what stays unchecked is
+  a file outside the kit dir that an arm comes to read. At `b5472169f` the row names nine run-gates
+  files and dirs one by one (`tools/gate-legs.json:1277-1285`). §3's Edges gain the hands-off to
+  TOOL-dRedressedBar-25. No other scope item, design or criterion moves.
 
 ## 10. Reuse audit
 
