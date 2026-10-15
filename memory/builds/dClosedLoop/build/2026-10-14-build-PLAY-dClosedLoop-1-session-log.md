@@ -81,6 +81,8 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 17 | gov-researcher | Roles: coverage | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-12-researcher.md` | 1799cb98 | returned, 4m37s, 23.9k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-roles-coverage.md` |
 | 18 | gov-researcher | Roles: interactions | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-13-researcher.md` | 1799cb98 | returned, 4m40s, 22.0k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-roles-interactions.md` |
 | 19 | gov-researcher | Roles: prior art | `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-14-researcher.md` | 1799cb98 | returned, 4m41s, 24.5k out | `build/2026-10-14-build-PLAY-dClosedLoop-1-research-roles-priorart.md` |
+| 20 | gov-researcher | Flow layer: Plan, Design and Build items | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | running | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-a.md` |
+| 21 | gov-researcher | Flow layer: Test, Deploy, Maintain and review items | `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-2-researcher.md` | 1799cb98 | running | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -138,6 +140,14 @@ calls.
 - returned — gov-researcher · wrote 0 files · 4m40s · 22.0k out · run direct/a444485861ad18d2b
 - agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-14-prompt-PLAY-dClosedLoop-1-14-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-14-researcher.md) · writes none · gates none · run direct/a2750bbc386a192e4
 - returned — gov-researcher · wrote 0 files · 4m41s · 24.5k out · run direct/a2750bbc386a192e4
+```
+
+The flow layer's item audit is two handoffs, dispatches 20 and 21. Their lines were derived the same
+way and held from the ledger:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-1-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-1-researcher.md) · writes none · gates none · run direct/a9cb53e6fd6bb4661
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-15-prompt-PLAY-dClosedLoop-1-2-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-2-researcher.md) · writes none · gates none · run direct/a2e4ed3684d8964ea
 ```
 
 ## Events
@@ -203,6 +213,9 @@ calls.
   all four expansions, the charter at level 0 with the card at level 1, and Skills as level-4 thin
   entries. v2 gains `[layers]`, P11 and P13 are amended, and P27 and P28 are added; nine gaps join the
   register.
+- 2026-10-15, session 1799cb98: the owner opened the flow layer's review. It was set against the
+  design, and three new gaps were proposed. An item-by-item audit of the 70 checklist items went to two
+  researchers (dispatches 20 and 21). Forks were put to the owner.
 
 ## Instruments
 
@@ -462,6 +475,7 @@ Runs, 2026-10-14:
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-design-overview-{layers.svg,cycle.html}` | The two diagrams shown with that overview: the three layers, and the item cycle as a stepper. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md` | The layer review's first round: the owner's layer model and the instruction layer, measured against the current design, with the gaps, the recommendations and the forks. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-model.svg` | The layer model as capabilities: the core cycle on Runtime, expansions plugged in at declared points, Distribution beneath. |
+| `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-flow.md` | The layer review's second round: the flow layer, each step at a glance, the owner's requirements against the design, the gaps, the recommendations and the forks. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md` | The gaps, keyed, graded and evidenced, each owned by one chain build; the register derives its counts. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v0.md` | The first proposal, before the owner's rounds, unedited. |
 | `build/2026-10-14-build-PLAY-dClosedLoop-1-design-rounds.md` | Rounds 1 to 5: every question, option and answer verbatim, and what each changed. |
