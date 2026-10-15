@@ -176,7 +176,7 @@ ids TOOL-dRedressedBar-14 TOOL-dRedressedBar-15 TOOL-dRedressedBar-16 TOOL-dRedr
 | [TOOL-dRedressedBar-24 — the runner scripts' fixed-name temp writers take unpredictable temps, and a shell-hygiene mode reds a new one](spec/2026-10-15-spec-TOOL-dRedressedBar-24.md) | 18 | 2 | CLOSED | rev-1 | 2026-10-15 |
 <!-- /gen:build-units -->
 
-Records: 99 bound to this build, across 4 record folder(s).
+Records: 100 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
