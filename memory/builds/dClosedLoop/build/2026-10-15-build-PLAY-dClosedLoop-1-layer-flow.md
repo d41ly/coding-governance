@@ -99,7 +99,7 @@ The flow has two review checklists:
 |---|---|---|
 | Five mandatory steps, and review at a breakpoint | six steps with Maintain on a cadence; stage reviews at fixed items; owner gates by `autonomy`; the Loop Review | designed; the count and the breakpoint framing are to settle |
 | The backbone everything is built through | P20; the entry-point table; patch builds at Design | designed |
-| Each step a deterministic, enforced process | 70 items, each witnessed (the flow record); P2, P24; the item cycle (flow-roles `[cycle]`) | designed as checklists; as programs, partly: no declared dependencies, and items are numbered |
+| Each step a deterministic, enforced process | the items `build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md` declares, each witnessed; P2, P24; the item cycle (flow-roles `[cycle]`) | designed as programs since the step definitions: each item declares what it needs, and items are tagged |
 | The instruction pieces per step, enforced | practice reach at Plan and Design items; P27's load sets | partly: items declare no instruction scope |
 | The roles per step | the actor map; flow-roles `[steps]`; four exclusivity points | designed, though three items have the driver reasoning |
 | Transitions and interactions | entry points; v2 `[contracts]`; backward routes; the records chain; dependencies, the mailbox, `landed` | partly: scattered, with no single declared table and no terminal state but landing |
@@ -107,9 +107,10 @@ The flow has two review checklists:
 ## [uncovered] What the layer does not yet cover
 
 Three new gaps are proposed:
-1. **gap-flow-10, HIGH, dDeclaredLoop.** A build can end only by landing.
+1. **gap-flow-10, HIGH, dWellOiledMachine since RT-3.** A build can end only by landing.
    - There is no withdrawn, superseded or merged terminal state.
-   - The owner has no command to pause, resume or withdraw a build.
+   - The owner's pause, resume and abort exist only for unattended runs (`--hold`, `--resume`,
+     `--abort`), not as a build's lifecycle, and supersede does not exist.
    - A dependent held until its parent lands (`deps.landing`) waits forever on a parent that never
      will.
 2. **gap-flow-11, MED, dCalibratedLens.** Reviews and owner gates are two mechanisms, fixed to set
@@ -117,11 +118,20 @@ Three new gaps are proposed:
    - Each step's review sits at one item (`review.<stage>`).
    - Owner gates sit at `autonomy`'s three points.
    - Neither can be placed at another item boundary.
-3. **gap-flow-12, MED, dCalibratedLens.** The driver reasons in three items.
-   - The review recommendation at Plan, Design and Test is scored by a command and reasoned by the
-     driver.
+3. **gap-flow-12, MED, dCalibratedLens.** The driver reasons in four items.
+   - The review recommendation at Plan, Design, Test and Deploy is scored by a command and reasoned by
+     the driver.
    - That breaks P25 and `driver.reads`, and FL-R3's "scored signals and reasoning" never named a role
      to do the reasoning.
+
+Two more gaps were registered from the audit, at `[settled]`:
+- **gap-flow-13, HIGH, dDeclaredLoop.** Item declarations are incomplete. Items carry more than one
+  actor, many state no witness or no failure route, and the records disagree. Deploy had no item for
+  settled behaviours: the parent-landing hold, the core re-check and the `landed` notice.
+- **gap-flow-14, HIGH, dDeclaredLoop.** Witnesses typed by the acting agent decide routes or mandates:
+  the tester's class routes a red, the builder's own "checks run" stands for acceptance, the driver's
+  typed disposition places a request, and Maintain's agent-typed intake becomes a patch build's
+  mandate.
 
 Already registered, and not proposed again:
 - no stage model (gap-spine-01);
@@ -178,7 +188,9 @@ Already registered, and not proposed again:
 **F-E. Terminal states and lifecycle events.**
 - A build ends landed, withdrawn or superseded. When superseded, its replacement inherits its kept work
   through the re-design inventory already settled for planning misses.
-- The owner can pause, resume, withdraw or supersede a build through the guarded command family.
+- The owner can pause, resume, withdraw or supersede a build. The controls extend unattended's
+  `--hold`, `--resume` and `--abort`, supersede is new, and Runtime executes them (RT-3; flow-steps
+  `[lifecycle]`).
 - A withdrawal:
   - releases the build's leases;
   - commits the card's terminal snapshot;
@@ -289,7 +301,8 @@ Answer: Program with dependencies (Recommended).
 - An owner breakpoint parks a build by definition, and exists only where the owner places one.
 
 **A build ends landed, withdrawn or superseded** (P20 amended).
-- The owner pauses, resumes, withdraws or supersedes a build through the guarded command.
+- The owner pauses, resumes, withdraws or supersedes a build through the owner's controls, which
+  Runtime executes (flow-steps `[lifecycle]`).
 - A withdrawn parent's dependents act as `deps.on-parent-withdrawn` says: `replan` by default, with
   `adopt-parent-work` and `withdraw-too` allowed.
 
@@ -297,27 +310,48 @@ Answer: Program with dependencies (Recommended).
 that depends on it starts.
 
 **Consistency fixes the audit found.** Each follows from settled design, so no fork was put:
-- **The recommendation's reasoning** comes from the step's producing role: the planner, architect, tester
-  or deployer. Its score stays computed. This reads FL-R3's "the agent" through P25 (a F2, b F-X1).
+- **The recommendation's reasoning** comes from the step's producing role: the planner, architect or
+  tester, answering one question after the score (flow-steps `[rules]`). Build and core Deploy have no
+  single producing role, so theirs is signals only. Its score stays computed. This reads FL-R3's "the
+  agent" through P25 (a F2, b F-X1).
 - **The placement disposition** is the orientation scout's return. The driver records it and runs
   `placement.check` (a F1; OR-1's "agent places" is the scout).
 - **Ratification under `request`:** the request meets `plan.authority`'s owner clause, and a plan revision
   proceeds under the request's mandate (a F14; FR-1, FR-12).
 - **The landing review** blocks the build's close, not the push. Its findings enter by the entry-point
-  table's post-close row (b F-D4).
-- **The bar's labels** MIXED, CONTENDED and DEAD PROBE route to asks (b F-T4).
+  table's post-close row, which now covers a landing-review finding and a post-landing core red, each
+  entering as a patch build, beside a verify that fails after the build closed (b F-D4).
+- **The bar's labels** MIXED, CONTENDED and DEAD PROBE route by `verdict.blocks`: to an ask when they do
+  not block, and otherwise to the tester, a re-run, a probe repair or an owner exception (flow-steps
+  `test.route`; b F-T4).
 - **Research records:** a build's own are memory, the trail; the library across builds is knowledge
   (a F9).
-- **Flake records** are a flow record kind that observability reads (b F-T8).
+- **Flake records** are a flow record kind that observability reads: the bar's `nondeterministic`
+  classes made a record, and a flaky leg past the threshold is held (`verdict.held`) (b F-T8).
 - **Dispositions:** one closed set, continue, amend, new, patch, ask or none. Defer maps to ask, and a
   duplicate maps to continue (a F12).
-- **Item tags** live in the `item` namespace, apart from policy keys (a F21; layers round one, R-B).
+- **Item tags** live in the `item` namespace, their full spelling `item.<step>.<name>`, apart from
+  `policy.` keys (a F21; layers round one, R-B).
 
 **The register gains five gaps:**
-- `gap-flow-10`, `gap-flow-13` and `gap-flow-14`, owned by dDeclaredLoop;
+- `gap-flow-13` and `gap-flow-14`, owned by dDeclaredLoop;
+- `gap-flow-10`, owned by dDeclaredLoop then, and by dWellOiledMachine since RT-3;
 - `gap-flow-11` and `gap-flow-12`, owned by dCalibratedLens.
 
 **Units:**
 - dDeclaredLoop, dCalibratedLens, dBoundRoles, dTendedCadence and dShippedRelease gain the units that
-  carry the settlement.
+  carry the settlement, and dWellOiledMachine, since RT-3, the owner's controls.
 - The audit's tables are the input to dDeclaredLoop's item declarations.
+
+## [revised] Revised 2026-10-16: the two Tier-2 rounds, folded
+
+Two Tier-2 rounds reviewed this record together with
+`build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md`. That record's `[revised]` places all 61
+defects, those fixed here among them:
+- `[fit]` points at the items flow-steps declares;
+- `[uncovered]` gives `gap-flow-10` to dWellOiledMachine and corrects its controls, counts four
+  reasoning items, and states `gap-flow-13` and `gap-flow-14`;
+- F-E's controls extend unattended's verbs;
+- `[settled]` names the producing roles that reason, the post-close row's patch builds, the bar's
+  labels routed by `verdict.blocks`, flake records, the items' full spelling, and dWellOiledMachine's
+  share.

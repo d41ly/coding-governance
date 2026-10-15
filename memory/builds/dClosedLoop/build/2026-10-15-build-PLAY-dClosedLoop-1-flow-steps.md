@@ -11,40 +11,75 @@ This record defines each core step of the flow layer, and the breakpoint, item b
 - the item audit (`build/2026-10-15-build-PLAY-dClosedLoop-1-research-flow-items-{a,b}.md`);
 - the instruction and flow rounds (`build/2026-10-15-build-PLAY-dClosedLoop-1-layer-{instruction,flow}.md`).
 
-The audit's fixes are applied. Each item is the draft that dDeclaredLoop's loop definition declares.
-Item tags sit in the `item` namespace, and checklist numbers are retired.
+The audit's fixes are applied, and so is the fold of two Tier-2 rounds (`[revised]`). Each item is the
+draft that dDeclaredLoop's loop definition declares. Checklist numbers are retired. Item tags sit in
+the `item` namespace: the tables write them short, and their full spelling, such as `item.build.scope`,
+never collides with a policy key such as `policy.build.scope` (instruction layer R-B).
 
 ## [rules] What every step shares
 
-- **One actor per item.** Every item the audit found with several actors is split.
-- **No witness is typed by the acting agent.** A witness is computed from history, written by a hook,
-  or a verifier's verdict. An agent's typed return is evidence that the witness joins.
-- **Every item's outcome set is closed, and every outcome routes.** A refusal routes by default: it is
-  recorded, and `next` names the first unwitnessed item. Routes are declared explicitly only where a
-  policy value refuses.
+- **One actor per item, of one kind:** a role, a command the supervisor runs, the executor, a hook the
+  supervisor awaits, or the owner. Every item the audit found with several actors is split, and an item
+  whose actor a policy value chooses is one item per value.
+- **No witness is typed by the acting agent.** A witness is computed from history, written by a hook
+  or a command, or a verifier's verdict. An agent's typed return is evidence that the witness joins.
+- **Every item declares what it needs.** The `Needs` column names the items whose witnesses it waits
+  for. Independent items run in parallel within the fan-out bound (P24).
+- **Every item's outcome set is closed, and every outcome routes.**
+  - A refusal routes by default: it is recorded, and `next` returns the frontier, the unwitnessed items
+    whose needs are witnessed.
+  - Routes are declared explicitly where a policy value decides them.
+- **Every route back is bounded.** A route back, a review round included, counts in the build's
+  transition record. Past `flow.route-backs` returns to the same item, the loop becomes an owner item,
+  resolved as `run.on-owner-question` says.
+- **Every ask an item files states its acceptance** in one of the memory layer's mechanical forms (LR-5):
+  - a red: the leg green on the default branch;
+  - an unverified finding: a review round that confirms or refutes it;
+  - a stray: the stray claimed;
+  - a repair: the producer's record corrected.
 - **Every work order loads its load set (P27):**
-  - the charter's level-0 units;
+  - the units scoped to every reader;
   - the role's units;
   - the item's scope tags;
   - the step's practice reach;
   - the policy values the item reads.
 - **At every item boundary,** the executor reads the build's mailbox (`mailbox.reads`) and updates the
   card's pointers (`card.pointers`).
-- **Every step ends in an exit item.** Its witness is the witnesses of all the step's items. A
-  breakpoint declared there blocks it until disposed.
-- **A recommendation is scored by a command.** Its reasoning is a field in the return of the step's
-  producing role. Where the step has no such role, it is signals-only (P7).
-- **Items run in dependency order.** Independent items run in parallel within the fan-out bound (P24).
+- **Every step ends in an exit item.** Its witness is the witnesses of every item the run reached. An
+  item a route skipped is not owed, and the transition record lists the path the run took. A breakpoint
+  declared there blocks it until disposed.
+- **A recommendation is scored by a command.** Under `review.recommendation.source:
+  scored-signals-and-reasoning`, the step's producing role then answers one question, with the score
+  handed: should this be reviewed, and why. That is the step's `reason` item. Where the step has no
+  single producing role, or under `signals-only`, the recommendation is signals only (P7).
+- **A range check reads the build's own work only.** Commits are read `--first-parent` and without
+  merges, so a merge of the default branch into the build never reads as the build's additions (the
+  gotcha `a-merge-of-the-default-branch-read-as-additions`).
+- **Every command item declares whether it is idempotent or reconciles**, as Runtime requires of every
+  command adapter.
 
 ## [entry] Entry: placing a request
 
 The flow's router, before any step.
 
-| Item | Actor | Does | Proven by | Then |
-|---|---|---|---|---|
-| `entry.intake` | command: the prompt-submit hook | records the owner's prompt verbatim | the hook-written intake entry | `entry.orient` |
-| `entry.orient` | orientation scout | composes the session's card: refreshed, or the full kickoff's where no READY card exists | the card written to its stores, its keys recomputing | `entry.place` |
-| `entry.place` | orientation scout | returns the disposition from the closed set (continue, amend, new, patch, ask, none), with its reason and evidence | `placement.check` over the return's facts | new → Plan; amend → Design re-entry, or an `intake` message to the session holding the build; patch → Design as a patch build; continue → that build's `next`; ask → filed; none → the answer relayed; a failed check → back to `entry.place` with the refusal |
+| Item | Actor | Needs | Does | Proven by | Then |
+|---|---|---|---|---|---|
+| `entry.intake` | hook: prompt-submit, in an attended-bound session only | — | records the owner's prompt, its secrets redacted and its size capped | the hook-written intake entry, carrying the session binding it came from | `entry.orient`; no intake, because the hook crashed or never fired → `entry.orient` records it absent, and no request mandate exists |
+| `entry.orient` | orientation scout | `entry.intake` | composes the session's card: refreshed, or the full kickoff's where no READY card exists | the card written to its stores, its keys recomputing | `entry.place`, `entry.place-check` or `entry.place-owner`, as `placement` says |
+| `entry.place` | orientation scout, under `placement: agent-places` | `entry.orient` | returns the disposition from the closed set (continue, amend, new, patch, ask, none), with its reason and evidence | `placement.check` over the return's facts | new → Plan; amend → Design re-entry, or an `intake` message to the session holding the build; patch → Design as a patch build; continue → that build's `next`; ask → filed; none → the answer relayed; a failed check → back to `entry.place` with the refusal |
+| `entry.place-check` | command, under `placement: declared-checked` | `entry.orient` | checks the placement the request declares | `placement.check` over the declared placement | as `entry.place`'s outcomes; a failed check → the request returned with the refusal |
+| `entry.place-owner` | owner, under `placement: owner-places` | `entry.orient` | places the request | the owner's disposition record | as `entry.place`'s outcomes |
+
+- **Whose prompt is intake.** Only a session whose binding record says "attended" writes intake. An
+  act session is bound to its act, and a `claude -p` an attended model runs from its shell is unbound,
+  so neither writes intake (Runtime's session binding).
+- **What intake keeps.** The prompt passes the secret scanner runlog ships (`scan_secrets` and its
+  closed class list), which moves into the core with runlog's journal grammar. A match is redacted in
+  the record and reported to the owner. A prompt over the record's size cap keeps its first bytes, its
+  length and its hash.
+- **The hook is Runtime's.** Its event joins Runtime's enforcement surface, with a witness its reader
+  checks (`gap-rt-14`).
+- **Policies:** `placement` and `placement.check`.
 
 Other sources enter Plan's triage directly:
 - asks, which are core;
@@ -53,7 +88,8 @@ Other sources enter Plan's triage directly:
 
 ## [plan] Plan: is this worth building, and what exactly?
 
-**Enters** on a `new` disposition, or with an ask, filing or proposal that triage selects.
+**Enters** on a `new` disposition, or on a pass of the triage over the open asks, filings and proposals,
+which selects one into a build.
 
 **Exits** when the plan record is complete and checked, placed and leased:
 - under `plan.ratification: request`, the request is the ratification;
@@ -62,32 +98,34 @@ Other sources enter Plan's triage directly:
 **Takes in** the intake record (the owner's words) or the selected ask. **Hands Design** the ratified
 plan record.
 
-| Item | Actor | Does | Proven by | Then |
-|---|---|---|---|---|
-| `plan.input` | command | pins the intake record, or the selected ask, filing or proposal | its SHA | `plan.dedupe` |
-| `plan.dedupe` | command | checks for duplicates and overlaps against live builds, the design index and open asks | the dupes record, keyed by the derived index | none → `plan.triage-rule`; a duplicate or an overlap → `entry.place`, with the finding |
-| `plan.triage-rule` | command | applies the declared rules: severity, acceptance, readiness | the triage record naming its rule | ruled → `plan.record`; no rule decides → `plan.triage-judge` |
-| `plan.triage-judge` | planner | triages what no rule decides | the schema check over its return | `plan.record` |
-| `plan.record` | planner | drafts the plan record: problem, goal, cut-line in and out, acceptance as observations, priority, parents with the interfaces it expects, and each active practice's Plan reach | the plan-record schema check | drafted → `plan.place`; a research request → `plan.research`; an owner question → best effort, recorded (FR-4) |
-| `plan.research` | researcher | answers the planner's question | the research record's schema check | `plan.record` |
-| `plan.place` | command | regenerates the plan view, the build placed by priority and parents | the placement predicate | placed → `plan.lease`; unplaced → as `plan.unplaced` says |
-| `plan.lease` | command | takes the build lease by compare-and-swap | the lease ref's history | held → `plan.recommend`; an overlap → noted on the card and in the other build's mailbox; refused → as `leases` says |
-| `plan.recommend` | command | scores the review recommendation, with the planner's reasoning field | the recommendation record | no review → `plan.exit`; a review → the Plan breakpoint |
-| `plan.exit` | command | records the transition; the intake record stands as the ratification | the transition record over every witness above | Design; the card is re-rendered and the executor launched where `run.host` says |
+| Item | Actor | Needs | Does | Proven by | Then |
+|---|---|---|---|---|---|
+| `plan.input` | command | — | pins the intake record, or the selected ask, filing or proposal | its SHA | `plan.dedupe` |
+| `plan.dedupe` | command | `plan.input` | checks for duplicates and overlaps against live builds, the design index and open asks | the dupes record, keyed by the derived index | none → `plan.triage-rule`; a duplicate or an overlap → `entry.place`, with the finding |
+| `plan.triage-rule` | command | `plan.dedupe` | applies the declared rules: severity, acceptance, readiness | the triage record naming its rule | select → `plan.record`; defer → filed as an ask, with its acceptance; retire → the ask retired, with the rule; refuse → out of scope, and the requester told; no rule decides → `plan.triage-judge` |
+| `plan.triage-judge` | planner | `plan.triage-rule` | triages what no rule decides, choosing select, defer, retire or refuse | the schema check over its return, its choice joined to the triage record | as `plan.triage-rule`'s outcomes |
+| `plan.record` | planner | a select | drafts the plan record: problem, goal, cut-line in and out, acceptance as observations, priority, parents with the interfaces it expects, and each active practice's Plan reach | the plan-record schema check | drafted → `plan.place`; a research request → `plan.research`; an owner question → an owner item, resolved as `run.on-owner-question` says |
+| `plan.research` | researcher | the request of `plan.record` | answers the planner's question | the research record's schema check | `plan.record` |
+| `plan.place` | command | `plan.record` | regenerates the plan view, the build placed by priority and parents | the placement predicate | placed → `plan.lease`; unplaced → as `plan.unplaced` says |
+| `plan.lease` | command | `plan.place` | takes the build lease by compare-and-swap | the lease record the lease engine writes at each take | held → `plan.recommend`; an overlap → noted on the card and in the other build's mailbox; refused → as `leases` says |
+| `plan.recommend` | command | `plan.lease` | scores the review recommendation | the recommendation record | `plan.reason`, or under `signals-only`: no review → `plan.exit`, a review → the Plan breakpoint |
+| `plan.reason` | planner | `plan.recommend` | answers the step's one question, the score handed | the schema check, its answer joined to the recommendation record | no review → `plan.exit`; a review → the Plan breakpoint |
+| `plan.exit` | command | every item the run reached | records the transition; under `plan.ratification: request`, the intake record stands as the ratification | the transition record over the reached items' witnesses | Design; the card is re-rendered and the executor launched where `run.host` says |
 
 - **Roles:** planner and researcher; reviewers at a breakpoint.
 - **Instruction:**
   - the practices' Plan reach (for `[yagni]`: is the need real now?);
   - the planning view;
   - the intake and plan-record schemas;
-  - the policies: `plan.triage`, `plan.authority`, `plan.ratification`, `autonomy`, `plan.unplaced`, `leases.*`, `review.plan`, `review.recommendation` and `deps.coordination`.
+  - the policies: `plan.triage`, `plan.authority`, `plan.ratification`, `autonomy`, `plan.unplaced`, `leases.*`, `run.host`, `run.on-owner-question`, `review.plan`, `review.recommendation`, `review.recommendation.source` and `deps.coordination`.
 - **Memory:**
   - reads the intake log, the plan view, the design index and the asks;
-  - writes the dupes, triage, plan and research records, the lease ref, the recommendation and the
+  - writes the dupes, triage, plan and research records, the lease record, the recommendation and the
     transition.
 - **Runtime:** the prompt-submit hook, the lease engine, the executor's launch.
-- **Breakpoints:** none by default. An owner breakpoint at `plan.exit` shows the plan before Design
-  starts.
+- **Breakpoints:** none by default. The ratification is an owner breakpoint at `plan.exit` under any
+  `plan.ratification` other than `request`, and under `three-gates` and `every-stage`. An owner may add
+  one there to see the plan before Design starts.
 - **Extension points:**
   - intake sources (observability, integrations);
   - the planner's knowledge slot: decisions, and the research library shared across builds;
@@ -96,44 +134,51 @@ plan record.
 
 ## [design] Design: how will it be built, and in what pieces?
 
-**Enters** on any of four inputs:
+**Enters** on any of six inputs:
 - the ratified plan record;
 - an admitted in-goal amendment;
 - a ratified plan revision;
-- a patch build's derived plan record.
+- a patch build's derived plan record;
+- a review finding disposed into a new unit;
+- a fix unit, for a red whose spec is wrong or a core red the build's own commits introduced.
 
 **Exits** when every unit in scope is READY, the roster is recorded and the confirmed interfaces are
 posted to dependents. The build moves through Design whole (FL-D1).
 
-| Item | Actor | Does | Proven by | Then |
-|---|---|---|---|---|
-| `design.input` | command | pins the input and its kind | its SHA and kind | plan record → `design.seams`; amendment → `design.reentry`; plan revision → `design.inventory`; patch → `design.unit-spec`, as a micro-spec |
-| `design.reentry` | command | classifies an amendment by a structural diff of the declared interfaces (FL-B4) | the diff record | additive and untriggered → `design.unit-spec` for the new units; breaking, or a `design.reentry` trigger → `design.decompose` for that feature |
-| `design.inventory` | architect | after a plan revision, gives each completed unit a verdict (kept, amended by a new unit, or retired) with its reason | the inventory joined to every built unit | `design.decompose` |
-| `design.seams` | reuse scout | finds the seams by a tree search over the plan's scope paths and the open asks, adding knowledge's sources where installed | the seams' probe digests, re-derived by the executor | `design.decompose` |
-| `design.decompose` | architect | decomposes into features and units: feature designs declaring interfaces structurally (producer, consumers, contract), units with their order and write sets, and feature forks recorded | the roster and interface schema check | decomposed → `design.overlaps`; a fact fork → `design.research`; a fork the goal cannot survive → a plan revision under the mandate (FR-12) |
-| `design.research` | researcher | answers a fact fork | the research record's schema check | back to the item that asked |
-| `design.overlaps` | command | runs the design index over the roster's write sets, against live builds | the overlap record | `design.unit-spec` |
-| `design.unit-spec` | spec writer, one per unit, in parallel within the bound | writes the unit's structured spec: definitions, design, boundaries, interfaces, acceptance as observations with their commands, and each active practice's Design reach; resolves unit forks by `design.forks`; acknowledges the unit's overlaps in its boundaries | the format check on the spec at its SHA; every raised fork joined to its resolution | authored → `design.recommend`; a feature-level fork → `design.decompose` |
-| `design.recommend` | command | scores the recommendation, with the architect's reasoning field | the recommendation record | no review → `design.ready`; a review → the Design breakpoint, the spec audit |
-| `design.ready` | command | derives READY per unit | derived READY: none MISSING, THIN or FORKED | all READY → `design.exit`; any not → back to that unit's spec writer |
-| `design.exit` | command | records the transition, and posts the confirmed interfaces to dependents | the transition record | Build |
+| Item | Actor | Needs | Does | Proven by | Then |
+|---|---|---|---|---|---|
+| `design.input` | command | — | pins the input and its kind | its SHA and kind | plan record → `design.seams`; amendment → `design.reentry`; plan revision → `design.inventory`; patch → `design.unit-spec`, as a micro-spec; finding or fix unit → `design.unit-spec` for its new unit, or `design.decompose` when it changes an interface |
+| `design.reentry` | command | `design.input` | classifies an amendment by a structural diff of the declared interfaces (FL-B4) | the diff record | additive and untriggered → `design.unit-spec` for the new units; breaking, or a `design.reentry` trigger → `design.decompose` for that feature |
+| `design.inventory` | architect | `design.input` | after a plan revision, gives each completed unit a verdict (kept, amended by a new unit, or retired) with its reason | the inventory joined to every built unit | `design.decompose` |
+| `design.seams` | reuse scout | `design.input` | finds the seams by a tree search over the plan's scope paths and the open asks, adding knowledge's sources where installed | the seams' probe digests, re-derived by the executor | `design.decompose` |
+| `design.decompose` | architect | `design.seams`, `design.inventory` or `design.reentry` | decomposes into features and units: feature designs declaring interfaces structurally (producer, consumers, contract), units with their order and write sets, and feature forks recorded | the roster and interface schema check | decomposed → `design.overlaps`; a fact fork → `design.research`; a fork the goal cannot survive → a plan revision under the mandate (FR-12) |
+| `design.research` | researcher | the asking item | answers a fact fork | the research record's schema check | back to the item that asked |
+| `design.overlaps` | command | `design.decompose` | runs the design index over the roster's write sets, against live builds | the overlap record | `design.unit-spec` |
+| `design.unit-spec` | spec writer, one per unit, in parallel within the bound | `design.overlaps`, or the input's unit | writes the unit's structured spec: definitions, design, boundaries, interfaces, acceptance as observations with their commands, and each active practice's Design reach; resolves unit forks by `design.forks`; acknowledges the unit's overlaps in its boundaries | the format check on the spec at its SHA; every raised fork joined to its resolution | authored → `design.recommend`; a feature-level fork → `design.decompose` |
+| `design.recommend` | command | every unit's `design.unit-spec` | scores the recommendation | the recommendation record | `design.reason`, or under `signals-only`: no review → `design.ready`, a review → the spec audit |
+| `design.reason` | architect | `design.recommend` | answers the step's one question, the score handed | the schema check, its answer joined to the recommendation record | no review → `design.ready`; a review → the spec audit |
+| `design.ready` | command | `design.recommend`, and the spec audit where it ran | derives READY per unit | derived READY: none MISSING, THIN or FORKED | all READY → `design.exit`; any not → back to that unit's spec writer |
+| `design.exit` | command | `design.ready` | records the transition, and posts the confirmed interfaces to dependents | the transition record | Build |
 
 - **Roles:** reuse scout, architect, spec writer and researcher; reviewers at a breakpoint.
 - **Instruction:**
   - the practices' Design reach;
   - the decomposition and spec-writing views;
   - the feature-design schema, the structured spec and the micro-spec;
-  - the policies: `design.forks`, `design.reentry`, `design.overlap`, `design.handoff`, `deps.early-build`, `deps.messaging` and `review.design`.
+  - the policies: `design.forks`, `design.reentry`, `design.overlap`, `design.handoff`, `deps.early-build`, `deps.messaging`, `review.design`, `review.design.rounds`, `review.design.round-count` and `review.recommendation.source`.
 - **Memory:**
   - reads the plan record, the design index and the parents' confirmed interfaces;
   - writes the roster, the feature designs, the specs, the fork, overlap and research records, the
     transition and the confirmed messages.
 - **Runtime:** the fan-out bound, the design index.
-- **Breakpoints:** the spec audit at `design.exit`, opt-in by default and owed under `strict`.
-  - It runs one round by default.
-  - `review.design.rounds` allows four other rules: rounds until no BLOCKER, until no HIGH, until
-    clean, or a fixed count (`review.design.round-count`).
+- **Breakpoints:**
+  - The spec audit sits after `design.recommend` and `design.reason`, before `design.ready`. It is
+    opt-in by default, owed under `strict`, and owed above the tier under `guarded`.
+    - It runs one round by default.
+    - `review.design.rounds` allows four other rules: rounds until no BLOCKER, until no HIGH, until
+      clean, or a fixed count (`review.design.round-count`). Each round folds into the unbuilt specs
+      before the next (`[breakpoint]`'s `review.fold`), and rounds count against `flow.route-backs`.
+  - The owner's design go sits at `design.exit` under `three-gates` and `every-stage`.
 - **Extension points:**
   - the map, recall and bug classes for `design.seams`, the lexicon for naming, and the research
     library (knowledge);
@@ -149,22 +194,23 @@ posted to dependents. The build moves through Design whole (FL-D1).
 - the closing review is folded, its findings built as new units;
 - no core red stands that the build's own commits introduced.
 
-| Item | Actor | Does | Proven by | Then |
-|---|---|---|---|---|
-| `build.base` | command | pins the base from history, and the mandate | the base SHA and the intake record | `build.unit-lease` |
-| `build.unit-lease` | command | takes each starting unit's lease with its write set | the lease ref's history | held → `build.unit-pass`; an overlap → warned (`leases.overlap`); refused → as `leases` says |
-| `build.unit-pass` | builder, one per unit, in declared order; disjoint write sets in parallel; commits queued by the executor | builds and commits one pass, with the unit id and its trailers | the commit, resolved by the executor | committed → `build.acceptance`; spec wrong → the spec writer (unit re-entry); interface change → the architect (feature re-entry if breaking); fork → as `design.forks` says |
-| `build.acceptance` | command: the executor | re-runs the spec's acceptance commands on the commit | the executor-written acceptance record | pass → the next pass, or the unit built; fail → a fix pass |
-| `build.scope` | command | checks each commit's paths against its unit's write set, from history | the scope report | in scope → onward; stray → warned with an ask, or refused, as `build.scope` says |
-| `build.recommend` | command | scores the recommendation, where the closing review is not owed | the recommendation record | `build.core`, or the closing review |
-| `build.core` | command: the executor | runs the core checks over the build's range | the executor-written result | clean → `build.exit`; an own red → refused until a new unit fixes it or it is excepted (`core.exceptions`) |
-| `build.exit` | command | records the transition | the transition record | Test |
+| Item | Actor | Needs | Does | Proven by | Then |
+|---|---|---|---|---|---|
+| `build.base` | command | — | pins the base from history, and the mandate | the base SHA and the intake record | `build.unit-lease` |
+| `build.unit-lease` | command | `build.base` | takes each starting unit's lease with its write set, declared as the driver's `--dispatch --pass <id> --writes <path>` declares one | the lease record | held → `build.unit-pass`; an overlap → warned (`leases.overlap`); refused → as `leases` says |
+| `build.unit-pass` | builder, one per unit, in declared order; disjoint write sets in parallel | `build.unit-lease` | builds and commits one pass, with the unit id and its trailers; the executor queues its commits | the commit, resolved by the executor | committed → `build.acceptance`; spec wrong → the spec writer (unit re-entry); interface change → the architect (feature re-entry if breaking); fork → as `design.forks` says |
+| `build.acceptance` | executor | `build.unit-pass` | re-runs the spec's acceptance commands on the commit | the executor-written acceptance record | pass → `build.scope`; fail → a fix pass |
+| `build.scope` | command | `build.acceptance` | checks the commit's paths against its unit's write set, from history, as the driver's `--check-commit` and check 23 already grade a pass | the scope report | in scope → the unit's next pass, or, its last pass done, the unit built; stray → as `build.scope` says: warned with an ask, reported, or refused. A refused stray routes to a revert pass on the unit, and a stray the range later reverts passes |
+| `build.recommend` | command | every unit built | scores the recommendation, signals only: Build runs a builder per unit, so it has no single producing role | the recommendation record | the closing review where owed; otherwise `build.core` |
+| `build.core` | executor | `build.recommend`, and the closing review where it ran | runs the core checks over the build's range | the executor-written result | clean → `build.exit`; an own red → a fix unit through Design, or excepted (`core.exceptions`) |
+| `build.exit` | command | `build.core` | records the transition | the transition record | Test |
 
-**The closing review** is the breakpoint at `build.core`, owed by default:
+**The closing review** is the breakpoint between `build.recommend` and `build.core`, owed by default:
 - it reviews through the diff lens;
 - its findings become new units by `review.findings`, so built specs stay frozen (P19), and those
   units pass through Design and back;
-- a follow-up round runs after a HIGH finding (`review.follow-up`).
+- a follow-up round runs after a HIGH finding (`review.follow-up`);
+- `build.core` then runs over the range, the findings' units included.
 
 - **Roles:** builder; the spec writer and the architect on a divergence; reviewers at the closing
   review.
@@ -172,7 +218,7 @@ posted to dependents. The build moves through Design whole (FL-D1).
   - the practices' Build reach;
   - the unit-building and divergence views;
   - the trailer and builder-return schemas;
-  - the policies: `build.worktree`, `build.scope`, `design.forks`, `design.reentry`, `review.build`, `review.findings`, `review.follow-up`, `core.bypass`, `core.exceptions`, `hooks.bypass` and `resume.partial`.
+  - the policies: `build.worktree`, `build.scope`, `leases.*`, `design.forks`, `design.reentry`, `review.build`, `review.findings`, `review.follow-up`, `core.bypass`, `core.exceptions`, `hooks.bypass` and `resume.partial`.
 - **Memory:**
   - reads the specs at their SHAs and the write sets;
   - writes the commits, the acceptance records, the scope reports, the review report, the core result
@@ -182,6 +228,7 @@ posted to dependents. The build moves through Design whole (FL-D1).
   - the commit queue in the shared worktree;
   - the executor's acceptance re-runs and core checks;
   - the write gate.
+- **Breakpoints:** the closing review; the owner's gate at `build.exit` under `every-stage`.
 - **Extension points:**
   - the bug-class checklist after each pass, recorded as not applicable without knowledge;
   - the lexicon (knowledge);
@@ -193,33 +240,38 @@ posted to dependents. The build moves through Design whole (FL-D1).
 
 **Exits** when:
 - the verdict for the tree to be landed is recorded;
-- no red blocks;
-- the verified tree is on the build's lease.
+- no red blocks: each blocking red is fixed or excepted;
+- the verified tree is on the build's lease record.
 
-| Item | Actor | Does | Proven by | Then |
-|---|---|---|---|---|
-| `test.merge` | command | merges the build onto the default branch's current tip, in Test's worktree | the merge SHA and its tree hash | merged → `test.select`; a conflict → Build for a resolution pass, or the architect when an interface clashes |
-| `test.select` | command | selects the legs the paths claim, the declared product-test levels (`tests.landing-levels`) and the held legs (`verdict.held`); without observability's Maintain, the levels left to its cadence too, as `tests.without-cadence` says | the selection record | `test.verdict` |
-| `test.verdict` | command: the bar, through the hook, on the declared backend | runs the bar; the hook writes the verdict for the tree | the hook-written verdict per tree hash | green → `test.flakes` and `test.seen-red`; red → `test.attribute`; stale → `test.merge` |
-| `test.attribute` | tester | classifies each red and names its route | a computed join: every red leg in the verdict has one disposition, and the artifact each disposition names exists | code misses its spec → a fix pass in Build; spec wrong → a new unit through Design; inherited, mixed, contended or a dead probe → an ask |
-| `test.flakes` | command | records flakes, and quarantines them past the threshold | the flake record, a flow record kind | a quarantine → an ask |
-| `test.seen-red` | command | checks that every gate the build added or changed has a seen-red record | the seen-red records | one missing → a fix pass on the unit that added the gate |
-| `test.recommend` | command | scores the recommendation, with the tester's reasoning field | the recommendation record | the gate review where declared, otherwise `test.exit` |
-| `test.exit` | command | records the transition, and the verified tree on the build's lease | the transition record and the lease ref's history | Deploy |
+| Item | Actor | Needs | Does | Proven by | Then |
+|---|---|---|---|---|---|
+| `test.merge` | command: the lander's `--prepare` | — | under `verdict.tree: prepared-merge`, prepares the landing merge in Test's worktree: the build merged onto the default branch's tip, kit versions minted and outputs regenerated into it. Under `build-tip`, it pins the build's tip | the prepared merge's SHA and tree hash, or the tip's | prepared → `test.select`; a conflict → Build for a resolution pass, or the architect when an interface clashes; refused → an ask naming the lander's refusal |
+| `test.select` | command | `test.merge` | selects the legs the paths claim, the declared product-test levels (`tests.landing-levels`) and the held legs (`verdict.held`); without observability's Maintain, the levels left to its cadence too, as `tests.without-cadence` says | the selection record | `test.verdict` |
+| `test.verdict` | command: the bar's runner, on the declared backend | `test.select` | runs the bar with attribution (`GATE_ATTRIBUTE`); the runner writes the verdict record for the tree, which the pre-push hook reads | the runner-written verdict per tree hash, each red classed OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE | green → `test.flakes` and `test.seen-red`; red → `test.route`; stale → `test.merge` |
+| `test.route` | command | `test.verdict` | routes each red by its computed class, as `verdict.blocks` says | every red joined to one route | an OWN or MIXED red → `test.attribute`; a blocking CONTENDED red → a re-run on a quiet host; a blocking DEAD PROBE → the probe repaired, or an owner exception (`core.exceptions`); a blocking INHERITED red → a fix unit through Design, or an owner exception; a red that does not block → an ask |
+| `test.attribute` | tester | the OWN and MIXED reds of `test.route` | judges each such red: the code misses its spec, or the spec is wrong | a computed join: every such red has one judgment, and the artifact its route names exists | as `verdict.red-route` says: under `fix-pass-or-design`, a code miss → a fix pass in Build and a wrong spec → a new unit through Design; under `always-new-unit`, both → a new unit through Design |
+| `test.flakes` | command | `test.verdict` | records the bar's `nondeterministic · <leg>` classes as the flake record; a leg past the threshold becomes a held leg (`verdict.held`), with an ask | the flake record, a flow record kind | `test.recommend` |
+| `test.seen-red` | command | `test.verdict` | checks that every gate the build added or changed has a seen-red record | the seen-red records | all present → `test.recommend`; one missing → a fix pass on the unit that added the gate |
+| `test.recommend` | command | `test.flakes`, `test.seen-red` | scores the recommendation | the recommendation record | `test.reason`, or under `signals-only`: the gate review where declared, otherwise `test.exit` |
+| `test.reason` | tester | `test.recommend` | answers the step's one question, the score handed | the schema check, its answer joined to the recommendation record | the gate review where declared, otherwise `test.exit` |
+| `test.exit` | command | `test.recommend`, and the gate review where it ran | records the transition, and the verified tree on the build's lease record | the transition record and the lease record | Deploy |
 
+- **The bar's quarantine is another thing.** Its `quarantine.<name key>` keeps a leg out of the reuse
+  cache until its manifest row changes. A held leg is the flow's carrier for a flaky one.
 - **Roles:** tester; builders and the architect through its routes; reviewers with the gate lens at a
   breakpoint.
 - **Instruction:**
   - the practices' Test reach;
   - the bar and attribution views;
-  - the tester-return schema, its disposition set closed;
-  - the policies: `verdict`, `verdict.tree`, `verdict.blocks`, `verdict.held`, `verdict.red-route`, `verdict.flakes`, `tests.landing-levels`, `tests.product`, `hooks.bypass` and `review.test`.
-- **Memory:** writes the merge, selection and attribution records, the hook-written verdict, the flake
-  and seen-red records, the transition and the verified tree.
-- **Runtime:** Test's worktree, the hook, the verdict backend, leases.
-- **Breakpoints:** the gate review, opt-in by default and above-tier under `strict`.
+  - the tester-return schema, its judgment set closed;
+  - the policies: `verdict`, `verdict.tree`, `verdict.blocks`, `verdict.held`, `verdict.red-route`, `verdict.flakes`, `tests.landing-levels`, `tests.without-cadence`, `tests.product`, `hooks.bypass`, `review.test` and `review.recommendation.source`.
+- **Memory:** writes the merge, selection, routing and attribution records, the runner-written verdict,
+  the flake and seen-red records, the transition and the verified tree.
+- **Runtime:** Test's worktree, the verdict backend, leases.
+- **Breakpoints:** the gate review, opt-in by default and above-tier under `strict`; the owner's gate at
+  `test.exit` under `every-stage`.
 - **Extension points:**
-  - verdict backends beyond the local hook: remote CI (integrations);
+  - verdict backends beyond the local runner: remote CI (integrations);
   - leg packs: gate-lint and the pytest guardrails;
   - product-test runner adapters;
   - the gate-health and flake signals that observability reads.
@@ -232,32 +284,39 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 
 **Exits** when:
 - the build is landed and recorded;
-- its leases are released;
 - its dependents are notified;
-- the card's terminal snapshot is committed.
+- the card's terminal snapshot is committed;
+- its leases are released and its mailbox pruned.
 
-| Item | Actor | Does | Proven by | Then |
-|---|---|---|---|---|
-| `deploy.current` | command | checks that the verdict's tree equals the prepared merge on the current tip | the comparison record | current → `deploy.mandate`; stale → Test |
-| `deploy.mandate` | command | checks the landing's authority: the request's mandate under `plan-only`, otherwise an owner breakpoint | the intake record, or the owner's disposition | `deploy.parents` |
-| `deploy.parents` | command | holds until every parent has landed (`deps.landing`) | the parents' landing records | landed → `deploy.land`; a parent withdrawn → as `deps.on-parent-withdrawn` says |
-| `deploy.land` | command: the lander, through the turnstile | merges `--no-ff` and pushes, reusing the pre-push verdict for the same tree | the pushed merge and the reused verdict | landed → `deploy.core`; the tip moved → Test |
-| `deploy.core` | command | runs the core checks on the landed tree (K1) | the core-check result | clean → `deploy.record`; a red → the build cannot close until a new unit fixes it or it is excepted |
-| `deploy.record` | command | writes the landing record: SHA, the builds and units carried, the verdict | the landing record | `deploy.recommend` |
-| `deploy.recommend` | command | scores the recommendation, signals only, since core Deploy has no producing role | the recommendation record | the landing review where declared, otherwise `deploy.close` |
-| `deploy.close` | command | releases the leases, posts `landed` to dependents, commits the card's terminal snapshot, and records the transition | the transition record, the deleted lease refs, the mailbox posts and the snapshot commit | the build is closed |
+| Item | Actor | Needs | Does | Proven by | Then |
+|---|---|---|---|---|---|
+| `deploy.current` | command | — | checks that the verdict's tree equals the prepared merge on the current tip, or under `verdict.tree: build-tip`, the build's tip | the comparison record | current → `deploy.mandate`; stale → Test |
+| `deploy.mandate` | command | `deploy.current` | checks the landing's authority: the request's mandate under `plan-only`; under `three-gates` and `every-stage`, the owner's landing gate before it | the intake record, or the gate's witness | `deploy.parents` |
+| `deploy.parents` | command | `deploy.mandate` | reads each parent's state, as `deps.landing` says | the parents' records | every parent landed → `deploy.land`; under `test-decides`, the build's own verdict green without the parents' unlanded work → `deploy.land`; a parent unlanded or paused → holds; a parent withdrawn → as `deps.on-parent-withdrawn` says; a parent superseded → the link moves to its replacement, and the hold reads that |
+| `deploy.land` | command: the lander's `--land` | `deploy.parents` | pushes the prepared merge and nothing else, reusing its verdict for the same tree; it refuses a second merge stacked on the prepared one | the pushed merge, the reused verdict and the lander's landing marker | exit 0, landed → `deploy.core`; the tip moved → Test; exit 1, refused (a mint or regen failure, a reconcile conflict, another build's carried commit) → Test to prepare again, or an ask for a carried commit; exit 2, an argument → an ask on the adapter; exit 3, a network or observation failure → the supervisor's retry, then an owner item; exit 4, pushed but LANDED UNGATED → `deploy.core`, the landing recorded ungated until its post-merge bar is green |
+| `deploy.core` | command: the lander's post-merge bar (`GATE_POST_MERGE`) | `deploy.land` | runs the core checks on the landed tree (K1) | the post-merge bar's result | clean → `deploy.record`; a red → a patch build through the entry-point table's post-close row, and the close waits for its filing |
+| `deploy.record` | command | `deploy.core` | writes the landing record from the lander's marker: SHA, the builds and units carried, the verdict | the landing record | `deploy.recommend` |
+| `deploy.recommend` | command | `deploy.record` | scores the recommendation, signals only, since core Deploy has no producing role | the recommendation record | the landing review where declared, otherwise `deploy.notify` |
+| `deploy.notify` | command, idempotent | `deploy.recommend`, and the landing review where it ran | posts `landed` to dependents, keyed by the landing SHA, so a repeated post is a no-op | the mailbox posts | `deploy.snapshot` |
+| `deploy.snapshot` | command, idempotent | `deploy.notify` | commits the card's terminal snapshot; an equal snapshot is a no-op | the snapshot commit | `deploy.release` |
+| `deploy.release` | command, idempotent | `deploy.snapshot` | deletes the build's lease refs, a missing ref counting as done, and prunes its mailbox ref once the build folder holds every disposed message | the deleted refs and the pruned mailbox | `deploy.close` |
+| `deploy.close` | command | `deploy.release` | records the transition | the transition record | the build is closed |
 
+- **The landing order.** Landings on a node are ordered by `landing.order` over the verified trees on
+  the builds' leases. The turnstile is the host-wide bar semaphore, admitting `slots` concurrent bars,
+  and `push-main.sh` never takes it, so no landing queue exists yet (`gap-flow-08`).
 - **Roles:** none in the core: every item is a command. The deployer works only in the expansions.
 - **Instruction:**
   - the practices' Deploy reach;
   - the landing view;
-  - the policies: `autonomy`, `plan.ratification`, `verdict.tree`, `landing.order`, `deps.landing`, `deps.on-parent-withdrawn`, `hooks.bypass`, `core.bypass`, `core.exceptions`, `build.closes`, `card.snapshot` and `review.deploy`.
+  - the policies: `autonomy`, `plan.ratification`, `verdict.tree`, `landing.order`, `deps.landing`, `deps.on-parent-withdrawn`, `hooks.bypass`, `core.bypass`, `core.exceptions`, `build.closes`, `card.snapshot`, `run.on-owner-question` and `review.deploy`.
 - **Memory:** writes the landing record, the transition, the terminal snapshot and the `landed`
-  messages, and deletes the lease refs.
-- **Runtime:** the lander, the turnstile queue, the hook, the core checks.
+  messages, and deletes the lease refs and the mailbox ref.
+- **Runtime:** the lander, the hook, the post-merge bar.
 - **Breakpoints:**
-  - the landing review, which blocks `deploy.close`, not the push;
-  - the owner's landing gate, under `three-gates` and `strict`.
+  - the landing review, between `deploy.recommend` and `deploy.notify`. It blocks the close, not the
+    push, and its findings enter as patch builds by the entry-point table's post-close row;
+  - the owner's landing gate, before `deploy.parents`, under `three-gates` and `every-stage`.
 - **Extension points:**
   - versions and release notes (distribution);
   - promotion through environments, each verify recorded per SHA, with `deploy.on-verify-fail`
@@ -275,25 +334,92 @@ A breakpoint declares three things:
 - its disposer: a reviewer lens with its skeptic and synthesizer, or the owner;
 - its trigger: owed by policy, a binding recommendation, or the owner's request.
 
-It blocks as `review.blocks` says. An owner breakpoint parks the build until the owner's disposition
-is hook-written. A reviewer breakpoint runs this program:
+It blocks as `review.blocks` says. Once disposed, the flow resumes at the item the breakpoint stands
+before.
 
-| Item | Actor | Does | Proven by | Then |
-|---|---|---|---|---|
-| `review.trigger` | command | records why the breakpoint fired | the policy value, the recommendation record, or the hook-written owner intake | fired → `review.pin`; not fired → the flow continues |
-| `review.pin` | command | pins the artifact: the plan revision, the spec revisions, the commit range or the landing record | the pinned SHAs | `review.lens` |
-| `review.lens` | reviewer, one per lens, within the fan-out bound | reviews through the lens | findings, each tagged with a class from the registered core set | `review.refute` |
-| `review.refute` | skeptic | tries to refute each finding | a verdict per finding: confirmed, refuted or unverified | `review.report` |
-| `review.report` | synthesizer | merges the findings into one report | the report under the build's `reviews/` | `review.dispose` |
-| `review.dispose` | command | disposes each confirmed finding by `review.findings` into new units or asks; counts each class by its tag (`review.left-shift`); turns an earned gate into a patch-build intake; files each unverified finding as `review.unverified` says, an ask by default | each disposition joined to its unit or ask id | disposed → released, with a follow-up round as `review.follow-up` says |
-| `review.cost` | command | records the review's cost in its report | the cost field | done |
+**An owner breakpoint is an owner item.** It parks the build, and resolves as `run.on-owner-question`
+says (LR-3). Its witness is one of two:
+- the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal
+  command or a prompt;
+- under `best-effort-recorded`, the supervisor's recorded choice.
 
+`autonomy` places the owner's gates:
+- `plan-only` places the Plan ratification, unless the request ratifies;
+- `three-gates` adds the design go at `design.exit` and the landing gate before `deploy.parents`;
+- `every-stage` adds a gate at every step's exit.
+
+**A reviewer breakpoint runs this program.** Its lens, refute and report items are one harness act,
+`tools/workflows/tier2-review.js` (finders, skeptic batches, one synthesis), which Runtime runs as one
+multi-agent act. The items are its witnessed stages:
+
+| Item | Actor | Needs | Does | Proven by | Then |
+|---|---|---|---|---|---|
+| `review.trigger` | command | — | records why the breakpoint fired | the policy value, the recommendation record, or the owner's request record | fired → `review.pin`; not fired → the flow continues |
+| `review.pin` | command | `review.trigger` | pins the artifact: the plan revision, the spec revisions, the commit range or the landing record | the pinned SHAs | `review.lens` |
+| `review.lens` | reviewer, one per lens, within the fan-out bound | `review.pin` | reviews through the lens | a computed join: each finding cites lines that exist in the pinned artifact, and carries its lens and, where knowledge is installed, a class from its catalogue | `review.refute` |
+| `review.refute` | skeptic | `review.lens` | tries to refute each finding | a computed join: every finding has one verdict (confirmed, refuted, or unverified, the harness's `uncertain`), and each verdict names its probe and the probe's output | `review.report` |
+| `review.report` | synthesizer | `review.refute` | merges the findings into one report | a computed join: every confirmed finding appears in the report, under the build's `reviews/` | `review.dispose` |
+| `review.dispose` | command | `review.report` | disposes each confirmed finding by the artifact's state. On an unbuilt spec, the findings go to `review.fold`. On built work, they become new units or asks by `review.findings`. It counts each class by its tag (`review.left-shift`), turns an earned gate into a patch-build intake, and files each unverified finding as `review.unverified` says | each disposition joined to its fold, unit or ask | unbuilt → `review.fold`; built → released, with a follow-up round as `review.follow-up` says; an unverified finding under `block` → a verification round |
+| `review.fold` | spec writer | `review.dispose` | folds the confirmed findings into the unbuilt specs, the spec-write workflow's disposal stage | each confirmed finding joined to its fold in the spec at its new SHA | the next round as `review.design.rounds` says, or released |
+| `review.cost` | command | `review.report` | records the review's agents and out-tokens in its report, as the harness logs them | the cost field | done |
+
+- **Classes.** `review.left-shift` counts by class where knowledge's catalogue tags them, and by lens
+  where it is absent, so the core needs no class set of its own.
+- **An unverified finding under `review.unverified: block`.** Its verification round re-runs the
+  skeptic with a fresh probe, and counts against `flow.route-backs`. Past that bound it becomes an
+  owner item, resolved as `run.on-owner-question` says.
 - **Instruction:**
   - the lens views;
   - the reviewer, skeptic and synthesizer schemas;
-  - the policies: `review.<stage>`, `review.breakpoints`, `review.blocks`, `review.findings`, `review.left-shift`, `review.follow-up` and `review.recommendation`.
+  - the policies: `review.<stage>`, `review.breakpoints`, `review.blocks`, `review.findings`, `review.left-shift`, `review.follow-up`, `review.unverified`, `review.design.rounds`, `review.design.round-count`, `review.recommendation`, `flow.route-backs` and `run.on-owner-question`.
 - **Extension points:** lens packs; the bug-class catalogue (knowledge); the value ledger
   (observability).
+
+## [lifecycle] The owner's controls: pause, resume, withdraw, supersede
+
+Runtime executes the owner's controls (dWellOiledMachine, RT-3). They extend unattended's `--hold`,
+`--resume` and `--abort`, and supersede is new. Each control runs as this program:
+
+| Item | Actor | Needs | Does | Proven by | Then |
+|---|---|---|---|---|---|
+| `life.request` | owner | — | asks to pause, resume, withdraw or supersede the build, through the guarded command | the command's record | `life.quiesce`; resume → the build's `next` |
+| `life.quiesce` | executor | `life.request` | dispatches nothing new. Each running act finishes within its ceiling. An open review fan finishes, and a prepared merge is discarded | the executor's record of the acts it let finish | pause → parked; withdraw or supersede → `life.notify`; a push already made → refused: the build has landed and closes as landed |
+| `life.notify` | command, idempotent | `life.quiesce` | posts `withdrawn` or `superseded` to dependents, with the replacement's slug | the mailbox posts | `life.snapshot` |
+| `life.snapshot` | command, idempotent | `life.notify` | commits the card's terminal snapshot | the snapshot commit | `life.release` |
+| `life.release` | command, idempotent | `life.snapshot` | deletes the leases and the mailbox ref, and reclaims the build's workspaces | the deleted refs and the workspace record | `life.close` |
+| `life.close` | command | `life.release` | records the terminal transition: withdrawn, or superseded by its replacement | the transition record | closed |
+
+- **A paused build keeps its leases.** The supervisor renews them while it is paused, so
+  `leases.expiry-hours` never expires a paused build. Resume enters its `next`.
+- **A superseded build's kept work** passes to its replacement through the replacement's
+  `design.inventory`.
+
+## [transitions] The build's transition table
+
+F-D settled one transition table per level. This is the build's, the draft dDeclaredLoop declares;
+the feature and unit tables are owed (`gap-flow-15`). Each state is derived from witnesses (P22), and
+the engine refuses any transition the table lacks.
+
+| From | On | To | Witness |
+|---|---|---|---|
+| none | `entry.place`: new | planning | the intake record |
+| none | `entry.place`: patch | designing | the patch's derived plan record |
+| planning | `plan.exit` | designing | the transition record |
+| designing | `design.exit` | building | the transition record |
+| designing | a fork the goal cannot survive | planning | the plan revision |
+| building | `build.exit` | testing | the transition record |
+| building | a unit or feature re-entry, or a fix unit | designing | the re-entry record |
+| testing | `test.exit` | deploying | the transition record |
+| testing | a fix pass, or a conflict to resolve | building | the routing record |
+| testing | a new unit through Design | designing | the routing record |
+| deploying | a stale verdict, or the tip moved | testing | the comparison record |
+| deploying | `deploy.close` | landed | the transition record |
+| any open state | `life.request`: pause | paused | the command's record |
+| paused | `life.request`: resume | the state it paused in | the command's record |
+| any open state, before the push | `life.close`: withdrawn | withdrawn | the transition record |
+| any open state, before the push | `life.close`: superseded | superseded | the transition record |
+
+Landed, withdrawn and superseded are terminal.
 
 ## [expansions] What the expansions add to the flow
 
@@ -306,20 +432,23 @@ is hook-written. A reviewer breakpoint runs this program:
 
   They are defined at observability's review.
 - **Distribution's and integrations' Deploy extensions:**
-  - kit versions and release notes;
-  - promotion through environments, with a verify per SHA and `deploy.on-verify-fail`.
+  - kit versions and release notes, from distribution;
+  - promotion through environments, with a verify per SHA and `deploy.on-verify-fail`, from
+    integrations.
 
 ## [consequences] What the definitions change
 
-- **Core Deploy has no role.** The deployer works only in the expansions: release notes and verify
-  judgment. So does the maintainer. Layer 3 sorts the roster by layer.
+- **Core Deploy has no role.** The deployer works only in the expansions: release notes for
+  distribution and verify judgment for integrations, so it registers under both. So does the
+  maintainer, under observability. Layer 3 sorts the roster by layer.
 - **The bug-class checklist is now an extension point of Build,** not a core item. Without knowledge it
   records not-applicable.
 - **Ratification is not an item:**
   - under `plan.ratification: request`, `plan.exit`'s witness carries it;
   - under any other value, it is an owner breakpoint at `plan.exit`.
-- **`build.closes`'s two other values exist only with their expansions,** and the policy check refuses
-  them otherwise.
+- **`build.closes`'s two other values exist only with their expansions.** A preset that sets one is
+  refused when it is selected on an install without that expansion, so `strict` and `guarded` need
+  integrations (the owner's LR-4, `policy.on-missing-expansion`).
 - **Three questions were put to the owner** (`[open]`).
 
 ## [open] Asked, 2026-10-15
@@ -334,6 +463,10 @@ is hook-written. A reviewer breakpoint runs this program:
 - Settled: `review.design.rounds`, `one` by default, with `until-no-blocker`, `until-no-high`,
   `until-clean` and `fixed-count` allowed. `review.design.round-count` holds the count, and is read
   only under `fixed-count`.
+- **The seam it extends.** The spec audit's round bound already has a carrier: `REVIEW_ROUNDS` in
+  `.unattended.conf`, whose kit default of 1 is an owner ruling. The driver also has its loop states:
+  CONVERGING, CONVERGED, NON-CONVERGENT and BOUNDED. `review.design.rounds` becomes that bound's one
+  carrier, and under the `until-` rules each round counts against `flow.route-backs`.
 
 **S-2. "What happens to a review finding the skeptic can neither confirm nor refute?"**
 - Offered:
@@ -344,11 +477,14 @@ is hook-written. A reviewer breakpoint runs this program:
   unit? backlog item?), the rest are owner-adjustable settings."
 - Settled: `review.unverified`, `ask` by default, with `block` and `record` allowed.
 - **What an ask is.** An ask is a backlog item, not a unit. Today it is a row in the raising build's
-  `BACKLOG.md` (`BACKLOG_MODE = builds`, `memory/HYGIENE.md` `[Backlog layout]`). The row carries:
-  - its own id;
-  - a status and a severity;
-  - the evidence: the file at a SHA, and the command that shows the problem;
-  - an acceptance, the check that says when the ask is resolved.
+  `BACKLOG.md` (`BACKLOG_MODE = builds`, `memory/HYGIENE.md` `[Backlog layout]`).
+  - Today's row carries its id, the date it was filed, and prose. Its status is folded from disposition
+    rows, and its severity is a separate `SEV` disposition row.
+  - backlog.py's V14 refuses an ask filed since `ASK_CUTOFF` that carries neither `accept` nor a
+    `seen … run`, so only recent rows carry an acceptance.
+  - The memory layer's design gives the row its own id, a status, a severity, the evidence (the file
+    at a SHA, and the command that shows the problem) and an acceptance, the check that says when the
+    ask is resolved (LR-5).
 
   `backlog/<FAMILY>.md` is generated from those rows. A unit belongs to a build's roster and is
   built in that build. An ask waits outside every roster until Plan's triage selects it, as a patch
@@ -370,8 +506,92 @@ that today wait for its cadence?"**
   settings."
 - Settled: `tests.without-cadence`, `run-at-landing` by default, with `report-unrun` and
   `wait-for-expansion` allowed.
+- **What the values do without the expansion,** the only case the key governs:
+  - `run-at-landing` runs the slower levels in every Test run, within the suite's declared wall-clock
+    ceiling, and a breach reds (`[cost]`);
+  - `wait-for-expansion` reports them unrun, each with an ask whose acceptance is the level green once
+    observability's Maintain runs it.
 
 **Presets.** Each preset's values follow its stance:
 - `strict` sets rounds until no HIGH, and blocks on an unverified finding;
 - `guarded` sets rounds until no BLOCKER;
 - `velocity` only records unverified findings, and reports the slower levels unrun.
+
+## [revised] Revised 2026-10-16: the two Tier-2 rounds, folded
+
+Two Tier-2 rounds reviewed this record and `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-flow.md`
+together, at blobs `43e9cf4b` and `7031c90f`. The comparison record places their findings on 61 defects
+(`build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared.md`, `[map-flow]`), and its map's
+`disposition` cells point here for both records. Each defect's fix sits in place, in the sections
+named:
+- **amend:** this record, or a sibling record, now states the fix;
+- **gap:** the owning chain build carries it in the register;
+- **fork:** the owner answered it, in the comparison record's `[answers]`;
+- **none:** every finding on it was refuted.
+
+Two keys join v2's catalogue: `flow.route-backs` (`[rules]`) and, from LR-4,
+`policy.on-missing-expansion` (`[consequences]`).
+
+| Defect | Disposition | Where the fix sits |
+|---|---|---|
+| `multi-actor-items` | amend | `[rules]`: one actor of one kind per item; every table's actor cells |
+| `self-typed-review-witnesses` | amend | `[breakpoint]`: the lens, refute and report items are witnessed by computed joins |
+| `exit-witness-all-items` | amend | `[rules]`: an exit's witness covers the items the run reached |
+| `breakpoint-placement` | amend | each step's breakpoints; `[breakpoint]`: the flow resumes at the item the breakpoint stands before |
+| `autonomy-gates-missing` | amend | `[breakpoint]`: where `autonomy` places the owner's gates; each step's breakpoints say `every-stage`, not `strict` |
+| `owner-gate-vs-question` | fork, amend | LR-3; `[breakpoint]`: an owner breakpoint is an owner item |
+| `superseded-parent` | amend | `deploy.parents`; `life.notify` |
+| `parents-test-decides` | amend | `deploy.parents` under `test-decides` |
+| `withdraw-program-missing` | amend, gap | `[lifecycle]`; `[transitions]`; `gap-flow-15` for the feature and unit tables |
+| `pause-leases` | amend | `[lifecycle]`: a paused build keeps its leases |
+| `review-findings-entry` | amend | `[design]`'s six inputs; `design.input` |
+| `landing-review-route` | amend | `[deploy]`: patch builds by the post-close row; `build.core`'s fix unit; layer-flow `[settled]` |
+| `deploy-close-reconcile` | amend | `[deploy]`: `deploy.notify`, `deploy.snapshot`, `deploy.release` and `deploy.close`, ordered, each idempotent |
+| `red-routes-ignore-policy` | amend | `test.route` and `test.attribute` route by `verdict.blocks` and `verdict.red-route`; layer-flow `[settled]` |
+| `unreachable-items` | amend | every table's `Needs` column and routes |
+| `ask-acceptance` | fork, amend | LR-5; `[rules]`: every filed ask states its acceptance |
+| `first-unwitnessed-item` | amend | `[rules]`: `next` returns the frontier |
+| `scope-refusal-stuck` | amend | `build.scope`: a refused stray routes to a revert pass |
+| `maintain-superseded-text` | none | refuted |
+| `gap-13-14-unstated` | amend | layer-flow `[uncovered]` states `gap-flow-13` and `gap-flow-14` |
+| `bar-attribution-unjoined` | amend | `test.verdict` runs `GATE_ATTRIBUTE`, `test.route` routes the computed classes, and `test.attribute` judges OWN and MIXED reds only |
+| `lander-rewrites-merge` | amend | `test.merge` is the lander's `--prepare`, and `deploy.land` its `--land` |
+| `verdict-tree-build-tip` | amend | `test.merge` and `deploy.current` under `build-tip` |
+| `presets-fail-build-closes` | fork, amend | LR-4; `[consequences]`; v2's `policy.on-missing-expansion` |
+| `hook-actor-kind` | amend | `entry.intake` is a hook; `test.verdict` is the runner, whose record the pre-push hook reads |
+| `ask-row-shape` | amend | `[open]` S-2: today's ask row |
+| `lease-ref-history` | amend | the lease record replaces "the lease ref's history" |
+| `merge-read-as-additions` | amend | `[rules]`: range checks read `--first-parent`, without merges |
+| `class-set-undefined` | amend | `[breakpoint]`: classes from knowledge where installed, the lens otherwise |
+| `deployer-producing-role` | amend | layer-flow `[settled]`; `build.recommend` is signals only |
+| `reasoning-item-count` | amend | layer-flow `[uncovered]`: four items |
+| `audit-b-count` | none | refuted |
+| `design-audit-no-fold` | amend | `[breakpoint]`: `review.fold`, and `review.dispose` by the artifact's state |
+| `design-rounds-carrier` | amend | `[open]` S-1: the key extends `REVIEW_ROUNDS` and the driver's loop states |
+| `review-harness-seam` | amend | `[breakpoint]`: one `tier2-review.js` act, its `uncertain` the unverified verdict |
+| `owner-controls-exist` | amend | `[lifecycle]` extends `--hold`, `--resume` and `--abort`; layer-flow `[uncovered]`; `gap-flow-10` |
+| `write-set-seams` | amend | `build.unit-lease` and `build.scope` name `--dispatch --writes`, `--check-commit` and check 23 |
+| `lander-seams` | amend | `deploy.core` is the post-merge bar; `deploy.record` reads the landing marker |
+| `tests-without-cadence-dup` | none | refuted |
+| `tests-without-cadence-semantics` | amend | `[open]` S-3: what each value does without the expansion |
+| `gap-flow-10-owner` | amend | layer-flow `[uncovered]` and `[settled]`: dWellOiledMachine |
+| `tag-policy-collision` | amend | the opening: an item's full spelling is `item.<step>.<name>` |
+| `policy-lists-incomplete` | amend | each step's policy list |
+| `unbounded-loops` | amend | `[rules]`: `flow.route-backs` |
+| `intake-hook-crash` | amend, gap | `entry.intake`'s missing route; `gap-rt-14` |
+| `intake-owner-scope` | amend | `[entry]`: only an attended-bound session writes intake |
+| `intake-secrets` | amend | `[entry]`: the secret scanner and the size cap |
+| `lander-exit-classes` | amend | `deploy.land`'s five exit classes |
+| `owner-disposition-witness` | fork, amend | LR-3; `[breakpoint]`: the disposition record by any channel, or the supervisor's choice |
+| `unverified-block-stuck` | amend | `[breakpoint]`: a verification round, bounded by `flow.route-backs` |
+| `item-count-readers` | amend | layer-flow `[fit]` points at the items declared here; dated snapshots and research returns keep their counts |
+| `mailbox-prune-orphan` | amend | `deploy.release` and `life.release` prune the mailbox; v2 `[open]` |
+| `turnstile-not-queue` | amend | `[deploy]`'s landing order; `gap-flow-08` gains the missing queue; v2 and the instruction record |
+| `reasoning-field-timing` | amend | `[rules]`: the step's `reason` item, after the score |
+| `tier-preset-guarded` | amend | `[design]`: owed above the tier under `guarded` |
+| `flakes-quarantine-seam` | amend | `test.flakes` extends the bar's `nondeterministic` class, and a flaky leg is held |
+| `placement-policy-routes` | amend | `[entry]`: `entry.place-check` and `entry.place-owner` |
+| `disposition-set-gaps` | amend | `[plan]`: select, defer, retire and refuse |
+| `deployer-expansion-mismatch` | amend | `[consequences]`: the deployer registers under distribution and integrations |
+| `instruction-tag-examples` | amend | the instruction layer's R-B, in that layer's fold |
+| `recommendation-source-mismatch` | none | refuted |

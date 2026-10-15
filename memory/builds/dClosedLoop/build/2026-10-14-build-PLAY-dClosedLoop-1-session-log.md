@@ -765,6 +765,16 @@ Rounds 1 and 2 of the layers' reviews, dispatches 39 and 40, were derived from t
   Foundations R2, C3 and C6, v2 and the register moved with it, and `instructions.proof` joined v2's
   catalogue.
 
+- 2026-10-16, session 1799cb98: the flow layer's 61 defects were folded, and flow-steps' `[revised]`
+  says where each went:
+  - flow-steps gains every item's needs, the owner's controls as a program (`[lifecycle]`), the build's
+    transition table, bounded routes back, and an intake scoped, scanned and capped;
+  - Test runs the lander's `--prepare` and routes reds by the bar's own attribution and the policies;
+    Deploy runs its `--land`, every exit class routed, and closes in four idempotent steps;
+  - an owner breakpoint is an owner item, after LR-3; `policy.on-missing-expansion` holds LR-4;
+  - `flow.route-backs` joined v2's catalogue, and `gap-flow-15` and `gap-rt-14` the register;
+  - 4 defects were refuted.
+
 ## Instruments
 
 ### The gap-ownership join
@@ -876,7 +886,7 @@ for k in sorted(expected - set(presets)):
 for k in sorted(set(presets) - expected):
     findings.append(f"preset table names a key that is excluded or not in the catalogue: {k}")
 
-FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count|a share of the window|a round count|a word range")
+FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count|a share of the window|a round count|a word range|a route-back count")
 for k, vals in presets.items():
     if k not in catalogue:
         continue
@@ -1069,6 +1079,21 @@ After the instruction layer's fold, both instruments were run as extracted from 
   - with `instructions.proof` struck from the "Presets never touch" sentence, naming it missing from
     the preset table;
   - with a preset row added for `instructions.proof`, naming it excluded.
+
+After the flow layer's fold, both instruments were run as extracted from this record:
+- **The changes:**
+  - `gap-flow-15` and `gap-rt-14` were registered and owned;
+  - `flow.route-backs` joined the catalogue and every preset;
+  - `policy.on-missing-expansion` joined the catalogue, outside every preset;
+  - the preset check's free-value pattern gains `a route-back count`, in the source above.
+- **The join** exits 0 on 165 keys and 15 builds. On a copy of v2 with `gap-flow-15` struck from
+  dDeclaredLoop's row and dWellOiledMachine's range cut to `gap-rt-13`, it exits 1, naming both
+  unowned.
+- **The preset check** exits 0 on 128 catalogue keys, 120 presettable and 120 preset rows. It exits 1
+  on two planted copies:
+  - with the `flow.route-backs` preset row removed, naming it missing;
+  - with `policy.on-missing-expansion` struck from the "Presets never touch" sentence, naming it
+    missing from the preset table.
 
 ### The foreign-build census
 

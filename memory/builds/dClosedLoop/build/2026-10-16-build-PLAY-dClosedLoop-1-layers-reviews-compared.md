@@ -346,67 +346,67 @@ Run A is `wf_1532dea2-2f7` and run B is `wf_782666f6-e98`.
 
 | defect | what | A | B | disposition |
 |---|---|---|---|---|
-| `multi-actor-items` | five items name two actor kinds, against "one actor per item" and P24, and the only derived check still passes | 1 | 31 | pending |
-| `self-typed-review-witnesses` | the breakpoint program's role items are proven by the acting agent's own typed output | 2 | — | pending |
-| `exit-witness-all-items` | an exit witness made of every item's witness cannot pass when conditional items never run | 3 | — | pending |
-| `breakpoint-placement` | each step places its review breakpoint differently, and nothing says where the flow resumes after `review.dispose` | 4 | 12 | pending |
-| `autonomy-gates-missing` | the owner gates `autonomy` declares appear in no step's breakpoints, and Deploy's gate mixes an autonomy value with a preset name | 5, 53, 62 | 6, 26 | pending |
-| `owner-gate-vs-question` | an owner breakpoint can be resolved by `run.on-owner-question`, since neither record separates an owner gate from an owner question | 6 | 37 | pending |
-| `superseded-parent` | a superseded or paused parent has no dependent rule: `deploy.parents` and `deps.on-parent-withdrawn` cover landed and withdrawn only | 7, 41, 61 | 39 | pending |
-| `parents-test-decides` | `deploy.parents` always holds, with no behaviour for `deps.landing: test-decides`, velocity's value | 48, 61 | — | pending |
-| `withdraw-program-missing` | withdraw, supersede, pause and resume have no items or program, and work in flight when they arrive is unhandled | 8, 50, 60 | 38 | pending |
-| `pause-leases` | pause says nothing of the paused build's leases, which the supervisor expires | — | 40 | pending |
-| `review-findings-entry` | findings and reds sent back through Design have no `design.input` kind | 9 | 8 | pending |
-| `landing-review-route` | the landing review's findings and a red after the push route to a new unit with no Deploy-to-Design transition | 10, 64 | 44 | pending |
-| `deploy-close-reconcile` | `deploy.close` has four effects in one item, no order, and no idempotence or reconcile declaration | 47, 65 | 44 | pending |
-| `red-routes-ignore-policy` | `test.attribute` routes ignore `verdict.blocks` and `verdict.red-route`, so under strict and guarded a build has no route out of Test | 11, 18, 30 | 2, 3, 14 | pending |
-| `unreachable-items` | no route reaches `build.scope`, `build.recommend`, `test.recommend` or `review.cost`, several outcomes route nowhere, and no item declares its dependencies | 12, 66 | 4 | pending |
-| `ask-acceptance` | core items file asks with no mechanical acceptance, which the memory layer's `asks.acceptance` refuses | 13 | — | pending |
-| `first-unwitnessed-item` | "the first unwitnessed item" has no meaning once steps are dependency programs answering with a frontier | 14, 49 | — | pending |
-| `scope-refusal-stuck` | a `build.scope` refusal leaves the stray commit, and the default route loops on the same history | — | 43 | pending |
-| `maintain-superseded-text` | the body still says Maintain stays core, against [settled] | 15 | — | pending |
-| `gap-13-14-unstated` | gap-flow-13 and gap-flow-14 are registered but stated nowhere in the record | 16 | 46 | pending |
-| `bar-attribution-unjoined` | the tester types a red's class that the bar already computes mechanically, and the two are never joined | 17, 29 | — | pending |
-| `lander-rewrites-merge` | Test and Deploy re-specify the landing merge, while the lander's `--prepare` mints versions and regenerates into it, so the graded tree is not the pushed one | 19, 59 | 20 | pending |
-| `verdict-tree-build-tip` | `verdict.tree` allows build-tip, yet `test.merge` always merges and `deploy.current` requires equality | 20 | — | pending |
-| `presets-fail-build-closes` | the policy check refuses `after-release-verifies` without integrations, yet strict and guarded set it, so both fail on a core install | 21, 38, 43 | 1, 25 | pending |
-| `hook-actor-kind` | hook-witnessed items are labelled command actors, which Runtime runs rather than awaits, and the verdict's writer is the runner, not a hook | 22, 46 | 15 | pending |
-| `ask-row-shape` | S-2 misstates today's ask row: status is folded from dispositions, and severity and acceptance are rare | 23 | 19 | pending |
-| `lease-ref-history` | witnesses rest on a lease ref's history, but the ref is a parentless commit replaced at each swap and deleted at close | 24 | — | pending |
-| `merge-read-as-additions` | the build's range checks read a conflict-resolution merge of the default branch as the build's own work | 25 | 18 | pending |
-| `class-set-undefined` | `review.lens` needs a registered core class set that no record defines, while the existing gotchas catalogue is demoted to an expansion | 26, 37 | 24 | pending |
-| `deployer-producing-role` | layer-flow names the deployer as Deploy's producing role, while flow-steps makes core Deploy roleless and signals-only | 27, 39 | 10, 26 | pending |
-| `reasoning-item-count` | [uncovered] counts three driver-reasoning items where [audit] and the register count four | 27, 52 | 11 | pending |
-| `audit-b-count` | return b's summary count differs from its findings section | 28 | — | pending |
-| `design-audit-no-fold` | the review program cannot run the Design spec audit's rounds: nothing folds an unbuilt spec, and `review.dispose` loops by the closing review's key | 32 | 7, 28 | pending |
-| `design-rounds-carrier` | S-1 mints round keys beside the existing `REVIEW_ROUNDS` carrier and its loop states, uncited | 31 | — | pending |
-| `review-harness-seam` | the breakpoint program rebuilds tier2-review.js's pipeline as separate items and drops its uncertain verdict | 33 | 21 | pending |
-| `owner-controls-exist` | gap-flow-10 says no pause, resume or withdraw command exists, though unattended ships `--hold`, `--resume` and `--abort` | 34 | 22 | pending |
-| `write-set-seams` | `build.unit-lease` and `build.scope` re-specify the driver's write-set declaration and check | 35 | 27 | pending |
-| `lander-seams` | `deploy.core` and `deploy.record` name none of the lander's post-merge bar and landing marker | 36 | — | pending |
-| `tests-without-cadence-dup` | `tests.without-cadence` duplicates `tests.landing-levels` | 40 | — | pending |
-| `tests-without-cadence-semantics` | `wait-for-expansion` is undefined without the expansion, and `run-at-landing` sets no time bound | — | 45 | pending |
-| `gap-flow-10-owner` | the record keeps gap-flow-10 and the owner's controls with dDeclaredLoop, which RT-3 moved to dWellOiledMachine | 42, 67 | 9, 22, 46 | pending |
-| `tag-policy-collision` | item tags `build.scope` and `design.reentry` are spelled like policy keys, which [settled] said would be kept apart | 44 | 5 | pending |
-| `policy-lists-incomplete` | each step's policy list omits keys its own items read | 45 | 7 | pending |
-| `unbounded-loops` | every route back is unbounded, and no non-converging loop becomes an owner item | 54 | 41 | pending |
-| `intake-hook-crash` | `entry.intake` rests on a prompt-submit hook outside Runtime's surface, with no crash behaviour, and none is wired today | 55 | 34 | pending |
-| `intake-owner-scope` | nothing says which sessions' prompts are the owner's intake, so an act session's prompt could become the mandate | 56 | 35 | pending |
-| `intake-secrets` | verbatim intake has no secret scan, redaction or size cap, beside a scanner the tree already ships | 57 | 36 | pending |
-| `lander-exit-classes` | `deploy.land` routes two outcomes where the lander has five exit classes, including landed ungated | 58 | — | pending |
-| `owner-disposition-witness` | the owner's disposition is "hook-written", while unattended owner items are answered through the mailbox or a terminal | 63 | — | pending |
-| `unverified-block-stuck` | under `review.unverified=block` nothing can unblock: no round is scheduled and the owner has no disposition | 63 | 42 | pending |
-| `item-count-readers` | the new item population updates none of the records that assert the old counts | 68 | — | pending |
-| `mailbox-prune-orphan` | moving Maintain to an expansion orphans pruning a closed build's mailbox ref | 69 | — | pending |
-| `turnstile-not-queue` | the turnstile is a host-wide bar semaphore, not a landing queue, and the lander never takes it | — | 16 | pending |
-| `reasoning-field-timing` | the recommendation's reasoning field sits in a return that does not exist on the common path, or predates the score | — | 17 | pending |
-| `tier-preset-guarded` | [design] omits the guarded preset's `owed-above-tier` spec audit | — | 13 | pending |
-| `flakes-quarantine-seam` | `test.flakes` mints a new record beside the bar's nondeterministic class and quarantine, which mean something else | — | 23 | pending |
-| `placement-policy-routes` | `entry.place` fixes the scout as placer, leaving `placement`'s other two values, which strict and guarded set, with no route | — | 29 | pending |
-| `disposition-set-gaps` | the closed disposition set maps only defer and duplicate: no item retires, refuses or selects an ask | — | 30 | pending |
-| `deployer-expansion-mismatch` | release notes go to distribution while the deployer registers under integrations, breaking the expansion-role check | — | 32 | pending |
-| `instruction-tag-examples` | the instruction layer's R-B still gives example tags that no defined item carries | — | 33 | pending |
-| `recommendation-source-mismatch` | core Deploy hard-codes signals-only while `review.recommendation.source` defaults to reasoning, and `agent-judgment` has no actor | 51 | — | pending |
+| `multi-actor-items` | five items name two actor kinds, against "one actor per item" and P24, and the only derived check still passes | 1 | 31 | amend; `flow-steps` `[revised]` |
+| `self-typed-review-witnesses` | the breakpoint program's role items are proven by the acting agent's own typed output | 2 | — | amend; `flow-steps` `[revised]` |
+| `exit-witness-all-items` | an exit witness made of every item's witness cannot pass when conditional items never run | 3 | — | amend; `flow-steps` `[revised]` |
+| `breakpoint-placement` | each step places its review breakpoint differently, and nothing says where the flow resumes after `review.dispose` | 4 | 12 | amend; `flow-steps` `[revised]` |
+| `autonomy-gates-missing` | the owner gates `autonomy` declares appear in no step's breakpoints, and Deploy's gate mixes an autonomy value with a preset name | 5, 53, 62 | 6, 26 | amend; `flow-steps` `[revised]` |
+| `owner-gate-vs-question` | an owner breakpoint can be resolved by `run.on-owner-question`, since neither record separates an owner gate from an owner question | 6 | 37 | fork, amend; `flow-steps` `[revised]` |
+| `superseded-parent` | a superseded or paused parent has no dependent rule: `deploy.parents` and `deps.on-parent-withdrawn` cover landed and withdrawn only | 7, 41, 61 | 39 | amend; `flow-steps` `[revised]` |
+| `parents-test-decides` | `deploy.parents` always holds, with no behaviour for `deps.landing: test-decides`, velocity's value | 48, 61 | — | amend; `flow-steps` `[revised]` |
+| `withdraw-program-missing` | withdraw, supersede, pause and resume have no items or program, and work in flight when they arrive is unhandled | 8, 50, 60 | 38 | amend, gap; `flow-steps` `[revised]` |
+| `pause-leases` | pause says nothing of the paused build's leases, which the supervisor expires | — | 40 | amend; `flow-steps` `[revised]` |
+| `review-findings-entry` | findings and reds sent back through Design have no `design.input` kind | 9 | 8 | amend; `flow-steps` `[revised]` |
+| `landing-review-route` | the landing review's findings and a red after the push route to a new unit with no Deploy-to-Design transition | 10, 64 | 44 | amend; `flow-steps` `[revised]` |
+| `deploy-close-reconcile` | `deploy.close` has four effects in one item, no order, and no idempotence or reconcile declaration | 47, 65 | 44 | amend; `flow-steps` `[revised]` |
+| `red-routes-ignore-policy` | `test.attribute` routes ignore `verdict.blocks` and `verdict.red-route`, so under strict and guarded a build has no route out of Test | 11, 18, 30 | 2, 3, 14 | amend; `flow-steps` `[revised]` |
+| `unreachable-items` | no route reaches `build.scope`, `build.recommend`, `test.recommend` or `review.cost`, several outcomes route nowhere, and no item declares its dependencies | 12, 66 | 4 | amend; `flow-steps` `[revised]` |
+| `ask-acceptance` | core items file asks with no mechanical acceptance, which the memory layer's `asks.acceptance` refuses | 13 | — | fork, amend; `flow-steps` `[revised]` |
+| `first-unwitnessed-item` | "the first unwitnessed item" has no meaning once steps are dependency programs answering with a frontier | 14, 49 | — | amend; `flow-steps` `[revised]` |
+| `scope-refusal-stuck` | a `build.scope` refusal leaves the stray commit, and the default route loops on the same history | — | 43 | amend; `flow-steps` `[revised]` |
+| `maintain-superseded-text` | the body still says Maintain stays core, against [settled] | 15 | — | none; `flow-steps` `[revised]` |
+| `gap-13-14-unstated` | gap-flow-13 and gap-flow-14 are registered but stated nowhere in the record | 16 | 46 | amend; `flow-steps` `[revised]` |
+| `bar-attribution-unjoined` | the tester types a red's class that the bar already computes mechanically, and the two are never joined | 17, 29 | — | amend; `flow-steps` `[revised]` |
+| `lander-rewrites-merge` | Test and Deploy re-specify the landing merge, while the lander's `--prepare` mints versions and regenerates into it, so the graded tree is not the pushed one | 19, 59 | 20 | amend; `flow-steps` `[revised]` |
+| `verdict-tree-build-tip` | `verdict.tree` allows build-tip, yet `test.merge` always merges and `deploy.current` requires equality | 20 | — | amend; `flow-steps` `[revised]` |
+| `presets-fail-build-closes` | the policy check refuses `after-release-verifies` without integrations, yet strict and guarded set it, so both fail on a core install | 21, 38, 43 | 1, 25 | fork, amend; `flow-steps` `[revised]` |
+| `hook-actor-kind` | hook-witnessed items are labelled command actors, which Runtime runs rather than awaits, and the verdict's writer is the runner, not a hook | 22, 46 | 15 | amend; `flow-steps` `[revised]` |
+| `ask-row-shape` | S-2 misstates today's ask row: status is folded from dispositions, and severity and acceptance are rare | 23 | 19 | amend; `flow-steps` `[revised]` |
+| `lease-ref-history` | witnesses rest on a lease ref's history, but the ref is a parentless commit replaced at each swap and deleted at close | 24 | — | amend; `flow-steps` `[revised]` |
+| `merge-read-as-additions` | the build's range checks read a conflict-resolution merge of the default branch as the build's own work | 25 | 18 | amend; `flow-steps` `[revised]` |
+| `class-set-undefined` | `review.lens` needs a registered core class set that no record defines, while the existing gotchas catalogue is demoted to an expansion | 26, 37 | 24 | amend; `flow-steps` `[revised]` |
+| `deployer-producing-role` | layer-flow names the deployer as Deploy's producing role, while flow-steps makes core Deploy roleless and signals-only | 27, 39 | 10, 26 | amend; `flow-steps` `[revised]` |
+| `reasoning-item-count` | [uncovered] counts three driver-reasoning items where [audit] and the register count four | 27, 52 | 11 | amend; `flow-steps` `[revised]` |
+| `audit-b-count` | return b's summary count differs from its findings section | 28 | — | none; `flow-steps` `[revised]` |
+| `design-audit-no-fold` | the review program cannot run the Design spec audit's rounds: nothing folds an unbuilt spec, and `review.dispose` loops by the closing review's key | 32 | 7, 28 | amend; `flow-steps` `[revised]` |
+| `design-rounds-carrier` | S-1 mints round keys beside the existing `REVIEW_ROUNDS` carrier and its loop states, uncited | 31 | — | amend; `flow-steps` `[revised]` |
+| `review-harness-seam` | the breakpoint program rebuilds tier2-review.js's pipeline as separate items and drops its uncertain verdict | 33 | 21 | amend; `flow-steps` `[revised]` |
+| `owner-controls-exist` | gap-flow-10 says no pause, resume or withdraw command exists, though unattended ships `--hold`, `--resume` and `--abort` | 34 | 22 | amend; `flow-steps` `[revised]` |
+| `write-set-seams` | `build.unit-lease` and `build.scope` re-specify the driver's write-set declaration and check | 35 | 27 | amend; `flow-steps` `[revised]` |
+| `lander-seams` | `deploy.core` and `deploy.record` name none of the lander's post-merge bar and landing marker | 36 | — | amend; `flow-steps` `[revised]` |
+| `tests-without-cadence-dup` | `tests.without-cadence` duplicates `tests.landing-levels` | 40 | — | none; `flow-steps` `[revised]` |
+| `tests-without-cadence-semantics` | `wait-for-expansion` is undefined without the expansion, and `run-at-landing` sets no time bound | — | 45 | amend; `flow-steps` `[revised]` |
+| `gap-flow-10-owner` | the record keeps gap-flow-10 and the owner's controls with dDeclaredLoop, which RT-3 moved to dWellOiledMachine | 42, 67 | 9, 22, 46 | amend; `flow-steps` `[revised]` |
+| `tag-policy-collision` | item tags `build.scope` and `design.reentry` are spelled like policy keys, which [settled] said would be kept apart | 44 | 5 | amend; `flow-steps` `[revised]` |
+| `policy-lists-incomplete` | each step's policy list omits keys its own items read | 45 | 7 | amend; `flow-steps` `[revised]` |
+| `unbounded-loops` | every route back is unbounded, and no non-converging loop becomes an owner item | 54 | 41 | amend; `flow-steps` `[revised]` |
+| `intake-hook-crash` | `entry.intake` rests on a prompt-submit hook outside Runtime's surface, with no crash behaviour, and none is wired today | 55 | 34 | amend, gap; `flow-steps` `[revised]` |
+| `intake-owner-scope` | nothing says which sessions' prompts are the owner's intake, so an act session's prompt could become the mandate | 56 | 35 | amend; `flow-steps` `[revised]` |
+| `intake-secrets` | verbatim intake has no secret scan, redaction or size cap, beside a scanner the tree already ships | 57 | 36 | amend; `flow-steps` `[revised]` |
+| `lander-exit-classes` | `deploy.land` routes two outcomes where the lander has five exit classes, including landed ungated | 58 | — | amend; `flow-steps` `[revised]` |
+| `owner-disposition-witness` | the owner's disposition is "hook-written", while unattended owner items are answered through the mailbox or a terminal | 63 | — | fork, amend; `flow-steps` `[revised]` |
+| `unverified-block-stuck` | under `review.unverified=block` nothing can unblock: no round is scheduled and the owner has no disposition | 63 | 42 | amend; `flow-steps` `[revised]` |
+| `item-count-readers` | the new item population updates none of the records that assert the old counts | 68 | — | amend; `flow-steps` `[revised]` |
+| `mailbox-prune-orphan` | moving Maintain to an expansion orphans pruning a closed build's mailbox ref | 69 | — | amend; `flow-steps` `[revised]` |
+| `turnstile-not-queue` | the turnstile is a host-wide bar semaphore, not a landing queue, and the lander never takes it | — | 16 | amend; `flow-steps` `[revised]` |
+| `reasoning-field-timing` | the recommendation's reasoning field sits in a return that does not exist on the common path, or predates the score | — | 17 | amend; `flow-steps` `[revised]` |
+| `tier-preset-guarded` | [design] omits the guarded preset's `owed-above-tier` spec audit | — | 13 | amend; `flow-steps` `[revised]` |
+| `flakes-quarantine-seam` | `test.flakes` mints a new record beside the bar's nondeterministic class and quarantine, which mean something else | — | 23 | amend; `flow-steps` `[revised]` |
+| `placement-policy-routes` | `entry.place` fixes the scout as placer, leaving `placement`'s other two values, which strict and guarded set, with no route | — | 29 | amend; `flow-steps` `[revised]` |
+| `disposition-set-gaps` | the closed disposition set maps only defer and duplicate: no item retires, refuses or selects an ask | — | 30 | amend; `flow-steps` `[revised]` |
+| `deployer-expansion-mismatch` | release notes go to distribution while the deployer registers under integrations, breaking the expansion-role check | — | 32 | amend; `flow-steps` `[revised]` |
+| `instruction-tag-examples` | the instruction layer's R-B still gives example tags that no defined item carries | — | 33 | amend; `flow-steps` `[revised]` |
+| `recommendation-source-mismatch` | core Deploy hard-codes signals-only while `review.recommendation.source` defaults to reasoning, and `agent-judgment` has no actor | 51 | — | none; `flow-steps` `[revised]` |
 
 ## [map-roles] The roles layer's findings, placed
 

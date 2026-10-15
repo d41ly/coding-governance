@@ -149,8 +149,8 @@ without it?
 Three reasons:
 - P24 makes the checklist a program, and a program needs a runner.
 - The items v2's `[owed]` held without a home were runtime: the executor and its harness.
-  dWellOiledMachine now owns them. The turnstile's landing queue and the lander's core re-check stay
-  Deploy's (dShippedRelease), and only the lander's hardening moved to Runtime.
+  dWellOiledMachine now owns them. The landing queue and the lander's core re-check stay Deploy's
+  (dShippedRelease), and only the lander's hardening moved to Runtime.
 - The instruction layer's MUST and NEVER become real only where Runtime enforces them.
 
 In one line: Instruction says, Runtime enforces, Flow witnesses, Memory proves.
@@ -223,7 +223,8 @@ In one line: Instruction says, Runtime enforces, Flow witnesses, Memory proves.
 | the loop kit, to be built | Flow: stage tags, checklists, the position function | core engine |
 | run-gates | Flow: the Test verdict | core engine; its legs come as packs |
 | gate-lint, pytest-parallel-guardrails | Flow: verdict leg packs | expansion |
-| `push-main.sh`, the turnstile, the lander | Flow: Deploy (dShippedRelease); the lander's hardening is Runtime's | core |
+| `push-main.sh`, the lander | Flow: Deploy (dShippedRelease); the lander's hardening is Runtime's | core |
+| the turnstile | Flow: Test, the host-wide bar semaphore | core |
 | session-kickoff | Flow: Entry, through the orientation scout | core |
 | unattended | Runtime: the supervisor, `resume-tick.sh` grown, and the `next` verb (RT-3); the `/unattended` Skill is a client of `run <build>` | core |
 | hooks | Runtime: enforcement at the tool boundary | core |
