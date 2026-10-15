@@ -32,11 +32,8 @@ never collides with a policy key such as `policy.build.scope` (instruction layer
 - **Every route back is bounded.** A route back, a review round included, counts in the build's
   transition record. Past `flow.route-backs` returns to the same item, the loop becomes an owner item,
   resolved as `run.on-owner-question` says.
-- **Every ask an item files states its acceptance** in one of the memory layer's mechanical forms (LR-5):
-  - a red: the leg green on the default branch;
-  - an unverified finding: a review round that confirms or refutes it;
-  - a stray: the stray claimed;
-  - a repair: the producer's record corrected.
+- **Every ask an item files states its acceptance** in one of the mechanical forms the memory layer's
+  `[asks]` declares (LR-5). The forms are cited from there, never copied.
 - **Every work order loads its load set (P27):**
   - the units scoped to every reader;
   - the role's units;
@@ -45,6 +42,9 @@ never collides with a policy key such as `policy.build.scope` (instruction layer
   - the policy values the item reads.
 - **At every item boundary,** the executor reads the build's mailbox (`mailbox.reads`) and updates the
   card's pointers (`card.pointers`).
+- **Closing a mailbox.** When a build closes, landed, withdrawn or superseded, every message still on
+  its mailbox ref, disposed or not, is copied into the build folder, and the undisposed ones are marked
+  so in the terminal snapshot. Only then is the ref pruned, and a missing ref counts as done.
 - **Every step ends in an exit item.** Its witness is the witnesses of every item the run reached. An
   item a route skipped is not owed, and the transition record lists the path the run took. A breakpoint
   declared there blocks it until disposed.
@@ -79,7 +79,7 @@ The flow's router, before any step.
   length and its hash.
 - **The hook is Runtime's.** Its event joins Runtime's enforcement surface, with a witness its reader
   checks (`gap-rt-14`).
-- **Policies:** `placement` and `placement.check`.
+- **Policies:** `placement`, `placement.check` and `flow.route-backs`.
 
 Other sources enter Plan's triage directly:
 - asks, which are core;
@@ -117,7 +117,7 @@ plan record.
   - the practices' Plan reach (for `[yagni]`: is the need real now?);
   - the planning view;
   - the intake and plan-record schemas;
-  - the policies: `plan.triage`, `plan.authority`, `plan.ratification`, `autonomy`, `plan.unplaced`, `leases.*`, `run.host`, `run.on-owner-question`, `review.plan`, `review.recommendation`, `review.recommendation.source` and `deps.coordination`.
+  - the policies: `plan.triage`, `plan.authority`, `plan.ratification`, `autonomy`, `plan.unplaced`, `leases.*`, `run.host`, `run.on-owner-question`, `review.plan`, `review.recommendation`, `review.recommendation.source`, `deps.coordination` and `flow.route-backs`.
 - **Memory:**
   - reads the intake log, the plan view, the design index and the asks;
   - writes the dupes, triage, plan and research records, the lease record, the recommendation and the
@@ -165,7 +165,7 @@ posted to dependents. The build moves through Design whole (FL-D1).
   - the practices' Design reach;
   - the decomposition and spec-writing views;
   - the feature-design schema, the structured spec and the micro-spec;
-  - the policies: `design.forks`, `design.reentry`, `design.overlap`, `design.handoff`, `deps.early-build`, `deps.messaging`, `review.design`, `review.design.rounds`, `review.design.round-count` and `review.recommendation.source`.
+  - the policies: `design.forks`, `design.reentry`, `design.overlap`, `design.handoff`, `deps.early-build`, `deps.messaging`, `review.design`, `review.design.rounds`, `review.design.round-count`, `review.recommendation.source` and `flow.route-backs`.
 - **Memory:**
   - reads the plan record, the design index and the parents' confirmed interfaces;
   - writes the roster, the feature designs, the specs, the fork, overlap and research records, the
@@ -218,7 +218,7 @@ posted to dependents. The build moves through Design whole (FL-D1).
   - the practices' Build reach;
   - the unit-building and divergence views;
   - the trailer and builder-return schemas;
-  - the policies: `build.worktree`, `build.scope`, `leases.*`, `design.forks`, `design.reentry`, `review.build`, `review.findings`, `review.follow-up`, `core.bypass`, `core.exceptions`, `hooks.bypass` and `resume.partial`.
+  - the policies: `build.worktree`, `build.scope`, `leases.*`, `design.forks`, `design.reentry`, `review.build`, `review.findings`, `review.follow-up`, `core.bypass`, `core.exceptions`, `hooks.bypass`, `resume.partial` and `flow.route-backs`.
 - **Memory:**
   - reads the specs at their SHAs and the write sets;
   - writes the commits, the acceptance records, the scope reports, the review report, the core result
@@ -247,24 +247,27 @@ posted to dependents. The build moves through Design whole (FL-D1).
 |---|---|---|---|---|---|
 | `test.merge` | command: the lander's `--prepare` | — | under `verdict.tree: prepared-merge`, prepares the landing merge in Test's worktree: the build merged onto the default branch's tip, kit versions minted and outputs regenerated into it. Under `build-tip`, it pins the build's tip | the prepared merge's SHA and tree hash, or the tip's | prepared → `test.select`; a conflict → Build for a resolution pass, or the architect when an interface clashes; refused → an ask naming the lander's refusal |
 | `test.select` | command | `test.merge` | selects the legs the paths claim, the declared product-test levels (`tests.landing-levels`) and the held legs (`verdict.held`); without observability's Maintain, the levels left to its cadence too, as `tests.without-cadence` says | the selection record | `test.verdict` |
-| `test.verdict` | command: the bar's runner, on the declared backend | `test.select` | runs the bar with attribution (`GATE_ATTRIBUTE`); the runner writes the verdict record for the tree, which the pre-push hook reads | the runner-written verdict per tree hash, each red classed OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE | green → `test.flakes` and `test.seen-red`; red → `test.route`; stale → `test.merge` |
-| `test.route` | command | `test.verdict` | routes each red by its computed class, as `verdict.blocks` says | every red joined to one route | an OWN or MIXED red → `test.attribute`; a blocking CONTENDED red → a re-run on a quiet host; a blocking DEAD PROBE → the probe repaired, or an owner exception (`core.exceptions`); a blocking INHERITED red → a fix unit through Design, or an owner exception; a red that does not block → an ask |
+| `test.verdict` | command: the bar's runner, on the declared backend | `test.select` | runs the bar with attribution (`GATE_ATTRIBUTE`); the runner writes the verdict record for the tree, which the pre-push hook reads | the runner-written verdict per tree hash, each red classed OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE | green → `test.seen-red`; red → `test.route`; stale → `test.merge` |
+| `test.route` | command | `test.verdict` | routes each red by its computed class, as `verdict.blocks` says | every red joined to one route | a `nondeterministic · <leg>` red, which the bar prints only on a run it has turned red → `test.flakes`; an OWN or MIXED red → `test.attribute`; a blocking CONTENDED red → a re-run on a quiet host; a blocking DEAD PROBE → the probe repaired, or an owner exception (`core.exceptions`); a blocking INHERITED red → a fix unit through Design, or an owner exception; a red that does not block → an ask |
 | `test.attribute` | tester | the OWN and MIXED reds of `test.route` | judges each such red: the code misses its spec, or the spec is wrong | a computed join: every such red has one judgment, and the artifact its route names exists | as `verdict.red-route` says: under `fix-pass-or-design`, a code miss → a fix pass in Build and a wrong spec → a new unit through Design; under `always-new-unit`, both → a new unit through Design |
-| `test.flakes` | command | `test.verdict` | records the bar's `nondeterministic · <leg>` classes as the flake record; a leg past the threshold becomes a held leg (`verdict.held`), with an ask | the flake record, a flow record kind | `test.recommend` |
+| `test.flakes` | command | the nondeterministic reds of `test.route` | records each nondeterministic leg as the flake record, and acts as `verdict.flakes` says | the flake record, a flow record kind | under `quarantine`, a leg past the threshold is held, and the run re-enters `test.verdict` for a fresh verdict on the same tree; under `record`, the flake is recorded and the run re-enters `test.verdict`; under `retry-only`, the run re-enters `test.verdict` and nothing is recorded. Each re-entry counts against `flow.route-backs` |
 | `test.seen-red` | command | `test.verdict` | checks that every gate the build added or changed has a seen-red record | the seen-red records | all present → `test.recommend`; one missing → a fix pass on the unit that added the gate |
-| `test.recommend` | command | `test.flakes`, `test.seen-red` | scores the recommendation | the recommendation record | `test.reason`, or under `signals-only`: the gate review where declared, otherwise `test.exit` |
+| `test.recommend` | command | `test.seen-red` | scores the recommendation | the recommendation record | `test.reason`, or under `signals-only`: the gate review where declared, otherwise `test.exit` |
 | `test.reason` | tester | `test.recommend` | answers the step's one question, the score handed | the schema check, its answer joined to the recommendation record | the gate review where declared, otherwise `test.exit` |
 | `test.exit` | command | `test.recommend`, and the gate review where it ran | records the transition, and the verified tree on the build's lease record | the transition record and the lease record | Deploy |
 
 - **The bar's quarantine is another thing.** Its `quarantine.<name key>` keeps a leg out of the reuse
   cache until its manifest row changes. A held leg is the flow's carrier for a flaky one.
+- **A held product leg.** Today the bar's held class is the kit self-test subject (`subject = "kit"`),
+  run only on request. dWitnessedBar's held legs by policy extend it to any leg a quarantine holds,
+  and `verdict.held` decides when a held leg runs: `peer-or-cadence`, `push-selected` or `on-demand`.
 - **Roles:** tester; builders and the architect through its routes; reviewers with the gate lens at a
   breakpoint.
 - **Instruction:**
   - the practices' Test reach;
   - the bar and attribution views;
   - the tester-return schema, its judgment set closed;
-  - the policies: `verdict`, `verdict.tree`, `verdict.blocks`, `verdict.held`, `verdict.red-route`, `verdict.flakes`, `tests.landing-levels`, `tests.without-cadence`, `tests.product`, `hooks.bypass`, `review.test` and `review.recommendation.source`.
+  - the policies: `verdict`, `verdict.tree`, `verdict.blocks`, `verdict.held`, `verdict.red-route`, `verdict.flakes`, `tests.landing-levels`, `tests.without-cadence`, `tests.product`, `hooks.bypass`, `review.test`, `review.recommendation.source` and `flow.route-backs`.
 - **Memory:** writes the merge, selection, routing and attribution records, the runner-written verdict,
   the flake and seen-red records, the transition and the verified tree.
 - **Runtime:** Test's worktree, the verdict backend, leases.
@@ -291,17 +294,32 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 | Item | Actor | Needs | Does | Proven by | Then |
 |---|---|---|---|---|---|
 | `deploy.current` | command | — | checks that the verdict's tree equals the prepared merge on the current tip, or under `verdict.tree: build-tip`, the build's tip | the comparison record | current → `deploy.mandate`; stale → Test |
-| `deploy.mandate` | command | `deploy.current` | checks the landing's authority: the request's mandate under `plan-only`; under `three-gates` and `every-stage`, the owner's landing gate before it | the intake record, or the gate's witness | `deploy.parents` |
+| `deploy.mandate` | command | `deploy.current` | checks the landing's authority: the request's mandate under `plan-only`; under `three-gates` and `every-stage`, the disposition of the owner's landing gate, the breakpoint before this item | the intake record, or the gate's witness | `deploy.parents` |
 | `deploy.parents` | command | `deploy.mandate` | reads each parent's state, as `deps.landing` says | the parents' records | every parent landed → `deploy.land`; under `test-decides`, the build's own verdict green without the parents' unlanded work → `deploy.land`; a parent unlanded or paused → holds; a parent withdrawn → as `deps.on-parent-withdrawn` says; a parent superseded → the link moves to its replacement, and the hold reads that |
-| `deploy.land` | command: the lander's `--land` | `deploy.parents` | pushes the prepared merge and nothing else, reusing its verdict for the same tree; it refuses a second merge stacked on the prepared one | the pushed merge, the reused verdict and the lander's landing marker | exit 0, landed → `deploy.core`; the tip moved → Test; exit 1, refused (a mint or regen failure, a reconcile conflict, another build's carried commit) → Test to prepare again, or an ask for a carried commit; exit 2, an argument → an ask on the adapter; exit 3, a network or observation failure → the supervisor's retry, then an owner item; exit 4, pushed but LANDED UNGATED → `deploy.core`, the landing recorded ungated until its post-merge bar is green |
-| `deploy.core` | command: the lander's post-merge bar (`GATE_POST_MERGE`) | `deploy.land` | runs the core checks on the landed tree (K1) | the post-merge bar's result | clean → `deploy.record`; a red → a patch build through the entry-point table's post-close row, and the close waits for its filing |
-| `deploy.record` | command | `deploy.core` | writes the landing record from the lander's marker: SHA, the builds and units carried, the verdict | the landing record | `deploy.recommend` |
+| `deploy.land` | command: the lander's `--land`, run with `GOV_PUSH_MAIN_MAX_RETRIES=1` | `deploy.parents` | pushes HEAD of the prepared merge, gated by the pre-push bar for that tree. On a race it re-prepares onto the new tip and exits without a second push | the pushed SHA, the pre-push verdict, and the lander's marker on exit 0 | exit 0, landed and marked → `deploy.core`; exit 1 before the push, a refusal or a race (a mint or regen failure, a reconcile conflict, another build's carried commit, the tip moved) → Test, which grades the merge `--land` re-prepared, or an ask for a carried commit; exit 1 after the push, landed with no marker written → `deploy.core`, the landing reconciled from the remote tip; exit 2, an argument → an ask on the adapter; exit 3, a network or observation failure → the supervisor's retry, then an owner item; exit 4, pushed but LANDED UNGATED, with no marker and no post-merge bar → `deploy.core`, which starts the bar itself |
+| `deploy.core` | command | `deploy.land` | reads, or starts, the bar on the landed SHA (K1), as `GATE_POST_MERGE` declares | the bar's verdict for the landed SHA, copied into the landing record when read | green → `deploy.record`; red → a patch build through the entry-point table's post-close row, and the close waits for its filing; still running → waits, within the act's ceiling; no verdict past it → an owner item |
+| `deploy.record` | command | `deploy.core` | writes the landing record: SHA, the builds and units carried, the pre-push verdict and the core re-check's verdict. It reads the lander's marker, or, after exit 4 or a marker never written, the pushed SHA and the remote tip | the landing record | `deploy.recommend` |
 | `deploy.recommend` | command | `deploy.record` | scores the recommendation, signals only, since core Deploy has no producing role | the recommendation record | the landing review where declared, otherwise `deploy.notify` |
 | `deploy.notify` | command, idempotent | `deploy.recommend`, and the landing review where it ran | posts `landed` to dependents, keyed by the landing SHA, so a repeated post is a no-op | the mailbox posts | `deploy.snapshot` |
 | `deploy.snapshot` | command, idempotent | `deploy.notify` | commits the card's terminal snapshot; an equal snapshot is a no-op | the snapshot commit | `deploy.release` |
-| `deploy.release` | command, idempotent | `deploy.snapshot` | deletes the build's lease refs, a missing ref counting as done, and prunes its mailbox ref once the build folder holds every disposed message | the deleted refs and the pruned mailbox | `deploy.close` |
+| `deploy.release` | command, idempotent | `deploy.snapshot` | deletes the build's lease refs, a missing ref counting as done, and closes its mailbox (`[rules]`) | the deleted refs, and the mailbox's messages in the folder | `deploy.close` |
 | `deploy.close` | command | `deploy.release` | records the transition | the transition record | the build is closed |
 
+- **The core re-check's witness** (K1). The lander tells the cases apart, and so does `deploy.core`:
+  - under `GATE_POST_MERGE=local`, the lander starts `post-merge.sh` detached on exit 0 and records the
+    start in `<common-dir>/gate-post-merge.start`. The verdict lands in `<common-dir>/gate-post-merge`
+    (keys `sha`, `verdict`, `published`), matched to the landed SHA, and a red is also published as
+    `refs/gov/bar-red`. The record keeps only the last verdict, so `deploy.core` copies it into the
+    landing record when it reads it. The bar is the full bar (`GATE_FULL=1`), which covers the core
+    checks;
+  - under `ci`, the remote CI's result for the landed SHA is the witness;
+  - undeclared, as on gov's own tree today, or a value outside the set: the lander starts no bar, so
+    `deploy.core` starts `post-merge.sh` on the landed SHA itself;
+  - after exit 4 the lander started no bar either, so `deploy.core` starts it on the pushed SHA, and
+    the landing record says LANDED UNGATED until that verdict is green.
+- **Exit 1 has two meanings.** The adapter tells them apart by whether the remote's default branch
+  holds the pushed SHA: not held, the refusal or race came before the push; held, the build landed
+  and only its marker failed.
 - **The landing order.** Landings on a node are ordered by `landing.order` over the verified trees on
   the builds' leases. The turnstile is the host-wide bar semaphore, admitting `slots` concurrent bars,
   and `push-main.sh` never takes it, so no landing queue exists yet (`gap-flow-08`).
@@ -309,14 +327,14 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 - **Instruction:**
   - the practices' Deploy reach;
   - the landing view;
-  - the policies: `autonomy`, `plan.ratification`, `verdict.tree`, `landing.order`, `deps.landing`, `deps.on-parent-withdrawn`, `hooks.bypass`, `core.bypass`, `core.exceptions`, `build.closes`, `card.snapshot`, `run.on-owner-question` and `review.deploy`.
+  - the policies: `autonomy`, `plan.ratification`, `verdict.tree`, `landing.order`, `deps.landing`, `deps.on-parent-withdrawn`, `hooks.bypass`, `core.bypass`, `core.exceptions`, `build.closes`, `card.snapshot`, `run.on-owner-question`, `review.deploy` and `flow.route-backs`.
 - **Memory:** writes the landing record, the transition, the terminal snapshot and the `landed`
   messages, and deletes the lease refs and the mailbox ref.
-- **Runtime:** the lander, the hook, the post-merge bar.
+- **Runtime:** the lander, the hook, the post-merge bar and its verdict record.
 - **Breakpoints:**
   - the landing review, between `deploy.recommend` and `deploy.notify`. It blocks the close, not the
     push, and its findings enter as patch builds by the entry-point table's post-close row;
-  - the owner's landing gate, before `deploy.parents`, under `three-gates` and `every-stage`.
+  - the owner's landing gate, before `deploy.mandate`, under `three-gates` and `every-stage`.
 - **Extension points:**
   - versions and release notes (distribution);
   - promotion through environments, each verify recorded per SHA, with `deploy.on-verify-fail`
@@ -337,15 +355,16 @@ A breakpoint declares three things:
 It blocks as `review.blocks` says. Once disposed, the flow resumes at the item the breakpoint stands
 before.
 
-**An owner breakpoint is an owner item.** It parks the build, and resolves as `run.on-owner-question`
-says (LR-3). Its witness is one of two:
+**An owner breakpoint is an owner item,** held or resolved as `run.on-owner-question` says (LR-3): the
+supervisor's recorded choice under `best-effort-recorded`, the item or the build parked under
+`park-item` or `park-build`, and the run stopped under `stop-run`. Its witness is one of two:
 - the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal
   command or a prompt;
 - under `best-effort-recorded`, the supervisor's recorded choice.
 
 `autonomy` places the owner's gates:
 - `plan-only` places the Plan ratification, unless the request ratifies;
-- `three-gates` adds the design go at `design.exit` and the landing gate before `deploy.parents`;
+- `three-gates` adds the design go at `design.exit` and the landing gate before `deploy.mandate`;
 - `every-stage` adds a gate at every step's exit.
 
 **A reviewer breakpoint runs this program.** Its lens, refute and report items are one harness act,
@@ -386,7 +405,7 @@ Runtime executes the owner's controls (dWellOiledMachine, RT-3). They extend una
 | `life.quiesce` | executor | `life.request` | dispatches nothing new. Each running act finishes within its ceiling. An open review fan finishes, and a prepared merge is discarded | the executor's record of the acts it let finish | pause → parked; withdraw or supersede → `life.notify`; a push already made → refused: the build has landed and closes as landed |
 | `life.notify` | command, idempotent | `life.quiesce` | posts `withdrawn` or `superseded` to dependents, with the replacement's slug | the mailbox posts | `life.snapshot` |
 | `life.snapshot` | command, idempotent | `life.notify` | commits the card's terminal snapshot | the snapshot commit | `life.release` |
-| `life.release` | command, idempotent | `life.snapshot` | deletes the leases and the mailbox ref, and reclaims the build's workspaces | the deleted refs and the workspace record | `life.close` |
+| `life.release` | command, idempotent | `life.snapshot` | deletes the leases, closes the mailbox (`[rules]`), and reclaims the build's workspaces | the deleted refs, the mailbox's messages in the folder, and the workspace record | `life.close` |
 | `life.close` | command | `life.release` | records the terminal transition: withdrawn, or superseded by its replacement | the transition record | closed |
 
 - **A paused build keeps its leases.** The supervisor renews them while it is paused, so
@@ -402,24 +421,31 @@ the engine refuses any transition the table lacks.
 
 | From | On | To | Witness |
 |---|---|---|---|
-| none | `entry.place`: new | planning | the intake record |
-| none | `entry.place`: patch | designing | the patch's derived plan record |
+| none | a placement disposition `new`, from `entry.place`, `entry.place-check` or `entry.place-owner` | planning | the intake record and the disposition |
+| none | triage's select of an ask, filing or proposal | planning | the triage record |
+| none | a placement disposition `patch`, from any of the three | designing | the patch's derived plan record |
 | planning | `plan.exit` | designing | the transition record |
+| planning | triage's defer, retire or refuse | deferred, retired or refused | the triage record |
+| planning | `plan.dedupe`: a duplicate, placed onto the build it matches | merged | the dupes record |
 | designing | `design.exit` | building | the transition record |
 | designing | a fork the goal cannot survive | planning | the plan revision |
 | building | `build.exit` | testing | the transition record |
 | building | a unit or feature re-entry, or a fix unit | designing | the re-entry record |
+| building, testing, or deploying before the push | an amendment admitted at an item boundary | designing | the re-entry record |
 | testing | `test.exit` | deploying | the transition record |
 | testing | a fix pass, or a conflict to resolve | building | the routing record |
 | testing | a new unit through Design | designing | the routing record |
-| deploying | a stale verdict, or the tip moved | testing | the comparison record |
+| deploying | a stale verdict | testing | the comparison record |
+| deploying | `deploy.land`'s exit 1 before the push: a refusal or a race | testing | the lander's exit and its line |
 | deploying | `deploy.close` | landed | the transition record |
 | any open state | `life.request`: pause | paused | the command's record |
 | paused | `life.request`: resume | the state it paused in | the command's record |
 | any open state, before the push | `life.close`: withdrawn | withdrawn | the transition record |
 | any open state, before the push | `life.close`: superseded | superseded | the transition record |
 
-Landed, withdrawn and superseded are terminal.
+Landed, withdrawn, superseded, deferred, retired, refused and merged are terminal. A join is owed
+beside the table (`gap-flow-15`): every cross-step route in an item's `Then` cell has a row, and every
+row is reached by an item, seen red on a planted dropped row.
 
 ## [expansions] What the expansions add to the flow
 
@@ -550,7 +576,7 @@ Two keys join v2's catalogue: `flow.route-backs` (`[rules]`) and, from LR-4,
 | `red-routes-ignore-policy` | amend | `test.route` and `test.attribute` route by `verdict.blocks` and `verdict.red-route`; layer-flow `[settled]` |
 | `unreachable-items` | amend | every table's `Needs` column and routes |
 | `ask-acceptance` | fork, amend | LR-5; `[rules]`: every filed ask states its acceptance |
-| `first-unwitnessed-item` | amend | `[rules]`: `next` returns the frontier |
+| `first-unwitnessed-item` | amend | `[rules]`: `next` returns the frontier; v2's dDeclaredLoop row too |
 | `scope-refusal-stuck` | amend | `build.scope`: a refused stray routes to a revert pass |
 | `maintain-superseded-text` | none | refuted |
 | `gap-13-14-unstated` | amend | layer-flow `[uncovered]` states `gap-flow-13` and `gap-flow-14` |
@@ -558,7 +584,7 @@ Two keys join v2's catalogue: `flow.route-backs` (`[rules]`) and, from LR-4,
 | `lander-rewrites-merge` | amend | `test.merge` is the lander's `--prepare`, and `deploy.land` its `--land` |
 | `verdict-tree-build-tip` | amend | `test.merge` and `deploy.current` under `build-tip` |
 | `presets-fail-build-closes` | fork, amend | LR-4; `[consequences]`; v2's `policy.on-missing-expansion` |
-| `hook-actor-kind` | amend | `entry.intake` is a hook; `test.verdict` is the runner, whose record the pre-push hook reads |
+| `hook-actor-kind` | amend | `entry.intake` is a hook; `test.verdict` is the runner, whose record the pre-push hook reads; layer-flow, v2's contracts and dWitnessedBar's row too |
 | `ask-row-shape` | amend | `[open]` S-2: today's ask row |
 | `lease-ref-history` | amend | the lease record replaces "the lease ref's history" |
 | `merge-read-as-additions` | amend | `[rules]`: range checks read `--first-parent`, without merges |
@@ -586,12 +612,19 @@ Two keys join v2's catalogue: `flow.route-backs` (`[rules]`) and, from LR-4,
 | `unverified-block-stuck` | amend | `[breakpoint]`: a verification round, bounded by `flow.route-backs` |
 | `item-count-readers` | amend | layer-flow `[fit]` points at the items declared here; dated snapshots and research returns keep their counts |
 | `mailbox-prune-orphan` | amend | `deploy.release` and `life.release` prune the mailbox; v2 `[open]` |
-| `turnstile-not-queue` | amend | `[deploy]`'s landing order; `gap-flow-08` gains the missing queue; v2 and the instruction record |
+| `turnstile-not-queue` | amend | `[deploy]`'s landing order; `gap-flow-08` gains the missing queue; v2, the instruction record, flow-roles and the runtime record |
 | `reasoning-field-timing` | amend | `[rules]`: the step's `reason` item, after the score |
 | `tier-preset-guarded` | amend | `[design]`: owed above the tier under `guarded` |
-| `flakes-quarantine-seam` | amend | `test.flakes` extends the bar's `nondeterministic` class, and a flaky leg is held |
+| `flakes-quarantine-seam` | amend | `test.route` sends the bar's `nondeterministic` reds, printed only on a red run, to `test.flakes`, which acts as `verdict.flakes` says |
 | `placement-policy-routes` | amend | `[entry]`: `entry.place-check` and `entry.place-owner` |
 | `disposition-set-gaps` | amend | `[plan]`: select, defer, retire and refuse |
 | `deployer-expansion-mismatch` | amend | `[consequences]`: the deployer registers under distribution and integrations |
 | `instruction-tag-examples` | amend | the instruction layer's R-B, in that layer's fold |
 | `recommendation-source-mismatch` | none | refuted |
+
+**Revised again, 2026-10-16, after the fold's closing review**
+(`reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md`). Its confirmed items are fixed in place here:
+`test.flakes` on the red route as `verdict.flakes` says, the lander's exit classes and the core
+re-check's witness, the transitions the items route, the landing gate before `deploy.mandate`, LR-3's
+wording, one mailbox rule, the acceptance forms cited from memory `[asks]`, and `flow.route-backs` in
+every step's list. The comparison record's `[closing-review]` names each item and where it went.

@@ -108,7 +108,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 44 | the same | Roles layer: Tier-2 review, run B | the same | 1799cb98 | returned, CLEAN WITH FIXES, 43 of 54 confirmed | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-roles-b.md` |
 | 45 | the same | Memory layer: Tier-2 review, run A | the same | 1799cb98 | returned, CLEAN WITH FIXES, 52 of 61 confirmed; its first launch, `wf_c5046686-f17`, stopped when the session ended with no agent completed, and it was relaunched as `wf_b6756400-d03` with the same args | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-memory-a.md` |
 | 46 | the same | Memory layer: Tier-2 review, run B | the same | 1799cb98 | returned, CLEAN WITH FIXES, 51 of 58 confirmed | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-memory-b.md` |
-| 47 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The layers' fold: closing diff review over `e7839224c..9e0e43aef` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | dispatched as `wf_9349d401-2da` | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md` |
+| 47 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The layers' fold: closing diff review over `e7839224c..9e0e43aef` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | returned as `wf_9349d401-2da`, CLEAN WITH FIXES, 28 of 31 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -511,6 +511,31 @@ Rounds 1 and 2 of the layers' reviews, dispatches 39 and 40, were derived from t
 - returned — gov-synthesizer · wrote 1 file · 6m39s · 49.4k out · run wf_ec731bfc-925/a7e0e4c409bfc1ecf
 ```
 
+The fold's closing review, dispatch 47, derived from its Workflow run the same way:
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, diff-review round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9349d401-2da/a22fa91eff1847c89
+- returned — workflow-subagent · wrote 0 files · 13s · 780 out · run wf_9349d401-2da/a22fa91eff1847c89
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:correctness · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9349d401-2da/a28923d5e4a79de5c
+- returned — gov-diff-reviewer · wrote 0 files · 8m25s · 48.6k out · run wf_9349d401-2da/a28923d5e4a79de5c
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:seams · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9349d401-2da/a8a0dac8e36427a16
+- returned — gov-diff-reviewer · wrote 0 files · 6m41s · 39.5k out · run wf_9349d401-2da/a8a0dac8e36427a16
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:verification · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9349d401-2da/a563760a1a72000a6
+- returned — gov-diff-reviewer · wrote 0 files · 3m55s · 21.2k out · run wf_9349d401-2da/a563760a1a72000a6
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-1-7 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9349d401-2da/a9d70b3880e676f4e
+- returned — gov-skeptic · wrote 0 files · 2m11s · 12.7k out · run wf_9349d401-2da/a9d70b3880e676f4e
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-8-14 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9349d401-2da/aed09aa8032944703
+- returned — gov-skeptic · wrote 0 files · 2m24s · 13.5k out · run wf_9349d401-2da/aed09aa8032944703
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-15-21 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9349d401-2da/aaa90bb21b6589995
+- returned — gov-skeptic · wrote 0 files · 2m21s · 12.9k out · run wf_9349d401-2da/aaa90bb21b6589995
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-22-28 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9349d401-2da/a460dbb18000be913
+- returned — gov-skeptic · wrote 0 files · 2m01s · 11.7k out · run wf_9349d401-2da/a460dbb18000be913
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-29-31 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9349d401-2da/aff8c7988a7b3f274
+- returned — gov-skeptic · wrote 0 files · 1m11s · 6.9k out · run wf_9349d401-2da/aff8c7988a7b3f274
+- agent — gov-synthesizer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_9349d401-2da/a1086d6f99f896fd7
+- returned — gov-synthesizer · wrote 1 file · 3m40s · 29.8k out · run wf_9349d401-2da/a1086d6f99f896fd7
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -798,7 +823,15 @@ Rounds 1 and 2 of the layers' reviews, dispatches 39 and 40, were derived from t
   - the id parser moves into memory-tree, and the decision log keeps its path, append-only;
   - `gap-mem-12` joined the register, one item went to the re-cut, and 5 defects were refuted.
 
-  All four layers are folded: 206 defects placed, and every map row's disposition set.
+  All four layers are folded: 227 map rows placed, 206 of them confirmed defects and 21 refuted, each
+  with its disposition set.
+
+- 2026-10-16, session 1799cb98: dispatch 47, the fold's closing review, returned CLEAN WITH FIXES:
+  28 of 31 findings confirmed, in 24 items, 2 of them high. 23 items were fixed in place, and the
+  comparison record's `[closing-review]` says where. One item, the acceptance owed by core asks that
+  fit no mechanical form, went to the owner as LR-7. Three classes joined `memory/gotchas/`:
+  `route-names-an-output-its-actor-never-emits`, `owner-item-without-its-reject-outcome` and
+  `parser-drops-rows-it-cannot-place`.
 
 ## Instruments
 
@@ -1207,6 +1240,7 @@ Runs, 2026-10-14:
 | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-{instruction,flow,roles,memory}-{a,b}.md` | The eight Tier-2 reports on layers 1 to 4, two per layer, as their synthesizers wrote them. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared.md` | Layers 1 to 4's rounds compared defect by defect: the runs, the five layers side by side, the patterns, the fold plan, the forks LR-1 to LR-6, and every finding placed on its defect. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` | That comparison's instruments, as fenced text: the args generator and the args, the comparison and summary scripts, their output, and the runs that saw each red. |
+| `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md` | The fold's closing review, a light diff review over the four fold commits, as its synthesizer wrote it. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-{executor,spawn,hooks,sessions}.md` | The runtime round's four researcher returns, verbatim. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-instruments.md` | The runtime researchers' probe scripts, as fenced text, with the one lost probe noted. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-instruments.md` | The lexicon researchers' probe files, as fenced text. |

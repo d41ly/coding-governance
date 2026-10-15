@@ -51,7 +51,8 @@ researchers of 2026-10-14 cover the field, and their records are cited where use
     headless act has no subagent agent id.
 - **The item cycle** (flow-roles `[cycle]`):
   1. `next` names the item and its actor.
-  2. The driver hands the prompt writer the item's details, with references to its input records.
+  2. The driver hands the prompt writer the item's resolved work order: its inputs as keyed content,
+     and references only for optional depth (flow-roles `[cycle]`, as the fold amended it).
   3. The executor wraps the prompt in the work order and spawns a fresh agent.
   4. The role returns a filled template through a schema-forced channel.
   5. The driver resolves the witness.
@@ -410,13 +411,15 @@ matrix from the step definitions as folded:
 - **The prompt writer and the driver** act in no item. The prompt writer is a cycle role: it acts in
   every role item's cycle, framing each work order (`[roster]`, flow-roles `[cycle]`). The driver
   routes and never works.
-- **The check has three arms**, each a finding:
+- **The check has four arms**, each a finding:
+  - every item row sits under a step's heading, and every step holds an item, since a parser that
+    skips what it cannot place reports a clean run (arm 0, added after the fold's closing review);
   - every item's actor is a command, the executor, a hook, the owner, or a declared item role;
   - every core item role acts in at least one core item;
   - no core item names an expansion role (P28).
 - **Seen red:** each arm on a planted copy of the step definitions, one line changed: a misspelled
-  role, a core role left with no item, an expansion role in a core item, and a cycle role in an item.
-  On the records as written it exits 0.
+  role, a core role left with no item, an expansion role in a core item, a cycle role in an item, and
+  a step's heading renamed. On the records as written it exits 0.
 - **Each role's static block renders only its own row**: the items it acts in, each with its inputs and
   its return. A builder never loads the loop.
 - **Built from data.** Once dDeclaredLoop's loop definition declares the items as data, the matrix is
@@ -1104,7 +1107,9 @@ UNMATCHED entry: entry.intake: nobody
 ### `role_matrix.py`, revised 2026-10-16
 
 The fold's revision reads each Actor cell's opening only, takes the roster from `[roster]`, and
-implements all three arms:
+implements all three arms. After the fold's closing review (M16), arm 0 refuses an item row under a
+heading that names no step, and a step with no item. Before it, a renamed heading dropped its items
+and the run still printed `findings 0`:
 
 ```python
 """Derive the role-by-step matrix from the step definitions, and check it against the roster both ways.
@@ -1114,7 +1119,9 @@ at the first comma, colon or parenthesis. Nothing after that is read, so prose n
 The roster is the roles record's `[roster]` table: each role's layer, and whether it acts as an item
 role or as a cycle role, which acts in every role item's cycle and in no item.
 
-Three arms, each a finding (exit 1 if any):
+Four arms, each a finding (exit 1 if any):
+  0. every item row sits under a step's heading, and every step holds at least one item, since a
+     parser that skips what it cannot place reports a clean run;
   1. every item's actor is a command, the executor, a hook, the owner, or a declared item role;
   2. every core item role acts in at least one core item;
   3. no core item names an expansion role (P28).
@@ -1153,15 +1160,20 @@ def main(argv):
     matrix = collections.defaultdict(lambda: collections.defaultdict(list))
     findings = []
     items = 0
+    per_step = collections.Counter()
     for line in steps_text.splitlines():
-        h = re.match(r"^## \[([a-z]+)\]", line)
+        h = re.match(r"^## \[([a-z-]+)\]", line)
         if h:
-            step = h.group(1) if h.group(1) in STEPS else None
+            step = h.group(1)
             continue
         row = re.match(r"^\| `([a-z]+\.[a-z0-9-]+)` \| ([^|]+) \|", line)
         if not row or step is None:
             continue
+        if step not in STEPS:
+            findings.append(f"arm 0: {row.group(1)} sits under [{step}], which is no step the matrix reads")
+            continue
         items += 1
+        per_step[step] += 1
         item, actor = row.group(1), actor_of(row.group(2))
         if actor in KINDS:
             matrix[actor][step].append(item)
@@ -1175,6 +1187,9 @@ def main(argv):
         if roles[actor]["layer"] != "core":
             findings.append(f"arm 3: {item}: core item names the expansion role '{actor}' ({roles[actor]['layer']})")
         matrix[actor][step].append(item)
+    for s in STEPS:
+        if per_step[s] == 0:
+            findings.append(f"arm 0: step [{s}] holds no item")
     for name, r in roles.items():
         if r["layer"] == "core" and not r["cycle"] and name not in matrix:
             findings.append(f"arm 2: core role '{name}' acts in no core item")
@@ -1226,6 +1241,17 @@ exit 1
 $ planted: `plan.reason`'s actor changed to the cycle role `prompt writer` (1 line changed)
 items 71; actor-item pairs 70; actors 15; items with a role 18; cycle roles 1; findings 1
 FINDING arm 1: plan.reason: 'prompt writer' is a cycle role, and acts in no item
+exit 1
+
+$ planted: the [lifecycle] heading renamed [controls] (1 line changed)
+items 65; actor-item pairs 65; actors 15; items with a role 19; cycle roles 1; findings 7
+FINDING arm 0: life.request sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.quiesce sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.notify sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.snapshot sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.release sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.close sits under [controls], which is no step the matrix reads
+FINDING arm 0: step [lifecycle] holds no item
 exit 1
 ```
 

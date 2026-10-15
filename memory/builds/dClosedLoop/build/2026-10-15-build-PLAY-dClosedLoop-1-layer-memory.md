@@ -311,9 +311,12 @@ once, with:
 
 One write command, `record`, is the only writer of authored record structure, as R-I's command is
 for instructions:
-- it mints the id, under the build's lease, so two clones never mint one sequence number; a slug is
-  checked against the remote's claims before it is minted (`check_slug_claimed`), and the charter's
-  `[ids]` rule holds: the session that owns an id mints it;
+- it mints the id under a lock held at each mint point. A build's slug is claimed first, by
+  compare-and-swap against the remote's claims (`check_slug_claimed`), at `plan.input`. The records a
+  build writes before its lease (intake, dupes, triage, plan) mint under that claim, and every later
+  one under the build's lease, taken at `plan.lease`. An ask filed outside any build mints under its
+  family's claim ref. So two clones never mint one id, and the charter's `[ids]` rule holds: the
+  session that owns an id mints it;
 - it is idempotent and content-addressed: a write is keyed by its kind's key, an id or a content key
   such as a return's task-sha. Replaying an equal write is a no-op. A different value under an
   existing key is refused, or versioned where the kind's lifecycle says so. Runtime's take-over
@@ -481,7 +484,10 @@ records. Neither may instruct by being recalled.
        `gov:feature` check counts a proposed entry;
      - the owner's disposition of the proposal is an owner item, and the entry renders into work
        orders once accepted;
-     - best effort never accepts it, since `instructions.edit` is a guard that presets never touch.
+     - best effort never accepts it, since `instructions.edit` is a guard that presets never touch;
+     - the owner item has three dispositions: accept, and the entry renders; reject and remove, and a
+       patch build removes the landed `gov:feature` anchor; reject and keep, and the entry stays
+       `rejected`, never rendered, which the both-ways check accepts.
    - **The owner's examples:**
      - the media picker becomes "MUST reuse the media picker wherever an image, video or media
        selector is needed", triggered by the need, anchored to `gov:feature media-picker`;
@@ -619,17 +625,21 @@ Around it:
   aKeyedAnnotation's shipped-evidence signal intact. The build's first test re-reads its numbers:
   signal 2 must discriminate before and after.
 - **`gov:feature <tag>` marks the canonical implementation of a reuse entry.** It is checked both
-  ways with the entry: the entry's anchor resolves, and every feature tag has an entry, proposed or
-  accepted (LR-6). This is the owner's "code tag references". A second `gov:feature` line for one tag is
+  ways with the entry: the entry's anchor resolves, and every feature tag has an entry, proposed,
+  accepted, or rejected and kept (LR-6). This is the owner's "code tag references". A second `gov:feature` line for one tag is
   a finding, and a file with no extractor pack cannot hold an anchor.
 - **A generated annotation index** comes from the map's comment lexer, which today strips comments. The
   lexer gains a profile chosen by shebang for extensionless files, the git hooks among them, and reads
   Python docstrings. The index is queried by tag and never loaded whole.
-- **References must resolve.** The resolve check extends drift-audit's
-  `source_cited_ids_resolving_to_no_record`, pinned at 2 and held shrink-only by a RATCHETS row.
+- **References must resolve, and the check is a gate.** drift-audit's
+  `source_cited_ids_resolving_to_no_record` is report-only today: it is not gateable, so crossing its
+  pin of 2 never blocks a merge, and it counts ids only. The resolve check is a gate leg built on its
+  function, `build_source_cited_ids_with_no_record`, extended to read `gov:note … refs=` ids and paths
+  and `gov:feature` tags. Its pin stays shrink-only through the RATCHETS row.
   - Its first green proves nothing: no `gov:note` or `gov:feature` line and no reuse part exists, so
-    the population is empty. The check is seen red on a planted dangling reference before it is
-    trusted, and asserts a non-empty population once the first annotation lands.
+    the population is empty. Three planted red cases are owed, each seen red before the check is
+    trusted: a dangling `refs=` id, a dangling `refs=` path, and a `gov:feature` tag with no entry.
+    The check asserts a non-empty population once the first annotation lands.
   - Over every comment-cited id, 35 ids resolve nowhere: fixture ids and foreign families such as `PKG`
     and `ARCH`. Each class is an exemption row in the check's registry.
 - **ANNOTATION-STYLE.md changes with it.** The grammar and the required anchor overturn its A1 (no
@@ -985,7 +995,7 @@ and its map's `disposition` cells point here. Each defect's fix sits in place, i
 | `stale-runlog-unchanged` | amend | `[tools]`: runlog re-engineered, its journal grammar in the core |
 | `slug-date-text-stale` | amend | `[names]`: `none` by F4-7, and what `shown` and `in-slug` do |
 | `record-idempotence` | amend | `[contract]`: `record` is idempotent and content-addressed |
-| `record-concurrent-mint` | amend | `[contract]`: minted under the build's lease, slugs checked against the remote's claims |
+| `record-concurrent-mint` | amend | `[contract]`: a lock at each mint point: the slug claim, then the build's lease |
 | `kind-list-incomplete` | amend | `[contract]`: each layer registers its kinds; the run record, the backlog row and the witness class added |
 | `ref-homed-kinds` | amend | `[contract]`: a home is a path or a ref |
 | `generated-kinds-door` | amend | `[contract]`: one door per kind, generators for generated kinds |
@@ -1018,7 +1028,7 @@ and its map's `disposition` cells point here. Each defect's fix sits in place, i
 | `supersession-seam` | amend | `[decisions]` 2: check 27 and `derive_supersession_map` |
 | `amends-vs-frozen-spec` | amend | `[relations]`: `amends` names a new unit, and `@rev-N` is dropped |
 | `reuse-entry-two-doors` | fork, amend | LR-6; `[decisions]` 1 and `[contract]`: the instruction command is the one door |
-| `reuse-entry-proposal-path` | fork, amend | LR-6; `[decisions]` 1: proposed with the build |
+| `reuse-entry-proposal-path` | fork, amend | LR-6; `[decisions]` 1: proposed with the build, and the owner's three dispositions |
 | `reuse-entry-level` | none | refuted |
 | `reuse-entry-should` | amend | `[decisions]` 1: a MUST with its trigger, ranked by a field |
 | `reuse-affordance-seam` | amend | `[decisions]` 1 extends the `## Reuse affordance` block; `gap-mem-03` |
@@ -1040,9 +1050,9 @@ and its map's `disposition` cells point here. Each defect's fix sits in place, i
 | `callers-restale` | amend | `[map]`: callers generated on demand, never tracked |
 | `dossier-anchor-seam` | amend | `[map]`: dossiers extend `[claims]` and `measure_dossier_staleness` |
 | `inventory-counts` | amend | `[current]`'s tooling counts; `gap-tool-06` |
-| `annotation-green-vacuous` | amend | `[annotations]`: seen red on a planted reference; a non-empty population once one lands |
+| `annotation-green-vacuous` | amend | `[annotations]`: a gate leg with three planted red cases owed; a non-empty population once one lands |
 | `dangling-ids-exist` | amend | `[annotations]`: 35 ids, each class an exemption row |
-| `resolve-check-seam` | amend | `[annotations]`: the check extends drift-audit's signal |
+| `resolve-check-seam` | amend | `[annotations]`: a gate leg on drift-audit's function, since its signal is report-only |
 | `lexer-blind-spots` | amend | `[annotations]`: a shebang profile, and docstrings |
 | `annotation-grammar-inputs` | none | refuted |
 | `feature-anchor-cases` | amend | `[annotations]`: one anchor per tag; no anchor without a pack |

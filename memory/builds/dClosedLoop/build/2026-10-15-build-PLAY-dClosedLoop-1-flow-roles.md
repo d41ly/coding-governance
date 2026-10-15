@@ -241,7 +241,8 @@ Every item, amendments at transitions. Answer: Every item, plus an intake kind (
   an allowed value each adopter can choose.
 - **Landings on a node pass through the turnstile landing queue that already exists.** How that
   tooling fits the new architecture is reviewed at the lower-level step, with the other mechanical
-  processes.
+  processes. Revised: 2026-10-16: no landing queue exists. The turnstile is the host-wide bar
+  semaphore, and `push-main.sh` never takes it, so dShippedRelease builds the queue (`gap-flow-08`).
 - **A dependent build's landing waits for its parent's** (`deps.landing`, default
   `hold-until-parent-lands`, with `test-decides` allowed).
 - **The executor reads the build's mailbox at every item boundary** (`mailbox.reads`, default
@@ -295,7 +296,7 @@ request's mandate, recorded for you. Is that right?"** Offered: Yes, even goal-l
 | H4 actors per item | the roles layer's item map |
 | H5 an amendment without the lease | FR-8: the `intake` message kind |
 | H6 parallel units in one worktree | FR-5: commits queued; own worktree allowed |
-| H7 the primary tree at landing | FR-6: the existing turnstile landing queue; tooling reviewed later |
+| H7 the primary tree at landing | FR-6: a landing queue, which dShippedRelease builds (`gap-flow-08`; revised 2026-10-16, since none exists); tooling reviewed later |
 | H8 review of review-born units | FR-9: `review.follow-up` |
 | H9 when the mailbox is read | FR-8: `mailbox.reads` |
 | H10 backward transitions | FR-11 |

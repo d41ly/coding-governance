@@ -926,18 +926,21 @@ $ planted: a [revised] row for a defect the map lacks, `ghost-defect`, appended 
 exit 1
 ```
 
-`tally_folded.py` counts the dispositions and writes `[folded]` in the comparison record:
+`tally_folded.py` counts the dispositions and writes `[folded]` in the comparison record. After the fold's
+closing review (L6) it takes `--record`, so its refusal can be seen red on a copy:
 
 ```python
 """Tally each layer map's dispositions in the comparison record, and write its [folded] section.
 
-Usage: python tally_folded.py [--write]
+Usage: python tally_folded.py [--record <path>] [--write]
 Reads the four `[map-<layer>]` tables; each row's last cell opens with its disposition, before `;`.
 """
 import re
 import sys
 
 C = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared.md"
+if "--record" in sys.argv:
+    C = sys.argv[sys.argv.index("--record") + 1]
 KINDS = ["amend", "amend, gap", "fork, amend", "owed", "none"]
 text = open(C, encoding="utf-8", newline="").read()
 rows, tot = [], {k: 0 for k in KINDS}
@@ -956,7 +959,7 @@ for layer in ("instruction", "flow", "roles", "memory"):
 table = ["| Layer | " + " | ".join(KINDS) + " | Rows |", "|---|" + "---|" * (len(KINDS) + 1)]
 for layer, c in rows + [("all four", tot)]:
     table.append(f"| {layer} | " + " | ".join(str(c[k]) for k in KINDS) + f" | {sum(c.values())} |")
-section = """## [folded] Where the defects went, 2026-10-16
+section = """## [folded] Where every map row went, 2026-10-16
 
 Each layer record's `[revised]` names where every defect's fix sits, and the maps' `disposition` cells
 point there. `tally_folded.py` (the instruments record) counts the cells:
@@ -979,6 +982,24 @@ if "--write" in sys.argv:
         text = text.replace("\n## [map-instruction]", "\n" + section + "\n## [map-instruction]", 1)
     open(C, "w", encoding="utf-8", newline="").write(text)
     print("[folded] written")
+```
+
+Its run, then its refusal on a planted copy, which left the record untouched:
+
+```text
+$ python tally_folded.py
+| Layer | amend | amend, gap | fork, amend | owed | none | Rows |
+|---|---|---|---|---|---|---|
+| instruction | 43 | 3 | 1 | 1 | 6 | 54 |
+| flow | 51 | 2 | 4 | 0 | 4 | 61 |
+| roles | 32 | 0 | 1 | 0 | 6 | 39 |
+| memory | 63 | 1 | 3 | 1 | 5 | 73 |
+| all four | 189 | 6 | 9 | 2 | 21 | 227 |
+exit 0
+
+$ planted: one instruction row's disposition misspelled `ammend` (1 line changed)
+instruction: unknown disposition 'ammend'
+exit 1
 ```
 
 ## [fold-review] The fold's closing review

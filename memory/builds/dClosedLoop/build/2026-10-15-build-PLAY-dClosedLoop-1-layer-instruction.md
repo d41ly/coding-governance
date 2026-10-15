@@ -446,6 +446,8 @@ Proposed gaps, each with its proposed owner build. The register holds them as `g
   - The budgets extend `tools/template-size-limits.txt` and `check-template-size.sh`, with their
     high-water ratchet and the owner's rule for who may raise a row. A new load point joins that
     table.
+  - The role block is the exception: its carrier is `check_roles.py`'s `BODY_CEILINGS` (roles
+    `[tags]`), which the render reads for a role file. Each load point has one carrier.
 - Load points come in two classes:
   - **Rendered**, which gov writes: the charter, role files, Skills and work orders. The render refuses
     a set over budget, which is too much. It refuses a set missing a unit that a role or item names in

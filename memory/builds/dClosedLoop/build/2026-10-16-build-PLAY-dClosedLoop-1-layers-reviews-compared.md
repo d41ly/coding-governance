@@ -281,7 +281,7 @@ What each answer changes, applied by the fold:
   entry renders into work orders once accepted. The record kind list drops the reuse entry, so its one
   door is the instruction command.
 
-## [folded] Where the defects went, 2026-10-16
+## [folded] Where every map row went, 2026-10-16
 
 Each layer record's `[revised]` names where every defect's fix sits, and the maps' `disposition` cells
 point there. `tally_folded.py` (the instruments record) counts the cells:
@@ -299,6 +299,44 @@ point there. `tally_folded.py` (the instruments record) counts the cells:
 - **The gaps registered:** `gap-rt-11` to `gap-rt-14`, `gap-flow-15` and `gap-mem-12`.
 - **The keys added to v2:** `instructions.proof`, `flow.route-backs`, and `policy.on-missing-expansion`
   from LR-4.
+
+## [closing-review] The fold's closing review, folded 2026-10-16
+
+Dispatch 47 reviewed the fold's four commits, `e7839224c..9e0e43aef`, at light intensity
+(`reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md`): CLEAN WITH FIXES, 28 of 31 findings
+confirmed, in 24 items. Ids 13, 14 and 27 were refuted. Each item went here:
+
+| Item | Ids | Disposition | Where the fix sits | Its class |
+|---|---|---|---|---|
+| H1 | 1 | fixed | flow-steps: `test.verdict`, `test.route`, `test.flakes` and `test.recommend` | `route-names-an-output-its-actor-never-emits`, new |
+| H2 | 2, 17 | fixed | flow-steps: `deploy.land`'s exit classes, `deploy.core`, `deploy.record`, the core re-check's witness, and exit 1's two meanings | the same |
+| M1 | 3 | fixed | `deploy.land` runs `--land` with `GOV_PUSH_MAIN_MAX_RETRIES=1`, so a race returns to Test | the same |
+| M2 | 4, 20, 30 | fixed | `[transitions]`: rows for every entry item, triage's select and disposals, a duplicate, amendments, and `deploy.land`'s refusal; the join owed in `gap-flow-15` | `two-answers-to-one-question` |
+| M3 | 5 | fixed | the landing gate stands before `deploy.mandate`, in all three places | `two-answers-to-one-question` |
+| M4 | 6 | fixed | `[breakpoint]`: held or resolved as `run.on-owner-question` says; v2's dBoundRoles row | `amendment-leaves-its-other-half-standing` |
+| M5 | 7 | fixed | `[rules]`: one mailbox rule, cited by `deploy.release` and `life.release`; v2's `[open]` | `two-answers-to-one-question` |
+| M6 | 9, 21 | fork | LR-7, put to the owner: which acceptance the core asks that fit no mechanical form state | none yet |
+| M7 | 11 | fixed | memory `[contract]`: a lock at each mint point, the slug claim, then the build's lease | `invariant-held-on-one-admission-path` |
+| M8 | 12 | fixed | memory `[decisions]` 1 and `[annotations]`: the owner item's three dispositions | `owner-item-without-its-reject-outcome`, new |
+| M9 | 18 | fixed | with H2: `deploy.core` starts the bar where the lander started none | `route-names-an-output-its-actor-never-emits` |
+| M10 | 19 | fixed | `test.flakes` acts as `verdict.flakes` says, and a held product leg is named; the policy-list join owed in `gap-flow-15` | `route-names-an-output-its-actor-never-emits` |
+| M11 | 22 | fixed | v2's dDeclaredLoop row returns the frontier | `amendment-leaves-its-other-half-standing` |
+| M12 | 23 | fixed | the runner writes Test's verdict in layer-flow, v2's contracts and dWitnessedBar's row | `amendment-leaves-its-other-half-standing` |
+| M13 | 24 | fixed | flow-roles' FR-6 and H7, and the runtime record's two rows, under dated notes | `amendment-leaves-its-other-half-standing` |
+| M14 | 26 | fixed | instruction R-C: `BODY_CEILINGS` carries the role block | `two-answers-to-one-question` |
+| M15 | 28 | fixed | memory `[annotations]`: the resolve check is a gate leg, with three planted red cases owed | `fixture-passes-by-finding-nothing` |
+| M16 | 29 | fixed | `role_matrix.py`'s arm 0, seen red on a renamed section (the roles record's `[instrument]`) | `parser-drops-rows-it-cannot-place`, new |
+| L1 | 8 | fixed | with M11 | `amendment-leaves-its-other-half-standing` |
+| L2 | 10 | fixed | flow-steps' `[rules]` cites memory `[asks]` | `two-answers-to-one-question` |
+| L3 | 15 | fixed | the session log's event; `[folded]`'s heading counts map rows | `two-answers-to-one-question` |
+| L4 | 16 | fixed | `flow.route-backs` in every step's policy list | `amendment-leaves-its-other-half-standing` |
+| L5 | 25 | fixed | layer-roles `[settled]`'s step 2 | `amendment-leaves-its-other-half-standing` |
+| L6 | 31 | fixed | `tally_folded.py` takes `--record`, and its run and refusal are recorded (the instruments record) | `fixture-passes-by-finding-nothing` |
+
+- **The left-shift.** Every item's class is a catalogue entry: three are new under `memory/gotchas/`,
+  and the rest are existing classes. No gate fits a design record's prose. The checks owed instead
+  are dDeclaredLoop's join beside `gap-flow-15` and the planted cases each fix names.
+- **The two high items were fixed in place,** and no follow-up round has reviewed those fixes.
 
 ## [map-instruction] The instruction layer's findings, placed
 
