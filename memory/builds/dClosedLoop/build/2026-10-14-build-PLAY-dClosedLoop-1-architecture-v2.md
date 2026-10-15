@@ -130,6 +130,12 @@ Revised: 2026-10-15, after layers round two (`build/2026-10-15-build-PLAY-dClose
 - `gap-flow-10` to `gap-flow-14` join the register. The item audit's findings are owned as item
   declarations by dDeclaredLoop.
 
+Revised: 2026-10-15, after the step definitions (`build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md`): four keys join the catalogue and the presets:
+- `review.design.rounds`, one round by default;
+- `review.design.round-count`;
+- `review.unverified`, an ask by default;
+- `tests.without-cadence`, running at landing by default.
+
 ## [layers] The product's layers
 
 A layer is a capability named by a tag. A kit implements layers, and its descriptor declares the layer
@@ -383,6 +389,10 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 | `instructions.edit` | owner-command-agents-propose, flow-only, command-for-all | owner-command-agents-propose | layers round one, the owner's write path |
 | `review.breakpoints` | a set of named item boundaries | none | layers round two: breakpoints beyond those `review.<stage>` and `autonomy` declare |
 | `deps.on-parent-withdrawn` | replan, adopt-parent-work, withdraw-too | replan | layers round two |
+| `review.design.rounds` | one, until-no-blocker, until-no-high, until-clean, fixed-count | one | flow steps: the owner's "1 spec review by default" |
+| `review.design.round-count` | a round count | 2 | flow steps; read only under `fixed-count` |
+| `review.unverified` | ask, block, record | ask | flow steps |
+| `tests.without-cadence` | run-at-landing, report-unrun, wait-for-expansion | run-at-landing | flow steps: the slower levels when observability's Maintain is not installed |
 | `verdict` | local-hook, peer-node, remote-ci | local-hook | R1.3, R4.4, R5.2 |
 | `verdict.blocks` | own-mixed-contended, every-red, own-only | own-only | walk T1 |
 | `verdict.held` | peer-or-cadence, push-selected, on-demand | on-demand | walk T2 |
@@ -515,6 +525,10 @@ repository on either overrides `verdict` to `local-hook`.
 | `instructions.checks` | warn | refuse | refuse | refuse |
 | `review.breakpoints` | none | none | none | none |
 | `deps.on-parent-withdrawn` | replan | replan | replan | replan |
+| `review.design.rounds` | one | one | until-no-high | until-no-blocker |
+| `review.design.round-count` | 2 | 2 | 2 | 2 |
+| `review.unverified` | record | ask | block | ask |
+| `tests.without-cadence` | report-unrun | run-at-landing | run-at-landing | run-at-landing |
 | `verdict` | local-hook | local-hook | peer-node | peer-node |
 | `verdict.blocks` | own-only | own-only | every-red | own-mixed-contended |
 | `verdict.held` | on-demand | on-demand | peer-or-cadence | peer-or-cadence |

@@ -131,6 +131,9 @@ posted to dependents. The build moves through Design whole (FL-D1).
     transition and the confirmed messages.
 - **Runtime:** the fan-out bound, the design index.
 - **Breakpoints:** the spec audit at `design.exit`, opt-in by default and owed under `strict`.
+  - It runs one round by default.
+  - `review.design.rounds` allows four other rules: rounds until no BLOCKER, until no HIGH, until
+    clean, or a fixed count (`review.design.round-count`).
 - **Extension points:**
   - the map, recall and bug classes for `design.seams`, the lexicon for naming, and the research
     library (knowledge);
@@ -196,7 +199,7 @@ posted to dependents. The build moves through Design whole (FL-D1).
 | Item | Actor | Does | Proven by | Then |
 |---|---|---|---|---|
 | `test.merge` | command | merges the build onto the default branch's current tip, in Test's worktree | the merge SHA and its tree hash | merged → `test.select`; a conflict → Build for a resolution pass, or the architect when an interface clashes |
-| `test.select` | command | selects the legs the paths claim, the declared product-test levels (`tests.landing-levels`) and the held legs (`verdict.held`) | the selection record | `test.verdict` |
+| `test.select` | command | selects the legs the paths claim, the declared product-test levels (`tests.landing-levels`) and the held legs (`verdict.held`); without observability's Maintain, the levels left to its cadence too, as `tests.without-cadence` says | the selection record | `test.verdict` |
 | `test.verdict` | command: the bar, through the hook, on the declared backend | runs the bar; the hook writes the verdict for the tree | the hook-written verdict per tree hash | green → `test.flakes` and `test.seen-red`; red → `test.attribute`; stale → `test.merge` |
 | `test.attribute` | tester | classifies each red and names its route | a computed join: every red leg in the verdict has one disposition, and the artifact each disposition names exists | code misses its spec → a fix pass in Build; spec wrong → a new unit through Design; inherited, mixed, contended or a dead probe → an ask |
 | `test.flakes` | command | records flakes, and quarantines them past the threshold | the flake record, a flow record kind | a quarantine → an ask |
@@ -282,7 +285,7 @@ is hook-written. A reviewer breakpoint runs this program:
 | `review.lens` | reviewer, one per lens, within the fan-out bound | reviews through the lens | findings, each tagged with a class from the registered core set | `review.refute` |
 | `review.refute` | skeptic | tries to refute each finding | a verdict per finding: confirmed, refuted or unverified | `review.report` |
 | `review.report` | synthesizer | merges the findings into one report | the report under the build's `reviews/` | `review.dispose` |
-| `review.dispose` | command | disposes each confirmed finding by `review.findings` into new units or asks; counts each class by its tag (`review.left-shift`); turns an earned gate into a patch-build intake | each disposition joined to its unit or ask id | disposed → released, with a follow-up round as `review.follow-up` says |
+| `review.dispose` | command | disposes each confirmed finding by `review.findings` into new units or asks; counts each class by its tag (`review.left-shift`); turns an earned gate into a patch-build intake; files each unverified finding as `review.unverified` says, an ask by default | each disposition joined to its unit or ask id | disposed → released, with a follow-up round as `review.follow-up` says |
 | `review.cost` | command | records the review's cost in its report | the cost field | done |
 
 - **Instruction:**
@@ -317,4 +320,58 @@ is hook-written. A reviewer breakpoint runs this program:
   - under any other value, it is an owner breakpoint at `plan.exit`.
 - **`build.closes`'s two other values exist only with their expansions,** and the policy check refuses
   them otherwise.
-- **Three questions are open** (`[open]`).
+- **Three questions were put to the owner** (`[open]`).
+
+## [open] Asked, 2026-10-15
+
+**S-1. "When does a Design spec audit stop running rounds?"**
+- Offered:
+  - After a round with no HIGH (Recommended);
+  - While rounds still find;
+  - A fixed number of rounds.
+- Answer, in the owner's words: "1 spec review by default, as it is now. This is an owner-adjustable
+  setting - until no BLOCKER, no HIGH, or no findings at all, or a set number of rounds."
+- Settled: `review.design.rounds`, `one` by default, with `until-no-blocker`, `until-no-high`,
+  `until-clean` and `fixed-count` allowed. `review.design.round-count` holds the count, and is read
+  only under `fixed-count`.
+
+**S-2. "What happens to a review finding the skeptic can neither confirm nor refute?"**
+- Offered:
+  - File it as an ask (Recommended);
+  - Block until verified;
+  - Record only.
+- Answer, in the owner's words: "FIle it as an ask by default (what is an 'ask' in this case? build
+  unit? backlog item?), the rest are owner-adjustable settings."
+- Settled: `review.unverified`, `ask` by default, with `block` and `record` allowed.
+- **What an ask is.** An ask is a backlog item, not a unit. Today it is a row in the raising build's
+  `BACKLOG.md` (`BACKLOG_MODE = builds`, `memory/HYGIENE.md` `[Backlog layout]`). The row carries:
+  - its own id;
+  - a status and a severity;
+  - the evidence: the file at a SHA, and the command that shows the problem;
+  - an acceptance, the check that says when the ask is resolved.
+
+  `backlog/<FAMILY>.md` is generated from those rows. A unit belongs to a build's roster and is
+  built in that build. An ask waits outside every roster until Plan's triage selects it, as a patch
+  build at Design or a unit of a planned build, or retires it.
+- **An unverified finding filed as an ask** carries the reviewer's evidence and the skeptic's
+  inconclusive verdict. Its acceptance is that a review round confirms or refutes it.
+- **For the memory layer:** core flow items file asks. Among them are Test's inherited, mixed,
+  contended and dead-probe reds, flake quarantines, scope strays, and unverified findings. So the
+  ask register is core memory, even though the owner listed "backlog functionality" among the
+  bookkeeping expansions. Its generated index, rotation and labels can stay in the expansion.
+
+**S-3. "Without observability's Maintain, who runs the slower test levels (end-to-end, performance)
+that today wait for its cadence?"**
+- Offered:
+  - Run them at landing (Recommended);
+  - Report them unrun;
+  - Wait for the expansion.
+- Answer, in the owner's words: "Run them at landing by default, other options as owner-adjustable
+  settings."
+- Settled: `tests.without-cadence`, `run-at-landing` by default, with `report-unrun` and
+  `wait-for-expansion` allowed.
+
+**Presets.** Each preset's values follow its stance:
+- `strict` sets rounds until no HIGH, and blocks on an unverified finding;
+- `guarded` sets rounds until no BLOCKER;
+- `velocity` only records unverified findings, and reports the slower levels unrun.

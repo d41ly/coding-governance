@@ -225,6 +225,13 @@ way and held from the ledger:
 - 2026-10-15, session 1799cb98: before layer 3, the owner asked for each flow step to be defined.
   Entry, the five core steps and the breakpoint were defined item by item, from the audit with its
   fixes applied. Three open questions were put to the owner.
+- 2026-10-15, session 1799cb98: the owner answered all three:
+  - one spec-audit round by default (`review.design.rounds`);
+  - an unverified finding filed as an ask (`review.unverified`), with the owner's question about
+    what an ask is answered in the record;
+  - the slower test levels run at landing without Maintain (`tests.without-cadence`).
+
+  Four keys joined the catalogue.
 
 ## Instruments
 
@@ -330,7 +337,7 @@ for k in sorted(expected - set(presets)):
 for k in sorted(set(presets) - expected):
     findings.append(f"preset table names a key that is excluded or not in the catalogue: {k}")
 
-FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count|a share of the window")
+FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count|a share of the window|a round count")
 for k, vals in presets.items():
     if k not in catalogue:
         continue
@@ -430,6 +437,14 @@ After layers round two, both instruments were run as extracted from this record:
 - **The preset check** exits 0 on 98 catalogue keys, 92 presettable, 92 preset rows. On a copy with
   standard `deps.on-parent-withdrawn` set to `adopt-parent-work` and strict set to `sometimes`, it
   exits 1 naming both.
+
+After the step definitions' answers, both instruments were run as extracted from this record:
+- **The changes:** `review.design.rounds`, `review.design.round-count`, `review.unverified` and
+  `tests.without-cadence` joined the catalogue and every preset. The preset check's free-value
+  pattern gains `a round count` in the source above.
+- **The preset check** exits 0 on 102 catalogue keys, 96 presettable, 96 preset rows. On a copy with
+  standard `review.unverified` set to `block` and strict set to `maybe`, it exits 1 naming both.
+- **The join** still exits 0 on 111 keys and 11 builds.
 
 ### The foreign-build census
 
