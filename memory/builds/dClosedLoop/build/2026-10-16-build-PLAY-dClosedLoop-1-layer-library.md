@@ -267,10 +267,43 @@ has no key:
 - **The gaps:** `gap-review-10` joins dFairHearing and `gap-mem-15` joins dTotalRecall. `gap-mem-02`,
   `gap-mem-03`, `gap-mem-11` and `gap-design-07` are extended.
 
+## [consult] The optional components, and the core without them
+
+**Each component's own design is already settled.**
+- The map's is layer-memory `[map]`: definitions for each declared language, import-aware Python
+  callers, shell and JavaScript callers through extractor packs, cross-language edges, and freshness
+  by tree hash.
+- Recall's is layer-memory `[reuse]`: a record finder for "why" questions.
+- The lexicon's re-engineering is dMindYourWords'.
+
+This round adds what the core does when one is not installed.
+
+**Every optional slot renders one of three states:** filled; searched with nothing found; or not
+installed, with the core's fallback named. Absence never renders as an empty result, which would read
+as a clean search.
+
+| Component | Where the core reads it | Not installed: what the core does instead |
+|---|---|---|
+| The map | `design.seams`' sources | the reuse scout searches the plan's scope paths, with the reuse entries as its index, and the seams record names the map as absent |
+| The map | the work order's `**Reuse:**` slot | the slot keeps its three states, and its index holds the reuse entries alone |
+| The map | a new class's dossier claim, and a dossier `seam:` seeding a reuse proposal | nothing to claim or seed: a class reaches its population through its own anchors |
+| The map | the owner's views `MAP.md`, `CARDS.md` and each symbol's callers | none rendered; `LIVE.md` and the build views stay |
+| Recall | the planner's recall slot | the research view and the decision log, selected by the plan's scope tags |
+| Recall | `design.seams`' recall sources | none; the scout's tree search stands |
+| Recall | the read hook under `annotations.grammar=pushed-at-read` | the value cannot be served, so `policy.on-missing-expansion` refuses it, or under `fallback-reported` falls back to `required` and says so |
+| Recall | the `/memory-recall` Skill and its journal | not rendered, and no journal is kept |
+| The lexicon | naming at Design and Build | the core's tag-shape check stands alone, and the naming slot names the lexicon as absent |
+| The lexicon | `lexicon.pin` | inert, and reported as inert when set |
+| The lexicon | the `/lexicon` Skill | not rendered |
+
+- **Each component's own legs install with it.** Without the map, its coverage and freshness legs are
+  absent from the legs manifest, not skipped.
+- **The witness is the work order.** Each optional slot carries one of the three states, and a
+  not-installed state names its fallback. The installed set is Distribution's, and dBoundRoles
+  renders the slots (layer-instruction `[settled]`). `gap-found-17`'s fix covers the mechanism, so no
+  new gap is owed.
+
 ## [open] What the library round owes
 
-- **The consult tools:**
-  - the map's languages, relations and callers, which the owner's memory words call underdeveloped;
-  - recall, narrowed to "why" questions;
-  - each component's behaviour when absent, rendered as its optional slot's state.
-- **This round's review** is owed before the round closes, over KN-1's fold and this design.
+- **This round's review** is owed before the round closes, over KN-1's fold, this design and its
+  settlement.
