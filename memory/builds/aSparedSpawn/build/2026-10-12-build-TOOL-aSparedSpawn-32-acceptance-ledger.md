@@ -18,8 +18,10 @@ rev-4 `764b145d1` (`Pass: none`); and the pass commit after it, which composes t
 §4 and closes the unit.
 
 **Evidences:** TOOL-aSparedSpawn-32
-- AC1 — the two-parent diff over the staged merge (`git diff -U0 69e0ff0f5 6e8f8b1da -- F`, every
-  added line searched for in the index) — 11 files; origin's added lines absent from the result: 4 in
+- AC1 — amended rev-5, the spec's entry recording that this criterion's range was never read —
+  NOT OBSERVED at the range the criterion names — the two-parent diff over the staged merge
+  (`git diff -U0 69e0ff0f5 6e8f8b1da -- F`, every added line searched for in the index) — 11 files;
+  origin's added lines absent from the result: 4 in
   the runner, 5 in the hook, 4 in the evidence suite, 1 in the README, 1 in `.memory-tree.conf`, 1 in
   `agent-cap.test.sh`, 1 in the hygiene suite, 2 in the dossier, 0 elsewhere. Each is a line both
   sides rewrote, kept as its composite: `HEAD_SHA=$RG_HEAD` (origin's read, this build's no-spawn
@@ -27,7 +29,9 @@ rev-4 `764b145d1` (`Pass: none`); and the pass commit after it, which composes t
   scoped decision lines carrying both sides' fields, `lineage_reuses=0` initialised beside this
   build's `reuses=0`, the summed `FLOOR_ASSERTIONS` (evidence 208 + 26 = 234, hygiene 613 + 5 = 618),
   the `ARMS_FLOORS` line with both pairs, `agent-cap`'s `node nr.js` calls with origin's
-  `unset GIT_DIR GIT_WORK_TREE`, and dossier prose condensed to its 20480-byte cap.
+  `unset GIT_DIR GIT_WORK_TREE`, and dossier prose condensed to its 20480-byte cap. Never read:
+  `git diff 69e0ff0f5 37200355d -- F`, the range the criterion names; the pass read origin's moved
+  tip 6e8f8b1da, where the spec's §4 (f) took the merge.
 - AC2 — the same diff from `01ba3a815` — this build's absent lines: 1 in the runner, 13 in the
   hook, 3 in the evidence suite, 1 in the README, 1 in `.memory-tree.conf`, 2 in `agent-cap`, 1 in
   the hygiene suite, 12 in the dossier. Each is the same composite seen from this side, plus
@@ -76,9 +80,9 @@ rev-4 `764b145d1` (`Pass: none`); and the pass commit after it, which composes t
   with an empty `full`, and `GATE_FULL=1 GATE_REUSE_LINEAGE=1` executes `pa` and records `lineage`.
 - AC11 — `grep -c 'WHAT LINEAGE REUSE DOES NOT CHECK' tools/run-gates/README.md` prints 1, the
   precedence table's header row occurs once, and the cache's not-checked sentence once.
-- AC12 — the fixture's runner section — RED at the merge; GREEN on the pass tree: full with both
-  knobs records `lineage` and prints `not used: GATE_REUSE`, and without the full flag records `env`
-  and prints `GATE_REUSE_LINEAGE is not used without GATE_FULL`.
+- AC12 — the fixture's runner section — RED at the merge; GREEN on the pass tree: full with both knobs records `lineage`
+  and prints `not used: GATE_REUSE`, and without the full flag records `env` and prints
+  `GATE_REUSE_LINEAGE is not used without GATE_FULL`.
 
 ## Arms written and owed at VERIFYING
 

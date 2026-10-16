@@ -32,4 +32,5 @@ the build's rules forbid: its pre-commit checks never ran, and the close's bar i
 - AC4 — `LANDED ABORTED` — the `node -p` read printed `LANDED ABORTED` and the grep printed `PHASES_TERMINAL="LANDED ABORTED"`.
 - AC5 — `Bash|PowerShell|AskUserQuestion` — the grep printed 1 for `gate-guard.fragment.json` and 0 for `.claude/settings.json`, and `settings-merge.py --check` exited 1 naming the missing `Bash|PowerShell|AskUserQuestion` hook: the settings half is the main loop's second-pass merge, which this pass may not write.
 - AC6 — `KIT_UNATTENDED_VERSION=1.105` — the count printed 1, and `git grep -l "gov:kit unattended@1.104"` printed no path under `tools/`; it printed the five rendered guides, the rendered Skill (the second pass's), and this unit's own spec, whose §4 and §6 quote the string.
-- AC7 — `PreToolUse` — owed to the main loop's live session at the close, after the merge and a restart; not observable by a fixture.
+- AC7 — amended rev-2, the spec's entry recording that this criterion was never observed — NOT OBSERVED —
+  `PreToolUse` — owed to the main loop's live session at the close, after the merge and a restart; not observable by a fixture. Never seen live: the refusal of an `AskUserQuestion` call.

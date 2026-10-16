@@ -199,6 +199,21 @@
     "ceiling": 300
   },
   {
+    "name": "shell hygiene (a fixed-name temp renamed into place)",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/sh_hygiene.py",
+      "--temp-names",
+      "memory/project/temp-name-sites.txt",
+      ".",
+      ":!*.test.sh",
+      ":!memory/"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "spawn budget (forks per hot entrypoint)",
     "argv": [
       "bash",
@@ -1252,6 +1267,25 @@
     "ceiling": 300
   },
   {
+    "name": "measure-legs selftest",
+    "argv": [
+      "python3",
+      "{prefix}/run-gates/measure_legs.py",
+      "--selftest"
+    ],
+    "guard": [
+      "{prefix}/run-gates/",
+      "{prefix}/gate-legs.json",
+      ".githooks/pre-push",
+      "{prefix}/process-monitor/census.py",
+      "{prefix}/process-monitor/reap.py",
+      "{prefix}/process-monitor/scope.py"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 500
+  },
+  {
     "name": "install-prefix (shipped surface)",
     "argv": [
       "bash",
@@ -1404,7 +1438,10 @@
       "{prefix}/govkit/selftest.py"
     ],
     "guard": [
-      "{prefix}/govkit/"
+      "{prefix}/govkit/",
+      "{prefix}/hooks/kit.toml",
+      "{prefix}/settings-merge.py",
+      "{prefix}/codebase-map/kit.toml"
     ],
     "chunk": "selftests",
     "subject": "kit",

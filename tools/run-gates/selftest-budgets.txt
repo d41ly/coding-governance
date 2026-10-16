@@ -71,6 +71,7 @@ kit-placeholders self-test	60		worst of 7 readings 24s, x1.5
 lexicon selftest	590		worst of 9 readings 389s, x1.5
 line-length gate selftest	60		measured 8s on node a 2026-09-07 under run-selftests.sh at its exported width 8 (was 208s worst-of-8 before the port), x1.5 floored at this file 60s minimum
 manifest-check self-test	3820		worst of 9 readings 2547s, x1.5
+measure-legs selftest	380		PINNED proxy r 250s on node d 2026-10-15, not a --selftest reading: its four fixture runs by direct CLI 99.4s, its pure arms about 6s, and its turnstile arm, which runs the real runner and was not run in the pass, priced at its 120s beacon bound plus 25s; x1.5. Its manifest ceiling 500 is max(r + 120, 2r). Re-price both from the first measured run. TOOL-dRedressedBar-18
 memory-hygiene self-test	1220		worst of 8 readings 808s, x1.5
 memory-recall kit selftest	1260		worst of 8 readings 835s, x1.5
 method-carriers self-test	180		worst of 11 readings 116s, x1.5

@@ -30,6 +30,27 @@ mutates_index = false
 # [[regenerate]] or this reason, and selfcheck refuses one declaring neither.
 why_no_regenerate = "the adopter merges hook fragments into .claude/settings.json, and update already re-runs that merge for every fragment it lands (its fragment-wiring step), so a second run here would merge the same rows twice"
 
+# AN ACCEPTED STOP, not a failure (TOOL-dRedressedBar-9). The bare argv above has one job, wiring
+# agent-cap's built-in `Workflow|Agent` entry, and it exits 2 when that hook is not installed. This
+# entry requires nothing and may stand alone, so a target with no hooks kit reaches that exit on
+# every correct install, and on every `update` that gains this entry while leaving agent-cap out for
+# an unmet requirement. The adopter refused before writing, so nothing naming a missing file is
+# wired. The PRESENCE, `must_exist`, pins `{prefix}` to the adopter's own directory. The ABSENCE
+# is one term, `must_not_resolve`, which asks the adopter's own resolver: the receipt,
+# `.governance/install.json`, then `{prefix}/hooks`, then the `hooks` directory in `{prefix}`'s
+# parent (TOOL-dRedressedBar-11). With the hook wherever the resolver finds it, an exit 2 stays a
+# failure. Two `must_not_exist` terms named the two static homes again until TOOL-dRedressedBar-28
+# retired them: the resolver already asks both, and the parent home's spelling is a kit path the
+# install-prefix ban counts. Since then a non-file named `agent-cap.js` at a static home reads as
+# absent, as the adopter reads it.
+# agent-cap runs the same argv under its own descriptor, which declares no outcome, so its refusal
+# still fails wherever agent-cap is selected.
+[[outcome]]
+code = 2
+probe = { must_exist = "{prefix}/settings-merge.py", must_not_resolve = "{prefix}/hooks/agent-cap.js" }
+means = "no-agent-cap-to-wire"
+ok = true
+
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
 # reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.

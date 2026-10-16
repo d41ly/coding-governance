@@ -38,10 +38,10 @@ identical output but for `--liveness`'s wall-clock age.
   on its specimen and silent on its near miss, a quoted-heredoc specimen and a commented one firing
   nothing. Two breaks staged in scratch copies each turned it RED: a BANNED row honoured instead of
   refused, and `$(<f)` with no second redirect graded a site.
-- AC6 — `python3 tools/gate-lint/sh_hygiene.py --spawn-idioms memory/project/spawn-idiom-sites.txt .
-  ':!*.test.sh' ':!memory/'` over the tree — exit 0, each class's scanned, gated and near-miss counts
-  printed, 0 sites for each BANNED class, 2099 registered sites in 292 rows; over a scratch copy of the
-  shell population with `x=$(date +%s)` appended to `tools/check-wiring.sh` it exited 1 printing
+- AC6 — `python3 tools/gate-lint/sh_hygiene.py --spawn-idioms memory/project/spawn-idiom-sites.txt . ':!*.test.sh' ':!memory/'`
+  over the tree — exit 0, each class's scanned, gated and near-miss counts printed, 0 sites for each
+  BANNED class, 2099 registered sites in 292 rows; over a scratch copy of the shell population with
+  `x=$(date +%s)` appended to `tools/check-wiring.sh` it exited 1 printing
   `tools/check-wiring.sh:1772: [epoch-date] x=$(date +%s) — use $EPOCHSECONDS…`, and with a pathspec
   selecting nothing it refused with 2. Every count in the registry was derived by the scan.
 - AC7 — the parent's `resolve_kit_dir` wrapper against the converted one in `lib-unattended.sh`, over
@@ -57,19 +57,19 @@ identical output but for `--liveness`'s wall-clock age.
 - AC9 — `bash tools/gate-lint/fork-count.sh --selftest` — the specimen counted 5 forks on both runs, equal to its declaration, and a scratch copy with
   `SPECIMEN_FORKS=6` refused with exit 2 and the line "the counter cannot move"; PASS (2 assertions),
   repeated on the final file.
-- AC10 — `bash tools/gate-lint/fork-count.sh memory/project/fork-ceilings.txt <scratch root> --only
-  unattended-status --sites` over a scratch repository holding the kits with `_ac10=$(:)` inserted
-  below the driver's `set -u`, and over its unbroken twin — the staged root redded `measured 48 ·
-  ceiling 47 · delta +1 · base 57` with the top ten `file:line` sites and the `--sites` hint, the twin
-  read `ok … measured 47`, and the two `--sites` tables differed by `unattended.sh:58` alone once the
-  sites below it were shifted back by one line. A first staged root that was no git repository read
-  76, which is why every fixture here is a repository.
+- AC10 — `bash tools/gate-lint/fork-count.sh memory/project/fork-ceilings.txt <scratch root> --only unattended-status --sites`
+  over a scratch repository holding the kits with `_ac10=$(:)` inserted below the driver's `set -u`,
+  and over its unbroken twin — the staged root redded `measured 48 · ceiling 47 · delta +1 · base 57`
+  with the top ten `file:line` sites and the `--sites` hint, the twin read `ok … measured 47`, and the
+  two `--sites` tables differed by `unattended.sh:58` alone once the sites below it were shifted back
+  by one line. A first staged root that was no git repository read 76, which is why every fixture
+  here is a repository.
 - AC11 — `bash tools/gate-lint/fork-count.sh <copy of the ceilings> .` — with `check-wiring` raised to 54 against its count of 50 (max(3, 5 %)
   is 3) redded `STALE ceiling 54 is more than 3 above the measured 50`, and a row whose setup is
-  `exit 3` printed `skipped — unbuildable · its fixture setup exited 3…` and the summary read `0 passed
-  · 1 red · 1 skipped`.
+  `exit 3` printed `skipped — unbuildable · its fixture setup exited 3…` (an instance of
+  `skipped — <id> · <why>`) and the summary read `0 passed · 1 red · 1 skipped`.
 - AC12 — `bash tools/gate-lint/fork-count.sh` over each fixture, the tree at base `22efab65` and at
-  the pass's tip side by side — forks per invocation, base then tip: `unattended-status` 57 → 47, `check-unattended` 709 →
+  the pass's tip side by side — forks per invocation, base then tip: `unattended-status` (the row whose command runs `tools/unattended/unattended.sh`) 57 → 47, `check-unattended` 709 →
   684, `run-gates-1leg` 72 → 72, `run-gates-2leg` 97 → 95, `memory-hygiene` 219 → 221 (the fixture
   copies the tree's conf, which grew), `manifest-check` 108 → 108, `check-wiring` 55 → 50. Every tip
   count repeated exactly on three runs except `run-gates-2leg`, which read 95, 95, 95 and 96, its pool

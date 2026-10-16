@@ -26,6 +26,7 @@ coding-governance-agents.template.md · v4.0's memory-tree protocol line points 
 .claude/agents/gov-diff-reviewer.md · rendered role agent; it cites M6 for the gates it judges from source and never runs
 .claude/agents/gov-orienter.md · rendered role agent; it cites M5 for the two context commands of a path set
 .claude/agents/gov-researcher.md · rendered role agent; it cites M12 as how it works, and restates no step of it
+.claude/agents/gov-reuse-scout.md · rendered role agent; its rendered charter block's protocol line points a build of more than one pass at the method, and it restates none of it
 .claude/agents/gov-skeptic.md · rendered role agent; it cites M6 for why it runs no gate
 .claude/agents/gov-spec-reviewer.md · rendered role agent; it cites M6 for why it runs no gate
 .claude/agents/gov-spec-writer.md · rendered role agent; it cites M2 for the one-mechanism unit it writes
