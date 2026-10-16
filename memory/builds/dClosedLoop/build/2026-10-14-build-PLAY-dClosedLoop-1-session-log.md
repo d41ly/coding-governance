@@ -144,7 +144,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 80 | the same | Role workflow shapes, run B, from the same handoff, in the second wave | the same | 1799cb98 | returned, 7m32s, 41.1k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-role-shapes-b.md` |
 | 81 | gov-researcher, at its declared medium effort | Memory structure, run A, in the first wave | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-26-researcher.md` | 1799cb98 | returned, 9m43s, 44.9k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-memory-structure-a.md` |
 | 82 | the same | Memory structure, run B, from the same handoff, in the second wave | the same | 1799cb98 | returned, 10m30s, 50.2k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-memory-structure-b.md` |
-| 83 | gov-researcher, at its declared medium effort | Retrofitting gov's practices into an existing repository, run A, with run B once review dispatch 65 returns | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | dispatched | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-a.md` |
+| 83 | gov-researcher, at its declared medium effort | Retrofitting gov's practices into an existing repository, run A, with run B once review dispatch 65 returns | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | returned, 12m19s, 57.6k out | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-a.md` |
 | 84 | the same | Retrofitting gov's practices into an existing repository, run B, from the same handoff, with run A | the same | 1799cb98 | returned, 9m08s, 46.7k out | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
@@ -1869,6 +1869,8 @@ Runs, 2026-10-14:
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md` | The retrofit system: the owner's words, what the design already holds, the research and its method, and later the agreement and the design. |
 | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-1-researcher.md` | The retrofit research handoff, run twice. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-b.md` | Dispatch 84's return, verbatim: retrofitting gov's practices, run B. |
+| `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-a.md` | Dispatch 83's return, verbatim: retrofitting gov's practices, run A. |
+| `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-instruments.md` | The retrofit researchers' files and shell commands, in order, from their transcripts. |
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | The library pass's research handoff: the four filling paths and two placements. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` | The library round's review, a light diff review over KN-1's fold, the library design and its settlement, as its synthesizer wrote it. |
