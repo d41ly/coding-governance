@@ -1,5 +1,7 @@
 # Layer review: the expansion layers, observability, integrations and distribution
 
+**Serves:** research PLAY-dClosedLoop-1
+
 The core's five layers are designed, reviewed and folded. This round designs the three expansions that
 architecture v2 `[layers]` names. Each is researched twice, independently, and the design rests on what
 both runs of a layer agree on.
@@ -541,10 +543,16 @@ Run A's args, verbatim. Run B's differ only in the context's run label and repor
 }
 ```
 
+**Returned.** Run A, `wf_644d225b-42a`: CLEAN WITH FIXES, 28 items (1 high, 19 medium, 8 low), 11 agents,
+215.0k out tokens. Run B, `wf_3a59e7c4-201`: CLEAN WITH FIXES, 35 items (5 high, 21 medium, 9 low), 11 agents,
+294.0k out tokens. `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` compares them
+and plans the fold.
+
 ## [open] What the expansion round owes
 
 - **The chain builds' planned units** for the eight core points and the three designs, at the chain
   re-cut v2 `[owed]` already carries.
-- **The round's Tier-2 review**, dispatched as two rounds (`[review]`); its comparison and fold are owed.
+- **The round's Tier-2 review**, returned (`[review]`); its fold, as
+  `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` plans it.
 - **Too small to register:** govkit's usage text omits the `contribute` verb it dispatches
   (distribution B).

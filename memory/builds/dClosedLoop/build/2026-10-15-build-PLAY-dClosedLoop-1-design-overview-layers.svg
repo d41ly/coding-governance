@@ -1,4 +1,7 @@
 <svg width="100%" viewBox="0 0 680 520" role="img" xmlns="http://www.w3.org/2000/svg">
+<!--
+**Serves:** research PLAY-dClosedLoop-1
+-->
 <title>Gov's three layers</title>
 <desc>Charter instructions drive the DLG flow from Plan to Maintain, with review at any step; roles perform each step's items, and their typed returns move the build.</desc>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>

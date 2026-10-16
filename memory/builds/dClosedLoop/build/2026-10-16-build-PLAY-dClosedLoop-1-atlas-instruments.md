@@ -1,5 +1,7 @@
 # Atlas instruments: the fifth version's refusals and checks
 
+**Serves:** research PLAY-dClosedLoop-1
+
 The Closed Loop Atlas's fifth version carries every record in the build folder and compares today's
 product with the target, area by area. Its generator refuses data it cannot place. This record keeps the
 probe that saw each new refusal red, the browser checks on the generated page, and the procedure that

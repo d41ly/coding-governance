@@ -1,3 +1,4 @@
+# **Serves:** research PLAY-dClosedLoop-1
 """Derive the Closed Loop Atlas from dClosedLoop's records, and write the publishable page.
 
 Usage: python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --out <page.html>
