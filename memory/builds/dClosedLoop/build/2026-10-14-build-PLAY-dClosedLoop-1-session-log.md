@@ -1155,6 +1155,11 @@ The expansion fold's follow-up round, dispatch 60, derived from its Workflow run
   and the comparison record's `[follow-up]` names where each went. The both-runs probe was rewritten,
   seen red on 37 rows and on three planted ones, and every row it flagged now cites each run's line.
 
+- 2026-10-16, session 1799cb98: the owner asked, verbatim: "What is the current state of this
+  rearchitecture? What remains uncovered?" `build/2026-10-16-build-PLAY-dClosedLoop-1-state.md` answers
+  from the records and the history. No review has read the lexicon, the review system or the runtime
+  round's fold, and three folds stand unreviewed: `1bc4883fe`, `0dd962724` and `5e139d377`.
+
 ## Instruments
 
 ### The gap-ownership join
@@ -1583,6 +1588,7 @@ Runs, 2026-10-14:
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` | The expansion round's two reviews compared defect by defect, the fold planned, and forks RH-1 and PIN-1 asked. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md` | The expansion fold's closing review, a light diff review over the fold's two commits, as its synthesizer wrote it. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md` | The expansion fold's follow-up round, a light diff review at round 2 over the closing review's fixes, as its synthesizer wrote it. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-state.md` | The owner's question on the rearchitecture's state, answered from the records: the deliverables, the text no review has read, what no answer settles, two stale open lists and what remains, with the probes and their runs. |
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | The library pass's research handoff: the four filling paths and two placements. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` | The library round's review, a light diff review over KN-1's fold, the library design and its settlement, as its synthesizer wrote it. |
