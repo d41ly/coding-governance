@@ -551,7 +551,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   | manifest-check, writing and replaying the card | SessionStart | session-kickoff | runtime: session binding and the card |
   | check-wiring `--session` | SessionStart | check-wiring | runtime: the wiring check |
   | procmon-hook | SessionStart; PostToolUse: shell | process-monitor | runtime: supervision |
-  | recall-opened | PostToolUse: Read | memory-recall | knowledge, an expansion: the recall journal |
+  | recall-opened | PostToolUse: Read | memory-recall | memory, an optional component (KN-1): the recall journal |
   | stop-guard | Stop | unattended | runtime: run continuation, retired for act sessions |
   | format-guard | Stop | hooks | instruction: the micro-formats |
   | stall-recorder | StopFailure | unattended | runtime: the limit signal |
@@ -775,7 +775,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | engine kits | unattended: the supervisor (resume-tick grown, act sessions, the commit queue), whose verbs become `next`, `run` and the owner's controls; workflows: the role harnesses and the deferral block; hooks: the dispatcher, the fragments as packs through settings-merge, and check-wiring's class arm; process-monitor: reaping; and the journal grammar, moved from runlog into the core, so the core writes what observability reads |
 | record kinds | return records, and act records (launch, epoch, outcome). Flow's witnesses and leases are written through `record` too |
 | extension points declared | the nine in `[extend]` |
-| extension points used | none. Integrations fill the host and notification adapters. Observability and knowledge register packs and read the journal |
+| extension points used | none. Integrations fill the host and notification adapters. Observability and memory's optional components register packs and read the journal |
 | policies | the `runtime.*` keys in `[policies]`, and the existing keys it reads |
 | gates | the build's fixtures in `[tests]` |
 

@@ -253,6 +253,17 @@ folded layer by layer, each layer record's `[revised]` naming where every defect
   - `[owed]` gains the order of dTotalRecall and its gaps' owners, and `gap-mem-12` joins
     dTotalRecall.
 
+Revised: 2026-10-16, after KN-1 (`build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md`): the owner chose "One layer, two
+sides". Knowledge folds into the memory layer:
+- `[layers]` has five core layers and three expansions: observability, integrations and distribution;
+- memory is the trail, what happened in a build, and the library, what generalizes beyond one: major
+  decisions, reuse entries, bug classes and research;
+- the codebase-map, memory-recall and lexicon kits are memory's optional components, and P28 governs
+  them as it governs expansions;
+- reuse entries are core, so a reuse directive renders on a core-only install;
+- `policy.on-missing-expansion` covers an absent optional component too;
+- the next round designs the library side, in place of a Knowledge layer.
+
 ## [layers] The product's layers
 
 A layer is a capability named by a tag. A kit implements layers, and its descriptor declares the layer
@@ -265,9 +276,8 @@ one, `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md`).
 | `instruction` | core | everything an agent is told, levelled 0 to 7 and tagged by scope |
 | `flow` | core | a build's lifecycle: Plan, Design, Build, Test and Deploy as programs of items, review as breakpoints, with the verdict engine and the lander |
 | `roles` | core | the bound workers, and the driver |
-| `memory` | core | the build trail: records, transitions, witnesses, the card's truth |
+| `memory` | core | the trail, what happened in a build: records, transitions, witnesses, the card's truth; and the library, what generalizes beyond one: major decisions, reuse entries, bug classes, research. Its optional components, the map, recall and the lexicon, are what agents consult to decide (KN-1) |
 | `runtime` | core | what executes the cycle: the supervisor and its checklist engine, act sessions and the spawn harness, the `next` verb and the owner's controls, the hooks, isolation, process supervision |
-| `knowledge` | expansion | what agents consult to decide: the map, bug classes, the lexicon, and the recall of decisions and past research, whose records the core writes |
 | `observability` | expansion | signals about the loop and the runtime, and the cadence steps that act on them: Maintain and the Loop Review |
 | `integrations` | expansion | adapters to outside services: remote CI, notifications, cloud hosts, trackers, and deploy engines that promote a landed tree through environments |
 | `distribution` | expansion | the product's delivery: govkit, the adopt scripts, overlays, the install of the render targets Runtime's harness adapters define, currency |
@@ -288,8 +298,8 @@ Every layer fills one contract, whether core or expansion:
 - the extension points it declares, and those it uses;
 - its policies and its gates.
 
-A work-order field, or any part of a core render, that an expansion fills is an optional slot, rendered
-empty on a core-only install. The kit-to-layer map is in the layer record. The layers are reviewed one
+A work-order field, or any part of a core render, that an expansion or an optional component fills is an
+optional slot, rendered empty where it is not installed. The kit-to-layer map is in the layer record. The layers are reviewed one
 by one with the owner, each in its own layer record.
 
 ## [principles] What every chain build implements
@@ -412,7 +422,8 @@ by one with the owner, each in its own layer record.
   named by a tag, and a kit implements layers and declares which. The core (instruction, flow, roles,
   memory, runtime) carries one build from request to landing alone. An expansion attaches only at an
   extension point a core layer declares. Every layer, core or expansion, fills one layer contract
-  (layers round one).
+  (layers round one). A core layer's optional component, such as memory's map, recall and lexicon
+  kits, attaches the same way, and the core never depends on it either (KN-1).
 - **P29 A role acts on what it is handed, and verifies only what its job is to verify.**
   - **Handed and keyed:** the executor hands a work order's inputs as content. Each fact is keyed by
     what it was derived from and classed `witnessed`, `decided` or `claimed`.
@@ -566,7 +577,7 @@ through one reader, mirrored to JSON for the hooks, and rendered into the charte
 | `review.design.round-count` | a round count | 2 | flow steps; read only under `fixed-count` |
 | `review.unverified` | ask, block, record | ask | flow steps |
 | `flow.route-backs` | a route-back count | 3 | the flow layer's fold: a route back past the count becomes an owner item |
-| `policy.on-missing-expansion` | refuse, fallback-reported | refuse | the owner's LR-4: a preset value whose expansion is absent |
+| `policy.on-missing-expansion` | refuse, fallback-reported | refuse | the owner's LR-4: a preset value whose expansion, or optional component, is absent (KN-1) |
 | `tests.without-cadence` | run-at-landing, report-unrun, wait-for-expansion | run-at-landing | flow steps: the slower levels when observability's Maintain is not installed |
 | `verdict` | local-hook, peer-node, remote-ci | local-hook | R1.3, R4.4, R5.2 |
 | `verdict.blocks` | own-mixed-contended, every-red, own-only | own-only | walk T1 |

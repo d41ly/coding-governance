@@ -72,6 +72,9 @@ layer, in `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md` (`[owner-no
     - research records.
   - The owner's memory layer spans both: the core trail, and the Knowledge expansion's stores. The
     core never depends on Knowledge (P28).
+  - **Revised 2026-10-16, KN-1** (`build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md`): Knowledge folds into this layer.
+    The layer is the trail and the library: major decisions, reuse entries, bug classes and research.
+    The codebase-map, memory-recall and lexicon kits are its optional components, under P28.
 - **Records are evidence, at level 7 of the ladder.** The charter's `[memory]` rule keeps recalled
   memory from instructing. `gap-found-14` (HIGH, dOrderedCharter) already records that the auto-memory
   index instructs outside the ladder. The layers round left the gap's home to this review.
@@ -92,7 +95,8 @@ layer, in `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md` (`[owner-no
 - **Kits:**
   - memory-tree is the memory layer's core engine. Its backlog, rotation and gotchas were left to
     this review.
-  - codebase-map, lexicon and memory-recall belong to Knowledge.
+  - codebase-map, lexicon and memory-recall belong to Knowledge, and since KN-1 they are this layer's
+    optional components.
 - **Gaps already registered that touch memory:**
 
   | Gap | What it records |
@@ -276,7 +280,7 @@ researchers through `role_orientation.py`'s classes, unchanged, beside every ear
 
 | The owner's point | Today | This round's answer |
 |---|---|---|
-| All lifecycle memory | the core trail plus Knowledge's stores, with conventions spread over `HYGIENE.md` (58.5 KB), the spec template, the guides and 21 memory-tree legs | one memory contract over both, sorted core and Knowledge by P28 (`[contract]`) |
+| All lifecycle memory | the core trail plus Knowledge's stores, with conventions spread over `HYGIENE.md` (58.5 KB), the spec template, the guides and 21 memory-tree legs | one memory contract over both, sorted into the trail, the library and the optional components by P28, after KN-1 (`[contract]`) |
 | An extensive definition of its conventions | no single declaration | the record-kind registry (`[contract]`) |
 | Every workflow uses it; the owner orients at a glance | some views generated (`LIVE.md`, README regions, `MAP.md`) | every view generated, while agents get handed fields (`[views]`) |
 | Build-centric, a tree, no read-path inflation | 96.4% of reads past the README, 77.9% never reading it | the work order is the agent's root and the README the owner's (`[build]`) |
@@ -362,13 +366,15 @@ set. The kinds sort by P28:
   declares (acceptance, verdict, attribution, transition, landing among them). Flow registers its
   flake, dupes and scope records. Runtime registers its return, act (launch, epoch, outcome), lease,
   session binding, mailbox message and journal records.
-- **Knowledge:** dossier, gotcha, the lexicon, and the generated stores: symbols, callers, the
-  annotation index and the recall index.
+- **Optional components** (KN-1; Knowledge's before it): dossier, symbols and callers, with the map; the
+  lexicon; the recall index. The gotcha kind is core since KN-1, on the library side. Whether the
+  annotation index is core or the map's is the library round's (`[open]` in its record).
 
 **One refinement to layers round one,** for research records and major decisions alike. Core items
 write them (`plan.research`, `design.research`, and each build's decisions as it makes them), so their
 kinds are core. Knowledge holds the consulting: memory-recall over decisions, and the research library
-across builds. v2's `[layers]` carries it.
+across builds. v2's `[layers]` carries it. Since KN-1 the consulting is this layer's own: recall is an
+optional component, and the research library is the library side.
 
 ### [build] The build: one root for the owner, one for each agent
 
@@ -396,7 +402,7 @@ across builds. v2's `[layers]` carries it.
 
 - **The grammar is policy values, read from one parser.** The id grammar is already single-sourced:
   memory-recall's `extract.grammar_for`, imported by memory-tree (`backlog.py`, `corpus_ids.py`) and by
-  drift-audit. The core needs it without Knowledge (P28), so the parser moves into memory-tree, the
+  drift-audit. The core needs it without memory-recall, an optional component (P28; KN-1), so the parser moves into memory-tree, the
   core engine, and memory-recall imports it from there. The slug grammar joins that parser:
   - `builds.slug-words`, 1 to 3 by the owner's words;
   - `builds.slug-style`, humorous, which is the product's foundation;
@@ -435,8 +441,8 @@ across builds. v2's `[layers]` carries it.
   cross builds. A target on another node's unlanded branch resolves through the remote's refs, the
   build's card and lease refs. A target found nowhere is pending, not red, until its build lands or is
   withdrawn.
-- **`implements <reuse-entry>`** is a relation Knowledge's contract registers, so a core-only install
-  has the other four (P28).
+- **`implements <reuse-entry>`** is a core relation since KN-1: reuse entries are the library side, so
+  every install has all five.
 - **Views:** the generated graph feeds the plan view, so a feature can be traced from the build that
   made it, through its patches and amendments, to its current entry.
 
@@ -510,9 +516,9 @@ records. Neither may instruct by being recalled.
        selector is needed", triggered by the need, anchored to `gov:feature media-picker`;
      - screen-reader support becomes a convention: "MUST support screen reading on every new page",
        with its convention's anchor.
-   - **Where Knowledge is absent:** the reuse entry is a Knowledge-filled slot. The charter's
-     `[records]` rule renders its reuse-entry clause only where Knowledge is installed, and
-     `implements <reuse-entry>` is a relation Knowledge's contract registers (P28).
+   - **On every install** (KN-1): the reuse entry is the library side, so the charter's `[records]`
+     rule renders its reuse-entry clause wherever gov is installed, and `implements <reuse-entry>` is a
+     relation the memory contract registers.
 2. **The decision log keeps major product decisions only.** That is about 12 of today's rows. Each row
    carries:
    - its date;
@@ -577,8 +583,8 @@ So the design is:
   becomes its producer. Delivery by path is rejected, because "anywhere a media selector is needed"
   is a need, not a path.
 - **The slot has three states,** each rendered distinctly: matched, with the entries; searched, with no
-  match; and not searched, with the reason: Knowledge is not installed, the scout failed, or the index
-  is stale.
+  match; and not searched, with the reason: the scout failed, or the index is stale. Without the map,
+  an optional component since KN-1, the index holds the reuse entries alone, and the slot says so.
 - **Under `reuse.delivery=on-demand`,** nothing is rendered into every work order. The reuse scout runs
   only when an item's work order asks for reuse, and its matches are handed to that item alone.
 - **The index's shape is M1c's.** Its 16 of 24 came from a small curated digest, 2 to 33 KB, with an
@@ -599,7 +605,8 @@ So the design is:
     which names `reuse_lookup.py`, so `MAP_CLI` is re-pointed at the map's CLI;
   - by value: the `reuse-probed` DoD item and M5 count the lookup's and recall's query logs as proof
     of a reuse probe. They read the reuse scout's record instead.
-- **memory-recall narrows to a record finder for "why" questions,** inside Knowledge. It leaves the
+- **memory-recall narrows to a record finder for "why" questions,** an optional component of this layer
+  since KN-1. It leaves the
   reuse obligation, since it holds no code. Its chunks arm is fixed or dropped.
 
 ### [map] The map: symbols and callers, generated
@@ -671,8 +678,9 @@ Around it:
   If follow-through does not rise, the runner-up is a hook that pushes records anchored to a file when
   it is opened, with per-session dedupe. The test's threshold, sample and window are dTotalRecall's to
   set (`gap-mem-12`).
-- **Under `annotations.grammar=pushed-at-read`,** that hook is the mechanism: a Knowledge pack in
-  Runtime's one dispatcher entry, at PostToolUse on a read, registered by Knowledge's contract.
+- **Under `annotations.grammar=pushed-at-read`,** that hook is the mechanism: a pack of this layer's
+  optional components in Runtime's one dispatcher entry, at PostToolUse on a read, registered by the
+  memory contract (KN-1).
   dTotalRecall builds it.
 
 ### [knowledge] Gotchas, the lexicon and recall
@@ -1049,7 +1057,7 @@ and its map's `disposition` cells point here. Each defect's fix sits in place, i
 | `reuse-entry-level` | none | refuted |
 | `reuse-entry-should` | amend | `[decisions]` 1: a MUST with its trigger, ranked by a field |
 | `reuse-affordance-seam` | amend | `[decisions]` 1 extends the `## Reuse affordance` block; `gap-mem-03` |
-| `core-needs-knowledge` | amend | `[decisions]` 1: the clause renders only where Knowledge is installed |
+| `core-needs-knowledge` | amend | `[decisions]` 1: the clause rendered only where Knowledge was installed; since KN-1 it renders on every install |
 | `reuse-field-seam` | amend | `[reuse]`: the task card's `**Reuse:**` field |
 | `reuse-slot-states` | amend | `[reuse]`: three states |
 | `house-index-evidence` | amend | `[reuse]`: the index takes M1c's shape |
@@ -1075,6 +1083,6 @@ and its map's `disposition` cells point here. Each defect's fix sits in place, i
 | `feature-anchor-cases` | amend | `[annotations]`: one anchor per tag; no anchor without a pack |
 | `annotation-style-overturned` | amend | `[annotations]`: the guide and its template change with it |
 | `follow-through-test` | amend, gap | `gap-mem-12`: its threshold, sample and window are dTotalRecall's |
-| `pushed-at-read-no-hook` | amend | `[annotations]`: the read hook is a Knowledge pack in Runtime's dispatcher |
+| `pushed-at-read-no-hook` | amend | `[annotations]`: the read hook is a pack of memory's optional components in Runtime's dispatcher (KN-1) |
 | `gap-owner-order` | owed | v2 `[owed]`: the re-cut orders dTotalRecall ahead of the gaps' owners, or moves the gaps to it |
 | `recall-boundroles-order` | none | refuted |

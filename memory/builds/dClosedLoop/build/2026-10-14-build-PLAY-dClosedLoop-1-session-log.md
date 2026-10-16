@@ -110,6 +110,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 46 | the same | Memory layer: Tier-2 review, run B | the same | 1799cb98 | returned, CLEAN WITH FIXES, 51 of 58 confirmed | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-memory-b.md` |
 | 47 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The layers' fold: closing diff review over `e7839224c..9e0e43aef` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | returned as `wf_9349d401-2da`, CLEAN WITH FIXES, 28 of 31 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md` |
 | 48 | the same, round 2 with round 1's 28 confirmed findings handed as `priorFindings` | The layers' fold: the follow-up round over the closing review's fixes, `9e0e43aef..2e6f9aa1b`, after the owner chose it | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | returned as `wf_e26eda01-523`, CLEAN WITH FIXES, 31 of 34 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md` |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md` | Memory's library side, which replaces the Knowledge layer: the owner's question, KN-1 and what it changed, and what the library round owes. |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -873,6 +874,14 @@ The follow-up round, dispatch 48, derived from its Workflow run the same way:
   are new, and `gap-test-04` and `gap-deploy-02` were extended. The flow program gained `entry.claim`
   and the terminal state `answered`. Four map rows moved to `amend, gap`, and the matrix instrument's
   arm 0 now refuses a row it cannot read, seen red on four malformed rows.
+
+- 2026-10-16, session 1799cb98: the owner asked, verbatim: "Let's understand the knowledge layer first -
+  why does it have to be logically separate from the memory layer in the first place? Technically,
+  those are just extra tools over the same entity." The reasoning went back with KN-1, and the owner
+  chose "One layer, two sides (Recommended)". Knowledge folds into the memory layer as its library
+  side, and the codebase-map, memory-recall and lexicon kits become its optional components. The fold
+  touched v2's `[layers]` and P28, the instruction, flow, step, runtime and memory records, and
+  `gap-found-17`. The library round's record opened: `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md`.
 
 ## Instruments
 

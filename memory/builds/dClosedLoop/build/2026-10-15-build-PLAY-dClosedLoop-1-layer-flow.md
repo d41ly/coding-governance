@@ -57,7 +57,7 @@ The flow has two review checklists:
     - gate health.
   - The expansions plug in further detectors:
     - drift, from observability;
-    - map freshness, from knowledge;
+    - map freshness, from the map, an optional memory component (KN-1);
     - adopter currency, from distribution.
 - **Review is a breakpoint, not a step.**
   - Today a stage review sits at one fixed item per step (`review.<stage>`); owner gates sit at
@@ -200,12 +200,14 @@ Already registered, and not proposed again:
 
 | Step | Extension point | Fed by |
 |---|---|---|
-| Design | seams, from the map | knowledge |
-| Build | bug classes | knowledge |
+| Design | seams, from the map | the map, an optional memory component |
 | Test | verdict leg packs | leg packs |
 | Deploy | release channels and adopter currency | distribution, integrations |
-| Maintain | detectors | observability, knowledge, distribution, runtime housekeeping |
+| Maintain | detectors | observability, the map, distribution, runtime housekeeping |
 | Every step | notifications | integrations |
+
+Revised 2026-10-16 (KN-1): bug classes are core, on memory's library side, so Build's row left the
+table, and the map is an optional component of memory.
 
 **F-G. The driver routes and roles reason.**
 - The review recommendation's reasoning becomes a reviewer item: one question, under the step's lens.
@@ -327,8 +329,8 @@ that depends on it starts.
 - **The bar's labels** MIXED, CONTENDED and DEAD PROBE route by `verdict.blocks`: to an ask when they do
   not block, and otherwise to the tester, a re-run, a probe repair or an owner exception (flow-steps
   `test.route`; b F-T4).
-- **Research records:** a build's own are memory, the trail; the library across builds is knowledge
-  (a F9).
+- **Research records:** a build's own are memory, the trail; the library across builds is memory's
+  library side (a F9; revised 2026-10-16, KN-1).
 - **Flake records** are a flow record kind that observability reads: the nondeterministic legs
   `test.route`'s re-run finds, made a record. Under `verdict.flakes: quarantine`, a flaky leg past the
   threshold is held (b F-T8; revised 2026-10-16).

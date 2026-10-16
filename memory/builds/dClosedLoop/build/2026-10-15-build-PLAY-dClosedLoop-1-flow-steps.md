@@ -129,7 +129,8 @@ plan record.
   one there to see the plan before Design starts.
 - **Extension points:**
   - intake sources (observability, integrations);
-  - the planner's knowledge slot: decisions, and the research library shared across builds;
+  - the planner's recall slot: past research and decisions, found by recall, an optional memory
+    component (KN-1);
   - recommendation signals from the value ledger (observability);
   - notifications (integrations).
 
@@ -151,7 +152,7 @@ posted to dependents. The build moves through Design whole (FL-D1).
 | `design.input` | command | — | pins the input and its kind | its SHA and kind | plan record → `design.seams`; amendment → `design.reentry`; plan revision → `design.inventory`; patch → `design.unit-spec`, as a micro-spec; finding or fix unit → `design.unit-spec` for its new unit, or `design.decompose` when it changes an interface |
 | `design.reentry` | command | `design.input` | classifies an amendment by a structural diff of the declared interfaces (FL-B4) | the diff record | additive and untriggered → `design.unit-spec` for the new units; breaking, or a `design.reentry` trigger → `design.decompose` for that feature |
 | `design.inventory` | architect | `design.input` | after a plan revision, gives each completed unit a verdict (kept, amended by a new unit, or retired) with its reason | the inventory joined to every built unit | `design.decompose` |
-| `design.seams` | reuse scout | `design.input` | finds the seams by a tree search over the plan's scope paths and the open asks, adding knowledge's sources where installed | the seams' probe digests, re-derived by the executor | `design.decompose` |
+| `design.seams` | reuse scout | `design.input` | finds the seams by a tree search over the plan's scope paths and the open asks, adding the map's and recall's sources where installed | the seams' probe digests, re-derived by the executor | `design.decompose` |
 | `design.decompose` | architect | `design.seams`, `design.inventory` or `design.reentry` | decomposes into features and units: feature designs declaring interfaces structurally (producer, consumers, contract), units with their order and write sets, and feature forks recorded | the roster and interface schema check | decomposed → `design.overlaps`; a fact fork → `design.research`; a fork the goal cannot survive → a plan revision under the mandate (FR-12) |
 | `design.research` | researcher | the asking item | answers a fact fork | the research record's schema check | back to the item that asked |
 | `design.overlaps` | command | `design.decompose` | runs the design index over the roster's write sets, against live builds | the overlap record | `design.unit-spec` |
@@ -181,8 +182,9 @@ posted to dependents. The build moves through Design whole (FL-D1).
       before the next (`[breakpoint]`'s `review.fold`), and rounds count against `flow.route-backs`.
   - The owner's design go sits at `design.exit` under `three-gates` and `every-stage`.
 - **Extension points:**
-  - the map, recall and bug classes for `design.seams`, the lexicon for naming, and the research
-    library (knowledge);
+  - the map and recall for `design.seams`, and the lexicon for naming, memory's optional components
+    (KN-1). Bug classes and the research library left this list at KN-1: they are memory's library
+    side, in the core;
   - audit cost (observability);
   - live delivery of confirmed messages (integrations).
 
@@ -221,7 +223,7 @@ posted to dependents. The build moves through Design whole (FL-D1).
   - the trailer and builder-return schemas;
   - the policies: `build.worktree`, `build.scope`, `leases.*`, `design.forks`, `design.reentry`, `review.build`, `review.findings`, `review.follow-up`, `core.bypass`, `core.exceptions`, `hooks.bypass`, `resume.partial` and `flow.route-backs`.
 - **Memory:**
-  - reads the specs at their SHAs and the write sets;
+  - reads the specs at their SHAs, the write sets, and the bug classes those write sets select;
   - writes the commits, the acceptance records, the scope reports, the review report, the core result
     and the transition.
 - **Runtime:**
@@ -231,8 +233,9 @@ posted to dependents. The build moves through Design whole (FL-D1).
   - the write gate.
 - **Breakpoints:** the closing review; the owner's gate at `build.exit` under `every-stage`.
 - **Extension points:**
-  - the bug-class checklist after each pass, recorded as not applicable without knowledge;
-  - the lexicon (knowledge);
+  - the lexicon, an optional memory component (KN-1). The bug-class checklist left this list at KN-1:
+    bug classes are core, on memory's library side, and ride the builder's work order by its unit's
+    write set;
   - review cost (observability).
 
 ## [test] Test: does the merged result hold?
@@ -385,15 +388,15 @@ multi-agent act. The items are its witnessed stages:
 |---|---|---|---|---|---|
 | `review.trigger` | command | — | records why the breakpoint fired | the policy value, the recommendation record, or the owner's request record | fired → `review.pin`; not fired → the flow continues |
 | `review.pin` | command | `review.trigger` | pins the artifact: the plan revision, the spec revisions, the commit range or the landing record | the pinned SHAs | `review.lens` |
-| `review.lens` | reviewer, one per lens, within the fan-out bound | `review.pin` | reviews through the lens | a computed join: each finding cites lines that exist in the pinned artifact, and carries its lens and, where knowledge is installed, a class from its catalogue | `review.refute` |
+| `review.lens` | reviewer, one per lens, within the fan-out bound | `review.pin` | reviews through the lens | a computed join: each finding cites lines that exist in the pinned artifact, and carries its lens and, where one fits, a class from memory's bug-class catalogue (KN-1) | `review.refute` |
 | `review.refute` | skeptic | `review.lens` | tries to refute each finding | a computed join: every finding has one verdict (confirmed, refuted, or unverified, the harness's `uncertain`), and each verdict names its probe and the probe's output | `review.report` |
 | `review.report` | synthesizer | `review.refute` | merges the findings into one report | a computed join: every confirmed finding appears in the report, under the build's `reviews/` | `review.dispose` |
 | `review.dispose` | command | `review.report` | disposes each confirmed finding by the artifact's state. On an unbuilt spec, the findings go to `review.fold`. On built work, they become new units or asks by `review.findings`. It counts each class by its tag (`review.left-shift`), turns an earned gate into a patch-build intake, and files each unverified finding as `review.unverified` says | each disposition joined to its fold, unit or ask | unbuilt → `review.fold`; built → released, with a follow-up round as `review.follow-up` says; an unverified finding under `block` → a verification round |
 | `review.fold` | spec writer | `review.dispose` | folds the confirmed findings into the unbuilt specs, the spec-write workflow's disposal stage | each confirmed finding joined to its fold in the spec at its new SHA | the next round as `review.design.rounds` says, or released |
 | `review.cost` | command | `review.report` | records the review's agents and out-tokens in its report, as the harness logs them | the cost field | done |
 
-- **Classes.** `review.left-shift` counts by class where knowledge's catalogue tags them, and by lens
-  where it is absent, so the core needs no class set of its own.
+- **Classes.** `review.left-shift` counts by class where memory's catalogue tags a finding, and by
+  lens where no class fits. The catalogue is core since KN-1, on memory's library side.
 - **An unverified finding under `review.unverified: block`.** Its verification round re-runs the
   skeptic with a fresh probe, and counts against `flow.route-backs`. Past that bound it becomes an
   owner item, resolved as `run.on-owner-question` says.
@@ -401,8 +404,8 @@ multi-agent act. The items are its witnessed stages:
   - the lens views;
   - the reviewer, skeptic and synthesizer schemas;
   - the policies: `review.<stage>`, `review.breakpoints`, `review.blocks`, `review.findings`, `review.left-shift`, `review.follow-up`, `review.unverified`, `review.design.rounds`, `review.design.round-count`, `review.recommendation`, `flow.route-backs` and `run.on-owner-question`.
-- **Extension points:** lens packs; the bug-class catalogue (knowledge); the value ledger
-  (observability).
+- **Extension points:** lens packs; the value ledger (observability). The bug-class catalogue is core
+  since KN-1.
 
 ## [lifecycle] The owner's controls: pause, resume, withdraw, supersede
 
@@ -481,8 +484,8 @@ row is reached by an item, seen red on a planted dropped row.
 - **Core Deploy has no role.** The deployer works only in the expansions: release notes for
   distribution and verify judgment for integrations, so it registers under both. So does the
   maintainer, under observability. Layer 3 sorts the roster by layer.
-- **The bug-class checklist is now an extension point of Build,** not a core item. Without knowledge it
-  records not-applicable.
+- **The bug-class checklist** was made an extension point of Build here. Since KN-1 it is core again:
+  it rides the builder's work order from memory's library side, by the unit's write set.
 - **Ratification is not an item:**
   - under `plan.ratification: request`, `plan.exit`'s witness carries it;
   - under any other value, it is an owner breakpoint at `plan.exit`.
@@ -602,7 +605,7 @@ Two keys join v2's catalogue: `flow.route-backs` (`[rules]`) and, from LR-4,
 | `ask-row-shape` | amend | `[open]` S-2: today's ask row |
 | `lease-ref-history` | amend | the lease record replaces "the lease ref's history" |
 | `merge-read-as-additions` | amend | `[rules]`: range checks read `--first-parent`, without merges |
-| `class-set-undefined` | amend | `[breakpoint]`: classes from knowledge where installed, the lens otherwise |
+| `class-set-undefined` | amend | `[breakpoint]`: classes from memory's catalogue where one fits, the lens otherwise (KN-1) |
 | `deployer-producing-role` | amend | layer-flow `[settled]`; `build.recommend` is signals only |
 | `reasoning-item-count` | amend | layer-flow `[uncovered]`: four items |
 | `audit-b-count` | none | refuted |

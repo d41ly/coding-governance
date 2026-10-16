@@ -133,7 +133,7 @@ without it?
   - memory, meaning the trail;
   - runtime.
 - If so, it is an **expansion**:
-  - knowledge;
+  - knowledge, folded into memory as its library side by KN-1 (2026-10-16);
   - observability;
   - integrations;
   - distribution, once gov is installed.
@@ -166,6 +166,9 @@ In one line: Instruction says, Runtime enforces, Flow witnesses, Memory proves.
   It absorbs most of the owner's memory bookkeeping. The research records and the major decisions
   themselves are core: core items write them, and Knowledge holds the consulting (the memory layer's
   refinement).
+
+  Revised 2026-10-16 (KN-1, `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md`): Knowledge folded into the memory layer
+  as its library side, and its kits became memory's optional components.
 - **Observability**, signals about the loop and the runtime, read by Maintain and the Loop Review:
   - run logs, through runlog, whose journal grammar is core (Runtime);
   - process health, from process-monitor's reports;
@@ -191,6 +194,10 @@ In one line: Instruction says, Runtime enforces, Flow witnesses, Memory proves.
 
   Each such field, and each part of a core render that carries an expansion's content, becomes an
   optional slot that its expansion fills. A core-only install renders it empty.
+
+  Revised 2026-10-16 (KN-1): bug classes are core, on memory's library side, so the first and the third
+  are no longer breaks. The map is an optional component of memory, so the second stays an optional
+  slot.
 - **Every layer fills one contract**, core or expansion. The contract holds:
   - its tag and its definition;
   - its instruction units;
@@ -230,7 +237,7 @@ In one line: Instruction says, Runtime enforces, Flow witnesses, Memory proves.
 | hooks | Runtime: enforcement at the tool boundary | core |
 | process-monitor | Runtime: reaping; its reports feed Observability | core |
 | branch-reconcile and the cleanup Skill | Runtime: isolation housekeeping | expansion |
-| codebase-map, lexicon, memory-recall | Knowledge; `reuse_lookup.py` retires | expansion |
+| codebase-map, lexicon, memory-recall | Memory: the library side's optional components (KN-1); `reuse_lookup.py` retires | expansion |
 | runlog, drift-audit | Observability; runlog's journal grammar is core (Runtime) | expansion |
 | govkit and the adopt scripts | Distribution | expansion |
 | lib | shared primitives inside kits | no layer |
@@ -503,7 +510,7 @@ Around the grammar:
   - build: the Build step, attended;
   - unattended: a client of `run <build>`, which Runtime's supervisor executes.
 - **Expansion entries**, each in its own layer:
-  - memory-recall and lexicon: Knowledge, lexicon naming at Design and Build;
+  - memory-recall and lexicon: memory's optional components (KN-1), lexicon naming at Design and Build;
   - runlog and drift-audit: Observability;
   - cleanup: Runtime's isolation housekeeping.
 - deploy-governance retires (the memory layer's tooling map). Adoption runs through govkit, in
@@ -632,6 +639,9 @@ a declared extension point and the core never depending on one.
 - the cycle on a base;
 - the layer contract;
 - optional slots for expansion-filled work-order fields.
+
+Revised 2026-10-16 (KN-1): three expansions remain. Knowledge folded into the memory layer as its library
+side, and its kits became memory's optional components, which fill optional slots the same way.
 
 **Principles.**
 - P11 now carries the owner's first instruction principle: everything loaded gives direction, through
