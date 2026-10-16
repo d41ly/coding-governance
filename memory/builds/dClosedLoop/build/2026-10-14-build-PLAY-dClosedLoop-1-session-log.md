@@ -121,6 +121,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 57 | `tier2-review.js`, full: five `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The expansion round's review, run A: a diff review over `ee2eee68e..f56e80fee`, the atlas excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md` `[review]` | 1799cb98 | returned as `wf_644d225b-42a`, CLEAN WITH FIXES, 37 of 45 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-a.md` |
 | 58 | the same | The expansion round's review, run B, after run A returns | the same | 1799cb98 | returned as `wf_3a59e7c4-201`, CLEAN WITH FIXES, 46 of 54 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-b.md` |
 | 59 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The expansion fold's closing review: a light diff review over `3fccdd78a..6e0ce0a55`, the review reports, the atlas and the generated files excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` `[fold-review]` | 1799cb98 | returned as `wf_27ececa4-f6c`, CLEAN WITH FIXES, 20 of 28 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md` |
+| 60 | the same, round 2 with round 1's 20 confirmed findings handed as `priorFindings` | The expansion fold's follow-up round over the closing review's fixes, `f506dd106..4edc6790b`, after the owner chose it | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` `[follow-up]` | 1799cb98 | dispatched | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1120,6 +1121,9 @@ The expansion fold's closing review, dispatch 59, derived from its Workflow run 
   and the comparison record's `[closing-review]` names where each went. The unattended offer now runs
   nothing from an adopter's tree, the secret scan binds at every boundary that publishes, and
   `deploy.released` waits under its own wake lease once the build's lease is gone.
+
+- 2026-10-16, session 1799cb98: asked whether to run a follow-up over the closing review's fixes, the owner
+  chose, verbatim: "Run the follow-up (Recommended)". Dispatch 60 runs it at round 2 over `f506dd106..4edc6790b`.
 
 ## Instruments
 

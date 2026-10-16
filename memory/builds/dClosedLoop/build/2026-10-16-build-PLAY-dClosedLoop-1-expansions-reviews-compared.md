@@ -357,7 +357,194 @@ findings: 0
 
 - **The checks, run again:** the preset check, the gap-ownership join and the role matrix, as in
   `[folded]`, with the same results.
-- **No follow-up round has reviewed these fixes.**
+- **The follow-up round** is dispatched, as `[follow-up]` says.
+
+## [follow-up] The follow-up round, dispatched 2026-10-16
+
+Asked whether to run a follow-up over the closing review's fixes, the owner chose, verbatim: "Run the follow-up (Recommended)".
+
+- **What runs.** Dispatch 60: one light Tier-2 diff review at round 2 over `f506dd106..4edc6790b`, the one commit
+  that folds the closing review, as dispatch 48 did for the layers' fold. Round 1's 20 confirmed
+  findings ride as `priorFindings`, trimmed to the fields the harness's prompt reads.
+- **The report:** `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md`.
+
+Its args, verbatim:
+
+```json
+{
+ "kind": "diff-review",
+ "base": "f506dd106a22b9dbc76bcd21968661333be2d33d",
+ "head": "4edc6790b50249c575c22ddc007075e903e74af4",
+ "repo": "C:/projects/coding-governance/.claude/worktrees/gov-architecture-plan-e34297",
+ "round": 2,
+ "priorFindings": [
+  {
+   "id": 1,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md:439",
+   "claim": "The kits.offer fix says GOVKIT_RERENDER=0 refuses target-side execution, and [revised] and v2's dShippedRelease row say the offer 'runs no adopter code'. The tree disagrees: govkit's update runs every touched kit's [check].argv in the target, before and after the write, and nothing gates that on GOVKIT_RERENDER.",
+   "severity": "high"
+  },
+  {
+   "id": 2,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md:770",
+   "claim": "The secret value scan binds 'at the lander's prepare' (test.merge), but its stated population is every refs/gov/* object the core pushes (mailbox, card, leases and claims). The core pushes those refs at other times, so a scan at prepare cannot read them, and its witness would still claim them.",
+   "severity": "high"
+  },
+  {
+   "id": 3,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md:358",
+   "claim": "The design says 'Every way a pass ends writes the release record with its outcome', but release.promote ('refused or unreachable → retry, then an owner item', :369) and release.verify ('dead probe → an owner item', :370) end in an owner item that writes no release record. The outcome set (verified, held, rolled forward, rolled back, halted) has no value for these cases.",
+   "severity": "medium"
+  },
+  {
+   "id": 4,
+   "lens": "correctness",
+   "ref": "memory/gotchas/core-depends-on-an-optional-part.md:41",
+   "claim": "The new class's probe, 'install the core alone, load each shipped preset, and expect none refused', contradicts the design. flow-steps:523-525 and v2's [presets] paragraph say strict and guarded, which select build.closes: after-release-verifies, are refused on an install without integrations under the default policy.on-missing-expansion: refuse.",
+   "severity": "medium"
+  },
+  {
+   "id": 6,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md:337",
+   "claim": "C7 policy-value-with-no-route: the new app-only arm says deploy.core records the claimed remote verdict 'beside its own witness, the post-merge bar on the landed SHA, and never advances on it'. Under GATE_POST_MERGE=ci, deploy.core starts no post-merge bar, so that witness does not exist.",
+   "severity": "medium"
+  },
+  {
+   "id": 7,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md:436",
+   "claim": "C16/C7: kits.cut fires 'each period, or under every-landing the core's landed event', and its new decline route is 'skipped for the period ... keyed by period'. owner-cut, the value strict selects (v2:854), names neither a period nor an event.",
+   "severity": "medium"
+  },
+  {
+   "id": 8,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md:442",
+   "claim": "C7: the new currency leg reads 'the newest committed currency record' and is a dead probe with no record. DI-1's source-mode receipt reads 'source, 0 behind', witnessed by the receipt (:437), so the leg has no arm for source mode.",
+   "severity": "medium"
+  },
+  {
+   "id": 9,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md:252",
+   "claim": "C16 owner-item-without-its-reject-outcome: the loop.file fix collapses repeats only onto an open ask. A proposal the owner refused at review.loop.retire leaves no open ask, so the next week's loop.propose files it again.",
+   "severity": "medium"
+  },
+  {
+   "id": 11,
+   "lens": "correctness",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md:753",
+   "claim": "layer-runtime's revision says [extend] now names 'every key that takes registered names'. Its list omits release.environments ('an ordered list of registered environments'), and the three lists of selecting keys disagree: layer-runtime has seven, gap-spine-07 five, and layer-expansions:404 four, without kits.host.",
+   "severity": "low"
+  },
+  {
+   "id": 13,
+   "lens": "correctness",
+   "ref": "memory/gotchas/policy-value-with-no-route.md:31",
+   "claim": "The class's new 'where it bit' entry says velocity's values for 'four observability keys' had no arm. The map row velocity-values-unrouted names five: maintain.reading-tree, maintain.node-readings, maintain.detector-admission, observability.run-record and review.loop.catch-source.",
+   "severity": "low"
+  },
+  {
+   "id": 14,
+   "lens": "seams",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:333",
+   "claim": "C11: under the default build.release-hold: close-only, deploy.unlease deletes the build's lease refs and prunes its mailbox before deploy.released has passed. deploy.released, its owner item and deploy.close then have no driver, no lease to mint records under and no mailbox for the owner's answer.",
+   "severity": "high"
+  },
+  {
+   "id": 15,
+   "lens": "seams",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:331",
+   "claim": "C11: deploy.released waits for an exit record but has no arm for one that never arrives, and life.quiesce still says a pushed build 'closes as landed', which deploy.close's new Needs make impossible.",
+   "severity": "medium"
+  },
+  {
+   "id": 17,
+   "lens": "seams",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md:231",
+   "claim": "The fold rewires release-verify-failed to fire on any exit outcome 'not verified', so a held outcome (the owner refused promotion) and rolled-forward/rolled-back outcomes that release.route already filed an ask for each raise a second Maintain filing as a 'failed verify'.",
+   "severity": "medium"
+  },
+  {
+   "id": 19,
+   "lens": "seams",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:365",
+   "claim": "Deploy's Memory bullet was not updated for deploy.released. It omits reading the release slot's exit record, and 'the pass record' (deploy.released's witness under at-landing and at-landing-maintain-owns) appears nowhere else in the build's records.",
+   "severity": "low"
+  },
+  {
+   "id": 21,
+   "lens": "verification",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md:439",
+   "claim": "C9: `kits.offer` says `GOVKIT_RERENDER=0` refuses target-side execution, but govkit's update runs each touched kit's `[check]` argv inside the target whatever that switch says. The class's named fixture plants only a regenerate argv, so it cannot fail on that path.",
+   "severity": "high"
+  },
+  {
+   "id": 23,
+   "lens": "verification",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md:708",
+   "claim": "C6: the journal pair rule is stated two ways. v2 (and layer-runtime's `[policies]` row) apply it unconditionally to every preset and override. layer-expansions applies it only 'while observability is installed', and `review.loop.window-days` is observability's key.",
+   "severity": "medium"
+  },
+  {
+   "id": 24,
+   "lens": "verification",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md:778",
+   "claim": "C12: the secret value scan's seen-red fixture plants the value in 3 of the 7 populations the scan names, and no fixture exercises its dead-probe arms. A scan that skips a population, or goes green on an unresolved value, passes every fixture named.",
+   "severity": "medium"
+  },
+  {
+   "id": 25,
+   "lens": "verification",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md:809",
+   "claim": "Three behaviours the fold gave Runtime (grant scope enforcement at registration, journal pruning by `runtime.journal`, and the secret scan) have no tagged fixture in `[tests]` and no row in `[invariants]`. `[contract]`'s gates row points at `[extend]` instead.",
+   "severity": "low"
+  },
+  {
+   "id": 26,
+   "lens": "verification",
+   "ref": "memory/gotchas/core-depends-on-an-optional-part.md:41",
+   "claim": "The new class names a probe ('install the core alone, load each shipped preset, and expect none refused') and says gap-found-17's check is its guard. But v2's dOrderedCharter cell owes only the core-item and EX-1 arms, and no chain build owes the preset-load probe.",
+   "severity": "low"
+  },
+  {
+   "id": 27,
+   "lens": "verification",
+   "ref": "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md:139",
+   "claim": "C15: run over the folded `[cross]`, the new class's own probe ('each `[agreement]` or `[cross]` row that names both runs carries two return citations') fails on rows the fold left standing.",
+   "severity": "low"
+  }
+ ],
+ "intensity": "light",
+ "reviewDir": "memory/builds/dClosedLoop/reviews",
+ "roles": {
+  "diffFinder": "gov-diff-reviewer",
+  "skeptic": "gov-skeptic",
+  "synthesis": "gov-synthesizer"
+ },
+ "efforts": {
+  "diffFinder": "high",
+  "skeptic": "high",
+  "synthesis": "high"
+ },
+ "specs": [
+  "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md",
+  "memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md",
+  "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md",
+  "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md",
+  "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md",
+  "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md",
+  "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md"
+ ],
+ "context": "The diff is round 2 of the closing review of the expansion fold in build dClosedLoop, a design-only build that re-architects gov onto one loop. Round 1 (memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md) reviewed the fold and returned CLEAN WITH FIXES, 20 of 28 confirmed in 18 items; its confirmed findings are handed in as priorFindings. The diff is the one commit 4edc6790b that folds them: layer-expansions (the release program's owner items now end in a record with the outcome unverified; only a failure fires release-verify-failed, keyed as release.route's ask is; loop.propose skips a row the owner kept; app-only's arms; kits.cut under owner-cut; the unattended kits.offer in a govkit mode that runs nothing from the adopter's tree; the currency leg's source-mode arm; one list of registered-name keys; [cross] citations), flow-steps (deploy.released as an event wait under its wake's own run lease, with a runtime.hold-ceiling arm and an owner channel that needs no mailbox; deploy.close minted under the claim ref; [rules]' mailbox rule; the unverified outcome; life.quiesce; the core re-check's app-only arm; Deploy's Memory bullet), layer-runtime ([extend]'s one key list and the secret value scan bound at the lander's prepare and the core's ref-push path, [schedule]'s event waits, [tests]' grant, secret-scan and journal-retention fixtures, an [invariants] row), v2 (the pair rule, dDeclaredLoop's and dShippedRelease's rows, a dated revision), the gap register (gap-deploy-13, gap-spine-07), five bug classes under memory/gotchas/, and the comparison record's [closing-review] and the session log. memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md [closing-review] names where each round-1 item went. Read the diff without round 1's report and the generated files: git -C C:/projects/coding-governance/.claude/worktrees/gov-architecture-plan-e34297 diff f506dd106a22b9dbc76bcd21968661333be2d33d...4edc6790b50249c575c22ddc007075e903e74af4 -- . ':(exclude)memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md' ':(exclude)memory/gotchas/INDEX.md' ':(exclude)memory/builds/dClosedLoop/README.md'. Review for three things: (1) a round-1 finding the fix leaves standing, fixes in part, or fixes in a way its own text contradicts; (2) a defect the fix itself introduced: an item, route, witness, key, value, record kind or lease with no producer, no arm or no home, or one fact now stated two ways; (3) text wrong about the tree, govkit's execution sites included. Write the report to memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md. Its head carries an H1, then, within its first twelve lines, the line `**Serves:** diff-review PLAY-dClosedLoop-1`. It carries exactly one `## Verdict:` line, whose token is CLEAN, CLEAN WITH FIXES or BLOCKED and nothing else.",
+ "byDesign": "- The build is design-only: no product code and no unit specs. Unit-level detail is absent by design and owed to the chain builds.\n- The owner's settled answers (RH-1, PIN-1, EX-1 to EX-3, DI-1, and the earlier KN-1, LB-1 to LB-4, F*, R-*, RT-* and LR-*) are decisions: a finding may show one contradicts a record or the tree, but does not re-argue the owner's choice.\n- For round 1's H1 the fold chose the fix that denies by default: the unattended offer runs nothing from the adopter's tree, and the adopter's own lander runs the checks it left unrun. A finding may show that choice contradicted elsewhere, not re-argue it against the sandbox-only alternative.\n- Dated records keep what held when they were written: research returns, revision notes, [forks], [settled], [review] and the session log's past entries.\n- Generated files (memory/LIVE.md, the build README's generated regions, memory/map/generated/ and memory/gotchas/INDEX.md) are rendered and not under review.\n- The atlas page and its generator are an owner-facing view outside this review.",
+ "checklist": "# recurring-bug-class checklist for f506dd106..4edc6790b (15 changed file(s))\n# 19 class(es) selected by an anchor + 6 universal\n# by anchor specificity: 10 path · 4 directory · 5 basename; a cut tier prints one line per class\n# invariants are read at f506dd106a22; 0 that this subject adds, edits or takes out are listed as items, never by design\n\n- [ ] fixture-passes-by-finding-nothing (universal)\n      a test arm whose fixture never triggers the rule passes, and proves nothing\n      memory/gotchas/fixture-passes-by-finding-nothing.md\n\n- [ ] guard-above-a-fold-makes-its-fallback-dead (universal)\n      a guard added above a fold settles the predicate the fold's own fallback re-tests, leaving a dead arm that reads as coverage\n      memory/gotchas/guard-above-a-fold-makes-its-fallback-dead.md\n\n- [ ] heredoc-escape-reaches-the-regex (universal)\n      source written through a shell heredoc into a non-raw string turns an escape into a control byte, and the symptom never looks like a quoting problem\n      memory/gotchas/heredoc-escape-reaches-the-regex.md\n\n- [ ] inline-fence-swallows-the-rest-of-the-file (universal)\n      a triple-backtick written inline in prose opens a fence the reader never closes, so every section after it silently disappears from the checker's view\n      memory/gotchas/inline-fence-swallows-the-rest-of-the-file.md\n\n- [ ] staged-break-substitutes-a-synthetic-value (universal)\n      an arm that proves a mechanism by replacing the shipped value with a simpler one proves the mechanism for the simpler value\n      memory/gotchas/staged-break-substitutes-a-synthetic-value.md\n\n- [ ] two-answers-to-one-question (universal)\n      a fact stated in two places drifts, and the copies need not disagree loudly to be wrong\n      memory/gotchas/two-answers-to-one-question.md\n\n- [ ] policy-value-with-no-route (path)\n      a policy key catalogues a value that no item reading the key routes or witnesses, so a preset that selects the value cannot run\n      memory/gotchas/policy-value-with-no-route.md\n\n- [ ] zero-witness-over-an-unnamed-population (path)\n      a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean\n      memory/gotchas/zero-witness-over-an-unnamed-population.md\n\n- [ ] foreign-code-runs-on-the-ambient-credential (path)\n      an unattended item runs code another repository authored, on the node's whole environment and ambient credential, so that repository's committers gain the node's rights\n      memory/gotchas/foreign-code-runs-on-the-ambient-credential.md\n\n- [ ] route-names-an-output-its-actor-never-emits (path)\n      a designed route or witness names an output, exit class or record that its actor never produces on that path, so the route is dead or waits forever\n      memory/gotchas/route-names-an-output-its-actor-never-emits.md\n\n- [ ] append-without-an-idempotence-key (path)\n      a command that appends to an append-only record declares no key, so a retried run writes the same row twice and a set-join witness stays green\n      memory/gotchas/append-without-an-idempotence-key.md\n\n- [ ] core-depends-on-an-optional-part (path)\n      a core item, leg, field or preset cannot run, or cannot be enforced, without an expansion or an optional component, and the dependency hides behind the guard or Absent clause that seems to degrade it\n      memory/gotchas/core-depends-on-an-optional-part.md\n\n- [ ] insert-after-a-key-that-occurs-twice (path)\n      a record edit inserts a row after the first match of a cell value that occurs in two tables, so the row lands in the wrong table and the right one never gains it\n      memory/gotchas/insert-after-a-key-that-occurs-twice.md\n\n- [ ] one-run-claim-recorded-as-agreed (path)\n      a comparison of two independent runs records a claim only one run made as what both found, so a single measurement carries the weight of agreement\n      memory/gotchas/one-run-claim-recorded-as-agreed.md\n\n- [ ] parser-drops-rows-it-cannot-place (path)\n      a record-parsing instrument skips rows under a heading it does not know, or rows its pattern cannot read, and still prints a clean run, so its population shrinks without a word\n      memory/gotchas/parser-drops-rows-it-cannot-place.md\n\n- [ ] rule-stated-with-no-check-that-fails (path)\n      a principle, a constraint between two keys or another rule is added in prose with no check that can fail on its breach, so it binds nothing and nobody can see that it does not\n      memory/gotchas/rule-stated-with-no-check-that-fails.md\n\n- [ ] a-merge-of-the-default-branch-read-as-additions (directory) · memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md\n\n- [ ] amendment-leaves-its-other-half-standing (directory) · memory/gotchas/amendment-leaves-its-other-half-standing.md\n\n- [ ] ledger-token-wrapped-across-a-line-joins-nothing (directory) · memory/gotchas/ledger-token-wrapped-across-a-line-joins-nothing.md\n\n- [ ] retirement-inventory-misses-readers-by-value (directory) · memory/gotchas/retirement-inventory-misses-readers-by-value.md\n\n- [ ] record-without-serves-or-with-a-round-counter (basename) · memory/gotchas/record-without-serves-or-with-a-round-counter.md\n\n- [ ] owner-item-without-its-reject-outcome (basename) · memory/gotchas/owner-item-without-its-reject-outcome.md\n\n- [ ] rate-quoted-without-its-denominator (basename) · memory/gotchas/rate-quoted-without-its-denominator.md\n\n- [ ] a-folded-field-leaves-its-row-shape-docs-behind (basename) · memory/gotchas/a-folded-field-leaves-its-row-shape-docs-behind.md\n\n- [ ] git-rm-cached-refuses-a-diverged-index-blob (basename) · memory/gotchas/git-rm-cached-refuses-a-diverged-index-blob.md\n\n# by design — 0 invariant(s) this selection touches\n"
+}
+```
 
 ## [map] Every finding, placed
 
