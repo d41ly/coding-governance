@@ -120,6 +120,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 56 | the same | The distribution expansion, run B, from the same handoff | the same | 1799cb98 | dispatched 17:00 after the five returned; returned, 6m11s, 34.4k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-distribution-b.md` |
 | 57 | `tier2-review.js`, full: five `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The expansion round's review, run A: a diff review over `ee2eee68e..f56e80fee`, the atlas excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md` `[review]` | 1799cb98 | returned as `wf_644d225b-42a`, CLEAN WITH FIXES, 37 of 45 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-a.md` |
 | 58 | the same | The expansion round's review, run B, after run A returns | the same | 1799cb98 | returned as `wf_3a59e7c4-201`, CLEAN WITH FIXES, 46 of 54 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-b.md` |
+| 59 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The expansion fold's closing review: a light diff review over `3fccdd78a..6e0ce0a55`, the review reports, the atlas and the generated files excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` `[fold-review]` | 1799cb98 | dispatched | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1081,6 +1082,13 @@ The expansion round's review, dispatches 57 and 58, derived from their Workflow 
   flow-steps, layer-runtime, layer-memory, layer-roles' derived matrix, v2 and the register, added
   `gap-deploy-13` and `gap-lex-08`, and filed five bug classes under `memory/gotchas/`. The comparison
   record's `[folded]` names where each defect went. The fold's own closing review is owed.
+
+- 2026-10-16, session 1799cb98: dispatch 59 runs the fold's closing review, one light diff review over
+  the fold's two commits, `3fccdd78a..6e0ce0a55`. Commit 6e0ce0a55's message counts four renamed keys; the fold renamed
+  five: `release.cadence`, `maintain.detector-admission`, the key `maintain.record`,
+  `integrations.secret-home` and `integrations.secret-scan`. The atlas generator now counts the
+  expansion layers' rounds by their record's name, so its progress view reads them reviewed twice and
+  folded.
 
 ## Instruments
 

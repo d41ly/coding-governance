@@ -393,7 +393,10 @@ def derive():
     for layer, lnames in LAYER_RECORDS.items():
         recs_l = [record(n) for n in lnames]
         progress.append({"layer": layer, "records": [r.name for r in recs_l],
-                         "reviews": [r["file"] for r in reviews if re.fullmatch(rf"{layer}-[ab]", r["scope"])],
+                         # A layer's rounds are named for its first record: `runtime-a`, or `expansions-a`
+                         # for the three expansions, which one record and one pair of rounds cover.
+                         "reviews": [r["file"] for r in reviews
+                                     if re.fullmatch(rf"{lnames[0].removeprefix('layer-')}-[ab]", r["scope"])],
                          "folded": any("\n## [revised]" in text(r) or re.search(r"^Revised: .*Tier-2", text(r), flags=re.M)
                                        for r in recs_l),
                          "sections": [{"path": rec["path"], "id": s["id"], "title": s["title"], "tag": s["tag"]}

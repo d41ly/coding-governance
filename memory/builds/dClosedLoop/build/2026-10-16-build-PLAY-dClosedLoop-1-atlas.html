@@ -1652,8 +1652,13 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
     var expansions = D.layers.filter(function (l) { return l.kind !== 'core'; });
     var designed = expansions.filter(function (l) { return PROG[l.tag]; });
     var reviewed = designed.filter(function (l) { return PROG[l.tag].reviews.length; });
+    var foldedX = reviewed.filter(function (l) { return PROG[l.tag].folded; });
+    var rounds = reviewed.length ? Math.min.apply(null, reviewed.map(function (l) { return PROG[l.tag].reviews.length; })) : 0;
+    var xState = !designed.length ? 'The expansions come last.' : reviewed.length < designed.length ?
+      designed.length + ' of ' + expansions.length + ' expansions proposed, ' + reviewed.length + ' reviewed.' :
+      designed.length + ' of ' + expansions.length + ' expansions designed, reviewed ' + (rounds === 1 ? 'once' : rounds === 2 ? 'twice' : rounds + ' times') + ' at Tier 2' + (foldedX.length === reviewed.length ? ' and folded.' : '.');
     head.appendChild(el('p', { class: 'lede' }, 'Each core layer was drafted with the owner, reviewed twice at Tier 2 and folded. The library side opened after KN-1: ' + esc(libraryState().replace(/^./, function (c) { return c.toLowerCase(); })) + ' ' +
-      (designed.length ? esc(designed.length + ' of ' + expansions.length + ' expansions proposed, ' + reviewed.length + ' reviewed.') : 'The expansions come last.')));
+      esc(xState)));
     v.appendChild(head);
     var rail = el('div', { class: 'rail' });
     function progressCard(p, meta) {

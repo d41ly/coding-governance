@@ -653,6 +653,6 @@ file, guarantee stated (Recommended)". In this record:
 - **The chain builds' planned units** for the eight core points and the three designs, at the chain
   re-cut v2 `[owed]` already carries.
 - **The round's Tier-2 review**, returned and folded (`[revised]`); the fold's own closing review is
-  owed, as the comparison record's `[fold]` says.
+  dispatched, as the comparison record's `[fold-review]` says.
 - **Too small to register:** govkit's usage text omits the `contribute` verb it dispatches
   (distribution B).
