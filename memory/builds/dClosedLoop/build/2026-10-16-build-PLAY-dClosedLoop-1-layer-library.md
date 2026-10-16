@@ -146,9 +146,9 @@ Every path is filled by hand, and nothing notices when one is skipped:
 | Path | Writer today | What lets it be skipped | Measured |
 |---|---|---|---|
 | A finding becomes a bug class | a class record, hand-written in a fold commit under the build method's prose rule | no check joins confirmed findings to classes | 183 of 907 confirmed findings in the 36 review appendices with a classes column carry a class; 13 of 124 class records cite the review or finding that filed them |
-| A built feature becomes a reuse entry | nothing; the spec's reuse audit, dossier seams and the card's `**Reuse:**` field come nearest | nothing proposes an entry, and the card is untracked | 256 specs in 67 of 163 builds say "no existing seam fits"; 4 of 20 stored cards fill `**Reuse:**`; `gov:feature` marks 0 code lines |
+| A built feature becomes a reuse entry | nothing; the spec's reuse audit, dossier seams and the card's `**Reuse:**` field come nearest | nothing proposes an entry, and the card is untracked | 256 specs in 67 of 163 builds say "no existing seam fits" or "no seam fits", 236 the exact phrase; 4 of 20 stored cards fill `**Reuse:**`; `gov:feature` marks 0 code lines |
 | A decision becomes a log row | hand edits to `memory/DECISIONS.md` | no rule requires a row, and nothing defines a major decision | 160 rows added in 60 days, beside 1,829 `Decided:` trailers |
-| A build's research joins the library | the researcher's record, bound by `**Serves:** research` and graded by check 21 | across builds only recall reaches it, and recall is optional | 202 records in 41 builds, 22 of them cited from another build |
+| A build's research joins the library | the researcher's record, bound by `**Serves:** research` and graded by check 21 | across builds only recall reaches it, and recall is optional | 59 research returns in 10 builds, 8 of them cited from another build; the binding alone also covers design records, logs and registers, 179 records |
 
 - **Dossiers hold little of what a reuse entry needs.** Their reuse-shaped part, `## Reuse affordance`,
   is 7.1% of their text. No dossier carries a directive or an owner's disposition, and 28 of 31 are
@@ -169,8 +169,8 @@ witness a check reads. The views over the library are derived.
 |---|---|---|---|
 | A finding becomes a bug class | the review breakpoint: `review.report`, then `review.dispose` | the synthesizer gives each disposition; the fold's spec writer or the fix unit's builder files a new class | every confirmed finding carries one left-shift disposition, and each one resolves |
 | A built feature becomes a reuse entry | Build: `build.unit-pass` | the builder proposes, and the owner disposes as LR-6 says | each unit that owes a reuse line carries one, and an accepted entry has its `gov:feature` anchor in code |
-| A decision becomes a log row | Deploy: `deploy.distill`, a new command after `deploy.record` | the command, from the build's major decisions | a join both ways between the build's major decisions and the log's rows that name the build |
-| A build's research joins the library | a derived view | none: the view renders from the bindings | check 21's binding, and the view's byte comparison |
+| A decision becomes a log row | Build: `build.distill`, before `build.exit`; Deploy's `deploy.distill` confirms the rows at the landed SHA | the command, from the build's resolved forks whose class is major | a one-to-one join between the build's classed forks and the rows of its major ones |
+| A build's research joins the library | a derived view | none: the view renders from the research returns | the research-return kind's check, and the view's byte comparison |
 
 ### [left-shift] A finding becomes a bug class
 
@@ -183,10 +183,14 @@ witness a check reads. The views over the library are derived.
 
   The harness's bare `C<n>` label is refused.
 - `review.report`'s witness gains a join. Each confirmed finding carries one disposition, `class:`
-  resolves to a record under `memory/gotchas/`, `gate:` resolves to a leg in the legs manifest, and
-  `new:` names a slug no record holds.
-- At `review.dispose`, each `new:` is filed with its fix. On an unbuilt spec, `review.fold`'s spec
-  writer writes the class beside the fold. On built work, the builder of the fix unit writes it. The
+  resolves to a record under `memory/gotchas/`, and `gate:` resolves to a leg in the legs manifest.
+  `new:` names a slug no record held at the report's pinned SHA, or whose record carries `from:` this
+  report and finding, so the join stays true once the class is filed. Under `reason` or `owner-rules`,
+  `none` carries its reason, and under `owner-rules` each `none` is an owner item before dispose.
+- At `review.dispose`, each `new:` is filed with the item that owes its record, and the join sits at
+  that item. On an unbuilt spec, `review.fold`'s spec writer writes the class beside the fold. On built
+  work, the builder of the fix unit writes it, in its write set. A finding that becomes an ask carries
+  its `new:` slug, and the ask is accepted once the class record exists. The
   new class carries `from: <review>#<finding id>`, which `gotchas.py --check` resolves, and where the
   map is installed, the dossier of the feature it guards claims it.
 - `review.left-shift` keeps its job: it decides when a class earns a gate, at its second occurrence by
@@ -194,34 +198,40 @@ witness a check reads. The views over the library are derived.
 
 ### [reuse-proposal] A built feature becomes a reuse entry
 
-- A unit whose spec's reuse audit says "no existing seam fits" has built a new seam. Its builder's
+- A unit whose spec's reuse audit records a new seam has built one. The audit's outcome becomes one
+  token that the spec template, the hygiene check and this witness read through one predicate
+  (`gap-design-05`), where today three phrasings pass the hygiene check. Its builder's
   return carries a reuse line: `proposed <tag>`, filed through the instruction command as LR-6 says,
   or `none` with its reason. Units that built a new seam owe the line (`reuse.propose: new-seam`, LB-2).
-- `build.unit-pass`'s witness gains that line for each unit that owes it.
+- `build.unit-pass`'s witness gains that line for each unit `reuse.propose` selects: under `every-unit`
+  every unit, and under `owner-asks` a unit building a feature an owner-filed reuse ask names.
 - A memory check reads the anchors. An accepted entry has at least one `gov:feature <tag>` in code, and
   a `removal-pending` entry has none left once its patch build lands. The check scans one marker, as
   each `gov:` gate does today.
 
 ### [log] A decision becomes a log row
 
-- A build records each decision as it is made, with its class declared: one of layer-memory
-  `[decisions]`' classes, or major.
-- At landing, `deploy.distill`, a new command item after `deploy.record`, appends a log row for each of
-  the build's major decisions. Each row carries its date, its build, the decision, a pointer to its
-  rationale, and the reuse entry it created, if any. A withdrawn build's decisions never reach the
-  log.
-- Its witness is a join both ways between the build's major decisions and the log's rows that name
-  the build. Its author declares a decision major, by the rubric (`decisions.major: author-rubric`,
+- Each resolved fork's record carries its decision and its declared class: one of layer-memory
+  `[decisions]`' classes, or major. Design writes the fork records, and `build.distill` checks each class.
+- `build.distill`, a command before `build.exit`, appends a log row for each major fork to the log in
+  the build's own branch, so the rows land with the build, and a withdrawn build's never do. Each row
+  carries its date, its build, the decision, a pointer to its rationale, and the reuse entry it
+  created, if any. It is idempotent: a row keyed by build and fork is never written twice.
+- Its witness is a one-to-one join between the build's resolved forks and the rows of the major ones.
+  A fork with no class is red, and so is a second row for one key. An empty set passes only where no
+  fork was resolved. At landing, `deploy.distill` confirms the rows at the landed SHA. Its author declares a decision major, by the rubric (`decisions.major: author-rubric`,
   LB-3).
 
 ### [research-view] A build's research joins the library
 
-- The research records are the library already. Each is bound by `**Serves:** research` and graded by
-  check 21.
+- The research returns are the library. The `**Serves:** research` binding also covers design records,
+  logs and registers, so the memory contract gives research returns their own kind, written by
+  `plan.research` and `design.research`, and the view selects that kind.
 - A generated research view lists them by build, date and question, beside the other views in
   layer-memory `[views]`. It is the planner's core source, and recall stays the optional slot that
   searches it.
-- Its witness is check 21's binding, and the view is byte-compared after rendering, like every view.
+- Its witness is the kind's check, seen red on a planted design record bound as research, and the view
+  is byte-compared after rendering, like every view.
 
 ### [placements] The two placements, confirmed by LB-4
 
@@ -236,12 +246,12 @@ witness a check reads. The views over the library are derived.
 - `gap-review-10` (MED, dFairHearing): left-shift has no witness. 724 of 907 confirmed findings carry
   no class and no disposition, and 13 of 124 class records cite the review that filed them.
 - `gap-mem-15` (MED, dTotalRecall): no research view. Research is found across builds only through
-  recall or by its file name, and 22 of 202 records are cited from another build.
+  recall or by its file name, and 8 of 59 research returns are cited from another build.
 - Extended:
   - `gap-mem-02`: nothing defines a major decision;
   - `gap-mem-03`: nothing proposes an entry, and `gov:feature` marks 0 code lines;
   - `gap-mem-11`: the two records above that contradict the code;
-  - `gap-design-07`: its count of 7 research records predates the binding count of 202.
+  - `gap-design-07`: its count of 7 research records predates the count of 59 research returns.
 
 ## [settled-lb] What LB-1 to LB-4 settled, 2026-10-16
 
@@ -259,13 +269,17 @@ has no key:
     one to a class record or a leg. `review.dispose` files each new class with its fix;
   - `build.unit-pass`'s witness carries the reuse line of each unit that built a new seam;
   - `deploy.distill`, a new command after `deploy.record`, appends the build's major decisions to the
-    log, and Deploy exits only once they are there.
+    log, and Deploy exits only once they are there. After the round's review, `build.distill` appends them
+    before Test, and `deploy.distill` confirms them at the landed SHA (`[review-fold]`).
 - **Memory:** layer-memory `[views]` gains the research view, `[decisions]` notes LB-3, and
   `[knowledge]` notes LB-1.
 - **v2:** the three keys join the catalogue and every preset. The non-default presets were assigned by
   analogy with their neighbours: velocity takes the lighter value, and strict the heavier one.
 - **The gaps:** `gap-review-10` joins dFairHearing and `gap-mem-15` joins dTotalRecall. `gap-mem-02`,
   `gap-mem-03`, `gap-mem-11` and `gap-design-07` are extended.
+- **Corrected 2026-10-16** (the round's review, M11): LB-2's option said about 1.6 proposals per build
+  that builds a new seam. The rate is about 3.8 per such build, 256 specs over 67 builds, and 1.6 per
+  build overall, 256 over 163. The answer stands.
 
 ## [consult] The optional components, and the core without them
 
@@ -295,6 +309,7 @@ as a clean search.
 | The lexicon | naming at Design and Build | the core's tag-shape check stands alone, and the naming slot names the lexicon as absent |
 | The lexicon | `lexicon.pin` | inert, and reported as inert when set |
 | The lexicon | the `/lexicon` Skill | not rendered |
+| Recall | check 27's near-match ranking of added decision rows and gotchas, and the decision log's holds-now view | no fallback is owed: both move into memory-tree, the core engine, as the id grammar's parser does (layer-memory `[names]`), and memory-recall imports them (dTotalRecall) |
 
 - **Each component's own legs install with it.** Without the map, its coverage and freshness legs are
   absent from the legs manifest, not skipped.
@@ -338,7 +353,42 @@ page and its generator by pathspec. Its args, verbatim:
 }
 ```
 
+## [review-fold] The round's review, folded 2026-10-16
+
+Dispatch 50 reviewed the round's four commits, `1bc4883fe..aa9639d98`, at light intensity
+(`reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md`): CLEAN WITH FIXES, 25 of 31 findings confirmed, in 19 items. Ids 16, 19,
+20, 23, 27 and 31 were refuted. Each item went here:
+
+| Item | Ids | Disposition | Where the fix sits | Its class |
+|---|---|---|---|---|
+| H1 | 12 | fixed | `build.distill` joins one to one over the build's resolved forks, each with its class declared, which Design's fork records carry; an empty set passes only where no fork was resolved | `vacuous-selector-empty-population` |
+| M1 | 1, 17, 29 | fixed | `review.report` gains the `none` arm under `reason` and `owner-rules`, and the owner route under `owner-rules` | `policy-value-with-no-route`, new |
+| M2 | 3, 13, 28 | fixed | the owner's ratification before `build.distill` under `author-owner-ratifies`, in Build's Breakpoints, each outcome routed | `owner-item-without-its-reject-outcome` |
+| M3 | 2, 25 | fixed | the class record joins at `review.fold` or at the fix unit's `build.unit-pass`, and an ask carries its `new:` slug | `route-names-an-output-its-actor-never-emits` |
+| M4 | 26 | fixed | `new:` is judged at the report's pinned SHA, or by the record's `from:` | `witness-graded-against-a-fact-written-after-it` |
+| M5 | 5 | fixed | `build.distill` is idempotent, keyed by build and fork, and its join refuses a second row | `append-without-an-idempotence-key`, new |
+| M6 | 14 | fixed | the rows are written in the build's branch before Test, `deploy.distill` confirms them at the landed SHA, and Deploy's Memory line reads them | `route-names-an-output-its-actor-never-emits` |
+| M7 | 4 | fixed | `build.unit-pass`'s witness takes its population from `reuse.propose`, each value's arm named | `policy-value-with-no-route`, new |
+| M8 | 30 | fixed, gap | the reuse audit's outcome becomes one token read through one predicate (`gap-design-05`) | `two-answers-to-one-question` |
+| M9 | 7 | fixed | v2's dBoundRoles row renders bug classes as a core field | `amendment-leaves-its-other-half-standing` |
+| M10 | 8 | fixed | v2 `[layers]` and layer-instruction state the slot's three states | `amendment-leaves-its-other-half-standing` |
+| M11 | 10 | fixed | a dated correction in `[settled-lb]`: about 3.8 per build that builds a new seam, 1.6 per build overall; the answer stands | `rate-quoted-without-its-denominator`, new |
+| M12 | 15 | fixed, gap | `[consult]` names check 27 and the holds-now view, both moving into memory-tree by v2's dTotalRecall row (`gap-found-17`) | `retirement-inventory-misses-readers-by-value` |
+| M13 | 18, 24 | fixed, gap | the research view selects a research-return kind; 59 returns in 10 builds, 8 cited from another build (`gap-mem-15`, `gap-design-07`) | `two-answers-to-one-question` |
+| M14 | 22 | fixed | five index rows moved from the session log's Dispatches table to its Records index, and the follow-up review's row, which a presence check never added, added | `insert-after-a-key-that-occurs-twice`, new |
+| L1 | 6 | fixed | the Plan, Design, Build and Deploy Memory lines carry the library's reads and writes | `amendment-leaves-its-other-half-standing` |
+| L2 | 9 | fixed | v2's dOrderedCharter row covers optional components, with a planted red case owed | `amendment-leaves-its-other-half-standing` |
+| L3 | 11 | fixed | the register's re-measure block: Review=10, Memory=15, Deploy=9; LOW=22, MED=70, HIGH=79 | `two-answers-to-one-question` |
+| L4 | 21 | fixed | layer-memory `[contract]` states LB-4's placement | `amendment-leaves-its-other-half-standing` |
+
+- **The method held.** The fold states each contract. The tool-level detail sits in the owning
+  builds' planned units and gaps: dTotalRecall's row, `gap-design-05`, `gap-found-17` and
+  `gap-flow-15`.
+- **The left-shift.** Four classes are new under `memory/gotchas/`, each claimed in its feature's
+  dossier. `route-names-an-output-its-actor-never-emits` and `owner-item-without-its-reject-outcome`
+  gained the review's checklist entries.
+- **The fold is unreviewed text.** A follow-up round over it is the owner's call.
+
 ## [open] What the library round owes
 
-- **This round's review** is owed before the round closes, over KN-1's fold, this design and its
-  settlement.
+- **A follow-up round** over `[review-fold]`, if the owner asks for one.

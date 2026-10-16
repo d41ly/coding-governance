@@ -197,7 +197,8 @@ In one line: Instruction says, Runtime enforces, Flow witnesses, Memory proves.
 
   Revised 2026-10-16 (KN-1): bug classes are core, on memory's library side, so the first and the third
   are no longer breaks. The map is an optional component of memory, so the second stays an optional
-  slot.
+  slot. Since layer-library `[consult]`, an absent component's slot renders "not installed" with its
+  fallback named, never empty.
 - **Every layer fills one contract**, core or expansion. The contract holds:
   - its tag and its definition;
   - its instruction units;

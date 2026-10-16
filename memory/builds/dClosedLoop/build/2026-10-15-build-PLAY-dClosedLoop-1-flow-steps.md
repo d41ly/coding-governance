@@ -120,7 +120,8 @@ plan record.
   - the intake and plan-record schemas;
   - the policies: `plan.triage`, `plan.authority`, `plan.ratification`, `autonomy`, `plan.unplaced`, `leases.*`, `run.host`, `run.on-owner-question`, `review.plan`, `review.recommendation`, `review.recommendation.source`, `deps.coordination` and `flow.route-backs`.
 - **Memory:**
-  - reads the intake log, the plan view, the design index and the asks;
+  - reads the intake log, the plan view, the design index, the asks, and the research view and the
+    decision log by the plan's scope tags;
   - writes the dupes, triage, plan and research records, the lease record, the recommendation and the
     transition.
 - **Runtime:** the prompt-submit hook, the lease engine, the executor's launch.
@@ -170,8 +171,9 @@ posted to dependents. The build moves through Design whole (FL-D1).
   - the policies: `design.forks`, `design.reentry`, `design.overlap`, `design.handoff`, `deps.early-build`, `deps.messaging`, `review.design`, `review.design.rounds`, `review.design.round-count`, `review.recommendation.source` and `flow.route-backs`.
 - **Memory:**
   - reads the plan record, the design index and the parents' confirmed interfaces;
-  - writes the roster, the feature designs, the specs, the fork, overlap and research records, the
-    transition and the confirmed messages.
+  - writes the roster, the feature designs, the specs, the fork records, each resolved fork with its
+    decision and its declared class, the overlap and research records, the transition and the
+    confirmed messages.
 - **Runtime:** the fan-out bound, the design index.
 - **Breakpoints:**
   - The spec audit sits after `design.recommend` and `design.reason`, before `design.ready`. It is
@@ -201,12 +203,13 @@ posted to dependents. The build moves through Design whole (FL-D1).
 |---|---|---|---|---|---|
 | `build.base` | command | — | pins the base from history, and the mandate | the base SHA and the intake record | `build.unit-lease` |
 | `build.unit-lease` | command | `build.base` | takes each starting unit's lease with its write set, declared as the driver's `--dispatch --pass <id> --writes <path>` declares one | the lease record | held → `build.unit-pass`; an overlap → warned (`leases.overlap`); refused → as `leases` says |
-| `build.unit-pass` | builder, one per unit, in declared order; disjoint write sets in parallel | `build.unit-lease` | builds and commits one pass, with the unit id and its trailers; the executor queues its commits | the commit, resolved by the executor, and, for a unit whose spec's reuse audit says "no existing seam fits", its reuse line, `proposed <tag>` or `none` with its reason, as `reuse.propose` says | committed → `build.acceptance`; spec wrong → the spec writer (unit re-entry); interface change → the architect (feature re-entry if breaking); fork → as `design.forks` says |
+| `build.unit-pass` | builder, one per unit, in declared order; disjoint write sets in parallel | `build.unit-lease` | builds and commits one pass, with the unit id and its trailers; the executor queues its commits | the commit, resolved by the executor. Each unit `reuse.propose` selects carries its reuse line, `proposed <tag>` or `none` with its reason: under `new-seam`, a unit whose spec's reuse audit records a new seam; under `every-unit`, every unit; under `owner-asks`, a unit that builds a feature an owner-filed reuse ask names. A fix unit carries the class records its findings' `new:` dispositions owe, in its write set | committed → `build.acceptance`; spec wrong → the spec writer (unit re-entry); interface change → the architect (feature re-entry if breaking); fork → as `design.forks` says |
 | `build.acceptance` | executor | `build.unit-pass` | re-runs the spec's acceptance commands on the commit | the executor-written acceptance record | pass → `build.scope`; fail → a fix pass |
 | `build.scope` | command | `build.acceptance` | checks the commit's paths against its unit's write set, from history, as the driver's `--check-commit` and check 23 already grade a pass | the scope report | in scope → the unit's next pass, or, its last pass done, the unit built; stray → as `build.scope` says: warned with an ask, reported, or refused. A refused stray routes to a revert pass on the unit, and a stray the range later reverts passes |
 | `build.recommend` | command | every unit built | scores the recommendation, signals only: Build runs a builder per unit, so it has no single producing role | the recommendation record | the closing review where owed; otherwise `build.core` |
-| `build.core` | executor | `build.recommend`, and the closing review where it ran | runs the core checks over the build's range | the executor-written result | clean → `build.exit`; an own red → a fix unit through Design, or excepted (`core.exceptions`) |
-| `build.exit` | command | `build.core` | records the transition | the transition record | Test |
+| `build.core` | executor | `build.recommend`, and the closing review where it ran | runs the core checks over the build's range | the executor-written result | clean → `build.distill`; an own red → a fix unit through Design, or excepted (`core.exceptions`) |
+| `build.distill` | command, idempotent | `build.core` | appends to the decision log, in the build's own branch, a row for each of its resolved forks whose class is major, as `decisions.major` says: its date, its build, the decision, a pointer to its rationale, and the reuse entry it created, if any. Under `owner-only`, only a fork the owner resolved may be major. A row already present, keyed by build and fork, is skipped | a one-to-one join between the build's resolved forks, each with its class declared, and a row for each major one; a fork with no class, or a second row for one key, is red | `build.exit`; under `author-owner-ratifies`, the owner's ratification comes first, an owner item: ratified → the row; rejected → the fork re-classed as not major, kept in the build's records only; held → as `run.on-owner-question` says |
+| `build.exit` | command | `build.distill` | records the transition | the transition record | Test |
 
 **The closing review** is the breakpoint between `build.recommend` and `build.core`, owed by default:
 - it reviews through the diff lens;
@@ -221,17 +224,19 @@ posted to dependents. The build moves through Design whole (FL-D1).
   - the practices' Build reach;
   - the unit-building and divergence views;
   - the trailer and builder-return schemas;
-  - the policies: `build.worktree`, `build.scope`, `leases.*`, `design.forks`, `design.reentry`, `review.build`, `review.findings`, `review.follow-up`, `reuse.propose`, `core.bypass`, `core.exceptions`, `hooks.bypass`, `resume.partial` and `flow.route-backs`.
+  - the policies: `build.worktree`, `build.scope`, `leases.*`, `design.forks`, `design.reentry`, `review.build`, `review.findings`, `review.follow-up`, `reuse.propose`, `decisions.major`, `core.bypass`, `core.exceptions`, `hooks.bypass`, `resume.partial` and `flow.route-backs`.
 - **Memory:**
   - reads the specs at their SHAs, the write sets, and the bug classes those write sets select;
-  - writes the commits, the acceptance records, the scope reports, the review report, the core result
-    and the transition.
+  - writes the commits, the acceptance records, the scope reports, the review report, the core result,
+    the reuse lines and proposals, the fix units' class records, the decision-log rows and the
+    transition.
 - **Runtime:**
   - unit leases;
   - the commit queue in the shared worktree;
   - the executor's acceptance re-runs and core checks;
   - the write gate.
-- **Breakpoints:** the closing review; the owner's gate at `build.exit` under `every-stage`.
+- **Breakpoints:** the closing review; the owner's ratification of major decisions before `build.distill`
+  under `decisions.major: author-owner-ratifies`; the owner's gate at `build.exit` under `every-stage`.
 - **Extension points:**
   - the lexicon, an optional memory component (KN-1). The bug-class checklist left this list at KN-1:
     bug classes are core, on memory's library side, and ride the builder's work order by its unit's
@@ -297,7 +302,7 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 
 **Exits** when:
 - the build is landed and recorded;
-- its major decisions are in the decision log;
+- its major decisions' rows are in the decision log at the landed SHA;
 - its dependents are notified;
 - the card's terminal snapshot is committed;
 - its leases are released and its mailbox pruned.
@@ -310,7 +315,7 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 | `deploy.land` | command: the lander's `--land`, run with `GOV_PUSH_MAIN_MAX_RETRIES=1` | `deploy.parents` | pushes HEAD of the prepared merge, gated by the pre-push bar for that tree. On a race it re-prepares onto the new tip and exits without a second push | the outcome class, from the lander's exit, the pre-push hook's allow and bar records, and a probe of the remote's default branch; a landing is the remote holding the pushed SHA, and the lander's marker is optional | landed and gated, the allow record naming the SHA and the bar record a real bar → `deploy.core`; landed ungated, no allow record naming the SHA or a bar record reading a stub → `deploy.core`, the landing recorded ungated until its bar is green; nothing pushed, the remote already holding the SHA → `deploy.core`, the landing recorded as already held; refused before the push, a race included → Test, which grades the merge `--land` re-prepared, or an ask for a carried commit; the remote unreachable, a failed probe included → the supervisor's retry, then an owner item; an argument → an ask on the adapter |
 | `deploy.core` | command | `deploy.land` | starts the post-merge bar on the landed SHA unless a run for that SHA already shows, and reads its verdict keyed by that SHA (K1), as `GATE_POST_MERGE` declares | the bar's verdict for the landed SHA, copied into the landing record when read | green → `deploy.record`; red → a patch build through the entry-point table's post-close row, and the close waits for its filing; refused → one re-run after a fetch, then an owner item; still running → waits, within the act's ceiling; no verdict past it → an owner item |
 | `deploy.record` | command | `deploy.core` | writes the landing record: SHA, the builds and units carried, the outcome class, the pre-push verdict or ungated, and the core re-check's verdict. It reads the lander's marker where one was written, otherwise the pushed SHA and the remote tip | the landing record | `deploy.distill` |
-| `deploy.distill` | command | `deploy.record` | appends a decision-log row for each of the build's decisions declared major, as `decisions.major` says: its date, its build, the decision, a pointer to its rationale, and the reuse entry it created, if any | a join both ways between the build's major decisions and the log's rows that name the build | `deploy.recommend` |
+| `deploy.distill` | command, idempotent | `deploy.record` | confirms that the decision-log rows `build.distill` wrote are in the log at the landed SHA | the rows at the landed SHA, joined one to one to the build's major forks | `deploy.recommend` |
 | `deploy.recommend` | command | `deploy.distill` | scores the recommendation, signals only, since core Deploy has no producing role | the recommendation record | the landing review where declared, otherwise `deploy.notify` |
 | `deploy.notify` | command, idempotent | `deploy.recommend`, and the landing review where it ran | posts `landed` to dependents, keyed by the landing SHA, so a repeated post is a no-op | the mailbox posts | `deploy.snapshot` |
 | `deploy.snapshot` | command, idempotent | `deploy.notify` | commits the card's terminal snapshot; an equal snapshot is a no-op | the snapshot commit | `deploy.release` |
@@ -342,9 +347,9 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 - **Instruction:**
   - the practices' Deploy reach;
   - the landing view;
-  - the policies: `autonomy`, `plan.ratification`, `verdict.tree`, `landing.order`, `deps.landing`, `deps.on-parent-withdrawn`, `hooks.bypass`, `core.bypass`, `core.exceptions`, `build.closes`, `card.snapshot`, `decisions.major`, `run.on-owner-question`, `review.deploy` and `flow.route-backs`.
+  - the policies: `autonomy`, `plan.ratification`, `verdict.tree`, `landing.order`, `deps.landing`, `deps.on-parent-withdrawn`, `hooks.bypass`, `core.bypass`, `core.exceptions`, `build.closes`, `card.snapshot`, `run.on-owner-question`, `review.deploy` and `flow.route-backs`.
 - **Memory:** writes the landing record, the transition, the terminal snapshot and the `landed`
-  messages, and deletes the lease refs and the mailbox ref.
+  messages, reads the decision log at the landed SHA, and deletes the lease refs and the mailbox ref.
 - **Runtime:** the lander, the hook, the post-merge bar and its verdict record.
 - **Breakpoints:**
   - the landing review, between `deploy.recommend` and `deploy.notify`. It blocks the close, not the
@@ -392,9 +397,9 @@ multi-agent act. The items are its witnessed stages:
 | `review.pin` | command | `review.trigger` | pins the artifact: the plan revision, the spec revisions, the commit range or the landing record | the pinned SHAs | `review.lens` |
 | `review.lens` | reviewer, one per lens, within the fan-out bound | `review.pin` | reviews through the lens | a computed join: each finding cites lines that exist in the pinned artifact, and carries its lens and, where one fits, a class from memory's bug-class catalogue (KN-1) | `review.refute` |
 | `review.refute` | skeptic | `review.lens` | tries to refute each finding | a computed join: every finding has one verdict (confirmed, refuted, or unverified, the harness's `uncertain`), and each verdict names its probe and the probe's output | `review.report` |
-| `review.report` | synthesizer | `review.refute` | merges the findings into one report, giving each confirmed finding its left-shift disposition: `class:<slug>`, `new:<slug>` or `gate:<leg>`, as `review.unclassed` says | a computed join: every confirmed finding appears in the report, under the build's `reviews/`, with one disposition; `class:` resolves to a record under `memory/gotchas/`, `gate:` to a leg in the legs manifest, and `new:` names a slug no record holds | `review.dispose` |
-| `review.dispose` | command | `review.report` | disposes each confirmed finding by the artifact's state. On an unbuilt spec, the findings go to `review.fold`. On built work, they become new units or asks by `review.findings`. It files each `new:` class with its fix, written beside the fold on an unbuilt spec and by the fix unit's builder on built work, carrying `from:` its review and finding. It counts each class by its tag (`review.left-shift`), turns an earned gate into a patch-build intake, and files each unverified finding as `review.unverified` says | each disposition joined to its fold, unit or ask, and each `new:` class to its record once written | unbuilt → `review.fold`; built → released, with a follow-up round as `review.follow-up` says; an unverified finding under `block` → a verification round |
-| `review.fold` | spec writer | `review.dispose` | folds the confirmed findings into the unbuilt specs, the spec-write workflow's disposal stage | each confirmed finding joined to its fold in the spec at its new SHA | the next round as `review.design.rounds` says, or released |
+| `review.report` | synthesizer | `review.refute` | merges the findings into one report, giving each confirmed finding its left-shift disposition: `class:<slug>`, `new:<slug>`, `gate:<leg>`, or, where `review.unclassed` allows it, `none` with its reason | a computed join: every confirmed finding appears in the report, under the build's `reviews/`, with one disposition. `class:` resolves to a record under `memory/gotchas/`, and `gate:` to a leg in the legs manifest. `new:` names a slug that no record held at the report's pinned SHA, or whose record carries `from:` this report and finding. `none` carries a reason, and appears only under `reason` or `owner-rules` | `review.dispose`; under `owner-rules`, each `none` → an owner item first, resolved as `run.on-owner-question` says: a class or a gate named, the reason accepted, or the finding returned for a disposition, within `flow.route-backs` |
+| `review.dispose` | command | `review.report` | disposes each confirmed finding by the artifact's state. On an unbuilt spec, the findings go to `review.fold`. On built work, they become new units or asks by `review.findings`. It files each `new:` class with the item that owes its record: `review.fold`'s spec writer on an unbuilt spec, and the fix unit's builder on built work. A finding that becomes an ask carries its `new:` slug, and the ask is accepted once the class record exists. Each new class carries `from:` its review and finding. It counts each class by its tag (`review.left-shift`), turns an earned gate into a patch-build intake, and files each unverified finding as `review.unverified` says | each disposition joined to its fold, unit or ask, and each `new:` slug to the item or ask that owes its record | unbuilt → `review.fold`; built → released, with a follow-up round as `review.follow-up` says; an unverified finding under `block` → a verification round |
+| `review.fold` | spec writer | `review.dispose` | folds the confirmed findings into the unbuilt specs, the spec-write workflow's disposal stage, and writes the class record of each `new:` disposition | each confirmed finding joined to its fold in the spec at its new SHA, and each `new:` slug to its class record, whose `from:` names this review and finding | the next round as `review.design.rounds` says, or released |
 | `review.cost` | command | `review.report` | records the review's agents and out-tokens in its report, as the harness logs them | the cost field | done |
 
 - **Classes.** `review.left-shift` counts by class where memory's catalogue tags a finding, and by
@@ -657,3 +662,8 @@ The comparison record's `[follow-up]` names each item and where it went.
 
 **Revised 2026-10-16, after the library round's forks LB-1 to LB-4** (layer-library `[settled-lb]`):
 `review.report`'s left-shift dispositions, `build.unit-pass`'s reuse line and `deploy.distill`.
+
+**Revised 2026-10-16, after the library round's review** (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md`):
+`build.distill` writes the major decisions' rows before Test, and `deploy.distill` confirms them at the
+landed SHA; `review.report` gains its `none` arm and its owner route; and each `new:` class record joins
+at the item that writes it.

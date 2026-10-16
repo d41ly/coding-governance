@@ -20,7 +20,8 @@ gotcha-classes = ["fold-text-is-unreviewed-surface.md", "amendment-leaves-its-ot
   "one-value-field-records-a-mixed-outcome.md", "criterion-asserts-what-its-own-command-cannot-show.md",
   "observation-before-the-last-fold-of-the-same-commit.md",
   "hand-named-gate-list-green-while-the-bar-reds.md",
-  "route-names-an-output-its-actor-never-emits.md", "owner-item-without-its-reject-outcome.md"]
+  "route-names-an-output-its-actor-never-emits.md", "owner-item-without-its-reject-outcome.md",
+  "policy-value-with-no-route.md", "rate-quoted-without-its-denominator.md"]
 guides = ["BUILD-METHOD.md"]
 backlog-shards = []
 lexicon-verbs = []

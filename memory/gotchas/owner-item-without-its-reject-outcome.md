@@ -35,6 +35,10 @@ the entry renders; reject and remove, and the entry is `removal-pending` until o
 removes the anchor and the entry; reject and keep, and the entry stays `rejected`, which the check
 accepts.
 
+A policy value whose catalogue text names an owner's wait has its owner item in the step's
+Breakpoints, with every outcome routed. The library round's review (M2) found the strict preset's
+`decisions.major: author-owner-ratifies` with none.
+
 The class lives where owner items are designed: unit specs under `/spec/`, written from
 `memory/TEMPLATE-SPEC.md`, and a build's design records under `/build/`. It has no machine gate yet. Once owner items are declared as data, their disposition sets can be
 checked for a refusal outcome.

@@ -53,7 +53,10 @@ Before a route names an outcome, read the actor's code on that path:
   the item that reads the state the route just changed;
 - name the item that writes into a record, and check that it runs before the record is committed;
 - where a fix needs a tool's own enumeration, state the contract and leave the enumeration to the
-  tool's owning build, since enumerated internals are where the follow-up round's findings sat.
+  tool's owning build, since enumerated internals are where the follow-up round's findings sat;
+- let a witness join only records written by its own item or an earlier one (the library round's review, M3);
+- name the item that lands a default-branch file a Deploy item writes after `deploy.land`, and let
+  its witness read the landed SHA (the library round's review, M6).
 
 It has no machine gate yet, because a design record's routes are prose. The join that dDeclaredLoop
 owes over the step definitions (`gap-flow-15`) grades routes against the transition table, not

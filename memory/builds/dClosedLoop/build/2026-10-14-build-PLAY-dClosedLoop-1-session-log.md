@@ -111,12 +111,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 47 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The layers' fold: closing diff review over `e7839224c..9e0e43aef` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | returned as `wf_9349d401-2da`, CLEAN WITH FIXES, 28 of 31 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md` |
 | 48 | the same, round 2 with round 1's 28 confirmed findings handed as `priorFindings` | The layers' fold: the follow-up round over the closing review's fixes, `9e0e43aef..2e6f9aa1b`, after the owner chose it | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | returned as `wf_e26eda01-523`, CLEAN WITH FIXES, 31 of 34 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md` |
 | 49 | gov-researcher | Memory's library side: its four filling paths and two placements | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | 1799cb98 | returned, 8m06s, 37.9k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` |
-| 50 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The library round's review: a light diff review over `1bc4883fe..aa9639d98`, the atlas excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md` `[review]` | 1799cb98 | dispatched as `wf_9d4cc07b-2f2` | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` |
-| `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
-| `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md` | Memory's library side, which replaces the Knowledge layer: the owner's question, KN-1 and what it changed, and what the library round owes. |
-| `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.html` | The Closed Loop Atlas, published as an artifact: layers, flow, lifecycle, roles, chain, policies and progress, its data region derived by the generator. |
-| `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py` | The atlas's generator: derives the page's data from the design records and reviews; `--check` says whether the page is current. |
-| `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | The library pass's research handoff: the four filling paths and two placements. |
+| 50 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The library round's review: a light diff review over `1bc4883fe..aa9639d98`, the atlas excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md` `[review]` | 1799cb98 | returned as `wf_9d4cc07b-2f2`, CLEAN WITH FIXES, 25 of 31 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -576,6 +571,31 @@ The library pass's researcher, dispatch 49, derived from its handoff the same wa
 - returned — gov-researcher · wrote 0 files · 8m06s · 37.9k out · run direct/a6ec949c25abd01f3
 ```
 
+The library round's review, dispatch 50, derived from its Workflow run the same way:
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, diff-review round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9d4cc07b-2f2/a807f94efb288c244
+- returned — workflow-subagent · wrote 0 files · 16s · 1.6k out · run wf_9d4cc07b-2f2/a807f94efb288c244
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:correctness · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9d4cc07b-2f2/a5b4346f672e47a43
+- returned — gov-diff-reviewer · wrote 0 files · 5m21s · 31.0k out · run wf_9d4cc07b-2f2/a5b4346f672e47a43
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:seams · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9d4cc07b-2f2/a22797c28fc5c537c
+- returned — gov-diff-reviewer · wrote 0 files · 5m22s · 29.3k out · run wf_9d4cc07b-2f2/a22797c28fc5c537c
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:verification · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9d4cc07b-2f2/a5b02ef368d959464
+- returned — gov-diff-reviewer · wrote 0 files · 6m07s · 22.6k out · run wf_9d4cc07b-2f2/a5b02ef368d959464
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-1-7 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9d4cc07b-2f2/ad0c21e5fc93051b1
+- returned — gov-skeptic · wrote 0 files · 1m36s · 9.3k out · run wf_9d4cc07b-2f2/ad0c21e5fc93051b1
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-8-14 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9d4cc07b-2f2/a2ea06a97bccb30d4
+- returned — gov-skeptic · wrote 0 files · 2m58s · 15.8k out · run wf_9d4cc07b-2f2/a2ea06a97bccb30d4
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-15-21 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9d4cc07b-2f2/a04c48e9081c04270
+- returned — gov-skeptic · wrote 0 files · 2m11s · 12.0k out · run wf_9d4cc07b-2f2/a04c48e9081c04270
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-22-28 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9d4cc07b-2f2/abbeaa440215712c0
+- returned — gov-skeptic · wrote 0 files · 2m36s · 14.3k out · run wf_9d4cc07b-2f2/abbeaa440215712c0
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-29-31 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9d4cc07b-2f2/a289c53998a06197b
+- returned — gov-skeptic · wrote 0 files · 1m34s · 8.7k out · run wf_9d4cc07b-2f2/a289c53998a06197b
+- agent — gov-synthesizer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_9d4cc07b-2f2/aa69d182e0727fff5
+- returned — gov-synthesizer · wrote 1 file · 3m42s · 29.5k out · run wf_9d4cc07b-2f2/aa69d182e0727fff5
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -924,6 +944,13 @@ The library pass's researcher, dispatch 49, derived from its handoff the same wa
   does when the map, recall or the lexicon is not installed: each optional slot renders filled, searched
   with nothing found, or not installed with its fallback named. Dispatch 50 runs the library round's
   review over KN-1's fold, the library design and its settlement.
+
+- 2026-10-16, session 1799cb98: dispatch 50, the library round's review, returned CLEAN WITH FIXES:
+  25 of 31 findings confirmed, in 19 items, one of them high. The high was `deploy.distill`'s join over
+  decisions no item had to produce. All 19 are fixed, and layer-library `[review-fold]` says where.
+  `build.distill` now writes the major decisions' rows before Test, and four classes joined
+  `memory/gotchas/`. Five index rows that earlier commits inserted into the Dispatches table moved to
+  the Records index, and the follow-up review's row, which a presence check never added, joined them.
 
 ## Instruments
 
@@ -1333,6 +1360,13 @@ Runs, 2026-10-14:
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared.md` | Layers 1 to 4's rounds compared defect by defect: the runs, the five layers side by side, the patterns, the fold plan, the forks LR-1 to LR-6, and every finding placed on its defect. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` | That comparison's instruments, as fenced text: the args generator and the args, the comparison and summary scripts, their output, and the runs that saw each red. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md` | The fold's closing review, a light diff review over the four fold commits, as its synthesizer wrote it. |
+| `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md` | The follow-up round over the closing review's fixes, a light diff review at round 2, as its synthesizer wrote it. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md` | Memory's library side, which replaces the Knowledge layer: the owner's question, KN-1 and what it changed, and what the library round owes. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.html` | The Closed Loop Atlas, published as an artifact: layers, flow, lifecycle, roles, chain, policies and progress, its data region derived by the generator. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py` | The atlas's generator: derives the page's data from the design records and reviews; `--check` says whether the page is current. |
+| `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | The library pass's research handoff: the four filling paths and two placements. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
+| `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` | The library round's review, a light diff review over KN-1's fold, the library design and its settlement, as its synthesizer wrote it. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-{executor,spawn,hooks,sessions}.md` | The runtime round's four researcher returns, verbatim. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-instruments.md` | The runtime researchers' probe scripts, as fenced text, with the one lost probe noted. |
 | `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-instruments.md` | The lexicon researchers' probe files, as fenced text. |

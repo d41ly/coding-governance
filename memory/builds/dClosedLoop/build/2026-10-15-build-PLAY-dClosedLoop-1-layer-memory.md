@@ -361,14 +361,17 @@ authored shared one under `SHARED_RECORDS`, a generated one under `GENERATED_IND
 
 Each layer's contract registers its own kinds, so the list below is the memory layer's, not a closed
 set. The kinds sort by P28:
-- **Core:** intake, card, plan, seams, feature design, spec, research, review, ask, the backlog row,
-  the run record (`RUN.md`), work order, major decision, and one witness record per witness the flow
+- **Core:** intake, card, plan, seams, feature design, spec, research return, design record, review,
+  ask, the backlog row,
+  the run record (`RUN.md`), work order, decision (each resolved fork's, its class declared, a major one
+  becoming a log row), and one witness record per witness the flow
   declares (acceptance, verdict, attribution, transition, landing among them). Flow registers its
   flake, dupes and scope records. Runtime registers its return, act (launch, epoch, outcome), lease,
   session binding, mailbox message and journal records.
 - **Optional components** (KN-1; Knowledge's before it): dossier, symbols and callers, with the map; the
-  lexicon; the recall index. The gotcha kind is core since KN-1, on the library side. Whether the
-  annotation index is core or the map's is the library round's (`[open]` in its record).
+  lexicon; the recall index. The gotcha kind is core since KN-1, on the library side. The annotation
+  index stays with the map and drift-audit, and the core reads `gov:feature` anchors by a one-marker
+  scan (LB-4, layer-library `[placements]`).
 
 **One refinement to layers round one,** for research records and major decisions alike. Core items
 write them (`plan.research`, `design.research`, and each build's decisions as it makes them), so their
@@ -711,7 +714,7 @@ Every view the owner reads is generated from records, never authored state:
 - the map views;
 - the ask views;
 - the gotcha index;
-- the research view: every research record by build, date and question (layer-library
+- the research view: every research return by build, date and question (layer-library
   `[research-view]`, 2026-10-16).
 
 Agents never read a view to work: their work orders hand them fields. The orientation scout is the
