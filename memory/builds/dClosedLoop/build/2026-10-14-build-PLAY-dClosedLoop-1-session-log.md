@@ -112,6 +112,12 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 48 | the same, round 2 with round 1's 28 confirmed findings handed as `priorFindings` | The layers' fold: the follow-up round over the closing review's fixes, `9e0e43aef..2e6f9aa1b`, after the owner chose it | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | returned as `wf_e26eda01-523`, CLEAN WITH FIXES, 31 of 34 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md` |
 | 49 | gov-researcher | Memory's library side: its four filling paths and two placements | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | 1799cb98 | returned, 8m06s, 37.9k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` |
 | 50 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The library round's review: a light diff review over `1bc4883fe..aa9639d98`, the atlas excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md` `[review]` | 1799cb98 | returned as `wf_9d4cc07b-2f2`, CLEAN WITH FIXES, 25 of 31 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` |
+| 51 | gov-researcher, at medium effort as the owner asked | The observability expansion, run A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-19-researcher.md` | 1799cb98 | dispatched | pending |
+| 52 | the same | The observability expansion, run B, from the same handoff | the same | 1799cb98 | dispatched | pending |
+| 53 | gov-researcher, at medium effort | The integrations expansion, run A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-20-researcher.md` | 1799cb98 | dispatched | pending |
+| 54 | the same | The integrations expansion, run B, from the same handoff | the same | 1799cb98 | dispatched | pending |
+| 55 | gov-researcher, at medium effort | The distribution expansion, run A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-21-researcher.md` | 1799cb98 | dispatched | pending |
+| 56 | the same | The distribution expansion, run B, from the same handoff | the same | 1799cb98 | waits for a spawn slot | pending |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -965,6 +971,11 @@ The library round's review, dispatch 50, derived from its Workflow run the same 
   it with `--out`. All eight new refusals were each seen red on a planted defect, and the page was
   published to the same link (`build/2026-10-16-build-PLAY-dClosedLoop-1-atlas-instruments.md`).
 
+- 2026-10-16, session 1799cb98: the owner said, verbatim: "let's move on to the expansion layers - launch a concurrent set of research agents each targeting their own expansion layer design given their fit into the new architectural design. Run each of them twice at medium effort. Then, base your own design against what the agents agree on."
+  Dispatches 51 to 55 send one researcher handoff per expansion layer, twice each, at medium effort.
+  Dispatch 56, distribution's second run, waits until the agent-cap hook's first slot frees. The
+  round's record is `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md`.
+
 ## Instruments
 
 ### The gap-ownership join
@@ -1378,6 +1389,10 @@ Runs, 2026-10-14:
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.html` | The Closed Loop Atlas's template: every view's markup, style and script, with an empty data region that the generator fills to publish it. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py` | The atlas's generator: derives the views' data, carries every record in the build folder, refuses data it cannot place, and writes the page with `--out`; `--check` derives without writing. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas-instruments.md` | The atlas's fifth version, checked: the regenerate and publish procedure, what the generator refuses, the probe that saw each new refusal red, and the browser checks. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md` | The expansion round: the owner's words, its scope, the six research dispatches, and the design the runs agree on. |
+| `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-19-researcher.md` | The observability expansion's research handoff, run twice. |
+| `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-20-researcher.md` | The integrations expansion's research handoff, run twice. |
+| `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-21-researcher.md` | The distribution expansion's research handoff, run twice. |
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | The library pass's research handoff: the four filling paths and two placements. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` | The library round's review, a light diff review over KN-1's fold, the library design and its settlement, as its synthesizer wrote it. |
