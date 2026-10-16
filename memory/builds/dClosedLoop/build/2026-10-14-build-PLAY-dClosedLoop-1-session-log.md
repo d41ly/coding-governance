@@ -122,6 +122,18 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 58 | the same | The expansion round's review, run B, after run A returns | the same | 1799cb98 | returned as `wf_3a59e7c4-201`, CLEAN WITH FIXES, 46 of 54 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-b.md` |
 | 59 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The expansion fold's closing review: a light diff review over `3fccdd78a..6e0ce0a55`, the review reports, the atlas and the generated files excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` `[fold-review]` | 1799cb98 | returned as `wf_27ececa4-f6c`, CLEAN WITH FIXES, 20 of 28 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md` |
 | 60 | the same, round 2 with round 1's 20 confirmed findings handed as `priorFindings` | The expansion fold's follow-up round over the closing review's fixes, `f506dd106..4edc6790b`, after the owner chose it | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` `[follow-up]` | 1799cb98 | returned as `wf_c69ed990-543`, CLEAN WITH FIXES, 24 of 35 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md` |
+| 61 | `tier2-review.js`, spec audit, full: `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at medium, as the owner asked | The lexicon's design record, run A, at `424d2a7de` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-lexicon]` | 1799cb98 | dispatched | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-a.md` |
+| 62 | the same | The lexicon's design record, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-lexicon]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-b.md` |
+| 63 | the same | The review system's design record, run A, at `40738693d` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-review-system]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-review-system-a.md` |
+| 64 | the same | The review system's design record, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-review-system]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-review-system-b.md` |
+| 65 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at medium, as the owner asked, round 1 | The runtime fold and its two settlements, run A: `6cfd21619..3611a60e9`, the audit reports and the research returns excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-runtime-fold]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-a.md` |
+| 66 | the same | The runtime fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-runtime-fold]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-b.md` |
+| 67 | the same, round 3 with round 2's 31 confirmed findings as `priorFindings` | The layers round's follow-up fold, run A: `cc4c83ad5..1bc4883fe` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-fold-round3]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-a.md` |
+| 68 | the same | The layers round's follow-up fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-fold-round3]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-b.md` |
+| 69 | the same, round 2 with round 1's 25 confirmed findings as `priorFindings` | The library round's fold, run A: `d4fc4bb51..0dd962724` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-library-followup]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library-followup-a.md` |
+| 70 | the same | The library round's fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-library-followup]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library-followup-b.md` |
+| 71 | the same, round 3 with round 2's 24 confirmed findings as `priorFindings` | The expansion round's follow-up fold, run A: `67c79f7cc..5e139d377` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-expansions-fold-round3]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-a.md` |
+| 72 | the same | The expansion round's follow-up fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-expansions-fold-round3]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1169,6 +1181,12 @@ The expansion fold's follow-up round, dispatch 60, derived from its Workflow run
   `instructions.edit`'s unwalked alternatives. The atlas's progress view shows the lexicon and the
   review system, and `fold-text-is-unreviewed-surface` gains the fold missed at a range's base.
 
+- 2026-10-16, session 1799cb98: dispatches 61 to 72 review the six pieces twice each at medium effort,
+  one run at a time, so no more than five agents run at once. The lexicon and the review system get spec
+  audits; the four folds get light diff reviews, and a fold that answers an earlier round runs as that
+  chain's next round with its confirmed set. `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared.md` holds the runs,
+  and its instruments record holds the args.
+
 ## Instruments
 
 ### The gap-ownership join
@@ -1598,6 +1616,8 @@ Runs, 2026-10-14:
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md` | The expansion fold's closing review, a light diff review over the fold's two commits, as its synthesizer wrote it. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md` | The expansion fold's follow-up round, a light diff review at round 2 over the closing review's fixes, as its synthesizer wrote it. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-state.md` | The owner's question on the rearchitecture's state, answered from the records: the deliverables, the text no review has read, what no answer settles, two stale open lists and what remains, with the probes and their runs. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared.md` | The six unreviewed pieces' twelve runs, how they run, and their comparison once they return. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` | Those runs' args, verbatim, with the script that wrote them and the pair check. |
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | The library pass's research handoff: the four filling paths and two placements. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` | The library round's review, a light diff review over KN-1's fold, the library design and its settlement, as its synthesizer wrote it. |
