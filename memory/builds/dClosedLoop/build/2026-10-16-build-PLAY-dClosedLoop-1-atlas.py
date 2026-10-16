@@ -228,7 +228,7 @@ def derive():
     for ln in op.split("\n"):
         m = re.match(r"^- \*\*(.+?)\*\*:?\s*(.*)$", ln)
         if m:
-            cur = {"label": m.group(1).rstrip(":"), "text": m.group(2), "items": []}
+            cur = {"label": m.group(1).rstrip(":,.;"), "text": m.group(2), "items": []}
             open_items.append(cur)
         elif ln.startswith("  - ") and cur:
             cur["items"].append(ln[4:].strip())

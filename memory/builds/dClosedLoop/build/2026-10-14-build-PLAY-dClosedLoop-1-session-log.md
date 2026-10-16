@@ -110,7 +110,8 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 46 | the same | Memory layer: Tier-2 review, run B | the same | 1799cb98 | returned, CLEAN WITH FIXES, 51 of 58 confirmed | `reviews/2026-10-15-review-PLAY-dClosedLoop-1-memory-b.md` |
 | 47 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The layers' fold: closing diff review over `e7839224c..9e0e43aef` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | returned as `wf_9349d401-2da`, CLEAN WITH FIXES, 28 of 31 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md` |
 | 48 | the same, round 2 with round 1's 28 confirmed findings handed as `priorFindings` | The layers' fold: the follow-up round over the closing review's fixes, `9e0e43aef..2e6f9aa1b`, after the owner chose it | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | returned as `wf_e26eda01-523`, CLEAN WITH FIXES, 31 of 34 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md` |
-| 49 | gov-researcher | Memory's library side: its four filling paths and two placements | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | 1799cb98 | dispatched | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` |
+| 49 | gov-researcher | Memory's library side: its four filling paths and two placements | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | 1799cb98 | returned, 8m06s, 37.9k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md` | Memory's library side, which replaces the Knowledge layer: the owner's question, KN-1 and what it changed, and what the library round owes. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.html` | The Closed Loop Atlas, published as an artifact: layers, flow, lifecycle, roles, chain, policies and progress, its data region derived by the generator. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py` | The atlas's generator: derives the page's data from the design records and reviews; `--check` says whether the page is current. |
@@ -571,6 +572,7 @@ The library pass's researcher, dispatch 49, derived from its handoff the same wa
 
 ```text
 - agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md) · writes none · gates none · run direct/a6ec949c25abd01f3
+- returned — gov-researcher · wrote 0 files · 8m06s · 37.9k out · run direct/a6ec949c25abd01f3
 ```
 
 ## Events
@@ -902,6 +904,20 @@ The library pass's researcher, dispatch 49, derived from its handoff the same wa
   definitions, the roles, instruction and library records and the reviews, refusing any row it cannot
   read. Each design change re-runs the generator and republishes the same page. Dispatch 49 sends one
   researcher over the library side's four filling paths and two placements.
+
+- 2026-10-16, session 1799cb98: dispatch 49 returned. Every library path is filled by hand today: 183
+  of 907 confirmed findings carry a class, no reuse entry exists, nothing defines a major decision,
+  and 22 of 202 research records are cited from another build. The draft put each path at one
+  declared flow point with a witness, and the owner answered LB-1 to LB-4:
+  - LB-1: "A class or a gate, always";
+  - LB-2: "Units that built a new seam (Recommended)";
+  - LB-3: "Its author, by the rubric";
+  - LB-4: "Both as measured (Recommended)".
+
+  `review.unclassed`, `reuse.propose` and `decisions.major` join the catalogue with those defaults.
+  `review.report` gives every confirmed finding a left-shift disposition, `build.unit-pass` carries
+  the reuse line, and `deploy.distill` appends major decisions at landing. `gap-review-10` and
+  `gap-mem-15` join the register. The atlas is regenerated and republished.
 
 ## Instruments
 

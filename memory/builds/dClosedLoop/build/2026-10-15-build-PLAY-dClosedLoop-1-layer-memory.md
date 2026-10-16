@@ -527,6 +527,9 @@ records. Neither may instruct by being recalled.
    - a pointer to its rationale;
    - the reuse entry it created, if any.
 
+   Since LB-3 (2026-10-16) a decision's author declares it major by the rubric, and `deploy.distill`
+   appends the build's major decisions to the log when it lands (layer-library `[log]`).
+
    Supersession extends the typed relations that exist. Check 27 (`row_grammar.py
    --check-relations`) obliges `supersedes`, `coexists-with` or `disputes` on every added row and
    gotcha, and memory-recall's `derive_supersession_map` already tags superseded hits. The generated
@@ -685,7 +688,8 @@ Around it:
 
 ### [knowledge] Gotchas, the lexicon and recall
 
-- **Gotchas** stay, as the bug-class kind behind the Build extension point.
+- **Gotchas** stay, as the bug-class kind on the library side, core since KN-1. Every confirmed
+  finding files a class or names a gate (LB-1, `review.unclassed`).
   - They are handed in builder and reviewer work orders by the unit's write set, instead of run by
     agents.
   - The six universal classes ride the role's static block.
@@ -706,7 +710,9 @@ Every view the owner reads is generated from records, never authored state:
 - the reuse view: features and conventions by area, with their directives;
 - the map views;
 - the ask views;
-- the gotcha index.
+- the gotcha index;
+- the research view: every research record by build, date and question (layer-library
+  `[research-view]`, 2026-10-16).
 
 Agents never read a view to work: their work orders hand them fields. The orientation scout is the
 one exception, reading the README, the owner's root, to compose the card. Under

@@ -402,12 +402,12 @@ matrix from the step definitions as folded:
 | reviewer | — | — | — | — | — | — | `review.lens` | — |
 | skeptic | — | — | — | — | — | — | `review.refute` | — |
 | synthesizer | — | — | — | — | — | — | `review.report` | — |
-| command | `entry.place-check`, `entry.claim` | `plan.input`, `plan.dedupe`, `plan.triage-rule`, `plan.place`, `plan.lease`, `plan.recommend`, `plan.exit` | `design.input`, `design.reentry`, `design.overlaps`, `design.recommend`, `design.ready`, `design.exit` | `build.base`, `build.unit-lease`, `build.scope`, `build.recommend`, `build.exit` | `test.merge`, `test.select`, `test.verdict`, `test.route`, `test.flakes`, `test.seen-red`, `test.recommend`, `test.exit` | `deploy.current`, `deploy.mandate`, `deploy.parents`, `deploy.land`, `deploy.core`, `deploy.record`, `deploy.recommend`, `deploy.notify`, `deploy.snapshot`, `deploy.release`, `deploy.close` | `review.trigger`, `review.pin`, `review.dispose`, `review.cost` | `life.notify`, `life.snapshot`, `life.release`, `life.close` |
+| command | `entry.place-check`, `entry.claim` | `plan.input`, `plan.dedupe`, `plan.triage-rule`, `plan.place`, `plan.lease`, `plan.recommend`, `plan.exit` | `design.input`, `design.reentry`, `design.overlaps`, `design.recommend`, `design.ready`, `design.exit` | `build.base`, `build.unit-lease`, `build.scope`, `build.recommend`, `build.exit` | `test.merge`, `test.select`, `test.verdict`, `test.route`, `test.flakes`, `test.seen-red`, `test.recommend`, `test.exit` | `deploy.current`, `deploy.mandate`, `deploy.parents`, `deploy.land`, `deploy.core`, `deploy.record`, `deploy.distill`, `deploy.recommend`, `deploy.notify`, `deploy.snapshot`, `deploy.release`, `deploy.close` | `review.trigger`, `review.pin`, `review.dispose`, `review.cost` | `life.notify`, `life.snapshot`, `life.release`, `life.close` |
 | executor | — | — | — | `build.acceptance`, `build.core` | — | — | — | `life.quiesce` |
 | hook | `entry.intake` | — | — | — | — | — | — | — |
 | owner | `entry.place-owner` | — | — | — | — | — | — | `life.request` |
 
-- **Counts:** 72 items, each with one actor; 15 actors; 19 items with a role.
+- **Counts:** 73 items, each with one actor; 15 actors; 19 items with a role.
 - **The prompt writer and the driver** act in no item. The prompt writer is a cycle role: it acts in
   every role item's cycle, framing each work order (`[roster]`, flow-roles `[cycle]`). The driver
   routes and never works.

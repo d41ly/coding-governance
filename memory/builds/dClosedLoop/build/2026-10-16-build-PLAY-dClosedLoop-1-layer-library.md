@@ -65,6 +65,42 @@ library side. This record holds:
 
 The answer reopens layers round one's L2, whose answer was all four expansions.
 
+**LB-1. "A confirmed finding that fits no bug class gets a `none` disposition. What must that `none`
+carry?"**
+- Offered:
+  - A stated reason (Recommended): the reason is the record, the review report lists every `none`, and
+    nothing waits on the owner.
+  - Your ruling on each: each `none` becomes an owner item, held as `run.on-owner-question` says.
+  - A class or a gate, always: `none` is refused, and every confirmed finding files a class or names a
+    gate, the charter's left-shift rule taken literally.
+- Answer: A class or a gate, always.
+
+**LB-2. "Which units must state a reuse line (proposed <tag>, or none with a reason) when they
+close?"**
+- Offered:
+  - Units that built a new seam (Recommended): only a unit whose spec's reuse audit says "no existing
+    seam fits", today 256 specs in 67 builds, about 1.6 proposals per such build.
+  - Every unit: every unit closes with `proposed <tag>` or `none` with its reason.
+  - Only when you ask: no line is owed, and the owner names the features to enter.
+- Answer: Units that built a new seam (Recommended).
+
+**LB-3. "Who declares a decision major, so that it enters the decision log when its build lands?"**
+- Offered:
+  - Its author; you ratify at landing (Recommended): the author declares the class by the rubric, and
+    each major row waits for the owner's ratification at `deploy.distill`.
+  - Its author, by the rubric: no owner step, and the rubric and the class check decide.
+  - Only you: only the owner's rulings can be major.
+- Answer: Its author, by the rubric.
+
+**LB-4. "The measurements point to two placements. Confirm them?"**
+- Offered:
+  - Both as measured (Recommended): dossiers stay with the map, an optional component, and the
+    annotation index stays out of the core, where only `gov:feature` anchors are read, by a one-marker
+    scan.
+  - Merge dossiers into reuse entries: dossiers become core library records.
+  - Make the annotation index core: a persisted index ships in the core.
+- Answer: Both as measured (Recommended).
+
 ## [settled] What KN-1 changed, 2026-10-16
 
 - **The layer model** (v2 `[layers]` and P28):
@@ -97,18 +133,144 @@ The answer reopens layers round one's L2, whose answer was all four expansions.
   side and these optional components. Revision notes mark the live ones, and dated history keeps its
   words.
 
+## [research] Dispatched, 2026-10-16
+
+Dispatch 49 sent one researcher over the four filling paths and the two open placements. Its return is
+saved verbatim in `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md`, and its
+question is in `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md`.
+
+## [current] How the library fills today, measured 2026-10-16
+
+Every path is filled by hand, and nothing notices when one is skipped:
+
+| Path | Writer today | What lets it be skipped | Measured |
+|---|---|---|---|
+| A finding becomes a bug class | a class record, hand-written in a fold commit under the build method's prose rule | no check joins confirmed findings to classes | 183 of 907 confirmed findings in the 36 review appendices with a classes column carry a class; 13 of 124 class records cite the review or finding that filed them |
+| A built feature becomes a reuse entry | nothing; the spec's reuse audit, dossier seams and the card's `**Reuse:**` field come nearest | nothing proposes an entry, and the card is untracked | 256 specs in 67 of 163 builds say "no existing seam fits"; 4 of 20 stored cards fill `**Reuse:**`; `gov:feature` marks 0 code lines |
+| A decision becomes a log row | hand edits to `memory/DECISIONS.md` | no rule requires a row, and nothing defines a major decision | 160 rows added in 60 days, beside 1,829 `Decided:` trailers |
+| A build's research joins the library | the researcher's record, bound by `**Serves:** research` and graded by check 21 | across builds only recall reaches it, and recall is optional | 202 records in 41 builds, 22 of them cited from another build |
+
+- **Dossiers hold little of what a reuse entry needs.** Their reuse-shaped part, `## Reuse affordance`,
+  is 7.1% of their text. No dossier carries a directive or an owner's disposition, and 28 of 31 are
+  stale by path ancestry.
+- **No annotation index exists.** drift-audit builds a cited-id map at report time, which gates
+  nothing, and each `gov:` marker kind is read by its own gate with a one-marker scan. A scan for
+  `gov:feature` takes 0.048 s.
+- **Two records contradict the code.** `ANNOTATION-STYLE.template.md` says no gate reads comment
+  citations, though drift-audit's report-only signal does. `HYGIENE.md` lists a `note` kind that the
+  catalogue never uses.
+
+## [design] The library side, as proposed
+
+**The library fills only at declared flow points.** Each path is an item, or a field of one, with a
+witness a check reads. The views over the library are derived.
+
+| Path | Where | Actor | Witness |
+|---|---|---|---|
+| A finding becomes a bug class | the review breakpoint: `review.report`, then `review.dispose` | the synthesizer gives each disposition; the fold's spec writer or the fix unit's builder files a new class | every confirmed finding carries one left-shift disposition, and each one resolves |
+| A built feature becomes a reuse entry | Build: `build.unit-pass` | the builder proposes, and the owner disposes as LR-6 says | each unit that owes a reuse line carries one, and an accepted entry has its `gov:feature` anchor in code |
+| A decision becomes a log row | Deploy: `deploy.distill`, a new command after `deploy.record` | the command, from the build's major decisions | a join both ways between the build's major decisions and the log's rows that name the build |
+| A build's research joins the library | a derived view | none: the view renders from the bindings | check 21's binding, and the view's byte comparison |
+
+### [left-shift] A finding becomes a bug class
+
+- At `review.report`, the synthesizer gives every confirmed finding one left-shift disposition:
+  - `class:<slug>`, an existing class;
+  - `new:<slug>`, a class to file, with its symptom in one line;
+  - `gate:<leg>`, a leg that already catches it;
+  - `none`, with its reason, which `review.unclassed` refuses by default (LB-1): every confirmed
+    finding files a class or names a gate.
+
+  The harness's bare `C<n>` label is refused.
+- `review.report`'s witness gains a join. Each confirmed finding carries one disposition, `class:`
+  resolves to a record under `memory/gotchas/`, `gate:` resolves to a leg in the legs manifest, and
+  `new:` names a slug no record holds.
+- At `review.dispose`, each `new:` is filed with its fix. On an unbuilt spec, `review.fold`'s spec
+  writer writes the class beside the fold. On built work, the builder of the fix unit writes it. The
+  new class carries `from: <review>#<finding id>`, which `gotchas.py --check` resolves, and where the
+  map is installed, the dossier of the feature it guards claims it.
+- `review.left-shift` keeps its job: it decides when a class earns a gate, at its second occurrence by
+  default.
+
+### [reuse-proposal] A built feature becomes a reuse entry
+
+- A unit whose spec's reuse audit says "no existing seam fits" has built a new seam. Its builder's
+  return carries a reuse line: `proposed <tag>`, filed through the instruction command as LR-6 says,
+  or `none` with its reason. Units that built a new seam owe the line (`reuse.propose: new-seam`, LB-2).
+- `build.unit-pass`'s witness gains that line for each unit that owes it.
+- A memory check reads the anchors. An accepted entry has at least one `gov:feature <tag>` in code, and
+  a `removal-pending` entry has none left once its patch build lands. The check scans one marker, as
+  each `gov:` gate does today.
+
+### [log] A decision becomes a log row
+
+- A build records each decision as it is made, with its class declared: one of layer-memory
+  `[decisions]`' classes, or major.
+- At landing, `deploy.distill`, a new command item after `deploy.record`, appends a log row for each of
+  the build's major decisions. Each row carries its date, its build, the decision, a pointer to its
+  rationale, and the reuse entry it created, if any. A withdrawn build's decisions never reach the
+  log.
+- Its witness is a join both ways between the build's major decisions and the log's rows that name
+  the build. Its author declares a decision major, by the rubric (`decisions.major: author-rubric`,
+  LB-3).
+
+### [research-view] A build's research joins the library
+
+- The research records are the library already. Each is bound by `**Serves:** research` and graded by
+  check 21.
+- A generated research view lists them by build, date and question, beside the other views in
+  layer-memory `[views]`. It is the planner's core source, and recall stays the optional slot that
+  searches it.
+- Its witness is check 21's binding, and the view is byte-compared after rendering, like every view.
+
+### [placements] The two placements, confirmed by LB-4
+
+- **Dossiers stay with the map,** an optional component. A reuse entry would use 7.1% of a dossier's
+  text. Where the map is installed, a dossier's `seam:` paragraph may seed a reuse proposal and cite
+  the entry's tag.
+- **The annotation index stays with the map and drift-audit.** The core needs only the `gov:feature`
+  anchors, which a one-marker scan reads.
+
+### [gaps-proposed] Registered 2026-10-16, after LB-1 to LB-4
+
+- `gap-review-10` (MED, dFairHearing): left-shift has no witness. 724 of 907 confirmed findings carry
+  no class and no disposition, and 13 of 124 class records cite the review that filed them.
+- `gap-mem-15` (MED, dTotalRecall): no research view. Research is found across builds only through
+  recall or by its file name, and 22 of 202 records are cited from another build.
+- Extended:
+  - `gap-mem-02`: nothing defines a major decision;
+  - `gap-mem-03`: nothing proposes an entry, and `gov:feature` marks 0 code lines;
+  - `gap-mem-11`: the two records above that contradict the code;
+  - `gap-design-07`: its count of 7 research records predates the binding count of 202.
+
+## [settled-lb] What LB-1 to LB-4 settled, 2026-10-16
+
+Each answer is a policy whose default is the owner's answer. LB-4's placements are structural, so it
+has no key:
+
+| Fork | Key | Allowed values | Default |
+|---|---|---|---|
+| LB-1 | `review.unclassed` | refuse, reason, owner-rules | refuse |
+| LB-2 | `reuse.propose` | new-seam, every-unit, owner-asks | new-seam |
+| LB-3 | `decisions.major` | author-rubric, author-owner-ratifies, owner-only | author-rubric |
+
+- **The step definitions:**
+  - `review.report` gives every confirmed finding a left-shift disposition, and its witness joins each
+    one to a class record or a leg. `review.dispose` files each new class with its fix;
+  - `build.unit-pass`'s witness carries the reuse line of each unit that built a new seam;
+  - `deploy.distill`, a new command after `deploy.record`, appends the build's major decisions to the
+    log, and Deploy exits only once they are there.
+- **Memory:** layer-memory `[views]` gains the research view, `[decisions]` notes LB-3, and
+  `[knowledge]` notes LB-1.
+- **v2:** the three keys join the catalogue and every preset. The non-default presets were assigned by
+  analogy with their neighbours: velocity takes the lighter value, and strict the heavier one.
+- **The gaps:** `gap-review-10` joins dFairHearing and `gap-mem-15` joins dTotalRecall. `gap-mem-02`,
+  `gap-mem-03`, `gap-mem-11` and `gap-design-07` are extended.
+
 ## [open] What the library round owes
 
-- **Distillation, declared as flow:** the item and the witness for each of these:
-  - a finding becomes a bug class (`review.left-shift`);
-  - a feature becomes a reuse entry (LR-6's proposal);
-  - a decision becomes a log row;
-  - a build's research joins the library.
 - **The consult tools:**
   - the map's languages, relations and callers, which the owner's memory words call underdeveloped;
   - recall, narrowed to "why" questions;
   - each component's behaviour when absent, rendered as its optional slot's state.
-- **Placements left open:**
-  - whether dossiers stay with the map or merge into reuse entries, since both describe features;
-  - whether the annotation index is core, with the resolve check that reads it, or the map's.
-- **This fold's review** is owed before the round closes.
+- **This round's review** is owed before the round closes, over KN-1's fold and this design.
