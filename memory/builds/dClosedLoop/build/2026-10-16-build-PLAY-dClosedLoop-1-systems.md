@@ -89,3 +89,371 @@ for key, name in SYSTEMS.items():
     (d / f"question-{key}.md").write_text(text, encoding="utf-8", newline="\n")
     print(f"question-{key}.md: {len(text.split())} words, {len(text.encode('utf-8'))} bytes")
 ```
+
+## [agreement] What each system's two runs agree on
+
+Each table sets a system's run A beside its run B, question by question. "Both runs" holds only what each
+run found on its own, with each run's line cited. The returns are filed verbatim as
+`research-<system>-a.md` and `-b.md` in `build/`.
+
+### [agree-tags] Tags, dispatches 73 and 74
+
+| Question | Both runs | Where they differ | The design takes |
+|---|---|---|---|
+| Grammar | one namespaced grammar, `<ns>.<seg>`, with a section tag scoped to its document and ids keeping memory's own grammar (`research-tags-a.md:13`, `research-tags-b.md:13`) | B caps a tag at 64 B | both |
+| Where a tag is declared | once, in place, at the site its owning layer already writes, with no authored registry (`research-tags-a.md:15`, `research-tags-b.md:13`) | A rejects a central `tags.toml` on one fact in one place; B on 956 restated rows | both |
+| The index | derived by extractors each namespace's owner registers, cached by tree id, never committed and never loaded whole (`research-tags-a.md:15`, `research-tags-b.md:13`) | A: 0.90 s over all of `memory/`; B: 0.18 s for 735 rows from seven sources | both, as one index with memory's (`[cross]`) |
+| Resolution | one call returns the smallest slice, a 2.2 KB median section where today an agent reads a whole file in three calls (`research-tags-a.md:19`, `research-tags-b.md:15`) | A measures a 35.9 KB median file; B 25 KB | both |
+| Renames and retirement | a retired tag keeps a forward pointer and is never reused (`research-tags-a.md:145`, `research-tags-b.md:141`) | A appends an alias row beside the source; B derives the redirect from the source's write-path change record | B's derivation, with A's never-reuse |
+| Rejected: one authored registry | it restates what every declaring site already holds (`research-tags-a.md:104`, `research-tags-b.md:106`) | — | rejected |
+| Rejected: grep at query time | a line grep cannot tell a definition from a citation, so it needs the per-source parsers an index has anyway (`research-tags-a.md:106`, `research-tags-b.md:107`) | — | rejected |
+| Populations with no tag | gate legs are free text: 139 of 140 fail the tag shape (`research-tags-a.md:167`, `research-tags-b.md:198`) | A adds `section`, `doc`, `feature`, `bug-class`, `leg`, `check`, `ext`, `command` and `pack`; B adds `section`, `unit`, `field`, `leg`, `point`, `hook`, `command`, `feature` and `class` | the union, in `[design-tags]` |
+| Positional references | they stay a defect the grammar replaces, held while Convergence migrates them (`research-tags-a.md:56`, `research-tags-b.md:196`) | A: their defect is overload, not reordering, so numbers become alias rows; B: they have no gap and no ratchet, so a shrink-only ratchet | both |
+| Step or stage | one namespace, `step` (`research-tags-a.md:224`, `research-tags-b.md:210`) | — | `step` |
+| Index location | an untracked cache keyed by tree id (`research-tags-a.md:222`, `research-tags-b.md:206`) | — | the cache |
+| The join engine | `compute_coverage` is the one both-ways join today, and it sits in an optional component (`research-tags-a.md:159`, `research-tags-b.md:31`) | A extracts it to `tools/lib` as the join factory | A's extraction |
+
+### [agree-annotations] Code annotations, dispatches 75 and 76
+
+| Question | Both runs | Where they differ | The design takes |
+|---|---|---|---|
+| The head line | one inline `gov:note` head line per annotated block, holding a definition and pointers (`research-annotations-a.md:15`, `research-annotations-b.md:13`) | A caps a block at 8 lines (`research-annotations-a.md:143`); B at 12, on touched blocks (`research-annotations-b.md:145`) | 12 lines, on touched blocks |
+| Its place in the instruction layer | not an instruction unit and no level of its own; a directive stays in the unit the line points at (`research-annotations-a.md:15`, `research-annotations-b.md:13`) | A calls it level-7 evidence; B calls it levelless | levelless pointers |
+| History and measurements | they move out of comments into the record the line's `refs=` names (`research-annotations-a.md:15`, `research-annotations-b.md:13`) | — | both |
+| Delivery | a work-order slot of at most 2 KB and a query by tag, with no read hook (`research-annotations-a.md:17`, `research-annotations-b.md:15`) | — | both |
+| Why no read hook | the Read tool carries a small share of the calls that read code: 5.4% (`research-annotations-a.md:17`) and 3.1% (`research-annotations-b.md:15`) | the two windows differ | retire `pushed-at-read` (fork AN-2) |
+| Comment volume | about 41% of code bytes are comments (`research-annotations-a.md:47`, `research-annotations-b.md:23`) | A: 51.6% of comment lines sit in blocks of 8 or more; B: 22.9% of comment bytes narrate in long blocks | both |
+| Pointers followed | agents rarely follow a comment's pointer: 7.6% within 3 calls (`research-annotations-a.md:76`) and 5.0% within 5 reads (`research-annotations-b.md:48`) | — | the comment carries the orientation itself |
+| Dangling citations | a comment cites a gotcha path that never existed, and no check sees it (`research-annotations-a.md:70`, `research-annotations-b.md:27`) | A also counts 2 real dangling ids; B files the same ids among fixtures and foreign families | re-measured at arming |
+| Where tags are found | — | A: a map-built index beside a core marker scan (`research-annotations-a.md:113`); B: an on-demand marker query in core, with no index (`research-annotations-b.md:184`) | fork AN-1 |
+
+### [agree-instruction-writing] Instruction writing, dispatches 77 and 78
+
+| Question | Both runs | Where they differ | The design takes |
+|---|---|---|---|
+| The source | every loaded instruction is a typed unit, one TOML row in its kit's manifest, and every instruction document is a render (`research-instruction-writing-a.md:13`, `research-instruction-writing-b.md:13`) | — | both |
+| Templates | one template per document kind, holding slot selectors and no prose (`research-instruction-writing-a.md:13`, `research-instruction-writing-b.md:13`) | B adds the harness prompt module as a kind | both, with B's kind |
+| Enforcement | a gate refuses any instruction file whose bytes differ from its render (`research-instruction-writing-a.md:13`, `research-instruction-writing-b.md:13`) | B arms the refusal at dOrderedCharter with a shrink-only legacy list (`research-instruction-writing-b.md:222`); A has each chain build migrate its own step's guides | fork IW-1 |
+| Unrendered load points | instruction text loads that no render produces: A's five hand-written load-path documents, 60 KB (`research-instruction-writing-a.md:24`); B's harness prompt literals, 38 KB (`research-instruction-writing-b.md:28`) | each found a different population | both populations |
+| Duplication | the charter blocks load twice per spawn, in 48 handoffs (`research-instruction-writing-a.md:64`, `research-instruction-writing-b.md:53`) | — | one carry per spawn |
+| Rejected: documents stay the source | a unit several load points need must be copied, and a section holds many units (`research-instruction-writing-a.md:95`, `research-instruction-writing-b.md:103`) | — | rejected |
+| Rejected: fully generated text | it loses as the whole system and survives as a unit's `source` field (`research-instruction-writing-a.md:96`, `research-instruction-writing-b.md:103`) | — | both |
+| Source format | TOML rows (`research-instruction-writing-a.md:230`, `research-instruction-writing-b.md:221`) | — | TOML |
+
+### [agree-role-shapes] Role workflow shapes, dispatches 79 and 80
+
+| Question | Both runs | Where they differ | The design takes |
+|---|---|---|---|
+| The declaration | each role item names a shape declared as data, of a registered harness kind (`research-role-shapes-a.md:15`, `research-role-shapes-b.md:16`) | A extends `workflows.toml`, B adds `shapes.toml`; A's kinds are single, per-unit, scout-pass and find-verify-synth, B's single, scout-judge, panel and twin | a per-item registry, `[design-role-shapes]` |
+| Effort | it stays in `policy.toml` (`research-role-shapes-a.md:15`, `research-role-shapes-b.md:150`) | — | both |
+| Enforcement today | the spawn guard admits an undeclared shape: a builder reviewing at low effort exits 0 (`research-role-shapes-a.md:93`, `research-role-shapes-b.md:62`) | — | the guard binds the call to its shape |
+| Twins | on design records only (`research-role-shapes-a.md:15`, `research-role-shapes-b.md:20`) | — | fork RS-1 |
+| Twin merge | grouping by cited address finds the true pairs and many false ones, so a synthesizer judges them (`research-role-shapes-a.md:103`, `research-role-shapes-b.md:118`) | A: 40% of cross-defect pairs would merge wrongly; B: 92.7% of shared-address pairs are different defects | a synthesizer over address-grouped candidates |
+| Ranking | verified results per 100k out-tokens, with recall checked against a twin union (`research-role-shapes-a.md:15`, `research-role-shapes-b.md:22`) | B ranks recall first, within 2 sd, then grade-weighted yield | B's order |
+| The reuse scout | one M1c scout with the house index handed first, never twinned (`research-role-shapes-a.md:140`, `research-role-shapes-b.md:161`) | — | both |
+| Yield by review shape | spec audits at medium yield the most, 21.4 confirmed per 100k out-tokens over 12 runs (`research-role-shapes-a.md:42`, `research-role-shapes-b.md:46`) | — | both |
+| The review-shape line | nothing reads it, and it lacks the effort and the shape (`research-role-shapes-a.md:184`, `research-role-shapes-b.md:223`) | — | `review.cost` writes a shape-run record |
+| Efforts nothing measured | the orientation scout stays at xhigh until a trial says otherwise (`research-role-shapes-a.md:192`, `research-role-shapes-b.md:232`) | — | fork RS-2 |
+| Rejected mechanisms | — | A rejects escalating on the first run's output, which fires on 37 of 43 runs; B rejects choosing shapes adaptively from the ledger, which needs 10.8 runs per arm (`research-role-shapes-a.md:83`, `research-role-shapes-b.md:93`) | both rejected |
+
+### [agree-memory-structure] Memory structure, dispatches 81 and 82
+
+| Question | Both runs | Where they differ | The design takes |
+|---|---|---|---|
+| The mechanism | keyed sections, read through one command and handed out by the work order (`research-memory-structure-a.md:13`, `research-memory-structure-b.md:15`) | A calls it a catalogue, B a section index | both, as one index with the tags' (`[cross]`) |
+| The index | generated, keyed by tree hash, never tracked and never loaded whole (`research-memory-structure-a.md:119`, `research-memory-structure-b.md:18`) | A: JSONL, 0.9 s; B: TSV, 0.44 s | both |
+| Default load | the card only, under a budget (`research-memory-structure-a.md:17`, `research-memory-structure-b.md:22`) | A: 6 KB or less; B: 8 KB | 8 KB |
+| Why | reads run too wide rather than miss: an id grep returns a median 15.5 files (`research-memory-structure-a.md:56`), and a spec's median section is 715 B, 4% of its file (`research-memory-structure-b.md:81`) | different measures | both |
+| Rejected: summaries and ranked retrieval | summaries drop identifiers, and recall's read-through is under 6% (`research-memory-structure-a.md:83`, `research-memory-structure-b.md:153`) | — | rejected |
+| Recall's read-through | 33 of about 590 queries led to a read of a shown hit (`research-memory-structure-a.md:31`, `research-memory-structure-b.md:86`) | A also measures a 477 MB cache | both |
+| Rejected: cold tiers | moving dormant builds out of the default path saves little (`research-memory-structure-a.md:103`, `research-memory-structure-b.md:145`) | — | rejected |
+| Auto-memory | the harness's auto-memory index loads 14 KB every session, outside the contract, and its directives should be promoted through the instruction write path (`research-memory-structure-a.md:206`, `research-memory-structure-b.md:255`) | B then holds it to the load budget | fork MS-1 |
+| Over budget | — | A refuses at render (`research-memory-structure-a.md:207`); B counts whole-file reads and refuses only under strict (`research-memory-structure-b.md:261`) | fork MS-2 |
+| Legacy records | headings become derived anchors and are never rewritten (`research-memory-structure-a.md:208`, `research-memory-structure-b.md:252`) | — | derived |
+| The gap | no index by key and no read budget (`research-memory-structure-a.md:195`, `research-memory-structure-b.md:238`) | A grades it HIGH, B MED | HIGH |
+
+## [cross] Where the five systems meet
+
+- **One grammar, one index, one resolver.** Both tag runs derive a tag index keyed by tree id, and both
+  memory runs derive a section index keyed by tree hash. They index one population under one key, because
+  memory's sections are the tag system's `section` namespace. So there is one derived index:
+  - the tag system's engine builds it from the extractors each owning layer registers;
+  - memory registers the `section` and `record` extractors, and `record find` and `record show` are its
+    views over that index;
+  - `gov tag show <address>` and `record show <id>#<tag>` resolve through one resolver.
+
+  dOrderedCharter builds the grammar, the engine and the resolver; dTotalRecall registers memory's
+  extractors and its read verbs.
+- **One work order, one budget.** A role item's work order carries its instruction units, its memory
+  sections and its code-note rows, each selected by tag, under one byte budget per item. The instruction
+  layer renders it (P27), `memory.item-budget` prices its sections, and the code-notes slot is capped
+  inside it.
+- **Annotations point at tags.** A `gov:note` line's tags and pointers resolve through the same resolver,
+  and a directive in code points at the instruction unit that states it.
+- **Shapes are data; their texts are units.** A shape never loads into an agent. Its checklist and
+  orientation template are instruction units, `orient.*`, selected into the role's static block or work
+  order by tag.
+- **The order.** The grammar, the index engine and the unit schema come first, with dOrderedCharter at
+  the chain's root. Memory's extractors, the role shapes and the annotation checks build on them.
+
+## [design] The design, system by system
+
+### [design-tags] Tags
+
+- **Grammar.** `tag := <ns>.<seg>(.<seg>)*`, `seg := [a-z0-9][a-z0-9-]*`, at most 64 B. A section is
+  `<doc> [<seg>]`, unique within its document. Ids keep memory's grammar: `FAMILY-<slug>-<seq>` and
+  `gap-<area>-NN`. A first segment may not be a namespace word.
+- **Namespaces.** R-B's twelve, plus `section`, `doc`, `unit`, `field`, `leg`, `check`, `point`, `hook`,
+  `command`, `pack`, `feature` and `class`. Each namespace is a row in its owning layer's contract: its
+  declaring source, its extractor, and whether it selects or describes. An expansion mints only under its
+  own prefix, at a core point.
+- **Mint, rename, retire.** A tag is minted by writing its declaring site through that site's write path.
+  A rename or retirement writes `retired → <new>` or `→ none` into that write path's change record, and
+  the index derives the redirect from it. A retired name is never reused.
+- **Index and resolver.** The index is derived JSON under the git directory, keyed by tree id, rebuilt on
+  a miss, never committed and never loaded whole. `gov tag show|where|refs|check <address>` returns the
+  smallest leaf slice in one call.
+- **Joins.** `compute_coverage` moves to `tools/lib` as the join factory, because the map that holds it
+  today is optional.
+- **Positional references.** Numbers that never moved, such as the M-steps and the hygiene checks, become
+  alias rows to their tags. Live text migrates through Convergence, and frozen records resolve through the
+  aliases. A shrink-only ratchet holds the live count meanwhile.
+- **Checks**, the `tags` leg pack, also run at render, softened only through `instructions.checks`:
+
+  | Check | Red on |
+  |---|---|
+  | shape and registered namespace | `item.Build.Scope` |
+  | unique | a second `plan.input` row, or a second `## [design]` in one record |
+  | owned | an expansion declaring `item.build.x` |
+  | resolves | `layer-memory [nmes]` |
+  | retired | new text citing a retired tag, or a retired name minted again |
+  | joins (R-B), armed per population | a step with no unit; "unarmed" while a population is empty, never green |
+  | positional | a new `§n`, `Mn` or `check n` in live text |
+- **Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter. dDeclaredLoop registers
+  `step`, `item` and `policy`; dBoundRoles `role` and `field`; dTotalRecall `section`, `record`, `feature`
+  and `class`; dWitnessedBar `leg` and `check`.
+- **Keys.**
+
+  | Key | Values | Default |
+  |---|---|---|
+  | `tags.slice` | leaf, subtree | leaf |
+  | `tags.retired-cites` | refuse-new, warn, allow | refuse-new |
+  | `tags.positional` | shrink-only, refuse, report | shrink-only |
+  | `tags.bare-refs` | charter-only, unique, never | charter-only |
+
+### [design-annotations] Code annotations
+
+- **The line.** `gov:note <tag>[,<tag>…] — <definition, at most 80 chars> → <unit tag|path|command>
+  [refs=<id|path>[,…]]`, and `gov:feature <tag>`. It holds a definition and pointers. A body line holding
+  MUST or NEVER needs `refs=` to the unit or record that states it. It has no level and never loads at a
+  load point; in a work order its rows are data inside the task.
+- **What stays and what moves.** A comment keeps what its block implements, what would break without it,
+  and its pointer. Dates, measurements and what a block used to do move to the record `refs=` names.
+- **Budget.** A block a commit touches is at most 12 lines, and a head line at most 160 B. Untouched
+  legacy blocks are held by a shrink-only ratchet on the lines in blocks of 9 or more.
+- **Delivery.** The work order's code-notes slot, at most 2 KB, filled from the item's tags and write set;
+  and a query by tag. Nothing is pushed when a file opens.
+- **Checks**, one `annotations` leg, each seen red on a planted case first:
+  - grammar;
+  - resolve, over every id and `memory/` path a comment cites, with exemption rows for fixtures and
+    foreign families. It is red on day one on the gotcha path that never existed, which the arming unit
+    fixes;
+  - one anchor per feature tag;
+  - the touched-block budget;
+  - history inside a note's body.
+- **Owners.** The memory layer, kit memory-tree, chain build dTotalRecall. The tags come from
+  dOrderedCharter's registry, and the slot from dBoundRoles' work order.
+- **Keys.**
+
+  | Key | Values | Default |
+  |---|---|---|
+  | `annotations.budget` | refuse, warn, record | refuse, on touched blocks |
+  | `annotations.resolve-scope` | notes, every-comment-ref | every-comment-ref |
+  | `annotations.delivery` | work-order, on-demand, off | work-order |
+
+### [design-instruction-writing] Instruction writing
+
+- **The unit.** One TOML row in `tools/<kit>/instructions.toml`, the adopter's in
+  `.governance/instructions.toml`, merged by row key. Its fields: `tag`, `type` (directive, constraint,
+  definition, pointer, policy, fact), `level`, `select`, `when`, `text` (one line, at most 200 B) or
+  `source` (derived), `required-by`, `enforced-by`, `budget`, `status` (`active` or
+  `retired:<forward-tag>`), and `help` for the rationale, which never loads.
+- **Per type.** A directive carries a modal. A constraint carries a value and its enforcer. A fact
+  carries a source and never typed text. A pointer's target resolves to a unit, a slice or a command,
+  never a whole document.
+- **Templates.** One per document kind, holding slot selectors and no prose: the charter, the card's
+  slots, a protocol slice, a Skill entry, a path rule, the role static block, the work order, a hook
+  message, a harness prompt module, and the instruction fields of a spec. Rationale moves to `help/`,
+  outside every load set.
+- **The renderer and its gate.** One renderer, extending `render_charter_blocks` and the playbook's
+  probes. One leg refuses any file at an instruction path whose bytes differ from its render, or that no
+  registry row produces. Unmigrated documents sit on a shrink-only legacy list.
+- **Checks:** schema; grammar; positional references; one fact in one unit (two active units with one
+  subject and value); render parity; unregistered files; the budget per load point both ways, too much
+  and too little; the joins; a single carry, no unit twice in one spawn.
+- **The saving, re-measured at landing.** A spawn's fixed text falls from about 8.7 KB to about 4.8 KB,
+  and a builder item's from 35.6 KB to about 8.4 KB; whole-guide reads for triggers the item decides
+  fall to none. The render ledger measures bytes per load point per spawn, before and after, on the same
+  item tags.
+- **Owners.** The instruction layer. dOrderedCharter builds the schema, the grammar, the renderer, the
+  charter and work-order templates and the write command. dBoundRoles builds the role static block and
+  the single carry. dWellOiledMachine builds the hook-message and harness-prompt templates.
+  dConvergedCharter builds the protocol slices and Skill entries, and each step's guides migrate as
+  IW-1 settles.
+- **Keys.**
+
+  | Key | Values | Default |
+  |---|---|---|
+  | `instructions.slices` | handed, pointer | handed |
+  | `instructions.legacy` | shrink-only, refuse | shrink-only |
+  | `instructions.task-charter` | when-not-static, always | when-not-static |
+
+### [design-role-shapes] Role workflow shapes
+
+- **The registry.** `tools/roles/shapes.toml`, one row per role item's shape: its kind; its stages, each
+  with a role and a fan; its checklist and orientation template, both instruction unit tags; its merge;
+  its twin rule; and its agent cap. Effort stays in `policy.toml`, keyed by shape and stage.
+- **Kinds.** Four role harnesses registered at Runtime's role-harness point: `single`, `per-unit`,
+  `panel` (finders, at most five skeptic batches, one synthesizer) and `twin` (two runs of one shape,
+  merged).
+- **Binding.** The work order carries the resolved shape's digest. Act binding refuses a Workflow call
+  whose roles, efforts or fan differ from it, and the supervisor reconciles the journal against the shape
+  afterwards. A verifier stage whose role wrote the artifact it verifies is refused.
+- **Twins and their merge.** Twins run where RS-1 settles. A synthesizer places both runs' findings on
+  defects over candidate pairs grouped by address, and the comparison instrument refuses an unplaced id.
+- **The metric.** Recall first, against a twin union or a known replay set, then grade-weighted verified
+  results per 100k out-tokens. `review.cost` writes a shape-run record carrying the shape, its efforts and
+  its role-sha. The Loop Review prices shapes in the value ledger and proposes a change only past the
+  measured noise between twins.
+- **Per role:**
+
+  | Role | Kind | Effort | Orientation template |
+  |---|---|---|---|
+  | orientation scout | single | xhigh, until RS-2's trial | the card |
+  | prompt writer | single | medium | the resolved work order |
+  | planner, architect | single | high | `orient.producer` |
+  | researcher | single; a twin on an owner-opened design question | medium | the handed question |
+  | reuse scout | single, never twinned | medium | the house index first, then a sketch and a census |
+  | spec writer, builder | per-unit | high, xhigh | `orient.producer` |
+  | tester | single | medium | `orient.verifier-cold` |
+  | reviewer, skeptic, synthesizer | panel | diff high; spec and design audits medium | `orient.verifier-cold` |
+  | deployer, maintainer | single, registered by their expansions | medium | `orient.producer` |
+- **Checks:** every role item names a shape and every stage a declared role; the binding, red on today's
+  probe, a builder as reviewer at low effort; the journal reconcile, red on a planted extra agent; the
+  separation of author and verifier; twin placement; a shape-run record for every role act.
+- **Owners.** dBoundRoles builds the registry and the shapes; dWellOiledMachine the binding and the
+  reconcile; dFairHearing the panel's internals and the twin merge; dCalibratedLens the ledger's shape
+  rows.
+- **Keys.**
+
+  | Key | Values | Default |
+  |---|---|---|
+  | `review.twin` | never, design-records, design-and-landing, always | as RS-1 settles |
+  | `roles.shape-enforce` | refuse, record | refuse |
+  | `roles.orientation.house-index` | handed, pointer, off | handed |
+
+### [design-memory-structure] Memory structure
+
+- **Sections.** Each record kind's registry entry declares its sections as `[tag]`s, each required or
+  optional. Legacy headings get derived anchors: the spec template's numbered headings map to tags by a
+  table, and no record is rewritten.
+- **The index and the verbs.** Memory's rows live in the one index (`[cross]`): key, kind, layer, build,
+  bytes, blob, tags, superseded-by and lifecycle. `record find --kind|--tag|--build|--paths` returns at
+  most 40 rows and no content, with superseded rows hidden. `record show <id>#<tag>[@blob]` returns one
+  section.
+- **Work orders hand sections.** A role item's read set is declared as `id#tag` keys. The executor inlines
+  the slices under the item's byte budget and writes a slice manifest, and a read outside it is journaled
+  and counted.
+- **Default load.** The charter and the card, the card at most 8 KB; the harness's auto-memory as MS-1
+  settles.
+- **Homes.** Build folders stay. A record no build owns goes under `memory/<layer>/<kind>/`.
+  `DECISIONS.md`, `gotchas/` and `map/` are declared homes at their paths.
+- **Checks:**
+
+  | Check | Red on |
+  |---|---|
+  | sections | a new spec headed `## Goal` |
+  | keys resolve, both ways | a dangling `rec:` key, or one section tag twice in a record |
+  | item budget | a planted work order over its budget |
+  | no default ingest | `@memory/DECISIONS.md` in `CLAUDE.md` |
+  | superseded slices | a superseded decision handed to a builder |
+  | index freshness | a served row whose blob is not HEAD's |
+- **The acceptance re-measure.** Thirty days after landing, an agent transcript's median memory bytes are
+  below 40 KB, measured as today's 52.7 to 68.9 KB were.
+- **Owners.** The memory layer, kit memory-tree, chain build dTotalRecall. dBoundRoles renders the slices,
+  and dRankedPlan sizes read sets at Plan.
+- **Keys.**
+
+  | Key | Values | Default |
+  |---|---|---|
+  | `memory.default-load` | card, card-and-live | card |
+  | `memory.load-budget` | 4k, 8k, 16k | 8k |
+  | `memory.item-budget` | KB per role | builder 24, reviewer 48, researcher 64 |
+  | `memory.over-budget` | refuse, report, off | as MS-2 settles |
+  | `memory.legacy-anchors` | derived, none | derived |
+  | `memory.superseded-slices` | refuse, mark | refuse |
+
+## [forks] To put to the owner
+
+| Fork | The question | Options, the recommendation first |
+|---|---|---|
+| AN-1 | Where are annotation tags found? | an on-demand marker query in core memory-tree, 0.057 s with nothing to keep fresh; or the map's generated index, as layer-memory designed it |
+| AN-2 | What happens to `pushed-at-read`, an allowed value of `annotations.grammar`? | retire it, since a Read hook sees 3 to 5% of code reads; or redefine it to fire on shell reads too |
+| IW-1 | When does the render gate start refusing hand-written instruction documents? | at dOrderedCharter, with a shrink-only legacy list and each chain build migrating its own step's guides; or only at dConvergedCharter, the chain's last build |
+| IW-2 | Where does each practice's reach per step live? | as step-scoped units handed in work orders, the charter keeping one line per practice; or inline in the charter, which leaves about 4% headroom under its 32 KiB cap |
+| RS-1 | When do twin runs happen by default? | on design records; never; or on design records and at landing |
+| RS-2 | What happens to the efforts no measurement backs, the orientation scout's and the builder's xhigh? | keep them until a matched trial says otherwise; or lower them now |
+| MS-1 | What happens to the harness's auto-memory, 14 KB loaded every session? | promote its standing directives through the instruction write path, then hold it to the load budget; unload it; or leave it |
+| MS-2 | What happens to a work order over its memory budget? | refuse it at render, since the retired global budget never trimmed; or count it and refuse only under strict |
+
+## [gaps-proposed] Gaps to register once the forks settle
+
+| System | Gap | Severity | Owner |
+|---|---|---|---|
+| tags | no section-tag resolver and no citation check: 1,438 citations, 788 of them ambiguous | HIGH | dOrderedCharter |
+| tags | populations with no tag (gate legs, points, hooks, commands, fields, units) and colliding spellings (`build.scope` is an item and a policy) | MED | dOrderedCharter |
+| tags | positional references have no gap and no ratchet | MED | dOrderedCharter |
+| tags | spec section numbers mean different sections by tier | LOW | dIndexedDesign |
+| annotations | a comment can cite a record that never existed, and no check sees it | MED | dTotalRecall |
+| annotations | comment load is unbudgeted: 41% of code bytes, and about 29% of commits add a long block | MED | dTotalRecall |
+| annotations | `pushed-at-read` reaches 3 to 5% of code reads | MED | dTotalRecall |
+| instruction writing | every role spawn carries the charter blocks twice | MED | dBoundRoles |
+| instruction writing | Workflow harness prompts are a load point with no grammar, budget or parity | MED | dWellOiledMachine |
+| instruction writing | the static block's budget covers its base body only | LOW | dBoundRoles |
+| instruction writing | one fact in one place is policed per instance, never as a class | MED | dOrderedCharter |
+| role shapes | the spawn guard admits any agent-true role in any stage at any effort | HIGH | dWellOiledMachine |
+| role shapes | nothing reads the review-shape line, and it carries no effort or shape | MED | dCalibratedLens |
+| role shapes | twin merges have no item, record kind or check | MED | dFairHearing |
+| role shapes | the review harness spawns an untyped agent that no stage declares | LOW | dFairHearing |
+| memory structure | no index by key or section | HIGH | dTotalRecall |
+| memory structure | no read budget per item, and the global one was retired | MED | dTotalRecall |
+| memory structure | recall's cache is 477 MB for a 67 MB memory tree | LOW | dTotalRecall |
+
+### [instrument-agreement] The both-runs probe over `[agreement]`
+
+The probe is the one `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` `[follow-up]`
+holds, with two lines changed: its layers are this round's five systems, and its subsection pattern reads
+a hyphenated name, `[agree-([a-z]+(?:-[a-z]+)*)]`, so `instruction-writing`, `role-shapes` and
+`memory-structure` are read as their own tables. Its run over this record:
+
+```text
+rows read: 51; rows the predicate matched: 48
+findings: 0
+```
+
+Over a copy with one cited line struck from the `Twins` row:
+
+```text
+rows read: 51; rows the predicate matched: 48
+[agreement] Twins: credits role-shapes A, role-shapes B; no line cited for role-shapes B
+findings: 1
+```
+
+The three rows it reads and does not match hold a dash in "Both runs": they record where the runs differ.
+
+## [open] What the round owes
+
+- The owner's answers to `[forks]`.
+- Then the fold: v2's catalogue and presets gain the new keys, the register gains `[gaps-proposed]`, and
+  the chain rows gain the units `[design]` names.
+- A Tier-2 review of the round, at the owner's word.
