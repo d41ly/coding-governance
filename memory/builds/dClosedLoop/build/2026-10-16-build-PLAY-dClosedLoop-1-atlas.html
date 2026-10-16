@@ -1646,22 +1646,29 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
     var head = el('div');
     head.appendChild(el('div', { class: 'eyebrow', text: 'Where the design stands' }));
     head.appendChild(el('h1', { class: 'view-title', text: 'Layer by layer, review by review' }));
-    head.appendChild(el('p', { class: 'lede' }, 'Each core layer was drafted with the owner, reviewed twice at Tier 2 and folded. The library side opened after KN-1: ' + esc(libraryState().replace(/^./, function (c) { return c.toLowerCase(); })) + ' The expansions come last.'));
+    var expansions = D.layers.filter(function (l) { return l.kind !== 'core'; });
+    var designed = expansions.filter(function (l) { return PROG[l.tag]; });
+    var reviewed = designed.filter(function (l) { return PROG[l.tag].reviews.length; });
+    head.appendChild(el('p', { class: 'lede' }, 'Each core layer was drafted with the owner, reviewed twice at Tier 2 and folded. The library side opened after KN-1: ' + esc(libraryState().replace(/^./, function (c) { return c.toLowerCase(); })) + ' ' +
+      (designed.length ? esc(designed.length + ' of ' + expansions.length + ' expansions designed, ' + reviewed.length + ' reviewed.') : 'The expansions come last.')));
     v.appendChild(head);
     var rail = el('div', { class: 'rail' });
-    D.progress.forEach(function (p) {
+    function progressCard(p, meta) {
       var c = el('button', { class: 'panel step-card', type: 'button' });
-      c.innerHTML = '<span class="sc-name">' + esc(p.layer) + '</span><span class="state-pill ' + (p.folded ? 'done' : 'open') + '">' + (p.folded ? 'reviewed ×' + p.reviews.length + ' · folded' : 'in review') + '</span><span class="sc-meta">' + plural(p.records.length, 'design record') + '</span>';
+      var pill = p.folded ? ['done', 'reviewed ×' + p.reviews.length + ' · folded'] : p.reviews.length ? ['open', 'in review'] : ['open', 'designed · review owed'];
+      c.innerHTML = '<span class="sc-name">' + esc(p.layer) + '</span><span class="state-pill ' + pill[0] + '">' + esc(pill[1]) + '</span><span class="sc-meta">' + esc(meta || plural(p.records.length, 'design record')) + '</span>';
       c.addEventListener('click', function () { select('layer', p.layer); });
-      rail.appendChild(c);
-    });
+      return c;
+    }
+    D.progress.forEach(function (p) { if (LAYER[p.layer] && LAYER[p.layer].kind === 'core') rail.appendChild(progressCard(p)); });
     var lib = el('button', { class: 'panel step-card', type: 'button' });
     lib.innerHTML = '<span class="sc-name">memory: library side</span><span class="pills"><span class="state-pill ' + (lr.folded ? 'done' : 'open') + '">' +
       (lr.reviews.length ? 'reviewed ×' + lr.reviews.length + (lr.folded ? ' · folded' : '') : 'in review') + '</span>' +
       (lr.open.length ? '<span class="state-pill open">owes ' + lr.open.length + '</span>' : '') + '</span><span class="sc-meta">replaces the Knowledge layer (KN-1)</span>';
     lib.addEventListener('click', function () { select('layer', 'memory'); });
     rail.appendChild(lib);
-    D.layers.filter(function (l) { return l.kind !== 'core'; }).forEach(function (l) {
+    expansions.forEach(function (l) {
+      if (PROG[l.tag]) { rail.appendChild(progressCard(PROG[l.tag], 'an expansion · ' + plural(PROG[l.tag].records.length, 'design record'))); return; }
       var c = el('button', { class: 'panel step-card', type: 'button' });
       c.innerHTML = '<span class="sc-name">' + esc(l.tag) + '</span><span class="state-pill todo">not designed yet</span><span class="sc-meta">an expansion</span>';
       c.addEventListener('click', function () { select('layer', l.tag); });

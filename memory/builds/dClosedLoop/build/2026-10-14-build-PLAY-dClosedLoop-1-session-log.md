@@ -117,7 +117,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 53 | gov-researcher, at medium effort | The integrations expansion, run A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-20-researcher.md` | 1799cb98 | dispatched | pending |
 | 54 | the same | The integrations expansion, run B, from the same handoff | the same | 1799cb98 | dispatched | pending |
 | 55 | gov-researcher, at medium effort | The distribution expansion, run A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-21-researcher.md` | 1799cb98 | dispatched | pending |
-| 56 | the same | The distribution expansion, run B, from the same handoff | the same | 1799cb98 | waits for a spawn slot | pending |
+| 56 | the same | The distribution expansion, run B, from the same handoff | the same | 1799cb98 | dispatched 17:00, after the five returned | pending |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -973,8 +973,9 @@ The library round's review, dispatch 50, derived from its Workflow run the same 
 
 - 2026-10-16, session 1799cb98: the owner said, verbatim: "let's move on to the expansion layers - launch a concurrent set of research agents each targeting their own expansion layer design given their fit into the new architectural design. Run each of them twice at medium effort. Then, base your own design against what the agents agree on."
   Dispatches 51 to 55 send one researcher handoff per expansion layer, twice each, at medium effort.
-  Dispatch 56, distribution's second run, waits until the agent-cap hook's first slot frees. The
-  round's record is `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md`.
+  Dispatch 56, distribution's second run, waited for the agent-cap hook's budget and started at 17:00,
+  once the five had returned. The round's record is
+  `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md`.
 
 ## Instruments
 

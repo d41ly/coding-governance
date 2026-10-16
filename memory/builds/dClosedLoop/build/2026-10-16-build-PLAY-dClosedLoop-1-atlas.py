@@ -44,6 +44,9 @@ LAYER_RECORDS = {
     "roles": ["layer-roles"],
     "memory": ["layer-memory", "layer-library"],
     "runtime": ["layer-runtime"],
+    "observability": ["layer-expansions"],
+    "integrations": ["layer-expansions"],
+    "distribution": ["layer-expansions"],
 }
 STEPS = ["entry", "plan", "design", "build", "test", "deploy", "breakpoint", "lifecycle"]
 KINDS = ("command", "executor", "hook", "owner")
