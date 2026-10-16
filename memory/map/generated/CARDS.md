@@ -46,7 +46,7 @@ The build method: how to spec, review and build, rendered from the memory-tree k
 - status `shipped` · streams `tooling` · dossier `memory/map/features/build-method.md`
 - decisions 1: `TOOL-aWrittenMethod-1`
 - gate-legs 3: `method carriers (every pointer declared)`, `method-carriers self-test`, `build-method size`
-- gotcha-classes 7: `fold-text-is-unreviewed-surface.md`, `amendment-leaves-its-other-half-standing.md`, `a-folded-field-leaves-its-row-shape-docs-behind.md`, `one-value-field-records-a-mixed-outcome.md`, `criterion-asserts-what-its-own-command-cannot-show.md`, `observation-before-the-last-fold-of-the-same-commit.md`, `hand-named-gate-list-green-while-the-bar-reds.md`
+- gotcha-classes 9: `fold-text-is-unreviewed-surface.md`, `amendment-leaves-its-other-half-standing.md`, `a-folded-field-leaves-its-row-shape-docs-behind.md`, `one-value-field-records-a-mixed-outcome.md`, `criterion-asserts-what-its-own-command-cannot-show.md`, `observation-before-the-last-fold-of-the-same-commit.md`, `hand-named-gate-list-green-while-the-bar-reds.md`, `route-names-an-output-its-actor-never-emits.md`, `owner-item-without-its-reject-outcome.md`
 - guides 1: `BUILD-METHOD.md`
 - globs 2: `tools/memory-tree/BUILD-METHOD.template.md`, `memory/guides/BUILD-METHOD.md`
 
@@ -158,9 +158,9 @@ check-memory-hygiene.sh: the memory tree's structural gate, its per-class size c
 - gate-legs 11: `memory hygiene`, `memory-hygiene self-test`, `verdict epoch (kit version dates the engine)`, `verdict-epoch self-test`, `kit version markers`, `kit/dogfood doc parity`, `transition-audit arms`, `backlog migration selftest`, `straggler-guard arms`, `routed commits name a specced unit`, `routed-commits selftest`
 - kits 1: `memory-tree`
 - git-hooks 2: `commit-msg`, `pre-rebase`
-- gotcha-classes 14: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`
+- gotcha-classes 15: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`
 - globs 11: `tools/memory-tree/check-memory-hygiene.sh`
-- cut 21 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 22 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## memory-tree-merge-driver
 
