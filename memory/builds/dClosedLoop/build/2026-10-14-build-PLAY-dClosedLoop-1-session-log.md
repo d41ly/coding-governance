@@ -118,6 +118,8 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 54 | the same | The integrations expansion, run B, from the same handoff | the same | 1799cb98 | returned, 6m14s, 30.5k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-integrations-b.md` |
 | 55 | gov-researcher, at medium effort | The distribution expansion, run A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-21-researcher.md` | 1799cb98 | returned, 6m24s, 34.7k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-distribution-a.md` |
 | 56 | the same | The distribution expansion, run B, from the same handoff | the same | 1799cb98 | dispatched 17:00 after the five returned; returned, 6m11s, 34.4k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-distribution-b.md` |
+| 57 | `tier2-review.js`, full: five `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The expansion round's review, run A: a diff review over `ee2eee68e..f56e80fee`, the atlas excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md` `[review]` | 1799cb98 | dispatched | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-a.md` |
+| 58 | the same | The expansion round's review, run B, after run A returns | the same | 1799cb98 | waits for run A | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1007,6 +1009,10 @@ The expansion round's researchers, dispatches 51 to 56, derived from their hando
   EX-1 "Only through the core (Recommended)"; EX-2 "memory/<layer>/<kind>/ (Recommended)"; EX-3 "A record every period by default, owner-switchable. Both options built.";
   DI-1 "Source-mode receipt (Recommended)". layer-expansions `[settled]` says where each landed: v2, flow-steps,
   layer-runtime, layer-memory and the register, with twenty gaps registered.
+
+- 2026-10-16, session 1799cb98: the owner said, verbatim: "go ahead with the Tier-2 review, twice". Dispatches 57 and 58 run the
+  round's Tier-2 diff review twice, run A first and run B once it returns, so no more than five agents run at
+  once. Their args are in layer-expansions `[review]`.
 
 ## Instruments
 
