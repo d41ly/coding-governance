@@ -4,7 +4,7 @@
  * while the unattended run on the current branch is in a phase before VERIFYING, and refuses an
  * `AskUserQuestion` call from the session holding a non-terminal run's lease.
  *
- * gov:kit unattended@1.106 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.107 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for TOOL-aDeferredBar-3 under the build folder of that slug.
@@ -686,14 +686,14 @@ function renderDeny(hits, live) {
  * one `(no question text)` entry rather than a throw: the deny must still name the park route.
  */
 function extractAskQuestions(input) {
-  const clean = (v) => String(v).replace(/[\u0000-\u001f\u007f-\u009f]/g, '').slice(0, ASK_QUOTE_MAX)
+  const renderAskQuote = (v) => String(v).replace(/[\u0000-\u001f\u007f-\u009f]/g, '').slice(0, ASK_QUOTE_MAX)
   const list = input && Array.isArray(input.questions) ? input.questions : []
   const out = []
   for (const q of list) {
     if (!q || typeof q !== 'object') continue
-    const text = typeof q.question === 'string' && q.question.trim() ? clean(q.question) : '(no question text)'
+    const text = typeof q.question === 'string' && q.question.trim() ? renderAskQuote(q.question) : '(no question text)'
     const opts = Array.isArray(q.options) ? q.options : []
-    const labels = opts.filter((o) => o && typeof o.label === 'string').map((o) => clean(o.label))
+    const labels = opts.filter((o) => o && typeof o.label === 'string').map((o) => renderAskQuote(o.label))
     out.push({ question: text, labels })
   }
   return out.length ? out : [{ question: '(no question text)', labels: [] }]

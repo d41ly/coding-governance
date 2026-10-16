@@ -65,12 +65,14 @@ const ck = (ok, name) => { if (ok) { pass++; console.log('ok   ' + name) } else 
 const die = (why) => { console.log('tier2-review-test: ' + why); console.log('---- ' + pass + ' passed, ' + (fail + 1) + ' failed ----'); process.exit(2) }
 
 // ---- extract the prelude, and PROVE the extraction moved -------------------------------------
-// The stop anchor is the line after the base-shape ladder, NOT the ladder's own first line: at
-// `const baseLooksPinned` the ladder is excluded and the two arms below would grade nothing.
+// The stop is the line after the `}` closing the base-shape ladder, found from `const baseLooksPinned`:
+// AT that line the ladder is excluded, and a stop on a line above it strands what moves below it.
 const metaEnd = lines.findIndex((l) => l === '}')
-const stop = lines.findIndex((l) => l.startsWith('const reviewDir = a.reviewDir'))
+const ladder = lines.findIndex((l) => l.startsWith('const baseLooksPinned'))
 if (metaEnd === -1) die('could not find the end of the `meta` block — the extraction anchor moved, and an empty body would pass every arm below')
-if (stop === -1) die('could not find `const reviewDir = a.reviewDir` — the extraction anchor moved, and an empty body would pass every arm below')
+if (ladder === -1) die('could not find `const baseLooksPinned`, the line the stop after the `if (!baseLooksPinned)` ladder is found from — the extraction anchor moved, and an empty body would pass every arm below')
+const stop = lines.findIndex((l, i) => i > ladder && l === '}') + 1
+if (stop === 0) die('could not find the `}` closing the `if (!baseLooksPinned)` ladder below `const baseLooksPinned` — the extraction anchor moved, and an empty body would pass every arm below')
 if (stop <= metaEnd) die('the extraction anchors are out of order (' + metaEnd + ' then ' + stop + ')')
 const body = lines.slice(metaEnd + 1, stop).join('\n')
 for (const needed of ['badSubject', 'const a = cfg', 'baseLooksPinned']) {

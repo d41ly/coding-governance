@@ -38,13 +38,13 @@ section 9d of `tools/run-gates/run-gates.test.sh`; and the `RP` arms of `.githoo
   executed and `pure` was reused; a second bar at that HEAD reused `hist`. The suite arm is owed at
   VERIFYING.
 - AC3 — `direct-checks.sh` — with `GATE_REUSE_DAY=1` against an earning bar on today's day, `clk`
-  executed and `pure` was reused. The suite arm is owed at VERIFYING.
+  (which reads `clock`) executed and `pure` was reused. The suite arm is owed at VERIFYING.
 - AC4 — `direct-checks.sh` — a `GATE_REUSE` bar in a worktree added after the earning bar printed
   `GATE reuse` for `pure` and `clk`. The suite arm is owed at VERIFYING.
 - AC5 — `direct-checks.sh` — on a cleared cache a bar with `RED=1` left no entry under the red leg's
-  key and wrote its green sibling's. A bar on a tree holding an untracked guarded file left the entry
-  count at 7. A reused leg's entry bytes were unchanged after the reusing bar. The suite arm is owed
-  at VERIFYING.
+  key and wrote its green sibling's. A bar on a tree holding an untracked guarded file (under which
+  the runner's `TREE_CLEAN` reads `no`) left the entry count at 7. A reused leg's entry bytes were
+  unchanged after the reusing bar. The suite arm is owed at VERIFYING.
 - AC6 — `direct-checks.sh` — at `GATE_REUSE_SAMPLE=1` with `FLIP=1` the bar exited 1, printed
   `cache disagreement · flip · <key>` with the key the record holds and `nondeterministic · nd`,
   erased flip's entry and wrote two quarantine files. After a clean bar earned flip's key again, a
@@ -60,9 +60,10 @@ section 9d of `tools/run-gates/run-gates.test.sh`; and the `RP` arms of `.githoo
 - AC10 — `direct-checks.sh` — the legacy `impure` leg executed on the bar that reused every other
   leg. After a push of a new branch to the fixture remote, its key moved with the `remote` leg's while
   `pure`'s did not. The suite arm is owed at VERIFYING.
-- AC11 — not run — it needs two whole bars with the self-test tier on a frozen clone, hours on node
-  `a`, which no pass may run. It is owed at VERIFYING as the reused count and seconds a second bar in
-  a fresh worktree reports.
+- AC11 — amended rev-6, the spec's entry recording that this criterion was never observed —
+  NOT OBSERVED — not run — it needs two whole bars with the self-test tier on a frozen clone, hours
+  on node `a`, which no pass may run. It is owed at VERIFYING as the reused count and seconds a
+  second bar in a fresh worktree reports.
 - AC12 — `direct-checks.sh` — under `GATE_REUSE_PUSH` naming HEAD, the probed tip and the
   advertisement digest, `rem` and `hist` were reused and `pure` and `based` executed. A moved tip,
   another advertisement digest, another pushed sha and a commit moving a guarded file each executed

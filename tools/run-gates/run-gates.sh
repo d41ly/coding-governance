@@ -33,7 +33,10 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.40   # gov:kit run-gates@1.40
+KIT_RUN_GATES_VERSION=1.42   # gov:kit run-gates@1.42
+# 1.40 -> 1.41: the kit ships `measure_legs.py`, a gate profiler that runs every manifest leg clean and
+# unbounded, each in its own Windows Job Object, with its fixtures and its `measure-legs selftest` leg
+# (TOOL-dRedressedBar-18). This runner's behaviour does not move; the profiler reads its text.
 # 1.30 + 1.30 -> 1.31: merging local main's reconcile (a30f4589) into aGraftedHelix. Both lines bumped
 # 1.29 -> 1.30 with different bytes, so the number alone could not tell the two kits apart.
 # 1.29 -> 1.30: the shard-join comment in run-selftests.sh stops justifying its unported reverse half
@@ -772,6 +775,8 @@ add_health_event() {
   return 0
 }
 # <<< health_log_sh
+# derive_temp_path <name> <dest> — sets <name> to an unpredictable sibling of <dest>; creates nothing (TOOL-dRedressedBar-24)
+derive_temp_path() { if [ -n "${SRANDOM:-}" ]; then printf -v "$1" '%s.%s%s.tmp' "$2" "$SRANDOM" "$SRANDOM"; else printf -v "$1" '%s' "$(mktemp -u "$2.XXXXXXXX" 2>/dev/null)"; [ -n "${!1}" ]; fi; }
 
 PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_WALL=0; PROF_MEMPAUSE=0; PROF_SPAWNPAUSE=0; PROF_SLOTS=1; PROF_TAG=""; PROF_WHERE=""
 if [ -f "$PROFILES" ]; then
@@ -1343,12 +1348,13 @@ if [ "${1:-}" = "--calibrate-width" ]; then
   printf 'rates\t%s\n' "$_cfield"
   printf 'theta\t%s\n' "$CALIBRATE_THETA"
   printf 'pick\t%s\n'  "$CAL_PICK"
-  if [ -n "$_ciso" ] && { printf '%s\t%s\t%s\t%s\n' "$CAL_PICK" "$_cfield" "$_ciso" "$BOOT_EPOCH" > "$CALIB_FILE.tmp"; } 2>/dev/null \
-     && mv -f "$CALIB_FILE.tmp" "$CALIB_FILE" 2>/dev/null; then
+  derive_temp_path _tp "$CALIB_FILE"
+  if [ -n "$_ciso" ] && { printf '%s\t%s\t%s\t%s\n' "$CAL_PICK" "$_cfield" "$_ciso" "$BOOT_EPOCH" > "$_tp"; } 2>/dev/null \
+     && mv -f "$_tp" "$CALIB_FILE" 2>/dev/null; then
     printf 'cache\t%s\n' "$CALIB_FILE"
     exit 0
   fi
-  rm -f "$CALIB_FILE.tmp" 2>/dev/null
+  rm -f "$_tp" 2>/dev/null
   echo "run-gates: --calibrate-width: the cache at $CALIB_FILE could not be written, so bars keep the width they had" >&2
   exit 1
 fi
@@ -1635,7 +1641,7 @@ TS_TICK_EVERY=$(( TS_TTL / 6 )); [ "$TS_TICK_EVERY" -ge 1 ] || TS_TICK_EVERY=1
 TS_TICK_PID=""
 TS_TICK_LIVE=0
 
-ts_hb()  { [ -n "$TS_DIR" ] && printf '%s' "$EPOCHSECONDS" > "$TS_DIR/heartbeat.tmp" 2>/dev/null && mv -f "$TS_DIR/heartbeat.tmp" "$TS_DIR/heartbeat" 2>/dev/null || true; }
+ts_hb()  { local _tp; [ -n "$TS_DIR" ] && derive_temp_path _tp "$TS_DIR/heartbeat" && printf '%s' "$EPOCHSECONDS" > "$_tp" 2>/dev/null && mv -f "$_tp" "$TS_DIR/heartbeat" 2>/dev/null || true; }
 ts_alive(){ kill -0 "$1" 2>/dev/null; }
 
 # RELEASE IS NONCE-GUARDED. A run whose beacon was reaped for being stale must never delete its
@@ -1679,17 +1685,19 @@ ts_drop_ticket() { [ -n "$TS_TICKET" ] && rm -f "$TS_TICKET" 2>/dev/null; TS_TIC
 # for the nonce, `$EPOCHSECONDS` for the time. ONE RULE, TOOL-aSparedSpawn-16 S15: the runner
 # requires bash 5's `EPOCHSECONDS` and reads it bare at every site, with no fallback, because a
 # `$(date +%s)` fallback is the banned `epoch-date` fork and no supported bash lacks the variable.
+# The heartbeat's temp name is `derive_temp_path`'s, built from `$SRANDOM` with no fork on bash 5.1
+# and later; bash 5.0 pays one `mktemp -u` a tick for it (TOOL-dRedressedBar-24).
 ts_tick_start() {
   [ -n "$TS_DIR" ] || return 0
-  local _hp=$$ _d=$TS_DIR _n=$TS_NONCE _every=$TS_TICK_EVERY _cur
+  local _hp=$$ _d=$TS_DIR _n=$TS_NONCE _every=$TS_TICK_EVERY _cur _tp
   (
     while :; do
       sleep "$_every"
       _cur=""; { IFS= read -r _cur < "$_d/nonce"; } 2>/dev/null
       [ "$_cur" = "$_n" ] || exit 0
       kill -0 "$_hp" 2>/dev/null || exit 0
-      printf '%s' "$EPOCHSECONDS" > "$_d/heartbeat.tmp" 2>/dev/null \
-        && mv -f "$_d/heartbeat.tmp" "$_d/heartbeat" 2>/dev/null || true
+      derive_temp_path _tp "$_d/heartbeat" && printf '%s' "$EPOCHSECONDS" > "$_tp" 2>/dev/null \
+        && mv -f "$_tp" "$_d/heartbeat" 2>/dev/null || true
     done
   # STDIO GOES NOWHERE, and that is the whole point. Backgrounded and disowned, this
   # subshell and its `sleep` still INHERIT the runner's fd 1 and 2, and the sleep outlives
@@ -2214,8 +2222,10 @@ WORK_COMMON=$RG_COMMON
 [ -n "$RG_HEALTH_LOG" ] || [ -z "$WORK_COMMON" ] || RG_HEALTH_LOG=$(derive_health_log "$WORK_COMMON")
 
 write_work_owner() { # -> $WORK/owner, one line: pid TAB common dir TAB start epoch; rc 1 when unwritten
-  printf '%s\t%s\t%s\n' "$$" "$WORK_COMMON" "$EPOCHSECONDS" > "$WORK/owner.tmp" 2>/dev/null \
-    && mv -f "$WORK/owner.tmp" "$WORK/owner" 2>/dev/null
+  local _tp
+  derive_temp_path _tp "$WORK/owner"
+  printf '%s\t%s\t%s\n' "$$" "$WORK_COMMON" "$EPOCHSECONDS" > "$_tp" 2>/dev/null \
+    && mv -f "$_tp" "$WORK/owner" 2>/dev/null
 }
 
 scan_dead_work() { # -> removes each gate-work dir under the ambient TMPDIR that this repo's dead bar owns
@@ -2590,7 +2600,8 @@ if [ -n "$gd" ]; then
   if mkdir -p "$RUNDIR" 2>/dev/null; then
     chmod 700 "$RUNDIR" 2>/dev/null || true
     RC="$RUNDIR"
-    printf '%s' "$RUNID" > "$RUNROOT/current.tmp" 2>/dev/null && mv -f "$RUNROOT/current.tmp" "$RUNROOT/current" 2>/dev/null || true
+    derive_temp_path _tp "$RUNROOT/current"
+    printf '%s' "$RUNID" > "$_tp" 2>/dev/null && mv -f "$_tp" "$RUNROOT/current" 2>/dev/null || true
     # The memory pause's episodes, one row each, beside the `.leg` rows they explain. Emptied when a
     # pinned id reuses the directory, so a row here is always this run's (TOOL-aGraftedHelix-7).
     MEMPAUSE_ROWS="$RUNDIR/pauses"
@@ -3461,6 +3472,7 @@ done
 MANIFEST_BLOB=$(git hash-object -- "$LEGS_FILE" 2>/dev/null)
 HEAD_SHA=$RG_HEAD
 if [ -n "$RUNDIR" ]; then
+  derive_temp_path _tp "$RUNDIR/header"
   {
     printf 'schema\t1\n'
     printf 'run_id\t%s\n' "$RUNID"
@@ -3534,7 +3546,7 @@ if [ -n "$RUNDIR" ]; then
     # scope. The chunking unit's ordering criteria read it from the record rather than
     # re-deriving it, which is what keeps the record's key set single-sourced.
     printf 'dispatch\t%s\n' "$ORDER"
-  } > "$RUNDIR/header.tmp" 2>/dev/null && mv -f "$RUNDIR/header.tmp" "$RUNDIR/header" 2>/dev/null || true
+  } > "$_tp" 2>/dev/null && mv -f "$_tp" "$RUNDIR/header" 2>/dev/null || true
   chmod 600 "$RUNDIR/header" 2>/dev/null || true
 fi
 
@@ -3779,18 +3791,19 @@ measure_spawn_cost() {
 # figure. A path that exists and is not a regular file is left alone, and a write that fails leaves
 # the old line in force; each says so on stderr.
 write_spawn_floor() {
-  local f=$1 us=$2
+  local f=$1 us=$2 _tp
   [ -n "$f" ] && [ -n "$us" ] || return 0
   [ -n "$SPAWN_FLOOR_US" ] && [ "$SPAWN_FLOOR_US" -le "$us" ] && return 0
   if [ -e "$f" ] && [ ! -f "$f" ]; then
     echo "run-gates: the spawn floor at $f is not a regular file, so this bar's measurement is not recorded there" >&2
     return 0
   fi
-  if { printf '%d.%03d\t%s\n' "$(( us / 1000 ))" "$(( us % 1000 ))" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$f.tmp"; } 2>/dev/null \
-     && mv -f "$f.tmp" "$f" 2>/dev/null; then
+  derive_temp_path _tp "$f"
+  if { printf '%d.%03d\t%s\n' "$(( us / 1000 ))" "$(( us % 1000 ))" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$_tp"; } 2>/dev/null \
+     && mv -f "$_tp" "$f" 2>/dev/null; then
     return 0
   fi
-  [ -f "$f.tmp" ] && rm -f "$f.tmp" 2>/dev/null
+  [ -f "$_tp" ] && rm -f "$_tp" 2>/dev/null
   echo "run-gates: the spawn floor at $f could not be written, so the floor it held stays in force" >&2
   return 0
 }
@@ -3826,7 +3839,7 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
   # The suffix is empty on a leg's first attempt and `.retry` on its serial retry (TOOL-dDerivedDocket-26
   # S2), so every file a retry writes sits BESIDE the first attempt's and the red attribution still
   # reads that first attempt exactly as it was written.
-  local i=$1 sfx=${2:-} s e out rc tpid="" FOREIGN=unknown
+  local i=$1 sfx=${2:-} s e out rc tpid="" FOREIGN=unknown _tp
   local -a chunks_out=()
   # THE WALL'S HANDLE ON THIS LEG. `$BASHPID`, never `$$`: inside a backgrounded function `$$` is
   # still the RUNNER's pid, and a wall that killed that would kill the shell that has to print the
@@ -3933,10 +3946,11 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
     # already forbids a tab inside one. The EIGHTH field is `foreign`, the census's verdict on this
     # attempt's window (TOOL-aGraftedHelix-5), appended so no positional reader moves.
     derive_foreign "$s" "$e"
+    derive_temp_path _tp "$RUNDIR/$i$sfx.leg"
     printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
       "${names[$i]}" "$st" "$rc" "$secs" "$s" "$e" "${INPUT_KEYS[$i]:--}" "$FOREIGN" \
-      > "$RUNDIR/$i$sfx.leg.tmp" 2>/dev/null \
-      && mv -f "$RUNDIR/$i$sfx.leg.tmp" "$RUNDIR/$i$sfx.leg" 2>/dev/null || true
+      > "$_tp" 2>/dev/null \
+      && mv -f "$_tp" "$RUNDIR/$i$sfx.leg" 2>/dev/null || true
   fi
   # THE ONE HEARTBEAT SITE, and it is here rather than in the reader loop because this is the
   # event the TTL is sized against: S4 refreshes at a leg COMPLETING, so "can the holder still be
@@ -3949,7 +3963,8 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
   # because the worker knows at completion what the manifest-order reader may not reach until the
   # floor leg ends, and the tail where its retry can run exists only while the pool still runs.
   [ "$fired" = 1 ] && [ -z "$sfx" ] && : > "$WORK/$i.defer"
-  printf '%s' "$rc" > "$WORK/$i$sfx.rc.tmp" && mv -f "$WORK/$i$sfx.rc.tmp" "$WORK/$i$sfx.rc"
+  derive_temp_path _tp "$WORK/$i$sfx.rc"
+  printf '%s' "$rc" > "$_tp" && mv -f "$_tp" "$WORK/$i$sfx.rc"
 }
 
 # THE TAIL CONTRACT (the run-gates promotion spec's S5). Every tailed line is `<verb>  <leg name>  <tail>`:
@@ -4256,7 +4271,7 @@ arm_census() {
   [ "$CENSUS_ARMED" = 0 ] || return 0
   CENSUS_ARMED=1
   [ -n "$RUNDIR" ] || return 0
-  local _f="$RUNDIR/census" _c="" _me=$$ _every=$CENSUS_EVERY _work=$WORK _spawn=0
+  local _f="$RUNDIR/census" _c="" _me=$$ _every=$CENSUS_EVERY _work=$WORK _spawn=0 _tp
   # THE SPAWN PAUSE'S READING (TOOL-aSparedSpawn-2): three timed spawns a tick, written tmp-then-rename
   # to the file the dispatcher reads with a builtin, only while the pause is live and no seam stands in.
   [ "${SPAWNPAUSE:-0}" -gt 0 ] && [ -n "${SPAWNPAUSE_FLOOR:-}" ] && [ -z "$SPAWN_NOW_SEAM" ] && _spawn=1
@@ -4273,8 +4288,8 @@ arm_census() {
       [ -f "$_work/census.disarm" ] && exit 0
       if [ "$_spawn" = 1 ]; then
         measure_spawn_cost 3
-        [ -n "$SPAWN_US" ] && printf '%s\n' "$SPAWN_US" > "$_work/spawn-now.tmp" 2>/dev/null \
-          && mv -f "$_work/spawn-now.tmp" "$_work/spawn-now" 2>/dev/null
+        [ -n "$SPAWN_US" ] && derive_temp_path _tp "$_work/spawn-now" && printf '%s\n' "$SPAWN_US" > "$_tp" 2>/dev/null \
+          && mv -f "$_tp" "$_work/spawn-now" 2>/dev/null
       fi
       measure_foreign >> "$_f" 2>/dev/null || exit 0
     done
@@ -5212,7 +5227,10 @@ FPRINT_END=$(fingerprint)
 tree_moved=no
 [ -n "$FPRINT_START" ] && [ -n "$FPRINT_END" ] && [ "$FPRINT_START" != "$FPRINT_END" ] && tree_moved=yes
 if [ -n "$LEDGER" ]; then
-  new="$WORK/ledger.new"; merged="$WORK/ledger.merged"; : > "$new"
+  # THE MERGE IS STAGED BESIDE THE LEDGER, under a name nobody can know before `cp` creates it
+  # (TOOL-dRedressedBar-24). A fixed staging name in the scratch dir, which sits in the shared temp
+  # dir, let a process that can write there plant a link the merge then wrote through.
+  new="$WORK/ledger.new"; derive_temp_path merged "$LEDGER"; : > "$new"
   lfull=""; [ -n "${GATE_FULL:-}" ] && [ "$TREE_CLEAN" = yes ] && [ "$tree_moved" = no ] && lfull=1
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
@@ -5254,6 +5272,7 @@ if [ -n "$LEDGER" ]; then
   # ATOMIC rather than a copy in place. A reader that opens the ledger while the bar is mid-write
   # got a truncated file before; a rename is the only way this file is ever replaced now.
   mv -f "$merged" "$LEDGER" 2>/dev/null || cp "$merged" "$LEDGER" 2>/dev/null || true
+  [ -e "$merged" ] && rm -f "$merged" 2>/dev/null
   # THE RETIRED CACHE IS DELETED HERE. Nothing reads `gate-timings.tsv` since the ledger replaced it,
   # yet every node that ran an older runner still holds a copy: a stale second store of one fact that
   # build records had to warn readers not to cite. The runner is the one program every node runs, so it
@@ -5333,6 +5352,7 @@ if [ -f "$WORK/wall.breach" ]; then
   # same reason, and its own neighbour comment already said so. TOOL-aQuenchedHarness-1,
   # corrected in TOOL-aQuenchedHarness-7's closing pass.
   if [ -n "$RUNDIR" ]; then
+    derive_temp_path _tp "$RUNDIR/verdict"
     {
       printf 'ended\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
       printf 'verdict\t%s\n' RED
@@ -5345,7 +5365,7 @@ if [ -f "$WORK/wall.breach" ]; then
       printf 'paused\t%s\n' "$MEMPAUSE_N"
       printf 'paused_s\t%s\n' "$MEMPAUSE_HELD_S"
       printf 'wall_breach\t%s\n' "$WALL"
-    } > "$RUNDIR/verdict.tmp" 2>/dev/null && mv -f "$RUNDIR/verdict.tmp" "$RUNDIR/verdict" 2>/dev/null || true
+    } > "$_tp" 2>/dev/null && mv -f "$_tp" "$RUNDIR/verdict" 2>/dev/null || true
     chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
   fi
   exit 1
@@ -5362,6 +5382,7 @@ if [ "$fails" = 0 ] && [ "$ran" -le 0 ] && [ "${ondemands:-0}" -gt 0 ] \
   # GREEN` standing in gate-last-summary.txt for anyone who reads the durable record instead of the
   # terminal. Both records say REFUSED instead. TOOL-dUnstalledConvoy-26.
   if [ -n "$RUNDIR" ]; then
+    derive_temp_path _tp "$RUNDIR/verdict"
     { printf 'ended\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
       printf 'verdict\tREFUSED\n'
       printf 'ran\t0\n'
@@ -5372,7 +5393,7 @@ if [ "$fails" = 0 ] && [ "$ran" -le 0 ] && [ "${ondemands:-0}" -gt 0 ] \
       printf 'retried\t0\n'
       printf 'paused\t%s\n' "$MEMPAUSE_N"
       printf 'paused_s\t%s\n' "$MEMPAUSE_HELD_S"
-    } > "$RUNDIR/verdict.tmp" 2>/dev/null && mv -f "$RUNDIR/verdict.tmp" "$RUNDIR/verdict" 2>/dev/null || true
+    } > "$_tp" 2>/dev/null && mv -f "$_tp" "$RUNDIR/verdict" 2>/dev/null || true
     chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
   fi
   [ -n "$sfile" ] && printf 'gates REFUSED — every leg is a held kit self-test, so this run executed nothing\n' >"$sfile" 2>/dev/null || true
@@ -5409,8 +5430,9 @@ if [ -n "${GATE_SELFTESTS:-}" ] && [ -n "$HELD_DIR" ] && [ -n "$RG_HEAD" ]; then
     _hfile="$HELD_DIR/${heldkeys[$i]}"
     if [ "$_hrc" = 0 ]; then
       [ "$TREE_CLEAN" = yes ] && [ "$tree_moved" = no ] || continue
-      printf 'sha\t%s\nrow\t%s\n' "$RG_HEAD" "${rowhashes[$i]}" > "$_hfile.tmp.$$" 2>/dev/null \
-        && mv -f "$_hfile.tmp.$$" "$_hfile" 2>/dev/null || true
+      derive_temp_path _tp "$_hfile"
+      printf 'sha\t%s\nrow\t%s\n' "$RG_HEAD" "${rowhashes[$i]}" > "$_tp" 2>/dev/null \
+        && mv -f "$_tp" "$_hfile" 2>/dev/null || true
     else
       rm -f "$_hfile" 2>/dev/null || true
     fi
@@ -5456,22 +5478,28 @@ if [ -n "$REUSE_CACHE" ] && [ -n "$RG_HEAD" ]; then
     for _l in ${_cwl[@]+"${_cwl[@]}"}; do [ "${_l##*$'\t'}" = 1 ] || printf '%s\n' "$_l" >> "$_cw"; done
   fi
   if [ -s "$_cw" ] || [ "$REUSE_MODE" != off ]; then
-    "$PYBIN" -c '
-import os, sys, time
+    # -I: this program runs from $ROOT, where a top-level tempfile.py would shadow the stdlib module (TOOL-dRedressedBar-26)
+    "$PYBIN" -I -c '
+import os, sys, tempfile, time
 root = sys.argv[1]
 for line in sys.stdin.read().splitlines():
     f = line.split("\t")
     if len(f) < 5 or len(f[0]) < 3:
         continue
+    key, tmp = f[0], ""
     try:
-        d = os.path.join(root, f[0][:2])
+        d = os.path.join(root, key[:2])
         os.makedirs(d, exist_ok=True)
-        tmp = os.path.join(d, f[0] + ".tmp." + str(os.getpid()))
-        with open(tmp, "w", encoding="utf-8", newline="\n") as fh:
+        fd, tmp = tempfile.mkstemp(dir=d, prefix=key + ".", suffix=".tmp")
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as fh:
             fh.write("ok\t" + "\t".join(f[1:5]) + "\t0\n")
-        os.replace(tmp, os.path.join(d, f[0]))
+        os.replace(tmp, os.path.join(d, key))
     except OSError:
-        pass
+        if tmp:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
 cut = time.time() - 30 * 86400
 for sub in (os.listdir(root) if os.path.isdir(root) else []):
     p = os.path.join(root, sub)
@@ -5518,8 +5546,8 @@ if [ -n "$RUNDIR" ]; then
   # `GATE_VERDICT_FAULT` is an ARM SEAM, not a conf key (TOOL-dDerivedDocket-26 S6): it points this
   # write into a directory that does not exist, which is the only way to reach the refusal below that
   # will not certify a green whose record was never written.
-  _vtmp="$RUNDIR/verdict.tmp"
-  [ -n "$VERDICT_FAULT" ] && _vtmp="$RUNDIR/verdict-fault/verdict.tmp"
+  derive_temp_path _vtmp "$RUNDIR/verdict"
+  [ -n "$VERDICT_FAULT" ] && derive_temp_path _vtmp "$RUNDIR/verdict-fault/verdict"
   {
     printf 'ended\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     printf 'verdict\t%s\n' "$gate_verdict"
@@ -5574,6 +5602,7 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = "$linea
    && [ "$cache_reuses" = 0 ] && [ ! -f "$WORK/wall.breach" ] \
    && [ "$tree_moved" = no ] && [ "$TREE_CLEAN" = yes ] && [ -n "$FPRINT_START" ] \
    && [ "$gate_verdict" = GREEN ] && [ -f "$RUNDIR/verdict" ]; then
+  derive_temp_path _tp "$gd/gate-full-green"
   {
     printf 'sha\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"
     printf 'fingerprint\t%s\n' "$FPRINT_START"
@@ -5593,8 +5622,8 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = "$linea
     printf 'selftests\t%s\n' "$SELFTESTS_STAMP"
     printf 'run_id\t%s\n' "$RUNID"
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  } > "$gd/gate-full-green.tmp" 2>/dev/null \
-    && mv -f "$gd/gate-full-green.tmp" "$gd/gate-full-green" 2>/dev/null || true
+  } > "$_tp" 2>/dev/null \
+    && mv -f "$_tp" "$gd/gate-full-green" 2>/dev/null || true
   # SHARED FROM A LINKED WORKTREE (TOOL-dThriftyLanding-2). The common dir's own `gate-full-green` is
   # the PRIMARY tree's stamp and is never written from here: a branch's green that is no ancestor of
   # the default branch would replace the primary's valid one. A separate `.shared` file, which the push
@@ -5606,12 +5635,15 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = "$linea
     _gcd_abs=$(cd "$_gcd" 2>/dev/null && pwd -P) || _gcd_abs=""
     _gd_abs=$(cd "$gd" 2>/dev/null && pwd -P) || _gd_abs=""
     if [ -n "$_gcd_abs" ] && [ -n "$_gd_abs" ] && [ "$_gcd_abs" != "$_gd_abs" ]; then
-      # STAGED UNDER THIS PROCESS'S OWN NAME (TOOL-aPairedSlots-7): two bars of one repository stamp at
+      # STAGED UNDER A NAME OF ITS OWN (TOOL-aPairedSlots-7): two bars of one repository stamp at
       # once, and a fixed staging name let one bar's `cp` truncate the file the other was moving.
-      # Each `mv` now places a whole stamp, and the last writer wins.
-      cp "$gd/gate-full-green" "$_gcd_abs/gate-full-green.shared.tmp.$$" 2>/dev/null \
-        && mv -f "$_gcd_abs/gate-full-green.shared.tmp.$$" "$_gcd_abs/gate-full-green.shared" 2>/dev/null \
-        || rm -f "$_gcd_abs/gate-full-green.shared.tmp.$$" 2>/dev/null || true
+      # Each `mv` now places a whole stamp, and the last writer wins. The name is `derive_temp_path`'s,
+      # which no other process can know before `cp` creates it (TOOL-dRedressedBar-24). ONE statement
+      # from the call to the `|| true`: the runlog suite's TWO arm extracts and runs it whole.
+      derive_temp_path _tp "$_gcd_abs/gate-full-green.shared" \
+        && cp "$gd/gate-full-green" "$_tp" 2>/dev/null \
+        && mv -f "$_tp" "$_gcd_abs/gate-full-green.shared" 2>/dev/null \
+        || rm -f "$_tp" 2>/dev/null || true
     fi
   fi
 fi
@@ -5632,6 +5664,7 @@ fi
 if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ "$ATTR_LANDABLE" = 1 ] \
    && [ "$fails" -gt 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] && [ ! -f "$WORK/wall.breach" ] \
    && [ "$tree_moved" = no ] && [ "$TREE_CLEAN" = yes ] && [ -n "$FPRINT_START" ] && [ -n "${ATTR_RSHA:-}" ]; then
+  derive_temp_path _tp "$gd/gate-inherited-green"
   {
     printf 'sha\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"
     printf 'fingerprint\t%s\n' "$FPRINT_START"
@@ -5645,8 +5678,8 @@ if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ "$ATTR_LANDABLE" = 1 ] \
     printf 'reused_cache\t%s\n' "$cache_reuses"
     printf 'run_id\t%s\n' "$RUNID"
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  } > "$gd/gate-inherited-green.tmp" 2>/dev/null \
-    && mv -f "$gd/gate-inherited-green.tmp" "$gd/gate-inherited-green" 2>/dev/null || true
+  } > "$_tp" 2>/dev/null \
+    && mv -f "$_tp" "$gd/gate-inherited-green" 2>/dev/null || true
   echo "run-gates: inherited-green stamp written — every red leg is INHERITED at ${ATTR_RSHA:0:8}${ATTR_MAX_AGE:+, aged against the ${ATTR_MAX_AGE}-landing bound}: $ATTR_LAND_LEGS"
 fi
 

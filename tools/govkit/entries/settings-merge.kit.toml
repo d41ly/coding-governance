@@ -30,6 +30,25 @@ mutates_index = false
 # [[regenerate]] or this reason, and selfcheck refuses one declaring neither.
 why_no_regenerate = "the adopter merges hook fragments into .claude/settings.json, and update already re-runs that merge for every fragment it lands (its fragment-wiring step), so a second run here would merge the same rows twice"
 
+# AN ACCEPTED STOP, not a failure (TOOL-dRedressedBar-9). The bare argv above has one job, wiring
+# agent-cap's built-in `Workflow|Agent` entry, and it exits 2 when that hook is not installed. This
+# entry requires nothing and may stand alone, so a target with no hooks kit reaches that exit on
+# every correct install, and on every `update` that gains this entry while leaving agent-cap out for
+# an unmet requirement. The adopter refused before writing, so nothing naming a missing file is
+# wired. The PRESENCE, `must_exist`, pins `{prefix}` to the adopter's own directory. The ABSENCE is
+# three terms, one per place the adopter's resolver looks. `must_not_exist` names its two static
+# homes, `{prefix}/hooks` and `{prefix}/../hooks` (TOOL-dRedressedBar-10). `must_not_resolve` asks
+# the adopter's own resolver, which reads the receipt, `.governance/install.json`, before either
+# static home, so a hook at a home only the receipt records is found too (TOOL-dRedressedBar-11).
+# With the hook where any of the three terms finds it, an exit 2 stays a failure.
+# agent-cap runs the same argv under its own descriptor, which declares no outcome, so its refusal
+# still fails wherever agent-cap is selected.
+[[outcome]]
+code = 2
+probe = { must_exist = "{prefix}/settings-merge.py", must_not_exist = ["{prefix}/hooks/agent-cap.js", "{prefix}/../hooks/agent-cap.js"], must_not_resolve = "{prefix}/hooks/agent-cap.js" }
+means = "no-agent-cap-to-wire"
+ok = true
+
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
 # reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.

@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-32 — reconcile the build with origin/main 37200355
 
-**Status:** CLOSED · rev-4 · 2026-10-12 · node a · Tier-2 · base fce4b707 · streams tooling · order 5 · ratified 2026-10-12
+**Status:** CLOSED · rev-5 · 2026-10-16 · node a · Tier-2 · base fce4b707 · streams tooling · order 5 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
@@ -375,6 +375,9 @@ New arm: .githooks/pre-push.test.sh · covers AC7 AC8 · a lineage full stamp re
   points the merged code decided that (a) to (e) did not name: lineage read through `legreads` and
   `INPUT_KEYS`, predicate 9 in its own function, the probe after the cover pass, the holder nonce left
   out of the digest, and (d)'s row 4 over S7; plus the post-merge and driver scrubs left owed.
+- rev-5 · 2026-10-16 · AC1 · records, TOOL-dRedressedBar-27: the range was read at origin's moved tip
+  `6e8f8b1da`, where rev-4's §4 (f) moved the merge, and never at `37200355d`. The criterion does
+  not move, and the status stays CLOSED.
 
 ## 10. Reuse audit
 

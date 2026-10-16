@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # adopt-branch-reconcile.sh — render the /cleanup Skill, and check the rendered copy has not drifted.
-# gov:kit branch-reconcile@1.4
+# gov:kit branch-reconcile@1.5
 #
 #   bash <this kit>/adopt-branch-reconcile.sh --scaffold    # render .claude/skills/cleanup/SKILL.md
 #   bash <this kit>/adopt-branch-reconcile.sh --check       # the gate leg: is the rendered Skill a fresh render?
@@ -22,7 +22,7 @@
 #   a repository.
 set -u
 
-HERE="$(cd "$(dirname "$0")" && pwd)" || exit 2
+HERE=.; [[ $0 == */* ]] && HERE=${0%/*}; HERE="$(cd "$HERE" && pwd)" || exit 2
 ROOT="$(unset GIT_DIR GIT_WORK_TREE; cd "$HERE" && git rev-parse --show-toplevel 2>/dev/null)" || {
   echo "branch-reconcile: the directory holding this script is not inside a git repository"; exit 2; }
 cd "$ROOT" || exit 2
@@ -71,7 +71,7 @@ check_render() { # $1 = a fresh render -> 0 when it may be written or compared, 
   hits=$(tr -d '\r' < "$TEMPLATE" | grep -nE '(^|[^A-Za-z0-9_.-])tools/' || true)
   if [ -n "$hits" ]; then
     echo "branch-reconcile: $KIT_REL/SKILL.template.md spells a literal tools/ path; name it through the kit-dir token:"
-    printf '%s\n' "$hits" | sed 's/^/  /'
+    printf '  %s\n' "${hits//$'\n'/$'\n'  }"
     bad=1
   fi
   if [ ! -s "$1" ]; then
@@ -81,7 +81,7 @@ check_render() { # $1 = a fresh render -> 0 when it may be written or compared, 
   hits=$(grep -n '{{\|}}' "$1" || true)
   if [ -n "$hits" ]; then
     echo "branch-reconcile: a double brace survives the render, so the template carries a token this script does not substitute:"
-    printf '%s\n' "$hits" | sed 's/^/  /'
+    printf '  %s\n' "${hits//$'\n'/$'\n'  }"
     bad=1
   fi
   if ! grep -qF "python $KIT_REL/branch_reconcile.py" "$1"; then
@@ -111,7 +111,7 @@ check_old_render() { # -> 0 when no old render stays (withdrawing it under --sca
   [ -e "$OLD" ] || return 0
   local front
   front=$(tr -d '\r' < "$OLD" | awk 'NR == 1 && $0 != "---" { exit } NR > 1 && $0 == "---" { exit } NR > 1')
-  if ! printf '%s\n' "$front" | grep -qx 'name: branch-reconcile' || ! grep -qF 'branch_reconcile.py' "$OLD"; then
+  if ! [[ $'\n'$front$'\n' == *$'\n''name: branch-reconcile'$'\n'* ]] || ! grep -qF 'branch_reconcile.py' "$OLD"; then
     echo "branch-reconcile: $OLD_REL is not this kit's old render, so it is kept; remove it by hand once"
     echo "  nothing needs it — /cleanup at $SKILL_REL replaces the old /branch-reconcile skill"
     return 1
@@ -122,7 +122,7 @@ check_old_render() { # -> 0 when no old render stays (withdrawing it under --sca
     return 1
   fi
   rm -f "$OLD" || return 1
-  rmdir "$(dirname "$OLD")" 2>/dev/null || true
+  rmdir "${OLD%/*}" 2>/dev/null || true
   echo "withdrew $OLD_REL, the old /branch-reconcile render"
 }
 
@@ -139,7 +139,7 @@ if [ "$MODE" = "--check" ]; then
   exit 1
 fi
 
-mkdir -p "$(dirname "$SKILL")" || exit 1
+mkdir -p "${SKILL%/*}" || exit 1
 cp "$TMP" "$SKILL.tmp" && mv "$SKILL.tmp" "$SKILL" || exit 1
 echo "rendered $SKILL_REL (CLI $KIT_REL/branch_reconcile.py)"
 check_old_render || exit 1

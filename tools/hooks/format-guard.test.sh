@@ -163,7 +163,7 @@ check_empty() { # <name> <file>
 }
 check_absent() { # <name> <file> <fixed string>
   if ! grep -qF -- "$3" "$2"; then echo "ok   $1"; pass=$((pass+1))
-  else echo "FAIL $1 ('$3' in $(basename "$2"))"; sed 's/^/     /' "$2"; fail=$((fail+1)); fi
+  else echo "FAIL $1 ('$3' in ${2##*/})"; sed 's/^/     /' "$2"; fail=$((fail+1)); fi
 }
 
 # write_message <name> <line>... — one message file, one argument per line. Every string here is one line and

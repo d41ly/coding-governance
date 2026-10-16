@@ -47,10 +47,10 @@ unattended driver's suite and the fixture.
   and the scan measures 2"; after it exited 0, "58 declared site(s) in 43 row(s), no undeclared loop
   fed by a command substitution", with the registry untouched. The changed arm itself runs in the
   driver suite's shard 1 at VERIFYING.
-- AC9 — `bash tools/gate-lint/fork-count.sh memory/project/fork-ceilings.txt . --only
-  run-gates-2leg` — calibrated on its 5-fork specimen, then "ok run-gates-2leg · measured 95 ·
-  ceiling 99 · base 97"; the row's reason names the stated margin, the readings it sits over and the
-  stale direction's bound at 95.
+- AC9 — `bash tools/gate-lint/fork-count.sh memory/project/fork-ceilings.txt . --only run-gates-2leg`
+  — calibrated on its 5-fork specimen, then "ok run-gates-2leg · measured 95 · ceiling 99 · base
+  97"; the row's reason names the stated margin, the readings it sits over and the stale
+  direction's bound at 95.
 
 Checked as well, none of them a bar leg run: `sh_hygiene.py --spawn-idioms` with the leg's pathspecs
 exited 0 with every registered count unchanged; `sh_hygiene.py --location-probes` exited 0;

@@ -14,7 +14,7 @@ gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring"
   "selftest harness self-test", "extract-arms self-test",
   "leg ceilings clear their evidenced maximum", "run-gates run-log line",
   "receipt sync (installed files match the receipt)", "pre-push bar self-test",
-  "held-halves selftest"]
+  "held-halves selftest", "measure-legs selftest"]
 kits = ["run-gates"]
 git-hooks = []
 harness-hooks = []
@@ -62,6 +62,8 @@ globs = [
   "tools/run-gates/run-held-wsl.sh",
   "tools/run-gates/held_halves.py",
   "tools/run-gates/windows-only-legs.txt",
+  "tools/run-gates/measure_legs.py",
+  "tools/run-gates/fixtures/measure-legs/*",
   "tools/run-gates/post-merge.sh",
 ]
 ```

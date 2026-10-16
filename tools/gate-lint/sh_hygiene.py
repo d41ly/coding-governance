@@ -7,7 +7,21 @@ Project-agnostic. Run over any repo:
     python <this file> [registry-path] [root]     # scan; exit 0 clean, 1 on an undeclared site
     python <this file> --location-probes [registry-path] [root] [pathspec ...]   # the second class
     python <this file> --spawn-idioms [registry-path] [root] [pathspec ...]      # the third class
+    python <this file> --temp-names [registry-path] [root] [pathspec ...]        # the fourth class
     python <this file> --selftest                 # prove every predicate in BOTH directions
+
+THE FOURTH CLASS, `--temp-names` (TOOL-dRedressedBar-24). A file written at a fixed temp name and
+renamed over its destination: a process that can write the directory plants a link at that name
+before the write, and the write goes through the link into whatever it names. A `fixed-temp` site is
+an `mv` whose source names a temp no unpredictable part names. The source is admitted when it holds
+`$(mktemp`, when it is one expansion whose binding one hop up in its scope does, or when that binding
+is a call to a binder: a function of the same file whose body sets `printf -v "$1"`, holds `mktemp`,
+and expands `SRANDOM` only beside the test `${SRANDOM:-`. A bare `SRANDOM` name is FIXED: on a bash
+before 5.1 the variable is unset and `"$f.$SRANDOM.tmp"` expands to `<f>..tmp` (TOOL-dRedressedBar-26).
+A source that is one positional parameter, one expansion with no binding in its scope, or one whose
+binding is itself one expansion or one positional, is UNFOLLOWED, counted and printed, never gated.
+The registry counts sites per (path, `fixed-temp`) and shrinks only. What the mode does not check is
+`TEMP_BOUNDARY`, named on `run_temp_scan` beside the mode it bounds.
 
 THE THIRD CLASS, `--spawn-idioms` (TOOL-aSparedSpawn-8). A command substitution forks a subshell, 89 to
 315 ms under MSYS, and the idioms below fork for work bash does in-process. Three have no false positive
@@ -210,7 +224,11 @@ PROBE_CLASSES = [
 #: nine arms stranded past an unconditional exit while the suite printed a total and every
 #: other gate held. Raise it with the arms; it may never be lowered to fit a regression.
 #: RAISED 55 -> 81 by TOOL-aSparedSpawn-8: the spawn-idiom arms, 26 executed, every one unconditional.
-FLOOR_ASSERTIONS = 81
+#: RAISED 81 -> 92 by TOOL-dRedressedBar-24: the temp-name arms, ten fixture cases and the registry
+#: arm, 11 executed, every one unconditional, counted off the arms.
+#: RAISED 92 -> 125 by TOOL-dRedressedBar-26: eight temp rows, the ten-word lead arm, the 13-row
+#: boundary arm and the two one-line-per-key rows, 33 executed, every one unconditional.
+FLOOR_ASSERTIONS = 125
 
 
 def check_substitution(text: str) -> bool:
@@ -443,11 +461,13 @@ def resolve_declaration(arg: str | None, shape: tuple = DELIMITER_SHAPE,
 
 def check_registry(measured: dict[tuple[str, str], int],
                    declared: dict[tuple[str, str], int],
-                   explained: dict[tuple[str, str], str] | None = None) -> list[str]:
+                   explained: dict[tuple[str, str], str] | None = None,
+                   listing: dict[tuple[str, str], str] | None = None) -> list[str]:
     """Set equality in both directions, with the counts. Returns one line per violation.
 
     `explained` carries the undeclared-site text for a key, where the caller's class needs its own
-    words; a key it does not carry gets the loop scan's.
+    words; a key it does not carry gets the loop scan's. `listing` carries a key's site lines, which
+    its count-mismatch line ends with, so a drifted key is ONE finding that names its sites.
     """
     problems = []
     for key in sorted(set(measured) | set(declared)):
@@ -466,7 +486,8 @@ def check_registry(measured: dict[tuple[str, str], int],
         elif have != want:
             problems.append(
                 f"{rel}: the registry declares {want} site(s) at `{delim}` and the scan measures "
-                f"{have} — the count may fall with the sites and may not rise")
+                f"{have} — the count may fall with the sites and may not rise"
+                + (listing.get(key, "") if listing else ""))
     return problems
 
 
@@ -943,6 +964,261 @@ def run_spawn_scan(args: list[str]) -> int:
     return 1
 
 
+# ---- the FIXED-TEMP class, `--temp-names` -------------------------------------------------------
+# The keywords a command word may follow at a segment's start: ONE list, read by both predicates.
+TEMP_KEYWORDS = ("if", "then", "else", "elif", "do", "while", "until")
+# Words that run the word after them as a command. Read before `mv` only: none of them runs a shell
+# function, so a binder call after one binds nothing.
+TEMP_PREFIXES = ("command", "builtin", "exec")
+# `mv` as a command word: at a segment's start, or after `;`, `&`, `|`, `{`, `(` or `!`, once a run of
+# lead words is skipped — an opener or `!`, a keyword, a prefix, or an assignment word `NAME=value`.
+# Read on the line with its quoted text blanked, so a quoted `mv` is data and a quoted value holds no
+# space: `B="x y" mv` is one assignment word and `mv` (TOOL-dRedressedBar-26).
+TEMP_MV = re.compile(r"(?:\A|[;&|{(!])(?:[ \t]*(?:[{(!]|(?:" + "|".join(TEMP_KEYWORDS + TEMP_PREFIXES)
+                     + r")(?=[ \t])|[A-Za-z_][A-Za-z0-9_]*\+?=[^ \t]*(?=[ \t])))*[ \t]*mv(?=[ \t])")
+# One shell word after `mv`: the location-probe mode's word, so `"$(mktemp -u "$f.X")"` is one word.
+TEMP_WORD = re.compile(r"[ \t]+(" + PROBE_WORD + r")")
+# A source that is exactly one expansion — `"$n"`, `"${n}"`, `$n` or `${n}` — which is followed.
+TEMP_FOLLOW = re.compile(r"\A(\"?)\$(?:([A-Za-z_][A-Za-z0-9_]*)|\{([A-Za-z_][A-Za-z0-9_]*)\})\1\Z")
+# A source that is exactly one positional parameter — `$1`, `${12}`, `$@` or `$*`, quoted or not. It is
+# a temp handed in by a caller this line cannot see, so it is unfollowed and never gated.
+TEMP_POSITIONAL = re.compile(r"\A(\"?)\$(?:[0-9@*]|\{(?:[0-9]+|[@*])\})\1\Z")
+# What makes a name unknowable before the write creates it on EVERY bash: a `$(mktemp`. A bare
+# `SRANDOM` is not one — a bash before 5.1 leaves it unset, and the name it builds is fixed.
+TEMP_UNPREDICTABLE = re.compile(r"\$\([ \t]*mktemp(?![\w-])")
+# A binder's own write: it sets the variable its first argument names.
+TEMP_BINDER = re.compile(r"printf[ \t]+-v[ \t]+\"\$1\"")
+# The openers and keywords a segment may lead with before an assignment or a binder call.
+TEMP_LEAD = re.compile(r"\A(?:[ \t]*(?:[{(!]|(?:" + "|".join(TEMP_KEYWORDS) + r")(?=[ \t])))*[ \t]*")
+# `<binder> <name>`: a call that binds the name it is handed, when the first word is a binder.
+TEMP_CALL = re.compile(r"\A([A-Za-z_][A-Za-z0-9_]*)[ \t]+([A-Za-z_][A-Za-z0-9_]*)(?![\w=])")
+# A registry key is the one class, so a line number is refused as malformed.
+TEMP_KEY = re.compile(r"\Afixed-temp\Z")
+TEMP_KEY_SHAPE = (TEMP_KEY, "the class `fixed-temp`", "CLASS")
+# The taxonomy, in report order: (key, mark, label).
+TEMP_CLASSES = [
+    ("fixed", "GATED", "an `mv` whose source names a temp no unpredictable part names"),
+    ("admitted", "admitted", "the source, or the one binding it follows, holds `$(mktemp`, or is bound by a "
+                             "binder whose body holds `mktemp` and expands `SRANDOM` only beside `${SRANDOM:-`"),
+    ("unfollowed", "unfollowed", "a source that is one positional parameter, or one expansion with no binding "
+                                 "in its scope or whose binding is itself one expansion or one positional, or "
+                                 "no source on the line — counted, never gated"),
+]
+# What the mode does not check, one row per form: (label, a shell example, the class it lands in), the
+# class one of `TEMP_CLASSES`' keys or `unread`, which counts no `mv`. `run_temp_scan`'s docstring and
+# the kit README's `--temp-names` section name every label, and the selftest runs every example and
+# finds every label in both, so the documented boundary and the scanner are one list.
+TEMP_BOUNDARY = [
+    ("a positional source", 'f() { mv -f "$1" "$2"; }', "unfollowed"),
+    ("a binding that is itself one expansion", 'u=$(mktemp -u "$x.XXXXXXXX")\nt=$u\nmv "$t" "$x"', "unfollowed"),
+    ("a temp bound in another scope", 'a() {\n  t="$x.tmp"\n}\nb() {\n  mv "$t" "$x"\n}', "unfollowed"),
+    ("a loop variable", 'for f in a.*; do mv -f "$f" "$f.bak"; done', "unfollowed"),
+    ("a binder in a sourced library", '. ./lib.sh\nname_temp t "$f"\nmv "$t" "$f"', "unfollowed"),
+    ("an mv split across a line continuation", 'mv -f \\\n  "$f.tmp" "$f"', "unfollowed"),
+    ("an mv in a case arm", 'case $x in a) mv "$f.tmp" "$f" ;; esac', "unread"),
+    ("an mv run through a wrapper command", 'env mv "$f.tmp" "$f"', "unread"),
+    ("an mv named by a path or escaped", '\\mv "$f.tmp" "$f"', "unread"),
+    ("an mv inside a quoted string or under eval", 'eval "mv $f.tmp $f"', "unread"),
+    ("a fixed name written with no mv", 'printf x > "$f.tmp"', "unread"),
+    ("a mktemp temp in another directory", 't=$(mktemp)\nmv "$t" "$f"', "admitted"),
+    ("a name a function prints", 't=$(name_temp "$f")\nmv "$t" "$f"', "fixed"),
+]
+# The undeclared-key text; the selftest's registry arm grades check_registry with this same text.
+TEMP_UNDECLARED = ("{rel}: {count} `fixed-temp` site(s) and no registry row declares them — give each an "
+                   "unpredictable temp, or declare the row with its reason:")
+TEMP_REMEDY = ("name the temp so nobody can know it before the write creates it, beside its destination: "
+               "`t=$(mktemp -u \"$dest.XXXXXXXX\")`, or a binder, a function whose body sets `printf -v \"$1\"` "
+               "from `$SRANDOM` only behind the test `[ -n \"${SRANDOM:-}\" ]` and from "
+               "`$(mktemp -u \"$2.XXXXXXXX\")` otherwise, called as `<binder> t \"$dest\"`")
+
+
+def check_temp_source(text: str) -> bool:
+    """True when a source word or a bound value holds a `$(mktemp`."""
+    return bool(TEMP_UNPREDICTABLE.search(text))
+
+
+def read_temp_binders(code_lines: list[tuple[int, str, str]]) -> dict[str, bool]:
+    """The binders one source defines, `{name: admits}`: a function whose body sets `printf -v "$1"`.
+
+    It admits when its body holds `mktemp` and, wherever it expands `SRANDOM`, also holds the test
+    `${SRANDOM:-`: the shape of a binder that takes `SRANDOM` where the shell has it and falls back to
+    `mktemp` where it does not. It is fixed otherwise, since a bare `SRANDOM` is unset on a bash before
+    5.1 and the name it builds is one a planter knows. THE TEST IS TEXTUAL: a body holding the guard
+    and the `mktemp` fallback in an order that does not protect the write is admitted all the same.
+    """
+    return {name: bool(re.search(r"(?<![\w-])mktemp(?![\w-])", body))
+                  and ("${SRANDOM:-" in body or not re.search(r"\$\{?SRANDOM(?![A-Za-z0-9_])", body))
+            for name, body in read_function_bodies(code_lines).items() if TEMP_BINDER.search(body)}
+
+
+def scan_temp_file(text: str) -> dict[str, list[tuple[int, str]]]:
+    """Classify every `mv` in one shell source: `{class: [(line, source), ...]}`, by `TEMP_CLASSES`.
+
+    The source is the first word after `mv` that does not open with `-`. A source that is one
+    expansion is followed ONE hop, to the latest binding of its name above it in the same scope: the
+    innermost function whose span holds the line — its definition and its closing brace, found as
+    `read_function_bodies` finds them — else the top level. A binding is a `;`, `&&` or `||` segment
+    that is an assignment, or a call `<binder> <name>`. A source that is one positional parameter, and
+    one whose binding's value is itself one expansion or one positional, is unfollowed: the name it
+    holds is decided somewhere this one hop does not reach.
+    """
+    code_lines = read_code_lines(text)
+    binders = read_temp_binders(code_lines)
+    spans: list[tuple[int, int]] = []
+    for i, (_number, code, _comment) in enumerate(code_lines):
+        head = FUNCTION_DEF.match(code)
+        if head and head.group(3).rstrip().endswith("}"):
+            spans.append((i, i))
+        elif head:
+            close = re.compile(re.escape(head.group(1)) + r"\}")
+            spans.append((i, next((j for j in range(i + 1, len(code_lines)) if close.match(code_lines[j][1])),
+                                  len(code_lines) - 1)))
+    found: dict[str, list[tuple[int, str]]] = {key: [] for key, _m, _l in TEMP_CLASSES}
+    tables: dict[int, dict[str, tuple[str, str]]] = {}
+    for i, (number, code, _comment) in enumerate(code_lines):
+        table = tables.setdefault(max((start for start, end in spans if start <= i <= end), default=-1), {})
+        # The line with every quoted character blanked and its length kept, so a `;` or an `mv` inside
+        # quotes is data and an offset into it is an offset into the line.
+        flat, quote, k = [], "", 0
+        while k < len(code):
+            ch = code[k]
+            if ch == "\\" and quote != "'":
+                flat.append("_" * len(code[k:k + 2]))
+                k += 2
+                continue
+            if quote:
+                flat.append(ch if ch == quote else "_")
+                quote = "" if ch == quote else quote
+            else:
+                quote = ch if ch in "'\"" else ""
+                flat.append(ch)
+            k += 1
+        blank = "".join(flat)
+        cuts = list(re.finditer(r";|&&|\|\|", blank))
+        for start, end in zip([0] + [cut.end() for cut in cuts], [cut.start() for cut in cuts] + [len(code)]):
+            segment = code[start:end]
+            head = FUNCTION_DEF.match(segment)
+            lead = head.start(3) if head else 0
+            body = segment[lead + TEMP_LEAD.match(segment[lead:]).end():]
+            assigned, call = ASSIGNMENT.match(body), TEMP_CALL.match(body)
+            if assigned:
+                table[assigned.group(1)] = ("value", assigned.group(2))
+            elif call and call.group(1) in binders:
+                table[call.group(2)] = ("binder", call.group(1))
+            for mv in TEMP_MV.finditer(blank[start:end]):
+                at, source = mv.end(), ""
+                while not source:
+                    word = TEMP_WORD.match(segment, at)
+                    if not word:
+                        break
+                    at = word.end()
+                    source = "" if word.group(1).startswith("-") else word.group(1)
+                follow = TEMP_FOLLOW.match(source)
+                bound = table.get(follow.group(2) or follow.group(3)) if follow else None
+                value = bound[1].strip() if bound and bound[0] == "value" else ""
+                if (not source or TEMP_POSITIONAL.match(source) or (follow and bound is None)
+                        or TEMP_FOLLOW.match(value) or TEMP_POSITIONAL.match(value)):
+                    kind = "unfollowed"
+                elif bound and bound[0] == "binder":
+                    kind = "admitted" if binders[bound[1]] else "fixed"
+                else:
+                    kind = "admitted" if check_temp_source(value or source) else "fixed"
+                found[kind].append((number, source or "(no source on this line)"))
+    return found
+
+
+def scan_temp_tree(root: pathlib.Path, pathspecs: list[str]
+                   ) -> tuple[dict[str, list[tuple[str, int, str]]], int]:
+    """Every tracked shell source under `root` and the pathspecs, classified. Returns (found, files)."""
+    total: dict[str, list[tuple[str, int, str]]] = {key: [] for key, _m, _l in TEMP_CLASSES}
+    sources = read_shell_sources(root, pathspecs)
+    for rel, data in sources:
+        for key, sites in scan_temp_file(data.decode("utf-8", "replace")).items():
+            total[key].extend((rel, line, source) for line, source in sites)
+    return total, len(sources)
+
+
+def build_temp_measured(found: dict[str, list[tuple[str, int, str]]]) -> dict[tuple[str, str], int]:
+    """The fixed-temp sites as `{(path, "fixed-temp"): count}` — the registry's own key."""
+    measured: dict[tuple[str, str], int] = {}
+    for rel, _line, _source in found["fixed"]:
+        measured[(rel, "fixed-temp")] = measured.get((rel, "fixed-temp"), 0) + 1
+    return measured
+
+
+def print_temp_populations(found: dict[str, list[tuple[str, int, str]]], scanned: int) -> None:
+    print(f"sh-hygiene: temp names — {scanned} tracked shell source(s) scanned, "
+          f"{sum(len(sites) for sites in found.values())} `mv` command(s) read")
+    for key, mark, label in TEMP_CLASSES:
+        sites = found[key]
+        print(f"sh-hygiene:   [{mark}] {len(sites)} site(s) in {len({s[0] for s in sites})} file(s) — {label}")
+    for rel, line, source in found["unfollowed"]:
+        print(f"sh-hygiene:   unfollowed — {rel}:{line}  {source}")
+
+
+def run_temp_scan(args: list[str]) -> int:
+    """`--temp-names [registry] [root] [pathspec ...]`: 0 clean, 1 findings, 2 refusal.
+
+    WHAT THIS DOES NOT CHECK, by the class each form lands in. `TEMP_BOUNDARY` holds one example of
+    each, and the selftest runs every one. Only the `fixed` class is gated.
+
+    UNFOLLOWED, counted and printed, never gated, so each is a MISS: a positional source; a binding
+    that is itself one expansion, whichever way its own name was bound; a temp bound in another scope;
+    a loop variable; a binder in a sourced library, whose call binds nothing here; and an mv split
+    across a line continuation, whose source is on a line this reader does not join.
+
+    UNREAD, no `mv` counted, so each is a MISS: an mv in a case arm; an mv run through a wrapper
+    command, `env`, `time`, `nohup`, `xargs` or `command -p`; an mv named by a path or escaped; an mv
+    inside a quoted string or under eval; a fixed name written with no mv, the wider class of a direct
+    write at a name a planter can know; and Python inside a shell string, which no shell predicate
+    reads and which has no shell example.
+
+    ADMITTED, so a MISS: a mktemp temp in another directory, whose `mv` is a copy and not a rename.
+
+    FIXED, the mode's one known false red: a name a function prints, which is not followed into the
+    function. Its remedy is a binder, which the scan does follow.
+    """
+    root = pathlib.Path(args[1] if len(args) > 1 else ".").resolve()
+    if not root.is_dir():
+        print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
+        return 2
+    reasons: dict[tuple[str, str], str] = {}
+    try:
+        declared, malformed = resolve_declaration(args[0] if args else None, TEMP_KEY_SHAPE, reasons)
+        found, scanned = scan_temp_tree(root, args[2:])
+    except OSError as exc:
+        print(f"sh-hygiene: {exc}", file=sys.stderr)
+        return 2
+    if scanned == 0:
+        print("sh-hygiene: no tracked shell source under the root and pathspecs, so this run graded "
+              "NOTHING — that is a refusal and not a pass", file=sys.stderr)
+        return 2
+    if not args:
+        print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
+    print_temp_populations(found, scanned)
+    # A REGISTERED SITE SAYS WHY ON EVERY RUN, green included: a reason nobody reads is no reason.
+    for key in sorted(declared):
+        print(f"sh-hygiene: registered — {key[0]}: `{key[1]}` × {declared[key]} — {reasons[key]}")
+    measured = build_temp_measured(found)
+    listing: dict[tuple[str, str], str] = {}
+    for rel, line, source in found["fixed"]:
+        listing[(rel, "fixed-temp")] = listing.get((rel, "fixed-temp"), "") + f"\n    {rel}:{line}  {source}"
+    explained = {key: TEMP_UNDECLARED.format(rel=key[0], count=count) + listing[key]
+                 for key, count in measured.items()}
+    problems = malformed + check_registry(measured, declared, explained, listing)
+    if not problems:
+        print(f"sh-hygiene: OK — {sum(declared.values())} registered site(s) in {len(declared)} row(s) match "
+              f"the scan, and no undeclared fixed-name temp is renamed into place")
+        return 0
+    print(f"sh-hygiene: {len(problems)} finding(s). A temp written at a name anyone can know before the write "
+          f"is a name a process that can write its directory can plant a link at, and the write goes "
+          f"through the link.")
+    for problem in problems:
+        print(f"  {problem}")
+    print(f"sh-hygiene: remedy — {TEMP_REMEDY}")
+    return 1
+
+
 def run_selftest() -> int:
     """Stage the break, confirm RED. A gate whose failing case has never been observed is not one."""
     ok = True
@@ -1157,7 +1433,8 @@ def run_selftest() -> int:
             tree = pathlib.Path(scratch)
             probe = probe_cases[0][0] + "\n"
             files = {"a.sh": probe, "hook": "#!/usr/bin/env bash\n" + probe,
-                     "tool": "#!/usr/bin/env python3\n" + probe, "b.test.sh": probe}
+                     "tool": "#!/usr/bin/env python3\n" + probe, "b.test.sh": probe,
+                     "t.sh": 'mv -f "$f.tmp" "$f"\n'}
             for rel, body in files.items():
                 (tree / rel).write_bytes(body.encode("utf-8"))
             for argv in (["git", "init", "-q", "."], ["git", "add", "-A"]):
@@ -1196,6 +1473,17 @@ def run_selftest() -> int:
                     refusals.append(run_probe_scan(argv))
             test("an empty population and an unresolvable registry each refuse with 2", refusals, [2, 2],
                  say=True)
+            # ONE FINDING PER DRIFTED KEY: the temp mode's count-mismatch line carries the key's site
+            # lines, so a key declared 2 and measured 1 is one finding, never two (TOOL-dRedressedBar-26).
+            temp_reg = tree / "temp-reg.txt"
+            temp_reg.write_text("t.sh\tfixed-temp\t2\tdrifted\n", encoding="utf-8")
+            said = io.StringIO()
+            with contextlib.redirect_stdout(said), contextlib.redirect_stderr(io.StringIO()):
+                code = run_temp_scan([str(temp_reg), str(tree), ":!*.test.sh"])
+            test("temp [registry] a drifted key over a repository prints one finding, carrying its site",
+                 (code, "sh-hygiene: 1 finding(s)." in said.getvalue(),
+                  "and the scan measures 1 — the count may fall with the sites and may not rise\n    t.sh:1  "
+                  in said.getvalue()), (1, True, True), say=True)
             (tree / ".git").rename(tree / "not-git")
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                 refusals = [run_probe_scan([str(reg), str(tree)])]
@@ -1290,6 +1578,77 @@ def run_selftest() -> int:
     finally:
         os.environ.update(held)
 
+    # ---- the FIXED-TEMP class: every row of the unit's fixture table, each with its verdict ----------
+    # Each case is graded on all three counts and on the fixed sites' lines, so an arm cannot pass by
+    # grading nothing: the comment-and-data case carries a live site below its two dead spellings.
+    binder = ("derive_temp_path() { if [ -n \"${SRANDOM:-}\" ]; then printf -v \"$1\" '%s.%s%s.tmp' \"$2\" "
+              "\"$SRANDOM\" \"$SRANDOM\"; else printf -v \"$1\" '%s' \"$(mktemp -u \"$2.XXXXXXXX\" 2>/dev/null)\"; "
+              "[ -n \"${!1}\" ]; fi; }\n")
+    temp_cases = [
+        ("literal tail", 'mv -f "$f.tmp" "$f"\nmv -f -- "$a.new" "$a"\n', ([1, 2], 0, 0)),
+        ("pid suffix", 'mv "$x.tmp.$$" "$x"\n', ([1], 0, 0)),
+        ("one hop", 't="$WORK/owner.tmp"\nmv -f "$t" "$WORK/owner"\n', ([2], 0, 0)),
+        ("mktemp -u", 't=$(mktemp -u "$f.XXXXXXXX")\nmv -f "$t" "$f"\n', ([], 1, 0)),
+        # A bare SRANDOM is unset on a bash before 5.1, so the name is `<f>..tmp`: fixed, not admitted.
+        ("SRANDOM", 't="$f.$SRANDOM$SRANDOM.tmp"\nmv -f "$t" "$f"\n', ([2], 0, 0)),
+        ("binder", binder + 'derive_temp_path t "$f" && mv -f "$t" "$f"\n', ([], 1, 0)),
+        ("fixed binder", "fake() { printf -v \"$1\" '%s.tmp' \"$2\"; }\nfake t \"$f\"; mv \"$t\" \"$f\"\n", ([2], 0, 0)),
+        ("scope", 'a() {\n  t="$x.tmp"\n}\nb() {\n  mv "$t" "$x"\n}\n', ([], 0, 1)),
+        ("loop rename", 'g() {\n  for f in a.*; do mv -f "$f" "$f.bak"; done\n}\n', ([], 0, 1)),
+        ("comment and data", "# mv x.tmp x\ncat <<'EOF'\nmv x.tmp x\nEOF\nmv y.tmp y\n", ([5], 0, 0)),
+        # TOOL-dRedressedBar-26: an `mv` after a keyword, a prefix assignment or `command` is read; a
+        # positional source, and a binding that is itself one expansion, is unfollowed; a binder that
+        # expands SRANDOM with no `${SRANDOM:-` guard and no mktemp fallback is fixed.
+        ("if mv", 'if mv "$f.tmp" "$f"; then :; fi\n', ([1], 0, 0)),
+        ("prefix assignment", 'LC_ALL=C mv "$f.tmp" "$f"\n', ([1], 0, 0)),
+        ("two prefix assignments", 'A=1 B="x y" mv -f "$f.tmp" "$f"\n', ([1], 0, 0)),
+        ("command mv", 'command mv "$x.tmp" x\n', ([1], 0, 0)),
+        ("positional", 'rename_into() { mv -f "$1" "$2"; }\n', ([], 0, 1)),
+        ("positional one hop", 'g() {\n  local src=$1\n  mv -f "$src" "$2"\n}\n', ([], 0, 1)),
+        ("two hops", 'u=$(mktemp -u "$x.XXXX")\nt=$u\nmv "$t" x\n', ([], 0, 1)),
+        ("unguarded binder", "dt() { printf -v \"$1\" '%s.%s.tmp' \"$2\" \"$SRANDOM\"; }\n"
+                             "dt t \"$f\" && mv \"$t\" \"$f\"\n", ([2], 0, 0)),
+    ]
+    for label, text, want in temp_cases:
+        seen_temp = scan_temp_file(text)
+        test(f"temp [{label}] fixed lines, admitted, unfollowed",
+             ([line for line, _s in seen_temp["fixed"]], len(seen_temp["admitted"]), len(seen_temp["unfollowed"])),
+             want, say=True)
+    # THE LEAD WORDS, one row per word of both lists: each reads the `mv` after it as a site, and
+    # TEMP_LEAD skips a keyword and never a prefix, so the two predicates read one keyword list.
+    for word in TEMP_KEYWORDS + TEMP_PREFIXES:
+        lead_seen = scan_temp_file(f'{word} mv "$f.tmp" "$f"\n')
+        test(f"temp [lead {word}] the mv is one site on line 1, and TEMP_LEAD skips the word only as a keyword",
+             ([line for line, _s in lead_seen["fixed"]], TEMP_LEAD.match(f"{word} t=x").end()),
+             ([1], len(word) + 1 if word in TEMP_KEYWORDS else 0), say=True)
+    # THE BOUNDARY: every documented form lands in its class alone, `unread` when no list holds it, and
+    # its label sits in run_temp_scan's docstring and in the README's `--temp-names` section, each
+    # read with its whitespace squeezed. The arm grades that each label is NAMED and that its example
+    # lands in its class; it does not grade that the prose around a label states that class.
+    try:
+        readme = pathlib.Path(__file__).with_name("README.md").read_text(encoding="utf-8").splitlines()
+    except OSError:
+        readme = []
+    opens = next((i for i, line in enumerate(readme) if line.startswith("### `--temp-names` ")), len(readme))
+    closes = next((i for i in range(opens + 1, len(readme)) if readme[i].startswith("## ")), len(readme))
+    section = " ".join(" ".join(readme[opens:closes]).split())
+    docstring = " ".join((run_temp_scan.__doc__ or "").split())
+    for label, example, want in TEMP_BOUNDARY:
+        kinds = [key for key, sites in scan_temp_file(example + "\n").items() if sites]
+        test(f"temp [boundary] {label}: its class, named in the docstring, named in the README",
+             (kinds[0] if len(kinds) == 1 else "+".join(kinds) or "unread", label in docstring, label in section),
+             (want, True, True), say=True)
+    temp_problems = check_registry({("a.sh", "fixed-temp"): 1}, {("gone.sh", "fixed-temp"): 1},
+                                   {("a.sh", "fixed-temp"): TEMP_UNDECLARED.format(rel="a.sh", count=1)})
+    test("temp [registry] an undeclared key and a stale row are two findings, the first in the mode's words",
+         (len(temp_problems), temp_problems[0] == TEMP_UNDECLARED.format(rel="a.sh", count=1),
+          "no longer finds" in temp_problems[1]), (2, True, True), say=True)
+    drift_sites = '\n    a.sh:1  "$f.tmp"\n    a.sh:4  "$g.tmp"'
+    drift = check_registry({("a.sh", "fixed-temp"): 2}, {("a.sh", "fixed-temp"): 1}, None,
+                           {("a.sh", "fixed-temp"): drift_sites})
+    test("temp [registry] a drifted key is one finding, and it ends with the key's site lines",
+         (len(drift), drift[0].endswith(drift_sites) if drift else False), (1, True), say=True)
+
     if n < FLOOR_ASSERTIONS:
         print(f"SELFTEST FAIL: {n} assertion(s) executed, under the floor of {FLOOR_ASSERTIONS} — an arm is stranded past an early exit, which is the one defect a printed count can see and a per-arm check cannot")
         ok = False
@@ -1304,6 +1663,8 @@ def main(argv: list[str]) -> int:
         return run_probe_scan([arg for arg in argv[1:] if arg != "--location-probes"])
     if "--spawn-idioms" in argv:
         return run_spawn_scan([arg for arg in argv[1:] if arg != "--spawn-idioms"])
+    if "--temp-names" in argv:
+        return run_temp_scan([arg for arg in argv[1:] if arg != "--temp-names"])
     args = argv[1:]
     root = pathlib.Path(args[1] if len(args) > 1 else ".").resolve()
     if not root.is_dir():

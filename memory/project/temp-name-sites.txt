@@ -1,0 +1,32 @@
+# temp-name-sites.txt — the sites the `shell hygiene (a fixed-name temp renamed into place)` leg carries.
+# TOOL-dRedressedBar-24.
+#
+# A row is `<path> TAB <class> TAB <count> TAB <reason>`. The key is the file and the one CLASS,
+# `fixed-temp`, and NEVER a line number, because a line-keyed registry reds on an unrelated edit above
+# the site. The count is how many `mv` commands in that file rename a temp whose name anyone can know
+# before the write creates it: a fixed name, or one suffixed with the writer's pid.
+#
+# SET EQUALITY IN BOTH DIRECTIONS, and the counts too: a measured path with no row fails, a row the
+# scan no longer finds fails, and a count that no longer matches fails, so fixing a site forces its
+# count down in the same commit. The leg grades the tracked product shell sources, less the suites and
+# the memory tree, so a suite's scratch temps are not rows here.
+#
+# Every row predates the lint. A `health_log_sh` row is the trim of the one block four kits carry
+# byte-identically under a parity table, with a Python twin; its fix is open ask TOOL-aPairedSlots-10,
+# and it writes the git common dir, which a process confined to the temp dir cannot write. The leg
+# prints every row's reason on every run, green included. No total is written here: the scanner
+# derives them.
+.githooks/pre-push	fixed-temp	2	the bar-green stamp, git dir and common dir; predates the lint; drained by deleting this row in the commit that fixes it
+skills/session-kickoff/manifest-check.sh	fixed-temp	3	the `health_log_sh` trim, ask TOOL-aPairedSlots-10; two card rewrites in its `mktemp -d` scratch; predates the lint; drained by deleting this row in the commit that fixes it
+tools/branch-reconcile/adopt-branch-reconcile.sh	fixed-temp	1	the rendered skill in the target; predates the lint; drained by deleting this row in the commit that fixes it
+tools/check-template-size.sh	fixed-temp	1	the high-water file, `.tmp.$$`; predates the lint; drained by deleting this row in the commit that fixes it
+tools/check-wiring.sh	fixed-temp	2	the `health_log_sh` trim, ask TOOL-aPairedSlots-10; an EOL rewrite in the target; predates the lint; drained by deleting this row in the commit that fixes it
+tools/codebase-map/adopt-codebase-map.sh	fixed-temp	1	a rendered file in the target; predates the lint; drained by deleting this row in the commit that fixes it
+tools/lib/health-log.sh	fixed-temp	1	the canonical `health_log_sh` trim, ask TOOL-aPairedSlots-10; predates the lint; drained by deleting this row in the commit that fixes it
+tools/memory-recall/adopt-memory-recall.sh	fixed-temp	1	the rendered skill in the target; predates the lint; drained by deleting this row in the commit that fixes it
+tools/memory-tree/adopt-memory-tree.sh	fixed-temp	2	a rendered file and the slot-limits file in the target; predates the lint; drained by deleting this row in the commit that fixes it
+tools/run-gates/run-gates.sh	fixed-temp	1	the `health_log_sh` trim, ask TOOL-aPairedSlots-10; predates the lint; drained by deleting this row in the commit that fixes it
+tools/runlog/adopt-runlog.sh	fixed-temp	1	the rendered skill in the target; predates the lint; drained by deleting this row in the commit that fixes it
+tools/unattended/adopt-unattended.sh	fixed-temp	1	the conf rewrite in the target; predates the lint; drained by deleting this row in the commit that fixes it
+tools/unattended/lib-unattended.sh	fixed-temp	1	the `health_log_sh` trim, ask TOOL-aPairedSlots-10; predates the lint; drained by deleting this row in the commit that fixes it
+tools/unattended/unattended.sh	fixed-temp	2	the bar-green stamp, git dir and common dir; predates the lint; drained by deleting this row in the commit that fixes it
