@@ -111,6 +111,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 47 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The layers' fold: closing diff review over `e7839224c..9e0e43aef` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | returned as `wf_9349d401-2da`, CLEAN WITH FIXES, 28 of 31 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md` |
 | 48 | the same, round 2 with round 1's 28 confirmed findings handed as `priorFindings` | The layers' fold: the follow-up round over the closing review's fixes, `9e0e43aef..2e6f9aa1b`, after the owner chose it | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | returned as `wf_e26eda01-523`, CLEAN WITH FIXES, 31 of 34 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md` |
 | 49 | gov-researcher | Memory's library side: its four filling paths and two placements | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | 1799cb98 | returned, 8m06s, 37.9k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` |
+| 50 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The library round's review: a light diff review over `1bc4883fe..aa9639d98`, the atlas excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md` `[review]` | 1799cb98 | dispatched as `wf_9d4cc07b-2f2` | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md` | Memory's library side, which replaces the Knowledge layer: the owner's question, KN-1 and what it changed, and what the library round owes. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.html` | The Closed Loop Atlas, published as an artifact: layers, flow, lifecycle, roles, chain, policies and progress, its data region derived by the generator. |
@@ -918,6 +919,11 @@ The library pass's researcher, dispatch 49, derived from its handoff the same wa
   `review.report` gives every confirmed finding a left-shift disposition, `build.unit-pass` carries
   the reuse line, and `deploy.distill` appends major decisions at landing. `gap-review-10` and
   `gap-mem-15` join the register. The atlas is regenerated and republished.
+
+- 2026-10-16, session 1799cb98: the owner said "continue". Layer-library `[consult]` sets what the core
+  does when the map, recall or the lexicon is not installed: each optional slot renders filled, searched
+  with nothing found, or not installed with its fallback named. Dispatch 50 runs the library round's
+  review over KN-1's fold, the library design and its settlement.
 
 ## Instruments
 
