@@ -243,7 +243,7 @@ record, when installed) and `session-start-breach` (by the card's cells).
 | `maintain.node-readings` | every-node, lease-holder | every-node | a node-scoped reading sees only its own node |
 | `maintain.detector-admission` | refuse-unowned, report-unowned | refuse-unowned | 0 of the 27 drift signals carry an owner |
 | `maintain.dead-after` | a count of readings | 10 | drift-report's existing limit |
-| `maintain.record` | every-period, on-finding | as EX-3 settles | a period that finds nothing |
+| `maintain.record` | every-period, on-finding | every-period | EX-3: both values built, the default the owner's |
 | `observability.run-record` | per-run, on-anomaly, none | per-run | today's behaviour; on-anomaly eases `gap-maint-04` |
 | `review.loop.catch-source` | verdict-records, node-journal | verdict-records | another node cannot see a node's journal |
 
@@ -355,7 +355,7 @@ writes no receipt, and the runbook is generated from the descriptors.
 | tag and definition | `layer.distribution`, as above |
 | instruction units | the operator order for install and update, in the runbook generated from the descriptors; the release-note and currency views. The deploy-governance Skill retires, as the tooling map says (`gap-tool-05`) |
 | engine kits | govkit, with check-wiring's install arms and check-placeholders folded in; the install half of each adopt script; the inline-copy generator; `adopters.toml`, grown into the fleet register |
-| record kinds | `receipt` (`.governance/install.json`, schema 4: per-kit versions, the release tag, the source remote); `kit-release` (an annotated `gov/v<date>.<n>` tag, its notes generated from the landing records and version deltas); `currency` (an adopter's releases behind, keyed by its HEAD SHA); `fleet` (gov's reading of each adopter, per release); the fleet register's rows; outbox orders, as today |
+| record kinds | `receipt` (`.governance/install.json`, schema 4: per-kit versions, the release tag, the source remote; gov's own in source mode, DI-1); `kit-release` (an annotated `gov/v<date>.<n>` tag, its notes generated from the landing records and version deltas); `currency` (an adopter's releases behind, keyed by its HEAD SHA); `fleet` (gov's reading of each adopter, per release); the fleet register's rows; outbox orders, as today |
 | extension points declared | none: the descriptor schema, the version slot and the install targets are core points (`[core-points]`) |
 | extension points used | Flow's version slot in Deploy; Runtime's cadence items, command adapters, harness adapters' install targets and notification adapters |
 | policies | `release.cadence`, `deploy.currency`, `runtime.harnesses`, and the new keys below |
@@ -461,17 +461,37 @@ The two distribution runs split here.
 - **No receipt.** Gov's tree stays the standing fixture of the core without distribution, and a
   self-receipt would only hash the source against itself. Distribution B.
 
+## [settled] What EX-1 to EX-3 and DI-1 settled, 2026-10-16
+
+The owner's answers, verbatim:
+- **EX-1:** "Only through the core (Recommended)". Expansions meet only through the core. P28 says so, gov's kit
+  release and the currency probe are distribution's own cadence programs, and Maintain no longer
+  cuts the release.
+- **EX-2:** "memory/<layer>/<kind>/ (Recommended)". A record that belongs to no build lives under
+  `memory/<layer>/<kind>/`, its home declared in the memory contract (layer-memory
+  `[revised-expansions]`).
+- **EX-3:** "A record every period by default, owner-switchable. Both options built.". `maintain.record` defaults to
+  `every-period`, `on-finding` stays allowed, and the build owes both arms with a fixture each.
+- **DI-1:** "Source-mode receipt (Recommended)". Gov records itself as the source of its own install, so
+  the receipt's readers, the wiring verdict and the currency probe run in gov as in an adopter, and
+  currency reads "source, 0 behind".
+
+**Where each landed:**
+- v2 `[layers]` takes the three definitions and P28 the rule; `[policies]` takes seventeen keys,
+  `[presets]` sixteen of them, with `release.environments` among the keys presets never touch; the
+  selecting keys take registered names; the chain's cells take the twenty gaps.
+- flow-steps declares Test's verdict backends and Deploy's version and release slots, rewrites
+  `[expansions]`, and renames `deploy.release` and `life.release` to `deploy.unlease` and
+  `life.unlease`, which mean the same thing: delete the build's leases and close its mailbox.
+- layer-runtime declares cadence items as its tenth point, the reading and fix classes, adapter
+  grants and install targets, and settles `runtime.journal` as retention.
+- The register takes the twenty gaps in `[gaps-proposed]`, and widens `gap-tool-02` and
+  `gap-tool-04`.
+
 ## [open] What the expansion round owes
 
-- **The owner's answers** to EX-1, EX-2, EX-3 and DI-1.
-- **The settlement**, once they come:
-  - v2 `[layers]` takes the three definitions, `[policies]` and `[presets]` the new keys, and P28 the
-    rule EX-1 settles;
-  - flow-steps renames `deploy.release` to `deploy.unlease`, declares the release slot and the version
-    slot in Deploy and the verdict backends in Test, and rewrites `[expansions]`;
-  - layer-runtime declares cadence items, the reading and fix classes, the adapter grant, the install
-    targets, and `runtime.journal` as retention;
-  - the register takes the twenty gaps in `[gaps-proposed]`, and v2's chain cells take their owners.
+- **The chain builds' planned units** for the eight core points and the three designs, at the chain
+  re-cut v2 `[owed]` already carries.
 - **The round's Tier-2 review**, owed before the round closes.
 - **Too small to register:** govkit's usage text omits the `contribute` verb it dispatches
   (distribution B).

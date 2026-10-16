@@ -1003,6 +1003,11 @@ The expansion round's researchers, dispatches 51 to 56, derived from their hando
   the three designs and twenty gaps, and asks EX-1 to EX-3 and DI-1. Commit 50ebfc4de's message
   counts sixteen proposed gaps; its table held fifteen.
 
+- 2026-10-16, session 1799cb98: the owner answered the expansion round's forks, verbatim:
+  EX-1 "Only through the core (Recommended)"; EX-2 "memory/<layer>/<kind>/ (Recommended)"; EX-3 "A record every period by default, owner-switchable. Both options built.";
+  DI-1 "Source-mode receipt (Recommended)". layer-expansions `[settled]` says where each landed: v2, flow-steps,
+  layer-runtime, layer-memory and the register, with twenty gaps registered.
+
 ## Instruments
 
 ### The gap-ownership join

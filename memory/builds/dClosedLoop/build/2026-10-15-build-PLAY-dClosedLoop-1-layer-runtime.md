@@ -740,12 +740,22 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | spawn backends | a way to start a role agent | in-session Workflow, headless per agent, another harness's spawner |
 | role harnesses | a Workflow script, with its declared spawn sites and fan | the role cycle, the Tier-2 review |
 | hook packs | a fragment, with its owner, class, failure mode, budget and key | the spawn guard, act binding, the lexicon's commit check |
-| harness adapters | how a harness loads instructions, spawns, hooks and compacts, with its capability table | Claude Code, Codex |
+| harness adapters | how a harness loads instructions, spawns, hooks and compacts, with its capability table and its install targets | Claude Code, Codex |
 | host adapters | where the supervisor and its sessions run | the node tick, a cloud host |
 | notification adapters | how an owner request reaches the owner | the terminal, a push notification |
 | journal readers | what reads the journal | runlog, observability's store |
+| cadence items | a program with its host key, its period, its lease and its events | Maintain and the Loop Review; gov's kit release and the currency probe |
 
 - The keys that select an extension (`runtime.harnesses`, `runtime.spawn-backend`) take registered names.
+- Added by the expansion round (`build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md`):
+  - cadence items, the tenth point above;
+  - a command adapter carries a class: an act, a reading or a fix. A reading carries its scope
+    (repo, node or outside), pin, events, fix and liveness, and its owner is derived from the memory
+    contract;
+  - every adapter row carries a grant: the service it reaches, the scopes it needs, and its secret by
+    reference, never by value, or `anonymous`;
+  - a harness adapter declares its install targets: where a rendered Skill, agent, rule, hook or
+    settings fragment lands.
   They are validated against the registry, never against a literal enumeration.
 - A new step, role, record kind, rule, harness, backend or host is a filled contract, so Runtime gains
   no code.
@@ -774,7 +784,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | instruction units | the act session's static block (make the one call your act names, nothing else); the supervisor's run rules; the compaction keep-list |
 | engine kits | unattended: the supervisor (resume-tick grown, act sessions, the commit queue), whose verbs become `next`, `run` and the owner's controls; workflows: the role harnesses and the deferral block; hooks: the dispatcher, the fragments as packs through settings-merge, and check-wiring's class arm; process-monitor: reaping; and the journal grammar, moved from runlog into the core, so the core writes what observability reads |
 | record kinds | return records, and act records (launch, epoch, outcome). Flow's witnesses and leases are written through `record` too |
-| extension points declared | the nine in `[extend]` |
+| extension points declared | the ten in `[extend]` |
 | extension points used | none. Integrations fill the host and notification adapters. Observability and memory's optional components register packs and read the journal |
 | policies | the `runtime.*` keys in `[policies]`, and the existing keys it reads |
 | gates | the build's fixtures in `[tests]` |
@@ -819,7 +829,8 @@ That question is owed in v2's `[owed]`.
   closed through the permission baseline;
 - `runtime.fanout`, `runtime.isolation`, `runtime.reap` and `runtime.scheduler`, because the existing
   keys above answer them;
-- `runtime.journal`, because the run record is observability's, to be settled in its review.
+- `runtime.journal`, because the run record is observability's, to be settled in its review. The
+  expansion round settled it as the journal's retention: days, or all, default 60.
 
 ## [build] Runtime's own chain build
 

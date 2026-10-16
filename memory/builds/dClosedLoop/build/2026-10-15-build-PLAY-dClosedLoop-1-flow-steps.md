@@ -42,7 +42,7 @@ never collides with a policy key such as `policy.build.scope` (instruction layer
   - the policy values the item reads.
 - **At every item boundary,** the executor reads the build's mailbox (`mailbox.reads`) and updates the
   card's pointers (`card.pointers`).
-- **Closing a mailbox.** When `deploy.release` or `life.release` closes a build, every message still on
+- **Closing a mailbox.** When `deploy.unlease` or `life.unlease` closes a build, every message still on
   its mailbox ref, disposed or not, is copied into the build folder, and the undisposed ones are marked
   so in that copy. Only then is the ref pruned, and a missing ref counts as done.
 - **Every step ends in an exit item.** Its witness is the witnesses of every item the run reached. An
@@ -289,7 +289,9 @@ posted to dependents. The build moves through Design whole (FL-D1).
 - **Breakpoints:** the gate review, opt-in by default and above-tier under `strict`; the owner's gate at
   `test.exit` under `every-stage`.
 - **Extension points:**
-  - verdict backends beyond the local runner: remote CI (integrations);
+  - verdict backends, a registry: `local-hook` is built in, and integrations registers `peer-node` and
+    `remote-ci`; remote CI's verdict is read after the landing only, for `deploy.core` (the expansion
+    round);
   - leg packs: gate-lint and the pytest guardrails;
   - product-test runner adapters;
   - the gate-health and flake signals that observability reads.
@@ -318,9 +320,9 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 | `deploy.distill` | command, idempotent | `deploy.record` | confirms that the decision-log rows `build.distill` wrote are in the log at the landed SHA | the rows at the landed SHA, joined one to one to the build's major forks | `deploy.recommend` |
 | `deploy.recommend` | command | `deploy.distill` | scores the recommendation, signals only, since core Deploy has no producing role | the recommendation record | the landing review where declared, otherwise `deploy.notify` |
 | `deploy.notify` | command, idempotent | `deploy.recommend`, and the landing review where it ran | posts `landed` to dependents, keyed by the landing SHA, so a repeated post is a no-op | the mailbox posts | `deploy.snapshot` |
-| `deploy.snapshot` | command, idempotent | `deploy.notify` | commits the card's terminal snapshot; an equal snapshot is a no-op | the snapshot commit | `deploy.release` |
-| `deploy.release` | command, idempotent | `deploy.snapshot` | deletes the build's lease refs, a missing ref counting as done, and closes its mailbox (`[rules]`) | the deleted refs, and the mailbox's messages in the folder | `deploy.close` |
-| `deploy.close` | command | `deploy.release` | records the transition | the transition record | the build is closed |
+| `deploy.snapshot` | command, idempotent | `deploy.notify` | commits the card's terminal snapshot; an equal snapshot is a no-op | the snapshot commit | `deploy.unlease` |
+| `deploy.unlease` | command, idempotent | `deploy.snapshot` | deletes the build's lease refs, a missing ref counting as done, and closes its mailbox (`[rules]`) | the deleted refs, and the mailbox's messages in the folder | `deploy.close` |
+| `deploy.close` | command | `deploy.unlease` | records the transition | the transition record | the build is closed |
 
 - **The core re-check's witness** (K1):
   - under `GATE_POST_MERGE=local` or undeclared, `deploy.core` starts `post-merge.sh` on the landed
@@ -356,10 +358,11 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
     push, and its findings enter as patch builds by the entry-point table's post-close row;
   - the owner's landing gate, before `deploy.mandate`, under `three-gates` and `every-stage`.
 - **Extension points:**
-  - versions and release notes (distribution);
-  - promotion through environments, each verify recorded per SHA, with `deploy.on-verify-fail`
-    (integrations);
-  - notifications (integrations).
+  - the version slot in the landing's prepare: `deploy.version`, which distribution fills;
+  - the release slot, after `deploy.core` is green: integrations' `release.*` program, per SHA and
+    per environment, each environment naming an engine and a verify adapter, routed by
+    `deploy.on-verify-fail`;
+  - notifications, through Runtime's notification adapters, which integrations fills.
 
 `build.closes`'s other two values each need an expansion:
 - `after-release-verifies` needs integrations' deploy engine;
@@ -424,9 +427,9 @@ Runtime executes the owner's controls (dWellOiledMachine, RT-3). They extend una
 | `life.request` | owner | — | asks to pause, resume, withdraw or supersede the build, through the guarded command | the command's record | `life.quiesce`; resume → the build's `next` |
 | `life.quiesce` | executor | `life.request` | dispatches nothing new. Each running act finishes within its ceiling. An open review fan finishes, and a prepared merge is discarded | the executor's record of the acts it let finish | pause → parked; withdraw or supersede → `life.notify`; a push already made → refused: the build has landed and closes as landed |
 | `life.notify` | command, idempotent | `life.quiesce` | posts `withdrawn` or `superseded` to dependents, with the replacement's slug | the mailbox posts | `life.snapshot` |
-| `life.snapshot` | command, idempotent | `life.notify` | commits the card's terminal snapshot | the snapshot commit | `life.release` |
-| `life.release` | command, idempotent | `life.snapshot` | deletes the leases, closes the mailbox (`[rules]`), and reclaims the build's workspaces | the deleted refs, the mailbox's messages in the folder, and the workspace record | `life.close` |
-| `life.close` | command | `life.release` | records the terminal transition: withdrawn, or superseded by its replacement | the transition record | closed |
+| `life.snapshot` | command, idempotent | `life.notify` | commits the card's terminal snapshot | the snapshot commit | `life.unlease` |
+| `life.unlease` | command, idempotent | `life.snapshot` | deletes the leases, closes the mailbox (`[rules]`), and reclaims the build's workspaces | the deleted refs, the mailbox's messages in the folder, and the workspace record | `life.close` |
+| `life.close` | command | `life.unlease` | records the terminal transition: withdrawn, or superseded by its replacement | the transition record | closed |
 
 - **A paused build keeps its leases.** The supervisor renews them while it is paused, so
   `leases.expiry-hours` never expires a paused build. Resume enters its `next`.
@@ -473,18 +476,17 @@ row is reached by an item, seen red on a planted dropped row.
 
 ## [expansions] What the expansions add to the flow
 
-- **Observability's cadence steps, Maintain and the Loop Review.** They keep the programs walked in
-  the flow record's `[maintain]` and `[review]`, with the audit's fixes:
-  - a detector register by layer;
-  - intakes rendered from keyed readings;
-  - event runs keyed by event;
-  - a declared home for each report.
-
-  They are defined at observability's review.
-- **Distribution's and integrations' Deploy extensions:**
-  - kit versions and release notes, from distribution;
-  - promotion through environments, with a verify per SHA and `deploy.on-verify-fail`, from
-    integrations.
+Settled by the expansion round (`build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md`).
+Expansions meet only through the core (EX-1), so each item below attaches at a core point.
+- **Observability's cadence programs, Maintain (`maintain.*`) and the Loop Review (`loop.*`).** They
+  register at Runtime's cadence items and read every reading registered at its command adapters:
+  each reading's owner is derived, its pin declared, its asks keyed by reading and offender, and
+  each event run keyed by event and SHA. A period records a maintenance record, as
+  `maintain.record` says.
+- **Integrations' release program (`release.*`)** fills Deploy's release slot, and its `remote-ci`
+  backend fills Test's verdict-backend registry, read after the landing only.
+- **Distribution's `deploy.version`** fills Deploy's version slot. Its kit releases (`kits.cut`) and
+  currency probe (`kits.currency`) are its own cadence programs, not Maintain's.
 
 ## [consequences] What the definitions change
 

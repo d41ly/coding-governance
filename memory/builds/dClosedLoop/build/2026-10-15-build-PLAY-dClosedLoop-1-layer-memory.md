@@ -1095,3 +1095,13 @@ and its map's `disposition` cells point here. Each defect's fix sits in place, i
 | `pushed-at-read-no-hook` | amend | `[annotations]`: the read hook is a pack of memory's optional components in Runtime's dispatcher (KN-1) |
 | `gap-owner-order` | owed | v2 `[owed]`: the re-cut orders dTotalRecall ahead of the gaps' owners, or moves the gaps to it |
 | `recall-boundroles-order` | none | refuted |
+
+## [revised-expansions] Revised 2026-10-16, after the expansion round's EX-2
+
+- **A record that belongs to no build lives under `memory/<layer>/<kind>/`.** The memory contract
+  declares each kind's home, and the layer's tag names the folder, so the home is derived (EX-2,
+  `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md`).
+- **The kinds that need one so far:** maintenance and Loop Review records under
+  `memory/observability/`, release records under `memory/integrations/`, and currency and fleet
+  records under `memory/distribution/`.
+- **The work** is `gap-mem-16`, dTotalRecall's.
