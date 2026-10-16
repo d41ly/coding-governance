@@ -406,6 +406,29 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 | MS-1 | What happens to the harness's auto-memory, 14 KB loaded every session? | promote its standing directives through the instruction write path, then hold it to the load budget; unload it; or leave it |
 | MS-2 | What happens to a work order over its memory budget? | refuse it at render, since the retired global budget never trimmed; or count it and refuse only under strict |
 
+## [answers] The owner's answers, 2026-10-17
+
+The first four forks, answered in one round. Each answer is quoted verbatim.
+
+| Fork | The owner's answer | What it settles |
+|---|---|---|
+| AN-1 | "both Marker query and part of codebase map tool index" | `annotations.lookup`: `query-and-map` by default, with `query` and `map-index` allowed. The core marker query always answers, and the codebase map's index carries the annotations too where the map is installed |
+| AN-2 | "Redefine for shell reads" | `pushed-at-read` stays an allowed value of `annotations.grammar`, redefined to fire on shell reads as well as Read; the default stays `voluntary` (F4-2) |
+| IW-1 | "At dOrderedCharter (Recommended)" | the render gate is armed at dOrderedCharter, with a shrink-only list of today's documents; each chain build migrates its own step's guides |
+| IW-2 | "Step units in work orders (Recommended)" | the charter keeps one line per practice, and each practice's reach per step renders as step-scoped units handed in work orders |
+
+- **AN-1, as designed.** The marker query in core memory-tree stays the path the core can always take
+  (P28). The codebase map's lexer gains the annotation rows as part of its index: a shebang profile for
+  extensionless files, docstrings, and string exclusion, which the plain marker query cannot do. With
+  the map absent, the slot renders "not installed" and names the marker query as its fallback.
+- **AN-2, as designed.** The read hook pack fires on PostToolUse Read and on PostToolUse Bash. On Bash it
+  reads the command's path arguments for `sed`, `cat`, `head`, `tail` and `grep` over code paths, never
+  the command's output, and injects each named file's anchored rows once per session. Its reach is
+  re-measured after landing on the same transcript mix; today's Read-only hook reaches 3 to 5% of
+  code-reading calls.
+- **IW-2 amends v2's front door** at the fold: the charter's practice lines stay one each, and the reach
+  table leaves the charter for step-scoped units.
+
 ## [gaps-proposed] Gaps to register once the forks settle
 
 | System | Gap | Severity | Owner |
