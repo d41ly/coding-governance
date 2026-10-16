@@ -122,8 +122,8 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 58 | the same | The expansion round's review, run B, after run A returns | the same | 1799cb98 | returned as `wf_3a59e7c4-201`, CLEAN WITH FIXES, 46 of 54 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-b.md` |
 | 59 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The expansion fold's closing review: a light diff review over `3fccdd78a..6e0ce0a55`, the review reports, the atlas and the generated files excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` `[fold-review]` | 1799cb98 | returned as `wf_27ececa4-f6c`, CLEAN WITH FIXES, 20 of 28 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md` |
 | 60 | the same, round 2 with round 1's 20 confirmed findings handed as `priorFindings` | The expansion fold's follow-up round over the closing review's fixes, `f506dd106..4edc6790b`, after the owner chose it | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` `[follow-up]` | 1799cb98 | returned as `wf_c69ed990-543`, CLEAN WITH FIXES, 24 of 35 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md` |
-| 61 | `tier2-review.js`, spec audit, full: `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at medium, as the owner asked | The lexicon's design record, run A, at `424d2a7de` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-lexicon]` | 1799cb98 | dispatched | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-a.md` |
-| 62 | the same | The lexicon's design record, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-lexicon]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-b.md` |
+| 61 | `tier2-review.js`, spec audit, full: `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at medium, as the owner asked | The lexicon's design record, run A, at `424d2a7de` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-lexicon]` | 1799cb98 | returned as `wf_14950dae-859`, CLEAN WITH FIXES, 47 of 53 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-a.md` |
+| 62 | the same | The lexicon's design record, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-lexicon]` | 1799cb98 | dispatched | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-b.md` |
 | 63 | the same | The review system's design record, run A, at `40738693d` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-review-system]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-review-system-a.md` |
 | 64 | the same | The review system's design record, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-review-system]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-review-system-b.md` |
 | 65 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at medium, as the owner asked, round 1 | The runtime fold and its two settlements, run A: `6cfd21619..3611a60e9`, the audit reports and the research returns excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-runtime-fold]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-a.md` |
@@ -738,6 +738,35 @@ The expansion fold's follow-up round, dispatch 60, derived from its Workflow run
 - returned — gov-synthesizer · wrote 1 file · 2m58s · 24.6k out · run wf_c69ed990-543/a6de6cf1ce0d3abdc
 ```
 
+Dispatch 61, `lexicon-a`, derived from its Workflow run the same way:
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_14950dae-859/a423064e161ec6b35
+- returned — workflow-subagent · wrote 0 files · 10s · 1.0k out · run wf_14950dae-859/a423064e161ec6b35
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:coherence · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_14950dae-859/a1e251ec4259b6992
+- returned — gov-spec-reviewer · wrote 0 files · 4m00s · 25.2k out · run wf_14950dae-859/a1e251ec4259b6992
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:grounding · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_14950dae-859/ac7639a3fbde2566a
+- returned — gov-spec-reviewer · wrote 0 files · 5m25s · 30.0k out · run wf_14950dae-859/ac7639a3fbde2566a
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:reuse · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_14950dae-859/a567f2504e80b6813
+- returned — gov-spec-reviewer · wrote 0 files · 6m14s · 33.3k out · run wf_14950dae-859/a567f2504e80b6813
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:blast-radius · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_14950dae-859/a06a4cbbb38c85fa9
+- returned — gov-spec-reviewer · wrote 0 files · 3m34s · 21.1k out · run wf_14950dae-859/a06a4cbbb38c85fa9
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:failure-envelope · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_14950dae-859/a01754e0428d78110
+- returned — gov-spec-reviewer · wrote 0 files · 5m22s · 33.8k out · run wf_14950dae-859/a01754e0428d78110
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-1-11 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_14950dae-859/a215c2e527c9d98be
+- returned — gov-skeptic · wrote 0 files · 1m01s · 6.2k out · run wf_14950dae-859/a215c2e527c9d98be
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-12-22 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_14950dae-859/a51f018039e68bb59
+- returned — gov-skeptic · wrote 0 files · 1m50s · 10.7k out · run wf_14950dae-859/a51f018039e68bb59
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-23-33 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_14950dae-859/aa898030da5868e92
+- returned — gov-skeptic · wrote 0 files · 2m09s · 12.7k out · run wf_14950dae-859/aa898030da5868e92
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-34-44 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_14950dae-859/ac9137da734c135ec
+- returned — gov-skeptic · wrote 0 files · 1m48s · 10.6k out · run wf_14950dae-859/ac9137da734c135ec
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-45-53 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_14950dae-859/a55f950221b21760d
+- returned — gov-skeptic · wrote 0 files · 1m21s · 8.1k out · run wf_14950dae-859/a55f950221b21760d
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_14950dae-859/aab6f2f86b0a4e5cd
+- returned — gov-synthesizer · wrote 1 file · 4m41s · 38.4k out · run wf_14950dae-859/aab6f2f86b0a4e5cd
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -1186,6 +1215,9 @@ The expansion fold's follow-up round, dispatch 60, derived from its Workflow run
   audits; the four folds get light diff reviews, and a fold that answers an earlier round runs as that
   chain's next round with its confirmed set. `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared.md` holds the runs,
   and its instruments record holds the args.
+
+- 2026-10-16, session 1799cb98: dispatch 61 returned CLEAN WITH FIXES: 47 of 53 findings confirmed,
+  36 items (3 high, 21 medium, 12 low), 11 agents, 206.1k out tokens (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-a.md`).
 
 ## Instruments
 
