@@ -962,8 +962,8 @@ The library round's review, dispatch 50, derived from its Workflow run the same 
   1,469 sections and searchable, with P1 to P30, 139 decision sections, the debts and the journal. Its
   comparison covers 16 areas, each with its measured state, its target and its gaps. The repository
   keeps the template, with an empty data region, and the generator, which writes the 4 MB page outside
-  it with `--out`. Six new refusals were each seen red on a planted defect, and the page was published
-  to the same link as version 5 (`build/2026-10-16-build-PLAY-dClosedLoop-1-atlas-instruments.md`).
+  it with `--out`. All eight new refusals were each seen red on a planted defect, and the page was
+  published to the same link (`build/2026-10-16-build-PLAY-dClosedLoop-1-atlas-instruments.md`).
 
 ## Instruments
 

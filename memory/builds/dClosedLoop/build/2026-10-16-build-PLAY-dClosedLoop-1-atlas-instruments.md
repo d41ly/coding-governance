@@ -130,6 +130,21 @@ def unparseable_principle(m):
     m.text = text
 
 
+def unresolvable_area(m):
+    m.AREAS[0]["today"] = [("layer-instruction", "no-such-section")]
+
+
+def readme_without_opened(m):
+    real = m.text
+
+    def text(p):
+        t = real(p)
+        if p.name == "README.md":
+            t = t.replace("\nopened: ", "\nopen-date: ", 1)
+        return t
+    m.text = text
+
+
 results = [
     arm("control: nothing planted", lambda m: None, None),
     arm("a v2 section with no declared view", drop_v2_view, "v2's sections and the views declared for them differ"),
@@ -138,6 +153,8 @@ results = [
     arm("an event bullet the parser cannot place", break_an_event, "event bullets but"),
     arm("a trail that selects nothing", blind_the_trail, "records an owner's answer, yet no section title marks it"),
     arm("a principle numbered out of sequence", unparseable_principle, "the principles are not P1 to"),
+    arm("an area whose measured section does not resolve", unresolvable_area, "has 0 sections with id 'no-such-section'"),
+    arm("a README without its opened date", readme_without_opened, "the build README has no opened: date"),
 ]
 print(f"{sum(results)} of {len(results)} arms as expected")
 sys.exit(0 if all(results) else 1)
@@ -150,11 +167,16 @@ GREEN control: nothing planted: derived without refusing
 RED  a v2 section with no declared view: atlas: v2's sections and the views declared for them differ: ['floor']
 RED  a gap stage no area claims: atlas: gap stages no comparison area claims: ['Tooling']
 RED  a split that loses a line: atlas: a record's sections do not rejoin to its text
-RED  an event bullet the parser cannot place: atlas: 54 event bullets but 53 parsed
+RED  an event bullet the parser cannot place: atlas: 55 event bullets but 54 parsed
 RED  a trail that selects nothing: atlas: flow-interactions records an owner's answer, yet no section title marks it
 RED  a principle numbered out of sequence: atlas: the principles are not P1 to P30 without a gap: [1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
-7 of 7 arms as expected
+RED  an area whose measured section does not resolve: atlas: layer-instruction has 0 sections with id 'no-such-section'
+RED  a README without its opened date: atlas: the build README has no opened: date
+9 of 9 arms as expected
 ```
+
+The first run had seven arms, so two of the eight new refusals went unplanted. The last two arms close
+that.
 
 The split arm's first version stayed green. It changed the splitter's input, and the rejoin check
 compares the parts with that same input, so nothing was planted. The arm now mutates the splitter.
