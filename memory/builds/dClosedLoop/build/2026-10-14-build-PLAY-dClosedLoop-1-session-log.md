@@ -956,6 +956,15 @@ The library round's review, dispatch 50, derived from its Workflow run the same 
   The library round's follow-up review is recorded as owed and deferred, in layer-library `[open]`.
   The atlas is audited against every design record, and gains the comparison with today's product.
 
+- 2026-10-16, session 1799cb98: the atlas's audit found its fourth version showing the structured views
+  only. P1 to P30, the decision trail, the debts, the journal and most record text were absent, and
+  nothing compared the target with today's product. The fifth version carries all 85 records whole,
+  1,469 sections and searchable, with P1 to P30, 139 decision sections, the debts and the journal. Its
+  comparison covers 16 areas, each with its measured state, its target and its gaps. The repository
+  keeps the template, with an empty data region, and the generator, which writes the 4 MB page outside
+  it with `--out`. Six new refusals were each seen red on a planted defect, and the page was published
+  to the same link as version 5 (`build/2026-10-16-build-PLAY-dClosedLoop-1-atlas-instruments.md`).
+
 ## Instruments
 
 ### The gap-ownership join
@@ -1366,8 +1375,9 @@ Runs, 2026-10-14:
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold.md` | The fold's closing review, a light diff review over the four fold commits, as its synthesizer wrote it. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md` | The follow-up round over the closing review's fixes, a light diff review at round 2, as its synthesizer wrote it. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md` | Memory's library side, which replaces the Knowledge layer: the owner's question, KN-1 and what it changed, and what the library round owes. |
-| `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.html` | The Closed Loop Atlas, published as an artifact: layers, flow, lifecycle, roles, chain, policies and progress, its data region derived by the generator. |
-| `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py` | The atlas's generator: derives the page's data from the design records and reviews; `--check` says whether the page is current. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.html` | The Closed Loop Atlas's template: every view's markup, style and script, with an empty data region that the generator fills to publish it. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py` | The atlas's generator: derives the views' data, carries every record in the build folder, refuses data it cannot place, and writes the page with `--out`; `--check` derives without writing. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-atlas-instruments.md` | The atlas's fifth version, checked: the regenerate and publish procedure, what the generator refuses, the probe that saw each new refusal red, and the browser checks. |
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | The library pass's research handoff: the four filling paths and two placements. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` | The library round's review, a light diff review over KN-1's fold, the library design and its settlement, as its synthesizer wrote it. |
