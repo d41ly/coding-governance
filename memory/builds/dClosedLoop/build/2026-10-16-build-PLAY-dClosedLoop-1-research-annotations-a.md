@@ -2,7 +2,9 @@
 
 **Serves:** research PLAY-dClosedLoop-1
 
-This is dispatch 75's return, verbatim. Its question is in
+This is dispatch 75's return, verbatim, except that its three citations of dUnstalledConvoy's unit 21,
+an id no record defines, carry the `missing:` form, so the build index joins it to no roster. Its question
+is in
 `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-23-researcher.md`, which dispatch 76 runs
 too, and its use is in `build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md`.
 
@@ -23,7 +25,7 @@ The core check is a one-marker scan that takes 0.05 s. The map adds the block bu
 | ANNOTATION-STYLE guide | A writing convention. A1 refuses any grammar, marker or gate; A2 makes citing a record voluntary | 4,813 B, byte-identical to its template | `memory/guides/ANNOTATION-STYLE.md:7-8,17-26`; `tools/memory-tree/ANNOTATION-STYLE.template.md` |
 | `gov:` waiver markers | Inline markers that gates read. Some already use the shape `gov:<m> — <reason>` | 22 of the code markers carry ` — reason`, e.g. 17 `gov:literal-python —` | `tools/check-wiring.sh:594`, `tools/hooks/agent-cap.js:461,482`, `.githooks/pre-commit:103`, `tools/unattended/check-unattended.sh:155,169` |
 | `gov:note` / `gov:feature` | — | **0 files each**, so the population is empty | `git grep -c` |
-| drift-audit's cited-id signal | Ids in tracked non-memory text that no record anchors. Report-only (`gateable: False`), pin 2, with a RATCHETS row | value **2**, of 1,250 cited ids (`TOOL-dUnstalledConvoy-21`, `-22`) | `tools/drift-audit/drift_report.py:2201-2264`; `drift_signals.py:308,455` |
+| drift-audit's cited-id signal | Ids in tracked non-memory text that no record anchors. Report-only (`gateable: False`), pin 2, with a RATCHETS row | value **2**, of 1,250 cited ids (`missing:TOOL-dUnstalledConvoy-21`, `-22`) | `tools/drift-audit/drift_report.py:2201-2264`; `drift_signals.py:308,455` |
 | check-dead-paths | Refuses basenames of files git deleted or renamed. A path that was never tracked is invisible to it | misses `memory/gotchas/msys-mangles-rev-colon-dotpath`, which never existed (`git log --all` is empty) | `tools/check-dead-paths.sh:122,131`; `tools/unattended/check-brief-recorded.sh:526` |
 | map comment lexer | `_LEX_PROFILES` table. It **strips** comments, and an extensionless file gets no profile, so nothing is stripped there either | strips at :698; `None` profile at :714-716; the hooks under `.githooks/` are extensionless | `tools/codebase-map/map_lib.py:663-670,698-716` |
 | Read hook | PostToolUse `Read` → `recall-opened.js`. It observes and injects nothing | — | `.claude/settings.json:65-71`; `tools/memory-recall/recall-opened.js:15-19` |
@@ -79,7 +81,7 @@ Grep tool calls naming gov: or an id: 16 of 651
 - 94.6% of code-read calls never pass through the Read tool.
 
 **Where the records and the code disagree:**
-- research-memory-annotations:69 says "No real dangling id was found", and layer-memory `[annotations]` (:674) lists 35 as fixtures or foreign. drift-audit finds 2 real ones, `TOOL-dUnstalledConvoy-21` and `-22`. A gate leg built on that signal is **red at tolerance 0 on its first run**, not vacuously green.
+- research-memory-annotations:69 says "No real dangling id was found", and layer-memory `[annotations]` (:674) lists 35 as fixtures or foreign. drift-audit finds 2 real ones, `missing:TOOL-dUnstalledConvoy-21` and `-22`. A gate leg built on that signal is **red at tolerance 0 on its first run**, not vacuously green.
 - layer-memory `[map]` (:642) says 28 of 31 dossiers are stale. Today's signal is 25 of 31.
 - layer-library `[consult]` (:307) files the read hook's absence under **Recall**. `[placements]` (:241) homes the annotation index with the **map**, which is what such a hook would serve.
 
@@ -163,7 +165,7 @@ I stopped at four. A per-file header block, or a per-kit table of contents, is a
 | history in a note | map lexer | a body holding `rev-2`, `2026-10-01` or a SHA |
 | essay ratchet | drift-audit RATCHETS | the tree-wide count of lines in 9+ line blocks rises (today 45,108) |
 
-All six red cases above were seen red in the fixture probe, apart from the duplicate anchor, which I did not plant. The resolve leg arms only after `TOOL-dUnstalledConvoy-21` and `-22` are fixed, or pinned at 2.
+All six red cases above were seen red in the fixture probe, apart from the duplicate anchor, which I did not plant. The resolve leg arms only after `missing:TOOL-dUnstalledConvoy-21` and `-22` are fixed, or pinned at 2.
 
 **Read-path cost.**
 - Work-order slot: at most 2 KB, about 16 rows.
