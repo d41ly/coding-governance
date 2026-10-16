@@ -330,10 +330,10 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 | `deploy.distill` | command, idempotent | `deploy.record` | confirms that the decision-log rows `build.distill` wrote are in the log at the landed SHA | the rows at the landed SHA, joined one to one to the build's major forks | `deploy.recommend` |
 | `deploy.recommend` | command | `deploy.distill` | scores the recommendation, signals only, since core Deploy has no producing role | the recommendation record | the landing review where declared, otherwise `deploy.notify` |
 | `deploy.notify` | command, idempotent | `deploy.recommend`, and the landing review where it ran | posts `landed` to dependents, keyed by the landing SHA, so a repeated post is a no-op | the mailbox posts | `deploy.released` and `deploy.snapshot` |
-| `deploy.released` | command | `deploy.notify` | reads `build.closes`. Under `after-release-verifies`, it is an event wait: the release slot's exit record for the landed SHA, or for a later SHA that contains it, wakes it, and the supervisor runs it under that wake's own run lease, since under `close-only` the build's lease is gone by then. Under the other two values, it passes at once | the slot's exit record, keyed by SHA, with its outcome; under the other two values, the landing record's `build.closes` value | verified, or a pass → `deploy.close`, once `deploy.unlease` is done; held, rolled forward, rolled back, halted or unverified → an owner item through the owner's notification adapter, since the build's mailbox may be closed, resolved as `run.on-owner-question` says: close unreleased, the outcome on the transition, or wait for a later release; no exit record within `runtime.hold-ceiling` → the same owner item; `release.environments` emptied, or integrations removed, after the landing → as `policy.on-missing-expansion` says |
+| `deploy.released` | command | `deploy.notify` | reads `build.closes`. Under `after-release-verifies`, it is an event wait: the release slot's exit record for the landed SHA, or for a later SHA that contains it, wakes it, once for each waiting build whose landed SHA it contains, and the supervisor runs each under that wake's own run lease, since under `close-only` the build's lease is gone by then. Under the other two values, it passes at once | the slot's exit record, keyed by SHA, with its outcome; under the other two values, the landing record's `build.closes` value | verified, or a pass → `deploy.close`, once `deploy.unlease` is done; held, rolled forward, rolled back, halted or unverified → an owner item through the owner's notification adapter, since the build's mailbox may be closed, resolved as `run.on-owner-question` says: close unreleased, the outcome on the transition, or wait for a later release; no exit record within `build.release-ceiling`, which the supervisor's sweep watches → the same owner item; `release.environments` emptied, or integrations removed, after the landing → as `policy.on-missing-expansion` says |
 | `deploy.snapshot` | command, idempotent | `deploy.notify`, and under `build.release-hold: whole-close`, `deploy.released` | commits the card's terminal snapshot; an equal snapshot is a no-op | the snapshot commit | `deploy.unlease` |
 | `deploy.unlease` | command, idempotent | `deploy.snapshot` | deletes the build's lease refs, a missing ref counting as done, and closes its mailbox (`[rules]`) | the deleted refs, and the mailbox's messages in the folder | `deploy.close`, once `deploy.released` has passed |
-| `deploy.close` | command | `deploy.unlease` and `deploy.released` | records the transition, with the release outcome under `after-release-verifies`, minted under the build's claim ref, or under the wake's run lease once the build's lease is gone | the transition record | the build is closed |
+| `deploy.close` | command | `deploy.unlease` and `deploy.released` | records the transition, with the release outcome under `after-release-verifies`, minted under the build's claim ref, which is never pruned (layer-memory `[contract]`) | the transition record | the build is closed |
 
 - **The core re-check's witness** (K1):
   - under `GATE_POST_MERGE=local` or undeclared, `deploy.core` starts `post-merge.sh` on the landed
@@ -365,7 +365,7 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 - **Instruction:**
   - the practices' Deploy reach;
   - the landing view;
-  - the policies: `autonomy`, `plan.ratification`, `verdict.tree`, `landing.order`, `deps.landing`, `deps.on-parent-withdrawn`, `hooks.bypass`, `core.bypass`, `core.exceptions`, `build.closes`, `build.release-hold`, `release.environments`, `card.snapshot`, `run.on-owner-question`, `review.deploy` and `flow.route-backs`.
+  - the policies: `autonomy`, `plan.ratification`, `verdict.tree`, `landing.order`, `deps.landing`, `deps.on-parent-withdrawn`, `hooks.bypass`, `core.bypass`, `core.exceptions`, `build.closes`, `build.release-hold`, `build.release-ceiling`, `release.environments`, `card.snapshot`, `run.on-owner-question`, `review.deploy` and `flow.route-backs`.
 - **Memory:** writes the landing record, the transition, the terminal snapshot and the `landed`
   messages, reads the decision log at the landed SHA and, under `after-release-verifies`, the release
   slot's exit record, and deletes the lease refs and the mailbox ref.
@@ -379,7 +379,8 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
     environment, each environment naming an engine, a verify adapter and whether it is production,
     routed by `deploy.on-verify-fail`. Every pass ends by writing the slot's exit record for its SHA,
     a flow record kind keyed by SHA with an outcome (verified, held, rolled forward, rolled back,
-    halted or unverified), which `deploy.released` reads;
+    halted or unverified), the environment that ended the pass and its release record's id, which
+    `deploy.released` reads;
   - notifications, through Runtime's notification adapters, which integrations fills.
 
 `build.closes`'s other two values each need an expansion (LR-4):
@@ -449,7 +450,7 @@ Runtime executes the owner's controls (dWellOiledMachine, RT-3). They extend una
 | Item | Actor | Needs | Does | Proven by | Then |
 |---|---|---|---|---|---|
 | `life.request` | owner | — | asks to pause, resume, withdraw or supersede the build, through the guarded command | the command's record | `life.quiesce`; resume → the build's `next` |
-| `life.quiesce` | executor | `life.request` | dispatches nothing new. Each running act finishes within its ceiling. An open review fan finishes, and a prepared merge is discarded | the executor's record of the acts it let finish | pause → parked; withdraw or supersede → `life.notify`; a push already made → refused: the build has landed. Under `after-release-verifies`, a landed build waiting at `deploy.released` hands the request to that item's owner item: close unreleased, or keep waiting |
+| `life.quiesce` | executor | `life.request` | dispatches nothing new. Each running act finishes within its ceiling. An open review fan finishes, and a prepared merge is discarded | the executor's record of the acts it let finish | pause → parked; withdraw or supersede → `life.notify`; a push already made → a pause is refused: the build has landed. A withdraw or supersede of a landed build waiting at `deploy.released` opens that item's owner item itself, unless one is open, through the notification adapter and keyed by (build, request): close unreleased, or keep waiting. Once `deploy.unlease` has run, `life.*` runs under the request's own run lease |
 | `life.notify` | command, idempotent | `life.quiesce` | posts `withdrawn` or `superseded` to dependents, with the replacement's slug | the mailbox posts | `life.snapshot` |
 | `life.snapshot` | command, idempotent | `life.notify` | commits the card's terminal snapshot | the snapshot commit | `life.unlease` |
 | `life.unlease` | command, idempotent | `life.snapshot` | deletes the leases, closes the mailbox (`[rules]`), and reclaims the build's workspaces | the deleted refs, the mailbox's messages in the folder, and the workspace record | `life.close` |
@@ -713,3 +714,9 @@ mailbox; `deploy.close` mints under the claim ref; unlease closes a mailbox, not
 record gains the outcome unverified; `life.quiesce` hands a landed build's withdraw to the release
 hold; the core re-check gives `app-only` its arm; and Deploy's Memory bullet reads the exit record.
 The comparison record's `[closing-review]` names each item and where it went.
+
+**Revised a third time, 2026-10-16, after the follow-up round** (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md`):
+`deploy.close` mints under the claim ref alone; `deploy.released` wakes once per waiting build, and its
+ceiling is `build.release-ceiling`, watched by the supervisor's sweep; `life.quiesce` opens the release hold's
+owner item itself; and the exit record names the environment that ended the pass. The comparison
+record's `[follow-up]` names each item and where it went.

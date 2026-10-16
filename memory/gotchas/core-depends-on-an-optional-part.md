@@ -42,6 +42,8 @@ run B's report beside it) found four:
   key the core reads, that selects an absent expansion, and none for a key an absent expansion owns.
   Walked by hand over v2's presets on 2026-10-16: `strict` and `guarded` are refused for
   `build.closes: after-release-verifies` (LR-4), and no preset is refused for any other key.
+- A refusal fixture is seen red both ways: on a loader that refuses everything, and on one that
+  refuses nothing.
 
 It has no machine gate yet. dOrderedCharter owes the check that the core never depends on an expansion
 or an optional component (`gap-found-17`), and dDeclaredLoop's preset check owes the core-only preset

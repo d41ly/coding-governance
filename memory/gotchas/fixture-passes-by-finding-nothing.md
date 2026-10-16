@@ -19,6 +19,13 @@ row — but a dash-led id row IS an anchor, so the row DEFINED the id and the co
 all. The arm asserted a message that never appeared, for a reason unrelated to the rule. Upstream
 counted six probes across one session that reported success while exercising nothing.
 
+A record probe in `memory/builds/dClosedLoop/`, 2026-10-16: the both-runs probe the class
+`one-run-claim-recorded-as-agreed` prescribes was recorded green over `[agreement]`, though its only
+predicate was a spelling no `[agreement]` row uses. It read 52 rows and matched 4. The follow-up
+round caught it (H1 of
+`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md`).
+A probe recorded green prints how many rows its predicate matched beside how many it read.
+
 ## The fix
 
 Every arm asserts the SPECIFIC message its branch emits, never a process exit code, and the fixture

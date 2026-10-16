@@ -40,6 +40,8 @@ fixture planted in three of its seven populations (H2 and M8 of `memory/builds/d
   answer of its own.
 - A scan's population is what crosses the boundary it binds at. Every other boundary that publishes
   the same population registers its own scan.
+- Each boundary enumerates its expected population from what it carries, so a zero against a
+  non-empty expectation is a dead probe, and an empty expectation reads "none carried".
 - A seen-red fixture plants the value in each population it names, one plant each, and adds one case
   per dead-probe arm.
 

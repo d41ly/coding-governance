@@ -39,6 +39,9 @@ its run B sibling.
 - Probe: each `[agreement]` or `[cross]` row that names both runs carries two return citations.
 
 It has no machine gate yet, because the comparison tables are prose; the probe above is the gate a
-comparison script would carry. Its probe was run by hand on 2026-10-16 over the expansion round's
-`[agreement]` and `[cross]`. It was red on four `[cross]` rows that credited both runs with no return
-citation, and green once each row cited each run's line (the comparison record's `[closing-review]`).
+comparison script would carry. Its first version, run on 2026-10-16, matched only the spelling
+"<layer> A and B", which no `[agreement]` row uses, so it read every `[agreement]` row and checked
+none (the follow-up round's H1). The corrected probe counts a credit in either form, reports a row it
+cannot place, and prints how many rows it matched. It was red on 36 `[agreement]` rows and one
+`[cross]` row, and on a planted row of each population, and green once each row cited each run's
+line (the comparison record's `[follow-up]`).

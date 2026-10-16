@@ -28,9 +28,13 @@ high finding (`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedL
 H2), and run A did not.
 
 The fold's closing review (`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md`, H1) caught the fold's own fix overclaiming. It said
-`GOVKIT_RERENDER=0` refused target-side execution, but that switch declines only the regenerate and
+`GOVKIT_RERENDER=0` refused target-side execution, but that switch declines only the regenerate, hook-wiring and
 adopter steps. Update still runs each touched kit's `[check]` argv in the target, before the write and
-again after it (`run_kit_check`, near lines 10015 and 11214).
+again after it (`run_kit_check`, near lines 10015 and 11214), and each `[[hole]]` discharge probe
+(`run_hole_probes`, near lines 10953 and 11800). The follow-up round
+(`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md`,
+H2) found that the fold's fix still left out the hook wiring, which runs the adopter's own
+`settings-merge.py`, and the hole probes.
 
 ## The fix
 
@@ -42,7 +46,10 @@ again after it (`run_kit_check`, near lines 10015 and 11214).
 - It pushes through a grant scoped to the refs it writes on that one remote, declared on its adapter
   row.
 - A fixture plants a payload in each kind of target-side code the command can reach: a regenerate
-  argv, a kit's adopt script that its check runs, and a workspace hook. Each reads the credential
-  helper and the environment, and expects to find neither.
+  argv, a kit's adopt script that its check runs, the adopter's `settings-merge.py`, a hole's
+  discharge command and a workspace hook. Each reads the credential helper and the environment, and
+  expects to find neither.
+- Probe: list every subprocess call reachable from the command whose working directory is the
+  target, and fail when the design does not name each one.
 
 It has no machine gate yet: dShippedRelease owes the sandbox and its fixture (`gap-deploy-13`).

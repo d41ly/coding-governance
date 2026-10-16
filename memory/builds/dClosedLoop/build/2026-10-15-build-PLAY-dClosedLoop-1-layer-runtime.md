@@ -426,6 +426,8 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - reaps act sessions past `runtime.act-ceiling`;
   - expires leases past `leases.expiry-hours` and prunes terminal claim refs, through dDeclaredLoop's
     coordination verbs;
+  - raises the owner item of each `deploy.released` wait whose landing record is older than
+    `build.release-ceiling`, once per (build, landed SHA), through the notification adapter;
   - names holders by fleet tag.
 - **Shared records.**
   - Under the supervisor, only it writes a build's shared mutable records: decision rows, the run
@@ -708,9 +710,11 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - So a node that wakes late, after another has run the period, skips it.
   - A missed period runs at the next wake.
 - **An item can wait on an event.** `deploy.released` waits for the release slot's exit record. The
-  record's event wakes it, keyed by (event, SHA) as a cadence instance is, and the supervisor runs it
-  under that wake's own run lease, so it needs no build lease. A wait past `runtime.hold-ceiling`
-  raises an owner item through the notification adapter, as a held launch does.
+  record's event fans out to one instance per waiting build whose landed SHA the record's SHA
+  contains, each keyed by (event, SHA, build) and witnessed by build, so a skipped key never skips a
+  second build. The supervisor runs each under its wake's own run lease, so it needs no build lease,
+  and its records mint under the build's claim ref. A wait with no record is watched by the
+  supervisor's sweep (`[supervise]`), which raises its owner item once `build.release-ceiling` passes.
 - **In-session cron is retired for cadence.**
   - It is session-scoped, expires after 7 days, and fires only while its session is open and idle.
   - The unattended skill's CronCreate keepalive and stop-guard's `session_crons` retire with it.
@@ -783,8 +787,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   A hit refuses that push. The journal and the transcripts never leave the node, so the node tick
   scans them as a node-local population, and a hit there is an owner item. Each witness names what it
   read: whether the value resolved (yes, no or `anonymous`), each population's count, and the
-  matches, as a count and a salted id only. An unresolved value or an empty population is a dead
-  probe, never green, and `anonymous` reads not applicable, not zero. The `secret-scan` fixture in
+  matches, as a count and a salted id only. Each boundary declares its expected population from what
+  the push carries: the pushed range's paths at the prepare, the one ref at the ref-push path. An
+  unresolved value, or a zero against a non-empty expected population, is a dead probe, never green;
+  an empty expected population reads "none carried", and `anonymous` reads not applicable, not zero. The `secret-scan` fixture in
   `[tests]` plants the value in every population named here.
 - A new step, role, record kind, rule, harness, backend or host is a filled contract, so Runtime gains
   no code.
@@ -805,6 +811,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | `no-skip` | No session the runtime launches skips permissions. | `no-skip` |
 | `policy-and-journal` | Every runtime behaviour is a policy key with a reader, and every runtime event is journaled. | `coverage` |
 | `grants-and-secrets` | An adapter acts only within the scopes it declared, its secret never leaves its process, and no push publishes a secret value; a journal is pruned past `runtime.journal`. | `grant`, `secret-scan`, `journal-retention` |
+| `event-waits` | A wait on a record is woken by that record's event once per waiting party, runs under its own lease, and mints under the build's claim ref; a wait with no record raises one owner item past its ceiling. | `event-wait` |
 
 ### [contract] Runtime's layer contract
 
@@ -1023,14 +1030,21 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   the next wake.
 - **`grant`:** an adapter whose granted scope is wider than its declared one is refused at registration,
   seen red on a probe stubbed to accept it.
-- **`journal-retention`:** a journal entry older than `runtime.journal` days is pruned on the node tick,
-  and none is pruned under `all`.
+- **`journal-retention`:** under `runtime.journal: N`, entries planted at N-1 and N+1 days: the node
+  tick prunes the older and keeps the younger, and under `all` it prunes nothing. It is seen red
+  against a pruner stubbed to delete everything.
 - **`secret-scan`:** one plant per population `[extend]` names: a removed commit, a tracked file, a
   `memory/` record, a mailbox ref written after the landing, a card ref, a lease ref and a claim ref at
   the push boundaries, and the journal and a transcript at the node tick, with one encoding of the
   value among them. Each plant turns its boundary red. Three witness cases are each seen red against a
   scanner stubbed to return zero: an unresolved value reads a dead probe and blocks, a population
-  emptied by a broken enumerator reads a dead probe, and an `anonymous` adapter reads not applicable.
+  emptied by a broken enumerator reads a dead probe, and an `anonymous` adapter reads not applicable. A
+  code-only landing and a lease-only push, whose expected populations hold no `memory/` path and no
+  mailbox, card or claim object, both read green.
+- **`event-wait`:** under `close-only`, unlease a build, then write the release slot's exit record:
+  the wake runs `deploy.released` and `deploy.close` under its own run lease, the close minted under
+  the claim ref. Two builds landed in one SHA both close on one exit record. With no exit record, one
+  owner item opens once `build.release-ceiling` passes, and only one.
 - **`extension`:**
   - a stub harness adapter registers with no edit to Runtime's code or schema;
   - Codex's capability table is checked against the dispatcher's required events;
@@ -1177,3 +1191,9 @@ lander's prepare and at the core's ref-push path, and scans the journal and tran
 population; `[schedule]` runs an item's event wait under its wake's own lease; and `[tests]` and
 `[invariants]` gain the `grant`, `secret-scan` and `journal-retention` fixtures. The comparison record's
 `[closing-review]` names each item and where it went.
+
+**Revised a third time, 2026-10-16, after the follow-up round** (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md`): the
+event wait fans out per waiting build and mints under the claim ref, the supervisor's sweep raises a
+wait past `build.release-ceiling`, the secret scan's boundaries declare their expected populations, and
+`[tests]` and `[invariants]` gain `event-wait` and a two-sided `journal-retention`. The comparison
+record's `[follow-up]` names each item and where it went.

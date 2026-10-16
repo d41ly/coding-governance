@@ -320,7 +320,8 @@ for instructions:
   unattended claims `refs/gov/runs/<slug>`. `check_slug_claimed` is only its local pre-check, since
   it reads the local clone. The records a build writes before its lease (dupes, triage, plan) mint
   under that claim, and every later one under the build's lease, taken at `plan.lease`, or at
-  `entry.claim` for a patch build. The intake record mints nothing: it is keyed by its session and
+  `entry.claim` for a patch build, until `deploy.unlease` deletes it. A record written after that,
+  such as `deploy.close`'s transition under `close-only`, mints under the build's claim ref. The intake record mints nothing: it is keyed by its session and
   content. An ask that `entry.place` files outside any build mints under its family's claim ref,
   created the same compare-and-swap way. dTotalRecall owes both refs (`gap-mem-13`). A slug's claim
   ref is never pruned, so a slug is minted once; the supervisor prunes run claims only. So two clones
@@ -1101,7 +1102,7 @@ and its map's `disposition` cells point here. Each defect's fix sits in place, i
 - **A record that belongs to no build lives under `memory/<layer>/<kind>/`.** The memory contract
   declares each kind's home, and the layer's tag names the folder, so the home is derived (EX-2,
   `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md`).
-- **The kinds that need one so far:** maintenance and Loop Review records under
+- **The kinds that need one so far:** maintenance, Loop Review and keep records under
   `memory/observability/`, release records under `memory/integrations/`, and currency and fleet
   records under `memory/distribution/`. The release slot's exit records, a flow kind keyed by SHA
   that integrations writes and core Deploy reads, live under `memory/flow/` (the expansion round's

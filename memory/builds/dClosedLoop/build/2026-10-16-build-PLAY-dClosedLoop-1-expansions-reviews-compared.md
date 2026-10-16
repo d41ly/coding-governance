@@ -295,7 +295,9 @@ findings confirmed, in 18 items (3 high, 9 medium, 6 low). Ids 5, 10, 12, 16, 18
   fixture (H1), the zero-witness boundary rule (H2, M8) and the policy class's count (L2).
 - **The probe, seen red.** `one-run-claim-recorded-as-agreed` prescribes a probe, and the review found
   it never run (L6). It ran over layer-expansions' `[agreement]` and `[cross]` before the citations went
-  in, and after:
+  in, and after. Its only predicate was the spelling "<layer> A and B", so it checked the `[cross]`
+  rows alone and no `[agreement]` row. The follow-up round found that (H1), and `[follow-up]` holds
+  the corrected probe and its runs:
 
 ```python
 """The probe one-run-claim-recorded-as-agreed prescribes, run over a design record's [agreement] and [cross].
@@ -357,7 +359,7 @@ findings: 0
 
 - **The checks, run again:** the preset check, the gap-ownership join and the role matrix, as in
   `[folded]`, with the same results.
-- **The follow-up round** is dispatched, as `[follow-up]` says.
+- **The follow-up round** returned, and `[follow-up]` folds it.
 
 ## [follow-up] The follow-up round, dispatched 2026-10-16
 
@@ -544,6 +546,213 @@ Its args, verbatim:
  "byDesign": "- The build is design-only: no product code and no unit specs. Unit-level detail is absent by design and owed to the chain builds.\n- The owner's settled answers (RH-1, PIN-1, EX-1 to EX-3, DI-1, and the earlier KN-1, LB-1 to LB-4, F*, R-*, RT-* and LR-*) are decisions: a finding may show one contradicts a record or the tree, but does not re-argue the owner's choice.\n- For round 1's H1 the fold chose the fix that denies by default: the unattended offer runs nothing from the adopter's tree, and the adopter's own lander runs the checks it left unrun. A finding may show that choice contradicted elsewhere, not re-argue it against the sandbox-only alternative.\n- Dated records keep what held when they were written: research returns, revision notes, [forks], [settled], [review] and the session log's past entries.\n- Generated files (memory/LIVE.md, the build README's generated regions, memory/map/generated/ and memory/gotchas/INDEX.md) are rendered and not under review.\n- The atlas page and its generator are an owner-facing view outside this review.",
  "checklist": "# recurring-bug-class checklist for f506dd106..4edc6790b (15 changed file(s))\n# 19 class(es) selected by an anchor + 6 universal\n# by anchor specificity: 10 path · 4 directory · 5 basename; a cut tier prints one line per class\n# invariants are read at f506dd106a22; 0 that this subject adds, edits or takes out are listed as items, never by design\n\n- [ ] fixture-passes-by-finding-nothing (universal)\n      a test arm whose fixture never triggers the rule passes, and proves nothing\n      memory/gotchas/fixture-passes-by-finding-nothing.md\n\n- [ ] guard-above-a-fold-makes-its-fallback-dead (universal)\n      a guard added above a fold settles the predicate the fold's own fallback re-tests, leaving a dead arm that reads as coverage\n      memory/gotchas/guard-above-a-fold-makes-its-fallback-dead.md\n\n- [ ] heredoc-escape-reaches-the-regex (universal)\n      source written through a shell heredoc into a non-raw string turns an escape into a control byte, and the symptom never looks like a quoting problem\n      memory/gotchas/heredoc-escape-reaches-the-regex.md\n\n- [ ] inline-fence-swallows-the-rest-of-the-file (universal)\n      a triple-backtick written inline in prose opens a fence the reader never closes, so every section after it silently disappears from the checker's view\n      memory/gotchas/inline-fence-swallows-the-rest-of-the-file.md\n\n- [ ] staged-break-substitutes-a-synthetic-value (universal)\n      an arm that proves a mechanism by replacing the shipped value with a simpler one proves the mechanism for the simpler value\n      memory/gotchas/staged-break-substitutes-a-synthetic-value.md\n\n- [ ] two-answers-to-one-question (universal)\n      a fact stated in two places drifts, and the copies need not disagree loudly to be wrong\n      memory/gotchas/two-answers-to-one-question.md\n\n- [ ] policy-value-with-no-route (path)\n      a policy key catalogues a value that no item reading the key routes or witnesses, so a preset that selects the value cannot run\n      memory/gotchas/policy-value-with-no-route.md\n\n- [ ] zero-witness-over-an-unnamed-population (path)\n      a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean\n      memory/gotchas/zero-witness-over-an-unnamed-population.md\n\n- [ ] foreign-code-runs-on-the-ambient-credential (path)\n      an unattended item runs code another repository authored, on the node's whole environment and ambient credential, so that repository's committers gain the node's rights\n      memory/gotchas/foreign-code-runs-on-the-ambient-credential.md\n\n- [ ] route-names-an-output-its-actor-never-emits (path)\n      a designed route or witness names an output, exit class or record that its actor never produces on that path, so the route is dead or waits forever\n      memory/gotchas/route-names-an-output-its-actor-never-emits.md\n\n- [ ] append-without-an-idempotence-key (path)\n      a command that appends to an append-only record declares no key, so a retried run writes the same row twice and a set-join witness stays green\n      memory/gotchas/append-without-an-idempotence-key.md\n\n- [ ] core-depends-on-an-optional-part (path)\n      a core item, leg, field or preset cannot run, or cannot be enforced, without an expansion or an optional component, and the dependency hides behind the guard or Absent clause that seems to degrade it\n      memory/gotchas/core-depends-on-an-optional-part.md\n\n- [ ] insert-after-a-key-that-occurs-twice (path)\n      a record edit inserts a row after the first match of a cell value that occurs in two tables, so the row lands in the wrong table and the right one never gains it\n      memory/gotchas/insert-after-a-key-that-occurs-twice.md\n\n- [ ] one-run-claim-recorded-as-agreed (path)\n      a comparison of two independent runs records a claim only one run made as what both found, so a single measurement carries the weight of agreement\n      memory/gotchas/one-run-claim-recorded-as-agreed.md\n\n- [ ] parser-drops-rows-it-cannot-place (path)\n      a record-parsing instrument skips rows under a heading it does not know, or rows its pattern cannot read, and still prints a clean run, so its population shrinks without a word\n      memory/gotchas/parser-drops-rows-it-cannot-place.md\n\n- [ ] rule-stated-with-no-check-that-fails (path)\n      a principle, a constraint between two keys or another rule is added in prose with no check that can fail on its breach, so it binds nothing and nobody can see that it does not\n      memory/gotchas/rule-stated-with-no-check-that-fails.md\n\n- [ ] a-merge-of-the-default-branch-read-as-additions (directory) · memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md\n\n- [ ] amendment-leaves-its-other-half-standing (directory) · memory/gotchas/amendment-leaves-its-other-half-standing.md\n\n- [ ] ledger-token-wrapped-across-a-line-joins-nothing (directory) · memory/gotchas/ledger-token-wrapped-across-a-line-joins-nothing.md\n\n- [ ] retirement-inventory-misses-readers-by-value (directory) · memory/gotchas/retirement-inventory-misses-readers-by-value.md\n\n- [ ] record-without-serves-or-with-a-round-counter (basename) · memory/gotchas/record-without-serves-or-with-a-round-counter.md\n\n- [ ] owner-item-without-its-reject-outcome (basename) · memory/gotchas/owner-item-without-its-reject-outcome.md\n\n- [ ] rate-quoted-without-its-denominator (basename) · memory/gotchas/rate-quoted-without-its-denominator.md\n\n- [ ] a-folded-field-leaves-its-row-shape-docs-behind (basename) · memory/gotchas/a-folded-field-leaves-its-row-shape-docs-behind.md\n\n- [ ] git-rm-cached-refuses-a-diverged-index-blob (basename) · memory/gotchas/git-rm-cached-refuses-a-diverged-index-blob.md\n\n# by design — 0 invariant(s) this selection touches\n"
 }
+```
+
+**Returned and folded.** Dispatch 60 returned CLEAN WITH FIXES (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md`, run `wf_c69ed990-543`): 24 of 35
+findings confirmed, in 14 items (2 high, 10 medium, 2 low). Ids 3, 8, 11, 12, 22, 23, 24, 29, 31, 32 and 35 were refuted. Each item went here:
+
+| Item | Ids | Disposition | Where the fix sits | Its class |
+|---|---|---|---|---|
+| H1 | 1, 14, 25 | fixed | the probe counts a credit in either form, reports a row it cannot place and prints how many rows it matched; 36 `[agreement]` rows and one `[cross]` row cite each run's line; the class and `[closing-review]` say what the first version checked | `fixture-passes-by-finding-nothing` |
+| H2 | 2, 26 | fixed, gap | layer-expansions' `kits.offer` names and refuses all five kinds of target-side code; `gap-deploy-13`; the class's fixture and probe | `foreign-code-runs-on-the-ambient-credential` |
+| M1 | 4 | fixed | flow-steps' `deploy.close` mints under the claim ref alone; layer-memory `[contract]` | `two-answers-to-one-question` |
+| M2 | 5, 20 | fixed | flow-steps' `life.quiesce` opens the hold's owner item itself, under the request's own run lease, and refuses a pause | `route-names-an-output-its-actor-never-emits` |
+| M3 | 6, 19, 34 | fixed | the exit record names the environment that ended the pass: flow-steps' release slot, layer-expansions' `[core-points]`, `release.record`, the asks paragraph and `maintain.file` | `route-names-an-output-its-actor-never-emits` |
+| M4 | 7, 18, 27 | fixed | layer-expansions' keep record, from which `loop.price` derives the ledger's state; layer-memory's home for it | `owner-item-without-its-reject-outcome` |
+| M5 | 9, 30 | fixed | layer-runtime `[tests]`' `journal-retention` plants one entry on each side of the limit | `fixture-passes-by-finding-nothing` |
+| M6 | 15 | fixed | layer-runtime `[extend]`: each boundary declares its expected population, and the `secret-scan` fixture adds a code-only landing and a lease-only push | `zero-witness-over-an-unnamed-population` |
+| M7 | 16 | fixed | layer-runtime `[schedule]`: the wake fans out per waiting build, keyed by (event, SHA, build); flow-steps' `deploy.released` | `append-without-an-idempotence-key` |
+| M8 | 17 | fixed | v2's `build.release-ceiling`; layer-runtime `[supervise]`'s sweep; flow-steps' `deploy.released` | `route-names-an-output-its-actor-never-emits` |
+| M9 | 33 | fixed | layer-runtime `[tests]`' `event-wait` and `[invariants]`' `event-waits`; v2's dWellOiledMachine row | `rule-stated-with-no-check-that-fails` |
+| M10 | 28 | fixed | v2's dDeclaredLoop row sees the core-only preset load red both ways; the class's bullet | `core-depends-on-an-optional-part` |
+| L1 | 10, 21 | fixed | `kits.watch-cadence`'s rows in layer-expansions and v2 | `amendment-leaves-its-other-half-standing` |
+| L2 | 13 | fixed | with M7 | `append-without-an-idempotence-key` |
+
+- **The method.** Each fix is the skeptic's, the corrected one for id 1. For M8, the round offered a
+  new key or a second reader for `runtime.hold-ceiling`, and the fold took the key, because the
+  hold-ceiling's six hours would fire on an overnight approval.
+- **The left-shift.** Every item's class is a catalogue entry already. The corrected classes are
+  `fixture-passes-by-finding-nothing` (a bite), `foreign-code-runs-on-the-ambient-credential` (five
+  sites, a wider fixture and a probe), `zero-witness-over-an-unnamed-population` (expected
+  populations), `core-depends-on-an-optional-part` (seen red both ways) and
+  `one-run-claim-recorded-as-agreed` (what its probe checked).
+- **The trend.** Round 1 of the fold's review confirmed 20 findings in 18 items, 3 of them high, and
+  round 2 confirmed 24 in 14 items, 2 of them high. Each round's highs sat in text the previous fold
+  wrote.
+- **No round has reviewed these fixes.**
+
+**The corrected probe.** It replaced the version `[closing-review]` holds:
+
+```python
+"""The probe one-run-claim-recorded-as-agreed prescribes, run over a design record's [agreement] and [cross].
+
+Usage: python both_runs_probe.py <record.md>
+
+A row credits a research run in one of two forms, and each credited run must be cited by a line of its
+own return, `research-<layer>-<a|b>.md:<line>`, unless the row says "re-measured here":
+- in [agreement], a table under `### [agree-<layer>]` whose "Both runs" cell is not empty or a dash
+  credits both runs of that layer;
+- in [cross], the "Found by" cell credits each run it names: "<layer> A and B" names both, and
+  "<layer> A" or "<layer> B" names one. A row naming two or more runs must cite each.
+
+Every table body row under the two sections is read. A row the probe cannot place, an [agreement] table
+outside a known layer's subsection, or a [cross] row whose "Found by" names no run, is a finding, so a
+predicate that matches nothing cannot pass silently. The probe prints how many rows it read and how many
+its predicate matched. Exit 1 on any finding.
+
+The revision of 2026-10-16 replaced a first version whose only predicate was the "<layer> A and B"
+spelling, which no [agreement] row uses (the follow-up round's H1).
+"""
+import re
+import sys
+
+LAYERS = ("observability", "integrations", "distribution")
+SEP = re.compile(r"^\|[\s:|-]+\|$")
+text = open(sys.argv[1], encoding="utf-8").read()
+findings, read, matched = [], 0, 0
+
+
+def cells(ln):
+    return [c.strip() for c in ln.strip().strip("|").split(" | ")]
+
+
+def check(tag, ln, runs):
+    global matched
+    matched += 1
+    if "re-measured here" in ln:
+        return
+    missing = [f"{layer} {run.upper()}" for layer, run in sorted(runs)
+               if not re.search(rf"research-{layer}-{run}\.md:\d+", ln)]
+    if missing:
+        findings.append(f"[{tag}] {cells(ln)[0][:60]}: credits {', '.join(sorted(f'{l} {r.upper()}' for l, r in runs))}; "
+                        f"no line cited for {', '.join(missing)}")
+
+
+for tag in ("agreement", "cross"):
+    head = f"\n## [{tag}]"
+    if head not in text:
+        sys.exit(f"no section {head.strip()}")
+    block = text.split(head, 1)[1].split("\n## ", 1)[0]
+    layer, header = None, None
+    for ln in block.split("\n"):
+        m = re.match(r"^### \[agree-([a-z]+)\]", ln)
+        if m:
+            layer, header = m.group(1), None
+            continue
+        if not ln.startswith("|"):
+            continue
+        if SEP.match(ln):
+            continue
+        if header is None:
+            header = cells(ln)
+            continue
+        read += 1
+        row = cells(ln)
+        if tag == "agreement":
+            if layer not in LAYERS or "Both runs" not in header:
+                findings.append(f"[agreement] a row the probe cannot place: {ln[:80]}")
+                continue
+            both = row[header.index("Both runs")]
+            if both not in ("", "—", "-"):
+                check(tag, ln, {(layer, "a"), (layer, "b")})
+        else:
+            if "Found by" not in header:
+                findings.append(f"[cross] a row the probe cannot place: {ln[:80]}")
+                continue
+            found = row[header.index("Found by")]
+            runs = set()
+            for lay, a, b in re.findall(r"\b(" + "|".join(LAYERS) + r") (A)(?: and (B))?\b", found):
+                runs.add((lay, "a"))
+                if b:
+                    runs.add((lay, "b"))
+            for lay in re.findall(r"\b(" + "|".join(LAYERS) + r") B\b", found):
+                runs.add((lay, "b"))
+            if not runs:
+                findings.append(f"[cross] a row whose Found by names no run: {ln[:80]}")
+            elif len(runs) >= 2:
+                check(tag, ln, runs)
+    header = None
+
+print(f"rows read: {read}; rows the predicate matched: {matched}")
+for f in findings:
+    print(f)
+print(f"findings: {len(findings)}")
+sys.exit(1 if findings else 0)
+```
+
+Before the citations:
+
+```text
+rows read: 52; rows the predicate matched: 44
+[agreement] The line: credits observability A, observability B; no line cited for observability A, observability B
+[agreement] The 7 gateable drift signals: credits observability A, observability B; no line cited for observability A, observability B
+[agreement] The detector register: credits observability A, observability B; no line cited for observability A, observability B
+[agreement] Where a detector registers: credits observability A, observability B; no line cited for observability A, observability B
+[agreement] Node-scoped detectors: credits observability A, observability B; no line cited for observability A, observability B
+[agreement] Maintain's items: credits observability A, observability B; no line cited for observability A, observability B
+[agreement] The Loop Review: credits observability A, observability B; no line cited for observability A, observability B
+[agreement] The value ledger: credits observability A, observability B; no line cited for observability A, observability B
+[agreement] Catches: credits observability A, observability B; no line cited for observability A, observability B
+[agreement] The run record: credits observability A, observability B; no line cited for observability A, observability B
+[agreement] Gaps: credits observability A, observability B; no line cited for observability A, observability B
+[agreement] The shape: credits integrations A, integrations B; no line cited for integrations A, integrations B
+[agreement] The header: credits integrations A, integrations B; no line cited for integrations A, integrations B
+[agreement] Remote CI: credits integrations A, integrations B; no line cited for integrations A, integrations B
+[agreement] Trusting a remote verdict: credits integrations A, integrations B; no line cited for integrations A, integrations B
+[agreement] The release: credits integrations A, integrations B; no line cited for integrations A, integrations B
+[agreement] Naming: credits integrations A, integrations B; no line cited for integrations A, integrations B
+[agreement] Notifications: credits integrations A, integrations B; no line cited for integrations A, integrations B
+[agreement] Trackers: credits integrations A, integrations B; no line cited for integrations A, integrations B
+[agreement] Grants and secrets: credits integrations A, integrations B; no line cited for integrations A, integrations B
+[agreement] Missing core points: credits integrations A, integrations B; no line cited for integrations A, integrations B
+[agreement] Keys typed as literals: credits integrations A, integrations B; no line cited for integrations A, integrations B
+[agreement] Gaps: credits integrations A, integrations B; no line cited for integrations A, integrations B
+[agreement] The line: credits distribution A, distribution B; no line cited for distribution A, distribution B
+[agreement] The mechanism: credits distribution A, distribution B; no line cited for distribution A, distribution B
+[agreement] Releases: credits distribution A, distribution B; no line cited for distribution A, distribution B
+[agreement] The receipt: credits distribution A, distribution B; no line cited for distribution A, distribution B
+[agreement] Currency: credits distribution A, distribution B; no line cited for distribution A, distribution B
+[agreement] The fleet register: credits distribution A, distribution B; no line cited for distribution A, distribution B
+[agreement] Descriptors: credits distribution A, distribution B; no line cited for distribution A, distribution B
+[agreement] Conformance: credits distribution A, distribution B; no line cited for distribution A, distribution B
+[agreement] Wiring and versions: credits distribution A, distribution B; no line cited for distribution A, distribution B
+[agreement] Render targets: credits distribution A, distribution B; no line cited for distribution A, distribution B
+[agreement] Keys: credits distribution A, distribution B; no line cited for distribution A, distribution B
+[agreement] Gaps: credits distribution A, distribution B; no line cited for distribution A, distribution B
+[agreement] The deploy-governance Skill: credits distribution A, distribution B; no line cited for distribution A, distribution B
+[cross] One expansion attaching to another breaks P28: credits distribution A, observability B; no line cited for distribution A, observability B
+findings: 37
+```
+
+With one planted uncited `[agreement]` row:
+
+```text
+rows read: 53; rows the predicate matched: 45
+[agreement] A planted question: credits observability A, observability B; no line cited for observability A, observability B
+findings: 1
+```
+
+With one planted uncited `[cross]` row:
+
+```text
+rows read: 53; rows the predicate matched: 45
+[cross] A planted finding: credits integrations A, integrations B; no line cited for integrations A, integrations B
+findings: 1
+```
+
+With one planted table it cannot place:
+
+```text
+rows read: 53; rows the predicate matched: 44
+[agreement] a row the probe cannot place: | a | b | c | d |
+findings: 1
+```
+
+After the citations:
+
+```text
+rows read: 52; rows the predicate matched: 44
+findings: 0
 ```
 
 ## [map] Every finding, placed
