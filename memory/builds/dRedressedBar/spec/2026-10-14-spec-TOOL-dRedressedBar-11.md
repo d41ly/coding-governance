@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-11 — a receipt-reading probe term in govkit's declared-outcome contract, closing settings-merge's last false-accept route
 
-**Status:** CLOSED · rev-6 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 7
+**Status:** CLOSED · rev-7 · 2026-10-16 · node d · Tier-2 · base ebce889c · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -102,6 +102,9 @@ both refusal sites print the adopter's own reason (owner, 2026-10-14, unit 10 §
   through S3's stderr tail, which unit 15's red half reads.
 - **hands-off** external — the stale `unclassified` clause, and the six inline spellings of a
   stderr tail in `tools/govkit/govkit.py`, consolidated into one helper by their own unit.
+- **hands-off** `TOOL-dRedressedBar-28` — the code-2 block's two static terms, which that unit takes
+  out because this unit's term asks both homes, and this spec's row C5 and §5 security clause,
+  which its spec-writer pass corrects.
 
 ## 4. Design
 
@@ -341,7 +344,7 @@ Each candidate was written down with the test that could make it lose, and the p
 | C2 — a path token, `{receipt:<kit>}`, resolved in `resolve_tokens` | An unresolved token fails the whole block (`:6318-6320`), so on a fresh `apply` with no receipt the stop would be refused, against the brief's absent case. `resolve_tokens` also feeds every argv the engine runs | Fails the brief's acceptance |
 | C3 — `classify_outcome` reads the receipt dict the verb holds | Four call sites change signature, and the dict equals the bytes the adopter read only by the order of writes | Survives; more surface for the same answer |
 | C4 — `must_not_resolve`, evaluated by the inlined resolver | Its losing test is fixture A: a term that still read ACCEPTED there would lose. It refuses there, and reads ACCEPTED in the absent rows (AC2) | Chosen |
-| C5 — also retire unit 10's two static terms, which C4 subsumes | The owner's pick names the narrowing ("(c) Narrow + receipt probe"), and unit 10's AC15 and parent-home row read those terms. Keeping them costs two `exists` calls | Rejected; kept |
+| C5 — also retire unit 10's two static terms, which C4 subsumes | The owner's pick names the narrowing ("(c) Narrow + receipt probe"), and unit 10's AC15 and parent-home row read those terms. Keeping them costs two `exists` calls | Rejected; kept. Taken by `TOOL-dRedressedBar-28`, at its §8 F1, once the install-prefix ban counted the parent home's spelling. C4 subsumes the terms in every state that unit measured but the two its §4 names |
 | C6 — extract a stderr-tail helper for S3 | `govkit.py` spells the idiom six ways (`:5916`, `:6219`, `:6590`, `:6899`, `:11019`, `:13200`). One helper for all six is its own mechanism, and a new function stales `symbols.json` after unit 7's regen | Rejected; handed off |
 | C7 — `classify_outcome` refuses any block carrying an unknown key at run time | Descriptors come only from gov's tree, and S4's key rule grades the whole class at the bar | Rejected as YAGNI |
 
@@ -352,8 +355,8 @@ Each candidate was written down with the test that could make it lose, and the p
   escapes the tree is skipped, never followed. That containment covers receipt rows only
   (`tools/govkit/govkit.py:222`). The resolver's two static probes, `<here>/hooks` and
   `<here>/../hooks` (`:224`), carry none, so with `prefix` at `.` the term's second static probe may
-  leave the tree, as unit 10's parent-home `must_not_exist` term may. Each fails closed there: a
-  hook in the target's parent makes the term refuse an exit unit 9 accepted, never accept one. S3
+  leave the tree, as unit 10's parent-home `must_not_exist` term could until `TOOL-dRedressedBar-28`
+  took it out of the block. The term fails closed there: a hook in the target's parent makes the term refuse an exit unit 9 accepted, never accept one. S3
   prints, verbatim
   and to the operator's terminal, the last three stderr lines of whichever adopter CONFIGURE or the
   gained loop refuses, as the regenerate site already does. So its producers are every shipped
@@ -525,6 +528,16 @@ none
   that a first `apply` never reaches the "With no receipt" reading above it. That reading describes
   the base, and its paragraph is not edited. The base line citations are unchanged. Unit 14's write
   is cited by its spec's S1, because unit 14 is not built yet. No scope or criterion moves.
+- rev-7 · 2026-10-16 · §3 · §4 · §5 · a records fix for TOOL-dRedressedBar-28, written by that
+  unit's spec-writer pass `<w28>`. The status stays CLOSED. That unit takes unit 10's two static
+  terms out of the code-2 block. The install-prefix ban counts the parent home's spelling, no drained
+  token names the prefix's parent, and this unit's term asks both homes. §3 Edges gain the hands-off
+  to `TOOL-dRedressedBar-28`. §4 row C5 keeps its rejection and adds that unit 28 took it, at its §8
+  F1, and that C4 subsumes the terms in every state unit 28 measured but the two its §4 names. §5
+  security no longer states that unit 10's term may leave the tree as a peer of this unit's. It says
+  the term could until unit 28 took it out, and that this unit's term fails closed there. S2, §4
+  "The term" and AC1 record the block as this unit built it, and do not move. No scope or criterion
+  moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-28 — install-prefix's two hits at the landing: settings-merge's static absence terms give way to the resolver term, and unit 14's measured landing is spelled through `{prefix}`
 
-**Status:** SPECCED · rev-1 · 2026-10-16 · node d · Tier-2 · base ebce889c · streams tooling · order 22
+**Status:** SPECCED · rev-2 · 2026-10-16 · node d · Tier-2 · base ebce889c · streams tooling · order 22 · ratified 2026-10-16
 
 <!-- gen:spec-records -->
 
@@ -87,8 +87,8 @@ rests on unit 11's resolver term alone, which already asks every home the adopte
   would leave an accepted stop declared by a presence alone, and the matrix's REFUSED rows would read
   ACCEPTED. Its spec's row C5 and §5 clause are what `<w28>` corrects.
 - **hands-off** external — the divergence between the term's lexical `<here>` and the adopter's
-  resolved directory on a target whose prefix directory is a symlink or a junction, for the owner to
-  schedule as §8 F1 option (b) or to record.
+  resolved directory on a target whose prefix directory is a symlink or a junction. Per §8 F1, the
+  build's wrap-up carries it to the owner as a follow-up, option (b).
 
 ## 4. Design
 
@@ -325,7 +325,7 @@ Each candidate was written down with the test that could make it lose, and the p
 
 | Candidate | The test that rejected it | Verdict |
 |---|---|---|
-| C1 — the whole `must_not_exist` term out of the block | rows 1 to 10 and 13 to 14 equal, rows 11 and 12 toward the adopter, the POSIX residual named | Chosen, pending F1 |
+| C1 — the whole `must_not_exist` term out of the block | rows 1 to 10 and 13 to 14 equal, rows 11 and 12 toward the adopter, the POSIX residual named | Chosen (§8 F1) |
 | C2 — only the parent-home element out, unit 9's first element kept | row 11 stays REFUSED while row 12 reads ACCEPTED: one block reading the resolver's two static homes by two file tests, two answers to one question | Rejected |
 | C3 — the parent-home element respelled through a drained token | no context token names the prefix's parent (`tools/govkit/govkit.py:1433-1495`), and every spelling reaches `hooks/agent-cap.js` after `../`, which the counter probe counts on the shipped line | Fails the brief's acceptance |
 | C4 — the `h` of the parent-home `hooks` written as a TOML unicode escape (a backslash, then `u0068`), which rule 3's lookbehind does not see | the counter probe reads it clean (measured). It keeps the literal the ban exists to refuse, an exemption a pass grants itself, which the checker's header rules out | Rejected by the charter's gate rule |
@@ -447,6 +447,10 @@ and AC2 observes the states its settings-merge arms stage. This unit adds no arm
   narrowing in force as behaviour at every state this tree's arms and fixtures stage. It spends no
   unit on a configuration no install has been observed in, whose Windows half already stands. (b)
   is the follow-up if the owner wants the linked-prefix case closed.
+  RESOLVED (agent, 2026-10-16, delegated): (a). Decided by the build's main loop under the owner's
+  2026-10-16 ask "land it without self tests", as relayed to this spec's writer at `<w28>`. Option
+  (c) cannot land. Option (b) is an owner turn, so it goes to the build's wrap-up as a follow-up and
+  not into this build. S1 to S4 stand as written.
 
 ## 9. Revision log
 
@@ -455,6 +459,11 @@ and AC2 observes the states its settings-merge arms stage. This unit adds no arm
   plus one POSIX state the host cannot stage. Both respellings and four rejected candidates were run
   through the checker's own counter. One fork, F1, is left to the owner because the change takes out
   the spelling of an owner pick.
+- rev-2 · 2026-10-16 · §8 · §3 · §4 · F1 resolved as (a), marked `RESOLVED (agent, 2026-10-16,
+  delegated)`. The main loop decided it under the owner's 2026-10-16 ask "land it without self
+  tests". Option (b) goes to the build's wrap-up as a follow-up. The §3 external hand-off says so,
+  §4 row C1 reads "Chosen (§8 F1)", and the header carries `ratified 2026-10-16`. Written at
+  `<w28>`, alongside S4. No scope or criterion moves.
 
 ## 10. Reuse audit
 

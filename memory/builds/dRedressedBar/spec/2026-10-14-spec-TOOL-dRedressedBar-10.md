@@ -1,6 +1,6 @@
 # TOOL-dRedressedBar-10 — the round-1 spec audit's 12 mediums and 11 lows, batched: each criterion observed in a form that can pass and fail, each false sentence corrected, and settings-merge's accepted stop narrowed
 
-**Status:** CLOSED · rev-6 · 2026-10-14 · node d · Tier-2 · base ebce889c · streams tooling · order 6 · ratified 2026-10-14
+**Status:** CLOSED · rev-7 · 2026-10-16 · node d · Tier-2 · base ebce889c · streams tooling · order 6 · ratified 2026-10-14
 
 <!-- gen:spec-records -->
 
@@ -219,6 +219,9 @@ names its own id.
   leaves, the criterion halves of AC3, AC5, AC8 and AC12 in a form that can fail, and S17's spec-9
   half. It corrects this spec's §1, §3, §4, §5, §7 and §10 in one rev bump. It derives the
   parent-home matrix row's path through `resolve_prefix_token`.
+- **hands-off** `TOOL-dRedressedBar-28` — the parent-home element of the code-2 `must_not_exist`
+  list, which that unit takes out of the block because no drained spelling names the prefix's
+  parent, and the parent-home row of `check_outcome_states`, which its AC3 reads unchanged.
 
 ## 4. Design
 
@@ -599,6 +602,12 @@ revision lines at `<s10>`.
   12 moved `tools/govkit/govkit.py` and `tools/govkit/matrix.py`: the class rule the report cites at
   `matrix.py:181-185` is at `:216-221`, and the unguarded exists test it cites in
   `govkit.py:6311-6325` is at `:6345`.
+- rev-7 · 2026-10-16 · §3 · a records fix for TOOL-dRedressedBar-28, written by that unit's
+  spec-writer pass `<w28>`. The status stays CLOSED. §3 Edges gain the hands-off to
+  `TOOL-dRedressedBar-28`. That unit takes the parent-home element of the code-2 list out of the
+  block, because the install-prefix ban counts its spelling and no drained token names the prefix's
+  parent; unit 11's resolver term still refuses that home. No scope, design or criterion moves:
+  S22, §4 and AC15 to AC17 record the block as this unit built it.
 
 ## 10. Reuse audit
 
