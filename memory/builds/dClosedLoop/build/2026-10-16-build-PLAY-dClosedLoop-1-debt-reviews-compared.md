@@ -37,7 +37,8 @@ script that wrote them, are in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-r
   report is not evidence.
 - **One at a time.** No more than five agents run at once, the review protocol's at-once bound, and one
   run already reaches five. So the twelve run in the table's order, each after the one before returns,
-  as dispatches 57 and 58 did.
+  as dispatches 57 and 58 did. The owner opened the systems round while dispatch 62 ran, so its two
+  research waves run between dispatches 62 and 63.
 - **The spec audits' opt-in.** This build's README carries `spec-audit:` under `authorized-by: prompt`,
   and agent-cap admits no audit on a key under that mode. So, as for dispatches 39 to 46, the README's line
   is set aside and `.unattended.conf` dates `SPEC_AUDIT_DEFAULT` around each spec audit's dispatch call,

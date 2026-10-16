@@ -134,6 +134,16 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 70 | the same | The library round's fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-library-followup]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library-followup-b.md` |
 | 71 | the same, round 3 with round 2's 24 confirmed findings as `priorFindings` | The expansion round's follow-up fold, run A: `67c79f7cc..5e139d377` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-expansions-fold-round3]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-a.md` |
 | 72 | the same | The expansion round's follow-up fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-expansions-fold-round3]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-b.md` |
+| 73 | gov-researcher, at its declared medium effort | The tag system, run A, in the first wave | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-22-researcher.md` | 1799cb98 | queued | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-tags-a.md` |
+| 74 | the same | The tag system, run B, from the same handoff, in the second wave | the same | 1799cb98 | queued | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-tags-b.md` |
+| 75 | gov-researcher, at its declared medium effort | Code annotations and commentary, run A, in the first wave | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-23-researcher.md` | 1799cb98 | queued | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-annotations-a.md` |
+| 76 | the same | Code annotations and commentary, run B, from the same handoff, in the second wave | the same | 1799cb98 | queued | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-annotations-b.md` |
+| 77 | gov-researcher, at its declared medium effort | The instruction writing system, run A, in the first wave | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-24-researcher.md` | 1799cb98 | queued | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-instruction-writing-a.md` |
+| 78 | the same | The instruction writing system, run B, from the same handoff, in the second wave | the same | 1799cb98 | queued | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-instruction-writing-b.md` |
+| 79 | gov-researcher, at its declared medium effort | Role workflow shapes, run A, in the first wave | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-25-researcher.md` | 1799cb98 | queued | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-role-shapes-a.md` |
+| 80 | the same | Role workflow shapes, run B, from the same handoff, in the second wave | the same | 1799cb98 | queued | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-role-shapes-b.md` |
+| 81 | gov-researcher, at its declared medium effort | Memory structure, run A, in the first wave | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-26-researcher.md` | 1799cb98 | queued | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-memory-structure-a.md` |
+| 82 | the same | Memory structure, run B, from the same handoff, in the second wave | the same | 1799cb98 | queued | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-memory-structure-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1216,6 +1226,18 @@ Dispatch 61, `lexicon-a`, derived from its Workflow run the same way:
   chain's next round with its confirmed set. `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared.md` holds the runs,
   and its instruments record holds the args.
 
+- 2026-10-16, session 1799cb98: the owner said, verbatim: "More systems need to be included for
+  design/review: * Tag system. How will tagging work, what will make it efficient across all layers? *
+  Code annotations/commentary - what is the design that ties in with the instruction layer to make code
+  commentary as efficient orientation point as possible? * Instruction layer writing system - what will
+  make it more efficient than the current prose? Will there be an instruction templating system, that
+  will be enforced across the entire design? * Role workflow shapes - what are the most efficient
+  workflow shapes to drive work by role? * Memory structure - how to make it more efficient compared to
+  the current implementation? Reduce unnecessary load on the read path? What does memory system
+  currently lack?" `build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md` opens the round: handoffs 22
+  to 26, one per system, each run twice as dispatches 73 to 82, in two waves of five between dispatches
+  62 and 63.
+
 - 2026-10-16, session 1799cb98: dispatch 61 returned CLEAN WITH FIXES: 47 of 53 findings confirmed,
   36 items (3 high, 21 medium, 12 low), 11 agents, 206.1k out tokens (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-a.md`).
 
@@ -1650,6 +1672,12 @@ Runs, 2026-10-14:
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-state.md` | The owner's question on the rearchitecture's state, answered from the records: the deliverables, the text no review has read, what no answer settles, two stale open lists and what remains, with the probes and their runs. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared.md` | The six unreviewed pieces' twelve runs, how they run, and their comparison once they return. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` | Those runs' args, verbatim, with the script that wrote them and the pair check. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md` | The systems round: the owner's words, what the design already holds for each of the five systems, the research and its method, and later the agreement and the design. |
+| `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-22-researcher.md` | The the tag system research handoff, run twice. |
+| `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-23-researcher.md` | The code annotations and commentary research handoff, run twice. |
+| `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-24-researcher.md` | The the instruction writing system research handoff, run twice. |
+| `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-25-researcher.md` | The role workflow shapes research handoff, run twice. |
+| `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-26-researcher.md` | The memory structure research handoff, run twice. |
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | The library pass's research handoff: the four filling paths and two placements. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` | The library round's review, a light diff review over KN-1's fold, the library design and its settlement, as its synthesizer wrote it. |
