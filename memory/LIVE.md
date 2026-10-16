@@ -4,7 +4,7 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-10-16, the newest record date in this tree (dClosedLoop).
+Dormant: no record dated within 21 days of 2026-10-17, the newest record date in this tree (dClosedLoop).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
@@ -12,7 +12,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 |---|---|---|---|---|---|---|---|---|
 | [aOrientedCast](builds/aOrientedCast/README.md) | OPEN | a | 2026-10-11 | tooling+kickoff+playbook | 33 | 2026-10-13 | active | 0 |
 | [aRoutedQuill](builds/aRoutedQuill/README.md) | DEFERRED | a | 2026-10-09 | tooling+kickoff+playbook+deployer | 15 | 2026-10-10 | active | 0 |
-| [dClosedLoop](builds/dClosedLoop/README.md) | OPEN | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 1 | 2026-10-16 | active | 0 |
+| [dClosedLoop](builds/dClosedLoop/README.md) | OPEN | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 1 | 2026-10-17 | active | 0 |
 | [dPinnedHandoff](builds/dPinnedHandoff/README.md) | SPECCED | d | 2026-09-22 | tooling | 3 | 2026-09-28 | active | 0 |
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 | 2026-08-08 | dormant | 1 |
 | [aDeclaredBound](builds/aDeclaredBound/README.md) | OPEN | a | 2026-08-18 | tooling | 6 | 2026-08-18 | dormant | 0 |
