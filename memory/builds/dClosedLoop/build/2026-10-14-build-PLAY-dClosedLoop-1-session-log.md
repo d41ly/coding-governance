@@ -1422,6 +1422,11 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
 - 2026-10-17, session 1799cb98: dispatches 83 and 84 returned, the retrofit research's runs A and B, each
   filed verbatim with both runs' instruments. Review dispatch 66, the runtime fold's run B, goes out.
 
+- 2026-10-17, session 1799cb98: the retrofit record gains the design, based on what the two runs agree
+  on. Retrofit is a system across the layers with its ledger in the core: one baseline primitive, seeded
+  at every check's registration, a drain on touch capped per unit, and `origin` on every record. The
+  cadence sweep is an observability option. Six forks go to the owner, RF-1 to RF-6.
+
 ## Instruments
 
 ### The gap-ownership join
