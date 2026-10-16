@@ -1650,12 +1650,12 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
     var designed = expansions.filter(function (l) { return PROG[l.tag]; });
     var reviewed = designed.filter(function (l) { return PROG[l.tag].reviews.length; });
     head.appendChild(el('p', { class: 'lede' }, 'Each core layer was drafted with the owner, reviewed twice at Tier 2 and folded. The library side opened after KN-1: ' + esc(libraryState().replace(/^./, function (c) { return c.toLowerCase(); })) + ' ' +
-      (designed.length ? esc(designed.length + ' of ' + expansions.length + ' expansions designed, ' + reviewed.length + ' reviewed.') : 'The expansions come last.')));
+      (designed.length ? esc(designed.length + ' of ' + expansions.length + ' expansions proposed, ' + reviewed.length + ' reviewed.') : 'The expansions come last.')));
     v.appendChild(head);
     var rail = el('div', { class: 'rail' });
     function progressCard(p, meta) {
       var c = el('button', { class: 'panel step-card', type: 'button' });
-      var pill = p.folded ? ['done', 'reviewed ×' + p.reviews.length + ' · folded'] : p.reviews.length ? ['open', 'in review'] : ['open', 'designed · review owed'];
+      var pill = p.folded ? ['done', 'reviewed ×' + p.reviews.length + ' · folded'] : p.reviews.length ? ['open', 'in review'] : ['open', 'proposed · review owed'];
       c.innerHTML = '<span class="sc-name">' + esc(p.layer) + '</span><span class="state-pill ' + pill[0] + '">' + esc(pill[1]) + '</span><span class="sc-meta">' + esc(meta || plural(p.records.length, 'design record')) + '</span>';
       c.addEventListener('click', function () { select('layer', p.layer); });
       return c;
