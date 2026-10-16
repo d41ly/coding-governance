@@ -9,6 +9,10 @@ interactions, the coordination and orientation records) under the `standard` pre
 is silent or contradicts itself, the trace says so in place and collects it under `[holes]`. Agent
 roles per item are not yet designed, so the actors named are today's roles, marked as placeholders.
 
+Revised: 2026-10-16, the stale sweep: roles per item are designed since, in layer-roles' roster and flow-steps'
+item tables, and the holes H1 to H16 are settled in
+`build/2026-10-15-build-PLAY-dClosedLoop-1-flow-roles.md` `[closed]`.
+
 ## [setup] The example
 
 - **The repository**: gov itself. Two nodes are live: `d`, the owner's machine, and `a`.

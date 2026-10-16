@@ -379,6 +379,8 @@ confirmed, in 18 items. Ids 11, 14 and 17 were refuted. Each item went here:
   design record's prose; the joins owed beside `gap-flow-15` stay the machine checks.
 - **Four map rows moved to `amend, gap`:** `lander-seams`, `lander-exit-classes`,
   `flakes-quarantine-seam` and `record-concurrent-mint`, so `[folded]` was derived again.
+- **No round has reviewed these fixes.** The fold is `1bc4883fe`, and the library review's range
+  starts at it, so that review read none of it (the stale sweep, 2026-10-16).
 
 ## [map-instruction] The instruction layer's findings, placed
 

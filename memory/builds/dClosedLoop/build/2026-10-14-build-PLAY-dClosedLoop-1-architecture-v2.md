@@ -318,6 +318,9 @@ Revised: 2026-10-16, after the follow-up round (`reviews/2026-10-16-review-PLAY-
 - dDeclaredLoop's core-only preset load is seen red both ways, and dWellOiledMachine owes event waits
   and their ceiling sweep.
 
+Revised: 2026-10-16, the stale sweep: `[owed]` gains gap-orient-08, which orientation's rule moves with the executor,
+and RT-3 placed the executor in dWellOiledMachine.
+
 ## [layers] The product's layers
 
 A layer is a capability named by a tag. A kit implements layers, and its descriptor declares the layer
@@ -1028,3 +1031,6 @@ out with the owner's ratification and confirms dPolishedVitrine's track, which w
   the charter renders the repository's preset. Yet the policy file, its schema, its one reader and the
   guard land with dDeclaredLoop, dOrderedCharter's child. The re-cut moves the policy file, schema and
   reader into dOrderedCharter, or orders those units after dDeclaredLoop.
+- **gap-orient-08 follows the executor.** Orientation's rule moves it with the executor when the
+  re-cut places the executor outside dDeclaredLoop (`build/2026-10-14-build-PLAY-dClosedLoop-1-orientation.md`
+  `[gaps]`), and RT-3 placed it in dWellOiledMachine. The re-cut moves gap-orient-08 there.

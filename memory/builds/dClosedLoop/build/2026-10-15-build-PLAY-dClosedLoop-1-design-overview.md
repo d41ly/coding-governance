@@ -6,6 +6,10 @@ Composed 2026-10-15 for the owner's question "How does the product design look l
 from the records at `2323a2a23`. This is a snapshot. Each section names the record that owns its
 content, and where the two differ, that record wins.
 
+Revised: 2026-10-16, the stale sweep: the Closed Loop Atlas, generated from every record in this folder by
+`build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py`, is the living overview. This record stays the
+2026-10-15 snapshot: three layers and eleven chain builds then, eight layers and fifteen builds now.
+
 The two diagrams shown with the answer are kept beside this record:
 - `build/2026-10-15-build-PLAY-dClosedLoop-1-design-overview-layers.svg`;
 - `build/2026-10-15-build-PLAY-dClosedLoop-1-design-overview-cycle.html`.
@@ -190,6 +194,19 @@ Owned by v2's `[chain]`. The join against the register shows 97 gaps, each owned
 | dConvergedCharter | Convergence | dScopedBuild, dShippedRelease, dCalibratedLens | 3 |
 
 ## [open] What is still open
+
+Revised: 2026-10-16, the stale sweep. Every item below has settled or moved since this snapshot:
+- K1 was confirmed on 2026-10-15 (v2's "Revised: 2026-10-15, K1 confirmed").
+- RT-3 gave the executor and its checklist engine to dWellOiledMachine. Runtime's `[spawn]` holds the
+  executor's harness, the landing queue stays Deploy's, and Runtime's `[sessions]` disposes the
+  compaction checks (v2 `[owed]`).
+- gap-orient-08 moves with the executor at the re-cut, as orientation's rule says, and v2 `[owed]`
+  carries it.
+- The flow steps' polish ran as the flow layer's round:
+  `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-flow.md`, then
+  `build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md`, which defines each step item by item.
+- What is open now is v2's `[open]` and `[owed]`. What remains, in order, is
+  `build/2026-10-16-build-PLAY-dClosedLoop-1-state.md` `[next]`.
 
 - **K1**, the reading of `core.bypass`, awaits the owner's confirmation.
 - **v2's `[open]`** holds interpretations to confirm at chain approval: positional references beyond

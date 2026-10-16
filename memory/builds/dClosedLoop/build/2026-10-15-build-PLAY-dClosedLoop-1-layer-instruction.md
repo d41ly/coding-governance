@@ -679,6 +679,11 @@ not yet walked:
 A third key, `instructions.proof`, joined at the fold (R-I). Its default is `tty-cli`, with `signed`
 and `both` allowed, and presets never touch it.
 
+Revised: 2026-10-16, the stale sweep: LR-1 walked `instructions.checks`
+(`build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared.md` `[answers]`): a principle's
+check softens by policy and is never skipped, and `velocity` keeps `warn`. `instructions.edit`'s
+alternatives are still not walked.
+
 **The register** gains `gap-found-09` to `gap-found-17`:
 - dOrderedCharter owns 09, 10, 11, 14, 15 and 17;
 - dConvergedCharter owns 12 and 13;

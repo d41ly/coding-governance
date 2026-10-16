@@ -48,6 +48,10 @@ LAYER_RECORDS = {
     "observability": ["layer-expansions"],
     "integrations": ["layer-expansions"],
     "distribution": ["layer-expansions"],
+    # Two designs outside the eight layers, each audited on its own record. Their rows are keyed by no
+    # layer tag, so the progress view draws them apart from the layers.
+    "lexicon": ["lexicon"],
+    "review system": ["review-system"],
 }
 STEPS = ["entry", "plan", "design", "build", "test", "deploy", "breakpoint", "lifecycle"]
 KINDS = ("command", "executor", "hook", "owner")

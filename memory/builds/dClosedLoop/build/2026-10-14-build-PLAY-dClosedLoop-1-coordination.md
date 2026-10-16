@@ -160,6 +160,10 @@ mechanisms that read settled answers are listed under `[interpretations]` for co
   checklist) has no owning chain build yet. The re-cut assigns it to one, so no live build working on
   the unattended kit is counted on either.
 
+Revised: 2026-10-16, the stale sweep: RT-3 gave the executor and its checklist engine to dWellOiledMachine, a chain
+build (v2 `[owed]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md`), so no live build is
+counted on for it.
+
 ## [interpretations] For the owner to confirm at chain approval
 
 Each reads a settled answer into a mechanism; v2's `[open]` lists them too.

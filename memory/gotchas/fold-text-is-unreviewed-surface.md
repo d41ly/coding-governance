@@ -42,6 +42,12 @@ A merge resolution is fold text too. On `dLoggedFlight` the resolution of a conf
 Skill kept one side's sentence and the other side's mechanism, and dropped a guard neither side meant
 to drop. No round read it until the closing diff review named the reconcile in its scope (R2-L3).
 
+A fold can also go unreviewed by position. On `dClosedLoop`, 2026-10-16, the layers round's follow-up
+fold, `1bc4883fe`, was the base of the next review's range, the library round's `1bc4883fe..aa9639d98`.
+A range excludes its base, so that review read none of the fold, and no record named the debt. The
+probe that found it found two more unreviewed folds and three designs no review had read
+(`memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-state.md` `[unreviewed]`).
+
 ## The fix
 
 **No machine gate**, and this is a documented check rather than an unwritten one. Nothing static can
@@ -71,6 +77,12 @@ Four practices, each earned by one of the shapes above:
   them for the old value's pronoun forms too (`it`, `the flag`), not only its spelling, and a fold
   that widens a claim from one value to two re-reads the code path for the SECOND value, not only
   the ruling behind the first (`dAlignedCarrier`'s closing review, round 2, L3 and M2).
+
+**A fold's review is a fact of the history, so check it there.** Each report's Reviewed line is a
+blob set or a range, and a range excludes its base. A fold commit at a range's base, or outside every
+range, is unreviewed however many rounds ran around it. `coverage.py`, in the state record's
+`[instrument]`, reads every report's line and names each such commit, with two reviewed commits as
+its controls.
 
 The round that follows a fold should be primed AT the fold rather than at the document: pass it the
 previous round's confirmed set, tell it the diff under review is the fold, and require the by-kind

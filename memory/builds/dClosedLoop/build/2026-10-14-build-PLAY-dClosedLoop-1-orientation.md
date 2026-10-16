@@ -239,6 +239,9 @@ dDeclaredLoop, the flow's build; briefs (07) to dOrderedCharter; allowances (09)
 memory's dead pointers (10) to dTendedCadence. The executor's home is still owed to the chain re-cut,
 and `gap-orient-08` moves with the executor if the re-cut places it elsewhere.
 
+Revised: 2026-10-16, the stale sweep: RT-3 placed the executor in dWellOiledMachine, so the re-cut moves
+`gap-orient-08` there from dDeclaredLoop. v2 `[owed]` carries the move.
+
 ## [forks] Asked, 2026-10-14
 
 **OR-1. "A request names no build and the session holds no build's lease. How is it placed by

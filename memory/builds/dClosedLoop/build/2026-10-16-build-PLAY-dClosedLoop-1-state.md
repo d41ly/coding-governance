@@ -92,14 +92,18 @@ v2 `[owed]` and `[open]` carry these to the chain re-cut, and none has an answer
 - the interpretations to confirm at chain approval: positional references beyond `§`, and the
   coordination record's interpretations;
 - every chain build's planned units, for the eight core points and the three expansion designs;
-- dMindYourWords' second-wave packs, which wait for an adopter census and so for the owner's ask.
+- dMindYourWords' second-wave packs, which wait for an adopter census and so for the owner's ask;
+- `instructions.edit`'s alternatives, `flow-only` and `command-for-all`, which the owner has not
+  walked: its default comes from the owner's words (layer-instruction).
 
-v2 decides two more, and the re-cut applies them to `[chain]`:
+Three more are decided, and the re-cut applies them to `[chain]`:
 - dTotalRecall lands ahead of dIndexedDesign and dTendedCadence, which consume what it builds.
   `[chain]` already orders dTendedCadence after it, through dWellOiledMachine, but gives dIndexedDesign
   only dDeclaredLoop as its parent.
 - The deployer's and the maintainer's definitions move to the builds that deliver integrations and
   observability, and dBoundRoles keeps their registration.
+- gap-orient-08 moves from dDeclaredLoop to dWellOiledMachine: orientation's rule moves it with the
+  executor, and RT-3 placed the executor there. v2 `[owed]` carries it since the stale sweep.
 
 ## [stale] Records that still list settled items as open
 
@@ -107,6 +111,11 @@ v2 decides two more, and the re-cut applies them to `[chain]`:
   2026-10-15: "the violator pays".
 - design-overview `[open]` and coordination `[owed]` say the executor and its checklist engine have no
   owning build. RT-3 gave them to dWellOiledMachine (v2 `[owed]`).
+
+Revised: 2026-10-16, the stale sweep: both records now carry dated notes saying what settled and where, as do
+orientation `[gaps]`, the session model, layer-instruction's two policies, and the runtime and layers
+comparison records. The atlas shows the lexicon and the review system, and the two items above it
+missed sit in `[undecided]`.
 
 ## [next] What remains, in order
 

@@ -1657,8 +1657,13 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
     var xState = !designed.length ? 'The expansions come last.' : reviewed.length < designed.length ?
       designed.length + ' of ' + expansions.length + ' expansions proposed, ' + reviewed.length + ' reviewed.' :
       designed.length + ' of ' + expansions.length + ' expansions designed, reviewed ' + (rounds === 1 ? 'once' : rounds === 2 ? 'twice' : rounds + ' times') + ' at Tier 2' + (foldedX.length === reviewed.length ? ' and folded.' : '.');
+    // The designs outside the eight layers: progress rows keyed by no layer tag.
+    var outside = D.progress.filter(function (p) { return !LAYER[p.layer]; });
+    var oState = outside.map(function (p) {
+      return p.layer + (p.folded ? ' reviewed ×' + p.reviews.length + ' and folded' : p.reviews.length ? ' reviewed ×' + p.reviews.length + ', its fold owed' : ' never reviewed');
+    }).join('; ');
     head.appendChild(el('p', { class: 'lede' }, 'Each core layer was drafted with the owner, reviewed twice at Tier 2 and folded. The library side opened after KN-1: ' + esc(libraryState().replace(/^./, function (c) { return c.toLowerCase(); })) + ' ' +
-      esc(xState)));
+      esc(xState) + (outside.length ? ' Outside the layers: ' + esc(oState) + '.' : '')));
     v.appendChild(head);
     var rail = el('div', { class: 'rail' });
     function progressCard(p, meta) {
@@ -1675,6 +1680,13 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
       (lr.open.length ? '<span class="state-pill open">owes ' + lr.open.length + '</span>' : '') + '</span><span class="sc-meta">replaces the Knowledge layer (KN-1)</span>';
     lib.addEventListener('click', function () { select('layer', 'memory'); });
     rail.appendChild(lib);
+    outside.forEach(function (p) {
+      var c = el('button', { class: 'panel step-card', type: 'button' });
+      var pill = p.folded ? ['done', 'reviewed ×' + p.reviews.length + ' · folded'] : p.reviews.length ? ['open', 'in review'] : ['open', 'review owed'];
+      c.innerHTML = '<span class="sc-name">' + esc(p.layer) + '</span><span class="state-pill ' + pill[0] + '">' + esc(pill[1]) + '</span><span class="sc-meta">a design outside the layers</span>';
+      if (p.sections.length) c.addEventListener('click', function () { openRecord(p.sections[0].path, p.sections[0].id); });
+      rail.appendChild(c);
+    });
     expansions.forEach(function (l) {
       if (PROG[l.tag]) { rail.appendChild(progressCard(PROG[l.tag], 'an expansion · ' + plural(PROG[l.tag].records.length, 'design record'))); return; }
       var c = el('button', { class: 'panel step-card', type: 'button' });

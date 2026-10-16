@@ -243,6 +243,9 @@ These are the main loop's own additions. No skeptic has tried to refute them.
   session start per agent instead. The fold registers it as a second backend, and the spike measures
   both before the build picks one.
 
+Revised: 2026-10-16, the stale sweep: no review has read the fold itself, `2dbf8f26f`, or the two settlements
+after it, `e30f0acbd` and `3611a60e9`. The first closing review of a fold came with the layers round.
+
 ## [instrument] The comparison script
 
 Run from the session scratchpad. It is kept here as fenced text, since the lexicon gate grades every tracked Python file.

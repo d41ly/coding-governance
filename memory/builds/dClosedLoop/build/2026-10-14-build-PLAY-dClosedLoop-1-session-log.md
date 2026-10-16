@@ -1160,6 +1160,15 @@ The expansion fold's follow-up round, dispatch 60, derived from its Workflow run
   from the records and the history. No review has read the lexicon, the review system or the runtime
   round's fold, and three folds stand unreviewed: `1bc4883fe`, `0dd962724` and `5e139d377`.
 
+- 2026-10-16, session 1799cb98: the owner said, verbatim: "fix everything that's stale, then review all 6
+  unreviewed pieces - medium effort, twice each." The stale sweep put a dated note on every record that
+  still stated a settled item as open: the design overview, whose head now names the atlas as the
+  living overview; coordination `[owed]`; orientation `[gaps]`; the session model; layer-instruction's
+  two policies; and the runtime and layers comparison records. v2 `[owed]` gains gap-orient-08's move
+  with the executor, which no record had carried forward, and the state record gains it and
+  `instructions.edit`'s unwalked alternatives. The atlas's progress view shows the lexicon and the
+  review system, and `fold-text-is-unreviewed-surface` gains the fold missed at a range's base.
+
 ## Instruments
 
 ### The gap-ownership join
