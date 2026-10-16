@@ -164,7 +164,7 @@ Each design takes what its layer's two runs agree on, resolves a split by the me
 
 ### [core-points] What the core declares so the expansions can attach
 
-P28 lets an expansion attach only where a core layer declares a point. The runs found six points
+P28 lets an expansion attach only where a core layer declares a point. The runs found eight points
 missing. Each lands in the core layer named, and its chain build is in `[gaps-proposed]`.
 
 | Point | Core layer | What registers there | Used by |
