@@ -139,7 +139,8 @@ fail=0
 # 326 -> 339, TOOL-aPairedSlots-15: section 11s's nine checks (TOOL-aPairedSlots-1), which left this
 # floor where it was, and its four ceiling checks, counted off the arm.
 # 388 + 339 -> 401, TOOL-aSparedSpawn-34, the merge of local main: base 326, plus 62 and 13.
-FLOOR_ASSERTIONS=401
+# 401 -> 405, TOOL-dRedressedBar-24 S9: arm 9e2's four, outside the `HAVE_TIMEOUT` gate, counted off the arm.
+FLOOR_ASSERTIONS=405
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -3151,6 +3152,25 @@ wait "$_hvroot" 2>/dev/null
 check_hv_value "AC11 the same reap rooted at a LIVE pid reaches it" "$(kill -0 "$_hvgc" 2>/dev/null && echo alive || echo dead)" dead
 [ -n "$_hvgc" ] && kill -9 "$_hvgc" 2>/dev/null
 
+# 9e2. TOOL-dRedressedBar-24 S9 — A LINK PLANTED IN THE SCRATCH DIR IS NEVER WRITTEN THROUGH. The bar's
+#      scratch dir sits in the shared temp dir, and its leg derives it from the TMPDIR the runner hands
+#      it. The leg hard-links the two names a runner that staged its writes at fixed names there would
+#      write through, leg 0's rc temp and the ledger's merge, to a secret outside the repository, and
+#      writes a marker naming both. A runner that stages at an unpredictable name leaves the secret's
+#      bytes alone, exits 0, and the ledger carries the leg's row. The marker says the plants were made.
+H9e2="$HV/r9e2"; build_hv_repo "$H9e2"
+printf 'SECRET-TOKEN=abc123\n' > "$HV/secret9e2"; cp "$HV/secret9e2" "$HV/secret9e2.keep"
+printf '#!/usr/bin/env bash\nw=${TMPDIR%%/tmp}\nln "$HV_SECRET" "$w/0.rc.tmp" && ln "$HV_SECRET" "$w/ledger.merged" && printf "%%s\\n" "$w/0.rc.tmp" "$w/ledger.merged" > "$HV_MARK"\nexit 0\n' > "$H9e2/fx/plant.sh"
+printf '[{"name": "plant", "argv": ["bash", "fx/plant.sh"]}]\n' > "$HV/plant.json"
+( cd "$H9e2" && git add -A && git commit -qm plant ) >/dev/null 2>&1
+rm -f "$HV/mark9e2"
+run_hv_bar "$H9e2" "$HV/plant.json" HV_SECRET="$HV/secret9e2" HV_MARK="$HV/mark9e2"
+check_hv_value "S9 the leg planted both links and named them" "$(grep -c . "$HV/mark9e2" 2>/dev/null)" 2
+check_hv_value "S9 the secret the links share still holds its bytes" "$(cmp -s "$HV/secret9e2" "$HV/secret9e2.keep" && echo same)" same
+check_hv_value "S9 the bar over the planted links exits 0" "$HV_RC" 0
+check_hv_value "S9 the ledger carries the leg's row" \
+  "$(awk -F'\t' '$1 == "plant" { c++ } END { print c + 0 }' "$H9e2/.git/gate-ledger.tsv" 2>/dev/null)" 1
+
 if [ "$HAVE_TIMEOUT" = 1 ]; then
   # 9f. AC1 and AC2 — A LEG THAT TIMES OUT ONLY BESIDE A SPINNER. The contended leg waits for the
   #     spinner to start, hangs while its flag stands, and passes once the spinner has finished, so
@@ -3233,11 +3253,15 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   run_hv_bar "$H4W" "$HV/lone.json" GATE_SPAWN_FLOOR="$HV/floor-dir" GATE_SPAWN_CMD="bash $HV/slow50.sh"
   check_hv_line "AC4 a directory at the floor path is announced unreadable" '^run-gates: the spawn floor at .*floor-dir cannot be read, so it is treated as absent'
   check_hv_line "AC4 and a double timeout under it reads no HOST" '^GATE FAIL  lone  \(timed out after 1s, again on its serial retry; the spawn floor could not be read, so HOST was not measured\)$'
-  # ...and a temp path staged as a DIRECTORY fails the write, announced, the held line untouched.
-  printf '9999.000\t2026-01-01T00:00:00Z\n' > "$HV/held"; cp "$HV/held" "$HV/held.keep"; mkdir -p "$HV/held.tmp"
-  run_hv_bar "$H4W" "$HV/bounded.json" GATE_SPAWN_FLOOR="$HV/held"
+  # ...and a floor whose NAME is 250 characters fails the write, announced, the held line untouched.
+  #    The file exists, and every temp the runner names beside it is at least 257 characters, past
+  #    the 255 a name component may hold; the temp's name is unpredictable, so no plant can stage
+  #    the failure at it (TOOL-dRedressedBar-24).
+  printf -v _hvlong '%*s' 246 ''; _hvlong="$HV/${_hvlong// /h}held"
+  printf '9999.000\t2026-01-01T00:00:00Z\n' > "$_hvlong"; cp "$_hvlong" "$HV/held.keep"
+  run_hv_bar "$H4W" "$HV/bounded.json" GATE_SPAWN_FLOOR="$_hvlong"
   check_hv_line "AC4 an unwritable floor is announced" '^run-gates: the spawn floor at .*held could not be written, so the floor it held stays in force$'
-  check_hv_value "AC4 and the line it held survives byte-identical" "$(cmp -s "$HV/held" "$HV/held.keep" && echo same)" same
+  check_hv_value "AC4 and the line it held survives byte-identical" "$(cmp -s "$_hvlong" "$HV/held.keep" && echo same)" same
 
   # 9i. AC10 — THE EXIT PRECEDENCE. The only failed leg is HOST while another leg moves a tracked
   #     file: exit 4, the HOST line naming the move. With a third leg failing an assertion: exit 1,
@@ -3408,7 +3432,10 @@ SH
 ( cd "$MP/r" && git add -A && git commit -qm mempause ) >/dev/null 2>&1
 write_mp_meminfo() { printf 'MemTotal: 1000 kB\nMemAvailable: %s kB\n' "$(( (100 - $2) * 10 ))" > "$1"; }
 run_mp_bar() { # run id · manifest · VAR=value… -> MP_OUT (stdout), MP_ERR (stderr) and MP_RC
-  ( cd "$MP/r" && env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_WALL= GATE_SELFTESTS= GATE_ATTRIBUTE= \
+  # MP_BOUND=<s> set by the caller runs the nested runner under `timeout -k 5s <s>`, MP_RC 124 or 137
+  # on expiry; unset, the runner runs exactly as before. Captured to files, the form arm 1c shows a
+  # `timeout` bounds on the clock. Only arm 11g's FIFO read can block forever (TOOL-dRedressedBar-8).
+  ( cd "$MP/r" && ${MP_BOUND:+timeout -k 5s "$MP_BOUND"} env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_WALL= GATE_SELFTESTS= GATE_ATTRIBUTE= \
       GATE_PROFILES= GATE_PROFILE= GATE_JOBS= GATE_MEMPAUSE= GATE_MEMPAUSE_HOLD= GATE_MEMINFO= \
       GATE_TURNSTILE=0 GATE_CGROUP_ROOT="$MP/cg" GATE_RUN_ID="$1" GATE_LEGS="$2" "${@:3}" \
       bash $KIT_REL/run-gates.sh >"$MP/x/out" 2>"$MP/x/err" ); MP_RC=$?
@@ -3595,9 +3622,18 @@ cat > "$MP/x/serve.sh" <<'SH'
 # ROWS, NOT ON A READ COUNT (TOOL-aMeteredSweep-1): an MSYS reader can take two writer opens before
 # its EOF, which advanced a count by two, served 95 % to the second dispatch and opened a second
 # episode, red in two of three quiet runs. A doubled read now serves the same answer twice.
+# IT OUTLIVES MSYS'S FIFO (TOOL-dRedressedBar-8). A loop that re-opened at once died in every scratch
+# run on node d, 2026-10-14: after 31, 31 and 4 reads, twice because an open failed with `No such
+# file or directory` on a FIFO that exists and `|| exit 0` ended it, once because a write met a
+# reader that had left and SIGPIPE killed it, 141. A dead server leaves the runner's next dispatch
+# decision blocked opening a FIFO with no writer, which held the canary to its ceiling. So SIGPIPE is
+# ignored and a failed open retries after 0.1 s while the FIFO exists: that alone lived through 300
+# reads in two runs, but 12 and 1 of them came back empty. With 0.2 s after each answer before the
+# next open, all 300 carried a reading in two runs, with no failed open and no failed write.
+trap '' PIPE
 f=$1; await=$2; go=$3; shift 3; held=""
-while :; do
-  exec 3>"$f" || exit 0
+while [ -p "$f" ]; do
+  exec 3>"$f" || { sleep 0.1; continue; }
   pct=10
   for t in "$@"; do [ -f "$t" ] && pct=95; done
   if [ "$pct" = 95 ] && [ -z "$held" ]; then
@@ -3607,20 +3643,40 @@ while :; do
   fi
   printf 'MemTotal: 1000 kB\nMemAvailable: %s kB\n' "$(( (100 - pct) * 10 ))" >&3
   exec 3>&-
+  sleep 0.2
 done
 SH
+# BOUNDED, AND THE SERVER READ BEFORE THE VERDICT (TOOL-dRedressedBar-8). The run's nested bar runs
+# under arm 11c's calibrated wall, so a dead or silent server reds this half inside that bound and
+# names itself, where it used to hold the leg to its ceiling. The wait's own status is the liveness
+# reading, never `kill -0`, which still answers for a child that has exited and not been reaped: 143
+# is this arm's TERM reaching a live server, anything else the status it died with. WHAT THIS DOES
+# NOT CHECK: the bound proves the half ends, not that the forced branch decided, which the verdict
+# check grades. The settle makes a lost answer rare but cannot rule it out under load, and a lost
+# one reds as `[]` rather than hanging. A host with no runnable `timeout -k` skips the half, announced,
+# because an unbounded read of a FIFO is the defect; its count stays above the branch either way.
 n=$((n+1))
-if ! mkfifo "$MP/x/fifo" 2>/dev/null; then
+if [ "$HAVE_TIMEOUT" != 1 ]; then
+  echo "canary: SKIP arm 11g's forced-branch half — this host has no runnable 'timeout -k', so the nested bar that reads the FIFO cannot be bounded"
+elif ! mkfifo "$MP/x/fifo" 2>/dev/null; then
   echo "canary: SKIP arm 11g's forced-branch half — this host has no mkfifo, so the FIFO that holds a decision until the last leg is gone cannot be built"
 else
   run_mp_bar ac14seed "$MP/x/ac14.json" GATE_JOBS=2 GATE_MEMPAUSE=0
   # The trigger is the FIRST quick leg's row, C's or Y's, whichever the seed's ledger dispatched second.
   bash "$MP/x/serve.sh" "$MP/x/fifo" "$(resolve_mp_record ac14)/1.leg" "$MP/x/ac14.go" \
-    "$(resolve_mp_record ac14)/0.leg" "$(resolve_mp_record ac14)/2.leg" >/dev/null 2>&1 & _mpsv=$!
-  run_mp_bar ac14 "$MP/x/ac14run.json" GATE_JOBS=2 GATE_MEMPAUSE=90 GATE_MEMINFO="$MP/x/fifo"
+    "$(resolve_mp_record ac14)/0.leg" "$(resolve_mp_record ac14)/2.leg" >/dev/null 2>"$MP/x/serve.err" & _mpsv=$!
+  _mpa0=$(date +%s)
+  MP_BOUND=$_mpwall run_mp_bar ac14 "$MP/x/ac14run.json" GATE_JOBS=2 GATE_MEMPAUSE=90 GATE_MEMINFO="$MP/x/fifo"
+  _mpas=$(( $(date +%s) - _mpa0 ))
   # A writer blocked opening the FIFO is released by a read-write open, which never blocks itself.
-  kill "$_mpsv" 2>/dev/null; exec 4<>"$MP/x/fifo"; exec 4>&-; wait "$_mpsv" 2>/dev/null
-  if [ "$MP_RC" = 0 ] && [ "$(read_mp_ends ac14)" = "drained " ]; then :; else
+  kill "$_mpsv" 2>/dev/null; exec 4<>"$MP/x/fifo"; exec 4>&-; wait "$_mpsv" 2>/dev/null; _mpsrc=$?
+  if [ "$_mpsrc" != 143 ]; then
+    echo "canary: memory pause — AC14 the FIFO server serve.sh died before the run ended (exit $_mpsrc), so a dispatch decision read a FIFO with no writer; the nested bar exited $MP_RC after ${_mpas}s"
+    sed 's/^/    /' "$MP/x/serve.err" 2>/dev/null; fail=1
+  elif [ "$MP_RC" = 124 ] || [ "$MP_RC" = 137 ]; then
+    echo "canary: memory pause — AC14 the nested bar outlived its ${_mpwall}s bound (exit $MP_RC after ${_mpas}s) with the FIFO server serve.sh alive, so the server stopped answering"
+    fail=1
+  elif [ "$MP_RC" = 0 ] && [ "$(read_mp_ends ac14)" = "drained " ]; then :; else
     echo "canary: memory pause — AC14 the forced branch's held leg closed [$(read_mp_ends ac14)] with exit $MP_RC, wanted [drained ] and 0"
     printf '%s\n' "$MP_OUT" | sed 's/^/    /'; fail=1
   fi

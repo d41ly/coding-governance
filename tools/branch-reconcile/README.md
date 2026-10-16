@@ -1,6 +1,6 @@
 # branch-reconcile — which branches and worktrees landed, and which still hold work
 
-<!-- gov:kit branch-reconcile@1.4 -->
+<!-- gov:kit branch-reconcile@1.5 -->
 
 One command that answers the question an owner keeps asking an agent to answer by hand: which of
 this repository's worktrees, local branches, remote branches and stash entries can go, and which

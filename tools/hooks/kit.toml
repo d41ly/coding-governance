@@ -105,11 +105,15 @@ to = "{prefix}/hooks/format-guard.fragment.json"
 # past the rows it meant to delete. `agent-cap` was then the only descriptor of thirteen
 # carrying neither, and `govkit check <target>` reds on exactly that for every adopter that
 # selected it. Found by the closing review of the build that deleted them.
-argv = ["python", "{prefix}/settings-merge.py"]
-mutates_index = false
-# DEPL-aHalvedInstall-3: why `update` never re-runs this adopter. A kit with an adopter declares
-# [[regenerate]] or this reason, and selfcheck refuses one declaring neither.
-why_no_regenerate = "the adopter merges hook fragments into .claude/settings.json, and update already re-runs that merge for every fragment it lands (its fragment-wiring step), so a second run here would merge the same rows twice"
+#
+# THE ADOPTER IS SETTINGS-MERGE'S (TOOL-dRedressedBar-15). Wiring the built-in `Workflow|Agent`
+# entry is settings-merge.py's default action, and the file is settings-merge's. A copy of its argv
+# here resolved `{prefix}` through THIS entry's table, so `[kit.agent-cap] prefix = "scripts"` ran
+# `scripts/settings-merge.py`, which nothing installed there. `via` runs settings-merge's own
+# adopter at settings-merge's home, its `mutates_index` and `why_no_regenerate` with it, and this
+# entry's descriptor still classifies the exit. It still runs when settings-merge is claimed and
+# not selected, which is the one step that wires the hook then.
+via = "settings-merge"
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a

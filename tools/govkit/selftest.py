@@ -1120,10 +1120,12 @@ def check_fix_carriers(tmp: pathlib.Path) -> None:
     """TOOL-aMendedFleet-64 S7 — `write_version_carriers` over a two-entry fixture, then again.
 
     `vk`'s constant is bumped alone to 1.1. Its same-line copy, a `version:` field matching the OTHER
-    entry's pattern in a file carrying `vk`'s marker, its CRLF README marker and the alias on its own
-    constant line must all move; `wk`'s own field and a decoy carrying no registry marker must not,
-    and a file that does not decode is skipped. A second run rewrites nothing. Skipping the same-line
-    clause leaves `copy.sh` at 1.0 and reds the first assertion.
+    entry's pattern in a file carrying `vk`'s marker that both entries' bases hold, its CRLF README
+    marker and the alias on its own constant line must all move; `wk`'s own field and a decoy
+    carrying no registry marker must not, and a file that does not decode is skipped. The same
+    `version:` field in a file outside `wk`'s basis keeps its number while `vk`'s marker moves
+    (TOOL-dRedressedBar-20). A second run rewrites nothing. Skipping the same-line clause leaves
+    `copy.sh` at 1.0 and reds the first assertion.
     """
     gk = govkit_module()
     fx = tmp / "fix-fx"
@@ -1135,6 +1137,9 @@ def check_fix_carriers(tmp: pathlib.Path) -> None:
         "vk/blob.dat": b"\xff\xfe gov:kit vk@1.0\n",
         "wk/wk.js": b"  version: '2.0', // gov:kit wk@2.0\n",
         "wk/decoy.js": b"  version: '9.9', // gov:kit other@9.9\n",
+        "wk/harness.js": b"  version: '1.0',\n// gov:kit vk@1.0\n",
+        # The stub `derive_tool_root` globs for, so vk's `{prefix}` carrier resolves to this root.
+        f"{gk.GOVKIT_DIR.name}/{gk.REGISTRY_NAME}": b"",
     }
     for rel, data in files.items():
         (fx / rel).parent.mkdir(parents=True, exist_ok=True)
@@ -1143,7 +1148,7 @@ def check_fix_carriers(tmp: pathlib.Path) -> None:
     # `-f`: a machine-global excludes file may ignore `*.dat`, and the basis reads tracked paths only.
     git(fx, "add", "-A", "-f")
     descs = {
-        "vk": ({"id": "vk", "home": "vk",
+        "vk": ({"id": "vk", "home": "vk", "marker_carriers": ["{prefix}/wk/harness.js"],
                 "version_from": {"file": "vk.sh", "pattern": "^KIT_VK_VERSION="}}, "vk/kit.toml"),
         "wk": ({"id": "wk", "home": "wk",
                 "version_from": {"file": "wk.js", "pattern": "version: "}}, "wk/kit.toml"),
@@ -1155,8 +1160,11 @@ def check_fix_carriers(tmp: pathlib.Path) -> None:
         return (fx / rel).read_bytes()
     check("[aMF-64 S2] a same-line constant copy moves with the constant",
           read_fx("vk/copy.sh") == b"KIT_VK_VERSION=1.1   # gov:kit vk@1.1\n", repr(read_fx("vk/copy.sh")))
-    check("[aMF-64 S2] another entry's pattern moves in a file carrying only this entry's marker",
-          read_fx("vk/harness.js") == b"  version: '1.1',\n// gov:kit vk@1.1\n", repr(read_fx("vk/harness.js")))
+    check("[aMF-64 S2] another entry's pattern moves in a file carrying only this entry's marker"
+          " that both entries' bases hold",
+          read_fx("wk/harness.js") == b"  version: '1.1',\n// gov:kit vk@1.1\n", repr(read_fx("wk/harness.js")))
+    check("[dRB-20] another entry's pattern in a file outside that entry's basis is not a carrier",
+          read_fx("vk/harness.js") == b"  version: '1.0',\n// gov:kit vk@1.1\n", repr(read_fx("vk/harness.js")))
     check("[aMF-64 S2] the alias on the constant's own line moves, the constant does not",
           read_fx("vk/vk.sh") == b"KIT_VK_VERSION=1.1   # gov:kit vk@1.1 // gov:kit vk-alias@1.1\n",
           repr(read_fx("vk/vk.sh")))
@@ -1169,7 +1177,7 @@ def check_fix_carriers(tmp: pathlib.Path) -> None:
     check("[aMF-64 S3] a file that does not decode is named and left untouched",
           read_fx("vk/blob.dat") == files["vk/blob.dat"] and "vk/blob.dat" in said.getvalue(),
           said.getvalue())
-    check("[aMF-64 S2] the rewrites are returned one per carrier", len(first) == 7, repr(first))
+    check("[aMF-64 S2] the rewrites are returned one per carrier", len(first) == 8, repr(first))
     with contextlib.redirect_stdout(io.StringIO()):
         second = gk.write_version_carriers(fx, descs, gk.derive_marker_basis(fx, descs))
     check("[aMF-64 S5] a second run over a fixed tree rewrites nothing", second == [], repr(second))
@@ -2762,7 +2770,8 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = 
     With `charter=False` it holds none, and this asserts AC13 instead: the apply still exits 0 through
     the adopter's accepted exit 3, the Skill alone is rendered, and check-wiring names the doc.
     With `runner=True` (TOOL-aOrientedCast-13 AC4) the deploy text also carries a `[gate_runner]`
-    built from the run-gates kit's `[gate_runner_seed]`, so the apply writes the target's own gate
+    built from the run-gates kit's `[gate_runner_seed]`, and the `gate_file` answer codebase-map's
+    leg reads (TOOL-dRedressedBar-3 S3), so the apply writes the target's own gate
     manifest, which holds no lexicon leg; the seed policy's optional lexicon grant must then leave
     the adopter's `--check` and the target's `check_roles.py` at exit 0, the latter with a note.
     WHAT THIS DOES NOT CHECK: the rendered bytes, which the kit's own legs grade, or an update's
@@ -2781,7 +2790,14 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = 
             manifest = vals[0] if k == "file" else manifest
             lines.append('%s = %s' % (k, "[" + ", ".join('"%s"' % x for x in vals) + "]"
                                       if isinstance(v, list) else '"%s"' % vals[0]))
-        deploy = DEPLOY_REGISTRY_DEFAULT.rstrip("\n") + "\n" + "\n".join(lines) + "\n"
+        # TOOL-dRedressedBar-3 S3: a runner renders every selected kit's `[[gate_leg]]`, and
+        # codebase-map's argv carries `{gate_file}`, which intake asks for and the registry default
+        # omits. Unresolved, the LEGS step withholds every leg and writes no manifest. The value is
+        # the descriptor's own `GATE_FILE` default, read rather than typed.
+        gate_file = tomllib.loads((KIT_DIRS["codebase-map"] / "kit.toml").read_text(
+            encoding="utf-8"))["config"]["defaults"]["GATE_FILE"]
+        deploy = (DEPLOY_REGISTRY_DEFAULT.replace("[answers]\n", '[answers]\ngate_file = "%s"\n' % gate_file)
+                  .rstrip("\n") + "\n" + "\n".join(lines) + "\n")
     t = make_target(pathlib.Path(tmp) / ("roles-runner" if runner else "roles-default" if charter
                                          else "roles-no-doc"), deploy)
     # The seed's CHARTER, read from the memory-tree kit's own conf example rather than typed.
@@ -3234,9 +3250,10 @@ def main() -> int:
              "24f39915b3de86010a30d8698d0d4b317db015de", "--", f"{PFX}check-wiring.sh"],
             capture_output=True, text=True).stdout.strip()
 
-        def stale_target(name: str, deploy: str = DEPLOY_FULL) -> pathlib.Path:
+        def stale_target(name: str, deploy: str = DEPLOY_FULL,
+                         kits: str = "check-wiring") -> pathlib.Path:
             t = make_target(tmp / name, deploy)
-            run("apply", "--target", str(t), "--kits", "check-wiring")
+            run("apply", "--target", str(t), "--kits", kits)
             # BOTH identities from OLD, and no row OLD never shipped: `write_vintage_receipt`'s
             # header says why each half is load-bearing. Measured before either: nine arms red on
             # a mixed-vintage row, and 27 on a row invented at a vintage that lacked its file.
@@ -3311,6 +3328,384 @@ def main() -> int:
         p = run("update", "--target", str(up))
         check("a second update over the same target reports current",
               "current" in p.stdout and "stale" not in p.stdout, p.stdout)
+
+        # --- TOOL-dRedressedBar-9. A NARROW RECEIPT'S UPDATE GAINS settings-merge AND COMPLETES.
+        # --- The default set gained settings-merge since OLD and agent-cap is left out for its
+        # --- unmet `kickoff-manifest`, so the gained adopter exits 2 with no hook to wire. The
+        # --- descriptor declares that exit an accepted stop: the run exits 0, re-stamps and claims
+        # --- the entry. A fixture of its own, sharing nothing with the arms above it witnesses. The
+        # --- `means` is read from the descriptor's code-2 block rather than typed here, so the line
+        # --- proves the adopter ran AND the declared stop accepted it; the claim is the half an
+        # --- exit-code-only arm would let a dropped gain pass.
+        rq9 = stale_target("rq9")
+        p9 = run("update", "--target", str(rq9), "--write")
+        rec9 = json.loads((rq9 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        sm9 = govroot / PFX / KIT_NAMES["govkit"] / "entries" / "settings-merge.kit.toml"
+        means9 = [b.get("means") for b in govkit_module().load_toml(sm9).get("outcome", [])
+                  if b.get("code") == 2]
+        check("[dRB-9] update --write over a narrow receipt that gains settings-merge exits 0",
+              p9.returncode == 0, f"rc {p9.returncode} · {(p9.stdout + p9.stderr)[-900:]}")
+        check("[dRB-9] and re-stamps the receipt at the pin",
+              rec9["gov_commit"] == run_gov_git(govroot, "rev-parse", GOV_PIN), rec9["gov_commit"])
+        check("[dRB-9] and the receipt claims settings-merge",
+              "settings-merge" in (rec9.get("kits") or []), str(rec9.get("kits")))
+        check("[dRB-9] and the gained adopter's exit 2 was the descriptor's declared stop",
+              len(means9) == 1
+              and f"default-gained settings-merge: adopter exit 2 — {means9[0]}" in p9.stdout,
+              f"code-2 means {means9} · {p9.stdout[-900:]}")
+        # --- TOOL-dRedressedBar-17 S13. THE GAINED LOOP RESOLVES agent-cap THROUGH `via`. With
+        # --- kickoff-manifest claimed, the update gains BOTH agent-cap and settings-merge, and
+        # --- `[kit.agent-cap] prefix = "scripts"` once made agent-cap's own argv name
+        # --- `scripts/settings-merge.py`, a file nothing installed: two adopter lines, one tail
+        # --- carrying `can't open file`. Through `via` agent-cap runs first and its resolved argv
+        # --- equals settings-merge's, so the dedup leaves ONE line and it is agent-cap's; a loop
+        # --- reading the declared argv leaves settings-merge's. No exit code is asserted: the
+        # --- delegate finds no receipt row for the hook, since the gained loop runs before
+        # --- `update` writes its receipt (unit 14's hand-off, spec 17 §4 "Three choices").
+        rq9p = stale_target("rq9p", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n',
+                            kits="check-wiring,kickoff-manifest")
+        p9p = run("update", "--target", str(rq9p), "--write")
+        p9pout = p9p.stdout.splitlines() + p9p.stderr.splitlines()
+        p9pl = [ln for ln in p9pout if ln.startswith("govkit update — default-gained ")
+                and "adopter exit" in ln and ("agent-cap" in ln or "settings-merge" in ln)]
+        check("[dRB-9] AC13 a per-kit-prefix update gaining agent-cap and settings-merge prints "
+              "exactly one adopter line naming either, and it is agent-cap's",
+              len(p9pl) == 1 and p9pl[0].startswith("govkit update — default-gained agent-cap:"),
+              " | ".join(p9pl) or f"rc {p9p.returncode} · {(p9p.stdout + p9p.stderr)[-900:]}")
+        check("[dRB-9] AC13 and no line carries `can't open file`",
+              not any("can't open file" in ln for ln in p9pout),
+              " | ".join(ln for ln in p9pout if "can't open file" in ln))
+
+        # --- TOOL-dRedressedBar-11. A HOOK ONLY THE RECEIPT LOCATES IS FOUND, SO ITS EXIT 2 FAILS.
+        # --- settings-merge.py finds agent-cap through the receipt before its two static homes, so
+        # --- with the hook at a renamed home and a malformed settings file it exits 2 on the PARSE,
+        # --- and a code-2 block reading the static homes alone accepted that as "no hook to wire"
+        # --- and swallowed the reason. Fixture A drives `apply`, fixture B the `update` that gains
+        # --- settings-merge with agent-cap at its per-kit prefix, and each must refuse on ONE
+        # --- problem line that carries the adopter's own `cannot read` (the line, never the whole
+        # --- output: four fragment lines in B carry it too). A-absent is the stop still accepted.
+        _rb11gk = govkit_module()
+        _rb11src = f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js"
+        _rb11a = make_target(tmp / "rq11a", DEPLOY_FULL)
+        run("apply", "--target", str(_rb11a), "--kits", "settings-merge")
+        settle(_rb11a, "the first apply")
+        _rb11hk = idx_of(_rb11src)
+        (_rb11a / "guard").mkdir()
+        (_rb11a / "guard" / "agent-cap.js").write_bytes(_rb11hk)
+        _rb11rp = _rb11a / ".governance" / "install.json"
+        _rb11rec = json.loads(_rb11rp.read_text(encoding="utf-8"))
+        _rb11rec["files"].append({"path": "guard/agent-cap.js", "kit": "agent-cap", "role": "engine",
+                                  "source": _rb11src, "sha256": _rb11gk._sha(_rb11hk),
+                                  "gov_oid": _rb11gk.blob_oid(_rb11hk)})
+        _rb11rec["kits"] = [*(_rb11rec.get("kits") or []), "agent-cap"]
+        _rb11rp.write_text(json.dumps(_rb11rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+        (_rb11a / ".claude").mkdir(exist_ok=True)
+        (_rb11a / ".claude" / "settings.json").write_text("{", encoding="utf-8", newline="\n")
+        settle(_rb11a, "agent-cap at a home only the receipt records, and a malformed settings file")
+        _rb11pa = run("apply", "--target", str(_rb11a), "--kits", "settings-merge")
+        # TOOL-dRedressedBar-12 AC2. THE REFUSAL HOLDS ON THE NEXT RUN. The refused apply still writes
+        # its receipt, and a receipt written from the selection alone dropped the planted row, so a
+        # third identical apply found the hook nowhere and accepted the stop. The row is compared
+        # whole, as planted; the third run's problem line is graded by the loop below.
+        settle(_rb11a, "the refused second apply")
+        _rb11plant = [f for f in _rb11rec["files"] if f.get("path") == "guard/agent-cap.js"]
+        _rb11kept = [f for f in json.loads(_rb11rp.read_text(encoding="utf-8"))["files"]
+                     if f.get("path") == "guard/agent-cap.js"]
+        check("[dRB-12] AC2 fixture A's refused apply leaves the planted agent-cap row in its receipt",
+              len(_rb11plant) == 1 and _rb11kept == _rb11plant,
+              f"planted {json.dumps(_rb11plant)} · kept {json.dumps(_rb11kept)}")
+        _rb11pa3 = run("apply", "--target", str(_rb11a), "--kits", "settings-merge")
+        check("[dRB-12] AC2 a third identical apply over fixture A exits 1",
+              _rb11pa3.returncode == 1, f"rc {_rb11pa3.returncode} · {_rb11pa3.stdout[-900:]}")
+
+        _rb11n = make_target(tmp / "rq11n", DEPLOY_FULL)
+        run("apply", "--target", str(_rb11n), "--kits", "settings-merge")
+        settle(_rb11n, "the first apply")
+        (_rb11n / ".claude").mkdir(exist_ok=True)
+        (_rb11n / ".claude" / "settings.json").write_text("{", encoding="utf-8", newline="\n")
+        settle(_rb11n, "a malformed settings file, and no agent-cap anywhere")
+        _rb11pn = run("apply", "--target", str(_rb11n), "--kits", "settings-merge")
+        check("[dRB-11] with agent-cap absent everywhere, the apply exits 0 on the declared stop",
+              _rb11pn.returncode == 0 and len(means9) == 1
+              and f"CONFIGURE settings-merge: adopter exit 2 — {means9[0]} [accepted stop]"
+              in _rb11pn.stdout,
+              f"rc {_rb11pn.returncode} · code-2 means {means9} · {_rb11pn.stdout[-900:]}")
+
+        # [dRB-11] fixture B: begin
+        # B's hook row is an OLDER INSTALL: its bytes and both identities at OLD, as the receipt's.
+        # The row carries the source `resolve_entry` gives agent-cap's hook in B's own context, and
+        # `write_vintage_receipt` writes that source's bytes at OLD and sets its `commit`, `sha256`
+        # and `gov_oid`, so this block never derives an identity itself (TOOL-dRedressedBar-13). The
+        # helper re-sets the rows `stale_target` already rewound to the same values. The two
+        # identity checks either side of that call are TOOL-dRedressedBar-17's S3: the row is
+        # appended bare, and the helper is what gives it all three keys.
+        _rb11b = stale_target("rq11b", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n')
+        _rb11dest = f"scripts/{KIT_NAMES['hooks']}/agent-cap.js"
+        _rb11d = _rb11gk.read_descriptors(govroot, _rb11gk.load_toml(
+            govroot / PFX / KIT_NAMES["govkit"] / "registry.toml"), _rb11gk.Report())["agent-cap"][0]
+        _rb11w = _rb11gk.resolve_entry(govroot, _rb11d, _rb11gk.target_context(
+            _rb11b, _rb11gk.load_toml(_rb11b / ".governance" / "deploy.toml"), "agent-cap",
+            _rb11d))["writes"]
+        (_rb11b / _rb11dest).parent.mkdir(parents=True, exist_ok=True)
+        _rb11rp = _rb11b / ".governance" / "install.json"
+        _rb11rec = json.loads(_rb11rp.read_text(encoding="utf-8"))
+        _rb11rec["files"].append({"path": _rb11dest, "kit": "agent-cap", "role": "engine",
+                                  "source": (_rb11w.get(_rb11dest) or {}).get("src")})
+        _rb11rec["kits"] = [*(_rb11rec.get("kits") or []), "agent-cap"]
+        _rb11rp.write_text(json.dumps(_rb11rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+        _rb11ids = ("commit", "sha256", "gov_oid")
+        _rb11pre = [f for f in json.loads(_rb11rp.read_text(encoding="utf-8"))["files"]
+                    if f.get("path") == _rb11dest]
+        check("[dRB-11] fixture B's appended agent-cap row carries none of commit, sha256 and "
+              "gov_oid before the vintage helper runs",
+              len(_rb11pre) == 1 and not any(k in _rb11pre[0] for k in _rb11ids),
+              json.dumps(_rb11pre))
+        write_vintage_receipt(govroot, _rb11b, OLD)
+        _rb11row = [f for f in json.loads(_rb11rp.read_text(encoding="utf-8"))["files"]
+                    if f.get("path") == _rb11dest]
+        check("[dRB-11] ...and all three after it, so the helper is what gave the row its identity",
+              len(_rb11row) == 1 and all(_rb11row[0].get(k) for k in _rb11ids),
+              json.dumps(_rb11row))
+        check("[dRB-11] LIVENESS gov shipped the hook at OLD, so fixture B's row is an older install",
+              len(_rb11row) == 1 and _rb11row[0].get("commit") == OLD and (_rb11b / _rb11dest).is_file(),
+              f"{_rb11dest} at {OLD[:8]}: {json.dumps(_rb11row)}")
+        (_rb11b / ".claude").mkdir(exist_ok=True)
+        (_rb11b / ".claude" / "settings.json").write_text("{", encoding="utf-8", newline="\n")
+        settle(_rb11b, "agent-cap at its per-kit prefix at OLD, and a malformed settings file")
+        _rb11pb = run("update", "--target", str(_rb11b), "--write")
+        check("[dRB-11] update over fixture B leaves the receipt's gov_commit where it was",
+              json.loads(_rb11rp.read_text(encoding="utf-8"))["gov_commit"] == _rb11rec["gov_commit"],
+              _rb11rp.read_text(encoding="utf-8")[:300])
+        # [dRB-11] fixture B: end
+        for _rb11tag, _rb11p in (("apply over fixture A", _rb11pa),
+                                 ("a third identical apply over fixture A", _rb11pa3),
+                                 ("update over fixture B", _rb11pb)):
+            _rb11out = _rb11p.stdout.splitlines() + _rb11p.stderr.splitlines()
+            _rb11sm = [ln for ln in _rb11out if ln.startswith("govkit: kit 'settings-merge'")]
+            check(f"[dRB-11] {_rb11tag} exits non-zero", _rb11p.returncode != 0,
+                  f"rc {_rb11p.returncode} · {_rb11p.stdout[-900:]}")
+            check(f"[dRB-11] {_rb11tag}: exactly one problem line names settings-merge, and it "
+                  "carries the adopter's `cannot read`",
+                  len(_rb11sm) == 1 and "cannot read" in _rb11sm[0], " | ".join(_rb11sm) or
+                  _rb11p.stdout[-900:])
+            check(f"[dRB-11] {_rb11tag}: no line carries the declared stop's means",
+                  len(means9) == 1 and not any(means9[0] in ln for ln in _rb11out),
+                  f"code-2 means {means9} · "
+                  + " | ".join(ln for ln in _rb11out if means9 and means9[0] in ln))
+
+        # --- TOOL-dRedressedBar-12. AN APPLY NARROWER THAN ITS RECEIPT KEEPS EVERY OTHER CLAIM.
+        # --- Three kits applied twice, then settings-merge alone, then kickoff-manifest alone. Written
+        # --- from its selection, the narrower apply dropped the other two kits' claims and their
+        # --- rows, and the next apply of either was refused as foreign. Every figure is read from the
+        # --- receipt the narrower apply read, so nothing here pins a row count. The carry is keyed
+        # --- on the claim: keyed on the selection, it also kept the prior `(govkit)` attributes row.
+        _rb12 = make_target(tmp / "rq12", DEPLOY_FULL)
+        _rb12rp = _rb12 / ".governance" / "install.json"
+        _rb12three = "agent-cap,settings-merge,kickoff-manifest"
+        _rb12keeps = "govkit apply — receipt KEEPS "
+        _rb12p1 = run("apply", "--target", str(_rb12), "--kits", _rb12three)
+        settle(_rb12, "three kits")
+        _rb12r1 = json.loads(_rb12rp.read_text(encoding="utf-8"))
+        _rb12p1b = run("apply", "--target", str(_rb12), "--kits", _rb12three)
+        settle(_rb12, "the same three kits again")
+        _rb12r1b = json.loads(_rb12rp.read_text(encoding="utf-8"))
+        # TOOL-dRedressedBar-23 S1. THE CARRIED KITS' ORDERS, over a receipt an EARLIER engine wrote:
+        # its hole orders carry no `kit`, so the strip below models every target installed before
+        # that unit, and the narrower apply must still carry them through the descriptor join.
+        _rb23s = json.loads(_rb12rp.read_text(encoding="utf-8"))
+        for _rb23o in _rb23s.get("orders") or []:
+            if isinstance(_rb23o, dict) and _rb23o.get("kind") == "hole":
+                _rb23o.pop("kit", None)
+        _rb12rp.write_text(json.dumps(_rb23s, indent=2) + "\n", encoding="utf-8", newline="\n")
+        settle(_rb12, "the hole orders' kit keys stripped, as an earlier engine wrote them")
+        _rb12p2 = run("apply", "--target", str(_rb12), "--kits", "settings-merge")
+        settle(_rb12, "settings-merge alone")
+        _rb12r2 = json.loads(_rb12rp.read_text(encoding="utf-8"))
+        _rb23glp = _rb12 / ".governance" / "outbox" / "gate-legs.md"
+        _rb23gl = _rb23glp.read_text(encoding="utf-8") if _rb23glp.is_file() else ""
+        # TOOL-dRedressedBar-17 S2. THE STEP LINE AND THE SIDECAR READ THE RECEIPT'S OWN LISTS, the
+        # carried rows included. Spec 12 claimed both and no check read either, so a sidecar written
+        # from this run's `rows` alone, or a step line counting `rows` and `selection`, passed. The
+        # sidecar is parsed as `check` parses it, and `check` itself is asked last.
+        _rb12step = [ln for ln in _rb12p2.stdout.splitlines() if "/RECEIPT]" in ln]
+        check("[dRB-12] AC2 the narrower apply's RECEIPT step line counts the receipt's files and kits",
+              len(_rb12step) == 1 and f"{len(_rb12r2['files'])} row(s), {len(_rb12r2['kits'])} kit(s)"
+              in _rb12step[0],
+              f"{' | '.join(_rb12step)} · receipt {len(_rb12r2['files'])} row(s), "
+              f"{len(_rb12r2['kits'])} kit(s)")
+
+        def read_sums_pairs17(t: pathlib.Path) -> set:
+            """`.governance/install.sums` as `(sha256, path)` pairs, split as `check` splits it."""
+            out = set()
+            for ln in (t / ".governance" / "install.sums").read_text(encoding="utf-8").splitlines():
+                if ln.strip():
+                    h, _, pth = ln.partition("  ")
+                    out.add((h.strip(), pth.strip()))
+            return out
+
+        _rb12want = {(f["sha256"], f["path"]) for f in _rb12r2["files"] if "sha256" in f}
+        _rb12carry = {(f["sha256"], f["path"]) for f in _rb12r2["files"] if "sha256" in f
+                      and f.get("kit") in _rb12r2["kits"] and f.get("kit") != "settings-merge"}
+        _rb12sums = read_sums_pairs17(_rb12)
+        check("[dRB-12] AC2 install.sums holds exactly the receipt's hashed rows, every carried row "
+              "among them",
+              bool(_rb12carry) and _rb12sums == _rb12want and _rb12carry <= _rb12sums,
+              f"carried hashed {len(_rb12carry)} · sums {len(_rb12sums)} · receipt {len(_rb12want)} · "
+              f"missing {sorted(p for _h, p in _rb12want - _rb12sums)[:4]}")
+        _rb12chk = run("check", "--target", str(_rb12))
+        _rb12bad = [ln for ln in (_rb12chk.stdout + _rb12chk.stderr).splitlines()
+                    if "install.sums carries" in ln or "which install.sums does not" in ln]
+        check("[dRB-12] AC2 `check` finds the sidecar and the receipt in agreement",
+              not _rb12bad and "sidecar:" in _rb12chk.stdout,
+              " | ".join(_rb12bad) or _rb12chk.stdout[-600:])
+        _rb12p3 = run("apply", "--target", str(_rb12), "--kits", "kickoff-manifest")
+        _rb12other = [k for k in _rb12r1b["kits"] if k != "settings-merge"]
+        _rb12rows1 = [f for f in _rb12r1b["files"] if f.get("kit") in _rb12other]
+        _rb12rows2 = [f for f in _rb12r2["files"] if f.get("kit") in _rb12other]
+        check("[dRB-12] LIVENESS step 1 exits 0, claims all three kits, and holds rows for both kits "
+              "step 2 does not name",
+              _rb12p1.returncode == 0
+              and sorted(_rb12r1["kits"]) == sorted(_rb12three.split(","))
+              and {f.get("kit") for f in _rb12rows1} == set(_rb12other) and len(_rb12other) == 2,
+              f"rc {_rb12p1.returncode} · kits {_rb12r1.get('kits')} · "
+              f"{(_rb12p1.stdout + _rb12p1.stderr)[-600:]}")
+        check("[dRB-12] AC3 the same selection applied twice prints no KEEPS line and writes the same "
+              "kits and row count",
+              _rb12p1b.returncode == 0
+              and not any(ln.startswith(_rb12keeps) for ln in _rb12p1b.stdout.splitlines())
+              and _rb12r1b["kits"] == _rb12r1["kits"]
+              and len(_rb12r1b["files"]) == len(_rb12r1["files"]),
+              f"rc {_rb12p1b.returncode} · kits {_rb12r1['kits']} -> {_rb12r1b['kits']} · rows "
+              f"{len(_rb12r1['files'])} -> {len(_rb12r1b['files'])}")
+        check("[dRB-12] AC1 the narrower apply exits 0 and claims settings-merge, then the two kits it "
+              "did not name in the prior receipt's order",
+              _rb12p2.returncode == 0 and _rb12r2["kits"] == ["settings-merge", *_rb12other],
+              f"rc {_rb12p2.returncode} · kits {_rb12r2.get('kits')} · "
+              f"{(_rb12p2.stdout + _rb12p2.stderr)[-600:]}")
+        check("[dRB-12] AC1 and keeps their rows verbatim, holding the prior receipt's row count",
+              _rb12rows2 == _rb12rows1 and len(_rb12r2["files"]) == len(_rb12r1b["files"]),
+              f"carried {len(_rb12rows2)} of {len(_rb12rows1)} · rows {len(_rb12r2['files'])} of "
+              f"{len(_rb12r1b['files'])}")
+        _rb12kl = [ln for ln in _rb12p2.stdout.splitlines()
+                   if ln.startswith(f"{_rb12keeps}{len(_rb12other)} kit(s)")]
+        check("[dRB-12] AC1 the narrower apply prints exactly one KEEPS line, and it names both kits",
+              len(_rb12kl) == 1 and all(k in _rb12kl[0] for k in _rb12other),
+              " | ".join(_rb12kl) or _rb12p2.stdout[-600:])
+        check("[dRB-12] AC3 after the narrower apply exactly one receipt row has role attributes",
+              sum(1 for f in _rb12r2["files"] if f.get("role") == "attributes") == 1,
+              json.dumps([f.get("kit") for f in _rb12r2["files"] if f.get("role") == "attributes"]))
+        check("[dRB-12] AC1 a re-apply of a kit the narrower apply did not name exits 0, refused as "
+              "foreign nowhere",
+              _rb12p3.returncode == 0
+              and not any("already carries" in ln
+                          for ln in (_rb12p3.stdout + _rb12p3.stderr).splitlines()),
+              f"rc {_rb12p3.returncode} · {(_rb12p3.stdout + _rb12p3.stderr)[-600:]}")
+        # TOOL-dRedressedBar-23 AC1. The stripped receipt's orders of the two carried kits are read
+        # off its own positions, joined to the unstripped receipt read just before the strip, so the
+        # expectation never asks the engine which hole is whose.
+        _rb23holes = [o for o in _rb12r1.get("orders") or [] if o.get("kind") == "hole"]
+        check("[dRB-12] dRB-23 AC1 every hole order a fresh three-kit apply writes carries `kit`",
+              bool(_rb23holes) and all("kit" in o for o in _rb23holes), json.dumps(_rb23holes))
+        _rb23so = _rb23s.get("orders") or []
+        _rb23pre = _rb12r1b.get("orders") or []
+        _rb23r2o = _rb12r2.get("orders") or []
+        _rb23want = [o for o, _pre in zip(_rb23so, _rb23pre) if _pre.get("kit") in _rb12other]
+        _rb23got = [o for o in _rb23r2o if o.get("kit") in _rb12other
+                    or (o.get("kind") == "hole" and "kit" not in o)]
+        check("[dRB-12] dRB-23 AC1 LIVENESS the strip left no hole order carrying `kit`, and the "
+              "carried kits held orders before the narrower apply",
+              bool(_rb23want) and len(_rb23so) == len(_rb23pre)
+              and not any("kit" in o for o in _rb23so if o.get("kind") == "hole"),
+              json.dumps(_rb23so))
+        check("[dRB-12] dRB-23 AC1 the narrower apply's receipt keeps the carried kits' orders, "
+              "the keyless hole order included, after its own, verbatim and in order",
+              json.dumps(_rb23got) == json.dumps(_rb23want)
+              and json.dumps(_rb23r2o[-len(_rb23want):]) == json.dumps(_rb23want),
+              f"want {json.dumps(_rb23want)} · got {json.dumps(_rb23r2o)}")
+        check("[dRB-12] dRB-23 AC1 ...and they hold a machine order and the manifest-section-b "
+              "hole order",
+              any(o.get("kind") == "machine" for o in _rb23got)
+              and any(o.get("kind") == "hole" and o.get("id") == "manifest-section-b"
+                      for o in _rb23got), json.dumps(_rb23got))
+        _rb23und = [ln for ln in _rb12chk.stdout.splitlines()
+                    if ln.startswith("govkit check — kickoff-manifest: undischargeable")]
+        check("[dRB-12] dRB-23 AC1 `check` after the narrower apply reports kickoff-manifest's "
+              "machine order undischargeable", bool(_rb23und), _rb12chk.stdout[-600:])
+        _rb23inst = _rb23gl.split("\n## WITHHELD", 1)[0].splitlines()
+        check("[dRB-12] dRB-23 AC1 the narrower apply's order lists kickoff-manifest's leg as an "
+              "instruction, above any WITHHELD heading",
+              any(ln.startswith("- kickoff-manifest ratchet: ") for ln in _rb23inst),
+              _rb23gl[:900] or "no .governance/outbox/gate-legs.md")
+
+        # --- TOOL-dRedressedBar-14. A FIRST APPLY AT A PER-KIT PREFIX CONFIGURES AGAINST THE HOMES IT
+        # --- JUST WROTE. settings-merge.py finds agent-cap's hook through the receipt, and `apply`
+        # --- wrote the receipt only at its last step, so on a first apply with `[kit.agent-cap]
+        # --- prefix = "scripts"` the adopter probed the two static homes alone, exited 2 for want of
+        # --- the hook, and the stop was accepted with the hook unwired. The receipt is now written
+        # --- ahead of CONFIGURE. Each fact is read on the line it names, and no exit code is
+        # --- asserted: the run's exit belongs to agent-cap's own argv (spec 14 §8 F1, unit 15).
+        _rb14 = make_target(tmp / "rq14", DEPLOY_FULL + '\n[kit.agent-cap]\nprefix = "scripts"\n')
+        _rb14p = run("apply", "--target", str(_rb14), "--kits",
+                     "agent-cap,settings-merge,kickoff-manifest")
+        _rb14so = _rb14p.stdout.splitlines()
+        _rb14out = _rb14so + _rb14p.stderr.splitlines()
+        _rb14dest = f"scripts/{KIT_NAMES['hooks']}/agent-cap.js"
+        _rb14src = f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js"
+        _rb14sm = [ln for ln in _rb14out if ln.startswith("govkit apply — CONFIGURE settings-merge:")]
+        check("[dRB-14] AC1 exactly one CONFIGURE settings-merge line, and it ends `adopter exit 0`",
+              len(_rb14sm) == 1 and _rb14sm[0].endswith("adopter exit 0"),
+              " | ".join(_rb14sm) or _rb14p.stdout[-900:])
+        _rb14ahead = [i for i, ln in enumerate(_rb14so)
+                      if ln.startswith("govkit apply — receipt written ahead of CONFIGURE")]
+        _rb14cfg = [i for i, ln in enumerate(_rb14so) if "CONFIGURE " in ln]
+        check("[dRB-14] AC1 the receipt-written-ahead line prints before the first line carrying "
+              "`CONFIGURE `",
+              bool(_rb14ahead) and bool(_rb14cfg) and _rb14ahead[0] < _rb14cfg[0],
+              f"ahead at {_rb14ahead} · CONFIGURE at {_rb14cfg[:3]} · {_rb14p.stdout[-900:]}")
+        _rb14rp = _rb14 / ".governance" / "install.json"
+        _rb14rows = [f for f in (json.loads(_rb14rp.read_text(encoding="utf-8"))["files"]
+                                 if _rb14rp.is_file() else []) if f.get("path") == _rb14dest]
+        check("[dRB-14] AC1 the receipt rows the hook at its per-kit prefix, sourced from gov's hook",
+              any(f.get("source") == _rb14src for f in _rb14rows),
+              f"{_rb14dest}: {json.dumps(_rb14rows)}")
+        _rb14sp = _rb14 / ".claude" / "settings.json"
+        _rb14set = json.loads(_rb14sp.read_text(encoding="utf-8")) if _rb14sp.is_file() else {}
+        _rb14cmds = [h.get("command") for g in (_rb14set.get("hooks") or {}).get("PreToolUse") or []
+                     if g.get("matcher") == "Workflow|Agent" for h in g.get("hooks") or []]
+        check("[dRB-14] AC1 settings.json's Workflow|Agent group holds exactly one command, and it "
+              "carries the hook at its per-kit prefix",
+              len(_rb14cmds) == 1 and _rb14dest in str(_rb14cmds[0]), json.dumps(_rb14cmds))
+        check("[dRB-14] AC1 no line opens `govkit: kit 'settings-merge'`",
+              not any(ln.startswith("govkit: kit 'settings-merge'") for ln in _rb14out),
+              " | ".join(ln for ln in _rb14out if ln.startswith("govkit: kit 'settings-merge'")))
+        # TOOL-dRedressedBar-17 S1: agent-cap's own outcome on this apply is unit 15's checks'
+        # below, and the problem-line check that once stood here contradicted them on the same run.
+        # S2: the same sidecar equality unit 12's block reads, on this first apply.
+        _rb14rec = json.loads(_rb14rp.read_text(encoding="utf-8")) if _rb14rp.is_file() else {}
+        _rb14want = {(f["sha256"], f["path"]) for f in _rb14rec.get("files") or [] if "sha256" in f}
+        _rb14sums = (read_sums_pairs17(_rb14)
+                     if (_rb14 / ".governance" / "install.sums").is_file() else set())
+        check("[dRB-14] AC1 install.sums holds exactly the receipt's hashed rows",
+              bool(_rb14want) and _rb14sums == _rb14want,
+              f"sums {len(_rb14sums)} · receipt {len(_rb14want)} · "
+              f"differ {sorted(p for _h, p in _rb14sums ^ _rb14want)[:4]}")
+
+        # --- TOOL-dRedressedBar-15. THE SAME APPLY, READ FOR AGENT-CAP'S OWN ADOPTER. Its argv was a
+        # --- copy of settings-merge's, resolved through `[kit.agent-cap]`, so it ran
+        # --- `scripts/settings-merge.py`, a file nothing installed there, and python exited 2.
+        # --- `[adopt] via = "settings-merge"` runs settings-merge's argv at settings-merge's home.
+        _rb15cfg = {k: [ln for ln in _rb14out if ln.startswith(f"govkit apply — CONFIGURE {k}:")]
+                    for k in ("settings-merge", "agent-cap")}
+        check("[dRB-15] AC1 the per-kit-prefix apply exits 0",
+              _rb14p.returncode == 0,
+              f"rc {_rb14p.returncode} · {(_rb14p.stdout + _rb14p.stderr)[-900:]}")
+        check("[dRB-15] AC1 exactly one CONFIGURE line each for settings-merge and agent-cap, and "
+              "each ends `adopter exit 0`",
+              all(len(v) == 1 and v[0].endswith("adopter exit 0") for v in _rb15cfg.values()),
+              json.dumps(_rb15cfg))
+        check("[dRB-15] AC1 no line opens `govkit: kit '`",
+              not any(ln.startswith("govkit: kit '") for ln in _rb14out),
+              " | ".join(ln for ln in _rb14out if ln.startswith("govkit: kit '")))
 
         # --- DEPL-dGaugedVintage-8 S3. THE STAMP MUST NOT OUTRUN ROWS THIS RUN NEVER GRADED.
         # --- An `evidence: "unattributed"` row is skipped before `classify_row`, by
@@ -5602,6 +5997,117 @@ user_skills = "/tmp/gk-fake-skills"
         bad_g = run_in(scratch_gov("true", "docs/nowhere/"))
         check("a guard in no declared class reds",
               bad_g.returncode == 1 and "declared classes" in bad_g.stdout, bad_g.stdout)
+
+        # ---- TOOL-dRedressedBar-15 S5: THE CROSS-ENTRY ARGV ARM AND THE `via` RULES, ON FIXTURES.
+        # Over gov's own tree the arm grades ownership and finds nothing once agent-cap delegates, so
+        # each branch is armed here. A second entry, `other`, is shaped as settings-merge is: flat,
+        # its home the tool root, one engine rule landing `other.py` at `{prefix}/other.py`, and an
+        # adopter naming that file. `demo` requires it. Every gov must print the arm's note, which is
+        # what tells an absent finding from an arm that never ran.
+        def build_scratch_gov_cross(tag: str, adopt: str, requires: str = '["other"]',
+                                    other_argv: str = '["python", "{prefix}/other.py"]',
+                                    rules: str = "") -> pathlib.Path:
+            g = build_scratch_gov_kit(
+                f"drb15-{tag}",
+                'id = "demo"\nhome = "demo"\nversion_from = { none = "fixture" }\n'
+                f'requires = {requires}\n\n[check]\nnone = "a fixture kit"\n\n'
+                '[[files]]\ninclude = "**"\nrole = "engine"\n\n' + rules +
+                f'[adopt]\nwhy_no_regenerate = "a fixture adopter"\n{adopt}\n')
+            (g / PFX / KIT_NAMES["govkit"] / "entries").mkdir(parents=True, exist_ok=True)
+            (g / PFX / KIT_NAMES["govkit"] / "entries" / "other.kit.toml").write_text(
+                'id = "other"\nscope = "repo"\nkind = "flat"\nhome = "."\n'
+                'version_from = { none = "fixture" }\nrequires = []\n\n'
+                '[check]\nnone = "a fixture kit"\n\n'
+                '[[files]]\ninclude = ["other.py"]\nrole = "engine"\nto = "{prefix}/other.py"\n\n'
+                '[adopt]\nwhy_no_regenerate = "a fixture adopter"\n'
+                f'argv = {other_argv}\nmutates_index = false\n', encoding="utf-8", newline="\n")
+            (g / PFX / "other.py").write_text("print('other')\n", encoding="utf-8", newline="\n")
+            _reg = g / PFX / KIT_NAMES["govkit"] / "registry.toml"
+            _gk = KIT_NAMES["govkit"]
+            _reg.write_text(_reg.read_text(encoding="utf-8") + '\n[[entry]]\nid = "other"\n'
+                            f'descriptor = "{{prefix}}/{_gk}/entries/other.kit.toml"\n',
+                            encoding="utf-8", newline="\n")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "other")
+            return g
+
+        _rb15gov = {
+            "argv": build_scratch_gov_cross("argv", 'argv = ["python", "{prefix}/other.py"]'),
+            "via": build_scratch_gov_cross("via", 'via = "other"'),
+            "nobody": build_scratch_gov_cross("nobody", 'via = "nobody"'),
+            "norequire": build_scratch_gov_cross("norequire", 'via = "other"', requires="[]"),
+            "noargv": build_scratch_gov_cross("noargv", 'via = "other"', other_argv="[]"),
+            "beside": build_scratch_gov_cross(
+                "beside", 'via = "other"\nargv = ["python", "{prefix}/other.py"]'),
+            "ungraded": build_scratch_gov_cross("ungraded", 'argv = ["bash", "{nosuch}/x.sh"]',
+                                                other_argv="[]"),
+            # TOOL-dRedressedBar-17: the first `via` rule (S24) and the sixth (S11).
+            "empty": build_scratch_gov_cross("empty", 'via = ""'),
+            "list": build_scratch_gov_cross("list", 'via = ["other"]'),
+            "rendered": build_scratch_gov_cross(
+                "rendered", 'via = "other"',
+                rules='[[files]]\ninclude = ["demo-rendered.md"]\nrole = "rendered"\n'
+                      'to = "docs/demo.md"\n\n'),
+        }
+        _rb15run = {k: run_in(g) for k, g in _rb15gov.items()}
+        _rb15out = {k: p.stdout.splitlines() for k, p in _rb15run.items()}
+        _rb15note = {k: [ln for ln in v if ln.startswith("govkit: cross-entry argv:")
+                         and "offered by" in ln] for k, v in _rb15out.items()}
+        check("[dRB-15] AC7 every cross-entry scratch gov prints exactly one `cross-entry argv:` "
+              "note carrying `offered by`",
+              all(len(v) == 1 for v in _rb15note.values()), json.dumps(_rb15note))
+        _rb15hit = [ln for ln in _rb15out["argv"]
+                    if ln.startswith("govkit: entry 'demo': its [adopt] argv names")]
+        check("[dRB-15] AC7 an [adopt] argv naming the file `other` ships reds once, naming both",
+              len(_rb15hit) == 1 and "other.py" in _rb15hit[0] and "'other'" in _rb15hit[0],
+              " | ".join(_rb15hit) or "\n".join(_rb15out["argv"][-30:]))
+        check("[dRB-15] AC7 `via = \"other\"` reds neither the join nor a `via` rule for demo",
+              not any(ln.startswith(("govkit: entry 'demo': its [adopt] argv",
+                                     "govkit: entry 'demo' declares [adopt] via"))
+                      for ln in _rb15out["via"]),
+              "\n".join(_rb15out["via"][-30:]))
+        for _rb15k, _rb15why in (("nobody", "names no registry entry"),
+                                 ("norequire", "is not in its requires"),
+                                 ("noargv", "declares no [adopt] argv of its own"),
+                                 ("beside", "sits beside an [adopt] argv")):
+            _rb15via = [ln for ln in _rb15out[_rb15k]
+                        if ln.startswith("govkit: entry 'demo' declares [adopt] via")]
+            check(f"[dRB-15] AC7 the `{_rb15k}` gov's `via` line carries `{_rb15why}`",
+                  len(_rb15via) == 1 and _rb15why in _rb15via[0],
+                  " | ".join(_rb15via) or "\n".join(_rb15out[_rb15k][-30:]))
+        _rb15live = [ln for ln in _rb15out["ungraded"]
+                     if ln.startswith("govkit: cross-entry argv:") and "none graded" in ln]
+        check("[dRB-15] AC7 LIVENESS offered elements with none graded red on a second "
+              "`cross-entry argv:` line",
+              len(_rb15live) == 1, "\n".join(_rb15out["ungraded"][-30:]))
+        # TOOL-dRedressedBar-17 S24 and S11. A `via` that is not a non-empty string read
+        # `names no registry entry`; it now reads its own reason, and at run time the walk raises
+        # rather than falling back to the entry's own argv, which unwired agent-cap silently. A
+        # `via` entry carrying a `rendered` rule is refused, because the producer test reads its own
+        # declared argv; the `via` gov above, with no such rule, is the control.
+        for _rb17k, _rb17why in (("empty", "is not a non-empty string"),
+                                 ("list", "is not a non-empty string"),
+                                 ("rendered", "carries a rendered, generated or merged rule")):
+            _rb17via = [ln for ln in _rb15out[_rb17k]
+                        if ln.startswith("govkit: entry 'demo' declares [adopt] via")]
+            check(f"[dRB-15] dRB-17 the `{_rb17k}` gov prints one `via` line, carrying `{_rb17why}`",
+                  len(_rb17via) == 1 and _rb17why in _rb17via[0],
+                  " | ".join(_rb17via) or "\n".join(_rb15out[_rb17k][-30:]))
+            check(f"[dRB-15] dRB-17 the `{_rb17k}` gov's selfcheck prints no traceback",
+                  "Traceback" not in _rb15run[_rb17k].stdout + _rb15run[_rb17k].stderr,
+                  _rb15run[_rb17k].stderr[-900:])
+        _rb17gk = govkit_module()
+        _rb17g = _rb15gov["empty"]
+        _rb17descs = _rb17gk.read_descriptors(_rb17g, _rb17gk.load_toml(
+            _rb17g / PFX / KIT_NAMES["govkit"] / "registry.toml"), _rb17gk.Report())
+        try:
+            _rb17got = repr(_rb17gk.resolve_adopter_argv(
+                _rb17g, {"gov_source": "local", "prefix": "tools"}, "demo", _rb17descs))
+        except KeyError as _rb17err:
+            _rb17got = f"KeyError {_rb17err}"
+        check("[dRB-15] dRB-17 resolve_adopter_argv raises KeyError naming demo for `via = \"\"`, "
+              "never falling back to demo's own argv",
+              _rb17got.startswith("KeyError") and "'demo'" in _rb17got, _rb17got)
 
         # ---- D3 (TOOL-dThriftyLanding-4): 7h holds a descriptor's doc_reads and the manifest's equal
         _d3 = scratch_gov("true", f"{PFX}demo/", tag="d3")
@@ -8003,7 +8509,11 @@ user_skills = "/tmp/gk-fake-skills"
         t8 = delta_target("d8-ac1")
         check("[-8] AC1 the fixture holds the operator's line before any update",
               mine_count(t8) == 1, repr((t8 / CWS).read_bytes()[-160:]))
-        _r81 = run("update", "--target", str(t8), "--to", V8[2], "--write")
+        # TOOL-dRedressedBar-3 S4: every writing update over `d8-ac1` and `d8-ac4` is scoped to the
+        # kit the fixture installed. Unscoped, the update gains the registry default's growth since
+        # V8[0] (TOOL-aRoutedQuill-5 S4), and the `run-gates` gained at V8[3] names files that
+        # vintage lacks; these arms grade the delta row, never the gaining.
+        _r81 = run("update", "--target", str(t8), "--kits", "check-wiring", "--to", V8[2], "--write")
         check("[-8] AC1 the first update MERGES the delta row rather than overwriting it",
               _r81.returncode == 0 and verdict_of(_r81.stdout, CWS) == "diverged",
               _r81.stdout[-900:] + _r81.stderr[-600:])
@@ -8042,7 +8552,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # ---- AC1, second half: the run that used to destroy the edit.
         settle(t8, "after the first update")
-        _r82 = run("update", "--target", str(t8), "--to", V8[3], "--write")
+        _r82 = run("update", "--target", str(t8), "--kits", "check-wiring", "--to", V8[3], "--write")
         check("[-8] AC1 the SECOND update reports `diverged`, never `stale`",
               _r82.returncode == 0 and verdict_of(_r82.stdout, CWS) == "diverged",
               _r82.stdout[-900:] + _r82.stderr[-600:])
@@ -8054,10 +8564,10 @@ user_skills = "/tmp/gk-fake-skills"
         t84 = delta_target("d8-ac4")
         _seen8: list[tuple[str, int, int]] = []
         for _i, _v in enumerate(V8[1:]):
-            _p8 = run("update", "--target", str(t84), "--to", _v, "--write")
+            _p8 = run("update", "--target", str(t84), "--kits", "check-wiring", "--to", _v, "--write")
             _seen8.append((verdict_of(_p8.stdout, CWS), _p8.returncode, mine_count(t84)))
             settle(t84, f"after update {_i + 1}")
-        _p8 = run("update", "--target", str(t84), "--write")
+        _p8 = run("update", "--target", str(t84), "--kits", "check-wiring", "--write")
         _seen8.append((verdict_of(_p8.stdout, CWS), _p8.returncode, mine_count(t84)))
         check("[-8] AC4 all four updates exit 0",
               all(rc == 0 for _v, rc, _n in _seen8), str(_seen8))
@@ -14074,7 +14584,14 @@ user_skills = "/tmp/gk-fake-skills"
         # SKIPS each by name. The consumer-edited engine row is `review-step.js` for that reason:
         # `tier2-review.js` is a render now, and an edited render is not the engine row these arms
         # grade.
-        _pvCAP_T = "// a fixture harness, fan-out cap {{FANOUT_CAP}}\n"
+        # TOOL-dRedressedBar-3 S1: the copied parity script's agent-type arm (TOOL-aOrientedCast-4)
+        # exits 1 on a DEAD PROBE when the owner `tier2-review.template.js` declares no
+        # `const AGENT_TYPE_SHAPE =` literal, and wants a copy elsewhere in the kit, which the two
+        # drift-audit templates sharing this text supply. The line is READ from the real owner at
+        # run time, never typed: a typed literal would be a second copy of the owner's value.
+        _pvAT_LINE = next((_ln for _ln in (_pvREAL / "tier2-review.template.js").read_text(
+            encoding="utf-8").splitlines() if _ln.startswith("const AGENT_TYPE_SHAPE = ")), "")
+        _pvCAP_T = "// a fixture harness, fan-out cap {{FANOUT_CAP}}\n" + _pvAT_LINE + "\n"
         _pvLOCAL_B = "line one\nline two, as gov has it at B\nline three\n"
 
         def build_pv_gov():
@@ -15286,12 +15803,18 @@ user_skills = "/tmp/gk-fake-skills"
             json.dumps([{"name": "control", "argv": ["true"]}], indent=2) + "\n",
             encoding="utf-8", newline="\n")
         (_qg / ".governance").mkdir(exist_ok=True)
+        import tomllib as _qtoml  # noqa: PLC0415
+        _qans = _qtoml.loads(DEPLOY_FULL)["answers"]
         (_qg / ".governance" / "deploy.toml").write_text(
             f'gov_source = "local"\nprefix = "{PFX[:-1]}"\n'
             # settings-merge is DECLARED by agent-cap as a dependency, and govkit refuses a
-            # selection that omits it rather than widening one on the caller's behalf.
-            'kits = ["agent-cap", "settings-merge"]\n\n'
-            '[answers]\nmemory_root = "memory"\n\n'
+            # selection that omits it rather than widening one on the caller's behalf. So is
+            # kickoff-manifest since TOOL-aRoutedQuill-5 S2 (TOOL-dRedressedBar-3 S2), and its
+            # destinations and leg read the two answers below, at DEPLOY_FULL's values, read
+            # from that constant rather than typed a second time.
+            'kits = ["agent-cap", "settings-merge", "kickoff-manifest"]\n\n'
+            '[answers]\nmemory_root = "memory"\n'
+            f'manifest_path = "{_qans["manifest_path"]}"\nuser_skills = "{_qans["user_skills"]}"\n\n'
             f'[gate_runner]\nkind = "manifest"\nfile = "{PFX}legs.json"\n'
             'grammar = "json-array"\ndedupe_key = "name"\n'
             f'command = ["bash", "{PFX}runner.sh"]\n'
@@ -15303,7 +15826,7 @@ user_skills = "/tmp/gk-fake-skills"
         git(_qg, "config", "user.name", "t"); git(_qg, "config", "core.autocrlf", "false")
         git(_qg, "add", "-A"); git(_qg, "commit", "-qm", "base")
 
-        _qa = run("apply", "--target", str(_qg), "--kits", "agent-cap,settings-merge")
+        _qa = run("apply", "--target", str(_qg), "--kits", "agent-cap,settings-merge,kickoff-manifest")
         check("aQuenchedHarness-3: the apply itself succeeds", _qa.returncode == 0,
               _qa.stdout + _qa.stderr)
 
@@ -15765,6 +16288,194 @@ user_skills = "/tmp/gk-fake-skills"
               and "the gate-leg step refused" not in _u13c.stdout,
               _u13c.stdout[-1400:] + _u13c.stderr[-600:])
 
+        # ---- [dRB-16]. A NARROWER APPLY KEEPS THE CARRIED KIT'S LEG OWNERSHIP TOO.
+        # ---- TOOL-dRedressedBar-12 keeps a kit the selection did not name in the receipt's `kits`,
+        # ---- and until this unit `apply` passed no carry, so that kit's leg left `emitted` while its
+        # ---- row stayed in the runner. The same-argv rule re-claims such a row only while gov's argv
+        # ---- is unchanged, so once gov moves it `update --write` reports `does not claim it` and
+        # ---- exits 1, and `apply --kits demo2` raises `already has a leg named` and exits 2. One
+        # ---- gov, two targets, one verb each. The ARGV moves in gov's descriptor, so
+        # ---- `write_vintage13`, which moves an engine byte, is not used.
+        _g16 = build_gov13("drb16")
+        _t16u = build_target13("drb16-u")
+        _t16a = build_target13("drb16-a")
+        for _t16 in (_t16u, _t16a):
+            _p16all = run_gov13(_g16, "apply", "--target", str(_t16))
+            settle(_t16, "both kits")
+            _p16demo = run_gov13(_g16, "apply", "--target", str(_t16), "--kits", "demo")
+            settle(_t16, "demo alone")
+            check(f"[dRB-16] LIVENESS {_t16.name}: both applies exit 0, the runner holds both kits' "
+                  f"legs, and the second apply emitted demo's leg alone",
+                  _p16all.returncode == 0 and _p16demo.returncode == 0
+                  and read_legs13(_t16) == ["demo leg", "demo2 leg"]
+                  and any(ln.startswith("govkit apply — gate legs: emitted 1 ")
+                          for ln in _p16demo.stdout.splitlines()),
+                  f"rc {_p16all.returncode}, {_p16demo.returncode} legs {read_legs13(_t16)}"
+                  + NL13 + (_p16demo.stdout + _p16demo.stderr)[-900:])
+            check(f"[dRB-16] AC1 {_t16.name}: after `apply --kits demo` the receipt's emitted still "
+                  f"holds demo2's leg row, kit demo2",
+                  ("demo2 leg", "demo2") in read_owned13(_t16), str(read_owned13(_t16)))
+        _kit16 = _g16 / PFX / "demo2" / "kit.toml"
+        _src16 = _kit16.read_text(encoding="utf-8")
+        _moved16 = _src16.replace('argv = ["bash", "{prefix}/demo2/engine.sh"]',
+                                  'argv = ["bash", "{prefix}/demo2/engine.sh", "--drb16"]', 1)
+        check("[dRB-16] LIVENESS the argv change matched demo2's leg, so both runs below meet an "
+              "argv gov has moved", _moved16 != _src16, _src16)
+        _kit16.write_text(_moved16, encoding="utf-8", newline="\n")
+        git(_g16, "add", "-A")
+        git(_g16, "commit", "-qm", "B: demo2's leg argv moves")
+        _p16u = run_gov13(_g16, "update", "--target", str(_t16u), "--write")
+        _p16a = run_gov13(_g16, "apply", "--target", str(_t16a), "--kits", "demo2")
+        _argv16 = {}
+        for _t16 in (_t16u, _t16a):
+            _argv16[_t16.name] = next(
+                (e.get("argv") for e in json.loads(
+                    (_t16 / "scripts" / "gate-legs.json").read_text(encoding="utf-8"))
+                 if e.get("name") == "demo2 leg"), None)
+        _out16u = (_p16u.stdout + _p16u.stderr).splitlines()
+        check("[dRB-16] AC1 `update --write` after the argv change exits 0, and no line carries "
+              "`does not claim it` or `the gate-leg step refused`",
+              _p16u.returncode == 0
+              and not any("does not claim it" in ln or "the gate-leg step refused" in ln
+                          for ln in _out16u),
+              f"rc {_p16u.returncode}" + NL13 + NL13.join(_out16u[-14:]))
+        check("[dRB-16] AC1 ...and the runner's demo2 leg row carries the new argv",
+              "--drb16" in (_argv16[_t16u.name] or []), str(_argv16[_t16u.name]))
+        _out16a = (_p16a.stdout + _p16a.stderr).splitlines()
+        check("[dRB-16] AC2 `apply --kits demo2` after the argv change exits 0, and no line carries "
+              "`already has a leg named`",
+              _p16a.returncode == 0
+              and not any("already has a leg named" in ln for ln in _out16a),
+              f"rc {_p16a.returncode}" + NL13 + NL13.join(_out16a[-14:]))
+        check("[dRB-16] AC2 ...and the runner's demo2 leg row carries the new argv",
+              "--drb16" in (_argv16[_t16a.name] or []), str(_argv16[_t16a.name]))
+
+        # ---- [dRB-23] NO RUNNER. A NARROWER APPLY'S ORDER LISTS THE CARRIED KIT'S LEGS TOO.
+        # ---- With no `[gate_runner]` the legs go to `.governance/outbox/gate-legs.md`, rewritten
+        # ---- whole, and the loop read the selection alone, so `apply --kits demo` dropped demo2's
+        # ---- leg from the order while the receipt kept demo2's claim. Each half is cut at the
+        # ---- order's first `## WITHHELD` line, because the same leg name in the other half is the
+        # ---- D7 test answering, and no carried kit's withheld leg raises a problem.
+        _g23n = build_gov13("drb23n")
+        _t23n = build_target13("drb23n", M13_DEPLOY_NONE)
+        _o23n = _t23n / ".governance" / "outbox" / "gate-legs.md"
+
+        def read_order_halves23() -> tuple[list[str], list[str]]:
+            """The order's instruction lines and its WITHHELD lines, cut at the first heading."""
+            txt = _o23n.read_text(encoding="utf-8") if _o23n.is_file() else ""
+            head, _sep, tail = txt.partition("\n## WITHHELD")
+            return head.splitlines(), (tail.splitlines() if _sep else [])
+
+        _p23n1 = run_gov13(_g23n, "apply", "--target", str(_t23n))
+        settle(_t23n, "both kits")
+        _p23n2 = run_gov13(_g23n, "apply", "--target", str(_t23n), "--kits", "demo")
+        settle(_t23n, "demo alone")
+        _h23n2, _w23n2 = read_order_halves23()
+        check("[dRB-23] AC2 LIVENESS both applies exit 0 over a target with no runner, and the "
+              "receipt still claims demo2",
+              _p23n1.returncode == 0 and _p23n2.returncode == 0
+              and "demo2" in (read_receipt13(_t23n).get("kits") or []),
+              f"rc {_p23n1.returncode}, {_p23n2.returncode}" + NL13
+              + (_p23n2.stdout + _p23n2.stderr)[-900:])
+        check("[dRB-23] AC2 `apply --kits demo`'s order lists the carried demo2 leg as an "
+              "instruction", any(ln.startswith("- demo2 leg: ") for ln in _h23n2),
+              NL13.join(_h23n2 + _w23n2))
+        (_g23n / PFX / "demo2" / "kit.toml").write_text(
+            build_kit13("demo2", "demo2 leg", "demo2/absent.sh", False), encoding="utf-8",
+            newline="\n")
+        git(_g23n, "add", "-A")
+        git(_g23n, "commit", "-qm", "B: demo2's leg names an engine gov does not ship")
+        _p23n3 = run_gov13(_g23n, "apply", "--target", str(_t23n), "--kits", "demo")
+        _h23n3, _w23n3 = read_order_halves23()
+        _out23n3 = (_p23n3.stdout + _p23n3.stderr).splitlines()
+        check("[dRB-23] AC2 with demo2's leg naming an absent engine, `apply --kits demo` exits 0",
+              _p23n3.returncode == 0,
+              f"rc {_p23n3.returncode}" + NL13 + NL13.join(_out23n3[-14:]))
+        check("[dRB-23] AC2 ...its order's instruction half carries no demo2 leg, and its WITHHELD "
+              "half does",
+              not any("demo2 leg" in ln for ln in _h23n3)
+              and any("demo2 leg" in ln for ln in _w23n3), NL13.join(_h23n3 + _w23n3))
+        check("[dRB-23] AC2 ...and no output line raises the carried kit's withheld leg",
+              not any("declares gate leg 'demo2 leg'" in ln for ln in _out23n3),
+              NL13.join(ln for ln in _out23n3 if "demo2 leg" in ln))
+
+        # ---- [dRB-23] GAINED. A REFUSED GAINED ADOPTER'S STDERR SURVIVES A BYTE THAT IS NOT UTF-8.
+        # ---- The gained loop decoded strictly while CONFIGURE and the regenerate site replaced, so
+        # ---- one 0xF6 on stderr blanked the refusal's reason on Windows and raised out of `update`
+        # ---- on POSIX. demo3 joins gov's default set with an adopter that prints `J`, 0xF6, `rg`
+        # ---- and exits 2, and the one problem line naming it must carry those characters.
+        _g23g = build_gov13("drb23g")
+        _t23g = build_target13("drb23g", M13_DEPLOY_NONE)
+        _p23g1 = run_gov13(_g23g, "apply", "--target", str(_t23g))
+        settle(_t23g, "both kits")
+        (_g23g / PFX / "demo3").mkdir(parents=True, exist_ok=True)
+        _kit23g = build_kit13("demo3", "demo3 leg", "demo3/engine.sh", False)
+        _kit23ga = _kit23g.replace('[adopt]\nargv = []\n',
+                                   '[adopt]\nargv = ["bash", "{prefix}/demo3/adopt.sh"]\n', 1)
+        (_g23g / PFX / "demo3" / "kit.toml").write_text(_kit23ga, encoding="utf-8", newline="\n")
+        (_g23g / PFX / "demo3" / "engine.sh").write_text("exit 0\n", encoding="utf-8",
+                                                         newline="\n")
+        # Each backslash is a literal byte of the script, so bash's printf writes the octal 366.
+        (_g23g / PFX / "demo3" / "adopt.sh").write_bytes(b"printf 'J\\366rg\\n' >&2\nexit 2\n")
+        _reg23g = (M13_REG.replace('default = ["demo", "demo2"]',
+                                   'default = ["demo", "demo2", "demo3"]', 1)
+                   + '\n[[entry]]\nid = "demo3"\ndescriptor = "{prefix}/demo3/kit.toml"\n')
+        (_g23g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(_reg23g, encoding="utf-8",
+                                                                         newline="\n")
+        git(_g23g, "add", "-A")
+        git(_g23g, "commit", "-qm", "B: demo3 joins the default set")
+        check("[dRB-23] AC3 LIVENESS the first apply exits 0, demo3's descriptor declares the "
+              "adopter, and the registry names demo3 in its default set",
+              _p23g1.returncode == 0 and _kit23ga != _kit23g
+              and '"demo3"]' in _reg23g and _reg23g != M13_REG,
+              f"rc {_p23g1.returncode}" + NL13 + (_p23g1.stdout + _p23g1.stderr)[-600:])
+        _u23g = run_gov13(_g23g, "update", "--target", str(_t23g), "--write")
+        _out23g = (_u23g.stdout + _u23g.stderr).splitlines()
+        _pl23g = [ln for ln in _out23g if ln.startswith(
+            "govkit: kit 'demo3': its adopter exited 2 on the update that gained it")]
+        check("[dRB-23] AC3 `update --write` prints exactly one problem line for demo3's refused "
+              "adopter, and it carries the stderr with the byte replaced",
+              len(_pl23g) == 1 and ("Its stderr ended: J" + chr(0xFFFD) + "rg") in _pl23g[0]
+              and "It printed nothing to stderr" not in _pl23g[0],
+              " | ".join(_pl23g) or NL13.join(_out23g[-14:]))
+        check("[dRB-23] AC3 ...and no output line carries UnicodeDecodeError",
+              not any("UnicodeDecodeError" in ln for ln in _out23g), NL13.join(_out23g[-14:]))
+
+        # ---- [dRB-23] THE CLASS, over SOURCE. The population is every `subprocess.run` whose first
+        # ---- argument is a `resolve_shell_argv(...)` call and which names an `encoding`: the
+        # ---- target-side spawns that decode UTF-8. Each must replace what it cannot decode, and
+        # ---- the population must hold the helper's own call, so an empty walk reds. The three
+        # ---- spawn sites call the helper, which the count below holds them to.
+        _gsrc23 = GOVKIT.read_text(encoding="utf-8")
+        _tree23 = _ast.parse(_gsrc23)
+        _fn23 = next((n for n in _tree23.body if isinstance(n, _ast.FunctionDef)
+                      and n.name == "run_target_argv"), None)
+        _in23 = {id(n) for n in _ast.walk(_fn23)} if _fn23 is not None else set()
+        _pop23: list = []
+        for _n23 in _ast.walk(_tree23):
+            if not (isinstance(_n23, _ast.Call) and isinstance(_n23.func, _ast.Attribute)
+                    and _n23.func.attr == "run" and isinstance(_n23.func.value, _ast.Name)
+                    and _n23.func.value.id == "subprocess" and _n23.args
+                    and isinstance(_n23.args[0], _ast.Call)
+                    and isinstance(_n23.args[0].func, _ast.Name)
+                    and _n23.args[0].func.id == "resolve_shell_argv"):
+                continue
+            _kw23 = {k.arg: k.value for k in _n23.keywords if k.arg}
+            if "encoding" in _kw23:
+                _pop23.append((_n23, _kw23))
+        _bad23 = [_n.lineno for _n, _kw in _pop23
+                  if not (isinstance(_kw.get("errors"), _ast.Constant)
+                          and _kw["errors"].value == "replace")]
+        check("[dRB-23] AC4 every target-side UTF-8 spawn replaces what it cannot decode, and the "
+              "population holds run_target_argv's own call",
+              bool(_pop23) and not _bad23 and any(id(_n) in _in23 for _n, _kw in _pop23),
+              f"population {[_n.lineno for _n, _kw in _pop23]} · lacking errors=\"replace\" "
+              f"{_bad23} · run_target_argv {'found' if _fn23 is not None else 'absent'}")
+        _calls23 = [n.lineno for n in _ast.walk(_tree23) if isinstance(n, _ast.Call)
+                    and isinstance(n.func, _ast.Name) and n.func.id == "run_target_argv"]
+        check("[dRB-23] AC4 run_target_argv is called exactly three times: CONFIGURE, the "
+              "regenerate site and the gained loop", len(_calls23) == 3, str(_calls23))
+
         # ========= DEPL-cMendedVintage-21 — THE ATOMIC WRITE IS ONE HELPER, AND OBSERVED =========
         # The mitigation above (`-13` S6) was implemented and UNGRADED. `-13` AC6 compares the
         # runner two runs of `apply` produce, and an ordinary in-place `write_text` produces those
@@ -15835,18 +16546,22 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- ENGINE's own constant, read rather than restated: a second copy here would keep
         # ---- passing against the harness's idea of what an adopter's bar reads, which is the
         # ---- two-spellings class this file's header names.
-        def read_bar_writes21() -> tuple[set, list, list]:
-            """Walk the engine's syntax and return its derived adopter-bar destination NAMES, the
-            direct writes to one of them, and the sites already routed through `write_atomic`.
+        def read_bar_writes21(members, src: str) -> tuple[set, list, list]:
+            """Walk the engine source `src` and return the adopter-bar destination NAMES `members`
+            derive, the direct writes to one of them, and the sites already routed through
+            `write_atomic`.
 
             PATH-SHAPED DERIVATIONS ONLY, and this half was measured over the real tree before it
             was wired. A rule propagating through any RHS that MENTIONS a destination pulled in
             `existing = json.loads(rf.read_text(...))` and everything derived from that — three
             innocent names a later direct write would have redded for no reason. A read is not a
             derivation.
+
+            THE MEMBERS AND THE SOURCE ARE ARGUMENTS (TOOL-dRedressedBar-23), so the walk runs over
+            each member alone and over a staged copy of the engine: over the union, a member that
+            matches nothing passed, because the other members kept both liveness checks true.
             """
-            mk = tuple(govkit_module().ADOPTER_BAR_PATHS)
-            src = GOVKIT.read_text(encoding="utf-8")
+            mk = tuple(members)
             tree = _ast.parse(src)
             pathcall = ("with_name", "with_suffix", "joinpath", "resolve", "absolute", "expanduser")
 
@@ -15908,7 +16623,8 @@ user_skills = "/tmp/gk-fake-skills"
                     direct.append((n.lineno, d.replace(chr(10), " ")[:80]))
             return dests, direct, routed
 
-        _dest21, _direct21, _routed21 = read_bar_writes21()
+        _mk21 = tuple(govkit_module().ADOPTER_BAR_PATHS)
+        _dest21, _direct21, _routed21 = read_bar_writes21(_mk21, _gsrc21)
         check("[-21] AC2 LIVENESS the declared set still reaches a destination in this engine, so "
               "a renamed `[gate_runner].file` read reds here rather than emptying the population",
               bool(_dest21), "ADOPTER_BAR_PATHS matched no assignment at all")
@@ -15918,6 +16634,14 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-21] AC2 S4 no direct write_text/write_bytes/open-for-write names a declared "
               "adopter-bar destination — every one routes through the helper",
               not _direct21, str(_direct21))
+        # TOOL-dRedressedBar-23 S6. LIVENESS PER MEMBER: the two checks above are aggregate, so a
+        # member whose spelling the engine stopped using, `receipt_path` renamed say, graded nothing
+        # while the other members kept both true.
+        for _m21 in _mk21:
+            _md21, _mdir21, _mr21 = read_bar_writes21((_m21,), _gsrc21)
+            check(f"[-21] AC2 LIVENESS the member {_m21} alone reaches a write_atomic site, so a "
+                  f"member matching nothing reds here rather than passing inside the union",
+                  bool(_mr21), f"member {_m21}: destinations {sorted(_md21)}, no routed site")
 
         # ===== DEPL-cMendedVintage-14 — stale conflict orders are reaped, and keyed on the path ====
         #

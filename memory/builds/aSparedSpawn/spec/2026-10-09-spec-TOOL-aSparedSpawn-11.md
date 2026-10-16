@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-11 — per-suite levers: five suites stop paying a process for a question they ask once
 
-**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
+**Status:** CLOSED · rev-4 · 2026-10-16 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -237,6 +237,9 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC9 · the unse
   stub first on PATH rather than redefining `GIT`: a second `GIT` definition is a second spelling of a
   name `lexicon naming predicates` grades, and it moved both of that leg's pins by one. The stub
   counts the same `rev-list` calls and passes every call through to the real git.
+- rev-4 · 2026-10-16 · AC6 · AC10 · records, TOOL-dRedressedBar-27: AC6's suite run and AC10's
+  timings were owed at VERIFYING, and no record observes either. The criteria do not move, and the
+  status stays CLOSED.
 
 ## 10. Reuse audit
 

@@ -33,7 +33,7 @@ re-rendered suites. Every suite arm this unit adds or moves is OWED at VERIFYING
   `----` lines at `GATE_JOBS=1` equal those at `GATE_JOBS=4` and the base runner's, and no leg reads
   `(no result)`, on the final runner. The canary's pool-equivalence arm is OWED at VERIFYING.
 - AC6 — `direct-checks.sh keys` — over a dirty tree (an edited tracked file, an untracked file under a
-  guard, a staged edit), all six ledger keys, a directory guard, a nested one, two files, a glob that
+  guard, a staged edit), all six `input_key` ledger keys, a directory guard, a nested one, two files, a glob that
   takes the per-leg path, an absent path and an unguarded leg, equal the base runner's, and a
   `GATE_REUSE` bar reused all six on the precomputed keys, on the final runner. The base is the
   parent, which carries the reuse-key unit's definition. The evidence suite's per-leg and
@@ -45,7 +45,8 @@ re-rendered suites. Every suite arm this unit adds or moves is OWED at VERIFYING
   redaction and the ledger seconds.
   The evidence suite's AC7 arms are OWED at VERIFYING.
 - AC8 — `direct-checks.sh forks` — the counter read the specimen's declared 5 forks and 1 exec, and the
-  same specimen with its trace descriptor closed first refused with 2. The run-log suite's SPAWNS arm
+  same specimen with its trace descriptor (the one its `PS4` trace writes to) closed first refused
+  with 2. The run-log suite's SPAWNS arm
   carries the same counter and is OWED at VERIFYING.
 - AC9 — `direct-checks.sh forks` — per-leg events, forks plus execs over ceiling-declaring legs at width
   1 with the spawn floor pinned: base 40 (25 forks, 15 execs), twice; cut 5 (2 forks, 3 execs), twice;
@@ -55,14 +56,14 @@ re-rendered suites. Every suite arm this unit adds or moves is OWED at VERIFYING
   runner, the floor write landing in one trace only, which is why the arm pins it.
 - AC10 — `direct-checks.sh procmon` — python execs before the first dispatch, base against cut: found
   kit 4 and 3, missing kit 3 and 2, refusing scope 4 and 3; the `run-gates: process-monitor:` line
-  equals the base's for all three, the refusal's paths included. The SPAWNS arm's in-suite form is OWED.
+  (which prints `PROCMON_WHY`) equals the base's for all three, the refusal's paths included. The SPAWNS arm's in-suite form is OWED.
 - AC11 — `direct-checks.sh parity` — the marked region of all 67 copies equals
   `tools/lib/resolve_kit_dir.py`, the population covers every file `git grep -l '>>> resolve_kit_dir'`
   lists outside `memory/`, and no file there still captures the heredoc with `cat`. The re-render's
   own checker refused on any moved byte inside the markers and reported none; the parity suite is
   OWED at VERIFYING.
 - AC12 — `direct-checks.sh ban` — the S12 predicate over a scratch copy of `agent-cap.test.sh` with its
-  wrapper reverted fired once, at line 73, and stayed silent on a comment spelling the idiom. The
+  wrapper reverted (to `"$(cat <<'RKD'`) fired once, at line 73, and stayed silent on a comment spelling the idiom. The
   resolve-python suite's ban arm is OWED at VERIFYING.
 
 Also observed directly: `fork-count.sh --only` on a frozen root read the one-leg row at 72 twice (its

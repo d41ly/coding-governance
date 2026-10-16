@@ -1969,10 +1969,13 @@ if [ -n "$ATTRIBUTE" ]; then
         # WRITTEN BY RENAME, AND ONLY HERE — after the R run RETURNED. A run killed mid-suite never
         # reaches this line, so a partial set can never be served as the baseline from then on.
         mkdir -p "$CACHE_ROOT" 2>/dev/null
-        if { printf 'rc %s\n' "$rrc"; cat "$ATTR_TMP/r.set"; } > "$cfile.tmp.$$" 2>/dev/null; then
-          mv -f "$cfile.tmp.$$" "$cfile" 2>/dev/null || rm -f "$cfile.tmp.$$" 2>/dev/null
+        # The temp's name is unknown until the write creates it (TOOL-dRedressedBar-24): `mktemp -u`
+        # names it beside the baseline and creates nothing. One fork, once per attributed suite.
+        t=$(mktemp -u "$cfile.XXXXXXXX" 2>/dev/null)
+        if { printf 'rc %s\n' "$rrc"; cat "$ATTR_TMP/r.set"; } > "$t" 2>/dev/null; then
+          mv -f "$t" "$cfile" 2>/dev/null || rm -f "$t" 2>/dev/null
         else
-          rm -f "$cfile.tmp.$$" 2>/dev/null
+          [ -z "$t" ] || rm -f "$t" 2>/dev/null
         fi
       fi
       # A DEAD R GIVES S(R) NO MEMBERS, so every line of S(L) reads NEW exactly as it does for a

@@ -1,0 +1,14 @@
+[
+  {
+    "name": "stall",
+    "argv": ["bash", "{prefix}/run-gates/fixtures/measure-legs/stall.sh", "20"]
+  },
+  {
+    "name": "steady",
+    "argv": ["python3", "{prefix}/run-gates/fixtures/measure-legs/steady.py", "20"]
+  },
+  {
+    "name": "churn",
+    "argv": ["python3", "{prefix}/run-gates/fixtures/measure-legs/churn.py", "20"]
+  }
+]

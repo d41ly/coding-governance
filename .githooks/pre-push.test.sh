@@ -116,6 +116,10 @@ export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=fals
 # untracked merge bar. Without this the whole file would test a refusal path and nothing else.
 # Cases 25-27 unset it deliberately.
 export GOV_GATE_CMD_TEST=1
+# GATE_SELFTESTS IS AN INPUT, NEVER INHERITED (TOOL-dRedressedBar-1 S4): predicate 8 forces a FULL
+# decision whenever it is set, and the bar exports it, so every push below would grade that forcing
+# case. Cleared once, here, for every arm; an arm that grades it sets its own value on its push.
+unset GATE_SELFTESTS
 
 # Isolate ONLY the pre-push hook (a scratch hooks dir) so the repo's pre-commit branch-guard does not
 # fire on the test's own setup commits. A clone does NOT carry core.hooksPath — set it explicitly.

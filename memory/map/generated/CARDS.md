@@ -76,11 +76,11 @@ Three scanners for the failure modes a reader cannot see: PowerShell's decoding 
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/gate-lint.md`
 - decisions 2: `TOOL-aLeakedHandle-1`, `TOOL-cListedCensus-1`
-- gate-legs 6: `shell hygiene (a loop fed by a command substitution)`, `shell-hygiene selftest`, `encoding posture (text IO names its encoding)`, `shell hygiene (a location probe asked from a moved directory)`, `shell hygiene (a fork spent on builtin work)`, `spawn budget (forks per hot entrypoint)`
+- gate-legs 7: `shell hygiene (a loop fed by a command substitution)`, `shell-hygiene selftest`, `encoding posture (text IO names its encoding)`, `shell hygiene (a location probe asked from a moved directory)`, `shell hygiene (a fork spent on builtin work)`, `shell hygiene (a fixed-name temp renamed into place)`, `spawn budget (forks per hot entrypoint)`
 - kits 1: `gate-lint`
 - gotcha-classes 1: `a-gate-that-walks-the-repo-root-reads-other-worktrees.md`
-- globs 6: `tools/gate-lint/*`, `memory/project/substitution-fed-loops.txt`, `memory/project/encoding-posture-sites.txt`, `memory/project/location-probe-waivers.txt`, `memory/project/spawn-idiom-sites.txt`
-- cut 1 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- globs 6: `tools/gate-lint/*`, `memory/project/substitution-fed-loops.txt`, `memory/project/encoding-posture-sites.txt`
+- cut 3 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## govkit
 
@@ -252,12 +252,12 @@ The gate runner, its harnesses, and the adopter that keeps a target's verdict re
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/run-gates.md`
 - decisions 9: `TOOL-aPacedTurnstile-1`, `TOOL-aPacedTurnstile-2`, `TOOL-aPacedTurnstile-4`, `TOOL-aPacedTurnstile-5`, `TOOL-aPacedTurnstile-6`, `TOOL-aPacedTurnstile-3`, `TOOL-aPacedTurnstile-7`, `TOOL-aPacedTurnstile-16`, `TOOL-dLoggedFlight-3`
-- gate-legs 13: `run-gates gov canary`, `run-gates adopter e2e`, `run-gates wiring`, `profile-bar selftest`, `every held leg is budgeted, every budget row resolves`, `run-selftests self-test`, `selftest harness self-test`, `extract-arms self-test`, `leg ceilings clear their evidenced maximum`, `run-gates run-log line`, `receipt sync (installed files match the receipt)`, `pre-push bar self-test`, `held-halves selftest`
-- kits 1: `run-gates`
+- gate-legs 14: `run-gates gov canary`, `run-gates adopter e2e`, `run-gates wiring`, `profile-bar selftest`, `every held leg is budgeted, every budget row resolves`, `run-selftests self-test`, `selftest harness self-test`, `extract-arms self-test`, `leg ceilings clear their evidenced maximum`, `run-gates run-log line`, `receipt sync (installed files match the receipt)`, `pre-push bar self-test`, `held-halves selftest`, `measure-legs selftest`
+- kits 1
 - gotcha-classes 15
-- guides 1: `MERGE-BAR.md`
-- globs 24
-- cut 39 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- guides 1
+- globs 26
+- cut 43 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## run-gates-turnstile
 

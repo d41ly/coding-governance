@@ -54,11 +54,14 @@ CDIR=""; SHA=""; RUN_ID=""; REMOTE=""; WT=""
 
 write_post_merge_record() { # verdict · published · why -> <common-dir>/gate-post-merge, tmp then rename
   [ -n "$CDIR" ] || return 0
-  local why=${3//[$'\t\n\r']/ }
+  local why=${3//[$'\t\n\r']/ } t
+  # The temp's name is unknown until the write creates it (TOOL-dRedressedBar-24): `mktemp -u` names
+  # it and creates nothing, so the `>` below is the open that makes it. One fork, once per bar.
+  t=$(mktemp -u "$CDIR/gate-post-merge.XXXXXXXX" 2>/dev/null)
   { printf 'sha\t%s\nverdict\t%s\nrun_id\t%s\npublished\t%s\nwhy\t%s\nremote\t%s\nstamped\t%s\n' \
       "$SHA" "$1" "$RUN_ID" "$2" "$why" "$REMOTE" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-      > "$CDIR/gate-post-merge.tmp" && mv -f "$CDIR/gate-post-merge.tmp" "$CDIR/gate-post-merge"; } 2>/dev/null \
-    || echo "post-merge: $CDIR/gate-post-merge could not be written"
+      > "$t" && mv -f "$t" "$CDIR/gate-post-merge"; } 2>/dev/null \
+    || { [ -z "$t" ] || rm -f "$t" 2>/dev/null; echo "post-merge: $CDIR/gate-post-merge could not be written"; }
 }
 
 write_refusal() { # why · [usage] -> the REFUSING line, the REFUSED record, exit 2
@@ -332,7 +335,7 @@ write_run_record() { # -> PM_RUN_COPY, the copy of the bar's run record under th
 }
 
 write_bar_green() { # -> <common-dir>/gate-bar-green.shared in design D3's grammar, by post-merge
-  local tree w paths="" dirty
+  local tree w paths="" dirty t
   local -a words=()
   # The hook's and the driver's writers refuse a dirty tree, and so does this one: a bar judged on rc
   # and HEAD alone may have rewritten tracked files, and the record would certify the pristine tree.
@@ -343,10 +346,11 @@ write_bar_green() { # -> <common-dir>/gate-bar-green.shared in design D3's gramm
   tree=$(git rev-parse -q --verify "$SHA^{tree}" 2>/dev/null) || tree=""
   read -ra words <<<"$BAR"
   for w in "${words[@]}"; do case "$w" in */*|*.sh) paths="$paths${paths:+ }$w" ;; esac; done
+  t=$(mktemp -u "$CDIR/gate-bar-green.shared.XXXXXXXX" 2>/dev/null)
   { printf 'sha\t%s\ntree\t%s\nbar\t%s\nbar_paths\t%s\nkind\tfull\nbase\t\nselftests\t%s\nrun_id\t%s\nby\tpost-merge\nstamped\t%s\n' \
       "$SHA" "$tree" "$BAR" "$paths" "${GATE_SELFTESTS:+1}" "$RUN_ID" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-      > "$CDIR/gate-bar-green.shared.tmp" && mv -f "$CDIR/gate-bar-green.shared.tmp" "$CDIR/gate-bar-green.shared"; } 2>/dev/null \
-    || echo "post-merge: $CDIR/gate-bar-green.shared could not be written"
+      > "$t" && mv -f "$t" "$CDIR/gate-bar-green.shared"; } 2>/dev/null \
+    || { [ -z "$t" ] || rm -f "$t" 2>/dev/null; echo "post-merge: $CDIR/gate-bar-green.shared could not be written"; }
 }
 
 # ---- 4. the scratch worktree, and its cleanup ------------------------------------------------------

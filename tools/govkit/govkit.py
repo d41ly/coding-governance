@@ -801,12 +801,14 @@ def write_version_carriers(root: pathlib.Path, descs: dict[str, tuple[dict, str]
     `version_from` constant; return one `(path, entry, carrier id, old, new)` per rewrite.
 
     Within an entry's basis it rewrites: every `gov:kit <entry>@<n>` marker whose number differs;
-    and, on a line matching ANY entry's `version_from` pattern then an optional quote and a number,
-    that number plus every same-line `gov:kit <alias>@<n>` whose alias is no OTHER entry's id — but
-    only when the line carries this entry's marker, or the file does elsewhere and carries no other
-    entry's marker at all. That ownership clause is what keeps review-harness's `version: ` number
-    out of the drift-audit harnesses its `**` also claims. On the constant's own line only the
-    aliases move; its number is the source.
+    and, on a line matching a `version_from` pattern then an optional quote and a number, that
+    number plus every same-line `gov:kit <alias>@<n>` whose alias is no OTHER entry's id — but only
+    when the line carries this entry's marker, or the file does elsewhere and carries no other
+    entry's marker at all. That ownership clause keeps review-harness's `version: ` number out of
+    the drift-audit harnesses its `**` also claims. A pattern counts only in its own entry's basis:
+    `playbook`'s matched a playbook-render selftest fixture outside playbook's basis, so every mint
+    wrote playbook-render's number there with no bump (TOOL-dRedressedBar-20). On the constant's
+    own line only the aliases move; its number is the source.
 
     WHAT IT DOES NOT DO: mint a value, run a `[[regenerate]]` argv, or touch a file outside the
     basis. Bytes are kept: read and written as UTF-8 with `newline=""`, split on `\\n` alone, and a
@@ -814,13 +816,13 @@ def write_version_carriers(root: pathlib.Path, descs: dict[str, tuple[dict, str]
     """
     mk = re.compile(r"gov:kit ([a-z0-9-]+)@([0-9]+(?:\.[0-9]+)*)")
     numv = re.compile(r"([0-9]+(?:\.[0-9]+)+)")
-    carrier_rxs = []
-    for d, _dp in descs.values():
+    carrier_rxs: dict[str, re.Pattern] = {}   # entry id -> its pattern, an optional quote, a number
+    for rid, (d, _dp) in descs.items():
         vf = d.get("version_from") or {}
         if "none" in vf or not vf.get("pattern"):
             continue
         try:
-            carrier_rxs.append(re.compile("(?:" + vf["pattern"] + r")['\"]?([0-9]+(?:\.[0-9]+)*)"))
+            carrier_rxs[rid] = re.compile("(?:" + vf["pattern"] + r")['\"]?([0-9]+(?:\.[0-9]+)*)")
         except re.error:
             continue
     texts: dict[str, list[str]] = {}   # path -> [as read, as rewritten so far]
@@ -860,12 +862,13 @@ def write_version_carriers(root: pathlib.Path, descs: dict[str, tuple[dict, str]
             lines = texts[f][1].split("\n")
             file_ids = {h.group(1) for h in mk.finditer(texts[f][1])}
             foreign = any(i != eid and i in descs for i in file_ids)
+            file_rxs = [rx for rid, rx in carrier_rxs.items() if f in basis.get(rid, ())]
             const_at = (next((n for n, ln in enumerate(lines) if own_rx.search(ln)), -1)
                         if f == src else -1)
             for n, ln in enumerate(lines):
                 line_own = any(h.group(1) == eid for h in mk.finditer(ln))
                 owned = line_own or (eid in file_ids and not foreign)
-                hits = [h for h in (rx.search(ln) for rx in carrier_rxs) if h] if n != const_at else []
+                hits = [h for h in (rx.search(ln) for rx in file_rxs) if h] if n != const_at else []
                 num = min(hits, key=lambda h: h.start(1)) if hits and owned else None
                 aliases = num is not None or (n == const_at and line_own)
                 edits = []   # (start, end, carrier id, old)
@@ -1209,6 +1212,21 @@ def resolve_shell_argv(argv: list[str]) -> list[str]:
         return list(argv)
 
 
+def run_target_argv(argv: list[str] | tuple[str, ...],
+                    target: pathlib.Path) -> subprocess.CompletedProcess:
+    """Run a kit's resolved target-side argv in `target`, its output captured and decoded as UTF-8
+    with every undecodable byte REPLACED (TOOL-dRedressedBar-23).
+
+    THREE CALLERS, ONE DECODE RULE: `apply`'s CONFIGURE spawn, `update`'s `[[regenerate]]` spawn
+    and `update`'s gained-kit adopter spawn. Each spelled its own keywords, and the gained loop's
+    lacked `errors="replace"`, so an adopter writing one non-UTF-8 byte to stderr made its refusal
+    line claim it printed nothing on Windows, and raised `UnicodeDecodeError` out of `update` on
+    POSIX. One helper holds the rule so the three cannot disagree again.
+    """
+    return subprocess.run(resolve_shell_argv(list(argv)), cwd=str(target), capture_output=True,
+                          text=True, encoding="utf-8", errors="replace")
+
+
 def resolve_tokens(s: str, ctx: dict[str, str]) -> tuple[str, list[str]]:
     """Substitute `{token}`s from the target's answers. Unresolved tokens are RETURNED, not emitted.
 
@@ -1475,6 +1493,45 @@ def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> 
             ctx[k] = demand_safe_token(f"kit.{eid}.{k}", v, f"entry '{eid}'", prose=True)
     ctx.setdefault("memory_root", "memory")
     return ctx
+
+
+def resolve_adopter_argv(target: pathlib.Path, deploy: dict, eid: str,
+                         descs: dict[str, tuple[dict, str]]) -> list[str]:
+    """The adopter argv CONFIGURE runs for `eid`, resolved in the context of the entry that owns it.
+
+    THE `via` GRAMMAR (TOOL-dRedressedBar-15). An entry's `[adopt]` table may hold `via = "<entry>"`
+    in place of an `argv`: "my adopter is that entry's adopter". The source entry is then `<entry>`,
+    else `eid` itself, and the source's `[adopt].argv` comes back with every element passed through
+    `resolve_tokens` against the SOURCE's `target_context`, so `{prefix}` and `{kit}` take the
+    source's per-kit table, exactly as its own CONFIGURE resolves them. Element `[0]` is kept as both
+    spawn sites always kept it. An entry, or a source, with no argv returns `[]`. The key is read
+    from gov's descriptors only: a target's `[kit.<eid>]` values become ctx tokens, never `[adopt]`
+    keys, so a target cannot point one entry's adopter at another.
+
+    THE SOURCE CHOICE IS `scan_entry_argv`'s, asked for `[adopt]` alone, and this returns the
+    resolved texts it yields (TOOL-dRedressedBar-17). The key's PRESENCE declares the delegate: a
+    `via` that is not a non-empty string naming a registry entry raises `KeyError` naming `eid`, and
+    never falls back to `eid`'s own argv.
+
+    The measured case: agent-cap's adopter is settings-merge.py's default action, and the file is
+    settings-merge's. Spelled as its own `{prefix}/settings-merge.py`, it resolved through
+    agent-cap's table, so `[kit.agent-cap] prefix = "scripts"` ran `scripts/settings-merge.py`, a
+    file nothing installed there, and python exited 2.
+
+    THE SIX RULES selfcheck enforces on every `via`, the first broken one reported: it is a
+    non-empty string; it names a registry entry; that entry is in `eid`'s `requires`, so its script
+    is installed whenever `eid` is configured; that entry declares a non-empty `[adopt] argv` of its
+    own, which rules out a chain; `eid`'s own `[adopt]` declares no non-empty `argv` beside it; and
+    `eid`'s `[[files]]` holds no `rendered`, `generated` or `merged` rule, because
+    `check_entry_producer` and the merged-rule guard in `apply` read `eid`'s own declared argv.
+
+    IT VALIDATES NOTHING beyond that `KeyError`. selfcheck is the one validator of a gov-authored
+    descriptor. The CONFIGURED entry's own descriptor and context still classify the exit and still
+    decide the inert, hole and resume skips; only the argv and the context its tokens resolve in are
+    the source's.
+    """
+    return [res for _e, _src, _kind, _name, _decl, res, _miss
+            in scan_entry_argv(descs, [eid], target, deploy, ("[adopt]",))]
 
 
 def load_deploy(target: pathlib.Path) -> dict:
@@ -3165,8 +3222,10 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         # by the same `missing` key.
         _bare_rows = planned_writes(root, _bare_t, _bare_deploy, descs, _bare_sel, Report())
         _bare_have = {x["dest"] for x in _bare_rows if not x["missing"]}
-        _leg_argv = sum(len(leg.get("argv", []))
-                        for _e in _bare_sel for leg in descs[_e][0].get("gate_leg", []))
+        # The `[[gate_leg]]` part of the population the cross-entry note below counts whole, by the
+        # one walk both read (TOOL-dRedressedBar-17).
+        _leg_argv = sum(1 for _t in scan_entry_argv(descs, _bare_sel, _bare_t, _bare_deploy,
+                                                     ("[[gate_leg]]",)))
         _silent = silenced_legs(descs, _bare_sel, _bare_t, _bare_deploy, _bare_have)
         for _eid, _nm, _bad in sorted(_silent):
             r.fail(f"entry '{_eid}' declares gate leg '{_nm}' whose argv names "
@@ -3219,6 +3278,95 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                f"{len(_silent)} naming a path no rule produces · "
                f"{len(_dests)} planned destination(s) graded against the reserved "
                f"`{{memory_root}}/project/` prefix, {len(_reserved_hits)} under it")
+
+        # ---- TOOL-dRedressedBar-15: NO ARGV NAMES A FILE ONLY ANOTHER ENTRY SHIPS.
+        #
+        # Each entry's tokens resolve from its OWN `[kit.<eid>]` table, so an argv spelling
+        # `{prefix}/<file>` for a file a SIBLING ships agrees with that sibling only while both
+        # share one prefix. Measured: agent-cap's adopter was a copy of settings-merge's, and at
+        # `[kit.agent-cap] prefix = "scripts"` it ran `scripts/settings-merge.py`, which nothing
+        # installed, and python exited 2. A per-entry prefix on either side moves one half and not
+        # the other. The remedy is `[adopt] via`, which `resolve_adopter_argv` resolves in the named
+        # entry's context.
+        #
+        # TWO PARTS. The `via` rules, the first broken one per entry, and an entry breaking one is
+        # left out of the join so the walk never meets an invalid `via`. Then the OWNERSHIP JOIN
+        # over the four argv kinds the engine resolves through the declaring entry's own
+        # `target_context`: `[adopt]` (joined to the SOURCE entry), `[check]` (`run_kit_check`),
+        # `[[gate_leg]]` (`write_gate_legs`) and `[[regenerate]]` (`update`'s re-render). The walk
+        # is `scan_entry_argv`, the one `silenced_legs` reads (TOOL-dRedressedBar-17), so every
+        # element it yields is OFFERED, it is GRADED by `silenced_legs`' own rule, a resolved text
+        # carrying `/` with nothing missing, and it is a HIT when some entry plans that path and the
+        # source entry does not. Owners are the bare rows with nothing missing.
+        #
+        # THE FIRST AND SIXTH `via` RULES are TOOL-dRedressedBar-17's. A value that is not a
+        # non-empty string read `names no registry entry`, a reason about the wrong thing. And an
+        # entry carrying a `rendered`, `generated` or `merged` rule is read through its OWN declared
+        # argv by `check_entry_producer` and by `apply`'s merged-rule guard, so beside `via` the
+        # first would call it a non-producer and the second refuse a delegate CONFIGURE runs.
+        #
+        # WHAT THIS DOES NOT CHECK: an element whose resolved text carries no `/` (the gap
+        # `silenced_legs` pins); an unresolved element, which is counted and not graded; `[[hole]]`
+        # discharge commands; `[[outcome]]` probe paths; a path NO entry ships, which
+        # `silenced_legs` grades for legs; whether the delegate's adopter succeeds; and a real
+        # per-entry prefix, since the bare target has one, so the class shows here as ownership
+        # rather than as a missing file.
+        _xa_owners: dict[str, set[str]] = {}
+        for _xa_row in _bare_rows:
+            if not _xa_row["missing"]:
+                _xa_owners.setdefault(_xa_row["dest"], set()).add(_xa_row["kit"])
+        _xa_sel: list[str] = []
+        for _xa_e in _bare_sel:
+            _xa_d = descs[_xa_e][0]
+            _xa_adopt = _xa_d.get("adopt") or {}
+            if "via" in _xa_adopt:
+                _xa_v = _xa_adopt.get("via")
+                if not (isinstance(_xa_v, str) and _xa_v):
+                    _xa_why = "is not a non-empty string"
+                elif _xa_v not in descs:
+                    _xa_why = "names no registry entry"
+                elif _xa_v not in (_xa_d.get("requires") or []):
+                    _xa_why = "is not in its requires, so that entry's script may not be installed"
+                elif not ((descs[_xa_v][0].get("adopt") or {}).get("argv") or []):
+                    _xa_why = "declares no [adopt] argv of its own"
+                elif _xa_adopt.get("argv") or []:
+                    _xa_why = "sits beside an [adopt] argv in the same table"
+                elif any(_xa_rule.get("role", "engine") in ("rendered", "generated", "merged")
+                         for _xa_rule in _xa_d.get("files", [])):
+                    _xa_why = ("carries a rendered, generated or merged rule, which the producer "
+                               "test and the merged-rule guard read through its own [adopt] argv")
+                else:
+                    _xa_why = ""
+                if _xa_why:
+                    r.fail(f"entry '{_xa_e}' declares [adopt] via = '{_xa_v}', which {_xa_why}")
+                    continue
+            _xa_sel.append(_xa_e)
+        _xa_offered = _xa_graded = _xa_hits = 0
+        for _xa_e, _xa_s, _xa_kind, _xa_nm, _xa_a, _xa_p, _xa_miss in scan_entry_argv(
+                descs, _xa_sel, _bare_t, _bare_deploy,
+                ("[adopt]", "[check]", "[[gate_leg]]", "[[regenerate]]")):
+            _xa_offered += 1
+            if _xa_miss or "/" not in _xa_p:
+                continue
+            _xa_graded += 1
+            _xa_own = _xa_owners.get(_xa_p) or set()
+            if not _xa_own or _xa_s in _xa_own:
+                continue
+            _xa_hits += 1
+            _xa_o = ", ".join(sorted(_xa_own))
+            _xa_label = f"gate leg '{_xa_nm}'" if _xa_kind == "[[gate_leg]]" else _xa_kind
+            r.fail(f"entry '{_xa_e}': its {_xa_label} argv names '{_xa_p}', a file entry "
+                   f"'{_xa_o}' ships and '{_xa_s}' does not. Each entry's tokens resolve "
+                   f"from its own table, so a per-entry prefix on either moves one side and "
+                   f"not the other. An adopter that runs another entry's script declares "
+                   f"[adopt] via = \"{_xa_o}\"")
+        r.note(f"cross-entry argv: {_xa_offered} argv element(s) offered by [adopt], "
+               f"[check], [[gate_leg]] and [[regenerate]] across {len(_bare_sel)} entries, "
+               f"{_xa_graded} graded, {_xa_hits} naming a file only another entry ships")
+        if _xa_offered and not _xa_graded:
+            r.fail(f"cross-entry argv: {_xa_offered} element(s) offered and none graded — every one "
+                   f"carried an unresolved token or resolved with no `/`, so the predicate read "
+                   f"nothing")
 
     # ---- 7i: per-file claim inside a NON-FLAT entry's home. Scoped deliberately: five `kind="flat"`
     #          entries declare `home = "tools"` as a source-resolution base, and quantifying over
@@ -3687,11 +3835,18 @@ KIND_MARKS = {"write": "write ", "order": "ORDER ", "side-effect": "SIDE  ",
 def check_entry_producer(desc: dict) -> bool:
     """Does `apply` run anything for this entry that could produce a `rendered`/`generated` file?
 
-    MEASURED, not assumed. CONFIGURE is `argv = d.get("adopt", {}).get("argv") or []` followed by
-    `if not argv: continue`, so an entry with an empty adopter runs NOTHING — and an entry carrying
-    a `rendered`/`generated` rule declares exactly that in writing: `review-harness` ("the render is
-    performed by the parity gate's own --render mode rather than by a separate adopter"). Previewing
-    it as a side-effect would be the same over-promise this unit deletes, moved one mark over.
+    MEASURED, not assumed. CONFIGURE is `resolved = resolve_adopter_argv(target, deploy, eid,
+    descs)` followed by `if not resolved: continue`, so an entry with an empty adopter runs NOTHING
+    — and an entry carrying a `rendered`/`generated` rule declares exactly that in writing:
+    `review-harness` ("the render is performed by the parity gate's own --render mode rather than
+    by a separate adopter"). Previewing it as a side-effect would be the same over-promise this unit
+    deletes, moved one mark over.
+
+    CONFIGURE FOLLOWS `[adopt] via` THERE, and this reads the entry's OWN declared argv
+    (TOOL-dRedressedBar-15, -17). It is asked only about an entry carrying a `rendered` or
+    `generated` rule, and selfcheck's `via` rules refuse `via` on an entry carrying a `rendered`,
+    `generated` or `merged` rule, so the two never disagree. The merged-rule guard in `apply` reads
+    the declared argv the same way, under the same rule.
 
     A `blocks_adopt` hole makes CONFIGURE skip too. Whether a shipped descriptor declares one is the
     descriptors' fact and not this docstring's, so that half is armed by a FIXTURE in `selftest.py`
@@ -3932,22 +4087,83 @@ def silenced_legs(descs: dict[str, tuple[dict, str]], selection: list[str], targ
     passes the target's index AFTER its own stage step, so this run's writes count as present;
     `plan` passes the index UNION this plan's own write destinations, because at plan time nothing
     has been written and the tracked-only predicate would red every first install.
+
+    THE WALK IS `scan_entry_argv`'s (TOOL-dRedressedBar-17), asked for `[[gate_leg]]` alone, so the
+    selfcheck ownership join grades an element by this same rule: a resolved text carrying `/` with
+    nothing missing. Elements group per entry and leg name, in the order the walk yields them.
     """
-    hits: list[tuple[str, str, list[str]]] = []
+    hits: dict[tuple[str, str], list[str]] = {}
+    for eid, _src, _kind, name, _decl, s, miss in scan_entry_argv(
+            descs, selection, target, deploy, ("[[gate_leg]]",)):
+        if miss or "/" not in s:
+            continue          # an unresolved token is the sibling branch's finding, not this
+        if s not in have:
+            hits.setdefault((eid, name), []).append(s)
+    return [(eid, name, bad) for (eid, name), bad in hits.items()]
+
+
+def scan_entry_argv(descs: dict[str, tuple[dict, str]], selection: list[str], target: pathlib.Path,
+                    deploy: dict, kinds: tuple[str, ...]):
+    """Yield every argv element the asked `kinds` declare for each entry in `selection`, resolved.
+
+    ONE WALK, three readers (TOOL-dRedressedBar-17). `silenced_legs` asks for `[[gate_leg]]`,
+    `resolve_adopter_argv` for `[adopt]`, and selfcheck's cross-entry ownership join for all four
+    kinds: `[adopt]`, `[check]`, `[[gate_leg]]` and `[[regenerate]]`. Two walks beside each other
+    disagreed on which element is a path, one grading the resolved text and one the declared, so
+    one selfcheck output offered two populations that did not nest.
+
+    Each yield is `(eid, source, kind, name, declared, resolved, missing)`, in selection order and,
+    per entry, in the kind order above. `name` is the leg's name for `[[gate_leg]]` and `None`
+    otherwise. Every element passes through `resolve_tokens` with the `target_context` of the entry
+    that OWNS it, which is `source`: the entry itself, except for `[adopt]` under `[adopt] via`.
+
+    THE `via` SOURCE CHOICE IS MADE HERE, ONCE. The `via` key's PRESENCE declares a delegate, so a
+    value that is not a non-empty string naming a registry entry raises `KeyError` naming the entry,
+    and never falls back to the entry's own argv: `via = ""` fell back, and agent-cap, which declares
+    no argv of its own, resolved to nothing and CONFIGURE skipped it without a line. selfcheck's
+    `via` rules refuse such a value first, with a reason, and pass this walk only the entries they
+    left valid. A source declaring no argv yields nothing, and its context is never read.
+
+    A kind outside the four raises `ValueError`, so a misspelt kind cannot read as an empty walk.
+    """
+    _bad_kinds = [k for k in kinds if k not in ("[adopt]", "[check]", "[[gate_leg]]",
+                                                "[[regenerate]]")]
+    if _bad_kinds:
+        raise ValueError(f"scan_entry_argv: unknown argv kind(s) {_bad_kinds}")
     for eid in selection:
-        d, _p = descs[eid]
+        d = descs[eid][0]
+        if "[adopt]" in kinds:
+            adopt = d.get("adopt") or {}
+            src = eid
+            if "via" in adopt:
+                via = adopt.get("via")
+                if not (isinstance(via, str) and via and via in descs):
+                    raise KeyError(f"entry '{eid}' declares [adopt] via = {via!r}, which is not a "
+                                   f"non-empty string naming a registry entry")
+                src = via
+            d_src = descs[src][0]
+            argv = (d_src.get("adopt") or {}).get("argv") or []
+            if argv:
+                ctx_src = target_context(target, deploy, src, d_src)
+                for a in argv:
+                    s, miss = resolve_tokens(str(a), ctx_src)
+                    yield (eid, src, "[adopt]", None, str(a), s, miss)
+        if not any(k != "[adopt]" for k in kinds):
+            continue
         ctx = target_context(target, deploy, eid, d)
-        for leg in d.get("gate_leg", []):
-            bad = []
-            for a in leg.get("argv", []):
-                s, miss = resolve_tokens(a, ctx)
-                if miss or "/" not in s:
-                    continue          # an unresolved token is the sibling branch's finding, not this
-                if s not in have:
-                    bad.append(s)
-            if bad:
-                hits.append((eid, str(leg.get("name")), bad))
-    return hits
+        owned: list[tuple[str, str | None, list]] = []
+        if "[check]" in kinds:
+            owned.append(("[check]", None, (d.get("check") or {}).get("argv") or []))
+        if "[[gate_leg]]" in kinds:
+            owned += [("[[gate_leg]]", str(leg.get("name")), leg.get("argv") or [])
+                      for leg in d.get("gate_leg", [])]
+        if "[[regenerate]]" in kinds:
+            owned += [("[[regenerate]]", None, blk.get("argv") or [])
+                      for blk in d.get("regenerate") or []]
+        for kind, name, argv in owned:
+            for a in argv:
+                s, miss = resolve_tokens(str(a), ctx)
+                yield (eid, eid, kind, name, str(a), s, miss)
 
 
 # ---- THE DECLARED ADOPTER-BAR DESTINATION SET (DEPL-cMendedVintage-21 S2) --------------------
@@ -3961,17 +4177,32 @@ def silenced_legs(descs: dict[str, tuple[dict, str]], selection: list[str], targ
 # derivations, and refuses a direct write to any of them. It grades THE DECLARED MEMBERS ONLY: a
 # destination nobody added here is a destination nobody grades, and the assertion would read as
 # coverage it does not have. Adding a member is meant to be a deliberate act.
-ADOPTER_BAR_PATHS = ('gr["file"]',)
+#
+# `receipt_path` IS THE SECOND MEMBER (TOOL-dRedressedBar-17): `.governance/install.json`, which
+# the adopter's `receipt sync` leg reads and the next `apply`, `update` and `adopt` parse. Its writes
+# were a plain `write_text`, so an exception mid-write left a truncated receipt the next run crashed
+# on or read as empty. Every one of them — `apply`'s early, re-stamp and RECEIPT writes, `update`'s
+# three and `adopt`'s one — now routes through `write_atomic`, and the assertion reds on any left.
+#
+# `"install.sums"` IS THE THIRD (TOOL-dRedressedBar-19 S40): `.governance/install.sums`, the flat
+# sidecar of the receipt that `check` compares with it both ways. It is written beside the receipt at
+# `apply`'s RECEIPT step, `update`'s three and `adopt`'s one, each through `write_atomic` and each
+# BEFORE its receipt, so an interrupt between the two leaves a new sidecar beside the old receipt,
+# which `check` reports until the next apply rewrites both, and never a truncated sidecar.
+ADOPTER_BAR_PATHS = ('gr["file"]', 'receipt_path', '"install.sums"')
 
 
 def write_atomic(dest: pathlib.Path, text: str) -> None:
     """Persist `text` at `dest` through a sibling temp file and `os.replace`, so a run that dies
     mid-write leaves the PREVIOUS file rather than a truncated one (DEPL-cMendedVintage-21 S1).
 
-    THE ONE WRITER for every destination `ADOPTER_BAR_PATHS` declares, which today is the gate-leg
-    manifest an adopter's whole bar reads. Two verbs write that file since DEPL-cMendedVintage-13,
-    and an exception between opening it and finishing it would hand the adopter a manifest that is
-    not JSON — every leg of their bar, gone, on a deployer step that was only adding one.
+    THE ONE WRITER for every destination `ADOPTER_BAR_PATHS` declares: the gate-leg manifest an
+    adopter's whole bar reads, the receipt, `.governance/install.json` (TOOL-dRedressedBar-17), and
+    its sidecar `.governance/install.sums`, written before the receipt (TOOL-dRedressedBar-19).
+    Two verbs write the manifest since DEPL-cMendedVintage-13, and an exception between opening it
+    and finishing it would hand the adopter a manifest that is not JSON — every leg of their bar,
+    gone, on a deployer step that was only adding one. A receipt cut short the same way is one the
+    next `apply`, `update` or `adopt` cannot parse.
 
     WHAT THIS DOES NOT CLAIM. No fsync and no directory sync, so this is not crash consistency:
     what it closes is a half-written file left by an EXCEPTION mid-write. Power loss is out of
@@ -4036,11 +4267,21 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
     already on disk, so an abort would leave the target updated with an un-restamped receipt and no
     emission — a wedge recorded against this step twice.
 
-    `carry_out_of_scope` is S4, and the two verbs need different answers because they keep different
-    receipts. `update` narrows which rows it classifies and leaves its receipt's `kits` list whole,
-    so an out-of-scope kit is still claimed and its ownership rows must survive this run. `apply`
-    rewrites `kits` and `files` to its own selection, so carrying rows for kits its receipt no
-    longer claims would make `emitted` name kits `kits` does not.
+    `carry_out_of_scope` is S4, and both verbs now pass it, because both keep every claimed kit in
+    the receipt's `kits`. `update` narrows which rows it classifies and leaves `kits` whole; `apply`
+    keeps `kits` and `files` whole for every claimed kit its selection did not name
+    (TOOL-dRedressedBar-12). Either way an out-of-scope kit is still claimed, so its ownership rows
+    must survive this run (TOOL-dRedressedBar-16). The same-argv rule (`check_leg_claimable`,
+    DEPL-aRepatriatedFork-17 S8) cannot stand in for the carry: it claims a leg only while gov's
+    resolved argv equals the runner's, and an argv gov has changed is never claimable, so a kit
+    whose row this run dropped would be refused by either verb once gov changed that leg's argv.
+    The non-manifest branch's ORDER lists every claimed kit's legs under the carry, the selection's
+    first and then each carried kit gov's registry still declares, in the receipt's `kits` order
+    (TOOL-dRedressedBar-23): the file is rewritten whole, so listing the selection's alone dropped a
+    carried kit's legs from it while `emitted` kept them. Each carried leg takes the D7 test below,
+    and a carried kit's silenced leg is listed under WITHHELD and raises NO problem: the manifest
+    branch resolves no carried kit's leg and so raises none for the same selection, and one
+    selection must not get two exit codes by runner kind. The run that selected the kit raised it.
 
     `orders` is `apply`'s list and `update` passes None: the non-manifest branch writes the same
     order at the same path either way, and `update` maintains no `orders` list at BASE. Minting one
@@ -4066,8 +4307,14 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
     # finding anywhere. On a manifest target the same leg reds and is withheld. That is
     # `gate the CLASS, not the instance` broken one branch over from the unit that closed the class,
     # and no `-6` arm could see it because every fixture declared `kind = "manifest"`.
+    #
+    # TOOL-dRedressedBar-23 S2. Under the carry, the claimed kits outside `selection` that `descs`
+    # declares, bound ONCE in the receipt's `kits` order, and `_silenced` asked of them too, so the
+    # order branch lists their legs through the same test the selection's take.
+    _carried_kits = ([k for k in (receipt or {}).get("kits") or []
+                      if k not in selection and k in descs] if carry_out_of_scope else [])
     _silenced = {(eid, nm): bad for eid, nm, bad in
-                 silenced_legs(descs, selection, target, deploy, have)}
+                 silenced_legs(descs, [*selection, *_carried_kits], target, deploy, have)}
     _silenced_found: list[str] = []
     if gr.get("kind") == "manifest":
         rf = target / gr["file"]
@@ -4330,7 +4577,9 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
         (target / ".governance" / "outbox").mkdir(parents=True, exist_ok=True)
         lines = ["# gate legs — ORDERED, not emitted", ""]
         _withheld: list[str] = []
-        for eid in selection:
+        # THE SELECTION'S LEGS, THEN EVERY CARRIED KIT'S (TOOL-dRedressedBar-23 S2), because this
+        # file is rewritten whole and a claimed kit's legs are still the adopter's to wire.
+        for eid in [*selection, *_carried_kits]:
             d, _p = descs[eid]
             ctx = target_context(target, deploy, eid, d)
             for leg in d.get("gate_leg", []):
@@ -4343,6 +4592,10 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 if _bad:
                     _withheld.append(f"- {nm}: {_argv}\n  WITHHELD — names {', '.join(_bad)}, "
                                      f"which this target does not hold and no kit ships here")
+                    # A CARRIED kit's withheld leg is listed and raises nothing, for the reason the
+                    # docstring's carry paragraph gives.
+                    if eid in _carried_kits:
+                        continue
                     _silenced_found.append(
                         f"entry '{eid}' declares gate leg '{nm}' whose argv names "
                         f"{', '.join(_bad)}, which this target does not hold — ordering it would "
@@ -6292,6 +6545,12 @@ def declares_outcome_for(desc: dict, rc: int) -> bool:
                for b in (desc.get("outcome") or []))
 
 
+#: Every key an `[[outcome]] probe` may carry, mapped to whether the thing it names must be found.
+#: DECLARED ONCE (TOOL-dRedressedBar-11): `classify_outcome` loops over it, and the matrix reads it
+#: both for the agreement rule's union by `want` and for the rule that every shipped key is one here.
+OUTCOME_PROBE_KEYS = {"must_exist": True, "must_not_exist": False, "must_not_resolve": False}
+
+
 def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: int) -> dict | None:
     """The DECLARED meaning of an adopter's exit code, decided by a filesystem PROBE.
 
@@ -6304,13 +6563,24 @@ def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: 
     invented. The block rather than its `means` string, because the caller needs `ok` too: a
     descriptor declares whether a classified outcome is an ACCEPTED STOP or a failure, and reducing
     it to a name here would throw that away.
+
+    THE KEYS are `OUTCOME_PROBE_KEYS`, each a string or a list of strings, every one of which must
+    hold. `must_exist` and `must_not_exist` hold when `target / <string>` exists, or does not.
+    `must_not_resolve = "<here>/<home>/<anchor>"` (TOOL-dRedressedBar-11) holds when
+    `resolve_kit_dir(<home>, <anchor>, target / <here>)` raises LookupError: the adopter's own
+    question, asked with the adopter's own resolver, so a kit homed where only the install receipt
+    records it reads as found. `<anchor>` is the last segment, `<home>` the one before it, `<here>`
+    every earlier segment (none means the target root). With NO RECEIPT, or one that is unreadable
+    or malformed, the resolver reads no rows, so the term reads the two static homes alone. A string
+    of fewer than two segments, a `<home>` or `<anchor>` that is empty, `.` or `..`, and an
+    unresolved token each fail the term, so the block does not match: deny by default.
     """
     for oc in desc.get("outcome", []):
         if oc.get("code") != rc:
             continue
         probe = oc.get("probe") or {}
         ok = True
-        for key, want in (("must_exist", True), ("must_not_exist", False)):
+        for key, want in OUTCOME_PROBE_KEYS.items():
             spec = probe.get(key)
             if not spec:
                 continue
@@ -6319,7 +6589,19 @@ def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: 
                 if miss:
                     ok = False
                     break
-                if (target / resolved).exists() is not want:
+                if key != "must_not_resolve":
+                    found = (target / resolved).exists()
+                else:
+                    segs = resolved.split("/")
+                    if len(segs) < 2 or any(s in ("", ".", "..") for s in segs[-2:]):
+                        ok = False
+                        break
+                    try:
+                        resolve_kit_dir(segs[-2], segs[-1], target.joinpath(*segs[:-2]))
+                        found = True
+                    except LookupError:
+                        found = False
+                if found is not want:
                     ok = False
                     break
             if not ok:
@@ -7660,6 +7942,53 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             r.fail("on_hook_block = refuse and the target's pre-commit hook refuses; the install is "
                    "on disk and staged, and nothing was rolled back")
 
+    # ---- THE RECEIPT, WRITTEN AHEAD OF CONFIGURE (TOOL-dRedressedBar-14). The class: an adopter
+    # ---- that finds a SIBLING kit through the receipt, by `resolve_kit_dir` — settings-merge finding
+    # ---- agent-cap's hook, lexicon finding codebase-map, unattended finding memory-tree. Written only
+    # ---- at RECEIPT, a first apply's adopters read no receipt and probed the two static homes alone,
+    # ---- so a kit landed at a per-kit prefix was invisible to them. Measured: `[kit.agent-cap]
+    # ---- prefix = "scripts"` landed the hook at agent-cap's `{prefix}/hooks/agent-cap.js` with
+    # ---- `{prefix}` resolved to `scripts`, and settings-merge exited 2 for want of it on the
+    # ---- first apply and wired it on the second. So the file is on
+    # ---- disk before any adopter runs, from the lists RECEIPT writes: this run's selection and rows,
+    # ---- unit 12's carry, and, for the three keys later steps fill, what the target holds now — the
+    # ---- prior run's, or none. RECEIPT REWRITES IT from this same dict, and so does the write after
+    # ---- the `oid` re-stamp when RENORMALIZE ran (TOOL-dRedressedBar-17), so an interrupt between
+    # ---- the writes leaves a receipt a re-run of `apply` recovers from, except between
+    # ---- `git add --renormalize` and that re-stamp write. `receipt` above stays the PRIOR one and
+    # ---- is never rebound; what reads this file is target-side code, and unit 11's
+    # ---- `must_not_resolve` term, which so reads the bytes the adopter read. Unit 12's carry is
+    # ---- bound HERE, once, for every write.
+    _carried_kits = [k for k in (receipt or {}).get("kits") or [] if k not in selection]
+    _carried_rows = [f for f in (receipt or {}).get("files") or []
+                     if isinstance(f, dict) and f.get("kit") in _carried_kits]
+    # TOOL-dRedressedBar-23 S1. A carried kit's ORDERS too, which RECEIPT writes after this run's.
+    # A hole order carries `kit` since that unit; one an earlier engine wrote carries none, and is
+    # matched through the hole ids the carried kit's descriptor declares, so the first narrower
+    # apply after the upgrade does not lose it. Either kind is carried verbatim, keyless or not, and
+    # a carried kit gov's registry no longer declares keeps its keyed orders alone.
+    _carried_orders = [o for o in (receipt or {}).get("orders") or []
+                       if isinstance(o, dict)
+                       and (o.get("kit") in _carried_kits
+                            or (o.get("kind") == "hole" and "kit" not in o
+                                and o.get("id") in {h.get("id") for k in _carried_kits
+                                                    if k in descs
+                                                    for h in descs[k][0].get("hole", [])}))]
+    _rcpt_doc = {
+        "schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
+        "prefix": (deploy.get("prefix") or "tools"), "kits": selection + _carried_kits,
+        "files": rows + _carried_rows,
+        "orders": (receipt or {}).get("orders") or [], "baseline": baseline,
+        "after": (receipt or {}).get("after") or {},
+        "hook_block": {"state": hook_state},
+        "gate_runner": (receipt or {}).get("gate_runner") or {
+            "kind": gr.get("kind", "absent"), "file": gr.get("file"),
+            "emitted": [], "legs_withheld": False}}
+    (target / ".governance").mkdir(exist_ok=True)
+    write_atomic(receipt_path, json.dumps(_rcpt_doc, indent=2) + "\n")
+    print(f"govkit apply — receipt written ahead of CONFIGURE: {len(_rcpt_doc['files'])} row(s), "
+          f"{len(_rcpt_doc['kits'])} kit(s); RECEIPT rewrites it")
+
     # ---- CONFIGURE. A kit with a blocks_adopt hole lands and is NOT configured.
     outbox = target / ".governance" / "outbox"
     outbox.mkdir(parents=True, exist_ok=True)
@@ -7678,7 +8007,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                 f"Discharge is decided by RUNNING this hole's probe, never by deleting this file.\n",
                 encoding="utf-8", newline="\n")
             orders.append({"kind": "hole", "id": h.get("id"),
-                           "path": f".governance/outbox/{h.get('id')}.md"})
+                           "path": f".governance/outbox/{h.get('id')}.md", "kit": eid})
 
         # A machine-scoped RULE gets an ORDER, never a write. The population is the RULE and not the
         # entry: every descriptor declares an entry-level scope of `repo` and exactly one rule in the
@@ -7737,11 +8066,25 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                   f"'{blocked[0].get('id')}' — landed but inert")
             configure_skipped.add(eid)
             continue
-        argv = d.get("adopt", {}).get("argv") or []
-        if not argv:
+        # The `via` entry's argv when this descriptor declares one, resolved in THAT entry's context
+        # (TOOL-dRedressedBar-15). `d` and `ctx` stay this entry's, so its own descriptor classifies
+        # the exit and the line below names it.
+        resolved = resolve_adopter_argv(target, deploy, eid, descs)
+        if not resolved:
             continue
-        resolved = [resolve_tokens(a, ctx)[0] for a in argv]
-        rc = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True, text=True).returncode
+        # BOUND, not reduced to its code (TOOL-dRedressedBar-11 S3): a refused exit below ends its
+        # problem line with the adopter's own stderr, the regenerate site's shape, so the operator
+        # reads the reason and not only an integer. UTF-8, never the host codepage, and REPLACED
+        # where it cannot decode, the rule `run_target_argv` holds for this site, the regenerate
+        # site and the gained loop alike (TOOL-dRedressedBar-13, TOOL-dRedressedBar-23).
+        # This runs after the early receipt was written ahead of CONFIGURE (TOOL-dRedressedBar-14),
+        # and RECEIPT rewrites it once every adopter has run. So a decode error raised here would
+        # stop `apply` between the two writes. The landed bytes and the early receipt stay, the
+        # receipt carrying the prior run's orders, `after` and gate runner, `install.sums` is not
+        # rewritten, and the adopters after this kit never run: the interrupt the receipt comment
+        # above says a re-run of `apply` recovers from.
+        _cfg_run = run_target_argv(resolved, target)
+        rc = _cfg_run.returncode
         outcome = classify_outcome(target, d, ctx, rc)
         means = outcome.get("means") if outcome else None
         accepted = bool(outcome and outcome.get("ok"))
@@ -7761,7 +8104,10 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             # The `[[outcome]]` blocks were declared by six descriptors and read by ZERO code, so an
             # exit code shared by six unrelated branches was reported as an integer. A declared
             # meaning lets a fixture assert a MEANING, which is what the acceptance layer needs.
-            r.fail(f"kit '{eid}': its adopter exited {rc} — {means}")
+            r.fail(f"kit '{eid}': its adopter exited {rc} — {means}"
+                   + (". Its stderr ended: " + " | ".join(
+                       [ln.strip() for ln in _cfg_run.stderr.splitlines() if ln.strip()][-3:])
+                      if (_cfg_run.stderr or "").strip() else ". It printed nothing to stderr"))
         elif rc != 0:
             # A non-zero adopter exit is a FINDING, not a printed integer. Measured before this:
             # `apply --resume` printed 'adopter exit 1' and exited 0, so an install whose configure
@@ -7769,7 +8115,10 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             # `[[outcome]]` evaluator, which is a later unit's; until then it is unclassified and
             # says so rather than being interpreted.
             r.fail(f"kit '{eid}': its adopter exited {rc} — unclassified, because no `[[outcome]]` "
-                   f"evaluator exists yet to say WHICH declared outcome that code means")
+                   f"evaluator exists yet to say WHICH declared outcome that code means"
+                   + (". Its stderr ended: " + " | ".join(
+                       [ln.strip() for ln in _cfg_run.stderr.splitlines() if ln.strip()][-3:])
+                      if (_cfg_run.stderr or "").strip() else ". It printed nothing to stderr"))
 
     # ---- TOOL-aRepatriatedFork-11 S3: WIRE the hook fragments this install landed, after every
     # ---- adopter ran — settings-merge's own adopter included, which is what created the file — and
@@ -7934,6 +8283,14 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         for w in rows:
             if w.get("role") in LANDABLE_ROLES and w.get("path") in _idx2:
                 w["oid"] = _idx2[w["path"]][1]
+    # TOOL-dRedressedBar-17 S22. THE RECEIPT FOLLOWS THE RENORMALIZE TO DISK. The early write holds
+    # STAGE's `oid`s, and `git add --renormalize` has just moved the index blob of every pinned row,
+    # so an interrupt in LEGS or AFTER left a receipt naming blobs the index no longer holds, and the
+    # re-run refused those paths as DIRTY. Rewritten here, a re-run recovers from an interrupt
+    # anywhere but between the renormalize and this write, a stretch in which nothing is spawned.
+    if _renormalized:
+        _rcpt_doc["files"] = rows + _carried_rows
+        write_atomic(receipt_path, json.dumps(_rcpt_doc, indent=2) + "\n")
 
     # ---- LEGS. The last CONTENT step of the hard order. Guards are RENDERED against the target's
     # ---- own prefix and memory root, and a guard is DROPPED on tracked-ness rather than existence:
@@ -7943,7 +8300,8 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- THE BODY IS `write_gate_legs`, shared with `update` since DEPL-cMendedVintage-13. What
     # ---- stays here is what is this verb's alone: the step announcement, the index read, the
     # ---- kit-subject advice below, and the before/after verdict maps around them. `orders` is
-    # ---- passed because the non-manifest branch's order row is `apply`'s to record.
+    # ---- passed because the non-manifest branch's order row is `apply`'s to record, and the carry
+    # ---- for the reason `write_gate_legs`' docstring gives (TOOL-dRedressedBar-16).
     # ----
     # ---- S6, and the index is read ONCE for this step and handed to both consumers inside it.
     # ---- `tracked(target)` is correct for BOTH kind branches: the stage step above has already
@@ -7952,7 +8310,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     step(STEP_LEGS, gr.get("kind", "absent"))
     emitted, _legs_withheld = write_gate_legs(
         "apply", target, deploy, gr, descs, selection, receipt, set(tracked(target)), r,
-        orders=orders)
+        orders=orders, carry_out_of_scope=True)
     if gr.get("kind") == "manifest":
         # THE KIT-SUBJECT LEGS ARE HELD, and an adopter has to be told twice: once here, where
         # they can run them for the first time against the kit they just installed, and once as
@@ -8015,19 +8373,35 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                 r.fail(f"leg '{nm}' did not exist before this install and is red after")
 
     # ---- RECEIPT. Tool-written only, plus the flat sidecar a target verifies with bash alone.
-    (target / ".governance").mkdir(exist_ok=True)
-    receipt_path.write_text(json.dumps(
-        {"schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
-         "prefix": (deploy.get("prefix") or "tools"), "kits": selection, "files": rows,
-         "orders": orders, "baseline": baseline, "after": after_map,
-         "hook_block": {"state": hook_state},
-         "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
-                         "emitted": emitted, "legs_withheld": _legs_withheld}},
-        indent=2) + "\n", encoding="utf-8", newline="\n")
-    (target / ".governance" / "install.sums").write_text(
-        "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w),
-        encoding="utf-8", newline="\n")
-    step(STEP_RECEIPT, f"{len(rows)} row(s), {len(selection)} kit(s), schema {RECEIPT_SCHEMA}")
+    # TOOL-dRedressedBar-12. A CLAIMED KIT THIS SELECTION DID NOT NAME KEEPS ITS CLAIM AND ITS ROWS,
+    # verbatim and in the prior receipt's order, after this run's own — the `pins` union above, applied
+    # to `kits` and `files`. Written from the selection alone, a narrower apply dropped them: the next
+    # apply of a dropped kit was refused as foreign, and a hook home only the receipt records was gone,
+    # so a refused settings-merge exit read as the accepted stop one run later. Keyed on the CLAIM,
+    # never on "outside the selection": the `(govkit)` attributes row is claimed by no kit and is
+    # rebuilt above, so a selection-keyed carry would write it twice. `receipt` is the prior one,
+    # bound before anything was written and never rebound; the carry is bound once, ahead of CONFIGURE.
+    # TOOL-dRedressedBar-14 S2. THE DICT WRITTEN AHEAD OF CONFIGURE, completed: `files` re-derived,
+    # because OBSERVE and the `oid` re-stamp mutated rows after that write, and this run's `orders`,
+    # `after` and `gate_runner` in place of the prior run's. ONE dict, so the writes cannot
+    # disagree about a key, and the sidecar and the step's counts read the lists it writes.
+    # TOOL-dRedressedBar-23 S1. ORDERS ARE CARRIED AS ROWS ARE: this run's first, then every prior
+    # order of a carried kit, verbatim and in the prior receipt's order. Written from this run's
+    # alone, a narrower apply dropped a carried kit's hole and machine orders while keeping its claim,
+    # so `check` stopped reporting its machine destination and verifying its outbox files.
+    _rcpt_doc.update({
+        "files": rows + _carried_rows, "orders": orders + _carried_orders, "after": after_map,
+        "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
+                        "emitted": emitted, "legs_withheld": _legs_withheld}})
+    # TOOL-dRedressedBar-19 S40: the sidecar first, the receipt last, each through `write_atomic`.
+    write_atomic(target / ".governance" / "install.sums",
+                 "".join(f"{w['sha256']}  {w['path']}\n" for w in _rcpt_doc["files"] if "sha256" in w))
+    write_atomic(receipt_path, json.dumps(_rcpt_doc, indent=2) + "\n")
+    if _carried_kits:
+        print(f"govkit apply — receipt KEEPS {len(_carried_kits)} kit(s) this selection did not "
+              f"name, with their {len(_carried_rows)} row(s) verbatim: {', '.join(_carried_kits)}")
+    step(STEP_RECEIPT, f"{len(_rcpt_doc['files'])} row(s), "
+                       f"{len(_rcpt_doc['kits'])} kit(s), schema {RECEIPT_SCHEMA}")
     return r.emit()
 
 
@@ -10983,9 +11357,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 if not _argv:
                     continue
                 _res = [resolve_tokens(a, _ctx_rr)[0] for a in _argv]
-                _out = subprocess.run(resolve_shell_argv(_res), cwd=str(target),
-                                      capture_output=True, text=True, encoding="utf-8",
-                                      errors="replace")
+                _out = run_target_argv(_res, target)
                 # THE EXIT CODE GOES THROUGH THE DECLARED PROBE, exactly as `_cmd_apply`'s
                 # CONFIGURE step does, and NOT through `rc != 0`. Writing the naive test here
                 # would have failed every update that touched `memory-tree`, whose adopter
@@ -11104,11 +11476,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         _ran_gained: set[tuple[str, ...]] = set()
         for _ge in gained:
             _d_g = descs[_ge][0]
-            _argv_g = (_d_g.get("adopt") or {}).get("argv") or []
-            if not _argv_g or _ge in _held_kits or _ge in read_inert_kits(deploy):
+            # Resolved in the `via` entry's context where one is declared (TOOL-dRedressedBar-15),
+            # so a shared script is one resolved argv at every prefix and the dedup below runs it
+            # once; `_ctx_g` stays this entry's, for the classification.
+            _res_g = tuple(resolve_adopter_argv(target, deploy, _ge, descs))
+            if not _res_g or _ge in _held_kits or _ge in read_inert_kits(deploy):
                 continue
             _ctx_g = target_context(target, deploy, _ge, _d_g)
-            _res_g = tuple(resolve_tokens(a, _ctx_g)[0] for a in _argv_g)
             if _res_g in _ran_gained:
                 continue
             if not _rerender_on:
@@ -11116,14 +11490,18 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                       f"exported, and configuring runs target-side code")
                 continue
             _ran_gained.add(_res_g)
-            _rc_g = subprocess.run(resolve_shell_argv(list(_res_g)), cwd=str(target),
-                                   capture_output=True, text=True, encoding="utf-8").returncode
+            # BOUND for its stderr (TOOL-dRedressedBar-11 S3), which a refusal below ends with.
+            _proc_g = run_target_argv(_res_g, target)
+            _rc_g = _proc_g.returncode
             _oc_g = classify_outcome(target, _d_g, _ctx_g, _rc_g)
             print(f"govkit update — default-gained {_ge}: adopter exit {_rc_g}"
                   + (f" — {_oc_g.get('means')}" if _oc_g else ""))
             if not outcome_accepted(_rc_g, _oc_g, declares_outcome_for(_d_g, _rc_g)):
                 r.fail(f"kit '{_ge}': its adopter exited {_rc_g} on the update that gained it, and no "
-                       f"declared outcome accepts that")
+                       f"declared outcome accepts that"
+                       + (". Its stderr ended: " + " | ".join(
+                           [ln.strip() for ln in _proc_g.stderr.splitlines() if ln.strip()][-3:])
+                          if (_proc_g.stderr or "").strip() else ". It printed nothing to stderr"))
 
     # ======================= DEPL-dCarriedReceipt-14 S4..S8 — POST-WRITE VERIFICATION ============
     # Every byte this run was going to move has moved. Now ask each TOUCHED kit the one question it
@@ -12014,10 +12392,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # skips that guard entirely and overwrites the project-owned file the first run refused to touch.
     # A partial update leaves the receipt describing what it did, at the commit it came from.
     if r.problems:
-        receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
-        (target / ".governance" / "install.sums").write_text(
-            "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
-            encoding="utf-8", newline="\n")
+        write_atomic(target / ".governance" / "install.sums",
+                     "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f))
+        write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
         print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
               f"deleted {len(deleted)}, withheld {withheld}, "
               f"{conflicts} conflict(s). The receipt is NOT re-stamped: this run had findings, and a "
@@ -12052,17 +12429,15 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"and this run graded none of them, so advancing gov_commit would move the base they "
               f"must be attributed from. Clear them with "
               f"`govkit adopt --re-adopt --pin <path>=<rev> --write`")
-        receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
-        (target / ".governance" / "install.sums").write_text(
-            "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
-            encoding="utf-8", newline="\n")
+        write_atomic(target / ".governance" / "install.sums",
+                     "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f))
+        write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
         return r.emit()
 
     receipt["gov_commit"] = to_commit
-    receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
-    (target / ".governance" / "install.sums").write_text(
-        "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
-        encoding="utf-8", newline="\n")
+    write_atomic(target / ".governance" / "install.sums",
+                 "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f))
+    write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
     # DEPL-cMendedVintage-4 S3. dGaugedVintage-8 S2's "what it overrode" clause went with the
     # override: reaching here now proves `ungraded` is 0, so the clause could only ever render empty.
     print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
@@ -12689,11 +13064,9 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
             print(f"govkit adopt — carried {len(_carried)} install-record key(s) forward from the "
                   f"receipt being replaced: {', '.join(_carried)}. Re-measuring provenance does not "
                   f"un-perform an install, and dropping these bricks the next `apply`")
-    receipt_path.write_text(json.dumps(envelope, indent=2) + "\n",
-                            encoding="utf-8", newline="\n")
-    (target / ".governance" / "install.sums").write_text(
-        "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w),
-        encoding="utf-8", newline="\n")
+    write_atomic(target / ".governance" / "install.sums",
+                 "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w))
+    write_atomic(receipt_path, json.dumps(envelope, indent=2) + "\n")
     print(f"govkit adopt — receipt written: {len(rows)} row(s), {len(selection)} kit(s), "
           f"schema {RECEIPT_SCHEMA}, gov_commit {commit[:8]}")
     if staged:

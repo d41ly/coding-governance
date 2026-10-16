@@ -13,6 +13,21 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
+      "id": "BasicAccounting",
+      "kind": "class",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "BasicAndIoAccounting",
+      "kind": "class",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "BasicLimit",
+      "kind": "class",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "Candidate",
       "kind": "class",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -78,6 +93,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "ExtendedLimit",
+      "kind": "class",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "FAMILY_of",
       "kind": "function",
       "file": "tools/memory-tree/adopt-memory-tree.sh"
@@ -118,6 +138,11 @@
       "file": "tools/runlog/runlog_lib.py"
     },
     {
+      "id": "IoCounters",
+      "kind": "class",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "Journal",
       "kind": "class",
       "file": "tools/runlog/runlog_lib.py"
@@ -128,6 +153,11 @@
       "file": "tools/runlog/runlog_lib.py"
     },
     {
+      "id": "LaunchFailed",
+      "kind": "class",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "MapError",
       "kind": "class",
       "file": "tools/codebase-map/map_lib.py"
@@ -136,6 +166,11 @@
       "id": "MapTree",
       "kind": "class",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "MemoryStatus",
+      "kind": "class",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "Misfiled",
@@ -191,6 +226,11 @@
       "id": "Problem",
       "kind": "class",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "ProfileRefused",
+      "kind": "class",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "Ranked",
@@ -291,6 +331,11 @@
       "id": "StructureDrift",
       "kind": "class",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "ThreadEntry",
+      "kind": "class",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "TrackedRecord",
@@ -1518,6 +1563,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "build_capture_file",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "build_carry",
       "kind": "function",
       "file": "tools/push-main.test.sh"
@@ -1928,6 +1978,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "build_holder_env",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "build_hooked_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -1986,6 +2041,16 @@
       "id": "build_items",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "build_job",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "build_junction",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "build_key_text",
@@ -2525,6 +2590,11 @@
     {
       "id": "build_scratch",
       "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "build_scratch",
+      "kind": "function",
       "file": "tools/run-gates/profile_bar.test.sh"
     },
     {
@@ -2586,6 +2656,11 @@
       "id": "build_skill_tree",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_snapshot_rows",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "build_source_cited_ids_with_no_record",
@@ -2693,6 +2768,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_symlink",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "build_synthetic_log",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -2711,6 +2791,11 @@
       "id": "build_target",
       "kind": "function",
       "file": "tools/run-gates/adopt-run-gates.test.sh"
+    },
+    {
+      "id": "build_temp_measured",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "build_tempdir",
@@ -3368,6 +3453,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "check_admit",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "check_adopter_owned",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -3398,6 +3488,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_app_alias",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "check_apply_owned",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -3421,6 +3516,11 @@
       "id": "check_arm",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "check_arm",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "check_ask_mandate",
@@ -4318,6 +4418,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_module_call",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "check_mp_value",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -4374,6 +4479,11 @@
     },
     {
       "id": "check_outcome_probes",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
+    },
+    {
+      "id": "check_outcome_states",
       "kind": "function",
       "file": "tools/govkit/matrix.py"
     },
@@ -4451,6 +4561,11 @@
       "id": "check_pid_alive",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "check_pinned_handle",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "check_placeholder",
@@ -5008,6 +5123,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_stalled",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "check_stamp_line",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -5056,6 +5176,11 @@
       "id": "check_target_reads_subject",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "check_temp_source",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "check_time_classes",
@@ -5191,6 +5316,11 @@
       "id": "check_verb_flag",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_verdict_read",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "check_view_line",
@@ -5416,11 +5546,6 @@
       "id": "classify_row",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "clean",
-      "kind": "function",
-      "file": "tools/unattended/gate-guard.js"
     },
     {
       "id": "cleanup",
@@ -5761,6 +5886,11 @@
       "id": "cmd_selftest",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "cmd_selftest",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "cmd_shipped",
@@ -6173,6 +6303,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "derive_abandoned_scratch",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "derive_action",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -6323,6 +6458,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "derive_census_tokens",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "derive_change_commit",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -6451,6 +6591,11 @@
       "id": "derive_entries",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "derive_env_digest",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "derive_epoch_state",
@@ -6748,6 +6893,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "derive_kit_rel",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "derive_landed_counts",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -6766,6 +6916,21 @@
       "id": "derive_layer_verdict",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "derive_leg_argv",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "derive_leg_profile",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "derive_leg_turnstile",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "derive_legs_path",
@@ -6821,6 +6986,11 @@
       "id": "derive_marker_coupling",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_mean_max",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "derive_memory_disciplines",
@@ -6896,6 +7066,11 @@
       "id": "derive_parity_lines",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_path_key",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "derive_path_key",
@@ -6983,6 +7158,11 @@
       "file": "tools/codebase-map/map_diff.py"
     },
     {
+      "id": "derive_redacted",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "derive_refreshed_at",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -7001,6 +7181,11 @@
       "id": "derive_regime",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "derive_regimes",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "derive_registry_path",
@@ -7116,6 +7301,11 @@
       "id": "derive_scope",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
+    },
+    {
+      "id": "derive_scrub_set",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "derive_section_sha",
@@ -7403,6 +7593,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_stall_window",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "derive_status",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -7448,6 +7643,16 @@
       "file": "tools/codebase-map/rank_harness.py"
     },
     {
+      "id": "derive_temp_path",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "derive_tick_readings",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "derive_timeline_values",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -7488,6 +7693,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "derive_turnstile_wait",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "derive_unit_key",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -7511,6 +7721,11 @@
       "id": "derive_verdict",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "derive_verdictless_tree",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "derive_verdicts",
@@ -8136,6 +8351,11 @@
       "id": "extract_run_facts",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "extract_runner_function",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "extract_section",
@@ -9258,6 +9478,11 @@
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
+      "id": "load_process_monitor",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "load_project_layer",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -9705,6 +9930,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
     },
     {
@@ -9915,6 +10145,11 @@
     {
       "id": "measure_foreign",
       "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "measure_foreign",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
     },
     {
@@ -9946,6 +10181,11 @@
       "id": "measure_hook_entries",
       "kind": "function",
       "file": "tools/process-monitor/adopt-process-monitor.sh"
+    },
+    {
+      "id": "measure_job_children",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "measure_killed",
@@ -10138,6 +10378,11 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
+      "id": "measure_scratch_bytes",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "measure_served",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
@@ -10166,6 +10411,11 @@
       "id": "measure_spawn_rate",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "measure_spawn_us",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "measure_spawns",
@@ -10838,6 +11088,11 @@
       "file": "tools/process-monitor/census.py"
     },
     {
+      "id": "parse_cim_bytes",
+      "kind": "function",
+      "file": "tools/process-monitor/census.py"
+    },
+    {
       "id": "parse_conf",
       "kind": "function",
       "file": "tools/memory-tree/tree_lib.py"
@@ -10876,6 +11131,11 @@
       "id": "parse_file",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "parse_flags",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "parse_float",
@@ -11558,6 +11818,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_temp_populations",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "print_touched_asks",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -12113,6 +12378,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_blind_ab_arms",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_blob_at",
       "kind": "function",
       "file": ".githooks/straggler-guard.sh"
@@ -12443,6 +12713,11 @@
       "file": "tools/run-gates/regen.py"
     },
     {
+      "id": "read_digest_classes",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_dirt",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -12486,6 +12761,11 @@
       "id": "read_engine_conf_reader",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_envelope",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "read_events",
@@ -12708,6 +12988,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "read_guard_misses",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_gw_record",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -12758,6 +13043,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_hold_beacon",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_hold_codes",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -12778,6 +13068,11 @@
       "file": "tools/check-wiring.test.sh"
     },
     {
+      "id": "read_hook_unsets",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_hook_verdict",
       "kind": "function",
       "file": "tools/hooks/format-guard.test.sh"
@@ -12791,6 +13086,11 @@
       "id": "read_host_calibration",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "read_host_load",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "read_host_name",
@@ -12863,6 +13163,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "read_job_accounting",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_journal",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
@@ -12911,6 +13216,11 @@
       "id": "read_kit_root",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_kit_version",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "read_kits",
@@ -13061,6 +13371,11 @@
       "id": "read_ln_fact",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_local_env_vars",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "read_log",
@@ -13333,6 +13648,16 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_plain_stat",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_plant_bytes",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_pm_key",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
@@ -13418,14 +13743,29 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_process_created",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_procs_alive",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_profile_legs",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_public_times",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_pybin_alias",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "read_receipt",
@@ -13553,6 +13893,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "read_root_exit",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_roots",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -13633,6 +13978,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "read_runner_text",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_runs",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
@@ -13656,6 +14006,11 @@
       "id": "read_scan_overlaps",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "read_scratch_file",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "read_serves_ids",
@@ -13803,6 +14158,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "read_spawn_floor_us",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_spawn_now",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -13938,6 +14298,11 @@
       "file": "tools/unattended/resume-tick.test.sh"
     },
     {
+      "id": "read_temp_binders",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "read_text",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -13958,6 +14323,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_ticket_stamp",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "read_timings",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -13976,6 +14346,11 @@
       "id": "read_token",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_tool_versions",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "read_tools",
@@ -14086,6 +14461,11 @@
       "id": "read_ts_type_end",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_turnstile",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "read_units",
@@ -14455,6 +14835,11 @@
     {
       "id": "remove_scratch",
       "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "remove_scratch",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
@@ -14579,6 +14964,11 @@
     },
     {
       "id": "renderAskDeny",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "renderAskQuote",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
     },
@@ -14993,6 +15383,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "render_census_row",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "render_charter_blocks",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -15128,9 +15523,19 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "render_holder_failure",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "render_hole_verdict",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "render_host_row",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "render_id_run",
@@ -15161,6 +15566,16 @@
       "id": "render_layer_refusal",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "render_leg_row",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "render_legs_row",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "render_line",
@@ -15763,6 +16178,16 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "resolve_adopter_argv",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_alias_interpreter",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "resolve_anchor",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -16153,6 +16578,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "resolve_job_backend",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "resolve_journal_root",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
@@ -16375,6 +16805,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
@@ -16548,6 +16983,16 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "resolve_launcher_aliases",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "resolve_leg_python",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "resolve_live_index_home",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.sh"
@@ -16586,6 +17031,11 @@
       "id": "resolve_mp_record",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "resolve_msys_dir",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "resolve_native",
@@ -16706,6 +17156,11 @@
       "id": "resolve_prefix_token",
       "kind": "function",
       "file": "tools/lib/resolve_prefix_token.py"
+    },
+    {
+      "id": "resolve_prefix_token",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "resolve_procs_path",
@@ -17368,6 +17823,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "resolve_turnstile_dir",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "resolve_version_value_at",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -17818,6 +18278,11 @@
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
+      "id": "run_bash",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "run_beside_holder",
       "kind": "function",
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
@@ -17856,6 +18321,11 @@
       "id": "run_case",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "run_census_worker",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "run_cf_defer",
@@ -18001,6 +18471,11 @@
       "id": "run_f4_filer",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "run_fixture_git",
@@ -18233,6 +18708,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "run_leg",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "run_leg_at",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -18431,6 +18911,11 @@
       "id": "run_proc",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_profile",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "run_push",
@@ -18736,6 +19221,16 @@
       "id": "run_takeover",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "run_target_argv",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "run_temp_scan",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "run_tick",
@@ -19073,6 +19568,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "scan_census_tick",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "scan_claimed_paths",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -19151,6 +19651,11 @@
       "id": "scan_engine_imports",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "scan_entry_argv",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "scan_exit_sites",
@@ -19248,6 +19753,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "scan_leg_trees",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "scan_message_lines",
       "kind": "function",
       "file": "tools/runlog/prose.py"
@@ -19281,6 +19791,11 @@
       "id": "scan_named",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_own_calls",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "scan_owner_spellings",
@@ -19343,6 +19858,11 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "scan_rename_calls",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "scan_replaced_spellings",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -19351,6 +19871,11 @@
       "id": "scan_rkd_capture",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "scan_root_exits",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "scan_round_writes",
@@ -19461,6 +19986,16 @@
       "id": "scan_substituted",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
+    },
+    {
+      "id": "scan_temp_file",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "scan_temp_tree",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "scan_template_pairs",
@@ -19868,6 +20403,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "set_environ",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "set_fact",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -20218,6 +20758,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "test_ab_arms_read_verdicts",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_aborted_work_landed",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -20318,9 +20863,19 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_alias_refusals",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_all_miss_fixture",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_app_alias",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_archive_segment_after_archive_is_durable",
@@ -20493,9 +21048,19 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_capture_pin",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_ceiling_decides_before_any_label",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_check_admit",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_chunk_arm_rolls_up",
@@ -20506,6 +21071,11 @@
       "id": "test_chunk_matching",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_cim_memory_fields_are_bytes",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_cited_families_are_ids_not_homes",
@@ -20521,6 +21091,11 @@
       "id": "test_closure_reaches_bare_argv_and_native_descendants",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_concurrent_run",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_conditional_tier_refuses_an_orphaned_artifact",
@@ -20873,6 +21448,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_extract_refuses",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_extract_rejects_flag_in_path_slot",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -20888,6 +21468,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_fixtures_withheld",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_fleet_over_budget",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -20896,6 +21481,16 @@
       "id": "test_floor_reds_alone",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_foreign_parity",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "test_fork_count",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_fresh_ac1_extracted_at",
@@ -21003,6 +21598,11 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_hold_beacon",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_hook_test",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -21026,6 +21626,11 @@
       "id": "test_install_prefix_resolution",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_interrupt_capture",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_js_probe_against_the_lexicon",
@@ -21058,6 +21663,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_launch_failure",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_leaves_are_killed_first",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -21071,6 +21681,11 @@
       "id": "test_legs_retried_after_timeout",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_legs_table",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_lexicon_marginal_rate",
@@ -21131,6 +21746,11 @@
       "id": "test_malformed_question_refuses",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_manifest_refusals",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_member_outside_the_scope_set_is_dropped",
@@ -21328,6 +21948,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "test_no_bare_bash_argv",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_no_command_row_can_be_a_descendant_but_not_a_root",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -21456,6 +22081,11 @@
       "id": "test_per_id_reds_alone",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_platform_refusal",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_posix_fixture_collapses_both_namespaces",
@@ -21693,6 +22323,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_redact_parity",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_redact_table_header",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -21736,6 +22371,11 @@
       "id": "test_require_adopted_root_refuses",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_resolution_disabled",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_result_cap_keeps_the_true_hit_count",
@@ -21843,6 +22483,21 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_scratch_read_pin",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "test_scratch_sweep",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "test_scrub_derivation",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_seed_affordances",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -21861,6 +22516,11 @@
       "id": "test_self_chain_target_is_refused_by_run_kill",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_serial_run",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_served_term_lists_refuse",
@@ -21901,6 +22561,11 @@
       "id": "test_shrink_low_water",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_signal_docs",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_signals_can_move",
@@ -22018,6 +22683,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_stall_run",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_substrate_dispatch_is_total",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -22123,6 +22793,16 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "test_turnstile_key",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "test_turnstile_run",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_unaddressable_row_is_reported_not_claimed",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -22163,6 +22843,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_venv_interpreter",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "test_verbatim_files",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -22191,6 +22876,11 @@
       "id": "test_worker_survives_post_to_closed_loop_and_connection_stays_usable",
       "kind": "function",
       "file": "tools/pytest-parallel-guardrails/aiosqlite_worker_resilience.test-template.py"
+    },
+    {
+      "id": "test_write_atomic_temp",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "test_writes_nothing_in_worktree",
@@ -22578,6 +23268,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "write_atomic",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "write_b1_receipt",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -22748,6 +23443,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
+      "id": "write_envelope",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "write_extract",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -22766,6 +23466,11 @@
       "id": "write_files_touched",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "write_final_capture",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "write_fixture",
@@ -22883,9 +23588,24 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "write_leg_capture",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "write_leg_record",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "write_legs",
       "kind": "function",
       "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "write_legs_table",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "write_lg_commit",
@@ -23073,9 +23793,19 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "write_record_line",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "write_records",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "write_recovered_logs",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "write_red_ref",
@@ -23121,6 +23851,11 @@
       "id": "write_rendered",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "write_replace",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "write_rev_spec",
@@ -23301,6 +24036,11 @@
       "id": "write_task_release",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_temp_manifest",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
     },
     {
       "id": "write_text",

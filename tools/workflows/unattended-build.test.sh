@@ -1044,8 +1044,8 @@ has "F2 dispatch.args carries the mode — attended" "$d" '"mode":"attended"'
 # sentence explaining that they are unavailable, and an arm aimed at the word would fail on the
 # explanation. That trap is already recorded against the attended preamble arm above.
 CHILD_ARGS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. goes under /tmp/s. ","checklist":"CK","mode":"%s"}'
-childU=$(run_wf "$(printf "$CHILD_ARGS" unattended)" '{}' "$C")
-childA=$(run_wf "$(printf "$CHILD_ARGS" attended)" '{}' "$C")
+printf -v _wfj "$CHILD_ARGS" unattended; childU=$(run_wf "$_wfj" '{}' "$C")
+printf -v _wfj "$CHILD_ARGS" attended; childA=$(run_wf "$_wfj" '{}' "$C")
 norun_out=''
 [ -f "$DRV" ] && norun_out=$(awk '
   FNR == NR && /^[A-Za-z_][A-Za-z0-9_]*\(\)/ { f = $0; sub(/\(\).*/, "", f); next }
@@ -1437,7 +1437,7 @@ has    "DP ...with the empty roster every non-throwing exit carries" "$o" '"rost
 hasnt_ "DP ...and no review round is recorded" "$o" "agent:record"
 hasnt_ "DP ...and the Disposal stage is not reached" "$o" "phase:Disposal"
 has    "DP ...and the next step re-runs once, then holds naming the runId" "$o" "--pending-run <that Workflow runId>"
-o=$(run_wf "$A_UNITS" "$(printf '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":%s}' "$DEF")")
+printf -v _wfj '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":%s}' "$DEF"; o=$(run_wf "$A_UNITS" "$_wfj")
 has    "DP attended: deferred too, and told to stop rather than hold" "$o" "an attended run has no driver to hold"
 # id 14: unverified findings are OUTSTANDING and run the stage.
 review_out 0 0 0 2 >/dev/null; rec CONVERGED >/dev/null; o=$(run_wf "$UNITS" "$(printf '{"spec-write":%s,"workflow":%s,"record":%s,"dispose":%s}' \
@@ -1857,7 +1857,7 @@ OFF_UNITS=$(printf '%s' "$UNITS" | sed 's#"specAudit":"2026-09-20","base":"5eed5
 # ---- one the pre-edit harness threw at the resolver before it could await the sub-workflow, and the
 # ---- `workflow:` absence arm passed over a harness that had not been reached — the vacuous pass,
 # ---- observed here. With subjects on offer, the pre-edit harness awaits and the arm reds.
-o=$(run_wf "$OFF_UNITS" "$(printf '{"spec-write":%s,"subjects":{"subjects":[{"path":"s1","blob":"abc1234"}]}}' "$SPEC_C")")
+printf -v _wfj '{"spec-write":%s,"subjects":{"subjects":[{"path":"s1","blob":"abc1234"}]}}' "$SPEC_C"; o=$(run_wf "$OFF_UNITS" "$_wfj")
 has    "BT3-AC2 OFF: the audit stage announces itself OFF by declaration" "$o" "log:audit stage: OFF by declaration"
 hasnt_ "BT3-AC2 OFF: the sub-workflow is never awaited" "$o" "workflow:"
 hasnt_ "BT3-AC2 OFF: ...and its args are never composed" "$o" "wargs:"
@@ -1899,14 +1899,14 @@ o=$(run_wf "${UNITS/'"specAudit":"2026-09-20","base":"5eed5eed5eed5eed5eed5eed5e
 has    "BT3-AC5 subjects beside no specAudit: THROWS" "$o" "THROW"
 has    "BT3-AC5 ...naming the pairing" "$o" '`subjects` is present beside no `specAudit`'
 hasnt_ "BT3-AC5 ...before any agent is spawned" "$o" "agent:"
-o=$(run_wf "$(printf '%s' "$OFF_UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":2,"auditIds":["A-tB-3"],#')" "$(returns CONVERGED 0)")
+_wfu=${OFF_UNITS/'"slug":"tB",'/'"slug":"tB","round":2,"auditIds":["A-tB-3"],'}; o=$(run_wf "$_wfu" "$(returns CONVERGED 0)")
 has    "BT3-AC5 auditIds beside no specAudit: THROWS by the same guard" "$o" '`auditIds` and `round` is present beside no `specAudit`'
-o=$(run_wf "$(printf '%s' "$OFF_UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":2,"subjectRound":2,#')" "$(returns CONVERGED 0)")
+_wfu=${OFF_UNITS/'"slug":"tB",'/'"slug":"tB","round":2,"subjectRound":2,'}; o=$(run_wf "$_wfu" "$(returns CONVERGED 0)")
 has    "BT3-AC5 subjectRound beside no specAudit: THROWS by the same guard" "$o" '`subjectRound` and `round` is present beside no `specAudit`'
 # ---- ...and `round > 1` ALONE (closing review of units 2–5, F6): the fourth audit-shaped argument.
 # ---- Only an audit re-invoke is ever told to pass it, so beside no declaration it names a round that
 # ---- never ran; before this arm the OFF path handed the roster out under `"round":2` without a word.
-o=$(run_wf "$(printf '%s' "$OFF_UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":2,#')" "$(returns CONVERGED 0)")
+_wfu=${OFF_UNITS/'"slug":"tB",'/'"slug":"tB","round":2,'}; o=$(run_wf "$_wfu" "$(returns CONVERGED 0)")
 has    "BT3-AC5 round 2 beside no specAudit: THROWS by the same guard" "$o" "THROW"
 has    "BT3-AC5 ...naming round" "$o" '`round` is present beside no `specAudit`'
 hasnt_ "BT3-AC5 ...before any agent is spawned" "$o" "agent:"
@@ -2468,7 +2468,7 @@ run_gh33() { # args · writer doubles · commit specs-json -> the run, its commi
 # AC1 - an id, an absolute path and two relative paths reach ONE commit naming all four, and four roster paths.
 GH33_U4='[{"id":"A-tB-1","order":1},{"id":"A-tB-2","order":2},{"id":"A-tB-3","order":3},{"id":"A-tB-4","order":4}]'
 GH33_S4='[{"id":"A-tB-1","path":"'$GH33_SF'/2026-10-06-spec-A-tB-1.md"},{"id":"A-tB-2","path":"'$GH33_SF'/2026-10-06-spec-A-tB-2.md"},{"id":"A-tB-3","path":"'$GH33_SF'/2026-10-06-spec-A-tB-3.md"},{"id":"A-tB-4","path":"'$GH33_SF'/2026-10-06-spec-A-tB-4.md"}]'
-o=$(run_gh33 "$(build_gh33_args "$GH33_U4")" "$(build_gh33_writer A-tB-1'["A-tB-1"]'),$(build_gh33_writer A-tB-2'["C:/w/r/'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]'),$(build_gh33_writer A-tB-3'["'$GH33_SF'/2026-10-06-spec-A-tB-3.md"]'),$(build_gh33_writer A-tB-4'["'$GH33_SF'/2026-10-06-spec-A-tB-4.md"]')" "$GH33_S4")
+o=$(run_gh33 "$(build_gh33_args "$GH33_U4")" "$(build_gh33_writer A-tB-1 '["A-tB-1"]'),$(build_gh33_writer A-tB-2 '["C:/w/r/'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]'),$(build_gh33_writer A-tB-3 '["'$GH33_SF'/2026-10-06-spec-A-tB-3.md"]'),$(build_gh33_writer A-tB-4 '["'$GH33_SF'/2026-10-06-spec-A-tB-4.md"]')" "$GH33_S4")
 same   "GH33 four spellings reach ONE commit stage" "$(printf '%s\n' "$o" | grep -c '^agent:commit$')" "1"
 has    "GH33 ...whose commit names all four ids" "$(printf '%s\n' "$o" | grep '^prompt:commit:')" "spec(tB): A-tB-1 A-tB-2 A-tB-3 A-tB-4"
 has    "GH33 ...committing four specs" "$o" "log:spec stage: committed 4 spec(s) at $CSHA"
@@ -2480,7 +2480,7 @@ same   "GH33 every writer is asked for ids, never paths" "$(printf '%s\n' "$o" |
 # AC2 - five more spellings, each placed: backslashes, the MSYS drive form, no family, a tail, the caller's path.
 GH33_U5='[{"id":"A-tB-1","order":1},{"id":"A-tB-2","order":2},{"id":"A-tB-3","order":3},{"id":"A-tB-4","order":4},{"id":"A-tB-5","order":5,"specPath":"'$GH33_SF'/notes-five.md"}]'
 GH33_S5='[{"id":"A-tB-1","path":"'$GH33_SF'/2026-10-06-spec-A-tB-1.md"},{"id":"A-tB-2","path":"'$GH33_SF'/2026-10-06-spec-A-tB-2.md"},{"id":"A-tB-3","path":"'$GH33_SF'/2026-10-06-spec-tB-3.md"},{"id":"A-tB-4","path":"'$GH33_SF'/2026-10-06-spec-A-tB-4-u6-indexed-join.md"},{"id":"A-tB-5","path":"'$GH33_SF'/notes-five.md"}]'
-o=$(run_gh33 "$(build_gh33_args "$GH33_U5")" "$(build_gh33_writer A-tB-1'["C:\\w\\r\\memory\\builds\\tB\\spec\\2026-10-06-spec-A-tB-1.md"]'),$(build_gh33_writer A-tB-2'["/c/w/r/'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]'),$(build_gh33_writer A-tB-3'["'$GH33_SF'/2026-10-06-spec-tB-3.md"]'),$(build_gh33_writer A-tB-4'["'$GH33_SF'/2026-10-06-spec-A-tB-4-u6-indexed-join.md"]'),$(build_gh33_writer A-tB-5'["'$GH33_SF'/notes-five.md"]')" "$GH33_S5")
+o=$(run_gh33 "$(build_gh33_args "$GH33_U5")" "$(build_gh33_writer A-tB-1 '["C:\\w\\r\\memory\\builds\\tB\\spec\\2026-10-06-spec-A-tB-1.md"]'),$(build_gh33_writer A-tB-2 '["/c/w/r/'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]'),$(build_gh33_writer A-tB-3 '["'$GH33_SF'/2026-10-06-spec-tB-3.md"]'),$(build_gh33_writer A-tB-4 '["'$GH33_SF'/2026-10-06-spec-A-tB-4-u6-indexed-join.md"]'),$(build_gh33_writer A-tB-5 '["'$GH33_SF'/notes-five.md"]')" "$GH33_S5")
 same   "GH33 five more spellings: nothing refuses" "$(printf '%s\n' "$o" | grep -c '^THROW')" "0"
 has    "GH33 ...and the commit names all five ids" "$(printf '%s\n' "$o" | grep '^prompt:commit:')" "spec(tB): A-tB-1 A-tB-2 A-tB-3 A-tB-4 A-tB-5"
 # AC3 - an entry no unit owns THROWS by name before any commit stage, once per spelling.
@@ -2493,14 +2493,14 @@ for c in "A-tB-9|$GH33_U1" \
          "C:/w/rx/$GH33_SF/2026-10-06-spec-A-tB-1.md|$GH33_U1" \
          "$GH33_SF/2026-10-06-spec-tB-1.md|"'[{"id":"A-tB-1","order":1},{"id":"B-tB-1","order":2}]'; do
   e=${c%%|*}
-  o=$(run_gh33 "$(build_gh33_args "${c#*|}")" "$(build_gh33_writer A-tB-1'["'"$e"'"]'),$(build_gh33_writer B-tB-1 '[]')" '[]')
+  o=$(run_gh33 "$(build_gh33_args "${c#*|}")" "$(build_gh33_writer A-tB-1 '["'"$e"'"]'),$(build_gh33_writer B-tB-1 '[]')" '[]')
   t=$(printf '%s\n' "$o" | grep '^THROW')
   has    "GH33 unplaceable [$e]: THROWS with the phrase" "$t" "names no roster unit by id and no unit's spec by path"
   has    "GH33 unplaceable [$e]: ...quoting the entry as JSON" "$t" "authored \"$e\""
   hasnt_ "GH33 unplaceable [$e]: ...before any commit stage" "$o" "agent:commit"
 done
 # AC4 - a path routed to a unit whose committed spec, found by its H1, is another file THROWS after the commit.
-o=$(run_gh33 "$(build_gh33_args '[{"id":"A-tB-1","order":1},{"id":"A-tB-2","order":2}]')" "$(build_gh33_writer A-tB-1'["A-tB-1"]'),$(build_gh33_writer A-tB-2'["'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]')" \
+o=$(run_gh33 "$(build_gh33_args '[{"id":"A-tB-1","order":1},{"id":"A-tB-2","order":2}]')" "$(build_gh33_writer A-tB-1 '["A-tB-1"]'),$(build_gh33_writer A-tB-2 '["'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]')" \
   '[{"id":"A-tB-1","path":"'$GH33_SF'/2026-10-06-spec-A-tB-1.md"},{"id":"A-tB-2","path":"'$GH33_SF'/2026-10-05-spec-A-tB-2-other.md"}]')
 t=$(printf '%s\n' "$o" | grep '^THROW')
 has    "GH33 H1 disagreement: THROWS naming the H1" "$t" "the spec whose H1 defines A-tB-2"
@@ -2509,7 +2509,7 @@ has    "GH33 ...before any audit or hand-out" "$t" "Refusing before any audit or
 hasnt_ "GH33 ...and no roster is handed out" "$o" '"roster"'
 # AC5 - an absolute caller path and an absolute commit path fold equal: placed, repo-relative, no difference logged.
 GH33_ABS="C:/w/r/$GH33_SF/2026-10-06-spec-A-tB-1.md"
-o=$(run_gh33 "$(build_gh33_args '[{"id":"A-tB-1","order":1,"specPath":"'$GH33_ABS'"}]')" "$(build_gh33_writer A-tB-1'["A-tB-1"]')" '[{"id":"A-tB-1","path":"'$GH33_ABS'"}]')
+o=$(run_gh33 "$(build_gh33_args '[{"id":"A-tB-1","order":1,"specPath":"'$GH33_ABS'"}]')" "$(build_gh33_writer A-tB-1 '["A-tB-1"]')" '[{"id":"A-tB-1","path":"'$GH33_ABS'"}]')
 same   "GH33 absolute caller and commit paths: nothing refuses" "$(printf '%s\n' "$o" | grep -c '^THROW')" "0"
 has    "GH33 ...the roster row carries the repo-relative path" "$o" '"id":"A-tB-1","order":1,"specPath":"'$GH33_SF'/2026-10-06-spec-A-tB-1.md"'
 hasnt_ "GH33 ...and no difference is logged" "$o" "the caller's path differs"
@@ -2695,7 +2695,7 @@ for v in '{"specWriter":"gov-x"}' '{"builder":"x y"}' '{"builder":"none"}'; do
   has    "OC4 AC3 the unit harness REFUSES roles $v" "$o" "THROW unattended-unit: \`roles"
   hasnt_ "OC4 AC3 ...before any spawn for $v" "$o" "agent:"
 done
-has    "OC4 AC3 the unit harness names the misspelt key" "$(run_wf "$(printf '%s' "$OC_CHILD" | sed 's#"slug":"tB",#"slug":"tB","roles":{"specWriter":"gov-x"},#')" '{}' "$C")" "specWriter"
+_wfu=${OC_CHILD/'"slug":"tB",'/'"slug":"tB","roles":{"specWriter":"gov-x"},'}; has    "OC4 AC3 the unit harness names the misspelt key" "$(run_wf "$_wfu" '{}' "$C")" "specWriter"
 # AC1/AC4 - the child: untyped is base byte for byte and says so; typed is stamped and hands back.
 for m in unattended attended; do
   o=$(run_wf "$(printf "$CHILD_ARGS" $m)" '{}' "$C")
@@ -2708,7 +2708,7 @@ for m in unattended attended; do
   hasnt_ "OC4 AC1 child $m untyped: ...nor the status-only flip" "$o" "changes nothing else in the spec"
   hasnt_ "OC4 AC1 child $m untyped: ...nor a role stamp" "$(printf '%s\n' "$o" | grep '^prompt:')" "This stage runs as the"
 done
-OC_CT=$(printf '%s' "$OC_CHILD" | sed 's#"slug":"tB",#"slug":"tB","roles":{"builder":"gov-builder"},#')
+OC_CT=${OC_CHILD/'"slug":"tB",'/'"slug":"tB","roles":{"builder":"gov-builder"},'}
 o=$(run_wf "$OC_CT" '{}' "$C")
 same   "OC4 AC4 the typed child spawns as gov-builder" "$(printf '%s\n' "$o" | grep '^type:')" "type:build:gov-builder"
 has    "OC4 AC4 ...stamped" "$o" "This stage runs as the gov-builder agent type"
@@ -2754,7 +2754,7 @@ hasnt_ "OC10 AC6 the resolver and the round recorder carry no level" "$(printf '
 has    "OC10 AC6 the audit forwards its three review levels" "$OC10_T0" 'wfefforts:{"skeptic":"medium","specFinder":"medium","synthesis":"medium"}'
 has    "OC10 AC6 the builder level travels to the child, alone" "$(printf '%s\n' "$OC10_T0" | grep '^RESULT')" '"efforts":{"builder":"high"}'
 has    "OC10 AC6 the log names each stage's level and source" "$OC10_T0" "log:effort specWriter: xhigh — efforts.specWriter"
-o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","efforts":{"skeptic":"medium"},#')" "$(returns CONVERGED 0)")
+_wfu=${UNITS/'"slug":"tB",'/'"slug":"tB","efforts":{"skeptic":"medium"},'}; o=$(run_wf "$_wfu" "$(returns CONVERGED 0)")
 has    "OC10 AC6 a skeptic level alone reaches the review call" "$o" 'wfefforts:{"skeptic":"medium"}'
 hasnt_ "OC10 AC6 ...and dispatch.args carries no efforts" "$(printf '%s\n' "$o" | grep '^RESULT')" '"efforts"'
 has    "OC10 AC6 ...and the log says the builder runs at its type's level" "$o" "log:effort builder: the agent type's own, else the session's — no efforts.builder"
@@ -2765,10 +2765,10 @@ for v in '[]' '{"finder":"high"}' '{"skeptic":"High"}' 'null'; do
   has    "OC10 AC6 the build harness REFUSES efforts $v" "$o" "THROW unattended-build: \`efforts\`"
   hasnt_ "OC10 AC6 ...before any spawn for $v" "$o" "agent:"
 done
-o=$(run_wf "$(printf '%s' "$OC_CHILD" | sed 's#"slug":"tB",#"slug":"tB","efforts":{"builder":"max"},#')" '{}' "$C")
+_wfu=${OC_CHILD/'"slug":"tB",'/'"slug":"tB","efforts":{"builder":"max"},'}; o=$(run_wf "$_wfu" '{}' "$C")
 same   "OC10 AC6 the unit harness spawns its builder at its level" "$(printf '%s\n' "$o" | grep '^effort:')" "effort:build:max"
 has    "OC10 AC6 ...and logs it" "$o" "log:effort builder: max — efforts.builder"
-o=$(run_wf "$(printf '%s' "$OC_CHILD" | sed 's#"slug":"tB",#"slug":"tB","roles":{"builder":"gov-builder"},"efforts":{"builder":"high"},#')" '{}' "$C")
+_wfu=${OC_CHILD/'"slug":"tB",'/'"slug":"tB","roles":{"builder":"gov-builder"},"efforts":{"builder":"high"},'}; o=$(run_wf "$_wfu" '{}' "$C")
 same   "OC10 AC6 a typed builder takes its level too" "$(printf '%s\n' "$o" | grep -E '^(type|effort):')" "type:build:gov-builder
 effort:build:high"
 for v in '[]' '{"finder":"high"}' '{"builder":"High"}'; do
@@ -2809,7 +2809,7 @@ OC27_ID='tB · unattended round 1 · spec, audit, disposal, hand-out'
 o=$(run_wf "$UNITS" "$(printf '{"spec-write":%s,"workflow":%s}' "$SPEC_OK" "$DEF")")
 same   "OC27 AC15 the identity is the first log line, ahead of every roles line and the phase" "$(printf '%s\n' "$o" | grep -m1 -E '^(log|phase):')" "log:$OC27_ID"
 has    "OC27 AC15 ...and the deferred return leads with it" "$(printf '%s\n' "$o" | grep '^RESULT ')" "RESULT {\"identity\":\"$OC27_ID\","
-o=$(run_wf "$A_UNITS" "$(printf '{"spec-write":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":%s}' "$DEF")")
+printf -v _wfj '{"spec-write":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":%s}' "$DEF"; o=$(run_wf "$A_UNITS" "$_wfj")
 same   "OC27 AC15 attended: the identity names the mode" "$(printf '%s\n' "$o" | grep -m1 -E '^(log|phase):')" "log:tB · attended round 1 · spec, audit, disposal, hand-out"
 has    "OC27 AC15 attended: ...and the return leads with it" "$(printf '%s\n' "$o" | grep '^RESULT ')" 'RESULT {"identity":"tB · attended round 1 · spec, audit, disposal, hand-out",'
 o=$(run_wf "$OFF_UNITS" "$(printf '{"spec-write":%s}' "$SPEC_C")")
