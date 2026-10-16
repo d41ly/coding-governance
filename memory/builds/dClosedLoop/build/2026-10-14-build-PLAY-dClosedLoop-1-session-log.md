@@ -127,7 +127,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 63 | the same | The review system's design record, run A, at `40738693d` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-review-system]` | 1799cb98 | returned as `wf_84ae201a-775`, CLEAN WITH FIXES, 41 of 47 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-review-system-a.md` |
 | 64 | the same | The review system's design record, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-review-system]` | 1799cb98 | returned as `wf_dd2730e2-e29`, CLEAN WITH FIXES, 39 of 45 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-review-system-b.md` |
 | 65 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at medium, as the owner asked, round 1 | The runtime fold and its two settlements, run A: `6cfd21619..3611a60e9`, the audit reports and the research returns excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-runtime-fold]` | 1799cb98 | returned as `wf_c8860577-b54`, CLEAN WITH FIXES, 18 of 22 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-a.md` |
-| 66 | the same | The runtime fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-runtime-fold]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-b.md` |
+| 66 | the same | The runtime fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-runtime-fold]` | 1799cb98 | dispatched | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-b.md` |
 | 67 | the same, round 3 with round 2's 31 confirmed findings as `priorFindings` | The layers round's follow-up fold, run A: `cc4c83ad5..1bc4883fe` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-fold-round3]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-a.md` |
 | 68 | the same | The layers round's follow-up fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-fold-round3]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-b.md` |
 | 69 | the same, round 2 with round 1's 25 confirmed findings as `priorFindings` | The library round's fold, run A: `d4fc4bb51..0dd962724` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-library-followup]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library-followup-a.md` |
@@ -1418,6 +1418,9 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
 - 2026-10-17, session 1799cb98: dispatches 83 and 84, the retrofit research's runs A and B, went out
   together from `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-1-researcher.md`. Review dispatch 66
   waits for both.
+
+- 2026-10-17, session 1799cb98: dispatches 83 and 84 returned, the retrofit research's runs A and B, each
+  filed verbatim with both runs' instruments. Review dispatch 66, the runtime fold's run B, goes out.
 
 ## Instruments
 
