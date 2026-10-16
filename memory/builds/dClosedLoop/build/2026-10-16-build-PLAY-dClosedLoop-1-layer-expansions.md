@@ -36,14 +36,14 @@ both runs of a layer agree on.
 
 ## [research] Dispatched, 2026-10-16
 
-| Dispatch | Layer | Run | Handoff | Returned |
+| Dispatch | Layer | Run | Handoff | Returned, and filed as |
 |---|---|---|---|---|
-| 51 | observability | A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-19-researcher.md` | pending |
-| 52 | observability | B | the same | pending |
-| 53 | integrations | A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-20-researcher.md` | pending |
-| 54 | integrations | B | the same | pending |
-| 55 | distribution | A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-21-researcher.md` | pending |
-| 56 | distribution | B | the same | waits for a spawn slot |
+| 51 | observability | A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-19-researcher.md` | 8m26s, 37.8k out; `build/2026-10-16-build-PLAY-dClosedLoop-1-research-observability-a.md` |
+| 52 | observability | B | the same | 10m01s, 45.2k out; `build/2026-10-16-build-PLAY-dClosedLoop-1-research-observability-b.md` |
+| 53 | integrations | A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-20-researcher.md` | 6m08s, 33.0k out; `build/2026-10-16-build-PLAY-dClosedLoop-1-research-integrations-a.md` |
+| 54 | integrations | B | the same | 6m14s, 30.5k out; `build/2026-10-16-build-PLAY-dClosedLoop-1-research-integrations-b.md` |
+| 55 | distribution | A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-21-researcher.md` | 6m24s, 34.7k out; `build/2026-10-16-build-PLAY-dClosedLoop-1-research-distribution-a.md` |
+| 56 | distribution | B | the same | 6m11s, 34.4k out; `build/2026-10-16-build-PLAY-dClosedLoop-1-research-distribution-b.md` |
 
 - **Why the sixth run went later.** The agent-cap hook gives a prompt five direct spawns, and a slot
   frees 45 minutes after its claim (`tools/hooks/agent-cap.js`, the slot ledger). Dispatches 51 to 55
@@ -101,6 +101,29 @@ the row says so. The returns are filed verbatim as `research-<layer>-a.md` and `
 | Gaps | close `gap-deploy-01`, 02, 03 (A: in part) and 05 | — | both |
 | One run only | — | A: the `up —` micro-format asks for a password value in chat (`AGENTS.md:61`), verified here | a new gap |
 
+### [agree-distribution] Distribution, dispatches 55 and 56
+
+| Question | Both runs | Where they differ | The design takes |
+|---|---|---|---|
+| The line | moving bytes and versions across a repository boundary is distribution's; rendering, checking, the bar and the lander on bytes already in the tree are core; the adopt scripts' render and check halves are core, and only their install half is distribution's | A holds the descriptor schema core; B lists the descriptor's layer rows as a point distribution declares | core: the core reads descriptors today (`tools/run-gates/regen.py`, the gate legs in kit packs), so it cannot take their schema from an expansion |
+| The mechanism | govkit installs by copy at a tagged release; a pinned reference or vendoring loses | A: a reference install loses on 13 adopter-written rows inside kit homes; B: vendoring loses on 28 of 92 rows landing outside the kit, and the hand `cp -r` path ignores 31 withheld rows and writes no receipt | copy at a release tag; the hand-copy path retires, and the runbook is generated from the descriptors |
+| Versions | `deploy.version` mints in the lander's prepare and fills Deploy's version slot; every kit must declare a version | A counts 10 of 29 entries unversioned; B 9 | 10, re-measured here with `govkit epoch` |
+| Releases | one annotated product tag per release, its notes generated from the landing records and version deltas, with no changelog file; none has ever been cut | A: `release/<date>`, cut by a cadence item of distribution's own; B: `gov/v<date>.<n>`, cut by Maintain as the handoff said | `gov/v<date>.<n>`, which orders several releases a day and leaves the word "release" to integrations; cut by distribution's own cadence program (EX-1) |
+| The receipt | it must name the release it installed and where that came from | A: `gov_source` is a local path (`tools/govkit/govkit.py:8020`), verified here; B: 31 core files read the receipt, yet no layer declares it | schema 4 carries the release tag and the source remote, and the receipt is distribution's declared record kind |
+| Currency | the adopter compares its receipt with gov's remote tag list and needs no gov checkout; gov reads each adopter's committed receipt for the fleet view; an unreachable remote is unverified, never green | A also runs the adopter's comparison as a bar leg | a cadence program, not a bar leg: the bar makes no network call for a value it does not grade (`tools/drift-audit/drift_report.py:3387-3389`) |
+| The fleet register | `adopters.toml` grows into it: key, remote, default branch, cadence | — | both |
+| Descriptors | they gain layers, the points they declare and use, record kinds and policies, each joined to its registry, and a required version | field names | `layers`, `declares`, `uses`, `records`, `policies`, `units` and `version_from` |
+| Conformance | one gate: fields present, every name resolving in its registry, a version required, `requires` closed over the siblings the code resolves, render destinations named by kind | A: owned by dOrderedCharter; B: the kit factory's, which v2's chain gives dShippedRelease | one core gate; its owner is the chain re-cut's |
+| Wiring and versions | one in-tree wiring verdict that iterates the descriptors as one bar leg, and one version check; `gap-tool-02` undercounts both | A: three wiring judges and five lockstep checks; B: all 11 `[check]` argvs duplicate their own gate legs | both |
+| Inline copies | generated from `tools/lib/`, never hand-kept | B: in-tree by a regen stage, tracked and drift-gated, and the class spans 16 primitives and 254 markers | in-tree by regen; 261 markers over 17 names, re-measured here |
+| Render targets | Claude Code's paths are hard-coded: 8 descriptor rows write under `.claude/` | A: distribution declares target kinds; B: a field on Runtime's harness adapters | an install-target field on each harness adapter (`[core-points]`) |
+| The overlay | — | A: a repository's own rules render inside the charter's one block, not a separate one (`AGENTS.md:1-177`, its section 2 at line 84), verified; B: gov's overlay says it selects every kit, yet selects 22 of 29 (`.governance/deploy.toml:11,18-26`), verified | one new gap for both |
+| Gov's own receipt (P8) | — | A: a source-mode receipt, so gov runs the same checks; B: none, so gov's tree stays the standing fixture of the core without distribution | put to the owner (DI-1) |
+| Keys | `currency.max-behind`, default 2 releases | A adds `currency.on-behind`, default owner-item; B adds `install.from`, default release-tag | all three |
+| Gaps | close `gap-deploy-04`, `gap-deploy-06` (its review stays a role's), `gap-deploy-08` in part, `gap-tool-02` and `gap-tool-04`, and only the version half of `gap-deploy-07` | — | both |
+| The deploy-governance Skill | both slim it to an operator order | — | it retires, as the memory round's tooling map already says (`gap-tool-05`: no reader, 0 loads); neither run was handed that verdict |
+| One run only | — | B: govkit's usage text omits the `contribute` verb it dispatches (`tools/govkit/govkit.py:13212` against `:13713`) | noted in `[open]`, too small to register |
+
 ## [cross] What runs on different layers found in common
 
 Some findings came from runs on different layers, each working alone. They shape all three designs.
@@ -127,8 +150,12 @@ other is absent it renders the core's fallback. Under this rule:
 
 **Three senses of "release".** Integrations' runs both rename the core item `deploy.release`, which
 deletes lease refs, to `deploy.unlease`, and give `release.*` to promoting a landed SHA through
-environments. Distribution A uses `release` for cutting gov's tagged kit release. The design keeps
-`release.*` for promotion and gives the kit release its own name (`[design-distribution]`).
+environments. Both distribution runs use "release" for cutting gov's tagged kit release. The design
+names the three apart:
+- `deploy.unlease`, the core item that deletes a build's lease refs and closes its mailbox;
+- `release.*` and the `release` record, integrations' promotion of a landed SHA through environments;
+- `kits.*`, the `kit-release` record and the `gov/v<date>.<n>` tags, distribution's delivery of gov's
+  kits.
 
 ## [design] The expansions, as proposed
 
@@ -148,6 +175,8 @@ missing. Each lands in the core layer named, and its chain build is in `[gaps-pr
 | verdict backends, as a registry | Flow, in Test | `local-hook` (built in), `peer-node`, `remote-ci` | integrations |
 | the release slot after the landing, with its environments, each naming an engine and a verify adapter | Flow, in Deploy | the `release.*` program and its engines | integrations |
 | homes for record kinds keyed by period, SHA or adopter rather than by build | Memory's contract | maintenance and Loop Review records, release records, fleet rows and currency observations | all three |
+| the version slot in the landing's prepare | Flow, in Deploy | `deploy.version`, which mints each kit whose shipped bytes moved | distribution |
+| install targets on each harness adapter: where a rendered Skill, agent, rule, hook or settings fragment lands | Runtime's harness adapters | each adapter's paths, read by the install | distribution |
 
 ### [design-observability] Observability
 
@@ -309,6 +338,58 @@ the registry, with today's values as the built-ins.
 terminal, and a build closes at landing with no release. `build.closes: after-release-verifies` is
 refused, or falls back with a report, as `policy.on-missing-expansion` says.
 
+### [design-distribution] Distribution
+
+**What it is.** `distribution` moves kits and their versions across a repository boundary: it
+installs a release of kits into a repository, keeps the release current there, and measures how far
+behind each repository is. What runs on bytes already in the tree stays core: the render and its
+`--check`, the bar, the lander, and the descriptor schema the core reads.
+
+**The mechanism.** govkit installs by copy at a release tag, and the receipt names that release and
+the remote it came from. A pinned reference or vendoring loses on rows that land outside the kit or
+that an adopter writes inside it. The hand `cp -r` path retires, because it ignores withheld rows and
+writes no receipt, and the runbook is generated from the descriptors.
+
+| Contract field | Distribution's entry |
+|---|---|
+| tag and definition | `layer.distribution`, as above |
+| instruction units | the operator order for install and update, in the runbook generated from the descriptors; the release-note and currency views. The deploy-governance Skill retires, as the tooling map says (`gap-tool-05`) |
+| engine kits | govkit, with check-wiring's install arms and check-placeholders folded in; the install half of each adopt script; the inline-copy generator; `adopters.toml`, grown into the fleet register |
+| record kinds | `receipt` (`.governance/install.json`, schema 4: per-kit versions, the release tag, the source remote); `kit-release` (an annotated `gov/v<date>.<n>` tag, its notes generated from the landing records and version deltas); `currency` (an adopter's releases behind, keyed by its HEAD SHA); `fleet` (gov's reading of each adopter, per release); the fleet register's rows; outbox orders, as today |
+| extension points declared | none: the descriptor schema, the version slot and the install targets are core points (`[core-points]`) |
+| extension points used | Flow's version slot in Deploy; Runtime's cadence items, command adapters, harness adapters' install targets and notification adapters |
+| policies | `release.cadence`, `deploy.currency`, `runtime.harnesses`, and the new keys below |
+| gates | one wiring verdict, in-tree, iterating the descriptors as one bar leg; one version check; kit conformance, core; receipt integrity |
+
+**The descriptor fields P28 needs**, each joined to its registry by the conformance gate: `layers`,
+`declares`, `uses`, `records`, `policies`, `units`, and a required `version_from`, with `none` refused
+unless the kit ships no bytes.
+
+**Items:**
+
+| Item | Actor | Does | Witness | Routes |
+|---|---|---|---|---|
+| `deploy.version` | command: `govkit mint`, in the lander's prepare | mints each kit whose shipped bytes moved, filling Deploy's version slot | the version check's verdict at the push boundary | minted or clean → the landing goes on; refused → Test; govkit absent → the announced skip |
+| `kits.cut` | command, a cadence program per `release.cadence` | cuts the annotated tag `gov/v<date>.<n>`, its notes generated since the previous tag; under `owner-cut`, an owner item | the tag on the remote, and its notes blob | nothing landed since the last tag → skip, announced; cut → done; refused by the remote → an owner item |
+| `kits.currency` | command, a cadence program in each adopter | joins the receipt's rows to gov's remote tag list: releases behind, per kit | the currency record, keyed by HEAD SHA; unreachable → unverified, never green | within `currency.max-behind` → done; over → as `currency.on-behind` says |
+| `kits.fleet` | command, a cadence program in gov | reads each register row's committed receipt at its remote tip | the fleet record, per release | `pull-and-watch` → reported; `push-branches` → `kits.offer` |
+| `kits.offer` | command | under `push-branches`, runs the update in a worktree and pushes `gov/update-<release>` to the adopter | the pushed ref on the adopter's remote | pushed → the adopter lands it with its own lander; refused → an outbox order |
+| `kits.install`, `kits.update` | the owner, or a command | applies or updates a release, installing each render target where the adapters in `runtime.harnesses` say | the receipt, and the wiring verdict | an adapter that declares no target → its slot renders not installed, the core render kept |
+
+**New keys:**
+
+| Key | Allowed values | Default | Why |
+|---|---|---|---|
+| `currency.max-behind` | a count of releases | 2 | it turns a measurement into an owner item; 990 commits behind went unseen because nothing set a bar |
+| `currency.on-behind` | note, owner-item, red | owner-item | a red would block an adopter's own landings on gov's cadence |
+| `install.from` | release-tag, any-commit | release-tag | the receipt then names one release, so "releases behind" is defined |
+
+**Absent.** The lander mints nothing, says so, and lands. `check-receipt` skips with "no receipt", and
+kit resolution probes beside the kit. The currency slot renders "not installed: no receipt, currency
+unmeasured". A preset that names `release.cadence` or `deploy.currency` is refused under
+`policy.on-missing-expansion: refuse`. The render and `--check` of `AGENTS.md` and its aliases still
+run, because they are core.
+
 ## [gaps-proposed] Gaps to register once the forks settle
 
 Each row is a distance both runs of a layer measured, or one run measured and this round re-measured.
@@ -333,6 +414,15 @@ and the verdict-backend registry is `gap-test-02`'s.
 | `gap-deploy-10` | Deploy | MED | `GATE_POST_MERGE=ci` binds nothing: the lander starts no bar under it, and the pre-push hook reads only `refs/gov/bar-red`, though flow-steps names the CI result as the witness. | `tools/push-main.sh:434`; `.githooks/pre-push:1919-1936`, verified here | dShippedRelease |
 | `gap-spine-07` | Spine | LOW | Keys that select an extension are typed as literal lists (`verdict`, `run.host`, `maintain.host`), against the rule that they take registered names. | v2 `[policies]`; layer-runtime `[extend]` | dDeclaredLoop |
 | `gap-found-18` | Foundation | MED | The `up —` micro-format asks for a password value, inviting a secret into chat. | `AGENTS.md:61`; `coding-governance-agents.template.md:64`, verified here | dOrderedCharter |
+| `gap-deploy-11` | Deploy | MED | No release has ever been cut: no release tag, no changelog, and 10 of 29 kit entries declare no version. | `git tag`; `govkit epoch`, re-measured here; distribution A and B | dShippedRelease |
+| `gap-deploy-12` | Deploy | MED | A receipt records gov's source as a local path, so an adopter cannot resolve where its install came from. | `tools/govkit/govkit.py:8020`, verified here | dShippedRelease |
+| `gap-rt-19` | Runtime | MED | Harness adapters declare no install targets: 8 descriptor rows write to Claude Code's `.claude/` paths. | `tools/*/kit.toml` and `tools/govkit/entries/`, verified here; layer-runtime `[harness]` | dWellOiledMachine |
+| `gap-tool-07` | Tooling | MED | Kit descriptors declare no layers, extension points, record kinds or policies, and nothing validates their keys. | 0 of 29 descriptors carry `layers`, verified here; distribution A and B | dShippedRelease |
+| `gap-found-19` | Foundation | MED | No overlay is a separate project block: a repository's own rules render inside the charter's one block, and gov's own overlay says it selects every kit, yet selects 22 of 29. | `AGENTS.md:1-177`; `.governance/deploy.toml:11,18-26`, verified here | dOrderedCharter |
+
+Two existing gaps grow instead of adding rows. `gap-tool-02` gains B's finding that all 11 `[check]`
+argvs duplicate their own gate legs. `gap-tool-04` widens from `resolve_python`'s 73 copies to 261
+inline markers over 17 primitives, re-measured here.
 
 ## [forks] Asked, 2026-10-16
 
@@ -361,3 +451,27 @@ split here.
   maintenance record only when something was fixed or filed. Observability A, and `gap-maint-04`'s
   weight of records.
 - **A committed maintenance record every period.** Observability B, at about 30 records a month.
+
+**DI-1. "Does gov carry its own install receipt?"** P8 says every adopter is an adopter, gov included.
+The two distribution runs split here.
+- **A source-mode receipt (Recommended).** Gov records itself as the source of its own install, so the
+  receipt's readers, the wiring verdict and the currency probe run in gov as they do in an adopter,
+  and currency reads "source, 0 behind". Distribution A, and the charter's "dogfoods every kit it
+  ships".
+- **No receipt.** Gov's tree stays the standing fixture of the core without distribution, and a
+  self-receipt would only hash the source against itself. Distribution B.
+
+## [open] What the expansion round owes
+
+- **The owner's answers** to EX-1, EX-2, EX-3 and DI-1.
+- **The settlement**, once they come:
+  - v2 `[layers]` takes the three definitions, `[policies]` and `[presets]` the new keys, and P28 the
+    rule EX-1 settles;
+  - flow-steps renames `deploy.release` to `deploy.unlease`, declares the release slot and the version
+    slot in Deploy and the verdict backends in Test, and rewrites `[expansions]`;
+  - layer-runtime declares cadence items, the reading and fix classes, the adapter grant, the install
+    targets, and `runtime.journal` as retention;
+  - the register takes the twenty gaps in `[gaps-proposed]`, and v2's chain cells take their owners.
+- **The round's Tier-2 review**, owed before the round closes.
+- **Too small to register:** govkit's usage text omits the `contribute` verb it dispatches
+  (distribution B).

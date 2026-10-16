@@ -112,12 +112,12 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 48 | the same, round 2 with round 1's 28 confirmed findings handed as `priorFindings` | The layers' fold: the follow-up round over the closing review's fixes, `9e0e43aef..2e6f9aa1b`, after the owner chose it | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[fold-review]` | 1799cb98 | returned as `wf_e26eda01-523`, CLEAN WITH FIXES, 31 of 34 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md` |
 | 49 | gov-researcher | Memory's library side: its four filling paths and two placements | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | 1799cb98 | returned, 8m06s, 37.9k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` |
 | 50 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The library round's review: a light diff review over `1bc4883fe..aa9639d98`, the atlas excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md` `[review]` | 1799cb98 | returned as `wf_9d4cc07b-2f2`, CLEAN WITH FIXES, 25 of 31 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` |
-| 51 | gov-researcher, at medium effort as the owner asked | The observability expansion, run A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-19-researcher.md` | 1799cb98 | dispatched | pending |
-| 52 | the same | The observability expansion, run B, from the same handoff | the same | 1799cb98 | dispatched | pending |
-| 53 | gov-researcher, at medium effort | The integrations expansion, run A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-20-researcher.md` | 1799cb98 | dispatched | pending |
-| 54 | the same | The integrations expansion, run B, from the same handoff | the same | 1799cb98 | dispatched | pending |
-| 55 | gov-researcher, at medium effort | The distribution expansion, run A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-21-researcher.md` | 1799cb98 | dispatched | pending |
-| 56 | the same | The distribution expansion, run B, from the same handoff | the same | 1799cb98 | dispatched 17:00, after the five returned | pending |
+| 51 | gov-researcher, at medium effort as the owner asked | The observability expansion, run A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-19-researcher.md` | 1799cb98 | returned, 8m26s, 37.8k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-observability-a.md` |
+| 52 | the same | The observability expansion, run B, from the same handoff | the same | 1799cb98 | returned, 10m01s, 45.2k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-observability-b.md` |
+| 53 | gov-researcher, at medium effort | The integrations expansion, run A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-20-researcher.md` | 1799cb98 | returned, 6m08s, 33.0k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-integrations-a.md` |
+| 54 | the same | The integrations expansion, run B, from the same handoff | the same | 1799cb98 | returned, 6m14s, 30.5k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-integrations-b.md` |
+| 55 | gov-researcher, at medium effort | The distribution expansion, run A | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-21-researcher.md` | 1799cb98 | returned, 6m24s, 34.7k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-distribution-a.md` |
+| 56 | the same | The distribution expansion, run B, from the same handoff | the same | 1799cb98 | dispatched 17:00 after the five returned; returned, 6m11s, 34.4k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-distribution-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -602,6 +602,23 @@ The library round's review, dispatch 50, derived from its Workflow run the same 
 - returned — gov-synthesizer · wrote 1 file · 3m42s · 29.5k out · run wf_9d4cc07b-2f2/aa69d182e0727fff5
 ```
 
+The expansion round's researchers, dispatches 51 to 56, derived from their handoffs the same way:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-19-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-19-researcher.md) · writes none · gates none · run direct/abcd975adc93473a6
+- returned — gov-researcher · wrote 0 files · 8m26s · 37.8k out · run direct/abcd975adc93473a6
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-19-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-19-researcher.md) · writes none · gates none · run direct/aeb25a3f5da2c79fa
+- returned — gov-researcher · wrote 0 files · 10m01s · 45.2k out · run direct/aeb25a3f5da2c79fa
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-20-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-20-researcher.md) · writes none · gates none · run direct/a4d3ad9d5ef89fc55
+- returned — gov-researcher · wrote 0 files · 6m08s · 33.0k out · run direct/a4d3ad9d5ef89fc55
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-20-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-20-researcher.md) · writes none · gates none · run direct/ad5cd3859453dd80a
+- returned — gov-researcher · wrote 0 files · 6m14s · 30.5k out · run direct/ad5cd3859453dd80a
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-21-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-21-researcher.md) · writes none · gates none · run direct/a7b8c089c758cea14
+- returned — gov-researcher · wrote 0 files · 6m24s · 34.7k out · run direct/a7b8c089c758cea14
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-21-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-21-researcher.md) · writes none · gates none · run direct/af201e9901137b2a6
+- returned — gov-researcher · wrote 0 files · 6m11s · 34.4k out · run direct/af201e9901137b2a6
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -976,6 +993,15 @@ The library round's review, dispatch 50, derived from its Workflow run the same 
   Dispatch 56, distribution's second run, waited for the agent-cap hook's budget and started at 17:00,
   once the five had returned. The round's record is
   `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md`.
+
+- 2026-10-16, session 1799cb98: dispatches 51 to 56 returned, each filed verbatim as a research record.
+  Each layer's two runs agree on its shape: observability reads and files through Maintain and the
+  Loop Review, integrations adapters register at the core point they serve under one header, and
+  distribution installs by copy at a release tag and measures currency from the receipt. Runs on
+  different layers found the same holes: no point for a cadence program, no home for records that
+  belong to no build, and one expansion reaching into another. layer-expansions `[design]` proposes
+  the three designs and twenty gaps, and asks EX-1 to EX-3 and DI-1. Commit 50ebfc4de's message
+  counts sixteen proposed gaps; its table held fifteen.
 
 ## Instruments
 
@@ -1394,6 +1420,12 @@ Runs, 2026-10-14:
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-19-researcher.md` | The observability expansion's research handoff, run twice. |
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-20-researcher.md` | The integrations expansion's research handoff, run twice. |
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-21-researcher.md` | The distribution expansion's research handoff, run twice. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-research-observability-a.md` | Dispatch 51's return, verbatim: the observability expansion, run A. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-research-observability-b.md` | Dispatch 52's return, verbatim: the observability expansion, run B. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-research-integrations-a.md` | Dispatch 53's return, verbatim: the integrations expansion, run A. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-research-integrations-b.md` | Dispatch 54's return, verbatim apart from its demoted title: the integrations expansion, run B. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-research-distribution-a.md` | Dispatch 55's return, verbatim apart from its demoted title: the distribution expansion, run A. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-research-distribution-b.md` | Dispatch 56's return, verbatim: the distribution expansion, run B. |
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | The library pass's research handoff: the four filling paths and two placements. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` | The library round's review, a light diff review over KN-1's fold, the library design and its settlement, as its synthesizer wrote it. |
