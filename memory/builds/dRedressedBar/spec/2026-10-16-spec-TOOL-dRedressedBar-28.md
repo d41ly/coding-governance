@@ -1,12 +1,13 @@
 # TOOL-dRedressedBar-28 — install-prefix's two hits at the landing: settings-merge's static absence terms give way to the resolver term, and unit 14's measured landing is spelled through `{prefix}`
 
-**Status:** SPECCED · rev-2 · 2026-10-16 · node d · Tier-2 · base ebce889c · streams tooling · order 22 · ratified 2026-10-16
+**Status:** CLOSED · rev-2 · 2026-10-16 · node d · Tier-2 · base ebce889c · streams tooling · order 22 · ratified 2026-10-16
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-16-build-TOOL-dRedressedBar-28-1-amendments.md](../build/2026-10-16-build-TOOL-dRedressedBar-28-1-amendments.md) | research | — |
+| [2026-10-16-build-TOOL-dRedressedBar-28-2-acceptance-ledger.md](../build/2026-10-16-build-TOOL-dRedressedBar-28-2-acceptance-ledger.md) | journal | — |
 | [2026-10-16-prompt-TOOL-dRedressedBar-28-1-spec-writer.md](../prompts/2026-10-16-prompt-TOOL-dRedressedBar-28-1-spec-writer.md) | journal | — |
 | [2026-10-16-prompt-TOOL-dRedressedBar-28-brief.md](../prompts/2026-10-16-prompt-TOOL-dRedressedBar-28-brief.md) | research | — |
 

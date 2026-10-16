@@ -7947,8 +7947,9 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- agent-cap's hook, lexicon finding codebase-map, unattended finding memory-tree. Written only
     # ---- at RECEIPT, a first apply's adopters read no receipt and probed the two static homes alone,
     # ---- so a kit landed at a per-kit prefix was invisible to them. Measured: `[kit.agent-cap]
-    # ---- prefix = "scripts"` landed the hook at `scripts/hooks/agent-cap.js`, and settings-merge
-    # ---- exited 2 for want of it on the first apply and wired it on the second. So the file is on
+    # ---- prefix = "scripts"` landed the hook at agent-cap's `{prefix}/hooks/agent-cap.js` with
+    # ---- `{prefix}` resolved to `scripts`, and settings-merge exited 2 for want of it on the
+    # ---- first apply and wired it on the second. So the file is on
     # ---- disk before any adopter runs, from the lists RECEIPT writes: this run's selection and rows,
     # ---- unit 12's carry, and, for the three keys later steps fill, what the target holds now — the
     # ---- prior run's, or none. RECEIPT REWRITES IT from this same dict, and so does the write after
