@@ -31,7 +31,7 @@ count below is derived, and `[instrument]` keeps the probes and their runs.
 |---|---|
 | Research through role agents | done: every return filed under `build/` |
 | The gap register | done: 193 gaps, file-cited, each owned by one chain build |
-| The design rounds | every layer walked, reviewed and folded; the owner's approval is not yet recorded |
+| The design rounds | every layer walked, reviewed twice and folded, though not the lexicon or the review system (`[unreviewed]`); the owner's approval is not yet recorded |
 | The spec | not written: there is no `spec/` folder, and hygiene check 21 reds until a spec defines the unit |
 | The declared spec audit | not run |
 | The chain's folders | none open: `memory/LIVE.md` names none of the 15 builds |
@@ -78,13 +78,13 @@ v2 `[owed]` and `[open]` carry these to the chain re-cut, and none has an answer
 - whether the kit confs Runtime reads (`FANOUT_CAP`, `PROCMON_REAP_MODE`, `RESUME_ATTEMPTS` and
   `RESUME_TURNS`) fold into `.governance/policy.toml`;
 - the tooling order: Flow first, as dispatch 26 picked, or the instruction layer first;
-- the chain's order:
-  - dTotalRecall ahead of dIndexedDesign and dTendedCadence, which consume what it builds;
-  - dWellOiledMachine's `next` ahead of every stage build whose commands end with a `next —` line;
-  - dOrderedCharter's policy file, schema and reader, which land with dDeclaredLoop, its child;
-  - `gap-design-01` and `gap-plan-06`, whose fixes dTotalRecall designs, reordered or moved to it;
-- the expansion roles' home: the deployer's and the maintainer's definitions move to the builds that
-  deliver integrations and observability;
+- the chain's order, where v2 leaves each choice open:
+  - dWellOiledMachine ahead of every stage build whose commands end with a `next —` line, or its
+    `next` unit landed first;
+  - dOrderedCharter's policy file, schema and reader moved into it, or its consuming units ordered
+    after dDeclaredLoop, its child;
+  - dTotalRecall ordered ahead of the owners of `gap-design-01` and `gap-plan-06`, or the two gaps
+    moved to it;
 - the roles layer's mechanical shape: each role item's agent set, effort, checklist, orientation
   template and merge, the revisit the owner set when round four opened;
 - the roles layer's lower-level design: how the answered-call hook matches a Read's range, how the
@@ -93,6 +93,13 @@ v2 `[owed]` and `[open]` carry these to the chain re-cut, and none has an answer
   coordination record's interpretations;
 - every chain build's planned units, for the eight core points and the three expansion designs;
 - dMindYourWords' second-wave packs, which wait for an adopter census and so for the owner's ask.
+
+v2 decides two more, and the re-cut applies them to `[chain]`:
+- dTotalRecall lands ahead of dIndexedDesign and dTendedCadence, which consume what it builds.
+  `[chain]` already orders dTendedCadence after it, through dWellOiledMachine, but gives dIndexedDesign
+  only dDeclaredLoop as its parent.
+- The deployer's and the maintainer's definitions move to the builds that deliver integrations and
+  observability, and dBoundRoles keeps their registration.
 
 ## [stale] Records that still list settled items as open
 
