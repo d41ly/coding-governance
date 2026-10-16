@@ -125,8 +125,8 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 61 | `tier2-review.js`, spec audit, full: `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at medium, as the owner asked | The lexicon's design record, run A, at `424d2a7de` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-lexicon]` | 1799cb98 | returned as `wf_14950dae-859`, CLEAN WITH FIXES, 47 of 53 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-a.md` |
 | 62 | the same | The lexicon's design record, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-lexicon]` | 1799cb98 | returned as `wf_b52591b3-8f4`, CLEAN WITH FIXES, 49 of 56 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-b.md` |
 | 63 | the same | The review system's design record, run A, at `40738693d` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-review-system]` | 1799cb98 | returned as `wf_84ae201a-775`, CLEAN WITH FIXES, 41 of 47 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-review-system-a.md` |
-| 64 | the same | The review system's design record, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-review-system]` | 1799cb98 | dispatched | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-review-system-b.md` |
-| 65 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at medium, as the owner asked, round 1 | The runtime fold and its two settlements, run A: `6cfd21619..3611a60e9`, the audit reports and the research returns excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-runtime-fold]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-a.md` |
+| 64 | the same | The review system's design record, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-review-system]` | 1799cb98 | returned as `wf_dd2730e2-e29`, CLEAN WITH FIXES, 39 of 45 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-review-system-b.md` |
+| 65 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at medium, as the owner asked, round 1 | The runtime fold and its two settlements, run A: `6cfd21619..3611a60e9`, the audit reports and the research returns excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-runtime-fold]` | 1799cb98 | dispatched | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-a.md` |
 | 66 | the same | The runtime fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-runtime-fold]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-b.md` |
 | 67 | the same, round 3 with round 2's 31 confirmed findings as `priorFindings` | The layers round's follow-up fold, run A: `cc4c83ad5..1bc4883fe` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-fold-round3]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-a.md` |
 | 68 | the same | The layers round's follow-up fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-fold-round3]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-b.md` |
@@ -835,6 +835,35 @@ Dispatch 63, `review-system-a`, derived from its Workflow run the same way:
 - returned — gov-synthesizer · wrote 1 file · 4m00s · 33.5k out · run wf_84ae201a-775/aaea5f16820548623
 ```
 
+Dispatch 64, `review-system-b`, derived from its Workflow run the same way:
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_dd2730e2-e29/a7451350ac0934e4e
+- returned — workflow-subagent · wrote 0 files · 9s · 913 out · run wf_dd2730e2-e29/a7451350ac0934e4e
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:coherence · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_dd2730e2-e29/aea34e018f82133f2
+- returned — gov-spec-reviewer · wrote 0 files · 4m17s · 23.3k out · run wf_dd2730e2-e29/aea34e018f82133f2
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:grounding · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_dd2730e2-e29/a137deb338ae6d5fc
+- returned — gov-spec-reviewer · wrote 0 files · 3m45s · 20.7k out · run wf_dd2730e2-e29/a137deb338ae6d5fc
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:reuse · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_dd2730e2-e29/a4707153a704df4d5
+- returned — gov-spec-reviewer · wrote 0 files · 5m43s · 31.3k out · run wf_dd2730e2-e29/a4707153a704df4d5
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:blast-radius · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_dd2730e2-e29/a463fcc9ae56670c3
+- returned — gov-spec-reviewer · wrote 0 files · 5m00s · 27.6k out · run wf_dd2730e2-e29/a463fcc9ae56670c3
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:failure-envelope · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_dd2730e2-e29/a823be192acbcc08e
+- returned — gov-spec-reviewer · wrote 0 files · 3m38s · 20.5k out · run wf_dd2730e2-e29/a823be192acbcc08e
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-1-9 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_dd2730e2-e29/a681c68c46aec7767
+- returned — gov-skeptic · wrote 0 files · 1m02s · 6.3k out · run wf_dd2730e2-e29/a681c68c46aec7767
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-10-18 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_dd2730e2-e29/af2f4b71f5ab7b4d2
+- returned — gov-skeptic · wrote 0 files · 1m39s · 9.6k out · run wf_dd2730e2-e29/af2f4b71f5ab7b4d2
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-19-27 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_dd2730e2-e29/a9f81d03c4d81eb46
+- returned — gov-skeptic · wrote 0 files · 1m06s · 7.0k out · run wf_dd2730e2-e29/a9f81d03c4d81eb46
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-28-36 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_dd2730e2-e29/aae66f593112951a9
+- returned — gov-skeptic · wrote 0 files · 1m38s · 9.0k out · run wf_dd2730e2-e29/aae66f593112951a9
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-37-45 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_dd2730e2-e29/a21edeafbe30437de
+- returned — gov-skeptic · wrote 0 files · 1m37s · 9.3k out · run wf_dd2730e2-e29/a21edeafbe30437de
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_dd2730e2-e29/a02c6ebb3451e22a8
+- returned — gov-synthesizer · wrote 1 file · 4m56s · 42.1k out · run wf_dd2730e2-e29/a02c6ebb3451e22a8
+```
+
 The systems round's researchers, dispatches 73 to 82, derived from their handoffs the same way:
 
 ```text
@@ -1334,6 +1363,27 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   "both Marker query and part of codebase map tool index"; AN-2 "Redefine for shell reads"; IW-1 "At
   dOrderedCharter (Recommended)"; IW-2 "Step units in work orders (Recommended)". The systems record's
   `[answers]` says what each settles.
+
+- 2026-10-17, session 1799cb98: the owner answered RS-1, RS-2 and MS-1 and asked about MS-2, verbatim:
+  RS-1 "twin runs are only this rearchitecture design's measure, by default,  this does not apply to the
+  actual product methods. However, this should be an owner opt-in option: a review step runs a two parallel
+  review cadence in the normal flow instead of one (in the normal review flow)."; RS-2 "move orientation to
+  medium, builder to high"; MS-1 "Promote, then budget (Recommended)"; MS-2 "Why was memory partitioned like
+  that? Was there a reason for these caps?" The per-role caps were run A's alone and measured no role, so the
+  design's default is corrected and MS-2 is asked again (the systems record's `[ms2]`).
+
+- 2026-10-17, session 1799cb98: dispatch 64 returned CLEAN WITH FIXES: 39 of 45 findings confirmed,
+  22 items (0 high, 14 medium, 8 low), 11 agents, 176.7k out tokens (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-review-system-b.md`).
+
+- 2026-10-17, session 1799cb98: the owner said, verbatim: "Continue with your current work queue but budget
+  research+design for another system: retrofitting the gov practices. What layer (extension?) does it go
+  to? When gov is adopted into a fresh repo, maintaining its methods (to be designed) like tagging, code
+  annotations, decision log and its major decisions, etc., is not an issue - they all happen along as code
+  is planned, designed, and built. However, Gov may be adopted into a product/repo that has an extensive
+  codebase already and has been following different practices. How would gov retrofit its practices into
+  an existing repo as it goves over its code to ensure efficient practices?" The review queue continues at
+  dispatch 65. The retrofit system gets its own record and one research handoff, run twice as dispatches
+  83 and 84 between review dispatches 65 and 66, and then its design.
 
 ## Instruments
 

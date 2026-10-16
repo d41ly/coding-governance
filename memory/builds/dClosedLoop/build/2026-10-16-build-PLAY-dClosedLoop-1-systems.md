@@ -319,7 +319,7 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 - **Binding.** The work order carries the resolved shape's digest. Act binding refuses a Workflow call
   whose roles, efforts or fan differ from it, and the supervisor reconciles the journal against the shape
   afterwards. A verifier stage whose role wrote the artifact it verifies is refused.
-- **Twins and their merge.** Twins run where RS-1 settles. A synthesizer places both runs' findings on
+- **Twins and their merge.** Twins run only on the owner's opt-in (RS-1). A synthesizer places both runs' findings on
   defects over candidate pairs grouped by address, and the comparison instrument refuses an unplaced id.
 - **The metric.** Recall first, against a twin union or a known replay set, then grade-weighted verified
   results per 100k out-tokens. `review.cost` writes a shape-run record carrying the shape, its efforts and
@@ -329,12 +329,12 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 
   | Role | Kind | Effort | Orientation template |
   |---|---|---|---|
-  | orientation scout | single | xhigh, until RS-2's trial | the card |
+  | orientation scout | single | medium (RS-2) | the card |
   | prompt writer | single | medium | the resolved work order |
   | planner, architect | single | high | `orient.producer` |
-  | researcher | single; a twin on an owner-opened design question | medium | the handed question |
+  | researcher | single (RS-1) | medium | the handed question |
   | reuse scout | single, never twinned | medium | the house index first, then a sketch and a census |
-  | spec writer, builder | per-unit | high, xhigh | `orient.producer` |
+  | spec writer, builder | per-unit | high (RS-2) | `orient.producer` |
   | tester | single | medium | `orient.verifier-cold` |
   | reviewer, skeptic, synthesizer | panel | diff high; spec and design audits medium | `orient.verifier-cold` |
   | deployer, maintainer | single, registered by their expansions | medium | `orient.producer` |
@@ -348,7 +348,7 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 
   | Key | Values | Default |
   |---|---|---|
-  | `review.twin` | never, design-records, design-and-landing, always | as RS-1 settles |
+  | `review.twin` | never, design-records, design-and-landing, always | never (RS-1) |
   | `roles.shape-enforce` | refuse, record | refuse |
   | `roles.orientation.house-index` | handed, pointer, off | handed |
 
@@ -388,7 +388,7 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   |---|---|---|
   | `memory.default-load` | card, card-and-live | card |
   | `memory.load-budget` | 4k, 8k, 16k | 8k |
-  | `memory.item-budget` | KB per role | builder 24, reviewer 48, researcher 64 |
+  | `memory.item-budget` | KB per role | derived per role from a measurement, as MS-2 settles |
   | `memory.over-budget` | refuse, report, off | as MS-2 settles |
   | `memory.legacy-anchors` | derived, none | derived |
   | `memory.superseded-slices` | refuse, mark | refuse |
@@ -416,6 +416,10 @@ The first four forks, answered in one round. Each answer is quoted verbatim.
 | AN-2 | "Redefine for shell reads" | `pushed-at-read` stays an allowed value of `annotations.grammar`, redefined to fire on shell reads as well as Read; the default stays `voluntary` (F4-2) |
 | IW-1 | "At dOrderedCharter (Recommended)" | the render gate is armed at dOrderedCharter, with a shrink-only list of today's documents; each chain build migrates its own step's guides |
 | IW-2 | "Step units in work orders (Recommended)" | the charter keeps one line per practice, and each practice's reach per step renders as step-scoped units handed in work orders |
+| RS-1 | "twin runs are only this rearchitecture design's measure, by default,  this does not apply to the actual product methods. However, this should be an owner opt-in option: a review step runs a two parallel review cadence in the normal flow instead of one (in the normal review flow)." | `review.twin`: `never` by default in the product; `design-records`, `design-and-landing` and `always` are the owner's opt-in, under which a review step runs two parallel reviews instead of one, merged by the synthesizer. Twin runs in this build stay the rearchitecture's own measure |
+| RS-2 | "move orientation to medium, builder to high" | the orientation scout runs at `medium` and the builder at `high` |
+| MS-1 | "Promote, then budget (Recommended)" | the auto-memory index's standing directives move into instruction units through `instructions.edit`, and what remains is held to `memory.load-budget` |
+| MS-2 | the owner asked, verbatim: "Why was memory partitioned like that? Was there a reason for these caps?" | answered in `[ms2]` and asked again |
 
 - **AN-1, as designed.** The marker query in core memory-tree stays the path the core can always take
   (P28). The codebase map's lexer gains the annotation rows as part of its index: a shebang profile for
@@ -428,6 +432,28 @@ The first four forks, answered in one round. Each answer is quoted verbatim.
   code-reading calls.
 - **IW-2 amends v2's front door** at the fold: the charter's practice lines stay one each, and the reach
   table leaves the charter for step-scoped units.
+- **RS-1, as designed.** No product step twins by default. `review.twin` opts a review step in, and an
+  opted-in step runs two parallel reviews of one shape in place of one, merged by the synthesizer. The
+  researcher runs single, since the owner opted review steps in and no other. The metric's recall is
+  taken against a known replay set, or the twin union where twins run. The noise between twins that gates
+  a shape change is this build's measured noise until opted-in twins re-measure it.
+- **RS-2, as designed.** The orientation scout drops from `xhigh` to `medium` and the builder from `xhigh`
+  to `high`. The spec writer stays at `high`.
+
+## [ms2] Where the per-role memory budgets came from
+
+- **Run A alone proposed them.** Its key `memory.item-budget` set builder 24 KB, reviewer 48 KB and
+  researcher 64 KB (`research-memory-structure-a.md:172`). Run B named a read allowance per role as what
+  role shapes need, with no figure (`research-memory-structure-b.md:141`). Its only budget is the card's,
+  from the card's measured p90 of 6.1 KB and maximum of 7.8 KB (`research-memory-structure-b.md:224`).
+- **No role was measured.** The figures rest on two measurements across all roles. The memory a subagent
+  reads has a median of 52.7 KB and a p90 of 183.6 KB over 1,328 agents
+  (`research-memory-structure-a.md:57`). A slice ratio of 29% was taken from one handoff
+  (`research-memory-structure-a.md:86`). The builder's 24 KB is that ratio applied to the median, plus a
+  margin (`research-memory-structure-a.md:144`). The reviewer's and researcher's figures carry no
+  derivation.
+- **The design took one run's unmeasured figures as defaults.** `[design-memory-structure]` is corrected:
+  each role's budget is derived from a measurement of that role, as `[forks]`' MS-2 is asked again.
 
 ## [gaps-proposed] Gaps to register once the forks settle
 
