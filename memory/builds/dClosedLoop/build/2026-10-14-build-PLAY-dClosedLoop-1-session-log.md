@@ -135,15 +135,15 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 71 | the same, round 3 with round 2's 24 confirmed findings as `priorFindings` | The expansion round's follow-up fold, run A: `67c79f7cc..5e139d377` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-expansions-fold-round3]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-a.md` |
 | 72 | the same | The expansion round's follow-up fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-expansions-fold-round3]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-b.md` |
 | 73 | gov-researcher, at its declared medium effort | The tag system, run A, in the first wave | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-22-researcher.md` | 1799cb98 | returned, 10m44s, 57.3k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-tags-a.md` |
-| 74 | the same | The tag system, run B, from the same handoff, in the second wave | the same | 1799cb98 | dispatched after the first wave returned | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-tags-b.md` |
+| 74 | the same | The tag system, run B, from the same handoff, in the second wave | the same | 1799cb98 | returned, 9m35s, 50.2k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-tags-b.md` |
 | 75 | gov-researcher, at its declared medium effort | Code annotations and commentary, run A, in the first wave | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-23-researcher.md` | 1799cb98 | returned, 10m04s, 51.7k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-annotations-a.md` |
-| 76 | the same | Code annotations and commentary, run B, from the same handoff, in the second wave | the same | 1799cb98 | dispatched after the first wave returned | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-annotations-b.md` |
+| 76 | the same | Code annotations and commentary, run B, from the same handoff, in the second wave | the same | 1799cb98 | returned, 10m05s, 51.6k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-annotations-b.md` |
 | 77 | gov-researcher, at its declared medium effort | The instruction writing system, run A, in the first wave | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-24-researcher.md` | 1799cb98 | returned, 8m31s, 46.1k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-instruction-writing-a.md` |
-| 78 | the same | The instruction writing system, run B, from the same handoff, in the second wave | the same | 1799cb98 | dispatched after the first wave returned | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-instruction-writing-b.md` |
+| 78 | the same | The instruction writing system, run B, from the same handoff, in the second wave | the same | 1799cb98 | returned, 7m50s, 41.5k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-instruction-writing-b.md` |
 | 79 | gov-researcher, at its declared medium effort | Role workflow shapes, run A, in the first wave | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-25-researcher.md` | 1799cb98 | returned, 6m02s, 32.5k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-role-shapes-a.md` |
-| 80 | the same | Role workflow shapes, run B, from the same handoff, in the second wave | the same | 1799cb98 | dispatched after the first wave returned | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-role-shapes-b.md` |
+| 80 | the same | Role workflow shapes, run B, from the same handoff, in the second wave | the same | 1799cb98 | returned, 7m32s, 41.1k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-role-shapes-b.md` |
 | 81 | gov-researcher, at its declared medium effort | Memory structure, run A, in the first wave | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-26-researcher.md` | 1799cb98 | returned, 9m43s, 44.9k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-memory-structure-a.md` |
-| 82 | the same | Memory structure, run B, from the same handoff, in the second wave | the same | 1799cb98 | dispatched after the first wave returned | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-memory-structure-b.md` |
+| 82 | the same | Memory structure, run B, from the same handoff, in the second wave | the same | 1799cb98 | returned, 10m30s, 50.2k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-memory-structure-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -804,6 +804,31 @@ Dispatch 62, `lexicon-b`, derived from its Workflow run the same way:
 - returned — gov-skeptic · wrote 0 files · 1m00s · 5.8k out · run wf_b52591b3-8f4/a7216b884198e0664
 - agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_b52591b3-8f4/a1edc71f848d4c4ce
 - returned — gov-synthesizer · wrote 1 file · 4m37s · 38.5k out · run wf_b52591b3-8f4/a1edc71f848d4c4ce
+```
+
+The systems round's researchers, dispatches 73 to 82, derived from their handoffs the same way:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-22-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-22-researcher.md) · writes none · gates none · run direct/a3587f86d4a3d2ca2
+- returned — gov-researcher · wrote 0 files · 10m44s · 57.3k out · run direct/a3587f86d4a3d2ca2
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-22-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-22-researcher.md) · writes none · gates none · run direct/a4611ca8ebc87c95f
+- returned — gov-researcher · wrote 0 files · 9m35s · 50.2k out · run direct/a4611ca8ebc87c95f
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-23-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-23-researcher.md) · writes none · gates none · run direct/a10f86afd96642204
+- returned — gov-researcher · wrote 0 files · 10m04s · 51.7k out · run direct/a10f86afd96642204
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-23-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-23-researcher.md) · writes none · gates none · run direct/affa0c9633ea8ae45
+- returned — gov-researcher · wrote 0 files · 10m05s · 51.6k out · run direct/affa0c9633ea8ae45
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-24-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-24-researcher.md) · writes none · gates none · run direct/a4c29bb087350cdcf
+- returned — gov-researcher · wrote 0 files · 8m31s · 46.1k out · run direct/a4c29bb087350cdcf
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-24-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-24-researcher.md) · writes none · gates none · run direct/a7722bc074537f18b
+- returned — gov-researcher · wrote 0 files · 7m50s · 41.5k out · run direct/a7722bc074537f18b
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-25-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-25-researcher.md) · writes none · gates none · run direct/a3dd52e092e6ca483
+- returned — gov-researcher · wrote 0 files · 6m02s · 32.5k out · run direct/a3dd52e092e6ca483
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-25-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-25-researcher.md) · writes none · gates none · run direct/adcdef604e381522d
+- returned — gov-researcher · wrote 0 files · 7m32s · 41.1k out · run direct/adcdef604e381522d
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-26-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-26-researcher.md) · writes none · gates none · run direct/a7ecbbad80696e9c1
+- returned — gov-researcher · wrote 0 files · 9m43s · 44.9k out · run direct/a7ecbbad80696e9c1
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-16-prompt-PLAY-dClosedLoop-1-26-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-26-researcher.md) · writes none · gates none · run direct/ad70c8e0c9a9c6236
+- returned — gov-researcher · wrote 0 files · 10m30s · 50.2k out · run direct/ad70c8e0c9a9c6236
 ```
 
 ## Events
@@ -1715,6 +1740,11 @@ Runs, 2026-10-14:
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-annotations-a.md` | Dispatch 75's return, verbatim: code annotations and commentary, run A. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-tags-a.md` | Dispatch 73's return, verbatim: the tag system, run A. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-memory-structure-a.md` | Dispatch 81's return, verbatim: memory structure, run A. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-research-instruction-writing-b.md` | Dispatch 78's return, verbatim: the instruction writing system, run B. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-research-role-shapes-b.md` | Dispatch 80's return, verbatim: role workflow shapes, run B. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-research-tags-b.md` | Dispatch 74's return, verbatim: the tag system, run B. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-research-annotations-b.md` | Dispatch 76's return, verbatim: code annotations and commentary, run B. |
+| `build/2026-10-16-build-PLAY-dClosedLoop-1-research-memory-structure-b.md` | Dispatch 82's return, verbatim: memory structure, run B. |
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | The library pass's research handoff: the four filling paths and two placements. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` | The library round's review, a light diff review over KN-1's fold, the library design and its settlement, as its synthesizer wrote it. |
