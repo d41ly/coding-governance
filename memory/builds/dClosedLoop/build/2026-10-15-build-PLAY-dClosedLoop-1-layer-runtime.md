@@ -707,6 +707,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - The supervisor consults that witness before it takes the cadence lease.
   - So a node that wakes late, after another has run the period, skips it.
   - A missed period runs at the next wake.
+- **An item can wait on an event.** `deploy.released` waits for the release slot's exit record. The
+  record's event wakes it, keyed by (event, SHA) as a cadence instance is, and the supervisor runs it
+  under that wake's own run lease, so it needs no build lease. A wait past `runtime.hold-ceiling`
+  raises an owner item through the notification adapter, as a held launch does.
 - **In-session cron is retired for cadence.**
   - It is session-scoped, expires after 7 days, and fires only while its session is open and idle.
   - The unattended skill's CronCreate keepalive and stop-guard's `session_crons` retire with it.
@@ -751,7 +755,8 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | cadence items | a program with its host key, its period, its lease and its events | Maintain and the Loop Review; gov's kit release and the currency probe |
 
 - The keys that select an extension (`runtime.harnesses`, `runtime.spawn-backend`, `verdict`, `run.host`,
-  `maintain.host`, `kits.host` and `notify.channel`) take registered names.
+  `maintain.host`, `kits.host`, `notify.channel` and `release.environments`) take registered names.
+  This is the one list of them, and other records point here.
   They are validated against the registry, never against a literal enumeration. A name no installed
   layer registers is refused, or falls back to the built-in with a report, as
   `policy.on-missing-expansion` says.
@@ -768,14 +773,19 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - a harness adapter declares its install targets: where a rendered Skill, agent, rule, hook or
     settings fragment lands.
 - **The secret value scan** is Runtime's gate, as `runtime.secret-scan` says. Each adapter's runner,
-  the one principal holding the value, scans for the value and its encodings at the lander's prepare,
-  so the value never leaves its process. Its population is everything a push publishes: the commits
-  in the pushed range, every `refs/gov/*` object the core pushes (mailbox, card, leases and claims),
-  and the tracked files, `memory/`, the journal and the transcripts. Its witness names what it read:
-  whether the value resolved (yes, no or `anonymous`), each population's count, and the matches, as a
-  count and a salted id only. An unresolved value or an empty population is a dead probe, never
-  green, and `anonymous` reads not applicable, not zero. A hit refuses the push. A seen-red fixture
-  plants the value in a removed commit and in a mailbox ref, and one encoding of it in the journal.
+  the one principal holding the value, scans for the value and its encodings, so the value never
+  leaves its process. It binds at every boundary that publishes, over what that boundary publishes:
+  - the lander's prepare, over the commits in the pushed range and the tracked files and `memory/`
+    they carry;
+  - the core's one ref-push path, over each `refs/gov/*` object it pushes (mailbox, card, leases and
+    claims), whenever it pushes one, before the landing and after it alike.
+
+  A hit refuses that push. The journal and the transcripts never leave the node, so the node tick
+  scans them as a node-local population, and a hit there is an owner item. Each witness names what it
+  read: whether the value resolved (yes, no or `anonymous`), each population's count, and the
+  matches, as a count and a salted id only. An unresolved value or an empty population is a dead
+  probe, never green, and `anonymous` reads not applicable, not zero. The `secret-scan` fixture in
+  `[tests]` plants the value in every population named here.
 - A new step, role, record kind, rule, harness, backend or host is a filled contract, so Runtime gains
   no code.
 - The `extension` fixture proves this once, by registering a stub adapter with no edit to Runtime's code
@@ -794,6 +804,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | `fail-closed` | Under `runtime.hook-failure=closed`, on every CLI version, a gated tool call runs only on the dispatcher's approval. A dispatcher that cannot run leaves the call denied, or put to the person when attended. Where the CLI carries `onFailure`, every enforcement entry fails closed too. Every event that cannot fail closed has a witness with a named reader. A bypass or an exception is journaled and re-checked, as K1 and K4 set. Under `open`, the class check reports the policy in force on every run. | `fail-closed`, `git-witness` |
 | `no-skip` | No session the runtime launches skips permissions. | `no-skip` |
 | `policy-and-journal` | Every runtime behaviour is a policy key with a reader, and every runtime event is journaled. | `coverage` |
+| `grants-and-secrets` | An adapter acts only within the scopes it declared, its secret never leaves its process, and no push publishes a secret value; a journal is pruned past `runtime.journal`. | `grant`, `secret-scan`, `journal-retention` |
 
 ### [contract] Runtime's layer contract
 
@@ -806,7 +817,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | extension points declared | the ten in `[extend]` |
 | extension points used | none. Integrations fill the host and notification adapters. Observability and memory's optional components register packs and read the journal |
 | policies | the `runtime.*` keys in `[policies]`, and the existing keys it reads |
-| gates | the build's fixtures in `[tests]`; the grant's scope probe and the secret value scan (`[extend]`) |
+| gates | the build's fixtures in `[tests]`, the `grant`, `secret-scan` and `journal-retention` fixtures among them |
 
 ## [policies] Runtime's keys, set under the owner's delegation
 
@@ -825,7 +836,7 @@ integrations because the grant they serve is Runtime's field.
 | `runtime.hold-ceiling` | hours | 6 | 6 | 6 | 6 | 6 |
 | `runtime.hook-failure` | closed, open | closed | closed | closed | closed | closed |
 | `runtime.harnesses` | a set of named harness adapters | claude-code | claude-code | claude-code | claude-code | claude-code |
-| `runtime.journal` | days, or all, and at least `review.loop.window-days` | 60 | 60 | 60 | 90 | 60 |
+| `runtime.journal` | days, or all, bounded by v2's pair rule | 60 | 60 | 60 | 90 | 60 |
 | `runtime.secret-home` | os-keychain, env-injected | os-keychain | os-keychain | os-keychain | os-keychain | os-keychain |
 | `runtime.secret-scan` | value-gate, value-gate+shape-report | value-gate+shape-report | value-gate | value-gate+shape-report | value-gate+shape-report | value-gate+shape-report |
 
@@ -1010,6 +1021,16 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   - the card stays under the re-attachment cap.
 - **`cadence`:** node A runs a period's item, and node B, waking late, skips it. A missed period runs at
   the next wake.
+- **`grant`:** an adapter whose granted scope is wider than its declared one is refused at registration,
+  seen red on a probe stubbed to accept it.
+- **`journal-retention`:** a journal entry older than `runtime.journal` days is pruned on the node tick,
+  and none is pruned under `all`.
+- **`secret-scan`:** one plant per population `[extend]` names: a removed commit, a tracked file, a
+  `memory/` record, a mailbox ref written after the landing, a card ref, a lease ref and a claim ref at
+  the push boundaries, and the journal and a transcript at the node tick, with one encoding of the
+  value among them. Each plant turns its boundary red. Three witness cases are each seen red against a
+  scanner stubbed to return zero: an unresolved value reads a dead probe and blocks, a population
+  emptied by a broken enumerator reads a dead probe, and an `anonymous` adapter reads not applicable.
 - **`extension`:**
   - a stub harness adapter registers with no edit to Runtime's code or schema;
   - Codex's capability table is checked against the dispatcher's required events;
@@ -1148,3 +1169,11 @@ the grant on every adapter row and runs the secret value scan over everything a 
 `runtime.secret-home` and `runtime.secret-scan`. The comparison record's `[folded]`
 (`build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md`) names each defect and
 where it went.
+
+**Revised again, 2026-10-16, after the fold's closing review**
+(`reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md`): `[extend]` holds the one list of
+keys that take registered names, `release.environments` among them; the secret value scan binds at the
+lander's prepare and at the core's ref-push path, and scans the journal and transcripts as a node-local
+population; `[schedule]` runs an item's event wait under its wake's own lease; and `[tests]` and
+`[invariants]` gain the `grant`, `secret-scan` and `journal-retention` fixtures. The comparison record's
+`[closing-review]` names each item and where it went.

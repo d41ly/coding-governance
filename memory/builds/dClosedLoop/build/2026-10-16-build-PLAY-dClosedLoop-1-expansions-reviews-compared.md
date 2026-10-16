@@ -208,7 +208,7 @@ is a record under `memory/gotchas/`.
 - **The checks, run again on the folded records:** the preset check (153 keys, 143 presettable, 143
   preset rows, no findings), the gap-ownership join (193 keys over 15 builds, none unowned or owned
   twice), the role matrix (75 items, 0 findings) and `gotchas.py --check` (exit 0).
-- **Still owed:** the fold's own closing review, dispatched as `[fold-review]` says.
+- **The fold's closing review** returned, and `[closing-review]` folds it.
 
 ## [fold-review] The fold's closing review, dispatched 2026-10-16
 
@@ -259,6 +259,105 @@ Its args, verbatim:
  "checklist": "# recurring-bug-class checklist for 3fccdd78a..6e0ce0a55 (30 changed file(s))\n# 19 class(es) selected by an anchor + 6 universal\n# by anchor specificity: 11 path · 4 directory · 4 basename; a cut tier prints one line per class\n# invariants are read at 3fccdd78a610; 0 that this subject adds, edits or takes out are listed as items, never by design\n\n- [ ] fixture-passes-by-finding-nothing (universal)\n      a test arm whose fixture never triggers the rule passes, and proves nothing\n      memory/gotchas/fixture-passes-by-finding-nothing.md\n\n- [ ] guard-above-a-fold-makes-its-fallback-dead (universal)\n      a guard added above a fold settles the predicate the fold's own fallback re-tests, leaving a dead arm that reads as coverage\n      memory/gotchas/guard-above-a-fold-makes-its-fallback-dead.md\n\n- [ ] heredoc-escape-reaches-the-regex (universal)\n      source written through a shell heredoc into a non-raw string turns an escape into a control byte, and the symptom never looks like a quoting problem\n      memory/gotchas/heredoc-escape-reaches-the-regex.md\n\n- [ ] inline-fence-swallows-the-rest-of-the-file (universal)\n      a triple-backtick written inline in prose opens a fence the reader never closes, so every section after it silently disappears from the checker's view\n      memory/gotchas/inline-fence-swallows-the-rest-of-the-file.md\n\n- [ ] staged-break-substitutes-a-synthetic-value (universal)\n      an arm that proves a mechanism by replacing the shipped value with a simpler one proves the mechanism for the simpler value\n      memory/gotchas/staged-break-substitutes-a-synthetic-value.md\n\n- [ ] two-answers-to-one-question (universal)\n      a fact stated in two places drifts, and the copies need not disagree loudly to be wrong\n      memory/gotchas/two-answers-to-one-question.md\n\n- [ ] policy-value-with-no-route (path)\n      a policy key catalogues a value that no item reading the key routes or witnesses, so a preset that selects the value cannot run\n      memory/gotchas/policy-value-with-no-route.md\n\n- [ ] core-depends-on-an-optional-part (path)\n      a core item, leg, field or preset cannot run, or cannot be enforced, without an expansion or an optional component, and the dependency hides behind the guard or Absent clause that seems to degrade it\n      memory/gotchas/core-depends-on-an-optional-part.md\n\n- [ ] foreign-code-runs-on-the-ambient-credential (path)\n      an unattended item runs code another repository authored, on the node's whole environment and ambient credential, so that repository's committers gain the node's rights\n      memory/gotchas/foreign-code-runs-on-the-ambient-credential.md\n\n- [ ] parser-drops-rows-it-cannot-place (path)\n      a record-parsing instrument skips rows under a heading it does not know, or rows its pattern cannot read, and still prints a clean run, so its population shrinks without a word\n      memory/gotchas/parser-drops-rows-it-cannot-place.md\n\n- [ ] route-names-an-output-its-actor-never-emits (path)\n      a designed route or witness names an output, exit class or record that its actor never produces on that path, so the route is dead or waits forever\n      memory/gotchas/route-names-an-output-its-actor-never-emits.md\n\n- [ ] zero-witness-over-an-unnamed-population (path)\n      a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean\n      memory/gotchas/zero-witness-over-an-unnamed-population.md\n\n- [ ] append-without-an-idempotence-key (path)\n      a command that appends to an append-only record declares no key, so a retried run writes the same row twice and a set-join witness stays green\n      memory/gotchas/append-without-an-idempotence-key.md\n\n- [ ] insert-after-a-key-that-occurs-twice (path)\n      a record edit inserts a row after the first match of a cell value that occurs in two tables, so the row lands in the wrong table and the right one never gains it\n      memory/gotchas/insert-after-a-key-that-occurs-twice.md\n\n- [ ] one-run-claim-recorded-as-agreed (path)\n      a comparison of two independent runs records a claim only one run made as what both found, so a single measurement carries the weight of agreement\n      memory/gotchas/one-run-claim-recorded-as-agreed.md\n\n- [ ] owner-item-without-its-reject-outcome (path)\n      a design hands a decision to the owner and routes only the yes, so a no leaves landed work with no route and a check that turns red on the default branch\n      memory/gotchas/owner-item-without-its-reject-outcome.md\n\n- [ ] rule-stated-with-no-check-that-fails (path)\n      a principle, a constraint between two keys or another rule is added in prose with no check that can fail on its breach, so it binds nothing and nobody can see that it does not\n      memory/gotchas/rule-stated-with-no-check-that-fails.md\n\n- [ ] a-merge-of-the-default-branch-read-as-additions (directory) · memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md\n\n- [ ] amendment-leaves-its-other-half-standing (directory) · memory/gotchas/amendment-leaves-its-other-half-standing.md\n\n- [ ] ledger-token-wrapped-across-a-line-joins-nothing (directory) · memory/gotchas/ledger-token-wrapped-across-a-line-joins-nothing.md\n\n- [ ] retirement-inventory-misses-readers-by-value (directory) · memory/gotchas/retirement-inventory-misses-readers-by-value.md\n\n- [ ] record-without-serves-or-with-a-round-counter (basename) · memory/gotchas/record-without-serves-or-with-a-round-counter.md\n\n- [ ] rate-quoted-without-its-denominator (basename) · memory/gotchas/rate-quoted-without-its-denominator.md\n\n- [ ] a-folded-field-leaves-its-row-shape-docs-behind (basename) · memory/gotchas/a-folded-field-leaves-its-row-shape-docs-behind.md\n\n- [ ] git-rm-cached-refuses-a-diverged-index-blob (basename) · memory/gotchas/git-rm-cached-refuses-a-diverged-index-blob.md\n\n# by design — 0 invariant(s) this selection touches\n"
 }
 ```
+
+## [closing-review] The fold's closing review, folded 2026-10-16
+
+Dispatch 59 reviewed the fold's two commits at light intensity (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md`, run `wf_27ececa4-f6c`): CLEAN WITH FIXES, 20 of 28
+findings confirmed, in 18 items (3 high, 9 medium, 6 low). Ids 5, 10, 12, 16, 18, 20, 22 and 28 were refuted. Each item went here:
+
+| Item | Ids | Disposition | Where the fix sits | Its class |
+|---|---|---|---|---|
+| H1 | 1, 21 | fixed, gap | layer-expansions' `kits.offer` runs nothing from the adopter's tree, its checks left to the adopter's lander; v2's dShippedRelease row; `gap-deploy-13`'s execution sites; the class's fixture | `foreign-code-runs-on-the-ambient-credential` |
+| H2 | 2 | fixed | layer-runtime `[extend]`: the scan binds at the lander's prepare and at the core's ref-push path, and scans the journal and transcripts at the node tick | `zero-witness-over-an-unnamed-population` |
+| H3 | 14 | fixed | flow-steps' `deploy.released` is an event wait under its wake's own lease, `deploy.close` mints under the claim ref, and `[rules]` says unlease closes a mailbox, not a build; layer-runtime `[schedule]` | `destructive-step-before-its-precondition` |
+| M1 | 3, 15 | fixed | layer-expansions' `release.promote` and `release.verify` end in a record with the outcome unverified; flow-steps' `deploy.released` gains its ceiling and its arm for an emptied list, and `life.quiesce` hands a landed build to it | `route-names-an-output-its-actor-never-emits` |
+| M2 | 4 | fixed | the class's probe, restated and walked by hand over v2's presets | `criterion-asserts-what-its-own-command-cannot-show` |
+| M3 | 6 | fixed | layer-expansions' `app-only` arm; flow-steps' core re-check | `policy-value-with-no-route` |
+| M4 | 7 | fixed | layer-expansions' `kits.cut` under `owner-cut`: its trigger, and its decline keyed by the span's tip SHA | `policy-value-with-no-route` |
+| M5 | 8 | fixed | layer-expansions' `currency` leg passes a source-mode receipt | `route-names-an-output-its-actor-never-emits` |
+| M6 | 9 | fixed | layer-expansions' `loop.propose` skips a kept row, and `loop.file` writes the kept state | `owner-item-without-its-reject-outcome` |
+| M7 | 17 | fixed | layer-expansions: only a failure fires `release-verify-failed`, and Maintain's ask shares `release.route`'s (SHA, environment) key | `append-without-an-idempotence-key` |
+| M8 | 24 | fixed | layer-runtime `[tests]`' `secret-scan` fixture: one plant per population and three witness cases | `zero-witness-over-an-unnamed-population` |
+| M9 | 23 | fixed | v2's pair rule binds while observability is installed; layer-runtime and layer-expansions point at it | `two-answers-to-one-question` |
+| L1 | 11 | fixed | layer-runtime `[extend]` holds the one list, `release.environments` added; `gap-spine-07` and layer-expansions point at it | `two-answers-to-one-question` |
+| L2 | 13 | fixed | `policy-value-with-no-route`: five observability keys | `two-answers-to-one-question` |
+| L3 | 19 | fixed | flow-steps' Memory bullet reads the exit record, and `deploy.released`'s pass witness is the landing record's `build.closes` value | `a-folded-field-leaves-its-row-shape-docs-behind` |
+| L4 | 25 | fixed | layer-runtime `[tests]`' `grant`, `secret-scan` and `journal-retention`, an `[invariants]` row, and `[contract]`'s gates | `rule-stated-with-no-check-that-fails` |
+| L5 | 26 | fixed | v2's dDeclaredLoop row owes the core-only preset load, and the class names it | `observed-by-claim-no-arm-discharges` |
+| L6 | 27 | fixed | layer-expansions' `[cross]` cites each run's line; the probe below ran red, then green | `one-run-claim-recorded-as-agreed` |
+
+- **The method.** Each item's fix is the skeptic's, the corrected one where the skeptic judged the
+  finder's unsound (ids 9, 14 and 17). For H1 the review offered two fixes, and the fold took the one
+  that denies by default: the offer runs nothing from the adopter's tree, and the adopter's own lander
+  runs the checks it left unrun.
+- **The left-shift.** Every item's class is a catalogue entry already. The five classes the fold filed
+  were corrected where the review found them wrong: the optional-part probe (M2, L5), the foreign-code
+  fixture (H1), the zero-witness boundary rule (H2, M8) and the policy class's count (L2).
+- **The probe, seen red.** `one-run-claim-recorded-as-agreed` prescribes a probe, and the review found
+  it never run (L6). It ran over layer-expansions' `[agreement]` and `[cross]` before the citations went
+  in, and after:
+
+```python
+"""The probe one-run-claim-recorded-as-agreed prescribes, run over a design record's [agreement] and [cross].
+
+Usage: python both_runs_probe.py <record.md>
+A table row that credits both runs of a layer ("<layer> A and B") must carry a return citation for each
+run named, `research-<layer>-a.md:<line>` and `research-<layer>-b.md:<line>`, or say "re-measured here".
+Every table body row under the two sections is read, and a row the probe cannot place is a finding, so a
+parser that skips what it cannot read never reports a clean run. Exit 1 on any finding.
+"""
+import re
+import sys
+
+text = open(sys.argv[1], encoding="utf-8").read()
+CREDIT = re.compile(r"\b(observability|integrations|distribution) A and B\b")
+findings, rows = [], 0
+for tag in ("agreement", "cross"):
+    head = f"\n## [{tag}]"
+    if head not in text:
+        sys.exit(f"no section {head.strip()}")
+    block = text.split(head, 1)[1].split("\n## ", 1)[0]
+    for ln in block.split("\n"):
+        if not ln.startswith("|") or re.match(r"^\|[\s:|-]+\|$", ln) or ln.startswith("| Question |") \
+                or ln.startswith("| Finding |"):
+            continue
+        rows += 1
+        for layer in sorted(set(CREDIT.findall(ln))):
+            if "re-measured here" in ln:
+                continue
+            missing = [r for r in "ab" if not re.search(rf"research-{layer}-{r}\.md:\d+", ln)]
+            if missing:
+                findings.append(f"[{tag}] {ln[:90]}... credits {layer} A and B, and cites no line of run(s) "
+                                f"{', '.join(m.upper() for m in missing)}")
+print(f"rows read: {rows}")
+for f in findings:
+    print(f)
+print(f"findings: {len(findings)}")
+sys.exit(1 if findings else 0)
+```
+
+Before:
+
+```text
+rows read: 52
+[cross] | The scheduler has no point where a layer registers a cadence program | observability A a... credits observability A and B, and cites no line of run(s) A, B
+[cross] | Records that belong to no build have no home | observability A and B, integrations B | m... credits observability A and B, and cites no line of run(s) A, B
+[cross] | Remote CI is red, not absent | integrations A and B; observability A and B found its dri... credits integrations A and B, and cites no line of run(s) A, B
+[cross] | Remote CI is red, not absent | integrations A and B; observability A and B found its dri... credits observability A and B, and cites no line of run(s) A, B
+[cross] | No catch history is committed | observability A and B | both runs counted 78 bars in thi... credits observability A and B, and cites no line of run(s) A, B
+findings: 5
+```
+
+After:
+
+```text
+rows read: 52
+findings: 0
+```
+
+- **The checks, run again:** the preset check, the gap-ownership join and the role matrix, as in
+  `[folded]`, with the same results.
+- **No follow-up round has reviewed these fixes.**
 
 ## [map] Every finding, placed
 

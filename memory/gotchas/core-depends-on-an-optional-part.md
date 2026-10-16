@@ -38,7 +38,11 @@ run B's report beside it) found four:
 - A core field is enforced by the core layer that declares it.
 - An expansion's Absent clause says its keys go unread, never refused. `policy.on-missing-expansion`
   governs only a value, on a key the core reads, that selects an expansion's behaviour (LR-4).
-- Probe: install the core alone, load each shipped preset, and expect none refused.
+- Probe: install the core alone and load each shipped preset. Expect a refusal only for a value, on a
+  key the core reads, that selects an absent expansion, and none for a key an absent expansion owns.
+  Walked by hand over v2's presets on 2026-10-16: `strict` and `guarded` are refused for
+  `build.closes: after-release-verifies` (LR-4), and no preset is refused for any other key.
 
 It has no machine gate yet. dOrderedCharter owes the check that the core never depends on an expansion
-or an optional component (`gap-found-17`), and until it lands this entry is the guard.
+or an optional component (`gap-found-17`), and dDeclaredLoop's preset check owes the core-only preset
+load above. Until they land, this entry is the guard.

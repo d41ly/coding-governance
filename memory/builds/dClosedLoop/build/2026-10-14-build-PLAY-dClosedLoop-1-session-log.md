@@ -120,7 +120,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 56 | the same | The distribution expansion, run B, from the same handoff | the same | 1799cb98 | dispatched 17:00 after the five returned; returned, 6m11s, 34.4k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-distribution-b.md` |
 | 57 | `tier2-review.js`, full: five `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The expansion round's review, run A: a diff review over `ee2eee68e..f56e80fee`, the atlas excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md` `[review]` | 1799cb98 | returned as `wf_644d225b-42a`, CLEAN WITH FIXES, 37 of 45 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-a.md` |
 | 58 | the same | The expansion round's review, run B, after run A returns | the same | 1799cb98 | returned as `wf_3a59e7c4-201`, CLEAN WITH FIXES, 46 of 54 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-b.md` |
-| 59 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The expansion fold's closing review: a light diff review over `3fccdd78a..6e0ce0a55`, the review reports, the atlas and the generated files excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` `[fold-review]` | 1799cb98 | dispatched | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md` |
+| 59 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at high, the closing-review roles' declared effort | The expansion fold's closing review: a light diff review over `3fccdd78a..6e0ce0a55`, the review reports, the atlas and the generated files excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` `[fold-review]` | 1799cb98 | returned as `wf_27ececa4-f6c`, CLEAN WITH FIXES, 20 of 28 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -675,6 +675,31 @@ The expansion round's review, dispatches 57 and 58, derived from their Workflow 
 - returned — gov-synthesizer · wrote 1 file · 5m03s · 42.0k out · run wf_3a59e7c4-201/aba4d565342814cb6
 ```
 
+The expansion fold's closing review, dispatch 59, derived from its Workflow run the same way:
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, diff-review round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_27ececa4-f6c/a10c0ae2b73692656
+- returned — workflow-subagent · wrote 0 files · 10s · 954 out · run wf_27ececa4-f6c/a10c0ae2b73692656
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:correctness · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_27ececa4-f6c/ada7b4214cdc49982
+- returned — gov-diff-reviewer · wrote 0 files · 7m09s · 41.8k out · run wf_27ececa4-f6c/ada7b4214cdc49982
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:seams · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_27ececa4-f6c/a7ec06604244b8d1b
+- returned — gov-diff-reviewer · wrote 0 files · 4m25s · 25.7k out · run wf_27ececa4-f6c/a7ec06604244b8d1b
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:verification · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_27ececa4-f6c/a41d2d5323ae706be
+- returned — gov-diff-reviewer · wrote 0 files · 6m00s · 32.5k out · run wf_27ececa4-f6c/a41d2d5323ae706be
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-1-6 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_27ececa4-f6c/a1fba4b0ec0c9477b
+- returned — gov-skeptic · wrote 0 files · 2m42s · 14.2k out · run wf_27ececa4-f6c/a1fba4b0ec0c9477b
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-7-12 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_27ececa4-f6c/ab4aaa0b3eda689f0
+- returned — gov-skeptic · wrote 0 files · 2m15s · 12.9k out · run wf_27ececa4-f6c/ab4aaa0b3eda689f0
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-13-18 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_27ececa4-f6c/a10980030036ef4a6
+- returned — gov-skeptic · wrote 0 files · 2m49s · 14.5k out · run wf_27ececa4-f6c/a10980030036ef4a6
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-19-24 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_27ececa4-f6c/a31f7d3f7f9dd9b87
+- returned — gov-skeptic · wrote 0 files · 2m25s · 13.6k out · run wf_27ececa4-f6c/a31f7d3f7f9dd9b87
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-25-28 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_27ececa4-f6c/a16dfeaa0c8ecb06d
+- returned — gov-skeptic · wrote 0 files · 2m09s · 11.5k out · run wf_27ececa4-f6c/a16dfeaa0c8ecb06d
+- agent — gov-synthesizer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_27ececa4-f6c/a0a2b5bc4769ae660
+- returned — gov-synthesizer · wrote 1 file · 3m18s · 26.8k out · run wf_27ececa4-f6c/a0a2b5bc4769ae660
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -1089,6 +1114,12 @@ The expansion round's review, dispatches 57 and 58, derived from their Workflow 
   `integrations.secret-home` and `integrations.secret-scan`. The atlas generator now counts the
   expansion layers' rounds by their record's name, so its progress view reads them reviewed twice and
   folded.
+
+- 2026-10-16, session 1799cb98: dispatch 59 returned CLEAN WITH FIXES: 20 of 28 findings confirmed,
+  18 items (3 high, 9 medium, 6 low), 9 agents, 178.7k out tokens. All 18 are folded,
+  and the comparison record's `[closing-review]` names where each went. The unattended offer now runs
+  nothing from an adopter's tree, the secret scan binds at every boundary that publishes, and
+  `deploy.released` waits under its own wake lease once the build's lease is gone.
 
 ## Instruments
 
@@ -1516,6 +1547,7 @@ Runs, 2026-10-14:
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-a.md` | The expansion round's review, run A: a full diff review over the round's six commits, as its synthesizer wrote it. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-b.md` | The expansion round's review, run B, from the same args, as its synthesizer wrote it. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` | The expansion round's two reviews compared defect by defect, the fold planned, and forks RH-1 and PIN-1 asked. |
+| `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md` | The expansion fold's closing review, a light diff review over the fold's two commits, as its synthesizer wrote it. |
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | The library pass's research handoff: the four filling paths and two placements. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` | The library round's review, a light diff review over KN-1's fold, the library design and its settlement, as its synthesizer wrote it. |

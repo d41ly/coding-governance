@@ -28,9 +28,12 @@ M7) found three keys whose non-default values had no arm:
 
 The expansion round, 2026-10-16, hit it seven times, though the class was on both of its review runs'
 checklists (`memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md`, `[patterns]`). `build.closes: after-release-verifies` held nothing; the
-values `velocity` selects for four observability keys had no arm; and `currency.on-behind: red`,
+values `velocity` selects for five observability keys, `observability.run-record` among them, had no
+arm; and `currency.on-behind: red`,
 `any-commit`, `pull-only`, `every-landing`, `owner-approves-prod`, `deploy.runs` and
-`verdict: remote-ci` routed nowhere.
+`verdict: remote-ci` routed nowhere. The fold's closing review found two more inside the fold: `app-only`
+had no arm under `GATE_POST_MERGE=ci`, and `owner-cut` named no trigger and no key for its decline
+(M3 and M4 of `memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md`).
 
 ## The fix
 
@@ -39,6 +42,9 @@ values `velocity` selects for four observability keys had no arm; and `currency.
 - Never type the default's guard in front of the key: the key selects the population.
 - Walk each preset through the transition table before calling a catalogue row done, and before the
   settlement commits: a checklist entry names the class, and only the walk finds the value.
+- Walk the cross products too: each value of a key that names a witness against every value of the key
+  that decides whether the witness exists, and each value that selects a trigger against the
+  idempotence key it fires under.
 
 The design records under `/build/` are its population. It has no machine gate yet: the join that
 dDeclaredLoop owes beside the transition table (`gap-flow-15`) now names this walk.

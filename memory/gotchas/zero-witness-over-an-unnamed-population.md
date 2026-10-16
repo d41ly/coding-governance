@@ -26,7 +26,10 @@ halves:
   A's M14).
 
 The fold moved the scan into Runtime's record,
-`memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md`.
+`memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md`. The fold's
+closing review then found the moved scan claiming a population its boundary never published. It bound
+at the lander's prepare while the core pushes its mailbox, card and claim refs at other times, and its
+fixture planted in three of its seven populations (H2 and M8 of `memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md`).
 
 ## The fix
 
@@ -35,7 +38,10 @@ The fold moved the scan into Runtime's record,
   from where the value usually sits.
 - An unresolved input or an empty population is a dead probe, never green, and "not applicable" is an
   answer of its own.
-- A seen-red fixture plants the value in each population the boundary publishes.
+- A scan's population is what crosses the boundary it binds at. Every other boundary that publishes
+  the same population registers its own scan.
+- A seen-red fixture plants the value in each population it names, one plant each, and adds one case
+  per dead-probe arm.
 
 It has no machine gate yet: dWellOiledMachine owes the secret scan built to this shape (`gap-rt-17`).
 

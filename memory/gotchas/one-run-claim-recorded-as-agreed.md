@@ -39,4 +39,6 @@ its run B sibling.
 - Probe: each `[agreement]` or `[cross]` row that names both runs carries two return citations.
 
 It has no machine gate yet, because the comparison tables are prose; the probe above is the gate a
-comparison script would carry.
+comparison script would carry. Its probe was run by hand on 2026-10-16 over the expansion round's
+`[agreement]` and `[cross]`. It was red on four `[cross]` rows that credited both runs with no return
+citation, and green once each row cited each run's line (the comparison record's `[closing-review]`).

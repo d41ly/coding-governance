@@ -99,7 +99,7 @@ the row says so. The returns are filed verbatim as `research-<layer>-a.md` and `
 | Trackers | no adapter kind: the ask backlog is the tracker, with an optional one-way mirror | A: a `tracker` key; B: the mirror registers as a journal reader | both |
 | Grants and secrets | a grant (service, scopes) and a secret named by reference on the header; scopes probed at registration; the secret resolved into the adapter's process only; a value scan, run by the adapter's runner, binds; a shape scan only reports | key names | `runtime.secret-scan`, default `value-gate+shape-report`: Runtime's since the review's fold, because the grant is Runtime's field |
 | Missing core points | a release slot with its environments in Flow's Deploy, and a grant field on Runtime's adapter rows; no tracker point is needed | B also: a verdict-backend registry in Flow's Test, prose only today | all three (`[cross]`) |
-| Keys typed as literals | a key that selects an extension takes registered names | — | `verdict`, `run.host`, `maintain.host` and `notify.channel` take registered names |
+| Keys typed as literals | a key that selects an extension takes registered names | — | they take registered names; layer-runtime `[extend]` lists every key that does |
 | Gaps | close `gap-deploy-01`, 02, 03 (A: in part) and 05 | — | both |
 | One run only | — | A: the `up —` micro-format asks for a password value in chat (`AGENTS.md:61`), verified here | a new gap |
 
@@ -132,11 +132,11 @@ Some findings came from runs on different layers, each working alone. They shape
 
 | Finding | Found by | Evidence | The design takes |
 |---|---|---|---|
-| The scheduler has no point where a layer registers a cadence program | observability A and B, distribution A | layer-runtime `[schedule]` runs "the cadence items that their layers declare", yet none of `[extend]`'s nine points takes one | Runtime declares a tenth point, cadence items |
-| Records that belong to no build have no home | observability A and B, integrations B | maintenance and Loop Review records are keyed by period, release records by SHA and environment; `memory/HYGIENE.md:17-35` has no such home, and `project/` holds waiver registries "and nothing else" | the memory contract declares one, asked as `[forks]` EX-2 |
+| The scheduler has no point where a layer registers a cadence program | observability A and B, distribution A (`research-observability-a.md:69`, `research-observability-b.md:83`, `research-distribution-a.md:68`) | layer-runtime `[schedule]` runs "the cadence items that their layers declare", yet none of `[extend]`'s nine points takes one | Runtime declares a tenth point, cadence items |
+| Records that belong to no build have no home | observability A and B, integrations B (`research-observability-a.md:70`, `research-observability-b.md:82`, `research-integrations-b.md:175`) | maintenance and Loop Review records are keyed by period, release records by SHA and environment; `memory/HYGIENE.md:17-35` has no such home, and `project/` holds waiver registries "and nothing else" | the memory contract declares one, asked as `[forks]` EX-2 |
 | One expansion attaching to another breaks P28 | observability B, distribution A | Maintain cutting gov's release makes observability carry distribution's work; observability reading remote CI needs an integrations adapter | expansions meet only through core points and records, asked as EX-1 |
-| Remote CI is red, not absent | integrations A and B; observability A and B found its drift signal dead | integrations A read 22 of the last 40 push runs as red, and integrations B every run since 2026-10-13 14:03, both through the public API. `remote_ci_red_streak` shells to `gh`, which is absent on this node, and is not asked under `--check` (`tools/drift-audit/drift_report.py:3333-3341,3385-3390`), verified here | the signal retires, and integrations' remote-verdict records replace it; reading the red runs' logs needs an authenticated read |
-| No catch history is committed | observability A and B | both runs counted 78 bars in this node's journal, and A set them against 361 landings on main; the gate ledger keeps only each leg's last state | Test's verdict record names each leg's reds |
+| Remote CI is red, not absent | integrations A and B (`research-integrations-a.md:20`, `research-integrations-b.md:28`); observability A and B found its drift signal dead (`research-observability-a.md:50`, `research-observability-b.md:45`) | integrations A read 22 of the last 40 push runs as red, and integrations B every run since 2026-10-13 14:03, both through the public API. `remote_ci_red_streak` shells to `gh`, which is absent on this node, and is not asked under `--check` (`tools/drift-audit/drift_report.py:3333-3341,3385-3390`), verified here | the signal retires, and integrations' remote-verdict records replace it; reading the red runs' logs needs an authenticated read |
+| No catch history is committed | observability A and B (`research-observability-a.md:45`, `research-observability-b.md:33`) | both runs counted 78 bars in this node's journal, and A set them against 361 landings on main; the gate ledger keeps only each leg's last state | Test's verdict record names each leg's reds |
 | A key that selects an extension is typed as a literal list | integrations A | `verdict`, `run.host` and `maintain.host` list values, against layer-runtime `[extend]`'s rule that such keys take registered names | they take registered names |
 
 **Expansions meet only through the core.** Each expansion registers only at points a core layer
@@ -211,7 +211,7 @@ unowned instead, and nothing is filed for it until an owner is derived.
 | record kinds | the maintenance record, per period or event run; the Loop Review record, per period, with the ledger snapshot it priced; the run record, per run; the value ledger, a generated library view |
 | extension points declared | none: readings, fixes and cadence programs all register at core points (`[core-points]`) |
 | extension points used | Runtime's cadence items, command adapters, journal readers, hook packs (the session-start breach), host and notification adapters; Flow's Plan intake, the patch-build entry at Design and the breakpoints; Memory's record kinds through `record`; the card's optional slots |
-| policies | `maintain.*`, `review.loop.*` and the new keys below. It reads Runtime's `runtime.journal`, which must be `all` or at least `review.loop.window-days` while observability is installed |
+| policies | `maintain.*`, `review.loop.*` and the new keys below. It reads Runtime's `runtime.journal`, bounded by v2's pair rule |
 | gates | reading admission (owner, pin, scope, liveness); the maintenance record's schema; every applied fix inside `maintain.fixes`; the value ledger derived, never typed |
 
 **Maintain**, a cadence program keyed by period, or by event and SHA:
@@ -229,13 +229,18 @@ unowned instead, and nothing is filed for it until an owner is derived.
 An event run carries only the readings whose events name it. Its events are `default-branch-red`
 (produced by the core's runner-written bar verdict for the default branch's tip, which
 `refs/gov/bar-red` indexes), `release-verify-failed` (by the release slot's exit record, when
-integrations is installed and the outcome is not verified) and `session-start-breach` (by the card's
+integrations is installed and the outcome is rolled forward, rolled back, halted or unverified; a
+held outcome is the owner's refusal, not a failure) and `session-start-breach` (by the card's
 cells).
 
 **Under `build.closes: at-landing-maintain-owns`** the build closes at landing, and Maintain owns its
 release. The `release-verify-failed` run files a failed verify of an already closed build as its
 owner item. A release reading over the landing records and the slot's exit records files a landed
 SHA that no exit record answers within `maintain.dead-after` readings.
+
+**The release asks share one key.** Maintain files the `release-verify-failed` run's ask keyed by
+(SHA, environment), the key `release.route` files its own ask under, so a second filing for one
+failure adds a `seen` row to the open ask.
 
 **The run record.** Observability's journal reader writes a run's record when the journal shows the
 run closed, as `observability.run-record` says: for every run, for a run with an anomaly (a refusal,
@@ -248,8 +253,8 @@ a ceiling breach, a dead probe or a red), or never.
 | `loop.lease` | executor | takes the week's lease | the lease | `loop.gather` |
 | `loop.gather` | command | gathers the metrics from committed records: cycle times from transitions, yield from review records, catches from Test's verdict records (and from this node's journal under `review.loop.catch-source: node-journal`), cost from the ceiling evidence, flakes from retries, records overhead and surface size from git | the metric set, each value with its source; a missing source renders searched-none | `loop.price` |
 | `loop.price` | command | regenerates the value ledger: kind, id, since, cost, catches, false reds, last catch, window, state | the ledger blob | `loop.propose` |
-| `loop.propose` | command | proposes retiring or merging each row with no catch in `review.loop.window-days`, and re-derives the caps | the proposal list | `loop.file` |
-| `loop.file` | command, idempotent, through `record` | files each proposal into Plan's triage with its ledger row, keyed by (ledger kind, id); an open ask with that key gains a `seen` row keyed by ISO week instead of a second ask | one ask per (ledger kind, id) | the owner's breakpoint, as `review.loop.retire` says |
+| `loop.propose` | command | proposes retiring or merging each row with no catch in `review.loop.window-days`, except a row the owner kept, until `review.loop.window-days` have passed since that disposition or the row records a new catch or false red; and re-derives the caps | the proposal list | `loop.file` |
+| `loop.file` | command, idempotent, through `record` | files each proposal into Plan's triage with its ledger row, keyed by (ledger kind, id); an open ask with that key gains a `seen` row keyed by ISO week instead of a second ask | one ask per (ledger kind, id) | the owner's breakpoint, as `review.loop.retire` says; a kept row's disposition is written to its ledger state, with its date, through `record` |
 | `loop.record` | command, through `record` | writes the Loop Review record | the record | closed |
 
 **New keys:**
@@ -264,8 +269,8 @@ a ceiling breach, a dead probe or a red), or never.
 | `observability.run-record` | per-run, on-anomaly, none | per-run | today's behaviour; on-anomaly eases `gap-maint-04` |
 | `review.loop.catch-source` | verdict-records, node-journal | verdict-records | another node cannot see a node's journal |
 
-`runtime.journal` is Runtime's key (layer-runtime `[policies]`). Observability needs it `all`, or at
-least `review.loop.window-days`, and v2's pair rule refuses less.
+`runtime.journal` is Runtime's key (layer-runtime `[policies]`). Observability needs enough journal for
+its window, and v2's pair rule, which binds while observability is installed, says how much.
 
 **Absent.** The core lands builds unchanged. The card's `drift —` and `health —` cells render "not
 installed: observability". No cadence program runs Maintain or the Loop Review, so asks and patch
@@ -306,7 +311,7 @@ dead probe as green.
 | tag and definition | `layer.integrations`, as above |
 | instruction units | the adapter author's unit (the header, the dead-probe rule); the grant rule: a secret is named, never written; the release view; the deployer role's release instruction |
 | engine kits | the `integrations` kit: the header factory and the registry check; `verdict:remote-ci`, extracted from `read_held_reds`; `host:cloud-routine`; notification channels; the release runner. Each adopter's engine adapter is a dShippedRelease unit |
-| record kinds | `remote-verdict` (SHA, tree, writer, run id, workflow blob, conclusion); `release` (one per SHA and environment, with its outcome: verified, held, rolled forward, rolled back or halted); `delivery` (a notification and its receipt); `grant` (declared scopes, never values) |
+| record kinds | `remote-verdict` (SHA, tree, writer, run id, workflow blob, conclusion); `release` (one per SHA and environment, with its outcome: verified, held, rolled forward, rolled back, halted or unverified); `delivery` (a notification and its receipt); `grant` (declared scopes, never values) |
 | extension points declared | none: every kind registers at a core point (`[core-points]`) |
 | extension points used | Flow's verdict backends and release slot; Runtime's command, host, notification and journal-reader points, and the grant field on adapter rows |
 | policies | the new keys below, and the catalogue's `verdict`, `run.host`, `maintain.host`, `notify.owner`, `deploy.runs`, `deploy.promotion`, `deploy.on-verify-fail` and `build.closes`, and Runtime's `runtime.secret-home` and `runtime.secret-scan` |
@@ -334,9 +339,10 @@ file that differs does:
 - `owner-reviews-workflow-change`: the owner item opens at once. Approved, the guarded command
   re-pins and the verdict stands; refused, the verdict is held and `deploy.core` waits on its own
   route;
-- `app-only`: the source check is skipped, so the verdict counts as claimed, not witnessed.
-  `deploy.core` records it beside its own witness, the post-merge bar on the landed SHA, and never
-  advances on it.
+- `app-only`: the source check is skipped, so the verdict counts as claimed, not witnessed. Under
+  `GATE_POST_MERGE=ci`, `deploy.core` starts the local post-merge bar on the landed SHA, as under
+  `local`, records the claim beside it, and advances only on the local run. Before the landing, under
+  `verdict: remote-ci`, `test.verdict` does the same with the local hook's bar.
 
 Neither of the first two lets a differing file stand unreviewed, so `strict`'s value is at least as
 strict as the default.
@@ -366,9 +372,9 @@ default `at-landing`, the program outlives the build. The core item `deploy.rele
 |---|---|---|---|---|
 | `release.pick` | command | takes the newest landed SHA with a green core verdict that environment E lacks, and E's promotion lease; an older SHA it passes over is superseded in E, and a build's hold reads a verified SHA that contains its own | the landing record and the SHA's core verdict | `release.approve` |
 | `release.approve` | the owner, or a command | asks the owner where `deploy.promotion` says so: for every environment under `owner-approves-each`, for one marked production under `owner-approves-prod`; otherwise it passes on green | the disposition, or `auto-on-green` | approved → `release.promote`; refused → `release.record`, the outcome held |
-| `release.promote` | command: E's engine adapter, where `deploy.runs` says | promotes the SHA into E; already there counts as done | the engine's deployment id, read back by (SHA, E) | promoted → `release.verify`; refused or unreachable → retry, then an owner item |
-| `release.verify` | command: E's verify adapter | verifies the SHA in E | a runner-written verdict keyed by (SHA, E) | green → `release.record`; red → `release.route`; dead probe → an owner item |
-| `release.route` | command | acts as `deploy.on-verify-fail` says: roll forward with an ask filed; roll back to E's last verified SHA, re-verify and file an ask; or halt E and notify the owner | the routing record | `release.record`, the outcome rolled forward, rolled back or halted |
+| `release.promote` | command: E's engine adapter, where `deploy.runs` says | promotes the SHA into E; already there counts as done | the engine's deployment id, read back by (SHA, E) | promoted → `release.verify`; refused or unreachable → retry, then an owner item, resolved as `run.on-owner-question` says: retry again, or `release.record`, the outcome unverified |
+| `release.verify` | command: E's verify adapter | verifies the SHA in E | a runner-written verdict keyed by (SHA, E) | green → `release.record`; red → `release.route`; dead probe → an owner item, resolved as `run.on-owner-question` says: verify again, or `release.record`, the outcome unverified |
+| `release.route` | command | acts as `deploy.on-verify-fail` says: roll forward with an ask filed; roll back to E's last verified SHA, re-verify and file an ask; or halt E and notify the owner. Each ask is keyed by (SHA, E) | the routing record | `release.record`, the outcome rolled forward, rolled back or halted |
 | `release.record` | command, idempotent, through `record` | writes the release record for (SHA, E), with its outcome | the record | verified → the next environment; verified at the last, or any other outcome → the release slot's exit record for the SHA, with the outcome |
 
 **Grants and secrets are Runtime's,** since the grant is a field on every adapter row (layer-runtime
@@ -376,8 +382,8 @@ default `at-landing`, the program outlives the build. The core item `deploy.rele
 `runtime.secret-home` says, or in the CI secret store for an adapter that runs in CI, and is
 resolved into the adapter's own process only. Registration probes the scopes granted, and refuses
 wider than declared. Runtime's value scan, run by each adapter's runner as `runtime.secret-scan`
-says, binds at the lander's prepare over everything a push publishes, and names the population it
-read. Runlog's shape scan reports, and gates nothing, because it reds on examples and fixtures.
+says, binds at every boundary that publishes, over what that boundary publishes, and names the
+population it read (layer-runtime `[extend]`). Runlog's shape scan reports, and gates nothing, because it reds on examples and fixtures.
 
 **New keys:**
 
@@ -390,8 +396,8 @@ read. Runlog's shape scan reports, and gates nothing, because it reds on example
 | `notify.channel` | registered channel names | terminal | the only channel today |
 | `integrations.tracker` | none, mirror-out | none | no tracker is in use |
 
-`verdict`, `run.host`, `maintain.host` and `notify.channel` take registered names, validated against
-the registry, with today's values as the built-ins.
+The keys that take registered names are listed once, in layer-runtime `[extend]`, and today's values
+are the built-ins.
 
 **Absent.** The verdict is the local hook or the core's `peer-node`, the host is the node tick, the
 owner hears through the terminal, and a build closes at landing with no release. A value on a core
@@ -433,15 +439,16 @@ unless the kit ships no bytes.
 | Item | Actor | Does | Witness | Routes |
 |---|---|---|---|---|
 | `kits.version` | command: `govkit mint`, in `test.merge`'s prepare | mints each kit whose shipped bytes moved, filling the version slot | the version check's verdict at the push boundary | minted or clean → `test.merge` goes on; refused → `test.merge`'s refusal, an ask naming the minter's refusal; govkit absent → the announced skip |
-| `kits.cut` | command, a cadence program on `kits.host` per `kits.cadence`: each period, or under `every-landing` the core's `landed` event, keyed by the landed SHA | cuts the annotated tag `gov/v<date>.<n>`, its notes generated since the previous tag; under `owner-cut`, an owner item | the tag on the remote, and its notes blob; for a declined cut, the disposition | nothing landed since the last tag → skip, announced; cut → done; declined → skipped for the period, the disposition its witness, keyed by period; refused by the remote → an owner item |
+| `kits.cut` | command, a cadence program on `kits.host` per `kits.cadence`: each period, or under `every-landing` the core's `landed` event, keyed by the landed SHA; under `owner-cut`, each `kits.watch-cadence` period, keyed by the tip SHA of the span since the last tag | cuts the annotated tag `gov/v<date>.<n>`, its notes generated since the previous tag; under `owner-cut`, an owner item | the tag on the remote, and its notes blob; for a declined cut, the disposition | nothing landed since the last tag → skip, announced; cut → done; declined → the disposition its witness, keyed by period, or under `owner-cut` by the span's tip SHA, so the next item opens only once a later landing moves the tip; refused by the remote → an owner item |
 | `kits.currency` | command, a cadence program in each adopter, on `kits.host` per `kits.watch-cadence` | joins the receipt's rows to gov's remote tag list: releases behind, per kit. Under `install.from: any-commit`, it counts the release tags dated after the installed commit. A source-mode receipt reads "source, 0 behind", witnessed by the receipt (DI-1) | the currency record, keyed by HEAD SHA; unreachable → unverified, never green | within `currency.max-behind` → done; over → as `currency.on-behind` says: a note, an owner item, or under `red` the `currency` leg's red |
 | `kits.fleet` | command, a cadence program in gov, on `kits.host` per `kits.watch-cadence` | reads each register row's committed receipt at its remote tip | the fleet record, per release | `pull-and-watch` → reported; `push-branches` → `kits.offer`; `pull-only` → recorded, never reported or offered |
-| `kits.offer` | command | under `push-branches`, runs one adopter's update in a throwaway workspace with no ambient credential (no credential helper, an emptied environment) and with target-side execution refused (`GOVKIT_RERENDER=0`), then pushes `gov/update-<release>` through that adopter's own grant, scoped to `gov/update-*` on its one remote | the pushed ref on the adopter's remote | pushed → the adopter lands it with its own lander; an update that needs target-side execution, or a refused push → an outbox order the adopter runs itself |
+| `kits.offer` | command | under `push-branches`, runs one adopter's update in a throwaway workspace with no ambient credential (no credential helper, an emptied environment) and in a govkit mode that runs nothing from the adopter's tree: no `[[regenerate]]` argv, no gained kit's adopter, and no kit `[check]` argv, whose baseline and verify passes update otherwise runs in the target (`tools/govkit/govkit.py:10015`, `:11214`) and which this mode records as unrun. It then pushes `gov/update-<release>` through that adopter's own grant, scoped to `gov/update-*` on its one remote | the pushed ref on the adopter's remote | pushed → the adopter lands it with its own lander, whose bar runs the checks the offer left unrun; an update that needs target-side execution, or a refused push → an outbox order the adopter runs itself |
 | `kits.install`, `kits.update` | the owner, or a command | applies or updates a release, installing each render target where the adapters in `runtime.harnesses` say | the receipt, and the wiring verdict | an adapter that declares no target → its slot renders not installed, the core render kept |
 
 **The `currency` leg.** Under `currency.on-behind: red`, distribution registers a `currency` leg at
 Test's leg-pack point. It reads the newest committed currency record offline, and reds over
-`currency.max-behind`. With no record, it is a dead probe, never green.
+`currency.max-behind`. A source-mode receipt passes it as "source, 0 behind", read from the receipt
+(DI-1). Otherwise, with no record, it is a dead probe, never green.
 
 **New keys:**
 
@@ -484,7 +491,7 @@ and the verdict-backend registry is `gap-test-02`'s.
 | `gap-rt-18` | Runtime | MED | No channel reaches the owner outside a session: no notification hook is wired, and no channel code exists. | `.claude/settings.json`; integrations A and B | dWellOiledMachine |
 | `gap-mem-16` | Memory | MED | Records that belong to no build have no home: maintenance and Loop Review records are keyed by period, release records by SHA and environment, currency observations by adopter. | `memory/HYGIENE.md:17-35`; observability A and B, integrations B | dTotalRecall |
 | `gap-deploy-10` | Deploy | MED | `GATE_POST_MERGE=ci` binds nothing: the lander starts no bar under it, and the pre-push hook reads only `refs/gov/bar-red`, though flow-steps names the CI result as the witness. | `tools/push-main.sh:434`; `.githooks/pre-push:1919-1936`, verified here | dShippedRelease |
-| `gap-spine-07` | Spine | LOW | No policy schema or reader validates a key that selects an extension against the registry: `verdict`, `run.host`, `maintain.host`, `kits.host` and `notify.channel` take registered names, and nothing refuses an unregistered one. | layer-runtime `[extend]`; dDeclaredLoop's schema and its one reader | dDeclaredLoop |
+| `gap-spine-07` | Spine | LOW | No policy schema or reader validates a key that selects an extension against the registry: the keys layer-runtime `[extend]` lists take registered names, and nothing refuses an unregistered one. | layer-runtime `[extend]`; dDeclaredLoop's schema and its one reader | dDeclaredLoop |
 | `gap-found-18` | Foundation | MED | The `up —` micro-format asks for a password value, inviting a secret into chat. | `AGENTS.md:61`; `coding-governance-agents.template.md:64`, verified here | dOrderedCharter |
 | `gap-deploy-11` | Deploy | MED | No release has ever been cut: no release tag, no changelog, and 10 of 29 kit entries declare no version. | `git tag`; `govkit epoch`, re-measured here; distribution A and B | dShippedRelease |
 | `gap-deploy-12` | Deploy | MED | A receipt records gov's source as a local path, so an adopter cannot resolve where its install came from. | `tools/govkit/govkit.py:8020`, verified here | dShippedRelease |
@@ -648,11 +655,20 @@ file, guarantee stated (Recommended)". In this record:
 - **Records:** `[cross]` credits one run's claims to that run, and `[gaps-proposed]` corrects the rows
   the register corrects.
 
+**Revised again, 2026-10-16, after the fold's closing review**
+(`reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md`). A release pass's owner items end
+in a record with the outcome unverified, and only a failure fires `release-verify-failed`, keyed as
+`release.route`'s own ask is. A row the owner kept stays out of the Loop Review's proposals until its
+window passes again. `app-only` has its arms, `owner-cut` its trigger, and the currency leg its
+source-mode arm. The unattended offer runs nothing from the adopter's tree, including the `[check]`
+argvs govkit's update would otherwise run there. Every `[cross]` row that credits both runs cites
+each run's line. The comparison record's `[closing-review]` names each item and where it went.
+
 ## [open] What the expansion round owes
 
 - **The chain builds' planned units** for the eight core points and the three designs, at the chain
   re-cut v2 `[owed]` already carries.
-- **The round's Tier-2 review**, returned and folded (`[revised]`); the fold's own closing review is
-  dispatched, as the comparison record's `[fold-review]` says.
+- **The round's Tier-2 review**, returned and folded (`[revised]`), and the fold's closing review folded
+  too (the comparison record's `[closing-review]`).
 - **Too small to register:** govkit's usage text omits the `contribute` verb it dispatches
   (distribution B).
