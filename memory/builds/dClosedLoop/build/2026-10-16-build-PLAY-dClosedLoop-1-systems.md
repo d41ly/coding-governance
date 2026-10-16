@@ -452,8 +452,113 @@ The first four forks, answered in one round. Each answer is quoted verbatim.
   (`research-memory-structure-a.md:86`). The builder's 24 KB is that ratio applied to the median, plus a
   margin (`research-memory-structure-a.md:144`). The reviewer's and researcher's figures carry no
   derivation.
+- **Measured per role, 2026-10-17.** The same measure, split by the agent type each subagent's
+  `meta.json` records, over 3,604 subagent transcripts (`[ms2-instrument]`):
+
+  | Agent type | Agents | Reading memory | Median | p90 |
+  |---|---|---|---|---|
+  | gov-builder | 38 | 38 | 78.6 KB | 128.4 KB |
+  | gov-spec-writer | 76 | 66 | 72.3 KB | 225.7 KB |
+  | gov-spec-reviewer | 90 | 90 | 64.3 KB | 149.0 KB |
+  | gov-researcher | 54 | 30 | 55.0 KB | 138.7 KB |
+  | gov-diff-reviewer | 43 | 33 | 48.1 KB | 115.2 KB |
+  | gov-skeptic | 144 | 33 | 40.1 KB | 68.7 KB |
+  | workflow-subagent | 2,608 | 1,002 | 49.6 KB | 199.3 KB |
+  | all, pooled | 3,604 | 1,346 | 52.5 KB | 179.8 KB |
+
+- **Run A's order is inverted.** It gave the builder the smallest budget, and builders read the most
+  memory: a median of 78.6 KB, against 40.1 KB for skeptics. Roles differ by about two times at the
+  median, so a per-role budget has a basis. Run A's figures do not.
+- **What the measure cannot say.** Today's reads are whole files, and the design hands sections, so the
+  table measures today's habit, not what a sliced work order would hand. The 2,608 workflow agents carry
+  no role in their `meta.json`. Their roles are in each run's journal.
 - **The design took one run's unmeasured figures as defaults.** `[design-memory-structure]` is corrected:
   each role's budget is derived from a measurement of that role, as `[forks]`' MS-2 is asked again.
+
+### [ms2-instrument] The per-role probe and its output
+
+```python
+"""Memory Read bytes per subagent, split by the agent's type: run A's memq3 measure (Read tool calls on a path
+under /memory/, the result's UTF-8 bytes, summed per agent), grouped by the agentType each subagent's
+meta.json records.
+
+Usage: python memq_roles.py
+Prints, per agent type: agents, agents that read memory at all, and the median and p90 of memory bytes
+over the agents that read any. Run A's figures (1,328 agents, median 52,694, p90 183,553) pooled every type.
+"""
+import collections
+import glob
+import json
+import os
+
+root = os.path.expanduser("~/.claude/projects")
+files = glob.glob(root + "/C--projects-coding-governance*/**/subagents/**/*.jsonl", recursive=True)
+by = collections.defaultdict(list)
+seen_all = collections.Counter()
+for f in files:
+    meta = f[:-len(".jsonl")] + ".meta.json"
+    try:
+        kind = json.load(open(meta, encoding="utf-8")).get("agentType") or "unknown"
+    except (OSError, ValueError):
+        kind = "no-meta"
+    seen_all[kind] += 1
+    pend, tot = {}, 0
+    for line in open(f, encoding="utf8", errors="replace"):
+        try:
+            r = json.loads(line)
+        except ValueError:
+            continue
+        c = (r.get("message") or {}).get("content")
+        if not isinstance(c, list):
+            continue
+        for b in c:
+            if not isinstance(b, dict):
+                continue
+            if b.get("type") == "tool_use" and b.get("name") == "Read":
+                p = str((b.get("input") or {}).get("file_path", "")).replace(chr(92), "/")
+                if "/memory/" in p:
+                    pend[b["id"]] = p
+            elif b.get("type") == "tool_result" and b.get("tool_use_id") in pend:
+                pend.pop(b["tool_use_id"])
+                cc = b.get("content")
+                t = cc if isinstance(cc, str) else "".join(x.get("text", "") for x in (cc or []) if isinstance(x, dict))
+                tot += len(t.encode("utf8", "replace"))
+    if tot:
+        by[kind].append(tot)
+
+
+def q(v, p):
+    return v[min(len(v) - 1, int(len(v) * p))]
+
+
+pooled = sorted(x for v in by.values() for x in v)
+print(f"files {len(files)}; agents reading memory {len(pooled)}; pooled median {q(pooled, .5)} p90 {q(pooled, .9)}")
+print(f"{'agent type':24}{'agents':>8}{'reading':>9}{'median B':>11}{'p90 B':>10}")
+for kind, n in seen_all.most_common():
+    v = sorted(by.get(kind, []))
+    if len(v) >= 5:
+        print(f"{kind:24}{n:8}{len(v):9}{q(v, .5):11}{q(v, .9):10}")
+    else:
+        print(f"{kind:24}{n:8}{len(v):9}{'-':>11}{'-':>10}")
+```
+
+```text
+$ python -I memq_roles.py
+files 3604; agents reading memory 1346; pooled median 52503 p90 179767
+agent type                agents  reading   median B     p90 B
+workflow-subagent           2608     1002      49583    199267
+no-meta                      426        1          -         -
+gov-skeptic                  144       33      40120     68691
+gov-spec-reviewer             90       90      64266    148973
+general-purpose               77       48      35347     91398
+gov-spec-writer               76       66      72349    225729
+gov-researcher                54       30      55018    138658
+gov-diff-reviewer             43       33      48067    115213
+gov-builder                   38       38      78616    128420
+gov-synthesizer               29        3          -         -
+Plan                          18        2          -         -
+Explore                        1        0          -         -
+```
 
 ## [gaps-proposed] Gaps to register once the forks settle
 
