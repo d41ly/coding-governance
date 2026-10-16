@@ -952,6 +952,10 @@ The library round's review, dispatch 50, derived from its Workflow run the same 
   `memory/gotchas/`. Five index rows that earlier commits inserted into the Dispatches table moved to
   the Records index, and the follow-up review's row, which a presence check never added, joined them.
 
+- 2026-10-16, session 1799cb98: the owner said, verbatim: "Let's record the follow-up round debt and skip it for now, but before we move to the expansion layers, let's review the artifact you created and ensure it covers all the details we worked through in this session - it shouldn't leave anything out of the design we've put here and should give an accurate representation of the state with every update. Additionally, it would be great to add comparison to the CURRENT state of the product so it'd be possible to see what changes exactly in comparison to the current architecture."
+  The library round's follow-up review is recorded as owed and deferred, in layer-library `[open]`.
+  The atlas is audited against every design record, and gains the comparison with today's product.
+
 ## Instruments
 
 ### The gap-ownership join

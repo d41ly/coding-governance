@@ -387,8 +387,10 @@ Dispatch 50 reviewed the round's four commits, `1bc4883fe..aa9639d98`, at light 
 - **The left-shift.** Four classes are new under `memory/gotchas/`, each claimed in its feature's
   dossier. `route-names-an-output-its-actor-never-emits` and `owner-item-without-its-reject-outcome`
   gained the review's checklist entries.
-- **The fold is unreviewed text.** A follow-up round over it is the owner's call.
+- **The fold is unreviewed text.** Its follow-up round is owed and deferred (`[open]`).
 
 ## [open] What the library round owes
 
-- **A follow-up round** over `[review-fold]`, if the owner asks for one.
+- **A follow-up round** over `[review-fold]` (`0dd962724`) is owed. The owner deferred it on 2026-10-16:
+  "Let's record the follow-up round debt and skip it for now". It stays owed until it runs, and
+  dClosedLoop does not close with it open.
