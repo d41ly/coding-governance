@@ -1073,6 +1073,15 @@ The expansion round's review, dispatches 57 and 58, derived from their Workflow 
   `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` compares them defect by defect
   and plans the fold.
 
+- 2026-10-16, session 1799cb98: the owner answered the review's two forks, verbatim: RH-1 "Only the close
+  (Recommended)"; PIN-1 "Workflow file, guarantee stated (Recommended)". `build.release-hold` and
+  `verdict.remote.pin-scope` join v2 with those answers as their defaults.
+
+- 2026-10-16, session 1799cb98: the fold placed all 38 confirmed defects. It amended layer-expansions,
+  flow-steps, layer-runtime, layer-memory, layer-roles' derived matrix, v2 and the register, added
+  `gap-deploy-13` and `gap-lex-08`, and filed five bug classes under `memory/gotchas/`. The comparison
+  record's `[folded]` names where each defect went. The fold's own closing review is owed.
+
 ## Instruments
 
 ### The gap-ownership join

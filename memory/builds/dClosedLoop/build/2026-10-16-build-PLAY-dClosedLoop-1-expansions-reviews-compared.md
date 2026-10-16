@@ -100,7 +100,7 @@ bound the fold:
 - **The fold gets its own review.** Fold text is unreviewed surface, so one light diff review runs
   over the fold's commits, as dispatch 47 did for the layers' fold.
 
-`[folded]` will name each defect's fix, where it sits, and its class, once the forks are answered.
+`[folded]` names each defect's fix, where it sits, and its class.
 
 ## [forks] Asked, 2026-10-16
 
@@ -125,6 +125,90 @@ the workflow runs the bar from the tree it judges. The key is `verdict.remote.pi
 - **The bar's dispatch closure.** The pin covers `remote-ci.yml`, `tools/run-gates/run-gates.sh`,
   `tools/gate-legs.json` and `.githooks/gate-env.sh`. Any change to them needs the owner's re-pin
   before a remote verdict stands again, so under `ci` most kit builds wait on the owner.
+
+## [answers] Answered, 2026-10-16
+
+The owner took the recommended option on both forks. Verbatim:
+- **RH-1:** "Only the close (Recommended)".
+- **PIN-1:** "Workflow file, guarantee stated (Recommended)".
+
+| Fork | Answer | Key | Default | Also allowed |
+|---|---|---|---|---|
+| RH-1 | Only the close | `build.release-hold` | `close-only` | `whole-close` |
+| PIN-1 | Workflow file, guarantee stated | `verdict.remote.pin-scope` | `workflow` | `dispatch-closure` |
+
+Their non-default preset values were assigned by analogy: `strict`, the maximum-assurance preset, selects
+`whole-close` and `dispatch-closure`, and the other three presets take the defaults.
+
+## [folded] Where every map row went, 2026-10-16
+
+Each defect's fix sits in place, under the dated revision line of the record named. A defect's class
+is a record under `memory/gotchas/`.
+
+| Defect | Disposition | Where the fix sits | Its class |
+|---|---|---|---|
+| `release-hold-unrouted` | fork, amend | RH-1; flow-steps' `deploy.released` and `[transitions]`; layer-expansions' release program and `release.record`; v2's `build.release-hold` | `policy-value-with-no-route` |
+| `empty-environments-close` | amend | flow-steps' `build.closes` values and Deploy's policy list; layer-expansions' integrations Absent; v2's paragraph on `strict` and `guarded` | `policy-value-with-no-route` |
+| `release-pick-key` | amend | layer-expansions' release program and `release.pick`; `deploy.released` reads a SHA that contains the build's own | `two-answers-to-one-question` |
+| `verify-failed-no-producer` | amend | layer-expansions: `release.route` ends in `release.record`, and the slot's exit record produces `release-verify-failed` | `route-names-an-output-its-actor-never-emits` |
+| `maintain-owns-unread` | amend | layer-expansions' Maintain: the event run and the release reading under `at-landing-maintain-owns`; flow-steps' `build.closes` values | `policy-value-with-no-route` |
+| `absent-clause-refuses-presets` | amend | layer-expansions' distribution Absent; v2's `policy.on-missing-expansion` row | `core-depends-on-an-optional-part` |
+| `peer-node-two-owners` | amend | layer-expansions' `[core-points]`, kinds and engine kits; flow-steps' Test extension points | `one-run-claim-recorded-as-agreed` |
+| `version-slot-step` | amend | flow-steps' `test.merge` and Test extension points; layer-expansions' `kits.version`; `gap-deploy-11` | `two-answers-to-one-question` |
+| `cadence-host-key` | amend | layer-expansions' distribution items and keys; layer-runtime `[schedule]`; v2's `kits.host` and `kits.watch-cadence` | `route-names-an-output-its-actor-never-emits` |
+| `journal-key-owner` | amend | layer-runtime `[policies]`, `[schedule]` and `[tests]`; layer-expansions' observability keys | `amendment-leaves-its-other-half-standing` |
+| `velocity-values-unrouted` | amend | layer-expansions' `maintain.lease`, `maintain.read`, registration, `loop.gather` and the run record; `maintain.reading-admission` | `policy-value-with-no-route` |
+| `distribution-values-unrouted` | amend | layer-expansions' `kits.cut`, `kits.currency`, `kits.fleet` and the `currency` leg; flow-steps' leg packs | `policy-value-with-no-route` |
+| `integrations-values-unrouted` | amend | layer-expansions' witness-rule arms, `release.approve`, `release.promote` and the release paragraph; flow-steps' release slot | `policy-value-with-no-route` |
+| `pin-closure` | fork, amend | PIN-1; layer-expansions' witness rule; `gap-test-11`; v2's `verdict.remote.pin-scope` | `inputs-inside-the-subjects-reach` |
+| `workflow-pin-home` | amend | layer-expansions' pin paragraph; v2's `verdict.remote.pin`, which presets never touch | `inputs-inside-the-subjects-reach` |
+| `ci-red-unpublished` | amend, gap | layer-expansions' remote verdict; flow-steps' core re-check (K1); `gap-deploy-10` | `route-names-an-output-its-actor-never-emits` |
+| `bar-red-witness` | amend | layer-expansions' observability line and events: the per-SHA verdict is the witness, the ref its index | `two-answers-to-one-question` |
+| `verdict-remote-ci-value` | amend | layer-expansions' remote verdict; flow-steps' Test bullets and extension points; `gap-test-02` | `policy-value-with-no-route` |
+| `offer-runs-adopter-code` | amend, gap | layer-expansions' `kits.offer`; `gap-deploy-13`; v2's dShippedRelease row | `foreign-code-runs-on-the-ambient-credential` |
+| `grant-enforcement-owner` | amend | layer-runtime `[extend]` and `[policies]`; layer-expansions' grants; v2's `runtime.secret-home` and `runtime.secret-scan` | `core-depends-on-an-optional-part` |
+| `secret-scan-population` | amend | layer-runtime `[extend]`: the secret value scan's population | `zero-witness-over-an-unnamed-population` |
+| `secret-scan-zero` | amend | layer-runtime `[extend]`: the secret value scan's witness | `zero-witness-over-an-unnamed-population` |
+| `lexicon-signals-core` | amend, gap | layer-expansions' observability line and Absent; flow-steps' leg packs; `gap-maint-09`, `gap-lex-08` | `core-depends-on-an-optional-part` |
+| `loop-file-key` | amend | layer-expansions' `loop.file`, and `[design]`'s idempotence rule | `append-without-an-idempotence-key` |
+| `seen-row-key` | amend | layer-expansions' `maintain.file` | `append-without-an-idempotence-key` |
+| `date-claim-attribution` | amend | layer-expansions' `[cross]` and `[gaps-proposed]`; `gap-test-12` | `one-run-claim-recorded-as-agreed` |
+| `literal-list-attribution` | amend | layer-expansions' `[cross]` | `one-run-claim-recorded-as-agreed` |
+| `extend-split` | amend | layer-runtime `[extend]` | `amendment-leaves-its-other-half-standing` |
+| `record-unbound` | amend | the seven records' Serves lines, in `f1c2cb0f3` | `record-without-serves-or-with-a-round-counter` |
+| `cut-decline-route` | amend | layer-expansions' `kits.cut` | `owner-item-without-its-reject-outcome` |
+| `key-schema-split` | amend | layer-expansions' key tables state v2's values | `two-answers-to-one-question` |
+| `journal-floor-prose` | amend | v2's pair rule in `[presets]`, and dDeclaredLoop's row | `rule-stated-with-no-check-that-fails` |
+| `ex1-unchecked` | amend, gap | v2's dOrderedCharter row; `gap-found-17` | `rule-stated-with-no-check-that-fails` |
+| `core-points-gap-rows` | amend | `gap-test-02`, `gap-deploy-01`, `gap-rt-15` and `gap-deploy-11` widened | `amendment-leaves-its-other-half-standing` |
+| `spine-07-evidence` | amend | `gap-spine-07` reworded, in the register and `[gaps-proposed]` | `amendment-leaves-its-other-half-standing` |
+| `tool-02-undercount` | amend | `gap-tool-02`: five lockstep checks, selfcheck's arm 5c among them | `amendment-leaves-its-other-half-standing` |
+| `source-receipt-route` | amend | layer-expansions' `kits.currency`, `install.from` and receipt integrity | `route-names-an-output-its-actor-never-emits` |
+| `naming-collisions` | amend | `kits.cadence`, `maintain.record-when` and `maintain.reading-admission`, across v2, flow-steps and layer-expansions | `two-answers-to-one-question` |
+| `env-injected-reach` | none | refuted; the map's row gives the reason | — |
+| `owner-answer-channel` | none | refuted; the map's row gives the reason | — |
+| `fleet-field-validation` | none | refuted; the map's row gives the reason | — |
+| `extend-fields-missing` | none | refuted; the map's row gives the reason | — |
+| `record-home-attribution` | none | refuted; the map's row gives the reason | — |
+| `tag-order` | none | refuted; the map's row gives the reason | — |
+| `ex3-record-rate` | none | refuted; the map's row gives the reason | — |
+| `gov-currency-arm-unexercised` | none | refuted; the map's row gives the reason | — |
+| `ex3-fixtures` | none | refuted; the map's row gives the reason | — |
+| `di1-planned-unit` | none | refuted; the map's row gives the reason | — |
+| `tool-07-owner` | none | refuted; the map's row gives the reason | — |
+
+- **The left-shift.** Five classes are new: `core-depends-on-an-optional-part`,
+  `foreign-code-runs-on-the-ambient-credential`, `zero-witness-over-an-unnamed-population`,
+  `one-run-claim-recorded-as-agreed` and `rule-stated-with-no-check-that-fails`. The build method's
+  dossier claims them. `policy-value-with-no-route` and `route-names-an-output-its-actor-never-emits`
+  record this round's hits. No gate fits a design record's prose, so each new class names the chain
+  build that owes its gate.
+- **Two gaps join the register,** `gap-deploy-13` (dShippedRelease) and `gap-lex-08`
+  (dMindYourWords). Nine take added facts, and two are corrected.
+- **The checks, run again on the folded records:** the preset check (153 keys, 143 presettable, 143
+  preset rows, no findings), the gap-ownership join (193 keys over 15 builds, none unowned or owned
+  twice), the role matrix (75 items, 0 findings) and `gotchas.py --check` (exit 0).
+- **Still owed:** the fold's own closing review, as `[fold]` says.
 
 ## [map] Every finding, placed
 

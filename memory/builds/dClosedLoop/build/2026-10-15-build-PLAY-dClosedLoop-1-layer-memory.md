@@ -1103,5 +1103,7 @@ and its map's `disposition` cells point here. Each defect's fix sits in place, i
   `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md`).
 - **The kinds that need one so far:** maintenance and Loop Review records under
   `memory/observability/`, release records under `memory/integrations/`, and currency and fleet
-  records under `memory/distribution/`.
+  records under `memory/distribution/`. The release slot's exit records, a flow kind keyed by SHA
+  that integrations writes and core Deploy reads, live under `memory/flow/` (the expansion round's
+  review, `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md`).
 - **The work** is `gap-mem-16`, dTotalRecall's.

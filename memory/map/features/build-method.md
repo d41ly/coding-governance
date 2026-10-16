@@ -21,7 +21,10 @@ gotcha-classes = ["fold-text-is-unreviewed-surface.md", "amendment-leaves-its-ot
   "observation-before-the-last-fold-of-the-same-commit.md",
   "hand-named-gate-list-green-while-the-bar-reds.md",
   "route-names-an-output-its-actor-never-emits.md", "owner-item-without-its-reject-outcome.md",
-  "policy-value-with-no-route.md", "rate-quoted-without-its-denominator.md"]
+  "policy-value-with-no-route.md", "rate-quoted-without-its-denominator.md",
+  "core-depends-on-an-optional-part.md", "foreign-code-runs-on-the-ambient-credential.md",
+  "zero-witness-over-an-unnamed-population.md", "one-run-claim-recorded-as-agreed.md",
+  "rule-stated-with-no-check-that-fails.md"]
 guides = ["BUILD-METHOD.md"]
 backlog-shards = []
 lexicon-verbs = []

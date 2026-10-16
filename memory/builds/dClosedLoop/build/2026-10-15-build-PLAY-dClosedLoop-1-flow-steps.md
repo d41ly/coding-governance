@@ -254,7 +254,7 @@ posted to dependents. The build moves through Design whole (FL-D1).
 
 | Item | Actor | Needs | Does | Proven by | Then |
 |---|---|---|---|---|---|
-| `test.merge` | command: the lander's `--prepare` | — | under `verdict.tree: prepared-merge`, prepares the landing merge in Test's worktree: the build merged onto the default branch's tip, kit versions minted and outputs regenerated into it. Under `build-tip`, it pins the build's tip | the prepared merge's SHA and tree hash, or the tip's | prepared → `test.select`; a conflict → Build for a resolution pass, or the architect when an interface clashes; refused → an ask naming the lander's refusal |
+| `test.merge` | command: the lander's `--prepare` | — | under `verdict.tree: prepared-merge`, prepares the landing merge in Test's worktree: the build merged onto the default branch's tip, kit versions minted where distribution fills the version slot, otherwise the announced skip, and outputs regenerated into it. Under `build-tip`, it pins the build's tip | the prepared merge's SHA and tree hash, or the tip's | prepared → `test.select`; a conflict → Build for a resolution pass, or the architect when an interface clashes; refused → an ask naming the lander's refusal |
 | `test.select` | command | `test.merge` | selects the legs the paths claim, the declared product-test levels (`tests.landing-levels`) and the held legs (`verdict.held`); without observability's Maintain, the levels left to its cadence too, as `tests.without-cadence` says | the selection record | `test.verdict` |
 | `test.verdict` | command: the bar's runner, on the declared backend | `test.select` | runs the bar with attribution (`GATE_ATTRIBUTE`); the runner writes the verdict record for the tree, which the pre-push hook reads | the runner-written verdict per tree hash, each red classed OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE | green → `test.seen-red`; red → `test.route`; stale → `test.merge` |
 | `test.route` | command | `test.verdict` | re-runs each red leg once on the same tree, under `test.verdict`'s env, then routes each red by its computed class, as `verdict.blocks` says. A leg red then green is nondeterministic | every red joined to one route, with its re-run's verdict | a nondeterministic leg → `test.flakes`; an OWN or MIXED red → `test.attribute`; a blocking CONTENDED red → a re-run on a quiet host; a blocking DEAD PROBE → the probe repaired, or an owner exception (`core.exceptions`); a blocking INHERITED red → a fix unit through Design, or an owner exception; a red that does not block → an ask |
@@ -276,6 +276,10 @@ posted to dependents. The build moves through Design whole (FL-D1).
 - **A held product leg.** Today the bar's held class is the kit self-test subject (`subject = "kit"`),
   run only on request. dWitnessedBar's held legs by policy extend it to any leg a quarantine holds,
   and `verdict.held` decides when a held leg runs: `peer-or-cadence`, `push-selected` or `on-demand`.
+- **The remote verdict before the landing.** Under `verdict: remote-ci`, P3's designed slot, the
+  lander publishes a candidate ref, as under `peer-node`. Remote CI runs the bar on it, and
+  `test.verdict` reads its verdict under integrations' witness rule, keyed by the candidate's SHA. It
+  is built when CI exists (R5.2).
 - **Roles:** tester; builders and the architect through its routes; reviewers with the gate lens at a
   breakpoint.
 - **Instruction:**
@@ -289,10 +293,12 @@ posted to dependents. The build moves through Design whole (FL-D1).
 - **Breakpoints:** the gate review, opt-in by default and above-tier under `strict`; the owner's gate at
   `test.exit` under `every-stage`.
 - **Extension points:**
-  - verdict backends, a registry: `local-hook` is built in, and integrations registers `peer-node` and
-    `remote-ci`; remote CI's verdict is read after the landing only, for `deploy.core` (the expansion
-    round);
-  - leg packs: gate-lint and the pytest guardrails;
+  - verdict backends, a registry: `local-hook` and `peer-node` are core, built by dWitnessedBar, and
+    integrations registers `remote-ci`, read before the landing under `verdict: remote-ci` and after it
+    for `deploy.core` under `GATE_POST_MERGE=ci`;
+  - the version slot in `test.merge`: `kits.version`, which distribution fills;
+  - leg packs: gate-lint, the pytest guardrails, the lexicon's two drift signals, and distribution's
+    `currency` leg under `currency.on-behind: red`;
   - product-test runner adapters;
   - the gate-health and flake signals that observability reads.
 
@@ -307,7 +313,9 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 - its major decisions' rows are in the decision log at the landed SHA;
 - its dependents are notified;
 - the card's terminal snapshot is committed;
-- its leases are released and its mailbox pruned.
+- its leases are released and its mailbox pruned;
+- under `build.closes: after-release-verifies`, a release verified its SHA or a later SHA that
+  contains it, or the owner closed it unreleased.
 
 | Item | Actor | Needs | Does | Proven by | Then |
 |---|---|---|---|---|---|
@@ -319,10 +327,11 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 | `deploy.record` | command | `deploy.core` | writes the landing record: SHA, the builds and units carried, the outcome class, the pre-push verdict or ungated, and the core re-check's verdict. It reads the lander's marker where one was written, otherwise the pushed SHA and the remote tip | the landing record | `deploy.distill` |
 | `deploy.distill` | command, idempotent | `deploy.record` | confirms that the decision-log rows `build.distill` wrote are in the log at the landed SHA | the rows at the landed SHA, joined one to one to the build's major forks | `deploy.recommend` |
 | `deploy.recommend` | command | `deploy.distill` | scores the recommendation, signals only, since core Deploy has no producing role | the recommendation record | the landing review where declared, otherwise `deploy.notify` |
-| `deploy.notify` | command, idempotent | `deploy.recommend`, and the landing review where it ran | posts `landed` to dependents, keyed by the landing SHA, so a repeated post is a no-op | the mailbox posts | `deploy.snapshot` |
-| `deploy.snapshot` | command, idempotent | `deploy.notify` | commits the card's terminal snapshot; an equal snapshot is a no-op | the snapshot commit | `deploy.unlease` |
-| `deploy.unlease` | command, idempotent | `deploy.snapshot` | deletes the build's lease refs, a missing ref counting as done, and closes its mailbox (`[rules]`) | the deleted refs, and the mailbox's messages in the folder | `deploy.close` |
-| `deploy.close` | command | `deploy.unlease` | records the transition | the transition record | the build is closed |
+| `deploy.notify` | command, idempotent | `deploy.recommend`, and the landing review where it ran | posts `landed` to dependents, keyed by the landing SHA, so a repeated post is a no-op | the mailbox posts | `deploy.released` and `deploy.snapshot` |
+| `deploy.released` | command | `deploy.notify` | reads `build.closes`. Under `after-release-verifies`, it waits for the release slot's exit record for the landed SHA, or for a later SHA that contains it; under the other two values, it passes at once | the slot's exit record, keyed by SHA, with its outcome; or the pass record | verified, or a pass → `deploy.close`, once `deploy.unlease` is done; held, rolled forward, rolled back or halted → an owner item, resolved as `run.on-owner-question` says: close unreleased, the outcome on the transition, or wait for a later release |
+| `deploy.snapshot` | command, idempotent | `deploy.notify`, and under `build.release-hold: whole-close`, `deploy.released` | commits the card's terminal snapshot; an equal snapshot is a no-op | the snapshot commit | `deploy.unlease` |
+| `deploy.unlease` | command, idempotent | `deploy.snapshot` | deletes the build's lease refs, a missing ref counting as done, and closes its mailbox (`[rules]`) | the deleted refs, and the mailbox's messages in the folder | `deploy.close`, once `deploy.released` has passed |
+| `deploy.close` | command | `deploy.unlease` and `deploy.released` | records the transition, with the release outcome under `after-release-verifies` | the transition record | the build is closed |
 
 - **The core re-check's witness** (K1):
   - under `GATE_POST_MERGE=local` or undeclared, `deploy.core` starts `post-merge.sh` on the landed
@@ -330,7 +339,10 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
     per-SHA log `<common-dir>/gate-post-merge-<sha8>.log` already shows a run for that SHA. That
     covers an ungated landing, a landing whose marker failed, a start the lander declined, and an
     undeclared key, as on gov's own tree today;
-  - under `ci`, the remote CI's result for the landed SHA is the witness;
+  - under `ci`, the remote CI's result for the landed SHA is the witness, under integrations' witness
+    rule. A red is written as the per-SHA verdict record and published as `refs/gov/bar-red` by the
+    node that read it. With no `remote-ci` backend registered, `ci` is refused, or falls back to the
+    local run with a report, as `policy.on-missing-expansion` says;
   - the verdict is read keyed by the landed SHA, from its per-SHA log, never from the single
     last-verdict file `<common-dir>/gate-post-merge`, which a later landing overwrites. A per-SHA
     verdict record is owed (`gap-deploy-02`);
@@ -349,7 +361,7 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 - **Instruction:**
   - the practices' Deploy reach;
   - the landing view;
-  - the policies: `autonomy`, `plan.ratification`, `verdict.tree`, `landing.order`, `deps.landing`, `deps.on-parent-withdrawn`, `hooks.bypass`, `core.bypass`, `core.exceptions`, `build.closes`, `card.snapshot`, `run.on-owner-question`, `review.deploy` and `flow.route-backs`.
+  - the policies: `autonomy`, `plan.ratification`, `verdict.tree`, `landing.order`, `deps.landing`, `deps.on-parent-withdrawn`, `hooks.bypass`, `core.bypass`, `core.exceptions`, `build.closes`, `build.release-hold`, `release.environments`, `card.snapshot`, `run.on-owner-question`, `review.deploy` and `flow.route-backs`.
 - **Memory:** writes the landing record, the transition, the terminal snapshot and the `landed`
   messages, reads the decision log at the landed SHA, and deletes the lease refs and the mailbox ref.
 - **Runtime:** the lander, the hook, the post-merge bar and its verdict record.
@@ -358,15 +370,22 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
     push, and its findings enter as patch builds by the entry-point table's post-close row;
   - the owner's landing gate, before `deploy.mandate`, under `three-gates` and `every-stage`.
 - **Extension points:**
-  - the version slot in the landing's prepare: `deploy.version`, which distribution fills;
-  - the release slot, after `deploy.core` is green: integrations' `release.*` program, per SHA and
-    per environment, each environment naming an engine and a verify adapter, routed by
-    `deploy.on-verify-fail`;
+  - the release slot, after `deploy.core` is green: integrations' `release.*` program, per
+    environment, each environment naming an engine, a verify adapter and whether it is production,
+    routed by `deploy.on-verify-fail`. Every pass ends by writing the slot's exit record for its SHA,
+    a flow record kind keyed by SHA with an outcome (verified, held, rolled forward, rolled back or
+    halted), which `deploy.released` reads;
   - notifications, through Runtime's notification adapters, which integrations fills.
 
-`build.closes`'s other two values each need an expansion:
-- `after-release-verifies` needs integrations' deploy engine;
-- `at-landing-maintain-owns` needs observability's Maintain.
+`build.closes`'s other two values each need an expansion (LR-4):
+- `after-release-verifies` holds the close at `deploy.released` until the release slot's exit record
+  verifies the landed SHA, or a later SHA that contains it. `build.release-hold` says what waits
+  (RH-1): the close alone under `close-only`, the default, or the snapshot, the leases and the mailbox
+  too under `whole-close`. It needs integrations with at least one environment listed; otherwise
+  `policy.on-missing-expansion` decides;
+- `at-landing-maintain-owns` closes at landing, and observability's Maintain owns the release after
+  it: its `release-verify-failed` run files a failed verify of the closed build as an owner item. It
+  needs observability; otherwise `policy.on-missing-expansion` decides.
 
 ## [breakpoint] The breakpoint: review at any boundary
 
@@ -462,7 +481,7 @@ the engine refuses any transition the table lacks.
 | testing | a new unit through Design | designing | the routing record |
 | deploying | a stale verdict | testing | the comparison record |
 | deploying | `deploy.land`'s class refused before the push, a race included | testing | the outcome class and the lander's line |
-| deploying | `deploy.close` | landed | the transition record |
+| deploying | `deploy.close` | landed | the transition record, which names the release outcome under `after-release-verifies` |
 | any open state | `life.request`: pause | paused | the command's record |
 | paused | `life.request`: resume | the state it paused in | the command's record |
 | any open state, before the push | `life.close`: withdrawn | withdrawn | the transition record |
@@ -482,11 +501,14 @@ Expansions meet only through the core (EX-1), so each item below attaches at a c
   register at Runtime's cadence items and read every reading registered at its command adapters:
   each reading's owner is derived, its pin declared, its asks keyed by reading and offender, and
   each event run keyed by event and SHA. A period records a maintenance record, as
-  `maintain.record` says.
-- **Integrations' release program (`release.*`)** fills Deploy's release slot, and its `remote-ci`
-  backend fills Test's verdict-backend registry, read after the landing only.
-- **Distribution's `deploy.version`** fills Deploy's version slot. Its kit releases (`kits.cut`) and
-  currency probe (`kits.currency`) are its own cadence programs, not Maintain's.
+  `maintain.record-when` says.
+- **Integrations' release program (`release.*`)** fills Deploy's release slot and writes its exit
+  record, and its `remote-ci` backend fills Test's verdict-backend registry, read before the landing
+  under `verdict: remote-ci` and after it under `GATE_POST_MERGE=ci`.
+- **Distribution's `kits.version`** fills the version slot in Test's `test.merge`. Its kit releases
+  (`kits.cut`), currency probe (`kits.currency`) and fleet reading (`kits.fleet`) are its own cadence
+  programs on `kits.host`, not Maintain's, and its `currency` leg joins Test's leg packs under
+  `currency.on-behind: red`.
 
 ## [consequences] What the definitions change
 
@@ -669,3 +691,12 @@ The comparison record's `[follow-up]` names each item and where it went.
 `build.distill` writes the major decisions' rows before Test, and `deploy.distill` confirms them at the
 landed SHA; `review.report` gains its `none` arm and its owner route; and each `new:` class record joins
 at the item that writes it.
+
+**Revised 2026-10-16, after the expansion round's two reviews**
+(`reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-a.md` and `-b.md`) and the owner's RH-1:
+`deploy.released` holds the close under `after-release-verifies`, and `build.release-hold` says what
+waits; the release slot's exit record is a flow record kind; the version slot moves into `test.merge`;
+Test keeps `peer-node` core and reads remote CI before and after the landing; a remote red under `ci`
+reaches `refs/gov/bar-red`; and the leg packs gain the lexicon's two signals and the `currency` leg. The
+comparison record's `[folded]` (`build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md`)
+names each defect and where it went.

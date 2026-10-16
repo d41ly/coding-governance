@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 128 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 133 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -273,6 +273,7 @@ Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `concurrent-runs-are-announced-not-refused.md` | unattended-mandate |
 | `conf-value-interpolated-into-a-regex.md` | agent-cap |
 | `containment-tested-one-way.md` | unattended |
+| `core-depends-on-an-optional-part.md` | build-method |
 | `criterion-asserts-what-its-own-command-cannot-show.md` | build-method |
 | `decision-re-derived-by-a-second-process.md` | run-gates |
 | `degradation-known-but-unreported.md` | review-harnesses |
@@ -286,6 +287,7 @@ Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `fixture-removes-the-path-under-test.md` | run-gates |
 | `floor-left-below-the-arms-it-guards.md` | run-gates-turnstile |
 | `fold-text-is-unreviewed-surface.md` | build-method |
+| `foreign-code-runs-on-the-ambient-credential.md` | build-method |
 | `format-derived-from-arity.md` | run-gates |
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
 | `git-rm-cached-refuses-a-diverged-index-blob.md` | agent-cap |
@@ -319,6 +321,7 @@ Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `nt-against-a-missing-file-is-true.md` | runlog |
 | `observation-before-the-last-fold-of-the-same-commit.md` | build-method |
 | `observed-by-claim-no-arm-discharges.md` | review-harnesses |
+| `one-run-claim-recorded-as-agreed.md` | build-method |
 | `one-value-field-records-a-mixed-outcome.md` | build-method |
 | `orchestrator-hand-off-owed-a-disposition.md` | unattended-stops |
 | `overlap-judged-from-the-invocation-interval.md` | run-gates-turnstile |
@@ -338,6 +341,7 @@ Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `retirement-inventory-misses-readers-by-value.md` | runlog |
 | `route-names-an-output-its-actor-never-emits.md` | build-method |
 | `row-driver-emits-a-plausible-file-with-rows-missing.md` | memory-tree-merge-driver |
+| `rule-stated-with-no-check-that-fails.md` | build-method |
 | `second-implementation-is-not-a-second-opinion.md` | unattended |
 | `settings-edit-takes-effect-mid-session.md` | agent-cap |
 | `shipped-checker-edit-is-an-adopter-contract-change.md` | session-kickoff |
@@ -368,6 +372,7 @@ Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `withheld-value-recovered-from-a-derived-one.md` | runlog |
 | `witness-graded-against-a-fact-written-after-it.md` | unattended |
 | `worktree-crlf-outside-the-gated-population.md` | run-gates |
+| `zero-witness-over-an-unnamed-population.md` | build-method |
 
 ## guides
 

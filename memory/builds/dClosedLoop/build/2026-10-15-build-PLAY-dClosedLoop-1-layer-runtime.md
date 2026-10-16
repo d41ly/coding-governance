@@ -688,12 +688,16 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 ### [schedule] The scheduler
 
 - **Runtime runs the cadence items that their layers declare.** These are Maintain's detectors, the
-  weekly Loop Review, lease and claim sweeps, and the nightly held bar. Each runs where its owner's key
-  says:
-  - `maintain.host` (session-start, os-scheduler, cloud-routine) for Maintain's items;
+  weekly Loop Review, distribution's kit release, currency probe and fleet reading, lease and claim
+  sweeps, and the nightly held bar. Each runs where its owner's key says:
+  - `maintain.host` (session-start, os-scheduler, cloud-routine) for Maintain's items and the Loop
+    Review;
+  - `kits.host` (the same names) for distribution's programs;
   - `run.host` (requesting-node, os-scheduler, cloud-routine) for runs.
 
   Runtime adds no host key.
+- **Journal retention.** The node tick prunes each journal past `runtime.journal`. Under `all`,
+  nothing is pruned.
 - **Host adapters:**
   - os-scheduler and requesting-node are the node tick (`[supervise]`);
   - session-start fires at the next session's binding;
@@ -746,17 +750,32 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | journal readers | what reads the journal | runlog, observability's store |
 | cadence items | a program with its host key, its period, its lease and its events | Maintain and the Loop Review; gov's kit release and the currency probe |
 
-- The keys that select an extension (`runtime.harnesses`, `runtime.spawn-backend`) take registered names.
+- The keys that select an extension (`runtime.harnesses`, `runtime.spawn-backend`, `verdict`, `run.host`,
+  `maintain.host`, `kits.host` and `notify.channel`) take registered names.
+  They are validated against the registry, never against a literal enumeration. A name no installed
+  layer registers is refused, or falls back to the built-in with a report, as
+  `policy.on-missing-expansion` says.
 - Added by the expansion round (`build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md`):
-  - cadence items, the tenth point above;
+  - cadence items, the tenth point above. Each event a cadence item names is produced by a core
+    record, such as `landed` by the landing record;
   - a command adapter carries a class: an act, a reading or a fix. A reading carries its scope
     (repo, node or outside), pin, events, fix and liveness, and its owner is derived from the memory
     contract;
   - every adapter row carries a grant: the service it reaches, the scopes it needs, and its secret by
-    reference, never by value, or `anonymous`;
+    reference, never by value, or `anonymous`. Runtime enforces it, whichever layer registers the
+    adapter: registration probes the scopes granted and refuses wider than declared, and the secret
+    lives where `runtime.secret-home` says;
   - a harness adapter declares its install targets: where a rendered Skill, agent, rule, hook or
     settings fragment lands.
-  They are validated against the registry, never against a literal enumeration.
+- **The secret value scan** is Runtime's gate, as `runtime.secret-scan` says. Each adapter's runner,
+  the one principal holding the value, scans for the value and its encodings at the lander's prepare,
+  so the value never leaves its process. Its population is everything a push publishes: the commits
+  in the pushed range, every `refs/gov/*` object the core pushes (mailbox, card, leases and claims),
+  and the tracked files, `memory/`, the journal and the transcripts. Its witness names what it read:
+  whether the value resolved (yes, no or `anonymous`), each population's count, and the matches, as a
+  count and a salted id only. An unresolved value or an empty population is a dead probe, never
+  green, and `anonymous` reads not applicable, not zero. A hit refuses the push. A seen-red fixture
+  plants the value in a removed commit and in a mailbox ref, and one encoding of it in the journal.
 - A new step, role, record kind, rule, harness, backend or host is a filled contract, so Runtime gains
   no code.
 - The `extension` fixture proves this once, by registering a stub adapter with no edit to Runtime's code
@@ -787,14 +806,16 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | extension points declared | the ten in `[extend]` |
 | extension points used | none. Integrations fill the host and notification adapters. Observability and memory's optional components register packs and read the journal |
 | policies | the `runtime.*` keys in `[policies]`, and the existing keys it reads |
-| gates | the build's fixtures in `[tests]` |
+| gates | the build's fixtures in `[tests]`; the grant's scope probe and the secret value scan (`[extend]`) |
 
 ## [policies] Runtime's keys, set under the owner's delegation
 
 The owner handed this layer to the main loop, so these defaults are the main loop's. Every one is
 switchable, and the default is the `standard` preset's value. The six settled keys joined v2's catalogue
 and presets on 2026-10-15, and v2 is canonical from then on. RT-2 retired `runtime.below-floor`, since
-no floor exists.
+no floor exists. `runtime.journal` joined them on 2026-10-16 from the expansion round, and
+`runtime.secret-home` and `runtime.secret-scan` from its review's fold, which moved them from
+integrations because the grant they serve is Runtime's field.
 
 | Key | Allowed values | Default | velocity | standard | strict | guarded |
 |---|---|---|---|---|---|---|
@@ -804,13 +825,17 @@ no floor exists.
 | `runtime.hold-ceiling` | hours | 6 | 6 | 6 | 6 | 6 |
 | `runtime.hook-failure` | closed, open | closed | closed | closed | closed | closed |
 | `runtime.harnesses` | a set of named harness adapters | claude-code | claude-code | claude-code | claude-code | claude-code |
+| `runtime.journal` | days, or all, and at least `review.loop.window-days` | 60 | 60 | 60 | 90 | 60 |
+| `runtime.secret-home` | os-keychain, env-injected | os-keychain | os-keychain | os-keychain | os-keychain | os-keychain |
+| `runtime.secret-scan` | value-gate, value-gate+shape-report | value-gate+shape-report | value-gate | value-gate+shape-report | value-gate+shape-report | value-gate+shape-report |
 
 **Existing keys Runtime reads, without re-declaring them:**
 
 | Behaviour | Key | Carrier |
 |---|---|---|
 | workspaces | `build.worktree` | v2's catalogue |
-| where runs and cadence run | `run.host`, `maintain.host` | v2's catalogue |
+| where runs and cadence run | `run.host`, `maintain.host`, `kits.host` | v2's catalogue |
+| the owner's channel | `notify.channel` | v2's catalogue |
 | agents in flight | `FANOUT_CAP`: lower-only, never above 5 | `.agent-cap.conf` |
 | reaping | `PROCMON_REAP_MODE` | `.process-monitor.conf` |
 | the relaunch cap and the turn cap | `RESUME_ATTEMPTS`, `RESUME_TURNS` | `.unattended.conf` |
@@ -829,8 +854,8 @@ That question is owed in v2's `[owed]`.
   closed through the permission baseline;
 - `runtime.fanout`, `runtime.isolation`, `runtime.reap` and `runtime.scheduler`, because the existing
   keys above answer them;
-- `runtime.journal`, because the run record is observability's, to be settled in its review. The
-  expansion round settled it as the journal's retention: days, or all, default 60.
+- `runtime.journal` was retired here, because the run record is observability's. The expansion
+  round restored it on 2026-10-16 as the journal's retention, now in the table above.
 
 ## [build] Runtime's own chain build
 
@@ -1011,7 +1036,8 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   - re-running the supervisor on a witnessed item dispatches nothing;
   - a direct write to a record, to an instruction file and to main is each refused;
   - an act session started in the primary tree is refused;
-  - every `runtime.*` key has a reader in this record's design;
+  - every `runtime.*` key in v2's catalogue, a population asserted non-empty, has a reader in this
+    record's design;
   - every event class leaves a journal line.
 - **`latency`:** ten dispatcher runs on a benign Bash payload. Their p50, against today's 57 ms, sets the
   dispatcher's declared budget.
@@ -1113,3 +1139,12 @@ is unchanged.
     `gap-found-06` and `gap-flow-10`.
   - dDeclaredLoop keeps the position function.
   - `[build]` holds the settled re-cut.
+
+**Revised 2026-10-16, after the expansion round's two reviews**
+(`reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-a.md` and `-b.md`): `[extend]`'s selecting
+keys keep their validation clause and name every key that takes registered names; Runtime enforces
+the grant on every adapter row and runs the secret value scan over everything a push publishes;
+`[schedule]` names `kits.host` and journal retention; and `[policies]` carries `runtime.journal`,
+`runtime.secret-home` and `runtime.secret-scan`. The comparison record's `[folded]`
+(`build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md`) names each defect and
+where it went.

@@ -26,12 +26,19 @@ M7) found three keys whose non-default values had no arm:
 - `decisions.major: author-owner-ratifies`, the strict preset's value, had no owner item;
 - `reuse.propose`'s witness typed the default's population in front of the key.
 
+The expansion round, 2026-10-16, hit it seven times, though the class was on both of its review runs'
+checklists (`memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md`, `[patterns]`). `build.closes: after-release-verifies` held nothing; the
+values `velocity` selects for four observability keys had no arm; and `currency.on-behind: red`,
+`any-commit`, `pull-only`, `every-landing`, `owner-approves-prod`, `deploy.runs` and
+`verdict: remote-ci` routed nowhere.
+
 ## The fix
 
 - For each key an item reads, write each catalogued value's arm into the item: its witness, its route,
   and any owner item, with every outcome routed.
 - Never type the default's guard in front of the key: the key selects the population.
-- Walk each preset through the transition table before calling a catalogue row done.
+- Walk each preset through the transition table before calling a catalogue row done, and before the
+  settlement commits: a checklist entry names the class, and only the walk finds the value.
 
 The design records under `/build/` are its population. It has no machine gate yet: the join that
 dDeclaredLoop owes beside the transition table (`gap-flow-15`) now names this walk.

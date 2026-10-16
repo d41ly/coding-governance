@@ -245,6 +245,7 @@
       "concurrent-runs-are-announced-not-refused.md",
       "conf-value-interpolated-into-a-regex.md",
       "containment-tested-one-way.md",
+      "core-depends-on-an-optional-part.md",
       "criterion-asserts-what-its-own-command-cannot-show.md",
       "decision-re-derived-by-a-second-process.md",
       "degradation-known-but-unreported.md",
@@ -258,6 +259,7 @@
       "fixture-removes-the-path-under-test.md",
       "floor-left-below-the-arms-it-guards.md",
       "fold-text-is-unreviewed-surface.md",
+      "foreign-code-runs-on-the-ambient-credential.md",
       "format-derived-from-arity.md",
       "gate-green-by-accident-on-generated-bytes.md",
       "git-rm-cached-refuses-a-diverged-index-blob.md",
@@ -291,6 +293,7 @@
       "nt-against-a-missing-file-is-true.md",
       "observation-before-the-last-fold-of-the-same-commit.md",
       "observed-by-claim-no-arm-discharges.md",
+      "one-run-claim-recorded-as-agreed.md",
       "one-value-field-records-a-mixed-outcome.md",
       "orchestrator-hand-off-owed-a-disposition.md",
       "overlap-judged-from-the-invocation-interval.md",
@@ -310,6 +313,7 @@
       "retirement-inventory-misses-readers-by-value.md",
       "route-names-an-output-its-actor-never-emits.md",
       "row-driver-emits-a-plausible-file-with-rows-missing.md",
+      "rule-stated-with-no-check-that-fails.md",
       "second-implementation-is-not-a-second-opinion.md",
       "settings-edit-takes-effect-mid-session.md",
       "shipped-checker-edit-is-an-adopter-contract-change.md",
@@ -339,7 +343,8 @@
       "waiver-row-that-hides-nothing-reds.md",
       "withheld-value-recovered-from-a-derived-one.md",
       "witness-graded-against-a-fact-written-after-it.md",
-      "worktree-crlf-outside-the-gated-population.md"
+      "worktree-crlf-outside-the-gated-population.md",
+      "zero-witness-over-an-unnamed-population.md"
     ],
     "guides": [
       "ANNOTATION-STYLE.md",

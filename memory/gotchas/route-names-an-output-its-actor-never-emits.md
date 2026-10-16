@@ -37,6 +37,14 @@ again inside those fixes:
   on paths the routes took as covered, and `post-merge.sh`'s REFUSED had no route (M1, M2, M3);
 - a release item was to mark messages in a snapshot already committed (M9).
 
+The expansion round's two reviews (`memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md`) found four more in its design:
+- `release-verify-failed` named the release record as its producer, though that record was written
+  only on a green verify;
+- a remote red under `GATE_POST_MERGE=ci` was said to reach the pre-push hook, though only the local
+  post-merge bar publishes the bar-red ref;
+- the cadence-items point required a host key that distribution's programs never named;
+- DI-1's "source, 0 behind" was a reading `kits.currency` had no arm to produce.
+
 ## The fix
 
 Before a route names an outcome, read the actor's code on that path:
