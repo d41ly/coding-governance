@@ -1850,6 +1850,12 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
     folders, decision rows, bar) is untouched (`build/2026-10-16-build-PLAY-dClosedLoop-1-state.md`
     `[revisit]`).
 
+- 2026-10-17, session 1799cb98: the owner set the convergence order, verbatim, "Let's take convergence steps in order, then. No new scope until 2-4 are done but we're not 'finishing the build' until this design takes full shape. Execute on The PM-10 ownership table, The chain reordering, and The review declared at kickoff."
+  - Recorded in the state record's `[convergence]`. No new scope until the three are done, and the
+    build's exit waits for the design's full shape.
+  - Step 2: PM-10's ownership table proposes an owner for all 351 nodes, with its evidence, and flags 47
+    for the owner's eye (`build/2026-10-17-build-PLAY-dClosedLoop-1-ownership.md`).
+
 ## Instruments
 
 ### The gap-ownership join
@@ -2322,6 +2328,7 @@ Runs, 2026-10-14:
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` | Those two runs' args, verbatim, with the script that wrote them. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md` | The owner's question on seeing the whole project at once: what orients an agent today, the audit's items sorted by cause, a level-0 map of gov sized, and forks PM-1 to PM-3. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-map.py` | The level-0 project map's generator: the atlas's derivation and the tree, rendered by the map's grammar within its budget, with its completeness, count, resolve, census, parity and owner checks. |
+| `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership.md` | PM-10's ownership table: a proposed owning build for every item, policy key, point, tag namespace, system and record kind, each with its evidence, and the rows that need the owner's eye. |
 | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-2-researcher.md` | The project-map research handoff, run twice. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-b.md` | Dispatch 88's return, verbatim: the level-0 project map, run B. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-instruments.md` | The project-map researchers' files and shell commands, in order, from their transcripts. |

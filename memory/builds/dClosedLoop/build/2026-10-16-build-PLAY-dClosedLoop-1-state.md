@@ -760,3 +760,18 @@ chain builds with a folder or a LIVE.md row: 0 of 15
 memory/DECISIONS.md lines naming dClosedLoop: 0
 the last bar's commit: ebce889c7 2026-10-13 (the kickoff card's drift line)
 ```
+
+## [convergence] The owner's order, 2026-10-17
+
+The owner said, verbatim:
+
+> Let's take convergence steps in order, then. No new scope until 2-4 are done but we're not 'finishing the build' until this design takes full shape. Execute on The PM-10 ownership table, The chain reordering, and The review declared at kickoff.
+
+- **Steps 2 to 4 of `[revisit-next]` run in order:**
+  - PM-10's ownership table, approved and folded (`build/2026-10-17-build-PLAY-dClosedLoop-1-ownership.md`);
+  - the re-cut: the three decided moves applied, and the undecided put to the owner;
+  - the declared audit, reading v2, the gap register and the chain whole, and its fold reviewed.
+- **No new scope until all three are done.** A review's findings are folds, not scope.
+- **The build's exit waits** until the design takes its full shape: the spec, the chain's folders, the
+  decision rows, the acceptance joins and the full bar. Step 5 is not started on the three's completion
+  alone.
