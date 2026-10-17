@@ -12,7 +12,7 @@
   --bg: #EDF1F0; --surface: #FFFFFF; --surface-2: #F5F8F7; --ink: #13201C; --ink-2: #384843; --muted: #64746E;
   --line: #CED8D5; --line-2: #A9B8B3; --accent: #0D6B5B; --accent-soft: #DCEFE9; --signal: #B07800; --signal-soft: #FBEFD2;
   --ok: #23824F; --warn: #A86A12; --bad: #B9362F; --ok-soft: #DDF1E5; --warn-soft: #F8EAD3; --bad-soft: #F7DEDB;
-  --l-entry: #62738C; --l-plan: #2A67C4; --l-design: #7748BA; --l-build: #C96A16; --l-test: #1F8D58; --l-deploy: #C23838; --l-breakpoint: #A98312; --l-lifecycle: #5F716D;
+  --l-entry: #62738C; --l-plan: #2A67C4; --l-design: #7748BA; --l-build: #C96A16; --l-test: #1F8D58; --l-deploy: #C23838; --l-breakpoint: #A98312; --l-lifecycle: #5F716D; --l-adopt: #2E7F86;
   --f-display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
   --f-body: "Overpass", "Segoe UI", system-ui, sans-serif;
   --f-mono: "Overpass Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
@@ -23,7 +23,7 @@
     --bg: #0D1412; --surface: #141D1A; --surface-2: #1A2522; --ink: #E3EBE8; --ink-2: #BFCBC6; --muted: #8A9B95;
     --line: #26332F; --line-2: #3A4B46; --accent: #52C4A9; --accent-soft: #16342D; --signal: #F0B23A; --signal-soft: #3A2E12;
     --ok: #4CC38A; --warn: #E3A43C; --bad: #EF6A5F; --ok-soft: #14321F; --warn-soft: #352812; --bad-soft: #3A1916;
-    --l-entry: #8EA0B8; --l-plan: #5C94EA; --l-design: #A47DE2; --l-build: #EE8E3A; --l-test: #3CC07F; --l-deploy: #EC6464; --l-breakpoint: #DDB23C; --l-lifecycle: #92A6A1;
+    --l-entry: #8EA0B8; --l-plan: #5C94EA; --l-design: #A47DE2; --l-build: #EE8E3A; --l-test: #3CC07F; --l-deploy: #EC6464; --l-breakpoint: #DDB23C; --l-lifecycle: #92A6A1; --l-adopt: #5FBEC6;
     color-scheme: dark;
   }
 }
@@ -31,7 +31,7 @@
   --bg: #0D1412; --surface: #141D1A; --surface-2: #1A2522; --ink: #E3EBE8; --ink-2: #BFCBC6; --muted: #8A9B95;
   --line: #26332F; --line-2: #3A4B46; --accent: #52C4A9; --accent-soft: #16342D; --signal: #F0B23A; --signal-soft: #3A2E12;
   --ok: #4CC38A; --warn: #E3A43C; --bad: #EF6A5F; --ok-soft: #14321F; --warn-soft: #352812; --bad-soft: #3A1916;
-  --l-entry: #8EA0B8; --l-plan: #5C94EA; --l-design: #A47DE2; --l-build: #EE8E3A; --l-test: #3CC07F; --l-deploy: #EC6464; --l-breakpoint: #DDB23C; --l-lifecycle: #92A6A1;
+  --l-entry: #8EA0B8; --l-plan: #5C94EA; --l-design: #A47DE2; --l-build: #EE8E3A; --l-test: #3CC07F; --l-deploy: #EC6464; --l-breakpoint: #DDB23C; --l-lifecycle: #92A6A1; --l-adopt: #5FBEC6;
   color-scheme: dark;
 }
 
@@ -46,11 +46,12 @@ button { font: inherit; color: inherit; }
 
 /* Masthead */
 .top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); border-bottom: 1px solid var(--line); }
-.stripe { display: grid; grid-template-columns: repeat(8, 1fr); height: 4px; }
+.stripe { display: grid; grid-template-columns: repeat(9, 1fr); height: 4px; }
 .stripe span:nth-child(1) { background: var(--l-entry); } .stripe span:nth-child(2) { background: var(--l-plan); }
 .stripe span:nth-child(3) { background: var(--l-design); } .stripe span:nth-child(4) { background: var(--l-build); }
 .stripe span:nth-child(5) { background: var(--l-test); } .stripe span:nth-child(6) { background: var(--l-deploy); }
 .stripe span:nth-child(7) { background: var(--l-breakpoint); } .stripe span:nth-child(8) { background: var(--l-lifecycle); }
+.stripe span:nth-child(9) { background: var(--l-adopt); }
 .top-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; padding-block: 10px; max-width: 1480px; margin: 0 auto; }
 .brand { display: flex; flex-direction: column; min-width: 0; }
 .wordmark { font-family: var(--f-display); font-weight: 700; font-size: 26px; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.05; }
@@ -382,7 +383,7 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
 </style>
 
 <header class="top">
-  <div class="stripe" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="stripe" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <div class="top-inner gutter">
     <div class="brand">
       <div class="wordmark">Closed <b>Loop</b> Atlas</div>
@@ -543,7 +544,7 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
   // ---------- derived indexes ----------
   var STEP_META = {
     entry: { badge: '0' }, plan: { badge: '1' }, design: { badge: '2' }, build: { badge: '3' },
-    test: { badge: '4' }, deploy: { badge: '5' }, breakpoint: { badge: 'R' }, lifecycle: { badge: 'C' }
+    test: { badge: '4' }, deploy: { badge: '5' }, breakpoint: { badge: 'R' }, lifecycle: { badge: 'C' }, adopt: { badge: 'A' }
   };
   var ITEMS = {}, STEP_OF = {}, NEEDED_BY = {}, ROUTED_FROM = {}, STEP = {};
   D.steps.forEach(function (s) {

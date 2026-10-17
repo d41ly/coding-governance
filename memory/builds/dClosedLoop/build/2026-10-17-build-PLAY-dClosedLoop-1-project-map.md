@@ -858,3 +858,164 @@ The four forks were asked in one round, through the question tool. Each answer i
   values. All four keys keep the owner's answer in every preset.
 - **Registered.** The three gaps of `[gaps-proposed]` are `gap-mem-26`, `gap-mem-27` and
   `gap-orient-15`.
+
+## [test-run] The map, derived for this design, 2026-10-17
+
+The owner asked, verbatim:
+
+> Let's run a test - map this design fully now by the design we finalized, and keep our session oriented with it.
+
+- **What runs it.** `build/2026-10-17-build-PLAY-dClosedLoop-1-map.py` is a design-time instrument,
+  beside the atlas generator.
+  - It imports the atlas's derivation, so the map and the atlas are two renders of one node table
+    (`[design]`'s "one derivation and two renders").
+  - The one index does not exist yet, so each namespace is derived from the source the index will
+    extract it from.
+  - It writes the map where `--out` says, never into the repository. `--ns <namespace>` prints one
+    namespace whole (level 1), and `--pending` lists the purposes awaiting the owner.
+- **The map's header** at the run's tree:
+
+  ```text
+  map 8a10fcc8 dirty · nodes 2008 · lines 325 · folded item,policy-key,gap,leg,bug-class,closed-build,decision-row,design-record,review,decision-section,event,population,marker,conf-key · pending 85 · unarmed record-kind
+  ```
+
+### [test-run-numbers] What the map holds
+
+```text
+$ python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --out design-map.txt
+map: 2008 nodes in 30 namespaces; 24063 B of 32768 (no degrade); folded 14; unarmed record-kind
+map: purposes declared 1355, derived 246, pending 407
+map: wrote C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/projectmap/design-map.txt
+map: every check passes, and record-kind is registered with no extractor: unarmed, never green
+exit 2
+```
+
+- **The whole design at level 0.** 325 lines in 24.1 KB, under the 32k budget with no degrading. That
+  is 2,008 nodes in 30 namespaces: 16 namespaces one line per node, and 14 folded to a counted line.
+- **It exits 2, never 0.** Every check passes. The record-kind namespace is registered with no
+  extractor, since layer-memory lists the kinds in prose. So it reads unarmed, never green, and the
+  header says so.
+- **Purposes:** 1,355 declared, 246 derived and 407 pending.
+  - The 85 pending at level 0 are the review list PM-5 hands the owner when each namespace's purpose
+    field lands. They are 7 roles with no agent file, 25 tag namespaces and 53 policy namespaces.
+  - The other 322 pending purposes sit in folded namespaces: legs, populations, markers and config
+    keys.
+
+```text
+$ python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --pending
+role: 7 — prompt-writer, planner, architect, tester, reviewer, deployer, maintainer
+tag-namespace: 25 — reader, level, layer, step, item, role, policy, practice, principle, kind, record, kit, section, doc, unit, field, leg
+policy-namespace: 53 — actions, annotations, asks, autonomy, budgets, build, builds, card, charter, context, core, currency, decisions, de
+leg: 140 — kickoff-manifest ratchet, template size <=48KiB, charter size, micro-format definitions, micro-format gate selftest, line lengt
+population: 27 — memory/map/affordance-exempt.toml, memory/map/baseline.toml, memory/project/brief-recorded-waiver.txt, memory/project/cor
+marker: 20 — gov:argv, gov:argv-begin, gov:argv-end, gov:bounded-fanout, gov:conf-allow-, gov:conf-allow-begin, gov:conf-allow-end, gov:fi
+conf-key: 135 — memory-tree.conf:MEMORY_ROOT, memory-tree.conf:ROUTED_PATHS, memory-tree.conf:ROUTED_COMMIT_CUTOFF, memory-tree.conf:ROUTE
+```
+
+### [test-run-checks] Each check, seen red
+
+Each plant damages one thing, either the render or the node table, and each turns the run red with
+the finding it names:
+
+```text
+$ python map.py --check --plant drop-line
+FINDING complete: layer has nodes on no line and in no count: ['instruction']
+exit 1
+$ python map.py --check --plant bad-count
+FINDING count: item.* counts 82, the table holds 81
+exit 1
+$ python map.py --check --plant ghost-rel
+FINDING resolves: chain.dOrderedCharter names owner=dGhostBuild, which resolves nowhere
+exit 1
+$ python map.py --check --plant census
+FINDING census: tools/newkit/kit.toml is on disk with no kit node
+exit 1
+$ python map.py --check --plant no-owner
+FINDING owner: tag-namespace.reader names no owning build
+exit 1
+```
+
+### [test-run-found] What the test found
+
+1. **The atlas had dropped the `[adopt]` step and its five items** since review 86's fold. Its step
+   list stopped at `lifecycle`, so it lost the step silently.
+   - The map's parity check caught it on its first run.
+   - The atlas now reads `[adopt]`, and its page gives the step a badge, a colour token in each theme
+     and a stripe span.
+   - The probe below checks that the page draws every step its data carries, and it reds on a
+     planted missing badge.
+2. **The decision log has no unique row key.** `TOOL-aWrittenMethod-1` labels four rows, and
+   `TOOL-aUnmannedHelm-5` and `-6` two rows each. An id names a unit, and one unit records several
+   decisions. The map keys a repeated id by its ordinal, as the systems record's M35 fix does for a
+   repeated heading.
+3. **A purpose can carry a date.** The aDeployScout README's title holds one. A line never holds a
+   date, so the renderer strips dates from purposes.
+4. **One hook script is registered twice under one event.** `manifest-check.sh` hangs off
+   SessionStart once per matcher, so a hook's key carries its matcher.
+5. **The header needs an unarmed field.** The design's populated check implies one, and the header
+   grammar has none. The test adds `unarmed <namespace>`.
+6. **A node's key is not always a tag.** Chain builds, live builds and principles keep their native
+   ids, such as `dTotalRecall` and `P27`, which the tag grammar's lowercase segments cannot spell. The
+   design must say whether a line opens with the node's tag or its id.
+7. **The checks caught the instrument's own first-run bugs** before any output was used:
+   - a title pattern under DOTALL swallowed every step;
+   - the census counted each settings hook twice;
+   - two Owners bullets the parser misread.
+
+   The census and key-uniqueness checks found them.
+
+```python
+"""Check that a written atlas page can draw every step its data carries: a STEP_META badge and a colour token
+in each of the three theme blocks, and a stripe span per step. Exit 1 on any gap.
+
+Usage: python atlas_step_probe.py <page.html> [--drop-meta <tag>]
+--drop-meta removes one step's badge from a copy in memory, to see the probe red.
+"""
+import json
+import re
+import sys
+
+page = open(sys.argv[1], encoding="utf-8").read()
+if "--drop-meta" in sys.argv:
+    tag = sys.argv[sys.argv.index("--drop-meta") + 1]
+    page = re.sub(r",?\s*" + re.escape(tag) + r": \{ badge: '[^']*' \}", "", page, count=1)
+data = json.loads(page.split('<script id="atlas-data" type="application/json">', 1)[1].split("</script>", 1)[0])
+steps = [s["tag"] for s in data["steps"]]
+meta = re.search(r"var STEP_META = \{(.*?)\};", page, flags=re.S).group(1)
+badges = set(re.findall(r"([a-z]+): \{ badge:", meta))
+blocks = re.findall(r"--l-entry:[^\n]*", page)
+stripe = re.search(r'<div class="stripe"[^>]*>(.*?)</div>', page).group(1).count("<span>")
+cols = re.search(r"\.stripe \{[^}]*repeat\((\d+), 1fr\)", page).group(1)
+bad = []
+for t in steps:
+    if t not in badges:
+        bad.append(f"{t}: no STEP_META badge")
+    for i, b in enumerate(blocks):
+        if f"--l-{t}:" not in b:
+            bad.append(f"{t}: no colour token in theme block {i + 1}")
+if stripe != len(steps) or int(cols) != len(steps):
+    bad.append(f"stripe: {stripe} spans in {cols} columns for {len(steps)} steps")
+print(f"steps {len(steps)} ({', '.join(steps)}); badges {len(badges)}; theme blocks {len(blocks)}; stripe {stripe} in {cols}")
+for b in bad:
+    print("FINDING", b)
+sys.exit(1 if bad else 0)
+```
+
+```text
+$ python atlas_step_probe.py closed-loop-atlas.html
+steps 9 (entry, plan, design, build, test, deploy, breakpoint, lifecycle, adopt); badges 9; theme blocks 3; stripe 9 in 9
+exit 0
+$ python atlas_step_probe.py closed-loop-atlas.html --drop-meta adopt
+steps 9 (entry, plan, design, build, test, deploy, breakpoint, lifecycle, adopt); badges 8; theme blocks 3; stripe 9 in 9
+FINDING adopt: no STEP_META badge
+exit 1
+```
+
+### [test-run-session] Keeping the session oriented
+
+- **This session now holds the map.** It was regenerated with `--out` and read whole, as PM-7 designs
+  for an attended session.
+- **It is regenerated after every design change** and read again at session start and after each
+  compaction. The owner's standing ask is recorded in the session's memory, beside the atlas's.
+- **The product version is dWellOiledMachine's.** Its session-start hook loads the card and the map
+  (PM-7). This test touches neither `.claude/` nor `tools/`.

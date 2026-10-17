@@ -1796,6 +1796,16 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   republished to its one link as version 24 after PM-1 to PM-3, as version 25 after the project map's
   design (`55cc777f8`), and as version 26 after PM-4 to PM-7 (`f88af352e`).
 
+- 2026-10-17, session 1799cb98: the owner asked, verbatim, "Let's run a test - map this design fully now by the design we finalized, and keep our session oriented with it."
+  - `build/2026-10-17-build-PLAY-dClosedLoop-1-map.py` derives the map from the atlas's derivation and
+    the tree: 2,008 nodes in 30 namespaces, 325 lines in 24.1 KB.
+  - Every check passes. The run exits 2, since the record-kind namespace is unarmed. Five plants each
+    red.
+  - The parity check found the atlas had dropped `[adopt]` since review 86's fold, and the atlas now
+    reads it, at version 27.
+  - The session holds the map (`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md`
+    `[test-run]`).
+
 ## Instruments
 
 ### The gap-ownership join
@@ -2267,6 +2277,7 @@ Runs, 2026-10-14:
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews.md` | The owner's ask for the folds' closing review and the systems and retrofit audit: the two runs, how they run, and their folds once they return. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` | Those two runs' args, verbatim, with the script that wrote them. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md` | The owner's question on seeing the whole project at once: what orients an agent today, the audit's items sorted by cause, a level-0 map of gov sized, and forks PM-1 to PM-3. |
+| `build/2026-10-17-build-PLAY-dClosedLoop-1-map.py` | The level-0 project map's generator: the atlas's derivation and the tree, rendered by the map's grammar within its budget, with its completeness, count, resolve, census, parity and owner checks. |
 | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-2-researcher.md` | The project-map research handoff, run twice. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-b.md` | Dispatch 88's return, verbatim: the level-0 project map, run B. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-instruments.md` | The project-map researchers' files and shell commands, in order, from their transcripts. |

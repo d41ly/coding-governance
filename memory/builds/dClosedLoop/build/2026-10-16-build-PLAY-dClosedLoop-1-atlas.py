@@ -53,7 +53,7 @@ LAYER_RECORDS = {
     "lexicon": ["lexicon"],
     "review system": ["review-system"],
 }
-STEPS = ["entry", "plan", "design", "build", "test", "deploy", "breakpoint", "lifecycle"]
+STEPS = ["entry", "plan", "design", "build", "test", "deploy", "breakpoint", "lifecycle", "adopt"]
 KINDS = ("command", "executor", "hook", "owner")
 SEP = re.compile(r"^\|(\s*:?-+:?\s*\|)+\s*$")
 ITEM_TAG = re.compile(r"`([a-z]+\.[a-z0-9-]+)`")
