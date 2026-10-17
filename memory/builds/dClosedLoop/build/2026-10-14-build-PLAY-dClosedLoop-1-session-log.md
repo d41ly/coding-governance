@@ -1831,6 +1831,16 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
     (`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md` `[answers-fixes]`).
   - Next: the ownership table PM-10 asks for.
 
+- 2026-10-17, session 1799cb98: the compaction's summary was found not verbatim. It had rewritten 3 of
+  the level-0 map's 355 lines, the three kits whose derived purposes were fragments.
+  - The generator mines no README prose now, and those kits render as pending (88 at level 0).
+  - The atlas step probe had matched its own source, embedded through the project-map record. It now
+    reads the page's style elements only.
+  - Two classes are filed: `summary-rewrites-the-text-it-carries` and
+    `instrument-recorded-into-the-corpus-it-scans` (`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md`
+    `[reload-summary]`).
+  - The atlas is at version 28.
+
 ## Instruments
 
 ### The gap-ownership join

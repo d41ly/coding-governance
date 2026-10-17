@@ -175,10 +175,9 @@ def derive():
             body = readme.read_text(encoding="utf-8")
             h1 = re.search(r"^# (.+)$", body, flags=re.M)
             purpose = h1.group(1).split(" — ", 1)[1] if h1 and " — " in h1.group(1) else ""
-            if not purpose:
-                # No purpose in the title: the README's first prose line, derived (PM-5).
-                prose = re.search(r"^(?![#>|`\-*<\s])(.{12,})$", body.split("\n", 1)[1] if "\n" in body else "", flags=re.M)
-                purpose = prose.group(1) if prose else (h1.group(1) if h1 else "")
+            # A README's prose is never mined for a purpose. Its first prose line was, three kits in three, the middle
+            # of a sentence or a disclaimer (the project-map record's [reload-summary]). PM-5's review derives those
+            # purposes, citing its source, and until then the kit renders as pending.
         main_py = REPO / "tools" / k / f"{k}.py"
         if not purpose and main_py.exists():
             # No README: the kit's main script's docstring, its first line after the kit's name (PM-5).

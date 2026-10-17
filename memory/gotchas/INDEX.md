@@ -82,6 +82,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [inline-marker-breaks-a-line-continuation](inline-marker-breaks-a-line-continuation.md) | class | 5 |  | appending a per-line annotation to the lines a gate selected breaks any of them that ended in a backslash, and the result is valid shell that silently drops the rest of the command |
 | [inputs-inside-the-subjects-reach](inputs-inside-the-subjects-reach.md) | class | 4 |  | a check whose inputs are all supplied by the thing it distrusts is not a check, however sound its logic |
 | [insert-after-a-key-that-occurs-twice](insert-after-a-key-that-occurs-twice.md) | class | 4 |  | a record edit inserts a row after the first match of a cell value that occurs in two tables, so the row lands in the wrong table and the right one never gains it |
+| [instrument-recorded-into-the-corpus-it-scans](instrument-recorded-into-the-corpus-it-scans.md) | class | 1 |  | a probe's source is recorded beside its results, the page it scans later embeds that record, and its literal pattern matches its own quotation, so a clean page reads as broken, or a broken one as clean |
 | [invariant-held-on-one-admission-path](invariant-held-on-one-admission-path.md) | class | 2 |  | an invariant one admission path enforces is silently absent on every other path into the same resource, and the spec that states it reads as covering them all |
 | [join-key-widened-by-a-shared-location](join-key-widened-by-a-shared-location.md) | class | 2 |  | a join keyed on WHERE something happened takes every place the subject ever touched, and one of those places is shared by every subject, so the key admits everyone's lines |
 | [ledger-token-wrapped-across-a-line-joins-nothing](ledger-token-wrapped-across-a-line-joins-nothing.md) | class | 2 |  | hygiene check 23 extracts a ledger line's backticked tokens PER LINE, so a token the writer wrapped across a line break belongs to no line and the criterion it answers reads as unanswered |
@@ -137,6 +138,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [subprocess-resolves-a-different-shell](subprocess-resolves-a-different-shell.md) | class | 4 |  | Python subprocess resolving the bare name bash finds the WSL launcher, which sees another filesystem |
 | [suite-edited-while-bash-executes-it](suite-edited-while-bash-executes-it.md) | class | 2 |  | bash reads a script incrementally by byte offset, so editing a suite file while a long run of it is executing corrupts the parse at the old offset and the run dies with a syntax error that names no edit |
 | [suite-invalidated-by-a-commit-under-it](suite-invalidated-by-a-commit-under-it.md) | class | 1 |  | a suite that pins gov's revision at import and stamps fixtures from live HEAD is silently invalidated by any commit made while it runs, and the failures name the product |
+| [summary-rewrites-the-text-it-carries](summary-rewrites-the-text-it-carries.md) | class | 1 |  | a compaction summary that reproduces a block as verbatim quietly rewrites the lines that look wrong in it, so the defects the block carried read as fixed and the copy passes for the original |
 | [swallowed-delegate-reads-as-clean](swallowed-delegate-reads-as-clean.md) | class | 2 |  | a gate that discards its delegate's exit status reads a delegate that never ran as a clean population |
 | [sweep-issues-no-cost-verdict](sweep-issues-no-cost-verdict.md) | invariant | 1 |  | the self-test sweep never grades a suite's wall clock against its budget, and that is the ruling, not a gap |
 | [test-oracle-read-from-a-historical-sha](test-oracle-read-from-a-historical-sha.md) | class | 2 |  | a test compares its subject with a copy read out of git at a literal sha, so every later legitimate edit of the subject reds it and the fix is always "move the sha" |
@@ -155,6 +157,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 3 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-140 record(s): 137 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+142 record(s): 139 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

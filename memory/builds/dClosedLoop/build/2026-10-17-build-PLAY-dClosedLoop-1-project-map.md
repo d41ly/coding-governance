@@ -1049,6 +1049,7 @@ and, after it:
 - **The map came through the compaction.** The compaction's summary carried the level-0 map verbatim,
   though the last message before it had said it would not. The standing ask was followed anyway: the
   map was regenerated with `--out` and read whole.
+  Corrected 2026-10-17 in `[reload-summary]`: the summary rewrote 3 of the map's 355 lines.
 - **It matches the map read before the compaction**, but for its header, now at a clean tree, and one
   event, the test run's own session-log entry:
 
@@ -1460,3 +1461,158 @@ All four are structural, so none adds a policy key.
   columns.
 - **The generator keeps today's derivation until then.** Once the columns land, it reads them and
   infers nothing, and its owner check is seen red on a planted orphan.
+
+## [reload-summary] The summary was not verbatim, 2026-10-17
+
+`[reload]` says the compaction's summary carried the level-0 map verbatim. It did not.
+- **3 of its 355 lines were rewritten.** They are the three kits whose derived purposes were fragments,
+  and the summary replaced each with plausible text. The diff reads the summary from the session's own
+  transcript:
+
+```python
+"""Diff the level-0 map the compaction summary carried against the map file read before the compaction.
+
+Usage: python -I summary_map_diff.py <session.jsonl> <design-map-precompact.txt>
+
+The summary arrives as a user message that opens "This session is being continued". Its map is the fenced
+text block that starts with the map's header line, indented under a list item.
+"""
+import difflib
+import json
+import re
+import sys
+
+summary = None
+for line in open(sys.argv[1], encoding="utf-8"):
+    rec = json.loads(line)
+    if rec.get("type") != "user":
+        continue
+    content = rec.get("message", {}).get("content")
+    parts = [content] if isinstance(content, str) else [c.get("text", "") for c in content or [] if isinstance(c, dict)]
+    for text in parts:
+        if text.startswith("This session is being continued") and "map 8a10fcc8" in text:
+            summary = text
+if summary is None:
+    sys.exit("no summary carrying the map found")
+FENCE = "`" * 3  # spelled out, so this source can sit inside a record's fence
+m = re.search(FENCE + r"text\n( *)(map 8a10fcc8.*?)\n\1" + FENCE, summary, flags=re.S)
+if not m:
+    sys.exit("the summary's map block was not found")
+indent = len(m.group(1))
+carried = [ln[indent:] if ln.startswith(" " * indent) else ln for ln in m.group(2).split("\n")]
+filed = open(sys.argv[2], encoding="utf-8", newline="").read().replace("\r\n", "\n").rstrip("\n").split("\n")
+print(f"carried {len(carried)} lines · filed {len(filed)} lines")
+changed = [d for d in difflib.unified_diff(filed, carried, "filed", "carried", n=0, lineterm="")
+           if d[:1] in "+-" and not d.startswith(("+++", "---"))]
+print(f"differing lines {len(changed)}")
+for d in changed:
+    print(d)
+```
+
+```text
+$ python -X utf8 -I summary_map_diff.py <session.jsonl> design-map-precompact.txt
+carried 355 lines · filed 355 lines
+differing lines 6
+-- kit.drift-audit — harness's own meta.version to the same number.
++- kit.drift-audit — drift-audit kit
+-- kit.run-gates — agreement between a marker and a constant, and this repo ha…
++- kit.run-gates — run-gates kit
+-- kit.unattended — The binding contract is not here. It is UNATTENDED-PROTOCOL…
++- kit.unattended — The unattended-run kit
+```
+
+- **So the regeneration was no ritual.** It restored the map as derived, defects included, where the
+  summary had hidden them. A summary does not carry anything that must stay exact, and that is the
+  reason for the standing ask to regenerate after a compaction. The class is filed as
+  `summary-rewrites-the-text-it-carries`.
+- **The fragments were the generator's.** With no purpose in a README's title, it took the README's
+  first prose line:
+  - for drift-audit and run-gates, that line continued a sentence whose first line opens with a
+    backtick, which the pattern skips;
+  - for unattended, it was a disclaimer, "The binding contract is not here".
+
+  The generator now mines no prose. The three kits render as pending, so the level-0 pending count is 88
+  and the derived purposes are 243. PM-5's review derives theirs, citing its source.
+
+```text
+$ python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --out design-map.txt
+map: 2015 nodes in 30 namespaces; 23903 B of 32768 (no degrade); folded 14; unarmed record-kind
+map: purposes declared 1362, derived 243, pending 410
+map: wrote C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/projectmap/design-map.txt
+map: every check passes, and record-kind is registered with no extractor: unarmed, never green
+rc 2
+$ diff design-map-before-kitfix.txt design-map.txt
+1c1
+< map 21211c64 · nodes 2015 · lines 325 · folded item,policy-key,gap,leg,bug-class,closed-build,decision-row,design-record,review,decision-section,event,population,marker,conf-key · pending 85 · unarmed record-kind
+---
+> map 21211c64 dirty · nodes 2015 · lines 325 · folded item,policy-key,gap,leg,bug-class,closed-build,decision-row,design-record,review,decision-section,event,population,marker,conf-key · pending 88 · unarmed record-kind
+127c127
+< - kit.drift-audit — harness's own meta.version to the same number.
+---
+> - kit.drift-audit — —
+139c139
+< - kit.run-gates — agreement between a marker and a constant, and this repo ha…
+---
+> - kit.run-gates — —
+141c141
+< - kit.unattended — The binding contract is not here. It is UNATTENDED-PROTOCOL…
+---
+> - kit.unattended — —
+```
+
+- **The atlas step probe matched its own source.** The page embeds every record, and `[test-run-found]`
+  embeds the probe, so the probe's theme-block pattern matched itself as a fourth block, with no step
+  tokens, and reported eight findings against a page that drew every step. The probe now reads only the
+  page's style elements. The class is filed as `instrument-recorded-into-the-corpus-it-scans`.
+
+```python
+"""Check that a written atlas page can draw every step its data carries: a STEP_META badge and a colour token
+in each of the three theme blocks, and a stripe span per step. Exit 1 on any gap.
+
+Usage: python atlas_step_probe.py <page.html> [--drop-meta <tag>]
+--drop-meta removes one step's badge from a copy in memory, to see the probe red.
+"""
+import json
+import re
+import sys
+
+page = open(sys.argv[1], encoding="utf-8").read()
+if "--drop-meta" in sys.argv:
+    tag = sys.argv[sys.argv.index("--drop-meta") + 1]
+    page = re.sub(r",?\s*" + re.escape(tag) + r": \{ badge: '[^']*' \}", "", page, count=1)
+data = json.loads(page.split('<script id="atlas-data" type="application/json">', 1)[1].split("</script>", 1)[0])
+steps = [s["tag"] for s in data["steps"]]
+meta = re.search(r"var STEP_META = \{(.*?)\};", page, flags=re.S).group(1)
+badges = set(re.findall(r"([a-z]+): \{ badge:", meta))
+# Theme blocks are read from the page's <style> elements only: the page embeds every record, and the record
+# that carries this probe's source would otherwise match the pattern below as a fourth block.
+css = "\n".join(re.findall(r"<style[^>]*>(.*?)</style>", page, flags=re.S))
+blocks = re.findall(r"--l-entry:[^\n]*", css)
+stripe = re.search(r'<div class="stripe"[^>]*>(.*?)</div>', page).group(1).count("<span>")
+cols = re.search(r"\.stripe \{[^}]*repeat\((\d+), 1fr\)", page).group(1)
+bad = []
+for t in steps:
+    if t not in badges:
+        bad.append(f"{t}: no STEP_META badge")
+    for i, b in enumerate(blocks):
+        if f"--l-{t}:" not in b:
+            bad.append(f"{t}: no colour token in theme block {i + 1}")
+if stripe != len(steps) or int(cols) != len(steps):
+    bad.append(f"stripe: {stripe} spans in {cols} columns for {len(steps)} steps")
+print(f"steps {len(steps)} ({', '.join(steps)}); badges {len(badges)}; theme blocks {len(blocks)}; stripe {stripe} in {cols}")
+for b in bad:
+    print("FINDING", b)
+sys.exit(1 if bad else 0)
+```
+
+```text
+$ python atlas_step_probe.py closed-loop-atlas.html
+steps 9 (entry, plan, design, build, test, deploy, breakpoint, lifecycle, adopt); badges 9; theme blocks 3; stripe 9 in 9
+rc 0
+$ python atlas_step_probe.py closed-loop-atlas.html --drop-meta adopt
+steps 9 (entry, plan, design, build, test, deploy, breakpoint, lifecycle, adopt); badges 8; theme blocks 3; stripe 9 in 9
+FINDING adopt: no STEP_META badge
+rc 1
+```
+
+- **The atlas is at version 28**, republished after PM-8 to PM-11's fold.

@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 140 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 142 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -308,6 +308,7 @@ Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `inline-marker-breaks-a-line-continuation.md` | install-prefix |
 | `inputs-inside-the-subjects-reach.md` | unattended |
 | `insert-after-a-key-that-occurs-twice.md` | memory-tree-hygiene |
+| `instrument-recorded-into-the-corpus-it-scans.md` | build-method |
 | `invariant-held-on-one-admission-path.md` | run-gates-turnstile |
 | `join-key-widened-by-a-shared-location.md` | runlog |
 | `ledger-token-wrapped-across-a-line-joins-nothing.md` | memory-tree-hygiene |
@@ -363,6 +364,7 @@ Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `subprocess-resolves-a-different-shell.md` | baseline |
 | `suite-edited-while-bash-executes-it.md` | memory-tree-hygiene |
 | `suite-invalidated-by-a-commit-under-it.md` | run-gates |
+| `summary-rewrites-the-text-it-carries.md` | build-method |
 | `swallowed-delegate-reads-as-clean.md` | memory-tree-hygiene |
 | `sweep-issues-no-cost-verdict.md` | run-gates |
 | `test-oracle-read-from-a-historical-sha.md` | review-harnesses |
