@@ -476,8 +476,18 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     The PreToolUse entry repeats the comparison to refuse early and to journal. It decides nothing, so
     a PreToolUse crash below 2.1.295 opens no path.
   - **The decision, by binding.** An act session's gated call is approved on its binding and its
-    allowance. An attended or unbound session's gated call is approved once the guard packs pass, the
-    write gate included.
+    allowance. Who judges an attended or unbound session's gated call is `runtime.attended-judge`'s
+    (RT-4, 2026-10-17):
+    - **`classifier-or-person`, the default.** The session loads no ask rule. Its guard packs refuse
+      what they refuse, the write gate included, and auto mode's classifier or the person judges
+      every other call, as today.
+    - **`allowance`.** The session loads the ask rules. The dispatcher approves only a call inside
+      `runtime.attended-allowance`, and makes no decision on any other, so it goes to the person.
+    - **`person`.** The session loads the ask rules, and the dispatcher approves none. The person
+      answers every gated call, and an unbound headless session's gated calls are denied.
+    - **What the first text did.** It approved those calls once the guard packs passed. None of the
+      packs judges whether a command is dangerous, so nothing judged them (the folds' closing
+      review's H1).
   - **Inside an admitted script.** No hook sees `agent()` or a nested `workflow()`, so these are bound
     statically and reconciled afterwards:
     - each registered harness declares its spawn sites and its maximum fan, which agent-cap's script
@@ -592,12 +602,16 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   | stall-recorder | StopFailure | unattended | runtime: the limit signal |
 - **Failing closed, on every CLI version, with no floor** (RT-2, re-verified by dispatch 36):
   - **The permission baseline.** Under `runtime.hook-failure=closed`, every gated tool carries an ask
-    rule. The gated tools are Bash, PowerShell, Write, Edit, MultiEdit, NotebookEdit, Agent and
-    Workflow.
+    rule in every act session. The gated tools are Bash, PowerShell, Write, Edit, MultiEdit,
+    NotebookEdit, Agent and Workflow.
+    - **Where it lives.** The supervisor launches each act session with the baseline as an extra
+      settings source, so the baseline is never in tracked settings under
+      `runtime.attended-judge: classifier-or-person`. Under `allowance` or `person`, tracked
+      settings carry it for every session (RT-4).
     - Only the dispatcher's PermissionRequest entry answers the rule, with a JSON decision made by the
       session's binding (`[act]`).
-    - A dispatcher that cannot run leaves the call unapproved. In an act session the call is denied;
-      in an attended session it goes to the person.
+    - A dispatcher that cannot run leaves the call unapproved. In an act session the call is denied.
+      In an attended session under `allowance` or `person`, it goes to the person.
     - Dispatch 36 saw every burst failure class denied this way on 2.1.292, read-only commands
       included.
   - **One checking hook is the allow path.**
@@ -612,8 +626,14 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     - This repo's `.claude/settings.local.json` allows `Bash(git fetch *)` today.
   - **Auto mode stays, as the owner ruled** (TOOL-aMendedFleet-116).
     - The classifier still judges ungated tools.
-    - An ask rule resolves before the classifier, so the dispatcher decides gated tools instead, by
-      the session's binding.
+    - An ask rule resolves before the classifier, so in an act session the dispatcher decides gated
+      tools instead, by its binding.
+    - Under `runtime.attended-judge: classifier-or-person`, the default (RT-4), an attended session
+      loads no ask rule, so the classifier still judges its gated calls too.
+    - **What fails closed where.** Act sessions fail closed on every CLI version, through the
+      baseline. An attended session under the default fails closed where the CLI carries
+      `onFailure`, from 2.1.295. Below that, a crashed guard lets the call reach the classifier or the
+      person without that guard's check. The node registry's capability record says so per binary.
   - **The switch, where the CLI carries it.** Revised: 2026-10-17, the debt round's fold.
     - Under `runtime.hook-failure=closed`, settings-merge writes `onFailure: "block"` on every entry,
       since one tracked settings file serves every node.
@@ -857,7 +877,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | `persisted-returns` | No result exists only in memory: every return is persisted through `record` before its item counts as done. | `spike`, `returns` |
 | `no-model-context` | Neither the decider nor the supervisor holds model context. | by construction: both are programs |
 | `one-door` | Records change only through `record`, instructions only through the instruction command, and main only through the lander. | `coverage` |
-| `fail-closed` | Under `runtime.hook-failure=closed`, on every CLI version, a gated tool call in an act session runs only on the dispatcher's approval, since preflight refuses a launch whose settings allow a gated tool or add a second permission hook. Attended, either is warned about at session start. A dispatcher that cannot run leaves the call denied, or put to the person when attended. Where the CLI carries `onFailure`, every enforcement entry fails closed too. Every event that cannot fail closed has a witness with a named reader. A bypass or an exception is journaled and re-checked, as K1 and K4 set. Under `open`, the class check reports the policy in force on every run. | `fail-closed`, `git-witness` |
+| `fail-closed` | Under `runtime.hook-failure=closed`, on every CLI version, a gated tool call in an act session runs only on the dispatcher's approval, since preflight refuses a launch whose settings allow a gated tool or add a second permission hook. Attended, either is warned about at session start. A dispatcher that cannot run leaves the call denied in an act session. An attended or unbound session's gated calls are judged as `runtime.attended-judge` says: by default it loads no ask rule, and auto mode's classifier or the person judges each (RT-4). Where the CLI carries `onFailure`, every enforcement entry fails closed too. Every event that cannot fail closed has a witness with a named reader. A bypass or an exception is journaled and re-checked, as K1 and K4 set. Under `open`, the class check reports the policy in force on every run. | `fail-closed`, `git-witness` |
 | `no-skip` | No session the runtime launches skips permissions. | `no-skip` |
 | `policy-and-journal` | Every runtime behaviour is a policy key with a reader, and every runtime event is journaled. | `coverage` |
 | `grants-and-secrets` | An adapter acts only within the scopes it declared, its secret never leaves its process, and no push publishes a secret value; a journal is pruned past `runtime.journal`. | `grant`, `secret-scan`, `journal-retention` |
@@ -892,6 +912,8 @@ integrations because the grant they serve is Runtime's field.
 | `runtime.act-ceiling` | hours | 1.5 | 1.5 | 1.5 | 1.5 | 1.5 |
 | `runtime.hold-ceiling` | hours | 6 | 6 | 6 | 6 | 6 |
 | `runtime.hook-failure` | closed, open | closed | closed | closed | closed | closed |
+| `runtime.attended-judge` | classifier-or-person, allowance, person | classifier-or-person (RT-4) | classifier-or-person | classifier-or-person | classifier-or-person | classifier-or-person |
+| `runtime.attended-allowance` | a set of named tools and command patterns, read under `allowance` | none | none | none | none | none |
 | `runtime.harnesses` | a set of named harness adapters | claude-code | claude-code | claude-code | claude-code | claude-code |
 | `runtime.journal` | days, or all, bounded by v2's pair rule | 60 | 60 | 60 | 90 | 60 |
 | `runtime.secret-home` | os-keychain, env-injected | os-keychain | os-keychain | os-keychain | os-keychain | os-keychain |
@@ -1049,8 +1071,12 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   - on 2.1.292 in auto mode, with only the PreToolUse entry crashed (out of memory, and a missing path)
     and PermissionRequest healthy, an unnamed Workflow call and a stale-epoch call are each denied.
     It is seen red first against today's split, where PreToolUse alone binds;
-  - benign gated calls from an attended session and from an unbound one are approved without a
-    prompt;
+  - under `runtime.attended-judge: classifier-or-person`, an attended session loads no ask rule. A
+    planted `rm -rf` of a scratch path reaches auto mode's classifier or the person, and the
+    dispatcher never approves it. The arm is seen red first against the first text, under which the
+    dispatcher approved it once the guard packs passed (RT-4);
+  - under `allowance`, a call outside `runtime.attended-allowance` goes to the person. Under
+    `person`, every gated call does, and an unbound headless session's is denied;
   - declaration coverage is measured separately, over the main-session transcripts: every Workflow,
     Agent and Bash act, with hook-issued verbs excluded. It is seen red first on session b710e9c3's 17
     inline workflows, and its population is asserted non-empty.
@@ -1258,6 +1284,8 @@ is unchanged.
   above the derived floor, and on node d the desktop's 2.1.295 qualifies. The question is what happens
   on a node with no such binary. The provisional answer is refuse.
 - **RT-3.** dWellOiledMachine, and the chain edits in `[build]`.
+- **RT-4,** asked 2026-10-17 from the folds' closing review's H1: who judges an attended or unbound
+  session's gated calls (`build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews.md` `[answers]`).
 
 ## [answers] The owner's answers, 2026-10-15
 
@@ -1287,6 +1315,15 @@ is unchanged.
     `gap-found-06` and `gap-flow-10`.
   - dDeclaredLoop keeps the position function.
   - `[build]` holds the settled re-cut.
+- **RT-4,** 2026-10-17: "Classifier or you (Recommended)".
+  - `runtime.attended-judge` defaults to `classifier-or-person`. `allowance` and `person` are its
+    allowed values, and `runtime.attended-allowance` is the list `allowance` reads.
+  - Only act sessions load the permission baseline, as an extra settings source at launch.
+  - Attended sessions work as today: their guard packs refuse, and auto mode's classifier or the
+    person judges each gated call.
+  - The cost, as the option stated it: on a CLI older than 2.1.295, a crashed guard in an attended
+    session no longer blocks, so the call reaches the classifier without that guard's check.
+  - `[act]`, `[enforce]`, `[policies]` and `[tests]` carry it.
 
 **Revised 2026-10-16, after the expansion round's two reviews**
 (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-a.md` and `-b.md`): `[extend]`'s selecting

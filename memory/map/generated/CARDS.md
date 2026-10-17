@@ -46,10 +46,10 @@ The build method: how to spec, review and build, rendered from the memory-tree k
 - status `shipped` · streams `tooling` · dossier `memory/map/features/build-method.md`
 - decisions 1: `TOOL-aWrittenMethod-1`
 - gate-legs 3: `method carriers (every pointer declared)`, `method-carriers self-test`, `build-method size`
-- gotcha-classes 20: `fold-text-is-unreviewed-surface.md`, `amendment-leaves-its-other-half-standing.md`, `a-folded-field-leaves-its-row-shape-docs-behind.md`, `one-value-field-records-a-mixed-outcome.md`, `criterion-asserts-what-its-own-command-cannot-show.md`, `observation-before-the-last-fold-of-the-same-commit.md`, `hand-named-gate-list-green-while-the-bar-reds.md`, `route-names-an-output-its-actor-never-emits.md`, `owner-item-without-its-reject-outcome.md`, `policy-value-with-no-route.md`, `rate-quoted-without-its-denominator.md`, `core-depends-on-an-optional-part.md`
+- gotcha-classes 21: `fold-text-is-unreviewed-surface.md`, `amendment-leaves-its-other-half-standing.md`, `a-folded-field-leaves-its-row-shape-docs-behind.md`, `one-value-field-records-a-mixed-outcome.md`, `criterion-asserts-what-its-own-command-cannot-show.md`, `observation-before-the-last-fold-of-the-same-commit.md`, `hand-named-gate-list-green-while-the-bar-reds.md`, `route-names-an-output-its-actor-never-emits.md`, `owner-item-without-its-reject-outcome.md`, `policy-value-with-no-route.md`, `rate-quoted-without-its-denominator.md`, `core-depends-on-an-optional-part.md`
 - guides 1
 - globs 2
-- cut 11 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 12 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## build-readme-surface
 

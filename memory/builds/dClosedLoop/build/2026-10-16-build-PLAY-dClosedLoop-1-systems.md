@@ -510,7 +510,7 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   |---|---|---|
   | `memory.default-load` | card, card-and-live | card |
   | `memory.load-budget` | 4k, 8k, 16k | 8k |
-  | `memory.item-budget` | KB per role, a KB being 1,000 bytes, each role's the owner's to set | 96 for every role, 96,000 B (MS-2) (revised 2026-10-17, the audit's L5) |
+  | `memory.item-budget` | measured, 96 or 128 for every role, or KB per role, a KB being 1,000 bytes, each role's the owner's to set | measured: 96 for every role until 30 sliced work orders per role are measured, then each role's own p90 (MS-2, asked a third time; the unit revised 2026-10-17, the audit's L5) |
   | `memory.over-budget` | refuse, report, off | report (MS-3) |
   | `memory.legacy-anchors` | derived, none | derived |
   | `memory.superseded-slices` | refuse, mark | refuse |
@@ -545,6 +545,7 @@ The first four forks, answered in one round. Each answer is quoted verbatim.
 | MS-2 | the owner asked, verbatim: "Why was memory partitioned like that? Was there a reason for these caps?" | answered in `[ms2]` and asked again |
 | MS-2, asked again | "set a default cap of 96K per role, but owner-adjustable per role" | `memory.item-budget`: 96 KB for every role by default, and each role's cap is the owner's to adjust. What happens to a work order over its cap is asked as MS-3 |
 | MS-3 | "Report only" | `memory.over-budget` defaults to `report`: a work order over its role's cap is counted and reported, never refused |
+| MS-2, asked a third time, 2026-10-17, after the audit's H2 corrected its measure | "Measure, then set" | `memory.item-budget` defaults to `measured`. Every role reports against 96 KB until 30 sliced work orders per role are measured. Then each role's default is that role's own p90 over them, which the Loop Review derives. The owner can still set any role's cap, and `96` and `128` for every role are the other allowed values |
 
 - **AN-1, as designed.** The marker query in core memory-tree stays the path the core can always take
   (P28). The codebase map's lexer gains the annotation rows as part of its index: a shebang profile for
@@ -630,8 +631,11 @@ The first four forks, answered in one round. Each answer is quoted verbatim.
   - **31.7% of the 3,073 agents that read memory went over 96 KB,** 65.8% of builders and 7.0% of
     skeptics.
   - **What the figures are.** They are still today's whole-file habit, as above.
-  - **MS-2 goes back to the owner.** The owner chose 96 KB from a table whose every median sat under
-    it, so MS-2 is put to the owner again with these figures.
+  - **MS-2 went back to the owner.** The owner had chosen 96 KB from a table whose every median sat
+    under it, so MS-2 was put to the owner again with these figures.
+  - **The answer, 2026-10-17:** "Measure, then set". Every role reports against 96 KB until 30 sliced work
+    orders per role are measured, and then each role's default is that role's own p90 over them
+    (`[answers]`).
 
 ### [ms2-instrument] The per-role probe and its output
 

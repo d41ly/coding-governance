@@ -31,6 +31,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [allocation-knob-without-a-ceiling](allocation-knob-without-a-ceiling.md) | class | 3 |  | a knob that sizes an allocation or a loop, validated only as a positive integer, hangs the process on a mistyped value before anything it guards runs |
 | [allowlist-narrower-than-the-root-it-guards](allowlist-narrower-than-the-root-it-guards.md) | class | 7 |  | a guard keyed on a path prefix denies the sanctioned destination too, because on this platform the sanctioned destination is INSIDE the prefix |
 | [amendment-leaves-its-other-half-standing](amendment-leaves-its-other-half-standing.md) | class | 3 |  | a criterion is amended and the clause, scope item or log line that only made sense under the old wording is left behind, so one rule now returns two verdicts |
+| [an-allow-that-bypasses-a-judge-names-none](an-allow-that-bypasses-a-judge-names-none.md) | class | 2 |  | a permission hook answers allow on calls that a judge, a classifier or a person, would otherwise have seen, and names no judge in its place, so a destructive call runs with nothing judging it |
 | [anchor-literal-resolves-above-its-target](anchor-literal-resolves-above-its-target.md) | class | 1 |  | a check that locates code by searching its own source for a literal finds an earlier occurrence inside a docstring or a string constant, so the comparison it anchors is made against the wrong place and reds on a correct file |
 | [append-without-an-idempotence-key](append-without-an-idempotence-key.md) | class | 4 |  | a command that appends to an append-only record declares no key, so a retried run writes the same row twice and a set-join witness stays green |
 | [arm-literal-strands-on-message-edit](arm-literal-strands-on-message-edit.md) | class | 5 |  | editing a fail message strands its arm silently — the branch stays armed-looking, the count drops by one, and only the arms gate notices |
@@ -153,6 +154,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 3 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-138 record(s): 135 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+139 record(s): 136 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

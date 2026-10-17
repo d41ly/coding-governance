@@ -164,3 +164,22 @@ from the ledger, beside the class this fold assigns:
   - `predicate-designed-without-a-run-over-the-tree`, which four items share;
   - `path-keyed-row-strands-on-a-rename`.
 - **The fold is unreviewed text,** like every fold before it.
+
+## [answers] The owner's answers, 2026-10-17
+
+Both were asked in one round, through the question tool. Each question is quoted as asked, and each
+answer verbatim.
+
+| Fork | The question | The owner's answer | What it settles |
+|---|---|---|---|
+| RT-4 | RT-4 (review 85's high): as designed, an attended or unbound session's gated calls (Bash, PowerShell, Write, Edit, Agent, Workflow) are approved as soon as gov's guard packs pass. Nothing then judges a destructive command: the ask rule keeps auto mode's classifier away, and you're never asked. Which should be the default? The other options become allowed values of the key. | "Classifier or you (Recommended)" | `runtime.attended-judge` defaults to `classifier-or-person`, with `allowance` and `person` its allowed values and `runtime.attended-allowance` the list `allowance` reads. Only act sessions load the permission baseline. Attended sessions keep auto mode's classifier or the person as their judge (layer-runtime `[answers]`) |
+| MS-2, asked a third time | MS-2, again: the measure behind your 96K-per-role cap counted only Read calls. Shell reads carry 59.5% of memory bytes, and counting them puts three roles' medians over 96K: builder 124 KB, spec reviewer 114 KB, spec writer 110 KB. Overall, 31.7% of agents that read memory exceed it (65.8% of builders). These figures are today's whole-file reads, while the design hands out sections, and MS-3 only reports. What should the default be? | "Measure, then set" | `memory.item-budget` defaults to `measured`: 96 KB for every role until 30 sliced work orders per role are measured, then each role's own p90, which the Loop Review derives. The owner can still set any role's cap (systems `[answers]`) |
+
+- **The offered options.** RT-4 offered "Classifier or you (Recommended)", "Attended allowance" and
+  "You decide each". MS-2 offered "Keep 96K per role (Recommended)", "128K per role" and "Measure, then
+  set". The owner chose the recommendation for RT-4, and against it for MS-2.
+- **Each answer is a policy.** The answer is the default, and the offered options are the allowed
+  values. Both keys keep the owner's answer in every preset.
+- **H1 is resolved.** Dispatch 85's H1, which `[fold-debt-folds]` held as a fork, is folded with RT-4.
+  Its left-shift is the `binding` fixture's planted arm and the class
+  `an-allow-that-bypasses-a-judge-names-none`.

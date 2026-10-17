@@ -1760,6 +1760,12 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   new bug classes. H2's corrected measure puts MS-2 back to the owner, beside dispatch 85's RT-4. The
   role matrix's instrument now reads flow-steps' new `[adopt]` group, 81 items clean.
 
+- 2026-10-17, session 1799cb98: the owner answered RT-4, verbatim, "Classifier or you (Recommended)", and MS-2, asked a
+  third time, "Measure, then set" (`build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews.md` `[answers]`).
+  `runtime.attended-judge` joins v2's catalogue and every preset, and only act sessions load the
+  permission baseline. `memory.item-budget` defaults to `measured`. Dispatch 85's H1 is folded, and its
+  class, an-allow-that-bypasses-a-judge-names-none, joins the build-method dossier.
+
 ## Instruments
 
 ### The gap-ownership join
