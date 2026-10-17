@@ -1786,6 +1786,11 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   core memory, about 13 to 14 KB today, and both re-rate the audit's sort, agreeing on 49 and 50 of its
   52. Forks PM-4 to PM-7 go to the owner.
 
+- 2026-10-17, session 1799cb98: the owner answered PM-4 to PM-7, verbatim: "32k"; "Required for new nodes, review all the existing nodes and either derive from available information or consult with the owner";
+  "Item-declared (Recommended)"; and "Card and map (Recommended)" (`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md` `[answers-design]`). Six keys land in v2's catalogue
+  and every preset, nine chain rows gain the map's units, and `gap-mem-26`, `gap-mem-27` and
+  `gap-orient-15` join the register.
+
 ## Instruments
 
 ### The gap-ownership join

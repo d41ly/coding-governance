@@ -468,6 +468,8 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   the slices under the item's byte budget and writes a slice manifest. A read outside it, through Read,
   a shell command or `record show`, is journaled and counted (revised 2026-10-17, the audit's H2).
 - **Default load.** The charter and the card, the card at most 8 KB.
+  - **An attended session also opens with the map** (PM-7, `build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md`): the level-0 project map, at
+    most `memory.map-budget`. An act session loads its work order.
   - **The harness's auto-memory,** as MS-1 settles, is promoted, and what remains is held to
     `memory.load-budget` too. The card and the auto-memory's remainder each get the budget, not a
     share of it.
@@ -508,7 +510,7 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 
   | Key | Values | Default |
   |---|---|---|
-  | `memory.default-load` | card, card-and-live | card |
+  | `memory.default-load` | card, card-and-live, card-and-map | card-and-map for attended sessions (PM-7) |
   | `memory.load-budget` | 4k, 8k, 16k | 8k |
   | `memory.item-budget` | measured, 96 or 128 for every role, or KB per role, a KB being 1,000 bytes, each role's the owner's to set | measured: 96 for every role until 30 sliced work orders per role are measured, then each role's own p90 (MS-2, asked a third time; the unit revised 2026-10-17, the audit's L5) |
   | `memory.over-budget` | refuse, report, off | report (MS-3) |

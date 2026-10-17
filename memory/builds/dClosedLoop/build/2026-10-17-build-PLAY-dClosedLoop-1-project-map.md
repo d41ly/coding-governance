@@ -609,7 +609,7 @@ header := "map " <tree-id> " · nodes " <int> " · lines " <int> " · folded " <
 | the spec writer, at `design.unit-spec` and `review.fold` | the map |
 | the reviewer, at `review.lens` under the coherence and reuse lenses | the map |
 | unit workers: the builder, the tester and the rest | no map. They get their slice and the `refs` rows of their write set. A `gov map` call from one is journaled as a read outside its slice |
-| the attended main session | as fork PM-7 decides |
+| an attended session | the card and the whole map when it opens, under `memory.default-load: card-and-map` (PM-7) |
 
 - **The slot.** dBoundRoles declares the `map` slot in the work order, beside `reuse`
   (`tools/roles/handoff.py:97`), and dTotalRecall's renderer fills it. The slot is hashed with the
@@ -640,8 +640,15 @@ today, the map reads it. Where none exists, the namespace's owning build adds on
 | tag namespace, policy namespace, gap area | none | `purpose` on the namespace row, dOrderedCharter; the policy namespace's dDeclaredLoop's, the gap area's dTotalRecall's |
 | design record | its H1 | declared |
 
-- **A node with no purpose** renders `—` and joins a shrink-only ledger population of purposeless
-  nodes. Each owning build drains that population, as `memory.map-purpose` says (fork PM-5).
+- **A node with no purpose,** under `memory.map-purpose: review` (PM-5):
+  - A new node must declare one. Its registration refuses it otherwise.
+  - Each existing node is reviewed by the unit that adds its namespace's purpose field. The unit
+    derives the purpose from what the node already carries: its README or H1, its docstring or header
+    comment, its doc field, or the record that introduced it. It cites that source in its own
+    record.
+  - A node that carries nothing to derive from is put to the owner, in one ask per namespace that
+    lists each such node with what was found.
+  - Until the owner answers, the node renders `—`, and the header counts it as pending.
 - **Builds after dTotalRecall.** A namespace whose owning build lands after dTotalRecall, kits and
   hooks among them, renders `—` until then. No chain edge is added for it.
 
@@ -693,19 +700,18 @@ today, the map reads it. Where none exists, the namespace's owning build adds on
 | dWitnessedBar | the leg's purpose field |
 | dWellOiledMachine | the hook and point purposes, and the journal's count of map reads outside a slice |
 | dShippedRelease | the kit factory's purpose field, and `kit.toml` for govkit and lib |
-| dFairHearing | the cause `review.dispose` computes |
-| dCalibratedLens | the Loop Review's reading of the not-in-view share |
+| dCalibratedLens | the not-in-view cause `review.dispose` computes from the author's slice manifest and the map, and the Loop Review's reading of its share. It descends from dTotalRecall and dBoundRoles, which produce both inputs; dFairHearing, at the chain's root, does not |
 
 ### [keys] Keys
 
 | Key | Values | Default |
 |---|---|---|
 | `memory.project-map` | structural-roles, every-role, owner-only | structural-roles (PM-1) |
-| `memory.map-budget` | 16k, 24k, 32k | as PM-4 settles |
+| `memory.map-budget` | 16k, 24k, 32k | 32k (PM-4) |
 | `memory.map-overflow` | degrade, refuse | degrade |
-| `memory.map-unfold` | item-declared, none, all | as PM-6 settles |
-| `memory.map-purpose` | required, report, off | as PM-5 settles |
-| `memory.default-load` | card, card-and-live, and `card-and-map` added | as PM-7 settles, for attended sessions |
+| `memory.map-unfold` | item-declared, none, all | item-declared (PM-6) |
+| `memory.map-purpose` | review, ledger, derive, refuse | review (PM-5) |
+| `memory.default-load` | card, card-and-live, card-and-map | card-and-map (PM-7), read by an attended session; an act session loads its work order |
 
 ## [forks-design] The design's forks, to put to the owner
 
@@ -832,3 +838,23 @@ rows read: 19; rows the predicate matched and checked: 18; exempt, their crediti
 findings: 1
 exit 1
 ```
+
+## [answers-design] The owner's answers to PM-4 to PM-7, 2026-10-17
+
+The four forks were asked in one round, through the question tool. Each answer is quoted verbatim.
+
+| Fork | The owner's answer | What it settles |
+|---|---|---|
+| PM-4 | "32k" | `memory.map-budget` defaults to 32k, against the recommended 24k. The map rarely folds, and a structural spawn pays up to 32 KB for it |
+| PM-5 | "Required for new nodes, review all the existing nodes and either derive from available information or consult with the owner" | `memory.map-purpose` defaults to `review`. A new node must declare a purpose. Each existing node is reviewed when its namespace's purpose field lands: its purpose is derived from what it already carries, or the owner is consulted (`[purpose]`). `ledger`, `derive` and `refuse` are the offered options, kept as allowed values |
+| PM-6 | "Item-declared (Recommended)" | `memory.map-unfold` defaults to `item-declared`. An item declares the namespaces it unfolds, and `gov map <ns>` pulls any other |
+| PM-7 | "Card and map (Recommended)" | `memory.default-load` gains `card-and-map` and defaults to it for attended sessions. A session opens with the card and the whole map, about 19 KB more. An act session still loads its work order, as PM-1 says |
+
+- **Against the recommendation.** PM-4 went against it.
+- **In the owner's own words.** PM-5 is a value the owner wrote: required for new nodes, as
+  recommended, with an active review of the existing nodes in place of the recommended passive
+  ledger.
+- **Each answer is a policy.** The answer is the default, and the offered options are the allowed
+  values. All four keys keep the owner's answer in every preset.
+- **Registered.** The three gaps of `[gaps-proposed]` are `gap-mem-26`, `gap-mem-27` and
+  `gap-orient-15`.

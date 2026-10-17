@@ -745,7 +745,7 @@ Revised 2026-10-17 by the owner's PM-1 (`build/2026-10-17-build-PLAY-dClosedLoop
 `[answers]`). One view is handed to agents: the level-0 project map, derived in core memory (PM-2).
 The orientation scout composes the card from it. Planners, architects, spec writers and the coherence
 and reuse lenses get it in their work orders, and unit workers keep their slice. Its design follows
-the round PM-3 opened. Under
+the round PM-3 opened. Revised again by PM-7: an attended session opens with the card and the map. Under
 `builds.agent-root=readme`, the executor hands each agent the README's routing region as its work
 order's root field, never the file.
 

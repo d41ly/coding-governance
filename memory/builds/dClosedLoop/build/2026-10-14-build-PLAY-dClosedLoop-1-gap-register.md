@@ -118,6 +118,7 @@ extends.
 | gap-orient-12 | Orient | HIGH | A resume delivered no card: in this session the resume hooks printed only the process and wiring checks, though the replay is wired for resume; the cause is unknown. Raised by the owner. | orientation research, preserve (this session's transcript, the resume at 16:21:01Z) | — |
 | gap-orient-13 | Orient | MED | The card never reaches the charter's instruction slot: hook output lands as a reminder at the hook point, subagents (`omitClaudeMd: true`) get only the route, and another harness gets nothing. Raised by the owner. | orientation research, preserve; `tools/roles/render_agents.py:132`; https://code.claude.com/docs/en/hooks | — |
 | gap-orient-14 | Orient | HIGH | Compaction is ungoverned: nothing persists an item's work in flight before an automatic compaction; the card the compact hook re-injects is the kickoff's, written once and never updated as the build progresses, so it points at none of the records made since; nothing sets what a session does as its window fills; and the summary is read as a source. In this session the summary alone carried 34 of the 55 facts that survived, 1 of 7 identifiers and 1 of 9 measured numbers came back, and the summary misstated one fact about the session. Raised by the owner. | compaction experiment, results (`build/2026-10-15-build-PLAY-dClosedLoop-1-compaction-results.md`); this session's compact hook output | — |
+| gap-orient-15 | Orient | MED | The orientation scout the design relies on has never run: 0 of 3,283 recorded subagents is a gov-orienter, and a command writes today's card. | the project-map round's `[gaps-proposed]` (`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md`) | — |
 | gap-roles-01 | Roles | HIGH | Most checklist items have no role: of 70 items across the steps, 11 are performed by a role, 18 by the main session, 9 by a command and 32 by nobody; no role exists for planning, feature design, testing, deployment, maintenance or the Plan, Test, Deploy and Loop reviews. Raised by the owner. | roles research, coverage | — |
 | gap-roles-02 | Roles | HIGH | The main session performs role functions: in 60 days it wrote or edited specs 605 times, product code 565 times, folded review findings 367 times, and wrote plans 336 times and task briefs 74 times. Raised by the owner. | roles research, coverage P2 and P5 | — |
 | gap-roles-03 | Roles | HIGH | Role limits are prose: 58 of the 59 prohibitions in role bodies name no enforcer, `writes` is a class rather than an allowance, and shell writes escape every role gate (85 from the main session and 66 from typed roles since the role arm landed). Raised by the owner. | roles research, anatomy probe 3, coverage P4 | — |
@@ -163,6 +164,8 @@ extends.
 | gap-mem-23 | Memory | MED | The map's touch-drop is wired to nothing: `--drop-affordance-exempt` has no caller in `tools/`, `.claude/`, `.github/` or `.githooks/`, and `WIRE-INTO-PROJECT.md:554` calls the drop mechanical. | the retrofit round's `[gaps-proposed]` (`build/2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md`) | — |
 | gap-mem-24 | Memory | MED | Nothing takes a census of a repository's own practices, and no cell shows the retrofit's progress. | the retrofit round's `[gaps-proposed]` (`build/2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md`) | — |
 | gap-mem-25 | Memory | LOW | Records carry no origin, so a reconstructed record reads as written. | the retrofit round's `[gaps-proposed]` (`build/2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md`) | — |
+| gap-mem-26 | Memory | HIGH | No whole-project view reaches an agent: 37 of 52 items of the systems and retrofit audit, and 30 of 39 in two more reviews, needed a piece their author did not have in view, and `MAP.md` and `CARDS.md` reach no agent (`research-project-map-a.md:203`, `research-project-map-b.md:233`). | the project-map round's `[gaps-proposed]` (`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md`) | — |
+| gap-mem-27 | Memory | MED | Nodes carry no declared purpose: kits, legs, hooks, points, record kinds and the tag and policy namespaces have no purpose field, and govkit and lib carry no `kit.toml`. | the project-map round's `[gaps-proposed]` (`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md`) | — |
 | gap-tool-01 | Tooling | MED | Gate legs are declared twice: 81 of 140 legs exist only in `tools/gate-legs.json`, beside 67 `[[gate_leg]]` rows in kit packs. | layer review, memory, `[tools]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-tooling.md` | — |
 | gap-tool-02 | Tooling | MED | Wiring is judged three ways (check-wiring, eleven `adopt-*.sh --check` legs, `govkit check`) and version lockstep five ways (check-kit-versions, check-placeholders, `govkit epoch`, check-verdict-epoch, and govkit selfcheck's arm 5c at `tools/govkit/govkit.py:2162`, the expansion round's review). All 11 `[check]` argvs also duplicate their own gate legs (the expansion round). | layer review, memory, `[tools]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-tooling.md` | — |
 | gap-tool-03 | Tooling | MED | The hook surface spans five kits: hooks, unattended (three hooks), process-monitor and memory-recall each wire their own entries in `.claude/settings.json`. | layer review, memory, `[tools]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-tooling.md` | — |
@@ -526,4 +529,13 @@ same instrument. A join of these 219 keys against v2's chain rows finds each own
 ```text
 Roles=20 Deploy=13 Plan=7 Spine=10 Orient=14 Test=17 Runtime=21 Lexicon=9 Tooling=7 Review=13 Foundation=23 Build=5 Memory=24 Flow=15 Maintain=11 Design=10
 LOW=33 MED=100 HIGH=86
+```
+
+Re-measured after the project-map round added three gaps, `gap-mem-26`, `gap-mem-27` and `gap-orient-15`
+(`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md`), same instrument. A join of these 222 keys against v2's chain rows finds each owned by exactly one
+build:
+
+```text
+Roles=20 Deploy=13 Plan=7 Spine=10 Orient=15 Test=17 Runtime=21 Lexicon=9 Tooling=7 Review=13 Foundation=23 Build=5 Memory=26 Flow=15 Maintain=11 Design=10
+LOW=33 MED=102 HIGH=87
 ```
