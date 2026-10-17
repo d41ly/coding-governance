@@ -1621,6 +1621,11 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   dated corrections. Its `[debt-fold]` names where each of the 52 map rows went. Three fixes in v2's
   dMindYourWords row and the register's gap-lex rows wait until review 72 returns.
 
+- 2026-10-17, session 1799cb98: the review-system pair is folded. The record's `[lenses]`,
+  `[adjudication]` and `[where]` are amended in place, with RV-1 applied, and its current, stale, gap and
+  answer sections take dated notes. Its `[debt-fold]` names where each of the 38 map rows went. Four fixes
+  in v2 and flow-steps wait until review 72 returns.
+
 ## Instruments
 
 ### The gap-ownership join
