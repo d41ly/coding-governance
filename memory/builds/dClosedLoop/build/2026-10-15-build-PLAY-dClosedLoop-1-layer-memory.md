@@ -739,7 +739,13 @@ Every view the owner reads is generated from records, never authored state:
   `[research-view]`, 2026-10-16).
 
 Agents never read a view to work: their work orders hand them fields. The orientation scout is the
-one exception, reading the README, the owner's root, to compose the card. Under
+one exception, reading the README, the owner's root, to compose the card.
+
+Revised 2026-10-17 by the owner's PM-1 (`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md`
+`[answers]`). One view is handed to agents: the level-0 project map, derived in core memory (PM-2).
+The orientation scout composes the card from it. Planners, architects, spec writers and the coherence
+and reuse lenses get it in their work orders, and unit workers keep their slice. Its design follows
+the round PM-3 opened. Under
 `builds.agent-root=readme`, the executor hands each agent the README's routing region as its work
 order's root field, never the file.
 

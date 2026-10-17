@@ -373,6 +373,14 @@ Revised: 2026-10-17, after the owner's RT-4 and MS-2, asked a third time
   are measured, then each role's own p90;
 - both keep the owner's answer in every preset, as `review.twin` and `memory.over-budget` do.
 
+Revised: 2026-10-17, after the owner's PM-1 to PM-3
+(`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md` `[answers]`):
+- a seventh system, the level-0 project map, is derived in core memory from the one index (PM-2);
+- the roles that change structure receive it, and unit workers keep their slice (PM-1). That amends
+  layer-memory `[views]`;
+- its keys, `memory.project-map` among them, join the catalogue at its design's fold, after the
+  research PM-3 opened.
+
 Revised: 2026-10-17, after the folds' closing review (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`):
 - dTotalRecall's row gains the shared extraction primitive, the research-return backfill and the
   `adopt` program, whose keys had no reader on any row;

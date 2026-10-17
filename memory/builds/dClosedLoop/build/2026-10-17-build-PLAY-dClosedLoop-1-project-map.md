@@ -388,3 +388,99 @@ all                 176 nodes   10411 B
 | PM-1 | Who sees the whole project at once? | the orienting and structural roles: the orientation scout composes the card from the map, and planners, architects, spec writers and the coherence and reuse lenses get it in their work orders, while unit workers keep their slice; every agent; the owner only, as today |
 | PM-2 | Where does the level-0 map live? | core memory, derived from the one index over every registered namespace, with the codebase map adding code depth where it is installed; the codebase map, so there is no map where the kit is absent |
 | PM-3 | How is it designed? | as a seventh system, with two research runs like the other six; directly from this record; not now |
+
+## [answers] The owner's answers, 2026-10-17
+
+The three forks were asked in one round, through the question tool. Each answer is quoted verbatim.
+
+| Fork | The owner's answer | What it settles |
+|---|---|---|
+| PM-1 | "Structural roles (Recommended)" | a policy, `memory.project-map`: by default the orientation scout composes the card from the map, and planners, architects, spec writers and the coherence and reuse lenses get it in their work orders, while unit workers keep their slice and `refs`. `every-role` and `owner-only` are its other allowed values |
+| PM-2 | "Core memory (Recommended)" | the core derives the map from the one index over every registered namespace. The codebase map adds code depth where it is installed |
+| PM-3 | "Research twice, then design (Recommended)" | a seventh system round: one handoff run twice, then the design and its forks |
+
+- **What PM-1 amends.** It amends layer-memory `[views]`' rule that agents never read a view. The view
+  is the map, and only the roles PM-1 names receive it.
+- **When the key lands.** It joins v2's catalogue at the design's fold, with the budget and tier keys
+  the design adds.
+
+## [research] Dispatched, 2026-10-17
+
+- **The method** is the retrofit round's. One handoff, `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-2-researcher.md`, runs twice at the researcher's
+  declared effort, medium, as dispatches 87 and 88. The design is based on what the two runs agree on.
+- **The handoff** shares the systems round's handed facts, way of working and return shape. It differs
+  in three places:
+  - its context, which quotes the owner's words above;
+  - its part, which hands PM-1 and PM-2 as settled, asks the researcher to re-sort two other reviews'
+    items as a second rater of `[sort]`, and asks for the map's losing test;
+  - the return shape's third section, which asks across the six systems.
+
+  The script below assembles it, `handoff.py render` renders it, and `handoff.py check` passes it.
+- **The returns** are filed verbatim as `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-<run>.md`.
+
+### [instrument] The script that assembles the question
+
+```python
+"""Assemble the project map's research question from the systems round's shared blocks and its own part, for
+the system the owner opened on 2026-10-17, then render and check its handoff.
+
+Usage: python assemble_project_map.py <dir> <systems-dir>   (from the worktree root)
+Writes <dir>/question-project-map.md, renders the handoff with handoff.py into the build's prompts/
+folder, writes the spawn prompt (the marker line, a blank line and the Task section) to <dir>/prompt-28.txt,
+and runs handoff.py check on the rendered file. The handed facts, the way of working and the return shape
+are the systems round's, so this question differs from the retrofit's only in its context, its part, and
+the return shape's third section, which asks across the six systems.
+"""
+import pathlib
+import subprocess
+import sys
+
+d, sysd = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+head = (sysd / "head-expansions.md").read_text(encoding="utf-8").rstrip("\n") + "\n" + \
+    (sysd / "head-more.md").read_text(encoding="utf-8")
+tail = (sysd / "shared-tail.md").read_text(encoding="utf-8")
+old = "   it; then what it needs from, and gives to, the other four systems.\n"
+if tail.count(old) != 1:
+    sys.exit("the return shape's third section has moved")
+tail = tail.replace(old, "   it; then what it needs from, and gives to, each of the six systems the rounds designed.\n")
+CONTEXT = (
+    "**Context.** dClosedLoop re-architects gov (coding-governance) onto one loop for agentic development.\n"
+    "The owner reviews the design layer by layer. All eight layers, the five core and the three expansions,\n"
+    "are designed, reviewed and folded. Six systems that cut across every layer were then researched,\n"
+    "designed, audited and folded: tags, code annotations, instruction writing, role workflow shapes, memory\n"
+    "structure, and retrofitting gov's practices into an existing repository. The owner now asks, in these\n"
+    "words:\n\n"
+    "> Now that even this plan has grown to a substantial size, how do you stay oriented in the entirety of\n"
+    "> it at high level (to make sure no piece of it is lost at a glance)? As in, when a session is opened,\n"
+    "> as a question is asked, do you have an overview of the ENTIRE design, then dig deeper into specific\n"
+    "> parts of it? Previously, codebase map tool was supposed to do exactly that - allow an agent to load\n"
+    "> the entire project at a high level, so no piece of it is left out. After, an agent would dig deeper\n"
+    "> into the parts it needs and still be able to find all relations at any point. Is this even needed?\n"
+    "> Feels like an essential piece to memory layer.\n\n"
+    "The owner then settled PM-1 and PM-2, handed below, and asked for this system to be researched twice,\n"
+    "then designed. Yours is **the level-0 project map**. Design it to fit the architecture handed below,\n"
+    "across all eight layers and the six systems. Measure what today's product does, say what the current\n"
+    "design already settles and what it lacks, and say what makes your pick efficient, in numbers a check\n"
+    "could hold it to.\n")
+part = (d / "part-project-map.md").read_text(encoding="utf-8")
+text = "\n".join([CONTEXT, head, part, tail]).rstrip("\n") + "\n"
+if "\r" in text:
+    sys.exit("a carriage return reached the question")
+(d / "question-project-map.md").write_text(text, encoding="utf-8", newline="\n")
+print(f"question-project-map.md: {len(text.split())} words, {len(text.encode('utf-8'))} bytes")
+
+r = subprocess.run([sys.executable, "tools/roles/handoff.py", "render", "--role", "gov-researcher",
+                    "--build", "dClosedLoop", "--unit", "PLAY-dClosedLoop-1", "--input", "question=" + text,
+                    "--part", "task"], capture_output=True)
+sys.stderr.write(r.stderr.decode("utf-8"))
+if r.returncode:
+    sys.exit(f"render exited {r.returncode}")
+task = r.stdout.decode("utf-8")
+(d / "prompt-28.txt").write_bytes(task.encode("utf-8"))
+marker = task.split("\n", 1)[0]
+path = marker.split(" path=", 1)[1].split(" ", 1)[0]
+print(f"rendered {path}")
+c = subprocess.run([sys.executable, "tools/roles/handoff.py", "check", path], capture_output=True)
+print(c.stdout.decode("utf-8") + c.stderr.decode("utf-8"), end="")
+sys.exit(c.returncode)
+```
