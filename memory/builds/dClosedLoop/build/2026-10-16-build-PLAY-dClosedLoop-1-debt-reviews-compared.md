@@ -283,19 +283,19 @@ refuted finding sits on the defect its claim names, beside its confirmed twin wh
 
 | defect | what | A | B | disposition |
 |---|---|---|---|---|
-| `claim-unreachable-from-triage` | `entry.claim` lists triage's select among its needs, and no route reaches it from triage, whose records are written before any claim | 2 | 7 | amend |
-| `publish-failed-no-arm` | `deploy.core` reads the verdict from the per-SHA log and routes green, red and REFUSED, and a failed publication prints none of the three there, while `refs/gov/bar-red` is not always published | 1, 7 | 2, 11, 17 | amend |
-| `held-leg-no-release` | the held-flaky-leg ask's acceptance names a consecutive-green count nothing produces, and no item lifts the hold when it is met | 4, 11 | 12, 18 | amend |
-| `flake-record-two-writers` | the runner and the `test.flakes` command are both named writers of the flake record | 13 | 5 | amend |
-| `parser-indented-rows` | `role_matrix.py`'s widened arm 0 still drops an indented or pipe-less row, and its body-row count shrinks with it | 5, 15 | 1, 14, 16 | amend |
-| `ask-claim-create-once` | the per-family ask claim ref is created once, so it serialises only a family's first ask | 3, 10 | — | amend |
-| `ask-lock-narrowed` | the ask mint lock covers only `entry.place`'s asks, while the owner, a surfaced idea, an expansion and the supervisor also file outside a build | — | 9 | amend |
-| `claim-no-idempotence-key` | `entry.claim` declares no key that lets a retry recognise its own claim | — | 8 | amend |
-| `claim-prune-two-ways` | a slug's claim ref is never pruned in memory, and the runtime supervisor prunes terminal claim refs with no namespace limit | 9 | — | amend |
-| `flakes-duplicate-ask` | under `quarantine`, `test.flakes` files the held-leg ask on every flake past the threshold, with no idempotence key | 12 | — | amend |
-| `removal-pending-no-filer` | a `removal-pending` entry waits on a patch build that no item files | 14 | 13 | amend |
-| `land-outcome-overlap` | `deploy.land`'s "landed ungated" and "nothing pushed" both hold on a no-op push, and its sources cannot tell them apart | 8 | 4 | amend |
-| `gaps-registered-list` | "the gaps registered" lists two new gaps after the follow-up round, and v2, the register and the record's own L4 row name a third, gap-mem-14 | — | 6, 15 | amend |
+| `claim-unreachable-from-triage` | `entry.claim` lists triage's select among its needs, and no route reaches it from triage, whose records are written before any claim | 2 | 7 | amend; `[fold-fold-round3]` |
+| `publish-failed-no-arm` | `deploy.core` reads the verdict from the per-SHA log and routes green, red and REFUSED, and a failed publication prints none of the three there, while `refs/gov/bar-red` is not always published | 1, 7 | 2, 11, 17 | amend; `[fold-fold-round3]` |
+| `held-leg-no-release` | the held-flaky-leg ask's acceptance names a consecutive-green count nothing produces, and no item lifts the hold when it is met | 4, 11 | 12, 18 | amend; `[fold-fold-round3]` |
+| `flake-record-two-writers` | the runner and the `test.flakes` command are both named writers of the flake record | 13 | 5 | amend; `[fold-fold-round3]` |
+| `parser-indented-rows` | `role_matrix.py`'s widened arm 0 still drops an indented or pipe-less row, and its body-row count shrinks with it | 5, 15 | 1, 14, 16 | amend; `[fold-fold-round3]` |
+| `ask-claim-create-once` | the per-family ask claim ref is created once, so it serialises only a family's first ask | 3, 10 | — | amend; `[fold-fold-round3]` |
+| `ask-lock-narrowed` | the ask mint lock covers only `entry.place`'s asks, while the owner, a surfaced idea, an expansion and the supervisor also file outside a build | — | 9 | amend; `[fold-fold-round3]` |
+| `claim-no-idempotence-key` | `entry.claim` declares no key that lets a retry recognise its own claim | — | 8 | amend; `[fold-fold-round3]` |
+| `claim-prune-two-ways` | a slug's claim ref is never pruned in memory, and the runtime supervisor prunes terminal claim refs with no namespace limit | 9 | — | amend; `[fold-fold-round3]` |
+| `flakes-duplicate-ask` | under `quarantine`, `test.flakes` files the held-leg ask on every flake past the threshold, with no idempotence key | 12 | — | amend; `[fold-fold-round3]` |
+| `removal-pending-no-filer` | a `removal-pending` entry waits on a patch build that no item files | 14 | 13 | amend; `[fold-fold-round3]` |
+| `land-outcome-overlap` | `deploy.land`'s "landed ungated" and "nothing pushed" both hold on a no-op push, and its sources cannot tell them apart | 8 | 4 | amend; `[fold-fold-round3]` |
+| `gaps-registered-list` | "the gaps registered" lists two new gaps after the follow-up round, and v2, the register and the record's own L4 row name a third, gap-mem-14 | — | 6, 15 | amend; `[fold-fold-round3]` |
 | `start-guard-blocks-refused-rerun` | `deploy.core`'s start guard makes its own REFUSED re-run dead | 6 | 10 | none: refuted, the re-run is an explicit route that never passes back through the start guard |
 | `gap-test-04-contract` | gap-test-04's row omits the re-run contract and probe the flow says it owes | 16 | — | none: refuted, the row carries the contract the design relies on, and the probe sits in the text that cites it |
 | `gap-rows-no-check` | gap-deploy-02 and gap-deploy-09 state the defect with no check that can fail | 17 | — | none: refuted, the register's rows carry no check column by its own form |
@@ -401,3 +401,31 @@ closing review of the debt round's folds is owed.
 | `relaunch-cap-fixture` | 8 | — | none: refuted, the design defines the cap per act and carries no reset rule over | — | — |
 | `act-ceiling-registration` | 9 | — | none: refuted, the two keys carry different facts | — | — |
 | `chain-count` | 22 | 8 | amend: refuted only as outside the range, and HEAD still carries it | layer-runtime `[build]` points at v2's `[chain]` | — |
+
+## [fold-fold-round3] The round-3 fold pair, folded 2026-10-17
+
+Dispatches 67 and 68 reviewed the layers round's follow-up fold, `cc4c83ad5..1bc4883fe`. Each of their
+map rows (`[map-fold-round3]`) went here, into flow-steps, layer-memory, layer-runtime, layer-roles, the
+register, two gotchas and the layers comparison record. Each row's classes are its confirmed findings'
+own, from the two ledgers. The fold is unreviewed text, and a closing review of the debt round's folds
+is owed.
+
+| Defect | A | B | Disposition | Where the fix sits | Its classes |
+|---|---|---|---|---|---|
+| `claim-unreachable-from-triage` | 2 | 7 | amend | flow-steps' Plan Enters and `plan.triage-rule`; layer-memory `[contract]` | `route-names-an-output-its-actor-never-emits` |
+| `publish-failed-no-arm` | 1, 7 | 2, 11, 17 | amend | flow-steps' `deploy.core` and the core re-check's witness; `gap-deploy-02` | `policy-value-with-no-route`, `route-names-an-output-its-actor-never-emits` |
+| `held-leg-no-release` | 4, 11 | 12, 18 | amend | flow-steps' `test.select`; layer-memory `[asks]`; `gap-test-04` | `amendment-leaves-its-other-half-standing` |
+| `flake-record-two-writers` | 13 | 5 | amend | flow-steps' `test.flakes`; layer-memory `[asks]`; `gap-test-04` | — |
+| `parser-indented-rows` | 5, 15 | 1, 14, 16 | amend | layer-roles `[instrument]`, `role_matrix.py` revised 2026-10-17; the parser gotcha | `parser-drops-rows-it-cannot-place`, `zero-witness-over-an-unnamed-population` |
+| `ask-claim-create-once` | 3, 10 | — | amend | layer-memory `[contract]`; `gap-mem-13` | — |
+| `ask-lock-narrowed` | — | 9 | amend | layer-memory `[contract]`; `gap-mem-13` | — |
+| `claim-no-idempotence-key` | — | 8 | amend | flow-steps' `entry.claim`; layer-memory `[contract]`; `gap-mem-13` | `append-without-an-idempotence-key` |
+| `claim-prune-two-ways` | 9 | — | amend | layer-runtime `[supervise]`; `gap-mem-13` | — |
+| `flakes-duplicate-ask` | 12 | — | amend | flow-steps' `test.flakes`; layer-memory `[asks]` | `append-without-an-idempotence-key` |
+| `removal-pending-no-filer` | 14 | 13 | amend | layer-memory `[reuse]` and `[asks]`; the reject-outcome gotcha | `owner-item-without-its-reject-outcome` |
+| `land-outcome-overlap` | 8 | 4 | amend | flow-steps' `deploy.land` and the lander's outcome classes | `route-names-an-output-its-actor-never-emits` |
+| `gaps-registered-list` | — | 6, 15 | amend | the layers comparison's `[folded]`, re-derived by its tally script | — |
+| `start-guard-blocks-refused-rerun` | 6 | 10 | none: refuted, the re-run is an explicit route that never passes back through the start guard | — | — |
+| `gap-test-04-contract` | 16 | — | none: refuted, the row carries the contract the design relies on, and the probe sits in the text that cites it | — | — |
+| `gap-rows-no-check` | 17 | — | none: refuted, the register's rows carry no check column by its own form | — | — |
+| `replacement-route` | — | 3 | none: refuted, a re-placement goes to `plan.triage-rule` and keeps its claim, as `[transitions]` says | — | — |

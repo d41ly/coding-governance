@@ -318,12 +318,18 @@ for instructions:
 - it mints the id under a claim or a lease. A build's slug is claimed first, by the flow's
   `entry.claim`: a compare-and-swap push that creates `refs/gov/claims/<slug>` on the remote, the way
   unattended claims `refs/gov/runs/<slug>`. `check_slug_claimed` is only its local pre-check, since
-  it reads the local clone. The records a build writes before its lease (dupes, triage, plan) mint
+  it reads the local clone. The claim commit carries the claimant's key, the session and the intake's
+  or the ask's content key, so `entry.claim` is idempotent: a claim ref carrying its own key is its
+  claim, not one made elsewhere. The records a build writes before its lease (dupes, triage, plan) mint
   under that claim, and every later one under the build's lease, taken at `plan.lease`, or at
   `entry.claim` for a patch build, until `deploy.unlease` deletes it. A record written after that,
   such as `deploy.close`'s transition under `close-only`, mints under the build's claim ref. The intake record mints nothing: it is keyed by its session and
-  content. An ask that `entry.place` files outside any build mints under its family's claim ref,
-  created the same compare-and-swap way. dTotalRecall owes both refs (`gap-mem-13`). A slug's claim
+  content. Nor does a triage pass outside any build: its triage records are keyed by the entry's
+  content. Every ask minted outside a build, whoever files it (`entry.place`, the owner, a surfaced
+  idea, an expansion or the supervisor), mints under its family's claim ref. That ref is a counter:
+  each mint advances it by a compare-and-swap push leased on its observed value
+  (`--force-with-lease`) that writes the new id into it, as unattended already leases its claim
+  pushes, so it serialises every mint, not only the first. dTotalRecall owes both refs (`gap-mem-13`). A slug's claim
   ref is never pruned, so a slug is minted once; the supervisor prunes run claims only. So two clones
   never mint one id, and the charter's `[ids]` rule holds: the session that owns an id mints it;
 - it is idempotent and content-addressed: a write is keyed by its kind's key, an id or a content key
@@ -463,10 +469,16 @@ optional component, and the research library is the library side.
   - a lander refusal: `--prepare` next succeeds for the build;
   - a carried commit: its build claims it;
   - an adapter fault: the adapter's next run passes;
-  - a held flaky leg: the leg green on as many consecutive runs as `verdict.flakes`' threshold,
-    which the runner records in the flake record (`gap-test-04`), or its manifest row changed.
-    `test.flakes` files it under `quarantine`; the runs come as `verdict.held` schedules held legs, or
-    on demand by whoever takes the ask;
+  - a held flaky leg, keyed by the leg's name, so a second filing while one is open is a no-op: the
+    leg green on as many consecutive runs as `verdict.flakes`' threshold, which serves both the hold
+    and its release, read from the runner's verdict records since the hold (`gap-test-04`); or its
+    manifest row changed, as the bar's own quarantine releases a leg whose row changed.
+    `test.flakes` files it under `quarantine` and is the flake record's one writer, and
+    `test.select` lifts the hold and closes the ask, citing the streak. The runs come as
+    `verdict.held` schedules held legs, or on demand by whoever takes the ask;
+  - a removal, keyed by the rejected reuse entry's id: the entry and its `gov:feature` anchors gone
+    at the default branch's tip. The owner's reject-and-remove disposition files it (`[reuse]`), and
+    triage selects it as a patch build;
   - an unrun test level: its first green run, once observability's Maintain runs it;
   - a confirmed finding filed below `review.findings`' threshold: its unit is built, or a review round
     rules it out.
@@ -512,8 +524,9 @@ records. Neither may instruct by being recalled.
        orders once accepted;
      - best effort never accepts it, since `instructions.edit` is a guard that presets never touch;
      - the owner item has three dispositions: accept, and the entry renders; reject and remove, and the
-       entry becomes `removal-pending`, which the both-ways check accepts until a patch build removes
-       the landed `gov:feature` anchor and the entry in one landing; reject and keep, and the entry
+       entry becomes `removal-pending`, and the disposition files the removal ask (`[asks]`), keyed by
+       the entry's id. The both-ways check accepts the state until the patch build that ask becomes
+       removes the landed `gov:feature` anchor and the entry in one landing; reject and keep, and the entry
        stays `rejected`, never rendered, which the check accepts.
    - **The owner's examples:**
      - the media picker becomes "MUST reuse the media picker wherever an image, video or media
@@ -1108,3 +1121,12 @@ and its map's `disposition` cells point here. Each defect's fix sits in place, i
   that integrations writes and core Deploy reads, live under `memory/flow/` (the expansion round's
   review, `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md`).
 - **The work** is `gap-mem-16`, dTotalRecall's.
+
+## [revised-debt] Revised 2026-10-17, after the debt round's folds
+
+- **The round-3 fold pair** (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-a.md` and
+  `-b.md`): the claim commit carries the claimant's key; a triage pass outside any build mints nothing;
+  an ask family's claim ref is a counter every filer outside a build advances; the held-flaky-leg ask is
+  keyed by its leg and released by `test.select`; and a rejected reuse entry's removal has its own ask
+  form, filed by the disposition. The debt comparison record's `[fold-fold-round3]` names each defect
+  and where it went.

@@ -1291,6 +1291,216 @@ FINDING arm 0: a row under [test] that the item pattern cannot read: | `test.att
 exit 1
 ```
 
+### `role_matrix.py`, revised 2026-10-17
+
+The debt round's two reviews of the follow-up fold (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-a.md`
+and `-b.md`) found arm 0 still reading a row by its first character. A row indented one space, or with its
+leading pipe dropped, still renders as a table row, and the instrument skipped both. Arm 0 now reads tables
+by the renderer's grammar: a header row and its separator open one, and it runs to the first blank line or
+block start. Only arm 0's reader changed:
+
+```diff
+--- role_matrix.py, 2026-10-16
++++ role_matrix.py, 2026-10-17
+@@ -8,7 +8,10 @@
+ Four arms, each a finding (exit 1 if any):
+   0. every table body row under a step's heading is an item row the item pattern reads, every item
+      row sits under a step's heading, and every step holds at least one item, since a parser that
+-     skips what it cannot place reports a clean run;
++     skips what it cannot place reports a clean run. A table is read by the renderer's grammar, not by
++     a line's first character: a header row and its separator open it, either indented up to three
++     spaces and with its edge pipes optional, and it runs to the first blank line or block start, so
++     an indented or pipe-less body row is a row to grade, and a finding when the pattern cannot read it;
+   1. every item's actor is a command, the executor, a hook, the owner, or a declared item role;
+   2. every core item role acts in at least one core item;
+   3. no core item names an expansion role (P28).
+@@ -22,7 +25,9 @@
+ KINDS = ("command", "executor", "hook", "owner")
+ STEPS = ["entry", "plan", "design", "build", "test", "deploy", "breakpoint", "lifecycle"]
+ ITEM = re.compile(r"^\| `([a-z]+\.[a-z0-9-]+)` \| ([^|]+) \|")
+-SEPARATOR = re.compile(r"^\|(\s*:?-+:?\s*\|)+\s*$")
++SEPARATOR = re.compile(r"^\|?(\s*:?-+:?\s*\|)+(\s*:?-+:?\s*)?$")
++INDENT = re.compile(r"^ {1,3}")
++BLOCK = re.compile(r"^ {0,3}(#|`{3}|~{3}|>|[-*+] |\d+[.)] )")
+ 
+ 
+ def roster(text):
+@@ -50,15 +55,21 @@
+     findings = []
+     items = body = 0
+     per_step = collections.Counter()
++    in_table = False
+     for n, line in enumerate(lines):
+         h = re.match(r"^## \[([a-z-]+)\]", line)
+         if h:
+-            step = h.group(1)
++            step, in_table = h.group(1), False
+             continue
+-        if step is None or not line.startswith("|"):
++        flat = INDENT.sub("", line)
++        if not in_table:
++            nxt = INDENT.sub("", lines[n + 1]) if n + 1 < len(lines) else ""
++            in_table = step is not None and "|" in flat and bool(SEPARATOR.match(nxt))
+             continue
+-        header = n + 1 < len(lines) and SEPARATOR.match(lines[n + 1])
+-        if header or SEPARATOR.match(line):
++        if not line.strip() or BLOCK.match(line):
++            in_table = False
++            continue
++        if SEPARATOR.match(flat):
+             continue
+         row = ITEM.match(line)
+         if step not in STEPS:
+```
+
+Run with its planting script, `plant_roles.py` below, over the step definitions at this fold: eleven
+plants, the two new ones last.
+The clean run prints what the 2026-10-16 instrument prints there, and the table in `[matrix]` is unchanged:
+
+```text
+$ clean
+items 75 of 75 body rows; actor-item pairs 75; actors 15; items with a role 19; cycle roles 1; findings 0
+exit 0
+
+$ planted: `plan.reason`'s actor misspelled `plannr` (1 line changed)
+items 75 of 75 body rows; actor-item pairs 74; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 1: plan.reason: actor 'plannr' is no kind and no declared role
+exit 1
+
+$ planted: `design.seams`'s actor changed to `command`, so the reuse scout acts in no item (1 line changed)
+items 75 of 75 body rows; actor-item pairs 75; actors 14; items with a role 18; cycle roles 1; findings 1
+FINDING arm 2: core role 'reuse scout' acts in no core item
+exit 1
+
+$ planted: `test.reason`'s actor changed to the expansion role `deployer` (1 line changed)
+items 75 of 75 body rows; actor-item pairs 75; actors 16; items with a role 19; cycle roles 1; findings 1
+FINDING arm 3: test.reason: core item names the expansion role 'deployer' (distribution, integrations)
+exit 1
+
+$ planted: `plan.reason`'s actor changed to the cycle role `prompt writer` (1 line changed)
+items 75 of 75 body rows; actor-item pairs 74; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 1: plan.reason: 'prompt writer' is a cycle role, and acts in no item
+exit 1
+
+$ planted: the [lifecycle] heading renamed [controls] (1 line changed)
+items 69 of 69 body rows; actor-item pairs 69; actors 15; items with a role 19; cycle roles 1; findings 7
+FINDING arm 0: life.request sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.quiesce sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.notify sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.snapshot sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.unlease sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.close sits under [controls], which is no step the matrix reads
+FINDING arm 0: step [lifecycle] holds no item
+exit 1
+
+$ planted: `test.reason`'s tag uppercased to `test.Reason` (1 line changed)
+items 74 of 75 body rows; actor-item pairs 74; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read: | `test.Reason` | tester | `test.recommend` | an
+exit 1
+
+$ planted: `test.attribute`'s tag given a second dot, `test.attribute.own` (1 line changed)
+items 74 of 75 body rows; actor-item pairs 74; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read: | `test.attribute.own` | tester | the OWN and MI
+exit 1
+
+$ planted: `deploy.notify`'s row with its backticks dropped (1 line changed)
+items 74 of 75 body rows; actor-item pairs 74; actors 15; items with a role 19; cycle roles 1; findings 1
+FINDING arm 0: a row under [deploy] that the item pattern cannot read: | deploy.notify | command, idempotent | `deploy.
+exit 1
+
+$ planted: a double space after `test.attribute`'s tag (1 line changed)
+items 74 of 75 body rows; actor-item pairs 74; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read: | `test.attribute`  | tester | the OWN and MIXED
+exit 1
+
+$ planted: `test.reason`'s row indented one space (1 line changed)
+items 74 of 75 body rows; actor-item pairs 74; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read:  | `test.reason` | tester | `test.recommend` | a
+exit 1
+
+$ planted: `deploy.notify`'s row with its leading pipe dropped (1 line changed)
+items 74 of 75 body rows; actor-item pairs 74; actors 15; items with a role 19; cycle roles 1; findings 1
+FINDING arm 0: a row under [deploy] that the item pattern cannot read: `deploy.notify` | command, idempotent | `deploy.
+exit 1
+```
+
+The planting script, run as `python plant_roles.py role_matrix.py <the step definitions> <this record>
+<scratch dir>`:
+
+```python
+"""Run the matrix instrument clean, then on planted copies of the step definitions, one line changed each.
+
+Usage: python plant_roles.py <role_matrix.py> <flow-steps record> <roles record> <scratch dir>
+Prints each run as the roles record's [instrument] keeps it: the summary and FINDING lines, then the exit.
+"""
+import re
+import subprocess
+import sys
+
+tool, steps, roles, scratch = sys.argv[1:5]
+text = open(steps, encoding="utf-8", newline="").read()
+
+PLANTS = [
+    ("`plan.reason`'s actor misspelled `plannr`",
+     r"(\| `plan\.reason` \| )planner", r"\1plannr"),
+    ("`design.seams`'s actor changed to `command`, so the reuse scout acts in no item",
+     r"(\| `design\.seams` \| )reuse scout", r"\1command"),
+    ("`test.reason`'s actor changed to the expansion role `deployer`",
+     r"(\| `test\.reason` \| )tester", r"\1deployer"),
+    ("`plan.reason`'s actor changed to the cycle role `prompt writer`",
+     r"(\| `plan\.reason` \| )planner", r"\1prompt writer"),
+    ("the [lifecycle] heading renamed [controls]",
+     r"(?m)^## \[lifecycle\]", "## [controls]"),
+    ("`test.reason`'s tag uppercased to `test.Reason`",
+     r"\| `test\.reason` \|", "| `test.Reason` |"),
+    ("`test.attribute`'s tag given a second dot, `test.attribute.own`",
+     r"\| `test\.attribute` \|", "| `test.attribute.own` |"),
+    ("`deploy.notify`'s row with its backticks dropped",
+     r"\| `deploy\.notify` \|", "| deploy.notify |"),
+    ("a double space after `test.attribute`'s tag",
+     r"\| `test\.attribute` \|", "| `test.attribute`  |"),
+    ("`test.reason`'s row indented one space",
+     r"(?m)^(\| `test\.reason` \|)", r" \1"),
+    ("`deploy.notify`'s row with its leading pipe dropped",
+     r"(?m)^\| (`deploy\.notify` \|)", r"\1"),
+]
+
+
+def run(path):
+    p = subprocess.run([sys.executable, tool, path, roles], capture_output=True, text=True, encoding="utf-8")
+    keep = [ln for ln in p.stdout.splitlines() if ln.startswith(("items ", "FINDING"))]
+    return "\n".join(keep), p.returncode
+
+
+out, rc = run(steps)
+print("$ clean")
+print(out)
+print(f"exit {rc}")
+for desc, pat, rep in PLANTS:
+    planted, n = re.subn(pat, rep, text, count=1)
+    if n != 1:
+        sys.exit(f"plant did not apply: {desc}")
+    changed = sum(a != b for a, b in zip(text.split("\n"), planted.split("\n")))
+    path = f"{scratch}/planted-steps.md"
+    open(path, "w", encoding="utf-8", newline="").write(planted)
+    out, rc = run(path)
+    print(f"\n$ planted: {desc} ({changed} line changed)")
+    print(out)
+    print(f"exit {rc}")
+```
+
+The 2026-10-16 instrument missed both new plants:
+
+```text
+$ planted: `test.reason`'s row indented one space (1 line changed)
+items 74 of 74 body rows; actor-item pairs 74; actors 15; items with a role 18; cycle roles 1; findings 0
+exit 0
+
+$ planted: `deploy.notify`'s row with its leading pipe dropped (1 line changed)
+items 74 of 74 body rows; actor-item pairs 74; actors 15; items with a role 19; cycle roles 1; findings 0
+exit 0
+```
+
 ## [revised] Revised 2026-10-16: the two Tier-2 rounds, folded
 
 Two Tier-2 rounds reviewed this record at blob `081ef3c1`. The comparison record places their findings

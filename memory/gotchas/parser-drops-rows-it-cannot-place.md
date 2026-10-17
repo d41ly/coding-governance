@@ -26,19 +26,24 @@ M16) renamed `## [lifecycle]` in a copy. Six items dropped out of the population
 `items 65; … findings 0`. The fix refused the unknown heading only. The follow-up round
 (`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md`, M10)
 uppercased one tag, gave another a second dot and dropped a third's backticks: each run printed
-`items 70; … findings 0`.
+`items 70; … findings 0`. The debt round's two reviews of that fold
+(`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-a.md` and `-b.md`)
+indented one row by a space and dropped another's leading pipe. The renderer still drew both as rows,
+and each run printed `items 74 of 74 body rows; … findings 0`.
 
 ## The fix
 
 Refuse what cannot be placed, and assert the population:
 - a row under an unknown heading or key is a finding, not a skip;
 - under a known heading, every table body row that is not a header or separator is a row to grade, and
-  one the pattern cannot read is a finding;
+  one the pattern cannot read is a finding. The renderer's grammar decides what a table row is, never
+  a line's first character, so a row indented up to three spaces, or with its leading pipe dropped, is
+  a row too;
 - every expected section holds at least one row;
 - the planted red cases rename a section and break a row's key, beside the cases that edit rows.
 
 It has no machine gate in the tree. The record parsers it guards live under `tools/memory-tree/`, and
 a build's own instruments live inside its records. role_matrix.py's arm 0 does both now, seen red on
-a renamed section and on four malformed rows, but that instrument lives in a design record, not in a
+a renamed section and on six malformed rows, but that instrument lives in a design record, not in a
 gate leg. It is a sibling of
 `vacuous-selector-empty-population`, where the selector matches nothing at all.

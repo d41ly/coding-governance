@@ -436,8 +436,9 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 - **Supervision.** On each beat, the supervisor:
   - runs `reap.py --sweep` under `PROCMON_REAP_MODE` (reap-orphans here);
   - reaps act sessions past `runtime.act-ceiling`;
-  - expires leases past `leases.expiry-hours` and prunes terminal claim refs, through dDeclaredLoop's
-    coordination verbs;
+  - expires leases past `leases.expiry-hours` and prunes terminal run claims (`refs/gov/runs/*`),
+    through dDeclaredLoop's coordination verbs. It never prunes `refs/gov/claims/*`, where a slug's
+    claim lives (layer-memory `[contract]`);
   - raises the owner item of each `deploy.released` wait whose landing record is older than
     `build.release-ceiling`, once per (build, landed SHA), through the notification adapter;
   - names holders by fleet tag.

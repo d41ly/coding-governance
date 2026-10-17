@@ -969,7 +969,8 @@ point there. `tally_folded.py` (the instruments record) counts the cells:
 - **owed** is the fifth disposition the fold needed: a fix that turns on the chain's order goes to v2's
   `[owed]`, for the re-cut.
 - **The gaps registered:** `gap-rt-11` to `gap-rt-14`, `gap-flow-15` and `gap-mem-12`; after the
-  follow-up round, `gap-deploy-09` and `gap-mem-13`, with `gap-test-04` and `gap-deploy-02` extended.
+  follow-up round, `gap-deploy-09`, `gap-mem-13` and `gap-mem-14`, with `gap-test-04` and
+  `gap-deploy-02` extended. Revised 2026-10-17: this line once left out `gap-mem-14`.
 - **The keys added to v2:** `instructions.proof`, `flow.route-backs`, and `policy.on-missing-expansion`
   from LR-4.
 """

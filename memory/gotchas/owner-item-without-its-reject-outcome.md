@@ -30,9 +30,10 @@ the check refuses, so the red stood for that whole window.
 
 List every owner item's dispositions, the refusal included, and say what each leaves on the default
 branch and which item cleans it up. Each disposition states the entry state it leaves, and every
-check that reads that state accepts it for as long as it persists. For the reuse entry: accept, and
-the entry renders; reject and remove, and the entry is `removal-pending` until one patch build
-removes the anchor and the entry; reject and keep, and the entry stays `rejected`, which the check
+check that reads that state accepts it for as long as it persists. Every pending state a disposition
+leaves names the item that resolves it. For the reuse entry: accept, and
+the entry renders; reject and remove, and the entry is `removal-pending` until the patch build
+its disposition files, through the removal ask, removes the anchor and the entry; reject and keep, and the entry stays `rejected`, which the check
 accepts.
 
 A policy value whose catalogue text names an owner's wait has its owner item in the step's
