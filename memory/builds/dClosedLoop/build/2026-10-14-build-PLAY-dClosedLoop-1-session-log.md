@@ -159,6 +159,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 95 | gov-researcher, at its declared medium effort | Round 2, verifier 3 of 3, apart from 92 and 93, once agent-cap freed a slot | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | returned, 18m36s, 134.6k out: v-osprey's table, 405 nodes, 325 of the 349 approved nodes it holds agreeing | `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` |
 | 96 | gov-skeptic, at its declared high effort | The 23 approved owners two or three round-2 verifiers dispute, each to refute against the records at `155568834` | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-2-skeptic.md` | 1799cb98 | returned, 6m36s, 39.9k out: its verdicts are `[verdicts]` | `build/2026-10-18-build-PLAY-dClosedLoop-1-ownership-skeptic.md` |
 | 97 | the same | The 52 nodes two or three round-2 verifiers found that the approved table lacks, as 30 findings, each to refute on membership, identity or owner | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-3-skeptic.md` | 1799cb98 | returned, 4m46s, 30.4k out: its verdicts are `[verdicts]` | `build/2026-10-18-build-PLAY-dClosedLoop-1-ownership-population.md` |
+| 98 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the spec-review workflow's declared medium, round 1 | The declared whole-design audit, step 4 of the owner's convergence order: v2 at blob `535c0e058` and the gap register at `9a05621f4`, read whole, eighteen layer and design records as specs | the args, recorded with the audit's fold | 1799cb98 | running as `wf_cd0da8b3-895` | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-design-audit.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1931,6 +1932,13 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
     ownership rule and its P28 sort are corrected, and five chain rows narrowed or extended (`[folded-2]`).
   - The map checks green over 2,139 nodes and red on each plant. The ancestor probe classes one new
     homonym, and the critical path holds at 176 units. The atlas is republished as version 33.
+
+- 2026-10-18, session 1799cb98: the ownership re-verification is closed, and its pinned worktree removed.
+  Steps 2 and 3 of the owner's convergence order are done.
+- 2026-10-18, session 1799cb98: dispatch 98, the declared whole-design audit and step 4, runs as
+  `wf_cd0da8b3-895`. It reads v2 and the gap register whole, with eighteen layer and design records as specs.
+  The spec-audit opt-in was set around its launch and restored. Nothing folds into its subjects or specs
+  until it returns.
 
 ## Instruments
 
