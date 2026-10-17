@@ -1806,6 +1806,16 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   - The session holds the map (`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md`
     `[test-run]`).
 
+- 2026-10-17, session 1799cb98: the owner said, verbatim, "Just to confirm, the context is it 90% now, after this message I will compact it. Need to check afterwards if the map's still loaded.", compacted the session, and then
+  asked, verbatim, "so, answer me something that only the map can directly point at"
+  - The map came through the compaction in its summary. It was regenerated and read whole anyway, and
+    matches the earlier map but for its header and one event.
+  - The map points at two steps no build owns: entry and lifecycle, 12 items, which neither a stage
+    nor a chain row's tag citation gives a build (`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md`
+    `[reload-pointer]`).
+  - The adopt step reads unowned on the map too, since the generator derives a step's owner only from
+    its stage, though v2's rows cite all five of its items.
+
 ## Instruments
 
 ### The gap-ownership join

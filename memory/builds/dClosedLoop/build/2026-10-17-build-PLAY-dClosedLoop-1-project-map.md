@@ -1019,3 +1019,162 @@ exit 1
   compaction. The owner's standing ask is recorded in the session's memory, beside the atlas's.
 - **The product version is dWellOiledMachine's.** Its session-start hook loads the card and the map
   (PM-7). This test touches neither `.claude/` nor `tools/`.
+
+## [reload] The map after the compaction, 2026-10-17
+
+The owner said, verbatim, before compacting the session:
+
+> Just to confirm, the context is it 90% now, after this message I will compact it. Need to check afterwards if the map's still loaded.
+
+and, after it:
+
+> so, answer me something that only the map can directly point at
+
+- **The map came through the compaction.** The compaction's summary carried the level-0 map verbatim,
+  though the last message before it had said it would not. The standing ask was followed anyway: the
+  map was regenerated with `--out` and read whole.
+- **It matches the map read before the compaction**, but for its header, now at a clean tree, and one
+  event, the test run's own session-log entry:
+
+  ```text
+  $ python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --out design-map.txt
+  map: 2009 nodes in 30 namespaces; 24057 B of 32768 (no degrade); folded 14; unarmed record-kind
+  map: purposes declared 1356, derived 246, pending 407
+  map: wrote C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/projectmap/design-map.txt
+  map: every check passes, and record-kind is registered with no extractor: unarmed, never green
+  exit 2
+  $ diff design-map-precompact.txt design-map.txt
+  1c1
+  < map 8a10fcc8 dirty · nodes 2008 · lines 325 · folded item,policy-key,gap,leg,bug-class,closed-build,decision-row,design-record,review,decision-section,event,population,marker,conf-key · pending 85 · unarmed record-kind
+  ---
+  > map 72acbd77 · nodes 2009 · lines 325 · folded item,policy-key,gap,leg,bug-class,closed-build,decision-row,design-record,review,decision-section,event,population,marker,conf-key · pending 85 · unarmed record-kind
+  349c349
+  < - event.* — 109 nodes · gov map event
+  ---
+  > - event.* — 110 nodes · gov map event
+  ```
+
+### [reload-pointer] What only the map points at: two steps no build owns
+
+- **The pointer.** At level 0, two of the nine steps carry no `owner=`: `step.entry` and
+  `step.lifecycle`, 6 items each. One level down, `--ns item` gives each of their 12 items its step as
+  owner, and nothing further.
+- **Why only the map shows it.** Each step's record lists its items, and each chain row lists what its
+  build builds. Nothing lists what no build claims. The map puts every step beside its owner, so the
+  absence is a blank on a line.
+- **The probe.** A step reaches a build one of two ways: through its stage's build, or through chain
+  rows that cite its items by tag. The probe joins the item namespace to v2's 15 chain rows.
+
+```python
+"""Which chain build owns each flow step's items? Joins the map's item namespace (level 1) to v2's chain rows.
+
+Usage: python step_owner_probe.py <item-ns.txt> <design-map.txt> <architecture-v2.md>
+
+<item-ns.txt> is `map.py --ns item`; <design-map.txt> is the level-0 map. A chain row claims an item when it
+cites the item's tag in backticks. The adopt step's claims are the probe's positive control: v2's rows cite
+them, so a probe that reads none of them is blind.
+"""
+import re
+import sys
+
+
+def read(path):
+    return open(path, encoding="utf-8", newline="").read().replace("\r\n", "\n")
+
+
+items = re.findall(r"^- item\.(\S+) — .*· owner=(\S+)$", read(sys.argv[1]), flags=re.M)
+owner = dict(re.findall(r"^- step\.(\S+) — .*?(?:· owner=(\S+))?$", read(sys.argv[2]), flags=re.M))
+v2 = read(sys.argv[3])
+rows = dict(re.findall(r"^\| (d[A-Z][a-z]+[A-Z]\w+) \|(.*)$", v2, flags=re.M))
+print(f"items {len(items)} · steps {len(owner)} · chain rows {len(rows)}")
+print()
+for step in owner:
+    tags = [t for t, s in items if s == step]
+    claimed = [t for t in tags if any(f"`{t}`" in r for r in rows.values())]
+    print(f"{step:<11} items {len(tags):>2} · claimed by tag in a chain row {len(claimed):>2} · map owner {owner[step] or '—'}")
+for step in ("entry", "lifecycle", "adopt"):
+    print()
+    print(f"[{step}]")
+    for t, s in items:
+        if s == step:
+            by = [b for b, r in rows.items() if f"`{t}`" in r]
+            print(f"  {t:<18} rows {','.join(by) or '—'} · cited in v2 {v2.count(f'`{t}`')}x")
+print()
+print("prose homes, by the words the items' work goes by:")
+for label, pat in (("placement", r"\bplacement\b"), ("intake log", r"intake log"),
+                   ("orientation card", r"orientation card"),
+                   ("pause, resume, withdraw, supersede", r"pause, resume, withdraw and supersede"),
+                   ("terminal states", r"terminal states"), ("quiesce", r"quiesc")):
+    hit = [b for b, r in rows.items() if re.search(pat, r, flags=re.I)]
+    print(f"  {label:<36} {','.join(hit) or '—'}")
+```
+
+```text
+$ python step_owner_probe.py item-ns.txt design-map.txt 2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md
+items 81 · steps 9 · chain rows 15
+
+entry       items  6 · claimed by tag in a chain row  0 · map owner —
+plan        items 11 · claimed by tag in a chain row  0 · map owner dRankedPlan
+design      items 12 · claimed by tag in a chain row  1 · map owner dIndexedDesign
+build       items 10 · claimed by tag in a chain row  2 · map owner dScopedBuild
+test        items 10 · claimed by tag in a chain row  0 · map owner dWitnessedBar
+deploy      items 13 · claimed by tag in a chain row  0 · map owner dShippedRelease
+breakpoint  items  8 · claimed by tag in a chain row  4 · map owner dCalibratedLens
+lifecycle   items  6 · claimed by tag in a chain row  0 · map owner —
+adopt       items  5 · claimed by tag in a chain row  5 · map owner —
+
+[entry]
+  entry.intake       rows — · cited in v2 0x
+  entry.orient       rows — · cited in v2 0x
+  entry.place        rows — · cited in v2 0x
+  entry.place-check  rows — · cited in v2 0x
+  entry.place-owner  rows — · cited in v2 0x
+  entry.claim        rows — · cited in v2 0x
+
+[lifecycle]
+  life.request       rows — · cited in v2 0x
+  life.quiesce       rows — · cited in v2 0x
+  life.notify        rows — · cited in v2 0x
+  life.snapshot      rows — · cited in v2 0x
+  life.unlease       rows — · cited in v2 1x
+  life.close         rows — · cited in v2 0x
+
+[adopt]
+  adopt.census       rows dTotalRecall · cited in v2 1x
+  test.seed          rows dWitnessedBar,dShippedRelease · cited in v2 3x
+  adopt.practices    rows dTotalRecall · cited in v2 2x
+  adopt.decisions    rows dTotalRecall · cited in v2 1x
+  adopt.reconstruct  rows dTotalRecall · cited in v2 3x
+
+prose homes, by the words the items' work goes by:
+  placement                            dBoundRoles,dRankedPlan
+  intake log                           dRankedPlan
+  orientation card                     dDeclaredLoop
+  pause, resume, withdraw, supersede   dWellOiledMachine
+  terminal states                      dDeclaredLoop
+  quiesce                              —
+```
+
+- **What it shows:**
+  - The stage steps reach their builds through their stage. Their items are rarely cited by tag: plan
+    0 of 11, test 0 of 10, deploy 0 of 13.
+  - Adopt has no stage, and v2's rows cite all five of its items. Four sit in dTotalRecall's row, and
+    `test.seed` in dWitnessedBar's. dShippedRelease's row cites `test.seed` only as something its
+    install and update hooks call.
+  - The probe reads a citation as a claim, so it can only over-count. Adopt's five are its positive
+    control.
+  - Entry and lifecycle have neither route. No chain row cites any of their 12 items. The only tag
+    citation of any of them in v2 is the rename note for `life.unlease`, at its line 293.
+  - Their work is described, but in prose split across builds:
+    - placement sits in dRankedPlan's and dBoundRoles' rows, the intake log in dRankedPlan's, and the
+      orientation card in dDeclaredLoop's;
+    - the owner's pause, resume, withdraw and supersede sit in dWellOiledMachine's row, and the
+      terminal states in dDeclaredLoop's;
+    - no chain row says "quiesce", the word `life.quiesce` is named for.
+- **The map's own miss.** The adopt line shows no owner either, but there the design is right and the
+  generator is wrong. It derives a step's owner only from the step's stage, through `step_stage`, so a
+  step owned through its items' claims reads unowned.
+- **Proposed, not asked:**
+  - a fork on how entry and lifecycle reach a build: an owning build per step, or each item claimed by
+    tag in its build's chain row;
+  - the generator reading the items' claims, so the adopt line reads `owner=dTotalRecall,dWitnessedBar`.
