@@ -388,8 +388,8 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   |---|---|---|
   | `memory.default-load` | card, card-and-live | card |
   | `memory.load-budget` | 4k, 8k, 16k | 8k |
-  | `memory.item-budget` | KB per role | derived per role from a measurement, as MS-2 settles |
-  | `memory.over-budget` | refuse, report, off | as MS-2 settles |
+  | `memory.item-budget` | KB per role, each role's the owner's to set | 96 for every role (MS-2) |
+  | `memory.over-budget` | refuse, report, off | as MS-3 settles |
   | `memory.legacy-anchors` | derived, none | derived |
   | `memory.superseded-slices` | refuse, mark | refuse |
 
@@ -420,6 +420,7 @@ The first four forks, answered in one round. Each answer is quoted verbatim.
 | RS-2 | "move orientation to medium, builder to high" | the orientation scout runs at `medium` and the builder at `high` |
 | MS-1 | "Promote, then budget (Recommended)" | the auto-memory index's standing directives move into instruction units through `instructions.edit`, and what remains is held to `memory.load-budget` |
 | MS-2 | the owner asked, verbatim: "Why was memory partitioned like that? Was there a reason for these caps?" | answered in `[ms2]` and asked again |
+| MS-2, asked again | "set a default cap of 96K per role, but owner-adjustable per role" | `memory.item-budget`: 96 KB for every role by default, and each role's cap is the owner's to adjust. What happens to a work order over its cap is asked as MS-3 |
 
 - **AN-1, as designed.** The marker query in core memory-tree stays the path the core can always take
   (P28). The codebase map's lexer gains the annotation rows as part of its index: a shebang profile for
@@ -474,6 +475,10 @@ The first four forks, answered in one round. Each answer is quoted verbatim.
   no role in their `meta.json`. Their roles are in each run's journal.
 - **The design took one run's unmeasured figures as defaults.** `[design-memory-structure]` is corrected:
   each role's budget is derived from a measurement of that role, as `[forks]`' MS-2 is asked again.
+- **Settled, 2026-10-17 (MS-2).** A cap of 96 KB for every role by default, each role's cap the
+  owner's to adjust. Today's whole-file loads sit under it at every role's median, and over it at every
+  role's p90 except the skeptic's. 25.6% of the agents that read memory went over 96 KB: 39.5% of
+  builders and 2.9% of skeptics (`[ms2-instrument]`, its second run).
 
 ### [ms2-instrument] The per-role probe and its output
 
@@ -558,6 +563,50 @@ gov-builder                   38       38      78616    128420
 gov-synthesizer               29        3          -         -
 Plan                          18        2          -         -
 Explore                        1        0          -         -
+```
+
+The second run, later the same day over more transcripts, appends the share over 96 KB to the same probe:
+
+```python
+print()
+CAP = 96000
+print(f"share of memory-reading agents over {CAP} B, per type")
+for kind, n in seen_all.most_common():
+    v = by.get(kind, [])
+    if len(v) >= 5:
+        over = sum(1 for x in v if x > CAP)
+        print(f"{kind:24}{over:5} of {len(v):5}  {100 * over / len(v):5.1f}%")
+over = sum(1 for x in pooled if x > CAP)
+print(f"{'all, pooled':24}{over:5} of {len(pooled):5}  {100 * over / len(pooled):5.1f}%")
+```
+
+```text
+$ python -I memq_roles_96.py
+files 3617; agents reading memory 1352; pooled median 52694 p90 179714
+agent type                agents  reading   median B     p90 B
+workflow-subagent           2609     1002      49583    199267
+no-meta                      427        1          -         -
+gov-skeptic                  149       34      40120     68691
+gov-spec-reviewer             90       90      64266    148973
+general-purpose               77       48      35347     91398
+gov-spec-writer               76       66      72349    225729
+gov-researcher                56       32      57097    124531
+gov-diff-reviewer             46       36      67292    116914
+gov-builder                   38       38      78616    128420
+gov-synthesizer               30        3          -         -
+Plan                          18        2          -         -
+Explore                        1        0          -         -
+
+share of memory-reading agents over 96000 B, per type
+workflow-subagent         263 of  1002   26.2%
+gov-skeptic                 1 of    34    2.9%
+gov-spec-reviewer          26 of    90   28.9%
+general-purpose             2 of    48    4.2%
+gov-spec-writer            23 of    66   34.8%
+gov-researcher              8 of    32   25.0%
+gov-diff-reviewer           8 of    36   22.2%
+gov-builder                15 of    38   39.5%
+all, pooled               346 of  1352   25.6%
 ```
 
 ## [gaps-proposed] Gaps to register once the forks settle

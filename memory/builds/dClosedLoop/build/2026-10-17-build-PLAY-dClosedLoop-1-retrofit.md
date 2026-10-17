@@ -209,8 +209,8 @@ run's line cited. The returns are filed verbatim as `research-retrofit-a.md` and
   - `adopt.practices`, the owner, rules each practice once: import, translate, keep alongside or
     retire. The asks go largest first, or by keys times reads where observability is installed. Until a
     ruling, the practice stays alongside.
-  - `adopt.decisions` routes the decision candidates through two raters, and the owner ratifies the
-    major ones, as RF-3 settles.
+  - `adopt.decisions` routes the decision candidates through two raters by the author's rubric. The
+    owner ratifies the major ones only where `retrofit.decisions` says so (RF-3).
 
 ### [drain] The drain on touch
 
@@ -259,7 +259,7 @@ run's line cited. The returns are filed verbatim as `research-retrofit-a.md` and
 | tags | namespaces from the inventories and the map | a tag on each touched site | rules the namespaces |
 | annotations | `refs=` rows from the comment refs that resolve, 1,248 of 1,250 in gov (`research-retrofit-a.md:52`) | a `gov:note` head line on each touched block | none |
 | codebase map and reuse | definitions and callers, generated | a dossier on first touch, and a reuse proposal | accepts each entry (LR-6) |
-| decision log | candidates from decision-shaped documents | none | ratifies each reconstructed major decision (RF-3) |
+| decision log | candidates from decision-shaped documents, and from commit trailers under `docs-and-trailers` | none | none under `author-rubric`; ratifies each major one under the other two values (RF-3) |
 | bug classes | candidates from fix commits | a class on a confirmed finding | none |
 | specs | none: legacy code gets no spec | a spec for new units only | none |
 | instruction units | the repository's instruction files join IW-1's list | migration per step | retires its own documents |
@@ -306,15 +306,14 @@ run's line cited. The returns are filed verbatim as `research-retrofit-a.md` and
 
 | Key | Values | Default |
 |---|---|---|
-| `retrofit.drain` | hunk, file, off | as RF-2 settles |
+| `retrofit.drain` | hunk, file, off | hunk (RF-2) |
 | `retrofit.drain-cap` | 5, 20, 50 sites per unit | 20 |
 | `retrofit.claim-on-touch` | claim, carry, off | claim |
 | `retrofit.claim-cap` | 1, 3, 5 keys per unit | 3 |
 | `retrofit.widen` | record-reason, refuse | record-reason |
 | `retrofit.unseeded` | unarmed, refuse | unarmed |
 | `retrofit.reconstruct` | on-touch, at-adoption, on-ask | on-touch |
-| `retrofit.decisions-import` | docs, docs-and-trailers, none | as RF-3 settles |
-| `retrofit.reconstructed-major` | owner-ratifies, author-rubric | as RF-3 settles |
+| `retrofit.decisions` | author-rubric, docs-owner-ratifies, docs-and-trailers | author-rubric, set per repository (RF-3) |
 | `retrofit.practice-pending` | alongside, refuse | as RF-4 settles |
 | `retrofit.cadence` | off, hot-first | as RF-6 settles |
 | `retrofit.slot-bytes` | 512, 1024, 2048 | 1024 |
@@ -332,6 +331,16 @@ runtime layer's forks, so the design keeps A's names and A's numbering. B's RT-5
 | RF-4 | What happens to a repository practice the owner has not ruled on? | it stays alongside; it is proposed for retirement |
 | RF-5 | Do gov's own 27 registries move onto the ledger? | yes, in dWitnessedBar, which also retires drift's hand-typed list; no, the ledger serves new checks only, and the count ratchet stays written twice |
 | RF-6 | When does the cadence sweep run? | off until the owner opts in, with observability's reading reporting the share of reads on untouched legacy; hot-first by default wherever observability is installed |
+
+## [answers] The owner's answers, 2026-10-17
+
+Each answer is quoted verbatim.
+
+| Fork | The owner's answer | What it settles |
+|---|---|---|
+| RF-1 | "Across the layers (Recommended)" | retrofit is a system across the layers. Its ledger is core, and its parts belong to the chain builds in `[owners]` |
+| RF-2 | "Drain hunks, capped (Recommended)" | `retrofit.drain` defaults to `hunk`: a unit drains the baselined sites in its changed hunks and claims the keys it touches, within 20 sites and 3 claims, and carries the rest |
+| RF-3 | "Author's rubric by default, owner-switchable between the three options per repo" | one key, `retrofit.decisions`, replaces the two the design drafted. Its values are the three options: `author-rubric` (the default), `docs-owner-ratifies` and `docs-and-trailers`. The owner sets it per repository. Under `author-rubric`, no reconstructed decision waits on the owner, and each stays marked `reconstructed` |
 
 ## [gaps-proposed] Gaps to register once the forks settle
 
