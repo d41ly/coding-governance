@@ -1766,6 +1766,9 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   permission baseline. `memory.item-budget` defaults to `measured`. Dispatch 85's H1 is folded, and its
   class, an-allow-that-bypasses-a-judge-names-none, joins the build-method dossier.
 
+- 2026-10-17, session 1799cb98: the atlas is republished as version 22 after the audit's fold
+  (`274085b92`), and as version 23 after the owner's RT-4 and MS-2 (`716baabb7`), both to the same link.
+
 ## Instruments
 
 ### The gap-ownership join
