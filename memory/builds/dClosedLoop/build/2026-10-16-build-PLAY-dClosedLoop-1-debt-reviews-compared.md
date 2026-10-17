@@ -77,55 +77,55 @@ refuted finding sits on the defect its claim names, beside its confirmed twin wh
 
 | defect | what | A | B | disposition |
 |---|---|---|---|---|
-`ratified-readers` | retiring the `ratified` stamp names none of its readers: the drift signal v2 makes the lexicon's own leg pack, `adopt-lexicon.sh --check`, the kit's hole and the scaffold | 3, 30, 37, 41 | 2, 30, 38 | amend; `lexicon` `[debt-fold]`
-`acquire-family` | the drift rule's verb families do not exist: the canon has no `acquire` family, and load, read and parse are three clusters | 25 | 14, 29 | fork, amend; `lexicon` `[debt-fold]`
-`drift-vs-classes` | a declared verb that breaks the one-verb rule is conforming by the class table and debt by `[drift]` | 1 | — | amend; `lexicon` `[debt-fold]`
-`drift-object-undefined` | "one verb per family per object" defines neither the object nor the established verb when an object has two | 48 | 54 | amend; `lexicon` `[debt-fold]`
-`drift-enforcement-site` | where "refuse new splits" is enforced, and how `lexicon.drift` combines with `lexicon.at-commit`, is unsaid | — | 9 | amend; `lexicon` `[debt-fold]`
-`map-extraction-states` | the map reads only the working tree, yet the base comparison, the commit check and `--merge-losses` need other states | 35 | 40 | fork, amend; `lexicon` `[debt-fold]`
-`map-dependency-undeclared` | the lexicon comes to require the map, against the kit's self-containment gate and KN-1's independent components, with no `requires` and no absent state | 18, 28, 36, 40 | 5, 25, 28, 42, 52 | fork, amend; `lexicon` `[debt-fold]`
-`shim-uncovered` | no pack covers the `mktemp` shim, so 5 of 6 third-party names are covered and the pin cannot fall by 28 | 4, 17, 43 | 6, 16 | amend; `lexicon` `[debt-fold]`
-`pin-absorb-dead` | the pin "only falls", yet `absorb` and `no-gate` stay allowed and velocity's `absorb` is unreachable | 2 | 12 | amend; `lexicon` `[debt-fold]`
-`pin-rebaseline` | changes that widen or reclassify debt (the `init` row, frozen nouns, pack upgrades) have no re-baseline route | 47 | 49 | amend; `lexicon` `[debt-fold]`
-`markers-pep698` | the marker rule misstates PEP 698 and would red correct overrides of in-repository bases | 16 | 1 | amend; `lexicon` `[debt-fold]`
-`unresolved-base` | a site whose base cannot be resolved statically gets no class | 49 | 47 | amend; `lexicon` `[debt-fold]`
-`declaration-home` | contract declarations sit inline in source as `gov:` markers, outside `instructions.edit`, so an agent can clear its own debt; the readers they cite do not exist | 19, 52 | 23, 35, 48 | fork, amend; `lexicon` `[debt-fold]`
-`suppression-path` | a site suppression names no writer or write path, and TOOL-dScaffoldedMirror-4 already designs one | 6 | 31 | amend; `lexicon` `[debt-fold]`
-`bar-comparison-seam` | the bar's offender comparison runs only on a red leg under `GATE_ATTRIBUTE`, against the landing base, and never in remote CI | 12, 27 | 15 | amend; `lexicon` `[debt-fold]`
-`commit-check-seam` | the commit check names no seam, host, budget or bypass handling | 29, 45 | 8, 33, 51 | amend; `lexicon` `[debt-fold]`
-`commit-check-moves` | move-awareness is required at the bar but not at the commit check | 46 | 24 | amend; `lexicon` `[debt-fold]`
-`replay-threshold` | the move-aware replay names a measurement with no threshold or consequence | 8 | 32 | amend; `lexicon` `[debt-fold]`
-`stdlib-pack-platform` | the stdlib pack depends on the Python minor and the platform it is generated on, and nothing chooses either | 7, 15 | 17 | amend; `lexicon` `[debt-fold]`
-`pack-selection-inputs` | pack selection says nothing of a kit with no pack, a version outside every range, no manifest, or several minors | 50 | 50 | amend; `lexicon` `[debt-fold]`
-`pack-fixture` | the research's owed fixture across five frameworks is dropped | 5 | — | amend; `lexicon` `[debt-fold]`
-`prototype-live-import` | "5 of 5, byte-identical" was measured with the live import the design forbids, on one resolved site | 42 | — | amend; `lexicon` `[debt-fold]`
-`pack-row-validation` | what makes a host set namespaced, and how a custom pack's rows are validated, are unsaid | — | 55 | amend; `lexicon` `[debt-fold]`
-`forced-by-name-route` | `lexicon.forced` catalogues `by-name`, which no item routes | 32 | 36 | amend; `lexicon` `[debt-fold]`
-`suggest-forced-aware` | `--suggest` cannot be forced-aware before the enclosing class exists | 14 | — | amend; `lexicon` `[debt-fold]`
-`no-pack-owner-route` | a host with no pack goes to the owner only, with no outcome for a decline or an absent owner | 13 | — | amend; `lexicon` `[debt-fold]`
-`vocabulary-proposal-route` | a name that will not fit becomes a vocabulary proposal with no pending or rejected outcome | — | 22 | amend; `lexicon` `[debt-fold]`
-`nouns-table` | the NOUNS table rebuilds the canon's clusters and its owner overlay | 26 | — | amend; `lexicon` `[debt-fold]`
-`init-row-inventory` | removing the `init` row reds the map's `lexicon-verbs` inventory, and NOUNS has no inventory | — | 41 | amend; `lexicon` `[debt-fold]`
-`leg-placement` | the lexicon's bar legs are placed in no leg pack | — | 4 | amend; `lexicon` `[debt-fold]`
-`later-records` | later records changed this one with no revision note: gap-lex-08's leg pack and Runtime's hook pack | 9, 20, 51 | 27, 43, 56 | amend; `lexicon` `[debt-fold]`
-`chain-order` | L-4 orders dMindYourWords after dTotalRecall alone, before the builds whose extension points it fills | — | 3 | owed; `lexicon` `[debt-fold]`
-`chain-count` | the record's chain count is thirteen where v2 now has fifteen | 39 | 45 | amend; `lexicon` `[debt-fold]`
-`l6-misstated` | L-6 declared `html` and `svg` dark; the refusal still stands for every other extension | 53 | 11 | amend; `lexicon` `[debt-fold]`
-`settled-stale` | `[settled]` still gives dTotalRecall the lexicon's work and gap-mem-10, which L-4 moved | 10, 34 | 37 | amend; `lexicon` `[debt-fold]`
-`drain-count` | "one real drain in 60 days" against 11 drains measured | 22 | — | amend; `lexicon` `[debt-fold]`
-`readme-misread` | the README's "shrink-only" is the waiver registries', and the two-sided pin has more carriers than `[fixes]` names | 21 | 20, 39 | amend; `lexicon` `[debt-fold]`
-`pytest-installed` | "pytest is not installed on this node" is false | 24 | 18 | amend; `lexicon` `[debt-fold]`
-`doc-reads-stale` | the legs' `doc_reads` on `memory/builds/` go stale once records leave the population | — | 46 | amend; `lexicon` `[debt-fold]`
-`three-pins` | the kit carries three pin seams, and the design names one | — | 34 | amend; `lexicon` `[debt-fold]`
-`pins-plain-edit` | the pins and the cell arming still change by plain edit | 38 | — | amend; `lexicon` `[debt-fold]`
-`gaps-cite-asks` | the new gaps cite none of the live asks that already state them | 31 | — | amend; `lexicon` `[debt-fold]`
-`raise-misread` | "+24 of +30 in `301a36664`" misreads the commit | 23 | — | amend, owed; `lexicon` `[debt-fold]`
-`gap2-example` | gap 2's example list drops `get_queryset` | — | 13 | amend, owed; `lexicon` `[debt-fold]`
-`foreign-ask` | the out-of-scope class rests on aSurfacedLexicon's open ask, unabsorbed | — | 10, 44 | amend; `lexicon` `[debt-fold]`
-`main-red-stale` | `[now]`'s red on main is gone since `ef9c3fbab` | — | 19 | amend; `lexicon` `[debt-fold]`
-`fixture-undefined` | "fixture" in the out-of-scope class is undefined | 11 | — | amend; `lexicon` `[debt-fold]`
-`tokenizers-thin` | the shell and JavaScript tokenizers cannot give the enclosing class and its bases | 44 | 26 | amend; `lexicon` `[debt-fold]`
-`tag-check-point` | the vocabulary check on namespaced tag names, which dOrderedCharter builds, is filled by no lexicon unit | — | 7 | amend, owed; `lexicon` `[debt-fold]`
+| `ratified-readers` | retiring the `ratified` stamp names none of its readers: the drift signal v2 makes the lexicon's own leg pack, `adopt-lexicon.sh --check`, the kit's hole and the scaffold | 3, 30, 37, 41 | 2, 30, 38 | amend; `lexicon` `[debt-fold]` |
+| `acquire-family` | the drift rule's verb families do not exist: the canon has no `acquire` family, and load, read and parse are three clusters | 25 | 14, 29 | fork, amend; `lexicon` `[debt-fold]` |
+| `drift-vs-classes` | a declared verb that breaks the one-verb rule is conforming by the class table and debt by `[drift]` | 1 | — | amend; `lexicon` `[debt-fold]` |
+| `drift-object-undefined` | "one verb per family per object" defines neither the object nor the established verb when an object has two | 48 | 54 | amend; `lexicon` `[debt-fold]` |
+| `drift-enforcement-site` | where "refuse new splits" is enforced, and how `lexicon.drift` combines with `lexicon.at-commit`, is unsaid | — | 9 | amend; `lexicon` `[debt-fold]` |
+| `map-extraction-states` | the map reads only the working tree, yet the base comparison, the commit check and `--merge-losses` need other states | 35 | 40 | fork, amend; `lexicon` `[debt-fold]` |
+| `map-dependency-undeclared` | the lexicon comes to require the map, against the kit's self-containment gate and KN-1's independent components, with no `requires` and no absent state | 18, 28, 36, 40 | 5, 25, 28, 42, 52 | fork, amend; `lexicon` `[debt-fold]` |
+| `shim-uncovered` | no pack covers the `mktemp` shim, so 5 of 6 third-party names are covered and the pin cannot fall by 28 | 4, 17, 43 | 6, 16 | amend; `lexicon` `[debt-fold]` |
+| `pin-absorb-dead` | the pin "only falls", yet `absorb` and `no-gate` stay allowed and velocity's `absorb` is unreachable | 2 | 12 | amend; `lexicon` `[debt-fold]` |
+| `pin-rebaseline` | changes that widen or reclassify debt (the `init` row, frozen nouns, pack upgrades) have no re-baseline route | 47 | 49 | amend; `lexicon` `[debt-fold]` |
+| `markers-pep698` | the marker rule misstates PEP 698 and would red correct overrides of in-repository bases | 16 | 1 | amend; `lexicon` `[debt-fold]` |
+| `unresolved-base` | a site whose base cannot be resolved statically gets no class | 49 | 47 | amend; `lexicon` `[debt-fold]` |
+| `declaration-home` | contract declarations sit inline in source as `gov:` markers, outside `instructions.edit`, so an agent can clear its own debt; the readers they cite do not exist | 19, 52 | 23, 35, 48 | fork, amend; `lexicon` `[debt-fold]` |
+| `suppression-path` | a site suppression names no writer or write path, and TOOL-dScaffoldedMirror-4 already designs one | 6 | 31 | amend; `lexicon` `[debt-fold]` |
+| `bar-comparison-seam` | the bar's offender comparison runs only on a red leg under `GATE_ATTRIBUTE`, against the landing base, and never in remote CI | 12, 27 | 15 | amend; `lexicon` `[debt-fold]` |
+| `commit-check-seam` | the commit check names no seam, host, budget or bypass handling | 29, 45 | 8, 33, 51 | amend; `lexicon` `[debt-fold]` |
+| `commit-check-moves` | move-awareness is required at the bar but not at the commit check | 46 | 24 | amend; `lexicon` `[debt-fold]` |
+| `replay-threshold` | the move-aware replay names a measurement with no threshold or consequence | 8 | 32 | amend; `lexicon` `[debt-fold]` |
+| `stdlib-pack-platform` | the stdlib pack depends on the Python minor and the platform it is generated on, and nothing chooses either | 7, 15 | 17 | amend; `lexicon` `[debt-fold]` |
+| `pack-selection-inputs` | pack selection says nothing of a kit with no pack, a version outside every range, no manifest, or several minors | 50 | 50 | amend; `lexicon` `[debt-fold]` |
+| `pack-fixture` | the research's owed fixture across five frameworks is dropped | 5 | — | amend; `lexicon` `[debt-fold]` |
+| `prototype-live-import` | "5 of 5, byte-identical" was measured with the live import the design forbids, on one resolved site | 42 | — | amend; `lexicon` `[debt-fold]` |
+| `pack-row-validation` | what makes a host set namespaced, and how a custom pack's rows are validated, are unsaid | — | 55 | amend; `lexicon` `[debt-fold]` |
+| `forced-by-name-route` | `lexicon.forced` catalogues `by-name`, which no item routes | 32 | 36 | amend; `lexicon` `[debt-fold]` |
+| `suggest-forced-aware` | `--suggest` cannot be forced-aware before the enclosing class exists | 14 | — | amend; `lexicon` `[debt-fold]` |
+| `no-pack-owner-route` | a host with no pack goes to the owner only, with no outcome for a decline or an absent owner | 13 | — | amend; `lexicon` `[debt-fold]` |
+| `vocabulary-proposal-route` | a name that will not fit becomes a vocabulary proposal with no pending or rejected outcome | — | 22 | amend; `lexicon` `[debt-fold]` |
+| `nouns-table` | the NOUNS table rebuilds the canon's clusters and its owner overlay | 26 | — | amend; `lexicon` `[debt-fold]` |
+| `init-row-inventory` | removing the `init` row reds the map's `lexicon-verbs` inventory, and NOUNS has no inventory | — | 41 | amend; `lexicon` `[debt-fold]` |
+| `leg-placement` | the lexicon's bar legs are placed in no leg pack | — | 4 | amend; `lexicon` `[debt-fold]` |
+| `later-records` | later records changed this one with no revision note: gap-lex-08's leg pack and Runtime's hook pack | 9, 20, 51 | 27, 43, 56 | amend; `lexicon` `[debt-fold]` |
+| `chain-order` | L-4 orders dMindYourWords after dTotalRecall alone, before the builds whose extension points it fills | — | 3 | owed; `lexicon` `[debt-fold]` |
+| `chain-count` | the record's chain count is thirteen where v2 now has fifteen | 39 | 45 | amend; `lexicon` `[debt-fold]` |
+| `l6-misstated` | L-6 declared `html` and `svg` dark; the refusal still stands for every other extension | 53 | 11 | amend; `lexicon` `[debt-fold]` |
+| `settled-stale` | `[settled]` still gives dTotalRecall the lexicon's work and gap-mem-10, which L-4 moved | 10, 34 | 37 | amend; `lexicon` `[debt-fold]` |
+| `drain-count` | "one real drain in 60 days" against 11 drains measured | 22 | — | amend; `lexicon` `[debt-fold]` |
+| `readme-misread` | the README's "shrink-only" is the waiver registries', and the two-sided pin has more carriers than `[fixes]` names | 21 | 20, 39 | amend; `lexicon` `[debt-fold]` |
+| `pytest-installed` | "pytest is not installed on this node" is false | 24 | 18 | amend; `lexicon` `[debt-fold]` |
+| `doc-reads-stale` | the legs' `doc_reads` on `memory/builds/` go stale once records leave the population | — | 46 | amend; `lexicon` `[debt-fold]` |
+| `three-pins` | the kit carries three pin seams, and the design names one | — | 34 | amend; `lexicon` `[debt-fold]` |
+| `pins-plain-edit` | the pins and the cell arming still change by plain edit | 38 | — | amend; `lexicon` `[debt-fold]` |
+| `gaps-cite-asks` | the new gaps cite none of the live asks that already state them | 31 | — | amend; `lexicon` `[debt-fold]` |
+| `raise-misread` | "+24 of +30 in `301a36664`" misreads the commit | 23 | — | amend, owed; `lexicon` `[debt-fold]` |
+| `gap2-example` | gap 2's example list drops `get_queryset` | — | 13 | amend, owed; `lexicon` `[debt-fold]` |
+| `foreign-ask` | the out-of-scope class rests on aSurfacedLexicon's open ask, unabsorbed | — | 10, 44 | amend; `lexicon` `[debt-fold]` |
+| `main-red-stale` | `[now]`'s red on main is gone since `ef9c3fbab` | — | 19 | amend; `lexicon` `[debt-fold]` |
+| `fixture-undefined` | "fixture" in the out-of-scope class is undefined | 11 | — | amend; `lexicon` `[debt-fold]` |
+| `tokenizers-thin` | the shell and JavaScript tokenizers cannot give the enclosing class and its bases | 44 | 26 | amend; `lexicon` `[debt-fold]` |
+| `tag-check-point` | the vocabulary check on namespaced tag names, which dOrderedCharter builds, is filled by no lexicon unit | — | 7 | amend, owed; `lexicon` `[debt-fold]` |
 | `declaration-second-carrier` | a contract declaration as a hand-kept copy of the reader's constants | 33 | — | none: refuted, the example limits nothing and a stale arm guards the copy |
 | `import-census` | no extractor collects imports | — | 21 | none: refuted, `lexicon.py`'s Python and JS extractors collect imports |
 | `keys-absent` | the four new keys have no absent state | — | 53 | none: refuted, v2's `policy.on-missing-expansion` covers an absent component |
