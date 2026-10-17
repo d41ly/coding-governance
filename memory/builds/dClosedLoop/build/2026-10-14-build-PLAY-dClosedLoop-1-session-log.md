@@ -1769,6 +1769,11 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
 - 2026-10-17, session 1799cb98: the atlas is republished as version 22 after the audit's fold
   (`274085b92`), and as version 23 after the owner's RT-4 and MS-2 (`716baabb7`), both to the same link.
 
+- 2026-10-17, session 1799cb98: the owner asked how an agent stays oriented in the whole design, and
+  whether a whole-project view is needed. The answer, its measurements and forks PM-1 to PM-3 are in
+  `build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md`. 37 of the audit's 52 items needed a piece
+  their author did not have in view, and a level-0 map of all of gov measures 176 nodes in 10.4 KB.
+
 ## Instruments
 
 ### The gap-ownership join
@@ -2239,6 +2244,7 @@ Runs, 2026-10-14:
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-instruments.md` | The retrofit researchers' files and shell commands, in order, from their transcripts. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews.md` | The owner's ask for the folds' closing review and the systems and retrofit audit: the two runs, how they run, and their folds once they return. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` | Those two runs' args, verbatim, with the script that wrote them. |
+| `build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md` | The owner's question on seeing the whole project at once: what orients an agent today, the audit's items sorted by cause, a level-0 map of gov sized, and forks PM-1 to PM-3. |
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | The library pass's research handoff: the four filling paths and two placements. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` | The library round's review, a light diff review over KN-1's fold, the library design and its settlement, as its synthesizer wrote it. |
