@@ -1841,6 +1841,15 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
     `[reload-summary]`).
   - The atlas is at version 28.
 
+- 2026-10-17, session 1799cb98: the owner asked, verbatim, "What's is the current state of this design, what parts are yet missing and unreviewed? Is it converging into a cohesive architecture?"
+  - The skeleton has held since 2026-10-16. The detail grew by seven systems, 38 catalogue rows and 29
+    gaps.
+  - 49% of the design records' lines have been read by no review, v2's 70% and the project map's all
+    among them. v2 and the gap register have never been read whole.
+  - The re-cut's three decided moves are unapplied. The build's exit (spec, whole-design audit, chain
+    folders, decision rows, bar) is untouched (`build/2026-10-16-build-PLAY-dClosedLoop-1-state.md`
+    `[revisit]`).
+
 ## Instruments
 
 ### The gap-ownership join

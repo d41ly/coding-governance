@@ -387,3 +387,376 @@ Its run:
 tool dirs 19, with kit.toml 17, kit-table rows 19
 dirs the kit table never names: none
 ```
+
+## [revisit] The state, revisited at the owner's question, 2026-10-17
+
+The owner asked, verbatim:
+
+> What's is the current state of this design, what parts are yet missing and unreviewed? Is it converging into a cohesive architecture?
+
+### [revisit-state] What the design holds
+
+|  | 2026-10-16, `[state]` | 2026-10-17 |
+| --- | --- | --- |
+| layers | 8 | 8 |
+| principles | 30 | 30 |
+| roles | 14 | 14 |
+| chain builds | 15 | 15 |
+| systems | 0 | 7 |
+| steps, and their items | 8, holding 75 | 9, holding 81 |
+| policy catalogue rows | 149 | 187 |
+| gaps | 193 | 222 |
+| Tier-2 reports | 17 | 31 |
+| decision sections | 144 | 164 |
+
+- **The skeleton has held.** Layers, principles, roles, chain builds and the stage set are unchanged
+  since `[state]`. The joins are clean: every gap is owned by exactly one chain build, the role matrix
+  reads 81 items with no finding, and the presets cover 182 of 182 presettable keys.
+- **No review has found a blocker,** in 31 reports.
+- **The detail has grown.** The systems round, the retrofit and the project map added the seven
+  systems, 38 catalogue rows, 29 gaps, the adopt step and its 5 items.
+
+### [revisit-unreviewed] Text no review has read
+
+`coverage_v2.py` (`[revisit-instrument]`) attributes each current line of each design record to the
+commit that last wrote it. A line is reviewed when an audit read its record at a later blob, or when
+its commit lies inside a reviewed range.
+
+- **8,961 of 18,422 lines (49%)** in 30 design records have been read by no review.
+- **All of `[unreviewed]`'s list has been reviewed since.** The lexicon and the review system were
+  audited, and the runtime, layers, library and expansions folds each had a follow-up round.
+- **What no review has read now:**
+  - v2: 849 of its 1,207 lines (70%). No audit has read it whole, only the diffs into it;
+  - the gap register: 353 of 541 (65%), never read whole either;
+  - the project map: all 1,618 lines;
+  - the systems and retrofit audit's fold (`274085b92`), 895 lines across its records, and the closing
+    review's fold (`2cb3a2c23`), 171. Each earlier fold review confirmed 18 to 31 findings;
+  - the 2026-10-14 walks (the walk-through, flow, roles, orientation, coordination, the session model,
+    the design rounds, the overview, flow interactions, v0 and v1). v2 consolidated them, and none of
+    them was reviewed itself.
+- **Its control is seen:** with the systems and retrofit audit left out, systems reads 98% unreviewed
+  and retrofit 99%, from 37% and 48%.
+
+### [revisit-recut] What the chain still owes
+
+v2 `[owed]` and `[undecided]`, re-checked against v2's `[chain]` and the project map's `after=` and
+`owner=` relations:
+- **Decided on 2026-10-16, and not yet applied to `[chain]`:**
+  - dTotalRecall ahead of dIndexedDesign, which uses its house index. dIndexedDesign still follows
+    dDeclaredLoop alone;
+  - `gap-orient-08` moved to dWellOiledMachine. It is still dDeclaredLoop's;
+  - the deployer's and the maintainer's definitions moved to the builds that deliver integrations and
+    observability. Neither dShippedRelease's row nor dTendedCadence's names them.
+- **Still undecided:**
+  - dOrderedCharter consumes `instructions.*` from a policy file, schema and reader that dDeclaredLoop,
+    its child, builds;
+  - `gap-design-01` is dDeclaredLoop's, and dTotalRecall, its child, builds the fix;
+  - whether the kit confs that Runtime reads fold into the policy file;
+  - the tooling order;
+  - the roles layer's lower-level design: the answered-call hook's matching, the excerpt keys, and a
+    repair's carry;
+  - the interpretations to confirm at chain approval, and `instructions.edit`'s alternatives;
+  - dMindYourWords' second-wave packs, which wait for an adopter census.
+- **Answered since:**
+  - `gap-plan-06`'s owner, dRankedPlan, now follows dTotalRecall;
+  - dWellOiledMachine's row lands the `next` check with the laggards on a shrink-only list, so the
+    stage builds need not follow it. `[owed]` still lists the item.
+- **Ownership** (the project map's `[fixes]`, PM-8 and PM-10): 115 of 187 policy keys are cited by no
+  chain row, and the ownership table is next.
+
+### [revisit-converging] Is it converging
+
+- **The skeleton has converged.** It has not moved across the last two rounds, its joins are clean,
+  and no review has found a blocker.
+- **Each surface converges under review.** A first audit confirms 36 to 62 findings, its fold review
+  18 to 31, and a third round 12 to 21.
+- **The whole has not.** It grows faster than it closes:
+  - v2 has grown from 145 lines at its consolidation to 1,207, with 46 revision notes, and its
+    catalogue from 41 rows to 187;
+  - the branch's commits ran 32, 30, 44 and 54 a day;
+  - each new surface opens at the first audit's rate again: the systems and retrofit audit confirmed
+    62.
+- **The seams are where cohesion is missing:**
+  - ownership has four homes and no field;
+  - the chain's order holds the conflicts above;
+  - v2, the record that joins the design, has never been read whole.
+- **The build's exit is untouched:**
+  - there is no spec and no whole-design audit;
+  - no chain build has a folder or a `memory/LIVE.md` row;
+  - `memory/DECISIONS.md` names dClosedLoop 0 times;
+  - no bar has run since `ebce889c7` (2026-10-13).
+
+### [revisit-next] What closes it, in order
+
+1. Stop adding surface until the seams close.
+2. PM-10's ownership table, approved and folded.
+3. The re-cut: the three decided moves applied, and the undecided put to the owner.
+4. The declared audit, reading v2, the gap register and the chain whole, with the layer records as
+   context, and its fold reviewed.
+5. The spec, the chain's folders, the decision rows, the acceptance joins, and the full bar.
+
+### [revisit-instrument] The probes and their runs
+
+Each ran from the worktree root on a clean tree at `f21b63ab9`, before this section existed.
+
+```python
+"""Which lines of dClosedLoop's design records no Tier-2 review has read, line by line.
+
+Usage: python coverage_v2.py [--plant-uncover <review-stem>]   (from the worktree root)
+
+Each report's "Reviewed:" or "Range:" line is a blob set (an audit that read named records whole at those
+blobs) or a range (a diff review over (base, head]). `git blame HEAD` gives every current line the commit that
+last wrote it. A line is reviewed when an audit read its record at a blob whose commit descends from that
+commit, or when that commit lies inside a reviewed range. Anything else is unreviewed.
+--plant-uncover drops one report, to see the lines it covered turn unreviewed.
+"""
+import collections
+import pathlib
+import re
+import subprocess
+import sys
+
+REV = pathlib.Path("memory/builds/dClosedLoop/reviews")
+BUILD = pathlib.Path("memory/builds/dClosedLoop/build")
+SKIP = re.compile(r"-1-(research-|session-log|compaction-)|compared|instruments")
+
+
+def git(*a):
+    r = subprocess.run(["git", *a], capture_output=True, text=True, encoding="utf-8")
+    return r.stdout
+
+
+drop = sys.argv[sys.argv.index("--plant-uncover") + 1] if "--plant-uncover" in sys.argv else None
+audits, ranges = [], {}
+for p in sorted(REV.glob("*.md")):
+    stem = p.stem.split("PLAY-dClosedLoop-1-")[1]
+    if stem == drop:
+        continue
+    m = re.search(r"^(?:Reviewed|Range|Range reviewed): (.+)$", p.read_text(encoding="utf-8"), re.M)
+    if not m:
+        sys.exit(f"{p.name}: no Reviewed or Range line")
+    r = re.match(r"([0-9a-f]{40})\.\.\.?([0-9a-f]{40})", m.group(1))
+    if r:
+        ranges[stem] = set(git("rev-list", f"{r.group(1)}..{r.group(2)}").split())
+        continue
+    pairs = re.findall(r"(memory/builds/dClosedLoop/build/[^@,\s]+\.md)@([0-9a-f]{40})", m.group(1))
+    if not pairs:
+        sys.exit(f"{p.name}: a Reviewed line that is neither a range nor a blob set")
+    audits += [(stem, path, blob) for path, blob in pairs]
+print(f"reports read: {len(set(a[0] for a in audits))} audits over {len(audits)} record blobs, {len(ranges)} diff ranges")
+
+# For each audited (record, blob): the commits touching the record that the audit point descends from.
+# `audited` is kept apart, since a lookup in the defaultdict would add every record to it.
+covered_by_audit = collections.defaultdict(set)
+audited = {path for _, path, _ in audits}
+for stem, path, blob in audits:
+    cands = git("log", "--format=%H", f"--find-object={blob}", "--", path).split()
+    points = [c for c in cands if git("rev-parse", f"{c}:{path}").strip() == blob]
+    if not points:
+        sys.exit(f"{stem}: blob {blob[:9]} of {path} matches no commit")
+    covered_by_audit[path] |= set(git("rev-list", points[0], "--", path).split())
+
+subject = {}
+rows = []
+for p in sorted(BUILD.glob("*.md")):
+    if SKIP.search(p.name):
+        continue
+    path = p.as_posix()
+    blame = git("blame", "--line-porcelain", "HEAD", "--", path)
+    commits = [ln.split()[0] for ln in blame.split("\n") if re.match(r"^[0-9a-f]{40} \d+ \d+", ln)]
+    unrev = collections.Counter()
+    for c in commits:
+        if c in covered_by_audit[path] or any(c in s for s in ranges.values()):
+            continue
+        unrev[c] += 1
+    for c in unrev:
+        if c not in subject:
+            subject[c] = git("log", "-1", "--format=%h %s", c).strip()
+    rows.append((p.stem.split("PLAY-dClosedLoop-1-")[1], len(commits), sum(unrev.values()),
+                 path in audited, unrev))
+
+total = sum(r[1] for r in rows)
+unrev_total = sum(r[2] for r in rows)
+print(f"design records {len(rows)} · lines {total} · unreviewed {unrev_total} ({100 * unrev_total / total:.0f}%)")
+print()
+print(f"{'record':<34} {'lines':>6} {'unrev':>6} {'share':>6}  read whole")
+for name, n, u, whole, _ in sorted(rows, key=lambda r: -r[2]):
+    print(f"{name:<34} {n:>6} {u:>6} {100 * u / n if n else 0:>5.0f}%  {'yes' if whole else 'no'}")
+print()
+by_commit = collections.Counter()
+for *_, unrev in rows:
+    by_commit.update(unrev)
+print("unreviewed lines by the commit that wrote them, the largest 25:")
+for c, n in by_commit.most_common(25):
+    print(f"  {n:>5}  {subject[c][:150]}")
+```
+
+```text
+$ python coverage_v2.py
+reports read: 15 audits over 18 record blobs, 16 diff ranges
+design records 30 · lines 18422 · unreviewed 8961 (49%)
+
+record                              lines  unrev  share  read whole
+project-map                          1618   1618   100%  no
+walkthrough                           864    864   100%  no
+architecture-v2                      1207    849    70%  no
+flow                                  745    745   100%  no
+roles                                 413    413   100%  no
+state                                 389    389   100%  no
+foundations                           400    380    95%  no
+systems                               997    368    37%  yes
+gap-register                          541    353    65%  no
+orientation                           353    353   100%  no
+design-rounds                         303    303   100%  no
+retrofit                              608    293    48%  yes
+flow-roles                            309    292    94%  no
+session-model                         273    273   100%  no
+design-overview                       229    229   100%  no
+layer-roles                          1730    195    11%  yes
+final-reviews                         186    186   100%  no
+coordination                          182    182   100%  no
+architecture-v1                       178    178   100%  no
+flow-interactions                     170    170   100%  no
+architecture-v0                       113    113   100%  no
+layer-runtime                        1367     68     5%  yes
+layer-expansions                      699     54     8%  no
+layer-library                         429     40     9%  no
+flow-steps                            781     28     4%  yes
+layer-memory                         1149     11     1%  yes
+review-system                         387      9     2%  yes
+layer-instruction                     769      5     1%  yes
+layer-flow                            363      0     0%  yes
+lexicon                               670      0     0%  yes
+
+unreviewed lines by the commit that wrote them, the largest 25:
+    895  274085b92 records(dClosedLoop): the systems and retrofit audit folded — all 52 items amended, the ledger's populations kept where their checks keep th
+    415  ade9e49e3 records(dClosedLoop): design rounds 1 to 4 and the converged v1 architecture
+    390  e265c40c2 records(dClosedLoop): the owner asks how an agent sees the whole project at once — 37 of the audit's 52 items needed a piece not in view, a 
+    364  3be2225ae records(dClosedLoop): the rearchitecture's state recorded at the owner's question — no review has read the lexicon, the review system or the
+    331  55cc777f8 records(dClosedLoop): the project map designed from what both runs agree on — a tiered map in core memory, its delivery by role, its checks 
+    320  93cbe65c1 records(dClosedLoop): walk-through — Concurrency, Test, Plan and Design settled, Build drafted
+    283  df49d1c0b records(dClosedLoop): walk-through — Build, Deploy, Maintain and Review settled, Convergence drafted
+    276  e93ce4ea3 records(dClosedLoop): both orientation interpretations confirmed; one build modelled through every step, and fourteen holes
+    255  077602d0a records(dClosedLoop): the flow layer, Plan's scope and boundaries, unattended by default, Design drafted
+    241  2f8829d35 records(dClosedLoop): what the map's findings say to fix — ownership has four homes and no field, lifecycle is owned after all, and forks PM
+    240  17e0f7394 records(dClosedLoop): the gap register and the v0 architecture proposal
+    233  5b6a11ce2 records(dClosedLoop): round 5, and the walk-through's Spine settled and Concurrency drafted
+    228  b10785bd8 records(dClosedLoop): the roles layer designed — bound workers, a driver that does no role work, every checklist item mapped to its actor
+    226  525b64a97 records(dClosedLoop): coordination designed in — dLeasedFleet leaves the chain, and no build outside it is counted on
+    212  ca6d9b93d records(dClosedLoop): the design at this stage — an overview of the three layers, the chain and what is open
+    196  b85510fa6 records(dClosedLoop): entry, orientation and progression — the measured state, the design, and ten gaps
+    175  aa0d778b1 records(dClosedLoop): foundations step 1 — the ranked charter, practices with reach, a new root build
+    172  b0b3f29bc records(dClosedLoop): the flow revisit settled — the request is the ratification, no fork parks a build, every hole closed
+    171  2cb3a2c23 records(dClosedLoop): the folds' closing review folded — 19 of 20 items fixed, the high sent to the owner as RT-4, and update's git writes f
+    161  01dcdd1ae records(dClosedLoop): the project map test-run — the whole design mapped at 2,008 nodes in 24.1 KB, every check seen red, and the atlas's dr
+    159  6353ef8ac records(dClosedLoop): the core cannot be built around — principle registry, meta-check, factories
+    159  c6e9d44ab records(dClosedLoop): the map reloaded after the compaction, and what only it points at — entry and lifecycle, 12 items no build owns
+    156  f21b63ab9 records(dClosedLoop): the compaction summary was not verbatim — 3 of the map's 355 lines rewritten, the generator mines no README prose, and
+    155  e56f13caa records(dClosedLoop): the flow revisited with roles — one item cycle, each step's role sequence and routes
+    154  d56c897fc records(dClosedLoop): the walk-through completed, and architecture v2 consolidated
+$ python coverage_v2.py --plant-uncover systems-retrofit
+reports read: 14 audits over 16 record blobs, 16 diff ranges
+design records 30 · lines 18422 · unreviewed 9886 (54%)
+
+record                              lines  unrev  share  read whole
+project-map                          1618   1618   100%  no
+systems                               997    982    98%  no
+walkthrough                           864    864   100%  no
+architecture-v2                      1207    849    70%  no
+flow                                  745    745   100%  no
+retrofit                              608    604    99%  no
+roles                                 413    413   100%  no
+state                                 389    389   100%  no
+foundations                           400    380    95%  no
+gap-register                          541    353    65%  no
+orientation                           353    353   100%  no
+design-rounds                         303    303   100%  no
+flow-roles                            309    292    94%  no
+session-model                         273    273   100%  no
+design-overview                       229    229   100%  no
+layer-roles                          1730    195    11%  yes
+final-reviews                         186    186   100%  no
+coordination                          182    182   100%  no
+architecture-v1                       178    178   100%  no
+flow-interactions                     170    170   100%  no
+architecture-v0                       113    113   100%  no
+layer-runtime                        1367     68     5%  yes
+layer-expansions                      699     54     8%  no
+layer-library                         429     40     9%  no
+flow-steps                            781     28     4%  yes
+layer-memory                         1149     11     1%  yes
+review-system                         387      9     2%  yes
+layer-instruction                     769      5     1%  yes
+layer-flow                            363      0     0%  yes
+lexicon                               670      0     0%  yes
+
+unreviewed lines by the commit that wrote them, the largest 25:
+    895  274085b92 records(dClosedLoop): the systems and retrofit audit folded — all 52 items amended, the ledger's populations kept where their checks keep th
+    415  ade9e49e3 records(dClosedLoop): design rounds 1 to 4 and the converged v1 architecture
+    390  e265c40c2 records(dClosedLoop): the owner asks how an agent sees the whole project at once — 37 of the audit's 52 items needed a piece not in view, a 
+    364  3be2225ae records(dClosedLoop): the rearchitecture's state recorded at the owner's question — no review has read the lexicon, the review system or the
+    331  55cc777f8 records(dClosedLoop): the project map designed from what both runs agree on — a tiered map in core memory, its delivery by role, its checks 
+    320  93cbe65c1 records(dClosedLoop): walk-through — Concurrency, Test, Plan and Design settled, Build drafted
+    314  f839cb100 records(dClosedLoop): the systems round's two runs compared and its design drafted — one tag grammar and one derived index shared with memor
+    283  df49d1c0b records(dClosedLoop): walk-through — Build, Deploy, Maintain and Review settled, Convergence drafted
+    276  e93ce4ea3 records(dClosedLoop): both orientation interpretations confirmed; one build modelled through every step, and fourteen holes
+    255  077602d0a records(dClosedLoop): the flow layer, Plan's scope and boundaries, unattended by default, Design drafted
+    241  2f8829d35 records(dClosedLoop): what the map's findings say to fix — ownership has four homes and no field, lifecycle is owned after all, and forks PM
+    240  17e0f7394 records(dClosedLoop): the gap register and the v0 architecture proposal
+    233  5b6a11ce2 records(dClosedLoop): round 5, and the walk-through's Spine settled and Concurrency drafted
+    228  b10785bd8 records(dClosedLoop): the roles layer designed — bound workers, a driver that does no role work, every checklist item mapped to its actor
+    226  525b64a97 records(dClosedLoop): coordination designed in — dLeasedFleet leaves the chain, and no build outside it is counted on
+    212  ca6d9b93d records(dClosedLoop): the design at this stage — an overview of the three layers, the chain and what is open
+    196  b85510fa6 records(dClosedLoop): entry, orientation and progression — the measured state, the design, and ten gaps
+    178  8537cc641 records(dClosedLoop): the retrofit design — a system across the layers, its ledger in the core: one baseline primitive seeded at every check
+    175  aa0d778b1 records(dClosedLoop): foundations step 1 — the ranked charter, practices with reach, a new root build
+    172  b0b3f29bc records(dClosedLoop): the flow revisit settled — the request is the ratification, no fork parks a build, every hole closed
+    171  2cb3a2c23 records(dClosedLoop): the folds' closing review folded — 19 of 20 items fixed, the high sent to the owner as RT-4, and update's git writes f
+    161  01dcdd1ae records(dClosedLoop): the project map test-run — the whole design mapped at 2,008 nodes in 24.1 KB, every check seen red, and the atlas's dr
+    159  6353ef8ac records(dClosedLoop): the core cannot be built around — principle registry, meta-check, factories
+    159  c6e9d44ab records(dClosedLoop): the map reloaded after the compaction, and what only it points at — entry and lifecycle, 12 items no build owns
+    156  f21b63ab9 records(dClosedLoop): the compaction summary was not verbatim — 3 of the map's 355 lines rewritten, the generator mines no README prose, and
+```
+
+```bash
+#!/usr/bin/env bash
+# How the design has grown since v2's consolidation, and the build's state against its acceptance. Run from the
+# worktree root; prints to stdout.
+set -u
+B=memory/builds/dClosedLoop
+V=$B/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md
+C=d56c897fc
+cat_rows() { awk '/^## \[policies\]/{f=1;next} /^## \[/{f=0} f && /^\| `/' | wc -l; }
+echo "\$ v2 at its consolidation ($(git log -1 --format='%h %cs' $C)) and at HEAD ($(git log -1 --format='%h' HEAD))"
+echo "lines $(git show $C:$V | wc -l) -> $(wc -l < $V)"
+echo "catalogue rows $(git show $C:$V | cat_rows) -> $(cat_rows < $V)"
+echo "revision notes $(git show $C:$V | grep -c '^Revised: ') -> $(grep -c '^Revised: ' $V)"
+echo "\$ commits on the build's branch since its base, by day"
+git log --format=%cs 742957fcf..HEAD | sort | uniq -c
+echo "\$ the build's own deliverables"
+echo "spec folder: $([ -d $B/spec ] && echo present || echo absent)"
+n=0; for c in dOrderedCharter dFairHearing dDeclaredLoop dBoundRoles dTotalRecall dMindYourWords dWellOiledMachine \
+  dWitnessedBar dRankedPlan dIndexedDesign dScopedBuild dShippedRelease dTendedCadence dCalibratedLens dConvergedCharter; do
+  { [ -d memory/builds/$c ] || grep -q "$c" memory/LIVE.md; } && n=$((n + 1)); done
+echo "chain builds with a folder or a LIVE.md row: $n of 15"
+echo "memory/DECISIONS.md lines naming dClosedLoop: $(grep -c dClosedLoop memory/DECISIONS.md)"
+echo "the last bar's commit: $(git log -1 --format='%h %cs' ebce889c7) (the kickoff card's drift line)"
+```
+
+```text
+$ bash growth_probe.sh
+$ v2 at its consolidation (d56c897fc 2026-10-14) and at HEAD (f21b63ab9)
+lines 145 -> 1207
+catalogue rows 41 -> 187
+revision notes 0 -> 46
+$ commits on the build's branch since its base, by day
+     32 2026-10-14
+     30 2026-10-15
+     44 2026-10-16
+     54 2026-10-17
+$ the build's own deliverables
+spec folder: absent
+chain builds with a folder or a LIVE.md row: 0 of 15
+memory/DECISIONS.md lines naming dClosedLoop: 0
+the last bar's commit: ebce889c7 2026-10-13 (the kickoff card's drift line)
+```
