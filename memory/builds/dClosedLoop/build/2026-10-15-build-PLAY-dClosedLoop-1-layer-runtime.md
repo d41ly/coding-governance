@@ -274,12 +274,12 @@ each decision through mechanisms it supervises, enforces at every boundary, and 
                                      │
                                      ▼
  Flow's position function (dDeclaredLoop), asked through Runtime's next verb: a pure function of
- declaration, witnesses and policy, answering act · blocked · terminal · stuck · invalid-input ·
- stale-remote
+ declaration, witnesses and policy, answering act · awaiting · blocked · terminal · stuck ·
+ invalid-input · stale-remote
                                      │ asked on every beat
                                      ▼
  ┌───────── THE SUPERVISOR: the executor as a process, no model (resume-tick grown) ─────────┐
- │ started and restarted by the node tick · holds the run lease and its epoch · cuts each     │──► journal
+ │ started and restarted by the node tick · holds each build lease and its epoch · cuts each  │──► journal
  │ work order fresh · runs command items · raises owner items · launches one act session per  │
  │ role act · reserves agent slots · queues and merges commits · allocates and sweeps         │
  │ workspaces · holds on limits · wakes cadence items                                         │
@@ -327,7 +327,8 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   | Answer | What it carries | What the supervisor does |
   |---|---|---|
   | `act` | the frontier's items, each with its act: the item, its actor kind, its work order's key and `task-sha`, its harness, and the outcome table it routes on | runs each act |
-  | `blocked` | each blocked item, with what blocks it | raises an owner item once nothing the item waits on is in flight |
+  | `awaiting` | each awaited item, with the event or record it waits on | holds, renews its lease, and asks again when that event fires. It raises no owner item itself: a wait with a ceiling is raised by the supervisor's sweep (`[supervise]`) |
+| `blocked` | each blocked item, with what blocks it | raises an owner item once nothing the item waits on is in flight |
   | `terminal` | all work terminal | closes the run; the two runs left at BUILDING were this case |
   | `stuck` | no frontier, while the build is not terminal | raises an owner item at once |
   | `invalid-input` | a malformed declaration, policy value or witness, named with its path | refuses to act, and journals it |
@@ -342,7 +343,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   So "never runs again" holds per instance, and the flow's loops still loop.
 - **Clients.** Runtime's verbs are the whole client surface (RT-3):
   - `next`, which prints the position function's answer, ending with its `next —` line;
-  - `run <build>`. Attended, it binds the owner's session as the driver. Unattended, it takes the run
+  - `run <build>`. Attended, it binds the owner's session as the driver. Unattended, it takes the build
     lease and registers the build with the node's supervisor;
   - the owner's pause, resume, withdraw and supersede (`gap-flow-10`), through dDeclaredLoop's guarded
     command. They extend unattended's `--hold`, `--resume` and `--abort`; supersede is new. The
@@ -362,7 +363,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   It replaces only the launch: `--resume --dangerously-skip-permissions`, at `resume-tick.sh:385`.
 - **Its host is the node tick.**
   - The OS-scheduled `gov-resume-tick` registration runs every 10 minutes (`tools/unattended/README.md`).
-    It starts the supervisor when none beats under a live run lease, and restarts it after a crash or a
+    It starts the supervisor when none beats under a live lease, and restarts it after a crash or a
     reboot.
   - Preflight refuses a node that declares itself a run host without that registration.
   - A desktop scheduled task wakes a model session, so it can host an act but never the supervisor.
@@ -396,10 +397,19 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     keeps renewing its lease.
   - A weekly limit can hold for days. So once the hold passes `runtime.hold-ceiling`, the supervisor
     raises an owner item and keeps holding.
-- **Fencing.**
-  - Each run lease carries an epoch, bumped at every take-over.
+- **Fencing.** Revised: 2026-10-17, the debt round's fold.
+  - Each lease carries an epoch in dDeclaredLoop's lease grammar, bumped at every take-over. One name
+    per lease: the build lease (which the first draft also called the run lease), the unit lease, and
+    the cadence lease, which an event wake takes for its instance (`[schedule]`).
   - Each act session's `--session-id` is recorded with the epoch it serves.
-  - Act binding refuses any call from a session whose epoch is not current, and so does the commit path.
+  - The dispatcher's PermissionRequest decision refuses any gated call from a session whose epoch is
+    not current (`[act]`). The commit queue and the lander's prepare refuse one too.
+  - **Where the epoch is read.** The dispatcher reads the lease ref in its clone, which the supervisor
+    refreshes from the remote at each beat, since `next` reads the lease witnesses. A supervisor that
+    finds its lease taken over kills the act sessions it launched under the old epoch. With no
+    supervisor beating there, the node tick restarts one within its period, and that one does the
+    same. Until then an old session's gated calls touch only its own workspace: the commit queue and
+    the lander's prepare re-read the epoch from the remote before they commit or push.
 
   So a take-over is safe while the old node's act sessions still run. It is safe under clock skew too
   (node d runs 8 to 13 s slow), because correctness rests on the epoch, never on two clocks agreeing.
@@ -419,7 +429,9 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     against a counter under the lease. When slots are short, it queues the act.
   - It releases the slots when the act session exits, or when the reap kills its tree.
   - Attended, the PreToolUse entry on Workflow and Agent reserves the same way, and refuses instead of
-    queueing.
+    queueing. Both calls run in the background, so the reservation is released when the call's work
+    ends: at SubagentStop for an Agent call, and at the run's saved result for a Workflow call. A sweep
+    keyed to the session's liveness frees what a dead session held.
   - agent-cap's per-prompt total is unchanged.
 - **Supervision.** On each beat, the supervisor:
   - runs `reap.py --sweep` under `PROCMON_REAP_MODE` (reap-orphans here);
@@ -447,10 +459,19 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - wraps its task in the work order;
   - spawns the role agent (roles `[cycle]`).
 - **Binding happens at the granularity the platform lets a hook see.**
-  - **The call.** The PreToolUse entry for Workflow and Agent compares the call (the registered harness,
-    and its args digest) with the act `next` named for this session. It refuses:
+  - **The call.** Revised: 2026-10-17, the debt round's fold. The dispatcher's PermissionRequest entry
+    decides every gated call, and it is the one entry that fails closed below 2.1.295 (`[enforce]`). In
+    an act session it compares the call (the registered harness, and its args digest) with the act
+    `next` named for this session, and the session's epoch with the lease's (`[supervise]`). It
+    refuses:
     - a Workflow, Agent or transition call the act did not name;
-    - any call from a session whose epoch is stale.
+    - any gated call from a session whose epoch is stale.
+
+    The PreToolUse entry repeats the comparison to refuse early and to journal. It decides nothing, so
+    a PreToolUse crash below 2.1.295 opens no path.
+  - **The decision, by binding.** An act session's gated call is approved on its binding and its
+    allowance. An attended or unbound session's gated call is approved once the guard packs pass, the
+    write gate included.
   - **Inside an admitted script.** No hook sees `agent()` or a nested `workflow()`, so these are bound
     statically and reconciled afterwards:
     - each registered harness declares its spawn sites and its maximum fan, which agent-cap's script
@@ -468,7 +489,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - **Session binding.**
     - SessionStart writes a binding record: the build, plus either the act and its epoch or
       "attended".
-    - Act binding requires that record, so a crashed SessionStart makes the first tool call refuse.
+    - Act binding requires that record, so a crashed SessionStart makes the first gated call refuse.
     - A session outside every build's workspace is unbound. Act binding then does not apply, and the
       write gate still refuses product code that no specced unit owns.
     - The orientation scout's spawn at session start is a bound act of the attended binding.
@@ -493,8 +514,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   the default is `in-session`.
 - **Returns are persisted from where they live:**
   - a SubagentStop entry writes each agent's return through `record`, under the return-record kind;
-  - it keys the return by the item and the work order's `task-sha`, which, unlike `agent_id`, is stable
-    across sessions;
+  - it keys the return by the item instance, the work order's `task-sha`, and the spawn site and index
+    the harness declares (`[act]`). All are stable across sessions, unlike `agent_id`. SubagentStop
+    reads the spawn site from the spawn marker it journals, so a relaunch can tell which agents of one
+    fan returned;
   - for a schema-forced agent, the return is the input of the last `StructuredOutput` call in
     `agent_transcript_path`. Such an agent ends on that call with no text block: the roles research
     counted 2,588 such endings against 226 text endings. So `last_assistant_message` is read only for
@@ -534,20 +557,24 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - settings-merge.py renders one dispatcher entry per event from the fragments, writes `onFailure`,
     and compares both in `--check`;
   - the class check "every enforcement entry fails closed" is a new arm of check-wiring.sh, over its one
-    fragment reader;
+    fragment reader. It also fails when a gated tool's ask rule has no PermissionRequest dispatcher
+    entry;
   - agent-cap's hard-coded arm becomes a fragment.
 - **The events:**
   - PreToolUse and PostToolUse;
+  - PermissionRequest, the gated tools' one allow path;
   - SessionStart, from every source: startup, resume, clear, compact and fork;
   - SubagentStart and SubagentStop;
   - Stop and StopFailure;
   - PreCompact, PostCompact and SessionEnd;
   - the git hooks.
-- **Every live hook has an owner pack.** A gate compares this table with `settings.json`:
+- **Every live hook has an owner pack.** A gate compares this table with `settings.json` both ways: an
+  entry with no row turns it red, and so does a row with no entry.
 
   | Hook today | Event | Kit | Pack |
   |---|---|---|---|
-  | agent-cap | PreToolUse: Workflow, Agent | hooks | roles: the spawn guard; runtime: the slot reservation and act binding |
+  | agent-cap | PreToolUse: Workflow, Agent | hooks | roles: the spawn guard; runtime: the slot reservation, and binding's early refusal |
+| the dispatcher's permission entry, new | PermissionRequest: the gated tools | hooks | runtime: the permission baseline, act binding and the epoch check |
   | scratch-guard | PreToolUse: shell and edits; SubagentStart | hooks | roles: write gates |
   | gate-guard | PreToolUse: shell, AskUserQuestion | unattended | runtime: the run guard |
   | manifest-check, writing and replaying the card | SessionStart | session-kickoff | runtime: session binding and the card |
@@ -561,7 +588,8 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - **The permission baseline.** Under `runtime.hook-failure=closed`, every gated tool carries an ask
     rule. The gated tools are Bash, PowerShell, Write, Edit, MultiEdit, NotebookEdit, Agent and
     Workflow.
-    - Only the dispatcher's PermissionRequest entry answers the rule, with a JSON decision.
+    - Only the dispatcher's PermissionRequest entry answers the rule, with a JSON decision made by the
+      session's binding (`[act]`).
     - A dispatcher that cannot run leaves the call unapproved. In an act session the call is denied;
       in an attended session it goes to the person.
     - Dispatch 36 saw every burst failure class denied this way on 2.1.292, read-only commands
@@ -569,18 +597,22 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - **One checking hook is the allow path.**
     - A crashed guard sitting beside a healthy allowing hook lets the call run, which is why the
       dispatcher is a single entry.
-    - An allow rule on a gated tool would bypass the dispatcher. So a class check refuses one in
-      tracked settings, and check-wiring's session arm warns on one in local or user settings.
+    - An allow rule on a gated tool would bypass the dispatcher, and so would a second
+      PermissionRequest hook. A class check refuses either in tracked settings. The supervisor's
+      preflight reads every settings source an act session loads, and refuses the launch while any
+      holds one. check-wiring's session arm warns on either in every scope.
     - This repo's `.claude/settings.local.json` allows `Bash(git fetch *)` today.
   - **Auto mode stays, as the owner ruled** (TOOL-aMendedFleet-116).
     - The classifier still judges ungated tools.
     - An ask rule resolves before the classifier, so the dispatcher decides gated tools instead, by
-      the act's allowance.
-  - **The switch, where the CLI carries it.**
-    - `onFailure: "block"` is a capability the node registry detects from the version: 2.1.295 and
-      later.
+      the session's binding.
+  - **The switch, where the CLI carries it.** Revised: 2026-10-17, the debt round's fold.
+    - Under `runtime.hook-failure=closed`, settings-merge writes `onFailure: "block"` on every entry,
+      since one tracked settings file serves every node.
+    - The node registry records per binary whether the key takes effect, from 2.1.295. That
+      capability decides only what the supervisor journals and what `fail-closed` claims for the node.
     - 2.1.292 ignores the key without a warning, so the switch is never assumed.
-    - Where it is present, every enforcement entry also fails closed, ungated tools included.
+    - Where it takes effect, every enforcement entry also fails closed, ungated tools included.
   - **No version is refused or degraded.** TOOL-aMendedFleet-61's launch-version pin stands, and
     `read_cli_version` with the pinned `cli-version` fact reads the running session's version.
   - **What stays open below 2.1.295:** rules on ungated tools, such as the answered-call rule on reads.
@@ -589,10 +621,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 
     | Event | Witness | Its reader |
     |---|---|---|
-    | SessionStart | the binding record | act binding, at the first PreToolUse |
+    | SessionStart | the binding record | act binding, at the first gated call's PermissionRequest decision |
     | SubagentStart | the journal entry, with the spawn marker | the supervisor's reconciliation at the act's end. Enforcement sits on the ask rule for Agent and Workflow |
     | SubagentStop | the persisted return | the supervisor, which counts an item done only on it |
-    | Stop | the act's outcome record | the supervisor |
+    | Stop | the act's outcome record, which the supervisor writes through `record` from the process's JSON result at exit | the supervisor |
     | pre-commit, commit-msg | a witness per commit, keyed by its tree and message | the supervisor, which counts a commit item done only with it. An attended commit without one meets the lander's core re-check (K1) and is reported (`core.bypass=with-hooks-report`). |
     | pre-push | the allow record | push-main, as today |
   - **Signal traps.** Git hooks trap signals and exit non-zero when killed. That closes the class behind
@@ -614,16 +646,17 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     "the violator pays") stands. A bypass is journaled, and its commit meets the lander's re-check.
   - A rule a session cannot satisfy is excepted through the exception register (`core.exceptions`, K4).
     The exception is journaled and audited by the Loop Review.
-  - A dispatcher that cannot start refuses every call, the call to record an exception included. Its
-    repair therefore happens outside the agent: from the owner's terminal, or by the supervisor parking
-    the run with the error. The repair is recorded in the same register.
+  - A dispatcher that cannot start leaves every gated call denied in an act session, the call that
+    records an exception included, and puts it to the person when attended. An act session's repair
+    therefore happens outside the agent: from the owner's terminal, or by the supervisor parking the
+    run with the error. The repair is recorded in the same register.
 - **User-level guards are outside the surface.** The node's own hooks, such as `git_dash_c_guard`, are
   recorded in the node registry. check-wiring's session arm warns on one that lacks
   `onFailure: "block"`.
 - **Latency is measured, never promised.**
   - One guard costs 57 ms today.
   - The research projects about 85 ms for an in-process dispatcher, unless rules load lazily.
-  - The `latency` fixture sets the dispatcher's budget.
+  - The `latency` fixture's first run sets the dispatcher's budget, and every later run is held to it.
 
 ### [isolate] Workspaces by `build.worktree`
 
@@ -706,13 +739,14 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - cloud-routine is an integrations adapter, used once a routine has shown a green bar;
   - CI's schedule stays, for read-only verdicts.
 - **Each cadence instance is keyed by its period** (ISO week or date).
-  - The supervisor consults that witness before it takes the cadence lease.
+  - The supervisor consults that witness before it takes the cadence lease, and again after. A
+    witness that appeared in between releases the lease without a run.
   - So a node that wakes late, after another has run the period, skips it.
   - A missed period runs at the next wake.
 - **An item can wait on an event.** `deploy.released` waits for the release slot's exit record. The
   record's event fans out to one instance per waiting build whose landed SHA the record's SHA
   contains, each keyed by (event, SHA, build) and witnessed by build, so a skipped key never skips a
-  second build. The supervisor runs each under its wake's own run lease, so it needs no build lease,
+  second build. The supervisor runs each under its instance's cadence lease, so it needs no build lease,
   and its records mint under the build's claim ref. A wait with no record is watched by the
   supervisor's sweep (`[supervise]`), which raises its owner item once `build.release-ceiling` passes.
 - **In-session cron is retired for cadence.**
@@ -725,7 +759,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   adapters.
 - **Each harness adapter carries a capability table, measured and never claimed:**
   - **Claude Code:** every event in `[enforce]`, the Workflow tool, ask rules answered by PermissionRequest
-    on every version, and `onFailure` from 2.1.295.
+    as measured on 2.1.292 and 2.1.295, and `onFailure` from 2.1.295.
   - **Codex:**
     - it has PreToolUse (Bash, apply_patch, MCP), SubagentStart, SubagentStop, PreCompact and
       SessionEnd;
@@ -738,7 +772,8 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 - **The git boundary is the floor for every harness.** Harnesses with instructions only (Gemini,
   Copilot, Cursor, Windsurf) keep that floor.
 - **The node registry gains runtime facts,** which the supervisor reads before it launches:
-  - each `claude` binary, with its path and version;
+  - each `claude` binary, with its path and version, whether `onFailure` takes effect on it, and whether
+    its PermissionRequest can approve each gated tool;
   - the clock offset, and `autocrlf`;
   - the process-start cost class;
   - the user-level guards.
@@ -803,11 +838,11 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 |---|---|---|
 | `pure-position` | Position is a pure function of the declaration, the witnesses and the policy, the same in every mode. It is Flow's, and Runtime relies on it. | `next` |
 | `named-acts` | Every act was named by `next`. An unnamed Workflow, Agent or transition call is refused, and so is a shell call outside the act's allowance. An unnamed agent inside an admitted script voids its act's witness. A stale epoch is refused. | `binding`, `fencing` |
-| `once-per-instance` | An item instance whose witness is current never runs again, and an unwitnessed one can always be dispatched again. Every command is idempotent or reconciles. | `relaunch`, `idempotence`, `coverage` |
+| `once-per-instance` | An item instance whose witness is current never runs again, and an unwitnessed one can always be dispatched again. Every command is idempotent or reconciles. | `relaunch`, `idempotence`, `act-ceiling`, `coverage` |
 | `persisted-returns` | No result exists only in memory: every return is persisted through `record` before its item counts as done. | `spike`, `returns` |
 | `no-model-context` | Neither the decider nor the supervisor holds model context. | by construction: both are programs |
 | `one-door` | Records change only through `record`, instructions only through the instruction command, and main only through the lander. | `coverage` |
-| `fail-closed` | Under `runtime.hook-failure=closed`, on every CLI version, a gated tool call runs only on the dispatcher's approval. A dispatcher that cannot run leaves the call denied, or put to the person when attended. Where the CLI carries `onFailure`, every enforcement entry fails closed too. Every event that cannot fail closed has a witness with a named reader. A bypass or an exception is journaled and re-checked, as K1 and K4 set. Under `open`, the class check reports the policy in force on every run. | `fail-closed`, `git-witness` |
+| `fail-closed` | Under `runtime.hook-failure=closed`, on every CLI version, a gated tool call in an act session runs only on the dispatcher's approval, since preflight refuses a launch whose settings allow a gated tool or add a second permission hook. Attended, either is warned about at session start. A dispatcher that cannot run leaves the call denied, or put to the person when attended. Where the CLI carries `onFailure`, every enforcement entry fails closed too. Every event that cannot fail closed has a witness with a named reader. A bypass or an exception is journaled and re-checked, as K1 and K4 set. Under `open`, the class check reports the policy in force on every run. | `fail-closed`, `git-witness` |
 | `no-skip` | No session the runtime launches skips permissions. | `no-skip` |
 | `policy-and-journal` | Every runtime behaviour is a policy key with a reader, and every runtime event is journaled. | `coverage` |
 | `grants-and-secrets` | An adapter acts only within the scopes it declared, its secret never leaves its process, and no push publishes a secret value; a journal is pruned past `runtime.journal`. | `grant`, `secret-scan`, `journal-retention` |
@@ -895,18 +930,19 @@ Settled by RT-3: the owner chose "Runtime takes `next` and the controls too".
      - the owner's controls, mapped onto unattended's verbs;
   3. the supervisor:
      - `resume-tick.sh` grown, started and restarted by the node tick;
+     - the act's outcome record, written from the process's JSON result at exit;
      - act sessions, relaunch and its cap, limit holds and fencing;
      - command adapters that are idempotent or reconcile;
      - acting on the position function's answers;
      - writing the shared records itself;
-  4. act binding, a runtime pack;
+  4. act binding and the epoch check, decided in the dispatcher's PermissionRequest entry, a runtime pack;
   5. the persisted-return store, and the deferral block;
   6. the slot reservation, under agent-cap's cap;
   7. the enforcement surface:
      - the fragments as packs, settings-merge's dispatcher entries, and check-wiring's class arm;
      - the permission baseline: ask rules on gated tools, the dispatcher's PermissionRequest entry as the
        only allow path, and the allow-rule class check;
-     - `onFailure`, wherever the node registry shows the CLI carries it;
+     - `onFailure: "block"` on every entry, its effect recorded per binary in the node registry;
      - the owner-pack table;
      - the witnesses and their readers;
      - signal traps on every git hook;
@@ -945,7 +981,8 @@ Settled by RT-3: the owner chose "Runtime takes `next` and the controls too".
     cadence" became the cadence on Runtime's hosts, and it gains dWellOiledMachine as a parent.
   - **dShippedRelease** keeps the landing record, the landing queue it builds and the lander's core
     re-check (K1). Revised 2026-10-16: the turnstile is a bar semaphore, so no landing queue exists yet.
-- **The chain has fourteen builds.**
+- **The chain's builds are v2's `[chain]` rows.** Revised: 2026-10-17: this line once counted
+  fourteen, which v2 outgrew.
 - **An ordering consequence.** Every stage build whose commands must end with a `next —` line now
   depends on dWellOiledMachine. v2's `[owed]` gives that ordering to the re-cut.
 - **Retired or rewritten, each with its consumers:**
@@ -977,18 +1014,33 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   - its answers are byte-identical on one build folder, attended and unattended, with `.unattended.conf`
     absent;
   - an empty frontier with all work terminal answers `terminal`, and one with work open answers `stuck`;
-  - a corrupt witness answers `invalid-input`, naming its path.
+  - a corrupt witness answers `invalid-input`, naming its path;
+  - a frontier holding only a hook item answers `awaiting`;
+  - a blocked item whose blocker is in flight raises no owner item until the blocker ends, then raises
+    exactly one;
+  - an unreadable lease ref answers `stale-remote`, and the item parks once `leases.expiry-hours`
+    passes;
+  - a failed check routed back to `entry.place` mints a new instance key and is dispatched again, while
+    the old instance stays witnessed.
+
+  The last four are each seen red against a stub supervisor.
 - **`binding`:**
   - in an act session, each of these is refused when `next` did not name it: a Workflow call, an Agent
     call, a `--phase` transition and a Bash script;
   - an admitted script that calls `agent()` beyond its declared fan voids its act's witness;
   - the prompt-writer and role spawns inside the bound harness call are admitted;
+  - on 2.1.292 in auto mode, with only the PreToolUse entry crashed (out of memory, and a missing path)
+    and PermissionRequest healthy, an unnamed Workflow call and a stale-epoch call are each denied.
+    It is seen red first against today's split, where PreToolUse alone binds;
+  - benign gated calls from an attended session and from an unbound one are approved without a
+    prompt;
   - declaration coverage is measured separately, over the main-session transcripts: every Workflow,
     Agent and Bash act, with hook-issued verbs excluded. It is seen red first on session b710e9c3's 17
     inline workflows, and its population is asserted non-empty.
 - **`relaunch`:** kill a review fan's act session after some of its agents return. The fresh relaunch
   spawns only the agents without a persisted return, checked by spawn counts and the journals'
-  `totalTokens`. With SubagentStop disabled, the relaunch follows `runtime.relaunch`.
+  `totalTokens`. With SubagentStop disabled, the relaunch follows `runtime.relaunch`. A five-agent fan
+  killed after two returns respawns exactly three agents, each for a named spawn site.
 - **`limits`:**
   - in a partial fan where some of k agents return null, the returns persist, the nulls become
     `deferred-platform`, and the relaunch re-pays only the nulls;
@@ -997,7 +1049,8 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
 - **`in-flight`:**
   - with `FANOUT_CAP=3`, the supervisor queues an act whose declared fan exceeds the free slots, and the
     attended PreToolUse entry refuses the same call;
-  - killing an act session that holds slots releases them once the reap runs.
+  - killing an act session that holds slots releases them once the reap runs;
+  - an attended Workflow call's slots are freed when its run ends, and a dead session's by the sweep.
 - **`returns`:**
   - a schema-forced agent's persisted return byte-matches what `agent()` resolved to;
   - a payload whose final text is valid JSON, while its `StructuredOutput` call is not, is refused;
@@ -1010,8 +1063,21 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
     ungated tools included;
   - in an attended 2.1.292 session, a missing dispatcher puts a gated call to the person and never runs
     it. Dispatch 36 could not run this case, because it needs a terminal;
-  - an allow rule matching a gated tool fails the class check;
-  - a crashed SessionStart dispatcher makes the first tool call refuse;
+  - an allow rule matching a gated tool fails the class check, and so does a settings file with the
+    PermissionRequest entry removed;
+  - a crashed SessionStart dispatcher makes the first gated call refuse, planted as a Bash or Workflow
+    call;
+  - kill the PermissionRequest host after its first healthy answer in a running act session, and the
+    next gated call is denied. It is seen red against a stub that admits;
+  - a dead dispatcher refuses the exception-record call, and the repair is recorded from outside the
+    agent;
+  - a user-level `Bash(*)` allow rule, and a user-level always-allow PermissionRequest hook beside a
+    crashed dispatcher, each refuse an act session's launch at preflight and are warned about
+    attended. Each is seen red first;
+  - under `runtime.hook-failure=open`, every run's journal and the class check's output name the
+    policy in force, seen red when that line is dropped;
+  - a `hooks.bypass` commit and a `core.exceptions` entry each leave a journal line, and the lander's
+    re-check reports the bypass;
   - the burst's user-level guards are reported, not counted.
 - **`workspaces`:**
   - under per-unit, two units commit concurrently in their own worktrees, and after release the build
@@ -1020,14 +1086,18 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   - under shared, two disjoint passes commit through the queue with no index lock;
   - in a run that touches shared records, only the supervisor writes them;
   - a dirty worktree and a foreign temp directory survive the sweep;
-  - an edited `.githooks` in a worktree does not run.
+  - an edited `.githooks` in a worktree does not run;
+  - on a node registry whose `autocrlf` differs from the tree's, a fresh worktree is clean and
+    `--preflight` passes.
 - **`sessions`:**
   - a `fork` and a resume each deliver the card;
   - a PreCompact hook flushes an item's work before an automatic compaction;
   - after a manual compaction, the summary names the build, the item and the open asks;
   - the card stays under the re-attachment cap.
 - **`cadence`:** node A runs a period's item, and node B, waking late, skips it. A missed period runs at
-  the next wake.
+  the next wake. Two supervisors released together on one period make one run and one witness.
+- **`act-ceiling`:** a stub act session sleeping past a lowered `runtime.act-ceiling` is reaped,
+  journaled and relaunched under the cap.
 - **`grant`:** an adapter whose granted scope is wider than its declared one is refused at registration,
   seen red on a probe stubbed to accept it.
 - **`journal-retention`:** under `runtime.journal: N`, entries planted at N-1 and N+1 days: the node
@@ -1047,14 +1117,19 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   owner item opens once `build.release-ceiling` passes, and only one.
 - **`extension`:**
   - a stub harness adapter registers with no edit to Runtime's code or schema;
-  - Codex's capability table is checked against the dispatcher's required events;
+  - the owner-pack table and `settings.json` are compared both ways, seen red on an entry with no row
+    and on a row with no entry;
+  - Codex's capability table is checked against the dispatcher's required events, PermissionRequest
+    among them;
   - a crashing Codex hook is refused, or recorded as one that cannot be.
 - **`start-cost`:** a lean act session's first turn on Windows stays under the 84k-token median of a
   fresh session. If it is red, the remedy is a leaner launch, since one session per act is structural.
 - **`no-skip`:** a class check over every launcher's argv fails on `--dangerously-skip-permissions`. It
   is seen red on today's `resume-tick.sh:385`.
-- **`fencing`:** kill only the supervisor mid-act, and let a second supervisor take over with a new
-  epoch. The old act session's next call is refused, and one witness and one commit result.
+- **`fencing`:** run across two nodes, or with the old act session outside the killed tree. Kill only the
+  supervisor mid-act, and let a second supervisor take over with a new epoch. The old act session's next
+  gated call and its commit are each refused, and the refusal is the one in the old session's journal.
+  One witness and one commit result.
 - **`idempotence`:** kill the supervisor after the lander's push and before its witness. The take-over's
   reconcile probe finds origin at the expected sha, and nothing pushes twice.
 - **`relaunch-cap`:** a stub CLI that always exits at `--max-turns` parks the item after
@@ -1063,19 +1138,23 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   - kill the supervisor, then reboot the node, and the node tick restarts it within one period;
   - preflight refuses a run-host node without the tick's registration.
 - **`binary`:** with a stub `claude` printing 2.1.292 first on PATH, the supervisor launches it, records
-  it in the node registry as lacking the switch, and journals that. The dispatcher's entries then omit
-  `onFailure`, and a gated call made while the dispatcher is missing is still denied.
+  in the node registry that `onFailure` has no effect on it, and journals that. The entries still carry
+  the key, and a gated call made while the dispatcher is missing is still denied.
 - **`git-witness`:** a SIGKILL to pre-commit lands no witness. The supervisor does not count that commit
-  item done, and the lander reports the commit.
+  item done, and the lander reports the commit. TERM and INT sent mid-run to pre-commit, commit-msg,
+  pre-rebase and pre-push each make the hook exit non-zero and leave no witness, seen red first on
+  today's pre-commit.
 - **`coverage`:**
   - re-running the supervisor on a witnessed item dispatches nothing;
   - a direct write to a record, to an instruction file and to main is each refused;
   - an act session started in the primary tree is refused;
-  - every `runtime.*` key in v2's catalogue, a population asserted non-empty, has a reader in this
-    record's design;
+  - every `runtime.*` key in v2's catalogue, a population asserted non-empty, has a reader call site in
+    dWellOiledMachine's code, found through the one policy reader's key registry. It is seen red on a
+    planted catalogue key with no reader;
   - every event class leaves a journal line.
-- **`latency`:** ten dispatcher runs on a benign Bash payload. Their p50, against today's 57 ms, sets the
-  dispatcher's declared budget.
+- **`latency`:** ten dispatcher runs on a benign Bash payload. The first measurement's p50, against
+  today's 57 ms, sets the dispatcher's declared budget. From then on the fixture is red when the p50
+  exceeds it, seen red once against a dispatcher stub with an injected sleep.
 
 ## [gaps-proposed] Gaps, registered 2026-10-15
 
@@ -1169,6 +1248,8 @@ is unchanged.
     - `runtime.below-floor` and the derived floor are retired.
   - Two cases are untested and stay as losing tests in `[tests]`: an attended 2.1.292 session's
     fallback to the person, and a permission host that crashes mid-run.
+  - **Revised: 2026-10-17, the debt round.** `[tests]` `fail-closed` now holds both cases. The
+    mid-run case had no arm until this fold.
 - **RT-3:** "Runtime takes `next` and the controls too", not the recommended option.
   - The `next` verb, its micro-format and the owner's controls moved to dWellOiledMachine, with
     `gap-found-06` and `gap-flow-10`.
@@ -1197,3 +1278,11 @@ event wait fans out per waiting build and mints under the claim ref, the supervi
 wait past `build.release-ceiling`, the secret scan's boundaries declare their expected populations, and
 `[tests]` and `[invariants]` gain `event-wait` and a two-sided `journal-retention`. The comparison
 record's `[follow-up]` names each item and where it went.
+
+**Revised a fourth time, 2026-10-17, after the debt round's runtime-fold pair**
+(`reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-a.md` and `-b.md`): act binding and the
+epoch check are decided in the dispatcher's PermissionRequest entry, the one that fails closed below
+2.1.295; returns are keyed per spawn site; the epoch's reading is stated, with one name per lease;
+PermissionRequest joins the events and the owner-pack table; `onFailure` is written on every entry;
+`next` gains `awaiting`; and every claim the pair found untested gains its fixture arm. The debt
+comparison record's `[fold-runtime-fold]` names each defect and where it went.

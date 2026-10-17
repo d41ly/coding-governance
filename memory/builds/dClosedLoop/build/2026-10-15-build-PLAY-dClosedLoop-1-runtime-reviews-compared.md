@@ -62,7 +62,8 @@ lines in the session log, and derives every number below. It refuses when:
 - the map names an id that a report lacks;
 - a run has no returned lines.
 
-It was seen red on two planted copies before it was trusted, and that output is kept with it.
+It was seen red on three planted inputs before it was trusted, and that output is kept with it (Revised:
+2026-10-17; this line once said two planted copies).
 
 A defect counts as **found** by a round when at least one of that round's findings on it was
 confirmed. Its grade in a round is the highest grade any confirmed finding on it got, using the

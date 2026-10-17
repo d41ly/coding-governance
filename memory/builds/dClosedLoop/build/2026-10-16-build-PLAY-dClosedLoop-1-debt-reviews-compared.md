@@ -248,33 +248,33 @@ refuted finding sits on the defect its claim names, beside its confirmed twin wh
 
 | defect | what | A | B | disposition |
 |---|---|---|---|---|
-| `binding-on-fail-open-entry` | act binding and the stale-epoch fence sit on the PreToolUse entry, which fails open below 2.1.295, while the PermissionRequest entry, the one path that fails closed, decides by the allowance alone; no fixture crashes PreToolUse beside a healthy PermissionRequest | 1, 13 | 3, 10, 17 | amend |
-| `return-key-per-act` | a persisted return is keyed by the item and the act's task-sha, so the agents of one fan share a key and a relaunch cannot tell which returned | — | 1 | amend |
-| `fencing-epoch` | fencing rests on an epoch no lease grammar carries, says nothing of how a dispatcher on another node learns it, and its fixture can pass without the refusal running | — | 2 | amend |
-| `permission-request-unlisted` | `[enforce]`'s event list and the owner-pack table leave out PermissionRequest, the only allow path for gated tools after RT-2 | 2, 14 | 11, 18 | amend |
-| `mid-run-crash-untested` | RT-2's answer says a permission host that crashes mid-run stays a losing test in `[tests]`, and `[tests]` holds no such case | 3, 11, 16 | 7, 15, 24 | amend |
-| `onfailure-three-ways` | `onFailure` is written unconditionally by settings-merge, conditionally by unit 7, and omitted by the `binary` fixture, over one tracked settings file for every node | 10, 15 | 14, 19 | amend |
-| `next-awaiting-answer` | `[terms]` has `next` report a hook item as awaiting its event, and the closed answer set has no such answer | 4 | 13 | amend |
-| `next-answers-untested` | the `next` fixture checks terminal, stuck and invalid-input only, not blocked, stale-remote or act | 17 | — | amend |
-| `seen-red-count` | the instrument's red evidence is two planted copies in `[method]` and three in the kept output | 7 | 9, 25 | amend |
-| `open-policy-untested` | the `fail-closed` invariant's clauses for a journaled bypass and for `runtime.hook-failure: open` have no fixture arm | 20 | 21 | amend |
-| `coverage-arm-design-text` | the `coverage` arm asks whether each `runtime.*` key has a reader in the design record, not in the built code | 18 | 22 | amend |
-| `neither-additions-untested` | the fold's own additions, the reap past `runtime.act-ceiling` and the workspace line endings from the node registry, have no fixture | — | 22 | amend |
-| `attended-no-allowance` | PermissionRequest decides by the act's allowance, and attended and unbound sessions have no act | 12 | — | amend |
-| `dispatcher-start-two-ways` | a dispatcher that cannot start refuses every call at line 617, and hands an attended call to the person at lines 565-566 and in the fixture | — | 6 | amend |
-| `allow-rule-bypass` | a gated call "runs only on the dispatcher's approval", yet an allow rule in local or user settings is only warned about, and the act session's launch does not restrict its setting sources | — | 5 | amend |
-| `second-permission-hook` | nothing checks local or user settings for a second PermissionRequest hook beside the single dispatcher | — | 20 | amend |
-| `attended-slot-release` | an attended session's PreToolUse entry reserves fan slots, and only an act session's exit or reap releases them | — | 12 | amend |
-| `cadence-dedup-race` | the supervisor reads the cadence witness before it takes the lease and never re-reads it after | — | 4 | amend |
-| `stop-witness-producer` | the Stop row names the act's outcome record as its witness, and nothing produces it | — | 16 | amend |
-| `latency-fixture-no-red` | the `latency` fixture's p50 sets the budget it measures, so it names no red | — | 23 | amend |
-| `fail-closed-arm-ungated` | the `fail-closed` arm's first tool call after a crashed SessionStart names no gated tool, and Read stays open below 2.1.295 | 5 | — | amend |
-| `trap-untested` | git hooks trapping signals closes gap-deploy-07's class, says the record, and the only git arm sends SIGKILL, which no trap catches | 19 | — | amend |
-| `capability-claimed` | the capability table claims PermissionRequest answers ask rules on every version, under a heading that claims nothing unmeasured, and only 2.1.292 and 2.1.295 were measured | 21 | — | amend |
+| `binding-on-fail-open-entry` | act binding and the stale-epoch fence sit on the PreToolUse entry, which fails open below 2.1.295, while the PermissionRequest entry, the one path that fails closed, decides by the allowance alone; no fixture crashes PreToolUse beside a healthy PermissionRequest | 1, 13 | 3, 10, 17 | amend; `[fold-runtime-fold]` |
+| `return-key-per-act` | a persisted return is keyed by the item and the act's task-sha, so the agents of one fan share a key and a relaunch cannot tell which returned | — | 1 | amend; `[fold-runtime-fold]` |
+| `fencing-epoch` | fencing rests on an epoch no lease grammar carries, says nothing of how a dispatcher on another node learns it, and its fixture can pass without the refusal running | — | 2 | amend; `[fold-runtime-fold]` |
+| `permission-request-unlisted` | `[enforce]`'s event list and the owner-pack table leave out PermissionRequest, the only allow path for gated tools after RT-2 | 2, 14 | 11, 18 | amend; `[fold-runtime-fold]` |
+| `mid-run-crash-untested` | RT-2's answer says a permission host that crashes mid-run stays a losing test in `[tests]`, and `[tests]` holds no such case | 3, 11, 16 | 7, 15, 24 | amend; `[fold-runtime-fold]` |
+| `onfailure-three-ways` | `onFailure` is written unconditionally by settings-merge, conditionally by unit 7, and omitted by the `binary` fixture, over one tracked settings file for every node | 10, 15 | 14, 19 | amend; `[fold-runtime-fold]` |
+| `next-awaiting-answer` | `[terms]` has `next` report a hook item as awaiting its event, and the closed answer set has no such answer | 4 | 13 | amend; `[fold-runtime-fold]` |
+| `next-answers-untested` | the `next` fixture checks terminal, stuck and invalid-input only, not blocked, stale-remote or act | 17 | — | amend; `[fold-runtime-fold]` |
+| `seen-red-count` | the instrument's red evidence is two planted copies in `[method]` and three in the kept output | 7 | 9, 25 | amend; `[fold-runtime-fold]` |
+| `open-policy-untested` | the `fail-closed` invariant's clauses for a journaled bypass and for `runtime.hook-failure: open` have no fixture arm | 20 | 21 | amend; `[fold-runtime-fold]` |
+| `coverage-arm-design-text` | the `coverage` arm asks whether each `runtime.*` key has a reader in the design record, not in the built code | 18 | 22 | amend; `[fold-runtime-fold]` |
+| `neither-additions-untested` | the fold's own additions, the reap past `runtime.act-ceiling` and the workspace line endings from the node registry, have no fixture | — | 22 | amend; `[fold-runtime-fold]` |
+| `attended-no-allowance` | PermissionRequest decides by the act's allowance, and attended and unbound sessions have no act | 12 | — | amend; `[fold-runtime-fold]` |
+| `dispatcher-start-two-ways` | a dispatcher that cannot start refuses every call at line 617, and hands an attended call to the person at lines 565-566 and in the fixture | — | 6 | amend; `[fold-runtime-fold]` |
+| `allow-rule-bypass` | a gated call "runs only on the dispatcher's approval", yet an allow rule in local or user settings is only warned about, and the act session's launch does not restrict its setting sources | — | 5 | amend; `[fold-runtime-fold]` |
+| `second-permission-hook` | nothing checks local or user settings for a second PermissionRequest hook beside the single dispatcher | — | 20 | amend; `[fold-runtime-fold]` |
+| `attended-slot-release` | an attended session's PreToolUse entry reserves fan slots, and only an act session's exit or reap releases them | — | 12 | amend; `[fold-runtime-fold]` |
+| `cadence-dedup-race` | the supervisor reads the cadence witness before it takes the lease and never re-reads it after | — | 4 | amend; `[fold-runtime-fold]` |
+| `stop-witness-producer` | the Stop row names the act's outcome record as its witness, and nothing produces it | — | 16 | amend; `[fold-runtime-fold]` |
+| `latency-fixture-no-red` | the `latency` fixture's p50 sets the budget it measures, so it names no red | — | 23 | amend; `[fold-runtime-fold]` |
+| `fail-closed-arm-ungated` | the `fail-closed` arm's first tool call after a crashed SessionStart names no gated tool, and Read stays open below 2.1.295 | 5 | — | amend; `[fold-runtime-fold]` |
+| `trap-untested` | git hooks trapping signals closes gap-deploy-07's class, says the record, and the only git arm sends SIGKILL, which no trap catches | 19 | — | amend; `[fold-runtime-fold]` |
+| `capability-claimed` | the capability table claims PermissionRequest answers ask rules on every version, under a heading that claims nothing unmeasured, and only 2.1.292 and 2.1.295 were measured | 21 | — | amend; `[fold-runtime-fold]` |
 | `rt1-two-ways` | RT-1 is restated as a fresh start at every boundary | 6 | — | none: refuted, the line answers the on-full check and the next bullet keeps `context.on-full` |
 | `relaunch-cap-fixture` | the relaunch cap's fixture counts resume-tick's resetting counter | 8 | — | none: refuted, the design defines the cap per act and carries no reset rule over |
 | `act-ceiling-registration` | `runtime.act-ceiling` is a second carrier of process-monitor's ceiling | 9 | — | none: refuted, the two keys carry different facts |
-| `chain-count` | "the chain has fourteen builds" against v2's fifteen | 22 | 8 | amend: refuted only as outside the range, and HEAD still carries it |
+| `chain-count` | "the chain has fourteen builds" against v2's fifteen | 22 | 8 | amend: refuted only as outside the range, and HEAD still carries it; `[fold-runtime-fold]` |
 
 ## [map-fold-round3] The layers round's round-3 fold findings, placed
 
@@ -364,3 +364,40 @@ refuted finding sits on the defect its claim names, beside its confirmed twin wh
 | `same-sha-repass-skipped` | after a held pass, a second exit record for the same SHA reuses a witnessed wake key and is skipped | 15 | — | amend: refuted only as older than the diff, since the base keyed the wake by (event, SHA) |
 | `payload-fixture-vacuous` | under the refusing mode no planted payload runs, so the fixture cannot tell a refusal from a clean sandbox or a crashed payload | 22 | — | amend: refuted only as older than the diff, since the base fixture asserted the same |
 | `ceiling-sweep-no-driver` | nothing beats to run the ceiling sweep when no lease is live | — | 6 | none: refuted, the node tick starts a supervisor when none beats under a live lease, and its beat runs the sweep |
+
+## [fold-runtime-fold] The runtime-fold pair, folded 2026-10-17
+
+Dispatches 65 and 66 reviewed the runtime fold, `6cfd21619..3611a60e9`. Each of their map rows
+(`[map-runtime-fold]`) went here, into layer-runtime, v2's chain rows and the runtime comparison record. Each
+row's classes are its confirmed findings' own, from the two ledgers. The fold is unreviewed text, and a
+closing review of the debt round's folds is owed.
+
+| Defect | A | B | Disposition | Where the fix sits | Its classes |
+|---|---|---|---|---|---|
+| `binding-on-fail-open-entry` | 1, 13 | 3, 10, 17 | amend | layer-runtime `[act]`'s call binding and `[enforce]`'s permission baseline; `[tests]` `binding` | `rule-stated-with-no-check-that-fails` |
+| `return-key-per-act` | — | 1 | amend | layer-runtime `[spawn]`'s return key; `[tests]` `relaunch` | — |
+| `fencing-epoch` | — | 2 | amend | layer-runtime `[supervise]`'s fencing and its lease names; v2's dDeclaredLoop row; `[tests]` `fencing` | — |
+| `permission-request-unlisted` | 2, 14 | 11, 18 | amend | layer-runtime `[enforce]`'s events, owner-pack table and class arm; `[harness]`; `[tests]` `extension` | `amendment-leaves-its-other-half-standing` |
+| `mid-run-crash-untested` | 3, 11, 16 | 7, 15, 24 | amend | layer-runtime `[tests]` `fail-closed`; `[answers]`' dated RT-2 note | `rule-stated-with-no-check-that-fails` |
+| `onfailure-three-ways` | 10, 15 | 14, 19 | amend | layer-runtime `[enforce]`'s switch; `[build]` unit 7; `[tests]` `binary` | `amendment-leaves-its-other-half-standing`, `two-answers-to-one-question` |
+| `next-awaiting-answer` | 4 | 13 | amend | layer-runtime `[decide]`'s answers and the diagram; v2's dDeclaredLoop row; `[tests]` `next` | — |
+| `next-answers-untested` | 17 | — | amend | layer-runtime `[tests]` `next` | `rule-stated-with-no-check-that-fails` |
+| `seen-red-count` | 7 | 9, 25 | amend | the runtime comparison record's method line | `two-answers-to-one-question` |
+| `open-policy-untested` | 20 | 21 | amend | layer-runtime `[tests]` `fail-closed` | `rule-stated-with-no-check-that-fails` |
+| `coverage-arm-design-text` | 18 | 22 | amend | layer-runtime `[tests]` `coverage` | `rule-stated-with-no-check-that-fails` |
+| `neither-additions-untested` | — | 22 | amend | layer-runtime `[tests]` `act-ceiling` and `workspaces` | `rule-stated-with-no-check-that-fails` |
+| `attended-no-allowance` | 12 | — | amend | layer-runtime `[act]`'s decision by binding; `[tests]` `binding` | — |
+| `dispatcher-start-two-ways` | — | 6 | amend | layer-runtime `[enforce]`'s bypasses | — |
+| `allow-rule-bypass` | — | 5 | amend | layer-runtime `[enforce]`'s allow path and `[invariants]` `fail-closed`; `[tests]` `fail-closed` | — |
+| `second-permission-hook` | — | 20 | amend | layer-runtime `[enforce]`'s allow path; `[tests]` `fail-closed` | `rule-stated-with-no-check-that-fails` |
+| `attended-slot-release` | — | 12 | amend | layer-runtime `[supervise]`'s agents in flight; `[tests]` `in-flight` | — |
+| `cadence-dedup-race` | — | 4 | amend | layer-runtime `[schedule]`'s cadence witness; `[tests]` `cadence` | — |
+| `stop-witness-producer` | — | 16 | amend | layer-runtime `[enforce]`'s witness table; `[build]` unit 3 | — |
+| `latency-fixture-no-red` | — | 23 | amend | layer-runtime `[enforce]`'s latency; `[tests]` `latency` | `rule-stated-with-no-check-that-fails` |
+| `fail-closed-arm-ungated` | 5 | — | amend | layer-runtime `[act]`'s session binding; `[tests]` `fail-closed` | — |
+| `trap-untested` | 19 | — | amend | layer-runtime `[tests]` `git-witness` | `rule-stated-with-no-check-that-fails` |
+| `capability-claimed` | 21 | — | amend | layer-runtime `[harness]`'s capability table and node registry | — |
+| `rt1-two-ways` | 6 | — | none: refuted, the line answers the on-full check and the next bullet keeps `context.on-full` | — | — |
+| `relaunch-cap-fixture` | 8 | — | none: refuted, the design defines the cap per act and carries no reset rule over | — | — |
+| `act-ceiling-registration` | 9 | — | none: refuted, the two keys carry different facts | — | — |
+| `chain-count` | 22 | 8 | amend: refuted only as outside the range, and HEAD still carries it | layer-runtime `[build]` points at v2's `[chain]` | — |
