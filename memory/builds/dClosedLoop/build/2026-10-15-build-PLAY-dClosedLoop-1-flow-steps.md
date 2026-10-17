@@ -83,6 +83,9 @@ The flow's router, before any step.
 - **The hook is Runtime's.** Its event joins Runtime's enforcement surface, with a witness its reader
   checks (`gap-rt-14`).
 - **Policies:** `placement`, `placement.check`, `builds.slug-*`, `leases.*` and `flow.route-backs`.
+- **Owner** (revised 2026-10-17, PM-9): dDeclaredLoop builds the step's items, and `entry.intake`'s
+  hook stays dWellOiledMachine's, with `gap-rt-14`. The owner column lands with the ownership table
+  (PM-8, PM-10).
 
 Other sources enter Plan's triage directly:
 - asks, which are core;

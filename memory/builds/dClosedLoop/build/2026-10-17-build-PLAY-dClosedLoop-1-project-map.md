@@ -549,15 +549,29 @@ takes it.
 ### [line] One line per node
 
 ```text
-line   := "- " <tag> [" — " <purpose>] [" · " <count> {", " <count>}] [" · " <rel> {" " <rel>}]
+line   := "- " <key> [" — " <purpose>] [" · " <count> {", " <count>}] [" · " <rel> {" " <rel>}]
+key    := <ns> "." <id> where the node has a native id, such as "chain.dTotalRecall"; its tag otherwise
 purpose:= at most 60 characters, verbatim from the namespace's declared purpose source
-count  := <noun> " " <int>, derived from the index, such as "gaps 21" or "items 12"
-rel    := ("layer" | "owner" | "after" | "implements") "=" <tag> {"," <tag>}, at most three keys
+count  := <noun> " " (<int> | "?"), derived from the index, such as "gaps 21" or "items 12"
+rel    := ("layer" | "owner" | "after" | "implements") "=" (<key> {"," <key>} | "?"), at most three keys
 nsline := "- " <ns> ".* — " <int> " nodes · gov map " <ns>
 header := "map " <tree-id> " · nodes " <int> " · lines " <int> " · folded " <ns> {"," <ns>}
+          [" · pending " <int>] [" · unowned " <int>] [" · unarmed " <ns> {"," <ns>}]
 ```
 
 - **A node with no purpose** renders `—` in its place.
+- **A required field that is missing renders `?`** (revised 2026-10-17, `[fixes]`):
+  - `owner=?` on a node a build must build, or `items ?` on a core item role that acts in no item;
+  - the header counts the missing owners as `unowned`;
+  - a field the node does not require is omitted, so an omitted field is never a finding, and a `?`
+    always is.
+- **A line reads declared fields only** (PM-8). The renderer infers no relation: no owner from a
+  stage, from a literal or from a default. The owners of a step, a system and a namespace are derived
+  from their members' declared owners, so a step can have several.
+- **The key is the native id where one exists** (PM-11), as for chain builds, live and closed builds,
+  principles and gaps: the ids agents already search for. The resolver accepts both forms. Where a
+  native id is not unique, as a decision row's is today, the row's key stays open (`[fixes-concept]`,
+  6).
 - **A line never holds:**
   - section content;
   - dates or ages;
@@ -659,7 +673,9 @@ today, the map reads it. Where none exists, the namespace's owning build adds on
 | complete, three ways | a planted `tools/newkit/` with no `kit` node, found by the disk census through `compute_coverage`; a planted index node on no line and in no count |
 | resolves | a line naming `feature.ghost`, or a relation key whose target resolves nowhere |
 | count | a counted line one off from the index's count, planted by an extractor that drops a row |
-| owner and extractor | a namespace registered with neither, such as `doc` |
+| owner | a node a build must build with no declared owner, or with two: an item, a policy key, a point, a record kind, a tag namespace or a system (revised 2026-10-17, PM-8); planted, an item whose owner field is emptied |
+| extractor | a namespace registered with no extractor, such as `doc` |
+| no inference | a relation rendered from no declared field; planted, a namespace whose owner comes from a default |
 | purpose | under `required`, a new `kit.toml` with no purpose |
 | budget | under `refuse`, a planted map over the budget; under `degrade`, a degraded render whose header omits a step |
 | freshness | a work order whose map tree id is not the served index's, outside the rows marked `dirty` |
@@ -693,12 +709,12 @@ today, the map reads it. Where none exists, the namespace's owning build adds on
 
 | Chain build | Its part |
 |---|---|
-| dTotalRecall | the renderer and `gov map`; the three-way completeness check and the `map` leg pack; the atlas re-rendered from the same node table; the purposeless-node population; the record-kind registry's purpose field; the replay at its first unit |
-| dOrderedCharter | the namespace row's `purpose-source` and `owner` fields, and the chain registry's purpose field |
+| dTotalRecall | the renderer and `gov map`; the three-way completeness check and the `map` leg pack; the atlas re-rendered from the same node table; the purposeless-node population; the record-kind registry's purpose and owner fields; the owner and no-inference checks (PM-8); the replay at its first unit |
+| dOrderedCharter | the namespace row's `purpose-source` and `owner` fields, the chain registry's purpose field, and the resolver's native-id keys (PM-11) |
 | dBoundRoles | the work order's `map` slot and the per-item unfolds; the orientation scout composing the card's map cell |
-| dDeclaredLoop | the items' declarations of the slot and their unfolds, and the policy namespaces' purposes |
+| dDeclaredLoop | the items' declarations of the slot and their unfolds, the policy namespaces' purposes, and the owner fields of the items and the policy catalogue (PM-8) |
 | dWitnessedBar | the leg's purpose field |
-| dWellOiledMachine | the hook and point purposes, and the journal's count of map reads outside a slice |
+| dWellOiledMachine | the hook and point purposes, the points' owner field (PM-8), and the journal's count of map reads outside a slice |
 | dShippedRelease | the kit factory's purpose field, and `kit.toml` for govkit and lib |
 | dCalibratedLens | the not-in-view cause `review.dispose` computes from the author's slice manifest and the map, and the Loop Review's reading of its share. It descends from dTotalRecall and dBoundRoles, which produce both inputs; dFairHearing, at the chain's root, does not |
 
@@ -1419,3 +1435,28 @@ no machine gate yet. The owner check, `[fixes-concept]`'s second fix, is the gat
 - **PM-11, a line's key:**
   - the native id where one exists (recommended);
   - always a tag, with the id as an alias.
+
+## [answers-fixes] The owner's answers to PM-8 to PM-11, 2026-10-17
+
+The owner chose, verbatim:
+- PM-8: "A field on each node (Recommended)"
+- PM-9: "dDeclaredLoop (Recommended)"
+- PM-10: "I propose, you approve (Recommended)"
+- PM-11: "Native id where one exists (Recommended)"
+
+All four are structural, so none adds a policy key.
+
+- **Folded:**
+  - `[line]` gains the native-id key, `?` for a missing required field, the header's `pending`,
+    `unowned` and `unarmed` fields, and the rule that a line reads declared fields only;
+  - `[checks]` splits owner from extractor, widens the owner check to every node a build must build,
+    and adds the no-inference check;
+  - `[owners]` gives the owner fields to dDeclaredLoop, dWellOiledMachine and dTotalRecall, and the
+    native-id keys to dOrderedCharter;
+  - v2 gains a revision note, flow-steps' `[entry]` its owner, and the systems record's
+    `[design-tags]` the map keys.
+- **Next, under PM-10:** a table proposing an owner for every item, policy key, point and tag
+  namespace, each with its evidence, for the owner to approve in one pass. Its fold adds the owner
+  columns.
+- **The generator keeps today's derivation until then.** Once the columns land, it reads them and
+  infers nothing, and its owner check is seen red on a planted orphan.

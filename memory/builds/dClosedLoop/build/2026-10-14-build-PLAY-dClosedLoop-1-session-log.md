@@ -1824,6 +1824,13 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
     `[fixes]`).
   - The class is filed as `absence-read-from-one-of-several-homes`.
 
+- 2026-10-17, session 1799cb98: the owner answered, verbatim, PM-8 "A field on each node (Recommended)", PM-9
+  "dDeclaredLoop (Recommended)", PM-10 "I propose, you approve (Recommended)" and PM-11 "Native id where one exists (Recommended)"
+  - Folded into the project map's `[line]`, `[checks]` and `[owners]`, v2's revision notes,
+    flow-steps' `[entry]` and the systems record's `[design-tags]`
+    (`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md` `[answers-fixes]`).
+  - Next: the ownership table PM-10 asks for.
+
 ## Instruments
 
 ### The gap-ownership join

@@ -226,6 +226,8 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 - **Grammar.** `tag := <ns>.<seg>(.<seg>)*`, `seg := [a-z0-9][a-z0-9-]*`, at most 64 B. A section is
   `<doc> [<seg>]`, unique within its document. Ids keep memory's grammar: `FAMILY-<slug>-<seq>` and
   `gap-<area>-NN`. A first segment may not be a namespace word.
+- **Map keys** (revised 2026-10-17, PM-11): a map line keys a node by its native id where one exists,
+  as `chain.dTotalRecall` and `principle.P27`, and by its tag otherwise. The resolver accepts both.
 - **Namespaces.** R-B's twelve, plus `section`, `doc`, `unit`, `field`, `leg`, `check`, `point`, `hook`,
   `command`, `pack`, `feature` and `class`, and `marker` (`[design-annotations]`). Each namespace is a row
   in its owning layer's contract: its declaring source, its extractor, and whether it selects or

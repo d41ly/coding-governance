@@ -390,6 +390,20 @@ Revised: 2026-10-17, after the project map's design and the owner's PM-4 to PM-7
   its purpose field and reviews its existing nodes (PM-5);
 - `gap-mem-26`, `gap-mem-27` and `gap-orient-15` join the register and their chain builds' cells.
 
+Revised: 2026-10-17, after the project map's findings and the owner's PM-8 to PM-11
+(`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md` `[fixes]` and `[answers-fixes]`):
+- a node's owning build is a field on the node, declared once: an item's in the loop definition, a
+  policy key's in the catalogue, and a point's or a record kind's in its registry. The owners of a
+  step, a system and a namespace are derived from their members. A chain row's prose describes a
+  build's work, and is never read as its ownership (PM-8);
+- the map's owner check covers every node a build must build, each owned by exactly one build, and
+  the renderer infers no relation;
+- the entry step's items are dDeclaredLoop's, and `entry.intake`'s hook stays dWellOiledMachine's
+  (PM-9);
+- a map line opens with a node's native id where one exists (PM-11);
+- the owner fields land as columns in flow-steps and the catalogue once the owner approves the
+  proposed table (PM-10).
+
 Revised: 2026-10-17, after the folds' closing review (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`):
 - dTotalRecall's row gains the shared extraction primitive, the research-return backfill and the
   `adopt` program, whose keys had no reader on any row;
