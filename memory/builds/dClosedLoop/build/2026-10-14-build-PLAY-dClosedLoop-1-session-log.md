@@ -149,7 +149,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 85 | `tier2-review.js`, diff review, full: five `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the closing-review workflow's declared high, round 1 | The closing review of the debt round's folds and the systems and retrofit fold, `9b188202a..cdcea2c9b` | the args in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[args-debt-folds]` | 1799cb98 | returned as `wf_da2dee67-bf2`, CLEAN WITH FIXES, 22 of 27 confirmed | `reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md` |
 | 86 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the spec-review workflow's declared medium, round 1 | The systems and retrofit records, at blobs `9335a3533` and `cec90968d`, after dispatch 85 returns | the args in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[args-systems-retrofit]` | 1799cb98 | returned as `wf_ca8d9fb9-519`, CLEAN WITH FIXES, 62 of 67 confirmed | `reviews/2026-10-17-review-PLAY-dClosedLoop-1-systems-retrofit.md` |
 | 87 | gov-researcher, at its declared medium effort | The level-0 project map, run A, with run B | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-2-researcher.md` | 1799cb98 | dispatched | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-a.md` |
-| 88 | the same | The level-0 project map, run B, from the same handoff, with run A | the same | 1799cb98 | dispatched | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-b.md` |
+| 88 | the same | The level-0 project map, run B, from the same handoff, with run A | the same | 1799cb98 | returned, 11m01s, 56.6k out | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -2253,6 +2253,7 @@ Runs, 2026-10-14:
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` | Those two runs' args, verbatim, with the script that wrote them. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md` | The owner's question on seeing the whole project at once: what orients an agent today, the audit's items sorted by cause, a level-0 map of gov sized, and forks PM-1 to PM-3. |
 | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-2-researcher.md` | The project-map research handoff, run twice. |
+| `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-b.md` | Dispatch 88's return, verbatim: the level-0 project map, run B. |
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | The library pass's research handoff: the four filling paths and two placements. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` | The library round's review, a light diff review over KN-1's fold, the library design and its settlement, as its synthesizer wrote it. |
