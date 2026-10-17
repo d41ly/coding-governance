@@ -235,3 +235,33 @@ refuted finding sits on the defect its claim names, beside its confirmed twin wh
 | `gap-test-04-contract` | gap-test-04's row omits the re-run contract and probe the flow says it owes | 16 | — | none: refuted, the row carries the contract the design relies on, and the probe sits in the text that cites it |
 | `gap-rows-no-check` | gap-deploy-02 and gap-deploy-09 state the defect with no check that can fail | 17 | — | none: refuted, the register's rows carry no check column by its own form |
 | `replacement-route` | the route after `plan.dedupe` contradicts itself on a re-placement | — | 3 | none: refuted, a re-placement goes to `plan.triage-rule` and keeps its claim, as `[transitions]` says |
+
+## [map-library-followup] The library round's fold findings, placed
+
+Run A is `wf_579f3126-0b4` and run B is `wf_0beb4276-c5c`. The ids are each report's appendix ids. A
+refuted finding sits on the defect its claim names, beside its confirmed twin where one exists.
+
+| defect | what | A | B | disposition |
+|---|---|---|---|---|
+| `distill-class-no-producer` | `build.distill` reds on a fork with no class, yet no Design item's witness requires the class, and the red has no route | 1, 20 | 2, 12 | amend |
+| `ratification-two-places` | under `author-owner-ratifies`, Build's breakpoints put the owner's ratification before `build.distill`, its Needs and Then put it after, and a rejected re-class has no writer | 10, 19 | 1, 11, 23 | amend |
+| `owner-only-no-arm` | `owner-only`'s rule that only an owner-resolved fork may be major sits in Does, with no witness arm and no route | 2, 19 | 20 | amend |
+| `distill-key-no-fork-field` | `build.distill`'s idempotence and its one-to-one witness are keyed by build and fork, and the row it writes has no fork field | 9, 17 | 8 | amend |
+| `deploy-distill-no-route` | `deploy.distill` can now go red on a row missing at the landed SHA, and its only route is `deploy.recommend` | 7, 12, 20 | 6, 21 | amend |
+| `distill-after-core` | `build.distill` runs after `build.core`, so the core checks, check 27 among them, never grade the rows it appends, and Build's exit is certified before its last commit | 3, 13 | — | amend |
+| `layer-memory-stale-writer` | layer-memory `[decisions]` still has `deploy.distill` append the major decisions when the build lands | 4 | 5, 13 | amend |
+| `typed-reuse-witness` | round 1's typed-witness finding stands: `build.unit-pass` is still proven by the builder's own reuse line, whose `none` arm cannot fail | 22 | 3, 22 | amend |
+| `built-path-class-unchecked` | on built work nothing checks that an owed class record was written; a write set only allows the path | 18 | 19 | amend |
+| `ask-form-not-catalogued` | the new acceptance, "accepted once the class record exists", is not among layer-memory `[asks]`' closed forms | 16 | 14 | amend |
+| `plan-scope-tags` | Plan reads the research view and the decision log by scope tags that neither carries | 14 | 7, 15 | amend |
+| `build-policy-list-missing` | `build.distill` routes by `run.on-owner-question`, which Build's policy list leaves out | 11 | 10 | amend |
+| `research-kind-selector` | the research-return kind declares no selector, and its witness's planted red cannot fire, since no record in the tree carries the kind | 15 | 18 | amend |
+| `reuse-token-population` | gap-design-05 sizes the token migration against the wrong predicate: the hygiene check admits the substring "no existing seam" | 8, 24 | — | amend |
+| `fork-population-unobserved` | the witness reads only the forks Design recorded, so an empty set cannot show that no fork was resolved | 21 | — | amend |
+| `ordering-dorderedcharter` | dOrderedCharter's widened dependency check can pass only after dTotalRecall lands, though dOrderedCharter comes first | 5 | — | amend |
+| `new-slug-collision` | a `new:` slug passes if no record held it at the report's pinned SHA, so two concurrent reviews can mint one slug | 6 | — | amend |
+| `research-population-count` | the "59 research returns" are selected by file name and include instrument records | 23 | — | amend |
+| `owner-asks-two-meanings` | `owner-asks` means "no line is owed" in LB-2's offer and "a line for the features an owner ask names" in the fold | — | 4 | amend |
+| `recall-imports-eight` | the planned move covers recall's two core-read functions, and check 27 imports eight names from the recall kit | — | 9 | amend |
+| `fix-unit-write-set` | the fix unit's write set omits the dossier edit that claims the new class | — | 17 | amend |
+| `gotcha-claim-wrong-dossier` | the idempotence class is claimed by a dossier of checkers | — | 16 | none: refuted, gotchas.py selects a class by its own anchors, not by a dossier's claims |

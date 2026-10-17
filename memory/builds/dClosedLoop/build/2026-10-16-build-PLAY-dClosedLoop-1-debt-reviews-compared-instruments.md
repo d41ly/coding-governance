@@ -1319,3 +1319,37 @@ B2 (publish-failed-no-arm): confirmed twin A1, A7, B11, B17
 B3 (replacement-route): confirmed twin none
 B10 (start-guard-blocks-refused-rerun): confirmed twin none
 ```
+
+## [compare-library-followup] The library-followup pair's comparison, run over the record
+
+```text
+$ python compare_rounds.py reviews/2026-10-16-review-PLAY-dClosedLoop-1-library-followup-a.md \
+    reviews/2026-10-16-review-PLAY-dClosedLoop-1-library-followup-b.md \
+    build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared.md \
+    build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md wf_579f3126-0b4 wf_0beb4276-c5c map-library-followup
+== runs
+A: raw 24, confirmed 19, refuted 5, precision 0.79, high findings 0, agents 10, out 128.6k (sum of returned lines)
+B: raw 23, confirmed 22, refuted 1, precision 0.96, high findings 0, agents 10, out 112.0k (sum of returned lines)
+== defects
+map rows 22, confirmed defects 21, refuted-only 1
+both 10, A only 6, B only 5
+A alone covers 16 of 21 (76%)
+B alone covers 15 of 21 (71%)
+overlap (Jaccard) 0.48
+Chapman estimate of the population: 23.7, so about 3 found by neither
+A only: distill-after-core, reuse-token-population, fork-population-unobserved, ordering-dorderedcharter, new-slug-collision, research-population-count
+B only: deploy-distill-no-route, research-kind-selector, owner-asks-two-meanings, recall-imports-eight, fix-unit-write-set
+== severity (a defect takes its highest confirmed grade per round)
+high defects 0: 
+shared defects graded alike 9 of 10
+== lenses behind the defects one round alone found
+A: correctness 3, verification 3, seams 1
+B: correctness 2, verification 2, seams 2
+== refuted findings and their twins
+A7 (deploy-distill-no-route): confirmed twin B6, B21
+A8 (reuse-token-population): confirmed twin A24
+A12 (deploy-distill-no-route): confirmed twin B6, B21
+A15 (research-kind-selector): confirmed twin B18
+A20 (distill-class-no-producer): confirmed twin A1, B2, B12
+B16 (gotcha-claim-wrong-dossier): confirmed twin none
+```
