@@ -1791,6 +1791,11 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   and every preset, nine chain rows gain the map's units, and `gap-mem-26`, `gap-mem-27` and
   `gap-orient-15` join the register.
 
+- 2026-10-17, session 1799cb98: the duplicate atlas, `4UyRaoozVkbK6ECCCBvDg1`, no longer exists: the
+  session's watch on it ended with the artifact not found, after the owner's delete. The atlas is
+  republished to its one link as version 24 after PM-1 to PM-3, as version 25 after the project map's
+  design (`55cc777f8`), and as version 26 after PM-4 to PM-7 (`f88af352e`).
+
 ## Instruments
 
 ### The gap-ownership join

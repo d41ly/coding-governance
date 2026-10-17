@@ -21,6 +21,7 @@ are in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md`.
 
 - **The duplicate artifact first.** The delete of `4UyRaoozVkbK6ECCCBvDg1` needs the owner's confirmation,
   which this session cannot show, so nothing was deleted. The owner deletes it from the artifact's own menu.
+  Done 2026-10-17: the session's watch on it ended because the artifact no longer exists.
 - **One at a time.** Each run reaches five agents at once, the review protocol's bound, so dispatch 86
   goes once dispatch 85 returns.
 - **Efforts.** Each run takes what `handoff.py stage-efforts` prints for its workflow: the closing review
