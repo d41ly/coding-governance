@@ -1,0 +1,403 @@
+kind	node	owner	evidence	settled
+item	entry.intake	dDeclaredLoop	11195-build-PLAY-dClosedLoop-1-flow-steps.md:86 "(revised 2026-10-17, PM-9): dDeclaredLoop builds the step's items" (settled by PM-9; entry.intake's hook itself is dWellOiledMachine's (gap-rt-14))	yes
+item	entry.orient	dDeclaredLoop	11195-build-PLAY-dClosedLoop-1-flow-steps.md:86 "(revised 2026-10-17, PM-9): dDeclaredLoop builds the step's items" (settled by PM-9)	yes
+item	entry.place	dDeclaredLoop	11195-build-PLAY-dClosedLoop-1-flow-steps.md:86 "(revised 2026-10-17, PM-9): dDeclaredLoop builds the step's items" (settled by PM-9)	yes
+item	entry.place-check	dDeclaredLoop	11195-build-PLAY-dClosedLoop-1-flow-steps.md:86 "(revised 2026-10-17, PM-9): dDeclaredLoop builds the step's items" (settled by PM-9)	yes
+item	entry.place-owner	dDeclaredLoop	11195-build-PLAY-dClosedLoop-1-flow-steps.md:86 "(revised 2026-10-17, PM-9): dDeclaredLoop builds the step's items" (settled by PM-9)	yes
+item	entry.claim	dDeclaredLoop	11195-build-PLAY-dClosedLoop-1-flow-steps.md:86 "(revised 2026-10-17, PM-9): dDeclaredLoop builds the step's items" (settled by PM-9)	yes
+item	plan.input	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "| dRankedPlan | Plan | dDeclaredLoop, dTotalRecall |" (Plan step program; no more specific claim)	no
+item	plan.dedupe	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "| dRankedPlan | Plan | dDeclaredLoop, dTotalRecall |" (Plan step program; writes the dupes record)	no
+item	plan.triage-rule	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "rule-based triage"	no
+item	plan.triage-judge	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "the planner and triager role and Plan workflow"	no
+item	plan.record	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "the planner and triager role and Plan workflow"	no
+item	plan.research	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "| dRankedPlan | Plan | dDeclaredLoop, dTotalRecall |" (Plan step program; the researcher role is dBoundRoles' roster)	no
+item	plan.place	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "the placement predicate"	no
+item	plan.lease	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "| dRankedPlan | Plan | dDeclaredLoop, dTotalRecall |" (Plan step program; calls dDeclaredLoop's lease verbs, which does not make that build the owner)	no
+item	plan.recommend	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the recommendation's score computed and its reasoning returned by the step's producing role" (also gap-flow-12, dCalibratedLens (layer-flow:121))	no
+item	plan.reason	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the recommendation's score computed and its reasoning returned by the step's producing role" (the step's reason item (flow-steps [rules]))	no
+item	plan.exit	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "the request as the ratification by `plan.ratification`"	no
+item	design.input	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "| dIndexedDesign | Design | dDeclaredLoop |" (Design step program)	no
+item	design.reentry	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "two-level re-entry by `design.reentry`"	no
+item	design.inventory	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "| dIndexedDesign | Design | dDeclaredLoop |" (Design step program)	no
+item	design.seams	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "reuse and alternatives backed by recorded probes" (reads dTotalRecall's house index (v2 [owed]))	no
+item	design.decompose	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "the feature level (build, features, units)"	no
+item	design.research	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "the research harness"	no
+item	design.overlaps	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "the design index"	no
+item	design.unit-spec	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "the spec redesigned as a structured, tagged contract"	no
+item	design.recommend	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the recommendation's score computed and its reasoning returned by the step's producing role"	no
+item	design.reason	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the recommendation's score computed and its reasoning returned by the step's producing role"	no
+item	design.ready	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "the derived-READY hand-off"	no
+item	design.exit	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "the derived-READY hand-off" (posts confirmed interfaces through dDeclaredLoop's mailbox, a call)	no
+item	build.base	dScopedBuild	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1121 "one exit contract with a history-derived base"	no
+item	build.unit-lease	dScopedBuild	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1121 "| dScopedBuild | Build |" (Build step program; calls the lease verbs)	no
+item	build.unit-pass	dScopedBuild	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1121 "`build.unit-pass` and `build.scope` draining the legacy a unit touches"	no
+item	build.acceptance	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "acceptance re-run by the executor" (gap-flow-14's computed witness; a stage default would give dScopedBuild)	no
+item	build.scope	dScopedBuild	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1121 "the touch join as `build.scope`'s one check"	no
+item	build.recommend	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the stage-exit recommendation" (signals only at Build (flow-steps build.recommend))	no
+item	build.ratify	dTotalRecall	11194-build-PLAY-dClosedLoop-1-gap-register.md:143 "Nothing defines a major decision" (gap-mem-02 sits in dTotalRecall's row (v2:1115 'the major-decision log'); the item is decisions.major's owner ratification)	no
+item	build.distill	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "the major-decision log with its holds-now view" (the library's 'decision becomes a log row' path (layer-library:176), gap-mem-02)	no
+item	build.core	dScopedBuild	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1121 "the core checks run by the executor at Build's exit"	no
+item	build.exit	dScopedBuild	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1121 "one exit contract with a history-derived base"	no
+item	test.merge	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "| dWitnessedBar | Test | dDeclaredLoop |" (Test step program; the lander's --prepare is called, not built here)	no
+item	test.select	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "held legs by policy"	no
+item	test.verdict	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "the runner-written verdict the pre-push hook reads"	no
+item	test.route	dWitnessedBar	11195-build-PLAY-dClosedLoop-1-flow-steps.md:283 "dWitnessedBar owes (`gap-test-04`)"	no
+item	test.attribute	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "attribution deciding what blocks"	no
+item	test.flakes	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "flake quarantine"	no
+item	test.seen-red	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "seen-red records"	no
+item	test.recommend	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the recommendation's score computed and its reasoning returned by the step's producing role"	no
+item	test.reason	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the recommendation's score computed and its reasoning returned by the step's producing role"	no
+item	test.exit	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "| dWitnessedBar | Test | dDeclaredLoop |" (Test step program)	no
+item	deploy.current	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "| dShippedRelease | Deploy | dWitnessedBar, dTotalRecall |" (Deploy step program)	no
+item	deploy.mandate	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "| dShippedRelease | Deploy | dWitnessedBar, dTotalRecall |" (Deploy step program)	no
+item	deploy.parents	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "a dependent's landing held until its parent lands (`deps.landing`)"	no
+item	deploy.land	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "landings ordered through the landing queue it builds"	no
+item	deploy.core	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "the lander running the core checks on the landed tree before it releases the build"	no
+item	deploy.record	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "the landing record"	no
+item	deploy.distill	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "the major-decision log with its holds-now view" (confirms build.distill's rows at the landed SHA (layer-library:240))	no
+item	deploy.recommend	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the stage-exit recommendation" (signals only at Deploy)	no
+item	deploy.notify	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "| dShippedRelease | Deploy | dWitnessedBar, dTotalRecall |" (Deploy step program; posts through dDeclaredLoop's mailbox and landing notices, a call)	no
+item	deploy.released	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "the landing review blocking the build's close rather than the push" (Deploy's close hold; the event-wait engine it runs on is dWellOiledMachine's)	no
+item	deploy.snapshot	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "| dShippedRelease | Deploy | dWitnessedBar, dTotalRecall |" (Deploy step program; the card snapshot mechanism is dDeclaredLoop's)	no
+item	deploy.unlease	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "| dShippedRelease | Deploy | dWitnessedBar, dTotalRecall |" (Deploy step program; calls the lease verbs)	no
+item	deploy.close	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "| dShippedRelease | Deploy | dWitnessedBar, dTotalRecall |" (Deploy step program)	no
+item	review.trigger	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "breakpoints placeable at any item boundary (`review.breakpoints`)"	no
+item	review.pin	dFairHearing	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1112 "that `review.pin` maps from `review.opt-in`"	no
+item	review.lens	dFairHearing	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1112 "opt-in lenses (security, alternatives, cost, portability, adopter migration, topology)" (lens, refute and report are one tier2-review.js act (flow-steps:435))	no
+item	review.refute	dFairHearing	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1112 "skeptic batches sorted by cited address"	no
+item	review.report	dFairHearing	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1112 "every confirmed finding given one disposition from `review.report`'s grammar"	no
+item	review.dispose	dFairHearing	11195-build-PLAY-dClosedLoop-1-review-system.md:236 "A new gate is `new:<slug>` with a patch-build intake. This closes" (closes gap-review-07 and -10, dFairHearing's; dCalibratedLens adds the not-in-view cause (v2:1124))	no
+item	review.fold	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "design review by policy" (the spec-write workflow's disposal stage on unbuilt specs (flow-steps:447))	no
+item	review.cost	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "gap-flow-12, gap-review-11" (gap-review-11: nothing reads the review-shape line (gap-register:288))	no
+item	life.request	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-flow-steps.md:466 "Runtime executes the owner's controls (dWellOiledMachine, RT-3)" (settled by RT-3)	yes
+item	life.quiesce	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-flow-steps.md:466 "Runtime executes the owner's controls (dWellOiledMachine, RT-3)" (settled by RT-3)	yes
+item	life.notify	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-flow-steps.md:466 "Runtime executes the owner's controls (dWellOiledMachine, RT-3)" (settled by RT-3)	yes
+item	life.snapshot	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-flow-steps.md:466 "Runtime executes the owner's controls (dWellOiledMachine, RT-3)" (settled by RT-3)	yes
+item	life.unlease	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-flow-steps.md:466 "Runtime executes the owner's controls (dWellOiledMachine, RT-3)" (settled by RT-3)	yes
+item	life.close	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-flow-steps.md:466 "Runtime executes the owner's controls (dWellOiledMachine, RT-3)" (settled by RT-3)	yes
+item	adopt.census	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "`adopt.census`, `adopt.practices`"	no
+item	test.seed	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "`test.seed` at every check's registration"	no
+item	adopt.practices	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "`adopt.census`, `adopt.practices`"	no
+item	adopt.decisions	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "`adopt.decisions` (two raters by the author's rubric"	no
+item	adopt.reconstruct	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "with `adopt.reconstruct`, which `retrofit.reconstruct` governs"	no
+item	maintain.lease	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "Maintain and the Loop Review delivered as cadence steps of the observability expansion"	no
+item	maintain.read	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "Maintain and the Loop Review delivered as cadence steps of the observability expansion"	no
+item	maintain.direct	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "Maintain and the Loop Review delivered as cadence steps of the observability expansion"	no
+item	maintain.patch	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "Maintain and the Loop Review delivered as cadence steps of the observability expansion"	no
+item	maintain.file	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "Maintain and the Loop Review delivered as cadence steps of the observability expansion"	no
+item	maintain.levels	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "Maintain and the Loop Review delivered as cadence steps of the observability expansion"	no
+item	maintain.record	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "Maintain and the Loop Review delivered as cadence steps of the observability expansion"	no
+item	loop.lease	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the shared value ledger; the weekly Loop Review" (dTendedCadence delivers it as a cadence step (v2:1123); review-system:269 keeps the Loop Review with dCalibratedLens)	no
+item	loop.gather	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the shared value ledger; the weekly Loop Review" (dTendedCadence delivers it as a cadence step (v2:1123); review-system:269 keeps the Loop Review with dCalibratedLens)	no
+item	loop.price	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the shared value ledger; the weekly Loop Review" (dTendedCadence delivers it as a cadence step (v2:1123); review-system:269 keeps the Loop Review with dCalibratedLens)	no
+item	loop.propose	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the shared value ledger; the weekly Loop Review" (dTendedCadence delivers it as a cadence step (v2:1123); review-system:269 keeps the Loop Review with dCalibratedLens)	no
+item	loop.file	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the shared value ledger; the weekly Loop Review" (dTendedCadence delivers it as a cadence step (v2:1123); review-system:269 keeps the Loop Review with dCalibratedLens)	no
+item	loop.record	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the shared value ledger; the weekly Loop Review" (dTendedCadence delivers it as a cadence step (v2:1123); review-system:269 keeps the Loop Review with dCalibratedLens)	no
+item	release.pick	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "promotion after landing through environments as an integrations extension point"	no
+item	release.approve	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "promotion after landing through environments as an integrations extension point"	no
+item	release.promote	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "promotion after landing through environments as an integrations extension point"	no
+item	release.verify	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "promotion after landing through environments as an integrations extension point"	no
+item	release.route	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "promotion after landing through environments as an integrations extension point"	no
+item	release.record	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "promotion after landing through environments as an integrations extension point"	no
+item	kits.version	dShippedRelease	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:505 "10 of 29 kit entries declare no version" (gap-deploy-11, owner column dShippedRelease)	no
+item	kits.cut	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "kit release notes"	no
+item	kits.currency	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "the fleet register and currency watch"	no
+item	kits.fleet	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "the fleet register and currency watch"	no
+item	kits.offer	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "an unattended `kits.offer` in a govkit mode"	no
+item	kits.install	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "the install and update hooks that call `adopt` and `test.seed`" (one row writes `kits.install`, `kits.update`; counted as two items)	no
+item	kits.update	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "the install and update hooks that call `adopt` and `test.seed`" (shares its row with kits.install)	no
+key	preset	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "the named presets and their completeness check"	no
+key	charter.override	dOrderedCharter	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1111 "override rule with `charter.override` and its record"	no
+key	charter.practices	dOrderedCharter	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1111 "and `charter.practices`"	no
+key	core.bypass	dOrderedCharter	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1111 "the exception register and the `core.*` policies"	no
+key	core.exceptions	dOrderedCharter	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1111 "the exception register and the `core.*` policies"	no
+key	design.forks	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "fork resolution by `design.forks`"	no
+key	design.reentry	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "two-level re-entry by `design.reentry`"	no
+key	autonomy	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "reviews and owner gates one mechanism with `review.<stage>` and `autonomy` its default declarations"	no
+key	policy.guard	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "the guard, the TTY CLI and the default floor"	no
+key	policy.proof	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "the guard, the TTY CLI and the default floor" (tty-cli is the proof's default value)	no
+key	floor	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "the guard, the TTY CLI and the default floor"	no
+key	hooks.bypass	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "bypasses recorded" (v2:1081 'each bypass is recorded')	no
+key	transitions.record	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "the transition record three ways"	no
+key	leases	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "overlap warned or refused"	no
+key	leases.granularity	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "one lease grammar for builds, units and cadence runs"	no
+key	leases.renewal	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "acquired, renewed, released and taken over through CLI verbs"	no
+key	leases.expiry-hours	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "acquired, renewed, released and taken over through CLI verbs"	no
+key	leases.overlap	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "overlap warned or refused"	no
+key	leases.offline	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "offline behaviour"	no
+key	deps.coordination	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "dependency coordination by the parent's lease"	no
+key	deps.early-build	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "interfaces confirmed at Design's exit"	no
+key	deps.messaging	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "live delivery where the harness has it"	no
+key	landing.order	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "landings ordered through the landing queue it builds"	no
+key	card.follows	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "the build's orientation card at level 1"	no
+key	placement	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "made by `placement`"	no
+key	placement.check	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "its facts checked by `placement.check`" (dBoundRoles' driver runs the check (v2:1114), a call)	no
+key	kickoff.runs	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "the full kickoff only where `kickoff.runs` says"	no
+key	card.store	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "the stores selected by `card.store`"	no
+key	card.snapshot	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "snapshotted into the build folder per `card.snapshot`"	no
+key	actions.free	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "`actions.free` at the tool call"	no
+key	resume.partial	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "partial work handled by `resume.partial`"	no
+key	resume.context	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "a fresh session recommended by `resume.context`"	no
+key	orient.budget	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "orientation cost recorded per stage"	no
+key	driver.reads	dBoundRoles	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1114 "`driver.reads`, `prompts.author` and `roles.no-spawn`"	no
+key	prompts.author	dBoundRoles	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1114 "`driver.reads`, `prompts.author` and `roles.no-spawn`"	no
+key	roles.retries	dBoundRoles	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1114 "residual failures retried by `roles.retries`"	no
+key	roles.no-spawn	dBoundRoles	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1114 "`driver.reads`, `prompts.author` and `roles.no-spawn`"	no
+key	roles.trust	dBoundRoles	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1114 "(`roles.trust`, `roles.verifier-context`)"	no
+key	roles.answered-calls	dBoundRoles	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1114 "the answered-call hook (`roles.answered-calls`)"	no
+key	roles.verifier-context	dBoundRoles	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1114 "(`roles.trust`, `roles.verifier-context`)"	no
+key	roles.on-contradiction	dBoundRoles	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1114 "(`roles.on-contradiction`)"	no
+key	reuse.delivery	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "(`reuse.delivery`)"	no
+key	reuse.propose	dTotalRecall	11194-build-PLAY-dClosedLoop-1-gap-register.md:144 "Nothing proposes an entry when a unit builds a new seam" (gap-mem-03, in dTotalRecall's row (v2:1115); build.unit-pass carries the line (layer-library:213))	no
+key	annotations.grammar	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "(`annotations.grammar`)"	no
+key	builds.agent-root	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "(`builds.agent-root`)"	no
+key	asks.acceptance	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "(`asks.acceptance`)"	no
+key	decisions.major	dTotalRecall	11194-build-PLAY-dClosedLoop-1-gap-register.md:143 "Nothing defines a major decision" (gap-mem-02, in dTotalRecall's row (v2:1115))	no
+key	builds.slug-words	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "(`builds.slug-words`, `builds.slug-style`, `builds.slug-date`)"	no
+key	builds.slug-style	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "(`builds.slug-words`, `builds.slug-style`, `builds.slug-date`)"	no
+key	builds.slug-date	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "(`builds.slug-words`, `builds.slug-style`, `builds.slug-date`)"	no
+key	lexicon.pin	dMindYourWords	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1116 "(`lexicon.pin`)"	no
+key	lexicon.forced	dMindYourWords	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1116 "(`lexicon.forced`)"	no
+key	lexicon.at-commit	dMindYourWords	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1116 "(`lexicon.at-commit`)"	no
+key	lexicon.drift	dMindYourWords	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1116 "(`lexicon.drift`)"	no
+key	lexicon.packs	dMindYourWords	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1116 "(`lexicon.packs`)"	no
+key	review.opt-in	dFairHearing	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1112 "that `review.pin` maps from `review.opt-in`"	no
+key	runtime.spawn-backend	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:910 "| `runtime.spawn-backend` |" (Runtime's own keys table ([policies]); Runtime's build is dWellOiledMachine (layer-runtime:955))	no
+key	runtime.relaunch	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:911 "| `runtime.relaunch` |" (Runtime's own keys table ([policies]); Runtime's build is dWellOiledMachine (layer-runtime:955))	no
+key	runtime.act-ceiling	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:912 "| `runtime.act-ceiling` |" (Runtime's own keys table ([policies]); Runtime's build is dWellOiledMachine (layer-runtime:955))	no
+key	runtime.hold-ceiling	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:913 "| `runtime.hold-ceiling` |" (Runtime's own keys table ([policies]); Runtime's build is dWellOiledMachine (layer-runtime:955))	no
+key	runtime.hook-failure	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:914 "| `runtime.hook-failure` |" (Runtime's own keys table ([policies]); Runtime's build is dWellOiledMachine (layer-runtime:955))	no
+key	runtime.attended-judge	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:915 "| `runtime.attended-judge` |" (Runtime's own keys table ([policies]); Runtime's build is dWellOiledMachine (layer-runtime:955))	no
+key	runtime.attended-allowance	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:916 "| `runtime.attended-allowance` |" (Runtime's own keys table ([policies]); Runtime's build is dWellOiledMachine (layer-runtime:955))	no
+key	runtime.harnesses	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:917 "| `runtime.harnesses` |" (Runtime's own keys table ([policies]); Runtime's build is dWellOiledMachine (layer-runtime:955))	no
+key	runtime.journal	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:918 "| `runtime.journal` |" (Runtime's own keys table ([policies]); Runtime's build is dWellOiledMachine (layer-runtime:955))	no
+key	runtime.secret-home	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:919 "| `runtime.secret-home` |" (Runtime's own keys table ([policies]); Runtime's build is dWellOiledMachine (layer-runtime:955))	no
+key	runtime.secret-scan	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:920 "| `runtime.secret-scan` |" (Runtime's own keys table ([policies]); Runtime's build is dWellOiledMachine (layer-runtime:955))	no
+key	plan.ratification	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "the request as the ratification by `plan.ratification`"	no
+key	run.host	dWellOiledMachine	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1117 "the executor launched where `run.host` says"	no
+key	notify.owner	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "progress reported by `notify.owner`"	no
+key	notify.channel	dWellOiledMachine	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:500 "No channel reaches the owner outside a session" (gap-rt-18, owner column dWellOiledMachine; notification adapters are Runtime's point)	no
+key	run.on-owner-question	dBoundRoles	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1114 "held as `run.on-owner-question` says (LR-3)"	no
+key	deps.landing	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "(`deps.landing`)"	no
+key	mailbox.reads	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "by `mailbox.reads`"	no
+key	review.follow-up	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "follow-up closing-review rounds by `review.follow-up`"	no
+key	prompts.batch	dBoundRoles	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1114 "prompt-writer calls batched by `prompts.batch`"	no
+key	context.on-full	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "by `context.on-full` and `context.threshold`" (Runtime's [sessions] reads it for attended sessions (layer-runtime:746))	no
+key	context.threshold	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "by `context.on-full` and `context.threshold`"	no
+key	card.pointers	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "by `card.pointers`"	no
+key	notices.record	dBoundRoles	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1114 "by `notices.record`"	no
+key	instructions.checks	dOrderedCharter	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1111 "(`instructions.checks`)"	no
+key	instructions.edit	dOrderedCharter	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1111 "(`instructions.edit`, `instructions.proof`)"	no
+key	instructions.proof	dOrderedCharter	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1111 "(`instructions.edit`, `instructions.proof`)"	no
+key	review.breakpoints	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "(`review.breakpoints`)"	no
+key	deps.on-parent-withdrawn	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "and `deps.on-parent-withdrawn`"	no
+key	review.design.rounds	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "design review by policy" (gap-design-03, design review off by default (gap-register:224))	no
+key	review.design.round-count	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "design review by policy" (read only under fixed-count)	no
+key	review.unverified	dFairHearing	11195-build-PLAY-dClosedLoop-1-flow-steps.md:446 "files each unverified finding as `review.unverified` says" (behaviour sits in review.dispose, dFairHearing's)	no
+key	review.unclassed	dFairHearing	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1112 "or `none` under `review.unclassed`"	no
+key	flow.route-backs	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "the engine refusing any transition it lacks" (the bound counts in the transition record (flow-steps:32))	no
+key	policy.on-missing-expansion	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "refused only for a value on a core key that selects an absent expansion"	no
+key	tests.without-cadence	dWitnessedBar	11195-build-PLAY-dClosedLoop-1-flow-steps.md:272 "as `tests.without-cadence` says" (test.select, Test's program (dWitnessedBar))	no
+key	verdict	dWitnessedBar	11195-build-PLAY-dClosedLoop-1-flow-steps.md:310 "`local-hook` and `peer-node` are core, built by dWitnessedBar"	no
+key	verdict.blocks	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "attribution deciding what blocks"	no
+key	verdict.held	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "held legs by policy"	no
+key	verdict.flakes	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "flake quarantine"	no
+key	tests.product	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "the product-test contract with runner adapters"	no
+key	tests.landing-levels	dWitnessedBar	11195-build-PLAY-dClosedLoop-1-flow-steps.md:272 "the declared product-test levels (`tests.landing-levels`)" (test.select, Test's program)	no
+key	verdict.tree	dWitnessedBar	11195-build-PLAY-dClosedLoop-1-flow-steps.md:271 "under `verdict.tree: prepared-merge`" (test.merge, Test's program)	no
+key	verdict.red-route	dWitnessedBar	11195-build-PLAY-dClosedLoop-1-flow-steps.md:275 "as `verdict.red-route` says" (test.attribute, Test's program)	no
+key	verdict.remote.trust	dWitnessedBar	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:494 "A remote verdict certifies itself" (gap-test-11, owner column dWitnessedBar)	no
+key	verdict.remote.pin-scope	dWitnessedBar	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:494 "A remote verdict certifies itself" (gap-test-11)	no
+key	verdict.remote.pin	dWitnessedBar	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:494 "A remote verdict certifies itself" (gap-test-11)	no
+key	plan.authority	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "the planner and triager role and Plan workflow"	no
+key	plan.unplaced	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "the placement predicate"	no
+key	plan.triage	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "rule-based triage"	no
+key	plan.kickoff	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "kickoff offering the next item"	no
+key	design.handoff	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "the derived-READY hand-off"	no
+key	design.overlap	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "the design index"	no
+key	build.scope	dScopedBuild	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1121 "the touch join as `build.scope`'s one check"	no
+key	build.worktree	dWellOiledMachine	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1117 "workspaces by `build.worktree`"	no
+key	deploy.runs	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "the deploy engine"	no
+key	deploy.promotion	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "promotion after landing through environments"	no
+key	deploy.on-verify-fail	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "promotion after landing through environments" (read by release.route)	no
+key	deploy.currency	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "the fleet register and currency watch"	no
+key	currency.max-behind	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "the fleet register and currency watch"	no
+key	currency.on-behind	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "the fleet register and currency watch"	no
+key	install.from	dShippedRelease	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:506 "A receipt records gov's source as a local path" (gap-deploy-12, owner column dShippedRelease)	no
+key	build.closes	dShippedRelease	11195-build-PLAY-dClosedLoop-1-flow-steps.md:321 "The core runs to the landing, and the build closes there (`build.closes: at-landing`)." (Deploy's program (dShippedRelease); dDeclaredLoop only refuses presets on it)	no
+key	build.release-hold	dShippedRelease	11195-build-PLAY-dClosedLoop-1-flow-steps.md:405 "`build.release-hold` says what waits" (deploy.released, Deploy's program)	no
+key	build.release-ceiling	dWellOiledMachine	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1117 "the sweep that raises a wait past `build.release-ceiling` once"	no
+key	kits.cadence	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "kit release notes" (distribution's cut cadence (layer-expansions:439))	no
+key	kits.host	dShippedRelease	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:469 "distribution's programs run on a host key of their own" (distribution's programs are dShippedRelease's (v2:1122))	no
+key	kits.watch-cadence	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "the fleet register and currency watch"	no
+key	release.environments	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "promotion after landing through environments as an integrations extension point"	no
+key	integrations.tracker	dShippedRelease	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:316 "none: the ask backlog is the tracker" (no chain row names the tracker mirror; dShippedRelease is the build that delivers integrations' adapters (weak))	no
+key	maintain.host	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "the cadence, on Runtime's hosts"	no
+key	maintain.cadence	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "the cadence, on Runtime's hosts"	no
+key	maintain.fixes	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "the safe-fix set"	no
+key	maintain.on-breach	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "detectors with owners" (maintain.file's route)	no
+key	maintain.events	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "event runs keyed by event"	no
+key	maintain.reading-tree	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "detectors registered by layer" (gap-maint-10 is in this row)	no
+key	maintain.node-readings	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "detectors registered by layer"	no
+key	maintain.reading-admission	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "detectors with owners"	no
+key	maintain.dead-after	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "detectors with owners"	no
+key	maintain.record-when	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "the maintenance record"	no
+key	observability.run-record	dTendedCadence	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:249 "as `observability.run-record` says" (observability's journal reader; gap-maint-05 is in dTendedCadence's row)	no
+key	patch.ratify	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "patch intakes rendered from keyed detector readings" (weak: FL-M3 came from the Maintain walk; it also governs entry's patch builds)	no
+key	review.<stage>	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "review by policy per stage and effort"	no
+key	review.<stage>.effort	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "review by policy per stage and effort"	no
+key	review.recommendation	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the stage-exit recommendation"	no
+key	review.build.when	dScopedBuild	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1121 "the closing review recorded"	no
+key	review.findings	dScopedBuild	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1121 "every closing-review finding disposed as new units by `review.findings`"	no
+key	review.blocks	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "breakpoints placeable at any item boundary" (a breakpoint blocks as review.blocks says (flow-steps:420))	no
+key	review.left-shift	dFairHearing	11195-build-PLAY-dClosedLoop-1-review-system.md:236 "A new gate is `new:<slug>` with a patch-build intake. This closes" (gap-review-07, dFairHearing's)	no
+key	review.recommendation.source	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the recommendation's score computed and its reasoning returned by the step's producing role"	no
+key	review.loop.cadence	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the weekly Loop Review"	no
+key	review.loop.retire	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the weekly Loop Review"	no
+key	review.loop.window-days	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the weekly Loop Review"	no
+key	review.loop.catch-source	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the weekly Loop Review"	no
+key	budgets.*	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "caps re-derived from evidence and review cost"	no
+key	tags.slice	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:268 "**Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter." (the tags system's keys (systems:276-283))	no
+key	tags.retired-cites	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:268 "**Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter." (the tags system's keys (systems:276-283))	no
+key	tags.positional	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:268 "**Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter." (the tags system's keys (systems:276-283))	no
+key	tags.bare-refs	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:268 "**Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter." (the tags system's keys (systems:276-283))	no
+key	annotations.lookup	dTotalRecall	11196-build-PLAY-dClosedLoop-1-systems.md:324 "**Owners.** The memory layer, kit memory-tree, chain build dTotalRecall." (the annotations system's keys (systems:326-334))	no
+key	annotations.budget	dTotalRecall	11196-build-PLAY-dClosedLoop-1-systems.md:324 "**Owners.** The memory layer, kit memory-tree, chain build dTotalRecall." (the annotations system's keys (systems:326-334))	no
+key	annotations.resolve-scope	dTotalRecall	11196-build-PLAY-dClosedLoop-1-systems.md:324 "**Owners.** The memory layer, kit memory-tree, chain build dTotalRecall." (the annotations system's keys (systems:326-334))	no
+key	annotations.delivery	dTotalRecall	11196-build-PLAY-dClosedLoop-1-systems.md:324 "**Owners.** The memory layer, kit memory-tree, chain build dTotalRecall." (the annotations system's keys (systems:326-334))	no
+key	instructions.slices	dBoundRoles	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1114 "the role files' re-verification orders and protocol pointers replaced by rendered slices" (handed against pointer; dOrderedCharter renders the units)	no
+key	instructions.legacy	dOrderedCharter	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1111 "the render gate armed with a shrink-only legacy list (IW-1)"	no
+key	instructions.task-charter	dBoundRoles	11196-build-PLAY-dClosedLoop-1-systems.md:376 "dBoundRoles builds the role static block and" ('the single carry' (systems:377), whose check reads this key (systems:367-368))	no
+key	review.twin	dFairHearing	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1112 "when the owner's `review.twin` opts it in (RS-1)"	no
+key	roles.shape-enforce	dWellOiledMachine	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1117 "act binding against the resolved shape's digest" (systems:443: dWellOiledMachine builds the binding that refuses or records)	no
+key	roles.orientation.house-index	dBoundRoles	11196-build-PLAY-dClosedLoop-1-systems.md:443 "dBoundRoles extends `workflows.toml` with the shapes" (the orientation template is a shape field (systems:391-392))	no
+key	memory.default-load	dWellOiledMachine	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1117 "the session-start hook loading the card and the map in an attended session (PM-7)" (dTotalRecall's row names 'the default load of the charter and the card'; the key's values switch what the hook loads)	no
+key	memory.load-budget	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "reported against `memory.load-budget` at session start"	no
+key	memory.item-budget	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "(`memory.item-budget`, MS-2" (dCalibratedLens derives the measured value (v2:1124), a reader)	no
+key	memory.over-budget	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "reported when exceeded, MS-3"	no
+key	memory.project-map	dBoundRoles	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1114 "the work order's `map` slot for the roles `memory.project-map` names"	no
+key	memory.map-budget	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "at most `memory.map-budget` and degraded in a fixed order"	no
+key	memory.map-overflow	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "degraded in a fixed order over it, never dropping a node"	no
+key	memory.map-unfold	dBoundRoles	11197-build-PLAY-dClosedLoop-1-project-map.md:714 "the work order's `map` slot and the per-item unfolds"	no
+key	memory.map-purpose	dTotalRecall	11197-build-PLAY-dClosedLoop-1-project-map.md:712 "the purposeless-node population"	no
+key	memory.legacy-anchors	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "legacy anchors derived"	no
+key	memory.superseded-slices	dTotalRecall	11196-build-PLAY-dClosedLoop-1-systems.md:509 "**Owners.** The memory layer, kit memory-tree, chain build dTotalRecall."	no
+key	retrofit.drain	dScopedBuild	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1121 "draining the legacy a unit touches, in hunks under `retrofit.drain-cap`"	no
+key	retrofit.drain-cap	dScopedBuild	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1121 "draining the legacy a unit touches, in hunks under `retrofit.drain-cap`"	no
+key	retrofit.claim-on-touch	dScopedBuild	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1121 "claiming the baselined map keys its write set holds (dossiers) under `retrofit.claim-cap`"	no
+key	retrofit.claim-cap	dScopedBuild	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1121 "claiming the baselined map keys its write set holds (dossiers) under `retrofit.claim-cap`"	no
+key	retrofit.widen	dWitnessedBar	11197-build-PLAY-dClosedLoop-1-retrofit.md:527 "the factory, with each registration's direction and home" (the widen record is the ledger's and test.seed's (retrofit:321-322))	no
+key	retrofit.unseeded	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "recording a failed or dead-probe seed unarmed"	no
+key	retrofit.reconstruct	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "which `retrofit.reconstruct` governs"	no
+key	retrofit.decisions	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "through `retrofit.decisions`"	no
+key	retrofit.practice-pending	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "through `retrofit.practice-pending`"	no
+key	retrofit.cadence	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "under `retrofit.cadence: hot-first`'s standing ask"	no
+key	retrofit.slot-bytes	dBoundRoles	11197-build-PLAY-dClosedLoop-1-retrofit.md:530 "the legacy slot's render, in its four states"	no
+point	actor kinds	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:894 "| extension points declared | the ten in `[extend]` |" (Runtime's contract declares the point; dWellOiledMachine builds the points' owner field (project-map:717))	no
+point	command adapters	dWellOiledMachine	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1117 "command adapters that are idempotent or reconcile"	no
+point	spawn backends	dWellOiledMachine	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1117 "with the headless backend measured beside it"	no
+point	role harnesses	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:894 "| extension points declared | the ten in `[extend]` |" (close call: dBoundRoles' shapes registry lists the four harness kinds that register here (systems:408))	no
+point	hook packs	dWellOiledMachine	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1117 "the kits' fragments as packs"	no
+point	harness adapters	dWellOiledMachine	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1117 "harness adapters with capability tables"	no
+point	host adapters	dWellOiledMachine	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1117 "the scheduler's host adapters"	no
+point	notification adapters	dWellOiledMachine	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:500 "No channel reaches the owner outside a session" (gap-rt-18, owner column dWellOiledMachine)	no
+point	journal readers	dWellOiledMachine	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1117 "the journal grammar moved into the core"	no
+point	cadence items	dWellOiledMachine	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:497 "no extension point takes one" (gap-rt-15, owner column dWellOiledMachine)	no
+namespace	reader	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:268 "**Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter." (R-B's twelve (layer-instruction:407-408); no later row moves it)	no
+namespace	level	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:268 "**Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter." (R-B's twelve (layer-instruction:407-408); no later row moves it)	no
+namespace	layer	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:268 "**Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter." (R-B's twelve (layer-instruction:407-408); no later row moves it)	no
+namespace	practice	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:268 "**Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter." (R-B's twelve (layer-instruction:407-408); no later row moves it)	no
+namespace	principle	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:268 "**Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter." (R-B's twelve (layer-instruction:407-408); no later row moves it)	no
+namespace	kind	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:268 "**Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter." (R-B's twelve (layer-instruction:407-408); no later row moves it)	no
+namespace	kit	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:268 "**Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter." (R-B's twelve (layer-instruction:407-408); no later row moves it)	no
+namespace	doc	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:270 "dOrderedCharter registers `doc` and `unit`"	no
+namespace	unit	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:270 "dOrderedCharter registers `doc` and `unit`"	no
+namespace	step	dDeclaredLoop	11196-build-PLAY-dClosedLoop-1-systems.md:271 "dDeclaredLoop `step`, `item`, `policy` and `command`"	no
+namespace	item	dDeclaredLoop	11196-build-PLAY-dClosedLoop-1-systems.md:271 "dDeclaredLoop `step`, `item`, `policy` and `command`"	no
+namespace	policy	dDeclaredLoop	11196-build-PLAY-dClosedLoop-1-systems.md:271 "dDeclaredLoop `step`, `item`, `policy` and `command`"	no
+namespace	command	dDeclaredLoop	11196-build-PLAY-dClosedLoop-1-systems.md:271 "dDeclaredLoop `step`, `item`, `policy` and `command`"	no
+namespace	role	dBoundRoles	11196-build-PLAY-dClosedLoop-1-systems.md:272 "dBoundRoles `role` and `field`"	no
+namespace	field	dBoundRoles	11196-build-PLAY-dClosedLoop-1-systems.md:272 "dBoundRoles `role` and `field`"	no
+namespace	section	dTotalRecall	11196-build-PLAY-dClosedLoop-1-systems.md:273 "dTotalRecall `section`, `record`, `feature`, `class` and `marker`"	no
+namespace	record	dTotalRecall	11196-build-PLAY-dClosedLoop-1-systems.md:273 "dTotalRecall `section`, `record`, `feature`, `class` and `marker`" (`record` is also one of R-B's twelve in v2's dOrderedCharter row; the M10 revision gives it to dTotalRecall)	no
+namespace	feature	dTotalRecall	11196-build-PLAY-dClosedLoop-1-systems.md:273 "dTotalRecall `section`, `record`, `feature`, `class` and `marker`"	no
+namespace	class	dTotalRecall	11196-build-PLAY-dClosedLoop-1-systems.md:273 "dTotalRecall `section`, `record`, `feature`, `class` and `marker`"	no
+namespace	marker	dTotalRecall	11196-build-PLAY-dClosedLoop-1-systems.md:273 "dTotalRecall `section`, `record`, `feature`, `class` and `marker`"	no
+namespace	leg	dWitnessedBar	11196-build-PLAY-dClosedLoop-1-systems.md:274 "dWitnessedBar `leg`, `check` and `pack`"	no
+namespace	check	dWitnessedBar	11196-build-PLAY-dClosedLoop-1-systems.md:274 "dWitnessedBar `leg`, `check` and `pack`"	no
+namespace	pack	dWitnessedBar	11196-build-PLAY-dClosedLoop-1-systems.md:274 "dWitnessedBar `leg`, `check` and `pack`"	no
+namespace	hook	dWellOiledMachine	11196-build-PLAY-dClosedLoop-1-systems.md:275 "dWellOiledMachine `hook` and `point`"	no
+namespace	point	dWellOiledMachine	11196-build-PLAY-dClosedLoop-1-systems.md:275 "dWellOiledMachine `hook` and `point`"	no
+system	tags	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:268 "**Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter."	no
+system	annotations	dTotalRecall	11196-build-PLAY-dClosedLoop-1-systems.md:324 "**Owners.** The memory layer, kit memory-tree, chain build dTotalRecall."	no
+system	instruction writing	dOrderedCharter	11196-build-PLAY-dClosedLoop-1-systems.md:375 "dOrderedCharter builds the schema, the grammar, the renderer, the" (its record splits parts to dBoundRoles, dWellOiledMachine and dConvergedCharter; the schema, renderer and write command are dOrderedCharter's)	no
+system	role workflow shapes	dBoundRoles	11196-build-PLAY-dClosedLoop-1-systems.md:443 "dBoundRoles extends `workflows.toml` with the shapes" (the binding is dWellOiledMachine's, the panel dFairHearing's, the ledger rows dCalibratedLens's)	no
+system	memory structure	dTotalRecall	11196-build-PLAY-dClosedLoop-1-systems.md:509 "**Owners.** The memory layer, kit memory-tree, chain build dTotalRecall."	no
+system	retrofit	dWitnessedBar	11197-build-PLAY-dClosedLoop-1-retrofit.md:527 "| dWitnessedBar | the factory, with each registration's direction and home" (its record names no single owner (RF-1: parts owned by the builds in [owners]); its core, the ledger factory, is dWitnessedBar's)	no
+system	project map	dTotalRecall	11197-build-PLAY-dClosedLoop-1-project-map.md:542 "**Core memory** (PM-2): kit memory-tree, chain build dTotalRecall."	no
+record-kind	intake	dRankedPlan	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1119 "recorded with its reason in the intake record" (this row also builds the prompt-submit hook writing the intake log; PM-9 keeps the hook dWellOiledMachine's)	no
+record-kind	card	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "the build's orientation card at level 1"	no
+record-kind	plan	dRankedPlan	11195-build-PLAY-dClosedLoop-1-flow-steps.md:117 "the plan-record schema check" (written by plan.record, Plan's program)	no
+record-kind	seams	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "reuse and alternatives backed by recorded probes"	no
+record-kind	feature design	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "with each feature's interfaces declared structurally"	no
+record-kind	spec	dIndexedDesign	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1120 "the spec redesigned as a structured, tagged contract"	no
+record-kind	research return	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "the research view, over the research-return kind" (covers the research record of plan.research and design.research)	no
+record-kind	design record	dTotalRecall	11195-build-PLAY-dClosedLoop-1-layer-memory.md:371 "research return, design record, review," (could not place: no build names it; dTotalRecall by the memory contract alone, which the rule says is not enough)	no
+record-kind	review	dFairHearing	11195-build-PLAY-dClosedLoop-1-flow-steps.md:445 "every confirmed finding appears in the report, under the build's `reviews/`" (the report review.report writes)	no
+record-kind	ask	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "the ask kind's acceptance at filing (`asks.acceptance`)"	no
+record-kind	backlog row	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "extending backlog.py's V14"	no
+record-kind	run record	dTendedCadence	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:211 "the run record, per run" (layer-memory:373 sorts the run record (RUN.md) as core; layer-expansions makes it observability's)	no
+record-kind	work order	dBoundRoles	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1114 "the work order rendered per item"	no
+record-kind	decision	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "decisions split by kind" (each resolved fork's record (layer-memory:373); covers the fork record and the log row)	no
+record-kind	acceptance	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "acceptance re-run by the executor" (the executor-written acceptance record (flow-steps:216))	no
+record-kind	verdict	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "the runner-written verdict the pre-push hook reads"	no
+record-kind	attribution	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "attribution deciding what blocks"	no
+record-kind	transition	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "the transition record three ways"	no
+record-kind	landing	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "the landing record"	no
+record-kind	flake	dWitnessedBar	11195-build-PLAY-dClosedLoop-1-flow-steps.md:276 "the flake record, a flow record kind"	no
+record-kind	dupes	dRankedPlan	11195-build-PLAY-dClosedLoop-1-flow-steps.md:114 "the dupes record, keyed by the derived index" (plan.dedupe, Plan's program)	no
+record-kind	scope	dScopedBuild	11195-build-PLAY-dClosedLoop-1-flow-steps.md:217 "the scope report" (build.scope, dScopedBuild's)	no
+record-kind	return	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:893 "| record kinds | return records, and act records (launch, epoch, outcome)." (schema from dBoundRoles' return template; the persisted-return store writes it (v2:1117))	no
+record-kind	act	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-layer-runtime.md:893 "| record kinds | return records, and act records (launch, epoch, outcome)."	no
+record-kind	lease	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "one lease grammar for builds, units and cadence runs" (layer-memory:376 says Runtime registers it; layer-runtime:1013 keeps coordination with dDeclaredLoop)	no
+record-kind	session binding	dWellOiledMachine	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1117 "sessions bound on every source"	no
+record-kind	mailbox message	dDeclaredLoop	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1113 "its closed set of message kinds checked on write" (layer-memory:376 says Runtime registers it)	no
+record-kind	journal	dWellOiledMachine	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1117 "the journal grammar moved into the core"	no
+record-kind	dossier	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "with dossiers anchored to symbol keys"	no
+record-kind	symbols	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "the caller map: every Python definition"	no
+record-kind	callers	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "the caller map: every Python definition"	no
+record-kind	lexicon	dMindYourWords	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1116 "the packs, generated per host kit" (layer-memory:379 lists the lexicon among optional-component kinds; its committed data is the packs)	no
+record-kind	recall index	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "memory-recall narrowed to a record finder"	no
+record-kind	gotcha	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "gotchas handed by write set" (the class record of review.fold and build.unit-pass)	no
+record-kind	annotation index	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "the generated annotation index and its resolve check"	no
+record-kind	override	dOrderedCharter	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1111 "`charter.override` and its record"	no
+record-kind	exception	dOrderedCharter	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1111 "the exception register and the `core.*` policies"	no
+record-kind	instruction change record	dOrderedCharter	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1111 "each unit's status derived from its change record"	no
+record-kind	tag index	dOrderedCharter	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1111 "the derived tag index, one JSON file per tree"	no
+record-kind	build readme	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "the build README's declared front-matter schema"	no
+record-kind	baseline	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "retrofit's `baseline` and `census` record kinds" (covers test.seed's population files; the ledger factory is dWitnessedBar's)	no
+record-kind	census	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "retrofit's `baseline` and `census` record kinds"	no
+record-kind	shape-run	dTotalRecall	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1115 "the shape-run kind" (its writers are review.cost and the journal reconcile)	no
+record-kind	seen-red	dWitnessedBar	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1118 "seen-red records"	no
+record-kind	maintenance	dTendedCadence	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1123 "the maintenance record"	no
+record-kind	value ledger	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the shared value ledger" (a generated library view (layer-expansions:211), judged in)	no
+record-kind	loop review	dCalibratedLens	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:261 "writes the Loop Review record" (loop.record, dCalibratedLens's)	no
+record-kind	fleet register	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "the fleet register and currency watch"	no
+record-kind	fleet	dShippedRelease	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:453 "the fleet record, per release"	no
+record-kind	currency	dShippedRelease	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:452 "the currency record, keyed by HEAD SHA"	no
+record-kind	receipt	dShippedRelease	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:455 "the receipt, and the wiring verdict" (gap-deploy-12 in dShippedRelease's row)	no
+record-kind	kit-release	dShippedRelease	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1122 "kit release notes"	no
+record-kind	release	dShippedRelease	11196-build-PLAY-dClosedLoop-1-layer-expansions.md:387 "writes the release record for (SHA, E), with its outcome"	no
+record-kind	release exit	dShippedRelease	11195-build-PLAY-dClosedLoop-1-flow-steps.md:345 "naming the slot's exit record" (a flow kind under memory/flow/ (layer-memory:1133), declared by Deploy's release slot)	no
+record-kind	triage	dRankedPlan	11195-build-PLAY-dClosedLoop-1-flow-steps.md:115 "the triage record naming its rule"	no
+record-kind	recommendation	dCalibratedLens	11194-build-PLAY-dClosedLoop-1-architecture-v2.md:1124 "the stage-exit recommendation"	no
+record-kind	diff	dIndexedDesign	11195-build-PLAY-dClosedLoop-1-flow-steps.md:163 "the diff record" (design.reentry, dIndexedDesign's)	no
+record-kind	re-entry	dIndexedDesign	11195-build-PLAY-dClosedLoop-1-flow-steps.md:518 "the re-entry record" (a transitions-table Witness cell; two-level re-entry is dIndexedDesign's (v2:1120))	no
+record-kind	overlap	dIndexedDesign	11195-build-PLAY-dClosedLoop-1-flow-steps.md:168 "the overlap record"	no
+record-kind	selection	dWitnessedBar	11195-build-PLAY-dClosedLoop-1-flow-steps.md:272 "the selection record"	no
+record-kind	routing	dWitnessedBar	11195-build-PLAY-dClosedLoop-1-flow-steps.md:521 "the routing record" (release.route also writes a routing record (layer-expansions:386))	no
+record-kind	comparison	dShippedRelease	11195-build-PLAY-dClosedLoop-1-flow-steps.md:336 "the comparison record" (deploy.current, Deploy's program)	no
+record-kind	owner disposition	dCalibratedLens	11195-build-PLAY-dClosedLoop-1-flow-steps.md:73 "the owner's disposition record" (an owner breakpoint's witness (flow-steps:426); reviews and owner gates are one mechanism (v2:1124))	no
+record-kind	control request	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-flow-steps.md:471 "the command's record" (life.request's guarded-command record)	no
+record-kind	workspace	dWellOiledMachine	11195-build-PLAY-dClosedLoop-1-flow-steps.md:475 "the workspace record" (life.unlease; workspaces by build.worktree (v2:1117))	no
+record-kind	ruling	dTotalRecall	11195-build-PLAY-dClosedLoop-1-flow-steps.md:495 "the ruling records" (adopt.practices, dTotalRecall's)	no

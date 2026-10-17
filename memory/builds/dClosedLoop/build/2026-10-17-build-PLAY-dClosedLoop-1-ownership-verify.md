@@ -429,3 +429,707 @@ scratchpad's root.
 - **Population:** a node two or three verifiers find, and the table lacks, is proposed to the owner in the
   same question, with its majority owner.
 - **No owner field changes before the owner answers,** and the map's owner check is run after the fold.
+
+## [round-2] Round 2: three verifiers, and what they returned
+
+Dispatches 92, 93 and 95 ran `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-1-researcher.md`, each a
+gov-researcher handed `[task-2]`'s question. Each named its folder by a suffix it picked: v-kestrel, v-heron
+and v-osprey. The third waited for agent-cap to free a slot, so it ran as dispatch 95, after the order review.
+
+### [return-2a] Dispatch 92, verifier 1 of 3, v-kestrel
+
+Its returned line, derived by the roles kit:
+
+- returned — gov-researcher · wrote 0 files · 16m40s · 114.7k out · run direct/a8dc62a43ba33f323
+
+Its return, verbatim, with any heading demoted below this record's:
+
+I derived an owner for all 408 nodes and wrote them to the table. None of the 12 settled rows breaks the rule outright, but three show strain, listed under rule conflicts.
+
+#### 1. The file
+
+`C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/verify2/v-kestrel/owners.tsv`
+
+sha256 `5e1af4f4f105bfb1d58e2ddee397b3499712e3ce7f68ef83320194804af23e2e`
+
+It has a header line, then 408 rows with the columns `kind`, `node`, `owner`, `evidence`, `settled`. Every evidence quote was found by an exact-substring search in the pinned worktree, and the generator stops if any quote is missing. Every row that cites v2's `[chain]` lands on the owner's own chain row (checked). The generator `gen.py` sits beside the table, in my own folder.
+
+#### 2. Counts
+
+| kind | count | settled |
+|---|---|---|
+| item | 107 | 12 |
+| key | 187 | 0 |
+| record-kind | 72 | 0 |
+| namespace | 25 | 0 |
+| point | 10 | 0 |
+| system | 7 | 0 |
+
+By owner: dTotalRecall 54, dShippedRelease 53, dWellOiledMachine 44, dDeclaredLoop 43, dWitnessedBar 36, dCalibratedLens 33, dIndexedDesign 25, dOrderedCharter 25, dRankedPlan 24, dTendedCadence 22, dBoundRoles 20, dScopedBuild 19, dMindYourWords 6, dFairHearing 4, dConvergedCharter 0.
+
+dConvergedCharter owns no node. It builds the record-kind factory and its gate, and under the rule that is not registering any one kind.
+
+#### 3. Membership judgments
+
+**Items (107 nodes from 106 rows):**
+- In: 81 flow-steps tags and 26 layer-expansions tags.
+- Split: the row `` `kits.install`, `kits.update` `` holds two tags, so I counted two nodes.
+- Out: flow-roles' six `| Item | Actor |` tables (flow-roles.md:59–113). Their rows are retired checklist numbers ("1 to 4"), not tags, and flow-steps says "Checklist numbers are retired".
+- Out: the 17 such tables in `research-*.md` files. Those are research inputs, not design records.
+
+**Keys (187):** every row of v2 `[policies]` (v2:652–838). `review.<stage>`, `review.<stage>.effort` and `budgets.*` count once each. 97 keys have no chain row or owner table that names them, so I derived their owner from the behaviour the key switches. Those evidence cells quote that behaviour, not the key.
+
+**Points (10):** the rows of layer-runtime `[extend]`. Three of layer-expansions' eight `[core-points]` (reading/fix classes, grants, install targets) are fields on existing Runtime rows, and cadence items already is the tenth row. The other four (verdict backends, release slot, version slot, memory homes) are not `[extend]` rows. All eight are out as separate points.
+
+**Namespaces (25):** R-B's twelve plus systems' thirteen. `record` appears in both lists and counts once. Out: `chain`, `gap`, `orient`, `build`, `skill` and `bug class`, which the map and other records use but neither list names.
+
+**Systems (7):** tags, code annotations, instruction writing, role workflow shapes, memory structure, retrofit, project map.
+
+**Record kinds:** 72 in. My test for inclusion: named as a kind, or as a record a step writes, in layer-memory `[contract]`, a v2 `[chain]` row, or a Proven-by/Witness cell. I merged synonyms:
+- per-SHA post-merge verdict and pre-push "bar record" → verdict
+- snapshot commit → card
+- population files → baseline
+- class-claim ref → claim
+- fork record and reconstructed decisions → decision
+- lease record → lease
+- mailbox posts → mailbox message
+
+Out:
+
+| Excluded | Why |
+|---|---|
+| keep record | named only in a Routes cell and integrations' contract table |
+| remote-verdict, delivery, grant | named only in integrations' contract table |
+| metric set, proposal list | intermediate outputs |
+| allow record, lander marker | hook or lander artifacts no contract declares |
+| SHAs, commits, refs, tags, deployment id, pushed ref | git or outside objects |
+| schema checks, predicates, wiring and version verdicts | checks, not records |
+| design index, house index, plan view, relation graph, slice manifest | views or indexes the sources never call a kind |
+| reuse entry | layer-memory says it is an instruction unit the registry does not list |
+| spawn marker, role index, progress cell, parents' records | not a record this item writes |
+
+#### 4. Rule conflicts
+
+**Settled rows** (I kept the owner's assignment in each case):
+- **`entry.intake`:** PM-9 gives the entry step's items to dDeclaredLoop and the intake hook to dWellOiledMachine. This item's actor *is* that hook, so I wrote dWellOiledMachine. If the owner meant the item itself stays dDeclaredLoop, this one row flips.
+- **`entry.claim`:** the step rule gives dDeclaredLoop, but the compare-and-swap claim ref it takes is designed into dTotalRecall (layer-memory: "dTotalRecall owes both refs (`gap-mem-13`)").
+- **`entry.orient` and `entry.place`:** the rule gives dDeclaredLoop, yet dBoundRoles' row builds the scout that composes the card. dRankedPlan's row builds placement ("a disposition for every request, made by `placement`").
+
+**Other rows:**
+- **The breakpoint step, all 8 items → dCalibratedLens.** Read per item instead of per step, `review.lens`, `review.refute`, `review.report` and arguably `review.pin` go to dFairHearing. They are the stages of its harness, and its row maps `review.pin`'s arguments.
+- **Items inside stage steps whose mechanism another build's row names.** I kept the stage build for each:
+  - `plan.lease` and `build.unit-lease`: the lease engine is dDeclaredLoop's.
+  - `test.merge`: it is the lander's `--prepare`.
+  - `deploy.released`: event waits are dWellOiledMachine's.
+  - `build.distill`: the decision log is dTotalRecall's.
+  - `design.seams`: the house index is dTotalRecall's.
+  - `review.cost`: it writes shape-run rows.
+- **The adopt section has no stage.** I gave its four `adopt.*` items to dTotalRecall (retrofit's adopt program). `test.seed` went to dWitnessedBar, although it sits in the adopt table.
+- **The Loop Review.** dTendedCadence's row says "Maintain and the Loop Review delivered as cadence steps". dCalibratedLens's row says "the weekly Loop Review" and owns `gap-review-02`. I gave `loop.*` and the Loop Review record to dCalibratedLens.
+- **Where two records disagree:**
+  - Layer-memory `[contract]` says Runtime registers lease and mailbox message. Layer-runtime `[settled]` puts both under dDeclaredLoop. I chose dDeclaredLoop.
+  - Layer-memory lists the run record as a core kind, while layer-expansions has observability register it. I chose dTendedCadence.
+  - dRankedPlan's row still claims the prompt-submit hook that PM-9 moved. I gave the intake kind to dRankedPlan, but its writer is now dWellOiledMachine's hook.
+- **`return` → dWellOiledMachine.** Runtime's contract registers it, but dBoundRoles owns the return contract's schema.
+- **`memory.default-load` → dWellOiledMachine.** dWellOiledMachine's row builds the session-start load (PM-7), while dTotalRecall's row says "the default load of the charter and the card".
+- **Keys implemented inside another build's step:**
+  - `reuse.propose` and `decisions.major` → dTotalRecall, though they take effect at `build.unit-pass` and `build.distill`.
+  - `retrofit.reconstruct`'s default `on-touch` arm runs in `build.unit-pass`.
+  - `placement.check` is also run by dBoundRoles' driver.
+  - `review.unverified`, `review.left-shift` and `review.blocks` → dCalibratedLens through `review.dispose` and the breakpoint, though the harness side is arguable for dFairHearing.
+- **Systems whose records name several builds:**
+  - Retrofit's `[owners]` names seven. I took v2's "whose ledger dWitnessedBar builds".
+  - Instruction writing names four. I took dOrderedCharter, which builds the schema and renderer.
+  - Role shapes names four. I took dBoundRoles, which builds the registry.
+
+#### 5. Method
+
+**Order of reading:**
+1. The worktree's build listing.
+2. Flow-steps in full.
+3. v2: `[chain]`, `[contracts]`, `[policies]`, the revision notes, `[layers]` and `[principles]`.
+4. Layer-expansions: design, settled, revised and open sections.
+5. Layer-runtime: `[settled]`, `[design]` through `[act]`, `[extend]`, `[contract]`, `[policies]`, `[build]`.
+6. Systems: `[cross]`, `[design-*]`, `[answers]`.
+7. Layer-memory: `[contract]`, `[asks]`, `[revised-*]`.
+8. Retrofit: `[cross]` through `[keys]`.
+9. Project-map: `[design]` and `[owners]`.
+10. Layer-library `[settled-lb]`, layer-instruction R-B, the gap register in full, and targeted searches. Research returns were read only to learn what a key means.
+
+**How I built the table:** a script read only the pinned worktree. It extracted the populations by table membership and joined them against my owner map, refusing any missing or extra key or namespace. It then resolved every evidence quote to a file and line.
+
+**Disclosures:**
+- Listing the scratchpad root showed files named `ownership*.md` and `own.md`. I read none of them.
+- Project-map's `[reload-pointer]` probe output (lines 1136–1144) prints an older generator's step owners. I saw it while reading, but no evidence cell uses it.
+
+**Could not place with direct evidence:**
+- `integrations.tracker` (no record names a build; I gave dShippedRelease as integrations' adapter builder).
+- The `design record` kind (dTotalRecall).
+- The `decision` kind (dIndexedDesign; dBoundRoles is the alternative).
+- The `disposition` kind (dCalibratedLens).
+- The `owner request` kind (dWellOiledMachine).
+- The `actor kinds` point (dWellOiledMachine by Runtime's contract; dDeclaredLoop's loop definition is the alternative).
+
+### [return-2b] Dispatch 93, verifier 2 of 3, v-heron
+
+Its returned line, derived by the roles kit:
+
+- returned — gov-researcher · wrote 0 files · 14m04s · 94.3k out · run direct/a6907abe57526497e
+
+Its return, verbatim, with any heading demoted below this record's:
+
+I derived an owner for all 402 nodes and wrote them to the table. Every evidence quote was checked by script against the exact line it cites (0 misses). I also checked the item and key rows against their source tables: none missing, none extra.
+
+**File:** `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/verify2/v-heron/owners.tsv`
+**sha256:** `4385284e405ce614946413564cb9a2dfb4f0ac9f92fb4d843297afdeb9190dc2`
+
+The scripts I used are in `.../verify2/v-heron/work/`. Nothing was written in the repository.
+
+#### Counts by kind
+| kind | rows |
+|---|---|
+| item | 107 |
+| key | 187 |
+| point | 10 |
+| namespace | 25 |
+| system | 7 |
+| record-kind | 66 |
+| **total** | **402** (12 marked settled) |
+
+By owner: dTotalRecall 55, dShippedRelease 49, dDeclaredLoop 45, dWellOiledMachine 41, dWitnessedBar 34, dCalibratedLens 33, dOrderedCharter 27, dIndexedDesign 23, dTendedCadence 22, dRankedPlan 21, dBoundRoles 21, dScopedBuild 14, dFairHearing 11, dMindYourWords 6, dConvergedCharter 0.
+
+#### Membership judgements
+- **Items**
+  - **In:** every tagged row of flow-steps' 9 tables (81 items) and layer-expansions' 4 tables (26).
+  - **One row split into two:** the row that writes `` `kits.install`, `kits.update` `` is two tags, so I counted it as two items.
+  - **Out, flow-roles:** its six `| Item | Actor |` tables list numbered checklist rows ("1 to 4"), not tags. flow-roles:42 keeps them only as the record of a revisit, and flow-steps:15 says "Checklist numbers are retired."
+  - **Out, research returns:** the 15 research files with `| Item | Actor |` tables are research returns, not design records.
+- **Keys:** 187 catalogue rows. `review.<stage>`, `review.<stage>.effort` and `budgets.*` count once each.
+- **Namespaces:** 25 — R-B's twelve plus systems:231's thirteen. `record` appears in both lists and is counted once.
+- **Record kinds: 66 in.**
+  - **In, from layer-memory [contract]:** 35 kinds.
+  - **In, from v2's chain rows:** override, exception, instruction change record, tag index, build readme, baseline, census, shape-run, seen-red, maintenance, value ledger, fleet register, kit-release.
+  - **In, from Proven-by and Witness cells:** triage, recommendation, diff, re-entry, overlap, selection, routing, comparison, owner disposition, control request, workspace, ruling, loop review, fleet, currency, receipt, release, release exit. "Witness cells" includes the Witness column of flow-steps' `[transitions]` table, which is where re-entry, routing and comparison come from.
+- **Merged into an existing kind, not counted again:**
+  - fork record and decision-log row → decision
+  - research record → research return
+  - report → review
+  - class record → gotcha
+  - population files → baseline
+  - mailbox posts → mailbox message
+  - placement disposition → intake
+  - intake entry → intake
+  - ledger blob → value ledger
+  - the executor's quiesce record → act
+- **Out:**
+  - Refs, SHAs, commits and blobs: the claim ref, deleted refs, the snapshot commit, the prepared merge, the base SHA, pushed refs, the tag and notes blob.
+  - Checks, verdict lines and fields: the version-check verdict, the cost field, the outcome class, the wake's witness.
+  - Things never called a record in the source cells: inventory, roster, core result, plan view.
+  - Reconstructed records, which is an `origin` value, not a kind.
+  - Reuse entry, which LR-6 makes an instruction unit and the registry does not list.
+  - Relations.
+  - keep record, which appears only in a Routes cell.
+  - remote-verdict, delivery, grant and outbox order, which are named only in layer-expansions' contract tables. Those tables are outside the three sources you listed.
+
+#### Rule conflicts
+1. **entry.intake.** The rule would give it to dWellOiledMachine, because the whole item is the hook (gap-rt-14). I kept PM-9's dDeclaredLoop. Separately, v2's dRankedPlan row (v2:1119) also claims "the prompt-submit hook writing each owner prompt verbatim to the session's intake log", which contradicts PM-9.
+2. **Where an item's mechanism belongs to another build.** I used the step's own build unless a record names the item's function:
+   - `*.recommend` and `*.reason` → dCalibratedLens (v2:1124, gap-flow-12)
+   - `build.acceptance` → dDeclaredLoop ("acceptance re-run by the executor")
+   - `review.pin`, `review.lens`, `review.refute`, `review.report`, `review.dispose` → dFairHearing
+   - `review.cost` → dCalibratedLens (gap-review-11)
+   - `build.ratify`, `build.distill`, `deploy.distill` and `decisions.major` → dTotalRecall (gap-mem-02, "the major-decision log"). This is a judgement call: the step's own build (dScopedBuild, dShippedRelease) is the alternative.
+   - Items that only call another build's mechanism stayed with their step's build: `deploy.notify`, `deploy.snapshot`, `deploy.unlease`, `plan.lease`.
+3. **Loop Review.** v2:1123 has dTendedCadence deliver "Maintain and the Loop Review" as cadence steps. v2:1124 and review-system:269 keep "the weekly Loop Review" with dCalibratedLens. I gave the `loop.*` items to dCalibratedLens.
+4. **Kinds layer-memory:376 assigns to Runtime.**
+   - lease and mailbox message: dDeclaredLoop builds their grammar and writers (v2:1113, layer-runtime:1013), so I chose dDeclaredLoop.
+   - run record: layer-memory:373 calls it core (RUN.md), but layer-expansions:211 makes it observability's. I chose dTendedCadence.
+5. **Keys where the build named in the chain row is not the one that implements the behaviour.**
+   - `roles.shape-enforce` → dWellOiledMachine, which builds the binding.
+   - `memory.default-load` → dWellOiledMachine (PM-7 hook), although dTotalRecall's row names "the default load".
+   - `context.on-full` → dDeclaredLoop, per its chain row, although Runtime's `[sessions]` reads it.
+   - `build.closes` → dShippedRelease. dDeclaredLoop only refuses presets on it.
+   - `preset` → dDeclaredLoop. A plain search hits dFairHearing's `preset` argument, which is a different thing.
+6. **Retrofit has no single owner in its own record.** RF-1 spreads its parts over seven builds. I named dWitnessedBar, which owns the ledger factory at its core.
+
+#### Method and what I could not place
+- **Order of reading:**
+  1. v2 `[policies]`, `[chain]`, `[owed]` and `[layers]`.
+  2. flow-steps in full.
+  3. flow-roles' tables.
+  4. layer-expansions in full.
+  5. layer-runtime `[schedule]` through `[build]`.
+  6. layer-memory `[contract]` and its revisions.
+  7. systems `[cross]` and `[design-*]`.
+  8. layer-instruction R-B.
+  9. retrofit `[design]` through `[answers]`.
+  10. project-map `[design]`, `[owners]`, `[reload]` and `[fixes]`.
+  11. layer-library `[design]`.
+  12. review-system `[adjudication]` and `[where]`.
+  13. layer-flow `[uncovered]`.
+  14. gap-register rows, by targeted search.
+- **Not read whole:** the other files in the build folder (research returns, compaction and atlas records, the session log). I did not read the ownership table by any route, and the project map's rendered owners played no part.
+- **Weakly placed:**
+  - `design record`: no build names it; dTotalRecall by the memory contract alone.
+  - `integrations.tracker`: no chain row names it; I gave it to dShippedRelease.
+  - `patch.ratify`: dTendedCadence, but it also governs patch builds that enter through entry.
+  - `owner disposition`: dCalibratedLens.
+  - `review.fold`: dIndexedDesign.
+  - the `role harnesses` point: dWellOiledMachine against dBoundRoles' shapes registry.
+  - the `kit` and `kind` namespaces: dOrderedCharter by systems:268, though dShippedRelease builds the kit factory.
+
+### [return-2c] Dispatch 95, verifier 3 of 3, v-osprey
+
+Its returned line, derived by the roles kit:
+
+- returned — gov-researcher · wrote 1 file · 18m36s · 134.6k out · run direct/a7e7aa8fdfea6aa74
+
+Its return, verbatim, with any heading demoted below this record's:
+
+The table is written: an owner for 405 nodes, each with evidence. Every quoted citation was checked by script against the line it cites in the pinned worktree, and all of them match. My item and policy-key populations match the records exactly. My total differs from the approved table's 351, mostly because I counted 69 record kinds.
+
+**File:** `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/verify2/v-osprey/owners.tsv`
+**sha256:** `543a744c8925b4906a380187502148141112312337e30b193d48ec55f842c074`
+
+The other files in that folder are scratch: `build_table.py` assembles the table and checks every quote, and `check.py` checks the populations. I wrote nothing in the repository.
+
+#### Counts by kind
+| Kind | Rows |
+|---|---|
+| item | 107 (12 settled) |
+| key | 187 |
+| record-kind | 69 |
+| namespace | 25 |
+| point | 10 |
+| system | 7 |
+| **total** | **405** |
+
+By owner: dTotalRecall 54, dShippedRelease 51, dDeclaredLoop 44, dWellOiledMachine 39, dCalibratedLens 37, dWitnessedBar 34, dOrderedCharter 25, dIndexedDesign 24, dRankedPlan 23, dTendedCadence 21, dBoundRoles 21, dScopedBuild 19, dFairHearing 8, dMindYourWords 5, dConvergedCharter 0.
+
+#### Membership I judged
+**Items**
+- **In:** flow-steps' 9 item tables (81 items) and layer-expansions' 4 programs (26 items).
+- **Split:** I counted the row `kits.install`, `kits.update` as two items.
+- **Out:** flow-roles has 6 tables whose header starts `| Item | Actor |`, but their rows are checklist numbers ("1 to 4", "5, 6"). flow-steps:15 says "Checklist numbers are retired", so they name no node. Research returns are not design records. roles.md and session-model use other headers.
+
+**Keys:** all 187 catalogue rows, each template row counted once.
+
+**Namespaces:** 25. That is v2's twelve plus the systems record's thirteen additions.
+
+**Record kinds in (69):**
+- **From layer-memory `[contract]`:**
+  - the core list;
+  - the kinds Flow and Runtime register;
+  - the optional components' dossier, symbols, callers and recall index;
+  - the annotation index.
+- **From v2 chain rows:** baseline, census, shape-run, seen-red, landing, maintenance, value ledger, build README, override.
+- **From Proven-by and Witness cells:** dupes, triage, diff, inventory, roster, overlap, core result, selection, routing, merge, comparison, card snapshot, workspace, ruling, claim, disposition, recommendation, instruction proposal, keep, loop review, release, release routing, release exit, kit-release, currency, fleet, receipt.
+
+**Record kinds out:**
+- "the lexicon": it names a component, not a kind.
+- remote-verdict, delivery, grant, fleet-register rows and outbox orders: they appear only in layer-expansions' contract tables, which are not among the three named sources.
+- reconstructed records: that is an `origin` value, not a kind.
+- the patch intake: it is the intake kind.
+- Generic or non-record witnesses: "the command's record", the owner's request record, the metric set, the proposal list, pinned SHAs, the cost field, a deployment id, refs and commits.
+- v2 `[contracts]`' per-SHA deploy and verify records and gate health: that section is not a named source.
+
+#### Rule conflicts (settled rows only)
+- **`entry.orient`:** the rule points to dBoundRoles. v2:1114 says "the orientation scout composing the card in a sidechain at session start".
+- **`entry.place`, `entry.place-check`, `entry.place-owner`:** the rule points to dRankedPlan. v2:1119 says "placement: a disposition for every request, made by `placement` … its facts checked by `placement.check`".
+- **`entry.claim`:** the rule points to dTotalRecall. layer-memory:332 says "dTotalRecall owes both refs (`gap-mem-13`)", meaning the claim ref.
+- **`entry.intake`:** dRankedPlan's row (v2:1119) also claims "the prompt-submit hook writing each owner prompt verbatim to the session's intake log", which competes with PM-9's dWellOiledMachine.
+- **`life.close`:** its terminal transition is arguably dDeclaredLoop's. layer-runtime:1006-1008 says "The terminal states … stay dDeclaredLoop's".
+
+#### Method
+**Reading order:**
+1. v2 in full: `[chain]`, `[policies]`, the revision notes, `[floor]` and `[owed]`.
+2. flow-steps in full.
+3. layer-expansions in full.
+4. layer-runtime `[schedule]` through `[build]`.
+5. layer-memory `[contract]` through `[views]`.
+6. systems `[cross]` through `[answers]`.
+7. retrofit `[cross]` through `[gaps-proposed]`.
+8. project-map `[cross]` through `[keys]`, `[reload-pointer]` and `[fixes]`. I used its prose only, not its rendered map lines.
+9. The library and layer-flow records, the gap register's rows, and targeted parts of the walkthrough and flow records.
+
+I did not read the ownership table, the main working tree, or the other two verifiers' folders.
+
+**Rule I applied:**
+- A step's items go to the build whose v2 Stage is that step.
+- A design record or chain row overrides that when it names the item's tag, or the mechanism that is the item's whole job. On that basis:
+  - every `*.recommend` and `*.reason` item goes to dCalibratedLens (gap-flow-12, "the stage-exit recommendation");
+  - `review.pin`, `review.lens`, `review.refute` and `review.report` go to dFairHearing;
+  - `review.dispose` and `review.cost` go to dCalibratedLens.
+- An item that only calls another build's engine (a lease verb, the mailbox, an event wait) keeps its step's build.
+
+**Low-confidence placements, flagged for review:**
+- **`design.inventory` and the inventory kind:** I gave both to dRankedPlan because it owns gap-flow-04, "no re-design inventory of completed work".
+- **`review.fold`, `review.design.rounds`, `review.design.round-count`:** dIndexedDesign, from "design review by policy".
+- **`patch.ratify`:** dIndexedDesign. No record names an owner.
+- **`integrations.tracker`:** dShippedRelease. I could not place it with direct evidence.
+- **The retrofit system:** dWitnessedBar, from v2:350 "ledger dWitnessedBar builds". RF-1 says its parts belong to several builds, so it names no single owner.
+- **`loop.*`:** dCalibratedLens ("the weekly Loop Review"), although dTendedCadence's row says it delivers the Loop Review.
+- **The `kit` namespace:** dShippedRelease, from project-map:666-667, which puts kits among the namespaces whose owning build lands after dTotalRecall.
+- **`hooks.bypass`:** dDeclaredLoop, as part of the default floor (walkthrough:129), rather than dWitnessedBar's "bypasses recorded".
+- **Record kinds where two records disagree:**
+  - return: dWellOiledMachine by layer-runtime's contract, though dBoundRoles owns the return template;
+  - lease: dDeclaredLoop's lease grammar, though layer-memory says Runtime registers it;
+  - run record: observability's (dTendedCadence) per layer-expansions, though layer-memory lists it as core.
+- **Disagreements between records:** v2 `[owed]` asks whether the kit confs fold into the policy file, which is still undecided. layer-memory:376 says Runtime registers the lease and the mailbox message, while v2:1113 puts both grammars in dDeclaredLoop. I followed v2.
+
+## [compare-2] The three tables, compared
+
+The tables are filed byte for byte beside this record, and each hash is the one its verifier returned:
+
+- `2026-10-18-build-PLAY-dClosedLoop-1-owners-v-kestrel.tsv`: v-kestrel's, from dispatch 92, 408 nodes, sha256 `5e1af4f4f105bfb1d58e2ddee397b3499712e3ce7f68ef83320194804af23e2e`
+- `2026-10-18-build-PLAY-dClosedLoop-1-owners-v-heron.tsv`: v-heron's, from dispatch 93, 402 nodes, sha256 `4385284e405ce614946413564cb9a2dfb4f0ac9f92fb4d843297afdeb9190dc2`
+- `2026-10-18-build-PLAY-dClosedLoop-1-owners-v-osprey.tsv`: v-osprey's, from dispatch 95, 405 nodes, sha256 `543a744c8925b4906a380187502148141112312337e30b193d48ec55f842c074`
+
+- **The approved table is read as the proposal wrote it,** `ownership.json`, from the script in
+  `2026-10-17-build-PLAY-dClosedLoop-1-ownership.md` `[instrument]`, run at `248ef556d`.
+- **v-heron's evidence cells spell each record's date as a number,** such as `11194-build-` for
+  `2026-10-14-build-`. The comparison reads owners only, so it is unaffected. The skeptics' briefs restore the
+  dates.
+- **The run below is from the filed tables.** It prints byte for byte what the first run, from the
+  verifiers' own folders, printed.
+
+```python
+"""Compare round 2's derived owner tables with the approved one, and with each other, node by node.
+
+Usage: python compare_r2.py <approved ownership.json> <owners.tsv> [<owners.tsv> ...]   (from the worktree root)
+
+The approved table is the proposal's output, which the owner approved as proposed. A node is keyed by its kind
+and a normalised name: lower case, backticks and the trailing record/s stripped, spaces and hyphens folded.
+Prints each verifier's population and agreement, the nodes two or more verifiers own differently from the
+approved owner (escalated, by the disposition), the nodes one verifier does (listed), and the population the
+approved table lacks.
+"""
+import collections
+import json
+import pathlib
+import re
+import sys
+
+KIND = {"items": "item", "keys": "key", "points": "point", "tagns": "namespace", "systems": "system",
+        "kinds": "record-kind"}
+
+
+# One node's two names, seen in the verifiers' tables: a system's full title, a kind named by its component.
+ALIAS = {("system", "role-workflow-shapes"): ("system", "role-shapes"),
+         ("system", "code-annotations"): ("system", "annotations"),
+         ("record-kind", "lexicon"): ("record-kind", "lexicon-declaration")}
+
+
+def norm(kind, node):
+    n = node.strip().strip("`").lower()
+    if kind == "record-kind":
+        n = re.sub(r"\s+records?$", "", n)
+        n = re.sub(r"\s+kind$", "", n)
+    key = (kind, re.sub(r"[\s_-]+", "-", n))
+    return ALIAS.get(key, key)
+
+
+approved = {}
+for sec, rows in json.load(open(sys.argv[1], encoding="utf-8")).items():
+    for r in rows:
+        approved[norm(KIND[sec], r["node"])] = r["owner"]
+tables = []
+for path in sys.argv[2:]:
+    t = {}
+    for i, line in enumerate(open(path, encoding="utf-8")):
+        cells = line.rstrip("\n").split("\t")
+        if i == 0 and cells[0].strip().lower() == "kind":
+            continue
+        if len(cells) < 3 or not cells[0].strip():
+            continue
+        t[norm(cells[0].strip().lower(), cells[1])] = cells[2].strip()
+    # A table is named by its verifier's suffix, from its folder in the scratchpad or its filed name.
+    tables.append((re.findall(r"(?<![a-z])v-[a-z]+", pathlib.Path(path).as_posix())[-1], t))
+
+print(f"approved nodes {len(approved)}")
+for path, t in tables:
+    common = set(t) & set(approved)
+    agree = sum(1 for k in common if t[k] == approved[k])
+    print(f"{path}: nodes {len(t)}, in the approved table {len(common)}, agreeing {agree} "
+          f"({100 * agree / max(1, len(common)):.1f}%), not in it {len(set(t) - set(approved))}, "
+          f"approved and missing here {len(set(approved) - set(t))}")
+    print("  by kind: " + ", ".join(f"{k} {v}" for k, v in sorted(collections.Counter(k for k, _ in t).items())))
+for (pa, ta), (pb, tb) in [(tables[i], tables[j]) for i in range(len(tables)) for j in range(i + 1, len(tables))]:
+    common = set(ta) & set(tb)
+    print(f"pairwise {pa} vs {pb}: {sum(1 for k in common if ta[k] == tb[k])} of "
+          f"{len(common)} agree")
+
+against = collections.defaultdict(list)
+for path, t in tables:
+    for k, own in t.items():
+        if k in approved and own != approved[k]:
+            against[k].append((path, own))
+esc = {k: v for k, v in against.items() if len(v) >= 2}
+one = {k: v for k, v in against.items() if len(v) == 1}
+print(f"\nescalated, two or more verifiers against the approved owner: {len(esc)}")
+for k, v in sorted(esc.items()):
+    print(f"  {k[0]} {k[1]}: approved {approved[k]}; " + "; ".join(f"{who} {own}" for who, own in v))
+print(f"listed, one verifier against: {len(one)}")
+for k, v in sorted(one.items()):
+    print(f"  {k[0]} {k[1]}: approved {approved[k]}; " + "; ".join(f"{who} {own}" for who, own in v))
+extra = collections.defaultdict(list)
+for path, t in tables:
+    for k, own in t.items():
+        if k not in approved:
+            extra[k].append((path, own))
+print(f"\npopulation the approved table lacks, by how many verifiers found it: "
+      f"{dict(collections.Counter(len(v) for v in extra.values()))}")
+for k, v in sorted(extra.items(), key=lambda x: (-len(x[1]), x[0])):
+    owners = collections.Counter(own for _, own in v)
+    print(f"  {len(v)}x {k[0]} {k[1]}: " + ", ".join(f"{o} {n}" for o, n in owners.most_common()))
+```
+
+```text
+$ python -X utf8 compare_r2.py ownership.json 2026-10-18-build-PLAY-dClosedLoop-1-owners-v-heron.tsv 2026-10-18-build-PLAY-dClosedLoop-1-owners-v-kestrel.tsv 2026-10-18-build-PLAY-dClosedLoop-1-owners-v-osprey.tsv
+approved nodes 351
+v-heron: nodes 402, in the approved table 350, agreeing 321 (91.7%), not in it 52, approved and missing here 1
+  by kind: item 107, key 187, namespace 25, point 10, record-kind 66, system 7
+v-kestrel: nodes 408, in the approved table 350, agreeing 331 (94.6%), not in it 58, approved and missing here 1
+  by kind: item 107, key 187, namespace 25, point 10, record-kind 72, system 7
+v-osprey: nodes 405, in the approved table 349, agreeing 325 (93.1%), not in it 56, approved and missing here 2
+  by kind: item 107, key 187, namespace 25, point 10, record-kind 69, system 7
+pairwise v-heron vs v-kestrel: 371 of 395 agree
+pairwise v-heron vs v-osprey: 377 of 394 agree
+pairwise v-kestrel vs v-osprey: 376 of 397 agree
+
+escalated, two or more verifiers against the approved owner: 23
+  item build.recommend: approved dScopedBuild; v-heron dCalibratedLens; v-osprey dCalibratedLens
+  item deploy.recommend: approved dShippedRelease; v-heron dCalibratedLens; v-osprey dCalibratedLens
+  item design.reason: approved dIndexedDesign; v-heron dCalibratedLens; v-osprey dCalibratedLens
+  item design.recommend: approved dIndexedDesign; v-heron dCalibratedLens; v-osprey dCalibratedLens
+  item plan.reason: approved dRankedPlan; v-heron dCalibratedLens; v-osprey dCalibratedLens
+  item plan.recommend: approved dRankedPlan; v-heron dCalibratedLens; v-osprey dCalibratedLens
+  item review.fold: approved dCalibratedLens; v-heron dIndexedDesign; v-osprey dIndexedDesign
+  item test.reason: approved dWitnessedBar; v-heron dCalibratedLens; v-osprey dCalibratedLens
+  item test.recommend: approved dWitnessedBar; v-heron dCalibratedLens; v-osprey dCalibratedLens
+  key annotations.delivery: approved dBoundRoles; v-heron dTotalRecall; v-kestrel dTotalRecall; v-osprey dTotalRecall
+  key instructions.slices: approved dOrderedCharter; v-heron dBoundRoles; v-kestrel dBoundRoles
+  key instructions.task-charter: approved dOrderedCharter; v-heron dBoundRoles; v-kestrel dBoundRoles; v-osprey dBoundRoles
+  key integrations.tracker: approved dTotalRecall; v-heron dShippedRelease; v-kestrel dShippedRelease; v-osprey dShippedRelease
+  key memory.default-load: approved dTotalRecall; v-heron dWellOiledMachine; v-kestrel dWellOiledMachine
+  key review.build.when: approved dCalibratedLens; v-heron dScopedBuild; v-kestrel dScopedBuild; v-osprey dScopedBuild
+  key review.design.round-count: approved dCalibratedLens; v-heron dIndexedDesign; v-kestrel dIndexedDesign; v-osprey dIndexedDesign
+  key review.design.rounds: approved dCalibratedLens; v-heron dIndexedDesign; v-kestrel dIndexedDesign; v-osprey dIndexedDesign
+  key roles.shape-enforce: approved dBoundRoles; v-heron dWellOiledMachine; v-kestrel dWellOiledMachine; v-osprey dWellOiledMachine
+  namespace kit: approved dOrderedCharter; v-kestrel dShippedRelease; v-osprey dShippedRelease
+  record-kind acceptance: approved dScopedBuild; v-heron dDeclaredLoop; v-kestrel dDeclaredLoop
+  record-kind decision: approved dTotalRecall; v-kestrel dIndexedDesign; v-osprey dIndexedDesign
+  record-kind intake: approved dWellOiledMachine; v-heron dRankedPlan; v-kestrel dRankedPlan; v-osprey dRankedPlan
+  record-kind run: approved dWellOiledMachine; v-heron dTendedCadence; v-kestrel dTendedCadence; v-osprey dTendedCadence
+listed, one verifier against: 17
+  item build.acceptance: approved dScopedBuild; v-heron dDeclaredLoop
+  item build.distill: approved dScopedBuild; v-heron dTotalRecall
+  item build.ratify: approved dScopedBuild; v-heron dTotalRecall
+  item deploy.distill: approved dShippedRelease; v-heron dTotalRecall
+  item design.inventory: approved dIndexedDesign; v-osprey dRankedPlan
+  item entry.intake: approved dWellOiledMachine; v-heron dDeclaredLoop
+  item review.dispose: approved dCalibratedLens; v-heron dFairHearing
+  item review.lens: approved dFairHearing; v-kestrel dCalibratedLens
+  item review.pin: approved dFairHearing; v-kestrel dCalibratedLens
+  item review.refute: approved dFairHearing; v-kestrel dCalibratedLens
+  item review.report: approved dFairHearing; v-kestrel dCalibratedLens
+  key hooks.bypass: approved dWitnessedBar; v-osprey dDeclaredLoop
+  key patch.ratify: approved dTendedCadence; v-osprey dIndexedDesign
+  key review.left-shift: approved dCalibratedLens; v-heron dFairHearing
+  key review.unverified: approved dCalibratedLens; v-heron dFairHearing
+  key run.on-owner-question: approved dBoundRoles; v-kestrel dWellOiledMachine
+  point role-harnesses: approved dWellOiledMachine; v-osprey dBoundRoles
+
+population the approved table lacks, by how many verifiers found it: {3: 43, 2: 9, 1: 19}
+  3x item kits.currency: dShippedRelease 3
+  3x item kits.cut: dShippedRelease 3
+  3x item kits.fleet: dShippedRelease 3
+  3x item kits.install: dShippedRelease 3
+  3x item kits.offer: dShippedRelease 3
+  3x item kits.update: dShippedRelease 3
+  3x item kits.version: dShippedRelease 3
+  3x item loop.file: dCalibratedLens 3
+  3x item loop.gather: dCalibratedLens 3
+  3x item loop.lease: dCalibratedLens 3
+  3x item loop.price: dCalibratedLens 3
+  3x item loop.propose: dCalibratedLens 3
+  3x item loop.record: dCalibratedLens 3
+  3x item maintain.direct: dTendedCadence 3
+  3x item maintain.file: dTendedCadence 3
+  3x item maintain.lease: dTendedCadence 3
+  3x item maintain.levels: dTendedCadence 3
+  3x item maintain.patch: dTendedCadence 3
+  3x item maintain.read: dTendedCadence 3
+  3x item maintain.record: dTendedCadence 3
+  3x item release.approve: dShippedRelease 3
+  3x item release.pick: dShippedRelease 3
+  3x item release.promote: dShippedRelease 3
+  3x item release.record: dShippedRelease 3
+  3x item release.route: dShippedRelease 3
+  3x item release.verify: dShippedRelease 3
+  3x record-kind build-readme: dTotalRecall 3
+  3x record-kind comparison: dShippedRelease 3
+  3x record-kind currency: dShippedRelease 3
+  3x record-kind fleet: dShippedRelease 3
+  3x record-kind kit-release: dShippedRelease 3
+  3x record-kind loop-review: dCalibratedLens 3
+  3x record-kind overlap: dIndexedDesign 3
+  3x record-kind override: dOrderedCharter 3
+  3x record-kind receipt: dShippedRelease 3
+  3x record-kind recommendation: dCalibratedLens 3
+  3x record-kind release: dShippedRelease 3
+  3x record-kind routing: dWitnessedBar 3
+  3x record-kind seen-red: dWitnessedBar 3
+  3x record-kind selection: dWitnessedBar 3
+  3x record-kind triage: dRankedPlan 3
+  3x record-kind value-ledger: dCalibratedLens 3
+  3x record-kind workspace: dWellOiledMachine 3
+  2x record-kind claim: dTotalRecall 2
+  2x record-kind core-result: dScopedBuild 2
+  2x record-kind diff: dIndexedDesign 2
+  2x record-kind disposition: dCalibratedLens 2
+  2x record-kind exception: dOrderedCharter 2
+  2x record-kind fleet-register: dShippedRelease 2
+  2x record-kind inventory: dRankedPlan 2
+  2x record-kind release-exit: dShippedRelease 2
+  2x record-kind roster: dIndexedDesign 2
+  1x record-kind card-snapshot: dDeclaredLoop 1
+  1x record-kind change: dOrderedCharter 1
+  1x record-kind control-request: dWellOiledMachine 1
+  1x record-kind decision-log: dTotalRecall 1
+  1x record-kind decision-log-row: dTotalRecall 1
+  1x record-kind exit: dShippedRelease 1
+  1x record-kind instruction-change: dOrderedCharter 1
+  1x record-kind instruction-proposal: dOrderedCharter 1
+  1x record-kind keep: dCalibratedLens 1
+  1x record-kind merge: dWitnessedBar 1
+  1x record-kind outbox-order: dShippedRelease 1
+  1x record-kind owner-disposition: dCalibratedLens 1
+  1x record-kind owner-request: dWellOiledMachine 1
+  1x record-kind re-entry: dIndexedDesign 1
+  1x record-kind re-entry-diff: dIndexedDesign 1
+  1x record-kind release-routing: dShippedRelease 1
+  1x record-kind reuse-proposal: dTotalRecall 1
+  1x record-kind tag-index: dOrderedCharter 1
+  1x record-kind wake-witness: dWellOiledMachine 1
+```
+
+## [disposition-amended] The disposition, amended before the population went to the owner
+
+- **The 23 escalated owners went to a skeptic, as set.** Dispatch 96 tried to refute each
+  (`build/2026-10-18-build-PLAY-dClosedLoop-1-ownership-skeptic.md`).
+- **The population faced a skeptic too, which the disposition did not set.** It proposed the 52 nodes two
+  or three verifiers found straight to the owner. Their evidence showed candidates that may be one node under
+  two names, such as `release` and `release-exit`, or `fleet` and `fleet-register`. So dispatch 97 tested each
+  on membership, identity and owner first (`build/2026-10-18-build-PLAY-dClosedLoop-1-ownership-population.md`).
+- **The skeptics are 2 of the review's 5 verify agents** (`[bound]`).
+
+## [pm-12] What the skeptics left standing, put to the owner
+
+Both skeptics' verdicts are in their records' `[verdicts]`: dispatch 96 in
+`2026-10-18-build-PLAY-dClosedLoop-1-ownership-skeptic.md`, and dispatch 97 in
+`2026-10-18-build-PLAY-dClosedLoop-1-ownership-population.md`. This section is what goes to the owner as PM-12.
+No owner field changes before the owner answers.
+
+### [pm-12-moves] The 13 disputed owners the skeptic confirmed
+
+| Id | Node | Kind | Approved | Proposed | Why |
+| --- | --- | --- | --- | --- | --- |
+| F1 | `build.recommend` | item | dScopedBuild | dCalibratedLens | v2's dCalibratedLens row builds "the stage-exit recommendation" and "the recommendation's score computed and its reasoning returned by the step's producing role" |
+| F2 | `deploy.recommend` | item | dShippedRelease | dCalibratedLens | as F1 |
+| F3 | `design.reason` | item | dIndexedDesign | dCalibratedLens | as F1, and dCalibratedLens owns gap-flow-12, "The driver reasons in four items" |
+| F5 | `plan.reason` | item | dRankedPlan | dCalibratedLens | as F3 |
+| F6 | `plan.recommend` | item | dRankedPlan | dCalibratedLens | as F1 |
+| F8 | `test.reason` | item | dWitnessedBar | dCalibratedLens | as F3 |
+| F9 | `test.recommend` | item | dWitnessedBar | dCalibratedLens | as F1 |
+| F11 | `instructions.slices` | key | dOrderedCharter | dBoundRoles | the key removes method-document reads (gap-orient-07), which is dBoundRoles's gap; the skeptic's confidence is moderate |
+| F12 | `instructions.task-charter` | key | dOrderedCharter | dBoundRoles | systems: "dBoundRoles builds the role static block and the single carry", and the single-carry check reads the key |
+| F15 | `review.build.when` | key | dCalibratedLens | dScopedBuild | the key was minted in dScopedBuild's own fork B3, for its unit "The closing review, recorded" |
+| F18 | `roles.shape-enforce` | key | dBoundRoles | dWellOiledMachine | the key's values apply at act binding, and systems says "dWellOiledMachine the binding, the reconcile" |
+| F20 | `acceptance` | record kind | dScopedBuild | dDeclaredLoop | v2: "each item's witness is declared by the loop (dDeclaredLoop)", and acceptance is one of those witness records |
+| F23 | `run record` | record kind | dWellOiledMachine | dTendedCadence | layer-expansions: observability's journal reader writes it, and dTendedCadence delivers observability |
+
+The seven stage items move as one: every stage's exit recommendation is one mechanism, so it has one owner.
+That owner lands late in the chain, after dTendedCadence, so until it lands no stage's recommendation is
+scored. The ancestor probe, re-run after the fold, shows which rows cite these items
+and need a class.
+
+### [pm-12-unsettled] The 5 the records do not settle, each with a recommendation
+
+| Id | Node | Kind | Approved | Verifiers | Recommended | Why |
+| --- | --- | --- | --- | --- | --- | --- |
+| F4 | `design.recommend` | item | dIndexedDesign | dCalibratedLens | dCalibratedLens | one mechanism, one owner, as its seven siblings; dIndexedDesign's "design review by policy" keeps `review.design`'s opt-in, effort and audit guard, and its walkthrough clause naming the recommendation is narrowed |
+| F13 | `integrations.tracker` | key | dTotalRecall | dShippedRelease | dShippedRelease | `mirror-out` is an allowed value and needs an adapter; the re-cut has dShippedRelease deliver integrations, and no row names this adapter, so dShippedRelease's row gains it |
+| F14 | `memory.default-load` | key | dTotalRecall | dWellOiledMachine | dWellOiledMachine | the key selects the load set, which the harness adapter lists and the session-start hook loads, both dWellOiledMachine's; dTotalRecall keeps its auto-memory check on that load |
+| F16 | `review.design.round-count` | key | dCalibratedLens | dIndexedDesign | dCalibratedLens | as F17 |
+| F17 | `review.design.rounds` | key | dCalibratedLens | dIndexedDesign | dCalibratedLens | the round loop sits in the breakpoint program dCalibratedLens builds (`review.fold` routes "the next round as `review.design.rounds` says"), the reading that refuted F7; its row then names the key, with `REVIEW_ROUNDS` re-pointed |
+
+### [pm-12-kept] The 5 the skeptic refuted: the approved owner stays
+
+| Id | Node | Kind | Owner kept | Why the skeptic refuted the move |
+| --- | --- | --- | --- | --- |
+| F7 | `review.fold` | item | dCalibratedLens | part of the breakpoint program dCalibratedLens builds; "design review by policy" holds no fold |
+| F10 | `annotations.delivery` | key | dBoundRoles | its default fills the work order's code-notes slot, which dBoundRoles builds; the verifiers cited the system's owner, the rule for systems, not keys |
+| F19 | `kit` | tag namespace | dOrderedCharter | the tags system's builder registers it, and v2 now lists it among dOrderedCharter's seven |
+| F21 | `decision` | record kind | dTotalRecall | the verifiers' evidence names the fork record, a separate kind already dIndexedDesign's |
+| F22 | `intake` | record kind | dWellOiledMachine | it rested on a row the re-cut changed: the hook now sits in dWellOiledMachine's row |
+
+### [pm-12-population] The 52 nodes the table lacks, after the skeptic
+
+| Finding | Nodes | Kind | Owner | Verdict |
+| --- | --- | --- | --- | --- |
+| P1 | `maintain.direct`, `maintain.file`, `maintain.lease`, `maintain.levels`, `maintain.patch`, `maintain.read`, `maintain.record` | item | dTendedCadence | confirmed |
+| P2 | `loop.file`, `loop.gather`, `loop.lease`, `loop.price`, `loop.propose`, `loop.record` | item | dCalibratedLens | confirmed |
+| P3 | `release.pick`, `release.approve`, `release.promote`, `release.verify`, `release.route`, `release.record` | item | dShippedRelease | confirmed |
+| P4 | `kits.version`, `kits.cut`, `kits.currency`, `kits.fleet`, `kits.offer`, `kits.install`, `kits.update` | item | dShippedRelease | confirmed |
+| P5 | `build-readme` | record kind | dTotalRecall | confirmed |
+| P6 | `claim` | record kind | dTotalRecall | confirmed |
+| P7 | `comparison` | record kind | dShippedRelease | confirmed |
+| P8 | `core-result` | record kind | dScopedBuild | confirmed |
+| P9 | `currency` | record kind | dShippedRelease | confirmed |
+| P10 | `diff` | record kind | dIndexedDesign | confirmed |
+| P12 | `exception` | record kind | dOrderedCharter | confirmed |
+| P13 | `fleet` | record kind | dShippedRelease | confirmed |
+| P14 | `fleet-register` | record kind | dShippedRelease | confirmed |
+| P15 | `inventory` | record kind | dIndexedDesign | refuted on owner: its writer is `design.inventory`, dIndexedDesign's |
+| P16 | `kit-release` | record kind | dShippedRelease | confirmed |
+| P17 | `loop-review` | record kind | dCalibratedLens | confirmed |
+| P18 | `overlap` | record kind | dIndexedDesign | confirmed |
+| P19 | `override` | record kind | dOrderedCharter | confirmed |
+| P20 | `receipt` | record kind | dShippedRelease | confirmed |
+| P21 | `recommendation` | record kind | dCalibratedLens | confirmed |
+| P22 | `release` | record kind | dShippedRelease | confirmed |
+| P23 | `release-exit` | record kind | dShippedRelease | confirmed |
+| P24 | `roster` | record kind | dIndexedDesign | confirmed |
+| P25 | `routing` | record kind | dWitnessedBar | confirmed; `release.route`, dShippedRelease's, also writes a routing record |
+| P26 | `seen-red` | record kind | dWitnessedBar | confirmed |
+| P27 | `selection` | record kind | dWitnessedBar | confirmed |
+| P28 | `triage` | record kind | dRankedPlan | confirmed |
+| P29 | `value-ledger` | record kind | dCalibratedLens | confirmed |
+| P30 | `workspace` | record kind | dWellOiledMachine | confirmed |
+
+- **51 are proposed for the table:** the 26 items and 25 record kinds above. `inventory` takes the owner the
+  skeptic found, dIndexedDesign, not the verifiers' majority.
+- **`disposition` (P11) is not settled.** The owner's disposition record is "written by whichever channel
+  carried it", the mailbox, a terminal command or a prompt, and it witnesses `entry.place-owner`
+  (dDeclaredLoop's), `build.ratify` (dScopedBuild's) and the breakpoints (dCalibratedLens's). No record names the
+  build that registers it. The recommendation is dDeclaredLoop: the loop declares every item's witness, the reading
+  the skeptic confirmed for `acceptance` (F20), and `entry.place-owner` writes it first.
+- **No candidate was one node under two names.** `release-exit` and `release`, and `fleet-register` and
+  `fleet`, are each two kinds.
+
+### [pm-12-listed] Single dissents, for information
+
+`[compare-2]`'s "listed" block holds the 17 owners one verifier alone disputes. By the disposition they are
+listed, not escalated, and no move is proposed for them.
+
+### [pm-12-fold] What lands once the owner answers
+
+- **The owner fields:** flow-steps' Owner cells for the moved items, v2's catalogue Owner cells for the moved
+  keys, and layer-memory's `[contract]` kind table for the moved and added kinds.
+- **The expansions' items:** layer-expansions' four `| Item | Actor |` tables gain an Owner column, and the
+  map's item extractor and its census read them.
+- **The chain rows:** each row that claims a moved behaviour is narrowed to what it still builds, and the
+  receiving row names it. That covers dIndexedDesign's "design review by policy", dTotalRecall's default load,
+  dShippedRelease's tracker mirror and dCalibratedLens's design-review rounds.
+- **The checks:** the map's owner check and the ancestor probe are re-run, then the atlas is republished.
