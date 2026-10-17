@@ -60,7 +60,7 @@ the adopter's own file in the target (`measure_contract_parity`, near line 6065,
   canary cannot pass as refused. Under a sandbox that runs it, the fixture asserts the canary and
   finds neither the credential nor the environment.
 - Probe: list every subprocess call reachable from the command whose working directory is the
-  target, and fail when the design does not name each one. It ran on 2026-10-17 (`target_spawns.py`,
+  target, and fail when the design does not name each one. It ran on 2026-10-17 (the target-spawn probe,
   in `memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md`,
   `[probes-expansions]`): 11 sites reachable from update, the contract parity probe among them, and
   `decline_findings`' discharge, which update never arms.
