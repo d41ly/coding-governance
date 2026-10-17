@@ -1940,6 +1940,19 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   The spec-audit opt-in was set around its launch and restored. Nothing folds into its subjects or specs
   until it returns.
 
+- 2026-10-18, session 1799cb98: a candidate finding, seen while folding PM-12 and held for dispatch 98's fold,
+  since its subjects and specs take no edit while it runs.
+  - dShippedRelease delivers distribution and integrations. Their contracts register at Runtime's points
+    (layer-expansions: distribution's "Runtime's cadence items, command adapters, … and notification
+    adapters", and integrations' "Runtime's command, host, notification and journal-reader points"). Every
+    one of those points is dWellOiledMachine's, and dWellOiledMachine is not among dShippedRelease's
+    ancestors. No row declares a tolerance for it.
+  - The edge dShippedRelease after dWellOiledMachine costs nothing: `critical_path.py` reads 176 units with
+    it, as without it.
+  - The ancestor probe missed it, and so did the build-order review. The probe reads only backticked
+    citations in the chain rows, and a contract's "extension points used" row never reaches it. That is a
+    class to gate.
+
 ## Instruments
 
 ### The gap-ownership join
