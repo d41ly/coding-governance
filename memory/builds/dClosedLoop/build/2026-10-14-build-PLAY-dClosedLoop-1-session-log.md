@@ -146,8 +146,8 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 82 | the same | Memory structure, run B, from the same handoff, in the second wave | the same | 1799cb98 | returned, 10m30s, 50.2k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-memory-structure-b.md` |
 | 83 | gov-researcher, at its declared medium effort | Retrofitting gov's practices into an existing repository, run A, with run B once review dispatch 65 returns | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | returned, 12m19s, 57.6k out | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-a.md` |
 | 84 | the same | Retrofitting gov's practices into an existing repository, run B, from the same handoff, with run A | the same | 1799cb98 | returned, 9m08s, 46.7k out | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-b.md` |
-| 85 | `tier2-review.js`, diff review, full: five `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the closing-review workflow's declared high, round 1 | The closing review of the debt round's folds and the systems and retrofit fold, `9b188202a..cdcea2c9b` | the args in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[args-debt-folds]` | 1799cb98 | dispatched | `reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md` |
-| 86 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the spec-review workflow's declared medium, round 1 | The systems and retrofit records, at blobs `9335a3533` and `cec90968d`, after dispatch 85 returns | the args in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[args-systems-retrofit]` | 1799cb98 | queued | `reviews/2026-10-17-review-PLAY-dClosedLoop-1-systems-retrofit.md` |
+| 85 | `tier2-review.js`, diff review, full: five `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the closing-review workflow's declared high, round 1 | The closing review of the debt round's folds and the systems and retrofit fold, `9b188202a..cdcea2c9b` | the args in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[args-debt-folds]` | 1799cb98 | returned as `wf_da2dee67-bf2`, CLEAN WITH FIXES, 22 of 27 confirmed | `reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md` |
+| 86 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the spec-review workflow's declared medium, round 1 | The systems and retrofit records, at blobs `9335a3533` and `cec90968d`, after dispatch 85 returns | the args in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[args-systems-retrofit]` | 1799cb98 | dispatched | `reviews/2026-10-17-review-PLAY-dClosedLoop-1-systems-retrofit.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1068,6 +1068,35 @@ Dispatch 72, `expansions-fold-round3-b`, derived from its Workflow run the same 
 - returned — gov-synthesizer · wrote 1 file · 2m07s · 17.9k out · run wf_bf702393-ce3/acb9b0ee740d8a861
 ```
 
+Dispatch 85, `debt-folds`, derived from its Workflow run the same way:
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, diff-review round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_da2dee67-bf2/a5c8dcae6c375e464
+- returned — workflow-subagent · wrote 0 files · 14s · 1.5k out · run wf_da2dee67-bf2/a5c8dcae6c375e464
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:security · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_da2dee67-bf2/aa20b5befab66b316
+- returned — gov-diff-reviewer · wrote 0 files · 4m27s · 24.6k out · run wf_da2dee67-bf2/aa20b5befab66b316
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:correctness · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_da2dee67-bf2/a91dda20ec917c25f
+- returned — gov-diff-reviewer · wrote 0 files · 10m59s · 57.1k out · run wf_da2dee67-bf2/a91dda20ec917c25f
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:seams · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_da2dee67-bf2/ab5682a912ae826e2
+- returned — gov-diff-reviewer · wrote 0 files · 10m00s · 37.1k out · run wf_da2dee67-bf2/ab5682a912ae826e2
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:verification · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_da2dee67-bf2/aeda7ef3e2c52e282
+- returned — gov-diff-reviewer · wrote 0 files · 8m33s · 35.8k out · run wf_da2dee67-bf2/aeda7ef3e2c52e282
+- agent — gov-diff-reviewer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:intent · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_da2dee67-bf2/a17f4337393c34fb7
+- returned — gov-diff-reviewer · wrote 0 files · 9m31s · 48.7k out · run wf_da2dee67-bf2/a17f4337393c34fb7
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-1-6 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_da2dee67-bf2/adde46b2719ebf39a
+- returned — gov-skeptic · wrote 0 files · 2m27s · 13.1k out · run wf_da2dee67-bf2/adde46b2719ebf39a
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-7-12 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_da2dee67-bf2/a9779bf3da88dbc94
+- returned — gov-skeptic · wrote 0 files · 2m53s · 16.5k out · run wf_da2dee67-bf2/a9779bf3da88dbc94
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-13-18 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_da2dee67-bf2/a2e9e144211f5740d
+- returned — gov-skeptic · wrote 0 files · 3m53s · 16.1k out · run wf_da2dee67-bf2/a2e9e144211f5740d
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-19-24 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_da2dee67-bf2/a908f8a161278ec7c
+- returned — gov-skeptic · wrote 0 files · 2m54s · 12.9k out · run wf_da2dee67-bf2/a908f8a161278ec7c
+- agent — gov-skeptic · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-25-27 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_da2dee67-bf2/a870f00d66ec660e4
+- returned — gov-skeptic · wrote 0 files · 1m39s · 9.4k out · run wf_da2dee67-bf2/a870f00d66ec660e4
+- agent — gov-synthesizer · effort high · model claude-opus-5-5 · dClosedLoop, diff-review round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_da2dee67-bf2/aa24225c7221b260e
+- returned — gov-synthesizer · wrote 1 file · 3m34s · 28.6k out · run wf_da2dee67-bf2/aa24225c7221b260e
+```
+
 The systems round's researchers, dispatches 73 to 82, derived from their handoffs the same way:
 
 ```text
@@ -1681,6 +1710,9 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   of `4UyRaoozVkbK6ECCCBvDg1` needs the owner's confirmation, which this session cannot show, so nothing
   was deleted. Dispatch 85, the folds' closing review, is dispatched, and dispatch 86, the systems and
   retrofit audit, waits for it (`build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews.md`).
+
+- 2026-10-17, session 1799cb98: dispatch 85 returned CLEAN WITH FIXES: 22 of 27 findings confirmed,
+  20 items (1 high, 14 medium, 5 low), 11 agents, 283.8k out tokens (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`).
 
 ## Instruments
 
