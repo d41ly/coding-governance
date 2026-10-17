@@ -255,6 +255,13 @@ def corpus():
             group = "Foundations and walks"
         recs.append({"path": p.relative_to(REPO).as_posix(), "name": name, "date": date,
                      "title": h1.group(1).strip() if h1 else name, "group": group, "sections": split_sections(body)})
+    # A record is keyed by the name its stem derives, so two records that derive one name would have the later one
+    # read in the earlier's place, its title and its decisions with it.
+    names = [r["name"] for r in recs]
+    shared = sorted({n for n in names if names.count(n) > 1})
+    if shared:
+        sys.exit("atlas: records share a derived name, so one would be read as the other: " + ", ".join(
+            f"{n} ({', '.join(r['path'].rsplit('/', 1)[-1] for r in recs if r['name'] == n)})" for n in shared))
     return recs
 
 

@@ -456,7 +456,7 @@ Revised: 2026-10-18, after the declared whole-design audit (`reviews/2026-10-18-
 - dShippedRelease follows dWellOiledMachine, whose points its programs register at (C1);
 - the audit's other items are folded row by row, each marked with its item.
 
-Revised: 2026-10-18, after the audit fold's closing review (`reviews/2026-10-18-review-PLAY-dClosedLoop-1-audit-fold.md`) and the owner's FL1
+Revised: 2026-10-18, after the audit fold's closing review (`reviews/2026-10-18-review-PLAY-dClosedLoop-1-audit-fold-closing.md`) and the owner's FL1
 (`build/2026-10-18-build-PLAY-dClosedLoop-1-audit-fold.md` `[review-fold]`):
 - the design audit's marks carry a DA- prefix, apart from the chain-order review's H, M and L (FM6);
 - `review.findings` follows `review.dispose` to dDeclaredLoop (FM4), and dTendedCadence follows dIndexedDesign,

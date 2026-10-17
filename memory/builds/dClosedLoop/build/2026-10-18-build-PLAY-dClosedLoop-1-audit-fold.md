@@ -396,11 +396,15 @@ rc 0
   rules each go red.
 - **The role matrix reads flow-steps' 81 items alone,** and the expansions' items name no role.
 
+## [words-2] The owner's words on the fold review, 2026-10-18
+
+Dispatch 99 reviewed this fold as a diff and returned CLEAN WITH FIXES: 21 items, 3 high, no blocker (`reviews/2026-10-18-review-PLAY-dClosedLoop-1-audit-fold-closing.md`). One item was the owner's to
+choose. The owner chose, verbatim, for FL1, asked as "FL1: leases.offline's value follow-leases, which the guarded preset ships, is defined nowhere. What should it do when the remote is unreachable?": "Until held leases expire (Recommended)", whose text read:
+"Work continues under leases a session already holds, until each one's recorded expiry, since none can be renewed offline. New leases, claims and ask-id mints are refused until reconnection. Sits between warn (proceed, reconcile later) and refuse (stop)."
+
 ## [review-fold] The fold's closing review, folded
 
-Dispatch 99 reviewed this fold as a diff and returned CLEAN WITH FIXES: 21 items, 3 high, no blocker (`reviews/2026-10-18-review-PLAY-dClosedLoop-1-audit-fold.md`).
-One item was the owner's to choose. The owner chose, verbatim, for FL1, asked as "FL1: leases.offline's value follow-leases, which the guarded preset ships, is defined nowhere. What should it do when the remote is unreachable?": "Until held leases expire (Recommended)", whose text read:
-"Work continues under leases a session already holds, until each one's recorded expiry, since none can be renewed offline. New leases, claims and ask-id mints are refused until reconnection. Sits between warn (proceed, reconcile later) and refuse (stop)."
+The review's items, each folded:
 
 | Item | What changed | Where |
 | --- | --- | --- |
@@ -814,3 +818,8 @@ catalogue keys 193 · presettable 182 · preset rows 182
 no findings
 rc 0
 ```
+
+- **The report was renamed on 2026-10-18,** from `…-audit-fold.md` to `…-audit-fold-closing.md`. The atlas names a
+  record by its filename's stem, so the report and this record both read `audit-fold`, and the later one was read in
+  the earlier's place: the map's round for this record carried the report's title and lost its forks. The atlas now
+  refuses two records that derive one name, seen red on that collision before the rename.
