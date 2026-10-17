@@ -665,5 +665,6 @@ classes are its confirmed findings' own, from the two ledgers.
   spec. The parents become dWellOiledMachine and dWitnessedBar (`chain-order`), and the roster gains the
   tag-name vocabulary check (`tag-check-point`). The register's gap-lex rows take the corrected evidence
   (`raise-misread`, `gap2-example`, gap 3's history), and `gap-mem-10` moves to area Lexicon. They land
-  with the systems fold.
+  with the systems fold. Revised 2026-10-17: they landed once review 72 returned, in v2's chain rows,
+  flow-steps and the register.
 - **The fold is unreviewed text.** A closing review of the debt fold is owed.

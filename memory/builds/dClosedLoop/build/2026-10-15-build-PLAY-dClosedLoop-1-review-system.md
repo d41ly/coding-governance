@@ -379,5 +379,6 @@ classes are its confirmed findings' own, from the two ledgers.
   dFairHearing a parent of dDeclaredLoop (`ordering-unenforced`), and v2's dFairHearing row names the
   template sources (`rendered-targets`). flow-steps' breakpoint policy list gains `review.opt-in`
   (`opt-in-no-reader`), and its lens-pack extension point says what `[lenses]` says (`opt-in-extension`).
-  They land with the systems fold.
+  They land with the systems fold. Revised 2026-10-17: they landed once review 72 returned, in v2's chain rows,
+  flow-steps and the register.
 - **The fold is unreviewed text.** A closing review of the debt fold is owed.
