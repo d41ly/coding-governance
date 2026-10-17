@@ -1159,3 +1159,48 @@ Run B's differ only as `[pairs]` shows.
  ]
 }
 ```
+
+## [compare-lexicon] The lexicon pair's comparison, run over the record
+
+```text
+$ python compare_rounds.py reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-a.md \
+    reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-b.md \
+    build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared.md \
+    build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md wf_14950dae-859 wf_b52591b3-8f4 map-lexicon
+== runs
+A: raw 53, confirmed 47, refuted 6, precision 0.89, high findings 3, agents 12, out 231.1k (sum of returned lines)
+B: raw 56, confirmed 49, refuted 7, precision 0.88, high findings 3, agents 12, out 230.8k (sum of returned lines)
+== defects
+map rows 52, confirmed defects 49, refuted-only 3
+both 23, A only 13, B only 13
+A alone covers 36 of 49 (73%)
+B alone covers 36 of 49 (73%)
+overlap (Jaccard) 0.47
+Chapman estimate of the population: 56.0, so about 7 found by neither
+A only: drift-vs-classes, replay-threshold, pack-fixture, prototype-live-import, forced-by-name-route, suggest-forced-aware, no-pack-owner-route, nouns-table, drain-count, pins-plain-edit, gaps-cite-asks, raise-misread, fixture-undefined
+B only: drift-enforcement-site, pack-selection-inputs, pack-row-validation, vocabulary-proposal-route, init-row-inventory, leg-placement, chain-order, doc-reads-stale, three-pins, gap2-example, foreign-ask, main-red-stale, tag-check-point
+== severity (a defect takes its highest confirmed grade per round)
+high defects 4: ratified-readers, acquire-family, map-extraction-states, declaration-home
+  ratified-readers: A 3 B 2
+  acquire-family: A 3 B 3
+  map-extraction-states: A 3 B 2
+  declaration-home: A 2 B 3
+shared defects graded alike 14 of 23
+== lenses behind the defects one round alone found
+A: coherence 4, grounding 4, reuse 3, failure-envelope 1, blast-radius 1
+B: coherence 6, blast-radius 3, failure-envelope 2, grounding 2, reuse 1
+== refuted findings and their twins
+A27 (bar-comparison-seam): confirmed twin A12, B15
+A33 (declaration-second-carrier): confirmed twin none
+A41 (ratified-readers): confirmed twin A3, A30, A37, B2, B30, B38
+A45 (commit-check-seam): confirmed twin A29, B8, B33
+A50 (pack-selection-inputs): confirmed twin B50
+A52 (declaration-home): confirmed twin A19, B23, B35, B48
+B21 (import-census): confirmed twin none
+B25 (map-dependency-undeclared): confirmed twin A18, A28, A36, A40, B5, B28, B42, B52
+B32 (replay-threshold): confirmed twin A8
+B36 (forced-by-name-route): confirmed twin A32
+B43 (later-records): confirmed twin A9, A20, A51, B27, B56
+B51 (commit-check-seam): confirmed twin A29, B8, B33
+B53 (keys-absent): confirmed twin none
+```
