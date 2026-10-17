@@ -38,7 +38,8 @@ def record(name):
 
 SOURCES = {key: record(name) for key, name in {
     "v2": "architecture-v2", "gaps": "gap-register", "steps": "flow-steps", "roles": "layer-roles",
-    "instruction": "layer-instruction", "library": "layer-library", "memory": "layer-memory"}.items()}
+    "instruction": "layer-instruction", "library": "layer-library", "memory": "layer-memory",
+    "expansions": "layer-expansions"}.items()}
 LAYER_RECORDS = {
     "instruction": ["layer-instruction"],
     "flow": ["layer-flow", "flow-steps", "flow-roles"],
@@ -502,6 +503,16 @@ def derive():
     v2_ids = [s["id"] for r in recs if r["name"] == "architecture-v2" for s in r["sections"] if s["level"] == 2]
     if sorted(v2_ids) != sorted(V2_VIEWS):
         sys.exit(f"atlas: v2's sections and the views declared for them differ: {sorted(set(v2_ids) ^ set(V2_VIEWS))}")
+    # The expansions' programs: each layer-expansions table headed `| Item | Actor |` is one program's, outside the
+    # steps, and a row may name two items (PM-12).
+    programs = []
+    for head, rows in tables(src["expansions"]):
+        if head[:2] != ["Item", "Actor"]:
+            continue
+        its = [{"tag": t, "actor": r[1], "does": r[2], "witness": r[3], "routes": r[4],
+                "owner": r[head.index("Owner")] if "Owner" in head else ""} for r in rows for t in ITEM_TAG.findall(r[0])]
+        programs.append({"program": its[0]["tag"].split(".")[0], "items": its})
+
     v2_rec = next(r for r in recs if r["name"] == "architecture-v2")
     v2map = [{"id": s["id"], "title": s["title"], "view": V2_VIEWS[s["id"]], "path": v2_rec["path"]}
              for s in v2_rec["sections"] if s["level"] == 2]
@@ -515,7 +526,7 @@ def derive():
         "build": "dClosedLoop", "digest": digest.hexdigest()[:12], "latest": max(t["date"] for t in timeline),
         "oneLine": one_line.group(1) if one_line else "",
         "layers": layers, "cycle": cycle, "contract": contract, "kits": kits,
-        "steps": steps, "transitions": transitions, "terminal": terminal, "contracts": contracts,
+        "steps": steps, "programs": programs, "transitions": transitions, "terminal": terminal, "contracts": contracts,
         "roster": roster, "chain": chain, "gaps": gaps, "policies": policies, "presets": presets,
         "principles": principles, "timeline": timeline, "reviews": reviews, "progress": progress,
         "libraryRound": library_round, "libraryPaths": lib_paths, "consult": consult, "libraryItems": library_items,

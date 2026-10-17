@@ -370,7 +370,7 @@ Each layer's contract registers its own kinds, so the list below is the memory l
 set. The kinds sort by P28:
 - **Core:** intake, card, plan, seams, feature design, spec, research return, design record, review,
   ask, the backlog row,
-  the run record (`RUN.md`), work order, decision (each resolved fork's, its class declared, a major one
+  work order, decision (each resolved fork's, its class declared, a major one
   becoming a log row), and one witness record per witness the flow
   declares (acceptance, verdict, attribution, transition, landing among them). Flow registers its
   flake, dupes and scope records. Runtime registers its return, act (launch, epoch, outcome), lease,
@@ -379,35 +379,62 @@ set. The kinds sort by P28:
   lexicon; the recall index. The gotcha kind is core since KN-1, on the library side. The annotation
   index stays with the map and drift-audit, and the core reads `gov:feature` anchors by a one-marker
   scan (LB-4, layer-library `[placements]`).
+- **Moved out, 2026-10-18 (PM-12):** the run record, listed above as core (`RUN.md`) until then, is
+  observability's. Its journal reader writes it when the journal shows a run closed, and its contract
+  registers it (layer-expansions).
 
 **Each kind's owner** (revised 2026-10-17, PM-8 and PM-10,
-`build/2026-10-17-build-PLAY-dClosedLoop-1-ownership.md`): the build of its writer. The list is not closed: a
+`build/2026-10-17-build-PLAY-dClosedLoop-1-ownership.md`): the build that registers it, with its schema and its
+writer, through its layer's contract (revised 2026-10-18, PM-12). A kind that several items or channels
+write has one owner, and dTotalRecall's registry and `record` command make it the owner of no kind by
+themselves. The list is not closed: a
 layer that registers a kind adds its row.
 
 | Kind | Owner | Its writer, or what names it |
 |---|---|---|
-| intake | dWellOiledMachine | its writer is `entry.intake`'s hook (PM-9); dRankedPlan's row also describes that hook, which the re-cut reconciles |
+| exception | dOrderedCharter | the exception register beside the `core.*` policies |
+| override | dOrderedCharter | `charter.override` and its record, under the precedence and override rule |
+| intake | dWellOiledMachine | its writer is `entry.intake`'s hook (PM-9), in dWellOiledMachine's row since the re-cut |
 | card | dDeclaredLoop | the build's orientation card at level 1, its stores and snapshot |
 | plan | dRankedPlan | its writer is `plan.record` |
 | dupes | dRankedPlan | its writer is `plan.dedupe` |
+| triage | dRankedPlan | its writer is `plan.triage-rule`, naming the rule it applied |
 | seams | dIndexedDesign | its writer is `design.seams` |
 | feature design | dIndexedDesign | its writer is `design.decompose` |
 | spec | dIndexedDesign | its writer is `design.unit-spec`; the spec redesigned as a structured, tagged contract |
 | fork | dIndexedDesign | a flow record kind (layer-memory `[decisions]`); fork resolution by `design.forks` is dIndexedDesign's, though forks arise in every step |
-| acceptance | dScopedBuild | its writer is `build.acceptance` |
+| overlap | dIndexedDesign | its writer is `design.overlaps` |
+| diff | dIndexedDesign | its writer is `design.reentry`, classifying an amendment by a structural diff |
+| roster | dIndexedDesign | its writer is `design.decompose`, with the interface schema check; not the README's derived `roster` field |
+| inventory | dIndexedDesign | its writer is `design.inventory`, joined to every built unit |
+| acceptance | dDeclaredLoop | its writer is `build.acceptance`; dDeclaredLoop builds the witnesses computed rather than typed, the acceptance re-run by the executor among them (PM-12) |
 | scope | dScopedBuild | its writer is `build.scope` |
+| core result | dScopedBuild | its writer is `build.core`, the executor-written result |
 | verdict | dWitnessedBar | its writer is `test.verdict` |
 | attribution | dWitnessedBar | its writer is `test.attribute` |
 | flake | dWitnessedBar | its writer is `test.flakes`; flake quarantine |
+| selection | dWitnessedBar | its writer is `test.select` |
+| routing | dWitnessedBar | its writers are `test.route` and `test.flakes`, the re-entry's routing record; `release.route`, dShippedRelease's, also writes one |
+| seen-red | dWitnessedBar | its writer is `test.seen-red` |
 | landing | dShippedRelease | the landing record; its writer is `deploy.record` |
+| comparison | dShippedRelease | its writer is `deploy.current` |
+| release | dShippedRelease | its writer is `release.record`, one per (SHA, environment) with its outcome |
+| release exit | dShippedRelease | the release slot's exit record, keyed by SHA with an outcome; `release.record` writes it and `deploy.released` names it |
+| kit release | dShippedRelease | its writer is `kits.cut`: the annotated tag and its notes blob |
+| receipt | dShippedRelease | its writers are `kits.install` and `kits.update`, with the wiring verdict |
+| currency | dShippedRelease | its writer is `kits.currency`, keyed by HEAD SHA |
+| fleet | dShippedRelease | its writer is `kits.fleet`: gov's reading of each adopter, per release |
+| fleet register | dShippedRelease | `adopters.toml` grown into the register, its rows read by `kits.fleet` |
 | transition | dDeclaredLoop | the transition record three ways; every step's exit item writes it |
 | lease | dDeclaredLoop | dDeclaredLoop's row builds the one lease grammar; layer-memory lists the lease among Runtime's kinds |
 | mailbox message | dDeclaredLoop | dDeclaredLoop's row builds the mailbox and its message kinds; layer-memory lists it among Runtime's kinds |
+| disposition | dDeclaredLoop | the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal command or a prompt. dDeclaredLoop is the earliest of its writers' builds and an ancestor of the others, and `entry.place-owner` writes it first (PM-12d) |
 | return | dWellOiledMachine | the persisted-return store, keyed per spawn site |
 | act | dWellOiledMachine | one act session per role act; act binding and the epoch check |
 | session binding | dWellOiledMachine | sessions bound on every source |
 | journal | dWellOiledMachine | the journal grammar moved into the core |
-| run record | dWellOiledMachine | `RUN.md` belongs to the unattended run, which the supervisor executes; observability's `observability.run-record` reads it |
+| workspace | dWellOiledMachine | its writer is `life.unlease`; workspaces by `build.worktree` |
+| run record | dTendedCadence | observability's journal reader writes it when the journal shows a run closed, as `observability.run-record` says (layer-expansions; PM-12) |
 | work order | dBoundRoles | the work order rendered per item |
 | review | dFairHearing | its writer is `review.report`, the harness's, under the proposal for the breakpoint's items |
 | research return | dTotalRecall | the research view over the research-return kind and its dated backfill; `plan.research` and `design.research` write it |
@@ -425,7 +452,12 @@ layer that registers a kind adds its row.
 | census | dTotalRecall | retrofit's `baseline` and `census` record kinds; `adopt.census` writes it |
 | ruling | dTotalRecall | `adopt.practices` writes the ruling records, an item dTotalRecall owns |
 | shape-run | dTotalRecall | the shape-run kind |
+| build readme | dTotalRecall | the build README's declared front-matter schema, with unknown keys refused |
+| claim | dTotalRecall | the claim ref on the remote and the ask-family counter ref (`gap-mem-13`); `entry.claim` writes the claim |
 | maintenance record | dTendedCadence | the maintenance record |
+| recommendation | dCalibratedLens | every `*.recommend` item writes it; the stage-exit recommendation is one mechanism |
+| loop review | dCalibratedLens | its writer is `loop.record` |
+| value ledger | dCalibratedLens | a generated library view; `loop.price` regenerates it |
 | lexicon declaration | dMindYourWords | layer-memory lists the lexicon as an optional component's kind; dMindYourWords builds the declaration and its packs |
 
 **One refinement to layers round one,** for research records and major decisions alike. Core items

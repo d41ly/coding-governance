@@ -148,6 +148,19 @@ def derive():
             items.append(node(atlas.plain(r[0]), r[3], rels=[("owner", [own] if own else [])]))
         steps.append(node(m.group(1), m.group(2), counts=[("items", len(rows))], rels=[("owner", sorted(set(owners)))]))
     ns["step"] = steps
+    # The expansions' items: each layer-expansions table headed `| Item | Actor |` is one program's, outside the steps
+    # (PM-12). A row may name two items, and each takes the row's Owner cell.
+    expansions = text("memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md")
+    for head, rows in atlas.tables(expansions):
+        if head[:2] != ["Item", "Actor"]:
+            continue
+        oc = head.index("Owner") if "Owner" in head else None
+        for r in rows:
+            own = r[oc].strip() if oc is not None else ""
+            for tag in re.findall(r"`([a-z]+\.[a-z0-9-]+)`", r[0]):
+                if own:
+                    DECLARED.add(("item", tag))
+                items.append(node(tag, r[2], rels=[("owner", [own] if own else [])]))
 
     agents = {}
     for p in sorted((REPO / "tools/roles/agents").glob("gov-*.agent.md")):
@@ -157,8 +170,6 @@ def derive():
                   "builder": "gov-builder", "skeptic": "gov-skeptic", "synthesizer": "gov-synthesizer",
                   "researcher": "gov-researcher"}
     acts = {}
-    for it in items:
-        pass
     for s in A["steps"]:
         for it in s["items"]:
             if it["role"]:
@@ -450,6 +461,17 @@ LINE = re.compile(r"^- ([a-z-]+)\.(.+?) — (.+)$")
 NSLINE = re.compile(r"^- ([a-z-]+)\.\* — (\d+) nodes · gov map ([a-z-]+)$")
 
 
+def expansion_items(le):
+    """The expansions' item tags, counted from the raw lines under each `| Item | Actor |` header."""
+    n = 0
+    for block in le.split("\n| Item | Actor |")[1:]:
+        for ln in block.split("\n")[2:]:      # past the header's rest and its separator
+            if not ln.startswith("| `"):
+                break
+            n += len(re.findall(r"`[a-z]+\.[a-z0-9-]+`", ln.split(" | ", 1)[0]))
+    return n
+
+
 def census():
     """Each population counted from disk by a route that shares nothing with the builders above."""
     v2 = text("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
@@ -463,7 +485,8 @@ def census():
         "record-kind": len(re.findall(r"(?m)^\| [a-z][a-z -]* \| d[A-Z]\w+ \| ", contract)),
         "principle": len(re.findall(r"(?m)^- \*\*P\d+ ", v2)),
         "chain": len(re.findall(r"(?m)^\| d[A-Z]", ch)),
-        "item": len(re.findall(r"(?m)^\| `[a-z]+\.[a-z0-9-]+` \|", steps)),
+        "item": len(re.findall(r"(?m)^\| `[a-z]+\.[a-z0-9-]+` \|", steps)) + expansion_items(
+            text("memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md")),
         "gap": len(re.findall(r"(?m)^\| gap-[a-z]+-\d\d \|", reg)),
         "policy-key": len(re.findall(r"(?m)^\| `[a-z]", pol)),
         "leg": text("tools/gate-legs.json").count('"name"'),
@@ -534,7 +557,7 @@ def check(A, ns, out, folded, plant=None):
         if k not in {n["key"] for n in ns["kit"]}:
             findings.append(f"census: tools/{k}/kit.toml is on disk with no kit node")
     a_steps = {s["tag"] for s in A["steps"]}
-    a_items = {it["tag"] for s in A["steps"] for it in s["items"]}
+    a_items = {it["tag"] for s in A["steps"] for it in s["items"]} | {it["tag"] for p in A["programs"] for it in p["items"]}
     for kind, a_set, m_set in (("step", a_steps, {n["key"] for n in ns["step"]}), ("item", a_items, {n["key"] for n in ns["item"]}),
                                ("layer", {l["tag"] for l in A["layers"]}, {n["key"] for n in ns["layer"]}),
                                ("chain", {c["build"] for c in A["chain"]}, {n["key"] for n in ns["chain"]}),

@@ -182,6 +182,7 @@ class with no citation, is a finding.
 | dOrderedCharter | `check` | dWitnessedBar | homonym | the resolver's `check` verb beside `show`, `where` and `refs`, not the `check` tag namespace |
 | dOrderedCharter | `memory.map-purpose` | dTotalRecall | moved | the review that reads the key is dTotalRecall's PM-5 unit; the row names the key only to say so (H1) |
 | dRankedPlan | `entry.intake` | dWellOiledMachine | tolerance | RC-9's fallback: an owner breakpoint, witness "intake not installed", until dWellOiledMachine lands the hook and drains it |
+| dTotalRecall | `roster` | dIndexedDesign | homonym | the build README's derived `roster` front-matter field, not the roster record kind `design.decompose` writes (PM-12) |
 
 The critical path, its instrument and its runs:
 

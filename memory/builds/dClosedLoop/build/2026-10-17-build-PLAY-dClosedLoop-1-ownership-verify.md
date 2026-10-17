@@ -1133,3 +1133,133 @@ listed, not escalated, and no move is proposed for them.
   receiving row names it. That covers dIndexedDesign's "design review by policy", dTotalRecall's default load,
   dShippedRelease's tracker mirror and dCalibratedLens's design-review rounds.
 - **The checks:** the map's owner check and the ancestor probe are re-run, then the atlas is republished.
+
+## [answers-2] The owner's answers, 2026-10-18
+
+- PM-12a, asked as "PM-12a: the skeptic confirmed 13 of the disputed owners. Move them?": "Move all 13 (Recommended)"
+- PM-12b, asked as "PM-12b: 5 owners the records don't settle. Take the recommendations?": "Take recommendations (Recommended)"
+- PM-12c, asked as "PM-12c: add the 51 nodes the table lacks?": "Add all 51 (Recommended)"
+- PM-12d, asked as "PM-12d: who registers the owner's disposition record?": "dDeclaredLoop (Recommended)"
+
+Each answer takes `[pm-12]`'s recommendation whole. The answers are structural, so they add no policy key.
+
+## [folded-2] What landed
+
+- **The owner fields:**
+  - flow-steps: the eight stage reason and recommend items' Owner cells read dCalibratedLens;
+  - v2's catalogue: six keys' Owner cells move, as `[pm-12-moves]` and `[pm-12-unsettled]` say;
+  - layer-expansions: the four program tables gain an Owner column over their 26 items;
+  - layer-memory `[contract]`: `acceptance` and the run record move, and 26 kinds join, 67 in all.
+- **The rule and the sort, corrected in layer-memory:**
+  - the ownership rule reads "the build that registers it" in place of "the build of its writer", which the
+    moved and added kinds need;
+  - the P28 sort moves the run record out of core to observability, as layer-expansions and layer-runtime
+    already had it.
+- **The chain rows,** with a revision note in v2:
+  - dIndexedDesign's design review leaves the stage-exit recommendation to dCalibratedLens;
+  - dTotalRecall keeps the default load's memory share and its session-start report, and the loading is
+    dWellOiledMachine's, whose hook now names `memory.default-load`;
+  - dCalibratedLens names the design audit's two round keys;
+  - dShippedRelease gains the tracker mirror, 20 units from 19.
+- **The instruments:**
+  - the map and the atlas read the expansions' items, and the map's census counts them by its own route;
+  - the parity check spans the steps' items and the programs' items both;
+  - the ancestor probe found one new citation, dTotalRecall's `roster`. It is the README's derived field, a
+    homonym of the new kind, and is now classed in the re-cut record's `[reconciled-order]`.
+- **PM-12d's reason, corrected.** The question and `[pm-12]` said the loop declares every item's witness.
+  That over-reaches: `verdict`, `attribution` and `landing` are loop-declared witnesses too, and they stay
+  with their stage builds. The kind table carries the reason that holds. dDeclaredLoop is the earliest of
+  the disposition record's writers' builds and an ancestor of the others, and `entry.place-owner` writes it
+  first.
+
+The checks after the fold, the ancestor probe's first run among them:
+
+```text
+$ python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --check
+atlas: derived — 142 records, 2467 sections, 169 decision sections, 16 comparison areas, 30 principles
+rc 0
+$ python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --check
+map: 2139 nodes in 30 namespaces; 29688 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1419, derived 243, pending 477
+rc 0
+$ python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --check --plant <case>, for each case
+orphan: FINDING owner: item.entry.intake names no owning build rc 1
+two-owners: FINDING owner: policy-key.preset names 2 owning builds rc 1
+inferred: FINDING no inference: point.actor-kinds's owner comes from no declared field rc 1
+no-owner: FINDING owner: tag-namespace.reader names no owning build rc 1
+drop-line: FINDING complete: layer has nodes on no line and in no count: ['instruction'] rc 1
+bad-count: FINDING count: item.* counts 108, the table holds 107 rc 1
+ghost-rel: FINDING resolves: chain.dGroundRules names owner=dGhostBuild, which resolves nowhere rc 1
+census: FINDING census: tools/newkit/kit.toml is on disk with no kit node rc 1
+$ python ancestor_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md
+chain rows 16 · owned nodes read 396 (items, keys, points, record kinds, tag namespaces; systems are cited in prose and left out) · backticked citations 268 · of a non-ancestor's node 10
+  dDeclaredLoop cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
+  dDeclaredLoop cites `intake` (dWellOiledMachine's, not an ancestor): homonym
+  dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
+  dFairHearing cites `preset` (dDeclaredLoop's, not an ancestor): homonym
+  dGroundRules cites `policy.guard` (dDeclaredLoop's, not an ancestor): not a use
+  dGroundRules cites `policy.proof` (dDeclaredLoop's, not an ancestor): not a use
+  dOrderedCharter cites `check` (dWitnessedBar's, not an ancestor): homonym
+  dOrderedCharter cites `memory.map-purpose` (dTotalRecall's, not an ancestor): moved
+  dRankedPlan cites `entry.intake` (dWellOiledMachine's, not an ancestor): tolerance
+  dTotalRecall cites `roster` (dIndexedDesign's, not an ancestor): UNCLASSED
+findings 1
+rc 1
+$ python critical_path.py
+critical path: 176 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 6, dFairHearing 21, dOrderedCharter 28, dDeclaredLoop 65, dWitnessedBar 85, dBoundRoles 115, dTotalRecall 117, dIndexedDesign 126, dRankedPlan 128, dShippedRelease 137, dWellOiledMachine 141, dScopedBuild 150, dTendedCadence 151, dMindYourWords 157, dCalibratedLens 164, dConvergedCharter 176
+rc 0
+```
+
+After the class row, the probe green, and red with that row planted away:
+
+```text
+$ python ancestor_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md
+chain rows 16 · owned nodes read 396 (items, keys, points, record kinds, tag namespaces; systems are cited in prose and left out) · backticked citations 268 · of a non-ancestor's node 10
+  dDeclaredLoop cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
+  dDeclaredLoop cites `intake` (dWellOiledMachine's, not an ancestor): homonym
+  dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
+  dFairHearing cites `preset` (dDeclaredLoop's, not an ancestor): homonym
+  dGroundRules cites `policy.guard` (dDeclaredLoop's, not an ancestor): not a use
+  dGroundRules cites `policy.proof` (dDeclaredLoop's, not an ancestor): not a use
+  dOrderedCharter cites `check` (dWitnessedBar's, not an ancestor): homonym
+  dOrderedCharter cites `memory.map-purpose` (dTotalRecall's, not an ancestor): moved
+  dRankedPlan cites `entry.intake` (dWellOiledMachine's, not an ancestor): tolerance
+  dTotalRecall cites `roster` (dIndexedDesign's, not an ancestor): homonym
+findings 0
+$ python ancestor_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md --plant-drop dTotalRecall:roster
+chain rows 16 · owned nodes read 396 (items, keys, points, record kinds, tag namespaces; systems are cited in prose and left out) · backticked citations 268 · of a non-ancestor's node 10
+  dDeclaredLoop cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
+  dDeclaredLoop cites `intake` (dWellOiledMachine's, not an ancestor): homonym
+  dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
+  dFairHearing cites `preset` (dDeclaredLoop's, not an ancestor): homonym
+  dGroundRules cites `policy.guard` (dDeclaredLoop's, not an ancestor): not a use
+  dGroundRules cites `policy.proof` (dDeclaredLoop's, not an ancestor): not a use
+  dOrderedCharter cites `check` (dWitnessedBar's, not an ancestor): homonym
+  dOrderedCharter cites `memory.map-purpose` (dTotalRecall's, not an ancestor): moved
+  dRankedPlan cites `entry.intake` (dWellOiledMachine's, not an ancestor): tolerance
+  dTotalRecall cites `roster` (dIndexedDesign's, not an ancestor): UNCLASSED
+findings 1
+```
+
+The other instruments the PM-10 fold ran:
+
+```text
+$ python role_matrix_v5.py flow-steps layer-roles
+items 81 of 81 body rows; actor-item pairs 81; actors 15; items with a role 20; cycle roles 1; findings 0
+rc 0
+$ python gap_join_filed.py gap-register architecture-v2
+owned twice or more: none
+owned but not in the register: none
+builds owning nothing: none
+rc 0
+$ python preset_check_canonical.py architecture-v2
+catalogue keys 192 · presettable 182 · preset rows 182
+no findings
+rc 0
+```
+
+- **The role matrix still reads flow-steps' 81 items alone.** It joins items to the roles layer's matrix,
+  and the expansions' 26 items name no role.
+- **A stale copy of the preset check was found and deleted.** It read 0 catalogue keys and exited 0, at HEAD
+  and after the fold alike. The canonical check above reads the catalogue whole.

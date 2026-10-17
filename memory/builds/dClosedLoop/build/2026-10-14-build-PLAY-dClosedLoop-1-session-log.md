@@ -1924,6 +1924,14 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
     `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` (`[round-2]`, `[compare-2]`), with the
     disposition's amendment (`[disposition-amended]`). What goes to the owner is `[pm-12]`.
 
+- 2026-10-18, session 1799cb98: the owner answered PM-12, verbatim: PM-12a "Move all 13 (Recommended)",
+  PM-12b "Take recommendations (Recommended)", PM-12c "Add all 51 (Recommended)" and PM-12d "dDeclaredLoop
+  (Recommended)" (`build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` `[answers-2]`).
+  - Folded: 13 owners moved, 5 recommendations taken, and 52 nodes added, 403 in all. layer-memory's
+    ownership rule and its P28 sort are corrected, and five chain rows narrowed or extended (`[folded-2]`).
+  - The map checks green over 2,139 nodes and red on each plant. The ancestor probe classes one new
+    homonym, and the critical path holds at 176 units. The atlas is republished as version 33.
+
 ## Instruments
 
 ### The gap-ownership join
