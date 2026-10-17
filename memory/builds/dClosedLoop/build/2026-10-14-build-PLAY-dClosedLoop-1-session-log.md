@@ -1992,6 +1992,12 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   `reviews/2026-10-18-review-PLAY-dClosedLoop-1-audit-fold-closing.md`, because its derived atlas name collided with
   the fold record's. The atlas now refuses two records with one derived name; it was seen red on the collision.
 
+- 2026-10-18, session 1799cb98: asked "Step 4 has run: audit, fold, the fold's review, and its fold. What next?", the owner chose, verbatim, "Walk the design first". The walk opens in
+  `build/2026-10-18-build-PLAY-dClosedLoop-1-walk.md`, with wave 1, the foundation: dGroundRules, dOrderedCharter,
+  dFairHearing and dDeclaredLoop.
+  - Fixed on the way in: dFairHearing's preset clause split into five units on its own parenthesis, 15 counted where
+    11 were meant. `paren_semis.py` now scans every row for a split inside a clause.
+
 ## Instruments
 
 ### The gap-ownership join
