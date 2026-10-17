@@ -353,6 +353,8 @@ all                 176 nodes   10411 B
   - The record kinds, the major decisions that hold now, and this build's 100 records.
   - A purpose line for each live build. `memory/LIVE.md` holds none, so the probe shows a build's status
     where its purpose belongs.
+  - Corrected 2026-10-17: both research runs found every build README declaring its purpose in its
+    H1, after the slug. `LIVE.md` was the wrong source (`[agreement]`).
 - **Its principle parse is loose.** It reads only the `**Pn Title.**` bullets, so a principle written
   another way is missed. It is a size probe, not the map.
 
@@ -483,4 +485,350 @@ print(f"rendered {path}")
 c = subprocess.run([sys.executable, "tools/roles/handoff.py", "check", path], capture_output=True)
 print(c.stdout.decode("utf-8") + c.stderr.decode("utf-8"), end="")
 sys.exit(c.returncode)
+```
+
+## [agreement] What the two runs agree on
+
+Run A beside run B, question by question. "Both runs" holds only what each run found on its own, with
+each run's line cited. The returns are filed verbatim as `research-project-map-a.md` and `-b.md` in
+`build/`. A finding one run alone made, and that this record checked, says "verified" where the design
+takes it.
+
+### [agree-project-map] The level-0 project map, dispatches 87 and 88
+
+| Question | Both runs | Where they differ | The design takes |
+|---|---|---|---|
+| Owner | core memory, kit memory-tree, chain build dTotalRecall (`research-project-map-a.md:159`, `research-project-map-b.md:148`) | — | both |
+| The mechanism | a tiered map derived from the one index: a structural node gets one line, and a large population folds to one counted line with its drill verb (`research-project-map-a.md:17`, `research-project-map-b.md:15`) | A pushes a namespace's roll call to the items that declare it (`research-project-map-a.md:196`). B pulls one namespace on demand with `gov map <ns>` (`research-project-map-b.md:17`) | both: item-declared unfolds, and the pull verb (fork PM-6) |
+| Its size today | about 13 to 14 KB: A's base is 13.7 KB (`research-project-map-a.md:19`), B's tier 0 is 173 lines in 13.2 KB (`research-project-map-b.md:16`) | A adds the namespaces the design declares and the index does not yet derive, for about 19 KB | about 19 KB once the designed namespaces land |
+| A flat map | loses: one line for every node is far over any slot (`research-project-map-a.md:116`, `research-project-map-b.md:131`), and grows about 20 KB a month (`research-project-map-b.md:100`) | A counts 1,589 nodes at 123.8 KB, B 1,057 at 81 KB with 60-character purposes | rejected |
+| Query alone | loses: structural agents already search for existence often, and most audit items were still not in view (`research-project-map-a.md:119`, `research-project-map-b.md:133`) | — | rejected; the verbs stay as the drill-down and the replay's control arm |
+| Extending the codebase map | loses: the kit is optional, so the core map cannot live in it (`research-project-map-a.md:120`, `research-project-map-b.md:134`) | A finds the kit in govkit's default install, while its README calls it opt-in (`research-project-map-a.md:39`) | rejected; code depth is an optional slot. A's finding is verified: `tools/govkit/registry.toml` lists `codebase-map` in `default` |
+| Declared purposes | many node classes declare none, kits among them (`research-project-map-a.md:43`, `research-project-map-b.md:46`) | A adds config keys, populations, items and design records; B adds workflow scripts, chain builds and gap areas | a purpose source per namespace, and the nodes without one held on the ledger (fork PM-5) |
+| A build's purpose | every build README declares one in its H1, after the slug (`research-project-map-a.md:41`, `research-project-map-b.md:44`) | — | the H1 is a build's purpose source. `[probe]` read `memory/LIVE.md`, the wrong source |
+| Delivery | the orientation scout composes the card's map cells from the map within 8 KB, structural roles get it in their work orders, and unit workers keep `refs` (`research-project-map-a.md:151`, `research-project-map-b.md:174`) | B finds the orientation scout never spawned (`research-project-map-b.md:33`). A asks what the attended main session loads (`research-project-map-a.md:218`) | both. B's finding is verified: 0 of 3,283 recorded subagents is a gov-orienter. The main session is fork PM-7 |
+| The owner's view | the atlas is the owner's render of the same derivation (`research-project-map-a.md:22`, `research-project-map-b.md:20`) | — | both |
+| No piece lost | a both-ways completeness check over the index and the map (`research-project-map-a.md:170`, `research-project-map-b.md:184`) | A also joins the disk census, through `compute_coverage` | A's three ways |
+| The record's sort | it holds: A agrees on 49 of 52, κ 0.85 (`research-project-map-a.md:66`), and B on 50 of 52, κ 0.90 (`research-project-map-b.md:82`) | — | the sort stands |
+| Two more reviews | the library review had 14 of 19 items not in view, in each run's rating (`research-project-map-a.md:62`, `research-project-map-b.md:80`) | the debt folds' review: A 16 of 20, B 17 of 20 | about three items in four were not in view |
+| What a map would catch | about half to two-thirds of the items a part elsewhere caused: A 12 of 22 with unfolds (`research-project-map-a.md:109`), B about 13 of 20 (`research-project-map-b.md:87`) | A's base map alone names 5 of 22 | the unfolds carry most of the catch |
+| Reads before a first act | structural roles read a median of 98 to 241 KB before acting (`research-project-map-a.md:50`, `research-project-map-b.md:69`) | — | the map adds 7 to 13% to that |
+| The losing test | a replay with the map handed and without, scored on the share not in view (`research-project-map-a.md:223`, `research-project-map-b.md:200`) | A adds a cause computed at `review.dispose`, read continuously. B runs the replay before the build, at dTotalRecall's first unit | both |
+| The new gap | no whole-project view reaches an agent, `gap-mem-26` (`research-project-map-a.md:203`, `research-project-map-b.md:233`) | — | registered at the fold |
+| Kit descriptors | govkit and lib carry no `kit.toml` (`research-project-map-a.md:40`, `research-project-map-b.md:239`) | — | the kit factory's purpose field covers both |
+| The budget | — | A 24k (`research-project-map-a.md:194`), B 16k (`research-project-map-b.md:217`) | fork PM-4 |
+
+## [cross] Where the map meets the six systems
+
+- **Tags.** Each namespace row gains `purpose-source` and `owner` (dOrderedCharter). The completeness
+  check joins every registered namespace, so a namespace with no extractor or owner reds, which would
+  have caught the audit's M10.
+- **Annotations.** `gov:feature` anchors are counted on each feature's line. The `marker` namespace
+  folds to one counted line.
+- **Instruction writing.** A map line is a derived fact or a pointer (P11), never authored. A purpose
+  that is a unit's is written through `instructions.edit`.
+- **Role shapes.** An item declares its map slot and its unfolds. A shape-run row carries the map's
+  bytes.
+- **Memory structure.** The map is its own work-order slot, with its own budget and its own answer
+  when it runs over, outside `memory.item-budget`, as the audit's M1 settled for every slot.
+  layer-memory `[views]` carries PM-1.
+- **Retrofit.** The nodes that declare no purpose are a ledger population, shrink-only, drained by
+  each namespace's owning build. A population's count is a line the map shows.
+
+## [design] The design
+
+### [placement] Where it sits
+
+- **Core memory** (PM-2): kit memory-tree, chain build dTotalRecall.
+- **A view, not a record kind.** It is derived from the one index, never committed, and cached beside
+  the index at `<git-common-dir>/gov/index/<tree>.map`.
+- **The codebase map adds code depth** where it is installed: symbols, callers and dossiers, through
+  an optional slot, `map.code`. That slot renders filled, searched with nothing found, or not
+  installed, with `gov tag where` named as the fallback.
+
+### [line] One line per node
+
+```text
+line   := "- " <tag> [" — " <purpose>] [" · " <count> {", " <count>}] [" · " <rel> {" " <rel>}]
+purpose:= at most 60 characters, verbatim from the namespace's declared purpose source
+count  := <noun> " " <int>, derived from the index, such as "gaps 21" or "items 12"
+rel    := ("layer" | "owner" | "after" | "implements") "=" <tag> {"," <tag>}, at most three keys
+nsline := "- " <ns> ".* — " <int> " nodes · gov map " <ns>
+header := "map " <tree-id> " · nodes " <int> " · lines " <int> " · folded " <ns> {"," <ns>}
+```
+
+- **A node with no purpose** renders `—` in its place.
+- **A line never holds:**
+  - section content;
+  - dates or ages;
+  - typed status words. The only status allowed is one the index derives, such as a live build's.
+  - line numbers, summaries, render provenance or judgments.
+
+### [tiers] What an agent holds, and how it digs
+
+- **The map, level 0.**
+  - It opens with the header.
+  - Then come the bounded namespaces, one line per node, in a declared order: layer, principle,
+    chain build, step, role, feature, kit, live build, point, hook, record kind, tag namespace,
+    policy namespace, gap area.
+  - Then comes one counted line per unbounded namespace: legs, bug classes, closed builds, decision
+    rows, gaps, config keys, populations, markers, items and design records.
+  - A namespace's registry row says which it is, `map: line` or `map: fold`. A row that says neither
+    folds past 40 nodes.
+- **Unfolds.** An item declares the namespaces whose roll call it needs. Its work order's map slot
+  then lists those namespaces node by node, as `memory.map-unfold` says (fork PM-6).
+  - `design.inventory` unfolds legs, checks, config keys, populations, markers and kits, which costs
+    12.3 KB.
+  - In run A's hit test, the base map named 5 of 22 audit items a missing part caused, and the
+    architect's unfolds named 12.
+- **The pull, level 1.** `gov map <ns>[.<seg>]` returns one namespace in the same grammar, for an
+  agent that knows which namespace it needs.
+- **Content, level 2.** `gov tag show <tag>` or `record show <id>#<tag>`.
+- **Relations, both ways.** Outbound relations are the line's own keys, and `gov tag refs <tag>`
+  returns the inbound ones.
+
+### [fit] Over its budget, no node is dropped
+
+- **Under `memory.map-overflow: degrade`,** the default, the map degrades in a fixed order:
+  1. Purposes are cut to 40 characters.
+  2. The lowest-ordered bounded namespaces fold to their counted lines, one at a time, until the map
+     fits.
+
+  The header names each step it took.
+- **Under `refuse`,** a map over its budget is refused at render, as strict may want.
+- **Either way, every node stays on the map,** as a line or inside a count.
+
+### [delivery] Who receives it
+
+| Reader | What it receives, under `memory.project-map: structural-roles` (PM-1) |
+|---|---|
+| the orientation scout, at `entry.orient` | the whole map. It composes the card's map cell from it within the card's 8 KB: the header, and the build's neighbourhood, which is its layer, its chain build's line, its features, its gap areas and the live builds that overlap its write set |
+| the planner, at `plan.triage-judge` and `plan.reason` | the map, as the work order's `map` slot |
+| the architect, at `design.inventory`, `design.decompose` and `design.reason` | the map, with `design.inventory`'s unfolds |
+| the reuse scout, at `design.seams` | the map, inside the house index |
+| the spec writer, at `design.unit-spec` and `review.fold` | the map |
+| the reviewer, at `review.lens` under the coherence and reuse lenses | the map |
+| unit workers: the builder, the tester and the rest | no map. They get their slice and the `refs` rows of their write set. A `gov map` call from one is journaled as a read outside its slice |
+| the attended main session | as fork PM-7 decides |
+
+- **The slot.** dBoundRoles declares the `map` slot in the work order, beside `reuse`
+  (`tools/roles/handoff.py:97`), and dTotalRecall's renderer fills it. The slot is hashed with the
+  work order.
+- **Until the renderer lands,** the slot renders "not installed".
+- **The scout has never run.** The card today is written by a command, and 0 of 3,283 recorded
+  subagents is an orientation scout. dBoundRoles builds the scout, so PM-1's card cell lands with it.
+
+### [purpose] Where each node's purpose comes from
+
+Each namespace row declares its purpose source (dOrderedCharter adds the field). Where a source exists
+today, the map reads it. Where none exists, the namespace's owning build adds one.
+
+| Namespace | Its purpose source | Today |
+|---|---|---|
+| layer | v2 `[layers]`' definition column | declared |
+| principle | its title | declared |
+| build | the README H1, after the slug | declared, 167 of 167 |
+| feature | the dossier's `title` | declared |
+| skill, role | the `description` of the skill or the agent file | declared |
+| bug class | the gotcha's `description` | declared |
+| item | flow-steps' `does` column | declared |
+| chain build | its stage word only | a purpose field, dOrderedCharter's chain registry |
+| kit | none; govkit and lib carry no `kit.toml` | `purpose` in `kit.toml`, dShippedRelease's kit factory |
+| leg | none: the leg has a name only | `purpose` in `gate-legs.json`, dWitnessedBar |
+| hook, point | none | `purpose` on the pack and point registrations, dWellOiledMachine |
+| record kind | none | `purpose` in the kind registry, dTotalRecall |
+| tag namespace, policy namespace, gap area | none | `purpose` on the namespace row, dOrderedCharter; the policy namespace's dDeclaredLoop's, the gap area's dTotalRecall's |
+| design record | its H1 | declared |
+
+- **A node with no purpose** renders `—` and joins a shrink-only ledger population of purposeless
+  nodes. Each owning build drains that population, as `memory.map-purpose` says (fork PM-5).
+- **Builds after dTotalRecall.** A namespace whose owning build lands after dTotalRecall, kits and
+  hooks among them, renders `—` until then. No chain edge is added for it.
+
+### [checks] The `map` leg pack
+
+| Check | Red on |
+|---|---|
+| complete, three ways | a planted `tools/newkit/` with no `kit` node, found by the disk census through `compute_coverage`; a planted index node on no line and in no count |
+| resolves | a line naming `feature.ghost`, or a relation key whose target resolves nowhere |
+| count | a counted line one off from the index's count, planted by an extractor that drops a row |
+| owner and extractor | a namespace registered with neither, such as `doc` |
+| purpose | under `required`, a new `kit.toml` with no purpose |
+| budget | under `refuse`, a planted map over the budget; under `degrade`, a degraded render whose header omits a step |
+| freshness | a work order whose map tree id is not the served index's, outside the rows marked `dirty` |
+| delivery | a structural item's work order without the slot, or a unit worker's with it |
+| render parity | a node in the atlas that is not on the map, or the reverse |
+| no stale facts | a line holding a date or a typed status |
+| populated | fewer namespaces present than registered, which reads unarmed, never green |
+
+### [test] Its losing test
+
+- **Before the build.** At dTotalRecall's first unit, a map derived from today's sources is replayed,
+  as the runs' size probes derived theirs.
+  - **The replay.** The coherence and reuse lenses run twice with the map and the architect's unfolds
+    handed, and twice without. They run at the base commits of the systems and retrofit, library and
+    debt-folds audits.
+  - **The scoring.** `tools/workflows/review_replay.py` scores the runs against the known set of
+    those audits' not-in-view items, counting each defect once.
+  - **The map loses, and is not built, if any of these holds:**
+    - the recall of the known set rises by less than the twin runs' difference plus 5 items;
+    - the median of existence searches per lens falls by less than one;
+    - the bytes read before the first act rise by more than the map's own bytes.
+- **After landing.**
+  - `review.dispose` computes each confirmed finding's cause. It is "not in view" when the address
+    the finding's fix needs is in neither the author's slice manifest nor the map.
+  - The Loop Review reads that share over the next 38 confirmed findings. That is enough to detect a
+    fall from 74% to 55%, at α 0.05 and power 0.8.
+  - If the share has not fallen by 15 points, the Loop Review proposes setting `memory.project-map` to
+    `owner-only`.
+
+### [owners] Owners
+
+| Chain build | Its part |
+|---|---|
+| dTotalRecall | the renderer and `gov map`; the three-way completeness check and the `map` leg pack; the atlas re-rendered from the same node table; the purposeless-node population; the record-kind registry's purpose field; the replay at its first unit |
+| dOrderedCharter | the namespace row's `purpose-source` and `owner` fields, and the chain registry's purpose field |
+| dBoundRoles | the work order's `map` slot and the per-item unfolds; the orientation scout composing the card's map cell |
+| dDeclaredLoop | the items' declarations of the slot and their unfolds, and the policy namespaces' purposes |
+| dWitnessedBar | the leg's purpose field |
+| dWellOiledMachine | the hook and point purposes, and the journal's count of map reads outside a slice |
+| dShippedRelease | the kit factory's purpose field, and `kit.toml` for govkit and lib |
+| dFairHearing | the cause `review.dispose` computes |
+| dCalibratedLens | the Loop Review's reading of the not-in-view share |
+
+### [keys] Keys
+
+| Key | Values | Default |
+|---|---|---|
+| `memory.project-map` | structural-roles, every-role, owner-only | structural-roles (PM-1) |
+| `memory.map-budget` | 16k, 24k, 32k | as PM-4 settles |
+| `memory.map-overflow` | degrade, refuse | degrade |
+| `memory.map-unfold` | item-declared, none, all | as PM-6 settles |
+| `memory.map-purpose` | required, report, off | as PM-5 settles |
+| `memory.default-load` | card, card-and-live, and `card-and-map` added | as PM-7 settles, for attended sessions |
+
+## [forks-design] The design's forks, to put to the owner
+
+| Fork | The question | Options, the recommendation first |
+|---|---|---|
+| PM-4 | What is the map's budget? | 24k, which holds about 19 KB once the designed namespaces land; 16k, which fits today's 13.2 to 13.7 KB and folds as namespaces land; 32k |
+| PM-5 | What happens to a node with no declared purpose? | a new node must declare one, and today's purposeless nodes sit on a shrink-only ledger population each owning build drains; the purpose is derived from the node's first comment or README line; the map is refused until every node declares one |
+| PM-6 | How does a role see a whole namespace? | each item declares the namespaces it unfolds, pushed into its work order; no unfolds, only the pull verb; every structural role gets every roll call, about 55 KB |
+| PM-7 | What does an attended session load when it opens? | the card and the map, about 19 KB more per session start; the card, whose map cell holds the build's neighbourhood and a pointer to `gov map`; the card only |
+
+## [gaps-proposed] Gaps to register once the forks settle
+
+| Gap | Severity | Owner |
+|---|---|---|
+| no whole-project view reaches an agent: 37 of 52 audit items, and 30 of 39 in two more reviews, needed a piece their author did not have in view; `MAP.md` and `CARDS.md` reach no agent (`research-project-map-a.md:203`, `research-project-map-b.md:233`) | HIGH | dTotalRecall |
+| nodes carry no declared purpose: kits, legs, hooks, points, record kinds and the tag and policy namespaces have no purpose field, and govkit and lib no `kit.toml` | MED | dTotalRecall |
+| the orientation scout the design relies on has never run: 0 of 3,283 recorded subagents is a gov-orienter, and a command writes today's card | MED | dBoundRoles |
+
+## [instrument-agreement] The citations, and the both-runs probe over `[agreement]`
+
+Every line `[agreement]` cites was read from the filed returns by this helper, never typed. Its two
+missing phrases were then found by hand at `research-project-map-a.md:22` and `research-project-map-b.md:33`,
+the lines the table cites:
+
+```python
+"""Print the line, in each filed project-map return, of each phrase the agreement table cites, so every
+citation is read from the record, never typed. Exits 1 when a phrase is missing or matches more than once.
+
+Usage: python cite_lines.py   (from the worktree root)
+"""
+import sys
+
+B = "memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-"
+PHRASES = {
+    "owner": ("builds the renderer, the check and the atlas re-render", "**Owner.** The memory layer, kit memory-tree"),
+    "mechanism": ("a tiered map that folds to fit", "two-tier project map that core memory derives"),
+    "size": ("The base map is 13.7 KB today", "Today that is 173 lines and 13.2 KB"),
+    "flat": ("| **A. Flat** |", "| **A. Flat map** |"),
+    "purpose": ("It is declared for **0%** of kits", "| kit | 19 | 1,397 |"),
+    "builds": ("all 167 build READMEs declare one in their H1", "the README H1 after the slug (167 of 167 have one)"),
+    "delivery": ("`entry.orient` gets L0 and cuts the card", "| orientation scout (`entry.orient`) | tier 0 whole."),
+    "query": ("| **D. Query only** |", "| **C. Query only** |"),
+    "codemap": ("| **E. Extend the codebase map** |", "| **D. Extend an existing generator (the seam)** |"),
+    "atlas": ("the atlas becomes the owner's render of the same node table", "the atlas is the owner's render of the same derivation"),
+    "closure": ("| complete, three ways", "| closure, forward |"),
+    "rater": ("**Agreement on the 52 is 49 of 52 (94.2%), κ = 0.85.**", "agree on 50 of 52, kappa 0.90"),
+    "library": ("| library (`reviews/2026-10-16-…-library.md`), 19 items |", "| library (`reviews/2026-10-16-…-library.md`, 19 items) |"),
+    "ceiling": ("Barch  26002 B  hits 12/22", "That sets the map's ceiling at about 13 of 20."),
+    "reads": ("| spec writer | 76 | 20.5 |", "| spec writer | 76 | 149.9 |"),
+    "losing": ("**The map is retired if** the share does not fall", "**The map loses** if any of these holds:"),
+    "growth": ("grows about 20 KB a month", "**Flat:** about 21 KB a month."),
+    "gap26": ("**gap-mem-26 (HIGH): no whole-project view reaches an agent.**", "| gap-mem-26 |"),
+    "kittoml": ("**Two kit directories have no descriptor.**", "there are 17 kit.toml files against MAP.md's 19 kits"),
+    "budget": ("| `memory.map-budget` | 16k, 24k, 32k | 24k |", "| `memory.map-budget` | 8k, 16k, 32k | 16k |"),
+    "unfold": ("| `memory.map-unfold` |", "**Tier 1** is `gov map <ns>`"),
+    "scout": (None, "| orientation scout | per PM-1, it composes the card |"),
+    "default": ("**The codebase map is installed by default.**", None),
+    "mainsession": ("| PM-7: the attended main session |", None),
+}
+bad = 0
+for key, pair in PHRASES.items():
+    out = []
+    for run, phrase in zip("ab", pair):
+        if phrase is None:
+            out.append(f"{run}:-")
+            continue
+        lines = open(B + run + ".md", encoding="utf-8").read().split("\n")
+        hits = [i + 1 for i, ln in enumerate(lines) if phrase in ln]
+        if len(hits) != 1:
+            bad += 1
+            out.append(f"{run}:{hits or 'MISSING'}")
+        else:
+            out.append(f"{run}:{hits[0]}")
+    print(f"{key:12} {' '.join(out)}")
+sys.exit(1 if bad else 0)
+```
+
+```text
+$ python cite_lines.py
+owner        a:159 b:148
+mechanism    a:17 b:15
+size         a:19 b:16
+flat         a:116 b:131
+purpose      a:43 b:46
+builds       a:41 b:44
+delivery     a:151 b:174
+query        a:119 b:133
+codemap      a:120 b:134
+atlas        a:MISSING b:20
+closure      a:170 b:184
+rater        a:66 b:82
+library      a:62 b:80
+ceiling      a:109 b:87
+reads        a:50 b:69
+losing       a:223 b:200
+growth       a:116 b:100
+gap26        a:203 b:233
+kittoml      a:40 b:239
+budget       a:194 b:217
+unfold       a:196 b:17
+scout        a:- b:MISSING
+default      a:39 b:-
+mainsession  a:218 b:-
+exit 1
+```
+
+The both-runs probe is the systems record's variant (`build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md`
+`[instrument-agreement]`) with its layer list changed to this record's one subsection,
+`LAYERS = ("project-map",)`. It reads the table clean:
+
+```text
+$ python both_runs_probe_v4_pm.py build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md
+rows read: 19; rows the predicate matched and checked: 18; exempt, their crediting cell re-measured: 0
+findings: 0
+exit 0
+```
+
+On a copy whose owner row cites run A alone, it fails on that row:
+
+```text
+$ python both_runs_probe_v4_pm.py pm-planted.md
+rows read: 19; rows the predicate matched and checked: 18; exempt, their crediting cell re-measured: 0
+[agreement] Owner: credits project-map A, project-map B; no line cited for project-map B
+findings: 1
+exit 1
 ```

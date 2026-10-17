@@ -1781,6 +1781,11 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   the roles that change structure. layer-memory `[views]` and v2 take dated notes, and dispatches 87 and
   88 run the round's one handoff twice (`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md`).
 
+- 2026-10-17, session 1799cb98: dispatches 87 and 88 returned, filed verbatim with their instruments.
+  The project-map record gains `[agreement]`, `[cross]` and `[design]`. Both runs pick a tiered map in
+  core memory, about 13 to 14 KB today, and both re-rate the audit's sort, agreeing on 49 and 50 of its
+  52. Forks PM-4 to PM-7 go to the owner.
+
 ## Instruments
 
 ### The gap-ownership join
