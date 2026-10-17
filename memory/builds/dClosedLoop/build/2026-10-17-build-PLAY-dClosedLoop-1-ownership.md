@@ -924,3 +924,47 @@ print(f"every node has exactly one owner, and every owner is a chain build: yes 
 unowned_builds = sorted(chain - set(by_owner))
 print(f"chain builds that own no node: {', '.join(unowned_builds) or 'none'}")
 ```
+
+## [answers] The owner's answer, 2026-10-17
+
+The owner chose, verbatim: "Approve as proposed (Recommended)". All 351 owners land as proposed, the 47 flagged rows among them.
+The answer is structural, so it adds no policy key.
+
+## [folded] What landed
+
+- **The owner fields:**
+  - flow-steps' nine item tables gain an `Owner` column, 81 rows, and `[rules]` says so;
+  - v2's catalogue gains an `Owner` column, 187 rows, under a revision note;
+  - layer-runtime `[extend]` gains an `Owner` column, 10 rows;
+  - the systems record's Owners bullet declares the seven namespaces dOrderedCharter registers;
+  - layer-memory `[contract]` gains the record-kind table, 41 rows.
+- **The generator reads the declared fields only** (`build/2026-10-17-build-PLAY-dClosedLoop-1-map.py`):
+  - an item's owner from its `Owner` column, a key's from the catalogue's, a point's from `[extend]`'s, a
+    record kind's from layer-memory's table, and a namespace's from the Owners bullet. The stage rule,
+    the point literal and the namespace default are gone;
+  - a step's and a policy namespace's owners are derived from their members, so the breakpoint reads
+    `owner=dCalibratedLens,dFairHearing`;
+  - the owner check covers the six kinds: exactly one owner each, a chain build, read from a declared
+    field. A missing owner renders `owner=?` and the header counts it as `unowned`;
+  - record kinds have an extractor at last, so no namespace is unarmed, and the map exits 0.
+- **The atlas** carries each item's and each key's owner. **The preset check** reads the catalogue's five
+  columns, and still reads 192 keys, 182 presettable and 182 preset rows.
+
+```text
+$ python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --check
+map: 2066 nodes in 30 namespaces; 27770 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1372, derived 243, pending 451
+rc 0
+$ python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --check --plant <case>, for each case
+orphan: FINDING owner: item.entry.intake names no owning build rc 1
+two-owners: FINDING owner: policy-key.preset names 2 owning builds rc 1
+inferred: FINDING no inference: point.actor-kinds's owner comes from no declared field rc 1
+no-owner: FINDING owner: tag-namespace.reader names no owning build rc 1
+drop-line: FINDING complete: layer has nodes on no line and in no count: ['instruction'] rc 1
+bad-count: FINDING count: item.* counts 82, the table holds 81 rc 1
+ghost-rel: FINDING resolves: chain.dOrderedCharter names owner=dGhostBuild, which resolves nowhere rc 1
+census: FINDING census: tools/newkit/kit.toml is on disk with no kit node rc 1
+```
+
+- **The other instruments hold:** the role matrix reads 81 of 81 items with 0 findings, the gap join is
+  clean, the table-shape check finds only its 2 known rows, and the atlas derives 137 records.

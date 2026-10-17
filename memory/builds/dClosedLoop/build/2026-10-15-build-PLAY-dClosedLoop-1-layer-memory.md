@@ -380,6 +380,54 @@ set. The kinds sort by P28:
   index stays with the map and drift-audit, and the core reads `gov:feature` anchors by a one-marker
   scan (LB-4, layer-library `[placements]`).
 
+**Each kind's owner** (revised 2026-10-17, PM-8 and PM-10,
+`build/2026-10-17-build-PLAY-dClosedLoop-1-ownership.md`): the build of its writer. The list is not closed: a
+layer that registers a kind adds its row.
+
+| Kind | Owner | Its writer, or what names it |
+|---|---|---|
+| intake | dWellOiledMachine | its writer is `entry.intake`'s hook (PM-9); dRankedPlan's row also describes that hook, which the re-cut reconciles |
+| card | dDeclaredLoop | the build's orientation card at level 1, its stores and snapshot |
+| plan | dRankedPlan | its writer is `plan.record` |
+| dupes | dRankedPlan | its writer is `plan.dedupe` |
+| seams | dIndexedDesign | its writer is `design.seams` |
+| feature design | dIndexedDesign | its writer is `design.decompose` |
+| spec | dIndexedDesign | its writer is `design.unit-spec`; the spec redesigned as a structured, tagged contract |
+| fork | dIndexedDesign | a flow record kind (layer-memory `[decisions]`); fork resolution by `design.forks` is dIndexedDesign's, though forks arise in every step |
+| acceptance | dScopedBuild | its writer is `build.acceptance` |
+| scope | dScopedBuild | its writer is `build.scope` |
+| verdict | dWitnessedBar | its writer is `test.verdict` |
+| attribution | dWitnessedBar | its writer is `test.attribute` |
+| flake | dWitnessedBar | its writer is `test.flakes`; flake quarantine |
+| landing | dShippedRelease | the landing record; its writer is `deploy.record` |
+| transition | dDeclaredLoop | the transition record three ways; every step's exit item writes it |
+| lease | dDeclaredLoop | dDeclaredLoop's row builds the one lease grammar; layer-memory lists the lease among Runtime's kinds |
+| mailbox message | dDeclaredLoop | dDeclaredLoop's row builds the mailbox and its message kinds; layer-memory lists it among Runtime's kinds |
+| return | dWellOiledMachine | the persisted-return store, keyed per spawn site |
+| act | dWellOiledMachine | one act session per role act; act binding and the epoch check |
+| session binding | dWellOiledMachine | sessions bound on every source |
+| journal | dWellOiledMachine | the journal grammar moved into the core |
+| run record | dWellOiledMachine | `RUN.md` belongs to the unattended run, which the supervisor executes; observability's `observability.run-record` reads it |
+| work order | dBoundRoles | the work order rendered per item |
+| review | dFairHearing | its writer is `review.report`, the harness's, under the proposal for the breakpoint's items |
+| research return | dTotalRecall | the research view over the research-return kind and its dated backfill; `plan.research` and `design.research` write it |
+| design record | dTotalRecall | a core memory kind with no writer item; the memory contract declares it |
+| ask | dTotalRecall | the ask kind's acceptance at filing |
+| backlog row | dTotalRecall | the ask register's row store; the memory contract declares it |
+| decision | dTotalRecall | decisions split by kind, the major-decision log |
+| gotcha | dTotalRecall | gotchas handed by write set |
+| dossier | dTotalRecall | dossiers anchored to symbol keys |
+| symbols | dTotalRecall | the caller map |
+| callers | dTotalRecall | the caller map |
+| annotation index | dTotalRecall | the generated annotation index and its resolve check |
+| recall index | dTotalRecall | memory-recall narrowed to a record finder |
+| baseline | dTotalRecall | retrofit's `baseline` and `census` record kinds |
+| census | dTotalRecall | retrofit's `baseline` and `census` record kinds; `adopt.census` writes it |
+| ruling | dTotalRecall | `adopt.practices` writes the ruling records, an item dTotalRecall owns |
+| shape-run | dTotalRecall | the shape-run kind |
+| maintenance record | dTendedCadence | the maintenance record |
+| lexicon declaration | dMindYourWords | layer-memory lists the lexicon as an optional component's kind; dMindYourWords builds the declaration and its packs |
+
 **One refinement to layers round one,** for research records and major decisions alike. Core items
 write them (`plan.research`, `design.research`, and each build's decisions as it makes them), so their
 kinds are core. Knowledge holds the consulting: memory-recall over decisions, and the research library

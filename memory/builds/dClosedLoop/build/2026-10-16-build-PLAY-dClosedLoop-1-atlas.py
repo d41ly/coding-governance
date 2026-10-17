@@ -292,7 +292,8 @@ def derive():
                 sys.exit(f"atlas: [{tag}] has an item tag the pattern cannot read: {r[0]!r}")
             head = re.split(r"[,:(]", r[1], maxsplit=1)[0].strip().lower()
             items.append({"tag": plain(r[0]), "actor": r[1], "kind": head if head in KINDS else "role",
-                          "role": "" if head in KINDS else head, "needs": r[2], "does": r[3], "proof": r[4], "then": r[5]})
+                          "role": "" if head in KINDS else head, "needs": r[2], "does": r[3], "proof": r[4], "then": r[5],
+                          "owner": r[6] if len(r) > 6 else ""})
             all_tags.add(plain(r[0]))
         pol = re.search(r"the policies: (.+?)\.\n", block)
         steps.append({"tag": tag, "title": title.split("]")[-1].strip(), "enters": paragraph(block, "**Enters**"),
@@ -346,7 +347,8 @@ def derive():
         sys.exit(f"atlas: chain owns gaps the register lacks: {phantom}")
 
     _, pol = section(v2, "policies")
-    policies = [{"key": plain(r[0]), "values": r[1], "default": r[2], "source": r[3]} for r in table(pol, "Key", "v2 [policies]")]
+    policies = [{"key": plain(r[0]), "values": r[1], "default": r[2], "source": r[3], "owner": r[4] if len(r) > 4 else ""}
+                for r in table(pol, "Key", "v2 [policies]")]
     _, pre = section(v2, "presets")
     head = next(h for h, _ in tables(pre) if h[0] == "Key")
     names = [re.sub(r"\s*\(default\)", "", h) for h in head[1:]]

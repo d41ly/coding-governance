@@ -1856,6 +1856,11 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   - Step 2: PM-10's ownership table proposes an owner for all 351 nodes, with its evidence, and flags 47
     for the owner's eye (`build/2026-10-17-build-PLAY-dClosedLoop-1-ownership.md`).
 
+- 2026-10-17, session 1799cb98: the owner answered PM-10, verbatim, "Approve as proposed (Recommended)"
+  - The owner fields landed in flow-steps, v2's catalogue, layer-runtime `[extend]`, the systems record
+    and layer-memory `[contract]`: 351 nodes, each owned by one chain build
+    (`build/2026-10-17-build-PLAY-dClosedLoop-1-ownership.md` `[folded]`).
+
 ## Instruments
 
 ### The gap-ownership join

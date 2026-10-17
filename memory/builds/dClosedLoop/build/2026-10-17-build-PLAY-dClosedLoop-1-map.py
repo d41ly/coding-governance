@@ -8,6 +8,8 @@ Usage:
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --ns <namespace>   print one namespace whole (level 1)
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --check            derive and check; write nothing
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --check --plant <case>   damage the render, expect exit 1
+      cases: drop-line, bad-count, ghost-rel, census, no-owner, orphan (an item's owner emptied), two-owners,
+      inferred (a point's owner kept with its declaration dropped)
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --pending          list the nodes whose purpose waits on the owner
   --unfold <ns>[,<ns>...] renders those namespaces node by node, as an item's declared unfolds would.
 
@@ -32,6 +34,10 @@ BUDGET = 32 * 1024          # memory.map-budget, 32k (PM-4)
 PURPOSE, PURPOSE_DEGRADED = 60, 40
 FOLD_PAST = 40              # a namespace whose registry row says neither line nor fold folds past 40 nodes
 SPLIT = " · "
+# The nodes a build must build, each owning build declared once on the node (PM-8, PM-10). An owner is read only
+# from a declared field, and the extractor that reads it records the node in DECLARED: the no-inference check.
+OWNED = ("item", "policy-key", "point", "record-kind", "tag-namespace", "system")
+DECLARED = set()
 
 spec = importlib.util.spec_from_file_location("atlas", HERE / "2026-10-16-build-PLAY-dClosedLoop-1-atlas.py")
 atlas = importlib.util.module_from_spec(spec)
@@ -88,8 +94,8 @@ def first_comment(path):
 def derive():
     A = atlas.derive()
     ns = {}
+    DECLARED.clear()
     chain_names = {c["build"] for c in A["chain"]}
-    stage_owner = {c["stage"]: c["build"] for c in A["chain"]}
 
     kits_by_layer = {}
     for k in A["kits"]:
@@ -104,6 +110,8 @@ def derive():
     for m in re.finditer(r"^### \[design-([a-z-]+)\] ([^\n]+)\n(.*?)(?=^### |\Z)", sdesign, flags=re.M | re.S):
         owner = re.search(r"\*\*Owners\.\*\*.*?\b(d[A-Z][a-z]+[A-Z]\w+)", m.group(3), flags=re.S)
         keys = len(re.findall(r"^\s*\| `[a-z]+\.[a-z0-9.-]+` \|", m.group(3), flags=re.M))
+        if owner:
+            DECLARED.add(("system", m.group(1)))
         systems.append(node(m.group(1), m.group(2), counts=[("keys", keys or None)],
                             rels=[("owner", [owner.group(1)] if owner else [])]))
     for name, rel, own_from in (("retrofit", "2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md", "owners"),
@@ -113,6 +121,8 @@ def derive():
         purpose = h1.split(": ", 1)[1] if ": " in h1 else h1
         own = re.search(r"\| (d[A-Z]\w+) \|" if own_from == "owners" else r"chain build (d[A-Z]\w+)", body.split(f"[{own_from}]", 1)[1])
         keys = len(re.findall(r"^\| `[a-z]+\.[a-z0-9.-]+` \|", section(body, "design")[1] if "## [design]" in body else "", flags=re.M))
+        if own:
+            DECLARED.add(("system", name))
         systems.append(node(name, purpose, counts=[("keys", keys or None)], rels=[("owner", [own.group(1)] if own else [])]))
     ns["system"] = systems
 
@@ -121,18 +131,22 @@ def derive():
                         rels=[("after", [p for p in c["parents"] if p in chain_names])]) for c in A["chain"]]
 
     # Steps and items read straight from flow-steps: every section whose table opens with "Item".
+    # An item's owner is its table's Owner column; a step's owners are its items' owners, derived (PM-8).
     steps_text = text("memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
-    step_stage = {"plan": "Plan", "design": "Design", "build": "Build", "test": "Test", "deploy": "Deploy", "breakpoint": "Review"}
     steps, items = [], []
     for m in re.finditer(r"^## \[([a-z-]+)\] ([^\n]+)\n(.*?)(?=^## |\Z)", steps_text, flags=re.M | re.S):
         rows = [atlas.cells(ln) for ln in m.group(3).split("\n") if ln.startswith("| `")]
         heads = [h for h, _ in atlas.tables(m.group(3)) if h and h[0] == "Item"]
         if not heads:
             continue
+        owners = []
         for r in rows:
-            items.append(node(atlas.plain(r[0]), r[3], rels=[("owner", [m.group(1)])]))
-        steps.append(node(m.group(1), m.group(2), counts=[("items", len(rows))],
-                          rels=[("owner", [stage_owner[step_stage[m.group(1)]]] if m.group(1) in step_stage else [])]))
+            own = r[6].strip() if len(r) > 6 else ""
+            if own:
+                DECLARED.add(("item", atlas.plain(r[0])))
+                owners.append(own)
+            items.append(node(atlas.plain(r[0]), r[3], rels=[("owner", [own] if own else [])]))
+        steps.append(node(m.group(1), m.group(2), counts=[("items", len(rows))], rels=[("owner", sorted(set(owners)))]))
     ns["step"] = steps
 
     agents = {}
@@ -205,8 +219,13 @@ def derive():
 
     rt = text("memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md")
     ext = rt.split("### [extend]", 1)[1]
-    ns["point"] = [node(atlas.slug(r[0]), r[1], rels=[("owner", ["dWellOiledMachine"])])
-                   for r in atlas.table(ext.split("\n### ", 1)[0], "Extension point", "layer-runtime [extend]")]
+    points = []
+    for r in atlas.table(ext.split("\n### ", 1)[0], "Extension point", "layer-runtime [extend]"):
+        own = r[3].strip() if len(r) > 3 else ""
+        if own:
+            DECLARED.add(("point", atlas.slug(r[0])))
+        points.append(node(atlas.slug(r[0]), r[1], rels=[("owner", [own] if own else [])]))
+    ns["point"] = points
 
     settings = json.loads(text(".claude/settings.json"))
     entries = []
@@ -225,17 +244,24 @@ def derive():
         hooks.append(node(f"git.{g}", first_comment(REPO / ".githooks" / g), src="derived"))
     ns["hook"] = hooks
 
-    ns["record-kind"] = None   # registered, with no extractor yet: the memory contract's kind registry is designed, not built
+    # The record kinds: layer-memory [contract]'s table, the design-time stand-in for the kind registry (PM-10).
+    lm = text("memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+    contract = lm.split("### [contract]", 1)[1].split("\n### ", 1)[0]
+    kinds = []
+    for r in atlas.table(contract, "Kind", "layer-memory [contract]"):
+        own = r[1].strip()
+        if own:
+            DECLARED.add(("record-kind", atlas.slug(r[0])))
+        kinds.append(node(atlas.slug(r[0]), "", rels=[("owner", [own] if own else [])]))
+    ns["record-kind"] = kinds
 
     tags_text = sdesign.split("### [design-tags]", 1)[1].split("\n### ", 1)[0]
     v2 = text("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
     rb = re.search(r"namespaced tag system \(([a-z, ]+)\)", v2)
     plus = re.search(r"\*\*Namespaces\.\*\* R-B's twelve, plus (.+?)\. Each namespace", tags_text, flags=re.S)
     names = [n.strip() for n in rb.group(1).split(",")] + re.findall(r"`([a-z]+)`", plus.group(1))
-    # The Owners bullet opens with the namespace system's own chain build; a namespace no later line assigns
-    # is that build's.
-    default = re.search(r"\*\*Owners\.\*\*[^\n]*?chain build (d[A-Z]\w+)", tags_text)
-    owner_of = {n: default.group(1) for n in []} if not default else {}
+    # Each namespace's owner is declared on one of the Owners bullet's lines; none is defaulted (PM-8).
+    owner_of = {}
     for m in re.finditer(r"^  - (d[A-Z]\w+)(?: registers)? (.+?)[;.]$", tags_text, flags=re.M):
         for t in re.findall(r"`([a-z]+)`", m.group(2)):
             owner_of[t] = m.group(1)
@@ -244,14 +270,21 @@ def derive():
         if n in seen:
             continue
         seen.add(n)
-        own = owner_of.get(n) or (default.group(1) if default else "")
+        own = owner_of.get(n, "")
+        if own:
+            DECLARED.add(("tag-namespace", n))
         tagns.append(node(n, "", rels=[("owner", [own] if own else [])]))
     ns["tag-namespace"] = tagns
 
-    pol_ns = {}
+    # A policy namespace's owners are its keys' owners, derived.
+    pol_ns, pol_own = {}, {}
     for p in A["policies"]:
-        pol_ns[p["key"].split(".", 1)[0]] = pol_ns.get(p["key"].split(".", 1)[0], 0) + 1
-    ns["policy-namespace"] = [node(k, "", counts=[("keys", v)]) for k, v in sorted(pol_ns.items())]
+        k = p["key"].split(".", 1)[0]
+        pol_ns[k] = pol_ns.get(k, 0) + 1
+        if p.get("owner"):
+            pol_own.setdefault(k, set()).add(p["owner"])
+    ns["policy-namespace"] = [node(k, "", counts=[("keys", v)], rels=[("owner", sorted(pol_own.get(k, ())))])
+                              for k, v in sorted(pol_ns.items())]
 
     area_title = {}
     for a in atlas.AREAS:
@@ -279,7 +312,13 @@ def derive():
 
     # The unbounded namespaces: each folds to one counted line, and --ns lists it whole.
     ns["item"] = items
-    ns["policy-key"] = [node(p["key"], p["values"], src="derived", rels=[]) for p in A["policies"]]
+    pkeys = []
+    for p in A["policies"]:
+        own = p.get("owner", "")
+        if own:
+            DECLARED.add(("policy-key", p["key"]))
+        pkeys.append(node(p["key"], p["values"], src="derived", rels=[("owner", [own] if own else [])]))
+    ns["policy-key"] = pkeys
     ns["gap"] = [node(g["id"], g["gap"], rels=[("owner", [g["owner"]])]) for g in A["gaps"]]
     legs = json.loads(text("tools/gate-legs.json"))
     ns["leg"] = [node(l["name"], l.get("doc", "") or "") for l in legs]
@@ -340,7 +379,11 @@ REGISTRY = [
     ("closed-build", "fold"), ("decision-row", "fold"), ("design-record", "fold"), ("review", "fold"),
     ("decision-section", "fold"), ("event", "fold"), ("population", "fold"), ("marker", "fold"), ("conf-key", "fold"),
 ]
-REL_NS = {"after": "chain", "owner": None, "layer": "layer"}
+REL_NS = {"after": "chain", "owner": "chain", "layer": "layer"}
+
+
+def unowned(ns):
+    return [(name, n["key"]) for name in OWNED for n in (ns.get(name) or []) if not any(k == "owner" for k, _ in n["rels"])]
 
 
 # ------------------------------------------------------------------------------------------------- rendering
@@ -348,8 +391,11 @@ def line(ns, n, width):
     parts = [f"- {ns}.{n['key']} — {cut(n['purpose'], width) if n['purpose'] else '—'}"]
     if n["counts"]:
         parts.append(", ".join(f"{k} {v}" for k, v in n["counts"]))
-    if n["rels"]:
-        parts.append(" ".join(f"{k}={','.join(v)}" for k, v in n["rels"]))
+    rels = list(n["rels"])
+    if ns in OWNED and not any(k == "owner" for k, _ in rels):
+        rels.append(("owner", ["?"]))   # a required field that is missing renders ?, never a blank
+    if rels:
+        parts.append(" ".join(f"{k}={','.join(v)}" for k, v in rels))
     return SPLIT.join(parts)
 
 
@@ -372,6 +418,8 @@ def render(ns, unfold=(), width=PURPOSE, folded_extra=()):
     pending = sum(1 for name, _ in REGISTRY if ns.get(name) for n in ns[name] if not n["purpose"] and name not in folded)
     head = (f"map {tree}{' dirty' if dirty else ''} · nodes {sum(len(v) for v in ns.values() if v)} · lines "
             f"{sum(1 for b in body if b)} · folded {','.join(folded) or 'none'} · pending {pending}")
+    if unowned(ns):
+        head += f" · unowned {len(unowned(ns))}"
     if unarmed:
         head += f" · unarmed {','.join(unarmed)}"
     if width != PURPOSE:
@@ -409,7 +457,10 @@ def census():
     reg = text("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
     pol = v2.split("\n## [policies]", 1)[1].split("\n## ", 1)[0]
     ch = v2.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+    lm = text("memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+    contract = lm.split("\n### [contract]", 1)[1].split("\n### ", 1)[0]
     return {
+        "record-kind": len(re.findall(r"(?m)^\| [a-z][a-z -]* \| d[A-Z]\w+ \| ", contract)),
         "principle": len(re.findall(r"(?m)^- \*\*P\d+ ", v2)),
         "chain": len(re.findall(r"(?m)^\| d[A-Z]", ch)),
         "item": len(re.findall(r"(?m)^\| `[a-z]+\.[a-z0-9-]+` \|", steps)),
@@ -454,9 +505,9 @@ def check(A, ns, out, folded, plant=None):
         seen.setdefault(m.group(1), set()).add(m.group(2))
         for rel in re.findall(r"\b(after|owner|layer)=([^\s·]+)", m.group(3)):
             for target in rel[1].split(","):
-                pool = ({n["key"] for n in ns["chain"]} if REL_NS[rel[0]] == "chain" else
-                        {n["key"] for n in ns["layer"]} if REL_NS[rel[0]] == "layer" else
-                        {n["key"] for n in ns["chain"]} | {n["key"] for n in ns["step"]})
+                if target == "?":
+                    continue   # a missing owner: the owner check below reports it
+                pool = {n["key"] for n in ns[REL_NS[rel[0]]]}
                 if target not in pool:
                     findings.append(f"resolves: {m.group(1)}.{m.group(2)} names {rel[0]}={target}, which resolves nowhere")
     for name, _ in REGISTRY:
@@ -475,7 +526,8 @@ def check(A, ns, out, folded, plant=None):
     c = census()
     if plant == "census":
         c["kit-dirs"] = c["kit-dirs"] + ["newkit"]
-    for name in ("principle", "chain", "item", "gap", "policy-key", "leg", "bug-class", "feature", "live-build", "hook", "decision-row"):
+    for name in ("principle", "chain", "item", "gap", "policy-key", "leg", "bug-class", "feature", "live-build", "hook",
+                 "decision-row", "record-kind"):
         if c[name] != len(ns[name]):
             findings.append(f"census: {name} counts {c[name]} on disk, the map holds {len(ns[name])}")
     for k in c["kit-dirs"]:
@@ -492,11 +544,19 @@ def check(A, ns, out, folded, plant=None):
                             f"in the atlas and not on the map {sorted(a_set - m_set)[:6]}")
     if any(re.search(r"\b20\d\d-\d\d-\d\d\b", ln) for ln in lines[2:]):
         findings.append("no stale facts: a line holds a date")
-    # Owner and extractor: every namespace of the design's tag registry, and every system, names its owner.
-    for name in ("tag-namespace", "system"):
-        for n in ns[name]:
-            if not any(k == "owner" and v for k, v in n["rels"]):
+    # Owner: every node a build must build names exactly one chain build, read from a declared field (PM-8).
+    chain = {n["key"] for n in ns["chain"]}
+    for name in OWNED:
+        for n in ns.get(name) or []:
+            owners = [v for k, vs in n["rels"] if k == "owner" for v in vs]
+            if not owners:
                 findings.append(f"owner: {name}.{n['key']} names no owning build")
+            elif len(owners) > 1:
+                findings.append(f"owner: {name}.{n['key']} names {len(owners)} owning builds")
+            elif owners[0] not in chain:
+                findings.append(f"owner: {name}.{n['key']} names {owners[0]}, which is no chain build")
+            elif (name, n["key"]) not in DECLARED:
+                findings.append(f"no inference: {name}.{n['key']}'s owner comes from no declared field")
     return findings
 
 
@@ -523,6 +583,12 @@ def main(argv):
     plant = argv[argv.index("--plant") + 1] if "--plant" in argv else None
     if plant == "no-owner":
         ns["tag-namespace"][0]["rels"] = []
+    elif plant == "orphan":
+        ns["item"][0]["rels"] = []
+    elif plant == "two-owners":
+        ns["policy-key"][0]["rels"] = [("owner", ["dDeclaredLoop", "dTotalRecall"])]
+    elif plant == "inferred":
+        DECLARED.discard(("point", ns["point"][0]["key"]))
     findings = check(A, ns, out, folded, plant)
     size = len(out.encode("utf-8"))
     src = {}

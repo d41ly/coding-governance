@@ -404,6 +404,15 @@ Revised: 2026-10-17, after the project map's findings and the owner's PM-8 to PM
 - the owner fields land as columns in flow-steps and the catalogue once the owner approves the
   proposed table (PM-10).
 
+Revised: 2026-10-17, after the owner approved PM-10's
+ownership table (`build/2026-10-17-build-PLAY-dClosedLoop-1-ownership.md` `[answers]`):
+- every node a build must build declares its owning build: the catalogue's rows in its `Owner` column, the
+  items in flow-steps', the points in layer-runtime `[extend]`'s, the tag namespaces in the systems
+  record's Owners bullet, and the record kinds in layer-memory `[contract]`'s table;
+- 351 nodes, each owned by exactly one chain build. dConvergedCharter owns none of them, and owns its 7
+  gaps;
+- the re-cut reconciles the chain rows with them.
+
 Revised: 2026-10-17, after the folds' closing review (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`):
 - dTotalRecall's row gains the shared extraction primitive, the research-return backfill and the
   `adopt` program, whose keys had no reader on any row;
@@ -647,195 +656,195 @@ Rendered text uses the one term "level" throughout.
 Every key lives in `.governance/policy.toml` (walk S2), validated by the loop kit's schema, read
 through one reader, mirrored to JSON for the hooks, and rendered into the charter.
 
-| Key | Allowed values | Default | Source |
-|---|---|---|---|
-| `preset` | velocity, standard, strict, guarded, or a repo-declared preset | standard | owner directive after the walk-through; `autonomous` renamed `guarded`, flow FL-D0 |
-| `charter.override` | explicit-override, live-owner-wins, absolute | explicit-override | foundations F1-1 |
-| `charter.practices` | a set of catalogue or repo-declared practices | the governance foundation set | foundations F1-3 |
-| `core.bypass` | with-hooks-report, with-hooks-block, never | with-hooks-report | foundations K1 |
-| `core.exceptions` | any-session-recorded, owner-only-expiring, none | any-session-recorded | foundations K4 |
-| `design.forks` | agents-feature-rich-expandable, preference-forks-park, owner-decides-all | agents-feature-rich-expandable | flow FL-D3 |
-| `design.reentry` | any subset of interface-change, two-plus-units, review-cross-unit-flaw, planner-or-owner-flag | interface-change, review-cross-unit-flaw, planner-or-owner-flag | flow FL-D5 |
-| `autonomy` | plan-only, three-gates, every-stage | plan-only | R1.4, superseded by flow FL-P6 |
-| `policy.guard` | owner-only, agents-with-reason, agents-within-mandate | owner-only | R4.2 |
-| `policy.proof` | tty-cli, signed, both | tty-cli | walk S3 |
-| `floor` | each of the four invariants, on or off, under the guard | all on | R5.1 |
-| `hooks.bypass` | allowed, refused | allowed | R5.1 |
-| `transitions.record` | any subset of trailer, log, micro-format | all three | walk S4 |
-| `leases` | warn, refuse | warn | R2.2 |
-| `leases.granularity` | build-and-unit, build, unit | build-and-unit | walk C1 |
-| `leases.renewal` | activity, fixed, none | activity | walk C2 |
-| `leases.expiry-hours` | hours | 24 | walk C2 |
-| `leases.overlap` | kit-dirs, files, builds | kit-dirs | walk C3 |
-| `leases.offline` | warn, refuse, follow-leases | warn | walk C4 |
-| `deps.coordination` | message-then-progress, wait-for-landing, order-only | message-then-progress | flow interactions FI-2 |
-| `deps.early-build` | confirmed-interfaces, design-only, anything-coordinated | confirmed-interfaces | flow interactions FI-5 |
-| `deps.messaging` | live-and-mailbox, live-only, mailbox-only | live-and-mailbox | flow interactions FI-6 |
-| `landing.order` | plan-priority-then-first-verified, first-verified, owner-orders | plan-priority-then-first-verified | flow interactions FI-7 |
-| `card.follows` | re-render-at-transition, card-per-step, fixed-at-start | re-render-at-transition | flow interactions FI-8 |
-| `placement` | agent-places, declared-checked, owner-places | agent-places | orientation OR-1 |
-| `placement.check` | refuse, record | refuse | orientation OR-6 |
-| `kickoff.runs` | no-ready-card, opening-a-build, every-session, plan-absorbs | no-ready-card | orientation OR-2 |
-| `card.store` | any subset of remote-ref, build-folder, local-clone | all three | orientation OR-5 |
-| `card.snapshot` | terminal-only, every-transition | terminal-only | orientation OR-5, the adopted research |
-| `actions.free` | read-only-probes, item-reads-only, recorded-anything | read-only-probes | orientation OR-3 |
-| `resume.partial` | continue-item, restart-item, ask-owner | continue-item | orientation OR-4 |
-| `resume.context` | fresh-when-idle, always-resume, always-fresh | fresh-when-idle | orientation OR-7 |
-| `orient.budget` | record-only, warn-at-evidence-ceiling, owner-ceiling | record-only | orientation OR-8 |
-| `driver.reads` | none-scout-only, state-reads-only, read-only-probes | state-reads-only | roles RL-5 |
-| `prompts.author` | prompt-writer, requesting-worker-rendered | prompt-writer | roles RL-4 |
-| `roles.retries` | a retry count | 3 | roles RL-7 |
-| `roles.no-spawn` | executor-role-session, recorded-stand-in, refuse | executor-role-session | roles RL-8 |
-| `roles.trust` | keyed, witnessed-only | keyed | roles layer F3-1 |
-| `roles.answered-calls` | refuse, warn, record | refuse | roles layer F3-2 |
-| `roles.verifier-context` | cold, warm | cold | roles layer F3-3 |
-| `roles.on-contradiction` | repair-and-record, return, ask | repair-and-record | roles layer F3-4: the owner's answer over the recommended `return` |
-| `reuse.delivery` | rendered, on-demand | rendered | memory layer F4-1: reuse entries rendered into work orders when a build's needs match |
-| `reuse.propose` | new-seam, every-unit, owner-asks | new-seam | the library round's LB-2: which units close with a reuse line |
-| `annotations.grammar` | voluntary, required, pushed-at-read | voluntary | memory layer F4-2; the systems round's AN-2: `pushed-at-read` fires on shell reads as well as Read; under `voluntary`, retrofit's drain checks a note's shape only where a unit writes one |
-| `builds.agent-root` | work-order, readme | work-order | memory layer F4-5 |
-| `asks.acceptance` | refuse, grade | refuse | memory layer F4-6 |
-| `decisions.major` | author-rubric, author-owner-ratifies, owner-only | author-rubric | the library round's LB-3: who declares a decision major, for the log |
-| `builds.slug-words` | a word range | 1-3 | memory layer, the owner's words |
-| `builds.slug-style` | humorous, descriptive | humorous | memory layer, the owner's words: humorous ids are a foundation |
-| `builds.slug-date` | none, shown, in-slug | none | memory layer F4-7 |
-| `lexicon.pin` | shrink-only, absorb, no-gate | shrink-only | memory layer F4-8 |
-| `lexicon.forced` | verified, by-name, by-annotation | verified | lexicon review L-1: forced names recognised by what forces them |
-| `lexicon.at-commit` | refuse, warn, off | refuse | lexicon review L-2 |
-| `lexicon.drift` | refuse-new, report, off | refuse-new | lexicon review L-3 |
-| `lexicon.packs` | detected-and-declared, detected, declared, all | detected-and-declared | lexicon review L-5: the owner's answer, custom packs included |
-| `review.opt-in` | none, or a set of named lenses, each replacing a named default lens of its preset | none | review system R-1: the owner's answer, "Both" |
-| `runtime.spawn-backend` | in-session, headless, or a registered spawn backend | in-session | runtime `[spawn]`; the spike decides the default for single-agent acts |
-| `runtime.relaunch` | fresh, resume | fresh | runtime `[supervise]` |
-| `runtime.act-ceiling` | hours | 1.5 | runtime `[supervise]` |
-| `runtime.hold-ceiling` | hours | 6 | runtime `[supervise]` |
-| `runtime.hook-failure` | closed, open | closed | runtime `[enforce]` |
-| `runtime.attended-judge` | classifier-or-person, allowance, person | classifier-or-person | runtime `[act]`; the owner's RT-4: "Classifier or you (Recommended)" |
-| `runtime.attended-allowance` | a set of named tools and command patterns, read under `allowance` | none | runtime `[act]`, RT-4 |
-| `runtime.harnesses` | a set of named harness adapters | claude-code | runtime `[harness]` |
-| `runtime.journal` | days, or all | 60 | the expansion round: the journal's retention, bounded by `[presets]`' pair rule while observability is installed |
-| `runtime.secret-home` | os-keychain, env-injected | os-keychain | the expansion round, as `integrations.secret-home`; Runtime's since its review, as the grant's home: a CI-hosted adapter reads the CI store |
-| `runtime.secret-scan` | value-gate, value-gate+shape-report | value-gate+shape-report | the expansion round, as `integrations.secret-scan`; Runtime's since its review: a shape scan alone reds on fixtures |
-| `plan.ratification` | request, hook-keyword, terminal-command, signed-commit | request | flow-roles FR-1 |
-| `run.host` | requesting-node, os-scheduler, cloud-routine, or another registered host | requesting-node | flow-roles FR-2 |
-| `notify.owner` | turn-micro-formats, park-and-landing, every-transition, park-only | turn-micro-formats | flow-roles FR-3 |
-| `notify.channel` | terminal, or another registered channel | terminal | the expansion round: integrations' notification adapters |
-| `run.on-owner-question` | best-effort-recorded, park-item, park-build, stop-run | best-effort-recorded | flow-roles FR-4, FR-12 |
-| `deps.landing` | hold-until-parent-lands, test-decides | hold-until-parent-lands | flow-roles FR-7 |
-| `mailbox.reads` | every-item, transitions-only, every-item-amendments-at-transitions | every-item | flow-roles FR-8 |
-| `review.follow-up` | after-high, while-finding, never | after-high | flow-roles FR-9 |
-| `prompts.batch` | per-batch, per-task | per-batch | flow-roles FR-10 |
-| `context.on-full` | compact-with-card, fresh-at-boundary | fresh-at-boundary | compaction CX-1; runtime RT-1 |
-| `context.threshold` | a share of the window | 60% | compaction CX-1; read only under `fresh-at-boundary` |
-| `card.pointers` | every-item, at-transitions | every-item | compaction CX-1, the owner's addition |
-| `notices.record` | none, security-and-failures, all | none | compaction CX-2 |
-| `instructions.checks` | refuse, warn, record | refuse | layers round one, the owner's "enforced wherever possible" |
-| `instructions.edit` | owner-command-agents-propose, flow-only, command-for-all | owner-command-agents-propose | layers round one, the owner's write path |
-| `instructions.proof` | tty-cli, signed, both | tty-cli | the instruction layer's fold: the instruction command's owner proof, as `policy.proof` |
-| `review.breakpoints` | a set of named item boundaries | none | layers round two: breakpoints beyond those `review.<stage>` and `autonomy` declare |
-| `deps.on-parent-withdrawn` | replan, adopt-parent-work, withdraw-too | replan | layers round two |
-| `review.design.rounds` | one, until-no-blocker, until-no-high, until-clean, fixed-count | one | flow steps: the owner's "1 spec review by default" |
-| `review.design.round-count` | a round count | 2 | flow steps; read only under `fixed-count` |
-| `review.unverified` | ask, block, record | ask | flow steps |
-| `review.unclassed` | refuse, reason, owner-rules | refuse | the library round's LB-1: a confirmed finding that fits no class |
-| `flow.route-backs` | a route-back count | 3 | the flow layer's fold: a route back past the count becomes an owner item |
-| `policy.on-missing-expansion` | refuse, fallback-reported | refuse | the owner's LR-4: a value, on a key the core reads, that selects an absent expansion or optional component (KN-1); a key an absent expansion owns is unread |
-| `tests.without-cadence` | run-at-landing, report-unrun, wait-for-expansion | run-at-landing | flow steps: the slower levels when observability's Maintain is not installed |
-| `verdict` | local-hook, peer-node, remote-ci, or another registered backend | local-hook | R1.3, R4.4, R5.2 |
-| `verdict.blocks` | own-mixed-contended, every-red, own-only | own-only | walk T1 |
-| `verdict.held` | peer-or-cadence, push-selected, on-demand | on-demand | walk T2 |
-| `verdict.flakes` | quarantine, record, retry-only; a threshold | quarantine | walk T3 |
-| `tests.product` | declared, declared-with-runners, none | declared-with-runners | walk T4 |
-| `tests.landing-levels` | any subset of unit, integration, e2e, performance | unit, integration | flow FL-T3 |
-| `verdict.tree` | prepared-merge, build-tip | prepared-merge | flow FL-T1 |
-| `verdict.red-route` | fix-pass-or-design, always-new-unit | fix-pass-or-design | flow FL-T2 |
-| `verdict.remote.trust` | pinned-workflow, owner-reviews-workflow-change, app-only | pinned-workflow | the expansion round: a remote verdict's workflow sits in the tree it judges |
-| `verdict.remote.pin-scope` | workflow, dispatch-closure | workflow | the owner's PIN-1: the files the remote verdict's pin covers |
-| `verdict.remote.pin` | the pinned files' blob ids | none, until the owner pins | the expansion round's review: written only by the owner's guarded command |
-| `plan.authority` | planner-drafts-owner-ratifies, planner-within-themes, owner-orders | planner-drafts-owner-ratifies | R2.4 |
-| `plan.unplaced` | warn, refuse-new, review-only | warn | walk P2 |
-| `plan.triage` | owner-batches, rules, archive-legacy | rules | walk P3 |
-| `plan.kickoff` | offer-next, binding, advisory | offer-next | walk P4 |
-| `design.handoff` | derived-ready, ready-plus-audit, status-and-tier | derived-ready | walk D1 |
-| `design.overlap` | warn, refuse, index-only | warn | walk D2 |
-| `build.scope` | warn-and-ask, refuse, report | warn-and-ask | walk B1; it also grades retrofit's touch join |
-| `build.worktree` | per-unit, parallel-only, shared | shared | walk B2 |
-| `deploy.runs` | landing-node, adopter-ci, operator | landing-node | walk DP1 |
-| `deploy.promotion` | owner-approves-prod, auto-on-green, owner-approves-each | auto-on-green | walk DP2 |
-| `deploy.on-verify-fail` | rollback-and-ask, halt-and-alert, roll-forward | roll-forward | walk DP3 |
-| `deploy.currency` | pull-and-watch, push-branches, pull-only | pull-and-watch | walk DP4 |
-| `currency.max-behind` | 0, 1, 2, 4 | 2 | the expansion round: releases behind before an owner item |
-| `currency.on-behind` | note, owner-item, red | owner-item | the expansion round: a red would block an adopter's landings on gov's cadence |
-| `install.from` | release-tag, any-commit | release-tag | the expansion round: the receipt names one release |
-| `build.closes` | at-landing, after-release-verifies, at-landing-maintain-owns | at-landing | flow FL-DP1 |
-| `build.release-hold` | close-only, whole-close | close-only | the owner's RH-1: what waits for the release under `after-release-verifies` |
-| `build.release-ceiling` | hours | 72 | the expansion fold's follow-up round: how long `deploy.released` waits for an exit record before an owner item |
-| `kits.cadence` | every-landing, daily, weekly, owner-cut | weekly | flow FL-DP2, as `release.cadence`, renamed by the expansion round's review so `release.*` stays integrations'; the period is the main loop's choice |
-| `kits.host` | session-start, os-scheduler, cloud-routine, or another registered host | session-start | the expansion round's review: distribution's cadence programs run on a host key of their own |
-| `kits.watch-cadence` | daily, weekly, every-session | daily | the expansion round's review: the period of the currency probe, the fleet reading, and the cut under `kits.cadence: owner-cut` |
-| `release.environments` | an ordered list of registered environments | none | the expansion round: integrations' release program runs for listed environments only |
-| `integrations.tracker` | none, mirror-out | none | the expansion round: the ask backlog is the tracker |
-| `maintain.host` | session-start, os-scheduler, cloud-routine, or another registered host | session-start | walk M1 |
-| `maintain.cadence` | daily, weekly, every-session | daily | walk M2 |
-| `maintain.fixes` | a set of named safe fixes | reap, prune landed, regenerate stale, defer dormant, records-only fixes, close finished run records | R2.3 |
-| `maintain.on-breach` | file-ask, red-leg, report | file-ask | walk M3 |
-| `maintain.events` | any subset of default-branch-red, release-verify-failed, session-start-breach | all three | flow FL-M2 |
-| `maintain.reading-tree` | clean-base, worktree | clean-base | the expansion round: 14 of 108 repeated readings varied with the tree |
-| `maintain.node-readings` | every-node, lease-holder | every-node | the expansion round: a node-scoped reading sees only its node |
-| `maintain.reading-admission` | refuse-unowned, report-unowned | refuse-unowned | the expansion round: 0 of 27 drift signals carry an owner |
-| `maintain.dead-after` | 5, 10, 20 | 10 | the expansion round: drift-report's existing limit |
-| `maintain.record-when` | every-period, on-finding | every-period | the expansion round's EX-3: both values built; renamed by its review, so the item `maintain.record` keeps its name |
-| `observability.run-record` | per-run, on-anomaly, none | per-run | the expansion round |
-| `patch.ratify` | auto, owner | auto | flow FL-M3 |
-| `review.<stage>` | off, opt-in, owed, owed-above-tier | opt-in; Build owed | R2.1 |
-| `review.<stage>.effort` | the role efforts | the role's declared effort | R2.1 |
-| `review.recommendation` | advice, binding, binding-above-tier | advice | R4.3 |
-| `review.build.when` | per-build, per-unit, per-landing | per-build | walk B3 |
-| `review.findings` | blocker-high-own, all-own, blocker-own | blocker-high-own | flow FL-B3 |
-| `review.blocks` | every-review, owed-only, none | every-review | flow FL-R1 |
-| `review.left-shift` | second-occurrence, every-class, owner-selects | second-occurrence | flow FL-R2 |
-| `review.recommendation.source` | scored-signals-and-reasoning, agent-judgment, signals-only | scored-signals-and-reasoning | flow FL-R3 |
-| `review.loop.cadence` | weekly, monthly, every-n-landings | weekly | walk R1 |
-| `review.loop.retire` | propose-ratify, demote-then-propose, report | propose-ratify | walk R2 |
-| `review.loop.window-days` | days | 60 | walk R3 |
-| `review.loop.catch-source` | verdict-records, node-journal | verdict-records | the expansion round: another node cannot see a node's journal |
-| `budgets.*` | each cap's value and its mode, hard or soft | re-derived from evidence | walk R4 |
-| `tags.slice` | leaf, subtree | leaf | the systems round |
-| `tags.retired-cites` | refuse-new, warn, allow | refuse-new | the systems round |
-| `tags.positional` | shrink-only, refuse, report | shrink-only | the systems round |
-| `tags.bare-refs` | charter-only, unique, never | charter-only | the systems round; read by the `resolves` check and the resolver |
-| `annotations.lookup` | query-and-map, query, map-index | query-and-map | the systems round's AN-1: the owner's "both" |
-| `annotations.budget` | refuse, warn, record, each over the blocks a commit touches | refuse | the systems round |
-| `annotations.resolve-scope` | notes, every-comment-ref | every-comment-ref | the systems round |
-| `annotations.delivery` | work-order, on-demand, off | work-order | the systems round |
-| `instructions.slices` | handed, pointer | handed | the systems round |
-| `instructions.legacy` | shrink-only, refuse | shrink-only | the systems round; IW-1 arms the render gate at dOrderedCharter |
-| `instructions.task-charter` | when-not-static, always | when-not-static | the systems round; the single-carry check refuses `always` on a backend that loads the static block, where it carries the charter twice |
-| `review.twin` | never, design-records, design-and-landing, always | never | the systems round's RS-1: twin runs only on the owner's opt-in |
-| `roles.shape-enforce` | refuse, record | refuse | the systems round |
-| `roles.orientation.house-index` | handed, pointer, off | handed | the systems round |
-| `memory.default-load` | card, card-and-live, card-and-map | card-and-map | the systems round; the owner's PM-7, "Card and map (Recommended)": an attended session opens with the card and the map, and an act session loads its work order |
-| `memory.load-budget` | 4k, 8k, 16k | 8k | the systems round; MS-1 holds the auto-memory's remainder to it |
-| `memory.item-budget` | measured, 96 or 128 for every role, or KB per role (each role's cap the owner's to adjust) | measured | the systems round's MS-2, asked a third time: "Measure, then set"; 96 for every role until 30 sliced work orders per role are measured, then each role's own p90, which the Loop Review derives; a KB is 1,000 bytes |
-| `memory.over-budget` | refuse, report, off | report | the systems round's MS-3: the owner's "Report only"; memory slices over the cap are exempt from `instructions.checks`' refusal and roles' route-back (P27) |
-| `memory.project-map` | structural-roles, every-role, owner-only | structural-roles | the project map's PM-1, "Structural roles (Recommended)" |
-| `memory.map-budget` | 16k, 24k, 32k | 32k | the project map's PM-4, "32k" |
-| `memory.map-overflow` | degrade, refuse | degrade | the project map's design: over its budget the map degrades in a fixed order and never drops a node |
-| `memory.map-unfold` | item-declared, none, all | item-declared | the project map's PM-6, "Item-declared (Recommended)" |
-| `memory.map-purpose` | review, ledger, derive, refuse | review | the project map's PM-5, in the owner's words: "Required for new nodes, review all the existing nodes and either derive from available information or consult with the owner" |
-| `memory.legacy-anchors` | derived, none | derived | the systems round |
-| `memory.superseded-slices` | refuse, mark | refuse | the systems round |
-| `retrofit.drain` | hunk, file, off | hunk | the retrofit round's RF-2; `file` owes every baselined site in each touched file, under the cap |
-| `retrofit.drain-cap` | 5, 20, 50 sites per unit | 20 | the retrofit round |
-| `retrofit.claim-on-touch` | claim, carry, off | claim | the retrofit round |
-| `retrofit.claim-cap` | 1, 3, 5 keys per unit | 3 | the retrofit round |
-| `retrofit.widen` | record-reason, refuse | record-reason | the retrofit round |
-| `retrofit.unseeded` | unarmed, refuse | unarmed | the retrofit round; `refuse` refuses the adoption at `adopt` and the registration at `test.seed` while a registered check lacks a seed |
-| `retrofit.reconstruct` | on-touch, at-adoption, on-ask | on-touch | the retrofit round; `at-adoption` and `on-ask` run `adopt.reconstruct`, the value being the owner's ask |
-| `retrofit.decisions` | author-rubric, docs-owner-ratifies, docs-and-trailers | author-rubric | the retrofit round's RF-3: the owner switches it per repository |
-| `retrofit.practice-pending` | alongside, propose-retire | alongside | the retrofit round's RF-4: `propose-retire` is its second option, read at `adopt.practices` |
-| `retrofit.cadence` | off, hot-first | hot-first | the retrofit round's RF-6: read only where observability is installed, and off where it is absent |
-| `retrofit.slot-bytes` | 512, 1024, 2048 | 1024 | the retrofit round |
+| Key | Allowed values | Default | Source | Owner |
+|---|---|---|---|---|
+| `preset` | velocity, standard, strict, guarded, or a repo-declared preset | standard | owner directive after the walk-through; `autonomous` renamed `guarded`, flow FL-D0 | dDeclaredLoop |
+| `charter.override` | explicit-override, live-owner-wins, absolute | explicit-override | foundations F1-1 | dOrderedCharter |
+| `charter.practices` | a set of catalogue or repo-declared practices | the governance foundation set | foundations F1-3 | dOrderedCharter |
+| `core.bypass` | with-hooks-report, with-hooks-block, never | with-hooks-report | foundations K1 | dOrderedCharter |
+| `core.exceptions` | any-session-recorded, owner-only-expiring, none | any-session-recorded | foundations K4 | dOrderedCharter |
+| `design.forks` | agents-feature-rich-expandable, preference-forks-park, owner-decides-all | agents-feature-rich-expandable | flow FL-D3 | dIndexedDesign |
+| `design.reentry` | any subset of interface-change, two-plus-units, review-cross-unit-flaw, planner-or-owner-flag | interface-change, review-cross-unit-flaw, planner-or-owner-flag | flow FL-D5 | dIndexedDesign |
+| `autonomy` | plan-only, three-gates, every-stage | plan-only | R1.4, superseded by flow FL-P6 | dCalibratedLens |
+| `policy.guard` | owner-only, agents-with-reason, agents-within-mandate | owner-only | R4.2 | dDeclaredLoop |
+| `policy.proof` | tty-cli, signed, both | tty-cli | walk S3 | dDeclaredLoop |
+| `floor` | each of the four invariants, on or off, under the guard | all on | R5.1 | dDeclaredLoop |
+| `hooks.bypass` | allowed, refused | allowed | R5.1 | dWitnessedBar |
+| `transitions.record` | any subset of trailer, log, micro-format | all three | walk S4 | dDeclaredLoop |
+| `leases` | warn, refuse | warn | R2.2 | dDeclaredLoop |
+| `leases.granularity` | build-and-unit, build, unit | build-and-unit | walk C1 | dDeclaredLoop |
+| `leases.renewal` | activity, fixed, none | activity | walk C2 | dDeclaredLoop |
+| `leases.expiry-hours` | hours | 24 | walk C2 | dDeclaredLoop |
+| `leases.overlap` | kit-dirs, files, builds | kit-dirs | walk C3 | dDeclaredLoop |
+| `leases.offline` | warn, refuse, follow-leases | warn | walk C4 | dDeclaredLoop |
+| `deps.coordination` | message-then-progress, wait-for-landing, order-only | message-then-progress | flow interactions FI-2 | dDeclaredLoop |
+| `deps.early-build` | confirmed-interfaces, design-only, anything-coordinated | confirmed-interfaces | flow interactions FI-5 | dDeclaredLoop |
+| `deps.messaging` | live-and-mailbox, live-only, mailbox-only | live-and-mailbox | flow interactions FI-6 | dDeclaredLoop |
+| `landing.order` | plan-priority-then-first-verified, first-verified, owner-orders | plan-priority-then-first-verified | flow interactions FI-7 | dShippedRelease |
+| `card.follows` | re-render-at-transition, card-per-step, fixed-at-start | re-render-at-transition | flow interactions FI-8 | dDeclaredLoop |
+| `placement` | agent-places, declared-checked, owner-places | agent-places | orientation OR-1 | dRankedPlan |
+| `placement.check` | refuse, record | refuse | orientation OR-6 | dRankedPlan |
+| `kickoff.runs` | no-ready-card, opening-a-build, every-session, plan-absorbs | no-ready-card | orientation OR-2 | dRankedPlan |
+| `card.store` | any subset of remote-ref, build-folder, local-clone | all three | orientation OR-5 | dDeclaredLoop |
+| `card.snapshot` | terminal-only, every-transition | terminal-only | orientation OR-5, the adopted research | dDeclaredLoop |
+| `actions.free` | read-only-probes, item-reads-only, recorded-anything | read-only-probes | orientation OR-3 | dDeclaredLoop |
+| `resume.partial` | continue-item, restart-item, ask-owner | continue-item | orientation OR-4 | dDeclaredLoop |
+| `resume.context` | fresh-when-idle, always-resume, always-fresh | fresh-when-idle | orientation OR-7 | dDeclaredLoop |
+| `orient.budget` | record-only, warn-at-evidence-ceiling, owner-ceiling | record-only | orientation OR-8 | dDeclaredLoop |
+| `driver.reads` | none-scout-only, state-reads-only, read-only-probes | state-reads-only | roles RL-5 | dBoundRoles |
+| `prompts.author` | prompt-writer, requesting-worker-rendered | prompt-writer | roles RL-4 | dBoundRoles |
+| `roles.retries` | a retry count | 3 | roles RL-7 | dBoundRoles |
+| `roles.no-spawn` | executor-role-session, recorded-stand-in, refuse | executor-role-session | roles RL-8 | dBoundRoles |
+| `roles.trust` | keyed, witnessed-only | keyed | roles layer F3-1 | dBoundRoles |
+| `roles.answered-calls` | refuse, warn, record | refuse | roles layer F3-2 | dBoundRoles |
+| `roles.verifier-context` | cold, warm | cold | roles layer F3-3 | dBoundRoles |
+| `roles.on-contradiction` | repair-and-record, return, ask | repair-and-record | roles layer F3-4: the owner's answer over the recommended `return` | dBoundRoles |
+| `reuse.delivery` | rendered, on-demand | rendered | memory layer F4-1: reuse entries rendered into work orders when a build's needs match | dTotalRecall |
+| `reuse.propose` | new-seam, every-unit, owner-asks | new-seam | the library round's LB-2: which units close with a reuse line | dTotalRecall |
+| `annotations.grammar` | voluntary, required, pushed-at-read | voluntary | memory layer F4-2; the systems round's AN-2: `pushed-at-read` fires on shell reads as well as Read; under `voluntary`, retrofit's drain checks a note's shape only where a unit writes one | dTotalRecall |
+| `builds.agent-root` | work-order, readme | work-order | memory layer F4-5 | dTotalRecall |
+| `asks.acceptance` | refuse, grade | refuse | memory layer F4-6 | dTotalRecall |
+| `decisions.major` | author-rubric, author-owner-ratifies, owner-only | author-rubric | the library round's LB-3: who declares a decision major, for the log | dTotalRecall |
+| `builds.slug-words` | a word range | 1-3 | memory layer, the owner's words | dTotalRecall |
+| `builds.slug-style` | humorous, descriptive | humorous | memory layer, the owner's words: humorous ids are a foundation | dTotalRecall |
+| `builds.slug-date` | none, shown, in-slug | none | memory layer F4-7 | dTotalRecall |
+| `lexicon.pin` | shrink-only, absorb, no-gate | shrink-only | memory layer F4-8 | dMindYourWords |
+| `lexicon.forced` | verified, by-name, by-annotation | verified | lexicon review L-1: forced names recognised by what forces them | dMindYourWords |
+| `lexicon.at-commit` | refuse, warn, off | refuse | lexicon review L-2 | dMindYourWords |
+| `lexicon.drift` | refuse-new, report, off | refuse-new | lexicon review L-3 | dMindYourWords |
+| `lexicon.packs` | detected-and-declared, detected, declared, all | detected-and-declared | lexicon review L-5: the owner's answer, custom packs included | dMindYourWords |
+| `review.opt-in` | none, or a set of named lenses, each replacing a named default lens of its preset | none | review system R-1: the owner's answer, "Both" | dFairHearing |
+| `runtime.spawn-backend` | in-session, headless, or a registered spawn backend | in-session | runtime `[spawn]`; the spike decides the default for single-agent acts | dWellOiledMachine |
+| `runtime.relaunch` | fresh, resume | fresh | runtime `[supervise]` | dWellOiledMachine |
+| `runtime.act-ceiling` | hours | 1.5 | runtime `[supervise]` | dWellOiledMachine |
+| `runtime.hold-ceiling` | hours | 6 | runtime `[supervise]` | dWellOiledMachine |
+| `runtime.hook-failure` | closed, open | closed | runtime `[enforce]` | dWellOiledMachine |
+| `runtime.attended-judge` | classifier-or-person, allowance, person | classifier-or-person | runtime `[act]`; the owner's RT-4: "Classifier or you (Recommended)" | dWellOiledMachine |
+| `runtime.attended-allowance` | a set of named tools and command patterns, read under `allowance` | none | runtime `[act]`, RT-4 | dWellOiledMachine |
+| `runtime.harnesses` | a set of named harness adapters | claude-code | runtime `[harness]` | dWellOiledMachine |
+| `runtime.journal` | days, or all | 60 | the expansion round: the journal's retention, bounded by `[presets]`' pair rule while observability is installed | dWellOiledMachine |
+| `runtime.secret-home` | os-keychain, env-injected | os-keychain | the expansion round, as `integrations.secret-home`; Runtime's since its review, as the grant's home: a CI-hosted adapter reads the CI store | dWellOiledMachine |
+| `runtime.secret-scan` | value-gate, value-gate+shape-report | value-gate+shape-report | the expansion round, as `integrations.secret-scan`; Runtime's since its review: a shape scan alone reds on fixtures | dWellOiledMachine |
+| `plan.ratification` | request, hook-keyword, terminal-command, signed-commit | request | flow-roles FR-1 | dRankedPlan |
+| `run.host` | requesting-node, os-scheduler, cloud-routine, or another registered host | requesting-node | flow-roles FR-2 | dWellOiledMachine |
+| `notify.owner` | turn-micro-formats, park-and-landing, every-transition, park-only | turn-micro-formats | flow-roles FR-3 | dDeclaredLoop |
+| `notify.channel` | terminal, or another registered channel | terminal | the expansion round: integrations' notification adapters | dWellOiledMachine |
+| `run.on-owner-question` | best-effort-recorded, park-item, park-build, stop-run | best-effort-recorded | flow-roles FR-4, FR-12 | dBoundRoles |
+| `deps.landing` | hold-until-parent-lands, test-decides | hold-until-parent-lands | flow-roles FR-7 | dShippedRelease |
+| `mailbox.reads` | every-item, transitions-only, every-item-amendments-at-transitions | every-item | flow-roles FR-8 | dDeclaredLoop |
+| `review.follow-up` | after-high, while-finding, never | after-high | flow-roles FR-9 | dCalibratedLens |
+| `prompts.batch` | per-batch, per-task | per-batch | flow-roles FR-10 | dBoundRoles |
+| `context.on-full` | compact-with-card, fresh-at-boundary | fresh-at-boundary | compaction CX-1; runtime RT-1 | dDeclaredLoop |
+| `context.threshold` | a share of the window | 60% | compaction CX-1; read only under `fresh-at-boundary` | dDeclaredLoop |
+| `card.pointers` | every-item, at-transitions | every-item | compaction CX-1, the owner's addition | dDeclaredLoop |
+| `notices.record` | none, security-and-failures, all | none | compaction CX-2 | dBoundRoles |
+| `instructions.checks` | refuse, warn, record | refuse | layers round one, the owner's "enforced wherever possible" | dOrderedCharter |
+| `instructions.edit` | owner-command-agents-propose, flow-only, command-for-all | owner-command-agents-propose | layers round one, the owner's write path | dOrderedCharter |
+| `instructions.proof` | tty-cli, signed, both | tty-cli | the instruction layer's fold: the instruction command's owner proof, as `policy.proof` | dOrderedCharter |
+| `review.breakpoints` | a set of named item boundaries | none | layers round two: breakpoints beyond those `review.<stage>` and `autonomy` declare | dCalibratedLens |
+| `deps.on-parent-withdrawn` | replan, adopt-parent-work, withdraw-too | replan | layers round two | dDeclaredLoop |
+| `review.design.rounds` | one, until-no-blocker, until-no-high, until-clean, fixed-count | one | flow steps: the owner's "1 spec review by default" | dCalibratedLens |
+| `review.design.round-count` | a round count | 2 | flow steps; read only under `fixed-count` | dCalibratedLens |
+| `review.unverified` | ask, block, record | ask | flow steps | dCalibratedLens |
+| `review.unclassed` | refuse, reason, owner-rules | refuse | the library round's LB-1: a confirmed finding that fits no class | dFairHearing |
+| `flow.route-backs` | a route-back count | 3 | the flow layer's fold: a route back past the count becomes an owner item | dDeclaredLoop |
+| `policy.on-missing-expansion` | refuse, fallback-reported | refuse | the owner's LR-4: a value, on a key the core reads, that selects an absent expansion or optional component (KN-1); a key an absent expansion owns is unread | dDeclaredLoop |
+| `tests.without-cadence` | run-at-landing, report-unrun, wait-for-expansion | run-at-landing | flow steps: the slower levels when observability's Maintain is not installed | dWitnessedBar |
+| `verdict` | local-hook, peer-node, remote-ci, or another registered backend | local-hook | R1.3, R4.4, R5.2 | dWitnessedBar |
+| `verdict.blocks` | own-mixed-contended, every-red, own-only | own-only | walk T1 | dWitnessedBar |
+| `verdict.held` | peer-or-cadence, push-selected, on-demand | on-demand | walk T2 | dWitnessedBar |
+| `verdict.flakes` | quarantine, record, retry-only; a threshold | quarantine | walk T3 | dWitnessedBar |
+| `tests.product` | declared, declared-with-runners, none | declared-with-runners | walk T4 | dWitnessedBar |
+| `tests.landing-levels` | any subset of unit, integration, e2e, performance | unit, integration | flow FL-T3 | dWitnessedBar |
+| `verdict.tree` | prepared-merge, build-tip | prepared-merge | flow FL-T1 | dWitnessedBar |
+| `verdict.red-route` | fix-pass-or-design, always-new-unit | fix-pass-or-design | flow FL-T2 | dWitnessedBar |
+| `verdict.remote.trust` | pinned-workflow, owner-reviews-workflow-change, app-only | pinned-workflow | the expansion round: a remote verdict's workflow sits in the tree it judges | dWitnessedBar |
+| `verdict.remote.pin-scope` | workflow, dispatch-closure | workflow | the owner's PIN-1: the files the remote verdict's pin covers | dWitnessedBar |
+| `verdict.remote.pin` | the pinned files' blob ids | none, until the owner pins | the expansion round's review: written only by the owner's guarded command | dWitnessedBar |
+| `plan.authority` | planner-drafts-owner-ratifies, planner-within-themes, owner-orders | planner-drafts-owner-ratifies | R2.4 | dRankedPlan |
+| `plan.unplaced` | warn, refuse-new, review-only | warn | walk P2 | dRankedPlan |
+| `plan.triage` | owner-batches, rules, archive-legacy | rules | walk P3 | dRankedPlan |
+| `plan.kickoff` | offer-next, binding, advisory | offer-next | walk P4 | dRankedPlan |
+| `design.handoff` | derived-ready, ready-plus-audit, status-and-tier | derived-ready | walk D1 | dIndexedDesign |
+| `design.overlap` | warn, refuse, index-only | warn | walk D2 | dIndexedDesign |
+| `build.scope` | warn-and-ask, refuse, report | warn-and-ask | walk B1; it also grades retrofit's touch join | dScopedBuild |
+| `build.worktree` | per-unit, parallel-only, shared | shared | walk B2 | dWellOiledMachine |
+| `deploy.runs` | landing-node, adopter-ci, operator | landing-node | walk DP1 | dShippedRelease |
+| `deploy.promotion` | owner-approves-prod, auto-on-green, owner-approves-each | auto-on-green | walk DP2 | dShippedRelease |
+| `deploy.on-verify-fail` | rollback-and-ask, halt-and-alert, roll-forward | roll-forward | walk DP3 | dShippedRelease |
+| `deploy.currency` | pull-and-watch, push-branches, pull-only | pull-and-watch | walk DP4 | dShippedRelease |
+| `currency.max-behind` | 0, 1, 2, 4 | 2 | the expansion round: releases behind before an owner item | dShippedRelease |
+| `currency.on-behind` | note, owner-item, red | owner-item | the expansion round: a red would block an adopter's landings on gov's cadence | dShippedRelease |
+| `install.from` | release-tag, any-commit | release-tag | the expansion round: the receipt names one release | dShippedRelease |
+| `build.closes` | at-landing, after-release-verifies, at-landing-maintain-owns | at-landing | flow FL-DP1 | dShippedRelease |
+| `build.release-hold` | close-only, whole-close | close-only | the owner's RH-1: what waits for the release under `after-release-verifies` | dShippedRelease |
+| `build.release-ceiling` | hours | 72 | the expansion fold's follow-up round: how long `deploy.released` waits for an exit record before an owner item | dWellOiledMachine |
+| `kits.cadence` | every-landing, daily, weekly, owner-cut | weekly | flow FL-DP2, as `release.cadence`, renamed by the expansion round's review so `release.*` stays integrations'; the period is the main loop's choice | dShippedRelease |
+| `kits.host` | session-start, os-scheduler, cloud-routine, or another registered host | session-start | the expansion round's review: distribution's cadence programs run on a host key of their own | dShippedRelease |
+| `kits.watch-cadence` | daily, weekly, every-session | daily | the expansion round's review: the period of the currency probe, the fleet reading, and the cut under `kits.cadence: owner-cut` | dShippedRelease |
+| `release.environments` | an ordered list of registered environments | none | the expansion round: integrations' release program runs for listed environments only | dShippedRelease |
+| `integrations.tracker` | none, mirror-out | none | the expansion round: the ask backlog is the tracker | dTotalRecall |
+| `maintain.host` | session-start, os-scheduler, cloud-routine, or another registered host | session-start | walk M1 | dTendedCadence |
+| `maintain.cadence` | daily, weekly, every-session | daily | walk M2 | dTendedCadence |
+| `maintain.fixes` | a set of named safe fixes | reap, prune landed, regenerate stale, defer dormant, records-only fixes, close finished run records | R2.3 | dTendedCadence |
+| `maintain.on-breach` | file-ask, red-leg, report | file-ask | walk M3 | dTendedCadence |
+| `maintain.events` | any subset of default-branch-red, release-verify-failed, session-start-breach | all three | flow FL-M2 | dTendedCadence |
+| `maintain.reading-tree` | clean-base, worktree | clean-base | the expansion round: 14 of 108 repeated readings varied with the tree | dTendedCadence |
+| `maintain.node-readings` | every-node, lease-holder | every-node | the expansion round: a node-scoped reading sees only its node | dTendedCadence |
+| `maintain.reading-admission` | refuse-unowned, report-unowned | refuse-unowned | the expansion round: 0 of 27 drift signals carry an owner | dTendedCadence |
+| `maintain.dead-after` | 5, 10, 20 | 10 | the expansion round: drift-report's existing limit | dTendedCadence |
+| `maintain.record-when` | every-period, on-finding | every-period | the expansion round's EX-3: both values built; renamed by its review, so the item `maintain.record` keeps its name | dTendedCadence |
+| `observability.run-record` | per-run, on-anomaly, none | per-run | the expansion round | dTendedCadence |
+| `patch.ratify` | auto, owner | auto | flow FL-M3 | dTendedCadence |
+| `review.<stage>` | off, opt-in, owed, owed-above-tier | opt-in; Build owed | R2.1 | dCalibratedLens |
+| `review.<stage>.effort` | the role efforts | the role's declared effort | R2.1 | dCalibratedLens |
+| `review.recommendation` | advice, binding, binding-above-tier | advice | R4.3 | dCalibratedLens |
+| `review.build.when` | per-build, per-unit, per-landing | per-build | walk B3 | dCalibratedLens |
+| `review.findings` | blocker-high-own, all-own, blocker-own | blocker-high-own | flow FL-B3 | dScopedBuild |
+| `review.blocks` | every-review, owed-only, none | every-review | flow FL-R1 | dCalibratedLens |
+| `review.left-shift` | second-occurrence, every-class, owner-selects | second-occurrence | flow FL-R2 | dCalibratedLens |
+| `review.recommendation.source` | scored-signals-and-reasoning, agent-judgment, signals-only | scored-signals-and-reasoning | flow FL-R3 | dCalibratedLens |
+| `review.loop.cadence` | weekly, monthly, every-n-landings | weekly | walk R1 | dCalibratedLens |
+| `review.loop.retire` | propose-ratify, demote-then-propose, report | propose-ratify | walk R2 | dCalibratedLens |
+| `review.loop.window-days` | days | 60 | walk R3 | dCalibratedLens |
+| `review.loop.catch-source` | verdict-records, node-journal | verdict-records | the expansion round: another node cannot see a node's journal | dCalibratedLens |
+| `budgets.*` | each cap's value and its mode, hard or soft | re-derived from evidence | walk R4 | dCalibratedLens |
+| `tags.slice` | leaf, subtree | leaf | the systems round | dOrderedCharter |
+| `tags.retired-cites` | refuse-new, warn, allow | refuse-new | the systems round | dOrderedCharter |
+| `tags.positional` | shrink-only, refuse, report | shrink-only | the systems round | dOrderedCharter |
+| `tags.bare-refs` | charter-only, unique, never | charter-only | the systems round; read by the `resolves` check and the resolver | dOrderedCharter |
+| `annotations.lookup` | query-and-map, query, map-index | query-and-map | the systems round's AN-1: the owner's "both" | dTotalRecall |
+| `annotations.budget` | refuse, warn, record, each over the blocks a commit touches | refuse | the systems round | dTotalRecall |
+| `annotations.resolve-scope` | notes, every-comment-ref | every-comment-ref | the systems round | dTotalRecall |
+| `annotations.delivery` | work-order, on-demand, off | work-order | the systems round | dBoundRoles |
+| `instructions.slices` | handed, pointer | handed | the systems round | dOrderedCharter |
+| `instructions.legacy` | shrink-only, refuse | shrink-only | the systems round; IW-1 arms the render gate at dOrderedCharter | dOrderedCharter |
+| `instructions.task-charter` | when-not-static, always | when-not-static | the systems round; the single-carry check refuses `always` on a backend that loads the static block, where it carries the charter twice | dOrderedCharter |
+| `review.twin` | never, design-records, design-and-landing, always | never | the systems round's RS-1: twin runs only on the owner's opt-in | dFairHearing |
+| `roles.shape-enforce` | refuse, record | refuse | the systems round | dBoundRoles |
+| `roles.orientation.house-index` | handed, pointer, off | handed | the systems round | dBoundRoles |
+| `memory.default-load` | card, card-and-live, card-and-map | card-and-map | the systems round; the owner's PM-7, "Card and map (Recommended)": an attended session opens with the card and the map, and an act session loads its work order | dTotalRecall |
+| `memory.load-budget` | 4k, 8k, 16k | 8k | the systems round; MS-1 holds the auto-memory's remainder to it | dTotalRecall |
+| `memory.item-budget` | measured, 96 or 128 for every role, or KB per role (each role's cap the owner's to adjust) | measured | the systems round's MS-2, asked a third time: "Measure, then set"; 96 for every role until 30 sliced work orders per role are measured, then each role's own p90, which the Loop Review derives; a KB is 1,000 bytes | dTotalRecall |
+| `memory.over-budget` | refuse, report, off | report | the systems round's MS-3: the owner's "Report only"; memory slices over the cap are exempt from `instructions.checks`' refusal and roles' route-back (P27) | dTotalRecall |
+| `memory.project-map` | structural-roles, every-role, owner-only | structural-roles | the project map's PM-1, "Structural roles (Recommended)" | dBoundRoles |
+| `memory.map-budget` | 16k, 24k, 32k | 32k | the project map's PM-4, "32k" | dTotalRecall |
+| `memory.map-overflow` | degrade, refuse | degrade | the project map's design: over its budget the map degrades in a fixed order and never drops a node | dTotalRecall |
+| `memory.map-unfold` | item-declared, none, all | item-declared | the project map's PM-6, "Item-declared (Recommended)" | dBoundRoles |
+| `memory.map-purpose` | review, ledger, derive, refuse | review | the project map's PM-5, in the owner's words: "Required for new nodes, review all the existing nodes and either derive from available information or consult with the owner" | dTotalRecall |
+| `memory.legacy-anchors` | derived, none | derived | the systems round | dTotalRecall |
+| `memory.superseded-slices` | refuse, mark | refuse | the systems round | dTotalRecall |
+| `retrofit.drain` | hunk, file, off | hunk | the retrofit round's RF-2; `file` owes every baselined site in each touched file, under the cap | dScopedBuild |
+| `retrofit.drain-cap` | 5, 20, 50 sites per unit | 20 | the retrofit round | dScopedBuild |
+| `retrofit.claim-on-touch` | claim, carry, off | claim | the retrofit round | dScopedBuild |
+| `retrofit.claim-cap` | 1, 3, 5 keys per unit | 3 | the retrofit round | dScopedBuild |
+| `retrofit.widen` | record-reason, refuse | record-reason | the retrofit round | dWitnessedBar |
+| `retrofit.unseeded` | unarmed, refuse | unarmed | the retrofit round; `refuse` refuses the adoption at `adopt` and the registration at `test.seed` while a registered check lacks a seed | dWitnessedBar |
+| `retrofit.reconstruct` | on-touch, at-adoption, on-ask | on-touch | the retrofit round; `at-adoption` and `on-ask` run `adopt.reconstruct`, the value being the owner's ask | dTotalRecall |
+| `retrofit.decisions` | author-rubric, docs-owner-ratifies, docs-and-trailers | author-rubric | the retrofit round's RF-3: the owner switches it per repository | dTotalRecall |
+| `retrofit.practice-pending` | alongside, propose-retire | alongside | the retrofit round's RF-4: `propose-retire` is its second option, read at `adopt.practices` | dTotalRecall |
+| `retrofit.cadence` | off, hot-first | hot-first | the retrofit round's RF-6: read only where observability is installed, and off where it is absent | dTendedCadence |
+| `retrofit.slot-bytes` | 512, 1024, 2048 | 1024 | the retrofit round | dBoundRoles |
 
 ## [presets] Named policy presets
 

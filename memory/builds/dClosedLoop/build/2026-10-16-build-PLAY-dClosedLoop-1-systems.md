@@ -267,7 +267,7 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   | positional | a new `§n`, `Mn` or `check n` in live text |
 - **Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter. Each registration
   carries its extractor. Six namespaces gained an owner (revised 2026-10-17, the audit's M10):
-  - dOrderedCharter registers `doc` and `unit`;
+  - dOrderedCharter registers `doc` and `unit`, and, declared at PM-10 (2026-10-17), `reader`, `level`, `layer`, `practice`, `principle`, `kind` and `kit`;
   - dDeclaredLoop `step`, `item`, `policy` and `command`;
   - dBoundRoles `role` and `field`;
   - dTotalRecall `section`, `record`, `feature`, `class` and `marker`;

@@ -811,18 +811,18 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 
 ### [extend] Every extension is a registered adapter or pack
 
-| Extension point | What registers there | Examples |
-|---|---|---|
-| actor kinds | a kind of actor an item can name | role, command, hook, executor, owner |
-| command adapters | a command, with its witness contract and its idempotence or reconcile probe | the bar, the lander, `record`, the instruction command |
-| spawn backends | a way to start a role agent | in-session Workflow, headless per agent, another harness's spawner |
-| role harnesses | a Workflow script, with its declared spawn sites and fan | the role cycle, the Tier-2 review |
-| hook packs | a fragment, with its owner, class, failure mode, budget and key | the spawn guard, act binding, the lexicon's commit check |
-| harness adapters | how a harness loads instructions, spawns, hooks and compacts, with its capability table and its install targets | Claude Code, Codex |
-| host adapters | where the supervisor and its sessions run | the node tick, a cloud host |
-| notification adapters | how an owner request reaches the owner | the terminal, a push notification |
-| journal readers | what reads the journal | runlog, observability's store |
-| cadence items | a program with its host key, its period, its lease and its events | Maintain and the Loop Review; gov's kit release and the currency probe |
+| Extension point | What registers there | Examples | Owner |
+|---|---|---|---|
+| actor kinds | a kind of actor an item can name | role, command, hook, executor, owner | dWellOiledMachine |
+| command adapters | a command, with its witness contract and its idempotence or reconcile probe | the bar, the lander, `record`, the instruction command | dWellOiledMachine |
+| spawn backends | a way to start a role agent | in-session Workflow, headless per agent, another harness's spawner | dWellOiledMachine |
+| role harnesses | a Workflow script, with its declared spawn sites and fan | the role cycle, the Tier-2 review | dWellOiledMachine |
+| hook packs | a fragment, with its owner, class, failure mode, budget and key | the spawn guard, act binding, the lexicon's commit check | dWellOiledMachine |
+| harness adapters | how a harness loads instructions, spawns, hooks and compacts, with its capability table and its install targets | Claude Code, Codex | dWellOiledMachine |
+| host adapters | where the supervisor and its sessions run | the node tick, a cloud host | dWellOiledMachine |
+| notification adapters | how an owner request reaches the owner | the terminal, a push notification | dWellOiledMachine |
+| journal readers | what reads the journal | runlog, observability's store | dWellOiledMachine |
+| cadence items | a program with its host key, its period, its lease and its events | Maintain and the Loop Review; gov's kit release and the currency probe | dWellOiledMachine |
 
 - The keys that select an extension (`runtime.harnesses`, `runtime.spawn-backend`, `verdict`, `run.host`,
   `maintain.host`, `kits.host`, `notify.channel` and `release.environments`) take registered names.
