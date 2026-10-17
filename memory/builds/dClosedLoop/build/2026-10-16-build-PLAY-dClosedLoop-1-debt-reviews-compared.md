@@ -59,6 +59,17 @@ settled answer or a standing decision. The last two pairs may add more.
 | LX-3 | `declaration-home` | Contract declarations are to change only through `instructions.edit`, yet the design places them as `gov:` markers in product code, where any builder's commit edits them. Where do they live? | in a declarations table the instruction write path owns, with at most a pointer in the code that a check resolves; inline `gov:` markers, with a check that refuses a marker change carrying no owner instruction record; in `.lexicon.conf`, owner-edited, as today |
 | RV-1 | `design-audit-selection`, `design-audit-readers` | The design-audit preset is chosen by the subject's kind, and nothing says whether that is a third kind. A third kind passes agent-cap RULE 0's owner opt-in unexamined and misses every reader that keys on the two kinds by value. How is the preset selected? | as a preset of the spec-audit kind, selected by the subject, so RULE 0 and every reader stay as they are; as a third kind, with RULE 0, the harness's kind set, the record-kind vocabulary and the replay scorer updated |
 
+## [answers] Answered, 2026-10-17
+
+Each answer is quoted verbatim.
+
+| Fork | The owner's answer | What it settles |
+|---|---|---|
+| LX-1 | "mechanism that automatically declares families based on what kits were discovered in the adopting repo + owner-declared families" | the drift rule's verb families come from two sources. Each pack that the stack census selects for a kit it discovers in the repository declares that kit's families. The owner declares the rest through `instructions.edit`. `lexicon.drift` refuses a new split inside a declared family and reports one outside every family |
+| LX-2 | "Shared primitive in tools/lib (Recommended)" | one extraction primitive in `tools/lib` reads the working tree, the index or a revision. The map and the lexicon each call it, so neither kit requires the other, and the standing decision TOOL-dClosedLexicon-12 stands |
+| LX-3 | "Instruction-owned table (Recommended)" | contract declarations live in a table the instruction write path owns. The code carries at most a pointer, which a check resolves |
+| RV-1 | "Preset of spec-audit (Recommended)" | design-audit is a preset of the spec-audit kind, selected by its subject. agent-cap RULE 0's owner opt-in and every reader keyed on the two kinds stay as they are |
+
 ## [map-lexicon] The lexicon's findings, placed
 
 Run A is `wf_14950dae-859` and run B is `wf_b52591b3-8f4`. The ids are each report's appendix ids. A
