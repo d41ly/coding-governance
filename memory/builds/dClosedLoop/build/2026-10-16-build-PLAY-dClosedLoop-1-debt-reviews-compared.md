@@ -106,3 +106,49 @@ refuted finding sits on the defect its claim names, beside its confirmed twin wh
 | `declaration-second-carrier` | a contract declaration as a hand-kept copy of the reader's constants | 33 | — | none: refuted, the example limits nothing and a stale arm guards the copy |
 | `import-census` | no extractor collects imports | — | 21 | none: refuted, `lexicon.py`'s Python and JS extractors collect imports |
 | `keys-absent` | the four new keys have no absent state | — | 53 | none: refuted, v2's `policy.on-missing-expansion` covers an absent component |
+
+## [map-review-system] The review system's findings, placed
+
+Run A is `wf_84ae201a-775` and run B is `wf_dd2730e2-e29`. The ids are each report's appendix ids. A
+refuted finding sits on the defect its claim names, beside its confirmed twin where one exists.
+
+| defect | what | A | B | disposition |
+|---|---|---|---|---|
+| `design-audit-selection` | nothing says how a run or the flow selects the design-audit preset, or whether it is a third kind or a spec-audit preset, and no breakpoint can select it | 1, 13, 30 | 8, 12, 25 | fork |
+| `design-audit-readers` | a third kind meets readers that key on the two kinds by value, and the record names none: agent-cap RULE 0's owner opt-in, the harness's kind set and its `isSpec` branches, the record-kind vocabulary, the replay scorer | 10, 13, 30, 32 | 1, 12, 30, 31, 40 | fork, with `design-audit-selection` |
+| `rendered-targets` | the edits point at rendered copies, never their sources: `tier2-review.template.js`, `REVIEW-PROTOCOL.template.md` and `gov-synthesizer.agent.md` | 3, 20, 33, 45 | 2, 14, 22, 33 | amend |
+| `gate-home-grammar` | the record's gate homes, "an existing leg, suite or bug class, or new", disagree with `review.report`'s settled dispositions, `class:`, `new:`, `gate:` and `none` | 8, 18, 23, 43 | 3, 23, 44 | amend |
+| `gap-range-stale` | dFairHearing's range reads gap-review-04 to 09, where v2 and the register give it 04 to 10 since the library round | 12, 22, 38 | 4, 18, 28, 39 | amend |
+| `stale-gap-review-03` | `[stale]` lists gap-review-03's agent count as disagreeing, though the register already took the measured count | 12, 22 | — | amend |
+| `preset-two-names` | the current preset is `spec-audit` in `[current]` and "the unit-spec preset" in `[lenses]` | 12 | — | amend |
+| `change-count` | five harness changes in the heading and R-2's fork, four in R-2's answer, which folds the duplicate fix into batching | 9, 31, 40 | 5 | amend |
+| `lenses-heading` | `[lenses]`' heading still reads "no opt-in lenses yet" after R-1's "Both" | 40 | 27 | amend |
+| `owed-tests-missing` | the duplicates change, its orphan check on the diff kind, and gates with a home have no owed test | 9 | 6 | amend |
+| `twins-test-positive-only` | the twins test hands the synthesizer only positive pairs, so one that flags every pair passes | — | 6 | amend |
+| `fix-verdict-test` | the class-level fix-verdict test has a one-instance fixture and no expected verdict | 11 | — | amend |
+| `grade-test-synthetic` | the grade-per-id test uses a hand-built mixed-grade item, not the 110 real same-address pairs | 46 | — | amend |
+| `batch-test-weak` | the batching test's twin arm can move one of three uneven twins, so it can hardly fail | 17 | — | amend |
+| `opt-in-tests` | the opt-in lenses ship with none of the research's losing tests | 6 | — | amend |
+| `replay-blindness` | nothing makes the blind replay blind: a worktree at `6cfd21619` shares refs and objects with the branch that holds the reports | 5, 44 | — | amend |
+| `replay-threshold` | the replay's bar, "about 70%", is not a decidable threshold, sits below what the current preset scores, and has no rule for matching a finding | 4, 14, 44 | 11, 43 | amend |
+| `replay-scorer` | the replay never names `review_replay.py`, which refuses `[tag]`-addressed findings, and the known escapes sit in no appendix | 24, 34 | 43 | amend |
+| `replay-reject-route` | the owed replays route only a pass, and nothing says what happens when one loses | 15 | 17 | amend |
+| `replay-rule0` | the replay's procedure omits agent-cap RULE 0 on that tree | 21 | — | none: refuted, a unit admits its own replay as its spec writes, and the one-off opt-in already exists |
+| `opt-in-extension` | the opt-in catalogue is a closed list in the harness, tied to neither the flow's lens packs nor the roles layer's registration, so an expansion's lens needs a code edit | 7, 19, 26, 37 | 9, 26, 35, 45 | amend |
+| `opt-in-no-reader` | no item in the flow's review program reads `review.opt-in` | 27 | 24 | amend |
+| `opt-in-preset-meaning` | `review.opt-in` mixes policy presets with review presets and is not scoped by review kind | — | 7, 24 | amend |
+| `opt-in-inputs` | `review.opt-in` covers only well-formed values: no validator, no malformed or contradictory value, and no change to the resume key | 41 | 7, 41 | amend |
+| `lensnotes-collision` | the opt-in swap collides with the lens notes' key validation and the light-lens check | 35 | 34 | amend |
+| `lens-duplicates-briefs` | opt-in lenses rebuild briefs the default lenses carry, reopening the retirement of prior-art and unstated-assumption | 25 | 21 | amend |
+| `universal-budget` | three new universal classes take the count to 9 against `UNIVERSAL_BUDGET=6`, which gotchas.py's check 19 refuses | — | 13, 32 | amend |
+| `ordering-unenforced` | nothing orders the chain builds' audits after dFairHearing: only dCalibratedLens names it as a parent | 2 | 10, 16 | amend |
+| `opt-in-depends-on-later-build` | dFairHearing reads `review.opt-in`, whose policy file, schema and reader land later, in dDeclaredLoop | 1 | — | amend |
+| `batch-sort-key` | "sorted by the address they cite" defines no key for a free-text, multi-section or empty address, and a literal sort does not reproduce the measured gains | 42 | 15, 42 | amend |
+| `batch-contiguity` | an address sort breaks the contiguous ids that batch labels, resume files and a code comment assume, and the test file holds 25 references, not 24 | 16 | 19, 36 | amend |
+| `twins-input` | the synthesizer gains no new input from the twins change | 29 | — | none: refuted, the synthesizer is not handed refuted rows' claims today, so the change does add one |
+| `orphan-check-wrong-half` | extending the orphan check to the diff kind extends the parser, while the diff skeptic's prompt asks for a bare "duplicate" | 28 | — | amend |
+| `grade-per-id-f2` | "the counts stay by binding grade, so F2 stands", where F2 chose counts derived from the synthesis's items | — | 20 | amend |
+| `leg-manifest-dependency` | handing the synthesizer the leg manifest adds a dependency the kit does not declare, with no case for an install without it | 36, 47 | — | amend |
+| `rate-denominator` | the twin gain is quoted over 8 beside a population of 9, and lens-note use over "about 49" beside 50 | 39 | 38 | amend |
+| `review-driver-nonexistent` | "the review driver" passes lens notes, but no tool by that name exists, and the Audit stage passes none | — | 29 | amend |
+| `restatement-gate` | restating the hook's lens count as a digit is what the restatement gate refuses | — | 37 | none: refuted, the restatement leg refuses a bare digit at the bar, so nothing wrong ships |

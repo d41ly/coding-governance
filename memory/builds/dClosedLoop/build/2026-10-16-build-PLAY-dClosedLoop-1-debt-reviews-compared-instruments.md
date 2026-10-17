@@ -1204,3 +1204,45 @@ B43 (later-records): confirmed twin A9, A20, A51, B27, B56
 B51 (commit-check-seam): confirmed twin A29, B8, B33
 B53 (keys-absent): confirmed twin none
 ```
+
+## [compare-review-system] The review-system pair's comparison, run over the record
+
+```text
+$ python compare_rounds.py reviews/2026-10-16-review-PLAY-dClosedLoop-1-review-system-a.md \
+    reviews/2026-10-16-review-PLAY-dClosedLoop-1-review-system-b.md \
+    build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared.md \
+    build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md wf_84ae201a-775 wf_dd2730e2-e29 map-review-system
+== runs
+A: raw 47, confirmed 41, refuted 6, precision 0.87, high findings 1, agents 12, out 224.7k (sum of returned lines)
+B: raw 45, confirmed 39, refuted 6, precision 0.87, high findings 0, agents 12, out 207.6k (sum of returned lines)
+== defects
+map rows 38, confirmed defects 35, refuted-only 3
+both 19, A only 10, B only 6
+A alone covers 29 of 35 (83%)
+B alone covers 25 of 35 (71%)
+overlap (Jaccard) 0.54
+Chapman estimate of the population: 38.0, so about 3 found by neither
+A only: stale-gap-review-03, preset-two-names, fix-verdict-test, grade-test-synthetic, batch-test-weak, opt-in-tests, replay-blindness, opt-in-depends-on-later-build, orphan-check-wrong-half, leg-manifest-dependency
+B only: twins-test-positive-only, replay-scorer, opt-in-preset-meaning, universal-budget, grade-per-id-f2, review-driver-nonexistent
+== severity (a defect takes its highest confirmed grade per round)
+high defects 2: replay-blindness, replay-threshold
+  replay-blindness: A 3 B 0
+  replay-threshold: A 3 B 2
+shared defects graded alike 15 of 19
+== lenses behind the defects one round alone found
+A: coherence 6, grounding 2, failure-envelope 2, reuse 1, blast-radius 1
+B: reuse 3, coherence 2, failure-envelope 1, blast-radius 1, grounding 1
+== refuted findings and their twins
+A14 (replay-threshold): confirmed twin A4, A44, B11, B43
+A21 (replay-rule0): confirmed twin none
+A24 (replay-scorer): confirmed twin B43
+A29 (twins-input): confirmed twin none
+A34 (replay-scorer): confirmed twin B43
+A47 (leg-manifest-dependency): confirmed twin A36
+B10 (ordering-unenforced): confirmed twin A2, B16
+B19 (batch-contiguity): confirmed twin A16, B36
+B25 (design-audit-selection): confirmed twin A1, A13, A30, B8, B12
+B35 (opt-in-extension): confirmed twin A7, A19, A26, A37, B9, B26, B45
+B37 (restatement-gate): confirmed twin none
+B42 (batch-sort-key): confirmed twin A42, B15
+```
