@@ -155,6 +155,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 91 | the same | The ownership table re-verified, reviewer 3 of 3, apart from 89 and 90 | the same | 1799cb98 | returned, 5m13s, 27.6k out: it audited the brief, not the table (`[misfire]`) | the same |
 | 92 | gov-researcher, at its declared medium effort | The ownership table re-verified, round 2, verifier 1 of 3, from a worktree pinned at `a169b3350` without the table | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | running | `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` |
 | 93 | the same | Round 2, verifier 2 of 3, apart from 92 | the same | 1799cb98 | running | the same |
+| 94 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the spec-review workflow's declared medium, round 1 | The chain's build order, at the owner's RC-1: v2 at blob `a8038f04e` and the re-cut record at `d3726ab57`, sixteen design records as specs | the args, recorded with the review's fold | 1799cb98 | running as `wf_89aa1fa4-62c` | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-chain-order.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1882,6 +1883,10 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   - Round 2, dispatches 92 and 93, runs the re-verification itself as researchers, from a worktree pinned
     without the table. The third verifier waits: agent-cap refused a sixth direct spawn in the turn, and a
     slot frees 45 minutes after its spawn or at the owner's next prompt.
+
+- 2026-10-18, session 1799cb98: dispatch 94, the Tier-2 review of the build order the owner asked for at RC-1,
+  runs as `wf_89aa1fa4-62c`, the spec-audit opt-in set around its launch and restored. Nothing folds into
+  its subjects or specs until it returns.
 
 ## Instruments
 
