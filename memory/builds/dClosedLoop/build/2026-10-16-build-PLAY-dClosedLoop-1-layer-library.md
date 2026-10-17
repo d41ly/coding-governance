@@ -417,6 +417,8 @@ Dispatch 50 reviewed the round's four commits, `1bc4883fe..aa9639d98`, at light 
 - **A follow-up round** over `[review-fold]` (`0dd962724`) is owed. The owner deferred it on 2026-10-16:
   "Let's record the follow-up round debt and skip it for now". It stays owed until it runs, and
   dClosedLoop does not close with it open.
+  - **Revised 2026-10-17.** It ran twice, as the debt round's dispatches 69 and 70, at the owner's
+    "review all 6 unreviewed pieces", and `[debt-fold]` folds it.
 
 ## [debt-fold] The debt round's library pair, folded 2026-10-17
 

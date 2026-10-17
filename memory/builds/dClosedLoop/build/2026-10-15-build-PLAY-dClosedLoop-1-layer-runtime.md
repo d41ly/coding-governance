@@ -439,8 +439,11 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - expires leases past `leases.expiry-hours` and prunes terminal run claims (`refs/gov/runs/*`),
     through dDeclaredLoop's coordination verbs. It never prunes `refs/gov/claims/*`, where a slug's
     claim lives (layer-memory `[contract]`);
-  - raises the owner item of each `deploy.released` wait whose landing record is older than
-    `build.release-ceiling`, once per (build, landed SHA), through the notification adapter;
+  - raises the release hold's owner item for each `deploy.released` wait that has outlived
+    `build.release-ceiling`, counted from the landing record or from the owner's last keep-waiting
+    answer, through the notification adapter. The item is keyed by (build, landed SHA), and the sweep
+    opens it only when none is open, as every producer of that item does (flow-steps'
+    `deploy.released` and `life.quiesce`). The sweep reads `build.closes` and `build.release-ceiling`;
   - names holders by fleet tag.
 - **Shared records.**
   - Under the supervisor, only it writes a build's shared mutable records: decision rows, the run
@@ -746,10 +749,13 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - A missed period runs at the next wake.
 - **An item can wait on an event.** `deploy.released` waits for the release slot's exit record. The
   record's event fans out to one instance per waiting build whose landed SHA the record's SHA
-  contains, each keyed by (event, SHA, build) and witnessed by build, so a skipped key never skips a
-  second build. The supervisor runs each under its instance's cadence lease, so it needs no build lease,
+  contains, each keyed by (event, the exit record's id, build) and witnessed by build, so a skipped key
+  never skips a second build, and a second pass over one SHA, whose exit record is a new one, wakes
+  the build again (Revised 2026-10-17, the debt round's fold). The supervisor runs each under its instance's cadence lease, so it needs no build lease,
   and its records mint under the build's claim ref. A wait with no record is watched by the
   supervisor's sweep (`[supervise]`), which raises its owner item once `build.release-ceiling` passes.
+  An owner request on a build whose lease is gone is an event too: the guarded command's record wakes
+  one instance, keyed by (request, build), and `life.quiesce` runs under its cadence lease.
 - **In-session cron is retired for cadence.**
   - It is session-scoped, expires after 7 days, and fires only while its session is open and idle.
   - The unattended skill's CronCreate keepalive and stop-guard's `session_crons` retire with it.
@@ -823,10 +829,14 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   A hit refuses that push. The journal and the transcripts never leave the node, so the node tick
   scans them as a node-local population, and a hit there is an owner item. Each witness names what it
   read: whether the value resolved (yes, no or `anonymous`), each population's count, and the
-  matches, as a count and a salted id only. Each boundary declares its expected population from what
-  the push carries: the pushed range's paths at the prepare, the one ref at the ref-push path. An
-  unresolved value, or a zero against a non-empty expected population, is a dead probe, never green;
-  an empty expected population reads "none carried", and `anonymous` reads not applicable, not zero. The `secret-scan` fixture in
+  matches, as a count and a salted id only. Each population declares what it expects from a source the
+  scanner does not enumerate (Revised 2026-10-17, the debt round's fold). The prepare takes it from the
+  push's own ref update, its old and new SHAs, so a push that carries commits expects at least one,
+  whatever the scanner's range reads; the ref-push path takes the one ref it pushes; and the node tick
+  takes the journal entries and transcripts modified since its last scan, by their modification times.
+  An unresolved value, or a zero against a non-empty expected population, is a dead probe, never
+  green; an empty expected population reads "none carried", and `anonymous` reads not applicable, not
+  zero. The `secret-scan` fixture in
   `[tests]` plants the value in every population named here.
 - A new step, role, record kind, rule, harness, backend or host is a filled contract, so Runtime gains
   no code.
@@ -847,7 +857,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | `no-skip` | No session the runtime launches skips permissions. | `no-skip` |
 | `policy-and-journal` | Every runtime behaviour is a policy key with a reader, and every runtime event is journaled. | `coverage` |
 | `grants-and-secrets` | An adapter acts only within the scopes it declared, its secret never leaves its process, and no push publishes a secret value; a journal is pruned past `runtime.journal`. | `grant`, `secret-scan`, `journal-retention` |
-| `event-waits` | A wait on a record is woken by that record's event once per waiting party, runs under its own lease, and mints under the build's claim ref; a wait with no record raises one owner item past its ceiling. | `event-wait` |
+| `event-waits` | A wait on a record is woken by that record's event once per waiting party, runs under its own lease, and mints under the build's claim ref; a wait with no record raises one owner item past its ceiling. | `event-wait`, `lifecycle` |
 
 ### [contract] Runtime's layer contract
 
@@ -898,6 +908,7 @@ integrations because the grant they serve is Runtime's field.
 | bypasses and exceptions | `hooks.bypass`, `core.bypass`, `core.exceptions` | v2's catalogue |
 | attended context | `context.on-full`, `context.threshold` | v2's catalogue |
 | owner questions | `run.on-owner-question` | v2's catalogue |
+| the release wait: which builds wait, and its ceiling | `build.closes`, `build.release-ceiling` | v2's catalogue |
 
 v2 says every key lives in `.governance/policy.toml`, but never says whether the kit confs fold into it.
 That question is owed in v2's `[owed]`.
@@ -1107,15 +1118,27 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
 - **`secret-scan`:** one plant per population `[extend]` names: a removed commit, a tracked file, a
   `memory/` record, a mailbox ref written after the landing, a card ref, a lease ref and a claim ref at
   the push boundaries, and the journal and a transcript at the node tick, with one encoding of the
-  value among them. Each plant turns its boundary red. Three witness cases are each seen red against a
-  scanner stubbed to return zero: an unresolved value reads a dead probe and blocks, a population
-  emptied by a broken enumerator reads a dead probe, and an `anonymous` adapter reads not applicable. A
+  value among them. Each plant turns its boundary red. Four witness cases are each seen red against a
+  scanner stubbed to return zero: an unresolved value reads a dead probe and blocks; a prepare whose ref
+  update carries commits, its scanner's enumerator stubbed empty, reads a dead probe; a node tick whose
+  enumerator returns nothing while a journal entry changed reads a dead probe; and an `anonymous`
+  adapter reads not applicable. A
   code-only landing and a lease-only push, whose expected populations hold no `memory/` path and no
   mailbox, card or claim object, both read green.
 - **`event-wait`:** under `close-only`, unlease a build, then write the release slot's exit record:
-  the wake runs `deploy.released` and `deploy.close` under its own run lease, the close minted under
-  the claim ref. Two builds landed in one SHA both close on one exit record. With no exit record, one
-  owner item opens once `build.release-ceiling` passes, and only one.
+  the wake runs `deploy.released` and `deploy.close` under its instance's cadence lease, the close
+  minted under the claim ref. Two builds landed at two SHAs, both contained in a later SHA, both close
+  on one exit record for that later SHA. A held pass, then a verified pass over the same SHA, closes
+  the build on the second exit record. With no exit record, one owner item opens once
+  `build.release-ceiling` passes, and only one; a wait still under the ceiling, or answered before it,
+  opens none; after the owner keeps waiting, a second ceiling opens a second item; and an item a
+  withdraw already opened is not opened again. Each case is seen red against a supervisor stub that
+  keys the wake by SHA alone and raises the ceiling's item without looking for an open one.
+- **`lifecycle`:** a pause of a landed build is refused; a withdraw of a landed build at
+  `deploy.notify` under `at-landing` is refused; a withdraw of a build waiting at `deploy.released`
+  opens the release hold's one owner item; and after `deploy.unlease`, a withdraw runs under its
+  request's wake. Each is seen red against a stub `life.quiesce` that sends every withdraw to
+  `life.notify`.
 - **`extension`:**
   - a stub harness adapter registers with no edit to Runtime's code or schema;
   - the owner-pack table and `settings.json` are compared both ways, seen red on an entry with no row
@@ -1287,3 +1310,13 @@ epoch check are decided in the dispatcher's PermissionRequest entry, the one tha
 PermissionRequest joins the events and the owner-pack table; `onFailure` is written on every entry;
 `next` gains `awaiting`; and every claim the pair found untested gains its fixture arm. The debt
 comparison record's `[fold-runtime-fold]` names each defect and where it went.
+
+**Revised a fifth time, 2026-10-17, after the debt round's expansion pair**
+(`reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-a.md` and `-b.md`): the sweep
+opens the release hold's one owner item only when none is open, and restarts its ceiling after a
+keep-waiting answer; a wake is keyed by the exit record's id, so a second pass over one SHA wakes it
+again; an owner request on an unleased build is an event wake; each secret-scan population takes its
+expectation from a source the scanner does not enumerate, the node tick's included; the reader table
+lists the release keys the sweep reads; and `[tests]` gains a fuller `event-wait` and a `lifecycle`
+fixture. The debt comparison record's `[fold-expansions-fold-round3]` names each defect and where it
+went.

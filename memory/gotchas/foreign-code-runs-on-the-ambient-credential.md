@@ -30,11 +30,18 @@ H2), and run A did not.
 The fold's closing review (`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md`, H1) caught the fold's own fix overclaiming. It said
 `GOVKIT_RERENDER=0` refused target-side execution, but that switch declines only the regenerate, hook-wiring and
 adopter steps. Update still runs each touched kit's `[check]` argv in the target, before the write and
-again after it (`run_kit_check`, near lines 10015 and 11214), and each `[[hole]]` discharge probe
-(`run_hole_probes`, near lines 10953 and 11800). The follow-up round
+again after it (`run_kit_check`, near lines 10015 and 11214). This record once added each `[[hole]]`
+discharge probe (`run_hole_probes`, near lines 10953 and 11800), which the same switch declines
+(corrected 2026-10-17). The follow-up round
 (`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md`,
 H2) found that the fold's fix still left out the hook wiring, which runs the adopter's own
 `settings-merge.py`, and the hole probes.
+
+The debt round's two reviews of that fold
+(`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-a.md`
+and `-b.md`) found a sixth kind that no switch declines: each `[[contract]]` parity probe, which runs
+the adopter's own file in the target (`measure_contract_parity`, near line 6065, reached through
+`derive_parity_lines`, near line 9658). The probe below, run then, lists every site.
 
 ## The fix
 
@@ -47,9 +54,15 @@ H2) found that the fold's fix still left out the hook wiring, which runs the ado
   row.
 - A fixture plants a payload in each kind of target-side code the command can reach: a regenerate
   argv, a kit's adopt script that its check runs, the adopter's `settings-merge.py`, a hole's
-  discharge command and a workspace hook. Each reads the credential helper and the environment, and
-  expects to find neither.
+  discharge command, a contract-probed file and a workspace hook. Each payload writes a canary when it
+  runs, then reads the credential helper and the environment. Under a mode that refuses execution,
+  the fixture asserts no canary and one refusal record per kind, so a payload that crashed before its
+  canary cannot pass as refused. Under a sandbox that runs it, the fixture asserts the canary and
+  finds neither the credential nor the environment.
 - Probe: list every subprocess call reachable from the command whose working directory is the
-  target, and fail when the design does not name each one.
+  target, and fail when the design does not name each one. It ran on 2026-10-17 (`target_spawns.py`,
+  in `memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md`,
+  `[probes-expansions]`): 11 sites reachable from update, the contract parity probe among them, and
+  `decline_findings`' discharge, which update never arms.
 
 It has no machine gate yet: dShippedRelease owes the sandbox and its fixture (`gap-deploy-13`).

@@ -36,7 +36,9 @@ its run B sibling.
 - A claim one run made is credited to that run, with the other run's figure beside it.
 - A component moved between layers on one run's word is marked single-run, and the move reaches v2's
   chain in the same commit, or is not made.
-- Probe: each `[agreement]` or `[cross]` row that names both runs carries two return citations.
+- Probe: each `[agreement]` or `[cross]` row that names both runs carries two return citations, unless
+  its crediting cell itself says "re-measured here". A phrase in another cell re-measures that cell's
+  claim, not the credit.
 
 It has no machine gate yet, because the comparison tables are prose; the probe above is the gate a
 comparison script would carry. Its first version, run on 2026-10-16, matched only the spelling
@@ -44,4 +46,11 @@ comparison script would carry. Its first version, run on 2026-10-16, matched onl
 none (the follow-up round's H1). The corrected probe counts a credit in either form, reports a row it
 cannot place, and prints how many rows it matched. It was red on 36 `[agreement]` rows and one
 `[cross]` row, and on a planted row of each population, and green once each row cited each run's
-line (the comparison record's `[follow-up]`).
+line (the comparison record's `[follow-up]`). The debt round's two reviews of that fold
+(`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-a.md`
+and `-b.md`) found it still exempting a row whose "re-measured here" sat in another cell, and counting
+that row as checked, so three rows passed with no citation. Its revision reads the exemption from the
+crediting cell and counts exempt rows apart. It was red on those three rows, where the version before
+it was green, and is green once they cite each run
+(`memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md`,
+`[probes-expansions]`).

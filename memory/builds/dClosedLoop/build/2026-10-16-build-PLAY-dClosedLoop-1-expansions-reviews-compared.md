@@ -755,6 +755,14 @@ rows read: 52; rows the predicate matched: 44
 findings: 0
 ```
 
+- **Revised 2026-10-17, the debt round.** Both runs of its review (dispatches 71 and 72) found this
+  probe still exempting a row whose "re-measured here" sat in another cell, and counting it as
+  checked, so `[agreement]`'s Readings, Versions and Inline copies rows passed with no citation. Its
+  revision, with its runs, is in the debt comparison's instruments record
+  (`build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md`,
+  `[probes-expansions]`), and the three rows cite each run. The H2 row's probe ran there too, and
+  found a sixth kind of target-side code.
+
 ## [map] Every finding, placed
 
 Run A is `wf_644d225b-42a` and run B is `wf_3a59e7c4-201`. The ids are each report's appendix ids. A

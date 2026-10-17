@@ -1795,3 +1795,245 @@ hygiene, as it reads: those or "reuse-first" in section 10: 333 specs in 75 buil
 the trigger: "no existing seam fits": 236 specs in 60 builds
 the union of the trigger and hygiene's reading: 339 specs in 76 builds
 ```
+
+## [probes-expansions] The expansion pair's two probes
+
+**The both-runs probe, revised.** It is the expansions comparison's `[follow-up]` probe with one change:
+the "re-measured here" exemption reads the crediting cell, and exempt rows print apart. Run from the
+worktree root over `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md`:
+
+```python
+"""The probe one-run-claim-recorded-as-agreed prescribes, run over a design record's [agreement] and [cross].
+
+Usage: python both_runs_probe.py <record.md>
+
+A row credits a research run in one of two forms, and each credited run must be cited by a line of its
+own return, `research-<layer>-<a|b>.md:<line>`, unless the crediting cell itself says "re-measured
+here" (a phrase in another cell re-measures that cell's claim, not the credit):
+- in [agreement], a table under `### [agree-<layer>]` whose "Both runs" cell is not empty or a dash
+  credits both runs of that layer;
+- in [cross], the "Found by" cell credits each run it names: "<layer> A and B" names both, and
+  "<layer> A" or "<layer> B" names one. A row naming two or more runs must cite each.
+
+Every table body row under the two sections is read. A row the probe cannot place, an [agreement] table
+outside a known layer's subsection, or a [cross] row whose "Found by" names no run, is a finding, so a
+predicate that matches nothing cannot pass silently. The probe prints how many rows it read and how many
+its predicate matched. Exit 1 on any finding.
+
+The revision of 2026-10-17 (the debt round) reads the exemption from the crediting cell, where the
+version before it exempted a row whose phrase sat in any cell, and counted it as checked. Exempt rows
+print apart from checked ones.
+
+The revision of 2026-10-16 replaced a first version whose only predicate was the "<layer> A and B"
+spelling, which no [agreement] row uses (the follow-up round's H1).
+"""
+import re
+import sys
+
+LAYERS = ("observability", "integrations", "distribution")
+SEP = re.compile(r"^\|[\s:|-]+\|$")
+text = open(sys.argv[1], encoding="utf-8").read()
+findings, read, matched, exempt = [], 0, 0, 0
+
+
+def cells(ln):
+    return [c.strip() for c in ln.strip().strip("|").split(" | ")]
+
+
+def check(tag, ln, runs, cell):
+    global matched, exempt
+    if "re-measured here" in cell:
+        exempt += 1
+        return
+    matched += 1
+    missing = [f"{layer} {run.upper()}" for layer, run in sorted(runs)
+               if not re.search(rf"research-{layer}-{run}\.md:\d+", ln)]
+    if missing:
+        findings.append(f"[{tag}] {cells(ln)[0][:60]}: credits {', '.join(sorted(f'{l} {r.upper()}' for l, r in runs))}; "
+                        f"no line cited for {', '.join(missing)}")
+
+
+for tag in ("agreement", "cross"):
+    head = f"\n## [{tag}]"
+    if head not in text:
+        sys.exit(f"no section {head.strip()}")
+    block = text.split(head, 1)[1].split("\n## ", 1)[0]
+    layer, header = None, None
+    for ln in block.split("\n"):
+        m = re.match(r"^### \[agree-([a-z]+)\]", ln)
+        if m:
+            layer, header = m.group(1), None
+            continue
+        if not ln.startswith("|"):
+            continue
+        if SEP.match(ln):
+            continue
+        if header is None:
+            header = cells(ln)
+            continue
+        read += 1
+        row = cells(ln)
+        if tag == "agreement":
+            if layer not in LAYERS or "Both runs" not in header:
+                findings.append(f"[agreement] a row the probe cannot place: {ln[:80]}")
+                continue
+            both = row[header.index("Both runs")]
+            if both not in ("", "—", "-"):
+                check(tag, ln, {(layer, "a"), (layer, "b")}, both)
+        else:
+            if "Found by" not in header:
+                findings.append(f"[cross] a row the probe cannot place: {ln[:80]}")
+                continue
+            found = row[header.index("Found by")]
+            runs = set()
+            for lay, a, b in re.findall(r"\b(" + "|".join(LAYERS) + r") (A)(?: and (B))?\b", found):
+                runs.add((lay, "a"))
+                if b:
+                    runs.add((lay, "b"))
+            for lay in re.findall(r"\b(" + "|".join(LAYERS) + r") B\b", found):
+                runs.add((lay, "b"))
+            if not runs:
+                findings.append(f"[cross] a row whose Found by names no run: {ln[:80]}")
+            elif len(runs) >= 2:
+                check(tag, ln, runs, found)
+    header = None
+
+print(f"rows read: {read}; rows the predicate matched and checked: {matched}; exempt, their crediting cell re-measured: {exempt}")
+for f in findings:
+    print(f)
+print(f"findings: {len(findings)}")
+sys.exit(1 if findings else 0)
+```
+
+Over the record before the fold's citations, the revised probe:
+
+```text
+rows read: 52; rows the predicate matched and checked: 44; exempt, their crediting cell re-measured: 0
+[agreement] Readings: credits observability A, observability B; no line cited for observability A, observability B
+[agreement] Versions: credits distribution A, distribution B; no line cited for distribution A, distribution B
+[agreement] Inline copies: credits distribution A, distribution B; no line cited for distribution A, distribution B
+findings: 3
+```
+
+The probe before it, over the same record, printed `findings: 0` and exited 0. After the citations, the
+revised probe:
+
+```text
+rows read: 52; rows the predicate matched and checked: 44; exempt, their crediting cell re-measured: 0
+findings: 0
+```
+
+**The target-spawn probe.** The foreign-code class's probe, run over `tools/govkit/govkit.py` at
+`e56925e3d`:
+
+```python
+"""List every subprocess call in govkit.py whose working directory is the target tree, with the function
+that holds it and whether `govkit update` reaches that function, by a static call graph.
+
+Usage: python target_spawns.py tools/govkit/govkit.py [entry]   (entry defaults to _cmd_update)
+The call graph is by name: a call `f(...)` or `x.f(...)` to a function defined at module level or as a
+nested function. It over-approximates: a guard on the path (a switch such as GOVKIT_RERENDER, or an
+argument such as run_discharge) is not evaluated, so "reached" means reachable on some path, and each
+site's guard is read by hand from its source.
+"""
+import ast
+import collections
+import sys
+
+path = sys.argv[1]
+entry = sys.argv[2] if len(sys.argv) > 2 else "_cmd_update"
+tree = ast.parse(open(path, encoding="utf-8").read())
+
+defs = {}
+parent = {}
+
+
+def walk(node, owner):
+    for child in ast.iter_child_nodes(node):
+        if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            defs.setdefault(child.name, []).append(child)
+            parent[child] = owner
+            walk(child, child)
+        else:
+            walk(child, owner)
+
+
+walk(tree, None)
+calls = collections.defaultdict(set)
+for name, nodes in defs.items():
+    for fn in nodes:
+        for sub in ast.walk(fn):
+            if isinstance(sub, ast.Call):
+                f = sub.func
+                callee = f.id if isinstance(f, ast.Name) else f.attr if isinstance(f, ast.Attribute) else None
+                if callee in defs:
+                    calls[name].add(callee)
+            if isinstance(sub, (ast.FunctionDef, ast.AsyncFunctionDef)) and sub is not fn:
+                calls[name].add(sub.name)
+
+seen, stack = set(), [entry]
+while stack:
+    n = stack.pop()
+    if n in seen:
+        continue
+    seen.add(n)
+    stack.extend(calls.get(n, ()))
+
+
+def enclosing(lineno):
+    best = None
+    for name, nodes in defs.items():
+        for fn in nodes:
+            if fn.lineno <= lineno <= (fn.end_lineno or fn.lineno):
+                if best is None or fn.lineno > best[1]:
+                    best = (name, fn.lineno)
+    return best
+
+
+rows = []
+for node in ast.walk(tree):
+    if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr in ("run", "Popen", "check_output", "call"):
+        for kw in node.keywords:
+            if kw.arg == "cwd":
+                src = ast.unparse(kw.value)
+                if "target" in src or src in ("str(root)", "root"):
+                    fn = enclosing(node.lineno)
+                    rows.append((node.lineno, fn[0] if fn else "<module>", src, (fn[0] in seen) if fn else False))
+print(f"entry: {entry}; functions it reaches: {len(seen)}")
+for lineno, fn, src, reached in sorted(rows):
+    print(f"{lineno:>6}  {'REACHED' if reached else 'not    '}  {fn}  cwd={src}")
+print(f"sites: {len(rows)}; reached from {entry}: {sum(1 for r in rows if r[3])}")
+```
+
+```text
+$ python target_spawns.py tools/govkit/govkit.py
+entry: _cmd_update; functions it reaches: 135
+  4757  REACHED  decline_findings  cwd=str(target)
+  5012  REACHED  run_hole_probes  cwd=str(target)
+  5051  REACHED  run_kit_check  cwd=str(target)
+  5888  REACHED  run_fragment_merges  cwd=str(target)
+  5897  REACHED  run_fragment_merges  cwd=str(target)
+  5909  REACHED  run_fragment_merges  cwd=str(target)
+  5912  REACHED  run_fragment_merges  cwd=str(target)
+  5933  REACHED  remove_wired_fragments  cwd=str(target)
+  5958  not      read_gate_verdicts  cwd=str(target)
+  6065  REACHED  measure_contract_parity  cwd=str(target)
+  6189  not      exempt_leg  cwd=str(target)
+  7744  not      _cmd_apply  cwd=str(target)
+ 10986  REACHED  _cmd_update  cwd=str(target)
+ 11119  REACHED  _cmd_update  cwd=str(target)
+ 13198  not      cmd_mint  cwd=str(root)
+sites: 15; reached from _cmd_update: 11
+```
+
+Read by hand, the eleven reached sites are seven kinds, by their callers on update's path:
+- `run_kit_check` (`:5051`), each kit's `[check]` argv, called at `:10015` and `:11214`, ungated;
+- `measure_contract_parity` (`:6065`), each `[[contract]]` parity probe, through `derive_parity_lines` at
+  `:9658`, ungated;
+- `run_hole_probes` (`:5012`), called at `:10953` and `:11800`, both behind `GOVKIT_RERENDER`;
+- the `[[regenerate]]` argvs (`:10986`) and the gained kits' adopters (`:11119`), behind it;
+- `run_fragment_merges` (`:5888`, `:5897`, `:5909`, `:5912`), the hook wiring, called at `:11094`, behind
+  it, and `remove_wired_fragments` (`:5933`), its rollback, called at `:11304` only for wiring this run
+  added;
+- `decline_findings` (`:4757`), reached at `:11949`, which runs a discharge only with `run_discharge`,
+  and update never passes it.

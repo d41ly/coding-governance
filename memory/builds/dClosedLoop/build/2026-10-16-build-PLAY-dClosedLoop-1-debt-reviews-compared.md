@@ -344,25 +344,25 @@ refuted finding sits on the defect its claim names, beside its confirmed twin wh
 
 | defect | what | A | B | disposition |
 |---|---|---|---|---|
-| `both-runs-probe-exempts-rows` | the corrected both-runs probe counts a row as matched, then exempts it when "re-measured here" sits in any cell, so three `[agreement]` rows that credit both runs with no return citation pass | 1, 17 | 1, 10, 17 | amend |
-| `rerender-declines-hole-probes` | gap-deploy-13 and the gotcha say `GOVKIT_RERENDER=0` leaves the `[[hole]]` probes running, and both of update's hole-probe sites sit behind that switch | 2, 11 | 2, 9 | amend |
-| `quiesce-landed-withdraw` | `life.quiesce` now refuses only a pause of a landed build, so a withdraw or supersede of a landed build outside the release wait falls to `life.notify` and is recorded withdrawn | 3 | 4 | amend |
-| `release-hold-item-keys` | the release wait's owner item is keyed three ways, by the supervisor's sweep, by `life.quiesce` and by `deploy.released`'s arm, and the sweep has no "unless one is open" | 4, 13 | 5, 12, 21 | amend |
-| `request-lease-no-producer` | "life.* runs under the request's own run lease" names a lease that no layer produces | 9, 12 | 5 | amend |
-| `ceiling-sweep-key-spent` | the ceiling sweep fires once per (build, landed SHA), so after the owner keeps waiting no later ceiling exists | 5 | — | amend |
-| `release-ask-two-keys` | `maintain.file` keys the release-verify-failed ask by (reading, offender key), which makes it (release-verify-failed, SHA, E), and `release.route` keys its ask by (SHA, E) | 7, 14, 20 | 7, 11 | amend |
-| `second-keep-same-key` | the keep record is keyed by (ledger kind, id), so once a keep lapses a second keep of the same row cannot be written | 8, 16 | 8, 13 | amend |
-| `keep-fixture-one-sided` | the keep fixture checks only that a kept row is left out, never that it returns after the window or on a new catch | 19 | 20 | amend |
-| `event-wait-fixture-arms` | the event-wait fixture plants two builds in one landed SHA instead of one exit record for a later SHA containing several, names no stub that turns it red, and its sweep case has no negative arm | 10, 18 | 19 | amend |
-| `expected-population-shared-state` | each push boundary's expected population comes from the same range the scan reads, so a range computed wrong empties both and reads "none carried" | 6, 21 | 22 | amend |
-| `node-tick-no-expected-population` | the node tick's journal and transcript scan declares no expected population, and the rule that made its empty population a dead probe is gone | — | 3, 15 | amend |
-| `quiesce-arms-no-fixture` | `life.quiesce`'s new arms have no fixture | — | 21 | amend |
-| `contract-probe-sixth-site` | update's `[[contract]]` parity probe runs the adopter's file with cwd at the target and no `GOVKIT_RERENDER` gate, a sixth kind beside the records' "all five" | — | 18 | amend |
-| `five-kinds-probe-unrun` | the reachability probe behind "five kinds" has no recorded run, and run statically it also lists `decline_findings`' spawn, which is off by default | 23 | — | amend |
-| `released-witness-no-build` | `deploy.released`'s witness names the exit record keyed by SHA, with no build, while `[schedule]` witnesses each wake by build | — | 14 | amend |
-| `runtime-reader-table` | Runtime's reader table omits `build.release-ceiling` and `build.closes`, which the new sweep reads | — | 16 | amend |
-| `same-sha-repass-skipped` | after a held pass, a second exit record for the same SHA reuses a witnessed wake key and is skipped | 15 | — | amend: refuted only as older than the diff, since the base keyed the wake by (event, SHA) |
-| `payload-fixture-vacuous` | under the refusing mode no planted payload runs, so the fixture cannot tell a refusal from a clean sandbox or a crashed payload | 22 | — | amend: refuted only as older than the diff, since the base fixture asserted the same |
+| `both-runs-probe-exempts-rows` | the corrected both-runs probe counts a row as matched, then exempts it when "re-measured here" sits in any cell, so three `[agreement]` rows that credit both runs with no return citation pass | 1, 17 | 1, 10, 17 | amend; `[fold-expansions-fold-round3]` |
+| `rerender-declines-hole-probes` | gap-deploy-13 and the gotcha say `GOVKIT_RERENDER=0` leaves the `[[hole]]` probes running, and both of update's hole-probe sites sit behind that switch | 2, 11 | 2, 9 | amend; `[fold-expansions-fold-round3]` |
+| `quiesce-landed-withdraw` | `life.quiesce` now refuses only a pause of a landed build, so a withdraw or supersede of a landed build outside the release wait falls to `life.notify` and is recorded withdrawn | 3 | 4 | amend; `[fold-expansions-fold-round3]` |
+| `release-hold-item-keys` | the release wait's owner item is keyed three ways, by the supervisor's sweep, by `life.quiesce` and by `deploy.released`'s arm, and the sweep has no "unless one is open" | 4, 13 | 5, 12, 21 | amend; `[fold-expansions-fold-round3]` |
+| `request-lease-no-producer` | "life.* runs under the request's own run lease" names a lease that no layer produces | 9, 12 | 5 | amend; `[fold-expansions-fold-round3]` |
+| `ceiling-sweep-key-spent` | the ceiling sweep fires once per (build, landed SHA), so after the owner keeps waiting no later ceiling exists | 5 | — | amend; `[fold-expansions-fold-round3]` |
+| `release-ask-two-keys` | `maintain.file` keys the release-verify-failed ask by (reading, offender key), which makes it (release-verify-failed, SHA, E), and `release.route` keys its ask by (SHA, E) | 7, 14, 20 | 7, 11 | amend; `[fold-expansions-fold-round3]` |
+| `second-keep-same-key` | the keep record is keyed by (ledger kind, id), so once a keep lapses a second keep of the same row cannot be written | 8, 16 | 8, 13 | amend; `[fold-expansions-fold-round3]` |
+| `keep-fixture-one-sided` | the keep fixture checks only that a kept row is left out, never that it returns after the window or on a new catch | 19 | 20 | amend; `[fold-expansions-fold-round3]` |
+| `event-wait-fixture-arms` | the event-wait fixture plants two builds in one landed SHA instead of one exit record for a later SHA containing several, names no stub that turns it red, and its sweep case has no negative arm | 10, 18 | 19 | amend; `[fold-expansions-fold-round3]` |
+| `expected-population-shared-state` | each push boundary's expected population comes from the same range the scan reads, so a range computed wrong empties both and reads "none carried" | 6, 21 | 22 | amend; `[fold-expansions-fold-round3]` |
+| `node-tick-no-expected-population` | the node tick's journal and transcript scan declares no expected population, and the rule that made its empty population a dead probe is gone | — | 3, 15 | amend; `[fold-expansions-fold-round3]` |
+| `quiesce-arms-no-fixture` | `life.quiesce`'s new arms have no fixture | — | 21 | amend; `[fold-expansions-fold-round3]` |
+| `contract-probe-sixth-site` | update's `[[contract]]` parity probe runs the adopter's file with cwd at the target and no `GOVKIT_RERENDER` gate, a sixth kind beside the records' "all five" | — | 18 | amend; `[fold-expansions-fold-round3]` |
+| `five-kinds-probe-unrun` | the reachability probe behind "five kinds" has no recorded run, and run statically it also lists `decline_findings`' spawn, which is off by default | 23 | — | amend; `[fold-expansions-fold-round3]` |
+| `released-witness-no-build` | `deploy.released`'s witness names the exit record keyed by SHA, with no build, while `[schedule]` witnesses each wake by build | — | 14 | amend; `[fold-expansions-fold-round3]` |
+| `runtime-reader-table` | Runtime's reader table omits `build.release-ceiling` and `build.closes`, which the new sweep reads | — | 16 | amend; `[fold-expansions-fold-round3]` |
+| `same-sha-repass-skipped` | after a held pass, a second exit record for the same SHA reuses a witnessed wake key and is skipped | 15 | — | amend: refuted only as older than the diff, since the base keyed the wake by (event, SHA); `[fold-expansions-fold-round3]` |
+| `payload-fixture-vacuous` | under the refusing mode no planted payload runs, so the fixture cannot tell a refusal from a clean sandbox or a crashed payload | 22 | — | amend: refuted only as older than the diff, since the base fixture asserted the same; `[fold-expansions-fold-round3]` |
 | `ceiling-sweep-no-driver` | nothing beats to run the ceiling sweep when no lease is live | — | 6 | none: refuted, the node tick starts a supervisor when none beats under a live lease, and its beat runs the sweep |
 
 ## [fold-runtime-fold] The runtime-fold pair, folded 2026-10-17
@@ -463,3 +463,34 @@ a closing review of the debt round's folds is owed.
 | `recall-imports-eight` | — | 9 | amend | layer-library `[consult]`; v2's rows and its dated note | — |
 | `fix-unit-write-set` | — | 17 | amend | flow-steps' `build.unit-pass`; layer-library `[left-shift]` | — |
 | `gotcha-claim-wrong-dossier` | — | 16 | none: refuted, gotchas.py selects a class by its own anchors, not by a dossier's claims | — | — |
+
+## [fold-expansions-fold-round3] The expansion pair, folded 2026-10-17
+
+Dispatches 71 and 72 reviewed the expansion fold's round 3, `67c79f7cc..5e139d377`. Each of their map
+rows (`[map-expansions-fold-round3]`) went here, into flow-steps, layer-runtime, layer-expansions, v2, the register, two
+gotchas and the expansions comparison record, with two probes filed in the instruments record's
+`[probes-expansions]`. Each row's classes are its confirmed findings' own, from the two ledgers. The
+fold is unreviewed text, and a closing review of the debt round's folds is owed.
+
+| Defect | A | B | Disposition | Where the fix sits | Its classes |
+|---|---|---|---|---|---|
+| `both-runs-probe-exempts-rows` | 1, 17 | 1, 10, 17 | amend | the both-runs probe revised in the debt instruments' `[probes-expansions]`; layer-expansions' three `[agreement]` rows cited; the gotcha; the expansions comparison's `[follow-up]` note | `fixture-passes-by-finding-nothing`, `one-run-claim-recorded-as-agreed` |
+| `rerender-declines-hole-probes` | 2, 11 | 2, 9 | amend | `gap-deploy-13`; the foreign-code gotcha | `foreign-code-runs-on-the-ambient-credential` |
+| `quiesce-landed-withdraw` | 3 | 4 | amend | flow-steps' `life.quiesce` | — |
+| `release-hold-item-keys` | 4, 13 | 5, 12, 21 | amend | flow-steps' `life.quiesce` and `deploy.released`; layer-runtime `[supervise]`'s sweep | `append-without-an-idempotence-key`, `two-answers-to-one-question` |
+| `request-lease-no-producer` | 9, 12 | 5 | amend | flow-steps' `life.quiesce`; layer-runtime `[schedule]`; v2's dWellOiledMachine row | — |
+| `ceiling-sweep-key-spent` | 5 | — | amend | layer-runtime `[supervise]`'s sweep | — |
+| `release-ask-two-keys` | 7, 14, 20 | 7, 11 | amend | layer-expansions' release asks paragraph and `release.route` | `two-answers-to-one-question` |
+| `second-keep-same-key` | 8, 16 | 8, 13 | amend | layer-expansions' keep record, `loop.propose` and `loop.file` | `append-without-an-idempotence-key` |
+| `keep-fixture-one-sided` | 19 | 20 | amend | layer-expansions' keep fixture | — |
+| `event-wait-fixture-arms` | 10, 18 | 19 | amend | layer-runtime `[tests]` `event-wait` | `fixture-passes-by-finding-nothing`, `route-names-an-output-its-actor-never-emits` |
+| `expected-population-shared-state` | 6, 21 | 22 | amend | layer-runtime `[extend]`'s secret scan; `[tests]` `secret-scan` | — |
+| `node-tick-no-expected-population` | — | 3, 15 | amend | layer-runtime `[extend]`'s secret scan; `[tests]` `secret-scan` | `zero-witness-over-an-unnamed-population` |
+| `quiesce-arms-no-fixture` | — | 21 | amend | layer-runtime `[tests]` `lifecycle` | `two-answers-to-one-question` |
+| `contract-probe-sixth-site` | — | 18 | amend | layer-expansions' `kits.offer`; `gap-deploy-13`; the foreign-code gotcha | — |
+| `five-kinds-probe-unrun` | 23 | — | amend | the target-spawn probe run in the debt instruments' `[probes-expansions]`; `kits.offer`; the foreign-code gotcha | `route-names-an-output-its-actor-never-emits` |
+| `released-witness-no-build` | — | 14 | amend | flow-steps' `deploy.released` | — |
+| `runtime-reader-table` | — | 16 | amend | layer-runtime `[policies]`' reader table | — |
+| `same-sha-repass-skipped` | 15 | — | amend: refuted only as older than the diff, since the base keyed the wake by (event, SHA) | layer-runtime `[schedule]`'s wake key; `[tests]` `event-wait` | — |
+| `payload-fixture-vacuous` | 22 | — | amend: refuted only as older than the diff, since the base fixture asserted the same | the foreign-code gotcha's fixture | — |
+| `ceiling-sweep-no-driver` | — | 6 | none: refuted, the node tick starts a supervisor when none beats under a live lease, and its beat runs the sweep | — | — |
