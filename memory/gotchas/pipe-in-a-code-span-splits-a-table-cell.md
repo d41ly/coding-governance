@@ -31,4 +31,9 @@ pipe with a space on each side, missed it.
 - Count each table row's cells against its header's, so an extra cell reds the record.
 
 It has no machine gate yet. The per-table column-count check that
-`insert-after-a-key-that-occurs-twice` proposes for `memory/` would catch this class too.
+`insert-after-a-key-that-occurs-twice` proposes for `memory/` would catch this class too. A probe of that
+shape, which also checks each row's indent against its header's, ran over dClosedLoop's records after
+the folds' closing review. It found two rows inserted at column 0 inside list-nested tables and one row
+split by a pipe in a verbatim research return
+(`memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md`,
+`[probes-final]`).

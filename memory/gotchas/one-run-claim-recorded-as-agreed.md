@@ -53,4 +53,7 @@ that row as checked, so three rows passed with no citation. Its revision reads t
 crediting cell and counts exempt rows apart. It was red on those three rows, where the version before
 it was green, and is green once they cite each run
 (`memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md`,
-`[probes-expansions]`).
+`[probes-expansions]`). Its second revision, after the folds' closing review, reads each table by the
+renderer's grammar: an indented or pipe-less row had still dropped out, and the run had stayed green
+(`memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md`,
+`[probes-final]`).

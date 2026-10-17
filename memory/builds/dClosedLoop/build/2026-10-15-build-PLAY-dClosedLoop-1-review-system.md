@@ -126,9 +126,9 @@ where each defect's fix sits.
 - **How it is selected.** The run's kind stays `spec-audit`, so its records bind `**Serves:** spec-audit`,
   agent-cap RULE 0's owner opt-in admits it as it admits any spec audit, and every reader keyed on the two
   kinds stays as it is. A `preset` argument picks the lens literal: `unit-spec` or `design-audit`. The
-  harness chooses among its three literals with the marked ternary the hook admits. Design's breakpoint
-  passes `design-audit` when every pinned spec revision is a design or architecture record, which the
-  record-kind registry tells apart from a unit spec. A manual call may pass it for any spec audit. An
+  harness chooses among its three literals with the marked ternary the hook admits. Design's breakpoint's
+  `review.pin` passes `design-audit` when every pinned spec revision is a design or architecture record,
+  which the record-kind registry tells apart from a unit spec. A manual call may pass it for any spec audit. An
   `agent-cap.test.sh` arm sends a design-audit call against a README with no `spec-audit:` date, and it
   is denied.
 - **The unit-spec and diff presets keep their lenses,** since their escapes are recall misses inside a
@@ -151,7 +151,8 @@ where each defect's fix sits.
   - **The channel.** The harness takes `optIn` and `preset` as arguments, supplied per review by its
     caller. `review.opt-in` holds the policy default, keyed by preset: none, or a set of named lenses, each
     with the default it replaces. Every preset carries none, so a review opts in for its subject.
-    `review.lens` reads the key and maps it onto the arguments. The witness is the lens keys in the
+    `review.pin`, the command item before the fan-out, reads the key and passes the arguments (Revised 2026-10-17, the folds' closing review:
+    this line once named `review.lens`, which runs inside the act after the lens set is fixed). The witness is the lens keys in the
     report's lens-yield table, joined to the policy value. The running lens keys join the review key's
     input print, so a changed opt-in set never resumes an older run.
   - **One check at the argument boundary** refuses, by name: an unknown lens; a replaced default the
@@ -178,8 +179,10 @@ where each defect's fix sits.
     of the 59 known defects, which is the spec-audit preset's own lower run on that blob (76%). A defect
     counts as found only through a confirmed finding (layers-reviews-compared `[method]`).
   - **Its scorer.** `review_replay.py`'s spec mode is extended to `[tag]`-addressed sections. A known-set
-    file holds the 6 escapes with their addresses. A finding matches a known defect by the address key,
-    and a named adjudicator records the matched list. A run with a dead finder or skeptic is re-run, not
+    file holds all 59 known defects, each with its address, its grade and whether it escaped, from the
+    runtime comparison record's `[map]`. A finding matches a known defect by the address key, and the
+    scorer counts each matched defect once, however many findings match it; a planted known defect
+    confirmed twice scores once. A named adjudicator records the matched list. A run with a dead finder or skeptic is re-run, not
     scored. A deliberately weak candidate is seen scored below the bar once.
   - **Its reject outcome.** If either run misses its bar, design records keep the unit-spec preset,
     dFairHearing ships only the harness changes, and an owner item reopens R-1 with the replay's

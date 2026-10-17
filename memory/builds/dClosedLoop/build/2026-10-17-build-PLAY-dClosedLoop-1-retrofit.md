@@ -211,6 +211,10 @@ run's line cited. The returns are filed verbatim as `research-retrofit-a.md` and
     ruling, the practice stays alongside.
   - `adopt.decisions` routes the decision candidates through two raters by the author's rubric. The
     owner ratifies the major ones only where `retrofit.decisions` says so (RF-3).
+- **An offered update** (Revised 2026-10-17, the folds' closing review). An update `kits.offer` offers runs neither `test.seed` nor `adopt` in
+  the adopter's tree, since both run the adopter's code. Its new checks land unseeded and read unarmed
+  under `retrofit.unseeded: unarmed`. Its outbox order names the adopter's own run of `test.seed`, which
+  arms them. Under `refuse`, the adopter's own lander refuses the update until that run.
 
 ### [drain] The drain on touch
 
@@ -296,7 +300,7 @@ run's line cited. The returns are filed verbatim as `research-retrofit-a.md` and
 | Chain build | Its part |
 |---|---|
 | dWitnessedBar | the factory, the `ratchet` leg pack, `test.seed` and the registration fields, and the move of gov's own 27 registries onto the ledger (RF-5) |
-| dTotalRecall | the `baseline` and `census` kinds, the `origin` field, and `adopt.census` |
+| dTotalRecall | the `baseline` and `census` kinds, the `origin` field, and the `adopt` program: `adopt.census`, `adopt.practices` and `adopt.decisions` (Revised 2026-10-17, the folds' closing review: this row once named `adopt.census` alone) |
 | dScopedBuild | `build.unit-pass` and `build.scope`, filled |
 | dBoundRoles | the legacy slot's render |
 | dTendedCadence | `maintain.retrofit-heat` |

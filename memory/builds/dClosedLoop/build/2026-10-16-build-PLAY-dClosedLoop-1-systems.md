@@ -669,6 +669,9 @@ rows read: 51; rows the predicate matched and checked: 48; exempt, their crediti
 findings: 0
 ```
 
+Revised 2026-10-17, the folds' closing review: the probe now reads each table by the renderer's grammar, so an indented or pipe-less row is
+read and checked (`memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[probes-final]`). Re-run here, it reads the same 51 rows, 48 checked, with no finding.
+
 ## [open] What the round owes
 
 - The owner's answers to `[forks]`.

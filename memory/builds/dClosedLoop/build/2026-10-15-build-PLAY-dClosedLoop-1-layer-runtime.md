@@ -327,8 +327,8 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   | Answer | What it carries | What the supervisor does |
   |---|---|---|
   | `act` | the frontier's items, each with its act: the item, its actor kind, its work order's key and `task-sha`, its harness, and the outcome table it routes on | runs each act |
-  | `awaiting` | each awaited item, with the event or record it waits on | holds, renews its lease, and asks again when that event fires. It raises no owner item itself: a wait with a ceiling is raised by the supervisor's sweep (`[supervise]`) |
-| `blocked` | each blocked item, with what blocks it | raises an owner item once nothing the item waits on is in flight |
+  | `awaiting` | each awaited item, with the event or record it waits on | holds, and asks again when that event fires. A build that still holds its lease renews it; one whose lease `deploy.unlease` deleted holds none, and its wait belongs to its event wake and the ceiling sweep (`[schedule]`). It raises no owner item itself: a wait with a ceiling is raised by the supervisor's sweep (`[supervise]`) |
+  | `blocked` | each blocked item, with what blocks it | raises an owner item once nothing the item waits on is in flight |
   | `terminal` | all work terminal | closes the run; the two runs left at BUILDING were this case |
   | `stuck` | no frontier, while the build is not terminal | raises an owner item at once |
   | `invalid-input` | a malformed declaration, policy value or witness, named with its path | refuses to act, and journals it |
@@ -402,8 +402,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     per lease: the build lease (which the first draft also called the run lease), the unit lease, and
     the cadence lease, which an event wake takes for its instance (`[schedule]`).
   - Each act session's `--session-id` is recorded with the epoch it serves.
-  - The dispatcher's PermissionRequest decision refuses any gated call from a session whose epoch is
-    not current (`[act]`). The commit queue and the lander's prepare refuse one too.
+  - The commit queue and the lander's prepare refuse a stale epoch at once, since each re-reads the
+    lease from the remote. The dispatcher's PermissionRequest decision refuses a gated call once the
+    lease ref it reads shows the epoch stale, which across nodes is no later than the refresh below
+    (`[act]`). Revised 2026-10-17, the folds' closing review: this bullet once claimed the dispatcher refused at once.
   - **Where the epoch is read.** The dispatcher reads the lease ref in its clone, which the supervisor
     refreshes from the remote at each beat, since `next` reads the lease witnesses. A supervisor that
     finds its lease taken over kills the act sessions it launched under the old epoch. With no
@@ -578,7 +580,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   | Hook today | Event | Kit | Pack |
   |---|---|---|---|
   | agent-cap | PreToolUse: Workflow, Agent | hooks | roles: the spawn guard; runtime: the slot reservation, and binding's early refusal |
-| the dispatcher's permission entry, new | PermissionRequest: the gated tools | hooks | runtime: the permission baseline, act binding and the epoch check |
+  | the dispatcher's permission entry, new | PermissionRequest: the gated tools | hooks | runtime: the permission baseline, act binding and the epoch check |
   | scratch-guard | PreToolUse: shell and edits; SubagentStart | hooks | roles: write gates |
   | gate-guard | PreToolUse: shell, AskUserQuestion | unattended | runtime: the run guard |
   | manifest-check, writing and replaying the card | SessionStart | session-kickoff | runtime: session binding and the card |
@@ -603,8 +605,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
       dispatcher is a single entry.
     - An allow rule on a gated tool would bypass the dispatcher, and so would a second
       PermissionRequest hook. A class check refuses either in tracked settings. The supervisor's
-      preflight reads every settings source an act session loads, and refuses the launch while any
-      holds one. check-wiring's session arm warns on either in every scope.
+      preflight reads every hook and permission source an act session loads: the managed, user,
+      project and local settings, each enabled plugin's hook files, and the hooks in agent and skill
+      frontmatter. It refuses the launch while any holds one. check-wiring's session arm warns on
+      either in every one of those sources (Revised 2026-10-17, the folds' closing review: the list once said settings only).
     - This repo's `.claude/settings.local.json` allows `Bash(git fetch *)` today.
   - **Auto mode stays, as the owner ruled** (TOOL-aMendedFleet-116).
     - The classifier still judges ungated tools.
@@ -848,7 +852,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | Tag | Guarantee | Observed by |
 |---|---|---|
 | `pure-position` | Position is a pure function of the declaration, the witnesses and the policy, the same in every mode. It is Flow's, and Runtime relies on it. | `next` |
-| `named-acts` | Every act was named by `next`. An unnamed Workflow, Agent or transition call is refused, and so is a shell call outside the act's allowance. An unnamed agent inside an admitted script voids its act's witness. A stale epoch is refused. | `binding`, `fencing` |
+| `named-acts` | Every act was named by `next`. An unnamed Workflow, Agent or transition call is refused, and so is a shell call outside the act's allowance. An unnamed agent inside an admitted script voids its act's witness. A stale epoch is refused at the commit queue and the lander at once, and at the dispatcher once its lease ref refreshes, within one node-tick period across nodes. | `binding`, `fencing` |
 | `once-per-instance` | An item instance whose witness is current never runs again, and an unwitnessed one can always be dispatched again. Every command is idempotent or reconciles. | `relaunch`, `idempotence`, `act-ceiling`, `coverage` |
 | `persisted-returns` | No result exists only in memory: every return is persisted through `record` before its item counts as done. | `spike`, `returns` |
 | `no-model-context` | Neither the decider nor the supervisor holds model context. | by construction: both are programs |
@@ -1028,6 +1032,7 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   - an empty frontier with all work terminal answers `terminal`, and one with work open answers `stuck`;
   - a corrupt witness answers `invalid-input`, naming its path;
   - a frontier holding only a hook item answers `awaiting`;
+  - an unleased build waiting at `deploy.released` answers `awaiting`, and no lease ref is written;
   - a blocked item whose blocker is in flight raises no owner item until the blocker ends, then raises
     exactly one;
   - an unreadable lease ref answers `stale-remote`, and the item parks once `leases.expiry-hours`
@@ -1085,7 +1090,8 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
     agent;
   - a user-level `Bash(*)` allow rule, and a user-level always-allow PermissionRequest hook beside a
     crashed dispatcher, each refuse an act session's launch at preflight and are warned about
-    attended. Each is seen red first;
+    attended. So does an always-allow PermissionRequest hook in an enabled plugin, planted beside a
+    crashed dispatcher. Each is seen red first;
   - under `runtime.hook-failure=open`, every run's journal and the class check's output name the
     policy in force, seen red when that line is dropped;
   - a `hooks.bypass` commit and a `core.exceptions` entry each leave a journal line, and the lander's
@@ -1151,9 +1157,11 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
 - **`no-skip`:** a class check over every launcher's argv fails on `--dangerously-skip-permissions`. It
   is seen red on today's `resume-tick.sh:385`.
 - **`fencing`:** run across two nodes, or with the old act session outside the killed tree. Kill only the
-  supervisor mid-act, and let a second supervisor take over with a new epoch. The old act session's next
-  gated call and its commit are each refused, and the refusal is the one in the old session's journal.
-  One witness and one commit result.
+  supervisor mid-act, and let a second supervisor take over with a new epoch. Until the old node's tick
+  restarts a supervisor, the old act session's gated calls are approved in its own workspace, and its
+  commit and push are each refused, the refusal the one in its journal. Once the restarted supervisor
+  reads the take-over, it kills the old session, and a gated call made after the refresh is refused.
+  One witness and one commit result. Revised 2026-10-17, the folds' closing review: this fixture once asserted the next gated call refused at once.
 - **`idempotence`:** kill the supervisor after the lander's push and before its witness. The take-over's
   reconcile probe finds origin at the expected sha, and nothing pushes twice.
 - **`relaunch-cap`:** a stub CLI that always exits at `--max-turns` parks the item after

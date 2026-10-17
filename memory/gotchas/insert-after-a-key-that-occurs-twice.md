@@ -31,6 +31,10 @@ path in the Dispatches table, so that row was never added.
 - Assert that the anchor matches once within the section, and that the new row has its table's column
   count.
 - Scope a presence check to the same section, or it finds the value elsewhere and skips the write.
+- Keep the table's indent. An anchor that starts at a row's pipe, after the indent of the list the
+  table sits in, makes the new row's line start at column 0, and the renderer ends the table there.
+  dClosedLoop's runtime fold did this twice on 2026-10-17, and the folds' closing review caught it
+  (`memory/builds/dClosedLoop/reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`, L2).
 
 It has no machine gate yet. A hygiene check that every table row under `memory/` has its header's
 column count would catch the whole class.

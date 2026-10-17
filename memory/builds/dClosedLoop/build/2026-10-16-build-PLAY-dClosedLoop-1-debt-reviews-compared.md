@@ -424,7 +424,7 @@ is owed.
 | `flakes-duplicate-ask` | 12 | — | amend | flow-steps' `test.flakes`; layer-memory `[asks]` | `append-without-an-idempotence-key` |
 | `removal-pending-no-filer` | 14 | 13 | amend | layer-memory `[reuse]` and `[asks]`; the reject-outcome gotcha | `owner-item-without-its-reject-outcome` |
 | `land-outcome-overlap` | 8 | 4 | amend | flow-steps' `deploy.land` and the lander's outcome classes | `route-names-an-output-its-actor-never-emits` |
-| `gaps-registered-list` | — | 6, 15 | amend | the layers comparison's `[folded]`, re-derived by its tally script | — |
+| `gaps-registered-list` | — | 6, 15 | amend | the layers comparison's `[folded]`, a gap list typed by hand in the tally script's template, which derives only the counts | — |
 | `start-guard-blocks-refused-rerun` | 6 | 10 | none: refuted, the re-run is an explicit route that never passes back through the start guard | — | — |
 | `gap-test-04-contract` | 16 | — | none: refuted, the row carries the contract the design relies on, and the probe sits in the text that cites it | — | — |
 | `gap-rows-no-check` | 17 | — | none: refuted, the register's rows carry no check column by its own form | — | — |

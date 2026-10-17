@@ -407,7 +407,9 @@ matrix from the step definitions as folded:
 | hook | `entry.intake` | — | — | — | — | — | — | — |
 | owner | `entry.place-owner` | — | — | `build.ratify` | — | — | — | `life.request` |
 
-- **Counts:** 75 items, each with one actor; 15 actors; 19 items with a role.
+- **Counts:** 76 items, each with one actor; 15 actors; 19 items with a role. Revised 2026-10-17, the
+  folds' closing review: the library fold's `build.ratify` added the 76th, and the run of 2026-10-17 in
+  `[instrument]` derives these counts.
 - **The prompt writer and the driver** act in no item. The prompt writer is a cycle role: it acts in
   every role item's cycle, framing each work order (`[roster]`, flow-roles `[cycle]`). The driver
   routes and never works.
@@ -1499,6 +1501,80 @@ exit 0
 $ planted: `deploy.notify`'s row with its leading pipe dropped (1 line changed)
 items 74 of 74 body rows; actor-item pairs 74; actors 15; items with a role 19; cycle roles 1; findings 0
 exit 0
+```
+
+### `role_matrix.py`, run again 2026-10-17
+
+The folds' closing review (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`, M12) found the
+Counts line in `[matrix]` still at 75 once the library fold added `build.ratify`. The revised instrument
+and its planting script, unchanged, run over the step definitions at `0e7c41abb`. The outputs above stay as
+they were for their own commit:
+
+```text
+$ clean
+items 76 of 76 body rows; actor-item pairs 76; actors 15; items with a role 19; cycle roles 1; findings 0
+exit 0
+
+$ planted: `plan.reason`'s actor misspelled `plannr` (1 line changed)
+items 76 of 76 body rows; actor-item pairs 75; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 1: plan.reason: actor 'plannr' is no kind and no declared role
+exit 1
+
+$ planted: `design.seams`'s actor changed to `command`, so the reuse scout acts in no item (1 line changed)
+items 76 of 76 body rows; actor-item pairs 76; actors 14; items with a role 18; cycle roles 1; findings 1
+FINDING arm 2: core role 'reuse scout' acts in no core item
+exit 1
+
+$ planted: `test.reason`'s actor changed to the expansion role `deployer` (1 line changed)
+items 76 of 76 body rows; actor-item pairs 76; actors 16; items with a role 19; cycle roles 1; findings 1
+FINDING arm 3: test.reason: core item names the expansion role 'deployer' (distribution, integrations)
+exit 1
+
+$ planted: `plan.reason`'s actor changed to the cycle role `prompt writer` (1 line changed)
+items 76 of 76 body rows; actor-item pairs 75; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 1: plan.reason: 'prompt writer' is a cycle role, and acts in no item
+exit 1
+
+$ planted: the [lifecycle] heading renamed [controls] (1 line changed)
+items 70 of 70 body rows; actor-item pairs 70; actors 15; items with a role 19; cycle roles 1; findings 7
+FINDING arm 0: life.request sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.quiesce sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.notify sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.snapshot sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.unlease sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.close sits under [controls], which is no step the matrix reads
+FINDING arm 0: step [lifecycle] holds no item
+exit 1
+
+$ planted: `test.reason`'s tag uppercased to `test.Reason` (1 line changed)
+items 75 of 76 body rows; actor-item pairs 75; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read: | `test.Reason` | tester | `test.recommend` | an
+exit 1
+
+$ planted: `test.attribute`'s tag given a second dot, `test.attribute.own` (1 line changed)
+items 75 of 76 body rows; actor-item pairs 75; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read: | `test.attribute.own` | tester | the OWN and MI
+exit 1
+
+$ planted: `deploy.notify`'s row with its backticks dropped (1 line changed)
+items 75 of 76 body rows; actor-item pairs 75; actors 15; items with a role 19; cycle roles 1; findings 1
+FINDING arm 0: a row under [deploy] that the item pattern cannot read: | deploy.notify | command, idempotent | `deploy.
+exit 1
+
+$ planted: a double space after `test.attribute`'s tag (1 line changed)
+items 75 of 76 body rows; actor-item pairs 75; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read: | `test.attribute`  | tester | the OWN and MIXED
+exit 1
+
+$ planted: `test.reason`'s row indented one space (1 line changed)
+items 75 of 76 body rows; actor-item pairs 75; actors 15; items with a role 18; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read:  | `test.reason` | tester | `test.recommend` | a
+exit 1
+
+$ planted: `deploy.notify`'s row with its leading pipe dropped (1 line changed)
+items 75 of 76 body rows; actor-item pairs 75; actors 15; items with a role 19; cycle roles 1; findings 1
+FINDING arm 0: a row under [deploy] that the item pattern cannot read: `deploy.notify` | command, idempotent | `deploy.
+exit 1
 ```
 
 ## [revised] Revised 2026-10-16: the two Tier-2 rounds, folded

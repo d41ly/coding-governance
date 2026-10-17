@@ -54,15 +54,17 @@ the adopter's own file in the target (`measure_contract_parity`, near line 6065,
   row.
 - A fixture plants a payload in each kind of target-side code the command can reach: a regenerate
   argv, a kit's adopt script that its check runs, the adopter's `settings-merge.py`, a hole's
-  discharge command, a contract-probed file and a workspace hook. Each payload writes a canary when it
+  discharge command, a contract-probed file, a seed argv, a git hook that an index write fires
+  (post-index-change) and a workspace hook. Each payload writes a canary when it
   runs, then reads the credential helper and the environment. Under a mode that refuses execution,
   the fixture asserts no canary and one refusal record per kind, so a payload that crashed before its
   canary cannot pass as refused. Under a sandbox that runs it, the fixture asserts the canary and
   finds neither the credential nor the environment.
 - Probe: list every subprocess call reachable from the command whose working directory is the
-  target, and fail when the design does not name each one. It ran on 2026-10-17 (the target-spawn probe,
-  in `memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md`,
-  `[probes-expansions]`): 11 sites reachable from update, the contract parity probe among them, and
-  `decline_findings`' discharge, which update never arms.
+  target, and fail when the design does not name each one. Its first run, on 2026-10-17, listed sites and
+  checked nothing. Its revision takes the design's named list and fails when the reached sites differ, and
+  it also reads git calls in the target, whose writes fire the target's own hooks: 27 sites in 9 functions
+  on update's path (`memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md`,
+  `[probes-final]`).
 
 It has no machine gate yet: dShippedRelease owes the sandbox and its fixture (`gap-deploy-13`).

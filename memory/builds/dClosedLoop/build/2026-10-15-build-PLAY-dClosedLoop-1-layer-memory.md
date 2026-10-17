@@ -411,9 +411,10 @@ optional component, and the research library is the library side.
 ### [names] Slugs and names
 
 - **The grammar is policy values, read from one parser.** The id grammar is already single-sourced:
-  memory-recall's `extract.grammar_for`, imported by memory-tree (`backlog.py`, `corpus_ids.py`) and by
-  drift-audit. The core needs it without memory-recall, an optional component (P28; KN-1), so the parser moves into memory-tree, the
-  core engine, and memory-recall imports it from there. The slug grammar joins that parser:
+  memory-recall's `extract.grammar_for` and `anchor_at`, imported by memory-tree (`backlog.py`,
+  `corpus_ids.py`, `merge-rows.py`, `transition_audit.py`) and by drift-audit. The core needs it without memory-recall, an optional component (P28; KN-1), so the parser moves into memory-tree, the
+  core engine, and memory-recall imports it from there. dOrderedCharter moves it unchanged, before its
+  dependency check lands, and dTotalRecall extends it with the slug grammar (Revised 2026-10-17, the folds' closing review). The slug grammar joins that parser:
   - `builds.slug-words`, 1 to 3 by the owner's words;
   - `builds.slug-style`, humorous, which is the product's foundation;
   - `builds.slug-date`, `none` by F4-7, with `shown` and `in-slug` allowed.
