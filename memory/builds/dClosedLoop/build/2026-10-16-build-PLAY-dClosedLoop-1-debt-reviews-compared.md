@@ -47,10 +47,75 @@ script that wrote them, are in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-r
 - **The comparison** follows the layers' method: each pair's findings are placed on shared defects, and
   what one run alone found is named.
 
+## [summary] Six pairs side by side
+
+Derived by `summarize_debt.py` over this record's six maps (the instruments' `[summarize]`). The columns
+read as the layers comparison's `[summary]` defines them
+(`build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared.md`).
+
+| Pair | Kind | Findings A / B | Confirmed A / B | Precision A / B | Out A / B |
+|---|---|---|---|---|---|
+| lexicon | spec audit | 53 / 56 | 47 / 49 | 0.89 / 0.88 | 231.1k / 230.8k |
+| review-system | spec audit | 47 / 45 | 41 / 39 | 0.87 / 0.87 | 224.7k / 207.6k |
+| runtime-fold | light diff | 22 / 25 | 18 / 24 | 0.82 / 0.96 | 88.2k / 119.9k |
+| fold-round3 | light diff | 17 / 18 | 12 / 15 | 0.71 / 0.83 | 105.6k / 106.1k |
+| library-followup | light diff | 24 / 23 | 19 / 22 | 0.79 / 0.96 | 128.6k / 112.0k |
+| expansions-fold-round3 | light diff | 23 / 22 | 19 / 21 | 0.83 / 0.95 | 105.3k / 110.7k |
+| all 6 | — | 186 / 189 | 156 / 170 | 0.84 / 0.90 | 883.5k / 887.1k |
+
+| Pair | Defects | Both | A only | B only | A alone covers | B alone covers | Overlap | Chapman: found by neither | High defects | High, one run only | Shared, graded alike | Refuted, with a confirmed twin |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| lexicon | 49 | 23 | 13 | 13 | 73% | 73% | 0.47 | 7 | 4 | 0 | 14 of 23 | 10 of 13 |
+| review-system | 35 | 19 | 10 | 6 | 83% | 71% | 0.54 | 3 | 2 | 1 | 15 of 19 | 9 of 12 |
+| runtime-fold | 23 | 8 | 5 | 10 | 57% | 78% | 0.35 | 6 | 3 | 2 | 6 of 8 | 0 of 5 |
+| fold-round3 | 13 | 5 | 3 | 5 | 62% | 77% | 0.38 | 2 | 1 | 0 | 3 of 5 | 3 of 8 |
+| library-followup | 21 | 10 | 6 | 5 | 76% | 71% | 0.48 | 3 | 0 | 0 | 9 of 10 | 5 of 6 |
+| expansions-fold-round3 | 17 | 9 | 2 | 6 | 65% | 88% | 0.53 | 1 | 3 | 1 | 7 of 9 | 2 of 5 |
+| the spec audit pairs | 84 | 42 | 23 | 19 | 77% | 73% | 0.50 | 10 | 6 | 1 | 29 of 42 | 19 of 25 |
+| the light diff pairs | 74 | 32 | 16 | 26 | 65% | 78% | 0.43 | 12 | 7 | 3 | 25 of 32 | 10 of 24 |
+| all 6 | 158 | 74 | 39 | 45 | 72% | 75% | 0.47 | 22 | 13 | 4 | 54 of 74 | 29 of 49 |
+
+## [patterns] What the six comparisons show
+
+- **One run still finds three quarters of what two find.**
+  - Alone, a run covers 57% to 88% of its pair's defects, and 72% and 75% over all six pairs. The layers
+    gave 74% and 75%.
+  - The runs overlap at 0.47, against the layers' 0.49. About 22 defects lie beyond both runs.
+  - Run B added 45 defects to run A's 113, about two fifths more. It cost 887.1k output tokens, about 5.1
+    new defects per 100k.
+- **The light diff reviews agree less than the spec audits.** The two full spec audits overlap at 0.50,
+  and the four light diff reviews at 0.43.
+- **High defects slip past a single run.** 4 of the 13 high defects were found by one run only, and 3 of
+  the 4 sit in light diff reviews.
+  - Run A missed three: the runtime fold's `return-key-per-act` and `fencing-epoch`, and the expansion
+    fold's `contract-probe-sixth-site`.
+  - Run B missed one: the review system's `replay-blindness`.
+- **Adjudication is still the noisier half.**
+  - 29 of the 49 refuted findings sit on a defect another finding confirmed. The layers had 40 of 70.
+  - The runs graded 54 of the 74 shared defects alike.
+  - On one claim the skeptics split outright. Run A's two skeptics refuted the expected population's
+    shared state, and run B's confirmed it (`expected-population-shared-state`).
+  - Run B refuted fewer findings in every light diff pair: 6 of 88, against run A's 18 of 86. A post-hoc
+    Fisher test puts the gap at p ≈ 0.01. The spec audits show no gap, at 12 of 100 and 13 of 101.
+- **Run A's findings did not reach run B, save one line.** The two runs' args differ only in their labels,
+  and the instruments' `[contamination]` reads every run-B transcript for the run-A report's name.
+  - In the lexicon pair, one run-B skeptic's `git grep` for an ask id returned one fix line of run A's
+    report.
+  - Elsewhere the name appears only in file listings, in the session's git status, and in run A's args,
+    which carry no finding.
+  - So the light diff pairs' precision gap stays unexplained. dFairHearing's replays are where to watch it.
+- **A fold breaks what it touches.** Every fold review found defects its fold wrote. The expansion fold's
+  both-runs probe is wrong a second time: round 2 found it blind on `[agreement]`, and both round-3 runs
+  found the rewrite exempting three rows it counts as matched.
+- **Four defects went to the owner, all from the two spec audits.** They are `[forks]`' LX-1 to LX-3 and
+  RV-1. Each repair in the four fold pairs stays inside a settled answer.
+
 ## [forks] Asked, 2026-10-17
 
 Four pairs are compared so far. Their maps send four defects to the owner, since each one's repair changes a
 settled answer or a standing decision. The last two pairs may add more.
+
+- **Revised: 2026-10-17, all six compared.** The last two pairs add no fork (`[patterns]`).
 
 | Fork | Defects | The question | Options, the recommendation first |
 |---|---|---|---|
@@ -265,3 +330,37 @@ refuted finding sits on the defect its claim names, beside its confirmed twin wh
 | `recall-imports-eight` | the planned move covers recall's two core-read functions, and check 27 imports eight names from the recall kit | — | 9 | amend |
 | `fix-unit-write-set` | the fix unit's write set omits the dossier edit that claims the new class | — | 17 | amend |
 | `gotcha-claim-wrong-dossier` | the idempotence class is claimed by a dossier of checkers | — | 16 | none: refuted, gotchas.py selects a class by its own anchors, not by a dossier's claims |
+
+## [map-expansions-fold-round3] The expansion round's round-3 fold findings, placed
+
+Run A is `wf_e8eb06bb-8ca` and run B is `wf_bf702393-ce3`. The ids are each report's appendix ids. A
+refuted finding sits on the defect its claim names, beside its confirmed twin where one exists.
+- **A finding that names two defects sits on each one its skeptic confirmed.** B3's skeptic confirmed
+  only its node-tick half, so B3 sits there alone.
+- **The skeptics split on one claim.** A6 and A21 were refuted and B22 was confirmed, all on the
+  expected population's shared state.
+- **Two refuted findings name defects older than the diff.** Their skeptics found A15 and A22 real, but
+  present at the base. Their rows read amend, and the comparison still counts them refuted.
+
+| defect | what | A | B | disposition |
+|---|---|---|---|---|
+| `both-runs-probe-exempts-rows` | the corrected both-runs probe counts a row as matched, then exempts it when "re-measured here" sits in any cell, so three `[agreement]` rows that credit both runs with no return citation pass | 1, 17 | 1, 10, 17 | amend |
+| `rerender-declines-hole-probes` | gap-deploy-13 and the gotcha say `GOVKIT_RERENDER=0` leaves the `[[hole]]` probes running, and both of update's hole-probe sites sit behind that switch | 2, 11 | 2, 9 | amend |
+| `quiesce-landed-withdraw` | `life.quiesce` now refuses only a pause of a landed build, so a withdraw or supersede of a landed build outside the release wait falls to `life.notify` and is recorded withdrawn | 3 | 4 | amend |
+| `release-hold-item-keys` | the release wait's owner item is keyed three ways, by the supervisor's sweep, by `life.quiesce` and by `deploy.released`'s arm, and the sweep has no "unless one is open" | 4, 13 | 5, 12, 21 | amend |
+| `request-lease-no-producer` | "life.* runs under the request's own run lease" names a lease that no layer produces | 9, 12 | 5 | amend |
+| `ceiling-sweep-key-spent` | the ceiling sweep fires once per (build, landed SHA), so after the owner keeps waiting no later ceiling exists | 5 | — | amend |
+| `release-ask-two-keys` | `maintain.file` keys the release-verify-failed ask by (reading, offender key), which makes it (release-verify-failed, SHA, E), and `release.route` keys its ask by (SHA, E) | 7, 14, 20 | 7, 11 | amend |
+| `second-keep-same-key` | the keep record is keyed by (ledger kind, id), so once a keep lapses a second keep of the same row cannot be written | 8, 16 | 8, 13 | amend |
+| `keep-fixture-one-sided` | the keep fixture checks only that a kept row is left out, never that it returns after the window or on a new catch | 19 | 20 | amend |
+| `event-wait-fixture-arms` | the event-wait fixture plants two builds in one landed SHA instead of one exit record for a later SHA containing several, names no stub that turns it red, and its sweep case has no negative arm | 10, 18 | 19 | amend |
+| `expected-population-shared-state` | each push boundary's expected population comes from the same range the scan reads, so a range computed wrong empties both and reads "none carried" | 6, 21 | 22 | amend |
+| `node-tick-no-expected-population` | the node tick's journal and transcript scan declares no expected population, and the rule that made its empty population a dead probe is gone | — | 3, 15 | amend |
+| `quiesce-arms-no-fixture` | `life.quiesce`'s new arms have no fixture | — | 21 | amend |
+| `contract-probe-sixth-site` | update's `[[contract]]` parity probe runs the adopter's file with cwd at the target and no `GOVKIT_RERENDER` gate, a sixth kind beside the records' "all five" | — | 18 | amend |
+| `five-kinds-probe-unrun` | the reachability probe behind "five kinds" has no recorded run, and run statically it also lists `decline_findings`' spawn, which is off by default | 23 | — | amend |
+| `released-witness-no-build` | `deploy.released`'s witness names the exit record keyed by SHA, with no build, while `[schedule]` witnesses each wake by build | — | 14 | amend |
+| `runtime-reader-table` | Runtime's reader table omits `build.release-ceiling` and `build.closes`, which the new sweep reads | — | 16 | amend |
+| `same-sha-repass-skipped` | after a held pass, a second exit record for the same SHA reuses a witnessed wake key and is skipped | 15 | — | amend: refuted only as older than the diff, since the base keyed the wake by (event, SHA) |
+| `payload-fixture-vacuous` | under the refusing mode no planted payload runs, so the fixture cannot tell a refusal from a clean sandbox or a crashed payload | 22 | — | amend: refuted only as older than the diff, since the base fixture asserted the same |
+| `ceiling-sweep-no-driver` | nothing beats to run the ceiling sweep when no lease is live | — | 6 | none: refuted, the node tick starts a supervisor when none beats under a live lease, and its beat runs the sweep |

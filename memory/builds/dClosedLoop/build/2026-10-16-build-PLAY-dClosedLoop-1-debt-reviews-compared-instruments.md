@@ -1353,3 +1353,285 @@ A15 (research-kind-selector): confirmed twin B18
 A20 (distill-class-no-producer): confirmed twin A1, B2, B12
 B16 (gotcha-claim-wrong-dossier): confirmed twin none
 ```
+
+## [compare-expansions-fold-round3] The expansions-fold-round3 pair's comparison, run over the record
+
+```text
+$ python compare_rounds.py reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-a.md \
+    reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-b.md \
+    build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared.md \
+    build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md wf_e8eb06bb-8ca wf_bf702393-ce3 map-expansions-fold-round3
+== runs
+A: raw 23, confirmed 19, refuted 4, precision 0.83, high findings 2, agents 10, out 105.3k (sum of returned lines)
+B: raw 22, confirmed 21, refuted 1, precision 0.95, high findings 1, agents 10, out 110.7k (sum of returned lines)
+== defects
+map rows 20, confirmed defects 17, refuted-only 3
+both 9, A only 2, B only 6
+A alone covers 11 of 17 (65%)
+B alone covers 15 of 17 (88%)
+overlap (Jaccard) 0.53
+Chapman estimate of the population: 18.2, so about 1 found by neither
+A only: ceiling-sweep-key-spent, five-kinds-probe-unrun
+B only: expected-population-shared-state, node-tick-no-expected-population, quiesce-arms-no-fixture, contract-probe-sixth-site, released-witness-no-build, runtime-reader-table
+== severity (a defect takes its highest confirmed grade per round)
+high defects 3: both-runs-probe-exempts-rows, quiesce-landed-withdraw, contract-probe-sixth-site
+  both-runs-probe-exempts-rows: A 3 B 2
+  quiesce-landed-withdraw: A 3 B 2
+  contract-probe-sixth-site: A 0 B 3
+shared defects graded alike 7 of 9
+== lenses behind the defects one round alone found
+A: correctness 1, verification 1
+B: verification 3, seams 3, correctness 1
+== refuted findings and their twins
+A6 (expected-population-shared-state): confirmed twin B22
+A15 (same-sha-repass-skipped): confirmed twin none
+A21 (expected-population-shared-state): confirmed twin B22
+A22 (payload-fixture-vacuous): confirmed twin none
+B6 (ceiling-sweep-no-driver): confirmed twin none
+```
+
+## [summarize] The summary script
+
+`summarize_debt.py`, run from the worktree root with the layers instruments' `compare_rounds.py`
+(`build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared-instruments.md` `[compare]`).
+
+```python
+"""Run the round comparison over each debt pair's map and derive the cross-pair tables, split by review kind.
+
+Usage: python summarize_debt.py <compare_rounds.py> <debt-record> <session-log> [--only <piece>,...]
+
+The layers round's summarize_layers.py, with its five layers swapped for the debt round's six pairs, all
+mapped in the one debt comparison record, and a subtotal per kind: the two full spec audits and the four
+light diff reviews. Refuses, exit 1, when any run refuses or prints a line this parser does not recognise.
+Prints the tables, then every run's full output.
+"""
+import re
+import subprocess
+import sys
+
+REPORT = "memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-{}-{}.md"
+PIECES = [  # name, kind, run A, run B; the map is `[map-<name>]`
+    ("lexicon", "spec audit", "wf_14950dae-859", "wf_b52591b3-8f4"),
+    ("review-system", "spec audit", "wf_84ae201a-775", "wf_dd2730e2-e29"),
+    ("runtime-fold", "light diff", "wf_c8860577-b54", "wf_dea5d838-89e"),
+    ("fold-round3", "light diff", "wf_588892a6-fb7", "wf_fc0975c8-622"),
+    ("library-followup", "light diff", "wf_579f3126-0b4", "wf_0beb4276-c5c"),
+    ("expansions-fold-round3", "light diff", "wf_e8eb06bb-8ca", "wf_bf702393-ce3"),
+]
+
+
+def grab(pattern, text, name):
+    m = re.search(pattern, text, re.M)
+    if not m:
+        sys.exit(f"{name}: no line matches {pattern!r}")
+    return m.groups()
+
+
+def run(script, record, log, name, run_a, run_b):
+    out = subprocess.run([sys.executable, script, REPORT.format(name, "a"), REPORT.format(name, "b"),
+                          record, log, run_a, run_b, "map-" + name], capture_output=True, text=True)
+    if out.returncode != 0:
+        sys.exit(f"{name}: compare_rounds refused: {(out.stdout + out.stderr).strip()}")
+    t = out.stdout
+    r = {"name": name, "text": t}
+    for side in "AB":
+        raw, conf, prec, spent = grab(rf"^{side}: raw (\d+), confirmed (\d+), refuted \d+, precision ([0-9.]+), "
+                                      rf"high findings \d+, agents \d+, out ([0-9.]+)k ", t, name)
+        r[side] = (int(raw), int(conf), prec, float(spent))
+    r["defects"], r["refuted_only"] = map(int, grab(r"^map rows \d+, confirmed defects (\d+), refuted-only (\d+)$", t, name))
+    r["both"], r["a_only"], r["b_only"] = map(int, grab(r"^both (\d+), A only (\d+), B only (\d+)$", t, name))
+    r["chapman"] = float(grab(r"^Chapman estimate of the population: ([0-9.]+),", t, name)[0])
+    highs = re.findall(r"^  (\S+): A (\d) B (\d)$", t, re.M)
+    r["high"] = len(highs)
+    r["high_one"] = [tag for tag, a, b in highs if a == "0" or b == "0"]
+    r["alike"] = tuple(map(int, grab(r"^shared defects graded alike (\d+) of (\d+)$", t, name)))
+    refuted = re.findall(r"^[AB]\d+ \(\S+\): confirmed twin (.+)$", t, re.M)
+    r["refuted"] = len(refuted)
+    r["twinned"] = sum(1 for v in refuted if v != "none")
+    if len(highs) != int(grab(r"^high defects (\d+)", t, name)[0]):
+        sys.exit(f"{name}: the high-defect lines do not match their count")
+    return r
+
+
+def pct(n, d):
+    return f"{n / d:.0%}"
+
+
+def total_row(label, rows):
+    t = {k: sum(r[k] for r in rows) for k in ("defects", "both", "a_only", "b_only", "high", "refuted", "twinned")}
+    ho = sum(len(r["high_one"]) for r in rows)
+    al, sh = sum(r["alike"][0] for r in rows), sum(r["alike"][1] for r in rows)
+    chap = sum(r["chapman"] - r["defects"] for r in rows)
+    d, both = t["defects"], t["both"]
+    return (f"| {label} | {d} | {both} | {t['a_only']} | {t['b_only']} | {pct(both + t['a_only'], d)} "
+            f"| {pct(both + t['b_only'], d)} | {both / d:.2f} | {chap:.0f} | {t['high']} | {ho} | {al} of {sh} "
+            f"| {t['twinned']} of {t['refuted']} |")
+
+
+def main():
+    script, record, log = sys.argv[1:4]
+    only = sys.argv[sys.argv.index("--only") + 1].split(",") if "--only" in sys.argv else None
+    pieces = [p for p in PIECES if (only is None or p[0] in only)]
+    if any(b is None for _, _, _, b in pieces):
+        sys.exit("a pair has no run B yet; pass --only for the pairs that have both")
+    rows = [dict(run(script, record, log, n, a, b), kind=k) for n, k, a, b in pieces]
+    print("| Pair | Kind | Findings A / B | Confirmed A / B | Precision A / B | Out A / B |")
+    print("|---|---|---|---|---|---|")
+    for r in rows:
+        print(f"| {r['name']} | {r['kind']} | {r['A'][0]} / {r['B'][0]} | {r['A'][1]} / {r['B'][1]} "
+              f"| {r['A'][2]} / {r['B'][2]} | {r['A'][3]:.1f}k / {r['B'][3]:.1f}k |")
+    fa, fb = sum(r["A"][0] for r in rows), sum(r["B"][0] for r in rows)
+    ca, cb = sum(r["A"][1] for r in rows), sum(r["B"][1] for r in rows)
+    oa, ob = sum(r["A"][3] for r in rows), sum(r["B"][3] for r in rows)
+    print(f"| all {len(rows)} | — | {fa} / {fb} | {ca} / {cb} | {ca / fa:.2f} / {cb / fb:.2f} | {oa:.1f}k / {ob:.1f}k |")
+    print()
+    print("| Pair | Defects | Both | A only | B only | A alone covers | B alone covers | Overlap "
+          "| Chapman: found by neither | High defects | High, one run only | Shared, graded alike "
+          "| Refuted, with a confirmed twin |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    for r in rows:
+        print(total_row(r["name"], [r]))
+    for kind in ("spec audit", "light diff"):
+        sub = [r for r in rows if r["kind"] == kind]
+        if len(sub) > 1:
+            print(total_row(f"the {kind} pairs", sub))
+    print(total_row(f"all {len(rows)}", rows))
+    print()
+    print("high defects one run alone found: " + ("; ".join(
+        f"{r['name']}: {', '.join(r['high_one'])}" for r in rows if r["high_one"]) or "none"))
+    for r in rows:
+        print(f"\n=== {r['name']}\n{r['text'].rstrip()}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+### Its output
+
+```text
+$ python summarize_debt.py compare_rounds.py \
+    build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared.md \
+    build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md
+| Pair | Kind | Findings A / B | Confirmed A / B | Precision A / B | Out A / B |
+|---|---|---|---|---|---|
+| lexicon | spec audit | 53 / 56 | 47 / 49 | 0.89 / 0.88 | 231.1k / 230.8k |
+| review-system | spec audit | 47 / 45 | 41 / 39 | 0.87 / 0.87 | 224.7k / 207.6k |
+| runtime-fold | light diff | 22 / 25 | 18 / 24 | 0.82 / 0.96 | 88.2k / 119.9k |
+| fold-round3 | light diff | 17 / 18 | 12 / 15 | 0.71 / 0.83 | 105.6k / 106.1k |
+| library-followup | light diff | 24 / 23 | 19 / 22 | 0.79 / 0.96 | 128.6k / 112.0k |
+| expansions-fold-round3 | light diff | 23 / 22 | 19 / 21 | 0.83 / 0.95 | 105.3k / 110.7k |
+| all 6 | — | 186 / 189 | 156 / 170 | 0.84 / 0.90 | 883.5k / 887.1k |
+
+| Pair | Defects | Both | A only | B only | A alone covers | B alone covers | Overlap | Chapman: found by neither | High defects | High, one run only | Shared, graded alike | Refuted, with a confirmed twin |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| lexicon | 49 | 23 | 13 | 13 | 73% | 73% | 0.47 | 7 | 4 | 0 | 14 of 23 | 10 of 13 |
+| review-system | 35 | 19 | 10 | 6 | 83% | 71% | 0.54 | 3 | 2 | 1 | 15 of 19 | 9 of 12 |
+| runtime-fold | 23 | 8 | 5 | 10 | 57% | 78% | 0.35 | 6 | 3 | 2 | 6 of 8 | 0 of 5 |
+| fold-round3 | 13 | 5 | 3 | 5 | 62% | 77% | 0.38 | 2 | 1 | 0 | 3 of 5 | 3 of 8 |
+| library-followup | 21 | 10 | 6 | 5 | 76% | 71% | 0.48 | 3 | 0 | 0 | 9 of 10 | 5 of 6 |
+| expansions-fold-round3 | 17 | 9 | 2 | 6 | 65% | 88% | 0.53 | 1 | 3 | 1 | 7 of 9 | 2 of 5 |
+| the spec audit pairs | 84 | 42 | 23 | 19 | 77% | 73% | 0.50 | 10 | 6 | 1 | 29 of 42 | 19 of 25 |
+| the light diff pairs | 74 | 32 | 16 | 26 | 65% | 78% | 0.43 | 12 | 7 | 3 | 25 of 32 | 10 of 24 |
+| all 6 | 158 | 74 | 39 | 45 | 72% | 75% | 0.47 | 22 | 13 | 4 | 54 of 74 | 29 of 49 |
+
+high defects one run alone found: review-system: replay-blindness; runtime-fold: return-key-per-act, fencing-epoch; expansions-fold-round3: contract-probe-sixth-site
+```
+
+Each pair's full comparison follows these tables in the output, as `[compare-<pair>]` above files it.
+
+### Seen red
+
+```text
+$ planted: summarize_debt.py over a copy whose [map-expansions-fold-round3] heading is renamed
+expansions-fold-round3: compare_rounds refused: ...: no section ## [map-expansions-fold-round3]
+exit 1
+$ planted: summarize_debt.py over a copy whose contract-probe-sixth-site row places no id
+expansions-fold-round3: compare_rounds refused: report B: ids the map does not place: [18]
+exit 1
+```
+
+## [contamination] Run A's report in run B's transcripts
+
+`contamination.py` reads every run-B agent transcript the Workflow tool kept for this session, and lists
+each entry that names its pair's run-A report.
+
+```python
+"""For each debt pair's run B, list every transcript entry of its agents that names run A's report, by kind:
+the prompt, a tool call's input, a tool result, or an attachment such as the session's git status. A tool
+result is printed with the call that produced it and the 160 characters after the name, so a reader can
+tell a file name in a listing from the report's own text.
+
+Usage: python contamination.py <subagents/workflows dir>
+Prints the population read per pair (agent transcripts and entries), so a zero is a zero over that population.
+"""
+import json
+import pathlib
+import sys
+
+D = pathlib.Path(sys.argv[1])
+PAIRS = [("lexicon", "wf_b52591b3-8f4"), ("review-system", "wf_dd2730e2-e29"), ("runtime-fold", "wf_dea5d838-89e"),
+         ("fold-round3", "wf_fc0975c8-622"), ("library-followup", "wf_0beb4276-c5c"),
+         ("expansions-fold-round3", "wf_bf702393-ce3")]
+
+for name, wf in PAIRS:
+    needle = f"review-PLAY-dClosedLoop-1-{name}-a.md"
+    files = sorted((D / wf).glob("agent-*.jsonl"))
+    if not files:
+        sys.exit(f"{name}: no agent transcripts under {D / wf}")
+    entries, hits, shown = 0, {"prompt": 0, "tool_use": 0, "tool_result": 0, "attachment": 0}, []
+    for f in files:
+        meta = json.loads(f.with_name(f.name.replace(".jsonl", ".meta.json")).read_text(encoding="utf-8"))
+        who = meta.get("description", "").split(" · ")[-1]
+        calls = {}
+        for line in f.read_text(encoding="utf-8").splitlines():
+            entries += 1
+            e = json.loads(line)
+            msg = e.get("message") or {}
+            content = msg.get("content")
+            if isinstance(content, list):
+                for c in content:
+                    if isinstance(c, dict) and c.get("type") == "tool_use":
+                        calls[c.get("id")] = json.dumps(c.get("input"))[:140]
+            if needle not in line:
+                continue
+            if e.get("type") == "attachment":
+                hits["attachment"] += 1
+            elif msg.get("role") == "assistant":
+                hits["tool_use"] += 1
+                shown.append(f"  {who}: a call names it: {line[line.index(needle) - 80:line.index(needle) + 60]}")
+            elif isinstance(content, list) and any(isinstance(c, dict) and c.get("type") == "tool_result" for c in content):
+                for c in content:
+                    if isinstance(c, dict) and c.get("type") == "tool_result":
+                        t = c["content"] if isinstance(c["content"], str) else json.dumps(c["content"])
+                        if needle in t:
+                            hits["tool_result"] += 1
+                            i = t.index(needle) + len(needle)
+                            shown.append(f"  {who}: result of {calls.get(c.get('tool_use_id'), '?')}\n"
+                                         f"      after the name: {t[i:i + 160]!r}")
+            else:
+                hits["prompt"] += 1
+    print(f"{name}: {len(files)} transcripts, {entries} entries; " + ", ".join(f"{k} {v}" for k, v in hits.items()))
+    for s in shown:
+        print(s)
+```
+
+```text
+$ python contamination.py <the session's subagents/workflows directory>
+lexicon: 12 transcripts, 1165 entries; prompt 0, tool_use 0, tool_result 2, attachment 6
+  verify:ids-37-48: result of {"command": "cd C:/projects/coding-governance/.claude/worktrees/gov-architecture-plan-e34297 && git grep -n 'aSurfacedLexicon-23\\|aSurfaced
+      after the name: ':335:- **Fix (skeptic: sound):** Reword it: "L-6 declared `html` and `svg` dark. The undeclared-extension refusal sta'
+  find:reuse: result of {"command": "cd C:/projects/coding-governance/.claude/worktrees/gov-architecture-plan-e34297 && git ls-files | grep -E \"reuse_lookup.py|mem
+      after the name: '\nmemory/builds/dScaffoldedMirror/build/2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md\nmemory/map/features/lexicon.md\ntools/codebase-ma'
+review-system: 12 transcripts, 1165 entries; prompt 0, tool_use 0, tool_result 1, attachment 6
+  synth: result of {"command": "cd C:/projects/coding-governance/.claude/worktrees/gov-architecture-plan-e34297/memory/builds/dClosedLoop/reviews && ls | tail 
+      after the name: "\n**Serves:** spec-audit PLAY-dClosedLoop-1\n\n# Tier-2 review, run A: the lexicon's design record for dClosedLoop (the lexicon kit under the one-loop architecture"
+runtime-fold: 10 transcripts, 592 entries; prompt 0, tool_use 0, tool_result 1, attachment 0
+  synth: result of {"command": "cd C:/projects/coding-governance/.claude/worktrees/gov-architecture-plan-e34297/memory/builds/dClosedLoop/reviews && ls | tail 
+      after the name: "\n**Serves:** diff-review PLAY-dClosedLoop-1\n\n# Tier-2 review: the fold of the expansion fold's closing review in dClosedLoop (the closing review's follow-up)\n\nP"
+fold-round3: 10 transcripts, 610 entries; prompt 0, tool_use 0, tool_result 0, attachment 0
+library-followup: 10 transcripts, 623 entries; prompt 0, tool_use 0, tool_result 0, attachment 0
+expansions-fold-round3: 10 transcripts, 629 entries; prompt 0, tool_use 0, tool_result 1, attachment 0
+  verify:ids-16-20: result of {"command": "cd C:/projects/coding-governance/.claude/worktrees/gov-architecture-plan-e34297; F=memory/builds/dClosedLoop/build/2026-10-15-b
+      after the name: '. Its head carries an H1, then, within its first twelve lines, the line `**Serves:** diff-review PLAY-dClosedLoop-1`. It carries exactly one `## Verdict:` line,'
+```
