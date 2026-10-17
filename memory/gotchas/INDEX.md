@@ -28,6 +28,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [a-view-fix-trades-one-blindness-for-another](a-view-fix-trades-one-blindness-for-another.md) | class | 3 |  | a scanner that grades source through a rendered view has a blind spot, and building a better view moves it rather than closing it, each move a new fail-open or false-deny |
 | [ab-arm-never-did-the-work](ab-arm-never-did-the-work.md) | class | 3 |  | a timing A/B whose arms are not each asserted to have DONE the work measures a refusal against a run, and the fast arm looks like the good one |
 | [absence-assertion-over-whole-file-text](absence-assertion-over-whole-file-text.md) | class | 3 |  | a ban that greps whole file text reds on the comment documenting its own fix |
+| [absence-read-from-one-of-several-homes](absence-read-from-one-of-several-homes.md) | class | 1 |  | a fact stated in several homes is read from one, so a derived view or a probe reports it absent wherever that home is silent, and the blank reads exactly like a real gap |
 | [allocation-knob-without-a-ceiling](allocation-knob-without-a-ceiling.md) | class | 3 |  | a knob that sizes an allocation or a loop, validated only as a positive integer, hangs the process on a mistyped value before anything it guards runs |
 | [allowlist-narrower-than-the-root-it-guards](allowlist-narrower-than-the-root-it-guards.md) | class | 7 |  | a guard keyed on a path prefix denies the sanctioned destination too, because on this platform the sanctioned destination is INSIDE the prefix |
 | [amendment-leaves-its-other-half-standing](amendment-leaves-its-other-half-standing.md) | class | 3 |  | a criterion is amended and the clause, scope item or log line that only made sense under the old wording is left behind, so one rule now returns two verdicts |
@@ -154,6 +155,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 3 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-139 record(s): 136 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+140 record(s): 137 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

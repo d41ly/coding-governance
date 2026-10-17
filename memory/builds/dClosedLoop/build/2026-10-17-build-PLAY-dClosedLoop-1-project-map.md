@@ -1056,6 +1056,9 @@ and, after it:
 
 ### [reload-pointer] What only the map points at: two steps no build owns
 
+Corrected 2026-10-17 in `[fixes-correction]`: lifecycle's own section names its owner, so only entry
+is owned by no build.
+
 - **The pointer.** At level 0, two of the nine steps carry no `owner=`: `step.entry` and
   `step.lifecycle`, 6 items each. One level down, `--ns item` gives each of their 12 items its step as
   owner, and nothing further.
@@ -1178,3 +1181,241 @@ prose homes, by the words the items' work goes by:
   - a fork on how entry and lifecycle reach a build: an owning build per step, or each item claimed by
     tag in its build's chain row;
   - the generator reading the items' claims, so the adopt line reads `owner=dTotalRecall,dWitnessedBar`.
+
+## [fixes] What the findings say to fix, 2026-10-17
+
+The owner asked, verbatim:
+
+> Based on these findings, what needs to be fixed to improve the concept?
+
+### [fixes-correction] Lifecycle is owned, and entry is not
+
+`[reload-pointer]` reported that no build owns entry or lifecycle. Half of that was wrong.
+- **Lifecycle names its owner in its own section.** flow-steps' `[lifecycle]` opens: "Runtime executes
+  the owner's controls (dWellOiledMachine, RT-3)". The probe read only v2's chain rows, so it missed
+  that statement the way the generator misses adopt's claims.
+- **Entry names none.** Its section says only that the intake hook is Runtime's, and that hook's gap,
+  `gap-rt-14`, is dWellOiledMachine's. Its other five items have no owner statement anywhere. The
+  `[adopt]` match below is a record path the section cites, not an owner.
+- **The register leans one way.** dDeclaredLoop owns 7 of the 15 Orient gaps, the area entry's work
+  falls in.
+
+### [fixes-cause] One relation, four homes, read from one
+
+Who owns a node is stated in four places, and none of them is a declared field:
+- v2's chain table, whose stage column gives each stage step its build;
+- chain-row prose, which cites some items and keys by tag;
+- step-section prose, as lifecycle's does;
+- the systems' owner tables.
+
+The generator reads one home per kind of node, and renders a blank where that home is silent. So a
+blank means one of three things, and the reader cannot tell which:
+- a real gap, as entry is;
+- a fact stated in a home the generator does not read, as adopt's and lifecycle's are;
+- nothing, by design: the prompt writer is a cycle role and acts in no item, and the deployer and the
+  maintainer act in expansion layers (layer-roles `[roster]`, P28).
+
+The checks passed through all three. The run exits 2, never 1, because the owner check covers only the
+tag namespaces and the systems.
+
+The policy keys show the scale.
+- The catalogue's columns are key, allowed values, default and source, and its source names the round
+  that decided the key, not a build.
+- 115 of 187 keys are cited by no chain row, so their owner can only be inferred, from a namespace's
+  name, a system's owner table or a row's prose.
+- The map renders no owner field on a policy namespace at all, so this blank is not even visible.
+
+```bash
+#!/usr/bin/env bash
+# The probes behind the project map's [fixes] section. Run from the worktree root; writes into the directory $1.
+set -u
+OUT=$1
+H=$(dirname "$0")
+B=memory/builds/dClosedLoop/build
+V=$B/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md
+M=$B/2026-10-17-build-PLAY-dClosedLoop-1-map.py
+python $M --ns policy-key > "$OUT/policy-key-ns.txt"
+python $M --ns gap > "$OUT/gap-ns.txt"
+{
+  echo '$ step sections that name a chain build in their first eight lines'
+  awk '/^## \[(entry|plan|design|build|test|deploy|breakpoint|lifecycle|adopt)\]/{s=$2; n=0} s && n<8 {n++; if (match($0, /d[A-Z][a-z]+[A-Z][A-Za-z]+/)) print s, substr($0, RSTART, RLENGTH)}' \
+    $B/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md | sort -u
+  echo '$ the Orient gaps by owning build, and gap-rt-14'
+  grep -oE '^- gap\.gap-orient-[0-9]+ .*owner=\S+' "$OUT/gap-ns.txt" | grep -oE 'owner=\S+' | sort | uniq -c
+  grep -E '^- gap\.gap-rt-14 ' "$OUT/gap-ns.txt" | grep -oE 'gap-rt-14|owner=\S+' | paste -sd' '
+  echo '$ the policy catalogue header'
+  grep -nE '^\| Key \| Allowed values' $V
+  echo '$ python key_owner_probe.py policy-key-ns.txt architecture-v2.md'
+  python "$H/key_owner_probe.py" "$OUT/policy-key-ns.txt" $V
+  echo '$ python key_owner_probe.py policy-key-ns.txt architecture-v2.md --plant floor'
+  python "$H/key_owner_probe.py" "$OUT/policy-key-ns.txt" $V --plant floor | head -1
+} > "$OUT/fixes-probes.txt" 2>&1
+```
+
+```python
+"""How many of a namespace's nodes does some chain row cite? Joins `map.py --ns <namespace>` to v2's chain rows.
+
+Usage: python key_owner_probe.py <ns.txt> <architecture-v2.md> [--plant <key>]
+
+A row cites a node when it holds the node's key in backticks. A citation is not always a claim (a row may
+name a key it only calls), so the 1-row and 2+-row counts over-state ownership; the 0-row count is exact.
+--plant appends a citation of <key> to the first chain row, in memory, to see a 0-row key leave the list.
+"""
+import re
+import sys
+
+
+def read(path):
+    return open(path, encoding="utf-8", newline="").read().replace("\r\n", "\n")
+
+
+nodes = re.findall(r"^- ([a-z-]+)\.(\S+) — ", read(sys.argv[1]), flags=re.M)
+v2 = read(sys.argv[2])
+rows = dict(re.findall(r"^\| (d[A-Z][a-z]+[A-Z]\w+) \|(.*)$", v2, flags=re.M))
+if "--plant" in sys.argv:
+    first = next(iter(rows))
+    rows[first] += f" `{sys.argv[sys.argv.index('--plant') + 1]}`"
+by = {key: [b for b, r in rows.items() if f"`{key}`" in r] for _, key in nodes}
+zero = [k for k in by if not by[k]]
+one = [k for k in by if len(by[k]) == 1]
+many = [k for k in by if len(by[k]) > 1]
+print(f"{nodes[0][0] if nodes else '?'}: {len(nodes)} nodes · chain rows {len(rows)} · "
+      f"cited by no row {len(zero)} · one row {len(one)} · two or more {len(many)}")
+groups = {}
+for k in zero:
+    groups.setdefault(k.split(".")[0], []).append(k)
+print("cited by no row, by namespace:")
+for g in sorted(groups):
+    print(f"  {g} {len(groups[g])}: {', '.join(groups[g])}")
+print("cited by two or more rows:")
+for k in many:
+    print(f"  {k}: {', '.join(by[k])}")
+```
+
+```text
+$ step sections that name a chain build in their first eight lines
+[adopt] dClosedLoop
+[lifecycle] dWellOiledMachine
+$ the Orient gaps by owning build, and gap-rt-14
+      3 owner=dBoundRoles
+      7 owner=dDeclaredLoop
+      1 owner=dOrderedCharter
+      1 owner=dRankedPlan
+      1 owner=dTendedCadence
+      2 owner=dWellOiledMachine
+gap-rt-14 owner=dWellOiledMachine
+$ the policy catalogue header
+636:| Key | Allowed values | Default | Source |
+$ python key_owner_probe.py policy-key-ns.txt architecture-v2.md
+policy-key: 187 nodes · chain rows 15 · cited by no row 115 · one row 68 · two or more 4
+cited by no row, by namespace:
+  annotations 4: annotations.lookup, annotations.budget, annotations.resolve-scope, annotations.delivery
+  budgets 1: budgets.*
+  build 1: build.release-hold
+  card 1: card.follows
+  core 2: core.bypass, core.exceptions
+  currency 2: currency.max-behind, currency.on-behind
+  decisions 1: decisions.major
+  deploy 4: deploy.runs, deploy.promotion, deploy.on-verify-fail, deploy.currency
+  deps 3: deps.coordination, deps.early-build, deps.messaging
+  design 2: design.handoff, design.overlap
+  floor 1: floor
+  flow 1: flow.route-backs
+  hooks 1: hooks.bypass
+  install 1: install.from
+  instructions 3: instructions.slices, instructions.legacy, instructions.task-charter
+  integrations 1: integrations.tracker
+  kits 3: kits.cadence, kits.host, kits.watch-cadence
+  landing 1: landing.order
+  leases 6: leases, leases.granularity, leases.renewal, leases.expiry-hours, leases.overlap, leases.offline
+  maintain 10: maintain.host, maintain.cadence, maintain.fixes, maintain.on-breach, maintain.events, maintain.reading-tree, maintain.node-readings, maintain.reading-admission, maintain.dead-after, maintain.record-when
+  memory 6: memory.default-load, memory.over-budget, memory.map-overflow, memory.map-unfold, memory.legacy-anchors, memory.superseded-slices
+  notify 1: notify.channel
+  observability 1: observability.run-record
+  orient 1: orient.budget
+  patch 1: patch.ratify
+  plan 4: plan.authority, plan.unplaced, plan.triage, plan.kickoff
+  policy 3: policy.guard, policy.proof, policy.on-missing-expansion
+  release 1: release.environments
+  retrofit 6: retrofit.drain, retrofit.claim-on-touch, retrofit.widen, retrofit.unseeded, retrofit.cadence, retrofit.slot-bytes
+  reuse 1: reuse.propose
+  review 13: review.design.rounds, review.design.round-count, review.unverified, review.<stage>.effort, review.recommendation, review.build.when, review.blocks, review.left-shift, review.recommendation.source, review.loop.cadence, review.loop.retire, review.loop.window-days, review.loop.catch-source
+  roles 2: roles.shape-enforce, roles.orientation.house-index
+  runtime 9: runtime.spawn-backend, runtime.relaunch, runtime.act-ceiling, runtime.hold-ceiling, runtime.hook-failure, runtime.attended-allowance, runtime.harnesses, runtime.secret-home, runtime.secret-scan
+  tags 4: tags.slice, tags.retired-cites, tags.positional, tags.bare-refs
+  tests 3: tests.without-cadence, tests.product, tests.landing-levels
+  transitions 1: transitions.record
+  verdict 9: verdict, verdict.blocks, verdict.held, verdict.flakes, verdict.tree, verdict.red-route, verdict.remote.trust, verdict.remote.pin-scope, verdict.remote.pin
+cited by two or more rows:
+  placement.check: dBoundRoles, dRankedPlan
+  instructions.edit: dOrderedCharter, dTotalRecall, dMindYourWords
+  memory.item-budget: dTotalRecall, dCalibratedLens
+  memory.map-purpose: dOrderedCharter, dTotalRecall
+$ python key_owner_probe.py policy-key-ns.txt architecture-v2.md --plant floor
+policy-key: 187 nodes · chain rows 15 · cited by no row 114 · one row 69 · two or more 4
+```
+
+The class is new, and is filed as `absence-read-from-one-of-several-homes` in `memory/gotchas/`. It has
+no machine gate yet. The owner check, `[fixes-concept]`'s second fix, is the gate it owes.
+
+### [fixes-concept] What to fix in the concept
+
+1. **One home for ownership.** Every node a build must build declares its owning build once, in a field:
+   - items, beside their actor in flow-steps;
+   - keys, in a catalogue column;
+   - points, in their table;
+   - record kinds, in their registry.
+
+   The owners of a step, a system and a namespace are derived from their members, so a step can have
+   several. Prose stops being a source of ownership.
+2. **The owner check covers everything a build must build.** Items, keys, points, record kinds, tag
+   namespaces and systems are each owned by exactly one build, and the check is seen red on a planted
+   orphan. It is acceptance check (c)'s gap join, widened from gaps.
+3. **The generator never infers a relation.** Today it infers three:
+   - a step's owner, from its stage (`step_stage`);
+   - every point's owner, dWellOiledMachine, from a literal;
+   - a tag namespace's owner, defaulted from the Owners bullet.
+
+   An inferred owner reads exactly like a declared one, so a default hides the gap the map exists to
+   show.
+4. **Typed blanks, and the debt in the header.**
+   - A line tells "nothing, by design" from "not declared". A role line carries the roster's layer and
+     mode, so the three by-design blanks explain themselves.
+   - A required relation that is missing is a finding. The header counts it beside `pending` and
+     `unarmed`, as `unowned N`.
+5. **Arm what prose holds.** record-kind stays unarmed while layer-memory lists the kinds in prose. A
+   design-time table arms it now, and dTotalRecall's registry replaces the table in the product.
+6. **Stable keys.**
+   - A decision row keyed by its ordinal changes key when a row is inserted above it, so every citation
+     of it goes stale.
+   - Whether a line opens with a node's tag or its native id is still open (`[test-run-found]`, 6).
+
+### [fixes-design] What the fixes leave in the design
+
+- **Entry's six items need an owner.** Their work sits in prose across four builds:
+  - placement and the intake log, in dRankedPlan's row;
+  - the scout's placement return, in dBoundRoles' row;
+  - the card, in dDeclaredLoop's row;
+  - the intake hook, in Runtime's section.
+- **115 policy keys need an owner.** Four keys that two or three rows cite need one of those builds
+  named: `placement.check`, `instructions.edit`, `memory.item-budget` and `memory.map-purpose`.
+- **Lifecycle and adopt are owned already.** Their owners move into the field.
+- **The 85 purposes pending at level 0** are PM-5's review, queued since `[test-run]`.
+
+### [forks-fixes] Asked, 2026-10-17
+
+- **PM-8, ownership's home:**
+  - a field on each node, with the owners of steps and namespaces derived (recommended);
+  - a field per step and per namespace, inherited by their nodes;
+  - chain rows claiming by tag.
+- **PM-9, entry's owner:**
+  - dDeclaredLoop, with the intake hook kept by dWellOiledMachine (recommended);
+  - each item to the build whose row describes its work;
+  - dRankedPlan.
+- **PM-10, the 115 keys:**
+  - a proposed owner for each key, with its evidence, approved in one pass (recommended);
+  - one owner per namespace, inherited by its keys;
+  - two research runs, with their disagreements put to the owner.
+- **PM-11, a line's key:**
+  - the native id where one exists (recommended);
+  - always a tag, with the id as an alias.

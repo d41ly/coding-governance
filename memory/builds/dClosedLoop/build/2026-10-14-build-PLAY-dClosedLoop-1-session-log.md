@@ -1816,6 +1816,14 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   - The adopt step reads unowned on the map too, since the generator derives a step's owner only from
     its stage, though v2's rows cite all five of its items.
 
+- 2026-10-17, session 1799cb98: the owner asked, verbatim, "Based on these findings, what needs to be fixed to improve the concept?"
+  - The check behind the answer found `[reload-pointer]` half wrong. flow-steps' `[lifecycle]` names
+    dWellOiledMachine, so only entry is owned by no build.
+  - The cause: ownership has four homes and no field, and the generator reads one per kind. Six fixes
+    to the concept, and forks PM-8 to PM-11 (`build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md`
+    `[fixes]`).
+  - The class is filed as `absence-read-from-one-of-several-homes`.
+
 ## Instruments
 
 ### The gap-ownership join

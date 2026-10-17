@@ -26,7 +26,8 @@ gotcha-classes = ["fold-text-is-unreviewed-surface.md", "amendment-leaves-its-ot
   "zero-witness-over-an-unnamed-population.md", "one-run-claim-recorded-as-agreed.md",
   "rule-stated-with-no-check-that-fails.md", "ratchet-migration-ignores-how-each-source-grows.md",
   "reseed-at-a-later-sha-launders-the-base.md", "predicate-designed-without-a-run-over-the-tree.md",
-  "path-keyed-row-strands-on-a-rename.md", "an-allow-that-bypasses-a-judge-names-none.md"]
+  "path-keyed-row-strands-on-a-rename.md", "an-allow-that-bypasses-a-judge-names-none.md",
+  "absence-read-from-one-of-several-homes.md"]
 guides = ["BUILD-METHOD.md"]
 backlog-shards = []
 lexicon-verbs = []
