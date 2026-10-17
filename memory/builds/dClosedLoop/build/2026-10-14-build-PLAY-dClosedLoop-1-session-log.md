@@ -153,9 +153,11 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 89 | gov-spec-reviewer, at the spec-review workflow's declared medium | The ownership table re-verified, reviewer 1 of 3, blind at `a169b3350`, then compared | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-3-spec-reviewer.md` | 1799cb98 | returned, 4m04s, 20.7k out: it audited the brief, not the table (`[misfire]`) | `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` |
 | 90 | the same | The ownership table re-verified, reviewer 2 of 3, apart from 89 and 91 | the same | 1799cb98 | returned, 4m34s, 25.6k out: it audited the brief, not the table (`[misfire]`) | the same |
 | 91 | the same | The ownership table re-verified, reviewer 3 of 3, apart from 89 and 90 | the same | 1799cb98 | returned, 5m13s, 27.6k out: it audited the brief, not the table (`[misfire]`) | the same |
-| 92 | gov-researcher, at its declared medium effort | The ownership table re-verified, round 2, verifier 1 of 3, from a worktree pinned at `a169b3350` without the table | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | running | `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` |
-| 93 | the same | Round 2, verifier 2 of 3, apart from 92 | the same | 1799cb98 | running | the same |
+| 92 | gov-researcher, at its declared medium effort | The ownership table re-verified, round 2, verifier 1 of 3, from a worktree pinned at `a169b3350` without the table | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | returned, 16m40s, 114.7k out: v-kestrel's table, 408 nodes, 331 of the 350 approved nodes it holds agreeing | `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` |
+| 93 | the same | Round 2, verifier 2 of 3, apart from 92 | the same | 1799cb98 | returned, 14m04s, 94.3k out: v-heron's table, 402 nodes, 321 of the 350 approved nodes it holds agreeing | the same |
 | 94 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the spec-review workflow's declared medium, round 1 | The chain's build order, at the owner's RC-1: v2 at blob `a8038f04e` and the re-cut record at `d3726ab57`, sixteen design records as specs | the args, recorded with the review's fold | 1799cb98 | returned as `wf_89aa1fa4-62c`, CLEAN WITH FIXES, 32 of 35 confirmed | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-chain-order.md` |
+| 95 | gov-researcher, at its declared medium effort | Round 2, verifier 3 of 3, apart from 92 and 93, once agent-cap freed a slot | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | returned, 18m36s, 134.6k out: v-osprey's table, 405 nodes, 325 of the 349 approved nodes it holds agreeing | `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` |
+| 96 | gov-skeptic, at its declared high effort | The 23 approved owners two or three round-2 verifiers dispute, each to refute against the records at `155568834` | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-2-skeptic.md` | 1799cb98 | running | `build/2026-10-18-build-PLAY-dClosedLoop-1-ownership-skeptic.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1896,6 +1898,15 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
     row. The critical path is 176 units, from 168.
   - The reconciliation's probe now tests ancestry, and each of its 9 non-ancestor citations carries a class
     (`build/2026-10-18-build-PLAY-dClosedLoop-1-recut.md` `[order-review]`).
+
+- 2026-10-18, session 1799cb98: round 2 returned. Dispatches 92, 93 and 95 each derived the whole table from the
+  pinned worktree, as v-kestrel, v-heron and v-osprey. They agree with the approved table on 331 of 350, 321 of
+  350 and 325 of 349 nodes.
+  - Two or three of them dispute 23 approved owners. By the disposition set before they ran, dispatch 96, a
+    gov-skeptic, tries to refute each against the records as they are now
+    (`build/2026-10-18-build-PLAY-dClosedLoop-1-ownership-skeptic.md`).
+  - The returns, their tables and the comparison are filed in `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` once the skeptic has returned, since
+    it may read that record. No owner field changes before the owner answers.
 
 ## Instruments
 
