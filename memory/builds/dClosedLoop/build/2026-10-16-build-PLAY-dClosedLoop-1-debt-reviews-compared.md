@@ -187,3 +187,28 @@ refuted finding sits on the defect its claim names, beside its confirmed twin wh
 | `relaunch-cap-fixture` | the relaunch cap's fixture counts resume-tick's resetting counter | 8 | — | none: refuted, the design defines the cap per act and carries no reset rule over |
 | `act-ceiling-registration` | `runtime.act-ceiling` is a second carrier of process-monitor's ceiling | 9 | — | none: refuted, the two keys carry different facts |
 | `chain-count` | "the chain has fourteen builds" against v2's fifteen | 22 | 8 | amend: refuted only as outside the range, and HEAD still carries it |
+
+## [map-fold-round3] The layers round's round-3 fold findings, placed
+
+Run A is `wf_588892a6-fb7` and run B is `wf_fc0975c8-622`. The ids are each report's appendix ids. A
+refuted finding sits on the defect its claim names, beside its confirmed twin where one exists.
+
+| defect | what | A | B | disposition |
+|---|---|---|---|---|
+| `claim-unreachable-from-triage` | `entry.claim` lists triage's select among its needs, and no route reaches it from triage, whose records are written before any claim | 2 | 7 | amend |
+| `publish-failed-no-arm` | `deploy.core` reads the verdict from the per-SHA log and routes green, red and REFUSED, and a failed publication prints none of the three there, while `refs/gov/bar-red` is not always published | 1, 7 | 2, 11, 17 | amend |
+| `held-leg-no-release` | the held-flaky-leg ask's acceptance names a consecutive-green count nothing produces, and no item lifts the hold when it is met | 4, 11 | 12, 18 | amend |
+| `flake-record-two-writers` | the runner and the `test.flakes` command are both named writers of the flake record | 13 | 5 | amend |
+| `parser-indented-rows` | `role_matrix.py`'s widened arm 0 still drops an indented or pipe-less row, and its body-row count shrinks with it | 5, 15 | 1, 14, 16 | amend |
+| `ask-claim-create-once` | the per-family ask claim ref is created once, so it serialises only a family's first ask | 3, 10 | — | amend |
+| `ask-lock-narrowed` | the ask mint lock covers only `entry.place`'s asks, while the owner, a surfaced idea, an expansion and the supervisor also file outside a build | — | 9 | amend |
+| `claim-no-idempotence-key` | `entry.claim` declares no key that lets a retry recognise its own claim | — | 8 | amend |
+| `claim-prune-two-ways` | a slug's claim ref is never pruned in memory, and the runtime supervisor prunes terminal claim refs with no namespace limit | 9 | — | amend |
+| `flakes-duplicate-ask` | under `quarantine`, `test.flakes` files the held-leg ask on every flake past the threshold, with no idempotence key | 12 | — | amend |
+| `removal-pending-no-filer` | a `removal-pending` entry waits on a patch build that no item files | 14 | 13 | amend |
+| `land-outcome-overlap` | `deploy.land`'s "landed ungated" and "nothing pushed" both hold on a no-op push, and its sources cannot tell them apart | 8 | 4 | amend |
+| `gaps-registered-list` | "the gaps registered" lists two new gaps after the follow-up round, and v2, the register and the record's own L4 row name a third, gap-mem-14 | — | 6, 15 | amend |
+| `start-guard-blocks-refused-rerun` | `deploy.core`'s start guard makes its own REFUSED re-run dead | 6 | 10 | none: refuted, the re-run is an explicit route that never passes back through the start guard |
+| `gap-test-04-contract` | gap-test-04's row omits the re-run contract and probe the flow says it owes | 16 | — | none: refuted, the row carries the contract the design relies on, and the probe sits in the text that cites it |
+| `gap-rows-no-check` | gap-deploy-02 and gap-deploy-09 state the defect with no check that can fail | 17 | — | none: refuted, the register's rows carry no check column by its own form |
+| `replacement-route` | the route after `plan.dedupe` contradicts itself on a re-placement | — | 3 | none: refuted, a re-placement goes to `plan.triage-rule` and keeps its claim, as `[transitions]` says |

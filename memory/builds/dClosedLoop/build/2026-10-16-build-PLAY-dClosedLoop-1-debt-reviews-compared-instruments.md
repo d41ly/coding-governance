@@ -1282,3 +1282,40 @@ A9 (act-ceiling-registration): confirmed twin none
 A22 (chain-count): confirmed twin none
 B8 (chain-count): confirmed twin none
 ```
+
+## [compare-fold-round3] The fold-round3 pair's comparison, run over the record
+
+```text
+$ python compare_rounds.py reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-a.md \
+    reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-b.md \
+    build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared.md \
+    build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md wf_588892a6-fb7 wf_fc0975c8-622 map-fold-round3
+== runs
+A: raw 17, confirmed 12, refuted 5, precision 0.71, high findings 0, agents 10, out 105.6k (sum of returned lines)
+B: raw 18, confirmed 15, refuted 3, precision 0.83, high findings 1, agents 10, out 106.1k (sum of returned lines)
+== defects
+map rows 17, confirmed defects 13, refuted-only 4
+both 5, A only 3, B only 5
+A alone covers 8 of 13 (62%)
+B alone covers 10 of 13 (77%)
+overlap (Jaccard) 0.38
+Chapman estimate of the population: 15.5, so about 2 found by neither
+A only: ask-claim-create-once, claim-prune-two-ways, flakes-duplicate-ask
+B only: flake-record-two-writers, ask-lock-narrowed, claim-no-idempotence-key, land-outcome-overlap, gaps-registered-list
+== severity (a defect takes its highest confirmed grade per round)
+high defects 1: claim-unreachable-from-triage
+  claim-unreachable-from-triage: A 2 B 3
+shared defects graded alike 3 of 5
+== lenses behind the defects one round alone found
+A: seams 3, correctness 1
+B: correctness 3, seams 3
+== refuted findings and their twins
+A6 (start-guard-blocks-refused-rerun): confirmed twin none
+A8 (land-outcome-overlap): confirmed twin B4
+A13 (flake-record-two-writers): confirmed twin B5
+A16 (gap-test-04-contract): confirmed twin none
+A17 (gap-rows-no-check): confirmed twin none
+B2 (publish-failed-no-arm): confirmed twin A1, A7, B11, B17
+B3 (replacement-route): confirmed twin none
+B10 (start-guard-blocks-refused-rerun): confirmed twin none
+```
