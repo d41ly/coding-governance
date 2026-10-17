@@ -160,6 +160,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 96 | gov-skeptic, at its declared high effort | The 23 approved owners two or three round-2 verifiers dispute, each to refute against the records at `155568834` | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-2-skeptic.md` | 1799cb98 | returned, 6m36s, 39.9k out: its verdicts are `[verdicts]` | `build/2026-10-18-build-PLAY-dClosedLoop-1-ownership-skeptic.md` |
 | 97 | the same | The 52 nodes two or three round-2 verifiers found that the approved table lacks, as 30 findings, each to refute on membership, identity or owner | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-3-skeptic.md` | 1799cb98 | returned, 4m46s, 30.4k out: its verdicts are `[verdicts]` | `build/2026-10-18-build-PLAY-dClosedLoop-1-ownership-population.md` |
 | 98 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the spec-review workflow's declared medium, round 1 | The declared whole-design audit, step 4 of the owner's convergence order: v2 at blob `535c0e058` and the gap register at `9a05621f4`, read whole, eighteen layer and design records as specs | the args, recorded with the audit's fold | 1799cb98 | returned as `wf_cd0da8b3-895`, CLEAN WITH FIXES, 33 of 34 confirmed | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-design-audit.md` |
+| 99 | `tier2-review.js`, diff review, full: five `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the diff-review workflow's declared high, round 1 | The audit fold's closing review: `159b4d467` over `dc97a1b25`, twenty design records as specs | the args, recorded with its fold | 1799cb98 | returned as `wf_fbd955bb-a36`, CLEAN WITH FIXES, 26 of 38 confirmed | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-audit-fold.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1970,6 +1971,14 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
     by row.
   - The reconciliation probe now reads stage items, routes and registrations as well as citations. It was seen red
     on 16 findings before the fold and green after it, and four classes are filed. The critical path is 181 units.
+
+- 2026-10-18, session 1799cb98: dispatch 99, the audit fold's closing review, ran as `wf_fbd955bb-a36` and
+  returned CLEAN WITH FIXES, with no blocker: 21 items, 3 of them high (`reviews/2026-10-18-review-PLAY-dClosedLoop-1-audit-fold.md`).
+  - FH1: flow-steps still lets `run.on-owner-question` resolve an owner gate, ratifications included, though v2's
+    H1 rule says never.
+  - FH2 and FH3: the reconciliation probe passes a blank class cell. Its docstring claims routes and
+    registrations it never reads, and it is green over dTendedCadence's dependency on dIndexedDesign.
+  - It was logged on its return, since its diff held this log.
 
 ## Instruments
 
