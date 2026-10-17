@@ -181,8 +181,11 @@ class with no citation, is a finding.
 | dGroundRules | `policy.proof` | dDeclaredLoop | not a use | the minimal guard enforces the key's default, the TTY proof, without reading the key |
 | dOrderedCharter | `check` | dWitnessedBar | homonym | the resolver's `check` verb beside `show`, `where` and `refs`, not the `check` tag namespace |
 | dOrderedCharter | `memory.map-purpose` | dTotalRecall | moved | the review that reads the key is dTotalRecall's PM-5 unit; the row names the key only to say so (H1) |
-| dRankedPlan | `entry.intake` | dWellOiledMachine | tolerance | RC-9's fallback: an owner breakpoint, witness "intake not installed", until dWellOiledMachine lands the hook and drains it |
+| dRankedPlan | `entry.intake` | dWellOiledMachine | tolerance | RC-9's fallback: dDeclaredLoop's owner gate (AF-1), witness "intake not installed", until dWellOiledMachine lands the hook and drains it |
 | dTotalRecall | `roster` | dIndexedDesign | homonym | the build README's derived `roster` front-matter field, not the roster record kind `design.decompose` writes (PM-12) |
+| dFairHearing | `review.trigger` | dDeclaredLoop | not a use | the harness takes the `preset` argument Design's breakpoint passes (RV-1); the breakpoint calls the harness, never the reverse (AF-1) |
+| dDeclaredLoop | `run.on-owner-question` | dBoundRoles | tolerance | the owner gate holds for the owner's disposition until dBoundRoles lands the key, and never reads it for a ratification (AF-1) |
+| dDeclaredLoop | `hooks.bypass` | dWitnessedBar | not a use | the preset step's arm reads the key's resolved value in a planted strict file; it never implements the bypass (M10) |
 
 The critical path, its instrument and its runs:
 

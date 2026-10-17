@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 144 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 148 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -281,6 +281,7 @@ Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `degradation-known-but-unreported.md` | review-harnesses |
 | `destructive-step-before-its-precondition.md` | unattended |
 | `empty-field-collapses-unless-it-is-last.md` | run-gates |
+| `fallback-drain-strands-its-witnesses.md` | build-method |
 | `fallback-fabricates-the-passing-value.md` | unattended |
 | `fixed-sleep-does-not-place-a-signal.md` | runlog |
 | `fixture-inherits-ambient-machine-state.md` | unattended |
@@ -317,6 +318,7 @@ Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `line-keyed-registry-reds-on-a-file-that-grew.md` | lexicon |
 | `liveness-negative-from-another-population.md` | unattended-stops |
 | `merge-keeps-both-sides-of-one-derivation.md` | process-monitor |
+| `move-inventory-misses-readers-by-path.md` | build-method |
 | `msys-grep-counts-cr-on-every-line.md` | session-kickoff |
 | `name-search-resolves-a-namesake.md` | memory-tree-hygiene |
 | `naming-leg-grades-what-python-named.md` | lexicon |
@@ -345,6 +347,7 @@ Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `record-file-read-by-line-position.md` | run-gates-turnstile |
 | `record-without-serves-or-with-a-round-counter.md` | memory-tree-hygiene |
 | `reflowed-prompt-string-reads-as-a-deleted-stop.md` | unattended |
+| `remote-write-without-an-unreachable-outcome.md` | build-method |
 | `reseed-at-a-later-sha-launders-the-base.md` | build-method |
 | `retirement-inventory-misses-readers-by-value.md` | runlog |
 | `route-names-an-output-its-actor-never-emits.md` | build-method |
@@ -360,6 +363,7 @@ Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `staged-break-runs-stale-bytecode.md` | runlog |
 | `staged-break-substitutes-a-synthetic-value.md` | unattended |
 | `status-set-in-a-subshell.md` | unattended |
+| `step-depends-on-a-later-build.md` | build-method |
 | `structured-record-split-on-whitespace.md` | unattended |
 | `subagent-scratch-overwrites-the-parents-files.md` | build-method |
 | `subprocess-resolves-a-different-shell.md` | baseline |

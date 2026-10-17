@@ -455,7 +455,7 @@ layer that registers a kind adds its row.
 | build readme | dTotalRecall | the build README's declared front-matter schema, with unknown keys refused |
 | claim | dTotalRecall | the claim ref on the remote and the ask-family counter ref (`gap-mem-13`); `entry.claim` writes the claim |
 | maintenance record | dTendedCadence | the maintenance record |
-| recommendation | dCalibratedLens | every `*.recommend` item writes it; the stage-exit recommendation is one mechanism |
+| recommendation | dDeclaredLoop | every `*.recommend` item writes it; the stage-exit recommendation is one mechanism, dDeclaredLoop's (AF-1) |
 | loop review | dCalibratedLens | its writer is `loop.record` |
 | value ledger | dCalibratedLens | a generated library view; `loop.price` regenerates it |
 | lexicon declaration | dMindYourWords | layer-memory lists the lexicon as an optional component's kind; dMindYourWords builds the declaration and its packs |

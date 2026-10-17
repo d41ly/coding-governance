@@ -978,3 +978,7 @@ census: FINDING census: tools/newkit/kit.toml is on disk with no kit node rc 1
 - **PM-12, 2026-10-18:** the owner's answers on the table's re-verification move 13 owners, take a
   recommendation for 5 more, add 52 nodes and give the `disposition` kind to dDeclaredLoop. The owner fields
   carry the changes (`build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` `[pm-12]`, `[answers-2]`).
+- **AF-1, 2026-10-18:** the design audit's H1 and H2 put the stage-exit recommendation and the owner gate where every
+  step reaches them. The breakpoint mechanism is dDeclaredLoop's: 12 items, 11 keys, the `recommendation` kind and
+  gap-flow-11 and gap-flow-12, which re-opens PM-12a for the 8 stage items
+  (`build/2026-10-18-build-PLAY-dClosedLoop-1-audit-fold.md` `[af-1]`).

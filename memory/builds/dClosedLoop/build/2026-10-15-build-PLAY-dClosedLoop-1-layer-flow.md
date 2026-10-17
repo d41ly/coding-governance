@@ -113,12 +113,12 @@ Three new gaps are proposed:
      `--abort`), not as a build's lifecycle, and supersede does not exist.
    - A dependent held until its parent lands (`deps.landing`) waits forever on a parent that never
      will.
-2. **gap-flow-11, MED, dCalibratedLens.** Reviews and owner gates are two mechanisms, fixed to set
+2. **gap-flow-11, MED, dDeclaredLoop (AF-1).** Reviews and owner gates are two mechanisms, fixed to set
    points.
    - Each step's review sits at one item (`review.<stage>`).
    - Owner gates sit at `autonomy`'s three points.
    - Neither can be placed at another item boundary.
-3. **gap-flow-12, MED, dCalibratedLens.** The driver reasons in four items.
+3. **gap-flow-12, MED, dDeclaredLoop (AF-1).** The driver reasons in four items.
    - The review recommendation at Plan, Design, Test and Deploy is scored by a command and reasoned by
      the driver.
    - That breaks P25 and `driver.reads`, and FL-R3's "scored signals and reasoning" never named a role

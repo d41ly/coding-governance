@@ -1962,6 +1962,15 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   - It did not catch the dShippedRelease edge logged before it ran, so that joins the fold as a main-loop
     item.
 
+- 2026-10-18, session 1799cb98: the owner answered AF-1 to AF-3, verbatim: AF-1 "Land the mechanism earlier", AF-2
+  "Last valid, else refuse (Recommended)" and AF-3 "Add every-declared (Recommended)"
+  (`build/2026-10-18-build-PLAY-dClosedLoop-1-audit-fold.md` `[words]`).
+  - Folded: the breakpoint mechanism, its owner gate and the stage-exit recommendation are dDeclaredLoop's. An
+    invalid policy input reads the last valid revision, or refuses. The audit's other items and C1 are folded row
+    by row.
+  - The reconciliation probe now reads stage items, routes and registrations as well as citations. It was seen red
+    on 16 findings before the fold and green after it, and four classes are filed. The critical path is 181 units.
+
 ## Instruments
 
 ### The gap-ownership join
