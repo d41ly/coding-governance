@@ -128,8 +128,8 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 64 | the same | The review system's design record, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-review-system]` | 1799cb98 | returned as `wf_dd2730e2-e29`, CLEAN WITH FIXES, 39 of 45 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-review-system-b.md` |
 | 65 | `tier2-review.js`, light: three `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at medium, as the owner asked, round 1 | The runtime fold and its two settlements, run A: `6cfd21619..3611a60e9`, the audit reports and the research returns excluded | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-runtime-fold]` | 1799cb98 | returned as `wf_c8860577-b54`, CLEAN WITH FIXES, 18 of 22 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-a.md` |
 | 66 | the same | The runtime fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-runtime-fold]` | 1799cb98 | returned as `wf_dea5d838-89e`, CLEAN WITH FIXES, 24 of 25 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-b.md` |
-| 67 | the same, round 3 with round 2's 31 confirmed findings as `priorFindings` | The layers round's follow-up fold, run A: `cc4c83ad5..1bc4883fe` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-fold-round3]` | 1799cb98 | dispatched | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-a.md` |
-| 68 | the same | The layers round's follow-up fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-fold-round3]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-b.md` |
+| 67 | the same, round 3 with round 2's 31 confirmed findings as `priorFindings` | The layers round's follow-up fold, run A: `cc4c83ad5..1bc4883fe` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-fold-round3]` | 1799cb98 | returned as `wf_588892a6-fb7`, CLEAN WITH FIXES, 12 of 17 confirmed | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-a.md` |
+| 68 | the same | The layers round's follow-up fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-fold-round3]` | 1799cb98 | dispatched | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-b.md` |
 | 69 | the same, round 2 with round 1's 25 confirmed findings as `priorFindings` | The library round's fold, run A: `d4fc4bb51..0dd962724` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-library-followup]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library-followup-a.md` |
 | 70 | the same | The library round's fold, run B, after run A returns | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-library-followup]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library-followup-b.md` |
 | 71 | the same, round 3 with round 2's 24 confirmed findings as `priorFindings` | The expansion round's follow-up fold, run A: `67c79f7cc..5e139d377` | the args in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md` `[args-expansions-fold-round3]` | 1799cb98 | queued | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-a.md` |
@@ -916,6 +916,31 @@ Dispatch 66, `runtime-fold-b`, derived from its Workflow run the same way:
 - returned — gov-synthesizer · wrote 1 file · 2m20s · 19.6k out · run wf_dea5d838-89e/a2874bcbb3a56c13f
 ```
 
+Dispatch 67, `fold-round3-a`, derived from its Workflow run the same way:
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, diff-review round 3, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_588892a6-fb7/ac909578cfbcea124
+- returned — workflow-subagent · wrote 0 files · 16s · 1.6k out · run wf_588892a6-fb7/ac909578cfbcea124
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 3, find:correctness · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_588892a6-fb7/a7b1e30ba162df59e
+- returned — gov-diff-reviewer · wrote 0 files · 4m17s · 23.7k out · run wf_588892a6-fb7/a7b1e30ba162df59e
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 3, find:seams · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_588892a6-fb7/a05f2b74d340c7ecb
+- returned — gov-diff-reviewer · wrote 0 files · 4m35s · 26.9k out · run wf_588892a6-fb7/a05f2b74d340c7ecb
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 3, find:verification · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_588892a6-fb7/a8e52e29416465ad6
+- returned — gov-diff-reviewer · wrote 0 files · 2m15s · 12.1k out · run wf_588892a6-fb7/a8e52e29416465ad6
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 3, verify:ids-1-4 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_588892a6-fb7/a8db42af6f62a00ce
+- returned — gov-skeptic · wrote 0 files · 54s · 5.2k out · run wf_588892a6-fb7/a8db42af6f62a00ce
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 3, verify:ids-5-8 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_588892a6-fb7/a8509f008ce4bba0e
+- returned — gov-skeptic · wrote 0 files · 1m37s · 9.4k out · run wf_588892a6-fb7/a8509f008ce4bba0e
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 3, verify:ids-9-12 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_588892a6-fb7/ade3cf6852024b15a
+- returned — gov-skeptic · wrote 0 files · 1m04s · 6.0k out · run wf_588892a6-fb7/ade3cf6852024b15a
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 3, verify:ids-13-16 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_588892a6-fb7/a354196003a6209ac
+- returned — gov-skeptic · wrote 0 files · 57s · 5.4k out · run wf_588892a6-fb7/a354196003a6209ac
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 3, verify:ids-17-17 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_588892a6-fb7/a780f0677e0237296
+- returned — gov-skeptic · wrote 0 files · 17s · 1.7k out · run wf_588892a6-fb7/a780f0677e0237296
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 3, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_588892a6-fb7/ab53d015f2359f3ab
+- returned — gov-synthesizer · wrote 1 file · 1m36s · 13.6k out · run wf_588892a6-fb7/ab53d015f2359f3ab
+```
+
 The systems round's researchers, dispatches 73 to 82, derived from their handoffs the same way:
 
 ```text
@@ -1460,6 +1485,14 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
 
 - 2026-10-17, session 1799cb98: dispatch 66 returned CLEAN WITH FIXES: 24 of 25 findings confirmed,
   18 items (3 high, 10 medium, 5 low), 9 agents, 142.8k out tokens (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-b.md`).
+
+- 2026-10-17, session 1799cb98: the owner answered, verbatim: MS-3 "Report only"; RF-4 "Stays alongside
+  (Recommended)"; RF-5 "Migrate in dWitnessedBar (Recommended)"; RF-6 "Hot-first by default". The
+  systems record's and the retrofit record's `[answers]` say what each settles. Every fork of the
+  systems round and the retrofit round is now answered.
+
+- 2026-10-17, session 1799cb98: dispatch 67 returned CLEAN WITH FIXES: 12 of 17 findings confirmed,
+  8 items (0 high, 7 medium, 1 low), 9 agents, 94.6k out tokens (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-a.md`).
 
 ## Instruments
 

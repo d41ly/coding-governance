@@ -389,7 +389,7 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   | `memory.default-load` | card, card-and-live | card |
   | `memory.load-budget` | 4k, 8k, 16k | 8k |
   | `memory.item-budget` | KB per role, each role's the owner's to set | 96 for every role (MS-2) |
-  | `memory.over-budget` | refuse, report, off | as MS-3 settles |
+  | `memory.over-budget` | refuse, report, off | report (MS-3) |
   | `memory.legacy-anchors` | derived, none | derived |
   | `memory.superseded-slices` | refuse, mark | refuse |
 
@@ -405,6 +405,7 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 | RS-2 | What happens to the efforts no measurement backs, the orientation scout's and the builder's xhigh? | keep them until a matched trial says otherwise; or lower them now |
 | MS-1 | What happens to the harness's auto-memory, 14 KB loaded every session? | promote its standing directives through the instruction write path, then hold it to the load budget; unload it; or leave it |
 | MS-2 | What happens to a work order over its memory budget? | refuse it at render, since the retired global budget never trimmed; or count it and refuse only under strict |
+| MS-3 | What happens to a work order over its role's cap, now 96 KB? | report, then refuse once the sliced loads are measured over 30 work orders per role; refuse at render now; report only; or refuse under strict only |
 
 ## [answers] The owner's answers, 2026-10-17
 
@@ -421,6 +422,7 @@ The first four forks, answered in one round. Each answer is quoted verbatim.
 | MS-1 | "Promote, then budget (Recommended)" | the auto-memory index's standing directives move into instruction units through `instructions.edit`, and what remains is held to `memory.load-budget` |
 | MS-2 | the owner asked, verbatim: "Why was memory partitioned like that? Was there a reason for these caps?" | answered in `[ms2]` and asked again |
 | MS-2, asked again | "set a default cap of 96K per role, but owner-adjustable per role" | `memory.item-budget`: 96 KB for every role by default, and each role's cap is the owner's to adjust. What happens to a work order over its cap is asked as MS-3 |
+| MS-3 | "Report only" | `memory.over-budget` defaults to `report`: a work order over its role's cap is counted and reported, never refused |
 
 - **AN-1, as designed.** The marker query in core memory-tree stays the path the core can always take
   (P28). The codebase map's lexer gains the annotation rows as part of its index: a shebang profile for

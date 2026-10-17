@@ -295,7 +295,7 @@ run's line cited. The returns are filed verbatim as `research-retrofit-a.md` and
 
 | Chain build | Its part |
 |---|---|
-| dWitnessedBar | the factory, the `ratchet` leg pack, `test.seed` and the registration fields |
+| dWitnessedBar | the factory, the `ratchet` leg pack, `test.seed` and the registration fields, and the move of gov's own 27 registries onto the ledger (RF-5) |
 | dTotalRecall | the `baseline` and `census` kinds, the `origin` field, and `adopt.census` |
 | dScopedBuild | `build.unit-pass` and `build.scope`, filled |
 | dBoundRoles | the legacy slot's render |
@@ -314,8 +314,8 @@ run's line cited. The returns are filed verbatim as `research-retrofit-a.md` and
 | `retrofit.unseeded` | unarmed, refuse | unarmed |
 | `retrofit.reconstruct` | on-touch, at-adoption, on-ask | on-touch |
 | `retrofit.decisions` | author-rubric, docs-owner-ratifies, docs-and-trailers | author-rubric, set per repository (RF-3) |
-| `retrofit.practice-pending` | alongside, refuse | as RF-4 settles |
-| `retrofit.cadence` | off, hot-first | as RF-6 settles |
+| `retrofit.practice-pending` | alongside, refuse | alongside (RF-4) |
+| `retrofit.cadence` | off, hot-first | hot-first where observability is installed, off where it is absent (RF-6) |
 | `retrofit.slot-bytes` | 512, 1024, 2048 | 1024 |
 
 ## [forks] To put to the owner
@@ -341,6 +341,9 @@ Each answer is quoted verbatim.
 | RF-1 | "Across the layers (Recommended)" | retrofit is a system across the layers. Its ledger is core, and its parts belong to the chain builds in `[owners]` |
 | RF-2 | "Drain hunks, capped (Recommended)" | `retrofit.drain` defaults to `hunk`: a unit drains the baselined sites in its changed hunks and claims the keys it touches, within 20 sites and 3 claims, and carries the rest |
 | RF-3 | "Author's rubric by default, owner-switchable between the three options per repo" | one key, `retrofit.decisions`, replaces the two the design drafted. Its values are the three options: `author-rubric` (the default), `docs-owner-ratifies` and `docs-and-trailers`. The owner sets it per repository. Under `author-rubric`, no reconstructed decision waits on the owner, and each stays marked `reconstructed` |
+| RF-4 | "Stays alongside (Recommended)" | `retrofit.practice-pending` defaults to `alongside`: a practice the owner has not ruled on stays as it is |
+| RF-5 | "Migrate in dWitnessedBar (Recommended)" | gov's own 27 registries move onto the ledger in dWitnessedBar. The index of populations is derived from the registrations, which retires drift's hand-typed list |
+| RF-6 | "Hot-first by default" | `retrofit.cadence` defaults to `hot-first` wherever observability is installed. Each period, Maintain files a sweep of the most-read untouched legacy as a patch build. The policy value is the standing ask that `[never]` requires. Where observability is absent, the key reads `off`, and its slot renders not installed, with the touch drain as the core's fallback. So the default never meets `policy.on-missing-expansion` |
 
 ## [gaps-proposed] Gaps to register once the forks settle
 
