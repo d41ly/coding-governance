@@ -1654,6 +1654,26 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
 - 2026-10-17, session 1799cb98: dispatch 72 returned CLEAN WITH FIXES: 21 of 22 findings confirmed,
   13 items (1 high, 11 medium, 1 low), 9 agents, 129.9k out tokens (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-b.md`).
 
+- 2026-10-17, session 1799cb98: the expansion pair is compared, and the six pairs summarized in the debt
+  comparison record's `[summary]` and `[patterns]`: 158 defects, one run alone covering 72% and 75%, and 4
+  of the 13 highs found by one run only. Run B refuted fewer findings in every light diff pair, 6 of 88
+  against 18 of 86, and a contamination probe over every run-B transcript finds one line of a run-A
+  report reached one run-B skeptic, in the lexicon pair.
+
+- 2026-10-17, session 1799cb98: the four fold pairs are folded, each with a `[fold-<pair>]` section in the
+  debt comparison record: the runtime fold into layer-runtime, v2 and the runtime comparison; the
+  layers round's round-3 fold into flow-steps, layer-memory, layer-runtime, layer-roles, the register and
+  two gotchas, with `role_matrix.py`'s arm 0 revised; the library round's fold into flow-steps,
+  layer-memory, layer-library, v2 and the register, with two figures re-measured; and the expansion
+  fold's round 3 into flow-steps, layer-runtime, layer-expansions, v2, the register and two gotchas, with
+  the both-runs probe revised and the target-side probe run. The lexicon and review-system folds' owed
+  fixes landed in v2, flow-steps and the register once review 72 returned.
+
+- 2026-10-17, session 1799cb98: the systems and retrofit rounds are folded into v2: thirty-one keys in the
+  catalogue and every preset, IW-2's front door, fourteen chain rows' units and twenty-six gaps. The
+  gap-ownership join exits 0 on 219 keys over 15 builds, and the preset check on 175 presettable keys.
+  The atlas is republished as version 20.
+
 ## Instruments
 
 ### The gap-ownership join
