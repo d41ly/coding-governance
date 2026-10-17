@@ -150,6 +150,9 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 86 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the spec-review workflow's declared medium, round 1 | The systems and retrofit records, at blobs `9335a3533` and `cec90968d`, after dispatch 85 returns | the args in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[args-systems-retrofit]` | 1799cb98 | returned as `wf_ca8d9fb9-519`, CLEAN WITH FIXES, 62 of 67 confirmed | `reviews/2026-10-17-review-PLAY-dClosedLoop-1-systems-retrofit.md` |
 | 87 | gov-researcher, at its declared medium effort | The level-0 project map, run A, with run B | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-2-researcher.md` | 1799cb98 | returned, 15m04s, 70.4k out | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-a.md` |
 | 88 | the same | The level-0 project map, run B, from the same handoff, with run A | the same | 1799cb98 | returned, 11m01s, 56.6k out | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-b.md` |
+| 89 | gov-spec-reviewer, at the spec-review workflow's declared medium | The ownership table re-verified, reviewer 1 of 3, blind at `a169b3350`, then compared | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-3-spec-reviewer.md` | 1799cb98 | running | `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` |
+| 90 | the same | The ownership table re-verified, reviewer 2 of 3, apart from 89 and 91 | the same | 1799cb98 | running | the same |
+| 91 | the same | The ownership table re-verified, reviewer 3 of 3, apart from 89 and 90 | the same | 1799cb98 | running | the same |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1861,6 +1864,15 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
     and layer-memory `[contract]`: 351 nodes, each owned by one chain build
     (`build/2026-10-17-build-PLAY-dClosedLoop-1-ownership.md` `[folded]`).
 
+- 2026-10-17, session 1799cb98: the owner answered the re-cut, verbatim, RC-1 "Conduct a full tier2 review of the build ORDER and ensure it's correctly arranged.", RC-2
+  "Move it to dTotalRecall (Recommended)", RC-3 "Fold all at convergence (Recommended)", and RC-4 to RC-7 "RC-4 Instruction layer first,RC-5 Confirm v2's [open] items,RC-6 instructions.edit as it is,RC-7 Roles details to unit specs"
+  - Applied to v2's `[chain]`: the three decided moves, RC-2 to RC-7, and the rows reconciled with the
+    ownership table (`build/2026-10-18-build-PLAY-dClosedLoop-1-recut.md`).
+  - RC-1 waits on the Tier-2 review of the build order the owner asked for.
+- 2026-10-17, session 1799cb98: the owner asked, verbatim, "run a review of the ownership table in parallel - instruct 3 independent agents to re-verify ownership"
+  - Dispatches 89 to 91: three gov-spec-reviewers, each deriving every owner blind at `a169b3350`, then
+    comparing with the approved table.
+
 ## Instruments
 
 ### The gap-ownership join
@@ -2334,6 +2346,8 @@ Runs, 2026-10-14:
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md` | The owner's question on seeing the whole project at once: what orients an agent today, the audit's items sorted by cause, a level-0 map of gov sized, and forks PM-1 to PM-3. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-map.py` | The level-0 project map's generator: the atlas's derivation and the tree, rendered by the map's grammar within its budget, with its completeness, count, resolve, census, parity and owner checks. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership.md` | PM-10's ownership table: a proposed owning build for every item, policy key, point, tag namespace, system and record kind, each with its evidence, and the rows that need the owner's eye. |
+| `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` | The ownership table re-verified by three independent reviewers: the task each is handed, and later their returns. |
+| `build/2026-10-18-build-PLAY-dClosedLoop-1-recut.md` | The chain re-cut: the owner's RC-1 to RC-7, the moves applied to v2's `[chain]`, the rows reconciled with the ownership table, and each owed item's state. |
 | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-2-researcher.md` | The project-map research handoff, run twice. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-b.md` | Dispatch 88's return, verbatim: the level-0 project map, run B. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-instruments.md` | The project-map researchers' files and shell commands, in order, from their transcripts. |
