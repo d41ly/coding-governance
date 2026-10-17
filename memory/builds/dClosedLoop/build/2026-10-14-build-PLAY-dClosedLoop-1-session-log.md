@@ -1980,6 +1980,14 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
     registrations it never reads, and it is green over dTendedCadence's dependency on dIndexedDesign.
   - It was logged on its return, since its diff held this log.
 
+- 2026-10-18, session 1799cb98: the owner answered FL1, verbatim: "Until held leases expire (Recommended)"
+  (`build/2026-10-18-build-PLAY-dClosedLoop-1-audit-fold.md` `[review-fold]`).
+  - Folded the fold review's 21 items. flow-steps' owner gate now matches v2's H1 rule. `review.findings` follows
+    `review.dispose` to dDeclaredLoop, and dTendedCadence follows dIndexedDesign. The policy reader's mirror and
+    invalid-file rules are tightened, and the audit's marks carry a DA- prefix.
+  - The reconciliation probe now matches a closed class set on each row's owner. It reads routes into a stage and
+    the keys an item names, takes the breakpoint's names from flow-steps, and is seen red on one plant per rule.
+
 ## Instruments
 
 ### The gap-ownership join

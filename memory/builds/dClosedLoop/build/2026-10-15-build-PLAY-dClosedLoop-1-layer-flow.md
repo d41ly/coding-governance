@@ -342,7 +342,8 @@ that depends on it starts.
 **The register gains five gaps:**
 - `gap-flow-13` and `gap-flow-14`, owned by dDeclaredLoop;
 - `gap-flow-10`, owned by dDeclaredLoop then, and by dWellOiledMachine since RT-3;
-- `gap-flow-11` and `gap-flow-12`, owned by dCalibratedLens.
+- `gap-flow-11` and `gap-flow-12`, owned by dCalibratedLens until AF-1 moved them to dDeclaredLoop, 2026-10-18
+  (FL3).
 
 **Units:**
 - dDeclaredLoop, dCalibratedLens, dBoundRoles, dTendedCadence and dShippedRelease gain the units that

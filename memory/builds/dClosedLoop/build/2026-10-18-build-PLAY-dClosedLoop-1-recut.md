@@ -171,6 +171,12 @@ The probe below replaces `[reconciled]`'s. Each backticked citation of another b
 citing build or an ancestor in the after relation, or carry a class in this table. A citation with no class, or a
 class with no citation, is a finding.
 
+Since the design audit's fold, 2026-10-18, the table classes every dependency kind the reconciliation probe reads:
+cites, stage, routes, reads and registers. Each row is matched on its owner too, and its class must be one of
+tolerance, homonym, not a use and moved. That probe is the order's gate
+(`build/2026-10-18-build-PLAY-dClosedLoop-1-audit-fold.md` `[instrument]`). The citations-only probe below is
+superseded: re-run on the committed tree, it reds on the routes row it cannot read (FM5).
+
 | Row | Node | Owner | Class | Why |
 | --- | --- | --- | --- | --- |
 | dDeclaredLoop | `build.closes` | dShippedRelease | tolerance | the presets check refuses `strict` and `guarded` for it on a core-only install; it validates a value and never runs the key |
@@ -185,7 +191,10 @@ class with no citation, is a finding.
 | dTotalRecall | `roster` | dIndexedDesign | homonym | the build README's derived `roster` front-matter field, not the roster record kind `design.decompose` writes (PM-12) |
 | dFairHearing | `review.trigger` | dDeclaredLoop | not a use | the harness takes the `preset` argument Design's breakpoint passes (RV-1); the breakpoint calls the harness, never the reverse (AF-1) |
 | dDeclaredLoop | `run.on-owner-question` | dBoundRoles | tolerance | the owner gate holds for the owner's disposition until dBoundRoles lands the key, and never reads it for a ratification (AF-1) |
-| dDeclaredLoop | `hooks.bypass` | dWitnessedBar | not a use | the preset step's arm reads the key's resolved value in a planted strict file; it never implements the bypass (M10) |
+| dDeclaredLoop | `hooks.bypass` | dWitnessedBar | not a use | the preset step's arm reads the key's resolved value in a planted strict file; it never implements the bypass (DA-M10) |
+| dDeclaredLoop | `decisions.major` | dTotalRecall | tolerance | `build.recommend` routes on the key only inside the Build step, whose build descends from dTotalRecall (FM4's reads rule) |
+| dFairHearing | `flow.route-backs` | dDeclaredLoop | not a use | dDeclaredLoop's program counts the bound as it routes the harness's report; the harness never reads it (FM4's reads rule) |
+| dRankedPlan | `run.host` | dWellOiledMachine | tolerance | `plan.exit` launches the executor only where the supervisor is installed; before dWellOiledMachine lands, the attended session carries the build into Design (FM4's reads rule) |
 
 The critical path, its instrument and its runs:
 
@@ -269,7 +278,8 @@ each build's earliest finish, in units: dGroundRules 6, dFairHearing 21, dOrdere
 - **The path:** dGroundRules, dOrderedCharter, dDeclaredLoop, dWitnessedBar, dTotalRecall, dWellOiledMachine,
   dTendedCadence, dCalibratedLens, dConvergedCharter.
 
-The ancestor probe, its green run, and the run with one class planted away:
+Superseded on 2026-10-18 by the reconciliation probe (FM5). The ancestor probe, its green run, and the run with one
+class planted away:
 
 ```python
 """The order's reconciliation gate: every node a chain row cites must be built by the row's build or one of its
@@ -382,4 +392,5 @@ findings 1
 
 - **Its first run, before the classes, found the 9 citations above unclassed** and exited 1. The table classes
   each one, and none needed an edge or a move beyond what the fold made.
-- **It is the gate the review asks for** (H1's): a row that cites a later build's node without a class reds.
+- **It was the gate the review asks for** (H1's): a row that cites a later build's node without a class reds. The
+  reconciliation probe superseded it on 2026-10-18 (FM5).

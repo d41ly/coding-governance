@@ -510,7 +510,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
       write gate still refuses product code that no specced unit owns.
     - The orientation scout's spawn at session start is a bound act of the attended binding.
 - **Owner items need no session.** The supervisor raises them through the mailbox and the notification
-  adapter, or resolves them as `run.on-owner-question` says.
+  adapter, or resolves them as `run.on-owner-question` says, never a ratification (FH1).
 - **Hook items** are awaited, never dispatched (`[terms]`).
 - **An act session's lifetime is structural.** It lives for one act. The platform fixes the schema and
   the working directory per launch, so a session serving many acts could neither schema-force each one

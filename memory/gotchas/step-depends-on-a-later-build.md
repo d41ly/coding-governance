@@ -34,6 +34,7 @@ The build-order review and the ancestor probe both read green over all three.
 - Check every kind of dependency, not only citations:
   - each item of a stage step is built by the stage's build or an ancestor of it;
   - a route into a shared mechanism needs the whole mechanism from an ancestor;
-  - an expansion's registrations need each point's owner to be an ancestor of the expansion's owners.
+  - an expansion's registrations need each point's owner to be an ancestor of the expansion's owners;
+  - a key an item's cells name is owned by the item's owner or an ancestor of it.
 - See the check red on today's tree before the fix, and red again on a planted dropped edge after it.
 - Fix by moving the mechanism to an ancestor, by adding the edge, or by declaring a tolerance the check reads.

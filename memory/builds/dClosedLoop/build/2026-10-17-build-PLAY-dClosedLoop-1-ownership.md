@@ -982,3 +982,6 @@ census: FINDING census: tools/newkit/kit.toml is on disk with no kit node rc 1
   step reaches them. The breakpoint mechanism is dDeclaredLoop's: 12 items, 11 keys, the `recommendation` kind and
   gap-flow-11 and gap-flow-12, which re-opens PM-12a for the 8 stage items
   (`build/2026-10-18-build-PLAY-dClosedLoop-1-audit-fold.md` `[af-1]`).
+- **FM4, 2026-10-18:** `review.findings` follows `review.dispose`, which reads it, to dDeclaredLoop, so AF-1's cut
+  leaves no key of the disposal on the far side (`build/2026-10-18-build-PLAY-dClosedLoop-1-audit-fold.md`
+  `[review-fold]`).

@@ -25,6 +25,7 @@ installed" had no reader once the readers were re-pointed.
 ## The fix
 
 - Drain per adapter: only where its capability table declares the event, keeping the fallback in force for any other.
-- Keep the fallback's witnesses readable. The readers accept both kinds, keyed by the landing that drained the
-  fallback, or the drain backfills marked records.
+- Keep the fallback's witnesses readable, keyed per adapter. The readers accept the fallback witness at any time
+  from an adapter without the capability, and from any other only before that adapter's own drain landing. Or the
+  drain backfills marked records.
 - Probe a planted adapter without the capability, and a build that crosses the drain.
