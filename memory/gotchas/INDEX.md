@@ -135,12 +135,14 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [staged-break-substitutes-a-synthetic-value](staged-break-substitutes-a-synthetic-value.md) | class | 1 | yes | an arm that proves a mechanism by replacing the shipped value with a simpler one proves the mechanism for the simpler value |
 | [status-set-in-a-subshell](status-set-in-a-subshell.md) | class | 2 |  | a gate that prints FAILED from inside a pipeline sets a status the parent never sees, so it reports the violation and exits 0 |
 | [structured-record-split-on-whitespace](structured-record-split-on-whitespace.md) | class | 1 |  | a multi-field record iterated with an unquoted shell expansion degenerates into its first field, and every assertion built on the later fields becomes unfalsifiable |
+| [subagent-scratch-overwrites-the-parents-files](subagent-scratch-overwrites-the-parents-files.md) | class | 3 |  | a subagent shares its parent session's scratchpad, so a snapshot it names like a file the parent keeps there overwrites that file silently, and the scratch guard admits the write |
 | [subprocess-resolves-a-different-shell](subprocess-resolves-a-different-shell.md) | class | 4 |  | Python subprocess resolving the bare name bash finds the WSL launcher, which sees another filesystem |
 | [suite-edited-while-bash-executes-it](suite-edited-while-bash-executes-it.md) | class | 2 |  | bash reads a script incrementally by byte offset, so editing a suite file while a long run of it is executing corrupts the parse at the old offset and the run dies with a syntax error that names no edit |
 | [suite-invalidated-by-a-commit-under-it](suite-invalidated-by-a-commit-under-it.md) | class | 1 |  | a suite that pins gov's revision at import and stamps fixtures from live HEAD is silently invalidated by any commit made while it runs, and the failures name the product |
 | [summary-rewrites-the-text-it-carries](summary-rewrites-the-text-it-carries.md) | class | 1 |  | a compaction summary that reproduces a block as verbatim quietly rewrites the lines that look wrong in it, so the defects the block carried read as fixed and the copy passes for the original |
 | [swallowed-delegate-reads-as-clean](swallowed-delegate-reads-as-clean.md) | class | 2 |  | a gate that discards its delegate's exit status reads a delegate that never ran as a clean population |
 | [sweep-issues-no-cost-verdict](sweep-issues-no-cost-verdict.md) | invariant | 1 |  | the self-test sweep never grades a suite's wall clock against its budget, and that is the ruling, not a gap |
+| [task-handed-as-the-spec-is-reviewed-not-done](task-handed-as-the-spec-is-reviewed-not-done.md) | class | 1 |  | a task handed to a reviewer role through its spec input is read as the subject, so the reviewer audits the task's own text instead of doing it, and returns findings about the brief |
 | [test-oracle-read-from-a-historical-sha](test-oracle-read-from-a-historical-sha.md) | class | 2 |  | a test compares its subject with a copy read out of git at a literal sha, so every later legitimate edit of the subject reds it and the fix is always "move the sha" |
 | [text-mode-read-eats-a-bare-cr](text-mode-read-eats-a-bare-cr.md) | class | 2 |  | reading a CRLF worktree file in text mode turns a bare CR inside a regex into a newline |
 | [trace-profile-measures-itself](trace-profile-measures-itself.md) | class | 1 |  | a per-line set -x profile charges its own write overhead to the next line, so its seconds rank by call count and an optimisation aimed at them moves nothing |
@@ -157,6 +159,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 3 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-142 record(s): 139 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+144 record(s): 141 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

@@ -28,7 +28,8 @@ gotcha-classes = ["fold-text-is-unreviewed-surface.md", "amendment-leaves-its-ot
   "reseed-at-a-later-sha-launders-the-base.md", "predicate-designed-without-a-run-over-the-tree.md",
   "path-keyed-row-strands-on-a-rename.md", "an-allow-that-bypasses-a-judge-names-none.md",
   "absence-read-from-one-of-several-homes.md", "summary-rewrites-the-text-it-carries.md",
-  "instrument-recorded-into-the-corpus-it-scans.md"]
+  "instrument-recorded-into-the-corpus-it-scans.md", "task-handed-as-the-spec-is-reviewed-not-done.md",
+  "subagent-scratch-overwrites-the-parents-files.md"]
 guides = ["BUILD-METHOD.md"]
 backlog-shards = []
 lexicon-verbs = []

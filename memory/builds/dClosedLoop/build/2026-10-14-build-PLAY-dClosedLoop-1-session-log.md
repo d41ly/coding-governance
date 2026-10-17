@@ -150,9 +150,11 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 86 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the spec-review workflow's declared medium, round 1 | The systems and retrofit records, at blobs `9335a3533` and `cec90968d`, after dispatch 85 returns | the args in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[args-systems-retrofit]` | 1799cb98 | returned as `wf_ca8d9fb9-519`, CLEAN WITH FIXES, 62 of 67 confirmed | `reviews/2026-10-17-review-PLAY-dClosedLoop-1-systems-retrofit.md` |
 | 87 | gov-researcher, at its declared medium effort | The level-0 project map, run A, with run B | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-2-researcher.md` | 1799cb98 | returned, 15m04s, 70.4k out | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-a.md` |
 | 88 | the same | The level-0 project map, run B, from the same handoff, with run A | the same | 1799cb98 | returned, 11m01s, 56.6k out | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-project-map-b.md` |
-| 89 | gov-spec-reviewer, at the spec-review workflow's declared medium | The ownership table re-verified, reviewer 1 of 3, blind at `a169b3350`, then compared | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-3-spec-reviewer.md` | 1799cb98 | running | `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` |
-| 90 | the same | The ownership table re-verified, reviewer 2 of 3, apart from 89 and 91 | the same | 1799cb98 | running | the same |
-| 91 | the same | The ownership table re-verified, reviewer 3 of 3, apart from 89 and 90 | the same | 1799cb98 | running | the same |
+| 89 | gov-spec-reviewer, at the spec-review workflow's declared medium | The ownership table re-verified, reviewer 1 of 3, blind at `a169b3350`, then compared | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-3-spec-reviewer.md` | 1799cb98 | returned, 4m04s, 20.7k out: it audited the brief, not the table (`[misfire]`) | `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` |
+| 90 | the same | The ownership table re-verified, reviewer 2 of 3, apart from 89 and 91 | the same | 1799cb98 | returned, 4m34s, 25.6k out: it audited the brief, not the table (`[misfire]`) | the same |
+| 91 | the same | The ownership table re-verified, reviewer 3 of 3, apart from 89 and 90 | the same | 1799cb98 | returned, 5m13s, 27.6k out: it audited the brief, not the table (`[misfire]`) | the same |
+| 92 | gov-researcher, at its declared medium effort | The ownership table re-verified, round 2, verifier 1 of 3, from a worktree pinned at `a169b3350` without the table | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | running | `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` |
+| 93 | the same | Round 2, verifier 2 of 3, apart from 92 | the same | 1799cb98 | running | the same |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1872,6 +1874,14 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
 - 2026-10-17, session 1799cb98: the owner asked, verbatim, "run a review of the ownership table in parallel - instruct 3 independent agents to re-verify ownership"
   - Dispatches 89 to 91: three gov-spec-reviewers, each deriving every owner blind at `a169b3350`, then
     comparing with the approved table.
+
+- 2026-10-18, session 1799cb98: dispatches 89 to 91 returned, and each audited the brief it was handed as its
+  spec, not the table (`build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` `[misfire]`).
+  - What they found in the table: the expansions' 24 items and five record kinds missing, and the rule
+    ambiguous for record kinds (`[found-1]`).
+  - Round 2, dispatches 92 and 93, runs the re-verification itself as researchers, from a worktree pinned
+    without the table. The third verifier waits: agent-cap refused a sixth direct spawn in the turn, and a
+    slot frees 45 minutes after its spawn or at the owner's next prompt.
 
 ## Instruments
 

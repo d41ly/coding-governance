@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 142 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 144 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -361,12 +361,14 @@ Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `staged-break-substitutes-a-synthetic-value.md` | unattended |
 | `status-set-in-a-subshell.md` | unattended |
 | `structured-record-split-on-whitespace.md` | unattended |
+| `subagent-scratch-overwrites-the-parents-files.md` | build-method |
 | `subprocess-resolves-a-different-shell.md` | baseline |
 | `suite-edited-while-bash-executes-it.md` | memory-tree-hygiene |
 | `suite-invalidated-by-a-commit-under-it.md` | run-gates |
 | `summary-rewrites-the-text-it-carries.md` | build-method |
 | `swallowed-delegate-reads-as-clean.md` | memory-tree-hygiene |
 | `sweep-issues-no-cost-verdict.md` | run-gates |
+| `task-handed-as-the-spec-is-reviewed-not-done.md` | build-method |
 | `test-oracle-read-from-a-historical-sha.md` | review-harnesses |
 | `text-mode-read-eats-a-bare-cr.md` | unattended |
 | `trace-profile-measures-itself.md` | unattended |
