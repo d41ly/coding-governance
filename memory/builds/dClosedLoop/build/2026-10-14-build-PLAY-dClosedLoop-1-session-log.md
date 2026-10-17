@@ -158,6 +158,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 94 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the spec-review workflow's declared medium, round 1 | The chain's build order, at the owner's RC-1: v2 at blob `a8038f04e` and the re-cut record at `d3726ab57`, sixteen design records as specs | the args, recorded with the review's fold | 1799cb98 | returned as `wf_89aa1fa4-62c`, CLEAN WITH FIXES, 32 of 35 confirmed | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-chain-order.md` |
 | 95 | gov-researcher, at its declared medium effort | Round 2, verifier 3 of 3, apart from 92 and 93, once agent-cap freed a slot | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | returned, 18m36s, 134.6k out: v-osprey's table, 405 nodes, 325 of the 349 approved nodes it holds agreeing | `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` |
 | 96 | gov-skeptic, at its declared high effort | The 23 approved owners two or three round-2 verifiers dispute, each to refute against the records at `155568834` | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-2-skeptic.md` | 1799cb98 | running | `build/2026-10-18-build-PLAY-dClosedLoop-1-ownership-skeptic.md` |
+| 97 | the same | The 52 nodes two or three round-2 verifiers found that the approved table lacks, as 30 findings, each to refute on membership, identity or owner | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-3-skeptic.md` | 1799cb98 | running | `build/2026-10-18-build-PLAY-dClosedLoop-1-ownership-population.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1907,6 +1908,13 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
     (`build/2026-10-18-build-PLAY-dClosedLoop-1-ownership-skeptic.md`).
   - The returns, their tables and the comparison are filed in `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md` once the skeptic has returned, since
     it may read that record. No owner field changes before the owner answers.
+
+- 2026-10-18, session 1799cb98: dispatch 97, a second gov-skeptic, tests the 52 nodes two or three verifiers
+  found that the approved table lacks: the expansions' 26 items, as four findings, and 26 record kinds.
+  - The disposition proposed them to the owner directly. Their evidence shows candidates that may be one
+    node under two names, such as `release` and `release-exit`, or `fleet` and `fleet-register`, so each
+    faces a skeptic first. The amendment is recorded in the ownership-verify record with round 2's filing.
+  - The skeptics are 2 of the review's 5 verify agents (`[bound]`).
 
 ## Instruments
 
