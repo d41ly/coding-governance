@@ -968,3 +968,10 @@ census: FINDING census: tools/newkit/kit.toml is on disk with no kit node rc 1
 
 - **The other instruments hold:** the role matrix reads 81 of 81 items with 0 findings, the gap join is
   clean, the table-shape check finds only its 2 known rows, and the atlas derives 137 records.
+
+## [amended] Amended after approval
+
+- **RC-8, 2026-10-18:** `placement` and `placement.check` are dDeclaredLoop's, not dRankedPlan's. The entry step's
+  placing items are dDeclaredLoop's under PM-9, and they branch on the one key and are witnessed by the other, so the
+  keys move with them; dBoundRoles's driver then runs a check its ancestor owns. v2's catalogue carries the change
+  (`build/2026-10-18-build-PLAY-dClosedLoop-1-recut.md` `[order-review]`). The tables above keep the approved proposal as it was.

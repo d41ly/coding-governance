@@ -74,6 +74,8 @@ are found.
 
 ## [undecided] What no answer settles yet
 
+Revised 2026-10-18: the re-cut answered or applied each item below; its state is in `build/2026-10-18-build-PLAY-dClosedLoop-1-recut.md` `[owed-state]` and `[order-review]`.
+
 v2 `[owed]` and `[open]` carry these to the chain re-cut, and none has an answer yet:
 - whether the kit confs Runtime reads (`FANOUT_CAP`, `PROCMON_REAP_MODE`, `RESUME_ATTEMPTS` and
   `RESUME_TURNS`) fold into `.governance/policy.toml`;
@@ -438,6 +440,8 @@ its commit lies inside a reviewed range.
   and retrofit 99%, from 37% and 48%.
 
 ### [revisit-recut] What the chain still owes
+
+Revised 2026-10-18: each item's state is in `build/2026-10-18-build-PLAY-dClosedLoop-1-recut.md` `[owed-state]` and `[order-review]`.
 
 v2 `[owed]` and `[undecided]`, re-checked against v2's `[chain]` and the project map's `after=` and
 `owner=` relations:

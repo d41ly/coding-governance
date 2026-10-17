@@ -918,7 +918,8 @@ New area `Tooling`:
 - `gap-found-14`: memory instructs outside the ladder.
 
 Their owners stand, but their fixes are dTotalRecall's units, and dDeclaredLoop, `gap-design-01`'s
-owner, is dTotalRecall's parent. v2's `[owed]` carries the order to the re-cut.
+owner, is dTotalRecall's parent. v2's `[owed]` carries the order to the re-cut. Revised 2026-10-18: the re-cut
+moved `gap-design-01` to dTotalRecall (RC-2, `build/2026-10-18-build-PLAY-dClosedLoop-1-recut.md`).
 
 ## [forks] Asked, 2026-10-15
 
