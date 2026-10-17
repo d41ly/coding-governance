@@ -1038,3 +1038,216 @@ agent-ac2cbc996542ec907: hash-object calls 1, pinned-blob extractions 0
 agent-ad62633e1ec295193: hash-object calls 1, pinned-blob extractions 1
 agent-af79baab0288105ce: hash-object calls 1, pinned-blob extractions 0
 ```
+
+## [probes-86] The systems and retrofit audit's probes, at `51dfed5a5`
+
+Each runs from the worktree root. The audit (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-systems-retrofit.md`)
+asked for each, and the retrofit record's `[ledger]` cites their output.
+
+### The registries' directions (H1)
+
+```python
+"""List research A's 27 registries at a revision, each with its row count, its header's first lines, and the
+direction the retrofit design assigns it; exit 1 unless every one is classified and none is classified
+twice, and unless the population is 27.
+
+Usage: python registry_directions.py [rev]   (from the worktree root; rev defaults to HEAD)
+The population is research A's: `memory/project/*.txt`, the `*waivers*.txt` files under `tools/`, and the
+map's `baseline.toml` and `affordance-exempt.toml`. A direction is read from the file's own header, then
+held here as a table, so a new registry with no row exits 1.
+"""
+import subprocess
+import sys
+
+REV = sys.argv[1] if len(sys.argv) > 1 else "HEAD"
+DIRECTION = {
+    "append-only history": ["memory/project/refusal-retirements.txt", "memory/project/transition-audit.txt"],
+    "declared set": ["memory/project/method-carriers.txt", "memory/project/readme-contract.txt",
+                     "memory/project/legacy-files.txt", "tools/playbook-kit-waivers.txt",
+                     "tools/dead-path-waivers.txt", "tools/lexicon/lexicon-suffix-waivers.txt",
+                     "tools/lexicon/lexicon-verb-waivers.txt"],
+    "ceiling": ["memory/project/fork-ceilings.txt"],
+    "shrink-only debt": ["memory/project/brief-recorded-waiver.txt", "memory/project/corpus-path-unresolved.txt",
+                         "memory/project/curation-debt.txt", "memory/project/encoding-posture-sites.txt",
+                         "memory/project/id-orphan-waiver.txt", "memory/project/location-probe-waivers.txt",
+                         "memory/project/pass-order-waiver.txt", "memory/project/spawn-idiom-sites.txt",
+                         "memory/project/spec-token-waivers.txt", "memory/project/stale-header-waiver.txt",
+                         "memory/project/substitution-fed-loops.txt", "memory/project/testsuite-count-waivers.txt",
+                         "memory/project/trace-waiver.txt", "memory/project/unarmed-branches.txt",
+                         "tools/agent-cap-restatement-waivers.txt", "memory/map/baseline.toml",
+                         "memory/map/affordance-exempt.toml"],
+}
+
+
+def git(*a):
+    return subprocess.run(["git", *a], capture_output=True, text=True, encoding="utf-8", check=True).stdout
+
+
+names = git("ls-tree", "-r", "--name-only", REV).splitlines()
+population = sorted(n for n in names
+                    if (n.startswith("memory/project/") and n.endswith(".txt") and n.count("/") == 2)
+                    or (n.startswith("tools/") and "waivers" in n.rsplit("/", 1)[-1] and n.endswith(".txt"))
+                    or n in ("memory/map/baseline.toml", "memory/map/affordance-exempt.toml"))
+where = {}
+for d, files in DIRECTION.items():
+    for f in files:
+        if f in where:
+            print(f"FINDING {f} classified twice: {where[f]} and {d}")
+        where[f] = d
+bad = 0
+for f in population:
+    body = git("show", f"{REV}:{f}").splitlines()
+    rows = sum(1 for ln in body if ln.strip() and not ln.lstrip().startswith("#"))
+    head = " ".join(ln.lstrip("# ").strip() for ln in body if ln.startswith("#"))[:150]
+    d = where.get(f)
+    if d is None:
+        bad += 1
+        print(f"FINDING {f} has no direction")
+    print(f"{d or 'UNCLASSIFIED':20} {rows:4} rows  {f}  | {head}")
+stale = sorted(set(where) - set(population))
+for f in stale:
+    bad += 1
+    print(f"FINDING {f} is classified but not in the population")
+counts = {d: sum(1 for f in population if where.get(f) == d) for d in DIRECTION}
+print(f"population {len(population)}; " + "; ".join(f"{d} {n}" for d, n in counts.items()))
+sys.exit(1 if bad or len(population) != 27 else 0)
+```
+
+```text
+$ python registry_directions.py 51dfed5a5
+shrink-only debt        1 rows  memory/map/affordance-exempt.toml  | affordance-exempt.toml — the shrink-only affordance grace list (codebase-map kit). Dossiers here predate the '## Reuse affordance' section; the graced
+shrink-only debt       54 rows  memory/map/baseline.toml  | baseline.toml — the shrink-only ratchet baseline (codebase-map kit). Items inventoried from code but not yet claimed by a dossier or FOUNDATION.md. Th
+shrink-only debt       21 rows  memory/project/brief-recorded-waiver.txt  | brief-recorded-waiver.txt — units the `brief-recorded` leg reds that are DECLARED exceptions. TOOL-aRepatriatedFork-51. Legalised under `memory/projec
+shrink-only debt        0 rows  memory/project/corpus-path-unresolved.txt  | corpus-path-unresolved.txt — rooted repo-path citations in the present-tense corpus that resolve to nothing. One row per (citing-file, cited-path), TA
+shrink-only debt        2 rows  memory/project/curation-debt.txt  | curation-debt.txt - index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.  A ROW THAT HIDES NOTHING NOW REDS (TO
+shrink-only debt       16 rows  memory/project/encoding-posture-sites.txt  | encoding-posture-sites.txt — the sites that PREDATE the `encoding posture (text IO names its encoding)` leg. TOOL-aRepatriatedFork-3.  A row is `<path
+ceiling                 7 rows  memory/project/fork-ceilings.txt  | fork-ceilings.txt — the forks per invocation each hot entrypoint may spend, read by the `spawn budget (forks per hot entrypoint)` leg through `fork-co
+shrink-only debt        0 rows  memory/project/id-orphan-waiver.txt  | id-orphan-waiver.txt — ids cited but never defined, deliberately. Shrink-only (ORPHAN_ID_PIN). EMPTY, and that is its working state rather than its re
+declared set            3 rows  memory/project/legacy-files.txt  | legacy-files.txt — recording files kept under historical names (permanent C5 exemption). Empty = strict. DRAINED 2026-08-17 (TOOL-aTetheredRecord-7): 
+shrink-only debt        0 rows  memory/project/location-probe-waivers.txt  | location-probe-waivers.txt — the probes the `shell hygiene (a location probe asked from a moved directory)` leg waives. TOOL-aGraftedHelix-45.  A row 
+declared set           30 rows  memory/project/method-carriers.txt  | method-carriers.txt — every file that POINTS AT memory/guides/BUILD-METHOD.md, declared. One '<repo-relative-path> · <why>' row each. The 'why' is the
+shrink-only debt        6 rows  memory/project/pass-order-waiver.txt  | pass-order-waiver.txt — units the `pass-order history` leg reds that are DECLARED exceptions. TOOL-aStagedLane-1 S2e. Legalised under `memory/project/
+declared set          168 rows  memory/project/readme-contract.txt  | readme-contract.txt - which build READMEs the heading canon and the slot budgets BIND. TOOL-dFramedEntrypoint-3. Asserted in BOTH directions by `gen_b
+append-only history     5 rows  memory/project/refusal-retirements.txt  | refusal-retirements.txt - one row per retired refusal, read by check-arms.py --check (TOOL-aSparedSpawn-14). APPEND-ONLY. Grammar and rules: the memor
+shrink-only debt      303 rows  memory/project/spawn-idiom-sites.txt  | spawn-idiom-sites.txt — the sites the `shell hygiene (a fork spent on builtin work)` leg carries. TOOL-aSparedSpawn-8.  A row is `<path> TAB <class> T
+shrink-only debt       23 rows  memory/project/spec-token-waivers.txt  | spec-token-waivers.txt - declared exceptions for tools/check-spec-tokens.py (TOOL-dRetiredFork-20).  One `<token>	<reason>` per row. SHRINK-ONLY: the 
+shrink-only debt        0 rows  memory/project/stale-header-waiver.txt  | stale-header-waiver.txt — build READMEs whose PRESENT-but-unparseable header is tolerated.  TOOL-dRetiredFork-3. `gen_build_index.py` raises StaleHead
+shrink-only debt       43 rows  memory/project/substitution-fed-loops.txt  | substitution-fed-loops.txt — the sites that PREDATE the `shell hygiene (a loop fed by a command substitution)` leg. TOOL-aLeakedHandle-1.  A row is `<
+shrink-only debt       20 rows  memory/project/testsuite-count-waivers.txt  | testsuite-count-waivers.txt — suites on the bar that do not yet print an executed assertion count against a floor. SHRINK-ONLY: a row leaves when its 
+shrink-only debt        9 rows  memory/project/trace-waiver.txt  | trace-waiver.txt — CLOSED specs that no TRACE_GLOBS commit subject can ever name, one row per spec. SHRINK-ONLY. Read by drift-audit signal 6 (`closed
+append-only history     0 rows  memory/project/transition-audit.txt  | transition-audit.txt — the PINNED transition merges hygiene check 26 knows about.  One row per merge: `<sha> accounted`. A row is APPEND-ONLY, because
+shrink-only debt      159 rows  memory/project/unarmed-branches.txt  | unarmed-branches.txt — branches with no positive assertion naming their own failure text. SHRINK-ONLY: a row leaves when its branch gains an arm, and 
+shrink-only debt        2 rows  tools/agent-cap-restatement-waivers.txt  | agent-cap-restatement waivers — rows are `<matched text><TAB><reason>`, keyed on the TEXT. Shrink-only. A row whose text no longer appears anywhere RE
+declared set           14 rows  tools/dead-path-waivers.txt  | dead-path waivers - deliberate spellings of a DELETED filename outside memory/.  A ROW IS `<path>\t<ordinal>\t<line-text>\t<reason>`, TAB-separated, a
+declared set            0 rows  tools/lexicon/lexicon-suffix-waivers.txt  | lexicon suffix waivers — deliberate exceptions to predicate P2. One MATCHED TEXT per row, reason after whitespace. The pin is a TWO-SIDED EQUALITY: a 
+declared set            0 rows  tools/lexicon/lexicon-verb-waivers.txt  | lexicon verb waivers — deliberate exceptions to predicate P1. One MATCHED TEXT per row, reason after whitespace. The pin is a TWO-SIDED EQUALITY: a co
+declared set            1 rows  tools/playbook-kit-waivers.txt  | playbook-kit-waivers.txt — kit dirs under tools/ that are deliberately NOT named in the three shipped charter template, with the reason each is exempt
+population 27; append-only history 2; declared set 7; ceiling 1; shrink-only debt 17
+exit 0
+```
+
+With `fork-ceilings.txt` struck from its table, it fails on the one registry:
+
+```text
+$ python registry_directions_planted.py 51dfed5a5
+FINDING memory/project/fork-ceilings.txt has no direction
+population 27; append-only history 2; declared set 7; ceiling 0; shrink-only debt 17
+exit 1
+```
+
+### The classes a check tolerates (M16, M20, M33)
+
+```python
+"""Count, at one revision, each class of population a gov check tolerates, as the retrofit record's `[ledger]`
+lists them after the systems and retrofit audit (M16, M20, M33): the scalar pins, the date cutoffs, and the
+`gov:` marker words with their sites. The exemption files are `registry_directions.py`'s population.
+
+Usage: python class_census.py [rev]   (from the worktree root; rev defaults to HEAD)
+A pin is a `NAME_PIN=` assignment at a line's start, and a cutoff a `NAME_CUTOFF=` one, in the four kit
+conf files. A marker is `gov:<word>` outside `memory/` and outside Markdown, as the audit's M33 counted.
+"""
+import collections
+import re
+import subprocess
+import sys
+
+REV = sys.argv[1] if len(sys.argv) > 1 else "HEAD"
+CONFS = [".memory-tree.conf", ".codebase-map.conf", ".lexicon.conf", ".unattended.conf"]
+
+
+def git(*a):
+    r = subprocess.run(["git", *a], capture_output=True, text=True, encoding="utf-8")
+    if r.returncode not in (0, 1):
+        sys.exit(r.stderr)
+    return r.stdout
+
+
+pins, cutoffs = [], collections.Counter()
+for conf in CONFS:
+    body = git("show", f"{REV}:{conf}")
+    for n, line in enumerate(body.splitlines(), 1):
+        m = re.match(r"^([A-Z0-9_]+_PIN)=(.*)$", line)
+        if m:
+            pins.append(f"{conf}:{n}: {m.group(1)}={m.group(2)}")
+        if re.match(r"^[A-Z0-9_]+_CUTOFF=", line):
+            cutoffs[conf] += 1
+print(f"pins {len(pins)}")
+for p in pins:
+    print("  " + p)
+print(f"cutoffs {sum(cutoffs.values())}: " + ", ".join(f"{c} {n}" for c, n in cutoffs.items()))
+hits = git("grep", "-h", "-o", "-E", r"gov:[a-z][a-z-]*", REV, "--", ":!memory/", ":!*.md").splitlines()
+words = collections.Counter(h.split(":", 2)[-1] if h.count(":") > 1 else h for h in hits)
+print(f"gov: marker sites {sum(words.values())} over {len(words)} words")
+for w, n in words.most_common():
+    print(f"  {n:4} {w}")
+```
+
+```text
+$ python class_census.py 51dfed5a5
+pins 9
+  .memory-tree.conf:452: ORPHAN_ID_PIN="0"
+  .memory-tree.conf:455: DEAD_PATH_PIN="0"
+  .memory-tree.conf:688: ROW_DUPLICATE_PIN="3"
+  .memory-tree.conf:716: SEVERITY_UNLABELLED_PIN=""
+  .memory-tree.conf:717: LIVE_ROW_PIN=""
+  .memory-tree.conf:783: RECORD_UNBOUND_PIN="16"
+  .codebase-map.conf:47: DOSSIER_DECISIONS_EMPTY_PIN=16
+  .lexicon.conf:268: VERB_OFFENDER_PIN="1087"
+  .lexicon.conf:269: SUFFIX_OFFENDER_PIN="0"
+cutoffs 34: .memory-tree.conf 24, .unattended.conf 10
+gov: marker sites 374 over 20 words
+   165 gov:kit
+    45 gov:fixed-verifiers
+    34 gov:bounded-fanout
+    32 gov:sequential-agents
+    21 gov:literal-python
+    16 gov:playbook
+    13 gov:handoff
+    10 gov:conf-allow-end
+     8 gov:conf-allow-begin
+     6 gov:argv-begin
+     5 gov:argv-end
+     3 gov:literal-resolve
+     3 gov:one-extractor
+     3 gov:lander-mode-set
+     3 gov:resume-schedule-set
+     2 gov:lander-mode-default
+     2 gov:resume-schedule-default
+     1 gov:root-fixture
+     1 gov:argv
+     1 gov:conf-allow-
+```
+
+### The memory probe's third run (H2)
+
+It is filed beside its first two runs, in the systems record's `[ms2-instrument]`.
+
+### The instruments after the fold
+
+- The gap-ownership join and the preset check, run as extracted from the session log, exit 0. The join
+  reads 219 gap keys over 15 builds, none unowned. The preset check reads 185 catalogue keys, 175
+  presettable and 175 preset rows.
+- The both-runs probe reads 52 rows in layer-expansions, 44 checked, and 51 in the systems record, 48
+  checked, with no finding.
+- The table-shape probe finds only the verbatim research return's row it found before.
+- The role matrix's revision is filed in layer-roles' `[instrument]`.

@@ -1754,6 +1754,12 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
 - 2026-10-17, session 1799cb98: dispatch 86 returned CLEAN WITH FIXES: 62 of 67 findings confirmed,
   52 items (5 high, 36 medium, 11 low), 11 agents, 335.7k out tokens (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-systems-retrofit.md`).
 
+- 2026-10-17, session 1799cb98: dispatch 86's findings are folded. All 52 items are amended, in the
+  retrofit and systems records, v2, flow-steps and layer-roles
+  (`build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews.md` `[fold-systems-retrofit]`), with four
+  new bug classes. H2's corrected measure puts MS-2 back to the owner, beside dispatch 85's RT-4. The
+  role matrix's instrument now reads flow-steps' new `[adopt]` group, 81 items clean.
+
 ## Instruments
 
 ### The gap-ownership join

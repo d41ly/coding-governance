@@ -120,8 +120,8 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 | The head line | one inline `gov:note` head line per annotated block, holding a definition and pointers (`research-annotations-a.md:15`, `research-annotations-b.md:13`) | A caps a block at 8 lines (`research-annotations-a.md:143`); B at 12, on touched blocks (`research-annotations-b.md:145`) | 12 lines, on touched blocks |
 | Its place in the instruction layer | not an instruction unit and no level of its own; a directive stays in the unit the line points at (`research-annotations-a.md:15`, `research-annotations-b.md:13`) | A calls it level-7 evidence; B calls it levelless | levelless pointers |
 | History and measurements | they move out of comments into the record the line's `refs=` names (`research-annotations-a.md:15`, `research-annotations-b.md:13`) | — | both |
-| Delivery | a work-order slot of at most 2 KB and a query by tag, with no read hook (`research-annotations-a.md:17`, `research-annotations-b.md:15`) | — | both |
-| Why no read hook | the Read tool carries a small share of the calls that read code: 5.4% (`research-annotations-a.md:17`) and 3.1% (`research-annotations-b.md:15`) | the two windows differ | retire `pushed-at-read` (fork AN-2) |
+| Delivery | a work-order slot of at most 2 KB and a query by tag, with no read hook (`research-annotations-a.md:17`, `research-annotations-b.md:15`) | — | both, superseded by AN-2's read hook under `pushed-at-read` (revised 2026-10-17, the audit's M8) |
+| Why no read hook | the Read tool carries a small share of the calls that read code: 5.4% (`research-annotations-a.md:17`) and 3.1% (`research-annotations-b.md:15`) | the two windows differ | fork AN-2, which kept `pushed-at-read` and redefined it for shell reads; this row's retirement is superseded (revised 2026-10-17, the audit's M8) |
 | Comment volume | about 41% of code bytes are comments (`research-annotations-a.md:47`, `research-annotations-b.md:23`) | A: 51.6% of comment lines sit in blocks of 8 or more; B: 22.9% of comment bytes narrate in long blocks | both |
 | Pointers followed | agents rarely follow a comment's pointer: 7.6% within 3 calls (`research-annotations-a.md:76`) and 5.0% within 5 reads (`research-annotations-b.md:48`) | — | the comment carries the orientation itself |
 | Dangling citations | a comment cites a gotcha path that never existed, and no check sees it (`research-annotations-a.md:70`, `research-annotations-b.md:27`) | A also counts 2 real dangling ids; B files the same ids among fixtures and foreign families | re-measured at arming |
@@ -161,7 +161,7 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 | Question | Both runs | Where they differ | The design takes |
 |---|---|---|---|
 | The mechanism | keyed sections, read through one command and handed out by the work order (`research-memory-structure-a.md:13`, `research-memory-structure-b.md:15`) | A calls it a catalogue, B a section index | both, as one index with the tags' (`[cross]`) |
-| The index | generated, keyed by tree hash, never tracked and never loaded whole (`research-memory-structure-a.md:119`, `research-memory-structure-b.md:18`) | A: JSONL, 0.9 s; B: TSV, 0.44 s | both |
+| The index | generated, keyed by tree hash, never tracked and never loaded whole (`research-memory-structure-a.md:119`, `research-memory-structure-b.md:18`) | A: JSONL, 0.9 s; B: TSV, 0.44 s | one JSON index, as `[cross]` names it (revised 2026-10-17, the audit's L3) |
 | Default load | the card only, under a budget (`research-memory-structure-a.md:17`, `research-memory-structure-b.md:22`) | A: 6 KB or less; B: 8 KB | 8 KB |
 | Why | reads run too wide rather than miss: an id grep returns a median 15.5 files (`research-memory-structure-a.md:56`), and a spec's median section is 715 B, 4% of its file (`research-memory-structure-b.md:81`) | different measures | both |
 | Rejected: summaries and ranked retrieval | summaries drop identifiers, and recall's read-through is under 6% (`research-memory-structure-a.md:83`, `research-memory-structure-b.md:153`) | — | rejected |
@@ -181,13 +181,31 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   - memory registers the `section` and `record` extractors, and `record find` and `record show` are its
     views over that index;
   - `gov tag show <address>` and `record show <id>#<tag>` resolve through one resolver.
+  - **Where it lives** (revised 2026-10-17, the audit's M17 and L3).
+    - The index is one JSON file per tree, at `<git-common-dir>/gov/index/<tree>.json`, shared
+      across worktrees.
+    - It is written atomically, with a temp file and a rename. So concurrent rebuilds on a cold
+      cache race to one identical file, and a reader never sees a torn one.
+  - **An uncommitted edit.** A working tree with uncommitted edits is served HEAD's tree, overlaid
+    with the working-tree blobs of its modified tracked files. Those rows are marked `dirty`, and
+    the freshness check exempts them.
+  - **Probe:** five concurrent `gov tag show` calls on a cold cache, then a query after an
+    uncommitted edit.
 
   dOrderedCharter builds the grammar, the engine and the resolver; dTotalRecall registers memory's
   extractors and its read verbs.
-- **One work order, one budget.** A role item's work order carries its instruction units, its memory
-  sections and its code-note rows, each selected by tag, under one byte budget per item. The instruction
-  layer renders it (P27), `memory.item-budget` prices its sections, and the code-notes slot is capped
-  inside it.
+- **One work order, one budget per slot** (revised 2026-10-17, the audit's M1). A role item's work order carries its
+  instruction units, its memory sections, its code-note rows and its legacy rows, each selected by tag.
+  The instruction layer renders it (P27). Each slot has one key and one answer when it runs over:
+  - **The instruction load set** is budgeted by P27. Over its budget, it is refused at render, as
+    `instructions.checks` says, or routed back by the roles layer.
+  - **The memory slices** are priced by `memory.item-budget`. Over it, they are answered by
+    `memory.over-budget`: counted and reported under the default `report` (MS-3), never refused and
+    never routed back.
+  - **The code-notes slot** is capped at 2 KB, and the legacy slot by `retrofit.slot-bytes`. Rows
+    past a cap are left to the query by tag.
+  - **Why.** The first text named one byte budget per item with no key. That gave one over-budget
+    work order three answers.
 - **Annotations point at tags.** A `gov:note` line's tags and pointers resolve through the same resolver,
   and a directive in code points at the instruction unit that states it.
 - **Shapes are data; their texts are units.** A shape never loads into an agent. Its checklist and
@@ -197,7 +215,8 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   the chain's root. Memory's extractors, the role shapes and the annotation checks build on them.
 - **Retrofit** (2026-10-17, `build/2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md`) is a sixth system
   across the layers. Its ledger holds the shrink-only populations these five name: the positional
-  references, IW-1's legacy list, the resolve check's legacy and the legacy anchors. Its `[cross]` says
+  references, IW-1's legacy list, the resolve check's legacy, the untouched long blocks, and the `gov:`
+  waiver markers. Its `[cross]` says
   how each system meets it.
 
 ## [design] The design, system by system
@@ -208,34 +227,50 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   `<doc> [<seg>]`, unique within its document. Ids keep memory's grammar: `FAMILY-<slug>-<seq>` and
   `gap-<area>-NN`. A first segment may not be a namespace word.
 - **Namespaces.** R-B's twelve, plus `section`, `doc`, `unit`, `field`, `leg`, `check`, `point`, `hook`,
-  `command`, `pack`, `feature` and `class`. Each namespace is a row in its owning layer's contract: its
-  declaring source, its extractor, and whether it selects or describes. An expansion mints only under its
-  own prefix, at a core point.
+  `command`, `pack`, `feature` and `class`, and `marker` (`[design-annotations]`). Each namespace is a row
+  in its owning layer's contract: its declaring source, its extractor, and whether it selects or
+  describes. An expansion mints only under its own prefix, at a core point.
+- **A leg keeps its name** (revised 2026-10-17, the audit's M26).
+  - A leg gains a `tag` field beside its free-text `name`. The shape check grades the tag, never the
+    name.
+  - The name stays the join key of every file keyed by leg name:
+    - `tools/run-gates/ceiling-evidence.txt`, `selftest-budgets.txt` and `windows-only-legs.txt`;
+    - `tools/roles/house/policy.toml`'s `[gates]`;
+    - every kit.toml's `silenced_legs`;
+    - the run-log history.
+  - 139 of today's 140 leg names fail the tag shape.
 - **Mint, rename, retire.** A tag is minted by writing its declaring site through that site's write path.
   A rename or retirement writes `retired → <new>` or `→ none` into that write path's change record, and
   the index derives the redirect from it. A retired name is never reused.
-- **Index and resolver.** The index is derived JSON under the git directory, keyed by tree id, rebuilt on
-  a miss, never committed and never loaded whole. `gov tag show|where|refs|check <address>` returns the
+- **Index and resolver.** The index is the one derived JSON file `[cross]` places, keyed by tree id,
+  rebuilt on a miss, never committed and never loaded whole. `gov tag show|where|refs|check <address>` returns the
   smallest leaf slice in one call.
 - **Joins.** `compute_coverage` moves to `tools/lib` as the join factory, because the map that holds it
   today is optional.
 - **Positional references.** Numbers that never moved, such as the M-steps and the hygiene checks, become
   alias rows to their tags. Live text migrates through Convergence, and frozen records resolve through the
-  aliases. A shrink-only ratchet holds the live count meanwhile.
+  aliases. Meanwhile the live references are held by key, path and reference: dOrderedCharter keeps
+  them as a keyed list, and dWitnessedBar's migration registers that list as a ledger population.
+  They are never held as a count (revised 2026-10-17, the audit's M4).
 - **Checks**, the `tags` leg pack, also run at render, softened only through `instructions.checks`:
 
   | Check | Red on |
   |---|---|
-  | shape and registered namespace | `item.Build.Scope` |
+  | shape and registered namespace | `item.Build.Scope`; run over today's population when a namespace registers, reporting how many sites fail its shape |
   | unique | a second `plan.input` row, or a second `## [design]` in one record |
   | owned | an expansion declaring `item.build.x` |
-  | resolves | `layer-memory [nmes]` |
+  | resolves, with bare references as `tags.bare-refs` says | `layer-memory [nmes]`; under `unique`, a bare reference two namespaces match; under `never`, any bare reference outside the charter (revised 2026-10-17, the audit's M30) |
   | retired | new text citing a retired tag, or a retired name minted again |
   | joins (R-B), armed per population | a step with no unit; "unarmed" while a population is empty, never green |
   | positional | a new `§n`, `Mn` or `check n` in live text |
-- **Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter. dDeclaredLoop registers
-  `step`, `item` and `policy`; dBoundRoles `role` and `field`; dTotalRecall `section`, `record`, `feature`
-  and `class`; dWitnessedBar `leg` and `check`.
+- **Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter. Each registration
+  carries its extractor. Six namespaces gained an owner (revised 2026-10-17, the audit's M10):
+  - dOrderedCharter registers `doc` and `unit`;
+  - dDeclaredLoop `step`, `item`, `policy` and `command`;
+  - dBoundRoles `role` and `field`;
+  - dTotalRecall `section`, `record`, `feature`, `class` and `marker`;
+  - dWitnessedBar `leg`, `check` and `pack`;
+  - dWellOiledMachine `hook` and `point`.
 - **Keys.**
 
   | Key | Values | Default |
@@ -251,12 +286,26 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   [refs=<id|path>[,…]]`, and `gov:feature <tag>`. It holds a definition and pointers. A body line holding
   MUST or NEVER needs `refs=` to the unit or record that states it. It has no level and never loads at a
   load point; in a work order its rows are data inside the task.
+- **Markers** (revised 2026-10-17, the audit's M33).
+  - `gov:` is a reserved prefix, and `note` and `feature` are its annotation words.
+  - The 20 words gates already read are registered in the `marker` namespace, each with its reading
+    check. `gov:kit`, `gov:fixed-verifiers` and `gov:bounded-fanout` are three of them, and together
+    they mark 374 sites outside `memory/` at `51dfed5a5`.
+  - A word a gate reads as a waiver is a ledger population of that check (retrofit `[ledger]`).
+  - The grammar check runs per registered word, and an unregistered `gov:` word reds.
+  - Probe: the marker query over today's tree classifies every site, with none unregistered.
 - **What stays and what moves.** A comment keeps what its block implements, what would break without it,
   and its pointer. Dates, measurements and what a block used to do move to the record `refs=` names.
-- **Budget.** A block a commit touches is at most 12 lines, and a head line at most 160 B. Untouched
-  legacy blocks are held by a shrink-only ratchet on the lines in blocks of 9 or more.
-- **Delivery.** The work order's code-notes slot, at most 2 KB, filled from the item's tags and write set;
-  and a query by tag. Nothing is pushed when a file opens.
+- **Budget.** A block a commit touches is at most 12 lines, and a head line at most 160 B.
+  - Untouched legacy blocks over 12 lines, the touched-block cap, are a ledger population (retrofit
+    `[ledger]`), keyed by path and block anchor.
+  - The first design held a count over blocks of 9 or more, from run A's 8-line cap. A count lets a
+    drained long block offset a newly grown one (revised 2026-10-17, the audit's M4).
+- **Delivery** (revised 2026-10-17, the audit's M8):
+  - the work order's code-notes slot, at most 2 KB, filled from the item's tags and write set;
+  - a query by tag, through the marker query or the map's index as `annotations.lookup` says (AN-1);
+  - and, only under `annotations.grammar: pushed-at-read`, the read hook (AN-2, as `[answers]`
+    designs it). Under the default, nothing is pushed when a file opens.
 - **Checks**, one `annotations` leg, each seen red on a planted case first:
   - grammar;
   - resolve, over every id and `memory/` path a comment cites, with exemption rows for fixtures and
@@ -264,7 +313,12 @@ run found on its own, with each run's line cited. The returns are filed verbatim
     fixes;
   - one anchor per feature tag;
   - the touched-block budget;
-  - history inside a note's body.
+  - history inside a note's body;
+  - the read hook, under `pushed-at-read`: it fires on a planted `cat <code path>` shell call, and
+    injects once per session;
+  - the lookup: with the map absent, the slot renders "not installed" and falls back to the marker
+    query;
+  - markers: no unregistered `gov:` word.
 - **Owners.** The memory layer, kit memory-tree, chain build dTotalRecall. The tags come from
   dOrderedCharter's registry, and the slot from dBoundRoles' work order.
 - **Keys.**
@@ -274,6 +328,8 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   | `annotations.budget` | refuse, warn, record | refuse, on touched blocks |
   | `annotations.resolve-scope` | notes, every-comment-ref | every-comment-ref |
   | `annotations.delivery` | work-order, on-demand, off | work-order |
+  | `annotations.lookup` | query-and-map, query, map-index | query-and-map (AN-1) |
+  | `annotations.grammar` | voluntary, required, pushed-at-read | voluntary; `pushed-at-read` kept and redefined for shell reads (AN-2) |
 
 ### [design-instruction-writing] Instruction writing
 
@@ -281,20 +337,35 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   `.governance/instructions.toml`, merged by row key. Its fields: `tag`, `type` (directive, constraint,
   definition, pointer, policy, fact), `level`, `select`, `when`, `text` (one line, at most 200 B) or
   `source` (derived), `required-by`, `enforced-by`, `budget`, `status` (`active` or
-  `retired:<forward-tag>`), and `help` for the rationale, which never loads.
+  `retired:<forward-tag>`), and `help` for the rationale, which never loads. `status` is derived from the
+  `instructions.edit` change record that `[design-tags]` reads for every retirement, and is never typed
+  (revised 2026-10-17, the audit's L7).
 - **Per type.** A directive carries a modal. A constraint carries a value and its enforcer. A fact
   carries a source and never typed text. A pointer's target resolves to a unit, a slice or a command,
   never a whole document.
 - **Templates.** One per document kind, holding slot selectors and no prose: the charter, the card's
   slots, a protocol slice, a Skill entry, a path rule, the role static block, the work order, a hook
-  message, a harness prompt module, and the instruction fields of a spec. Rationale moves to `help/`,
-  outside every load set.
+  message, a harness prompt module, and the instruction fields of a spec.
+  Rationale moves into each unit's `help` field, outside every load set.
+  It never goes to `help/`, whose pages are user-facing features (`help/README.md:3`) under the
+  playbook kit's adopter-set `HELP_DIR` (`playbook.kit.toml:252-255`) (revised 2026-10-17, the audit's L10).
 - **The renderer and its gate.** One renderer, extending `render_charter_blocks` and the playbook's
   probes. One leg refuses any file at an instruction path whose bytes differ from its render, or that no
   registry row produces. Unmigrated documents sit on a shrink-only legacy list.
+- **The renderers it absorbs** (revised 2026-10-17, the audit's M27). Each existing renderer and leg over instruction files has
+  a disposition, and a check holds every instruction file to exactly one renderer of record.
+  - **Absorbed at dOrderedCharter,** over the documents it renders first, the charter and the agent
+    files: playbook parity, playbook render wiring and its selftest, roles render wiring and its
+    selftest, and agent-instructions wiring.
+  - **Kept beside the legacy list until their documents migrate,** each retired with its last
+    document: kit/dogfood doc parity, review-protocol parity, each kit's skill wiring `--check`, and
+    govkit's placeholder render in adopters.
 - **Checks:** schema; grammar; positional references; one fact in one unit (two active units with one
   subject and value); render parity; unregistered files; the budget per load point both ways, too much
-  and too little; the joins; a single carry, no unit twice in one spawn.
+  and too little; the joins; a single carry, no unit twice in one spawn. The single-carry check reads
+  `instructions.task-charter` and the harness kind, and refuses `always` on a backend that loads the
+  static block, where it would carry the charter twice. The strict preset's value is now
+  `when-not-static` (revised 2026-10-17, the audit's M29).
 - **The saving, re-measured at landing.** A spawn's fixed text falls from about 8.7 KB to about 4.8 KB,
   and a builder item's from 35.6 KB to about 8.4 KB; whole-guide reads for triggers the item decides
   fall to none. The render ledger measures bytes per load point per spawn, before and after, on the same
@@ -314,9 +385,24 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 
 ### [design-role-shapes] Role workflow shapes
 
-- **The registry.** `tools/roles/shapes.toml`, one row per role item's shape: its kind; its stages, each
-  with a role and a fan; its checklist and orientation template, both instruction unit tags; its merge;
-  its twin rule; and its agent cap. Effort stays in `policy.toml`, keyed by shape and stage.
+- **The registry** (revised 2026-10-17, the audit's M18).
+  - **One registry, extended.** Each `tools/roles/workflows.toml` entry gains its shape: its kind, its
+    fan, its checklist and orientation template (both instruction unit tags), its merge, its twin
+    rule, and its agent cap. A per-call intensity is a named variant row. That is run A's pick
+    (`research-role-shapes-a.md:15,116`).
+  - **The agent cap** is bounded by agent-cap's `FANOUT_CAP`, never a new value.
+  - **Effort stays in `policy.toml`,** under `[effort.roles]` and `[effort.stages.<workflow>]`, which
+    `resolve_stage_efforts` already reads (`roles_lib.py:561`).
+  - **Why.** The first design added `tools/roles/shapes.toml` beside `workflows.toml`, which already
+    declares each workflow's roles and stages (`workflows.toml:37-67`). That made two registries over
+    one fact.
+  - **The consumers dBoundRoles rewrites in the same unit:**
+    - R12 and `resolve_stage_efforts` in roles_lib.py;
+    - `handoff.py stage-efforts` and `harness-args`;
+    - check_roles.py R6 to R9;
+    - adopt-roles.sh, render_agents.py and check-wiring.sh;
+    - agent-cap's `args.roles` refusal;
+    - the build Skill's calls.
 - **Kinds.** Four role harnesses registered at Runtime's role-harness point: `single`, `per-unit`,
   `panel` (finders, at most five skeptic batches, one synthesizer) and `twin` (two runs of one shape,
   merged).
@@ -326,8 +412,14 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 - **Twins and their merge.** Twins run only on the owner's opt-in (RS-1). A synthesizer places both runs' findings on
   defects over candidate pairs grouped by address, and the comparison instrument refuses an unplaced id.
 - **The metric.** Recall first, against a twin union or a known replay set, then grade-weighted verified
-  results per 100k out-tokens. `review.cost` writes a shape-run record carrying the shape, its efforts and
-  its role-sha. The Loop Review prices shapes in the value ledger and proposes a change only past the
+  results per 100k out-tokens. The shape-run record has two writers (revised 2026-10-17, the audit's M9 and L6).
+  - **A review act's row:** `review.cost` extends the `review-shape` line that
+    `tools/workflows/tier2-review.js:79` already emits, adding `shape`, `efforts` and `role-sha`. The
+    shape-run record is that line's parsed view, and `tier2-review.test.sh`'s SHAPE_RE and the reader
+    at README:265 move with it.
+  - **Every other role act's row** comes from the supervisor's journal reconcile (dWellOiledMachine),
+    which already binds each act's agents to its shape.
+  - **The kind** is registered in `[design-memory-structure]`. The Loop Review prices shapes in the value ledger and proposes a change only past the
   measured noise between twins.
 - **Per role:**
 
@@ -344,9 +436,10 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   | deployer, maintainer | single, registered by their expansions | medium | `orient.producer` |
 - **Checks:** every role item names a shape and every stage a declared role; the binding, red on today's
   probe, a builder as reviewer at low effort; the journal reconcile, red on a planted extra agent; the
-  separation of author and verifier; twin placement; a shape-run record for every role act.
-- **Owners.** dBoundRoles builds the registry and the shapes; dWellOiledMachine the binding and the
-  reconcile; dFairHearing the panel's internals and the twin merge; dCalibratedLens the ledger's shape
+  separation of author and verifier; twin placement; a shape-run record for every role act, from
+  `review.cost` for a review act and from the journal reconcile for every other.
+- **Owners.** dBoundRoles extends `workflows.toml` with the shapes; dWellOiledMachine the binding, the
+  reconcile and the non-review shape-run rows; dFairHearing the panel's internals and the twin merge; dCalibratedLens the ledger's shape
   rows.
 - **Keys.**
 
@@ -361,15 +454,28 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 - **Sections.** Each record kind's registry entry declares its sections as `[tag]`s, each required or
   optional. Legacy headings get derived anchors: the spec template's numbered headings map to tags by a
   table, and no record is rewritten.
+  - **A repeated heading** takes its parent's anchor plus an ordinal suffix, `-2` or `-3`, in
+    document order (revised 2026-10-17, the audit's M35).
+  - **Derived anchors are not graded for uniqueness.** That check grades only authored `[tag]`s.
+  - **Probe:** derive anchors over the whole memory tree, and expect no collision. Today 13 tracked
+    records repeat an H2 or H3 heading.
 - **The index and the verbs.** Memory's rows live in the one index (`[cross]`): key, kind, layer, build,
   bytes, blob, tags, superseded-by and lifecycle. `record find --kind|--tag|--build|--paths` returns at
-  most 40 rows and no content, with superseded rows hidden. `record show <id>#<tag>[@blob]` returns one
+  most 40 rows and no content, with superseded rows hidden. When more match, its last line gives the
+  total and a hint to narrow the query, held by a check on a planted 41-row case (revised 2026-10-17, the audit's L11). `record show <id>#<tag>[@blob]` returns one
   section.
 - **Work orders hand sections.** A role item's read set is declared as `id#tag` keys. The executor inlines
-  the slices under the item's byte budget and writes a slice manifest, and a read outside it is journaled
-  and counted.
-- **Default load.** The charter and the card, the card at most 8 KB; the harness's auto-memory as MS-1
-  settles.
+  the slices under the item's byte budget and writes a slice manifest. A read outside it, through Read,
+  a shell command or `record show`, is journaled and counted (revised 2026-10-17, the audit's H2).
+- **Default load.** The charter and the card, the card at most 8 KB.
+  - **The harness's auto-memory,** as MS-1 settles, is promoted, and what remains is held to
+    `memory.load-budget` too. The card and the auto-memory's remainder each get the budget, not a
+    share of it.
+  - **A session-start check** reports the auto-memory's bytes against the budget. The session-start
+    hook runs it, where the per-user store is readable, and it is seen red on a planted 9 KB index
+    (revised 2026-10-17, the audit's M12).
+- **The shape-run record** is a registered kind: the `review-shape` line's parsed view, with the
+  journal's rows for non-review acts (`[design-role-shapes]`).
 - **Homes.** Build folders stay. A record no build owns goes under `memory/<layer>/<kind>/`.
   `DECISIONS.md`, `gotchas/` and `map/` are declared homes at their paths.
 - **Checks:**
@@ -377,13 +483,25 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   | Check | Red on |
   |---|---|
   | sections | a new spec headed `## Goal` |
-  | keys resolve, both ways | a dangling `rec:` key, or one section tag twice in a record |
-  | item budget | a planted work order over its budget |
+  | keys resolve, both ways | a dangling `rec:` key, or one authored section tag twice in a record |
+  | item budget, as `memory.over-budget` says | under `report`, a planted over-cap work order missing from the report with its role and bytes; under `refuse`, a fixture's over-cap work order rendered (revised 2026-10-17, the audit's M1) |
   | no default ingest | `@memory/DECISIONS.md` in `CLAUDE.md` |
   | superseded slices | a superseded decision handed to a builder |
-  | index freshness | a served row whose blob is not HEAD's |
-- **The acceptance re-measure.** Thirty days after landing, an agent transcript's median memory bytes are
-  below 40 KB, measured as today's 52.7 to 68.9 KB were.
+  | index freshness | a row served without `@blob` whose blob is not the tree's, outside the rows marked `dirty` (revised 2026-10-17, the audit's L3 and M17) |
+  | auto-memory | a session-start report missing a planted 9 KB index over `memory.load-budget` |
+- **The acceptance re-measure** (revised 2026-10-17, the audit's H2).
+  - **The target.** Thirty days after landing, the median memory bytes per agent that reads memory
+    are below 33 KB.
+  - **The measure counts every channel:**
+    - the work order's inlined slices, from the slice manifest;
+    - Read results on memory paths;
+    - the output of shell commands that name a memory path or call `record show`, `record find` or
+      `gov tag`.
+  - **Why 33 KB.** Today's median under that measure is 57.2 KB, over 3,073 agents. 33 KB is the
+    ratio research B's test set, 40 of 68.9 KB (`research-memory-structure-b.md:204`).
+  - **Why the first measure could not fail.** It counted Read calls alone, which carry 40.0% of
+    today's memory bytes. Moving reads into work orders and `record show` would have passed it by
+    construction (`[ms2-instrument]`, its third run).
 - **Owners.** The memory layer, kit memory-tree, chain build dTotalRecall. dBoundRoles renders the slices,
   and dRankedPlan sizes read sets at Plan.
 - **Keys.**
@@ -392,7 +510,7 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   |---|---|---|
   | `memory.default-load` | card, card-and-live | card |
   | `memory.load-budget` | 4k, 8k, 16k | 8k |
-  | `memory.item-budget` | KB per role, each role's the owner's to set | 96 for every role (MS-2) |
+  | `memory.item-budget` | KB per role, a KB being 1,000 bytes, each role's the owner's to set | 96 for every role, 96,000 B (MS-2) (revised 2026-10-17, the audit's L5) |
   | `memory.over-budget` | refuse, report, off | report (MS-3) |
   | `memory.legacy-anchors` | derived, none | derived |
   | `memory.superseded-slices` | refuse, mark | refuse |
@@ -437,6 +555,23 @@ The first four forks, answered in one round. Each answer is quoted verbatim.
   the command's output, and injects each named file's anchored rows once per session. Its reach is
   re-measured after landing on the same transcript mix; today's Read-only hook reaches 3 to 5% of
   code-reading calls.
+
+  **Revised 2026-10-17, the audit's M15.** The first text matched Read and Bash only, and parsed five
+  commands.
+  - **What the pack matches.** It matches `Bash|PowerShell`, as every shell hook in
+    `.claude/settings.json` does, and the Grep tool's path argument too.
+  - **What it parses,** by the commands' measured share: `grep` and `rg`, `sed -n`, `cat`, `git grep`,
+    `git show <rev>:<path>`, PowerShell's `Get-Content` and `Select-String`, and `head` and `tail`.
+  - **How it reads a path.**
+    - It folds MSYS spellings (`/c/...`) and drive-letter spellings onto repo-relative paths, as
+      `scratch-guard.js:161-162` and `:818` do.
+    - It resolves a path against a leading `cd` or a `git -C`.
+    - A directory argument injects the rows of its tracked files within the 2 KB slot, nearest
+      first.
+  - **Its carriers** are `.claude/settings.json` and the hook's settings fragment, under the
+    `*.fragment.json` eol rule.
+  - **Probe:** replay a sample of transcript shell reads through the parser, and count the share
+    that resolves to a tracked file. A fixture holds it to a minimum share.
 - **IW-2 amends v2's front door** at the fold: the charter's practice lines stay one each, and the reach
   table leaves the charter for step-scoped units.
 - **RS-1, as designed.** No product step twins by default. `review.twin` opts a review step in, and an
@@ -460,7 +595,8 @@ The first four forks, answered in one round. Each answer is quoted verbatim.
   margin (`research-memory-structure-a.md:144`). The reviewer's and researcher's figures carry no
   derivation.
 - **Measured per role, 2026-10-17.** The same measure, split by the agent type each subagent's
-  `meta.json` records, over 3,604 subagent transcripts (`[ms2-instrument]`):
+  `meta.json` records, over 3,604 subagent transcripts (`[ms2-instrument]`, its first run; the
+  researcher's and diff reviewer's rows moved in its second (revised 2026-10-17, the audit's L2)):
 
   | Agent type | Agents | Reading memory | Median | p90 |
   |---|---|---|---|---|
@@ -480,11 +616,22 @@ The first four forks, answered in one round. Each answer is quoted verbatim.
   table measures today's habit, not what a sliced work order would hand. The 2,608 workflow agents carry
   no role in their `meta.json`. Their roles are in each run's journal.
 - **The design took one run's unmeasured figures as defaults.** `[design-memory-structure]` is corrected:
-  each role's budget is derived from a measurement of that role, as `[forks]`' MS-2 is asked again.
+  each role's budget was to be derived from a measurement of that role, as `[forks]`' MS-2 was asked
+  again. The answer settled one cap for every role, below (revised 2026-10-17, the audit's L2).
 - **Settled, 2026-10-17 (MS-2).** A cap of 96 KB for every role by default, each role's cap the
   owner's to adjust. Today's whole-file loads sit under it at every role's median, and over it at every
   role's p90 except the skeptic's. 25.6% of the agents that read memory went over 96 KB: 39.5% of
   builders and 2.9% of skeptics (`[ms2-instrument]`, its second run).
+- **Counted over every channel, 2026-10-17** (revised 2026-10-17, the audit's H2). Read carried only 40.0% of today's memory
+  bytes. Shell commands carried 59.5%, and Grep 0.5%. Counted over all three (`[ms2-instrument]`, its
+  third run):
+  - **Three roles' medians are over the cap:** the builder's 124.1 KB, the spec reviewer's 113.7 KB
+    and the spec writer's 110.5 KB.
+  - **31.7% of the 3,073 agents that read memory went over 96 KB,** 65.8% of builders and 7.0% of
+    skeptics.
+  - **What the figures are.** They are still today's whole-file habit, as above.
+  - **MS-2 goes back to the owner.** The owner chose 96 KB from a table whose every median sat under
+    it, so MS-2 is put to the owner again with these figures.
 
 ### [ms2-instrument] The per-role probe and its output
 
@@ -615,6 +762,162 @@ gov-builder                15 of    38   39.5%
 all, pooled               346 of  1352   25.6%
 ```
 
+The third run, 2026-10-17, after the systems and retrofit audit's H2. It counts every channel a
+memory read can take, and first checks itself on two planted transcripts:
+
+```python
+"""Memory bytes per subagent, by agent type, over every channel a read can take (revised 2026-10-17, after
+the systems and retrofit audit's H2: the first version counted Read calls only).
+
+A tool call reads memory when it is:
+- a Read whose file_path holds `/memory/`;
+- a Bash or PowerShell call whose command names a path under `memory/`, or calls one of the designed
+  read verbs (`record show`, `record find`, `gov tag show|where|refs`);
+- a Grep whose path is under `memory/`.
+Its result's UTF-8 bytes are summed per agent and per channel. A shell command that names a memory path
+may print more than memory, so the shell channel is an upper bound, held the same before and after.
+
+Usage: python -I memq_roles_v3.py
+First runs the measure on two planted transcripts and exits 1 unless it counts a `record show` read and
+ignores a shell read of no memory path, and unless the Read-only measure misses the first. Then prints,
+per agent type, the Read-only median and p90, the all-channel median and p90, and the share over 96,000 B;
+and the bytes per channel.
+"""
+import collections
+import glob
+import json
+import os
+import re
+import sys
+
+MEM_PATH = re.compile(r"(^|[\s'\"=/\\:])memory[/\\]")
+VERBS = re.compile(r"\b(record\s+(show|find)|gov\s+tag\s+(show|where|refs))\b")
+SHELL = {"Bash", "PowerShell"}
+CAP = 96000
+
+
+def channels(lines, read_only=False):
+    """Memory bytes per channel in one transcript's lines."""
+    pend, tot = {}, collections.Counter()
+    for line in lines:
+        try:
+            r = json.loads(line)
+        except ValueError:
+            continue
+        c = (r.get("message") or {}).get("content")
+        if not isinstance(c, list):
+            continue
+        for b in c:
+            if not isinstance(b, dict):
+                continue
+            if b.get("type") == "tool_use":
+                name, inp = b.get("name"), (b.get("input") or {})
+                if name == "Read":
+                    if "/memory/" in str(inp.get("file_path", "")).replace(chr(92), "/"):
+                        pend[b["id"]] = "read"
+                elif read_only:
+                    continue
+                elif name in SHELL:
+                    cmd = str(inp.get("command", ""))
+                    if MEM_PATH.search(cmd) or VERBS.search(cmd):
+                        pend[b["id"]] = "shell"
+                elif name == "Grep":
+                    p = str(inp.get("path", "")).replace(chr(92), "/")
+                    if "/memory/" in p or p.startswith("memory/") or p == "memory":
+                        pend[b["id"]] = "grep"
+            elif b.get("type") == "tool_result" and b.get("tool_use_id") in pend:
+                ch = pend.pop(b["tool_use_id"])
+                cc = b.get("content")
+                t = cc if isinstance(cc, str) else "".join(x.get("text", "") for x in (cc or []) if isinstance(x, dict))
+                tot[ch] += len(t.encode("utf8", "replace"))
+    return tot
+
+
+def planted(cmd, nbytes):
+    use = {"type": "assistant", "message": {"content": [
+        {"type": "tool_use", "id": "t1", "name": "Bash", "input": {"command": cmd}}]}}
+    res = {"type": "user", "message": {"content": [
+        {"type": "tool_result", "tool_use_id": "t1", "content": "x" * nbytes}]}}
+    return [json.dumps(use), json.dumps(res)]
+
+
+shown = planted("record show PLAY-dClosedLoop-1#design", 5000)
+control = planted("ls tools/run-gates", 3000)
+arms = {
+    "a record show over Bash counts its bytes": sum(channels(shown).values()) == 5000,
+    "the Read-only measure misses it": sum(channels(shown, read_only=True).values()) == 0,
+    "a shell read of no memory path counts nothing": sum(channels(control).values()) == 0,
+}
+for arm, ok in arms.items():
+    print(f"planted: {arm}: {'yes' if ok else 'NO'}")
+if not all(arms.values()):
+    sys.exit(1)
+
+
+def q(v, p):
+    return v[min(len(v) - 1, int(len(v) * p))] if v else 0
+
+
+root = os.path.expanduser("~/.claude/projects")
+files = glob.glob(root + "/C--projects-coding-governance*/**/subagents/**/*.jsonl", recursive=True)
+old, new = collections.defaultdict(list), collections.defaultdict(list)
+seen, by_channel = collections.Counter(), collections.Counter()
+for f in files:
+    try:
+        kind = json.load(open(f[:-len(".jsonl")] + ".meta.json", encoding="utf-8")).get("agentType") or "unknown"
+    except (OSError, ValueError):
+        kind = "no-meta"
+    seen[kind] += 1
+    lines = open(f, encoding="utf8", errors="replace").read().splitlines()
+    tot = channels(lines)
+    by_channel.update(tot)
+    if tot.get("read"):
+        old[kind].append(tot["read"])
+    if sum(tot.values()):
+        new[kind].append(sum(tot.values()))
+
+po, pn = sorted(x for v in old.values() for x in v), sorted(x for v in new.values() for x in v)
+print(f"files {len(files)}; agents reading memory: Read only {len(po)}, any channel {len(pn)}")
+print(f"{'agent type':20}{'agents':>7}{'Read':>6}{'med B':>9}{'p90 B':>9}{'any':>6}{'med B':>9}{'p90 B':>9}{'over 96000':>12}")
+for kind, n in seen.most_common():
+    vo, vn = sorted(old.get(kind, [])), sorted(new.get(kind, []))
+    if len(vn) < 5:
+        continue
+    over = sum(1 for x in vn if x > CAP)
+    print(f"{kind:20}{n:7}{len(vo):6}{q(vo, .5):9}{q(vo, .9):9}{len(vn):6}{q(vn, .5):9}{q(vn, .9):9}"
+          f"{100 * over / len(vn):11.1f}%")
+over = sum(1 for x in pn if x > CAP)
+print(f"{'all, pooled':20}{sum(seen.values()):7}{len(po):6}{q(po, .5):9}{q(po, .9):9}{len(pn):6}{q(pn, .5):9}"
+      f"{q(pn, .9):9}{100 * over / len(pn):11.1f}%")
+total = sum(by_channel.values())
+for ch in ("read", "shell", "grep"):
+    print(f"bytes through {ch}: {by_channel[ch] / 1e6:.1f} MB, {100 * by_channel[ch] / total:.1f}%")
+```
+
+```text
+$ python -I memq_roles_v3.py
+planted: a record show over Bash counts its bytes: yes
+planted: the Read-only measure misses it: yes
+planted: a shell read of no memory path counts nothing: yes
+files 3709; agents reading memory: Read only 1372, any channel 3073
+agent type           agents  Read    med B    p90 B   any    med B    p90 B  over 96000
+workflow-subagent      2617  1002    49583   199267  2430    54507   210916       31.2%
+no-meta                 435     1    74976    74976     6   108795   232219       50.0%
+gov-skeptic             189    34    40120    68691   186    46710    87913        7.0%
+gov-spec-reviewer        95    95    65174   148010    95   113721   186958       68.4%
+general-purpose          77    48    35347    91398    72    59710   154081       30.6%
+gov-spec-writer          76    66    72349   225729    76   110457   295554       56.6%
+gov-diff-reviewer        69    51    41394   115213    68    73992   150457       39.7%
+gov-researcher           56    32    57097   124531    53    60239   161813       35.8%
+gov-synthesizer          38     3     7247     8359    31     8955    13175        0.0%
+gov-builder              38    38    78616   128420    38   124061   230023       65.8%
+Plan                     18     2    13422    13422    17    12989    65126        0.0%
+all, pooled            3709  1372    52381   179278  3073    57185   197563       31.7%
+bytes through read: 104.5 MB, 40.0%
+bytes through shell: 155.3 MB, 59.5%
+bytes through grep: 1.4 MB, 0.5%
+```
+
 ## [gaps-proposed] Gaps to register once the forks settle
 
 | System | Gap | Severity | Owner |
@@ -673,6 +976,10 @@ Revised 2026-10-17, the folds' closing review: the probe now reads each table by
 read and checked (`memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[probes-final]`). Re-run here, it reads the same 51 rows, 48 checked, with no finding.
 
 ## [open] What the round owes
+
+- **The audit.** Dispatch 86 returned CLEAN WITH FIXES, and its fold is mapped item by item in
+  `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews.md` `[fold-systems-retrofit]`. MS-2 goes
+  back to the owner with `[ms2]`'s third run.
 
 - The owner's answers to `[forks]`.
 - Then the fold: v2's catalogue and presets gain the new keys, the register gains `[gaps-proposed]`, and

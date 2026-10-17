@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 134 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 138 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -327,18 +327,22 @@ Inventories: gate-legs: 140 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `overlap-judged-from-the-invocation-interval.md` | run-gates-turnstile |
 | `owner-item-without-its-reject-outcome.md` | build-method |
 | `parser-drops-rows-it-cannot-place.md` | memory-tree-hygiene |
+| `path-keyed-row-strands-on-a-rename.md` | build-method |
 | `pin-copied-from-another-corpus.md` | baseline |
 | `pin-gated-checks-arm-nothing-without-a-pin.md` | memory-tree-hygiene |
 | `pipe-in-a-code-span-splits-a-table-cell.md` | memory-tree-hygiene |
 | `policy-value-with-no-route.md` | build-method |
 | `porcelain-diff-names-a-rename-by-its-destination.md` | unattended |
 | `predicate-bounded-by-its-own-count.md` | run-gates-turnstile |
+| `predicate-designed-without-a-run-over-the-tree.md` | build-method |
 | `process-creation-is-the-suite-cost.md` | unattended |
+| `ratchet-migration-ignores-how-each-source-grows.md` | build-method |
 | `rate-quoted-without-its-denominator.md` | build-method |
 | `record-citing-a-foreign-id-defines-or-orphans-it.md` | memory-tree-hygiene |
 | `record-file-read-by-line-position.md` | run-gates-turnstile |
 | `record-without-serves-or-with-a-round-counter.md` | memory-tree-hygiene |
 | `reflowed-prompt-string-reads-as-a-deleted-stop.md` | unattended |
+| `reseed-at-a-later-sha-launders-the-base.md` | build-method |
 | `retirement-inventory-misses-readers-by-value.md` | runlog |
 | `route-names-an-output-its-actor-never-emits.md` | build-method |
 | `row-driver-emits-a-plausible-file-with-rows-missing.md` | memory-tree-merge-driver |

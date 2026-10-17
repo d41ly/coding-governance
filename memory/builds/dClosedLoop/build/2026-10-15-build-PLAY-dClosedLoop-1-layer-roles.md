@@ -225,7 +225,9 @@ job is to verify.**
    - **Over budget:** the render demotes the optional inputs to references first. Still over, the item
      routes back to the item that produced its largest input, as a divergence: a unit too big for its
      builder's packet returns to the architect for a split. The route counts against
-     `flow.route-backs`.
+     `flow.route-backs`. Memory slices are not among these inputs: over `memory.item-budget`, they are
+     counted and reported as `memory.over-budget` says, never demoted or routed back (MS-3; revised
+     2026-10-17, the systems and retrofit audit's M1).
    - **A vanished anchor:** a fact whose file was renamed, deleted or rewritten is found again by its
      key's blob in history. Not found, it is handed as missing, and the role works without it on
      record.
@@ -389,27 +391,29 @@ role's name, which ends at the first comma, colon or parenthesis. `role_matrix.p
 revised 2026-10-17) reads only that opening, so prose in the cell never adds an actor, and derives the
 matrix from the step definitions as folded:
 
-| Actor | entry | plan | design | build | test | deploy | breakpoint | lifecycle |
-|---|---|---|---|---|---|---|---|---|
-| orientation scout | `entry.orient`, `entry.place` | — | — | — | — | — | — | — |
-| planner | — | `plan.triage-judge`, `plan.record`, `plan.reason` | — | — | — | — | — | — |
-| researcher | — | `plan.research` | `design.research` | — | — | — | — | — |
-| reuse scout | — | — | `design.seams` | — | — | — | — | — |
-| architect | — | — | `design.inventory`, `design.decompose`, `design.reason` | — | — | — | — | — |
-| spec writer | — | — | `design.unit-spec` | — | — | — | `review.fold` | — |
-| builder | — | — | — | `build.unit-pass` | — | — | — | — |
-| tester | — | — | — | — | `test.attribute`, `test.reason` | — | — | — |
-| reviewer | — | — | — | — | — | — | `review.lens` | — |
-| skeptic | — | — | — | — | — | — | `review.refute` | — |
-| synthesizer | — | — | — | — | — | — | `review.report` | — |
-| command | `entry.place-check`, `entry.claim` | `plan.input`, `plan.dedupe`, `plan.triage-rule`, `plan.place`, `plan.lease`, `plan.recommend`, `plan.exit` | `design.input`, `design.reentry`, `design.overlaps`, `design.recommend`, `design.ready`, `design.exit` | `build.base`, `build.unit-lease`, `build.scope`, `build.recommend`, `build.distill`, `build.exit` | `test.merge`, `test.select`, `test.verdict`, `test.route`, `test.flakes`, `test.seen-red`, `test.recommend`, `test.exit` | `deploy.current`, `deploy.mandate`, `deploy.parents`, `deploy.land`, `deploy.core`, `deploy.record`, `deploy.distill`, `deploy.recommend`, `deploy.notify`, `deploy.released`, `deploy.snapshot`, `deploy.unlease`, `deploy.close` | `review.trigger`, `review.pin`, `review.dispose`, `review.cost` | `life.notify`, `life.snapshot`, `life.unlease`, `life.close` |
-| executor | — | — | — | `build.acceptance`, `build.core` | — | — | — | `life.quiesce` |
-| hook | `entry.intake` | — | — | — | — | — | — | — |
-| owner | `entry.place-owner` | — | — | `build.ratify` | — | — | — | `life.request` |
+| Actor | entry | plan | design | build | test | deploy | breakpoint | lifecycle | adopt |
+|---|---|---|---|---|---|---|---|---|---|
+| orientation scout | `entry.orient`, `entry.place` | — | — | — | — | — | — | — | — |
+| planner | — | `plan.triage-judge`, `plan.record`, `plan.reason` | — | — | — | — | — | — | — |
+| researcher | — | `plan.research` | `design.research` | — | — | — | — | — | — |
+| reuse scout | — | — | `design.seams` | — | — | — | — | — | — |
+| architect | — | — | `design.inventory`, `design.decompose`, `design.reason` | — | — | — | — | — | — |
+| spec writer | — | — | `design.unit-spec` | — | — | — | `review.fold` | — | — |
+| builder | — | — | — | `build.unit-pass` | — | — | — | — | — |
+| tester | — | — | — | — | `test.attribute`, `test.reason` | — | — | — | — |
+| reviewer | — | — | — | — | — | — | `review.lens` | — | `adopt.decisions` |
+| skeptic | — | — | — | — | — | — | `review.refute` | — | — |
+| synthesizer | — | — | — | — | — | — | `review.report` | — | — |
+| command | `entry.place-check`, `entry.claim` | `plan.input`, `plan.dedupe`, `plan.triage-rule`, `plan.place`, `plan.lease`, `plan.recommend`, `plan.exit` | `design.input`, `design.reentry`, `design.overlaps`, `design.recommend`, `design.ready`, `design.exit` | `build.base`, `build.unit-lease`, `build.scope`, `build.recommend`, `build.distill`, `build.exit` | `test.merge`, `test.select`, `test.verdict`, `test.route`, `test.flakes`, `test.seen-red`, `test.recommend`, `test.exit` | `deploy.current`, `deploy.mandate`, `deploy.parents`, `deploy.land`, `deploy.core`, `deploy.record`, `deploy.distill`, `deploy.recommend`, `deploy.notify`, `deploy.released`, `deploy.snapshot`, `deploy.unlease`, `deploy.close` | `review.trigger`, `review.pin`, `review.dispose`, `review.cost` | `life.notify`, `life.snapshot`, `life.unlease`, `life.close` | `adopt.census`, `test.seed`, `adopt.reconstruct` |
+| executor | — | — | — | `build.acceptance`, `build.core` | — | — | — | `life.quiesce` | — |
+| hook | `entry.intake` | — | — | — | — | — | — | — | — |
+| owner | `entry.place-owner` | — | — | `build.ratify` | — | — | — | `life.request` | `adopt.practices` |
 
-- **Counts:** 76 items, each with one actor; 15 actors; 19 items with a role. Revised 2026-10-17, the
-  folds' closing review: the library fold's `build.ratify` added the 76th, and the run of 2026-10-17 in
-  `[instrument]` derives these counts.
+- **Counts:** 81 items, each with one actor; 15 actors; 20 items with a role.
+  - Revised 2026-10-17, the folds' closing review: the library fold's `build.ratify` added the 76th.
+  - Revised again 2026-10-17, the systems and retrofit audit's M3: flow-steps' `[adopt]` added five,
+    and `adopt.decisions` is the twentieth with a role. The matrix gained the `adopt` column, and
+    the instrument's revision for that group, in `[instrument]`, derives these counts.
 - **The prompt writer and the driver** act in no item. The prompt writer is a cycle role: it acts in
   every role item's cycle, framing each work order (`[roster]`, flow-roles `[cycle]`). The driver
   routes and never works.
@@ -1573,6 +1577,101 @@ exit 1
 
 $ planted: `deploy.notify`'s row with its leading pipe dropped (1 line changed)
 items 75 of 76 body rows; actor-item pairs 75; actors 15; items with a role 19; cycle roles 1; findings 1
+FINDING arm 0: a row under [deploy] that the item pattern cannot read: `deploy.notify` | command, idempotent | `deploy.
+exit 1
+```
+
+### `role_matrix.py`, revised again 2026-10-17: the `adopt` group
+
+The systems and retrofit audit (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-systems-retrofit.md`,
+M3) found retrofit's `adopt.*` items declared under no step, so the item join could not read them.
+flow-steps now declares them in `[adopt]`, beside the owner's lifecycle controls, and the
+instrument reads that group as a column. Its one changed line, beside a docstring note:
+
+```text
+- STEPS = ["entry", "plan", "design", "build", "test", "deploy", "breakpoint", "lifecycle"]
++ STEPS = ["entry", "plan", "design", "build", "test", "deploy", "breakpoint", "lifecycle", "adopt"]
+```
+
+The revision before it, run over the folded step definitions, reds on each new item:
+
+```text
+$ python role_matrix.py <flow-steps> <layer-roles>   # the revision before this one
+items 76 of 76 body rows; actor-item pairs 76; actors 15; items with a role 19; cycle roles 1; findings 5
+FINDING arm 0: adopt.census sits under [adopt], which is no step the matrix reads
+FINDING arm 0: test.seed sits under [adopt], which is no step the matrix reads
+FINDING arm 0: adopt.practices sits under [adopt], which is no step the matrix reads
+FINDING arm 0: adopt.decisions sits under [adopt], which is no step the matrix reads
+FINDING arm 0: adopt.reconstruct sits under [adopt], which is no step the matrix reads
+exit 1
+```
+
+The revised instrument and the planting script, the script unchanged, run over the folded step
+definitions. `adopt.decisions`' actor is the reviewer, as two raters:
+
+```text
+$ clean
+items 81 of 81 body rows; actor-item pairs 81; actors 15; items with a role 20; cycle roles 1; findings 0
+exit 0
+
+$ planted: `plan.reason`'s actor misspelled `plannr` (1 line changed)
+items 81 of 81 body rows; actor-item pairs 80; actors 15; items with a role 19; cycle roles 1; findings 1
+FINDING arm 1: plan.reason: actor 'plannr' is no kind and no declared role
+exit 1
+
+$ planted: `design.seams`'s actor changed to `command`, so the reuse scout acts in no item (1 line changed)
+items 81 of 81 body rows; actor-item pairs 81; actors 14; items with a role 19; cycle roles 1; findings 1
+FINDING arm 2: core role 'reuse scout' acts in no core item
+exit 1
+
+$ planted: `test.reason`'s actor changed to the expansion role `deployer` (1 line changed)
+items 81 of 81 body rows; actor-item pairs 81; actors 16; items with a role 20; cycle roles 1; findings 1
+FINDING arm 3: test.reason: core item names the expansion role 'deployer' (distribution, integrations)
+exit 1
+
+$ planted: `plan.reason`'s actor changed to the cycle role `prompt writer` (1 line changed)
+items 81 of 81 body rows; actor-item pairs 80; actors 15; items with a role 19; cycle roles 1; findings 1
+FINDING arm 1: plan.reason: 'prompt writer' is a cycle role, and acts in no item
+exit 1
+
+$ planted: the [lifecycle] heading renamed [controls] (1 line changed)
+items 75 of 75 body rows; actor-item pairs 75; actors 15; items with a role 20; cycle roles 1; findings 7
+FINDING arm 0: life.request sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.quiesce sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.notify sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.snapshot sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.unlease sits under [controls], which is no step the matrix reads
+FINDING arm 0: life.close sits under [controls], which is no step the matrix reads
+FINDING arm 0: step [lifecycle] holds no item
+exit 1
+
+$ planted: `test.reason`'s tag uppercased to `test.Reason` (1 line changed)
+items 80 of 81 body rows; actor-item pairs 80; actors 15; items with a role 19; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read: | `test.Reason` | tester | `test.recommend` | an
+exit 1
+
+$ planted: `test.attribute`'s tag given a second dot, `test.attribute.own` (1 line changed)
+items 80 of 81 body rows; actor-item pairs 80; actors 15; items with a role 19; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read: | `test.attribute.own` | tester | the OWN and MI
+exit 1
+
+$ planted: `deploy.notify`'s row with its backticks dropped (1 line changed)
+items 80 of 81 body rows; actor-item pairs 80; actors 15; items with a role 20; cycle roles 1; findings 1
+FINDING arm 0: a row under [deploy] that the item pattern cannot read: | deploy.notify | command, idempotent | `deploy.
+exit 1
+
+$ planted: a double space after `test.attribute`'s tag (1 line changed)
+items 80 of 81 body rows; actor-item pairs 80; actors 15; items with a role 19; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read: | `test.attribute`  | tester | the OWN and MIXED
+exit 1
+
+$ planted: `test.reason`'s row indented one space (1 line changed)
+items 80 of 81 body rows; actor-item pairs 80; actors 15; items with a role 19; cycle roles 1; findings 1
+FINDING arm 0: a row under [test] that the item pattern cannot read:  | `test.reason` | tester | `test.recommend` | a
+exit 1
+
+$ planted: `deploy.notify`'s row with its leading pipe dropped (1 line changed)
+items 80 of 81 body rows; actor-item pairs 80; actors 15; items with a role 20; cycle roles 1; findings 1
 FINDING arm 0: a row under [deploy] that the item pattern cannot read: `deploy.notify` | command, idempotent | `deploy.
 exit 1
 ```

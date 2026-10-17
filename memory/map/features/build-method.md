@@ -24,7 +24,9 @@ gotcha-classes = ["fold-text-is-unreviewed-surface.md", "amendment-leaves-its-ot
   "policy-value-with-no-route.md", "rate-quoted-without-its-denominator.md",
   "core-depends-on-an-optional-part.md", "foreign-code-runs-on-the-ambient-credential.md",
   "zero-witness-over-an-unnamed-population.md", "one-run-claim-recorded-as-agreed.md",
-  "rule-stated-with-no-check-that-fails.md"]
+  "rule-stated-with-no-check-that-fails.md", "ratchet-migration-ignores-how-each-source-grows.md",
+  "reseed-at-a-later-sha-launders-the-base.md", "predicate-designed-without-a-run-over-the-tree.md",
+  "path-keyed-row-strands-on-a-rename.md"]
 guides = ["BUILD-METHOD.md"]
 backlog-shards = []
 lexicon-verbs = []
