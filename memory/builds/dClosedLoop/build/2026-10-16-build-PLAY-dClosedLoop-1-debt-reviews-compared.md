@@ -47,6 +47,18 @@ script that wrote them, are in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-r
 - **The comparison** follows the layers' method: each pair's findings are placed on shared defects, and
   what one run alone found is named.
 
+## [forks] Asked, 2026-10-17
+
+Four pairs are compared so far. Their maps send four defects to the owner, since each one's repair changes a
+settled answer or a standing decision. The last two pairs may add more.
+
+| Fork | Defects | The question | Options, the recommendation first |
+|---|---|---|---|
+| LX-1 | `acquire-family` | L-3 settled "refuse new splits" as one verb per family per object. The canon has no families: load, read and parse are three clusters, and the "acquire" family was a researcher's probe set. What does the drift rule refuse? | families the owner declares above the canon's clusters, through `instructions.edit`, with `lexicon.drift` reporting until a family is declared; the canon's clusters as the families, so only a split inside one cluster is refused; report only, L-3's second option |
+| LX-2 | `map-extraction-states`, `map-dependency-undeclared` | The lexicon was to classify the map's definitions. That makes it require the map, against KN-1's independent components and the standing decision TOOL-dClosedLexicon-12. The map also reads only the working tree, while the bar, the commit check and `--merge-losses` need the base, the index and both parents of a merge. Where does extraction live? | one extraction primitive in `tools/lib` that reads the working tree, the index or a revision, which both kits call, so neither requires the other; the lexicon requires the map, declared and superseding the decision, and the map learns to read revisions and the index; two extractors, as today |
+| LX-3 | `declaration-home` | Contract declarations are to change only through `instructions.edit`, yet the design places them as `gov:` markers in product code, where any builder's commit edits them. Where do they live? | in a declarations table the instruction write path owns, with at most a pointer in the code that a check resolves; inline `gov:` markers, with a check that refuses a marker change carrying no owner instruction record; in `.lexicon.conf`, owner-edited, as today |
+| RV-1 | `design-audit-selection`, `design-audit-readers` | The design-audit preset is chosen by the subject's kind, and nothing says whether that is a third kind. A third kind passes agent-cap RULE 0's owner opt-in unexamined and misses every reader that keys on the two kinds by value. How is the preset selected? | as a preset of the spec-audit kind, selected by the subject, so RULE 0 and every reader stay as they are; as a third kind, with RULE 0, the harness's kind set, the record-kind vocabulary and the replay scorer updated |
+
 ## [map-lexicon] The lexicon's findings, placed
 
 Run A is `wf_14950dae-859` and run B is `wf_b52591b3-8f4`. The ids are each report's appendix ids. A

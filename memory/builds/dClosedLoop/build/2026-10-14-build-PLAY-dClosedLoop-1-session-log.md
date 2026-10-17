@@ -1522,6 +1522,10 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
 - 2026-10-17, session 1799cb98: dispatch 68 returned CLEAN WITH FIXES: 15 of 18 findings confirmed,
   10 items (1 high, 7 medium, 2 low), 9 agents, 102.5k out tokens (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-b.md`).
 
+- 2026-10-17, session 1799cb98: four of the six debt pairs are compared: the lexicon, the review system,
+  the runtime fold and the round-3 fold. Their maps send four defects to the owner as forks LX-1 to LX-3
+  and RV-1 (the debt comparison record's `[forks]`), asked while reviews 69 to 72 run.
+
 ## Instruments
 
 ### The gap-ownership join
