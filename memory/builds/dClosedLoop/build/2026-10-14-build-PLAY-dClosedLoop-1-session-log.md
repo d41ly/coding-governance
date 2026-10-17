@@ -146,6 +146,8 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 82 | the same | Memory structure, run B, from the same handoff, in the second wave | the same | 1799cb98 | returned, 10m30s, 50.2k out | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-memory-structure-b.md` |
 | 83 | gov-researcher, at its declared medium effort | Retrofitting gov's practices into an existing repository, run A, with run B once review dispatch 65 returns | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | returned, 12m19s, 57.6k out | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-a.md` |
 | 84 | the same | Retrofitting gov's practices into an existing repository, run B, from the same handoff, with run A | the same | 1799cb98 | returned, 9m08s, 46.7k out | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-b.md` |
+| 85 | `tier2-review.js`, diff review, full: five `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the closing-review workflow's declared high, round 1 | The closing review of the debt round's folds and the systems and retrofit fold, `9b188202a..cdcea2c9b` | the args in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[args-debt-folds]` | 1799cb98 | dispatched | `reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md` |
+| 86 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the spec-review workflow's declared medium, round 1 | The systems and retrofit records, at blobs `9335a3533` and `cec90968d`, after dispatch 85 returns | the args in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[args-systems-retrofit]` | 1799cb98 | queued | `reviews/2026-10-17-review-PLAY-dClosedLoop-1-systems-retrofit.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1674,6 +1676,12 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   gap-ownership join exits 0 on 219 keys over 15 builds, and the preset check on 175 presettable keys.
   The atlas is republished as version 20.
 
+- 2026-10-17, session 1799cb98: the owner asked, verbatim, "delete the duplicate artifact first, then do
+  both the closing review of the folds and a tier-2 review of the systems and retrofit rounds." The delete
+  of `4UyRaoozVkbK6ECCCBvDg1` needs the owner's confirmation, which this session cannot show, so nothing
+  was deleted. Dispatch 85, the folds' closing review, is dispatched, and dispatch 86, the systems and
+  retrofit audit, waits for it (`build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews.md`).
+
 ## Instruments
 
 ### The gap-ownership join
@@ -2142,6 +2150,8 @@ Runs, 2026-10-14:
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-b.md` | Dispatch 84's return, verbatim: retrofitting gov's practices, run B. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-a.md` | Dispatch 83's return, verbatim: retrofitting gov's practices, run A. |
 | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-instruments.md` | The retrofit researchers' files and shell commands, in order, from their transcripts. |
+| `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews.md` | The owner's ask for the folds' closing review and the systems and retrofit audit: the two runs, how they run, and their folds once they return. |
+| `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` | Those two runs' args, verbatim, with the script that wrote them. |
 | `prompts/2026-10-16-prompt-PLAY-dClosedLoop-1-18-researcher.md` | The library pass's research handoff: the four filling paths and two placements. |
 | `build/2026-10-16-build-PLAY-dClosedLoop-1-research-library-paths.md` | Dispatch 49's return, verbatim: the library side's four filling paths and two placements, measured. |
 | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md` | The library round's review, a light diff review over KN-1's fold, the library design and its settlement, as its synthesizer wrote it. |
