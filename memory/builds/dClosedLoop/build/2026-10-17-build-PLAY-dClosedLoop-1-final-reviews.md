@@ -37,6 +37,15 @@ are in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md`.
   `.unattended.conf` dates `SPEC_AUDIT_DEFAULT` around the audit's dispatch call, in the working tree only.
   Both are restored once the call is admitted, and neither change is committed.
 
+- **What dispatch 86 read** (recorded 2026-10-17, once it returned). Dispatch 86 went once dispatch
+  85's return was recorded, and the fold of 85 was written while it ran. The fold wrote both subjects at
+  11:44:56Z: a three-line re-run note in the systems record, and the retrofit record's offered-update
+  bullet and its dTotalRecall owners row. Each of the five finders read the subjects between 11:35:42Z
+  and 11:42:28Z, before that write. Each of the five skeptics found both subjects moved with `git
+  hash-object`, and read the pinned blobs from git. So the audit covers the pinned text, and the fold's
+  lines in the two subjects are 85's fold text, unreviewed like every fold. The timing probe and its
+  output are in the final instruments' `[read-86]`.
+
 ## [fold-debt-folds] Dispatch 85's findings, folded 2026-10-17
 
 The folds' closing review returned CLEAN WITH FIXES, 22 of 27 findings confirmed in 20 items

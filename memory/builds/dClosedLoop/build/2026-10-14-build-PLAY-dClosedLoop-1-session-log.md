@@ -147,7 +147,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 83 | gov-researcher, at its declared medium effort | Retrofitting gov's practices into an existing repository, run A, with run B once review dispatch 65 returns | `prompts/2026-10-17-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | returned, 12m19s, 57.6k out | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-a.md` |
 | 84 | the same | Retrofitting gov's practices into an existing repository, run B, from the same handoff, with run A | the same | 1799cb98 | returned, 9m08s, 46.7k out | `build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-b.md` |
 | 85 | `tier2-review.js`, diff review, full: five `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the closing-review workflow's declared high, round 1 | The closing review of the debt round's folds and the systems and retrofit fold, `9b188202a..cdcea2c9b` | the args in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[args-debt-folds]` | 1799cb98 | returned as `wf_da2dee67-bf2`, CLEAN WITH FIXES, 22 of 27 confirmed | `reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md` |
-| 86 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the spec-review workflow's declared medium, round 1 | The systems and retrofit records, at blobs `9335a3533` and `cec90968d`, after dispatch 85 returns | the args in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[args-systems-retrofit]` | 1799cb98 | dispatched | `reviews/2026-10-17-review-PLAY-dClosedLoop-1-systems-retrofit.md` |
+| 86 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the spec-review workflow's declared medium, round 1 | The systems and retrofit records, at blobs `9335a3533` and `cec90968d`, after dispatch 85 returns | the args in `build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md` `[args-systems-retrofit]` | 1799cb98 | returned as `wf_ca8d9fb9-519`, CLEAN WITH FIXES, 62 of 67 confirmed | `reviews/2026-10-17-review-PLAY-dClosedLoop-1-systems-retrofit.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1097,6 +1097,35 @@ Dispatch 85, `debt-folds`, derived from its Workflow run the same way:
 - returned — gov-synthesizer · wrote 1 file · 3m34s · 28.6k out · run wf_da2dee67-bf2/aa24225c7221b260e
 ```
 
+Dispatch 86, `systems-retrofit`, derived from its Workflow run the same way:
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ca8d9fb9-519/a6c6e282b8dfb2a25
+- returned — workflow-subagent · wrote 0 files · 12s · 1.2k out · run wf_ca8d9fb9-519/a6c6e282b8dfb2a25
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:coherence · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ca8d9fb9-519/a982d09bd002bc508
+- returned — gov-spec-reviewer · wrote 0 files · 5m05s · 31.1k out · run wf_ca8d9fb9-519/a982d09bd002bc508
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:grounding · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ca8d9fb9-519/a343bba55da7ea366
+- returned — gov-spec-reviewer · wrote 0 files · 6m13s · 35.1k out · run wf_ca8d9fb9-519/a343bba55da7ea366
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:reuse · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ca8d9fb9-519/ac2cbc996542ec907
+- returned — gov-spec-reviewer · wrote 0 files · 6m48s · 37.5k out · run wf_ca8d9fb9-519/ac2cbc996542ec907
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:blast-radius · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ca8d9fb9-519/af79baab0288105ce
+- returned — gov-spec-reviewer · wrote 0 files · 10m03s · 56.5k out · run wf_ca8d9fb9-519/af79baab0288105ce
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:failure-envelope · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ca8d9fb9-519/a31262c2452244907
+- returned — gov-spec-reviewer · wrote 0 files · 6m48s · 26.7k out · run wf_ca8d9fb9-519/a31262c2452244907
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-1-14 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ca8d9fb9-519/a5baa7df9159fa352
+- returned — gov-skeptic · wrote 0 files · 2m25s · 14.0k out · run wf_ca8d9fb9-519/a5baa7df9159fa352
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-15-28 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ca8d9fb9-519/ad62633e1ec295193
+- returned — gov-skeptic · wrote 0 files · 3m01s · 16.9k out · run wf_ca8d9fb9-519/ad62633e1ec295193
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-29-42 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ca8d9fb9-519/a822cc3082211b0c4
+- returned — gov-skeptic · wrote 0 files · 3m24s · 18.7k out · run wf_ca8d9fb9-519/a822cc3082211b0c4
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-43-56 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ca8d9fb9-519/a0a0ba4a49c954fb1
+- returned — gov-skeptic · wrote 0 files · 2m21s · 13.9k out · run wf_ca8d9fb9-519/a0a0ba4a49c954fb1
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-57-67 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ca8d9fb9-519/a0bd63856ba40a685
+- returned — gov-skeptic · wrote 0 files · 1m46s · 10.2k out · run wf_ca8d9fb9-519/a0bd63856ba40a685
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_ca8d9fb9-519/ada9ecd509438ceb9
+- returned — gov-synthesizer · wrote 1 file · 6m39s · 55.3k out · run wf_ca8d9fb9-519/ada9ecd509438ceb9
+```
+
 The systems round's researchers, dispatches 73 to 82, derived from their handoffs the same way:
 
 ```text
@@ -1713,6 +1742,17 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
 
 - 2026-10-17, session 1799cb98: dispatch 85 returned CLEAN WITH FIXES: 22 of 27 findings confirmed,
   20 items (1 high, 14 medium, 5 low), 11 agents, 283.8k out tokens (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`).
+
+- 2026-10-17, session 1799cb98: dispatch 85's findings are folded, 19 of 20 items amended
+  (`build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews.md` `[fold-debt-folds]`), with four probes
+  filed in the final instruments' `[probes-final]`. H1 goes to the owner as RT-4. M10's probe found
+  update's git writes in the target firing the adopter's own hooks, a seventh kind of target-side code.
+  Dispatch 86 ran while the fold was written. Its finders read both subjects before the fold reached
+  them, and its skeptics read the pinned blobs, so the fold's lines in them are outside its audit. The
+  atlas is republished as version 21.
+
+- 2026-10-17, session 1799cb98: dispatch 86 returned CLEAN WITH FIXES: 62 of 67 findings confirmed,
+  52 items (5 high, 36 medium, 11 low), 11 agents, 335.7k out tokens (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-systems-retrofit.md`).
 
 ## Instruments
 

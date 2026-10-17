@@ -934,3 +934,107 @@ the union of the trigger and hygiene's reading: 323 specs in 66 builds
 
 After the fold, the gap-ownership join and the preset check, run as extracted from the session log, exit 0:
 219 gap keys over 15 builds, none unowned, and 185 catalogue keys, 175 presettable, 175 preset rows.
+
+## [read-86] What dispatch 86 read, timed
+
+Dispatch 86's Workflow run keeps each agent's transcript. This probe lists every tool call that names an
+audited subject's file name, with its timestamp, and flags each call at or after the fold's write. The
+fold wrote both subjects at 14:44:56 local time, 11:44:56Z, as the files' modification times read. A
+read of a pinned blob through git names no file, so it never counts.
+
+```python
+"""For each agent of one Workflow run, list every tool call that reads an audited subject, with its
+timestamp, and flag the calls made at or after the moment a fold rewrote the subjects.
+
+Usage: python read_times.py <run-dir> <moved-at ISO, UTC> <subject-substring>...
+A call reads a subject when its input names the subject's file name: a Read's file_path, or a Bash or
+Grep call whose command, path or pattern names it. Reads of a pinned blob through git name no file, so
+they never count.
+"""
+import json
+import pathlib
+import sys
+
+run = pathlib.Path(sys.argv[1])
+moved = sys.argv[2]
+subjects = sys.argv[3:]
+labels = {}
+for meta in run.glob("agent-*.meta.json"):
+    try:
+        labels[meta.name.split(".")[0]] = json.loads(meta.read_text(encoding="utf-8")).get("description", "")
+    except Exception:
+        pass
+late_total = 0
+for path in sorted(run.glob("agent-*.jsonl")):
+    agent = path.stem
+    calls = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        try:
+            e = json.loads(line)
+        except Exception:
+            continue
+        msg = e.get("message") or {}
+        if e.get("type") != "assistant" or not isinstance(msg.get("content"), list):
+            continue
+        for c in msg["content"]:
+            if c.get("type") != "tool_use":
+                continue
+            blob = json.dumps(c.get("input", {}), ensure_ascii=False)
+            hit = [s for s in subjects if s in blob]
+            if hit:
+                calls.append((e.get("timestamp", ""), c.get("name"), ",".join(hit)))
+    if not calls:
+        continue
+    late = [c for c in calls if c[0] >= moved]
+    late_total += len(late)
+    print(f"{agent} {labels.get(agent, '')!r}: {len(calls)} reads, first {calls[0][0]}, last {calls[-1][0]}, "
+          f"at or after the move {len(late)}")
+    for t, name, hit in late:
+        print(f"    late {t} {name} {hit}")
+print(f"late reads in all: {late_total}")
+```
+
+```text
+$ python read_times.py <run-dir> 2026-10-17T11:44:56 PLAY-dClosedLoop-1-systems.md PLAY-dClosedLoop-1-retrofit.md
+agent-a0a0ba4a49c954fb1 'dClosedLoop · spec-audit round 1 · verify:ids-43-56': 3 reads, first 2026-10-17T11:45:48.573Z, last 2026-10-17T11:46:14.914Z, at or after the move 3
+    late 2026-10-17T11:45:48.573Z Bash PLAY-dClosedLoop-1-systems.md,PLAY-dClosedLoop-1-retrofit.md
+    late 2026-10-17T11:45:53.141Z Bash PLAY-dClosedLoop-1-systems.md
+    late 2026-10-17T11:46:14.914Z Bash PLAY-dClosedLoop-1-retrofit.md
+agent-a0bd63856ba40a685 'dClosedLoop · spec-audit round 1 · verify:ids-57-67': 2 reads, first 2026-10-17T11:45:49.211Z, last 2026-10-17T11:46:00.712Z, at or after the move 2
+    late 2026-10-17T11:45:49.211Z Bash PLAY-dClosedLoop-1-systems.md,PLAY-dClosedLoop-1-retrofit.md
+    late 2026-10-17T11:46:00.712Z Bash PLAY-dClosedLoop-1-systems.md
+agent-a31262c2452244907 'dClosedLoop · spec-audit round 1 · find:failure-envelope': 8 reads, first 2026-10-17T11:35:43.887Z, last 2026-10-17T11:42:28.303Z, at or after the move 0
+agent-a343bba55da7ea366 'dClosedLoop · spec-audit round 1 · find:grounding': 4 reads, first 2026-10-17T11:35:43.232Z, last 2026-10-17T11:41:53.451Z, at or after the move 0
+agent-a5baa7df9159fa352 'dClosedLoop · spec-audit round 1 · verify:ids-1-14': 1 reads, first 2026-10-17T11:45:47.641Z, last 2026-10-17T11:45:47.641Z, at or after the move 1
+    late 2026-10-17T11:45:47.641Z Bash PLAY-dClosedLoop-1-systems.md,PLAY-dClosedLoop-1-retrofit.md
+agent-a6c6e282b8dfb2a25 'dClosedLoop · spec-audit round 1 · resume:probe': 3 reads, first 2026-10-17T11:35:30.152Z, last 2026-10-17T11:35:39.267Z, at or after the move 0
+agent-a822cc3082211b0c4 'dClosedLoop · spec-audit round 1 · verify:ids-29-42': 1 reads, first 2026-10-17T11:45:49.425Z, last 2026-10-17T11:45:49.425Z, at or after the move 1
+    late 2026-10-17T11:45:49.425Z Bash PLAY-dClosedLoop-1-systems.md,PLAY-dClosedLoop-1-retrofit.md
+agent-a982d09bd002bc508 'dClosedLoop · spec-audit round 1 · find:coherence': 5 reads, first 2026-10-17T11:35:42.204Z, last 2026-10-17T11:40:45.262Z, at or after the move 0
+agent-ac2cbc996542ec907 'dClosedLoop · spec-audit round 1 · find:reuse': 6 reads, first 2026-10-17T11:35:43.311Z, last 2026-10-17T11:42:28.297Z, at or after the move 0
+agent-ad62633e1ec295193 'dClosedLoop · spec-audit round 1 · verify:ids-15-28': 1 reads, first 2026-10-17T11:45:49.769Z, last 2026-10-17T11:45:49.769Z, at or after the move 1
+    late 2026-10-17T11:45:49.769Z Bash PLAY-dClosedLoop-1-systems.md,PLAY-dClosedLoop-1-retrofit.md
+agent-af79baab0288105ce 'dClosedLoop · spec-audit round 1 · find:blast-radius': 5 reads, first 2026-10-17T11:35:43.085Z, last 2026-10-17T11:45:43.719Z, at or after the move 1
+    late 2026-10-17T11:45:43.719Z StructuredOutput PLAY-dClosedLoop-1-systems.md,PLAY-dClosedLoop-1-retrofit.md
+late reads in all: 9
+```
+
+The finders are `find:*`, and no finder's read falls after the write. The blast-radius finder's one late
+call is its structured return, which names the files. The five skeptics' late calls are Bash calls: each
+runs `git hash-object` on both subjects, then extracts the pinned blobs into its own scratch folder.
+Counted over every transcript, with `git cat-file -p` or `git show` of `9335a35` or `cec9096` taken as an
+extraction:
+
+```text
+agent-a0a0ba4a49c954fb1: hash-object calls 1, pinned-blob extractions 1
+agent-a0bd63856ba40a685: hash-object calls 1, pinned-blob extractions 3
+agent-a31262c2452244907: hash-object calls 1, pinned-blob extractions 0
+agent-a343bba55da7ea366: hash-object calls 1, pinned-blob extractions 0
+agent-a5baa7df9159fa352: hash-object calls 1, pinned-blob extractions 1
+agent-a6c6e282b8dfb2a25: hash-object calls 2, pinned-blob extractions 0
+agent-a822cc3082211b0c4: hash-object calls 1, pinned-blob extractions 1
+agent-a982d09bd002bc508: hash-object calls 1, pinned-blob extractions 0
+agent-ac2cbc996542ec907: hash-object calls 1, pinned-blob extractions 0
+agent-ad62633e1ec295193: hash-object calls 1, pinned-blob extractions 1
+agent-af79baab0288105ce: hash-object calls 1, pinned-blob extractions 0
+```
