@@ -103,6 +103,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [parser-drops-rows-it-cannot-place](parser-drops-rows-it-cannot-place.md) | class | 7 |  | a record-parsing instrument skips rows under a heading it does not know, or rows its pattern cannot read, and still prints a clean run, so its population shrinks without a word |
 | [pin-copied-from-another-corpus](pin-copied-from-another-corpus.md) | class | 2 |  | a threshold measured on one tree is vacuous or permanently red on another |
 | [pin-gated-checks-arm-nothing-without-a-pin](pin-gated-checks-arm-nothing-without-a-pin.md) | class | 5 |  | hygiene checks 13-15 alone are behind a declared pin, so a fixture conf without one arms nothing there and the checks report clean by never loading |
+| [pipe-in-a-code-span-splits-a-table-cell](pipe-in-a-code-span-splits-a-table-cell.md) | class | 3 |  | a markdown table cell holding a pipe, even inside backticks, splits into extra cells, so a reader that splits the row on its pipes reads the wrong cell as a column |
 | [policy-value-with-no-route](policy-value-with-no-route.md) | class | 6 |  | a policy key catalogues a value that no item reading the key routes or witnesses, so a preset that selects the value cannot run |
 | [porcelain-diff-names-a-rename-by-its-destination](porcelain-diff-names-a-rename-by-its-destination.md) | class | 4 |  | a touched-set read built on porcelain `git diff --name-only` names a renamed file by its destination alone, so a prefix match misses a file moved OUT of the prefix |
 | [predicate-bounded-by-its-own-count](predicate-bounded-by-its-own-count.md) | class | 2 |  | a predicate about other processes' holdings that walks only up to this process's own configured count misses a neighbour configured higher |
@@ -148,6 +149,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 3 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-133 record(s): 130 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+134 record(s): 131 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

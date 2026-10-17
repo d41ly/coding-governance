@@ -1765,7 +1765,7 @@ for k in sorted(expected - set(presets)):
 for k in sorted(set(presets) - expected):
     findings.append(f"preset table names a key that is excluded or not in the catalogue: {k}")
 
-FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count|a share of the window|a round count|a word range|a route-back count")
+FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count|a share of the window|a round count|a word range|a route-back count|KB per role")
 for k, vals in presets.items():
     if k not in catalogue:
         continue
@@ -1979,6 +1979,22 @@ After the memory layer's fold, both instruments were run as extracted from this 
 - **The join** exits 0 on 166 keys and 15 builds. On a copy of v2 with `gap-mem-12` struck from
   dTotalRecall's row, it exits 1, naming it unowned.
 - **The preset check** still exits 0 on 128 catalogue keys, 120 presettable and 120 preset rows.
+
+After the debt round's folds and the systems and retrofit rounds' fold (2026-10-17), both instruments
+were run as extracted from this record:
+- **The changes:** twenty-six gaps registered and owned (`gap-found-20` to `gap-found-23`,
+  `gap-design-10`, `gap-mem-17` to `gap-mem-25`, `gap-roles-19`, `gap-roles-20`, `gap-rt-20`, `gap-rt-21`,
+  `gap-review-11` to `gap-review-13`, `gap-test-14` to `gap-test-17` and `gap-build-05`), and thirty-one
+  keys joined the catalogue and every preset. The preset check's free-value pattern gains `KB per role`,
+  for `memory.item-budget`, in the source above.
+- **The join** exits 0 on 219 keys and 15 builds. It first read 14 builds, since a resolver's name
+  written with pipes inside backticks split dOrderedCharter's row into extra cells; the clause now names
+  the verbs without pipes. On a copy of v2 with `gap-found-20` struck from dOrderedCharter's row, it
+  exits 1, naming it unowned.
+- **The preset check** exits 0 on 185 catalogue keys, 175 presettable and 175 preset rows. It first
+  refused four of the new rows, three with a note fused into a default and one with a domain its pattern
+  did not read, and they were corrected. On a copy with standard `memory.over-budget` set to `refuse` and strict
+  `retrofit.drain` set to `sometimes`, it exits 1, naming both.
 
 ### The foreign-build census
 

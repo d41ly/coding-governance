@@ -195,6 +195,10 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   order by tag.
 - **The order.** The grammar, the index engine and the unit schema come first, with dOrderedCharter at
   the chain's root. Memory's extractors, the role shapes and the annotation checks build on them.
+- **Retrofit** (2026-10-17, `build/2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md`) is a sixth system
+  across the layers. Its ledger holds the shrink-only populations these five name: the positional
+  references, IW-1's legacy list, the resolve check's legacy and the legacy anchors. Its `[cross]` says
+  how each system meets it.
 
 ## [design] The design, system by system
 
@@ -656,9 +660,20 @@ findings: 1
 
 The three rows it reads and does not match hold a dash in "Both runs": they record where the runs differ.
 
+Revised 2026-10-17, the debt round: the probe's revision reads its "re-measured here" exemption from the
+crediting cell (`build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md`,
+`[probes-expansions]`). Re-run here with that change and this record's five systems:
+
+```text
+rows read: 51; rows the predicate matched and checked: 48; exempt, their crediting cell re-measured: 0
+findings: 0
+```
+
 ## [open] What the round owes
 
 - The owner's answers to `[forks]`.
 - Then the fold: v2's catalogue and presets gain the new keys, the register gains `[gaps-proposed]`, and
-  the chain rows gain the units `[design]` names.
+  the chain rows gain the units `[design]` names. Revised 2026-10-17: folded, the gaps registered as
+  `gap-found-20` to `gap-found-23`, `gap-design-10`, `gap-mem-17` to `gap-mem-22`, `gap-roles-19`,
+  `gap-roles-20`, `gap-rt-20`, `gap-rt-21` and `gap-review-11` to `gap-review-13`.
 - A Tier-2 review of the round, at the owner's word.

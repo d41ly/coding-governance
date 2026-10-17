@@ -301,6 +301,7 @@
       "parser-drops-rows-it-cannot-place.md",
       "pin-copied-from-another-corpus.md",
       "pin-gated-checks-arm-nothing-without-a-pin.md",
+      "pipe-in-a-code-span-splits-a-table-cell.md",
       "policy-value-with-no-route.md",
       "porcelain-diff-names-a-rename-by-its-destination.md",
       "predicate-bounded-by-its-own-count.md",

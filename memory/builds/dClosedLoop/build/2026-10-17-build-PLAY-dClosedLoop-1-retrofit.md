@@ -352,7 +352,7 @@ Each answer is quoted verbatim.
 | no single baseline primitive: 27 registries in at least 6 grammars, with the count ratchet written twice (`research-retrofit-a.md:26`) | HIGH | dWitnessedBar |
 | "shrink-only" is enforced only for the map's baseline: unarmed-branches grew from 9 rows to 159, and drift tracks 5 of the 27 lists by hand (`research-retrofit-a.md:27`) | MED | dWitnessedBar |
 | baselines are not tied to touch: five kits stay baselined after 14 to 278 touches each, and the per-file count ratchet let 29 of 129 encoding sites persist on edited lines (`research-retrofit-b.md:118`, `research-retrofit-a.md:102`) | MED | dScopedBuild |
-| a count pin over code acts as a waiver: `VERB_OFFENDER_PIN` rose from 412 to 1,087 (`research-retrofit-b.md:31`); the lexicon's own instance is gap-lex-08's | MED | dWitnessedBar |
+| a count pin over code acts as a waiver: `VERB_OFFENDER_PIN` rose from 412 to 1,087 (`research-retrofit-b.md:31`); the lexicon's own instance is `gap-mem-10`'s (corrected 2026-10-17: it was written as gap-lex-08's) | MED | dWitnessedBar |
 | the map's touch-drop is wired to nothing: `--drop-affordance-exempt` has no caller in `tools/`, `.claude/`, `.github/` or `.githooks/`, and `WIRE-INTO-PROJECT.md:554` calls the drop mechanical | MED | dTotalRecall |
 | no census of a repository's own practices, and no progress cell | MED | dTotalRecall |
 | no origin on records, so a reconstructed record reads as written | LOW | dTotalRecall |
@@ -362,5 +362,7 @@ Each answer is quoted verbatim.
 
 - The owner's answers to `[forks]`.
 - Then the fold. v2's catalogue gains the `retrofit.*` keys, the register gains `[gaps-proposed]`, the
-  chain rows gain the parts in `[owners]`, and the systems record's `[cross]` gains retrofit.
+  chain rows gain the parts in `[owners]`, and the systems record's `[cross]` gains retrofit. Revised
+  2026-10-17: folded, the gaps registered as `gap-test-14` to `gap-test-17`, `gap-build-05` and
+  `gap-mem-23` to `gap-mem-25`.
 - A Tier-2 review of the round, at the owner's word.
