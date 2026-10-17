@@ -1635,3 +1635,163 @@ expansions-fold-round3: 10 transcripts, 629 entries; prompt 0, tool_use 0, tool_
   verify:ids-16-20: result of {"command": "cd C:/projects/coding-governance/.claude/worktrees/gov-architecture-plan-e34297; F=memory/builds/dClosedLoop/build/2026-10-15-b
       after the name: '. Its head carries an H1, then, within its first twelve lines, the line `**Serves:** diff-review PLAY-dClosedLoop-1`. It carries exactly one `## Verdict:` line,'
 ```
+
+## [probes-library] The library pair's two probes
+
+The library pair's fold corrects two figures, and each probe runs from the worktree root against a
+revision.
+
+`research_count.py` reproduces the library round's 59 research returns, then drops the instruments records
+it took in:
+
+```python
+"""Count the research returns at a revision: the library round's predicate, and that predicate without
+the instruments records it wrongly took in.
+
+Usage: python research_count.py <rev>   (from the worktree root)
+The library round's predicate: a tracked memory/builds/**/*.md whose first `**Serves:**` line binds
+`research`, and whose file name holds "research" in any case. An instruments record (`-instruments.md`)
+archives probe scripts and is not a return. "Cited from another build" means a tracked file of another
+build names the return's file name. Each population prints with its predicate and its build count.
+"""
+import collections
+import re
+import subprocess
+import sys
+
+rev = sys.argv[1]
+
+
+def git(*args):
+    return subprocess.run(["git", *args], capture_output=True, text=True, encoding="utf-8", check=True).stdout
+
+
+paths = [p for p in git("ls-tree", "-r", "--name-only", rev, "memory/builds/").splitlines() if p.endswith(".md")]
+texts = {p: git("show", f"{rev}:{p}") for p in paths}
+
+
+def serves(p):
+    m = re.search(r"^\*\*Serves:\*\* (\S+)", texts[p], re.M)
+    return m.group(1) if m else None
+
+
+def build_of(p):
+    return p.split("/")[2]
+
+
+def cited_elsewhere(ret):
+    name = ret.rsplit("/", 1)[-1]
+    return any(name in t for q, t in texts.items() if build_of(q) != build_of(ret))
+
+
+bound = [p for p in paths if serves(p) == "research"]
+named = [p for p in bound if "research" in p.rsplit("/", 1)[-1].lower()]
+instruments = [p for p in named if p.endswith("-instruments.md")]
+returns = [p for p in named if not p.endswith("-instruments.md")]
+for label, pop in (("bound as research", bound),
+                   ("bound as research, named research (the library round's predicate)", named),
+                   ("of which instruments records", instruments),
+                   ("research returns: the predicate, instruments excluded", returns)):
+    builds = collections.Counter(build_of(p) for p in pop)
+    print(f"{label}: {len(pop)} files in {len(builds)} builds, {sum(map(cited_elsewhere, pop))} cited from another build")
+for p in instruments:
+    print(f"  instruments: {p}")
+```
+
+```text
+$ python research_count.py 3c34b82dc
+bound as research: 243 files in 63 builds, 21 cited from another build
+bound as research, named research (the library round's predicate): 59 files in 10 builds, 8 cited from another build
+of which instruments records: 5 files in 1 builds, 0 cited from another build
+research returns: the predicate, instruments excluded: 54 files in 10 builds, 8 cited from another build
+  instruments: memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-instruments.md
+  instruments: memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-instruments.md
+  instruments: memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-research-review-adjudication-instruments.md
+  instruments: memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-research-review-lenses-instruments.md
+  instruments: memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-instruments.md
+$ python research_count.py 1b759b620
+bound as research: 270 files in 63 builds, 22 cited from another build
+bound as research, named research (the library round's predicate): 78 files in 10 builds, 9 cited from another build
+of which instruments records: 6 files in 1 builds, 0 cited from another build
+research returns: the predicate, instruments excluded: 72 files in 10 builds, 9 cited from another build
+  instruments: memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-instruments.md
+  instruments: memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-instruments.md
+  instruments: memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-research-review-adjudication-instruments.md
+  instruments: memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-research-review-lenses-instruments.md
+  instruments: memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-instruments.md
+  instruments: memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-research-retrofit-instruments.md
+```
+
+`reuse_token_count.py` sizes `gap-design-05`'s migration under each predicate that reads the reuse audit
+today:
+
+```python
+"""Size gap-design-05's one-token migration: the specs whose reuse audit records a new seam, under each
+predicate that reads it today.
+
+Usage: python reuse_token_count.py <rev>   (from the worktree root)
+Population: tracked memory/builds/*/spec/*.md at <rev>. Every match is case-insensitive.
+- the trigger: the exact phrase "no existing seam fits", which `reuse.propose: new-seam` reads;
+- one of two: that phrase or "no seam fits";
+- hygiene: the substrings "no existing seam" or "no seam fits", or "reuse-first", read as
+  check-memory-hygiene.sh reads them, inside the spec's `## 10. Reuse audit` section before its
+  "recall terms" or `--terms`; and, beside it, the same substrings over the whole file;
+- the union of the trigger and hygiene's section reading.
+"""
+import collections
+import re
+import subprocess
+import sys
+
+rev = sys.argv[1]
+
+
+def git(*args):
+    return subprocess.run(["git", *args], capture_output=True, text=True, encoding="utf-8", check=True).stdout
+
+
+specs = [p for p in git("ls-tree", "-r", "--name-only", rev, "memory/builds/").splitlines()
+         if re.match(r"^memory/builds/[^/]+/spec/[^/]+\.md$", p)]
+
+
+def section10(text):
+    out, inside = [], False
+    for line in text.split("\n"):
+        if line.startswith("## "):
+            inside = bool(re.match(r"^## 10\. Reuse audit", line))
+            continue
+        if inside:
+            out.append(line.lower())
+    s = " " + " ".join(out)
+    cuts = [i for i in (s.find("recall terms"), s.find("--terms")) if i >= 0]
+    return s[:min(cuts)] if cuts else s
+
+
+pops = collections.defaultdict(set)
+for p in specs:
+    t = git("show", f"{rev}:{p}")
+    low, s10 = t.lower(), section10(t)
+    if "no existing seam fits" in low:
+        pops["the trigger: \"no existing seam fits\""].add(p)
+    if "no existing seam fits" in low or "no seam fits" in low:
+        pops["one of two: that phrase or \"no seam fits\""].add(p)
+    if "no existing seam" in low or "no seam fits" in low:
+        pops["whole file: \"no existing seam\" or \"no seam fits\""].add(p)
+    if any(k in s10 for k in ("no existing seam", "no seam fits", "reuse-first")):
+        pops["hygiene, as it reads: those or \"reuse-first\" in section 10"].add(p)
+pops["the union of the trigger and hygiene's reading"] = (pops["the trigger: \"no existing seam fits\""]
+                                                          | pops["hygiene, as it reads: those or \"reuse-first\" in section 10"])
+print(f"specs read: {len(specs)} in {len({p.split('/')[2] for p in specs})} builds")
+for label, pop in pops.items():
+    print(f"{label}: {len(pop)} specs in {len({p.split('/')[2] for p in pop})} builds")
+```
+
+```text
+$ python reuse_token_count.py 1b759b620
+specs read: 1301 in 163 builds
+one of two: that phrase or "no seam fits": 251 specs in 67 builds
+whole file: "no existing seam" or "no seam fits": 323 specs in 77 builds
+hygiene, as it reads: those or "reuse-first" in section 10: 333 specs in 75 builds
+the trigger: "no existing seam fits": 236 specs in 60 builds
+the union of the trigger and hygiene's reading: 339 specs in 76 builds
+```

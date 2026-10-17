@@ -480,8 +480,10 @@ optional component, and the research library is the library side.
     at the default branch's tip. The owner's reject-and-remove disposition files it (`[reuse]`), and
     triage selects it as a patch build;
   - an unrun test level: its first green run, once observability's Maintain runs it;
-  - a confirmed finding filed below `review.findings`' threshold: its unit is built, or a review round
-    rules it out.
+  - a confirmed finding filed below `review.findings`' threshold: its unit is built and, where the
+    finding carries a `new:` slug, the class record exists with `from:` this review and finding,
+    written by the unit that takes up the ask; or a review round rules it out, and the slug is
+    re-disposed as `class:`, `gate:` or an owner-ruled `none`.
 
   These are the core filers' whole set (LR-7). An item that files an ask names its form, and a new core
   ask kind adds its form here first. Every other filer, whether the owner, a surfaced idea, an expansion or the supervisor on a role's
@@ -542,10 +544,14 @@ records. Neither may instruct by being recalled.
    - its build;
    - the decision;
    - a pointer to its rationale;
-   - the reuse entry it created, if any.
+   - the reuse entry it created, if any;
+   - its fork's id, which `record` mints in the fork record, a flow record kind holding the fork's
+     id, resolver, decision and class. It keys `build.distill`'s skip and both joins.
 
-   Since LB-3 (2026-10-16) a decision's author declares it major by the rubric, and `deploy.distill`
-   appends the build's major decisions to the log when it lands (layer-library `[log]`).
+   Since LB-3 (2026-10-16) a decision's author declares it major by the rubric. Revised 2026-10-17,
+   the debt round's fold: `build.distill` appends each major fork's row in the build's branch before
+   Test, keyed by (build, fork id), and `deploy.distill` confirms the rows at the landed SHA
+   (layer-library `[log]`).
 
    Supersession extends the typed relations that exist. Check 27 (`row_grammar.py
    --check-relations`) obliges `supersedes`, `coexists-with` or `disputes` on every added row and
@@ -1130,3 +1136,7 @@ and its map's `disposition` cells point here. Each defect's fix sits in place, i
   keyed by its leg and released by `test.select`; and a rejected reuse entry's removal has its own ask
   form, filed by the disposition. The debt comparison record's `[fold-fold-round3]` names each defect
   and where it went.
+- **The library pair** (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-library-followup-a.md` and
+  `-b.md`): the decision row carries its fork's id, the log's writer is `build.distill` before Test with
+  `deploy.distill` confirming, and the below-threshold ask form names the class record's writer. The
+  debt comparison record's `[fold-library-followup]` names each defect and where it went.

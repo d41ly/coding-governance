@@ -386,7 +386,7 @@ at the spawn, not because another agent said it. The design keeps three boundari
 The relation is derived from the item declarations, never typed. Today the step definitions are the
 declarations. Each Actor cell opens with one actor's kind: `command`, `executor`, `hook`, `owner`, or a
 role's name, which ends at the first comma, colon or parenthesis. `role_matrix.py` (`[instrument]`,
-revised 2026-10-16) reads only that opening, so prose in the cell never adds an actor, and derives the
+revised 2026-10-17) reads only that opening, so prose in the cell never adds an actor, and derives the
 matrix from the step definitions as folded:
 
 | Actor | entry | plan | design | build | test | deploy | breakpoint | lifecycle |
@@ -405,7 +405,7 @@ matrix from the step definitions as folded:
 | command | `entry.place-check`, `entry.claim` | `plan.input`, `plan.dedupe`, `plan.triage-rule`, `plan.place`, `plan.lease`, `plan.recommend`, `plan.exit` | `design.input`, `design.reentry`, `design.overlaps`, `design.recommend`, `design.ready`, `design.exit` | `build.base`, `build.unit-lease`, `build.scope`, `build.recommend`, `build.distill`, `build.exit` | `test.merge`, `test.select`, `test.verdict`, `test.route`, `test.flakes`, `test.seen-red`, `test.recommend`, `test.exit` | `deploy.current`, `deploy.mandate`, `deploy.parents`, `deploy.land`, `deploy.core`, `deploy.record`, `deploy.distill`, `deploy.recommend`, `deploy.notify`, `deploy.released`, `deploy.snapshot`, `deploy.unlease`, `deploy.close` | `review.trigger`, `review.pin`, `review.dispose`, `review.cost` | `life.notify`, `life.snapshot`, `life.unlease`, `life.close` |
 | executor | — | — | — | `build.acceptance`, `build.core` | — | — | — | `life.quiesce` |
 | hook | `entry.intake` | — | — | — | — | — | — | — |
-| owner | `entry.place-owner` | — | — | — | — | — | — | `life.request` |
+| owner | `entry.place-owner` | — | — | `build.ratify` | — | — | — | `life.request` |
 
 - **Counts:** 75 items, each with one actor; 15 actors; 19 items with a role.
 - **The prompt writer and the driver** act in no item. The prompt writer is a cycle role: it acts in

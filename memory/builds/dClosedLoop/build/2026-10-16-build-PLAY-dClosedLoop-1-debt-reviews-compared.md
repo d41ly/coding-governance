@@ -308,27 +308,27 @@ refuted finding sits on the defect its claim names, beside its confirmed twin wh
 
 | defect | what | A | B | disposition |
 |---|---|---|---|---|
-| `distill-class-no-producer` | `build.distill` reds on a fork with no class, yet no Design item's witness requires the class, and the red has no route | 1, 20 | 2, 12 | amend |
-| `ratification-two-places` | under `author-owner-ratifies`, Build's breakpoints put the owner's ratification before `build.distill`, its Needs and Then put it after, and a rejected re-class has no writer | 10, 19 | 1, 11, 23 | amend |
-| `owner-only-no-arm` | `owner-only`'s rule that only an owner-resolved fork may be major sits in Does, with no witness arm and no route | 2, 19 | 20 | amend |
-| `distill-key-no-fork-field` | `build.distill`'s idempotence and its one-to-one witness are keyed by build and fork, and the row it writes has no fork field | 9, 17 | 8 | amend |
-| `deploy-distill-no-route` | `deploy.distill` can now go red on a row missing at the landed SHA, and its only route is `deploy.recommend` | 7, 12, 20 | 6, 21 | amend |
-| `distill-after-core` | `build.distill` runs after `build.core`, so the core checks, check 27 among them, never grade the rows it appends, and Build's exit is certified before its last commit | 3, 13 | — | amend |
-| `layer-memory-stale-writer` | layer-memory `[decisions]` still has `deploy.distill` append the major decisions when the build lands | 4 | 5, 13 | amend |
-| `typed-reuse-witness` | round 1's typed-witness finding stands: `build.unit-pass` is still proven by the builder's own reuse line, whose `none` arm cannot fail | 22 | 3, 22 | amend |
-| `built-path-class-unchecked` | on built work nothing checks that an owed class record was written; a write set only allows the path | 18 | 19 | amend |
-| `ask-form-not-catalogued` | the new acceptance, "accepted once the class record exists", is not among layer-memory `[asks]`' closed forms | 16 | 14 | amend |
-| `plan-scope-tags` | Plan reads the research view and the decision log by scope tags that neither carries | 14 | 7, 15 | amend |
-| `build-policy-list-missing` | `build.distill` routes by `run.on-owner-question`, which Build's policy list leaves out | 11 | 10 | amend |
-| `research-kind-selector` | the research-return kind declares no selector, and its witness's planted red cannot fire, since no record in the tree carries the kind | 15 | 18 | amend |
-| `reuse-token-population` | gap-design-05 sizes the token migration against the wrong predicate: the hygiene check admits the substring "no existing seam" | 8, 24 | — | amend |
-| `fork-population-unobserved` | the witness reads only the forks Design recorded, so an empty set cannot show that no fork was resolved | 21 | — | amend |
-| `ordering-dorderedcharter` | dOrderedCharter's widened dependency check can pass only after dTotalRecall lands, though dOrderedCharter comes first | 5 | — | amend |
-| `new-slug-collision` | a `new:` slug passes if no record held it at the report's pinned SHA, so two concurrent reviews can mint one slug | 6 | — | amend |
-| `research-population-count` | the "59 research returns" are selected by file name and include instrument records | 23 | — | amend |
-| `owner-asks-two-meanings` | `owner-asks` means "no line is owed" in LB-2's offer and "a line for the features an owner ask names" in the fold | — | 4 | amend |
-| `recall-imports-eight` | the planned move covers recall's two core-read functions, and check 27 imports eight names from the recall kit | — | 9 | amend |
-| `fix-unit-write-set` | the fix unit's write set omits the dossier edit that claims the new class | — | 17 | amend |
+| `distill-class-no-producer` | `build.distill` reds on a fork with no class, yet no Design item's witness requires the class, and the red has no route | 1, 20 | 2, 12 | amend; `[fold-library-followup]` |
+| `ratification-two-places` | under `author-owner-ratifies`, Build's breakpoints put the owner's ratification before `build.distill`, its Needs and Then put it after, and a rejected re-class has no writer | 10, 19 | 1, 11, 23 | amend; `[fold-library-followup]` |
+| `owner-only-no-arm` | `owner-only`'s rule that only an owner-resolved fork may be major sits in Does, with no witness arm and no route | 2, 19 | 20 | amend; `[fold-library-followup]` |
+| `distill-key-no-fork-field` | `build.distill`'s idempotence and its one-to-one witness are keyed by build and fork, and the row it writes has no fork field | 9, 17 | 8 | amend; `[fold-library-followup]` |
+| `deploy-distill-no-route` | `deploy.distill` can now go red on a row missing at the landed SHA, and its only route is `deploy.recommend` | 7, 12, 20 | 6, 21 | amend; `[fold-library-followup]` |
+| `distill-after-core` | `build.distill` runs after `build.core`, so the core checks, check 27 among them, never grade the rows it appends, and Build's exit is certified before its last commit | 3, 13 | — | amend; `[fold-library-followup]` |
+| `layer-memory-stale-writer` | layer-memory `[decisions]` still has `deploy.distill` append the major decisions when the build lands | 4 | 5, 13 | amend; `[fold-library-followup]` |
+| `typed-reuse-witness` | round 1's typed-witness finding stands: `build.unit-pass` is still proven by the builder's own reuse line, whose `none` arm cannot fail | 22 | 3, 22 | amend; `[fold-library-followup]` |
+| `built-path-class-unchecked` | on built work nothing checks that an owed class record was written; a write set only allows the path | 18 | 19 | amend; `[fold-library-followup]` |
+| `ask-form-not-catalogued` | the new acceptance, "accepted once the class record exists", is not among layer-memory `[asks]`' closed forms | 16 | 14 | amend; `[fold-library-followup]` |
+| `plan-scope-tags` | Plan reads the research view and the decision log by scope tags that neither carries | 14 | 7, 15 | amend; `[fold-library-followup]` |
+| `build-policy-list-missing` | `build.distill` routes by `run.on-owner-question`, which Build's policy list leaves out | 11 | 10 | amend; `[fold-library-followup]` |
+| `research-kind-selector` | the research-return kind declares no selector, and its witness's planted red cannot fire, since no record in the tree carries the kind | 15 | 18 | amend; `[fold-library-followup]` |
+| `reuse-token-population` | gap-design-05 sizes the token migration against the wrong predicate: the hygiene check admits the substring "no existing seam" | 8, 24 | — | amend; `[fold-library-followup]` |
+| `fork-population-unobserved` | the witness reads only the forks Design recorded, so an empty set cannot show that no fork was resolved | 21 | — | amend; `[fold-library-followup]` |
+| `ordering-dorderedcharter` | dOrderedCharter's widened dependency check can pass only after dTotalRecall lands, though dOrderedCharter comes first | 5 | — | amend; `[fold-library-followup]` |
+| `new-slug-collision` | a `new:` slug passes if no record held it at the report's pinned SHA, so two concurrent reviews can mint one slug | 6 | — | amend; `[fold-library-followup]` |
+| `research-population-count` | the "59 research returns" are selected by file name and include instrument records | 23 | — | amend; `[fold-library-followup]` |
+| `owner-asks-two-meanings` | `owner-asks` means "no line is owed" in LB-2's offer and "a line for the features an owner ask names" in the fold | — | 4 | amend; `[fold-library-followup]` |
+| `recall-imports-eight` | the planned move covers recall's two core-read functions, and check 27 imports eight names from the recall kit | — | 9 | amend; `[fold-library-followup]` |
+| `fix-unit-write-set` | the fix unit's write set omits the dossier edit that claims the new class | — | 17 | amend; `[fold-library-followup]` |
 | `gotcha-claim-wrong-dossier` | the idempotence class is claimed by a dossier of checkers | — | 16 | none: refuted, gotchas.py selects a class by its own anchors, not by a dossier's claims |
 
 ## [map-expansions-fold-round3] The expansion round's round-3 fold findings, placed
@@ -429,3 +429,37 @@ is owed.
 | `gap-test-04-contract` | 16 | — | none: refuted, the row carries the contract the design relies on, and the probe sits in the text that cites it | — | — |
 | `gap-rows-no-check` | 17 | — | none: refuted, the register's rows carry no check column by its own form | — | — |
 | `replacement-route` | — | 3 | none: refuted, a re-placement goes to `plan.triage-rule` and keeps its claim, as `[transitions]` says | — | — |
+
+## [fold-library-followup] The library pair, folded 2026-10-17
+
+Dispatches 69 and 70 reviewed the library round's fold, `d4fc4bb51..0dd962724`. Each of their map rows
+(`[map-library-followup]`) went here, into flow-steps, layer-memory, layer-library, v2 and the register, with two
+probes filed in the instruments record's `[probes-library]`. Each row's classes are its confirmed
+findings' own, from the two ledgers. One fix moves work between chain builds: dOrderedCharter, not
+dTotalRecall, moves check 27's eight recall-kit names into memory-tree. The fold is unreviewed text, and
+a closing review of the debt round's folds is owed.
+
+| Defect | A | B | Disposition | Where the fix sits | Its classes |
+|---|---|---|---|---|---|
+| `distill-class-no-producer` | 1, 20 | 2, 12 | amend | flow-steps' `design.decompose`, `design.unit-spec` and `build.distill`; Build's Memory line; layer-library `[log]` | `route-names-an-output-its-actor-never-emits`, `rule-stated-with-no-check-that-fails` |
+| `ratification-two-places` | 10, 19 | 1, 11, 23 | amend | flow-steps' new `build.ratify` and Build's Breakpoints; layer-library `[log]` | `owner-item-without-its-reject-outcome`, `route-names-an-output-its-actor-never-emits`, `two-answers-to-one-question` |
+| `owner-only-no-arm` | 2, 19 | 20 | amend | flow-steps' `build.distill` witness and route; Design's Memory line | `owner-item-without-its-reject-outcome`, `policy-value-with-no-route` |
+| `distill-key-no-fork-field` | 9, 17 | 8 | amend | flow-steps' `build.distill` and `deploy.distill`; layer-memory `[decisions]`; layer-library `[log]` | — |
+| `deploy-distill-no-route` | 7, 12, 20 | 6, 21 | amend | flow-steps' `deploy.distill`; layer-library `[log]` | `route-names-an-output-its-actor-never-emits` |
+| `distill-after-core` | 3, 13 | — | amend | flow-steps' Build table and the closing review; layer-library `[log]` | — |
+| `layer-memory-stale-writer` | 4 | 5, 13 | amend | layer-memory `[decisions]` | `amendment-leaves-its-other-half-standing` |
+| `typed-reuse-witness` | 22 | 3, 22 | amend | flow-steps' `build.unit-pass`; layer-library `[reuse-proposal]` | — |
+| `built-path-class-unchecked` | 18 | 19 | amend | flow-steps' `build.unit-pass` | — |
+| `ask-form-not-catalogued` | 16 | 14 | amend | layer-memory `[asks]`; flow-steps' `review.dispose`; layer-library `[left-shift]` | — |
+| `plan-scope-tags` | 14 | 7, 15 | amend | flow-steps' Plan Memory line; layer-library `[consult]` | — |
+| `build-policy-list-missing` | 11 | 10 | amend | flow-steps' Build policy list | — |
+| `research-kind-selector` | 15 | 18 | amend | layer-library `[research-view]` | `two-answers-to-one-question` |
+| `reuse-token-population` | 8, 24 | — | amend | `gap-design-05`, with its probe in the debt instruments' `[probes-library]` | — |
+| `fork-population-unobserved` | 21 | — | amend | flow-steps' Design witnesses and `build.distill`'s population | — |
+| `ordering-dorderedcharter` | 5 | — | amend | v2's dOrderedCharter and dTotalRecall rows; layer-library `[consult]` | — |
+| `new-slug-collision` | 6 | — | amend | flow-steps' `review.report`; layer-library `[left-shift]` | — |
+| `research-population-count` | 23 | — | amend | layer-library `[current]`; `gap-mem-15` and `gap-design-07`, with the probe in `[probes-library]` | — |
+| `owner-asks-two-meanings` | — | 4 | amend | flow-steps' `build.unit-pass`; layer-library `[reuse-proposal]` | `amendment-leaves-its-other-half-standing` |
+| `recall-imports-eight` | — | 9 | amend | layer-library `[consult]`; v2's rows and its dated note | — |
+| `fix-unit-write-set` | — | 17 | amend | flow-steps' `build.unit-pass`; layer-library `[left-shift]` | — |
+| `gotcha-claim-wrong-dossier` | — | 16 | none: refuted, gotchas.py selects a class by its own anchors, not by a dossier's claims | — | — |

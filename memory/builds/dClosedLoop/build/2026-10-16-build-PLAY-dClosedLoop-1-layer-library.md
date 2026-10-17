@@ -150,6 +150,10 @@ Every path is filled by hand, and nothing notices when one is skipped:
 | A decision becomes a log row | hand edits to `memory/DECISIONS.md` | no rule requires a row, and nothing defines a major decision | 160 rows added in 60 days, beside 1,829 `Decided:` trailers |
 | A build's research joins the library | the researcher's record, bound by `**Serves:** research` and graded by check 21 | across builds only recall reaches it, and recall is optional | 59 research returns in 10 builds, 8 of them cited from another build; the binding alone also covers design records, logs and registers, 179 records |
 
+- **Corrected 2026-10-17, the debt round.** Five of the 59 research returns were instruments records,
+  which archive probe scripts. By the same predicate, research returns were 54 in 10 builds at
+  `3c34b82dc`, 8 cited from another build, and are 72 in 10 builds at `1b759b620`, 9 cited. The probe
+  is `research_count.py`, in the debt comparison's instruments record (`[probes-library]`).
 - **Dossiers hold little of what a reuse entry needs.** Their reuse-shaped part, `## Reuse affordance`,
   is 7.1% of their text. No dossier carries a directive or an owner's disposition, and 28 of 31 are
   stale by path ancestry.
@@ -184,15 +188,18 @@ witness a check reads. The views over the library are derived.
   The harness's bare `C<n>` label is refused.
 - `review.report`'s witness gains a join. Each confirmed finding carries one disposition, `class:`
   resolves to a record under `memory/gotchas/`, and `gate:` resolves to a leg in the legs manifest.
-  `new:` names a slug no record held at the report's pinned SHA, or whose record carries `from:` this
-  report and finding, so the join stays true once the class is filed. Under `reason` or `owner-rules`,
+  `new:` names a slug the report claimed at report time, by a compare-and-swap ref on the remote
+  (`refs/gov/class-claims/<slug>`), so a slug another branch minted is seen, or whose record carries
+  `from:` this report and finding, so the join stays true once the class is filed. A slug claimed
+  elsewhere is re-disposed (Revised 2026-10-17, the debt round's fold). Under `reason` or `owner-rules`,
   `none` carries its reason, and under `owner-rules` each `none` is an owner item before dispose.
 - At `review.dispose`, each `new:` is filed with the item that owes its record, and the join sits at
   that item. On an unbuilt spec, `review.fold`'s spec writer writes the class beside the fold. On built
   work, the builder of the fix unit writes it, in its write set. A finding that becomes an ask carries
-  its `new:` slug, and the ask is accepted once the class record exists. The
+  its `new:` slug, in layer-memory `[asks]`' below-threshold form. The
   new class carries `from: <review>#<finding id>`, which `gotchas.py --check` resolves, and where the
-  map is installed, the dossier of the feature it guards claims it.
+  map is installed, the dossier of the feature it guards claims it, an edit in the fix unit's write
+  set. `build.unit-pass`'s witness joins each owed slug to its record at the unit's commit.
 - `review.left-shift` keeps its job: it decides when a class earns a gate, at its second occurrence by
   default.
 
@@ -204,34 +211,50 @@ witness a check reads. The views over the library are derived.
   return carries a reuse line: `proposed <tag>`, filed through the instruction command as LR-6 says,
   or `none` with its reason. Units that built a new seam owe the line (`reuse.propose: new-seam`, LB-2).
 - `build.unit-pass`'s witness gains that line for each unit `reuse.propose` selects: under `every-unit`
-  every unit, and under `owner-asks` a unit building a feature an owner-filed reuse ask names.
+  every unit, and under `owner-asks` none, the owner naming the features to enter through the
+  instruction command, as LB-2 offered it. Revised 2026-10-17, the debt round's fold: the fold had
+  given `owner-asks` a second meaning, a unit building a feature an owner-filed reuse ask names, which
+  no kind produced. The line is computed, never taken as typed: `proposed <tag>` joins its proposal
+  record, and `none` joins the reuse-audit token or carries a reason from a closed set (flow-steps'
+  `build.unit-pass`).
 - A memory check reads the anchors. An accepted entry has at least one `gov:feature <tag>` in code, and
   a `removal-pending` entry has none left once its patch build lands. The check scans one marker, as
   each `gov:` gate does today.
 
 ### [log] A decision becomes a log row
 
-- Each resolved fork's record carries its decision and its declared class: one of layer-memory
-  `[decisions]`' classes, or major. Design writes the fork records, and `build.distill` checks each class.
-- `build.distill`, a command before `build.exit`, appends a log row for each major fork to the log in
-  the build's own branch, so the rows land with the build, and a withdrawn build's never do. Each row
-  carries its date, its build, the decision, a pointer to its rationale, and the reuse entry it
-  created, if any. It is idempotent: a row keyed by build and fork is never written twice.
+- Each resolved fork's record carries its id, its decision, its resolver and its declared class: one
+  of layer-memory `[decisions]`' classes, or major. Design's witnesses join every raised fork to its
+  record, and the role or owner that resolves a fork in Build writes its record. `build.distill` reads
+  that joined population and checks each class. Revised 2026-10-17, the debt round's fold.
+- `build.distill`, a command after the closing review and before `build.core`, appends a log row for
+  each major fork to the log in the build's own branch, so the rows land with the build, the core
+  checks grade them, and a withdrawn build's never land. Each row carries its date, its build, its
+  fork's id, the decision, a pointer to its rationale, and the reuse entry it created, if any. It is
+  idempotent: a row keyed by (build, fork id) is never written twice. A fork with no class goes back
+  to the role that resolved it. Under `author-owner-ratifies`, the owner rules first at
+  `build.ratify`, and a rejected fork is re-classed on its record; under `owner-only`, a major row
+  whose fork the owner did not resolve is red.
 - Its witness is a one-to-one join between the build's resolved forks and the rows of the major ones.
   A fork with no class is red, and so is a second row for one key. An empty set passes only where no
-  fork was resolved. At landing, `deploy.distill` confirms the rows at the landed SHA. Its author declares a decision major, by the rubric (`decisions.major: author-rubric`,
+  fork was raised. At landing, `deploy.distill` confirms the rows at the landed SHA, and a missing row
+  routes to a patch build. Its author declares a decision major, by the rubric (`decisions.major: author-rubric`,
   LB-3).
 
 ### [research-view] A build's research joins the library
 
 - The research returns are the library. The `**Serves:** research` binding also covers design records,
   logs and registers, so the memory contract gives research returns their own kind, written by
-  `plan.research` and `design.research`, and the view selects that kind.
+  `plan.research` and `design.research`, and the view selects that kind. Revised 2026-10-17, the debt
+  round's fold: its discriminator is a declared field, `kind: research-return`, which those items
+  write. dTotalRecall's planned units owe a dated backfill of the existing returns, 72 at
+  `1b759b620` by `research_count.py`, and the view must render at least that population.
 - A generated research view lists them by build, date and question, beside the other views in
   layer-memory `[views]`. It is the planner's core source, and recall stays the optional slot that
   searches it.
-- Its witness is the kind's check, seen red on a planted design record bound as research, and the view
-  is byte-compared after rendering, like every view.
+- Its witness is the kind's check, seen red on a planted design record and a planted instruments
+  record, each bound as research without the field, and on a view rendered empty. The view is
+  byte-compared after rendering, like every view.
 
 ### [placements] The two placements, confirmed by LB-4
 
@@ -302,14 +325,14 @@ as a clean search.
 | The map | the work order's `**Reuse:**` slot | the slot keeps its three states, and its index holds the reuse entries alone |
 | The map | a new class's dossier claim, and a dossier `seam:` seeding a reuse proposal | nothing to claim or seed: a class reaches its population through its own anchors |
 | The map | the owner's views `MAP.md`, `CARDS.md` and each symbol's callers | none rendered; `LIVE.md` and the build views stay |
-| Recall | the planner's recall slot | the research view and the decision log, selected by the plan's scope tags |
+| Recall | the planner's recall slot | the research view and the decision log, selected by build: the plan's parents and the builds `plan.dedupe` matched |
 | Recall | `design.seams`' recall sources | none; the scout's tree search stands |
 | Recall | the read hook under `annotations.grammar=pushed-at-read` | the value cannot be served, so `policy.on-missing-expansion` refuses it, or under `fallback-reported` falls back to `required` and says so |
 | Recall | the `/memory-recall` Skill and its journal | not rendered, and no journal is kept |
 | The lexicon | naming at Design and Build | the core's tag-shape check stands alone, and the naming slot names the lexicon as absent |
 | The lexicon | `lexicon.pin` | inert, and reported as inert when set |
 | The lexicon | the `/lexicon` Skill | not rendered |
-| Recall | check 27's near-match ranking of added decision rows and gotchas, and the decision log's holds-now view | no fallback is owed: both move into memory-tree, the core engine, as the id grammar's parser does (layer-memory `[names]`), and memory-recall imports them (dTotalRecall) |
+| Recall | check 27's near-match ranking of added decision rows and gotchas, and the decision log's holds-now view | no fallback is owed: all eight names check 27 imports from the recall kit move into memory-tree, the core engine, as the id grammar's parser does (layer-memory `[names]`): `bench`'s `build_index`, `match_expr`, `terms` and `ALIAS_WEIGHT`, and `extract`'s `corpus_inputs`, `extract_records`, `extract_supersessions` and `derive_supersession_map`. memory-recall imports them. dOrderedCharter moves them before its dependency check lands, since that check would stay red until they moved (Revised 2026-10-17: dTotalRecall was named) |
 
 - **Each component's own legs install with it.** Without the map, its coverage and freshness legs are
   absent from the legs manifest, not skipped.
@@ -394,3 +417,11 @@ Dispatch 50 reviewed the round's four commits, `1bc4883fe..aa9639d98`, at light 
 - **A follow-up round** over `[review-fold]` (`0dd962724`) is owed. The owner deferred it on 2026-10-16:
   "Let's record the follow-up round debt and skip it for now". It stays owed until it runs, and
   dClosedLoop does not close with it open.
+
+## [debt-fold] The debt round's library pair, folded 2026-10-17
+
+Dispatches 69 and 70 reviewed `[review-fold]`'s fold (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-library-followup-a.md`
+and `-b.md`), which is the follow-up round `[open]` recorded as owed. The fixes sit in place above, in
+flow-steps, layer-memory, v2 and the register, and the debt comparison record's `[fold-library-followup]`
+names where each defect went. The fold is unreviewed text, and a closing review of the debt round's folds
+is owed.
