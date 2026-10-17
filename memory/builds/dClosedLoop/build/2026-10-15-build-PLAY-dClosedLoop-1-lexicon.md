@@ -45,6 +45,12 @@ beside this record, and the design is written here once they return.
   - Two waiver files exist, of 8 lines each.
   - Agents ran the kit 1,305 times bare and 542 times with `--suggest` in 60 days.
   - The drift audit read `lexicon_marginal_offense_rate` at 584 of 4,948.
+- **Revised: 2026-10-17, the debt round.** Three lines above were overtaken:
+  - L-4 moved the lexicon's work and `gap-mem-10` from dTotalRecall to dMindYourWords. `gap-mem-10`
+    keeps its key, and its area becomes Lexicon;
+  - KN-1 made the lexicon an optional component of memory's library side, which this record calls the
+    Knowledge expansion;
+  - the pin's history holds 11 drains (−107) and 19 raises (+814), not one drain (dispatch 28).
 
 ## [history] The builds that made the kit
 
@@ -60,6 +66,10 @@ beside this record, and the design is written here once they return.
   - `TOOL-aSurfacedLexicon-15` is the rename unit the pin was meant to fall with.
 
 Neither build is live. Both are evidence; no chain build counts on them.
+
+Revised: 2026-10-17, the debt round. dMindYourWords absorbs `TOOL-aSurfacedLexicon-23` and
+`TOOL-aSurfacedLexicon-15`, and links or closes each row when it opens. This build changes no ask's
+status.
 
 ## [research] Dispatched, 2026-10-15
 
@@ -94,6 +104,9 @@ Their probe files are kept in `build/2026-10-15-build-PLAY-dClosedLoop-1-researc
   - **Who meets it:** the next landing that runs the naming leg.
   - **Scope:** renaming the function is product code, outside this build's cut-line, and raising the
     pin is the habit this review exists to end.
+- **Revised: 2026-10-17, the debt round.** Both reds are gone. L-6 declared `html` and `svg` dark in
+  LANGS (`0ac38b016`), and the undeclared-extension refusal stays armed for every other extension. Main's
+  red is gone since `ef9c3fbab`.
 
 ## [current] What the kit is and does, measured 2026-10-15
 
@@ -172,6 +185,11 @@ Their probe files are kept in `build/2026-10-15-build-PLAY-dClosedLoop-1-researc
   | Node events and Express | none: event names are strings, and handlers are anonymous |
 
   All were measured from wheels and `.d.ts` files without importing them.
+- **Revised: 2026-10-17, the debt round.** Two readings above were overtaken:
+  - the packs cover 5 of 6 third-party-forced names, not 5 of 5: the `mktemp` shell shim is in no pack,
+    and `[packs]` adds shim rows. The byte-identical result came from a live import on one class site;
+  - the README's "shrink-only" (its line 650) describes the waiver registry. Every carrier's pin text
+    says two-sided equality, which the settled `shrink-only` retires (`[fixes]`).
 
 ## [fit] The owner's points against the design
 
@@ -186,20 +204,34 @@ Their probe files are kept in `build/2026-10-15-build-PLAY-dClosedLoop-1-researc
 
 ## [design] The lexicon, as proposed
 
+Revised: 2026-10-17, the debt round's fold. Its subsections are amended in place, and `[debt-fold]` names
+where each defect's fix sits.
+
 ### [classes] Every definition gets exactly one class
 
 | Class | Means | Counts against the pin? |
 |---|---|---|
-| conforming | its verb is declared, and its case matches its cell | no |
+| conforming | its verb is declared and its case matches its cell; it keeps its object's established verb inside a declared family (`[drift]`), and its nouns are canon | no |
 | forced | a name the code cannot choose, with a verified source (`[forced]`) | no; reported in its own tally |
-| out of scope | a record or a fixture, found by a path selector (`TOOL-aSurfacedLexicon-23`) | no; not graded |
+| out of scope | a record under `memory/builds/**`, or a file in a planted fixture tree, found by the path selector (`TOOL-aSurfacedLexicon-23`, which dMindYourWords absorbs). Test files stay graded | no; not graded |
 | not a name | an IIFE value or a `@property`, fixed in the extractor | no |
-| debt | everything else | yes |
+| debt | everything else: a drift or noun-canon split and a banned suffix included | yes |
 
-- The pin counts debt only, and only falls (`lexicon.pin`).
-- Each forced or out-of-scope name carries its source, so the lexicon has no reasonless exemption left.
-- On this tree the pin falls by 28 forced and 43 out-of-scope names, and by 4 false positives, once
-  the classes land.
+- **The pin counts debt only.** Under `lexicon.pin: shrink-only`, the default, it only falls. Under
+  `absorb`, a raise moves only the backstop count and is recorded with its cause; the bar's by-name
+  comparison still refuses what a branch adds. `no-gate` reports both and refuses neither.
+- **One pin over today's three seams.** `VERB_OFFENDER_PIN` becomes the debt pin. `SUFFIX_OFFENDER_PIN`
+  folds into it, since a banned suffix is debt. The per-cell `PINS:` block retires, its cells counted
+  inside the one pin. F4-8's shrink-only supersedes `TOOL-aSurfacedLexicon-18`.
+- **A drift or noun split is debt.** A new split is refused as L-3 settled (`[drift]`). The existing
+  splits join the pin once, through `[vocabulary]`'s re-baseline, with the delta and its cause recorded.
+- **Each forced or out-of-scope name carries its source,** so the lexicon has no reasonless exemption
+  left.
+- **On this tree the pin falls by 28 forced names,** 22 contract-forced, 5 host-forced and the `mktemp`
+  shim through `[packs]`' shim rows, and by 43 out-of-scope names and 4 false positives, once the
+  classes land. The splits then raise it once, by the count the re-baseline records.
+- **Two cells re-arm.** `py.file` and `py.constant`, declared off for want of the selector, re-arm once
+  it excludes `memory/builds/**`.
 
 ### [forced] How a forced name is recognised, with no agent action
 
@@ -212,45 +244,86 @@ Their probe files are kept in `build/2026-10-15-build-PLAY-dClosedLoop-1-researc
 
    A generic name (`emit`, `handle`, `run`, `do_*`) is forced only where its enclosing class resolves,
    statically and through its imports, to the base that defines it. A namespaced closed set applies by
-   name. The same `emit` stays debt in a module function, or on a class with no outside base.
-2. **Contract-forced names are declared beside the reader that keys on them.** For example,
-   `agent-cap.js` declares that it reads `boundedParallel` and `chunk` by name. The declaration lives
-   in the `gov:` marker family. A stale arm reds it once the reader stops matching. This is where
-   `.lexicon.conf` already says the constraint belongs.
-3. **Markers are a fast path, never a pass.** `@typing.override` (PEP 698), TypeScript's `override` and
-   `hookimpl` are honoured only where the packs confirm an outside base. An unconfirmed marker reds, as
-   PEP 698 rules.
-4. **A site suppression with a reason is the owner's fallback** for a host no pack covers. It is
-   counted and printed, never the default. Exempting by a stamp anyone can apply is the habit this
-   review ends.
-5. **No live import.** Resolution runs against committed pack data, so every node grades the same.
-   `pytest` is not installed on this node, which is the reason.
+   name, and its rows carry a namespace pattern the pack grammar accepts (`pytest_*`, `__*__`). The same
+   `emit` stays debt in a module function, or on a class with no outside base. Three cases have their
+   own outcome, each with a fixture:
+   - **an unresolved base** grades as debt, reported as unresolved;
+   - **an override of a parent defined in the repository** is forced by that parent, and falls with the
+     parent's rename;
+   - **a marker on a base defined in the repository, or on an unpacked base,** reports rather than reds.
 
-`--suggest` becomes forced-aware. It never proposes renaming a forced name; it answers that the name
-is forced by its base or host, and to keep it.
+   Context comes per language. Python's comes from its syntax tree. JavaScript and TypeScript need a
+   parser that yields class membership, `extends` and import resolution, which the shared extraction
+   primitive owes in its second wave (`[integration]`). Until it lands, JavaScript and TypeScript
+   forced names are out of the first wave, and an `override` there reports rather than reds.
+2. **Contract-forced names are declared in a table the instruction write path owns**
+   (LX-3). Each row names the reader, the name and the match rule the reader applies, such as
+   `agent-cap.js`'s regular expressions over `boundedParallel` and `chunk`. The code carries at most a
+   `gov:` pointer to its row, which a check resolves. A stale arm reds a row once the reader stops
+   matching: the check runs the row's own match rule over the reader's source.
+3. **Markers are a fast path, never a pass.** A marker whose base is defined in the repository is
+   confirmed when that base defines the member, and the name takes the base's class. A marker on an
+   outside base (`@typing.override`, TypeScript's `override`, `hookimpl`) is honoured where a pack
+   confirms the base. Only a marker with no defining base reds, as PEP 698 rules.
+4. **A site suppression with a reason is the owner's fallback** for a host no pack covers. It extends
+   today's waiver files and `load_waivers` under the `path::name` key that `TOOL-dScaffoldedMirror-4`
+   designs, with a mandatory reason (`TOOL-aLoosenedCeiling-5`). It changes only through
+   `instructions.edit`, and the check refuses a suppression with no provenance record. It is counted
+   and printed, never the default. A commit refused on an uncovered forced name goes to an owner item
+   with three outcomes: suppress the site, add a custom pack row, or rename. An unattended run under
+   `refuse` renames or parks the unit.
+5. **No live import.** Resolution runs against committed pack data, so every node grades the same. A
+   live import depends on each node's packages and user site: on this node, pytest imports under one
+   interpreter and not the other.
+
+- **`lexicon.forced`'s other values route too.** `by-name` applies the same packs without base
+  resolution: a member name is exempted wherever it appears, printed with its measured false-exemption
+  rate (53 sites for 1 forced on this tree), and witnessed by the forced tally. `by-annotation` is
+  item 4's site suppression, each site annotated with its reason.
+- **`--suggest` becomes forced-aware.** It takes the site's base or host (`--base logging.Handler`), or
+  reads the site from the extraction. It never proposes renaming a forced name. For a generic name with
+  no base given, its answer is conditional: forced if the class derives from the named base, otherwise
+  the rename. The work order hands it the base the spec declares.
 
 ### [packs] The pre-built tables, as packs
 
 - **One pack per host kit, generated where possible:**
-  - `inspect` per Python minor version for the stdlib;
-  - the wheel's AST for pip kits, never an import;
+  - `inspect` for the stdlib, keyed on a declared Python version: `requires-python`, or a repository
+    declaration changed through `instructions.edit`, never the running interpreter. Failing both, the
+    union across the declared minor range. A module that differs by platform is generated per platform
+    tag;
+  - the wheel's syntax tree for pip kits, never an import;
   - pluggy's hook specifications for pytest;
   - `.d.ts` declarations for JavaScript kits.
 
-  Shell hosts (bats, and bash's and zsh's hook functions) are curated, about 8 names.
-- **Each pack carries a header:** the kit, its version range, and the generator command that rebuilds
-  it.
+  Shell hosts are curated: bats, bash's and zsh's hook functions (about 8 names), and command shims.
+  A shim row is a closed set of external commands a shell function may shadow, applied only where the
+  function's name equals a command it also invokes, as the `mktemp` shim does.
+- **Each pack carries a header:** the kit, its version range, the generator command that rebuilds it,
+  and the verb families it declares for its kit (`[drift]`).
+- **Every pack is validated at load:** its header, its grammar, duplicate rows, and bare generic tokens
+  in a by-name set. A malformed pack is refused whole, with its offending row named, and a custom
+  pack the same way.
 - **First wave:**
   - the Python data model;
   - the commonly subclassed stdlib bases;
   - unittest, pytest, argparse, `ast`, `http.server`, `logging`, `json` and `cmd`;
-  - the shell hosts.
+  - the shell hosts and shims.
+- **Its acceptance.** Each first-wave pack is proven on a planted fixture with one forced site per row
+  kind (member, prefix, host set) and one free module function of the same name: the arm clears the
+  forced sites and grades the free one. The stdlib pack adds a cross-node byte-identity run, 3.12
+  against 3.14. The research's "5 of 5, byte-identical" was a prototype's result, measured with a live
+  import on one class site.
 - **Second wave:** Django, Flask, Starlette and FastAPI, and React's lifecycle and hooks. Each ships
   after a census in an adopter shows its names actually offend. Node's core events and Express need
   no pack.
-- **Selection:** the adopter's stack is detected from the import census the extractor already makes,
-  with manifests (`pyproject.toml`, `requirements.txt`, `package.json`, `composer.json`) supplying
-  versions where they exist. Asked as L-5.
+- **Selection** is detected and declared, with custom packs (L-5). The stack is detected from the import
+  census the extraction makes, with manifests (`pyproject.toml`, `requirements.txt`, `package.json`,
+  `composer.json`) supplying versions where they exist. Inputs no pack covers have their own states:
+  - a kit with no pack is reported as uncovered, and its names route as `[forced]` item 4;
+  - a version outside every pack's range takes the nearest range below and reports the gap;
+  - no manifest selects by the import census alone, its versions unknown;
+  - several minors take the union across them.
 
 ### [enforcement] Where a name is judged
 
@@ -258,50 +331,119 @@ is forced by its base or host, and to keep it.
    - the verb rows with their negatives;
    - the packs that apply to its write set;
    - forced-aware `--suggest` answers for the names its spec declares.
-2. **At commit.** The definitions a commit adds or renames, in its staged files, are graded. Merge
-   commits are left to the bar, because their diff carries the other parent's names. What an offense
-   does is asked as L-2.
+2. **At commit.** The definitions a commit adds or renames, in its staged files, are graded. The check
+   is a Runtime hook pack rendered into `.githooks/pre-commit`'s staged-arm sequence, within 2 s per
+   commit. A bypass is journaled, and the bar's comparison catches what it skipped. The check keys
+   against HEAD's definitions with rename detection (`git diff --cached -M`): a staged definition whose
+   name stands as debt in HEAD, at a path the commit deletes or removes that definition from, is a move,
+   not an addition. A fixture in which a `git mv` of a file holding an offender commits clean is its
+   acceptance. Merge commits are left to the bar, because their diff carries the other parent's names.
+   L-2 settled `refuse`.
 3. **At the bar, by name.** The branch's offender set is compared with its base's, and the bar reds on
-   any offender the branch adds. Dispatch 27 found the bar already computes this comparison, but only
-   to label a red. The keys must be move-aware: the build first replays the merges since 2026-08-16,
-   and counts the reds that come from moved files.
-4. **The count stays as the backstop.** The debt-only pin, shrink-only.
+   any offender the branch adds. This is a new binding arm on every bar, not the report-only
+   attribution block, which runs only on a red leg under `GATE_ATTRIBUTE`. Its base is the current
+   default tip, read as a three-dot diff from the merge base, never a frozen branch point. Remote CI runs
+   the same arm against the remote's default tip. The keys are move-aware. The build first replays the
+   merges since 2026-08-16 with the shipped keys, and the replay must show 0 reds attributable to a moved
+   or renamed file. It is seen red with path-only keys on a planted move.
+4. **The count stays as the backstop:** the debt-only pin, over today's three seams (`[classes]`).
 5. **The Loop Review reads the trends:** debt, the forced tally, and drift.
+6. **The lexicon's leg pack.** The naming comparison, the pin backstop, the wiring, the selftest and the
+   two drift signals form the lexicon's leg pack at Test's leg-pack point (`gap-lex-08`). The pack is
+   absent from the legs manifest where the lexicon is not installed.
 
 ### [drift] Consistency beyond verbs
 
-- **One verb per family per object.** The canon already groups verbs into families, such as acquire
-  (load, read, parse) and create (build, make, new). A new definition over an object that already has
-  an established verb in that family must use it.
-- **A noun canon.** A NOUNS table, alongside VERBS, holds one spelling per concept (`sha` against
-  `oid`, `hash` and `digest`). It is seeded from the corpus census and then frozen, as the verb seed
-  was.
-- **Existing splits become debt with their rename.** New splits are handled as L-3 says.
+- **Verb families are declared, never inferred** (LX-1). The canon's clusters are synonyms, and load,
+  read and parse are three clusters with three meanings, so the canon holds no families. Families come
+  from two sources:
+  - each pack the stack census selects for a kit it discovers in the repository declares that kit's
+    families;
+  - the owner declares the rest through `instructions.edit`.
+
+  A family groups canon representatives. An acquire family over `load`, `read` and `parse` exists only
+  where a pack or the owner declares it.
+- **One verb per declared family per object.** The object is the subtokens after the verb, compared
+  after the noun canon's normalization. Its established verb is the one its earliest-landed definition
+  in the family uses. A new definition over that object must use it. A tie, or an object already split,
+  is reported for the owner instead of refused. A forced name never establishes a verb, and is never
+  refused for drift.
+- **A noun canon.** NOUNS extends canon.py's cluster shape (CLUSTERS and the `build_clusters` overlay)
+  with noun clusters, written exogenously, such as `sha` against `oid`, `hash` and `digest`. The corpus
+  decides only which clusters are live. Its overlay is a naming convention (`[vocabulary]`).
+- **Where a split is judged.** A split is debt (`[classes]`), so the commit check and the bar refuse a
+  new split as they refuse a new offender:
+
+  | `lexicon.at-commit` | `lexicon.drift: refuse-new` | `report` | `off` |
+  |---|---|---|---|
+  | `refuse` | refused at commit and at the bar | counted in the drift signal, refused nowhere | not measured |
+  | `warn` | warned at commit, refused at the bar | counted, refused nowhere | not measured |
+  | `off` | refused at the bar | counted, refused nowhere | not measured |
+
+  A split outside every declared family is reported, never refused.
+- **The map's inventories.** The map ratchets a `lexicon-verbs` inventory from VERBS, and the lexicon's
+  dossier claims `init`. The inventory stays, and NOUNS gains a sibling `lexicon-nouns` inventory.
+  Removing the `init` row moves the dossier's claim and the coverage and freshness leg in the same
+  commit.
+- **Existing splits become debt with their rename,** through the re-baseline.
 
 ### [vocabulary] How the vocabulary changes
 
-- **The verb table, the noun canon, the pack selection and the contract declarations are naming
-  conventions.** Each changes only through the instruction layer's write path (`instructions.edit`:
-  the owner's command, agents propose).
+- **These are naming conventions,** and each changes only through the instruction layer's write path
+  (`instructions.edit`: the owner's command, agents propose):
+  - the verb table;
+  - the noun canon and its overlay;
+  - the verb families the owner declares;
+  - the pack selection and custom packs;
+  - the contract-declaration table;
+  - site suppressions;
+  - the pins and the cells' arming.
+
+  A check refuses a commit that raises a pin or un-arms a cell with no instruction-path record. It is
+  probed by staging a pin raise in a scratch clone.
+- **The re-baseline.** A change through the write path that widens or reclassifies debt re-grades the
+  corpus in the same commit, and sets the pin to the new debt count, with the delta and its cause
+  recorded. Such changes are a removed verb row, a frozen noun, a pack upgrade, or the splits joining
+  the pin. A pin change in any other commit stays refused. Probe: remove the `init` row on a fixture,
+  and see one record carry the delta.
 - **No session raises the pin or adds a verb on its own.** A name that will not fit is renamed, shown to
-  be forced, or proposed as a vocabulary change.
-- **`ratified` gives way to that path's record.** The `init` verb row, which partly exists to clear
-  `__init__`, is re-justified as vocabulary or removed, since the data-model pack clears `__init__`.
+  be forced, or proposed as a vocabulary change. While the proposal is pending, its unit routes as a
+  fork under `design.forks`: it is parked, or built under a conforming name. On the owner's no, the
+  proposal record routes a rename to the unit that added the name. An unattended run under `refuse`
+  picks a conforming name or parks the unit.
+- **`ratified` gives way to that path's record, and its readers move with it.** The drift signal that
+  compares VERBS and LANGS edits with `ratified` reads the write path's latest record date instead, as
+  `gap-lex-08`'s leg pack. `adopt-lexicon.sh --check`, the kit's `lexicon-pins` hole and the scaffold
+  read that record too. The leg pack's arm is seen red on a planted LANGS change newer than the record.
+- **The `init` row** partly exists to clear `__init__`. It is re-justified as vocabulary or removed,
+  since the data-model pack clears `__init__`.
 
 ### [integration] One extraction, one classification
 
-- **The codebase map extracts every definition with its context:**
+- **One extraction primitive in `tools/lib`** (LX-2) reads every definition with its context:
   - the enclosing class;
   - its bases, resolved through imports;
   - its decorators, with aliases resolved;
   - the module's imports, which feed the stack census.
 
-  This is dTotalRecall's map work. The lexicon stops walking the corpus itself, and classifies the
-  map's definitions.
-- **Today's dependency inverts.** The map borrows the lexicon's tokenizers now; the map comes to own
-  extraction, with those tokenizers as its shell and JavaScript parsers.
-- **A `gov:note` may document a forced name, and never exempts one alone.** Contract declarations use
-  the marker family's existing readers.
+  It reads the working tree, the index or any revision. The codebase map and the lexicon each call it,
+  and each copy-installed kit carries it inline. So neither kit requires the other, as KN-1 and the
+  standing decision `TOOL-dClosedLexicon-12` hold. dTotalRecall builds it with the map's extraction,
+  and dMindYourWords calls it.
+- **The states the lexicon reads:**
+  - the working tree, for `--suggest` and the census;
+  - the index, for the commit check;
+  - the base revision, for the bar's comparison;
+  - both parents of a merge, for `--merge-losses`, which `.githooks/pre-push`'s default-branch
+    merge-loss refusal and the lander call.
+- **The tokenizers move into the primitive** as its shell and JavaScript parsers, so the map stops
+  borrowing them from the lexicon kit. The map's other dependency on the lexicon, its `lexicon-verbs`
+  inventory, stays (`[drift]`).
+- **A `gov:note` may document a forced name, and never exempts one alone.** Contract declarations live
+  in their table (`[forced]` item 2), not in the marker family.
+- **The tag vocabulary.** The lexicon registers a tag-name vocabulary check at the instruction layer's
+  name-check point, which dOrderedCharter builds: it checks the verbs and nouns in tag leaves. Where the
+  lexicon is absent, the core's tag-shape check stands alone.
 - **The reviewer's lens is handed the debt a diff adds.** The Loop Review gets the trends.
 
 ### [fixes] The kit's own defects
@@ -309,12 +451,20 @@ is forced by its base or host, and to keep it.
 - Refuse a repeated block header in the conf.
 - Stop grading IIFE values and `@property` definitions as verbs.
 - Remove `--brief` and `--help` from the documentation, or answer them.
-- Reconcile the Skill, the conf and the README on what the gate does.
-- Keep records out of the graded population with the path selector.
+- Retire the two-sided pin wording in every carrier that holds it: the engine, the README's pin text,
+  LEXICON.md, the Skill template, kit.toml's `lexicon-pins` hole, adopt-lexicon.sh, the scaffold, both
+  waiver headers, the conf and the selftest arms. Each line is listed in
+  `reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-b.md`'s M17. The README's line 650 calls the
+  waiver registry shrink-only, which is correct and stays.
+- Keep records out of the graded population with the path selector (`[classes]`).
+- The legs' `doc_reads` on `memory/builds/` go stale once records leave the graded population.
+  dMindYourWords lists both carriers in its touched set, and drops or re-justifies them once the
+  selector lands.
 
 ## [gaps-proposed] Gaps to register once the forks settle their home
 
-Registered on 2026-10-15, after the forks, as `gap-lex-01` to `gap-lex-07`, in the order below.
+Registered on 2026-10-15, after the forks, as `gap-lex-01` to `gap-lex-07`, in the order below. The
+expansion round added `gap-lex-08`: the two drift signals become the lexicon's own leg pack.
 They go to dMindYourWords, with `gap-mem-10`.
 
 New area `Lexicon`. `gap-mem-10` (the gate absorbs debt) moves with them.
@@ -326,14 +476,15 @@ New area `Lexicon`. `gap-mem-10` (the gate absorbs debt) moves with them.
 2. HIGH. `--suggest` proposes renames that break overrides:
    - `do_GET` to `cmd_get`, `emit` to `print`, `handle` to `run`;
    - `setUp` to `set_up`, which silently stops unittest calling it;
+   - `get_queryset` to `read_queryset`, which breaks a Django view;
    - P29 would hand these answers to builders.
 3. HIGH. Enforcement is a corpus count at the bar:
    - nothing judges a name at commit or by name;
    - a fixed offender plus a new one nets to zero;
-   - landings do not hold the equality, and main reads 1,088 against 1,087.
+   - landings absorbed raises instead of holding the equality: 19 raises (+814) in the pin's history.
 4. MED. Records are graded:
-   - 43 offenders sit under `memory/builds/`, and they drove the latest raise (+24 of +30 in
-     `301a36664`);
+   - 43 offenders sit under `memory/builds/`. The latest raise, +24 net in `301a36664`, came from 30
+     arrivals, all aSparedSpawn build records, less 6 departures;
    - undeclared record extensions refuse the wiring leg.
 5. MED. No consistency beyond verbs:
    - 57 objects carry two or more declared acquire-family verbs;
@@ -347,6 +498,14 @@ New area `Lexicon`. `gap-mem-10` (the gate absorbs debt) moves with them.
    - 4 non-names are graded as verbs;
    - two dead modes still draw calls;
    - the Skill, the conf and the README disagree on what the gate does.
+
+- **Revised: 2026-10-17. The live asks these gaps state.** dMindYourWords links or closes each one when it
+  opens, and this build changes no ask's status:
+  - `gap-lex-01` states TOOL-aWeldedTribunal-12, with L-1, and TOOL-aProbedToolkit-5;
+  - `gap-lex-02` and `gap-lex-03` state TOOL-aProbedToolkit-4;
+  - `gap-lex-06` states TOOL-aProbedToolkit-6;
+  - `gap-lex-07` states TOOL-aProbedToolkit-5 too;
+  - `[integration]` states TOOL-aMendedFleet-96 and TOOL-aGradedDialect-6.
 
 ## [forks] Asked, 2026-10-15
 
@@ -422,6 +581,8 @@ should that be fixed now?"**
   contract-forced names, declared beside their reader, are the in-repository case of the same idea.
 - **L-6** turned the undeclared-extension refusal off. The check still exits 1, on main's inherited
   1,088 against 1,087.
+  Revised: 2026-10-17. L-6 declared `html` and `svg` dark; the refusal stays armed for every other
+  extension, and the class closes only with the path selector (`[now]`).
 
 **Presets.** `velocity` warns at commit and only reports drift. Every other new key holds its
 default in all four presets.
@@ -429,7 +590,80 @@ default in all four presets.
 **What changed elsewhere:**
 - **v2:**
   - The four keys join the catalogue and every preset.
-  - The chain gains dMindYourWords and becomes thirteen builds.
+  - The chain gains dMindYourWords and becomes thirteen builds. Revised: 2026-10-17: fifteen since
+    (v2 `[chain]`), after dWellOiledMachine and dFairHearing joined.
   - dTotalRecall gives up the lexicon pin and `gap-mem-10`.
   - `[owed]` gains the adopter census the second-wave packs wait on.
 - **The register** gains `gap-lex-01` to `gap-lex-07`.
+- **Revised: 2026-10-17.** The expansion round added `gap-lex-08` and made the two drift signals the
+  lexicon's leg pack. The runtime round made the commit check a Runtime hook pack. The debt fold owes
+  v2's dMindYourWords row two changes (`[debt-fold]`).
+
+## [debt-fold] The debt round's lexicon pair, folded 2026-10-17
+
+Dispatches 61 and 62 audited this record at `424d2a7de`
+(`reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-a.md` and `-b.md`). Each of their 52 map rows
+(the debt comparison record's `[map-lexicon]`) went here, and LX-1 to LX-3 settled its forks. Each row's
+classes are its confirmed findings' own, from the two ledgers.
+
+| Defect | A | B | Disposition | Where the fix sits | Its classes |
+|---|---|---|---|---|---|
+| `ratified-readers` | 3, 30, 37, 41 | 2, 30, 38 | amend | `[vocabulary]`, `ratified` and its readers | `retirement-inventory-misses-readers-by-value` |
+| `acquire-family` | 25 | 14, 29 | fork, amend | `[drift]`, declared families (LX-1) | — |
+| `drift-vs-classes` | 1 | — | amend | `[classes]`, the conforming and debt rows | — |
+| `drift-object-undefined` | 48 | 54 | amend | `[drift]`, one verb per declared family per object | — |
+| `drift-enforcement-site` | — | 9 | amend | `[drift]`, where a split is judged | — |
+| `map-extraction-states` | 35 | 40 | fork, amend | `[integration]`, the states the lexicon reads (LX-2) | — |
+| `map-dependency-undeclared` | 18, 28, 36, 40 | 5, 25, 28, 42, 52 | fork, amend | `[integration]`, one extraction primitive (LX-2) | — |
+| `shim-uncovered` | 4, 17, 43 | 6, 16 | amend | `[packs]`, the shim rows; `[current]`'s dated note | `two-answers-to-one-question` |
+| `pin-absorb-dead` | 2 | 12 | amend | `[classes]`, the pin counts debt only | — |
+| `pin-rebaseline` | 47 | 49 | amend | `[vocabulary]`, the re-baseline | — |
+| `markers-pep698` | 16 | 1 | amend | `[forced]` item 3 | — |
+| `unresolved-base` | 49 | 47 | amend | `[forced]` item 1, three cases | — |
+| `declaration-home` | 19, 52 | 23, 35, 48 | fork, amend | `[forced]` item 2 (LX-3) | — |
+| `suppression-path` | 6 | 31 | amend | `[forced]` item 4 | — |
+| `bar-comparison-seam` | 12, 27 | 15 | amend | `[enforcement]` item 3 | `a-merge-of-the-default-branch-read-as-additions` |
+| `commit-check-seam` | 29, 45 | 8, 33, 51 | amend | `[enforcement]` item 2 | — |
+| `commit-check-moves` | 46 | 24 | amend | `[enforcement]` item 2 | — |
+| `replay-threshold` | 8 | 32 | amend | `[enforcement]` item 3 | — |
+| `stdlib-pack-platform` | 7, 15 | 17 | amend | `[packs]`, the stdlib pack and its acceptance | — |
+| `pack-selection-inputs` | 50 | 50 | amend | `[packs]`, selection states | — |
+| `pack-fixture` | 5 | — | amend | `[packs]`, its acceptance | `fixture-passes-by-finding-nothing` |
+| `prototype-live-import` | 42 | — | amend | `[packs]`, its acceptance; `[current]`'s dated note | `staged-break-substitutes-a-synthetic-value` |
+| `pack-row-validation` | — | 55 | amend | `[packs]`, validated at load; `[forced]` item 1 | — |
+| `forced-by-name-route` | 32 | 36 | amend | `[forced]`, the other values | `policy-value-with-no-route` |
+| `suggest-forced-aware` | 14 | — | amend | `[forced]`, `--suggest` | — |
+| `no-pack-owner-route` | 13 | — | amend | `[forced]` item 4 | `owner-item-without-its-reject-outcome` |
+| `vocabulary-proposal-route` | — | 22 | amend | `[vocabulary]`, a proposal pending or refused | `owner-item-without-its-reject-outcome` |
+| `nouns-table` | 26 | — | amend | `[drift]`, the noun canon | — |
+| `init-row-inventory` | — | 41 | amend | `[drift]`, the map's inventories | — |
+| `leg-placement` | — | 4 | amend | `[enforcement]` item 6 | — |
+| `later-records` | 9, 20, 51 | 27, 43, 56 | amend | `[enforcement]` item 6; the dated note in What changed elsewhere | — |
+| `chain-order` | — | 3 | owed | v2's dMindYourWords row, after review 72 | — |
+| `chain-count` | 39 | 45 | amend | the dated note in What changed elsewhere | — |
+| `l6-misstated` | 53 | 11 | amend | L-6's bullet; `[now]`'s dated note | — |
+| `settled-stale` | 10, 34 | 37 | amend | `[settled]`'s dated note | `amendment-leaves-its-other-half-standing` |
+| `drain-count` | 22 | — | amend | `[settled]`'s dated note | — |
+| `readme-misread` | 21 | 20, 39 | amend | `[fixes]`; `[current]`'s dated note | — |
+| `pytest-installed` | 24 | 18 | amend | `[forced]` item 5 | — |
+| `doc-reads-stale` | — | 46 | amend | `[fixes]` | — |
+| `three-pins` | — | 34 | amend | `[classes]`, one pin over three seams | — |
+| `pins-plain-edit` | 38 | — | amend | `[vocabulary]`, the conventions and their check | — |
+| `gaps-cite-asks` | 31 | — | amend | `[gaps-proposed]`'s dated note | — |
+| `raise-misread` | 23 | — | amend, owed | `[gaps-proposed]` item 4; the register's row after review 72 | — |
+| `gap2-example` | — | 13 | amend, owed | `[gaps-proposed]` item 2; the register's row after review 72 | `two-answers-to-one-question` |
+| `foreign-ask` | — | 10, 44 | amend | `[classes]`; `[history]`'s dated note | `two-answers-to-one-question` |
+| `main-red-stale` | — | 19 | amend | `[now]`'s dated note | — |
+| `fixture-undefined` | 11 | — | amend | `[classes]`, out of scope | — |
+| `tokenizers-thin` | 44 | 26 | amend | `[forced]` item 1, context per language | — |
+| `tag-check-point` | — | 7 | amend, owed | `[integration]`, the tag vocabulary; v2's roster after review 72 | — |
+| `declaration-second-carrier` | 33 | — | none: refuted, the example limits nothing and a stale arm guards the copy | — | — |
+| `import-census` | — | 21 | none: refuted, `lexicon.py`'s Python and JS extractors collect imports | — | — |
+| `keys-absent` | — | 53 | none: refuted, v2's `policy.on-missing-expansion` covers an absent component | — | — |
+
+- **Owed after review 72.** Two fixes sit in v2's dMindYourWords row, which reviews 71 and 72 read as a
+  spec. The parents become dWellOiledMachine and dWitnessedBar (`chain-order`), and the roster gains the
+  tag-name vocabulary check (`tag-check-point`). The register's gap-lex rows take the corrected evidence
+  (`raise-misread`, `gap2-example`, gap 3's history), and `gap-mem-10` moves to area Lexicon. They land
+  with the systems fold.
+- **The fold is unreviewed text.** A closing review of the debt fold is owed.

@@ -1616,6 +1616,11 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
 - 2026-10-17, session 1799cb98: dispatch 71 returned CLEAN WITH FIXES: 19 of 23 findings confirmed,
   15 items (2 high, 8 medium, 5 low), 9 agents, 111.8k out tokens (`reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-a.md`).
 
+- 2026-10-17, session 1799cb98: the lexicon pair is folded. The lexicon record's `[design]` is amended in
+  place under a dated line, with LX-1 to LX-3 applied, and its settled, current and gap sections take
+  dated corrections. Its `[debt-fold]` names where each of the 52 map rows went. Three fixes in v2's
+  dMindYourWords row and the register's gap-lex rows wait until review 72 returns.
+
 ## Instruments
 
 ### The gap-ownership join
