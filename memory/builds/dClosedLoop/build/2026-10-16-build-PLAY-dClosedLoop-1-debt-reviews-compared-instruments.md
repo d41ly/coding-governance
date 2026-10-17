@@ -1246,3 +1246,39 @@ B35 (opt-in-extension): confirmed twin A7, A19, A26, A37, B9, B26, B45
 B37 (restatement-gate): confirmed twin none
 B42 (batch-sort-key): confirmed twin A42, B15
 ```
+
+## [compare-runtime-fold] The runtime-fold pair's comparison, run over the record
+
+```text
+$ python compare_rounds.py reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-a.md \
+    reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-b.md \
+    build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared.md \
+    build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md wf_c8860577-b54 wf_dea5d838-89e map-runtime-fold
+== runs
+A: raw 22, confirmed 18, refuted 4, precision 0.82, high findings 2, agents 10, out 88.2k (sum of returned lines)
+B: raw 25, confirmed 24, refuted 1, precision 0.96, high findings 3, agents 10, out 119.9k (sum of returned lines)
+== defects
+map rows 27, confirmed defects 23, refuted-only 4
+both 8, A only 5, B only 10
+A alone covers 13 of 23 (57%)
+B alone covers 18 of 23 (78%)
+overlap (Jaccard) 0.35
+Chapman estimate of the population: 28.6, so about 6 found by neither
+A only: next-answers-untested, attended-no-allowance, fail-closed-arm-ungated, trap-untested, capability-claimed
+B only: return-key-per-act, fencing-epoch, neither-additions-untested, dispatcher-start-two-ways, allow-rule-bypass, second-permission-hook, attended-slot-release, cadence-dedup-race, stop-witness-producer, latency-fixture-no-red
+== severity (a defect takes its highest confirmed grade per round)
+high defects 3: binding-on-fail-open-entry, return-key-per-act, fencing-epoch
+  binding-on-fail-open-entry: A 3 B 3
+  return-key-per-act: A 0 B 3
+  fencing-epoch: A 0 B 3
+shared defects graded alike 6 of 8
+== lenses behind the defects one round alone found
+A: verification 3, seams 1, correctness 1
+B: correctness 5, verification 3, seams 2
+== refuted findings and their twins
+A6 (rt1-two-ways): confirmed twin none
+A8 (relaunch-cap-fixture): confirmed twin none
+A9 (act-ceiling-registration): confirmed twin none
+A22 (chain-count): confirmed twin none
+B8 (chain-count): confirmed twin none
+```
