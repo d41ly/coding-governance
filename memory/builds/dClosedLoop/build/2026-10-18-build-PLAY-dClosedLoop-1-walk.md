@@ -19,6 +19,7 @@ the owner's word on each.
 - The owner's request for wave 3, 2026-10-18, verbatim: "present wave 3".
 - The owner's word on wave 3 and its forks, 2026-10-18, verbatim: "approve wave 3, take the recommendations, present
   wave 4".
+- The owner's word on wave 4 and its forks, 2026-10-18, verbatim: "wave 4 approved, go with your recommendations".
 
 ## [chain] The chain at a glance
 
@@ -735,6 +736,26 @@ chain. It owns no node, and closes 9 gaps, 2 of them HIGH.
 |---|---|---|---|
 | WK-7 | Split dCalibratedLens at the Loop Review, now that its lead over dShippedRelease is eight units? | keep it whole: the split saves five to seven units for a new build, below what the splits taken so far returned per build, and the caps' home decides the low end; split it, the lens machinery after dWellOiledMachine and the weekly Loop Review after dTendedCadence | a structural decision about the chain |
 | WK-8 | How should dShippedRelease's adopter-named adapter ship? | a neutral adapter named for the engine it drives, the adopter's values in its own policy file, so the ban stays clean; the adopter's own adapter, registered at the integrations point from its own repository, gov shipping only the point; keep the name, and let the ban refuse it at build time | a structural decision |
+
+## [wave-4-answers] Wave 4's forks, answered
+
+The owner approved wave 4 and took each fork's recommendation, 2026-10-18 (`[words]`):
+- **WK-7:** dCalibratedLens stays whole. The spine split's pricing kept it whole when nothing could save more than
+  four units, and that answer stands on the moved premise. One new build would buy five to seven units, and each split
+  taken so far returned more per new build.
+- **WK-8:** dShippedRelease's first engine adapter is named for the engine it drives, never for an adopter. The
+  adopter's values live in that adopter's own policy file. The adapter is still fitted to what the first adopter runs,
+  as round 3 settled: signed container images on compose and systemd hosts. Its exact name is the spec's, under that
+  rule.
+
+WK-8's class is a planned unit or a node key that names an adopter. A unit becomes shipped work and many keys become
+shipped names, and govkit selfcheck's arm 10 refuses an adopter's name in any file gov ships. The design map's
+adopter-free arm now checks both against `tools/govkit/adopters.toml`, arm 10's own source, matched as arm 10
+matches. It was red on this unit before the fold and is green after it (the instruments record's `[adopter-free]`).
+It does not read purposes or prose, which describe gov's own records and never ship.
+
+With wave 4 the walk is complete: every build is walked and approved, and every fork it raised is answered. The
+build's exit, and any review before it, waits on the owner's word that the design has its full shape.
 
 ## [walk-instrument] The walk's facts, and the clause scan
 

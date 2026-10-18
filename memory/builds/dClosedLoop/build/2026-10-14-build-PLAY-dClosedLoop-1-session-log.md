@@ -2136,6 +2136,11 @@ The night pass's closing review, dispatch 105, derived from its run the same way
   - WK-8: dShippedRelease's "incms adapter" names an adopter, and govkit's adopter-name ban would refuse it as a
     shipped file.
 
+- 2026-10-18, session 1799cb98: the owner approved wave 4 and took both recommendations (the walk record's
+  `[wave-4-answers]`), so the walk is complete. dCalibratedLens stays whole (WK-7). dShippedRelease's first engine
+  adapter is named for its engine, never for an adopter (WK-8). The design map gains an adopter-free arm for the class,
+  seen red on that unit before the fold.
+
 ## Instruments
 
 ### The gap-ownership join

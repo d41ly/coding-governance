@@ -10,8 +10,8 @@ Usage:
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --check --plant <case>   damage the render, expect exit 1
       cases: drop-line, bad-count, ghost-rel, no-layer, fates-absent, fates-drop, fates-ghost, fates-bad, fates-unbuilt,
       fates-empty, fates-kit, fates-kit-drop, fates-kit-ghost, fates-count, fates-absorbed-stays, fates-bare-none,
-      fates-rel, fates-none, unpinned-count, unpinned-path, census, no-owner, orphan (an item's owner emptied), two-owners,
-      inferred (a point's owner kept with its declaration dropped)
+      fates-rel, fates-none, unpinned-count, unpinned-path, adopter-unit, adopter-key, census, no-owner, orphan (an item's
+      owner emptied), two-owners, inferred (a point's owner kept with its declaration dropped)
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --pending          list the nodes whose purpose waits on the owner
   --unfold <ns>[,<ns>...] renders those namespaces node by node, as an item's declared unfolds would.
 
@@ -28,6 +28,7 @@ import json
 import re
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -566,6 +567,31 @@ def unpinned_counts(plant=None):
     return found
 
 
+# Adopter-free: no planned unit and no node key names an adopter. A unit becomes shipped work and many keys shipped
+# names, and govkit selfcheck's arm 10 refuses an adopter's name in any file gov ships (WK-8 found "the incms
+# adapter"). The names are `adopters.toml`'s `[[adopter]]` rows, arm 10's own source, matched as arm 10 matches them: a
+# substring, case-insensitively. It does not read purposes or prose, which describe gov's own records and never ship
+# (live builds' and decision rows' purposes do name adopters), an adopter's neutral `key`, or a brand no row declares.
+ADOPTERS = REPO / "tools" / "govkit" / "adopters.toml"
+
+
+def adopter_free(A, ns, plant=None):
+    rows = tomllib.loads(ADOPTERS.read_text(encoding="utf-8")).get("adopter", [])
+    names = [n for r in rows for n in r.get("names", []) if n.strip()]
+    if not names:
+        return ["adopter-free: adopters.toml declares no names, so the scan reads nothing"]
+    pat = re.compile("|".join(re.escape(n) for n in names), re.I)
+    chain = [dict(c) for c in A["chain"]]
+    if plant == "adopter-unit":
+        chain[0]["units"] += f"; the {names[0]} adapter"
+    keys = [(name, n["key"]) for name, nodes in ns.items() for n in nodes or []]
+    if plant == "adopter-key":
+        keys[0] = (keys[0][0], f"{keys[0][1]}-{names[0]}")
+    found = [f"adopter-free: {c['build']} plans {u[:60]!r}, which names an adopter"
+             for c in chain for u in c["units"].split("; ") if pat.search(u)]
+    return found + [f"adopter-free: {name}.{k} names an adopter" for name, k in keys if pat.search(k)]
+
+
 def check(A, ns, out, folded, plant=None):
     findings = []
     lines = out.split("\n")
@@ -711,6 +737,7 @@ def check(A, ns, out, folded, plant=None):
         findings.append("no stale facts: a line holds a date")
     for name, i, q in unpinned_counts(plant):
         findings.append(f"no stale facts: {name}:{i} quotes {q!r} with nothing pinning it on its line")
+    findings += adopter_free(A, ns, plant)
     # Owner: every node a build must build names exactly one chain build, read from a declared field (PM-8).
     chain = {n["key"] for n in ns["chain"]}
     for name in OWNED:

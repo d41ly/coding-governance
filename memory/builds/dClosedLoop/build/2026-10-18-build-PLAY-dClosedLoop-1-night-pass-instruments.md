@@ -6329,6 +6329,130 @@ W.done += 1
 W.save()
 ````
 
+### `adopter_probe.py`
+
+WK-8's class over the real tree before it became the map's adopter-free arm: the planned units and node keys that name an adopter, and the purposes that do, which never ship.
+
+````python
+"""WK-8's class, run over the real tree before it becomes an arm: which planned units, and which map node keys and
+purposes, name an adopter as `tools/govkit/adopters.toml` declares them (govkit selfcheck arm 10's source).
+
+Usage: python -X utf8 adopter_probe.py   (from the worktree root)
+"""
+import importlib.util
+import pathlib
+import re
+import sys
+import tomllib
+
+ROOT = pathlib.Path.cwd()
+MAP = ROOT / "memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-map.py"
+spec = importlib.util.spec_from_file_location("map", MAP)
+m = importlib.util.module_from_spec(spec)
+sys.argv = [str(MAP)]
+spec.loader.exec_module(m)
+A, ns = m.derive()
+
+rows = tomllib.loads((ROOT / "tools/govkit/adopters.toml").read_text(encoding="utf-8")).get("adopter", [])
+names = [n for r in rows for n in r.get("names", [])]
+pat = re.compile("|".join(re.escape(n) for n in names), re.I)
+print(f"adopter names: {len(names)} from {len(rows)} rows")
+
+units = [(c["build"], u) for c in A["chain"] for u in c["units"].split("; ")]
+print(f"planned units scanned: {len(units)} over {len(A['chain'])} chain rows")
+for b, u in units:
+    if pat.search(u):
+        print(f"  UNIT {b}: {u[:120]!r}")
+
+keys = purposes = 0
+for name, nodes in ns.items():
+    for n in nodes or []:
+        keys += 1
+        if pat.search(n["key"]):
+            print(f"  KEY {name}.{n['key']}")
+        if n.get("purpose") and pat.search(n["purpose"]):
+            purposes += 1
+            print(f"  PURPOSE {name}.{n['key']}: {n['purpose'][:100]!r}")
+print(f"node keys scanned: {keys}; purposes naming an adopter: {purposes}")
+````
+
+### `fold_wk7_wk8.py`
+
+The owner's word on wave 4: WK-7 keeps dCalibratedLens whole, WK-8 names the first engine adapter for its engine, and the walk completes.
+
+````python
+"""Record the owner's word on wave 4 and fold its forks: WK-7 keeps dCalibratedLens whole, which changes nothing, and
+WK-8 names dShippedRelease's first engine adapter for the engine it drives, never for an adopter. The walk completes.
+
+Usage: python -X utf8 fold_wk7_wk8.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+W = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-walk.md")
+W.sub("""- The owner's word on wave 3 and its forks, 2026-10-18, verbatim: "approve wave 3, take the recommendations, present
+  wave 4".
+""", """- The owner's word on wave 3 and its forks, 2026-10-18, verbatim: "approve wave 3, take the recommendations, present
+  wave 4".
+- The owner's word on wave 4 and its forks, 2026-10-18, verbatim: "wave 4 approved, go with your recommendations".
+""", "words")
+W.insert_before("## [walk-instrument] The walk's facts, and the clause scan", """## [wave-4-answers] Wave 4's forks, answered
+
+The owner approved wave 4 and took each fork's recommendation, 2026-10-18 (`[words]`):
+- **WK-7:** dCalibratedLens stays whole. The spine split's pricing kept it whole when nothing could save more than
+  four units, and that answer stands on the moved premise. One new build would buy five to seven units, and each split
+  taken so far returned more per new build.
+- **WK-8:** dShippedRelease's first engine adapter is named for the engine it drives, never for an adopter. The
+  adopter's values live in that adopter's own policy file. The adapter is still fitted to what the first adopter runs,
+  as round 3 settled: signed container images on compose and systemd hosts. Its exact name is the spec's, under that
+  rule.
+
+WK-8's class is a planned unit or a node key that names an adopter. A unit becomes shipped work and many keys become
+shipped names, and govkit selfcheck's arm 10 refuses an adopter's name in any file gov ships. The design map's
+adopter-free arm now checks both against `tools/govkit/adopters.toml`, arm 10's own source, matched as arm 10
+matches. It was red on this unit before the fold and is green after it (the instruments record's `[adopter-free]`).
+It does not read purposes or prose, which describe gov's own records and never ship.
+
+With wave 4 the walk is complete: every build is walked and approved, and every fork it raised is answered. The
+build's exit, and any review before it, waits on the owner's word that the design has its full shape.
+
+""", "wave-4 answers")
+W.save()
+
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.insert_before("\nRevised: 2026-10-17, after the folds' closing review", """
+Revised: 2026-10-18, the walk's wave 4 (`build/2026-10-18-build-PLAY-dClosedLoop-1-walk.md` `[wave-4-answers]`):
+dCalibratedLens stays whole (WK-7). dShippedRelease's first engine adapter is named for the engine it drives, never
+for an adopter, with the adopter's values in that adopter's own policy file, since govkit selfcheck's arm 10 refuses
+an adopter's name in any file gov ships (WK-8). The walk is complete.
+""", "revision note")
+V.sub("; the deploy engine; the incms adapter; ",
+      "; the deploy engine; the first engine adapter, named for the engine it drives and never for an adopter, fitted to "
+      "signed container images on compose and systemd hosts, with the adopter's values in that adopter's own policy file (WK-8); ",
+      "WK-8 unit")
+V.save()
+
+X = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md")
+X.sub("the release runner. Each adopter's engine adapter is a dShippedRelease unit |",
+      "the release runner. Each engine adapter is named for the engine it drives, never for an adopter, and an "
+      "adopter's values live in that adopter's own policy file (WK-8); the first is a dShippedRelease unit |",
+      "WK-8 engine kits")
+X.save()
+
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-18, session 1799cb98: the owner approved wave 4 and took both recommendations (the walk record's
+  `[wave-4-answers]`), so the walk is complete. dCalibratedLens stays whole (WK-7). dShippedRelease's first engine
+  adapter is named for its engine, never for an adopter (WK-8). The design map gains an adopter-free arm for the class,
+  seen red on that unit before the fold.
+""", "event")
+L.save()
+````
+
 ### `record_instruments.py`
 
 This record's own writer.
@@ -6455,6 +6579,10 @@ MINE = [
     ("walk7/lens_now.py", "Wave 4: SP-2 re-priced on today's chain, dConvergedCharter's parents and the Loop Review "
      "split."),
     ("walk7/record_walk7.py", "Wave 4 presented with its two forks."),
+    ("walk8/adopter_probe.py", "WK-8's class over the real tree before it became the map's adopter-free arm: the "
+     "planned units and node keys that name an adopter, and the purposes that do, which never ship."),
+    ("walk8/fold_wk7_wk8.py", "The owner's word on wave 4: WK-7 keeps dCalibratedLens whole, WK-8 names the first "
+     "engine adapter for its engine, and the walk completes."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -6553,15 +6681,34 @@ The map's arm on the same tree:
 
 """ + block("text", "$ python map.py --check\n" + "\n".join(
     l for l in read(S / "night/map_path_red.out").split("\n") if l.startswith(("FINDING", "map:"))) + "\nrc 1"))
+parts.append("""
+## [adopter-free] WK-8's class, before and after the fold
+
+Wave 4 found a planned unit named for an adopter, which govkit selfcheck's arm 10 would refuse once built. The
+predicate, run over the real tree before the arm was written, reports the purposes that name an adopter but grades
+none of them:
+
+""" + block("text", "$ python adopter_probe.py\n" + read(S / "walk8/adopter_probe.before.out")) + """
+The map's adopter-free arm on the same tree, before the fold:
+
+""" + block("text", "$ python map.py --check\n" + "\n".join(
+    l for l in read(S / "walk8/map_adopter_red.out").split("\n") if l.startswith(("FINDING", "map:"))) + "\nrc 1") + """
+The predicate after the fold, its purpose lines left out:
+
+""" + block("text", "$ python adopter_probe.py\n" + read(S / "walk8/adopter_probe.after.out")) + """
+The arm's two plants are re-run in `[plants]`, and the map's green run is in `[final]`.
+""")
 plants = []
 for p in ("no-layer", "fates-absent", "fates-drop", "fates-ghost", "fates-bad", "fates-unbuilt", "fates-empty",
           "fates-kit", "fates-kit-drop", "fates-kit-ghost", "fates-count", "fates-absorbed-stays", "fates-bare-none",
-          "fates-rel", "fates-none", "unpinned-count", "unpinned-path"):
+          "fates-rel", "fates-none", "unpinned-count", "unpinned-path", "adopter-unit", "adopter-key"):
     out, rc = run(B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py", "--check", "--plant", p)
     plants.append(f"$ python map.py --check --plant {p}\n" + "\n".join(l for l in out.split("\n") if l.startswith(("FINDING", "atlas:")))
                   + f"\nrc {rc}")
     if rc != 1:
         sys.exit(f"plant {p} did not red")
+    if p.startswith("adopter-") and "FINDING adopter-free" not in out:
+        sys.exit(f"plant {p} redded without the adopter-free finding")
 parts.append("""
 ## [plants] The map's plants, re-run
 
@@ -7148,6 +7295,50 @@ rc 1
 ````
 
 
+## [adopter-free] WK-8's class, before and after the fold
+
+Wave 4 found a planned unit named for an adopter, which govkit selfcheck's arm 10 would refuse once built. The
+predicate, run over the real tree before the arm was written, reports the purposes that name an adopter but grades
+none of them:
+
+````text
+$ python adopter_probe.py
+adopter names: 3 from 3 rows
+planned units scanned: 335 over 20 chain rows
+  UNIT dShippedRelease: 'the incms adapter'
+  PURPOSE live-build.dPinnedHandoff: 'three habits of the NicoCares handoff briefs, as spec shapes a machine reads'
+  PURPOSE live-build.aFerriedDossier: "an adopter's dossier, carried in from inCMS"
+  PURPOSE closed-build.dGaugedVintage: 'the second inCMS dossier, triaged against this tree'
+  PURPOSE decision-row.TOOL-dRetiredFork-4: "inCMS's D1 is nested template INTERPOLATION, not a nested agent loop; two spec revisions argued a fi"
+  PURPOSE decision-row.TOOL-dUnstuckLanding-21: 'OWNER RULING (2026-10-04): dUnstuckLanding BUILDS asks TOOL-dUnstuckLanding-3 to -10 in gov, not des'
+  PURPOSE decision-row.TOOL-dScaffoldedMirror-16: 'F4 (retire P1 if unused across two adopters) SUPERSEDED: 136 definitions and ZERO offenders since th'
+  PURPOSE decision-row.DEPL-dRetiredFork-10: "the `forked` role is declared in OPPOSITE directions by gov and inCMS, and inCMS's own two registers"
+  PURPOSE decision-row.TOOL-dMuffledSentinel-3: '**drift-audit 1.10 and unattended 1.19, over the bytes unit 2 changed**: an adopter pulling unit 2 c'
+node keys scanned: 2273; purposes naming an adopter: 8
+````
+
+The map's adopter-free arm on the same tree, before the fold:
+
+````text
+$ python map.py --check
+map: 2273 nodes in 30 namespaces; 32108 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1532, derived 259, pending 482
+FINDING adopter-free: dShippedRelease plans 'the incms adapter', which names an adopter
+rc 1
+````
+
+The predicate after the fold, its purpose lines left out:
+
+````text
+$ python adopter_probe.py
+adopter names: 3 from 3 rows
+planned units scanned: 335 over 20 chain rows
+node keys scanned: 2275; purposes naming an adopter: 8
+````
+
+The arm's two plants are re-run in `[plants]`, and the map's green run is in `[final]`.
+
+
 ## [plants] The map's plants, re-run
 
 ````text
@@ -7266,6 +7457,12 @@ rc 1
 $ python map.py --check --plant unpinned-path
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:596 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
+$ python map.py --check --plant adopter-unit
+FINDING adopter-free: dGroundRules plans 'the NicoCares adapter', which names an adopter
+rc 1
+$ python map.py --check --plant adopter-key
+FINDING adopter-free: layer.instruction-NicoCares names an adopter
+rc 1
 ````
 
 
@@ -7273,12 +7470,12 @@ rc 1
 
 ````text
 $ design map
-map: 2273 nodes in 30 namespaces; 32108 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1532, derived 259, pending 482
+map: 2275 nodes in 30 namespaces; 32108 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1534, derived 259, pending 482
 rc 0
 
 $ atlas
-atlas: derived — 157 records, 2759 sections, 185 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 157 records, 2765 sections, 186 decision sections, 16 comparison areas, 33 principles
 rc 0
 
 $ fold state

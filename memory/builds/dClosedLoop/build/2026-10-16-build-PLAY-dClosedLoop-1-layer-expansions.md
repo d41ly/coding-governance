@@ -319,7 +319,7 @@ dead probe as green.
 |---|---|
 | tag and definition | `layer.integrations`, as above |
 | instruction units | the adapter author's unit (the header, the dead-probe rule); the grant rule: a secret is named, never written; the release view; the deployer role's release instruction |
-| engine kits | the `integrations` kit: the header factory and the registry check; `verdict:remote-ci`, extracted from `read_held_reds`; `host:cloud-routine`; notification channels; the release runner. Each adopter's engine adapter is a dShippedRelease unit |
+| engine kits | the `integrations` kit: the header factory and the registry check; `verdict:remote-ci`, extracted from `read_held_reds`; `host:cloud-routine`; notification channels; the release runner. Each engine adapter is named for the engine it drives, never for an adopter, and an adopter's values live in that adopter's own policy file (WK-8); the first is a dShippedRelease unit |
 | record kinds | `remote-verdict` (SHA, tree, writer, run id, workflow blob, conclusion); `release` (one per SHA and environment, with its outcome: verified, held, rolled forward, rolled back, halted or unverified); `delivery` (a notification and its receipt); `grant` (declared scopes, never values) |
 | extension points declared | none: every kind registers at a core point (`[core-points]`) |
 | extension points used | Flow's verdict backends and release slot; Runtime's command, host, notification and journal-reader points, and the grant field on adapter rows |
