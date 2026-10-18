@@ -216,8 +216,9 @@ Gaps: gap-flow-18, gap-roles-21, gap-rt-23 and gap-test-18.
    - Each purpose is keyed to its definition's body hash. Keyed by file, it would rot: 60% of files change in a
      week, against 3.4% of definition bodies.
 4. **`git grep` is the floor,** for any language with no extractor and for the population hunts no map answers.
-5. **Who gets it:** the spec writer, builder, tester, researcher, architect and reviewer, and the prompt writer
-   through its actor (`memory.code-roles`). The map's delivery table now includes the researcher and the prompt writer.
+5. **Who gets it:** every role, by the owner's NP-9. The night pass proposed the working roles: the spec writer,
+   builder, tester, researcher, architect and reviewer, and the prompt writer through its actor
+   (`memory.code-roles`). The map's delivery table now includes the researcher and the prompt writer.
 6. **Level 0 holds one counted `code` line,** never a line per file.
    At `15cec9200`, the map stood at 31,203 of its 32,768 B.
 
@@ -260,7 +261,7 @@ rows):
    - **line spans in a sidecar** lost hardest. 88.9% had shifted within 30 days.
 
    NP-12 keeps the owner's own idea, explicit regions everywhere, as an option.
-4. **`gov tag bundle <tag>`** returns one manifest.
+4. **`gov tag bundle <tag>`** returns one manifest, or by flag the content inlined (`tags.bundle: both`, NP-14).
    - The node comes first, then every inbound edge grouped by type.
    - Each row reads `path:span · type · bytes`, and its content is pulled per row.
    - The `roles` bundle runs about 44 rows unfolded, and 39 with its kit folded.
@@ -434,7 +435,8 @@ Maintain.
   - Later rounds overtook at least nine of them.
   - No inventory was at function level with a fate.
 - **Now it is,** in `build/2026-10-18-build-PLAY-dClosedLoop-1-fates.md`.
-  - 131 parts: 26 stay, 70 are reshaped, 21 are merged and 14 retired. None is left undecided.
+  - 131 parts: 24 stay, 70 are reshaped, 23 are merged and 14 retired, after the owner's row-by-row review
+    (NP-22). None is left undecided.
   - Dispatch 104 derived 118 rows.
   - The night pass split some rows, and added the unattended kit's dissolution and its modes. It also decided
     playbook mode's home.
@@ -541,6 +543,9 @@ Each fork's first option is the recommendation, and the design as folded shows i
 | NP-23 | The night's new nodes and their owners? | approve them as proposed; review them | the ownership record's night-pass amendment |
 | NP-24 | dDeclaredLoop now holds 47 units, and the critical path runs through dTendedCadence and dCalibratedLens at 211 (`15cec9200`) | price a split of dDeclaredLoop, and a lighter dCalibratedLens, before the walk resumes; keep the chain as it stands | a structural decision about the chain |
 
+The owner answered all twenty-four on 2026-10-18 (`[answers]`), and the design carries the answers
+(`[folded-answers]`).
+
 The walk is not a fork: wave 1 still waits for the owner's read, and wave 2 follows it.
 
 ## [review-fold] The closing review, folded
@@ -634,3 +639,120 @@ The night pass's scripts and probes, and their runs, are in
 - **The gap join** reads 250 keys against 16 chain rows, each owned exactly once, rc 0.
 - **The preset check** reads 205 keys, 192 presettable, and 192 preset rows, with no findings.
 - **The critical path** is 211 units at `15cec9200`.
+
+## [answers] The owner's answers, 2026-10-18
+
+Asked on the owner's return, "put the forks to me", through AskUserQuestion in six batches of four, the
+recommendation first. Each answer is quoted as the tool returned it.
+
+- NP-1, asked as "NP-1: Who should drive a build while you attend? (a structural decision)": "Supervisor always (Recommended)"
+- NP-2, asked as "NP-2: When you attend, what should a bare attend request turn on? (All three become allowed values of `attendance`, beside `unattended`.)": "Announce + confirm steps (Recommended)"
+- NP-3, asked as "NP-3: How long should an attend or unattend request hold, as `attendance.scope`'s default?": "The build (Recommended)"
+- NP-4, asked as "NP-4: When should `/unattended` go? (a structural decision)": "At convergence (Recommended)"
+- NP-5, asked as "NP-5: Who should verify a probe, as `probe.design`'s actor? (a structural decision, since each item has one actor)": "The tester, cold (Recommended)"
+- NP-6, asked as "NP-6: Who should authorize an experiment's agents, as `probe.experiment.authority`'s default?": "Within the agent cap by default, opt-in as an owner switchable policy"
+- NP-7, asked as "NP-7: When should an observation in your request be verified, as `probe.observations`'s default?": "Before placement (Recommended)"
+- NP-24, asked at `a15c1f55c` as "NP-24: dDeclaredLoop is now 47 units, and the critical path is 211 units through dTendedCadence and dCalibratedLens. Price a split before the walk resumes? (a structural decision about the chain)": "Price it now (Recommended)"
+- NP-8, asked as "NP-8: How large should the per-item `code` slot be, as `memory.code-budget`'s default?": "16KB default, freely adjustable by the owner by policy"
+- NP-9, asked as "NP-9: Which roles should get the `code` slot, as `memory.code-roles`'s default?": "Every role"
+- NP-10, asked as "NP-10: Which languages should the core extract definitions and calls for, as `memory.code-languages`'s default?": "Explain the implications of this. Leaning towards ctags but what are pros and cons?"
+- NP-11, asked as "NP-11: Where should code purposes live, as `memory.code-enrich`'s default?": "Slots by body hash (Recommended)"
+- NP-12, asked as "NP-12: How should a region be marked? (a structural decision: P33 and the annotation grammar)": "Derived, gov:end if needed (Recommended)"
+- NP-13, asked as "NP-13: Can an instruction be scoped to a feature? (a structural decision)": "Yes, a selector (Recommended)"
+- NP-14, asked as "NP-14: What should `gov tag bundle` return, as `tags.bundle`'s default?": "Both, by flag"
+- NP-15, asked as "NP-15: How many edge types should the relational syntax have? (a structural decision)": "Twelve plus cites (Recommended)"
+- NP-16, asked as "NP-16: What should become of the codebase-map dossier? (a structural decision)": "Header becomes the node (Recommended)"
+- NP-17, asked as "NP-17: How should new text cite code? (a structural decision, read through `tags.positional`)": "path#symbol or blob (Recommended)"
+- NP-22, asked as "NP-22: Accept the fates proposed for the 19 parts no record had decided?": "Review row by row"
+- NP-23, asked as "NP-23: Accept the night's new nodes and their owning builds?": "Review them"
+- NP-18, asked as "NP-18 (SDLC playbook): Should parallel work be bounded by your review capacity?": "Measure first (Recommended)"
+- NP-19, asked as "NP-19 (SDLC playbook): Should a security review recur? (adds the key `maintain.security-review`)": "Weekly by default, owner-adjustable by policy"
+- NP-20, asked as "NP-20 (SDLC playbook): Should the core guards install into managed settings? (adds the key `install.guards`)": "Project settings (Recommended)"
+- NP-21, asked as "NP-21 (SDLC playbook): Should Maintain tier its readings by deviation?": "Bands now"
+
+NP-10 was answered with a question. The session then gave its pros and cons. ctags gives definitions, their kinds and
+mostly their end lines for about 140 languages. It gives no calls and no docstrings, and adds nothing for gov's own
+Python, shell and JavaScript. It costs a binary on every node and adopter, version skew between nodes and a GPL
+licence, and a missing ctags must stop the run rather than degrade. The session recommended the built-in extractors
+by default with a ctags pack a repository opts into, and asked again:
+
+- NP-10, asked as "NP-10, again: which extraction should `memory.code-languages` default to? (The other options stay allowed values.)": "Built-in, ctags pack opt-in (Recommended)"
+
+NP-22, "Review row by row", was asked one row at a time. The session changed one recommendation on review:
+`migrate_backlog` should not retire after gov's own migration, since gov and its adopters still carry backlog
+shards and `[core]` asks for an upgrade step.
+
+- NP-22, asked as "NP-22 · 1/19 · workflows `drift-audit-*.js`, today the drift audit's agent harnesses. Proposed: RESHAPED into observability's detectors, read as Maintain's cadence readings (dTendedCadence). Approve?": "Reshape to detectors (Recommended)"
+- NP-22, asked as "NP-22 · 2/19 · workflows `orient-counterfactual.js`, a one-off kickoff experiment. Proposed: RETIRED, since the `experiment` shape kind (dBoundRoles) generalises it. Approve?": "Retire it (Recommended)"
+- NP-22, asked as "NP-22 · 3/19 · memory-tree `routed_commits`: every commit on a product path names a unit specced before it. Proposed: MERGED into `build.scope`'s commit check and the touch join (dScopedBuild). Approve?": "Merge into build.scope (Recommended)"
+- NP-22, asked as "NP-22 · 4/19 · memory-tree `check-arms`: the rows recording which population each check arms. Proposed: RESHAPED into the ledger's armed populations (dWitnessedBar). Approve?": "Move to the ledger (Recommended)"
+- NP-22, asked as "NP-22 · 5/19 · memory-tree `row_grammar` (check 20): row grammar and id collisions within one file. Proposed: RESHAPED into the record-kind registry's generated schema checks (dTotalRecall). Approve?": "Generate from registry (Recommended)"
+- NP-22, asked as "NP-22 · 6/19 · memory-tree `migrate_backlog`: moves the backlog from shards to per-build files. The night pass proposed RETIRED once the migration has run. I now recommend keeping it as an upgrade step instead. Which?": "Adopter upgrade step (Recommended)"
+- NP-22, asked as "NP-22 · 7/19 · codebase-map `map_diff`: a commit range's feature digest, and stale dossiers. Proposed: RESHAPED into a range read over the `code` record, with enrichment staleness by body hash (dTotalRecall). Approve?": "Read over code record (Recommended)"
+- NP-22, asked as "NP-22 · 8/19 · codebase-map `check_gate_coverage`: an adopter's gate compares every artifact the map engine writes. Proposed: STAYS, as a distribution check for the optional map's install (dShippedRelease). Approve?": "Merge into govkit check"
+- NP-22, asked as "NP-22 · 9/19 · memory-recall `bench` and `union`: the retrieval bench and its union of runs. Proposed: RESHAPED into an `experiment` shape instance over recall's corpus (dBoundRoles). Approve?": "An experiment instance (Recommended)"
+- NP-22, asked as "NP-22 · 10/19 · memory-recall `check-recall`: recall's floor check. Proposed: RESHAPED into the record finder's leg (dTotalRecall). Approve?": "Record finder's leg (Recommended)"
+- NP-22, asked as "NP-22 · 11/19 · unattended `run-lease.js`: binds a session to its run for the three hooks. Proposed: RESHAPED into the session binding record (dWellOiledMachine). Approve?": "Session binding record (Recommended)"
+- NP-22, asked as "NP-22 · 12/19 · unattended `check-unattended`: the kit's own gate. Proposed: RESHAPED into the stage coverage gates and the loop kit's conformance gates (dDeclaredLoop). Approve?": "Retire with the kit"
+- NP-22, asked as "NP-22 · 13/19 · unattended `check-pass-order` and `check-brief-recorded`: pass order and brief records. Proposed: RESHAPED into the work order's hash and the shape-run rows (dBoundRoles). Approve?": "Work order hash (Recommended)"
+- NP-22, asked as "NP-22 · 14/19 · unattended `check-arms-groups`: lints the batched self-test's groups. Proposed: RETIRED, since the self-test file it lints dissolves with the kit (dConvergedCharter). Approve?": "Retire it (Recommended)"
+- NP-22, asked as "NP-22 · 15/19 · pytest-parallel-guardrails' xdist guard: bounded parallel tests. Proposed: STAYS, as an adopter-only Flow leg pack that gov declares and never runs, since gov has no xdist suite (dWitnessedBar); the kit stays optional. Approve?": "Adopter-only pack (Recommended)"
+- NP-22, asked as "NP-22 · 16/19 · run-gates `gate-legs.json`, the leg manifest. Proposed: RESHAPED, with v2's `tag` and `purpose` fields, and its rows generated by the leg factory from the packs' declarations (dWitnessedBar). Approve?": "Generated manifest (Recommended)"
+- NP-22, asked as "NP-22 · 17/19 · `check-agent-cap-restatement.sh`: catches the fan-out bound restated outside its source. Proposed: RESHAPED, generalised to any policy value restated outside the catalogue (dOrderedCharter). Approve?": "Generalise it (Recommended)"
+- NP-22, asked as "NP-22 · 18/19 · `check-dead-paths.sh`: dead references. Proposed: STAYS, its dangling-path function shared with Maintain's dead-pointer detector (dTendedCadence). Approve?": "Merge into the detector"
+- NP-22, asked as "NP-22 · 19/19 · the kickoff skill's manifest ratchet: the kickoff manifest audit. Proposed: RESHAPED into the guarded instruction manifest (dOrderedCharter). Approve?": "Instruction manifest (Recommended)"
+
+NP-23, "Review them", was asked as four groups, the fourth adding the keys NP-19 to NP-21 bring:
+
+- NP-23, asked as "NP-23 · 1/4 · The probe program: its 7 items (probe.trigger, pin, design, experiment, run, judge, return), its 4 keys (probe.points, probe.raise, probe.observations, probe.experiment.authority) and the `probe` record kind, all to dDeclaredLoop. Approve?": "All to dDeclaredLoop (Recommended)"
+- NP-23, asked as "NP-23 · 2/4 · Attendance: the `attendance` key to dDeclaredLoop, whose rule rides the breakpoint seam; `attendance.scope` and the `attendance override` kind to dWellOiledMachine, which receives requests. Approve?": "Split as proposed (Recommended)"
+- NP-23, asked as "NP-23 · 3/4 · Code depth: the `code` kind (replacing `symbols` and `callers`), `memory.code-languages` and `memory.code-enrich` to dTotalRecall; `memory.code-budget` and `memory.code-roles` to dBoundRoles. Approve?": "Split as proposed (Recommended)"
+- NP-23, asked as "NP-23 · 4/4 · The rest: `tags.bundle` and `tags.bundle-rows` to dOrderedCharter; the `playbook` and `playbook set` kinds to dIndexedDesign; and your answers' new keys, `maintain.security-review` and `maintain.tiers` to dTendedCadence, `install.guards` to dShippedRelease. Approve?": "Approve all (Recommended)"
+
+## [folded-answers] What the answers changed
+
+- **v2's catalogue and presets** (`build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md`, its revision note
+  dated 2026-10-18):
+  - every pending marker gives way to the owner's answer;
+  - four defaults move: `probe.experiment.authority` to within-cap, `memory.code-budget` to 16k, `memory.code-roles`
+    to every-role and `tags.bundle` to both;
+  - `memory.code-languages` reads builtin, builtin+ctags or ctags;
+  - three keys land: `maintain.security-review`, `maintain.tiers` and `install.guards`, the last among the keys presets
+    never touch;
+  - the preset rows follow, each `standard` cell equal to the default.
+- **v2's chain rows:** four planned units, and the clause changes the answers imply:
+  - dTotalRecall gains the ctags extractor pack;
+  - dShippedRelease gains `install.guards`, and its update hooks run the backlog migration as an upgrade step;
+  - dTendedCadence gains the recurring security review and the deviation bands, and its dead-pointer detector absorbs
+    `check-dead-paths.sh` with its merge-bar leg;
+  - dCalibratedLens reads the owner queue's depth with no bound;
+  - dOrderedCharter's `gov tag bundle` inlines content by flag.
+- **The gap register:** gap-mem-34, gap-deploy-14, gap-maint-12, gap-maint-13 and gap-review-16, each owned once, and
+  the tally re-measured.
+- **The fates record:** the nineteen proposed rows are now decided by the owner, and four fates change:
+  - `migrate_backlog` is reshaped into an update's upgrade step;
+  - `check_gate_coverage` merges into `govkit check`;
+  - `check-unattended` retires with its kit;
+  - `check-dead-paths.sh` merges into Maintain's dead-pointer detector.
+
+  The counts become 24 stay, 70 reshaped, 23 merged and 14 retired, and the design map's count arm reads them.
+- **The ownership record:** NP-23's approval, with the three new keys' owners.
+- **flow-steps, the systems record and this record's summaries:** NP-5's verifier, NP-14's bundle, NP-9's roles and
+  NP-22's counts.
+- **The chain:** the critical path grows by three units, one in dTotalRecall and two in dTendedCadence, and still runs
+  through dTendedCadence and dCalibratedLens. The instruments record's `[final]` holds the run.
+
+**Interpretations, for the owner to correct:**
+- NP-6 keeps `free` as an allowed value, since P10 makes every offered option one. The owner's words name within-cap
+  as the default and opt-in as the switch.
+- NP-8's "freely adjustable" reads as any size in KB, 4k, 8k and 16k among them, so the preset check reads it as
+  free-form.
+- NP-14's `both` returns the manifest unless a call passes `--inline` with the byte budget it names.
+- NP-21's bands measure a reading's deviation from its pin. Rolling baselines, the playbook's reference, were not
+  asked, and stay out.
+- NP-20's `install.guards` joins the keys presets never touch, since where the guards install is the operator's
+  choice.
+- NP-22's merge of `check-dead-paths.sh` keeps its merge-bar leg, registered by the detector at Test's leg-pack point,
+  so a dead path still blocks a merge.
+
+**Owed next:** NP-24's pricing of a dDeclaredLoop split and a lighter dCalibratedLens, before the walk resumes.

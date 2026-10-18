@@ -2083,6 +2083,11 @@ The night pass's closing review, dispatch 105, derived from its run the same way
   six fates arms, where the fold left twelve findings. Both are fixed. No gate reads an owner named in prose, so
   `amendment-leaves-its-other-half-standing` gains a checklist line instead.
 
+- 2026-10-18, session 1799cb98: the owner answered NP-1 to NP-24 through AskUserQuestion in six batches. NP-10 was
+  asked again after its pros and cons, NP-22 reviewed row by row and NP-23 in four groups (the night-pass record's
+  `[answers]`). The fold moves four defaults, adds three keys, five gaps and four planned units, and decides the
+  fates record's nineteen proposed rows, four of them changed (`[folded-answers]`). NP-24's pricing is next.
+
 ## Instruments
 
 ### The gap-ownership join

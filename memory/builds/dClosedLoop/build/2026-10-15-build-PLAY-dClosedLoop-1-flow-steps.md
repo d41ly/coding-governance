@@ -538,7 +538,8 @@ feeds `deploy.current`.
   captured at the pinned SHA and the executor can re-run. An agent's reading of a screenshot is claimed. The owner's
   own observation is an owner disposition. A visual defect worth keeping becomes a deterministic probe, seen red.
 - **Roles:** the tester verifies cold; the researcher designs an experiment; the executor runs it; a scorer or a
-  blind judge decides it. Who verifies is a structural choice, NP-5, since one actor acts per item (`[rules]`).
+  blind judge decides it. The tester verifies, as the owner chose (NP-5, 2026-10-18), since one actor acts per
+  item (`[rules]`).
 - **Instruction:** the probe and tester-return schemas, each verdict set closed; the policies: `probe.points`,
   `probe.raise`, `probe.observations`, `probe.experiment.authority` and `flow.route-backs`.
 - **Memory:** writes the trigger, the probe record and an experiment's shape-run rows.

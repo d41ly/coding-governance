@@ -225,7 +225,8 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 
 Revised 2026-10-18, the night pass (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md`, point 4): the tag system gains one closed set of typed edges, each declared
 at the site that owns its fact, with every inverse derived, and `gov tag bundle`, which returns a tag's members,
-regions and instructions as a manifest of ranges under `tags.bundle-rows`. `feature` becomes an instruction selector
+regions and instructions as a manifest of ranges under `tags.bundle-rows`, or with their content inlined, by
+flag (`tags.bundle`, NP-14). `feature` becomes an instruction selector
 once dTotalRecall registers it (P33).
 
 - **Grammar.** `tag := <ns>.<seg>(.<seg>)*`, `seg := [a-z0-9][a-z0-9-]*`, at most 64 B. A section is

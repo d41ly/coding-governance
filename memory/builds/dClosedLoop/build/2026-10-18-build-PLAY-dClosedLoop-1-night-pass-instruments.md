@@ -3013,6 +3013,486 @@ plant() {   # label, then the probe's plant arguments
 cat "$S/audit/plants-review.txt"
 ````
 
+### `chain_clauses.py`
+
+The owner's answers: prints a chain row's planned-units clauses, numbered, to find each clause an answer touches.
+
+````python
+"""Print chosen chain rows of architecture v2, one planned-units clause per line, numbered, with the row's other cells.
+
+Usage: python -X utf8 chain_clauses.py <v2.md> <build> [<build> ...] [--grep <regex>]
+"""
+import re
+import sys
+
+args = sys.argv[1:]
+pat = None
+if "--grep" in args:
+    i = args.index("--grep")
+    pat = re.compile(args[i + 1], re.I)
+    args = args[:i] + args[i + 2:]
+text = open(args[0], encoding="utf-8").read()
+chain = re.search(r"^## \[chain\].*?(?=^## \[)", text, flags=re.M | re.S).group(0)
+for b in args[1:]:
+    row = next((ln for ln in chain.split("\n") if ln.startswith(f"| {b} |")), None)
+    if row is None:
+        print(f"=== {b}: no row")
+        continue
+    cells = [c.strip() for c in row.strip().strip("|").split(" | ")]
+    print(f"=== {b} · {len(cells)} cells · stage {cells[1]} · after {cells[2]}")
+    # split on '; ' outside parentheses, backticks and double quotes, as the clause scan does
+    out, depth, tick, quote, cur = [], 0, False, False, ""
+    s = cells[3]
+    i = 0
+    while i < len(s):
+        ch = s[i]
+        if ch == "`" and not quote:
+            tick = not tick
+        elif ch == '"' and not tick:
+            quote = not quote
+        elif ch == "(" and not tick and not quote:
+            depth += 1
+        elif ch == ")" and not tick and not quote:
+            depth -= 1
+        if s.startswith("; ", i) and not (depth or tick or quote):
+            out.append(cur)
+            cur = ""
+            i += 2
+            continue
+        cur += ch
+        i += 1
+    out.append(cur)
+    for n, c in enumerate(out, 1):
+        if pat is None or pat.search(c):
+            print(f"{n:2}: {c[:300]}")
+    print(f"   units {len(out)} · other cells: {' | '.join(x[:200] for x in cells[4:])}")
+````
+
+### `fold_answers.py`
+
+The owner's answers to NP-1 to NP-24, folded into v2, the gap register, the fates record, the ownership record, flow-steps, the systems record and the night-pass record's summaries.
+
+````python
+"""Fold the owner's answers to NP-1..NP-24 (2026-10-18) into the design records: v2's catalogue, presets, P33 and
+chain rows, the gap register's rows, the fates record, the ownership amendment, flow-steps, the systems record and
+the night-pass record's summaries. The night-pass record's [answers] and [folded-answers] sections, and the register's
+tally, are written by their own scripts after this one runs.
+
+Usage: python -X utf8 fold_answers.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+
+
+def after_line(rec, prefix, block, label):
+    """Insert block after the one line starting with prefix."""
+    lines = rec.text.split("\n")
+    hits = [i for i, ln in enumerate(lines) if ln.startswith(prefix)]
+    if len(hits) != 1:
+        sys.exit(f"{rec.path.name}: {label}: {len(hits)} lines start with {prefix!r}")
+    lines[hits[0] + 1:hits[0] + 1] = block.split("\n")
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+# --- architecture v2 -------------------------------------------------------------------------------------------
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.insert_before("\nRevised: 2026-10-17, after the folds' closing review", """
+Revised: 2026-10-18, the owner's answers to the night pass's forks (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[answers]`):
+- the recommendation stands for NP-1 to NP-5, NP-7, NP-11 to NP-13, NP-15 to NP-20 and NP-24, and for NP-10, asked
+  again after its pros and cons;
+- four defaults move: `probe.experiment.authority` to within-cap (NP-6), `memory.code-budget` to 16k with any size
+  allowed (NP-8), `memory.code-roles` to every-role (NP-9) and `tags.bundle` to both (NP-14);
+- `maintain.tiers` lands with bands as its default (NP-21), beside `maintain.security-review` (NP-19) and
+  `install.guards` (NP-20), each with its gap and planned unit; the owner queue's depth joins the Loop Review's
+  readings with no bound (NP-18), and `memory.code-languages`' ctags pack gains its unit and gap (NP-10);
+- the fates record's nineteen proposed rows are decided row by row, four of them changed (NP-22), and the night
+  pass's nodes and owners are approved, with the three new keys' (NP-23);
+- a split of dDeclaredLoop and a lighter dCalibratedLens are priced before the walk resumes (NP-24).
+""", "revision note")
+
+V.sub("which attended value a bare attend request selects, night pass, pending NP-2; the default shown is the "
+      "recommendation until the owner answers |",
+      "a bare attend request selects confirm-steps, the owner's NP-2, 2026-10-18 |", "attendance")
+V.sub("how long an attend or unattend request holds, night pass, pending NP-3; the default shown is the recommendation "
+      "until the owner answers |",
+      "how long an attend or unattend request holds, the owner's NP-3, 2026-10-18 |", "attendance.scope")
+V.sub("an owner's observation in a request, night pass, pending NP-7; the default shown is the recommendation until the "
+      "owner answers |",
+      "an owner's observation in a request, the owner's NP-7, 2026-10-18 |", "probe.observations")
+V.sub("| `probe.experiment.authority` | owner-opts-in, within-cap, free | owner-opts-in | aScoutedSeam's one re-run spent "
+      "195 agents, night pass, pending NP-6; the default shown is the recommendation until the owner answers |",
+      "| `probe.experiment.authority` | within-cap, owner-opts-in, free | within-cap | the owner's NP-6, 2026-10-18: "
+      "\"Within the agent cap by default, opt-in as an owner switchable policy\"; aScoutedSeam's one re-run spent 195 "
+      "agents |", "probe.experiment.authority")
+V.sub("| `tags.bundle` | manifest, inline, both | manifest | what `gov tag bundle` returns, night pass, pending NP-14; the "
+      "default shown is the recommendation until the owner answers |",
+      "| `tags.bundle` | manifest, inline, both | both | what `gov tag bundle` returns: under both, the manifest, or with "
+      "`--inline` the content under the byte budget the call names, the owner's NP-14, 2026-10-18 |", "tags.bundle")
+V.sub("| `memory.code-budget` | 4k, 8k, 16k | 8k | the `code` slot's budget, ranges and never bodies, night pass, pending "
+      "NP-8; the default shown is the recommendation until the owner answers |",
+      "| `memory.code-budget` | any size, in KB per role per item, 4k, 8k and 16k among them | 16k | the `code` slot's "
+      "budget, ranges and never bodies, the owner's NP-8, 2026-10-18: \"16KB default, freely adjustable by the owner by "
+      "policy\" |", "memory.code-budget")
+V.sub("| `memory.code-roles` | working-roles, every-role, structural-roles | working-roles | the working roles are the spec "
+      "writer, builder, tester, researcher, architect and reviewer, and the prompt writer through its actor, night pass, "
+      "pending NP-9; the default shown is the recommendation until the owner answers |",
+      "| `memory.code-roles` | working-roles, every-role, structural-roles | every-role | the owner's NP-9, 2026-10-18; "
+      "the working roles are the spec writer, builder, tester, researcher, architect and reviewer, and the prompt writer "
+      "through its actor |", "memory.code-roles")
+V.sub("| `memory.code-languages` | python-shell-js, file-level-only, ctags | python-shell-js | other languages at file "
+      "level, `git grep` the floor, night pass, pending NP-10; the default shown is the recommendation until the owner "
+      "answers |",
+      "| `memory.code-languages` | builtin, builtin+ctags, ctags | builtin | Python, shell and JavaScript extracted in "
+      "core with their calls, other languages at file level, `git grep` the floor; `builtin+ctags` adds the ctags pack's "
+      "definitions for every other language, and `ctags` takes every language's definitions from it, the built-in "
+      "extractors still giving calls; under either, a missing ctags stops the run and the record names its extractors "
+      "and the ctags version; the owner's NP-10, 2026-10-18, asked again after its pros and cons |",
+      "memory.code-languages")
+V.sub("purposes keyed to a definition's body hash, night pass, pending NP-11; the default shown is the recommendation "
+      "until the owner answers |",
+      "purposes keyed to a definition's body hash, the owner's NP-11, 2026-10-18 |", "memory.code-enrich")
+after_line(V, "| `install.from` | release-tag, any-commit |",
+           "| `install.guards` | project, managed | project | where the core guards install: the project's settings, or "
+           "managed settings where the operator opts in, never set by a preset; the owner's NP-20, 2026-10-18 (the SDLC "
+           "playbook's practice 16) | dShippedRelease |", "install.guards")
+after_line(V, "| `maintain.record-when` | every-period, on-finding |",
+           "| `maintain.security-review` | weekly, every-landing, off | weekly | dFairHearing's security lens over the "
+           "landed tree, the owner's NP-19, 2026-10-18: \"Weekly by default, owner-adjustable by policy\" (the SDLC "
+           "playbook's practice 21) | dTendedCadence |\n"
+           "| `maintain.tiers` | bands, pins | bands | a reading's response tiered by its deviation from its pin, to log, "
+           "to diagnose read-only or to act within `maintain.fixes`, or one severity per pin as before; the owner's "
+           "NP-21, 2026-10-18 (the SDLC playbook's practice 20) | dTendedCadence |", "maintain keys")
+V.sub("`verdict.remote.pin`, `attendance` or `attendance.scope`:",
+      "`verdict.remote.pin`, `attendance`, `attendance.scope` or `install.guards`:", "never-touch keys")
+V.sub("repository's environments and its pinned workflow are facts about it; and whether the owner attends is\n"
+      "  the owner's own choice (night pass, point 1).",
+      "repository's environments and its pinned workflow are facts about it; whether the owner attends is\n"
+      "  the owner's own choice (night pass, point 1); and where the core guards install is the operator's (NP-20).",
+      "never-touch reasons")
+V.sub("| `probe.experiment.authority` | within-cap | owner-opts-in | owner-opts-in | owner-opts-in |",
+      "| `probe.experiment.authority` | within-cap | within-cap | owner-opts-in | within-cap |", "preset authority")
+V.sub("| `tags.bundle` | manifest | manifest | manifest | manifest |",
+      "| `tags.bundle` | both | both | both | both |", "preset bundle")
+V.sub("| `memory.code-budget` | 8k | 8k | 16k | 8k |",
+      "| `memory.code-budget` | 8k | 16k | 16k | 16k |", "preset code-budget")
+V.sub("| `memory.code-roles` | working-roles | working-roles | every-role | working-roles |",
+      "| `memory.code-roles` | working-roles | every-role | every-role | every-role |", "preset code-roles")
+V.sub("| `memory.code-languages` | python-shell-js | python-shell-js | python-shell-js | python-shell-js |",
+      "| `memory.code-languages` | builtin | builtin | builtin | builtin |", "preset code-languages")
+after_line(V, "| `maintain.record-when` | on-finding |",
+           "| `maintain.security-review` | weekly | weekly | every-landing | every-landing |\n"
+           "| `maintain.tiers` | bands | bands | bands | bands |", "preset maintain keys")
+V.sub("every member, region and instruction joined to it, as a manifest of ranges under a row budget (the owner's\n"
+      "  point 4, night pass).",
+      "every member, region and instruction joined to it, as a manifest of ranges under a row budget, or with its\n"
+      "  content inlined, by flag (the owner's point 4, night pass, and NP-14).", "P33")
+# The chain rows.
+V.sub("returning a tag's members, regions and instructions as a manifest of ranges under `tags.bundle-rows`, folded past "
+      "it, with its type-registered",
+      "returning a tag's members, regions and instructions as a manifest of ranges under `tags.bundle-rows`, folded past "
+      "it, or with their content inlined under the byte budget the call names, by flag as `tags.bundle` allows (NP-14), "
+      "with its type-registered", "dOrderedCharter bundle")
+V.sub(" | gap-mem-01, gap-mem-02, gap-mem-03,",
+      "; the ctags extractor pack, opted into by `memory.code-languages: builtin+ctags` or `ctags`: definitions and "
+      "their ranges for every language the built-in extractors do not read, the record naming its extractors and the "
+      "ctags version, and a missing ctags stopping the run rather than degrading to file level (NP-10)"
+      " | gap-mem-01, gap-mem-02, gap-mem-03,", "dTotalRecall ctags pack")
+V.sub("gap-mem-32, gap-mem-33 |", "gap-mem-32, gap-mem-33, gap-mem-34 |", "dTotalRecall gap")
+V.sub("the install and update hooks that call `adopt` and `test.seed`, attended;",
+      "the install and update hooks that call `adopt` and `test.seed`, attended, and the shards-to-builds backlog "
+      "migration as an update's upgrade step, run attended until no tree is left on shards (NP-22);",
+      "dShippedRelease upgrade step")
+V.sub("registered through dBoundRoles's layer contract | gap-deploy-01,",
+      "registered through dBoundRoles's layer contract; `install.guards`: the core guards installed into the project's "
+      "settings, or into managed settings where the operator opts in (NP-20) | gap-deploy-01,",
+      "dShippedRelease install.guards")
+V.sub("gap-deploy-13, gap-flow-08,", "gap-deploy-13, gap-deploy-14, gap-flow-08,", "dShippedRelease gap")
+V.sub("a detector for the memory's dead pointers, owned by Maintain;",
+      "a detector for the memory's dead pointers, owned by Maintain, absorbing `check-dead-paths.sh` and keeping its "
+      "merge-bar leg at Test's leg-pack point (NP-22);", "dTendedCadence dead pointers")
+V.sub("(night pass, point 4) | gap-maint-01, gap-maint-02,",
+      "(night pass, point 4); the recurring security review, a cadence item running dFairHearing's security lens over "
+      "the landed tree as `maintain.security-review` says, weekly by default (NP-19); readings tiered by their "
+      "deviation from their pins under `maintain.tiers: bands`, to log, to diagnose read-only or to act within "
+      "`maintain.fixes` (NP-21) | gap-maint-01, gap-maint-02,", "dTendedCadence clauses")
+V.sub("gap-maint-11, gap-orient-10 |", "gap-maint-11, gap-maint-12, gap-maint-13, gap-orient-10 |", "dTendedCadence gaps")
+V.sub("route-backs per build and scope drift (night pass, point 6) | gap-review-01,",
+      "route-backs per build and scope drift (night pass, point 6), and the owner queue's depth, read with no bound "
+      "(NP-18) | gap-review-01,", "dCalibratedLens owner queue")
+V.sub("gap-review-14, gap-review-15 |", "gap-review-14, gap-review-15, gap-review-16 |", "dCalibratedLens gap")
+V.save()
+
+# --- the gap register ------------------------------------------------------------------------------------------
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+ANS = "the owner's NP-{} (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[answers]`)"
+after_line(G, "| gap-mem-33 |",
+           "| gap-mem-34 | Memory | LOW | A language other than Python, shell and JavaScript stays at file level: an "
+           "adopter written in one gets no definitions, ranges or calls for it. | night pass `[p3-code]`; "
+           + ANS.format(10) + " | — |", "gap-mem-34")
+after_line(G, "| gap-deploy-13 |",
+           "| gap-deploy-14 | Deploy | LOW | The core guards install only into a project's own settings, which the "
+           "project can edit, and managed settings are not designed. | night pass `[p6-sdlc]`, the playbook's practice "
+           "16; " + ANS.format(20) + " | — |", "gap-deploy-14")
+after_line(G, "| gap-maint-11 |",
+           "| gap-maint-12 | Maintain | MED | No security review recurs: the security lens runs only when a build opts "
+           "into it, and nothing re-reads the landed tree for security on a period. | night pass `[p6-sdlc]`, the "
+           "playbook's practice 21; " + ANS.format(19) + " | — |\n"
+           "| gap-maint-13 | Maintain | LOW | A reading's breach gets one response whatever its size: nothing tiers it "
+           "by how far the reading deviates, to log, to diagnose read-only or to act. | night pass `[p6-sdlc]`, the "
+           "playbook's practice 20; " + ANS.format(21) + " | — |", "gap-maint-12, 13")
+after_line(G, "| gap-review-15 |",
+           "| gap-review-16 | Review | LOW | No reading measures the owner queue's depth, so parallel work cannot be "
+           "weighed against the owner's capacity to review it. | night pass `[p6-sdlc]`, the playbook's practice 10; "
+           + ANS.format(18) + " | — |", "gap-review-16")
+G.save()
+
+# --- the fates record ------------------------------------------------------------------------------------------
+F = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md")
+F.sub("or \"proposed by the night pass (NP-22)\" for a part no record decided. Counts: 26 stay,\n"
+      "70 reshaped, 21 merged and 14 retired, over 131 rows.",
+      "or \"the owner, NP-22, 2026-10-18\" for a part the night pass proposed and the owner decided row by row. "
+      "Counts: 24 stay,\n70 reshaped, 23 merged and 14 retired, over 131 rows.", "lead-in")
+F.sub("| RETIRED | the ask register, once the migration has run (dTotalRecall) |",
+      "| RESHAPED | an update's upgrade step, run attended, retired once no tree is left on shards (dShippedRelease) |",
+      "migrate_backlog")
+F.sub("| STAYS | a distribution check for the optional map's install (dShippedRelease) |",
+      "| MERGED | into `govkit check`, the one install check (dShippedRelease) |", "check_gate_coverage")
+F.sub("| RESHAPED | the stage coverage gates and the loop kit's conformance gates (dDeclaredLoop) |",
+      "| RETIRED | none: it gates the unattended kit itself, which dissolves at convergence (dConvergedCharter) |",
+      "check-unattended")
+F.sub("| STAYS | its dangling-path function shared with Maintain's dead-pointer detector (dTendedCadence) |",
+      "| MERGED | into Maintain's dead-pointer detector, which keeps its merge-bar leg (dTendedCadence) |",
+      "check-dead-paths")
+n = F.text.count("proposed by the night pass (NP-22)")
+if n != 19:
+    sys.exit(f"fates: expected 19 proposed rows, found {n}")
+F.text = F.text.replace("proposed by the night pass (NP-22)", "the owner, NP-22, 2026-10-18")
+F.done += 1
+F.sub("| pytest-parallel-guardrails | optional | an adopter-only Flow leg pack, as proposed (NP-22) |",
+      "| pytest-parallel-guardrails | optional | an adopter-only Flow leg pack (the owner, NP-22, 2026-10-18) |",
+      "pytest kit row")
+F.sub("7. **The leg manifest:** proposed as one manifest whose rows the leg factory generates from the packs' "
+      "declarations\n   (dWitnessedBar, NP-22),",
+      "7. **The leg manifest:** decided as one manifest whose rows the leg factory generates from the packs' "
+      "declarations\n   (dWitnessedBar, the owner's NP-22),", "stale 7")
+F.save()
+
+# --- the ownership record --------------------------------------------------------------------------------------
+O = Record(B + "2026-10-17-build-PLAY-dClosedLoop-1-ownership.md")
+O.text = O.text.rstrip("\n") + """
+- **NP-23, 2026-10-18:** the owner approved the night pass's nodes and owners on review, asked as four groups
+  (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[answers]`), with the keys NP-19 to NP-21 add:
+  `maintain.security-review` and `maintain.tiers`: dTendedCadence; `install.guards`: dShippedRelease.
+"""
+O.done += 1
+O.save()
+
+# --- flow-steps and the systems record -------------------------------------------------------------------------
+FS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+FS.sub("  blind judge decides it. Who verifies is a structural choice, NP-5, since one actor acts per item (`[rules]`).",
+       "  blind judge decides it. The tester verifies, as the owner chose (NP-5, 2026-10-18), since one actor acts per\n"
+       "  item (`[rules]`).", "NP-5")
+FS.save()
+SY = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+SY.sub("regions and instructions as a manifest of ranges under `tags.bundle-rows`. `feature` becomes",
+       "regions and instructions as a manifest of ranges under `tags.bundle-rows`, or with their content inlined, by\n"
+       "flag (`tags.bundle`, NP-14). `feature` becomes", "bundle")
+SY.save()
+
+# --- the night-pass record's summaries -------------------------------------------------------------------------
+N = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md")
+N.sub("5. **Who gets it:** the spec writer, builder, tester, researcher, architect and reviewer, and the prompt writer\n"
+      "   through its actor (`memory.code-roles`).",
+      "5. **Who gets it:** every role, by the owner's NP-9. The night pass proposed the working roles: the spec writer,\n"
+      "   builder, tester, researcher, architect and reviewer, and the prompt writer through its actor\n"
+      "   (`memory.code-roles`).", "p3 who gets it")
+N.sub("4. **`gov tag bundle <tag>`** returns one manifest.",
+      "4. **`gov tag bundle <tag>`** returns one manifest, or by flag the content inlined (`tags.bundle: both`, NP-14).",
+      "p4 bundle")
+N.sub("  - 131 parts: 26 stay, 70 are reshaped, 21 are merged and 14 retired. None is left undecided.",
+      "  - 131 parts: 24 stay, 70 are reshaped, 23 are merged and 14 retired, after the owner's row-by-row review\n"
+      "    (NP-22). None is left undecided.", "p8 counts")
+N.sub("The walk is not a fork: wave 1 still waits for the owner's read, and wave 2 follows it.",
+      "The owner answered all twenty-four on 2026-10-18 (`[answers]`), and the design carries the answers\n"
+      "(`[folded-answers]`).\n\n"
+      "The walk is not a fork: wave 1 still waits for the owner's read, and wave 2 follows it.", "forks pointer")
+N.save()
+````
+
+### `write_answers.py`
+
+Writes the night-pass record's `[answers]`, verbatim, and `[folded-answers]`, the register's re-measured tally and the session log's event.
+
+````python
+"""Write the owner's answers to NP-1..NP-24 into the night-pass record ([answers], verbatim, and [folded-answers]),
+the gap register's re-measured tally, and the session log's event.
+
+Usage: python -X utf8 write_answers.py <fork_answers.md> <tally.out>   (from the worktree root)
+"""
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+answers = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n")
+tally = "\n".join(ln.rstrip() for ln in pathlib.Path(sys.argv[2]).read_text(encoding="utf-8").strip("\n").split("\n"))
+
+pairs = re.findall(r'^"(.+)"="(.+)"$', answers, flags=re.M)
+if len(pairs) != 48:
+    sys.exit(f"expected 48 answered questions (24 forks, NP-10 twice, 19 NP-22 rows, 4 NP-23 groups), found {len(pairs)}")
+
+
+def bullets(sel):
+    out = []
+    for q, a in pairs:
+        if sel(q):
+            fid = re.match(r"(NP-\d+)", q).group(1)
+            # a question quoting a derived count is pinned to the commit it was asked at, for the map's arm
+            at = " at `a15c1f55c`" if "critical path" in q else ""
+            out.append(f"- {fid}, asked{at} as \"{q}\": \"{a}\"")
+    return "\n".join(out)
+
+
+main = bullets(lambda q: re.match(r"NP-\d+(?: \(SDLC playbook\))?: ", q) and not q.startswith(("NP-22 ·", "NP-23 ·")))
+again = bullets(lambda q: q.startswith("NP-10, again"))
+rows = bullets(lambda q: q.startswith("NP-22 ·"))
+groups = bullets(lambda q: q.startswith("NP-23 ·"))
+for name, block, want in (("main", main, 24), ("again", again, 1), ("rows", rows, 19), ("groups", groups, 4)):
+    if block.count("\n- ") + 1 != want:
+        sys.exit(f"{name}: expected {want} bullets, found {block.count(chr(10) + '- ') + 1}")
+
+N = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md")
+N.text = N.text.rstrip("\n") + f"""
+
+## [answers] The owner's answers, 2026-10-18
+
+Asked on the owner's return, "put the forks to me", through AskUserQuestion in six batches of four, the
+recommendation first. Each answer is quoted as the tool returned it.
+
+{main}
+
+NP-10 was answered with a question. The session then gave its pros and cons. ctags gives definitions, their kinds and
+mostly their end lines for about 140 languages. It gives no calls and no docstrings, and adds nothing for gov's own
+Python, shell and JavaScript. It costs a binary on every node and adopter, version skew between nodes and a GPL
+licence, and a missing ctags must stop the run rather than degrade. The session recommended the built-in extractors
+by default with a ctags pack a repository opts into, and asked again:
+
+{again}
+
+NP-22, "Review row by row", was asked one row at a time. The session changed one recommendation on review:
+`migrate_backlog` should not retire after gov's own migration, since gov and its adopters still carry backlog
+shards and `[core]` asks for an upgrade step.
+
+{rows}
+
+NP-23, "Review them", was asked as four groups, the fourth adding the keys NP-19 to NP-21 bring:
+
+{groups}
+
+## [folded-answers] What the answers changed
+
+- **v2's catalogue and presets** (`build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md`, its revision note
+  dated 2026-10-18):
+  - every pending marker gives way to the owner's answer;
+  - four defaults move: `probe.experiment.authority` to within-cap, `memory.code-budget` to 16k, `memory.code-roles`
+    to every-role and `tags.bundle` to both;
+  - `memory.code-languages` reads builtin, builtin+ctags or ctags;
+  - three keys land: `maintain.security-review`, `maintain.tiers` and `install.guards`, the last among the keys presets
+    never touch;
+  - the preset rows follow, each `standard` cell equal to the default.
+- **v2's chain rows:** four planned units, and the clause changes the answers imply:
+  - dTotalRecall gains the ctags extractor pack;
+  - dShippedRelease gains `install.guards`, and its update hooks run the backlog migration as an upgrade step;
+  - dTendedCadence gains the recurring security review and the deviation bands, and its dead-pointer detector absorbs
+    `check-dead-paths.sh` with its merge-bar leg;
+  - dCalibratedLens reads the owner queue's depth with no bound;
+  - dOrderedCharter's `gov tag bundle` inlines content by flag.
+- **The gap register:** gap-mem-34, gap-deploy-14, gap-maint-12, gap-maint-13 and gap-review-16, each owned once, and
+  the tally re-measured.
+- **The fates record:** the nineteen proposed rows are now decided by the owner, and four fates change:
+  - `migrate_backlog` is reshaped into an update's upgrade step;
+  - `check_gate_coverage` merges into `govkit check`;
+  - `check-unattended` retires with its kit;
+  - `check-dead-paths.sh` merges into Maintain's dead-pointer detector.
+
+  The counts become 24 stay, 70 reshaped, 23 merged and 14 retired, and the design map's count arm reads them.
+- **The ownership record:** NP-23's approval, with the three new keys' owners.
+- **flow-steps, the systems record and this record's summaries:** NP-5's verifier, NP-14's bundle, NP-9's roles and
+  NP-22's counts.
+- **The chain:** the critical path grows by three units, one in dTotalRecall and two in dTendedCadence, and still runs
+  through dTendedCadence and dCalibratedLens. The instruments record's `[final]` holds the run.
+
+**Interpretations, for the owner to correct:**
+- NP-6 keeps `free` as an allowed value, since P10 makes every offered option one. The owner's words name within-cap
+  as the default and opt-in as the switch.
+- NP-8's "freely adjustable" reads as any size in KB, 4k, 8k and 16k among them, so the preset check reads it as
+  free-form.
+- NP-14's `both` returns the manifest unless a call passes `--inline` with the byte budget it names.
+- NP-21's bands measure a reading's deviation from its pin. Rolling baselines, the playbook's reference, were not
+  asked, and stay out.
+- NP-20's `install.guards` joins the keys presets never touch, since where the guards install is the operator's
+  choice.
+- NP-22's merge of `check-dead-paths.sh` keeps its merge-bar leg, registered by the detector at Test's leg-pack point,
+  so a dead path still blocks a merge.
+
+**Owed next:** NP-24's pricing of a dDeclaredLoop split and a lighter dCalibratedLens, before the walk resumes.
+"""
+N.done += 1
+N.save()
+
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+G.text = G.text.rstrip("\n") + f"""
+
+Re-measured after the owner's answers added five gaps, `gap-deploy-14`, `gap-maint-12`, `gap-maint-13`, `gap-mem-34`
+and `gap-review-16` (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[answers]`), same instrument. A join
+of these 255 keys against v2's chain rows finds each owned by exactly one build:
+
+```text
+{tally}
+```
+"""
+G.done += 1
+G.save()
+
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-18, session 1799cb98: the owner answered NP-1 to NP-24 through AskUserQuestion in six batches. NP-10 was
+  asked again after its pros and cons, NP-22 reviewed row by row and NP-23 in four groups (the night-pass record's
+  `[answers]`). The fold moves four defaults, adds three keys, five gaps and four planned units, and decides the
+  fates record's nineteen proposed rows, four of them changed (`[folded-answers]`). NP-24's pricing is next.
+""", "event")
+L.save()
+````
+
+### `pin_np24.py`
+
+Pins NP-24's answer line, which quotes the critical path, to the commit it was asked at. The map's arm was red on it first.
+
+````python
+"""Pin NP-24's answer line, which quotes the critical path, to the commit it was asked at, as write_answers.py now
+writes it. Usage: python -X utf8 pin_np24.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+N = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md")
+N.sub("- NP-24, asked as \"NP-24: dDeclaredLoop is now 47 units, and the critical path is 211",
+      "- NP-24, asked at `a15c1f55c` as \"NP-24: dDeclaredLoop is now 47 units, and the critical path is 211", "NP-24 pin")
+N.save()
+````
+
 ### `record_instruments.py`
 
 This record's own writer.
@@ -3089,6 +3569,14 @@ MINE = [
     ("night/log_np.py", "The session log: dispatches 100 to 104 and the night's event."),
     ("night/log_review.py", "The session log: dispatch 105 and the review's fold."),
     ("night/plants_committed.sh", "The probe's earlier plant suite, pointed at the committed copy."),
+    ("forks/chain_clauses.py", "The owner's answers: prints a chain row's planned-units clauses, numbered, to find each "
+     "clause an answer touches."),
+    ("forks/fold_answers.py", "The owner's answers to NP-1 to NP-24, folded into v2, the gap register, the fates "
+     "record, the ownership record, flow-steps, the systems record and the night-pass record's summaries."),
+    ("forks/write_answers.py", "Writes the night-pass record's `[answers]`, verbatim, and `[folded-answers]`, the "
+     "register's re-measured tally and the session log's event."),
+    ("forks/pin_np24.py", "Pins NP-24's answer line, which quotes the critical path, to the commit it was asked at. "
+     "The map's arm was red on it first."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -3779,15 +4267,15 @@ atlas: 0 records named fates-absent-plant
 rc 1
 $ python map.py --check --plant fates-drop
 FINDING fates: kit.agent-instructions has no [table] row
-FINDING fates: the rows count [26, 69, 21, 14, 130], and the record states [26, 70, 21, 14, 131]
+FINDING fates: the rows count [24, 69, 23, 14, 130], and the record states [24, 70, 23, 14, 131]
 rc 1
 $ python map.py --check --plant fates-ghost
 FINDING fates: a row names ghostkit, which is no kit
-FINDING fates: the rows count [27, 70, 21, 14, 132], and the record states [26, 70, 21, 14, 131]
+FINDING fates: the rows count [25, 70, 23, 14, 132], and the record states [24, 70, 23, 14, 131]
 rc 1
 $ python map.py --check --plant fates-bad
 FINDING fates: agent-instructions · harness wiring has the fate MAYBE, outside the set
-FINDING fates: the rows count [26, 69, 21, 14, 131], and the record states [26, 70, 21, 14, 131]
+FINDING fates: the rows count [24, 69, 23, 14, 131], and the record states [24, 70, 23, 14, 131]
 rc 1
 $ python map.py --check --plant fates-unbuilt
 FINDING fates: agent-instructions · harness wiring names no chain build where it goes
@@ -3807,11 +4295,11 @@ $ python map.py --check --plant fates-kit-ghost
 FINDING fates: [kits] names ghostkit, which is no kit node
 rc 1
 $ python map.py --check --plant fates-count
-FINDING fates: the rows count [25, 71, 21, 14, 131], and the record states [26, 70, 21, 14, 131]
+FINDING fates: the rows count [23, 71, 23, 14, 131], and the record states [24, 70, 23, 14, 131]
 rc 1
 $ python map.py --check --plant fates-absorbed-stays
 FINDING fates: agent-instructions · harness wiring stays, yet its kit is absorbed
-FINDING fates: the rows count [27, 69, 21, 14, 131], and the record states [26, 70, 21, 14, 131]
+FINDING fates: the rows count [25, 69, 23, 14, 131], and the record states [24, 70, 23, 14, 131]
 rc 1
 $ python map.py --check --plant fates-bare-none
 FINDING fates: workflows · `orient-counterfactual.js` retires naming neither a replacement nor a reason
@@ -3859,7 +4347,7 @@ FINDING fates: kit.unattended has no [kits] row
 FINDING fates: kit.unattended has no [table] row
 FINDING fates: kit.workflows has no [kits] row
 FINDING fates: kit.workflows has no [table] row
-FINDING fates: the rows count [0, 0, 0, 0, 0], and the record states [26, 70, 21, 14, 131]
+FINDING fates: the rows count [0, 0, 0, 0, 0], and the record states [24, 70, 23, 14, 131]
 FINDING fates: kit.agent-instructions carries fate=absorbed, and [kits] says None
 FINDING fates: kit.branch-reconcile carries fate=optional, and [kits] says None
 FINDING fates: kit.codebase-map carries fate=optional, and [kits] says None
@@ -3881,10 +4369,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:582 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:596 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:582 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:596 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 ````
 
@@ -3893,12 +4381,12 @@ rc 1
 
 ````text
 $ design map
-map: 2238 nodes in 30 namespaces; 31203 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1500, derived 256, pending 482
+map: 2248 nodes in 30 namespaces; 31204 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1507, derived 259, pending 482
 rc 0
 
 $ atlas
-atlas: derived — 155 records, 2679 sections, 175 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 155 records, 2681 sections, 176 decision sections, 16 comparison areas, 33 principles
 rc 0
 
 $ fold state
@@ -3916,7 +4404,7 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 16 · owned nodes read 419 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 20 (cites 16, stage 0, routes 1, reads 3, registers 0)
+chain rows 16 · owned nodes read 422 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 20 (cites 16, stage 0, routes 1, reads 3, registers 0)
 left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 46 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dBoundRoles cites `code` (dTotalRecall's, not an ancestor): tolerance
@@ -3947,7 +4435,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 250 · chain builds 16
+register keys 255 · chain builds 16
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -3955,13 +4443,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 205 · presettable 192 · preset rows 192
+catalogue keys 208 · presettable 194 · preset rows 194
 no findings
 rc 0
 
 $ critical path
-critical path: 211 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dFairHearing 20, dOrderedCharter 35, dDeclaredLoop 82, dWitnessedBar 104, dBoundRoles 138, dTotalRecall 143, dIndexedDesign 155, dRankedPlan 156, dWellOiledMachine 174, dScopedBuild 185, dTendedCadence 186, dMindYourWords 191, dShippedRelease 194, dCalibratedLens 197, dConvergedCharter 211
+critical path: 214 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dFairHearing 20, dOrderedCharter 35, dDeclaredLoop 82, dWitnessedBar 104, dBoundRoles 138, dTotalRecall 144, dIndexedDesign 156, dRankedPlan 157, dWellOiledMachine 175, dScopedBuild 186, dTendedCadence 189, dMindYourWords 192, dShippedRelease 196, dCalibratedLens 200, dConvergedCharter 214
 rc 0
 ````
 

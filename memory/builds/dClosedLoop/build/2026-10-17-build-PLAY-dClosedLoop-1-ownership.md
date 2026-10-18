@@ -996,3 +996,6 @@ census: FINDING census: tools/newkit/kit.toml is on disk with no kit node rc 1
   - record kinds `probe`: dDeclaredLoop; `code`: dTotalRecall, replacing `symbols` and `callers`; `playbook`:
     dIndexedDesign; `playbook set`: dIndexedDesign, which registers its set check at Test's leg-pack point (the
     closing review's H2); `attendance override`: dWellOiledMachine (M13).
+- **NP-23, 2026-10-18:** the owner approved the night pass's nodes and owners on review, asked as four groups
+  (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[answers]`), with the keys NP-19 to NP-21 add:
+  `maintain.security-review` and `maintain.tiers`: dTendedCadence; `install.guards`: dShippedRelease.
