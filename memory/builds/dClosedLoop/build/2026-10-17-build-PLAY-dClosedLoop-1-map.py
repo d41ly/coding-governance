@@ -10,8 +10,9 @@ Usage:
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --check --plant <case>   damage the render, expect exit 1
       cases: drop-line, bad-count, ghost-rel, no-layer, fates-absent, fates-drop, fates-ghost, fates-bad, fates-unbuilt,
       fates-empty, fates-kit, fates-kit-drop, fates-kit-ghost, fates-count, fates-absorbed-stays, fates-bare-none,
-      fates-rel, fates-none, unpinned-count, unpinned-path, adopter-unit, adopter-key, census, no-owner, orphan (an item's
-      owner emptied), two-owners, inferred (a point's owner kept with its declaration dropped)
+      fates-rel, fates-none, unpinned-count, unpinned-path, unclosed-fence, no-records, adopter-unit, adopter-key,
+      chain-echo, census, no-owner, orphan (an item's owner emptied), two-owners, inferred (a point's owner kept with its
+      declaration dropped)
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --pending          list the nodes whose purpose waits on the owner
   --unfold <ns>[,<ns>...] renders those namespaces node by node, as an item's declared unfolds would.
 
@@ -540,21 +541,29 @@ def census():
 # records but the research returns, instruments and session log, dated by kind, and not the reviews; and it skips a
 # fenced block, a run as captured. It does not read a map count written without a thousands comma, any other count,
 # or a quote wrapped across lines, and it takes any hex word with a letter and a digit for a sha.
+# Its zero is witnessed (the away pass's review, M6): it counts the records it read and the quotes it saw, pinned or
+# not, prints both, and reds on reading no record, on seeing fewer quotes than its floor, or on a record that ends
+# inside an open fence, which would mute every line after the fence.
 COUNT = re.compile(r"\b\d{1,3}(?:,\d{3})+ (?:nodes\b|of (?:its |the )?32,768\b)|critical path\b[^|.]{0,80}?\b\d{2,3}\b")
 PIN = re.compile(r"\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\d)[0-9a-f]{7,40}\b|`[^`]*research-[^`]*\.md:\d+`")
 DATED = ("-research-", "-instruments", "-session-log")
 UNPINNED = {"unpinned-count": "The level-0 map stands at 31,203 of its 32,768 B.",
             "unpinned-path": "The critical path is 211 units."}
+STALE_FLOOR = 15   # the quotes it must see; 21, in 51 records, were counted at a66c855f3, when the floor was declared
 
 
 def unpinned_counts(plant=None):
-    found = []
-    for p in sorted(HERE.glob("*.md")):
+    """Return (unpinned quotes, records read, quotes seen, records ending inside an open fence)."""
+    found, read, seen, open_end = [], 0, 0, []
+    for p in ([] if plant == "no-records" else sorted(HERE.glob("*.md"))):
         if any(s in p.name for s in DATED):
             continue
+        read += 1
         rows = p.read_text(encoding="utf-8").split("\n")
         if plant in UNPINNED and p.name.endswith("-gap-register.md"):
             rows.append(UNPINNED[plant])
+        if plant == "unclosed-fence" and p.name.endswith("-gap-register.md"):
+            rows += ["```", UNPINNED["unpinned-count"]]
         fence = ""
         for i, row in enumerate(rows, 1):
             m = re.match(r"\s*(`{3,})", row)
@@ -562,9 +571,36 @@ def unpinned_counts(plant=None):
                 fence = m.group(1)
             elif m and len(m.group(1)) >= len(fence) and not row.strip().strip("`"):
                 fence = ""
-            elif not fence and not PIN.search(row):
-                found += [(p.name, i, m.group(0)) for m in COUNT.finditer(row)]
-    return found
+            elif not fence:
+                hits = list(COUNT.finditer(row))
+                seen += len(hits)
+                if not PIN.search(row):
+                    found += [(p.name, i, h.group(0)) for h in hits]
+        if fence:
+            open_end.append(p.name)
+    return found, read, seen, open_end
+
+
+# Chain echo (the away pass's review, H1): each row of the memory plan's [chain] names a v2 [chain] clause by its
+# opening words and the build whose row holds it. It reds when that build's row holds no clause opening so, so the
+# plan cannot place a unit on a build v2 does not. It does not check a clause's full text, nor that every clause the
+# plan builds has a row.
+def chain_echo(plant=None):
+    plan = (HERE / "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md").read_text(encoding="utf-8")
+    v2 = (HERE / "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md").read_text(encoding="utf-8")
+    rows = [list(r) for r in atlas.table(plan.split("\n## [chain]", 1)[1].split("\n## ", 1)[0], "Build", "memory-plan [chain]")]
+    if plant == "chain-echo":
+        rows[0][0] = "dGroundRules" if rows[0][0] != "dGroundRules" else "dOrderedCharter"
+    clauses = {}
+    for ln in v2.split("\n## [chain]", 1)[1].split("\n## ", 1)[0].split("\n"):
+        m = re.match(r"^\| (d[A-Z]\w+) \| [^|]+ \| [^|]+ \| (.+) \| [^|]+ \|$", ln)
+        if m:
+            clauses[m.group(1)] = [c.strip() for c in m.group(2).split("; ")]
+    out = [] if rows else ["chain echo: memory-plan [chain] holds no row"]
+    for r in rows:
+        if not any(c.startswith(r[2]) for c in clauses.get(r[0], [])):
+            out.append(f"chain echo: memory-plan [chain] puts {r[2][:50]!r} on {r[0]}, whose v2 row holds no clause opening so")
+    return out
 
 
 # Adopter-free: no planned unit and no node key names an adopter. A unit becomes shipped work and many keys shipped
@@ -735,9 +771,17 @@ def check(A, ns, out, folded, plant=None):
             findings.append(f"layer: kit.{n['key']} joins no layer")
     if any(re.search(r"\b20\d\d-\d\d-\d\d\b", ln) for ln in lines[2:]):
         findings.append("no stale facts: a line holds a date")
-    for name, i, q in unpinned_counts(plant):
+    stale, read, seen, open_end = unpinned_counts(plant)
+    for name, i, q in stale:
         findings.append(f"no stale facts: {name}:{i} quotes {q!r} with nothing pinning it on its line")
+    if not read:
+        findings.append("no stale facts: read no design record")
+    elif seen < STALE_FLOOR:
+        findings.append(f"no stale facts: saw {seen} quotes in {read} records, under its floor of {STALE_FLOOR}")
+    for name in open_end:
+        findings.append(f"no stale facts: {name} ends inside an open fence, which mutes every line after it")
     findings += adopter_free(A, ns, plant)
+    findings += chain_echo(plant)
     # Owner: every node a build must build names exactly one chain build, read from a declared field (PM-8).
     chain = {n["key"] for n in ns["chain"]}
     for name in OWNED:
@@ -796,6 +840,8 @@ def main(argv):
     print(f"map: {sum(len(v) for v in ns.values() if v)} nodes in {len(REGISTRY)} namespaces; {size} B of {BUDGET} "
           f"({'degraded: ' + ', '.join(steps) if steps else 'no degrade'}); folded {len(folded)}; unarmed {', '.join(unarmed) or 'none'}")
     print(f"map: purposes declared {src.get('declared', 0)}, derived {src.get('derived', 0)}, pending {src.get('pending', 0)}")
+    _, read, seen, _ = unpinned_counts(plant)
+    print(f"map: no stale facts read {read} records and {seen} quotes of a map count or the critical path")
     for f in findings:
         print(f"FINDING {f}")
     if "--out" in argv and not plant:

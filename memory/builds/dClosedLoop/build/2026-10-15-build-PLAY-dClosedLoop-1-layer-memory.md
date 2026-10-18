@@ -394,23 +394,23 @@ layer that registers a kind adds its row.
 
 | Kind | Owner | Its writer, or what names it |
 |---|---|---|
-| exception | dOrderedCharter | the exception register beside the `core.*` policies |
-| override | dOrderedCharter | `charter.override` and its record, under the precedence and override rule |
+| exception | dOrderedCharter | the exception register beside the `core.*` policies; writer item not named |
+| override | dOrderedCharter | `charter.override` and its record, under the precedence and override rule; writer item not named |
 | attendance override | dWellOiledMachine | its writer is `life.request`'s attend and unattend: the attendance value and its scope, which `attendance.scope` reads (the night pass's closing review, M13) |
 | intake | dWellOiledMachine | its writer is `entry.intake`'s hook (PM-9), in dWellOiledMachine's row since the re-cut |
-| card | dPlacedRequest | the build's orientation card at level 1, its stores and snapshot |
+| card | dPlacedRequest | the build's orientation card at level 1, its stores and snapshot; its writer is `entry.orient`, which composes it |
 | plan | dRankedPlan | its writer is `plan.record` |
 | dupes | dRankedPlan | its writer is `plan.dedupe` |
 | triage | dRankedPlan | its writer is `plan.triage-rule`, naming the rule it applied |
 | seams | dIndexedDesign | its writer is `design.seams` |
 | feature design | dIndexedDesign | its writer is `design.decompose` |
 | spec | dIndexedDesign | its writer is `design.unit-spec`; the spec redesigned as a structured, tagged contract |
-| fork | dIndexedDesign | a flow record kind (layer-memory `[decisions]`); fork resolution by `design.forks` is dIndexedDesign's, though forks arise in every step |
+| fork | dIndexedDesign | a flow record kind (layer-memory `[decisions]`); fork resolution by `design.forks` is dIndexedDesign's, though forks arise in every step; writer item not named |
 | overlap | dIndexedDesign | its writer is `design.overlaps` |
 | diff | dIndexedDesign | its writer is `design.reentry`, classifying an amendment by a structural diff |
 | roster | dIndexedDesign | its writer is `design.decompose`, with the interface schema check; not the README's derived `roster` field |
 | inventory | dIndexedDesign | its writer is `design.inventory`, joined to every built unit |
-| playbook | dIndexedDesign | a design record kind carrying dScriptedRepeat's canon, which an ordinary build authors and the `repeat` disposition follows (night pass, point 1) |
+| playbook | dIndexedDesign | a design record kind carrying dScriptedRepeat's canon, which an ordinary build authors and the `repeat` disposition follows (night pass, point 1); writer item not named |
 | acceptance | dDeclaredLoop | its writer is `build.acceptance`; dDeclaredLoop builds the witnesses computed rather than typed, the acceptance re-run by the executor among them (PM-12) |
 | scope | dScopedBuild | its writer is `build.scope` |
 | core result | dScopedBuild | its writer is `build.core`, the executor-written result |
@@ -420,7 +420,7 @@ layer that registers a kind adds its row.
 | selection | dWitnessedBar | its writer is `test.select` |
 | routing | dWitnessedBar | its writers are `test.route` and `test.flakes`, the re-entry's routing record; `release.route`, dShippedRelease's, also writes one |
 | seen-red | dWitnessedBar | its writer is `test.seen-red` |
-| playbook set | dIndexedDesign | its writer is the set check, which dIndexedDesign registers at Test's leg-pack point: a playbook run's pieces joined by hash, and the set's identity derived from them (night pass, point 1, moved by its closing review's H2) |
+| playbook set | dIndexedDesign | its writer is the set check, which dIndexedDesign registers at Test's leg-pack point: a playbook run's pieces joined by hash, and the set's identity derived from them (night pass, point 1, moved by its closing review's H2); writer item not named |
 | landing | dShippedRelease | the landing record; its writer is `deploy.record` |
 | comparison | dShippedRelease | its writer is `deploy.current` |
 | release | dShippedRelease | its writer is `release.record`, one per (SHA, environment) with its outcome |
@@ -431,45 +431,45 @@ layer that registers a kind adds its row.
 | fleet | dShippedRelease | its writer is `kits.fleet`: gov's reading of each adopter, per release |
 | fleet register | dShippedRelease | `adopters.toml` grown into the register, its rows read by `kits.fleet` |
 | transition | dDeclaredLoop | the transition record three ways; every step's exit item writes it |
-| lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar; layer-memory lists the lease among Runtime's kinds |
-| mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; layer-memory lists it among Runtime's kinds |
+| lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar; layer-memory lists the lease among Runtime's kinds; writer item not named |
+| mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; layer-memory lists it among Runtime's kinds; writer item not named |
 | disposition | dDeclaredLoop | the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal command or a prompt. dDeclaredLoop is the earliest of its writers' builds and an ancestor of the others, and `entry.place-owner` writes it first (PM-12d) |
-| return | dWellOiledMachine | the persisted-return store, keyed per spawn site |
-| act | dWellOiledMachine | one act session per role act; act binding and the epoch check |
-| session binding | dWellOiledMachine | sessions bound on every source |
-| journal | dWellOiledMachine | the journal grammar moved into the core |
+| return | dWellOiledMachine | the persisted-return store, keyed per spawn site; writer item not named |
+| act | dWellOiledMachine | one act session per role act; act binding and the epoch check; writer item not named |
+| session binding | dWellOiledMachine | sessions bound on every source; writer item not named |
+| journal | dWellOiledMachine | the journal grammar moved into the core; writer item not named |
 | workspace | dWellOiledMachine | its writer is `life.unlease`; workspaces by `build.worktree` |
-| run record | dTendedCadence | observability's journal reader writes it when the journal shows a run closed, as `observability.run-record` says (layer-expansions; PM-12) |
-| work order | dBoundRoles | the work order rendered per item |
+| run record | dTendedCadence | observability's journal reader writes it when the journal shows a run closed, as `observability.run-record` says (layer-expansions; PM-12); writer item not named |
+| work order | dBoundRoles | the work order rendered per item; writer item not named |
 | review | dFairHearing | its writer is `review.report`, the harness's, under the proposal for the breakpoint's items |
 | research return | dLinkedLibrary | the research view over the research-return kind and its dated backfill; `plan.research` and `design.research` write it |
 | design record | dTotalRecall | a core memory kind with no writer item; the memory contract declares it |
-| ask | dTotalRecall | the ask kind's acceptance at filing |
-| backlog row | dTotalRecall | the ask register's row store; the memory contract declares it |
-| decision | dLinkedLibrary | decisions split by kind, the major-decision log |
-| gotcha | dLinkedLibrary | gotchas handed by write set |
-| dossier | dTotalRecall | dossiers anchored to symbol keys |
-| code | dTotalRecall | the core code record: files, definitions with their ranges and body hashes, imports, resolved calls, tests and kit membership, derived per blob and cached by tree hash. It replaces the optional symbols and callers (night pass, point 3) |
-| annotation index | dLinkedLibrary | the generated annotation index and its resolve check |
-| recall index | dLinkedLibrary | memory-recall narrowed to a record finder |
-| baseline | dLinkedLibrary | retrofit's `baseline` and `census` record kinds |
+| ask | dTotalRecall | the ask kind's acceptance at filing; writer item not named |
+| backlog row | dTotalRecall | the ask register's row store; the memory contract declares it; writer item not named |
+| decision | dLinkedLibrary | decisions split by kind, the major-decision log; writer item not named |
+| gotcha | dLinkedLibrary | gotchas handed by write set; writer item not named |
+| dossier | dTotalRecall | dossiers anchored to symbol keys; writer item not named |
+| code | dTotalRecall | the core code record: files, definitions with their ranges and body hashes, imports, resolved calls, tests and kit membership, derived per blob and cached by tree hash. It replaces the optional symbols and callers (night pass, point 3); writer item not named |
+| annotation index | dLinkedLibrary | the generated annotation index and its resolve check; writer item not named |
+| recall index | dLinkedLibrary | memory-recall narrowed to a record finder; writer item not named |
+| baseline | dLinkedLibrary | retrofit's `baseline` and `census` record kinds; writer item not named |
 | census | dLinkedLibrary | retrofit's `baseline` and `census` record kinds; `adopt.census` writes it |
 | ruling | dLinkedLibrary | `adopt.practices` writes the ruling records, an item dLinkedLibrary owns |
-| shape-run | dTotalRecall | the shape-run kind |
-| build readme | dTotalRecall | the build README's declared front-matter schema, with unknown keys refused |
+| shape-run | dTotalRecall | the shape-run kind; writer item not named |
+| build readme | dTotalRecall | the build README's declared front-matter schema, with unknown keys refused; writer item not named |
 | claim | dTotalRecall | the claim ref on the remote and the ask-family counter ref (`gap-mem-13`); `entry.claim` writes the claim |
-| maintenance record | dTendedCadence | the maintenance record |
+| maintenance record | dTendedCadence | the maintenance record; writer item not named |
 | recommendation | dDeclaredLoop | every `*.recommend` item writes it; the stage-exit recommendation is one mechanism, dDeclaredLoop's (AF-1) |
 | probe | dPlacedRequest | its writer is `probe.return`: one record per probe, its kind a verification, a reproduction or an experiment, an experiment's record the measured reference that later acceptance cites (night pass, point 2) |
 | loop review | dCalibratedLens | its writer is `loop.record` |
 | value ledger | dCalibratedLens | a generated library view; `loop.price` regenerates it |
-| lexicon declaration | dMindYourWords | layer-memory lists the lexicon as an optional component's kind; dMindYourWords builds the declaration and its packs |
-| commit | dDeclaredLoop | a git commit, its `Gov-*` trailers an edge site; written by the commit queue from the act binding and by the owner's `prepare-commit-msg` filler (the memory plan, the away pass) |
-| view | dTotalRecall | a generated view: LIVE.md, the ledger, the ask views; re-rendered, never merged (the away pass) |
-| registry | dWitnessedBar | a gate's row registry under `memory/project/`, written by its gate's pin emitter (the away pass) |
-| archive | dTotalRecall | a rotated record under `memory/archive/`, written by rotation (the away pass) |
-| instrument | dTotalRecall | a script, table or drawing kept beside the record it serves (the away pass) |
-| witness | dTotalRecall | a declared pocket outside the tree, such as a transcript, a Codex rollout, the auto-memory, the live inbox or a scheduled task: its home, key and reader, written by its own owner and never by `record` (the away pass) |
+| lexicon declaration | dMindYourWords | layer-memory lists the lexicon as an optional component's kind; dMindYourWords builds the declaration and its packs; writer item not named |
+| commit | dDeclaredLoop | a git commit, its `Gov-*` trailers an edge site; written by the commit queue from the act binding and by the owner's `prepare-commit-msg` filler (the memory plan, the away pass); writer item not named |
+| view | dTotalRecall | a generated view: LIVE.md, the ledger, the ask views; re-rendered, never merged (the away pass); writer item not named |
+| registry | dTotalRecall | a gate's row registry under `memory/project/`, written by its gate's pin emitter (the away pass); writer item not named |
+| archive | dTotalRecall | a rotated record under `memory/archive/`, written by rotation (the away pass); writer item not named |
+| instrument | dTotalRecall | a script, table or drawing kept beside the record it serves (the away pass); writer item not named |
+| witness | dTotalRecall | a declared pocket outside the tree, such as a transcript, a Codex rollout, the auto-memory, the live inbox or a scheduled task: its home, key and reader, written by its own owner and never by `record` (the away pass); writer item not named |
 
 **One refinement to layers round one,** for research records and major decisions alike. Core items
 write them (`plan.research`, `design.research`, and each build's decisions as it makes them), so their

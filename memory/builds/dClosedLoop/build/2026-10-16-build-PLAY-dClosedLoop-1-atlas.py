@@ -3,6 +3,8 @@
 
 Usage: python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --out <page.html>
        python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --check
+       python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --check --plant <case>   damage the memory view's sources,
+           expect exit 1; cases: kind-unplaced, kind-ghost-tag, edge-status, hop-edge, edges-split
 
 The template beside this file is the page without its data. A run splices the derived data into a copy
 written to --out, never into the template, so the repository keeps the template and this generator while
@@ -14,6 +16,7 @@ Nothing the records hold may leave the atlas without a refusal:
 - every gap stage maps to one comparison area, and every source an area names resolves;
 - every design record that records an owner's answer contributes a decision section.
 """
+import fnmatch
 import hashlib
 import json
 import re
@@ -114,6 +117,9 @@ DECISION_KINDS = [
     ("asked", re.compile(r"(?i)\basked\b|\bforks?\b|\bput to the owner\b|\bfor the owner\b|\bquestions\b|\binterpretations\b")),
 ]
 # Where the atlas shows each section of the converged design, so a section v2 gains cannot go unshown.
+# A kind's writer cell names a writer item, or carries one of these declared markers (the away pass's review, M4).
+KIND_MARKERS = ("no writer item", "writer item not named", "every step's")
+MEMORY_PLANTS = ("kind-unplaced", "kind-ghost-tag", "edge-status", "hop-edge", "edges-split")
 V2_VIEWS = {"layers": "overview", "principles": "principles", "front-door": "records", "policies": "policies",
             "presets": "policies", "floor": "records", "witnesses": "records", "contracts": "flow", "chain": "chain",
             "open": "progress", "owed": "progress"}
@@ -275,8 +281,30 @@ def find(recs, name, sid):
     return {"path": hits[0]["path"], "id": sid}
 
 
-def derive():
-    src = {k: text(p) for k, p in SOURCES.items()}
+def plant_memory(src, plant):
+    """Damage one memory-view source in memory, so `--check --plant <case>` must stop the run (the away pass's review)."""
+    def swap(key, old, new):
+        if old not in src[key]:
+            sys.exit(f"atlas: plant {plant}: its anchor is gone")
+        src[key] = src[key].replace(old, new, 1)
+    lex = "\n| lexicon declaration | dMindYourWords |"
+    if plant == "kind-unplaced":
+        swap("memory", lex, "\n| ghost kind | dTotalRecall | a planted kind that names no writer |" + lex)
+    elif plant == "kind-ghost-tag":
+        swap("memory", lex, "\n| ghost kind | dTotalRecall | its writer is `plan.ghost-writer` |" + lex)
+    elif plant == "edge-status":
+        swap("plan", "| `made` | new |", "| `made` | nwe |")
+    elif plant == "hop-edge":
+        swap("plan", "| `follows` | none |", "| `follows`, `answered-by-typo` | none |")
+    elif plant == "edges-split":
+        swap("plan", "\n| `implements` |", "\n\n| `implements` |")
+    elif plant:
+        sys.exit(f"atlas: no plant {plant}; the cases are {', '.join(MEMORY_PLANTS)}")
+    return src
+
+
+def derive(plant=None):
+    src = plant_memory({k: text(p) for k, p in SOURCES.items()}, plant)
     v2, steps_text = src["v2"], src["steps"]
     recs = corpus()
 
@@ -527,54 +555,93 @@ def derive():
         programs.append({"program": its[0]["tag"].split(".")[0], "items": its})
 
     # The memory layer drawn whole (the away pass, point 1): the plan's families, pockets, sites, edges and cycle; the
-    # kind registry's record kinds, each placed on the step or program its writer item belongs to; and the instruction
-    # ladder memory sits at the foot of. Every pocket and hop names a family the plan declares, and every pocket's
-    # status and every hop's state is read from a fixed leading word, or the run stops.
+    # kind registry's record kinds, each placed on the step or program of the first writer item its cell names; and
+    # the instruction ladder memory sits at the foot of. Every pocket and hop names a family the plan declares; every
+    # pocket's status, edge's status and hop's state is read from a fixed leading word; every hop edge is a declared
+    # type; every plan table is counted against its raw row lines; and every kind names a writer item or carries a
+    # declared marker, its other dotted tokens resolving to a policy key or a file. Anything else stops the run. It does
+    # not check that a writer item truly writes the kind, nor that a pocket's owner owns it.
+    def one_table(block, first, where):
+        rows = table(block, first, where)
+        raw = [ln for ln in block.split("\n") if ln.startswith("| ") and not ln.startswith(f"| {first} |")]
+        if len(raw) != len(rows):
+            sys.exit(f"atlas: {where} holds {len(raw)} row lines but its table parsed {len(rows)}: a split table drops rows")
+        return rows
+
     plan = src["plan"]
     _, pfr = section(plan, "frame")
     first = pfr.strip().split("\n\n", 1)[0].split("\n")
     frame = " ".join(first[:next((i for i, ln in enumerate(first) if ln.startswith("- ")), len(first))])
     _, pfam = section(plan, "families")
     families = [{"family": r[0], "level": r[1], "holds": r[2], "lifecycle": r[3]}
-                for r in table(pfam, "Family", "memory-plan [families]")]
+                for r in one_table(pfam, "Family", "memory-plan [families]")]
     fams = {f["family"] for f in families}
     _, ppoc = section(plan, "pockets")
     pockets = []
-    for r in table(ppoc, "Pocket", "memory-plan [pockets]"):
+    for r in one_table(ppoc, "Pocket", "memory-plan [pockets]"):
         m = re.match(r"(node-local node|node|witness|out|edge site|folded|retired)\b", r[4])
         if r[1] not in fams or not m:
             sys.exit(f"atlas: memory-plan [pockets] row {r[0]!r}: family {r[1]!r} or status {r[4][:30]!r} unread")
         pockets.append({"pocket": r[0], "family": r[1], "where": r[2], "today": r[3], "becomes": r[4],
                         "status": {"node-local node": "node", "retired": "folded"}.get(m.group(1), m.group(1)),
                         "key": r[5], "owner": r[6]})
-    raw_p = [ln for ln in ppoc.split("\n") if ln.startswith("| ") and not ln.startswith("| Pocket |")]
-    if len(raw_p) != len(pockets):
-        sys.exit(f"atlas: memory-plan [pockets] holds {len(raw_p)} rows but parsed {len(pockets)}")
     _, psite = section(plan, "sites")
-    sites = [{"site": r[0], "syntax": r[1], "door": r[2]} for r in table(psite, "Site", "memory-plan [sites]")]
+    sites = [{"site": r[0], "syntax": r[1], "door": r[2]} for r in one_table(psite, "Site", "memory-plan [sites]")]
     _, pedge = section(plan, "edges")
-    medges = [{"edge": plain(r[0]), "fromTo": r[1], "site": r[2], "inverse": plain(r[3]),
-               "status": "derived" if r[4].startswith("derived") else "new" if r[4].startswith("new") else "P33",
-               "statusText": r[4], "need": r[5]} for r in table(pedge, "Edge", "memory-plan [edges]")]
+    medges = []
+    for r in one_table(pedge, "Edge", "memory-plan [edges]"):
+        m = re.match(r"(P33|new|derived)\b", r[4])
+        if not m:
+            sys.exit(f"atlas: memory-plan [edges] row {r[0]!r}: status {r[4][:30]!r} unread")
+        medges.append({"edge": plain(r[0]), "fromTo": r[1], "site": r[2], "inverse": plain(r[3]), "status": m.group(1),
+                       "statusText": r[4], "need": r[5]})
     names = {e["edge"] for e in medges}
     _, pcyc = section(plan, "cycle")
     hops = []
-    for r in table(pcyc, "Hop", "memory-plan [cycle]"):
+    for r in one_table(pcyc, "Hop", "memory-plan [cycle]"):
         m = re.match(r"(partly typed|typed|prose|search|none)\b", r[4])
-        used = [e for e in re.findall(r"`([a-z-]+)`", r[3]) if e in names]
-        if r[1] not in fams or r[2] not in fams or not m or not used:
-            sys.exit(f"atlas: memory-plan [cycle] hop {r[0]!r}: a family, its state or its edge is unread")
-        hops.append({"hop": r[0], "from": r[1], "to": r[2], "edges": used, "edgeText": r[3], "today": r[4],
+        found = re.findall(r"`([a-z-]+)`", r[3])
+        unknown = [e for e in found if e not in names]
+        if r[1] not in fams or r[2] not in fams or not m or not found or unknown:
+            sys.exit(f"atlas: memory-plan [cycle] hop {r[0]!r}: a family, its state or an edge is unread {unknown}")
+        hops.append({"hop": r[0], "from": r[1], "to": r[2], "edges": found, "edgeText": r[3], "today": r[4],
                      "state": m.group(1), "site": r[5]})
     _, mdes = section(src["memory"], "design")
     con_blk = mdes.split("### [contract]", 1)[1].split("\n### ", 1)[0]
     place = {it["tag"]: s["tag"] for s in steps for it in s["items"]}
     place.update({it["tag"]: p["program"] for p in programs for it in p["items"]})
+    keyset = {p["key"] for p in policies}
+    taglike = re.compile(r"[a-z*][a-z0-9*-]*(?:\.[a-z0-9*][a-z0-9*-]*)+")
+    con_rows = table(con_blk, "Kind", "layer-memory [contract]")
+    raw_k = re.findall(r"(?m)^\| [a-z][a-z -]* \| d[A-Z]\w+ \| ", con_blk)
+    if len(raw_k) != len(con_rows):
+        sys.exit(f"atlas: layer-memory [contract] holds {len(raw_k)} kind lines but its table parsed {len(con_rows)}")
     kinds = []
-    for r in table(con_blk, "Kind", "layer-memory [contract]"):
-        writers = [t for t in ITEM_TAG.findall(r[2]) if t in place]
-        kinds.append({"kind": r[0], "owner": r[1], "writer": r[2], "items": writers,
-                      "places": sorted({place[t] for t in writers})})
+    for r in con_rows:
+        writers, ghosts = [], []
+        for t in re.findall(r"`([^`]+)`", r[2]):
+            if not taglike.fullmatch(t) or re.search(r"\.(?:toml|md|py|sh|js|json|txt|conf)$", t):
+                continue   # a plain word, a path, a trailer or a file name: never a writer tag
+            if "*" in t:
+                hits = sorted(x for x in place if fnmatch.fnmatchcase(x, t))
+                if hits:
+                    writers += hits
+                elif not any(fnmatch.fnmatchcase(k, t) for k in keyset):
+                    ghosts.append(t)
+            elif t in place:
+                writers.append(t)
+            elif t not in keyset:
+                ghosts.append(t)
+        if ghosts:
+            sys.exit(f"atlas: layer-memory [contract] kind {r[0]!r} names {ghosts}, resolving to no item, key or file")
+        marker = next((mk for mk in KIND_MARKERS if mk in r[2]), "")
+        if not writers and not marker:
+            sys.exit(f"atlas: layer-memory [contract] kind {r[0]!r} names no writer item and carries no marker")
+        places = []
+        for t in writers:
+            if place[t] not in places:
+                places.append(place[t])
+        kinds.append({"kind": r[0], "owner": r[1], "writer": r[2], "items": writers, "places": places, "marker": marker})
     levels = [{"level": r[0], "what": r[1]} for r in table(src["instruction"], "Level", "layer-instruction R-G")]
     memory = {"frame": frame, "path": SOURCES["plan"].relative_to(REPO).as_posix(), "families": families,
               "pockets": pockets, "sites": sites, "edges": medges, "hops": hops, "kinds": kinds, "levels": levels}
@@ -603,7 +670,7 @@ def derive():
 
 
 def main(argv):
-    data = derive()
+    data = derive(argv[argv.index("--plant") + 1] if "--plant" in argv else None)
     if "--check" in argv:
         n = sum(len(r["sections"]) for r in data["records"])
         print(f"atlas: derived — {len(data['records'])} records, {n} sections, {len(data['decisions'])} decision sections, "

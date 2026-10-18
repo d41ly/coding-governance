@@ -211,29 +211,32 @@ review acts' output tokens only.
    witness holds, and rolls back by running the down steps in reverse.
 3. **gov runs every step on itself first**, through the lander in the prepared merge.
 4. **Two bounded windows** keep old surfaces working: a command or hook path forwards and warns for
-   `install.deprecation-window` releases, and an old conf or record shape is read until its step runs.
+   `install.deprecation-window` releases, through dGroundRules' forwarding shim, and an old conf or record shape is
+   read until its step runs. The window is at least `currency.max-behind`, so an adopter inside its currency budget
+   never meets a removed surface.
 5. **A release-0 fixture tree** is walked up, down and up again, byte-identical down, each step seen load-bearing.
 6. **The receipt records the steps**, and the currency watch and the fleet register read steps pending and shim
    calls, so the owner sees a stuck migration, not only an adopter behind.
 7. **Where the step kind is built.** It must exist before dOrderedCharter, the first build to change what an adopter
    sees. It is placed in dGroundRules, beside the legacy homes the translation window reads, and the recovery,
-   receipt and fleet units go to dShippedRelease. The researcher recommended a build of its own; at four units the
+   receipt and fleet units go to dShippedRelease. The researcher recommended a build of its own; at five units the
    path cost is the same either way, so the split is the owner's (AP-25).
 8. **Four keys**: `install.deprecation-window`, `install.on-shim-call`, `install.retired-edits`, `install.steps`.
 
 ## [chain-impact] What the away pass did to the chain
 
 The chain keeps its twenty builds; no build is added, split or reordered, and the one structural question, where
-the upgrade-step kind lives, is parked as AP-25. Thirteen builds gain units, 30 in all, each clause on its own build
-or one it depends on:
+the upgrade-step kind lives, is parked as AP-25. Fourteen builds gain units, 32 in all, two of them from the closing
+review, each clause on its own build or one it depends on:
 
 | Build | Units added | For |
 |---|---|---|
-| dGroundRules | 4 | the upgrade-step kind, its walk, its down steps and its fixture (point 6) |
+| dGroundRules | 5 | the upgrade-step kind, its walk, its down steps, its fixture and the forwarding shim (point 6) |
 | dOrderedCharter | 4 | the edge grammar, the writing practice's checks, the portable practice, its own upgrade steps (points 1, 4, 6) |
-| dDeclaredLoop | 1 | the commit node and its trailer keys (point 1) |
+| dDeclaredLoop | 1 | the commit node, its kind and its trailer keys (point 1) |
 | dPlacedRequest | 1 | the kickoff manifest as instruction units (point 1) |
 | dWitnessedBar | 2 | the portability leg pack, and the verdict's cause and leg tails (points 4, 5) |
+| dKeptSession | 1 | the catalogue's reader join (the closing review) |
 | dTotalRecall | 2 | the completed kind registry, and `record`'s header and edge line (points 1, 5) |
 | dLinkedLibrary | 1 | decision and bug-class edges (points 1, 4) |
 | dBoundRoles | 1 | markers on every work order, `answers` on every return (point 1) |
@@ -247,27 +250,29 @@ The path, recomputed by `critical_path.py` on the folded tree, against the one t
 
 ```text
 before, at fa62092db: critical path 171 units over 335
-critical path: 190 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 12, dFairHearing 24, dOrderedCharter 43, dDeclaredLoop 66, dPlacedRequest 74, dWitnessedBar 91, dKeptSession 92, dBoundRoles 108, dTotalRecall 110, dRankedPlan 123, dFurnishedOrders 126, dLinkedLibrary 134, dIndexedDesign 146, dWellOiledMachine 147, dScopedBuild 158, dTendedCadence 162, dMindYourWords 164, dShippedRelease 172, dCalibratedLens 174, dConvergedCharter 190
+critical path: 191 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 13, dFairHearing 25, dOrderedCharter 44, dDeclaredLoop 67, dPlacedRequest 75, dWitnessedBar 92, dKeptSession 94, dBoundRoles 109, dTotalRecall 111, dRankedPlan 124, dFurnishedOrders 127, dLinkedLibrary 135, dIndexedDesign 147, dWellOiledMachine 148, dScopedBuild 159, dTendedCadence 163, dMindYourWords 165, dShippedRelease 173, dCalibratedLens 175, dConvergedCharter 191
 ```
 
-It grows by 19 units. Its run moves from dLinkedLibrary and dIndexedDesign onto dWellOiledMachine, whose six new
+It grows by 20 units. Its run moves from dLinkedLibrary and dIndexedDesign onto dWellOiledMachine, whose six new
 units make it finish one unit after dIndexedDesign. AP-25's homes for the step kind, priced the same way:
 
 ```text
-as placed, in dGroundRules: 190 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-in dShippedRelease, adopters held until it lands: 188 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dShippedRelease > dConvergedCharter
-a build of its own between dGroundRules and dOrderedCharter: 190 units, dGroundRules > dHandedOverStandIn > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+as placed, in dGroundRules: 191 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+in dShippedRelease, adopters held until it lands: 189 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dShippedRelease > dConvergedCharter
+a build of its own between dGroundRules and dOrderedCharter: 191 units, dGroundRules > dHandedOverStandIn > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 ```
 
 Holding adopters back until dShippedRelease saves two units, because dShippedRelease then becomes the critical
 build, and it would freeze every adopter on today's kits through the whole chain. The other effects:
-- **The gap register** grows by 39 gaps, every one owned by exactly one build: Memory 6, Roles 1, Spine 2,
-  Runtime 7, Orient 2, Test 1, Maintain 1, Deploy 9, Tooling 10. Two Codex rows, `gap-rt-09` and `gap-rt-11`, are
-  amended with Codex's current hooks.
-- **The catalogue** gains 17 keys, 13 of them in every preset and 4 among the keys presets never touch.
+- **The gap register** grows by 41 gaps, every one owned by exactly one build: Memory 6, Roles 1, Spine 3,
+  Runtime 7, Orient 2, Test 1, Maintain 1, Deploy 10, Tooling 10. Two Codex rows, `gap-rt-09` and `gap-rt-11`, are
+  rewritten with Codex's current hooks.
+- **The catalogue** gains 16 keys, 12 of them in every preset and 4 among the keys presets never touch, and the
+  systems round's `memory.legacy-anchors` gains a `retag` value.
 - **The principles** gain P34 to P38, and P33's closed set eleven types.
-- **The kind registry** gains six kinds: commit, view, registry, archive, instrument and witness.
+- **The kind registry** gains six kinds: commit, view, registry, archive, instrument and witness. The card's row now
+  names its writer item, and the 32 rows that name none carry the marker `writer item not named`.
 - **The level-0 map** now uses its degrade order, shortening purposes to 40 characters to stay within its budget,
   as its design allows; gap-mem-30's owed measurement covers it.
 - **The atlas** gains its Memory view, derived from the plan record and the kind registry.
@@ -280,7 +285,7 @@ Thirty forks, each with the recommendation first. A key's default stands as reco
 |---|---|---|---|
 | AP-1 | How does a record section declare its edges? (a structural decision) | one `**Edges:**` line under the heading, as the Serves line declares the record's; front matter keyed by section; a sidecar per record | the plan's `[sites]` |
 | AP-2 | How far does the closed edge set grow? (a structural decision) | the eleven types, each needed by a measured hop; a core four (`serves`, `made-by`, `caused-by`, `answers`) with the rest as record fields; `part-of` and `cites` widened to carry them | P33's closed set |
-| AP-3 | `memory.legacy-records`: how do today's records reach the plan? | backfill: Serves lines read as edges, derived anchors, no file rewritten; anchors-only; retag every record | the key's default |
+| AP-3 | `memory.legacy-anchors`, widened: how do today's records reach the plan? | derived: anchors derived and Serves lines read as edges, no file rewritten; retag every record's headings; none | the key's default |
 | AP-4 | How does a design-only build's unit become a node? | the build README's `ids:` defines it; design-only builds exempt from the bindings check | dTotalRecall's registry |
 | AP-5 | How does git join the syntax? (a structural decision) | typed trailers, one key per edge, mapped in the registry; one `Gov-Edge:` key; git notes; a derived commit index alone | dDeclaredLoop's commit node |
 | AP-6 | `commits.edge-check`: where are the trailers checked? | push-leg, reading the binding; commit-msg; off | the key's default |
@@ -309,3 +314,86 @@ Thirty forks, each with the recommendation first. A key's default stands as reco
 | AP-29 | `install.steps`: who runs an upgrade step? | offer: gov's no-target-code mode, a step needing the target's code falling back to attended; attended always | the key's default |
 | AP-30 | How does gov itself migrate? (P8) | the lander runs each new step on gov first, recorded in its source-mode receipt; gov's own diff is its migration | dShippedRelease's lander unit |
 
+## [review-fold] The closing review, folded
+
+The closing review, dispatch 112, read everything design-bearing since the night pass's review fold, `a66c855f3` over
+`15cec9200`: the night pass's folded answers, the walk's four waves and the away pass. It ran `tier2-review.js` light,
+at the owner's medium effort: three `gov-diff-reviewer` lenses (correctness, seams, verification), four `gov-skeptic`
+batches and one `gov-synthesizer`. Its report, `reviews/2026-10-18-review-PLAY-dClosedLoop-1-away-pass-closing.md`,
+reads CLEAN WITH FIXES: 16 raw findings, 15 confirmed and 1 refuted, as 13 items, 2 high, 6 medium and 5 low. Every
+item is folded:
+
+| Item | What it found | The fold |
+|---|---|---|
+| H1 | the plan's `[chain]` put three units on builds v2 does not | the plan's `[chain]` now names each unit by its v2 clause's opening words and its build, and the design map's chain-echo arm reds on a mismatch |
+| H2 | no unit built `install.deprecation-window` or `install.on-shim-call` | dGroundRules gains the forwarding shim, each value seen on a planted retired path, and `gap-deploy-24` |
+| M1 | the window's presets contradicted its own rule | the window is at least `currency.max-behind` by a pair rule in v2 `[presets]`, its presets now 4, 2, 1 and 2, and the preset check's pair arm reds on the old velocity row |
+| M2 | the same misplacement as H1, seen by another lens | folded with H1 |
+| M3 | no edge type carried a commit to a unit or an item | `serves` takes a commit, `Gov-Unit` and `Gov-Item` map to it and `Gov-Act` to `made-by`, and a planted `Gov-Item:` joins the commit gates |
+| M4 | the Memory view passed kinds it could not place | the atlas resolves each writer token as an item, a key or a file, and refuses a ghost token or a kind with neither a writer item nor a marker; 32 kinds carry `writer item not named`, the card names `entry.orient`, and `gap-mem-37` counts them |
+| M5 | an unread edge status became P33, and an undeclared hop edge vanished | the status is read from P33, new or derived, and every hop edge must be declared |
+| M6 | the no-stale-facts arm witnessed its own zero | the arm counts its records and quotes, prints both, and reds on no record, on fewer quotes than its floor of 15, or on a record ending inside an open fence |
+| L1 | layer-runtime kept the stale Codex hook set beside its revision | the Codex row states the twelve events with the revision kept as provenance, and the same stale claim is rewritten in layer-instruction, `gap-rt-09` and `gap-rt-11` |
+| L2 | the commit and registry kinds had two owners | the commit kind is named in dDeclaredLoop's row, the registry kind moves to dTotalRecall, and dTotalRecall's row names view, registry, archive, instrument and witness |
+| L3 | a kind was grouped under a step that only names it | a kind is grouped by the first writer item its row names |
+| L4 | a mistyped second hop edge dropped silently | folded with M5 |
+| L5 | only `[pockets]` was counted against its raw lines | every plan table and the kind registry are counted, and a split table stops the run |
+
+**Found while folding.**
+- `memory.legacy-records` duplicated the systems round's `memory.legacy-anchors`. The duplicate is dropped, and
+  `memory.legacy-anchors` gains `retag`; AP-3 asks about the widened key.
+- `install.retired-edits` was dGroundRules' while dShippedRelease's row honours it. It moves to dShippedRelease, and
+  every key the away pass added is now named by a unit on its owner's row.
+- H2's proposed gate, a key that no unit on its owner's row names, was run over the tree first: 116 of 220 keys fail
+  it, so it cannot arm as a red. dKeptSession's catalogue reader join holds them as a shrink-only population, and
+  `gap-spine-10` registers them.
+
+**The gates, each seen red on its planted case before it is trusted:**
+
+```text
+$ python map.py --check --plant <case>
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
+FINDING no stale facts: read no design record
+FINDING chain echo: memory-plan [chain] puts 'the shared edge grammar at every site the memory p' on dGroundRules, whose v2 row holds no clause opening so
+$ python atlas.py --check --plant <case>
+atlas: layer-memory [contract] kind 'ghost kind' names no writer item and carries no marker
+atlas: layer-memory [contract] kind 'ghost kind' names ['plan.ghost-writer'], resolving to no item, key or file
+atlas: memory-plan [edges] row '`made-by`': status 'nwe' unread
+atlas: memory-plan [cycle] hop 'work order → act': a family, its state or an edge is unread ['answered-by-typo']
+atlas: memory-plan [edges] holds 24 row lines but its table parsed 1: a split table drops rows
+$ python atlas.py --check   (the fixed generator on the registry before its markers)
+atlas: layer-memory [contract] kind 'exception' names no writer item and carries no marker
+$ python preset_check_canonical.py v2-at-a66c855f3.md
+catalogue keys 225 · presettable 207 · preset rows 207
+pair rule: velocity sets install.deprecation-window 1 under currency.max-behind 4
+```
+
+The fold is one round, as the knee of earlier rounds advises: it changes records and instruments, every check is
+green on the folded tree, and the planted cases above show each new arm can fail. The security and intent lenses
+did not run, since the review was light.
+
+## [state] The report, and the state the pass leaves
+
+**Each point, in one line:**
+- **1, memory and instruction.** Yes. One writing practice (P34), one edge grammar at every site, eleven new edge
+  types, and all 45 pockets placed as node, witness or out. Git joins by typed trailers, sessions through the act,
+  and Codex keeps ids and transcripts without a live inbox. The atlas shows it in its new Memory view.
+- **2, the plan.** `build/2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md`, laid down before any chain build
+  proceeds: every pocket, site, edge, hop, door, layer, unit, migration step, check and key.
+- **3, the CLI.** Yes, as the runtime, never as the owner's window. A headless session ran and was resumed by its id,
+  and harness adapters measured by one conformance fixture keep gov independent of the owner's application (P36).
+- **4, compatibility.** One practice, a role per language, ratcheting toward Python (P37). Only Windows is tested
+  today. Under WSL, two of three checks failed, so a declared platform matrix and its runners are owed.
+- **5, observability.** Not as designed; yes with a cause on every record, cost on every act, and `gov trace` and
+  `gov why` (P35).
+- **6, distribution.** Release-chained upgrade steps, up and down, gov first, with a forwarding window for moved
+  surfaces (P38). Today's engine refuses a retired kit outright and cannot roll back.
+
+**The state:**
+- **The design:** 20 builds, 367 planned units, 38 principles, 224 keys, 296 gaps and 76 record kinds.
+- **The checks:** every one green on the folded tree, re-run in the instruments record's `[final]`.
+- **The chain's path:** it grows by 20 units, now through dWellOiledMachine; `[chain-impact]` holds the run.
+- **The closing review:** CLEAN WITH FIXES, every item folded, `[review-fold]`.
+- **Forks parked:** AP-1 to AP-30, seven of them structural: AP-1, AP-2, AP-5, AP-10, AP-15, AP-24 and AP-25.
+- **Not done:** nothing merged or pushed, no product code, no chain spec written. The build's exit still waits on the
+  owner's word that the design has its full shape.

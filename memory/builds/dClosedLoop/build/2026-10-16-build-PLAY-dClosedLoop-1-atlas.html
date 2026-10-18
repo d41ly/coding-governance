@@ -1514,14 +1514,15 @@ tr[data-medge].on td { background: var(--accent-soft); }
     });
     v.appendChild(grid);
     var kb = el('div', { class: 'panel box' });
-    kb.appendChild(el('div', { class: 'eyebrow', text: 'Record kinds, by the step or program whose item writes them' }));
+    kb.appendChild(el('div', { class: 'eyebrow', text: 'Record kinds, by the step or program of the first item named as their writer' }));
+    var MARKER_LABEL = { 'no writer item': 'no flow item writes it', 'writer item not named': 'writer item not named yet', "every step's": "every step's exit item writes it" };
     var groups = {}, gorder = [];
-    MEM.kinds.forEach(function (k) { var g = k.places.length ? k.places[0] : ''; if (!groups[g]) { groups[g] = []; gorder.push(g); } groups[g].push(k.kind); });
-    var rank = function (g) { var i = D.steps.findIndex(function (s) { return s.tag === g; }); return g === '' ? 999 : i < 0 ? 500 : i; };
+    MEM.kinds.forEach(function (k) { var g = k.places.length ? k.places[0] : '~' + k.marker; if (!groups[g]) { groups[g] = []; gorder.push(g); } groups[g].push(k.kind); });
+    var rank = function (g) { var i = D.steps.findIndex(function (s) { return s.tag === g; }); return g.charAt(0) === '~' ? 900 : i < 0 ? 500 : i; };
     gorder.sort(function (a, b) { return rank(a) - rank(b) || (a < b ? -1 : 1); });
     gorder.forEach(function (g) {
       var row = el('div', { class: 'mk-row' });
-      row.appendChild(el('div', { class: 'sub-head' }, g === '' ? 'named by no flow item' : STEP[g] ? esc(STEP[g].name) : 'the ' + esc(g) + ' program'));
+      row.appendChild(el('div', { class: 'sub-head' }, g.charAt(0) === '~' ? esc(MARKER_LABEL[g.slice(1)] || g.slice(1)) : STEP[g] ? esc(STEP[g].name) : 'the ' + esc(g) + ' program'));
       row.appendChild(chips(groups[g], kindChip));
       kb.appendChild(row);
     });
@@ -1561,7 +1562,8 @@ tr[data-medge].on td { background: var(--accent-soft); }
   function showKind(name) {
     var k = MKIND[name];
     var nodes = [block('Owner', null, ownerNode(k.owner)), block('Its writer, or what names it', md(k.writer))];
-    if (k.items.length) nodes.push(block('Writer items', null, chips(k.items, function (t) { return ITEMS[t] ? itemChip(t) : el('code', { text: t }); })));
+    if (k.items.length) nodes.push(block('Writer items, the first deciding its group', null, chips(k.items, function (t) { return ITEMS[t] ? itemChip(t) : el('code', { text: t }); })));
+    else if (k.marker) nodes.push(block('Declared marker', '<code>' + esc(k.marker) + '</code> <span class="muted">· shown apart from the steps until the kind registry names its writer item</span>'));
     nodes.push(block('Source', null, refChip(D.sources.memory, null, 'layer-memory, the kind registry')));
     inspector('Record kind', name, true, nodes);
   }

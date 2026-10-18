@@ -95,7 +95,7 @@ reader needs. The counts are the returns' measurements.
 | gate ledger, logs and caches | views | the git dir | keyed by tree or range SHA | out: the verdict record is the node | — | dWitnessedBar |
 | LIVE and the ledger | views | `memory/LIVE.md`, `memory/ledger/` | generated | node: a view kind | — | dTotalRecall |
 | ask views | views | `memory/backlog/*.md` | generated | node: a view kind | — | dTotalRecall |
-| project registries | views | `memory/project/*.txt` | 872 path-keyed rows | node: the `registry` kind | path | dWitnessedBar |
+| project registries | views | `memory/project/*.txt` | 872 path-keyed rows | node: the `registry` kind | path | dTotalRecall |
 | archive | views | `memory/archive/` | rotated records | node: the `archive` kind | path | dTotalRecall |
 | instruments | views | scripts and tables in build folders | 94 files; 3 carry no Serves line | node: the `instrument` kind | path | dTotalRecall |
 | recall index | views | the git common dir | derived | node: `recall-index` | — | dLinkedLibrary |
@@ -133,7 +133,7 @@ The shared grammar of an edge, at every site: `type=target[,target]`.
 | a record's section | the `## [tag] Title` heading, then at most one line `**Edges:** type=target type=target` | `record` |
 | an instruction unit | its row's `select`, `required-by` and `enforced-by` fields, as today, and `edges` in the same grammar | `instructions.edit` |
 | code | `gov:note <tags> — <definition> → <pointer> [refs=…]` and `gov:feature <tag>` | the builder, under the annotation grammar |
-| a commit | one trailer key per edge: `Gov-Unit:`, `Gov-Item:`, `Gov-Act:`, with `Pass:` and `Decided:` kept as registered keys, each mapped to its edge type in the registry | the commit queue from the act binding; a `prepare-commit-msg` filler in the owner's session |
+| a commit | one trailer key per edge: `Gov-Unit:` and `Gov-Item:` for `serves`, `Gov-Act:` for `made-by`, with `Pass:` and `Decided:` kept as registered keys, each mapped to its edge type in the registry | the commit queue from the act binding; a `prepare-commit-msg` filler in the owner's session |
 | a work order | the `gov:handoff` marker (role, build, unit, path, `role-sha`, `task-sha`), gaining `item=` | the handoff renderer |
 | an act | the act record's fields: item instance, work order `task-sha`, harness, harness session, node, parent | the supervisor |
 | a kind's registry row | its writer and readers | dTotalRecall's registry |
@@ -163,7 +163,7 @@ derived.
 | `patches` | patch build → build or item | the patch build's intake | `patched-by` | P33 | Maintain's fixes |
 | `owner` | node → chain build or layer | the node's declaration | `owns` | P33 | ownership |
 | `layer` | kit or part → layer | the descriptor | `in-layer` | P33 | layers |
-| `serves` | record, work order → unit or build | the `**Serves:**` line | `served-by` | new: today's Serves line, typed | record to unit (2,278 records) |
+| `serves` | record, work order, commit → unit, item or build | the `**Serves:**` line; the `Gov-Unit:` and `Gov-Item:` trailers | `served-by` | new: today's Serves line, typed | record to unit (2,278 records), and commit to unit and item |
 | `made-by` | commit, record → act or the owner | `Gov-Act:`; the record header | `made` | new | who made a thing |
 | `caused-by` | record → the record or event that caused it | the record header's `**Caused-by:**` | `causes` | new | why a thing exists; the trace's spine |
 | `follows` | act → work order | the act record | `followed-by` | new | under which instruction an act ran |
@@ -190,7 +190,7 @@ and "prose" mean it does not.
 | work order → act | instruction | runtime | `follows` | none | the act record's `task-sha` |
 | act → session | runtime | runtime | `runs-in` | none: the run claim carries a session in prose | the session binding |
 | act → commit | runtime | git | `made-by` | search: by SHA across transcripts | the `Gov-Act:` trailer |
-| commit → unit and item | git | trail | `serves` (through `Gov-Unit:`), `made-by` | partly typed: the subject's scope, unchecked | `Gov-Unit:` and `Gov-Item:` trailers |
+| commit → unit and item | git | trail | `serves` (through `Gov-Unit:` and `Gov-Item:`) | partly typed: the subject's scope, unchecked | `Gov-Unit:` and `Gov-Item:` trailers |
 | commit → landing | git | trail | `carries` | none: landing records are designed | the landing record |
 | landing → verdict | trail | trail | `caused-by` | none | the verdict record's parent |
 | return → work order | trail | instruction | `answers` | prose: in most research records | the return's header |
@@ -265,34 +265,34 @@ So Codex can do the same for ids, resume and transcripts, and joins inter-sessio
 
 ## [chain] The units, by build
 
-Each line is one planned unit, added to its build's row in v2 `[chain]`.
+The plan's units live in v2 `[chain]`, one clause each. Each row below names the build whose row holds one, and the
+clause by its opening words. The design map's chain-echo arm reds when a row's build holds no clause opening so.
 
-| Build | Unit |
-|---|---|
-| dOrderedCharter | the shared edge grammar at every site, with the eleven new types registered and `decides` and `after` widened |
-| dOrderedCharter | the writing practice's rules as checks over records as well as units: address, one subject, typed relations, pinned facts, one door |
-| dDeclaredLoop | the commit node: its trailer keys mapped to edge types, one reader for `Pass:`, and the position engine reading them |
-| dWitnessedBar | the edge leg: types, targets, namespaces and inverses, each arm seen red on a planted case; the commit-key leg at the push, reading the binding |
-| dTotalRecall | the registry's rows completed (home, lifecycle, readers, layer), with witness rows for the pockets outside the tree |
-| dTotalRecall | `record` writing the header (Serves, Made-by, Caused-by) and the section edge line, refusing a missing cause |
-| dTotalRecall | the view, registry, archive and instrument kinds, and the Serves kind `journal` renamed `log` |
-| dTotalRecall | the Serves backfill: every existing Serves line read as a `serves` edge, derived anchors for untagged headings |
-| dLinkedLibrary | `decides` on every decision row, `Decided:` trailers read as decision rows, and `caused-by` on every bug class |
-| dLinkedLibrary | the promotion route: `instructions.edit` writing `promoted-from`, and reuse entries rendered from it |
-| dBoundRoles | every work order carrying the marker with `item=`, and every return its `answers` |
-| dWellOiledMachine | the act as the key: minted at launch, the session preset, and act, harness and session recorded together |
-| dWellOiledMachine | the commit queue's trailers and the `prepare-commit-msg` filler |
-| dWellOiledMachine | the session node derived from bindings, with `runs-in` and `after`, and live delivery through the inbox |
-| dShippedRelease | `carries` on the landing record, and a publication recorded as a release |
-| dConvergedCharter | the guides' positional citations migrated to tags, and the legacy records' anchors kept as aliases |
-| dClosedLoop | the atlas's memory view, derived from this record and the kind registry (built in the away pass) |
+| Build | The plan's part | Its v2 clause opens with |
+|---|---|---|
+| dOrderedCharter | the edge grammar, the eleven types, `promoted-from` and the edge checks | the shared edge grammar at every site the memory plan names |
+| dOrderedCharter | the writing practice's checks | the one writing practice's checks over records as well as units |
+| dDeclaredLoop | the commit node, its kind and its trailer keys | the commit node and its kind |
+| dTotalRecall | the completed kind registry and the new kinds | the kind registry completed |
+| dTotalRecall | `record`'s header and edge line, and the legacy records' reading | `record` writing each record's header |
+| dLinkedLibrary | the decision and bug-class edges | `decides` on every decision row |
+| dBoundRoles | markers on work orders, `answers` on returns | every work order carrying its marker |
+| dWellOiledMachine | the act as the key | the act as the key |
+| dWellOiledMachine | the commit queue's trailers and the commit-key leg | the commit queue writing the `Gov-*` trailers |
+| dWellOiledMachine | the session node and live delivery | the session node derived from bindings |
+| dPlacedRequest | the kickoff manifest as instruction units | the kickoff manifest's facts |
+| dShippedRelease | `carries` on landings, and publications | `carries` on the landing record |
+| dConvergedCharter | the guides' migration to tags | the guides' positional citations migrated to tags |
+
+The atlas's memory view, derived from this record and the kind registry, was built in the away pass itself and
+belongs to no chain build.
 
 ## [migration] Today's memory onto the plan
 
 Nothing is rewritten by hand. Each step is mechanical, owned and graded:
 - **Serves lines** become `serves` edges by reading, with no file changed.
 - **Untagged headings** get derived anchors, frozen as aliases, so a legacy section is addressable without a retag;
-  `memory.legacy-records` says whether an adopter keeps anchors only, backfills edge lines, or retags.
+  `memory.legacy-anchors` says whether an adopter derives anchors, the default, retags its records, or keeps neither.
 - **Decision rows** gain `decides` from the dossiers that already list them, then by hand where none does, each a
   row of the decision kind's ledger population.
 - **Old commits** stay as they are. The index reads what they carry, the subject's scope, `Pass:` and `Decided:`,
@@ -307,7 +307,8 @@ Each is seen red on a planted case before it is trusted:
 - **edges:** an unregistered type; a target that resolves nowhere; a source or target outside the type's namespaces;
   an inverse not rendered;
 - **causes:** a non-root record with no `caused-by`; an orphan, a record nothing reaches from a root;
-- **commits:** a pushed commit an act made with no `Gov-Act:`; a `Gov-Act:` the binding does not hold;
+- **commits:** a pushed commit an act made with no `Gov-Act:`; a `Gov-Act:` the binding does not hold; a planted
+  `Gov-Item:` trailer read as anything but `serves`;
 - **work orders:** a handoff with no marker; a return with no `answers`;
 - **positional:** a new positional citation in live text;
 - **pins:** a quoted derived fact with no pin on its line, across every record;
@@ -318,19 +319,22 @@ Each is seen red on a planted case before it is trusted:
 The atlas gains a Memory view, derived and never typed. It draws:
 - the eight families of `[families]`, as one ring in the cycle's order, each listing its pockets;
 - every pocket of `[pockets]`, with its status (node, witness, out), its owner and its key;
-- the kind registry's record kinds (layer-memory `[contract]`), each placed on the step or program its writer belongs
-  to, with its owner;
+- the kind registry's record kinds (layer-memory `[contract]`), each placed on the step or program of the first writer
+  item its row names, or shown apart under its declared marker (no writer item, writer item not named, every step's
+  exit item), with its owner;
 - the closed edge set of `[edges]`, each type with its declaring site and its inverse;
 - the cycle of `[cycle]`, each hop marked typed or not today.
 
 Clicking a pocket, a kind or an edge opens its detail. The view reads this record and layer-memory, so a change to
-either moves it.
+either moves it. It refuses what it cannot place: a kind with neither a writer item nor a marker, a writer token that
+resolves to no item, key or file, an unread status or state, an undeclared hop edge, and a table split by a blank
+line, each seen red on a planted case.
 
 ## [keys] The keys the plan adds
 
 | Key | Allowed values | Default | Why |
 |---|---|---|---|
-| `memory.legacy-records` | anchors-only, backfill, retag | backfill | an adopter's own records are its own; the backfill changes no file |
+| `memory.legacy-anchors`, widened | derived, none, retag | derived | the systems round's key gains `retag`: an adopter's own records are its own, and the default rewrites no file |
 | `commits.edge-check` | push-leg, commit-msg, off | push-leg | a refusal at commit time catches the owner's own commits mid-thought; the push is the binding boundary |
 | `commits.squash` | re-emit-union, refuse, accept-loss | re-emit-union | a squash drops every trailer; gov never squashes, an adopter may |
 | `trace.identity` | act-only, session, salted | act-only | the owner's rule of 2026-09-13 keeps session ids out of committed records |

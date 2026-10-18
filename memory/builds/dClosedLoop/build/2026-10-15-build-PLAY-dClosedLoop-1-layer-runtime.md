@@ -795,13 +795,14 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - **Codex:**
     - it has PreToolUse (Bash, apply_patch, MCP), SubagentStart, SubagentStop, PreCompact and
       SessionEnd;
-    - it has no SessionStart, PostToolUse, Stop or PostCompact;
+    - as of Codex CLI 0.139 it documents twelve hook events, SessionStart, PermissionRequest, UserPromptSubmit, Stop
+      and PostCompact among them, each project hook trusted by hash before it runs; whether PostToolUse is among them is
+      unmeasured;
     - it has no Workflow tool (unverified), and no fail-closed switch is shown;
     - its own docs call its hooks "not a complete enforcement boundary".
     - Revised 2026-10-18, the away pass (`build/2026-10-18-build-PLAY-dClosedLoop-1-research-harness-cli.md` section
-      3): Codex CLI 0.139 documents twelve hook events, SessionStart, PermissionRequest, UserPromptSubmit, Stop and
-      PostCompact among them, each project hook trusted by hash before it runs. The conformance fixture re-measures
-      its row (P36).
+      3): the twelve events replace the five measured before, which named no SessionStart, PostToolUse, Stop or
+      PostCompact. The conformance fixture re-measures the row (P36).
 
   Under Codex, the binding, return and fail-closed invariants hold only at the git boundary and through
   witnesses. So Codex runs instructions plus guards until a spawn backend is registered for it.

@@ -601,7 +601,7 @@ It is the seam the adapters' render targets extend.
 | Harness | Load points |
 |---|---|
 | Claude Code | `CLAUDE.md`, agents, Skills, hooks, rules |
-| Codex | `AGENTS.md` alone. Codex reads one file per directory, so an override file would replace the charter rather than add to it. The 32 KiB limit covers the whole chain of files it reads. Codex has no SessionStart, so the card reaches it only through the adapter's launch input (`gap-rt-11`) |
+| Codex | `AGENTS.md` alone. Codex reads one file per directory, so an override file would replace the charter rather than add to it. The 32 KiB limit covers the whole chain of files it reads. Codex's SessionStart hook runs only once the owner trusts it, so until then the card reaches it through the adapter's launch input (`gap-rt-11`; revised 2026-10-18, the away pass) |
 | The rest | the file the agent-instructions kit wires for each |
 
 ## [forks] Asked, 2026-10-15

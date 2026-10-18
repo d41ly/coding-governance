@@ -6894,8 +6894,8 @@ AP-25 priced: the upgrade-step kind in dGroundRules, in a build of its own, or i
 
 ````python
 """Price AP-25: where the upgrade-step kind is built. Reads v2's [chain] as committed in the working tree, then moves
-the step kind's four dGroundRules clauses (each naming `[[upgrade]]`, `update` walking, down steps, or the release-0
-fixture) to each candidate home in memory, and prints the critical path for each. Writes nothing.
+the step kind's five dGroundRules clauses (the step kind, the `update` walk, the down steps, the release-0 fixture and
+the forwarding shim) to each candidate home in memory, and prints the critical path for each. Writes nothing.
 
 Usage: python -X utf8 price_ap25.py   (from the worktree root)
 """
@@ -6910,9 +6910,9 @@ for ln in chain.split("\n"):
     if m:
         clauses[m.group(1)] = [u for u in m.group(3).split("; ") if u.strip()]
         parents[m.group(1)] = [p.strip() for p in m.group(2).split(",") if p.strip() in names]
-STEP = ("the upgrade-step kind", "`update` walking every step", "down steps run in reverse", "the release-0 fixture tree")
+STEP = ("the upgrade-step kind", "`update` walking every step", "down steps run in reverse", "the release-0 fixture tree", "a forwarding shim")
 moved = [c for c in clauses["dGroundRules"] if c.startswith(STEP)]
-assert len(moved) == 4, moved
+assert len(moved) == 5, moved
 
 
 def path(units, parents):
@@ -6932,9 +6932,9 @@ def path(units, parents):
 
 base = {b: len(c) for b, c in clauses.items()}
 print("as placed, in dGroundRules: %d units, %s" % path(base, parents))
-alt = dict(base, dGroundRules=base["dGroundRules"] - 4, dShippedRelease=base["dShippedRelease"] + 4)
+alt = dict(base, dGroundRules=base["dGroundRules"] - 5, dShippedRelease=base["dShippedRelease"] + 5)
 print("in dShippedRelease, adopters held until it lands: %d units, %s" % path(alt, parents))
-new = dict(base, dGroundRules=base["dGroundRules"] - 4, dHandedOverStandIn=4)
+new = dict(base, dGroundRules=base["dGroundRules"] - 5, dHandedOverStandIn=5)
 par = dict(parents, dHandedOverStandIn=["dGroundRules"])
 par["dOrderedCharter"] = parents["dOrderedCharter"] + ["dHandedOverStandIn"]
 print("a build of its own between dGroundRules and dOrderedCharter: %d units, %s" % path(new, par))
@@ -7138,6 +7138,666 @@ L.insert_before("\n## Instruments\n", """
 L.save()
 ````
 
+### `build_args_away.py`
+
+The args of the away pass's closing review, dispatch 112: a light Tier-2 diff review of a66c855f3 over 15cec9200, at the owner's medium effort.
+
+````python
+"""Build the args of the away pass's closing review: a light Tier-2 diff review, at the owner's medium effort, of every
+design change since the night pass's review fold, the walk's folds and the away pass's design together.
+
+Usage: python -X utf8 build_args_away.py <scratch-dir> <base> <head>   (from the worktree root)
+Writes <scratch-dir>/away/args-away-review.json.
+"""
+import json
+import pathlib
+import subprocess
+import sys
+
+S, BASE, HEAD = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+B = "memory/builds/dClosedLoop/build/"
+REPORT = "memory/builds/dClosedLoop/reviews/2026-10-18-review-PLAY-dClosedLoop-1-away-pass-closing.md"
+a = json.loads((S / "night" / "args-night-review.json").read_text(encoding="utf-8"))
+full = lambda r: subprocess.run(["git", "rev-parse", r], capture_output=True, text=True, check=True).stdout.strip()
+a["base"], a["head"] = full(BASE), full(HEAD)
+a["intensity"], a["round"], a["scratch"] = "light", 1, (S / "review-away-pass").as_posix()
+a["efforts"] = {"diffFinder": "medium", "skeptic": "medium", "synthesis": "medium"}
+a["specs"] = a["specs"] + [B + n for n in (
+    "2026-10-18-build-PLAY-dClosedLoop-1-np24-pricing.md", "2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md",
+    "2026-10-18-build-PLAY-dClosedLoop-1-walk.md", "2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md",
+    "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")]
+for p in a["specs"]:
+    if not pathlib.Path(p).exists():
+        sys.exit(f"missing: {p}")
+if pathlib.Path(REPORT).exists():
+    sys.exit(f"{REPORT} exists")
+a["checklist"] = subprocess.run([sys.executable, "tools/memory-tree/gotchas.py", "--for-diff", f"{BASE}..{HEAD}"],
+                                capture_output=True, text=True, encoding="utf-8", check=True).stdout
+a["byDesign"] = "\n".join([
+    "- The build is design-only: no product code and no unit specs. Unit-level detail is absent by design and owed to "
+    "the chain builds, and a row's planned units are prose, counted one per clause.",
+    "- The owner's words are decisions where they direct, recorded verbatim: the night pass's eight points and their "
+    "answers ([answers]), the walk's four waves ([words] and each [wave-N-answers]), and the away pass's six points "
+    "([words] in the away-pass record): memory and instruction share one writing practice and one syntax with every "
+    "pocket joined; a plan laid down before the build proceeds; the CLI and application agnosticism; one coding "
+    "practice across platforms; analysing any part of the flow; seamless supersession. A finding may show a fold "
+    "contradicting a record or the tree, not re-argue the owner's direction.",
+    "- The forks AP-1 to AP-30 are parked for the owner. A key's default marked pending is the recommendation shown "
+    "until the owner answers; a finding may show that a pending default contradicts a record, not that a fork should "
+    "have been settled. AP-25 parks where the upgrade-step kind is built; it sits in dGroundRules meanwhile.",
+    "- Every earlier answer stands: NP-1 to NP-24, SP-1 and SP-2, WK-1 to WK-8, PM-1 to PM-12, RC-1 to RC-9, AF-1 to "
+    "AF-3, FL1, CX-1 to CX-3, RT-1 to RT-4, and every round's before them.",
+    "- The six research returns of the away pass (research-memory-pockets, -git-pockets, -harness-cli, "
+    "-compatibility, -observability-trace and -supersession) and the night pass's five are verbatim and dated, and "
+    "their prompts are rendered handoffs: neither is under review, though a fold that misstates its return is. The "
+    "instruments record holds the scripts as they ran.",
+    "- The walk record's wave sections ([chain-2], [wave-1-2], [wave-2] to [wave-4]) and the two pricing records' "
+    "runs are presentations and measurements as made; their folds into the defining records are under review.",
+    "- Dated records keep what held when they were written: revision notes, the session log's past entries, and the "
+    "ownership record's approved tables, which its [amended] bullets amend.",
+    "- Generated files (memory/LIVE.md and the build README's generated regions) are rendered, not reviewed. The map "
+    "generator's and the atlas's changes are instruments, and are reviewed: can each new arm fail, does each say what "
+    "it does not check, and does the atlas's Memory view refuse a row it cannot place?",
+])
+a["context"] = (
+    "The diff is " + a["head"][:9] + " over " + a["base"][:9] + ": everything design-bearing since the night pass's "
+    "closing review was folded. It has three parts. First, the night pass's answers folded (night-pass record "
+    "[answers] and [folded-answers]), the spine's split priced and applied (np24-pricing record, S3: dPlacedRequest and "
+    "dKeptSession), and the walk's four waves with their forks WK-1 to WK-8, the memory and roles split among them "
+    "(wk3-pricing record, C2: dLinkedLibrary and dFurnishedOrders). Second, the map generator's adopter-free and "
+    "no-stale-facts arms. Third, the away pass: the owner's six points, worked unattended (" + B +
+    "2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md: [p1-memory] to [p6-distribution], [chain-impact], [forks]), "
+    "with point 2's plan in its own record (" + B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md). The away "
+    "pass adds P34 to P38 and widens P33's closed set by eleven edge types; adds seventeen catalogue keys and thirteen "
+    "preset rows; adds thirty units on thirteen chain rows with thirty-nine new gaps; adds six record kinds to "
+    "layer-memory's registry and amends layer-runtime's Codex facts; and gives the atlas a Memory view. Review it as "
+    "a design change. Does each edit say one thing, the same way in every record it touches, and leave no text that "
+    "still states the old answer? Does every new item, key, kind and edge type have one owner, and does every new "
+    "clause sit on its own build or an ancestor, never a later build's node? Does each new gap state a measured fact "
+    "its cited return supports, and is each owned by the build whose unit closes it? Do the memory plan's pockets, "
+    "sites, edges and cycle agree with each other, with P30, P33 and P34, and with the returns they cite? Do the "
+    "harness, portability, trace and supersession designs keep every behaviour the owner may switch as a key with a "
+    "default and its allowed values, and does each structural choice sit with its fork? Can each new check arm fail? "
+    "A fold's own text is new surface: check it as hard as the text it replaced. Write the report to " + REPORT +
+    ". Its head carries an H1, then, within its first twelve lines, the line `**Serves:** diff-review "
+    "PLAY-dClosedLoop-1`. It carries exactly one `## Verdict:` line, whose token is CLEAN, CLEAN WITH FIXES or BLOCKED "
+    "and nothing else.")
+out = S / "away" / "args-away-review.json"
+out.write_text(json.dumps(a, indent=1, ensure_ascii=False), encoding="utf-8", newline="\n")
+print(f"args: {a['kind']} {a['base'][:9]}..{a['head'][:9]}, {a['intensity']}, {len(a['specs'])} specs, checklist "
+      f"{len(a['checklist'].splitlines())} lines, efforts {a['efforts']}, roles {a['roles']}, context "
+      f"{len(a['context'].split())} words")
+````
+
+### `kind_writers.py`
+
+The review's M4 predicate, run over the kind registry before it became the atlas's refusal: 36 of 76 kinds named no writer item, and no dotted token resolved to nothing.
+
+````python
+"""The review's M4 predicate, run over the real registry before it becomes the atlas's refusal: classify every
+backticked token in layer-memory [contract]'s writer cells as a flow item, a policy key, a file name or nothing, and
+list the kinds that name no writer item.
+
+Usage: python -X utf8 kind_writers.py   (from the worktree root)
+"""
+import importlib.util
+import re
+import sys
+
+sys.argv = ["x"]
+spec = importlib.util.spec_from_file_location("atlas", "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py")
+a = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(a)
+src = {k: a.text(p) for k, p in a.SOURCES.items()}
+D = a.derive()
+items = {it["tag"] for s in D["steps"] for it in s["items"]} | {it["tag"] for p in D["programs"] for it in p["items"]}
+keys = {p["key"] for p in D["policies"]}
+_, mdes = a.section(src["memory"], "design")
+con = mdes.split("### [contract]", 1)[1].split("\n### ", 1)[0]
+noitem, unresolved = [], []
+for r in a.table(con, "Kind", "layer-memory [contract]"):
+    toks = re.findall(r"`([^`]+)`", r[2])
+    kinds = {"item": [], "key": [], "file": [], "other": []}
+    for t in toks:
+        if t in items:
+            kinds["item"].append(t)
+        elif t in keys:
+            kinds["key"].append(t)
+        elif re.search(r"\.(toml|md|py|sh|js|json|txt|conf)$", t) or "/" in t:
+            kinds["file"].append(t)
+        else:
+            kinds["other"].append(t)
+    if not kinds["item"]:
+        noitem.append((r[0], r[1], r[2][:110]))
+    for t in kinds["other"]:
+        if re.fullmatch(r"[a-z]+\.[a-z0-9.-]+", t):
+            unresolved.append((r[0], t))
+print(f"kinds {len(a.table(con, 'Kind', 'x'))}; with no writer item {len(noitem)}")
+for k, o, w in noitem:
+    print(f"  NOITEM {k} [{o}]: {w}")
+print(f"dotted tokens resolving to no item or key: {len(unresolved)}")
+for k, t in unresolved:
+    print(f"  GHOST {k}: {t}")
+````
+
+### `fold_review.py`
+
+The closing review folded into the records: the forwarding shim, the pair rule, `serves` widened, the kinds' owners and markers, the Codex facts, the plan's [chain], and the duplicate key dropped.
+
+````python
+"""Fold the away pass's closing review (CLEAN WITH FIXES, 13 items) into the records, with the two defects found while
+folding: `memory.legacy-records` duplicated `memory.legacy-anchors`, and `install.retired-edits` sat on a build whose
+row never names it.
+
+Usage: python -X utf8 fold_review.py   (from the worktree root)
+"""
+import collections
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+REVIEW = "`reviews/2026-10-18-review-PLAY-dClosedLoop-1-away-pass-closing.md`"
+
+
+def line(rec, prefix):
+    found = [ln for ln in rec.text.split("\n") if ln.startswith(prefix)]
+    if len(found) != 1:
+        sys.exit(f"{rec.path.name}: {len(found)} lines open with {prefix!r}")
+    return found[0]
+
+
+def chain_append(rec, build, clauses, gaps):
+    row = line(rec, f"| {build} | ")
+    m = re.match(r"^(\| \S+ \| [^|]+ \| [^|]+ \| )(.+)( \| )([^|]+)( \|)$", row)
+    if not m or any("; " in c or "|" in c for c in clauses):
+        sys.exit(f"{build}: the row or a clause does not parse")
+    rec.sub(row, m.group(1) + m.group(2) + "".join("; " + c for c in clauses) + m.group(3) + m.group(4)
+            + "".join(", " + g for g in gaps) + m.group(5), f"{build} row")
+
+
+# ---- v2 -------------------------------------------------------------------------------------------------------------
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub(line(V, "| `memory.legacy-records` | anchors-only, backfill, retag |") + "\n", "", "drop the duplicate key")
+V.sub("| `memory.legacy-anchors` | derived, none | derived | the systems round | dTotalRecall |",
+      "| `memory.legacy-anchors` | derived, none, retag | derived | the systems round; `retag` added by the away pass, point 1: an adopter's own records are its own, and the default rewrites no file, reading Serves lines as edges; pending AP-3 | dTotalRecall |",
+      "legacy-anchors widened")
+V.sub("| `memory.legacy-records` | anchors-only | backfill | backfill | backfill |\n", "", "drop the duplicate preset row")
+row = line(V, "| `install.retired-edits` | order, keep, delete |")
+V.sub(row, row.replace("| dGroundRules |", "| dShippedRelease |"), "retired-edits owner")
+V.sub("equal to `currency.max-behind`, so an adopter inside its currency budget never meets a removed surface",
+      "at least `currency.max-behind` by the pair rule, so an adopter inside its currency budget never meets a removed surface",
+      "window rule")
+if "| `currency.max-behind` | 4 | 2 | 1 | 2 |" not in V.text:
+    sys.exit("currency.max-behind's presets moved")
+V.sub("| `install.deprecation-window` | 1 | 2 | 2 | 4 |", "| `install.deprecation-window` | 4 | 2 | 1 | 2 |", "window presets")
+V.sub("""  `review.loop.window-days`; without it, the window is unread and binds nothing.
+""", """  `review.loop.window-days`; without it, the window is unread and binds nothing. `install.deprecation-window` is at
+  least `currency.max-behind`, so an adopter inside its currency budget never meets a removed surface (the away pass's
+  closing review, M1).
+""", "pair rule")
+chain_append(V, "dGroundRules", [
+    "a forwarding shim for a moved command or hook path, kept for `install.deprecation-window` releases and acting as `install.on-shim-call` says, each value seen on a planted retired path (P38)",
+], ["gap-deploy-24"])
+V.sub("the commit, view, registry, archive, instrument and witness kinds", "the view, registry, archive, instrument and witness kinds",
+      "dTotalRecall kinds")
+V.sub("as `memory.legacy-records` says", "as `memory.legacy-anchors` says", "dTotalRecall key")
+V.sub("the commit node: the trailer keys `Gov-Unit`, `Gov-Item` and `Gov-Act` mapped to edge types,",
+      "the commit node and its kind: the trailer keys `Gov-Unit` and `Gov-Item` mapped to `serves` and `Gov-Act` to `made-by`,",
+      "dDeclaredLoop commit kind")
+V.sub("and the session's cost and duration from its JSON result (P35, P36)",
+      "and the session's cost and duration from its JSON result, as `trace.identity` and `trace.cost` say (P35, P36)", "act unit keys")
+V.sub("`gov trace <key>` and `gov why <key>` over the one index,",
+      "`gov trace <key>` and `gov why <key>` over the one index, each timeline bounded by `trace.rows`,", "trace unit key")
+V.sub("measured per binary into the node registry with OS, shell and interpreter versions (P36, P37)",
+      "measured per binary into the node registry with OS, shell and interpreter versions, its rows read by `runtime.binary`, `runtime.owner-harness` and `runtime.act-harness` (P36, P37)",
+      "fixture unit keys")
+V.sub("a transient-auth relaunch class,", "a transient-auth relaunch class under `runtime.act-auth`,", "preflight unit key")
+chain_append(V, "dKeptSession", [
+    "the catalogue's reader join: every key named by a unit on its owner build's row, today's unnamed keys a shrink-only population (the away pass's closing review)",
+], ["gap-spine-10"])
+V.sub("""seventeen keys join the catalogue, thirteen of them every preset and four the keys
+presets never touch;""", """sixteen keys join the catalogue, twelve of them every preset and four the keys
+presets never touch, and `memory.legacy-anchors` gains `retag`;""", "revision note counts")
+V.insert_before("\nRevised: 2026-10-17, after the folds' closing review", """
+Revised: 2026-10-18, after the away pass's closing review (""" + REVIEW + """), CLEAN WITH FIXES, 13
+items, 2 high: dGroundRules gains the forwarding shim that honours `install.deprecation-window` and
+`install.on-shim-call`; the window is at least `currency.max-behind` by a pair rule, its presets now equal to it;
+the commit kind is dDeclaredLoop's and the registry kind dTotalRecall's alone; `Gov-Unit` and `Gov-Item` map to
+`serves`, widened to take a commit; `install.retired-edits` moves to dShippedRelease, whose row honours it; every
+away-pass key is named by a unit on its owner's row; dKeptSession gains the catalogue's reader join; and
+`memory.legacy-anchors` takes `retag` in place of a duplicate key.
+""", "review revision note")
+V.save()
+
+# ---- the gap register ---------------------------------------------------------------------------------------------
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+for after, row in (
+        ("gap-deploy-23", "| gap-deploy-24 | Deploy | MED | Nothing forwards a moved command or hook path: an adopter's call to a retired surface fails outright, and no window keeps the old surface working while the adopter catches up. | `research-supersession.md` section 4 (candidate B, kept as a bounded window); the away pass's closing review, H2 | — |"),
+        ("gap-spine-09", "| gap-spine-10 | Spine | LOW | 116 of 220 catalogue keys are named by no unit on their owner build's chain row, so a spec writer finds no unit that reads them. | the away pass's closing review, H2; the predicate run in the away-pass record's `[review-fold]` | — |")):
+    prev = line(G, f"| {after} |")
+    G.sub(prev + "\n", prev + "\n" + row + "\n", f"after {after}")
+G.sub("| gap-rt-09 | Runtime | LOW | gov wires none of the five hook events Codex ships. Revised 2026-10-18, the away pass: Codex now documents twelve, SessionStart, Stop and PostCompact among them, each project hook trusted by hash before it runs (`research-harness-cli.md` section 3). |",
+      "| gap-rt-09 | Runtime | LOW | gov wires none of the hook events Codex ships: twelve as of CLI 0.139, SessionStart, Stop and PostCompact among them, each project hook trusted by hash before it runs (revised 2026-10-18, the away pass, from the five once measured; `research-harness-cli.md` section 3). |",
+      "gap-rt-09")
+G.sub("and Codex has no SessionStart, so only the harness adapter's launch input can carry the card. Revised 2026-10-18, the away pass: Codex now has SessionStart, so a trusted hook can carry the card (`research-harness-cli.md` section 3).",
+      "and Codex's SessionStart hook runs only once the owner trusts it, so until then only the harness adapter's launch input can carry the card (revised 2026-10-18, the away pass; `research-harness-cli.md` section 3).",
+      "gap-rt-11")
+G.sub("The kind registry declares an owner and a writer only: home, lifecycle, readers and layer are undeclared for every kind, and views,",
+      "The kind registry declares an owner and a writer cell only: home, lifecycle, readers and layer are undeclared for every kind, 32 of 76 writer cells name no writer item yet, and views,",
+      "gap-mem-37")
+# the away pass's tally paragraph, re-measured with the two new gaps
+old_par = G.text[G.text.index("Re-measured after the away pass added thirty-nine gaps"):]
+rows = re.findall(r"^\| (gap-[a-z]+-\d\d) \| ([A-Za-z]+) \| (HIGH|MED|LOW)\b", G.text, flags=re.M)
+stage, sev = collections.Counter(r[1] for r in rows), collections.Counter(r[2] for r in rows)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+F = "`" * 3
+new_par = ("Re-measured after the away pass and its closing review added forty-one gaps, `gap-mem-35` to `gap-mem-40`,\n"
+           "`gap-roles-23`, `gap-spine-08` to `gap-spine-10`, `gap-rt-25` to `gap-rt-31`, `gap-orient-19` and `gap-orient-20`,\n"
+           "`gap-test-20`, `gap-maint-14`, `gap-deploy-15` to `gap-deploy-24` and `gap-tool-10` to `gap-tool-19`\n"
+           "(`build/2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md` `[chain-impact]` and `[review-fold]`), same instrument. A\n"
+           f"join of these {len(rows)} keys against v2's chain rows finds each owned by exactly one build:\n\n"
+           f"{F}text\n" + " ".join(f"{s}={stage[s]}" for s in ORDER) + "\n"
+           + " ".join(f"{s}={sev[s]}" for s in ("LOW", "MED", "HIGH")) + f"\n{F}\n")
+G.sub(old_par, new_par, "tally paragraph")
+G.save()
+
+# ---- the kind registry ---------------------------------------------------------------------------------------------
+M = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+row = line(M, "| registry | dWitnessedBar |")
+M.sub(row, row.replace("| registry | dWitnessedBar |", "| registry | dTotalRecall |"), "registry owner")
+row = line(M, "| card | dPlacedRequest |")
+M.sub(row, row[:-2] + "; its writer is `entry.orient`, which composes it |", "card writer")
+PENDING = ["exception", "override", "fork", "playbook", "playbook set", "lease", "mailbox message", "return", "act",
+           "session binding", "journal", "run record", "work order", "ask", "backlog row", "decision", "gotcha", "dossier",
+           "code", "annotation index", "recall index", "baseline", "shape-run", "build readme", "maintenance record",
+           "lexicon declaration", "commit", "view", "registry", "archive", "instrument", "witness"]
+for kind in PENDING:
+    row = [ln for ln in M.text.split("\n") if re.match(rf"^\| {re.escape(kind)} \| d[A-Z]\w+ \| ", ln)]
+    if len(row) != 1 or not row[0].endswith(" |"):
+        sys.exit(f"contract: {len(row)} rows for {kind}")
+    M.sub(row[0], row[0][:-2] + "; writer item not named |", f"{kind} marker")
+M.save()
+
+# ---- the runtime and instruction records' Codex facts ---------------------------------------------------------------
+R = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md")
+R.sub("""    - it has no SessionStart, PostToolUse, Stop or PostCompact;
+""", """    - as of Codex CLI 0.139 it documents twelve hook events, SessionStart, PermissionRequest, UserPromptSubmit, Stop
+      and PostCompact among them, each project hook trusted by hash before it runs; whether PostToolUse is among them is
+      unmeasured;
+""", "codex events")
+R.sub("""      3): Codex CLI 0.139 documents twelve hook events, SessionStart, PermissionRequest, UserPromptSubmit, Stop and
+      PostCompact among them, each project hook trusted by hash before it runs. The conformance fixture re-measures
+      its row (P36).
+""", """      3): the twelve events replace the five measured before, which named no SessionStart, PostToolUse, Stop or
+      PostCompact. The conformance fixture re-measures the row (P36).
+""", "codex provenance")
+R.save()
+I = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md")
+I.sub("Codex has no SessionStart, so the card reaches it only through the adapter's launch input (`gap-rt-11`)",
+      "Codex's SessionStart hook runs only once the owner trusts it, so until then the card reaches it through the adapter's launch input (`gap-rt-11`; revised 2026-10-18, the away pass)",
+      "codex card")
+I.save()
+
+# ---- the memory plan ------------------------------------------------------------------------------------------------
+P = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+old_chain = P.text[P.text.index("## [chain] The units, by build"):P.text.index("## [migration]")]
+P.sub(old_chain, """## [chain] The units, by build
+
+The plan's units live in v2 `[chain]`, one clause each. Each row below names the build whose row holds one, and the
+clause by its opening words. The design map's chain-echo arm reds when a row's build holds no clause opening so.
+
+| Build | The plan's part | Its v2 clause opens with |
+|---|---|---|
+| dOrderedCharter | the edge grammar, the eleven types, `promoted-from` and the edge checks | the shared edge grammar at every site the memory plan names |
+| dOrderedCharter | the writing practice's checks | the one writing practice's checks over records as well as units |
+| dDeclaredLoop | the commit node, its kind and its trailer keys | the commit node and its kind |
+| dTotalRecall | the completed kind registry and the new kinds | the kind registry completed |
+| dTotalRecall | `record`'s header and edge line, and the legacy records' reading | `record` writing each record's header |
+| dLinkedLibrary | the decision and bug-class edges | `decides` on every decision row |
+| dBoundRoles | markers on work orders, `answers` on returns | every work order carrying its marker |
+| dWellOiledMachine | the act as the key | the act as the key |
+| dWellOiledMachine | the commit queue's trailers and the commit-key leg | the commit queue writing the `Gov-*` trailers |
+| dWellOiledMachine | the session node and live delivery | the session node derived from bindings |
+| dPlacedRequest | the kickoff manifest as instruction units | the kickoff manifest's facts |
+| dShippedRelease | `carries` on landings, and publications | `carries` on the landing record |
+| dConvergedCharter | the guides' migration to tags | the guides' positional citations migrated to tags |
+
+The atlas's memory view, derived from this record and the kind registry, was built in the away pass itself and
+belongs to no chain build.
+
+""", "chain table")
+P.sub("| `serves` | record, work order → unit or build | the `**Serves:**` line | `served-by` | new: today's Serves line, typed | record to unit (2,278 records) |",
+      "| `serves` | record, work order, commit → unit, item or build | the `**Serves:**` line; the `Gov-Unit:` and `Gov-Item:` trailers | `served-by` | new: today's Serves line, typed | record to unit (2,278 records), and commit to unit and item |",
+      "serves widened")
+P.sub("| a commit | one trailer key per edge: `Gov-Unit:`, `Gov-Item:`, `Gov-Act:`, with `Pass:` and `Decided:` kept as registered keys, each mapped to its edge type in the registry |",
+      "| a commit | one trailer key per edge: `Gov-Unit:` and `Gov-Item:` for `serves`, `Gov-Act:` for `made-by`, with `Pass:` and `Decided:` kept as registered keys, each mapped to its edge type in the registry |",
+      "commit site")
+P.sub("| commit → unit and item | git | trail | `serves` (through `Gov-Unit:`), `made-by` |",
+      "| commit → unit and item | git | trail | `serves` (through `Gov-Unit:` and `Gov-Item:`) |", "commit hop")
+P.sub("  `memory.legacy-records` says whether an adopter keeps anchors only, backfills edge lines, or retags.",
+      "  `memory.legacy-anchors` says whether an adopter derives anchors, the default, retags its records, or keeps neither.",
+      "migration key")
+P.sub("| `memory.legacy-records` | anchors-only, backfill, retag | backfill | an adopter's own records are its own; the backfill changes no file |",
+      "| `memory.legacy-anchors`, widened | derived, none, retag | derived | the systems round's key gains `retag`: an adopter's own records are its own, and the default rewrites no file |",
+      "keys row")
+row = line(P, "| project registries | views |")
+P.sub(row, row.replace("| path | dWitnessedBar |", "| path | dTotalRecall |"), "registries owner")
+P.sub("""- the kind registry's record kinds (layer-memory `[contract]`), each placed on the step or program its writer belongs
+  to, with its owner;""", """- the kind registry's record kinds (layer-memory `[contract]`), each placed on the step or program of the first writer
+  item its row names, or shown apart under its declared marker (no writer item, writer item not named, every step's
+  exit item), with its owner;""", "view kinds")
+P.sub("""Clicking a pocket, a kind or an edge opens its detail. The view reads this record and layer-memory, so a change to
+either moves it.""", """Clicking a pocket, a kind or an edge opens its detail. The view reads this record and layer-memory, so a change to
+either moves it. It refuses what it cannot place: a kind with neither a writer item nor a marker, a writer token that
+resolves to no item, key or file, an unread status or state, an undeclared hop edge, and a table split by a blank
+line, each seen red on a planted case.""", "view refusals")
+P.sub("- **commits:** a pushed commit an act made with no `Gov-Act:`; a `Gov-Act:` the binding does not hold;",
+      "- **commits:** a pushed commit an act made with no `Gov-Act:`; a `Gov-Act:` the binding does not hold; a planted\n  `Gov-Item:` trailer read as anything but `serves`;", "commit gates")
+P.save()
+````
+
+### `write_review_fold.py`
+
+The away-pass record's [chain-impact] re-run, AP-3 re-asked, [review-fold] and [state].
+
+````python
+"""Bring the away-pass record up to the folded design: [p6-distribution]'s shim and AP-25's size, [chain-impact] re-run,
+AP-3 re-asked about the widened key, and two new sections, [review-fold] and [state], the plants and runs spliced from
+their outputs.
+
+Usage: python -X utf8 write_review_fold.py <scratch-away-dir>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+D = pathlib.Path(sys.argv[1])
+F = "`" * 3
+
+
+def out(name):
+    return (D / name).read_text(encoding="utf-8").replace("\r\n", "\n").strip()
+
+
+A = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md")
+A.sub("""4. **Two bounded windows** keep old surfaces working: a command or hook path forwards and warns for
+   `install.deprecation-window` releases, and an old conf or record shape is read until its step runs.""",
+      """4. **Two bounded windows** keep old surfaces working: a command or hook path forwards and warns for
+   `install.deprecation-window` releases, through dGroundRules' forwarding shim, and an old conf or record shape is
+   read until its step runs. The window is at least `currency.max-behind`, so an adopter inside its currency budget
+   never meets a removed surface.""", "p6 windows")
+A.sub("The researcher recommended a build of its own; at four units the\n   path cost is the same either way, so the split is the owner's (AP-25).",
+      "The researcher recommended a build of its own; at five units the\n   path cost is the same either way, so the split is the owner's (AP-25).", "p6 size")
+old_impact = A.text[A.text.index("## [chain-impact]"):A.text.index("## [forks]")]
+A.sub(old_impact, f"""## [chain-impact] What the away pass did to the chain
+
+The chain keeps its twenty builds; no build is added, split or reordered, and the one structural question, where
+the upgrade-step kind lives, is parked as AP-25. Fourteen builds gain units, 32 in all, two of them from the closing
+review, each clause on its own build or one it depends on:
+
+| Build | Units added | For |
+|---|---|---|
+| dGroundRules | 5 | the upgrade-step kind, its walk, its down steps, its fixture and the forwarding shim (point 6) |
+| dOrderedCharter | 4 | the edge grammar, the writing practice's checks, the portable practice, its own upgrade steps (points 1, 4, 6) |
+| dDeclaredLoop | 1 | the commit node, its kind and its trailer keys (point 1) |
+| dPlacedRequest | 1 | the kickoff manifest as instruction units (point 1) |
+| dWitnessedBar | 2 | the portability leg pack, and the verdict's cause and leg tails (points 4, 5) |
+| dKeptSession | 1 | the catalogue's reader join (the closing review) |
+| dTotalRecall | 2 | the completed kind registry, and `record`'s header and edge line (points 1, 5) |
+| dLinkedLibrary | 1 | decision and bug-class edges (points 1, 4) |
+| dBoundRoles | 1 | markers on every work order, `answers` on every return (point 1) |
+| dWellOiledMachine | 6 | the act key, trailers, the trace verbs, the session node, the conformance fixture, preflight (points 1, 3, 4, 5) |
+| dTendedCadence | 1 | readings for missing outcomes, runs and keys (point 5) |
+| dCalibratedLens | 1 | the Loop Review priced from trace rows (point 5) |
+| dShippedRelease | 4 | the receipt and fleet for steps, gov first, the platform matrix, landings and publications (points 1, 3, 4, 6) |
+| dConvergedCharter | 2 | the migration to tags and class pins, and the steps that close the convergence (points 1, 4, 6) |
+
+The path, recomputed by `critical_path.py` on the folded tree, against the one the walk closed with at `fa62092db`:
+
+{F}text
+before, at fa62092db: critical path 171 units over 335
+{out("cp-after-2.out")}
+{F}
+
+It grows by 20 units. Its run moves from dLinkedLibrary and dIndexedDesign onto dWellOiledMachine, whose six new
+units make it finish one unit after dIndexedDesign. AP-25's homes for the step kind, priced the same way:
+
+{F}text
+{out("price_ap25-2.out")}
+{F}
+
+Holding adopters back until dShippedRelease saves two units, because dShippedRelease then becomes the critical
+build, and it would freeze every adopter on today's kits through the whole chain. The other effects:
+- **The gap register** grows by 41 gaps, every one owned by exactly one build: Memory 6, Roles 1, Spine 3,
+  Runtime 7, Orient 2, Test 1, Maintain 1, Deploy 10, Tooling 10. Two Codex rows, `gap-rt-09` and `gap-rt-11`, are
+  rewritten with Codex's current hooks.
+- **The catalogue** gains 16 keys, 12 of them in every preset and 4 among the keys presets never touch, and the
+  systems round's `memory.legacy-anchors` gains a `retag` value.
+- **The principles** gain P34 to P38, and P33's closed set eleven types.
+- **The kind registry** gains six kinds: commit, view, registry, archive, instrument and witness. The card's row now
+  names its writer item, and the 32 rows that name none carry the marker `writer item not named`.
+- **The level-0 map** now uses its degrade order, shortening purposes to 40 characters to stay within its budget,
+  as its design allows; gap-mem-30's owed measurement covers it.
+- **The atlas** gains its Memory view, derived from the plan record and the kind registry.
+
+""", "chain impact")
+row = [ln for ln in A.text.split("\n") if ln.startswith("| AP-3 |")]
+A.sub(row[0], "| AP-3 | `memory.legacy-anchors`, widened: how do today's records reach the plan? | derived: anchors derived and Serves lines read as edges, no file rewritten; retag every record's headings; none | the key's default |",
+      "AP-3")
+A.text = A.text.rstrip("\n") + f"""
+
+## [review-fold] The closing review, folded
+
+The closing review, dispatch 112, read everything design-bearing since the night pass's review fold, `a66c855f3` over
+`15cec9200`: the night pass's folded answers, the walk's four waves and the away pass. It ran `tier2-review.js` light,
+at the owner's medium effort: three `gov-diff-reviewer` lenses (correctness, seams, verification), four `gov-skeptic`
+batches and one `gov-synthesizer`. Its report, `reviews/2026-10-18-review-PLAY-dClosedLoop-1-away-pass-closing.md`,
+reads CLEAN WITH FIXES: 16 raw findings, 15 confirmed and 1 refuted, as 13 items, 2 high, 6 medium and 5 low. Every
+item is folded:
+
+| Item | What it found | The fold |
+|---|---|---|
+| H1 | the plan's `[chain]` put three units on builds v2 does not | the plan's `[chain]` now names each unit by its v2 clause's opening words and its build, and the design map's chain-echo arm reds on a mismatch |
+| H2 | no unit built `install.deprecation-window` or `install.on-shim-call` | dGroundRules gains the forwarding shim, each value seen on a planted retired path, and `gap-deploy-24` |
+| M1 | the window's presets contradicted its own rule | the window is at least `currency.max-behind` by a pair rule in v2 `[presets]`, its presets now 4, 2, 1 and 2, and the preset check's pair arm reds on the old velocity row |
+| M2 | the same misplacement as H1, seen by another lens | folded with H1 |
+| M3 | no edge type carried a commit to a unit or an item | `serves` takes a commit, `Gov-Unit` and `Gov-Item` map to it and `Gov-Act` to `made-by`, and a planted `Gov-Item:` joins the commit gates |
+| M4 | the Memory view passed kinds it could not place | the atlas resolves each writer token as an item, a key or a file, and refuses a ghost token or a kind with neither a writer item nor a marker; 32 kinds carry `writer item not named`, the card names `entry.orient`, and `gap-mem-37` counts them |
+| M5 | an unread edge status became P33, and an undeclared hop edge vanished | the status is read from P33, new or derived, and every hop edge must be declared |
+| M6 | the no-stale-facts arm witnessed its own zero | the arm counts its records and quotes, prints both, and reds on no record, on fewer quotes than its floor of 15, or on a record ending inside an open fence |
+| L1 | layer-runtime kept the stale Codex hook set beside its revision | the Codex row states the twelve events with the revision kept as provenance, and the same stale claim is rewritten in layer-instruction, `gap-rt-09` and `gap-rt-11` |
+| L2 | the commit and registry kinds had two owners | the commit kind is named in dDeclaredLoop's row, the registry kind moves to dTotalRecall, and dTotalRecall's row names view, registry, archive, instrument and witness |
+| L3 | a kind was grouped under a step that only names it | a kind is grouped by the first writer item its row names |
+| L4 | a mistyped second hop edge dropped silently | folded with M5 |
+| L5 | only `[pockets]` was counted against its raw lines | every plan table and the kind registry are counted, and a split table stops the run |
+
+**Found while folding.**
+- `memory.legacy-records` duplicated the systems round's `memory.legacy-anchors`. The duplicate is dropped, and
+  `memory.legacy-anchors` gains `retag`; AP-3 asks about the widened key.
+- `install.retired-edits` was dGroundRules' while dShippedRelease's row honours it. It moves to dShippedRelease, and
+  every key the away pass added is now named by a unit on its owner's row.
+- H2's proposed gate, a key that no unit on its owner's row names, was run over the tree first: 116 of 220 keys fail
+  it, so it cannot arm as a red. dKeptSession's catalogue reader join holds them as a shrink-only population, and
+  `gap-spine-10` registers them.
+
+**The gates, each seen red on its planted case before it is trusted:**
+
+{F}text
+$ python map.py --check --plant <case>
+{chr(10).join(out(f"mp-{p}.out").split(chr(10))[-1] if False else next(l for l in out(f"mp-{p}.out").split(chr(10)) if l.startswith("FINDING")) for p in ("unclosed-fence", "no-records", "chain-echo"))}
+$ python atlas.py --check --plant <case>
+{chr(10).join(out(f"ap-{p}.out").split(chr(10))[-1] for p in ("kind-unplaced", "kind-ghost-tag", "edge-status", "hop-edge", "edges-split"))}
+$ python atlas.py --check   (the fixed generator on the registry before its markers)
+{out("atlas-red-real.out")}
+$ python preset_check_canonical.py v2-at-a66c855f3.md
+{out("pair-red.out")}
+{F}
+
+The fold is one round, as the knee of earlier rounds advises: it changes records and instruments, every check is
+green on the folded tree, and the planted cases above show each new arm can fail. The security and intent lenses
+did not run, since the review was light.
+
+## [state] The report, and the state the pass leaves
+
+**Each point, in one line:**
+- **1, memory and instruction.** Yes. One writing practice (P34), one edge grammar at every site, eleven new edge
+  types, and all 45 pockets placed as node, witness or out. Git joins by typed trailers, sessions through the act,
+  and Codex keeps ids and transcripts without a live inbox. The atlas shows it in its new Memory view.
+- **2, the plan.** `build/2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md`, laid down before any chain build
+  proceeds: every pocket, site, edge, hop, door, layer, unit, migration step, check and key.
+- **3, the CLI.** Yes, as the runtime, never as the owner's window. A headless session ran and was resumed by its id,
+  and harness adapters measured by one conformance fixture keep gov independent of the owner's application (P36).
+- **4, compatibility.** One practice, a role per language, ratcheting toward Python (P37). Only Windows is tested
+  today. Under WSL, two of three checks failed, so a declared platform matrix and its runners are owed.
+- **5, observability.** Not as designed; yes with a cause on every record, cost on every act, and `gov trace` and
+  `gov why` (P35).
+- **6, distribution.** Release-chained upgrade steps, up and down, gov first, with a forwarding window for moved
+  surfaces (P38). Today's engine refuses a retired kit outright and cannot roll back.
+
+**The state:**
+- **The design:** 20 builds, 367 planned units, 38 principles, 224 keys, 296 gaps and 76 record kinds.
+- **The checks:** every one green on the folded tree, re-run in the instruments record's `[final]`.
+- **The chain's path:** it grows by 20 units, now through dWellOiledMachine; `[chain-impact]` holds the run.
+- **The closing review:** CLEAN WITH FIXES, every item folded, `[review-fold]`.
+- **Forks parked:** AP-1 to AP-30, seven of them structural: AP-1, AP-2, AP-5, AP-10, AP-15, AP-24 and AP-25.
+- **Not done:** nothing merged or pushed, no product code, no chain spec written. The build's exit still waits on the
+  owner's word that the design has its full shape.
+"""
+A.done += 1
+A.save()
+````
+
+### `log_review.py`
+
+The session log's dispatch 112 row, its agent lines and the fold's event.
+
+````python
+"""Record the away pass's closing review in the session log: dispatch 112's row, its derived agent lines, and the fold.
+
+Usage: python -X utf8 log_review.py <agent-lines-review.txt>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+lines = [ln for ln in pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n").split("\n")
+         if ln.startswith(("- agent —", "- returned —"))]
+if len(lines) != 18:
+    sys.exit(f"eighteen agent and returned lines expected, read {len(lines)}")
+F = "`" * 3
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+row111 = [ln for ln in L.text.split("\n") if ln.startswith("| 111 |")]
+if len(row111) != 1:
+    sys.exit("no single dispatch row 111")
+L.sub(row111[0] + "\n", row111[0] + "\n" + (
+    "| 112 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), "
+    "`gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, round 1 | The away pass's closing review: "
+    "`a66c855f3` over `15cec9200`, twenty-seven design records as specs | the args, built by `build_args_away.py` in the "
+    "instruments record (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass-instruments.md`) | 1799cb98 | returned as "
+    "`wf_d5e376d2-7b1`, CLEAN WITH FIXES, 15 of 16 confirmed, 13 items, 2 high | "
+    "`reviews/2026-10-18-review-PLAY-dClosedLoop-1-away-pass-closing.md` |\n"), "dispatch row")
+L.insert_before("\n## Events\n", "\nThe away pass's closing review, dispatch 112, derived from its run the same way:\n\n" + F + "text\n"
+                + "\n".join(lines) + "\n" + F + "\n", "agent lines")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-18, session 1799cb98: the away pass's closing review, dispatch 112, returned CLEAN WITH FIXES, 13 items, 2
+  high, and every item is folded (the away-pass record's `[review-fold]`). The fold adds dGroundRules' forwarding shim
+  and dKeptSession's catalogue reader join, two gaps and a pair rule, gives the atlas and the map arms that refuse
+  what they cannot read, and drops a key that duplicated `memory.legacy-anchors`.
+""", "event")
+L.save()
+````
+
+### `preset_check_canonical.py`
+
+The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row.
+
+````python
+"""Check architecture v2's preset table against its policy catalogue: every presettable key assigned
+in every preset, no excluded key present, every enumerated value allowed, and the `standard` column
+equal to the catalogue's defaults. Reads one file; writes nothing; exit 1 on any finding."""
+import re
+import sys
+
+text = open(sys.argv[1], encoding="utf-8").read()
+
+
+def section(tag):
+    m = re.search(r"^## \[" + re.escape(tag) + r"\].*?(?=^## \[|\Z)", text, flags=re.M | re.S)
+    return m.group(0) if m else ""
+
+
+def rows(block, ncols):
+    out = []
+    for line in block.splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) == ncols and cells[0].startswith("`"):
+            out.append([cells[0].strip("`")] + cells[1:])
+    return out
+
+
+STAGES = ["plan", "design", "build", "test", "deploy", "maintain"]
+never = re.search(r"Presets never touch (.*?):", section("presets"), flags=re.S)
+if not never:
+    sys.exit("v2 [presets] states no 'Presets never touch' list")
+EXCLUDED = set(re.findall(r"`([^`]+)`", never.group(1))) | {"preset"}
+if "the floor" in never.group(1):
+    EXCLUDED.add("floor")
+head = next((ln for ln in section("presets").splitlines() if ln.startswith("| Key |")), "")
+NAMES = [c.strip().split(" ")[0] for c in head.strip().strip("|").split("|")[1:]]
+catalogue = {}
+for key, allowed, default, _src, _owner in rows(section("policies"), 5):   # the Owner column since PM-10
+    keys = [key.replace("<stage>", s) for s in STAGES] if key == "review.<stage>" else [key]
+    for k in keys:
+        if key == "review.<stage>":
+            d = "owed" if k == "review.build" else "opt-in"
+        else:
+            d = default
+        catalogue[k] = (allowed, d)
+
+presets = {r[0]: r[1:] for r in rows(section("presets"), 5)}
+findings = []
+expected = {k for k in catalogue if k not in EXCLUDED}
+for k in sorted(expected - set(presets)):
+    findings.append(f"presettable key missing from the preset table: {k}")
+for k in sorted(set(presets) - expected):
+    findings.append(f"preset table names a key that is excluded or not in the catalogue: {k}")
+
+FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count|a share of the window|a round count|a word range|a route-back count|KB per role")
+for k, vals in presets.items():
+    if k not in catalogue:
+        continue
+    allowed_text, default = catalogue[k]
+    if not FREE.search(allowed_text):
+        allowed = {a.strip() for a in re.split(r"[,;]", allowed_text) if a.strip()}
+        for name, v in zip(NAMES, vals):
+            if v not in allowed:
+                findings.append(f"{k}: {name} = '{v}' is not an allowed value ({allowed_text})")
+        if vals[1] != default:
+            findings.append(f"{k}: standard = '{vals[1]}' but the catalogue default is '{default}'")
+
+# The away pass's pair rule (its closing review, M1): the deprecation window is at least the currency budget in every
+# preset, so an adopter inside its budget never meets a removed surface. Skipped, and said so, before both keys exist.
+PAIR = ("install.deprecation-window", "currency.max-behind")
+if all(k in presets for k in PAIR):
+    for name, w, b in zip(NAMES, presets[PAIR[0]], presets[PAIR[1]]):
+        if w.isdigit() and b.isdigit() and int(w) < int(b):
+            findings.append(f"pair rule: {name} sets {PAIR[0]} {w} under {PAIR[1]} {b}")
+else:
+    print(f"pair rule {PAIR[0]} >= {PAIR[1]}: not checked, a key is absent")
+print(f"catalogue keys {len(catalogue)} · presettable {len(expected)} · preset rows {len(presets)}")
+print("\n".join(findings) if findings else "no findings")
+sys.exit(1 if findings else 0)
+````
+
 ### `record_instruments.py`
 
 This record's own writer.
@@ -7284,6 +7944,17 @@ MINE = [
     ("away/tally.py", "The gap register's tally by stage and severity; it reproduces the register's last recorded "
      "tally at fa62092db."),
     ("away/log_away.py", "The register's re-measure and the session log's dispatch rows, agent lines and event."),
+    ("away/build_args_away.py", "The args of the away pass's closing review, dispatch 112: a light Tier-2 diff review "
+     "of a66c855f3 over 15cec9200, at the owner's medium effort."),
+    ("away/kind_writers.py", "The review's M4 predicate, run over the kind registry before it became the atlas's "
+     "refusal: 36 of 76 kinds named no writer item, and no dotted token resolved to nothing."),
+    ("away/fold_review.py", "The closing review folded into the records: the forwarding shim, the pair rule, `serves` "
+     "widened, the kinds' owners and markers, the Codex facts, the plan's [chain], and the duplicate key dropped."),
+    ("away/write_review_fold.py", "The away-pass record's [chain-impact] re-run, AP-3 re-asked, [review-fold] and "
+     "[state]."),
+    ("away/log_review.py", "The session log's dispatch 112 row, its agent lines and the fold's event."),
+    ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
+     "away pass's closing review and seen red on a66c855f3's velocity row."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -7402,7 +8073,8 @@ The arm's two plants are re-run in `[plants]`, and the map's green run is in `[f
 plants = []
 for p in ("no-layer", "fates-absent", "fates-drop", "fates-ghost", "fates-bad", "fates-unbuilt", "fates-empty",
           "fates-kit", "fates-kit-drop", "fates-kit-ghost", "fates-count", "fates-absorbed-stays", "fates-bare-none",
-          "fates-rel", "fates-none", "unpinned-count", "unpinned-path", "adopter-unit", "adopter-key"):
+          "fates-rel", "fates-none", "unpinned-count", "unpinned-path", "unclosed-fence", "no-records", "adopter-unit",
+          "adopter-key", "chain-echo"):
     out, rc = run(B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py", "--check", "--plant", p)
     plants.append(f"$ python map.py --check --plant {p}\n" + "\n".join(l for l in out.split("\n") if l.startswith(("FINDING", "atlas:")))
                   + f"\nrc {rc}")
@@ -7410,8 +8082,20 @@ for p in ("no-layer", "fates-absent", "fates-drop", "fates-ghost", "fates-bad", 
         sys.exit(f"plant {p} did not red")
     if p.startswith("adopter-") and "FINDING adopter-free" not in out:
         sys.exit(f"plant {p} redded without the adopter-free finding")
+    if p in ("unclosed-fence", "no-records") and "FINDING no stale facts" not in out:
+        sys.exit(f"plant {p} redded without the no-stale-facts finding")
+    if p == "chain-echo" and "FINDING chain echo" not in out:
+        sys.exit("plant chain-echo redded without the chain-echo finding")
+# The atlas's memory-view plants (the away pass's closing review): each must stop the run with its own refusal.
+WANT = {"kind-unplaced": "carries no marker", "kind-ghost-tag": "resolving to no item", "edge-status": "status 'nwe'",
+        "hop-edge": "answered-by-typo", "edges-split": "a split table drops rows"}
+for p, want in WANT.items():
+    out, rc = run(B + "2026-10-16-build-PLAY-dClosedLoop-1-atlas.py", "--check", "--plant", p)
+    plants.append(f"$ python atlas.py --check --plant {p}\n{out}\nrc {rc}")
+    if rc != 1 or want not in out:
+        sys.exit(f"atlas plant {p} did not red for its own reason")
 parts.append("""
-## [plants] The map's plants, re-run
+## [plants] The map's and the atlas's plants, re-run
 
 """ + block("text", "\n".join(plants)))
 final = []
@@ -7713,10 +8397,10 @@ scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dSc
 code                     4  dGroundRules (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
 witness                  4  dGroundRules (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dBoundRoles (dTotalRecall's)
 seen red                 3  dGroundRules (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dKeptSession (dWitnessedBar's)
+registry                 3  dGroundRules (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
 return                   3  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's)
 intake                   3  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 fork                     3  dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
-registry                 2  dGroundRules (dWitnessedBar's), dOrderedCharter (dWitnessedBar's)
 playbook                 2  dOrderedCharter (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
 release                  2  dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 probe                    2  dOrderedCharter (dPlacedRequest's), dDeclaredLoop (dPlacedRequest's)
@@ -7742,7 +8426,7 @@ value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
 decision                 1  dWellOiledMachine (dLinkedLibrary's)
 census                   1  dWitnessedBar (dLinkedLibrary's)
-plain-word hits on a non-ancestor's record kind: 71, over 35 kinds
+plain-word hits on a non-ancestor's record kind: 72, over 35 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -8046,7 +8730,7 @@ node keys scanned: 2275; purposes naming an adopter: 8
 The arm's two plants are re-run in `[plants]`, and the map's green run is in `[final]`.
 
 
-## [plants] The map's plants, re-run
+## [plants] The map's and the atlas's plants, re-run
 
 ````text
 $ python map.py --check --plant no-layer
@@ -8159,16 +8843,40 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:646 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:648 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:646 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:648 quotes 'critical path is 211' with nothing pinning it on its line
+rc 1
+$ python map.py --check --plant unclosed-fence
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
+rc 1
+$ python map.py --check --plant no-records
+FINDING no stale facts: read no design record
 rc 1
 $ python map.py --check --plant adopter-unit
 FINDING adopter-free: dGroundRules plans 'the NicoCares adapter', which names an adopter
 rc 1
 $ python map.py --check --plant adopter-key
 FINDING adopter-free: layer.instruction-NicoCares names an adopter
+rc 1
+$ python map.py --check --plant chain-echo
+FINDING chain echo: memory-plan [chain] puts 'the shared edge grammar at every site the memory p' on dGroundRules, whose v2 row holds no clause opening so
+rc 1
+$ python atlas.py --check --plant kind-unplaced
+atlas: layer-memory [contract] kind 'ghost kind' names no writer item and carries no marker
+rc 1
+$ python atlas.py --check --plant kind-ghost-tag
+atlas: layer-memory [contract] kind 'ghost kind' names ['plan.ghost-writer'], resolving to no item, key or file
+rc 1
+$ python atlas.py --check --plant edge-status
+atlas: memory-plan [edges] row '`made-by`': status 'nwe' unread
+rc 1
+$ python atlas.py --check --plant hop-edge
+atlas: memory-plan [cycle] hop 'work order → act': a family, its state or an edge is unread ['answered-by-typo']
+rc 1
+$ python atlas.py --check --plant edges-split
+atlas: memory-plan [edges] holds 24 row lines but its table parsed 1: a split table drops rows
 rc 1
 ````
 
@@ -8177,12 +8885,13 @@ rc 1
 
 ````text
 $ design map
-map: 2357 nodes in 30 namespaces; 30709 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1590, derived 276, pending 491
+map: 2360 nodes in 30 namespaces; 30708 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1594, derived 275, pending 491
+map: no stale facts read 51 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 165 records, 2810 sections, 188 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 166 records, 2841 sections, 188 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -8200,8 +8909,8 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 20 · owned nodes read 445 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 71 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+chain rows 20 · owned nodes read 444 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 72 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
@@ -8233,7 +8942,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 294 · chain builds 20
+register keys 296 · chain builds 20
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -8241,13 +8950,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 225 · presettable 207 · preset rows 207
+catalogue keys 224 · presettable 206 · preset rows 206
 no findings
 rc 0
 
 $ critical path
-critical path: 190 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 12, dFairHearing 24, dOrderedCharter 43, dDeclaredLoop 66, dPlacedRequest 74, dWitnessedBar 91, dKeptSession 92, dBoundRoles 108, dTotalRecall 110, dRankedPlan 123, dFurnishedOrders 126, dLinkedLibrary 134, dIndexedDesign 146, dWellOiledMachine 147, dScopedBuild 158, dTendedCadence 162, dMindYourWords 164, dShippedRelease 172, dCalibratedLens 174, dConvergedCharter 190
+critical path: 191 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 13, dFairHearing 25, dOrderedCharter 44, dDeclaredLoop 67, dPlacedRequest 75, dWitnessedBar 92, dKeptSession 94, dBoundRoles 109, dTotalRecall 111, dRankedPlan 124, dFurnishedOrders 127, dLinkedLibrary 135, dIndexedDesign 147, dWellOiledMachine 148, dScopedBuild 159, dTendedCadence 163, dMindYourWords 165, dShippedRelease 173, dCalibratedLens 175, dConvergedCharter 191
 rc 0
 ````
 

@@ -189,7 +189,7 @@ extends.
 | gap-mem-34 | Memory | LOW | A language other than Python, shell and JavaScript stays at file level: an adopter written in one gets no definitions, ranges or calls for it. | night pass `[p3-code]`; the owner's NP-10 (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[answers]`) | — |
 | gap-mem-35 | Memory | HIGH | The closed edge set cannot carry the cycle the owner asked for: a record serving a unit, who made a thing and why, the instruction an act followed, a return answering its work order, an act's session, what a landing carried, a pin, an item's reads and writes, and a promotion have no type. Five of twelve hops on one feature need prose or search, and four of seven from one commit. | `research-memory-pockets.md` section 4; `research-git-pockets.md` section 4; the memory plan `[edges]` | — |
 | gap-mem-36 | Memory | MED | Record sections declare no edges: outside dClosedLoop no record heading carries a tag, and the Serves line is the only typed link a record holds. | `research-memory-pockets.md` section 2 | — |
-| gap-mem-37 | Memory | MED | The kind registry declares an owner and a writer only: home, lifecycle, readers and layer are undeclared for every kind, and views, row registries, the archive, instruments and the pockets outside the tree have no kind. | `research-memory-pockets.md` sections 2 and 5; `research-git-pockets.md` section 3 | — |
+| gap-mem-37 | Memory | MED | The kind registry declares an owner and a writer cell only: home, lifecycle, readers and layer are undeclared for every kind, 32 of 76 writer cells name no writer item yet, and views, row registries, the archive, instruments and the pockets outside the tree have no kind. | `research-memory-pockets.md` sections 2 and 5; `research-git-pockets.md` section 3 | — |
 | gap-mem-38 | Memory | LOW | "journal" names two kinds: a Serves kind on 1,436 records and Runtime's journal. | `research-memory-pockets.md` section 2 | — |
 | gap-mem-39 | Memory | MED | Decision rows and bug classes relate to nothing they decide or came from: a feature edge on 0 of 200 decision rows, and `from:` on 0 of 149 bug classes. | `research-memory-pockets.md` sections 2 and 4 | — |
 | gap-mem-40 | Memory | LOW | A design-only build's records name a unit no spec defines, so the bindings check reports a row for each of them. | `research-memory-pockets.md` section 2 | — |
@@ -229,9 +229,9 @@ extends.
 | gap-rt-06 | Runtime | MED | Workspaces are neither allocated nor reclaimed: 8 merged worktrees and 497 stale temp directories remain, the directories' source unattributed, and concurrent agents share one scratch directory. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-hooks.md` | — |
 | gap-rt-07 | Runtime | LOW | Session hooks miss events: no matcher covers `fork`, and SubagentStop, PreCompact, PostCompact and SessionEnd are unwired. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-sessions.md` | — |
 | gap-rt-08 | Runtime | LOW | Node facts go unrecorded: the `claude` binaries and their versions, node d's clock running 8 to 13 s slow, and its `autocrlf` against CI's. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-sessions.md` | — |
-| gap-rt-09 | Runtime | LOW | gov wires none of the five hook events Codex ships. Revised 2026-10-18, the away pass: Codex now documents twelve, SessionStart, Stop and PostCompact among them, each project hook trusted by hash before it runs (`research-harness-cli.md` section 3). | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-sessions.md` | — |
+| gap-rt-09 | Runtime | LOW | gov wires none of the hook events Codex ships: twelve as of CLI 0.139, SessionStart, Stop and PostCompact among them, each project hook trusted by hash before it runs (revised 2026-10-18, the away pass, from the five once measured; `research-harness-cli.md` section 3). | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-sessions.md` | — |
 | gap-rt-10 | Runtime | LOW | Runtime records contradict the code: the "four-verb driver" has 30 verbs, `/build` claims an identical spec review in both modes, an earlier design record said the spawn guard compares `role-sha`, the Facts line's placeholder "Worktrees: none yet", meaning no bootstrap script, reads as no worktrees while 13 exist, and a keepalive comment says the cron store dies with its session. | layer review, runtime, `[current]`; the four runtime research returns | — |
-| gap-rt-11 | Runtime | MED | Codex gets no card: an override file would replace the charter, since Codex reads one instruction file per directory; its 32 KiB limit covers the whole chain it reads; and Codex has no SessionStart, so only the harness adapter's launch input can carry the card. Revised 2026-10-18, the away pass: Codex now has SessionStart, so a trusted hook can carry the card (`research-harness-cli.md` section 3). | the instruction layer's fold, `codex-override`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-sessions.md` | — |
+| gap-rt-11 | Runtime | MED | Codex gets no card: an override file would replace the charter, since Codex reads one instruction file per directory; its 32 KiB limit covers the whole chain it reads; and Codex's SessionStart hook runs only once the owner trusts it, so until then only the harness adapter's launch input can carry the card (revised 2026-10-18, the away pass; `research-harness-cli.md` section 3). | the instruction layer's fold, `codex-override`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-sessions.md` | — |
 | gap-rt-12 | Runtime | MED | An act session loads the whole charter: `claude -p` reads `CLAUDE.md`, which imports `AGENTS.md`, so driver-scoped units such as the micro-formats reach a role's act, and nothing renders the act's own load set. | the instruction layer's fold, `act-session-load-point` | — |
 | gap-rt-13 | Runtime | MED | Hook text is unregistered instruction: SubagentStart context, Stop-hook block reasons, PreToolUse deny reasons and SessionStart output are composed in code, outside the unit registry, its grammar and its budgets. | the instruction layer's fold, `hook-injected-loads` | — |
 | gap-rt-14 | Runtime | HIGH | The intake hook sits outside Runtime's enforcement surface: no prompt-submit event is wired, nothing scopes it to attended-bound sessions, and no reader checks its witness when it crashes or never fires, though the intake record is the mandate to land. | the flow layer's fold, `intake-hook-crash`, `intake-owner-scope` | — |
@@ -261,6 +261,7 @@ extends.
 | gap-spine-07 | Spine | LOW | No policy schema or reader validates a key that selects an extension against the registry: the keys layer-runtime `[extend]` lists take registered names, and nothing refuses an unregistered one. | layer-runtime `[extend]`; dGroundRules's schema and reader, extended by dDeclaredLoop's registry check (RC-1, DA-M2); the expansion round, `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md` | — |
 | gap-spine-08 | Spine | HIGH | No commit names the item, act or session that made it, 0 of 6,084, and the trailer schema the flow records name is declared nowhere. | `research-git-pockets.md` section 2 | — |
 | gap-spine-09 | Spine | LOW | `Pass:` has two readers that disagree: one unions the subject's ids with the trailer's, the other lets the trailer replace them. | `research-git-pockets.md` section 2 | — |
+| gap-spine-10 | Spine | LOW | 116 of 220 catalogue keys are named by no unit on their owner build's chain row, so a spec writer finds no unit that reads them. | the away pass's closing review, H2; the predicate run in the away-pass record's `[review-fold]` | — |
 | gap-conc-01 | Spine | HIGH | Cross-build and cross-node overlap is advisory: the probe always returns 0 and sees only pushed refs; no unit or path claim exists. | build §4, design §4.2 (41 pairs across 22 build pairs) | — |
 | gap-conc-02 | Spine | MED | Claims never age, name a user rather than a fleet tag, and cover unattended runs only; slug uniqueness is checked against local history only. | plan §4 (8 of 17 held, 17 of 17 user names) | — |
 | gap-conc-03 | Spine | MED | `[isolate]` has no mechanism: harness passes share one worktree and meet git's index lock. | build §4 | — |
@@ -330,6 +331,7 @@ extends.
 | gap-deploy-21 | Deploy | LOW | A Codex project hook is skipped until it is trusted, and no install step surfaces the trust. | `research-harness-cli.md` section 3 | — |
 | gap-deploy-22 | Deploy | LOW | A squash merge drops every trailer, at an adopter that squashes. | `research-git-pockets.md` section 2 | — |
 | gap-deploy-23 | Deploy | LOW | A publication records no tree: the atlas is published by hand, and nothing names what it showed. | `research-git-pockets.md` section 3 | — |
+| gap-deploy-24 | Deploy | MED | Nothing forwards a moved command or hook path: an adopter's call to a retired surface fails outright, and no window keeps the old surface working while the adopter catches up. | `research-supersession.md` section 4 (candidate B, kept as a bounded window); the away pass's closing review, H2 | — |
 | gap-maint-01 | Maintain | HIGH | No cadence: no declared cadence item runs on a schedule. The only scheduled actors are the OS-scheduled resume tick, the desktop durable-restart task and CI's read-only cron, and in-session cron expires after 7 days; corrected by the runtime layer's review. | maintain §4; runtime `[current]` | — |
 | gap-maint-02 | Maintain | HIGH | Detectors without owners: 15 of 27 drift signals nonzero, most report-only, 2 dead probes. | maintain §4, instrument 1 | — |
 | gap-maint-03 | Maintain | HIGH | The governing surface only grows, and nothing prices or retires a leg, rule or bug class. | maintain §4, instrument 2 | — |
@@ -632,13 +634,13 @@ Roles=22 Deploy=14 Plan=8 Spine=10 Orient=18 Test=19 Runtime=24 Lexicon=10 Tooli
 LOW=44 MED=117 HIGH=94
 ```
 
-Re-measured after the away pass added thirty-nine gaps, `gap-mem-35` to `gap-mem-40`, `gap-roles-23`,
-`gap-spine-08` and `gap-spine-09`, `gap-rt-25` to `gap-rt-31`, `gap-orient-19` and `gap-orient-20`, `gap-test-20`,
-`gap-maint-14`, `gap-deploy-15` to `gap-deploy-23` and `gap-tool-10` to `gap-tool-19`
-(`build/2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md` `[chain-impact]`), same instrument. A join of these 294 keys
-against v2's chain rows finds each owned by exactly one build:
+Re-measured after the away pass and its closing review added forty-one gaps, `gap-mem-35` to `gap-mem-40`,
+`gap-roles-23`, `gap-spine-08` to `gap-spine-10`, `gap-rt-25` to `gap-rt-31`, `gap-orient-19` and `gap-orient-20`,
+`gap-test-20`, `gap-maint-14`, `gap-deploy-15` to `gap-deploy-24` and `gap-tool-10` to `gap-tool-19`
+(`build/2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md` `[chain-impact]` and `[review-fold]`), same instrument. A
+join of these 296 keys against v2's chain rows finds each owned by exactly one build:
 
 ```text
-Roles=23 Deploy=23 Plan=8 Spine=12 Orient=20 Test=20 Runtime=31 Lexicon=10 Tooling=19 Review=16 Foundation=26 Build=5 Memory=39 Flow=18 Maintain=14 Design=10
-LOW=54 MED=138 HIGH=102
+Roles=23 Deploy=24 Plan=8 Spine=13 Orient=20 Test=20 Runtime=31 Lexicon=10 Tooling=19 Review=16 Foundation=26 Build=5 Memory=39 Flow=18 Maintain=14 Design=10
+LOW=55 MED=139 HIGH=102
 ```
