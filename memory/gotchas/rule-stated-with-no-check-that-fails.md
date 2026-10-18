@@ -28,6 +28,13 @@ It bit again in the answers fold, 2026-10-18 (`memory/builds/dClosedLoop/build/2
 trailer was to be written "as `trace.identity` says", and `runtime.act-auth` was to try api-key last, each with no check
 that could fail. Both now name planted arms, seen red once built.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Seven rules of the
+converged design had no check that could fail: P38's upgrade step for every adopter-visible change, P35's `not-local`
+and `pruned` states, P34's rationale apart, three of P37's seven legs, the plan's claim that every hop of the cycle
+closes, the `[docs]` rule over `help/`, and two settled owner answers no clause carried. Each now names its arm, the
+step gate first.
+
 ## The fix
 
 - A rule lands with the check that fails on its breach, named in the same commit: a pair rule in the

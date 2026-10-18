@@ -29,6 +29,14 @@ It bit again in the answers fold, 2026-10-18 (`memory/builds/dClosedLoop/build/2
 pwsh-launch plan's gaps would join the register when its trigger held, while the register already held them, filed the
 same day under AP-33.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Twelve in one design:
+two builds each built the record finder and the bug-class selector, and two the record-kind factory; the one-door rule
+listed five doors beside writers the same record named; `reads` and `writes` were declared at two sites; the edge
+grammar said one line and one line per type; the refs and policy-values pockets named superseded owners; the hop tally
+disagreed with its own table; and three consolidations (the bash resolver, the ledger's merge driver, the `Pass:`
+reader) ignored the seams that exist.
+
 ## The fix
 
 Ask, do not copy. `tools/memory-tree/check-memory-hygiene.sh` owns the append-only set and the index

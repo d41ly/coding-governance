@@ -2328,6 +2328,13 @@ The whole-design shape audit, dispatches 116 and 117, derived from each run the 
   `git diff --quiet` clean each time, nothing committed. Run A, dispatch 116, returned 45 of 49 confirmed with 4 high;
   run B, dispatch 117, 53 of 56 with 5 high items. `build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md` maps the 105 findings onto 71 defects.
 
+- 2026-10-19, session 1799cb98: the owner answered the shape audit's twelve forks in three batches (`build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`
+  `[answers]`). SA-9 came back first as a question, which the records answered: the flow and the orientation scout
+  already hold every job `/session-kickoff` does, and the owner chose to retire it. All 66 confirmed defects and the
+  answers are folded: dSafePassage gains the step gate, the step's isolation contract, gov first and the recovery moved
+  from dShippedRelease; act bindings are pushed for checks on any node; and dConvergedCharter renders `help/`, retires
+  the kickoff and walks the cycle by key. The chain is recomputed in `[folded]`.
+
 ## Instruments
 
 ### The gap-ownership join

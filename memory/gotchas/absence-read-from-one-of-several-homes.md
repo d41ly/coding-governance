@@ -30,6 +30,12 @@ dClosedLoop's project map, 2026-10-17
 - Ownership has four homes in that design: the chain table's stage column, chain-row prose,
   step-section prose and the systems' owner tables. None of them is a declared field.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). The commit-key and
+cause checks read act bindings from the node they run on, while bindings live on the node that made the act, so a lander
+or a peer would read another node's work as unbound. Each act now pushes a minimal binding record the checks read on any
+node, a missing one counted `not-local` and never passed.
+
 ## The fix
 
 - Give the relation one home, a declared field, and derive every other statement of it from that field.

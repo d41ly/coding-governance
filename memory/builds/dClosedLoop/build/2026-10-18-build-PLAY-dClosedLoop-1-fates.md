@@ -39,12 +39,12 @@ A kit's fate is one of four:
 | branch-reconcile | optional | observability's prune fix (dTendedCadence) |
 | codebase-map | optional | its symbols become the core `code` record (dTotalRecall); its dossiers and owner views stay optional, and `reuse_lookup.py` retires |
 | drift-audit | optional | its gateable signals become core legs, and its report half is observability's (dTendedCadence) |
-| gate-lint | optional | a Flow leg pack (dWitnessedBar) |
+| gate-lint | optional | a Flow leg pack (dWitnessedBar), less its Python text-IO scan and shell-hygiene mode, which move into the core portability pack (dWitnessedBar) |
 | govkit | optional | distribution's engine: release tags, the receipt, the one version check (dShippedRelease) |
 | hooks | kept | its guards become packs on the one enforcement surface (dWellOiledMachine) |
 | lexicon | optional | rebuilt by dMindYourWords |
 | lib | kept | the shared primitives, and the join, ledger, extraction, region-parser and scorer factories |
-| memory-recall | optional | narrowed to a record finder (dLinkedLibrary) |
+| memory-recall | optional | narrowed to its why-search (dLinkedLibrary), its bench and union an `experiment` instance (dBoundRoles), its finder dTotalRecall's `record find` (SA-6) |
 | memory-tree | kept | the memory contract's engine: the kind registry, `record` and the `code` record (dTotalRecall) |
 | playbook | kept | the instruction engine, the one renderer (dOrderedCharter) |
 | process-monitor | kept | Runtime's reaping (dWellOiledMachine); its census an observability reading |
@@ -59,7 +59,8 @@ A kit's fate is one of four:
   lexicon gives it (gap-lex-09).
 - **Two kits disappear:** agent-instructions and unattended, both absorbed. No kit is retired outright.
 - **Beside the kits:** the top-level checks fold into packs or into govkit's one version check, `skills/`
-  loses `deploy-governance` and reshapes the kickoff into the entry step and the orientation scout, the git hooks
+  loses `deploy-governance`, and loses `session-kickoff` once the entry step and the orientation scout take its
+  procedure (SA-9), the git hooks
   stay with their bar and trap changes, and the hand-written guides retire into rendered views.
 
 ## [table] Every part, function by function
@@ -67,7 +68,7 @@ A kit's fate is one of four:
 The fate is one of STAYS, RESHAPED, MERGED and RETIRED. "Where it goes" names the chain build that keeps or receives
 it. "Decided by" names the record that decides it, a line-number citation of dispatch 104's resolved to its section
 tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and the owner decided row by row. Counts: 24 stay,
-70 reshaped, 23 merged and 14 retired, over 131 rows.
+72 reshaped, 25 merged and 15 retired, over 136 rows.
 
 | Kit | Function | Today's job | Fate | Where it goes | Decided by |
 |---|---|---|---|---|---|
@@ -85,6 +86,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | roles | `render_agents.py` | renders agent types | MERGED | the one renderer ("roles render wiring") (dOrderedCharter) | v2 `[chain]` dOrderedCharter |
 | roles | `check_roles.py` | role, table and doc agree | RESHAPED | role-by-step matrix joined both ways (dFurnishedOrders); policy reader re-pointed (dConvergedCharter) | v2 `[chain]` dFurnishedOrders; v2 `[chain]` dConvergedCharter |
 | roles | `house/policy.toml` | effort and gates | MERGED | into `.governance/policy.toml` (dConvergedCharter); on dGroundRules's legacy list until then | v2 `[chain]` dGroundRules; v2 `[chain]` dBoundRoles |
+| roles | `.claude/roles.json` | the rendered role index | RESHAPED | the role index beyond every worker's reach, `role-sha` compared at spawn (dBoundRoles) | v2 `[chain]` dBoundRoles; the shape audit, run B's M10 |
 | workflows | `tier2-review.js` | review harness | RESHAPED | presets, opt-in lenses, skeptic batches (dFairHearing), run at breakpoints (dDeclaredLoop) | v2 `[chain]` dFairHearing; v2 `[chain]` dDeclaredLoop |
 | workflows | `REVIEW-PROTOCOL.template.md` | protocol text | RESHAPED | corrected by dFairHearing, then a rendered view (dConvergedCharter) | v2 `[chain]` dFairHearing; v2 `[chain]` dConvergedCharter |
 | workflows | `unattended-build.js`, `unattended-unit.js` | unit harnesses | RESHAPED | role harnesses inside act sessions, the deferral block, persisted returns (dWellOiledMachine) | layer-runtime `[contract]`; v2 `[chain]` dWellOiledMachine |
@@ -115,7 +117,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | codebase-map | stale-dossier signal | freshness | RESHAPED | observability reading; map freshness (dTendedCadence) | layer-expansions `[design-observability]`; v2 `[chain]` dTendedCadence |
 | codebase-map | `map_diff` | a range's feature digest, and stale dossiers | RESHAPED | a range read over the `code` record (dTotalRecall), and enrichment staleness by body hash (dLinkedLibrary) | the owner, NP-22, 2026-10-18 |
 | codebase-map | `check_gate_coverage` | the adopter's gate compares every artifact the engine writes | MERGED | into `govkit check`, the one install check (dShippedRelease) | the owner, NP-22, 2026-10-18 |
-| memory-recall | `query.py` | full-text search | RESHAPED | a record finder, `record find` (dTotalRecall) | layer-memory `[tools]`; v2 `[chain]` dTotalRecall |
+| memory-recall | `query.py` | full-text search | RESHAPED | a record finder, `record find` (dTotalRecall) | layer-memory `[tools]`; v2 `[chain]` dTotalRecall; the owner, SA-6, 2026-10-19 |
 | memory-recall | `extract.py` grammar, `recall_conf` | id parser | MERGED | into memory-tree (dOrderedCharter) | v2 `[chain]` dOrderedCharter |
 | memory-recall | `recall-opened.js` | Read observer | RESHAPED | optional hook pack (dWellOiledMachine); shell reads too (dLinkedLibrary) | layer-runtime `[enforce]`; v2 `[chain]` dLinkedLibrary |
 | memory-recall | `bench`, `union` | the retrieval bench and its union of runs | RESHAPED | an `experiment` shape instance over recall's corpus (dBoundRoles) | the owner, NP-22, 2026-10-18 |
@@ -125,7 +127,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | lexicon | `subtokens`, tokenizers | splitting | MERGED | `tools/lib` extraction primitive (dTotalRecall, LX-2) | v2 `[chain]` dTotalRecall |
 | lexicon | its two drift signals | gating | MERGED | the lexicon's leg pack (dMindYourWords) | layer-expansions `[design-observability]`; v2 `[chain]` dMindYourWords |
 | runlog | `runlog_lib` grammar | line grammar | MERGED | the core journal (dWellOiledMachine) | v2 `[chain]` dWellOiledMachine; layer-runtime `[contract]` |
-| runlog | reader, extract, model, prose | reader | STAYS | observability's reader half; role metrics read it (dFurnishedOrders) | layer-expansions `[design-observability]`; v2 `[chain]` dFurnishedOrders |
+| runlog | reader, extract, model, prose | reader | STAYS | observability's reader half; role metrics read it (dFurnishedOrders); its timeline model read through the core reader and index (dWellOiledMachine) | layer-expansions `[design-observability]`; v2 `[chain]` dFurnishedOrders |
 | runlog | `record.py` | run record | RESHAPED | run-record kind through `record`, owned by dWellOiledMachine | ownership `[look]`; layer-expansions `[agree-observability]` |
 | drift-audit | seven gateable signals | drift gating | RESHAPED | five core legs and two lexicon legs (dTendedCadence gap-maint-09; dMindYourWords) | layer-expansions `[design-observability]`; layer-expansions `[gaps-proposed]` |
 | drift-audit | report-only signals | readings | RESHAPED | observability detectors with owners (dTendedCadence) | layer-expansions `[design-observability]`; v2 `[chain]` dTendedCadence |
@@ -146,18 +148,20 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | unattended | `run-lease.js` | binds a session to its run for the three hooks | RESHAPED | the session binding record (dWellOiledMachine) | the owner, NP-22, 2026-10-18; layer-runtime `[act]` |
 | unattended | playbook mode (`--record-piece`, `--record-set`, `check-playbook`) | repeatable content as pieces and sets | RESHAPED | the playbook record kind and `check-playbook` as Design's pack (dIndexedDesign), pieces built as units (dScopedBuild), the set check, registered at Test (dIndexedDesign), a cyclic playbook's filer (dTendedCadence), reached by the `repeat` disposition (dKeptSession) | the owner's point 1 (night pass) |
 | unattended | `check-unattended` | the kit's own gate | RETIRED | none: it gates the unattended kit itself, which dissolves at convergence (dConvergedCharter) | the owner, NP-22, 2026-10-18 |
+| unattended | `RUNAWAY_CEILING` and the runaway detector | the round-count bound | MERGED | the loop kit's definition, moved in the unit that retires `REVIEW_ROUNDS` (dDeclaredLoop) | v2 `[chain]` dDeclaredLoop; the shape audit, run A's M22 and run B's M5 |
 | unattended | `check-pass-order`, `check-brief-recorded` | pass order and brief records | RESHAPED | the work order's hash and the shape-run rows (dBoundRoles) | the owner, NP-22, 2026-10-18; `research-unattended-core.md` |
 | unattended | `check-arms-groups` | lints the batched self-test's groups | RETIRED | none: it lints the kit's own self-test file, which dissolves with the kit (dConvergedCharter) | the owner, NP-22, 2026-10-18 |
 | unattended | drift and runlog calls, `read_policy_key` | cross-kit edges | RESHAPED | optional slots (dOrderedCharter); re-pointed (dConvergedCharter) | v2 `[chain]` dOrderedCharter; v2 `[chain]` dConvergedCharter |
 | unattended | guide templates (PROTOCOL, VERBS, STOPS, ASKS) | the protocol text | RESHAPED | rendered views of the loop's checklists (dConvergedCharter) | v2 `[chain]` dConvergedCharter |
 | unattended | the `/unattended` Skill | starts, resumes or closes a run | RETIRED | a client of `run` until dConvergedCharter retires it, unattended being the default state (NP-4) | the owner's point 1 (night pass) |
 | hooks | `agent-cap.js` | fan-out guard | STAYS | spawn-guard pack; its arm becomes a fragment; slot reservation added (dWellOiledMachine) | layer-runtime `[enforce]` |
-| hooks | `scratch-guard.js` | write gate | STAYS | roles write-gate pack (dBoundRoles, packed by dWellOiledMachine) | layer-runtime `[enforce]` |
+| hooks | `scratch-guard.js` | write gate | STAYS | roles write-gate pack (dBoundRoles, packed by dWellOiledMachine), its card and route reads re-pointed to the session binding (dWellOiledMachine) | layer-runtime `[enforce]` |
 | hooks | `format-guard.js` | final-message format | RESHAPED | statement-grammar check (dOrderedCharter) | layer-instruction `[recommendations]`; layer-runtime `[enforce]` |
 | process-monitor | reap, scope, classify | reaping | STAYS | Runtime, at the act ceiling (dWellOiledMachine) | layer-runtime `[supervise]`; layer-runtime `[contract]` |
 | process-monitor | census, procmon-hook | report | RESHAPED | observability node reading (dTendedCadence) | layer-expansions `[design-observability]` |
 | branch-reconcile | report, cleanup Skill | prune report | STAYS | observability's prune fix (dTendedCadence; `[stale]` 9) | layer-runtime `[isolate]` |
-| gate-lint | scans | source hygiene | STAYS | leg pack, expansion (dWitnessedBar, at Test's leg-pack point) | layer-instruction `[layers]` |
+| gate-lint | scans | source hygiene | STAYS | leg pack, expansion, less the two below (dWitnessedBar, at Test's leg-pack point) | layer-instruction `[layers]` |
+| gate-lint | `encoding_posture.py` and the shell-hygiene mode | Python text IO and shell hygiene | MERGED | the core portability pack, so every P37 rule has a core leg (dWitnessedBar) | v2 `[chain]` dWitnessedBar; the shape audit, run B's M11 |
 | pytest-parallel-guardrails | xdist guard | bounded parallel tests | STAYS | an adopter-only Flow leg pack, declared so in gov, which runs no xdist suite (dWitnessedBar) | the owner, NP-22, 2026-10-18 |
 | run-gates | `run-gates.sh` | the bar | RESHAPED | runner-written verdict, attribution, held legs by policy, leg factory (dWitnessedBar) | v2 `[chain]` dWitnessedBar |
 | run-gates | `gate-legs.json` | leg manifest | RESHAPED | `tag` and `purpose` fields, and one manifest whose rows the leg factory generates from the packs' declarations (dWitnessedBar) | v2 `[chain]` dWitnessedBar; the owner, NP-22, 2026-10-18 |
@@ -188,11 +192,13 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | top-level | `push-main.sh` | the lander | RESHAPED | command adapter and hardening (dWellOiledMachine); landing queue and core re-check (dShippedRelease) | v2 `[chain]` dWellOiledMachine; v2 `[chain]` dShippedRelease |
 | top-level | `settings-merge.py` | hook wiring | RESHAPED | one dispatcher entry per event, `onFailure` (dWellOiledMachine) | layer-runtime `[enforce]` |
 | top-level | waiver, limit and high-water files | exemptions | RESHAPED | ledger populations (RF-5) (dWitnessedBar) | retrofit `[ledger]`; v2 `[chain]` dWitnessedBar |
+| top-level | `help/` pages | user documentation | RESHAPED | rendered from each user-facing unit's `usage` field, with the docs leg (dConvergedCharter) | the owner, SA-5, 2026-10-19 |
 | skills | manifest-check card hooks | card | RESHAPED | per-worktree card file (dOrderedCharter); card ref (dPlacedRequest); compact re-inject (dWellOiledMachine) | v2 `[chain]` dOrderedCharter; v2 `[chain]` dPlacedRequest; v2 `[chain]` dWellOiledMachine |
-| skills | kickoff procedure | orientation | RESHAPED | orientation scout (dFurnishedOrders); `kickoff.runs` (dRankedPlan); thin entry | v2 `[chain]` dFurnishedOrders; v2 `[chain]` dRankedPlan; v2 `[chain]` dConvergedCharter |
+| skills | kickoff procedure | orientation | RESHAPED | orientation scout (dFurnishedOrders); `kickoff.runs` (dRankedPlan); the Skill itself retired (dConvergedCharter) | v2 `[chain]` dFurnishedOrders; v2 `[chain]` dRankedPlan; v2 `[chain]` dConvergedCharter; the owner, SA-9, 2026-10-19 |
 | skills | manifest ratchet | the kickoff manifest audit | RESHAPED | the guarded instruction manifest (dOrderedCharter) | the owner, NP-22, 2026-10-18 |
 | skills | deploy-governance | operator Skill | RETIRED | no reader, 0 loads; govkit's verbs replace it | layer-instruction `[recommendations]`; gap-tool-05 |
 | skills | rendered Skills, six of seven, `/unattended` apart | entries | RESHAPED | thin level-4 entries; `/build` becomes a client of `next` and `run` (dConvergedCharter, with dWellOiledMachine for the client) | layer-instruction `[recommendations]`; layer-runtime `[decide]` |
+| skills | the `/session-kickoff` Skill and its per-machine link | the manual kickoff entry, linked from each machine to gov's live checkout | RETIRED | a forwarding stub for `install.deprecation-window` releases, then removed, each node's dangling link reported by its preflight (dConvergedCharter) | the owner, SA-9, 2026-10-19 |
 | .githooks | pre-commit | fast leg | RESHAPED | derived list (dWitnessedBar); witness and signal trap (dWellOiledMachine) | v2 `[chain]` dWitnessedBar; v2 `[chain]` dWellOiledMachine |
 | .githooks | commit-msg | transition audit | STAYS | gains a signal trap (dWellOiledMachine) | v2 `[chain]` dWellOiledMachine |
 | .githooks | pre-push | the bar | RESHAPED | reads the runner verdict; trusted copy; policy re-point (dWitnessedBar, dWellOiledMachine, dConvergedCharter) | v2 `[chain]` dWitnessedBar; v2 `[chain]` dWellOiledMachine; v2 `[chain]` dConvergedCharter |
@@ -211,8 +217,8 @@ Dispatch 104 found thirteen places where a later round overtook an earlier verdi
 2. **check-wiring:** only its install arms fold into govkit (`layer-expansions` `[design-distribution]`). Its session
    arm stays, with a fail-closed class arm under Runtime (`layer-runtime` `[enforce]`).
 3. **workflows:** reshaped by dFairHearing, dBoundRoles and dWellOiledMachine, not kept as is.
-4. **push-main, session-kickoff, process-monitor and settings-merge:** reshaped, not kept as is. The census of
-   process-monitor moves to observability.
+4. **push-main, process-monitor and settings-merge:** reshaped, not kept as is, and session-kickoff retired once its
+   procedure is reshaped (SA-9). The census of process-monitor moves to observability.
 5. **drift-audit:** its seven gateable signals leave it for core and lexicon legs, and its hand-typed lists retire.
 6. **The lexicon's pin:** held as a keyed ledger population, not a shrink-only count (v2's dMindYourWords row).
 7. **The leg manifest:** decided as one manifest whose rows the leg factory generates from the packs' declarations
@@ -246,4 +252,6 @@ The record is read by name, so a renamed or missing record stops the check, and 
   that exists;
 - it does not judge a RETIRED row's replacement or reason, only that one is named;
 - it does not catch one part named in two rows under different kits;
+- it does not derive the shipped-part population from the tree: convergence's exit check does, over `git
+  ls-files` (v2's `[chain]` dConvergedCharter);
 - whether each part reaches its fate is dConvergedCharter's exit check (v2's `[chain]`).

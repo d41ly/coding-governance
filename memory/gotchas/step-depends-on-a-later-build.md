@@ -39,6 +39,13 @@ second build, raised the interpreter floor and retired the PEP 701 ban, while th
 gov's own CI interpreter sat on dWitnessedBar, 81 units later, and a sentence credited dSafePassage with the self-run
 that dShippedRelease's lander brings. Each now lands in dSafePassage itself.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Five more: `record`
+refused a missing cause before any root kind existed; dKeptSession's live owner questions were dFurnishedOrders'
+mechanism; steps landed before dShippedRelease never ran on gov first; adopter surfaces changed before their recovery
+(hook unwiring, retired-edit orders, the stale lock) existed; and a deprecation window counted releases before the first
+was cut.
+
 ## The fix
 
 - Check every kind of dependency, not only citations:

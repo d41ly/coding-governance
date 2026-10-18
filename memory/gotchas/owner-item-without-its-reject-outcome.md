@@ -26,6 +26,12 @@ default branch, and every later build would inherit the red. The follow-up round
 found the fix's own reject-and-remove left the entry `rejected` until the patch build landed, a state
 the check refuses, so the red stood for that whole window.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Convergence retired
+superseded parts through ratified proposals, and only the owner's yes was routed: a declined retirement left the fates
+join red with no exit. A decline now amends the part's row through the ratification record, and the join reads the
+amended row.
+
 ## The fix
 
 List every owner item's dispositions, the refusal included, and say what each leaves on the default

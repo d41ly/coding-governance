@@ -30,6 +30,11 @@ run B's report beside it) found four:
 - under `GATE_POST_MERGE=ci` with integrations absent, `deploy.core` had no producer for its witness
   (run B's M6).
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). P37 is core, but its
+Python text-IO leg lived only in gate-lint, an optional pack, and the core's `gov trace` stood beside runlog's optional
+timeline model as a second engine. The leg moves into the core pack, and the model reads through the core index.
+
 ## The fix
 
 - Before a thing moves into the core, grep its source for an import or a resolver call that reaches an

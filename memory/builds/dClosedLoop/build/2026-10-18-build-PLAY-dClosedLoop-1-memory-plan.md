@@ -17,9 +17,11 @@ parked in the away-pass record's `[forks]`, each named there by its AP id.
 The layers already form a cycle: instruction says, runtime enforces, flow witnesses, memory proves
 (layer-instruction `[layers]`). Instruction directs the flow, the flow names items, roles perform them, their
 returns become memory, and memory renders the card and every work order. The plan makes that cycle one graph:
-- **Every piece is a node.** A node has an address: a tag (`<ns>.<seg>`), a section (`<doc> [<seg>]`), or a native
-  id (a commit's SHA, an id `FAMILY-<slug>-<seq>`, a gap key, an act id). Instruction units, record sections, code
-  regions, commits, acts and sessions are all nodes of one index, resolved by one resolver.
+- **Every piece is a node.** A node has an address: a tag (`<ns>.<seg>`), a section (`<doc> [<seg>]` in prose,
+  `<doc>#<seg>` in an edge target, which holds no space), or a native id (a commit's SHA, an id
+  `FAMILY-<slug>-<seq>`, a gap key, an act, session or landing id), each native-id class registered with its owner
+  (P33). Instruction units, record sections, code regions, commits, acts and sessions are all nodes of one index,
+  resolved by one resolver; acts and sessions are read beside a tree's index from the binding records.
 - **Every relation is a typed edge.** Its type comes from one closed set, it is declared once at the site that owns
   its fact, and its inverse is derived (P33). A reference written as prose is a derived `cites`, never a typed fact.
 - **Instruction and memory differ in level and lifecycle, never in grammar.** An instruction unit sits at levels 0
@@ -29,10 +31,11 @@ returns become memory, and memory renders the card and every work order. The pla
   auto-memory, is a declared witness: the registry names its home, its key and its reader, and a node in the tree
   carries the pointer.
 
-Today one family of typed links works end to end: the `**Serves:**` line, on 2,278 records, its inverse derived and
-graded both ways (`research-memory-pockets.md` section 1). Of the twelve hops that trace one feature, seven are
-typed and five need prose or search. From one commit, three of seven targets are reached by key
-(`research-git-pockets.md` section 4). The plan closes every hop.
+Today one family of typed links works end to end: the `**Serves:**` line, on 2,278 records when dispatch 106
+measured them, its inverse derived and graded both ways (`research-memory-pockets.md` section 1). Of the fourteen
+hops `[cycle]` walks, two are typed today, two partly, and ten need prose or search. From one commit, three of seven
+targets are reached by key (`research-git-pockets.md` section 4). The plan closes every hop, and dConvergedCharter
+walks the cycle by key to prove it (`[gates]`).
 
 ## [families] The memory's families
 
@@ -44,8 +47,8 @@ Eight families group every pocket, drawn as the atlas's memory view draws them.
 | trail | 7 | one build's records: README, specs, design records, research returns, reviews, transitions, verdicts, landings, runs, asks | append-only or frozen at a transition, written through `record` |
 | library | 7 | what generalizes beyond a build: decisions, bug classes, research, dossiers, the lexicon | current-state, written through `record`; consulted, never loaded as instruction |
 | code | 7 | the code record, `gov:` annotations, tests, kits, legs, hooks | derived from the tree by hash; annotated by builders |
-| git | 7 | commits, their messages and trailers, refs (claims, runs, mail, bar-red), tags (kit releases) | immutable once pushed; refs move by compare-and-swap |
-| runtime | 7 | acts, session bindings, the journal, the inbox, and the harness stores the bindings point at | node-local, kept for `runtime.journal` |
+| git | 7 | commits, their messages and trailers, refs (claims, runs, mail, bar-red, bindings), tags (kit releases) | immutable once pushed; refs move by compare-and-swap |
+| runtime | 7 | acts, session bindings, the journal, the inbox, and the harness stores the bindings point at | node-local, kept for `runtime.journal`; each act's minimal binding record pushed to `refs/gov/bindings` |
 | views | 7 | what is generated: LIVE.md, the ledger, ask views, the map, the recall index, the atlas | re-rendered, never merged |
 | outside | 7 | what lives beyond the repository and the node's runtime: published artifacts, remote pull requests, issues and CI | read through an integrations adapter |
 
@@ -58,7 +61,8 @@ reader needs. The counts are the returns' measurements.
 | Pocket | Family | Where | Today | Becomes | Key | Owner |
 |---|---|---|---|---|---|---|
 | charter | instruction | `AGENTS.md`, rendered from the template | 45 rule tags; 0 of 9 headings tagged | node: units at level 0, `practice.<tag>` | tag | dOrderedCharter |
-| policy values | instruction | the policy file, and today each kit's conf | keys typed per kit | node: units at level 2 | `policy.<key>` | dDeclaredLoop |
+| deploy overlay | instruction | `.governance/deploy.toml`, committed | the repository's answers and adopter rules, rendered into the charter; no node, door or guard | node: units at level 0, written only through `instructions.edit`, under dGroundRules' minimal guard (SA-12) | tag | dOrderedCharter |
+| policy values | instruction | the policy file, and today each kit's conf | keys typed per kit | node: units at level 2; the file, its schema and its reader dGroundRules', the presets dKeptSession's | `policy.<key>` | dGroundRules |
 | protocols and guides | instruction | `memory/guides/`, `HYGIENE.md`, `TEMPLATE-SPEC.md` | 0 of 138 headings tagged; positional citations by number | node: protocol slices at level 3 | `doc.<name> [<seg>]` | dConvergedCharter |
 | kickoff manifest | instruction | `memory/guides/SESSION-KICKOFF.md` | no kind and no unit | node: units at level 2 that the card reads | tag | dPlacedRequest |
 | Skills and path rules | instruction | `.claude/skills/`, `.claude/rules/` | 0 tagged | node: thin entries at level 4 | tag | dConvergedCharter |
@@ -81,30 +85,41 @@ reader needs. The counts are the returns' measurements.
 | code record | code | derived from the tree (P32) | the map's symbols | node: definitions with ranges | path and symbol | dTotalRecall |
 | annotations | code | `gov:note`, `gov:feature` in code | 0 `gov:feature` lines; 20 marker words registered | edge site: `part-of`, `implements` | tag | dLinkedLibrary |
 | commits | git | the history | 6,084; `Pass:` on 1,353 and `Decided:` on 677; none names an item, act or session | node, its trailers an edge site | SHA | dDeclaredLoop |
-| refs | git | `refs/gov/claims`, `runs`, `mail`, `bar-red` | 17 run claims, never deleted | node: claims, leases, mail | ref name | dPlacedRequest |
+| refs: claims and leases | git | `refs/gov/claims`, `refs/gov/runs` | 17 run claims, never deleted | node: claims and leases | ref name | dPlacedRequest |
+| refs: mail | git | `refs/gov/mail` | designed | node: the mailbox's durable copy | ref name | dKeptSession |
+| refs: bar-red | git | `refs/gov/bar-red` | written and read by the pre-push hook | node: the red verdict's marker | ref name | dWitnessedBar |
+| refs: bindings | git | `refs/gov/bindings` | designed (SA-10) | node: each act's minimal binding record, read by the checks on any node | act id | dWellOiledMachine |
 | tags | git | kit releases, archive tags | 3 archive tags | node: `kit-release` | tag name | dShippedRelease |
 | acts and session bindings | runtime | written by the supervisor | designed | node: the act carries item, work order, harness, harness session and node | act id | dWellOiledMachine |
 | journal | runtime | `.git/runlog/` | slug on every line, unit on 368 of 1,964, session on none | node-local node: every line keyed by act or session | act id | dWellOiledMachine |
 | health and stall logs | runtime | the git dir | no key | folded into the journal grammar | act id | dWellOiledMachine |
-| Claude transcripts | runtime | `~/.claude/projects/<cwd>/<id>.jsonl` and `subagents/` | keyed by session and agent id; kept 365 days | witness: the binding's `transcript=` pointer | harness session id | dWellOiledMachine |
-| Codex rollouts | runtime | `~/.codex/sessions/.../rollout-<ts>-<id>.jsonl` | `session_meta.id` on every file | witness: the binding's `transcript=` pointer | harness session id | dWellOiledMachine |
+| Claude transcripts | runtime | `~/.claude/projects/<cwd>/<id>.jsonl` and `subagents/` | keyed by session and agent id; kept for the node's `cleanupPeriodDays`, 365 on gov's node and 30 by the harness's default, measured per node by dWellOiledMachine's conformance fixture | witness: the binding's `transcript=` pointer | harness session id | dWellOiledMachine |
+| Codex rollouts | runtime | `~/.codex/sessions/.../rollout-<ts>-<id>.jsonl` | `session_meta.id` on every file; retention measured per node like the transcripts' | witness: the binding's `transcript=` pointer | harness session id | dWellOiledMachine |
 | the live inbox | runtime | the harness's per-session inbox | Claude only; addressed by session id | witness: live delivery beside the mailbox | harness session id | dWellOiledMachine |
 | auto-memory | runtime | `~/.claude/projects/<repo>/memory/` | 88 files; `originSessionId` on 79 | witness: its standing directives promoted, its rows claimed | `name` | dTotalRecall |
-| orientation cards | runtime | `<git-common-dir>/orientation/<id>.md` | 22, one per session | retired into the session binding | — | dWellOiledMachine |
+| orientation cards | runtime | `<git-common-dir>/orientation/<id>.md` | 22, one per session, read by the write gate's route check | retired into the session binding, the write gate's card and route reads re-pointed in the same unit | — | dWellOiledMachine |
+| unattended sidecars | runtime | `<git-common-dir>/unattended/` | leases, process lists and landed logs | folded into the supervisor's leases and journal | — | dWellOiledMachine |
+| drift history | runtime | `<git-common-dir>/drift-history.tsv` | node-local drift readings over time | node-local node: Maintain's reading history | period | dTendedCadence |
 | scheduled tasks | runtime | the OS scheduler, the harness's task list | 0 for gov | witness: read by preflight | task name | dWellOiledMachine |
 | gate ledger, logs and caches | views | the git dir | keyed by tree or range SHA | out: the verdict record is the node | — | dWitnessedBar |
+| pre-push allow | views | `<git-common-dir>/pre-push-allow` | the bar's allow marker | out: superseded by the runner-written verdict | — | dWitnessedBar |
+| reuse lookups log | views | `<git-common-dir>/codebase-map/lookups.jsonl` | every `reuse_lookup.py` query | out: retired with `reuse_lookup.py` | — | dLinkedLibrary |
 | LIVE and the ledger | views | `memory/LIVE.md`, `memory/ledger/` | generated | node: a view kind | — | dTotalRecall |
 | ask views | views | `memory/backlog/*.md` | generated | node: a view kind | — | dTotalRecall |
 | project registries | views | `memory/project/*.txt` | 872 path-keyed rows | node: the `registry` kind | path | dTotalRecall |
 | archive | views | `memory/archive/` | rotated records | node: the `archive` kind | path | dTotalRecall |
 | instruments | views | scripts and tables in build folders | 94 files; 3 carry no Serves line | node: the `instrument` kind | path | dTotalRecall |
-| recall index | views | the git common dir | derived | node: `recall-index` | — | dLinkedLibrary |
+| recall index | views | the git common dir | derived | node: `recall-index`, read by `record find` (SA-6) | — | dTotalRecall |
 | the map and the atlas | views | the level-0 map; the atlas, a published artifact | the atlas published by hand, its tree unrecorded | node: a publication is a `release` per (SHA, artifact environment) | URL | dShippedRelease |
+| help pages | views | `help/` | two hand-written pages, which nothing checks | node: a view rendered from each user-facing unit's `usage` field, with the docs leg (SA-5) | page | dConvergedCharter |
 | pull requests, issues, CI | outside | the remote | none in use by gov | out for gov; a witness through an adapter row for an adopter | — | dShippedRelease |
 | prompt history and checkpoints | outside | the harness's own stores | keyed by session | out: the intake record supersedes them | — | — |
 
-Two names collide today. "journal" is both a Serves kind on 1,436 records and Runtime's journal record kind; the
-Serves kind is renamed `log` when dTotalRecall's registry lands.
+Two names collide today. "journal" is both a Serves kind on 1,443 records at `dd1ebb01b` and Runtime's journal
+record kind; the Serves kind is renamed `log` when dTotalRecall's registry lands, `journal` kept as its read-only
+retired alias, so no record is rewritten, and every reader of the value re-pointed by value in the rename's unit.
+
+The git-dir rows are joined to a listing of the git common dir, so a pocket no row names reds (dTotalRecall).
 
 ## [practice] One writing practice
 
@@ -115,12 +130,12 @@ Every rule applies to an instruction unit and to a record section alike. Each ha
 | address | a node is named by its tag, its section or its native id, never by position | `positional` (tags pack), shrink-only over today's population |
 | one subject | a unit or a section holds one subject, and its tag is unique in its document | `unique` |
 | typed relations | every relation to another node is an edge of a registered type, declared once at the site that owns the fact | the edge checks: type registered, target resolves, from and to namespaces allowed, inverse rendered |
-| pinned facts | a quoted derived fact (a count, a size, a path's length) carries its pin on its line: a SHA or a cited line | `pinned-at`; the map's no-stale-facts arm, generalized from the design records to every record |
+| pinned facts | a quoted derived fact (a count, a size, a path's length) carries its pin on its line: a SHA or a cited line | `pinned-at`; the map's no-stale-facts arm, generalized from the design records to every record, its predicate naming the shapes it reads and what it does not, today's unpinned facts a keyed legacy population |
 | statement types | loaded text is one of P11's six statement types; a record's prose is evidence and never loads | statement-type check on loaded units only |
 | rationale apart | why a unit says what it says lives in its `help` field; a record keeps its reasoning in its own sections | render parity: `help` never renders into a load set |
-| one door | each site has one writer: `instructions.edit`, `record`, the commit queue and its hook, the handoff renderer, the supervisor | render parity and the record check; a write elsewhere reds |
-| one owner | every node names one owning build or layer | `owned` |
-| retire, never vanish | a retired node leaves `retired → <new>` and its tag is never reused | `retired` |
+| one door | each node has one writer, a door `[doors]` lists | the one-door check, reading the one door list; a write by an unlisted writer reds |
+| one owner | every node names one owning build or layer | `one-owner`, a check of its own, never the tags pack's `owned` |
+| retire, never vanish | a retired node leaves `retired → <new>` and its tag is never reused | `retired`, over tags and sections |
 | levels decide | a conflict resolves by level; memory at level 7 never instructs | the envelope (P13); promotion only through `instructions.edit` |
 
 The shared grammar of an edge, at every site: `type=target[,target]`.
@@ -130,16 +145,16 @@ The shared grammar of an edge, at every site: `type=target[,target]`.
 | Site | Syntax | Door |
 |---|---|---|
 | a record's header | `**Serves:** <kind> <unit>`, as today; `**Made-by:** <act or owner>`; `**Caused-by:** <id>` | `record` |
-| a record's section | the `## [tag] Title` heading, then at most one line `**Edges:** type=target type=target` | `record` |
+| a record's section | the `## [tag] Title` heading, then one `**Edges:**` line per edge type, `**Edges:** type=target[,target]`, a target holding no space, comma or bracket, a section target written `<doc>#<seg>` | `record` |
 | an instruction unit | its row's `select`, `required-by` and `enforced-by` fields, as today, and `edges` in the same grammar | `instructions.edit` |
-| code | `gov:note <tags> — <definition> → <pointer> [refs=…]` and `gov:feature <tag>` | the builder, under the annotation grammar |
-| a commit | one trailer key per edge: `Gov-Unit:` and `Gov-Item:` for `serves`, `Gov-Act:` for `made-by`, `Gov-Session:` for `runs-in` as `trace.identity` says, with `Pass:` and `Decided:` kept as registered keys, each mapped to its edge type in the registry | the commit queue from the act binding; a `prepare-commit-msg` filler in the owner's session |
+| code | `gov:note <tags> — <definition> → <pointer> [refs=…]`, its refs in the edge-target form, and `gov:feature <tag>` | the builder, under the annotation grammar |
+| a commit | one trailer key per edge: `Gov-Unit:` and `Gov-Item:` for `serves`, `Gov-Act:` for `made-by`, `Gov-Session:` for `runs-in` as `trace.identity` says, with `Pass:` and `Decided:` kept as registered keys, `Pass:` mapped to `serves` and `Decided:` to `decides` | the commit queue from the act binding; a `prepare-commit-msg` filler in the owner's session; the lander, for its own merge, reconcile, `mint:` and `regen:` commits, from the binding it runs under |
 | a work order | the `gov:handoff` marker (role, build, unit, path, `role-sha`, `task-sha`), gaining `item=` | the handoff renderer |
 | an act | the act record's fields: item instance, work order `task-sha`, harness, harness session, node, parent | the supervisor |
 | a kind's registry row | its writer and readers | dTotalRecall's registry |
 
-An edge line is one line under its heading, a median of 40 B, measured as an upper bound over today's records; a
-section with more types than fit takes one line per type (`research-memory-pockets.md` section 3). The other three
+Each edge line sits under its heading, one line per type, a median of 40 B, measured as an upper bound over today's
+records (`research-memory-pockets.md` section 3). The other three
 placements each lost a measured test there: a section as a 200 B unit fits 7.3% of sections; front matter keyed by
 section strands 43 of 45 multi-section records' facts away from their sections; a sidecar list kept apart drifted
 in 12 of 31 dossiers.
@@ -163,7 +178,7 @@ derived.
 | `patches` | patch build → build or item | the patch build's intake | `patched-by` | P33 | Maintain's fixes |
 | `owner` | node → chain build or layer | the node's declaration | `owns` | P33 | ownership |
 | `layer` | kit or part → layer | the descriptor | `in-layer` | P33 | layers |
-| `serves` | record, work order, commit → unit, item or build | the `**Serves:**` line; the `Gov-Unit:` and `Gov-Item:` trailers | `served-by` | new: today's Serves line, typed | record to unit (2,278 records), and commit to unit and item |
+| `serves` | record, work order, commit → unit, item or build | the `**Serves:**` line; the `Gov-Unit:`, `Gov-Item:` and `Pass:` trailers | `served-by` | new: today's Serves line, typed | record to unit (2,278 records), and commit to unit and item |
 | `made-by` | commit, record → act or the owner | `Gov-Act:`; the record header | `made` | new | who made a thing |
 | `caused-by` | record → the record or event that caused it | the record header's `**Caused-by:**` | `causes` | new | why a thing exists; the trace's spine |
 | `follows` | act → work order | the act record | `followed-by` | new | under which instruction an act ran |
@@ -171,8 +186,8 @@ derived.
 | `runs-in` | act, claim, commit → session | the session binding; a claim's `session:`; the `Gov-Session:` trailer | `hosts` | new | act and commit to session |
 | `carries` | landing → unit, commit | the landing record | `carried-by` | new | what a landing moved |
 | `pinned-at` | record, probe, claim → commit or tree | "Derived at", a probe's pin | `pinned-by` | new: today's pins, now typed apart from `cites` | staleness |
-| `reads` | item, role → record kind | the kind's registry row | `read-by` | new | who reads a kind |
-| `writes` | item, role → record kind | the kind's registry row | `written-by` | new | who writes a kind |
+| `reads` | item, role → record kind | the role definition's `reads:` field and the item's declaration; the kind's registry row renders its readers from them | `read-by` | new | who reads a kind |
+| `writes` | item, role → record kind | the role definition's `writes:` field and the item's declaration; the kind's registry row names the door it writes through | `written-by` | new | who writes a kind |
 | `promoted-from` | instruction unit → memory node | `instructions.edit`'s change record | `promoted-to` | new | memory to instruction (no route today) |
 | `cites` | any text → any node | derived from the text | `cited-by` | derived | prose references |
 
@@ -234,19 +249,29 @@ So Codex can do the same for ids, resume and transcripts, and joins inter-sessio
 
 ## [doors] Writing and reading
 
-**Writing.** Five doors, one per site kind, and nothing else writes a node:
+**Writing.** Every writer of a node is a door, and nothing else writes one. The doors are listed once, in the
+registry's writer column, the edge sites' doors until dTotalRecall's kind registry lands, and the one-door check
+reads that list, seen red on a planted write by an unlisted writer and green on a lease acquisition. Five doors
+serve the edge sites:
 - `instructions.edit` writes instruction units and their change records, promotion included;
 - `record` writes every record, its header and its edge lines, and refuses a missing `caused-by` on a kind that is
-  not a root (intake, session binding, cadence lease);
+  not a root (intake, session binding, cadence lease), the build README or its claim commit standing in as the
+  root until those land;
 - the commit queue writes the trailers from the act binding, and `prepare-commit-msg` fills them in the owner's own
   session;
 - the handoff renderer writes work orders with their marker;
-- the supervisor writes acts and session bindings.
+- the supervisor writes acts and session bindings, and pushes each act's minimal binding record.
+
+The other doors write the other node kinds: the builder writes code annotations under the grammar;
+dTotalRecall's registry writes registry rows; the coordination verbs write refs, claims, leases and mail; the
+renderers write views; the release writes `kit-release` tags; and the lander writes its own commits, their
+trailers from the binding it runs under.
 
 **Reading.** One index answers every read:
 - `gov tag show | where | refs | bundle <address>` returns a node, its location, its inbound edges, or its bundle
   (P33);
-- `gov trace <key>` walks `caused-by` down from any key into a timeline, and `gov why <key>` walks up to the
+- `gov trace <key>` walks `caused-by` down from any key into a timeline, through runlog's timeline engine read
+  over the one index, and `gov why <key>` walks up to the
   instruction units and the request behind it (the away pass's `[p5-observe]`);
 - the card and every work order render their slots from the index, by tag;
 - the atlas draws the families, the pockets and the edges from the records this plan names (`[view]`).
@@ -256,13 +281,13 @@ So Codex can do the same for ids, resume and transcripts, and joins inter-sessio
 | Layer | What the plan adds |
 |---|---|
 | instruction | the shared edge grammar; the record header and section edge line as the instruction unit's twin; the eleven edge types registered; `promoted-from` on promotion |
-| flow | the commit node and its trailer keys; one reader for `Pass:`, whose two readers disagree today; `carries` on landings |
+| flow | the commit node and its trailer keys; one reader for `Pass:` and `Decided:`, offering both views today's readers answer, the union of subject and trailer ids and the trailer replacing the subject; `carries` on landings |
 | roles | every work order marked; `reads` and `writes` from role definitions; `answers` on every return |
-| memory | the registry's rows gain home, lifecycle, readers and layer; witness rows for pockets outside the tree; the `caused-by` field on every kind; view, registry, archive and instrument kinds; the Serves backfill |
+| memory | the registry's rows gain home, lifecycle, readers and layer; witness rows for pockets outside the tree; the `caused-by` field on every kind; view, registry, archive and instrument kinds; the `journal` alias |
 | runtime | the act as the key; session bindings with their pointers; journal lines keyed; the commit queue's trailers; the trace verbs |
 | observability | readings over the journal and the commit keys; the Loop Review priced from trace rows |
 | integrations | an artifact publication recorded as a release; adopters' remote trackers joined as witnesses |
-| distribution | the Serves backfill and the edge lines as an update's upgrade step in each adopter |
+| distribution | dTotalRecall's upgrade steps in each adopter: the `journal` alias, and the retag step only where `memory.legacy-anchors: retag` says |
 
 ## [chain] The units, by build
 
@@ -276,22 +301,30 @@ clause by its opening words. The design map's chain-echo arm reds when a row's b
 | dDeclaredLoop | the commit node, its kind and its trailer keys | the commit node and its kind |
 | dTotalRecall | the completed kind registry and the new kinds | the kind registry completed |
 | dTotalRecall | `record`'s header and edge line, and the legacy records' reading | `record` writing each record's header |
+| dTotalRecall | the `journal` alias and the adopter's steps | its own upgrade steps |
 | dLinkedLibrary | the decision and bug-class edges | `decides` on every decision row |
 | dBoundRoles | markers on work orders, `answers` on returns | every work order carrying its marker |
 | dWellOiledMachine | the act as the key | the act as the key |
 | dWellOiledMachine | the commit queue's trailers and the commit-key leg | the commit queue writing the `Gov-*` trailers |
 | dWellOiledMachine | the session node and live delivery | the session node derived from bindings |
+| dWellOiledMachine | the per-session card retired into the binding | the per-session orientation card retired |
+| dWellOiledMachine | binding records for checks on any node | every act's minimal binding record |
 | dPlacedRequest | the kickoff manifest as instruction units | the kickoff manifest's facts |
 | dShippedRelease | `carries` on landings, and publications | `carries` on the landing record |
 | dConvergedCharter | the guides' migration to tags | the guides' positional citations migrated to tags |
+| dConvergedCharter | the cycle, walked by key | the owner's cycle walked by key |
 
 The atlas's memory view, derived from this record and the kind registry, was built in the away pass itself and
 belongs to no chain build.
 
 ## [migration] Today's memory onto the plan
 
-Nothing is rewritten by hand. Each step is mechanical, owned and graded:
-- **Serves lines** become `serves` edges by reading, with no file changed.
+Each step is owned and graded; only the decision rows no dossier lists are routed by hand, by dLinkedLibrary's
+two raters:
+- **Serves lines** become `serves` edges by reading, with no file changed, and the `journal` kind is read through
+  its alias.
+- **Causes** of a legacy record are read from its Serves unit. Today's records are the causes check's legacy
+  population, so only a record written through `record` after dTotalRecall lands is refused.
 - **Untagged headings** get derived anchors, frozen as aliases, so a legacy section is addressable without a retag;
   `memory.legacy-anchors` says whether an adopter derives anchors, the default, retags its records, or keeps neither.
 - **Decision rows** gain `decides` from the dossiers that already list them, then by hand where none does, each a
@@ -300,21 +333,34 @@ Nothing is rewritten by hand. Each step is mechanical, owned and graded:
   and marks every edge it derives that way as derived.
 - **Transcripts and the auto-memory** move nowhere. Bindings point at transcripts from the first act onward, and the
   auto-memory's standing directives are promoted as MS-1 settled.
-- **In an adopter**, the backfill runs as an update's upgrade step, as the backlog migration does (NP-22).
+- **In an adopter**, nothing is rewritten under `memory.legacy-anchors: derived`. Under `retag`, dTotalRecall's
+  retag step rewrites the adopter's own records, as an update's upgrade step, as the backlog migration runs
+  (NP-22).
 
 ## [gates] The checks the plan arms
 
-Each is seen red on a planted case before it is trusted:
+Each is seen red on a planted case before it is trusted, and each declares its population: today's records,
+handoffs and commits are a legacy population `test.seed` seeds at registration, keyed by record path and section
+or by commit SHA, so an arm refuses only what is written after it arms, and today's tree stays green:
 - **edges:** an unregistered type; a target that resolves nowhere; a source or target outside the type's namespaces;
-  an inverse not rendered;
-- **causes:** a non-root record with no `caused-by`; an orphan, a record nothing reaches from a root;
+  an inverse not rendered; a malformed section target, or a second edge line of one type; one edge per address
+  form, each resolved;
+- **causes:** a non-root record with no `caused-by`; an orphan, a record nothing reaches from a root, its roots read
+  from the pushed binding records on any node;
 - **commits:** a pushed commit an act made with no `Gov-Act:`; a `Gov-Act:` the binding does not hold; a planted
   `Gov-Item:` trailer read as anything but `serves`; a `Gov-Session:` trailer under `trace.identity: act-only`; an
-  act-made commit with no `Gov-Session:` under `session`;
+  act-made commit with no `Gov-Session:` under `session`; a raw session id, or a digest the binding does not hold,
+  under `salted`; a planted `Gov-Act:` naming no act; each over `<current default>..HEAD` with `--no-merges`, green
+  on a branch merging main with another node's act commits and on a landing a third node makes;
 - **work orders:** a handoff with no marker; a return with no `answers`;
 - **positional:** a new positional citation in live text;
-- **pins:** a quoted derived fact with no pin on its line, across every record;
-- **promotion:** a standing directive found in memory and not promoted, as the auto-memory's measure already reads.
+- **pins:** a quoted derived fact with no pin on its line, by a predicate that names the shapes it reads and what it
+  does not, over every record outside its legacy population;
+- **promotion:** a standing directive found in the node's auto-memory and not promoted, as the auto-memory's measure
+  already reads: a node-scoped reading in Maintain, filed as an ask, never a bar or push leg, since the auto-memory
+  lives on one node (dTendedCadence);
+- **cycle:** from a planted build's intake, every `[cycle]` hop walked by key, red on a hop resolved by search or
+  prose: dConvergedCharter's acceptance, once every hop's build has landed.
 
 ## [view] The atlas's memory view
 
@@ -339,4 +385,4 @@ line, each seen red on a planted case.
 | `memory.legacy-anchors`, widened | derived, none, retag | derived | the systems round's key gains `retag`: an adopter's own records are its own, and the default rewrites no file |
 | `commits.edge-check` | push-leg, commit-msg, off | push-leg | a refusal at commit time catches the owner's own commits mid-thought; the push is the binding boundary |
 | `commits.squash` | re-emit-union, refuse, accept-loss | re-emit-union | a squash drops every trailer; gov never squashes, an adopter may |
-| `trace.identity` | act-only, session, salted | session | the owner's AP-8: committed memory may name the harness session id beside the act |
+| `trace.identity` | act-only, session, salted | session | the owner's AP-8: committed memory may name the harness session id beside the act; `salted` writes a keyed hash of it instead, the key a per-node salt (SA-4) |

@@ -29,6 +29,12 @@ four instances:
 The designs are in `memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md` and
 `memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md`.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Three populations
+were typed rather than run: the causes, pins and work-order gates armed over today's corpus with no legacy population,
+where a run over the tree would have shown almost no record carrying a cause; the region-parser factory's typed five,
+beside which a query finds two more; and the floor inventory's grep for one version, which missed a `py>=3.10`.
+
 ## The fix
 
 - Before a design states a predicate, run it over the real tree, as the charter's class rule says, and

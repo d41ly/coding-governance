@@ -28,6 +28,12 @@ wrong component.
 It also cost a second diagnosis: the same leg had failed in an earlier run alongside six others that
 WERE environmental, so the batch got one explanation and this one rode along inside it.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). A node's settings
+stated as facts: the memory plan kept transcripts "365 days", which is one node's `cleanupPeriodDays` against a harness
+default of 30, and a promotion gate would have read one node's auto-memory as a bar leg. Retention is now measured per
+node, and promotion is a node-scoped reading.
+
 ## The fix
 
 The scratch repo that gets an identity is not the only repo the fixture writes objects into. Every

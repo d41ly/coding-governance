@@ -28,6 +28,12 @@ turned into 28 notes of noise. `tools/govkit/registry.toml` moved its descriptor
 the adopter-fixture regenerator read every one as empty and returned no homes. The playbook
 renderer's bar deriver read `prefix` from the `[answers]` table when intake writes it at the top.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). The design renamed
+the Serves kind `journal` to `log` with no reader inventory: the hygiene check's Evidences ledger and check 23, the
+index's kind tokens, runlog's writer and the rendered docs all pin the old spelling, over 1,443 records at `dd1ebb01b`.
+The fold keeps `journal` as a read-only alias and re-points every reader by value in the rename's unit.
+
 ## Cause
 
 A migration's inventory is built by asking where the value is RESOLVED, because that is the code

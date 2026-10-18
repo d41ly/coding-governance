@@ -34,6 +34,13 @@ The same shape is why a build's own records are searched by grep rather than by 
 sweep touches every folder under `memory/builds/`, and a reader keyed on the folder's name finds none
 of it.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Five: the receipt
+schema bump would have widened a back-fill keyed to the constant's value; `RUNAWAY_CEILING` retired with the unattended
+kit while a catalogue bound still read it; the per-session orientation card retired while the write gate read it; the
+unattended kit's retirement named its README and missed its legs, size rows and pointers; and `/session-kickoff`'s
+per-machine link had no fate at all.
+
 ## Cause
 
 Inventorying is a search, and a search needs a term. The name is the only term available, so the

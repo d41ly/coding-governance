@@ -35,6 +35,11 @@ arm; and `currency.on-behind: red`,
 had no arm under `GATE_POST_MERGE=ci`, and `owner-cut` named no trigger and no key for its decline
 (M3 and M4 of `memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md`).
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Five more values with
+no route: `commits.edge-check: commit-msg` and `commits.squash: refuse`, both in the strict preset, `accept-loss`,
+`trace.identity: salted`, which no record defined, and `memory.legacy-anchors: retag`, whose adopter step had no owner.
+
 ## The fix
 
 - For each key an item reads, write each catalogued value's arm into the item: its witness, its route,

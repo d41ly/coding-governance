@@ -43,6 +43,12 @@ and `-b.md`) found a sixth kind that no switch declines: each `[[contract]]` par
 the adopter's own file in the target (`measure_contract_parity`, near line 6065, reached through
 `derive_parity_lines`, near line 9658). The probe below, run then, lists every site.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Upgrade steps run in
+an adopter's tree with no execution contract: a step's `git mv` fires the adopter's hooks, and its imports run adopter
+code, in the workspace that pushes through the adopter's grant. The step kind now runs every step scrubbed, isolated and
+hookless, with no ambient credential.
+
 ## The fix
 
 - An unattended item that touches another repository names its sandbox: a throwaway workspace, an

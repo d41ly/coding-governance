@@ -40,6 +40,11 @@ this class, all of them introduced by the amendments made twenty minutes earlier
 
 None of the four was a lowered bar. Every one was a correct amendment with an uncorrected neighbour.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Twice: the memory
+plan's `[migration]` opened "Nothing is rewritten by hand" above a bullet that routes decision rows by hand, and
+dOrderedCharter held `map_lib`'s re-export for one release after the deprecation window became a policy of two.
+
 ## The fix
 
 **Amend the RULE, not the sentence.** Before writing the new wording, find everything whose truth
