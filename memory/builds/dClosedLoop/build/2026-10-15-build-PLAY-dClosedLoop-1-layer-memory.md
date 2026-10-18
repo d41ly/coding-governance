@@ -398,7 +398,7 @@ layer that registers a kind adds its row.
 | override | dOrderedCharter | `charter.override` and its record, under the precedence and override rule |
 | attendance override | dWellOiledMachine | its writer is `life.request`'s attend and unattend: the attendance value and its scope, which `attendance.scope` reads (the night pass's closing review, M13) |
 | intake | dWellOiledMachine | its writer is `entry.intake`'s hook (PM-9), in dWellOiledMachine's row since the re-cut |
-| card | dDeclaredLoop | the build's orientation card at level 1, its stores and snapshot |
+| card | dPlacedRequest | the build's orientation card at level 1, its stores and snapshot |
 | plan | dRankedPlan | its writer is `plan.record` |
 | dupes | dRankedPlan | its writer is `plan.dedupe` |
 | triage | dRankedPlan | its writer is `plan.triage-rule`, naming the rule it applied |
@@ -431,8 +431,8 @@ layer that registers a kind adds its row.
 | fleet | dShippedRelease | its writer is `kits.fleet`: gov's reading of each adopter, per release |
 | fleet register | dShippedRelease | `adopters.toml` grown into the register, its rows read by `kits.fleet` |
 | transition | dDeclaredLoop | the transition record three ways; every step's exit item writes it |
-| lease | dDeclaredLoop | dDeclaredLoop's row builds the one lease grammar; layer-memory lists the lease among Runtime's kinds |
-| mailbox message | dDeclaredLoop | dDeclaredLoop's row builds the mailbox and its message kinds; layer-memory lists it among Runtime's kinds |
+| lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar; layer-memory lists the lease among Runtime's kinds |
+| mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; layer-memory lists it among Runtime's kinds |
 | disposition | dDeclaredLoop | the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal command or a prompt. dDeclaredLoop is the earliest of its writers' builds and an ancestor of the others, and `entry.place-owner` writes it first (PM-12d) |
 | return | dWellOiledMachine | the persisted-return store, keyed per spawn site |
 | act | dWellOiledMachine | one act session per role act; act binding and the epoch check |
@@ -460,7 +460,7 @@ layer that registers a kind adds its row.
 | claim | dTotalRecall | the claim ref on the remote and the ask-family counter ref (`gap-mem-13`); `entry.claim` writes the claim |
 | maintenance record | dTendedCadence | the maintenance record |
 | recommendation | dDeclaredLoop | every `*.recommend` item writes it; the stage-exit recommendation is one mechanism, dDeclaredLoop's (AF-1) |
-| probe | dDeclaredLoop | its writer is `probe.return`: one record per probe, its kind a verification, a reproduction or an experiment, an experiment's record the measured reference that later acceptance cites (night pass, point 2) |
+| probe | dPlacedRequest | its writer is `probe.return`: one record per probe, its kind a verification, a reproduction or an experiment, an experiment's record the measured reference that later acceptance cites (night pass, point 2) |
 | loop review | dCalibratedLens | its writer is `loop.record` |
 | value ledger | dCalibratedLens | a generated library view; `loop.price` regenerates it |
 | lexicon declaration | dMindYourWords | layer-memory lists the lexicon as an optional component's kind; dMindYourWords builds the declaration and its packs |

@@ -756,3 +756,5 @@ NP-23, "Review them", was asked as four groups, the fourth adding the keys NP-19
   so a dead path still blocks a merge.
 
 **Owed next:** NP-24's pricing of a dDeclaredLoop split and a lighter dCalibratedLens, before the walk resumes.
+It is done in `build/2026-10-18-build-PLAY-dClosedLoop-1-np24-pricing.md`, where the owner chose a three-way split,
+dPlacedRequest and dKeptSession leaving dDeclaredLoop, and kept dCalibratedLens whole.

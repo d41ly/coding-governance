@@ -181,10 +181,10 @@ superseded: re-run on the committed tree, it reds on the routes row it cannot re
 
 | Row | Node | Owner | Class | Why |
 | --- | --- | --- | --- | --- |
-| dDeclaredLoop | `build.closes` | dShippedRelease | tolerance | the presets check refuses `strict` and `guarded` for it on a core-only install; it validates a value and never runs the key |
-| dDeclaredLoop | `intake` | dWellOiledMachine | homonym | the mailbox's `intake` message kind, not the intake record kind |
+| dKeptSession | `build.closes` | dShippedRelease | tolerance | the presets check refuses `strict` and `guarded` for it on a core-only install; it validates a value and never runs the key |
+| dKeptSession | `intake` | dWellOiledMachine | homonym | the mailbox's `intake` message kind, not the intake record kind |
 | dFairHearing | `class` | dTotalRecall | homonym | the `class:` prefix of `review.report`'s disposition grammar, not the `class` tag namespace |
-| dFairHearing | `preset` | dDeclaredLoop | homonym | the review harness's own `preset` argument, not the policy key |
+| dFairHearing | `preset` | dKeptSession | homonym | the review harness's own `preset` argument, not the policy key |
 | dGroundRules | `policy.guard` | dDeclaredLoop | not a use | the minimal guard enforces the key's default, owner-only, without reading the key |
 | dGroundRules | `policy.proof` | dDeclaredLoop | not a use | the minimal guard enforces the key's default, the TTY proof, without reading the key |
 | dOrderedCharter | `check` | dWitnessedBar | homonym | the resolver's `check` verb beside `show`, `where` and `refs`, not the `check` tag namespace |
@@ -193,11 +193,11 @@ superseded: re-run on the committed tree, it reds on the routes row it cannot re
 | dBoundRoles | `feature` | dTotalRecall | tolerance | the work order selects by `feature.*` only once dTotalRecall arms that selector, and its code-notes and `code` slots render "not installed" until dTotalRecall lands, as the `map` slot does (night pass, point 4) |
 | dBoundRoles | `code` | dTotalRecall | tolerance | the work order's `code` slot renders "not installed" until dTotalRecall's `code` record lands, as the `map` slot does (night pass, point 3) |
 | dOrderedCharter | `code` | dTotalRecall | not a use | each role's load set budgets the `code` slot's bytes, and never reads the record (night pass, point 3) |
-| dDeclaredLoop | `playbook` | dIndexedDesign | tolerance | the `repeat` disposition files an ask until dIndexedDesign lands the playbook record kind (the night pass's closing review, H2) |
+| dKeptSession | `playbook` | dIndexedDesign | tolerance | the `repeat` disposition files an ask until dIndexedDesign lands the playbook record kind (the night pass's closing review, H2) |
 | dTotalRecall | `roster` | dIndexedDesign | homonym | the build README's derived `roster` front-matter field, not the roster record kind `design.decompose` writes (PM-12) |
 | dFairHearing | `review.trigger` | dDeclaredLoop | not a use | the harness takes the `preset` argument Design's breakpoint passes (RV-1); the breakpoint calls the harness, never the reverse (AF-1) |
 | dDeclaredLoop | `run.on-owner-question` | dBoundRoles | tolerance | the owner gate holds for the owner's disposition until dBoundRoles lands the key, and never reads it for a ratification (AF-1) |
-| dDeclaredLoop | `hooks.bypass` | dWitnessedBar | not a use | the preset step's arm reads the key's resolved value in a planted strict file; it never implements the bypass (DA-M10) |
+| dKeptSession | `hooks.bypass` | dWitnessedBar | not a use | the preset step's arm reads the key's resolved value in a planted strict file; it never implements the bypass (DA-M10) |
 | dDeclaredLoop | `decisions.major` | dTotalRecall | tolerance | `build.recommend` routes on the key only inside the Build step, whose build descends from dTotalRecall (FM4's reads rule) |
 | dFairHearing | `flow.route-backs` | dDeclaredLoop | not a use | dDeclaredLoop's program counts the bound as it routes the harness's report; the harness never reads it (FM4's reads rule) |
 | dRankedPlan | `run.host` | dWellOiledMachine | tolerance | `plan.exit` launches the executor only where the supervisor is installed; before dWellOiledMachine lands, the attended session carries the build into Design (FM4's reads rule) |

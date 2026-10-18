@@ -74,7 +74,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | agent-instructions | harness wiring | one charter file, aliased per harness | RESHAPED | dOrderedCharter's one renderer absorbs the wiring; each harness's files come from dWellOiledMachine's harness adapters | v2 `[chain]` dOrderedCharter; layer-instruction `[layers]` |
 | playbook | `render_playbook.py` | renders the charter template | RESHAPED | dOrderedCharter: the one renderer, the charter in its level-0 envelope | v2 `[chain]` dOrderedCharter |
 | playbook | `adopt-playbook --check` | checks the render's wiring | MERGED | into the one renderer (dOrderedCharter) | v2 `[chain]` dOrderedCharter |
-| playbook | `fleet.toml`, `--claim-node` | node registry | RESHAPED | node registry's runtime facts (dWellOiledMachine); fleet identity in the lease grammar (dDeclaredLoop) | v2 `[chain]` dDeclaredLoop; v2 `[chain]` dWellOiledMachine |
+| playbook | `fleet.toml`, `--claim-node` | node registry | RESHAPED | node registry's runtime facts (dWellOiledMachine); fleet identity in the lease grammar (dPlacedRequest) | v2 `[chain]` dPlacedRequest; v2 `[chain]` dWellOiledMachine |
 | roles | `agents/*`, `house/*.md` | role definitions | RESHAPED | twelve core roles with structured fields and typed returns (dBoundRoles) | v2 `[chain]` dBoundRoles |
 | roles | spec-reviewer, diff-reviewer | two reviewer roles | MERGED | one reviewer with a lens per step (dBoundRoles) | roles `[forks]`; v2 `[chain]` dBoundRoles |
 | roles | gov-session | hands work to another session | MERGED | the prompt writer ("session-handoff template folds") (dBoundRoles) | roles `[forks]` |
@@ -135,7 +135,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | unattended | `--plan`, `--status` | position | MERGED | loop kit position engine (dDeclaredLoop) and `next` (dWellOiledMachine) | v2 `[chain]` dDeclaredLoop; v2 `[chain]` dWellOiledMachine |
 | unattended | transition verbs (brief, review, pass, landed, close, park, settle) | run state | RESHAPED | per-level transition tables and the transition record (dDeclaredLoop) | v2 `[chain]` dDeclaredLoop |
 | unattended | `--hold`, `--resume`, `--abort` | owner control | RESHAPED | pause, resume, withdraw, supersede (dWellOiledMachine) | layer-runtime `[decide]` |
-| unattended | `--claims`, `--overlaps` | run claims | MERGED | the one lease grammar (dDeclaredLoop) | v2 `[chain]` dDeclaredLoop |
+| unattended | `--claims`, `--overlaps` | run claims | MERGED | the one lease grammar (dPlacedRequest) | v2 `[chain]` dPlacedRequest |
 | unattended | `--authorization` | the build folder or prompt record as the mandate | RESHAPED | the request is the mandate under `plan.ratification: request` (dRankedPlan), its intake written by the hook (dWellOiledMachine); ANCHOR_SCOPE and AUTH_PARAM retired | the owner's point 1 (night pass); v2 `[chain]` dRankedPlan |
 | unattended | `--attest` | a typed attestation of a directive | RETIRED | none: an agent-typed witness, which P2 forbids; witnesses are computed | the owner's point 1 (night pass) |
 | unattended | `resume-tick.sh` | out-of-process resumer | RESHAPED | the supervisor (dWellOiledMachine) | layer-runtime `[supervise]` |
@@ -144,7 +144,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | unattended | `stop-guard.js`, cron keepalive | continuation | RETIRED | for act sessions and cadence; the supervisor's beat replaces them | layer-runtime `[enforce]`; layer-runtime `[schedule]` |
 | unattended | `stall-recorder.js` | API-stall record | RESHAPED | the supervisor's limit signal, in the runtime's own kit (dWellOiledMachine) | layer-runtime `[supervise]` |
 | unattended | `run-lease.js` | binds a session to its run for the three hooks | RESHAPED | the session binding record (dWellOiledMachine) | the owner, NP-22, 2026-10-18; layer-runtime `[act]` |
-| unattended | playbook mode (`--record-piece`, `--record-set`, `check-playbook`) | repeatable content as pieces and sets | RESHAPED | the playbook record kind and `check-playbook` as Design's pack (dIndexedDesign), pieces built as units (dScopedBuild), the set check, registered at Test (dIndexedDesign), a cyclic playbook's filer (dTendedCadence), reached by the `repeat` disposition (dDeclaredLoop) | the owner's point 1 (night pass) |
+| unattended | playbook mode (`--record-piece`, `--record-set`, `check-playbook`) | repeatable content as pieces and sets | RESHAPED | the playbook record kind and `check-playbook` as Design's pack (dIndexedDesign), pieces built as units (dScopedBuild), the set check, registered at Test (dIndexedDesign), a cyclic playbook's filer (dTendedCadence), reached by the `repeat` disposition (dKeptSession) | the owner's point 1 (night pass) |
 | unattended | `check-unattended` | the kit's own gate | RETIRED | none: it gates the unattended kit itself, which dissolves at convergence (dConvergedCharter) | the owner, NP-22, 2026-10-18 |
 | unattended | `check-pass-order`, `check-brief-recorded` | pass order and brief records | RESHAPED | the work order's hash and the shape-run rows (dBoundRoles) | the owner, NP-22, 2026-10-18; `research-unattended-core.md` |
 | unattended | `check-arms-groups` | lints the batched self-test's groups | RETIRED | none: it lints the kit's own self-test file, which dissolves with the kit (dConvergedCharter) | the owner, NP-22, 2026-10-18 |
@@ -188,7 +188,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | top-level | `push-main.sh` | the lander | RESHAPED | command adapter and hardening (dWellOiledMachine); landing queue and core re-check (dShippedRelease) | v2 `[chain]` dWellOiledMachine; v2 `[chain]` dShippedRelease |
 | top-level | `settings-merge.py` | hook wiring | RESHAPED | one dispatcher entry per event, `onFailure` (dWellOiledMachine) | layer-runtime `[enforce]` |
 | top-level | waiver, limit and high-water files | exemptions | RESHAPED | ledger populations (RF-5) (dWitnessedBar) | retrofit `[ledger]`; v2 `[chain]` dWitnessedBar |
-| skills | manifest-check card hooks | card | RESHAPED | per-worktree card file (dOrderedCharter); card ref (dDeclaredLoop); compact re-inject (dWellOiledMachine) | v2 `[chain]` dOrderedCharter; v2 `[chain]` dDeclaredLoop; v2 `[chain]` dWellOiledMachine |
+| skills | manifest-check card hooks | card | RESHAPED | per-worktree card file (dOrderedCharter); card ref (dPlacedRequest); compact re-inject (dWellOiledMachine) | v2 `[chain]` dOrderedCharter; v2 `[chain]` dPlacedRequest; v2 `[chain]` dWellOiledMachine |
 | skills | kickoff procedure | orientation | RESHAPED | orientation scout (dBoundRoles); `kickoff.runs` (dRankedPlan); thin entry | v2 `[chain]` dBoundRoles; v2 `[chain]` dRankedPlan; v2 `[chain]` dConvergedCharter |
 | skills | manifest ratchet | the kickoff manifest audit | RESHAPED | the guarded instruction manifest (dOrderedCharter) | the owner, NP-22, 2026-10-18 |
 | skills | deploy-governance | operator Skill | RETIRED | no reader, 0 loads; govkit's verbs replace it | layer-instruction `[recommendations]`; gap-tool-05 |
@@ -200,7 +200,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | .githooks | `gate-env.sh` | bar settings | RESHAPED | owner keys folded (dConvergedCharter); mechanics stay | v2 `[chain]` dGroundRules |
 | guides | hand-written guides | protocols | RETIRED | rendered views; rationale moves to `help` fields (dConvergedCharter) | v2 `[chain]` dConvergedCharter |
 | unattended | the kit as a kit | the unattended-run kit | RETIRED | dissolved: its ladder, transitions and claims into the loop kit (dDeclaredLoop), its supervisor seam, hooks and controls into the runtime's own kit (dWellOiledMachine) | the owner's point 1 (night pass) |
-| unattended | slug mode | a run started on a named build | RETIRED | none: every run is a placed request, continue among `entry.place`'s dispositions (dDeclaredLoop) | the owner's point 1 (night pass) |
+| unattended | slug mode | a run started on a named build | RETIRED | none: every run is a placed request, continue among `entry.place`'s dispositions (dPlacedRequest) | the owner's point 1 (night pass) |
 | unattended | ask mode | a run started on ask ids | RETIRED | none: asks enter through Plan's triage (dRankedPlan) | the owner's point 1 (night pass) |
 
 ## [stale] Where the records disagreed, and what stands

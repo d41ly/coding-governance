@@ -2088,6 +2088,13 @@ The night pass's closing review, dispatch 105, derived from its run the same way
   `[answers]`). The fold moves four defaults, adds three keys, five gaps and four planned units, and decides the
   fates record's nineteen proposed rows, four of them changed (`[folded-answers]`). NP-24's pricing is next.
 
+- 2026-10-18, session 1799cb98: NP-24 priced (`build/2026-10-18-build-PLAY-dClosedLoop-1-np24-pricing.md`). The owner
+  chose S3 for SP-1, splitting dDeclaredLoop into itself, dPlacedRequest (Entry) and dKeptSession (Session), and kept
+  dCalibratedLens whole for SP-2. Folding S3 found two clauses placed against the gate's own rules. The card moved
+  to the early build, and the follow-up rounds stayed in the spine. That left dDeclaredLoop at 22 units,
+  dPlacedRequest at 7 and dKeptSession at 18, and the critical path a unit longer than first priced. The gate was
+  red on four class rows whose citing clause had moved, until each named dKeptSession.
+
 ## Instruments
 
 ### The gap-ownership join

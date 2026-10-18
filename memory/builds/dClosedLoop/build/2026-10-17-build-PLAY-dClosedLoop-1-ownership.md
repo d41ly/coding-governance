@@ -999,3 +999,9 @@ census: FINDING census: tools/newkit/kit.toml is on disk with no kit node rc 1
 - **NP-23, 2026-10-18:** the owner approved the night pass's nodes and owners on review, asked as four groups
   (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[answers]`), with the keys NP-19 to NP-21 add:
   `maintain.security-review` and `maintain.tiers`: dTendedCadence; `install.guards`: dShippedRelease.
+- **SP-1, 2026-10-18:** the owner chose S3, so dDeclaredLoop splits into itself, dPlacedRequest and dKeptSession
+  (`build/2026-10-18-build-PLAY-dClosedLoop-1-np24-pricing.md`). The nodes move with their clauses:
+  - to dPlacedRequest: the entry items `entry.orient`, `entry.place`, `entry.place-check`, `entry.place-owner` and
+    `entry.claim`, the probe program's seven items, the `lease`, `card` and `probe` kinds, and the keys
+    `leases`, `leases.granularity`, `leases.renewal`, `leases.expiry-hours`, `leases.overlap`, `leases.offline`, `card.follows`, `card.store`, `card.snapshot`, `resume.partial`, `resume.context`, `placement`, `placement.check`, `probe.points`, `probe.raise`, `probe.observations`, `probe.experiment.authority`;
+  - to dKeptSession: the `mailbox message` kind and the keys `preset`, `attendance`, `deps.coordination`, `deps.early-build`, `deps.messaging`, `notify.owner`, `mailbox.reads`, `context.on-full`, `context.threshold`, `card.pointers`, `actions.free`, `orient.budget`.

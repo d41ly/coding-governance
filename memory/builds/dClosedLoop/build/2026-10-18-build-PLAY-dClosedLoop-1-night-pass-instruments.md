@@ -3493,6 +3493,965 @@ N.sub("- NP-24, asked as \"NP-24: dDeclaredLoop is now 47 units, and the critica
 N.save()
 ````
 
+### `node_users.py`
+
+NP-24: each node a build owns, the clauses naming it, and the later builds depending on it by the gate's own rules.
+
+````python
+"""For one chain build X: each node X owns, the X clauses that name it, and the later builds that depend on it, by the
+reconciliation gate's own rules (cites, stage, reads, routes), read from the same records.
+
+Usage: python -X utf8 node_users.py <build> [--json <out>]   (from the worktree root)
+It reads backticked citations only, as the gate does; a dependency spelled in plain words is not seen.
+"""
+import importlib.util
+import json
+import re
+import sys
+
+B = "memory/builds/dClosedLoop/build/"
+X = sys.argv[1]
+spec = importlib.util.spec_from_file_location("projectmap", B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py")
+mp = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mp)
+_, ns = mp.derive()
+owner = {}
+for kind in ("item", "policy-key", "point", "record-kind", "tag-namespace"):
+    for n in ns[kind]:
+        own = [v for k, vs in n["rels"] if k == "owner" for v in vs]
+        if own:
+            owner[(kind, n["key"])] = own[0]
+
+v2 = open(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md", encoding="utf-8").read()
+chain = v2.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+rows, parents, stage_build = {}, {}, {}
+names = re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| ([^|]+) \| ([^|]+) \| (.+) \| [^|]+ \|$", ln)
+    if m:
+        rows[m.group(1)] = m.group(4)
+        parents[m.group(1)] = [p.strip() for p in m.group(3).split(",") if p.strip() in names]
+        stage_build[m.group(2).strip().lower()] = m.group(1)
+
+
+def ancestors(b, acc=None):
+    acc = set() if acc is None else acc
+    for p in parents[b]:
+        if p not in acc:
+            acc.add(p)
+            ancestors(p, acc)
+    return acc
+
+
+later = [b for b in rows if X in ancestors(b)]
+mine = {k: o for k, o in owner.items() if o == X}
+
+
+def cells(ln):
+    return [c.strip() for c in re.split(r"(?<!\\)\|", ln.strip().strip("|"))]
+
+
+def tokens(text):
+    t = set(re.findall(r"`([^`\s][^`]*?)(?::[^`]*)?`", text))
+    return t, {x[:-2] for x in t if x.endswith(".*")}
+
+
+def cites(text, kind, key):
+    t, wild = tokens(text)
+    spelled = key if kind != "record-kind" else key.replace("-", " ")
+    return key in t or spelled in t or (kind == "tag-namespace" and key in wild) or \
+        (kind == "policy-key" and any(key.startswith(w + ".") for w in wild))
+
+
+fs = open(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md", encoding="utf-8").read()
+items = {}
+for m in re.finditer(r"^## \[([a-z-]+)\][^\n]*\n(.*?)(?=^## |\Z)", fs, flags=re.M | re.S):
+    for ln in m.group(2).split("\n"):
+        if ln.startswith("| `"):
+            c = cells(ln)
+            if len(c) == 7:
+                for tag in re.findall(r"`([a-z]+\.[a-z0-9-]+)`", c[0]):
+                    items[tag] = (m.group(1), c[6], " ".join(c[1:6]), c[5])
+bp = fs.split("\n## [breakpoint]", 1)[1].split("\n## ", 1)[0]
+names_line = next((ln for ln in bp.split("\n") if ln.startswith("- **Its names**")), "")
+BREAK = re.compile("|".join(re.escape(v) for v in sorted(re.findall(r"`([a-z][a-z ]+)`", names_line),
+                                                          key=len, reverse=True)), re.I)
+clauses = [c for c in rows[X].split("; ") if c.strip()]
+
+users = {}   # node -> {build: [rules]}
+for (kind, key) in mine:
+    u = {}
+    for b in later:
+        why = []
+        if cites(rows[b], kind, key):
+            why.append("cites")
+        if kind == "item" and key in items:
+            step = items[key][0]
+            if stage_build.get(step) == b:
+                why.append("stage")
+        if kind == "policy-key":
+            for tag, (step, own, body, then) in items.items():
+                if own == b and cites(body, kind, key):
+                    why.append(f"reads:{tag}")
+                    break
+        if kind == "item" and items.get(key, ("",))[0] == "breakpoint":
+            if BREAK.search(rows[b]) or any(own == b and step != "breakpoint" and BREAK.search(then)
+                                            for tag, (step, own, body, then) in items.items()):
+                why.append("routes")
+        if why:
+            u[b] = why
+    named = [i + 1 for i, c in enumerate(clauses) if cites(c, kind, key)]
+    users[f"{kind}:{key}"] = {"clauses": named, "users": u}
+
+if "--json" in sys.argv:
+    json.dump({"build": X, "clauses": clauses, "later": later, "parents": parents, "nodes": users},
+              open(sys.argv[sys.argv.index("--json") + 1], "w", encoding="utf-8"), indent=1)
+for node, d in sorted(users.items()):
+    us = ", ".join(f"{b}({'/'.join(w)})" for b, w in sorted(d["users"].items()))
+    print(f"{node:45} clauses {d['clauses'] or '-'} · used by {us or 'none'}")
+print(f"{X}: {len(mine)} owned nodes, {len(clauses)} clauses, {len(later)} later builds")
+````
+
+### `price_split_asked.py`
+
+NP-24's pricing as the owner was asked from, before its two corrections.
+
+````python
+"""NP-24: price a split of dDeclaredLoop and a lighter dCalibratedLens, as critical paths over v2's [chain].
+
+Usage: python -X utf8 price_split.py   (from the worktree root)
+
+A build's units are its planned-units clauses, split on "; " as critical_path.py and the map count them, and a build
+starts when every parent has landed. A candidate split replaces one build by two or three, each holding a set of its
+clauses, and makes each later build wait for every part holding a clause it needs.
+
+What a later build needs is the classification below. It joins two readings: the gate's mechanical one
+(node_users.py: backticked cites, stage items, keys read and routes into the breakpoint program), and a reading of
+the plain-word structural dependencies the gate cannot see, each stated with its reason. A split loses if
+dWitnessedBar, the spine's critical successor, needs any clause moved out of the spine's first part.
+"""
+import re
+import sys
+
+V = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+text = open(V, encoding="utf-8").read()
+chain = text.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+names = re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)
+units, parents, clauses = {}, {}, {}
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| [^|]+ \| ([^|]+) \| (.+) \| [^|]+ \|$", ln)
+    if m:
+        clauses[m.group(1)] = [u for u in m.group(3).split("; ") if u.strip()]
+        units[m.group(1)] = len(clauses[m.group(1)])
+        parents[m.group(1)] = [p.strip() for p in m.group(2).split(",") if p.strip() in names]
+assert len(units) == 16, len(units)
+
+
+def path(units, parents):
+    finish, via = {}, {}
+
+    def fin(b):
+        if b not in finish:
+            best = max(parents[b], key=fin, default=None)
+            via[b] = best
+            finish[b] = units[b] + (fin(best) if best else 0)
+        return finish[b]
+
+    end = max(units, key=fin)
+    chain_, b = [], end
+    while b:
+        chain_.append(b)
+        b = via[b]
+    return finish[end], list(reversed(chain_)), finish
+
+
+# dDeclaredLoop's clauses, numbered as chain_clauses.py prints them, by who needs them.
+X = "dDeclaredLoop"
+SPINE_CORE = {1, 5, 6, 7, 8, 10, 15, 17, 20, 23, 30, 31, 32, 33, 34, 35, 36, 37}
+# The breakpoint mechanism dWitnessedBar's stage needs: test.recommend and test.reason are its stage items (the
+# gate's stage rule), and they run through breakpoints and the program's items (AF-1).
+TEST_NEEDS = {40, 41, 43}
+# Needed by dTotalRecall or dBoundRoles, which start as dWitnessedBar lands.
+EARLY = {
+    11: "dTotalRecall cites `leases.offline` and mints ids under a claim or lease; dRankedPlan and dScopedBuild read "
+        "lease keys",
+    18: "dBoundRoles renders every item's work order, the entry items' included; dRankedPlan follows entry",
+    19: "dBoundRoles cites `placement.check`",
+    38: "dBoundRoles's work order carries the `map` slot each item declares; dTotalRecall's replay reads it",
+    46: "dBoundRoles cites the `probe` kind, each role's return gaining the probe outcome; dRankedPlan reads "
+        "`probe.observations`",
+    47: "dBoundRoles computes each item's `code` slot from its declared seed",
+}
+# Needed only by builds that start after dTotalRecall or dBoundRoles lands.
+LATE = {
+    2: "the named presets: until they land a key reads its catalogue default, so only `standard` works",
+    3: "the preset step in the reader, with them",
+    4: "the charter's preset section, with them",
+    9: "policy at govkit intake: dShippedRelease",
+    21: "`actions.free` at the tool call: dWellOiledMachine's hooks",
+    39: "the policy namespaces' purposes, reviewed: no later build",
+    16: "the card: dWellOiledMachine's session-start load and dRankedPlan's entry",
+    22: "orientation cost per stage: dCalibratedLens",
+    25: "`notify.owner`: dWellOiledMachine's notification adapters",
+    26: "the fresh-session recommendation: dWellOiledMachine",
+    27: "`card.pointers`: dWellOiledMachine's replay",
+    28: "`context.on-full`: dWellOiledMachine",
+    29: "a compaction summary read as a lead: dWellOiledMachine",
+    12: "the mailbox: dWellOiledMachine's live delivery, dScopedBuild and dShippedRelease",
+    13: "live delivery: dWellOiledMachine",
+    14: "dependency coordination: dIndexedDesign, dScopedBuild and dShippedRelease",
+    24: "`mailbox.reads`: dWellOiledMachine",
+    42: "follow-up and design-audit rounds: dScopedBuild and dIndexedDesign",
+    44: "the attendance rule: dWellOiledMachine's announcement and attendance override",
+    45: "`repeat`: dIndexedDesign's seventh input and dTendedCadence's cyclic playbooks",
+}
+EARLY_USERS = {"dTotalRecall", "dBoundRoles", "dRankedPlan", "dScopedBuild"}
+LATE_USERS = {"dShippedRelease", "dWellOiledMachine", "dRankedPlan", "dCalibratedLens", "dScopedBuild",
+              "dIndexedDesign", "dTendedCadence", "dConvergedCharter"}
+allc = SPINE_CORE | TEST_NEEDS | set(EARLY) | set(LATE)
+if allc != set(range(1, units[X] + 1)) or len(SPINE_CORE) + len(TEST_NEEDS) + len(EARLY) + len(LATE) != units[X]:
+    sys.exit(f"the classification covers {sorted(allc)} of {units[X]} clauses, or holds one twice")
+
+
+def split(parts):
+    """parts: [(name, clause set, parents of the part, builds needing it)]; the first part keeps X's name."""
+    u, p = dict(units), {b: list(v) for b, v in parents.items()}
+    del u[X]
+    for name, cs, par, users in parts:
+        u[name] = len(cs)
+        p[name] = list(par)
+    for b in p:
+        if X in p[b]:
+            p[b] = [q for q in p[b] if q != X] + [X] + [name for name, _, _, users in parts[1:] if b in users]
+    return u, p
+
+
+base, base_path, base_fin = path(units, parents)
+print(f"baseline: {base} units, {' > '.join(base_path)}")
+first = SPINE_CORE | TEST_NEEDS
+cands = {
+    "S1, two builds: the late parts leave": [
+        (X, first | set(EARLY), parents[X], None),
+        ("dDeclaredLoop-B", set(LATE), [X], LATE_USERS)],
+    "S2, two builds: everything dWitnessedBar does not need leaves": [
+        (X, first, parents[X], None),
+        ("dDeclaredLoop-B", set(EARLY) | set(LATE), [X], EARLY_USERS | LATE_USERS)],
+    "S3, three builds: the early and the late parts each leave": [
+        (X, first, parents[X], None),
+        ("dDeclaredLoop-B", set(EARLY), [X], EARLY_USERS),
+        ("dDeclaredLoop-C", set(LATE), [X], LATE_USERS)],
+}
+for label, parts in cands.items():
+    u, p = split(parts)
+    n, pth, fin = path(u, p)
+    sizes = ", ".join(f"{name} {len(cs)}" for name, cs, _, _ in parts)
+    print(f"{label}: {sizes} · {n} units ({n - base:+d}), {' > '.join(pth)}")
+    if "dWitnessedBar" in [b for b in p if any(q.startswith("dDeclaredLoop-") for q in p[b])]:
+        print("  LOSES: dWitnessedBar waits for a moved part")
+    for name, cs, _, _ in parts[1:]:
+        print(f"  {name} lands at {fin[name]}, dWitnessedBar at {fin['dWitnessedBar']}")
+
+# dCalibratedLens: the tail. dConvergedCharter starts when its last parent lands.
+Y, Z = "dCalibratedLens", "dConvergedCharter"
+tail = sorted(((base_fin[q], q) for q in parents[Z]), reverse=True)
+print(f"{Z}'s parents land at: " + ", ".join(f"{q} {f}" for f, q in tail))
+slack = tail[0][0] - tail[1][0]
+print(f"lightening {Y} by k units saves min(k, {slack}): the next parent, {tail[1][1]}, lands only {slack} units before "
+      f"{Y} does")
+LOOP_REVIEW = {3, 5, 8, 11}   # the clauses that read the Loop Review, which dTendedCadence's cadence delivers
+rest = set(range(1, units[Y] + 1)) - LOOP_REVIEW
+u, p = dict(units), {b: list(v) for b, v in parents.items()}
+u[Y] = len(LOOP_REVIEW)
+u[Y + "-A"] = len(rest)
+p[Y + "-A"] = [q for q in parents[Y] if q != "dTendedCadence"] + ["dWellOiledMachine"]
+p[Y] = parents[Y] + [Y + "-A"]
+n, pth, fin = path(u, p)
+print(f"L1, {Y} split: the Loop Review's {len(LOOP_REVIEW)} after dTendedCadence, the other {len(rest)} after "
+      f"dWellOiledMachine · {n} units ({n - base:+d}), {' > '.join(pth)}")
+for label, parts in list(cands.items())[:1]:
+    u2, p2 = split(parts)
+    u2[Y] = len(LOOP_REVIEW)
+    u2[Y + "-A"] = len(rest)
+    p2[Y + "-A"] = [q for q in parents[Y] if q != "dTendedCadence"] + ["dWellOiledMachine"]
+    p2[Y] = parents[Y] + [Y + "-A"]
+    n2, pth2, _ = path(u2, p2)
+    print(f"S1 with L1: {n2} units ({n2 - base:+d}), {' > '.join(pth2)}")
+````
+
+### `price_split.py`
+
+NP-24's pricing, corrected: the classification, the candidate splits' critical paths and dCalibratedLens's slack.
+
+````python
+"""NP-24: price a split of dDeclaredLoop and a lighter dCalibratedLens, as critical paths over v2's [chain].
+
+Usage: python -X utf8 price_split.py   (from the worktree root)
+
+A build's units are its planned-units clauses, split on "; " as critical_path.py and the map count them, and a build
+starts when every parent has landed. A candidate split replaces one build by two or three, each holding a set of its
+clauses, and makes each later build wait for every part holding a clause it needs.
+
+What a later build needs is the classification below. It joins two readings: the gate's mechanical one
+(node_users.py: backticked cites, stage items, keys read and routes into the breakpoint program), and a reading of
+the plain-word structural dependencies the gate cannot see, each stated with its reason. A split loses if
+dWitnessedBar, the spine's critical successor, needs any clause moved out of the spine's first part.
+"""
+import re
+import sys
+
+V = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+text = open(V, encoding="utf-8").read()
+chain = text.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+names = re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)
+units, parents, clauses = {}, {}, {}
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| [^|]+ \| ([^|]+) \| (.+) \| [^|]+ \|$", ln)
+    if m:
+        clauses[m.group(1)] = [u for u in m.group(3).split("; ") if u.strip()]
+        units[m.group(1)] = len(clauses[m.group(1)])
+        parents[m.group(1)] = [p.strip() for p in m.group(2).split(",") if p.strip() in names]
+assert len(units) == 16, len(units)
+
+
+def path(units, parents):
+    finish, via = {}, {}
+
+    def fin(b):
+        if b not in finish:
+            best = max(parents[b], key=fin, default=None)
+            via[b] = best
+            finish[b] = units[b] + (fin(best) if best else 0)
+        return finish[b]
+
+    end = max(units, key=fin)
+    chain_, b = [], end
+    while b:
+        chain_.append(b)
+        b = via[b]
+    return finish[end], list(reversed(chain_)), finish
+
+
+# dDeclaredLoop's clauses, numbered as chain_clauses.py prints them, by who needs them.
+X = "dDeclaredLoop"
+# 42 joined the core while the owner's S3 was folded: `review.dispose`, a core item, reads `review.follow-up`
+# (the gate's reads rule over flow-steps), so the follow-up rounds cannot land after the core.
+SPINE_CORE = {1, 5, 6, 7, 8, 10, 15, 17, 20, 23, 30, 31, 32, 33, 34, 35, 36, 37, 42}
+CORRECTED = {
+    16: "moved from the late parts to the early ones: `entry.orient`, an entry item, composes the card",
+    42: "moved from the late parts to the core: `review.dispose`, a core item, reads `review.follow-up`",
+}
+# The breakpoint mechanism dWitnessedBar's stage needs: test.recommend and test.reason are its stage items (the
+# gate's stage rule), and they run through breakpoints and the program's items (AF-1).
+TEST_NEEDS = {40, 41, 43}
+# Needed by dTotalRecall or dBoundRoles, which start as dWitnessedBar lands.
+EARLY = {
+    11: "dTotalRecall cites `leases.offline` and mints ids under a claim or lease; dRankedPlan and dScopedBuild read "
+        "lease keys",
+    18: "dBoundRoles renders every item's work order, the entry items' included; dRankedPlan follows entry",
+    19: "dBoundRoles cites `placement.check`",
+    38: "dBoundRoles's work order carries the `map` slot each item declares; dTotalRecall's replay reads it",
+    46: "dBoundRoles cites the `probe` kind, each role's return gaining the probe outcome; dRankedPlan reads "
+        "`probe.observations`",
+    47: "dBoundRoles computes each item's `code` slot from its declared seed",
+    16: "the card: `entry.orient` composes it, and dWellOiledMachine's session-start load reads it",
+}
+# Needed only by builds that start after dTotalRecall or dBoundRoles lands.
+LATE = {
+    2: "the named presets: until they land a key reads its catalogue default, so only `standard` works",
+    3: "the preset step in the reader, with them",
+    4: "the charter's preset section, with them",
+    9: "policy at govkit intake: dShippedRelease",
+    21: "`actions.free` at the tool call: dWellOiledMachine's hooks",
+    39: "the policy namespaces' purposes, reviewed: no later build",
+    22: "orientation cost per stage: dCalibratedLens",
+    25: "`notify.owner`: dWellOiledMachine's notification adapters",
+    26: "the fresh-session recommendation: dWellOiledMachine",
+    27: "`card.pointers`: dWellOiledMachine's replay",
+    28: "`context.on-full`: dWellOiledMachine",
+    29: "a compaction summary read as a lead: dWellOiledMachine",
+    12: "the mailbox: dWellOiledMachine's live delivery, dScopedBuild and dShippedRelease",
+    13: "live delivery: dWellOiledMachine",
+    14: "dependency coordination: dIndexedDesign, dScopedBuild and dShippedRelease",
+    24: "`mailbox.reads`: dWellOiledMachine",
+    44: "the attendance rule: dWellOiledMachine's announcement and attendance override",
+    45: "`repeat`: dIndexedDesign's seventh input and dTendedCadence's cyclic playbooks",
+}
+EARLY_USERS = {"dTotalRecall", "dBoundRoles", "dRankedPlan", "dScopedBuild"}
+LATE_USERS = {"dShippedRelease", "dWellOiledMachine", "dRankedPlan", "dCalibratedLens", "dScopedBuild",
+              "dIndexedDesign", "dTendedCadence", "dConvergedCharter"}
+allc = SPINE_CORE | TEST_NEEDS | set(EARLY) | set(LATE)
+if allc != set(range(1, units[X] + 1)) or len(SPINE_CORE) + len(TEST_NEEDS) + len(EARLY) + len(LATE) != units[X]:
+    sys.exit(f"the classification covers {sorted(allc)} of {units[X]} clauses, or holds one twice")
+
+
+def split(parts):
+    """parts: [(name, clause set, parents of the part, builds needing it)]; the first part keeps X's name."""
+    u, p = dict(units), {b: list(v) for b, v in parents.items()}
+    del u[X]
+    for name, cs, par, users in parts:
+        u[name] = len(cs)
+        p[name] = list(par)
+    for b in p:
+        if X in p[b]:
+            p[b] = [q for q in p[b] if q != X] + [X] + [name for name, _, _, users in parts[1:] if b in users]
+    return u, p
+
+
+base, base_path, base_fin = path(units, parents)
+RESULTS = []   # (label, part sizes, new builds, path, saved), for the record's table
+print(f"baseline: {base} units, {' > '.join(base_path)}")
+for n_, why in sorted(CORRECTED.items()):
+    print(f"corrected while folding: clause {n_} {why}")
+first = SPINE_CORE | TEST_NEEDS
+cands = {
+    "S1, two builds: the late parts leave": [
+        (X, first | set(EARLY), parents[X], None),
+        ("dDeclaredLoop-B", set(LATE), [X], LATE_USERS)],
+    "S2, two builds: everything dWitnessedBar does not need leaves": [
+        (X, first, parents[X], None),
+        ("dDeclaredLoop-B", set(EARLY) | set(LATE), [X], EARLY_USERS | LATE_USERS)],
+    "S3, three builds: the early and the late parts each leave": [
+        (X, first, parents[X], None),
+        ("dDeclaredLoop-B", set(EARLY), [X], EARLY_USERS),
+        ("dDeclaredLoop-C", set(LATE), [X], LATE_USERS)],
+}
+for label, parts in cands.items():
+    u, p = split(parts)
+    n, pth, fin = path(u, p)
+    sizes = ", ".join(f"{name} {len(cs)}" for name, cs, _, _ in parts)
+    print(f"{label}: {sizes} · {n} units ({n - base:+d}), {' > '.join(pth)}")
+    RESULTS.append((label, [len(cs) for _, cs, _, _ in parts], len(parts) - 1, n, base - n))
+    if "dWitnessedBar" in [b for b in p if any(q.startswith("dDeclaredLoop-") for q in p[b])]:
+        print("  LOSES: dWitnessedBar waits for a moved part")
+    for name, cs, _, _ in parts[1:]:
+        print(f"  {name} lands at {fin[name]}, dWitnessedBar at {fin['dWitnessedBar']}")
+
+# dCalibratedLens: the tail. dConvergedCharter starts when its last parent lands.
+Y, Z = "dCalibratedLens", "dConvergedCharter"
+tail = sorted(((base_fin[q], q) for q in parents[Z]), reverse=True)
+print(f"{Z}'s parents land at: " + ", ".join(f"{q} {f}" for f, q in tail))
+slack = tail[0][0] - tail[1][0]
+print(f"lightening {Y} by k units saves min(k, {slack}): the next parent, {tail[1][1]}, lands only {slack} units before "
+      f"{Y} does")
+LOOP_REVIEW = {3, 5, 8, 11}   # the clauses that read the Loop Review, which dTendedCadence's cadence delivers
+rest = set(range(1, units[Y] + 1)) - LOOP_REVIEW
+u, p = dict(units), {b: list(v) for b, v in parents.items()}
+u[Y] = len(LOOP_REVIEW)
+u[Y + "-A"] = len(rest)
+p[Y + "-A"] = [q for q in parents[Y] if q != "dTendedCadence"] + ["dWellOiledMachine"]
+p[Y] = parents[Y] + [Y + "-A"]
+n, pth, fin = path(u, p)
+print(f"L1, {Y} split: the Loop Review's {len(LOOP_REVIEW)} after dTendedCadence, the other {len(rest)} after "
+      f"dWellOiledMachine · {n} units ({n - base:+d}), {' > '.join(pth)}")
+RESULTS.append(("L1: dCalibratedLens split at the Loop Review", [len(LOOP_REVIEW), len(rest)], 1, n, base - n))
+for label, parts in list(cands.items())[:1]:
+    u2, p2 = split(parts)
+    u2[Y] = len(LOOP_REVIEW)
+    u2[Y + "-A"] = len(rest)
+    p2[Y + "-A"] = [q for q in parents[Y] if q != "dTendedCadence"] + ["dWellOiledMachine"]
+    p2[Y] = parents[Y] + [Y + "-A"]
+    n2, pth2, _ = path(u2, p2)
+    print(f"S1 with L1: {n2} units ({n2 - base:+d}), {' > '.join(pth2)}")
+    RESULTS.append(("S1 with L1", [], 2, n2, base - n2))
+````
+
+### `write_pricing.py`
+
+Writes the pricing record from both runs, its table derived from the corrected one.
+
+````python
+"""Write NP-24's pricing record from price_split.py's classification, its corrected run and the run the owner was
+asked from. Run it on the chain as priced, `1d32760f3`, before the split is folded.
+
+Usage: python -X utf8 write_pricing.py <price.out> <price_asked.out>   (from the worktree root)
+"""
+import importlib.util
+import os
+import pathlib
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+spec = importlib.util.spec_from_file_location("price", HERE / "price_split.py")
+P = importlib.util.module_from_spec(spec)
+_out = sys.stdout
+sys.stdout = open(os.devnull, "w")
+spec.loader.exec_module(P)   # its prints are the run, recorded from the captured file instead
+sys.stdout = _out
+run = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n").strip("\n")
+asked = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8").replace("\r\n", "\n").strip("\n")
+OUT = pathlib.Path("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-np24-pricing.md")
+cl = P.clauses[P.X]
+
+
+def short(n):
+    c = cl[n - 1]
+    return c if len(c) <= 90 else c[:87].rsplit(" ", 1)[0] + " …"
+
+
+def table(d):
+    rows = ["| Clause | The unit | Who needs it, and why |", "|---|---|---|"]
+    rows += [f"| {n} | {short(n).replace('|', '/')} | {why} |" for n, why in sorted(d.items())]
+    return "\n".join(rows)
+
+
+def listed(xs):
+    xs = [str(x) for x in xs]
+    return "" if not xs else xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
+
+
+core = listed(sorted(P.SPINE_CORE))
+test = listed(sorted(P.TEST_NEEDS))
+results = ["| Candidate | Parts, in units | New builds | Path, in units | Saved |", "|---|---|---|---|---|"]
+results += [f"| {label} | {listed(sizes)} | {nb} | {n} | {saved} |" for label, sizes, nb, n, saved in P.RESULTS]
+corrected = "\n".join(f"  - clause {n} {why};" for n, why in sorted(P.CORRECTED.items())).rstrip(";") + "."
+OUT.write_text(f"""# NP-24 priced: a split of dDeclaredLoop, and a lighter dCalibratedLens
+
+**Serves:** research PLAY-dClosedLoop-1
+
+The owner's answer to NP-24, 2026-10-18, was "Price it now (Recommended)"
+(`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[answers]`). This record prices both changes against the
+chain at `1d32760f3`, the commit that folded the answers, and parks the choice as SP-1 and SP-2. At that commit the
+critical path is {P.base} units, `1d32760f3`'s v2 `[chain]` read by the script below.
+
+## [method] How a split is priced
+
+- **Units.** A build's units are its planned-units clauses, split on "; " as the design map and the critical-path
+  script count them. A build starts when every parent has landed.
+- **A split** replaces dDeclaredLoop by two or three parts, each holding a set of its clauses. A later build waits for
+  every part that holds a clause it needs.
+- **What a later build needs** joins two readings:
+  - the reconciliation gate's mechanical one: backticked cites, stage items, keys read, and routes into the breakpoint
+    program (`node_users.py`, kept in the night-pass instruments record);
+  - a reading of the structural needs the gate cannot see, because they are spelled in plain words, stated clause by
+    clause in `[classification]`.
+- **The losing test.** A split loses if dWitnessedBar, the spine's successor on the critical path, waits for a moved
+  part.
+- **What it does not price.** A new build's fixed cost, which no unit counts: its kickoff, README and roster, its specs
+  and their audit, a closing review and a landing.
+
+## [classification] dDeclaredLoop's {len(cl)} clauses, by who needs them
+
+Clause numbers are those `chain_clauses.py` prints for dDeclaredLoop's row at `1d32760f3`.
+
+- **The spine's core ({len(P.SPINE_CORE)}): clauses {core}.** Every later build rests on these: the loop kit, the
+  guard and floor, transitions, stage claims and coverage, the witness-class rule, the factories, the position engine,
+  claims, item declarations, the transition tables, the failure route, terminal states, the disposition set, computed
+  witnesses and the tag namespaces. The follow-up rounds join them, since `review.dispose`, a core item, reads
+  `review.follow-up`.
+- **What dWitnessedBar's stage needs ({len(P.TEST_NEEDS)}): clauses {test}.** These are the breakpoint mechanism.
+  `test.recommend` and `test.reason` are Test's stage items, by the gate's stage rule, and they run through the
+  breakpoints and the program's items.
+- **Needed by dTotalRecall or dBoundRoles ({len(P.EARLY)}).** Both builds start as dWitnessedBar lands.
+
+{table(P.EARLY)}
+
+- **Needed only by builds that start later ({len(P.LATE)}).** Each later build starts after dTotalRecall or dBoundRoles
+  lands.
+
+{table(P.LATE)}
+
+## [results] The candidates, at `1d32760f3`
+
+**As asked.** The owner was asked from the first run, as captured:
+
+```text
+{asked}
+```
+
+**As corrected.** Folding the owner's S3 found two clauses placed against the gate's own rules:
+{corrected}
+
+The run after both corrections, as captured:
+
+```text
+{run}
+```
+
+{chr(10).join(results)}
+
+- **S3, the owner's choice, delays nothing.** Its early part lands before dWitnessedBar. Its late part's first user
+  starts only after dTotalRecall lands.
+- **S2 couples the early parts' users to the late ones.** dTotalRecall and dBoundRoles then wait for one moved part
+  that holds both, and it lands after dWitnessedBar.
+- **S1 leaves the early parts in the spine.** That keeps one build, but holds the spine's successor longer.
+- **No lightening of dCalibratedLens saves more than {P.slack} units.** dShippedRelease lands only {P.slack} units
+  before it, and the path then runs through dShippedRelease.
+
+## [costs] What a split costs
+
+- **One more build per new part.** Each new part brings the fixed cost `[method]` names.
+- **While the moved parts land beside dWitnessedBar:**
+  - only the `standard` preset works, since every key reads its catalogue default;
+  - sessions orient on today's kickoff card until the early part lands;
+  - no mailbox carries dependency notices;
+  - `attendance` is not yet a key, so every run is unattended, which is its default anyway.
+- **The re-cut it owes:**
+  - the new builds' rows, rosters and gaps;
+  - their nodes' owners, moved in the ownership record and flow-steps;
+  - the later builds' after cells;
+  - the reconciliation gate, re-run;
+  - the walk's waves, derived again.
+
+## [forks] Parked for the owner
+
+| Fork | Question | Options, the recommendation first | What the answer sets |
+|---|---|---|---|
+| SP-1 | Split dDeclaredLoop? | S1, the late parts leave as one new build; S3, the early and the late parts leave as two new builds; keep the chain as it stands | a structural decision about the chain |
+| SP-2 | Lighten dCalibratedLens? | keep it whole, since no lightening saves more than the slack before dShippedRelease; split it at the Loop Review, L1 | a structural decision about the chain |
+
+S1 was recommended because one new build buys most of what any split reaches (`[results]`).
+""", encoding="utf-8", newline="\n")
+print(f"wrote {OUT}: {OUT.stat().st_size} bytes")
+````
+
+### `fold_split.py`
+
+The owner's S3 folded: the three rows, the moved owners, the parents, the class row, the fates destinations and the ownership amendment.
+
+````python
+"""Fold the owner's SP-1 (S3) and SP-2 into the design: dDeclaredLoop splits into itself, dPlacedRequest (Entry) and
+dKeptSession (Session) along price_split.py's corrected classification, and dCalibratedLens stays whole. The nodes
+move with their clauses: v2's chain rows and catalogue owners, flow-steps' item owners, layer-memory's kinds, the
+re-cut's class row, the fates record's destinations and the ownership amendment.
+
+Usage: python -X utf8 fold_split.py   (from the worktree root, on the chain as priced, before any split)
+"""
+import importlib.util
+import os
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+spec = importlib.util.spec_from_file_location("price", HERE / "price_split.py")
+P = importlib.util.module_from_spec(spec)
+_out = sys.stdout
+sys.stdout = open(os.devnull, "w")
+spec.loader.exec_module(P)
+sys.stdout = _out
+
+B = "memory/builds/dClosedLoop/build/"
+A_SET = P.SPINE_CORE | P.TEST_NEEDS
+E_SET, L_SET = set(P.EARLY), set(P.LATE)
+CL = P.clauses[P.X]
+assert len(A_SET) + len(E_SET) + len(L_SET) == len(CL) == 47
+E, L = "dPlacedRequest", "dKeptSession"
+GAPS = {
+    "dDeclaredLoop": ["gap-spine-01", "gap-spine-02", "gap-orient-03", "gap-orient-05", "gap-flow-13", "gap-flow-14",
+                      "gap-flow-15", "gap-spine-07", "gap-flow-11", "gap-flow-12"],
+    E: ["gap-flow-07", "gap-conc-01", "gap-conc-02", "gap-orient-01", "gap-orient-02", "gap-orient-04", "gap-orient-11",
+        "gap-flow-18"],
+    L: ["gap-flow-06", "gap-orient-06", "gap-flow-16"],
+}
+E_KEYS = ["leases", "leases.granularity", "leases.renewal", "leases.expiry-hours", "leases.overlap", "leases.offline",
+          "card.follows", "card.store", "card.snapshot", "resume.partial", "resume.context", "placement",
+          "placement.check", "probe.points", "probe.raise", "probe.observations", "probe.experiment.authority"]
+L_KEYS = ["preset", "attendance", "deps.coordination", "deps.early-build", "deps.messaging", "notify.owner",
+          "mailbox.reads", "context.on-full", "context.threshold", "card.pointers", "actions.free", "orient.budget"]
+E_ITEMS = ["entry.orient", "entry.place", "entry.place-check", "entry.place-owner", "entry.claim", "probe.trigger",
+           "probe.pin", "probe.design", "probe.experiment", "probe.run", "probe.judge", "probe.return"]
+
+
+def pick(nums):
+    return "; ".join(CL[n - 1] for n in sorted(nums))
+
+
+# --- v2 ---------------------------------------------------------------------------------------------------------
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+old_row = next(ln for ln in V.text.split("\n") if ln.startswith("| dDeclaredLoop | Spine |"))
+cells = [c.strip() for c in old_row.strip().strip("|").split(" | ")]
+assert cells[3] == "; ".join(CL), "dDeclaredLoop's planned units differ from the priced row"
+new_rows = "\n".join([
+    f"| dDeclaredLoop | Spine | {cells[2]} | {pick(A_SET)} | {', '.join(GAPS['dDeclaredLoop'])} |",
+    f"| {E} | Entry | dDeclaredLoop | {pick(E_SET)} | {', '.join(GAPS[E])} |",
+    f"| {L} | Session | dDeclaredLoop, {E} | {pick(L_SET)} | {', '.join(GAPS[L])} |",
+])
+moved = set(g.strip() for g in cells[4].split(","))
+assert moved == set(sum(GAPS.values(), [])), sorted(moved ^ set(sum(GAPS.values(), [])))
+V.sub(old_row, new_rows, "dDeclaredLoop's row, split")
+for build, stage, old, new in (("dBoundRoles", "Roles", "dDeclaredLoop, dWitnessedBar", f"dDeclaredLoop, dWitnessedBar, {E}"),
+                               ("dTotalRecall", "Memory", "dDeclaredLoop, dWitnessedBar", f"dDeclaredLoop, dWitnessedBar, {E}"),
+                               ("dWellOiledMachine", "Runtime", "dBoundRoles, dTotalRecall", f"dBoundRoles, dTotalRecall, {L}"),
+                               ("dIndexedDesign", "Design", "dDeclaredLoop, dTotalRecall", f"dDeclaredLoop, dTotalRecall, {L}")):
+    V.sub(f"| {build} | {stage} | {old} |", f"| {build} | {stage} | {new} |", f"{build}'s parents")
+pol = V.text.split("\n## [policies]", 1)[1].split("\n## ", 1)[0]
+new_pol = pol
+for keys, owner in ((E_KEYS, E), (L_KEYS, L)):
+    for k in keys:
+        rows = [ln for ln in new_pol.split("\n") if ln.startswith(f"| `{k}` |")]
+        if len(rows) != 1 or not rows[0].endswith("| dDeclaredLoop |"):
+            sys.exit(f"catalogue: `{k}` has {len(rows)} rows, or another owner")
+        new_pol = new_pol.replace(rows[0], rows[0][:-len("dDeclaredLoop |")] + f"{owner} |")
+V.sub(pol, new_pol, "catalogue owners")
+V.done += len(E_KEYS) + len(L_KEYS) - 1
+V.sub("once dDeclaredLoop adds presets to this reader", f"once {L} adds presets to this reader", "dGroundRules presets")
+V.sub("and dDeclaredLoop renders the charter's preset section",
+      f"and {L}, split from dDeclaredLoop (SP-1), renders the charter's preset section", "owed preset section")
+V.insert_before("\nRevised: 2026-10-17, after the folds' closing review", f"""
+Revised: 2026-10-18, NP-24 priced and the owner's SP-1 and SP-2 (`build/2026-10-18-build-PLAY-dClosedLoop-1-np24-pricing.md`):
+- dDeclaredLoop splits three ways, the owner's S3: it keeps the spine's core and the breakpoint mechanism; {E}, the
+  entry, takes leases, the card, the entry items, placement, the `map` slot, the probe program and the code seed; and
+  {L}, the session, takes presets, session handling across compaction, the mailbox and dependency notices, the
+  attendance rule and `repeat`;
+- each moved key, item and kind changes owner with its clause, and dBoundRoles and dTotalRecall gain {E} as a parent,
+  dWellOiledMachine and dIndexedDesign {L};
+- dDeclaredLoop's gaps split with its clauses, ten, eight and three;
+- dCalibratedLens stays whole (SP-2): no lightening saves more than the slack before dShippedRelease.
+""", "revision note")
+V.save()
+
+# --- flow-steps -------------------------------------------------------------------------------------------------
+FS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+for tag in E_ITEMS:
+    rows = [ln for ln in FS.text.split("\n") if ln.startswith(f"| `{tag}` |")]
+    if len(rows) != 1 or not rows[0].endswith("| dDeclaredLoop |"):
+        sys.exit(f"flow-steps: `{tag}` has {len(rows)} rows, or another owner")
+    FS.sub(rows[0], rows[0][:-len("dDeclaredLoop |")] + f"{E} |", tag)
+FS.sub("- **Owner** (revised 2026-10-17, PM-9): dDeclaredLoop builds the step's items,",
+       f"- **Owner** (revised 2026-10-17, PM-9, and 2026-10-18, SP-1): {E} builds the step's items,", "entry owner")
+FS.sub("(the closing review's H2 and M2). dDeclaredLoop builds the program ahead of",
+       f"(the closing review's H2 and M2). {E} builds the program ahead of", "probe owner")
+FS.save()
+
+# --- layer-memory -----------------------------------------------------------------------------------------------
+LM = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+LM.sub("| card | dDeclaredLoop |", f"| card | {E} |", "card")
+LM.sub("| lease | dDeclaredLoop | dDeclaredLoop's row builds the one lease grammar;",
+       f"| lease | {E} | {E}'s row builds the one lease grammar;", "lease")
+LM.sub("| mailbox message | dDeclaredLoop | dDeclaredLoop's row builds the mailbox and its message kinds;",
+       f"| mailbox message | {L} | {L}'s row builds the mailbox and its message kinds;", "mailbox message")
+LM.sub("| probe | dDeclaredLoop |", f"| probe | {E} |", "probe")
+LM.save()
+
+# --- the re-cut's class row ---------------------------------------------------------------------------------------
+RC = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md")
+RC.sub("| dFairHearing | `preset` | dDeclaredLoop | homonym |", f"| dFairHearing | `preset` | {L} | homonym |", "preset")
+RC.save()
+
+# --- the fates record's destinations -------------------------------------------------------------------------------
+F = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md")
+F.sub("fleet identity in the lease grammar (dDeclaredLoop) | v2 `[chain]` dDeclaredLoop; v2 `[chain]` dWellOiledMachine |",
+      f"fleet identity in the lease grammar ({E}) | v2 `[chain]` {E}; v2 `[chain]` dWellOiledMachine |", "fleet.toml")
+F.sub("| MERGED | the one lease grammar (dDeclaredLoop) | v2 `[chain]` dDeclaredLoop |",
+      f"| MERGED | the one lease grammar ({E}) | v2 `[chain]` {E} |", "claims")
+F.sub("reached by the `repeat` disposition (dDeclaredLoop) |", f"reached by the `repeat` disposition ({L}) |", "playbook mode")
+F.sub("card ref (dDeclaredLoop); compact re-inject (dWellOiledMachine) | v2 `[chain]` dOrderedCharter; v2 `[chain]` "
+      "dDeclaredLoop;",
+      f"card ref ({E}); compact re-inject (dWellOiledMachine) | v2 `[chain]` dOrderedCharter; v2 `[chain]` {E};",
+      "card hooks")
+F.sub("continue among `entry.place`'s dispositions (dDeclaredLoop) |",
+      f"continue among `entry.place`'s dispositions ({E}) |", "slug mode")
+F.save()
+
+# --- the ownership record -----------------------------------------------------------------------------------------
+O = Record(B + "2026-10-17-build-PLAY-dClosedLoop-1-ownership.md")
+O.text = O.text.rstrip("\n") + f"""
+- **SP-1, 2026-10-18:** the owner chose S3, so dDeclaredLoop splits into itself, {E} and {L}
+  (`build/2026-10-18-build-PLAY-dClosedLoop-1-np24-pricing.md`). The nodes move with their clauses:
+  - to {E}: the entry items `entry.orient`, `entry.place`, `entry.place-check`, `entry.place-owner` and
+    `entry.claim`, the probe program's seven items, the `lease`, `card` and `probe` kinds, and the keys
+    {', '.join(f'`{k}`' for k in E_KEYS)};
+  - to {L}: the `mailbox message` kind and the keys {', '.join(f'`{k}`' for k in L_KEYS)}.
+"""
+O.done += 1
+O.save()
+print(f"split: dDeclaredLoop {len(A_SET)}, {E} {len(E_SET)}, {L} {len(L_SET)}")
+````
+
+### `fold_split_classes.py`
+
+The four class rows whose citing clause moved, re-pointed once the gate was red on them.
+
+````python
+"""The re-cut's class rows whose citing clause moved to dKeptSession with SP-1: the gate read them as rows no dependency
+needs, and the moved clauses' citations as unclassed, until each row names the build that now cites.
+
+Usage: python -X utf8 fold_split_classes.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+RC = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-recut.md")
+for node in ("`build.closes`", "`intake`", "`playbook`", "`hooks.bypass`"):
+    RC.sub(f"| dDeclaredLoop | {node} |", f"| dKeptSession | {node} |", node)
+RC.save()
+````
+
+### `write_split_answers.py`
+
+The pricing record's `[answers]` and `[folded]`, the night-pass record's owed line and the session log's event.
+
+````python
+"""Record the owner's SP-1, SP-2 and the two build names in the pricing record ([answers], verbatim, and [folded]),
+amend the night-pass record's owed line, and log the event.
+
+Usage: python -X utf8 write_split_answers.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+PR = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-np24-pricing.md")
+PR.text = PR.text.rstrip("\n") + """
+
+## [answers] The owner's answers, 2026-10-18
+
+Asked through AskUserQuestion with the first run's figures (`[results]`, "As asked"), each answer quoted as the tool
+returned it, the critical path's quoted length pinned to the commit it was read at:
+- SP-1, asked at `1d32760f3` as "SP-1: Split dDeclaredLoop? (a structural decision about the chain; critical path 214 today)": "S3, two new builds"
+- SP-2, asked as "SP-2: Lighten dCalibratedLens? (a structural decision about the chain)": "Keep it whole (Recommended)"
+
+The two new builds' names, asked after:
+- asked as "Name for the early build (7 units: leases, the card, the entry items and placement, the map slot, the probe program, the code seed), which lands beside dWitnessedBar?": "dPlacedRequest (Recommended)"
+- asked as "Name for the late build (19 units: presets, session handling across compaction, the mailbox and dependency notices, follow-up review rounds, attendance, repeat)?": "dKeptSession (Recommended)"
+
+The naming questions already carried the first correction, the card moving to the early build. The second, the
+follow-up rounds staying in the spine, was found after them, so dKeptSession holds 18 units, not the 19 asked.
+
+## [folded] What the answers changed
+
+- **v2's chain** (its revision note dated 2026-10-18, SP-1):
+  - dDeclaredLoop keeps 22 units, the spine's core and the breakpoint mechanism;
+  - dPlacedRequest, stage Entry, after dDeclaredLoop, takes 7;
+  - dKeptSession, stage Session, after dDeclaredLoop and dPlacedRequest, takes 18;
+  - dBoundRoles and dTotalRecall gain dPlacedRequest as a parent, and dWellOiledMachine and dIndexedDesign gain
+    dKeptSession;
+  - dDeclaredLoop's 21 gaps split ten, eight and three;
+  - dGroundRules's preset step and `[owed]`'s preset section now name dKeptSession.
+- **The owners:**
+  - v2's catalogue: 17 keys to dPlacedRequest and 12 to dKeptSession;
+  - flow-steps: the five entry items and the probe program's seven to dPlacedRequest;
+  - layer-memory: the `card`, `lease` and `probe` kinds to dPlacedRequest, and the `mailbox message` kind to
+    dKeptSession;
+  - the ownership record's amendment lists every moved node.
+- **The re-cut's class rows:** the five whose citing clause moved now name dKeptSession. The gate read the old rows as
+  needing no dependency, and the moved citations as unclassed, until they did.
+- **The fates record:** five destinations that moved with their clauses.
+- **The chain:** the critical path drops by twenty-five units, as the corrected run priced. Both new builds land before
+  any build that waits on them starts. The instruments record's `[final]` holds the run.
+- **dCalibratedLens** stays whole (SP-2).
+
+**Owed next:** the walk resumes, its `[chain]` glance and wave 1 derived again over eighteen builds.
+"""
+PR.done += 1
+PR.save()
+
+N = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md")
+N.sub("**Owed next:** NP-24's pricing of a dDeclaredLoop split and a lighter dCalibratedLens, before the walk resumes.",
+      "**Owed next:** NP-24's pricing of a dDeclaredLoop split and a lighter dCalibratedLens, before the walk resumes.\n"
+      "It is done in `build/2026-10-18-build-PLAY-dClosedLoop-1-np24-pricing.md`, where the owner chose a three-way split,\n"
+      "dPlacedRequest and dKeptSession leaving dDeclaredLoop, and kept dCalibratedLens whole.", "owed next")
+N.save()
+
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-18, session 1799cb98: NP-24 priced (`build/2026-10-18-build-PLAY-dClosedLoop-1-np24-pricing.md`). The owner
+  chose S3 for SP-1, splitting dDeclaredLoop into itself, dPlacedRequest (Entry) and dKeptSession (Session), and kept
+  dCalibratedLens whole for SP-2. Folding S3 found two clauses placed against the gate's own rules. The card moved
+  to the early build, and the follow-up rounds stayed in the spine. That left dDeclaredLoop at 22 units,
+  dPlacedRequest at 7 and dKeptSession at 18, and the critical path a unit longer than first priced. The gate was
+  red on four class rows whose citing clause had moved, until each named dKeptSession.
+""", "event")
+L.save()
+````
+
+### `fix_split_wording.py`
+
+The `[folded]` class-row line, reworded to tell the owner row from the four citing rows.
+
+````python
+"""The pricing record's [folded] class-row line: one row's owner moved and four rows' citing build moved, which the
+first wording counted as five alike. Usage: python -X utf8 fix_split_wording.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+PR = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-np24-pricing.md")
+PR.sub("- **The re-cut's class rows:** the five whose citing clause moved now name dKeptSession. The gate read the old rows as\n"
+       "  needing no dependency, and the moved citations as unclassed, until they did.",
+       "- **The re-cut's class rows:** `preset`'s row names dKeptSession as the key's owner. The four rows whose citing\n"
+       "  clause moved name it as the citing build. The gate read those four as needing no dependency, and the moved\n"
+       "  citations as unclassed, until they did.", "class rows")
+PR.save()
+````
+
+### `critical_path.py`
+
+The critical path over v2's `[chain]`, run by `[final]`. SP-1 raised its build count to 18.
+
+````python
+"""The chain's critical path: the longest chain of builds by planned units, over v2's [chain] after relation, and
+what each candidate edge would add to it.
+
+Usage: python critical_path.py [--edge <child>:<parent> ...]   (from the worktree root)
+
+A build's units are its planned-units cell's clauses, counted as the map counts them (split on "; "). A build
+starts when every parent has landed, so the path's length is the largest sum of units along a parent chain.
+"""
+import re
+import sys
+
+V = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+text = open(V, encoding="utf-8").read()
+chain = text.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+units, parents = {}, {}
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| [^|]+ \| ([^|]+) \| (.+) \| [^|]+ \|$", ln)
+    if m:
+        units[m.group(1)] = len([u for u in m.group(3).split("; ") if u.strip()])
+        parents[m.group(1)] = [p.strip() for p in m.group(2).split(",") if p.strip() in
+                               re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)]
+assert len(units) == 18, len(units)   # 16 until SP-1 split dDeclaredLoop three ways, 2026-10-18
+
+
+def longest(par):
+    memo, via = {}, {}
+
+    def f(b, seen=()):
+        if b in seen:
+            sys.exit(f"cycle through {b}")
+        if b not in memo:
+            best, arg = 0, None
+            for p in par[b]:
+                v = f(p, seen + (b,))
+                if v > best:
+                    best, arg = v, p
+            memo[b], via[b] = best + units[b], arg
+        return memo[b]
+
+    for b in par:
+        f(b)
+    end = max(memo, key=memo.get)
+    path, b = [], end
+    while b:
+        path.append(b)
+        b = via[b]
+    return memo[end], list(reversed(path)), memo
+
+
+base, path, memo = longest(parents)
+print(f"critical path: {base} units, {' > '.join(path)}")
+print("each build's earliest finish, in units: " + ", ".join(f"{b} {memo[b]}" for b in sorted(memo, key=memo.get)))
+for arg in [a for a in sys.argv[1:] if ":" in a]:
+    child, parent = arg.split(":")
+    par = {b: list(ps) for b, ps in parents.items()}
+    par[child] = par[child] + [parent]
+    length, p, _ = longest(par)
+    print(f"with {child} after {parent}: {length} units ({length - base:+d}), {' > '.join(p)}")
+````
+
 ### `record_instruments.py`
 
 This record's own writer.
@@ -3577,6 +4536,22 @@ MINE = [
      "register's re-measured tally and the session log's event."),
     ("forks/pin_np24.py", "Pins NP-24's answer line, which quotes the critical path, to the commit it was asked at. "
      "The map's arm was red on it first."),
+    ("forks/node_users.py", "NP-24: each node a build owns, the clauses naming it, and the later builds depending on "
+     "it by the gate's own rules."),
+    ("forks/price_split_asked.py", "NP-24's pricing as the owner was asked from, before its two corrections."),
+    ("forks/price_split.py", "NP-24's pricing, corrected: the classification, the candidate splits' critical paths and "
+     "dCalibratedLens's slack."),
+    ("forks/write_pricing.py", "Writes the pricing record from both runs, its table derived from the corrected one."),
+    ("forks/fold_split.py", "The owner's S3 folded: the three rows, the moved owners, the parents, the class row, the "
+     "fates destinations and the ownership amendment."),
+    ("forks/fold_split_classes.py", "The four class rows whose citing clause moved, re-pointed once the gate was red on "
+     "them."),
+    ("forks/write_split_answers.py", "The pricing record's `[answers]` and `[folded]`, the night-pass record's owed line "
+     "and the session log's event."),
+    ("forks/fix_split_wording.py", "The `[folded]` class-row line, reworded to tell the owner row from the four citing "
+     "rows."),
+    ("order/critical_path.py", "The critical path over v2's `[chain]`, run by `[final]`. SP-1 raised its build count to "
+     "18."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -3795,6 +4770,15 @@ After that commit, `0dce5cd2f`:
     at Test's leg-pack point (as layer-memory's kind table says), and point 8's fates check, now twelve findings and two
     stops. The gotcha `amendment-leaves-its-other-half-standing` gained a checklist line by one Edit, and
     `gotchas.py --write` re-rendered its index.
+
+After the owner's answers, `1d32760f3`, and NP-24's pricing:
+
+15. The critical-path script's build count, raised from 16 to 18 by one sed once SP-1 split dDeclaredLoop three ways:
+    sed -i 's/^assert len(units) == 16, len(units)$/assert len(units) == 18, len(units)   # 16 until SP-1 .../' \
+    order/critical_path.py
+16. The pricing script's first version, as the owner was asked from, was copied aside before its two corrections
+    (`price_split_asked.py`, with its run). The corrections were Edits: clause 16 to the early parts, clause 42 to the
+    core, a `CORRECTED` table naming both, and a `RESULTS` list the record's table derives from.
 ````
 
 ## [red] The red runs, as captured
@@ -3968,35 +4952,35 @@ H2's measurement, re-run on the folded tree. The first fold read 47 mentions ove
 
 ````text
 $ python plain_cites.py
-landing                  5  dGroundRules (dShippedRelease's), dOrderedCharter (dShippedRelease's), dDeclaredLoop (dShippedRelease's), dWellOiledMachine (dShippedRelease's), dCalibratedLens (dShippedRelease's)
-scope                    4  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
-seen red                 3  dGroundRules (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's)
+landing                  5  dGroundRules (dShippedRelease's), dOrderedCharter (dShippedRelease's), dKeptSession (dShippedRelease's), dWellOiledMachine (dShippedRelease's), dCalibratedLens (dShippedRelease's)
+scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
+seen red                 3  dGroundRules (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dKeptSession (dWitnessedBar's)
+code                     3  dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
+intake                   3  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 playbook                 2  dOrderedCharter (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
 release                  2  dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
+probe                    2  dOrderedCharter (dPlacedRequest's), dDeclaredLoop (dPlacedRequest's)
 spec                     2  dFairHearing (dIndexedDesign's), dBoundRoles (dIndexedDesign's)
-code                     2  dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's)
-intake                   2  dDeclaredLoop (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 return                   2  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
 act                      2  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
+claim                    2  dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
 fork                     2  dBoundRoles (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
 baseline                 2  dBoundRoles (dTotalRecall's), dWitnessedBar (dTotalRecall's)
 override                 1  dGroundRules (dOrderedCharter's)
-card                     1  dOrderedCharter (dDeclaredLoop's)
+card                     1  dOrderedCharter (dPlacedRequest's)
 inventory                1  dOrderedCharter (dIndexedDesign's)
-probe                    1  dOrderedCharter (dDeclaredLoop's)
 disposition              1  dFairHearing (dDeclaredLoop's)
-triage                   1  dDeclaredLoop (dRankedPlan's)
-overlap                  1  dDeclaredLoop (dIndexedDesign's)
 verdict                  1  dDeclaredLoop (dWitnessedBar's)
 attribution              1  dDeclaredLoop (dWitnessedBar's)
-routing                  1  dDeclaredLoop (dWitnessedBar's)
-fleet                    1  dDeclaredLoop (dShippedRelease's)
-ask                      1  dDeclaredLoop (dTotalRecall's)
-claim                    1  dDeclaredLoop (dTotalRecall's)
+triage                   1  dPlacedRequest (dRankedPlan's)
+overlap                  1  dPlacedRequest (dIndexedDesign's)
+fleet                    1  dPlacedRequest (dShippedRelease's)
+routing                  1  dKeptSession (dWitnessedBar's)
+ask                      1  dKeptSession (dTotalRecall's)
 roster                   1  dBoundRoles (dIndexedDesign's)
 value ledger             1  dBoundRoles (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
-plain-word hits on a non-ancestor's record kind: 46, over 28 kinds
+plain-word hits on a non-ancestor's record kind: 51, over 28 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -4381,12 +5365,12 @@ rc 1
 
 ````text
 $ design map
-map: 2248 nodes in 30 namespaces; 31204 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1507, derived 259, pending 482
+map: 2255 nodes in 30 namespaces; 31566 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1514, derived 259, pending 482
 rc 0
 
 $ atlas
-atlas: derived — 155 records, 2681 sections, 176 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 156 records, 2693 sections, 178 decision sections, 16 comparison areas, 33 principles
 rc 0
 
 $ fold state
@@ -4404,20 +5388,20 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 16 · owned nodes read 422 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 20 (cites 16, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 46 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+chain rows 18 · owned nodes read 422 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 20 (cites 16, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 51 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dBoundRoles cites `code` (dTotalRecall's, not an ancestor): tolerance
   dBoundRoles cites `feature` (dTotalRecall's, not an ancestor): tolerance
-  dDeclaredLoop cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
-  dDeclaredLoop cites `hooks.bypass` (dWitnessedBar's, not an ancestor): not a use
-  dDeclaredLoop cites `intake` (dWellOiledMachine's, not an ancestor): homonym
-  dDeclaredLoop cites `playbook` (dIndexedDesign's, not an ancestor): tolerance
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
-  dFairHearing cites `preset` (dDeclaredLoop's, not an ancestor): homonym
+  dFairHearing cites `preset` (dKeptSession's, not an ancestor): homonym
   dGroundRules cites `policy.guard` (dDeclaredLoop's, not an ancestor): not a use
   dGroundRules cites `policy.proof` (dDeclaredLoop's, not an ancestor): not a use
+  dKeptSession cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
+  dKeptSession cites `hooks.bypass` (dWitnessedBar's, not an ancestor): not a use
+  dKeptSession cites `intake` (dWellOiledMachine's, not an ancestor): homonym
+  dKeptSession cites `playbook` (dIndexedDesign's, not an ancestor): tolerance
   dOrderedCharter cites `check` (dWitnessedBar's, not an ancestor): homonym
   dOrderedCharter cites `code` (dTotalRecall's, not an ancestor): not a use
   dOrderedCharter cites `memory.map-purpose` (dTotalRecall's, not an ancestor): moved
@@ -4435,7 +5419,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 255 · chain builds 16
+register keys 255 · chain builds 18
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -4448,8 +5432,8 @@ no findings
 rc 0
 
 $ critical path
-critical path: 214 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dFairHearing 20, dOrderedCharter 35, dDeclaredLoop 82, dWitnessedBar 104, dBoundRoles 138, dTotalRecall 144, dIndexedDesign 156, dRankedPlan 157, dWellOiledMachine 175, dScopedBuild 186, dTendedCadence 189, dMindYourWords 192, dShippedRelease 196, dCalibratedLens 200, dConvergedCharter 214
+critical path: 189 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dFairHearing 20, dOrderedCharter 35, dDeclaredLoop 57, dPlacedRequest 64, dWitnessedBar 79, dKeptSession 82, dBoundRoles 113, dTotalRecall 119, dIndexedDesign 131, dRankedPlan 132, dWellOiledMachine 150, dScopedBuild 161, dTendedCadence 164, dMindYourWords 167, dShippedRelease 171, dCalibratedLens 175, dConvergedCharter 189
 rc 0
 ````
 
