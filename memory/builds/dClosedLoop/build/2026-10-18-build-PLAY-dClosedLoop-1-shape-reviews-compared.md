@@ -353,3 +353,36 @@ dShippedRelease, and the step gate), one in dTotalRecall (its own steps), two in
 retirement and the binding records) and three in dConvergedCharter (`help/`, the kickoff's retirement and the cycle
 walk). dBoundRoles gains its steps off the path; dShippedRelease loses the moved clause, and dLinkedLibrary its
 selector.
+
+## [skills] The rest of the Skills, 2026-10-19
+
+After SA-9, the owner asked:
+
+> We've decided to retire session-kickoff but what about the rest of the skills - do they still serve any purpose, are they getting retired as well?
+
+The records answered it. Of today's nine Skills, three were already set to retire: `/session-kickoff` (SA-9),
+`/unattended` (NP-4) and `deploy-governance` (`gap-tool-05`). `/build`, which drives an attended build, would be a
+second door beside a placed request, since the supervisor drives every build and `attend` makes one attended. The five
+question Skills do not enter the flow: their procedures dissolve into commands, which leaves each a trigger line and a
+command, a slash shortcut for the owner and a trigger the model matches, at the cost of repeating the charter's drive
+line in every session. Two forks went to the owner, each with its recommendation first:
+
+| Fork | Question | The owner's answer |
+|---|---|---|
+| SK-1 | retire `/build` once the supervisor drives attended builds, as with `/session-kickoff`? | "Retire it (Recommended)" |
+| SK-2 | keep the five question Skills as generated one-line shortcuts? | "Keep, generated but all gov-rendered skills need their names updated to indentify skills belonging to the project. /gov-runlog;/gov-recall;/gov-cleanup;etc.." |
+
+How the answers were read:
+- **SK-1:** `/build` becomes a client of `run` in the unit where dWellOiledMachine's supervisor becomes the only driver,
+  and dConvergedCharter retires it, with its readers inventoried by value and the client kept for the deprecation
+  window.
+- **SK-2:** the five stay as thin entries, each generated from its command's drive row and never hand-written, and
+  every gov-rendered Skill is named `gov-<name>`: `/gov-recall` and `/gov-runlog`, the owner's names, core shortcuts
+  over `gov why`, `record find` and `gov trace`; `/gov-cleanup`, the owner's name; and `/gov-lexicon` and
+  `/gov-drift-audit`, read from the owner's "etc.", which v2's `[open]` keeps to confirm. Each rename ships as an upgrade
+  step with its old name forwarded for the window, and the Skill kind's conformance gate refuses a gov-rendered Skill
+  without the prefix. `gap-found-28` records today's bare names.
+
+Folded: v2's level-4 row, dWellOiledMachine's driver clause, dConvergedCharter's Skills clause and a new `/build`
+clause, `[open]` and a revision note; the memory plan's Skills pocket; the fates record's rendered-Skills row and a
+`/build` row; and `gap-found-28`, with the register's tally re-measured.

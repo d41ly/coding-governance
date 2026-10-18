@@ -68,7 +68,7 @@ A kit's fate is one of four:
 The fate is one of STAYS, RESHAPED, MERGED and RETIRED. "Where it goes" names the chain build that keeps or receives
 it. "Decided by" names the record that decides it, a line-number citation of dispatch 104's resolved to its section
 tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and the owner decided row by row. Counts: 24 stay,
-72 reshaped, 25 merged and 15 retired, over 136 rows.
+72 reshaped, 25 merged and 16 retired, over 137 rows.
 
 | Kit | Function | Today's job | Fate | Where it goes | Decided by |
 |---|---|---|---|---|---|
@@ -87,6 +87,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | roles | `check_roles.py` | role, table and doc agree | RESHAPED | role-by-step matrix joined both ways (dFurnishedOrders); policy reader re-pointed (dConvergedCharter) | v2 `[chain]` dFurnishedOrders; v2 `[chain]` dConvergedCharter |
 | roles | `house/policy.toml` | effort and gates | MERGED | into `.governance/policy.toml` (dConvergedCharter); on dGroundRules's legacy list until then | v2 `[chain]` dGroundRules; v2 `[chain]` dBoundRoles |
 | roles | `.claude/roles.json` | the rendered role index | RESHAPED | the role index beyond every worker's reach, `role-sha` compared at spawn (dBoundRoles) | v2 `[chain]` dBoundRoles; the shape audit, run B's M10 |
+| roles | the `/build` Skill | drives an attended build through the harness pipeline | RETIRED | a client of `run` once the supervisor drives attended builds (dWellOiledMachine), removed after the deprecation window (dConvergedCharter) | the owner, SK-1, 2026-10-19 |
 | workflows | `tier2-review.js` | review harness | RESHAPED | presets, opt-in lenses, skeptic batches (dFairHearing), run at breakpoints (dDeclaredLoop) | v2 `[chain]` dFairHearing; v2 `[chain]` dDeclaredLoop |
 | workflows | `REVIEW-PROTOCOL.template.md` | protocol text | RESHAPED | corrected by dFairHearing, then a rendered view (dConvergedCharter) | v2 `[chain]` dFairHearing; v2 `[chain]` dConvergedCharter |
 | workflows | `unattended-build.js`, `unattended-unit.js` | unit harnesses | RESHAPED | role harnesses inside act sessions, the deferral block, persisted returns (dWellOiledMachine) | layer-runtime `[contract]`; v2 `[chain]` dWellOiledMachine |
@@ -197,7 +198,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | skills | kickoff procedure | orientation | RESHAPED | orientation scout (dFurnishedOrders); `kickoff.runs` (dRankedPlan); the Skill itself retired (dConvergedCharter) | v2 `[chain]` dFurnishedOrders; v2 `[chain]` dRankedPlan; v2 `[chain]` dConvergedCharter; the owner, SA-9, 2026-10-19 |
 | skills | manifest ratchet | the kickoff manifest audit | RESHAPED | the guarded instruction manifest (dOrderedCharter) | the owner, NP-22, 2026-10-18 |
 | skills | deploy-governance | operator Skill | RETIRED | no reader, 0 loads; govkit's verbs replace it | layer-instruction `[recommendations]`; gap-tool-05 |
-| skills | rendered Skills, six of seven, `/unattended` apart | entries | RESHAPED | thin level-4 entries; `/build` becomes a client of `next` and `run` (dConvergedCharter, with dWellOiledMachine for the client) | layer-instruction `[recommendations]`; layer-runtime `[decide]` |
+| skills | rendered Skills, five of seven, `/unattended` and `/build` apart | entries | RESHAPED | thin level-4 entries generated from their commands' drive rows and renamed `gov-<name>`: `/gov-recall` and `/gov-runlog` core, `/gov-lexicon`, `/gov-drift-audit` and `/gov-cleanup` with their kits (dConvergedCharter) | layer-instruction `[recommendations]`; layer-runtime `[decide]`; the owner, SK-2, 2026-10-19 |
 | skills | the `/session-kickoff` Skill and its per-machine link | the manual kickoff entry, linked from each machine to gov's live checkout | RETIRED | a forwarding stub for `install.deprecation-window` releases, then removed, each node's dangling link reported by its preflight (dConvergedCharter) | the owner, SA-9, 2026-10-19 |
 | .githooks | pre-commit | fast leg | RESHAPED | derived list (dWitnessedBar); witness and signal trap (dWellOiledMachine) | v2 `[chain]` dWitnessedBar; v2 `[chain]` dWellOiledMachine |
 | .githooks | commit-msg | transition audit | STAYS | gains a signal trap (dWellOiledMachine) | v2 `[chain]` dWellOiledMachine |

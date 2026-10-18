@@ -65,7 +65,7 @@ reader needs. The counts are the returns' measurements.
 | policy values | instruction | the policy file, and today each kit's conf | keys typed per kit | node: units at level 2; the file, its schema and its reader dGroundRules', the presets dKeptSession's | `policy.<key>` | dGroundRules |
 | protocols and guides | instruction | `memory/guides/`, `HYGIENE.md`, `TEMPLATE-SPEC.md` | 0 of 138 headings tagged; positional citations by number | node: protocol slices at level 3 | `doc.<name> [<seg>]` | dConvergedCharter |
 | kickoff manifest | instruction | `memory/guides/SESSION-KICKOFF.md` | no kind and no unit | node: units at level 2 that the card reads | tag | dPlacedRequest |
-| Skills and path rules | instruction | `.claude/skills/`, `.claude/rules/` | 0 tagged | node: thin entries at level 4 | tag | dConvergedCharter |
+| Skills and path rules | instruction | `.claude/skills/`, `.claude/rules/` | 0 tagged | node: thin entries at level 4, each generated from its command's drive row, gov's named `gov-<name>` (SK-2) | tag | dConvergedCharter |
 | role definitions | instruction | `tools/roles/agents/`, `.claude/agents/` | typed `reads:`, `writes:` and `rules:` fields | node: static blocks at level 5; `reads` and `writes` edges | `role.<name>` | dBoundRoles |
 | work orders and handoffs | instruction | `memory/builds/*/prompts/` | the `gov:handoff` marker on 59 of 595 | node: level 6, every one marked | marker path, `task-sha` | dBoundRoles |
 | the card | instruction | per build, rendered | per-session cards in the git dir today | node: level 1 | build | dPlacedRequest |

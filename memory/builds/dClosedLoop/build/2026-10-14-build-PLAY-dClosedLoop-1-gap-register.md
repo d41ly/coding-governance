@@ -92,6 +92,7 @@ extends.
 | gap-found-25 | Foundation | MED | Two relation vocabularies and no closed edge set: the map's layer, owner, after and implements, and memory's depends-on, patches, amends, supersedes and implements, with no tests, decides or instructs edge. | `research-relational-syntax.md` section 3 | — |
 | gap-found-26 | Foundation | MED | file:line citations go stale unseen: 10,655 code citations sit in memory, and of a sample of 60, 6 still point at the same line. | `research-relational-syntax.md` section 2 | — |
 | gap-found-27 | Foundation | MED | The charter's `[docs]` rule binds every user-facing change to its page under `help/`, and nothing checks it: `help/` holds two hand-written pages, and no unit keeps `help/roles.md` current while the chain rewrites the roles it describes. | the shape audit, run A's M13 and run B's M10 | — |
+| gap-found-28 | Foundation | LOW | gov's rendered Skills carry bare names, `/build`, `/cleanup`, `/lexicon`, `/runlog` and the rest, which nothing marks as gov's beside a repository's or a user's own Skills. | the owner, SK-2, 2026-10-19 | — |
 | gap-found-06 | Foundation | HIGH | No tool names the next step: six adopt scripts print install hints and nothing else ends with the caller's next command, so the loop advances only by agents re-deriving it. Raised by the owner. | foundations step 1 continued, current state | — |
 | gap-flow-01 | Flow | HIGH | No feature level between build and unit: the interfaces between a feature's units have no record, so a change that breaks a feature cannot be told from one that touches a unit, and re-design has no granularity but the unit. Raised by the owner. | flow FL-D2, FL-D4, FL-D5 | — |
 | gap-flow-02 | Flow | HIGH | The decision principles that resolve unattended forks (the most feature-rich option, then the most expandable, fully recorded) are stated nowhere; M3 names feature-rich only, and nothing ranks them above the charter's adjustable practices. Raised by the owner. | flow FL-D3, FL-D6; `memory/guides/BUILD-METHOD.md` M3 | — |
@@ -679,4 +680,11 @@ and `gap-tool-22`, and moved `gap-deploy-18`, `gap-deploy-19` and `gap-deploy-20
 ```text
 Roles=23 Deploy=25 Plan=8 Spine=13 Orient=21 Test=20 Runtime=32 Lexicon=10 Tooling=23 Review=16 Foundation=27 Build=5 Memory=39 Flow=18 Maintain=15 Design=10
 LOW=56 MED=145 HIGH=104
+```
+
+Re-measured after the owner's SK-2 added `gap-found-28` (`build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md` `[skills]`), same instrument, over 306 keys:
+
+```text
+Roles=23 Deploy=25 Plan=8 Spine=13 Orient=21 Test=20 Runtime=32 Lexicon=10 Tooling=23 Review=16 Foundation=28 Build=5 Memory=39 Flow=18 Maintain=15 Design=10
+LOW=57 MED=145 HIGH=104
 ```

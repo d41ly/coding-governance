@@ -11210,6 +11210,222 @@ p.write_text(t, encoding="utf-8", newline="\n")
 print("noted")
 ````
 
+### `fold_skills.py`
+
+The owner's answers on the rest of the Skills, SK-1 and SK-2, folded into v2, the memory plan, the fates record, the gap register, the comparison record's [skills] and the session log.
+
+````python
+"""Fold the owner's answers on the rest of the Skills, SK-1 and SK-2: `/build` retires beside `/session-kickoff` and
+`/unattended`, and the five question Skills stay as generated thin entries, every gov-rendered Skill named `gov-<name>`.
+Edits v2 (the level-4 row, dWellOiledMachine's driver clause, two dConvergedCharter clauses and a third, `[open]` and a
+revision note), the memory plan's Skills pocket, the fates record (the rendered-Skills row, a `/build` row, the counts),
+the gap register (`gap-found-28` and the tally), the comparison record's `[skills]` and the session log's event.
+
+Usage: python -X utf8 fold_skills.py <scratch-dir>   (from the worktree root)
+"""
+import pathlib
+import re
+import subprocess
+import sys
+
+S = pathlib.Path(sys.argv[1])
+sys.path.insert(0, str(S / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+COMPARED = "build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md"
+F = "`" * 3
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+P = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+T = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md")
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+C = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md")
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+
+said = {}
+for ln in (S / "away" / "answers-skills.txt").read_text(encoding="utf-8").replace("\r\n", "\n").split("\n"):
+    m = re.match(r"^(question|SK-\d) = (.+)$", ln)
+    if m:
+        said[m.group(1)] = m.group(2)
+if sorted(said) != ["SK-1", "SK-2", "question"]:
+    sys.exit(f"answers-skills.txt holds {sorted(said)}")
+
+ROW = re.compile(r"^\| (d[A-Z]\w+) \| ([^|]+) \| ([^|]+) \| (.+) \| ([^|]+) \|$")
+
+
+def chain_row(build):
+    chain = V.text.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+    hits = [ln for ln in chain.split("\n") if ln.startswith(f"| {build} |")]
+    if len(hits) != 1:
+        sys.exit(f"[chain]: {len(hits)} rows for {build}")
+    m = ROW.match(hits[0])
+    return hits[0], m.group(2), m.group(3), m.group(4).split("; "), [g.strip() for g in m.group(5).split(",")]
+
+
+def put(old, build, stage, parents, clauses, gaps):
+    for c in clauses:
+        if "; " in c or "|" in c:
+            sys.exit(f"{build}: a clause holds '; ' or a pipe: {c[:80]}")
+    V.sub(old, f"| {build} | {stage} | {parents} | {'; '.join(clauses)} | {', '.join(gaps)} |", f"chain {build}")
+
+
+def at(clauses, opens):
+    hits = [i for i, c in enumerate(clauses) if c.startswith(opens)]
+    if len(hits) != 1:
+        sys.exit(f"clause {opens!r}: {len(hits)} clauses open so")
+    return hits[0]
+
+
+# --- v2.
+V.sub("| 4 | kit runbooks, Skills and path-scoped rules; a Skill is a thin entry: its trigger contract, the CLI command it "
+      "shortcuts and the tags it enters, with no procedure of its own |",
+      "| 4 | kit runbooks, Skills and path-scoped rules; a Skill is a thin entry: its trigger contract, the CLI command it "
+      "shortcuts and the tags it enters, with no procedure of its own, generated from that command's drive row and, when "
+      "gov renders it, named `gov-<name>` (SK-2) |", "level 4")
+old, stage, parents, cl, gaps = chain_row("dWellOiledMachine")
+i = at(cl, "the supervisor the only driver in every mode")
+if not cl[i].endswith("each role act it hosts act-bound with that act's epoch (night pass, point 1)"):
+    sys.exit("dWellOiledMachine's driver clause changed")
+cl[i] = cl[i][:-len(" (night pass, point 1)")] + (", and `/build` reduced in the same unit to a client of `run`, which "
+                                                  "dConvergedCharter retires (night pass, point 1, SK-1)")
+put(old, "dWellOiledMachine", stage, parents, cl, gaps)
+old, stage, parents, cl, gaps = chain_row("dConvergedCharter")
+i = at(cl, "Skills converged to level-4 thin entries")
+if cl[i] != "Skills converged to level-4 thin entries, each described \"Use when …, runs …\"":
+    sys.exit("dConvergedCharter's Skills clause changed")
+cl[i] = ("Skills converged to level-4 thin entries, each generated from the drive row of the command it runs and never "
+         "hand-written, described \"Use when …, runs …\", installed with that command, and named `gov-<name>` where gov "
+         "renders it: `/gov-recall` over `gov why` and `record find` and `/gov-runlog` over `gov trace`, both core, and "
+         "`/gov-lexicon`, `/gov-drift-audit` and `/gov-cleanup` with their kits, each rename shipped as an upgrade step "
+         "with the old name forwarded for `install.deprecation-window` releases, and the Skill kind's conformance gate "
+         "refusing a gov-rendered Skill without the prefix, seen red on a planted one (SK-2)")
+i = at(cl, "the `/session-kickoff` Skill retired")
+cl.insert(i + 1, "the `/build` Skill retired once dWellOiledMachine's supervisor drives attended builds: a `[[retired]]` "
+                 "row with its readers inventoried by value, the charter's attended-build line, the roles kit's skill "
+                 "template, its install row and probe, and its harness wiring, and the kickoff card's hand-off to it, the "
+                 "client dWellOiledMachine left kept for `install.deprecation-window` releases, then removed (SK-1)")
+put(old, "dConvergedCharter", stage, parents, cl, gaps + ["gap-found-28"])
+V.sub("  a page.\n\n## [owed]",
+      "  a page.\n\n"
+      f"Open, 2026-10-19, from the owner's answers on the rest of the Skills (`{COMPARED}` `[skills]`):\n"
+      "- SK-2's `/gov-lexicon` and `/gov-drift-audit` follow the owner's pattern, beside the owner's own `/gov-recall`,\n"
+      "  `/gov-runlog` and `/gov-cleanup`.\n\n## [owed]", "open")
+V.sub("corpus declare their legacy populations, every rename and retirement inventories its readers by value, and every\n"
+      "set-valued key says whether it may be empty.\n\n",
+      "corpus declare their legacy populations, every rename and retirement inventories its readers by value, and every\n"
+      "set-valued key says whether it may be empty.\n\n"
+      f"Revised: 2026-10-19, the owner's answers on the rest of the Skills (`{COMPARED}` `[skills]`): `/build` retires\n"
+      "beside `/session-kickoff` and `/unattended`, a client of `run` from dWellOiledMachine until dConvergedCharter\n"
+      "removes it (SK-1); and the five question Skills stay as thin entries generated from their commands' drive rows,\n"
+      "every gov-rendered Skill named `gov-<name>` (SK-2).\n\n", "revision note")
+
+# --- The memory plan.
+P.sub("| Skills and path rules | instruction | `.claude/skills/`, `.claude/rules/` | 0 tagged | node: thin entries at level 4 |",
+      "| Skills and path rules | instruction | `.claude/skills/`, `.claude/rules/` | 0 tagged | node: thin entries at level "
+      "4, each generated from its command's drive row, gov's named `gov-<name>` (SK-2) |", "pocket Skills")
+
+# --- The fates record.
+T.sub("| skills | rendered Skills, six of seven, `/unattended` apart | entries | RESHAPED | thin level-4 entries; `/build` "
+      "becomes a client of `next` and `run` (dConvergedCharter, with dWellOiledMachine for the client) | layer-instruction "
+      "`[recommendations]`; layer-runtime `[decide]` |",
+      "| skills | rendered Skills, five of seven, `/unattended` and `/build` apart | entries | RESHAPED | thin level-4 "
+      "entries generated from their commands' drive rows and renamed `gov-<name>`: `/gov-recall` and `/gov-runlog` core, "
+      "`/gov-lexicon`, `/gov-drift-audit` and `/gov-cleanup` with their kits (dConvergedCharter) | layer-instruction "
+      "`[recommendations]`; layer-runtime `[decide]`; the owner, SK-2, 2026-10-19 |", "row rendered Skills")
+anchor = [ln for ln in T.text.split("\n") if ln.startswith("| roles | `.claude/roles.json` |")]
+if len(anchor) != 1:
+    sys.exit("the roles.json row moved")
+T.sub(anchor[0] + "\n", anchor[0] + "\n"
+      "| roles | the `/build` Skill | drives an attended build through the harness pipeline | RETIRED | a client of `run` "
+      "once the supervisor drives attended builds (dWellOiledMachine), removed after the deprecation window "
+      "(dConvergedCharter) | the owner, SK-1, 2026-10-19 |\n", "row build")
+table = T.text.split("\n## [table]", 1)[1].split("\n## ", 1)[0]
+fates = [ln.split(" | ")[3] for ln in table.split("\n") if ln.startswith("| ") and not ln.startswith("| Kit |")
+         and not ln.startswith("|---")]
+n = {f: fates.count(f) for f in ("STAYS", "RESHAPED", "MERGED", "RETIRED")}
+if sum(n.values()) != len(fates):
+    sys.exit(f"a fate outside the closed set: {sorted(set(fates))}")
+m = re.search(r"Counts: (\d+) stay,\n(\d+) reshaped, (\d+) merged and (\d+) retired, over (\d+) rows\.", T.text)
+if not m:
+    sys.exit("the fates counts sentence moved")
+T.sub(m.group(0), f"Counts: {n['STAYS']} stay,\n{n['RESHAPED']} reshaped, {n['MERGED']} merged and {n['RETIRED']} "
+      f"retired, over {len(fates)} rows.", "counts")
+
+# --- The gap register.
+row27 = [ln for ln in G.text.split("\n") if ln.startswith("| gap-found-27 |")]
+if len(row27) != 1:
+    sys.exit("gap-found-27 moved")
+G.sub(row27[0] + "\n", row27[0] + "\n"
+      "| gap-found-28 | Foundation | LOW | gov's rendered Skills carry bare names, `/build`, `/cleanup`, `/lexicon`, "
+      "`/runlog` and the rest, which nothing marks as gov's beside a repository's or a user's own Skills. | the owner, "
+      "SK-2, 2026-10-19 | — |\n", "gap-found-28")
+
+# --- The comparison record.
+C.text = C.text.rstrip("\n") + f"""
+
+## [skills] The rest of the Skills, 2026-10-19
+
+After SA-9, the owner asked:
+
+> {said['question']}
+
+The records answered it. Of today's nine Skills, three were already set to retire: `/session-kickoff` (SA-9),
+`/unattended` (NP-4) and `deploy-governance` (`gap-tool-05`). `/build`, which drives an attended build, would be a
+second door beside a placed request, since the supervisor drives every build and `attend` makes one attended. The five
+question Skills do not enter the flow: their procedures dissolve into commands, which leaves each a trigger line and a
+command, a slash shortcut for the owner and a trigger the model matches, at the cost of repeating the charter's drive
+line in every session. Two forks went to the owner, each with its recommendation first:
+
+| Fork | Question | The owner's answer |
+|---|---|---|
+| SK-1 | retire `/build` once the supervisor drives attended builds, as with `/session-kickoff`? | "{said['SK-1']}" |
+| SK-2 | keep the five question Skills as generated one-line shortcuts? | "{said['SK-2']}" |
+
+How the answers were read:
+- **SK-1:** `/build` becomes a client of `run` in the unit where dWellOiledMachine's supervisor becomes the only driver,
+  and dConvergedCharter retires it, with its readers inventoried by value and the client kept for the deprecation
+  window.
+- **SK-2:** the five stay as thin entries, each generated from its command's drive row and never hand-written, and
+  every gov-rendered Skill is named `gov-<name>`: `/gov-recall` and `/gov-runlog`, the owner's names, core shortcuts
+  over `gov why`, `record find` and `gov trace`; `/gov-cleanup`, the owner's name; and `/gov-lexicon` and
+  `/gov-drift-audit`, read from the owner's "etc.", which v2's `[open]` keeps to confirm. Each rename ships as an upgrade
+  step with its old name forwarded for the window, and the Skill kind's conformance gate refuses a gov-rendered Skill
+  without the prefix. `gap-found-28` records today's bare names.
+
+Folded: v2's level-4 row, dWellOiledMachine's driver clause, dConvergedCharter's Skills clause and a new `/build`
+clause, `[open]` and a revision note; the memory plan's Skills pocket; the fates record's rendered-Skills row and a
+`/build` row; and `gap-found-28`, with the register's tally re-measured.
+"""
+C.done += 1
+
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner asked whether the rest of the Skills still serve a purpose. The records
+  answered it, and two forks followed (`{COMPARED}` `[skills]`): `/build` retires beside `/session-kickoff` and
+  `/unattended` (SK-1), and the five question Skills stay as generated thin entries, every gov-rendered Skill named
+  `gov-<name>` (SK-2).
+""", "event")
+
+for rec in (V, P, T, G, C, L):
+    rec.save()
+
+tally = subprocess.run(["awk", "-F|", "-f", str(S / "away" / "tally.awk"), str(G.path)], capture_output=True, text=True,
+                       check=True).stdout.replace("\r\n", "\n").strip("\n").split("\n")
+counts = [ln.rstrip() for ln in tally]
+total = sum(int(kv.split("=")[1]) for kv in counts[0].split())
+G.text = G.text.rstrip("\n") + f"""
+
+Re-measured after the owner's SK-2 added `gap-found-28` (`{COMPARED}` `[skills]`), same instrument, over {total} keys:
+
+{F}text
+{counts[0]}
+{counts[1]}
+{F}
+"""
+G.done += 1
+G.save()
+print(f"register: {total} gaps; fates: {n}, {len(fates)} rows")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row.
@@ -11489,6 +11705,8 @@ MINE = [
     ("away/fold_shape_reconcile.py", "The two clauses the reconciliation probe reddened on, reworded so "
      "neither names a later build's key."),
     ("away/note_reconcile_shape.py", "Records that red in [folded], and registers these two scripts."),
+    ("away/fold_skills.py", "The owner's answers on the rest of the Skills, SK-1 and SK-2, folded into v2, "
+     "the memory plan, the fates record, the gap register, the comparison record's [skills] and the session log."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row."),
     ("night/record_instruments.py", "This record's own writer."),
@@ -12359,21 +12577,21 @@ atlas: 0 records named fates-absent-plant
 rc 1
 $ python map.py --check --plant fates-drop
 FINDING fates: kit.agent-instructions has no [table] row
-FINDING fates: the rows count [24, 71, 25, 15, 135], and the record states [24, 72, 25, 15, 136]
+FINDING fates: the rows count [24, 71, 25, 16, 136], and the record states [24, 72, 25, 16, 137]
 rc 1
 $ python map.py --check --plant fates-ghost
 FINDING fates: a row names ghostkit, which is no kit
-FINDING fates: the rows count [25, 72, 25, 15, 137], and the record states [24, 72, 25, 15, 136]
+FINDING fates: the rows count [25, 72, 25, 16, 138], and the record states [24, 72, 25, 16, 137]
 rc 1
 $ python map.py --check --plant fates-bad
 FINDING fates: agent-instructions · harness wiring has the fate MAYBE, outside the set
-FINDING fates: the rows count [24, 71, 25, 15, 136], and the record states [24, 72, 25, 15, 136]
+FINDING fates: the rows count [24, 71, 25, 16, 137], and the record states [24, 72, 25, 16, 137]
 rc 1
 $ python map.py --check --plant fates-unbuilt
 FINDING fates: agent-instructions · harness wiring names no chain build where it goes
 rc 1
 $ python map.py --check --plant fates-empty
-FINDING fates: workflows · `orient-counterfactual.js` retires naming neither a replacement nor a reason
+FINDING fates: roles · the `/build` Skill retires naming neither a replacement nor a reason
 rc 1
 $ python map.py --check --plant fates-kit
 FINDING fates: kit.agent-instructions's fate maybe is outside the set
@@ -12387,14 +12605,14 @@ $ python map.py --check --plant fates-kit-ghost
 FINDING fates: [kits] names ghostkit, which is no kit node
 rc 1
 $ python map.py --check --plant fates-count
-FINDING fates: the rows count [23, 73, 25, 15, 136], and the record states [24, 72, 25, 15, 136]
+FINDING fates: the rows count [23, 73, 25, 16, 137], and the record states [24, 72, 25, 16, 137]
 rc 1
 $ python map.py --check --plant fates-absorbed-stays
 FINDING fates: agent-instructions · harness wiring stays, yet its kit is absorbed
-FINDING fates: the rows count [25, 71, 25, 15, 136], and the record states [24, 72, 25, 15, 136]
+FINDING fates: the rows count [25, 71, 25, 16, 137], and the record states [24, 72, 25, 16, 137]
 rc 1
 $ python map.py --check --plant fates-bare-none
-FINDING fates: workflows · `orient-counterfactual.js` retires naming neither a replacement nor a reason
+FINDING fates: roles · the `/build` Skill retires naming neither a replacement nor a reason
 rc 1
 $ python map.py --check --plant fates-rel
 FINDING fates: kit.agent-instructions carries fate=retired, and [kits] says absorbed
@@ -12439,7 +12657,7 @@ FINDING fates: kit.unattended has no [kits] row
 FINDING fates: kit.unattended has no [table] row
 FINDING fates: kit.workflows has no [kits] row
 FINDING fates: kit.workflows has no [table] row
-FINDING fates: the rows count [0, 0, 0, 0, 0], and the record states [24, 72, 25, 15, 136]
+FINDING fates: the rows count [0, 0, 0, 0, 0], and the record states [24, 72, 25, 16, 137]
 FINDING fates: kit.agent-instructions carries fate=absorbed, and [kits] says None
 FINDING fates: kit.branch-reconcile carries fate=optional, and [kits] says None
 FINDING fates: kit.codebase-map carries fate=optional, and [kits] says None
@@ -12461,10 +12679,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:684 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:692 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:684 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:692 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -12512,13 +12730,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2386 nodes in 30 namespaces; 30905 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1618, derived 277, pending 491
+map: 2388 nodes in 30 namespaces; 30905 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1620, derived 277, pending 491
 map: no stale facts read 53 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 173 records, 3033 sections, 191 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 173 records, 3035 sections, 191 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -12569,7 +12787,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 305 · chain builds 21
+register keys 306 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -12582,8 +12800,8 @@ no findings
 rc 0
 
 $ critical path
-critical path: 206 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dSafePassage 19, dFairHearing 31, dOrderedCharter 50, dDeclaredLoop 73, dPlacedRequest 81, dKeptSession 100, dWitnessedBar 100, dBoundRoles 118, dTotalRecall 120, dRankedPlan 133, dFurnishedOrders 136, dLinkedLibrary 143, dIndexedDesign 155, dWellOiledMachine 159, dScopedBuild 170, dTendedCadence 175, dMindYourWords 176, dShippedRelease 183, dCalibratedLens 187, dConvergedCharter 206
+critical path: 207 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dSafePassage 19, dFairHearing 31, dOrderedCharter 50, dDeclaredLoop 73, dPlacedRequest 81, dKeptSession 100, dWitnessedBar 100, dBoundRoles 118, dTotalRecall 120, dRankedPlan 133, dFurnishedOrders 136, dLinkedLibrary 143, dIndexedDesign 155, dWellOiledMachine 159, dScopedBuild 170, dTendedCadence 175, dMindYourWords 176, dShippedRelease 183, dCalibratedLens 187, dConvergedCharter 207
 rc 0
 ````
 

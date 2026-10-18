@@ -2335,6 +2335,11 @@ The whole-design shape audit, dispatches 116 and 117, derived from each run the 
   from dShippedRelease; act bindings are pushed for checks on any node; and dConvergedCharter renders `help/`, retires
   the kickoff and walks the cycle by key. The chain is recomputed in `[folded]`.
 
+- 2026-10-19, session 1799cb98: the owner asked whether the rest of the Skills still serve a purpose. The records
+  answered it, and two forks followed (`build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md` `[skills]`): `/build` retires beside `/session-kickoff` and
+  `/unattended` (SK-1), and the five question Skills stay as generated thin entries, every gov-rendered Skill named
+  `gov-<name>` (SK-2).
+
 ## Instruments
 
 ### The gap-ownership join
