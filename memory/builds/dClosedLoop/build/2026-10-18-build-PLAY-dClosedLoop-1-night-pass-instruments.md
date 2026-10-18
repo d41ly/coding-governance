@@ -6074,6 +6074,59 @@ W.done += 1
 W.save()
 ````
 
+### `fold_wk5.py`
+
+The owner's word on wave 3, WK-5 folded: dMindYourWords a parent of dConvergedCharter.
+
+````python
+"""Record the owner's word on wave 3 and fold its forks: WK-5 makes dMindYourWords a parent of dConvergedCharter, and
+WK-6 keeps dTendedCadence whole, which changes nothing.
+
+Usage: python -X utf8 fold_wk5.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+W = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-walk.md")
+W.sub("""- The owner's request for wave 3, 2026-10-18, verbatim: "present wave 3".
+""", """- The owner's request for wave 3, 2026-10-18, verbatim: "present wave 3".
+- The owner's word on wave 3 and its forks, 2026-10-18, verbatim: "approve wave 3, take the recommendations, present
+  wave 4".
+""", "words")
+W.insert_before("## [walk-instrument] The walk's facts, and the clause scan", """## [wave-3-answers] Wave 3's forks, answered
+
+The owner approved wave 3 and took each fork's recommendation, 2026-10-18 (`[words]`):
+- **WK-5:** dConvergedCharter follows dMindYourWords, so convergence's fates join covers the lexicon's rows. The
+  lexicon lands before convergence can start, and the path does not move.
+- **WK-6:** dTendedCadence stays whole.
+
+""", "wave-3 answers")
+W.save()
+
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.insert_before("\nRevised: 2026-10-17, after the folds' closing review", """
+Revised: 2026-10-18, the walk's wave 3 (`build/2026-10-18-build-PLAY-dClosedLoop-1-walk.md` `[wave-3-answers]`):
+dConvergedCharter follows dMindYourWords, the one build besides it that no build waited on, so its exit check's fates
+join covers the lexicon's rows (WK-5); dTendedCadence stays whole (WK-6).
+""", "revision note")
+V.sub("| dConvergedCharter | Convergence | dScopedBuild, dShippedRelease, dCalibratedLens |",
+      "| dConvergedCharter | Convergence | dScopedBuild, dShippedRelease, dCalibratedLens, dMindYourWords |",
+      "dConvergedCharter parents")
+V.save()
+
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-18, session 1799cb98: the owner approved wave 3 and took both recommendations (the walk record's
+  `[wave-3-answers]`). dConvergedCharter now follows dMindYourWords at no cost to the path (WK-5), and dTendedCadence
+  stays whole (WK-6).
+""", "event")
+L.save()
+````
+
 ### `record_instruments.py`
 
 This record's own writer.
@@ -6196,6 +6249,7 @@ MINE = [
      "log's event."),
     ("walk5/leaves.py", "Wave 3: the builds no build waits on, and the fates rows each one owns."),
     ("walk5/record_walk5.py", "Wave 3 presented with its two forks."),
+    ("walk6/fold_wk5.py", "The owner's word on wave 3, WK-5 folded: dMindYourWords a parent of dConvergedCharter."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -7014,12 +7068,12 @@ rc 1
 
 ````text
 $ design map
-map: 2269 nodes in 30 namespaces; 32093 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1528, derived 259, pending 482
+map: 2271 nodes in 30 namespaces; 32108 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1530, derived 259, pending 482
 rc 0
 
 $ atlas
-atlas: derived — 157 records, 2749 sections, 183 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 157 records, 2752 sections, 184 decision sections, 16 comparison areas, 33 principles
 rc 0
 
 $ fold state

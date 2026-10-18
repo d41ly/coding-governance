@@ -17,6 +17,8 @@ the owner's word on each.
 - The owner's word on wave 1, 2026-10-18, verbatim: "approve wave 1, present wave 2".
 - The owner's word on wave 2 and its forks, 2026-10-18, verbatim: "approve wave 2, take the recommendations".
 - The owner's request for wave 3, 2026-10-18, verbatim: "present wave 3".
+- The owner's word on wave 3 and its forks, 2026-10-18, verbatim: "approve wave 3, take the recommendations, present
+  wave 4".
 
 ## [chain] The chain at a glance
 
@@ -628,6 +630,13 @@ on it. It owns 5 keys and the lexicon-declaration kind, and closes 10 gaps, 3 of
 |---|---|---|---|
 | WK-5 | Should dConvergedCharter wait for dMindYourWords? | yes: dMindYourWords lands at 145, before dConvergedCharter can start at 157, so the edge costs nothing, and convergence's fates join covers the lexicon's four rows; no, the lexicon lands on its own and convergence's join leaves its rows unchecked | a structural decision about the chain |
 | WK-6 | Split dTendedCadence? | keep it whole: no split saves more than eight units, bounded by dShippedRelease, and only its four new units could plausibly move, saving four; price a split, as WK-3 was | a structural decision about the chain |
+
+## [wave-3-answers] Wave 3's forks, answered
+
+The owner approved wave 3 and took each fork's recommendation, 2026-10-18 (`[words]`):
+- **WK-5:** dConvergedCharter follows dMindYourWords, so convergence's fates join covers the lexicon's rows. The
+  lexicon lands before convergence can start, and the path does not move.
+- **WK-6:** dTendedCadence stays whole.
 
 ## [walk-instrument] The walk's facts, and the clause scan
 

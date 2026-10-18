@@ -2125,6 +2125,10 @@ The night pass's closing review, dispatch 105, derived from its run the same way
   rows go to it (WK-5). dTendedCadence is back on the critical path, its four new units with it (WK-6).
   dWellOiledMachine left the path with WK-4.
 
+- 2026-10-18, session 1799cb98: the owner approved wave 3 and took both recommendations (the walk record's
+  `[wave-3-answers]`). dConvergedCharter now follows dMindYourWords at no cost to the path (WK-5), and dTendedCadence
+  stays whole (WK-6).
+
 ## Instruments
 
 ### The gap-ownership join
