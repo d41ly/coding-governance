@@ -471,22 +471,28 @@ research that AP-31 then answered, and dispatch 113's return changed the design 
   own, dSafePassage, between dGroundRules and dOrderedCharter, named at the owner's word. dOrderedCharter and
   dFairHearing now follow it. It owns the five gaps dGroundRules held for the step kind, and
   `install.deprecation-window` and `install.on-shim-call` move with the shim that reads them. Its sixth unit is the
-  step kind's first step: the interpreter floor raised to Python 3.15. gov runs it on itself first (AP-30).
+  step kind's first step: the interpreter floor raised to Python 3.15, the template a later raise
+  copies. Its seventh puts gov's own executors at the floor in the same landing and applies the step to gov's tree
+  first (AP-30).
 - **AP-31 and AP-32: the floor.** The research recommended keeping 3.11 and raising it to 3.12 by 2027-10, its end of
   life. The owner chose 3.15 now, every node upgrading. With every reader at 3.15, `tomllib` reads TOML 1.1
-  everywhere and UTF-8 is the default encoding, so the research's TOML 1.0 arm and its floor-raise template are not
-  built. The floor is declared once. dSafePassage's step refuses an interpreter below it and names the install
-  command, dWitnessedBar's floor arm runs a real interpreter at the floor, and dShippedRelease's emitted CI sets one
-  up. `platforms.provision` joins the catalogue, `name` by default.
-- **AP-33: one bash resolver, now.** dWitnessedBar gains the shared resolver, which asks git where its bash is before
-  it searches PATH and refuses rather than fall back to a bare `bash`, and a wrong-shell refusal at every entry point.
+  everywhere and UTF-8 is the default encoding. The research's TOML 1.0 arm is not built: the floor step's down
+  refuses while a tracked TOML file fails to parse under the floor it restores, which covers the one way back to an
+  older reader, and the step itself is the template a later raise copies. The floor is declared once. dSafePassage's
+  resolver refuses an interpreter below it and names the install command, gov's own remote CI sets one up in the
+  same landing, dWitnessedBar's floor arm runs a real interpreter at the floor, and dShippedRelease's emitted CI
+  sets one up for adopters. `platforms.provision` joins the catalogue, `name` by default.
+- **AP-33: one bash resolver, now.** dWitnessedBar gains the shared resolver, which replaces every bare-bash launch
+  site a query over Python and JavaScript finds, asks git where its bash is before it searches PATH, and refuses
+  rather than fall back to a bare `bash`, and a wrong-shell refusal at every entry point.
   The pwsh runner adapter waits in v2's `[planned]`. `gap-tool-20` records the class at its measured size.
 - **AP-8: session ids in committed memory.** `trace.identity` defaults to `session`. Committed records may name the
   harness session id beside the act, a commit carries a `Gov-Session` trailer, and `runs-in` widens to take a commit.
   dLoggedFlight's run log keeps its closed schema until dWellOiledMachine's act-key unit makes that leg read the key.
 - **AP-14: an ordered credential.** `runtime.act-auth` is an ordered list: a setup token, then the shared OAuth login,
   and an API key tried last, only when the owner adds it. Each is read from the node's credential store, never from a
-  file, and a transient-auth failure moves to the next.
+  file. An absent, expired or rejected credential moves to the next, and a transient failure relaunches on the
+  same credential under its own cap before it moves on.
 - **AP-13, AP-23 and AP-35.** `runtime.act-harness` stays claude-code, switched by the owner. A timeline shows 120
   rows before it folds. dTendedCadence gains a detector that files an intake six months before the floor's end of
   life, under the new key `maintain.interpreter-eol`.
@@ -497,9 +503,9 @@ research that AP-31 then answered, and dispatch 113's return changed the design 
 - **The catalogue** holds 226 keys, 206 of them presettable, and the presets follow.
 - **The recut record's** `check` homonym row moves with its clause to dSafePassage, after the reconciliation probe
   reddened on it.
-- **The atlas** shows v2's `[planned]` in its chain view.
+- **The atlas** shows v2's `[planned]` in its records view.
 
-**The chain after the answers,** recomputed by `critical_path.py` with its build count raised to 21:
+**The chain after the answers, at `fe3d09aba`,** recomputed by `critical_path.py` with its build count raised to 21:
 
 ```text
 critical path: 195 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
@@ -537,8 +543,17 @@ detector. It now runs through dSafePassage.
   ```
 
   Those literals reach a resolver first. The class reaches WSL through govkit's fall-back to a bare `bash` when no
-  PATH bash resolves, and through seven copies of a resolver loop that search PATH only. The answer stands, and
-  `gap-tool-20` states the class at that size.
+  PATH bash resolves, and through seven copies of a resolver loop that search PATH only. Tracked JavaScript holds
+  one more site, the stop guard's, which reaches the launcher wherever System32 precedes Git's bash on PATH, as the
+  closing review's run B found:
+
+  ```text
+  $ python js_bare_bash.py
+  tracked JavaScript files 21; bare-bash spawn sites 1 in 1 files
+    tools/unattended/stop-guard.js:111  const r = spawnSync('bash', [driver, '--liveness', slug],
+  ```
+
+  The answer stands, and `gap-tool-20` states the class at that size.
 
 **Interpretations, for the owner to correct:**
 - AP-13's "owner-switchable" reads as switched by the owner alone: `runtime.act-harness` joins the keys presets
@@ -549,11 +564,15 @@ detector. It now runs through dSafePassage.
   rule stands as written, and its README is untouched.
 - AP-25's dSafePassage precedes dFairHearing as well as dOrderedCharter, since the review harness is a shipped kit
   and so changes what an adopter sees. It costs the path nothing.
-- AP-31's "now" reads as the chain's first change an adopter sees: dSafePassage raises the floor before any later
-  build, so each may rely on 3.15.
+- AP-31's "now" reads as the chain's first change an adopter sees: dSafePassage raises the floor and its resolver
+  refuses below it before any later build, so each may rely on 3.15.
 - AP-32's `platforms.provision` joins the keys presets never touch, since how a node gets its interpreter is the
   operator's.
-- AP-17's future plan counts in no build's units and adds no gap to the register until its trigger holds.
+- AP-17's future plan counts in no build's units. macOS adds its gaps to the register when its trigger holds, and
+  pwsh-launch's measured gaps are there already, under AP-33.
 
 **The checks** are re-run in the instruments record's `[final]`, all green. The reconciliation probe's one red run
 on the way is in its `[answers-fold]`.
+
+**The closing review,** run twice at the owner's word, found seventeen defects in this fold, three of them high, and
+every one is folded: `build/2026-10-18-build-PLAY-dClosedLoop-1-answers-reviews-compared.md` `[folded]`.

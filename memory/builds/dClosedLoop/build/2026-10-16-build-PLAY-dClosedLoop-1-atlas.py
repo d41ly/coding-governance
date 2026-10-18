@@ -4,7 +4,8 @@
 Usage: python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --out <page.html>
        python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --check
        python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --check --plant <case>   damage the memory view's sources,
-           expect exit 1; cases: kind-unplaced, kind-ghost-tag, edge-status, hop-edge, edges-split
+           the record corpus or the view map, expect exit 1; cases: kind-unplaced, kind-ghost-tag, edge-status,
+           hop-edge, edges-split, instruments-decision, view-unread
 
 The template beside this file is the page without its data. A run splices the derived data into a copy
 written to --out, never into the template, so the repository keeps the template and this generator while
@@ -120,9 +121,12 @@ DECISION_KINDS = [
 # A kind's writer cell names a writer item, or carries one of these declared markers (the away pass's review, M4).
 KIND_MARKERS = ("no writer item", "writer item not named", "every step's")
 MEMORY_PLANTS = ("kind-unplaced", "kind-ghost-tag", "edge-status", "hop-edge", "edges-split")
+# Plants on the record corpus and the view map, each stopping the run with its own refusal (the answers fold's
+# closing review: run A's L4, run B's M4).
+CORPUS_PLANTS = ("instruments-decision", "view-unread")
 V2_VIEWS = {"layers": "overview", "principles": "principles", "front-door": "records", "policies": "policies",
             "presets": "policies", "floor": "records", "witnesses": "records", "contracts": "flow", "chain": "chain",
-            "planned": "chain", "open": "progress", "owed": "progress"}
+            "planned": "records", "open": "progress", "owed": "progress"}
 
 
 def text(path):
@@ -298,8 +302,8 @@ def plant_memory(src, plant):
         swap("plan", "| `follows` | none |", "| `follows`, `answered-by-typo` | none |")
     elif plant == "edges-split":
         swap("plan", "\n| `implements` |", "\n\n| `implements` |")
-    elif plant:
-        sys.exit(f"atlas: no plant {plant}; the cases are {', '.join(MEMORY_PLANTS)}")
+    elif plant and plant not in CORPUS_PLANTS:
+        sys.exit(f"atlas: no plant {plant}; the cases are {', '.join(MEMORY_PLANTS + CORPUS_PLANTS)}")
     return src
 
 
@@ -307,6 +311,12 @@ def derive(plant=None):
     src = plant_memory({k: text(p) for k, p in SOURCES.items()}, plant)
     v2, steps_text = src["v2"], src["steps"]
     recs = corpus()
+    if plant == "instruments-decision":
+        # The retitled case: an instruments record whose section title the decision pattern reads as an answer.
+        rec = next(r for r in recs if r["name"] == "night-pass-instruments")
+        rec["sections"].append({"id": "answers-fold-planted", "tag": "answers-fold", "level": 2,
+                                "title": "The owner's answers, folded", "md": ""})
+    views = dict(V2_VIEWS, planned="chain") if plant == "view-unread" else V2_VIEWS
 
     _, lay = section(v2, "layers")
     layers = [{"tag": plain(r[0]), "kind": r[1], "what": r[2]} for r in table(lay, "Layer", "v2 [layers]")]
@@ -511,6 +521,9 @@ def derive(plant=None):
         body = "\n".join(s["md"] for s in rec["sections"])
         if re.search(r"(?m)^\s*-?\s*\**Answers?\**:|^\s*-\s*Offered:", body) and not picked:
             sys.exit(f"atlas: {rec['name']} records an owner's answer, yet no section title marks it")
+        if picked and rec["name"].endswith("instruments"):
+            sys.exit(f"atlas: {rec['name']} is an instruments record, yet its section '{picked[0]['title']}' reads as "
+                     f"a decision; an instruments record holds scripts and runs, so retitle the section")
         for s in picked:
             kind = "round" if whole else next((k for k, rx in DECISION_KINDS if rx.search(s["title"])), "")
             if not kind:
@@ -542,8 +555,17 @@ def derive(plant=None):
 
     # Each section of the converged design, and the view that shows it.
     v2_ids = [s["id"] for r in recs if r["name"] == "architecture-v2" for s in r["sections"] if s["level"] == 2]
-    if sorted(v2_ids) != sorted(V2_VIEWS):
-        sys.exit(f"atlas: v2's sections and the views declared for them differ: {sorted(set(v2_ids) ^ set(V2_VIEWS))}")
+    if sorted(v2_ids) != sorted(views):
+        sys.exit(f"atlas: v2's sections and the views declared for them differ: {sorted(set(v2_ids) ^ set(views))}")
+    # A view other than records shows a section only if the derivation reads that section, so the sections it reads
+    # are taken from this file's own source, never typed beside it.
+    own = Path(__file__).read_text(encoding="utf-8")
+    read = set(re.findall(r'section\(v2, "([a-z0-9-]+)"\)', own)) | \
+        set(re.findall(r'find\(recs, "architecture-v2", "([a-z0-9-]+)"\)', own))
+    unread = sorted(s for s, view in views.items() if view != "records" and s not in read)
+    if unread:
+        sys.exit(f"atlas: v2's sections {unread} map to a view that reads none of them; map them to records or render "
+                 f"them")
     # The expansions' programs: each layer-expansions table headed `| Item | Actor |` is one program's, outside the
     # steps, and a row may name two items (PM-12).
     programs = []

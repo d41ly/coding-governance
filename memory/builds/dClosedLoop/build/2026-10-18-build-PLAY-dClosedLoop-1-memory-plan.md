@@ -309,7 +309,8 @@ Each is seen red on a planted case before it is trusted:
   an inverse not rendered;
 - **causes:** a non-root record with no `caused-by`; an orphan, a record nothing reaches from a root;
 - **commits:** a pushed commit an act made with no `Gov-Act:`; a `Gov-Act:` the binding does not hold; a planted
-  `Gov-Item:` trailer read as anything but `serves`;
+  `Gov-Item:` trailer read as anything but `serves`; a `Gov-Session:` trailer under `trace.identity: act-only`; an
+  act-made commit with no `Gov-Session:` under `session`;
 - **work orders:** a handoff with no marker; a return with no `answers`;
 - **positional:** a new positional citation in live text;
 - **pins:** a quoted derived fact with no pin on its line, across every record;

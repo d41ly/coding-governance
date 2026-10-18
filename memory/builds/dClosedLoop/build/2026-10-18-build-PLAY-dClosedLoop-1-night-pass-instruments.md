@@ -8489,6 +8489,651 @@ L.insert_before("\n## Instruments\n", """
 L.save()
 ````
 
+### `build_args_answers.py`
+
+The args of the answers fold's closing review, run twice: runs A and B differ only in the run label, the report path and the scratch path.
+
+````python
+"""Build the args of the answers' closing review, run twice at the owner's word ("run the closing review at medium
+effort twice", 2026-10-18): two independent light Tier-2 diff reviews of the owner's answers to the away pass's forks,
+folded, every role at medium. The two runs differ only in the run label, the report path and the scratch path, as the
+layers' paired rounds did (`build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared.md` `[runs]`).
+
+Usage: python -X utf8 build_args_answers.py <scratch-dir> <base> <head>   (from the worktree root)
+Writes <scratch-dir>/away/args-answers-a.json and args-answers-b.json.
+"""
+import json
+import pathlib
+import subprocess
+import sys
+
+S, BASE, HEAD = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+B = "memory/builds/dClosedLoop/build/"
+R = "memory/builds/dClosedLoop/reviews/2026-10-18-review-PLAY-dClosedLoop-1-answers-fold-{}.md"
+base = json.loads((S / "away" / "args-away-review.json").read_text(encoding="utf-8"))
+full = lambda r: subprocess.run(["git", "rev-parse", r], capture_output=True, text=True, check=True).stdout.strip()
+base["base"], base["head"] = full(BASE), full(HEAD)
+base["intensity"], base["round"] = "light", 1
+base["efforts"] = {"diffFinder": "medium", "skeptic": "medium", "synthesis": "medium"}
+for p in base["specs"]:
+    if not pathlib.Path(p).exists():
+        sys.exit(f"missing: {p}")
+base["checklist"] = subprocess.run([sys.executable, "tools/memory-tree/gotchas.py", "--for-diff", f"{BASE}..{HEAD}"],
+                                   capture_output=True, text=True, encoding="utf-8", check=True).stdout
+base["byDesign"] = "\n".join([
+    "- The build is design-only: no product code and no unit specs. Unit-level detail is absent by design and owed to "
+    "the chain builds, and a row's planned units are prose, counted one per clause.",
+    "- The owner's words are decisions where they direct, recorded verbatim: the away pass's six points ([words] in "
+    "the away-pass record) and the owner's answers to its thirty-five forks ([answers]), among them AP-8's `session`, "
+    "AP-14's ordered credentials, AP-23's 120 rows, AP-25's own build named dSafePassage and AP-31's Python 3.15 now. "
+    "A finding may show a fold contradicting the owner's words, a record or the tree, not re-argue the owner's "
+    "direction.",
+    "- The seven interpretations in [folded-answers] are open for the owner to correct. A finding may show that one "
+    "contradicts the owner's words or a record, not argue a different preference.",
+    "- Every earlier answer stands: AP-1 to AP-35, the away pass's closing-review items H1 to L5, NP-1 to NP-24, SP-1 "
+    "and SP-2, WK-1 to WK-8, PM-1 to PM-12, RC-1 to RC-9, AF-1 to AF-3, FL1, CX-1 to CX-3, RT-1 to RT-4, and every "
+    "round's before them.",
+    "- Research returns are verbatim and dated, dispatch 113's (research-python-floor) among them, and their prompts "
+    "are rendered handoffs: neither is under review, though a fold that misstates its return is. The instruments "
+    "record holds the scripts as they ran.",
+    "- Dated records keep what held when they were written: revision notes, the session log's past entries, the "
+    "ownership record's approved tables, and the away-pass record's [chain-impact], [review-fold] and [state], which "
+    "state the design at a9b00addd and point at [folded-answers] for the state after the answers.",
+    "- Generated files (memory/LIVE.md and the build README's generated regions) are rendered, not reviewed. The "
+    "atlas's view map is an instrument, and is reviewed.",
+])
+CONTEXT = (
+    "The diff is " + base["head"][:9] + " over " + base["base"][:9] + ": the owner's answers to the away pass's "
+    "thirty-five forks, folded, and one follow-up commit. The answers are verbatim in the away-pass record's [answers] "
+    "(" + B + "2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md); what they changed is its [folded-answers], with two "
+    "corrections and seven interpretations for the owner to correct. Dispatch 113's return (" + B +
+    "2026-10-18-build-PLAY-dClosedLoop-1-research-python-floor.md) priced AP-19 and AP-17 and raised AP-31 to AP-35. "
+    "The fold: the upgrade-step kind leaves dGroundRules for a new build, dSafePassage, between dGroundRules and "
+    "dOrderedCharter, with dOrderedCharter and dFairHearing re-parented onto it, five gaps and two keys moving with "
+    "it, and a sixth unit raising the interpreter floor to Python 3.15 (AP-25, AP-31); `trace.identity` defaults to "
+    "`session`, with a `Gov-Session` trailer and `runs-in` widened to take a commit (AP-8); `runtime.act-auth` becomes "
+    "an ordered list (AP-14); `trace.rows` defaults to 120 (AP-23); `runtime.act-harness` and the new "
+    "`platforms.provision` join the keys presets never touch, and `maintain.interpreter-eol` joins the catalogue with "
+    "a dTendedCadence detector (AP-13, AP-32, AP-35); dWitnessedBar gains one bash resolver and a wrong-shell refusal "
+    "(AP-33); v2 gains a [planned] section for macOS and pwsh-launch (AP-17, AP-34); five gaps join the register; "
+    "the recut record's `check` homonym row moves to dSafePassage; the atlas gives [planned] a view; and the "
+    "instruments record retitles a section the decision pattern read as an answer. Review it as a design change. "
+    "Does each answer land as the owner gave it, the same way in every record it touches, and does any text still "
+    "state the old default or the old home: the step kind in dGroundRules, `act-only`, 60 rows, `oauth-shared` alone, "
+    "or the 3.11 floor as design? Does dSafePassage own exactly what its units read and close, with every clause on "
+    "its own build or an ancestor, and do its re-parented children keep the chain's order and the path's arithmetic? "
+    "Is the 3.15 floor consistent across P37, the chain clauses, the catalogue, [planned] and the gap register, and "
+    "is dropping the research's TOML 1.0 arm and floor-raise template sound? Does the session-id change agree across "
+    "v2's catalogue, the memory plan's [sessions], [sites], [edges] and [keys], and dLoggedFlight's rule as its "
+    "README states it? Are the ordered credential list and the never-touch list consistent with the preset check and "
+    "with the charter's [security]? Does each new gap state a measured fact its cited evidence supports, and is each "
+    "owned by the build whose unit closes it? Are the corrections and the seven interpretations faithful to the "
+    "owner's words and to the tree? A fold's own text is new surface: check it as hard as the text it replaced. "
+    "This is run {run} of two independent runs on the same diff; read no other run's report. Write the report to "
+    "{report}. Its head carries an H1, then, within its first twelve lines, the line `**Serves:** diff-review "
+    "PLAY-dClosedLoop-1`. It carries exactly one `## Verdict:` line, whose token is CLEAN, CLEAN WITH FIXES or BLOCKED "
+    "and nothing else.")
+for run in ("A", "B"):
+    report = R.format(run.lower())
+    if pathlib.Path(report).exists():
+        sys.exit(f"{report} exists")
+    a = dict(base, scratch=(S / f"review-answers-{run.lower()}").as_posix(),
+             context=CONTEXT.replace("{run}", run).replace("{report}", report))
+    out = S / "away" / f"args-answers-{run.lower()}.json"
+    out.write_text(json.dumps(a, indent=1, ensure_ascii=False), encoding="utf-8", newline="\n")
+    print(f"run {run}: {a['kind']} {a['base'][:9]}..{a['head'][:9]}, {a['intensity']}, {len(a['specs'])} specs, "
+          f"checklist {len(a['checklist'].splitlines())} lines, efforts {a['efforts']}, roles {a['roles']}, context "
+          f"{len(a['context'].split())} words, report {report.rsplit('/', 1)[1]}")
+````
+
+### `log_reviews.py`
+
+The session log's dispatch 114 and 115 rows and the two runs' agent lines.
+
+````python
+"""Record the answers fold's two closing-review runs in the session log: dispatch rows 114 and 115, and each run's
+agent and returned lines as the roles kit derived them.
+
+Usage: python -X utf8 log_reviews.py <agent-lines-114.txt> <agent-lines-115.txt>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+
+def lines(p):
+    got = [ln for ln in pathlib.Path(p).read_text(encoding="utf-8").replace("\r\n", "\n").split("\n")
+           if ln.startswith(("- agent —", "- returned —"))]
+    if len(got) != 20:
+        sys.exit(f"{p}: twenty agent and returned lines expected, read {len(got)}")
+    return got
+
+
+a, b = lines(sys.argv[1]), lines(sys.argv[2])
+F = "`" * 3
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+row113 = [ln for ln in L.text.split("\n") if ln.startswith("| 113 |")]
+if len(row113) != 1:
+    sys.exit("no single dispatch row 113")
+ROW = ("| {n} | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, "
+       "verification), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run {r} of two | "
+       "The answers fold's closing review, run twice at the owner's word: `fe3d09aba` over `a9b00addd` | the args, built "
+       "by `build_args_answers.py` in the instruments record | 1799cb98 | returned as `{run}`, CLEAN WITH FIXES, {conf} "
+       "of {raw} confirmed, {items} items, {high} high | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-answers-fold-{x}.md` |")
+L.sub(row113[0] + "\n", row113[0] + "\n"
+      + ROW.format(n=114, r="A", run="wf_663c6465-b15", conf=11, raw=15, items=11, high=2, x="a") + "\n"
+      + ROW.format(n=115, r="B", run="wf_7b253e00-228", conf=12, raw=17, items=11, high=1, x="b") + "\n",
+      "dispatch rows")
+L.insert_before("\n## Events\n", "\nThe answers fold's closing review, dispatches 114 and 115, derived from each run the same "
+                "way:\n\n" + F + "text\n" + "\n".join(a + b) + "\n" + F + "\n", "agent lines")
+L.save()
+````
+
+### `js_bare_bash.py`
+
+Run B's M2, measured: tracked JavaScript that spawns a bare `bash`.
+
+````python
+"""B's M2 measured: tracked JavaScript that spawns a bare `bash`. A site is spawn, spawnSync, execFile or execFileSync
+whose first argument is the string 'bash' or "bash", or exec or execSync whose command string starts with `bash `.
+Node resolves a bare name through PATH, so such a site reaches WSL's launcher only where System32 precedes Git's
+bash on PATH, as a fresh terminal's does. Reads the tracked tree; writes nothing.
+
+Usage: python -X utf8 js_bare_bash.py   (from the worktree root)
+"""
+import re
+import subprocess
+
+files = subprocess.run(["git", "ls-files", "*.js", "*.mjs", "*.cjs"], capture_output=True, text=True,
+                       check=True).stdout.split()
+ARGV0 = re.compile(r"""\b(spawn|spawnSync|execFile|execFileSync)\(\s*['"]bash(\.exe)?['"]""")
+CMD = re.compile(r"""\b(exec|execSync)\(\s*['"`]bash\s""")
+sites = []
+for p in files:
+    for n, ln in enumerate(open(p, encoding="utf-8").read().split("\n"), 1):
+        if ARGV0.search(ln) or CMD.search(ln):
+            sites.append((p, n, ln.strip()[:100]))
+print(f"tracked JavaScript files {len(files)}; bare-bash spawn sites {len(sites)} in {len({p for p, _, _ in sites})} files")
+for p, n, ln in sites:
+    print(f"  {p}:{n}  {ln}")
+````
+
+### `write_compare.py`
+
+Writes the comparison record's [runs], [method] and [map], and runs `compare_rounds.py` over it.
+
+````python
+"""Write the comparison record of the answers fold's two closing-review runs: [runs], [method] and [map], then run
+compare_rounds.py over it and append [summary] with the script's output and [fold], the plan.
+
+Usage: python -X utf8 write_compare.py <scratch-dir>   (from the worktree root, after log_reviews.py)
+"""
+import pathlib
+import subprocess
+import sys
+
+S = pathlib.Path(sys.argv[1])
+B = "memory/builds/dClosedLoop/build/"
+R = "memory/builds/dClosedLoop/reviews/2026-10-18-review-PLAY-dClosedLoop-1-answers-fold-"
+OUT = pathlib.Path(B + "2026-10-18-build-PLAY-dClosedLoop-1-answers-reviews-compared.md")
+if OUT.exists():
+    sys.exit(f"{OUT} exists")
+F = "`" * 3
+MAP = [
+    ("auth-transient-route", "a transient-auth failure skips its credential, so a contended refresh on the last entry has no route", "1", "—", "fold: two classes, each with a planted arm"),
+    ("apikey-last-unstated", "v2 lets api-key sit anywhere in `runtime.act-auth`, and lets the list be empty", "—", "4", "fold: a schema arm for each"),
+    ("pep701-ban-early", "dSafePassage retires the PEP 701 ban before anything refuses a below-floor interpreter", "9", "1", "fold: the resolver's refusal moves into dSafePassage"),
+    ("floor-reliance-unenforced", "interpretation 5 lets later builds rely on a floor no launch enforces", "10", "1", "fold: the same move, and the interpretation restated"),
+    ("remote-ci-floor", "gov's own remote CI gets no interpreter at the floor", "13", "8, 13", "fold: a dSafePassage clause, and gap-tool-21 split"),
+    ("ap30-self-run", "\"gov runs it on itself first\" cites a self-run on a later build", "2", "9", "fold: the same clause applies the step to gov's tree"),
+    ("toml-drop-reason", "the reason for dropping the TOML 1.0 arm and the template fails on the floor step's down", "3", "2, 10, 14", "fold: the down refuses a TOML file the restored floor cannot parse"),
+    ("floor-file-count", "gap-tool-22's eight files are the research's edit count, not the tree's declarations", "11", "6", "fold: restated by its query"),
+    ("bash-census-js", "the AP-33 correction and gap-tool-20 omit the stop guard's bare `bash`", "—", "3", "fold: the census covers JavaScript"),
+    ("gov-session-unchecked", "no check can fail the `Gov-Session` rule", "5", "—", "fold: two planted arms"),
+    ("macos-trigger-widened", "[planned]'s macOS trigger adds an adopter's request the owner did not choose", "6", "5", "fold: the owner's trigger"),
+    ("planned-gaps-deferred", "[planned] defers gaps the register already holds", "7", "—", "fold: the sentence narrowed"),
+    ("separator-lost", "dDeclaredLoop's commit-node clause lost a separator", "8", "12", "fold: restored"),
+    ("eol-gap-evidence", "gap-maint-15's evidence is a below-floor interpreter, not the floor's end of life", "12", "—", "fold: restated"),
+    ("final-stale", "the instruments record's [final] reports the run before the record was written", "4, 14", "15", "fold: the recorder re-runs to a fixed point"),
+    ("atlas-decision-guard", "the atlas refuses no section wrongly read as a decision", "14", "16", "fold: a refusal in instruments records, planted"),
+    ("planned-view-unrendered", "the atlas maps [planned] to a view that renders none of it", "—", "7", "fold: mapped to records, and a read guard, planted"),
+    ("p37-floor-value", "P37 states the floor's value beside its one declaration", "—", "11", "refuted"),
+    ("policy-values-unrouted", "catalogue values no unit routes", "15", "17", "refuted"),
+]
+rows = "\n".join(f"| `{t}` | {w} | {a} | {b} | {d} |" for t, w, a, b, d in MAP)
+OUT.write_text(f"""# Research: the answers fold's closing review, run twice and compared
+
+**Serves:** research PLAY-dClosedLoop-1
+
+The owner asked for the closing review of the answers fold "at medium effort twice" (2026-10-18). Two independent
+runs, A and B, reviewed the same pinned diff. This record compares them defect by defect, as the layers' paired rounds
+were compared (`build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared.md`), and plans the fold. No defect
+contradicts an owner's answer, so none goes to the owner first.
+
+## [runs] The two runs
+
+- **Subject:** `fe3d09aba` over `a9b00addd`: the owner's answers to the away pass's thirty-five forks, folded, and
+  the instruments record's retitle.
+- **Harness:** `tools/workflows/tier2-review.js`, light: three `gov-diff-reviewer` lenses (correctness, seams,
+  verification), five `gov-skeptic` batches and one `gov-synthesizer`, every role at the owner's medium.
+- **Runs and reports:**
+
+  | Run | Dispatch | Workflow | Report |
+  |---|---|---|---|
+  | A | 114 | `wf_663c6465-b15` | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-answers-fold-a.md` |
+  | B | 115 | `wf_7b253e00-228` | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-answers-fold-b.md` |
+
+- **The args:** `build_args_answers.py` wrote both. They differ only in the run label, the report path and the
+  scratch path, checked equal otherwise before run B launched. The runs went one after the other, so no more than
+  five agents ran at once.
+- **The ledger:** the roles kit derived every agent and returned line. The session log holds them.
+
+## [method] How the runs were compared
+
+The runtime comparison's `[method]`, with the layers' additions, applies unchanged:
+- every finding of both runs, confirmed or refuted, is placed on the defect it names, and a finding that names two
+  defects lands on both;
+- a run finds a defect when one of its findings on it was confirmed, and the defect takes the highest grade any
+  confirmed finding on it got, the skeptic's where one was given;
+- the tables are derived: `compare_rounds.py` reads the two reports, `[map]` and the session log.
+
+## [map] Every finding, placed
+
+| Defect | What | A | B | Fold |
+|---|---|---|---|---|
+{rows}
+""", encoding="utf-8", newline="\n")
+run = subprocess.run([sys.executable, "-X", "utf8", str(S / "compare_rounds.py"), R + "a.md", R + "b.md", str(OUT),
+                      B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md", "wf_663c6465-b15", "wf_7b253e00-228"],
+                     capture_output=True, text=True)
+if run.returncode != 0:
+    OUT.unlink()
+    sys.exit(f"compare_rounds.py refused: {run.stdout}{run.stderr}")
+(S / "away" / "compare-answers.out").write_text(run.stdout, encoding="utf-8", newline="\n")
+print(run.stdout)
+````
+
+### `fold_review_answers.py`
+
+Folds the seventeen defects of the answers fold's closing review into v2, the memory plan, the gap register, the away-pass record, four bug classes and the comparison record.
+
+````python
+"""Fold the seventeen defects the answers fold's closing review found, run twice: v2's credential row and six chain
+rows, `[planned]` and a revision note; the memory plan's commits gate; five gap rows and the tally; the away-pass
+record's [folded-answers]; four bug classes; the session log's event; and the comparison record's [summary], [fold]
+and [folded]. The critical path, the JavaScript census and the comparison are spliced from their runs.
+
+Usage: python -X utf8 fold_review_answers.py <scratch-dir>   (from the worktree root, after write_compare.py)
+"""
+import pathlib
+import re
+import subprocess
+import sys
+
+S = pathlib.Path(sys.argv[1])
+sys.path.insert(0, str(S / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+COMPARED = "build/2026-10-18-build-PLAY-dClosedLoop-1-answers-reviews-compared.md"
+F = "`" * 3
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+P = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+A = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md")
+C = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-answers-reviews-compared.md")
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+K = {n: Record(f"memory/gotchas/{n}.md") for n in ("fold-text-is-unreviewed-surface", "step-depends-on-a-later-build",
+                                                     "rule-stated-with-no-check-that-fails", "two-answers-to-one-question")}
+
+
+def out(name):
+    return (S / "away" / name).read_text(encoding="utf-8").replace("\r\n", "\n").strip()
+
+
+def section(rec, tag):
+    m = re.search(r"^## \[" + re.escape(tag) + r"\].*?(?=^## \[|\Z)", rec.text, flags=re.M | re.S)
+    if not m:
+        sys.exit(f"{rec.path.name}: no [{tag}]")
+    return m.group(0)
+
+
+ROW = re.compile(r"^\| (d[A-Z]\w+) \| ([^|]+) \| ([^|]+) \| (.+) \| ([^|]+) \|$")
+
+
+def chain_row(build):
+    hits = [ln for ln in section(V, "chain").split("\n") if ln.startswith(f"| {build} |")]
+    if len(hits) != 1:
+        sys.exit(f"[chain]: {len(hits)} rows for {build}")
+    m = ROW.match(hits[0])
+    return hits[0], m.group(2), m.group(3), m.group(4).split("; "), [g.strip() for g in m.group(5).split(",")]
+
+
+def put(old, build, stage, parents, clauses, gaps):
+    if any("; " in c for c in clauses):
+        sys.exit(f"{build}: a clause holds '; '")
+    V.sub(old, f"| {build} | {stage} | {parents} | {'; '.join(clauses)} | {', '.join(gaps)} |", f"chain {build}")
+
+
+def edit(clauses, opens, old, new):
+    hits = [i for i, c in enumerate(clauses) if c.startswith(opens)]
+    if len(hits) != 1 or clauses[hits[0]].count(old) != 1:
+        sys.exit(f"clause {opens!r}: {len(hits)} clauses, or {old!r} not once in it")
+    clauses[hits[0]] = clauses[hits[0]].replace(old, new)
+
+
+# --- v2: the credential row (A's H1, B's M3).
+V.sub("| `runtime.act-auth` | an ordered list drawn from setup-token, oauth-shared and api-key, api-key only when the owner "
+      "adds it | setup-token, oauth-shared | the away pass, point 3: the operator's credentials, each read from the "
+      "node's credential store and never from a file, tried in order, a transient-auth failure moving to the next; the "
+      "owner's AP-14; never set by a preset | dWellOiledMachine |",
+      "| `runtime.act-auth` | a non-empty ordered list drawn from setup-token, oauth-shared and api-key, api-key only last "
+      "and only when the owner adds it | setup-token, oauth-shared | the away pass, point 3: the operator's credentials, "
+      "each read from the node's credential store and never from a file, tried in order: an absent, expired or rejected "
+      "credential moves to the next, and a transient failure, such as a contended OAuth refresh, relaunches on the same "
+      "credential under its own cap, outside the act's resume attempts, before it moves on; the owner's AP-14, and the "
+      "answers fold's closing review; never set by a preset | dWellOiledMachine |", "act-auth row")
+
+# --- v2's chain.
+old, stage, parents, cl, gaps = chain_row("dSafePassage")
+FLOOR_OLD = ("the interpreter floor raised to Python 3.15 as the step kind's first step (AP-31): declared once and read "
+             "from there by every reader, its up a preflight refusing an interpreter below the floor and naming the "
+             "install command as `platforms.provision` says, its down restoring the old declaration, walked by the "
+             "release-0 fixture, and the PEP 701 text ban in `merge-rows.test.sh` retired, since the floor admits the "
+             "syntax")
+if cl[-1] != FLOOR_OLD:
+    sys.exit("dSafePassage's floor clause changed")
+cl[-1] = ("the interpreter floor raised to Python 3.15 as the step kind's first step and the template a later raise "
+          "copies (AP-31): declared once and read from there by every reader, the resolver refusing an interpreter "
+          "below it, preferring a direct executable over an alias and naming the install command as "
+          "`platforms.provision` says, seen red on a planted below-floor interpreter, its up a preflight that refuses "
+          "the same way, its down restoring the old declaration and refusing while a tracked TOML file fails to parse "
+          "under the floor it restores, walked by the release-0 fixture, and the PEP 701 text ban in "
+          "`merge-rows.test.sh` retired in the same unit, since the resolver now refuses the interpreters it guarded "
+          "against")
+cl.append("gov's own executors at the floor in the landing that raises it: every job of "
+          "`.github/workflows/remote-ci.yml` that runs Python setting it up at the floor, read from its one declaration "
+          "and pinned by full commit sha, the floor's preflight as the bar's first step, and the floor step applied to "
+          "gov's own tree with its witness recorded, so gov is the first tree the step migrates (AP-30)")
+put(old, "dSafePassage", stage, parents, cl, gaps + ["gap-tool-12", "gap-tool-23"])
+
+old, stage, parents, cl, gaps = chain_row("dWitnessedBar")
+edit(cl, "the portability leg pack",
+     ", the shell-role ledger, and the resolver preferring a direct executable that meets the floor and refusing below "
+     "it with the install command `platforms.provision` names (P37, AP-31, AP-32)",
+     ", and the shell-role ledger, the resolver's own floor being dSafePassage's (P37, AP-31)")
+edit(cl, "one bash resolver in `tools/lib`", "replacing the seven copies of the loop over `bash.exe` and `bash`:",
+     "replacing every bare-bash launch site a query over tracked Python and JavaScript finds, the seven copies of the "
+     "loop over `bash.exe` and `bash` and the stop guard's `spawnSync('bash', …)` among them:")
+if "gap-tool-12" not in gaps:
+    sys.exit("dWitnessedBar no longer owns gap-tool-12")
+put(old, "dWitnessedBar", stage, parents, cl, [g for g in gaps if g != "gap-tool-12"])
+
+old, stage, parents, cl, gaps = chain_row("dWellOiledMachine")
+edit(cl, "the commit queue writing", "with `Gov-Session` written as `trace.identity` says (AP-8)",
+     "with `Gov-Session` written as `trace.identity` says, a `Gov-Session` trailer under `act-only` and an act-made "
+     "commit without one under `session` each refused, seen red (AP-8)")
+edit(cl, "preflight refusing a launch",
+     "the act's credential tried in `runtime.act-auth`'s order, a setup token and then the shared OAuth login by "
+     "default and an API key only when the owner adds it, each read from the node's credential store and never from "
+     "a file, with a transient-auth failure relaunching on the next in order (AP-14)",
+     "the act's credential tried in `runtime.act-auth`'s order, a setup token and then the shared OAuth login by "
+     "default and an API key last, only when the owner adds it, each read from the node's credential store and never "
+     "from a file, an absent, expired or rejected credential moving to the next and a transient failure relaunching on "
+     "the same credential under its own cap, outside the act's resume attempts, before it moves on, each class seen on "
+     "a planted node, and a list that is empty or puts api-key before another entry refused by the policy schema, seen "
+     "red (AP-14)")
+put(old, "dWellOiledMachine", stage, parents, cl, gaps)
+
+old, stage, parents, cl, gaps = chain_row("dDeclaredLoop")
+edit(cl, "the commit node and its kind", "mapped to `serves` `Gov-Act` to `made-by`", "mapped to `serves`, `Gov-Act` to `made-by`")
+put(old, "dDeclaredLoop", stage, parents, cl, gaps)
+
+# --- v2's [planned] (A's M3 and L1, B's L1).
+V.sub("Neither counts in a build's planned units, and neither's gaps join the register\n"
+      "until its trigger holds (`build/2026-10-18-build-PLAY-dClosedLoop-1-research-python-floor.md` sections 3 and 4).",
+      "Neither counts in a build's planned units. macOS's gaps join the register when its\n"
+      "trigger holds. pwsh-launch's measured gaps joined it under AP-33, as `gap-tool-20` and `gap-rt-32`, and only its\n"
+      "runner adapter waits (`build/2026-10-18-build-PLAY-dClosedLoop-1-research-python-floor.md` sections 3 and 4).",
+      "[planned] gaps")
+V.sub("- **macOS.** Trigger: a node registers darwin, or an adopter asks, and only after dWellOiledMachine dissolves\n"
+      "  `unattended/`, which holds most of the blockers.",
+      "- **macOS.** Trigger: a node registers darwin, and only after dWellOiledMachine dissolves `unattended/`,\n"
+      "  which holds most of the blockers.", "[planned] macOS trigger")
+V.insert_before("Revised: 2026-10-17, after the folds' closing review", f"""Revised: 2026-10-18, after the answers fold's closing review, run twice at the owner's word (`{COMPARED}`),
+seventeen defects, three high: dSafePassage's floor step takes the resolver's refusal below the floor, its preference
+for a direct executable and its install message, with `gap-tool-12`, so the PEP 701 ban retires in the unit that
+replaces it, and its down refuses a TOML file the floor it restores cannot parse; a seventh dSafePassage clause sets
+up gov's own remote CI at the floor and applies the step to gov's tree first, with `gap-tool-23`; `runtime.act-auth` is
+a non-empty list with api-key only last, and a transient failure relaunches on its own credential before the next; the
+commit-key leg refuses a `Gov-Session:` against `trace.identity`; dWitnessedBar's resolver replaces every bare-bash site
+a query finds, the stop guard's among them; and `[planned]` keeps the owner's macOS trigger.
+
+""", "revision note")
+
+# --- The memory plan's commits gate (A's M2).
+P.sub("- **commits:** a pushed commit an act made with no `Gov-Act:`; a `Gov-Act:` the binding does not hold; a planted\n"
+      "  `Gov-Item:` trailer read as anything but `serves`;",
+      "- **commits:** a pushed commit an act made with no `Gov-Act:`; a `Gov-Act:` the binding does not hold; a planted\n"
+      "  `Gov-Item:` trailer read as anything but `serves`; a `Gov-Session:` trailer under `trace.identity: act-only`; an\n"
+      "  act-made commit with no `Gov-Session:` under `session`;", "plan commits gate")
+
+# --- The gap register.
+REG = {
+    "gap-tool-20": "| gap-tool-20 | Tooling | MED | The bash resolver is copied, not shared: govkit's `resolve_bash`, "
+                   "`corpus_ids.py`'s copy and five more loops over `bash.exe` and `bash` search PATH only, so under a "
+                   "PATH without Git's bash they find none, and govkit's `resolve_shell_argv` then falls back to a bare "
+                   "`bash`, which Windows resolves to System32's WSL launcher under every launch shell. Tracked "
+                   "JavaScript spawns a bare `bash` at one site, the stop guard's liveness check "
+                   "(`tools/unattended/stop-guard.js:111`), which reaches the same launcher wherever System32 precedes "
+                   "Git's bash on PATH. | `research-python-floor.md` section 4; the away pass's `[folded-answers]`; "
+                   "`js_bare_bash.py` in the instruments record; "
+                   "`memory/gotchas/subprocess-resolves-a-different-shell.md` | — |",
+    "gap-tool-21": "| gap-tool-21 | Tooling | HIGH | The interpreter floor is tested nowhere: no node runs the declared "
+                   "floor, and a version-flagged parse accepts syntax the floor refuses. | `research-python-floor.md` "
+                   "section 2 | — |",
+    "gap-tool-22": "| gap-tool-22 | Tooling | MED | The interpreter floor is stated at 3.11 in five tracked files "
+                   "outside `memory/` and mentioned in two more, by `git grep -l '3\\.11' -- ':!memory'` at "
+                   "`fe3d09aba`, against the owner's 3.15 (AP-31), and raising it ships no upgrade step. | "
+                   "`research-python-floor.md` section 2; the query | — |",
+    "gap-maint-15": "| gap-maint-15 | Maintain | LOW | Nothing watches the interpreter floor's end of life: no record or "
+                    "reader takes the floor's end date, 2027-10 for today's 3.11 and 2031-10 for the owner's 3.15, so "
+                    "a raise is discovered rather than planned. | `research-python-floor.md` section 2, its "
+                    "end-of-life table | — |",
+}
+for key, new in REG.items():
+    old = [ln for ln in G.text.split("\n") if ln.startswith(f"| {key} |")]
+    if len(old) != 1:
+        sys.exit(f"register: {len(old)} rows for {key}")
+    G.sub(old[0], new, key)
+G.sub(REG["gap-tool-22"] + "\n", REG["gap-tool-22"] + "\n| gap-tool-23 | Tooling | MED | gov's own remote CI sets up no "
+      "Python: `.github/workflows/remote-ci.yml` runs `windows-latest` with no setup-python step, and its jobs take "
+      "whatever `resolve-python.sh` finds, so a raised floor reaches no runner. | the answers fold's closing review, run "
+      "A's M5 and run B's M1 | — |\n", "gap-tool-23")
+
+# --- The away-pass record's [folded-answers].
+A.sub("Python 3.15. gov runs it on itself first (AP-30).",
+      "Python 3.15, the template a later raise\n  copies. Its seventh puts gov's own executors at the floor in the same "
+      "landing and applies the step to gov's tree\n  first (AP-30).", "dSafePassage bullet")
+A.sub("With every reader at 3.15, `tomllib` reads TOML 1.1\n  everywhere and UTF-8 is the default encoding, so the "
+      "research's TOML 1.0 arm and its floor-raise template are not\n  built. The floor is declared once. dSafePassage's "
+      "step refuses an interpreter below it and names the install\n  command, dWitnessedBar's floor arm runs a real "
+      "interpreter at the floor, and dShippedRelease's emitted CI sets one\n  up.",
+      "With every reader at 3.15, `tomllib` reads TOML 1.1\n  everywhere and UTF-8 is the default encoding. The "
+      "research's TOML 1.0 arm is not built: the floor step's down\n  refuses while a tracked TOML file fails to parse "
+      "under the floor it restores, which covers the one way back to an\n  older reader, and the step itself is the "
+      "template a later raise copies. The floor is declared once. dSafePassage's\n  resolver refuses an interpreter "
+      "below it and names the install command, gov's own remote CI sets one up in the\n  same landing, dWitnessedBar's "
+      "floor arm runs a real interpreter at the floor, and dShippedRelease's emitted CI\n  sets one up for adopters.",
+      "floor bullet")
+A.sub("dWitnessedBar gains the shared resolver, which asks git where its bash is before\n  it searches PATH and refuses "
+      "rather than fall back to a bare `bash`,",
+      "dWitnessedBar gains the shared resolver, which replaces every bare-bash launch\n  site a query over Python and "
+      "JavaScript finds, asks git where its bash is before it searches PATH, and refuses\n  rather than fall back to a "
+      "bare `bash`,", "resolver bullet")
+A.sub("file, and a transient-auth failure moves to the next.",
+      "file. An absent, expired or rejected credential moves to the next, and a transient failure relaunches on the\n"
+      "  same credential under its own cap before it moves on.", "credential bullet")
+A.sub("- **The atlas** shows v2's `[planned]` in its chain view.", "- **The atlas** shows v2's `[planned]` in its records view.",
+      "atlas line")
+A.sub("**The chain after the answers,** recomputed", "**The chain after the answers, at `fe3d09aba`,** recomputed", "chain pin")
+js = out("js_bare_bash.out").replace("\n", "\n  ")
+A.sub("PATH bash resolves, and through seven copies of a resolver loop that search PATH only. The answer stands, and\n"
+      "  `gap-tool-20` states the class at that size.",
+      "PATH bash resolves, and through seven copies of a resolver loop that search PATH only. Tracked JavaScript holds\n"
+      "  one more site, the stop guard's, which reaches the launcher wherever System32 precedes Git's bash on PATH, as the\n"
+      f"  closing review's run B found:\n\n  {F}text\n  $ python js_bare_bash.py\n  {js}\n  {F}\n\n"
+      "  The answer stands, and `gap-tool-20` states the class at that size.", "AP-33 correction")
+A.sub("dSafePassage raises the floor before any later\n  build, so each may rely on 3.15.",
+      "dSafePassage raises the floor and its resolver\n  refuses below it before any later build, so each may rely on 3.15.",
+      "interpretation 5")
+A.sub("- AP-17's future plan counts in no build's units and adds no gap to the register until its trigger holds.",
+      "- AP-17's future plan counts in no build's units. macOS adds its gaps to the register when its trigger holds, and\n"
+      "  pwsh-launch's measured gaps are there already, under AP-33.", "interpretation 7")
+A.text = A.text.rstrip("\n") + f"""
+
+**The closing review,** run twice at the owner's word, found seventeen defects in this fold, three of them high, and
+every one is folded: `{COMPARED}` `[folded]`.
+"""
+A.done += 1
+
+# --- Four bug classes, each with its instance.
+WHERE = f"`memory/builds/dClosedLoop/{COMPARED}`"
+INSTANCES = {
+    "fold-text-is-unreviewed-surface": f"""It bit again in dClosedLoop's answers fold, 2026-10-18, reviewed twice ({WHERE}).
+Seven of its seventeen defects were the fold's own text saying more than its source: a credential rule the owner's words
+did not set, a trigger wider than the answer, a reason that failed on the floor step's down, a research edit count read
+as a declaration count, a correction drawn from a census of one language, an evidence sentence that measured another
+gap, and a separator lost inside an edited sentence. Run A alone found the one that was high.
+""",
+    "step-depends-on-a-later-build": f"""It bit again in the answers fold, 2026-10-18 ({WHERE}). dSafePassage, the chain's
+second build, raised the interpreter floor and retired the PEP 701 ban, while the resolver's refusal below the floor and
+gov's own CI interpreter sat on dWitnessedBar, 81 units later, and a sentence credited dSafePassage with the self-run
+that dShippedRelease's lander brings. Each now lands in dSafePassage itself.
+""",
+    "rule-stated-with-no-check-that-fails": f"""It bit again in the answers fold, 2026-10-18 ({WHERE}): the `Gov-Session:`
+trailer was to be written "as `trace.identity` says", and `runtime.act-auth` was to try api-key last, each with no check
+that could fail. Both now name planted arms, seen red once built.
+""",
+    "two-answers-to-one-question": f"""It bit again in the answers fold, 2026-10-18 ({WHERE}): v2's `[planned]` said the
+pwsh-launch plan's gaps would join the register when its trigger held, while the register already held them, filed the
+same day under AP-33.
+""",
+}
+for name, para in INSTANCES.items():
+    K[name].insert_before("\n## The fix\n", "\n" + para, f"{name} instance")
+
+# --- The comparison record: [summary], [fold], then [folded] after v2 is saved.
+C.text = C.text.rstrip("\n") + f"""
+
+## [summary] The two runs side by side
+
+{F}text
+$ python compare_rounds.py answers-fold-a.md answers-fold-b.md answers-reviews-compared.md session-log.md wf_663c6465-b15 wf_7b253e00-228
+{out("compare-answers.out")}
+{F}
+
+- **One run finds about two thirds of what two find.** Run A alone covers 11 of the 17 defects and run B 12, an
+  overlap of 0.35, below the layers' 0.49. Chapman's estimate leaves about four defects beyond both runs.
+- **A high defect slipped past one run.** `auth-transient-route`, the inverted credential rule, was found by run A
+  alone. Run B would have let it reach dWellOiledMachine's spec.
+- **Adjudication is again the noisier half.** Six of the nine refuted findings sit on a defect another finding
+  confirmed: run A's skeptics refuted three that run B's confirmed, run B's refuted one that run A's confirmed, and two
+  of run B's refutations sat beside its own confirmation.
+- **Most defects are the fold's own text.** Seven of the seventeen say more than their source, and four lean on a later
+  build. `[fold]` names the class each one is an instance of.
+
+## [fold] The fold plan
+
+| Defect | The fold | Left-shift |
+|---|---|---|
+| `auth-transient-route` | v2's catalogue row and dWellOiledMachine's preflight clause split the classes: an absent, expired or rejected credential moves to the next, and a transient failure relaunches on the same credential under its own cap, outside the act's resume attempts, before it moves on, each class seen on a planted node | `fold-text-is-unreviewed-surface`, an instance, and the planted arms |
+| `apikey-last-unstated` | the Allowed cell and the clause require a non-empty list with api-key only last, each refusal seen red on a planted policy file | `rule-stated-with-no-check-that-fails`, an instance, and the schema arms |
+| `pep701-ban-early` | the resolver's refusal below the floor, its preference for a direct executable and its install message move into dSafePassage's floor step, seen red on a planted below-floor interpreter, so the ban retires in the unit that replaces it, and `gap-tool-12` moves with them | `step-depends-on-a-later-build`, an instance |
+| `floor-reliance-unenforced` | the same move, and interpretation 5 restated | the same |
+| `remote-ci-floor` | a seventh dSafePassage clause sets up Python at the floor in every remote-CI job that runs it, pinned by full sha, with the floor's preflight as the bar's first step, and `gap-tool-21`'s remote-CI fact becomes `gap-tool-23`, owned by dSafePassage | the same |
+| `ap30-self-run` | the same clause applies the floor step to gov's own tree in its landing, its witness recorded | the same |
+| `toml-drop-reason` | the floor step's down refuses while a tracked TOML file fails to parse under the floor it restores, and the step is named the template a later raise copies | `fold-text-is-unreviewed-surface`, an instance |
+| `floor-file-count` | `gap-tool-22` counts the five files that state the floor and the two that mention it, with the query | the same |
+| `bash-census-js` | the census covers JavaScript, one site, the stop guard's, and `gap-tool-20`, the AP-33 correction and dWitnessedBar's resolver clause name every bare-bash launch site a query finds | the same |
+| `gov-session-unchecked` | the plan's commits gate and dWellOiledMachine's commit-key leg refuse a `Gov-Session:` under `act-only` and a missing one under `session`, each seen red | `rule-stated-with-no-check-that-fails`, an instance |
+| `macos-trigger-widened` | the trigger is the owner's: a node registers darwin | `fold-text-is-unreviewed-surface`, an instance |
+| `planned-gaps-deferred` | `[planned]` and interpretation 7 say pwsh-launch's measured gaps joined under AP-33 | `two-answers-to-one-question`, an instance |
+| `separator-lost` | restored | `fold-text-is-unreviewed-surface`, an instance |
+| `eol-gap-evidence` | `gap-maint-15` measures the floor's end date | the same |
+| `final-stale` | the recorder re-runs `[final]` over the record it writes until two passes agree, and refuses after four | the fixed point is the gate |
+| `atlas-decision-guard` | the atlas refuses a decision-titled section in an instruments record | the refusal, planted as `instruments-decision` |
+| `planned-view-unrendered` | `[planned]` maps to the records view, and a section mapped to any other view must be one the derivation reads | the read guard, planted as `view-unread` |
+"""
+C.done += 2
+
+for rec in (V, P, G, A, *K.values()):
+    rec.save()
+
+cp = subprocess.run([sys.executable, "-X", "utf8", str(S / "order/critical_path.py")], capture_output=True, text=True,
+                    check=True).stdout.replace("\r\n", "\n").strip()
+if not cp.startswith("critical path: 196 units, dGroundRules > dSafePassage > dOrderedCharter"):
+    sys.exit(f"the critical path moved: {cp[:120]}")
+C.text = C.text.rstrip("\n") + f"""
+
+## [folded] Every defect folded, 2026-10-18
+
+All seventeen are folded as `[fold]` plans, in one commit:
+- **v2:** the catalogue's `runtime.act-auth` row; dSafePassage's floor clause and its seventh clause, with
+  `gap-tool-12` and `gap-tool-23`; dWitnessedBar's portability and resolver clauses, less `gap-tool-12`;
+  dWellOiledMachine's commit-queue and preflight clauses; dDeclaredLoop's commit-node clause; `[planned]`; and a
+  revision note.
+- **The memory plan:** the commits gate's two `Gov-Session:` arms.
+- **The gap register:** `gap-tool-20`, `gap-tool-21`, `gap-tool-22` and `gap-maint-15` restated, `gap-tool-23` added,
+  and the tally re-measured.
+- **The away-pass record:** `[folded-answers]`' floor, credential, resolver and atlas lines, the AP-33 correction with
+  the JavaScript census, interpretations 5 and 7, and a pointer here.
+- **Four bug classes** carry the instances, and `gotchas.py --write` re-renders their index.
+- **The atlas** maps `[planned]` to its records view and refuses both misreadings, and **the recorder** writes
+  `[final]` to a fixed point. The instruments record's `[plants]` shows each new plant red.
+
+The chain, recomputed:
+
+{F}text
+{cp}
+{F}
+
+dSafePassage's seventh unit lengthens the path by one.
+"""
+C.done += 1
+C.save()
+
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-18, session 1799cb98: the answers fold's closing review ran twice at the owner's word, dispatches 114 and
+  115, each CLEAN WITH FIXES. Compared defect by defect (`{COMPARED}`), the two runs found seventeen defects, three
+  high, one of them by run A alone, and all are folded: the floor's enforcement and gov's own CI move into
+  dSafePassage, the credential rule splits its classes, and the atlas and the recorder gain gates. The critical path is
+  196 units.
+""", "event")
+L.save()
+
+tally = subprocess.run(["awk", "-F|", "-f", str(S / "away" / "tally.awk"), str(G.path)], capture_output=True, text=True,
+                       check=True).stdout.replace("\r\n", "\n").strip("\n").split("\n")
+counts = [ln.rstrip() for ln in tally]
+total = sum(int(kv.split("=")[1]) for kv in counts[0].split())
+G.text = G.text.rstrip("\n") + f"""
+
+Re-measured after the answers fold's closing review added `gap-tool-23` and restated `gap-tool-20`, `gap-tool-21`,
+`gap-tool-22` and `gap-maint-15` (`{COMPARED}` `[folded]`), and moved `gap-tool-12` to dSafePassage, same instrument,
+over {total} keys:
+
+{F}text
+{counts[0]}
+{counts[1]}
+{F}
+"""
+G.done += 1
+G.save()
+print(f"register: {total} gaps; {cp.splitlines()[0]}")
+````
+
 ### `fence_probe.py`
 
 A refuted hypothesis, kept: the instruments record read as a design round after the fold, and the atlas's toggle-on-any-fence reading was suspected. Against a length-aware reading it differs on no record, so the cause was a section title the decision pattern took, since retitled.
@@ -8796,6 +9441,14 @@ MINE = [
     ("away/fold_answers_record.py", "Writes the answers into the away-pass record: dispatch 113, `[answers]`, "
      "`[folded-answers]` and the summaries the answers made wrong."),
     ("away/log_answers.py", "The session log's dispatch 113 row, its agent lines and the fold's event."),
+    ("away/build_args_answers.py", "The args of the answers fold's closing review, run twice: runs A and B differ "
+     "only in the run label, the report path and the scratch path."),
+    ("away/log_reviews.py", "The session log's dispatch 114 and 115 rows and the two runs' agent lines."),
+    ("away/js_bare_bash.py", "Run B's M2, measured: tracked JavaScript that spawns a bare `bash`."),
+    ("away/write_compare.py", "Writes the comparison record's [runs], [method] and [map], and runs "
+     "`compare_rounds.py` over it."),
+    ("away/fold_review_answers.py", "Folds the seventeen defects of the answers fold's closing review into v2, the "
+     "memory plan, the gap register, the away-pass record, four bug classes and the comparison record."),
     ("away/fence_probe.py", "A refuted hypothesis, kept: the instruments record read as a design round after the fold, "
      "and the atlas's toggle-on-any-fence reading was suspected. Against a length-aware reading it differs on no "
      "record, so the cause was a section title the decision pattern took, since retitled."),
@@ -8947,7 +9600,8 @@ for p in ("no-layer", "fates-absent", "fates-drop", "fates-ghost", "fates-bad", 
         sys.exit("plant chain-echo redded without the chain-echo finding")
 # The atlas's memory-view plants (the away pass's closing review): each must stop the run with its own refusal.
 WANT = {"kind-unplaced": "carries no marker", "kind-ghost-tag": "resolving to no item", "edge-status": "status 'nwe'",
-        "hop-edge": "answered-by-typo", "edges-split": "a split table drops rows"}
+        "hop-edge": "answered-by-typo", "edges-split": "a split table drops rows",
+        "instruments-decision": "is an instruments record", "view-unread": "map to a view that reads none"}
 for p, want in WANT.items():
     out, rc = run(B + "2026-10-16-build-PLAY-dClosedLoop-1-atlas.py", "--check", "--plant", p)
     plants.append(f"$ python atlas.py --check --plant {p}\n{out}\nrc {rc}")
@@ -8957,38 +9611,62 @@ parts.append("""
 ## [plants] The map's and the atlas's plants, re-run
 
 """ + block("text", "\n".join(plants)))
-final = []
-for label, args in (("design map", [B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py", "--check"]),
-                    ("atlas", [B + "2026-10-16-build-PLAY-dClosedLoop-1-atlas.py", "--check"]),
-                    ("fold state", [str(S / "night/fold_state.py")]),
-                    ("reconciliation probe", [B + "2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py",
-                                              B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md"]),
-                    ("clause scan", [str(S / "walk/paren_semis.py")]),
-                    ("gap join", [str(S / "join_canonical.py"), B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md",
-                                  B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"]),
-                    ("preset check", [str(S / "preset_check_canonical.py"),
-                                      B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"]),
-                    ("critical path", [str(S / "order/critical_path.py")])):
-    out, rc = run(*args)
-    if rc != 0:
-        sys.exit(f"{label} is red: {out[-400:]}")
-    final.append(f"$ {label}\n{out}\nrc {rc}")
-parts.append("""
-## [final] Every check, re-run at the commit
+FINAL = (("design map", [B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py", "--check"]),
+         ("atlas", [B + "2026-10-16-build-PLAY-dClosedLoop-1-atlas.py", "--check"]),
+         ("fold state", [str(S / "night/fold_state.py")]),
+         ("reconciliation probe", [B + "2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py",
+                                   B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md"]),
+         ("clause scan", [str(S / "walk/paren_semis.py")]),
+         ("gap join", [str(S / "join_canonical.py"), B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md",
+                       B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"]),
+         ("preset check", [str(S / "preset_check_canonical.py"),
+                           B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"]),
+         ("critical path", [str(S / "order/critical_path.py")]))
 
-""" + block("text", "\n\n".join(final)))
-parts.append("""
+
+def run_final():
+    final = []
+    for label, args in FINAL:
+        out, rc = run(*args)
+        if rc != 0:
+            sys.exit(f"{label} is red: {out[-400:]}")
+        final.append(f"$ {label}\n{out}\nrc {rc}")
+    return final
+
+
+probes = ["""
 ## [probes] The researchers' probes
 
 Each researcher wrote its probes to the scratchpad and ran them read-only. They are kept here whole. Dispatch 101 re-ran
 aScoutedSeam's committed grader on copies of that branch's files, which stay on the branch,
 `origin/branch/deterministic-reuse-workflows-f70c33`. Dispatches 100 and 104 measured with inline commands, which their
 returns show.
-""")
-for rel, who in PROBES:
-    parts.append(f"### `{pathlib.Path(rel).name}`, {who}\n\n" + block(LANG[pathlib.Path(rel).suffix], read(S / rel)))
-OUT.write_text("\n".join(parts), encoding="utf-8", newline="\n")
-print(f"wrote {OUT}: {OUT.stat().st_size} bytes")
+"""] + [f"### `{pathlib.Path(rel).name}`, {who}\n\n" + block(LANG[pathlib.Path(rel).suffix], read(S / rel))
+        for rel, who in PROBES]
+
+
+def assemble(final):
+    return "\n".join(parts + ["""
+## [final] Every check, re-run on the record as written
+
+Each check runs again over the tree with this record written into it, until two passes print the same: one pass
+reported the tree as it stood before the record changed (the answers fold's closing review, run A's M1 and run B's M7).
+
+""" + block("text", "\n\n".join(final))] + probes)
+
+
+# [final] reports the tree this record is written into, so the record is rewritten until a pass over it prints what
+# the pass before printed, and a run that never settles is refused.
+seen = None
+for attempt in range(4):
+    final = run_final()
+    if final == seen:
+        break
+    OUT.write_text(assemble(final), encoding="utf-8", newline="\n")
+    seen = final
+else:
+    sys.exit("[final] did not settle in four passes")
+print(f"wrote {OUT}: {OUT.stat().st_size} bytes, [final] settled on pass {attempt + 1}")
 ````
 
 ## [inline] The inline edits, as run
@@ -9251,11 +9929,11 @@ H2's measurement, re-run on the folded tree. The first fold read 47 mentions ove
 ````text
 $ python plain_cites.py
 plan                     7  dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's), dLinkedLibrary (dRankedPlan's) …
-landing                  5  dGroundRules (dShippedRelease's), dOrderedCharter (dShippedRelease's), dKeptSession (dShippedRelease's), dWellOiledMachine (dShippedRelease's), dCalibratedLens (dShippedRelease's)
+landing                  6  dGroundRules (dShippedRelease's), dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dKeptSession (dShippedRelease's), dWellOiledMachine (dShippedRelease's), dCalibratedLens (dShippedRelease's)
 scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
+seen red                 4  dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dKeptSession (dWitnessedBar's)
 code                     4  dSafePassage (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
 witness                  4  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dBoundRoles (dTotalRecall's)
-seen red                 3  dGroundRules (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dKeptSession (dWitnessedBar's)
 registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
 return                   3  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's)
 intake                   3  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
@@ -9285,7 +9963,7 @@ value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
 decision                 1  dWellOiledMachine (dLinkedLibrary's)
 census                   1  dWitnessedBar (dLinkedLibrary's)
-plain-word hits on a non-ancestor's record kind: 72, over 35 kinds
+plain-word hits on a non-ancestor's record kind: 74, over 35 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -9745,10 +10423,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:662 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:672 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:662 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:672 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -9780,20 +10458,29 @@ rc 1
 $ python atlas.py --check --plant edges-split
 atlas: memory-plan [edges] holds 24 row lines but its table parsed 1: a split table drops rows
 rc 1
+$ python atlas.py --check --plant instruments-decision
+atlas: night-pass-instruments is an instruments record, yet its section 'The owner's answers, folded' reads as a decision; an instruments record holds scripts and runs, so retitle the section
+rc 1
+$ python atlas.py --check --plant view-unread
+atlas: v2's sections ['planned'] map to a view that reads none of them; map them to records or render them
+rc 1
 ````
 
 
-## [final] Every check, re-run at the commit
+## [final] Every check, re-run on the record as written
+
+Each check runs again over the tree with this record written into it, until two passes print the same: one pass
+reported the tree as it stood before the record changed (the answers fold's closing review, run A's M1 and run B's M7).
 
 ````text
 $ design map
-map: 2373 nodes in 30 namespaces; 30877 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1605, derived 277, pending 491
-map: no stale facts read 51 records and 21 quotes of a map count or the critical path
+map: 2376 nodes in 30 namespaces; 30799 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1608, derived 277, pending 491
+map: no stale facts read 52 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 167 records, 2869 sections, 190 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 170 records, 2908 sections, 189 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -9812,7 +10499,7 @@ rc 0
 
 $ reconciliation probe
 chain rows 21 · owned nodes read 446 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 72 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 74 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
@@ -9844,7 +10531,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 301 · chain builds 21
+register keys 302 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -9857,8 +10544,8 @@ no findings
 rc 0
 
 $ critical path
-critical path: 195 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dSafePassage 14, dFairHearing 26, dOrderedCharter 45, dDeclaredLoop 68, dPlacedRequest 76, dKeptSession 95, dWitnessedBar 95, dBoundRoles 112, dTotalRecall 114, dRankedPlan 127, dFurnishedOrders 130, dLinkedLibrary 138, dIndexedDesign 150, dWellOiledMachine 151, dScopedBuild 162, dTendedCadence 167, dMindYourWords 168, dShippedRelease 176, dCalibratedLens 179, dConvergedCharter 195
+critical path: 196 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dSafePassage 15, dFairHearing 27, dOrderedCharter 46, dDeclaredLoop 69, dPlacedRequest 77, dKeptSession 96, dWitnessedBar 96, dBoundRoles 113, dTotalRecall 115, dRankedPlan 128, dFurnishedOrders 131, dLinkedLibrary 139, dIndexedDesign 151, dWellOiledMachine 152, dScopedBuild 163, dTendedCadence 168, dMindYourWords 169, dShippedRelease 177, dCalibratedLens 180, dConvergedCharter 196
 rc 0
 ````
 

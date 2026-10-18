@@ -48,6 +48,12 @@ A range excludes its base, so that review read none of the fold, and no record n
 probe that found it found two more unreviewed folds and three designs no review had read
 (`memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-state.md` `[unreviewed]`).
 
+It bit again in dClosedLoop's answers fold, 2026-10-18, reviewed twice (`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-answers-reviews-compared.md`).
+Seven of its seventeen defects were the fold's own text saying more than its source: a credential rule the owner's words
+did not set, a trigger wider than the answer, a reason that failed on the floor step's down, a research edit count read
+as a declaration count, a correction drawn from a census of one language, an evidence sentence that measured another
+gap, and a separator lost inside an edited sentence. Run A alone found the one that was high.
+
 ## The fix
 
 **No machine gate**, and this is a documented check rather than an unwritten one. Nothing static can

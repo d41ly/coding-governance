@@ -24,6 +24,10 @@ The expansion round, 2026-10-16:
 - P28 gained EX-1's rule that expansions meet only through the core, and no check in the chain could
   fail on one expansion using a point another declares (review B's M18).
 
+It bit again in the answers fold, 2026-10-18 (`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-answers-reviews-compared.md`): the `Gov-Session:`
+trailer was to be written "as `trace.identity` says", and `runtime.act-auth` was to try api-key last, each with no check
+that could fail. Both now name planted arms, seen red once built.
+
 ## The fix
 
 - A rule lands with the check that fails on its breach, named in the same commit: a pair rule in the

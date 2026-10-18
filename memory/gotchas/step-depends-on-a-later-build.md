@@ -34,6 +34,11 @@ It bit again in dClosedLoop's night pass, 2026-10-18
 clauses named a later build's playbook kind, tester role, experiment shape or announcement in plain words. The
 hardened reconciliation probe read green, because its cites rule reads only backticked tokens.
 
+It bit again in the answers fold, 2026-10-18 (`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-answers-reviews-compared.md`). dSafePassage, the chain's
+second build, raised the interpreter floor and retired the PEP 701 ban, while the resolver's refusal below the floor and
+gov's own CI interpreter sat on dWitnessedBar, 81 units later, and a sentence credited dSafePassage with the self-run
+that dShippedRelease's lander brings. Each now lands in dSafePassage itself.
+
 ## The fix
 
 - Check every kind of dependency, not only citations:

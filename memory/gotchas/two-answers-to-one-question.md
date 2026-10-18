@@ -25,6 +25,10 @@ Python side still excluded left a file under no cap at all.
 Here, `tools/memory-tree/SPEC-TEMPLATE.template.md` described a nine-section canon while the
 installed copy and the gate had required ten for four days. Nothing connected them.
 
+It bit again in the answers fold, 2026-10-18 (`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-answers-reviews-compared.md`): v2's `[planned]` said the
+pwsh-launch plan's gaps would join the register when its trigger held, while the register already held them, filed the
+same day under AP-33.
+
 ## The fix
 
 Ask, do not copy. `tools/memory-tree/check-memory-hygiene.sh` owns the append-only set and the index
