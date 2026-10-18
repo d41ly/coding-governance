@@ -29,6 +29,11 @@ loop's C1 (`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-
 
 The build-order review and the ancestor probe both read green over all three.
 
+It bit again in dClosedLoop's night pass, 2026-10-18
+(`memory/builds/dClosedLoop/reviews/2026-10-18-review-PLAY-dClosedLoop-1-night-pass-closing.md`, H2). Five new
+clauses named a later build's playbook kind, tester role, experiment shape or announcement in plain words. The
+hardened reconciliation probe read green, because its cites rule reads only backticked tokens.
+
 ## The fix
 
 - Check every kind of dependency, not only citations:
@@ -38,3 +43,7 @@ The build-order review and the ancestor probe both read green over all three.
   - a key an item's cells name is owned by the item's owner or an ancestor of it.
 - See the check red on today's tree before the fix, and red again on a planted dropped edge after it.
 - Fix by moving the mechanism to an ancestor, by adding the edge, or by declaring a tolerance the check reads.
+- Cite a dependency on another build's node backticked, so the check can read it. Widening the check to plain words
+  was measured at 47 hits over 27 record kinds, mostly homonyms such as "landing" and "scope", so the check prints
+  that count as unread instead of reading it. Roles, shapes and commands are not owned nodes. A clause that rests on
+  one states its stand-in until that build lands.

@@ -173,8 +173,10 @@ class with no citation, is a finding.
 
 Since the design audit's fold, 2026-10-18, the table classes every dependency kind the reconciliation probe reads:
 cites, stage, routes, reads and registers. Each row is matched on its owner too, and its class must be one of
-tolerance, homonym, not a use and moved. That probe is the order's gate
-(`build/2026-10-18-build-PLAY-dClosedLoop-1-audit-fold.md` `[instrument]`). The citations-only probe below is
+tolerance, homonym, not a use and moved. That probe is the order's gate, kept as one committed script,
+`build/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py`, which also checks each routed disposition's transition row (the
+night pass's closing review, M7 and H1). Its copies in the audit fold's `[review-instrument]` and the night pass's
+instruments record are snapshots. The citations-only probe below is
 superseded: re-run on the committed tree, it reds on the routes row it cannot read (FM5).
 
 | Row | Node | Owner | Class | Why |
@@ -191,6 +193,7 @@ superseded: re-run on the committed tree, it reds on the routes row it cannot re
 | dBoundRoles | `feature` | dTotalRecall | tolerance | the work order selects by `feature.*` only once dTotalRecall arms that selector, and its code-notes and `code` slots render "not installed" until dTotalRecall lands, as the `map` slot does (night pass, point 4) |
 | dBoundRoles | `code` | dTotalRecall | tolerance | the work order's `code` slot renders "not installed" until dTotalRecall's `code` record lands, as the `map` slot does (night pass, point 3) |
 | dOrderedCharter | `code` | dTotalRecall | not a use | each role's load set budgets the `code` slot's bytes, and never reads the record (night pass, point 3) |
+| dDeclaredLoop | `playbook` | dIndexedDesign | tolerance | the `repeat` disposition files an ask until dIndexedDesign lands the playbook record kind (the night pass's closing review, H2) |
 | dTotalRecall | `roster` | dIndexedDesign | homonym | the build README's derived `roster` front-matter field, not the roster record kind `design.decompose` writes (PM-12) |
 | dFairHearing | `review.trigger` | dDeclaredLoop | not a use | the harness takes the `preset` argument Design's breakpoint passes (RV-1); the breakpoint calls the harness, never the reverse (AF-1) |
 | dDeclaredLoop | `run.on-owner-question` | dBoundRoles | tolerance | the owner gate holds for the owner's disposition until dBoundRoles lands the key, and never reads it for a ratification (AF-1) |

@@ -8,8 +8,9 @@ Usage:
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --ns <namespace>   print one namespace whole (level 1)
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --check            derive and check; write nothing
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --check --plant <case>   damage the render, expect exit 1
-      cases: drop-line, bad-count, ghost-rel, no-layer, fates-drop, fates-ghost, fates-bad, fates-unbuilt,
-      fates-empty, fates-kit, census, no-owner, orphan (an item's owner emptied), two-owners,
+      cases: drop-line, bad-count, ghost-rel, no-layer, fates-absent, fates-drop, fates-ghost, fates-bad, fates-unbuilt,
+      fates-empty, fates-kit, fates-kit-drop, fates-kit-ghost, fates-count, fates-absorbed-stays, fates-bare-none,
+      fates-rel, fates-none, census, no-owner, orphan (an item's owner emptied), two-owners,
       inferred (a point's owner kept with its declaration dropped)
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --pending          list the nodes whose purpose waits on the owner
   --unfold <ns>[,<ns>...] renders those namespaces node by node, as an item's declared unfolds would.
@@ -42,8 +43,10 @@ DECLARED = set()
 # Kits whose row in the instruction layer's kits table says "no layer"; every other kit joins a layer (the layer arm).
 NO_LAYER = set()
 # The fates record (night pass, point 8): each kit's declared fate, and every part's row, read for the fates arms.
-FATES = HERE / "2026-10-18-build-PLAY-dClosedLoop-1-fates.md"
-FATE_KITS, FATE_ROWS = {}, []
+# Resolved by name through the atlas's record lookup, which exits when no record or two carry it (the closing review's
+# H3 and M8): a renamed, re-dated or moved record fails hard, never switching the fates arms off.
+FATES = "fates"
+FATE_KITS, FATE_ROWS, FATE_COUNTS = {}, [], []
 FATE_KIT_SET = {"kept", "optional", "absorbed", "retired"}
 FATE_ROW_SET = {"STAYS", "RESHAPED", "MERGED", "RETIRED"}
 FATE_PSEUDO = {"top-level", "skills", ".githooks", "guides"}
@@ -232,20 +235,18 @@ def derive():
             fact = re.search(r"tools/" + re.escape(k) + r"/ — ([^.;]+)", text("AGENTS.md"))
             purpose = fact.group(1) if fact else ""
         kits.append(node(k, purpose, src="derived", rels=[("layer", [l for l in kit_layer.get(k, []) if l in layer_tags])]))
-    if FATES.exists():
-        body = FATES.read_text(encoding="utf-8")
-        for tag, width, sink in (("kits", 3, "kits"), ("table", 6, "rows")):
-            _, block = section(body, tag)
-            for ln in block.split("\n"):
-                c = atlas.cells(ln) if ln.startswith("| ") else []
-                if len(c) == width and c[0] != "Kit" and not set(c[0]) <= set("-"):
-                    if sink == "kits":
-                        FATE_KITS[c[0]] = c[1]
-                    else:
-                        FATE_ROWS.append(c)
-        for n in kits:
-            if n["key"] in FATE_KITS:
-                n["rels"].append(("fate", [FATE_KITS[n["key"]]]))
+    # The fates record's two tables, read through the atlas's table reader, which stops the run on a row of the wrong
+    # width (M14), and the counts its [table] lead-in states, which the count arm compares with the rows.
+    body = atlas.record(FATES).read_text(encoding="utf-8")
+    _, kits_block = section(body, "kits")
+    FATE_KITS.update({c[0]: c[1] for c in atlas.table(kits_block, "Kit", "fates [kits]")})
+    _, rows_block = section(body, "table")
+    FATE_ROWS.extend(atlas.table(rows_block, "Kit", "fates [table]"))
+    stated = re.search(r"Counts: (\d+) stay,\s+(\d+) reshaped,\s+(\d+) merged and (\d+) retired, over (\d+) rows", rows_block)
+    FATE_COUNTS.extend(int(x) for x in stated.groups()) if stated else None
+    for n in kits:
+        if n["key"] in FATE_KITS:
+            n["rels"].append(("fate", [FATE_KITS[n["key"]]]))
     ns["kit"] = kits
 
     live = text("memory/LIVE.md")
@@ -545,9 +546,6 @@ def check(A, ns, out, folded, plant=None):
     elif plant == "ghost-rel":
         i = next(i for i, ln in enumerate(lines) if ln.startswith("- chain."))
         lines[i] += " owner=dGhostBuild"
-    elif plant == "no-layer":
-        i = next(i for i, ln in enumerate(lines) if ln.startswith("- kit.") and " layer=" in ln)
-        lines[i] = re.sub(r" · layer=\S+", "", lines[i])
     seen, counts = {}, {}
     for ln in lines[2:]:
         if not ln.strip():
@@ -600,9 +598,12 @@ def check(A, ns, out, folded, plant=None):
         if a_set != m_set:
             findings.append(f"parity: {kind} on the map and not in the atlas {sorted(m_set - a_set)[:6]}, "
                             f"in the atlas and not on the map {sorted(a_set - m_set)[:6]}")
-    # Fates: every kit has a declared fate and rows, every row a known kit, a fate in its set and a destination.
-    if FATE_KITS or FATE_ROWS:
+    # Fates: every kit has a declared fate and rows, every row a known kit, a fate in its set and a destination, the
+    # rows match the counts the record states, and no STAYS part sits in a kit that goes. The record is read hard in
+    # derive(), so an absent one never reaches here (H3).
+    if True:
         rows_, kits_ = [list(r) for r in FATE_ROWS], dict(FATE_KITS)
+        fate_rel = {n["key"]: next((v[0] for k, v in n["rels"] if k == "fate"), None) for n in ns["kit"]}
         if plant == "fates-drop":
             rows_ = [r for r in rows_ if r[0] != rows_[0][0]]
         elif plant == "fates-ghost":
@@ -617,6 +618,24 @@ def check(A, ns, out, folded, plant=None):
             rows_[i][4] = ""
         elif plant == "fates-kit":
             kits_[next(iter(kits_))] = "maybe"
+        elif plant == "fates-kit-drop":
+            kits_.pop(next(iter(kits_)))
+        elif plant == "fates-kit-ghost":
+            kits_["ghostkit"] = "kept"
+        elif plant == "fates-count":
+            rows_[next(i for i, r in enumerate(rows_) if r[3] == "STAYS")][3] = "RESHAPED"
+        elif plant == "fates-absorbed-stays":
+            k = next(k for k, f in kits_.items() if f == "absorbed")
+            rows_[next(i for i, r in enumerate(rows_) if r[0] == k)][3] = "STAYS"
+        elif plant == "fates-bare-none":
+            rows_[next(i for i, r in enumerate(rows_) if r[3] == "RETIRED")][4] = "none"
+        elif plant == "fates-rel":
+            k = next(iter(fate_rel))
+            fate_rel[k] = "retired" if fate_rel[k] != "retired" else "kept"
+        elif plant == "fates-none":
+            rows_, kits_ = [], {}
+        if not rows_ or not kits_:
+            findings.append("fates: the record's [kits] or [table] holds no row")
         kitkeys, chainkeys = {n["key"] for n in ns["kit"]}, {n["key"] for n in ns["chain"]}
         for k in sorted(kitkeys):
             if k not in kits_:
@@ -635,13 +654,26 @@ def check(A, ns, out, folded, plant=None):
                 findings.append(f"fates: {r[0]} · {r[1]} has the fate {r[3]}, outside the set")
             elif r[3] != "RETIRED" and not set(re.findall(r"\bd[A-Z]\w+", r[4])) & chainkeys:
                 findings.append(f"fates: {r[0]} · {r[1]} names no chain build where it goes")
-            elif r[3] == "RETIRED" and not r[4].strip():
-                findings.append(f"fates: {r[0]} · {r[1]} retires with no replacement named")
-    # Layer: every kit line joins a layer, unless its kits-table row says "no layer" (dispatch 104 found all 19 empty).
-    for ln in lines[2:]:
-        m = LINE.match(ln)
-        if m and m.group(1) == "kit" and m.group(2) not in NO_LAYER and " layer=" not in ln:
-            findings.append(f"layer: kit.{m.group(2)} joins no layer")
+            elif r[3] == "RETIRED" and r[4].strip().rstrip(".").lower() in ("", "none"):
+                findings.append(f"fates: {r[0]} · {r[1]} retires naming neither a replacement nor a reason")
+            if r[3] == "STAYS" and kits_.get(r[0]) in ("absorbed", "retired"):
+                findings.append(f"fates: {r[0]} · {r[1]} stays, yet its kit is {kits_[r[0]]}")
+        counted = [sum(r[3] == f for r in rows_) for f in ("STAYS", "RESHAPED", "MERGED", "RETIRED")] + [len(rows_)]
+        if counted != FATE_COUNTS:
+            findings.append(f"fates: the rows count {counted}, and the record states {FATE_COUNTS or 'no counts'}")
+        for k, f in sorted(fate_rel.items()):
+            if f != kits_.get(k):
+                findings.append(f"fates: kit.{k} carries fate={f}, and [kits] says {kits_.get(k)}")
+    # Layer: every kit node joins a layer, unless its kits-table row says "no layer" (dispatch 104 found all 19 empty).
+    # It reads the derived nodes, so a folded kit namespace still checks (the closing review's L6), and it does not
+    # check that the layer is the right one.
+    kit_nodes = [dict(n, rels=list(n["rels"])) for n in ns["kit"]]
+    if plant == "no-layer":
+        i = next(i for i, n in enumerate(kit_nodes) if any(k == "layer" and v for k, v in n["rels"]))
+        kit_nodes[i]["rels"] = [r for r in kit_nodes[i]["rels"] if r[0] != "layer"]
+    for n in kit_nodes:
+        if n["key"] not in NO_LAYER and not any(k == "layer" and v for k, v in n["rels"]):
+            findings.append(f"layer: kit.{n['key']} joins no layer")
     if any(re.search(r"\b20\d\d-\d\d-\d\d\b", ln) for ln in lines[2:]):
         findings.append("no stale facts: a line holds a date")
     # Owner: every node a build must build names exactly one chain build, read from a declared field (PM-8).
@@ -661,8 +693,11 @@ def check(A, ns, out, folded, plant=None):
 
 
 def main(argv):
+    global FATES
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
+    if "--plant" in argv and argv[argv.index("--plant") + 1] == "fates-absent":
+        FATES = "fates-absent-plant"   # no record carries this name, so derive() must exit non-zero
     A, ns = derive()
     unfold = ()
     if "--unfold" in argv:
@@ -690,7 +725,8 @@ def main(argv):
     elif plant == "inferred":
         DECLARED.discard(("point", ns["point"][0]["key"]))
     findings = check(A, ns, out, folded, plant)
-    size = len(out.encode("utf-8"))
+    # The printed size leaves out the head line's dirty marker, so a recorded figure reproduces on a clean tree (L7).
+    size = len(re.sub(r"^(map \S+) dirty", r"\1", out, count=1).encode("utf-8"))
     src = {}
     for name, _ in REGISTRY:
         for n in ns.get(name) or []:

@@ -77,7 +77,8 @@ directly. Each handoff is in `prompts/`, and each return is saved verbatim besid
    - P4, P20 and P25 now say so.
 2. **Attendance is one switch, and only an interaction switch.**
    - `attendance` is `unattended` by default, in the owner's words. It is set in the policy file, or by an attend
-     request, which writes an `override` record scoped by `attendance.scope`.
+     request, which writes an `attendance override` record scoped by `attendance.scope` (its own kind, after the
+     closing review's M13).
    - While the owner attends, gov announces each act's step and role, confirms at the breakpoints the value
      places, and asks owner questions live.
    - The attendance rule's arm refuses any value that changes an item's actor, the driver or a binding
@@ -89,8 +90,9 @@ directly. Each handoff is in `prompts/`, and each return is saved verbatim besid
        swaps an item's actor.
 3. **One driver, bound the same way in every mode.**
    - The supervisor drives every build, and the owner's session is its client.
-   - Until dWellOiledMachine lands, the owner's session hosts the same driver program, bound as an act session
-     (NP-1).
+   - The owner's session hosts the driver only until dWellOiledMachine lands, or if its platform spike fails. It
+     keeps its owner binding, and each role act it hosts is act-bound with that act's epoch (NP-1; the closing
+     review's M6).
    - The platform spike is its owed test (v2 `[owed]`).
 4. **The announcement.** Before each act while attended, and once when attendance begins, gov prints
    `step — <build> · <step> · <item> · <role> · <why> · writes <set>`. It is rendered from `next` and the item's
@@ -157,6 +159,14 @@ What it could not do:
      capture adapter.
    - The witness is a set of deterministic DOM, console and layout assertions, re-runnable at the pinned SHA.
 8. **The tester agent** is defined by dBoundRoles. Every role's return template gains the `probe` outcome.
+9. **Stand-ins until the later builds land,** declared in `[probe]` after the closing review's H2 and M2:
+   - an owner item stands in for the tester and for the experiment shape;
+   - probes are placed only, never raised;
+   - the probe record is a plain file;
+   - a visual check is unrunnable.
+
+   The verifier is the tester. Choosing another is a structural choice, NP-5, because flow-steps gives each item one
+   actor, so the experiment has its own item, `probe.experiment`.
 
 **Dispatch 101's candidates,** each against its losing test:
 - **a boundary point alone:** lost. A role mid-item cannot obtain a result and continue.
@@ -205,8 +215,8 @@ Gaps: gap-flow-18, gap-roles-21, gap-rt-23 and gap-test-18.
    - Each purpose is keyed to its definition's body hash. Keyed by file, it would rot: 60% of files change in a
      week, against 3.4% of definition bodies.
 4. **`git grep` is the floor,** for any language with no extractor and for the population hunts no map answers.
-5. **Who gets it:** the spec writer, builder, researcher, architect and reviewer, and the prompt writer through its
-   actor (`memory.code-roles`). The map's delivery table now includes the researcher and the prompt writer.
+5. **Who gets it:** the spec writer, builder, tester, researcher, architect and reviewer, and the prompt writer
+   through its actor (`memory.code-roles`). The map's delivery table now includes the researcher and the prompt writer.
 6. **Level 0 holds one counted `code` line,** never a line per file. The map stands at 31,133 of its 32,768 B.
 
 **This partly reverses KN-1,** which made the codebase map an optional component.
@@ -422,11 +432,12 @@ Maintain.
   - Later rounds overtook at least nine of them.
   - No inventory was at function level with a fate.
 - **Now it is,** in `build/2026-10-18-build-PLAY-dClosedLoop-1-fates.md`.
-  - 131 parts: 28 stay, 69 are reshaped, 20 are merged and 14 retired. None is left undecided.
+  - 131 parts: 26 stay, 70 are reshaped, 21 are merged and 14 retired. None is left undecided.
   - Dispatch 104 derived 118 rows.
   - The night pass split some rows, and added the unattended kit's dissolution and its modes. It also decided
     playbook mode's home.
-  - It proposed a fate for each of the 11 parts no record decided (NP-22).
+  - It proposed fates for 19 parts no record decided (NP-22): dispatch 104's 11 undecided rows, split into 17 parts,
+    and two cells the table had left open.
   - Every line-number citation in the table was resolved to the section it pointed at. Tonight's fold had
     already moved most of those lines, which is gap-found-26's own point.
 - **What stays and what goes, by kit:**
@@ -457,10 +468,10 @@ Gap: gap-tool-09. dConvergedCharter runs the table's join as convergence's exit 
 | dOrderedCharter | 22 | 27 | 5 |
 | dFairHearing | 11 | 12 | 1 |
 | dDeclaredLoop | 43 | 47 | 4 |
-| dWitnessedBar | 20 | 24 | 4 |
+| dWitnessedBar | 20 | 22 | 2 |
 | dBoundRoles | 30 | 34 | 4 |
 | dTotalRecall | 32 | 39 | 7 |
-| dIndexedDesign | 9 | 11 | 2 |
+| dIndexedDesign | 9 | 12 | 3 |
 | dRankedPlan | 11 | 13 | 2 |
 | dWellOiledMachine | 24 | 31 | 7 |
 | dScopedBuild | 9 | 11 | 2 |
@@ -470,18 +481,27 @@ Gap: gap-tool-09. dConvergedCharter runs the table's join as convergence's exit 
 | dShippedRelease | 20 | 20 | 0 |
 | dConvergedCharter | 12, of which 11 meant | 14 | 3 |
 
-- **Units: 285 to 331.** dConvergedCharter's old count held a quoted clause split in two, the same defect as
-  dFairHearing's before the walk. The clause scan now reads double quotes too, and was seen red on it.
-- **The critical path: 181 to 213 units.**
+- **Units: 285 to 330.** dConvergedCharter's old count held a quoted clause split
+  in two, the same defect as dFairHearing's before the walk. The clause scan now reads double quotes too, and was seen
+  red on it.
+- **The critical path: 181 to 211 units.**
   - It now runs dGroundRules, dOrderedCharter, dDeclaredLoop, dWitnessedBar, dTotalRecall, dWellOiledMachine,
     dTendedCadence, dCalibratedLens and dConvergedCharter.
   - The Maintain and Review builds' additions (instruction evals, delivery metrics, a cyclic playbook's filer, a
-    bundle detector) put them ahead of dShippedRelease, which finishes at 195.
-- **dDeclaredLoop grows from 43 to 47 units.** It holds the attendance rule, the `repeat` disposition, the probe
-  program and the code seed. The walk's offer to price a split stands, and NP-24 asks it.
-- **No edge changed.** Every new dependency on a later build either waits in a slot that renders "not installed",
-  or is classed in the re-cut's `[reconciled-order]`: three new rows, one each for `feature` and `code` from
-  dBoundRoles, and one for `code` from dOrderedCharter.
+    bundle detector) put them ahead of dShippedRelease.
+- **dDeclaredLoop grows from 43 to 47 units.** It holds the attendance rule, the `repeat`
+  disposition, the probe program and the code seed. The walk's offer to price a split stands, and NP-24 asks it.
+- **No edge changed, but not every new dependency was seen at first.** The closing review found five clauses that
+  rested on a build outside their ancestry, named in plain words the order's gate cannot read (its H2). Each was then
+  fixed one of three ways:
+  - **a stand-in:** the probe program's stand-ins, the research harness running as today, and the announcement joining
+    with dWellOiledMachine;
+  - **a class row:** `repeat`'s `playbook`, a tolerance;
+  - **a move:** the playbook set check to dIndexedDesign, and the probe's re-run into dDeclaredLoop's own computed
+    witnesses.
+
+  The re-cut's `[reconciled-order]` gained four class rows tonight: `feature` and `code` from dBoundRoles, `code` from
+  dOrderedCharter, and `playbook` from dDeclaredLoop.
 
 ## [forks] Parked for the owner, 2026-10-18
 
@@ -493,15 +513,15 @@ Each fork's first option is the recommendation, and the design as folded shows i
 
 | Fork | Question | Options, the recommendation first | What the answer sets |
 |---|---|---|---|
-| NP-1 | Who drives a build while the owner attends? | the supervisor always, the owner's session its client, hosting the same driver, bound as an act session, until dWellOiledMachine lands; the owner's session drives, under the same act binding; the owner's session drives entry and Plan only | a structural decision: layer-runtime `[terms]` and dWellOiledMachine's row |
+| NP-1 | Who drives a build while the owner attends? | the supervisor always, the owner's session its client, hosting the driver under its owner binding, each role act act-bound, only until dWellOiledMachine lands or if its spike fails; the owner's session drives, under the same act binding; the owner's session drives entry and Plan only | a structural decision: layer-runtime `[terms]` and dWellOiledMachine's row |
 | NP-2 | What does attending turn on? | each act announced, a confirmation at every step's exit, owner questions asked live; announcements only; announcements and a confirmation before every act | the value of `attendance` a bare attend request selects; all three become its allowed values beside `unattended` |
 | NP-3 | How long does an attend or unattend request hold? | until the build's terminal state; until the session ends; until revoked, repository-wide | `attendance.scope`'s default |
 | NP-4 | When does `/unattended` go? | a client of `run` until dConvergedCharter retires it; retired as soon as dWellOiledMachine's driver lands | a structural decision |
-| NP-5 | Who verifies a probe? | the tester, cold; the asking role; the researcher | `probe.verifier`'s default |
+| NP-5 | Who verifies a probe? | the tester, cold; the asking role; the researcher | a structural decision: `probe.design`'s actor, since one actor acts per item |
 | NP-6 | Who authorizes an experiment's agents? | the owner opts in, each time; any experiment within the agent cap; free | `probe.experiment.authority`'s default |
 | NP-7 | When is an owner's observation verified? | before the request is placed; at Plan; only when asked | `probe.observations`'s default |
 | NP-8 | How large is the `code` slot? | 8 KB; 4 KB; 16 KB | `memory.code-budget`'s default |
-| NP-9 | Which roles get the `code` slot? | the working roles: spec writer, builder, researcher, architect, reviewer, and the prompt writer through its actor; every role; the structural roles only | `memory.code-roles`'s default |
+| NP-9 | Which roles get the `code` slot? | the working roles: spec writer, builder, tester, researcher, architect, reviewer, and the prompt writer through its actor; every role; the structural roles only | `memory.code-roles`'s default |
 | NP-10 | Which languages does the core extract? | Python, shell and JavaScript, others at file level with `git grep`; file level only; require ctags, absent on this node | `memory.code-languages`'s default |
 | NP-11 | Where do code purposes live? | in record slots keyed by each definition's body hash, derived first; in-code `gov:note` only; derived only, with no agent pass | `memory.code-enrich`'s default |
 | NP-12 | How is a region marked? | derived from a definition's extent, `gov:end` only where none derives; explicit `gov:region` and `gov:end` around every region; point anchors with no spans | a structural decision: P33 and the annotation grammar |
@@ -520,19 +540,87 @@ Each fork's first option is the recommendation, and the design as folded shows i
 
 The walk is not a fork: wave 1 still waits for the owner's read, and wave 2 follows it.
 
+## [review-fold] The closing review, folded
+
+The night pass's closing review ran as dispatch 105, a light Tier-2 diff review at medium effort, with 9 agents
+(`reviews/2026-10-18-review-PLAY-dClosedLoop-1-night-pass-closing.md`):
+- **What ran:** three lenses, correctness, seams and verification, then skeptic batches and one synthesis. The security
+  and intent lenses did not run.
+- **What it found:** CLEAN WITH FIXES. 26 items, 0 blocker, 3 high, 16 medium and 7 low, over 30 confirmed findings of
+  31.
+
+Every item is folded.
+
+| Item | What was wrong | Where it is fixed |
+|---|---|---|
+| H1 | `repeat` had no transition row and no Design entry | flow-steps `[transitions]`, `[design]`'s seventh input and `design.input`; P20; and the order's gate, now checking every routed disposition's row |
+| H2 | five clauses rested on a later build, named in plain words the probe cannot read | a stand-in, a class row or a move each (`[chain-impact]`); widening the rule to plain words was measured at 47 hits over 27 kinds, mostly homonyms, so the probe prints that count as unread |
+| H3, M8 | the fates arms switched off when the record was missing or re-dated | the map resolves the record by name and stops when it is absent; the `fates-absent` plant |
+| M1, M2 | the research harness and the probe program rested on later builds | as H2 |
+| M3 | `unrunnable` sat outside the closed verdict set | `[probe]`'s closed verdicts, with `probe.return` routing it to an owner item |
+| M4 | two fate rows contradicted their destination, or each other | `house/policy.toml` MERGED; the Skills row names six, `/unattended` apart |
+| M5 | two copies disagreed on who gets the `code` slot | the tester joins the working roles; the delivery table gives the slot to the architect, spec writer and reviewer |
+| M6 | the hosting rule was stated two ways | one statement in layer-runtime, layer-roles, v2's row and `[owed]`, and NP-1 |
+| M7 | the re-cut pointed at a superseded copy of the order's gate | the gate is one committed script, `build/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py` |
+| M9 | `verify-at-plan` and `on-request` had no route | `plan.input` routes the first, and `[probe]` says how each value runs |
+| M10 | `probe.verifier: asking-role` had no actor for a placed probe | the key is gone: the experiment has its own item, and the verifier is a structural choice, NP-5 |
+| M11 | `[sessions]` still classed sessions as attended | the owner's session there, in `[enforce]` and in v2's `memory.default-load` reason |
+| M12 | memory's `[reuse]` still treated symbols and callers as optional | `[reuse]` reads the core `code` record; v2's memory row narrowed |
+| M13 | attendance wrote into dOrderedCharter's `override` kind | its own kind, the attendance override, dWellOiledMachine's |
+| M14 | the fates parser dropped wrong-width rows | the atlas's table reader, which stops on one (seen red), and a count arm |
+| M15 | two fates arms were never seen red, and `fate=` went unchecked | plants for both, and an arm comparing each kit node's fate with `[kits]` |
+| M16 | the fix-pass clause named no witness | its arm and seen-red case, and the acceptance fix pass |
+| L1 | a delivery row was split across two lines | joined |
+| L2 | the `code` slot's states lacked "not installed" | added |
+| L3 | the RETIRED arm was overstated, and a STAYS part sat in an absorbed kit | the arm refuses a bare "none"; a STAYS-under-absorbed arm; `stall-recorder.js` RESHAPED; `[check]` matched to the arms |
+| L4 | stale text in the fates record | branch-reconcile's row and layer; the two open cells proposed; the proposed count restated |
+| L5 | "the attended binding" survived the rename | "the owner binding" |
+| L6 | the layer arm read rendered lines | it reads the derived kit nodes |
+| L7 | recorded map sizes included the dirty marker | the printed size leaves the marker out |
+
+**Beside the review,** the night pass's own sweep ran while the review was reading, and folded four more:
+- `probe.design`'s actor was chosen by a key and by the probe's kind, against flow-steps' rule of one actor per item.
+  `probe.experiment` is now its own item.
+- `entry.place` routed on an observation its return did not carry. Its return now names each observation.
+- `verify-at-plan` had no route. `plan.input` routes it, as M9 also asked.
+- layer-roles still said the main session drives, and design passages still said "attended session" for the owner's
+  session.
+
+**Left-shift.** Each class is gated where a gate fits:
+- the transitions rule and its plant (H1);
+- the map's fates arms and plants (H3, M8, M14, M15, L3);
+- the layer arm on derived nodes (L6).
+
+The rest are checklist lessons:
+- H2 recurs `step-depends-on-a-later-build`. Its entry now says to cite a dependency backticked and to state a
+  stand-in.
+- A renamed term is grepped across every record before the fold commits (M6, M11, L5:
+  `amendment-leaves-its-other-half-standing`).
+- An instrument lives in one committed file (M7: `two-answers-to-one-question`).
+- Every value of a policy key has a route (M9: `policy-value-with-no-route`).
+
 ## [instrument] The checks, as run
 
 The night pass's scripts and probes, and their runs, are in
-`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass-instruments.md`. As committed:
-- **The design map** derives 2,232 nodes in 30 namespaces, 31,133 of 32,768 B, rc 0.
-  - Its new layer arm read 19 kits joined to no layer before the fix, rc 1, and none after it.
-  - Its six fates arms each red on their plant.
-- **The atlas** derives 154 records and 33 principles, rc 0.
+`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass-instruments.md`. The order's gate is the committed
+`build/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py`. As committed, after the closing review's fold:
+- **The design map** derives 2,234 nodes in 30 namespaces, 31,203 of 32,768 B, rc 0. Its printed size leaves out the
+  head line's dirty marker.
+  - Its layer arm read 19 kits joined to no layer before the fix, rc 1, and none after it. It reads the derived kit
+    nodes, and does not check that a layer is the right one.
+  - It reads the fates record by name, so an absent one stops the run, and a row of the wrong width stops it too. Each
+    was seen red: `fates-absent`, and one widened row.
+  - Its twelve fates findings each red on at least one of fourteen plants: drop, ghost, bad, unbuilt, empty, kit,
+    kit-drop, kit-ghost, count, absorbed-stays, bare-none, rel, none and absent.
+- **The atlas** derives 155 records and 33 principles, rc 0.
   - The fold-state probe read 2 rows unfolded despite a fold section before point 7's fix, and 0 after it.
-- **The reconciliation probe** reads 19 classed dependencies, rc 0.
-  - Its cites rule now reads a namespace cited through a wildcard. It was red on dBoundRoles' `feature.*` until the
-    class row landed.
-  - Every one of its plants still reds.
+- **The reconciliation probe** reads 20 classed dependencies and every routed disposition's transition row, rc 0.
+  - Its cites rule reads a namespace cited through a wildcard. It was red on dBoundRoles' `feature.*` until the class
+    row landed.
+  - Its transitions rule was red on `repeat` before the row landed, and reds on the `--plant-transition-drop` plant.
+  - It prints, as unread, 46 plain-word mentions of a record kind a non-ancestor owns.
+  - Every one of its earlier plants still reds against the committed copy.
 - **The clause scan** finds 0 splits. It was red on dConvergedCharter's quoted clause before the join.
 - **The gap join** reads 250 keys against 16 chain rows, each owned exactly once, rc 0.
-- **The preset check** reads 206 keys, 193 presettable, and 193 preset rows, with no findings.
+- **The preset check** reads 205 keys, 192 presettable, and 192 preset rows, with no findings.
+- **The critical path** is 211 units.

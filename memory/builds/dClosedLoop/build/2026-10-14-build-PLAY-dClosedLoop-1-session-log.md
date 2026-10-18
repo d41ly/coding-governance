@@ -166,6 +166,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 102 | gov-researcher, at the owner's medium effort | Point 3: code depth in the core, the map shaped mechanically and enriched, orientation by role | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-6-researcher.md` | 1799cb98 | returned, 16m59s, 54.8k out: a core code record, a per-item code slot, `git grep` as the floor | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-code-orientation.md` |
 | 103 | gov-researcher, at the owner's medium effort | Point 4: one relational syntax across memory, pulling a tag for its regions and instructions | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-7-researcher.md` | 1799cb98 | returned, 9m30s, 50.6k out: declare at the site, derive the rest, four other mechanisms each losing a test | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-relational-syntax.md` |
 | 104 | gov-researcher, at the owner's medium effort | Point 8: today's tools, function by function, and their fates under v2 | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-8-researcher.md` | 1799cb98 | returned, 11m18s, 70.3k out: 118 function rows, 11 undecided, the kit-level map stale in nine rows | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-tool-fates.md` |
+| 105 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, round 1 | The night pass's closing review: `9ab7a5c5c` over `beda01950`, twenty-two design records as specs | the args, recorded with its fold (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass-instruments.md`) | 1799cb98 | returned as `wf_ce0c2168-8c2`, CLEAN WITH FIXES, 30 of 31 confirmed, 26 items, 3 high | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-night-pass-closing.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1184,6 +1185,31 @@ The night pass's researchers, dispatches 100 to 104, derived from their handoffs
 - returned — gov-researcher · wrote 0 files · 11m18s · 70.3k out · run direct/ab6d91f97ad7e1f8a
 ```
 
+The night pass's closing review, dispatch 105, derived from its run the same way:
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, diff-review round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ce0c2168-8c2/a5218e6a5b4101f64
+- returned — workflow-subagent · wrote 0 files · 12s · 1.3k out · run wf_ce0c2168-8c2/a5218e6a5b4101f64
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:correctness · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ce0c2168-8c2/ad0212942b820e803
+- returned — gov-diff-reviewer · wrote 0 files · 7m10s · 41.9k out · run wf_ce0c2168-8c2/ad0212942b820e803
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:seams · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ce0c2168-8c2/acc1e4552709a30c1
+- returned — gov-diff-reviewer · wrote 0 files · 5m57s · 33.8k out · run wf_ce0c2168-8c2/acc1e4552709a30c1
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:verification · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ce0c2168-8c2/a1f553ecc9f8fc7f2
+- returned — gov-diff-reviewer · wrote 0 files · 3m10s · 17.4k out · run wf_ce0c2168-8c2/a1f553ecc9f8fc7f2
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-1-7 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ce0c2168-8c2/a1140549358bb3f26
+- returned — gov-skeptic · wrote 0 files · 1m19s · 8.1k out · run wf_ce0c2168-8c2/a1140549358bb3f26
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-8-14 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ce0c2168-8c2/adc6878d02ea90ce7
+- returned — gov-skeptic · wrote 0 files · 1m18s · 7.7k out · run wf_ce0c2168-8c2/adc6878d02ea90ce7
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-15-21 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ce0c2168-8c2/a75658c517c4b9f02
+- returned — gov-skeptic · wrote 0 files · 1m31s · 8.9k out · run wf_ce0c2168-8c2/a75658c517c4b9f02
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-22-28 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ce0c2168-8c2/a82f793ad9649f345
+- returned — gov-skeptic · wrote 0 files · 1m34s · 9.1k out · run wf_ce0c2168-8c2/a82f793ad9649f345
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-29-31 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_ce0c2168-8c2/aa578f56a6034c9e7
+- returned — gov-skeptic · wrote 0 files · 56s · 4.5k out · run wf_ce0c2168-8c2/aa578f56a6034c9e7
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_ce0c2168-8c2/ae8278d8927e3d4cf
+- returned — gov-synthesizer · wrote 1 file · 2m57s · 24.3k out · run wf_ce0c2168-8c2/ae8278d8927e3d4cf
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -2030,6 +2056,17 @@ The night pass's researchers, dispatches 100 to 104, derived from their handoffs
     reconciliation probe's reading of wildcard citations, each seen red first;
   - registered twenty-eight gaps, grew the chain from 285 units to 331 and the critical path from 181 to 213, and
     parked NP-1 to NP-24 for the owner.
+
+- 2026-10-18, session 1799cb98: the night pass's closing review, dispatch 105, returned CLEAN WITH FIXES, with 26
+  items, 3 of them high, and no blocker (`reviews/2026-10-18-review-PLAY-dClosedLoop-1-night-pass-closing.md`). Every
+  item is folded, with four more from the night pass's own sweep (the night-pass record's `[review-fold]`):
+  - `repeat` gained its transition row and its Design entry. The order's gate, now one committed script
+    (`build/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py`), checks every routed disposition's row.
+  - Five dependencies on a later build, named in plain words, each gained a stand-in, a class row or a move.
+  - The map's fates arms now stop on an absent or malformed record, and are counted and planted, every finding seen
+    red.
+  - The hosting rule reads one way everywhere. Attendance writes its own record kind, and `probe.design` keeps one
+    actor.
 
 ## Instruments
 

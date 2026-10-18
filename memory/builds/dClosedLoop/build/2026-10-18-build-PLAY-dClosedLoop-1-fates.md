@@ -66,8 +66,8 @@ A kit's fate is one of four:
 
 The fate is one of STAYS, RESHAPED, MERGED and RETIRED. "Where it goes" names the chain build that keeps or receives
 it. "Decided by" names the record that decides it, a line-number citation of dispatch 104's resolved to its section
-tag, or "proposed by the night pass (NP-22)" for a part no record decided. Counts: 28 stay,
-69 reshaped, 20 merged and 14 retired, over 131 rows.
+tag, or "proposed by the night pass (NP-22)" for a part no record decided. Counts: 26 stay,
+70 reshaped, 21 merged and 14 retired, over 131 rows.
 
 | Kit | Function | Today's job | Fate | Where it goes | Decided by |
 |---|---|---|---|---|---|
@@ -84,7 +84,7 @@ tag, or "proposed by the night pass (NP-22)" for a part no record decided. Count
 | roles | `handoff.py` | hashed prompt file | RESHAPED | a work order per item, hashed into the spawn marker (dBoundRoles) | v2 `[chain]` dBoundRoles; layer-runtime `[current]` |
 | roles | `render_agents.py` | renders agent types | MERGED | the one renderer ("roles render wiring") (dOrderedCharter) | v2 `[chain]` dOrderedCharter |
 | roles | `check_roles.py` | role, table and doc agree | RESHAPED | role-by-step matrix joined both ways (dBoundRoles); policy reader re-pointed (dConvergedCharter) | v2 `[chain]` dBoundRoles; v2 `[chain]` dConvergedCharter |
-| roles | `house/policy.toml` | effort and gates | STAYS | until dConvergedCharter folds it; on dGroundRules's legacy list until then | v2 `[chain]` dGroundRules; v2 `[chain]` dBoundRoles |
+| roles | `house/policy.toml` | effort and gates | MERGED | into `.governance/policy.toml` (dConvergedCharter); on dGroundRules's legacy list until then | v2 `[chain]` dGroundRules; v2 `[chain]` dBoundRoles |
 | workflows | `tier2-review.js` | review harness | RESHAPED | presets, opt-in lenses, skeptic batches (dFairHearing), run at breakpoints (dDeclaredLoop) | v2 `[chain]` dFairHearing; v2 `[chain]` dDeclaredLoop |
 | workflows | `REVIEW-PROTOCOL.template.md` | protocol text | RESHAPED | corrected by dFairHearing, then a rendered view (dConvergedCharter) | v2 `[chain]` dFairHearing; v2 `[chain]` dConvergedCharter |
 | workflows | `unattended-build.js`, `unattended-unit.js` | unit harnesses | RESHAPED | role harnesses inside act sessions, the deferral block, persisted returns (dWellOiledMachine) | layer-runtime `[contract]`; v2 `[chain]` dWellOiledMachine |
@@ -142,9 +142,9 @@ tag, or "proposed by the night pass (NP-22)" for a part no record decided. Count
 | unattended | `RESUME_SCHEDULE_*` | desktop restart task | RETIRED | the node tick hosts the supervisor | layer-runtime `[supervise]` |
 | unattended | `gate-guard.js` | run guard | RESHAPED | dispatcher pack (dWellOiledMachine) | layer-runtime `[enforce]` |
 | unattended | `stop-guard.js`, cron keepalive | continuation | RETIRED | for act sessions and cadence; the supervisor's beat replaces them | layer-runtime `[enforce]`; layer-runtime `[schedule]` |
-| unattended | `stall-recorder.js` | API-stall record | STAYS | the supervisor's limit signal (dWellOiledMachine) | layer-runtime `[supervise]` |
+| unattended | `stall-recorder.js` | API-stall record | RESHAPED | the supervisor's limit signal, in the runtime's own kit (dWellOiledMachine) | layer-runtime `[supervise]` |
 | unattended | `run-lease.js` | binds a session to its run for the three hooks | RESHAPED | the session binding record (dWellOiledMachine) | proposed by the night pass (NP-22); layer-runtime `[act]` |
-| unattended | playbook mode (`--record-piece`, `--record-set`, `check-playbook`) | repeatable content as pieces and sets | RESHAPED | the playbook record kind and `check-playbook` as Design's pack (dIndexedDesign), pieces built as units (dScopedBuild), the set check (dWitnessedBar), a cyclic playbook's filer (dTendedCadence), reached by the `repeat` disposition (dDeclaredLoop) | the owner's point 1 (night pass) |
+| unattended | playbook mode (`--record-piece`, `--record-set`, `check-playbook`) | repeatable content as pieces and sets | RESHAPED | the playbook record kind and `check-playbook` as Design's pack (dIndexedDesign), pieces built as units (dScopedBuild), the set check, registered at Test (dIndexedDesign), a cyclic playbook's filer (dTendedCadence), reached by the `repeat` disposition (dDeclaredLoop) | the owner's point 1 (night pass) |
 | unattended | `check-unattended` | the kit's own gate | RESHAPED | the stage coverage gates and the loop kit's conformance gates (dDeclaredLoop) | proposed by the night pass (NP-22) |
 | unattended | `check-pass-order`, `check-brief-recorded` | pass order and brief records | RESHAPED | the work order's hash and the shape-run rows (dBoundRoles) | proposed by the night pass (NP-22); `research-unattended-core.md` |
 | unattended | `check-arms-groups` | lints the batched self-test's groups | RETIRED | none: it lints the kit's own self-test file, which dissolves with the kit (dConvergedCharter) | proposed by the night pass (NP-22) |
@@ -156,11 +156,11 @@ tag, or "proposed by the night pass (NP-22)" for a part no record decided. Count
 | hooks | `format-guard.js` | final-message format | RESHAPED | statement-grammar check (dOrderedCharter) | layer-instruction `[recommendations]`; layer-runtime `[enforce]` |
 | process-monitor | reap, scope, classify | reaping | STAYS | Runtime, at the act ceiling (dWellOiledMachine) | layer-runtime `[supervise]`; layer-runtime `[contract]` |
 | process-monitor | census, procmon-hook | report | RESHAPED | observability node reading (dTendedCadence) | layer-expansions `[design-observability]` |
-| branch-reconcile | report, cleanup Skill | prune report | STAYS | expansion; its layer is disputed (section 5) (dTendedCadence, observability's prune fix) | layer-runtime `[isolate]` |
+| branch-reconcile | report, cleanup Skill | prune report | STAYS | observability's prune fix (dTendedCadence; `[stale]` 9) | layer-runtime `[isolate]` |
 | gate-lint | scans | source hygiene | STAYS | leg pack, expansion (dWitnessedBar, at Test's leg-pack point) | layer-instruction `[layers]` |
 | pytest-parallel-guardrails | xdist guard | bounded parallel tests | STAYS | an adopter-only Flow leg pack, declared so in gov, which runs no xdist suite (dWitnessedBar) | proposed by the night pass (NP-22) |
 | run-gates | `run-gates.sh` | the bar | RESHAPED | runner-written verdict, attribution, held legs by policy, leg factory (dWitnessedBar) | v2 `[chain]` dWitnessedBar |
-| run-gates | `gate-legs.json` | leg manifest | RESHAPED | `tag` and `purpose` fields (dWitnessedBar); JSON-or-packs UNDECIDED | v2 `[chain]` dWitnessedBar |
+| run-gates | `gate-legs.json` | leg manifest | RESHAPED | `tag` and `purpose` fields, and one manifest whose rows the leg factory generates from the packs' declarations (dWitnessedBar) | v2 `[chain]` dWitnessedBar; proposed by the night pass (NP-22) |
 | run-gates | turnstile | bar semaphore | STAYS | core (dWitnessedBar) | layer-instruction `[layers]` |
 | run-gates | `post-merge.sh` | landed-SHA bar | RESHAPED | `deploy.core`; core checks before release (dShippedRelease) | v2 `[chain]` dShippedRelease; layer-expansions `[design-integrations]` |
 | run-gates | held halves, WSL, selftests, profile, ceilings | bar tooling | STAYS | `held_halves` re-pointed (dConvergedCharter) | v2 `[chain]` dConvergedCharter |
@@ -183,7 +183,7 @@ tag, or "proposed by the night pass (NP-22)" for a part no record decided. Count
 | top-level | `check-agent-cap-restatement.sh` | the fan-out bound restated | RESHAPED | generalised to a policy value restated outside the catalogue (dOrderedCharter) | proposed by the night pass (NP-22); layer-memory `[tools]` |
 | top-level | `check-line-length.sh` | prose lines | STAYS | extended by the grammar check (dOrderedCharter, whose statement grammar extends it) | layer-instruction `[recommendations]` |
 | top-level | `check-spec-tokens.py` | spec tokens | STAYS | Design's pack (dIndexedDesign) | layer-memory `[tools]` |
-| top-level | `check-dead-paths.sh` | dead references | STAYS | the shared function is undecided (dTendedCadence, whose dead-pointer detector shares its function) | layer-memory `[tools]` |
+| top-level | `check-dead-paths.sh` | dead references | STAYS | its dangling-path function shared with Maintain's dead-pointer detector (dTendedCadence) | layer-memory `[tools]`; proposed by the night pass (NP-22) |
 | top-level | prefix, remotes, hook destinations, placeholders, counts | distribution and test checks | STAYS | packs; two re-pointed (dShippedRelease) | layer-memory `[tools]`; v2 `[chain]` dShippedRelease |
 | top-level | `push-main.sh` | the lander | RESHAPED | command adapter and hardening (dWellOiledMachine); landing queue and core re-check (dShippedRelease) | v2 `[chain]` dWellOiledMachine; v2 `[chain]` dShippedRelease |
 | top-level | `settings-merge.py` | hook wiring | RESHAPED | one dispatcher entry per event, `onFailure` (dWellOiledMachine) | layer-runtime `[enforce]` |
@@ -192,7 +192,7 @@ tag, or "proposed by the night pass (NP-22)" for a part no record decided. Count
 | skills | kickoff procedure | orientation | RESHAPED | orientation scout (dBoundRoles); `kickoff.runs` (dRankedPlan); thin entry | v2 `[chain]` dBoundRoles; v2 `[chain]` dRankedPlan; v2 `[chain]` dConvergedCharter |
 | skills | manifest ratchet | the kickoff manifest audit | RESHAPED | the guarded instruction manifest (dOrderedCharter) | proposed by the night pass (NP-22) |
 | skills | deploy-governance | operator Skill | RETIRED | no reader, 0 loads; govkit's verbs replace it | layer-instruction `[recommendations]`; gap-tool-05 |
-| skills | rendered Skills (7) | entries | RESHAPED | thin level-4 entries; build and unattended become clients of `next` and `run` (dConvergedCharter, with dWellOiledMachine for the clients) | layer-instruction `[recommendations]`; layer-runtime `[decide]` |
+| skills | rendered Skills, six of seven, `/unattended` apart | entries | RESHAPED | thin level-4 entries; `/build` becomes a client of `next` and `run` (dConvergedCharter, with dWellOiledMachine for the client) | layer-instruction `[recommendations]`; layer-runtime `[decide]` |
 | .githooks | pre-commit | fast leg | RESHAPED | derived list (dWitnessedBar); witness and signal trap (dWellOiledMachine) | v2 `[chain]` dWitnessedBar; v2 `[chain]` dWellOiledMachine |
 | .githooks | commit-msg | transition audit | STAYS | gains a signal trap (dWellOiledMachine) | v2 `[chain]` dWellOiledMachine |
 | .githooks | pre-push | the bar | RESHAPED | reads the runner verdict; trusted copy; policy re-point (dWitnessedBar, dWellOiledMachine, dConvergedCharter) | v2 `[chain]` dWitnessedBar; v2 `[chain]` dWellOiledMachine; v2 `[chain]` dConvergedCharter |
@@ -234,8 +234,16 @@ The design map reads this record, as it reads the ownership table:
 - every `[table]` row's kit is a kit node, or one of `top-level`, `skills`, `.githooks` and `guides`;
 - every fate is in its closed set, for kits and for rows alike;
 - every STAYS, RESHAPED or MERGED row names a chain build in "Where it goes";
-- every RETIRED row names its replacement, or says "none" and why.
+- every RETIRED row's "Where it goes" names something other than a bare "none";
+- no STAYS part sits in a kit whose fate is absorbed or retired;
+- the rows match the counts this record states, fate by fate;
+- each kit node's `fate` equals its `[kits]` row.
 
-Each arm is seen red on a planted case (`night-pass` `[instrument]`). What the check does not do: it does not prove
-that a row's fate is right, only that every part has one, in the closed set, landing in a build that exists. Whether
-each lands is dConvergedCharter's exit check (v2's `[chain]`).
+The record is read by name, so a renamed or missing record stops the check, and a row of the wrong width stops it too
+(the night pass's closing review, H3, M8 and M14). Each arm is seen red on a planted case (`night-pass`
+`[instrument]`). What the check does not do:
+- it does not prove that a row's fate is right, only that every part has one, in the closed set, landing in a build
+  that exists;
+- it does not judge a RETIRED row's replacement or reason, only that one is named;
+- it does not catch one part named in two rows under different kits;
+- whether each part reaches its fate is dConvergedCharter's exit check (v2's `[chain]`).

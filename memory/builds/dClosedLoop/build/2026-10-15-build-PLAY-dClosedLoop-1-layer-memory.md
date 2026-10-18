@@ -374,8 +374,8 @@ set. The kinds sort by P28:
   becoming a log row), and one witness record per witness the flow
   declares (acceptance, verdict, attribution, transition, landing among them). Flow registers its
   flake, dupes and scope records. Runtime registers its return, act (launch, epoch, outcome), lease,
-  session binding, mailbox message and journal records. The night pass adds the `code` record, the `probe` record, and
-  the playbook and playbook set kinds (points 1 to 3).
+  session binding, mailbox message and journal records. The night pass adds the `code` record, the `probe` record, the
+  playbook and playbook set kinds, and the attendance override (points 1 to 3).
 - **Optional components** (KN-1; Knowledge's before it): the dossier and the map's owner views; the
   lexicon; the recall index. Code depth left this list in the night pass (point 3): the core `code` record replaces
   the optional symbols and callers, which partly reverses KN-1 for the codebase map. The gotcha kind is core since KN-1, on the library side. The annotation
@@ -396,6 +396,7 @@ layer that registers a kind adds its row.
 |---|---|---|
 | exception | dOrderedCharter | the exception register beside the `core.*` policies |
 | override | dOrderedCharter | `charter.override` and its record, under the precedence and override rule |
+| attendance override | dWellOiledMachine | its writer is `life.request`'s attend and unattend: the attendance value and its scope, which `attendance.scope` reads (the night pass's closing review, M13) |
 | intake | dWellOiledMachine | its writer is `entry.intake`'s hook (PM-9), in dWellOiledMachine's row since the re-cut |
 | card | dDeclaredLoop | the build's orientation card at level 1, its stores and snapshot |
 | plan | dRankedPlan | its writer is `plan.record` |
@@ -419,7 +420,7 @@ layer that registers a kind adds its row.
 | selection | dWitnessedBar | its writer is `test.select` |
 | routing | dWitnessedBar | its writers are `test.route` and `test.flakes`, the re-entry's routing record; `release.route`, dShippedRelease's, also writes one |
 | seen-red | dWitnessedBar | its writer is `test.seen-red` |
-| playbook set | dWitnessedBar | its writer is the set check at Test: a playbook run's pieces joined by hash, and the set's identity derived from them (night pass, point 1) |
+| playbook set | dIndexedDesign | its writer is the set check, which dIndexedDesign registers at Test's leg-pack point: a playbook run's pieces joined by hash, and the set's identity derived from them (night pass, point 1, moved by its closing review's H2) |
 | landing | dShippedRelease | the landing record; its writer is `deploy.record` |
 | comparison | dShippedRelease | its writer is `deploy.current` |
 | release | dShippedRelease | its writer is `release.record`, one per (SHA, environment) with its outcome |
@@ -685,7 +686,7 @@ aScoutedSeam measured the mechanism:
 So the design is:
 - **Reuse is the reuse scout's item** (`design.seams`). Its work order hands it the house index, never
   a ranking:
-  - the map's symbols and callers;
+  - the core `code` record's definitions and callers (night pass, point 3);
   - the dossiers and their seams;
   - the reuse entries.
 - **Rendered delivery.** The scout matches the build's needs against the entries' triggers. Its
@@ -694,8 +695,9 @@ So the design is:
   becomes its producer. Delivery by path is rejected, because "anywhere a media selector is needed"
   is a need, not a path.
 - **The slot has three states,** each rendered distinctly: matched, with the entries; searched, with no
-  match; and not searched, with the reason: the scout failed, or the index is stale. Without the map,
-  an optional component since KN-1, the index holds the reuse entries alone, and the slot says so.
+  match; and not searched, with the reason: the scout failed, or the index is stale. Without the map's
+  optional parts, the index still reads the core `code` record, and the slot names the parts absent (night pass,
+  point 3).
 - **Under `reuse.delivery=on-demand`,** nothing is rendered into every work order. The reuse scout runs
   only when an item's work order asks for reuse, and its matches are handed to that item alone.
 - **The index's shape is M1c's.** Its 16 of 24 came from a small curated digest, 2 to 33 KB, with an

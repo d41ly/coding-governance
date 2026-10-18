@@ -450,6 +450,9 @@ The review's items, each folded:
 
 ## [review-instrument] The reconciliation probe, hardened
 
+A snapshot: the order's gate is now one committed script, `build/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py`
+(the night pass's closing review, M7).
+
 ```python
 """The order's reconciliation gate: what a build's row cites, what its stage's items are, where its items route,
 what keys its items read, and where its expansion registers, is built by that build or one of its ancestors in

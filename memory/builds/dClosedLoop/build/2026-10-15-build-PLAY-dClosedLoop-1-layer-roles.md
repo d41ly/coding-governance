@@ -42,7 +42,10 @@ researchers of 2026-10-14 cover the field, and their records are cited where use
   - the tester, deployer and maintainer;
   - one reviewer with a lens per step, the skeptic and the synthesizer.
 
-  The main session is the driver and never a worker. The executor drives when no one attends.
+  The driver is never a worker. It is the supervisor in every mode, the owner's session its client. The owner's
+  session hosts the driver only until dWellOiledMachine lands, or if its platform spike fails, under its owner
+  binding, each role act it hosts act-bound with that act's epoch (the night pass, point 1, and its closing review's
+  M6, which replaced "the main session is the driver; the executor drives when no one attends").
 - **The two blocks** (`[model]`):
   - A role's static instructions are its system prompt, rendered from the roles kit at level 5 and
     keyed by `role-sha`.

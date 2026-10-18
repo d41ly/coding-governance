@@ -237,7 +237,7 @@ In one line: Instruction says, Runtime enforces, Flow witnesses, Memory proves.
 | unattended | Runtime: dissolved by the night pass (point 1). Its supervisor seam, hooks and controls go to the runtime's own kit, and its ladder, transitions and claims to the loop kit; the `/unattended` Skill is a client of `run <build>` until dConvergedCharter retires it | core, until dissolved |
 | hooks | Runtime: enforcement at the tool boundary | core |
 | process-monitor | Runtime: reaping; its reports feed Observability | core |
-| branch-reconcile and the cleanup Skill | Runtime: isolation housekeeping | expansion |
+| branch-reconcile and the cleanup Skill | Observability: the prune fix, its isolation housekeeping read as a reading (the fates record's `[stale]` 9) | expansion |
 | codebase-map, lexicon, memory-recall | Memory: the library side's optional components (KN-1); `reuse_lookup.py` retires | expansion |
 | runlog, drift-audit | Observability; runlog's journal grammar is core (Runtime) | expansion |
 | govkit and the adopt scripts | Distribution | expansion |

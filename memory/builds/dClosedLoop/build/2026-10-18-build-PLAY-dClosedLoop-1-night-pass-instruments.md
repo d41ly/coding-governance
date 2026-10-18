@@ -1832,6 +1832,1108 @@ P.write_text(head.rstrip("\n") + "\n\n" + "\n".join(secs[t] for t in ORDER), enc
 print(f"{P.name}: {len(ORDER)} sections, {P.stat().st_size} bytes")
 ````
 
+### `build_args_night.py`
+
+The closing review's args: a light diff review of the night-pass commit at medium.
+
+````python
+"""Build the args of the night pass's closing review: a light Tier-2 diff review of the night-pass commit, at the
+owner's medium effort, from the audit fold's closing review's args.
+
+Usage: python -X utf8 build_args_night.py <scratch-dir> <base> <head>   (from the worktree root)
+Writes <scratch-dir>/night/args-night-review.json.
+"""
+import json
+import pathlib
+import subprocess
+import sys
+
+S, BASE, HEAD = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+B = "memory/builds/dClosedLoop/build/"
+REPORT = "memory/builds/dClosedLoop/reviews/2026-10-18-review-PLAY-dClosedLoop-1-night-pass-closing.md"
+a = json.loads((S / "audit" / "args-fold-review.json").read_text(encoding="utf-8"))
+full = lambda r: subprocess.run(["git", "rev-parse", r], capture_output=True, text=True, check=True).stdout.strip()
+a["base"], a["head"] = full(BASE), full(HEAD)
+a["intensity"], a["round"], a["scratch"] = "light", 1, (S / "review-night-pass").as_posix()
+a["efforts"] = {"diffFinder": "medium", "skeptic": "medium", "synthesis": "medium"}
+a["specs"] = a["specs"] + [B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md",
+                           B + "2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md"]
+for p in a["specs"]:
+    if not pathlib.Path(p).exists():
+        sys.exit(f"missing: {p}")
+if pathlib.Path(REPORT).exists():
+    sys.exit(f"{REPORT} exists")
+a["checklist"] = subprocess.run([sys.executable, "tools/memory-tree/gotchas.py", "--for-diff", f"{BASE}..{HEAD}"],
+                                capture_output=True, text=True, encoding="utf-8", check=True).stdout
+a["byDesign"] = "\n".join([
+    "- The build is design-only: no product code and no unit specs. Unit-level detail is absent by design and owed to "
+    "the chain builds, and a row's planned units are prose, counted one per clause.",
+    "- The owner's eight points, recorded verbatim in the night-pass record's [words], are decisions where they "
+    "direct: unattended is the default state, attendance changes only the owner's interactions, testing can happen "
+    "anywhere, code depth is core, and playbook mode stays in the flow. A finding may show the fold contradicting a "
+    "record or the tree, not re-argue the owner's direction.",
+    "- The forks NP-1 to NP-24 are parked for the owner. A key's default marked pending is the recommendation shown "
+    "until the owner answers; a finding may show that a pending default contradicts a record, not that a fork should "
+    "have been settled.",
+    "- Every earlier answer stands: PM-1 to PM-12, RC-1 to RC-9, AF-1 to AF-3, FL1, CX-1 to CX-3, RT-1 to RT-4, KN-1 "
+    "as the night pass amends it, and every round's before them.",
+    "- The five research returns (research-unattended-core, -testing-anywhere, -code-orientation, -relational-syntax "
+    "and -tool-fates) are verbatim and dated, and their prompts are rendered handoffs: neither is under review. The "
+    "instruments record holds the scripts as they ran.",
+    "- Dated records keep what held when they were written: revision notes, the session log's past entries, and the "
+    "ownership record's approved tables, which its [amended] bullets amend.",
+    "- Generated files (memory/LIVE.md and the build README's generated regions) are rendered, not reviewed. The map "
+    "generator's and the atlas's changes are instruments, and are reviewed: can each new arm fail, and does each say "
+    "what it does not check?",
+])
+a["context"] = (
+    "The diff is one commit, " + a["head"][:9] + " over " + a["base"][:9] + ": build dClosedLoop's night pass, which "
+    "worked the owner's eight points into the design while the owner was away. dClosedLoop is a design-only build that "
+    "re-architects gov onto one loop. The night-pass record, " + B + "2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md, "
+    "says what each point changed ([p1-unattended] to [p8-fates]), the chain's growth ([chain-impact]) and the parked "
+    "forks ([forks]). The edits land in v2 (P4, P20, P25 amended, P31 to P33 added, thirteen keys and their preset rows, "
+    "every [chain] row's new clauses and owned gaps, [owed]), flow-steps (the `repeat` disposition, the entry-time "
+    "probe, [rules], the attendance gates in [breakpoint], a new [probe] program, attend and unattend in [lifecycle], "
+    "the fix pass in [test]), the gap register (28 gaps), layer-memory's kinds, layer-runtime's driver and binding, "
+    "layer-instruction, layer-library, the project map, the systems record, the ownership amendment, the re-cut's "
+    "class rows, a new fates record of 131 parts, and the design map's and the atlas's generators. Review it as a "
+    "design change. Does each edit say one thing, the same way in every record it touches, and leave no text that "
+    "still states the old answer, such as an attended session that drives or keeps its freedom? Does every new item, "
+    "key and record kind have one owner, and does every step's or row's new dependency sit on its own build or an "
+    "ancestor, or in a slot that renders not installed? Does each probe, attendance and code clause close the gaps it "
+    "owns? Is each fate in the fates record right against the tree and the design, and does each destination exist? "
+    "Can each new check arm fail? A fold's own text is new surface: check it as hard as the text it replaced. Write the "
+    "report to " + REPORT + ". Its head carries an H1, then, within its first twelve lines, the line `**Serves:** "
+    "diff-review PLAY-dClosedLoop-1`. It carries exactly one `## Verdict:` line, whose token is CLEAN, CLEAN WITH "
+    "FIXES or BLOCKED and nothing else.")
+out = S / "night" / "args-night-review.json"
+out.write_text(json.dumps(a, indent=1, ensure_ascii=False), encoding="utf-8", newline="\n")
+print(f"args: {a['kind']} {a['base'][:9]}..{a['head'][:9]}, {a['intensity']}, {len(a['specs'])} specs, checklist "
+      f"{len(a['checklist'].splitlines())} lines, efforts {a['efforts']}, context {len(a['context'].split())} words")
+````
+
+### `plain_cites.py`
+
+H2: plain-word spellings of a non-ancestor's record kind in the chain rows, measured.
+
+````python
+"""Measure H2's proposed widening of the reconciliation probe's cites rule: plain-word spellings of owned record kinds
+(and roles), whole-word, in each [chain] row, owned by a build that is not the row's own or an ancestor.
+
+Usage: python -X utf8 plain_cites.py   (from the worktree root); prints every hit, grouped by node
+"""
+import collections
+import importlib.util
+import re
+
+B = "memory/builds/dClosedLoop/build/"
+spec = importlib.util.spec_from_file_location("projectmap", B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py")
+mp = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mp)
+A, ns = mp.derive()
+owner = {}
+for n in ns["record-kind"]:
+    own = [v for k, vs in n["rels"] if k == "owner" for v in vs]
+    if own:
+        owner[n["key"].replace("-", " ")] = own[0]
+v2 = open(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md", encoding="utf-8").read()
+chain = v2.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+rows, parents = {}, {}
+names = re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| ([^|]+) \| ([^|]+) \| (.+) \| [^|]+ \|$", ln)
+    if m:
+        rows[m.group(1)] = m.group(4)
+        parents[m.group(1)] = [p.strip() for p in m.group(3).split(",") if p.strip() in names]
+
+
+def anc(b, acc=None):
+    acc = set() if acc is None else acc
+    for p in parents[b]:
+        if p not in acc:
+            acc.add(p)
+            anc(p, acc)
+    return acc
+
+
+hits = collections.defaultdict(list)
+for b, text in rows.items():
+    plain = re.sub(r"`[^`]*`", " ", text)          # backticked tokens are the existing rule's
+    for kind, own in owner.items():
+        if own == b or own in anc(b):
+            continue
+        if re.search(r"(?<![\w-])" + re.escape(kind) + r"(?![\w-])", plain):
+            hits[kind].append(f"{b} ({own}'s)")
+total = sum(len(v) for v in hits.values())
+for k in sorted(hits, key=lambda k: -len(hits[k])):
+    print(f"{k:22} {len(hits[k]):3}  {', '.join(hits[k][:6])}{' …' if len(hits[k]) > 6 else ''}")
+print(f"plain-word hits on a non-ancestor's record kind: {total}, over {len(hits)} kinds")
+````
+
+### `fold_np_self.py`
+
+The night pass's own sweep while the review ran: one actor per probe item, the observation entry.place returns, verify-at-plan's route, and Design's seventh input.
+
+````python
+"""The night pass's self-review, found while its closing review ran, folded beside the review's own findings.
+
+1. `probe.design`'s actor was chosen by a policy key, `probe.verifier`, and by the probe's kind. flow-steps `[rules]`
+   gives every item one actor, and an item whose actor a policy value chooses becomes one item per value. So the
+   experiment gets its own item, `probe.experiment` (the researcher), `probe.design` keeps the tester, and the
+   verifier is a structural decision, NP-5, not a key: `probe.verifier` leaves the catalogue and the presets.
+2. `entry.place` routed on "an observation the request claims", which no field of its return carried. Its return now
+   names the observations.
+3. `probe.observations: verify-at-plan` had no route (the class `policy-value-with-no-route`). `plan.input` now routes
+   an owed observation to `probe.trigger` first.
+4. The `repeat` disposition sent a playbook run into Design, whose inputs did not list it. Design gains a seventh
+   input, and `design.input` routes it.
+
+Usage: python -X utf8 fold_np_self.py   (from the worktree root); refuses unless every anchor matches exactly once.
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+F = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+# 1. The probe's design items, one actor each.
+F.sub("""| `probe.pin` | command | `probe.trigger` | pins the subject by SHA, and records the question, the kind and the losing outcome before anything runs | the probe record's head, its losing outcome committed first | `probe.design` | dDeclaredLoop |
+| `probe.design` | the role `probe.verifier` names; for an experiment, the researcher | `probe.pin` | declares the method: the commands, or the `experiment` shape with its corpus, its variants and its judge | the method's schema check, and an experiment's fan checked against `probe.experiment.authority` | `probe.run`; an experiment beyond its authority → an owner item, resolved as `[breakpoint]`'s owner gate is | dDeclaredLoop |
+| `probe.run` | executor | `probe.design` |""",
+      """| `probe.pin` | command | `probe.trigger` | pins the subject by SHA, and records the question, the kind and the losing outcome before anything runs | the probe record's head, its losing outcome committed first | a verification or a reproduction → `probe.design`; an experiment → `probe.experiment` | dDeclaredLoop |
+| `probe.design` | tester | `probe.pin` | declares the commands that test the claim at the pinned SHA, cold: from the claim and the subject, never from the asker's reasoning | the method's schema check | `probe.run` | dDeclaredLoop |
+| `probe.experiment` | researcher | `probe.pin` | declares the experiment: the `experiment` shape with its corpus, its variants and its judge | the method's schema check, and the experiment's fan checked against `probe.experiment.authority` | `probe.run`; an experiment beyond its authority → an owner item, resolved as `[breakpoint]`'s owner gate is | dDeclaredLoop |
+| `probe.run` | executor | `probe.design` or `probe.experiment` |""", "probe items")
+F.sub("""- **Roles:** the tester verifies cold, as `probe.verifier` says; the researcher designs an experiment; the executor
+  runs it; a scorer or a blind judge decides it.
+- **Instruction:** the probe and tester-return schemas, each verdict set closed; the policies: `probe.points`,
+  `probe.raise`, `probe.observations`, `probe.experiment.authority`, `probe.verifier` and `flow.route-backs`.""",
+      """- **Roles:** the tester verifies cold; the researcher designs an experiment; the executor runs it; a scorer or a
+  blind judge decides it. Who verifies is a structural choice, NP-5, since one actor acts per item (`[rules]`).
+- **Instruction:** the probe and tester-return schemas, each verdict set closed; the policies: `probe.points`,
+  `probe.raise`, `probe.observations`, `probe.experiment.authority` and `flow.route-backs`.""", "probe roles")
+# 2. The observation entry.place routes on.
+F.sub("returns the disposition from the closed set (continue, amend, new, patch, repeat, ask, none), with its reason and "
+      "evidence",
+      "returns the disposition from the closed set (continue, amend, new, patch, repeat, ask, none), with its reason and "
+      "evidence, and names each observation the request claims", "place return")
+# 3. verify-at-plan's route.
+F.sub("| `plan.input` | command | — | pins the intake record, or the selected ask, filing or proposal | its SHA | "
+      "`plan.dedupe` | dRankedPlan |",
+      "| `plan.input` | command | — | pins the intake record, or the selected ask, filing or proposal | its SHA | "
+      "`plan.dedupe`; an observation the request claims, under `probe.observations: verify-at-plan` → `probe.trigger` "
+      "first, then `plan.dedupe` with the probe's record | dRankedPlan |", "plan input")
+# 4. A playbook run into Design.
+F.sub("""**Enters** on any of six inputs:""", """**Enters** on any of seven inputs:""", "design inputs count")
+F.sub("""- a fix unit, for a red whose spec is wrong or a core red the build's own commits introduced.
+""", """- a fix unit, for a red whose spec is wrong or a core red the build's own commits introduced;
+- a playbook run's derived plan record, its playbook pinned beside it, its slug claimed and its lease taken by
+  `entry.claim` (the `repeat` disposition; night pass, point 1).
+""", "design seventh input")
+F.sub("finding or fix unit → `design.unit-spec` for its new unit, or `design.decompose` when it changes an interface | "
+      "dIndexedDesign |",
+      "finding or fix unit → `design.unit-spec` for its new unit, or `design.decompose` when it changes an interface; "
+      "playbook run → `design.unit-spec`, one unit for each piece its playbook declares | dIndexedDesign |",
+      "design input route")
+F.save()
+
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("""| `probe.verifier` | tester, asking-role, researcher | tester | who verifies cold, night pass, pending NP-5; the default shown is the recommendation until the owner answers | dDeclaredLoop |
+""", "", "verifier key")
+V.sub("""| `probe.verifier` | tester | tester | tester | tester |
+""", "", "verifier preset row")
+V.sub("the probe program (`probe.trigger`, `probe.pin`, `probe.design`, `probe.run`, `probe.judge`, `probe.return`)",
+      "the probe program (`probe.trigger`, `probe.pin`, `probe.design`, `probe.experiment`, `probe.run`, `probe.judge`, "
+      "`probe.return`)", "probe items clause")
+V.save()
+
+O = Record(B + "2026-10-17-build-PLAY-dClosedLoop-1-ownership.md")
+O.sub("""  - items `probe.trigger`, `probe.pin`, `probe.design`, `probe.run`, `probe.judge` and `probe.return`: dDeclaredLoop;
+  - keys `attendance`, `probe.points`, `probe.raise`, `probe.observations`, `probe.experiment.authority` and
+    `probe.verifier`: dDeclaredLoop;""", """  - items `probe.trigger`, `probe.pin`, `probe.design`, `probe.experiment`, `probe.run`, `probe.judge` and
+    `probe.return`: dDeclaredLoop;
+  - keys `attendance`, `probe.points`, `probe.raise`, `probe.observations` and `probe.experiment.authority`:
+    dDeclaredLoop;""", "ownership")
+O.save()
+
+N = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md")
+N.sub("| NP-5 | Who verifies a probe? | the tester, cold; the asking role; the researcher | `probe.verifier`'s default |",
+      "| NP-5 | Who verifies a probe? | the tester, cold; the asking role; the researcher | a structural decision: "
+      "`probe.design`'s actor, since one actor acts per item |", "NP-5")
+N.save()
+````
+
+### `fold_np_residue.py`
+
+Residue: layer-roles' driver sentence, and the owner's session named in the design text.
+
+````python
+"""The night pass's residue, found by a sweep while its closing review ran: text that still states the old model.
+- layer-roles still said the main session drives, and the executor only when no one attends;
+- design text in layer-runtime, the project map and the systems record still said "attended session" for the session
+  the owner types in, whose binding now reads "owner" (the night pass, point 1). Dated answers and the session model
+  keep their words.
+
+Usage: python -X utf8 fold_np_residue.py   (from the worktree root); refuses unless every anchor matches exactly once.
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/2026-10-1"
+RO = Record(B + "5-build-PLAY-dClosedLoop-1-layer-roles.md")
+RO.sub("""  The main session is the driver and never a worker. The executor drives when no one attends.""",
+       """  The driver is never a worker. It is the supervisor in every mode, the owner's session its client. The owner's
+  session hosts the driver only until dWellOiledMachine lands, or if its platform spike fails, under its owner
+  binding, each role act it hosts act-bound with that act's epoch (the night pass, point 1, and its closing review's
+  M6, which replaced "the main session is the driver; the executor drives when no one attends").""", "driver")
+RO.save()
+
+RT = Record(B + "5-build-PLAY-dClosedLoop-1-layer-runtime.md")
+for old, new, label in (
+    ("      In an attended session under `allowance` or `person`, it goes to the person.",
+     "      In the owner's session under `allowance` or `person`, it goes to the person.", "dispatcher down"),
+    ("    - Under `runtime.attended-judge: classifier-or-person`, the default (RT-4), an attended session\n"
+     "      loads no ask rule,",
+     "    - Under `runtime.attended-judge: classifier-or-person`, the default (RT-4), the owner's session\n"
+     "      loads no ask rule,", "judge default"),
+    ("    baseline. An attended session under the default fails closed where the CLI carries",
+     "    baseline. The owner's session under the default fails closed where the CLI carries", "fails closed"),
+    ("    records an exception included, and puts it to the person when attended.",
+     "    records an exception included, and puts it to the person in the owner's session.", "exception"),
+    ("  - Attended sessions enter it only to land.", "  - The owner's session enters it only to land.", "primary tree"),
+    ("  - Attended sessions also get the card.", "  - The owner's session also gets the card.", "card"),
+    ("settled by RT-1. An attended session starts fresh at an item\n    boundary by default.",
+     "settled by RT-1. The owner's session starts fresh at an item\n    boundary by default.", "fresh"),
+    ("  - attended sessions follow `context.on-full`,", "  - the owner's session follows `context.on-full`,", "context"),
+    ("  - under `runtime.attended-judge: classifier-or-person`, an attended session loads no ask rule. A",
+     "  - under `runtime.attended-judge: classifier-or-person`, the owner's session loads no ask rule. A",
+     "judge test"),
+):
+    RT.sub(old, new, label)
+RT.sub("""  "owner", since attendance is a mode and not a kind of session.""",
+       """  "owner", since attendance is a mode and not a kind of session. Its design text says "the owner's session" for what
+  it called an attended session; `runtime.attended-judge` and `runtime.attended-allowance` keep their names until the
+  lexicon settles the term (gap-lex-09).""", "revised note")
+RT.save()
+
+PM = Record(B + "7-build-PLAY-dClosedLoop-1-project-map.md")
+PM.sub("| `memory.default-load` | card, card-and-live, card-and-map | card-and-map (PM-7), read by an attended session; an act "
+       "session loads its work order |",
+       "| `memory.default-load` | card, card-and-live, card-and-map | card-and-map (PM-7), read by the owner's session at "
+       "startup, resume and a compaction (night pass, point 5); an act session loads its work order |", "keys row")
+PM.save()
+
+SY = Record(B + "6-build-PLAY-dClosedLoop-1-systems.md")
+SY.sub("  - **An attended session also opens with the map** (PM-7,",
+       "  - **The owner's session also opens with the map,** and gets it back at a resume and a compaction (PM-7; the night "
+       "pass, point 5;", "opens with the map")
+SY.sub("| `memory.default-load` | card, card-and-live, card-and-map | card-and-map for attended sessions (PM-7) |",
+       "| `memory.default-load` | card, card-and-live, card-and-map | card-and-map for the owner's session (PM-7) |",
+       "keys row")
+SY.save()
+````
+
+### `fold_review_np.py`
+
+The closing review's fold into the design records.
+
+````python
+"""Fold the night pass's closing review (`reviews/2026-10-18-review-PLAY-dClosedLoop-1-night-pass-closing.md`) into the
+design records. Run after fold_np_self.py and fold_np_residue.py; the map's fixes are fix_map_review.py's, and the
+order's gate is the committed `build/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py`.
+
+Usage: python -X utf8 fold_review_np.py   (from the worktree root); refuses unless every anchor matches exactly once.
+"""
+import collections
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+REV = "`reviews/2026-10-18-review-PLAY-dClosedLoop-1-night-pass-closing.md`"
+
+# ---------------------------------------------------------------- flow-steps
+F = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+patch_row = ("| none | a placement disposition `patch`, from any of the three, its slug claimed and its lease taken by "
+             "`entry.claim` | designing | the patch's derived plan record, the claim ref and the lease record |\n")
+F.sub(patch_row, patch_row + "| none | a placement disposition `repeat`, from any of the three, its slug claimed and its "
+      "lease taken by `entry.claim` | designing | the playbook's record, the run's derived plan record, the claim ref and "
+      "the lease record (the night pass's closing review, H1) |\n", "H1 transition row")
+F.sub("""- **The driver knows a probe is owed,** because `next` returns the probe's items as the frontier while the asker
+  waits (P22).
+""", """- **The driver knows a probe is owed,** because `next` returns the probe's items as the frontier while the asker
+  waits (P22).
+- **Its verdicts are closed.** A verification or a reproduction is confirmed, refuted, inconclusive or unrunnable, and
+  an experiment is measured, within noise, aborted or unrunnable. A claimed or an unrunnable verdict goes to an owner
+  item (the closing review's M3).
+- **When an observation is verified,** as `probe.observations` says: before `entry.place` places the request; at
+  `plan.input` under `verify-at-plan`, though a patch or a repeat build, which never reaches Plan, is verified before
+  placement under that value too; and under `on-request` only when the owner asks, through the owner's request (M9).
+""", "M3 M9 probe intro")
+F.sub("| the asking item's re-entry, or the boundary's next item; a claimed verdict → an owner item, resolved as "
+      "`[breakpoint]`'s owner gate is | dDeclaredLoop |",
+      "| the asking item's re-entry, or the boundary's next item; a claimed or an unrunnable verdict → an owner item, "
+      "resolved as `[breakpoint]`'s owner gate is | dDeclaredLoop |", "M3 return route")
+F.sub("""- **Runtime:** the harness adapter's browser capability and the visual capture adapter, dWellOiledMachine's; act
+  binding for an experiment's acts.
+""", """- **Runtime:** the harness adapter's browser capability and the visual capture adapter, dWellOiledMachine's; act
+  binding for an experiment's acts.
+- **Before the builds it rests on land** (the closing review's H2 and M2). dDeclaredLoop builds the program ahead of
+  them, so each later part has a stand-in until its build lands:
+  - dBoundRoles' tester and `experiment` shape: `probe.design` and `probe.experiment` route to an owner item;
+  - dBoundRoles' `probe` outcome on the role templates: probes are placed, never raised;
+  - dTotalRecall's `record` command: `probe.return` writes the probe record into the build folder, keyed as its kind
+    declares;
+  - dWellOiledMachine's visual capture adapter: a visual verification is unrunnable.
+
+  The executor's re-run is dDeclaredLoop's own, its witnesses computed rather than typed, and the scorer factory is
+  dFairHearing's, an ancestor, so a probe is judged from the start.
+""", "H2 M2 stand-ins")
+F.sub("""  and its gate script. Changing them takes the tester's `test.attribute` judgment that the spec is wrong, which
+  routes to Design as a new unit (P19).""", """  and its gate script. Changing them takes the tester's `test.attribute` judgment that the spec is wrong, which
+  routes to Design as a new unit (P19). Its arm is seen red on a planted fix pass that writes the red leg's test file,
+  and a fix pass after a failed `build.acceptance` leaves the acceptance commands' own files alone too (M16).""",
+      "M16 fix pass")
+F.sub("attend or unattend → the `override` record, scoped by `attendance.scope`,",
+      "attend or unattend → the `attendance override` record, scoped by `attendance.scope`,", "M13 life.request")
+F.save()
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("""Revised: 2026-10-17, after the folds' closing review""", f"""Revised: 2026-10-18, after the night pass's closing review ({REV}), CLEAN WITH FIXES, 26 items, 3 high:
+- `repeat` gains its transition row and its Design entry (H1), and the order's gate now checks both (H1);
+- each new dependency on a later build gets a stand-in, a class row or a move: the playbook set check moves to
+  dIndexedDesign, the probe's re-run joins dDeclaredLoop's computed witnesses, and the probe program declares its
+  stand-ins (H2, M1, M2);
+- the owner's session hosts the driver under its owner binding, each role act it hosts act-bound, one statement
+  everywhere (M6); attendance writes its own record kind, the attendance override (M13);
+- the map's fates arms fail hard on an absent record and are counted, and the order's gate is one committed script
+  (H3, M7, M8, M14, M15);
+- the other items are folded row by row in the night-pass record's `[review-fold]`.
+
+Revised: 2026-10-17, after the folds' closing review""", "revision note")
+V.sub("""complex features enter at Plan, in-goal amendments and patch
+  builds at Design.""", """complex features enter at Plan, in-goal amendments, patch
+  builds and playbook runs (`repeat`) at Design.""", "H1 P20")
+V.sub("review as breakpoints, with the verdict engine and the lander |",
+      "review as breakpoints and testing as probes at any boundary, with the verdict engine and the lander |", "flow row")
+V.sub("Its optional components, the map, recall and the lexicon, are what agents consult to decide",
+      "Its optional components, the map's owner views and dossiers, recall and the lexicon, are what agents consult to "
+      "decide; the map's code depth is core since the night pass (point 3)", "M12 memory row")
+CL = [
+    ("the attendance rule: `attendance` places owner breakpoints, turns the `step —` announcement on and has owner "
+     "questions asked live, and never selects an item's actor, the driver or a binding, its arm seen red on a planted "
+     "value that swaps an actor (night pass, point 1)",
+     "the attendance rule: `attendance` places owner breakpoints and has owner questions asked live, and never selects "
+     "an item's actor, the driver or a binding, its arm seen red on a planted value that swaps an actor, the `step —` "
+     "announcement joining when dWellOiledMachine lands it (night pass, point 1)"),
+    ("the `repeat` disposition in the placement set, routing a request onto a playbook (night pass, point 1)",
+     "the `repeat` disposition in the placement set and its `none` row in the transition table, routing a request "
+     "onto a `playbook`, filed as an ask until dIndexedDesign lands that record kind (night pass, point 1)"),
+    ("its record handed to the asking item, an entry-time probe keyed by content as triage is (night pass, point 2)",
+     "its record handed to the asking item, an entry-time probe keyed by content as triage is, and a stand-in for each "
+     "later part it rests on, as flow-steps' `[probe]` declares (night pass, point 2)"),
+    ("witnesses computed rather than typed by the acting agent (acceptance re-run by the executor, red attribution "
+     "joined to the verdict)",
+     "witnesses computed rather than typed by the acting agent (acceptance re-run by the executor, a probe's commands "
+     "re-run at its pinned SHA, red attribution joined to the verdict)"),
+    ("; the probe witness: the executor re-running a probe's declared commands at its pinned SHA, a figure an agent "
+     "judged kept as claimed (night pass, point 2)", ""),
+    ("; the playbook set record and its set check at Test (night pass, point 1)", ""),
+    ("a change to them routed through the tester's wrong-spec judgment to Design as a new unit (night pass, point 6)",
+     "a change to them routed through the tester's wrong-spec judgment to Design as a new unit, its arm seen red on a "
+     "planted fix pass that writes the red leg's test file, and a fix pass after a failed acceptance leaving the "
+     "acceptance commands' own files alone (night pass, point 6)"),
+    ("the research harness, built on the `experiment` shape (night pass, point 2)",
+     "the research harness, built on the `experiment` shape once dBoundRoles registers it, and run as today until then "
+     "(night pass, point 2)"),
+    ("amendment by proposal, and `check-playbook` as Design's pack (night pass, point 1)",
+     "amendment by proposal, and `check-playbook` as Design's pack (night pass, point 1); the playbook set record and "
+     "its set check, registered at Test's leg-pack point (night pass, point 1)"),
+    ("and attend and unattend, each writing an `override` record scoped by `attendance.scope` (night pass, point 1)",
+     "and attend and unattend, each writing an `attendance override` record scoped by `attendance.scope` (night pass, "
+     "point 1)"),
+    ("the supervisor the only driver in every mode, the owner's session its client, and before this build lands the "
+     "owner's session hosting the same driver program under the same act binding (night pass, point 1)",
+     "the supervisor the only driver in every mode, the owner's session its client, which hosts the driver only before "
+     "this build lands or if its platform spike fails, under its owner binding, each role act it hosts act-bound with "
+     "that act's epoch (night pass, point 1)"),
+]
+for old, new in CL:
+    if "; " in new or "|" in new:
+        if not old.startswith("amendment by proposal"):
+            sys.exit(f"a clause holds a separator: {new[:60]}")
+    V.sub(old, new, old[:40])
+V.sub("""    act session, the owner's session keeps hosting the driver, bound as an act session (point 1, NP-1);""",
+      """    act session, the owner's session keeps hosting the driver under its owner binding, each role act it hosts
+    act-bound with that act's epoch (point 1, NP-1);""", "M6 owed")
+V.sub("an attended session opens with the card and the map, and an act session loads its work order",
+      "the owner's session opens with the card and the map, and an act session loads its work order", "M11 default-load")
+V.sub("the working roles are the spec writer, builder, researcher, architect and reviewer, and the prompt writer through "
+      "its actor", "the working roles are the spec writer, builder, tester, researcher, architect and reviewer, and the "
+      "prompt writer through its actor", "M5 code-roles")
+V.save()
+
+# ---------------------------------------------------------------- layer-runtime (M6, L5)
+R = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md")
+R.sub(""" attended or not: the supervisor drives, and the owner's session is its client; until dWellOiledMachine
+ lands, the owner's session hosts the same driver, bound the same way (night pass, point 1)""",
+      """ attended or not: the supervisor drives, and the owner's session is its client; it hosts the driver only
+ until dWellOiledMachine lands, or if its spike fails, each role act it hosts act-bound (night pass, point 1)""",
+      "M6 diagram")
+R.sub("Until dWellOiledMachine lands, the owner's session hosts the same driver program, bound as an act session. No "
+      "model session drives. |",
+      "The owner's session hosts the driver only until dWellOiledMachine lands, or if its platform spike fails (v2 "
+      "`[owed]`), under its owner binding, each role act it hosts act-bound with that act's epoch. No model session "
+      "drives. |", "M6 terms")
+R.sub("""The act session, or the owner's session while it
+  hosts the driver, bound the same way, makes exactly one call (night pass, point 1):""",
+      """The act session, or the owner's session while it
+  hosts the driver, its role act act-bound with that act's epoch, makes exactly one call (night pass, point 1):""",
+      "M6 act call")
+R.sub("""The owner's session is bound the same way for every role act it hosts. Outside role
+    acts it reads and orients,""", """Each role act the owner's session hosts is act-bound with that act's epoch, under the
+    session's owner binding. Outside role acts it reads and orients,""", "M6 act freedom")
+R.sub("""    - The orientation scout's spawn at session start is a bound act of the attended binding.""",
+      """    - The orientation scout's spawn at session start is a bound act of the owner binding.""", "L5")
+R.sub("""- the diagram, `[decide]`'s `run <build>` and its clients: the owner's session hosts the driver only until
+  dWellOiledMachine lands, bound as an act session, and `/unattended` retires with the kit;""",
+      """- the diagram, `[decide]`'s `run <build>` and its clients: the owner's session hosts the driver only until
+  dWellOiledMachine lands, or if its platform spike fails, under its owner binding, each role act it hosts act-bound
+  with that act's epoch (the closing review's M6), and `/unattended` retires with the kit;""", "M6 revised")
+R.save()
+
+# ---------------------------------------------------------------- layer-memory (H2 move, M13, M12)
+M = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+M.sub("""The night pass adds the `code` record, the `probe` record, and
+  the playbook and playbook set kinds (points 1 to 3).""", """The night pass adds the `code` record, the `probe` record, the
+  playbook and playbook set kinds, and the attendance override (points 1 to 3).""", "core kinds")
+M.sub("| playbook set | dWitnessedBar | its writer is the set check at Test: a playbook run's pieces joined by hash, and "
+      "the set's identity derived from them (night pass, point 1) |",
+      "| playbook set | dIndexedDesign | its writer is the set check, which dIndexedDesign registers at Test's leg-pack "
+      "point: a playbook run's pieces joined by hash, and the set's identity derived from them (night pass, point 1, "
+      "moved by its closing review's H2) |", "playbook set owner")
+ov = next(l for l in M.text.split("\n") if l.startswith("| override | dOrderedCharter |"))
+M.sub(ov + "\n", ov + "\n| attendance override | dWellOiledMachine | its writer is `life.request`'s attend and unattend: "
+      "the attendance value and its scope, which `attendance.scope` reads (the night pass's closing review, M13) |\n",
+      "attendance override kind")
+M.sub("""  - the map's symbols and callers;""", """  - the core `code` record's definitions and callers (night pass, point 3);""",
+      "M12 reuse index")
+M.sub("""Without the map,
+  an optional component since KN-1, the index holds the reuse entries alone, and the slot says so.""",
+      """Without the map's
+  optional parts, the index still reads the core `code` record, and the slot names the parts absent (night pass,
+  point 3).""", "M12 reuse absent")
+M.save()
+
+# ---------------------------------------------------------------- ownership
+O = Record(B + "2026-10-17-build-PLAY-dClosedLoop-1-ownership.md")
+O.sub("""    dIndexedDesign; `playbook set`: dWitnessedBar.""", """    dIndexedDesign; `playbook set`: dIndexedDesign, which registers its set check at Test's leg-pack point (the
+    closing review's H2); `attendance override`: dWellOiledMachine (M13).""", "ownership kinds")
+O.save()
+
+# ---------------------------------------------------------------- project map (L1, L2, M5)
+P = Record(B + "2026-10-17-build-PLAY-dClosedLoop-1-project-map.md")
+P.sub("""and since the night pass the builder and
+the tester get their write set's `code` slot (point 3).""", """and since the night pass the builder and the tester get their write set's `code` slot (point 3).""", "L1 join")
+P.sub("| the map, with `design.inventory`'s unfolds |",
+      "| the map, with `design.inventory`'s unfolds, and the `code` slot of its scope paths (night pass, point 3) |",
+      "M5 architect")
+P.sub("| the spec writer, at `design.unit-spec` and `review.fold` | the map |",
+      "| the spec writer, at `design.unit-spec` and `review.fold` | the map, and the `code` slot of its unit's write set "
+      "(night pass, point 3) |", "M5 spec writer")
+P.sub("| the reviewer, at `review.lens` under the coherence and reuse lenses | the map |",
+      "| the reviewer, at `review.lens` under the coherence and reuse lenses | the map, and the `code` slot of the "
+      "pinned range (night pass, point 3) |", "M5 reviewer")
+P.sub("""  The slot renders filled, derived with nothing related, or not extracted for a language, with `gov code where`
+  named as the fallback.""", """  The slot renders filled, derived with nothing related, not extracted for a language, with `gov code where`
+  named as the fallback, or not installed, until dTotalRecall's `code` record lands (the closing review's L2).""",
+      "L2 states")
+P.save()
+
+# ---------------------------------------------------------------- layer-instruction (L4)
+I = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md")
+I.sub("| branch-reconcile and the cleanup Skill | Runtime: isolation housekeeping | expansion |",
+      "| branch-reconcile and the cleanup Skill | Observability: the prune fix, its isolation housekeeping read as a "
+      "reading (the fates record's `[stale]` 9) | expansion |", "L4 branch-reconcile")
+I.save()
+
+# ---------------------------------------------------------------- the re-cut (M7, H2)
+C = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md")
+C.sub("""tolerance, homonym, not a use and moved. That probe is the order's gate
+(`build/2026-10-18-build-PLAY-dClosedLoop-1-audit-fold.md` `[instrument]`).""",
+      """tolerance, homonym, not a use and moved. That probe is the order's gate, kept as one committed script,
+`build/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py`, which also checks each routed disposition's transition row (the
+night pass's closing review, M7 and H1). Its copies in the audit fold's `[review-instrument]` and the night pass's
+instruments record are snapshots.""", "M7 gate")
+anchor = "| dTotalRecall | `roster` | dIndexedDesign | homonym |"
+i = C.text.index(anchor)
+if C.text.count(anchor) != 1:
+    sys.exit("roster anchor")
+C.text = C.text[:i] + ("| dDeclaredLoop | `playbook` | dIndexedDesign | tolerance | the `repeat` disposition files an ask "
+                       "until dIndexedDesign lands the playbook record kind (the night pass's closing review, H2) |\n") + C.text[i:]
+C.done += 1
+C.save()
+
+# ---------------------------------------------------------------- the audit fold's probe copy (M7)
+A = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-audit-fold.md")
+A.sub("""## [review-instrument] The reconciliation probe, hardened
+""", """## [review-instrument] The reconciliation probe, hardened
+
+A snapshot: the order's gate is now one committed script, `build/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py`
+(the night pass's closing review, M7).
+""", "M7 snapshot note")
+A.save()
+
+# ---------------------------------------------------------------- the fates record (M4, L3, L4)
+T = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md")
+T.sub("| roles | `house/policy.toml` | effort and gates | STAYS | until dConvergedCharter folds it; on dGroundRules's "
+      "legacy list until then |",
+      "| roles | `house/policy.toml` | effort and gates | MERGED | into `.governance/policy.toml` (dConvergedCharter); on "
+      "dGroundRules's legacy list until then |", "M4 house policy")
+T.sub("| unattended | `stall-recorder.js` | API-stall record | STAYS | the supervisor's limit signal (dWellOiledMachine) |",
+      "| unattended | `stall-recorder.js` | API-stall record | RESHAPED | the supervisor's limit signal, in the runtime's "
+      "own kit (dWellOiledMachine) |", "L3 stall-recorder")
+T.sub("the set check (dWitnessedBar), a cyclic playbook's filer", "the set check, registered at Test (dIndexedDesign), a "
+      "cyclic playbook's filer", "H2 set check")
+T.sub("| expansion; its layer is disputed (section 5) (dTendedCadence, observability's prune fix) |",
+      "| observability's prune fix (dTendedCadence; `[stale]` 9) |", "L4 branch-reconcile")
+T.sub("| `tag` and `purpose` fields (dWitnessedBar); JSON-or-packs UNDECIDED | v2 `[chain]` dWitnessedBar |",
+      "| `tag` and `purpose` fields, and one manifest whose rows the leg factory generates from the packs' declarations "
+      "(dWitnessedBar) | v2 `[chain]` dWitnessedBar; proposed by the night pass (NP-22) |", "L4 gate-legs")
+T.sub("| the shared function is undecided (dTendedCadence, whose dead-pointer detector shares its function) | "
+      "layer-memory `[tools]` |",
+      "| its dangling-path function shared with Maintain's dead-pointer detector (dTendedCadence) | layer-memory `[tools]`; "
+      "proposed by the night pass (NP-22) |", "L4 dead-paths")
+T.sub("| skills | rendered Skills (7) | entries | RESHAPED | thin level-4 entries; build and unattended become clients of "
+      "`next` and `run` (dConvergedCharter, with dWellOiledMachine for the clients) |",
+      "| skills | rendered Skills, six of seven, `/unattended` apart | entries | RESHAPED | thin level-4 entries; `/build` "
+      "becomes a client of `next` and `run` (dConvergedCharter, with dWellOiledMachine for the client) |", "M4 Skills")
+rows = [l for l in T.text.split("## [table]", 1)[1].split("\n## ", 1)[0].split("\n") if l.startswith("| ") and
+        not l.startswith("| Kit") and not l.startswith("|---")]
+fate = collections.Counter(l.split(" | ")[3].strip() for l in rows)
+proposed = sum("proposed by the night pass (NP-22)" in l for l in rows)
+old_counts = re.search(r"Counts: \d+ stay,\s+\d+ reshaped, \d+ merged and \d+ retired, over \d+ rows\.", T.text)
+T.sub(old_counts.group(0), f"Counts: {fate['STAYS']} stay,\n{fate['RESHAPED']} reshaped, {fate['MERGED']} merged and "
+      f"{fate['RETIRED']} retired, over {len(rows)} rows.", "counts")
+T.sub("""- every STAYS, RESHAPED or MERGED row names a chain build in "Where it goes";
+- every RETIRED row names its replacement, or says "none" and why.
+
+Each arm is seen red on a planted case (`night-pass` `[instrument]`). What the check does not do: it does not prove
+that a row's fate is right, only that every part has one, in the closed set, landing in a build that exists. Whether
+each lands is dConvergedCharter's exit check (v2's `[chain]`).""",
+      """- every STAYS, RESHAPED or MERGED row names a chain build in "Where it goes";
+- every RETIRED row's "Where it goes" names something other than a bare "none";
+- no STAYS part sits in a kit whose fate is absorbed or retired;
+- the rows match the counts this record states, fate by fate;
+- each kit node's `fate` equals its `[kits]` row.
+
+The record is read by name, so a renamed or missing record stops the check, and a row of the wrong width stops it too
+(the night pass's closing review, H3, M8 and M14). Each arm is seen red on a planted case (`night-pass`
+`[instrument]`). What the check does not do:
+- it does not prove that a row's fate is right, only that every part has one, in the closed set, landing in a build
+  that exists;
+- it does not judge a RETIRED row's replacement or reason, only that one is named;
+- it does not catch one part named in two rows under different kits;
+- whether each part reaches its fate is dConvergedCharter's exit check (v2's `[chain]`).""", "L3 check")
+T.save()
+print(f"fates: {dict(fate)} over {len(rows)} rows, {proposed} proposed")
+````
+
+### `fix_map_review.py`
+
+The closing review's fold into the map's generator.
+
+````python
+"""Fold the night pass's closing review into the design map's generator (H3, M8, M14, M15, L3, L6, L7):
+- the fates record is resolved by name through the atlas's lookup, which exits when none or two carry it, so a rename,
+  a re-date or a move fails hard instead of switching every fates arm off (H3, M8), and `--plant fates-absent` sees it;
+- its two tables parse through the atlas's table reader, which stops on a row of the wrong width (M14), and the rows
+  are counted against the counts the record states;
+- plants reach every fates arm (M15), a kit node's `fate` rel is checked against `[kits]`, and a STAYS part under an
+  absorbed or retired kit, and a RETIRED row that names nothing or a bare "none", red (L3);
+- the layer arm reads the derived kit nodes, not rendered lines, and its plant empties a node's rel (L6);
+- the printed size leaves out the head line's dirty marker, so a recorded figure reproduces on any tree (L7).
+
+Usage: python -X utf8 fix_map_review.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+P = pathlib.Path("memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-map.py")
+t = P.read_text(encoding="utf-8")
+
+
+def sub(old, new, label):
+    global t
+    if t.count(old) != 1:
+        sys.exit(f"{label}: the anchor matches {t.count(old)} times")
+    t = t.replace(old, new, 1)
+
+
+sub('''FATES = HERE / "2026-10-18-build-PLAY-dClosedLoop-1-fates.md"
+FATE_KITS, FATE_ROWS = {}, []
+''', '''# Resolved by name through the atlas's record lookup, which exits when no record or two carry it (the closing review's
+# H3 and M8): a renamed, re-dated or moved record fails hard, never switching the fates arms off.
+FATES = "fates"
+FATE_KITS, FATE_ROWS, FATE_COUNTS = {}, [], []
+''', "globals")
+
+sub(r'''    if FATES.exists():
+        body = FATES.read_text(encoding="utf-8")
+        for tag, width, sink in (("kits", 3, "kits"), ("table", 6, "rows")):
+            _, block = section(body, tag)
+            for ln in block.split("\n"):
+                c = atlas.cells(ln) if ln.startswith("| ") else []
+                if len(c) == width and c[0] != "Kit" and not set(c[0]) <= set("-"):
+                    if sink == "kits":
+                        FATE_KITS[c[0]] = c[1]
+                    else:
+                        FATE_ROWS.append(c)
+        for n in kits:
+            if n["key"] in FATE_KITS:
+                n["rels"].append(("fate", [FATE_KITS[n["key"]]]))
+''', r'''    # The fates record's two tables, read through the atlas's table reader, which stops the run on a row of the wrong
+    # width (M14), and the counts its [table] lead-in states, which the count arm compares with the rows.
+    body = atlas.record(FATES).read_text(encoding="utf-8")
+    _, kits_block = section(body, "kits")
+    FATE_KITS.update({c[0]: c[1] for c in atlas.table(kits_block, "Kit", "fates [kits]")})
+    _, rows_block = section(body, "table")
+    FATE_ROWS.extend(atlas.table(rows_block, "Kit", "fates [table]"))
+    stated = re.search(r"Counts: (\d+) stay,\s+(\d+) reshaped,\s+(\d+) merged and (\d+) retired, over (\d+) rows", rows_block)
+    FATE_COUNTS.extend(int(x) for x in stated.groups()) if stated else None
+    for n in kits:
+        if n["key"] in FATE_KITS:
+            n["rels"].append(("fate", [FATE_KITS[n["key"]]]))
+''', "derive")
+
+sub('''    elif plant == "no-layer":
+        i = next(i for i, ln in enumerate(lines) if ln.startswith("- kit.") and " layer=" in ln)
+        lines[i] = re.sub(r" · layer=\\S+", "", lines[i])
+''', '''''', "old no-layer plant")
+
+sub(r'''    # Fates: every kit has a declared fate and rows, every row a known kit, a fate in its set and a destination.
+    if FATE_KITS or FATE_ROWS:
+        rows_, kits_ = [list(r) for r in FATE_ROWS], dict(FATE_KITS)
+''', r'''    # Fates: every kit has a declared fate and rows, every row a known kit, a fate in its set and a destination, the
+    # rows match the counts the record states, and no STAYS part sits in a kit that goes. The record is read hard in
+    # derive(), so an absent one never reaches here (H3).
+    if True:
+        rows_, kits_ = [list(r) for r in FATE_ROWS], dict(FATE_KITS)
+        fate_rel = {n["key"]: next((v[0] for k, v in n["rels"] if k == "fate"), None) for n in ns["kit"]}
+''', "fates head")
+
+sub('''        elif plant == "fates-kit":
+            kits_[next(iter(kits_))] = "maybe"
+''', '''        elif plant == "fates-kit":
+            kits_[next(iter(kits_))] = "maybe"
+        elif plant == "fates-kit-drop":
+            kits_.pop(next(iter(kits_)))
+        elif plant == "fates-kit-ghost":
+            kits_["ghostkit"] = "kept"
+        elif plant == "fates-count":
+            rows_[next(i for i, r in enumerate(rows_) if r[3] == "STAYS")][3] = "RESHAPED"
+        elif plant == "fates-absorbed-stays":
+            k = next(k for k, f in kits_.items() if f == "absorbed")
+            rows_[next(i for i, r in enumerate(rows_) if r[0] == k)][3] = "STAYS"
+        elif plant == "fates-bare-none":
+            rows_[next(i for i, r in enumerate(rows_) if r[3] == "RETIRED")][4] = "none"
+        elif plant == "fates-rel":
+            k = next(iter(fate_rel))
+            fate_rel[k] = "retired" if fate_rel[k] != "retired" else "kept"
+        if not rows_ or not kits_:
+            findings.append("fates: the record's [kits] or [table] holds no row")
+''', "plants")
+
+sub('''            elif r[3] == "RETIRED" and not r[4].strip():
+                findings.append(f"fates: {r[0]} · {r[1]} retires with no replacement named")
+''', '''            elif r[3] == "RETIRED" and r[4].strip().rstrip(".").lower() in ("", "none"):
+                findings.append(f"fates: {r[0]} · {r[1]} retires naming neither a replacement nor a reason")
+            if r[3] == "STAYS" and kits_.get(r[0]) in ("absorbed", "retired"):
+                findings.append(f"fates: {r[0]} · {r[1]} stays, yet its kit is {kits_[r[0]]}")
+        counted = [sum(r[3] == f for r in rows_) for f in ("STAYS", "RESHAPED", "MERGED", "RETIRED")] + [len(rows_)]
+        if counted != FATE_COUNTS:
+            findings.append(f"fates: the rows count {counted}, and the record states {FATE_COUNTS or 'no counts'}")
+        for k, f in sorted(fate_rel.items()):
+            if f != kits_.get(k):
+                findings.append(f"fates: kit.{k} carries fate={f}, and [kits] says {kits_.get(k)}")
+''', "arms")
+
+sub('''    # Layer: every kit line joins a layer, unless its kits-table row says "no layer" (dispatch 104 found all 19 empty).
+    for ln in lines[2:]:
+        m = LINE.match(ln)
+        if m and m.group(1) == "kit" and m.group(2) not in NO_LAYER and " layer=" not in ln:
+            findings.append(f"layer: kit.{m.group(2)} joins no layer")
+''', '''    # Layer: every kit node joins a layer, unless its kits-table row says "no layer" (dispatch 104 found all 19 empty).
+    # It reads the derived nodes, so a folded kit namespace still checks (the closing review's L6), and it does not
+    # check that the layer is the right one.
+    kit_nodes = [dict(n, rels=list(n["rels"])) for n in ns["kit"]]
+    if plant == "no-layer":
+        i = next(i for i, n in enumerate(kit_nodes) if any(k == "layer" and v for k, v in n["rels"]))
+        kit_nodes[i]["rels"] = [r for r in kit_nodes[i]["rels"] if r[0] != "layer"]
+    for n in kit_nodes:
+        if n["key"] not in NO_LAYER and not any(k == "layer" and v for k, v in n["rels"]):
+            findings.append(f"layer: kit.{n['key']} joins no layer")
+''', "layer arm")
+
+sub('''    out, folded, unarmed, steps = fit(ns, unfold)
+    plant = argv[argv.index("--plant") + 1] if "--plant" in argv else None
+''', '''    out, folded, unarmed, steps = fit(ns, unfold)
+    plant = argv[argv.index("--plant") + 1] if "--plant" in argv else None
+''', "plant read (unchanged anchor)")
+
+sub('''def main(argv):
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+''', '''def main(argv):
+    global FATES
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    if "--plant" in argv and argv[argv.index("--plant") + 1] == "fates-absent":
+        FATES = "fates-absent-plant"   # no record carries this name, so derive() must exit non-zero
+''', "fates-absent plant")
+
+sub('''    size = len(out.encode("utf-8"))
+''', '''    # The printed size leaves out the head line's dirty marker, so a recorded figure reproduces on a clean tree (L7).
+    size = len(re.sub(r"^(map \\S+) dirty", r"\\1", out, count=1).encode("utf-8"))
+''', "size")
+
+sub('''      cases: drop-line, bad-count, ghost-rel, no-layer, fates-drop, fates-ghost, fates-bad, fates-unbuilt,
+      fates-empty, fates-kit, census,''', '''      cases: drop-line, bad-count, ghost-rel, no-layer, fates-absent, fates-drop, fates-ghost, fates-bad, fates-unbuilt,
+      fates-empty, fates-kit, fates-kit-drop, fates-kit-ghost, fates-count, fates-absorbed-stays, fates-bare-none,
+      fates-rel, census,''', "usage")
+P.write_text(t, encoding="utf-8", newline="\n")
+print("map.py: the closing review's fixes")
+````
+
+### `fold_np_record_review.py`
+
+The night-pass record brought in line with the review's fold.
+
+````python
+"""Bring the night-pass record in line with its closing review's fold: the points' text, the chain's impact recomputed,
+the review's items and where each is fixed, and the instruments' numbers.
+
+Usage: python -X utf8 fold_np_record_review.py <v2-before-the-night.md>   (from the worktree root)
+"""
+import pathlib
+import re
+import subprocess
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+S = pathlib.Path(__file__).resolve().parent.parent
+B = "memory/builds/dClosedLoop/build/"
+N = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md")
+N.sub("""     request, which writes an `override` record scoped by `attendance.scope`.""",
+      """     request, which writes an `attendance override` record scoped by `attendance.scope` (its own kind, after the
+     closing review's M13).""", "p1 override")
+N.sub("""   - Until dWellOiledMachine lands, the owner's session hosts the same driver program, bound as an act session
+     (NP-1).""", """   - The owner's session hosts the driver only until dWellOiledMachine lands, or if its platform spike fails. It
+     keeps its owner binding, and each role act it hosts is act-bound with that act's epoch (NP-1; the closing
+     review's M6).""", "p1 hosting")
+N.sub("the supervisor always, the owner's session its client, hosting the same driver, bound as an act session, until "
+      "dWellOiledMachine lands;",
+      "the supervisor always, the owner's session its client, hosting the driver under its owner binding, each role act "
+      "act-bound, only until dWellOiledMachine lands or if its spike fails;", "NP-1")
+N.sub("""8. **The tester agent** is defined by dBoundRoles. Every role's return template gains the `probe` outcome.""",
+      """8. **The tester agent** is defined by dBoundRoles. Every role's return template gains the `probe` outcome.
+9. **Stand-ins until the later builds land,** declared in `[probe]` after the closing review's H2 and M2:
+   - an owner item stands in for the tester and for the experiment shape;
+   - probes are placed only, never raised;
+   - the probe record is a plain file;
+   - a visual check is unrunnable.
+
+   The verifier is the tester. Choosing another is a structural choice, NP-5, because flow-steps gives each item one
+   actor, so the experiment has its own item, `probe.experiment`.""", "p2 stand-ins")
+N.sub("""5. **Who gets it:** the spec writer, builder, researcher, architect and reviewer, and the prompt writer through its
+   actor (`memory.code-roles`).""", """5. **Who gets it:** the spec writer, builder, tester, researcher, architect and reviewer, and the prompt writer
+   through its actor (`memory.code-roles`).""", "p3 roles")
+N.sub("the working roles: spec writer, builder, researcher, architect, reviewer, and the prompt writer through its actor;",
+      "the working roles: spec writer, builder, tester, researcher, architect, reviewer, and the prompt writer through its "
+      "actor;", "NP-9")
+N.sub("""  - 131 parts: 28 stay, 69 are reshaped, 20 are merged and 14 retired. None is left undecided.""",
+      """  - 131 parts: 26 stay, 70 are reshaped, 21 are merged and 14 retired. None is left undecided.""", "p8 counts")
+N.sub("""  - It proposed a fate for each of the 11 parts no record decided (NP-22).""",
+      """  - It proposed fates for 19 parts no record decided (NP-22): dispatch 104's 11 undecided rows, split into 17 parts,
+    and two cells the table had left open.""", "p8 proposed")
+
+# [chain-impact], recomputed against v2 before the night.
+def units(path):
+    v2 = open(path, encoding="utf-8").read()
+    chain = v2.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+    out = {}
+    for ln in chain.split("\n"):
+        m = re.match(r"^\| (d[A-Z]\w+) \| ([^|]+) \| ([^|]+) \| (.+) \| ([^|]+) \|$", ln)
+        if m:
+            out[m.group(1)] = len(m.group(4).split("; "))
+    return out
+
+
+before, after = units(sys.argv[1]), units(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+order = ["dGroundRules", "dOrderedCharter", "dFairHearing", "dDeclaredLoop", "dWitnessedBar", "dBoundRoles",
+         "dTotalRecall", "dIndexedDesign", "dRankedPlan", "dWellOiledMachine", "dScopedBuild", "dTendedCadence",
+         "dMindYourWords", "dCalibratedLens", "dShippedRelease", "dConvergedCharter"]
+rows = []
+for b in order:
+    was = before[b] - (1 if b == "dConvergedCharter" else 0)
+    shown = f"{before[b]}, of which 11 meant" if b == "dConvergedCharter" else str(before[b])
+    rows.append(f"| {b} | {shown} | {after[b]} | {after[b] - was} |")
+cp = subprocess.run([sys.executable, "-X", "utf8", str(S / "order/critical_path.py")], capture_output=True,
+                    text=True, encoding="utf-8").stdout.split("\n")[0]
+path_units = re.search(r"critical path: (\d+) units", cp).group(1)
+old = N.text.split("## [chain-impact] What the night pass did to the chain\n", 1)[1].split("\n## [forks]", 1)[0]
+N.sub(old, f"""
+| Build | Units before | Units after | Added |
+|---|---|---|---|
+{chr(10).join(rows)}
+
+- **Units: {sum(before.values())} to {sum(after.values())}.** dConvergedCharter's old count held a quoted clause split
+  in two, the same defect as dFairHearing's before the walk. The clause scan now reads double quotes too, and was seen
+  red on it.
+- **The critical path: 181 to {path_units} units.**
+  - It now runs dGroundRules, dOrderedCharter, dDeclaredLoop, dWitnessedBar, dTotalRecall, dWellOiledMachine,
+    dTendedCadence, dCalibratedLens and dConvergedCharter.
+  - The Maintain and Review builds' additions (instruction evals, delivery metrics, a cyclic playbook's filer, a
+    bundle detector) put them ahead of dShippedRelease.
+- **dDeclaredLoop grows from 43 to {after['dDeclaredLoop']} units.** It holds the attendance rule, the `repeat`
+  disposition, the probe program and the code seed. The walk's offer to price a split stands, and NP-24 asks it.
+- **No edge changed, but not every new dependency was seen at first.** The closing review found five clauses that
+  rested on a build outside their ancestry, named in plain words the order's gate cannot read (its H2). Each was then
+  fixed one of three ways:
+  - **a stand-in:** the probe program's stand-ins, the research harness running as today, and the announcement joining
+    with dWellOiledMachine;
+  - **a class row:** `repeat`'s `playbook`, a tolerance;
+  - **a move:** the playbook set check to dIndexedDesign, and the probe's re-run into dDeclaredLoop's own computed
+    witnesses.
+
+  The re-cut's `[reconciled-order]` gained four class rows tonight: `feature` and `code` from dBoundRoles, `code` from
+  dOrderedCharter, and `playbook` from dDeclaredLoop.
+""", "chain impact")
+
+N.sub("\n## [instrument] The checks, as run\n", """
+## [review-fold] The closing review, folded
+
+The night pass's closing review ran as dispatch 105, a light Tier-2 diff review at medium effort, with 9 agents
+(`reviews/2026-10-18-review-PLAY-dClosedLoop-1-night-pass-closing.md`):
+- **What ran:** three lenses, correctness, seams and verification, then skeptic batches and one synthesis. The security
+  and intent lenses did not run.
+- **What it found:** CLEAN WITH FIXES. 26 items, 0 blocker, 3 high, 16 medium and 7 low, over 30 confirmed findings of
+  31.
+
+Every item is folded.
+
+| Item | What was wrong | Where it is fixed |
+|---|---|---|
+| H1 | `repeat` had no transition row and no Design entry | flow-steps `[transitions]`, `[design]`'s seventh input and `design.input`; P20; and the order's gate, now checking every routed disposition's row |
+| H2 | five clauses rested on a later build, named in plain words the probe cannot read | a stand-in, a class row or a move each (`[chain-impact]`); widening the rule to plain words was measured at 47 hits over 27 kinds, mostly homonyms, so the probe prints that count as unread |
+| H3, M8 | the fates arms switched off when the record was missing or re-dated | the map resolves the record by name and stops when it is absent; the `fates-absent` plant |
+| M1, M2 | the research harness and the probe program rested on later builds | as H2 |
+| M3 | `unrunnable` sat outside the closed verdict set | `[probe]`'s closed verdicts, with `probe.return` routing it to an owner item |
+| M4 | two fate rows contradicted their destination, or each other | `house/policy.toml` MERGED; the Skills row names six, `/unattended` apart |
+| M5 | two copies disagreed on who gets the `code` slot | the tester joins the working roles; the delivery table gives the slot to the architect, spec writer and reviewer |
+| M6 | the hosting rule was stated two ways | one statement in layer-runtime, layer-roles, v2's row and `[owed]`, and NP-1 |
+| M7 | the re-cut pointed at a superseded copy of the order's gate | the gate is one committed script, `build/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py` |
+| M9 | `verify-at-plan` and `on-request` had no route | `plan.input` routes the first, and `[probe]` says how each value runs |
+| M10 | `probe.verifier: asking-role` had no actor for a placed probe | the key is gone: the experiment has its own item, and the verifier is a structural choice, NP-5 |
+| M11 | `[sessions]` still classed sessions as attended | the owner's session there, in `[enforce]` and in v2's `memory.default-load` reason |
+| M12 | memory's `[reuse]` still treated symbols and callers as optional | `[reuse]` reads the core `code` record; v2's memory row narrowed |
+| M13 | attendance wrote into dOrderedCharter's `override` kind | its own kind, the attendance override, dWellOiledMachine's |
+| M14 | the fates parser dropped wrong-width rows | the atlas's table reader, which stops on one (seen red), and a count arm |
+| M15 | two fates arms were never seen red, and `fate=` went unchecked | plants for both, and an arm comparing each kit node's fate with `[kits]` |
+| M16 | the fix-pass clause named no witness | its arm and seen-red case, and the acceptance fix pass |
+| L1 | a delivery row was split across two lines | joined |
+| L2 | the `code` slot's states lacked "not installed" | added |
+| L3 | the RETIRED arm was overstated, and a STAYS part sat in an absorbed kit | the arm refuses a bare "none"; a STAYS-under-absorbed arm; `stall-recorder.js` RESHAPED; `[check]` matched to the arms |
+| L4 | stale text in the fates record | branch-reconcile's row and layer; the two open cells proposed; the proposed count restated |
+| L5 | "the attended binding" survived the rename | "the owner binding" |
+| L6 | the layer arm read rendered lines | it reads the derived kit nodes |
+| L7 | recorded map sizes included the dirty marker | the printed size leaves the marker out |
+
+**Beside the review,** the night pass's own sweep ran while the review was reading, and folded four more:
+- `probe.design`'s actor was chosen by a key and by the probe's kind, against flow-steps' rule of one actor per item.
+  `probe.experiment` is now its own item.
+- `entry.place` routed on an observation its return did not carry. Its return now names each observation.
+- `verify-at-plan` had no route. `plan.input` routes it, as M9 also asked.
+- layer-roles still said the main session drives, and design passages still said "attended session" for the owner's
+  session.
+
+**Left-shift.** Each class is gated where a gate fits:
+- the transitions rule and its plant (H1);
+- the map's fates arms and plants (H3, M8, M14, M15, L3);
+- the layer arm on derived nodes (L6).
+
+The rest are checklist lessons:
+- H2 recurs `step-depends-on-a-later-build`. Its entry now says to cite a dependency backticked and to state a
+  stand-in.
+- A renamed term is grepped across every record before the fold commits (M6, M11, L5:
+  `amendment-leaves-its-other-half-standing`).
+- An instrument lives in one committed file (M7: `two-answers-to-one-question`).
+- Every value of a policy key has a route (M9: `policy-value-with-no-route`).
+
+## [instrument] The checks, as run
+""", "review-fold section")
+N.save()
+````
+
+### `log_np.py`
+
+The session log: dispatches 100 to 104 and the night's event.
+
+````python
+"""Log the night pass in the session log: dispatches 100 to 104 with their derived agent lines, and the event.
+
+Usage: python -X utf8 log_np.py <agent-lines.txt>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+lines = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n").strip("\n")
+if lines.count("- agent — ") != 5 or lines.count("- returned — ") != 5:
+    sys.exit("expected five agent and five returned lines")
+P = "`prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-{}-researcher.md`"
+R = "`build/2026-10-18-build-PLAY-dClosedLoop-1-research-{}.md`"
+ROWS = [
+    (100, 4, "The night pass's point 1: unattended as the core flow's default state, the kit's functions homed, attended "
+     "as an override", "7m40s, 42.1k out: one driver, with attendance on the breakpoint seam, and playbook mode seated by "
+     "`repeat`", "unattended-core"),
+    (101, 5, "Point 2: testing anywhere in the flow, the driver aware, roles testing and handing results down",
+     "7m41s, 42.3k out: one probe program with two ways in, four other mechanisms each losing a test",
+     "testing-anywhere"),
+    (102, 6, "Point 3: code depth in the core, the map shaped mechanically and enriched, orientation by role",
+     "16m59s, 54.8k out: a core code record, a per-item code slot, `git grep` as the floor", "code-orientation"),
+    (103, 7, "Point 4: one relational syntax across memory, pulling a tag for its regions and instructions",
+     "9m30s, 50.6k out: declare at the site, derive the rest, four other mechanisms each losing a test",
+     "relational-syntax"),
+    (104, 8, "Point 8: today's tools, function by function, and their fates under v2",
+     "11m18s, 70.3k out: 118 function rows, 11 undecided, the kit-level map stale in nine rows", "tool-fates"),
+]
+row99 = next(l for l in L.text.split("\n") if l.startswith("| 99 | "))
+new = "\n".join(f"| {n} | gov-researcher, at the owner's medium effort | {what} | {P.format(h)} | 1799cb98 | returned, {out} | "
+                f"{R.format(rec)} |" for n, h, what, out, rec in ROWS)
+L.sub(row99 + "\n", row99 + "\n" + new + "\n", "dispatch rows")
+L.insert_before("\n## Events\n", f"""
+The night pass's researchers, dispatches 100 to 104, derived from their handoffs the same way:
+
+```text
+{lines}
+```
+""", "agent lines")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-18, session 1799cb98: during the walk, after wave 1 was presented, the owner handed over eight points and
+  stepped away for the night. Their words are in `build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[words]`.
+  The night pass, unattended:
+  - dispatched five researchers, 100 to 104, one point each, and worked points 5 to 7 itself;
+  - folded unattended-by-default, testing anywhere, code depth in the core, one relational syntax, the compaction
+    replay and five practices from Anthropic's AI-native SDLC playbook into v2 (P4, P20 and P25 amended, P31 to P33
+    added), flow-steps (a new `[probe]` program), the layer records and the ownership record;
+  - wrote the fates table, 131 parts, in `build/2026-10-18-build-PLAY-dClosedLoop-1-fates.md`;
+  - fixed the atlas's fold test (point 7), the map's kit-to-layer join, the clause scan's reading of quotes and the
+    reconciliation probe's reading of wildcard citations, each seen red first;
+  - registered twenty-eight gaps, grew the chain from 285 units to 331 and the critical path from 181 to 213, and
+    parked NP-1 to NP-24 for the owner.
+""", "event")
+L.done += 1
+L.save()
+````
+
+### `log_review.py`
+
+The session log: dispatch 105 and the review's fold.
+
+````python
+"""Log the night pass's closing review in the session log: dispatch 105, its derived agent lines, and the fold.
+
+Usage: python -X utf8 log_review.py <workflow-lines.txt>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+lines = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").strip("\n")
+if lines.count("- agent — ") != 10 or lines.count("- returned — ") != 10:
+    sys.exit("expected ten agent and ten returned lines")
+row104 = next(l for l in L.text.split("\n") if l.startswith("| 104 | "))
+L.sub(row104 + "\n", row104 + "\n" + (
+    "| 105 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), "
+    "`gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, round 1 | The night pass's closing "
+    "review: `9ab7a5c5c` over `beda01950`, twenty-two design records as specs | the args, recorded with its fold "
+    "(`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass-instruments.md`) | 1799cb98 | returned as `wf_ce0c2168-8c2`, "
+    "CLEAN WITH FIXES, 30 of 31 confirmed, 26 items, 3 high | "
+    "`reviews/2026-10-18-review-PLAY-dClosedLoop-1-night-pass-closing.md` |\n"), "dispatch row")
+L.insert_before("\n## Events\n", f"""
+The night pass's closing review, dispatch 105, derived from its run the same way:
+
+```text
+{lines}
+```
+""", "agent lines")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-18, session 1799cb98: the night pass's closing review, dispatch 105, returned CLEAN WITH FIXES, with 26
+  items, 3 of them high, and no blocker (`reviews/2026-10-18-review-PLAY-dClosedLoop-1-night-pass-closing.md`). Every
+  item is folded, with four more from the night pass's own sweep (the night-pass record's `[review-fold]`):
+  - `repeat` gained its transition row and its Design entry. The order's gate, now one committed script
+    (`build/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py`), checks every routed disposition's row.
+  - Five dependencies on a later build, named in plain words, each gained a stand-in, a class row or a move.
+  - The map's fates arms now stop on an absent or malformed record, and are counted and planted, every finding seen
+    red.
+  - The hosting rule reads one way everywhere. Attendance writes its own record kind, and `probe.design` keeps one
+    actor.
+""", "event")
+L.done += 1
+L.save()
+````
+
+### `plants_committed.sh`
+
+The probe's earlier plant suite, pointed at the committed copy.
+
+````python
+#!/usr/bin/env bash
+# The hardened reconciliation probe, red on one plant per rule and per class-table defect, and the superseded
+# citations-only probe re-run red on the committed table. Run from the worktree root.
+S=C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad
+RC=memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-recut.md
+P=memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py
+plant() {   # label, then the probe's plant arguments
+  local label="$1"; shift
+  echo "\$ python reconcile_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md $*   ($label)"
+  python -X utf8 "$P" $RC "$@" 2>&1 | grep -v ': tolerance$\|: homonym$\|: not a use$\|: moved$\|^chain rows\|^left out' ; echo "rc ${PIPESTATUS[0]}"
+}
+{
+  plant "cites" --plant-drop dTotalRecall:roster
+  plant "stage" --plant-edge-drop dRankedPlan:dDeclaredLoop --plant-edge-drop dRankedPlan:dTotalRecall
+  plant "routes into the breakpoint, by a declared name (FM8)" --plant-item "plan.fake:plan:dOrderedCharter:an owner item"
+  plant "routes into a stage, from an expansion (FH3)" --plant-edge-drop dTendedCadence:dIndexedDesign
+  plant "routes keyed by owner (FL6)" --plant-item "review.extra:breakpoint:dCalibratedLens:done"
+  plant "reads (FM4)" --plant-item 'plan.reader:plan:dRankedPlan:reads `runtime.journal`'
+  plant "registers" --plant-edge-drop dShippedRelease:dWellOiledMachine
+  plant "a blank class cell (FH2)" --plant-class "dFairHearing:review.trigger="
+  plant "a class outside the set (FH2)" --plant-class "dFairHearing:review.trigger=anything"
+  plant "a class row no dependency needs (FL5)" --plant-add dRankedPlan:review.trigger:dDeclaredLoop
+  echo '$ python ancestor_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md   (superseded, re-run on the committed table, FM5)'
+  python -X utf8 "$S/order/ancestor_probe.py" $RC 2>&1 | grep -v ': tolerance$\|: homonym$\|: not a use$\|: moved$'; echo "rc ${PIPESTATUS[0]}"
+} > "$S/audit/plants-review.txt"
+cat "$S/audit/plants-review.txt"
+````
+
 ### `record_instruments.py`
 
 This record's own writer.
@@ -1892,6 +2994,18 @@ MINE = [
     ("night/record_fates.py", "Writes the fates record from those rows."),
     ("night/fix_map_fates.py", "The design map reads the fates record: `fate=` on each kit line, and six arms."),
     ("night/merge_np.py", "Orders the night-pass record's sections point by point."),
+    ("night/build_args_night.py", "The closing review's args: a light diff review of the night-pass commit at medium."),
+    ("night/plain_cites.py", "H2: plain-word spellings of a non-ancestor's record kind in the chain rows, measured."),
+    ("night/fold_np_self.py", "The night pass's own sweep while the review ran: one actor per probe item, the "
+     "observation entry.place returns, verify-at-plan's route, and Design's seventh input."),
+    ("night/fold_np_residue.py", "Residue: layer-roles' driver sentence, and the owner's session named in the design "
+     "text."),
+    ("night/fold_review_np.py", "The closing review's fold into the design records."),
+    ("night/fix_map_review.py", "The closing review's fold into the map's generator."),
+    ("night/fold_np_record_review.py", "The night-pass record brought in line with the review's fold."),
+    ("night/log_np.py", "The session log: dispatches 100 to 104 and the night's event."),
+    ("night/log_review.py", "The session log: dispatch 105 and the review's fold."),
+    ("night/plants_committed.sh", "The probe's earlier plant suite, pointed at the committed copy."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -1948,10 +3062,35 @@ The reconciliation probe, its wildcard reading added, before dBoundRoles' `featu
 The reconciliation probe after the records fold, before the two `code` class rows:
 
 """ + block("text", read(S / "night/reconcile6.out") + "\nrc 1"))
+parts.append("""
+## [review] The closing review's args, and its fold's red runs
+
+The args dispatch 105 ran on, as `build_args_night.py` built them:
+
+""" + block("json", read(S / "night/args-night-review.json")) + """
+H2's measurement, re-run on the folded tree. The first fold read 47 mentions over 27 kinds:
+
+""" + block("text", "$ python plain_cites.py\n" + run(str(S / "night/plain_cites.py"))[0]) + """
+The committed probe's transitions rule, red before `repeat`'s row landed:
+
+""" + block("text", read(S / "night/rc_h1_red.out") + "\nrc 1") + """
+After the row, its two new plants:
+
+""" + block("text", "$ python reconcile.py recut.md --plant-transition-drop repeat\n" + read(S / "night/rf_rcp.out")
+                     + "\nrc 1\n$ python reconcile.py recut.md --plant-drop dDeclaredLoop:playbook\n"
+                     + read(S / "night/rf_rcp2.out") + "\nrc 1") + """
+The map on a fates record with one row widened by a cell, restored byte for byte afterwards:
+
+""" + block("text", "$ python map.py --check\n" + read(S / "night/rf_wide.out") + "\nrc 1") + """
+The earlier plant suite against the committed probe:
+
+""" + block("text", read(S / "night/rf_plants.out")))
 plants = []
-for p in ("no-layer", "fates-drop", "fates-ghost", "fates-bad", "fates-unbuilt", "fates-empty", "fates-kit"):
+for p in ("no-layer", "fates-absent", "fates-drop", "fates-ghost", "fates-bad", "fates-unbuilt", "fates-empty",
+          "fates-kit", "fates-kit-drop", "fates-kit-ghost", "fates-count", "fates-absorbed-stays", "fates-bare-none",
+          "fates-rel", "fates-none"):
     out, rc = run(B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py", "--check", "--plant", p)
-    plants.append(f"$ python map.py --check --plant {p}\n" + "\n".join(l for l in out.split("\n") if l.startswith("FINDING"))
+    plants.append(f"$ python map.py --check --plant {p}\n" + "\n".join(l for l in out.split("\n") if l.startswith(("FINDING", "atlas:")))
                   + f"\nrc {rc}")
     if rc != 1:
         sys.exit(f"plant {p} did not red")
@@ -1963,7 +3102,7 @@ final = []
 for label, args in (("design map", [B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py", "--check"]),
                     ("atlas", [B + "2026-10-16-build-PLAY-dClosedLoop-1-atlas.py", "--check"]),
                     ("fold state", [str(S / "night/fold_state.py")]),
-                    ("reconciliation probe", [str(S / "audit/reconcile_probe.py"),
+                    ("reconciliation probe", [B + "2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py",
                                               B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md"]),
                     ("clause scan", [str(S / "walk/paren_semis.py")]),
                     ("gap join", [str(S / "join_canonical.py"), B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md",
@@ -2023,6 +3162,26 @@ The night pass's inline edits, each run once through a quoted heredoc that held 
 
 6. The quoted map numbers, updated to the staged tree's (2,232 nodes, 31,133 of 32,768 B; the atlas's 154 records):
    in the night-pass record's `[instrument]` and `[p3-code]`, v2's `[owed]` and gap-mem-30's text.
+
+After the night pass's first commit, during the closing review's fold:
+
+7. The reconciliation probe was copied into the build folder as
+   `build/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py` and edited there with the Edit tool: a Serves line and the
+   note that records cite this one copy; rule 6, transitions, with its `--plant-transition-drop` plant; and the summary
+   line naming what it does not read, with the plain-word count. Its source is the committed file.
+
+8. The map's generator gained the `fates-none` plant by an Edit after `fix_map_review.py` ran, and its usage line
+   names it (one sed). Every fates finding then had a red case.
+
+9. A wrong-width row was seen to stop the map: one fates row widened by a cell in place, the check run (rc 1, the
+   atlas's "7 cells under a 6-column header"), the record restored from a scratch copy, and `cmp` confirming it
+   byte for byte before the check ran green again.
+
+10. The gotcha `step-depends-on-a-later-build` gained the night pass in "Where it bit" and the backticked-citation fix,
+    by two Edits, and `gotchas.py --write` re-rendered its index row's count.
+
+11. The night-pass record's `[instrument]` section was rewritten with the final numbers, and its fates-arm count
+    corrected once `fates-none` landed.
 ````
 
 ## [red] The red runs, as captured
@@ -2138,29 +3297,384 @@ rc 1
 ````
 
 
+## [review] The closing review's args, and its fold's red runs
+
+The args dispatch 105 ran on, as `build_args_night.py` built them:
+
+````json
+{
+ "kind": "diff-review",
+ "base": "beda01950b99c0c11e91fe2f12e5d019be39536d",
+ "head": "9ab7a5c5cffa27b405c9caafa92d105db8a07ea0",
+ "repo": "C:/projects/coding-governance/.claude/worktrees/gov-architecture-plan-e34297",
+ "reviewDir": "memory/builds/dClosedLoop/reviews",
+ "specs": [
+  "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md",
+  "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md",
+  "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md",
+  "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-flow.md",
+  "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md",
+  "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-roles.md",
+  "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md",
+  "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md",
+  "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md",
+  "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md",
+  "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md",
+  "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-review-system.md",
+  "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md",
+  "memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md",
+  "memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-project-map.md",
+  "memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-ownership.md",
+  "memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md",
+  "memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-recut.md",
+  "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-walkthrough.md",
+  "memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md",
+  "memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-fates.md",
+  "memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md"
+ ],
+ "byDesign": "- The build is design-only: no product code and no unit specs. Unit-level detail is absent by design and owed to the chain builds, and a row's planned units are prose, counted one per clause.\n- The owner's eight points, recorded verbatim in the night-pass record's [words], are decisions where they direct: unattended is the default state, attendance changes only the owner's interactions, testing can happen anywhere, code depth is core, and playbook mode stays in the flow. A finding may show the fold contradicting a record or the tree, not re-argue the owner's direction.\n- The forks NP-1 to NP-24 are parked for the owner. A key's default marked pending is the recommendation shown until the owner answers; a finding may show that a pending default contradicts a record, not that a fork should have been settled.\n- Every earlier answer stands: PM-1 to PM-12, RC-1 to RC-9, AF-1 to AF-3, FL1, CX-1 to CX-3, RT-1 to RT-4, KN-1 as the night pass amends it, and every round's before them.\n- The five research returns (research-unattended-core, -testing-anywhere, -code-orientation, -relational-syntax and -tool-fates) are verbatim and dated, and their prompts are rendered handoffs: neither is under review. The instruments record holds the scripts as they ran.\n- Dated records keep what held when they were written: revision notes, the session log's past entries, and the ownership record's approved tables, which its [amended] bullets amend.\n- Generated files (memory/LIVE.md and the build README's generated regions) are rendered, not reviewed. The map generator's and the atlas's changes are instruments, and are reviewed: can each new arm fail, and does each say what it does not check?",
+ "checklist": "# recurring-bug-class checklist for beda01950..9ab7a5c5c (29 changed file(s))\n# 23 class(es) selected by an anchor + 6 universal\n# by anchor specificity: 15 path · 4 directory · 4 basename; a cut tier prints one line per class\n# invariants are read at beda01950b99; 0 that this subject adds, edits or takes out are listed as items, never by design\n\n- [ ] fixture-passes-by-finding-nothing (universal)\n      a test arm whose fixture never triggers the rule passes, and proves nothing\n      memory/gotchas/fixture-passes-by-finding-nothing.md\n\n- [ ] guard-above-a-fold-makes-its-fallback-dead (universal)\n      a guard added above a fold settles the predicate the fold's own fallback re-tests, leaving a dead arm that reads as coverage\n      memory/gotchas/guard-above-a-fold-makes-its-fallback-dead.md\n\n- [ ] heredoc-escape-reaches-the-regex (universal)\n      source written through a shell heredoc into a non-raw string turns an escape into a control byte, and the symptom never looks like a quoting problem\n      memory/gotchas/heredoc-escape-reaches-the-regex.md\n\n- [ ] inline-fence-swallows-the-rest-of-the-file (universal)\n      a triple-backtick written inline in prose opens a fence the reader never closes, so every section after it silently disappears from the checker's view\n      memory/gotchas/inline-fence-swallows-the-rest-of-the-file.md\n\n- [ ] staged-break-substitutes-a-synthetic-value (universal)\n      an arm that proves a mechanism by replacing the shipped value with a simpler one proves the mechanism for the simpler value\n      memory/gotchas/staged-break-substitutes-a-synthetic-value.md\n\n- [ ] two-answers-to-one-question (universal)\n      a fact stated in two places drifts, and the copies need not disagree loudly to be wrong\n      memory/gotchas/two-answers-to-one-question.md\n\n- [ ] pipe-in-a-code-span-splits-a-table-cell (path)\n      a markdown table cell holding a pipe, even inside backticks, splits into extra cells, so a reader that splits the row on its pipes reads the wrong cell as a column\n      memory/gotchas/pipe-in-a-code-span-splits-a-table-cell.md\n\n- [ ] policy-value-with-no-route (path)\n      a policy key catalogues a value that no item reading the key routes or witnesses, so a preset that selects the value cannot run\n      memory/gotchas/policy-value-with-no-route.md\n\n- [ ] absence-read-from-one-of-several-homes (path)\n      a fact stated in several homes is read from one, so a derived view or a probe reports it absent wherever that home is silent, and the blank reads exactly like a real gap\n      memory/gotchas/absence-read-from-one-of-several-homes.md\n\n- [ ] an-allow-that-bypasses-a-judge-names-none (path)\n      a permission hook answers allow on calls that a judge, a classifier or a person, would otherwise have seen, and names no judge in its place, so a destructive call runs with nothing judging it\n      memory/gotchas/an-allow-that-bypasses-a-judge-names-none.md\n\n- [ ] append-without-an-idempotence-key (path)\n      a command that appends to an append-only record declares no key, so a retried run writes the same row twice and a set-join witness stays green\n      memory/gotchas/append-without-an-idempotence-key.md\n\n- [ ] insert-after-a-key-that-occurs-twice (path)\n      a record edit inserts a row after the first match of a cell value that occurs in two tables, so the row lands in the wrong table and the right one never gains it\n      memory/gotchas/insert-after-a-key-that-occurs-twice.md\n\n- [ ] instrument-recorded-into-the-corpus-it-scans (path)\n      a probe's source is recorded beside its results, the page it scans later embeds that record, and its literal pattern matches its own quotation, so a clean page reads as broken, or a broken one as clean\n      memory/gotchas/instrument-recorded-into-the-corpus-it-scans.md\n\n- [ ] owner-item-without-its-reject-outcome (path)\n      a design hands a decision to the owner and routes only the yes, so a no leaves landed work with no route and a check that turns red on the default branch\n      memory/gotchas/owner-item-without-its-reject-outcome.md\n\n- [ ] parser-drops-rows-it-cannot-place (path)\n      a record-parsing instrument skips rows under a heading it does not know, or rows its pattern cannot read, and still prints a clean run, so its population shrinks without a word\n      memory/gotchas/parser-drops-rows-it-cannot-place.md\n\n- [ ] predicate-designed-without-a-run-over-the-tree (path)\n      a design states a new check's predicate without running it over today's population, so the check reds on hundreds of existing sites the day it arms, or ships with an exemption written by hand\n      memory/gotchas/predicate-designed-without-a-run-over-the-tree.md\n\n- [ ] rate-quoted-without-its-denominator (path)\n      a rate put to the owner in a fork divides by the wrong population, so the option's own cost reads several times off\n      memory/gotchas/rate-quoted-without-its-denominator.md\n\n- [ ] route-names-an-output-its-actor-never-emits (path)\n      a designed route or witness names an output, exit class or record that its actor never produces on that path, so the route is dead or waits forever\n      memory/gotchas/route-names-an-output-its-actor-never-emits.md\n\n- [ ] rule-stated-with-no-check-that-fails (path)\n      a principle, a constraint between two keys or another rule is added in prose with no check that can fail on its breach, so it binds nothing and nobody can see that it does not\n      memory/gotchas/rule-stated-with-no-check-that-fails.md\n\n- [ ] summary-rewrites-the-text-it-carries (path)\n      a compaction summary that reproduces a block as verbatim quietly rewrites the lines that look wrong in it, so the defects the block carried read as fixed and the copy passes for the original\n      memory/gotchas/summary-rewrites-the-text-it-carries.md\n\n- [ ] zero-witness-over-an-unnamed-population (path)\n      a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean\n      memory/gotchas/zero-witness-over-an-unnamed-population.md\n\n- [ ] a-merge-of-the-default-branch-read-as-additions (directory) · memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md\n\n- [ ] amendment-leaves-its-other-half-standing (directory) · memory/gotchas/amendment-leaves-its-other-half-standing.md\n\n- [ ] ledger-token-wrapped-across-a-line-joins-nothing (directory) · memory/gotchas/ledger-token-wrapped-across-a-line-joins-nothing.md\n\n- [ ] retirement-inventory-misses-readers-by-value (directory) · memory/gotchas/retirement-inventory-misses-readers-by-value.md\n\n- [ ] record-without-serves-or-with-a-round-counter (basename) · memory/gotchas/record-without-serves-or-with-a-round-counter.md\n\n- [ ] subagent-scratch-overwrites-the-parents-files (basename) · memory/gotchas/subagent-scratch-overwrites-the-parents-files.md\n\n- [ ] a-folded-field-leaves-its-row-shape-docs-behind (basename) · memory/gotchas/a-folded-field-leaves-its-row-shape-docs-behind.md\n\n- [ ] git-rm-cached-refuses-a-diverged-index-blob (basename) · memory/gotchas/git-rm-cached-refuses-a-diverged-index-blob.md\n\n# by design — 0 invariant(s) this selection touches\n",
+ "round": 1,
+ "intensity": "light",
+ "roles": {
+  "diffFinder": "gov-diff-reviewer",
+  "skeptic": "gov-skeptic",
+  "synthesis": "gov-synthesizer"
+ },
+ "efforts": {
+  "diffFinder": "medium",
+  "skeptic": "medium",
+  "synthesis": "medium"
+ },
+ "context": "The diff is one commit, 9ab7a5c5c over beda01950: build dClosedLoop's night pass, which worked the owner's eight points into the design while the owner was away. dClosedLoop is a design-only build that re-architects gov onto one loop. The night-pass record, memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md, says what each point changed ([p1-unattended] to [p8-fates]), the chain's growth ([chain-impact]) and the parked forks ([forks]). The edits land in v2 (P4, P20, P25 amended, P31 to P33 added, thirteen keys and their preset rows, every [chain] row's new clauses and owned gaps, [owed]), flow-steps (the `repeat` disposition, the entry-time probe, [rules], the attendance gates in [breakpoint], a new [probe] program, attend and unattend in [lifecycle], the fix pass in [test]), the gap register (28 gaps), layer-memory's kinds, layer-runtime's driver and binding, layer-instruction, layer-library, the project map, the systems record, the ownership amendment, the re-cut's class rows, a new fates record of 131 parts, and the design map's and the atlas's generators. Review it as a design change. Does each edit say one thing, the same way in every record it touches, and leave no text that still states the old answer, such as an attended session that drives or keeps its freedom? Does every new item, key and record kind have one owner, and does every step's or row's new dependency sit on its own build or an ancestor, or in a slot that renders not installed? Does each probe, attendance and code clause close the gaps it owns? Is each fate in the fates record right against the tree and the design, and does each destination exist? Can each new check arm fail? A fold's own text is new surface: check it as hard as the text it replaced. Write the report to memory/builds/dClosedLoop/reviews/2026-10-18-review-PLAY-dClosedLoop-1-night-pass-closing.md. Its head carries an H1, then, within its first twelve lines, the line `**Serves:** diff-review PLAY-dClosedLoop-1`. It carries exactly one `## Verdict:` line, whose token is CLEAN, CLEAN WITH FIXES or BLOCKED and nothing else.",
+ "scratch": "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/review-night-pass"
+}
+````
+
+H2's measurement, re-run on the folded tree. The first fold read 47 mentions over 27 kinds:
+
+````text
+$ python plain_cites.py
+landing                  5  dGroundRules (dShippedRelease's), dOrderedCharter (dShippedRelease's), dDeclaredLoop (dShippedRelease's), dWellOiledMachine (dShippedRelease's), dCalibratedLens (dShippedRelease's)
+scope                    4  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
+seen red                 3  dGroundRules (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's)
+playbook                 2  dOrderedCharter (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
+release                  2  dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
+spec                     2  dFairHearing (dIndexedDesign's), dBoundRoles (dIndexedDesign's)
+code                     2  dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's)
+intake                   2  dDeclaredLoop (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
+return                   2  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
+act                      2  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
+fork                     2  dBoundRoles (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
+baseline                 2  dBoundRoles (dTotalRecall's), dWitnessedBar (dTotalRecall's)
+override                 1  dGroundRules (dOrderedCharter's)
+card                     1  dOrderedCharter (dDeclaredLoop's)
+inventory                1  dOrderedCharter (dIndexedDesign's)
+probe                    1  dOrderedCharter (dDeclaredLoop's)
+disposition              1  dFairHearing (dDeclaredLoop's)
+triage                   1  dDeclaredLoop (dRankedPlan's)
+overlap                  1  dDeclaredLoop (dIndexedDesign's)
+verdict                  1  dDeclaredLoop (dWitnessedBar's)
+attribution              1  dDeclaredLoop (dWitnessedBar's)
+routing                  1  dDeclaredLoop (dWitnessedBar's)
+fleet                    1  dDeclaredLoop (dShippedRelease's)
+ask                      1  dDeclaredLoop (dTotalRecall's)
+claim                    1  dDeclaredLoop (dTotalRecall's)
+roster                   1  dBoundRoles (dIndexedDesign's)
+value ledger             1  dBoundRoles (dCalibratedLens's)
+work order               1  dTotalRecall (dBoundRoles's)
+plain-word hits on a non-ancestor's record kind: 46, over 28 kinds
+````
+
+The committed probe's transitions rule, red before `repeat`'s row landed:
+
+````text
+chain rows 16 · owned nodes read 418 · flow items read 87 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 19 (cites 15, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 47 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+transitions: 3 dispositions routed through entry.claim, 3 `none` rows
+  transitions: the disposition `repeat` routes through `entry.claim`, and [transitions] has no `none` row for it
+  dBoundRoles cites `code` (dTotalRecall's, not an ancestor): tolerance
+  dBoundRoles cites `feature` (dTotalRecall's, not an ancestor): tolerance
+  dDeclaredLoop cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
+  dDeclaredLoop cites `hooks.bypass` (dWitnessedBar's, not an ancestor): not a use
+  dDeclaredLoop cites `intake` (dWellOiledMachine's, not an ancestor): homonym
+  dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
+  dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
+  dFairHearing cites `preset` (dDeclaredLoop's, not an ancestor): homonym
+  dGroundRules cites `policy.guard` (dDeclaredLoop's, not an ancestor): not a use
+  dGroundRules cites `policy.proof` (dDeclaredLoop's, not an ancestor): not a use
+  dOrderedCharter cites `check` (dWitnessedBar's, not an ancestor): homonym
+  dOrderedCharter cites `code` (dTotalRecall's, not an ancestor): not a use
+  dOrderedCharter cites `memory.map-purpose` (dTotalRecall's, not an ancestor): moved
+  dRankedPlan cites `entry.intake` (dWellOiledMachine's, not an ancestor): tolerance
+  dTotalRecall cites `roster` (dIndexedDesign's, not an ancestor): homonym
+  dDeclaredLoop reads `decisions.major` (dTotalRecall's, not an ancestor): tolerance
+  dFairHearing reads `flow.route-backs` (dDeclaredLoop's, not an ancestor): not a use
+  dRankedPlan reads `run.host` (dWellOiledMachine's, not an ancestor): tolerance
+  dFairHearing routes `review.trigger` (dDeclaredLoop's, not an ancestor): not a use
+findings 1
+rc 1
+````
+
+After the row, its two new plants:
+
+````text
+$ python reconcile.py recut.md --plant-transition-drop repeat
+chain rows 16 · owned nodes read 419 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 20 (cites 16, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 46 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+transitions: 3 dispositions routed through entry.claim, 3 `none` rows
+  transitions: the disposition `repeat` routes through `entry.claim`, and [transitions] has no `none` row for it
+  dBoundRoles cites `code` (dTotalRecall's, not an ancestor): tolerance
+  dBoundRoles cites `feature` (dTotalRecall's, not an ancestor): tolerance
+  dDeclaredLoop cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
+  dDeclaredLoop cites `hooks.bypass` (dWitnessedBar's, not an ancestor): not a use
+  dDeclaredLoop cites `intake` (dWellOiledMachine's, not an ancestor): homonym
+  dDeclaredLoop cites `playbook` (dIndexedDesign's, not an ancestor): tolerance
+  dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
+  dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
+  dFairHearing cites `preset` (dDeclaredLoop's, not an ancestor): homonym
+  dGroundRules cites `policy.guard` (dDeclaredLoop's, not an ancestor): not a use
+  dGroundRules cites `policy.proof` (dDeclaredLoop's, not an ancestor): not a use
+  dOrderedCharter cites `check` (dWitnessedBar's, not an ancestor): homonym
+  dOrderedCharter cites `code` (dTotalRecall's, not an ancestor): not a use
+  dOrderedCharter cites `memory.map-purpose` (dTotalRecall's, not an ancestor): moved
+  dRankedPlan cites `entry.intake` (dWellOiledMachine's, not an ancestor): tolerance
+  dTotalRecall cites `roster` (dIndexedDesign's, not an ancestor): homonym
+  dDeclaredLoop reads `decisions.major` (dTotalRecall's, not an ancestor): tolerance
+  dFairHearing reads `flow.route-backs` (dDeclaredLoop's, not an ancestor): not a use
+  dRankedPlan reads `run.host` (dWellOiledMachine's, not an ancestor): tolerance
+  dFairHearing routes `review.trigger` (dDeclaredLoop's, not an ancestor): not a use
+findings 1
+rc 1
+$ python reconcile.py recut.md --plant-drop dDeclaredLoop:playbook
+chain rows 16 · owned nodes read 419 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 20 (cites 16, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 46 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+transitions: 3 dispositions routed through entry.claim, 4 `none` rows
+  dBoundRoles cites `code` (dTotalRecall's, not an ancestor): tolerance
+  dBoundRoles cites `feature` (dTotalRecall's, not an ancestor): tolerance
+  dDeclaredLoop cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
+  dDeclaredLoop cites `hooks.bypass` (dWitnessedBar's, not an ancestor): not a use
+  dDeclaredLoop cites `intake` (dWellOiledMachine's, not an ancestor): homonym
+  dDeclaredLoop cites `playbook` (dIndexedDesign's, not an ancestor): UNCLASSED
+  dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
+  dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
+  dFairHearing cites `preset` (dDeclaredLoop's, not an ancestor): homonym
+  dGroundRules cites `policy.guard` (dDeclaredLoop's, not an ancestor): not a use
+  dGroundRules cites `policy.proof` (dDeclaredLoop's, not an ancestor): not a use
+  dOrderedCharter cites `check` (dWitnessedBar's, not an ancestor): homonym
+  dOrderedCharter cites `code` (dTotalRecall's, not an ancestor): not a use
+  dOrderedCharter cites `memory.map-purpose` (dTotalRecall's, not an ancestor): moved
+  dRankedPlan cites `entry.intake` (dWellOiledMachine's, not an ancestor): tolerance
+  dTotalRecall cites `roster` (dIndexedDesign's, not an ancestor): homonym
+  dDeclaredLoop reads `decisions.major` (dTotalRecall's, not an ancestor): tolerance
+  dFairHearing reads `flow.route-backs` (dDeclaredLoop's, not an ancestor): not a use
+  dRankedPlan reads `run.host` (dWellOiledMachine's, not an ancestor): tolerance
+  dFairHearing routes `review.trigger` (dDeclaredLoop's, not an ancestor): not a use
+findings 1
+rc 1
+````
+
+The map on a fates record with one row widened by a cell, restored byte for byte afterwards:
+
+````text
+$ python map.py --check
+atlas: 7 cells under a 6-column header: | lib | resolvers, render-doc, health-log, arms | primitives | STAYS | inline copies gener
+rc 1
+````
+
+The earlier plant suite against the committed probe:
+
+````text
+$ python reconcile_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md --plant-drop dTotalRecall:roster   (cites)
+transitions: 3 dispositions routed through entry.claim, 4 `none` rows
+  dTotalRecall cites `roster` (dIndexedDesign's, not an ancestor): UNCLASSED
+findings 1
+rc 1
+$ python reconcile_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md --plant-edge-drop dRankedPlan:dDeclaredLoop --plant-edge-drop dRankedPlan:dTotalRecall   (stage)
+transitions: 3 dispositions routed through entry.claim, 4 `none` rows
+  dRankedPlan cites `code` (dTotalRecall's, not an ancestor): UNCLASSED
+  dRankedPlan reads `probe.observations` (dDeclaredLoop's, not an ancestor): UNCLASSED
+  dRankedPlan routes `review.trigger` (dDeclaredLoop,dFairHearing's, not an ancestor): UNCLASSED
+  dRankedPlan stage `plan.reason` (dDeclaredLoop's, not an ancestor): UNCLASSED
+  dRankedPlan stage `plan.recommend` (dDeclaredLoop's, not an ancestor): UNCLASSED
+findings 5
+rc 1
+$ python reconcile_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md --plant-item plan.fake:plan:dOrderedCharter:an owner item   (routes into the breakpoint, by a declared name (FM8))
+transitions: 3 dispositions routed through entry.claim, 4 `none` rows
+  dOrderedCharter routes `review.trigger` (dDeclaredLoop,dFairHearing's, not an ancestor): UNCLASSED
+findings 1
+rc 1
+$ python reconcile_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md --plant-edge-drop dTendedCadence:dIndexedDesign   (routes into a stage, from an expansion (FH3))
+transitions: 3 dispositions routed through entry.claim, 4 `none` rows
+  dTendedCadence routes `design step` (dIndexedDesign's, not an ancestor): UNCLASSED
+findings 1
+rc 1
+$ python reconcile_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md --plant-item review.extra:breakpoint:dCalibratedLens:done   (routes keyed by owner (FL6))
+transitions: 3 dispositions routed through entry.claim, 4 `none` rows
+  dDeclaredLoop routes `review.trigger` (dCalibratedLens's, not an ancestor): UNCLASSED
+  dFairHearing routes `review.trigger` (dCalibratedLens,dDeclaredLoop's, not an ancestor): BAD CLASS ROW (owner dDeclaredLoop, class not a use)
+  dRankedPlan routes `review.trigger` (dCalibratedLens's, not an ancestor): UNCLASSED
+  dScopedBuild routes `review.trigger` (dCalibratedLens's, not an ancestor): UNCLASSED
+  dShippedRelease routes `review.trigger` (dCalibratedLens's, not an ancestor): UNCLASSED
+  dWellOiledMachine routes `review.trigger` (dCalibratedLens's, not an ancestor): UNCLASSED
+findings 6
+rc 1
+$ python reconcile_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md --plant-item plan.reader:plan:dRankedPlan:reads `runtime.journal`   (reads (FM4))
+transitions: 3 dispositions routed through entry.claim, 4 `none` rows
+  dRankedPlan reads `runtime.journal` (dWellOiledMachine's, not an ancestor): UNCLASSED
+findings 1
+rc 1
+$ python reconcile_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md --plant-edge-drop dShippedRelease:dWellOiledMachine   (registers)
+transitions: 3 dispositions routed through entry.claim, 4 `none` rows
+  dShippedRelease reads `build.release-ceiling` (dWellOiledMachine's, not an ancestor): UNCLASSED
+  dShippedRelease registers `cadence-items` (dWellOiledMachine's, not an ancestor): UNCLASSED
+  dShippedRelease registers `command-adapters` (dWellOiledMachine's, not an ancestor): UNCLASSED
+  dShippedRelease registers `harness-adapters` (dWellOiledMachine's, not an ancestor): UNCLASSED
+  dShippedRelease registers `host-adapters` (dWellOiledMachine's, not an ancestor): UNCLASSED
+  dShippedRelease registers `journal-readers` (dWellOiledMachine's, not an ancestor): UNCLASSED
+  dShippedRelease registers `notification-adapters` (dWellOiledMachine's, not an ancestor): UNCLASSED
+findings 7
+rc 1
+$ python reconcile_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md --plant-class dFairHearing:review.trigger=   (a blank class cell (FH2))
+transitions: 3 dispositions routed through entry.claim, 4 `none` rows
+  dFairHearing routes `review.trigger` (dDeclaredLoop's, not an ancestor): BAD CLASS ROW (owner dDeclaredLoop, class -)
+  class row outside the closed set: dFairHearing `review.trigger` (blank)
+findings 1
+rc 1
+$ python reconcile_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md --plant-class dFairHearing:review.trigger=anything   (a class outside the set (FH2))
+transitions: 3 dispositions routed through entry.claim, 4 `none` rows
+  dFairHearing routes `review.trigger` (dDeclaredLoop's, not an ancestor): BAD CLASS ROW (owner dDeclaredLoop, class anything)
+  class row outside the closed set: dFairHearing `review.trigger` (anything)
+findings 1
+rc 1
+$ python reconcile_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md --plant-add dRankedPlan:review.trigger:dDeclaredLoop   (a class row no dependency needs (FL5))
+transitions: 3 dispositions routed through entry.claim, 4 `none` rows
+  class row with no dependency: dRankedPlan `review.trigger` (dDeclaredLoop, tolerance)
+findings 1
+rc 1
+$ python ancestor_probe.py 2026-10-18-build-PLAY-dClosedLoop-1-recut.md   (superseded, re-run on the committed table, FM5)
+chain rows 16 · owned nodes read 419 (items, keys, points, record kinds, tag namespaces; systems are cited in prose and left out) · backticked citations 414 · of a non-ancestor's node 15
+  class row with no citation: dBoundRoles `feature` (tolerance)
+  class row with no citation: dDeclaredLoop `decisions.major` (tolerance)
+  class row with no citation: dFairHearing `flow.route-backs` (not a use)
+  class row with no citation: dFairHearing `review.trigger` (not a use)
+  class row with no citation: dRankedPlan `run.host` (tolerance)
+findings 5
+rc 1
+````
+
+
 ## [plants] The map's plants, re-run
 
 ````text
 $ python map.py --check --plant no-layer
 FINDING layer: kit.agent-instructions joins no layer
 rc 1
+$ python map.py --check --plant fates-absent
+atlas: 0 records named fates-absent-plant
+rc 1
 $ python map.py --check --plant fates-drop
 FINDING fates: kit.agent-instructions has no [table] row
+FINDING fates: the rows count [26, 69, 21, 14, 130], and the record states [26, 70, 21, 14, 131]
 rc 1
 $ python map.py --check --plant fates-ghost
 FINDING fates: a row names ghostkit, which is no kit
+FINDING fates: the rows count [27, 70, 21, 14, 132], and the record states [26, 70, 21, 14, 131]
 rc 1
 $ python map.py --check --plant fates-bad
 FINDING fates: agent-instructions · harness wiring has the fate MAYBE, outside the set
+FINDING fates: the rows count [26, 69, 21, 14, 131], and the record states [26, 70, 21, 14, 131]
 rc 1
 $ python map.py --check --plant fates-unbuilt
 FINDING fates: agent-instructions · harness wiring names no chain build where it goes
 rc 1
 $ python map.py --check --plant fates-empty
-FINDING fates: workflows · `orient-counterfactual.js` retires with no replacement named
+FINDING fates: workflows · `orient-counterfactual.js` retires naming neither a replacement nor a reason
 rc 1
 $ python map.py --check --plant fates-kit
 FINDING fates: kit.agent-instructions's fate maybe is outside the set
+FINDING fates: kit.agent-instructions carries fate=absorbed, and [kits] says maybe
+rc 1
+$ python map.py --check --plant fates-kit-drop
+FINDING fates: kit.agent-instructions has no [kits] row
+FINDING fates: kit.agent-instructions carries fate=absorbed, and [kits] says None
+rc 1
+$ python map.py --check --plant fates-kit-ghost
+FINDING fates: [kits] names ghostkit, which is no kit node
+rc 1
+$ python map.py --check --plant fates-count
+FINDING fates: the rows count [25, 71, 21, 14, 131], and the record states [26, 70, 21, 14, 131]
+rc 1
+$ python map.py --check --plant fates-absorbed-stays
+FINDING fates: agent-instructions · harness wiring stays, yet its kit is absorbed
+FINDING fates: the rows count [27, 69, 21, 14, 131], and the record states [26, 70, 21, 14, 131]
+rc 1
+$ python map.py --check --plant fates-bare-none
+FINDING fates: workflows · `orient-counterfactual.js` retires naming neither a replacement nor a reason
+rc 1
+$ python map.py --check --plant fates-rel
+FINDING fates: kit.agent-instructions carries fate=retired, and [kits] says absorbed
+rc 1
+$ python map.py --check --plant fates-none
+FINDING fates: the record's [kits] or [table] holds no row
+FINDING fates: kit.agent-instructions has no [kits] row
+FINDING fates: kit.agent-instructions has no [table] row
+FINDING fates: kit.branch-reconcile has no [kits] row
+FINDING fates: kit.branch-reconcile has no [table] row
+FINDING fates: kit.codebase-map has no [kits] row
+FINDING fates: kit.codebase-map has no [table] row
+FINDING fates: kit.drift-audit has no [kits] row
+FINDING fates: kit.drift-audit has no [table] row
+FINDING fates: kit.gate-lint has no [kits] row
+FINDING fates: kit.gate-lint has no [table] row
+FINDING fates: kit.govkit has no [kits] row
+FINDING fates: kit.govkit has no [table] row
+FINDING fates: kit.hooks has no [kits] row
+FINDING fates: kit.hooks has no [table] row
+FINDING fates: kit.lexicon has no [kits] row
+FINDING fates: kit.lexicon has no [table] row
+FINDING fates: kit.lib has no [kits] row
+FINDING fates: kit.lib has no [table] row
+FINDING fates: kit.memory-recall has no [kits] row
+FINDING fates: kit.memory-recall has no [table] row
+FINDING fates: kit.memory-tree has no [kits] row
+FINDING fates: kit.memory-tree has no [table] row
+FINDING fates: kit.playbook has no [kits] row
+FINDING fates: kit.playbook has no [table] row
+FINDING fates: kit.process-monitor has no [kits] row
+FINDING fates: kit.process-monitor has no [table] row
+FINDING fates: kit.pytest-parallel-guardrails has no [kits] row
+FINDING fates: kit.pytest-parallel-guardrails has no [table] row
+FINDING fates: kit.roles has no [kits] row
+FINDING fates: kit.roles has no [table] row
+FINDING fates: kit.run-gates has no [kits] row
+FINDING fates: kit.run-gates has no [table] row
+FINDING fates: kit.runlog has no [kits] row
+FINDING fates: kit.runlog has no [table] row
+FINDING fates: kit.unattended has no [kits] row
+FINDING fates: kit.unattended has no [table] row
+FINDING fates: kit.workflows has no [kits] row
+FINDING fates: kit.workflows has no [table] row
+FINDING fates: the rows count [0, 0, 0, 0, 0], and the record states [26, 70, 21, 14, 131]
+FINDING fates: kit.agent-instructions carries fate=absorbed, and [kits] says None
+FINDING fates: kit.branch-reconcile carries fate=optional, and [kits] says None
+FINDING fates: kit.codebase-map carries fate=optional, and [kits] says None
+FINDING fates: kit.drift-audit carries fate=optional, and [kits] says None
+FINDING fates: kit.gate-lint carries fate=optional, and [kits] says None
+FINDING fates: kit.govkit carries fate=optional, and [kits] says None
+FINDING fates: kit.hooks carries fate=kept, and [kits] says None
+FINDING fates: kit.lexicon carries fate=optional, and [kits] says None
+FINDING fates: kit.lib carries fate=kept, and [kits] says None
+FINDING fates: kit.memory-recall carries fate=optional, and [kits] says None
+FINDING fates: kit.memory-tree carries fate=kept, and [kits] says None
+FINDING fates: kit.playbook carries fate=kept, and [kits] says None
+FINDING fates: kit.process-monitor carries fate=kept, and [kits] says None
+FINDING fates: kit.pytest-parallel-guardrails carries fate=optional, and [kits] says None
+FINDING fates: kit.roles carries fate=kept, and [kits] says None
+FINDING fates: kit.run-gates carries fate=kept, and [kits] says None
+FINDING fates: kit.runlog carries fate=optional, and [kits] says None
+FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
+FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 ````
 
@@ -2169,12 +3683,12 @@ rc 1
 
 ````text
 $ design map
-map: 2232 nodes in 30 namespaces; 31133 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1494, derived 257, pending 481
+map: 2235 nodes in 30 namespaces; 31203 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1497, derived 256, pending 482
 rc 0
 
 $ atlas
-atlas: derived — 154 records, 2630 sections, 175 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 155 records, 2665 sections, 175 decision sections, 16 comparison areas, 33 principles
 rc 0
 
 $ fold state
@@ -2192,13 +3706,15 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 16 · owned nodes read 418 · flow items read 87 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 19 (cites 15, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+chain rows 16 · owned nodes read 419 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 20 (cites 16, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 46 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dBoundRoles cites `code` (dTotalRecall's, not an ancestor): tolerance
   dBoundRoles cites `feature` (dTotalRecall's, not an ancestor): tolerance
   dDeclaredLoop cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
   dDeclaredLoop cites `hooks.bypass` (dWitnessedBar's, not an ancestor): not a use
   dDeclaredLoop cites `intake` (dWellOiledMachine's, not an ancestor): homonym
+  dDeclaredLoop cites `playbook` (dIndexedDesign's, not an ancestor): tolerance
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
   dFairHearing cites `preset` (dDeclaredLoop's, not an ancestor): homonym
@@ -2229,13 +3745,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 206 · presettable 193 · preset rows 193
+catalogue keys 205 · presettable 192 · preset rows 192
 no findings
 rc 0
 
 $ critical path
-critical path: 213 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dFairHearing 20, dOrderedCharter 35, dDeclaredLoop 82, dWitnessedBar 106, dBoundRoles 140, dTotalRecall 145, dIndexedDesign 156, dRankedPlan 158, dWellOiledMachine 176, dScopedBuild 187, dTendedCadence 188, dMindYourWords 193, dShippedRelease 196, dCalibratedLens 199, dConvergedCharter 213
+critical path: 211 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dFairHearing 20, dOrderedCharter 35, dDeclaredLoop 82, dWitnessedBar 104, dBoundRoles 138, dTotalRecall 143, dIndexedDesign 155, dRankedPlan 156, dWellOiledMachine 174, dScopedBuild 185, dTendedCadence 186, dMindYourWords 191, dShippedRelease 194, dCalibratedLens 197, dConvergedCharter 211
 rc 0
 ````
 

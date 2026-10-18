@@ -297,8 +297,8 @@ each decision through mechanisms it supervises, enforces at every boundary, and 
  one dispatcher entry per event rendered from the kits' fragments, packs from every layer, failing
  closed on every CLI version through ask rules only the dispatcher answers, and a witness with a
  named reader behind every event that cannot
- attended or not: the supervisor drives, and the owner's session is its client; until dWellOiledMachine
- lands, the owner's session hosts the same driver, bound the same way (night pass, point 1)
+ attended or not: the supervisor drives, and the owner's session is its client; it hosts the driver only
+ until dWellOiledMachine lands, or if its spike fails, each role act it hosts act-bound (night pass, point 1)
 ```
 
 ### [terms] The sibling layers' words, mapped
@@ -308,7 +308,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | Their word | Where | Runtime's part |
 |---|---|---|
 | the executor | flow-steps; roles `[cycle]`, `[trust]` and the matrix | the supervisor, together with the role harness it launches. It keys and cuts each work order fresh at the spawn, through dBoundRoles' renderer. It runs command items such as acceptance re-runs and the core checks, reads the mailbox at item boundaries, and queues commits. It is launched where `run.host` says. |
-| the driver | roles `[cycle]`: "The main session is the driver … The executor drives when no one attends." | the supervisor, in every mode (night pass, point 1). The owner's session is its client: it shows the announcements, takes the owner's dispositions and issues the owner's controls. Until dWellOiledMachine lands, the owner's session hosts the same driver program, bound as an act session. No model session drives. |
+| the driver | roles `[cycle]`: "The main session is the driver … The executor drives when no one attends." | the supervisor, in every mode (night pass, point 1). The owner's session is its client: it shows the announcements, takes the owner's dispositions and issues the owner's controls. The owner's session hosts the driver only until dWellOiledMachine lands, or if its platform spike fails (v2 `[owed]`), under its owner binding, each role act it hosts act-bound with that act's epoch. No model session drives. |
 | an act session | this record only | a headless `claude -p` session that the supervisor launches to host one role act's harness call. It decides nothing. The first draft called it a "driver session", a name the roles layer already uses. |
 | the actor kinds | the roles matrix: role, command, hook, executor, owner | a role item becomes a role act. The supervisor runs command and executor items. A hook item is awaited: its hook writes the witness when its event fires inside another act, and `next` reports it as awaiting that event. The supervisor raises an owner item. |
 
@@ -460,7 +460,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 ### [act] Acts, and how each is bound
 
 - **A role act is the roles cycle, in one call.** The act session, or the owner's session while it
-  hosts the driver, bound the same way, makes exactly one call (night pass, point 1): the registered role harness, with the act's work order and any persisted
+  hosts the driver, its role act act-bound with that act's epoch, makes exactly one call (night pass, point 1): the registered role harness, with the act's work order and any persisted
   returns as its args. Inside that call the harness:
   - spawns the prompt writer;
   - wraps its task in the work order;
@@ -501,15 +501,15 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     journal entries.
   - **The shell.** An act session's allowance names the commands it may run, and act binding refuses a
     Bash or PowerShell call outside it. That binds the class behind the 25 ad-hoc scripts in
-    `[current]`. The owner's session is bound the same way for every role act it hosts. Outside role
-    acts it reads and orients, and its product-code writes still pass the write gate (night pass, point 1).
+    `[current]`. Each role act the owner's session hosts is act-bound with that act's epoch, under the
+    session's owner binding. Outside role acts it reads and orients, and its product-code writes still pass the write gate (night pass, point 1).
   - **Session binding.**
     - SessionStart writes a binding record: the build, plus either the act and its epoch or
       "owner", the session the owner types in, attended or not (night pass, point 1).
     - Act binding requires that record, so a crashed SessionStart makes the first gated call refuse.
     - A session outside every build's workspace is unbound. Act binding then does not apply, and the
       write gate still refuses product code that no specced unit owns.
-    - The orientation scout's spawn at session start is a bound act of the attended binding.
+    - The orientation scout's spawn at session start is a bound act of the owner binding.
 - **Owner items need no session.** The supervisor raises them through the mailbox and the notification
   adapter, or resolves them as `run.on-owner-question` says, never a ratification (FH1).
 - **Hook items** are awaited, never dispatched (`[terms]`).
@@ -612,7 +612,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     - Only the dispatcher's PermissionRequest entry answers the rule, with a JSON decision made by the
       session's binding (`[act]`).
     - A dispatcher that cannot run leaves the call unapproved. In an act session the call is denied.
-      In an attended session under `allowance` or `person`, it goes to the person.
+      In the owner's session under `allowance` or `person`, it goes to the person.
     - Dispatch 36 saw every burst failure class denied this way on 2.1.292, read-only commands
       included.
   - **One checking hook is the allow path.**
@@ -629,10 +629,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     - The classifier still judges ungated tools.
     - An ask rule resolves before the classifier, so in an act session the dispatcher decides gated
       tools instead, by its binding.
-    - Under `runtime.attended-judge: classifier-or-person`, the default (RT-4), an attended session
+    - Under `runtime.attended-judge: classifier-or-person`, the default (RT-4), the owner's session
       loads no ask rule, so the classifier still judges its gated calls too.
     - **What fails closed where.** Act sessions fail closed on every CLI version, through the
-      baseline. An attended session under the default fails closed where the CLI carries
+      baseline. The owner's session under the default fails closed where the CLI carries
       `onFailure`, from 2.1.295. Below that, a crashed guard lets the call reach the classifier or the
       person without that guard's check. The node registry's capability record says so per binary.
   - **The switch, where the CLI carries it.** Revised: 2026-10-17, the debt round's fold.
@@ -676,7 +676,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - A rule a session cannot satisfy is excepted through the exception register (`core.exceptions`, K4).
     The exception is journaled and audited by the Loop Review.
   - A dispatcher that cannot start leaves every gated call denied in an act session, the call that
-    records an exception included, and puts it to the person when attended. An act session's repair
+    records an exception included, and puts it to the person in the owner's session. An act session's repair
     therefore happens outside the agent: from the owner's terminal, or by the supervisor parking the
     run with the error. The repair is recorded in the same register.
 - **User-level guards are outside the surface.** The node's own hooks, such as `git_dash_c_guard`, are
@@ -719,13 +719,13 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   expansion, so the core depends on nothing it does not ship.
 - **The primary tree belongs to the lander.**
   - Act sessions never run there, and preflight refuses one that starts there.
-  - Attended sessions enter it only to land.
+  - The owner's session enters it only to land.
 
 ### [sessions] Sessions and context
 
 - **Every SessionStart source binds the session.** The sources are startup, resume, clear, compact and
   fork; no matcher covers fork today.
-  - Attended sessions also get the card. The resume misses (7 of 14, `gap-orient-12`) are diagnosed and
+  - The owner's session also gets the card. The resume misses (7 of 14, `gap-orient-12`) are diagnosed and
     fixed first.
   - Act sessions bind to their act and skip the card, since the work order carries every fact.
 - **A PreCompact command hook flushes the item in flight** (commit or checkpoint) before an automatic
@@ -741,10 +741,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - **a subagent's own compaction, and a PreCompact flush inside a subagent:** out of scope, since 0 of
     2,708 agent transcripts compacted. A journaled detector reports the first one;
   - **the executor holding no model context:** true by construction (`[invariants]`);
-  - **compacting against starting fresh:** settled by RT-1. An attended session starts fresh at an item
+  - **compacting against starting fresh:** settled by RT-1. The owner's session starts fresh at an item
     boundary by default.
 - **Context, by kind of session:**
-  - attended sessions follow `context.on-full`, which now defaults to `fresh-at-boundary` (RT-1), and
+  - the owner's session follows `context.on-full`, which now defaults to `fresh-at-boundary` (RT-1), and
     `context.threshold`;
   - act sessions read neither, since each serves one act, bounded by `--max-turns` and
     `runtime.act-ceiling`.
@@ -1072,7 +1072,7 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   - on 2.1.292 in auto mode, with only the PreToolUse entry crashed (out of memory, and a missing path)
     and PermissionRequest healthy, an unnamed Workflow call and a stale-epoch call are each denied.
     It is seen red first against today's split, where PreToolUse alone binds;
-  - under `runtime.attended-judge: classifier-or-person`, an attended session loads no ask rule. A
+  - under `runtime.attended-judge: classifier-or-person`, the owner's session loads no ask rule. A
     planted `rm -rf` of a scratch path reaches auto mode's classifier or the person, and the
     dispatcher never approves it. The arm is seen red first against the first text, under which the
     dispatcher approved it once the guard packs passed (RT-4);
@@ -1373,9 +1373,12 @@ The owner's point 1 (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `
 owner's interactions, never the flow or role use. Amended in place:
 - `[terms]`: the supervisor is the driver in every mode, and the owner's session is its client;
 - the diagram, `[decide]`'s `run <build>` and its clients: the owner's session hosts the driver only until
-  dWellOiledMachine lands, bound as an act session, and `/unattended` retires with the kit;
+  dWellOiledMachine lands, or if its platform spike fails, under its owner binding, each role act it hosts act-bound
+  with that act's epoch (the closing review's M6), and `/unattended` retires with the kit;
 - `[act]`: the owner's session is bound the same way for every role act it hosts, and its binding record reads
-  "owner", since attendance is a mode and not a kind of session.
+  "owner", since attendance is a mode and not a kind of session. Its design text says "the owner's session" for what
+  it called an attended session; `runtime.attended-judge` and `runtime.attended-allowance` keep their names until the
+  lexicon settles the term (gap-lex-09).
 
 The night pass's other runtime additions are units in v2's dWellOiledMachine row: the attend and unattend controls,
 the `step —` announcement, intake for a prompt that reaches no owner session, the browser capability and the visual

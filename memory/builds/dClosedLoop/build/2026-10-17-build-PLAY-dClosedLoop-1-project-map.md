@@ -544,8 +544,8 @@ takes it.
   the index at `<git-common-dir>/gov/index/<tree>.map`.
 - **Code depth is core** (revised 2026-10-18, the night pass, point 3). dTotalRecall's `code` record fills each
   item's `code` slot with its seed's neighbourhood, and level 0 holds one counted `code` line, never a line per file.
-  The slot renders filled, derived with nothing related, or not extracted for a language, with `gov code where`
-  named as the fallback. The map's owner views and the dossier's prose stay optional.
+  The slot renders filled, derived with nothing related, not extracted for a language, with `gov code where`
+  named as the fallback, or not installed, until dTotalRecall's `code` record lands (the closing review's L2). The map's owner views and the dossier's prose stay optional.
 
 ### [line] One line per node
 
@@ -619,12 +619,11 @@ header := "map " <tree-id> " · nodes " <int> " · lines " <int> " · folded " <
 |---|---|
 | the orientation scout, at `entry.orient` | the whole map. It composes the card's map cell from it within the card's 8 KB: the header, and the build's neighbourhood, which is its layer, its chain build's line, its features, its gap areas and the live builds that overlap its write set |
 | the planner, at `plan.triage-judge` and `plan.reason` | the map, as the work order's `map` slot |
-| the architect, at `design.inventory`, `design.decompose` and `design.reason` | the map, with `design.inventory`'s unfolds |
+| the architect, at `design.inventory`, `design.decompose` and `design.reason` | the map, with `design.inventory`'s unfolds, and the `code` slot of its scope paths (night pass, point 3) |
 | the reuse scout, at `design.seams` | the map, inside the house index |
-| the spec writer, at `design.unit-spec` and `review.fold` | the map |
-| the reviewer, at `review.lens` under the coherence and reuse lenses | the map |
-| unit workers: the builder, the tester and the rest | no map. They get their slice and the `refs` rows of their write set, and since the night pass the builder and
-the tester get their write set's `code` slot (point 3). A `gov map` call from one is journaled as a read outside its slice |
+| the spec writer, at `design.unit-spec` and `review.fold` | the map, and the `code` slot of its unit's write set (night pass, point 3) |
+| the reviewer, at `review.lens` under the coherence and reuse lenses | the map, and the `code` slot of the pinned range (night pass, point 3) |
+| unit workers: the builder, the tester and the rest | no map. They get their slice and the `refs` rows of their write set, and since the night pass the builder and the tester get their write set's `code` slot (point 3). A `gov map` call from one is journaled as a read outside its slice |
 | the researcher, at `plan.research` and `design.research` | the map, and the `code` slot of its question's paths (night pass, point 3) |
 | the prompt writer | its actor's `map` and `code` slots, through the work order it frames (night pass, point 3) |
 | the owner's session | the card and the whole map when it opens, and again at a resume and a compaction, under `memory.default-load: card-and-map` (PM-7; night pass, point 5) |
@@ -731,7 +730,7 @@ today, the map reads it. Where none exists, the namespace's owning build adds on
 | `memory.map-overflow` | degrade, refuse | degrade |
 | `memory.map-unfold` | item-declared, none, all | item-declared (PM-6) |
 | `memory.map-purpose` | review, ledger, derive, refuse | review (PM-5) |
-| `memory.default-load` | card, card-and-live, card-and-map | card-and-map (PM-7), read by an attended session; an act session loads its work order |
+| `memory.default-load` | card, card-and-live, card-and-map | card-and-map (PM-7), read by the owner's session at startup, resume and a compaction (night pass, point 5); an act session loads its work order |
 
 ## [forks-design] The design's forks, to put to the owner
 

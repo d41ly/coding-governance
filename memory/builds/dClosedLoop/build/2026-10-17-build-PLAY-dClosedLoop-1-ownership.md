@@ -987,10 +987,12 @@ census: FINDING census: tools/newkit/kit.toml is on disk with no kit node rc 1
   `[review-fold]`).
 - **The night pass, 2026-10-18** (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md`): the new nodes and their owners, proposed for the owner's approval as PM-10's
   were (NP-23), each owner the build that implements the behaviour or registers the kind:
-  - items `probe.trigger`, `probe.pin`, `probe.design`, `probe.run`, `probe.judge` and `probe.return`: dDeclaredLoop;
-  - keys `attendance`, `probe.points`, `probe.raise`, `probe.observations`, `probe.experiment.authority` and
-    `probe.verifier`: dDeclaredLoop; `attendance.scope`: dWellOiledMachine; `memory.code-budget` and
+  - items `probe.trigger`, `probe.pin`, `probe.design`, `probe.experiment`, `probe.run`, `probe.judge` and
+    `probe.return`: dDeclaredLoop;
+  - keys `attendance`, `probe.points`, `probe.raise`, `probe.observations` and `probe.experiment.authority`:
+    dDeclaredLoop; `attendance.scope`: dWellOiledMachine; `memory.code-budget` and
     `memory.code-roles`: dBoundRoles; `memory.code-languages` and `memory.code-enrich`: dTotalRecall; `tags.bundle`
     and `tags.bundle-rows`: dOrderedCharter;
   - record kinds `probe`: dDeclaredLoop; `code`: dTotalRecall, replacing `symbols` and `callers`; `playbook`:
-    dIndexedDesign; `playbook set`: dWitnessedBar.
+    dIndexedDesign; `playbook set`: dIndexedDesign, which registers its set check at Test's leg-pack point (the
+    closing review's H2); `attendance override`: dWellOiledMachine (M13).
