@@ -4452,6 +4452,276 @@ for arg in [a for a in sys.argv[1:] if ":" in a]:
     print(f"with {child} after {parent}: {length} units ({length - base:+d}), {' > '.join(p)}")
 ````
 
+### `record_walk2.py`
+
+The walk derived again: the owner's words, `[chain-2]`, `[wave-1-2]` and `[walk-instrument-2]` in the walk record.
+
+````python
+"""Write the walk's re-derivation: the owner's words, `[chain-2]` (the glance over eighteen builds), `[wave-1-2]` (wave 1
+presented again) and `[walk-instrument-2]` (the scripts and their runs), and point the first glance at them.
+
+Usage: python -X utf8 record_walk2.py <facts.out> <since.out> <path.out>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+HERE = pathlib.Path(__file__).resolve().parent
+FENCE = "`" * 3
+
+
+def read(p):
+    return pathlib.Path(p).read_text(encoding="utf-8").replace("\r\n", "\n").strip("\n")
+
+
+facts, since, path = (read(p) for p in sys.argv[1:4])
+W = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-walk.md")
+W.sub("""## [chain] The chain at a glance
+""", """- Asked to resume after the night pass, the owner's answers and the spine's split, the owner said, verbatim:
+  "re-derive the walk and present wave 1" (2026-10-18). The glance and wave 1 are derived again in `[chain-2]` and
+  `[wave-1-2]`.
+
+## [chain] The chain at a glance
+""", "words")
+W.insert_before("## [walk-instrument] The walk's facts, and the clause scan", """## [chain-2] The chain at a glance, derived again
+
+Derived at `b3866c4ad`, after the night pass, the owner's answers and the spine's three-way split
+(`build/2026-10-18-build-PLAY-dClosedLoop-1-np24-pricing.md`). The facts are the runs `[walk-instrument-2]` holds.
+
+- **Eighteen builds,** ordered by when each can finish, in planned units: dGroundRules 8; dFairHearing 20;
+  dOrderedCharter 35; dDeclaredLoop 57; dPlacedRequest 64; dWitnessedBar 79; dKeptSession 82; dBoundRoles 113;
+  dTotalRecall 119; dIndexedDesign 131; dRankedPlan 132; dWellOiledMachine 150; dScopedBuild 161; dTendedCadence 164;
+  dMindYourWords 167; dShippedRelease 171; dCalibratedLens 175; dConvergedCharter 189.
+- **The critical path, 189 units at `b3866c4ad`:** dGroundRules, dOrderedCharter, dDeclaredLoop, dWitnessedBar,
+  dTotalRecall, dWellOiledMachine, dTendedCadence, dCalibratedLens and dConvergedCharter. Its tail now runs through
+  Maintain and Review, not dShippedRelease, since the night pass grew both.
+- **Since the first glance:** the chain grew from 285 units to 334, with the night pass and the owner's answers. Its
+  critical path went from 181 at `beda01950` to 214, and then fell to 189 at `b3866c4ad` with the split.
+- **The waves,** grouped as first presented, the two new builds joining wave 1, where their units were:
+  1. the foundation and the spine: dGroundRules, dOrderedCharter, dFairHearing, dDeclaredLoop, dPlacedRequest and
+     dKeptSession;
+  2. dWitnessedBar, dBoundRoles, dTotalRecall, dIndexedDesign and dRankedPlan;
+  3. dWellOiledMachine, dScopedBuild, dTendedCadence and dMindYourWords;
+  4. dCalibratedLens, dShippedRelease and dConvergedCharter.
+
+## [wave-1-2] The foundation and the spine, presented again
+
+### dGroundRules: Policy
+
+First of all, 8 units, finishing at 8 of 189. It owns `policy.on-invalid` and closes gap-spine-06 (HIGH, the
+policy sprawl).
+- **The policy file:** `.governance/policy.toml`, its schema, its one reader and its JSON mirror, here so that both
+  roots read policy from a build ahead of them (RC-1).
+- **How a key resolves:** an override in the file, then the named preset once dKeptSession adds presets, then the
+  catalogue default. An absent file reads defaults. A malformed file or an out-of-set value reads the last valid
+  landed revision, or refuses (AF-2). Every consumer reads the landed revision, never the working tree (FM1).
+- **A minimal guard:** owner-only writes to the policy file, its mirror and the instruction manifest, until
+  dDeclaredLoop's full guard lands.
+- **The legacy homes:** kit confs, `gate-env.sh` and the roles' house policy, on a shrink-only list derived from the
+  files, and an arm red when a landed build's key has no reader.
+- **Since first presented:** one word. Presets now come from dKeptSession, so until it lands at 82 a key resolves
+  from the file straight to the catalogue default.
+- **To look at:** it is still pure plumbing.
+
+### dOrderedCharter: Foundation, the instruction layer
+
+After dGroundRules, 27 units, finishing at 35. It owns 14 keys, the `exception` and `override` kinds, the tags and
+instruction-writing systems and 9 tag namespaces, and closes 24 gaps, 12 of them HIGH.
+- **The charter as the loop's front door:** its level-0 envelope (precedence and override, the instruction map, one
+  line per practice, the hand-off to the loop, the project block) and the drive section from kit descriptors. It is
+  held inside 32 KiB and re-injected on compact and resume.
+- **The instruction system:**
+  - the unit registry, schema and grammar;
+  - one renderer, absorbing the playbook, roles and agent-instructions wiring;
+  - the ladder renumbered 0 to 7, and load sets budgeted per reader and harness;
+  - the guarded instruction manifest;
+  - memory instructing nothing;
+  - practices rendered per step into work orders.
+- **The core that cannot be built around (P16):** the principle registry and meta-check, the kinds register, the
+  conformance-gate contract, the exception register and `core.*` policies, and the factories for units, practices,
+  Skills and layers.
+- **The tag system and the relational syntax (P33):**
+  - namespaced tags, a derived index and one resolver;
+  - the closed edge registry, twelve types declared and `cites` derived;
+  - `gov tag bundle`, a manifest of ranges or, by flag, the content inlined (NP-14);
+  - new text citing `path#symbol` or a blob-pinned line, not file:line (NP-17).
+- **Layers and P28:** the layer register and contract, and the check that the core never depends on an expansion or
+  an optional part, over every edge kind. Today's edges are each made a declared slot or moved into the core.
+- **The build's card** delivered at level 1, through a per-worktree file the charter imports.
+- **Since first presented:** five units, all from the night pass.
+  - The drive section says a build runs unattended by default from its request, and the `[land]` rule reads
+    through the request's mandate (point 1).
+  - The edge registry, `gov tag bundle` and the citation rule (point 4).
+  - Each role's load set budgets the `code` slot (point 3).
+
+  Three gaps came with them, gap-found-24 to gap-found-26.
+- **To look at:**
+  - It sits right after policy on the critical path. Half its gaps are HIGH, since the instruction layer is where
+    gov's sprawl lives.
+  - Its units are uneven. The core-independence check (clause 16) and the tag system (clause 19) each read like
+    several units of work, so its count understates it. Spec time is the place to cut them.
+
+### dFairHearing: the review harness
+
+After dGroundRules and beside dOrderedCharter, 12 units, finishing at 20. It owns the harness's four items
+(`review.pin`, `review.lens`, `review.refute`, `review.report`), `review.opt-in`, `review.unclassed` and
+`review.twin`, and the `review` kind, and closes 10 gaps.
+- **The owed replays first:** the design-audit preset run blind on a frozen history, scored against 59 known defects.
+- **The preset:** five lenses for design records. They are coherence, grounding, reuse held to precedent, the failure
+  envelope extended to trust boundaries, and alternatives and cost.
+- **Opt-in lenses** (security, alternatives, cost, portability, adopter migration, topology), each swapped for a named
+  default lens.
+- **The panel:**
+  - skeptic batches sorted by address;
+  - duplicates counted as merged confirmations;
+  - grades per id;
+  - refuted claims and twins flagged to the synthesizer;
+  - fix verdicts by class;
+  - one disposition per confirmed finding.
+- **The review records** realigned with the code, and the twin merge when the owner opts in (RS-1).
+- **Since first presented:** one unit, the scorer factory (night pass, point 2). It is one deterministic scorer that
+  re-derives every figure from raw outputs, extracted from `review_replay.py` with aScoutedSeam's grader as its second
+  instance. gap-test-18 came with it.
+- **To look at:**
+  - It must land before dDeclaredLoop, whose breakpoints call it (AF-1), and does, at 20 against 35.
+  - Its security lens now has a second caller, Maintain's weekly security review (NP-19).
+
+### dDeclaredLoop: Spine, the loop
+
+After dOrderedCharter and dFairHearing, 22 units, finishing at 57. Seven builds wait on it: dPlacedRequest,
+dKeptSession, dWitnessedBar, dBoundRoles, dTotalRecall, dRankedPlan and dIndexedDesign. It owns 12 items, 19 keys,
+4 kinds and 4 tag namespaces, and closes 10 gaps, 6 of them HIGH.
+- **The loop:**
+  - the loop kit, keyed by stage tags;
+  - each step a program of declared items, named by semantic tags;
+  - one transition table per level, backward transitions recorded, and an engine refusing any transition it lacks;
+  - terminal states, a default failure route and one closed disposition set;
+  - stage claims and the coverage gate;
+  - the `step`, `item`, `policy` and `command` namespaces.
+- **Witnesses and position:**
+  - witnesses computed, never typed, a probe's commands among them, re-run at its pinned SHA;
+  - the position engine, deriving step, next item and interrupts from witnesses;
+  - claims keyed and trusted by key and source.
+- **Policy machinery:** the guard, the TTY CLI and the default floor, and the factories and conformance gates for
+  commands, keys, presets, stages, hooks, roles and workflows.
+- **Review control flow (AF-1):**
+  - breakpoints at any item boundary, with reviews and owner gates one mechanism;
+  - the breakpoint program's trigger, disposal, fold and cost;
+  - the follow-up and design-audit rounds, with `REVIEW_ROUNDS` retired;
+  - the stage-exit recommendation for every step.
+- **Since first presented:** split three ways (SP-1, S3).
+  - It keeps the loop's core and the review control flow. Test's stage items run through that control flow, and
+    `review.dispose` reads the follow-up rounds' key.
+  - Twenty-one of its first 43 units moved to dPlacedRequest and dKeptSession, and so did the night pass's four
+    additions.
+- **To look at:**
+  - It finishes at 57, not 73. Of the seven builds that wait on it, dWitnessedBar is the one on the critical path.
+  - The review control flow is now its heaviest part: four units carrying eleven keys.
+
+### dPlacedRequest: Entry, new
+
+After dDeclaredLoop, 7 units, finishing at 64. dKeptSession, dBoundRoles and dTotalRecall wait on it. It owns the
+five entry items and the probe program's seven, 17 keys, and the `card`, `lease` and `probe` kinds. It closes 8 gaps,
+6 of them HIGH.
+- **Leases:**
+  - one lease grammar for builds, units and cadence runs, with epochs bumped at every take-over;
+  - run claims migrated onto it, and overlap warned or refused;
+  - fleet identity checked against the remote, and offline behaviour as `leases.offline` defines.
+- **The card:** at level 1, a ref per build on the remote, cached in the clone, snapshotted and re-keyed on resume,
+  with `resume.context` and `resume.partial`.
+- **Entry:** the entry step's items (orientation, the three placing items and the claim), and the placement predicate
+  and its check. An unattended prompt is placed the same way.
+- **What each item carries:** its `map` slot declarations and its code seed (point 3).
+- **The probe program:** seven items and the `probe` kind, placed at any boundary or raised by any role, with
+  stand-ins until the tester and the experiment shape land (point 2).
+- **To look at:**
+  - Six HIGH gaps rest on seven units. Orientation and concurrency are where today's sessions lose most, so the
+    leases and the card each carry several units of work.
+  - It has slack. It lands at 64, and dBoundRoles and dTotalRecall cannot start before dWitnessedBar lands at 79. It
+    can grow by 15 units at spec time without moving the path.
+
+### dKeptSession: Session, new
+
+After dDeclaredLoop and dPlacedRequest, 18 units, finishing at 82. dWellOiledMachine and dIndexedDesign wait on it.
+It owns 12 keys and the `mailbox message` kind, and closes 3 gaps, 2 of them HIGH.
+- **Presets:** the named presets and their completeness check, the preset step in dGroundRules's reader, the
+  charter's preset section, and policy at govkit intake.
+- **Coordination:** the mailbox per build, read at every item boundary; live delivery where the harness has it; and
+  dependency coordination through the parent's lease.
+- **Sessions:**
+  - orientation cost recorded per stage;
+  - progress reported through `notify.owner`;
+  - a fresh session recommended until the card-import fixture passes;
+  - the card's pointers;
+  - what a session does as its window fills;
+  - compaction summaries read as leads.
+- **Attendance and `repeat`** (point 1): the attendance rule, which never selects an actor, the driver or a binding,
+  and the `repeat` disposition onto a playbook.
+- **Two small units:** `actions.free` at the tool call, and the policy namespaces' purposes reviewed.
+- **To look at:**
+  - It is grouped by when its parts are needed, not by theme. That is the split's price.
+  - Until it lands at 82, only the `standard` preset works, no mailbox carries notices, and attendance is not yet a
+    key.
+  - It has the most slack in the wave. Nothing that waits on it starts before 119.
+
+""", "chain-2 and wave-1-2")
+W.text = W.text.rstrip("\n") + f"""
+
+## [walk-instrument-2] The walk derived again, at `b3866c4ad`
+
+`walk_facts.py` and `critical_path.py` as above, the latter's build count raised to 18 by the split. What changed
+since the first presentation is `since.py`'s:
+
+{FENCE}python
+{read(HERE / "since.py")}
+{FENCE}
+
+{FENCE}text
+$ python walk_facts.py dGroundRules dOrderedCharter dFairHearing dDeclaredLoop dPlacedRequest dKeptSession
+{facts}
+$ python critical_path.py
+{path}
+$ python since.py beda01950 dGroundRules dOrderedCharter dFairHearing dDeclaredLoop
+{since}
+{FENCE}
+"""
+W.done += 1
+W.save()
+````
+
+### `fix_walk2.py`
+
+Three corrections to the re-derivation, each checked against the records first.
+
+````python
+"""Three corrections to the walk's re-derivation, each checked against the records before it was made:
+- the review control flow carries twelve keys: `autonomy`, `review.<stage>`, `review.breakpoints`, the program's four,
+  the rounds' three and the recommendation's two, all still dDeclaredLoop's in v2's catalogue;
+- the tail moved because the night pass and the owner's answers both grew dTendedCadence, and the night pass dCalibratedLens;
+- the critical path's 214 is pinned to the commit it was read at.
+
+Usage: python -X utf8 fix_walk2.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+W = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-walk.md")
+W.sub("  - The review control flow is now its heaviest part: four units carrying eleven keys.",
+      "  - The review control flow is now its heaviest part: four units carrying twelve keys.", "twelve")
+W.sub("Its tail now runs through\n  Maintain and Review, not dShippedRelease, since the night pass grew both.",
+      "Its tail now runs through\n  Maintain and Review, not dShippedRelease, since the night pass and the owner's "
+      "answers grew both.", "tail")
+W.sub("critical path went from 181 at `beda01950` to 214, and then fell to 189 at `b3866c4ad` with the split.",
+      "critical path went from 181 at `beda01950` to 214 at `1d32760f3`, and then fell to 189 at `b3866c4ad` with the\n"
+      "  split.", "214 pin")
+W.save()
+````
+
 ### `record_instruments.py`
 
 This record's own writer.
@@ -4552,6 +4822,9 @@ MINE = [
      "rows."),
     ("order/critical_path.py", "The critical path over v2's `[chain]`, run by `[final]`. SP-1 raised its build count to "
      "18."),
+    ("walk2/record_walk2.py", "The walk derived again: the owner's words, `[chain-2]`, `[wave-1-2]` and "
+     "`[walk-instrument-2]` in the walk record."),
+    ("walk2/fix_walk2.py", "Three corrections to the re-derivation, each checked against the records first."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -5365,12 +5638,12 @@ rc 1
 
 ````text
 $ design map
-map: 2255 nodes in 30 namespaces; 31566 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1514, derived 259, pending 482
+map: 2256 nodes in 30 namespaces; 31566 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1515, derived 259, pending 482
 rc 0
 
 $ atlas
-atlas: derived — 156 records, 2693 sections, 178 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 156 records, 2711 sections, 178 decision sections, 16 comparison areas, 33 principles
 rc 0
 
 $ fold state

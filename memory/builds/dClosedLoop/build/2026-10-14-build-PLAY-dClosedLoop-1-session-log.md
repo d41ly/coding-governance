@@ -2095,6 +2095,12 @@ The night pass's closing review, dispatch 105, derived from its run the same way
   dPlacedRequest at 7 and dKeptSession at 18, and the critical path a unit longer than first priced. The gate was
   red on four class rows whose citing clause had moved, until each named dKeptSession.
 
+- 2026-10-18, session 1799cb98: the owner asked to "re-derive the walk and present wave 1". The walk record's
+  `[chain-2]` derives the glance over eighteen builds at `b3866c4ad`, the two new builds joining wave 1, where their
+  units were. `[wave-1-2]` presents wave 1 again, six builds, each with what changed since it was first presented.
+  Checking the record's own figures against the catalogue found one miscount, fixed before the commit: the review
+  control flow carries twelve keys, not eleven.
+
 ## Instruments
 
 ### The gap-ownership join
