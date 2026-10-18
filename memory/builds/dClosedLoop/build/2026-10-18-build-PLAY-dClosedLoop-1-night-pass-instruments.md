@@ -6453,6 +6453,691 @@ L.insert_before("\n## Instruments\n", """
 L.save()
 ````
 
+### `fix_plan_deps.py`
+
+The away pass: the memory plan's session units moved to dWellOiledMachine, the build that owns acts and bindings, once a dependency check found dKeptSession before it.
+
+````python
+"""Move the memory plan's session units to dWellOiledMachine, the build that owns acts and bindings, and drop `act=`
+from the work order's marker, since the act declares `follows`.
+
+Usage: python -X utf8 fix_plan_deps.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+P = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+P.sub("| a work order | the `gov:handoff` marker (role, build, unit, path, `role-sha`, `task-sha`), gaining `item=` and `act=` | the handoff renderer |",
+      "| a work order | the `gov:handoff` marker (role, build, unit, path, `role-sha`, `task-sha`), gaining `item=` | the handoff renderer |",
+      "marker sites")
+P.sub("| dBoundRoles | every work order carrying the marker with `item=` and `act=`, and every return its `answers` |",
+      "| dBoundRoles | every work order carrying the marker with `item=`, and every return its `answers` |",
+      "dBoundRoles unit")
+P.sub("| dKeptSession | the session node derived from bindings, with `runs-in` and `after`, and live delivery through the inbox |",
+      "| dWellOiledMachine | the session node derived from bindings, with `runs-in` and `after`, and live delivery through the inbox |",
+      "session unit")
+P.sub("| the live inbox | runtime | the harness's per-session inbox | Claude only; addressed by session id | witness: live delivery beside the mailbox | harness session id | dKeptSession |",
+      "| the live inbox | runtime | the harness's per-session inbox | Claude only; addressed by session id | witness: live delivery beside the mailbox | harness session id | dWellOiledMachine |",
+      "inbox owner")
+P.sub("| orientation cards | runtime | `<git-common-dir>/orientation/<id>.md` | 22, one per session | retired into the session binding | — | dKeptSession |",
+      "| orientation cards | runtime | `<git-common-dir>/orientation/<id>.md` | 22, one per session | retired into the session binding | — | dWellOiledMachine |",
+      "cards owner")
+P.save()
+````
+
+### `fold_away.py`
+
+The away pass folded: P33 widened and P34 to P38, seventeen keys and their preset rows, the chain rows' thirty units and their gaps, thirty-nine gaps, six record kinds and the Codex facts.
+
+````python
+"""Fold the away pass into the design: P34 to P38 and P33's widened edge set, seventeen catalogue keys and their
+preset rows, the chain rows' new units and gaps, the gap register's thirty-nine gaps and two amended Codex rows, six
+record kinds in the kind registry, and the runtime record's Codex facts.
+
+Usage: python -X utf8 fold_away.py   (from the worktree root)
+"""
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+PLAN = "`build/2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md`"
+AWAY = "`build/2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md`"
+
+# ---- v2 -------------------------------------------------------------------------------------------------------------
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+
+V.sub("""  content inlined, by flag (the owner's point 4, night pass, and NP-14).
+""", """  content inlined, by flag (the owner's point 4, night pass, and NP-14). The twelve declared types gain eleven, the
+  provenance and flow-data edges of the memory plan (""" + PLAN + """ `[edges]`): `serves`,
+  `made-by`, `caused-by`, `follows`, `answers`, `runs-in`, `carries`, `pinned-at`, `reads`, `writes` and
+  `promoted-from` (the away pass).
+- **P34 Instruction and memory share one writing practice.** A record section and an instruction unit are written
+  alike: named by a tag, one subject each, every relation a typed edge declared on its own line at the site that owns
+  it, every quoted derived fact pinned, and rationale kept apart from what loads. They differ in level and lifecycle,
+  never in grammar. Every pocket the loop writes or reads, in the tree or outside it, is a node or a declared witness
+  joined by a key, and none is left to prose (the owner's point 1, the away pass; """ + PLAN + """).
+- **P35 Every record names its cause.** Each record carries its own id and the id of what caused it, its inverse
+  derived, so `gov trace <key>` returns what happened from any key and `gov why <key>` the instruction and request
+  behind it. An act carries its own cost and duration. What lives on one node only renders `not-local` or `pruned`,
+  never empty (the owner's point 5, the away pass).
+- **P36 No harness is the runtime.** gov runs through harness adapters, each registered with capability rows that one
+  conformance fixture measures. The core relies only on the rows every registered act adapter passes, and a
+  capability above them is an optional slot. The supervisor launches acts through the CLI or an SDK, and the owner's
+  application is a viewer chosen by policy (the owner's point 3, the away pass).
+- **P37 One portable practice, a role per language.** Python carries logic, shell is a thin shim where a host demands
+  it and its other lines only shrink, and JavaScript serves only the harness's own surfaces. One rule set governs
+  encoding, line endings, paths, process launch, temp files, interpreter floors and quoting, each rule with its leg,
+  over the platforms the repository declares (the owner's point 4, the away pass).
+- **P38 Supersession walks declared steps.** A build that changes what an adopter can see ships its successor with an
+  upgrade step that runs up and down. `update` walks every step between an adopter's receipt and its target in
+  order, each idempotent by its witness; gov runs every step on itself first; and a surface an adopter can see keeps
+  working, or warns, until its window closes (the owner's point 6, the away pass).
+""", "P33 to P38")
+
+POL = [
+    ("memory.legacy-records", "anchors-only, backfill, retag", "backfill",
+     "the away pass, point 1: an adopter's records reach the plan with no file rewritten under `backfill`; pending AP-3", "dTotalRecall"),
+    ("commits.edge-check", "push-leg, commit-msg, off", "push-leg",
+     "the away pass, point 1: the commit queue writes the trailers, a leg at the push reads the binding; pending AP-6", "dWellOiledMachine"),
+    ("commits.squash", "re-emit-union, refuse, accept-loss", "re-emit-union",
+     "the away pass, point 1: a squash drops every trailer; gov never squashes, an adopter may; pending AP-7", "dShippedRelease"),
+    ("trace.identity", "act-only, session, salted", "act-only",
+     "the away pass, points 1 and 5: committed memory names the act, as the owner's rule of 2026-09-13 keeps session ids out of committed records; never set by a preset; pending AP-8", "dWellOiledMachine"),
+    ("trace.cost", "tokens+wall, tokens, none", "tokens+wall",
+     "the away pass, point 5: durations from the act's process output, never journal times of day; pending AP-21", "dWellOiledMachine"),
+    ("trace.leg-output", "tail-by-hash, node-local", "tail-by-hash",
+     "the away pass, point 5: a failing leg's output outlives its worktree; pending AP-22", "dWitnessedBar"),
+    ("trace.rows", "60, 120, all", "60",
+     "the away pass, point 5: one unattended run alone held 259 model events; pending AP-23", "dWellOiledMachine"),
+    ("runtime.binary", "newest-conforming, path, app-bundled, or a pinned path", "newest-conforming",
+     "the away pass, point 3: the CLI on PATH and the application's drift apart; pending AP-11", "dWellOiledMachine"),
+    ("runtime.owner-harness", "auto, or a registered harness adapter", "auto",
+     "the away pass, point 3: the owner's application is a viewer; never set by a preset; pending AP-12", "dWellOiledMachine"),
+    ("runtime.act-harness", "a registered harness adapter that passes the act rows", "claude-code",
+     "the away pass, point 3: Codex registers as an act backend once its rows pass; pending AP-13", "dWellOiledMachine"),
+    ("runtime.act-auth", "oauth-shared, setup-token, api-key", "oauth-shared",
+     "the away pass, point 3: the operator's credentials, never set by a preset; pending AP-14", "dWellOiledMachine"),
+    ("platforms.supported", "any subset of windows-gitbash, linux, macos, pwsh-launch", "windows-gitbash, linux",
+     "the away pass, point 4: a fact about the repository, never set by a preset; pending AP-17", "dShippedRelease"),
+    ("platforms.verify", "held, bar, ci, off", "held",
+     "the away pass, point 4: `held` until the Linux half is green; pending AP-18", "dShippedRelease"),
+    ("install.deprecation-window", "0, 1, 2, 4 releases", "2",
+     "the away pass, point 6: equal to `currency.max-behind`, so an adopter inside its currency budget never meets a removed surface; pending AP-26", "dGroundRules"),
+    ("install.on-shim-call", "warn, journal, refuse", "warn",
+     "the away pass, point 6: a forwarded call prints and is journaled for the fleet view; pending AP-27", "dGroundRules"),
+    ("install.retired-edits", "order, keep, delete", "order",
+     "the away pass, point 6: an edited retired file is kept, marked forked and ordered, never silently patched; pending AP-28", "dGroundRules"),
+    ("install.steps", "offer, attended", "offer",
+     "the away pass, point 6: a step needing the target's own code always falls back to attended (NP-22); pending AP-29", "dShippedRelease"),
+]
+row = "| `retrofit.slot-bytes` | 512, 1024, 2048 | 1024 | the retrofit round | dFurnishedOrders |\n"
+V.sub(row, row + "".join(f"| `{k}` | {v} | {d} | {s} | {o} |\n" for k, v, d, s, o in POL), "catalogue")
+
+PRE = [
+    ("memory.legacy-records", "anchors-only", "backfill", "backfill", "backfill"),
+    ("commits.edge-check", "push-leg", "push-leg", "commit-msg", "push-leg"),
+    ("commits.squash", "re-emit-union", "re-emit-union", "refuse", "re-emit-union"),
+    ("trace.cost", "tokens", "tokens+wall", "tokens+wall", "tokens+wall"),
+    ("trace.leg-output", "node-local", "tail-by-hash", "tail-by-hash", "tail-by-hash"),
+    ("trace.rows", "60", "60", "60", "60"),
+    ("runtime.binary", "newest-conforming", "newest-conforming", "newest-conforming", "newest-conforming"),
+    ("runtime.act-harness", "claude-code", "claude-code", "claude-code", "claude-code"),
+    ("platforms.verify", "held", "held", "ci", "held"),
+    ("install.deprecation-window", "1", "2", "2", "4"),
+    ("install.on-shim-call", "warn", "warn", "journal", "warn"),
+    ("install.retired-edits", "order", "order", "order", "order"),
+    ("install.steps", "offer", "offer", "attended", "offer"),
+]
+prow = "| `retrofit.slot-bytes` | 1024 | 1024 | 1024 | 1024 |\n"
+V.sub(prow, prow + "".join(f"| `{k}` | {a} | {b} | {c} | {d} |\n" for k, a, b, c, d in PRE), "presets")
+
+V.sub("""  `verdict.remote.pin`, `attendance`, `attendance.scope` or `install.guards`:""",
+      """  `verdict.remote.pin`, `attendance`, `attendance.scope`, `install.guards`, `trace.identity`,
+  `runtime.owner-harness`, `runtime.act-auth` or `platforms.supported`:""", "never-touch keys")
+V.sub("""the owner's own choice (night pass, point 1); and where the core guards install is the operator's (NP-20).""",
+      """the owner's own choice (night pass, point 1); where the core guards install is the operator's (NP-20); and
+  whether committed memory names a session, which application the owner works in, the operator's credentials and the
+  platforms a repository runs on are facts about the owner, the operator or the repository (the away pass).""",
+      "never-touch reason")
+
+UNITS = {
+    "dGroundRules": ([
+        "the upgrade-step kind: a kit descriptor's `[[upgrade]]` row (id, introducing commit, up and down argv run from gov's checkout, witness, surfaces, whether it needs the target's code) and the registry's `[[retired]]` succession rows, read by `update` and `check`, with the legacy homes declared as the translation window's population (P38, its home parked as AP-25)",
+        "`update` walking every step between a receipt's vintage and its target, oldest first, each skipped when its witness holds",
+        "down steps run in reverse, and a recorded rollback that lifts the downgrade refusal for a rollback only",
+        "the release-0 fixture tree and the `upgrade-walk` leg: up, down byte-identical, up again, every planted edit carried or ordered, each step seen load-bearing by skipping it once",
+    ], ["gap-deploy-15", "gap-deploy-16", "gap-deploy-17", "gap-tool-10"]),
+    "dOrderedCharter": ([
+        "the shared edge grammar at every site the memory plan names, the eleven new edge types registered with their namespaces, `decides` and `after` widened, `promoted-from` written by `instructions.edit`, and the edge checks in the tags leg pack (P33, P34)",
+        "the one writing practice's checks over records as well as units: address, one subject, typed relations, pinned facts and one door (P34)",
+        "the portable practice: a role per language, and one rule set for encoding, line endings, paths, launch, temp files, interpreter floors and quoting, each rule paired with its leg, absorbing `[cross-os]` and `[bytes]` (P37)",
+        "its own upgrade steps: agent-instructions' wiring moved to the one renderer, and the `map_lib` re-export declared as a deprecation (P38)",
+    ], ["gap-mem-35", "gap-tool-19"]),
+    "dDeclaredLoop": ([
+        "the commit node: the trailer keys `Gov-Unit`, `Gov-Item` and `Gov-Act` mapped to edge types, `Pass:` and `Decided:` registered with one reader, and the position engine reading them (the memory plan's `[sites]`)",
+    ], ["gap-spine-08", "gap-spine-09"]),
+    "dWitnessedBar": ([
+        "the portability leg pack: a line-ending class leg, encoding arms for stdout and JavaScript, a bare-shell-name arm, an interpreter-floor arm with a feature census, the shell-role ledger, and the resolver preferring a direct executable that meets the floor (P37)",
+        "the verdict record naming its bar run and its cause, and a failing leg's output tail kept by hash, as `trace.leg-output` says (P35)",
+    ], ["gap-tool-12", "gap-tool-13", "gap-tool-15", "gap-test-20"]),
+    "dTotalRecall": ([
+        "the kind registry completed: home, lifecycle, readers and layer on every row, witness rows for the pockets outside the tree, the commit, view, registry, archive, instrument and witness kinds, and the Serves kind `journal` renamed `log` (the memory plan's `[pockets]`)",
+        "`record` writing each record's header (Serves, Made-by, Caused-by) and each section's edge line, refusing a missing cause on a kind that is not a root, with the Serves lines read as `serves` edges and derived anchors for untagged headings, as `memory.legacy-records` says (P34, P35)",
+    ], ["gap-mem-36", "gap-mem-37", "gap-mem-38", "gap-mem-40"]),
+    "dLinkedLibrary": ([
+        "`decides` on every decision row, `Decided:` trailers read as decision rows, and every bug class naming its cause, language and platform (the memory plan's `[cycle]`, P37)",
+    ], ["gap-mem-39", "gap-tool-17"]),
+    "dBoundRoles": ([
+        "every work order carrying its marker with `item=`, and every return naming the work order it `answers` (the memory plan's `[sites]`)",
+    ], ["gap-roles-23"]),
+    "dWellOiledMachine": ([
+        "the act as the key: minted at launch with the harness session preset, the act record holding item, work order, harness, harness session, node and cause, and the session's cost and duration from its JSON result (P35, P36)",
+        "the commit queue writing the `Gov-*` trailers from the act binding, a `prepare-commit-msg` filler in the owner's session, and the commit-key leg at the push reading the binding, as `commits.edge-check` says",
+        "`gov trace <key>` and `gov why <key>` over the one index, journal lines keyed by act or session, the health and stall logs folded into the journal grammar, and a fixture replaying four recorded events, each answered in one query (P35)",
+        "the session node derived from bindings, joined to its act by `runs-in` and to its predecessor by `after`, live delivery through a session's inbox where its conformance row passes, and the card's session list filled through the harness adapter (P36)",
+        "the harness conformance fixture: launch by a program, id preset or returned, resume, headless fork, schema return, the hook events and fields the packs read, the fail-closed path, the live inbox, transcript homes and interpreters, measured per binary into the node registry with OS, shell and interpreter versions (P36, P37)",
+        "preflight refusing a launch that skips hooks or permissions, a launch-environment allowlist scrubbing the parent's messaging token, entrypoint and session variables, a transient-auth relaunch class, and worktree pointers written relative (P36, P37)",
+    ], ["gap-rt-25", "gap-rt-26", "gap-rt-27", "gap-rt-28", "gap-rt-29", "gap-rt-30", "gap-rt-31", "gap-orient-19",
+        "gap-tool-14", "gap-tool-16", "gap-tool-18"]),
+    "dTendedCadence": ([
+        "readings for an act launched with no outcome past `runtime.act-ceiling`, a node's run left unrecorded, and a pushed commit missing a required key (P35)",
+    ], ["gap-maint-14"]),
+    "dCalibratedLens": ([
+        "the Loop Review pricing cost per item kind from trace rows (P35)",
+    ], []),
+    "dShippedRelease": ([
+        "the receipt's schema 4 gaining `steps`, `superseded`, `deprecations` and `prior_commit`, `kits.currency` and the fleet register reading steps pending and shim calls, and `kits.offer` running the steps that need no target code, as `install.steps` says (P38)",
+        "the lander running each new upgrade step on gov's own tree in the prepared merge, recorded in the source-mode receipt, gov's deploy plan accepted, a stale lock reclaimed, withdrawn hook fragments unwired, and an edited retired file kept as a `forked` row with an order, as `install.retired-edits` says (P38)",
+        "the platform matrix verified per release: platform runner adapters for `platforms.supported` under `platforms.verify`, generalizing `run-held-wsl.sh`, per-kit interpreter floors in the kit factory and the receipt, and a Linux job in emitted CI (P37)",
+        "`carries` on the landing record, a publication recorded as a release per (SHA, artifact environment), a squash re-emitting the union of trailers as `commits.squash` says, and Codex install targets with their trust step surfaced (P36)",
+    ], ["gap-deploy-18", "gap-deploy-19", "gap-deploy-20", "gap-deploy-21", "gap-deploy-22", "gap-deploy-23",
+        "gap-tool-11"]),
+    "dConvergedCharter": ([
+        "the guides' positional citations migrated to tags, legacy anchors kept as aliases, and the per-directory line-ending pins retired into class pins (P34, P37)",
+        "the conf fold and the unattended kit's retirement shipped as upgrade steps, every shim removed when its window closes, and the exit check widened: every registered adopter at the converged commit with no step pending, or an owner item for that adopter (P38)",
+    ], []),
+    "dPlacedRequest": ([
+        "the kickoff manifest's facts as level-2 instruction units the card reads (the memory plan's `[pockets]`)",
+    ], ["gap-orient-20"]),
+}
+chain = V.text.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+for build, (clauses, gaps) in UNITS.items():
+    for c in clauses:
+        if "; " in c or "|" in c:
+            sys.exit(f"{build}: a clause holds a split: {c[:60]}")
+    lines = [ln for ln in chain.split("\n") if ln.startswith(f"| {build} | ")]
+    if len(lines) != 1:
+        sys.exit(f"{build}: {len(lines)} chain rows")
+    cells = lines[0].split(" | ")
+    # | build | stage | after | units | gaps |
+    m = re.match(r"^(\| \S+ \| [^|]+ \| [^|]+ \| )(.+)( \| )([^|]+)( \|)$", lines[0])
+    if not m:
+        sys.exit(f"{build}: the row does not parse")
+    units = m.group(2) + "; " + "; ".join(clauses)
+    gapcell = m.group(4) + ("".join(", " + g for g in gaps) if gaps else "")
+    V.sub(lines[0], m.group(1) + units + m.group(3) + gapcell + m.group(5), f"{build} row")
+
+V.insert_before("\nRevised: 2026-10-17, after the folds' closing review", """
+Revised: 2026-10-18, the away pass (""" + AWAY + """), the owner's six points worked in while the owner
+was away: P34 to P38 are added and P33's closed set grows by eleven types (the memory plan, """ + PLAN + """); seventeen keys join the catalogue, thirteen of them every preset and four the keys
+presets never touch; [chain] rows gain the units the six points need, each on its own build or one it depends on;
+the forks AP-1 to AP-30 are parked.
+""", "revision note")
+V.save()
+
+# ---- the gap register ---------------------------------------------------------------------------------------------
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+NEW = {
+    "gap-mem-34": [
+        ("gap-mem-35", "Memory", "HIGH", "The closed edge set cannot carry the cycle the owner asked for: a record serving a unit, who made a thing and why, the instruction an act followed, a return answering its work order, an act's session, what a landing carried, a pin, an item's reads and writes, and a promotion have no type. Five of twelve hops on one feature need prose or search, and four of seven from one commit.", "`research-memory-pockets.md` section 4; `research-git-pockets.md` section 4; the memory plan `[edges]`"),
+        ("gap-mem-36", "Memory", "MED", "Record sections declare no edges: outside dClosedLoop no record heading carries a tag, and the Serves line is the only typed link a record holds.", "`research-memory-pockets.md` section 2"),
+        ("gap-mem-37", "Memory", "MED", "The kind registry declares an owner and a writer only: home, lifecycle, readers and layer are undeclared for every kind, and views, row registries, the archive, instruments and the pockets outside the tree have no kind.", "`research-memory-pockets.md` sections 2 and 5; `research-git-pockets.md` section 3"),
+        ("gap-mem-38", "Memory", "LOW", "\"journal\" names two kinds: a Serves kind on 1,436 records and Runtime's journal.", "`research-memory-pockets.md` section 2"),
+        ("gap-mem-39", "Memory", "MED", "Decision rows and bug classes relate to nothing they decide or came from: a feature edge on 0 of 200 decision rows, and `from:` on 0 of 149 bug classes.", "`research-memory-pockets.md` sections 2 and 4"),
+        ("gap-mem-40", "Memory", "LOW", "A design-only build's records name a unit no spec defines, so the bindings check reports a row for each of them.", "`research-memory-pockets.md` section 2"),
+    ],
+    "gap-roles-22": [
+        ("gap-roles-23", "Roles", "MED", "Most handoffs carry no typed marker, 59 of 595, and a return names the work order it answers only in prose.", "`research-memory-pockets.md` sections 2 and 4"),
+    ],
+    "gap-spine-07": [
+        ("gap-spine-08", "Spine", "HIGH", "No commit names the item, act or session that made it, 0 of 6,084, and the trailer schema the flow records name is declared nowhere.", "`research-git-pockets.md` section 2"),
+        ("gap-spine-09", "Spine", "LOW", "`Pass:` has two readers that disagree: one unions the subject's ids with the trailer's, the other lets the trailer replace them.", "`research-git-pockets.md` section 2"),
+    ],
+    "gap-rt-24": [
+        ("gap-rt-25", "Runtime", "HIGH", "No record carries a key to its cause and no verb walks one: four past events each took six sources and eight or nine lookups to rebuild, and each left a question no record answers.", "`research-observability-trace.md` sections 2 and 3"),
+        ("gap-rt-26", "Runtime", "MED", "An act records no cost or duration; committed cost covers review acts' output tokens only.", "`research-observability-trace.md` section 2"),
+        ("gap-rt-27", "Runtime", "MED", "The journal carries no act or session key, and the health and stall logs carry no key at all, so a reap joins its bar only by the matching second.", "`research-observability-trace.md` sections 2 and 3"),
+        ("gap-rt-28", "Runtime", "HIGH", "An act session inherits its parent's entrypoint, session variables and messaging token, a secret that posts into the parent's inbox.", "`research-harness-cli.md` section 4"),
+        ("gap-rt-29", "Runtime", "MED", "The CLI on PATH and the application's bundled CLI drift apart, 2.1.292 against 2.1.299, the PATH one lacking a hook field the design needs, and a turn limit in use is undocumented.", "`research-harness-cli.md` section 3"),
+        ("gap-rt-30", "Runtime", "MED", "No preflight refuses a launch that skips hooks or permissions (`--bare`, `--safe-mode`, the skip flag).", "`research-harness-cli.md` section 4"),
+        ("gap-rt-31", "Runtime", "MED", "No fixture measures a harness adapter's capabilities: the Codex row went stale within days, and nothing separates what a harness can do from what an adapter claims.", "`research-harness-cli.md` sections 3 and 4"),
+    ],
+    "gap-orient-18": [
+        ("gap-orient-19", "Orient", "MED", "A session is no node: its id keys a per-session card and a run claim, and joins nothing else.", "`research-harness-cli.md` section 5"),
+        ("gap-orient-20", "Orient", "LOW", "The kickoff manifest has no record kind and no instruction unit; the card reads a guide.", "`research-memory-pockets.md` section 2"),
+    ],
+    "gap-test-19": [
+        ("gap-test-20", "Test", "MED", "A failing leg's output lives in its worktree's run directory and dies with the worktree.", "`research-observability-trace.md` section 2"),
+    ],
+    "gap-maint-13": [
+        ("gap-maint-14", "Maintain", "MED", "A node that dies before its journal reader writes the run record leaves a run nothing detects.", "`research-observability-trace.md` section 2"),
+    ],
+    "gap-deploy-14": [
+        ("gap-deploy-15", "Deploy", "HIGH", "A receipt naming a retired or absorbed kit refuses the whole update, and `check` reds on it.", "`research-supersession.md` section 2, probe A"),
+        ("gap-deploy-16", "Deploy", "HIGH", "No upgrade-step kind: a moved conf key is only reported, an old record shape is carried by date cutoffs, and the backlog migration stands alone.", "`research-supersession.md` section 2"),
+        ("gap-deploy-17", "Deploy", "MED", "No rollback across versions: a downgrade is refused, and rollback exists only inside one run, per kit.", "`research-supersession.md` section 2"),
+        ("gap-deploy-18", "Deploy", "MED", "An adopter's edit to a file gov retired reads as patched with no order, and a withdrawn hook stays wired.", "`research-supersession.md` section 2"),
+        ("gap-deploy-19", "Deploy", "MED", "A half-applied update leaves a lock and staged paths that an operator clears by hand.", "`research-supersession.md` section 2"),
+        ("gap-deploy-20", "Deploy", "MED", "gov cannot run `update` on itself, and `plan` refuses gov's own deploy file.", "`research-supersession.md` section 2, probe B"),
+        ("gap-deploy-21", "Deploy", "LOW", "A Codex project hook is skipped until it is trusted, and no install step surfaces the trust.", "`research-harness-cli.md` section 3"),
+        ("gap-deploy-22", "Deploy", "LOW", "A squash merge drops every trailer, at an adopter that squashes.", "`research-git-pockets.md` section 2"),
+        ("gap-deploy-23", "Deploy", "LOW", "A publication records no tree: the atlas is published by hand, and nothing names what it showed.", "`research-git-pockets.md` section 3"),
+    ],
+    "gap-tool-09": [
+        ("gap-tool-10", "Tooling", "LOW", "No release-0 adopter tree exists as a fixture: govkit's only fixture is a receipt, and its rename arm is graded by authored fixtures alone.", "`research-supersession.md` section 2"),
+        ("gap-tool-11", "Tooling", "HIGH", "No platform matrix is declared: only Windows with Git-Bash is tested, and under WSL two of three read-only kit checks fail.", "`research-compatibility.md` sections 2 and 4"),
+        ("gap-tool-12", "Tooling", "HIGH", "The Python resolver accepts an interpreter below the floor and prefers the Store alias, four times slower to spawn than the direct executable.", "`research-compatibility.md` section 2"),
+        ("gap-tool-13", "Tooling", "MED", "Line-ending pins are per-directory instances, not the class: most Python files check out with CRLF in a worktree.", "`research-compatibility.md` section 4"),
+        ("gap-tool-14", "Tooling", "MED", "node is an undeclared hard dependency: ten of thirteen hook commands run it, and the toolchain fact names bash and Python only.", "`research-compatibility.md` section 2"),
+        ("gap-tool-15", "Tooling", "MED", "gate-lint ships its encoding-posture check with no adopter leg.", "`research-compatibility.md` section 4"),
+        ("gap-tool-16", "Tooling", "MED", "A worktree's pointer holds a Windows path that WSL's git cannot open.", "`research-compatibility.md` section 2"),
+        ("gap-tool-17", "Tooling", "LOW", "A bug class carries no cause, language or platform field.", "`research-compatibility.md` section 5"),
+        ("gap-tool-18", "Tooling", "LOW", "The node registry's platform facts are free text.", "`research-compatibility.md` section 5"),
+        ("gap-tool-19", "Tooling", "MED", "No practice gives each language its role: shell grows outside shims, and each kit picks its own launch, encoding and path idioms.", "`research-compatibility.md` section 3"),
+    ],
+}
+for after, rows in NEW.items():
+    lines = [ln for ln in G.text.split("\n") if ln.startswith(f"| {after} |")]
+    if len(lines) != 1:
+        sys.exit(f"register: {len(lines)} rows for {after}")
+    G.sub(lines[0] + "\n", lines[0] + "\n" + "".join(f"| {k} | {s} | {v} | {g} | {e} | — |\n" for k, s, v, g, e in rows),
+          f"after {after}")
+G.sub("| gap-rt-09 | Runtime | LOW | gov wires none of the five hook events Codex ships. |",
+      "| gap-rt-09 | Runtime | LOW | gov wires none of the five hook events Codex ships. Revised 2026-10-18, the away pass: Codex now documents twelve, SessionStart, Stop and PostCompact among them, each project hook trusted by hash before it runs (`research-harness-cli.md` section 3). |",
+      "gap-rt-09")
+G.sub("and Codex has no SessionStart, so only the harness adapter's launch input can carry the card.",
+      "and Codex has no SessionStart, so only the harness adapter's launch input can carry the card. Revised 2026-10-18, the away pass: Codex now has SessionStart, so a trusted hook can carry the card (`research-harness-cli.md` section 3).",
+      "gap-rt-11")
+G.save()
+
+# ---- the kind registry --------------------------------------------------------------------------------------------
+M = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+last = [ln for ln in M.text.split("\n") if ln.startswith("| lexicon declaration | dMindYourWords |")]
+if len(last) != 1:
+    sys.exit(f"contract: {len(last)} lexicon rows")
+KINDS = [
+    ("commit", "dDeclaredLoop", "a git commit, its `Gov-*` trailers an edge site; written by the commit queue from the act binding and by the owner's `prepare-commit-msg` filler (the memory plan, the away pass)"),
+    ("view", "dTotalRecall", "a generated view: LIVE.md, the ledger, the ask views; re-rendered, never merged (the away pass)"),
+    ("registry", "dWitnessedBar", "a gate's row registry under `memory/project/`, written by its gate's pin emitter (the away pass)"),
+    ("archive", "dTotalRecall", "a rotated record under `memory/archive/`, written by rotation (the away pass)"),
+    ("instrument", "dTotalRecall", "a script, table or drawing kept beside the record it serves (the away pass)"),
+    ("witness", "dTotalRecall", "a declared pocket outside the tree, such as a transcript, a Codex rollout, the auto-memory, the live inbox or a scheduled task: its home, key and reader, written by its own owner and never by `record` (the away pass)"),
+]
+M.sub(last[0] + "\n", last[0] + "\n" + "".join(f"| {k} | {o} | {w} |\n" for k, o, w in KINDS), "kinds")
+M.save()
+
+# ---- the runtime record's Codex facts ------------------------------------------------------------------------------
+R = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md")
+R.sub("""    - its own docs call its hooks "not a complete enforcement boundary".
+""", """    - its own docs call its hooks "not a complete enforcement boundary".
+    - Revised 2026-10-18, the away pass (`build/2026-10-18-build-PLAY-dClosedLoop-1-research-harness-cli.md` section
+      3): Codex CLI 0.139 documents twelve hook events, SessionStart, PermissionRequest, UserPromptSubmit, Stop and
+      PostCompact among them, each project hook trusted by hash before it runs. The conformance fixture re-measures
+      its row (P36).
+""", "codex facts")
+R.save()
+````
+
+### `fix_presets.py`
+
+Two new keys' values spelled the way the preset check and their siblings read them.
+
+````python
+"""Spell two new keys' allowed values the way the preset check and their siblings read them.
+
+Usage: python -X utf8 fix_presets.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+V = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("| `runtime.act-harness` | a registered harness adapter that passes the act rows | claude-code |",
+      "| `runtime.act-harness` | claude-code, codex, or another registered harness adapter that passes the act rows | claude-code |",
+      "act-harness values")
+V.sub("| `install.deprecation-window` | 0, 1, 2, 4 releases | 2 | the away pass, point 6: equal to",
+      "| `install.deprecation-window` | 0, 1, 2, 4 | 2 | the away pass, point 6: a window counted in releases, equal to",
+      "window values")
+V.save()
+````
+
+### `fold_classes.py`
+
+The two citations the away pass's clauses made on a non-ancestor's node, classed as homonyms once the reconciliation probe reddened on them.
+
+````python
+"""Class the two citations the away pass's clauses made on a non-ancestor's node: both homonyms.
+
+Usage: python -X utf8 fold_classes.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+R = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-recut.md")
+lines = R.text.split("\n")
+head = lines.index("| Row | Node | Owner | Class | Why |")
+end = head + 2
+while end < len(lines) and lines[end].startswith("| "):
+    end += 1
+last = lines[end - 1]
+R.sub(last + "\n", last + "\n"
+      "| dGroundRules | `check` | dWitnessedBar | homonym | govkit's `check` verb beside `update`, which reads the `[[retired]]` rows, not the `check` tag namespace (the away pass) |\n"
+      "| dTotalRecall | `journal` | dWellOiledMachine | homonym | the Serves kind named `journal`, which the registry renames `log`, not Runtime's journal record kind (the away pass) |\n",
+      "class rows")
+R.save()
+````
+
+### `fix_cycle_table.py`
+
+The memory plan's cycle table given its families and a leading state word, so the atlas derives its memory diagram.
+
+````python
+"""Give the memory plan's [cycle] table the families each hop joins, and a status word leading each Today cell, so
+the atlas derives its memory diagram from the record.
+
+Usage: python -X utf8 fix_cycle_table.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+P = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+old = P.text.split("| Hop | Edge | Today | Planned site |", 1)[1].split("\n\n", 1)[0]
+old = "| Hop | Edge | Today | Planned site |" + old
+new = """| Hop | From | To | Edge | Today | Planned site |
+|---|---|---|---|---|---|
+| charter practice → feature-scoped units | instruction | instruction | `instructs` | prose | the unit's `select` naming `feature.<name>` |
+| units → work order | instruction | instruction | `instructs` | partly typed: `rules:` on role definitions | the work order's rendered slots, by tag |
+| work order → act | instruction | runtime | `follows` | none | the act record's `task-sha` |
+| act → session | runtime | runtime | `runs-in` | none: the run claim carries a session in prose | the session binding |
+| act → commit | runtime | git | `made-by` | search: by SHA across transcripts | the `Gov-Act:` trailer |
+| commit → unit and item | git | trail | `serves` (through `Gov-Unit:`), `made-by` | partly typed: the subject's scope, unchecked | `Gov-Unit:` and `Gov-Item:` trailers |
+| commit → landing | git | trail | `carries` | none: landing records are designed | the landing record |
+| landing → verdict | trail | trail | `caused-by` | none | the verdict record's parent |
+| return → work order | trail | instruction | `answers` | prose: in most research records | the return's header |
+| record → unit | trail | trail | `serves` | typed, and graded both ways | the Serves line, as today |
+| finding → bug class | trail | library | `caused-by` | none: `from:` on 0 of 149 | the class's header |
+| decision → feature, commit | library | git | `decides` | none: on 199 of 200 rows | the row's edge line; `Decided:` trailers |
+| bug class, decision → unit | library | instruction | `promoted-from` | none: no route | `instructions.edit` |
+| feature → code | library | code | `part-of`, `implements` | typed at kit level | annotations and claims |"""
+P.sub(old, new, "cycle table")
+P.save()
+````
+
+### `price_ap25.py`
+
+AP-25 priced: the upgrade-step kind in dGroundRules, in a build of its own, or in dShippedRelease with adopters held.
+
+````python
+"""Price AP-25: where the upgrade-step kind is built. Reads v2's [chain] as committed in the working tree, then moves
+the step kind's four dGroundRules clauses (each naming `[[upgrade]]`, `update` walking, down steps, or the release-0
+fixture) to each candidate home in memory, and prints the critical path for each. Writes nothing.
+
+Usage: python -X utf8 price_ap25.py   (from the worktree root)
+"""
+import re
+
+V = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+chain = open(V, encoding="utf-8").read().split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+units, parents, clauses = {}, {}, {}
+names = re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| [^|]+ \| ([^|]+) \| (.+) \| [^|]+ \|$", ln)
+    if m:
+        clauses[m.group(1)] = [u for u in m.group(3).split("; ") if u.strip()]
+        parents[m.group(1)] = [p.strip() for p in m.group(2).split(",") if p.strip() in names]
+STEP = ("the upgrade-step kind", "`update` walking every step", "down steps run in reverse", "the release-0 fixture tree")
+moved = [c for c in clauses["dGroundRules"] if c.startswith(STEP)]
+assert len(moved) == 4, moved
+
+
+def path(units, parents):
+    finish = {}
+
+    def f(b):
+        if b not in finish:
+            finish[b] = max([f(p) for p in parents[b]] or [0]) + units[b]
+        return finish[b]
+    end = max(units, key=f)
+    chain_, b = [end], end
+    while parents[b]:
+        b = max(parents[b], key=f)
+        chain_.append(b)
+    return finish[end], " > ".join(reversed(chain_))
+
+
+base = {b: len(c) for b, c in clauses.items()}
+print("as placed, in dGroundRules: %d units, %s" % path(base, parents))
+alt = dict(base, dGroundRules=base["dGroundRules"] - 4, dShippedRelease=base["dShippedRelease"] + 4)
+print("in dShippedRelease, adopters held until it lands: %d units, %s" % path(alt, parents))
+new = dict(base, dGroundRules=base["dGroundRules"] - 4, dHandedOverStandIn=4)
+par = dict(parents, dHandedOverStandIn=["dGroundRules"])
+par["dOrderedCharter"] = parents["dOrderedCharter"] + ["dHandedOverStandIn"]
+print("a build of its own between dGroundRules and dOrderedCharter: %d units, %s" % path(new, par))
+````
+
+### `write_impact_forks.py`
+
+The away-pass record's [chain-impact] and [forks], the path and prices spliced from their runs.
+
+````python
+"""Append the away pass's [chain-impact] and [forks] to its record, the path and AP-25's prices spliced from their runs.
+
+Usage: python -X utf8 write_impact_forks.py <cp-after.out> <price_ap25.out>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+cp = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n").strip()
+pr = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8").replace("\r\n", "\n").strip()
+F = "`" * 3
+rec = pathlib.Path("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md")
+t = rec.read_text(encoding="utf-8")
+if "## [chain-impact]" in t:
+    sys.exit("the record already holds [chain-impact]")
+FORKS = [
+    ("AP-1", "How does a record section declare its edges? (a structural decision)", "one `**Edges:**` line under the heading, as the Serves line declares the record's; front matter keyed by section; a sidecar per record", "the plan's `[sites]`"),
+    ("AP-2", "How far does the closed edge set grow? (a structural decision)", "the eleven types, each needed by a measured hop; a core four (`serves`, `made-by`, `caused-by`, `answers`) with the rest as record fields; `part-of` and `cites` widened to carry them", "P33's closed set"),
+    ("AP-3", "`memory.legacy-records`: how do today's records reach the plan?", "backfill: Serves lines read as edges, derived anchors, no file rewritten; anchors-only; retag every record", "the key's default"),
+    ("AP-4", "How does a design-only build's unit become a node?", "the build README's `ids:` defines it; design-only builds exempt from the bindings check", "dTotalRecall's registry"),
+    ("AP-5", "How does git join the syntax? (a structural decision)", "typed trailers, one key per edge, mapped in the registry; one `Gov-Edge:` key; git notes; a derived commit index alone", "dDeclaredLoop's commit node"),
+    ("AP-6", "`commits.edge-check`: where are the trailers checked?", "push-leg, reading the binding; commit-msg; off", "the key's default"),
+    ("AP-7", "`commits.squash`: what happens to trailers on a squash?", "re-emit-union; refuse; accept-loss", "the key's default"),
+    ("AP-8", "`trace.identity`: may committed memory name a session?", "act-only, as the owner's rule of 2026-09-13 keeps; session; salted", "the key's default, never set by a preset"),
+    ("AP-9", "What are transcripts and the auto-memory to the graph?", "witnesses with keyed pointers; nodes; out", "the plan's `[pockets]`"),
+    ("AP-10", "How does gov stay independent of the owner's application? (a structural decision)", "harness adapters with one conformance fixture, the CLI first, any application a viewer; the desktop app as the runtime; the CLI alone", "P36"),
+    ("AP-11", "`runtime.binary`: which CLI does the supervisor launch?", "newest-conforming, read from the node registry; path; app-bundled; a pinned path", "the key's default"),
+    ("AP-12", "`runtime.owner-harness`: which application is the owner's viewer?", "auto, taken from the session's binding; a named adapter", "the key's default, never set by a preset"),
+    ("AP-13", "`runtime.act-harness`: which harness runs acts?", "claude-code; codex, once its rows pass", "the key's default"),
+    ("AP-14", "`runtime.act-auth`: how does an act authenticate?", "oauth-shared, with transient retries; setup-token; api-key", "the key's default, never set by a preset"),
+    ("AP-15", "Which coding practice does gov follow? (a structural decision)", "a role per language, gated, ratcheting toward Python; Python-first now; node-first; a compiled binary", "P37"),
+    ("AP-16", "What language do harness hooks use?", "node, declared as a dependency; Python", "P37's roles"),
+    ("AP-17", "`platforms.supported`: which platforms does gov promise?", "windows-gitbash and linux; add macos; add pwsh-launch", "the key's default, never set by a preset"),
+    ("AP-18", "`platforms.verify`: how are they verified?", "held, until the Linux half is green, then ci; bar; ci; off", "the key's default"),
+    ("AP-19", "Which Python does gov require?", "3.11, the resolver naming how to provision it; 3.10, with a vendored TOML parser", "the interpreter floor"),
+    ("AP-20", "How are worktree pointers written?", "relative, tested first against WSL's git; absolute, WSL worktrees unsupported", "dWellOiledMachine's isolation"),
+    ("AP-21", "`trace.cost`: what does a committed act record carry?", "tokens and wall time, from the act's own output, never a journal time of day; tokens; none", "the key's default; the owner's rule of 2026-09-16 bears on it"),
+    ("AP-22", "`trace.leg-output`: where does a failing leg's output live?", "tail-by-hash, committed; node-local", "the key's default"),
+    ("AP-23", "`trace.rows`: how long is a timeline?", "60 rows, folding by kind past that; 120; all", "the key's default"),
+    ("AP-24", "How do the rebuilt kits supersede today's? (a structural decision)", "release-chained upgrade steps, up and down; one epoch release; shims alone; a translation layer alone", "P38"),
+    ("AP-25", "Where is the upgrade-step kind built? (a structural decision)", "in dGroundRules, as placed; a build of its own between dGroundRules and dOrderedCharter, named by the owner, at the same path; in dShippedRelease, adopters held at today's kits until it lands, two units shorter", "the chain"),
+    ("AP-26", "`install.deprecation-window`: how long does an old surface keep working?", "2 releases; 0; 1; 4", "the key's default"),
+    ("AP-27", "`install.on-shim-call`: what does a forwarded call do?", "warn, journaled for the fleet view; journal only; refuse", "the key's default"),
+    ("AP-28", "`install.retired-edits`: what happens to an adopter's edit of a retired file?", "order: kept, marked forked, with an order; keep silently; delete", "the key's default"),
+    ("AP-29", "`install.steps`: who runs an upgrade step?", "offer: gov's no-target-code mode, a step needing the target's code falling back to attended; attended always", "the key's default"),
+    ("AP-30", "How does gov itself migrate? (P8)", "the lander runs each new step on gov first, recorded in its source-mode receipt; gov's own diff is its migration", "dShippedRelease's lander unit"),
+]
+rows = "\n".join(f"| {a} | {q} | {o} | {s} |" for a, q, o, s in FORKS)
+t = t.rstrip("\n") + f"""
+
+## [chain-impact] What the away pass did to the chain
+
+The chain keeps its twenty builds; no build is added, split or reordered, and the one structural question, where
+the upgrade-step kind lives, is parked as AP-25. Thirteen builds gain units, 30 in all, each clause on its own build
+or one it depends on:
+
+| Build | Units added | For |
+|---|---|---|
+| dGroundRules | 4 | the upgrade-step kind, its walk, its down steps and its fixture (point 6) |
+| dOrderedCharter | 4 | the edge grammar, the writing practice's checks, the portable practice, its own upgrade steps (points 1, 4, 6) |
+| dDeclaredLoop | 1 | the commit node and its trailer keys (point 1) |
+| dPlacedRequest | 1 | the kickoff manifest as instruction units (point 1) |
+| dWitnessedBar | 2 | the portability leg pack, and the verdict's cause and leg tails (points 4, 5) |
+| dTotalRecall | 2 | the completed kind registry, and `record`'s header and edge line (points 1, 5) |
+| dLinkedLibrary | 1 | decision and bug-class edges (points 1, 4) |
+| dBoundRoles | 1 | markers on every work order, `answers` on every return (point 1) |
+| dWellOiledMachine | 6 | the act key, trailers, the trace verbs, the session node, the conformance fixture, preflight (points 1, 3, 4, 5) |
+| dTendedCadence | 1 | readings for missing outcomes, runs and keys (point 5) |
+| dCalibratedLens | 1 | the Loop Review priced from trace rows (point 5) |
+| dShippedRelease | 4 | the receipt and fleet for steps, gov first, the platform matrix, landings and publications (points 1, 3, 4, 6) |
+| dConvergedCharter | 2 | the migration to tags and class pins, and the steps that close the convergence (points 1, 4, 6) |
+
+The path, recomputed by `critical_path.py` on the folded tree, against the one the walk closed with at `fa62092db`:
+
+{F}text
+before, at fa62092db: critical path 171 units over 335
+{cp}
+{F}
+
+It grows by 19 units. Its run moves from dLinkedLibrary and dIndexedDesign onto dWellOiledMachine, whose six new
+units make it finish one unit after dIndexedDesign. AP-25's homes for the step kind, priced the same way:
+
+{F}text
+{pr}
+{F}
+
+Holding adopters back until dShippedRelease saves two units, because dShippedRelease then becomes the critical
+build, and it would freeze every adopter on today's kits through the whole chain. The other effects:
+- **The gap register** grows by 39 gaps, every one owned by exactly one build: Memory 6, Roles 1, Spine 2,
+  Runtime 7, Orient 2, Test 1, Maintain 1, Deploy 9, Tooling 10. Two Codex rows, `gap-rt-09` and `gap-rt-11`, are
+  amended with Codex's current hooks.
+- **The catalogue** gains 17 keys, 13 of them in every preset and 4 among the keys presets never touch.
+- **The principles** gain P34 to P38, and P33's closed set eleven types.
+- **The kind registry** gains six kinds: commit, view, registry, archive, instrument and witness.
+- **The level-0 map** now uses its degrade order, shortening purposes to 40 characters to stay within its budget,
+  as its design allows; gap-mem-30's owed measurement covers it.
+- **The atlas** gains its Memory view, derived from the plan record and the kind registry.
+
+## [forks] Parked for the owner, 2026-10-18
+
+Thirty forks, each with the recommendation first. A key's default stands as recommended until the owner answers.
+
+| Fork | Question | Options, the recommendation first | What the answer sets |
+|---|---|---|---|
+{rows}
+"""
+rec.write_text(t + "\n", encoding="utf-8", newline="\n")
+print("away-pass record:", len(t.splitlines()), "lines")
+````
+
+### `tally.py`
+
+The gap register's tally by stage and severity; it reproduces the register's last recorded tally at fa62092db.
+
+````python
+"""The gap register's tally by stage and severity, in the order the register's earlier re-measures print it.
+
+Usage: python -X utf8 tally.py <gap-register.md>
+"""
+import collections
+import re
+import sys
+
+rows = re.findall(r"^\| (gap-[a-z]+-\d\d) \| ([A-Za-z]+) \| (HIGH|MED|LOW)\b", open(sys.argv[1], encoding="utf-8").read(), flags=re.M)
+stage = collections.Counter(r[1] for r in rows)
+sev = collections.Counter(r[2] for r in rows)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+extra = sorted(set(stage) - set(ORDER))
+print(" ".join(f"{s}={stage[s]}" for s in ORDER + extra))
+print(" ".join(f"{s}={sev[s]}" for s in ("LOW", "MED", "HIGH")))
+print(f"rows {len(rows)}")
+````
+
+### `log_away.py`
+
+The register's re-measure and the session log's dispatch rows, agent lines and event.
+
+````python
+"""Record the away pass in the gap register's tally and the session log: the register re-measured, the six dispatch
+rows, their derived agent lines, and the pass's event.
+
+Usage: python -X utf8 log_away.py <tally-after.out> <agent-lines.txt>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+tally = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n").strip().split("\n")[:2]
+agents = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8").replace("\r\n", "\n").strip()
+if agents.count("- agent —") != 6 or agents.count("- returned —") != 6:
+    sys.exit("six agent and six returned lines expected")
+F = "`" * 3
+B = "memory/builds/dClosedLoop/build/"
+
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+G.text = G.text.rstrip("\n") + "\n\nRe-measured after the away pass added thirty-nine gaps, `gap-mem-35` to `gap-mem-40`, `gap-roles-23`,\n" \
+    "`gap-spine-08` and `gap-spine-09`, `gap-rt-25` to `gap-rt-31`, `gap-orient-19` and `gap-orient-20`, `gap-test-20`,\n" \
+    "`gap-maint-14`, `gap-deploy-15` to `gap-deploy-23` and `gap-tool-10` to `gap-tool-19`\n" \
+    "(`build/2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md` `[chain-impact]`), same instrument. A join of these 294 keys\n" \
+    "against v2's chain rows finds each owned by exactly one build:\n\n" + F + "text\n" + "\n".join(tally) + "\n" + F + "\n"
+G.done += 1
+G.save()
+
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+row105 = [ln for ln in L.text.split("\n") if ln.startswith("| 105 |")]
+if len(row105) != 1:
+    sys.exit("no single dispatch row 105")
+P = "`prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-%d-researcher.md`"
+R = "`build/2026-10-18-build-PLAY-dClosedLoop-1-research-%s.md`"
+ROWS = [
+    (106, "The away pass's point 1: the memory the repository holds, under one writing practice", 9, "returned, 9m46s, 49.5k out: 27 pockets, the Serves line the one typed link end to end, an edge line under each heading", "memory-pockets"),
+    (107, "Point 1: git and the memory outside the tracked files", 10, "returned, 9m32s, 49.6k out: typed commit trailers, notes and a derived index each losing a test", "git-pockets"),
+    (108, "Point 3, and point 1's session ids: the harness and its CLI, tested", 11, "returned, 8m58s, 44.1k out: a headless session run and resumed by id; adapters with one conformance fixture", "harness-cli"),
+    (109, "Point 4: one coding practice across platforms, tested", 12, "returned, 11m08s, 48.0k out: a role per language, gated; WSL fails two of three checks", "compatibility"),
+    (110, "Point 5: pointing at any part of the flow and telling what happened", 13, "returned, 8m30s, 43.7k out: not as designed; a cause on every record, cost on acts, a trace verb", "observability-trace"),
+    (111, "Point 6: the rebuilt kits superseding today's, seamlessly", 14, "returned, 7m28s, 40.1k out: release-chained upgrade steps; a retired kit refuses today's whole update", "supersession"),
+]
+new = "\n".join(f"| {d} | gov-researcher, at the owner's medium effort | {stage} | {P % p} | 1799cb98 | {out} | {R % rec} |"
+                for d, stage, p, out, rec in ROWS)
+L.sub(row105[0] + "\n", row105[0] + "\n" + new + "\n", "dispatch rows")
+L.insert_before("\n## Events\n", "\nThe away pass's researchers, dispatches 106 to 111, derived the same way:\n\n" + F + "text\n" + agents + "\n" + F + "\n",
+                "agent lines")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-18, session 1799cb98: the owner handed six points and stepped away (the away-pass record's `[words]`). Six
+  researchers ran, dispatches 106 to 111, and the design took each point in: the instruction and memory plan
+  (`build/2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md`), P34 to P38, 17 keys, 39 gaps, 30 units on 13 builds,
+  and the atlas's Memory view. The forks AP-1 to AP-30 are parked for the owner.
+""", "event")
+L.save()
+````
+
 ### `record_instruments.py`
 
 This record's own writer.
@@ -6583,6 +7268,22 @@ MINE = [
      "planned units and node keys that name an adopter, and the purposes that do, which never ship."),
     ("walk8/fold_wk7_wk8.py", "The owner's word on wave 4: WK-7 keeps dCalibratedLens whole, WK-8 names the first "
      "engine adapter for its engine, and the walk completes."),
+    ("away/fix_plan_deps.py", "The away pass: the memory plan's session units moved to dWellOiledMachine, the build that "
+     "owns acts and bindings, once a dependency check found dKeptSession before it."),
+    ("away/fold_away.py", "The away pass folded: P33 widened and P34 to P38, seventeen keys and their preset rows, the "
+     "chain rows' thirty units and their gaps, thirty-nine gaps, six record kinds and the Codex facts."),
+    ("away/fix_presets.py", "Two new keys' values spelled the way the preset check and their siblings read them."),
+    ("away/fold_classes.py", "The two citations the away pass's clauses made on a non-ancestor's node, classed as "
+     "homonyms once the reconciliation probe reddened on them."),
+    ("away/fix_cycle_table.py", "The memory plan's cycle table given its families and a leading state word, so the "
+     "atlas derives its memory diagram."),
+    ("away/price_ap25.py", "AP-25 priced: the upgrade-step kind in dGroundRules, in a build of its own, or in "
+     "dShippedRelease with adopters held."),
+    ("away/write_impact_forks.py", "The away-pass record's [chain-impact] and [forks], the path and prices spliced "
+     "from their runs."),
+    ("away/tally.py", "The gap register's tally by stage and severity; it reproduces the register's last recorded "
+     "tally at fa62092db."),
+    ("away/log_away.py", "The register's re-measure and the session log's dispatch rows, agent lines and event."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -7006,21 +7707,26 @@ H2's measurement, re-run on the folded tree. The first fold read 47 mentions ove
 
 ````text
 $ python plain_cites.py
+plan                     7  dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's), dLinkedLibrary (dRankedPlan's) …
 landing                  5  dGroundRules (dShippedRelease's), dOrderedCharter (dShippedRelease's), dKeptSession (dShippedRelease's), dWellOiledMachine (dShippedRelease's), dCalibratedLens (dShippedRelease's)
 scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
+code                     4  dGroundRules (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
+witness                  4  dGroundRules (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dBoundRoles (dTotalRecall's)
 seen red                 3  dGroundRules (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dKeptSession (dWitnessedBar's)
-code                     3  dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
 return                   3  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's)
 intake                   3  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
+fork                     3  dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
+registry                 2  dGroundRules (dWitnessedBar's), dOrderedCharter (dWitnessedBar's)
 playbook                 2  dOrderedCharter (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
 release                  2  dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 probe                    2  dOrderedCharter (dPlacedRequest's), dDeclaredLoop (dPlacedRequest's)
 spec                     2  dFairHearing (dIndexedDesign's), dBoundRoles (dIndexedDesign's)
 act                      2  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
 claim                    2  dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
-fork                     2  dBoundRoles (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
 baseline                 2  dFurnishedOrders (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 override                 1  dGroundRules (dOrderedCharter's)
+receipt                  1  dGroundRules (dShippedRelease's)
+commit                   1  dGroundRules (dDeclaredLoop's)
 card                     1  dOrderedCharter (dPlacedRequest's)
 inventory                1  dOrderedCharter (dIndexedDesign's)
 disposition              1  dFairHearing (dDeclaredLoop's)
@@ -7035,7 +7741,8 @@ roster                   1  dBoundRoles (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
 decision                 1  dWellOiledMachine (dLinkedLibrary's)
-plain-word hits on a non-ancestor's record kind: 53, over 29 kinds
+census                   1  dWitnessedBar (dLinkedLibrary's)
+plain-word hits on a non-ancestor's record kind: 71, over 35 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -7452,10 +8159,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:596 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:646 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:596 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:646 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant adopter-unit
 FINDING adopter-free: dGroundRules plans 'the NicoCares adapter', which names an adopter
@@ -7470,12 +8177,12 @@ rc 1
 
 ````text
 $ design map
-map: 2275 nodes in 30 namespaces; 32108 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1534, derived 259, pending 482
+map: 2357 nodes in 30 namespaces; 30709 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1590, derived 276, pending 491
 rc 0
 
 $ atlas
-atlas: derived — 157 records, 2765 sections, 186 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 165 records, 2810 sections, 188 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -7493,14 +8200,15 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 20 · owned nodes read 422 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 20 (cites 16, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 53 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+chain rows 20 · owned nodes read 445 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 71 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
   dFairHearing cites `preset` (dKeptSession's, not an ancestor): homonym
   dFurnishedOrders cites `code` (dTotalRecall's, not an ancestor): tolerance
   dFurnishedOrders cites `feature` (dTotalRecall's, not an ancestor): tolerance
+  dGroundRules cites `check` (dWitnessedBar's, not an ancestor): homonym
   dGroundRules cites `policy.guard` (dDeclaredLoop's, not an ancestor): not a use
   dGroundRules cites `policy.proof` (dDeclaredLoop's, not an ancestor): not a use
   dKeptSession cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
@@ -7511,6 +8219,7 @@ transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dOrderedCharter cites `code` (dTotalRecall's, not an ancestor): not a use
   dOrderedCharter cites `memory.map-purpose` (dTotalRecall's, not an ancestor): moved
   dRankedPlan cites `entry.intake` (dWellOiledMachine's, not an ancestor): tolerance
+  dTotalRecall cites `journal` (dWellOiledMachine's, not an ancestor): homonym
   dTotalRecall cites `roster` (dIndexedDesign's, not an ancestor): homonym
   dDeclaredLoop reads `decisions.major` (dLinkedLibrary's, not an ancestor): tolerance
   dFairHearing reads `flow.route-backs` (dDeclaredLoop's, not an ancestor): not a use
@@ -7524,7 +8233,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 255 · chain builds 20
+register keys 294 · chain builds 20
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -7532,13 +8241,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 208 · presettable 194 · preset rows 194
+catalogue keys 225 · presettable 207 · preset rows 207
 no findings
 rc 0
 
 $ critical path
-critical path: 171 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dLinkedLibrary > dIndexedDesign > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dFairHearing 20, dOrderedCharter 35, dDeclaredLoop 57, dPlacedRequest 64, dWitnessedBar 80, dKeptSession 82, dBoundRoles 96, dTotalRecall 97, dRankedPlan 110, dFurnishedOrders 114, dLinkedLibrary 120, dWellOiledMachine 128, dIndexedDesign 132, dScopedBuild 143, dMindYourWords 145, dTendedCadence 146, dShippedRelease 149, dCalibratedLens 157, dConvergedCharter 171
+critical path: 190 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 12, dFairHearing 24, dOrderedCharter 43, dDeclaredLoop 66, dPlacedRequest 74, dWitnessedBar 91, dKeptSession 92, dBoundRoles 108, dTotalRecall 110, dRankedPlan 123, dFurnishedOrders 126, dLinkedLibrary 134, dIndexedDesign 146, dWellOiledMachine 147, dScopedBuild 158, dTendedCadence 162, dMindYourWords 164, dShippedRelease 172, dCalibratedLens 174, dConvergedCharter 190
 rc 0
 ````
 

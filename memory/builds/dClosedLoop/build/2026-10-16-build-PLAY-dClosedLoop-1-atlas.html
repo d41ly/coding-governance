@@ -380,6 +380,41 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 .foot { color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--line); padding-top: 12px; display: flex; flex-wrap: wrap; gap: 4px 16px; }
 .muted { color: var(--muted); }
+/* the memory view (the away pass, point 1) */
+.mem-legend { margin: 2px 0 0; font-size: 13px; }
+.mem-legend .lg { display: inline-block; padding: 0 6px; border-radius: 3px; margin-right: 4px; border: 1px solid var(--line-2); }
+.mem-legend .lg-typed { border-color: var(--accent); color: var(--accent); }
+.mem-legend .lg-partly { border-style: dashed; border-color: var(--accent); color: var(--accent); }
+.mem-legend .lg-none { border-style: dashed; border-color: var(--signal); color: var(--signal); }
+.marc path { fill: none; stroke-width: 2; }
+.marc-typed path { stroke: var(--accent); }
+.marc-partly path { stroke: var(--accent); stroke-dasharray: 6 4; }
+.marc-none path { stroke: var(--signal); stroke-dasharray: 3 4; }
+.marc.hot path { stroke-width: 3.5; }
+.mah-typed, .mah-partly { fill: var(--accent); }
+.mah-none { fill: var(--signal); }
+.marc-label { fill: var(--ink-2); font-family: var(--f-mono); font-size: 11px; paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+.mem-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.mfam-card.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.mfam-name { border: 0; background: none; padding: 0; font-family: var(--f-display); font-weight: 700; font-size: 19px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink); cursor: pointer; display: flex; gap: 8px; align-items: center; }
+.mfam-holds { color: var(--ink-2); font-size: 13.5px; margin: 6px 0 8px; }
+.pk { --lc: var(--line-2); }
+.pk-node { --lc: var(--accent); }
+.pk-witness { --lc: var(--signal); }
+.pk-edge-site { --lc: var(--l-design); }
+.pk-folded, .pk-out { color: var(--muted); }
+.kind.pk-node { border-color: var(--accent); color: var(--accent); }
+.kind.pk-witness { border-color: var(--signal); color: var(--signal); }
+.mk-row { display: grid; gap: 4px; margin: 6px 0; }
+.me-new { --lc: var(--signal); }
+.me-p33 { --lc: var(--accent); }
+.me-derived { --lc: var(--line-2); }
+.hs { font-family: var(--f-mono); font-size: 11px; padding: 0 6px; border-radius: 999px; border: 1px solid var(--line-2); white-space: nowrap; }
+.hs-typed { border-color: var(--accent); color: var(--accent); }
+.hs-partly-typed { border-color: var(--accent); border-style: dashed; color: var(--accent); }
+.hs-prose, .hs-search, .hs-none { border-color: var(--signal); color: var(--signal); }
+tr[data-medge] { cursor: pointer; }
+tr[data-medge].on td { background: var(--accent-soft); }
 </style>
 
 <header class="top">
@@ -395,6 +430,7 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
       <button class="tab" role="tab" id="tab-flow" data-view="flow" aria-controls="view-flow">Flow</button>
       <button class="tab" role="tab" id="tab-lifecycle" data-view="lifecycle" aria-controls="view-lifecycle">Lifecycle</button>
       <button class="tab" role="tab" id="tab-roles" data-view="roles" aria-controls="view-roles">Roles</button>
+      <button class="tab" role="tab" id="tab-memory" data-view="memory" aria-controls="view-memory">Memory</button>
       <button class="tab" role="tab" id="tab-chain" data-view="chain" aria-controls="view-chain">Chain</button>
       <button class="tab" role="tab" id="tab-policies" data-view="policies" aria-controls="view-policies">Policies</button>
       <button class="tab" role="tab" id="tab-principles" data-view="principles" aria-controls="view-principles">Principles</button>
@@ -412,6 +448,7 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
     <section id="view-flow" class="view" role="tabpanel" aria-labelledby="tab-flow" hidden></section>
     <section id="view-lifecycle" class="view" role="tabpanel" aria-labelledby="tab-lifecycle" hidden></section>
     <section id="view-roles" class="view" role="tabpanel" aria-labelledby="tab-roles" hidden></section>
+    <section id="view-memory" class="view" role="tabpanel" aria-labelledby="tab-memory" hidden></section>
     <section id="view-chain" class="view" role="tabpanel" aria-labelledby="tab-chain" hidden></section>
     <section id="view-policies" class="view" role="tabpanel" aria-labelledby="tab-policies" hidden></section>
     <section id="view-principles" class="view" role="tabpanel" aria-labelledby="tab-principles" hidden></section>
@@ -570,6 +607,14 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
   var PRIN = {}; D.principles.forEach(function (p) { PRIN[p.n] = p; });
   var LIBSET = {}; D.libraryItems.forEach(function (t) { LIBSET[t] = true; });
   var PROG = {}; D.progress.forEach(function (p) { PROG[p.layer] = p; });
+  // The memory view's indexes: families, pockets, record kinds, edge types and the cycle's hops (the away pass, point 1)
+  var MEM = D.memory, FAM = {}, POCKET = {}, MKIND = {}, MEDGE = {};
+  MEM.families.forEach(function (f) { FAM[f.family] = f; f.pockets = []; f.out = []; f.in = []; });
+  MEM.pockets.forEach(function (p) { POCKET[p.pocket] = p; FAM[p.family].pockets.push(p); });
+  MEM.kinds.forEach(function (k) { MKIND[k.kind] = k; });
+  MEM.edges.forEach(function (e) { MEDGE[e.edge] = e; e.hops = []; });
+  MEM.hops.forEach(function (h) { FAM[h.from].out.push(h); if (h.to !== h.from) FAM[h.to].in.push(h); h.edges.forEach(function (e) { MEDGE[e].hops.push(h); }); });
+  var HOP_STATE = { 'typed': 'typed today', 'partly typed': 'partly typed', 'prose': 'prose today', 'search': 'search today', 'none': 'no link today' };
   function sevCount(ids) { var c = { HIGH: 0, MED: 0, LOW: 0 }; ids.forEach(function (id) { c[GAP[id].sev]++; }); return c; }
   function bySev(a, b) { return SEV_ORDER[GAP[a].sev] - SEV_ORDER[GAP[b].sev] || (a < b ? -1 : 1); }
   function kitsOf(tag) { return D.kits.filter(function (k) { return new RegExp('\\b' + tag + '\\b', 'i').test(k.layer.split(/[:;]/)[0]); }); }
@@ -622,7 +667,8 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
     current[activeView] = { type: type, id: id };
     memo('atlas.sel.' + activeView, type + '|' + id);
     ({ layer: showLayer, item: showItem, state: showState, edge: showEdge, build: showBuild, review: showReview, revision: showRevision,
-       gap: showGap, role: showRole, area: showArea, principle: showPrinciple, record: showRecord, trail: showTrail })[type](id);
+       gap: showGap, role: showRole, area: showArea, principle: showPrinciple, record: showRecord, trail: showTrail,
+       family: showFamily, pocket: showPocket, kind: showKind, medge: showMedge })[type](id);
     highlight();
     if (!quiet) insp.classList.add('open');
   }
@@ -656,6 +702,11 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
       nodes.push(block('Design records, section by section', null, wrap));
     } else {
       nodes.push(block('Design records', '<span class="muted">Not designed yet. An expansion gets its own round once the core is done.</span>'));
+    }
+    if (tag === 'memory' || tag === 'instruction') {
+      var mv = el('button', { class: 'ichip ref', type: 'button' }, 'Open the Memory view');
+      mv.addEventListener('click', function () { goView('memory'); });
+      nodes.splice(2, 0, block('Drawn whole', 'One graph with instruction: its families, pockets, edges and cycle.', mv));
     }
     if (tag === 'memory') {
       var lr = D.libraryRound;
@@ -1339,6 +1390,190 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
     ]);
   }
 
+  // Memory: the instruction and memory plan, drawn whole (the away pass, point 1)
+  function pocketChip(name) {
+    var p = POCKET[name];
+    var b = el('button', { class: 'ichip pk pk-' + p.status.replace(' ', '-'), type: 'button', title: p.status + ' · ' + p.becomes.replace(/`/g, '') }, esc(name));
+    b.addEventListener('click', function () { select('pocket', name); });
+    return b;
+  }
+  function kindChip(name) {
+    var k = MKIND[name], at = k.places[0];
+    var b = el('button', { class: 'ichip', type: 'button', style: '--lc: var(--l-' + (at && STEP[at] ? at : 'lifecycle') + ')', title: 'owner ' + k.owner }, esc(name));
+    b.addEventListener('click', function () { select('kind', name); });
+    return b;
+  }
+  function medgeChip(name) {
+    var e = MEDGE[name];
+    var b = el('button', { class: 'ichip me-' + e.status.toLowerCase(), type: 'button', title: e.fromTo.replace(/`/g, '') }, esc(name));
+    b.addEventListener('click', function () { select('medge', name); });
+    return b;
+  }
+  function memTable(title, heads, rows) {
+    var box = el('div', { class: 'panel box' });
+    box.appendChild(el('div', { class: 'eyebrow', text: title }));
+    var w = el('div', { class: 'scroll-x' });
+    var tb = el('table', { class: 'data' });
+    tb.innerHTML = '<thead><tr>' + heads.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('') + '</tr></thead>';
+    var body = el('tbody');
+    rows.forEach(function (r) {
+      var attrs = {}; if (r.type) attrs['data-' + r.type] = r.key;
+      var tr = el('tr', attrs);
+      r.cells.forEach(function (c) { var td = el('td'); if (typeof c === 'string') td.innerHTML = c; else td.appendChild(c); tr.appendChild(td); });
+      if (r.type) tr.addEventListener('click', function (ev) { if (ev.target.closest('button')) return; select(r.type, r.key); });
+      body.appendChild(tr);
+    });
+    tb.appendChild(body); w.appendChild(tb); box.appendChild(w);
+    return box;
+  }
+  // The ring follows the cycle: from the first family, each next one is reached by a hop from the last, and the
+  // families no hop reaches close the ring in the plan's order.
+  function ringOrder() {
+    var order = [MEM.families[0].family], left = MEM.families.slice(1).map(function (f) { return f.family; });
+    while (left.length) {
+      var last = order[order.length - 1];
+      var next = left.find(function (f) { return FAM[last].out.some(function (h) { return h.to === f; }); }) || left[0];
+      order.push(next); left.splice(left.indexOf(next), 1);
+    }
+    return order;
+  }
+  function clipBox(c, toward, w, h) {
+    var dx = toward[0] - c[0], dy = toward[1] - c[1];
+    if (!dx && !dy) return c;
+    var s = Math.min(dx ? (w / 2 + 5) / Math.abs(dx) : Infinity, dy ? (h / 2 + 5) / Math.abs(dy) : Infinity);
+    return [c[0] + dx * s, c[1] + dy * s];
+  }
+  function memoryDiagram() {
+    var W = 860, H = 600, cx = 430, cy = 296, R = 228, BW = 156, BH = 56;
+    var svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': 'The memory families on one ring, joined by the cycle\'s hops, each labelled with its edge types' });
+    var defs = sv('defs');
+    ['typed', 'partly', 'none'].forEach(function (k) {
+      var mk = sv('marker', { id: 'mar-' + k, viewBox: '0 0 10 10', refX: '8', refY: '5', markerWidth: '7', markerHeight: '7', orient: 'auto-start-reverse' });
+      mk.appendChild(sv('path', { d: 'M0 0L10 5L0 10z', class: 'mah-' + k })); defs.appendChild(mk);
+    });
+    svg.appendChild(defs);
+    var order = ringOrder(), pos = {};
+    order.forEach(function (f, i) { var a = (-90 + i * 360 / order.length) * Math.PI / 180; pos[f] = [cx + R * Math.cos(a), cy + R * Math.sin(a)]; });
+    var pairs = {}, keys = [];
+    MEM.hops.forEach(function (h) {
+      if (h.from === h.to) return;
+      var k = h.from + '>' + h.to;
+      if (!pairs[k]) { pairs[k] = { from: h.from, to: h.to, edges: [], states: [] }; keys.push(k); }
+      h.edges.forEach(function (e) { if (pairs[k].edges.indexOf(e) < 0) pairs[k].edges.push(e); });
+      pairs[k].states.push(h.state);
+    });
+    keys.forEach(function (k) {
+      var p = pairs[k], a = pos[p.from], b = pos[p.to];
+      var best = p.states.indexOf('typed') >= 0 ? 'typed' : p.states.indexOf('partly typed') >= 0 ? 'partly' : 'none';
+      var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, qx = mx + (cx - mx) * 0.38, qy = my + (cy - my) * 0.38;
+      var s = clipBox(a, [qx, qy], BW, BH), t = clipBox(b, [qx, qy], BW, BH);
+      var g = sv('g', { class: 'marc marc-' + best, 'data-from': p.from, 'data-to': p.to });
+      g.appendChild(sv('path', { d: 'M' + s[0] + ' ' + s[1] + ' Q' + qx + ' ' + qy + ' ' + t[0] + ' ' + t[1], 'marker-end': 'url(#mar-' + best + ')' }));
+      var lx = 0.25 * s[0] + 0.5 * qx + 0.25 * t[0], ly = 0.25 * s[1] + 0.5 * qy + 0.25 * t[1];
+      g.appendChild(sv('text', { x: lx, y: ly - 5, 'text-anchor': 'middle', class: 'marc-label' }, p.edges.join(', ')));
+      svg.appendChild(g);
+    });
+    order.forEach(function (name) {
+      var f = FAM[name], c = pos[name];
+      var g = sv('g', { class: 'svg-node mfam', 'data-fam': name });
+      g.appendChild(sv('rect', { x: c[0] - BW / 2, y: c[1] - BH / 2, width: BW, height: BH, rx: 6, class: 'body' }));
+      g.appendChild(sv('text', { x: c[0], y: c[1] - 4, 'text-anchor': 'middle', class: 'n-title', style: 'font-size:17px' }, name));
+      g.appendChild(sv('text', { x: c[0], y: c[1] + 14, 'text-anchor': 'middle', class: 'n-sub' }, 'level ' + f.level + ' · ' + plural(f.pockets.length, 'pocket')));
+      svgButton(g, cap(name) + ' family', function () { select('family', name); });
+      svg.appendChild(g);
+    });
+    return svg;
+  }
+  views.memory = function (v) {
+    var head = el('div');
+    head.appendChild(el('div', { class: 'eyebrow', text: 'The memory layer, drawn whole' }));
+    head.appendChild(el('h1', { class: 'view-title', text: 'One graph, written one way' }));
+    head.appendChild(el('p', { class: 'lede' }, md(MEM.frame)));
+    head.appendChild(el('div', { class: 'ref-line' })).appendChild(refChip(MEM.path, null, 'the instruction and memory plan'));
+    v.appendChild(head);
+    var st = {}, es = {};
+    MEM.pockets.forEach(function (p) { st[p.status] = (st[p.status] || 0) + 1; });
+    MEM.edges.forEach(function (e) { es[e.status] = (es[e.status] || 0) + 1; });
+    var typed = MEM.hops.filter(function (h) { return h.state === 'typed'; }).length;
+    var stats = el('div', { class: 'chips' });
+    [[MEM.families.length, 'families'], [MEM.pockets.length, 'pockets'], [st.node || 0, 'nodes'], [st.witness || 0, 'witnesses'], [st.out || 0, 'out'],
+     [MEM.kinds.length, 'record kinds'], [(es.P33 || 0) + (es.new || 0), 'declared edge types'], [es.new || 0, 'new in the away pass'],
+     [typed + ' of ' + MEM.hops.length, 'hops typed today']].forEach(function (p) { stats.appendChild(el('span', { class: 'chip' }, '<b>' + p[0] + '</b>' + esc(p[1]))); });
+    v.appendChild(stats);
+    var dia = el('div', { class: 'panel diagram scroll-x' }); dia.appendChild(memoryDiagram()); v.appendChild(dia);
+    v.appendChild(el('p', { class: 'muted mem-legend' }, 'Each arrow is a hop of the cycle between two families, labelled with its edge types: <span class="lg lg-typed">typed today</span><span class="lg lg-partly">partly typed</span><span class="lg lg-none">prose, search or no link today</span>. Every hop is typed once the plan lands. Click a family, a pocket, a kind or an edge type to open it.'));
+    var grid = el('div', { class: 'mem-grid' });
+    MEM.families.forEach(function (f) {
+      var c = el('div', { class: 'panel box mfam-card', 'data-fam': f.family });
+      var h = el('button', { class: 'mfam-name', type: 'button' }, esc(f.family) + ' <span class="kind">level ' + esc(f.level) + '</span>');
+      h.addEventListener('click', function () { select('family', f.family); });
+      c.appendChild(h);
+      c.appendChild(el('p', { class: 'mfam-holds' }, md(f.holds)));
+      c.appendChild(chips(f.pockets.map(function (p) { return p.pocket; }), pocketChip));
+      grid.appendChild(c);
+    });
+    v.appendChild(grid);
+    var kb = el('div', { class: 'panel box' });
+    kb.appendChild(el('div', { class: 'eyebrow', text: 'Record kinds, by the step or program whose item writes them' }));
+    var groups = {}, gorder = [];
+    MEM.kinds.forEach(function (k) { var g = k.places.length ? k.places[0] : ''; if (!groups[g]) { groups[g] = []; gorder.push(g); } groups[g].push(k.kind); });
+    var rank = function (g) { var i = D.steps.findIndex(function (s) { return s.tag === g; }); return g === '' ? 999 : i < 0 ? 500 : i; };
+    gorder.sort(function (a, b) { return rank(a) - rank(b) || (a < b ? -1 : 1); });
+    gorder.forEach(function (g) {
+      var row = el('div', { class: 'mk-row' });
+      row.appendChild(el('div', { class: 'sub-head' }, g === '' ? 'named by no flow item' : STEP[g] ? esc(STEP[g].name) : 'the ' + esc(g) + ' program'));
+      row.appendChild(chips(groups[g], kindChip));
+      kb.appendChild(row);
+    });
+    v.appendChild(kb);
+    v.appendChild(memTable('The closed edge set', ['Edge', 'From → to', 'Declared at', 'Inverse', 'Status', 'Needed by'], MEM.edges.map(function (e) {
+      return { type: 'medge', key: e.edge, cells: [medgeChip(e.edge), md(e.fromTo), md(e.site), '<code>' + esc(e.inverse) + '</code>', '<span class="kind">' + esc(e.status) + '</span>', md(e.need)] };
+    })));
+    v.appendChild(memTable('Where each edge is declared', ['Site', 'Syntax', 'Door'], MEM.sites.map(function (s) { return { cells: [md(s.site), md(s.syntax), md(s.door)] }; })));
+    v.appendChild(memTable('The cycle, hop by hop', ['Hop', 'From', 'To', 'Edge', 'Today', 'Planned site'], MEM.hops.map(function (h) {
+      var rest = h.today.slice(h.state.length).replace(/^(: |, )/, '');
+      return { cells: [md(h.hop), esc(h.from), esc(h.to), md(h.edgeText), '<span class="hs hs-' + h.state.replace(' ', '-') + '">' + esc(HOP_STATE[h.state]) + '</span>' + (rest ? ' ' + md(rest) : ''), md(h.site)] };
+    })));
+    v.appendChild(memTable('The instruction ladder, memory at its foot', ['Level', 'What sits there'], MEM.levels.map(function (l) { return { cells: [esc(l.level), md(l.what)] }; })));
+  };
+  function hopList(hs) {
+    var ul = el('ul');
+    hs.forEach(function (h) { ul.appendChild(el('li', null, md(h.hop) + ' <span class="muted">· ' + esc(h.from) + ' → ' + esc(h.to) + ' · ' + esc(HOP_STATE[h.state]) + '</span>')); });
+    return ul;
+  }
+  function ownerNode(o) { return BUILD[o] ? buildChip(o) : el('span', null, md(o)); }
+  function showFamily(name) {
+    var f = FAM[name];
+    var nodes = [block('Level', esc(f.level)), block('What it holds', md(f.holds)), block('Lifecycle', md(f.lifecycle)),
+      block('Pockets', null, chips(f.pockets.map(function (p) { return p.pocket; }), pocketChip))];
+    if (f.out.length) nodes.push(block('Hops leaving it', null, hopList(f.out)));
+    if (f.in.length) nodes.push(block('Hops arriving', null, hopList(f.in)));
+    nodes.push(block('Source', null, refChip(MEM.path, 'families')));
+    inspector('Memory family', name, false, nodes);
+  }
+  function showPocket(name) {
+    var p = POCKET[name];
+    inspector('Memory pocket', name, false, [
+      el('p', null, '<span class="kind pk-' + esc(p.status.replace(' ', '-')) + '">' + esc(p.status) + '</span> <span class="muted">in the ' + esc(p.family) + ' family</span>'),
+      kvList([['Where', p.where], ['Today', p.today], ['Becomes', p.becomes], ['Key', p.key]]),
+      block('Owner', null, ownerNode(p.owner)), block('Source', null, refChip(MEM.path, 'pockets'))]);
+  }
+  function showKind(name) {
+    var k = MKIND[name];
+    var nodes = [block('Owner', null, ownerNode(k.owner)), block('Its writer, or what names it', md(k.writer))];
+    if (k.items.length) nodes.push(block('Writer items', null, chips(k.items, function (t) { return ITEMS[t] ? itemChip(t) : el('code', { text: t }); })));
+    nodes.push(block('Source', null, refChip(D.sources.memory, null, 'layer-memory, the kind registry')));
+    inspector('Record kind', name, true, nodes);
+  }
+  function showMedge(name) {
+    var e = MEDGE[name];
+    var nodes = [el('p', null, '<span class="kind">' + esc(e.status) + '</span>' + (e.statusText !== e.status ? ' <span class="muted">' + md(e.statusText) + '</span>' : '')),
+      kvList([['From → to', e.fromTo], ['Declared at', e.site], ['Inverse, derived', '`' + e.inverse + '`'], ['Needed by', e.need]])];
+    if (e.hops.length) nodes.push(block('Hops it carries', null, hopList(e.hops)));
+    nodes.push(block('Source', null, refChip(MEM.path, 'edges')));
+    inspector('Edge type', name, true, nodes);
+  }
+
   // Chain
   var gapFilter = { sev: 'all', owner: 'all', q: '' };
   views.chain = function (v) {
@@ -1922,11 +2157,17 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
     $$('#area-table tr[data-area]').forEach(function (tr) { tr.classList.toggle('on', tr.getAttribute('data-area') === areaSel); });
     $$('.p-card').forEach(function (c) { c.classList.toggle('on', sel.type === 'principle' && +c.getAttribute('data-p') === sel.id); });
     $$('.tl-item').forEach(function (b) { b.classList.toggle('on', sel.type === 'revision' && +b.getAttribute('data-rev') === sel.id); });
+    var famOf = sel.type === 'family' ? sel.id : sel.type === 'pocket' && POCKET[sel.id] ? POCKET[sel.id].family : null;
+    $$('.mfam').forEach(function (n) { n.classList.toggle('on', n.getAttribute('data-fam') === famOf); });
+    $$('.mfam-card').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-fam') === famOf); });
+    $$('.marc').forEach(function (g) { g.classList.toggle('hot', !!famOf && (g.getAttribute('data-from') === famOf || g.getAttribute('data-to') === famOf)); });
+    $$('tr[data-medge]').forEach(function (tr) { tr.classList.toggle('on', sel.type === 'medge' && tr.getAttribute('data-medge') === sel.id); });
   }
 
   // ---------- tabs ----------
   var latestReview = D.reviews.length ? D.reviews.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; })[0].file : null;
   var DEFAULTS = { overview: ['layer', 'memory'], compare: ['area', D.areas[0].key], flow: ['item', 'entry.claim'], lifecycle: ['state', 'planning'], roles: ['role', 'reviewer'],
+    memory: ['family', MEM.families[0].family],
     chain: ['build', 'dTotalRecall'], policies: null, principles: ['principle', 1], decisions: ['trail', 'all'], progress: ['review', latestReview], records: ['record', V2 ? V2.path : D.records[0].path] };
   var NUMERIC = { revision: true, principle: true };
   var built = {};
@@ -1956,7 +2197,8 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
     return (s.type === 'layer' && LAYER[s.id]) || (s.type === 'item' && ITEMS[s.id]) || (s.type === 'state' && POS[s.id]) || (s.type === 'edge' && EDGES[s.id]) ||
       (s.type === 'build' && BUILD[s.id]) || (s.type === 'review' && REVIEW[s.id]) || (s.type === 'revision' && D.timeline[s.id]) || (s.type === 'gap' && GAP[s.id]) ||
       (s.type === 'role' && D.roster.some(function (r) { return r.role === s.id; })) || (s.type === 'area' && AREA[s.id]) || (s.type === 'principle' && PRIN[s.id]) ||
-      (s.type === 'record' && REC[s.id]) || s.type === 'trail';
+      (s.type === 'record' && REC[s.id]) || s.type === 'trail' || (s.type === 'family' && FAM[s.id]) || (s.type === 'pocket' && POCKET[s.id]) ||
+      (s.type === 'kind' && MKIND[s.id]) || (s.type === 'medge' && MEDGE[s.id]);
   }
   function footer() {
     var f = el('div', { class: 'foot' });

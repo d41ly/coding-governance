@@ -201,6 +201,8 @@ superseded: re-run on the committed tree, it reds on the routes row it cannot re
 | dDeclaredLoop | `decisions.major` | dLinkedLibrary | tolerance | `build.recommend` routes on the key only inside the Build step, whose build descends from dTotalRecall (FM4's reads rule) |
 | dFairHearing | `flow.route-backs` | dDeclaredLoop | not a use | dDeclaredLoop's program counts the bound as it routes the harness's report; the harness never reads it (FM4's reads rule) |
 | dRankedPlan | `run.host` | dWellOiledMachine | tolerance | `plan.exit` launches the executor only where the supervisor is installed; before dWellOiledMachine lands, the attended session carries the build into Design (FM4's reads rule) |
+| dGroundRules | `check` | dWitnessedBar | homonym | govkit's `check` verb beside `update`, which reads the `[[retired]]` rows, not the `check` tag namespace (the away pass) |
+| dTotalRecall | `journal` | dWellOiledMachine | homonym | the Serves kind named `journal`, which the registry renames `log`, not Runtime's journal record kind (the away pass) |
 
 The critical path, its instrument and its runs:
 

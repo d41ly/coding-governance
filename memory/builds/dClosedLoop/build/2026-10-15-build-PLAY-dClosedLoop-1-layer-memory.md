@@ -464,6 +464,12 @@ layer that registers a kind adds its row.
 | loop review | dCalibratedLens | its writer is `loop.record` |
 | value ledger | dCalibratedLens | a generated library view; `loop.price` regenerates it |
 | lexicon declaration | dMindYourWords | layer-memory lists the lexicon as an optional component's kind; dMindYourWords builds the declaration and its packs |
+| commit | dDeclaredLoop | a git commit, its `Gov-*` trailers an edge site; written by the commit queue from the act binding and by the owner's `prepare-commit-msg` filler (the memory plan, the away pass) |
+| view | dTotalRecall | a generated view: LIVE.md, the ledger, the ask views; re-rendered, never merged (the away pass) |
+| registry | dWitnessedBar | a gate's row registry under `memory/project/`, written by its gate's pin emitter (the away pass) |
+| archive | dTotalRecall | a rotated record under `memory/archive/`, written by rotation (the away pass) |
+| instrument | dTotalRecall | a script, table or drawing kept beside the record it serves (the away pass) |
+| witness | dTotalRecall | a declared pocket outside the tree, such as a transcript, a Codex rollout, the auto-memory, the live inbox or a scheduled task: its home, key and reader, written by its own owner and never by `record` (the away pass) |
 
 **One refinement to layers round one,** for research records and major decisions alike. Core items
 write them (`plan.research`, `design.research`, and each build's decisions as it makes them), so their

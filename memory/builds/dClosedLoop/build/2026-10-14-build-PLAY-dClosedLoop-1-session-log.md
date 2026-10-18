@@ -167,6 +167,12 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 103 | gov-researcher, at the owner's medium effort | Point 4: one relational syntax across memory, pulling a tag for its regions and instructions | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-7-researcher.md` | 1799cb98 | returned, 9m30s, 50.6k out: declare at the site, derive the rest, four other mechanisms each losing a test | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-relational-syntax.md` |
 | 104 | gov-researcher, at the owner's medium effort | Point 8: today's tools, function by function, and their fates under v2 | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-8-researcher.md` | 1799cb98 | returned, 11m18s, 70.3k out: 118 function rows, 11 undecided, the kit-level map stale in nine rows | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-tool-fates.md` |
 | 105 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, round 1 | The night pass's closing review: `9ab7a5c5c` over `beda01950`, twenty-two design records as specs | the args, recorded with its fold (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass-instruments.md`) | 1799cb98 | returned as `wf_ce0c2168-8c2`, CLEAN WITH FIXES, 30 of 31 confirmed, 26 items, 3 high | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-night-pass-closing.md` |
+| 106 | gov-researcher, at the owner's medium effort | The away pass's point 1: the memory the repository holds, under one writing practice | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-9-researcher.md` | 1799cb98 | returned, 9m46s, 49.5k out: 27 pockets, the Serves line the one typed link end to end, an edge line under each heading | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-memory-pockets.md` |
+| 107 | gov-researcher, at the owner's medium effort | Point 1: git and the memory outside the tracked files | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-10-researcher.md` | 1799cb98 | returned, 9m32s, 49.6k out: typed commit trailers, notes and a derived index each losing a test | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-git-pockets.md` |
+| 108 | gov-researcher, at the owner's medium effort | Point 3, and point 1's session ids: the harness and its CLI, tested | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-11-researcher.md` | 1799cb98 | returned, 8m58s, 44.1k out: a headless session run and resumed by id; adapters with one conformance fixture | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-harness-cli.md` |
+| 109 | gov-researcher, at the owner's medium effort | Point 4: one coding practice across platforms, tested | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-12-researcher.md` | 1799cb98 | returned, 11m08s, 48.0k out: a role per language, gated; WSL fails two of three checks | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-compatibility.md` |
+| 110 | gov-researcher, at the owner's medium effort | Point 5: pointing at any part of the flow and telling what happened | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-13-researcher.md` | 1799cb98 | returned, 8m30s, 43.7k out: not as designed; a cause on every record, cost on acts, a trace verb | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-observability-trace.md` |
+| 111 | gov-researcher, at the owner's medium effort | Point 6: the rebuilt kits superseding today's, seamlessly | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-14-researcher.md` | 1799cb98 | returned, 7m28s, 40.1k out: release-chained upgrade steps; a retired kit refuses today's whole update | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-supersession.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1210,6 +1216,23 @@ The night pass's closing review, dispatch 105, derived from its run the same way
 - returned — gov-synthesizer · wrote 1 file · 2m57s · 24.3k out · run wf_ce0c2168-8c2/ae8278d8927e3d4cf
 ```
 
+The away pass's researchers, dispatches 106 to 111, derived the same way:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-18-prompt-PLAY-dClosedLoop-1-9-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-9-researcher.md) · writes none · gates none · run direct/a75b541e755f717e0
+- returned — gov-researcher · wrote 0 files · 9m46s · 49.5k out · run direct/a75b541e755f717e0
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-18-prompt-PLAY-dClosedLoop-1-10-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-10-researcher.md) · writes none · gates none · run direct/a757b9f0ab7dada6d
+- returned — gov-researcher · wrote 0 files · 9m32s · 49.6k out · run direct/a757b9f0ab7dada6d
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-18-prompt-PLAY-dClosedLoop-1-11-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-11-researcher.md) · writes none · gates none · run direct/a96da2651ff7227c6
+- returned — gov-researcher · wrote 0 files · 8m58s · 44.1k out · run direct/a96da2651ff7227c6
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-18-prompt-PLAY-dClosedLoop-1-12-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-12-researcher.md) · writes none · gates none · run direct/a0f79215cc71b5d5f
+- returned — gov-researcher · wrote 0 files · 11m08s · 48.0k out · run direct/a0f79215cc71b5d5f
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-18-prompt-PLAY-dClosedLoop-1-13-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-13-researcher.md) · writes none · gates none · run direct/a3408d635b636db6a
+- returned — gov-researcher · wrote 0 files · 8m30s · 43.7k out · run direct/a3408d635b636db6a
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-18-prompt-PLAY-dClosedLoop-1-14-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-14-researcher.md) · writes none · gates none · run direct/a1b5eda6e97647e55
+- returned — gov-researcher · wrote 0 files · 7m28s · 40.1k out · run direct/a1b5eda6e97647e55
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -2140,6 +2163,11 @@ The night pass's closing review, dispatch 105, derived from its run the same way
   `[wave-4-answers]`), so the walk is complete. dCalibratedLens stays whole (WK-7). dShippedRelease's first engine
   adapter is named for its engine, never for an adopter (WK-8). The design map gains an adopter-free arm for the class,
   seen red on that unit before the fold.
+
+- 2026-10-18, session 1799cb98: the owner handed six points and stepped away (the away-pass record's `[words]`). Six
+  researchers ran, dispatches 106 to 111, and the design took each point in: the instruction and memory plan
+  (`build/2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md`), P34 to P38, 17 keys, 39 gaps, 30 units on 13 builds,
+  and the atlas's Memory view. The forks AP-1 to AP-30 are parked for the owner.
 
 ## Instruments
 

@@ -39,7 +39,7 @@ def record(name):
 SOURCES = {key: record(name) for key, name in {
     "v2": "architecture-v2", "gaps": "gap-register", "steps": "flow-steps", "roles": "layer-roles",
     "instruction": "layer-instruction", "library": "layer-library", "memory": "layer-memory",
-    "expansions": "layer-expansions", "fates": "fates"}.items()}
+    "expansions": "layer-expansions", "fates": "fates", "plan": "memory-plan"}.items()}
 LAYER_RECORDS = {
     "instruction": ["layer-instruction"],
     "flow": ["layer-flow", "flow-steps", "flow-roles"],
@@ -526,6 +526,59 @@ def derive():
                 "owner": r[head.index("Owner")] if "Owner" in head else ""} for r in rows for t in ITEM_TAG.findall(r[0])]
         programs.append({"program": its[0]["tag"].split(".")[0], "items": its})
 
+    # The memory layer drawn whole (the away pass, point 1): the plan's families, pockets, sites, edges and cycle; the
+    # kind registry's record kinds, each placed on the step or program its writer item belongs to; and the instruction
+    # ladder memory sits at the foot of. Every pocket and hop names a family the plan declares, and every pocket's
+    # status and every hop's state is read from a fixed leading word, or the run stops.
+    plan = src["plan"]
+    _, pfr = section(plan, "frame")
+    first = pfr.strip().split("\n\n", 1)[0].split("\n")
+    frame = " ".join(first[:next((i for i, ln in enumerate(first) if ln.startswith("- ")), len(first))])
+    _, pfam = section(plan, "families")
+    families = [{"family": r[0], "level": r[1], "holds": r[2], "lifecycle": r[3]}
+                for r in table(pfam, "Family", "memory-plan [families]")]
+    fams = {f["family"] for f in families}
+    _, ppoc = section(plan, "pockets")
+    pockets = []
+    for r in table(ppoc, "Pocket", "memory-plan [pockets]"):
+        m = re.match(r"(node-local node|node|witness|out|edge site|folded|retired)\b", r[4])
+        if r[1] not in fams or not m:
+            sys.exit(f"atlas: memory-plan [pockets] row {r[0]!r}: family {r[1]!r} or status {r[4][:30]!r} unread")
+        pockets.append({"pocket": r[0], "family": r[1], "where": r[2], "today": r[3], "becomes": r[4],
+                        "status": {"node-local node": "node", "retired": "folded"}.get(m.group(1), m.group(1)),
+                        "key": r[5], "owner": r[6]})
+    raw_p = [ln for ln in ppoc.split("\n") if ln.startswith("| ") and not ln.startswith("| Pocket |")]
+    if len(raw_p) != len(pockets):
+        sys.exit(f"atlas: memory-plan [pockets] holds {len(raw_p)} rows but parsed {len(pockets)}")
+    _, psite = section(plan, "sites")
+    sites = [{"site": r[0], "syntax": r[1], "door": r[2]} for r in table(psite, "Site", "memory-plan [sites]")]
+    _, pedge = section(plan, "edges")
+    medges = [{"edge": plain(r[0]), "fromTo": r[1], "site": r[2], "inverse": plain(r[3]),
+               "status": "derived" if r[4].startswith("derived") else "new" if r[4].startswith("new") else "P33",
+               "statusText": r[4], "need": r[5]} for r in table(pedge, "Edge", "memory-plan [edges]")]
+    names = {e["edge"] for e in medges}
+    _, pcyc = section(plan, "cycle")
+    hops = []
+    for r in table(pcyc, "Hop", "memory-plan [cycle]"):
+        m = re.match(r"(partly typed|typed|prose|search|none)\b", r[4])
+        used = [e for e in re.findall(r"`([a-z-]+)`", r[3]) if e in names]
+        if r[1] not in fams or r[2] not in fams or not m or not used:
+            sys.exit(f"atlas: memory-plan [cycle] hop {r[0]!r}: a family, its state or its edge is unread")
+        hops.append({"hop": r[0], "from": r[1], "to": r[2], "edges": used, "edgeText": r[3], "today": r[4],
+                     "state": m.group(1), "site": r[5]})
+    _, mdes = section(src["memory"], "design")
+    con_blk = mdes.split("### [contract]", 1)[1].split("\n### ", 1)[0]
+    place = {it["tag"]: s["tag"] for s in steps for it in s["items"]}
+    place.update({it["tag"]: p["program"] for p in programs for it in p["items"]})
+    kinds = []
+    for r in table(con_blk, "Kind", "layer-memory [contract]"):
+        writers = [t for t in ITEM_TAG.findall(r[2]) if t in place]
+        kinds.append({"kind": r[0], "owner": r[1], "writer": r[2], "items": writers,
+                      "places": sorted({place[t] for t in writers})})
+    levels = [{"level": r[0], "what": r[1]} for r in table(src["instruction"], "Level", "layer-instruction R-G")]
+    memory = {"frame": frame, "path": SOURCES["plan"].relative_to(REPO).as_posix(), "families": families,
+              "pockets": pockets, "sites": sites, "edges": medges, "hops": hops, "kinds": kinds, "levels": levels}
+
     v2_rec = next(r for r in recs if r["name"] == "architecture-v2")
     v2map = [{"id": s["id"], "title": s["title"], "view": V2_VIEWS[s["id"]], "path": v2_rec["path"]}
              for s in v2_rec["sections"] if s["level"] == 2]
@@ -544,7 +597,7 @@ def derive():
         "principles": principles, "timeline": timeline, "reviews": reviews, "progress": progress,
         "libraryRound": library_round, "libraryPaths": lib_paths, "consult": consult, "libraryItems": library_items,
         "tools": tools, "kitFates": kit_fates, "areas": areas, "loops": loops, "owed": owed, "v2open": v2open, "decisions": decisions,
-        "events": events, "v2map": v2map, "records": recs,
+        "events": events, "v2map": v2map, "memory": memory, "records": recs,
         "sources": {k: p.relative_to(REPO).as_posix() for k, p in SOURCES.items()},
     }
 
