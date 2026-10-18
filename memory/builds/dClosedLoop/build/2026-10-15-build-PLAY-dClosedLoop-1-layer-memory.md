@@ -442,19 +442,19 @@ layer that registers a kind adds its row.
 | run record | dTendedCadence | observability's journal reader writes it when the journal shows a run closed, as `observability.run-record` says (layer-expansions; PM-12) |
 | work order | dBoundRoles | the work order rendered per item |
 | review | dFairHearing | its writer is `review.report`, the harness's, under the proposal for the breakpoint's items |
-| research return | dTotalRecall | the research view over the research-return kind and its dated backfill; `plan.research` and `design.research` write it |
+| research return | dLinkedLibrary | the research view over the research-return kind and its dated backfill; `plan.research` and `design.research` write it |
 | design record | dTotalRecall | a core memory kind with no writer item; the memory contract declares it |
 | ask | dTotalRecall | the ask kind's acceptance at filing |
 | backlog row | dTotalRecall | the ask register's row store; the memory contract declares it |
-| decision | dTotalRecall | decisions split by kind, the major-decision log |
-| gotcha | dTotalRecall | gotchas handed by write set |
+| decision | dLinkedLibrary | decisions split by kind, the major-decision log |
+| gotcha | dLinkedLibrary | gotchas handed by write set |
 | dossier | dTotalRecall | dossiers anchored to symbol keys |
 | code | dTotalRecall | the core code record: files, definitions with their ranges and body hashes, imports, resolved calls, tests and kit membership, derived per blob and cached by tree hash. It replaces the optional symbols and callers (night pass, point 3) |
-| annotation index | dTotalRecall | the generated annotation index and its resolve check |
-| recall index | dTotalRecall | memory-recall narrowed to a record finder |
-| baseline | dTotalRecall | retrofit's `baseline` and `census` record kinds |
-| census | dTotalRecall | retrofit's `baseline` and `census` record kinds; `adopt.census` writes it |
-| ruling | dTotalRecall | `adopt.practices` writes the ruling records, an item dTotalRecall owns |
+| annotation index | dLinkedLibrary | the generated annotation index and its resolve check |
+| recall index | dLinkedLibrary | memory-recall narrowed to a record finder |
+| baseline | dLinkedLibrary | retrofit's `baseline` and `census` record kinds |
+| census | dLinkedLibrary | retrofit's `baseline` and `census` record kinds; `adopt.census` writes it |
+| ruling | dLinkedLibrary | `adopt.practices` writes the ruling records, an item dLinkedLibrary owns |
 | shape-run | dTotalRecall | the shape-run kind |
 | build readme | dTotalRecall | the build README's declared front-matter schema, with unknown keys refused |
 | claim | dTotalRecall | the claim ref on the remote and the ask-family counter ref (`gap-mem-13`); `entry.claim` writes the claim |

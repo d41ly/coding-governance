@@ -330,7 +330,7 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
   - the lookup: with the map absent, the slot renders "not installed" and falls back to the marker
     query;
   - markers: no unregistered `gov:` word.
-- **Owners.** The memory layer, kit memory-tree, chain build dTotalRecall. The tags come from
+- **Owners.** The memory layer, kit memory-tree, chain build dLinkedLibrary (WK-4). The tags come from
   dOrderedCharter's registry, and the slot from dBoundRoles' work order.
 - **Keys.**
 

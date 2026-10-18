@@ -44,7 +44,7 @@ A kit's fate is one of four:
 | hooks | kept | its guards become packs on the one enforcement surface (dWellOiledMachine) |
 | lexicon | optional | rebuilt by dMindYourWords |
 | lib | kept | the shared primitives, and the join, ledger, extraction, region-parser and scorer factories |
-| memory-recall | optional | narrowed to a record finder (dTotalRecall) |
+| memory-recall | optional | narrowed to a record finder (dLinkedLibrary) |
 | memory-tree | kept | the memory contract's engine: the kind registry, `record` and the `code` record (dTotalRecall) |
 | playbook | kept | the instruction engine, the one renderer (dOrderedCharter) |
 | process-monitor | kept | Runtime's reaping (dWellOiledMachine); its census an observability reading |
@@ -78,12 +78,12 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | roles | `agents/*`, `house/*.md` | role definitions | RESHAPED | twelve core roles with structured fields and typed returns (dBoundRoles) | v2 `[chain]` dBoundRoles |
 | roles | spec-reviewer, diff-reviewer | two reviewer roles | MERGED | one reviewer with a lens per step (dBoundRoles) | roles `[forks]`; v2 `[chain]` dBoundRoles |
 | roles | gov-session | hands work to another session | MERGED | the prompt writer ("session-handoff template folds") (dBoundRoles) | roles `[forks]` |
-| roles | gov-orienter | orientation | RESHAPED | the orientation scout, composing the card in a sidechain (dBoundRoles) | roles `[forks]`; v2 `[chain]` dBoundRoles |
+| roles | gov-orienter | orientation | RESHAPED | the orientation scout, composing the card in a sidechain (dFurnishedOrders) | roles `[forks]`; v2 `[chain]` dFurnishedOrders |
 | roles | `workflows.toml` stages | stage order 0 to 7 | MERGED | the loop kit; its seven readers re-pointed (dDeclaredLoop) | v2 `[chain]` dDeclaredLoop |
 | roles | `workflows.toml` entries | workflow table | RESHAPED | shapes registry: kind, fan, checklist, merge, cap (dBoundRoles) | v2 `[chain]` dBoundRoles |
 | roles | `handoff.py` | hashed prompt file | RESHAPED | a work order per item, hashed into the spawn marker (dBoundRoles) | v2 `[chain]` dBoundRoles; layer-runtime `[current]` |
 | roles | `render_agents.py` | renders agent types | MERGED | the one renderer ("roles render wiring") (dOrderedCharter) | v2 `[chain]` dOrderedCharter |
-| roles | `check_roles.py` | role, table and doc agree | RESHAPED | role-by-step matrix joined both ways (dBoundRoles); policy reader re-pointed (dConvergedCharter) | v2 `[chain]` dBoundRoles; v2 `[chain]` dConvergedCharter |
+| roles | `check_roles.py` | role, table and doc agree | RESHAPED | role-by-step matrix joined both ways (dFurnishedOrders); policy reader re-pointed (dConvergedCharter) | v2 `[chain]` dFurnishedOrders; v2 `[chain]` dConvergedCharter |
 | roles | `house/policy.toml` | effort and gates | MERGED | into `.governance/policy.toml` (dConvergedCharter); on dGroundRules's legacy list until then | v2 `[chain]` dGroundRules; v2 `[chain]` dBoundRoles |
 | workflows | `tier2-review.js` | review harness | RESHAPED | presets, opt-in lenses, skeptic batches (dFairHearing), run at breakpoints (dDeclaredLoop) | v2 `[chain]` dFairHearing; v2 `[chain]` dDeclaredLoop |
 | workflows | `REVIEW-PROTOCOL.template.md` | protocol text | RESHAPED | corrected by dFairHearing, then a rendered view (dConvergedCharter) | v2 `[chain]` dFairHearing; v2 `[chain]` dConvergedCharter |
@@ -93,10 +93,10 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | workflows | `orient-counterfactual.js` | a one-off kickoff experiment | RETIRED | the `experiment` shape kind (dBoundRoles), of which it is an early instance | the owner, NP-22, 2026-10-18 |
 | workflows | four harness checks | syntax, fan-out, join, parity | STAYS | kept (dBoundRoles, whose role harnesses they check) | layer-memory `[tools]` |
 | memory-tree | scaffold, `--new-build`, `--new-spec` | creates records | RESHAPED | the `record` write command (dTotalRecall) | v2 `[chain]` dTotalRecall; layer-memory `[revised]` |
-| memory-tree | `gen_build_index.py` | index, README regions | RESHAPED | generated views, README schema, routing region (dTotalRecall); drift import becomes an optional slot (dOrderedCharter) | v2 `[chain]` dTotalRecall; v2 `[chain]` dOrderedCharter |
+| memory-tree | `gen_build_index.py` | index, README regions | RESHAPED | generated views (dLinkedLibrary), README schema and routing region (dTotalRecall); drift import becomes an optional slot (dOrderedCharter) | v2 `[chain]` dLinkedLibrary; v2 `[chain]` dTotalRecall; v2 `[chain]` dOrderedCharter |
 | memory-tree | hygiene gate, `HYGIENE.md` | structural checks | RESHAPED | the kind registry generates the schema checks; `HYGIENE.md` becomes its view (dTotalRecall) | v2 `[chain]` dTotalRecall; layer-memory `[revised]` |
 | memory-tree | `backlog.py` | asks | STAYS | grammar kept; acceptance at filing and counter-ref ids added (dTotalRecall) | layer-memory `[tools]`; v2 `[chain]` dTotalRecall |
-| memory-tree | `gotchas.py` | bug classes | STAYS | handed by write set (dTotalRecall); check-18 probe becomes an optional slot | v2 `[chain]` dTotalRecall; v2 `[chain]` dOrderedCharter |
+| memory-tree | `gotchas.py` | bug classes | STAYS | handed by write set (dLinkedLibrary); check-18 probe becomes an optional slot | v2 `[chain]` dLinkedLibrary; v2 `[chain]` dOrderedCharter |
 | memory-tree | `corpus_ids.py` | id grammar | RESHAPED | one exported slug and id grammar, with recall's parser moved in (dOrderedCharter, dTotalRecall) | v2 `[chain]` dOrderedCharter; v2 `[chain]` dTotalRecall |
 | memory-tree | merge-rows | row-keyed merge driver | STAYS | also merges ledger TSVs (dWitnessedBar) | v2 `[chain]` dWitnessedBar |
 | memory-tree | `transition_audit.py` | check 26 | STAYS | an append-only history population; `read_modes` re-pointed (dConvergedCharter) | retrofit `[ledger]`; v2 `[chain]` dConvergedCharter |
@@ -107,17 +107,17 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | memory-tree | `check-arms` | a check's armed-population rows | RESHAPED | the ledger's armed populations (dWitnessedBar) | the owner, NP-22, 2026-10-18 |
 | memory-tree | `row_grammar` | check 20, row grammar and id collisions in one file | RESHAPED | the record-kind registry's generated schema checks (dTotalRecall) | the owner, NP-22, 2026-10-18 |
 | memory-tree | `migrate_backlog` | plans and relocates the backlog from shards to builds | RESHAPED | an update's upgrade step, run attended, retired once no tree is left on shards (dShippedRelease) | the owner, NP-22, 2026-10-18 |
-| memory-tree | `DECISIONS.md` | decision log | RESHAPED | split by kind; the log keeps its path, with a holds-now view (dTotalRecall) | layer-memory `[decisions]`; v2 `[chain]` dTotalRecall |
-| codebase-map | `gen_map.py`, its symbols | the inventory map and its public-name index | RESHAPED | the core `code` record and `gov map code` (dTotalRecall) | the owner's point 3 (night pass); v2 `[chain]` dTotalRecall |
-| codebase-map | dossiers, `MAP.md`, `CARDS.md` | feature prose and the owner's views | STAYS | optional: dossiers anchored to symbol keys, their header the feature node as NP-16 settles (dTotalRecall) | the owner's point 3 (night pass); layer-memory `[map]` |
+| memory-tree | `DECISIONS.md` | decision log | RESHAPED | split by kind; the log keeps its path, with a holds-now view (dLinkedLibrary) | layer-memory `[decisions]`; v2 `[chain]` dLinkedLibrary |
+| codebase-map | `gen_map.py`, its symbols | the inventory map and its public-name index | RESHAPED | the core `code` record (dTotalRecall) and `gov map code` (dLinkedLibrary) | the owner's point 3 (night pass); v2 `[chain]` dTotalRecall; v2 `[chain]` dLinkedLibrary |
+| codebase-map | dossiers, `MAP.md`, `CARDS.md` | feature prose and the owner's views | STAYS | optional: dossiers anchored to symbol keys (dTotalRecall), their header the feature node as NP-16 settles (dLinkedLibrary) | the owner's point 3 (night pass); layer-memory `[map]` |
 | codebase-map | `map_lib` join and base | coverage, compare base | MERGED | `tools/lib` join factory (dOrderedCharter, H5) | v2 `[chain]` dOrderedCharter |
-| codebase-map | `reuse_lookup` + agent, rank, replay | reuse ranker | RETIRED | 0 of 24 solved; replaced by the house index via **Reuse:** (dTotalRecall) | layer-memory `[reuse]`; layer-memory `[tools]` |
+| codebase-map | `reuse_lookup` + agent, rank, replay | reuse ranker | RETIRED | 0 of 24 solved; replaced by the house index via **Reuse:** (dLinkedLibrary) | layer-memory `[reuse]`; layer-memory `[tools]` |
 | codebase-map | stale-dossier signal | freshness | RESHAPED | observability reading; map freshness (dTendedCadence) | layer-expansions `[design-observability]`; v2 `[chain]` dTendedCadence |
-| codebase-map | `map_diff` | a range's feature digest, and stale dossiers | RESHAPED | a range read over the `code` record, and enrichment staleness by body hash (dTotalRecall) | the owner, NP-22, 2026-10-18 |
+| codebase-map | `map_diff` | a range's feature digest, and stale dossiers | RESHAPED | a range read over the `code` record (dTotalRecall), and enrichment staleness by body hash (dLinkedLibrary) | the owner, NP-22, 2026-10-18 |
 | codebase-map | `check_gate_coverage` | the adopter's gate compares every artifact the engine writes | MERGED | into `govkit check`, the one install check (dShippedRelease) | the owner, NP-22, 2026-10-18 |
 | memory-recall | `query.py` | full-text search | RESHAPED | a record finder, `record find` (dTotalRecall) | layer-memory `[tools]`; v2 `[chain]` dTotalRecall |
 | memory-recall | `extract.py` grammar, `recall_conf` | id parser | MERGED | into memory-tree (dOrderedCharter) | v2 `[chain]` dOrderedCharter |
-| memory-recall | `recall-opened.js` | Read observer | RESHAPED | optional hook pack (dWellOiledMachine); shell reads too (dTotalRecall) | layer-runtime `[enforce]`; v2 `[chain]` dTotalRecall |
+| memory-recall | `recall-opened.js` | Read observer | RESHAPED | optional hook pack (dWellOiledMachine); shell reads too (dLinkedLibrary) | layer-runtime `[enforce]`; v2 `[chain]` dLinkedLibrary |
 | memory-recall | `bench`, `union` | the retrieval bench and its union of runs | RESHAPED | an `experiment` shape instance over recall's corpus (dBoundRoles) | the owner, NP-22, 2026-10-18 |
 | memory-recall | `check-recall` | recall's floor check | RESHAPED | the record finder's leg (dTotalRecall) | the owner, NP-22, 2026-10-18 |
 | lexicon | `lexicon.py` gate and pin | naming gate | RESHAPED | definition classes, keyed debt ledger, forced packs (dMindYourWords) | v2 `[chain]` dMindYourWords |
@@ -125,7 +125,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | lexicon | `subtokens`, tokenizers | splitting | MERGED | `tools/lib` extraction primitive (dTotalRecall, LX-2) | v2 `[chain]` dTotalRecall |
 | lexicon | its two drift signals | gating | MERGED | the lexicon's leg pack (dMindYourWords) | layer-expansions `[design-observability]`; v2 `[chain]` dMindYourWords |
 | runlog | `runlog_lib` grammar | line grammar | MERGED | the core journal (dWellOiledMachine) | v2 `[chain]` dWellOiledMachine; layer-runtime `[contract]` |
-| runlog | reader, extract, model, prose | reader | STAYS | observability's reader half; role metrics read it (dBoundRoles) | layer-expansions `[design-observability]`; v2 `[chain]` dBoundRoles |
+| runlog | reader, extract, model, prose | reader | STAYS | observability's reader half; role metrics read it (dFurnishedOrders) | layer-expansions `[design-observability]`; v2 `[chain]` dFurnishedOrders |
 | runlog | `record.py` | run record | RESHAPED | run-record kind through `record`, owned by dWellOiledMachine | ownership `[look]`; layer-expansions `[agree-observability]` |
 | drift-audit | seven gateable signals | drift gating | RESHAPED | five core legs and two lexicon legs (dTendedCadence gap-maint-09; dMindYourWords) | layer-expansions `[design-observability]`; layer-expansions `[gaps-proposed]` |
 | drift-audit | report-only signals | readings | RESHAPED | observability detectors with owners (dTendedCadence) | layer-expansions `[design-observability]`; v2 `[chain]` dTendedCadence |
@@ -189,7 +189,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | top-level | `settings-merge.py` | hook wiring | RESHAPED | one dispatcher entry per event, `onFailure` (dWellOiledMachine) | layer-runtime `[enforce]` |
 | top-level | waiver, limit and high-water files | exemptions | RESHAPED | ledger populations (RF-5) (dWitnessedBar) | retrofit `[ledger]`; v2 `[chain]` dWitnessedBar |
 | skills | manifest-check card hooks | card | RESHAPED | per-worktree card file (dOrderedCharter); card ref (dPlacedRequest); compact re-inject (dWellOiledMachine) | v2 `[chain]` dOrderedCharter; v2 `[chain]` dPlacedRequest; v2 `[chain]` dWellOiledMachine |
-| skills | kickoff procedure | orientation | RESHAPED | orientation scout (dBoundRoles); `kickoff.runs` (dRankedPlan); thin entry | v2 `[chain]` dBoundRoles; v2 `[chain]` dRankedPlan; v2 `[chain]` dConvergedCharter |
+| skills | kickoff procedure | orientation | RESHAPED | orientation scout (dFurnishedOrders); `kickoff.runs` (dRankedPlan); thin entry | v2 `[chain]` dFurnishedOrders; v2 `[chain]` dRankedPlan; v2 `[chain]` dConvergedCharter |
 | skills | manifest ratchet | the kickoff manifest audit | RESHAPED | the guarded instruction manifest (dOrderedCharter) | the owner, NP-22, 2026-10-18 |
 | skills | deploy-governance | operator Skill | RETIRED | no reader, 0 loads; govkit's verbs replace it | layer-instruction `[recommendations]`; gap-tool-05 |
 | skills | rendered Skills, six of seven, `/unattended` apart | entries | RESHAPED | thin level-4 entries; `/build` becomes a client of `next` and `run` (dConvergedCharter, with dWellOiledMachine for the client) | layer-instruction `[recommendations]`; layer-runtime `[decide]` |

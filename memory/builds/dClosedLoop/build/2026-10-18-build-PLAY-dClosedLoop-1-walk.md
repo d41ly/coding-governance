@@ -506,6 +506,8 @@ The owner approved wave 2 and took each fork's recommendation, 2026-10-18 (`[wor
   The research harness builds on the `experiment` shape outright, and its stand-in is gone.
 - **WK-3:** a split of dTotalRecall is priced before wave 3, in
   `build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md`.
+- **WK-4,** asked once that pricing was written: the owner chose C2 (that record's `[answers]`). dTotalRecall and
+  dBoundRoles each split, and dLinkedLibrary and dFurnishedOrders join wave 2, where their units were.
 
 ## [walk-instrument] The walk's facts, and the clause scan
 

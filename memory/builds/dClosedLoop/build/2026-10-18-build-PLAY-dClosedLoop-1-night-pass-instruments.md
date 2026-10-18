@@ -4413,7 +4413,7 @@ for ln in chain.split("\n"):
         units[m.group(1)] = len([u for u in m.group(3).split("; ") if u.strip()])
         parents[m.group(1)] = [p.strip() for p in m.group(2).split(",") if p.strip() in
                                re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)]
-assert len(units) == 18, len(units)   # 16 until SP-1 split dDeclaredLoop three ways, 2026-10-18
+assert len(units) == 20, len(units)   # 16 until SP-1, 18 until WK-4 split dTotalRecall and dBoundRoles, 2026-10-18
 
 
 def longest(par):
@@ -5118,6 +5118,753 @@ FS.sub("  - dBoundRoles' tester and `experiment` shape: `probe.design` and `prob
 FS.save()
 ````
 
+### `gap_texts.py`
+
+WK-4: each build's gaps with grade and text, to assign them across the split.
+
+````python
+"""Print each named build's gaps, ranges expanded, with their grade and text, to assign them across a split.
+
+Usage: python -X utf8 gap_texts.py <build> [<build> ...]   (from the worktree root)
+"""
+import re
+import sys
+
+B = "memory/builds/dClosedLoop/build/"
+v2 = open(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md", encoding="utf-8").read()
+reg = open(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md", encoding="utf-8").read()
+text = {m.group(1): (m.group(2), m.group(3).strip())
+        for m in re.finditer(r"(?m)^\| (gap-[a-z]+-\d\d) \| [^|]+ \| (HIGH|MED|LOW) \| ([^|]+) \|", reg)}
+for b in sys.argv[1:]:
+    row = next(ln for ln in v2.split("\n") if ln.startswith(f"| {b} |"))
+    cell = row.strip().strip("|").rsplit(" | ", 1)[1]
+    gaps = []
+    for g in [x.strip() for x in cell.split(",")]:
+        m = re.match(r"(gap-[a-z]+)-(\d\d) to gap-[a-z]+-(\d\d)", g)
+        gaps += [f"{m.group(1)}-{i:02d}" for i in range(int(m.group(2)), int(m.group(3)) + 1)] if m else [g]
+    print(f"=== {b}: {len(gaps)} gaps, cell: {cell}")
+    for g in gaps:
+        s, t = text.get(g, ("?", "?"))
+        print(f"{g} [{s}] {t[:180]}")
+````
+
+### `price_wk3_asked.py`
+
+WK-3's pricing as the owner was asked from.
+
+````python
+"""WK-3: price a split of dTotalRecall, alone and with dBoundRoles, as critical paths over v2's [chain].
+
+Usage: python -X utf8 price_wk3.py   (from the worktree root)
+
+Units and paths as price_split.py counts them. dWellOiledMachine, the build after dTotalRecall on the critical path,
+waits for dBoundRoles too, so a dTotalRecall split saves no more than dBoundRoles' landing allows. The tables below say
+which units dWellOiledMachine needs, joining the gate's reading (node_users.py found no backticked dependency of it on
+either build) and a plain-word reading of its 31 clauses, each reason stated. A split loses if dWellOiledMachine waits
+for a moved part.
+"""
+import re
+
+V = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+text = open(V, encoding="utf-8").read()
+chain = text.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+names = re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)
+units, parents, clauses = {}, {}, {}
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| [^|]+ \| ([^|]+) \| (.+) \| [^|]+ \|$", ln)
+    if m:
+        clauses[m.group(1)] = [u for u in m.group(3).split("; ") if u.strip()]
+        units[m.group(1)] = len(clauses[m.group(1)])
+        parents[m.group(1)] = [p.strip() for p in m.group(2).split(",") if p.strip() in names]
+assert len(units) == 18, len(units)
+
+
+def path(units, parents):
+    finish, via = {}, {}
+
+    def fin(b):
+        if b not in finish:
+            best = max(parents[b], key=fin, default=None)
+            via[b] = best
+            finish[b] = units[b] + (fin(best) if best else 0)
+        return finish[b]
+
+    end = max(units, key=fin)
+    chain_, b = [], end
+    while b:
+        chain_.append(b)
+        b = via[b]
+    return finish[end], list(reversed(chain_)), finish
+
+
+TR, BR, WOM = "dTotalRecall", "dBoundRoles", "dWellOiledMachine"
+# dTotalRecall's units dWellOiledMachine needs, or that every later build rests on, and why.
+TR_KEEP = {
+    1: "the record-kind registry, where dWellOiledMachine registers its journal, act, return and binding kinds",
+    2: "the `record` command, through which the supervisor alone writes shared records",
+    3: "ids minted outside a build, for intake that reaches no owner session and for cadence filers",
+    4: "the work order as each agent's root, where every act session starts",
+    5: "the slug and id grammar every reader reads",
+    6: "typed relations, the dependency graph waits and landings read",
+    7: "the ask kind's acceptance at filing, kept so Plan's triage reads asks from the spine's memory alone",
+    16: "record find and show, the read budget, and the default load's memory share the session-start hook loads",
+    23: "derived anchors, part of the extractors",
+    24: "the shape-run kind, whose rows dWellOiledMachine writes for each act",
+    25: "the acceptance re-measure over every read channel, the runtime's among them",
+    26: "the shared extraction primitive the map calls",
+    28: "the level-0 map the session-start hook loads",
+    29: "the map's completeness check and leg pack",
+    31: "the purposes the map renders at level 0",
+    32: "the replay that decides whether the map is built, and so whether dWellOiledMachine loads it",
+}
+CODE = 11   # the `code` record: dRankedPlan's intent fields and dCalibratedLens cite it
+# dBoundRoles' units dWellOiledMachine needs, and why.
+BR_KEEP = {
+    1: "the roster, whose roles the act sessions run",
+    2: "each role's structured instructions and ceilings, loaded into its act session",
+    3: "the work order bound to its act by task-sha, which act binding checks",
+    4: "the prompt writer, which composes every act's task",
+    6: "returns through a schema-forced channel, which the persisted-return store keeps",
+    7: "the role index and `role-sha` compared at spawn",
+    8: "shell writes held to the allowance inside an act session",
+    10: "the write classes enforced inside an act session",
+    11: "`driver.reads`, `prompts.author` and `roles.no-spawn`, which the supervisor reads as the driver",
+    12: "forks held as `run.on-owner-question` says, which the driver applies",
+    16: "the driver recording the placement disposition, which dWellOiledMachine re-points to the intake record",
+    17: "the trust mechanism, re-cut fresh at act launch",
+    24: "the `role` and `field` namespaces the structured fields use",
+    25: "the static block carried once per spawn",
+    26: "the shapes, whose digest act binding checks, and the experiment shape's acts",
+}
+assert set(TR_KEEP) <= set(range(1, units[TR] + 1)) and set(BR_KEEP) <= set(range(1, units[BR] + 1))
+TR_USERS = {"dIndexedDesign", "dScopedBuild", "dShippedRelease", "dTendedCadence", "dMindYourWords", "dCalibratedLens",
+            "dConvergedCharter"}   # the reuse index, decisions, annotations, retrofit, views and the code depth
+BR_USERS = {"dScopedBuild", "dShippedRelease", "dTendedCadence", "dMindYourWords", "dCalibratedLens",
+            "dConvergedCharter"}   # the work order's slots, metrics, trust profiles and the answered-call hook
+
+
+def split(u, p, x, first, users):
+    u, p = dict(u), {b: list(v) for b, v in p.items()}
+    rest = units[x] - len(first)
+    u[x] = len(first)
+    u[x + "-B"] = rest
+    p[x + "-B"] = [x]
+    for b in users:
+        if x in p.get(b, []) or any(x in p[q] for q in p.get(b, [])):
+            p[b] = p[b] + [x + "-B"]
+    return u, p
+
+
+base, base_path, fin0 = path(units, parents)
+print(f"baseline: {base} units, {' > '.join(base_path)}")
+print(f"{WOM} starts when its last parent lands: " +
+      ", ".join(f"{q} {fin0[q]}" for q in sorted(parents[WOM], key=lambda q: -fin0[q])))
+RESULTS = []
+for label, parts in (
+        ("T1, dTotalRecall alone: what dWellOiledMachine does not need leaves, the code record with it",
+         [(TR, set(TR_KEEP), TR_USERS | {"dRankedPlan"})]),
+        ("T2, dTotalRecall alone, the code record kept", [(TR, set(TR_KEEP) | {CODE}, TR_USERS)]),
+        ("C1, both: each build's parts dWellOiledMachine does not need leave, the code record with them",
+         [(TR, set(TR_KEEP), TR_USERS | {"dRankedPlan"}), (BR, set(BR_KEEP), BR_USERS)]),
+        ("C2, both, the code record kept", [(TR, set(TR_KEEP) | {CODE}, TR_USERS), (BR, set(BR_KEEP), BR_USERS)])):
+    u, p = dict(units), {b: list(v) for b, v in parents.items()}
+    for x, first, users in parts:
+        u, p = split(u, p, x, first, users)
+    n, pth, fin = path(u, p)
+    sizes = "; ".join(f"{x} {len(first)} and {x}-B {units[x] - len(first)}" for x, first, _ in parts)
+    print(f"{label}: {sizes} · {n} units ({n - base:+d}), {' > '.join(pth)}")
+    print("  lands: " + ", ".join(f"{b} {fin[b]}" for b in sorted(fin, key=fin.get)
+                                  if b in (TR, BR, TR + '-B', BR + '-B', WOM, 'dRankedPlan', 'dIndexedDesign')))
+    RESULTS.append((label, [(x, len(first), units[x] - len(first)) for x, first, _ in parts], len(parts), n, base - n))
+````
+
+### `price_wk3.py`
+
+WK-3's pricing as folded: the role-gate escape's fix kept in dBoundRoles' first part.
+
+````python
+"""WK-3: price a split of dTotalRecall, alone and with dBoundRoles, as critical paths over v2's [chain].
+
+Usage: python -X utf8 price_wk3.py   (from the worktree root)
+
+Units and paths as price_split.py counts them. dWellOiledMachine, the build after dTotalRecall on the critical path,
+waits for dBoundRoles too, so a dTotalRecall split saves no more than dBoundRoles' landing allows. The tables below say
+which units dWellOiledMachine needs, joining the gate's reading (node_users.py found no backticked dependency of it on
+either build) and a plain-word reading of its 31 clauses, each reason stated. A split loses if dWellOiledMachine waits
+for a moved part.
+"""
+import re
+
+V = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+text = open(V, encoding="utf-8").read()
+chain = text.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+names = re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)
+units, parents, clauses = {}, {}, {}
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| [^|]+ \| ([^|]+) \| (.+) \| [^|]+ \|$", ln)
+    if m:
+        clauses[m.group(1)] = [u for u in m.group(3).split("; ") if u.strip()]
+        units[m.group(1)] = len(clauses[m.group(1)])
+        parents[m.group(1)] = [p.strip() for p in m.group(2).split(",") if p.strip() in names]
+assert len(units) == 18, len(units)
+
+
+def path(units, parents):
+    finish, via = {}, {}
+
+    def fin(b):
+        if b not in finish:
+            best = max(parents[b], key=fin, default=None)
+            via[b] = best
+            finish[b] = units[b] + (fin(best) if best else 0)
+        return finish[b]
+
+    end = max(units, key=fin)
+    chain_, b = [], end
+    while b:
+        chain_.append(b)
+        b = via[b]
+    return finish[end], list(reversed(chain_)), finish
+
+
+TR, BR, WOM = "dTotalRecall", "dBoundRoles", "dWellOiledMachine"
+# dTotalRecall's units dWellOiledMachine needs, or that every later build rests on, and why.
+TR_KEEP = {
+    1: "the record-kind registry, where dWellOiledMachine registers its journal, act, return and binding kinds",
+    2: "the `record` command, through which the supervisor alone writes shared records",
+    3: "ids minted outside a build, for intake that reaches no owner session and for cadence filers",
+    4: "the work order as each agent's root, where every act session starts",
+    5: "the slug and id grammar every reader reads",
+    6: "typed relations, the dependency graph waits and landings read",
+    7: "the ask kind's acceptance at filing, kept so Plan's triage reads asks from the spine's memory alone",
+    16: "record find and show, the read budget, and the default load's memory share the session-start hook loads",
+    23: "derived anchors, part of the extractors",
+    24: "the shape-run kind, whose rows dWellOiledMachine writes for each act",
+    25: "the acceptance re-measure over every read channel, the runtime's among them",
+    26: "the shared extraction primitive the map calls",
+    28: "the level-0 map the session-start hook loads",
+    29: "the map's completeness check and leg pack",
+    31: "the purposes the map renders at level 0",
+    32: "the replay that decides whether the map is built, and so whether dWellOiledMachine loads it",
+}
+CODE = 11   # the `code` record: dRankedPlan's intent fields and dCalibratedLens cite it
+# dBoundRoles' units dWellOiledMachine needs, and why.
+BR_KEEP = {
+    1: "the roster, whose roles the act sessions run",
+    2: "each role's structured instructions and ceilings, loaded into its act session",
+    3: "the work order bound to its act by task-sha, which act binding checks",
+    4: "the prompt writer, which composes every act's task",
+    6: "returns through a schema-forced channel, which the persisted-return store keeps",
+    7: "the role index and `role-sha` compared at spawn",
+    8: "shell writes held to the allowance inside an act session",
+    9: "the role-gate arm's field escape closed, kept while folding C2: allowances leak until it is, and keeping it "
+       "costs nothing, since dBoundRoles' first part still lands before dTotalRecall's",
+    10: "the write classes enforced inside an act session",
+    11: "`driver.reads`, `prompts.author` and `roles.no-spawn`, which the supervisor reads as the driver",
+    12: "forks held as `run.on-owner-question` says, which the driver applies",
+    16: "the driver recording the placement disposition, which dWellOiledMachine re-points to the intake record",
+    17: "the trust mechanism, re-cut fresh at act launch",
+    24: "the `role` and `field` namespaces the structured fields use",
+    25: "the static block carried once per spawn",
+    26: "the shapes, whose digest act binding checks, and the experiment shape's acts",
+}
+assert set(TR_KEEP) <= set(range(1, units[TR] + 1)) and set(BR_KEEP) <= set(range(1, units[BR] + 1))
+TR_USERS = {"dIndexedDesign", "dScopedBuild", "dShippedRelease", "dTendedCadence", "dMindYourWords", "dCalibratedLens",
+            "dConvergedCharter"}   # the reuse index, decisions, annotations, retrofit, views and the code depth
+BR_USERS = {"dScopedBuild", "dShippedRelease", "dTendedCadence", "dMindYourWords", "dCalibratedLens",
+            "dConvergedCharter"}   # the work order's slots, metrics, trust profiles and the answered-call hook
+
+
+def split(u, p, x, first, users):
+    u, p = dict(u), {b: list(v) for b, v in p.items()}
+    rest = units[x] - len(first)
+    u[x] = len(first)
+    u[x + "-B"] = rest
+    p[x + "-B"] = [x]
+    for b in users:
+        if x in p.get(b, []) or any(x in p[q] for q in p.get(b, [])):
+            p[b] = p[b] + [x + "-B"]
+    return u, p
+
+
+base, base_path, fin0 = path(units, parents)
+print(f"baseline: {base} units, {' > '.join(base_path)}")
+print(f"{WOM} starts when its last parent lands: " +
+      ", ".join(f"{q} {fin0[q]}" for q in sorted(parents[WOM], key=lambda q: -fin0[q])))
+RESULTS = []
+for label, parts in (
+        ("T1, dTotalRecall alone: what dWellOiledMachine does not need leaves, the code record with it",
+         [(TR, set(TR_KEEP), TR_USERS | {"dRankedPlan"})]),
+        ("T2, dTotalRecall alone, the code record kept", [(TR, set(TR_KEEP) | {CODE}, TR_USERS)]),
+        ("C1, both: each build's parts dWellOiledMachine does not need leave, the code record with them",
+         [(TR, set(TR_KEEP), TR_USERS | {"dRankedPlan"}), (BR, set(BR_KEEP), BR_USERS)]),
+        ("C2, both, the code record kept", [(TR, set(TR_KEEP) | {CODE}, TR_USERS), (BR, set(BR_KEEP), BR_USERS)])):
+    u, p = dict(units), {b: list(v) for b, v in parents.items()}
+    for x, first, users in parts:
+        u, p = split(u, p, x, first, users)
+    n, pth, fin = path(u, p)
+    sizes = "; ".join(f"{x} {len(first)} and {x}-B {units[x] - len(first)}" for x, first, _ in parts)
+    print(f"{label}: {sizes} · {n} units ({n - base:+d}), {' > '.join(pth)}")
+    print("  lands: " + ", ".join(f"{b} {fin[b]}" for b in sorted(fin, key=fin.get)
+                                  if b in (TR, BR, TR + '-B', BR + '-B', WOM, 'dRankedPlan', 'dIndexedDesign')))
+    RESULTS.append((label, [(x, len(first), units[x] - len(first)) for x, first, _ in parts], len(parts), n, base - n))
+````
+
+### `write_wk3.py`
+
+Writes WK-3's pricing record from both runs.
+
+````python
+"""Write WK-3's pricing record from price_wk3.py's classification and its run.
+
+Usage: python -X utf8 write_wk3.py <price.out>   (from the worktree root, on the chain as priced)
+"""
+import importlib.util
+import os
+import pathlib
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+spec = importlib.util.spec_from_file_location("wk3", HERE / "price_wk3.py")
+P = importlib.util.module_from_spec(spec)
+_out = sys.stdout
+sys.stdout = open(os.devnull, "w")
+spec.loader.exec_module(P)
+sys.stdout = _out
+run = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n").strip("\n")
+asked = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8").replace("\r\n", "\n").strip("\n")
+OUT = pathlib.Path("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md")
+
+
+def short(b, n):
+    c = P.clauses[b][n - 1]
+    return c if len(c) <= 90 else c[:87].rsplit(" ", 1)[0] + " …"
+
+
+def kept(b, d):
+    rows = ["| Clause | The unit | Why dWellOiledMachine needs it |", "|---|---|---|"]
+    rows += [f"| {n} | {short(b, n).replace('|', '/')} | {why} |" for n, why in sorted(d.items())]
+    return "\n".join(rows)
+
+
+def moved(b, keep):
+    return "; ".join(f"{n}, {short(b, n)}" for n in range(1, P.units[b] + 1) if n not in keep)
+
+
+def listed(xs):
+    xs = [str(x) for x in xs]
+    return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
+
+
+rows = ["| Candidate | Parts, in units | New builds | Path, in units | Saved |", "|---|---|---|---|---|"]
+for label, parts, nb, n, saved in P.RESULTS:
+    rows.append(f"| {label.split(':')[0]} | {'; '.join(f'{x} {a} and {b}' for x, a, b in parts)} | {nb} | {n} | {saved} |")
+OUT.write_text(f"""# WK-3 priced: a split of dTotalRecall, and of dBoundRoles with it
+
+**Serves:** research PLAY-dClosedLoop-1
+
+The owner took WK-3's recommendation on 2026-10-18, pricing a split of dTotalRecall before wave 3
+(`build/2026-10-18-build-PLAY-dClosedLoop-1-walk.md` `[wave-2-answers]`). This record prices it against the chain at
+`44c8c8435`, the commit that folded wave 2's answers. At that commit the critical path is {P.base} units.
+
+## [method] How the split is priced
+
+- **Units and paths** are counted as NP-24's pricing counts them (`build/2026-10-18-build-PLAY-dClosedLoop-1-np24-pricing.md`
+  `[method]`).
+- **The successor that matters** is dWellOiledMachine, the build after dTotalRecall on the critical path. A split
+  loses if dWellOiledMachine waits for a moved part.
+- **What dWellOiledMachine needs** joins two readings:
+  - the gate's mechanical one: `node_users.py` finds no backticked dependency of dWellOiledMachine on either build;
+  - a reading of its 31 clauses, stated unit by unit in `[classification]`.
+- **The bound.** dWellOiledMachine waits for dBoundRoles too, so a dTotalRecall split saves no more than dBoundRoles'
+  landing allows. dBoundRoles lands only six units before dTotalRecall.
+
+## [classification] The units dWellOiledMachine needs
+
+Clause numbers are those `chain_clauses.py` prints at `44c8c8435`.
+
+**dTotalRecall: {len(P.TR_KEEP)} of its {P.units[P.TR]} units stay.** The code record, clause {P.CODE}, stays as
+well in T2 and C2, since dRankedPlan's intent fields and dCalibratedLens cite the `code` kind.
+
+{kept(P.TR, P.TR_KEEP)}
+
+The units that move: {moved(P.TR, set(P.TR_KEEP) | {P.CODE})}. Their users are {listed(sorted(P.TR_USERS))}, each
+starting after dWellOiledMachine or, for dIndexedDesign, after dTotalRecall.
+
+**dBoundRoles: {len(P.BR_KEEP)} of its {P.units[P.BR]} units stay.**
+
+{kept(P.BR, P.BR_KEEP)}
+
+The units that move: {moved(P.BR, set(P.BR_KEEP))}. Their users are {listed(sorted(P.BR_USERS))}, each starting after
+dWellOiledMachine.
+
+## [results] The candidates, at `44c8c8435`
+
+**As asked.** The owner was asked from the first run, as captured:
+
+```text
+{asked}
+```
+
+**As folded.** Folding C2 kept one more of dBoundRoles' units in its first part: clause 9, the role-gate arm's field
+escape. Allowances leak until it is closed, and keeping it costs nothing, since dBoundRoles' first part still lands
+before dTotalRecall's. The run after it, as captured:
+
+```text
+{run}
+```
+
+{chr(10).join(rows)}
+
+- **dTotalRecall alone saves six units, however much moves.** dBoundRoles then decides when dWellOiledMachine starts,
+  and the path runs through it.
+- **Both together save eighteen or nineteen.** dWellOiledMachine then starts once both builds' first parts land. The
+  path's new long arm is dTotalRecall's moved part, through dIndexedDesign or dRankedPlan, which need what it holds.
+- **Keeping the code record (C2) beats moving it (C1) by one unit.** dRankedPlan, which cites it, then leaves the long
+  arm.
+- **What the pricing cannot settle.** dIndexedDesign's needs from the moved part are a reading, not a gate's. If
+  spec time finds it needs only the reuse index and the typed edges, those two units can stay too, and the path
+  shortens by about two more.
+
+## [costs] What the split costs
+
+- **Two more builds.** Each brings the fixed cost NP-24's `[method]` names, which no unit counts.
+- **While the moved parts land beside dWellOiledMachine:**
+  - no annotation index, research view or generated views;
+  - no retrofit kinds or `adopt` program;
+  - the `code` record's queries, enrichment and ctags pack absent;
+  - each role's trust profile, metrics and slots beyond the map, code and memory slices absent, the work order
+    carrying its core fields.
+- **The re-cut it owes:** the new rows, rosters and gaps, the moved nodes' owners, the later builds' after cells, and
+  the reconciliation gate re-run, as NP-24's split owed.
+
+## [forks] Parked for the owner
+
+| Fork | Question | Options, the recommendation first | What the answer sets |
+|---|---|---|---|
+| WK-4 | Split dTotalRecall, and dBoundRoles with it? | C2, both split and the code record kept in dTotalRecall's first part: two new builds; T2, dTotalRecall alone: one new build; keep both whole | a structural decision about the chain |
+
+C2 is recommended. dTotalRecall alone cannot save more than six units, and only splitting both lets dWellOiledMachine
+start earlier (`[results]`).
+""", encoding="utf-8", newline="\n")
+print(f"wrote {OUT}: {OUT.stat().st_size} bytes")
+````
+
+### `fold_wk4.py`
+
+The owner's C2 folded: the four rows, the moved owners, the parents, the kinds, the systems owner and the ownership amendment.
+
+````python
+"""Fold the owner's WK-4 (C2): dTotalRecall keeps the 17 units dWellOiledMachine needs and dLinkedLibrary (Library) takes
+23; dBoundRoles keeps 16 and dFurnishedOrders (Orders) takes 18, as price_wk3.py's folded classification says. The
+nodes move with their units: v2's rows, catalogue owners and parents, flow-steps' adopt items, layer-memory's kinds,
+the systems record's annotations owner, and the ownership amendment.
+
+Usage: python -X utf8 fold_wk4.py   (from the worktree root, on the chain as priced at 44c8c8435)
+"""
+import importlib.util
+import os
+import pathlib
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+spec = importlib.util.spec_from_file_location("wk3", HERE / "price_wk3.py")
+P = importlib.util.module_from_spec(spec)
+_out = sys.stdout
+sys.stdout = open(os.devnull, "w")
+spec.loader.exec_module(P)
+sys.stdout = _out
+
+B = "memory/builds/dClosedLoop/build/"
+L, F = "dLinkedLibrary", "dFurnishedOrders"
+TR_A, BR_A = set(P.TR_KEEP) | {P.CODE}, set(P.BR_KEEP)
+CL_TR, CL_BR = list(P.clauses["dTotalRecall"]), list(P.clauses["dBoundRoles"])
+assert len(TR_A) == 17 and len(BR_A) == 16 and len(CL_TR) == 40 and len(CL_BR) == 34
+# The feature selector's arming moves with dTotalRecall's clause 39, so dBoundRoles' clause 34 names its new home.
+old34 = "once dTotalRecall arms that selector"
+assert old34 in CL_BR[33]
+CL_BR[33] = CL_BR[33].replace(old34, f"once {L} arms that selector")
+GAPS = {
+    "dTotalRecall": ["gap-mem-01", "gap-mem-04", "gap-mem-05", "gap-mem-06", "gap-mem-07", "gap-mem-13", "gap-mem-16",
+                     "gap-mem-20", "gap-mem-21", "gap-mem-23", "gap-mem-26", "gap-mem-27", "gap-design-01",
+                     "gap-mem-28", "gap-mem-30"],
+    L: ["gap-mem-02", "gap-mem-03", "gap-mem-08", "gap-mem-09", "gap-mem-11", "gap-mem-12", "gap-mem-14", "gap-mem-15",
+        "gap-mem-17", "gap-mem-18", "gap-mem-19", "gap-mem-22", "gap-mem-24", "gap-mem-25", "gap-mem-29", "gap-mem-31",
+        "gap-mem-32", "gap-mem-33", "gap-mem-34"],
+    "dBoundRoles": ["gap-roles-01", "gap-roles-02", "gap-roles-03", "gap-roles-04", "gap-roles-05", "gap-roles-06",
+                    "gap-roles-07", "gap-roles-08", "gap-orient-07", "gap-orient-09", "gap-roles-11", "gap-roles-14",
+                    "gap-roles-18", "gap-roles-19", "gap-roles-20"],
+    F: ["gap-roles-09", "gap-roles-10", "gap-roles-12", "gap-roles-13", "gap-roles-15", "gap-roles-16", "gap-roles-17",
+        "gap-orient-15", "gap-roles-21", "gap-roles-22"],
+}
+L_KEYS = ["annotations.budget", "annotations.grammar", "annotations.lookup", "annotations.resolve-scope",
+          "decisions.major", "memory.code-enrich", "retrofit.decisions", "retrofit.practice-pending",
+          "retrofit.reconstruct", "reuse.delivery", "reuse.propose"]
+F_KEYS = ["annotations.delivery", "instructions.slices", "memory.code-budget", "memory.code-roles", "memory.map-unfold",
+          "memory.project-map", "notices.record", "prompts.batch", "retrofit.slot-bytes", "roles.answered-calls",
+          "roles.on-contradiction", "roles.orientation.house-index", "roles.trust", "roles.verifier-context"]
+L_ITEMS = ["adopt.census", "adopt.practices", "adopt.decisions", "adopt.reconstruct"]
+L_KINDS = ["research return", "decision", "gotcha", "annotation index", "recall index", "baseline", "census", "ruling"]
+
+
+def pick(cl, keep, first):
+    return "; ".join(c for i, c in enumerate(cl, 1) if (i in keep) == first)
+
+
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+for build, stage, cl, keep, new, nstage in (("dTotalRecall", "Memory", CL_TR, TR_A, L, "Library"),
+                                            ("dBoundRoles", "Roles", CL_BR, BR_A, F, "Orders")):
+    row = next(ln for ln in V.text.split("\n") if ln.startswith(f"| {build} | {stage} |"))
+    cells = [c.strip() for c in row.strip().strip("|").split(" | ")]
+    assert cells[3] == "; ".join(P.clauses[build]), f"{build}'s planned units differ from the priced row"
+    have = [g.strip() for g in cells[4].split(",")]
+    assert set(have) == set(GAPS[build]) | set(GAPS[new]), sorted(set(have) ^ (set(GAPS[build]) | set(GAPS[new])))
+    keep_g = [g for g in have if g in GAPS[build]]
+    new_g = [g for g in have if g in GAPS[new]]
+    V.sub(row, "\n".join([f"| {build} | {stage} | {cells[2]} | {pick(cl, keep, True)} | {', '.join(keep_g)} |",
+                          f"| {new} | {nstage} | {build} | {pick(cl, keep, False)} | {', '.join(new_g)} |"]),
+          f"{build}'s row, split")
+for build, stage, old, add in (("dIndexedDesign", "Design", "dDeclaredLoop, dTotalRecall, dKeptSession, dBoundRoles", [L]),
+                               ("dShippedRelease", "Deploy", "dWitnessedBar, dTotalRecall, dBoundRoles, dWellOiledMachine",
+                                [L, F]),
+                               ("dMindYourWords", "Lexicon", "dWellOiledMachine, dWitnessedBar", [L, F]),
+                               ("dScopedBuild", "Build", "dIndexedDesign, dWitnessedBar, dWellOiledMachine", [F]),
+                               ("dTendedCadence", "Maintain", "dWitnessedBar, dRankedPlan, dWellOiledMachine, "
+                                "dIndexedDesign", [F])):
+    V.sub(f"| {build} | {stage} | {old} |", f"| {build} | {stage} | {old}, {', '.join(add)} |", f"{build}'s parents")
+pol = V.text.split("\n## [policies]", 1)[1].split("\n## ", 1)[0]
+new_pol = pol
+for keys, frm, to in ((L_KEYS, "dTotalRecall", L), (F_KEYS, "dBoundRoles", F)):
+    for k in keys:
+        rows = [ln for ln in new_pol.split("\n") if ln.startswith(f"| `{k}` |")]
+        if len(rows) != 1 or not rows[0].endswith(f"| {frm} |"):
+            sys.exit(f"catalogue: `{k}` has {len(rows)} rows, or an owner other than {frm}")
+        new_pol = new_pol.replace(rows[0], rows[0][:-len(f"{frm} |")] + f"{to} |")
+V.sub(pol, new_pol, "catalogue owners")
+V.done += len(L_KEYS) + len(F_KEYS) - 1
+V.insert_before("\nRevised: 2026-10-17, after the folds' closing review", f"""
+Revised: 2026-10-18, WK-3 priced and the owner's WK-4 (`build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md`):
+- dTotalRecall keeps the 17 units dWellOiledMachine needs, the code record among them, and {L}, the library, takes
+  23: decisions and reuse, annotations, the views, the retrofit's memory kinds, the code record's queries,
+  enrichment and ctags pack, and the typed edges;
+- dBoundRoles keeps the 16 units dWellOiledMachine needs, the role-gate escape's fix among them, and {F}, the
+  orders, takes 18: the work order's slots, trust profiles, the answered-call hook, repairs, role metrics, the
+  tester re-founded and owner questions asked live;
+- each moved key, item, kind and the annotations system change owner with their unit, and five later builds gain a
+  parent;
+- the two builds' gaps split with their units, fifteen and nineteen, and fifteen and ten.
+""", "revision note")
+V.save()
+
+FS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+for tag in L_ITEMS:
+    rows = [ln for ln in FS.text.split("\n") if ln.startswith(f"| `{tag}` |")]
+    if len(rows) != 1 or not rows[0].endswith("| dTotalRecall |"):
+        sys.exit(f"flow-steps: `{tag}` has {len(rows)} rows, or another owner")
+    FS.sub(rows[0], rows[0][:-len("dTotalRecall |")] + f"{L} |", tag)
+FS.save()
+
+LM = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+for kind in L_KINDS:
+    LM.sub(f"| {kind} | dTotalRecall |", f"| {kind} | {L} |", kind)
+LM.sub("`adopt.practices` writes the ruling records, an item dTotalRecall owns",
+       f"`adopt.practices` writes the ruling records, an item {L} owns", "ruling's writer")
+LM.save()
+
+SY = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+SY.sub("- **Owners.** The memory layer, kit memory-tree, chain build dTotalRecall. The tags come from",
+       f"- **Owners.** The memory layer, kit memory-tree, chain build {L} (WK-4). The tags come from", "annotations owner")
+SY.save()
+
+O = Record(B + "2026-10-17-build-PLAY-dClosedLoop-1-ownership.md")
+O.text = O.text.rstrip("\n") + f"""
+- **WK-4, 2026-10-18:** the owner chose C2, so dTotalRecall splits into itself and {L}, and dBoundRoles into itself
+  and {F} (`build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md`). The nodes move with their units:
+  - to {L}: the items {', '.join(f'`{t}`' for t in L_ITEMS)}, the kinds {', '.join(f'`{k}`' for k in L_KINDS)}, the
+    annotations system, and the keys {', '.join(f'`{k}`' for k in L_KEYS)};
+  - to {F}: the keys {', '.join(f'`{k}`' for k in F_KEYS)}.
+"""
+O.done += 1
+O.save()
+print(f"split: dTotalRecall {len(TR_A)}, {L} {40 - len(TR_A)}; dBoundRoles {len(BR_A)}, {F} {34 - len(BR_A)}")
+````
+
+### `fold_wk4_classes.py`
+
+The three class rows WK-4 moved, re-pointed once the gate was red on them.
+
+````python
+"""The re-cut's class rows WK-4 moved, re-pointed once the gate was red on them: the two whose citing units moved from
+dBoundRoles to dFurnishedOrders, and the one whose key moved from dTotalRecall to dLinkedLibrary.
+
+Usage: python -X utf8 fold_wk4_classes.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+RC = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-recut.md")
+RC.sub("| dBoundRoles | `feature` | dTotalRecall | tolerance | the work order selects by `feature.*` only once dTotalRecall "
+       "arms that selector,",
+       "| dFurnishedOrders | `feature` | dTotalRecall | tolerance | the work order selects by `feature.*` only once "
+       "dLinkedLibrary arms that selector (WK-4),", "feature")
+RC.sub("| dBoundRoles | `code` | dTotalRecall | tolerance |", "| dFurnishedOrders | `code` | dTotalRecall | tolerance |",
+       "code")
+RC.sub("| dDeclaredLoop | `decisions.major` | dTotalRecall |", "| dDeclaredLoop | `decisions.major` | dLinkedLibrary |",
+       "decisions.major")
+RC.save()
+````
+
+### `fold_wk4_fates.py`
+
+The fates record's thirteen destinations WK-4 moved.
+
+````python
+"""The fates record's destinations that WK-4 moved: thirteen rows whose function now lands in dLinkedLibrary or
+dFurnishedOrders, each re-pointed with its "Decided by" chain row; a row whose function split names both builds.
+
+Usage: python -X utf8 fold_wk4_fates.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+L, F = "dLinkedLibrary", "dFurnishedOrders"
+FR = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-fates.md")
+for old, new, label in (
+        ("| memory-recall | optional | narrowed to a record finder (dTotalRecall) |",
+         f"| memory-recall | optional | narrowed to a record finder ({L}) |", "memory-recall kit"),
+        ("| the orientation scout, composing the card in a sidechain (dBoundRoles) | roles `[forks]`; v2 `[chain]` dBoundRoles |",
+         f"| the orientation scout, composing the card in a sidechain ({F}) | roles `[forks]`; v2 `[chain]` {F} |",
+         "gov-orienter"),
+        ("| role-by-step matrix joined both ways (dBoundRoles); policy reader re-pointed (dConvergedCharter) | v2 `[chain]` "
+         "dBoundRoles; v2 `[chain]` dConvergedCharter |",
+         f"| role-by-step matrix joined both ways ({F}); policy reader re-pointed (dConvergedCharter) | v2 `[chain]` "
+         f"{F}; v2 `[chain]` dConvergedCharter |", "check_roles.py"),
+        ("| generated views, README schema, routing region (dTotalRecall); drift import becomes an optional slot "
+         "(dOrderedCharter) | v2 `[chain]` dTotalRecall; v2 `[chain]` dOrderedCharter |",
+         f"| generated views ({L}), README schema and routing region (dTotalRecall); drift import becomes an optional slot "
+         f"(dOrderedCharter) | v2 `[chain]` {L}; v2 `[chain]` dTotalRecall; v2 `[chain]` dOrderedCharter |",
+         "gen_build_index.py"),
+        ("| handed by write set (dTotalRecall); check-18 probe becomes an optional slot | v2 `[chain]` dTotalRecall; "
+         "v2 `[chain]` dOrderedCharter |",
+         f"| handed by write set ({L}); check-18 probe becomes an optional slot | v2 `[chain]` {L}; "
+         "v2 `[chain]` dOrderedCharter |", "gotchas.py"),
+        ("| split by kind; the log keeps its path, with a holds-now view (dTotalRecall) | layer-memory `[decisions]`; "
+         "v2 `[chain]` dTotalRecall |",
+         f"| split by kind; the log keeps its path, with a holds-now view ({L}) | layer-memory `[decisions]`; "
+         f"v2 `[chain]` {L} |", "DECISIONS.md"),
+        ("| the core `code` record and `gov map code` (dTotalRecall) | the owner's point 3 (night pass); v2 `[chain]` "
+         "dTotalRecall |",
+         f"| the core `code` record (dTotalRecall) and `gov map code` ({L}) | the owner's point 3 (night pass); v2 "
+         f"`[chain]` dTotalRecall; v2 `[chain]` {L} |", "gen_map.py"),
+        ("| optional: dossiers anchored to symbol keys, their header the feature node as NP-16 settles (dTotalRecall) |",
+         f"| optional: dossiers anchored to symbol keys (dTotalRecall), their header the feature node as NP-16 settles "
+         f"({L}) |", "dossiers"),
+        ("| 0 of 24 solved; replaced by the house index via **Reuse:** (dTotalRecall) |",
+         f"| 0 of 24 solved; replaced by the house index via **Reuse:** ({L}) |", "reuse_lookup"),
+        ("| a range read over the `code` record, and enrichment staleness by body hash (dTotalRecall) |",
+         f"| a range read over the `code` record (dTotalRecall), and enrichment staleness by body hash ({L}) |",
+         "map_diff"),
+        ("| optional hook pack (dWellOiledMachine); shell reads too (dTotalRecall) | layer-runtime `[enforce]`; v2 "
+         "`[chain]` dTotalRecall |",
+         f"| optional hook pack (dWellOiledMachine); shell reads too ({L}) | layer-runtime `[enforce]`; v2 `[chain]` "
+         f"{L} |", "recall-opened.js"),
+        ("| observability's reader half; role metrics read it (dBoundRoles) | layer-expansions `[design-observability]`; "
+         "v2 `[chain]` dBoundRoles |",
+         f"| observability's reader half; role metrics read it ({F}) | layer-expansions `[design-observability]`; "
+         f"v2 `[chain]` {F} |", "runlog reader"),
+        ("| orientation scout (dBoundRoles); `kickoff.runs` (dRankedPlan); thin entry | v2 `[chain]` dBoundRoles; "
+         "v2 `[chain]` dRankedPlan;",
+         f"| orientation scout ({F}); `kickoff.runs` (dRankedPlan); thin entry | v2 `[chain]` {F}; "
+         "v2 `[chain]` dRankedPlan;", "kickoff procedure")):
+    FR.sub(old, new, label)
+FR.save()
+````
+
+### `write_wk4_answers.py`
+
+The pricing record's `[answers]` and `[folded]`, the walk's WK-4 line and the session log's event.
+
+````python
+"""Record WK-4's answer and the two names in the pricing record ([answers], verbatim, and [folded]), note WK-4 in the
+walk record's [wave-2-answers], and log the event. Usage: python -X utf8 write_wk4_answers.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+PR = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md")
+PR.text = PR.text.rstrip("\n") + """
+
+## [answers] The owner's answers, 2026-10-18
+
+Asked through AskUserQuestion from the run `[results]` keeps as asked, each answer quoted as the tool returned it, the
+critical path's quoted length pinned to the commit it was read at:
+- WK-4, asked at `44c8c8435` as "WK-4: Split dTotalRecall, and dBoundRoles with it? (a structural decision about the chain; critical path 190 today)": "C2, both split (Recommended)"
+
+The two new builds' names, asked after:
+- asked as "Name for dTotalRecall's split-off build (23 units: decisions and reuse, annotations, the views, the retrofit's memory kinds, the code record's queries, enrichment and ctags pack, and the typed edges)?": "dLinkedLibrary (Recommended)"
+- asked as "Name for dBoundRoles' split-off build (19 units: the work order's slots, trust profiles, the answered-call hook, repairs, role metrics, the tester re-founded, owner questions live)?": "dFurnishedOrders (Recommended)"
+
+The fold kept the role-gate escape's fix in dBoundRoles' first part (`[results]`, "As folded"), so dFurnishedOrders
+holds 18 units, not the 19 asked.
+
+## [folded] What the answers changed
+
+- **v2's chain** (its revision note dated 2026-10-18, WK-4):
+  - dTotalRecall keeps 17 units, and dLinkedLibrary, stage Library, after dTotalRecall, takes 23;
+  - dBoundRoles keeps 16, and dFurnishedOrders, stage Orders, after dBoundRoles, takes 18;
+  - dIndexedDesign gains dLinkedLibrary as a parent, and dScopedBuild and dTendedCadence gain dFurnishedOrders;
+  - dShippedRelease and dMindYourWords gain both;
+  - the two builds' gaps split fifteen and nineteen, and fifteen and ten.
+- **The owners:**
+  - v2's catalogue: 11 keys to dLinkedLibrary and 14 to dFurnishedOrders;
+  - flow-steps: the four `adopt.*` items to dLinkedLibrary;
+  - layer-memory: eight kinds to dLinkedLibrary;
+  - the systems record: the annotations system to dLinkedLibrary;
+  - the ownership record's amendment lists every moved node.
+- **The re-cut's class rows:** the two whose citing units moved now name dFurnishedOrders, and `decisions.major`'s now
+  names dLinkedLibrary as the key's owner. The gate was red on all three until they did.
+- **The fates record:** thirteen destinations moved with their functions, and a row whose function split names both
+  builds.
+- **The chain:** the critical path drops by nineteen units, as C2 priced, and now runs through dLinkedLibrary and
+  dIndexedDesign. The instruments record's `[final]` holds the run.
+"""
+PR.done += 1
+PR.save()
+
+W = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-walk.md")
+W.sub("""- **WK-3:** a split of dTotalRecall is priced before wave 3, in
+  `build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md`.
+""", """- **WK-3:** a split of dTotalRecall is priced before wave 3, in
+  `build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md`.
+- **WK-4,** asked once that pricing was written: the owner chose C2 (that record's `[answers]`). dTotalRecall and
+  dBoundRoles each split, and dLinkedLibrary and dFurnishedOrders join wave 2, where their units were.
+""", "WK-4")
+W.save()
+
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-18, session 1799cb98: WK-3 priced (`build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md`). A
+  dTotalRecall split alone saves six units at most, because dWellOiledMachine also waits for dBoundRoles. The owner
+  chose C2 for WK-4: dTotalRecall splits off dLinkedLibrary (Library) and dBoundRoles splits off dFurnishedOrders
+  (Orders), and the path drops by nineteen units. The fold kept the role-gate escape's fix in dBoundRoles' first part
+  at no cost. The gate was red on three class rows whose units or key had moved, until they were re-pointed.
+""", "event")
+L.save()
+````
+
 ### `record_instruments.py`
 
 This record's own writer.
@@ -5228,6 +5975,16 @@ MINE = [
      "forks."),
     ("walk4/fold_wk.py", "The owner's word on wave 2, and WK-1 and WK-2 folded: the minimal tester, and dBoundRoles as "
      "a parent of dIndexedDesign and dRankedPlan."),
+    ("wk3/gap_texts.py", "WK-4: each build's gaps with grade and text, to assign them across the split."),
+    ("wk3/price_wk3_asked.py", "WK-3's pricing as the owner was asked from."),
+    ("wk3/price_wk3.py", "WK-3's pricing as folded: the role-gate escape's fix kept in dBoundRoles' first part."),
+    ("wk3/write_wk3.py", "Writes WK-3's pricing record from both runs."),
+    ("wk3/fold_wk4.py", "The owner's C2 folded: the four rows, the moved owners, the parents, the kinds, the systems "
+     "owner and the ownership amendment."),
+    ("wk3/fold_wk4_classes.py", "The three class rows WK-4 moved, re-pointed once the gate was red on them."),
+    ("wk3/fold_wk4_fates.py", "The fates record's thirteen destinations WK-4 moved."),
+    ("wk3/write_wk4_answers.py", "The pricing record's `[answers]` and `[folded]`, the walk's WK-4 line and the session "
+     "log's event."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -5455,6 +6212,10 @@ After the owner's answers, `1d32760f3`, and NP-24's pricing:
 16. The pricing script's first version, as the owner was asked from, was copied aside before its two corrections
     (`price_split_asked.py`, with its run). The corrections were Edits: clause 16 to the early parts, clause 42 to the
     core, a `CORRECTED` table naming both, and a `RESULTS` list the record's table derives from.
+
+After the walk's wave 2, `44c8c8435`:
+
+17. The critical-path script's build count, raised from 18 to 20 by one sed once WK-4 split dTotalRecall and dBoundRoles.
 ````
 
 ## [red] The red runs, as captured
@@ -5632,16 +6393,16 @@ landing                  5  dGroundRules (dShippedRelease's), dOrderedCharter (d
 scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
 seen red                 3  dGroundRules (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dKeptSession (dWitnessedBar's)
 code                     3  dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
+return                   3  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's)
 intake                   3  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 playbook                 2  dOrderedCharter (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
 release                  2  dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 probe                    2  dOrderedCharter (dPlacedRequest's), dDeclaredLoop (dPlacedRequest's)
 spec                     2  dFairHearing (dIndexedDesign's), dBoundRoles (dIndexedDesign's)
-return                   2  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
 act                      2  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
 claim                    2  dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
 fork                     2  dBoundRoles (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
-baseline                 2  dBoundRoles (dTotalRecall's), dWitnessedBar (dTotalRecall's)
+baseline                 2  dFurnishedOrders (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 override                 1  dGroundRules (dOrderedCharter's)
 card                     1  dOrderedCharter (dPlacedRequest's)
 inventory                1  dOrderedCharter (dIndexedDesign's)
@@ -5654,9 +6415,10 @@ fleet                    1  dPlacedRequest (dShippedRelease's)
 routing                  1  dKeptSession (dWitnessedBar's)
 ask                      1  dKeptSession (dTotalRecall's)
 roster                   1  dBoundRoles (dIndexedDesign's)
-value ledger             1  dBoundRoles (dCalibratedLens's)
+value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
-plain-word hits on a non-ancestor's record kind: 51, over 28 kinds
+decision                 1  dWellOiledMachine (dLinkedLibrary's)
+plain-word hits on a non-ancestor's record kind: 53, over 29 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -6041,12 +6803,12 @@ rc 1
 
 ````text
 $ design map
-map: 2260 nodes in 30 namespaces; 31599 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1519, derived 259, pending 482
+map: 2267 nodes in 30 namespaces; 32093 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1526, derived 259, pending 482
 rc 0
 
 $ atlas
-atlas: derived — 156 records, 2725 sections, 180 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 157 records, 2734 sections, 182 decision sections, 16 comparison areas, 33 principles
 rc 0
 
 $ fold state
@@ -6064,14 +6826,14 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 18 · owned nodes read 422 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 20 (cites 16, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 51 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+chain rows 20 · owned nodes read 422 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 20 (cites 16, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 53 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
-  dBoundRoles cites `code` (dTotalRecall's, not an ancestor): tolerance
-  dBoundRoles cites `feature` (dTotalRecall's, not an ancestor): tolerance
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
   dFairHearing cites `preset` (dKeptSession's, not an ancestor): homonym
+  dFurnishedOrders cites `code` (dTotalRecall's, not an ancestor): tolerance
+  dFurnishedOrders cites `feature` (dTotalRecall's, not an ancestor): tolerance
   dGroundRules cites `policy.guard` (dDeclaredLoop's, not an ancestor): not a use
   dGroundRules cites `policy.proof` (dDeclaredLoop's, not an ancestor): not a use
   dKeptSession cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
@@ -6083,7 +6845,7 @@ transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dOrderedCharter cites `memory.map-purpose` (dTotalRecall's, not an ancestor): moved
   dRankedPlan cites `entry.intake` (dWellOiledMachine's, not an ancestor): tolerance
   dTotalRecall cites `roster` (dIndexedDesign's, not an ancestor): homonym
-  dDeclaredLoop reads `decisions.major` (dTotalRecall's, not an ancestor): tolerance
+  dDeclaredLoop reads `decisions.major` (dLinkedLibrary's, not an ancestor): tolerance
   dFairHearing reads `flow.route-backs` (dDeclaredLoop's, not an ancestor): not a use
   dRankedPlan reads `run.host` (dWellOiledMachine's, not an ancestor): tolerance
   dFairHearing routes `review.trigger` (dDeclaredLoop's, not an ancestor): not a use
@@ -6095,7 +6857,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 255 · chain builds 18
+register keys 255 · chain builds 20
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -6108,8 +6870,8 @@ no findings
 rc 0
 
 $ critical path
-critical path: 190 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dFairHearing 20, dOrderedCharter 35, dDeclaredLoop 57, dPlacedRequest 64, dWitnessedBar 80, dKeptSession 82, dBoundRoles 114, dTotalRecall 120, dIndexedDesign 132, dRankedPlan 133, dWellOiledMachine 151, dScopedBuild 162, dTendedCadence 165, dMindYourWords 168, dShippedRelease 172, dCalibratedLens 176, dConvergedCharter 190
+critical path: 171 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dLinkedLibrary > dIndexedDesign > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dFairHearing 20, dOrderedCharter 35, dDeclaredLoop 57, dPlacedRequest 64, dWitnessedBar 80, dKeptSession 82, dBoundRoles 96, dTotalRecall 97, dRankedPlan 110, dFurnishedOrders 114, dLinkedLibrary 120, dWellOiledMachine 128, dIndexedDesign 132, dScopedBuild 143, dMindYourWords 145, dTendedCadence 146, dShippedRelease 149, dCalibratedLens 157, dConvergedCharter 171
 rc 0
 ````
 

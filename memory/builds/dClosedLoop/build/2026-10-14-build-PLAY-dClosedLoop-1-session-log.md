@@ -2113,6 +2113,12 @@ The night pass's closing review, dispatch 105, derived from its run the same way
   that dBoundRoles re-founds, which adds a unit on the critical path. For WK-2, dIndexedDesign and dRankedPlan follow
   dBoundRoles at no cost to the path. WK-3, a dTotalRecall split, is priced next, before wave 3.
 
+- 2026-10-18, session 1799cb98: WK-3 priced (`build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md`). A
+  dTotalRecall split alone saves six units at most, because dWellOiledMachine also waits for dBoundRoles. The owner
+  chose C2 for WK-4: dTotalRecall splits off dLinkedLibrary (Library) and dBoundRoles splits off dFurnishedOrders
+  (Orders), and the path drops by nineteen units. The fold kept the role-gate escape's fix in dBoundRoles' first part
+  at no cost. The gate was red on three class rows whose units or key had moved, until they were re-pointed.
+
 ## Instruments
 
 ### The gap-ownership join
