@@ -5049,6 +5049,75 @@ L.sub("whom no agent plays today, in stages whose builds do not follow dBoundRol
 L.save()
 ````
 
+### `fold_wk.py`
+
+The owner's word on wave 2, and WK-1 and WK-2 folded: the minimal tester, and dBoundRoles as a parent of dIndexedDesign and dRankedPlan.
+
+````python
+"""Record the owner's word on wave 2 and fold WK-1 and WK-2; WK-3 is priced in its own record.
+- WK-1: a minimal tester agent ships with dWitnessedBar in today's roles kit, and dBoundRoles re-founds it.
+- WK-2: dIndexedDesign and dRankedPlan follow dBoundRoles, and the research harness's stand-in goes.
+
+Usage: python -X utf8 fold_wk.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+W = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-walk.md")
+W.sub("""- The owner's word on wave 1, 2026-10-18, verbatim: "approve wave 1, present wave 2".
+""", """- The owner's word on wave 1, 2026-10-18, verbatim: "approve wave 1, present wave 2".
+- The owner's word on wave 2 and its forks, 2026-10-18, verbatim: "approve wave 2, take the recommendations".
+""", "words")
+W.insert_before("## [walk-instrument] The walk's facts, and the clause scan", """## [wave-2-answers] Wave 2's forks, answered
+
+The owner approved wave 2 and took each fork's recommendation, 2026-10-18 (`[words]`):
+- **WK-1:** a minimal tester agent ships with dWitnessedBar in today's roles kit, and plays `test.attribute`,
+  `test.reason` and the fix pass's judgment. dBoundRoles re-founds it with the other roles. dWitnessedBar gains a
+  unit, and the critical path with it.
+- **WK-2:** dIndexedDesign and dRankedPlan follow dBoundRoles, so their stages' roles are bound before they start.
+  The research harness builds on the `experiment` shape outright, and its stand-in is gone.
+- **WK-3:** a split of dTotalRecall is priced before wave 3, in
+  `build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md`.
+
+""", "wave-2 answers")
+W.save()
+
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.insert_before("\nRevised: 2026-10-17, after the folds' closing review", """
+Revised: 2026-10-18, the walk's wave 2 (`build/2026-10-18-build-PLAY-dClosedLoop-1-walk.md` `[wave-2-answers]`):
+- dWitnessedBar ships a minimal tester agent, which dBoundRoles re-founds with the other roles (WK-1);
+- dIndexedDesign and dRankedPlan follow dBoundRoles, and the research harness builds on the `experiment` shape
+  outright (WK-2).
+""", "revision note")
+V.sub("(night pass, point 4) | gap-test-01,",
+      "(night pass, point 4); a minimal tester agent in today's roles kit, its allowance scratch only, playing "
+      "`test.attribute`, `test.reason` and the fix pass's wrong-spec judgment until dBoundRoles re-founds it with the "
+      "other roles (WK-1) | gap-test-01,", "dWitnessedBar tester")
+V.sub("the tester agent, absent today, with its allowance",
+      "the tester agent, re-founded from dWitnessedBar's minimal one (WK-1), with its allowance", "dBoundRoles tester")
+V.sub("| dIndexedDesign | Design | dDeclaredLoop, dTotalRecall, dKeptSession |",
+      "| dIndexedDesign | Design | dDeclaredLoop, dTotalRecall, dKeptSession, dBoundRoles |", "dIndexedDesign parents")
+V.sub("| dRankedPlan | Plan | dDeclaredLoop, dTotalRecall |",
+      "| dRankedPlan | Plan | dDeclaredLoop, dTotalRecall, dBoundRoles |", "dRankedPlan parents")
+V.sub("the research harness, built on the `experiment` shape once dBoundRoles registers it, and run as today until then "
+      "(night pass, point 2)",
+      "the research harness, built on dBoundRoles' `experiment` shape (night pass, point 2, and WK-2)", "research harness")
+V.save()
+
+FS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+FS.insert_before("- **Test is the landing verdict; testing elsewhere is a probe**", """- **The tester before dBoundRoles** (WK-1). Until dBoundRoles re-founds the roles, dWitnessedBar's minimal tester
+  agent plays `test.attribute`, `test.reason` and the fix pass's judgment, its allowance scratch only.
+""", "test tester")
+FS.sub("  - dBoundRoles' tester and `experiment` shape: `probe.design` and `probe.experiment` route to an owner item;",
+       "  - the tester, dWitnessedBar's minimal one first (WK-1), and dBoundRoles' `experiment` shape: until each lands,\n"
+       "    `probe.design` and `probe.experiment` route to an owner item;", "probe stand-in")
+FS.save()
+````
+
 ### `record_instruments.py`
 
 This record's own writer.
@@ -5157,6 +5226,8 @@ MINE = [
     ("walk3/record_walk3.py", "The owner's word on wave 1, and wave 2 presented with its three forks."),
     ("walk3/fix_fork_ids.py", "Wave 2's forks renamed to a family the map counts, under a title the atlas reads as "
      "forks."),
+    ("walk4/fold_wk.py", "The owner's word on wave 2, and WK-1 and WK-2 folded: the minimal tester, and dBoundRoles as "
+     "a parent of dIndexedDesign and dRankedPlan."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -5970,12 +6041,12 @@ rc 1
 
 ````text
 $ design map
-map: 2258 nodes in 30 namespaces; 31575 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1517, derived 259, pending 482
+map: 2260 nodes in 30 namespaces; 31599 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1519, derived 259, pending 482
 rc 0
 
 $ atlas
-atlas: derived — 156 records, 2723 sections, 179 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 156 records, 2725 sections, 180 decision sections, 16 comparison areas, 33 principles
 rc 0
 
 $ fold state
@@ -6037,8 +6108,8 @@ no findings
 rc 0
 
 $ critical path
-critical path: 189 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dFairHearing 20, dOrderedCharter 35, dDeclaredLoop 57, dPlacedRequest 64, dWitnessedBar 79, dKeptSession 82, dBoundRoles 113, dTotalRecall 119, dIndexedDesign 131, dRankedPlan 132, dWellOiledMachine 150, dScopedBuild 161, dTendedCadence 164, dMindYourWords 167, dShippedRelease 171, dCalibratedLens 175, dConvergedCharter 189
+critical path: 190 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dFairHearing 20, dOrderedCharter 35, dDeclaredLoop 57, dPlacedRequest 64, dWitnessedBar 80, dKeptSession 82, dBoundRoles 114, dTotalRecall 120, dIndexedDesign 132, dRankedPlan 133, dWellOiledMachine 151, dScopedBuild 162, dTendedCadence 165, dMindYourWords 168, dShippedRelease 172, dCalibratedLens 176, dConvergedCharter 190
 rc 0
 ````
 

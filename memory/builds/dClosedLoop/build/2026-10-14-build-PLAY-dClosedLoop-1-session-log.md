@@ -2108,6 +2108,11 @@ The night pass's closing review, dispatch 105, derived from its run the same way
   largest block on the path, may split as dDeclaredLoop did (WK-3). The forks were first minted as W2-1 to W2-3,
   which the map does not count as forks, and were renamed before the owner saw them.
 
+- 2026-10-18, session 1799cb98: the owner approved wave 2 and took each fork's recommendation, "approve wave 2, take
+  the recommendations" (the walk record's `[wave-2-answers]`). For WK-1, dWitnessedBar ships a minimal tester agent
+  that dBoundRoles re-founds, which adds a unit on the critical path. For WK-2, dIndexedDesign and dRankedPlan follow
+  dBoundRoles at no cost to the path. WK-3, a dTotalRecall split, is priced next, before wave 3.
+
 ## Instruments
 
 ### The gap-ownership join

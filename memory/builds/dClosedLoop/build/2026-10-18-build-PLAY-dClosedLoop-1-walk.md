@@ -15,6 +15,7 @@ the owner's word on each.
   "re-derive the walk and present wave 1" (2026-10-18). The glance and wave 1 are derived again in `[chain-2]` and
   `[wave-1-2]`.
 - The owner's word on wave 1, 2026-10-18, verbatim: "approve wave 1, present wave 2".
+- The owner's word on wave 2 and its forks, 2026-10-18, verbatim: "approve wave 2, take the recommendations".
 
 ## [chain] The chain at a glance
 
@@ -494,6 +495,17 @@ and 3 kinds, and closes 10 gaps, 5 of them HIGH.
 | WK-1 | Who plays the tester before dBoundRoles lands? | a minimal tester agent ships with dWitnessedBar in today's roles kit and dBoundRoles re-founds it with the other roles, one more unit in dWitnessedBar; an owner item stands in, as the probe program's does, so every own or mixed red and every Test exit waits for the owner until dBoundRoles lands; the skeptic stands in, a role doing another's work against P25 | a structural decision |
 | WK-2 | Should dIndexedDesign and dRankedPlan follow dBoundRoles? | yes, both: dBoundRoles lands at 113, before either can start at 119, so the edges cost nothing and their stages' roles are bound first; keep them as they are, the stages' roles unplayed until dBoundRoles happens to land | a structural decision about the chain |
 | WK-3 | Price a split of dTotalRecall? | price it before wave 3, as the spine's split was; keep it whole | a structural decision about the chain |
+
+## [wave-2-answers] Wave 2's forks, answered
+
+The owner approved wave 2 and took each fork's recommendation, 2026-10-18 (`[words]`):
+- **WK-1:** a minimal tester agent ships with dWitnessedBar in today's roles kit, and plays `test.attribute`,
+  `test.reason` and the fix pass's judgment. dBoundRoles re-founds it with the other roles. dWitnessedBar gains a
+  unit, and the critical path with it.
+- **WK-2:** dIndexedDesign and dRankedPlan follow dBoundRoles, so their stages' roles are bound before they start.
+  The research harness builds on the `experiment` shape outright, and its stand-in is gone.
+- **WK-3:** a split of dTotalRecall is priced before wave 3, in
+  `build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md`.
 
 ## [walk-instrument] The walk's facts, and the clause scan
 

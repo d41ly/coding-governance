@@ -312,6 +312,8 @@ posted to dependents. The build moves through Design whole (FL-D1).
   and its gate script. Changing them takes the tester's `test.attribute` judgment that the spec is wrong, which
   routes to Design as a new unit (P19). Its arm is seen red on a planted fix pass that writes the red leg's test file,
   and a fix pass after a failed `build.acceptance` leaves the acceptance commands' own files alone too (M16).
+- **The tester before dBoundRoles** (WK-1). Until dBoundRoles re-founds the roles, dWitnessedBar's minimal tester
+  agent plays `test.attribute`, `test.reason` and the fix pass's judgment, its allowance scratch only.
 - **Test is the landing verdict; testing elsewhere is a probe** (`[probe]`, P31).
 - **Roles:** tester; builders and the architect through its routes; reviewers with the gate lens at a
   breakpoint.
@@ -547,7 +549,8 @@ feeds `deploy.current`.
   binding for an experiment's acts.
 - **Before the builds it rests on land** (the closing review's H2 and M2). dPlacedRequest builds the program ahead of
   them, so each later part has a stand-in until its build lands:
-  - dBoundRoles' tester and `experiment` shape: `probe.design` and `probe.experiment` route to an owner item;
+  - the tester, dWitnessedBar's minimal one first (WK-1), and dBoundRoles' `experiment` shape: until each lands,
+    `probe.design` and `probe.experiment` route to an owner item;
   - dBoundRoles' `probe` outcome on the role templates: probes are placed, never raised;
   - dTotalRecall's `record` command: `probe.return` writes the probe record into the build folder, keyed as its kind
     declares;
