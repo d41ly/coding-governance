@@ -2340,6 +2340,9 @@ The whole-design shape audit, dispatches 116 and 117, derived from each run the 
   `/unattended` (SK-1), and the five question Skills stay as generated thin entries, every gov-rendered Skill named
   `gov-<name>` (SK-2).
 
+- 2026-10-19, session 1799cb98: the owner confirmed SK-2's names, renaming `/gov-drift-audit` to `/gov-drift`, and set
+  the instruction layer's rendering and adoption as the next review.
+
 ## Instruments
 
 ### The gap-ownership join

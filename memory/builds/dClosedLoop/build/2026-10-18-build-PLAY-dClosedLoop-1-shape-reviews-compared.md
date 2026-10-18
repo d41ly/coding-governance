@@ -379,10 +379,14 @@ How the answers were read:
 - **SK-2:** the five stay as thin entries, each generated from its command's drive row and never hand-written, and
   every gov-rendered Skill is named `gov-<name>`: `/gov-recall` and `/gov-runlog`, the owner's names, core shortcuts
   over `gov why`, `record find` and `gov trace`; `/gov-cleanup`, the owner's name; and `/gov-lexicon` and
-  `/gov-drift-audit`, read from the owner's "etc.", which v2's `[open]` keeps to confirm. Each rename ships as an upgrade
-  step with its old name forwarded for the window, and the Skill kind's conformance gate refuses a gov-rendered Skill
-  without the prefix. `gap-found-28` records today's bare names.
+  `/gov-drift-audit`, read from the owner's "etc.", which the owner then confirmed with `/gov-drift` for the second.
+  Each rename ships as an upgrade step with its old name forwarded for the window, and the Skill kind's conformance gate
+  refuses a gov-rendered Skill without the prefix. `gap-found-28` records today's bare names.
 
 Folded: v2's level-4 row, dWellOiledMachine's driver clause, dConvergedCharter's Skills clause and a new `/build`
 clause, `[open]` and a revision note; the memory plan's Skills pocket; the fates record's rendered-Skills row and a
 `/build` row; and `gap-found-28`, with the register's tally re-measured.
+
+The owner confirmed the names on 2026-10-19: "rename /gov-drift-audit to /gov-drift, otherwise approved. We will review
+Instruction layer's instruction rendering and adoption after." The rename is folded into v2's dConvergedCharter clause,
+its `[open]` entry, now confirmed, and its revision note, and into the fates record's rendered-Skills row.

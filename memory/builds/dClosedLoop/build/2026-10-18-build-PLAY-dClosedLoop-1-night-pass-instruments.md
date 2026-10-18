@@ -11426,6 +11426,105 @@ G.save()
 print(f"register: {total} gaps; fates: {n}, {len(fates)} rows")
 ````
 
+### `fold_skill_names.py`
+
+The owner's confirmation of SK-2's names, `/gov-drift` in place of `/gov-drift-audit`, folded into v2, the fates record, the comparison record and the session log.
+
+````python
+"""Fold the owner's confirmation of SK-2's names: `/gov-lexicon` as read, `/gov-drift` in place of `/gov-drift-audit`.
+Edits v2's dConvergedCharter clause, its `[open]` entry (now confirmed) and the Skills revision note, the fates record's
+rendered-Skills row, the comparison record's `[skills]`, with the owner's words verbatim, and the session log's event.
+
+Usage: python -X utf8 fold_skill_names.py <scratch-dir>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+S = pathlib.Path(sys.argv[1])
+sys.path.insert(0, str(S / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+COMPARED = "build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md"
+SAID = ("rename /gov-drift-audit to /gov-drift, otherwise approved. We will review Instruction layer's instruction "
+        "rendering and adoption after.")
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+T = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md")
+C = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md")
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+
+V.sub("`/gov-lexicon`, `/gov-drift-audit` and `/gov-cleanup` with their kits, each rename shipped",
+      "`/gov-lexicon`, `/gov-drift` and `/gov-cleanup` with their kits, each rename shipped", "dConvergedCharter clause")
+V.sub(f"Open, 2026-10-19, from the owner's answers on the rest of the Skills (`{COMPARED}` `[skills]`):\n"
+      "- SK-2's `/gov-lexicon` and `/gov-drift-audit` follow the owner's pattern, beside the owner's own `/gov-recall`,\n"
+      "  `/gov-runlog` and `/gov-cleanup`.\n",
+      f"Confirmed by the owner, 2026-10-19 (`{COMPARED}` `[skills]`): SK-2's names, `/gov-lexicon` as read, and\n"
+      "`/gov-drift` in place of `/gov-drift-audit`.\n", "open confirmed")
+V.sub("every gov-rendered Skill named `gov-<name>` (SK-2).\n",
+      "every gov-rendered Skill named `gov-<name>` (SK-2), the names confirmed with `/gov-drift` in place of\n"
+      "`/gov-drift-audit`.\n", "revision note")
+T.sub("`/gov-lexicon`, `/gov-drift-audit` and `/gov-cleanup` with their kits (dConvergedCharter)",
+      "`/gov-lexicon`, `/gov-drift` and `/gov-cleanup` with their kits (dConvergedCharter)", "fates row")
+C.sub("  over `gov why`, `record find` and `gov trace`; `/gov-cleanup`, the owner's name; and `/gov-lexicon` and\n"
+      "  `/gov-drift-audit`, read from the owner's \"etc.\", which v2's `[open]` keeps to confirm. Each rename ships as an "
+      "upgrade\n",
+      "  over `gov why`, `record find` and `gov trace`; `/gov-cleanup`, the owner's name; and `/gov-lexicon` and\n"
+      "  `/gov-drift-audit`, read from the owner's \"etc.\", which the owner then confirmed with `/gov-drift` for the "
+      "second. Each rename ships as an upgrade\n", "skills reading")
+C.sub("`/build` row; and `gap-found-28`, with the register's tally re-measured.\n",
+      "`/build` row; and `gap-found-28`, with the register's tally re-measured.\n\n"
+      f"The owner confirmed the names on 2026-10-19: \"{SAID}\" The rename is folded into v2's dConvergedCharter clause,\n"
+      "its `[open]` entry, now confirmed, and its revision note, and into the fates record's rendered-Skills row.\n",
+      "skills confirmed")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-19, session 1799cb98: the owner confirmed SK-2's names, renaming `/gov-drift-audit` to `/gov-drift`, and set
+  the instruction layer's rendering and adoption as the next review.
+""", "event")
+for rec in (V, T, C, L):
+    rec.save()
+````
+
+### `rewrap_skills.py`
+
+Rewraps the two [skills] paragraphs the confirmation lengthened, at 120 columns; a doubled space it left after the list dash was fixed by hand.
+
+````python
+"""Rewrap the two [skills] paragraphs the name confirmation lengthened, at the records' 120 columns."""
+import pathlib
+import sys
+
+p = pathlib.Path("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md")
+t = p.read_text(encoding="utf-8")
+
+
+def wrap(text, first, rest):
+    out, cur = [], first
+    for w in text.split(" "):
+        cand = (cur + " " + w) if cur.strip() else cur + w
+        if len(cand) > 120 and cur.strip():
+            out.append(cur)
+            cur = rest + w
+        else:
+            cur = cand
+    out.append(cur)
+    return "\n".join(out)
+
+
+start = t.index("- **SK-2:** the five stay as thin entries")
+end = t.index("`gap-found-28` records today's bare names.\n", start) + len("`gap-found-28` records today's bare names.")
+block = " ".join(ln.strip() for ln in t[start:end].split("\n"))
+t = t[:start] + wrap(block[len("- "):], "- ", "  ") + t[end:]
+start = t.index("The owner confirmed the names on 2026-10-19:")
+end = t.index("rendered-Skills row.\n", start) + len("rendered-Skills row.")
+block = " ".join(ln.strip() for ln in t[start:end].split("\n"))
+t = t[:start] + wrap(block, "", "") + t[end:]
+long = [ln for ln in t[t.index("## [skills]"):].split("\n") if len(ln) > 120 and not ln.startswith(("|", ">"))]
+if long:   # table rows and the quoted question cannot wrap; prose can
+    sys.exit(f"a [skills] prose line still runs past 120 columns: {long[0][:80]}")
+p.write_text(t, encoding="utf-8", newline="\n")
+print("rewrapped")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row.
@@ -11707,6 +11806,10 @@ MINE = [
     ("away/note_reconcile_shape.py", "Records that red in [folded], and registers these two scripts."),
     ("away/fold_skills.py", "The owner's answers on the rest of the Skills, SK-1 and SK-2, folded into v2, "
      "the memory plan, the fates record, the gap register, the comparison record's [skills] and the session log."),
+    ("away/fold_skill_names.py", "The owner's confirmation of SK-2's names, `/gov-drift` in place of "
+     "`/gov-drift-audit`, folded into v2, the fates record, the comparison record and the session log."),
+    ("away/rewrap_skills.py", "Rewraps the two [skills] paragraphs the confirmation lengthened, at 120 "
+     "columns; a doubled space it left after the list dash was fixed by hand."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row."),
     ("night/record_instruments.py", "This record's own writer."),
@@ -12730,13 +12833,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2388 nodes in 30 namespaces; 30905 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1620, derived 277, pending 491
+map: 2389 nodes in 30 namespaces; 30905 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1621, derived 277, pending 491
 map: no stale facts read 53 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 173 records, 3035 sections, 191 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 173 records, 3037 sections, 191 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
