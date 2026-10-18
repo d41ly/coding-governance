@@ -161,6 +161,11 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 97 | the same | The 52 nodes two or three round-2 verifiers found that the approved table lacks, as 30 findings, each to refute on membership, identity or owner | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-3-skeptic.md` | 1799cb98 | returned, 4m46s, 30.4k out: its verdicts are `[verdicts]` | `build/2026-10-18-build-PLAY-dClosedLoop-1-ownership-population.md` |
 | 98 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the spec-review workflow's declared medium, round 1 | The declared whole-design audit, step 4 of the owner's convergence order: v2 at blob `535c0e058` and the gap register at `9a05621f4`, read whole, eighteen layer and design records as specs | the args, recorded with the audit's fold | 1799cb98 | returned as `wf_cd0da8b3-895`, CLEAN WITH FIXES, 33 of 34 confirmed | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-design-audit.md` |
 | 99 | `tier2-review.js`, diff review, full: five `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the diff-review workflow's declared high, round 1 | The audit fold's closing review: `159b4d467` over `dc97a1b25`, twenty design records as specs | the args, recorded with its fold | 1799cb98 | returned as `wf_fbd955bb-a36`, CLEAN WITH FIXES, 26 of 38 confirmed | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-audit-fold-closing.md` |
+| 100 | gov-researcher, at the owner's medium effort | The night pass's point 1: unattended as the core flow's default state, the kit's functions homed, attended as an override | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-4-researcher.md` | 1799cb98 | returned, 7m40s, 42.1k out: one driver, with attendance on the breakpoint seam, and playbook mode seated by `repeat` | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-unattended-core.md` |
+| 101 | gov-researcher, at the owner's medium effort | Point 2: testing anywhere in the flow, the driver aware, roles testing and handing results down | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-5-researcher.md` | 1799cb98 | returned, 7m41s, 42.3k out: one probe program with two ways in, four other mechanisms each losing a test | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-testing-anywhere.md` |
+| 102 | gov-researcher, at the owner's medium effort | Point 3: code depth in the core, the map shaped mechanically and enriched, orientation by role | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-6-researcher.md` | 1799cb98 | returned, 16m59s, 54.8k out: a core code record, a per-item code slot, `git grep` as the floor | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-code-orientation.md` |
+| 103 | gov-researcher, at the owner's medium effort | Point 4: one relational syntax across memory, pulling a tag for its regions and instructions | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-7-researcher.md` | 1799cb98 | returned, 9m30s, 50.6k out: declare at the site, derive the rest, four other mechanisms each losing a test | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-relational-syntax.md` |
+| 104 | gov-researcher, at the owner's medium effort | Point 8: today's tools, function by function, and their fates under v2 | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-8-researcher.md` | 1799cb98 | returned, 11m18s, 70.3k out: 118 function rows, 11 undecided, the kit-level map stale in nine rows | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-tool-fates.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1164,6 +1169,21 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
 - returned — gov-researcher · wrote 0 files · 10m30s · 50.2k out · run direct/ad70c8e0c9a9c6236
 ```
 
+The night pass's researchers, dispatches 100 to 104, derived from their handoffs the same way:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-18-prompt-PLAY-dClosedLoop-1-4-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-4-researcher.md) · writes none · gates none · run direct/a0bc22eb32d23d896
+- returned — gov-researcher · wrote 0 files · 7m40s · 42.1k out · run direct/a0bc22eb32d23d896
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-18-prompt-PLAY-dClosedLoop-1-5-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-5-researcher.md) · writes none · gates none · run direct/a8d5661003dd2f490
+- returned — gov-researcher · wrote 0 files · 7m41s · 42.3k out · run direct/a8d5661003dd2f490
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-18-prompt-PLAY-dClosedLoop-1-6-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-6-researcher.md) · writes none · gates none · run direct/a46e90feff4376e95
+- returned — gov-researcher · wrote 0 files · 16m59s · 54.8k out · run direct/a46e90feff4376e95
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-18-prompt-PLAY-dClosedLoop-1-7-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-7-researcher.md) · writes none · gates none · run direct/a96b9c6992fb971ea
+- returned — gov-researcher · wrote 0 files · 9m30s · 50.6k out · run direct/a96b9c6992fb971ea
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-18-prompt-PLAY-dClosedLoop-1-8-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-8-researcher.md) · writes none · gates none · run direct/ab6d91f97ad7e1f8a
+- returned — gov-researcher · wrote 0 files · 11m18s · 70.3k out · run direct/ab6d91f97ad7e1f8a
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -1997,6 +2017,19 @@ The systems round's researchers, dispatches 73 to 82, derived from their handoff
   dFairHearing and dDeclaredLoop.
   - Fixed on the way in: dFairHearing's preset clause split into five units on its own parenthesis, 15 counted where
     11 were meant. `paren_semis.py` now scans every row for a split inside a clause.
+
+- 2026-10-18, session 1799cb98: during the walk, after wave 1 was presented, the owner handed over eight points and
+  stepped away for the night. Their words are in `build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[words]`.
+  The night pass, unattended:
+  - dispatched five researchers, 100 to 104, one point each, and worked points 5 to 7 itself;
+  - folded unattended-by-default, testing anywhere, code depth in the core, one relational syntax, the compaction
+    replay and five practices from Anthropic's AI-native SDLC playbook into v2 (P4, P20 and P25 amended, P31 to P33
+    added), flow-steps (a new `[probe]` program), the layer records and the ownership record;
+  - wrote the fates table, 131 parts, in `build/2026-10-18-build-PLAY-dClosedLoop-1-fates.md`;
+  - fixed the atlas's fold test (point 7), the map's kit-to-layer join, the clause scan's reading of quotes and the
+    reconciliation probe's reading of wildcard citations, each seen red first;
+  - registered twenty-eight gaps, grew the chain from 285 units to 331 and the critical path from 181 to 213, and
+    parked NP-1 to NP-24 for the owner.
 
 ## Instruments
 

@@ -39,7 +39,7 @@ def record(name):
 SOURCES = {key: record(name) for key, name in {
     "v2": "architecture-v2", "gaps": "gap-register", "steps": "flow-steps", "roles": "layer-roles",
     "instruction": "layer-instruction", "library": "layer-library", "memory": "layer-memory",
-    "expansions": "layer-expansions"}.items()}
+    "expansions": "layer-expansions", "fates": "fates"}.items()}
 LAYER_RECORDS = {
     "instruction": ["layer-instruction"],
     "flow": ["layer-flow", "flow-steps", "flow-roles"],
@@ -54,7 +54,7 @@ LAYER_RECORDS = {
     "lexicon": ["lexicon"],
     "review system": ["review-system"],
 }
-STEPS = ["entry", "plan", "design", "build", "test", "deploy", "breakpoint", "lifecycle", "adopt"]
+STEPS = ["entry", "plan", "design", "build", "test", "deploy", "breakpoint", "probe", "lifecycle", "adopt"]
 KINDS = ("command", "executor", "hook", "owner")
 SEP = re.compile(r"^\|(\s*:?-+:?\s*\|)+\s*$")
 ITEM_TAG = re.compile(r"`([a-z]+\.[a-z0-9-]+)`")
@@ -411,8 +411,10 @@ def derive():
                          # for the three expansions, which one record and one pair of rounds cover.
                          "reviews": [r["file"] for r in reviews
                                      if re.fullmatch(rf"{lnames[0].removeprefix('layer-')}-[ab]", r["scope"])],
-                         "folded": any("\n## [revised]" in text(r) or re.search(r"^Revised: .*Tier-2", text(r), flags=re.M)
-                                       for r in recs_l),
+                         # Folded: a record holds `[revised]` or a section whose tag ends in "fold", such as the
+                         # debt round's `[debt-fold]`, or a `Revised:` line naming its Tier-2 rounds.
+                         "folded": any(re.search(r"^## \[(?:revised|[a-z0-9-]*fold)\]", text(r), flags=re.M)
+                                       or re.search(r"^Revised: .*Tier-2", text(r), flags=re.M) for r in recs_l),
                          "sections": [{"path": rec["path"], "id": s["id"], "title": s["title"], "tag": s["tag"]}
                                       for n in lnames for rec in recs if rec["name"] == n and rec["group"] != "Reviews"
                                       for s in rec["sections"] if s["level"] == 2]})
@@ -440,9 +442,13 @@ def derive():
     consult = [{"component": r[0], "where": r[1], "absent": r[2]} for r in table(lcon, "Component", "layer-library [consult]")]
     library_items = sorted({t for p in lib_paths for t in ITEM_TAG.findall(p["where"] + " " + p["witness"]) if t in all_tags})
 
-    # The tooling map: each tool's fate.
-    _, tls = section(src["memory"], "tools")
-    tools = [{"verdict": r[0], "tools": r[1], "fact": r[2]} for r in table(tls, "Verdict", "layer-memory [tools]")]
+    # Each tool's fate: the fates record's kits and every part, function by function (night pass, point 8). Memory's
+    # kit-level tooling map is superseded, and stays readable in its record.
+    _, fk = section(src["fates"], "kits")
+    kit_fates = [{"kit": r[0], "fate": r[1], "what": r[2]} for r in table(fk, "Kit", "fates [kits]")]
+    _, ft = section(src["fates"], "table")
+    tools = [{"verdict": r[3], "tools": f"{r[0]} · {r[1]}", "fact": f"{r[4]}; decided by {r[5]}"}
+             for r in table(ft, "Kit", "fates [table]")]
 
     # Today against the target, area by area.
     stage_set = {g["stage"] for g in gaps}
@@ -537,7 +543,7 @@ def derive():
         "roster": roster, "chain": chain, "gaps": gaps, "policies": policies, "presets": presets,
         "principles": principles, "timeline": timeline, "reviews": reviews, "progress": progress,
         "libraryRound": library_round, "libraryPaths": lib_paths, "consult": consult, "libraryItems": library_items,
-        "tools": tools, "areas": areas, "loops": loops, "owed": owed, "v2open": v2open, "decisions": decisions,
+        "tools": tools, "kitFates": kit_fates, "areas": areas, "loops": loops, "owed": owed, "v2open": v2open, "decisions": decisions,
         "events": events, "v2map": v2map, "records": recs,
         "sources": {k: p.relative_to(REPO).as_posix() for k, p in SOURCES.items()},
     }

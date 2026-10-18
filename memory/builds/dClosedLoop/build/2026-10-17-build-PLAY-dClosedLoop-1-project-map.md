@@ -542,9 +542,10 @@ takes it.
 - **Core memory** (PM-2): kit memory-tree, chain build dTotalRecall.
 - **A view, not a record kind.** It is derived from the one index, never committed, and cached beside
   the index at `<git-common-dir>/gov/index/<tree>.map`.
-- **The codebase map adds code depth** where it is installed: symbols, callers and dossiers, through
-  an optional slot, `map.code`. That slot renders filled, searched with nothing found, or not
-  installed, with `gov tag where` named as the fallback.
+- **Code depth is core** (revised 2026-10-18, the night pass, point 3). dTotalRecall's `code` record fills each
+  item's `code` slot with its seed's neighbourhood, and level 0 holds one counted `code` line, never a line per file.
+  The slot renders filled, derived with nothing related, or not extracted for a language, with `gov code where`
+  named as the fallback. The map's owner views and the dossier's prose stay optional.
 
 ### [line] One line per node
 
@@ -622,8 +623,11 @@ header := "map " <tree-id> " · nodes " <int> " · lines " <int> " · folded " <
 | the reuse scout, at `design.seams` | the map, inside the house index |
 | the spec writer, at `design.unit-spec` and `review.fold` | the map |
 | the reviewer, at `review.lens` under the coherence and reuse lenses | the map |
-| unit workers: the builder, the tester and the rest | no map. They get their slice and the `refs` rows of their write set. A `gov map` call from one is journaled as a read outside its slice |
-| an attended session | the card and the whole map when it opens, under `memory.default-load: card-and-map` (PM-7) |
+| unit workers: the builder, the tester and the rest | no map. They get their slice and the `refs` rows of their write set, and since the night pass the builder and
+the tester get their write set's `code` slot (point 3). A `gov map` call from one is journaled as a read outside its slice |
+| the researcher, at `plan.research` and `design.research` | the map, and the `code` slot of its question's paths (night pass, point 3) |
+| the prompt writer | its actor's `map` and `code` slots, through the work order it frames (night pass, point 3) |
+| the owner's session | the card and the whole map when it opens, and again at a resume and a compaction, under `memory.default-load: card-and-map` (PM-7; night pass, point 5) |
 
 - **The slot.** dBoundRoles declares the `map` slot in the work order, beside `reuse`
   (`tools/roles/handoff.py:97`), and dTotalRecall's renderer fills it. The slot is hashed with the

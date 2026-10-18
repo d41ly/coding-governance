@@ -311,6 +311,8 @@ has no key:
   callers, shell and JavaScript callers through extractor packs, cross-language edges, and freshness
   by tree hash.
 - Recall's is layer-memory `[reuse]`: a record finder for "why" questions.
+- **Revised 2026-10-18, the night pass (point 3):** the map's code depth is core now, the `code` record, which partly
+  reverses KN-1. The map's owner views and the dossier stay optional, and the table's map row reads for those alone.
 - The lexicon's re-engineering is dMindYourWords'.
 
 This round adds what the core does when one is not installed.

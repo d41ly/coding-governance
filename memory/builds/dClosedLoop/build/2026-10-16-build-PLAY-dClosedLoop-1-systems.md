@@ -223,6 +223,11 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 
 ### [design-tags] Tags
 
+Revised 2026-10-18, the night pass (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md`, point 4): the tag system gains one closed set of typed edges, each declared
+at the site that owns its fact, with every inverse derived, and `gov tag bundle`, which returns a tag's members,
+regions and instructions as a manifest of ranges under `tags.bundle-rows`. `feature` becomes an instruction selector
+once dTotalRecall registers it (P33).
+
 - **Grammar.** `tag := <ns>.<seg>(.<seg>)*`, `seg := [a-z0-9][a-z0-9-]*`, at most 64 B. A section is
   `<doc> [<seg>]`, unique within its document. Ids keep memory's grammar: `FAMILY-<slug>-<seq>` and
   `gap-<area>-NN`. A first segment may not be a namespace word.
@@ -283,6 +288,9 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   | `tags.bare-refs` | charter-only, unique, never | charter-only |
 
 ### [design-annotations] Code annotations
+
+Revised 2026-10-18, the night pass (point 4): a `gov:note` block's extent is its definition's extent where one
+derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-of` edges in the closed set (P33).
 
 - **The line.** `gov:note <tag>[,<tag>…] — <definition, at most 80 chars> → <unit tag|path|command>
   [refs=<id|path>[,…]]`, and `gov:feature <tag>`. It holds a definition and pointers. A body line holding
@@ -452,6 +460,9 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   | `roles.orientation.house-index` | handed, pointer, off | handed |
 
 ### [design-memory-structure] Memory structure
+
+Revised 2026-10-18, the night pass (point 3): code depth joins the core as the `code` record, and each item's work
+order carries a `code` slot beside its memory slices (P32).
 
 - **Sections.** Each record kind's registry entry declares its sections as `[tag]`s, each required or
   optional. Legacy headings get derived anchors: the spec template's numbered headings map to tags by a

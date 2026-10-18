@@ -8,7 +8,8 @@ Usage:
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --ns <namespace>   print one namespace whole (level 1)
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --check            derive and check; write nothing
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --check --plant <case>   damage the render, expect exit 1
-      cases: drop-line, bad-count, ghost-rel, census, no-owner, orphan (an item's owner emptied), two-owners,
+      cases: drop-line, bad-count, ghost-rel, no-layer, fates-drop, fates-ghost, fates-bad, fates-unbuilt,
+      fates-empty, fates-kit, census, no-owner, orphan (an item's owner emptied), two-owners,
       inferred (a point's owner kept with its declaration dropped)
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --pending          list the nodes whose purpose waits on the owner
   --unfold <ns>[,<ns>...] renders those namespaces node by node, as an item's declared unfolds would.
@@ -38,6 +39,14 @@ SPLIT = " · "
 # from a declared field, and the extractor that reads it records the node in DECLARED: the no-inference check.
 OWNED = ("item", "policy-key", "point", "record-kind", "tag-namespace", "system")
 DECLARED = set()
+# Kits whose row in the instruction layer's kits table says "no layer"; every other kit joins a layer (the layer arm).
+NO_LAYER = set()
+# The fates record (night pass, point 8): each kit's declared fate, and every part's row, read for the fates arms.
+FATES = HERE / "2026-10-18-build-PLAY-dClosedLoop-1-fates.md"
+FATE_KITS, FATE_ROWS = {}, []
+FATE_KIT_SET = {"kept", "optional", "absorbed", "retired"}
+FATE_ROW_SET = {"STAYS", "RESHAPED", "MERGED", "RETIRED"}
+FATE_PSEUDO = {"top-level", "skills", ".githooks", "guides"}
 
 spec = importlib.util.spec_from_file_location("atlas", HERE / "2026-10-16-build-PLAY-dClosedLoop-1-atlas.py")
 atlas = importlib.util.module_from_spec(spec)
@@ -190,7 +199,17 @@ def derive():
     mapmd = text("memory/map/generated/MAP.md")
     kits_block = mapmd.split("\n## kits\n", 1)[1].split("\n## ", 1)[0]
     kit_names = [atlas.plain(atlas.cells(ln)[0]) for ln in kits_block.split("\n") if ln.startswith("| `")]
-    kit_layer = {k["kit"].strip("`").split("/")[-1].strip(): k["layer"] for k in A["kits"]}
+    # The instruction layer's kits table names one kit, or several joined by ", " or " and ", and opens its layer cell
+    # with a layer's name, or two joined by " and ". A row whose kind cell says "no layer" places its kits on none.
+    kit_layer = {}
+    for row in A["kits"]:
+        lead = re.match(r"\s*([A-Za-z]+(?:\s+and\s+[A-Za-z]+)?)", row["layer"])
+        lays = [w.lower() for w in re.split(r"\s+and\s+", lead.group(1))] if lead else []
+        for name in re.split(r",\s*|\s+and\s+", row["kit"]):
+            name = name.strip().strip("`").split("/")[-1].strip()
+            kit_layer.setdefault(name, lays)
+            if row["kind"].strip() == "no layer":
+                NO_LAYER.add(name)
     layer_tags = {l["tag"] for l in A["layers"]}
     kits = []
     for k in kit_names:
@@ -212,8 +231,21 @@ def derive():
             # Neither: the charter's own fact about the directory, where it states one (PM-5).
             fact = re.search(r"tools/" + re.escape(k) + r"/ — ([^.;]+)", text("AGENTS.md"))
             purpose = fact.group(1) if fact else ""
-        lay = kit_layer.get(k, "")
-        kits.append(node(k, purpose, src="derived", rels=[("layer", [lay] if lay in layer_tags else [])]))
+        kits.append(node(k, purpose, src="derived", rels=[("layer", [l for l in kit_layer.get(k, []) if l in layer_tags])]))
+    if FATES.exists():
+        body = FATES.read_text(encoding="utf-8")
+        for tag, width, sink in (("kits", 3, "kits"), ("table", 6, "rows")):
+            _, block = section(body, tag)
+            for ln in block.split("\n"):
+                c = atlas.cells(ln) if ln.startswith("| ") else []
+                if len(c) == width and c[0] != "Kit" and not set(c[0]) <= set("-"):
+                    if sink == "kits":
+                        FATE_KITS[c[0]] = c[1]
+                    else:
+                        FATE_ROWS.append(c)
+        for n in kits:
+            if n["key"] in FATE_KITS:
+                n["rels"].append(("fate", [FATE_KITS[n["key"]]]))
     ns["kit"] = kits
 
     live = text("memory/LIVE.md")
@@ -513,6 +545,9 @@ def check(A, ns, out, folded, plant=None):
     elif plant == "ghost-rel":
         i = next(i for i, ln in enumerate(lines) if ln.startswith("- chain."))
         lines[i] += " owner=dGhostBuild"
+    elif plant == "no-layer":
+        i = next(i for i, ln in enumerate(lines) if ln.startswith("- kit.") and " layer=" in ln)
+        lines[i] = re.sub(r" · layer=\S+", "", lines[i])
     seen, counts = {}, {}
     for ln in lines[2:]:
         if not ln.strip():
@@ -565,6 +600,48 @@ def check(A, ns, out, folded, plant=None):
         if a_set != m_set:
             findings.append(f"parity: {kind} on the map and not in the atlas {sorted(m_set - a_set)[:6]}, "
                             f"in the atlas and not on the map {sorted(a_set - m_set)[:6]}")
+    # Fates: every kit has a declared fate and rows, every row a known kit, a fate in its set and a destination.
+    if FATE_KITS or FATE_ROWS:
+        rows_, kits_ = [list(r) for r in FATE_ROWS], dict(FATE_KITS)
+        if plant == "fates-drop":
+            rows_ = [r for r in rows_ if r[0] != rows_[0][0]]
+        elif plant == "fates-ghost":
+            rows_.append(["ghostkit", "a part", "a job", "STAYS", "kept (dGroundRules)", "a plant"])
+        elif plant == "fates-bad":
+            rows_[0][3] = "MAYBE"
+        elif plant == "fates-unbuilt":
+            i = next(i for i, r in enumerate(rows_) if r[3] == "RESHAPED")
+            rows_[i][4] = "somewhere"
+        elif plant == "fates-empty":
+            i = next(i for i, r in enumerate(rows_) if r[3] == "RETIRED")
+            rows_[i][4] = ""
+        elif plant == "fates-kit":
+            kits_[next(iter(kits_))] = "maybe"
+        kitkeys, chainkeys = {n["key"] for n in ns["kit"]}, {n["key"] for n in ns["chain"]}
+        for k in sorted(kitkeys):
+            if k not in kits_:
+                findings.append(f"fates: kit.{k} has no [kits] row")
+            if not any(r[0] == k for r in rows_):
+                findings.append(f"fates: kit.{k} has no [table] row")
+        for k, f in kits_.items():
+            if f not in FATE_KIT_SET:
+                findings.append(f"fates: kit.{k}'s fate {f} is outside the set")
+            if k not in kitkeys:
+                findings.append(f"fates: [kits] names {k}, which is no kit node")
+        for r in rows_:
+            if r[0] not in kitkeys and r[0] not in FATE_PSEUDO:
+                findings.append(f"fates: a row names {r[0]}, which is no kit")
+            if r[3] not in FATE_ROW_SET:
+                findings.append(f"fates: {r[0]} · {r[1]} has the fate {r[3]}, outside the set")
+            elif r[3] != "RETIRED" and not set(re.findall(r"\bd[A-Z]\w+", r[4])) & chainkeys:
+                findings.append(f"fates: {r[0]} · {r[1]} names no chain build where it goes")
+            elif r[3] == "RETIRED" and not r[4].strip():
+                findings.append(f"fates: {r[0]} · {r[1]} retires with no replacement named")
+    # Layer: every kit line joins a layer, unless its kits-table row says "no layer" (dispatch 104 found all 19 empty).
+    for ln in lines[2:]:
+        m = LINE.match(ln)
+        if m and m.group(1) == "kit" and m.group(2) not in NO_LAYER and " layer=" not in ln:
+            findings.append(f"layer: kit.{m.group(2)} joins no layer")
     if any(re.search(r"\b20\d\d-\d\d-\d\d\b", ln) for ln in lines[2:]):
         findings.append("no stale facts: a line holds a date")
     # Owner: every node a build must build names exactly one chain build, read from a declared field (PM-8).

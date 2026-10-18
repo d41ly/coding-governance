@@ -374,9 +374,11 @@ set. The kinds sort by P28:
   becoming a log row), and one witness record per witness the flow
   declares (acceptance, verdict, attribution, transition, landing among them). Flow registers its
   flake, dupes and scope records. Runtime registers its return, act (launch, epoch, outcome), lease,
-  session binding, mailbox message and journal records.
-- **Optional components** (KN-1; Knowledge's before it): dossier, symbols and callers, with the map; the
-  lexicon; the recall index. The gotcha kind is core since KN-1, on the library side. The annotation
+  session binding, mailbox message and journal records. The night pass adds the `code` record, the `probe` record, and
+  the playbook and playbook set kinds (points 1 to 3).
+- **Optional components** (KN-1; Knowledge's before it): the dossier and the map's owner views; the
+  lexicon; the recall index. Code depth left this list in the night pass (point 3): the core `code` record replaces
+  the optional symbols and callers, which partly reverses KN-1 for the codebase map. The gotcha kind is core since KN-1, on the library side. The annotation
   index stays with the map and drift-audit, and the core reads `gov:feature` anchors by a one-marker
   scan (LB-4, layer-library `[placements]`).
 - **Moved out, 2026-10-18 (PM-12):** the run record, listed above as core (`RUN.md`) until then, is
@@ -407,6 +409,7 @@ layer that registers a kind adds its row.
 | diff | dIndexedDesign | its writer is `design.reentry`, classifying an amendment by a structural diff |
 | roster | dIndexedDesign | its writer is `design.decompose`, with the interface schema check; not the README's derived `roster` field |
 | inventory | dIndexedDesign | its writer is `design.inventory`, joined to every built unit |
+| playbook | dIndexedDesign | a design record kind carrying dScriptedRepeat's canon, which an ordinary build authors and the `repeat` disposition follows (night pass, point 1) |
 | acceptance | dDeclaredLoop | its writer is `build.acceptance`; dDeclaredLoop builds the witnesses computed rather than typed, the acceptance re-run by the executor among them (PM-12) |
 | scope | dScopedBuild | its writer is `build.scope` |
 | core result | dScopedBuild | its writer is `build.core`, the executor-written result |
@@ -416,6 +419,7 @@ layer that registers a kind adds its row.
 | selection | dWitnessedBar | its writer is `test.select` |
 | routing | dWitnessedBar | its writers are `test.route` and `test.flakes`, the re-entry's routing record; `release.route`, dShippedRelease's, also writes one |
 | seen-red | dWitnessedBar | its writer is `test.seen-red` |
+| playbook set | dWitnessedBar | its writer is the set check at Test: a playbook run's pieces joined by hash, and the set's identity derived from them (night pass, point 1) |
 | landing | dShippedRelease | the landing record; its writer is `deploy.record` |
 | comparison | dShippedRelease | its writer is `deploy.current` |
 | release | dShippedRelease | its writer is `release.record`, one per (SHA, environment) with its outcome |
@@ -444,8 +448,7 @@ layer that registers a kind adds its row.
 | decision | dTotalRecall | decisions split by kind, the major-decision log |
 | gotcha | dTotalRecall | gotchas handed by write set |
 | dossier | dTotalRecall | dossiers anchored to symbol keys |
-| symbols | dTotalRecall | the caller map |
-| callers | dTotalRecall | the caller map |
+| code | dTotalRecall | the core code record: files, definitions with their ranges and body hashes, imports, resolved calls, tests and kit membership, derived per blob and cached by tree hash. It replaces the optional symbols and callers (night pass, point 3) |
 | annotation index | dTotalRecall | the generated annotation index and its resolve check |
 | recall index | dTotalRecall | memory-recall narrowed to a record finder |
 | baseline | dTotalRecall | retrofit's `baseline` and `census` record kinds |
@@ -456,6 +459,7 @@ layer that registers a kind adds its row.
 | claim | dTotalRecall | the claim ref on the remote and the ask-family counter ref (`gap-mem-13`); `entry.claim` writes the claim |
 | maintenance record | dTendedCadence | the maintenance record |
 | recommendation | dDeclaredLoop | every `*.recommend` item writes it; the stage-exit recommendation is one mechanism, dDeclaredLoop's (AF-1) |
+| probe | dDeclaredLoop | its writer is `probe.return`: one record per probe, its kind a verification, a reproduction or an experiment, an experiment's record the measured reference that later acceptance cites (night pass, point 2) |
 | loop review | dCalibratedLens | its writer is `loop.record` |
 | value ledger | dCalibratedLens | a generated library view; `loop.price` regenerates it |
 | lexicon declaration | dMindYourWords | layer-memory lists the lexicon as an optional component's kind; dMindYourWords builds the declaration and its packs |
@@ -718,6 +722,10 @@ So the design is:
 
 ### [map] The map: symbols and callers, generated
 
+Revised 2026-10-18, the night pass (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md`, point 3): the symbols and callers below are one core record kind, `code`,
+no longer an optional component, with each definition's range and body hash, tests and kit membership added. Each
+item's work order carries its seed's neighbourhood from it in a `code` slot (P32).
+
 The map extends the existing seam, dispatch 24's pick A:
 - **Definitions:** every Python definition, including methods, nested and private functions, through
   `ast`.
@@ -840,6 +848,9 @@ order's root field, never the file.
   to two-rater agreement.
 
 ## [tools] The tooling map: keep, re-engineer, retire
+
+Superseded 2026-10-18 by the function-level fates table (`build/2026-10-18-build-PLAY-dClosedLoop-1-fates.md`), which
+found nine of these verdicts overtaken by later rounds (night pass, point 8). The table below is kept as it was.
 
 From dispatch 26. Where the memory design changes a verdict, the change is noted.
 

@@ -916,7 +916,7 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
   }
   function targetName(a) {
     var t = a.target;
-    if (t.tools) return 'the tooling map: keep, re-engineer, retire';
+    if (t.tools) return 'the tools\' fates: each kit, and every part by function';
     if (t.library) return 'memory\'s library side: four filling paths';
     if (t.transitions) return 'the flow layer and the build\'s transition table';
     if (t.step) {
@@ -1013,8 +1013,10 @@ mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border
       out.push(miniTable(['Component', 'Where', 'When absent'], D.consult.map(function (c) { return [c.component, c.where, c.absent]; })));
     }
     if (t.tools) {
-      out.push(el('div', { class: 'sub-head', text: 'Each tool\'s fate' }));
-      out.push(miniTable(['Verdict', 'Tools', 'Deciding fact'], D.tools.map(function (x) { return [x.verdict, x.tools, x.fact]; })));
+      out.push(el('div', { class: 'sub-head', text: 'Each kit\'s fate' }));
+      out.push(miniTable(['Kit', 'Fate', 'What becomes of it'], D.kitFates.map(function (k) { return [k.kit, k.fate, k.what]; })));
+      out.push(el('div', { class: 'sub-head', text: 'Every part, function by function' }));
+      out.push(miniTable(['Fate', 'Part', 'Where it goes, and who decided'], D.tools.map(function (x) { return [x.verdict, x.tools, x.fact]; })));
       out.push(el('div', { class: 'sub-head', text: 'Each kit\'s layer in the target' }));
       out.push(miniTable(['Kit or tool', 'Layer', 'Core or expansion'], D.kits.map(function (k) { return [k.kit, k.layer, k.kind]; })));
     }

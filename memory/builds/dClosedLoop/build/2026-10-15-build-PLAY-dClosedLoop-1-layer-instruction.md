@@ -234,7 +234,7 @@ In one line: Instruction says, Runtime enforces, Flow witnesses, Memory proves.
 | `push-main.sh`, the lander | Flow: Deploy (dShippedRelease); the lander's hardening is Runtime's | core |
 | the turnstile | Flow: Test, the host-wide bar semaphore | core |
 | session-kickoff | Flow: Entry, through the orientation scout | core |
-| unattended | Runtime: the supervisor, `resume-tick.sh` grown, and the `next` verb (RT-3); the `/unattended` Skill is a client of `run <build>` | core |
+| unattended | Runtime: dissolved by the night pass (point 1). Its supervisor seam, hooks and controls go to the runtime's own kit, and its ladder, transitions and claims to the loop kit; the `/unattended` Skill is a client of `run <build>` until dConvergedCharter retires it | core, until dissolved |
 | hooks | Runtime: enforcement at the tool boundary | core |
 | process-monitor | Runtime: reaping; its reports feed Observability | core |
 | branch-reconcile and the cleanup Skill | Runtime: isolation housekeeping | expansion |
@@ -408,7 +408,8 @@ Proposed gaps, each with its proposed owner build. The register holds them as `g
   `principle`, `kind`, `record` and `kit`.
 - Level says what wins; scope tags say who loads it. Two kinds of namespace:
   - **selectors** decide who loads a unit: `reader` (with `reader.every`, for every reader), `role`,
-    `item`, `step`, `practice` and `policy`;
+    `item`, `step`, `practice` and `policy`, and, since the night pass, `feature`, armed by dTotalRecall (point 4,
+    P33);
   - **descriptors** classify a unit and never select it: `level`, `layer`, `principle`, `kind`,
     `record` and `kit`.
 

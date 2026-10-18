@@ -297,8 +297,8 @@ each decision through mechanisms it supervises, enforces at every boundary, and 
  one dispatcher entry per event rendered from the kits' fragments, packs from every layer, failing
  closed on every CLI version through ask rules only the dispatcher answers, and a witness with a
  named reader behind every event that cannot
- attended: the owner's session is the driver, and runs acts from next through the same harness
- calls, bound the same way
+ attended or not: the supervisor drives, and the owner's session is its client; until dWellOiledMachine
+ lands, the owner's session hosts the same driver, bound the same way (night pass, point 1)
 ```
 
 ### [terms] The sibling layers' words, mapped
@@ -308,7 +308,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | Their word | Where | Runtime's part |
 |---|---|---|
 | the executor | flow-steps; roles `[cycle]`, `[trust]` and the matrix | the supervisor, together with the role harness it launches. It keys and cuts each work order fresh at the spawn, through dBoundRoles' renderer. It runs command items such as acceptance re-runs and the core checks, reads the mailbox at item boundaries, and queues commits. It is launched where `run.host` says. |
-| the driver | roles `[cycle]`: "The main session is the driver … The executor drives when no one attends." | attended, the owner's session; unattended, the supervisor. No model session drives unattended work. |
+| the driver | roles `[cycle]`: "The main session is the driver … The executor drives when no one attends." | the supervisor, in every mode (night pass, point 1). The owner's session is its client: it shows the announcements, takes the owner's dispositions and issues the owner's controls. Until dWellOiledMachine lands, the owner's session hosts the same driver program, bound as an act session. No model session drives. |
 | an act session | this record only | a headless `claude -p` session that the supervisor launches to host one role act's harness call. It decides nothing. The first draft called it a "driver session", a name the roles layer already uses. |
 | the actor kinds | the roles matrix: role, command, hook, executor, owner | a role item becomes a role act. The supervisor runs command and executor items. A hook item is awaited: its hook writes the witness when its event fires inside another act, and `next` reports it as awaiting that event. The supervisor raises an owner item. |
 
@@ -343,13 +343,14 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   So "never runs again" holds per instance, and the flow's loops still loop.
 - **Clients.** Runtime's verbs are the whole client surface (RT-3):
   - `next`, which prints the position function's answer, ending with its `next —` line;
-  - `run <build>`. Attended, it binds the owner's session as the driver. Unattended, it takes the build
-    lease and registers the build with the node's supervisor;
+  - `run <build>`, which takes the build lease and registers the build with the node's supervisor, attended
+    or not, the owner's session becoming its client (night pass, point 1);
   - the owner's pause, resume, withdraw and supersede (`gap-flow-10`), through dDeclaredLoop's guarded
     command. They extend unattended's `--hold`, `--resume` and `--abort`; supersede is new. The
     supervisor honours each at its next beat.
 
-  The `/build` and `/unattended` skills become clients of these verbs.
+  The `/build` and `/unattended` skills become clients of these verbs, and `/unattended` retires with the kit at
+  dConvergedCharter (night pass, point 1).
 
 ### [supervise] The supervisor: the executor, as a process outside any session
 
@@ -430,8 +431,8 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - Before a launch, the supervisor reserves the act's declared fan, its harness's static maximum,
     against a counter under the lease. When slots are short, it queues the act.
   - It releases the slots when the act session exits, or when the reap kills its tree.
-  - Attended, the PreToolUse entry on Workflow and Agent reserves the same way, and refuses instead of
-    queueing. Both calls run in the background, so the reservation is released when the call's work
+  - In the owner's session, while it hosts the driver, the PreToolUse entry on Workflow and Agent reserves
+    the same way, and refuses instead of queueing. Both calls run in the background, so the reservation is released when the call's work
     ends: at SubagentStop for an Agent call, and at the run's saved result for a Workflow call. A sweep
     keyed to the session's liveness frees what a dead session held.
   - agent-cap's per-prompt total is unchanged.
@@ -458,8 +459,8 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 
 ### [act] Acts, and how each is bound
 
-- **A role act is the roles cycle, in one call.** The act session, or attended the owner's session,
-  makes exactly one call: the registered role harness, with the act's work order and any persisted
+- **A role act is the roles cycle, in one call.** The act session, or the owner's session while it
+  hosts the driver, bound the same way, makes exactly one call (night pass, point 1): the registered role harness, with the act's work order and any persisted
   returns as its args. Inside that call the harness:
   - spawns the prompt writer;
   - wraps its task in the work order;
@@ -500,11 +501,11 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     journal entries.
   - **The shell.** An act session's allowance names the commands it may run, and act binding refuses a
     Bash or PowerShell call outside it. That binds the class behind the 25 ad-hoc scripts in
-    `[current]`. An attended owner's session keeps its freedom, and its product-code writes still pass
-    the write gate.
+    `[current]`. The owner's session is bound the same way for every role act it hosts. Outside role
+    acts it reads and orients, and its product-code writes still pass the write gate (night pass, point 1).
   - **Session binding.**
     - SessionStart writes a binding record: the build, plus either the act and its epoch or
-      "attended".
+      "owner", the session the owner types in, attended or not (night pass, point 1).
     - Act binding requires that record, so a crashed SessionStart makes the first gated call refuse.
     - A session outside every build's workspace is unbound. Act binding then does not apply, and the
       write gate still refuses product code that no specced unit owns.
@@ -1365,3 +1366,18 @@ expectation from a source the scanner does not enumerate, the node tick's includ
 lists the release keys the sweep reads; and `[tests]` gains a fuller `event-wait` and a `lifecycle`
 fixture. The debt comparison record's `[fold-expansions-fold-round3]` names each defect and where it
 went.
+
+## [revised-night] Revised 2026-10-18, the night pass
+
+The owner's point 1 (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[p1-unattended]`): unattended is the default state, and attendance changes only the
+owner's interactions, never the flow or role use. Amended in place:
+- `[terms]`: the supervisor is the driver in every mode, and the owner's session is its client;
+- the diagram, `[decide]`'s `run <build>` and its clients: the owner's session hosts the driver only until
+  dWellOiledMachine lands, bound as an act session, and `/unattended` retires with the kit;
+- `[act]`: the owner's session is bound the same way for every role act it hosts, and its binding record reads
+  "owner", since attendance is a mode and not a kind of session.
+
+The night pass's other runtime additions are units in v2's dWellOiledMachine row: the attend and unattend controls,
+the `step —` announcement, intake for a prompt that reaches no owner session, the browser capability and the visual
+capture adapter, the default load replayed at a compaction with `next`'s line, compactions journaled, and a hook
+pack's refusal text checked.

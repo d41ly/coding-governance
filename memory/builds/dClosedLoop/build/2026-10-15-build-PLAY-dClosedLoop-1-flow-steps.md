@@ -29,6 +29,11 @@ never collides with a policy key such as `policy.build.scope` (instruction layer
   - A refusal routes by default: it is recorded, and `next` returns the frontier, the unwitnessed items
     whose needs are witnessed.
   - Routes are declared explicitly where a policy value decides them.
+  - Every role item's outcome set includes `probe`, routed to `[probe]` under `probe.raise`, the probe's record
+    returned as the item's input on re-entry (night pass, point 2).
+- **Attendance changes no item.** Whether the owner attends never changes an item's actor, the driver or a binding.
+  It adds only the owner's interactions: the announcement, confirmations at breakpoints and owner questions asked
+  live (P4; `[breakpoint]`; night pass, point 1).
 - **Every route back is bounded.** A route back, a review round included, counts in the build's
   transition record. Past `flow.route-backs` returns to the same item, the loop becomes an owner item,
   resolved as [breakpoint]'s owner gate is (FH1).
@@ -68,15 +73,16 @@ The flow's router, before any step.
 
 | Item | Actor | Needs | Does | Proven by | Then | Owner |
 |---|---|---|---|---|---|---|
-| `entry.intake` | hook: prompt-submit, in an attended-bound session only | — | records the owner's prompt, its secrets redacted and its size capped | the hook-written intake entry, carrying the session binding it came from, keyed by its session and content, so it mints no id | `entry.orient`; no intake, because the hook crashed or never fired → `entry.orient` records it absent, and no request mandate exists | dWellOiledMachine |
+| `entry.intake` | hook: prompt-submit, in an owner-bound session only | — | records the owner's prompt, its secrets redacted and its size capped | the hook-written intake entry, carrying the session binding it came from, keyed by its session and content, so it mints no id | `entry.orient`; no intake, because the hook crashed or never fired → `entry.orient` records it absent, and no request mandate exists | dWellOiledMachine |
 | `entry.orient` | orientation scout | `entry.intake` | composes the session's card: refreshed, or the full kickoff's where no READY card exists | the card written to its stores, its keys recomputing | `entry.place`, `entry.place-check` or `entry.place-owner`, as `placement` says | dDeclaredLoop |
-| `entry.place` | orientation scout, under `placement: agent-places` | `entry.orient` | returns the disposition from the closed set (continue, amend, new, patch, ask, none), with its reason and evidence | `placement.check` over the return's facts | new → `entry.claim`, then Plan, or `plan.triage-rule` on a re-placement after `plan.dedupe`; amend → Design re-entry, or an `intake` message to the session holding the build; patch → `entry.claim`, then Design as a patch build; continue → that build's `next`; ask → filed; none → the answer relayed; a failed check → back to `entry.place` with the refusal | dDeclaredLoop |
+| `entry.place` | orientation scout, under `placement: agent-places` | `entry.orient` | returns the disposition from the closed set (continue, amend, new, patch, repeat, ask, none), with its reason and evidence | `placement.check` over the return's facts | new → `entry.claim`, then Plan, or `plan.triage-rule` on a re-placement after `plan.dedupe`; amend → Design re-entry, or an `intake` message to the session holding the build; patch → `entry.claim`, then Design as a patch build; repeat → `entry.claim`, then Design as a playbook run, its playbook supplying the feature design; an observation the request claims → `probe.trigger` first, as `probe.observations` says, and back to `entry.place` with the probe's record; continue → that build's `next`; ask → filed; none → the answer relayed; a failed check → back to `entry.place` with the refusal | dDeclaredLoop |
 | `entry.place-check` | command, under `placement: declared-checked` | `entry.orient` | checks the placement the request declares | `placement.check` over the declared placement | as `entry.place`'s outcomes; a failed check → the request returned with the refusal | dDeclaredLoop |
 | `entry.place-owner` | owner, under `placement: owner-places` | `entry.orient` | places the request | the owner's disposition record | as `entry.place`'s outcomes | dDeclaredLoop |
-| `entry.claim` | command | a `new` or `patch` disposition from any of the three placing items, or triage's select | mints the build's slug as memory `[names]` says, and claims it by a compare-and-swap push that creates `refs/gov/claims/<slug>` on the remote, the way unattended claims `refs/gov/runs/<slug>`; `check_slug_claimed` is only its local pre-check. The claim commit carries the claimant's key, the session and the intake's or the ask's content key, so a retry that finds its own key counts as claimed. On `patch` it also takes the build's lease, which a patch build never reaches `plan.lease` to take | the claim ref on the remote; on `patch`, the lease record too | claimed → Plan, or Design on `patch`; the slug claimed under another key → a fresh slug, within `flow.route-backs`; the lease refused → as `leases` says; the remote unreachable → no local id minted, the claim queued or refused as `leases.offline` says (DA-M13, FL1) | dDeclaredLoop |
+| `entry.claim` | command | a `new`, `patch` or `repeat` disposition from any of the three placing items, or triage's select | mints the build's slug as memory `[names]` says, and claims it by a compare-and-swap push that creates `refs/gov/claims/<slug>` on the remote, the way unattended claims `refs/gov/runs/<slug>`; `check_slug_claimed` is only its local pre-check. The claim commit carries the claimant's key, the session and the intake's or the ask's content key, so a retry that finds its own key counts as claimed. On `patch` or `repeat` it also takes the build's lease, which such a build never reaches `plan.lease` to take | the claim ref on the remote; on `patch` or `repeat`, the lease record too | claimed → Plan, or Design on `patch` or `repeat`; the slug claimed under another key → a fresh slug, within `flow.route-backs`; the lease refused → as `leases` says; the remote unreachable → no local id minted, the claim queued or refused as `leases.offline` says (DA-M13, FL1) | dDeclaredLoop |
 
-- **Whose prompt is intake.** Only a session whose binding record says "attended" writes intake. An
-  act session is bound to its act, and a `claude -p` an attended model runs from its shell is unbound,
+- **Whose prompt is intake.** Only a session whose binding record says "owner" writes intake: the session the
+  owner types in, attended or not, since attendance is a mode and not a kind of session (night pass, point 1). An
+  act session is bound to its act, and a `claude -p` the owner's session runs from its shell is unbound,
   so neither writes intake (Runtime's session binding).
 - **What intake keeps.** The prompt passes the secret scanner runlog ships (`scan_secrets` and its
   closed class list), which moves into the core with runlog's journal grammar. A match is redacted in
@@ -93,6 +99,10 @@ Other sources enter Plan's triage directly:
 - asks, which are core;
 - Maintain's filings and the Loop Review's proposals, from observability;
 - trackers and adopter feedback, from integrations.
+
+A prompt that reaches no owner session, through the mailbox's `intake` message or a cadence filer, a cyclic
+playbook's `repeat` included, is recorded as intake by dWellOiledMachine's filer and placed by `entry.place` the same
+way (night pass, point 1).
 
 ## [plan] Plan: is this worth building, and what exactly?
 
@@ -296,6 +306,10 @@ posted to dependents. The build moves through Design whole (FL-D1).
   lander publishes a candidate ref, as under `peer-node`. Remote CI runs the bar on it, and
   `test.verdict` reads its verdict under integrations' witness rule, keyed by the candidate's SHA. It
   is built when CI exists (R5.2).
+- **A fix pass keeps its check** (night pass, point 6). A fix pass's allowance excludes the red leg's own test files
+  and its gate script. Changing them takes the tester's `test.attribute` judgment that the spec is wrong, which
+  routes to Design as a new unit (P19).
+- **Test is the landing verdict; testing elsewhere is a probe** (`[probe]`, P31).
 - **Roles:** tester; builders and the architect through its routes; reviewers with the gate lens at a
   breakpoint.
 - **Instruction:**
@@ -437,6 +451,11 @@ parked under `park-item` or `park-build`, and the run stopped under `stop-run`. 
 - `three-gates` adds the design go at `design.exit` and the landing gate before `deploy.mandate`;
 - `every-stage` adds a gate at every step's exit.
 
+`attendance` adds the owner's interactions while the owner attends (night pass, point 1):
+- every attended value announces each act before it runs, with the `step —` line, and asks owner questions live;
+- `confirm-steps` adds a gate at every step's exit, and `confirm-acts` one before every act;
+- no value changes an item's actor, the driver or a binding, which the attendance rule's arm checks.
+
 **A reviewer breakpoint runs this program.** Its lens, refute and report items are one harness act,
 `tools/workflows/tier2-review.js` (finders, skeptic batches, one synthesis), which Runtime runs as one
 multi-agent act. The items are its witnessed stages:
@@ -466,6 +485,56 @@ multi-agent act. The items are its witnessed stages:
   (review-system `[lenses]`); the value ledger (observability). The bug-class catalogue is core
   since KN-1.
 
+## [probe] The probe: testing at any boundary
+
+Testing is not a step either (P31). A probe is one program with two ways in:
+- **placed** at an item boundary, as a breakpoint is: by `probe.points`, by the owner's request, or owed by
+  `probe.observations` when a request claims an observation;
+- **raised** by a role as the outcome of its item, under `probe.raise`, as research is routed: the asking item waits,
+  and the probe's record returns as its input on re-entry.
+
+Test stays the landing verdict. Only `test.verdict`'s runner-written record gates a landing, and no probe's verdict
+feeds `deploy.current`.
+
+- **Its kinds:**
+  - a **verification** checks a claim at a pinned SHA: an owner's observation, in the code or on screen;
+  - a **reproduction** makes a reported bug red before its fix;
+  - an **experiment** compares variants over a pre-registered corpus, and its record is the measured reference that
+    later acceptance cites.
+- **The driver knows a probe is owed,** because `next` returns the probe's items as the frontier while the asker
+  waits (P22).
+
+| Item | Actor | Needs | Does | Proven by | Then | Owner |
+|---|---|---|---|---|---|---|
+| `probe.trigger` | command | — | records why the probe opened: the boundary `probe.points` names, the owner's request, the observation `probe.observations` owes, or a role item's `probe` outcome under `probe.raise` | the trigger record, keyed by the boundary or the raising return, and by content for a probe before placement, which mints no id | opened → `probe.pin`; not opened → the flow continues | dDeclaredLoop |
+| `probe.pin` | command | `probe.trigger` | pins the subject by SHA, and records the question, the kind and the losing outcome before anything runs | the probe record's head, its losing outcome committed first | `probe.design` | dDeclaredLoop |
+| `probe.design` | the role `probe.verifier` names; for an experiment, the researcher | `probe.pin` | declares the method: the commands, or the `experiment` shape with its corpus, its variants and its judge | the method's schema check, and an experiment's fan checked against `probe.experiment.authority` | `probe.run`; an experiment beyond its authority → an owner item, resolved as `[breakpoint]`'s owner gate is | dDeclaredLoop |
+| `probe.run` | executor | `probe.design` | runs the commands at the pinned SHA, or launches the experiment's harness, keeping each output by hash; a visual verification runs through the visual capture adapter | the captured outputs by hash, and an experiment's shape-run rows | `probe.judge`; no capability for the method → `probe.return`, the verdict unrunnable | dDeclaredLoop |
+| `probe.judge` | command: the executor's re-run, or the experiment's scorer | `probe.run` | compares the outcome with the losing outcome: confirmed, refuted or inconclusive; an experiment measured, within noise or aborted | the re-run's or the scorer's computed verdict; where no command can judge, the verifier's judgment, recorded as claimed | `probe.return` | dDeclaredLoop |
+| `probe.return` | command, idempotent, through `record` | `probe.judge` | writes the probe record and hands it to the asking item as an input, or to the item after the boundary | the probe record | the asking item's re-entry, or the boundary's next item; a claimed verdict → an owner item, resolved as `[breakpoint]`'s owner gate is | dDeclaredLoop |
+
+- **Against Test and the breakpoint.** A probe gates nothing past the item that asked. A breakpoint disposes its
+  findings into folds, units or asks, while a probe hands its record back to the work. `probe.points` names
+  boundaries in `review.breakpoints`' grammar.
+- **The experiment shape,** dBoundRoles' `experiment` kind, after aScoutedSeam's benchmark, which no chain build
+  counts on:
+  - a corpus pinned to a point, with controls and decoys, and blinding at that point;
+  - variants sharing one return schema, run in a bounded fan;
+  - the scorer factory (dFairHearing) re-deriving every figure from committed raw outputs, paired over the cases every
+    variant answered;
+  - a blind judge for what no matcher can see;
+  - re-runs keyed by variant and effort, and cost as a pinned reading.
+- **A visual witness** is a set of deterministic DOM, console and layout assertions that the visual capture adapter
+  captured at the pinned SHA and the executor can re-run. An agent's reading of a screenshot is claimed. The owner's
+  own observation is an owner disposition. A visual defect worth keeping becomes a deterministic probe, seen red.
+- **Roles:** the tester verifies cold, as `probe.verifier` says; the researcher designs an experiment; the executor
+  runs it; a scorer or a blind judge decides it.
+- **Instruction:** the probe and tester-return schemas, each verdict set closed; the policies: `probe.points`,
+  `probe.raise`, `probe.observations`, `probe.experiment.authority`, `probe.verifier` and `flow.route-backs`.
+- **Memory:** writes the trigger, the probe record and an experiment's shape-run rows.
+- **Runtime:** the harness adapter's browser capability and the visual capture adapter, dWellOiledMachine's; act
+  binding for an experiment's acts.
+
 ## [lifecycle] The owner's controls: pause, resume, withdraw, supersede
 
 Runtime executes the owner's controls (dWellOiledMachine, RT-3). They extend unattended's `--hold`,
@@ -473,13 +542,15 @@ Runtime executes the owner's controls (dWellOiledMachine, RT-3). They extend una
 
 | Item | Actor | Needs | Does | Proven by | Then | Owner |
 |---|---|---|---|---|---|---|
-| `life.request` | owner | — | asks to pause, resume, withdraw or supersede the build, through the guarded command | the command's record | `life.quiesce`; resume → the build's `next` | dWellOiledMachine |
+| `life.request` | owner | — | asks to pause, resume, withdraw or supersede the build, or to attend or unattend it, through the guarded command | the command's record | `life.quiesce`; resume → the build's `next`; attend or unattend → the `override` record, scoped by `attendance.scope`, then the build's `next`, announced while attended | dWellOiledMachine |
 | `life.quiesce` | executor | `life.request` | dispatches nothing new. Each running act finishes within its ceiling. An open review fan finishes, and a prepared merge is discarded | the executor's record of the acts it let finish | pause → parked; withdraw or supersede → `life.notify`. Once a push is made, the build has landed, and a pause, withdraw or supersede is refused: the build closes through Deploy. One case is not refused: a withdraw or supersede of a landed build waiting at `deploy.released` goes to the release hold's owner item, keyed by (build, landed SHA), which `life.quiesce` opens unless one is open, through the notification adapter: close unreleased, or keep waiting. Once `deploy.unlease` has run, the request is an event wake, and `life.quiesce` runs under its instance's cadence lease (layer-runtime `[schedule]`) | dWellOiledMachine |
 | `life.notify` | command, idempotent | `life.quiesce` | posts `withdrawn` or `superseded` to dependents, with the replacement's slug | the mailbox posts | `life.snapshot` | dWellOiledMachine |
 | `life.snapshot` | command, idempotent | `life.notify` | commits the card's terminal snapshot | the snapshot commit | `life.unlease` | dWellOiledMachine |
 | `life.unlease` | command, idempotent | `life.snapshot` | deletes the leases, closes the mailbox (`[rules]`), and reclaims the build's workspaces | the deleted refs, the mailbox's messages in the folder, and the workspace record | `life.close` | dWellOiledMachine |
 | `life.close` | command | `life.unlease` | records the terminal transition: withdrawn, or superseded by its replacement | the transition record | closed | dWellOiledMachine |
 
+- **Attend and unattend stop at the record** (night pass, point 1). They quiesce nothing, since attendance changes no
+  item (P4): the next act reads the override and announces itself, or no longer does.
 - **A paused build keeps its leases.** The supervisor renews them while it is paused, so
   `leases.expiry-hours` never expires a paused build. Resume enters its `next`.
 - **A superseded build's kept work** passes to its replacement through the replacement's
