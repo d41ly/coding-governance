@@ -104,7 +104,8 @@ directly. Each handoff is in `prompts/`, and each return is saved verbatim besid
    - A playbook is a design record kind carrying dScriptedRepeat's canon (dIndexedDesign).
    - Following one is the `repeat` disposition. It enters Design as a patch build does, and the playbook supplies
      the feature design.
-   - Its pieces are built as units (dScopedBuild), and Test runs the set check (dWitnessedBar).
+   - Its pieces are built as units (dScopedBuild). Test runs the set check, which dIndexedDesign registers at Test's
+     leg-pack point.
    - A cyclic playbook is a cadence item that files `repeat` intakes (dTendedCadence).
    - The owner will expand it later; this is its seat.
 7. **Rejected from dispatch 100: dropping "attended briefs gated" from dRankedPlan.** That clause gates attended
@@ -453,8 +454,9 @@ Maintain.
   - `/unattended` itself.
 - **It stays true by check.**
   - The design map reads the fates record, and each kit line shows its fate.
-  - Six arms hold every kit to a row, every row to a known kit, every fate to its set, and every destination to a
-    chain build. Each arm was seen red on a plant.
+  - Twelve findings hold every kit to a row, every row to a known kit, every fate to its set, every destination to a
+    chain build, and the rows to the record's stated counts. An absent or malformed record stops the run. Each was
+    seen red on a plant (`[instrument]`).
   - The atlas's tools view reads it too.
 - **The kit-level map is marked superseded.** The thirteen places where records disagreed are settled in the fates
   record's `[stale]`.

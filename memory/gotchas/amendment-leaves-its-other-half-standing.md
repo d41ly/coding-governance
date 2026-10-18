@@ -65,6 +65,13 @@ The default is the amended half; the promises are the other half, spread across 
 build harness, the driver and two rendered guides. The harness template,
 `tools/workflows/tier2-review.template.js`, is anchored so the next edit to it selects this class.
 
+**Checklist line: a fold that moves an owner or grows a check re-reads the record's summaries of it.** Build
+dClosedLoop's night pass folded its closing review: the playbook set check moved to dIndexedDesign, and the map's
+fates check grew from six arms to twelve findings. The fold brought the record's fold and instrument sections in
+line, and left the per-point sections, written before it, saying "Test runs the set check (dWitnessedBar)" and "Six
+arms hold every kit to a row". Those sections were what the owner would read first. Grep the record for the old
+owner and the old count before calling a fold done.
+
 There is **no machine gate** for this class today, and the two arms above are filed as
 `TOOL-dTieredTribunal-24` rather than built here. Saying so plainly matters more than usual for this
 particular record: a class whose whole subject is a half-finished edit would be a poor place to leave

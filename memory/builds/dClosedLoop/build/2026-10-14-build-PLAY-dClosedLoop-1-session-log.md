@@ -2078,6 +2078,11 @@ The night pass's closing review, dispatch 105, derived from its run the same way
   and the walk's glance said 181 with no date. Each is pinned. The walk's `[chain]` now says its glance and wave 1
   are derived again when the walk resumes.
 
+- 2026-10-18, session 1799cb98: two of the night-pass record's per-point lines predated the review fold. Point 1 still
+  credited the playbook set check to dWitnessedBar, which the fold moved to dIndexedDesign, and point 8 still counted
+  six fates arms, where the fold left twelve findings. Both are fixed. No gate reads an owner named in prose, so
+  `amendment-leaves-its-other-half-standing` gains a checklist line instead.
+
 ## Instruments
 
 ### The gap-ownership join

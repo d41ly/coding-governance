@@ -3300,6 +3300,13 @@ After that commit, `2403c49ba`:
     records first. Then four lines in two records were pinned by Edits: the night-pass record's `[chain-impact]`
     path, NP-24's question, now 211, and its `[instrument]` path line; and the walk's glance, at `beda01950`, under
     a note that the glance and wave 1 are derived again when the walk resumes.
+
+After that commit, `0dce5cd2f`:
+
+14. Two per-point lines of the night-pass record, fixed by Edits: point 1's set check, now registered by dIndexedDesign
+    at Test's leg-pack point (as layer-memory's kind table says), and point 8's fates check, now twelve findings and two
+    stops. The gotcha `amendment-leaves-its-other-half-standing` gained a checklist line by one Edit, and
+    `gotchas.py --write` re-rendered its index.
 ````
 
 ## [red] The red runs, as captured
@@ -3886,12 +3893,12 @@ rc 1
 
 ````text
 $ design map
-map: 2237 nodes in 30 namespaces; 31203 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1499, derived 256, pending 482
+map: 2238 nodes in 30 namespaces; 31203 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1500, derived 256, pending 482
 rc 0
 
 $ atlas
-atlas: derived — 155 records, 2678 sections, 175 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 155 records, 2679 sections, 175 decision sections, 16 comparison areas, 33 principles
 rc 0
 
 $ fold state
