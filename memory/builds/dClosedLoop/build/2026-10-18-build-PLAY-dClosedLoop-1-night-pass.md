@@ -217,7 +217,8 @@ Gaps: gap-flow-18, gap-roles-21, gap-rt-23 and gap-test-18.
 4. **`git grep` is the floor,** for any language with no extractor and for the population hunts no map answers.
 5. **Who gets it:** the spec writer, builder, tester, researcher, architect and reviewer, and the prompt writer
    through its actor (`memory.code-roles`). The map's delivery table now includes the researcher and the prompt writer.
-6. **Level 0 holds one counted `code` line,** never a line per file. The map stands at 31,133 of its 32,768 B.
+6. **Level 0 holds one counted `code` line,** never a line per file.
+   At `15cec9200`, the map stood at 31,203 of its 32,768 B.
 
 **This partly reverses KN-1,** which made the codebase map an optional component.
 - The owner's words make code depth mandatory, so this pass reads them as the decision.
@@ -604,8 +605,13 @@ The rest are checklist lessons:
 The night pass's scripts and probes, and their runs, are in
 `build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass-instruments.md`. The order's gate is the committed
 `build/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py`. As committed, after the closing review's fold:
-- **The design map** derives 2,234 nodes in 30 namespaces, 31,203 of 32,768 B, rc 0. Its printed size leaves out the
-  head line's dirty marker.
+- **The design map** derives 2,235 nodes in 30 namespaces, 31,203 of 32,768 B, rc 0, at `15cec9200`. Its printed
+  size leaves out the head line's dirty marker.
+  - It reds on a design record quoting a map count with nothing pinning it on its line: a commit, or a research
+    record's cited line. At `15cec9200` this record said 2,234 nodes, counted before the session log's last event
+    added one. A first predicate, taking only a backticked sha for a pin, found ten quotes and nine unpinned. Widened
+    to a bare sha and a research record's cited line, the arm was red on six, four of them stale. Each is now pinned,
+    and the `unpinned-count` plant reds.
   - Its layer arm read 19 kits joined to no layer before the fix, rc 1, and none after it. It reads the derived kit
     nodes, and does not check that a layer is the right one.
   - It reads the fates record by name, so an absent one stops the run, and a row of the wrong width stops it too. Each

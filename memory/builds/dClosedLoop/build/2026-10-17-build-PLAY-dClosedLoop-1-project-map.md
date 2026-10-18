@@ -910,7 +910,8 @@ exit 2
 ```
 
 - **The whole design at level 0.** 325 lines in 24.1 KB, under the 32k budget with no degrading. That
-  is 2,008 nodes in 30 namespaces: 16 namespaces one line per node, and 14 folded to a counted line.
+  is 2,008 nodes in 30 namespaces in the run `01dcdd1ae` records: 16 namespaces one line per node, and 14 folded to a
+  counted line.
 - **It exits 2, never 0.** Every check passes. The record-kind namespace is registered with no
   extractor, since layer-memory lists the kinds in prose. So it reads unarmed, never green, and the
   header says so.

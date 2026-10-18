@@ -1361,5 +1361,5 @@ Revised 2026-10-18: the re-cut (`build/2026-10-18-build-PLAY-dClosedLoop-1-recut
   - the span share re-measured with the map's own extractors: the hybrid loses if 80% or more of a feature's outside
     spans sit in a derivable definition (point 4);
   - the code record's cold derivation re-timed at dTotalRecall's first unit: over 30 s or over 1 MB loses (point 3);
-  - the level-0 map's headroom, 31,133 of 32,768 B with the kits' layer and fate keys, budgeted for the `code` line
-    before it lands (point 3).
+  - the level-0 map's headroom, 31,203 of 32,768 B at `15cec9200` with the kits' layer and fate keys, budgeted for
+    the `code` line before it lands (point 3).

@@ -2068,6 +2068,11 @@ The night pass's closing review, dispatch 105, derived from its run the same way
   - The hosting rule reads one way everywhere. Attendance writes its own record kind, and `probe.design` keeps one
     actor.
 
+- 2026-10-18, session 1799cb98: after the fold's commit, `15cec9200`, the map's re-run read 2,235 nodes, where the
+  night-pass record quoted 2,234. Six quotes in four design records stated a map count with nothing pinning them, and
+  four of the six were stale. Each is now pinned to the commit that dates it, and the map's check reds on an unpinned
+  quote (plant `unpinned-count`). It was seen red on the records first (the night-pass record's `[instrument]`).
+
 ## Instruments
 
 ### The gap-ownership join

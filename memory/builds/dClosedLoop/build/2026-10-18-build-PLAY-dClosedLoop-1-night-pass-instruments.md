@@ -1970,6 +1970,43 @@ for k in sorted(hits, key=lambda k: -len(hits[k])):
 print(f"plain-word hits on a non-ancestor's record kind: {total}, over {len(hits)} kinds")
 ````
 
+### `pinned_counts.py`
+
+After the fold's commit: the design records' quoted map counts and their pins, run over the real tree before the map's arm was written.
+
+````python
+"""Probe: the design records that state a design map count (its nodes, or its bytes against the 32,768 cap) as a
+current fact, with no commit pinning it. A count the map prints goes stale with every fold, so a record may quote it
+only as a snapshot pinned to a sha on the same line.
+
+Usage: python -X utf8 pinned_counts.py   (from the worktree root); rc 1 on an unpinned quote
+Reads every build record except research returns, instruments, the session log and the review reports, which are
+dated by their own kind. It does not read counts spelled without a thousands comma, or quotes split across lines.
+"""
+import pathlib
+import re
+import sys
+
+B = pathlib.Path("memory/builds/dClosedLoop/build")
+SKIP = ("-research-", "-instruments", "-session-log")
+COUNT = re.compile(r"\b\d{1,3}(?:,\d{3})+ (?:nodes\b|of (?:its |the )?32,768\b)")
+PIN = re.compile(r"`[0-9a-f]{7,40}`")
+
+found = pinned = 0
+for p in sorted(B.glob("*.md")):
+    if any(s in p.name for s in SKIP):
+        continue
+    for i, line in enumerate(p.read_text(encoding="utf-8").split("\n"), 1):
+        for m in COUNT.finditer(line):
+            if PIN.search(line):
+                pinned += 1
+                continue
+            found += 1
+            print(f"UNPINNED {p.name}:{i}: {m.group(0)!r} in {line.strip()[:110]!r}")
+print(f"map counts quoted: {found + pinned} · pinned {pinned} · unpinned {found}")
+sys.exit(1 if found else 0)
+````
+
 ### `fold_np_self.py`
 
 The night pass's own sweep while the review ran: one actor per probe item, the observation entry.place returns, verify-at-plan's route, and Design's seventh input.
@@ -2996,6 +3033,8 @@ MINE = [
     ("night/merge_np.py", "Orders the night-pass record's sections point by point."),
     ("night/build_args_night.py", "The closing review's args: a light diff review of the night-pass commit at medium."),
     ("night/plain_cites.py", "H2: plain-word spellings of a non-ancestor's record kind in the chain rows, measured."),
+    ("night/pinned_counts.py", "After the fold's commit: the design records' quoted map counts and their pins, run over "
+     "the real tree before the map's arm was written."),
     ("night/fold_np_self.py", "The night pass's own sweep while the review ran: one actor per probe item, the "
      "observation entry.place returns, verify-at-plan's route, and Design's seventh input."),
     ("night/fold_np_residue.py", "Residue: layer-roles' driver sentence, and the owner's session named in the design "
@@ -3085,10 +3124,21 @@ The map on a fates record with one row widened by a cell, restored byte for byte
 The earlier plant suite against the committed probe:
 
 """ + block("text", read(S / "night/rf_plants.out")))
+parts.append("""
+## [after] After the fold's commit
+
+The map's re-run at `15cec9200` read 2,235 nodes, where the night-pass record quoted 2,234. The predicate, run over the
+build's records before any arm was written, took only a backticked sha for a pin:
+
+""" + block("text", "$ python pinned_counts.py\n" + read(S / "night/pinned_counts.out")) + """
+The map's arm, widened to a bare sha and a research record's cited line, on the records before their pins:
+
+""" + block("text", "$ python map.py --check\n" + "\n".join(
+    l for l in read(S / "night/map_unpinned_red.out").split("\n") if l.startswith(("FINDING", "map:"))) + "\nrc 1"))
 plants = []
 for p in ("no-layer", "fates-absent", "fates-drop", "fates-ghost", "fates-bad", "fates-unbuilt", "fates-empty",
           "fates-kit", "fates-kit-drop", "fates-kit-ghost", "fates-count", "fates-absorbed-stays", "fates-bare-none",
-          "fates-rel", "fates-none"):
+          "fates-rel", "fates-none", "unpinned-count"):
     out, rc = run(B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py", "--check", "--plant", p)
     plants.append(f"$ python map.py --check --plant {p}\n" + "\n".join(l for l in out.split("\n") if l.startswith(("FINDING", "atlas:")))
                   + f"\nrc {rc}")
@@ -3182,6 +3232,14 @@ After the night pass's first commit, during the closing review's fold:
 
 11. The night-pass record's `[instrument]` section was rewritten with the final numbers, and its fates-arm count
     corrected once `fates-none` landed.
+
+After the fold's commit, `15cec9200`:
+
+12. The map's generator gained the records' half of its no-stale-facts check, by three Edits: the `COUNT`, `PIN` and
+    `DATED` constants with `unpinned_counts()`, the arm in `check()`, and `unpinned-count` in its usage line. It was
+    run red on the records first. Then five lines in four records were pinned by Edits: v2's `[owed]` headroom,
+    gap-mem-30, and the night-pass record's `[p3-code]` item 6 and `[instrument]` map line, each at `15cec9200`; and
+    the project map's test run, at `01dcdd1ae`, the commit that recorded it (`git log -S` names it).
 ````
 
 ## [red] The red runs, as captured
@@ -3564,6 +3622,42 @@ rc 1
 ````
 
 
+## [after] After the fold's commit
+
+The map's re-run at `15cec9200` read 2,235 nodes, where the night-pass record quoted 2,234. The predicate, run over the
+build's records before any arm was written, took only a backticked sha for a pin:
+
+````text
+$ python pinned_counts.py
+UNPINNED 2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md:1364: '31,133 of 32,768' in "- the level-0 map's headroom, 31,133 of 32,768 B with the kits' layer and fate keys, budgeted for the `code` l"
+UNPINNED 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:182: '31,133 of its 32,768' in "| gap-mem-30 | Memory | LOW | The level-0 map stands at 31,133 of its 32,768 B with the kits' layer and fate k"
+UNPINNED 2026-10-16-build-PLAY-dClosedLoop-1-state.md:655: '2,008 nodes' in '161  01dcdd1ae records(dClosedLoop): the project map test-run — the whole design mapped at 2,008 nodes in 24.1'
+UNPINNED 2026-10-16-build-PLAY-dClosedLoop-1-state.md:719: '2,008 nodes' in '161  01dcdd1ae records(dClosedLoop): the project map test-run — the whole design mapped at 2,008 nodes in 24.1'
+UNPINNED 2026-10-17-build-PLAY-dClosedLoop-1-project-map.md:504: '1,589 nodes' in '| A flat map | loses: one line for every node is far over any slot (`research-project-map-a.md:116`, `research'
+UNPINNED 2026-10-17-build-PLAY-dClosedLoop-1-project-map.md:913: '2,008 nodes' in 'is 2,008 nodes in 30 namespaces: 16 namespaces one line per node, and 14 folded to a counted line.'
+UNPINNED 2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:220: '31,133 of its 32,768' in '6. **Level 0 holds one counted `code` line,** never a line per file. The map stands at 31,133 of its 32,768 B.'
+UNPINNED 2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:607: '2,234 nodes' in '- **The design map** derives 2,234 nodes in 30 namespaces, 31,203 of 32,768 B, rc 0. Its printed size leaves o'
+UNPINNED 2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:607: '31,203 of 32,768' in '- **The design map** derives 2,234 nodes in 30 namespaces, 31,203 of 32,768 B, rc 0. Its printed size leaves o'
+map counts quoted: 10 · pinned 1 · unpinned 9
+rc=1
+````
+
+The map's arm, widened to a bare sha and a research record's cited line, on the records before their pins:
+
+````text
+$ python map.py --check
+map: 2235 nodes in 30 namespaces; 31203 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1497, derived 256, pending 482
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md:1364 quotes the map's '31,133 of 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:182 quotes the map's '31,133 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-17-build-PLAY-dClosedLoop-1-project-map.md:913 quotes the map's '2,008 nodes' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:220 quotes the map's '31,133 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:607 quotes the map's '2,234 nodes' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:607 quotes the map's '31,203 of 32,768' with nothing pinning it on its line
+rc 1
+````
+
+
 ## [plants] The map's plants, re-run
 
 ````text
@@ -3676,6 +3770,9 @@ FINDING fates: kit.runlog carries fate=optional, and [kits] says None
 FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
+$ python map.py --check --plant unpinned-count
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:582 quotes the map's '31,203 of its 32,768' with nothing pinning it on its line
+rc 1
 ````
 
 
@@ -3683,12 +3780,12 @@ rc 1
 
 ````text
 $ design map
-map: 2235 nodes in 30 namespaces; 31203 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1497, derived 256, pending 482
+map: 2236 nodes in 30 namespaces; 31203 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1498, derived 256, pending 482
 rc 0
 
 $ atlas
-atlas: derived — 155 records, 2665 sections, 175 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 155 records, 2676 sections, 175 decision sections, 16 comparison areas, 33 principles
 rc 0
 
 $ fold state
