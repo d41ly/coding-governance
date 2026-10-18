@@ -5008,6 +5008,47 @@ W.done += 1
 W.save()
 ````
 
+### `fix_fork_ids.py`
+
+Wave 2's forks renamed to a family the map counts, under a title the atlas reads as forks.
+
+````python
+"""Wave 2's forks were minted as W2-1 to W2-3, which neither instrument reads as forks:
+- the map counts ids of the shape [A-Z]{2,3}-\\d{1,2}, a letters-only family, in a record's decision sections;
+- the atlas takes a section as a decision section by a tag it lists or a title naming forks, and "[wave-2-forks]
+  Parked for the owner" had neither.
+
+So the walk's forks become one family, WK-1 to WK-3, continued by later waves, under a title that names them. One
+option's text cited NP-24, which the map would count as a fourth fork of this record, so it now says "the spine's
+split". The session log's event carries the new ids. Usage: python -X utf8 fix_fork_ids.py   (from the worktree root)
+"""
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+W = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-walk.md")
+W.sub("## [wave-2-forks] Parked for the owner", "## [wave-2-forks] Wave 2's forks, parked for the owner", "title")
+W.sub("| price it before wave 3, as NP-24 was; keep it whole |", "| price it before wave 3, as the spine's split was; keep "
+      "it whole |", "NP-24 cite")
+n = len(re.findall(r"\bW2-([123])\b", W.text))
+if n != 8:
+    sys.exit(f"walk: expected 8 W2- mentions, found {n}")
+W.text = re.sub(r"\bW2-([123])\b", r"WK-\1", W.text)
+W.done += 1
+W.save()
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.sub("whom no agent plays today, in stages whose builds do not follow dBoundRoles (W2-1, W2-2). dTotalRecall, the\n"
+      "  largest block on the path, may split as dDeclaredLoop did (W2-3).",
+      "whom no agent plays today, in stages whose builds do not follow dBoundRoles (WK-1, WK-2). dTotalRecall, the\n"
+      "  largest block on the path, may split as dDeclaredLoop did (WK-3). The forks were first minted as W2-1 to W2-3,\n"
+      "  which the map does not count as forks, and were renamed before the owner saw them.", "event ids")
+L.save()
+````
+
 ### `record_instruments.py`
 
 This record's own writer.
@@ -5114,6 +5155,8 @@ MINE = [
     ("walk3/stage_actors.py", "Wave 2: the stage items acted by a role no agent plays today, against the chain's "
      "order of dBoundRoles."),
     ("walk3/record_walk3.py", "The owner's word on wave 1, and wave 2 presented with its three forks."),
+    ("walk3/fix_fork_ids.py", "Wave 2's forks renamed to a family the map counts, under a title the atlas reads as "
+     "forks."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -5927,12 +5970,12 @@ rc 1
 
 ````text
 $ design map
-map: 2257 nodes in 30 namespaces; 31566 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1516, derived 259, pending 482
+map: 2258 nodes in 30 namespaces; 31575 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1517, derived 259, pending 482
 rc 0
 
 $ atlas
-atlas: derived — 156 records, 2721 sections, 178 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 156 records, 2723 sections, 179 decision sections, 16 comparison areas, 33 principles
 rc 0
 
 $ fold state

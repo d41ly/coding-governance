@@ -367,7 +367,7 @@ namespaces, and closes 20 gaps, 6 of them HIGH.
   - It is the one stage build that lands before dBoundRoles binds the roles, and its stage names the tester three
     times: `test.attribute`, `test.reason` and the fix pass's judgment. No agent plays the tester today, and none
     until dBoundRoles lands at 113. The probe program declares a stand-in for the same gap, and Test declares none.
-    That is W2-1.
+    That is WK-1.
   - The reliability bar is what lets `strict` and `guarded` refuse hook bypass without stalling (R5.1).
 
 ### dBoundRoles: Roles
@@ -403,7 +403,7 @@ closes 25 gaps, 11 of them HIGH.
 - **To look at:**
   - Three of its slots render "not installed" until dTotalRecall lands, six units after it.
   - It binds the planner and the architect, whose items run dRankedPlan's and dIndexedDesign's stages, yet neither
-    build follows it. That is W2-2.
+    build follows it. That is WK-2.
   - 11 of its 25 gaps are HIGH. The roles layer is where P25, role work only in role agents, is enforced.
 
 ### dTotalRecall: Memory
@@ -442,7 +442,7 @@ dWellOiledMachine, dRankedPlan, dIndexedDesign and dShippedRelease. It owns 4 it
 - **To look at:**
   - It is the largest build in the chain, 40 units, and all of them sit on the critical path.
   - The nine new units, code depth and the relational syntax's memory half, may not be needed by dWellOiledMachine,
-    its successor on the path. If they are not, a split prices as dDeclaredLoop's did. That is W2-3.
+    its successor on the path. If they are not, a split prices as dDeclaredLoop's did. That is WK-3.
 
 ### dIndexedDesign: Design
 
@@ -462,7 +462,7 @@ it. It owns 10 items, 4 keys and 10 kinds, and closes 10 gaps, 4 of them HIGH.
 - **Since the walk opened:** three units from the night pass, the playbook kinds and the structured spec's edges. The
   research harness was re-based on the `experiment` shape, and gap-flow-17 came with them.
 - **To look at:** its stage's items are the architect's, and its research harness waits on dBoundRoles' `experiment`
-  shape. dBoundRoles is not its ancestor (W2-2).
+  shape. dBoundRoles is not its ancestor (WK-2).
 
 ### dRankedPlan: Plan
 
@@ -485,15 +485,15 @@ and 3 kinds, and closes 10 gaps, 5 of them HIGH.
 - **To look at:**
   - Until dWellOiledMachine lands, eighteen units after it, every Plan exit waits for the owner. Under unattended by
     default, that is the one owner gate the chain keeps for a while.
-  - Its stage's items are the planner's, and dBoundRoles is not its ancestor (W2-2).
+  - Its stage's items are the planner's, and dBoundRoles is not its ancestor (WK-2).
 
-## [wave-2-forks] Parked for the owner
+## [wave-2-forks] Wave 2's forks, parked for the owner
 
 | Fork | Question | Options, the recommendation first | What the answer sets |
 |---|---|---|---|
-| W2-1 | Who plays the tester before dBoundRoles lands? | a minimal tester agent ships with dWitnessedBar in today's roles kit and dBoundRoles re-founds it with the other roles, one more unit in dWitnessedBar; an owner item stands in, as the probe program's does, so every own or mixed red and every Test exit waits for the owner until dBoundRoles lands; the skeptic stands in, a role doing another's work against P25 | a structural decision |
-| W2-2 | Should dIndexedDesign and dRankedPlan follow dBoundRoles? | yes, both: dBoundRoles lands at 113, before either can start at 119, so the edges cost nothing and their stages' roles are bound first; keep them as they are, the stages' roles unplayed until dBoundRoles happens to land | a structural decision about the chain |
-| W2-3 | Price a split of dTotalRecall? | price it before wave 3, as NP-24 was; keep it whole | a structural decision about the chain |
+| WK-1 | Who plays the tester before dBoundRoles lands? | a minimal tester agent ships with dWitnessedBar in today's roles kit and dBoundRoles re-founds it with the other roles, one more unit in dWitnessedBar; an owner item stands in, as the probe program's does, so every own or mixed red and every Test exit waits for the owner until dBoundRoles lands; the skeptic stands in, a role doing another's work against P25 | a structural decision |
+| WK-2 | Should dIndexedDesign and dRankedPlan follow dBoundRoles? | yes, both: dBoundRoles lands at 113, before either can start at 119, so the edges cost nothing and their stages' roles are bound first; keep them as they are, the stages' roles unplayed until dBoundRoles happens to land | a structural decision about the chain |
+| WK-3 | Price a split of dTotalRecall? | price it before wave 3, as the spine's split was; keep it whole | a structural decision about the chain |
 
 ## [walk-instrument] The walk's facts, and the clause scan
 
