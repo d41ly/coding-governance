@@ -1,4 +1,4 @@
-**Serves:** research TOOL-aScoutedSeam-3
+**Serves:** research TOOL-aScoutedSeam-3 TOOL-aScoutedSeam-1
 
 # The blind judge's instructions for the diff-time arms
 

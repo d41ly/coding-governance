@@ -1,4 +1,4 @@
-**Serves:** research TOOL-aScoutedSeam-3
+**Serves:** research TOOL-aScoutedSeam-3 TOOL-aScoutedSeam-1
 
 # The blind judge and the `low` arm — the enumerated prompt holds at `medium` and fails at `low`
 

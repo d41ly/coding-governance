@@ -1,4 +1,4 @@
-**Serves:** research TOOL-aScoutedSeam-3
+**Serves:** research TOOL-aScoutedSeam-3 TOOL-aScoutedSeam-1
 
 # The enumerated-coverage prompt — how T1's prompt was written, and why it beat effort
 

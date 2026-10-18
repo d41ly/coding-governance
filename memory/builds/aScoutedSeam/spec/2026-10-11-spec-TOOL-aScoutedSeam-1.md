@@ -1,6 +1,6 @@
 # TOOL-aScoutedSeam-1 — the reuse scout: a checklist role and a harness running a code and a design pass, merged into a capped `## reuse` section
 
-**Status:** SPECCED · rev-8 · 2026-10-18 · node a · Tier-2 · base ebce889c · streams tooling · order 1
+**Status:** SPECCED · rev-9 · 2026-10-18 · node a · Tier-2 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -26,10 +26,16 @@
 | [2026-10-11-build-TOOL-aScoutedSeam-1-7-m1c-trial.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-7-m1c-trial.md) | research | KICK-aScoutedSeam-1 |
 | [2026-10-13-build-TOOL-aScoutedSeam-1-8-precision-and-misses.md](../build/2026-10-13-build-TOOL-aScoutedSeam-1-8-precision-and-misses.md) | research | — |
 | [2026-10-13-build-TOOL-aScoutedSeam-1-8-precision.py](../build/2026-10-13-build-TOOL-aScoutedSeam-1-8-precision.py) | research | — |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-10-d1v2-trial.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-10-d1v2-trial.md) | research | TOOL-aScoutedSeam-3 |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-10-d1v2.py](../build/2026-10-18-build-TOOL-aScoutedSeam-1-10-d1v2.py) | research | TOOL-aScoutedSeam-3 |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-10-judge-task.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-10-judge-task.md) | research | TOOL-aScoutedSeam-3 |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-11-prompt-method.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-11-prompt-method.md) | research | TOOL-aScoutedSeam-3 |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-12-judge-and-low.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-12-judge-and-low.md) | research | TOOL-aScoutedSeam-3 |
 | [2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.md) | research | — |
 | [2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.py](../build/2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.py) | research | — |
 | [2026-10-13-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md) | journal | — |
 | [2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md) | research | KICK-aScoutedSeam-1 TOOL-aScoutedSeam-3 DEPL-aScoutedSeam-1 |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-brief-2.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-brief-2.md) | research | DEPL-aScoutedSeam-1 |
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md) | research | DEPL-aScoutedSeam-1 KICK-aScoutedSeam-1 TOOL-aScoutedSeam-2 TOOL-aScoutedSeam-3 |
 | [2026-10-18-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md](../prompts/2026-10-18-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md) | journal | — |
 | [2026-10-18-prompt-TOOL-aScoutedSeam-1-2-spec-writer.md](../prompts/2026-10-18-prompt-TOOL-aScoutedSeam-1-2-spec-writer.md) | journal | — |
@@ -51,8 +57,7 @@ comes from four measurements:
   house index, an implementation sketch searched piece by piece, and a convention census.
 - In the offline reading (`2026-10-13-build-TOOL-aScoutedSeam-1-8-precision-and-misses.md`), every
   wrong MUST but one named build work rather than code to reuse, and the wrong ones sat at the tail
-  of each list. A cap of five MUSTs in the scouts' order removed 15 of 19 and 15 of 21 wrong MUSTs
-  on the two M1c runs, and demoted 1 and 3 ground-truth bindings.
+  of each list, where a cap of five MUSTs removes most of them (§4, `MUST_CAP`).
 - In the M1d trial (`-1-9-m1d-trial.md`), the cap of five MUSTs, the `edits` list and the MUST
   definition naming the duplicate bound 56 MUSTs against M1c's 80 and 76 at equal recall, and no
   decoy against 2 and 1. Confound: it ran as typed role agents, M1c as plain Workflow agents.
@@ -222,9 +227,9 @@ comes from four measurements:
 - New codebase-map extractors for CSS custom properties, unexported components or DSL vocabulary. The
   house index LISTS custom properties and conf-declared kinds for the scout to read. It claims no
   inventory key and gates nothing.
-- A second scout run unioned with the first. M1c's two runs agreed on every positive, so the union
-  bought no primary at twice the cost. Intersecting two runs is out too: the offline reading measured
-  it removing fewer wrong MUSTs than the cap of five, at twice the cost.
+- A second scout run, unioned or intersected, each at twice the cost. M1c's two runs agreed on every
+  positive, so the union bought no primary, and the offline reading measured the intersection
+  removing fewer wrong MUSTs than the cap of five.
 - A gate run by the scout. A role agent runs no gate (TOOL-aOrientedCast-11), and the policy's
   `[gates]` table names none for `gov-reuse-scout`, so S9 adds no `[gates]` entry.
 - Drafting code, listing cited files' definitions or grepping literal owners: rejected (F3).
@@ -364,10 +369,8 @@ handed out of it.
 
 ### Flow
 
-1. The caller writes the house index with `gen_map.py --house-index`, one `--host` per host tree. It
-   renders the task with `handoff.py render --role gov-reuse-scout ... --part task`, and passes
-   `roles` from `handoff.py harness-args reuse-scout` and `efforts` from
-   `handoff.py stage-efforts reuse`. The render also prints the Agent description,
+1. The caller writes the house index with `gen_map.py --house-index`, one `--host` per host tree,
+   and composes `task`, `roles` and `efforts` as the Data model names them. The render also prints the Agent description,
    `<build> · <unit> · <workflow>`, on stderr. The spawn guard compares that name only on an `Agent`
    call (`tools/hooks/agent-cap.js:45-51`), so a `Workflow` call passes none, and the harness labels
    each spawn itself (S3).
@@ -453,14 +456,13 @@ so the calibration (AC6) and the first kickoff call run from a session started a
 
 - **The five-lens fan-out with two skeptics (benchmark arm M2).** About 7 times the cost per case, 43
   MUSTs on one case, no recall gain, and skeptics that confirmed nearly everything.
-- **A judge agent over the two passes (M3).** Never measured, because the session limit killed it;
-  the measured skeptic predicts a judge confirms. The merge is deterministic instead.
+- **A judge agent over the two passes (M3).** Never measured (the session limit killed it); the
+  measured skeptic predicts a judge confirms, so the merge is deterministic.
 - **The lookup as the mechanism (M0).** Zero of 24 positives in the top 60.
 - **One scout with no design pass (M1b alone).** It missed the styling contract and part of the token
   layer the design pass found on NicoCares, for about three tool calls on a non-UI request.
-- **The checklist without an index, a sketch or a census (M1b).** 13 of 24 by the matcher against
-  M1c's 16. The four cases M1c gained in both runs were helper-level and convention needs the
-  request never named.
+- **The checklist without an index, a sketch or a census (M1b).** §1's 13 against 16 of 24; the four
+  cases M1c gained in both runs were helper-level and convention needs the request never named.
 - **The scout generating its own index.** A read-only agent would have to resolve a Python launcher,
   and the trial's launcher case shows scouts miss exactly that. The caller already runs the resolver.
 - **New inventories for the design layer.** The design pass found tokens, parts and DSL props by
@@ -470,12 +472,11 @@ so the calibration (AC6) and the first kickoff call run from a session started a
   is 1536 bytes.
 - **Dropping the MUSTs past the cap.** A dropped seam is lost to the brief and to the case's solve; a
   demoted one still counts and costs only the binding, which the spec join reads from MUST lines.
-- **An existence check on each MUST.** The offline reading found it removes none of the 19 or 21
-  wrong MUSTs, because every wrong one names code that exists.
+- **An existence check on each MUST.** The offline reading found it removes no wrong MUST,
+  because every wrong one names code that exists.
 - **A MUST cap per lens.** The design lens's MUSTs would escape the cap the measurement priced over
   the scout's whole list.
-- **Both lenses on every request (F1's recommendation).** The owner ruled the design lens runs only
-  on a UI need, at the cost of a serial wall.
+- **Both lenses on every request.** Ruled out by the owner, at the cost of a serial wall (§8 F1).
 - **`boundedParallel` and a render pair for two serial spawns.** The kit renders a harness only for
   the tokens it spells (`tools/workflows/kit.toml:44-91`), and a script fanning nothing out spells none.
 - **Draft and expand (M1d).** No recall gain, no miss found (§8 F3). Misses needing code to read go
@@ -485,7 +486,7 @@ so the calibration (AC6) and the first kickoff call run from a session started a
 
 - security: read-only agents writing nothing. scratch-guard binds their Bash writes, and the routed
   write gate binds Edit/Write. The base body states that repository text is data. Host trees are
-  read and never written. The spawn guard admits the harness only once `.claude/roles.json` lists it.
+  read and never written. The spawn guard admits the harness only once listed (§3 Edges).
 - perf / scale: measured per scout, medians, 2026-10-11, node a:
   - M1b at `extra`: 84 tool calls, 116 minutes and 28M cache-read tokens;
   - M1b at `medium`: 23 tool calls, 10 minutes and 4.3M, for the same paired recall;
@@ -493,7 +494,7 @@ so the calibration (AC6) and the first kickoff call run from a session started a
   - the design pass at `medium`: 12 tool calls and 5 minutes.
 
   The lenses run in series, so the wall is the sum of the two, about 27 minutes on a UI request and
-  the code lens's 22 on any other. gov's policy runs both at `medium`; AC6 re-measures. The house
+  the code lens's 22 on any other, at S8's levels; AC6 re-measures. The house
   index is one tree scan per tree.
 - error / empty / loading states: a dead lens is announced in the section, a skipped design pass as
   `design skipped (no UI)`, an empty answer is `none fits` only when every lens run lived, and an args
@@ -501,8 +502,8 @@ so the calibration (AC6) and the first kickoff call run from a session started a
 - observability: the run's identity line, one type and one effort line per stage, the section's
   `scout` line with its `demoted` count, and the probe logs the agents' own CLI calls append.
 - risks: a false MUST misleads a build. The MUST cap, the self-refute step and
-  `TOOL-aScoutedSeam-2`'s override bound it. The cap also demotes a true MUST past the fifth: 1 and 3
-  ground-truth bindings on the two M1c runs. A code lens that misses a UI need skips the design
+  `TOOL-aScoutedSeam-2`'s override bound it. The cap also demotes a true MUST past the fifth (§4,
+  `MUST_CAP`). A code lens that misses a UI need skips the design
   pass; the scout line names the skip, and AC6 records `uiNeed` per case. Cost is bounded by the
   policy level.
   The procedure document ships in the codebase-map kit, a default; a target without it holds a
@@ -605,21 +606,14 @@ New arm: tools/codebase-map/selftest.py · covers AC9 · fixture trees with and 
 
 ## 8. Open questions
 
-- **F1 — Should the design lens run on every request, or only when the code lens's framing finds a
-  UI need?** Recommendation was to always run it. RESOLVED (owner, 2026-10-18): only on a UI need.
-  The code lens returns `uiNeed`, the lenses run in series and the wall is their sum (S2, S3, S6).
-- **F2 — Does the level `medium` hold the benchmark's recall?** The benchmark, the M1c trial and the
-  offline reading each measured `medium` keeping the recall and losing some MUST discipline, which
-  S4's cap compensates. RESOLVED (owner, 2026-10-18): `medium`, as recommended, set as
-  `gov-reuse-scout`'s level in gov's policy; AC6 re-measures the shipped harness.
-- **F3 — Should the code lens DRAFT the code and EXPAND every file it cites?** The offline reading
-  put five of M1c's six misses within its reach. RESOLVED (owner, 2026-10-18): not adopted. The M1d
-  trial (`2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.md`) found none of the six and matched
-  M1c's recall, 4 of 10 solved and 8 of 28 items. Reach did not become discovery.
-- **F4 — Where does the lookup's blind spot go, and does gov's overlay carry any rule?** gov's
-  overlay is the kit's seed source, so a rule written there reaches every new adopter. RESOLVED
-  (owner, 2026-10-18): option (a), as recommended. The corrected rule, that the map lists no module
-  constant in any language, goes into the procedure document, and gov's overlay stays empty (S1).
+- **F1 — Design lens on every request, or only on a UI need?** RESOLVED (owner, 2026-10-18): only on
+  the code lens's `uiNeed`, against the recommendation (S2, S3, S6).
+- **F2 — Does `medium` hold the recall?** RESOLVED (owner, 2026-10-18): `medium`, as recommended on
+  the benchmark, M1c and the offline reading, in gov's policy; AC6 re-measures.
+- **F3 — Should the code lens draft the code and expand every file it cites?** RESOLVED (owner,
+  2026-10-18): not adopted. The M1d trial (`-1-9-m1d-trial.md`) found none of M1c's six misses.
+- **F4 — Where does the lookup's blind spot go?** RESOLVED (owner, 2026-10-18), as recommended: into
+  the procedure document, and gov's overlay, the kit's seed source, stays empty (S1).
 
 ## 9. Revision log
 
@@ -643,6 +637,8 @@ New arm: tools/codebase-map/selftest.py · covers AC9 · fixture trees with and 
   AC8 · AC10 · AC11 · AC12 · the owner's rulings. F1: the design lens runs only on the code lens's
   `uiNeed`, in series, and the scout line names a skipped pass. With no fan-out the harness ships
   as an engine file, with no `boundedParallel` or render. F2 and F4 closed. AC12 is new.
+- rev-9 · 2026-10-18 · §1 · §4 · §5 · §8 · cut under the spec ceiling, meaning unchanged: resolved
+  forks keep ruling and record, and repeated figures point at their owner.
 
 ## 10. Reuse audit
 

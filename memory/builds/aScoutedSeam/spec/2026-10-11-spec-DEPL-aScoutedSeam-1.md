@@ -1,6 +1,6 @@
 # DEPL-aScoutedSeam-1 — adopters get the scout and a resolved host tree, and the adopter-side gaps the research found are handed over
 
-**Status:** SPECCED · rev-4 · 2026-10-18 · node a · Tier-2 · base ebce889c · streams deployer+kickoff · order 5
+**Status:** SPECCED · rev-5 · 2026-10-18 · node a · Tier-2 · base ebce889c · streams deployer+kickoff · order 5
 
 <!-- gen:spec-records -->
 
@@ -64,9 +64,11 @@
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-59-skeptic.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-59-skeptic.md) | journal | — |
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-6-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-6-reuse-scout.md) | journal | — |
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-60-skeptic.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-60-skeptic.md) | journal | — |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-61-spec-writer.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-61-spec-writer.md) | journal | — |
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-7-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-7-reuse-scout.md) | journal | — |
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-8-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-8-reuse-scout.md) | journal | — |
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-9-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-9-reuse-scout.md) | journal | — |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-brief-2.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-brief-2.md) | research | TOOL-aScoutedSeam-1 |
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md) | research | KICK-aScoutedSeam-1 TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-2 TOOL-aScoutedSeam-3 |
 
 <!-- /gen:spec-records -->
@@ -113,11 +115,6 @@ reads them.
   - extend a style gate from colour to the lengths and type a token layer owns;
   - declare the lint-rule directory and the DSL vocabulary in `.codebase-map.conf`'s
     `HOUSE_INDEX_DIRS` and `HOUSE_INDEX_KINDS`, so the house index lists them;
-  - to run the diff mode at `high`, add `[effort.stages.reuse] diffCheck = "high"` to the roles
-    kit's `house/policy.toml` yourself. That file is seeded and never rewritten
-    (`tools/roles/README.md:173-176`), so an update does not bring gov's line, and the line is legal
-    only once the installed roles kit's `reuse` row carries the `diffCheck` stage key, which
-    `check_roles.py` refuses otherwise (R12);
   - put the project's own scout rules in the roles kit's `house/gov-reuse-scout.md` overlay, never
     in the base role, which every update overwrites (`tools/roles/README.md:17-23`).
   - AC4 observes it.
@@ -142,7 +139,8 @@ reads them.
   verb sits beside.
 - **consumes-from** `TOOL-aScoutedSeam-1` — the harness's `hostTrees` argument, and the calibration
   figures S4 quotes.
-- **consumes-from** `TOOL-aScoutedSeam-3` — the `diffCheck` stage key S4's policy line names.
+- **consumes-from** `TOOL-aScoutedSeam-3` — the `diffCheck` stage key, which runs at the scout
+  type's own level, so S4 names no policy line for it (`TOOL-aScoutedSeam-3` S6).
 - **hands-off** external — to the NicoCares owner: its charter's "no design system of its own" claim,
   which predates the 101-token layer, and its design gates, which refuse palette literals but not
   lengths or type.
@@ -227,10 +225,10 @@ and one runbook section.
   carries `REUSE_SCOUT_DEFAULT` and `REUSE_HOST_TREES`, both blank.
   Red when: either key ships armed.
 - **AC4** — When `WIRE-INTO-PROJECT.md` is read, its reuse-scout section names the two owner
-  decisions, the measured cost with its date, and the seven checklist items of S4, the `diffCheck`
-  policy line and the overlay among them.
-  Red when: the cost is written without the date it was measured, or the section says an update
-  writes the `diffCheck` line into an adopter's policy.
+  decisions, the measured cost with its date, and the six checklist items of S4, the overlay among
+  them.
+  Red when: the cost is written without the date it was measured, or the section tells an adopter to
+  add a `diffCheck` stage level to its policy.
 - **AC5** — When `govkit.py plan` runs for a fixture adopter selecting the review-harness kit,
   `reuse-scout.js` is planned as an engine file.
   Red when: the plan leaves the harness out.
@@ -262,6 +260,10 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 · a fixtur
   rung answers first, then the env, then the conf, and §4 and §5 state that the env cannot override
   a superproject. AC1 observes that order. `TOOL-aScoutedSeam-1` rev-8 ships the harness as an
   engine file, so S5 and AC5 no longer render it at the fan-out cap.
+- rev-5 · 2026-10-18 · S4 · §3 · AC4 · `TOOL-aScoutedSeam-3` rev-5 runs diff mode at the scout type's
+  own `medium`, with no stage override (`2026-10-18-build-TOOL-aScoutedSeam-1-12-judge-and-low.md`).
+  S4 drops the `diffCheck` policy item, leaving six, the edge consumes the stage key with no policy
+  line, and AC4 counts six and reds on a `diffCheck` stage level.
 
 ## 10. Reuse audit
 

@@ -1,4 +1,4 @@
-# **Serves:** research TOOL-aScoutedSeam-3
+# **Serves:** research TOOL-aScoutedSeam-3 TOOL-aScoutedSeam-1
 """T1: the diff-time duplicate check re-composed. A deterministic lister enumerates the units a diff
 ADDS, and the reviewer must return one verdict row per listed unit, so the first duplicate found
 cannot end the review. Tests the hypothesis that `medium` lost cases to an open-ended prompt with a
