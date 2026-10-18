@@ -174,6 +174,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 110 | gov-researcher, at the owner's medium effort | Point 5: pointing at any part of the flow and telling what happened | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-13-researcher.md` | 1799cb98 | returned, 8m30s, 43.7k out: not as designed; a cause on every record, cost on acts, a trace verb | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-observability-trace.md` |
 | 111 | gov-researcher, at the owner's medium effort | Point 6: the rebuilt kits superseding today's, seamlessly | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-14-researcher.md` | 1799cb98 | returned, 7m28s, 40.1k out: release-chained upgrade steps; a retired kit refuses today's whole update | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-supersession.md` |
 | 112 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, round 1 | The away pass's closing review: `a66c855f3` over `15cec9200`, twenty-seven design records as specs | the args, built by `build_args_away.py` in the instruments record (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass-instruments.md`) | 1799cb98 | returned as `wf_d5e376d2-7b1`, CLEAN WITH FIXES, 15 of 16 confirmed, 13 items, 2 high | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-away-pass-closing.md` |
+| 113 | gov-researcher, at the owner's medium effort | AP-17's future plan and AP-19's interpreter floor, asked while the owner answered the away pass's forks | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-15-researcher.md` | 1799cb98 | returned, 14m27s, 69.3k out: keep 3.11 and raise it to 3.12 by 2027-10; macOS and pwsh-launch planned behind triggers; AP-31 to AP-35 raised | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-python-floor.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1257,6 +1258,13 @@ The away pass's closing review, dispatch 112, derived from its run the same way:
 - returned — gov-synthesizer · wrote 1 file · 1m57s · 16.0k out · run wf_d5e376d2-7b1/a8aab7719527dcdc3
 ```
 
+Dispatch 113, derived from its handoff and this session's transcript the same way:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-18-prompt-PLAY-dClosedLoop-1-15-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-15-researcher.md) · writes none · gates none · run direct/a87e92ef2fa8792b9
+- returned — gov-researcher · wrote 0 files · 14m27s · 69.3k out · run direct/a87e92ef2fa8792b9
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -2197,6 +2205,12 @@ The away pass's closing review, dispatch 112, derived from its run the same way:
   high, and every item is folded (the away-pass record's `[review-fold]`). The fold adds dGroundRules' forwarding shim
   and dKeptSession's catalogue reader join, two gaps and a pair rule, gives the atlas and the map arms that refuse
   what they cannot read, and drops a key that duplicated `memory.legacy-anchors`.
+
+- 2026-10-18, session 1799cb98: the owner answered the away pass's thirty-five forks in nine batches (the away-pass
+  record's `[answers]`), twenty-seven of them as recommended, and the design carries them (`[folded-answers]`). The
+  upgrade-step kind becomes its own build, dSafePassage, whose first step raises the interpreter floor to Python
+  3.15; committed memory may name session ids; an act's credential is tried in order; and macOS and pwsh-launch are
+  planned behind triggers. The chain holds 21 builds, and its critical path is 195 units.
 
 ## Instruments
 

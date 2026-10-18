@@ -133,7 +133,7 @@ The shared grammar of an edge, at every site: `type=target[,target]`.
 | a record's section | the `## [tag] Title` heading, then at most one line `**Edges:** type=target type=target` | `record` |
 | an instruction unit | its row's `select`, `required-by` and `enforced-by` fields, as today, and `edges` in the same grammar | `instructions.edit` |
 | code | `gov:note <tags> — <definition> → <pointer> [refs=…]` and `gov:feature <tag>` | the builder, under the annotation grammar |
-| a commit | one trailer key per edge: `Gov-Unit:` and `Gov-Item:` for `serves`, `Gov-Act:` for `made-by`, with `Pass:` and `Decided:` kept as registered keys, each mapped to its edge type in the registry | the commit queue from the act binding; a `prepare-commit-msg` filler in the owner's session |
+| a commit | one trailer key per edge: `Gov-Unit:` and `Gov-Item:` for `serves`, `Gov-Act:` for `made-by`, `Gov-Session:` for `runs-in` as `trace.identity` says, with `Pass:` and `Decided:` kept as registered keys, each mapped to its edge type in the registry | the commit queue from the act binding; a `prepare-commit-msg` filler in the owner's session |
 | a work order | the `gov:handoff` marker (role, build, unit, path, `role-sha`, `task-sha`), gaining `item=` | the handoff renderer |
 | an act | the act record's fields: item instance, work order `task-sha`, harness, harness session, node, parent | the supervisor |
 | a kind's registry row | its writer and readers | dTotalRecall's registry |
@@ -168,7 +168,7 @@ derived.
 | `caused-by` | record → the record or event that caused it | the record header's `**Caused-by:**` | `causes` | new | why a thing exists; the trace's spine |
 | `follows` | act → work order | the act record | `followed-by` | new | under which instruction an act ran |
 | `answers` | return → work order; the owner's answer → fork | the return's header; the answer's section | `answered-by` | new | return to handoff (prose in 58 of 88 research records) |
-| `runs-in` | act, claim → session | the session binding; a claim's `session:` | `hosts` | new | act to session |
+| `runs-in` | act, claim, commit → session | the session binding; a claim's `session:`; the `Gov-Session:` trailer | `hosts` | new | act and commit to session |
 | `carries` | landing → unit, commit | the landing record | `carried-by` | new | what a landing moved |
 | `pinned-at` | record, probe, claim → commit or tree | "Derived at", a probe's pin | `pinned-by` | new: today's pins, now typed apart from `cites` | staleness |
 | `reads` | item, role → record kind | the kind's registry row | `read-by` | new | who reads a kind |
@@ -209,9 +209,10 @@ A session id addresses three things: a resumable conversation, its transcript, a
 plan keeps each where its writer keeps it and joins them by the act.
 - **The act is the key that does not depend on the harness.** The supervisor mints it at launch and records beside
   it the harness, the node and the harness's session id (`--session-id` presets it on Claude). Journal lines,
-  returns, commit trailers and records carry the act. Committed memory carries the act, not the session id, as the
-  owner's rule of 2026-09-13 keeps committed records free of session ids (`memory/builds/dLoggedFlight/README.md`);
-  `trace.identity` holds that default, and the owner may widen it (the away pass's `[forks]`).
+  returns, commit trailers and records carry the act. Committed memory carries the act and, beside it, the harness
+  session id, since the owner chose `trace.identity: session` (the away pass's AP-8). dLoggedFlight's run log keeps
+  its closed schema, whose leg refuses session ids (`memory/builds/dLoggedFlight/README.md`, owner, 2026-09-13),
+  until that leg reads the same key.
 - **A session is a node derived from bindings.** It joins its act by `runs-in` and its predecessor by `after`, through
   a resume or a fork. Its transcript is a witness the binding points at; it never leaves its node, so another node
   renders it `not-local: node <x>`.
@@ -337,4 +338,4 @@ line, each seen red on a planted case.
 | `memory.legacy-anchors`, widened | derived, none, retag | derived | the systems round's key gains `retag`: an adopter's own records are its own, and the default rewrites no file |
 | `commits.edge-check` | push-leg, commit-msg, off | push-leg | a refusal at commit time catches the owner's own commits mid-thought; the push is the binding boundary |
 | `commits.squash` | re-emit-union, refuse, accept-loss | re-emit-union | a squash drops every trailer; gov never squashes, an adopter may |
-| `trace.identity` | act-only, session, salted | act-only | the owner's rule of 2026-09-13 keeps session ids out of committed records |
+| `trace.identity` | act-only, session, salted | session | the owner's AP-8: committed memory may name the harness session id beside the act |

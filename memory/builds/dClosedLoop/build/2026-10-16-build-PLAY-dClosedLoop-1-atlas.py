@@ -122,7 +122,7 @@ KIND_MARKERS = ("no writer item", "writer item not named", "every step's")
 MEMORY_PLANTS = ("kind-unplaced", "kind-ghost-tag", "edge-status", "hop-edge", "edges-split")
 V2_VIEWS = {"layers": "overview", "principles": "principles", "front-door": "records", "policies": "policies",
             "presets": "policies", "floor": "records", "witnesses": "records", "contracts": "flow", "chain": "chain",
-            "open": "progress", "owed": "progress"}
+            "planned": "chain", "open": "progress", "owed": "progress"}
 
 
 def text(path):

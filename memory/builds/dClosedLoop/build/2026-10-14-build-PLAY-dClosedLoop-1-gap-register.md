@@ -212,6 +212,9 @@ extends.
 | gap-tool-17 | Tooling | LOW | A bug class carries no cause, language or platform field. | `research-compatibility.md` section 5 | — |
 | gap-tool-18 | Tooling | LOW | The node registry's platform facts are free text. | `research-compatibility.md` section 5 | — |
 | gap-tool-19 | Tooling | MED | No practice gives each language its role: shell grows outside shims, and each kit picks its own launch, encoding and path idioms. | `research-compatibility.md` section 3 | — |
+| gap-tool-20 | Tooling | MED | The bash resolver is copied, not shared: govkit's `resolve_bash`, `corpus_ids.py`'s copy and five more loops over `bash.exe` and `bash` search PATH only, so under a PATH without Git's bash they find none, and govkit's `resolve_shell_argv` then falls back to a bare `bash`, which Windows resolves to System32's WSL launcher under every launch shell. | `research-python-floor.md` section 4; the away pass's `[folded-answers]`; `memory/gotchas/subprocess-resolves-a-different-shell.md` | — |
+| gap-tool-21 | Tooling | HIGH | The interpreter floor is tested nowhere: no node runs the declared floor, remote CI sets up no Python, and a version-flagged parse accepts syntax the floor refuses. | `research-python-floor.md` section 2 | — |
+| gap-tool-22 | Tooling | MED | The interpreter floor is declared in eight files at 3.11, against the owner's 3.15 (AP-31), and raising it ships no upgrade step. | `research-python-floor.md` section 2 | — |
 | gap-lex-01 | Lexicon | HIGH | No class for forced names: every extracted definition is graded by its leading subtoken alone, so host-forced names (four pytest hooks, `__str__`, a command shim) and 22 names gov's own readers key on count as debt; the only exits are a pin raise or a corpus-wide text waiver, and history shows 19 raises and 0 waivers. Raised by the owner. | kit review, lexicon (`build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md`), `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-population.md` | — |
 | gap-lex-02 | Lexicon | HIGH | `--suggest` proposes renames that break overrides: `do_GET` to `cmd_get`, `emit` to `print`, `handle` to `run`, `get_queryset` to `read_queryset`, which breaks a Django view, and `setUp` to `set_up`, which silently stops unittest calling it; P29 would hand these answers to builders. Raised by the owner. | kit review, lexicon (`build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md`), `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-kit.md`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-population.md` | — |
 | gap-lex-03 | Lexicon | HIGH | Naming is enforced only as a corpus count at the bar: nothing judges a name at commit or by name, a fixed offender plus a new one nets to zero, and landings absorbed raises instead of holding the equality: 19 raises (+814) in the pin's history. Revised 2026-10-17, the debt round: this row once cited main's 1,088 against 1,087 since `8ddc0a482`, a red gone since `ef9c3fbab`. Raised by the owner. | kit review, lexicon (`build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md`), `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-kit.md` | — |
@@ -252,6 +255,7 @@ extends.
 | gap-rt-29 | Runtime | MED | The CLI on PATH and the application's bundled CLI drift apart, 2.1.292 against 2.1.299, the PATH one lacking a hook field the design needs, and a turn limit in use is undocumented. | `research-harness-cli.md` section 3 | — |
 | gap-rt-30 | Runtime | MED | No preflight refuses a launch that skips hooks or permissions (`--bare`, `--safe-mode`, the skip flag). | `research-harness-cli.md` section 4 | — |
 | gap-rt-31 | Runtime | MED | No fixture measures a harness adapter's capabilities: the Codex row went stale within days, and nothing separates what a harness can do from what an adapter claims. | `research-harness-cli.md` sections 3 and 4 | — |
+| gap-rt-32 | Runtime | MED | Which bash a harness hook runs in is not pinned: under a fresh terminal's PATH, Git's `usr/bin/bash.exe` sees no sed, awk, grep or mktemp, and `timeout` resolves to Windows' own. | `research-python-floor.md` section 4 | — |
 | gap-spine-01 | Spine | HIGH | No stage model: no kit, leg, dossier, role or hook declares the stage it serves, and the loop exists only implicitly. | design §4.1 (0 of 31 dossiers carry a stage); `tools/roles/workflows.toml` covers stages 0–7 only | — |
 | gap-spine-02 | Spine | HIGH | Guards read agent-written state across stages, against `[class]`. | build §4 (write gate), design §4.4 (INPROGRESS), test §5 C (pusher-written receipt), deploy §5 C | — |
 | gap-spine-03 | Spine | HIGH | Attended and unattended builds run different exit contracts. | build §3, §4 (DoD needs RUN.md) | — |
@@ -346,6 +350,7 @@ extends.
 | gap-maint-12 | Maintain | MED | No security review recurs: the security lens runs only when a build opts into it, and nothing re-reads the landed tree for security on a period. | night pass `[p6-sdlc]`, the playbook's practice 21; the owner's NP-19 (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[answers]`) | — |
 | gap-maint-13 | Maintain | LOW | A reading's breach gets one response whatever its size: nothing tiers it by how far the reading deviates, to log, to diagnose read-only or to act. | night pass `[p6-sdlc]`, the playbook's practice 20; the owner's NP-21 (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[answers]`) | — |
 | gap-maint-14 | Maintain | MED | A node that dies before its journal reader writes the run record leaves a run nothing detects. | `research-observability-trace.md` section 2 | — |
+| gap-maint-15 | Maintain | LOW | Nothing watches the interpreter floor's end of life: Python 3.10 reached its end on 2026-10-01, and WSL's Ubuntu 22.04 still resolves it. | `research-python-floor.md` section 2 | — |
 | gap-review-01 | Review | HIGH | Review exists at two stages only; Plan, Test, Deploy and Maintain have none. | every record §3 | — |
 | gap-review-02 | Review | HIGH | No review of the loop itself: no retrospective reads the loop's metrics and changes a stage contract. | maintain §3, §4 | — |
 | gap-review-03 | Review | MED | Review cost is high: a spec audit runs 11 or 12 agents (9 when this row was written) and about 0.81 M tokens, and that cost is why audits are off by default. | design §5 C3; agent count re-measured by the review system's research, 2026-10-15 | — |
@@ -643,4 +648,13 @@ join of these 296 keys against v2's chain rows finds each owned by exactly one b
 ```text
 Roles=23 Deploy=24 Plan=8 Spine=13 Orient=20 Test=20 Runtime=31 Lexicon=10 Tooling=19 Review=16 Foundation=26 Build=5 Memory=39 Flow=18 Maintain=14 Design=10
 LOW=55 MED=139 HIGH=102
+```
+
+Re-measured after the owner's answers to the away pass's forks added five gaps, `gap-tool-20` to `gap-tool-22`,
+`gap-rt-32` and `gap-maint-15` (`build/2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md` `[folded-answers]`), and moved
+five of dGroundRules' gaps to dSafePassage, same instrument, over 301 keys:
+
+```text
+Roles=23 Deploy=24 Plan=8 Spine=13 Orient=20 Test=20 Runtime=32 Lexicon=10 Tooling=22 Review=16 Foundation=26 Build=5 Memory=39 Flow=18 Maintain=15 Design=10
+LOW=56 MED=142 HIGH=103
 ```

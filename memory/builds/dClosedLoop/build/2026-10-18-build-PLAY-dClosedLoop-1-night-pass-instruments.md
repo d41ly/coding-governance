@@ -4413,7 +4413,8 @@ for ln in chain.split("\n"):
         units[m.group(1)] = len([u for u in m.group(3).split("; ") if u.strip()])
         parents[m.group(1)] = [p.strip() for p in m.group(2).split(",") if p.strip() in
                                re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)]
-assert len(units) == 20, len(units)   # 16 until SP-1, 18 until WK-4 split dTotalRecall and dBoundRoles, 2026-10-18
+assert len(units) == 21, len(units)   # 16 until SP-1, 18 until WK-4 split dTotalRecall and dBoundRoles, 20 until
+#                                       AP-25 gave the upgrade-step kind its own build, dSafePassage, 2026-10-18
 
 
 def longest(par):
@@ -7716,6 +7717,778 @@ L.insert_before("\n## Instruments\n", """
 L.save()
 ````
 
+### `chain_clauses.py`
+
+Prints v2's `[chain]` rows one clause per line, by build or pattern: how the clauses the owner's answers touch were read.
+
+````python
+"""Print selected v2 [chain] rows, one clause per line, with each row's header cells. Writes nothing.
+
+Usage: python -X utf8 chain_clauses.py <build> [<build> ...] [--grep <regex>]   (from the worktree root)
+"""
+import re
+import sys
+
+V = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+args = sys.argv[1:]
+pat = None
+if "--grep" in args:
+    i = args.index("--grep")
+    pat = re.compile(args[i + 1], re.I)
+    args = args[:i] + args[i + 2:]
+chain = open(V, encoding="utf-8").read().split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| ([^|]+) \| ([^|]+) \| (.+) \| ([^|]+) \|$", ln)
+    if not m or (args and m.group(1) not in args):
+        continue
+    clauses = [c for c in m.group(4).split("; ") if c.strip()]
+    hits = [(i, c) for i, c in enumerate(clauses, 1) if not pat or pat.search(c)]
+    if not hits:
+        continue
+    print(f"== {m.group(1)} | {m.group(2).strip()} | after: {m.group(3).strip()} | {len(clauses)} units | last cell: {m.group(5).strip()[:80]}")
+    for i, c in hits:
+        print(f"  {i:>2}. {c}")
+````
+
+### `bare_bash_census.py`
+
+AP-33's census: tracked Python calls that launch a bare `bash`, which read none.
+
+````python
+"""Count tracked Python calls that launch a bare `bash` (AP-33's gap). On Windows, CreateProcess searches System32
+before PATH, so a bare `bash` there runs WSL's launcher wherever WSL is installed, under every launch shell.
+
+A site is a call to subprocess's run, call, check_call, check_output or Popen, or os.exec*/os.spawn*, whose first
+argument is a list or tuple literal starting with the string "bash" or "bash.exe". Built argv lists are not
+resolved, so the count is a floor. Reads the tracked tree; writes nothing.
+
+Usage: python -X utf8 bare_bash_census.py   (from the worktree root)
+"""
+import ast
+import subprocess
+from collections import Counter
+
+CALLS = {"run", "call", "check_call", "check_output", "Popen"}
+files = subprocess.run(["git", "ls-files", "*.py"], capture_output=True, text=True, check=True).stdout.split()
+sites, unparsed = [], []
+for path in files:
+    try:
+        src = open(path, encoding="utf-8").read()
+        tree = ast.parse(src)
+    except (SyntaxError, UnicodeDecodeError, OSError):
+        unparsed.append(path)
+        continue
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call) or not node.args:
+            continue
+        f = node.func
+        name = f.attr if isinstance(f, ast.Attribute) else f.id if isinstance(f, ast.Name) else ""
+        if name not in CALLS and not name.startswith(("exec", "spawn")):
+            continue
+        a = node.args[0]
+        if isinstance(a, (ast.List, ast.Tuple)) and a.elts and isinstance(a.elts[0], ast.Constant) \
+                and a.elts[0].value in ("bash", "bash.exe"):
+            sites.append((path, node.lineno))
+area = Counter("records" if p.startswith("memory/") else p.split("/")[0] if "/" in p else "root" for p, _ in sites)
+print(f"tracked .py files {len(files)}, unparsed {len(unparsed)}")
+print(f"bare-bash call sites {len(sites)} in {len({p for p, _ in sites})} files; by area: "
+      + ", ".join(f"{k} {v}" for k, v in sorted(area.items())))
+for p, n in sites[:12]:
+    print(f"  {p}:{n}")
+````
+
+### `bare_bash_lists.py`
+
+AP-33's census, widened to every argv-shaped literal starting with `bash`.
+
+````python
+"""Every list or tuple literal in tracked Python whose first element is the string "bash", with its enclosing line,
+so a built argv is seen where the call-site census reads none. Writes nothing.
+
+Usage: python -X utf8 bare_bash_lists.py   (from the worktree root)
+"""
+import ast
+import subprocess
+from collections import Counter
+
+files = subprocess.run(["git", "ls-files", "*.py"], capture_output=True, text=True, check=True).stdout.split()
+hits = []
+for path in files:
+    src = open(path, encoding="utf-8").read()
+    lines = src.split("\n")
+    for node in ast.walk(ast.parse(src)):
+        if isinstance(node, (ast.List, ast.Tuple)) and node.elts and isinstance(node.elts[0], ast.Constant) \
+                and node.elts[0].value in ("bash", "bash.exe"):
+            hits.append((path, node.lineno, lines[node.lineno - 1].strip()[:110]))
+area = Counter("records" if p.startswith("memory/") else p.split("/")[1] if p.startswith("tools/") else p.split("/")[0]
+               for p, _, _ in hits)
+print(f"argv-shaped literals starting with bash: {len(hits)} in {len({p for p, _, _ in hits})} files; "
+      + ", ".join(f"{k} {v}" for k, v in sorted(area.items())))
+for p, n, l in hits:
+    if not p.startswith("memory/"):
+        print(f"  {p}:{n}  {l}")
+````
+
+### `bare_bash_repro.py`
+
+AP-33's reproduction: a bare `bash` from a Windows Python, beside PATH's bash.
+
+````python
+"""Reproduce AP-33's class: what a bare `bash` from a Windows Python runs, beside the bash a PATH search finds.
+Runs one read-only command in each; writes nothing.
+
+Usage: python -X utf8 bare_bash_repro.py   (from a Git-Bash launch)
+"""
+import shutil
+import subprocess
+
+CMD = "echo $BASH_VERSION; uname -s"
+for label, argv0 in (("bare bash", "bash"), ("PATH's bash", shutil.which("bash"))):
+    r = subprocess.run([argv0, "-c", CMD], capture_output=True, text=True)
+    print(f"{label} ({argv0}): rc {r.returncode}")
+    for stream, text in (("out", r.stdout), ("err", r.stderr)):
+        for ln in text.strip().split("\n"):
+            if ln:
+                print(f"  {stream}: {ln}")
+````
+
+### `fold_answers_design.py`
+
+Folds the owner's answers to AP-1 to AP-35 into v2, the memory plan and the gap register, the tally by the register's own awk program (`[answers-fold]`).
+
+````python
+"""Fold the owner's answers to the away pass's forks, AP-1 to AP-35, into the design: v2's catalogue, presets, P37,
+[chain] and a new [planned] section with its revision note; the memory plan's sessions, sites, edges and keys; and
+five gaps in the register with the tally re-measured. The away-pass record's own sections are written by
+fold_answers_record.py, after the checks run.
+
+Usage: python -X utf8 fold_answers_design.py   (from the worktree root)
+"""
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+P = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+
+
+def section(rec, tag):
+    m = re.search(r"^## \[" + re.escape(tag) + r"\].*?(?=^## \[|\Z)", rec.text, flags=re.M | re.S)
+    if not m:
+        sys.exit(f"{rec.path.name}: no [{tag}]")
+    return m.group(0)
+
+
+def line_in(rec, tag, prefix):
+    hits = [ln for ln in section(rec, tag).split("\n") if ln.startswith(prefix)]
+    if len(hits) != 1:
+        sys.exit(f"{rec.path.name} [{tag}]: {len(hits)} lines start with {prefix!r}")
+    return hits[0]
+
+
+def swap(rec, line, old, new, label):
+    if line.count(old) != 1:
+        sys.exit(f"{rec.path.name}: {label}: {old!r} occurs {line.count(old)} times in its line")
+    rec.sub(line, line.replace(old, new), label)
+    return line.replace(old, new)
+
+
+# --- v2's catalogue: each pending marker names its fork, and the eight changed answers rewrite their rows.
+KEPT = {"memory.legacy-anchors": 3, "commits.edge-check": 6, "commits.squash": 7, "trace.leg-output": 22,
+        "runtime.binary": 11, "runtime.owner-harness": 12, "platforms.verify": 18, "install.retired-edits": 28,
+        "install.steps": 29}
+for key, n in KEPT.items():
+    swap(V, line_in(V, "policies", f"| `{key}` |"), f"pending AP-{n} |", f"the owner's AP-{n} |", key)
+swap(V, line_in(V, "policies", "| `trace.cost` |"), "pending AP-21 |",
+     "the owner's AP-21, which confirms durations as no journal time of day under the rule of 2026-09-16 |", "trace.cost")
+for key, n in (("install.deprecation-window", 26), ("install.on-shim-call", 27)):
+    ln = swap(V, line_in(V, "policies", f"| `{key}` |"), f"pending AP-{n} |", f"the owner's AP-{n} |", key)
+    swap(V, ln, "| dGroundRules |", "| dSafePassage |", key + " owner")
+ROWS = {
+    "trace.identity": "| `trace.identity` | act-only, session, salted | session | the away pass, points 1 and 5: committed memory "
+                      "may name the harness session id beside the act, the owner's AP-8; dLoggedFlight's run log keeps the "
+                      "closed schema whose leg refuses session ids (owner, 2026-09-13) until dWellOiledMachine's act-key "
+                      "unit makes that leg read this key; never set by a preset | dWellOiledMachine |",
+    "trace.rows": "| `trace.rows` | 60, 120, all | 120 | the away pass, point 5: one unattended run alone held 259 model "
+                  "events; the owner's AP-23 | dWellOiledMachine |",
+    "runtime.act-harness": "| `runtime.act-harness` | claude-code, codex, or another registered harness adapter that passes "
+                           "the act rows | claude-code | the away pass, point 3: Codex registers as an act backend once its "
+                           "rows pass; the owner's AP-13, claude-code by default and switched by the owner, never set by a "
+                           "preset | dWellOiledMachine |",
+    "runtime.act-auth": "| `runtime.act-auth` | an ordered list drawn from setup-token, oauth-shared and api-key, api-key "
+                        "only when the owner adds it | setup-token, oauth-shared | the away pass, point 3: the operator's "
+                        "credentials, each read from the node's credential store and never from a file, tried in order, "
+                        "a transient-auth failure moving to the next; the owner's AP-14; never set by a preset | "
+                        "dWellOiledMachine |",
+    "platforms.supported": None,
+}
+for key, new in ROWS.items():
+    old = line_in(V, "policies", f"| `{key}` |")
+    if key == "platforms.supported":
+        swap(V, old, "pending AP-17 |", "the owner's AP-17, macOS and pwsh-launch planned in `[planned]` |", key)
+        continue
+    if f"pending AP-" not in old:
+        sys.exit(f"{key}: the row carries no pending marker")
+    V.sub(old, new, key)
+V.sub(line_in(V, "policies", "| `platforms.verify` |"),
+      line_in(V, "policies", "| `platforms.verify` |") + "\n| `platforms.provision` | name, uv, off | name | the owner's AP-32: "
+      "the interpreter floor's preflight and the resolver refuse an interpreter below it and name the install command "
+      "for its platform, recommending uv, or offer to run uv while the owner attends; how a node gets its interpreter is "
+      "the operator's, never set by a preset | dSafePassage |", "platforms.provision")
+V.sub(line_in(V, "policies", "| `maintain.tiers` |"),
+      line_in(V, "policies", "| `maintain.tiers` |") + "\n| `maintain.interpreter-eol` | file, warn, off | file | the owner's "
+      "AP-35: a detector files an intake six months before the interpreter floor's end of life, so the next raise is "
+      "planned, never discovered | dTendedCadence |", "maintain.interpreter-eol")
+if "pending AP-" in section(V, "policies"):
+    sys.exit("a pending marker is left in [policies]")
+
+# --- v2's presets: 120 rows everywhere, act-harness and provision never touched, and the end-of-life row.
+V.sub(line_in(V, "presets", "| `trace.rows` |"), "| `trace.rows` | 120 | 120 | 120 | 120 |", "preset trace.rows")
+V.sub(line_in(V, "presets", "| `runtime.act-harness` |") + "\n", "", "preset act-harness out")
+V.sub(line_in(V, "presets", "| `maintain.tiers` |"),
+      line_in(V, "presets", "| `maintain.tiers` |") + "\n| `maintain.interpreter-eol` | file | file | file | file |",
+      "preset interpreter-eol")
+V.sub("`runtime.owner-harness`, `runtime.act-auth` or `platforms.supported`:",
+      "`runtime.owner-harness`, `runtime.act-harness`, `runtime.act-auth`, `platforms.supported` or\n  `platforms.provision`:",
+      "never-touch list")
+V.sub("whether committed memory names a session, which application the owner works in, the operator's credentials and the\n"
+      "  platforms a repository runs on are facts about the owner, the operator or the repository (the away pass).",
+      "whether committed memory names a session, which application the owner works in, which harness runs acts, the\n"
+      "  operator's credentials, the platforms a repository runs on and how a node gets its interpreter are facts about the\n"
+      "  owner, the operator or the repository (the away pass, AP-13, AP-32).", "never-touch why")
+
+# --- P37: the floor.
+V.sub("over the platforms the repository declares (the owner's point 4, the away pass).",
+      "over the platforms the repository declares, on one interpreter floor declared once, Python 3.15 (the owner's\n"
+      "  point 4, the away pass, and AP-31).", "P37")
+
+# --- [chain].
+ROW = re.compile(r"^\| (d[A-Z]\w+) \| ([^|]+) \| ([^|]+) \| (.+) \| ([^|]+) \|$")
+
+
+def chain_row(build):
+    hits = [ln for ln in section(V, "chain").split("\n") if ln.startswith(f"| {build} |")]
+    if len(hits) != 1:
+        sys.exit(f"[chain]: {len(hits)} rows for {build}")
+    m = ROW.match(hits[0])
+    return hits[0], m.group(2), m.group(3), m.group(4).split("; "), m.group(5)
+
+
+def put(old, build, stage, parents, clauses, gaps):
+    if any("; " in c for c in clauses):
+        sys.exit(f"{build}: a clause holds '; '")
+    V.sub(old, f"| {build} | {stage} | {parents} | {'; '.join(clauses)} | {gaps} |", f"chain {build}")
+
+
+def edit(clauses, opens, old, new):
+    hits = [i for i, c in enumerate(clauses) if c.startswith(opens)]
+    if len(hits) != 1 or clauses[hits[0]].count(old) != 1:
+        sys.exit(f"clause {opens!r}: {len(hits)} clauses, or {old!r} not once in it")
+    clauses[hits[0]] = clauses[hits[0]].replace(old, new)
+
+
+STEP = ("the upgrade-step kind", "`update` walking every step", "down steps run in reverse", "the release-0 fixture tree",
+        "a forwarding shim")
+old, stage, parents, cl, gaps = chain_row("dGroundRules")
+moved = [c for c in cl if c.startswith(STEP)]
+if len(moved) != 5 or [c for c in cl[-5:]] != moved:
+    sys.exit("dGroundRules: the step kind's five clauses are not its last five")
+moved[0] = moved[0].replace("(P38, its home parked as AP-25)", "(P38, AP-25)")
+if "AP-25)" not in moved[0]:
+    sys.exit("the step kind's clause lost its AP-25 cite")
+STEP_GAPS = ["gap-deploy-15", "gap-deploy-16", "gap-deploy-17", "gap-tool-10", "gap-deploy-24"]
+gl = [g.strip() for g in gaps.split(",")]
+if gl != ["gap-spine-06"] + STEP_GAPS:
+    sys.exit(f"dGroundRules' gaps changed: {gl}")
+FLOOR = ("the interpreter floor raised to Python 3.15 as the step kind's first step (AP-31): declared once and read from "
+         "there by every reader, its up a preflight refusing an interpreter below the floor and naming the install "
+         "command as `platforms.provision` says, its down restoring the old declaration, walked by the release-0 fixture, "
+         "and the PEP 701 text ban in `merge-rows.test.sh` retired, since the floor admits the syntax")
+put(old, "dGroundRules", stage, parents, cl[:-5], "gap-spine-06")
+V.sub("| dGroundRules | " + stage + " | " + parents + " | " + "; ".join(cl[:-5]) + " | gap-spine-06 |\n",
+      "| dGroundRules | " + stage + " | " + parents + " | " + "; ".join(cl[:-5]) + " | gap-spine-06 |\n"
+      "| dSafePassage | Supersession | dGroundRules | " + "; ".join(moved + [FLOOR]) + " | "
+      + ", ".join(["gap-deploy-15", "gap-deploy-16", "gap-deploy-17", "gap-deploy-24", "gap-tool-10", "gap-tool-22"])
+      + " |\n", "chain dSafePassage")
+for b in ("dOrderedCharter", "dFairHearing"):
+    old, stage, parents, cl, gaps = chain_row(b)
+    if parents.strip() != "dGroundRules":
+        sys.exit(f"{b}'s parents changed: {parents}")
+    put(old, b, stage, "dSafePassage", cl, gaps)
+
+old, stage, parents, cl, gaps = chain_row("dWitnessedBar")
+edit(cl, "the portability leg pack", "an interpreter-floor arm with a feature census",
+     "an interpreter-floor arm that runs a real interpreter at the declared floor, with a feature census")
+edit(cl, "the portability leg pack", "the resolver preferring a direct executable that meets the floor (P37)",
+     "the resolver preferring a direct executable that meets the floor and refusing below it with the install command "
+     "`platforms.provision` names (P37, AP-31, AP-32)")
+cl += ["one bash resolver in `tools/lib` with its JavaScript twin, replacing the seven copies of the loop over "
+       "`bash.exe` and `bash`: Git's own `bin/bash.exe` derived from `git --exec-path` before PATH is searched, System32 "
+       "and WindowsApps launchers refused, and a refusal in place of any fall-back to a bare `bash`, which Windows "
+       "resolves to WSL's launcher (AP-33)",
+       "a wrong-shell refusal at every entry point: a gov script started by WSL's bash on a Windows checkout, a `/mnt/` "
+       "path over a Windows gitdir, refuses and names Git's bash (AP-33)"]
+put(old, "dWitnessedBar", stage, parents, cl, gaps.rstrip() + ", gap-tool-20, gap-tool-21")
+
+old, stage, parents, cl, gaps = chain_row("dWellOiledMachine")
+edit(cl, "the act as the key", "as `trace.identity` and `trace.cost` say (P35, P36)",
+     "as `trace.identity` and `trace.cost` say, committed records naming the harness session id beside the act under "
+     "`trace.identity: session` and the run log's closed-schema leg reading the same key (P35, P36, AP-8)")
+edit(cl, "the commit queue writing", "as `commits.edge-check` says",
+     "as `commits.edge-check` says, with `Gov-Session` written as `trace.identity` says (AP-8)")
+edit(cl, "the harness conformance fixture", "the live inbox, transcript homes and interpreters",
+     "the live inbox, transcript homes, interpreters, and which bash a hook runs in with the PATH inside it")
+edit(cl, "preflight refusing a launch", "a transient-auth relaunch class under `runtime.act-auth`",
+     "the act's credential tried in `runtime.act-auth`'s order, a setup token and then the shared OAuth login by "
+     "default and an API key only when the owner adds it, each read from the node's credential store and never from "
+     "a file, with a transient-auth failure relaunching on the next in order (AP-14)")
+put(old, "dWellOiledMachine", stage, parents, cl, gaps.rstrip() + ", gap-rt-32")
+
+old, stage, parents, cl, gaps = chain_row("dDeclaredLoop")
+edit(cl, "the commit node and its kind", "and `Gov-Act` to `made-by`,",
+     "`Gov-Act` to `made-by` and `Gov-Session` to `runs-in`,")
+put(old, "dDeclaredLoop", stage, parents, cl, gaps)
+
+old, stage, parents, cl, gaps = chain_row("dShippedRelease")
+edit(cl, "the platform matrix verified per release",
+     "per-kit interpreter floors in the kit factory and the receipt, and a Linux job in emitted CI (P37)",
+     "the interpreter floor read from its one declaration by the kit factory and recorded in the receipt, and a Linux "
+     "job in emitted CI that sets up Python at the floor (P37, AP-31)")
+put(old, "dShippedRelease", stage, parents, cl, gaps)
+
+old, stage, parents, cl, gaps = chain_row("dTendedCadence")
+cl += ["a detector filing an intake six months before the interpreter floor's end of life, as "
+       "`maintain.interpreter-eol` says (AP-35)"]
+put(old, "dTendedCadence", stage, parents, cl, gaps.rstrip() + ", gap-maint-15")
+
+# --- [planned]: the platforms planned behind their triggers.
+V.insert_before("\n## [open] Interpretations to confirm at chain approval", """
+## [planned] Planned, not scheduled
+
+Two platforms are planned and not promised (the owner's AP-17 and AP-34). `platforms.supported` keeps its default,
+and each plan waits for its trigger. Neither counts in a build's planned units, and neither's gaps join the register
+until its trigger holds (`build/2026-10-18-build-PLAY-dClosedLoop-1-research-python-floor.md` sections 3 and 4).
+- **macOS.** Trigger: a node registers darwin, or an adopter asks, and only after dWellOiledMachine dissolves
+  `unattended/`, which holds most of the blockers. Runner: GitHub's `macos-15`, or a fleet Mac for the held tier.
+  Units: a bash-5 guard every entry point sources, a lint for GNU-only flags over a shrink-only ledger, one shared
+  `timeout` resolver and the macOS runner adapter on dWitnessedBar; the macOS platform row, with its provisioning
+  preflight and an emitted CI job, on dShippedRelease; and a darwin row in dWellOiledMachine's conformance fixture.
+  Its gaps once triggered: no bash floor guard, GNU-only flags unledgered, and `timeout` resolved in no shared place.
+- **pwsh-launch.** Trigger: a node registers a PowerShell launch, or the owner adds `pwsh-launch` to
+  `platforms.supported`. Runner: `windows-latest` with `shell: pwsh`, PATH rebuilt inside the step. Unit: the pwsh
+  runner adapter on dWitnessedBar, beside the bash resolver and the wrong-shell refusal AP-33 schedules now.
+""", "[planned]")
+
+# --- v2's revision note.
+V.insert_before("Revised: 2026-10-17, after the folds' closing review", """Revised: 2026-10-18, the owner's answers to the away pass's forks (`build/2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md` `[answers]`
+and `[folded-answers]`), thirty-five in all, five of them raised by dispatch 113 while the owner answered
+(`build/2026-10-18-build-PLAY-dClosedLoop-1-research-python-floor.md`): the upgrade-step kind leaves dGroundRules for a
+build of its own, dSafePassage, which dOrderedCharter and dFairHearing now follow (AP-25); its first step raises the
+interpreter floor to Python 3.15 (AP-31); `trace.identity` defaults to `session` (AP-8), `trace.rows` to 120 (AP-23)
+and `runtime.act-auth` to a setup token, then the shared OAuth login (AP-14); `runtime.act-harness` and the new
+`platforms.provision` join the keys presets never touch, and `maintain.interpreter-eol` joins the catalogue;
+dWitnessedBar gains one bash resolver and a wrong-shell refusal (AP-33), and dTendedCadence an end-of-life detector
+(AP-35); and `[planned]` holds macOS and pwsh-launch behind their triggers (AP-17, AP-34).
+
+""", "revision note")
+
+# --- The memory plan.
+P.sub("Committed memory carries the act, not the session id, as the\n"
+      "  owner's rule of 2026-09-13 keeps committed records free of session ids (`memory/builds/dLoggedFlight/README.md`);\n"
+      "  `trace.identity` holds that default, and the owner may widen it (the away pass's `[forks]`).",
+      "Committed memory carries the act and, beside it, the harness\n"
+      "  session id, since the owner chose `trace.identity: session` (the away pass's AP-8). dLoggedFlight's run log keeps\n"
+      "  its closed schema, whose leg refuses session ids (`memory/builds/dLoggedFlight/README.md`, owner, 2026-09-13),\n"
+      "  until that leg reads the same key.", "plan [sessions]")
+swap(P, line_in(P, "sites", "| a commit |"), "`Gov-Act:` for `made-by`, with",
+     "`Gov-Act:` for `made-by`, `Gov-Session:` for `runs-in` as `trace.identity` says, with", "plan [sites] commit")
+P.sub(line_in(P, "edges", "| `runs-in` |"),
+      "| `runs-in` | act, claim, commit → session | the session binding; a claim's `session:`; the `Gov-Session:` trailer | "
+      "`hosts` | new | act and commit to session |", "plan [edges] runs-in")
+P.sub(line_in(P, "keys", "| `trace.identity` |"),
+      "| `trace.identity` | act-only, session, salted | session | the owner's AP-8: committed memory may name the harness "
+      "session id beside the act |", "plan [keys] trace.identity")
+
+# --- The gap register: five gaps, each owned once, and the tally re-measured.
+NEW = {
+    "gap-tool-19": ["| gap-tool-20 | Tooling | MED | The bash resolver is copied, not shared: govkit's `resolve_bash`, "
+                    "`corpus_ids.py`'s copy and five more loops over `bash.exe` and `bash` search PATH only, so under a "
+                    "PATH without Git's bash they find none, and govkit's `resolve_shell_argv` then falls back to a bare "
+                    "`bash`, which Windows resolves to System32's WSL launcher under every launch shell. | "
+                    "`research-python-floor.md` section 4; the away pass's `[folded-answers]`; "
+                    "`memory/gotchas/subprocess-resolves-a-different-shell.md` | — |",
+                    "| gap-tool-21 | Tooling | HIGH | The interpreter floor is tested nowhere: no node runs the declared "
+                    "floor, remote CI sets up no Python, and a version-flagged parse accepts syntax the floor refuses. | "
+                    "`research-python-floor.md` section 2 | — |",
+                    "| gap-tool-22 | Tooling | MED | The interpreter floor is declared in eight files at 3.11, against the "
+                    "owner's 3.15 (AP-31), and raising it ships no upgrade step. | `research-python-floor.md` section 2 | "
+                    "— |"],
+    "gap-rt-31": ["| gap-rt-32 | Runtime | MED | Which bash a harness hook runs in is not pinned: under a fresh "
+                  "terminal's PATH, Git's `usr/bin/bash.exe` sees no sed, awk, grep or mktemp, and `timeout` resolves to "
+                  "Windows' own. | `research-python-floor.md` section 4 | — |"],
+    "gap-maint-14": ["| gap-maint-15 | Maintain | LOW | Nothing watches the interpreter floor's end of life: Python 3.10 "
+                     "reached its end on 2026-10-01, and WSL's Ubuntu 22.04 still resolves it. | "
+                     "`research-python-floor.md` section 2 | — |"],
+}
+for after, rows in NEW.items():
+    old = line_in(G, "Register", f"| {after} |") if "## [Register]" in G.text else \
+        [ln for ln in G.text.split("\n") if ln.startswith(f"| {after} |")]
+    if isinstance(old, list):
+        if len(old) != 1:
+            sys.exit(f"register: {len(old)} rows for {after}")
+        old = old[0]
+    G.sub(old + "\n", old + "\n" + "\n".join(rows) + "\n", f"register after {after}")
+for rec in (V, P, G):
+    rec.save()
+
+# The tally, by the register's own instrument (its awk program, kept in tally.awk), run on the saved file.
+import subprocess  # noqa: E402
+
+out = subprocess.run(["awk", "-F|", "-f", str(pathlib.Path(__file__).resolve().parent / "tally.awk"), str(G.path)],
+                     capture_output=True, text=True, check=True).stdout
+counts = [ln.rstrip() for ln in out.replace("\r\n", "\n").strip("\n").split("\n")]
+total = sum(int(kv.split("=")[1]) for kv in counts[0].split())
+G.text = G.text.rstrip("\n") + f"""
+
+Re-measured after the owner's answers to the away pass's forks added five gaps, `gap-tool-20` to `gap-tool-22`,
+`gap-rt-32` and `gap-maint-15` (`build/2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md` `[folded-answers]`), and moved
+five of dGroundRules' gaps to dSafePassage, same instrument, over {total} keys:
+
+```text
+{counts[0]}
+{counts[1]}
+```
+"""
+G.done += 1
+G.save()
+print(f"register: {total} gaps")
+````
+
+### `fold_class_row.py`
+
+Moves the recut record's `check` homonym row to dSafePassage with its clause, after the reconciliation probe reddened on it.
+
+````python
+"""Move the recut record's `check` homonym class row from dGroundRules to dSafePassage, with the clause it classes
+(AP-25), so the reconciliation probe reads the citation where it now lives.
+
+Usage: python -X utf8 fold_class_row.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+R = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-recut.md")
+R.sub("| dGroundRules | `check` | dWitnessedBar | homonym | govkit's `check` verb beside `update`, which reads the "
+      "`[[retired]]` rows, not the `check` tag namespace (the away pass) |",
+      "| dSafePassage | `check` | dWitnessedBar | homonym | govkit's `check` verb beside `update`, which reads the "
+      "`[[retired]]` rows, not the `check` tag namespace (the away pass; moved with the step kind's clause, AP-25) |",
+      "class row")
+R.save()
+````
+
+### `fold_answers_record.py`
+
+Writes the answers into the away-pass record: dispatch 113, `[answers]`, `[folded-answers]` and the summaries the answers made wrong.
+
+````python
+"""Write the owner's answers to the away pass's forks into the away-pass record: dispatch 113 in [research], the
+summaries the answers made wrong, AP-31 to AP-35 in [forks], [state]'s numbers pinned, and two new sections,
+[answers] with every question as asked and every answer as the tool returned it, and [folded-answers] with what the
+answers changed, the corrections and the interpretations. The critical path and the reproductions are spliced from
+their runs.
+
+Usage: python -X utf8 fold_answers_record.py <scratch-away-dir>   (from the worktree root, after the design fold)
+"""
+import pathlib
+import subprocess
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+D = pathlib.Path(sys.argv[1])
+F = "`" * 3
+
+
+def out(name):
+    return (D / name).read_text(encoding="utf-8").replace("\r\n", "\n").strip()
+
+
+cp = subprocess.run([sys.executable, "-X", "utf8", str(D.parent / "order/critical_path.py")], capture_output=True,
+                    text=True, check=True).stdout.replace("\r\n", "\n").strip()
+if not cp.startswith("critical path: 195 units, dGroundRules > dSafePassage > dOrderedCharter"):
+    sys.exit(f"the critical path moved: {cp[:120]}")
+
+A = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-away-pass.md")
+
+# [research]: dispatch 113.
+row111 = [ln for ln in A.text.split("\n") if ln.startswith("| 111 |")]
+if len(row111) != 1:
+    sys.exit("no single dispatch row 111")
+A.sub(row111[0] + "\n", row111[0] + "\n| 113 | 4, asked while the owner answered: AP-19's floor and AP-17's future plan | "
+      "`prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-15-researcher.md` | "
+      "`build/2026-10-18-build-PLAY-dClosedLoop-1-research-python-floor.md` | keep 3.11 now and raise it to 3.12 by "
+      "2027-10, which the owner replaced with 3.15 now (AP-31); macOS and pwsh-launch planned behind triggers; a TOML 1.1 "
+      "split at 3.15 |\n", "research row 113")
+A.insert_before("\n## [p1-memory]", """- **Dispatch 113,** a seventh researcher at the owner's medium, ran while the owner answered the forks, on AP-17's
+  and AP-19's answers. Its return matched the harness's `settings-json` pattern, since it cites the hook wiring in
+  `.claude/settings.json` as evidence. Nothing in it was acted on as an instruction. It wrote no repository file, and
+  its probes are kept in the instruments record.
+""", "research bullet 113")
+
+# The summaries the answers made wrong.
+A.sub("sessions join through the act, which committed memory names in place of a session id, as the owner's\n"
+      "   rule of 2026-09-13 keeps;",
+      "sessions join through the act, and committed memory may name the harness session\n   id beside it (AP-8);",
+      "p1 sessions")
+A.sub("and two keys, `platforms.supported` and `platforms.verify`.",
+      "and two keys, `platforms.supported` and `platforms.verify`. The owner then set the\n"
+      "floor at Python 3.15, every node upgrading (AP-31), and placed macOS and pwsh-launch in v2's `[planned]` behind\n"
+      "their triggers (AP-17, AP-34).", "p4 floor")
+A.sub("`install.deprecation-window` releases, through dGroundRules' forwarding shim,",
+      "`install.deprecation-window` releases, through dSafePassage's forwarding shim,", "p6 shim")
+A.sub("""7. **Where the step kind is built.** It must exist before dOrderedCharter, the first build to change what an adopter
+   sees. It is placed in dGroundRules, beside the legacy homes the translation window reads, and the recovery,
+   receipt and fleet units go to dShippedRelease. The researcher recommended a build of its own; at five units the
+   path cost is the same either way, so the split is the owner's (AP-25).""",
+      """7. **Where the step kind is built.** It must exist before dOrderedCharter, the first build to change what an adopter
+   sees. The owner gave it a build of its own, dSafePassage, between dGroundRules and dOrderedCharter (AP-25), as the
+   researcher recommended and at the same path cost. The recovery, receipt and fleet units stay with dShippedRelease.""",
+      "p6 home")
+
+# [forks]: AP-31 to AP-35, and the answers' pointer.
+A.sub("Thirty forks, each with the recommendation first. A key's default stands as recommended until the owner answers.",
+      "Thirty forks, each with the recommendation first, and five more, AP-31 to AP-35, that dispatch 113 raised while the\n"
+      "owner answered. A key's default stands as recommended until the owner answers.", "forks intro")
+AP30 = ("| AP-30 | How does gov itself migrate? (P8) | the lander runs each new step on gov first, recorded in its "
+        "source-mode receipt; gov's own diff is its migration | dShippedRelease's lander unit |")
+A.sub(AP30 + "\n", AP30 + """
+| AP-31 | What is the next interpreter floor, once 3.11 nears its end of life in 2027-10? | 3.12 by 2027-10, as a P38 step after the chain closes; 3.14; 3.15 | the interpreter floor |
+| AP-32 | `platforms.provision`: how does a node get to the floor? | name: the refusal names the install command for its platform, recommending uv; uv, offered while the owner attends; off | the key's default |
+| AP-33 | A bare `bash` from Python runs WSL's bash on Windows: how is it fixed, and when? | one shared resolver and a wrong-shell refusal on dWitnessedBar now; the same, deferred with pwsh-launch; a PATH precondition | dWitnessedBar's units |
+| AP-34 | When does the macOS work start? | on a registered node, after dWellOiledMachine dissolves `unattended/`; now | v2 `[planned]` |
+| AP-35 | `maintain.interpreter-eol`: what happens as the floor's end of life nears? | file: an intake six months before it; warn; off | the key's default |
+
+The owner answered all thirty-five on 2026-10-18 (`[answers]`), and the design carries the answers
+(`[folded-answers]`).
+""", "forks rows")
+
+# [state]: the report's numbers, pinned to the commit they were read at.
+A.sub("- **The design:** 20 builds, 367 planned units, 38 principles, 224 keys, 296 gaps and 76 record kinds.",
+      "- **The design, at `a9b00addd`:** 20 builds, 367 planned units, 38 principles, 224 keys, 296 gaps and 76 record\n"
+      "  kinds.", "state design")
+A.sub("- **Forks parked:** AP-1 to AP-30, seven of them structural: AP-1, AP-2, AP-5, AP-10, AP-15, AP-24 and AP-25.",
+      "- **Forks parked:** AP-1 to AP-30, seven of them structural: AP-1, AP-2, AP-5, AP-10, AP-15, AP-24 and AP-25. The\n"
+      "  owner has answered them since, with five more (`[answers]`), and `[folded-answers]` holds the state after them.",
+      "state forks")
+
+ASKED = [
+    ("AP-1", "AP-1 (structural): how does a record section declare its edges?", "Edges line under heading (Recommended)", " with its preview"),
+    ("AP-2", "AP-2 (structural): how far does P33's closed edge set grow?", "The eleven types (Recommended)", ""),
+    ("AP-3", "AP-3: how do today's records reach the plan (memory.legacy-anchors)?", "derived (Recommended)", ""),
+    ("AP-4", "AP-4: how does a design-only build's unit become a node in the graph?", "README ids defines it (Recommended)", ""),
+    ("AP-5", "AP-5 (structural): how does git join the syntax?", "Typed trailers (Recommended)", " with its preview"),
+    ("AP-6", "AP-6: where are the commit trailers checked (commits.edge-check)?", "push-leg (Recommended)", ""),
+    ("AP-7", "AP-7: what happens to the trailers when an adopter squashes (commits.squash)?", "re-emit-union (Recommended)", ""),
+    ("AP-8", "AP-8: may committed memory name a session id (trace.identity, never set by a preset)?", "session", ""),
+    ("AP-9", "AP-9: what are transcripts and the auto-memory to the graph?", "Witnesses with pointers (Recommended)", ""),
+    ("AP-10", "AP-10 (structural): how does gov stay independent of your application?", "Harness adapters, CLI first (Recommended)", ""),
+    ("AP-11", "AP-11: which CLI does the supervisor launch (runtime.binary)?", "newest-conforming (Recommended)", ""),
+    ("AP-12", "AP-12: which application is your viewer (runtime.owner-harness, never set by a preset)?", "auto (Recommended)", ""),
+    ("AP-13", "AP-13: which harness runs acts (runtime.act-harness)?", "claude-code by default, but owner-switchable.", ""),
+    ("AP-14", "AP-14: how does an act authenticate (runtime.act-auth, never set by a preset)?",
+     "setup-token by default, oauth-shared fallback, with api-key as the last owner-selectable option from the all the options as necessary", ""),
+    ("AP-15", "AP-15 (structural): which coding practice does gov follow?", "Role per language (Recommended)", ""),
+    ("AP-16", "AP-16: what language do harness hooks use?", "node, declared (Recommended)", ""),
+    ("AP-17", "AP-17: which platforms does gov promise (platforms.supported, never set by a preset)?",
+     "gitbash + linux at start, but add a potential future plan for macos and pwsh-launch.", ""),
+    ("AP-18", "AP-18: how are the promised platforms verified (platforms.verify)?", "held, then ci (Recommended)", ""),
+    ("AP-19", "AP-19: which Python does gov require?",
+     "3.11 but let's plan this ahead, do we need a newer python version for any reason? Now is the time to price it in.", ""),
+    ("AP-20", "AP-20: how are worktree pointers written?", "relative (Recommended)", ""),
+    ("AP-21", "AP-21: what does a committed act record carry (trace.cost)?", "tokens+wall (Recommended)", ""),
+    ("AP-22", "AP-22: where does a failing gate leg's output live (trace.leg-output)?", "tail-by-hash (Recommended)", ""),
+    ("AP-23", "AP-23: how many rows does a `gov trace` timeline show (trace.rows)?", "120", ""),
+    ("AP-24", "AP-24 (structural): how do the rebuilt kits supersede today's?", "Release-chained steps (Recommended)", ""),
+    ("AP-25", "AP-25 (structural): where is the upgrade-step kind built (five units, the forwarding shim among them)?", "A build of its own", ""),
+    ("AP-26", "AP-26: how long does an old command or hook path keep working (install.deprecation-window)?", "2 releases (Recommended)", ""),
+    ("AP-27", "AP-27: what does a call through a forwarded old path do (install.on-shim-call)?", "warn (Recommended)", ""),
+    ("AP-28", "AP-28: what happens to an adopter's edit of a file that a step retires (install.retired-edits)?", "order (Recommended)", ""),
+    ("AP-29", "AP-29: who runs an upgrade step (install.steps)?", "offer (Recommended)", ""),
+    ("AP-30", "AP-30: how does gov itself migrate (P8)?", "Steps on gov first (Recommended)", ""),
+    ("AP-25, its name", "AP-25's new build sits between dGroundRules and dOrderedCharter and holds the step kind, the update walk, down steps, the release-0 fixture and the forwarding shim. What is it called?",
+     "dSafePassage (Recommended)", ""),
+    ("AP-31", "AP-31 (new, from the research): what is the next Python floor, once 3.11 nears its end of life in 2027-10?",
+     "3.15 now, all the nodes will upgrade.", ""),
+    ("AP-32", "AP-32: how does a node get to the 3.15 floor (platforms.provision)?", "name (Recommended)", ""),
+    ("AP-33", "AP-33 (new): on Windows, Python's bare `bash` runs WSL's bash 5.1.16 on every launch shell (I reproduced it). How is it fixed, and when?",
+     "Shared resolver, now (Recommended)", ""),
+    ("AP-34", "AP-34 (new): when does the macOS work start?", "On a registered node (Recommended)", ""),
+    ("AP-35", "AP-35 (new): what does gov do as the Python floor's end of life nears (maintain.interpreter-eol)? 3.15's is 2031-10.",
+     "file (Recommended)", ""),
+]
+if len({a for a, _, _, _ in ASKED}) != 36:
+    sys.exit("thirty-five forks and one name expected")
+answers = "\n".join(f'- {fid}, asked as "{q}": "{a}"{note}' for fid, q, a, note in ASKED)
+lists_head = out("bare_bash_lists.out").split("\n")[0]
+A.text = A.text.rstrip("\n") + f"""
+
+## [answers] The owner's answers, 2026-10-18
+
+Asked on the owner's return, "put the forks to me", through AskUserQuestion in nine batches of up to four, the
+recommendation first. Each answer is quoted as the tool returned it.
+
+{answers}
+
+- **AP-19 asked for a pricing.** Dispatch 113 ran while batches 6 and 7 were put, and its return raised AP-31 to
+  AP-35, put in batches 8 and 9. AP-31's answer, 3.15 now, replaces AP-19's 3.11.
+- **AP-25 chose a build of its own without naming it,** so its name was asked in batch 8.
+- **Five answers are in the owner's own words:** AP-13, AP-14, AP-17, AP-19 and AP-31.
+
+## [folded-answers] What the answers changed
+
+Twenty-seven answers took the recommendation, which the design already carried: each fork's pending marker in v2's
+catalogue now names the fork. Eight departed from the recommendation or added to it, AP-19's by asking for the
+research that AP-31 then answered, and dispatch 113's return changed the design with them.
+- **AP-25, AP-30 and AP-31: dSafePassage.** The upgrade-step kind's five units leave dGroundRules for a build of its
+  own, dSafePassage, between dGroundRules and dOrderedCharter, named at the owner's word. dOrderedCharter and
+  dFairHearing now follow it. It owns the five gaps dGroundRules held for the step kind, and
+  `install.deprecation-window` and `install.on-shim-call` move with the shim that reads them. Its sixth unit is the
+  step kind's first step: the interpreter floor raised to Python 3.15. gov runs it on itself first (AP-30).
+- **AP-31 and AP-32: the floor.** The research recommended keeping 3.11 and raising it to 3.12 by 2027-10, its end of
+  life. The owner chose 3.15 now, every node upgrading. With every reader at 3.15, `tomllib` reads TOML 1.1
+  everywhere and UTF-8 is the default encoding, so the research's TOML 1.0 arm and its floor-raise template are not
+  built. The floor is declared once. dSafePassage's step refuses an interpreter below it and names the install
+  command, dWitnessedBar's floor arm runs a real interpreter at the floor, and dShippedRelease's emitted CI sets one
+  up. `platforms.provision` joins the catalogue, `name` by default.
+- **AP-33: one bash resolver, now.** dWitnessedBar gains the shared resolver, which asks git where its bash is before
+  it searches PATH and refuses rather than fall back to a bare `bash`, and a wrong-shell refusal at every entry point.
+  The pwsh runner adapter waits in v2's `[planned]`. `gap-tool-20` records the class at its measured size.
+- **AP-8: session ids in committed memory.** `trace.identity` defaults to `session`. Committed records may name the
+  harness session id beside the act, a commit carries a `Gov-Session` trailer, and `runs-in` widens to take a commit.
+  dLoggedFlight's run log keeps its closed schema until dWellOiledMachine's act-key unit makes that leg read the key.
+- **AP-14: an ordered credential.** `runtime.act-auth` is an ordered list: a setup token, then the shared OAuth login,
+  and an API key tried last, only when the owner adds it. Each is read from the node's credential store, never from a
+  file, and a transient-auth failure moves to the next.
+- **AP-13, AP-23 and AP-35.** `runtime.act-harness` stays claude-code, switched by the owner. A timeline shows 120
+  rows before it folds. dTendedCadence gains a detector that files an intake six months before the floor's end of
+  life, under the new key `maintain.interpreter-eol`.
+- **AP-17 and AP-34: planned platforms.** macOS and pwsh-launch are in v2's new `[planned]` section, each with its
+  trigger, runner, units and gaps, counted in no build until its trigger holds.
+- **The gap register** gains five gaps, `gap-tool-20` to `gap-tool-22`, `gap-rt-32` and `gap-maint-15`, each owned
+  once, and its tally is re-measured. The join reads 301 gaps over 21 builds, each owning at least one.
+- **The catalogue** holds 226 keys, 206 of them presettable, and the presets follow.
+- **The recut record's** `check` homonym row moves with its clause to dSafePassage, after the reconciliation probe
+  reddened on it.
+- **The atlas** shows v2's `[planned]` in its chain view.
+
+**The chain after the answers,** recomputed by `critical_path.py` with its build count raised to 21:
+
+{F}text
+{cp}
+{F}
+
+The path grows by four units: dSafePassage's floor step, dWitnessedBar's two AP-33 units and dTendedCadence's
+detector. It now runs through dSafePassage.
+
+**Corrections.**
+- **The rule of 2026-09-13 is dLoggedFlight's.** Its committed run-log record has a closed schema, and a schema leg
+  refuses session ids there (`memory/builds/dLoggedFlight/README.md`). The away pass, its AP-8 row and the plan's
+  `[sessions]` read it as a rule over all committed memory. The plan and v2's catalogue now state it at its size.
+- **AP-33 was put larger than the tree shows.** Its question said a bare `bash` from Python runs WSL's bash on every
+  launch shell. That holds for a bare `bash`, reproduced from a Git-Bash launch:
+
+  {F}text
+  $ python bare_bash_repro.py
+  {out("bare_bash_repro.out").replace(chr(10), chr(10) + "  ")}
+  {F}
+
+  But tracked Python makes no bare `bash` call:
+
+  {F}text
+  $ python bare_bash_census.py
+  {out("bare_bash_census.out").replace(chr(10), chr(10) + "  ")}
+  $ python bare_bash_lists.py
+  {lists_head}
+  {F}
+
+  Those literals reach a resolver first. The class reaches WSL through govkit's fall-back to a bare `bash` when no
+  PATH bash resolves, and through seven copies of a resolver loop that search PATH only. The answer stands, and
+  `gap-tool-20` states the class at that size.
+
+**Interpretations, for the owner to correct:**
+- AP-13's "owner-switchable" reads as switched by the owner alone: `runtime.act-harness` joins the keys presets
+  never touch, so picking a preset never changes the harness.
+- AP-14's api-key, "the last owner-selectable option", reads as outside the default order: the owner adds it to
+  `runtime.act-auth`'s list, and it is tried last.
+- AP-8 reaches dLoggedFlight's run log too, once dWellOiledMachine lands its act-key unit. Until then that build's
+  rule stands as written, and its README is untouched.
+- AP-25's dSafePassage precedes dFairHearing as well as dOrderedCharter, since the review harness is a shipped kit
+  and so changes what an adopter sees. It costs the path nothing.
+- AP-31's "now" reads as the chain's first change an adopter sees: dSafePassage raises the floor before any later
+  build, so each may rely on 3.15.
+- AP-32's `platforms.provision` joins the keys presets never touch, since how a node gets its interpreter is the
+  operator's.
+- AP-17's future plan counts in no build's units and adds no gap to the register until its trigger holds.
+
+**The checks** are re-run in the instruments record's `[final]`, all green. The reconciliation probe's one red run
+on the way is in its `[answers-fold]`.
+"""
+A.done += 2
+A.save()
+````
+
+### `log_answers.py`
+
+The session log's dispatch 113 row, its agent lines and the fold's event.
+
+````python
+"""Record the owner's answers to the away pass's forks in the session log: dispatch 113's row, its derived agent
+lines, and the fold's event.
+
+Usage: python -X utf8 log_answers.py <agent-lines-113.txt>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+lines = [ln for ln in pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n").split("\n")
+         if ln.startswith(("- agent —", "- returned —"))]
+if len(lines) != 2:
+    sys.exit(f"two agent and returned lines expected, read {len(lines)}")
+F = "`" * 3
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+row112 = [ln for ln in L.text.split("\n") if ln.startswith("| 112 |")]
+if len(row112) != 1:
+    sys.exit("no single dispatch row 112")
+L.sub(row112[0] + "\n", row112[0] + "\n" + (
+    "| 113 | gov-researcher, at the owner's medium effort | AP-17's future plan and AP-19's interpreter floor, asked "
+    "while the owner answered the away pass's forks | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-15-researcher.md` | "
+    "1799cb98 | returned, 14m27s, 69.3k out: keep 3.11 and raise it to 3.12 by 2027-10; macOS and pwsh-launch planned "
+    "behind triggers; AP-31 to AP-35 raised | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-python-floor.md` |\n"),
+    "dispatch row")
+L.insert_before("\n## Events\n", "\nDispatch 113, derived from its handoff and this session's transcript the same way:\n\n"
+                + F + "text\n" + "\n".join(lines) + "\n" + F + "\n", "agent lines")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-18, session 1799cb98: the owner answered the away pass's thirty-five forks in nine batches (the away-pass
+  record's `[answers]`), twenty-seven of them as recommended, and the design carries them (`[folded-answers]`). The
+  upgrade-step kind becomes its own build, dSafePassage, whose first step raises the interpreter floor to Python
+  3.15; committed memory may name session ids; an act's credential is tried in order; and macOS and pwsh-launch are
+  planned behind triggers. The chain holds 21 builds, and its critical path is 195 units.
+""", "event")
+L.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row.
@@ -7953,13 +8726,28 @@ MINE = [
     ("away/write_review_fold.py", "The away-pass record's [chain-impact] re-run, AP-3 re-asked, [review-fold] and "
      "[state]."),
     ("away/log_review.py", "The session log's dispatch 112 row, its agent lines and the fold's event."),
+    ("away/chain_clauses.py", "Prints v2's `[chain]` rows one clause per line, by build or pattern: how the clauses the "
+     "owner's answers touch were read."),
+    ("away/bare_bash_census.py", "AP-33's census: tracked Python calls that launch a bare `bash`, which read none."),
+    ("away/bare_bash_lists.py", "AP-33's census, widened to every argv-shaped literal starting with `bash`."),
+    ("away/bare_bash_repro.py", "AP-33's reproduction: a bare `bash` from a Windows Python, beside PATH's bash."),
+    ("away/fold_answers_design.py", "Folds the owner's answers to AP-1 to AP-35 into v2, the memory plan and the gap "
+     "register, the tally by the register's own awk program (`[answers-fold]`)."),
+    ("away/fold_class_row.py", "Moves the recut record's `check` homonym row to dSafePassage with its clause, after the "
+     "reconciliation probe reddened on it."),
+    ("away/fold_answers_record.py", "Writes the answers into the away-pass record: dispatch 113, `[answers]`, "
+     "`[folded-answers]` and the summaries the answers made wrong."),
+    ("away/log_answers.py", "The session log's dispatch 113 row, its agent lines and the fold's event."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
                                                     "spans.py", "spandecay.py")] + \
-         [(n, "dispatch 102") for n in ("codemap.py", "nbhd2.py", "probe_unit.py", "lookups.py")]
+         [(n, "dispatch 102") for n in ("codemap.py", "nbhd2.py", "probe_unit.py", "lookups.py")] + \
+         [("away/d113/" + n, "dispatch 113") for n in ("census.py", "compile_all.py", "compile310.py", "shcensus.py",
+                                                       "rb.py", "nodebash.js", "clean.ps1", "tools.sh", "toml11.toml")]
+LANG = {".py": "python", ".js": "javascript", ".ps1": "powershell", ".sh": "bash", ".toml": "toml"}
 
 parts = ["""# Instruments: the night pass
 
@@ -8070,6 +8858,16 @@ The predicate after the fold, its purpose lines left out:
 """ + block("text", "$ python adopter_probe.py\n" + read(S / "walk8/adopter_probe.after.out")) + """
 The arm's two plants are re-run in `[plants]`, and the map's green run is in `[final]`.
 """)
+parts.append("""
+## [answers-fold] The owner's answers, folded: the register's tally program and the one red run
+
+The fold runs the gap register's tally instrument from a file, its awk program unchanged:
+
+""" + block("awk", read(S / "away/tally.awk")) + """
+The reconciliation probe after the design fold, before the recut record's `check` homonym row moved with its clause
+to dSafePassage:
+
+""" + block("text", read(S / "away/reconcile-red.out") + "\nrc 1"))
 plants = []
 for p in ("no-layer", "fates-absent", "fates-drop", "fates-ghost", "fates-bad", "fates-unbuilt", "fates-empty",
           "fates-kit", "fates-kit-drop", "fates-kit-ghost", "fates-count", "fates-absorbed-stays", "fates-bare-none",
@@ -8127,7 +8925,7 @@ aScoutedSeam's committed grader on copies of that branch's files, which stay on 
 returns show.
 """)
 for rel, who in PROBES:
-    parts.append(f"### `{pathlib.Path(rel).name}`, {who}\n\n" + block("python", read(S / rel)))
+    parts.append(f"### `{pathlib.Path(rel).name}`, {who}\n\n" + block(LANG[pathlib.Path(rel).suffix], read(S / rel)))
 OUT.write_text("\n".join(parts), encoding="utf-8", newline="\n")
 print(f"wrote {OUT}: {OUT.stat().st_size} bytes")
 ````
@@ -8394,10 +9192,10 @@ $ python plain_cites.py
 plan                     7  dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's), dLinkedLibrary (dRankedPlan's) …
 landing                  5  dGroundRules (dShippedRelease's), dOrderedCharter (dShippedRelease's), dKeptSession (dShippedRelease's), dWellOiledMachine (dShippedRelease's), dCalibratedLens (dShippedRelease's)
 scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
-code                     4  dGroundRules (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
-witness                  4  dGroundRules (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dBoundRoles (dTotalRecall's)
+code                     4  dSafePassage (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
+witness                  4  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dBoundRoles (dTotalRecall's)
 seen red                 3  dGroundRules (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dKeptSession (dWitnessedBar's)
-registry                 3  dGroundRules (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
+registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
 return                   3  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's)
 intake                   3  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 fork                     3  dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
@@ -8409,8 +9207,8 @@ act                      2  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dW
 claim                    2  dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
 baseline                 2  dFurnishedOrders (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 override                 1  dGroundRules (dOrderedCharter's)
-receipt                  1  dGroundRules (dShippedRelease's)
-commit                   1  dGroundRules (dDeclaredLoop's)
+receipt                  1  dSafePassage (dShippedRelease's)
+commit                   1  dSafePassage (dDeclaredLoop's)
 card                     1  dOrderedCharter (dPlacedRequest's)
 inventory                1  dOrderedCharter (dIndexedDesign's)
 disposition              1  dFairHearing (dDeclaredLoop's)
@@ -8730,6 +9528,49 @@ node keys scanned: 2275; purposes naming an adopter: 8
 The arm's two plants are re-run in `[plants]`, and the map's green run is in `[final]`.
 
 
+## [answers-fold] The owner's answers, folded: the register's tally program and the one red run
+
+The fold runs the gap register's tally instrument from a file, its awk program unchanged:
+
+````awk
+/^\| gap-/ {gsub(/ /,"",$3); gsub(/ /,"",$4); s[$3]++; v[$4]++} END {for (k in s) printf "%s=%d ", k, s[k]; print ""; for (k in v) printf "%s=%d ", k, v[k]; print ""}
+````
+
+The reconciliation probe after the design fold, before the recut record's `check` homonym row moved with its clause
+to dSafePassage:
+
+````text
+chain rows 21 · owned nodes read 446 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 72 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+transitions: 3 dispositions routed through entry.claim, 4 `none` rows
+  dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
+  dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
+  dFairHearing cites `preset` (dKeptSession's, not an ancestor): homonym
+  dFurnishedOrders cites `code` (dTotalRecall's, not an ancestor): tolerance
+  dFurnishedOrders cites `feature` (dTotalRecall's, not an ancestor): tolerance
+  dGroundRules cites `policy.guard` (dDeclaredLoop's, not an ancestor): not a use
+  dGroundRules cites `policy.proof` (dDeclaredLoop's, not an ancestor): not a use
+  dKeptSession cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
+  dKeptSession cites `hooks.bypass` (dWitnessedBar's, not an ancestor): not a use
+  dKeptSession cites `intake` (dWellOiledMachine's, not an ancestor): homonym
+  dKeptSession cites `playbook` (dIndexedDesign's, not an ancestor): tolerance
+  dOrderedCharter cites `check` (dWitnessedBar's, not an ancestor): homonym
+  dOrderedCharter cites `code` (dTotalRecall's, not an ancestor): not a use
+  dOrderedCharter cites `memory.map-purpose` (dTotalRecall's, not an ancestor): moved
+  dRankedPlan cites `entry.intake` (dWellOiledMachine's, not an ancestor): tolerance
+  dSafePassage cites `check` (dWitnessedBar's, not an ancestor): UNCLASSED
+  dTotalRecall cites `journal` (dWellOiledMachine's, not an ancestor): homonym
+  dTotalRecall cites `roster` (dIndexedDesign's, not an ancestor): homonym
+  dDeclaredLoop reads `decisions.major` (dLinkedLibrary's, not an ancestor): tolerance
+  dFairHearing reads `flow.route-backs` (dDeclaredLoop's, not an ancestor): not a use
+  dRankedPlan reads `run.host` (dWellOiledMachine's, not an ancestor): tolerance
+  dFairHearing routes `review.trigger` (dDeclaredLoop's, not an ancestor): not a use
+  class row with no dependency: dGroundRules `check` (dWitnessedBar, homonym)
+findings 2
+rc 1
+````
+
+
 ## [plants] The map's and the atlas's plants, re-run
 
 ````text
@@ -8843,10 +9684,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:648 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:662 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:648 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:662 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -8885,13 +9726,13 @@ rc 1
 
 ````text
 $ design map
-map: 2360 nodes in 30 namespaces; 30708 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1594, derived 275, pending 491
+map: 2371 nodes in 30 namespaces; 30799 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1603, derived 277, pending 491
 map: no stale facts read 51 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 166 records, 2841 sections, 188 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 167 records, 2851 sections, 189 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -8909,7 +9750,7 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 20 · owned nodes read 444 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+chain rows 21 · owned nodes read 446 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
 left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 72 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
@@ -8917,7 +9758,6 @@ transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dFairHearing cites `preset` (dKeptSession's, not an ancestor): homonym
   dFurnishedOrders cites `code` (dTotalRecall's, not an ancestor): tolerance
   dFurnishedOrders cites `feature` (dTotalRecall's, not an ancestor): tolerance
-  dGroundRules cites `check` (dWitnessedBar's, not an ancestor): homonym
   dGroundRules cites `policy.guard` (dDeclaredLoop's, not an ancestor): not a use
   dGroundRules cites `policy.proof` (dDeclaredLoop's, not an ancestor): not a use
   dKeptSession cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
@@ -8928,6 +9768,7 @@ transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dOrderedCharter cites `code` (dTotalRecall's, not an ancestor): not a use
   dOrderedCharter cites `memory.map-purpose` (dTotalRecall's, not an ancestor): moved
   dRankedPlan cites `entry.intake` (dWellOiledMachine's, not an ancestor): tolerance
+  dSafePassage cites `check` (dWitnessedBar's, not an ancestor): homonym
   dTotalRecall cites `journal` (dWellOiledMachine's, not an ancestor): homonym
   dTotalRecall cites `roster` (dIndexedDesign's, not an ancestor): homonym
   dDeclaredLoop reads `decisions.major` (dLinkedLibrary's, not an ancestor): tolerance
@@ -8942,7 +9783,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 296 · chain builds 20
+register keys 301 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -8950,13 +9791,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 224 · presettable 206 · preset rows 206
+catalogue keys 226 · presettable 206 · preset rows 206
 no findings
 rc 0
 
 $ critical path
-critical path: 191 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 13, dFairHearing 25, dOrderedCharter 44, dDeclaredLoop 67, dPlacedRequest 75, dWitnessedBar 92, dKeptSession 94, dBoundRoles 109, dTotalRecall 111, dRankedPlan 124, dFurnishedOrders 127, dLinkedLibrary 135, dIndexedDesign 147, dWellOiledMachine 148, dScopedBuild 159, dTendedCadence 163, dMindYourWords 165, dShippedRelease 173, dCalibratedLens 175, dConvergedCharter 191
+critical path: 195 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dSafePassage 14, dFairHearing 26, dOrderedCharter 45, dDeclaredLoop 68, dPlacedRequest 76, dKeptSession 95, dWitnessedBar 95, dBoundRoles 112, dTotalRecall 114, dRankedPlan 127, dFurnishedOrders 130, dLinkedLibrary 138, dIndexedDesign 150, dWellOiledMachine 151, dScopedBuild 162, dTendedCadence 167, dMindYourWords 168, dShippedRelease 176, dCalibratedLens 179, dConvergedCharter 195
 rc 0
 ````
 
@@ -9485,4 +10326,241 @@ for p in sys.argv[2:]:
             c[cls]+=1; ex[cls].append(pat[:50])
     print(p.split('/')[-1],dict(c))
     for k,v in ex.items(): print('  ',k,v[:6])
+````
+
+### `census.py`, dispatch 113
+
+````python
+"""Version-bound feature census over tracked Python. Read-only. argv: repo root, out json."""
+import ast, json, subprocess, sys, re, collections
+root = sys.argv[1]
+files = subprocess.run(["git","-C",root,"ls-files","*.py"],capture_output=True,text=True,check=True).stdout.split()
+# (key) -> (version note)
+MODS = {  # module imports
+ "tomllib":"added 3.11", "zoneinfo":"added 3.9", "graphlib":"added 3.9",
+ "annotationlib":"added 3.14", "compression":"added 3.14 (zstd)", "concurrent.interpreters":"added 3.14",
+ "distutils":"removed 3.12", "imp":"removed 3.12", "asynchat":"removed 3.12", "asyncore":"removed 3.12", "smtpd":"removed 3.12",
+ "lib2to3":"removed 3.13",
+}
+for m in "aifc audioop cgi cgitb chunk crypt imghdr mailcap msilib nis nntplib ossaudiodev pipes sndhdr spwd sunau telnetlib uu xdrlib".split():
+    MODS[m] = "removed 3.13 (PEP 594)"
+ATTRS = {  # module.attr
+ ("datetime","UTC"):"added 3.11", ("enum","StrEnum"):"added 3.11", ("asyncio","TaskGroup"):"added 3.11",
+ ("asyncio","timeout"):"added 3.11", ("hashlib","file_digest"):"added 3.11", ("contextlib","chdir"):"added 3.11",
+ ("typing","Self"):"added 3.11", ("typing","LiteralString"):"added 3.11", ("typing","Never"):"added 3.11",
+ ("typing","NotRequired"):"added 3.11", ("typing","Required"):"added 3.11", ("typing","assert_never"):"added 3.11",
+ ("typing","override"):"added 3.12", ("typing","TypeAliasType"):"added 3.12",
+ ("typing","TypeIs"):"added 3.13", ("typing","ReadOnly"):"added 3.13", ("warnings","deprecated"):"added 3.13",
+ ("copy","replace"):"added 3.13", ("glob","translate"):"added 3.13",
+ ("itertools","batched"):"added 3.12", ("itertools","pairwise"):"added 3.10",
+ ("datetime","utcnow"):"deprecated 3.12", ("datetime","utcfromtimestamp"):"deprecated 3.12",
+ ("locale","getdefaultlocale"):"deprecated 3.11, removal 3.15",
+ ("codecs","open"):"deprecated 3.14",
+ ("ast","Num"):"removed 3.14", ("ast","Str"):"removed 3.14", ("ast","Bytes"):"removed 3.14",
+ ("ast","NameConstant"):"removed 3.14", ("ast","Ellipsis"):"removed 3.14",
+ ("pkgutil","find_loader"):"removed 3.14", ("pkgutil","get_loader"):"removed 3.14",
+ ("unittest","makeSuite"):"removed 3.13", ("unittest","findTestCases"):"removed 3.13",
+ ("asyncio","get_event_loop"):"3.14 raises without a running loop",
+ ("concurrent.futures","InterpreterPoolExecutor"):"added 3.14",
+ ("sys","_is_gil_enabled"):"added 3.13",
+}
+METHODS = {  # attribute name anywhere (looser), note
+ "utcnow":"datetime.utcnow deprecated 3.12", "utcfromtimestamp":"deprecated 3.12",
+ "assertEquals":"removed 3.12", "assertRegexpMatches":"removed 3.12", "assertDictContainsSubset":"removed 3.12",
+ "readfp":"configparser.readfp removed 3.12", "is_junction":"added 3.12", "removeprefix":"added 3.9", "removesuffix":"added 3.9",
+ "is_relative_to":"added 3.9", "bit_count":"added 3.10", "full_match":"PurePath.full_match added 3.13",
+ "from_uri":"Path.from_uri added 3.13", "copy_into":"Path.copy_into 3.14", "move_into":"Path.move_into 3.14",
+}
+KW = {("rmtree","onerror"):"deprecated 3.12 (use onexc)",("rmtree","onexc"):"added 3.12",
+      ("zip","strict"):"added 3.10", ("dataclass","slots"):"added 3.10", ("dataclass","kw_only"):"added 3.10",
+      ("NamedTemporaryFile","delete_on_close"):"added 3.12", ("extractall","filter"):"added 3.12 backports; default 'data' in 3.14",
+      ("run","encoding"):"", }
+hits = collections.defaultdict(list)
+def add(k, f, n): hits[k].append(f"{f}:{n}")
+syntax_err = {}
+for f in files:
+    src = open(f"{root}/{f}", "rb").read()
+    try:
+        tree = ast.parse(src, filename=f)
+    except SyntaxError as e:
+        syntax_err[f] = str(e); continue
+    alias = {}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for a in node.names:
+                top = a.name
+                for m in MODS:
+                    if top == m or top.startswith(m+"."): add(f"import {m} [{MODS[m]}]", f, node.lineno)
+                alias[a.asname or a.name.split(".")[0]] = a.name if a.asname else a.name.split(".")[0]
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            mod = node.module
+            for m in MODS:
+                if mod == m or mod.startswith(m+"."): add(f"import {m} [{MODS[m]}]", f, node.lineno)
+            if mod == "__future__":
+                for a in node.names: add(f"from __future__ import {a.name}", f, node.lineno)
+            for a in node.names:
+                if (mod, a.name) in ATTRS: add(f"{mod}.{a.name} [{ATTRS[(mod,a.name)]}]", f, node.lineno)
+        elif isinstance(node, ast.Attribute):
+            v = node.value
+            if isinstance(v, ast.Name):
+                mod = alias.get(v.id, v.id)
+                if (mod, node.attr) in ATTRS: add(f"{mod}.{node.attr} [{ATTRS[(mod,node.attr)]}]", f, node.lineno)
+            if node.attr in METHODS: add(f".{node.attr} [{METHODS[node.attr]}]", f, node.lineno)
+        elif isinstance(node, ast.Match): add("match statement [3.10 syntax]", f, node.lineno)
+        elif type(node).__name__ == "TryStar": add("except* [3.11 syntax]", f, node.lineno)
+        elif type(node).__name__ == "TypeAlias": add("type statement [3.12 syntax]", f, node.lineno)
+        elif isinstance(node, ast.NamedExpr): add("walrus [3.8 syntax]", f, node.lineno)
+        elif isinstance(node, ast.Call):
+            fn = node.func; name = fn.attr if isinstance(fn, ast.Attribute) else (fn.id if isinstance(fn, ast.Name) else None)
+            for k in node.keywords:
+                if (name, k.arg) in KW and KW[(name,k.arg)]: add(f"{name}({k.arg}=) [{KW[(name,k.arg)]}]", f, node.lineno)
+        if hasattr(node, "type_params") and getattr(node, "type_params"): add("PEP 695 type params [3.12 syntax]", f, node.lineno)
+    # BinOp | in annotations evaluated at runtime
+    for node in ast.walk(tree):
+        for ann in ([node.annotation] if isinstance(node,(ast.AnnAssign,ast.arg)) and node.annotation else []) + ([node.returns] if isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef)) and node.returns else []):
+            if any(isinstance(x, ast.BinOp) and isinstance(x.op, ast.BitOr) for x in ast.walk(ann)):
+                add("X | Y annotation [3.10 at runtime unless __future__ annotations]", f, ann.lineno); break
+    text = src.decode("utf-8", "replace")
+    for i, line in enumerate(text.splitlines(), 1):
+        if re.search(r"\(\?>|[*+?]\+(?![\w\s=])", line) and ("re." in line or "compile" in line): add("regex atomic/possessive? [3.11] (text, review)", f, i)
+out = {"files": len(files), "syntax_errors_under_host": syntax_err,
+       "hits": {k: {"count": len(v), "files": len({x.rsplit(':',1)[0] for x in v}), "sample": v[:3]} for k, v in sorted(hits.items())}}
+json.dump(out, open(sys.argv[2], "w"), indent=1)
+for k, v in sorted(out["hits"].items()): print(f"{v['count']:5d} {v['files']:4d}  {k}  {v['sample'][0]}")
+print("syntax errors:", syntax_err)
+````
+
+### `compile_all.py`, dispatch 113
+
+````python
+import sys, subprocess, warnings, collections
+root = sys.argv[1]
+files = subprocess.run(["git","-C",root,"ls-files","*.py"],capture_output=True,text=True).stdout.split()
+fails, warns = {}, collections.Counter(); ws = []
+for f in files:
+    src = open(f"{root}/{f}","rb").read()
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        try: compile(src, f, "exec", dont_inherit=True)
+        except SyntaxError as e: fails[f] = f"{e.lineno}: {e.msg}"
+    for x in w: warns[(x.category.__name__, str(x.message)[:60])] += 1; ws.append(f"{f}:{x.lineno} {x.category.__name__} {str(x.message)[:70]}")
+print(sys.version.split()[0], "files", len(files), "syntax failures", len(fails))
+for f, m in fails.items(): print("  FAIL", f, m)
+print("warnings", sum(warns.values()))
+for k, v in warns.most_common(): print("  ", v, k)
+for s in ws[:6]: print("   e.g.", s)
+````
+
+### `compile310.py`, dispatch 113
+
+````python
+import sys, warnings
+root, lst = sys.argv[1], sys.argv[2]
+fails = []
+for f in open(lst).read().split():
+    try: compile(open(f"{root}/{f}","rb").read(), f, "exec", dont_inherit=True)
+    except SyntaxError as e: fails.append(f"{f}:{e.lineno}: {e.msg}")
+print(sys.version.split()[0], "syntax failures", len(fails)); [print(" ", x) for x in fails]
+````
+
+### `shcensus.py`, dispatch 113
+
+````python
+"""bash 4+ and GNU-only census over tracked shell, comment lines stripped. Read-only. argv: root."""
+import re, subprocess, sys, collections
+root = sys.argv[1]
+allf = subprocess.run(["git","-C",root,"ls-files"],capture_output=True,text=True).stdout.split("\n")
+def is_sh(f):
+    if not f or f.startswith("memory/") or f.startswith(".claude/"): return False
+    if f.endswith(".sh"): return True
+    if "." in f.rsplit("/",1)[-1]: return False
+    try: first = open(f"{root}/{f}","rb").readline()
+    except OSError: return False
+    return first.startswith(b"#!") and (b"bash" in first or b"/sh" in first)
+files = [f for f in allf if is_sh(f)]
+P = [  # (label, version/flavour, regex)
+ ("EPOCHREALTIME/EPOCHSECONDS","bash 5.0",r"\bEPOCH(REALTIME|SECONDS)\b"),
+ ("BASH_ARGV0","bash 5.0",r"\bBASH_ARGV0\b"),("SRANDOM","bash 5.1",r"\bSRANDOM\b"),("wait -p","bash 5.1",r"\bwait\s+(-n\s+)?-p\b"),
+ ("wait -n","bash 4.3",r"\bwait\s+-n\b"),("nameref local/declare -n","bash 4.3",r"\b(local|declare|typeset)\s+(-\w*n\w*)\b"),
+ ("negative subscript","bash 4.3",r"\$\{\w+\[-\d+\]\}"),("${x@Q} transforms","bash 4.4",r"\$\{[\w\[\]@*]+@[QEPAaKUuL]\}"),
+ ("inherit_errexit","bash 4.4",r"inherit_errexit"),
+ ("assoc array -A","bash 4.0",r"\b(local|declare|typeset)\s+-\w*A"),("mapfile/readarray","bash 4.0",r"\b(mapfile|readarray)\b"),
+ ("case modification ${x,,} ${x^^}","bash 4.0",r"\$\{\w+(\[[^]]*\])?(,,|\^\^|,|\^)\}"),("coproc","bash 4.0",r"\bcoproc\b"),
+ ("|& pipe","bash 4.0",r"\|&"),(";& / ;;& case fallthrough","bash 4.0",r";;&|[^;];&\s*$"),("globstar","bash 4.0",r"globstar"),
+ ("$BASHPID","bash 4.0",r"\bBASHPID\b"),("{fd}> auto fd","bash 4.1",r"\{\w+\}[<>]"),("printf %(..)T","bash 4.2",r"printf\s.*%\([^)]*\)T"),
+ ("lastpipe","bash 4.2",r"lastpipe"),("[[ -v var ]]","bash 4.2",r"\[\[\s+!?\s*-v\s"),("declare -g","bash 4.2",r"\b(declare|local)\s+-\w*g"),
+ ("read -t fractional","bash 4.0",r"\bread\b[^|;]*-t\s*0?\.\d"),
+ ("sed -i without suffix","GNU sed",r"\bsed\s+(-\w+\s+)*-i(\s|$)(?!'')"),("sed -r / -z","GNU sed",r"\bsed\s+(-\w+\s+)*-[a-zA-Z]*[rz]\b"),
+ ("grep -P","GNU grep",r"\bgrep\s+(-\w+\s+)*-\w*P"),("date -d / --date","GNU date",r"\bdate\b[^|;]*\s(-d|--date)\b"),("date %N","GNU date",r"\bdate\b[^|;]*%N"),
+ ("stat -c / --format","GNU stat",r"\bstat\s+(-\w+\s+)*(-c|--format|--printf)\b"),("readlink -f/-m/-e","GNU (macOS >=12.3 has -f)",r"\breadlink\s+-[fme]\b"),
+ ("realpath","coreutils (macOS >=13)",r"\brealpath\b"),("realpath --relative-to","GNU only",r"realpath\s.*--relative"),
+ ("mktemp -p / --tmpdir","GNU mktemp",r"\bmktemp\b[^|;]*\s(-p|--tmpdir)\b"),("xargs -r","GNU xargs",r"\bxargs\s+(-\w+\s+)*-\w*r\b"),
+ ("find -printf/-regextype","GNU find",r"\bfind\b.*\s-(printf|regextype|fprintf)\b"),("head -n -N","GNU head",r"\bhead\s+-n\s*-\d"),
+ ("timeout","coreutils (absent on macOS)",r"(^|[\s;|&(])timeout\s"),("md5sum/sha*sum","coreutils",r"\b(md5sum|sha1sum|sha256sum)\b"),
+ ("tac","coreutils (absent on macOS)",r"(^|[\s|;(])tac\b"),("nproc","coreutils (absent on macOS)",r"\bnproc\b"),
+ ("stdbuf/flock/setsid","util-linux/coreutils",r"\b(stdbuf|flock|setsid)\b"),("base64 -w","GNU base64",r"base64\s+-w"),
+ ("touch -d","GNU touch",r"\btouch\s+(-\w+\s+)*-d\b"),("cp -T / ln -T / ln -r / cp --","GNU cp/ln",r"\b(cp|ln)\s+(-\w+\s+)*-\w*[Tr]\b|\bcp\s+--\w"),
+ ("gawk-only fns","gawk",r"\b(gensub|strftime|systime|asort|asorti|PROCINFO|IGNORECASE|BEGINFILE|FPAT)\b"),
+ ("awk match(s,r,arr)","gawk",r"match\([^,()]+,[^,()]+,\s*\w+\)"),("/proc","Linux/Cygwin only",r"/proc/"),
+ ("uname -o","GNU uname",r"\buname\s+-\w*o"),("sort -V","GNU/newer BSD",r"\bsort\s+(-\w+\s+)*-\w*V"),
+ ("wc -L","GNU wc",r"\bwc\s+-\w*L"),("du -b","GNU du",r"\bdu\s+-\w*b"),("getopt (external)","GNU getopt",r"\bgetopt\s"),
+]
+res = collections.OrderedDict((p[0], [p[1], 0, set(), set(), []]) for p in P)
+rx = [(p[0], re.compile(p[2])) for p in P]
+for f in files:
+    test = ".test." in f or "/test" in f or "selftest" in f
+    for i, line in enumerate(open(f"{root}/{f}", encoding="utf-8", errors="replace"), 1):
+        s = line.lstrip()
+        if s.startswith("#"): continue
+        for lab, r in rx:
+            if r.search(line):
+                e = res[lab]; e[1] += 1; e[2 if not test else 3].add(f)
+                if len(e[4]) < 1: e[4].append(f"{f}:{i}")
+print(f"shell files: {len(files)}  (prod {sum(1 for f in files if not ('.test.' in f or '/test' in f or 'selftest' in f))})")
+print(f"{'feature':34} {'floor':26} {'lines':>5} {'prodF':>5} {'testF':>5}  sample")
+for lab, (v, n, pf, tf, smp) in res.items():
+    print(f"{lab:34} {v:26} {n:5d} {len(pf):5d} {len(tf):5d}  {smp[0] if smp else '-'}")
+````
+
+### `rb.py`, dispatch 113
+
+````python
+import sys, os, subprocess
+sys.dont_write_bytecode = True
+sys.path.insert(0, r"C:/projects/coding-governance/.claude/worktrees/gov-architecture-plan-e34297/tools/govkit")
+import govkit
+try: print("govkit.resolve_bash ->", govkit.resolve_bash())
+except Exception as e: print("govkit.resolve_bash -> Refusal:", str(e)[:90] or type(e).__name__)
+print("resolve_shell_argv ->", govkit.resolve_shell_argv(["bash","x.sh"])[0])
+ep = subprocess.run(["git","--exec-path"],capture_output=True,text=True).stdout.strip()
+cand = os.path.normpath(os.path.join(ep, "..", "..", "..", "usr", "bin", "bash.exe"))
+print("git --exec-path ->", ep, "| derived", cand, "exists", os.path.isfile(cand))
+````
+
+### `nodebash.js`, dispatch 113
+
+````javascript
+const r=require('child_process').spawnSync('bash',['--version'],{encoding:'utf8'});console.log('node bare bash ->',(r.stdout||'').split('\n')[0],'rc',r.status);
+````
+
+### `clean.ps1`, dispatch 113
+
+````powershell
+$env:PATH=[Environment]::GetEnvironmentVariable("Path","Machine")+";"+[Environment]::GetEnvironmentVariable("Path","User")
+Write-Output ("usr\bin\bash.exe: " + (& "C:\Program Files\Git\usr\bin\bash.exe" "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/away/d113/tools.sh"))
+Write-Output ("bin\bash.exe:     " + (& "C:\Program Files\Git\bin\bash.exe" "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/away/d113/tools.sh"))
+````
+
+### `tools.sh`, dispatch 113
+
+````bash
+for t in sed awk grep timeout mktemp node; do printf "%s=%s " "$t" "$(type -P "$t" || echo MISSING)"; done; echo
+````
+
+### `toml11.toml`, dispatch 113
+
+````toml
+tbl = {
+  key = "a",
+}
 ````

@@ -57,6 +57,7 @@ is this pass's own synthesis. Each handoff is in `prompts/`, and each return is 
 | 109 | 4, compatibility | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-12-researcher.md` | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-compatibility.md` | one practice, not one language: a role per language, gated, ratcheting toward Python; only Windows is tested, and WSL fails two of three checks |
 | 110 | 5, observability | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-13-researcher.md` | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-observability-trace.md` | not as designed: a cause on every record, cost on every act, and a trace verb |
 | 111 | 6, distribution | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-14-researcher.md` | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-supersession.md` | release-chained upgrade steps, run up and down; today a retired kit refuses the whole update |
+| 113 | 4, asked while the owner answered: AP-19's floor and AP-17's future plan | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-15-researcher.md` | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-python-floor.md` | keep 3.11 now and raise it to 3.12 by 2027-10, which the owner replaced with 3.15 now (AP-31); macOS and pwsh-launch planned behind triggers; a TOML 1.1 split at 3.15 |
 
 - **A harness notice on three returns.** The returns of dispatches 107, 108 and 109 matched the harness's
   instruction-shaped patterns: `settings-json` on all three, and `bypass-permissions` and
@@ -67,6 +68,10 @@ is this pass's own synthesis. Each handoff is in `prompts/`, and each return is 
   from its probe directory, which wrote two transcripts in the harness's own store; the resume cost 51 times the
   fresh run. Dispatch 109 ran read-only checks under WSL, PowerShell 7 and PowerShell 5.1. Nothing in the
   repository was written by any researcher.
+- **Dispatch 113,** a seventh researcher at the owner's medium, ran while the owner answered the forks, on AP-17's
+  and AP-19's answers. Its return matched the harness's `settings-json` pattern, since it cites the hook wiring in
+  `.claude/settings.json` as evidence. Nothing in it was acted on as an instruction. It wrote no repository file, and
+  its probes are kept in the instruments record.
 
 ## [p1-memory] Point 1: memory and instruction, one practice, every pocket
 
@@ -90,8 +95,8 @@ the tag system already gives one grammar and one resolver. What it lacked, measu
 3. **The closed set grows by eleven** (`[edges]`, P33 amended): `serves`, `made-by`, `caused-by`, `follows`,
    `answers`, `runs-in`, `carries`, `pinned-at`, `reads`, `writes` and `promoted-from`.
 4. **Every pocket placed** (`[pockets]`): node, witness or out, with its key and its owner. Git joins by typed
-   trailers; sessions join through the act, which committed memory names in place of a session id, as the owner's
-   rule of 2026-09-13 keeps; transcripts and the auto-memory are witnesses the bindings point at.
+   trailers; sessions join through the act, and committed memory may name the harness session
+   id beside it (AP-8); transcripts and the auto-memory are witnesses the bindings point at.
 5. **Codex can do the same** for ids, resume and transcripts, tested here at Codex CLI 0.139; it has no live inbox,
    so its sessions message through the mailbox (`[sessions]`).
 6. **The atlas gains a Memory view**, derived from the plan record and the kind registry, built in this pass.
@@ -167,7 +172,9 @@ launches act sessions as CLI processes. The test showed what that buys and costs
 **Worked in** (P37): a role per language, Python for logic, shell as thin shims, JavaScript on the harness's
 surfaces, with new and rebuilt code moving to Python by a shrink-only ratchet; one rule set, each rule with its leg
 (the compatibility return's section 4); a declared platform matrix, Windows with Git-Bash and Linux at tier 1, macOS
-unsupported until a node runs it; and two keys, `platforms.supported` and `platforms.verify`.
+unsupported until a node runs it; and two keys, `platforms.supported` and `platforms.verify`. The owner then set the
+floor at Python 3.15, every node upgrading (AP-31), and placed macOS and pwsh-launch in v2's `[planned]` behind
+their triggers (AP-17, AP-34).
 
 ## [p5-observe] Point 5: pointing at anything and telling what happened
 
@@ -211,16 +218,15 @@ review acts' output tokens only.
    witness holds, and rolls back by running the down steps in reverse.
 3. **gov runs every step on itself first**, through the lander in the prepared merge.
 4. **Two bounded windows** keep old surfaces working: a command or hook path forwards and warns for
-   `install.deprecation-window` releases, through dGroundRules' forwarding shim, and an old conf or record shape is
+   `install.deprecation-window` releases, through dSafePassage's forwarding shim, and an old conf or record shape is
    read until its step runs. The window is at least `currency.max-behind`, so an adopter inside its currency budget
    never meets a removed surface.
 5. **A release-0 fixture tree** is walked up, down and up again, byte-identical down, each step seen load-bearing.
 6. **The receipt records the steps**, and the currency watch and the fleet register read steps pending and shim
    calls, so the owner sees a stuck migration, not only an adopter behind.
 7. **Where the step kind is built.** It must exist before dOrderedCharter, the first build to change what an adopter
-   sees. It is placed in dGroundRules, beside the legacy homes the translation window reads, and the recovery,
-   receipt and fleet units go to dShippedRelease. The researcher recommended a build of its own; at five units the
-   path cost is the same either way, so the split is the owner's (AP-25).
+   sees. The owner gave it a build of its own, dSafePassage, between dGroundRules and dOrderedCharter (AP-25), as the
+   researcher recommended and at the same path cost. The recovery, receipt and fleet units stay with dShippedRelease.
 8. **Four keys**: `install.deprecation-window`, `install.on-shim-call`, `install.retired-edits`, `install.steps`.
 
 ## [chain-impact] What the away pass did to the chain
@@ -279,7 +285,8 @@ build, and it would freeze every adopter on today's kits through the whole chain
 
 ## [forks] Parked for the owner, 2026-10-18
 
-Thirty forks, each with the recommendation first. A key's default stands as recommended until the owner answers.
+Thirty forks, each with the recommendation first, and five more, AP-31 to AP-35, that dispatch 113 raised while the
+owner answered. A key's default stands as recommended until the owner answers.
 
 | Fork | Question | Options, the recommendation first | What the answer sets |
 |---|---|---|---|
@@ -313,6 +320,14 @@ Thirty forks, each with the recommendation first. A key's default stands as reco
 | AP-28 | `install.retired-edits`: what happens to an adopter's edit of a retired file? | order: kept, marked forked, with an order; keep silently; delete | the key's default |
 | AP-29 | `install.steps`: who runs an upgrade step? | offer: gov's no-target-code mode, a step needing the target's code falling back to attended; attended always | the key's default |
 | AP-30 | How does gov itself migrate? (P8) | the lander runs each new step on gov first, recorded in its source-mode receipt; gov's own diff is its migration | dShippedRelease's lander unit |
+| AP-31 | What is the next interpreter floor, once 3.11 nears its end of life in 2027-10? | 3.12 by 2027-10, as a P38 step after the chain closes; 3.14; 3.15 | the interpreter floor |
+| AP-32 | `platforms.provision`: how does a node get to the floor? | name: the refusal names the install command for its platform, recommending uv; uv, offered while the owner attends; off | the key's default |
+| AP-33 | A bare `bash` from Python runs WSL's bash on Windows: how is it fixed, and when? | one shared resolver and a wrong-shell refusal on dWitnessedBar now; the same, deferred with pwsh-launch; a PATH precondition | dWitnessedBar's units |
+| AP-34 | When does the macOS work start? | on a registered node, after dWellOiledMachine dissolves `unattended/`; now | v2 `[planned]` |
+| AP-35 | `maintain.interpreter-eol`: what happens as the floor's end of life nears? | file: an intake six months before it; warn; off | the key's default |
+
+The owner answered all thirty-five on 2026-10-18 (`[answers]`), and the design carries the answers
+(`[folded-answers]`).
 
 ## [review-fold] The closing review, folded
 
@@ -390,10 +405,155 @@ did not run, since the review was light.
   surfaces (P38). Today's engine refuses a retired kit outright and cannot roll back.
 
 **The state:**
-- **The design:** 20 builds, 367 planned units, 38 principles, 224 keys, 296 gaps and 76 record kinds.
+- **The design, at `a9b00addd`:** 20 builds, 367 planned units, 38 principles, 224 keys, 296 gaps and 76 record
+  kinds.
 - **The checks:** every one green on the folded tree, re-run in the instruments record's `[final]`.
 - **The chain's path:** it grows by 20 units, now through dWellOiledMachine; `[chain-impact]` holds the run.
 - **The closing review:** CLEAN WITH FIXES, every item folded, `[review-fold]`.
-- **Forks parked:** AP-1 to AP-30, seven of them structural: AP-1, AP-2, AP-5, AP-10, AP-15, AP-24 and AP-25.
+- **Forks parked:** AP-1 to AP-30, seven of them structural: AP-1, AP-2, AP-5, AP-10, AP-15, AP-24 and AP-25. The
+  owner has answered them since, with five more (`[answers]`), and `[folded-answers]` holds the state after them.
 - **Not done:** nothing merged or pushed, no product code, no chain spec written. The build's exit still waits on the
   owner's word that the design has its full shape.
+
+## [answers] The owner's answers, 2026-10-18
+
+Asked on the owner's return, "put the forks to me", through AskUserQuestion in nine batches of up to four, the
+recommendation first. Each answer is quoted as the tool returned it.
+
+- AP-1, asked as "AP-1 (structural): how does a record section declare its edges?": "Edges line under heading (Recommended)" with its preview
+- AP-2, asked as "AP-2 (structural): how far does P33's closed edge set grow?": "The eleven types (Recommended)"
+- AP-3, asked as "AP-3: how do today's records reach the plan (memory.legacy-anchors)?": "derived (Recommended)"
+- AP-4, asked as "AP-4: how does a design-only build's unit become a node in the graph?": "README ids defines it (Recommended)"
+- AP-5, asked as "AP-5 (structural): how does git join the syntax?": "Typed trailers (Recommended)" with its preview
+- AP-6, asked as "AP-6: where are the commit trailers checked (commits.edge-check)?": "push-leg (Recommended)"
+- AP-7, asked as "AP-7: what happens to the trailers when an adopter squashes (commits.squash)?": "re-emit-union (Recommended)"
+- AP-8, asked as "AP-8: may committed memory name a session id (trace.identity, never set by a preset)?": "session"
+- AP-9, asked as "AP-9: what are transcripts and the auto-memory to the graph?": "Witnesses with pointers (Recommended)"
+- AP-10, asked as "AP-10 (structural): how does gov stay independent of your application?": "Harness adapters, CLI first (Recommended)"
+- AP-11, asked as "AP-11: which CLI does the supervisor launch (runtime.binary)?": "newest-conforming (Recommended)"
+- AP-12, asked as "AP-12: which application is your viewer (runtime.owner-harness, never set by a preset)?": "auto (Recommended)"
+- AP-13, asked as "AP-13: which harness runs acts (runtime.act-harness)?": "claude-code by default, but owner-switchable."
+- AP-14, asked as "AP-14: how does an act authenticate (runtime.act-auth, never set by a preset)?": "setup-token by default, oauth-shared fallback, with api-key as the last owner-selectable option from the all the options as necessary"
+- AP-15, asked as "AP-15 (structural): which coding practice does gov follow?": "Role per language (Recommended)"
+- AP-16, asked as "AP-16: what language do harness hooks use?": "node, declared (Recommended)"
+- AP-17, asked as "AP-17: which platforms does gov promise (platforms.supported, never set by a preset)?": "gitbash + linux at start, but add a potential future plan for macos and pwsh-launch."
+- AP-18, asked as "AP-18: how are the promised platforms verified (platforms.verify)?": "held, then ci (Recommended)"
+- AP-19, asked as "AP-19: which Python does gov require?": "3.11 but let's plan this ahead, do we need a newer python version for any reason? Now is the time to price it in."
+- AP-20, asked as "AP-20: how are worktree pointers written?": "relative (Recommended)"
+- AP-21, asked as "AP-21: what does a committed act record carry (trace.cost)?": "tokens+wall (Recommended)"
+- AP-22, asked as "AP-22: where does a failing gate leg's output live (trace.leg-output)?": "tail-by-hash (Recommended)"
+- AP-23, asked as "AP-23: how many rows does a `gov trace` timeline show (trace.rows)?": "120"
+- AP-24, asked as "AP-24 (structural): how do the rebuilt kits supersede today's?": "Release-chained steps (Recommended)"
+- AP-25, asked as "AP-25 (structural): where is the upgrade-step kind built (five units, the forwarding shim among them)?": "A build of its own"
+- AP-26, asked as "AP-26: how long does an old command or hook path keep working (install.deprecation-window)?": "2 releases (Recommended)"
+- AP-27, asked as "AP-27: what does a call through a forwarded old path do (install.on-shim-call)?": "warn (Recommended)"
+- AP-28, asked as "AP-28: what happens to an adopter's edit of a file that a step retires (install.retired-edits)?": "order (Recommended)"
+- AP-29, asked as "AP-29: who runs an upgrade step (install.steps)?": "offer (Recommended)"
+- AP-30, asked as "AP-30: how does gov itself migrate (P8)?": "Steps on gov first (Recommended)"
+- AP-25, its name, asked as "AP-25's new build sits between dGroundRules and dOrderedCharter and holds the step kind, the update walk, down steps, the release-0 fixture and the forwarding shim. What is it called?": "dSafePassage (Recommended)"
+- AP-31, asked as "AP-31 (new, from the research): what is the next Python floor, once 3.11 nears its end of life in 2027-10?": "3.15 now, all the nodes will upgrade."
+- AP-32, asked as "AP-32: how does a node get to the 3.15 floor (platforms.provision)?": "name (Recommended)"
+- AP-33, asked as "AP-33 (new): on Windows, Python's bare `bash` runs WSL's bash 5.1.16 on every launch shell (I reproduced it). How is it fixed, and when?": "Shared resolver, now (Recommended)"
+- AP-34, asked as "AP-34 (new): when does the macOS work start?": "On a registered node (Recommended)"
+- AP-35, asked as "AP-35 (new): what does gov do as the Python floor's end of life nears (maintain.interpreter-eol)? 3.15's is 2031-10.": "file (Recommended)"
+
+- **AP-19 asked for a pricing.** Dispatch 113 ran while batches 6 and 7 were put, and its return raised AP-31 to
+  AP-35, put in batches 8 and 9. AP-31's answer, 3.15 now, replaces AP-19's 3.11.
+- **AP-25 chose a build of its own without naming it,** so its name was asked in batch 8.
+- **Five answers are in the owner's own words:** AP-13, AP-14, AP-17, AP-19 and AP-31.
+
+## [folded-answers] What the answers changed
+
+Twenty-seven answers took the recommendation, which the design already carried: each fork's pending marker in v2's
+catalogue now names the fork. Eight departed from the recommendation or added to it, AP-19's by asking for the
+research that AP-31 then answered, and dispatch 113's return changed the design with them.
+- **AP-25, AP-30 and AP-31: dSafePassage.** The upgrade-step kind's five units leave dGroundRules for a build of its
+  own, dSafePassage, between dGroundRules and dOrderedCharter, named at the owner's word. dOrderedCharter and
+  dFairHearing now follow it. It owns the five gaps dGroundRules held for the step kind, and
+  `install.deprecation-window` and `install.on-shim-call` move with the shim that reads them. Its sixth unit is the
+  step kind's first step: the interpreter floor raised to Python 3.15. gov runs it on itself first (AP-30).
+- **AP-31 and AP-32: the floor.** The research recommended keeping 3.11 and raising it to 3.12 by 2027-10, its end of
+  life. The owner chose 3.15 now, every node upgrading. With every reader at 3.15, `tomllib` reads TOML 1.1
+  everywhere and UTF-8 is the default encoding, so the research's TOML 1.0 arm and its floor-raise template are not
+  built. The floor is declared once. dSafePassage's step refuses an interpreter below it and names the install
+  command, dWitnessedBar's floor arm runs a real interpreter at the floor, and dShippedRelease's emitted CI sets one
+  up. `platforms.provision` joins the catalogue, `name` by default.
+- **AP-33: one bash resolver, now.** dWitnessedBar gains the shared resolver, which asks git where its bash is before
+  it searches PATH and refuses rather than fall back to a bare `bash`, and a wrong-shell refusal at every entry point.
+  The pwsh runner adapter waits in v2's `[planned]`. `gap-tool-20` records the class at its measured size.
+- **AP-8: session ids in committed memory.** `trace.identity` defaults to `session`. Committed records may name the
+  harness session id beside the act, a commit carries a `Gov-Session` trailer, and `runs-in` widens to take a commit.
+  dLoggedFlight's run log keeps its closed schema until dWellOiledMachine's act-key unit makes that leg read the key.
+- **AP-14: an ordered credential.** `runtime.act-auth` is an ordered list: a setup token, then the shared OAuth login,
+  and an API key tried last, only when the owner adds it. Each is read from the node's credential store, never from a
+  file, and a transient-auth failure moves to the next.
+- **AP-13, AP-23 and AP-35.** `runtime.act-harness` stays claude-code, switched by the owner. A timeline shows 120
+  rows before it folds. dTendedCadence gains a detector that files an intake six months before the floor's end of
+  life, under the new key `maintain.interpreter-eol`.
+- **AP-17 and AP-34: planned platforms.** macOS and pwsh-launch are in v2's new `[planned]` section, each with its
+  trigger, runner, units and gaps, counted in no build until its trigger holds.
+- **The gap register** gains five gaps, `gap-tool-20` to `gap-tool-22`, `gap-rt-32` and `gap-maint-15`, each owned
+  once, and its tally is re-measured. The join reads 301 gaps over 21 builds, each owning at least one.
+- **The catalogue** holds 226 keys, 206 of them presettable, and the presets follow.
+- **The recut record's** `check` homonym row moves with its clause to dSafePassage, after the reconciliation probe
+  reddened on it.
+- **The atlas** shows v2's `[planned]` in its chain view.
+
+**The chain after the answers,** recomputed by `critical_path.py` with its build count raised to 21:
+
+```text
+critical path: 195 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dSafePassage 14, dFairHearing 26, dOrderedCharter 45, dDeclaredLoop 68, dPlacedRequest 76, dKeptSession 95, dWitnessedBar 95, dBoundRoles 112, dTotalRecall 114, dRankedPlan 127, dFurnishedOrders 130, dLinkedLibrary 138, dIndexedDesign 150, dWellOiledMachine 151, dScopedBuild 162, dTendedCadence 167, dMindYourWords 168, dShippedRelease 176, dCalibratedLens 179, dConvergedCharter 195
+```
+
+The path grows by four units: dSafePassage's floor step, dWitnessedBar's two AP-33 units and dTendedCadence's
+detector. It now runs through dSafePassage.
+
+**Corrections.**
+- **The rule of 2026-09-13 is dLoggedFlight's.** Its committed run-log record has a closed schema, and a schema leg
+  refuses session ids there (`memory/builds/dLoggedFlight/README.md`). The away pass, its AP-8 row and the plan's
+  `[sessions]` read it as a rule over all committed memory. The plan and v2's catalogue now state it at its size.
+- **AP-33 was put larger than the tree shows.** Its question said a bare `bash` from Python runs WSL's bash on every
+  launch shell. That holds for a bare `bash`, reproduced from a Git-Bash launch:
+
+  ```text
+  $ python bare_bash_repro.py
+  bare bash (bash): rc 2
+    err: /bin/bash: -c: line 1: syntax error near unexpected token `('
+    err: /bin/bash: -c: line 1: `echo 5.1.16(1)-release; uname -s'
+  PATH's bash (C:\Program Files\Git\usr\bin\bash.EXE): rc 0
+    out: 5.3.9(1)-release
+    out: MINGW64_NT-10.0-22621
+  ```
+
+  But tracked Python makes no bare `bash` call:
+
+  ```text
+  $ python bare_bash_census.py
+  tracked .py files 111, unparsed 0
+  bare-bash call sites 0 in 0 files; by area:
+  $ python bare_bash_lists.py
+  argv-shaped literals starting with bash: 30 in 13 files; branch-reconcile 1, codebase-map 4, drift-audit 1, govkit 12, lexicon 1, memory-tree 1, process-monitor 1, roles 1, run-gates 6, runlog 1, settings-merge.py 1
+  ```
+
+  Those literals reach a resolver first. The class reaches WSL through govkit's fall-back to a bare `bash` when no
+  PATH bash resolves, and through seven copies of a resolver loop that search PATH only. The answer stands, and
+  `gap-tool-20` states the class at that size.
+
+**Interpretations, for the owner to correct:**
+- AP-13's "owner-switchable" reads as switched by the owner alone: `runtime.act-harness` joins the keys presets
+  never touch, so picking a preset never changes the harness.
+- AP-14's api-key, "the last owner-selectable option", reads as outside the default order: the owner adds it to
+  `runtime.act-auth`'s list, and it is tried last.
+- AP-8 reaches dLoggedFlight's run log too, once dWellOiledMachine lands its act-key unit. Until then that build's
+  rule stands as written, and its README is untouched.
+- AP-25's dSafePassage precedes dFairHearing as well as dOrderedCharter, since the review harness is a shipped kit
+  and so changes what an adopter sees. It costs the path nothing.
+- AP-31's "now" reads as the chain's first change an adopter sees: dSafePassage raises the floor before any later
+  build, so each may rely on 3.15.
+- AP-32's `platforms.provision` joins the keys presets never touch, since how a node gets its interpreter is the
+  operator's.
+- AP-17's future plan counts in no build's units and adds no gap to the register until its trigger holds.
+
+**The checks** are re-run in the instruments record's `[final]`, all green. The reconciliation probe's one red run
+on the way is in its `[answers-fold]`.
