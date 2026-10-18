@@ -2101,6 +2101,12 @@ The night pass's closing review, dispatch 105, derived from its run the same way
   Checking the record's own figures against the catalogue found one miscount, fixed before the commit: the review
   control flow carries twelve keys, not eleven.
 
+- 2026-10-18, session 1799cb98: the owner approved wave 1, "approve wave 1, present wave 2", recorded in the walk
+  record's `[words]`. `[wave-2]` presents dWitnessedBar, dBoundRoles, dTotalRecall, dIndexedDesign and dRankedPlan,
+  and parks three forks in `[wave-2-forks]`. Eight stage items are acted by the planner, the architect or the tester,
+  whom no agent plays today, in stages whose builds do not follow dBoundRoles (W2-1, W2-2). dTotalRecall, the
+  largest block on the path, may split as dDeclaredLoop did (W2-3).
+
 ## Instruments
 
 ### The gap-ownership join

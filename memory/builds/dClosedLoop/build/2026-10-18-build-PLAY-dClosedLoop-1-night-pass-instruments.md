@@ -4722,6 +4722,292 @@ W.sub("critical path went from 181 at `beda01950` to 214, and then fell to 189 a
 W.save()
 ````
 
+### `stage_actors.py`
+
+Wave 2: the stage items acted by a role no agent plays today, against the chain's order of dBoundRoles.
+
+````python
+"""Each stage item whose actor no agent plays today, with the stage's build and whether dBoundRoles, which binds the roles,
+is an ancestor of it. An item listed with "no" acts through a role nothing provides before that build starts, unless
+its records declare a stand-in.
+
+Usage: python -X utf8 stage_actors.py   (from the worktree root)
+It reads flow-steps' item rows (actor, owner), v2's [chain] (stages, parents) and tools/roles/agents/ (today's agents).
+It does not read stand-ins; the probe program's are declared in flow-steps' [probe], and the walk names the others.
+"""
+import pathlib
+import re
+
+B = "memory/builds/dClosedLoop/build/"
+fs = open(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md", encoding="utf-8").read()
+v2 = open(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md", encoding="utf-8").read()
+chain = v2.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+parents, stage_build = {}, {}
+names = re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| ([^|]+) \| ([^|]+) \| (.+) \| [^|]+ \|$", ln)
+    if m:
+        parents[m.group(1)] = [p.strip() for p in m.group(3).split(",") if p.strip() in names]
+        stage_build[m.group(2).strip().lower()] = m.group(1)
+
+
+def ancestors(b, acc=None):
+    acc = set() if acc is None else acc
+    for p in parents[b]:
+        if p not in acc:
+            acc.add(p)
+            ancestors(p, acc)
+    return acc
+
+
+today = {re.sub(r"^gov-|\.agent\.md$", "", p.name).replace("-", " ")
+         for p in pathlib.Path("tools/roles/agents").glob("*.agent.md")}
+ROLE_AGENT = {"spec writer": "spec writer", "builder": "builder", "researcher": "researcher", "reuse scout": "reuse scout",
+              "orientation scout": "orienter", "reviewer": "diff reviewer", "skeptic": "skeptic",
+              "synthesizer": "synthesizer"}
+print(f"today's agents: {', '.join(sorted(today))}")
+rows = 0
+for m in re.finditer(r"^## \[([a-z-]+)\][^\n]*\n(.*?)(?=^## |\Z)", fs, flags=re.M | re.S):
+    step = m.group(1)
+    if step not in stage_build:
+        continue
+    for ln in m.group(2).split("\n"):
+        c = [x.strip() for x in ln.strip().strip("|").split(" | ")]
+        if not ln.startswith("| `") or len(c) != 7:
+            continue
+        actor = re.split(r"[,:]", c[1])[0].strip()   # the role, its qualifiers ("one per unit", "under ...") dropped
+        if actor in ("command", "executor", "owner", "hook") or ROLE_AGENT.get(actor) in today:
+            continue
+        sb = stage_build[step]
+        bound = "yes" if "dBoundRoles" in ancestors(sb) or sb == "dBoundRoles" else "no"
+        rows += 1
+        print(f"{step:7} {c[0]:22} actor {actor:12} owner {c[6]:15} stage build {sb:15} after dBoundRoles: {bound}")
+print(f"stage items acted by a role no agent plays today: {rows}")
+````
+
+### `record_walk3.py`
+
+The owner's word on wave 1, and wave 2 presented with its three forks.
+
+````python
+"""Record the owner's word on wave 1 and present wave 2: `[wave-2]`, `[wave-2-forks]` and `[walk-instrument-3]`.
+
+Usage: python -X utf8 record_walk3.py <facts.out> <since.out> <actors.out>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+HERE = pathlib.Path(__file__).resolve().parent
+FENCE = "`" * 3
+
+
+def read(p):
+    return pathlib.Path(p).read_text(encoding="utf-8").replace("\r\n", "\n").strip("\n")
+
+
+facts, since, actors = (read(p) for p in sys.argv[1:4])
+W = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-walk.md")
+W.sub("""  `[wave-1-2]`.
+
+## [chain] The chain at a glance
+""", """  `[wave-1-2]`.
+- The owner's word on wave 1, 2026-10-18, verbatim: "approve wave 1, present wave 2".
+
+## [chain] The chain at a glance
+""", "words")
+W.insert_before("## [walk-instrument] The walk's facts, and the clause scan", """**The owner's word:** approved, 2026-10-18 (`[words]`).
+
+## [wave-2] The stage and memory builds, as presented
+
+Derived at `9b4386707`, whose chain is `b3866c4ad`'s. Each build's "since the walk opened" reads its row against
+`beda01950`, the commit the walk opened at.
+
+### dWitnessedBar: Test
+
+After dDeclaredLoop, 22 units, finishing at 79. Six builds wait on it: dBoundRoles, dTotalRecall, dMindYourWords,
+dScopedBuild, dShippedRelease and dTendedCadence. It owns 9 items, 15 keys, 6 kinds, the retrofit system and 3 tag
+namespaces, and closes 20 gaps, 6 of them HIGH.
+- **The verdict:**
+  - gate health measured against a reliability bar;
+  - bypasses recorded;
+  - attribution deciding what blocks;
+  - the runner-written verdict the pre-push hook reads;
+  - held legs by policy, and the peer-node verifier;
+  - seen-red records and flake quarantine.
+- **Tests as a product contract:** runner adapters, a derived pre-commit list, and multi-node cost evidence.
+- **Legs:**
+  - the gate-leg factory and its conformance gate, each leg declaring the principles it enforces;
+  - the `leg`, `check` and `pack` namespaces;
+  - each leg's purpose, today's 140 reviewed;
+  - `tests=` and `enforces=` edges on legs.
+- **The retrofit's ledger:** the baseline ledger factory (shrink-only debt, append-only history, declared set or
+  ceiling), the `ratchet` pack and `test.seed` at registration. Gov's own 27 registries, pins and legacy lists move
+  onto it.
+- **A fix pass keeps its check** (night pass, point 6). A fix pass may not edit the red leg's own tests or gate
+  script. A change there routes through the tester's wrong-spec judgment to Design as a new unit.
+- **Since the walk opened:** two units from the night pass, the fix-pass rule and the leg edges, and gap-test-19.
+- **To look at:**
+  - It is the one stage build that lands before dBoundRoles binds the roles, and its stage names the tester three
+    times: `test.attribute`, `test.reason` and the fix pass's judgment. No agent plays the tester today, and none
+    until dBoundRoles lands at 113. The probe program declares a stand-in for the same gap, and Test declares none.
+    That is W2-1.
+  - The reliability bar is what lets `strict` and `guarded` refuse hook bypass without stalling (R5.1).
+
+### dBoundRoles: Roles
+
+After dDeclaredLoop, dWitnessedBar and dPlacedRequest, 34 units, finishing at 113. dWellOiledMachine and
+dShippedRelease wait on it. It owns 20 keys, the `work order` kind, the role-shapes system and 2 tag namespaces, and
+closes 25 gaps, 11 of them HIGH.
+- **The roster:** twelve core roles, the tester among them, and the deployer and maintainer as expansion roles,
+  defined by dShippedRelease and dTendedCadence.
+- **The work order:**
+  - rendered per item, hashed into the spawn marker and bound to its act;
+  - memory slices, code-notes and legacy slots, each under its own budget;
+  - the `map` slot, the `code` slot from each item's seed, and instruction units selected by `feature.*`, each
+    "not installed" until dTotalRecall lands.
+- **Roles as enforced fields:**
+  - static instructions as fields, every limit paired with its enforcer;
+  - returns through a schema-forced channel;
+  - the role index beyond workers' reach;
+  - shell writes held to the allowance;
+  - write classes enforced.
+- **Trust and repairs (P29):** inputs handed as content, each fact keyed and classed by the executor, trust profiles,
+  the answered-call hook, and repairs filed as asks against the producer's record.
+- **Who composes what:** the prompt writer composes every role's task, and the orientation scout composes the card
+  and its map cell.
+- **Shapes:** `single`, `per-unit`, `panel`, `twin` and `experiment`, each with its fan, checklist, merge and an agent
+  cap.
+- **Since the walk opened:** four units from the night pass, with the `experiment` shape, and gap-roles-21 and
+  gap-roles-22:
+  - the tester agent and the `probe` outcome on every return;
+  - owner questions asked live while attended;
+  - the `code` slot;
+  - the `feature` selector and the code-notes slot from a tag's bundle.
+- **To look at:**
+  - Three of its slots render "not installed" until dTotalRecall lands, six units after it.
+  - It binds the planner and the architect, whose items run dRankedPlan's and dIndexedDesign's stages, yet neither
+    build follows it. That is W2-2.
+  - 11 of its 25 gaps are HIGH. The roles layer is where P25, role work only in role agents, is enforced.
+
+### dTotalRecall: Memory
+
+After dDeclaredLoop, dWitnessedBar and dPlacedRequest, 40 units, finishing at 119. Four builds wait on it:
+dWellOiledMachine, dRankedPlan, dIndexedDesign and dShippedRelease. It owns 4 items, 25 keys, 16 kinds, 3 systems and
+5 tag namespaces, and closes 34 gaps, 9 of them HIGH.
+- **The memory contract:** the record-kind registry, each kind with its tag, layer, home, id rule, schema, writer,
+  readers, lifecycle and check. Templates and checks are generated from it, and one `record` command writes, minting
+  ids under the build's claim or lease.
+- **Builds and relations:** the README's front-matter schema, the slug and id grammar exported once, typed relations
+  checked both ways, and the ask kind's acceptance at filing.
+- **Decisions and reuse:**
+  - decisions split by kind, reuse entries as level-3 units and a major-decision log;
+  - the reuse scout's house index;
+  - `reuse_lookup.py` retired, and memory-recall narrowed to a record finder.
+- **Finding records:** the extractors, `record find` and `record show` over the one index, the read budget per role
+  item, and the default load's memory share.
+- **The project map:** the level-0 map, `gov map`, its completeness check, and the atlas from the same node table.
+  The map is built only if it wins its replay.
+- **Code depth** (P32, night pass):
+  - the core `code` record, replacing symbols and callers;
+  - `gov code show`, `callers`, `tests` and `where`;
+  - enrichment keyed by body hash;
+  - the replay extended to code;
+  - the ctags pack (NP-10).
+- **The relational syntax's memory half** (P33):
+  - typed edges from annotations, front matter, dossiers and decision rows;
+  - the region-parser factory;
+  - the dossier's header becoming the feature node;
+  - the `feature` selector armed.
+- **The retrofit's memory half:** the `baseline` and `census` kinds, the `origin` field, the `adopt` program, the
+  annotations leg and the marker namespace.
+- **Since the walk opened:** nine units from the night pass and the owner's answers. The caller map gave way to the
+  `code` record, and gap-mem-28 to gap-mem-34 came with them.
+- **To look at:**
+  - It is the largest build in the chain, 40 units, and all of them sit on the critical path.
+  - The nine new units, code depth and the relational syntax's memory half, may not be needed by dWellOiledMachine,
+    its successor on the path. If they are not, a split prices as dDeclaredLoop's did. That is W2-3.
+
+### dIndexedDesign: Design
+
+After dDeclaredLoop, dTotalRecall and dKeptSession, 12 units, finishing at 131. dScopedBuild and dTendedCadence wait on
+it. It owns 10 items, 4 keys and 10 kinds, and closes 10 gaps, 4 of them HIGH.
+- **The hand-off and the index:** the derived-READY hand-off and the design index.
+- **Design review by policy,** with its opt-in, effort and audit guard.
+- **Evidence:** reuse and alternatives backed by recorded probes, and the research harness on the `experiment` shape.
+- **The spec as a contract:**
+  - measured, and redesigned as a structured, tagged contract;
+  - agreement and tier checks, and sections named by tag;
+  - the feature level, each feature's interfaces declared, with two-level re-entry and fork resolution by policy;
+  - `implements=` and `decides=` edges, and `design.seams` reading a tag's bundle.
+- **Playbooks** (night pass, point 1): the playbook record kind, which is dScriptedRepeat's canon with its pieces and
+  sets by hash and `check-playbook` as Design's pack. With it come the playbook set and its set check, registered at
+  Test's leg-pack point.
+- **Since the walk opened:** three units from the night pass, the playbook kinds and the structured spec's edges. The
+  research harness was re-based on the `experiment` shape, and gap-flow-17 came with them.
+- **To look at:** its stage's items are the architect's, and its research harness waits on dBoundRoles' `experiment`
+  shape. dBoundRoles is not its ancestor (W2-2).
+
+### dRankedPlan: Plan
+
+After dDeclaredLoop and dTotalRecall, 13 units, finishing at 132. dTendedCadence waits on it. It owns 9 items, 6 keys
+and 3 kinds, and closes 10 gaps, 5 of them HIGH.
+- **Priority and triage:** priority beside `parents:` and the generated plan view, rule-based triage, dormancy
+  disposal, and the live-build mapping carried out.
+- **The planner's stage:**
+  - the planner and triager role and the Plan workflow;
+  - Plan Review;
+  - kickoff offering the next item, with attended briefs gated;
+  - the full kickoff only where `kickoff.runs` says.
+- **Ratification:** the session's intake log is read as the request's ratification. Until dWellOiledMachine's hook
+  writes it, `plan.exit` falls back to the owner gate.
+- **What Plan hands on:**
+  - each role item's memory read set, sized at Plan;
+  - the probes owed before Design (night pass, point 2);
+  - the intent fields: affected systems derived from the `code` record, and open questions as fork tags (point 6).
+- **Since the walk opened:** two units from the night pass, and gap-plan-08.
+- **To look at:**
+  - Until dWellOiledMachine lands, eighteen units after it, every Plan exit waits for the owner. Under unattended by
+    default, that is the one owner gate the chain keeps for a while.
+  - Its stage's items are the planner's, and dBoundRoles is not its ancestor (W2-2).
+
+## [wave-2-forks] Parked for the owner
+
+| Fork | Question | Options, the recommendation first | What the answer sets |
+|---|---|---|---|
+| W2-1 | Who plays the tester before dBoundRoles lands? | a minimal tester agent ships with dWitnessedBar in today's roles kit and dBoundRoles re-founds it with the other roles, one more unit in dWitnessedBar; an owner item stands in, as the probe program's does, so every own or mixed red and every Test exit waits for the owner until dBoundRoles lands; the skeptic stands in, a role doing another's work against P25 | a structural decision |
+| W2-2 | Should dIndexedDesign and dRankedPlan follow dBoundRoles? | yes, both: dBoundRoles lands at 113, before either can start at 119, so the edges cost nothing and their stages' roles are bound first; keep them as they are, the stages' roles unplayed until dBoundRoles happens to land | a structural decision about the chain |
+| W2-3 | Price a split of dTotalRecall? | price it before wave 3, as NP-24 was; keep it whole | a structural decision about the chain |
+
+""", "wave-2")
+W.text = W.text.rstrip("\n") + f"""
+
+## [walk-instrument-3] Wave 2's facts, at `9b4386707`
+
+`walk_facts.py` and `since.py` as above. `stage_actors.py` finds the stage items acted by a role no agent plays today:
+
+{FENCE}python
+{read(HERE / "stage_actors.py")}
+{FENCE}
+
+Its first run compared whole actor cells, qualifiers included ("builder, one per unit"), and listed 23 items. Matching
+each actor's role name before its qualifiers gives the run below.
+
+{FENCE}text
+$ python walk_facts.py dWitnessedBar dBoundRoles dTotalRecall dIndexedDesign dRankedPlan
+{facts}
+$ python since.py beda01950 dWitnessedBar dBoundRoles dTotalRecall dIndexedDesign dRankedPlan
+{since}
+$ python stage_actors.py
+{actors}
+{FENCE}
+"""
+W.done += 1
+W.save()
+````
+
 ### `record_instruments.py`
 
 This record's own writer.
@@ -4825,6 +5111,9 @@ MINE = [
     ("walk2/record_walk2.py", "The walk derived again: the owner's words, `[chain-2]`, `[wave-1-2]` and "
      "`[walk-instrument-2]` in the walk record."),
     ("walk2/fix_walk2.py", "Three corrections to the re-derivation, each checked against the records first."),
+    ("walk3/stage_actors.py", "Wave 2: the stage items acted by a role no agent plays today, against the chain's "
+     "order of dBoundRoles."),
+    ("walk3/record_walk3.py", "The owner's word on wave 1, and wave 2 presented with its three forks."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -5638,12 +5927,12 @@ rc 1
 
 ````text
 $ design map
-map: 2256 nodes in 30 namespaces; 31566 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1515, derived 259, pending 482
+map: 2257 nodes in 30 namespaces; 31566 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1516, derived 259, pending 482
 rc 0
 
 $ atlas
-atlas: derived — 156 records, 2711 sections, 178 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 156 records, 2721 sections, 178 decision sections, 16 comparison areas, 33 principles
 rc 0
 
 $ fold state
