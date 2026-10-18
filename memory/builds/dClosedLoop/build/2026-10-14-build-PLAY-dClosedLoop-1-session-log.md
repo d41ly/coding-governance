@@ -2119,6 +2119,12 @@ The night pass's closing review, dispatch 105, derived from its run the same way
   (Orders), and the path drops by nineteen units. The fold kept the role-gate escape's fix in dBoundRoles' first part
   at no cost. The gate was red on three class rows whose units or key had moved, until they were re-pointed.
 
+- 2026-10-18, session 1799cb98: the owner asked to "present wave 3". The walk record's `[wave-3]` presents
+  dWellOiledMachine, dScopedBuild, dTendedCadence and dMindYourWords, and `[wave-3-forks]` parks two forks.
+  `leaves.py` found dMindYourWords to be the one build besides convergence that no build waits on, though four fates
+  rows go to it (WK-5). dTendedCadence is back on the critical path, its four new units with it (WK-6).
+  dWellOiledMachine left the path with WK-4.
+
 ## Instruments
 
 ### The gap-ownership join

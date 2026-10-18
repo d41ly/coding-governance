@@ -16,6 +16,7 @@ the owner's word on each.
   `[wave-1-2]`.
 - The owner's word on wave 1, 2026-10-18, verbatim: "approve wave 1, present wave 2".
 - The owner's word on wave 2 and its forks, 2026-10-18, verbatim: "approve wave 2, take the recommendations".
+- The owner's request for wave 3, 2026-10-18, verbatim: "present wave 3".
 
 ## [chain] The chain at a glance
 
@@ -508,6 +509,125 @@ The owner approved wave 2 and took each fork's recommendation, 2026-10-18 (`[wor
   `build/2026-10-18-build-PLAY-dClosedLoop-1-wk3-pricing.md`.
 - **WK-4,** asked once that pricing was written: the owner chose C2 (that record's `[answers]`). dTotalRecall and
   dBoundRoles each split, and dLinkedLibrary and dFurnishedOrders join wave 2, where their units were.
+
+## [wave-3] The runtime and the builds it opens, as presented
+
+Derived at `7788ac269`. Each build's "since the walk opened" reads its row against `beda01950`.
+
+### dWellOiledMachine: Runtime
+
+After dBoundRoles, dTotalRecall and dKeptSession, 31 units, finishing at 128. Four builds wait on it: dMindYourWords,
+dScopedBuild, dShippedRelease and dTendedCadence. It owns 7 items, 10 extension points, 18 keys, 7 kinds and 2 tag
+namespaces, and closes 35 gaps, 13 of them HIGH, the most of any build.
+- **The platform spike first:** a role-typed Workflow agent run inside a headless act session, with the headless
+  backend measured beside it.
+- **The driver:**
+  - the supervisor, the only driver in every mode, the owner's session its client;
+  - `next` over the loop kit's position function, and the `next —` micro-format;
+  - the owner's pause, resume, withdraw and supersede, and attend and unattend;
+  - the `step —` announcement before each act while attended.
+- **Intake:** the prompt-submit hook writing each owner prompt to the session's intake log, Plan's ratification and the
+  placement dispositions re-pointed to it, and intake for a prompt that reaches no owner session.
+- **Acts:**
+  - one act session per role act, with act binding and the epoch check at every spawn;
+  - binding against the resolved shape's digest, each act writing its shape-run row;
+  - the persisted-return store, and agent slots reserved under the cap.
+- **The enforcement surface:** one dispatcher entry per event, the kits' fragments as packs, ask rules only the
+  dispatcher answers, and each pack's refusal naming its rule and remedy; grants on every adapter row, and the secret
+  value scan.
+- **Sessions:** bound on every source; the compact hook re-injecting the build's card; the session-start hook loading
+  the default set, card and map, and ending with `next`'s line; each compaction journaled.
+- **Hosts and adapters:** scheduler hosts, harness adapters with capability tables, a measured `browser` row among them,
+  the node registry, and the `visual.capture` command adapter.
+- **The rest:** workspaces and the commit queue, event waits, the journal grammar, and the unattended kit dissolved
+  into the loop kit and this one.
+- **Since the walk opened:** seven units from the night pass:
+  - the one-driver statement;
+  - the announcement;
+  - intake beyond the owner's session;
+  - the unattended kit's dissolution;
+  - the browser row and visual capture;
+  - experiments' acts;
+  - refusal text.
+
+  Three units were reworded, and gap-orient-16 to gap-orient-18 and gap-rt-22 to gap-rt-24 came with them.
+- **To look at:**
+  - It left the critical path with WK-4. It lands four units before dTendedCadence can start, so it can grow by four
+    at spec time before it returns to the path.
+  - Its first unit, the platform spike, decides the runtime's shape. If it fails, the owner's session keeps hosting
+    the driver under its owner binding, as the night pass's hosting rule says.
+  - It carries the most gaps of any build.
+
+### dScopedBuild: Build
+
+After dIndexedDesign, dWitnessedBar, dWellOiledMachine and dFurnishedOrders, 11 units, finishing at 143.
+dConvergedCharter waits on it. It owns 9 items, 6 keys and 2 kinds, and closes 7 gaps, 3 of them HIGH.
+- **The exit contract:** one contract with a history-derived base, refusing a build's exit while a core red its own
+  commits introduced stands, and the core checks run by the executor at Build's exit.
+- **Scope and specs:**
+  - built specs frozen;
+  - every closing-review finding disposed as new units;
+  - scope checked at the push by the touch join over the unit's own commits.
+- **The record:** the closing review recorded, a write gate reading derived state, and the checklist witnessed.
+- **The retrofit's drain:** each unit drains the legacy it touches, in hunks under `retrofit.drain-cap`, and claims
+  the baselined map keys its write set holds.
+- **Since the walk opened:** two units from the night pass. A bug-report patch build gets a red-first `reproduction`
+  probe before its fix, and a playbook's pieces are built as units.
+- **To look at:** it has 14 units of slack before dConvergedCharter can start. Its builders' code and map slots come
+  from dFurnishedOrders, its parent since WK-4.
+
+### dTendedCadence: Maintain
+
+After dWitnessedBar, dRankedPlan, dWellOiledMachine, dIndexedDesign and dFurnishedOrders, 14 units, finishing at 146.
+dCalibratedLens waits on it. It owns 7 items, 15 keys and 2 kinds, and closes 12 gaps, 2 of them HIGH.
+- **The Maintain run:** its step checklist on the flow's executor, never a recipe-mode playbook, the cadence on
+  Runtime's hosts, the safe-fix set and the maintenance record.
+- **Detectors:**
+  - detectors with owners, and map freshness;
+  - the memory's dead pointers, absorbing `check-dead-paths.sh` with its merge-bar leg;
+  - bundle members whose code changed while their head line did not.
+- **Delivery:** Maintain and the Loop Review as cadence steps of the observability expansion, patch intakes rendered
+  from keyed readings, `maintain.retrofit-heat`'s sweeps filed as patch builds, and the maintainer's definition.
+- **Since the walk opened:** four units from the night pass and the owner's answers, and gap-maint-12 and
+  gap-maint-13:
+  - a cyclic playbook's cadence item, filing `repeat` intakes;
+  - the bundle detector;
+  - the weekly security review;
+  - readings tiered by their deviation.
+- **To look at:**
+  - It is on the critical path again, now after dIndexedDesign.
+  - Its four new units sit on the path. A split could save at most eight units, since dConvergedCharter also waits for
+    dShippedRelease, and moving only the four new units would save four. That is WK-6.
+
+### dMindYourWords: Lexicon
+
+After dWellOiledMachine, dWitnessedBar, dLinkedLibrary and dFurnishedOrders, 17 units, finishing at 145. No build waits
+on it. It owns 5 keys and the lexicon-declaration kind, and closes 10 gaps, 3 of them HIGH.
+- **Definition classes:** conforming, forced, out of scope, not a name, and debt. Only debt counts against the
+  shrink-only pin, held as a keyed ledger population.
+- **Forced names:** recognised by what forces them, from packs generated per host kit, and gov's own contract-forced
+  names in a table the instruction write path owns. The first wave of packs covers Python's stdlib bases, its test
+  frameworks, `ast`, `logging` and the shell hosts. Django, Flask, Starlette, FastAPI and React follow after an
+  adopter census.
+- **Enforcement:**
+  - the work order's vocabulary slice;
+  - staged definitions checked at commit;
+  - the branch's offenders compared with its base's at the bar;
+  - drift beyond verbs, one verb per declared family per object, and a frozen noun canon.
+- **The vocabulary** changes only through the instruction write path, and the two drift signals are the lexicon's own
+  leg pack.
+- **Since the walk opened:** one unit, the overloaded terms settled: attended, playbook and baseline (gap-lex-09).
+- **To look at:**
+  - No build waits on it, not even dConvergedCharter, whose exit check joins the fates table, and four fates rows go
+    to it. That is WK-5.
+  - Its packs unit, clause 7, reads like several units of work: two waves of generated packs.
+
+## [wave-3-forks] Wave 3's forks, parked for the owner
+
+| Fork | Question | Options, the recommendation first | What the answer sets |
+|---|---|---|---|
+| WK-5 | Should dConvergedCharter wait for dMindYourWords? | yes: dMindYourWords lands at 145, before dConvergedCharter can start at 157, so the edge costs nothing, and convergence's fates join covers the lexicon's four rows; no, the lexicon lands on its own and convergence's join leaves its rows unchecked | a structural decision about the chain |
+| WK-6 | Split dTendedCadence? | keep it whole: no split saves more than eight units, bounded by dShippedRelease, and only its four new units could plausibly move, saving four; price a split, as WK-3 was | a structural decision about the chain |
 
 ## [walk-instrument] The walk's facts, and the clause scan
 
@@ -1171,4 +1291,178 @@ design  `design.reason`        actor architect    owner dDeclaredLoop   stage bu
 test    `test.attribute`       actor tester       owner dWitnessedBar   stage build dWitnessedBar   after dBoundRoles: no
 test    `test.reason`          actor tester       owner dDeclaredLoop   stage build dWitnessedBar   after dBoundRoles: no
 stage items acted by a role no agent plays today: 8
+```
+
+## [walk-instrument-4] Wave 3's facts, at `7788ac269`
+
+`walk_facts.py`, `since.py` and `critical_path.py` as above, the last now counting twenty builds. `leaves.py` finds the
+builds no build waits on, and the fates rows each one owns:
+
+```python
+"""The chain builds no build waits on, and the fates table's destinations each one owns. A leaf other than the
+convergence build lands outside convergence's exit check, which joins the fates table.
+
+Usage: python -X utf8 leaves.py   (from the worktree root)
+"""
+import re
+
+B = "memory/builds/dClosedLoop/build/"
+v2 = open(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md", encoding="utf-8").read()
+fates = open(B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md", encoding="utf-8").read()
+chain = v2.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+names = re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)
+parents = {}
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| [^|]+ \| ([^|]+) \| .+ \| [^|]+ \|$", ln)
+    if m:
+        parents[m.group(1)] = [p.strip() for p in m.group(2).split(",") if p.strip() in names]
+children = {b: [c for c in parents if b in parents[c]] for b in parents}
+table = fates.split("## [table]", 1)[1].split("\n## ", 1)[0]
+for b in sorted(b for b, cs in children.items() if not cs):
+    rows = [ln for ln in table.split("\n") if ln.startswith("| ") and re.search(rf"\b{b}\b", ln.split(" | ")[4] if
+                                                                                   ln.count(" | ") >= 5 else "")]
+    print(f"leaf {b}: {len(rows)} fates rows go to it")
+    for ln in rows:
+        c = [x.strip() for x in ln.strip().strip("|").split(" | ")]
+        print(f"  {c[0]} · {c[1][:50]} · {c[3]} · {c[4][:110]}")
+print(f"builds no build waits on: {sum(1 for cs in children.values() if not cs)} of {len(children)}")
+```
+
+```text
+$ python walk_facts.py dWellOiledMachine dScopedBuild dTendedCadence dMindYourWords
+=== dWellOiledMachine · Runtime · after dBoundRoles, dTotalRecall, dKeptSession · before dMindYourWords, dScopedBuild, dShippedRelease, dTendedCadence · finishes at 128 of 171 · units 31 · gaps 35 (HIGH 13, LOW 5, MED 17) · owns 7 items, 10 points, 18 policy-keys, 7 record-kinds, 2 tag-namespaces
+   1. the platform spike first: a role-typed Workflow agent run inside a headless act session, with the headless backend measured beside it
+   2. the `next` verb over the loop kit's position function, the `next —` micro-format, and the check that every declared command ends with one or declares …
+   3. the owner's pause, resume, withdraw and supersede through the guarded command, mapped onto unattended's verbs, and attend and unattend, each writing a…
+   4. the prompt-submit hook writing each owner prompt verbatim to the session's intake log, its secrets redacted and its size capped (`entry.intake`, PM-9)
+   5. Plan's ratification and the placement dispositions re-pointed to the intake record, RC-9's fallback drained per harness, only where an adapter's capab…
+   6. the supervisor: `resume-tick.sh` grown, started and restarted by the node tick, the executor launched where `run.host` says, its liveness its build le…
+   7. act binding and the epoch check at the Workflow, Agent and shell call, decided in the dispatcher's PermissionRequest entry, with in-script spawns decl…
+   8. the persisted-return store, keyed per spawn site, and the shared deferral block
+   9. agent slots reserved under agent-cap's cap
+  10. the one enforcement surface: the kits' fragments as packs, one dispatcher entry per event, ask rules on gated tools that only the dispatcher's Permiss…
+  11. workspaces by `build.worktree`, the commit queue, integration before release and the sweep
+  12. sessions bound on every source, a resume that delivers no card diagnosed and closed, the compact hook re-injecting the build's current card, never the…
+  13. the scheduler's host adapters and per-period cadence witnesses
+  14. harness adapters with capability tables
+  15. the node registry's runtime facts
+  16. the journal grammar moved into the core, and its retention by `runtime.journal`
+  17. the grant enforced on every adapter row, and the secret value scan at every boundary that publishes
+  18. event waits woken by their record, keyed by the record's id and the build, an owner request on an unleased build woken the same way, and the sweep tha…
+  19. act binding against the resolved shape's digest, and the journal reconciled against it, writing each non-review act's shape-run row
+  20. the `hook` and `point` tag namespaces
+  21. the hook-message and harness-prompt templates
+  22. hook and point purposes, reviewed
+  23. the session-start hook loading the set `memory.default-load` names, the card and the map by default in the owner's session, at startup, at resume and …
+  24. the journal's count of map reads outside a slice
+  25. the supervisor the only driver in every mode, the owner's session its client, which hosts the driver only before this build lands or if its platform s…
+  26. the `step —` announcement before each act while attended, and once when attendance begins, rendered from `next` and the item's declaration, never type…
+  27. intake for a prompt that reaches no owner session, through the mailbox's `intake` message or a cadence filer (night pass, point 1)
+  28. the unattended kit dissolved into the loop kit and the runtime's own kit: its hooks repacked, its supervisor seam taken, `/unattended` a client of `ru…
+  29. a measured `browser` row in each harness adapter's capability table, and the `visual.capture` command adapter: the pinned tree served, the cache buste…
+  30. act binding and shape-run rows for an experiment's acts (night pass, point 2)
+  31. a hook pack's refusal text, naming its rule and its remedy, declared in the pack's contract and checked at registration (night pass, point 6)
+=== dScopedBuild · Build · after dIndexedDesign, dWitnessedBar, dWellOiledMachine, dFurnishedOrders · before dConvergedCharter · finishes at 143 of 171 · units 11 · gaps 7 (HIGH 3, LOW 1, MED 3) · owns 9 items, 6 policy-keys, 2 record-kinds
+   1. one exit contract with a history-derived base, refusing a build's exit while a core red its own commits introduced stands
+   2. built specs frozen, every closing-review finding disposed as new units by `review.findings`
+   3. scope at the push
+   4. the closing review recorded
+   5. a write gate reading derived state
+   6. the checklist witnessed
+   7. the core checks run by the executor at Build's exit
+   8. `build.unit-pass` and `build.scope` draining the legacy a unit touches, in hunks under `retrofit.drain-cap`, and claiming the baselined map keys its w…
+   9. the touch join as `build.scope`'s one check, graded by its value, over the union of `git diff-tree -U0 --no-merges -M` across the unit's own commits, …
+  10. a red-first reproduction, a `reproduction` probe, before a patch build's fix when the build comes from a bug report (night pass, point 2)
+  11. a playbook's pieces built as units with piece records joined by hash, and a proposal to amend the playbook filed as an ask (night pass, point 1)
+=== dTendedCadence · Maintain · after dWitnessedBar, dRankedPlan, dWellOiledMachine, dIndexedDesign, dFurnishedOrders · before dCalibratedLens · finishes at 146 of 171 · units 14 · gaps 12 (HIGH 2, LOW 4, MED 6) · owns 7 items, 15 policy-keys, 2 record-kinds
+   1. the Maintain run as its step checklist on the flow's executor, never a recipe-mode playbook
+   2. the cadence, on Runtime's hosts
+   3. the safe-fix set
+   4. detectors with owners
+   5. map freshness
+   6. the maintenance record
+   7. a detector for the memory's dead pointers, owned by Maintain, absorbing `check-dead-paths.sh` and keeping its merge-bar leg at Test's leg-pack point (…
+   8. Maintain and the Loop Review delivered as cadence steps of the observability expansion, detectors registered by layer, patch intakes rendered from key…
+   9. `maintain.retrofit-heat`, filing each period's sweep as a patch build under `retrofit.cadence: hot-first`'s standing ask and sweep asks only under `of…
+  10. the maintainer's definition, Maintain's filings, registered through dBoundRoles's layer contract
+  11. a cyclic playbook's cadence item, filing `repeat` intakes (night pass, point 1)
+  12. a detector for bundle members whose code changed while their head line did not (night pass, point 4)
+  13. the recurring security review, a cadence item running dFairHearing's security lens over the landed tree as `maintain.security-review` says, weekly by …
+  14. readings tiered by their deviation from their pins under `maintain.tiers: bands`, to log, to diagnose read-only or to act within `maintain.fixes` (NP-…
+=== dMindYourWords · Lexicon · after dWellOiledMachine, dWitnessedBar, dLinkedLibrary, dFurnishedOrders · before none · finishes at 145 of 171 · units 17 · gaps 10 (HIGH 3, LOW 3, MED 4) · owns 5 policy-keys, 1 record-kinds
+   1. the definition classes (conforming, forced, out of scope, not a name, debt), with only debt counted against the shrink-only pin (`lexicon.pin`), held …
+   2. forced names recognised by what forces them (`lexicon.forced`): packs keyed by base member, base prefix and host namespace, applied only where the sit…
+   3. gov's own contract-forced names declared in a table the instruction write path owns, the code carrying at most a pointer a check resolves (LX-3), with…
+   4. override markers verified against the packs
+   5. a reasoned site suppression as the owner's counted fallback
+   6. `--suggest` made forced-aware
+   7. the packs, generated per host kit (`inspect` per Python minor, wheel AST, pluggy hookspecs, `.d.ts`), shell hosts curated, each with its kit, version …
+   8. packs detected from the import census and manifests and declared by the owner, custom packs included (`lexicon.packs`)
+   9. enforcement: the work order's vocabulary slice and forced-aware answers, staged definitions checked at commit (`lexicon.at-commit`), and the branch's …
+  10. drift beyond verbs (`lexicon.drift`): one verb per declared family per object, the families declared by the packs the stack census selects for the kit…
+  11. the vocabulary changed only through the instruction write path, with `ratified` replaced by its record and the `init` row re-justified
+  12. one extraction primitive in `tools/lib`, which dTotalRecall builds and the map and the lexicon each call over the working tree, the index or a revisio…
+  13. the tag-name vocabulary check, registered at the instruction layer's name-check point that dOrderedCharter builds
+  14. the kit's defects fixed: repeated block headers refused, IIFE values and properties ungraded, the dead modes, and the Skill, conf and README reconcile…
+  15. records kept out by the path selector
+  16. the two lexicon drift signals as the lexicon's own leg pack, registered at Test's leg-pack point
+  17. the overloaded terms settled: attended as a session kind and as a mode, playbook as the charter renderer and as playbook mode, and baseline as retrofi…
+$ python since.py beda01950 dWellOiledMachine dScopedBuild dTendedCadence dMindYourWords
+=== dWellOiledMachine: units 24 -> 31, gaps 9 -> 15
+  reworded: the owner's pause, resume, withdraw and supersede through the guarded command, mapped onto unattended's verbs, and attend and unattend, each writing an `attendance override` record scoped by `attendan
+  reworded: sessions bound on every source, a resume that delivers no card diagnosed and closed, the compact hook re-injecting the build's current card, never the kickoff's, the PreCompact flush and the keep-list
+  reworded: the session-start hook loading the set `memory.default-load` names, the card and the map by default in the owner's session, at startup, at resume and at a compaction, ending with `next`'s line compute
+  added: the supervisor the only driver in every mode, the owner's session its client, which hosts the driver only before this build lands or if its platform spike fails, under its owner binding, each role act
+  added: the `step —` announcement before each act while attended, and once when attendance begins, rendered from `next` and the item's declaration, never typed by a model (night pass, point 1)
+  added: intake for a prompt that reaches no owner session, through the mailbox's `intake` message or a cadence filer (night pass, point 1)
+  added: the unattended kit dissolved into the loop kit and the runtime's own kit: its hooks repacked, its supervisor seam taken, `/unattended` a client of `run` until dConvergedCharter retires it (night pass,
+  added: a measured `browser` row in each harness adapter's capability table, and the `visual.capture` command adapter: the pinned tree served, the cache busted, the declared viewports taken, screenshots kept 
+  added: act binding and shape-run rows for an experiment's acts (night pass, point 2)
+  added: a hook pack's refusal text, naming its rule and its remedy, declared in the pack's contract and checked at registration (night pass, point 6)
+  gap added: gap-orient-16
+  gap added: gap-orient-17
+  gap added: gap-orient-18
+  gap added: gap-rt-22
+  gap added: gap-rt-23
+  gap added: gap-rt-24
+=== dScopedBuild: units 9 -> 11, gaps 7 -> 7
+  added: a red-first reproduction, a `reproduction` probe, before a patch build's fix when the build comes from a bug report (night pass, point 2)
+  added: a playbook's pieces built as units with piece records joined by hash, and a proposal to amend the playbook filed as an ask (night pass, point 1)
+=== dTendedCadence: units 10 -> 14, gaps 10 -> 12
+  reworded: a detector for the memory's dead pointers, owned by Maintain, absorbing `check-dead-paths.sh` and keeping its merge-bar leg at Test's leg-pack point (NP-22)
+  added: a cyclic playbook's cadence item, filing `repeat` intakes (night pass, point 1)
+  added: a detector for bundle members whose code changed while their head line did not (night pass, point 4)
+  added: the recurring security review, a cadence item running dFairHearing's security lens over the landed tree as `maintain.security-review` says, weekly by default (NP-19)
+  added: readings tiered by their deviation from their pins under `maintain.tiers: bands`, to log, to diagnose read-only or to act within `maintain.fixes` (NP-21)
+  gap added: gap-maint-12
+  gap added: gap-maint-13
+=== dMindYourWords: units 16 -> 17, gaps 9 -> 10
+  added: the overloaded terms settled: attended as a session kind and as a mode, playbook as the charter renderer and as playbook mode, and baseline as retrofit's debt and as a measured reference (night pass, 
+  gap added: gap-lex-09
+$ python critical_path.py
+critical path: 171 units, dGroundRules > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dLinkedLibrary > dIndexedDesign > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dFairHearing 20, dOrderedCharter 35, dDeclaredLoop 57, dPlacedRequest 64, dWitnessedBar 80, dKeptSession 82, dBoundRoles 96, dTotalRecall 97, dRankedPlan 110, dFurnishedOrders 114, dLinkedLibrary 120, dWellOiledMachine 128, dIndexedDesign 132, dScopedBuild 143, dMindYourWords 145, dTendedCadence 146, dShippedRelease 149, dCalibratedLens 157, dConvergedCharter 171
+$ python leaves.py
+leaf dConvergedCharter: 15 fates rows go to it
+  roles · `check_roles.py` · RESHAPED · role-by-step matrix joined both ways (dFurnishedOrders); policy reader re-pointed (dConvergedCharter)
+  roles · `house/policy.toml` · MERGED · into `.governance/policy.toml` (dConvergedCharter); on dGroundRules's legacy list until then
+  workflows · `REVIEW-PROTOCOL.template.md` · RESHAPED · corrected by dFairHearing, then a rendered view (dConvergedCharter)
+  memory-tree · `transition_audit.py` · STAYS · an append-only history population; `read_modes` re-pointed (dConvergedCharter)
+  memory-tree · method, spec and annotation templates · RESHAPED · spec as a tagged contract (dIndexedDesign); guides as views (dConvergedCharter)
+  unattended · `check-unattended` · RETIRED · none: it gates the unattended kit itself, which dissolves at convergence (dConvergedCharter)
+  unattended · `check-arms-groups` · RETIRED · none: it lints the kit's own self-test file, which dissolves with the kit (dConvergedCharter)
+  unattended · drift and runlog calls, `read_policy_key` · RESHAPED · optional slots (dOrderedCharter); re-pointed (dConvergedCharter)
+  unattended · guide templates (PROTOCOL, VERBS, STOPS, ASKS) · RESHAPED · rendered views of the loop's checklists (dConvergedCharter)
+  unattended · the `/unattended` Skill · RETIRED · a client of `run` until dConvergedCharter retires it, unattended being the default state (NP-4)
+  run-gates · held halves, WSL, selftests, profile, ceilings · STAYS · `held_halves` re-pointed (dConvergedCharter)
+  skills · rendered Skills, six of seven, `/unattended` apart · RESHAPED · thin level-4 entries; `/build` becomes a client of `next` and `run` (dConvergedCharter, with dWellOiledMachine
+  .githooks · pre-push · RESHAPED · reads the runner verdict; trusted copy; policy re-point (dWitnessedBar, dWellOiledMachine, dConvergedCharter)
+  .githooks · `gate-env.sh` · RESHAPED · owner keys folded (dConvergedCharter); mechanics stay
+  guides · hand-written guides · RETIRED · rendered views; rationale moves to `help` fields (dConvergedCharter)
+leaf dMindYourWords: 4 fates rows go to it
+  lexicon · `lexicon.py` gate and pin · RESHAPED · definition classes, keyed debt ledger, forced packs (dMindYourWords)
+  lexicon · `canon`, `scaffold_lexicon` · RESHAPED · noun canon seeded and frozen; packs chosen by census (dMindYourWords)
+  lexicon · its two drift signals · MERGED · the lexicon's leg pack (dMindYourWords)
+  drift-audit · seven gateable signals · RESHAPED · five core legs and two lexicon legs (dTendedCadence gap-maint-09; dMindYourWords)
+builds no build waits on: 2 of 20
 ```
