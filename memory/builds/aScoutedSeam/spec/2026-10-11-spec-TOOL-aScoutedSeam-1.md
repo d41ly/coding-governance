@@ -1,6 +1,6 @@
 # TOOL-aScoutedSeam-1 — the reuse scout: a checklist role and a harness running a code and a design pass, merged into a capped `## reuse` section
 
-**Status:** SPECCED · rev-6 · 2026-10-13 · node a · Tier-2 · base ebce889c · streams tooling · order 1
+**Status:** SPECCED · rev-7 · 2026-10-18 · node a · Tier-2 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -30,6 +30,8 @@
 | [2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.py](../build/2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.py) | research | — |
 | [2026-10-13-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md) | journal | — |
 | [2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md) | research | KICK-aScoutedSeam-1 TOOL-aScoutedSeam-3 DEPL-aScoutedSeam-1 |
+| [2026-10-18-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md](../prompts/2026-10-18-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md) | journal | — |
+| [2026-10-18-prompt-TOOL-aScoutedSeam-1-brief.md](../prompts/2026-10-18-prompt-TOOL-aScoutedSeam-1-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -38,7 +40,7 @@
 Ship the agent that orientation runs before any spec is written. It reads the code, not the names,
 and returns the seams a request must build with as a short, binding, capped list. It is a role of
 the roles kit as that kit landed (`tools/roles/README.md`), driven by a declared harness. The design
-comes from three measurements:
+comes from four measurements:
 - In the benchmark (`2026-10-11-build-TOOL-aScoutedSeam-1-2-benchmark.md`), one checklist scout
   solved 10 of 14 paired positives where the shipped lookup solved none. A design pass beside it
   recovered the token and pattern layer the code pass missed.
@@ -49,6 +51,9 @@ comes from three measurements:
   wrong MUST but one named build work rather than code to reuse, and the wrong ones sat at the tail
   of each list. A cap of five MUSTs in the scouts' order removed 15 of 19 and 15 of 21 wrong MUSTs
   on the two M1c runs, and demoted 1 and 3 ground-truth bindings.
+- In the M1d trial (`-1-9-m1d-trial.md`), the cap of five MUSTs, the `edits` list and the MUST
+  definition naming the duplicate bound 56 MUSTs against M1c's 80 and 76 at equal recall, and no
+  decoy against 2 and 1. Confound: it ran as typed role agents, M1c as plain Workflow agents.
 
 ## 2. Scope (IN)
 
@@ -216,8 +221,7 @@ comes from three measurements:
   it removing fewer wrong MUSTs than the cap of five, at twice the cost.
 - A gate run by the scout. A role agent runs no gate (TOOL-aOrientedCast-11), and the policy's
   `[gates]` table names none for `gov-reuse-scout`, so S9 adds no `[gates]` entry.
-- The draft-and-expand shape, in which the code lens drafts the code and lists every definition of
-  each file it cites. It is fork F3, the owner's, not scope.
+- Drafting code, listing cited files' definitions or grepping literal owners: rejected (F3).
 - Calling the harness at kickoff, writing the card or the brief: `KICK-aScoutedSeam-1`.
 - The catalogue's grammar, its other rows, the front-matter grammar, the renderers, the checker and
   the router's other stages: aOrientedCast's. This unit edits the values S9 lists and nothing else of
@@ -461,6 +465,8 @@ so the calibration (AC6) and the first kickoff call run from a session started a
   wrong MUSTs, because every wrong one names code that exists.
 - **A MUST cap per lens.** The design lens's MUSTs would escape the cap the measurement priced over
   the scout's whole list.
+- **Draft and expand (M1d).** No recall gain, no miss found (§8 F3). Misses needing code to read go
+  to the diff-time mode, `TOOL-aScoutedSeam-3`, which found two of them in the benchmark.
 
 ## 5. Production-readiness checklist
 
@@ -593,26 +599,12 @@ New arm: tools/codebase-map/selftest.py · covers AC9 · fixture trees with and 
   the shipped harness and observes the return contract's seam definition for the first time, since
   the trial only recommended it.
 - **F3 — Should the code lens DRAFT the code and EXPAND every file it cites?** The offline reading
-  found the six positives both M1c runs missed one level below the sketch:
-  - Three ground truths sat in a file the scout had cited, and two more had a copy in one.
-  - Listing every definition of the cited files, constants included, reaches five of the six in run
-    A and four in run B, at 181 names per case at the median. The diff-time arm found two of them by
-    reading code.
-
-  The shape: the code lens writes the code a builder would TYPE, as a return field and never a file.
-  It lists the definitions of every file it cites with a deterministic lister, a codebase-map mode
-  beside `--house-index`. That mode must list module constants too, because the map's symbol
-  inventory lacks them (`PHASES_TERMINAL`, `DEFAULT_DECISION_ID_RE`). It greps the owner of every
-  literal, regex and launcher call in the draft. It returns `expanded`, and the harness counts the
-  cited files missing from it on the scout line.
-
-  Measurement: the spawn guard now admits only listed harnesses, so the benchmark's arm scripts
-  cannot run in this tree. The measurement is AC6 run over the whole 30-case corpus through the
-  shipped harness, against M1c, at about 60 agents.
-
-  Options: (a) build it into this unit and widen AC6 to the corpus; (b) ship this unit as specced and
-  measure the shape in a later unit; (c) a second stage that reviews the draft. Recommendation: (a),
-  with (c) only if the single-agent shape leaves the misses.
+  put five of M1c's six misses within its reach. Options: (a) build it here and widen AC6 to the
+  corpus; (b) a later unit; (c) a second stage reviewing the draft. Recommendation was (a).
+  RESOLVED (owner, 2026-10-18): not adopted. The M1d trial
+  (`2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.md`) ran the draft, the cited-file definition
+  listing and the owner grep on the six misses and six calibration cases. It found none of the six,
+  and matched M1c's recall: 4 of 10 solved, 8 of 28 items. Reach did not become discovery.
 - **F4 — Where does the lookup's blind spot go, and does gov's overlay carry any rule?** The brief
   put "`reuse_lookup.py` cannot see shell, so a shell seam is grepped" in gov's overlay. Two facts
   bear on it:
@@ -657,6 +649,8 @@ New arm: tools/codebase-map/selftest.py · covers AC9 · fixture trees with and 
   spawn guard's harness list. F2 gains the offline caveat, and F3 and F4 are new. AC4 and AC7 are
   rewritten, AC6 records `demoted`, AC10 and AC11 are new, and §7 gains the roles, playbook and
   version legs.
+- rev-7 · 2026-10-18 · §1 · §3 · §4 · §8 · F3 closed, not adopted, on the M1d trial. No S, AC or
+  gate moved.
 
 ## 10. Reuse audit
 
