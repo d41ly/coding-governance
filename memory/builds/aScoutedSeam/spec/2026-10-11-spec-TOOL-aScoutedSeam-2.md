@@ -1,12 +1,13 @@
 # TOOL-aScoutedSeam-2 — a spec's §10 names every MUST seam its brief carries, or overrides it with a reason, and check 12 grades it
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-10-18 · node a · Tier-2 · base d19938f3 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-11-build-TOOL-aScoutedSeam-1-1-failure-analysis.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-1-failure-analysis.md) | research | TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-3 KICK-aScoutedSeam-1 DEPL-aScoutedSeam-1 |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md) | research | DEPL-aScoutedSeam-1 KICK-aScoutedSeam-1 TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-3 |
 
 <!-- /gen:spec-records -->
 
@@ -164,10 +165,12 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 AC3 AC
 - **F1 — Should an override need the owner's word, or is the spec author's reason enough?** The spec
   is approved by the owner before a build starts, so the reason is read at that approval.
   Recommendation: the author's reason, read at approval; no separate owner mark.
+  RESOLVED (owner, 2026-10-18): the author's reason, read at approval, as recommended.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-18 · §8 · F1 closed as recommended. No S, AC or gate moved.
 
 ## 10. Reuse audit
 

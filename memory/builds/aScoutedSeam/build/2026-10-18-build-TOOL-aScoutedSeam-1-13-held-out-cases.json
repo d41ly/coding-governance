@@ -1,0 +1,428 @@
+// **Serves:** research TOOL-aScoutedSeam-3 TOOL-aScoutedSeam-1
+// The held-out set: mined from commits after the tuning corpus was cut, frozen before any further tuning, and never read to change a prompt.
+[
+ {
+  "id": "gov-h-govkit-argv-walker",
+  "repo": "gov",
+  "point": "kickoff",
+  "sha": "2e187ee8bb9d51996095e29dde8bd31d52bdd532",
+  "sha_before": "b3ab8df5461250cb1fc3ba5a30a96c5952e9a58c",
+  "slug": "dRedressedBar",
+  "prompt": "agent-cap's adopter argv is `python {prefix}/settings-merge.py`, and `{prefix}` fills from agent-cap's own per-kit prefix, so with a per-kit prefix it runs a file the settings-merge kit never installed there. Fix it so the per-kit-prefix apply exits 0, and gate the class, not the instance: a check that no adopter argv names another kit's file through its own `{prefix}`, run over the real registry first.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tools/govkit/govkit.py",
+    "symbol": "silenced_legs",
+    "why": "already walks each entry's descriptor argv through target_context and grades resolved path elements; the new selfcheck block is a second walker with a different path rule"
+   },
+   {
+    "path": "tools/govkit/govkit.py",
+    "symbol": "target_context",
+    "why": "the per-entry token context every argv element resolves in"
+   },
+   {
+    "path": "tools/govkit/govkit.py",
+    "symbol": "resolve_tokens",
+    "why": "the token resolver both walkers apply per element"
+   }
+  ],
+  "reinvention": {
+   "sha": "0a178ed8f0e3e6780f613bf88bb9a47b6f5c3865",
+   "paths": [
+    "tools/govkit/govkit.py"
+   ],
+   "what": "resolve_adopter_argv plus a selfcheck block that re-walks [adopt]/[check]/[[gate_leg]]/[[regenerate]] argv per entry with its own declared-text '/' rule"
+  },
+  "evidence": "6057a55c1 (TOOL-dRedressedBar-17 'one argv walker') replaced the walk with scan_entry_argv shared by silenced_legs; spec audit reviews/2026-10-14-review-TOOL-dRedressedBar-12-15-spec-audit-round1.md M4 (id 10) names silenced_legs as the walker being duplicated",
+  "short": "h01",
+  "held_out": true,
+  "decoys": []
+ },
+ {
+  "id": "gov-h-profiler-leg-manifest-reader",
+  "repo": "gov",
+  "point": "kickoff",
+  "sha": "2e187ee8bb9d51996095e29dde8bd31d52bdd532",
+  "sha_before": "4a496095808fe09bdfd7d689194026317b31efe0",
+  "slug": "dRedressedBar",
+  "prompt": "Add a gate profiling tool (does none exist yet?) that will run ALL EXISTING (current and future) legs, including all self-tests, in either sequential or concurrent modes (to the max of 80% processor load/90% memory load), without any contaminating parameters, preserving all logs, no ceilings, fully profiling each leg - cpu/memory load/process spawn time/processes spawned/each process detailed.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tools/run-gates/held_halves.py",
+    "symbol": "load_manifest",
+    "why": "the kit's leg-manifest reader: json.load plus refusal of a non-list or nameless row"
+   },
+   {
+    "path": "tools/run-gates/derive-ceilings.py",
+    "symbol": "read_legs",
+    "why": "a second leg-manifest reader in the same kit that already existed, honouring GATE_LEGS"
+   }
+  ],
+  "reinvention": {
+   "sha": "6783992aa59c5114a10969487459fba652847e5c",
+   "paths": [
+    "tools/run-gates/measure_legs.py"
+   ],
+   "what": "a third leg-manifest parser, read_legs, with its own empty/nameless/argv/duplicate refusals"
+  },
+  "evidence": "809f794e4 (TOOL-dRedressedBar-19): 'read_profile_legs replaces read_legs and reads through held_halves.load_manifest'; spec audit reviews/2026-10-14-review-TOOL-dRedressedBar-16-18-spec-audit-round1.md M5 (id 19) names both existing readers",
+  "short": "h02",
+  "held_out": true,
+  "decoys": []
+ },
+ {
+  "id": "gov-h-regen-bash-resolver",
+  "repo": "gov",
+  "point": "kickoff",
+  "sha": "b726385f2b5b8fd16802925c02104377253a9045",
+  "sha_before": "d6214c0c4c001bf000080d1fe627013c4d4a2ab9",
+  "slug": "aPrimedIndex",
+  "prompt": "One frequent case of gate bars failing and having to be restarted from scratch is generated indices not being regenerated prior to running the bars - sessions/agents wait for the bar results to regenerate them 100% of the time. Your task: ensure that regenerating every generated index (find all of them first - codebase map, gotchas, what else is there?) is ENFORCED before running any merge/landing bars.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tools/run-gates/profile_bar.py",
+    "symbol": "resolve_bash",
+    "why": "same-kit bash resolver that RUNS each candidate because PATH order finds WSL's System32 launcher first"
+   },
+   {
+    "path": "tools/govkit/govkit.py",
+    "symbol": "resolve_bash",
+    "why": "the original probe-based resolver, honouring GOV_BASH and skipping System32/WindowsApps"
+   }
+  ],
+  "reinvention": {
+   "sha": "3a20991f98621ce709af82fc5626ecbbaf0c0cf9",
+   "paths": [
+    "tools/run-gates/regen.py"
+   ],
+   "what": "run_command resolves a bash argv with shutil.which(run[0]) instead of the kit's probe-based resolver"
+  },
+  "evidence": "0ab48d83b (TOOL-aPrimedIndex-7) added a resolve_bash in regen.py that loads profile_bar.resolve_bash; review reviews/2026-10-11-review-TOOL-aPrimedIndex-1-4-implementation-diff-round1.md M5 (id 8): 'profile_bar.py:282-304 in this same kit already ships a resolve_bash'",
+  "short": "h03",
+  "held_out": true,
+  "decoys": []
+ },
+ {
+  "id": "gov-h-skill-adopter-render-copy",
+  "repo": "gov",
+  "point": "kickoff",
+  "sha": "2b852f5fd87147540a0a73d310354440c84c72ea",
+  "sha_before": "5bd6ca596ab58f60e8e74177eff6123ff7ed3f72",
+  "slug": "dSweptBranches",
+  "prompt": "A tool and a skill that reconcile and clean up a repository's branches and worktrees, so an owner never has to re-prompt this by hand again. It ships as a kit adopters receive through govkit. The skill triggers on asks like \"clean up branches\" and \"reconcile worktrees\" and routes through the tool.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tools/lib/render-doc.sh",
+    "symbol": "render_doc",
+    "why": "the canonical template-token renderer (X sentinel, CR strip, {{KIT_DIR}} substitution) that copy-installed kits carry as a gated inline copy"
+   },
+   {
+    "path": "tools/runlog/adopt-runlog.sh",
+    "symbol": "render_skill / check_render",
+    "why": "the skill-adopter shape that was copied: render, check the render, --check compares, --scaffold writes"
+   },
+   {
+    "path": "tools/lib/resolve-python.test.sh",
+    "symbol": "render_doc|$ROOT/$KIT_REL/render-doc.sh",
+    "why": "the parity table that gates every inline render_doc copy byte for byte"
+   }
+  ],
+  "reinvention": {
+   "sha": "0ac2418c05fad32467e20a93f04b8546383a1c4d",
+   "paths": [
+    "tools/branch-reconcile/adopt-branch-reconcile.sh"
+   ],
+   "what": "a new skill adopter whose render_skill/check_render re-type render_doc's body and copy adopt-runlog.sh instead of carrying the gated render_doc block"
+  },
+  "evidence": "comparison: render_skill's body lines (local out; out=$( cat ... || exit 1; printf X ) || return 1; out=${out%X}; out=${out//$'\\r'/}; out=${out//\\{\\{KIT_DIR\\}\\}/\"$KIT_REL\"}) are verbatim render-doc.sh:36-40 at R^, 16 of 39 substantive added lines appear verbatim in adopt-runlog.sh, and the header says 'The runlog kit's adopter is the shape this follows'",
+  "short": "h04",
+  "held_out": true,
+  "decoys": []
+ },
+ {
+  "id": "gov-h-profiler-guard-rule-copy",
+  "repo": "gov",
+  "point": "kickoff",
+  "sha": "2e187ee8bb9d51996095e29dde8bd31d52bdd532",
+  "sha_before": "7c7950204883b040e1e0cc27ef04715b370e49ef",
+  "slug": "dRedressedBar",
+  "prompt": "The profiler's self-test leg guard is a hand-listed snapshot of files. Make that guard cover every file the self-test's arms read, including the kit README and the kit's Python files, and give it an arm that fails when a file the self-test reads falls outside the guard.",
+  "reconstructed": true,
+  "ground_truth": [
+   {
+    "path": "tools/run-gates/run-gates.sh",
+    "symbol": "build_input_keys",
+    "why": "the runner's plain-guard class and exact-or-under-directory match, which read_guard_misses re-types"
+   },
+   {
+    "path": "tools/check-spec-tokens.py",
+    "symbol": "check_guard_trips",
+    "why": "an existing Python implementation of the same git-pathspec guard rule"
+   }
+  ],
+  "reinvention": {
+   "sha": "e23b495362ae91c60f955b912702d9b391bc4d81",
+   "paths": [
+    "tools/run-gates/measure_legs.py"
+   ],
+   "what": "read_guard_misses re-implements the runner's plain-guard regex and match rule in Python with no parity tie"
+  },
+  "evidence": "review reviews/2026-10-15-review-TOOL-dRedressedBar-25-26-diff-review-round3.md (committed b7f19d442) L7 (id 15): 'read_guard_misses is a Python copy of the runner's plain-guard rule, with no parity check'; the copy was kept under a parity-arm fix, not replaced",
+  "short": "h05",
+  "held_out": true,
+  "decoys": []
+ },
+ {
+  "id": "incms-h-ensure-perm-floor",
+  "repo": "incms",
+  "point": "kickoff",
+  "sha": "1ec5cff26548e5c24a3d441a6bc81821ae0849c7",
+  "sha_before": "f182c5e6d5c365c98802e850d7e26f827cf995a2",
+  "slug": "dCarriedLintel",
+  "prompt": "Build, in inCMS core, an opt-in way for a package re-apply or upgrade to carry collection template changes onto the collection pages the package already seeded. It should re-skin only the collections whose template or chrome the re-apply actually changed, and reuse the existing apply-template behaviour rather than forking it: same RBAC, same audit action, same snapshot and republish behaviour, and it requires the collection_templates flag as apply-template does.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "services/api/app/core/authz.py",
+    "symbol": "ensure_perm",
+    "why": "the declared ONE home for the service-layer `if perm not in permissions_for_actor(actor): raise 403` floor, with a caller-chosen detail string"
+   }
+  ],
+  "reinvention": {
+   "sha": "7d365f9d0cf476c5ee0726baef606c04a87146bb",
+   "paths": [
+    "services/api/app/services/plugin_service.py"
+   ],
+   "what": "check_apply_templates_allowed hand-rolls the collection_types.manage permission check and HTTPException(403) instead of calling ensure_perm"
+  },
+  "evidence": "Review memory/builds/dCarriedLintel/reviews/2026-10-11-review-ARCH-dCarriedLintel-1-diff-review.md finding 5 (confirmed: 'exactly the body app.core.authz.ensure_perm declares itself the ONE home for'); fixed by aad03e2a1ed98da74ee79c5561460e07e7dad550 ('check_apply_templates_allowed now calls ensure_perm with the same 403 detail')",
+  "short": "h06",
+  "held_out": true,
+  "decoys": []
+ },
+ {
+  "id": "incms-h-package-media-test-scaffold",
+  "repo": "incms",
+  "point": "kickoff",
+  "sha": "1ec5cff26548e5c24a3d441a6bc81821ae0849c7",
+  "sha_before": "5cb9e420438b4b36e217539b5fe38c1972b57fa2",
+  "slug": "dInlaidFolio",
+  "prompt": "Resolve @media:<key> tokens inside rich-text and article field values during package seed, install, re-apply and upgrade, not only as a whole string or an image url; an unknown key must refuse the install naming the field and the key. Acceptance: a seed test installs a package whose article body holds an inline <img src=\"@media:k\"> figure and reads the stored body with the asset URL and media id in place, and a re-apply of an unchanged package is idempotent.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "services/api/tests/test_package_media_identity.py",
+    "symbol": "_remove_build_rows",
+    "why": "autouse cleanup fixture reaping plugin displacement/backup rows, prefixed content, package media assets and plugins - copied nearly verbatim"
+   },
+   {
+    "path": "services/api/tests/test_package_media_identity.py",
+    "symbol": "_write_content_pkg",
+    "why": "writes a package content/ root with media/pat.png, collections.json and pages/00.json - the same directory-building body was copied"
+   },
+   {
+    "path": "services/api/tests/test_package_media_identity.py",
+    "symbol": "_run_enable",
+    "why": "enables a plugin from a package dir with the content+settings force scope"
+   },
+   {
+    "path": "services/api/tests/test_package_media_identity.py",
+    "symbol": "_load_ref_rows",
+    "why": "loads MediaAsset rows by media_service.build_package_source_ref(slug, key)"
+   }
+  ],
+  "reinvention": {
+   "sha": "440dd84186b3f8d36a25873e1601b54b3cbd2f8e",
+   "paths": [
+    "services/api/tests/test_seed_inline_media.py"
+   ],
+   "what": "the new inline-media install tests re-define the package writer, cleanup fixture, enable and asset-lookup helpers that the package-media identity suite already owns"
+  },
+  "evidence": "56074d0a84a45cc43677b056aeaa12e386c9dcd9 'fold the five test clones clone-ratchet found': 'The inline-media test file duplicated test_package_media_identity.py's package writer, its cleanup fixture and its asset and enable helpers' - now imported; near-verbatim bodies verified by git show R^ vs R",
+  "short": "h07",
+  "held_out": true,
+  "decoys": []
+ },
+ {
+  "id": "incms-h-auth-test-fixtures",
+  "repo": "incms",
+  "point": "kickoff",
+  "sha": "0a36ad19ec828714bc39c74fa8f630d383fe37f8",
+  "sha_before": "1c1688e75424a04f2d27d06a81411b37a1bc0ca6",
+  "slug": "bSealedPostern",
+  "prompt": "Close the audit's auth and session findings: a hijacked staff session that knows the password must not be able to strip MFA and then step up on the password alone, MCP OAuth consent must not mint a live bearer without step-up, and the CSRF bearer bypass must not key on a header the cookie auth ignores. Wrong step-up guesses are counted per account, separately from the login lockout, and each fix is pinned by a regression test that reds on the vulnerable code.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "services/api/tests/test_login_lockout.py",
+    "symbol": "lockout_on",
+    "why": "fixture enabling login lockout with threshold 3 and 900 s window/duration - copied line for line"
+   },
+   {
+    "path": "services/api/tests/test_step_up.py",
+    "symbol": "step_up_on",
+    "why": "fixture flipping step_up_reauth_enabled on for a test - copied verbatim"
+   }
+  ],
+  "reinvention": {
+   "sha": "82cceaba17b5eb88feb951b1d22704112c735361",
+   "paths": [
+    "services/api/tests/test_bSealedPostern_auth.py"
+   ],
+   "what": "the new auth regression suite redefines the lockout_on and step_up_on pytest fixtures that the lockout and step-up suites already own"
+  },
+  "evidence": "f467a834488d7bb4985249bdc96d11d988493fd8 'fold(bSealedPostern): ... two duplicated fixtures are imported from their owners (lockout_on, step_up_on)' - the local definitions are deleted and replaced by imports from tests.test_login_lockout and tests.test_step_up",
+  "short": "h08",
+  "held_out": true,
+  "decoys": []
+ },
+ {
+  "id": "incms-h-settings-page-test-mocks",
+  "repo": "incms",
+  "point": "kickoff",
+  "sha": "1ec5cff26548e5c24a3d441a6bc81821ae0849c7",
+  "sha_before": "4bb05aff4846f2cab46a0a0c9f23c8cb236b7648",
+  "slug": "dPurgedLedger",
+  "prompt": "Make the submission retention setting actually delete what it names: the retention sweep hard-deletes handled and spam submissions older than the period, but only after an operator turns on a separate opt-in that is off by default, so no existing instance starts deleting data on deploy. The opt-in sits on the content settings screen beside the period, with tests for the switch.",
+  "reconstructed": true,
+  "ground_truth": [
+   {
+    "path": "apps/web/settingsContentNoticeField.test.tsx",
+    "symbol": "vi.mock(\"./components/admin/settings/SettingsSubPageGuard\"",
+    "why": "the existing content-settings page test already mocks the sub-page guard as a children(me) pass-through and the Toast hook - the shapes that were copied"
+   },
+   {
+    "path": "apps/web/components/admin/ui/Toast.tsx",
+    "symbol": "ToastProvider",
+    "why": "the real toast provider a mounted settings-page test can wrap instead of a stub useToast mock"
+   }
+  ],
+  "reinvention": {
+   "sha": "9949fb264b1ea160515c039a877c1eba7d60c402",
+   "paths": [
+    "apps/web/settingsContentPurgeSwitch.test.tsx"
+   ],
+   "what": "the purge-switch test copies the SettingsSubPageGuard pass-through mock and the no-op useToast mock from the existing content-settings test"
+  },
+  "evidence": "4f5872f25be800336fb3edb0ac0fee5b6ae572a1 'the clone ratchet folded ... The two content-page tests share settingsSubPageMocks.tsx, and the switch test mounts the real ToastProvider'; the copied vi.mock bodies match settingsContentNoticeField.test.tsx at R^ lines 35-42 nearly verbatim",
+  "short": "h09",
+  "held_out": true,
+  "decoys": []
+ },
+ {
+  "id": "nicocares-h-media-alt-gate-coverage-arm",
+  "repo": "nicocares",
+  "point": "kickoff",
+  "sha": "10a58653cbb2b78af8479cb3c4f7d1fbc7da575c",
+  "sha_before": "a497caf7bcf4c119fe7716a0ac985ece36d1bf5b",
+  "slug": "bAudibleLandmark",
+  "prompt": "NicoCares+inCMS needs to be fully compatible with screen readers. As part of that, add an nc gate refusing a media stem with no alt decision, a decorative image described in words, or an empty page alt over a meaningful stem.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tests/test_v3_media_refs.py",
+    "symbol": "test_every_shipped_image_has_alt_text",
+    "why": "already fails any shipped image with no content/media-alt.json entry (gate 8), the new gate's arm A"
+   },
+   {
+    "path": "tests/test_v3_media_refs.py",
+    "symbol": "test_every_media_alt_names_a_shipped_file",
+    "why": "already fails a media-alt.json key that names no file in content/media/, arm A's other half"
+   },
+   {
+    "path": "tests/test_v3_media_refs.py",
+    "symbol": "_extract_alt_pairs",
+    "why": "existing walker yielding every (@media stem, inline alt) pair, which scan_placements re-implements"
+   }
+  ],
+  "reinvention": {
+   "sha": "0874cfb2de4f6c2eb26d1da4f1d295d6642a21e2",
+   "paths": [
+    "scripts/check_media_alt.py"
+   ],
+   "what": "a new core-free alt gate whose arm A re-checks media-alt coverage both ways and whose scan_placements re-walks @media alt pairs"
+  },
+  "evidence": "8171aedb retires arm A because 'tests/test_v3_media_refs.py already owns alt coverage ... a second copy of that fact'; 8391eeb8 re-points the gate's walk at 'the population tests/test_v3_media_refs.py's inline-parity test reads'",
+  "core_point_sha": "0130003061d5d9602433d6cc9e9b85d0b73b66c2",
+  "short": "h10",
+  "held_out": true,
+  "decoys": []
+ },
+ {
+  "id": "nicocares-h-c21-billing-probe-predicates",
+  "repo": "nicocares",
+  "point": "kickoff",
+  "sha": "1359aff6c431aadcef7a36f2de6758b70ddacd3e",
+  "sha_before": "b45f8547e046a0114ae2b743a36326b18eb4b06f",
+  "slug": "dTenderedReceipt",
+  "prompt": "Make every sentence on the site that states when or how a plan is billed say the plan is charged once for its full length at checkout, for a term the subscriber commits to, and that cancelling before the next billing date stops further charges. No 'cancel anytime' and no 'no term commitment' may survive anywhere the package ships, and the claims gate must refuse the retired promises so they cannot come back.",
+  "reconstructed": false,
+  "ground_truth": [
+   {
+    "path": "tests/test_v3_claims.py",
+    "symbol": "_C21_DEFERRED",
+    "why": "the existing C21 deferred-charge pattern the probe's DEFERRED copies near-verbatim"
+   },
+   {
+    "path": "scripts/claims_predicates.py",
+    "symbol": "walk",
+    "why": "the module that holds 'the ONE definition of every claims predicate'; its walk is the probe's walk byte-for-byte apart from branch order"
+   },
+   {
+    "path": "tests/test_v3_claims.py",
+    "symbol": "_check_c21_deferred",
+    "why": "existing sentence check (block tags and blank lines end a sentence) that the probe's sentences() re-derives"
+   }
+  ],
+  "reinvention": {
+   "sha": "9818b50b24c22182d1bfab79a1393871bf4d37aa",
+   "paths": [
+    "memory/builds/dTenderedReceipt/build/research/probe_c21.py"
+   ],
+   "what": "a billing-copy probe carrying private copies of the C21 regexes, a JSON string walker and a sentence splitter instead of importing the claims predicates"
+  },
+  "evidence": "closing review dTenderedReceipt-1-3 round 1 id 1 (high) found the probe's MONEY differed from the wired arm; 0c66de17 moved the C21 predicates into scripts/claims_predicates.py and made the probe import them, its docstring citing 'The first cut kept private copies'",
+  "core_point_sha": "1ec5cff26548e5c24a3d441a6bc81821ae0849c7",
+  "short": "h11",
+  "held_out": true,
+  "decoys": []
+ },
+ {
+  "id": "nicocares-h-ps-hygiene-tracked-population",
+  "repo": "nicocares",
+  "point": "in-build",
+  "sha": "a67cf5592c1884451a12b69f27884b8e6e8e70ad",
+  "sha_before": "a67cf5592c1884451a12b69f27884b8e6e8e70ad",
+  "slug": "bIndexedHarrow",
+  "prompt": "push-main went red from the primary tree because the PowerShell hygiene gate walked the repo root and graded other sessions' checkouts parked under .claude/worktrees/. Make that gate grade only the .ps1 files the commit carries, and refuse rather than pass when it cannot work out which files those are.",
+  "reconstructed": true,
+  "ground_truth": [
+   {
+    "path": "scripts/gate-lint/sh_hygiene.py",
+    "symbol": "scan_tree",
+    "why": "existing tracked-file population via git ls-files -z with the dead-probe OSError, which the new scan copies near-verbatim"
+   },
+   {
+    "path": "scripts/gate-lint/encoding_posture.py",
+    "symbol": "scan_tree",
+    "why": "second existing instance of the same git ls-files population and identical error message"
+   }
+  ],
+  "reinvention": {
+   "sha": "bcc6f8a4e529bf503a50f45c2589a286c6442be7",
+   "paths": [
+    "scripts/gate-lint/ps-hygiene.py"
+   ],
+   "what": "ps-hygiene's scan re-implements the git ls-files population, dead-probe refusal and loop of its two sibling gates as a third inline copy"
+  },
+  "evidence": "near-verbatim copy verified against bcc6f8a4^: same subprocess call shape and the identical string 'git ls-files failed, so the population could not be derived at all: ' as sh_hygiene.scan_tree:281 and encoding_posture.scan_tree:140; the commit body itself says 'like its siblings sh_hygiene.py and encoding_posture.py'",
+  "core_point_sha": "1ec5cff26548e5c24a3d441a6bc81821ae0849c7",
+  "short": "h12",
+  "held_out": true,
+  "decoys": []
+ }
+]

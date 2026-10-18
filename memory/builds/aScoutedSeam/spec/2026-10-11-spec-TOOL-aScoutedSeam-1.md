@@ -1,6 +1,6 @@
 # TOOL-aScoutedSeam-1 — the reuse scout: a checklist role and a harness running a code and a design pass, merged into a capped `## reuse` section
 
-**Status:** SPECCED · rev-6 · 2026-10-13 · node a · Tier-2 · base ebce889c · streams tooling · order 1
+**Status:** SPECCED · rev-9 · 2026-10-18 · node a · Tier-2 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -26,8 +26,23 @@
 | [2026-10-11-build-TOOL-aScoutedSeam-1-7-m1c-trial.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-7-m1c-trial.md) | research | KICK-aScoutedSeam-1 |
 | [2026-10-13-build-TOOL-aScoutedSeam-1-8-precision-and-misses.md](../build/2026-10-13-build-TOOL-aScoutedSeam-1-8-precision-and-misses.md) | research | — |
 | [2026-10-13-build-TOOL-aScoutedSeam-1-8-precision.py](../build/2026-10-13-build-TOOL-aScoutedSeam-1-8-precision.py) | research | — |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-10-d1v2-trial.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-10-d1v2-trial.md) | research | TOOL-aScoutedSeam-3 |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-10-d1v2.py](../build/2026-10-18-build-TOOL-aScoutedSeam-1-10-d1v2.py) | research | TOOL-aScoutedSeam-3 |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-10-judge-task.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-10-judge-task.md) | research | TOOL-aScoutedSeam-3 |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-11-prompt-method.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-11-prompt-method.md) | research | TOOL-aScoutedSeam-3 |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-12-judge-and-low.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-12-judge-and-low.md) | research | TOOL-aScoutedSeam-3 |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-13-held-out-cases.json](../build/2026-10-18-build-TOOL-aScoutedSeam-1-13-held-out-cases.json) | research | TOOL-aScoutedSeam-3 |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-13-system.py](../build/2026-10-18-build-TOOL-aScoutedSeam-1-13-system.py) | research | TOOL-aScoutedSeam-3 |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.md) | research | — |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.py](../build/2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.py) | research | — |
 | [2026-10-13-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md) | journal | — |
 | [2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md) | research | KICK-aScoutedSeam-1 TOOL-aScoutedSeam-3 DEPL-aScoutedSeam-1 |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-brief-2.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-brief-2.md) | research | DEPL-aScoutedSeam-1 |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md) | research | DEPL-aScoutedSeam-1 KICK-aScoutedSeam-1 TOOL-aScoutedSeam-2 TOOL-aScoutedSeam-3 |
+| [2026-10-18-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md](../prompts/2026-10-18-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md) | journal | — |
+| [2026-10-18-prompt-TOOL-aScoutedSeam-1-2-spec-writer.md](../prompts/2026-10-18-prompt-TOOL-aScoutedSeam-1-2-spec-writer.md) | journal | — |
+| [2026-10-18-prompt-TOOL-aScoutedSeam-1-brief.md](../prompts/2026-10-18-prompt-TOOL-aScoutedSeam-1-brief.md) | research | — |
+| [2026-10-18-prompt-TOOL-aScoutedSeam-3-brief-2.md](../prompts/2026-10-18-prompt-TOOL-aScoutedSeam-3-brief-2.md) | research | TOOL-aScoutedSeam-3 |
 
 <!-- /gen:spec-records -->
 
@@ -36,7 +51,7 @@
 Ship the agent that orientation runs before any spec is written. It reads the code, not the names,
 and returns the seams a request must build with as a short, binding, capped list. It is a role of
 the roles kit as that kit landed (`tools/roles/README.md`), driven by a declared harness. The design
-comes from three measurements:
+comes from four measurements:
 - In the benchmark (`2026-10-11-build-TOOL-aScoutedSeam-1-2-benchmark.md`), one checklist scout
   solved 10 of 14 paired positives where the shipped lookup solved none. A design pass beside it
   recovered the token and pattern layer the code pass missed.
@@ -45,8 +60,10 @@ comes from three measurements:
   house index, an implementation sketch searched piece by piece, and a convention census.
 - In the offline reading (`2026-10-13-build-TOOL-aScoutedSeam-1-8-precision-and-misses.md`), every
   wrong MUST but one named build work rather than code to reuse, and the wrong ones sat at the tail
-  of each list. A cap of five MUSTs in the scouts' order removed 15 of 19 and 15 of 21 wrong MUSTs
-  on the two M1c runs, and demoted 1 and 3 ground-truth bindings.
+  of each list, where a cap of five MUSTs removes most of them (§4, `MUST_CAP`).
+- In the M1d trial (`-1-9-m1d-trial.md`), the cap of five MUSTs, the `edits` list and the MUST
+  definition naming the duplicate bound 56 MUSTs against M1c's 80 and 76 at equal recall, and no
+  decoy against 2 and 1. Confound: it ran as typed role agents, M1c as plain Workflow agents.
 
 ## 2. Scope (IN)
 
@@ -80,23 +97,24 @@ comes from three measurements:
     census binds the majority. For a HELPER, it binds the canonical implementation and names the
     copies in `not`, because a majority of copies is a debt. The trial's one census loss was four
     local copies of a conf reader bound as the convention. The document's existing sections stand.
-  - The HOUSE OVERLAY `tools/roles/house/gov-reuse-scout.md` stays as F4 decides. As written here,
-    on F4's recommendation, it stays empty and the lookup's blind spot goes into the procedure
-    document instead: the map lists no module constant in any language, so a constant, a regex
-    literal or a launcher call is grepped, never looked up.
+  - The HOUSE OVERLAY `tools/roles/house/gov-reuse-scout.md` stays empty (F4), and the lookup's
+    blind spot goes into the procedure document instead: the map lists no module constant in any
+    language, so a constant, a regex literal or a launcher call is grepped, never looked up.
   - AC6 and AC7 observe it.
 - **S2** — Two LENSES of that one role, each a stage of the harness, chosen by the lens instruction
-  the harness appends to each spawn's task:
-  - the CODE lens, stage key `codeLens`, runs every step but the design system;
-  - the DESIGN lens, stage key `designLens`, reads the index's token and DSL sections, then runs
-    orient, the surfaces the request names, the census over sibling UI instances and the design
-    system over every tree it is given. It returns `no UI` with no seams when the request has none.
+  the harness appends to each spawn's task, run in series:
+  - the CODE lens, stage key `codeLens`, runs every step but the design system. It sets the boolean
+    `uiNeed` in its return: true when a need it framed sits on a surface a user sees, a page, a
+    component, a style or a token;
+  - the DESIGN lens, stage key `designLens`, is spawned only when that `uiNeed` is `true`. It reads
+    the index's token and DSL sections, then runs orient, the surfaces the request names, the census
+    over sibling UI instances and the design system over every tree it is given.
 
   Both run read-only, with no write and no commit.
-  - AC3 and AC6 observe it.
-- **S3** — A harness, `tools/workflows/reuse-scout.template.js`, rendered to `reuse-scout.js` with
-  the adopter's `{{FANOUT_CAP}}`. It follows the stage convention of
-  `tools/workflows/tier2-review.template.js` (lines 223-319):
+  - AC3, AC6 and AC12 observe it.
+- **S3** — A harness, `tools/workflows/reuse-scout.js`, shipped as an engine file of the kit: it fans
+  nothing out, so it carries no `{{FANOUT_CAP}}` and needs no render (§4, Alternatives). It follows
+  the stage convention of `tools/workflows/tier2-review.template.js` (lines 223-319):
   - It validates its args before any spawn (§4). `roles` is what `handoff.py harness-args
     reuse-scout` prints and `efforts` is what `handoff.py stage-efforts reuse` prints, each keyed by
     the row's stage keys. The old `effort` arg and `roles.scout` are gone.
@@ -111,11 +129,13 @@ comes from three measurements:
     are read from the task's `gov:handoff` marker line, the unit part left out for a `-` unit.
   - Each lens's prompt is the caller's `args.task`, unchanged, then that lens's instruction, which
     names the house index path from `args.index` as the first read, then `RETURN_CONTRACT`.
-  - It fans the two lenses through the inlined `boundedParallel` over a two-element literal.
+  - It awaits the code lens, then spawns the design lens only when the code lens's `uiNeed` is the
+    boolean `true`; anything else skips it. Each is one awaited `agent` call, the shape
+    `unattended-build.template.js` line 1185 already passes the spawn guard with.
   - `RETURN_CONTRACT` is restated in every spawn, because the harness owns its return contract
     (`tools/roles/README.md:26-28`). It holds the schema, the MUST and SHOULD definitions, `not`,
-    `edits` and the census line shape, as §4 states them.
-  - AC4, AC5 and AC11 observe it.
+    `edits`, `uiNeed` and the census line shape, as §4 states them.
+  - AC4, AC5, AC11 and AC12 observe it.
 - **S4** — A DETERMINISTIC merge in the script, with no judge agent:
   - the code lens's seams, then the design lens's, each in the scout's own order;
   - one seam per repository, path and first code token of its symbol, case-folded, kept at its
@@ -134,17 +154,18 @@ comes from three measurements:
   the section left out. The full list is returned beside it, demoted seams included at SHOULD.
   - AC2 and AC10 observe it.
 - **S6** — Liveness:
-  - A lens that returns null counts as dead, and the section's `scout` line says how many lenses
-    lived.
-  - `none fits` is written only when both lenses lived and neither returned a seam, and it names what
+  - A lens that returns null counts as dead, and the section's `scout` line says how many of the
+    lenses run lived.
+  - A design lens not run because `uiNeed` is false is announced on that line as
+    `design skipped (no UI)`, never counted dead. A dead code lens marks no UI need, so the line
+    reads `lenses 0/1`.
+  - `none fits` is written only when every lens run lived and none returned a seam, and it names what
     was searched.
-  - AC3 observes it.
+  - AC3 and AC12 observe it.
 - **S7** — The kit plumbing:
-  - the template and its render are a `rendered` row in `tools/workflows/kit.toml` and a pair in the
-    parity suite;
+  - the harness ships under `tools/workflows/kit.toml`'s `**` engine rule, so it needs no row;
   - the self-test is declared held, `subject = "kit"`;
-  - the map claim for both files sits beside the other harnesses;
-  - `VERB_OFFENDER_PIN` is raised by the two `boundedParallel` copies in a reasoned row;
+  - the map claim for the harness and its self-test sits beside the other harnesses;
   - the review-harness kit version is bumped once, after `TOOL-aScoutedSeam-3`, and the
     codebase-map kit's once, for S1's procedure section and S10.
   - AC5 observes it.
@@ -152,7 +173,7 @@ comes from three measurements:
   corpus, at the levels `handoff.py stage-efforts reuse` prints, `medium` for both lenses in gov.
   The record lands under this build's `build/`.
   - AC6 observes it.
-- **S9** — The roles kit edits, landed in ONE commit with the rendered harness, so no catalogue entry
+- **S9** — The roles kit edits, landed in ONE commit with the harness, so no catalogue entry
   names a script the tree lacks:
   - The `reuse` row in `tools/roles/workflows.toml` takes §4's values: a `workflow` driver, the
     harness `{prefix}/workflows/reuse-scout.js`, the two stages, and an `enforced-by` that opens with
@@ -209,13 +230,12 @@ comes from three measurements:
 - New codebase-map extractors for CSS custom properties, unexported components or DSL vocabulary. The
   house index LISTS custom properties and conf-declared kinds for the scout to read. It claims no
   inventory key and gates nothing.
-- A second scout run unioned with the first. M1c's two runs agreed on every positive, so the union
-  bought no primary at twice the cost. Intersecting two runs is out too: the offline reading measured
-  it removing fewer wrong MUSTs than the cap of five, at twice the cost.
+- A second scout run, unioned or intersected, each at twice the cost. M1c's two runs agreed on every
+  positive, so the union bought no primary, and the offline reading measured the intersection
+  removing fewer wrong MUSTs than the cap of five.
 - A gate run by the scout. A role agent runs no gate (TOOL-aOrientedCast-11), and the policy's
   `[gates]` table names none for `gov-reuse-scout`, so S9 adds no `[gates]` entry.
-- The draft-and-expand shape, in which the code lens drafts the code and lists every definition of
-  each file it cites. It is fork F3, the owner's, not scope.
+- Drafting code, listing cited files' definitions or grepping literal owners: rejected (F3).
 - Calling the harness at kickoff, writing the card or the brief: `KICK-aScoutedSeam-1`.
 - The catalogue's grammar, its other rows, the front-matter grammar, the renderers, the checker and
   the router's other stages: aOrientedCast's. This unit edits the values S9 lists and nothing else of
@@ -239,8 +259,7 @@ comes from three measurements:
   them the harness has no agent type to spawn and S9 has no row to edit. The spawn guard admits a
   `Workflow` call only for a script `.claude/roles.json` lists under `harnesses`
   (`tools/hooks/agent-cap.js:52-53`, the check at line 2173). So the harness is refused until S9's
-  render lists it, and the benchmark's own arm scripts under this build's `build/` are refused in
-  any tree carrying the index. `harness-args` prints only the `roles` object, so `index` is composed
+  render lists it. `harness-args` prints only the `roles` object, so `index` is composed
   beside it by the caller, as every other harness arg is. aOrientedCast confirmed on 2026-10-11 that
   the arg is no conflict.
 
@@ -288,8 +307,11 @@ The section grammar, one line per entry, in this order:
 - constraint <path> :: <rule> — <how>
 - convention <choice>: <majority> (<n> of <m>)
 - unmet <need> — searched <what>
-- scout <optIn> · lenses <live>/2 · seams <n> · cut <n> · demoted <n>
+- scout <optIn> · lenses <live>/<run>[ · design skipped (no UI)] · seams <n> · cut <n> · demoted <n>
 ```
+
+`<run>` is 2 when the design lens was spawned and 1 when it was not. The skip clause appears only
+on `lenses 1/1`, when the code lens lived and returned `uiNeed` false.
 
 `SECTION_CAP` is 1400 bytes. That is PINNED from the card budget measured on 2026-10-11: a
 six-section READY card held 6547 of the card's 8192 bytes, so a cap above about 1600 refuses the
@@ -300,7 +322,10 @@ removed 18 and 21 but demoted 7 and 6.
 ### The return contract
 
 `RETURN_CONTRACT` is a constant of the harness, appended to every lens's prompt. It states:
-- the JSON schema of one lens's return: `seams`, `constraints`, `conventions`, `edits` and `unmet`;
+- the JSON schema of one lens's return: `seams`, `constraints`, `conventions`, `edits`, `unmet`
+  and the boolean `uiNeed`, which the harness reads from the code lens only;
+- `uiNeed` is true when a need the lens framed sits on a surface a user sees, a page, a component,
+  a style or a token;
 - a MUST is an existing implementation the build would duplicate or bypass if it ignored it, and
   its `how` names that duplicate;
 - a SHOULD is an existing implementation that fits the need where ignoring it duplicates nothing;
@@ -347,17 +372,16 @@ handed out of it.
 
 ### Flow
 
-1. The caller writes the house index with `gen_map.py --house-index`, one `--host` per host tree. It
-   renders the task with `handoff.py render --role gov-reuse-scout ... --part task`, and passes
-   `roles` from `handoff.py harness-args reuse-scout` and `efforts` from
-   `handoff.py stage-efforts reuse`. The render also prints the Agent description,
+1. The caller writes the house index with `gen_map.py --house-index`, one `--host` per host tree,
+   and composes `task`, `roles` and `efforts` as the Data model names them. The render also prints the Agent description,
    `<build> · <unit> · <workflow>`, on stderr. The spawn guard compares that name only on an `Agent`
    call (`tools/hooks/agent-cap.js:45-51`), so a `Workflow` call passes none, and the harness labels
    each spawn itself (S3).
 2. The script validates the args and throws on the first refusal. It logs the run's identity, then
    one type line and one effort line per stage.
-3. It fans `[codeLens, designLens]` through `boundedParallel`, each spawn with `renderStageOpts` of
-   its stage key, its label, and the task, that lens's instruction and `RETURN_CONTRACT`.
+3. It awaits the `codeLens` spawn, built with `renderStageOpts` of its stage key, its label, and the
+   task, that lens's instruction and `RETURN_CONTRACT`. When that return's `uiNeed` is `true`, it
+   awaits the `designLens` spawn, built the same way; otherwise it logs the skip and spawns nothing.
 4. It merges (S4), renders (S5), marks liveness (S6), and returns. It writes nothing; the caller owns
    every write.
 
@@ -382,24 +406,22 @@ role, and the scout stays optional; the first entry still opens with `agent-cap.
 
 | identifier | cell |
 |---|---|
-| `reuse-scout.template.js`, `reuse-scout.js`, `reuse-scout.test.sh` | file names, kit file cell |
+| `reuse-scout.js`, `reuse-scout.test.sh` | file names, kit file cell |
 | `checkArgs`, `renderLensTask`, `deriveMerged`, `renderSection`, `measureBytes`, `renderStageOpts`, `renderAgentLabel`, `extractTaskMarker` | js.function |
 | `SECTION_CAP`, `MUST_CAP`, `LENSES`, `STAGE_KEYS`, `SEAMS_SCHEMA`, `RETURN_CONTRACT` | js.constant |
 | `render_house_index`, `load_house_listings` | py.function |
 | `--house-index` | checker verb, no naming cell |
 | `HOUSE_INDEX_DIRS`, `HOUSE_INDEX_KINDS` | conf key |
 
-Each function name leads with a declared verb; `boundedParallel` is the hook's and is pinned (S7).
+Each function name leads with a declared verb, so no lexicon pin moves.
 `renderStageOpts` and `renderAgentLabel` are the third copies of their names, after
 `tier2-review.template.js` and `unattended-build.template.js`.
 
 ### Files touched (estimate)
 
-- `tools/workflows/reuse-scout.template.js`
 - `tools/workflows/reuse-scout.js`
 - `tools/workflows/reuse-scout.test.sh`
 - `tools/workflows/kit.toml`
-- `tools/workflows/check-protocol-parity.test.sh`
 - `tools/workflows/README.md`
 - `tools/roles/agents/gov-reuse-scout.agent.md` (body, `returns` and `output`)
 - `tools/roles/agents/gov-spec-writer.agent.md` (`reads` only)
@@ -418,7 +440,6 @@ Each function name leads with a declared verb; `boundedParallel` is the hook's a
 - `help/roles.md` (line 65)
 - `memory/map/features/review-harnesses.md`
 - `memory/map/generated/symbols.json`
-- `.lexicon.conf`
 - `tools/codebase-map/reuse-lookup.agent.md`
 - `tools/codebase-map/gen_map.py`
 - `tools/codebase-map/selftest.py`
@@ -438,14 +459,13 @@ so the calibration (AC6) and the first kickoff call run from a session started a
 
 - **The five-lens fan-out with two skeptics (benchmark arm M2).** About 7 times the cost per case, 43
   MUSTs on one case, no recall gain, and skeptics that confirmed nearly everything.
-- **A judge agent over the two passes (M3).** Never measured, because the session limit killed it;
-  the measured skeptic predicts a judge confirms. The merge is deterministic instead.
+- **A judge agent over the two passes (M3).** Never measured (the session limit killed it); the
+  measured skeptic predicts a judge confirms, so the merge is deterministic.
 - **The lookup as the mechanism (M0).** Zero of 24 positives in the top 60.
 - **One scout with no design pass (M1b alone).** It missed the styling contract and part of the token
   layer the design pass found on NicoCares, for about three tool calls on a non-UI request.
-- **The checklist without an index, a sketch or a census (M1b).** 13 of 24 by the matcher against
-  M1c's 16. The four cases M1c gained in both runs were helper-level and convention needs the
-  request never named.
+- **The checklist without an index, a sketch or a census (M1b).** §1's 13 against 16 of 24; the four
+  cases M1c gained in both runs were helper-level and convention needs the request never named.
 - **The scout generating its own index.** A read-only agent would have to resolve a Python launcher,
   and the trial's launcher case shows scouts miss exactly that. The caller already runs the resolver.
 - **New inventories for the design layer.** The design pass found tokens, parts and DSL props by
@@ -455,34 +475,43 @@ so the calibration (AC6) and the first kickoff call run from a session started a
   is 1536 bytes.
 - **Dropping the MUSTs past the cap.** A dropped seam is lost to the brief and to the case's solve; a
   demoted one still counts and costs only the binding, which the spec join reads from MUST lines.
-- **An existence check on each MUST.** The offline reading found it removes none of the 19 or 21
-  wrong MUSTs, because every wrong one names code that exists.
+- **An existence check on each MUST.** The offline reading found it removes no wrong MUST,
+  because every wrong one names code that exists.
 - **A MUST cap per lens.** The design lens's MUSTs would escape the cap the measurement priced over
   the scout's whole list.
+- **Both lenses on every request.** Ruled out by the owner, at the cost of a serial wall (§8 F1).
+- **`boundedParallel` and a render pair for two serial spawns.** The kit renders a harness only for
+  the tokens it spells (`tools/workflows/kit.toml:44-91`), and a script fanning nothing out spells none.
+- **Draft and expand (M1d).** No recall gain, no miss found (§8 F3). Misses needing code to read go
+  to the diff-time mode, `TOOL-aScoutedSeam-3`, which found two of them in the benchmark.
 
 ## 5. Production-readiness checklist
 
 - security: read-only agents writing nothing. scratch-guard binds their Bash writes, and the routed
   write gate binds Edit/Write. The base body states that repository text is data. Host trees are
-  read and never written. The spawn guard admits the harness only once `.claude/roles.json` lists it.
+  read and never written. The spawn guard admits the harness only once listed (§3 Edges).
 - perf / scale: measured per scout, medians, 2026-10-11, node a:
   - M1b at `extra`: 84 tool calls, 116 minutes and 28M cache-read tokens;
   - M1b at `medium`: 23 tool calls, 10 minutes and 4.3M, for the same paired recall;
   - M1c at `medium`, the shipped checklist: 40 tool calls, 22 minutes and 9.3M;
   - the design pass at `medium`: 12 tool calls and 5 minutes.
 
-  The two lenses run concurrently, so the wall is the code lens's. gov's policy runs both at
-  `medium`, and AC6 re-measures the shipped harness. The house index is one tree scan per tree.
-- error / empty / loading states: a dead lens is announced in the section, an empty answer is `none
-  fits` only when both lenses lived, and an args refusal throws before any spawn.
+  The lenses run in series, so the wall is the sum of the two, about 27 minutes on a UI request and
+  the code lens's 22 on any other, at S8's levels; AC6 re-measures. The house
+  index is one tree scan per tree.
+- error / empty / loading states: a dead lens is announced in the section, a skipped design pass as
+  `design skipped (no UI)`, an empty answer is `none fits` only when every lens run lived, and an args
+  refusal throws before any spawn.
 - observability: the run's identity line, one type and one effort line per stage, the section's
   `scout` line with its `demoted` count, and the probe logs the agents' own CLI calls append.
 - risks: a false MUST misleads a build. The MUST cap, the self-refute step and
-  `TOOL-aScoutedSeam-2`'s override bound it. The cap also demotes a true MUST past the fifth: 1 and 3
-  ground-truth bindings on the two M1c runs. Cost is the second risk, bounded by the policy level.
+  `TOOL-aScoutedSeam-2`'s override bound it. The cap also demotes a true MUST past the fifth (§4,
+  `MUST_CAP`). A code lens that misses a UI need skips the design
+  pass; the scout line names the skip, and AC6 records `uiNeed` per case. Cost is bounded by the
+  policy level.
   The procedure document ships in the codebase-map kit, a default; a target without it holds a
   scout whose body names a document it lacks, as the landed base already does.
-- testing: `reuse-scout.test.sh` evaluates the rendered script as an AsyncFunction with stub agents,
+- testing: `reuse-scout.test.sh` evaluates the script as an AsyncFunction with stub agents,
   the shape `tier2-review.test.sh` uses. It is held as a kit self-test, not a new guarded bar leg.
 - migration: N/A — a new file pair, and the catalogue row's values change in place; nothing is
   renamed or moved.
@@ -491,23 +520,25 @@ so the calibration (AC6) and the first kickoff call run from a session started a
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the stub suite drives `reuse-scout.js` with both lenses naming one seam, once at
-  SHOULD and once at MUST under different symbol spellings, the merged list holds it once, at MUST.
+- **AC1** — When the stub suite drives `reuse-scout.js` with the code lens returning `uiNeed: true`
+  and both lenses naming one seam, once at SHOULD and once at MUST under different symbol
+  spellings, the merged list holds it once, at MUST.
   Red when: the merge keys on the whole symbol string and keeps both.
 - **AC2** — When the stub returns fourteen seams carrying em dashes, the section holds at most ten
   seam lines, every MUST before every SHOULD, and `measureBytes` of it is at most `SECTION_CAP`.
   A `cut` count names the rest.
   Red when: the cap is measured in characters, so an em dash costs one instead of three.
-- **AC3** — When one lens returns null, the section's `scout` line reads `lenses 1/2` and no
-  `none fits` line appears.
+- **AC3** — When the code lens returns `uiNeed: true` and the design lens null, the section's `scout`
+  line reads `lenses 1/2` and no `none fits` line appears. When the code lens returns null, the stub
+  records no design spawn and the line reads `lenses 0/1`.
   Red when: a dead lens reads as an empty answer.
 - **AC4** — When the args carry `optIn: "yes"`, or no `roles.codeLens`, or a `roles` key `scout`, or
   an `efforts` value `High`, or a `task` with no `gov:handoff` marker naming `gov-reuse-scout`, or a
   relative `repo` or `index`, the script throws naming that field before the stub records any spawn.
   Red when: a validator runs after the first `agent` call.
 - **AC5** — When `check-verifier-fanout.sh` and `check-workflow-syntax.js` run over the tree, both
-  count `reuse-scout.js` and pass, and `lexicon.py --check` passes at the raised pin.
-  Red when: the template spells a fan-out bound the hook cannot resolve.
+  count `reuse-scout.js` and pass, and `lexicon.py --check` passes at the unchanged pin.
+  Red when: the hook reads the two awaited spawns as an unbounded fan-out.
 - **AC6** — When the shipped harness runs at the levels `handoff.py stage-efforts reuse` prints on
   six cases of `2026-10-11-build-TOOL-aScoutedSeam-1-3-cases.json` and `bench.py grade` reads its
   output, all four positives are solved and the visitor-upload control binds no decoy at MUST. The
@@ -516,11 +547,11 @@ so the calibration (AC6) and the first kickoff call run from a session started a
   positives in both runs. On the health-log control every `medium` scout measured, M1c included,
   bound the decoy `runlog_lib.read_journal`. The record therefore states that case's outcome rather
   than gating on it, because `TOOL-aScoutedSeam-2`'s override is its backstop. The record also
-  states the median wall and cache-read per agent, how many of the section's MUST lines are edits
+  states each case's `uiNeed`, the median wall and cache-read per agent, how many of the section's MUST lines are edits
   rather than existing implementations, and each case's `demoted` count with whether a demoted seam
   was the case's ground truth. The edit count observes the return contract's seam definition.
   Red when: a positive M1c solved is lost, or the visitor-upload control binds a decoy at MUST.
-  cost: twelve agents, about twenty minutes each at the measured M1c rate.
+  cost: at most twelve agents, about twenty minutes each at the measured M1c rate.
   permission: the owner's opt-in to Workflow runs.
   fixture: frozen clones of gov, inCMS and NicoCares, rebuilt with `bench.py trees`, driven from a
   session started after S9's render, so the spawn guard lists the harness and the type is current.
@@ -537,13 +568,13 @@ so the calibration (AC6) and the first kickoff call run from a session started a
     and the `index` arg;
   - the scout's line in `AGENTS.md` equals the one `handoff.py roster` prints.
 
-  Red when: the row, a role file or the policy is edited in a commit that does not carry the rendered
+  Red when: the row, a role file or the policy is edited in a commit that does not carry the
   harness, which `git show --stat` of that commit shows; or the scout body is over its ceiling; or a
   render is left stale, so `adopt-roles.sh --check` or the roster compare disagrees.
   fixture: aOrientedCast's catalogue, checker, renderers and router, landed.
-- **AC8** — When the stub suite's two lenses return the census choice `Section width` with different
-  counts, plus three `edits` each, the section holds one `- convention Section width:` line, the code
-  lens's, and no edit text. The return's `edits` holds all six.
+- **AC8** — When the code lens returns `uiNeed: true` and the two lenses return the census choice
+  `Section width` with different counts, plus three `edits` each, the section holds one
+  `- convention Section width:` line, the code lens's, and no edit text. The return's `edits` holds all six.
   Red when: an edit reaches the section as a seam line, or a convention is keyed on its whole text
   and appears twice.
 - **AC9** — When `gen_map.py --house-index` runs twice on a fixture tree carrying a
@@ -552,116 +583,72 @@ so the calibration (AC6) and the first kickoff call run from a session started a
   directory, the output holds the bug-class section's `absent` line.
   Red when: an absent source prints nothing, or the output order follows the filesystem's listing
   order.
-- **AC10** — When the stub suite's code lens returns eight distinct MUSTs and its design lens two,
-  the section holds five MUST lines, the code lens's first five, and the other five as SHOULD lines.
+- **AC10** — When the stub's code lens returns `uiNeed: true` and eight distinct MUSTs, and its design
+  lens two, the section holds five MUST lines, the code lens's first five, and the other five as SHOULD lines.
   The `scout` line reads `demoted 5`, and the return's `seams` holds all ten.
   Red when: the cap drops a seam instead of demoting it, or counts each lens separately and keeps
   seven MUSTs.
-- **AC11** — When the stub suite records each spawn of a run whose `efforts` names `codeLens` and
-  omits `designLens`, the code lens's options carry that `effort` and the design lens's carry none,
-  and both carry `agentType` from `roles`. The log holds one effort line per stage naming
+- **AC11** — When the stub suite records each spawn of a `uiNeed: true` run whose `efforts` names
+  `codeLens` and omits `designLens`, the code lens's options carry that `effort` and the design
+  lens's carry none, and both carry `agentType` from `roles`. The log holds one effort line per stage naming
   `efforts.codeLens` and `no efforts.designLens`. Each prompt opens with `args.task` byte for byte
   and ends with `RETURN_CONTRACT`.
   Red when: an omitted stage is sent a default level written in the harness, or a lens prompt
   rewrites the task.
+- **AC12** — When the stub's code lens returns `uiNeed: false`, and again when it returns the string
+  `"true"`, the stub records no design spawn and the `scout` line reads
+  `lenses 1/1 · design skipped (no UI)`.
+  Red when: a skipped design pass reads as a dead lens, or the design lens is spawned anyway.
 
 ## 7. Gates
 
 `workflow script syntax` · `verifier fan-out` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `install-prefix (shipped surface)` · `review-protocol parity (kit vs dogfood)` · `memory hygiene` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `review-join self-test` · `straggler-guard arms` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `check-wiring self-test` · `roles catalogue` · `roles render wiring` · `playbook render wiring` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)`
 
-New arm: tools/workflows/reuse-scout.test.sh · covers AC1 AC2 AC3 AC4 AC8 AC10 AC11 · stub lens returns staged per arm · none
+New arm: tools/workflows/reuse-scout.test.sh · covers AC1 AC2 AC3 AC4 AC8 AC10 AC11 AC12 · stub lens returns staged per arm · none
 New arm: tools/codebase-map/selftest.py · covers AC9 · fixture trees with and without each index source, staged per arm · none
 
 ## 8. Open questions
 
-- **F1 — Should the design lens run on every request, or only when the code lens's framing finds a
-  UI need?** Running it always costs about three tool calls on a non-UI request, measured. Gating it
-  on the code lens serializes the two passes and doubles the wall. Recommendation: always run it.
-- **F2 — Does the level `medium` hold the benchmark's recall?** Now measured three times:
-  - The benchmark record's effort section paired `medium` against `extra`, and the scouts moved by at
-    most one solved case. The checklist scout's cost fell from two hours to ten minutes, and its MUST
-    count rose from 97 to 114.
-  - The M1c trial ran the shipped checklist at `medium`. On the 14 positives M1b answered at `extra`,
-    it found 11 and 12 primaries by the blind judge, against M1b's 11 at `extra`.
-  - The offline reading paired M1b over the 19 cases it answered at both levels: it bound 1 wrong
-    MUST of 97 at `extra` and 8 of 114 at `medium`. So `medium` keeps the recall and loses some MUST
-    discipline, and S4's MUST cap is the compensation.
-
-  Recommendation: ship `medium`, set as `gov-reuse-scout`'s level in gov's policy. AC6 re-measures
-  the shipped harness and observes the return contract's seam definition for the first time, since
-  the trial only recommended it.
-- **F3 — Should the code lens DRAFT the code and EXPAND every file it cites?** The offline reading
-  found the six positives both M1c runs missed one level below the sketch:
-  - Three ground truths sat in a file the scout had cited, and two more had a copy in one.
-  - Listing every definition of the cited files, constants included, reaches five of the six in run
-    A and four in run B, at 181 names per case at the median. The diff-time arm found two of them by
-    reading code.
-
-  The shape: the code lens writes the code a builder would TYPE, as a return field and never a file.
-  It lists the definitions of every file it cites with a deterministic lister, a codebase-map mode
-  beside `--house-index`. That mode must list module constants too, because the map's symbol
-  inventory lacks them (`PHASES_TERMINAL`, `DEFAULT_DECISION_ID_RE`). It greps the owner of every
-  literal, regex and launcher call in the draft. It returns `expanded`, and the harness counts the
-  cited files missing from it on the scout line.
-
-  Measurement: the spawn guard now admits only listed harnesses, so the benchmark's arm scripts
-  cannot run in this tree. The measurement is AC6 run over the whole 30-case corpus through the
-  shipped harness, against M1c, at about 60 agents.
-
-  Options: (a) build it into this unit and widen AC6 to the corpus; (b) ship this unit as specced and
-  measure the shape in a later unit; (c) a second stage that reviews the draft. Recommendation: (a),
-  with (c) only if the single-agent shape leaves the misses.
-- **F4 — Where does the lookup's blind spot go, and does gov's overlay carry any rule?** The brief
-  put "`reuse_lookup.py` cannot see shell, so a shell seam is grepped" in gov's overlay. Two facts
-  bear on it:
-  - The claim is false as stated. `memory/map/generated/symbols.json` holds 1919 shell entries,
-    `arm_wall` among them. What the map lacks in every language is a module constant:
-    `PHASES_TERMINAL` and `DEFAULT_DECISION_ID_RE` are absent from it, as the offline reading found.
-  - gov's `tools/roles/house/gov-reuse-scout.md` is the kit's seed source (`tools/roles/kit.toml`,
-    the `seed` row), so whatever gov writes there reaches every new adopter once, as gov's levels in
-    `house/policy.toml` already do. An adopter's overlay is seeded empty only while gov's is empty.
-
-  Options: (a) the corrected rule goes into the procedure document, true in every tree, and gov's
-  overlay stays empty; (b) the corrected rule goes into gov's overlay, and new adopters receive it
-  once and own it; (c) a govkit carve-out that seeds the overlay empty while gov's carries rules, a
-  new descriptor mechanism. Recommendation: (a). The rule is not gov's, and the empty seed then
-  holds with no new mechanism. S1 is written to (a).
+- **F1 — Design lens on every request, or only on a UI need?** RESOLVED (owner, 2026-10-18): only on
+  the code lens's `uiNeed`, against the recommendation (S2, S3, S6).
+- **F2 — Does `medium` hold the recall?** RESOLVED (owner, 2026-10-18): `medium`, as recommended on
+  the benchmark, M1c and the offline reading, in gov's policy; AC6 re-measures.
+- **F3 — Should the code lens draft the code and expand every file it cites?** RESOLVED (owner,
+  2026-10-18): not adopted. The M1d trial (`-1-9-m1d-trial.md`) found none of M1c's six misses.
+- **F4 — Where does the lookup's blind spot go?** RESOLVED (owner, 2026-10-18), as recommended: into
+  the procedure document, and gov's overlay, the kit's seed source, stays empty (S1).
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
-- rev-2 · 2026-10-11 · S9 · AC7 · §3 · §4 · the `reuse` catalogue row moves into this unit's scope:
-  aOrientedCast already carries the row and ruled that its harness value is this unit's edit, landed
-  with the harness, so the catalogue never names a missing script.
+- rev-2 · 2026-10-11 · S9 · AC7 · §3 · §4 · the `reuse` catalogue row moves into this unit's scope,
+  landed with the harness.
 - rev-3 · 2026-10-11 · §5 · §8 · AC6 · the effort comparison measured `medium` against `extra`: the
-  same recall at a fifth to a seventh of the cost, so F2's recommendation and AC6's cost now cite it.
+  same recall at a fifth to a seventh of the cost.
 - rev-4 · 2026-10-11 · §1 · S1 · S2 · S3 · S4 · S10 · §3 · §4 · §5 · §8 · AC4 · AC6 · AC8 · AC9 · the
   M1c trial (`-1-7-m1c-trial.md`) beat the checklist by three cases in each of two runs, so the
-  role becomes M1c's with the trial's three corrections. The section gains `convention` lines and
-  the return gains `edits`. The house index is a new codebase-map mode the caller runs, and AC6's
-  baseline moves to M1c.
-- rev-5 · 2026-10-11 · S9 · §3 · §4 · AC7 · aOrientedCast placed the router's stage 2 in this unit:
-  the `index` arg and the house-index step are spelled in `tools/roles/SKILL.template.md` and
-  re-rendered in the commit that edits the catalogue row.
+  role becomes M1c's, with `convention` lines, `edits` and the house index.
+- rev-5 · 2026-10-11 · S9 · §3 · §4 · AC7 · aOrientedCast placed the router's stage 2, with the
+  `index` arg and the house-index step, in this unit.
 - rev-6 · 2026-10-13 · §1 · S1 · S2 · S3 · S4 · S5 · S7 · S8 · S9 · §3 · §4 · §5 · §7 · §8 · §10 · AC4 ·
   AC6 · AC7 · AC10 · AC11 · re-specced on the roles kit as landed at ebce889c, with the offline
-  reading's precision fix. S1 splits the role into a base body under its ceiling, the M1c checklist
-  and census rule in `reuse-lookup.agent.md`, and an overlay F4 decides. The return contract moves
-  into the harness (§4). S3 takes `roles` and `efforts` per stage key, `codeLens` and `designLens`,
-  through one `renderStageOpts`, with per-stage log lines and labels; `effort` and `roles.scout` go.
-  S4 adds the MUST cap of 5 that demotes, and S5 and the grammar gain `demoted`. S9 makes the row a
-  workflow driver, adds `card:reuse?` to three consumers, the policy line, the README and help
-  corrections, the renders and one version bump. §3 gains the no-gate and F3 non-goals and the
-  spawn guard's harness list. F2 gains the offline caveat, and F3 and F4 are new. AC4 and AC7 are
-  rewritten, AC6 records `demoted`, AC10 and AC11 are new, and §7 gains the roles, playbook and
-  version legs.
+  reading's precision fix: the role split three ways, the return contract in the harness, per-stage
+  `roles` and `efforts`, the MUST cap of 5 that demotes, and S9's catalogue, policy and render edits.
+- rev-7 · 2026-10-18 · §1 · §3 · §4 · §8 · F3 closed, not adopted, on the M1d trial. No S, AC or
+  gate moved.
+- rev-8 · 2026-10-18 · S1 · S2 · S3 · S6 · S7 · §4 · §5 · §6 · §7 · §8 · §10 · AC1 · AC3 · AC5 · AC6 ·
+  AC8 · AC10 · AC11 · AC12 · the owner's rulings. F1: the design lens runs only on the code lens's
+  `uiNeed`, in series, and the scout line names a skipped pass. With no fan-out the harness ships
+  as an engine file, with no `boundedParallel` or render. F2 and F4 closed. AC12 is new.
+- rev-9 · 2026-10-18 · §1 · §4 · §5 · §8 · cut under the spec ceiling, meaning unchanged: resolved
+  forks keep ruling and record, and repeated figures point at their owner.
 
 ## 10. Reuse audit
 
 The seam this unit extends is the harness convention of `tools/workflows/tier2-review.template.js`:
-a rendered template, the inlined `boundedParallel` at `{{FANOUT_CAP}}`, a literal lens array, the
-per-stage `roles` and `efforts` validation and `renderStageOpts` (lines 223-268), the per-stage log
-lines (lines 309-319), `renderAgentLabel` (line 298), and an AsyncFunction stub suite. The roles kit
+the per-stage `roles` and `efforts` validation and `renderStageOpts` (lines 223-268), the per-stage log
+lines (lines 309-319), `renderAgentLabel` (line 298), and an AsyncFunction stub suite. Its two
+awaited spawns take the single-call shape of `unattended-build.template.js` (line 1185). The roles kit
 seams it consumes are `tools/roles/handoff.py`'s `render_handoff` (line 312), `print_harness_args`
 (line 453) and `print_stage_efforts` (line 474), and `tools/roles/roles_lib.py`'s `render_role`
 (line 569) and `load_policy` (line 363). The procedure extends
