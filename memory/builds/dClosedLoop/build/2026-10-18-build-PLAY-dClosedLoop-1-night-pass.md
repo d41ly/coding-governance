@@ -485,7 +485,7 @@ Gap: gap-tool-09. dConvergedCharter runs the table's join as convergence's exit 
 - **Units: 285 to 330.** dConvergedCharter's old count held a quoted clause split
   in two, the same defect as dFairHearing's before the walk. The clause scan now reads double quotes too, and was seen
   red on it.
-- **The critical path: 181 to 211 units.**
+- **The critical path: 181 units at `beda01950`, and 211 at `15cec9200`.**
   - It now runs dGroundRules, dOrderedCharter, dDeclaredLoop, dWitnessedBar, dTotalRecall, dWellOiledMachine,
     dTendedCadence, dCalibratedLens and dConvergedCharter.
   - The Maintain and Review builds' additions (instruction evals, delivery metrics, a cyclic playbook's filer, a
@@ -537,7 +537,7 @@ Each fork's first option is the recommendation, and the design as folded shows i
 | NP-21 | Should Maintain tier its readings by deviation? | defer: pins with a severity, as today, until the Loop Review has rolling baselines; bands now: log, diagnose read-only, act | a new key, `maintain.tiers`, only on bands |
 | NP-22 | The fates proposed for the parts no record decided? | approve them as proposed; review them row by row | the fates record's rows marked proposed |
 | NP-23 | The night's new nodes and their owners? | approve them as proposed; review them | the ownership record's night-pass amendment |
-| NP-24 | dDeclaredLoop now holds 47 units, and the critical path runs through dTendedCadence and dCalibratedLens at 213 | price a split of dDeclaredLoop, and a lighter dCalibratedLens, before the walk resumes; keep the chain as it stands | a structural decision about the chain |
+| NP-24 | dDeclaredLoop now holds 47 units, and the critical path runs through dTendedCadence and dCalibratedLens at 211 (`15cec9200`) | price a split of dDeclaredLoop, and a lighter dCalibratedLens, before the walk resumes; keep the chain as it stands | a structural decision about the chain |
 
 The walk is not a fork: wave 1 still waits for the owner's read, and wave 2 follows it.
 
@@ -607,11 +607,13 @@ The night pass's scripts and probes, and their runs, are in
 `build/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py`. As committed, after the closing review's fold:
 - **The design map** derives 2,235 nodes in 30 namespaces, 31,203 of 32,768 B, rc 0, at `15cec9200`. Its printed
   size leaves out the head line's dirty marker.
-  - It reds on a design record quoting a map count with nothing pinning it on its line: a commit, or a research
+  - It reds on a design record quoting a derived count with nothing pinning it on its line: a commit, or a research
     record's cited line. At `15cec9200` this record said 2,234 nodes, counted before the session log's last event
-    added one. A first predicate, taking only a backticked sha for a pin, found ten quotes and nine unpinned. Widened
-    to a bare sha and a research record's cited line, the arm was red on six, four of them stale. Each is now pinned,
-    and the `unpinned-count` plant reds.
+    added one. A first predicate, over map counts and taking only a backticked sha for a pin, found ten quotes and
+    nine unpinned. Widened to a bare sha and a research record's cited line, the arm was red on six, four of them
+    stale. Widened again to the critical path, it skips a fenced run capture. It then read 21 quotes and was red on
+    four: NP-24 still said 213, and the walk's glance said 181 with no date. Each is now pinned, and the
+    `unpinned-count` and `unpinned-path` plants red.
   - Its layer arm read 19 kits joined to no layer before the fix, rc 1, and none after it. It reads the derived kit
     nodes, and does not check that a layer is the right one.
   - It reads the fates record by name, so an absent one stops the run, and a row of the wrong width stops it too. Each
@@ -629,4 +631,4 @@ The night pass's scripts and probes, and their runs, are in
 - **The clause scan** finds 0 splits. It was red on dConvergedCharter's quoted clause before the join.
 - **The gap join** reads 250 keys against 16 chain rows, each owned exactly once, rc 0.
 - **The preset check** reads 205 keys, 192 presettable, and 192 preset rows, with no findings.
-- **The critical path** is 211 units.
+- **The critical path** is 211 units at `15cec9200`.

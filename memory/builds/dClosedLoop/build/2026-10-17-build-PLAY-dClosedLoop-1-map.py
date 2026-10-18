@@ -10,7 +10,7 @@ Usage:
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --check --plant <case>   damage the render, expect exit 1
       cases: drop-line, bad-count, ghost-rel, no-layer, fates-absent, fates-drop, fates-ghost, fates-bad, fates-unbuilt,
       fates-empty, fates-kit, fates-kit-drop, fates-kit-ghost, fates-count, fates-absorbed-stays, fates-bare-none,
-      fates-rel, fates-none, unpinned-count, census, no-owner, orphan (an item's owner emptied), two-owners,
+      fates-rel, fates-none, unpinned-count, unpinned-path, census, no-owner, orphan (an item's owner emptied), two-owners,
       inferred (a point's owner kept with its declaration dropped)
   python 2026-10-17-build-PLAY-dClosedLoop-1-map.py --pending          list the nodes whose purpose waits on the owner
   --unfold <ns>[,<ns>...] renders those namespaces node by node, as an item's declared unfolds would.
@@ -533,14 +533,17 @@ def census():
     }
 
 
-# No stale facts, the records' half: a design record quotes a map count, its nodes or its bytes against the cap, only
-# pinned on the same line to what dates it: a commit, or a research record's cited line. Every fold moves the count,
-# so an unpinned quote goes stale (the night pass found four). It reads this folder's records but the research
-# returns, instruments and session log, dated by kind, and not the reviews. It does not read a count written without
-# a thousands comma, or a quote wrapped across lines, and it takes any hex word with a letter and a digit for a sha.
-COUNT = re.compile(r"\b\d{1,3}(?:,\d{3})+ (?:nodes\b|of (?:its |the )?32,768\b)")
+# No stale facts, the records' half: a design record quotes a derived count, the map's nodes or bytes against the cap
+# or the chain's critical path, only pinned on the same line to what dates it: a commit, or a research record's cited
+# line. Every fold moves the count, so an unpinned quote goes stale (the night pass found six). It reads this folder's
+# records but the research returns, instruments and session log, dated by kind, and not the reviews; and it skips a
+# fenced block, a run as captured. It does not read a map count written without a thousands comma, any other count,
+# or a quote wrapped across lines, and it takes any hex word with a letter and a digit for a sha.
+COUNT = re.compile(r"\b\d{1,3}(?:,\d{3})+ (?:nodes\b|of (?:its |the )?32,768\b)|critical path\b[^|.]{0,80}?\b\d{2,3}\b")
 PIN = re.compile(r"\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\d)[0-9a-f]{7,40}\b|`[^`]*research-[^`]*\.md:\d+`")
 DATED = ("-research-", "-instruments", "-session-log")
+UNPINNED = {"unpinned-count": "The level-0 map stands at 31,203 of its 32,768 B.",
+            "unpinned-path": "The critical path is 211 units."}
 
 
 def unpinned_counts(plant=None):
@@ -549,10 +552,16 @@ def unpinned_counts(plant=None):
         if any(s in p.name for s in DATED):
             continue
         rows = p.read_text(encoding="utf-8").split("\n")
-        if plant == "unpinned-count" and p.name.endswith("-gap-register.md"):
-            rows.append("The level-0 map stands at 31,203 of its 32,768 B.")
+        if plant in UNPINNED and p.name.endswith("-gap-register.md"):
+            rows.append(UNPINNED[plant])
+        fence = ""
         for i, row in enumerate(rows, 1):
-            if not PIN.search(row):
+            m = re.match(r"\s*(`{3,})", row)
+            if m and not fence:
+                fence = m.group(1)
+            elif m and len(m.group(1)) >= len(fence) and not row.strip().strip("`"):
+                fence = ""
+            elif not fence and not PIN.search(row):
                 found += [(p.name, i, m.group(0)) for m in COUNT.finditer(row)]
     return found
 
@@ -701,7 +710,7 @@ def check(A, ns, out, folded, plant=None):
     if any(re.search(r"\b20\d\d-\d\d-\d\d\b", ln) for ln in lines[2:]):
         findings.append("no stale facts: a line holds a date")
     for name, i, q in unpinned_counts(plant):
-        findings.append(f"no stale facts: {name}:{i} quotes the map's {q!r} with nothing pinning it on its line")
+        findings.append(f"no stale facts: {name}:{i} quotes {q!r} with nothing pinning it on its line")
     # Owner: every node a build must build names exactly one chain build, read from a declared field (PM-8).
     chain = {n["key"] for n in ns["chain"]}
     for name in OWNED:

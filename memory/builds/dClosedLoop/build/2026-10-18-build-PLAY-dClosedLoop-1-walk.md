@@ -13,12 +13,16 @@ the owner's word on each.
 
 ## [chain] The chain at a glance
 
+As presented, at `beda01950`. The night pass has since grown the chain to 330 units.
+At `15cec9200` the critical path is 211 units (the night-pass record's `[chain-impact]`). This glance and wave 1 are
+derived again when the walk resumes.
+
 - **Sixteen builds,** ordered by when each can finish, in planned units, a unit being one clause of a row's
   planned units: dGroundRules 8; dFairHearing 19; dOrderedCharter 30; dDeclaredLoop 73; dWitnessedBar 93; dBoundRoles
   123; dTotalRecall 125; dIndexedDesign 134; dRankedPlan 136; dWellOiledMachine 149; dScopedBuild 158; dTendedCadence
   159; dMindYourWords 165; dCalibratedLens 167; dShippedRelease 169; dConvergedCharter 181.
-- **The critical path, 181 units:** dGroundRules, dOrderedCharter, dDeclaredLoop, dWitnessedBar, dTotalRecall,
-  dWellOiledMachine, dShippedRelease and dConvergedCharter.
+- **The critical path, 181 units at `beda01950`:** dGroundRules, dOrderedCharter, dDeclaredLoop, dWitnessedBar,
+  dTotalRecall, dWellOiledMachine, dShippedRelease and dConvergedCharter.
 - **The waves:**
   1. the foundation: dGroundRules, dOrderedCharter, dFairHearing and dDeclaredLoop;
   2. dWitnessedBar, dBoundRoles, dTotalRecall, dIndexedDesign and dRankedPlan;

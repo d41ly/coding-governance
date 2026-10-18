@@ -2007,6 +2007,48 @@ print(f"map counts quoted: {found + pinned} · pinned {pinned} · unpinned {foun
 sys.exit(1 if found else 0)
 ````
 
+### `pinned_counts2.py`
+
+The same, widened to the class: every derived count the map's arm reads, each with its disposition, through the generator's own patterns.
+
+````python
+"""Probe, widened to the class: every derived count the design records quote (the map's nodes or bytes, and the
+chain's critical path), each with its disposition: pinned on its line, inside a fenced run capture, or unpinned. It
+imports the map generator's own COUNT and PIN, so the population it prints is the one the map's arm reads.
+
+Usage: python -X utf8 pinned_counts2.py   (from the worktree root); rc 1 on an unpinned quote
+"""
+import importlib.util
+import pathlib
+import re
+import sys
+
+B = pathlib.Path("memory/builds/dClosedLoop/build")
+spec = importlib.util.spec_from_file_location("map", B / "2026-10-17-build-PLAY-dClosedLoop-1-map.py")
+M = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(M)
+
+tally = {"pinned": 0, "fenced": 0, "unpinned": 0}
+for p in sorted(B.glob("*.md")):
+    if any(s in p.name for s in M.DATED):
+        continue
+    fence = ""
+    for i, row in enumerate(p.read_text(encoding="utf-8").split("\n"), 1):
+        f = re.match(r"\s*(`{3,})", row)
+        if f and not fence:
+            fence = f.group(1)
+            continue
+        if f and len(f.group(1)) >= len(fence) and not row.strip().strip("`"):
+            fence = ""
+            continue
+        for m in M.COUNT.finditer(row):
+            how = "fenced" if fence else "pinned" if M.PIN.search(row) else "unpinned"
+            tally[how] += 1
+            print(f"{how:8} {p.name}:{i}: {m.group(0)!r}")
+print("derived counts quoted: " + " · ".join(f"{k} {v}" for k, v in tally.items()))
+sys.exit(1 if tally["unpinned"] else 0)
+````
+
 ### `fold_np_self.py`
 
 The night pass's own sweep while the review ran: one actor per probe item, the observation entry.place returns, verify-at-plan's route, and Design's seventh input.
@@ -3035,6 +3077,8 @@ MINE = [
     ("night/plain_cites.py", "H2: plain-word spellings of a non-ancestor's record kind in the chain rows, measured."),
     ("night/pinned_counts.py", "After the fold's commit: the design records' quoted map counts and their pins, run over "
      "the real tree before the map's arm was written."),
+    ("night/pinned_counts2.py", "The same, widened to the class: every derived count the map's arm reads, each with its "
+     "disposition, through the generator's own patterns."),
     ("night/fold_np_self.py", "The night pass's own sweep while the review ran: one actor per probe item, the "
      "observation entry.place returns, verify-at-plan's route, and Design's seventh input."),
     ("night/fold_np_residue.py", "Residue: layer-roles' driver sentence, and the owner's session named in the design "
@@ -3134,11 +3178,19 @@ build's records before any arm was written, took only a backticked sha for a pin
 The map's arm, widened to a bare sha and a research record's cited line, on the records before their pins:
 
 """ + block("text", "$ python map.py --check\n" + "\n".join(
-    l for l in read(S / "night/map_unpinned_red.out").split("\n") if l.startswith(("FINDING", "map:"))) + "\nrc 1"))
+    l for l in read(S / "night/map_unpinned_red.out").split("\n") if l.startswith(("FINDING", "map:"))) + "\nrc 1") + """
+After that commit, `2403c49ba`, the class widened to the chain's critical path, skipping a fenced run capture. The
+population, through the generator's own patterns, before the pins:
+
+""" + block("text", "$ python pinned_counts2.py\n" + read(S / "night/pinned_counts2.out")) + """
+The map's arm on the same tree:
+
+""" + block("text", "$ python map.py --check\n" + "\n".join(
+    l for l in read(S / "night/map_path_red.out").split("\n") if l.startswith(("FINDING", "map:"))) + "\nrc 1"))
 plants = []
 for p in ("no-layer", "fates-absent", "fates-drop", "fates-ghost", "fates-bad", "fates-unbuilt", "fates-empty",
           "fates-kit", "fates-kit-drop", "fates-kit-ghost", "fates-count", "fates-absorbed-stays", "fates-bare-none",
-          "fates-rel", "fates-none", "unpinned-count"):
+          "fates-rel", "fates-none", "unpinned-count", "unpinned-path"):
     out, rc = run(B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py", "--check", "--plant", p)
     plants.append(f"$ python map.py --check --plant {p}\n" + "\n".join(l for l in out.split("\n") if l.startswith(("FINDING", "atlas:")))
                   + f"\nrc {rc}")
@@ -3240,6 +3292,14 @@ After the fold's commit, `15cec9200`:
     run red on the records first. Then five lines in four records were pinned by Edits: v2's `[owed]` headroom,
     gap-mem-30, and the night-pass record's `[p3-code]` item 6 and `[instrument]` map line, each at `15cec9200`; and
     the project map's test run, at `01dcdd1ae`, the commit that recorded it (`git log -S` names it).
+
+After that commit, `2403c49ba`:
+
+13. The check widened to the chain's critical path, by Edits: `COUNT`'s second alternative, a fence-skipping walk,
+    and an `UNPINNED` table carrying the two plants, `unpinned-count` and `unpinned-path`. It was run red on the
+    records first. Then four lines in two records were pinned by Edits: the night-pass record's `[chain-impact]`
+    path, NP-24's question, now 211, and its `[instrument]` path line; and the walk's glance, at `beda01950`, under
+    a note that the glance and wave 1 are derived again when the walk resumes.
 ````
 
 ## [red] The red runs, as captured
@@ -3657,6 +3717,49 @@ FINDING no stale facts: 2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:607 qu
 rc 1
 ````
 
+After that commit, `2403c49ba`, the class widened to the chain's critical path, skipping a fenced run capture. The
+population, through the generator's own patterns, before the pins:
+
+````text
+$ python pinned_counts2.py
+pinned   2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md:1364: '31,203 of 32,768'
+pinned   2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:182: '31,203 of its 32,768'
+fenced   2026-10-16-build-PLAY-dClosedLoop-1-state.md:655: '2,008 nodes'
+fenced   2026-10-16-build-PLAY-dClosedLoop-1-state.md:719: '2,008 nodes'
+fenced   2026-10-17-build-PLAY-dClosedLoop-1-ownership-verify.md:1209: 'critical path: 176'
+pinned   2026-10-17-build-PLAY-dClosedLoop-1-project-map.md:504: '1,589 nodes'
+pinned   2026-10-17-build-PLAY-dClosedLoop-1-project-map.md:913: '2,008 nodes'
+pinned   2026-10-18-build-PLAY-dClosedLoop-1-audit-fold.md:127: '2,154 nodes'
+fenced   2026-10-18-build-PLAY-dClosedLoop-1-audit-fold.md:377: 'critical path: 181'
+fenced   2026-10-18-build-PLAY-dClosedLoop-1-audit-fold.md:808: 'critical path: 181'
+pinned   2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:221: '31,203 of its 32,768'
+unpinned 2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:488: 'critical path: 181'
+unpinned 2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:540: 'critical path runs through dTendedCadence and dCalibratedLens at 213'
+pinned   2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:608: '2,235 nodes'
+pinned   2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:608: '31,203 of 32,768'
+pinned   2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:611: '2,234 nodes'
+unpinned 2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:632: 'critical path** is 211'
+fenced   2026-10-18-build-PLAY-dClosedLoop-1-recut.md:270: 'critical path: 168'
+fenced   2026-10-18-build-PLAY-dClosedLoop-1-recut.md:277: 'critical path: 176'
+unpinned 2026-10-18-build-PLAY-dClosedLoop-1-walk.md:20: 'critical path, 181'
+fenced   2026-10-18-build-PLAY-dClosedLoop-1-walk.md:305: 'critical path: 181'
+derived counts quoted: pinned 9 · fenced 8 · unpinned 4
+rc=1
+````
+
+The map's arm on the same tree:
+
+````text
+$ python map.py --check
+map: 2236 nodes in 30 namespaces; 31203 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1498, derived 256, pending 482
+FINDING no stale facts: 2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:488 quotes 'critical path: 181' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:540 quotes 'critical path runs through dTendedCadence and dCalibratedLens at 213' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md:632 quotes 'critical path** is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-18-build-PLAY-dClosedLoop-1-walk.md:20 quotes 'critical path, 181' with nothing pinning it on its line
+rc 1
+````
+
 
 ## [plants] The map's plants, re-run
 
@@ -3771,7 +3874,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:582 quotes the map's '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:582 quotes '31,203 of its 32,768' with nothing pinning it on its line
+rc 1
+$ python map.py --check --plant unpinned-path
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:582 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 ````
 
@@ -3780,12 +3886,12 @@ rc 1
 
 ````text
 $ design map
-map: 2236 nodes in 30 namespaces; 31203 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1498, derived 256, pending 482
+map: 2237 nodes in 30 namespaces; 31203 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1499, derived 256, pending 482
 rc 0
 
 $ atlas
-atlas: derived — 155 records, 2676 sections, 175 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 155 records, 2678 sections, 175 decision sections, 16 comparison areas, 33 principles
 rc 0
 
 $ fold state

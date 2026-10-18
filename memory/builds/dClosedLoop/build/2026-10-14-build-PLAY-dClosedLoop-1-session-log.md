@@ -2073,6 +2073,11 @@ The night pass's closing review, dispatch 105, derived from its run the same way
   four of the six were stale. Each is now pinned to the commit that dates it, and the map's check reds on an unpinned
   quote (plant `unpinned-count`). It was seen red on the records first (the night-pass record's `[instrument]`).
 
+- 2026-10-18, session 1799cb98: the pin check widened to the chain's critical path, and skips a fenced run capture.
+  It read 21 quotes and was red on four. NP-24's question still said 213, where the path is 211 since the review fold,
+  and the walk's glance said 181 with no date. Each is pinned. The walk's `[chain]` now says its glance and wave 1
+  are derived again when the walk resumes.
+
 ## Instruments
 
 ### The gap-ownership join
