@@ -9,6 +9,18 @@
 | [2026-10-11-build-TOOL-aScoutedSeam-1-1-failure-analysis.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-1-failure-analysis.md) | research | TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-2 TOOL-aScoutedSeam-3 KICK-aScoutedSeam-1 |
 | [2026-10-13-prompt-DEPL-aScoutedSeam-1-1-session.md](../prompts/2026-10-13-prompt-DEPL-aScoutedSeam-1-1-session.md) | journal | — |
 | [2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md) | research | TOOL-aScoutedSeam-1 KICK-aScoutedSeam-1 TOOL-aScoutedSeam-3 |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-1-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-1-reuse-scout.md) | journal | — |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-10-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-10-reuse-scout.md) | journal | — |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-11-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-11-reuse-scout.md) | journal | — |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-12-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-12-reuse-scout.md) | journal | — |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-2-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-2-reuse-scout.md) | journal | — |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-3-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-3-reuse-scout.md) | journal | — |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-4-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-4-reuse-scout.md) | journal | — |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-5-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-5-reuse-scout.md) | journal | — |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-6-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-6-reuse-scout.md) | journal | — |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-7-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-7-reuse-scout.md) | journal | — |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-8-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-8-reuse-scout.md) | journal | — |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-9-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-9-reuse-scout.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

@@ -8,6 +8,7 @@ No agent runs. Reads the committed corpus, results and judge verdicts, and the f
     python <this> [--tree-root <dir>] precision <arm>...
     python <this> [--tree-root <dir>] misses
     python <this> [--tree-root <dir>] expansion
+    python <this> defs <file>...      the definitions lister the M1d scouts call
 
 What it does NOT check: the judge's verdicts are taken as given, the edit-shaped pattern is a
 heuristic over `how` and `symbol` text, and a demotion is simulated on the recorded order, never
@@ -224,6 +225,9 @@ def main(argv):
         run_misses(tree_root)
     elif argv == ["expansion"]:
         run_expansion(tree_root)
+    elif argv[:1] == ["defs"] and argv[1:]:
+        for path in argv[1:]:
+            print(f"{path}: " + " ".join(sorted(extract_definitions(Path(path)))))
     else:
         print(__doc__, file=sys.stderr)
         return 2

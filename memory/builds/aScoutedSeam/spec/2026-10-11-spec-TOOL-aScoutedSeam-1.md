@@ -26,6 +26,8 @@
 | [2026-10-11-build-TOOL-aScoutedSeam-1-7-m1c-trial.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-7-m1c-trial.md) | research | KICK-aScoutedSeam-1 |
 | [2026-10-13-build-TOOL-aScoutedSeam-1-8-precision-and-misses.md](../build/2026-10-13-build-TOOL-aScoutedSeam-1-8-precision-and-misses.md) | research | — |
 | [2026-10-13-build-TOOL-aScoutedSeam-1-8-precision.py](../build/2026-10-13-build-TOOL-aScoutedSeam-1-8-precision.py) | research | — |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.md) | research | — |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.py](../build/2026-10-18-build-TOOL-aScoutedSeam-1-9-m1d-trial.py) | research | — |
 | [2026-10-13-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md) | journal | — |
 | [2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md) | research | KICK-aScoutedSeam-1 TOOL-aScoutedSeam-3 DEPL-aScoutedSeam-1 |
 
