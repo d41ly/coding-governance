@@ -6127,6 +6127,208 @@ L.insert_before("\n## Instruments\n", """
 L.save()
 ````
 
+### `lens_now.py`
+
+Wave 4: SP-2 re-priced on today's chain, dConvergedCharter's parents and the Loop Review split.
+
+````python
+"""SP-2 re-priced on today's chain: dConvergedCharter's parents and their slack, and L1, dCalibratedLens split at the
+Loop Review, as NP-24's pricing defined it (its Loop Review units 3, 5, 8 and 11 after dTendedCadence, the other seven
+after dWellOiledMachine and dFurnishedOrders, whose code slot and slices they read).
+
+Usage: python -X utf8 lens_now.py   (from the worktree root)
+"""
+import re
+
+V = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+text = open(V, encoding="utf-8").read()
+chain = text.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+names = re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)
+units, parents = {}, {}
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| [^|]+ \| ([^|]+) \| (.+) \| [^|]+ \|$", ln)
+    if m:
+        units[m.group(1)] = len([u for u in m.group(3).split("; ") if u.strip()])
+        parents[m.group(1)] = [p.strip() for p in m.group(2).split(",") if p.strip() in names]
+
+
+def path(units, parents):
+    finish = {}
+
+    def fin(b):
+        if b not in finish:
+            finish[b] = units[b] + max((fin(p) for p in parents[b]), default=0)
+        return finish[b]
+
+    for b in units:
+        fin(b)
+    return max(finish.values()), finish
+
+
+base, fin = path(units, parents)
+Y, Z = "dCalibratedLens", "dConvergedCharter"
+tail = sorted(((fin[q], q) for q in parents[Z]), reverse=True)
+print(f"baseline: {base} units; {Z}'s parents land at " + ", ".join(f"{q} {f}" for f, q in tail))
+print(f"slack before {Y} decides {Z}'s start: {tail[0][0] - tail[1][0]} units, to {tail[1][1]}")
+LOOP = {3, 5, 8, 11}
+u, p = dict(units), {b: list(v) for b, v in parents.items()}
+u[Y], u[Y + "-A"] = len(LOOP), units[Y] - len(LOOP)
+p[Y + "-A"] = ["dWellOiledMachine", "dFurnishedOrders", "dFairHearing"]
+p[Y] = parents[Y] + [Y + "-A"]
+n, f2 = path(u, p)
+print(f"L1: {Y}-A {u[Y + '-A']} lands at {f2[Y + '-A']}, the Loop Review's {u[Y]} at {f2[Y]} · {n} units ({n - base:+d})")
+````
+
+### `record_walk7.py`
+
+Wave 4 presented with its two forks.
+
+````python
+"""Present wave 4 in the walk record: `[wave-4]`, `[wave-4-forks]` and `[walk-instrument-5]`.
+
+Usage: python -X utf8 record_walk7.py <facts.out> <since.out> <lens.out>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+HERE = pathlib.Path(__file__).resolve().parent
+FENCE = "`" * 3
+
+
+def read(p):
+    return pathlib.Path(p).read_text(encoding="utf-8").replace("\r\n", "\n").strip("\n")
+
+
+facts, since, lens = (read(p) for p in sys.argv[1:4])
+W = Record("memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-walk.md")
+W.insert_before("## [walk-instrument] The walk's facts, and the clause scan", """## [wave-4] Review, release and convergence, as presented
+
+Derived at `7554745d5`. Each build's "since the walk opened" reads its row against `beda01950`.
+
+### dCalibratedLens: Review
+
+After dTendedCadence and dFairHearing, 11 units, finishing at 157. dConvergedCharter waits on it. It owns 6 items, 6
+keys and 2 kinds, and closes 10 gaps, 3 of them HIGH.
+- **Stage reviews:** each stage review's lenses and effort, for Plan, Test, Deploy and Maintain, drawn from
+  dFairHearing's catalogue and run through dDeclaredLoop's breakpoints.
+- **The value ledger:**
+  - one shared ledger;
+  - its shape rows priced from the shape-run rows and the journal;
+  - probe cost priced in it;
+  - compactions counted per item kind as a sizing signal.
+- **Calibration:** caps re-derived from evidence and review cost, and each role's item budget derived from its p90
+  over sliced work orders.
+- **The weekly Loop Review:**
+  - instruction effectiveness measured from returns and findings, with units that bear no load pruned;
+  - the not-in-view cause and its share, proposing the map's retirement if the share does not fall;
+  - delivery metrics, and the owner queue's depth.
+- **Instruction evals:** a replay suite of recorded items, re-run as a held leg whenever an instruction unit changes.
+- **Since the walk opened:** three units from the night pass, the not-in-view cause reworded, and gap-review-14 to
+  gap-review-16:
+  - probe cost and compaction counts;
+  - instruction evals;
+  - delivery metrics.
+- **To look at:**
+  - It is the critical path's last stage before convergence.
+  - SP-2 kept it whole when no lightening could save more than four units. The splits since have changed that: it
+    now leads dShippedRelease by eight. A split at the Loop Review saves five to seven units, depending on whether
+    the caps and item budgets are the Loop Review's own computations. That is WK-7.
+
+### dShippedRelease: Deploy
+
+After dWitnessedBar, dTotalRecall, dBoundRoles, dWellOiledMachine, dLinkedLibrary and dFurnishedOrders, 21 units,
+finishing at 149. dConvergedCharter waits on it. It owns 25 items, 17 keys and 9 kinds, and closes 17 gaps, 5 of them
+HIGH.
+- **Landing:** the landing record, ordered through a landing queue, and a dependent held until its parent lands. The
+  lander runs the core checks on the landed tree before it releases the build, and the landing review blocks the
+  close.
+- **Release:**
+  - the deploy engine, and promotion after landing through environments, an integrations extension point;
+  - kit release notes, and the deployer's definition;
+  - a derived runbook;
+  - the incms adapter.
+- **Distribution:**
+  - the kit factory and its conformance gate, with `kit.toml` for govkit and lib;
+  - the fleet register and its currency watch, and optional emitted CI;
+  - `kits.offer`, unattended or on update, running nothing from the adopter's tree;
+  - the install and update hooks, with the backlog migration as an upgrade step;
+  - an adopter's CI test jobs imported as legs;
+  - `install.guards`.
+- **Integrations:** the ask tracker's one-way mirror.
+- **Since the walk opened:** one unit, `install.guards` (NP-20), the install hooks reworded for the backlog
+  migration's upgrade step (NP-22), and gap-deploy-14.
+- **To look at:**
+  - It has eight units of slack before dConvergedCharter can start.
+  - One unit, "the incms adapter", names an adopter. The adopter-name ban (govkit selfcheck's check 10) refuses any
+    shipped file that names one, case-insensitively, and `adopters.toml` declares that name. Built as worded, the
+    adapter fails its own distribution gate. That is WK-8.
+
+### dConvergedCharter: Convergence
+
+After dScopedBuild, dShippedRelease, dCalibratedLens and dMindYourWords, 14 units, finishing at 171, the end of the
+chain. It owns no node, and closes 9 gaps, 2 of them HIGH.
+- **Protocols as facts:** protocol text derived to facts only, each document in its envelope, and protocols and
+  templates rendered as tag-sliced views. The hand-written guides retire, their rationale moving into their units'
+  `help` fields, and feature-specific guide prose moves into feature-scoped units.
+- **Migration:**
+  - every remaining positional reference migrated to tags;
+  - records merged by evidence;
+  - superseded parts retired through ratified proposals;
+  - adopters migrated onto the ranked charter and the loop.
+- **Consolidation:**
+  - the record-kind factory and its conformance gate;
+  - the remaining renderers absorbed;
+  - Skills converged to thin entries rendered from units;
+  - every kit conf key the retrofit does not convert folded into the policy file.
+- **Retirement:** the unattended kit, its four guides and `/unattended`, once dWellOiledMachine's driver carries every
+  run.
+- **The exit check:** every part in the fates table at its fate, the table's join run as convergence's exit check.
+- **Since the walk opened:** three units from the night pass: the unattended kit's retirement, the guide prose's move,
+  and the fates join. A clause split in two at the first count was rejoined, and gap-tool-08 and gap-tool-09 came with
+  them.
+- **To look at:**
+  - Since WK-5 it waits for every build, so the fates join can hold.
+  - Its record-kind factory comes last, although every build from dTotalRecall on registers kinds through the
+    registry. The registry's generated checks carry them until then.
+  - Migrating the adopters is one unit for three repositories. Spec time is the place to cut it.
+
+## [wave-4-forks] Wave 4's forks, parked for the owner
+
+| Fork | Question | Options, the recommendation first | What the answer sets |
+|---|---|---|---|
+| WK-7 | Split dCalibratedLens at the Loop Review, now that its lead over dShippedRelease is eight units? | keep it whole: the split saves five to seven units for a new build, below what the splits taken so far returned per build, and the caps' home decides the low end; split it, the lens machinery after dWellOiledMachine and the weekly Loop Review after dTendedCadence | a structural decision about the chain |
+| WK-8 | How should dShippedRelease's adopter-named adapter ship? | a neutral adapter named for the engine it drives, the adopter's values in its own policy file, so the ban stays clean; the adopter's own adapter, registered at the integrations point from its own repository, gov shipping only the point; keep the name, and let the ban refuse it at build time | a structural decision |
+
+""", "wave-4")
+W.text = W.text.rstrip("\n") + f"""
+
+## [walk-instrument-5] Wave 4's facts, at `7554745d5`
+
+`walk_facts.py` and `since.py` as above. `lens_now.py` re-prices SP-2 on today's chain:
+
+{FENCE}python
+{read(HERE / "lens_now.py")}
+{FENCE}
+
+{FENCE}text
+$ python walk_facts.py dCalibratedLens dShippedRelease dConvergedCharter
+{facts}
+$ python since.py beda01950 dCalibratedLens dShippedRelease dConvergedCharter
+{since}
+$ python lens_now.py
+{lens}
+{FENCE}
+
+The adopter-name ban's source is `tools/govkit/govkit.py`, check 10, and the names it reads are `tools/govkit/adopters.toml`'s
+`[[adopter]]` rows.
+"""
+W.done += 1
+W.save()
+````
+
 ### `record_instruments.py`
 
 This record's own writer.
@@ -6250,6 +6452,9 @@ MINE = [
     ("walk5/leaves.py", "Wave 3: the builds no build waits on, and the fates rows each one owns."),
     ("walk5/record_walk5.py", "Wave 3 presented with its two forks."),
     ("walk6/fold_wk5.py", "The owner's word on wave 3, WK-5 folded: dMindYourWords a parent of dConvergedCharter."),
+    ("walk7/lens_now.py", "Wave 4: SP-2 re-priced on today's chain, dConvergedCharter's parents and the Loop Review "
+     "split."),
+    ("walk7/record_walk7.py", "Wave 4 presented with its two forks."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -7068,12 +7273,12 @@ rc 1
 
 ````text
 $ design map
-map: 2271 nodes in 30 namespaces; 32108 B of 32768 (no degrade); folded 14; unarmed none
-map: purposes declared 1530, derived 259, pending 482
+map: 2273 nodes in 30 namespaces; 32108 B of 32768 (no degrade); folded 14; unarmed none
+map: purposes declared 1532, derived 259, pending 482
 rc 0
 
 $ atlas
-atlas: derived — 157 records, 2752 sections, 184 decision sections, 16 comparison areas, 33 principles
+atlas: derived — 157 records, 2759 sections, 185 decision sections, 16 comparison areas, 33 principles
 rc 0
 
 $ fold state

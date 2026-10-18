@@ -638,6 +638,104 @@ The owner approved wave 3 and took each fork's recommendation, 2026-10-18 (`[wor
   lexicon lands before convergence can start, and the path does not move.
 - **WK-6:** dTendedCadence stays whole.
 
+## [wave-4] Review, release and convergence, as presented
+
+Derived at `7554745d5`. Each build's "since the walk opened" reads its row against `beda01950`.
+
+### dCalibratedLens: Review
+
+After dTendedCadence and dFairHearing, 11 units, finishing at 157. dConvergedCharter waits on it. It owns 6 items, 6
+keys and 2 kinds, and closes 10 gaps, 3 of them HIGH.
+- **Stage reviews:** each stage review's lenses and effort, for Plan, Test, Deploy and Maintain, drawn from
+  dFairHearing's catalogue and run through dDeclaredLoop's breakpoints.
+- **The value ledger:**
+  - one shared ledger;
+  - its shape rows priced from the shape-run rows and the journal;
+  - probe cost priced in it;
+  - compactions counted per item kind as a sizing signal.
+- **Calibration:** caps re-derived from evidence and review cost, and each role's item budget derived from its p90
+  over sliced work orders.
+- **The weekly Loop Review:**
+  - instruction effectiveness measured from returns and findings, with units that bear no load pruned;
+  - the not-in-view cause and its share, proposing the map's retirement if the share does not fall;
+  - delivery metrics, and the owner queue's depth.
+- **Instruction evals:** a replay suite of recorded items, re-run as a held leg whenever an instruction unit changes.
+- **Since the walk opened:** three units from the night pass, the not-in-view cause reworded, and gap-review-14 to
+  gap-review-16:
+  - probe cost and compaction counts;
+  - instruction evals;
+  - delivery metrics.
+- **To look at:**
+  - It is the critical path's last stage before convergence.
+  - SP-2 kept it whole when no lightening could save more than four units. The splits since have changed that: it
+    now leads dShippedRelease by eight. A split at the Loop Review saves five to seven units, depending on whether
+    the caps and item budgets are the Loop Review's own computations. That is WK-7.
+
+### dShippedRelease: Deploy
+
+After dWitnessedBar, dTotalRecall, dBoundRoles, dWellOiledMachine, dLinkedLibrary and dFurnishedOrders, 21 units,
+finishing at 149. dConvergedCharter waits on it. It owns 25 items, 17 keys and 9 kinds, and closes 17 gaps, 5 of them
+HIGH.
+- **Landing:** the landing record, ordered through a landing queue, and a dependent held until its parent lands. The
+  lander runs the core checks on the landed tree before it releases the build, and the landing review blocks the
+  close.
+- **Release:**
+  - the deploy engine, and promotion after landing through environments, an integrations extension point;
+  - kit release notes, and the deployer's definition;
+  - a derived runbook;
+  - the incms adapter.
+- **Distribution:**
+  - the kit factory and its conformance gate, with `kit.toml` for govkit and lib;
+  - the fleet register and its currency watch, and optional emitted CI;
+  - `kits.offer`, unattended or on update, running nothing from the adopter's tree;
+  - the install and update hooks, with the backlog migration as an upgrade step;
+  - an adopter's CI test jobs imported as legs;
+  - `install.guards`.
+- **Integrations:** the ask tracker's one-way mirror.
+- **Since the walk opened:** one unit, `install.guards` (NP-20), the install hooks reworded for the backlog
+  migration's upgrade step (NP-22), and gap-deploy-14.
+- **To look at:**
+  - It has eight units of slack before dConvergedCharter can start.
+  - One unit, "the incms adapter", names an adopter. The adopter-name ban (govkit selfcheck's check 10) refuses any
+    shipped file that names one, case-insensitively, and `adopters.toml` declares that name. Built as worded, the
+    adapter fails its own distribution gate. That is WK-8.
+
+### dConvergedCharter: Convergence
+
+After dScopedBuild, dShippedRelease, dCalibratedLens and dMindYourWords, 14 units, finishing at 171, the end of the
+chain. It owns no node, and closes 9 gaps, 2 of them HIGH.
+- **Protocols as facts:** protocol text derived to facts only, each document in its envelope, and protocols and
+  templates rendered as tag-sliced views. The hand-written guides retire, their rationale moving into their units'
+  `help` fields, and feature-specific guide prose moves into feature-scoped units.
+- **Migration:**
+  - every remaining positional reference migrated to tags;
+  - records merged by evidence;
+  - superseded parts retired through ratified proposals;
+  - adopters migrated onto the ranked charter and the loop.
+- **Consolidation:**
+  - the record-kind factory and its conformance gate;
+  - the remaining renderers absorbed;
+  - Skills converged to thin entries rendered from units;
+  - every kit conf key the retrofit does not convert folded into the policy file.
+- **Retirement:** the unattended kit, its four guides and `/unattended`, once dWellOiledMachine's driver carries every
+  run.
+- **The exit check:** every part in the fates table at its fate, the table's join run as convergence's exit check.
+- **Since the walk opened:** three units from the night pass: the unattended kit's retirement, the guide prose's move,
+  and the fates join. A clause split in two at the first count was rejoined, and gap-tool-08 and gap-tool-09 came with
+  them.
+- **To look at:**
+  - Since WK-5 it waits for every build, so the fates join can hold.
+  - Its record-kind factory comes last, although every build from dTotalRecall on registers kinds through the
+    registry. The registry's generated checks carry them until then.
+  - Migrating the adopters is one unit for three repositories. Spec time is the place to cut it.
+
+## [wave-4-forks] Wave 4's forks, parked for the owner
+
+| Fork | Question | Options, the recommendation first | What the answer sets |
+|---|---|---|---|
+| WK-7 | Split dCalibratedLens at the Loop Review, now that its lead over dShippedRelease is eight units? | keep it whole: the split saves five to seven units for a new build, below what the splits taken so far returned per build, and the caps' home decides the low end; split it, the lens machinery after dWellOiledMachine and the weekly Loop Review after dTendedCadence | a structural decision about the chain |
+| WK-8 | How should dShippedRelease's adopter-named adapter ship? | a neutral adapter named for the engine it drives, the adopter's values in its own policy file, so the ban stays clean; the adopter's own adapter, registered at the integrations point from its own repository, gov shipping only the point; keep the name, and let the ban refuse it at build time | a structural decision |
+
 ## [walk-instrument] The walk's facts, and the clause scan
 
 Each build's facts are derived, never typed: its stage, parents, children, finish, units, gaps by grade and owned
@@ -1475,3 +1573,136 @@ leaf dMindYourWords: 4 fates rows go to it
   drift-audit · seven gateable signals · RESHAPED · five core legs and two lexicon legs (dTendedCadence gap-maint-09; dMindYourWords)
 builds no build waits on: 2 of 20
 ```
+
+## [walk-instrument-5] Wave 4's facts, at `7554745d5`
+
+`walk_facts.py` and `since.py` as above. `lens_now.py` re-prices SP-2 on today's chain:
+
+```python
+"""SP-2 re-priced on today's chain: dConvergedCharter's parents and their slack, and L1, dCalibratedLens split at the
+Loop Review, as NP-24's pricing defined it (its Loop Review units 3, 5, 8 and 11 after dTendedCadence, the other seven
+after dWellOiledMachine and dFurnishedOrders, whose code slot and slices they read).
+
+Usage: python -X utf8 lens_now.py   (from the worktree root)
+"""
+import re
+
+V = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+text = open(V, encoding="utf-8").read()
+chain = text.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+names = re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)
+units, parents = {}, {}
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| [^|]+ \| ([^|]+) \| (.+) \| [^|]+ \|$", ln)
+    if m:
+        units[m.group(1)] = len([u for u in m.group(3).split("; ") if u.strip()])
+        parents[m.group(1)] = [p.strip() for p in m.group(2).split(",") if p.strip() in names]
+
+
+def path(units, parents):
+    finish = {}
+
+    def fin(b):
+        if b not in finish:
+            finish[b] = units[b] + max((fin(p) for p in parents[b]), default=0)
+        return finish[b]
+
+    for b in units:
+        fin(b)
+    return max(finish.values()), finish
+
+
+base, fin = path(units, parents)
+Y, Z = "dCalibratedLens", "dConvergedCharter"
+tail = sorted(((fin[q], q) for q in parents[Z]), reverse=True)
+print(f"baseline: {base} units; {Z}'s parents land at " + ", ".join(f"{q} {f}" for f, q in tail))
+print(f"slack before {Y} decides {Z}'s start: {tail[0][0] - tail[1][0]} units, to {tail[1][1]}")
+LOOP = {3, 5, 8, 11}
+u, p = dict(units), {b: list(v) for b, v in parents.items()}
+u[Y], u[Y + "-A"] = len(LOOP), units[Y] - len(LOOP)
+p[Y + "-A"] = ["dWellOiledMachine", "dFurnishedOrders", "dFairHearing"]
+p[Y] = parents[Y] + [Y + "-A"]
+n, f2 = path(u, p)
+print(f"L1: {Y}-A {u[Y + '-A']} lands at {f2[Y + '-A']}, the Loop Review's {u[Y]} at {f2[Y]} · {n} units ({n - base:+d})")
+```
+
+```text
+$ python walk_facts.py dCalibratedLens dShippedRelease dConvergedCharter
+=== dCalibratedLens · Review · after dTendedCadence, dFairHearing · before dConvergedCharter · finishes at 157 of 171 · units 11 · gaps 10 (HIGH 3, LOW 3, MED 4) · owns 6 items, 6 policy-keys, 2 record-kinds
+   1. each stage review's lenses and effort: lenses for Plan, Test, Deploy and Maintain, drawn from dFairHearing's catalogue, run at `review.<stage>.effort`…
+   2. the shared value ledger
+   3. the weekly Loop Review
+   4. caps re-derived from evidence and review cost
+   5. instruction effectiveness measured from returns and findings that cite unit tags, the Loop Review pruning units that bear no load and tightening those…
+   6. each role's `memory.item-budget` derived from its p90 over 30 sliced work orders under `measured`, through the guarded policy command, the owner's own…
+   7. the value ledger's shape rows, priced from the shape-run rows `review.cost` writes for review acts and the journal reconcile writes for every other
+   8. the not-in-view cause added to `review.dispose`'s record, computed from the author's slice manifest, the map and the `code` slot (night pass, point 3)…
+   9. probe cost priced in the value ledger, and compactions counted per item kind as a sizing signal (night pass, points 2 and 5)
+  10. instruction evals: a replay suite of recorded items with known outcomes, re-run as a held leg when an instruction unit changes, a confirmed finding wh…
+  11. the Loop Review's delivery metrics: lead time, landing frequency, change failure rate, time to restore, first-pass verdict rate, route-backs per build…
+=== dShippedRelease · Deploy · after dWitnessedBar, dTotalRecall, dBoundRoles, dWellOiledMachine, dLinkedLibrary, dFurnishedOrders · before dConvergedCharter · finishes at 149 of 171 · units 21 · gaps 17 (HIGH 5, LOW 3, MED 9) · owns 25 items, 17 policy-keys, 9 record-kinds
+   1. the landing record
+   2. kit release notes
+   3. the deploy engine
+   4. the incms adapter
+   5. the fleet register and currency watch
+   6. optional emitted CI
+   7. a derived runbook
+   8. the kit factory and its conformance gate
+   9. a dependent's landing held until its parent lands (`deps.landing`)
+  10. landings ordered through the landing queue it builds (`gap-flow-08`)
+  11. the lander running the core checks on the landed tree before it releases the build, so a core red the landing merge introduced stops that build from c…
+  12. the landing review blocking the build's close rather than the push
+  13. promotion after landing through environments as an integrations extension point
+  14. an unattended `kits.offer` in a govkit mode that runs nothing from the adopter's tree, its checks left to the adopter's lander, pushing through the ad…
+  15. the install and update hooks that call `adopt` and `test.seed`, attended, and the shards-to-builds backlog migration as an update's upgrade step, run …
+  16. the integrations import of an adopter's CI jobs as legs, test jobs only, each through an adapter row with its grant and secret reference, a job that d…
+  17. an update `kits.offer` offers runs neither in the adopter's tree, and its outbox order names the adopter's own run of both
+  18. the kit factory's purpose field and a `kit.toml` for govkit and lib, today's kits reviewed, lib's marked not installable and each `*/kit.toml` consume…
+  19. the ask tracker's one-way mirror, the adapter `integrations.tracker: mirror-out` selects (PM-12)
+  20. the deployer's definition, release notes for distribution and verify judgment for integrations, registered through dBoundRoles's layer contract
+  21. `install.guards`: the core guards installed into the project's settings, or into managed settings where the operator opts in (NP-20)
+=== dConvergedCharter · Convergence · after dScopedBuild, dShippedRelease, dCalibratedLens, dMindYourWords · before none · finishes at 171 of 171 · units 14 · gaps 9 (HIGH 2, LOW 3, MED 4) · owns 
+   1. protocol text derived to facts only, each document in its envelope
+   2. every remaining positional reference migrated to tags
+   3. records merged by evidence
+   4. superseded parts retired through ratified proposals
+   5. adopters migrated onto the ranked charter and the loop
+   6. the record-kind factory and its conformance gate
+   7. protocols and templates rendered as tag-sliced views from the loop's checklists, the roles, the record schemas and the policies, the hand-written guid…
+   8. the remaining renderers absorbed, each retired with its last document: kit/dogfood doc parity, review-protocol parity, each kit's skill wiring `--chec…
+   9. Skills converged to level-4 thin entries, each described "Use when …, runs …"
+  10. the protocol slices and Skill entries rendered from units
+  11. every kit conf key the retrofit does not convert folded into the policy file, with the legacy homes dGroundRules lists (RC-3, M7), and a reader invent…
+  12. the unattended kit, its four guides and `/unattended` retired once dWellOiledMachine's driver carries every run, the kit's README and the product rule…
+  13. feature-specific guide prose migrated into feature-scoped units (night pass, point 4)
+  14. every part in the fates table at its fate, the table's join run as convergence's exit check (night pass, point 8)
+$ python since.py beda01950 dCalibratedLens dShippedRelease dConvergedCharter
+=== dCalibratedLens: units 8 -> 11, gaps 7 -> 10
+  reworded: the not-in-view cause added to `review.dispose`'s record, computed from the author's slice manifest, the map and the `code` slot (night pass, point 3), and the Loop Review's reading of its share, prop
+  added: probe cost priced in the value ledger, and compactions counted per item kind as a sizing signal (night pass, points 2 and 5)
+  added: instruction evals: a replay suite of recorded items with known outcomes, re-run as a held leg when an instruction unit changes, a confirmed finding whose cause is an instruction adding a case (night p
+  added: the Loop Review's delivery metrics: lead time, landing frequency, change failure rate, time to restore, first-pass verdict rate, route-backs per build and scope drift (night pass, point 6), and the ow
+  gap added: gap-review-14
+  gap added: gap-review-15
+  gap added: gap-review-16
+=== dShippedRelease: units 20 -> 21, gaps 16 -> 17
+  reworded: the install and update hooks that call `adopt` and `test.seed`, attended, and the shards-to-builds backlog migration as an update's upgrade step, run attended until no tree is left on shards (NP-22)
+  added: `install.guards`: the core guards installed into the project's settings, or into managed settings where the operator opts in (NP-20)
+  gap added: gap-deploy-14
+=== dConvergedCharter: units 12 -> 14, gaps 7 -> 9
+  reworded: Skills converged to level-4 thin entries, each described "Use when …, runs …"
+  added: the unattended kit, its four guides and `/unattended` retired once dWellOiledMachine's driver carries every run, the kit's README and the product rule's "four-verb driver" corrected with them (night p
+  added: feature-specific guide prose migrated into feature-scoped units (night pass, point 4)
+  added: every part in the fates table at its fate, the table's join run as convergence's exit check (night pass, point 8)
+  left: runs …"
+  gap added: gap-tool-08
+  gap added: gap-tool-09
+$ python lens_now.py
+baseline: 171 units; dConvergedCharter's parents land at dCalibratedLens 157, dShippedRelease 149, dMindYourWords 145, dScopedBuild 143
+slack before dCalibratedLens decides dConvergedCharter's start: 8 units, to dShippedRelease
+L1: dCalibratedLens-A 7 lands at 135, the Loop Review's 4 at 150 · 164 units (-7)
+```
+
+The adopter-name ban's source is `tools/govkit/govkit.py`, check 10, and the names it reads are `tools/govkit/adopters.toml`'s
+`[[adopter]]` rows.

@@ -2129,6 +2129,13 @@ The night pass's closing review, dispatch 105, derived from its run the same way
   `[wave-3-answers]`). dConvergedCharter now follows dMindYourWords at no cost to the path (WK-5), and dTendedCadence
   stays whole (WK-6).
 
+- 2026-10-18, session 1799cb98: wave 4, the last, is presented in the walk record's `[wave-4]`: dCalibratedLens,
+  dShippedRelease and dConvergedCharter. `[wave-4-forks]` parks two forks.
+  - WK-7: SP-2's premise has moved. dCalibratedLens now leads dShippedRelease by eight units, and a split at the Loop
+    Review saves five to seven (`lens_now.py`).
+  - WK-8: dShippedRelease's "incms adapter" names an adopter, and govkit's adopter-name ban would refuse it as a
+    shipped file.
+
 ## Instruments
 
 ### The gap-ownership join
