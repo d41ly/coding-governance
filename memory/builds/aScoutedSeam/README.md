@@ -78,7 +78,7 @@ ids DEPL-aScoutedSeam-1 KICK-aScoutedSeam-1 TOOL-aScoutedSeam-1 TOOL-aScoutedSea
 | [DEPL-aScoutedSeam-1 — adopters get the scout and a resolved host tree, and the adopter-side gaps the research found are handed over](spec/2026-10-11-spec-DEPL-aScoutedSeam-1.md) | 5 | 2 | SPECCED | rev-5 | 2026-10-18 |
 <!-- /gen:build-units -->
 
-Records: 125 bound to this build, across 3 record folder(s).
+Records: 221 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

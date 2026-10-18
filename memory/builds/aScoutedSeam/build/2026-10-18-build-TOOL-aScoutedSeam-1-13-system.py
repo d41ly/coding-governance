@@ -144,7 +144,7 @@ CSS_VALUE = re.compile(r"(?<![\w.-])(\d+(?:\.\d+)?(?:px|rem|em)|#[0-9a-fA-F]{3,8
 TOKEN_DEF = re.compile(r"(--[a-z][\w-]*)\s*:\s*([^;{}\"]+?)\s*[;}\"]")
 
 
-def collect_tokens(tree):
+def read_tokens(tree):
     """`--token: value` definitions across the tree's CSS and JSON, keyed by the literal value."""
     out = {}
     hits = bench.run_git(tree, "grep", "-h", "-o", "-E", "-e", r"--[a-z][a-zA-Z0-9_-]*\s*:\s*[^;{}\"]{1,40}[;}\"]",
@@ -160,7 +160,7 @@ def extract_units_t2(diff_text, tree):
     """T1's units, plus a spec diff's scope items and every added CSS literal equal to a token's value."""
     units = d1v2.extract_units(diff_text)
     path = None
-    tokens = collect_tokens(tree)
+    tokens = read_tokens(tree)
     literal = []
     for line in diff_text.splitlines():
         if line.startswith("+++ "):
@@ -245,11 +245,17 @@ JSON_BLOCK = re.compile(r"```json\s*(.*?)```", re.S)
 
 
 def extract_reply(text):
+    """The last ```json block. A reply may quote ``` inside a JSON string, so the fallback decodes one
+    JSON value from the last fence instead of stopping at the first closing fence."""
     blocks = JSON_BLOCK.findall(text)
     try:
         return json.loads(blocks[-1]) if blocks else None
     except json.JSONDecodeError:
-        return None
+        start = text.rfind("```json")
+        try:
+            return json.JSONDecoder().raw_decode(text[start + 7:].lstrip())[0]
+        except json.JSONDecodeError:
+            return None
 
 
 def run_collect(results, arm, reports):
@@ -309,7 +315,9 @@ def run_judge_collect(corpus, results, key_file, reports):
 def run_system(corpus, results, arms):
     """Judged primary per case for each arm, then the union of the orient arm with each diff arm."""
     judge = bench.read_json(results).get("judge2", {})
-    ids = [c["id"] for c in bench.read_json(corpus) if c.get("ground_truth")]
+    # A case no arm was judged on (a pre-spec case with no diff) is outside the population, not a miss.
+    ids = [c["id"] for c in bench.read_json(corpus)
+           if c.get("ground_truth") and any(judge.get(a, {}).get(c["id"]) for a in arms)]
     covered = lambda a, i: bool((judge.get(a, {}).get(i) or {}).get("primary"))
     print(f"{'case':<36}" + "".join(f"{a[:14]:>15}" for a in arms))
     for i in ids:
