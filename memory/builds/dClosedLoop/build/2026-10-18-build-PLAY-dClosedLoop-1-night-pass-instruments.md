@@ -11525,6 +11525,201 @@ p.write_text(t, encoding="utf-8", newline="\n")
 print("rewrapped")
 ````
 
+### `save_return.py`
+
+night/save_return.py with the record's date as an argument: saves each researcher's return verbatim as a research record.
+
+````python
+"""Save one agent's final return, verbatim, as a research record in the build folder: night/save_return.py with the
+record's date as an argument, since that script writes 2026-10-18 into every name it makes.
+
+Usage: python -X utf8 save_return.py <date> <transcript.jsonl> <record-name> <title> <dispatch> <prompt-file> <use>
+  date         the record's date, e.g. 2026-10-19
+  record-name  e.g. research-adopter-today, saved as build/<date>-build-PLAY-dClosedLoop-1-<record-name>.md
+  title        the record's H1, after "Research: "
+  dispatch     the session log's dispatch number
+  prompt-file  the handoff's file name under prompts/
+  use          where the return is used, a record name under build/, dated the same day
+
+Reads the transcript's last assistant message, joins its text blocks, demotes any H1 to bold, and writes the record.
+Prints the record's path, its size and the return's first line only. Refuses to overwrite.
+"""
+import json
+import pathlib
+import re
+import sys
+
+date, src, name, title, dispatch, prompt, use = sys.argv[1:8]
+if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date):
+    sys.exit("the date reads YYYY-MM-DD")
+last = None
+with open(src, encoding="utf-8") as f:
+    for line in f:
+        try:
+            ev = json.loads(line)
+        except ValueError:
+            continue
+        msg = ev.get("message") if isinstance(ev, dict) else None
+        if ev.get("type") == "assistant" and isinstance(msg, dict):
+            texts = [b.get("text", "") for b in msg.get("content", []) if isinstance(b, dict) and b.get("type") == "text"]
+            if any(t.strip() for t in texts):
+                last = "\n".join(t for t in texts if t.strip())
+if not last:
+    sys.exit("no assistant text in " + src)
+body = re.sub(r"^# (.+)$", r"**\1**", last.replace("\r\n", "\n").strip("\n"), flags=re.M)
+out = pathlib.Path("memory/builds/dClosedLoop/build/%s-build-PLAY-dClosedLoop-1-%s.md" % (date, name))
+if out.exists():
+    sys.exit("%s exists" % out)
+head = ("# Research: %s\n\n**Serves:** research PLAY-dClosedLoop-1\n\n"
+        "This is dispatch %s's return, verbatim, except that a title line would be demoted to keep one H1 per record. "
+        "Its question is in `prompts/%s`, and its use is in `build/%s-build-PLAY-dClosedLoop-1-%s.md`.\n\n---\n\n"
+        % (title, dispatch, prompt, date, use))
+out.write_text(head + body + "\n", encoding="utf-8", newline="\n")
+print("%s · %d bytes · first line: %s" % (out, out.stat().st_size, body.split("\n", 1)[0][:100]))
+````
+
+### `dispatch_prompt.py`
+
+Builds each researcher's dispatch prompt from its rendered handoff: the marker line, then the handoff from its Task section on.
+
+````python
+"""Build a dispatch prompt from a rendered handoff: its marker line, then the handoff from `## Task` to its end."""
+import pathlib
+import re
+import sys
+
+text = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n")
+marker = [ln for ln in text.split("\n") if re.fullmatch(r"<!-- gov:handoff .* -->", ln)]
+if len(marker) != 1 or "\n## Task\n" not in text:
+    sys.exit("no single marker line, or no Task section")
+out = marker[0] + "\n\n" + "## Task\n" + text.split("\n## Task\n", 1)[1]
+pathlib.Path(sys.argv[2]).write_text(out, encoding="utf-8", newline="\n")
+print(sys.argv[2], len(out))
+````
+
+### `peek_dispatch.py`
+
+Reads an earlier Agent dispatch's shape from the session transcript, to match it.
+
+````python
+"""Print the shape of one earlier Agent dispatch: the first lines and the length of its prompt."""
+import json
+import sys
+
+needle = sys.argv[2]
+with open(sys.argv[1], encoding="utf-8") as fh:
+    for line in fh:
+        if '"Agent"' not in line or needle not in line:
+            continue
+        rec = json.loads(line)
+        for b in rec.get("message", {}).get("content", []) or []:
+            if isinstance(b, dict) and b.get("type") == "tool_use" and b.get("name") == "Agent":
+                p = b["input"].get("prompt", "")
+                if needle in p:
+                    print({k: v for k, v in b["input"].items() if k != "prompt"})
+                    print(len(p), "chars; first lines:")
+                    print("\n".join(p.split("\n")[:8]))
+                    print("... last line:", p.rstrip().split("\n")[-1][:160])
+                    sys.exit(0)
+print("not found")
+````
+
+### `log_adopt.py`
+
+The session log's dispatch 118 to 121 rows, the four researchers' agent lines, the pass's event and the map-orientation event.
+
+````python
+"""Record the adopter-instructions research in the session log: dispatch rows 118 to 121, the four researchers' agent
+and returned lines as the roles kit derived them, and two events: the research pass, and the owner's side question,
+whether the session is still oriented by the design map, with what the last compaction showed.
+
+Usage: python -X utf8 log_adopt.py <agent-lines-118-121.txt>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+lines = [ln for ln in pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n").split("\n")
+         if ln.startswith(("- agent —", "- returned —"))]
+if len(lines) != 8:
+    sys.exit(f"eight agent and returned lines expected, read {len(lines)}")
+F = "`" * 3
+REC = "build/2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md"
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+row117 = [ln for ln in L.text.split("\n") if ln.startswith("| 117 |")]
+if len(row117) != 1:
+    sys.exit("no single dispatch row 117")
+ROWS = [
+    (118, 1, "The adopter-instructions pass: how an adopter adds to or changes gov's instructions today, and what the "
+     "next update does, measured on a scratch install", "returned, 18m08s, 57.4k out: only the overlay slot and the "
+     "house files carry adopter text through an update; an edit to a rendered instruction is overwritten and named "
+     "only `re-rendered`", "research-adopter-today"),
+    (119, 2, "The pass: what the converged design decides about adopter instructions, and what it leaves open",
+     "returned, 5m54s, 31.8k out: who writes and the project block decided; amending, replacing, masking and surviving "
+     "an update open; six contradictions", "research-adopter-design"),
+    (120, 3, "The pass: prior art outside gov for customizing shipped defaults through upstream updates",
+     "returned, 5m31s, 25.9k out: eight families; an overlay plus tag-keyed amendments pinned to their base; a "
+     "contradicting new unit passes every mechanical check", "research-adopter-prior-art"),
+    (121, 4, "The pass: the owner's hypothesis, tag every edit and render around it, against gov's own history",
+     "returned, 27m37s, 62.0k out: 778 of 797 landed edits kept their anchor, so a bare tag misses them; a tag plus a "
+     "base-text hash, and a map with every restructure", "research-adopter-history"),
+]
+new = "".join(f"| {n} | gov-researcher, at the owner's medium effort | {what} | "
+              f"`prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-{p}-researcher.md` | 1799cb98 | {out} | "
+              f"`build/2026-10-19-build-PLAY-dClosedLoop-1-{rec}.md` |\n" for n, p, what, out, rec in ROWS)
+L.sub(row117[0] + "\n", row117[0] + "\n" + new, "dispatch rows")
+L.insert_before("\n## Events\n", "\nThe adopter-instructions research, dispatches 118 to 121, derived from each run the "
+                "same way:\n\n" + F + "text\n" + "\n".join(lines) + "\n" + F + "\n", "agent lines")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner opened a review of the instruction layer's rendering and adoption: every
+  repository, gov included, wants its own instructions and to adjust gov's, and those must survive gov's updates.
+  Four researchers took one question each, dispatches 118 to 121, and `{REC}` answers the owner's two questions,
+  tests the owner's hypothesis against gov's history, recommends composing every document from gov's units and the
+  repository's own units with typed, pinned edges, and puts six forks, IA-1 to IA-6, to the owner.
+- 2026-10-19, session 1799cb98: the owner asked whether the session is still oriented by the design map, as a test of
+  the feature that it survives compaction. It held after every design change, but not at the compaction: nothing
+  re-injected the map, the compact hook re-injected only the kickoff card of 2026-10-14, whose current-state line named
+  a commit on main rather than this branch, and the map was re-read only after the first fold. This is evidence for
+  dWellOiledMachine's default load (PM-7, PM-12), which injects the card and the map at startup, resume and compaction.
+""", "events")
+L.save()
+````
+
+### `add_mine_adopt.py`
+
+Registers these scripts here, and dispatch 120's probe.
+
+````python
+"""Register the adopter-instructions pass's scripts in the recorder's MINE list, and dispatch 120's probe in PROBES."""
+import pathlib
+import sys
+
+p = pathlib.Path(sys.argv[1]) / "night" / "record_instruments.py"
+t = p.read_text(encoding="utf-8")
+anchor = '    ("preset_check_canonical.py", "The preset check [final] runs,'
+rows = '''    ("adopt/save_return.py", "night/save_return.py with the record's date as an argument: saves each researcher's "
+     "return verbatim as a research record."),
+    ("adopt/dispatch_prompt.py", "Builds each researcher's dispatch prompt from its rendered handoff: the marker line, "
+     "then the handoff from its Task section on."),
+    ("adopt/peek_dispatch.py", "Reads an earlier Agent dispatch's shape from the session transcript, to match it."),
+    ("adopt/log_adopt.py", "The session log's dispatch 118 to 121 rows, the four researchers' agent lines, the pass's "
+     "event and the map-orientation event."),
+    ("adopt/add_mine_adopt.py", "Registers these scripts here, and dispatch 120's probe."),
+'''
+old_probes = '''                                                       "rb.py", "nodebash.js", "clean.ps1", "tools.sh", "toml11.toml")]
+'''
+new_probes = '''                                                       "rb.py", "nodebash.js", "clean.ps1", "tools.sh", "toml11.toml")] + \
+         [("probe/c2.py", "dispatch 120")]
+'''
+if t.count(anchor) != 1 or "adopt/log_adopt.py" in t or t.count(old_probes) != 1:
+    sys.exit("the recorder's lists moved, or already hold the adopter scripts")
+t = t.replace(anchor, rows + anchor).replace(old_probes, new_probes)
+p.write_text(t, encoding="utf-8", newline="\n")
+print("registered")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row.
@@ -11810,6 +12005,14 @@ MINE = [
      "`/gov-drift-audit`, folded into v2, the fates record, the comparison record and the session log."),
     ("away/rewrap_skills.py", "Rewraps the two [skills] paragraphs the confirmation lengthened, at 120 "
      "columns; a doubled space it left after the list dash was fixed by hand."),
+    ("adopt/save_return.py", "night/save_return.py with the record's date as an argument: saves each researcher's "
+     "return verbatim as a research record."),
+    ("adopt/dispatch_prompt.py", "Builds each researcher's dispatch prompt from its rendered handoff: the marker line, "
+     "then the handoff from its Task section on."),
+    ("adopt/peek_dispatch.py", "Reads an earlier Agent dispatch's shape from the session transcript, to match it."),
+    ("adopt/log_adopt.py", "The session log's dispatch 118 to 121 rows, the four researchers' agent lines, the pass's "
+     "event and the map-orientation event."),
+    ("adopt/add_mine_adopt.py", "Registers these scripts here, and dispatch 120's probe."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row."),
     ("night/record_instruments.py", "This record's own writer."),
@@ -11818,7 +12021,7 @@ PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_dr
                                                     "spans.py", "spandecay.py")] + \
          [(n, "dispatch 102") for n in ("codemap.py", "nbhd2.py", "probe_unit.py", "lookups.py")] + \
          [("away/d113/" + n, "dispatch 113") for n in ("census.py", "compile_all.py", "compile310.py", "shcensus.py",
-                                                       "rb.py", "nodebash.js", "clean.ps1", "tools.sh", "toml11.toml")]
+                                                       "rb.py", "nodebash.js", "clean.ps1", "tools.sh", "toml11.toml")] +          [("probe/c2.py", "dispatch 120")]
 LANG = {".py": "python", ".js": "javascript", ".ps1": "powershell", ".sh": "bash", ".toml": "toml"}
 
 parts = ["""# Instruments: the night pass
@@ -12833,13 +13036,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2389 nodes in 30 namespaces; 30905 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1621, derived 277, pending 491
-map: no stale facts read 53 records and 21 quotes of a map count or the critical path
+map: 2400 nodes in 30 namespaces; 31005 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1632, derived 277, pending 491
+map: no stale facts read 54 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 173 records, 3037 sections, 191 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 178 records, 3081 sections, 194 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -13670,4 +13873,35 @@ for t in sed awk grep timeout mktemp node; do printf "%s=%s " "$t" "$(type -P "$
 tbl = {
   key = "a",
 }
+````
+
+### `c2.py`, dispatch 120
+
+````python
+import hashlib,json,sys
+h=lambda s: hashlib.sha256(s.encode()).hexdigest()[:12]
+def check(upstream, amendments, steps):
+    # steps: list of (op, old, new) retargets shipped by upstream release
+    errs=[]
+    for a in amendments:
+        tgt=a["target"]
+        for op,old,new in steps:
+            if tgt==old and op=="rename": tgt=new
+            if tgt==old and op=="split": errs.append(f"{a['tag']}: target {old} split into {new}; retarget required"); tgt=None
+        if tgt is None: continue
+        if tgt not in upstream: errs.append(f"{a['tag']}: dangling amends -> {tgt}"); continue
+        if h(upstream[tgt])!=a["base"]: errs.append(f"{a['tag']}: base drift on {tgt} (pinned {a['base']}, now {h(upstream[tgt])})")
+    return errs
+v1={"core.verify":"Verify before claiming done.","core.reuse":"Reuse before building."}
+am=[{"tag":"local.verify-log","target":"core.verify","base":h(v1["core.verify"]),"text":"Attach the gate log."}]
+cases={
+ "S0 unchanged": (v1,[]),
+ "S1 reword": ({**v1,"core.verify":"Verify before claiming done: a check that exercises THIS change."},[]),
+ "S1b typo-only": ({**v1,"core.verify":"Verify before claiming done. "},[]),
+ "S2 rename w/ step": ({"core.verify-done":v1["core.verify"],"core.reuse":v1["core.reuse"]},[("rename","core.verify","core.verify-done")]),
+ "S2b rename no step": ({"core.verify-done":v1["core.verify"],"core.reuse":v1["core.reuse"]},[]),
+ "S3 split": ({"core.verify":"Verify before claiming done.","core.verify-scope":"The check must exercise THIS change.","core.reuse":v1["core.reuse"]},[("split","core.verify","core.verify,core.verify-scope")]),
+ "S4 contradicting new unit": ({**v1,"core.no-logs":"Never attach gate logs to the record."},[]),
+}
+for k,(up,st) in cases.items(): print(k,"->",check(up,am,st) or "PASS (green)")
 ````

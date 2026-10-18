@@ -179,6 +179,10 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 115 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The answers fold's closing review, run twice at the owner's word: `fe3d09aba` over `a9b00addd` | the args, built by `build_args_answers.py` in the instruments record | 1799cb98 | returned as `wf_7b253e00-228`, CLEAN WITH FIXES, 12 of 17 confirmed, 11 items, 1 high | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-answers-fold-b.md` |
 | 116 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses (coherence, grounding, reuse, blast-radius, failure-envelope) each with a shape note, five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run A of two | The whole-design shape audit the owner asked for: v2, the gap register and the memory plan at `89e44048f`, read whole | the args, built by `build_args_shape.py` | 1799cb98 | returned as `wf_0dd3b79b-986`, CLEAN WITH FIXES, 45 of 49 confirmed, 45 items, 4 high | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-shape-audit-a.md` |
 | 117 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses (coherence, grounding, reuse, blast-radius, failure-envelope) each with a shape note, five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The whole-design shape audit the owner asked for: v2, the gap register and the memory plan at `89e44048f`, read whole | the args, built by `build_args_shape.py` | 1799cb98 | returned as `wf_359adbd0-0d7`, CLEAN WITH FIXES, 53 of 56 confirmed, 46 items, 5 high | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-shape-audit-b.md` |
+| 118 | gov-researcher, at the owner's medium effort | The adopter-instructions pass: how an adopter adds to or changes gov's instructions today, and what the next update does, measured on a scratch install | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-1-researcher.md` | 1799cb98 | returned, 18m08s, 57.4k out: only the overlay slot and the house files carry adopter text through an update; an edit to a rendered instruction is overwritten and named only `re-rendered` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-adopter-today.md` |
+| 119 | gov-researcher, at the owner's medium effort | The pass: what the converged design decides about adopter instructions, and what it leaves open | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-2-researcher.md` | 1799cb98 | returned, 5m54s, 31.8k out: who writes and the project block decided; amending, replacing, masking and surviving an update open; six contradictions | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-adopter-design.md` |
+| 120 | gov-researcher, at the owner's medium effort | The pass: prior art outside gov for customizing shipped defaults through upstream updates | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-3-researcher.md` | 1799cb98 | returned, 5m31s, 25.9k out: eight families; an overlay plus tag-keyed amendments pinned to their base; a contradicting new unit passes every mechanical check | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-adopter-prior-art.md` |
+| 121 | gov-researcher, at the owner's medium effort | The pass: the owner's hypothesis, tag every edit and render around it, against gov's own history | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-4-researcher.md` | 1799cb98 | returned, 27m37s, 62.0k out: 778 of 797 landed edits kept their anchor, so a bare tag misses them; a tag plus a base-text hash, and a map with every restructure | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-adopter-history.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1367,6 +1371,19 @@ The whole-design shape audit, dispatches 116 and 117, derived from each run the 
 - returned — gov-synthesizer · wrote 1 file · 5m18s · 44.2k out · run wf_359adbd0-0d7/a96366825e9613236
 ```
 
+The adopter-instructions research, dispatches 118 to 121, derived from each run the same way:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-1-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-1-researcher.md) · writes none · gates none · run direct/a8881eeaa44a53a01
+- returned — gov-researcher · wrote 0 files · 18m08s · 57.4k out · run direct/a8881eeaa44a53a01
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-2-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-2-researcher.md) · writes none · gates none · run direct/adfa3c365532aa175
+- returned — gov-researcher · wrote 0 files · 5m54s · 31.8k out · run direct/adfa3c365532aa175
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-3-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-3-researcher.md) · writes none · gates none · run direct/a100ec1e94159adf1
+- returned — gov-researcher · wrote 0 files · 5m31s · 25.9k out · run direct/a100ec1e94159adf1
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-4-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-4-researcher.md) · writes none · gates none · run direct/a52576de3dd4f80e6
+- returned — gov-researcher · wrote 0 files · 27m37s · 62.0k out · run direct/a52576de3dd4f80e6
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -2342,6 +2359,17 @@ The whole-design shape audit, dispatches 116 and 117, derived from each run the 
 
 - 2026-10-19, session 1799cb98: the owner confirmed SK-2's names, renaming `/gov-drift-audit` to `/gov-drift`, and set
   the instruction layer's rendering and adoption as the next review.
+
+- 2026-10-19, session 1799cb98: the owner opened a review of the instruction layer's rendering and adoption: every
+  repository, gov included, wants its own instructions and to adjust gov's, and those must survive gov's updates.
+  Four researchers took one question each, dispatches 118 to 121, and `build/2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md` answers the owner's two questions,
+  tests the owner's hypothesis against gov's history, recommends composing every document from gov's units and the
+  repository's own units with typed, pinned edges, and puts six forks, IA-1 to IA-6, to the owner.
+- 2026-10-19, session 1799cb98: the owner asked whether the session is still oriented by the design map, as a test of
+  the feature that it survives compaction. It held after every design change, but not at the compaction: nothing
+  re-injected the map, the compact hook re-injected only the kickoff card of 2026-10-14, whose current-state line named
+  a commit on main rather than this branch, and the map was re-read only after the first fold. This is evidence for
+  dWellOiledMachine's default load (PM-7, PM-12), which injects the card and the map at startup, resume and compaction.
 
 ## Instruments
 
