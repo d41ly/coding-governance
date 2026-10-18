@@ -1,6 +1,6 @@
 # KICK-aScoutedSeam-1 — kickoff asks once, runs the scout on opt-in, and carries its seams onto the card and into the brief
 
-**Status:** SPECCED · rev-3 · 2026-10-13 · node a · Tier-2 · base ebce889c · streams kickoff · order 2
+**Status:** SPECCED · rev-4 · 2026-10-18 · node a · Tier-2 · base ebce889c · streams kickoff · order 2
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-11-build-TOOL-aScoutedSeam-1-1-failure-analysis.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-1-failure-analysis.md) | research | TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-2 TOOL-aScoutedSeam-3 DEPL-aScoutedSeam-1 |
 | [2026-10-11-build-TOOL-aScoutedSeam-1-7-m1c-trial.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-7-m1c-trial.md) | research | TOOL-aScoutedSeam-1 |
 | [2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md) | research | TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-3 DEPL-aScoutedSeam-1 |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md) | research | DEPL-aScoutedSeam-1 TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-2 TOOL-aScoutedSeam-3 |
 
 <!-- /gen:spec-records -->
 
@@ -130,8 +131,9 @@ The `## open` answer line takes one of three forms, the same shapes `spec audit:
 `--card --append` parses `## reuse` with a closed set of line heads: `- MUST `, `- SHOULD `,
 `- constraint `, `- convention `, `- unmet ` and `- scout `. A seam line must carry ` :: ` and ` — `.
 A convention line must carry `: ` and end in `(<n> of <m>)` with `n` at most `m`. The scout line is
-`- scout <ISO date> · lenses <n>/2 · seams <n> · cut <n> · demoted <n>`, each count a non-negative
-integer, and a scout line lacking the `demoted` field is refused. The check grades
+`- scout <ISO date> · lenses <n>/<m>[ · design skipped (no UI)] · seams <n> · cut <n> · demoted <n>`,
+each count a non-negative integer, `m` 1 or 2 and `n` at most `m`. The skip clause appears only on
+`lenses 1/1`, and a scout line lacking the `demoted` field is refused. The check grades
 SHAPE: a well-formed line naming the wrong seam passes, and that is `TOOL-aScoutedSeam-2`'s and the
 diff mode's to catch.
 
@@ -173,8 +175,8 @@ card that carries `## reuse`, so no existing card reds.
 
 - security: no new write path. The opt-in keys are read, and a run cannot write its own, by the
   existing self-opt-in rule.
-- perf / scale: the scout's cost is `TOOL-aScoutedSeam-1`'s, measured at about 22 minutes per lens
-  at `medium`. Kickoff adds one house-index scan per tree, one append and one brief sub-head.
+- perf / scale: the scout's cost is `TOOL-aScoutedSeam-1`'s: about 22 minutes for the code lens at
+  `medium`, plus the design lens's 5 in series on a UI request. Kickoff adds one house-index scan per tree, one append and one brief sub-head.
 - error / empty / loading states: a dead lens is announced in the section and on the READY hand-back.
   A refused append names the line, and the session repairs it before the hand-back.
 - observability: the `## open` answer line and the section's `scout` line.
@@ -200,9 +202,10 @@ card that carries `## reuse`, so no existing card reds.
   reading `- convention Section width: normal (5 of 3)`, and a scout line with no `demoted` field.
   A conforming section with one line of each of the six kinds, its scout line reading
   `- scout 2026-10-13 · lenses 2/2 · seams 7 · cut 0 · demoted 2`, appends and survives
-  `--card --replay`.
+  `--card --replay`, as does one whose scout line reads
+  `- scout 2026-10-18 · lenses 1/1 · design skipped (no UI) · seams 2 · cut 0 · demoted 0`.
   Red when: the append accepts an unknown line head or a convention count above its population, or
-  refuses a conforming scout line that carries `demoted`.
+  refuses a conforming scout line that carries `demoted` or the skip clause.
 - **AC4** — When `manifest-check.sh --brief-skeleton` prints the skeleton, its `### Reuse` placeholder
   names the scout's line grammar and the fallback for a build with no opt-in.
   Red when: the placeholder still names only the two probes.
@@ -222,10 +225,10 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC3 AC4 AC5
 - **F1 — Should the project default be armed in gov itself when this lands?** Arming it makes every
   gov kickoff that writes product code run the scout, at the measured cost. Recommendation: leave it
   blank and let the owner arm it after `TOOL-aScoutedSeam-1`'s calibration reports the cost at
-  effort `medium`.
+  effort `medium`. RESOLVED (owner, 2026-10-18): leave gov's default blank, as recommended.
 - **F2 — Does the Step 3 question also cover a task that writes only records?** The measured
   reinventions were all product code. Recommendation: product code only, the same trigger that writes
-  a brief.
+  a brief. RESOLVED (owner, 2026-10-18): product code only, as recommended.
 
 ## 9. Revision log
 
@@ -239,6 +242,11 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC3 AC4 AC5
   and passes `roles` and `efforts` from `harness-args` and `stage-efforts`, after the build README
   exists. The grammar check grades the scout line's shape, which gains `demoted`. §3 gains the roles
   kit edge, and §5's engine figure is re-measured.
+- rev-4 · 2026-10-18 · §4 · §5 · §8 · AC3 · the owner's rulings. F1 and F2 closed as
+  recommended. `TOOL-aScoutedSeam-1` rev-8 runs the design lens only on a UI need, in series, so
+  the grammar check reads the scout line as `lenses <n>/<m>` with an optional
+  `design skipped (no UI)` clause, AC3 appends a skipped-design section, and §5's cost is the
+  serial wall.
 
 ## 10. Reuse audit
 

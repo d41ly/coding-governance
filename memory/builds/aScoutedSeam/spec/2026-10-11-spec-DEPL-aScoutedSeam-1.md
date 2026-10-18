@@ -1,6 +1,6 @@
 # DEPL-aScoutedSeam-1 — adopters get the scout and a resolved host tree, and the adopter-side gaps the research found are handed over
 
-**Status:** SPECCED · rev-3 · 2026-10-13 · node a · Tier-2 · base ebce889c · streams deployer+kickoff · order 5
+**Status:** SPECCED · rev-4 · 2026-10-18 · node a · Tier-2 · base ebce889c · streams deployer+kickoff · order 5
 
 <!-- gen:spec-records -->
 
@@ -21,6 +21,7 @@
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-7-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-7-reuse-scout.md) | journal | — |
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-8-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-8-reuse-scout.md) | journal | — |
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-9-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-9-reuse-scout.md) | journal | — |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md) | research | KICK-aScoutedSeam-1 TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-2 TOOL-aScoutedSeam-3 |
 
 <!-- /gen:spec-records -->
 
@@ -36,12 +37,13 @@ reads them.
 
 - **S1** — Host-tree resolution, a kickoff checker verb `manifest-check.sh --reuse-hosts`. It prints
   one absolute path per line, or `hosts: none`, from the first rung that answers:
-  1. the environment variable `GOV_REUSE_HOSTS`, absolute paths separated by the platform's path
-     separator, the per-node rung;
-  2. `git rev-parse --show-superproject-working-tree`, when the repository is checked out as a
+  1. `git rev-parse --show-superproject-working-tree`, when the repository is checked out as a
      submodule of its host;
+  2. the environment variable `GOV_REUSE_HOSTS`, absolute paths separated by the platform's path
+     separator, the per-node rung;
   3. `REUSE_HOST_TREES` in `.unattended.conf`, paths relative to the repository root, the
      project-wide rung.
+  4. else `hosts: none`.
 
   Every printed path must be a git work tree; one that is not refuses, naming it. The rung that
   answered is printed with the paths.
@@ -74,7 +76,8 @@ reads them.
     in the base role, which every update overwrites (`tools/roles/README.md:17-23`).
   - AC4 observes it.
 - **S5** — The scout's files reach an adopter through the kits that already carry them: the
-  review-harness kit renders `reuse-scout.js` at the adopter's fan-out cap, the roles kit carries the
+  review-harness kit ships `reuse-scout.js` as an engine file, since it fans nothing out
+  (`TOOL-aScoutedSeam-1` S3), the roles kit carries the
   role, its catalogue row and its overlay seed, the codebase-map kit the procedure document, the
   kickoff kit the verbs, and the memory-tree kit the §10 join. No new kit and no new descriptor.
   - AC5 observes it.
@@ -108,11 +111,15 @@ reads them.
 
 ### The ladder
 
-The per-node rung comes first because the node registry says roots differ by node, so a path that is
-right on one node is wrong on another. The superproject rung comes second because it answers with no
-configuration wherever a package is checked out inside its host. Measured on node `a`: NicoCares'
-checkout printed `C:/projects/incms/main`. The conf rung is last because a project-wide relative path
-holds only on nodes sharing a layout.
+The superproject rung comes first, by the owner's ruling (F1): it answers with no configuration
+wherever a package is checked out inside its host. Measured on node `a`: NicoCares' checkout printed
+`C:/projects/incms/main`. The per-node rung comes second, for a package cloned on its own, because
+the node registry says roots differ by node, so a path right on one node is wrong on another. The
+conf rung is last because a project-wide relative path holds only on nodes sharing a layout.
+
+What the order costs: a node that checks the package out away from its host, while the package is
+still a submodule, cannot override the superproject with `GOV_REUSE_HOSTS`. The superproject
+answers first, and the env rung is never read.
 
 ### Inventory
 
@@ -154,7 +161,7 @@ and one runbook section.
   by name.
 - observability: the rung that answered is printed with the paths.
 - risks: a stale env path on one node points at an old host checkout. It must be a work tree, but its
-  revision is not checked.
+  revision is not checked. A submodule checkout cannot override its superproject with the env (§4).
 - testing: `manifest-check.test.sh` gains one fixture per rung, including a submodule fixture.
 - migration: N/A — new blank keys.
 - user docs: the runbook section (S4).
@@ -162,9 +169,11 @@ and one runbook section.
 ## 6. Acceptance criteria
 
 - **AC1** — When `manifest-check.sh --reuse-hosts` runs in a fixture repository checked out as a
-  submodule of a fixture host, it prints the host's path and the rung `superproject`. With
-  `GOV_REUSE_HOSTS` set it prints that path and the rung `env`. With neither it prints `hosts: none`.
-  Red when: a path that is not a git work tree is printed instead of refused.
+  submodule of a fixture host, with `GOV_REUSE_HOSTS` naming a second fixture tree, it prints the
+  host's path and the rung `superproject`. In a standalone fixture with `GOV_REUSE_HOSTS` set it
+  prints that path and the rung `env`. With neither it prints `hosts: none`.
+  Red when: the env rung answers ahead of the superproject, or a path that is not a git work tree is
+  printed instead of refused.
 - **AC2** — When the kickoff catalog line is read from `MANIFEST-TEMPLATE.md`, it passes the
   `--reuse-hosts` output as `hostTrees`.
   Red when: the catalog line passes an empty list unconditionally.
@@ -177,8 +186,8 @@ and one runbook section.
   Red when: the cost is written without the date it was measured, or the section says an update
   writes the `diffCheck` line into an adopter's policy.
 - **AC5** — When `govkit.py plan` runs for a fixture adopter selecting the review-harness kit,
-  `reuse-scout.js` is planned as a rendered file at the adopter's fan-out cap.
-  Red when: the harness ships as an engine file spelling the literal cap.
+  `reuse-scout.js` is planned as an engine file.
+  Red when: the plan leaves the harness out.
 
 ## 7. Gates
 
@@ -190,7 +199,8 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 · a fixtur
 
 - **F1 — Should the superproject rung be ahead of the env rung?** It needs no configuration, but a
   node that checks the package out somewhere else, with the host elsewhere still, needs the env to
-  win. Recommendation: env first, as written.
+  win. Recommendation was env first. RESOLVED (owner, 2026-10-18): the superproject rung first,
+  against the recommendation. S1's ladder and AC1 are reordered, and §4 states the cost.
 
 ## 9. Revision log
 
@@ -202,6 +212,10 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 · a fixtur
   seeded and never rewritten, and the overlay as the home of an adopter's scout rules. S5 names the
   roles and codebase-map kits, §3 gains the edge to `TOOL-aScoutedSeam-3`, and AC4 counts the
   checklist as S4 now lists it.
+- rev-4 · 2026-10-18 · S1 · S5 · §4 · §5 · §8 · AC1 · AC5 · the owner's rulings. F1: the superproject
+  rung answers first, then the env, then the conf, and §4 and §5 state that the env cannot override
+  a superproject. AC1 observes that order. `TOOL-aScoutedSeam-1` rev-8 ships the harness as an
+  engine file, so S5 and AC5 no longer render it at the fan-out cap.
 
 ## 10. Reuse audit
 

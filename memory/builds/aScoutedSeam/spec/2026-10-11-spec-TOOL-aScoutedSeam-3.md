@@ -1,6 +1,6 @@
 # TOOL-aScoutedSeam-3 — the scout's diff mode: a landed diff checked against the tree and the `## reuse` seams
 
-**Status:** SPECCED · rev-3 · 2026-10-13 · node a · Tier-2 · base ebce889c · streams tooling · order 3
+**Status:** SPECCED · rev-4 · 2026-10-18 · node a · Tier-2 · base ebce889c · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-11-build-TOOL-aScoutedSeam-1-1-failure-analysis.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-1-failure-analysis.md) | research | TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-2 KICK-aScoutedSeam-1 DEPL-aScoutedSeam-1 |
 | [2026-10-11-build-TOOL-aScoutedSeam-1-2-benchmark.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-2-benchmark.md) | research | TOOL-aScoutedSeam-1 |
 | [2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md) | research | TOOL-aScoutedSeam-1 KICK-aScoutedSeam-1 DEPL-aScoutedSeam-1 |
+| [2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md) | research | DEPL-aScoutedSeam-1 KICK-aScoutedSeam-1 TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-2 |
 
 <!-- /gen:spec-records -->
 
@@ -138,7 +139,6 @@ The return:
 
 ### Files touched (estimate)
 
-- `tools/workflows/reuse-scout.template.js`
 - `tools/workflows/reuse-scout.js`
 - `tools/workflows/reuse-scout.test.sh`
 - `tools/workflows/README.md`
@@ -217,12 +217,14 @@ New arm: tools/workflows/reuse-scout.test.sh · covers AC1 AC2 · stub diff retu
 - **F1 — Should diff mode run per unit or once over the build's range before the closing review?** Per
   unit catches a duplicate before the next unit copies it. Once per build halves the cost on a large
   build. Recommendation: per unit, because two measured duplicates were copied forward by a sibling
-  unit.
+  unit. RESOLVED (owner, 2026-10-18): per unit, as recommended.
 - **F2 — Is `high` enough for diff mode, or should it default to `extra`?** `medium` was measured
   and lost 3 of 7 solved cases, and `extra` cost 31 minutes per diff; `high` was not measured.
   Recommendation: `high`, with AC3 as the measurement. If AC3 falls short, gov's `diffCheck`
   override moves to `xhigh`, the next level the policy takes; `extra`, the session level the
   benchmark ran at, is not one of the policy's names (`roles_lib.EFFORT_LEVELS`).
+  Open, measurement owed (owner, 2026-10-18): the owner asked for diff mode measured at `high`
+  first, and for a hypothesis on why `medium` lost cases, before ruling. S6's level stands.
 
 ## 9. Revision log
 
@@ -237,6 +239,9 @@ New arm: tools/workflows/reuse-scout.test.sh · covers AC1 AC2 · stub diff retu
   lands the row and policy edits together. The diff procedure moves from the role body to
   `reuse-lookup.agent.md`. AC1 refuses a missing `diffCheck`, AC3 runs at the policy's level, and
   AC5 is new. F2 names its fallback as a policy level.
+- rev-4 · 2026-10-18 · §4 · §8 · F1 closed as recommended, and F2 marked a measurement owed, with
+  the effort unchanged. `TOOL-aScoutedSeam-1` rev-8 ships the harness as an engine file, so §4's
+  files drop its template.
 
 ## 10. Reuse audit
 
