@@ -190,6 +190,7 @@
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-99-reuse-scout.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-99-reuse-scout.md) | journal | — |
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-brief-2.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-brief-2.md) | research | TOOL-aScoutedSeam-1 |
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md) | research | KICK-aScoutedSeam-1 TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-2 TOOL-aScoutedSeam-3 |
+| [2026-10-19-prompt-DEPL-aScoutedSeam-1-1-session.md](../prompts/2026-10-19-prompt-DEPL-aScoutedSeam-1-1-session.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
