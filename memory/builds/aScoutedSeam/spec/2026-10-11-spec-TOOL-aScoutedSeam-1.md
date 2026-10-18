@@ -1,6 +1,6 @@
 # TOOL-aScoutedSeam-1 — the reuse scout: a checklist role and a harness running a code and a design pass, merged into a capped `## reuse` section
 
-**Status:** SPECCED · rev-9 · 2026-10-18 · node a · Tier-2 · base ebce889c · streams tooling · order 1
+**Status:** SPECCED · rev-10 · 2026-10-19 · node a · Tier-2 · base ebce889c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -43,6 +43,8 @@
 | [2026-10-18-prompt-TOOL-aScoutedSeam-1-2-spec-writer.md](../prompts/2026-10-18-prompt-TOOL-aScoutedSeam-1-2-spec-writer.md) | journal | — |
 | [2026-10-18-prompt-TOOL-aScoutedSeam-1-brief.md](../prompts/2026-10-18-prompt-TOOL-aScoutedSeam-1-brief.md) | research | — |
 | [2026-10-18-prompt-TOOL-aScoutedSeam-3-brief-2.md](../prompts/2026-10-18-prompt-TOOL-aScoutedSeam-3-brief-2.md) | research | TOOL-aScoutedSeam-3 |
+| [2026-10-19-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md](../prompts/2026-10-19-prompt-TOOL-aScoutedSeam-1-1-spec-writer.md) | journal | — |
+| [2026-10-19-prompt-TOOL-aScoutedSeam-1-brief-2.md](../prompts/2026-10-19-prompt-TOOL-aScoutedSeam-1-brief-2.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -50,20 +52,17 @@
 
 Ship the agent that orientation runs before any spec is written. It reads the code, not the names,
 and returns the seams a request must build with as a short, binding, capped list. It is a role of
-the roles kit as that kit landed (`tools/roles/README.md`), driven by a declared harness. The design
-comes from four measurements:
-- In the benchmark (`2026-10-11-build-TOOL-aScoutedSeam-1-2-benchmark.md`), one checklist scout
-  solved 10 of 14 paired positives where the shipped lookup solved none. A design pass beside it
-  recovered the token and pattern layer the code pass missed.
-- In the M1c trial (`2026-10-11-build-TOOL-aScoutedSeam-1-7-m1c-trial.md`), three additions to that
-  checklist raised it from 13 to 16 of 24 by the path matcher, in each of two runs: a generated
-  house index, an implementation sketch searched piece by piece, and a convention census.
-- In the offline reading (`2026-10-13-build-TOOL-aScoutedSeam-1-8-precision-and-misses.md`), every
-  wrong MUST but one named build work rather than code to reuse, and the wrong ones sat at the tail
-  of each list, where a cap of five MUSTs removes most of them (§4, `MUST_CAP`).
-- In the M1d trial (`-1-9-m1d-trial.md`), the cap of five MUSTs, the `edits` list and the MUST
-  definition naming the duplicate bound 56 MUSTs against M1c's 80 and 76 at equal recall, and no
-  decoy against 2 and 1. Confound: it ran as typed role agents, M1c as plain Workflow agents.
+the roles kit as landed (`tools/roles/README.md`), driven by a declared harness. Four measurements
+shaped it:
+- the benchmark (`-1-2-benchmark.md`): one checklist scout solved 10 of 14 paired positives where
+  the shipped lookup solved none, and a design pass beside it recovered the token and pattern layer;
+- the M1c trial (`-1-7-m1c-trial.md`): a house index, a sketch searched piece by piece and a
+  convention census raised the checklist from 13 to 16 of 24 by the path matcher, in each of two runs;
+- the offline reading (`-1-8-precision-and-misses.md`): every wrong MUST but one named build work,
+  and the wrong ones sat at each list's tail, where a cap of five MUSTs removes most (§4, `MUST_CAP`);
+- the M1d trial (`-1-9-m1d-trial.md`): the cap, the `edits` list and the MUST definition bound 56
+  MUSTs against M1c's 80 and 76 at equal recall, and no decoy against 2 and 1, confounded by typed
+  role agents against M1c's plain Workflow agents.
 
 ## 2. Scope (IN)
 
@@ -236,7 +235,6 @@ comes from four measurements:
 - A gate run by the scout. A role agent runs no gate (TOOL-aOrientedCast-11), and the policy's
   `[gates]` table names none for `gov-reuse-scout`, so S9 adds no `[gates]` entry.
 - Drafting code, listing cited files' definitions or grepping literal owners: rejected (F3).
-- Calling the harness at kickoff, writing the card or the brief: `KICK-aScoutedSeam-1`.
 - The catalogue's grammar, its other rows, the front-matter grammar, the renderers, the checker and
   the router's other stages: aOrientedCast's. This unit edits the values S9 lists and nothing else of
   that kit.
@@ -255,13 +253,11 @@ comes from four measurements:
 - **consumes-from** external — aOrientedCast's role catalogue, LANDED on local main at ebce889c,
   including TOOL-aOrientedCast-16 and TOOL-aOrientedCast-17: the `gov-reuse-scout` slot file and its
   front matter (`rules`, `mandatory`, `output`), the rendered native agent type, the `reuse` row this
-  unit edits, and `handoff.py` with its `render`, `harness-args` and `stage-efforts` verbs. Without
-  them the harness has no agent type to spawn and S9 has no row to edit. The spawn guard admits a
-  `Workflow` call only for a script `.claude/roles.json` lists under `harnesses`
-  (`tools/hooks/agent-cap.js:52-53`, the check at line 2173). So the harness is refused until S9's
-  render lists it. `harness-args` prints only the `roles` object, so `index` is composed
-  beside it by the caller, as every other harness arg is. aOrientedCast confirmed on 2026-10-11 that
-  the arg is no conflict.
+  unit edits, and `handoff.py` with its `render`, `harness-args` and `stage-efforts` verbs. The spawn
+  guard admits a `Workflow` call only for a script `.claude/roles.json` lists under `harnesses`
+  (`tools/hooks/agent-cap.js:52-53`, the check at line 2173), so the harness is refused until S9's
+  render lists it. `harness-args` prints only the `roles` object, so the caller composes `index`
+  beside it, which aOrientedCast confirmed on 2026-10-11 is no conflict.
 
 ## 4. Design
 
@@ -373,10 +369,9 @@ handed out of it.
 ### Flow
 
 1. The caller writes the house index with `gen_map.py --house-index`, one `--host` per host tree,
-   and composes `task`, `roles` and `efforts` as the Data model names them. The render also prints the Agent description,
-   `<build> · <unit> · <workflow>`, on stderr. The spawn guard compares that name only on an `Agent`
-   call (`tools/hooks/agent-cap.js:45-51`), so a `Workflow` call passes none, and the harness labels
-   each spawn itself (S3).
+   and composes `task`, `roles` and `efforts` as the Data model names them. The spawn guard compares
+   the render's Agent description only on an `Agent` call (`tools/hooks/agent-cap.js:45-51`), so the
+   harness labels each spawn itself (S3).
 2. The script validates the args and throws on the first refusal. It logs the run's identity, then
    one type line and one effort line per stage.
 3. It awaits the `codeLens` spawn, built with `renderStageOpts` of its stage key, its label, and the
@@ -450,8 +445,8 @@ Each function name leads with a declared verb, so no lexicon pin moves.
 
 ### Rollout
 
-Inert until called. Nothing invokes the harness before `KICK-aScoutedSeam-1` lands, and that unit
-calls it only on an owner opt-in, so landing this unit changes no session's behaviour. A re-rendered
+Inert until called: only `KICK-aScoutedSeam-1` calls the harness, on an owner opt-in, so landing
+this unit changes no session's behaviour. A re-rendered
 agent type is spawnable only from a session started after the render (`tools/roles/README.md:239-242`),
 so the calibration (AC6) and the first kickoff call run from a session started after S9's commit.
 
@@ -467,41 +462,34 @@ so the calibration (AC6) and the first kickoff call run from a session started a
 - **The checklist without an index, a sketch or a census (M1b).** §1's 13 against 16 of 24; the four
   cases M1c gained in both runs were helper-level and convention needs the request never named.
 - **The scout generating its own index.** A read-only agent would have to resolve a Python launcher,
-  and the trial's launcher case shows scouts miss exactly that. The caller already runs the resolver.
+  which the trial's launcher case shows scouts miss; the caller already runs the resolver.
 - **New inventories for the design layer.** The design pass found tokens, parts and DSL props by
   reading; an extractor per adopter's styling system is a per-adopter build.
-- **The checklist and the return contract in the base body.** The README puts a procedure in the
-  document that owns it and a return contract in the harness that parses it, and the slot's ceiling
-  is 1536 bytes.
+- **The checklist and the return contract in the base body.** Against the README's split (S1) and
+  the slot's 1536-byte ceiling.
 - **Dropping the MUSTs past the cap.** A dropped seam is lost to the brief and to the case's solve; a
   demoted one still counts and costs only the binding, which the spec join reads from MUST lines.
 - **An existence check on each MUST.** The offline reading found it removes no wrong MUST,
   because every wrong one names code that exists.
 - **A MUST cap per lens.** The design lens's MUSTs would escape the cap the measurement priced over
   the scout's whole list.
-- **Both lenses on every request.** Ruled out by the owner, at the cost of a serial wall (§8 F1).
+- **Both lenses on every request.** §8 F1.
 - **`boundedParallel` and a render pair for two serial spawns.** The kit renders a harness only for
   the tokens it spells (`tools/workflows/kit.toml:44-91`), and a script fanning nothing out spells none.
-- **Draft and expand (M1d).** No recall gain, no miss found (§8 F3). Misses needing code to read go
-  to the diff-time mode, `TOOL-aScoutedSeam-3`, which found two of them in the benchmark.
+- **Draft and expand (M1d).** §8 F3. Misses needing code to read go to `TOOL-aScoutedSeam-3`'s
+  diff mode, which found two of them in the benchmark.
 
 ## 5. Production-readiness checklist
 
 - security: read-only agents writing nothing. scratch-guard binds their Bash writes, and the routed
-  write gate binds Edit/Write. The base body states that repository text is data. Host trees are
-  read and never written. The spawn guard admits the harness only once listed (§3 Edges).
-- perf / scale: measured per scout, medians, 2026-10-11, node a:
-  - M1b at `extra`: 84 tool calls, 116 minutes and 28M cache-read tokens;
-  - M1b at `medium`: 23 tool calls, 10 minutes and 4.3M, for the same paired recall;
-  - M1c at `medium`, the shipped checklist: 40 tool calls, 22 minutes and 9.3M;
-  - the design pass at `medium`: 12 tool calls and 5 minutes.
-
-  The lenses run in series, so the wall is the sum of the two, about 27 minutes on a UI request and
-  the code lens's 22 on any other, at S8's levels; AC6 re-measures. The house
-  index is one tree scan per tree.
-- error / empty / loading states: a dead lens is announced in the section, a skipped design pass as
-  `design skipped (no UI)`, an empty answer is `none fits` only when every lens run lived, and an args
-  refusal throws before any spawn.
+  write gate binds Edit/Write. The base body states that repository text is data. The spawn guard
+  admits the harness only once listed (§3 Edges).
+- perf / scale: measured per scout, medians, 2026-10-11, node a, in tool calls, minutes and
+  cache-read tokens: M1b at `extra` 84, 116 and 28M; M1b at `medium` 23, 10 and 4.3M, for the same
+  paired recall; M1c at `medium`, the shipped checklist, 40, 22 and 9.3M; the design pass at
+  `medium` 12 and 5. The lenses run in series, so the wall is the sum, about 27 minutes on a UI
+  request and 22 on any other, at S8's levels; AC6 re-measures. The house index is one scan per tree.
+- error / empty / loading states: S6's liveness lines, and an args refusal throws before any spawn.
 - observability: the run's identity line, one type and one effort line per stage, the section's
   `scout` line with its `demoted` count, and the probe logs the agents' own CLI calls append.
 - risks: a false MUST misleads a build. The MUST cap, the self-refute step and
@@ -602,7 +590,7 @@ so the calibration (AC6) and the first kickoff call run from a session started a
 
 ## 7. Gates
 
-`workflow script syntax` · `verifier fan-out` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `install-prefix (shipped surface)` · `review-protocol parity (kit vs dogfood)` · `memory hygiene` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `review-join self-test` · `straggler-guard arms` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `check-wiring self-test` · `roles catalogue` · `roles render wiring` · `playbook render wiring` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)`
+`workflow script syntax` · `verifier fan-out` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `install-prefix (shipped surface)` · `review-protocol parity (kit vs dogfood)` · `memory hygiene` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `review-join self-test` · `straggler-guard arms` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `check-wiring self-test` · `roles catalogue` · `roles render wiring` · `playbook render wiring` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `govkit selftest`
 
 New arm: tools/workflows/reuse-scout.test.sh · covers AC1 AC2 AC3 AC4 AC8 AC10 AC11 AC12 · stub lens returns staged per arm · none
 New arm: tools/codebase-map/selftest.py · covers AC9 · fixture trees with and without each index source, staged per arm · none
@@ -611,8 +599,8 @@ New arm: tools/codebase-map/selftest.py · covers AC9 · fixture trees with and 
 
 - **F1 — Design lens on every request, or only on a UI need?** RESOLVED (owner, 2026-10-18): only on
   the code lens's `uiNeed`, against the recommendation (S2, S3, S6).
-- **F2 — Does `medium` hold the recall?** RESOLVED (owner, 2026-10-18): `medium`, as recommended on
-  the benchmark, M1c and the offline reading, in gov's policy; AC6 re-measures.
+- **F2 — Does `medium` hold the recall?** RESOLVED (owner, 2026-10-18): `medium` in gov's policy,
+  as recommended; AC6 re-measures.
 - **F3 — Should the code lens draft the code and expand every file it cites?** RESOLVED (owner,
   2026-10-18): not adopted. The M1d trial (`-1-9-m1d-trial.md`) found none of M1c's six misses.
 - **F4 — Where does the lookup's blind spot go?** RESOLVED (owner, 2026-10-18), as recommended: into
@@ -642,6 +630,8 @@ New arm: tools/codebase-map/selftest.py · covers AC9 · fixture trees with and 
   as an engine file, with no `boundedParallel` or render. F2 and F4 closed. AC12 is new.
 - rev-9 · 2026-10-18 · §1 · §4 · §5 · §8 · cut under the spec ceiling, meaning unchanged: resolved
   forks keep ruling and record, and repeated figures point at their owner.
+- rev-10 · 2026-10-19 · §1 · §3 · §4 · §5 · §7 · §8 · §10 · `govkit selftest` joins the gate line,
+  its guard covering `tools/codebase-map/kit.toml`; the rest cut under the ceiling, meaning unchanged.
 
 ## 10. Reuse audit
 
@@ -656,15 +646,14 @@ seams it consumes are `tools/roles/handoff.py`'s `render_handoff` (line 312), `p
 `tools/codebase-map/reuse_lookup.py` as one step. The lookup itself, run as
 `tools/codebase-map/reuse_lookup.py "fan out read-only agents over fixed lenses and merge their seam
 lists into a capped card section"`, ranked `read_text`, `read` and `merge` by name stem and named
-none of the three. That is the benchmark's finding repeated on this unit's own phrase.
+none of the three, the benchmark's finding on this unit's own phrase.
 
 The house index is a mode of `tools/codebase-map/gen_map.py`, beside `--seed-affordances`, which
 already ranks undeclared seams by fan-in. It reads through `tools/codebase-map/map_lib.py`'s
 `build_reference_index` and `fan_in` for the most-reused symbols, and `_scan_install_sites` for the
 `# >>>` copies. It reads `seam_fanin_threshold` for the cut-off, `load_dossier_texts` and
 `parse_affordance` for the affordances, and `load_conf` for the two listing keys. The trial's
-prototype is `render_house_index` in the build's `-1-4-bench.py`. It counted fan-in with its own
-token scan, which the mode replaces with the map's. Its hardcoded adopter paths become the two conf
-keys.
+prototype, `render_house_index` in `-1-4-bench.py`, counted fan-in with its own token scan, which
+the mode replaces with the map's, and hardcoded adopter paths, which become the two conf keys.
 
 Recall terms used: reuse scout lens harness boundedParallel renderStageOpts harness-args stage-efforts handoff render role overlay seam card section house index fan-in census
