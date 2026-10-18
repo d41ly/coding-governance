@@ -6,6 +6,8 @@ single verdict, not to effort.
 
     python <this> units <diff-file>                  the enumerated added units, one per line
     python <this> questions <d1-root> <out-dir>      one question file per diff case
+    python <this> packets <out-dir> <arm>...         blind judge packets and tasks for the diff cases
+    python <this> judge-collect <key.json> <short>=<reply>...   judge verdicts into the results
 
 The replies are collected by `-1-9-m1d-trial.py collect d1v2@medium <case-id>=<file>...`.
 
@@ -45,20 +47,20 @@ def extract_units(diff_text):
     added inside an existing function is still listed."""
     units, seen, path, hunk = [], set(), None, None
 
-    def close_hunk():
+    def add_hunk_unit():
         if hunk and not hunk["named"] and len(hunk["added"]) >= HUNK_MIN_ADDED:
             first = next((a.strip() for a in hunk["added"] if a.strip()), "")[:70]
             units.append(("hunk", f"{hunk['at']}: {first}", hunk["path"]))
 
     for line in diff_text.splitlines():
         if line.startswith("+++ ") or line.startswith("diff --git"):
-            close_hunk()
+            add_hunk_unit()
             hunk = None
             if line.startswith("+++ "):
                 path = line[6:] if line.startswith("+++ b/") else None
             continue
         if line.startswith("@@"):
-            close_hunk()
+            add_hunk_unit()
             hunk = {"at": line.split("@@")[1].strip(), "added": [], "named": False, "path": path}
             continue
         if not path or SKIP_PATH.search(path) or not line.startswith("+"):
@@ -76,7 +78,7 @@ def extract_units(diff_text):
                     if hunk is not None:
                         hunk["named"] = True
                     break
-    close_hunk()
+    add_hunk_unit()
     return units
 
 
@@ -140,12 +142,78 @@ def run_questions(d1_root, out_dir):
         print(f"{c['id']:<34} units {len(units):>4}")
 
 
+HERE = Path(__file__).resolve().parent
+STEM = "2026-10-11-build-TOOL-aScoutedSeam-1-"
+RSB_ROOT = Path("C:/Users/daily-agent/AppData/Local/Temp/rsb")
+
+
+def load_bench():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("bench", HERE / (STEM + "4-bench.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def run_packets(out_dir, arms):
+    """Blind packets for the diff cases through the bench's own `judge-packets`, each extended with the
+    diff under review and its pre-diff tree. The judge's instructions are `-1-10-judge-task.md`."""
+    bench = load_bench()
+    out = Path(out_dir)
+    bench.cmd_judge_packets([str(HERE / (STEM + "3-cases.json")), str(HERE / (STEM + "5-results.json")),
+                             str(out), str(RSB_ROOT)] + arms)
+    cases = json.loads((D1_ROOT / "d1.cases.json").read_text(encoding="utf-8"))
+    for short, c in cases.items():
+        packet = out / f"{short}.md"
+        packet.write_text(packet.read_text(encoding="utf-8") + "\n## The diff under review\n\n"
+                          f"- diff: {c['diff']} (commit subject: \"{c['subject']}\")\n"
+                          f"- pre-diff tree: {c['tree']}\n", encoding="utf-8", newline="\n")
+    for p in out.glob("c*.md"):
+        if p.stem not in cases:
+            p.unlink()
+    print(f"{len(cases)} diff packets in {out}")
+
+
+def run_judge_collect(key_file, reports):
+    """Each report is `<short>=<reply-file>`; the last ```json block's arms join back through the key and
+    land under `judge` in the results, as the bench's own `judge-collect` files them."""
+    import re as _re
+    key = json.loads(Path(key_file).read_text(encoding="utf-8"))
+    cases = json.loads((D1_ROOT / "d1.cases.json").read_text(encoding="utf-8"))
+    bench = load_bench()
+    path = HERE / (STEM + "5-results.json")
+    results = bench.read_json(str(path))
+    verdicts = results.setdefault("judge", {})
+    bad = 0
+    for spec in reports:
+        short, _, f = spec.partition("=")
+        blocks = _re.findall(r"```json\s*(.*?)```", Path(f).read_text(encoding="utf-8", errors="replace"), _re.S)
+        try:
+            arms_out = json.loads(blocks[-1])["arms"]
+        except (IndexError, ValueError, KeyError, TypeError):
+            bad += 1
+            continue
+        for a in arms_out:
+            arm = key.get(short, {}).get(a.get("label"))
+            if arm:
+                cell = {k: a.get(k) for k in ("covered", "primary", "wrong", "valid_extra", "score", "note")}
+                if isinstance(cell["valid_extra"], dict):  # one judge split it by binding; the rubric counts both
+                    cell["valid_extra"] = sum(v for v in cell["valid_extra"].values() if isinstance(v, int))
+                verdicts.setdefault(arm, {})[cases[short]["id"]] = cell
+    bench.write_json(str(path), results)
+    print(f"judge: {len(reports)} report(s), {bad} unparsed")
+
+
 def main(argv):
     if argv[:1] == ["units"] and len(argv) == 2:
         for kind, name, path in extract_units(Path(argv[1]).read_text(encoding="utf-8", errors="replace")):
             print(f"{kind}\t{name}\t{path}")
     elif argv[:1] == ["questions"] and len(argv) == 3:
         run_questions(argv[1], argv[2])
+    elif argv[:1] == ["packets"] and len(argv) > 2:
+        run_packets(argv[1], argv[2:])
+    elif argv[:1] == ["judge-collect"] and len(argv) > 2:
+        run_judge_collect(argv[1], argv[2:])
     else:
         print(__doc__, file=sys.stderr)
         return 2

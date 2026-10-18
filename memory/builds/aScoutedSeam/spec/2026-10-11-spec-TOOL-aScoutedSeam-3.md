@@ -10,7 +10,9 @@
 | [2026-10-11-build-TOOL-aScoutedSeam-1-2-benchmark.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-2-benchmark.md) | research | TOOL-aScoutedSeam-1 |
 | [2026-10-18-build-TOOL-aScoutedSeam-1-10-d1v2-trial.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-10-d1v2-trial.md) | research | — |
 | [2026-10-18-build-TOOL-aScoutedSeam-1-10-d1v2.py](../build/2026-10-18-build-TOOL-aScoutedSeam-1-10-d1v2.py) | research | — |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-10-judge-task.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-10-judge-task.md) | research | — |
 | [2026-10-18-build-TOOL-aScoutedSeam-1-11-prompt-method.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-11-prompt-method.md) | research | — |
+| [2026-10-18-build-TOOL-aScoutedSeam-1-12-judge-and-low.md](../build/2026-10-18-build-TOOL-aScoutedSeam-1-12-judge-and-low.md) | research | — |
 | [2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md) | research | TOOL-aScoutedSeam-1 KICK-aScoutedSeam-1 DEPL-aScoutedSeam-1 |
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md) | research | DEPL-aScoutedSeam-1 KICK-aScoutedSeam-1 TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-2 |
 
