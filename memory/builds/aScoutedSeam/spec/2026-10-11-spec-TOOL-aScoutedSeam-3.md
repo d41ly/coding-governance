@@ -17,11 +17,13 @@
 | [2026-10-18-build-TOOL-aScoutedSeam-1-13-system.py](../build/2026-10-18-build-TOOL-aScoutedSeam-1-13-system.py) | research | TOOL-aScoutedSeam-1 |
 | [2026-10-18-build-TOOL-aScoutedSeam-3-1-system-and-held-out.md](../build/2026-10-18-build-TOOL-aScoutedSeam-3-1-system-and-held-out.md) | research | — |
 | [2026-10-18-build-TOOL-aScoutedSeam-3-2-workflow-design-set.md](../build/2026-10-18-build-TOOL-aScoutedSeam-3-2-workflow-design-set.md) | research | — |
+| [2026-10-19-build-TOOL-aScoutedSeam-3-3-agent-prompt-principles.md](../build/2026-10-19-build-TOOL-aScoutedSeam-3-3-agent-prompt-principles.md) | research | — |
 | [2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md](../prompts/2026-10-13-prompt-TOOL-aScoutedSeam-1-brief.md) | research | TOOL-aScoutedSeam-1 KICK-aScoutedSeam-1 DEPL-aScoutedSeam-1 |
 | [2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md](../prompts/2026-10-18-prompt-DEPL-aScoutedSeam-1-brief.md) | research | DEPL-aScoutedSeam-1 KICK-aScoutedSeam-1 TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-2 |
 | [2026-10-18-prompt-TOOL-aScoutedSeam-3-1-spec-writer.md](../prompts/2026-10-18-prompt-TOOL-aScoutedSeam-3-1-spec-writer.md) | journal | — |
 | [2026-10-18-prompt-TOOL-aScoutedSeam-3-brief-2.md](../prompts/2026-10-18-prompt-TOOL-aScoutedSeam-3-brief-2.md) | research | TOOL-aScoutedSeam-1 |
 | [2026-10-18-prompt-TOOL-aScoutedSeam-3-brief.md](../prompts/2026-10-18-prompt-TOOL-aScoutedSeam-3-brief.md) | research | — |
+| [2026-10-19-prompt-TOOL-aScoutedSeam-3-brief-3.md](../prompts/2026-10-19-prompt-TOOL-aScoutedSeam-3-brief-3.md) | research | — |
 
 <!-- /gen:spec-records -->
 
