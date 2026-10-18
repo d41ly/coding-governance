@@ -8489,6 +8489,64 @@ L.insert_before("\n## Instruments\n", """
 L.save()
 ````
 
+### `fence_probe.py`
+
+A refuted hypothesis, kept: the instruments record read as a design round after the fold, and the atlas's toggle-on-any-fence reading was suspected. Against a length-aware reading it differs on no record, so the cause was a section title the decision pattern took, since retitled.
+
+````python
+"""The atlas's fence class, measured: for each design record, the headings its toggle-on-any-``` reading takes against
+those a length-aware reading takes (CommonMark: a fence closes only on a fence line at least as long as the opener).
+Reads the build folder's records; writes nothing.
+
+Usage: python -X utf8 fence_probe.py   (from the worktree root)
+"""
+import pathlib
+import re
+
+HEAD = re.compile(r"^(#{2,3}) (.+)$")
+
+
+def naive(lines):
+    out, fence = set(), False
+    for i, ln in enumerate(lines):
+        if ln.lstrip().startswith("```"):
+            fence = not fence
+            continue
+        if not fence and HEAD.match(ln):
+            out.add(i)
+    return out
+
+
+def aware(lines):
+    out, fence = set(), ""
+    for i, ln in enumerate(lines):
+        m = re.match(r"^\s{0,3}(`{3,}|~{3,})(.*)$", ln)
+        if m and not fence:
+            fence = m.group(1)
+            continue
+        if m and fence and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) and not m.group(2).strip():
+            fence = ""
+            continue
+        if not fence and HEAD.match(ln):
+            out.add(i)
+    return out
+
+
+total = 0
+for p in sorted(pathlib.Path("memory/builds/dClosedLoop").rglob("*.md")):
+    lines = p.read_text(encoding="utf-8").split("\n")
+    a, b = naive(lines), aware(lines)
+    if a != b:
+        total += 1
+        extra, missed = sorted(a - b), sorted(b - a)
+        print(f"{p.name}: naive reads {len(extra)} heading(s) inside a fence, misses {len(missed)} real one(s)")
+        for i in extra[:3]:
+            print(f"    read  :{i + 1} {lines[i][:90]}")
+        for i in missed[:3]:
+            print(f"    missed:{i + 1} {lines[i][:90]}")
+print(f"records whose readings differ: {total}")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row.
@@ -8738,6 +8796,9 @@ MINE = [
     ("away/fold_answers_record.py", "Writes the answers into the away-pass record: dispatch 113, `[answers]`, "
      "`[folded-answers]` and the summaries the answers made wrong."),
     ("away/log_answers.py", "The session log's dispatch 113 row, its agent lines and the fold's event."),
+    ("away/fence_probe.py", "A refuted hypothesis, kept: the instruments record read as a design round after the fold, "
+     "and the atlas's toggle-on-any-fence reading was suspected. Against a length-aware reading it differs on no "
+     "record, so the cause was a section title the decision pattern took, since retitled."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row."),
     ("night/record_instruments.py", "This record's own writer."),
@@ -8859,7 +8920,7 @@ The predicate after the fold, its purpose lines left out:
 The arm's two plants are re-run in `[plants]`, and the map's green run is in `[final]`.
 """)
 parts.append("""
-## [answers-fold] The owner's answers, folded: the register's tally program and the one red run
+## [answers-fold] The fold's tally program and its one red run
 
 The fold runs the gap register's tally instrument from a file, its awk program unchanged:
 
@@ -9528,7 +9589,7 @@ node keys scanned: 2275; purposes naming an adopter: 8
 The arm's two plants are re-run in `[plants]`, and the map's green run is in `[final]`.
 
 
-## [answers-fold] The owner's answers, folded: the register's tally program and the one red run
+## [answers-fold] The fold's tally program and its one red run
 
 The fold runs the gap register's tally instrument from a file, its awk program unchanged:
 
@@ -9726,13 +9787,13 @@ rc 1
 
 ````text
 $ design map
-map: 2371 nodes in 30 namespaces; 30799 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1603, derived 277, pending 491
+map: 2373 nodes in 30 namespaces; 30877 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1605, derived 277, pending 491
 map: no stale facts read 51 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 167 records, 2851 sections, 189 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 167 records, 2869 sections, 190 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
