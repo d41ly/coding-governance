@@ -177,6 +177,8 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 113 | gov-researcher, at the owner's medium effort | AP-17's future plan and AP-19's interpreter floor, asked while the owner answered the away pass's forks | `prompts/2026-10-18-prompt-PLAY-dClosedLoop-1-15-researcher.md` | 1799cb98 | returned, 14m27s, 69.3k out: keep 3.11 and raise it to 3.12 by 2027-10; macOS and pwsh-launch planned behind triggers; AP-31 to AP-35 raised | `build/2026-10-18-build-PLAY-dClosedLoop-1-research-python-floor.md` |
 | 114 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run A of two | The answers fold's closing review, run twice at the owner's word: `fe3d09aba` over `a9b00addd` | the args, built by `build_args_answers.py` in the instruments record | 1799cb98 | returned as `wf_663c6465-b15`, CLEAN WITH FIXES, 11 of 15 confirmed, 11 items, 2 high | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-answers-fold-a.md` |
 | 115 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The answers fold's closing review, run twice at the owner's word: `fe3d09aba` over `a9b00addd` | the args, built by `build_args_answers.py` in the instruments record | 1799cb98 | returned as `wf_7b253e00-228`, CLEAN WITH FIXES, 12 of 17 confirmed, 11 items, 1 high | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-answers-fold-b.md` |
+| 116 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses (coherence, grounding, reuse, blast-radius, failure-envelope) each with a shape note, five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run A of two | The whole-design shape audit the owner asked for: v2, the gap register and the memory plan at `89e44048f`, read whole | the args, built by `build_args_shape.py` | 1799cb98 | returned as `wf_0dd3b79b-986`, CLEAN WITH FIXES, 45 of 49 confirmed, 45 items, 4 high | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-shape-audit-a.md` |
+| 117 | `tier2-review.js`, spec audit, full: five `gov-spec-reviewer` lenses (coherence, grounding, reuse, blast-radius, failure-envelope) each with a shape note, five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The whole-design shape audit the owner asked for: v2, the gap register and the memory plan at `89e44048f`, read whole | the args, built by `build_args_shape.py` | 1799cb98 | returned as `wf_359adbd0-0d7`, CLEAN WITH FIXES, 53 of 56 confirmed, 46 items, 5 high | `reviews/2026-10-18-review-PLAY-dClosedLoop-1-shape-audit-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1312,6 +1314,59 @@ The answers fold's closing review, dispatches 114 and 115, derived from each run
 - returned — gov-synthesizer · wrote 1 file · 1m47s · 14.9k out · run wf_7b253e00-228/a58fa186edfc13f5b
 ```
 
+The whole-design shape audit, dispatches 116 and 117, derived from each run the same way:
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_0dd3b79b-986/a5118a366654a392e
+- returned — workflow-subagent · wrote 0 files · 14s · 1.2k out · run wf_0dd3b79b-986/a5118a366654a392e
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:coherence · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_0dd3b79b-986/a0185973717a31658
+- returned — gov-spec-reviewer · wrote 0 files · 6m21s · 33.0k out · run wf_0dd3b79b-986/a0185973717a31658
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:grounding · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_0dd3b79b-986/a8a6cd95e6d61a8ca
+- returned — gov-spec-reviewer · wrote 0 files · 7m37s · 36.6k out · run wf_0dd3b79b-986/a8a6cd95e6d61a8ca
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:reuse · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_0dd3b79b-986/a0ecc4e27a8439219
+- returned — gov-spec-reviewer · wrote 0 files · 6m28s · 30.7k out · run wf_0dd3b79b-986/a0ecc4e27a8439219
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:blast-radius · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_0dd3b79b-986/a1c33686a016b606c
+- returned — gov-spec-reviewer · wrote 0 files · 7m33s · 39.0k out · run wf_0dd3b79b-986/a1c33686a016b606c
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:failure-envelope · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_0dd3b79b-986/a01d8767958ae026f
+- returned — gov-spec-reviewer · wrote 0 files · 8m36s · 43.0k out · run wf_0dd3b79b-986/a01d8767958ae026f
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-1-10 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_0dd3b79b-986/aee7ef662ae6b481e
+- returned — gov-skeptic · wrote 0 files · 2m46s · 12.9k out · run wf_0dd3b79b-986/aee7ef662ae6b481e
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-11-20 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_0dd3b79b-986/a19da06c9b137d436
+- returned — gov-skeptic · wrote 0 files · 2m51s · 15.4k out · run wf_0dd3b79b-986/a19da06c9b137d436
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-21-30 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_0dd3b79b-986/ab62a5b9fdbafaae2
+- returned — gov-skeptic · wrote 0 files · 2m51s · 14.3k out · run wf_0dd3b79b-986/ab62a5b9fdbafaae2
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-31-40 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_0dd3b79b-986/aea5adcbaf5635a43
+- returned — gov-skeptic · wrote 0 files · 3m01s · 15.6k out · run wf_0dd3b79b-986/aea5adcbaf5635a43
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-41-49 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_0dd3b79b-986/aed8e451490463b62
+- returned — gov-skeptic · wrote 0 files · 2m03s · 9.6k out · run wf_0dd3b79b-986/aed8e451490463b62
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_0dd3b79b-986/a745bcc0cb3bbc9e1
+- returned — gov-synthesizer · wrote 1 file · 4m49s · 40.4k out · run wf_0dd3b79b-986/a745bcc0cb3bbc9e1
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_359adbd0-0d7/af8b1e37f55b49e6b
+- returned — workflow-subagent · wrote 0 files · 12s · 1.2k out · run wf_359adbd0-0d7/af8b1e37f55b49e6b
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:coherence · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_359adbd0-0d7/a6c58e716bac6db50
+- returned — gov-spec-reviewer · wrote 0 files · 9m17s · 51.6k out · run wf_359adbd0-0d7/a6c58e716bac6db50
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:grounding · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_359adbd0-0d7/af4008c3bac70dd97
+- returned — gov-spec-reviewer · wrote 0 files · 8m51s · 48.2k out · run wf_359adbd0-0d7/af4008c3bac70dd97
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:reuse · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_359adbd0-0d7/afd7ceb927f34d2d2
+- returned — gov-spec-reviewer · wrote 0 files · 5m33s · 29.4k out · run wf_359adbd0-0d7/afd7ceb927f34d2d2
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:blast-radius · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_359adbd0-0d7/a7faeeefef4a82c6d
+- returned — gov-spec-reviewer · wrote 0 files · 5m07s · 27.1k out · run wf_359adbd0-0d7/a7faeeefef4a82c6d
+- agent — gov-spec-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, find:failure-envelope · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_359adbd0-0d7/a5138e87452d3aa99
+- returned — gov-spec-reviewer · wrote 0 files · 10m27s · 46.7k out · run wf_359adbd0-0d7/a5138e87452d3aa99
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-1-12 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_359adbd0-0d7/a95cc7122a62377e9
+- returned — gov-skeptic · wrote 0 files · 2m21s · 12.7k out · run wf_359adbd0-0d7/a95cc7122a62377e9
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-13-24 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_359adbd0-0d7/a783b946a1bc1eaac
+- returned — gov-skeptic · wrote 0 files · 2m52s · 15.7k out · run wf_359adbd0-0d7/a783b946a1bc1eaac
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-25-36 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_359adbd0-0d7/afa5a1544ba8a3a8d
+- returned — gov-skeptic · wrote 0 files · 2m51s · 15.0k out · run wf_359adbd0-0d7/afa5a1544ba8a3a8d
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-37-48 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_359adbd0-0d7/a444ef4be49381f6c
+- returned — gov-skeptic · wrote 0 files · 2m52s · 15.8k out · run wf_359adbd0-0d7/a444ef4be49381f6c
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, verify:ids-49-56 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_359adbd0-0d7/ab37e304fcf4c08c7
+- returned — gov-skeptic · wrote 0 files · 2m03s · 10.4k out · run wf_359adbd0-0d7/ab37e304fcf4c08c7
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, spec-audit round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_359adbd0-0d7/a96366825e9613236
+- returned — gov-synthesizer · wrote 1 file · 5m18s · 44.2k out · run wf_359adbd0-0d7/a96366825e9613236
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -2264,6 +2319,14 @@ The answers fold's closing review, dispatches 114 and 115, derived from each run
   high, one of them by run A alone, and all are folded: the floor's enforcement and gov's own CI move into
   dSafePassage, the credential rule splits its classes, and the atlas and the recorder gain gates. The critical path is
   196 units.
+
+- 2026-10-18 and 2026-10-19, session 1799cb98: the owner asked "Can we review the entire design's shape for any gaps
+  that may be left?" and chose two full runs at medium. agent-cap refused the first launch, as on 2026-10-15: this
+  build's README is prompt-authorized, so its own `spec-audit:` key admits nothing. The same one-off admission the
+  owner chose then was set around each launch and restored: in the working tree only, `SPEC_AUDIT_DEFAULT` set to the
+  day's date and the README's `spec-audit:` line set aside, both returned to HEAD the moment the run was admitted,
+  `git diff --quiet` clean each time, nothing committed. Run A, dispatch 116, returned 45 of 49 confirmed with 4 high;
+  run B, dispatch 117, 53 of 56 with 5 high items. `build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md` maps the 105 findings onto 71 defects.
 
 ## Instruments
 
