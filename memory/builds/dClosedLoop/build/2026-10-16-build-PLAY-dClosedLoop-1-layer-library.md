@@ -329,7 +329,7 @@ as a clean search.
 | The map | the owner's views `MAP.md`, `CARDS.md` and each symbol's callers | none rendered; `LIVE.md` and the build views stay |
 | Recall | the planner's recall slot | the research view and the decision log, selected by build: the plan's parents and the builds `plan.dedupe` matched |
 | Recall | `design.seams`' recall sources | none; the scout's tree search stands |
-| Recall | the read hook under `annotations.grammar=pushed-at-read` | the value cannot be served, so `policy.on-missing-expansion` refuses it, or under `fallback-reported` falls back to `required` and says so |
+| Recall | the read hook under `annotations.grammar=pushed-at-read` | the value cannot be served, so `policy-file.on-missing-expansion` refuses it, or under `fallback-reported` falls back to `required` and says so |
 | Recall | the `/memory-recall` Skill and its journal | not rendered, and no journal is kept |
 | The lexicon | naming at Design and Build | the core's tag-shape check stands alone, and the naming slot names the lexicon as absent |
 | The lexicon | `lexicon.pin` | inert, and reported as inert when set |

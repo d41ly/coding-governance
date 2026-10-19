@@ -845,7 +845,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   This is the one list of them, and other records point here.
   They are validated against the registry, never against a literal enumeration. A name no installed
   layer registers is refused, or falls back to the built-in with a report, as
-  `policy.on-missing-expansion` says.
+  `policy-file.on-missing-expansion` says.
 - Added by the expansion round (`build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md`):
   - cadence items, the tenth point above. Each event a cadence item names is produced by a core
     record, such as `landed` by the landing record;

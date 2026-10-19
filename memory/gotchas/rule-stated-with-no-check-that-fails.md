@@ -58,6 +58,12 @@ It bit again in the owner's answers' closing review, 2026-10-19
 The change feed's ordered, rebuilt-equal promise, the mirror's never-read-by-a-verdict invariant and the pass push's
 freedom from the lander's lock each landed with no case that could fail.
 
+It bit again in the tag grammar, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md` `[renamed]`).
+The grammar forbade a namespace word as a name's first segment, and nothing checked it: the tags research named three
+policy keys that broke it and called renaming them free, and three days later four keys and every repository row's
+owner segment still broke it. The core's shape check now refuses one, each rule planted red.
+
 ## The fix
 
 - A rule lands with the check that fails on its breach, named in the same commit: a pair rule in the

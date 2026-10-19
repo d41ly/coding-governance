@@ -185,8 +185,8 @@ superseded: re-run on the committed tree, it reds on the routes row it cannot re
 | dKeptSession | `intake` | dWellOiledMachine | homonym | the mailbox's `intake` message kind, not the intake record kind |
 | dFairHearing | `class` | dTotalRecall | homonym | the `class:` prefix of `review.report`'s disposition grammar, not the `class` tag namespace |
 | dFairHearing | `preset` | dKeptSession | homonym | the review harness's own `preset` argument, not the policy key |
-| dGroundRules | `policy.guard` | dDeclaredLoop | not a use | the minimal guard enforces the key's default, owner-only, without reading the key |
-| dGroundRules | `policy.proof` | dDeclaredLoop | not a use | the minimal guard enforces the key's default, the TTY proof, without reading the key |
+| dGroundRules | `policy-file.guard` | dDeclaredLoop | not a use | the minimal guard enforces the key's default, owner-only, without reading the key |
+| dGroundRules | `policy-file.proof` | dDeclaredLoop | not a use | the minimal guard enforces the key's default, the TTY proof, without reading the key |
 | dOrderedCharter | `check` | dWitnessedBar | homonym | the resolver's `check` verb beside `show`, `where` and `refs`, not the `check` tag namespace |
 | dOrderedCharter | `memory.map-purpose` | dTotalRecall | moved | the review that reads the key is dTotalRecall's PM-5 unit; the row names the key only to say so (H1) |
 | dRankedPlan | `entry.intake` | dWellOiledMachine | tolerance | RC-9's fallback: dDeclaredLoop's owner gate (AF-1), witness "intake not installed", until dWellOiledMachine lands the hook and drains it |

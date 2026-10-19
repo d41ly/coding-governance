@@ -430,3 +430,11 @@ owner with the recommendation to admit the segment as an exception, the owner an
 "rename that segment to conform to tag grammar". The segment is `adopter` in every tag form above, in v2, the systems
 record, the memory plan and the adopter-instructions record, and a repository's own policy keys sit under `adopter.`
 in the policy file. The `repo` namespace keeps a repository's prose units.
+
+The same rule caught four of the catalogue's keys, whose first segment is `policy`. Asked whether to rename them and
+add a check, the owner answered, verbatim: "yes, rename them and add the check but also -  shouldn't lexicon integrate with the tag grammar? Will this be accounted for?" The keys are `policy-file.guard`, `policy-file.proof`,
+`policy-file.on-invalid` and `policy-file.on-missing-expansion`. dOrderedCharter's core shape check now states the
+grammar's rules and refuses a name whose first segment is a namespace word, reading the namespace words from the
+registry, and dDeclaredLoop arms it over every catalogue key. The lexicon was already designed to check tag names at
+the name-check point (dMindYourWords). It now grades every tag's name and policy key, answers tag names through
+`--suggest`, and reads the namespace words from the same registry, and `gap-lex-10` holds it to that.

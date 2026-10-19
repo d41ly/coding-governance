@@ -146,7 +146,10 @@ owner.
 
 **The owner's answer, 2026-10-19, verbatim:** "rename that segment to conform to tag grammar". The segment is
 `adopter`, renamed in every design record that carried it; the adoption record's `[renamed]` gives the account. The
-four `policy.*` keys are a separate question, put to the owner with the answer.
+four `policy.*` keys were a separate question, put to the owner with the answer. The owner answered, verbatim:
+"yes, rename them and add the check but also -  shouldn't lexicon integrate with the tag grammar? Will this be accounted for?" The keys are
+`policy-file.*`, dOrderedCharter's shape check enforces the rule, and the lexicon's tag-name check reads the same
+namespace words.
 
 ## [folded] Every defect folded, 2026-10-19
 

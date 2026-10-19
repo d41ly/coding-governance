@@ -556,7 +556,7 @@ revision note of 2026-10-16 supersedes them.
 - One command adds, edits, removes, lists, renders and checks units. It extends the seams that already
   serve this text: `render_playbook.py` with `adopt-playbook.sh --check`, the placeholder registry, and
   the roles kit's house overlay.
-- The command proves its caller is the owner by `instructions.proof`, as `policy.proof` does for
+- The command proves its caller is the owner by `instructions.proof`, as `policy-file.proof` does for
   policy writes: `tty-cli` by default, with `signed` and `both` allowed, and presets never touch it.
   An agent's shell call cannot pass the proof, so an agent only proposes a change, through the flow
   (P20).

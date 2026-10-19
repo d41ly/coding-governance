@@ -287,7 +287,7 @@ builds come from requests alone (P6). A stage review keeps its cost in its own r
 slot renders not installed. The five core signals still gate, and the two lexicon signals gate
 wherever the lexicon is installed. Reaping happens only at Runtime's act ceiling.
 `build.closes: at-landing-maintain-owns` is refused, or falls back with a report, as
-`policy.on-missing-expansion` says (LR-4).
+`policy-file.on-missing-expansion` says (LR-4).
 
 ### [design-integrations] Integrations
 
@@ -343,7 +343,7 @@ files: `workflow`, the default, pins `.github/workflows/remote-ci.yml`, and `dis
 `tools/run-gates/run-gates.sh`, `tools/gate-legs.json` and `.githooks/gate-env.sh`.
 
 **The pin** is a guarded value. Only the owner's guarded command writes `verdict.remote.pin`, never an
-agent, whatever `policy.guard` allows for other keys. `verdict.remote.trust` decides what a pinned
+agent, whatever `policy-file.guard` allows for other keys. `verdict.remote.trust` decides what a pinned
 file that differs does:
 - `pinned-workflow`, the default: no verdict stands, and an owner item asks to re-pin or to refuse;
 - `owner-reviews-workflow-change`: the owner item opens at once. Approved, the guarded command
@@ -366,7 +366,7 @@ Remote CI's verdict is read at two points:
   node that read it, so the pre-push hook and the `default-branch-red` event read one witness.
 
 With no `remote-ci` backend registered, either value is refused, or falls back to the local run with
-a report, as `policy.on-missing-expansion` says.
+a report, as `policy-file.on-missing-expansion` says.
 
 **The release**, a program per environment, opened when `deploy.core` is green and
 `release.environments` is not empty. Each pass picks one SHA, and its records are keyed by (that SHA,
@@ -411,7 +411,7 @@ are the built-ins.
 
 **Absent.** The verdict is the local hook or the core's `peer-node`, the host is the node tick, the
 owner hears through the terminal, and a build closes at landing with no release. A value on a core
-key that needs integrations is refused, or falls back with a report, as `policy.on-missing-expansion`
+key that needs integrations is refused, or falls back with a report, as `policy-file.on-missing-expansion`
 says (LR-4): `build.closes: after-release-verifies`, `verdict: remote-ci`, `GATE_POST_MERGE=ci`, and
 a host or channel name only integrations registers. So is `after-release-verifies` with
 integrations installed and `release.environments` empty, since no program then fills the release
@@ -475,7 +475,7 @@ Test's leg-pack point. It reads the newest committed currency record offline, an
 receipt, currency unmeasured". The keys distribution owns are unread: `kits.cadence`, `kits.host`,
 `kits.watch-cadence`, `deploy.currency`, `currency.max-behind`, `currency.on-behind` and
 `install.from`. Their slots render "not installed: distribution", and no preset is refused for them,
-because the core reads none of them. `policy.on-missing-expansion` governs only a value, on a key the
+because the core reads none of them. `policy-file.on-missing-expansion` governs only a value, on a key the
 core reads, that selects an expansion's behaviour (LR-4). The render and `--check` of `AGENTS.md` and
 its aliases still run, because they are core.
 

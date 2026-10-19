@@ -365,7 +365,7 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 | `deploy.distill` | command, idempotent | `deploy.record` | confirms that the decision-log rows `build.distill` wrote are in the log at the landed SHA | the rows at the landed SHA, joined one to one on (build, fork id) to the build's major forks | `deploy.recommend`; rows missing at the landed SHA → a patch build through the entry-point table's post-close row, as `deploy.core`'s red does, its append keyed by (build, fork id) so it stays idempotent | dShippedRelease |
 | `deploy.recommend` | command | `deploy.distill` | scores the recommendation, signals only, since core Deploy has no producing role | the recommendation record | the landing review where declared, otherwise `deploy.notify` | dDeclaredLoop |
 | `deploy.notify` | command, idempotent | `deploy.recommend`, and the landing review where it ran | posts `landed` to dependents, keyed by the landing SHA, so a repeated post is a no-op | the mailbox posts | `deploy.released` and `deploy.snapshot` | dShippedRelease |
-| `deploy.released` | command | `deploy.notify` | reads `build.closes`. Under `after-release-verifies`, it is an event wait: the release slot's exit record for the landed SHA, or for a later SHA that contains it, wakes it, once for each waiting build whose landed SHA it contains, and the supervisor runs each under that instance's cadence lease, since under `close-only` the build's lease is gone by then. Under the other two values, it passes at once | the wake's witness, keyed by (exit record id, build), naming the slot's exit record, with its SHA, environment and outcome, and the build it answered; under the other two values, the landing record's `build.closes` value | verified, or a pass → `deploy.close`, once `deploy.unlease` is done; held, rolled forward, rolled back, halted or unverified → the release hold's owner item, keyed by (build, landed SHA) and opened unless one is open, through the owner's notification adapter, since the build's mailbox may be closed, resolved as `run.on-owner-question` says: close unreleased, the outcome on the transition, or wait for a later release; no exit record within `build.release-ceiling`, which the supervisor's sweep watches → the same owner item; `release.environments` emptied, or integrations removed, after the landing → as `policy.on-missing-expansion` says | dShippedRelease |
+| `deploy.released` | command | `deploy.notify` | reads `build.closes`. Under `after-release-verifies`, it is an event wait: the release slot's exit record for the landed SHA, or for a later SHA that contains it, wakes it, once for each waiting build whose landed SHA it contains, and the supervisor runs each under that instance's cadence lease, since under `close-only` the build's lease is gone by then. Under the other two values, it passes at once | the wake's witness, keyed by (exit record id, build), naming the slot's exit record, with its SHA, environment and outcome, and the build it answered; under the other two values, the landing record's `build.closes` value | verified, or a pass → `deploy.close`, once `deploy.unlease` is done; held, rolled forward, rolled back, halted or unverified → the release hold's owner item, keyed by (build, landed SHA) and opened unless one is open, through the owner's notification adapter, since the build's mailbox may be closed, resolved as `run.on-owner-question` says: close unreleased, the outcome on the transition, or wait for a later release; no exit record within `build.release-ceiling`, which the supervisor's sweep watches → the same owner item; `release.environments` emptied, or integrations removed, after the landing → as `policy-file.on-missing-expansion` says | dShippedRelease |
 | `deploy.snapshot` | command, idempotent | `deploy.notify`, and under `build.release-hold: whole-close`, `deploy.released` | commits the card's terminal snapshot; an equal snapshot is a no-op | the snapshot commit | `deploy.unlease` | dShippedRelease |
 | `deploy.unlease` | command, idempotent | `deploy.snapshot` | deletes the build's lease refs, a missing ref counting as done, and closes its mailbox (`[rules]`) | the deleted refs, and the mailbox's messages in the folder | `deploy.close`, once `deploy.released` has passed | dShippedRelease |
 | `deploy.close` | command | `deploy.unlease` and `deploy.released` | records the transition, with the release outcome under `after-release-verifies`, minted under the build's claim ref, which is never pruned (layer-memory `[contract]`) | the transition record | the build is closed | dShippedRelease |
@@ -379,7 +379,7 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
   - under `ci`, the remote CI's result for the landed SHA is the witness, under integrations' witness
     rule. A red is written as the per-SHA verdict record and published as `refs/gov/bar-red` by the
     node that read it. With no `remote-ci` backend registered, `ci` is refused, or falls back to the
-    local run with a report, as `policy.on-missing-expansion` says;
+    local run with a report, as `policy-file.on-missing-expansion` says;
   - under `ci` with `verdict.remote.trust: app-only`, the remote result is a claim, not a witness, so
     `deploy.core` starts the local run, as under `local`, and advances only on it;
   - the verdict is read keyed by the landed SHA, from its per-SHA log, never from the single
@@ -428,10 +428,10 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
   verifies the landed SHA, or a later SHA that contains it. `build.release-hold` says what waits
   (RH-1): the close alone under `close-only`, the default, or the snapshot, the leases and the mailbox
   too under `whole-close`. It needs integrations with at least one environment listed; otherwise
-  `policy.on-missing-expansion` decides;
+  `policy-file.on-missing-expansion` decides;
 - `at-landing-maintain-owns` closes at landing, and observability's Maintain owns the release after
   it: its `release-verify-failed` run files a failed verify of the closed build as an owner item. It
-  needs observability; otherwise `policy.on-missing-expansion` decides.
+  needs observability; otherwise `policy-file.on-missing-expansion` decides.
 
 ## [breakpoint] The breakpoint: review at any boundary
 
@@ -670,7 +670,7 @@ Expansions meet only through the core (EX-1), so each item below attaches at a c
   - under any other value, it is an owner breakpoint at `plan.exit`.
 - **`build.closes`'s two other values exist only with their expansions.** A preset that sets one is
   refused when it is selected on an install without that expansion, so `strict` and `guarded` need
-  integrations (the owner's LR-4, `policy.on-missing-expansion`).
+  integrations (the owner's LR-4, `policy-file.on-missing-expansion`).
 - **Three questions were put to the owner** (`[open]`).
 
 ## [open] Asked, 2026-10-15

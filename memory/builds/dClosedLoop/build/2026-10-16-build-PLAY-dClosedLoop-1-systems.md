@@ -245,7 +245,11 @@ once dTotalRecall registers it (P33).
   `<doc> [<seg>]`, unique within its document. Ids keep memory's grammar: `FAMILY-<slug>-<seq>` and
   `gap-<area>-NN`. A first segment may not be a namespace word, so a repository row's tag carries the owner segment
   `adopter`, never `repo`, which names the namespace of a repository's units (revised 2026-10-19, the owner's answer:
-  "rename that segment to conform to tag grammar").
+  "rename that segment to conform to tag grammar"). The policy file's own keys are `policy-file.guard`,
+  `policy-file.proof`, `policy-file.on-invalid` and `policy-file.on-missing-expansion` for the same reason.
+  dOrderedCharter's core shape check refuses a name that breaks the rule in every registered namespace, policy
+  keys included, and the lexicon reads the same namespace words when it grades or suggests a tag's name
+  (revised 2026-10-19, the owner: "yes, rename them and add the check").
 - **Map keys** (revised 2026-10-17, PM-11): a map line keys a node by its native id where one exists,
   as `chain.dTotalRecall` and `principle.P27`, and by its tag otherwise. The resolver accepts both.
 - **Namespaces.** R-B's twelve, plus `section`, `doc`, `unit`, `field`, `leg`, `check`, `point`, `hook`,

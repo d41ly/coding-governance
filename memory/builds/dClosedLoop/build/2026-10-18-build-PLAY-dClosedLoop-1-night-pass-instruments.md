@@ -18856,6 +18856,307 @@ L.insert_before("\n## Instruments\n", """
 L.save()
 ````
 
+### `first_segment_probe.py`
+
+The first-segment rule run over the design's own population before the check was designed in: four of 239 catalogue keys broke it, no tag did; after the fold, none, the check's own planted red listed apart.
+
+````python
+"""Run the tag grammar's first-segment rule over the design's own population before the check is designed in: every
+catalogue key (a name in the `policy` namespace) and every backticked tag in the living design records whose namespace
+is registered. A name's first segment may not be a namespace word (the systems record's [design-tags]).
+
+The namespace words are read from the records, never typed here: R-B's twelve from v2's dOrderedCharter row and the
+rest from the systems record's Namespaces bullet. Placeholders (`<step>`) and wildcards are skipped. A planted example
+the design names as a red case is listed as such.
+
+Usage: python -X utf8 first_segment_probe.py   (from the worktree root); exit 1 on any breach outside a planted case
+"""
+import re
+import sys
+
+B = "memory/builds/dClosedLoop/build/"
+V = open(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md", encoding="utf-8").read()
+Y = open(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md", encoding="utf-8").read()
+
+twelve = re.search(r"the namespaced tag system \(([^)]*)\)", V)
+bullet = re.search(r"- \*\*Namespaces\.\*\* R-B's twelve, plus (.*?)\. Each namespace is a row", Y, flags=re.S)
+if not twelve or not bullet:
+    sys.exit("cannot read the namespace words from the records")
+words = {w.strip() for w in twelve.group(1).split(",")} | set(re.findall(r"`([a-z]+)`", bullet.group(1)))
+print(f"namespace words {len(words)}: {', '.join(sorted(words))}")
+
+section = re.search(r"^## \[policies\].*?(?=^## \[)", V, flags=re.M | re.S).group(0)
+keys = [m.group(1) for m in re.finditer(r"^\| `([a-z][a-z0-9.<>*-]*)` \|", section, flags=re.M)]
+bad_keys = [k for k in keys if k.split(".")[0] in words]
+print(f"catalogue keys {len(keys)}, opening with a namespace word {len(bad_keys)}: {', '.join(bad_keys) or 'none'}")
+
+LIVING = ["2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md", "2026-10-16-build-PLAY-dClosedLoop-1-systems.md",
+          "2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md",
+          "2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md",
+          "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md", "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md",
+          "2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md", "2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md",
+          "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md", "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md",
+          "2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md", "2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md",
+          "2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md", "2026-10-14-build-PLAY-dClosedLoop-1-coordination.md"]
+tags, breaches, planted = set(), [], []
+for name in LIVING:
+    text = open(B + name, encoding="utf-8").read()
+    for m in re.finditer(r"`([a-z]+)\.([a-z0-9<>*-]+)((?:\.[a-z0-9<>*-]+)*)`", text):
+        ns, first = m.group(1), m.group(2)
+        if ns not in words or first.startswith("<") or first == "*":
+            continue
+        tags.add(m.group(0))
+        if first in words:
+            ctx = text[max(0, m.start() - 120):m.start()]
+            (planted if "planted" in ctx else breaches).append(f"{name.split('-1-', 1)[1]}: {m.group(0)}")
+print(f"tags read {len(tags)} in {len(LIVING)} living records; breaches {len(breaches)}; planted reds {len(planted)}")
+for b in breaches:
+    print(f"  BREACH {b}")
+for p in planted:
+    print(f"  planted {p}")
+sys.exit(1 if bad_keys or breaches else 0)
+````
+
+### `where_keys.py`
+
+Each use of the four `policy.*` keys with its section, to judge living text from a dated note.
+
+````python
+"""For each use of the four `policy.*` keys in a record, print its line, its section heading and the line's start, so
+each use can be judged living text or a dated note."""
+import re
+import sys
+
+PAT = re.compile(r"policy\.(guard|proof|on-invalid|on-missing-expansion)\b")
+for path in sys.argv[1:]:
+    lines = open(path, encoding="utf-8").read().split("\n")
+    head = "(top)"
+    for n, line in enumerate(lines, 1):
+        if line.startswith("## "):
+            head = line[:60]
+        for m in PAT.finditer(line):
+            print(f"{path.rsplit('-', 1)[-1][:22]:22} {n:5} {head:60} | {line[:70]}")
+````
+
+### `fold_tag_grammar.py`
+
+The owner's second tag-grammar answer: the four keys renamed `policy-file.*` in the living text, the core shape check and its arming over the catalogue, the lexicon's tag-name check widened, `gap-lex-10`, dry-run on a full copy of the tree first.
+
+````python
+"""The owner's second tag-grammar answer, 2026-10-19, verbatim: "yes, rename them and add the check but also -  shouldn't
+lexicon integrate with the tag grammar? Will this be accounted for?"
+
+1. The four catalogue keys whose first segment is the namespace word `policy` become `policy-file.guard`,
+   `policy-file.proof`, `policy-file.on-invalid` and `policy-file.on-missing-expansion`, in the living design text.
+   Dated text keeps them: v2's revision notes, flow-steps' `[revised]`, layer-library's `[settled]`, the recut's
+   recorded probe runs, and every review, comparison, walk, round, research and prompt record.
+2. The check: dOrderedCharter's core shape check states the tag grammar's rules, the first-segment rule among them,
+   reads the namespace words from the registry and plants a red for each; dDeclaredLoop arms it over every catalogue
+   key when it registers the `policy` namespace.
+3. The lexicon: the design already registers the lexicon's tag-name vocabulary check at dOrderedCharter's name-check
+   point (dMindYourWords). It now grades every tag's name, policy keys and the overlay's rows among them, reads the
+   namespace words from the same registry, and answers a tag's name through `--suggest`; `gap-lex-10` records that
+   today's lexicon grades four code surfaces only.
+
+Usage: python -X utf8 fold_tag_grammar.py   (from the worktree root)
+"""
+import collections
+import pathlib
+import re
+import sys
+import textwrap
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+WORDS = ("yes, rename them and add the check but also -  shouldn't lexicon integrate with the tag grammar? Will this be "
+         "accounted for?")
+RV = "the owner's tag-grammar answers"
+KEY = re.compile(r"\bpolicy\.(guard|proof|on-invalid|on-missing-expansion)\b")
+
+
+def rename_keys(rec, keep, expect, label):
+    """Rename the four keys on every line `keep(n, line)` does not hold back; return the count."""
+    lines = rec.text.split("\n")
+    head, done, held = "", 0, 0
+    for i, line in enumerate(lines):
+        if line.startswith("## "):
+            head = line
+        hits = len(KEY.findall(line))
+        if not hits:
+            continue
+        if keep(i + 1, line, head):
+            held += hits
+            continue
+        lines[i] = KEY.sub(r"policy-file.\1", line)
+        done += hits
+    if done != expect:
+        sys.exit(f"{rec.path.name}: {label}: {done} renamed, {expect} expected ({held} held as dated)")
+    rec.text = "\n".join(lines)
+    rec.done += 1
+    print(f"{rec.path.name}: {done} renamed, {held} held as dated")
+
+
+# ---------------------------------------------------------------- 1. the rename
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+first_section = V.text.split("\n").index("## [layers] The product's layers") + 1
+rename_keys(V, lambda n, line, head: n < first_section, 17, "v2")
+F = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+rename_keys(F, lambda n, line, head: head.startswith("## [revised]"), 5, "flow-steps")
+F.save()
+for name, n in (("2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md", 5),
+                ("2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md", 1),
+                ("2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md", 1)):
+    R = Record(B + name)
+    rename_keys(R, lambda n, line, head: False, n, name)
+    R.save()
+Lb = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-layer-library.md")
+rename_keys(Lb, lambda n, line, head: head.startswith("## [settled]"), 1, "layer-library")
+Lb.save()
+Rc = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md")
+rename_keys(Rc, lambda n, line, head: not line.startswith("| dGroundRules | `policy."), 2, "recut tolerances")
+Rc.save()
+G1 = Record("memory/gotchas/core-depends-on-an-optional-part.md")
+rename_keys(G1, lambda n, line, head: not head.startswith("## The fix"), 1, "core-depends fix")
+G1.save()
+
+# ---------------------------------------------------------------- 2. the check, and 3. the lexicon, in v2
+V.sub("its own joined both ways over non-empty populations, its names shape-checked in the core and the lexicon's "
+      "vocabulary added at an extension point",
+      "its own joined both ways over non-empty populations, its names shape-checked in the core against the tag grammar "
+      "the systems record states, every tag in a registered namespace, every segment of the `seg` shape, the tag at "
+      "most 64 B and no name whose first segment is a namespace word, the namespace words read from the registry and "
+      "never typed beside it, each later namespace's tags joining the check as its build arms its join, each rule seen "
+      "red on a planted tag in a namespace this build registers, `practice.repo.x` among them, and green over every tag "
+      "its own namespaces hold, and the lexicon's vocabulary added at the name-check point, the registry's namespace "
+      f"words handed to it ({RV})", "dOrderedCharter shape check")
+V.sub("the `step`, `item`, `policy` and `command` tag namespaces, with their extractors",
+      "the `step`, `item`, `policy` and `command` tag namespaces, with their extractors, each joining the core's "
+      "tag-shape check, every catalogue key's name among the `policy` namespace's tags, seen red on a planted key whose "
+      f"first segment is a namespace word and green over the catalogue ({RV})", "dDeclaredLoop namespaces")
+V.sub("the tag-name vocabulary check, registered at the instruction layer's name-check point that dOrderedCharter builds",
+      "the tag-name vocabulary check, registered at the instruction layer's name-check point that dOrderedCharter "
+      "builds, grading the verbs and nouns of every tag's name, policy keys and the overlay's rows among them, against "
+      "the declared families and the noun canon, the namespace words read from dOrderedCharter's registry and never "
+      "declared in `.lexicon.conf`, and `--suggest` answering a tag's name as it answers a function's, with "
+      "`--as tag.<namespace>`, never proposing a name whose first segment is a namespace word, seen red on a planted "
+      "tag whose name takes an undeclared verb, on a planted request for a name opening with a namespace word answered "
+      f"with a conforming one, and on a namespace word added to `.lexicon.conf` ({RV}, `gap-lex-10`)",
+      "dMindYourWords tag check")
+V.sub("gap-lex-08, gap-lex-09 |", "gap-lex-08, gap-lex-09, gap-lex-10 |", "dMindYourWords gaps")
+V.save()
+
+# ---------------------------------------------------------------- the systems record and the lexicon record
+Y = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+Y.sub("  \"rename that segment to conform to tag grammar\").",
+      "  \"rename that segment to conform to tag grammar\"). The policy file's own keys are `policy-file.guard`,\n"
+      "  `policy-file.proof`, `policy-file.on-invalid` and `policy-file.on-missing-expansion` for the same reason.\n"
+      "  dOrderedCharter's core shape check refuses a name that breaks the rule in every registered namespace, policy\n"
+      "  keys included, and the lexicon reads the same namespace words when it grades or suggests a tag's name\n"
+      "  (revised 2026-10-19, the owner: \"yes, rename them and add the check\").", "grammar rule")
+Y.save()
+X = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md")
+X.sub("  name-check point, which dOrderedCharter builds: it checks the verbs and nouns in tag leaves. Where the\n"
+      "  lexicon is absent, the core's tag-shape check stands alone.",
+      "  name-check point, which dOrderedCharter builds: it checks the verbs and nouns in tag leaves. Where the\n"
+      "  lexicon is absent, the core's tag-shape check stands alone. The check grades every tag's name, policy keys\n"
+      "  and the overlay's rows among them, and `--suggest` answers a tag's name as it answers a function's, with\n"
+      "  `--as tag.<namespace>`. The namespace words come from dOrderedCharter's registry, never from `.lexicon.conf`,\n"
+      "  so the core's shape check and the lexicon's answers never disagree on which words may open a name (revised\n"
+      "  2026-10-19, the owner: \"shouldn't lexicon integrate with the tag grammar? Will this be accounted for?\";\n"
+      "  `gap-lex-10`).", "tag vocabulary")
+X.save()
+
+# ---------------------------------------------------------------- the register: gap-lex-10
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+lines = G.text.split("\n")
+idx = [i for i, ln in enumerate(lines) if ln.startswith("| gap-lex-09 |")]
+if len(idx) != 1:
+    sys.exit(f"gap-lex-09: {len(idx)} rows")
+lines.insert(idx[0] + 1, "| gap-lex-10 | Lexicon | MED | The lexicon grades four code surfaces only, JavaScript and "
+             "Python functions, Python types and shell functions: no tag, conf key or policy key is named against the "
+             "declared vocabulary, and `--suggest` cannot answer one. Raised by the owner. | `.lexicon.conf` `CELLS:`, "
+             "four cells; the owner, 2026-10-19: \"shouldn't lexicon integrate with the tag grammar?\" | — |")
+G.text = "\n".join(lines)
+keys = re.findall(r"^\| (gap-[a-z]+-\d+) \| ([A-Za-z]+) \| (LOW|MED|HIGH) \|", G.text, flags=re.M)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+st, sv = collections.Counter(k[1] for k in keys), collections.Counter(k[2] for k in keys)
+if len(keys) != 354 or set(st) - set(ORDER):
+    sys.exit(f"{len(keys)} keys")
+F3 = "`" * 3
+G.text = G.text.rstrip("\n") + (
+    "\n\nRe-measured after the owner's tag-grammar answers added `gap-lex-10`\n"
+    "(`build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md` `[renamed]`), same instrument, over "
+    f"{len(keys)} keys:\n\n{F3}text\n" + " ".join(f"{s}={st[s]}" for s in ORDER) + "\n"
+    + " ".join(f"{s}={sv[s]}" for s in ("LOW", "MED", "HIGH")) + f"\n{F3}\n")
+G.done += 1
+G.save()
+
+# ---------------------------------------------------------------- the adoption record and the comparison record
+A = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md")
+A.text = A.text.rstrip("\n") + f"""
+
+The same rule caught four of the catalogue's keys, whose first segment is `policy`. Asked whether to rename them and
+add a check, the owner answered, verbatim: "{WORDS}" The keys are `policy-file.guard`, `policy-file.proof`,
+`policy-file.on-invalid` and `policy-file.on-missing-expansion`. dOrderedCharter's core shape check now states the
+grammar's rules and refuses a name whose first segment is a namespace word, reading the namespace words from the
+registry, and dDeclaredLoop arms it over every catalogue key. The lexicon was already designed to check tag names at
+the name-check point (dMindYourWords). It now grades every tag's name and policy key, answers tag names through
+`--suggest`, and reads the namespace words from the same registry, and `gap-lex-10` holds it to that.
+"""
+A.done += 1
+A.save()
+C = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md")
+C.sub("The\nfour `policy.*` keys are a separate question, put to the owner with the answer.",
+      "The\nfour `policy.*` keys were a separate question, put to the owner with the answer. The owner answered, "
+      f"verbatim:\n\"{WORDS}\" The keys are\n`policy-file.*`, dOrderedCharter's shape check enforces the rule, and the "
+      "lexicon's tag-name check reads the same\nnamespace words.", "second answer")
+C.save()
+
+# ---------------------------------------------------------------- the bug class's instance
+K = Record("memory/gotchas/rule-stated-with-no-check-that-fails.md")
+K.sub("\n## The fix\n",
+      "\nIt bit again in the tag grammar, 2026-10-19\n"
+      "(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md` `[renamed]`).\n"
+      + textwrap.fill("The grammar forbade a namespace word as a name's first segment, and nothing checked it: the tags "
+                      "research named three policy keys that broke it and called renaming them free, and three days "
+                      "later four keys and every repository row's owner segment still broke it. The core's shape check "
+                      "now refuses one, each rule planted red.", 118, break_long_words=False, break_on_hyphens=False)
+      + "\n\n## The fix\n", "instance")
+K.save()
+print("folded the owner's tag-grammar answers")
+````
+
+### `log_tag_grammar.py`
+
+The session log's event for the owner's second tag-grammar answer.
+
+````python
+"""The session log's event for the owner's second tag-grammar answer: the four keys, the check, the lexicon."""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-19, session 1799cb98: asked whether to rename the four catalogue keys whose first segment is `policy`, and
+  add a check, the owner answered, verbatim: "yes, rename them and add the check but also -  shouldn't lexicon
+  integrate with the tag grammar? Will this be accounted for?" A probe ran the first-segment rule over the design
+  first: four of 239 catalogue keys broke it, and no tag did after the owner segment's rename. The keys are
+  `policy-file.*` in the living design text. dOrderedCharter's core shape check states the grammar's rules, a red
+  planted for each, and dDeclaredLoop arms it over the catalogue. The lexicon's tag-name check, already designed at
+  the name-check point, now grades every tag's name and policy key, answers tag names through `--suggest` and reads
+  the namespace words from the same registry. `gap-lex-10` records that today's lexicon grades four code surfaces
+  only.
+""", "the tag-grammar event")
+L.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before.
@@ -19227,6 +19528,10 @@ MINE = [
     ('night2/tag/scan_repo_segment.py', "The owner's tag-grammar answer: lists every place the design records use `repo` as a segment in another namespace's tag, or as the policy file's table for a repository's own keys."),
     ('night2/tag/rename_repo_segment.py', 'The owner\'s tag-grammar answer, "rename that segment to conform to tag grammar": the owner segment renamed `adopter` in the design records, counts asserted, the scan finding none left, dry-run on a full copy of the tree first.'),
     ('night2/tag/log_rename.py', "The session log's event for the owner's tag-grammar answer."),
+    ('night2/tag/first_segment_probe.py', "The first-segment rule run over the design's own population before the check was designed in: four of 239 catalogue keys broke it, no tag did; after the fold, none, the check's own planted red listed apart."),
+    ('night2/tag/where_keys.py', 'Each use of the four `policy.*` keys with its section, to judge living text from a dated note.'),
+    ('night2/tag/fold_tag_grammar.py', "The owner's second tag-grammar answer: the four keys renamed `policy-file.*` in the living text, the core shape check and its arming over the catalogue, the lexicon's tag-name check widened, `gap-lex-10`, dry-run on a full copy of the tree first."),
+    ('night2/tag/log_tag_grammar.py', "The session log's event for the owner's second tag-grammar answer."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before."),
@@ -19383,6 +19688,14 @@ for p, want in WANT.items():
     plants.append(f"$ python atlas.py --check --plant {p}\n{out}\nrc {rc}")
     if rc != 1 or want not in out:
         sys.exit(f"atlas plant {p} did not red for its own reason")
+parts.append("""
+## [first-segment] The tag grammar's first-segment rule, before and after its check
+
+The owner's tag-grammar answers asked for the check. The rule was run over the design's own population before the
+check was designed in, and again after the fold, the check's own planted red listed apart:
+
+""" + block("text", "$ python first_segment_probe.py\n" + read(S / "night2/tag/probe-before.keep") + "\nrc 1")
+    + "\n" + block("text", "$ python first_segment_probe.py\n" + read(S / "night2/tag/probe-after.out") + "\nrc 0"))
 parts.append("""
 ## [plants] The map's and the atlas's plants, re-run
 
@@ -20093,6 +20406,29 @@ rc 1
 ````
 
 
+## [first-segment] The tag grammar's first-segment rule, before and after its check
+
+The owner's tag-grammar answers asked for the check. The rule was run over the design's own population before the
+check was designed in, and again after the fold, the check's own planted red listed apart:
+
+````text
+$ python first_segment_probe.py
+namespace words 29: check, class, command, doc, feature, field, hook, item, kind, kit, layer, leg, lens, level, marker, pack, point, policy, practice, principle, reader, record, repo, role, scenario, section, step, unit, workflow
+catalogue keys 239, opening with a namespace word 4: policy.guard, policy.proof, policy.on-invalid, policy.on-missing-expansion
+tags read 24 in 14 living records; breaches 0; planted reds 0
+rc 1
+````
+
+````text
+$ python first_segment_probe.py
+namespace words 29: check, class, command, doc, feature, field, hook, item, kind, kit, layer, leg, lens, level, marker, pack, point, policy, practice, principle, reader, record, repo, role, scenario, section, step, unit, workflow
+catalogue keys 239, opening with a namespace word 0: none
+tags read 23 in 14 living records; breaches 0; planted reds 1
+  planted architecture-v2.md: `practice.repo.x`
+rc 0
+````
+
+
 ## [plants] The map's and the atlas's plants, re-run
 
 ````text
@@ -20206,10 +20542,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:833 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:842 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:833 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:842 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -20257,13 +20593,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2527 nodes in 30 namespaces; 31563 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1737, derived 295, pending 495
+map: 2529 nodes in 30 namespaces; 31568 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1739, derived 295, pending 495
 map: no stale facts read 60 records and 23 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 208 records, 3486 sections, 202 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 208 records, 3491 sections, 202 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -20289,8 +20625,8 @@ transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dFairHearing cites `preset` (dKeptSession's, not an ancestor): homonym
   dFurnishedOrders cites `code` (dTotalRecall's, not an ancestor): tolerance
   dFurnishedOrders cites `feature` (dTotalRecall's, not an ancestor): tolerance
-  dGroundRules cites `policy.guard` (dDeclaredLoop's, not an ancestor): not a use
-  dGroundRules cites `policy.proof` (dDeclaredLoop's, not an ancestor): not a use
+  dGroundRules cites `policy-file.guard` (dDeclaredLoop's, not an ancestor): not a use
+  dGroundRules cites `policy-file.proof` (dDeclaredLoop's, not an ancestor): not a use
   dKeptSession cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
   dKeptSession cites `hooks.bypass` (dWitnessedBar's, not an ancestor): not a use
   dKeptSession cites `intake` (dWellOiledMachine's, not an ancestor): homonym
@@ -20314,7 +20650,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 353 · chain builds 21
+register keys 354 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none

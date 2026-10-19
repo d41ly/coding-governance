@@ -443,7 +443,12 @@ where each defect's fix sits.
   in their table (`[forced]` item 2), not in the marker family.
 - **The tag vocabulary.** The lexicon registers a tag-name vocabulary check at the instruction layer's
   name-check point, which dOrderedCharter builds: it checks the verbs and nouns in tag leaves. Where the
-  lexicon is absent, the core's tag-shape check stands alone.
+  lexicon is absent, the core's tag-shape check stands alone. The check grades every tag's name, policy keys
+  and the overlay's rows among them, and `--suggest` answers a tag's name as it answers a function's, with
+  `--as tag.<namespace>`. The namespace words come from dOrderedCharter's registry, never from `.lexicon.conf`,
+  so the core's shape check and the lexicon's answers never disagree on which words may open a name (revised
+  2026-10-19, the owner: "shouldn't lexicon integrate with the tag grammar? Will this be accounted for?";
+  `gap-lex-10`).
 - **The reviewer's lens is handed the debt a diff adds.** The Loop Review gets the trends.
 
 ### [fixes] The kit's own defects

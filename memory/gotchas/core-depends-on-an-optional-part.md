@@ -41,7 +41,7 @@ timeline model as a second engine. The leg moves into the core pack, and the mod
   optional kit. Move only what has none; what reads an optional part stays that part's, as a pack it
   registers at a core point.
 - A core field is enforced by the core layer that declares it.
-- An expansion's Absent clause says its keys go unread, never refused. `policy.on-missing-expansion`
+- An expansion's Absent clause says its keys go unread, never refused. `policy-file.on-missing-expansion`
   governs only a value, on a key the core reads, that selects an expansion's behaviour (LR-4).
 - Probe: install the core alone and load each shipped preset. Expect a refusal only for a value, on a
   key the core reads, that selects an absent expansion, and none for a key an absent expansion owns.

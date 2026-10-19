@@ -2707,6 +2707,16 @@ The owner's answers' closing review, dispatches 141 and 142, derived from each r
   namespace keeps a repository's prose units. The catalogue's four `policy.*` keys, which break the same rule, are a
   separate question put to the owner.
 
+- 2026-10-19, session 1799cb98: asked whether to rename the four catalogue keys whose first segment is `policy`, and
+  add a check, the owner answered, verbatim: "yes, rename them and add the check but also -  shouldn't lexicon
+  integrate with the tag grammar? Will this be accounted for?" A probe ran the first-segment rule over the design
+  first: four of 239 catalogue keys broke it, and no tag did after the owner segment's rename. The keys are
+  `policy-file.*` in the living design text. dOrderedCharter's core shape check states the grammar's rules, a red
+  planted for each, and dDeclaredLoop arms it over the catalogue. The lexicon's tag-name check, already designed at
+  the name-check point, now grades every tag's name and policy key, answers tag names through `--suggest` and reads
+  the namespace words from the same registry. `gap-lex-10` records that today's lexicon grades four code surfaces
+  only.
+
 ## Instruments
 
 ### The gap-ownership join

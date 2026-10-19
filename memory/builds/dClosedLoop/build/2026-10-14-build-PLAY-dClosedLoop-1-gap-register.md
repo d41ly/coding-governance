@@ -254,6 +254,7 @@ extends.
 | gap-lex-07 | Lexicon | LOW | Kit defects: a repeated block header silently replaces the earlier block, four non-names (an IIFE value, three properties) are graded as verbs, `--brief` and `--help` exit 2 though about 130 calls used them, and the Skill, the conf and the README disagree on what the gate does. | kit review, lexicon (`build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md`), `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-kit.md`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-population.md` | — |
 | gap-lex-08 | Lexicon | LOW | The lexicon's two drift signals reach the bar through drift-audit's engine, which imports the optional lexicon kit, instead of as a leg pack the lexicon registers. | `tools/drift-audit/drift_report.py:1182-1213,1245-1279`; the expansion round's review, `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md` | — |
 | gap-lex-09 | Lexicon | LOW | Overloaded terms: attended names both a session kind and a mode, playbook both the charter renderer and playbook mode, and baseline both retrofit's tolerated debt and a measured reference. | `research-unattended-core.md` section 8; `research-testing-anywhere.md` section 7 | — |
+| gap-lex-10 | Lexicon | MED | The lexicon grades four code surfaces only, JavaScript and Python functions, Python types and shell functions: no tag, conf key or policy key is named against the declared vocabulary, and `--suggest` cannot answer one. Raised by the owner. | `.lexicon.conf` `CELLS:`, four cells; the owner, 2026-10-19: "shouldn't lexicon integrate with the tag grammar?" | — |
 | gap-rt-01 | Runtime | HIGH | A model session decides every next act: 19 of 20 sessions resumed from a compaction's summary instead of state, the driver refused 47 malformed or out-of-order transitions, one session improvised 17 inline workflows and another more than 25 ad-hoc scripts, and 2 runs were left at BUILDING with all work terminal. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-executor.md` | — |
 | gap-rt-02 | Runtime | HIGH | Every enforcement hook fails open: no entry sets `onFailure`, all 31 failures of one burst on 2026-10-14 admitted the call, and pre-commit, commit-msg and pre-rebase trap no signal. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-hooks.md` | — |
 | gap-rt-03 | Runtime | HIGH | Spawned work dies with its session: 4 background agents died with their parent, limits killed 57 agents in 16 Workflow runs and the whole fan in 10, 7 of 12 all-errored runs report `completed`, and a null becomes `committed:false` with no reason. | layer review, runtime, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-runtime-spawn.md` | — |
@@ -828,4 +829,12 @@ Re-measured after the owner's answers to the night pass two's forks added `gap-m
 ```text
 Roles=30 Deploy=28 Plan=8 Spine=21 Orient=21 Test=22 Runtime=36 Lexicon=10 Tooling=24 Review=20 Foundation=34 Build=6 Memory=45 Flow=22 Maintain=15 Design=11
 LOW=58 MED=177 HIGH=118
+```
+
+Re-measured after the owner's tag-grammar answers added `gap-lex-10`
+(`build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md` `[renamed]`), same instrument, over 354 keys:
+
+```text
+Roles=30 Deploy=28 Plan=8 Spine=21 Orient=21 Test=22 Runtime=36 Lexicon=11 Tooling=24 Review=20 Foundation=34 Build=6 Memory=45 Flow=22 Maintain=15 Design=11
+LOW=58 MED=178 HIGH=118
 ```
