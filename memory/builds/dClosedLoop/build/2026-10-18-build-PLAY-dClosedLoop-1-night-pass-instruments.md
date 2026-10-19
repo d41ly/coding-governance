@@ -27613,7 +27613,7 @@ K5: principles 42, clauses 496, retired 0 · findings 0
 rerun design map: rc 0
   map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 290 records, 4721 sections, 230 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 295 records, 4727 sections, 230 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -27629,7 +27629,7 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 108 · lines 42224 · unreviewed 11071 (26%)
+  design records 113 · lines 42224 · unreviewed 11071 (26%)
 rerun review debt: rc 0
   design commits after the floor that no closing review covers: 17
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
@@ -27867,13 +27867,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2738 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
-map: purposes declared 1917, derived 321, pending 500
+map: 2743 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
+map: purposes declared 1922, derived 321, pending 500
 map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 290 records, 4721 sections, 230 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 295 records, 4727 sections, 230 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state
