@@ -380,8 +380,9 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
   line, at most 200 B) or `source` (derived), `required-by`, `enforced-by`, `budget`, `origin` (a kit or the
   repository, apart from the `owner` edge, which names a chain build), `class` (`fixed` or `open`, derived from
   the parsers and the floor, never typed), `edges` (the shared grammar, an `amends` or `supersedes` target
-  pinned as `<tag>@<hash>`), `status` (`active`, `retired:<tag>[,<tag>]` or `retired:none`), and `help` for the
-  rationale, which never loads. `status` is derived from the `instructions.edit` change record that
+  pinned as `<tag>@<hash>`), `status` (`active`, `retired:<tag>[,<tag>]` or `retired:none`), `usage` on a user-facing unit, which its
+  help page renders, and `help` for the rationale, which never loads and renders only into its own tree under
+  `help/` (revised 2026-10-19, the owner's FQ-5 and FQ-6). `status` is derived from the `instructions.edit` change record that
   `[design-tags]` reads for every retirement, and is never typed (revised 2026-10-17, the audit's L7; revised
   2026-10-19, the folds' closing review, after IA-2, IA-4 and the adopter-instructions record's items 8 and 10).
 - **Per type.** A directive carries a modal. A constraint carries a value and its enforcer. A fact
@@ -391,8 +392,9 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
   slots, a protocol slice, a Skill entry, a path rule, the role static block, the work order, a hook
   message, a harness prompt module, and the instruction fields of a spec.
   Rationale moves into each unit's `help` field, outside every load set.
-  It never goes to `help/`, whose pages are user-facing features (`help/README.md:3`) under the
-  playbook kit's adopter-set `HELP_DIR` (`playbook.kit.toml:252-255`) (revised 2026-10-17, the audit's L10).
+  It renders into a tree of its own under `help/`, apart from the feature pages (`help/README.md:3`) under the
+  playbook kit's adopter-set `HELP_DIR` (`playbook.kit.toml:252-255`), as `help.explanation` says (revised
+  2026-10-17, the audit's L10, and 2026-10-19, the owner's FQ-6: it never went to `help/`).
 - **The renderer and its gate.** One renderer, extending `render_charter_blocks` and the playbook's
   probes. One leg refuses any file at an instruction path whose bytes differ from its render, or that no
   registry row produces. Unmigrated documents sit on a shrink-only legacy list.

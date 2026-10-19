@@ -2893,6 +2893,13 @@ The final questions' research, dispatches 155 to 159, derived from each run the 
   rebuilt memory-recall's derived cache under the git common directory, outside its scratch folder; nothing tracked
   changed. The atlas stands at version 69, published after the parked debt's fold.
 
+- 2026-10-19, session 1799cb98: the owner answered FQ-1 to FQ-8, recorded verbatim in `build/2026-10-19-build-PLAY-dClosedLoop-1-final-questions.md` `[answers]`, each taking
+  the recommendation, and the answers were folded (`[folded]`) with no agent dispatched. P41 and P42 join v2;
+  dTrueNorth opens the chain at its root with the speccing controls; nine keys join the catalogue and every preset;
+  nine chain rows gain their part, and dLinkedLibrary's atlas clause moves to dTotalRecall; seven gaps join the
+  register; and systems, fates and the memory plan follow FQ-5, FQ-6 and FQ-8. The chain holds 22 builds. The clause
+  ids, the audit's instruments, the audit and the baseline follow, in that order.
+
 ## Instruments
 
 ### The gap-ownership join

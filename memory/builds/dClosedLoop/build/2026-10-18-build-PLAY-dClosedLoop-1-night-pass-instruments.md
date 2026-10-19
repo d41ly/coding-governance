@@ -4413,7 +4413,7 @@ for ln in chain.split("\n"):
         units[m.group(1)] = len([u for u in m.group(3).split("; ") if u.strip()])
         parents[m.group(1)] = [p.strip() for p in m.group(2).split(",") if p.strip() in
                                re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)]
-assert len(units) == 21, len(units)   # 16 until SP-1, 18 until WK-4 split dTotalRecall and dBoundRoles, 20 until
+assert len(units) == 22, len(units)   # 21 until the owner's FQ-4 opened the chain with dTrueNorth, 2026-10-19; 16 until SP-1, 18 until WK-4 split dTotalRecall and dBoundRoles, 20 until
 #                                       AP-25 gave the upgrade-step kind its own build, dSafePassage, 2026-10-18
 
 
@@ -22661,6 +22661,518 @@ L.insert_before("\n## Instruments\n", f"""
 L.save()
 ````
 
+### `chain_lib.py`
+
+Clause-level edits of v2's [chain] rows over a fold_lib Record, extracted at their second use: edit, replace, drop and add a clause, append owned gaps, insert a row and set its parents, each clause checked for a '; ' or a pipe.
+
+````python
+"""Clause-level edits of v2's [chain] rows, over a fold_lib Record: one clause at a time, so a split on "; " still counts
+each unit once. Extracted at its second use (the parked debt's fold had its own copy).
+"""
+import sys
+
+
+def _row(rec, slug):
+    lines = rec.text.split("\n")
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {slug} | ")]
+    if len(idx) != 1:
+        sys.exit(f"{slug}: {len(idx)} chain rows")
+    cells = lines[idx[0]].split(" | ")
+    if len(cells) != 5:
+        sys.exit(f"{slug}: {len(cells)} cells")
+    return lines, idx[0], cells
+
+
+def _check(clauses):
+    for c in clauses:
+        if "; " in c or "|" in c:
+            sys.exit(f"a clause holds '; ' or '|': {c[:80]}")
+
+
+def _put(rec, lines, i, cells, clauses):
+    _check(clauses)
+    cells[3] = "; ".join(clauses)
+    lines[i] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+def cedit(rec, slug, prefix, old, new, label):
+    """Within the one clause of `slug` that starts with `prefix`, replace `old`, which it holds once, by `new`."""
+    lines, i, cells = _row(rec, slug)
+    clauses = cells[3].split("; ")
+    hits = [k for k, c in enumerate(clauses) if c.startswith(prefix)]
+    if len(hits) != 1:
+        sys.exit(f"{slug}: {label}: the prefix starts {len(hits)} clauses")
+    c = clauses[hits[0]]
+    if c.count(old) != 1:
+        sys.exit(f"{slug}: {label}: the clause holds the anchor {c.count(old)} times")
+    clauses[hits[0]] = c.replace(old, new, 1)
+    _put(rec, lines, i, cells, clauses)
+
+
+def cset(rec, slug, old, new, label):
+    """Replace the clause of `slug` that is exactly `old`."""
+    lines, i, cells = _row(rec, slug)
+    clauses = cells[3].split("; ")
+    if clauses.count(old) != 1:
+        sys.exit(f"{slug}: {label}: {clauses.count(old)} clauses equal the old text")
+    clauses[clauses.index(old)] = new
+    _put(rec, lines, i, cells, clauses)
+
+
+def cdrop(rec, slug, old, label):
+    """Remove the clause of `slug` that is exactly `old`."""
+    lines, i, cells = _row(rec, slug)
+    clauses = cells[3].split("; ")
+    if clauses.count(old) != 1:
+        sys.exit(f"{slug}: {label}: {clauses.count(old)} clauses equal the old text")
+    clauses.remove(old)
+    _put(rec, lines, i, cells, clauses)
+
+
+def cadd(rec, slug, new, label):
+    lines, i, cells = _row(rec, slug)
+    clauses = cells[3].split("; ")
+    if any(c.startswith(new[:60]) for c in clauses):
+        sys.exit(f"{slug}: {label}: already there")
+    _put(rec, lines, i, cells, clauses + [new])
+
+
+def gaps_add(rec, slug, keys, label):
+    """Append gap keys to the row's gaps cell."""
+    lines, i, cells = _row(rec, slug)
+    have = [g.strip() for g in cells[4].rstrip(" |").split(",") if g.strip()]
+    if any(k in have for k in keys):
+        sys.exit(f"{slug}: {label}: a key is already owned there")
+    cells[4] = ", ".join(have + keys) + " |"
+    lines[i] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+def row_insert_before(rec, slug, row, label):
+    """Insert a whole new chain row, its clauses checked, before `slug`'s row."""
+    cells = row.split(" | ")
+    if len(cells) != 5 or not row.startswith("| d") or not row.endswith(" |"):
+        sys.exit(f"{label}: the new row is not a five-cell chain row")
+    _check(cells[3].split("; "))
+    lines, i, _ = _row(rec, slug)
+    lines.insert(i, row)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+def parents_set(rec, slug, old, new, label):
+    lines, i, cells = _row(rec, slug)
+    if cells[2] != old:
+        sys.exit(f"{slug}: {label}: parents read {cells[2]!r}, not {old!r}")
+    cells[2] = new
+    lines[i] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+````
+
+### `fold_final_answers.py`
+
+The owner's FQ-1 to FQ-8 folded: P41 and P42, dTrueNorth at the chain's root, nine keys and their preset rows, nine chain rows' parts, dLinkedLibrary's atlas clause moved to dTotalRecall, seven gaps and the register's re-measure, the help plan in systems, fates and the memory plan, and the round record's [answers] and [folded], dry-run first on a full copy of the tree with the eight checks green there.
+
+````python
+"""The owner's answers to the final questions, FQ-1 to FQ-8, folded: P41 and P42; dTrueNorth at the chain's root with the
+speccing controls; nine keys and their preset rows; the docs, coverage, deviation, atlas and walk clauses on nine chain
+rows, dLinkedLibrary's atlas clause moved to dTotalRecall; [open]'s SA-5 reading; seven gaps and the register's
+re-measure; the systems, fates and memory-plan statements of the help plan; and the round record's [answers] and
+[folded].
+
+Usage: python -X utf8 fold_final_answers.py   (from the worktree root, or a full copy of it)
+"""
+import collections
+import pathlib
+import re
+import subprocess
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+sys.path.insert(0, str(HERE))
+from fold_lib import Record  # noqa: E402
+from chain_lib import cadd, cdrop, cedit, cset, gaps_add, parents_set, row_insert_before  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+REC = "build/2026-10-19-build-PLAY-dClosedLoop-1-final-questions.md"
+BASE = "590305b02"
+
+
+def row_after(rec, prefix, new_rows, label):
+    lines = rec.text.split("\n")
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(prefix)]
+    if len(idx) != 1:
+        sys.exit(f"{label}: {len(idx)} rows start with {prefix!r}")
+    lines[idx[0] + 1:idx[0] + 1] = new_rows
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+# ---- v2 -----------------------------------------------------------------------------------------------------------
+
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("  latency and never correctness (the owner's cloud round, CL-1 to CL-4).\n",
+      "  latency and never correctness (the owner's cloud round, CL-1 to CL-4).\n"
+      "- **P41 The design is carried whole.** Every clause of the design carries a minted id that is never reused, and a\n"
+      "  spec carries it, pinned to the hash of its text, or a recorded decision moves, retires or defers it. Once the\n"
+      "  design is frozen at its baseline, every departure from it, a spec from its clause or code from its spec, is a\n"
+      "  typed deviation record approved by its risk, and what ships renders from the as-built view, the baseline and its\n"
+      "  deviations together. A join refuses what it can see, a lens reads the meaning it cannot, and the owner reads the\n"
+      "  coverage at every Design exit (the owner's final questions, FQ-2 to FQ-4 and FQ-7).\n"
+      "- **P42 Every user-facing surface is documented from the fact that defines it.** A command, key, preset, leg, hook,\n"
+      "  record kind, role or extension point takes its reference page from its own registry row, its usage is\n"
+      "  fingerprinted and gated from dSafePassage on, the commands a page shows run as tests, its rationale renders into\n"
+      "  a tree of its own that no agent loads, and an atlas of the product is generated beside the help pages and refused\n"
+      "  when stale (the owner's final questions, FQ-5 to FQ-8).\n", "principles")
+V.insert_before(
+    "Revised: 2026-10-17, after the folds' closing review (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`):\n",
+    f"Revised: 2026-10-19, the owner's answers to the final questions (`{REC}`\n"
+    "`[answers]`): P41 and P42 are added, the design carried whole and every user-facing surface documented from the fact\n"
+    "that defines it (FQ-7). A bootstrap build, dTrueNorth, opens the chain ahead of dGroundRules and is built with today's\n"
+    "tools before any chain spec: the clause ids every spec carries, the join that reds a dropped or silently revised\n"
+    "clause, the deviation record and its population, and the as-built view (FQ-2 to FQ-4). The design freezes at a\n"
+    "baseline after the whole-design audit, which runs first as mechanical checks, a paired walk and a paired closing\n"
+    "review (FQ-1, FQ-3). Help is gated from dSafePassage on, its reference generated from the registries and its rationale\n"
+    "rendered into a tree of its own (FQ-5, FQ-6), and the atlas becomes generated pages under `help/atlas/` that\n"
+    "dTotalRecall owns (FQ-8). Nine keys join the catalogue and every preset, and seven gaps join the register.\n\n",
+    "revised paragraph")
+
+KEYS = [
+    "| `design.coverage` | refuse, warn, off | refuse | the owner's FQ-2: \"Clause ids + join (Recommended)\"; the join of "
+    "every clause and owned node to the specs that carry it, read at each Design exit and at each spec's revision: a "
+    "dropped, unbound, stale or silently revised carrier refuses the exit, warns with an ask, or is not checked (P41) | "
+    "dIndexedDesign |",
+    "| `design.coverage.semantic` | every-exit, with-spec-audit, off | every-exit | the owner's FQ-2: the lens that reads "
+    "each carried clause and the sections it rests on, for the contradiction no join sees, at every Design exit, only "
+    "where a spec audit runs, or never (P41) | dIndexedDesign |",
+    "| `deviation.gate` | refuse, warn-and-ask, report | refuse | the owner's FQ-3: \"Baseline + records (Recommended)\"; "
+    "a departure from the baseline design, a spec or its acceptance with no deviation record whose approver meets its "
+    "risk, at the commit and at the Build exit: refused, warned with an ask, or reported (P41) | dScopedBuild |",
+    "| `deviation.approval` | by-risk, owner-all, author-recorded | by-risk | the owner's FQ-3: who approves a deviation: "
+    "by its risk, an editorial one its author, an additive or stricter one the spec writer with the changed sections "
+    "re-audited, a loosening or a breaking one the owner; the owner for every one; or its author, recorded (P41) | "
+    "dDeclaredLoop |",
+    "| `help.enforce` | refuse, warn, off | refuse | the owner's FQ-5: \"At dSafePassage (Recommended)\"; a landing that "
+    "moves a user-facing surface's declared usage with no change to its page: refused, warned, or not checked (P42) | "
+    "dSafePassage |",
+    "| `help.explanation` | rendered, registry-only | rendered | the owner's FQ-6: \"Render separately (Recommended)\"; "
+    "each unit's rationale rendered into its own tree under `help/`, which no agent loads, or kept in the registries "
+    "only, as SA-5 first settled (P42) | dConvergedCharter |",
+    "| `help.atlas` | committed, on-demand, off | committed | the owner's FQ-8: \"Markdown + Mermaid (Recommended)\"; the "
+    "product's atlas generated under `help/atlas/` and refused when stale, rendered on demand and never committed, or "
+    "not rendered (P42) | dTotalRecall |",
+]
+AUDIT_KEYS = [
+    "| `review.design-audit.runs` | 1, 2, 3 | 2 | the owner's FQ-1: \"Paired walk + checks (Recommended)\"; the "
+    "independent runs of the whole-design walk, each sliced its own way | dFairHearing |",
+    "| `review.design-audit.seed` | reverted-escapes, synthetic, none | reverted-escapes | the owner's FQ-1: the walk's "
+    "recall graded on fixed past defects reverted into a sealed copy, on synthetic ones, or not graded | dFairHearing |",
+]
+row_after(V, "| `design.streams` | opt-in, always, off | opt-in | ", KEYS, "catalogue rows")
+row_after(V, "| `review.max-rounds` | a round count | 3 | ", AUDIT_KEYS, "audit catalogue rows")
+row_after(V, "| `design.streams` | opt-in | opt-in | opt-in | opt-in |", [
+    "| `design.coverage` | warn | refuse | refuse | refuse |",
+    "| `design.coverage.semantic` | with-spec-audit | every-exit | every-exit | every-exit |",
+    "| `deviation.gate` | warn-and-ask | refuse | refuse | refuse |",
+    "| `deviation.approval` | by-risk | by-risk | owner-all | by-risk |",
+    "| `help.enforce` | warn | refuse | refuse | refuse |",
+    "| `help.explanation` | rendered | rendered | rendered | rendered |",
+    "| `help.atlas` | committed | committed | committed | committed |",
+], "preset rows")
+row_after(V, "| `review.max-rounds` | 2 | 3 | 4 | 3 |", [
+    "| `review.design-audit.runs` | 1 | 2 | 3 | 2 |",
+    "| `review.design-audit.seed` | synthetic | reverted-escapes | reverted-escapes | reverted-escapes |",
+], "audit preset rows")
+
+TN = [
+    "the clause ids: each clause of the design read with its minted `cl-` id and the hash of its text, the retired ids "
+    "from the design's `[clause-ids]` section, and each spec's `**Carries:**` lines, a clause carried whole or as "
+    "`part k/n`, an owned node as `node:<ns>.<key>`, or `**Derived:**` with its decision, parsed and a malformed line "
+    "refused, the chain builds' specs alone read, behind a configuration cutoff, seen red on a planted malformed line "
+    "(the owner's FQ-2, P41)",
+    "the carries join, a ninth join of the spec tokens leg behind that cutoff as the handoff join is: a ghost id, an "
+    "unbound spec, a stale pin, two specs carrying one clause whole and disagreeing, and a revision that stops carrying "
+    "a clause with no decision each red, a token of a clause missing from its carriers red, and a run that measured no "
+    "spec never green, each seen on its planted case over a fixture spec set (the owner's FQ-2, P41)",
+    "the coverage report rendered into each chain build's README beside its unit ids: the clauses carried whole and "
+    "split, those moved, retired or deferred with their decisions, the uncarried, stale and ambiguous counts with an "
+    "explicit none, the owned nodes no carrier names, the specs derived from no clause with their decisions, and the "
+    "clauses the token arm cannot see, and memory hygiene refusing a chain build's spec in progress while its build's "
+    "coverage is red, seen red on a planted uncarried clause (the owner's FQ-2)",
+    "the deviation record, its kind joined to check 21's kinds and its fields the departure's address, before and after, "
+    "cause class, reason, evidence, risk class, approver and follow-through, and its population computed from history: "
+    "each spec revision after its unit's first attributed pass commit or after its pinned audited revision, each "
+    "AMENDED acceptance line, each divergence hand-back, each rescope row and each clause-hash move, joined at the commit "
+    "through the routed-commit attribution and at the close to a record whose approver meets its risk class, seen red "
+    "on a planted revision after a pass with no record, an AMENDED line with no record, a mismatched pin and an approver "
+    "below the risk, and green on a status-only edit (the owner's FQ-3, P41)",
+    "every audit of a spec record pinning the revision it read as `@rev-N` on its Serves line, a revision past its pin "
+    "read as unaudited, and the builder's, spec reviewer's and diff reviewer's rule lines carrying the docs rule (the "
+    "owner's FQ-3 and FQ-5)",
+    "the as-built view: the design at its baseline commit with each deviation's amends or supersedes row applied, each "
+    "changed clause citing its record, generated and never hand-edited, the coverage join and the later help and atlas "
+    "renders reading it, seen red on a hand edit, on a deviation with no row and on a changed clause with no citation "
+    "(the owner's FQ-3, P41)",
+]
+row_insert_before(V, "dGroundRules",
+                  "| dTrueNorth | Fidelity | dClosedLoop | " + "; ".join(TN)
+                  + " | gap-design-13, gap-build-07, gap-mem-47 |", "dTrueNorth row")
+parents_set(V, "dGroundRules", "dClosedLoop", "dTrueNorth", "dGroundRules after dTrueNorth")
+cedit(V, "dGroundRules", "`.governance/policy.toml`, its schema",
+      "and a set-valued key that declares no empty-set rule refused (the shape audit)",
+      "and a set-valued key that declares no empty-set rule refused (the shape audit), and each key's row carrying a "
+      "summary and a usage, a key added without them refused and today's keys drained from a shrink-only list, seen "
+      "red on a planted new key with no summary (the owner's FQ-5, P42)", "schema rows")
+cadd(V, "dSafePassage",
+     "the docs leg, an arm of the step gate over its population under `help.enforce`: each member's usage declared as "
+     "a row, a verb and its flags, a key with its values and default, a hook's event and matcher, a leg's name and "
+     "argv, and fingerprinted, a member whose fingerprint moves with no change to its page red, each command a page "
+     "shows run as a test, an offline link check, and today's undocumented members on a shrink-only list, each later "
+     "class's rows joining when its build lands it, seen red on a planted stale page and green on the real ones (the "
+     "owner's FQ-5, P42)", "docs leg")
+gaps_add(V, "dSafePassage", ["gap-found-35"], "docs leg gap")
+cedit(V, "dOrderedCharter", "the instruction-unit registry (per unit:",
+      "apart from the `owner` edge, which names a chain build, and class, fixed or open)",
+      "apart from the `owner` edge, which names a chain build, a `usage` on a user-facing unit, a `help` holding its "
+      "rationale, and class, fixed or open)", "unit fields")
+cadd(V, "dOrderedCharter",
+     "the help pages: reference pages rendered by the one renderer from each registry's rows, the policy schema's, the "
+     "drive table's, the kinds register's and the unit registry's first and each later registry's when its build lands "
+     "it, every row carrying a summary and a usage, concept, task and tutorial pages written beside them, every command "
+     "a page shows run as a test and the tutorial run in an adopter fixture, each page linked to its unit by tag, seen "
+     "red on a planted row with no usage and on a planted page whose command fails (the owner's FQ-5, P42)",
+     "help pages")
+cadd(V, "dDeclaredLoop",
+     "the deviation approval route under `deviation.approval`: by its risk, an editorial deviation its author's by "
+     "dOrderedCharter's classifier, an additive or stricter one the spec writer's with the changed sections re-audited at "
+     "the new revision, a loosening or a breaking one the owner's, and an owner's ruling quoted, each value seen on its "
+     "planted case and red on an approver below the risk (the owner's FQ-3, P41)", "approval route")
+cadd(V, "dIndexedDesign",
+     "the design coverage under `design.coverage` and `design.coverage.semantic`: dTrueNorth's join read at each Design "
+     "exit and at each spec's revision, `design.ready` gaining an UNCARRIED class, `implements=` edges taking a clause "
+     "target, the design index rendering coverage, and at each Design exit the lens reading each carried clause with "
+     "the sections it rests on and the owner reading the coverage report, seen red on a planted dropped clause and on a "
+     "planted carrier that keeps every token and contradicts its clause, which only the lens sees (the owner's FQ-2, "
+     "P41)", "design coverage")
+cadd(V, "dScopedBuild",
+     "the deviation gate under `deviation.gate`: dTrueNorth's joins read at the commit and at the Build exit beside "
+     "`build.scope`, an unrecorded deviation refused, warned with an ask or reported as the key says, each value seen "
+     "on its planted case (the owner's FQ-3, P41)", "deviation gate")
+cdrop(V, "dLinkedLibrary", "the atlas re-rendered from the same node table", "atlas clause moved")
+cadd(V, "dTotalRecall",
+     "the atlas under `help/atlas/`, as `help.atlas` says: generated Markdown pages with Mermaid diagrams, one per "
+     "namespace and the plan split per build, units drawn as tables, read from the one index's node table and never the "
+     "design records, a generated-output row at regeneration stage 3 so the merge bar's stale-output refusal covers it, "
+     "the regeneration kit's path tokens gaining a help root, its check a byte comparison and its parity arm reading "
+     "the committed pages back against index rows read on their own, a page past its budget split by segment and never "
+     "dropping a node, a design-against-built page reading the clause ids and the deviation records, and each node "
+     "linked to its help page by tag and back under one link check, seen red on a catalogue default changed with no "
+     "regeneration, a hand edit, a namespace registered and not rendered, and a new step shown with no change to the "
+     "renderer (the owner's FQ-8, P42)", "atlas")
+gaps_add(V, "dTotalRecall", ["gap-mem-48"], "atlas gap")
+cadd(V, "dFairHearing",
+     "the whole-design walk as a preset of the design audit: walkers sliced by scenario and by step under "
+     "`review.design-audit.runs`, each returning its findings and a walk table of every item and scenario with its "
+     "actor, needs, witness, route and verdict, a synthesis red on an empty cell, skeptics refuting a sample of clean "
+     "cells, the replay scorer reading `[tag]` addresses, and recall graded on seeded past escapes as "
+     "`review.design-audit.seed` says, seen red on a planted gap the walk misses and on an empty cell (the owner's FQ-1)",
+     "walk preset")
+gaps_add(V, "dFairHearing", ["gap-review-22"], "walk gap")
+cedit(V, "dConvergedCharter", "protocols and templates rendered as tag-sliced views",
+      "never into `help/`'s feature pages",
+      "never into `help/`'s feature pages, rendered into a tree of its own under `help/` as `help.explanation` says, "
+      "which no agent loads, and no guide retired while a section of it maps to no unit's rationale, seen red on a "
+      "planted retirement of such a guide (the owner's FQ-6)", "rationale tree")
+cset(V, "dConvergedCharter",
+     "the `help/` pages rendered from a `usage` field on each user-facing unit, beside the `help` field that keeps its "
+     "rationale out of every page, a hand edit to a page red at render parity, and a docs leg red on a landing that "
+     "changes a user-facing surface, the step gate's population, with no change to its unit's `usage` (SA-5)",
+     "the hand-written `help/` pages, the kit READMEs, root `README.md` and the agent runbook migrated, each with its "
+     "fates row, its reference half generated from its registry by dOrderedCharter's renderer and its how-to half "
+     "written as a page under the docs leg, a hand edit to a rendered page red at render parity (SA-5, the owner's FQ-5)",
+     "hand pages migrated")
+gaps_add(V, "dConvergedCharter", ["gap-found-36"], "explanation gap")
+V.sub("- SA-5's field is named `usage`, since a unit's `help` field already holds its rationale, which never renders into\n"
+      "  a page.\n",
+      "- SA-5's field is named `usage`, since a unit's `help` field already holds its rationale, which renders only into\n"
+      "  its own tree under `help/` (the owner's FQ-6).\n", "open SA-5")
+V.save()
+cp = subprocess.run([sys.executable, "-X", "utf8", str(HERE.parent / "order/critical_path.py")],
+                    capture_output=True, text=True, encoding="utf-8")
+m = re.search(r"critical path: (\d+) units", cp.stdout)
+if cp.returncode or not m:
+    sys.exit("the critical path did not run: " + cp.stdout + cp.stderr)
+PATH = int(m.group(1))
+
+# ---- the gap register ---------------------------------------------------------------------------------------------
+
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+R = "`build/2026-10-19-build-PLAY-dClosedLoop-1-research-final-{}.md` {}"
+GAPS = {
+    "| gap-design-12 |": ["| gap-design-13 | Design | HIGH | Nothing joins a design clause to the spec that carries it: no "
+                          "spec of 1,322 binds to a design, and 218 of 498 owned design nodes are named in no clause of "
+                          "their owning build, so a dropped clause is found only if a review happens to run. | "
+                          + R.format("coverage", "sections 1 to 3") + " | — |"],
+    "| gap-build-06 |": ["| gap-build-07 | Build | HIGH | A deviation is recorded but never gated: 176 spec revisions in "
+                         "105 specs came after their unit's code started, and 1 spec audit of 669 pins the revision it "
+                         "read, so a spec and its code can move together with no reason or approver any check reads. | "
+                         + R.format("deviation", "sections 1 and 2") + " | — |"],
+    "| gap-mem-46 |": ["| gap-mem-47 | Memory | MED | The design is amended in place: 347 `Revised:` paragraphs across 34 "
+                       "records carry its changes, two tables of one fact disagree (11 of 39 shared kind owners), and no "
+                       "view gives the design as built. | " + R.format("deviation", "sections 1 and 5") + " | — |",
+                       "| gap-mem-48 | Memory | MED | No atlas lives in the repository: the atlas is an online page "
+                       "derived from design records, and nothing renders the product's own registries for a human. | "
+                       + R.format("atlas", "section 1") + " | — |"],
+    "| gap-found-34 |": ["| gap-found-35 | Foundation | HIGH | Help is gated only at the chain's last build: every earlier "
+                         "build ships user-facing surfaces under a prose rule that 6 of 216 product commits followed, "
+                         "and nothing reads `help/`. | " + R.format("help", "sections 1 and 2") + " | — |",
+                         "| gap-found-36 | Foundation | MED | The product cannot explain itself to a human: rationale "
+                         "renders nowhere once the guides retire, and no registry row carries a human sentence (0 of "
+                         "140 legs, 0 of 9 hook fragments, 0 of 29 kit descriptors). | "
+                         + R.format("help", "section 4") + " | — |"],
+    "| gap-review-21 |": ["| gap-review-22 | Review | MED | Design audits slice by lens and never walk a scenario through "
+                          "every step: their whole-design reads cite no item of six steps, 41% of the design records' "
+                          "lines were read by no review, and no audit measures its recall. | "
+                          + R.format("audit", "sections 1b and 1c") + " | — |"],
+}
+for prefix, rows in GAPS.items():
+    row_after(G, prefix, rows, prefix)
+found = re.findall(r"^\| (gap-[a-z]+-\d\d) \| ([A-Za-z]+) \| (HIGH|MED|LOW)\b", G.text, flags=re.M)
+stage = collections.Counter(r[1] for r in found)
+sev = collections.Counter(r[2] for r in found)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+if set(stage) - set(ORDER) or len(found) != 385:
+    sys.exit(f"the register reads {len(found)} rows and stages {sorted(set(stage) - set(ORDER))} outside the order")
+G.text = G.text.rstrip("\n") + "\n\n" + (
+    "Re-measured after the owner's final questions added `gap-design-13`, `gap-build-07`, `gap-mem-47`, `gap-mem-48`,\n"
+    f"`gap-found-35`, `gap-found-36` and `gap-review-22` (`{REC}` `[gaps]`), same instrument, over {len(found)} keys:\n\n"
+    "```text\n" + " ".join(f"{s}={stage[s]}" for s in ORDER) + "\n"
+    + " ".join(f"{s}={sev[s]}" for s in ("LOW", "MED", "HIGH")) + "\n```\n")
+G.done += 1
+G.save()
+
+# ---- systems, fates and the memory plan ---------------------------------------------------------------------------
+
+Y = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+Y.sub("and `help` for the\n  rationale, which never loads.",
+      "`usage` on a user-facing unit, which its\n  help page renders, and `help` for the rationale, which never loads and "
+      "renders only into its own tree under\n  `help/` (revised 2026-10-19, the owner's FQ-5 and FQ-6).", "unit fields")
+Y.sub("  It never goes to `help/`, whose pages are user-facing features (`help/README.md:3`) under the\n"
+      "  playbook kit's adopter-set `HELP_DIR` (`playbook.kit.toml:252-255`) (revised 2026-10-17, the audit's L10).\n",
+      "  It renders into a tree of its own under `help/`, apart from the feature pages (`help/README.md:3`) under the\n"
+      "  playbook kit's adopter-set `HELP_DIR` (`playbook.kit.toml:252-255`), as `help.explanation` says (revised\n"
+      "  2026-10-17, the audit's L10, and 2026-10-19, the owner's FQ-6: it never went to `help/`).\n", "rationale")
+Y.save()
+FT = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md")
+FT.sub("| top-level | `help/` pages | user documentation | RESHAPED | rendered from each user-facing unit's `usage` field, "
+       "with the docs leg (dConvergedCharter) | the owner, SA-5, 2026-10-19 |",
+       "| top-level | `help/` pages | user documentation | RESHAPED | reference generated from the registries' `summary` "
+       "and `usage` rows by the one renderer (dOrderedCharter), gated by the docs leg from dSafePassage on, rationale in "
+       "a tree of its own and the hand pages migrated (dConvergedCharter), and the atlas beside them under `help/atlas/` "
+       "(dTotalRecall) | the owner, SA-5, FQ-5, FQ-6 and FQ-8, 2026-10-19 |", "help fate")
+FT.save()
+MP = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+MP.sub("| help pages | views | `help/` | two hand-written pages, which nothing checks | node: a view rendered from each "
+       "user-facing unit's `usage` field, with the docs leg (SA-5) | page | dConvergedCharter |",
+       "| help pages | views | `help/` | two hand-written pages, which nothing checks | node: a view generated by the one "
+       "renderer from the registries' `summary` and `usage` rows beside written pages, gated by the docs leg from "
+       "dSafePassage on, rationale in a tree of its own, and the atlas under `help/atlas/` from the node table (SA-5, "
+       "the owner's FQ-5, FQ-6 and FQ-8) | page | dOrderedCharter |", "help pages node")
+MP.save()
+
+# ---- the round record ---------------------------------------------------------------------------------------------
+
+K = Record("memory/builds/dClosedLoop/" + REC)
+for key, old in (("gap-design-13", "dIndexedDesign"), ("gap-build-07", "dScopedBuild"), ("gap-mem-47", "dLinkedLibrary")):
+    lines = K.text.split("\n")
+    hit = [i for i, ln in enumerate(lines) if ln.startswith(f"| `{key}` |")]
+    if len(hit) != 1 or not lines[hit[0]].endswith(f"| {old} |"):
+        sys.exit(f"{key}: its [gaps] row is not the one this fold read")
+    lines[hit[0]] = lines[hit[0]][:-len(f"| {old} |")] + "| dTrueNorth |"
+    K.text = "\n".join(lines)
+    K.done += 1
+K.sub("The two HIGH controls' owners stand for the product. Under FQ-4 their first code lands in the bootstrap build.\n",
+      "dTrueNorth owns the three gaps whose first code it lands, under FQ-4. dIndexedDesign, dScopedBuild and dDeclaredLoop\n"
+      "then carry the controls into the product's stages.\n", "gaps note")
+K.text = K.text.rstrip("\n") + "\n" + f"""
+## [answers] The owner's answers, 2026-10-19
+
+Put to the owner in two batches of four, each question with its recommendation first. The owner's words, verbatim:
+
+| Fork | The owner's answer |
+|---|---|
+| FQ-1 | "Paired walk + checks (Recommended)" |
+| FQ-2 | "Clause ids + join (Recommended)" |
+| FQ-3 | "Baseline + records (Recommended)" |
+| FQ-4 | "Bootstrap build (Recommended)" |
+| FQ-5 | "At dSafePassage (Recommended)" |
+| FQ-6 | "Render separately (Recommended)" |
+| FQ-7 | "Add P41 and P42 (Recommended)" |
+| FQ-8 | "Markdown + Mermaid (Recommended)" |
+
+All eight took the recommendation as offered. FQ-6 departs from the owner's SA-5 by the owner's own word: rationale
+renders, but only into its own tree, which no agent loads.
+
+## [folded] Where the answers went, 2026-10-19
+
+- **v2:** P41 and P42 join the principles. dTrueNorth opens the chain ahead of dGroundRules, whose parent it becomes,
+  with six units: the clause ids and what each spec carries, the carries join, the coverage report, the deviation
+  record and its population, audits pinned to the revision they read, and the as-built view. Nine keys join the
+  catalogue and every preset: `design.coverage` and `design.coverage.semantic` on dIndexedDesign, `deviation.gate` on
+  dScopedBuild, `deviation.approval` on dDeclaredLoop, `help.enforce` on dSafePassage, `help.explanation` on
+  dConvergedCharter, `help.atlas` on dTotalRecall, and `review.design-audit.runs` and `review.design-audit.seed` on
+  dFairHearing. Nine chain rows gain their part: dGroundRules' schema rows carry a summary and a usage; dSafePassage's
+  step gate gains the docs leg; dOrderedCharter's registry names `usage` and `help`, and its renderer writes the help
+  pages; dDeclaredLoop routes a deviation's approval; dIndexedDesign reads the coverage at each Design exit;
+  dScopedBuild gates deviations at the Build exit; dTotalRecall renders the atlas, taking dLinkedLibrary's atlas
+  clause; dFairHearing gains the walk; and dConvergedCharter renders rationale into its own tree and migrates the
+  hand-written pages. `[open]`'s SA-5 reading follows FQ-6.
+- **The gap register:** the seven gaps in [gaps], dTrueNorth owning the three whose first code it lands.
+- **systems, fates and the memory plan:** the `usage` field named, the rationale's own tree, and the help pages' fate
+  and node.
+- **The chain:** 22 builds, the critical path growing from 263 units at `{BASE}` to {PATH}.
+- **Not yet folded:** the clause ids, minted in a commit of their own by the instrument that mints them; the audit's
+  instruments; the audit; and the baseline after it.
+"""
+K.done += 1
+K.save()
+print(f"critical path {PATH} units")
+````
+
+### `log_final_answers.py`
+
+The session log's event for the owner's final answers and their fold.
+
+````python
+"""Record the owner's answers to the final questions and their fold in the session log's events.
+
+Usage: python -X utf8 log_final_answers.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+REC = "build/2026-10-19-build-PLAY-dClosedLoop-1-final-questions.md"
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner answered FQ-1 to FQ-8, recorded verbatim in `{REC}` `[answers]`, each taking
+  the recommendation, and the answers were folded (`[folded]`) with no agent dispatched. P41 and P42 join v2;
+  dTrueNorth opens the chain at its root with the speccing controls; nine keys join the catalogue and every preset;
+  nine chain rows gain their part, and dLinkedLibrary's atlas clause moves to dTotalRecall; seven gaps join the
+  register; and systems, fates and the memory plan follow FQ-5, FQ-6 and FQ-8. The chain holds 22 builds. The clause
+  ids, the audit's instruments, the audit and the baseline follow, in that order.
+""", "the answers' event")
+L.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -23060,6 +23572,9 @@ MINE = [
     ('final/quote_words.py', "The owner's five final questions quoted for the round record's [words], wrapped on spaces only and checked word for word."),
     ('final/write_questions.py', "The final round's five research questions, each quoting the owner's questions verbatim and naming the researcher's own scratch folder, for `handoff.py render --input question=...`."),
     ('final/log_final_research.py', "The session log's dispatch rows 155 to 159, the derived agent lines and the round's event."),
+    ('final/chain_lib.py', "Clause-level edits of v2's [chain] rows over a fold_lib Record, extracted at their second use: edit, replace, drop and add a clause, append owned gaps, insert a row and set its parents, each clause checked for a '; ' or a pipe."),
+    ('final/fold_final_answers.py', "The owner's FQ-1 to FQ-8 folded: P41 and P42, dTrueNorth at the chain's root, nine keys and their preset rows, nine chain rows' parts, dLinkedLibrary's atlas clause moved to dTotalRecall, seven gaps and the register's re-measure, the help plan in systems, fates and the memory plan, and the round record's [answers] and [folded], dry-run first on a full copy of the tree with the eight checks green there."),
+    ('final/log_final_answers.py', "The session log's event for the owner's final answers and their fold."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -23566,47 +24081,48 @@ H2's measurement, re-run on the folded tree. The first fold read 47 mentions ove
 $ python plain_cites.py
 landing                 10  dGroundRules (dShippedRelease's), dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dDeclaredLoop (dShippedRelease's), dPlacedRequest (dShippedRelease's), dKeptSession (dShippedRelease's) …
 plan                     9  dSafePassage (dRankedPlan's), dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's) …
-seen red                 7  dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dFairHearing (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's), dPlacedRequest (dWitnessedBar's) …
+seen red                 8  dTrueNorth (dWitnessedBar's), dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dFairHearing (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's) …
 census                   6  dGroundRules (dLinkedLibrary's), dOrderedCharter (dLinkedLibrary's), dPlacedRequest (dLinkedLibrary's), dKeptSession (dLinkedLibrary's), dTotalRecall (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
+witness                  6  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 scope                    6  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dWellOiledMachine (dScopedBuild's), dCalibratedLens (dScopedBuild's)
+spec                     5  dTrueNorth (dIndexedDesign's), dFairHearing (dIndexedDesign's), dDeclaredLoop (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dFurnishedOrders (dIndexedDesign's)
 code                     5  dSafePassage (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
-witness                  5  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 return                   5  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's), dIndexedDesign (dWellOiledMachine's)
+commit                   4  dTrueNorth (dDeclaredLoop's), dSafePassage (dDeclaredLoop's), dOrderedCharter (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 release                  4  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dPlacedRequest (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
-spec                     4  dFairHearing (dIndexedDesign's), dDeclaredLoop (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dFurnishedOrders (dIndexedDesign's)
 act                      4  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
 intake                   4  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 fork                     4  dPlacedRequest (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
+decision                 3  dTrueNorth (dLinkedLibrary's), dTotalRecall (dLinkedLibrary's), dWellOiledMachine (dLinkedLibrary's)
+baseline                 3  dTrueNorth (dLinkedLibrary's), dFurnishedOrders (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 review                   3  dGroundRules (dFairHearing's), dSafePassage (dFairHearing's), dOrderedCharter (dFairHearing's)
-commit                   3  dSafePassage (dDeclaredLoop's), dOrderedCharter (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
+diff                     2  dTrueNorth (dIndexedDesign's), dOrderedCharter (dIndexedDesign's)
+attribution              2  dTrueNorth (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's)
+view                     2  dTrueNorth (dTotalRecall's), dDeclaredLoop (dTotalRecall's)
 inventory                2  dOrderedCharter (dIndexedDesign's), dTotalRecall (dIndexedDesign's)
 playbook                 2  dOrderedCharter (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
 adopters                 2  dOrderedCharter (dShippedRelease's), dWitnessedBar (dShippedRelease's)
+ruling                   2  dOrderedCharter (dLinkedLibrary's), dDeclaredLoop (dLinkedLibrary's)
 probe                    2  dOrderedCharter (dPlacedRequest's), dDeclaredLoop (dPlacedRequest's)
+verdict                  2  dFairHearing (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's)
 routing                  2  dDeclaredLoop (dWitnessedBar's), dKeptSession (dWitnessedBar's)
 ask                      2  dDeclaredLoop (dTotalRecall's), dKeptSession (dTotalRecall's)
 claim                    2  dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
+comparison               2  dPlacedRequest (dShippedRelease's), dTotalRecall (dShippedRelease's)
 roster                   2  dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's)
-baseline                 2  dFurnishedOrders (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
-decision                 2  dTotalRecall (dLinkedLibrary's), dWellOiledMachine (dLinkedLibrary's)
+acceptance               1  dTrueNorth (dDeclaredLoop's)
 override                 1  dGroundRules (dOrderedCharter's)
 receipt                  1  dSafePassage (dShippedRelease's)
 card                     1  dOrderedCharter (dPlacedRequest's)
-diff                     1  dOrderedCharter (dIndexedDesign's)
-ruling                   1  dOrderedCharter (dLinkedLibrary's)
 selection                1  dFairHearing (dWitnessedBar's)
 disposition              1  dFairHearing (dDeclaredLoop's)
-verdict                  1  dDeclaredLoop (dWitnessedBar's)
-attribution              1  dDeclaredLoop (dWitnessedBar's)
-view                     1  dDeclaredLoop (dTotalRecall's)
 triage                   1  dPlacedRequest (dRankedPlan's)
 overlap                  1  dPlacedRequest (dIndexedDesign's)
-comparison               1  dPlacedRequest (dShippedRelease's)
 seams                    1  dFurnishedOrders (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
-plain-word hits on a non-ancestor's record kind: 118, over 42 kinds
+plain-word hits on a non-ancestor's record kind: 131, over 43 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -23984,7 +24500,7 @@ green run on the real table is in `[final]`.
 
 ````text
 $ python preset_check_canonical.py v2-round-count-over.md
-catalogue keys 261 · presettable 235 · preset rows 235
+catalogue keys 270 · presettable 244 · preset rows 244
 pair rule: velocity sets review.max-rounds 2 under review.design.round-count 3
 rc 1
 ````
@@ -24103,10 +24619,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:892 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:907 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:892 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:907 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -24115,7 +24631,7 @@ $ python map.py --check --plant no-records
 FINDING no stale facts: read no design record
 rc 1
 $ python map.py --check --plant adopter-unit
-FINDING adopter-free: dGroundRules plans 'the NicoCares adapter', which names an adopter
+FINDING adopter-free: dTrueNorth plans 'the NicoCares adapter', which names an adopter
 rc 1
 $ python map.py --check --plant adopter-key
 FINDING adopter-free: layer.instruction-NicoCares names an adopter
@@ -24154,13 +24670,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2620 nodes in 30 namespaces; 32160 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1810, derived 312, pending 498
-map: no stale facts read 64 records and 27 quotes of a map count or the critical path
+map: 2643 nodes in 30 namespaces; 32520 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1822, derived 321, pending 500
+map: no stale facts read 64 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 229 records, 3750 sections, 213 decision sections, 16 comparison areas, 40 principles
+atlas: derived — 229 records, 3755 sections, 214 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state
@@ -24178,8 +24694,8 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 21 · owned nodes read 491 · flow items read 90 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 118 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+chain rows 22 · owned nodes read 500 · flow items read 90 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 131 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
@@ -24211,7 +24727,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 378 · chain builds 21
+register keys 385 · chain builds 22
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -24219,13 +24735,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 261 · presettable 235 · preset rows 235
+catalogue keys 270 · presettable 244 · preset rows 244
 no findings
 rc 0
 
 $ critical path
-critical path: 263 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 11, dSafePassage 23, dFairHearing 40, dOrderedCharter 59, dDeclaredLoop 92, dPlacedRequest 111, dWitnessedBar 122, dKeptSession 138, dTotalRecall 147, dBoundRoles 148, dRankedPlan 162, dFurnishedOrders 168, dLinkedLibrary 172, dIndexedDesign 187, dWellOiledMachine 208, dScopedBuild 221, dTendedCadence 224, dMindYourWords 225, dShippedRelease 237, dCalibratedLens 241, dConvergedCharter 263
+critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dTrueNorth 6, dGroundRules 17, dSafePassage 30, dFairHearing 48, dOrderedCharter 67, dDeclaredLoop 101, dPlacedRequest 120, dWitnessedBar 131, dKeptSession 147, dBoundRoles 157, dTotalRecall 157, dRankedPlan 171, dFurnishedOrders 177, dLinkedLibrary 181, dIndexedDesign 197, dWellOiledMachine 217, dScopedBuild 231, dTendedCadence 233, dMindYourWords 234, dShippedRelease 246, dCalibratedLens 250, dConvergedCharter 272
 rc 0
 ````
 

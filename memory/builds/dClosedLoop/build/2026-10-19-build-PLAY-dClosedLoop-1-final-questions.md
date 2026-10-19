@@ -320,15 +320,16 @@ Routed to the audit's Stage 0 unless the fold settles them first:
 
 | Key | Stage | Sev | Gap | Owner |
 |---|---|---|---|---|
-| `gap-design-13` | Design | HIGH | Nothing joins a design clause to the spec that carries it: no spec of 1,322 binds to a design, and 218 of 498 owned design nodes are named in no clause of their owning build, so a dropped clause is found only if a review happens to run. | dIndexedDesign |
-| `gap-build-07` | Build | HIGH | A deviation is recorded but never gated: 176 spec revisions in 105 specs came after their unit's code started, and 1 spec audit of 669 pins the revision it read, so a spec and its code can move together with no reason or approver any check reads. | dScopedBuild |
-| `gap-mem-47` | Memory | MED | The design is amended in place: 347 `Revised:` paragraphs across 34 records carry its changes, two tables of one fact disagree (11 of 39 shared kind owners), and no view gives the design as built. | dLinkedLibrary |
+| `gap-design-13` | Design | HIGH | Nothing joins a design clause to the spec that carries it: no spec of 1,322 binds to a design, and 218 of 498 owned design nodes are named in no clause of their owning build, so a dropped clause is found only if a review happens to run. | dTrueNorth |
+| `gap-build-07` | Build | HIGH | A deviation is recorded but never gated: 176 spec revisions in 105 specs came after their unit's code started, and 1 spec audit of 669 pins the revision it read, so a spec and its code can move together with no reason or approver any check reads. | dTrueNorth |
+| `gap-mem-47` | Memory | MED | The design is amended in place: 347 `Revised:` paragraphs across 34 records carry its changes, two tables of one fact disagree (11 of 39 shared kind owners), and no view gives the design as built. | dTrueNorth |
 | `gap-found-35` | Foundation | HIGH | Help is gated only at the chain's last build: every earlier build ships user-facing surfaces under a prose rule that 6 of 216 product commits followed, and nothing reads `help/`. | dSafePassage |
 | `gap-found-36` | Foundation | MED | The product cannot explain itself to a human: rationale renders nowhere once the guides retire, and no registry row carries a human sentence (0 of 140 legs, 0 of 9 hook fragments, 0 of 29 kit descriptors). | dConvergedCharter |
 | `gap-mem-48` | Memory | MED | No atlas lives in the repository: the atlas is an online page derived from design records, and nothing renders the product's own registries for a human. | dTotalRecall |
 | `gap-review-22` | Review | MED | Design audits slice by lens and never walk a scenario through every step: their whole-design reads cite no item of six steps, 41% of the design records' lines were read by no review, and no audit measures its recall. | dFairHearing |
 
-The two HIGH controls' owners stand for the product. Under FQ-4 their first code lands in the bootstrap build.
+dTrueNorth owns the three gaps whose first code it lands, under FQ-4. dIndexedDesign, dScopedBuild and dDeclaredLoop
+then carry the controls into the product's stages.
 
 ## [forks] For the owner, 2026-10-19
 
@@ -357,3 +358,42 @@ The keys each recommendation brings, its answer the default and its options the 
 The researchers' finer keys (the coverage population, a stale pin's handling, derived specs, the atlas's page budget
 and diagrams, the walk's slicing and cell sampling) are left to the owning units' specs, each a value of these or a
 structural choice. `help.*` is used where the researchers wrote `docs.*`, since `doc` is a namespace word.
+
+## [answers] The owner's answers, 2026-10-19
+
+Put to the owner in two batches of four, each question with its recommendation first. The owner's words, verbatim:
+
+| Fork | The owner's answer |
+|---|---|
+| FQ-1 | "Paired walk + checks (Recommended)" |
+| FQ-2 | "Clause ids + join (Recommended)" |
+| FQ-3 | "Baseline + records (Recommended)" |
+| FQ-4 | "Bootstrap build (Recommended)" |
+| FQ-5 | "At dSafePassage (Recommended)" |
+| FQ-6 | "Render separately (Recommended)" |
+| FQ-7 | "Add P41 and P42 (Recommended)" |
+| FQ-8 | "Markdown + Mermaid (Recommended)" |
+
+All eight took the recommendation as offered. FQ-6 departs from the owner's SA-5 by the owner's own word: rationale
+renders, but only into its own tree, which no agent loads.
+
+## [folded] Where the answers went, 2026-10-19
+
+- **v2:** P41 and P42 join the principles. dTrueNorth opens the chain ahead of dGroundRules, whose parent it becomes,
+  with six units: the clause ids and what each spec carries, the carries join, the coverage report, the deviation
+  record and its population, audits pinned to the revision they read, and the as-built view. Nine keys join the
+  catalogue and every preset: `design.coverage` and `design.coverage.semantic` on dIndexedDesign, `deviation.gate` on
+  dScopedBuild, `deviation.approval` on dDeclaredLoop, `help.enforce` on dSafePassage, `help.explanation` on
+  dConvergedCharter, `help.atlas` on dTotalRecall, and `review.design-audit.runs` and `review.design-audit.seed` on
+  dFairHearing. Nine chain rows gain their part: dGroundRules' schema rows carry a summary and a usage; dSafePassage's
+  step gate gains the docs leg; dOrderedCharter's registry names `usage` and `help`, and its renderer writes the help
+  pages; dDeclaredLoop routes a deviation's approval; dIndexedDesign reads the coverage at each Design exit;
+  dScopedBuild gates deviations at the Build exit; dTotalRecall renders the atlas, taking dLinkedLibrary's atlas
+  clause; dFairHearing gains the walk; and dConvergedCharter renders rationale into its own tree and migrates the
+  hand-written pages. `[open]`'s SA-5 reading follows FQ-6.
+- **The gap register:** the seven gaps in [gaps], dTrueNorth owning the three whose first code it lands.
+- **systems, fates and the memory plan:** the `usage` field named, the rationale's own tree, and the help pages' fate
+  and node.
+- **The chain:** 22 builds, the critical path growing from 263 units at `590305b02` to 272.
+- **Not yet folded:** the clause ids, minted in a commit of their own by the instrument that mints them; the audit's
+  instruments; the audit; and the baseline after it.
